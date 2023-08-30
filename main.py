@@ -1,0 +1,83 @@
+import openpyxl
+import sys
+import open_pz
+# import plan.py
+from PyQt5.QtWidgets import QTextEdit
+from PyQt6 import QtWidgets, QtCore
+from PyQt6.QtWidgets import QApplication, QMainWindow, QTableWidget, QTableWidgetItem, QMenu, QMenuBar, QFileDialog
+
+class MyWindow(QMainWindow):
+
+    def __init__(self, parent = None):
+        super(MyWindow, self).__init__(parent)
+        self.setWindowTitle('Создание')
+        self.setGeometry(300, 250, 350, 200)
+        self.table_widget = QtWidgets.QTableWidget(self)
+        self.setCentralWidget(self.table_widget)
+
+        self.createMenuBar()
+
+
+    def createMenuBar(self):
+        self.menuBar = QMenuBar(self)
+        self.setMenuBar(self.menuBar)
+        self.fileMenu = QMenu('&Файл', self)
+        self.classifierMenu = QMenu('&Классификатор', self)
+        self.menuBar.addMenu(self.fileMenu)
+        self.menuBar.addMenu(self.classifierMenu)
+
+        self.create_file =self.fileMenu.addMenu('&Создать')
+        self.create_KRS = self.create_file.addAction('План КРС', self.action_clicked)
+        self.create_GNKT = self.create_file.addMenu('&План ГНКТ')
+        self.create_GNKT_OPZ = self.create_GNKT.addAction('ОПЗ', self.action_clicked)
+        self.create_GNKT_frez = self.create_GNKT.addAction('Фрезерование', self.action_clicked)
+        self.create_GNKT_GRP = self.create_GNKT.addAction('Освоение после ГРП', self.action_clicked)
+        self.create_PRS = self.create_file.addAction('План ПРС', self.action_clicked)
+        self.open_file = self.fileMenu.addAction('Открыть', self.action_clicked )
+        self.save_file = self.fileMenu.addAction('Сохранить', self.action_clicked)
+        self.save_file = self.fileMenu.addAction('Сохранить как', self.action_clicked)
+
+
+        class_well = self.classifierMenu.addAction('&классификатор')
+        list_without_jamming = self.classifierMenu.addAction('&Перечень без глушения')
+
+
+
+    @QtCore.pyqtSlot()
+    def action_clicked(self):
+        action = self.sender()
+        if action == self.create_KRS:
+
+            self.fname = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
+        "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
+            print(self.fname)
+
+
+            try:
+                values = open_pz.open_excel_file(self.fname[0])
+                self.table_widget.setRowCount(values.row)
+                self.table_widget.setColumnCount(13)
+                for row in values.iter_rows(values_only=True):
+                    for col, value in enumerate(row):
+                        item = QTableWidgetItem(str(value))
+                        self.table_widget.setItem(row, col, item)
+            except FileNotFoundError:
+                print('Файл не найден')
+
+            if action == self.save_file:
+                open_pz.open_excel_file().wb.save("test_unmerge.xlsx")
+
+
+
+
+
+            #
+
+def application():
+    app = QApplication(sys.argv)
+    window = MyWindow()
+    window.show()
+    sys.exit(app.exec())
+
+if __name__ == "__main__":
+    application()
