@@ -1,4 +1,5 @@
 import sys
+
 import openpyxl as op
 from openpyxl import Workbook, load_workbook
 from openpyxl.utils import get_column_letter
@@ -6,7 +7,8 @@ from copy import copy
 from openpyxl.utils.cell import range_boundaries
 import name
 from openpyxl.utils.cell import get_column_letter
-# file_path = '6147.xlsx'
+from openpyxl.styles import Border, Side, PatternFill, Font, GradientFill, Alignment
+import plan
 
 
 fname = '6147.xlsx'
@@ -19,7 +21,8 @@ def open_excel_file(fname):
     ws = wb.active
 
     wb2 = op.Workbook()
-    ws2 = wb2.active
+    ws2 = wb2.get_sheet_by_name('Sheet')
+    ws2.title = "План работ"
 
     column_additional = False
 
@@ -29,8 +32,8 @@ def open_excel_file(fname):
     values = []
     data_well_min = ''
     data_well_max = ''
-    data_X_min = ''
-    data_X_max = ''
+    data_x_min = ''
+    data_x_max = ''
     data_pvr_min = ''
     data_pvr_max = ''
     perforations_intervals = []
@@ -42,21 +45,21 @@ def open_excel_file(fname):
     column_additional_wall_thickness = ''
     data_column_additional = ''
     bottomhole_artificial = ''
-
+    row_expected = []
     for row_ind, row in enumerate(ws.iter_rows(values_only=True)):
         if 'Категория скважины' in row:
-            cat_well_min = row_ind  # индекс начала категории
+            cat_well_min = row_ind +1 # индекс начала категории
         elif 'План-заказ' in row:
             ws.cell(row = row_ind + 1, column = 2).value = 'ПЛАН РАБОТ'
             cat_well_max = row_ind - 1
             data_well_min = row_ind + 1
         elif 'IX. Мероприятия по предотвращению аварий, инцидентов и осложнений::' in row:
-            data_well_max = row_ind -1
+            data_well_max = row_ind - 1
         elif 'X. Ожидаемые показатели после ремонта:' in row:
-            data_X_min = row_ind
+            data_x_min = row_ind
+
         elif 'ХI Планируемый объём работ:' in row:
             data_x_max = row_ind
-
 
         elif 'II. История эксплуатации скважины' in row:
             data_pvr_max = row_ind - 2
@@ -139,91 +142,153 @@ def open_excel_file(fname):
                 paker_do = row[col+4]
                 H_F_paker_do = ws.cell(row=row_ind+4, column = col+5).value
 
+    list_block_append = [cat_well_min, data_well_min+1, data_well_max]
+
+    for j in range(data_x_min, data_x_max): # Ожидаемые показатели после ремонта
+        lst = []
+        for i in range(0, 12):
+           lst.append(ws.cell(row=j+1, column=i + 1).value)
+        row_expected.append(lst)
+
+    bound = []
+    for _range in ws.merged_cells.ranges:
+        boundaries = range_boundaries(str(_range))
+        if data_pvr_min+2 <= boundaries[1] <= data_pvr_max+2:
+            bound.append(boundaries)
+            # ws2.unmerge_cells(start_column=boundaries[0], start_row=boundaries[1] + len(name.razdel_1) + 1,
+            #                end_column=boundaries[2], end_row=boundaries[3] + len(name.razdel_1) + 1)
+        elif boundaries[1] >= data_well_max+3:
+            bound.append(boundaries)
+        else:
+            ws2.merge_cells(start_column=boundaries[0], start_row=boundaries[1]+len(name.razdel_1)+1,
+                        end_column=boundaries[2], end_row=boundaries[3]+len(name.razdel_1)+1)
+
 
     for j in range(data_pvr_min, data_pvr_max): # Сортировка интервала перфорации
         lst = []
-        for i in range(11):
-            if type(ws.cell(row=j+2, column=i+1).value) == float:
-                lst.append(round(ws.cell(row=j+2, column=i+1).value, 1))
+        for i in range(1,12):
+            if type(ws.cell(row=j+1, column=i+1).value) == float:
+                lst.append(round(ws.cell(row=j+1, column=i+1).value, 1))
             else:
                 lst.append(ws.cell(row=j+2, column=i+1).value)
         perforations_intervals.append(lst)
+    perforations_intervals = sorted(perforations_intervals, key = lambda x: x[3])
 
-    # sorted_perforations_intervals = sorted(perforations_intervals, key = lambda x: x[3])
-    head = f'A{cat_well_min}:S{data_x_max}'
-    print(head)
-    for _range in ws.merged_cells.ranges:
-        boundaries = range_boundaries(str(_range))
-        ws2.merge_cells(start_column=boundaries[0], start_row=boundaries[1]+len(name.razdel_1)+1,
-                        end_column=boundaries[2], end_row=boundaries[3]+len(name.razdel_1)+1)
-
-    for row_number, row in enumerate(ws[head]):
-        for col_number, cell in enumerate(row):
-            ws2.cell(row_number + 1 + len(name.razdel_1) + cat_well_min, col_number + 1, cell.value)
-            if cell.has_style:
-                ws2.cell(row_number + 1 + len(name.razdel_1) + cat_well_min, col_number + 1).font = copy(cell.font)
-                ws2.cell(row_number + 1 + len(name.razdel_1) + cat_well_min, col_number + 1).fill = copy(cell.fill)
-                ws2.cell(row_number + 1 + len(name.razdel_1) + cat_well_min, col_number + 1).border = copy(cell.border)
-                ws2.cell(row_number + 1 + len(name.razdel_1) + cat_well_min, col_number + 1).number_format = copy(cell.number_format)
-                ws2.cell(row_number + 1 + len(name.razdel_1) + cat_well_min, col_number + 1).protection = copy(cell.protection)
-                ws2.cell(row_number + 1 + len(name.razdel_1) + cat_well_min, col_number + 1).alignment = copy(cell.alignment)
-                ws2.cell(row_number + 1 + len(name.razdel_1) + cat_well_min, col_number + 1).quotePrefix = copy(cell.quotePrefix)
-                ws2.cell(row_number + 1 + len(name.razdel_1) + cat_well_min, col_number + 1).pivotButton = copy(cell.pivotButton)
+    ins_ind = len(name.razdel_1) + cat_well_min
+    print(ins_ind)
+    for i in range(1, len(list_block_append)): # цикл добавления блоков план-заказов
+        head = plan.head_ind(list_block_append[i-1], list_block_append[i]+2)
+        name_values = name.razdel_1
+        index_row = list_block_append[i-1]
+        ins_ind += (list_block_append[i]+2-list_block_append[i-1])
+        print(ins_ind)
+        plan.copy_row(ws, ws2, name_values, index_row, head)
 
 
+    thin_border = Border(left=Side(style='thin'),
+                         right=Side(style='thin'),
+                         top=Side(style='thin'),
+                         bottom=Side(style='thin'))
 
+    for i in range(1, len(perforations_intervals)+1):  # Добавление данных по интервалу перфорации
+        for j in range(1, 12):
 
+            ws2.cell(row=i + data_pvr_min + len(name.razdel_1) + 2, column=j + 1).border = thin_border
+            ws2.cell(row=i + data_pvr_min + len(name.razdel_1) + 2, column=j + 1).font = 'Arial'
+            ws2.cell(row=i + data_pvr_min + len(name.razdel_1) + 2, column=j + 1).alignment = Alignment(wrap_text=True)
+            ws2.cell(row=i+data_pvr_min + len(name.razdel_1)+2, column=j+1).value = perforations_intervals[i-1][j-1]
+    print(list_block_append[-1] - 4 - len(name.razdel_1))
+    for i in range(ins_ind, ins_ind + len(name.events_gnvp)):
+        ws2.merge_cells(start_row=i, start_column=2, end_row=i, end_column=12)
+
+        for j in range(2):
+
+            if i == ins_ind + 13 or i == ins_ind + 28:
+                ws2.cell(row=i, column=1 + 1).alignment = Alignment(wrap_text=True, horizontal='center', vertical='center')
+                ws2.cell(row=i, column=1 + 1).font = Font(name='Arial',size = 13, bold = True)
+
+                ws2.cell(row=i, column=1 + 1).value = name.events_gnvp[i - ins_ind][j]
+            else:
+                ws2.cell(row=i, column=j + 1).alignment = Alignment(wrap_text=True, horizontal='left', vertical='top')
+                ws2.cell(row=i, column=j + 1).font = Font(name='Arial',size = 12)
+
+                ws2.cell(row=i, column=j + 1 ).value = name.events_gnvp[i-ins_ind][j]
+    ins_ind += len(name.events_gnvp)-1
 
     for i in range(1, len(name.razdel_1)): # Добавлением подписантов на вверху
         for j in range(1, 13):
+
             ws2.cell(row = i, column = j).value = name.razdel_1[i-1][j-1]
+            ws2.cell(row=i, column=j).font = Font(name='Arial',size = 13, bold = False)
     for i in range(1, 16):
         ws2.merge_cells(start_row=i, start_column = 2, end_row =i, end_column = 7)
         ws2.merge_cells(start_row=i, start_column=9, end_row=i, end_column=13)
 
-    for i in range(data_x_max, len(name.itog_1)+data_x_max+1): # Добавлением подписантов на внизу
-
-        for j in range(1, 13):
-            ws2.cell(row = i+data_x_max+1, column = j).value = name.itog_1[i+data_x_max+1][j-1]
 
 
 
-    ws2.row_dimensions[2].height = 25
-    ws2.row_dimensions[6].height = 25
+    ws2.row_dimensions[2].height = 30
+    ws2.row_dimensions[6].height = 30
 
     for row in range(1, 16):
-
-        for col in range(1, 13):
+       for col in range(1, 13):
             ws2.cell(row = row, column = col).alignment = ws2.cell(row = row, column = col).alignment.copy(wrapText=True)
+            ws2.cell(row= row, column=j + col).font = 'Arial'
     lst2 = []
     for j in range(1, max_rows):
-
         lst3 = []
         for i in range(1, 13):
             lst3.append(ws2.cell(row=j, column = i).value)
         lst2.append(lst3)
-    # print(lst2)
+    #print(lst2)
     # data_main_production_string = ws.cell(row=int(ind_data_main_production_string[1:])+1, column=int(ind_data_main_production_string[0])+2).value
-    for i in range(1, 15):
-        ws2.column_dimensions[get_column_letter(i)].width = 15
+
+    rowHeights_gnvp = [95.0, 155.5, 110.25, 36.0, 52.25, 36.25, 36.0, 45.25, 20.25, 135.75, 38.5, 30.25, 30.5,
+                       18.0, 50.5, 21.75, 240.75, 125.0, 66.75, 48.0, 33.0, 38.25, 45.0, 32.25, 45.75, 30.75, 32.25,
+                       310.0, 21.75, 50.25, 57.25, 78.75, 64.5, 25.0, 25.0, 25.0, 25.0]
+
+    rowHeights = [ws.row_dimensions[i + 1].height  for i in range(data_well_max+2)] + rowHeights_gnvp
+    colWidth = [ws.column_dimensions[get_column_letter(i + 1)].width for i in range(0, 13)] + [None]
+
+    for index_row, row in enumerate(ws2.iter_rows()): # Копирование высоты строки
+       if len(rowHeights) >= index_row:
+           ws2.row_dimensions[index_row+len(name.razdel_1)+1].height = rowHeights[index_row-1]
+       for col_ind, col in enumerate(row):
+
+           if col_ind <= 12:
+               ws2.column_dimensions[get_column_letter(col_ind+1)].width = colWidth[col_ind]
+           else:
+               break
+    ws2.unmerge_cells(start_column=2, start_row=ins_ind,end_column=12, end_row=ins_ind)
+    print(ins_ind)
+    row_expected = row_expected[::-1]
+    for i in range(len(row_expected)):  # Добавление данных по интервалу перфорации
+        for j in range(1, 13):
+            ws2.cell(row=i+ins_ind, column=j).font = Font(name='Arial',size = 13, bold = True)
+            ws2.cell(row=i+ins_ind, column=j).alignment = Alignment(wrap_text=True, horizontal='center', vertical='center')
+            ws2.cell(row=i+ins_ind, column=j).value = row_expected[i-1][j-1]
+
+        ws2.merge_cells(start_column=2, start_row=ins_ind, end_column=12, end_row=ins_ind)
+    print(row_expected)
 
 
-    print(f' номер скважины -{well_number}'\
-          f' месторождение скважины - {oilfield} '\
-          f' площадь - {well_area}'\
-          f' ЦДНГ - {cdng}' 
-          f' диаметр колонны - {column_diametr}  {wall_thickness} - {shoe_column}'
-          f' макс угол {max_angle} на глубине  {max_h_angle}'\
-          f' {data_column_additional}'\
-          f' доп колонна {head_column_additional} - {shoe_column_additional}'
-          f'по Рпл - {cat_P_1},'
-          f'по H2S - {int(cat_H2S_1)},'
-          f' Диаметр доп коллоны - {column_additional_diametr} - {column_additional_wall_thickness},'
-          f' Максимальное давление опрессовки - {max_expected_pressure},'
-          f' максимальное ожидаемое давление - {max_admissible_pressure },'
-          f' Фондовый пакер в скважине {paker_do} на глубине {H_F_paker_do}')
+    # print(f' номер скважины -{well_number}'\
+    #       f' месторождение скважины - {oilfield} '\
+    #       f' площадь - {well_area}'\
+    #       f' ЦДНГ - {cdng}'
+    #       f' диаметр колонны - {column_diametr}  {wall_thickness} - {shoe_column}'
+    #       f' макс угол {max_angle} на глубине  {max_h_angle}'\
+    #       f' {data_column_additional}'\
+    #       f' доп колонна {head_column_additional} - {shoe_column_additional}'
+    #       f'по Рпл - {cat_P_1},'
+    #       f'по H2S - {int(cat_H2S_1)},'
+    #       f' Диаметр доп коллоны - {column_additional_diametr} - {column_additional_wall_thickness},'
+    #       f' Максимальное давление опрессовки - {max_expected_pressure},'
+    #       f' максимальное ожидаемое давление - {max_admissible_pressure },'
+    #       f' Фондовый пакер в скважине {paker_do} на глубине {H_F_paker_do}')
 
 
     wb2.save('123.xlsx')
 print(open_excel_file('Копия 212г ГОНС.xlsx'))
 
+# imp
