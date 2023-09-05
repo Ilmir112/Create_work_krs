@@ -74,3 +74,4 @@ def xls_to_xlsx(*args, **kw):
                 for cell in sheet_xls.row_slice(row, end_colx=sheet_xls.row_len(row))
             ))
     return book_xlsx
+

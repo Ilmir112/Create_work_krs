@@ -7,6 +7,7 @@ from PyQt6 import QtWidgets, QtCore
 from PyQt6.QtWidgets import QApplication, QMainWindow, QTableWidget, QTableWidgetItem, QMenu, QMenuBar, QFileDialog
 
 class MyWindow(QMainWindow):
+    fname = ''
 
     def __init__(self, parent = None):
         super(MyWindow, self).__init__(parent)
@@ -14,10 +15,7 @@ class MyWindow(QMainWindow):
         self.setGeometry(300, 250, 350, 200)
         self.table_widget = QtWidgets.QTableWidget(self)
         self.setCentralWidget(self.table_widget)
-
         self.createMenuBar()
-
-
     def createMenuBar(self):
         self.menuBar = QMenuBar(self)
         self.setMenuBar(self.menuBar)
@@ -50,28 +48,41 @@ class MyWindow(QMainWindow):
 
             self.fname = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
         "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
-            print(self.fname)
+            #self.fname ='6147.xlsx'
 
 
             try:
-                values = open_pz.open_excel_file(self.fname[0])
-                self.table_widget.setRowCount(values.row)
-                self.table_widget.setColumnCount(13)
-                for row in values.iter_rows(values_only=True):
-                    for col, value in enumerate(row):
-                        item = QTableWidgetItem(str(value))
-                        self.table_widget.setItem(row, col, item)
+                sheet = open_pz.Create_PZ.open_excel_file(self, self.fname[0])
+                rows = sheet.max_row
+                merged_cells = sheet.merged_cells
+                cols = 13
+                self.table_widget.setRowCount(rows)
+                self.table_widget.setColumnCount(cols)
+                for row in range(1, rows + 1):
+                    for col in range(1, cols + 1):
+                        if sheet.cell(row=row, column=col).value != None:
+                            cell_value = str(sheet.cell(row=row, column=col).value)
+                            item = QtWidgets.QTableWidgetItem(cell_value)
+                            self.table_widget.setItem(row - 1, col - 1, item)
+                            # Проверяем, является ли текущая ячейка объединенной
+                            for merged_cell in merged_cells:
+                                if row in range(merged_cell.min_row, merged_cell.max_row + 1) and \
+                                        col in range(merged_cell.min_col, merged_cell.max_col + 1):
+                                    # Устанавливаем количество объединяемых строк и столбцов для текущей ячейки
+                                    self.table_widget.setSpan(row - 1, col - 1, merged_cell.max_row - merged_cell.min_row + 1,
+                                                       merged_cell.max_col - merged_cell.min_col + 1)
+                # self.table_widget.setHorizontalHeaderLabels(
+                #     [str(sheet.cell(row=1, column=col).value) for col in range(1, cols + 1)])
+                # self.table_widget.setVerticalHeaderLabels(
+                #     [str(sheet.cell(row=row, column=1).value) for row in range(1, rows + 1)])
+                self.table_widget.resizeColumnsToContents()
+
             except FileNotFoundError:
                 print('Файл не найден')
 
             if action == self.save_file:
                 open_pz.open_excel_file().wb.save("test_unmerge.xlsx")
 
-
-
-
-
-            #
 
 def application():
     app = QApplication(sys.argv)
