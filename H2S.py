@@ -1,164 +1,180 @@
 import openpyxl
+from openpyxl.styles import Border, Side, PatternFill, Font, GradientFill, Alignment
+from openpyxl.utils.cell import get_column_letter
 
 
+def calc_H2S(self, wb2, H2S_pr, H2S_mg):
+    from open_pz import Create_PZ
+    ws3 = wb2["Расчет необходимого количества поглотителя H2S"]
+    nkt_1 = int(list(self.dict_nkt.keys())[0])
+    nkt_1_l = self.dict_nkt[nkt_1]
 
-def calc_SNPKH(self, wb2):
+    try:
+        nkt_2 = int(list(self.dict_nkt.keys())[1])
+        nkt_2_l = self.dict_nkt[nkt_2]
+    except:
+        nkt_2 = 0
+        nkt_2_l = 0
 
-    import open_pz
-    head_column_additional = open_pz.Create_PZ.head_column_additional
-    shoe_column_additional = open_pz.Create_PZ.shoe_column_additional
-    column_additional_diametr = open_pz.Create_PZ.column_additional_diametr
-    column_additional_wall_thickness = open_pz.Create_PZ.column_additional_wall_thickness
-    column_additional_diametr = open_pz.Create_PZ.column_additional_diametr
-    column_additional_wall_thickness = open_pz.Create_PZ.column_additional_wall_thickness
-    data_column_additional = open_pz.Create_PZ.data_column_additional
-    bottomhole_artificial = open_pz.Create_PZ.bottomhole_artificial
+    def well_volume():
+        if self.column_additional == False:
+            volume_well = 3.14 * (self.column_diametr - self.column_wall_thickness * 2) ** 2 / 4 / 1000000 * (
+                self.bottomhole_artificial)
+            return volume_well
+        else:
+
+            volume_well = (3.14 * (self.column_additional_diametr - self.column_wall_thickness * 2) ** 2 / 4 / 1000 * (
+                        self.bottomhole_artificial - self.head_column_additional) / 1000) + (
+                                      3.14 * (self.column_diametr - self.column_wall_thickness * 2) ** 2 / 4 / 1000 * (
+                                  self.head_column_additional) / 1000)
+            return volume_well
+
+    def gno_volume():
+        nkt_l = sum(list(self.dict_nkt.values()))
+        print(nkt_l)
+        if self.column_additional == True:
+
+            gno_well = 3.14*(self.column_diametr-self.column_wall_thickness*2)**2/4/1000*(self.current_bottom-self.head_column_additional)/1000/10
+        else:
+            if nkt_l < self.shoe_column:
+                gno_well = (3.14*(self.column_diametr-self.column_wall_thickness*2)**2/4/1000*(self.current_bottom-self.head_column_additional)/1000)+(3.14*(self.column_diametr-self.column_wall_thickness*2)**2/4/1000*(self.shoe_column-nkt_l)/1000)
+            else:
+                gno_well = 3.14*(self.column_additional_diametr-self.column_additional_wall_thickness*2)**2/4/1000*(self.current_bottom-nkt_1_l)/10000
+        return gno_well
+
+    print(gno_volume())
+    try:
+        nkt_3 = int(list(self.dict_nkt.keys())[2])
+    except:
+        nkt_3 = 0
+    try:
+        sucker_rod_l_25 = self.dict_sucker_rod[25]
+    except:
+        sucker_rod_l_25 = 0
+    try:
+        sucker_rod_l_22 = self.dict_sucker_rod[22]
+    except:
+        sucker_rod_l_22 = 0
+    try:
+        sucker_rod_l_19 = self.dict_sucker_rod[19]
+    except:
+        sucker_rod_l_19 = 0
 
     SNPKH = [
-        ['Расчет расхода нейтрализатора сероводорода на модификацию раствора глушения*', None, None, None, None, None,
-         None,
-         None, None, None, None, None],
-        ['Масса нейтрализатора сероводорода - по результатам расчета*', None, None, None, None, None, None, None,
-         None, None, None, None],
-        ['Объем раствора глушения - по объему скважины от устья до забоя', None, None, None, None, None, None, None,
-         None, None, None, None],
-        [None, None, None, None, None, None, None, None, None, None, None, None],
-        ['№', 'Параметр', None, 'Результат расчета', None, None, None, None, None, None, None, None],
-        [1, 'Параметры скважины', None, 'скв. 1', None, None, None, None, None, None, None, None],
-        [1.1, 'Забой скважины', 'м', open_pz.Create_PZ.bottomhole_artificial, 'формула', None, None, None, None, None,
-         None, None],
-        [1.2, 'текущий забой', 'м', 1350.4, 'ввод', None, None, None, None, None, None, None],
-        [1.3, 'Диаметр ЭК (ступень 1 верхняя)', 'мм', 114, 'ввод', None, None, None, None, None, None, None],
-        ['1.3.1.', 'Толщина стенки ЭК (ступень 1 верхняя)', 'мм', 7.7, 'ввод', None, None, None, None, None, None,
+        [None, 'Расчет расхода нейтрализатора сероводорода на модификацию раствора глушения*', None, None, None,
          None],
-        ['1.3.2.', 'Длина подвески ЭК (ступень 1 верхняя)', 'м', 1350.4, 'ввод', None, None, None, None, None, None,
+        [None, 'Масса нейтрализатора сероводорода - по результатам расчета*', None, None, None, None],
+        [None, 'Объем раствора глушения - по объему скважины от устья до забоя', None, None, None, None],
+        [None, None, None, None, None, None],
+        [None, '№', 'Параметр', None, 'Результат расчета', None],
+        [None, 1, 'Параметры скважины', None, f'{self.well_number} {self.well_area}', None],
+        [None, 1.1, 'Забой скважины', 'м', float(self.bottomhole_artificial), 'формула'],
+        [None, 1.2, 'текущий забой', 'м', float(self.bottomhole_artificial), 'ввод'],
+        [None, 1.3, 'Диаметр ЭК (ступень 1 верхняя)', 'мм', int(self.column_diametr), 'ввод'],
+            [None, '1.3.1.', 'Толщина стенки ЭК (ступень 1 верхняя)', 'мм', float(self.column_wall_thickness), 'ввод'],
+        [None, '1.3.2.', 'Длина подвески ЭК (ступень 1 верхняя)', 'м', int(self.shoe_column), 'ввод'],
+        [None, '1.3.3.', 'Диаметр ЭК (ступень 2 хвостовик)', 'мм', int(self.column_additional_diametr), 'ввод'],
+        [None, '1.3.4.', 'Толщина стенки ЭК (ступень 2 хвостовик)', 'м', float(self.column_additional_wall_thickness),
+         'ввод'],
+        [None, '1.3.5.', 'Длина подвески ЭК (ступень 2 хвостовик)', 'м',
+         abs(int(self.head_column_additional) - int(self.shoe_column_additional)), 'ввод'],
+        [None, '1.3.6.', 'Глубина "головы" (ступень 2 хвостовик)', 'м', int(self.head_column_additional), 'ввод',
+         ],
+        [None, '1.3.7.', 'Глубина "башмака" (ступень 2 хвостовик)', 'м', int(self.shoe_column_additional),
+         'формула'],
+        [None, None, None, None, None, None],
+        [None, 2, 'Параметры ГНО', None, None, None, None],
+        [None, '2.1.', 'Общая глубина подвески НКТ', 'м', '=E22+E25', 'формула'],
+        [None, '1.4.1', 'Толщина стенки подвески НКТ (ступень 1 верхняя)', 'мм', 5.5, 'ввод'],
+        [None, '1.4.2', 'Внешний диаметр подвески НКТ (ступень 1 верхняя)', 'мм', nkt_1, 'ввод'],
+        [None, '1.4.3', 'Длина подвески НКТ (ступень 1 верхняя)', 'м', nkt_1_l, 'ввод'],
+        [None, '1.4.4', 'Толщина стенки подвески НКТ (ступень 2 нижняя)', 'мм', 0, 'ввод'],
+        [None, '1.4.5', 'Внешний диаметр подвески НКТ (ступень 2 нижняя)', 'мм', nkt_2, 'ввод'],
+        [None, '1.4.6', 'Длина подвески НКТ (ступень 2 нижняя)', 'м', nkt_2_l, 'ввод'],
+        [None, '2.2', 'Общая глубина подвески штанг', 'м', '=E27+E28+E29', 'формула'],
+        [None, '2.2.1.', 'Длина штанг 25 мм', 'м', sucker_rod_l_25, 'ввод'],
+        [None, '2.2.2.', 'Длина штанг 22 мм', 'м', sucker_rod_l_22, 'ввод'],
+        [None, '2.2.3.', 'Длина штанг 19 мм', 'м', sucker_rod_l_19, 'ввод'],
+        [None, 3, 'Расчеты емкости', None, None, None, None],
+        [None, 3.1, 'Удельный  внутренний объем ЭК', 'дм3/м', "=10*3.14*((E9-E10*2)*0.01)^2/4", 'формула'],
+        [None, 3.2, 'Удельный  внутренний объем хвостовика', 'дм3/м', '=10*3.14*((E12-E13*2)*0.01)^2/4', 'формула'],
+        [None, 3.3, 'Объем жидкости под ГНО, в т.ч.:', 'м3', '=if(E14=0,(3.14*(E9-E10*2)^2/4/1000*(E8-E19)/1000),if(E19<E16,(3.14*(E12-E13*2)^2/4/1000*(E8-E19)/1000),((3.14*(E12-E13*2)^2/4/1000*(E14)/1000) +3.14*(E9-E10*2)^2/4/1000*(E19-E15)/1000 )))', 'формула'],
+        [None, '3.3.1.', 'Объем скважины', 'м3', '=if(E14=0,3.14*(E9-E10*2)^2/4/1000*(E8)/1000,(3.14*(E12-E13*2)^2/4/1000*(E8-E15)/1000)+(3.14*(E9-E10*2)^2/4/1000*(E11)/1000))', 'формула'],
+        [None, '3.3.1.', 'Удельное водоизмещение подвески НКТ (ступень 1 верхняя)', 'дм3/м',
+         '=10*3.14*((E21*0.01)^2-(E21*0.01-E20*2*0.01)^2)/4',
+         'формула'],
+        [None, '3.3.2.', 'Удельное водоизмещение подвески НКТ  (ступень 2 нижняя)', 'дм3/м',
+         '=10*3.14*((E24*0.01)^2-(E24*0.01-E23*2*0.01)^2)/4', 'формула',],
+        [None, '3.3.3.', 'Водоизмещение подвески НКТ (объем жидкости притока при СПО)', 'м3/СПО',
+         '=(E22*E35/1000) +(E25*E36/1000)', 'формула'],
+        [None, '3.3.4.', 'Водоизмещение подвески штанг (объем жидкости притока при СПО)', 'м3/СПО',
+         '=(10*3.14*((25*0.01)^2/4)*E27/1000)+(10*3.14*((22*0.01)^2/4)*E28/1000)+(10*3.14*((19*0.01)^2/4)*E29/1000)',
+         'формула'],
+        [None, None, None, None, None, None],
+        [None, 4, 'Параметры добываемой жидкости и газа', None, None, None, None],
+        [None, 4.1, 'Газосодержание нефти', 'м3/тонну', self.gaz_f_pr, 'ввод'],
+        [None, 4.2, 'Содержание сероводорода в газе (по данным проекта разработки)', '% (об)', H2S_pr[0], 'ввод'],
+        [None, 4.3, 'Обводенность продукции', '% (масс.)', self.water_cut, 'ввод'],
+        [None, 4.4, 'Содержание сероводорода в пластовом флюиде (устьевая проба, вода+нефть)', 'мг/дм3', H2S_mg[0], 'ввод'],
+        [None, 4.5, 'Плотность воды', 'г/см3', 1.17, 'ввод'],
+        [None, 4.6, 'Плотность нефти', 'г/см3', 0.9, 'ввод'],
+        [None, None, None, None, None, None],
+        [None, 5, 'Расчет массы сероводорода в жидкости притока (в объеме водоизмещения подвески НКТ и штанг)', None, None, None],
+        [None, 5.1, 'Масса нефти ', 'т', '=(E37+E38)*(100-E43)*E46/100', 'формула'],
+        [None, 5.2, 'Объем сероводорода, м3', 'м3', '=E41*E49*E42/100', 'формула'],
+        [None, 5.3, 'Масса сероводорода в нефти (выделяющаяся в газовую фазу при снижении давления)', 'г',
+         '=(34*E50*1000/22,14)','формула'],
+        [None, 5.4, 'Масса сероводорода в жидкости (остаточная растворенная часть)', 'г', '=(E37+E38)*E44', 'формула'],
+        [None, None, None, None, None, None],
+        [None, 6, 'Расчет массы сероводорода в поднасосной жидкости (в объеме скважины под ГНО)', None, None, None],
+        [None, 6.1, 'Масса нефти ', 'т', '=E33*(100-E43)*E46/100    ', 'формула'],
+        [None, 6.2, 'Объем сероводорода, м3', 'м3', '=E41*E55*E42/100   ', 'формула'],
+        [None, 6.3, 'Масса сероводорода в нефти (доля, выделяющаяся в газовую фазу при снижении давления)', 'г',
+         '=(34*E56*1000/22,14)  ', 'формула'],
+        [None, 6.4, 'Масса сероводорода в жидкости (остаточная растворенная часть)', 'г', '=E33*E44',
+         'формула'],
+        [None, None, None, None, None, None],
+        [None, 7, 'Масса сероводорода общая', 'г', '=E51+E52+E57+E58', 'формула'],
+        [None, None, None, None, None, None],
+        [None, 8, 'Параметр нейтрализатора сероводорода', None, None, None],
+        [None, 8.1, 'Емкость реагента по сероводороду (определяется по результатам ЛИ конкретной марки)', 'г/г H2S',
+         24,'ввод'],
+        [None, 8.2, 'Плотность товарной формы (марки) реагента (по ТУ)', 'г/см3', 1.065, 'ввод'],
+        [None, None, None, None, None, None],
+        [None, 9, 'Результат расчета расхода нейтрализатора сероводорода', None, None, None],
+        [None, 9.1, 'Расчетная масса реагента', 'кг', '=E63*E60/1000', 'формула'],
+        [None, 9.2, 'Коэффициент запаса по реагенту (решение ОГ)', 'крат', 1.25, 'ввод'],
+        [None, 9.3, 'Масса реагента с запасом', 'кг', '=E67*E68', 'формула', None, None, None],
+        [None, None, None, None, None, None],
+        [None, 10, 'Удельный расход нейтрализатора сероводорода в растворе глушения', None, None, None],
+        [None, 10.1, 'Удельный массовый расход нейтрализатора сероводорода ', 'кг/м3', '=E69/E34', 'формула'],
+        [None, 10.2, 'Удельный объемный расход нейтрализатора сероводорода ', 'м3/м3', '=E72/E64','формула'],
+        [ 'Примечание: * - расчет приблизительный, поскольку нет информации по содержанию H2S в каждой фазе (вода, нефть, газ) в одинаковых условиях',
+            None, None, None, None, None, ],
+        [None, None, None, None, None, None],
+        [None, 'Ячейки для заполнения данными параметров скважины', None, None, None, None],
+        [None, 'По данным конструкции скважины', None, None, None, None],
+        [None, None, None, None, None, None],
+        [None, None, None, None, None, None],
+        [None, 'По данным лабораторных исследований марки нейтрализатора сероводорода', None, None, None, None,
          None],
-        ['1.3.3.', 'Диаметр ЭК (ступень 2 хвостовик)', 'мм', 0, 'ввод', None, None, None, None, None, None, None],
-        ['1.3.4.', 'Толщина стенки ЭК (ступень 2 хвостовик)', 'м', 0, 'ввод', None, None, None, None, None, None, None],
-        ['1.3.5.', 'Длина подвески ЭК (ступень 2 хвостовик)', 'м', 0, 'ввод', None, None, None, None, None, None, None],
-        ['1.3.6.', 'Глубина "головы" (ступень 2 хвостовик)', 'м', 0, 'ввод', None, None, None, None, None, None, None],
-        ['1.3.7.', 'Глубина "башмака" (ступень 2 хвостовик)', 'м', 0, 'формула', None, None, None, None, None, None,
-         None],
-        [None, None, None, None, None, None, None, None, None, None, None, None],
-        [2, 'Параметры ГНО', None, None, None, None, None, None, None, None, None, None],
-        ['2.1.', 'Общая глубина подвески НКТ', 'м', 1340.8, 'формула', None, None, None, None, None, None, None],
-        ['1.4.1', 'Толщина стенки подвески НКТ (ступень 1 верхняя)', 'мм', 5.5, 'ввод', None, None, None, None, None,
-         None, None],
-        ['1.4.2', 'Внешний диаметр подвески НКТ (ступень 1 верхняя)', 'мм', 73, 'ввод', None, None, None, None, None,
-         None, None],
-        ['1.4.3', 'Длина подвески НКТ (ступень 1 верхняя)', 'м', None, 'ввод', None, None, None, None, None, None,
-         None],
-        ['1.4.4', 'Толщина стенки подвески НКТ (ступень 2 нижняя)', 'мм', None, 'ввод', None, None, None, None, None,
-         None, None],
-        ['1.4.5', 'Внешний диаметр подвески НКТ (ступень 2 нижняя)', 'мм', None, 'ввод', None, None, None, None, None,
-         None, None],
-        ['1.4.6', 'Длина подвески НКТ (ступень 2 нижняя)', 'м', None, 'ввод', None, None, None, None, None, None, None],
-        ['2.2', 'Общая глубина подвески штанг', 'м', 1340.8, 'формула', None, None, None, None, None, None, None],
-        ['2.2.1.', 'Длина штанг 25 мм', 'м', None, 'ввод', None, None, None, None, None, None, None],
-        ['2.2.2.', 'Длина штанг 22 мм', 'м', None, 'ввод', None, None, None, None, None, None, None],
-        ['2.2.3.', 'Длина штанг 19 мм', 'м', None, 'ввод', None, None, None, None, None, None, None],
-        [3, 'Расчеты емкости', None, None, None, None, None, None, None, None, None, None],
-        [3.1, 'Удельный  внутренний объем ЭК', 'дм3/м', 7.6317386, 'формула', None, None, None, None, None, None, None],
-        [3.2, 'Удельный  внутренний объем хвостовика', 'дм3/м', 0, 'формула', None, None, None, None, None, None, None],
-        [3.3, 'Объем жидкости под ГНО, в т.ч.:', 'м3', 0.07326469056000103, 'формула', None, None, None, None, None,
-         None, None],
-        ['3.3.1.', 'Объем скважины', 'м3', 10.30589980544, 'формула', None, None, None, None, None, None, None],
-        ['3.3.1.', 'Удельное водоизмещение подвески НКТ (ступень 1 верхняя)', 'дм3/м', 1.1657249999999995, 'формула',
-         None, None, None,
-         None, None, None, None],
-        ['3.3.2.', 'Удельное водоизмещение подвески НКТ  (ступень 2 нижняя)', 'дм3/м', 0, 'формула', None, None, None,
-         None,
-         None, None, None],
-        ['3.3.3.', 'Водоизмещение подвески НКТ (объем жидкости притока при СПО)', 'м3/СПО', 0, 'формула', None, None,
-         None,
-         None, None, None, None],
-        ['3.3.4.', 'Водоизмещение подвески штанг (объем жидкости притока при СПО)', 'м3/СПО', 0, 'формула', None, None,
-         None, None,
-         None, None, None],
-        [None, None, None, None, None, None, None, None, None, None, None, None],
-        [4, 'Параметры добываемой жидкости и газа', None, None, None, None, None, None, None, None, None, None],
-        [4.1, 'Газосодержание нефти', 'м3/тонну', 5.9, 'ввод', None, None, None, None, None, None, None],
-        [4.2, 'Содержание сероводорода в газе (по данным проекта разработки)', '% (об)', 0.3, 'ввод', None, None, None,
-         None, None, None, None],
-        [4.3, 'Обводенность продукции', '% (масс.)', 80.5, 'ввод', None, None, None, None, None, None, None],
-        [4.4, 'Содержание сероводорода в пластовом флюиде (устьевая проба, вода+нефть)', 'мг/дм3', 50, 'ввод', None,
-         None,
-         None, None, None, None, None],
-        [4.5, 'Плотность воды', 'г/см3', 1.17, 'ввод', None, None, None, None, None, None, None],
-        [4.6, 'Плотность нефти', 'г/см3', 0.9, 'ввод', None, None, None, None, None, None, None],
-        [None, None, None, None, None, None, None, None, None, None, None, None],
-        [5, 'Расчет массы сероводорода в жидкости притока (в объеме водоизмещения подвески НКТ и штанг)', None, None,
-         None,
-         None, None, None, None, None, None, None],
-        [5.1, 'Масса нефти ', 'т', 0, 'формула', None, None, None, None, None, None, None],
-        [5.2, 'Объем сероводорода, м3', 'м3', 0, 'формула', None, None, None, None, None, None, None],
-        [5.3, 'Масса сероводорода в нефти (выделяющаяся в газовую фазу при снижении давления)', 'г', 0, 'формула', None,
-         None, None, None, None, None, None],
-        [5.4, 'Масса сероводорода в жидкости (остаточная растворенная часть)', 'г', 0, 'формула', None, None,
-         None, None, None, None, None],
-        [None, None, None, None, None, None, None, None, None, None, None, None],
-        [6, 'Расчет массы сероводорода в поднасосной жидкости (в объеме скважины под ГНО)', None, None, None,
-         None, None, None, None, None, None, None],
-        [6.1, 'Масса нефти ', 'т', 0.01285795319328018, 'формула', None, None, None, None, None, None, None],
-        [6.2, 'Объем сероводорода, м3', 'м3', 0.00022758577152105915, 'формула', None, None, None, None, None, None,
-         None],
-        [6.3, 'Масса сероводорода в нефти (доля, выделяющаяся в газовую фазу при снижении давления)', 'г',
-         0.34949937812628773,
-         'формула', None, None, None, None, None, None, None],
-        [6.4, 'Масса сероводорода в жидкости (остаточная растворенная часть)', 'г', 3.6632345280000513, 'формула', None,
-         None,
-         None, None, None, None, None],
-        [None, None, None, None, None, None, None, None, None, None, None, None],
-        [7, 'Масса сероводорода общая', 'г', 4.012733906126339, 'формула', None, None, None, None, None, None, None],
-        [None, None, None, None, None, None, None, None, None, None, None, None],
-        [8, 'Параметр нейтрализатора сероводорода', None, None, None, None, None, None, None, None, None, None],
-        [8.1, 'Емкость реагента по сероводороду (определяется по результатам ЛИ конкретной марки)', 'г/г H2S', 24,
-         'ввод', None,
-         None, None, None, None, None, None],
-        [8.2, 'Плотность товарной формы (марки) реагента (по ТУ)', 'г/см3', 1.065, 'ввод', None, None, None, None, None,
-         None, None],
-        [None, None, None, None, None, None, None, None, None, None, None, None],
-        [9, 'Результат расчета расхода нейтрализатора сероводорода', None, None, None, None, None, None, None, None,
-         None, None],
-        [9.1, 'Расчетная масса реагента', 'кг', 0.09630561374703214, 'формула', None, None, None, None, None, None,
-         None],
-        [9.2, 'Коэффициент запаса по реагенту (решение ОГ)', 'крат', 1.25, 'ввод', None, None, None, None, None, None,
-         None],
-        [9.3, 'Масса реагента с запасом', 'кг', 0.12038201718379019, 'формула', None, None, None, None, None, None,
-         None],
-        [None, None, None, None, None, None, None, None, None, None, None, None],
-        [10, 'Удельный расход нейтрализатора сероводорода в растворе глушения', None, None, None, None, None, None,
-         None, None, None, None],
-        [10.1, 'Удельный массовый расход нейтрализатора сероводорода ', 'кг/м3', 0.01168088371286573, 'формула', None,
-         None, None, None, None, None, None],
-        [10.2, 'Удельный объемный расход нейтрализатора сероводорода ', 'м3/м3', 0.010967965927573455, 'формула', None,
-         None, None, None, None, None, None],
-        [
-            'Примечание: * - расчет приблизительный, поскольку нет информации по содержанию H2S в каждой фазе (вода, нефть, газ) в одинаковых условиях',
-            None,
-            None, None, None, None, None, None, None, None, None, None],
-        [None, None, None, None, None, None, None, None, None, None, None, None],
-        ['Ячейки для заполнения данными параметров скважины', None, None, None, None, None, None, None, None, None,
-         None, None],
-        [None, 'По данным конструкции скважины', None, None, None, None, None, None, None, None, None, None],
-        [None, None, None, None, None, None, None, None, None, None, None, None],
-        [None, None, None, None, None, None, None, None, None, None, None, None],
-        [None, 'По данным лабораторных исследований марки нейтрализатора сероводорода', None, None, None, None, None,
-         None, None,
-         None, None, None],
-        [None, None, None, None, None, None, None, None, None, None, None, None]]
+    ]
+    print(SNPKH)
+    max_row_H2S = len(SNPKH)
+    thin_border = Border(left=Side(style='thin'),
+                         right=Side(style='thin'),
+                         top=Side(style='thin'),
+                         bottom=Side(style='thin'))
+    ws3.column_dimensions['B'].width = 15
+    ws3.column_dimensions['C'].width = 80
+    ws3.column_dimensions['D'].width = 25
+    ws3.column_dimensions['e'].width = 25
+    for row in range(1, max_row_H2S):
+        for col in range(1, 6):
+            ws3.cell(row=row, column=col).value = SNPKH[row - 1][col - 1]
 
-
-    for row in range(1, 84):
-        for col in range(1, 12):
-            open_pz.Create_PZ.ws3.cell(row = row, column = col).value = SNPKH[row-1][col -1 ]
-
-
-
-
-
-
-
-
-
-
+            if 5 <= row <= 73 and 1 < col < 6:
+                ws3.cell(row=row, column=col).border = thin_border
+                ws3.cell(row=row, column=col).font = Font(name='Arial', size=13, bold=True)
+                ws3.cell(row=row, column=col).alignment = Alignment(wrap_text=True, horizontal='center',
+                                                                    vertical='center')
