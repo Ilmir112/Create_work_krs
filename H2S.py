@@ -1,10 +1,10 @@
-import openpyxl
+
 from openpyxl.styles import Border, Side, PatternFill, Font, GradientFill, Alignment
 from openpyxl.utils.cell import get_column_letter
 
 
 def calc_H2S(self, wb2, H2S_pr, H2S_mg):
-    from open_pz import Create_PZ
+    from open_pz import open_excel_file
     ws3 = wb2["Расчет необходимого количества поглотителя H2S"]
     nkt_1 = int(list(self.dict_nkt.keys())[0])
     nkt_1_l = self.dict_nkt[nkt_1]
@@ -42,7 +42,7 @@ def calc_H2S(self, wb2, H2S_pr, H2S_mg):
                 gno_well = 3.14*(self.column_additional_diametr-self.column_additional_wall_thickness*2)**2/4/1000*(self.current_bottom-nkt_1_l)/10000
         return gno_well
 
-    print(gno_volume())
+
     try:
         nkt_3 = int(list(self.dict_nkt.keys())[2])
     except:
@@ -159,7 +159,7 @@ def calc_H2S(self, wb2, H2S_pr, H2S_mg):
         [None, 'По данным лабораторных исследований марки нейтрализатора сероводорода', None, None, None, None,
          None],
     ]
-    print(SNPKH)
+
     max_row_H2S = len(SNPKH)
     thin_border = Border(left=Side(style='thin'),
                          right=Side(style='thin'),

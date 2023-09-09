@@ -7,7 +7,7 @@ from PyQt6 import QtWidgets, QtCore
 from PyQt6.QtWidgets import QApplication, QMainWindow, QTableWidget, QTableWidgetItem, QMenu, QMenuBar, QFileDialog
 
 class MyWindow(QMainWindow):
-    fname = ''
+
 
     def __init__(self, parent = None):
         super(MyWindow, self).__init__(parent)
@@ -52,7 +52,8 @@ class MyWindow(QMainWindow):
 
 
             try:
-                sheet = open_pz.Create_PZ.open_excel_file(self, self.fname[0])
+
+                sheet = open_pz.open_excel_file(self, self.fname[0])
                 rows = sheet.max_row
                 merged_cells = sheet.merged_cells
                 cols = 13
