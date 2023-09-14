@@ -4,10 +4,11 @@ from datetime import datetime
 
 from cdng import region_dict, region_p, events_gnvp
 
+
 def region(cdng):
 
     region = ''.join([key for key, value in region_dict.items() if cdng in value])
-
+    print(region)
     return region
 
 
@@ -134,6 +135,7 @@ def pop_down(self, region, curator_sel, curator_ved):
     return podp_down
 
 def razdel_1(self, region):
+    from open_pz import CreatePZ
 
     gi_region = [''.join(region_p[region][0].keys()), ''.join(region_p[region][0].values())]
     gg_region = [''.join(region_p[region][1].keys()), ''.join(region_p[region][1].values())]

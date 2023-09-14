@@ -3,60 +3,64 @@ from openpyxl.styles import Border, Side, PatternFill, Font, GradientFill, Align
 from openpyxl.utils.cell import get_column_letter
 
 
-def calc_H2S(self, wb2, H2S_pr, H2S_mg):
-    from open_pz import open_excel_file
+def calc_H2S(wb2, H2S_pr, H2S_mg):
+    from open_pz import CreatePZ
+    ws3 = wb2.create_sheet('Sheet1')
+    ws3.title = "Расчет необходимого количества поглотителя H2S"
+
     ws3 = wb2["Расчет необходимого количества поглотителя H2S"]
-    nkt_1 = int(list(self.dict_nkt.keys())[0])
-    nkt_1_l = self.dict_nkt[nkt_1]
+    print(CreatePZ.dict_nkt)
+    nkt_1 = int(list(CreatePZ.dict_nkt.keys())[0])
+    nkt_1_l = CreatePZ.dict_nkt[nkt_1]
 
     try:
-        nkt_2 = int(list(self.dict_nkt.keys())[1])
-        nkt_2_l = self.dict_nkt[nkt_2]
+        nkt_2 = int(list(CreatePZ.dict_nkt.keys())[1])
+        nkt_2_l = CreatePZ.dict_nkt[nkt_2]
     except:
         nkt_2 = 0
         nkt_2_l = 0
 
     def well_volume():
-        if self.column_additional == False:
-            volume_well = 3.14 * (self.column_diametr - self.column_wall_thickness * 2) ** 2 / 4 / 1000000 * (
-                self.bottomhole_artificial)
+        if CreatePZ.column_additional == False:
+            volume_well = 3.14 * (CreatePZ.column_diametr - CreatePZ.column_wall_thickness * 2) ** 2 / 4 / 1000000 * (
+                CreatePZ.bottomhole_artificial)
             return volume_well
         else:
 
-            volume_well = (3.14 * (self.column_additional_diametr - self.column_wall_thickness * 2) ** 2 / 4 / 1000 * (
-                        self.bottomhole_artificial - self.head_column_additional) / 1000) + (
-                                      3.14 * (self.column_diametr - self.column_wall_thickness * 2) ** 2 / 4 / 1000 * (
-                                  self.head_column_additional) / 1000)
+            volume_well = (3.14 * (CreatePZ.column_additional_diametr - CreatePZ.column_wall_thickness * 2) ** 2 / 4 / 1000 * (
+                    CreatePZ.bottomhole_artificial - CreatePZ.head_column_additional) / 1000) + (
+                                      3.14 * (CreatePZ.column_diametr - CreatePZ.column_wall_thickness * 2) ** 2 / 4 / 1000 * (
+                                  CreatePZ.head_column_additional) / 1000)
             return volume_well
 
     def gno_volume():
-        nkt_l = sum(list(self.dict_nkt.values()))
+        nkt_l = sum(list(CreatePZ.dict_nkt.values()))
         print(nkt_l)
-        if self.column_additional == True:
+        if CreatePZ.column_additional == True:
 
-            gno_well = 3.14*(self.column_diametr-self.column_wall_thickness*2)**2/4/1000*(self.current_bottom-self.head_column_additional)/1000/10
+            gno_well = 3.14*(CreatePZ.column_diametr-CreatePZ.column_wall_thickness*2)**2/4/1000*(CreatePZ.current_bottom-CreatePZ.head_column_additional)/1000/10
         else:
-            if nkt_l < self.shoe_column:
-                gno_well = (3.14*(self.column_diametr-self.column_wall_thickness*2)**2/4/1000*(self.current_bottom-self.head_column_additional)/1000)+(3.14*(self.column_diametr-self.column_wall_thickness*2)**2/4/1000*(self.shoe_column-nkt_l)/1000)
+            if nkt_l < CreatePZ.shoe_column:
+                gno_well = (3.14*(CreatePZ.column_diametr-CreatePZ.column_wall_thickness*2)**2/4/1000*(CreatePZ.current_bottom- CreatePZ.head_column_additional)/1000)+(3.14*(self.column_diametr-self.column_wall_thickness*2)**2/4/1000*(self.shoe_column-nkt_l)/1000)
             else:
-                gno_well = 3.14*(self.column_additional_diametr-self.column_additional_wall_thickness*2)**2/4/1000*(self.current_bottom-nkt_1_l)/10000
+                gno_well = 3.14*(CreatePZ.column_additional_diametr-CreatePZ.column_additional_wall_thickness*2)**2/4/1000*(CreatePZ.current_bottom-nkt_1_l)/10000
         return gno_well
 
 
     try:
-        nkt_3 = int(list(self.dict_nkt.keys())[2])
+        nkt_3 = int(list(CreatePZ.dict_nkt.keys())[2])
     except:
         nkt_3 = 0
     try:
-        sucker_rod_l_25 = self.dict_sucker_rod[25]
+        sucker_rod_l_25 =CreatePZ.dict_sucker_rod[25]
     except:
         sucker_rod_l_25 = 0
     try:
-        sucker_rod_l_22 = self.dict_sucker_rod[22]
+        sucker_rod_l_22 = CreatePZ.dict_sucker_rod[22]
     except:
         sucker_rod_l_22 = 0
     try:
-        sucker_rod_l_19 = self.dict_sucker_rod[19]
+        sucker_rod_l_19 = CreatePZ.dict_sucker_rod[19]
     except:
         sucker_rod_l_19 = 0
 
@@ -67,20 +71,20 @@ def calc_H2S(self, wb2, H2S_pr, H2S_mg):
         [None, 'Объем раствора глушения - по объему скважины от устья до забоя', None, None, None, None],
         [None, None, None, None, None, None],
         [None, '№', 'Параметр', None, 'Результат расчета', None],
-        [None, 1, 'Параметры скважины', None, f'{self.well_number} {self.well_area}', None],
-        [None, 1.1, 'Забой скважины', 'м', float(self.bottomhole_artificial), 'формула'],
-        [None, 1.2, 'текущий забой', 'м', float(self.bottomhole_artificial), 'ввод'],
-        [None, 1.3, 'Диаметр ЭК (ступень 1 верхняя)', 'мм', int(self.column_diametr), 'ввод'],
-            [None, '1.3.1.', 'Толщина стенки ЭК (ступень 1 верхняя)', 'мм', float(self.column_wall_thickness), 'ввод'],
-        [None, '1.3.2.', 'Длина подвески ЭК (ступень 1 верхняя)', 'м', int(self.shoe_column), 'ввод'],
-        [None, '1.3.3.', 'Диаметр ЭК (ступень 2 хвостовик)', 'мм', int(self.column_additional_diametr), 'ввод'],
-        [None, '1.3.4.', 'Толщина стенки ЭК (ступень 2 хвостовик)', 'м', float(self.column_additional_wall_thickness),
+        [None, 1, 'Параметры скважины', None, f'{CreatePZ.well_number} {CreatePZ.well_area}', None],
+        [None, 1.1, 'Забой скважины', 'м', float(CreatePZ.bottomhole_artificial), 'формула'],
+        [None, 1.2, 'текущий забой', 'м', float(CreatePZ.bottomhole_artificial), 'ввод'],
+        [None, 1.3, 'Диаметр ЭК (ступень 1 верхняя)', 'мм', int(CreatePZ.column_diametr), 'ввод'],
+            [None, '1.3.1.', 'Толщина стенки ЭК (ступень 1 верхняя)', 'мм', float(CreatePZ.column_wall_thickness), 'ввод'],
+        [None, '1.3.2.', 'Длина подвески ЭК (ступень 1 верхняя)', 'м', int(CreatePZ.shoe_column), 'ввод'],
+        [None, '1.3.3.', 'Диаметр ЭК (ступень 2 хвостовик)', 'мм', int(CreatePZ.column_additional_diametr), 'ввод'],
+        [None, '1.3.4.', 'Толщина стенки ЭК (ступень 2 хвостовик)', 'м', float(CreatePZ.column_additional_wall_thickness),
          'ввод'],
         [None, '1.3.5.', 'Длина подвески ЭК (ступень 2 хвостовик)', 'м',
-         abs(int(self.head_column_additional) - int(self.shoe_column_additional)), 'ввод'],
-        [None, '1.3.6.', 'Глубина "головы" (ступень 2 хвостовик)', 'м', int(self.head_column_additional), 'ввод',
+         abs(int(CreatePZ.head_column_additional) - int(CreatePZ.shoe_column_additional)), 'ввод'],
+        [None, '1.3.6.', 'Глубина "головы" (ступень 2 хвостовик)', 'м', int(CreatePZ.head_column_additional), 'ввод',
          ],
-        [None, '1.3.7.', 'Глубина "башмака" (ступень 2 хвостовик)', 'м', int(self.shoe_column_additional),
+        [None, '1.3.7.', 'Глубина "башмака" (ступень 2 хвостовик)', 'м', int(CreatePZ.shoe_column_additional),
          'формула'],
         [None, None, None, None, None, None],
         [None, 2, 'Параметры ГНО', None, None, None, None],
@@ -112,9 +116,9 @@ def calc_H2S(self, wb2, H2S_pr, H2S_mg):
          'формула'],
         [None, None, None, None, None, None],
         [None, 4, 'Параметры добываемой жидкости и газа', None, None, None, None],
-        [None, 4.1, 'Газосодержание нефти', 'м3/тонну', self.gaz_f_pr, 'ввод'],
+        [None, 4.1, 'Газосодержание нефти', 'м3/тонну', CreatePZ.gaz_f_pr, 'ввод'],
         [None, 4.2, 'Содержание сероводорода в газе (по данным проекта разработки)', '% (об)', H2S_pr[0], 'ввод'],
-        [None, 4.3, 'Обводенность продукции', '% (масс.)', self.water_cut, 'ввод'],
+        [None, 4.3, 'Обводенность продукции', '% (масс.)',CreatePZ.water_cut, 'ввод'],
         [None, 4.4, 'Содержание сероводорода в пластовом флюиде (устьевая проба, вода+нефть)', 'мг/дм3', H2S_mg[0], 'ввод'],
         [None, 4.5, 'Плотность воды', 'г/см3', 1.17, 'ввод'],
         [None, 4.6, 'Плотность нефти', 'г/см3', 0.9, 'ввод'],
