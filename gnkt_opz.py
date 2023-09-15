@@ -10,25 +10,25 @@ def gnkt_work(self, H_F_paker_do, H2S, max_expected_pressure, max_admissible_pre
     V_rast = 0
     fluid_work = 0
     current_bottom = 1250
-    # acid_true_quest = input('Планировать кислоту: Да или Нет')
-    # fluid_work = float(input('удельный рабочей жидкости'))
-    #
-    # current_bottom= float(input('Введите необходимый забой'))
-    # if CreatePZ.H2S_mg != None:
-    #     fluid_work = f'{fluid_work}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из расчета 0.25кг/м3 '
-    # else:
-    #     fluid_work = f'{fluid_work}г/см3 '
-    # if acid_true_quest.lower() == 'нет':
-    #     V_rast = input('Введите объем растворителя')
-    #     acid_true = False
-    #
-    #
-    # else:
-    #     V_rast = input('Введите объем растворителя')
-    #
-    #     acid = input('Введите вид кислоты: HF, HCl')
-    #     acid_V = float(input('Введите объем кислоты: '))
-    #     acid_pr = int(input('Введите концентрацию кислоты:'))
+    acid_true_quest = input('Планировать кислоту: Да или Нет')
+    fluid_work = float(input('удельный рабочей жидкости'))
+
+    current_bottom= float(input('Введите необходимый забой'))
+    if CreatePZ.H2S_mg != None:
+        fluid_work = f'{fluid_work}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из расчета 0.25кг/м3 '
+    else:
+        fluid_work = f'{fluid_work}г/см3 '
+    if acid_true_quest.lower() == 'нет':
+        V_rast = input('Введите объем растворителя')
+        acid_true = False
+
+
+    else:
+        V_rast = input('Введите объем растворителя')
+
+        acid = input('Введите вид кислоты: HF, HCl')
+        acid_V = float(input('Введите объем кислоты: '))
+        acid_pr = int(input('Введите концентрацию кислоты:'))
 
     gnkt_opz =[
      [None, 'Порядок работы', None, None, None, None, None, None, None, None, None, None],
@@ -147,7 +147,7 @@ def gnkt_work(self, H_F_paker_do, H2S, max_expected_pressure, max_admissible_pre
             'Мастер ГНКТ, состав бригады', 1],
     [None, 22, f'Спустить БДТ до забоя. Промыть скважину от продуктов реакции кислоты мин.водой  {fluid_work}  с составлением \
     соответствующего акта. \nПРИ ПОЯВЛЕНИИ ЗАТЯЖЕК ИЛИ ПОСАДОК ПРИ СПУСКО-ПОДЪЕМНЫХ ОПЕРАЦИЯХ ПРОИЗВЕСТИ ИНТЕНСИВНУЮ ПРОМЫВКУ \
-    ОСЛОЖНЕННОГО УЧАСТКА СКВАЖИНЫ ',
+    ОСЛОЖНЕННОГО УЧАСТКА СКВАЖИНЫ '.lower(),
         None, None, None, None, None, None, None,
             'Мастер ГНКТ, состав бригады, представитель Заказчика', 0.93],
     [None, 23, f'Произвести гидросвабирование пласта в интервале {min(list(CreatePZ.work_pervorations_dict.keys()))}-{max(list(CreatePZ.work_pervorations_dict.values()))}мм (закрыть затруб, произвести задавку в пласт \

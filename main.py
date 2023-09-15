@@ -57,19 +57,20 @@ class MyWindow(QMainWindow):
             except FileNotFoundError:
                 print('Файл не найден')
 
-            if action == self.create_GNKT_OPZ:
-                self.fname = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
-                                                                   "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
+        if action == self.create_GNKT_OPZ:
+            print('кнопка нажата')
+            self.fname = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
+                                                               "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
 
-                try:
-                    work_plan = 'gnkt_opz'
-                    sheet = open_pz.open_excel_file(self, self.fname[0], work_plan)
-                    self.copy_pz(sheet)
+            try:
+                work_plan = 'gnkt_opz'
+                sheet = open_pz.CreatePZ.open_excel_file(self, self.fname[0], work_plan)
+                self.copy_pz(sheet)
 
 
 
-                except FileNotFoundError:
-                    print('Файл не найден')
+            except FileNotFoundError:
+                print('Файл не найден')
 
             if action == self.save_file:
                 open_pz.open_excel_file().wb.save("test_unmerge.xlsx")
