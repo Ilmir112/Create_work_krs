@@ -1,3 +1,4 @@
+
 import sys
 
 import block_name
@@ -7,6 +8,7 @@ import self
 from datetime import datetime
 from openpyxl import Workbook, load_workbook
 from openpyxl.utils import get_column_letter
+
 from copy import copy
 from openpyxl.utils.cell import range_boundaries
 # from main import MyWindow
@@ -21,12 +23,14 @@ from gnkt_opz import gnkt_work
 class CreatePZ:
     data_well_max = 0
     razdel_1 = ''
-
+    expected_pick_up = {}
+    work_pervorations = []
+    work_pervorations_dict ={}
     data = None
     cat_well_min = None
     cat_well_max = None
     data_well_min = 0
-    data_well_max = data_well_max
+    data_well_max = 0
     data_x_min = 0
     data_x_max = 0
     data_pvr_min = 0
@@ -51,20 +55,23 @@ class CreatePZ:
     values = []
     H_F_paker_do = []
     cat_H2S_list  = []
-    cat_P_1 = 0
+    cat_P_1 = []
     # dict_nkt = {0: 0}
+    # dict_nkt_po = {}
     # dict_nkt_po = {}
     dict_sucker_rod = {32:0, 25: 0, 22: 0, 19: 0}
     dict_sucker_rod_po = {}
 
     cdng = ''
     # curator = input('Введите сектор кураторов региона, ОР или ГТМ, или ГРР или ГО:  ')
-    curator = 'ГТМ'
+    curator = 'ОР'
     sucker_rod_ind = 0
     sucker_rod = False
     sucker_rod_ind_cancel = 0
     condition_of_wells = 0
     pipes_ind = ''
+    itog_ind_min = 0
+    itog_ind_max = 0
     well_number = 0
     well_area = ''
     H2S_pr = []
@@ -137,26 +144,22 @@ class CreatePZ:
     #     self.razdel_1 = ''
 
     def open_excel_file(self, fname, work_plan='gnkt_opz'):
-        # self.fname = fname
+
         wb = op.load_workbook(fname, data_only=True)
         ws = wb.active
-        max_rows = ws.max_row
-        cat_H2S_list = []
-        H2S_mg = []
-        H2S_pr = []
-        cdng = ''
+
         for row_ind, row in enumerate(ws.iter_rows(values_only=True)):
             if 'Категория скважины' in row:
                 cat_well_min = row_ind + 1  # индекс начала категории
-
+                print(cat_well_min)
 
             elif 'План-заказ' in row:
                 ws.cell(row=row_ind + 1, column=2).value = 'ПЛАН РАБОТ'
                 cat_well_max = row_ind - 1
                 data_well_min = row_ind + 1
 
-            elif 'IX. Мероприятия по предотвращению аварий, инцидентов и осложнений::' in row:
-                CreatePZ.data_well_max = row_ind - 1
+            elif 'VIII. Вид и категория ремонта, его шифр' in row:
+                CreatePZ.data_well_max = row_ind + 1
             elif 'X. Ожидаемые показатели после ремонта:' in row:
                 data_x_min = row_ind
             elif 'ШТАНГИ' in row:
@@ -183,9 +186,15 @@ class CreatePZ:
 
                 elif '7. Пробуренный забой' == value:
                     try:
-                        bottomhole_artificial = float(row[col + 5])
+                        CreatePZ.bottomhole_artificial = float(row[col + 5])
+                        n = 1
+                        while CreatePZ.bottomhole_artificial== None:
+                            CreatePZ.bottomhole_artificial = row[col +5 + n]
+                            n += 1
+                            CreatePZ.bottomhole_artificial = float(row[col +5 + n])
+
                     except:
-                        CreatePZ.CreatePZ.bottomhole_artificial = float(input('Искусственный забой равен:  '))
+                        CreatePZ.bottomhole_artificial = float(input('Искусственный забой равен:  '))
                 elif 'Текущий забой ' == value:
                     try:
                         CreatePZ.current_bottom = float(row[col + 2])
@@ -207,7 +216,7 @@ class CreatePZ:
                         except:
                             CreatePZ.column_wall_thickness = float(input('Толщина стенки:'))
                         try:
-                            CreatePZ.shoe_column = float(data_main_production_string[-1].strip().replace('(м)', '')[4:])
+                            CreatePZ.shoe_column = float(CreatePZ.without_b(data_main_production_string[2]))
 
                         except:
                             CreatePZ.shoe_column = float(input('Башмак колонны: '))
@@ -237,13 +246,20 @@ class CreatePZ:
 
 
                 elif 'плотн.воды' == value:
-                    CreatePZ.water_cut = row[col - 1]
+                    if CreatePZ.curator == 'ОР':
+                        CreatePZ.water_cut = 100
+                    else:
+                        try:
+                            CreatePZ.water_cut =float(row[col - 1]) # обводненность
+                        except:
+                            CreatePZ.water_cut = float(input('ВВедите обводненность скважинной продукции: '))
                 elif 'по Pпл' == value:
-                    CreatePZ.cat_P_1 = row[col + 1]
+                    cat_P_1 = row[col + 1]
                     n = 1
-                    while CreatePZ.cat_P_1 == None:
-                        CreatePZ.cat_P_1 = row[col + n]
+                    while cat_P_1 == None:
+                        cat_P_1 = row[col + n]
                         n += 1
+                    CreatePZ.cat_P_1.append(cat_P_1)
                 elif 'по H2S' == value:
 
                     CreatePZ.cat_H2S_1 = row[col + 1]
@@ -260,6 +276,8 @@ class CreatePZ:
                         n += 1
                 elif 'мг/дм3' == value or 'мг/л' == value:
                     CreatePZ.H2S_mg.append(row[col - 1])
+
+
                 elif '%' == value:
 
                     CreatePZ.H2S_pr.append(row[col - 1])
@@ -271,19 +289,19 @@ class CreatePZ:
                     CreatePZ.data_column_additional = ws.cell(row=row_ind + 3, column=col + 2).value
                     if CreatePZ.data_column_additional != None or \
                             CreatePZ.data_column_additional != '-':
-                        column_additional = True
+                        CreatePZ.column_additional = True
                     try:
-                        head_column_additional = float(CreatePZ.data_column_additional.split('-')[0])
+                        CreatePZ.head_column_additional = float(CreatePZ.data_column_additional.split('-')[0])
 
-                        shoe_column_additional = CreatePZ.data_column_additional.split('-')[1]
-                        column_additional_diametr = ws.cell(row=row_ind + 3, column=col + 4).value
-                        column_additional_wall_thickness = ws.cell(row=row_ind + 3, column=col + 6).value
+                        CreatePZ.shoe_column_additional = CreatePZ.data_column_additional.split('-')[1]
+                        CreatePZ.column_additional_diametr = ws.cell(row=row_ind + 3, column=col + 4).value
+                        CreatePZ.column_additional_wall_thickness = ws.cell(row=row_ind + 3, column=col + 6).value
                     except:
-                        head_column_additional = 0
+                        CreatePZ.head_column_additional = 0
 
-                        shoe_column_additional = 0
-                        column_additional_diametr = 0
-                        column_additional_wall_thickness = 0
+                        CreatePZ.shoe_column_additional = 0
+                        CreatePZ.column_additional_diametr = 0
+                        CreatePZ.column_additional_wall_thickness = 0
                         print('Доп колонна отсутствует')
 
                 elif 'Максимально ожидаемое давление на устье' == value:
@@ -309,7 +327,24 @@ class CreatePZ:
                         CreatePZ.max_admissible_pressure = int(input('Введите максимально ожидаемое давление на устье: '))
                 elif value == 'Пакер' and row[col + 2] == 'типоразмер':
                     CreatePZ.paker_do = row[col + 4]
-                    CreatePZ.H_F_paker_do = ws.cell(row=row_ind + 4, column=col + 5).value
+                    try:
+                        CreatePZ.H_F_paker_do = int(ws.cell(row=row_ind + 4, column=col + 5).value)
+                    except:
+                        CreatePZ.H_F_paker_do =int(input('Глубина посадки фондового пакера: '))
+
+
+        for row in range(data_x_min + 1, data_x_max):
+            expected_list = []
+            for col in range(1, 12):
+
+                if ws.cell(row= row, column = col).value != None:
+                    if ws.cell(row= row, column = col).value.isnumeric() == True:
+                        expected_list.append(ws.cell(row= row, column = col).value)
+            if len(expected_list) !=0:
+                CreatePZ.expected_pick_up[expected_list[0]] = expected_list[1]
+
+
+
 
         for row in range(pipes_ind + 1, condition_of_wells):  # словарь  количества НКТ и метраж
             if ws.cell(row=row, column=3).value == 'План':
@@ -327,10 +362,10 @@ class CreatePZ:
         CreatePZ.dict_nkt_po = dict_nkt_po
 
         try:
-            for row in range(self.sucker_rod_ind, self.pipes_ind - 1):
+            for row in range(sucker_rod_ind, pipes_ind - 1):
                 if ws.cell(row=row, column=3).value == 'План':
                     b_plan = row
-            for row in range(self.sucker_rod_ind + 1, self.pipes_ind - 1):
+            for row in range(sucker_rod_ind + 1, pipes_ind - 1):
                 key = ws.cell(row=row, column=4).value
                 value = ws.cell(row=row, column=7).value
                 if key != None and row < b_plan:
@@ -353,6 +388,13 @@ class CreatePZ:
             perforations_intervals.append(lst)
         perforations_intervals = sorted(perforations_intervals, key=lambda x: x[3])
 
+
+        for row in perforations_intervals:
+            if int(row[2]) > CreatePZ.H_F_paker_do and row[5] == None:
+                CreatePZ.work_pervorations.append(row)
+                CreatePZ.work_pervorations_dict[row[2]] = row[3]
+        print(CreatePZ.work_pervorations_dict)
+
         CreatePZ.region = block_name.region(cdng)
 
         razdel_1 = block_name.razdel_1(self, CreatePZ.region)
@@ -374,17 +416,19 @@ class CreatePZ:
                 bound.append(boundaries)
             else:
                 ws2.merge_cells(start_column=boundaries[0], start_row=boundaries[1] + len(razdel_1) + 1,
-                                end_column=boundaries[2], end_row=boundaries[3] + len(razdel_1) + 1)
-
+                                end_column=boundaries[2], end_row=boundaries[3] + len(razdel_1) + 1 )
+        for i in range(12, 22):
+            ws2.row_dimensions[i].height = 5
         for i in range(1, len(razdel_1)):  # Добавлением подписантов на вверху
             for j in range(1, 13):
                 ws2.cell(row=i, column=j).value = razdel_1[i - 1][j - 1]
                 ws2.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=False)
-        # for i in range(1, 16):
             ws2.merge_cells(start_row=i, start_column=2, end_row=i, end_column=7)
-            ws2.merge_cells(start_row=i, start_column=9, end_row=i, end_column=13)
+            ws2.merge_cells(start_row=i, start_column=8, end_row=i, end_column=13)
         ins_ind = len(razdel_1) + cat_well_min
+
         list_block = [cat_well_min, data_well_min + 1, CreatePZ.data_well_max]
+        print(list_block)
 
         for i in range(1, len(list_block)):  # цикл добавления блоков план-заказов
             head = plan.head_ind(list_block[i - 1], list_block[i] + 2)
@@ -432,10 +476,11 @@ class CreatePZ:
             else:
                 ws2.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='left',
                                                                     vertical='top')
-                ws2.cell(row=i, column=2).font = Font(name='Arial', size=11)
+                ws2.cell(row=i, column=2).font = Font(name='Arial', size=12)
 
                 ws2.cell(row=i, column=2).value = dict_events_gnvp[work_plan][i - ins_ind][1]
         ins_ind += len(dict_events_gnvp[work_plan]) - 1
+
 
 
 
@@ -450,7 +495,6 @@ class CreatePZ:
             for i in range(0, 12):
                 lst.append(ws.cell(row=j + 1, column=i + 1).value)
             CreatePZ.row_expected.append(lst)
-
 
         for i in range(len(CreatePZ.row_expected)):  # Добавление  показатели после ремонта
             for j in range(1, 12):
@@ -472,15 +516,20 @@ class CreatePZ:
 
         gnkt_work1 = gnkt_work(self, CreatePZ.H_F_paker_do, H2S, CreatePZ.max_expected_pressure, CreatePZ.max_admissible_pressure)
 
-        ins_ind +=  3
+        ins_ind += 3
+        CreatePZ.count_row_height(ws2, gnkt_work1, ins_ind)
+        CreatePZ.itog_ind_min = ins_ind
         for i in range(ins_ind + 1 , len(gnkt_work1) + ins_ind ):  # Добавлением работ
 
             for j in range(1, 13):
                 ws2.cell(row=i, column=j).value = gnkt_work1[i - ins_ind-1][j - 1]
-                ws2.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=False)
+
                 if j != 1:
                     ws2.cell(row=i, column=j).border = thin_border
-
+                if j == 11:
+                    ws2.cell(row=i, column=j).font = Font(name='Arial', size=12, bold=False)
+                else:
+                    ws2.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=False)
             if i ==  ins_ind+1:
                 ws2.merge_cells(start_row=i, start_column=2, end_row=i, end_column=12)
                 ws2.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='center',
@@ -503,27 +552,32 @@ class CreatePZ:
 
 
         ins_ind += len(gnkt_work1) -3
-
-        for i in range(ins_ind + 2 + 1, len(itog_1) + ins_ind + 2):  # Добавлением итогов
+        CreatePZ.itog_ind_max = ins_ind
+        for i in range(ins_ind + 2 + 1, len(itog_1()) + ins_ind + 2):  # Добавлением итогов
             if i < ins_ind + 2 + 1 +6:
                 for j in range(1, 13):
-                    ws2.cell(row=i, column=j).value = itog_1[i - ins_ind - 2 - 1][j - 1]
+                    ws2.cell(row=i, column=j).value = itog_1()[i - ins_ind - 2 - 1][j - 1]
                     if j != 1:
                         ws2.cell(row=i, column=j).border = thin_border
+                        ws2.cell(row=i, column=j).font =  Font(name='Arial', size=13, bold=False)
                 ws2.merge_cells(start_row=i, start_column=2, end_row=i, end_column=11)
-                ws2.cell(row=i + ins_ind, column=2).alignment = Alignment(wrap_text=True, horizontal='left',
+                ws2.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='left',
                                                                                vertical='center')
             else:
                 for j in range(1, 13):
-                    ws2.row_dimensions[i].height = 30
-                    ws2.cell(row=i, column=j).value = itog_1[i - ins_ind - 2 - 1][j - 1]
+                    ws2.row_dimensions[i].height = 55
+                    ws2.cell(row=i, column=j).value = itog_1()[i - ins_ind - 2 - 1][j - 1]
                     ws2.cell(row=i, column=j).border = thin_border
+                    ws2.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=False)
+                    ws2.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='left',
+                                                                    vertical='center')
 
                 ws2.merge_cells(start_row=i, start_column=2, end_row=i, end_column=12)
                 ws2.cell(row=i + ins_ind, column=2).alignment = Alignment(wrap_text=True, horizontal='left',
                                                                                vertical='center')
 
-        ins_ind += len(itog_1) + 2
+        ins_ind += len(itog_1()) + 2
+
         curator_sel = block_name.curator_sel(self, CreatePZ.curator, CreatePZ.region)
         curator_ved_sel = block_name.curator_sel(self, CreatePZ.curator, CreatePZ.region)
         podp_down = block_name.pop_down(self, CreatePZ.region,curator_sel, curator_ved_sel)
@@ -531,15 +585,16 @@ class CreatePZ:
             for j in range(1, 13):
                 ws2.cell(row=i, column=j).value = podp_down[i - 1 - ins_ind][j - 1]
                 ws2.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=False)
-        for i in range(1, 16):
-            ws2.merge_cells(start_row=i, start_column=2, end_row=i, end_column=8)
-            ws2.merge_cells(start_row=i, start_column=9, end_row=i, end_column=13)
+            if i in [1 + ins_ind + 7, 1 + ins_ind + 8, 1 + ins_ind + 9, 1 + ins_ind +10, 1 + ins_ind + 11, 1 + ins_ind + 12, 1 + ins_ind + 13, 1 + ins_ind + 14]:
+                ws2.merge_cells(start_row=i, start_column=2, end_row=i, end_column=5)
+                ws2.cell(row = i, column = 2).alignment = Alignment(wrap_text=True, vertical= 'top', horizontal= 'left')
+                if i == 1 + ins_ind + 11:
+                    ws2.row_dimensions[i].height = 55
 
-
-        for row in range(1, 16):
-           for col in range(1, 13):
-                ws2.cell(row = row, column = col).alignment = ws2.cell(row = row, column = col).alignment.copy(wrapText=True)
-                ws2.cell(row= row, column=j + col).font = 'Arial'
+        # for row in range(1, 16):
+        #    for col in range(1, 13):
+        #         ws2.cell(row = row, column = col).alignment = ws2.cell(row = row, column = col).alignment.copy(wrapText=True)
+        #         ws2.cell(row= row, column=j + col).font = 'Arial'
         # lst2 = []
         # for j in range(1, max_rows):
         #     lst3 = []
@@ -552,9 +607,11 @@ class CreatePZ:
             print(CreatePZ.H2S_pr, CreatePZ.H2S_mg)
             calc_H2S(wb2, CreatePZ.H2S_pr, CreatePZ.H2S_mg)
 
+
         else:
 
             print(f'{CreatePZ.cat_H2S_list} Расчет поглотителя сероводорода не требуется')
+
 
         wb2.save(f'{CreatePZ.well_number} {CreatePZ.well_area} {work_plan}.xlsx')
         return ws2
@@ -584,6 +641,33 @@ class CreatePZ:
                     ws2.column_dimensions[get_column_letter(col_ind + 1)].width = colWidth[col_ind]
                 else:
                     break
+
+    def without_b(a):
+        b = ''
+        for i in range(len(a)):
+            if a[i] in '0123456789':
+                b += a[i]
+        return b
+
+    def count_row_height(ws2, values, ins_int):
+        row_count = []
+        for row in values:
+            count_val = []
+            for col in row:
+                if col != None:
+                    count_val.append(len(str(col)))
+                else:
+                    count_val.append(2)
+            row_count.append(max(count_val)/4.7)
+
+        for index_row, row in enumerate(row_count):  # Копирование высоты строки
+            if row_count[index_row - 1] >40:
+                ws2.row_dimensions[index_row +  ins_int].height = row_count[index_row - 1]
+
+        ws2.column_dimensions[get_column_letter(11)].width = 25
+
+        return 'Высота изменена'
+
         # ws2.unmerge_cells(start_column=2, start_row=self.ins_ind, end_column=12, end_row=self.ins_ind)
-fname = 'ПЗ 53 Мустафинского м-я (ГНКТ) Т-3.xlsx'
+fname = 'Копия 2327 Манчаровского м-я (ПЗ) 11092023.xlsx'
 print(CreatePZ.open_excel_file(fname, fname, work_plan='gnkt_opz'))

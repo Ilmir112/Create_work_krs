@@ -50,7 +50,7 @@ class MyWindow(QMainWindow):
 
             try:
                 work_plan= 'krs'
-                sheet = open_pz.open_excel_file(self, self.fname[0], work_plan)
+                sheet = open_pz.CreatePZ.open_excel_file(self, self.fname[0], work_plan)
                 self.copy_pz(sheet)
 
 

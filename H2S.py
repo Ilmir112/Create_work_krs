@@ -41,7 +41,7 @@ def calc_H2S(wb2, H2S_pr, H2S_mg):
             gno_well = 3.14*(CreatePZ.column_diametr-CreatePZ.column_wall_thickness*2)**2/4/1000*(CreatePZ.current_bottom-CreatePZ.head_column_additional)/1000/10
         else:
             if nkt_l < CreatePZ.shoe_column:
-                gno_well = (3.14*(CreatePZ.column_diametr-CreatePZ.column_wall_thickness*2)**2/4/1000*(CreatePZ.current_bottom- CreatePZ.head_column_additional)/1000)+(3.14*(self.column_diametr-self.column_wall_thickness*2)**2/4/1000*(self.shoe_column-nkt_l)/1000)
+                gno_well = (3.14*(CreatePZ.column_diametr-CreatePZ.column_wall_thickness*2)**2/4/1000*(CreatePZ.current_bottom- CreatePZ.head_column_additional)/1000)+(3.14*(CreatePZ.column_diametr-CreatePZ.column_wall_thickness*2)**2/4/1000*(CreatePZ.shoe_column-nkt_l)/1000)
             else:
                 gno_well = 3.14*(CreatePZ.column_additional_diametr-CreatePZ.column_additional_wall_thickness*2)**2/4/1000*(CreatePZ.current_bottom-nkt_1_l)/10000
         return gno_well
@@ -117,9 +117,9 @@ def calc_H2S(wb2, H2S_pr, H2S_mg):
         [None, None, None, None, None, None],
         [None, 4, 'Параметры добываемой жидкости и газа', None, None, None, None],
         [None, 4.1, 'Газосодержание нефти', 'м3/тонну', CreatePZ.gaz_f_pr, 'ввод'],
-        [None, 4.2, 'Содержание сероводорода в газе (по данным проекта разработки)', '% (об)', H2S_pr[0], 'ввод'],
+        [None, 4.2, 'Содержание сероводорода в газе (по данным проекта разработки)', '% (об)', CreatePZ.H2S_pr[0], 'ввод'],
         [None, 4.3, 'Обводенность продукции', '% (масс.)',CreatePZ.water_cut, 'ввод'],
-        [None, 4.4, 'Содержание сероводорода в пластовом флюиде (устьевая проба, вода+нефть)', 'мг/дм3', H2S_mg[0], 'ввод'],
+        [None, 4.4, 'Содержание сероводорода в пластовом флюиде (устьевая проба, вода+нефть)', 'мг/дм3', CreatePZ.H2S_mg[0], 'ввод'],
         [None, 4.5, 'Плотность воды', 'г/см3', 1.17, 'ввод'],
         [None, 4.6, 'Плотность нефти', 'г/см3', 0.9, 'ввод'],
         [None, None, None, None, None, None],
@@ -127,14 +127,14 @@ def calc_H2S(wb2, H2S_pr, H2S_mg):
         [None, 5.1, 'Масса нефти ', 'т', '=(E37+E38)*(100-E43)*E46/100', 'формула'],
         [None, 5.2, 'Объем сероводорода, м3', 'м3', '=E41*E49*E42/100', 'формула'],
         [None, 5.3, 'Масса сероводорода в нефти (выделяющаяся в газовую фазу при снижении давления)', 'г',
-         '=(34*E50*1000/22,14)','формула'],
+         '=(34*E50*1000/22.14)','формула'],
         [None, 5.4, 'Масса сероводорода в жидкости (остаточная растворенная часть)', 'г', '=(E37+E38)*E44', 'формула'],
         [None, None, None, None, None, None],
         [None, 6, 'Расчет массы сероводорода в поднасосной жидкости (в объеме скважины под ГНО)', None, None, None],
         [None, 6.1, 'Масса нефти ', 'т', '=E33*(100-E43)*E46/100    ', 'формула'],
         [None, 6.2, 'Объем сероводорода, м3', 'м3', '=E41*E55*E42/100   ', 'формула'],
         [None, 6.3, 'Масса сероводорода в нефти (доля, выделяющаяся в газовую фазу при снижении давления)', 'г',
-         '=(34*E56*1000/22,14)  ', 'формула'],
+         '=(34*E56*1000/22.14)  ', 'формула'],
         [None, 6.4, 'Масса сероводорода в жидкости (остаточная растворенная часть)', 'г', '=E33*E44',
          'формула'],
         [None, None, None, None, None, None],
@@ -174,7 +174,7 @@ def calc_H2S(wb2, H2S_pr, H2S_mg):
     ws3.column_dimensions['D'].width = 25
     ws3.column_dimensions['e'].width = 25
     for row in range(1, max_row_H2S):
-        for col in range(1, 6):
+        for col in range(1, 7):
             ws3.cell(row=row, column=col).value = SNPKH[row - 1][col - 1]
 
             if 5 <= row <= 73 and 1 < col < 6:
