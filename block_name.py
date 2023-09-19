@@ -12,7 +12,7 @@ def region(cdng):
     return region
 
 
-nach_tkrs = ['А.Р.Габдулхаков ', 'З.К. Алиев', 'М.К.Алиев']
+
 
 
 def curator_sel(self, curator, region):
@@ -21,8 +21,8 @@ def curator_sel(self, curator, region):
     rum_gtm = [''.join(region_p[region][3].keys()), ''.join(region_p[region][3].values())]
     ruk_usrs_krs = [''.join(region_p[region][5].keys()), ''.join(region_p[region][5].values())]
     ruk_go = [''.join(region_p[region][6].keys()), ''.join(region_p[region][6].values())]
-    ved_gtm = [''.join(region_p[region][7].keys()), ''.join(region_p[region][7].values())]
-    ved_orm = [''.join(region_p[region][8].keys()), ''.join(region_p[region][8].values())]
+    self.ved_gtm = [''.join(region_p[region][7].keys()), ''.join(region_p[region][7].values())]
+    self.ved_orm = [''.join(region_p[region][8].keys()), ''.join(region_p[region][8].values())]
 
     if curator == 'ОР':
         return ruk_orm
@@ -32,31 +32,21 @@ def curator_sel(self, curator, region):
         return ruk_go
 
 
-def curator_ved_sel(self, curator, region):
 
-
-    if curator == 'ГТМ' and region == 'ЧГМ' or curator == 'ГТМ' and \
-            region == 'КГМ' or curator == 'ОР' and region == 'КГМ':
-
-        return ved_gtm
-    elif curator == 'ОР' and region == 'ЧГМ':
-        return ved_orm
-    else:
-        a = [' ', ' ']
-
-
-if region == 'ЧГМ' or region == 'ТГМ':
-    nach_tkrs = nach_tkrs[0]
-elif region == 'КГМ' or region == 'АГМ':
-    nach_tkrs = nach_tkrs[1]
-elif region == 'ИГМ':
-    nach_tkrs = nach_tkrs[2]
 
 
 
 current_datetime = datetime.today()
 
-def pop_down(self, region, curator_sel, curator_ved):
+def pop_down(self, region, curator_sel):
+    from open_pz import CreatePZ
+    nach_tkrs_list = ['А.Р.Габдулхаков ', 'З.К. Алиев', 'М.К.Алиев']
+    if region == 'ЧГМ' or region == 'ТГМ':
+        nach_tkrs = nach_tkrs_list[0]
+    elif region == 'КГМ' or region == 'АГМ':
+        nach_tkrs = nach_tkrs_list[1]
+    elif region == 'ИГМ':
+        nach_tkrs = nach_tkrs_list[2]
 
 
     ruk_orm = [''.join(region_p[region][2].keys()), ''.join(region_p[region][2].values())]
@@ -74,11 +64,11 @@ def pop_down(self, region, curator_sel, curator_ved):
         [None, 'План работ составил Ведущий геолог Ойл-сервис', None, None, None, None, None, None, None,
          '/И.М. Зуфаров/', None, None],
         [None, None, None, None, None, None, None, None, None, '     дата подписания', None, None],
-        # [None, None, 'Начальник ЦТКРС ООО  " Ойл-Сервис"', None, None, None, None, None, None,
-        #  ''.join(nach_tkrs), None, None],
+        [None, None, 'Начальник ЦТКРС ООО  " Ойл-Сервис"', None, None, None, None, None, None,
+         ''.join(nach_tkrs), None, None],
         [None, None, None, None, None, None, None, None, None, '     дата подписания', None, None],
         [None, ' ', 'Согласовано:', None, None, None, None, None, None, None, None, None],
-        [None, '', None, None, None, None, '', None, None, '', None, None],
+
         [None, None, None, None, None, None, '', None, None, '', None, None],
         [None, curator_sel[0], None, None, None, None, '___________________', None, None,
          curator_sel[1], None, None],
@@ -92,8 +82,8 @@ def pop_down(self, region, curator_sel, curator_ved):
          None, None, None, ruk_usrs_krs[1], None, None],
         [None, None, None, None, None, None, '"___"___________', None, None, '     дата подписания', None,
          None],
-        [None, '', None, None, None, None, '', None, None, '', None, None],
-        [None, None, None, None, None, None, '', None, None, '', None, None],
+        [None, None, None, None, None, None, None, None, None, None, None, None],
+
         [None, 'Замечания:', None, None, None, None, None, None, None, None, None, None],
         [None, '1.', '________________________________________________________________________________________________', None, None, None, None,
          None,
@@ -134,7 +124,18 @@ def pop_down(self, region, curator_sel, curator_ved):
          None, None, None, None],
         [None, None, None, None, None, None, None, None, None, None, None, None]]
 
+    ved_gtm_list = [None, ved_gtm[0], None, None, None, None,  '"___"___________' , None, None, ved_gtm[1], None, None]
+
+    ved_orm_list = [None, ved_orm[0], None, None, None, None, '"___"___________', None, None, ved_orm[1], None, None]
+    if (region == 'ЧГМ' or region == 'КГМ') and CreatePZ.curator == 'ОР':
+        print(pop_down)
+        podp_down.insert(13, ved_orm_list)
+    elif region == 'КГМ' or region == 'ЧГМ' and CreatePZ.curator == 'ГТМ':
+        podp_down.insert(13, ved_gtm_list)
+
+
     return podp_down
+
 
 def razdel_1(self, region):
     from open_pz import CreatePZ

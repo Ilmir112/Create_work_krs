@@ -7,7 +7,7 @@ import self
 from datetime import datetime
 from openpyxl import Workbook, load_workbook
 from openpyxl.utils import get_column_letter
-
+from PyQt6.QtWidgets import QInputDialog
 from copy import copy
 from openpyxl.utils.cell import range_boundaries
 # from main import MyWindow
@@ -21,37 +21,37 @@ from gnkt_opz import gnkt_work
 
 
 class CreatePZ:
-    data_well_max = 0
-    razdel_1 = ''
+    # data_well_max = 0
+    # razdel_1 = ''
     expected_pick_up = {}
     work_pervorations = []
     work_pervorations_dict = {}
-    data = None
-    cat_well_min = None
-    cat_well_max = None
-    data_well_min = 0
-    data_well_max = 0
-    data_x_min = 0
-    data_x_max = 0
-    data_pvr_min = 0
-    data_pvr_max = 0
-    head_column_additional = 0
-    shoe_column_additional = 0
-    column_additional_diametr = 0
-    column_additional_wall_thickness = 0
-    paker_do = ''
-    data_column_additional = 0
-    bottomhole_artificial = 0
-    art_bottom_well = ''
-    current_bottom = ''
-    gaz_f_pr = ''
-    region = ''
-    well_number = 0
-    well_area = ''
-    column_diametr = 0
-    column_wall_thickness = 0
-    shoe_column = 0
-    column_additional = False
+    # data = None
+    # cat_well_min = None
+    # cat_well_max = None
+    # data_well_min = 0
+    # data_well_max = 0
+    # data_x_min = 0
+    # data_x_max = 0
+    # data_pvr_min = 0
+    # data_pvr_max = 0
+    # head_column_additional = 0
+    # shoe_column_additional = 0
+    # column_additional_diametr = 0
+    # column_additional_wall_thickness = 0
+    # paker_do = ''
+    # data_column_additional = 0
+    # bottomhole_artificial = 0
+    # art_bottom_well = ''
+    # current_bottom = ''
+    # gaz_f_pr = ''
+    # region = ''
+    # well_number = 0
+    # well_area = ''
+    # column_diametr = 0
+    # column_wall_thickness = 0
+    # shoe_column = 0
+    # column_additional = False
     values = []
     H_F_paker_do = []
     cat_H2S_list = []
@@ -61,19 +61,18 @@ class CreatePZ:
     # dict_nkt_po = {}
     dict_sucker_rod = {32: 0, 25: 0, 22: 0, 19: 0}
     dict_sucker_rod_po = {}
-
-    cdng = ''
-    # curator = input('Введите сектор кураторов региона, ОР или ГТМ, или ГРР или ГО:  ')
-    curator = 'ОР'
-    sucker_rod_ind = 0
-    sucker_rod = False
-    sucker_rod_ind_cancel = 0
-    condition_of_wells = 0
-    pipes_ind = ''
-    itog_ind_min = 0
-    itog_ind_max = 0
-    well_number = 0
-    well_area = ''
+    # curator = ''
+    # cdng = ''
+    #
+    # sucker_rod_ind = 0
+    # sucker_rod = False
+    # sucker_rod_ind_cancel = 0
+    # condition_of_wells = 0
+    # pipes_ind = ''
+    # itog_ind_min = 0
+    # itog_ind_max = 0
+    # well_number = 0
+    # well_area = ''
     H2S_pr = []
     cat_H2S_list = []
     H2S_mg = []
@@ -87,6 +86,12 @@ class CreatePZ:
 
         wb = op.load_workbook(fname, data_only=True)
         ws = wb.active
+        curator_list = ['ОР', 'ГТМ', 'ГРР', 'ГО']
+        # curator = 'ОР'
+        curator, ok = QInputDialog.getItem(self, 'Выбор кураторов ремонта', 'Введите сектор кураторов региона',
+                                            curator_list, 0, False)
+        if ok and curator:
+           CreatePZ.curator = curator
 
         for row_ind, row in enumerate(ws.iter_rows(values_only=True)):
             if 'Категория скважины' in row:
@@ -134,12 +139,12 @@ class CreatePZ:
                             CreatePZ.bottomhole_artificial = float(row[col + 5 + n])
 
                     except:
-                        CreatePZ.bottomhole_artificial = float(input('Искусственный забой равен:  '))
+                        CreatePZ.bottomhole_artificial, ok = QInputDialog.getDouble(self, 'Искусственный забой', 'Введите искусственный забой по скважине, 1000, 50, 4000, 1)  ')
                 elif 'Текущий забой ' == value:
                     try:
                         CreatePZ.current_bottom = float(row[col + 2])
                     except:
-                        CreatePZ.current_bottom = float(input('Текущий забой равен: '))
+                        CreatePZ.current_bottom, ok = QInputDialog.getDouble(self,'Текущий забоя', 'Введите Текущий забой равен', 1000, 1, 4000, 1)
                 elif 'месторождение ' == value:
                     CreatePZ.oilfield = row[col + 2]
 
@@ -150,16 +155,16 @@ class CreatePZ:
                         try:
                             CreatePZ.column_diametr = float(data_main_production_string[0])
                         except:
-                            CreatePZ.column_diametr = float(input('диаметр колонны основной:'))
+                            CreatePZ.column_diametr = QInputDialog.getInt(self, 'диаметр основной колонны', 'Введите диаметр основной колонны', 146, 80, 276)
                         try:
                             CreatePZ.column_wall_thickness = float(data_main_production_string[1][1:])
                         except:
-                            CreatePZ.column_wall_thickness = float(input('Толщина стенки:'))
+                            CreatePZ.column_wall_thickness = QInputDialog.getDouble(self, 'Толщина стенки', 'Введите толщины стенки ЭК', 7.7, 5, 15, 1)
                         try:
                             CreatePZ.shoe_column = float(CreatePZ.without_b(data_main_production_string[2]))
 
                         except:
-                            CreatePZ.shoe_column = float(input('Башмак колонны: '))
+                            CreatePZ.shoe_column = QInputDialog.getInt(self, 'Башмак колонны: ',  'Башмак колонны: ', 1000, 20, 4000, 1)
 
 
                 elif '9. Максимальный зенитный угол' == value:
@@ -170,29 +175,26 @@ class CreatePZ:
                             CreatePZ.max_angle = row[col + n]
                             n += 1
                     except:
-                        CreatePZ.max_angle = float(input('Введите максимальный зенитный угол: '))
-
+                        CreatePZ.max_angle, ok = QInputDialog.getDouble(self, 'Максимальный зенитный угол /'
+                                                                          '','Введите максимальный зенитный угол', 25, 1, 100, 2)
 
                 elif '9. Максимальный зенитный угол' in row and value == 'на глубине':
                     try:
                         CreatePZ.max_h_angle = row[col + 1]
                     except:
-                        CreatePZ.max_h_angle = int(input('Введите глубину максимального зетного угла: '))
+                        CreatePZ.max_h_angle, ok = QInputDialog.getint(self, 'Глубина максимального угла', 'Введите глубину максимального зетного угла: ', 500, 1, 4000)
                 elif 'цех' == value and 'назначение ' in row:
                     cdng = row[col + 1]
                     CreatePZ.cdng = cdng
 
-
-
-
                 elif 'плотн.воды' == value:
                     if CreatePZ.curator == 'ОР':
-                        CreatePZ.water_cut = 100
+                        CreatePZ.water_cut = 100 # Обводненность скважины
                     else:
                         try:
                             CreatePZ.water_cut = float(row[col - 1])  # обводненность
                         except:
-                            CreatePZ.water_cut = float(input('ВВедите обводненность скважинной продукции: '))
+                            CreatePZ.water_cut = QInputDialog.getInt(self, 'Обводненность', 'Введите обводненность скважинной продукции', 50, 0, 100)
                 elif 'по Pпл' == value:
                     cat_P_1 = row[col + 1]
                     n = 1
@@ -254,7 +256,7 @@ class CreatePZ:
                             n += 1
 
                     except:
-                        CreatePZ.max_expected_pressure = int(input('Введите максимально ожидамое давление на устье: '))
+                        CreatePZ.max_expected_pressure, ok = QInputDialog.getInt(self, 'Максимальное ожидаемое давление', 'Введите максимально ожидамое давление на устье: ', 80, 0, 200)
 
                 elif 'Максимально допустимое давление опрессовки э/колонны' == value:
                     try:
@@ -264,14 +266,14 @@ class CreatePZ:
                             CreatePZ.max_admissible_pressure = row[col + n]
                             n += 1
                     except:
-                        CreatePZ.max_admissible_pressure = int(
-                            input('Введите максимально ожидаемое давление на устье: '))
+                        CreatePZ.max_admissible_pressure, ok = QInputDialog.getInt(self, 'Максимальное допустимое давление опрессовки э/колонны', 'Введите максимально допустимое давление опрессовки э/колонны: ', 80, 0, 200)
+
                 elif value == 'Пакер' and row[col + 2] == 'типоразмер':
                     CreatePZ.paker_do = row[col + 4]
                     try:
                         CreatePZ.H_F_paker_do = int(ws.cell(row=row_ind + 4, column=col + 5).value)
                     except:
-                        CreatePZ.H_F_paker_do = int(input('Глубина посадки фондового пакера: '))
+                        CreatePZ.H_F_paker_do, ok = QInputDialog.getInt(self, 'Глубина посадки фондового пакера', 'Глубина посадки фондового пакера', 500, 0, 4000)
 
         for row in range(data_x_min + 1, data_x_max):
             expected_list = []
@@ -515,7 +517,7 @@ class CreatePZ:
 
         curator_sel = block_name.curator_sel(self, CreatePZ.curator, CreatePZ.region)
         curator_ved_sel = block_name.curator_sel(self, CreatePZ.curator, CreatePZ.region)
-        podp_down = block_name.pop_down(self, CreatePZ.region, curator_sel, curator_ved_sel)
+        podp_down = block_name.pop_down(self, CreatePZ.region, curator_sel)
         for i in range(1 + ins_ind, 1 + ins_ind + len(podp_down)):  # Добавлением подписантов внизу
             for j in range(1, 13):
                 ws2.cell(row=i, column=j).value = podp_down[i - 1 - ins_ind][j - 1]
@@ -526,7 +528,7 @@ class CreatePZ:
                 ws2.cell(row=i, column=2).alignment = Alignment(wrap_text=True, vertical='top', horizontal='left')
                 if i == 1 + ins_ind + 11:
                     ws2.row_dimensions[i].height = 55
-
+        ins_ind += len(podp_down)
         # for row in range(1, 16):
         #    for col in range(1, 13):
         #         ws2.cell(row = row, column = col).alignment = ws2.cell(row = row, column = col).alignment.copy(wrapText=True)
@@ -540,13 +542,28 @@ class CreatePZ:
         #
 
         if 2 in CreatePZ.cat_H2S_list or '2' in CreatePZ.cat_H2S_list:
+            ws3 = wb2.create_sheet('Sheet1')
+            ws3.title = "Расчет необходимого количества поглотителя H2S"
+
+            ws3 = wb2["Расчет необходимого количества поглотителя H2S"]
             print(CreatePZ.H2S_pr, CreatePZ.H2S_mg)
-            calc_H2S(wb2, CreatePZ.H2S_pr, CreatePZ.H2S_mg)
+            calc_H2S(ws3, CreatePZ.H2S_pr, CreatePZ.H2S_mg)
+            ws3.print_area = f'A1:A2'
+            # ws3.page_setup.fitToPage = True
+            # ws3.page_setup.fitToHeight = False
+            # ws3.page_setup.fitToWidth = True
 
 
         else:
 
             print(f'{CreatePZ.cat_H2S_list} Расчет поглотителя сероводорода не требуется')
+
+        max_row = ws2.max_row
+        ws2.print_area = f'B1:L{ins_ind}'
+        ws2.page_setup.fitToPage = True
+        ws2.page_setup.fitToHeight = False
+        ws2.page_setup.fitToWidth = True
+        ws2.print_options.horizontalCentered = True
 
         wb2.save(f'{CreatePZ.well_number} {CreatePZ.well_area} {work_plan}.xlsx')
         return ws2
@@ -592,7 +609,7 @@ class CreatePZ:
                     count_val.append(len(str(col)))
                 else:
                     count_val.append(2)
-            row_count.append(max(count_val) / 4.7)
+            row_count.append(max(count_val) / 4.85)
 
         for index_row, row in enumerate(row_count):  # Копирование высоты строки
             if row_count[index_row - 1] > 40:

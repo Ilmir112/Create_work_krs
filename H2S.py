@@ -3,12 +3,9 @@ from openpyxl.styles import Border, Side, PatternFill, Font, GradientFill, Align
 from openpyxl.utils.cell import get_column_letter
 
 
-def calc_H2S(wb2, H2S_pr, H2S_mg):
+def calc_H2S(ws3, H2S_pr, H2S_mg):
     from open_pz import CreatePZ
-    ws3 = wb2.create_sheet('Sheet1')
-    ws3.title = "Расчет необходимого количества поглотителя H2S"
 
-    ws3 = wb2["Расчет необходимого количества поглотителя H2S"]
     print(CreatePZ.dict_nkt)
     nkt_1 = int(list(CreatePZ.dict_nkt.keys())[0])
     nkt_1_l = CreatePZ.dict_nkt[nkt_1]
@@ -44,6 +41,7 @@ def calc_H2S(wb2, H2S_pr, H2S_mg):
                 gno_well = (3.14*(CreatePZ.column_diametr-CreatePZ.column_wall_thickness*2)**2/4/1000*(CreatePZ.current_bottom- CreatePZ.head_column_additional)/1000)+(3.14*(CreatePZ.column_diametr-CreatePZ.column_wall_thickness*2)**2/4/1000*(CreatePZ.shoe_column-nkt_l)/1000)
             else:
                 gno_well = 3.14*(CreatePZ.column_additional_diametr-CreatePZ.column_additional_wall_thickness*2)**2/4/1000*(CreatePZ.current_bottom-nkt_1_l)/10000
+
         return gno_well
 
 

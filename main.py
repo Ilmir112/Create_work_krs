@@ -1,21 +1,27 @@
 import openpyxl
 import sys
+
+from openpyxl.utils import get_column_letter
+
 import open_pz
 # import plan.py
 from PyQt5.QtWidgets import QTextEdit
 from PyQt6 import QtWidgets, QtCore
-from PyQt6.QtWidgets import QApplication, QMainWindow, QTableWidget, QTableWidgetItem, QMenu, QMenuBar, QFileDialog
+from PyQt6.QtWidgets import QApplication, QMainWindow, QTableWidget, QTableWidgetItem, QMenu, QMenuBar, QFileDialog,QLineEdit
 
 class MyWindow(QMainWindow):
     fname = ''
 
-    def __init__(self, parent = None):
-        super(MyWindow, self).__init__(parent)
+    def __init__(self, parent = None, *args, **kwargs):
+        super(MyWindow, self).__init__(parent, *args, **kwargs)
         self.setWindowTitle('Создание')
-        self.setGeometry(300, 250, 350, 200)
+        self.setGeometry(500, 450, 550, 400)
         self.table_widget = QtWidgets.QTableWidget(self)
         self.setCentralWidget(self.table_widget)
         self.createMenuBar()
+        self.le = QLineEdit()
+        # self.line_edit = QtWidgets.QLineEdit(self)
+
     def createMenuBar(self):
         self.menuBar = QMenuBar(self)
         self.setMenuBar(self.menuBar)
@@ -53,7 +59,6 @@ class MyWindow(QMainWindow):
                 sheet = open_pz.CreatePZ.open_excel_file(self, self.fname[0], work_plan)
                 self.copy_pz(sheet)
 
-
             except FileNotFoundError:
                 print('Файл не найден')
 
@@ -66,8 +71,12 @@ class MyWindow(QMainWindow):
                 work_plan = 'gnkt_opz'
                 sheet = open_pz.CreatePZ.open_excel_file(self, self.fname[0], work_plan)
                 self.copy_pz(sheet)
-
-
+                # # for c in sheet.iter_cols():
+                #     print(sheet.column_dimensions[get_column_letter(c)].width)
+                # columnWidths = [sheet.column_dimensions[get_column_letter(c + 1)].width for c in sheet.iter_cols()]
+                #
+                #
+                # self.copyColumnWidths(self.table_widget, columnWidths)
 
             except FileNotFoundError:
                 print('Файл не найден')
@@ -75,6 +84,20 @@ class MyWindow(QMainWindow):
             if action == self.save_file:
                 open_pz.open_excel_file().wb.save("test_unmerge.xlsx")
 
+    # def copyColumnWidths(tableWidget, columnWidths):
+    #     for column in range(tableWidget.columnCount()):
+    #         tableWidget.setColumnWidth(column, columnWidths[column])
+
+    # def open_dialog(self):
+    #     current_text = self.line_edit.text()
+    #     title = 'Введите новое значение'
+    #     label = 'Текущее значение: {}'.format(current_text)
+    #     ok_button = 'OK'
+    #     cancel_button = 'Cancel'
+    #
+    #     reply = QtWidgets.QInputDialog.getText(self, title, label, 'New Value')
+    #     if reply:
+    #         self.line_edit.setText(reply)
     def copy_pz(self, sheet):
         rows = sheet.max_row
         merged_cells = sheet.merged_cells

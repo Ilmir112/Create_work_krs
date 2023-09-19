@@ -1,7 +1,7 @@
-
+from PyQt6.QtWidgets import QInputDialog, QMessageBox
+from main import MyWindow
 def gnkt_work(self, H_F_paker_do, H2S, max_expected_pressure, max_admissible_pressure):
     from open_pz import CreatePZ
-
 
     acid_true = True
     acid_V = 0
@@ -10,25 +10,31 @@ def gnkt_work(self, H_F_paker_do, H2S, max_expected_pressure, max_admissible_pre
     V_rast = 0
     fluid_work = 0
     current_bottom = 1250
-    acid_true_quest = input('Планировать кислоту: Да или Нет')
-    fluid_work = float(input('удельный рабочей жидкости'))
 
-    current_bottom= float(input('Введите необходимый забой'))
+    acid_true_quest  = QMessageBox.question(self, 'Необходимость кислоты', 'Планировать кислоту?')
+    if acid_true_quest == QMessageBox.StandardButton.Yes:
+        acid_true_quest = True
+    else:
+        acid_true_quest = False
+    fluid_work, ok = QInputDialog.getDouble(self,'Рабочая жидкость', 'Введите удельный вес рабочей жидкости', 1.02, 0.87, 2, 2)
+
+    current_bottom, ok = QInputDialog.getDouble(self,'Необходимый забой', 'Введите забой до которого нужно нормализовать')
     if CreatePZ.H2S_mg != None:
         fluid_work = f'{fluid_work}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из расчета 0.25кг/м3 '
     else:
         fluid_work = f'{fluid_work}г/см3 '
-    if acid_true_quest.lower() == 'нет':
-        V_rast = input('Введите объем растворителя')
+    if acid_true_quest == False:
+        V_rast, ok = QInputDialog.getDouble(self,'Растворитель', 'Введите объем растворителя', 2, 0.1, 30, 1)
         acid_true = False
 
-
     else:
-        V_rast = input('Введите объем растворителя')
-
-        acid = input('Введите вид кислоты: HF, HCl')
-        acid_V = float(input('Введите объем кислоты: '))
-        acid_pr = int(input('Введите концентрацию кислоты:'))
+        V_rast, ok  = QInputDialog.getDouble(self, 'Растворитель', 'Введите объем растворителя', 2, 0.1, 30, 1)
+        acid_list = ['HCl', 'HF']
+        acid, ok = QInputDialog.getItem(self, 'Вид кислоты', 'Введите вид кислоты: HF, HCl', acid_list, 0, False)
+        if ok and acid_list:
+            self.le.setText(acid)
+        acid_V, ok = QInputDialog.getDouble(self, 'Объем кислоты', 'Введите объем кислоты:', 10, 0.5, 300, 1)
+        acid_pr, ok = QInputDialog.getInt(self, 'концентрация кислоты', 'Введите концентрацию кислоты', 15, 2, 24)
 
     gnkt_opz =[
      [None, 'Порядок работы', None, None, None, None, None, None, None, None, None, None],
@@ -54,12 +60,11 @@ def gnkt_work(self, H_F_paker_do, H2S, max_expected_pressure, max_admissible_pre
     [None, 4, 'Проводить замеры газовоздушной среды согласно утвержденного графика',
         None, None, None, None, None, None, None,
             'Мастер ГНКТ, состав бригады', None],
-    [None, 5, f'Опрессовать пакер на {max_expected_pressure} атм с выдержкой 30 мин с оформлением соответствующего акта в присутствии \
+    [None, 5, f'Опрессовать пакер на {max_admissible_pressure}атм с выдержкой 30 мин с оформлением соответствующего акта в присутствии \
     представителя представителя ЦДНГ',
         None, None, None, None, None, None, None,
             'Мастер ГНКТ, состав бригады, представитель Заказчика', 1],
-    [None, 6, 'Провести работы по монтажу колтюбинговой установки в соответствии с технологической инструкцией, \
-        федеральных норм и правила в области промышленной безопасности «Правила безопасности в нефтяной и газовой\
+    [None, 6, 'Провести работы по монтажу колтюбинговой установки в соответствии с технологической инструкцией, федеральных норм и правила в области промышленной безопасности «Правила безопасности в нефтяной и газовой\
          промышленности»  РОСТЕХНАДЗОР Приказ №1 от 15.12.2020г и РД 153-39-023-97.',
      None, None, None, None, None, None, None,
         'Мастер ГНКТ, состав бригады ГНКТ', None],
@@ -70,7 +75,7 @@ def gnkt_work(self, H_F_paker_do, H2S, max_expected_pressure, max_admissible_pre
     [None, 8, 'Произвести монтаж колтюбингового оборудования ПП4- 80х70 (при изменении тип и марку ПВО указывает мастер)\
      ______________________  (ПВО согласно утверждённой схемы № 5 от 14.10.2021г ("Обвязки устья при глушении скважин, после \
      проведения гидроразрыва пласта и работы на скважинах ППД с оборудованием койлтюбинговых установок на месторождениях\
-     ООО "Башнефть-Добыча") \n"',
+     ООО "Башнефть-Добыча")',
         None, None, None, None, None, None, None,
             'Мастер ГНКТ, бур-к КРС, машинист подъёмника, пред. УСРСиСТ', 3.5],
         [None, 9, 'Пусковой комиссии в составе мастера и членов бригады согласно положения от 2015г.  \
@@ -122,7 +127,7 @@ def gnkt_work(self, H_F_paker_do, H2S, max_expected_pressure, max_admissible_pre
     [None, 17, f'Произвести  солянокислотную обработку пласта C1t в объеме  {acid_V}м3  ({acid} - {acid_pr} %) силами Крезол НС с протяжкой БДТ \
     вдоль интервалов перфорации {min(list(CreatePZ.work_pervorations_dict.keys()))}-{max(list(CreatePZ.work_pervorations_dict.values()))}м\
      (снизу вверх) в присутствии представителя Заказчика с составлением акта, не превышая\
-     давления закачки не более Р={max_expected_pressure}атм.\n(для приготовления соляной кислоты в объеме {acid_V}м3 - {acid_pr}%\
+     давления закачки не более Р={max_admissible_pressure}атм.\n(для приготовления соляной кислоты в объеме {acid_V}м3 - {acid_pr}%\
       необходимо замешать 7,27т HCL 24% \
      и пресной воды 4,7м3) ',
          None, None, None, None, None, None, None,
@@ -134,8 +139,8 @@ def gnkt_work(self, H_F_paker_do, H2S, max_expected_pressure, max_admissible_pre
     [None, 19, f'Продавить кислоту в пласт мин.водой уд.веса {fluid_work} в объёме 3м3 при давлении не более 80атм. Составить Акт',
         None, None, None, None, None, None, None,
             'Мастер ГНКТ, состав бригады', 1.11],
-    [None, 20, f'Приподнять БДТ на {int(H_F_paker_do)-20}м. Стоянка на реакции 2 часа. \nВ СЛУЧАЕ ОТСУТСТВИЯ ДАВЛЕНИЯ ПРОДАВКИ ПРИ СКО, \
-     РАБОТЫ ПРОИЗВОДИМ БЕЗ РЕАГИРОВАНИЯ.СОСТАВИТЬ АКТ)'.lower(),
+    [None, 20, f'Приподнять БДТ на {int(H_F_paker_do)-20}м. Стоянка на реакции 2 часа. В СЛУЧАЕ ОТСУТСТВИЯ ДАВЛЕНИЯ ПРОДАВКИ ПРИ СКО, \
+     РАБОТЫ ПРОИЗВОДИМ БЕЗ РЕАГИРОВАНИЯ.СОСТАВИТЬ АКТ)',
         None, None, None, None, None, None, None,
         'Мастер ГНКТ, состав бригады', 3.06],
     [None, 21, 'Произвести разрядку скважины для извлечения продуктов реакции кислоты в объёме не менее объёма закаченной кислоты\
@@ -146,12 +151,12 @@ def gnkt_work(self, H_F_paker_do, H2S, max_expected_pressure, max_admissible_pre
         None, None, None, None, None, None, None,
             'Мастер ГНКТ, состав бригады', 1],
     [None, 22, f'Спустить БДТ до забоя. Промыть скважину от продуктов реакции кислоты мин.водой  {fluid_work}  с составлением \
-    соответствующего акта. \nПРИ ПОЯВЛЕНИИ ЗАТЯЖЕК ИЛИ ПОСАДОК ПРИ СПУСКО-ПОДЪЕМНЫХ ОПЕРАЦИЯХ ПРОИЗВЕСТИ ИНТЕНСИВНУЮ ПРОМЫВКУ \
-    ОСЛОЖНЕННОГО УЧАСТКА СКВАЖИНЫ '.lower(),
+    соответствующего акта. \n ПРИ ПОЯВЛЕНИИ ЗАТЯЖЕК ИЛИ ПОСАДОК ПРИ СПУСКО-ПОДЪЕМНЫХ ОПЕРАЦИЯХ ПРОИЗВЕСТИ ИНТЕНСИВНУЮ ПРОМЫВКУ \
+    ОСЛОЖНЕННОГО УЧАСТКА СКВАЖИНЫ ',
         None, None, None, None, None, None, None,
             'Мастер ГНКТ, состав бригады, представитель Заказчика', 0.93],
     [None, 23, f'Произвести гидросвабирование пласта в интервале {min(list(CreatePZ.work_pervorations_dict.keys()))}-{max(list(CreatePZ.work_pervorations_dict.values()))}мм (закрыть затруб, произвести задавку в пласт \
-    жидкости при не более Рзак={max_expected_pressure}атм при установленном герметичном пакере. Операции по задавке и изливу произвести 3-4 раза \
+    жидкости при не более Рзак={max_admissible_pressure}атм при установленном герметичном пакере. Операции по задавке и изливу произвести 3-4 раза \
     в зависимости от приёмистости). ',
         None, None, None, None, None, None, None,
             'Мастер ГНКТ, состав бригады, представитель Заказчика', 1],
