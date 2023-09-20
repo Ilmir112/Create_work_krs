@@ -17,13 +17,13 @@ def gnkt_work(self, H_F_paker_do, H2S, max_expected_pressure, max_admissible_pre
         acid_true_quest = True
     else:
         acid_true_quest = False
-    fluid_work, ok = QInputDialog.getDouble(self,'Рабочая жидкость', 'Введите удельный вес рабочей жидкости', 1.02, 0.87, 2, 2)
+    fluid_work_insert, ok = QInputDialog.getDouble(self,'Рабочая жидкость', 'Введите удельный вес рабочей жидкости', 1.02, 0.87, 2, 2)
 
     current_bottom, ok = QInputDialog.getDouble(self,'Необходимый забой', 'Введите забой до которого нужно нормализовать')
-    if CreatePZ.H2S_mg != None:
-        fluid_work = f'{fluid_work}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из расчета {H2S.calv_h2s(self)}кг/м3 '
+    if 2 in CreatePZ.cat_H2S_list or '2' in CreatePZ.cat_H2S_list:
+        fluid_work = f'{fluid_work_insert}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из расчета {H2S.calv_h2s(self)}кг/м3 '
     else:
-        fluid_work = f'{fluid_work}г/см3 '
+        fluid_work = f'{fluid_work_insert}г/см3 '
     if acid_true_quest == False:
         V_rast, ok = QInputDialog.getDouble(self,'Растворитель', 'Введите объем растворителя', 2, 0.1, 30, 1)
         acid_true = False
@@ -36,6 +36,8 @@ def gnkt_work(self, H_F_paker_do, H2S, max_expected_pressure, max_admissible_pre
             self.le.setText(acid)
         acid_V, ok = QInputDialog.getDouble(self, 'Объем кислоты', 'Введите объем кислоты:', 10, 0.5, 300, 1)
         acid_pr, ok = QInputDialog.getInt(self, 'концентрация кислоты', 'Введите концентрацию кислоты', 15, 2, 24)
+
+
     paker_opr = [None, 5, f'Опрессовать пакер на {max_admissible_pressure}атм с выдержкой 30 мин с оформлением соответствующего акта в присутствии \
     представителя представителя ЦДНГ',
         None, None, None, None, None, None, None,
@@ -250,7 +252,7 @@ def gnkt_work(self, H_F_paker_do, H2S, max_expected_pressure, max_admissible_pre
       записью в журнале.',
         None, None, None, None, None, None, None,
             'Мастер КРС, представ.БВО (вызов по телефонограмме)', 0.47],
-    [None, 12, f'Произвести спуск БДТ + насадка 5 каналов до {current_bottom}м (забой) с промывкой скважины мин.водой уд.веса 1,18 г/см3  \
+    [None, 12, f'Произвести спуск БДТ + насадка 5 каналов до {current_bottom}м (забой) с промывкой скважины мин.водой уд.веса {fluid_work}  \
     с фиксацией давления промывки, расход жидкости не менее 200л\\мин, объем промывки не менее 1 цикла  со скоростью 5м/мин. \
     Убедиться в наличии свободного прохода КНК-2 (при прохождении насадкой лубрикаторной задвижки, пакера, воронки скорость\
      спуска минимальная 2м/мин). При посадке ГНКТ в колонне НКТ произвести закачку (на циркуляции) растворителя \
