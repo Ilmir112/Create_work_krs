@@ -181,4 +181,3 @@ def razdel_1(self, region):
 
 
 
-

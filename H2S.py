@@ -2,6 +2,8 @@
 from openpyxl.styles import Border, Side, PatternFill, Font, GradientFill, Alignment
 from openpyxl.utils.cell import get_column_letter
 
+import H2S
+
 
 def calc_H2S(ws3, H2S_pr, H2S_mg):
     from open_pz import CreatePZ
@@ -17,18 +19,7 @@ def calc_H2S(ws3, H2S_pr, H2S_mg):
         nkt_2 = 0
         nkt_2_l = 0
 
-    def well_volume():
-        if CreatePZ.column_additional == False:
-            volume_well = 3.14 * (CreatePZ.column_diametr - CreatePZ.column_wall_thickness * 2) ** 2 / 4 / 1000000 * (
-                CreatePZ.bottomhole_artificial)
-            return volume_well
-        else:
 
-            volume_well = (3.14 * (CreatePZ.column_additional_diametr - CreatePZ.column_wall_thickness * 2) ** 2 / 4 / 1000 * (
-                    CreatePZ.bottomhole_artificial - CreatePZ.head_column_additional) / 1000) + (
-                                      3.14 * (CreatePZ.column_diametr - CreatePZ.column_wall_thickness * 2) ** 2 / 4 / 1000 * (
-                                  CreatePZ.head_column_additional) / 1000)
-            return volume_well
 
     def gno_volume():
         nkt_l = sum(list(CreatePZ.dict_nkt.values()))
@@ -100,8 +91,8 @@ def calc_H2S(ws3, H2S_pr, H2S_mg):
         [None, 3, 'Расчеты емкости', None, None, None, None],
         [None, 3.1, 'Удельный  внутренний объем ЭК', 'дм3/м', "=10*3.14*((E9-E10*2)*0.01)^2/4", 'формула'],
         [None, 3.2, 'Удельный  внутренний объем хвостовика', 'дм3/м', '=10*3.14*((E12-E13*2)*0.01)^2/4', 'формула'],
-        [None, 3.3, 'Объем жидкости под ГНО, в т.ч.:', 'м3', '=if(E14=0,(3.14*(E9-E10*2)^2/4/1000*(E8-E19)/1000),if(E19<E16,(3.14*(E12-E13*2)^2/4/1000*(E8-E19)/1000),((3.14*(E12-E13*2)^2/4/1000*(E14)/1000) +3.14*(E9-E10*2)^2/4/1000*(E19-E15)/1000 )))', 'формула'],
-        [None, '3.3.1.', 'Объем скважины', 'м3', '=if(E14=0,3.14*(E9-E10*2)^2/4/1000*(E8)/1000,(3.14*(E12-E13*2)^2/4/1000*(E8-E15)/1000)+(3.14*(E9-E10*2)^2/4/1000*(E11)/1000))', 'формула'],
+        [None, 3.3, 'Объем жидкости под ГНО, в т.ч.:', 'м3', '=if(E14=0,(3.14*(E9-E10*2)^2/4/1000*(E8-E19)/1000),if(E19<E15,(3.14*(E12-E13*2)^2/4/1000*(E8-E19)/1000),((3.14*(E12-E13*2)^2/4/1000*(E8-E15)/1000) +3.14*(E9-E10*2)^2/4/1000*(E15-E19)/1000 )))', 'формула'],
+        [None, '3.3.1.', 'Объем скважины', 'м3', '=if(E14=0,3.14*(E9-E10*2)^2/4/1000*(E8)/1000,(3.14*(E12-E13*2)^2/4/1000*(E8-E15)/1000)+(3.14*(E9-E10*2)^2/4/1000*(E15)/1000))', 'формула'],
         [None, '3.3.1.', 'Удельное водоизмещение подвески НКТ (ступень 1 верхняя)', 'дм3/м',
          '=10*3.14*((E21*0.01)^2-(E21*0.01-E20*2*0.01)^2)/4',
          'формула'],
@@ -180,3 +171,110 @@ def calc_H2S(ws3, H2S_pr, H2S_mg):
                 ws3.cell(row=row, column=col).font = Font(name='Arial', size=13, bold=True)
                 ws3.cell(row=row, column=col).alignment = Alignment(wrap_text=True, horizontal='center',
                                                                     vertical='center')
+def well_volume(self):
+    from open_pz import CreatePZ
+    print(CreatePZ.column_additional)
+    if CreatePZ.column_additional == False:
+
+        volume_well = 3.14 * (CreatePZ.column_diametr - CreatePZ.column_wall_thickness * 2) ** 2 / 4 / 1000000 * (
+            CreatePZ.bottomhole_artificial)
+        return volume_well
+    else:
+
+        volume_well = (3.14 * (CreatePZ.column_additional_diametr - CreatePZ.column_wall_thickness * 2) ** 2 / 4 / 1000 * (
+                CreatePZ.bottomhole_artificial - CreatePZ.head_column_additional) / 1000) + (
+                                  3.14 * (CreatePZ.column_diametr - CreatePZ.column_wall_thickness * 2) ** 2 / 4 / 1000 * (
+                              CreatePZ.head_column_additional) / 1000)
+        return volume_well
+def calv_h2s(self):
+
+    from open_pz import CreatePZ
+    if 2 in CreatePZ.cat_H2S_list or 1 in CreatePZ.cat_H2S_list:
+        nkt_l = sum(list(CreatePZ.dict_nkt.values()))
+
+        udel_vnutr_v = 10 *3.14 *((CreatePZ.column_diametr - CreatePZ.column_wall_thickness*2)*0.01)**2/4
+
+        udel_vn__khv = 10 *3.14 *((CreatePZ.column_additional_diametr - CreatePZ.column_additional_wall_thickness*2)*0.01)**2/4
+        print(f'ff{udel_vn__khv}')
+        print(f' НКТ{CreatePZ.column_diametr}2 {nkt_l, CreatePZ.head_column_additional}88{CreatePZ.column_diametr, CreatePZ.column_wall_thickness}0{CreatePZ.head_column_additional, CreatePZ.bottomhole_artificial}')
+        if CreatePZ.column_additional == False:
+            print('ffd ')
+            v_pod_gno = 3.14 * (int(CreatePZ.column_diametr) - int(CreatePZ.column_wall_thickness)*2)**2/4/1000*(CreatePZ.bottomhole_artificial-int(nkt_l))/1000
+        elif nkt_l > CreatePZ.head_column_additional:
+            v_pod_gno = 3.14 * (CreatePZ.column_diametr - CreatePZ.column_wall_thickness*2)**2/4/1000 * (CreatePZ.head_column_additional-nkt_l)/1000+ 3.14*(CreatePZ.column_additional_diametr - CreatePZ.column_additional_wall_thickness*2)**2/4/1000*(CreatePZ.bottomhole_artificial-CreatePZ.head_column_additional)/1000
+        elif nkt_l < CreatePZ.head_column_additional:
+            v_pod_gno = 3.14 *(CreatePZ.column_additional_diametr-CreatePZ.column_additional_wall_thickness*2)**2/4/1000 * (CreatePZ.bottomhole_artificial-nkt_l)/1000
+        print(f'под ГНО{v_pod_gno}')
+        volume_well =  H2S.well_volume(self)
+        print(volume_well)
+        print(f'{volume_well} объем скважины')
+        nkt_1 = int(list(CreatePZ.dict_nkt.keys())[0])
+
+        nkt_1_l = CreatePZ.dict_nkt[nkt_1]
+
+        try:
+            print(list(CreatePZ.dict_nkt.keys()))
+            nkt_2 = int(list(CreatePZ.dict_nkt.keys())[1])
+            nkt_2_l = CreatePZ.dict_nkt[nkt_2]
+        except:
+            nkt_2 = 0
+            nkt_2_l = 0
+        print(nkt_1)
+        udel_vodoiz_nkt = 10*3.14*((nkt_1*0.01) **2- (nkt_1*0.01 - 5.5*2*0.01)**2)/4
+        print(f' удел {udel_vodoiz_nkt}')
+        try:
+            print(f'НКТ-{nkt_2}')
+            if nkt_2 != 0:
+                udel_vodoiz_nkt_2 = 10 * 3.14 * ((nkt_2 * 0.01) ** 2 + (nkt_2 * 0.01 - 5 * 2 * 0.01) ** 2) / 4
+                print(f'dnjhfzНКТ {udel_vodoiz_nkt_2}')
+        except:
+            udel_vodoiz_nkt= udel_vodoiz_nkt
+            print(f'dnjhfzНКТ {udel_vodoiz_nkt}')
+        vodoiz_nkt = nkt_1_l *udel_vodoiz_nkt/1000
+        try:
+            vodoiz_nkt += nkt_2_l*udel_vodoiz_nkt_2/1000
+        except:
+            vodoiz_nkt = vodoiz_nkt
+        try:
+            sucker_rod_l_25 = CreatePZ.dict_sucker_rod[25]
+        except:
+            sucker_rod_l_25 = 0
+        try:
+            sucker_rod_l_22 = CreatePZ.dict_sucker_rod[22]
+        except:
+            sucker_rod_l_22 = 0
+        try:
+            sucker_rod_l_19 = CreatePZ.dict_sucker_rod[19]
+        except:
+            sucker_rod_l_19 = 0
+
+        vodoiz_sucker = (10 * 3.14 *((25*0.01)**2/4)*sucker_rod_l_25/1000) +(10 * 3.14 *((25*0.01)**2/4)*sucker_rod_l_22/1000) +(10 * 3.14 *((25*0.01)**2/4)*sucker_rod_l_19/1000)
+
+        oil_mass = v_pod_gno*(100- CreatePZ.water_cut) * 0.9/100
+        print(f'oil {oil_mass}')
+        volume_h2s = CreatePZ.gaz_f_pr*oil_mass* (float(CreatePZ.H2S_pr[0]))/100
+
+        h2s_mass_in_oil = (34*volume_h2s*1000/22.14)
+        h2s_mass_in_water = (vodoiz_sucker+vodoiz_nkt)*CreatePZ.H2S_mg[0]
+        print(f'h2a{h2s_mass_in_water}')
+        mass_oil_pog_gno = (vodoiz_sucker+vodoiz_nkt) * (100-CreatePZ.water_cut)*0.9/100
+        h2s_volume_pod_gno = mass_oil_pog_gno* CreatePZ.gaz_f_pr*CreatePZ.H2S_pr[0]/100
+        mass_h2s_gas = 34*h2s_volume_pod_gno/22.14
+        mass_h2s_water = v_pod_gno*CreatePZ.H2S_mg[0]
+        print(f'mass{mass_h2s_water}')
+        mass_h2s_all = h2s_mass_in_water + h2s_mass_in_oil + mass_h2s_gas + mass_h2s_water
+        print(f'mass_h2 {mass_h2s_all}')
+
+
+
+        emk_reag = 24
+        plotn_reag = 1.065
+        raschet_mass = mass_h2s_all*emk_reag/1000
+        print(f'ras{raschet_mass}')
+
+        koeff_zapas = 1.25
+        mass_reag_s_zapas = raschet_mass*koeff_zapas
+        print(f'mass{mass_reag_s_zapas}')
+        udel_mas_raskhod = mass_reag_s_zapas/volume_well
+        print(udel_mas_raskhod)
+        return round(udel_mas_raskhod, 2)
