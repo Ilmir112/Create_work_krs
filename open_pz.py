@@ -25,53 +25,16 @@ class CreatePZ:
     shoe_column_additional = 0
     column_additional_diametr = 0
     column_additional_wall_thickness = 0
-    # data_well_max = 0
-    # razdel_1 = ''
     expected_pick_up = {}
     work_pervorations = []
     work_pervorations_dict = {}
-    data = None
-    cat_well_min = None
-    cat_well_max = None
-    data_well_min = 0
-    data_well_max = 0
-    data_x_min = 0
-    data_x_max = 0
-    data_pvr_min = 0
-    data_pvr_max = 0
-
     paker_do = {}
-    # data_column_additional = 0
-    # bottomhole_artificial = 0
-    # art_bottom_well = ''
-    # current_bottom = ''
-    # gaz_f_pr = ''
-    region = ''
-    well_number = 0
-    well_area = ''
-    column_diametr = 0
-    column_wall_thickness = 0
-    shoe_column = 0
     column_additional = False
     values = []
     H_F_paker_do = {}
-    cat_H2S_list = []
     cat_P_1 = []
-
     dict_sucker_rod = {32: 0, 25: 0, 22: 0, 19: 0}
     dict_sucker_rod_po = {}
-    # curator = ''
-    # cdng = ''
-    #
-    # sucker_rod_ind = 0
-    # sucker_rod = False
-    # sucker_rod_ind_cancel = 0
-    # condition_of_wells = 0
-    # pipes_ind = ''
-    # itog_ind_min = 0
-    # itog_ind_max = 0
-    # well_number = 0
-    # well_area = ''
     H2S_pr = []
     cat_H2S_list = []
     H2S_mg = []
@@ -95,7 +58,6 @@ class CreatePZ:
         for row_ind, row in enumerate(ws.iter_rows(values_only=True)):
             if 'Категория скважины' in row:
                 cat_well_min = row_ind + 1  # индекс начала категории
-                print(cat_well_min)
 
             elif 'План-заказ' in row:
                 ws.cell(row=row_ind + 1, column=2).value = 'ПЛАН РАБОТ'
@@ -220,7 +182,6 @@ class CreatePZ:
                     CreatePZ.gaz_f_pr = row[col - 1]
                 elif '6. Конструкция хвостовика' == value:
                     CreatePZ.data_column_additional = ws.cell(row=row_ind + 3, column=col + 2).value
-                    print(f'dd{CreatePZ.data_column_additional}')
                     if CreatePZ.data_column_additional != None or CreatePZ.data_column_additional != '-':
                         CreatePZ.column_additional = True
                     if   CreatePZ.column_additional == True:
@@ -240,19 +201,15 @@ class CreatePZ:
                             CreatePZ.column_additional_wall_thickness = ws.cell(row=row_ind + 3, column=col + 6).value
                         except:
                             CreatePZ.column_additional_wall_thickness, ok = QInputDialog.getInt(self, ',толщина стенки доп колонны', 'введите толщину стенки доп колонны', 600, 0, 3500)
-
-
                 elif 'Дата вскрытия/отключения' == value:
                     CreatePZ.old_version = True
                 elif 'Максимально ожидаемое давление на устье' == value:
                     try:
-
                         CreatePZ.max_expected_pressure = row[col + 1]
                         n = 1
                         while CreatePZ.max_expected_pressure == None:
                             CreatePZ.max_expected_pressure = row[col + n]
                             n += 1
-
                     except:
                         CreatePZ.max_expected_pressure, ok = QInputDialog.getInt(self, 'Максимальное ожидаемое давление', 'Введите максимально ожидамое давление на устье: ', 80, 0, 200)
 
@@ -267,14 +224,11 @@ class CreatePZ:
                         CreatePZ.max_admissible_pressure, ok = QInputDialog.getInt(self, 'Максимальное допустимое давление опрессовки э/колонны', 'Введите максимально допустимое давление опрессовки э/колонны: ', 80, 0, 200)
 
                 elif value == 'Пакер' and row[col + 2] == 'типоразмер':
-
                     CreatePZ.paker_do['do'] = row[col + 4]
                     if CreatePZ.old_version == True:
                         CreatePZ.paker_do['posle'] = row[col + 8]
                     else:
                         CreatePZ.paker_do['posle'] = row[col + 9]
-
-                    print(CreatePZ.paker_do)
 
                 elif value == 'Н посадки, м':
                     try:
@@ -283,7 +237,6 @@ class CreatePZ:
                             CreatePZ.H_F_paker_do['posle'] = row[col + 6]
                         else:
                             CreatePZ.H_F_paker_do['posle'] = row[col + 7]
-                        print(f' глубина посадки пакера {CreatePZ.H_F_paker_do}')
 
                     except:
                         CreatePZ.H_F_paker_do, ok = QInputDialog.getInt(self, 'Глубина посадки фондового пакера', 'Глубина посадки фондового пакера', 500, 0, 4000)
@@ -293,15 +246,13 @@ class CreatePZ:
                             CreatePZ.H_F_paker_do['posle'], ok = QInputDialog.getInt(self, 'Глубина посадки фондового пакера',
                                                                             'Глубина посадки фондового пакера до ремонта', 1000, 0,
                                                                             4000)
-
-
                 elif 2 in CreatePZ.cat_H2S_list or 1 in CreatePZ.cat_H2S_list:
                     if 'мг/дм3' == value or 'мг/л' == value:
                         try:
                             CreatePZ.H2S_mg.append(float(row[col - 1]))
                         except:
                             CreatePZ.H2S_mg.append(float(QInputDialog.getDouble(self, 'Сероводород', 'Введите содержание сероводорода в мг/л', 50, 0, 1000, 2)))
-                        print(f' Содерж H2S{CreatePZ.H2S_mg}')
+
                     elif '%' == value:
                         try:
                             CreatePZ.H2S_pr.append(float(row[col - 1]))
@@ -339,7 +290,7 @@ class CreatePZ:
             CreatePZ.shoe_nkt > CreatePZ.bottomhole_artificial
         except:
             print('НКТ ниже забоя')
-        print(f'C-{CreatePZ.shoe_nkt}м')
+
         try:
             for row in range(sucker_rod_ind, pipes_ind - 1):
                 if ws.cell(row=row, column=3).value == 'План':
@@ -348,7 +299,7 @@ class CreatePZ:
                 key = ws.cell(row=row, column=4).value
                 value = ws.cell(row=row, column=7).value
                 if key != None and row < b_plan:
-                    print(key)
+
                     self.dict_sucker_rod[key] = self.dict_sucker_rod.get(key, 0) + value
                     if key != None and row >= b_plan:
                         self.dict_sucker_rod_po[key] = self.dict_sucker_rod_po.get(key, 0) + value
@@ -366,8 +317,6 @@ class CreatePZ:
                     lst.append(ws.cell(row=j + 2, column=i + 1).value)
             perforations_intervals.append(lst)
         perforations_intervals = sorted(perforations_intervals, key=lambda x: x[3])
-        print(perforations_intervals)
-        print(CreatePZ.H_F_paker_do)
         for row in perforations_intervals:
             if int(row[2]) > CreatePZ.H_F_paker_do['do'] and row[5] == None and int(row[2]) <=CreatePZ.bottomhole_artificial and CreatePZ.old_version == False:
                 CreatePZ.work_pervorations.append(row)
@@ -379,7 +328,7 @@ class CreatePZ:
 
         CreatePZ.region = block_name.region(cdng)
 
-        razdel_1 = block_name.razdel_1(self, CreatePZ.region)
+        razdel_1 = block_name.razdel_1(self)
 
         wb2 = op.Workbook()
         ws2 = wb2.get_sheet_by_name('Sheet')
@@ -410,7 +359,7 @@ class CreatePZ:
         ins_ind = len(razdel_1) + cat_well_min
 
         list_block = [cat_well_min,  CreatePZ.data_well_max]
-        print(list_block)
+
         head = plan.head_ind(cat_well_min, CreatePZ.data_well_max + 1)
         name_values = razdel_1
         index_row = cat_well_min
@@ -420,8 +369,6 @@ class CreatePZ:
         #     head = plan.head_ind(list_block[i - 1], list_block[i] + 2)
         #
         #     ins_ind += (list_block[i] + 2 - list_block[i - 1])
-
-
 
         thin_border = Border(left=Side(style='thin'),
                              right=Side(style='thin'),
@@ -445,7 +392,7 @@ class CreatePZ:
             ws2.merge_cells(start_row=i, start_column=2, end_row=i, end_column=12)
 
             if i == (ins_ind + 13 or i == ins_ind + 28) and work_plan == 'krs':
-                print(work_plan == 'krs')
+
                 ws2.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='center',
                                                                 vertical='center')
                 ws2.cell(row=i, column=2).font = Font(name='Arial', size=13, bold=True)
@@ -594,7 +541,7 @@ class CreatePZ:
             ws3.title = "Расчет необходимого количества поглотителя H2S"
 
             ws3 = wb2["Расчет необходимого количества поглотителя H2S"]
-            print(CreatePZ.H2S_pr, CreatePZ.H2S_mg)
+
             calc_H2S(ws3, CreatePZ.H2S_pr, CreatePZ.H2S_mg)
             ws3.print_area = f'A1:A2'
             # ws3.page_setup.fitToPage = True
@@ -636,7 +583,7 @@ class CreatePZ:
         # print(f' f {len(dict_rowHeights[work_plan])}')
         for index_row, row in enumerate(ws2.iter_rows()):  # Копирование высоты строки
             if len(rowHeights) >= index_row:
-                ws2.row_dimensions[index_row + len(block_name.razdel_1(self, CreatePZ.region)) + 1].height = rowHeights[
+                ws2.row_dimensions[index_row + len(block_name.razdel_1(self)) + 1].height = rowHeights[
                     index_row - 1]
             for col_ind, col in enumerate(row):
 
