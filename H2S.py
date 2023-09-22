@@ -62,7 +62,7 @@ def calc_H2S(ws3, H2S_pr, H2S_mg):
         [None, '№', 'Параметр', None, 'Результат расчета', None],
         [None, 1, 'Параметры скважины', None, f'{CreatePZ.well_number} {CreatePZ.well_area}', None],
         [None, 1.1, 'Забой скважины', 'м', float(CreatePZ.bottomhole_artificial), 'формула'],
-        [None, 1.2, 'текущий забой', 'м', float(CreatePZ.bottomhole_artificial), 'ввод'],
+        [None, 1.2, 'текущий забой', 'м', float(CreatePZ.current_bottom), 'ввод'],
         [None, 1.3, 'Диаметр ЭК (ступень 1 верхняя)', 'мм', int(CreatePZ.column_diametr), 'ввод'],
             [None, '1.3.1.', 'Толщина стенки ЭК (ступень 1 верхняя)', 'мм', float(CreatePZ.column_wall_thickness), 'ввод'],
         [None, '1.3.2.', 'Длина подвески ЭК (ступень 1 верхняя)', 'м', int(CreatePZ.shoe_column), 'ввод'],
@@ -277,4 +277,7 @@ def calv_h2s(self):
         print(f'mass{mass_reag_s_zapas}')
         udel_mas_raskhod = mass_reag_s_zapas/volume_well
         print(udel_mas_raskhod)
-        return round(udel_mas_raskhod, 2)
+
+        if udel_mas_raskhod <=0.01:
+            udel_mas_raskhod = 0.01
+        return round(udel_mas_raskhod, 3)
