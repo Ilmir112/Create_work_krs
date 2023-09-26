@@ -173,7 +173,7 @@ def calc_H2S(ws3, H2S_pr, H2S_mg):
                                                                     vertical='center')
 def well_volume(self):
     from open_pz import CreatePZ
-    print(CreatePZ.column_additional)
+    # print(CreatePZ.column_additional)
     if CreatePZ.column_additional == False:
 
         volume_well = 3.14 * (CreatePZ.column_diametr - CreatePZ.column_wall_thickness * 2) ** 2 / 4 / 1000000 * (
@@ -195,8 +195,8 @@ def calv_h2s(self):
         udel_vnutr_v = 10 *3.14 *((CreatePZ.column_diametr - CreatePZ.column_wall_thickness*2)*0.01)**2/4
 
         udel_vn__khv = 10 *3.14 *((CreatePZ.column_additional_diametr - CreatePZ.column_additional_wall_thickness*2)*0.01)**2/4
-        print(f'ff{udel_vn__khv}')
-        print(f' НКТ{CreatePZ.column_diametr}2 {nkt_l, CreatePZ.head_column_additional}88{CreatePZ.column_diametr, CreatePZ.column_wall_thickness}0{CreatePZ.head_column_additional, CreatePZ.bottomhole_artificial}')
+        # print(f'ff{udel_vn__khv}')
+        # print(f' НКТ{CreatePZ.column_diametr}2 {nkt_l, CreatePZ.head_column_additional}88{CreatePZ.column_diametr, CreatePZ.column_wall_thickness}0{CreatePZ.head_column_additional, CreatePZ.bottomhole_artificial}')
         if CreatePZ.column_additional == False:
             print('ffd ')
             v_pod_gno = 3.14 * (int(CreatePZ.column_diametr) - int(CreatePZ.column_wall_thickness)*2)**2/4/1000*(CreatePZ.bottomhole_artificial-int(nkt_l))/1000
@@ -204,32 +204,32 @@ def calv_h2s(self):
             v_pod_gno = 3.14 * (CreatePZ.column_diametr - CreatePZ.column_wall_thickness*2)**2/4/1000 * (CreatePZ.head_column_additional-nkt_l)/1000+ 3.14*(CreatePZ.column_additional_diametr - CreatePZ.column_additional_wall_thickness*2)**2/4/1000*(CreatePZ.bottomhole_artificial-CreatePZ.head_column_additional)/1000
         elif nkt_l < CreatePZ.head_column_additional:
             v_pod_gno = 3.14 *(CreatePZ.column_additional_diametr-CreatePZ.column_additional_wall_thickness*2)**2/4/1000 * (CreatePZ.bottomhole_artificial-nkt_l)/1000
-        print(f'под ГНО{v_pod_gno}')
+        # print(f'под ГНО{v_pod_gno}')
         volume_well =  H2S.well_volume(self)
-        print(volume_well)
-        print(f'{volume_well} объем скважины')
+        # print(volume_well)
+        # print(f'{volume_well} объем скважины')
         nkt_1 = int(list(CreatePZ.dict_nkt.keys())[0])
 
         nkt_1_l = CreatePZ.dict_nkt[nkt_1]
 
         try:
-            print(list(CreatePZ.dict_nkt.keys()))
+            # print(list(CreatePZ.dict_nkt.keys()))
             nkt_2 = int(list(CreatePZ.dict_nkt.keys())[1])
             nkt_2_l = CreatePZ.dict_nkt[nkt_2]
         except:
             nkt_2 = 0
             nkt_2_l = 0
-        print(nkt_1)
+        # print(nkt_1)
         udel_vodoiz_nkt = 10*3.14*((nkt_1*0.01) **2- (nkt_1*0.01 - 5.5*2*0.01)**2)/4
-        print(f' удел {udel_vodoiz_nkt}')
+        # print(f' удел {udel_vodoiz_nkt}')
         try:
-            print(f'НКТ-{nkt_2}')
+            # print(f'НКТ-{nkt_2}')
             if nkt_2 != 0:
                 udel_vodoiz_nkt_2 = 10 * 3.14 * ((nkt_2 * 0.01) ** 2 + (nkt_2 * 0.01 - 5 * 2 * 0.01) ** 2) / 4
-                print(f'dnjhfzНКТ {udel_vodoiz_nkt_2}')
+                # print(f'dnjhfzНКТ {udel_vodoiz_nkt_2}')
         except:
             udel_vodoiz_nkt= udel_vodoiz_nkt
-            print(f'dnjhfzНКТ {udel_vodoiz_nkt}')
+            # print(f'dnjhfzНКТ {udel_vodoiz_nkt}')
         vodoiz_nkt = nkt_1_l *udel_vodoiz_nkt/1000
         try:
             vodoiz_nkt += nkt_2_l*udel_vodoiz_nkt_2/1000
@@ -251,32 +251,32 @@ def calv_h2s(self):
         vodoiz_sucker = (10 * 3.14 *((25*0.01)**2/4)*sucker_rod_l_25/1000) +(10 * 3.14 *((25*0.01)**2/4)*sucker_rod_l_22/1000) +(10 * 3.14 *((25*0.01)**2/4)*sucker_rod_l_19/1000)
 
         oil_mass = v_pod_gno*(100- CreatePZ.water_cut) * 0.9/100
-        print(f'oil {oil_mass}')
+        # print(f'oil {oil_mass}')
         volume_h2s = CreatePZ.gaz_f_pr*oil_mass* (float(CreatePZ.H2S_pr[0]))/100
 
         h2s_mass_in_oil = (34*volume_h2s*1000/22.14)
         h2s_mass_in_water = (vodoiz_sucker+vodoiz_nkt)*CreatePZ.H2S_mg[0]
-        print(f'h2a{h2s_mass_in_water}')
+        # print(f'h2a{h2s_mass_in_water}')
         mass_oil_pog_gno = (vodoiz_sucker+vodoiz_nkt) * (100-CreatePZ.water_cut)*0.9/100
         h2s_volume_pod_gno = mass_oil_pog_gno* CreatePZ.gaz_f_pr*CreatePZ.H2S_pr[0]/100
         mass_h2s_gas = 34*h2s_volume_pod_gno/22.14
         mass_h2s_water = v_pod_gno*CreatePZ.H2S_mg[0]
-        print(f'mass{mass_h2s_water}')
+        # print(f'mass{mass_h2s_water}')
         mass_h2s_all = h2s_mass_in_water + h2s_mass_in_oil + mass_h2s_gas + mass_h2s_water
-        print(f'mass_h2 {mass_h2s_all}')
+        # print(f'mass_h2 {mass_h2s_all}')
 
 
 
         emk_reag = 24
         plotn_reag = 1.065
         raschet_mass = mass_h2s_all*emk_reag/1000
-        print(f'ras{raschet_mass}')
+        # print(f'ras{raschet_mass}')
 
         koeff_zapas = 1.25
         mass_reag_s_zapas = raschet_mass*koeff_zapas
-        print(f'mass{mass_reag_s_zapas}')
+        # print(f'mass{mass_reag_s_zapas}')
         udel_mas_raskhod = mass_reag_s_zapas/volume_well
-        print(udel_mas_raskhod)
+        # print(udel_mas_raskhod)
 
         if udel_mas_raskhod <=0.01:
             udel_mas_raskhod = 0.01

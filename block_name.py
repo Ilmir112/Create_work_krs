@@ -133,6 +133,13 @@ def razdel_1(self):
                  None],
                 [None, f'"____"_____________________{current_datetime.year}г.', None, None, '', None, None,
                  f'"____"_____________________{current_datetime.year}г.', None, None, None, None],
+                [None, None, None, None, None, None, None, None, None, None, None, None],
+                [None, None, None, None, None, None, None, None, None, None, None, None],
+                [None, None, None, None, None, None, None, None, None, None, None, None],
+                [None, None, None, None, None, None, None, None, None, None, None, None],
+                [None, None, None, None, None, None, None, None, None, None, None, None],
+                [None, None, None, None, None, None, None, None, None, None, None, None],
+                [None, None, None, None, None, None, None, None, None, None, None, None],
                 [None, None, None, None, None, None, None, None, None, None, None, None]]
 
     podp_grp = [[None, 'Представитель подрядчика по ГРП', None, None, None, None, None, None, None, None, None,
@@ -150,7 +157,10 @@ def razdel_1(self):
                  None]]
 
     if '1' in CreatePZ.cat_P_1 or '1' in CreatePZ.cat_H2S_list or 1 in CreatePZ.cat_P_1 or 1 in CreatePZ.cat_H2S_list:
-        razdel_1.append(podp_bvo)
+
+         for row in range(len(podp_bvo)):
+             for col in range(len(podp_bvo[row])):
+                 razdel_1[row+9][col] = podp_bvo[row][col]
     return razdel_1
 
 
