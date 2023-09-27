@@ -43,11 +43,12 @@ def gnkt_work(self):
     представителя представителя ЦДНГ',
         None, None, None, None, None, None, None,
             'Мастер ГНКТ, состав бригады, представитель Заказчика', 1]
-    if CreatePZ.H_F_paker_do['do'] == None:
-        CreatePZ.H_F_paker_do = sum(list(CreatePZ.dict_nkt.values()))
-        if CreatePZ.H_F_paker_do >= Create.PZcurrent_bottom:
+    if CreatePZ.H_F_paker_do['do'] == 0:
+        print(25)
+        H_F_paker_do = sum(list(CreatePZ.dict_nkt.values()))
+        if H_F_paker_do >= CreatePZ.current_bottom:
             H_F_paker_do, ok = QInputDialog.getDouble(self, 'глубина НКТ',
-                                                        'Введите Глубины башмака НКТ',500 , 0, Create.PZcurrent_bottom)
+                                                        'Введите Глубины башмака НКТ',500 , 0, CreatePZ.current_bottom)
     else:
         H_F_paker_do = CreatePZ.H_F_paker_do['do']
     gnkt_opz =[
@@ -218,7 +219,7 @@ def gnkt_work(self):
             'Мастер ГНКТ, состав бригады', 1]]
 
     n = 17
-    if CreatePZ.H_F_paker_do != None or CreatePZ.H_F_paker_do != '-': # вставка строк при наличии пакера
+    if CreatePZ.H_F_paker_do['do'] != 0: # вставка строк при наличии пакера
         gnkt_opz.insert(7, paker_opr)
         n +=1
 

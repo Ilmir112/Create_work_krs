@@ -39,7 +39,8 @@ class MyWindow(QMainWindow):
         self.create_PRS = self.create_file.addAction('План ПРС', self.action_clicked)
         self.open_file = self.fileMenu.addAction('Открыть', self.action_clicked )
         self.save_file = self.fileMenu.addAction('Сохранить', self.action_clicked)
-        self.save_file = self.fileMenu.addAction('Сохранить как', self.action_clicked)
+        self.save_file_as = self.fileMenu.addAction('Сохранить как', self.action_clicked)
+
 
 
         class_well = self.classifierMenu.addAction('&классификатор')
@@ -57,12 +58,13 @@ class MyWindow(QMainWindow):
             try:
                 work_plan= 'krs'
                 sheet = open_pz.CreatePZ.open_excel_file(self, self.fname[0], work_plan)
+
                 self.copy_pz(sheet)
 
             except FileNotFoundError:
                 print('Файл не найден')
 
-        if action == self.create_GNKT_OPZ:
+        elif action == self.create_GNKT_OPZ:
             print('кнопка нажата')
             self.fname = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
                                                                "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
@@ -71,41 +73,39 @@ class MyWindow(QMainWindow):
                 work_plan = 'gnkt_opz'
                 sheet = open_pz.CreatePZ.open_excel_file(self, self.fname[0], work_plan)
                 self.copy_pz(sheet)
-                # # for c in sheet.iter_cols():
-                #     print(sheet.column_dimensions[get_column_letter(c)].width)
-                # columnWidths = [sheet.column_dimensions[get_column_letter(c + 1)].width for c in sheet.iter_cols()]
-                #
-                #
-                # self.copyColumnWidths(self.table_widget, columnWidths)
+
 
             except FileNotFoundError:
                 print('Файл не найден')
 
-            if action == self.save_file:
-                open_pz.open_excel_file().wb.save("test_unmerge.xlsx")
+            # if action == self.save_file:
+            #     open_pz.open_excel_file().wb.save("test_unmerge.xlsx")
 
-    # def copyColumnWidths(tableWidget, columnWidths):
-    #     for column in range(tableWidget.columnCount()):
-    #         tableWidget.setColumnWidth(column, columnWidths[column])
+        elif action == self.save_file_as:
+            self.saveFileDialog()
 
-    # def open_dialog(self):
-    #     current_text = self.line_edit.text()
-    #     title = 'Введите новое значение'
-    #     label = 'Текущее значение: {}'.format(current_text)
-    #     ok_button = 'OK'
-    #     cancel_button = 'Cancel'
-    #
-    #     reply = QtWidgets.QInputDialog.getText(self, title, label, 'New Value')
-    #     if reply:
-    #         self.line_edit.setText(reply)
+    def saveFileDialog(self):
+
+        fname, _ = QFileDialog.getSaveFileName(self, "QFileDialog.getSaveFileName()", "",
+                                                   "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
+        if fname:
+            print(fname)
+
     def copy_pz(self, sheet):
+        from open_pz import CreatePZ
         rows = sheet.max_row
         merged_cells = sheet.merged_cells
         cols = 13
         self.table_widget.setRowCount(rows)
         self.table_widget.setColumnCount(cols)
+        rowHeights_exit = [sheet.row_dimensions[i + 1].height if sheet.row_dimensions[i + 1].height != None else 18 for i in range(sheet.max_row)]
+
+
         for row in range(1, rows + 1):
+            if row > 1 and row < rows -1:
+                self.table_widget.setRowHeight(row, int(rowHeights_exit[row]))
             for col in range(1, cols + 1):
+
                 if sheet.cell(row=row, column=col).value != None:
                     cell_value = str(sheet.cell(row=row, column=col).value)
                     item = QtWidgets.QTableWidgetItem(cell_value)
@@ -118,7 +118,8 @@ class MyWindow(QMainWindow):
                             self.table_widget.setSpan(row - 1, col - 1,
                                                       merged_cell.max_row - merged_cell.min_row + 1,
                                                       merged_cell.max_col - merged_cell.min_col + 1)
-        self.table_widget.resizeColumnsToContents()
+        # self.table_widget.resizeColumnsToContents()
+
 
 
 def application():

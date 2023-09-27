@@ -198,7 +198,7 @@ def calv_h2s(self):
         # print(f'ff{udel_vn__khv}')
         # print(f' НКТ{CreatePZ.column_diametr}2 {nkt_l, CreatePZ.head_column_additional}88{CreatePZ.column_diametr, CreatePZ.column_wall_thickness}0{CreatePZ.head_column_additional, CreatePZ.bottomhole_artificial}')
         if CreatePZ.column_additional == False:
-            print('ffd ')
+
             v_pod_gno = 3.14 * (int(CreatePZ.column_diametr) - int(CreatePZ.column_wall_thickness)*2)**2/4/1000*(CreatePZ.bottomhole_artificial-int(nkt_l))/1000
         elif nkt_l > CreatePZ.head_column_additional:
             v_pod_gno = 3.14 * (CreatePZ.column_diametr - CreatePZ.column_wall_thickness*2)**2/4/1000 * (CreatePZ.head_column_additional-nkt_l)/1000+ 3.14*(CreatePZ.column_additional_diametr - CreatePZ.column_additional_wall_thickness*2)**2/4/1000*(CreatePZ.bottomhole_artificial-CreatePZ.head_column_additional)/1000

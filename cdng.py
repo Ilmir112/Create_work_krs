@@ -378,7 +378,7 @@ region_dict = {
 def itog_1():
     from open_pz import CreatePZ
     itog_1 = [
-        [None, 'ИТОГО:', None, None, None, None, None, None, None, None, None, f'=ROUND(SUM(L{CreatePZ.itog_ind_min}:L{CreatePZ.itog_ind_max+2}),1)'],
+        [None, 'ИТОГО:', None, None, None, None, None, None, None, None, None, f'=ROUND(SUM(L{CreatePZ.itog_ind_min}:L{CreatePZ.itog_ind_max}),1)'],
                   [None, 'Герметизация ,  разгерметизация  устья  скважины', None, None, None, None, None, None, None,
                    None, None, f'=ROUND(SUM(L{CreatePZ.itog_ind_min}:L{CreatePZ.itog_ind_max-1})/11.5*11/60 ,1)'],
                   [None, 'Заправка ДВС', None, None, None, None, None, None, None, None, None, f'=ROUND(SUM(L{CreatePZ.itog_ind_min}:L{CreatePZ.itog_ind_max+2})/23*0.13 ,1)'],
