@@ -10,7 +10,8 @@ def gnkt_work(self):
     acid = 0
     V_rast = 0
     fluid_work = 0
-
+    pervoration_min = round(min([CreatePZ.dict_perforation[i]['кровля'] for i in CreatePZ.plast_work])[0], 1)
+    pervoration_max = round(max([CreatePZ.dict_perforation[i]['подошва'] for i in CreatePZ.plast_work])[0], 1)
 
 
     acid_true_quest  = QMessageBox.question(self, 'Необходимость кислоты', 'Планировать кислоту?')
@@ -31,14 +32,31 @@ def gnkt_work(self):
 
     else:
         V_rast, ok  = QInputDialog.getDouble(self, 'Растворитель', 'Введите объем растворителя', 2, 0.1, 30, 1)
-        acid_list = ['HCl', 'HF']
+        acid_list = ['HCl', 'HF', 'ВТ']
         acid, ok = QInputDialog.getItem(self, 'Вид кислоты', 'Введите вид кислоты: HF, HCl', acid_list, 0, False)
         if ok and acid_list:
             self.le.setText(acid)
         acid_V, ok = QInputDialog.getDouble(self, 'Объем кислоты', 'Введите объем кислоты:', 10, 0.5, 300, 1)
         acid_pr, ok = QInputDialog.getInt(self, 'концентрация кислоты', 'Введите концентрацию кислоты', 15, 2, 24)
-
-
+    acid_sel = 0
+    if acid == 'HCl':
+        acid_sel = f'Произвести  солянокислотную обработку {" ".join(CreatePZ.plast_work)}  в объеме  {acid_V}м3  ({acid} - {acid_pr} %) силами/' \
+                   f' Крезол НС с протяжкой БДТ вдоль интервалов перфорации {pervoration_min}-\
+                   {pervoration_max}м (снизу вверх) в присутствии представителя Заказчика с \
+                   составлением акта, не превышая давления закачки не более Р={CreatePZ.max_admissible_pressure}атм.\n (для приготовления \
+                   соляной кислоты в объеме {acid_V}м3 - {acid_pr}% необходимо замешать {round(acid_V*acid_pr/24*1.118,1)}т HCL 24% и пресной\
+                    воды {round(acid_V-acid_V*acid_pr/24*1.118,1)}м3)'
+    elif acid == 'ВТ':
+        vt, ok = QInputDialog.getText(None, 'Высокотехнологическая кислоты', 'Нужно расписать вид кислоты и объем')
+        acid_sel = f'Произвести кислотную обработку пласта {" ".join(CreatePZ.plast_work)} {vt}  силами Крезол \
+           НС с протяжкой БДТ вдоль интервалов перфорации {pervoration_min}-\
+           {pervoration_max}м (снизу вверх) в присутствии представителя \
+           Заказчика с составлением акта, не превышая давления закачки не более Р={CreatePZ.max_admissible_pressure}атм.'
+    elif acid == 'HF':
+        acid_sel = f'Произвести  солянокислотную обработку пласта {" ".join(CreatePZ.plast_work)}  в объеме  {acid_V}м3  ({acid} - {acid_pr} %) силами Крезол \
+           НС с протяжкой БДТ вдоль интервалов перфорации {pervoration_min}-\
+           {pervoration_max}м (снизу вверх) в присутствии представителя \
+           Заказчика с составлением акта, не превышая давления закачки не более Р={CreatePZ.max_admissible_pressure}атм.'
     paker_opr = [None, 5, f'Опрессовать пакер на {CreatePZ.max_admissible_pressure}атм с выдержкой 30 мин с оформлением соответствующего акта в присутствии \
     представителя представителя ЦДНГ',
         None, None, None, None, None, None, None,
@@ -146,8 +164,8 @@ def gnkt_work(self):
                f'ИНТЕНСИВНУЮ ПРОМЫВКУ ОСЛОЖНЕННОГО УЧАСТКА СКВАЖИНЫ ',
         None, None, None, None, None, None, None,
             'Мастер ГНКТ, состав бригады, представитель Заказчика', 0.93],
-    [None, 23, f'Произвести гидросвабирование пласта в интервале {min(list(CreatePZ.work_pervorations_dict.keys()))}-'
-               f'{max(list(CreatePZ.work_pervorations_dict.values()))}мм (закрыть затруб, произвести задавку в пласт'
+    [None, 23, f'Произвести гидросвабирование пласта в интервале {pervoration_min}-'
+               f'{pervoration_max}м (закрыть затруб, произвести задавку в пласт'
                f'жидкости при не более Рзак={CreatePZ.max_admissible_pressure}атм при установленном герметичном пакере. '
                f'Операции по задавке и изливу произвести 3-4 раза в зависимости от приёмистости). ',
         None, None, None, None, None, None, None,
@@ -189,12 +207,7 @@ def gnkt_work(self):
                       f'давлении закачки, но не более 1 часа). Установить БДТ на гл.{CreatePZ.current_bottom}м.',
          None, None, None, None, None, None, None,
            'Мастер ГНКТ, состав бригады, представитель Заказчика', 1.33],
-    [None, 17, f'Произвести  солянокислотную обработку пласта C1t в объеме  {acid_V}м3  ({acid} - {acid_pr} %) силами Крезол '
-               f'НС с протяжкой БДТ вдоль интервалов перфорации {min(list(CreatePZ.work_pervorations_dict.keys()))}-'
-               f'{max(list(CreatePZ.work_pervorations_dict.values()))}м (снизу вверх) в присутствии представителя '
-               f'Заказчика с составлением акта, не превышая давления закачки не более Р={CreatePZ.max_admissible_pressure}атм.'
-               f'\n(для приготовления соляной кислоты в объеме {acid_V}м3 - {acid_pr}% необходимо замешать '
-               f'{round(acid_V*acid_pr/24*1.118,1)}т HCL 24% и пресной воды {round(acid_V-acid_V*acid_pr/24*1.118,1)}м3) ',
+    [None, 17, acid_sel,
          None, None, None, None, None, None, None,
             'Мастер ГНКТ, состав бригады, подрядчик по ОПЗ', 4.88],
     [None, 18, f'Закачку 2,2м3 кислоты производить при открытом малом затрубном пространстве на циркуляции. Закачку оставшейся '
@@ -217,6 +230,8 @@ def gnkt_work(self):
                'работы бригад. Составить Акт.',
         None, None, None, None, None, None, None,
             'Мастер ГНКТ, состав бригады', 1]]
+
+
 
     n = 17
     if CreatePZ.H_F_paker_do['do'] != 0: # вставка строк при наличии пакера

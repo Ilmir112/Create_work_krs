@@ -1,5 +1,5 @@
 import H2S
-
+import math
 def well_volume():
     from open_pz import CreatePZ
     # print(CreatePZ.column_additional)
@@ -67,6 +67,7 @@ def template_diam_ek():
 def template_diam_additional_ek():
     from open_pz import CreatePZ
     diam_internal_ek = CreatePZ.column_diametr - 2 * CreatePZ.column_wall_thickness
+    diam_internal_ek_addition = CreatePZ.column_additional_diametr - 2 * CreatePZ.column_additional_wall_thickness
     template_second_diam_dict = {
         84: (88, 92),
         90: (92.1, 97),
@@ -87,17 +88,19 @@ def template_diam_additional_ek():
     }
 
     for diam, diam_internal in template_second_diam_dict.items():
-        if diam_internal[0] <= diam_internal_ek << diam_internal[1]:
+        if diam_internal[0] <= diam_internal_ek <= diam_internal[1]:
             template_second_diam = diam
     for diam, diam_internal in template_second_diam_dict.items():
-        if diam_internal[0] <= diam_internal_ek << diam_internal[1]:
+        if diam_internal[0] <= diam_internal_ek_addition <= diam_internal[1]:
             template_first_diam = diam
     return (template_first_diam, template_second_diam)
 
 def template_ek_without_skm():
     from open_pz import CreatePZ
     open_trunk_well = False
-    print(f' Башмака {CreatePZ.shoe_column, CreatePZ.current_bottom}')
+    # print(f' Башмака {CreatePZ.shoe_column, CreatePZ.current_bottom}')
+
+    length_template_addition = int(''.join(['30' if CreatePZ.lift_ecn_can_addition == True else '2']))
     if CreatePZ.column_additional == False and CreatePZ.shoe_column <= CreatePZ.current_bottom:
         open_trunk_well = True
     elif CreatePZ.column_additional == True and CreatePZ.shoe_column_additional <= CreatePZ.current_bottom:
@@ -114,37 +117,40 @@ def template_ek_without_skm():
 
     lift_ecn_can = {True: 30, False: 4}
 
-
+    print(f' кровля ПВР {CreatePZ.pervoration_min}')
 
     nkt_diam = ''.join(['73' if CreatePZ.column_diametr >110 else '60'])
     if CreatePZ.column_additional == False and open_trunk_well == False and CreatePZ.work_pervorations_approved == False:
-        template_str = f'перо + шаблон-{template_diam_ek()[0]}мм L-2м + НКТ{nkt_diam}мм {int(CreatePZ.current_bottom - min(list(CreatePZ.work_pervorations_dict))+8)}м ' \
+        template_str = f'перо + шаблон-{template_diam_ek()[0]}мм L-2м + НКТ{nkt_diam}мм {int(CreatePZ.current_bottom - math.ceil(CreatePZ.pervoration_min)+8)}м ' \
                        f'+  НКТ{nkt_diam}мм + шаблон-{template_diam_ek()[1]}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can]}м '
-        ckm_teml = f'шаблон; Ф-{template_diam_ek()[1]}мм до гл.{int(min(list(CreatePZ.work_pervorations_dict))-8)}м)'
-        CreatePZ.template_depth = int(min(list(CreatePZ.work_pervorations_dict))-8)
+        ckm_teml = f'шаблон; Ф-{template_diam_ek()[1]}мм до гл.{math.ceil(CreatePZ.pervoration_min-8)}м)'
+        CreatePZ.template_depth = math.ceil(CreatePZ.pervoration_min-8)
     elif CreatePZ.column_additional == False and open_trunk_well ==  True and CreatePZ.work_pervorations_approved == False:
-        template_str = f'фильтр-направление L-2м + НКТ{nkt_diam}мм {int(CreatePZ.current_bottom - min(list(CreatePZ.work_pervorations_dict))+8)}м' \
+        template_str = f'фильтр-направление L-2м + НКТ{nkt_diam}мм {math.ceil(CreatePZ.current_bottom - CreatePZ.pervoration_min+8)}м' \
                        f'НКТ{nkt_diam}мм + шаблон-{template_diam_ek()[1]}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can]}м '
-        ckm_teml = f'шаблон; Ф-{template_diam_ek()[1]}мм до гл.{int(min(list(CreatePZ.work_pervorations_dict)) - 8)}м)'
-        CreatePZ.template_depth = int(min(list(CreatePZ.work_pervorations_dict)) - 8)
+        ckm_teml = f'шаблон; Ф-{template_diam_ek()[1]}мм до гл.{math.ceil(CreatePZ.pervoration_min - 8)}м)'
+        CreatePZ.template_depth = math.ceil(CreatePZ.pervoration_min - 8)
     elif CreatePZ.column_additional == False and open_trunk_well == False and CreatePZ.work_pervorations_approved == True:
         template_str = f'перо +НКТ{nkt_diam}мм + шаблон-{template_diam_ek()[1]}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can]}м '
-        ckm_teml = f'шаблон; Ф-{template_diam_ek()[1]}мм до гл.{int(min(list(CreatePZ.current_bottom)) - 8)}м)'
-        CreatePZ.template_depth = int(min(list(CreatePZ.current_bottom)) - 8)
+        ckm_teml = f'шаблон; Ф-{template_diam_ek()[1]}мм до гл.{math.ceil(min(list(CreatePZ.current_bottom)) - 8)}м)'
+        CreatePZ.template_depth = math.ceil(min(list(CreatePZ.current_bottom)) - 8)
     elif CreatePZ.column_additional == True and open_trunk_well == False and CreatePZ.work_pervorations_approved == False:
-        template_str = f'обточная муфта + шаблон-{template_diam_additional_ek()[0]}мм L-2м + НКТ{nkt_pod}мм {int(CreatePZ.current_bottom - min(list(CreatePZ.work_pervorations_dict)) + 8)}м ' \
+        template_str = f'обточная муфта + НКТ{nkt_pod} {math.ceil(CreatePZ.current_bottom-math.ceil(CreatePZ.pervoration_min - 10))} +' \
+                       f' шаблон-{template_diam_additional_ek()[0]}мм L-{length_template_addition}м + НКТ{nkt_pod}' \
+                       f' {math.ceil(CreatePZ.current_bottom + (math.ceil(CreatePZ.current_bottom-math.ceil(CreatePZ.pervoration_min - 10)))- length_template_addition - 30- CreatePZ.head_column_additional)}м ' \
                f' + шаблон-{template_diam_additional_ek()[1]}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can]}м '
-        ckm_teml = f'шаблон; Ф-{template_diam_additional_ek()[1]}мм до гл.{int(min(list(CreatePZ.work_pervorations_dict)) - 8)}м)'
-        CreatePZ.template_depth = int(min(list(CreatePZ.work_pervorations_dict)) - 8)
+        ckm_teml = f'(шаблон; Ф-{template_diam_additional_ek()[0]}мм до гл.{math.ceil(CreatePZ.pervoration_min - 10)}м, шаблон; Ф-{template_diam_additional_ek()[0]}мм до гл.{CreatePZ.head_column_additional-10}м)'
+        CreatePZ.template_depth = math.ceil(CreatePZ.pervoration_min - 8)
     elif CreatePZ.column_additional == True and open_trunk_well == True and CreatePZ.work_pervorations_approved == False:
-        template_str = f'фильтр направление L-2м + НКТ{nkt_pod}мм {int(CreatePZ.current_bottom - min(list(CreatePZ.work_pervorations_dict)) + 8)}м ' \
-                       f'+ шаблон-{template_diam_additional_ek()[1]}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can]}м '
-        ckm_teml = f'шаблон; Ф-{template_diam_additional_ek()[1]}мм до гл.{int(min(list(CreatePZ.work_pervorations_dict)) - 8)}м)'
-        CreatePZ.template_depth = int(min(list(CreatePZ.work_pervorations_dict)) - 8)
+        template_str = f'фильтр направление L-2м + НКТ{nkt_pod} {math.ceil(CreatePZ.current_bottom - math.ceil(CreatePZ.pervoration_min) + 8)}м ' \
+                        f'шаблон-{template_diam_additional_ek()[0]}мм L-{length_template_addition} + {math.ceil(CreatePZ.pervoration_min) + 8- CreatePZ.head_column_additional-length_template_addition -6}'\
+                      f'+ шаблон-{template_diam_additional_ek()[1]}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can]}м '
+        ckm_teml = f'(шаблон-{template_diam_additional_ek()[0]}мм до {math.ceil(CreatePZ.pervoration_min) - 10}м, шаблон Ф-{template_diam_additional_ek()[1]}мм до гл.{CreatePZ.head_column_additional- 10}м)'
+        CreatePZ.template_depth = math.ceil(CreatePZ.pervoration_min - 8)
     elif CreatePZ.column_additional == True and CreatePZ.work_pervorations_approved == True:
         template_str = f'обточная муфта + шаблон-{template_diam_additional_ek()[1]}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can]}м '
-        ckm_teml = f'шаблон; Ф-{template_diam_additional_ek()[1]}мм до гл.{int(min(list(CreatePZ.current_bottom)))}м)'
-        CreatePZ.template_depth = int(min(list(CreatePZ.current_bottom)))
+        ckm_teml = f'шаблон; Ф-{template_diam_additional_ek()[1]}мм до гл.{math.ceil(min(list(CreatePZ.current_bottom)))}м)'
+        CreatePZ.template_depth = math.ceil(min(list(CreatePZ.current_bottom)))
 
     list_template_ek = [
         [None, None, f'Спустить  {template_str}на 'f'НКТ{nkt_diam}мм {ckm_teml} с замером, шаблонированием НКТ. \n'
@@ -179,7 +185,7 @@ def template_ek_without_skm():
     if CreatePZ.column_additional == False:
         temlate_ek = template_diam_ek()[1]
     else:
-        temlate_ek = template_diam_additional_ek()[1]
+        temlate_ek = template_diam_additional_ek()[0]
 
     notes_list = [[None,None,
                   f'ПРИМЕЧАНИЕ №1: При непрохождении шаблона d={temlate_ek}мм предусмотреть СПО забойного двигателя с райбером d={temlate_ek+1}мм, '
@@ -221,7 +227,7 @@ def template_ek_without_skm():
                      f'уд.весом {CreatePZ.fluid_work}   до глубины {CreatePZ.current_bottom}м',
                      None, None, None, None, None, None, None, 'Мастер КРС', None, None]
 
-    if CreatePZ.current_bottom - max(list(CreatePZ.work_pervorations_dict.values())) <= 10:
+    if CreatePZ.current_bottom - CreatePZ.pervoration_max <= 10:
         list_template_ek.insert(-1, privyazka_nkt)
 
     return list_template_ek + notes_list
@@ -240,56 +246,67 @@ def template_ek():
     if CreatePZ.column_additional == True:
         nkt_pod = ['60мм' if CreatePZ.column_additional_diametr <110 else '73мм со снятыми фасками']
         nkt_pod = ''.join(nkt_pod)
+
         # temlate_ek = template_ek()
     else:
         template_ek = template_diam_ek()
 
     lift_ecn_can = {True: 30, False: 4}
-
+    print(CreatePZ.plast_all)
+    print(CreatePZ.dict_work_pervorations.keys())
+    
 
     nkt_diam = ''.join(['73' if CreatePZ.column_diametr >110 else '60'])
+    length_template_addition = int(''.join(['30' if CreatePZ.lift_ecn_can_addition == True else '2']))
     if CreatePZ.column_additional == False and open_trunk_well == False and CreatePZ.work_pervorations_approved == False:
-        template_str = f'перо + шаблон-{template_diam_ek()[0]}мм L-2м + НКТ{nkt_diam}мм {int(CreatePZ.current_bottom - min(list(CreatePZ.work_pervorations_dict))+8)}м ' \
+        template_str = f'перо + шаблон-{template_diam_ek()[0]}мм L-2м + НКТ{nkt_diam}мм {int(CreatePZ.current_bottom - CreatePZ.pervoration_min+8)}м ' \
                        f'+ СКМ-{int(CreatePZ.column_diametr)} +10м НКТ{nkt_diam}мм + шаблон-{template_diam_ek()[1]}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can]}м '
-        ckm_teml = f'(СКМ-{int(CreatePZ.column_diametr)} до Н={int(min(list(CreatePZ.work_pervorations_dict))-8)}м,' \
-                   f'шаблон; Ф-{template_diam_ek()[1]}мм до гл.{int(min(list(CreatePZ.work_pervorations_dict))-18)}м)'
-        CreatePZ.template_depth = int(min(list(CreatePZ.work_pervorations_dict)) - 18)
+        ckm_teml = f'(СКМ-{int(CreatePZ.column_diametr)} до Н={int(CreatePZ.pervoration_min-8)}м,' \
+                   f'шаблон; Ф-{template_diam_ek()[1]}мм до гл.{int(CreatePZ.pervoration_min-18)}м)'
+        CreatePZ.template_depth = math.ceil(CreatePZ.pervoration_min - 18)
     elif CreatePZ.column_additional == False and open_trunk_well ==  True and CreatePZ.work_pervorations_approved == False:
-        template_str = f'фильтр-направление L-2м + НКТ{nkt_diam}мм {int(CreatePZ.current_bottom - min(list(CreatePZ.work_pervorations_dict))+8)}м' \
+        template_str = f'фильтр-направление L-2м + НКТ{nkt_diam}мм {int(CreatePZ.current_bottom - CreatePZ.pervoration_min+8)}м' \
                        f'+ СКМ-{int(CreatePZ.column_diametr)} +10м ' \
                        f'НКТ{nkt_diam}мм + шаблон-{template_diam_ek()[1]}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can]}м '
-        ckm_teml = f'(СКМ-{int(CreatePZ.column_diametr)} до Н={int(min(list(CreatePZ.work_pervorations_dict)) - 8)}м,' \
-                   f'шаблон; Ф-{template_diam_ek()[1]}мм до гл.{int(min(list(CreatePZ.work_pervorations_dict)) - 18)}м)'
-        CreatePZ.template_depth = int(min(list(CreatePZ.work_pervorations_dict)) - 18)
+        ckm_teml = f'(СКМ-{int(CreatePZ.column_diametr)} до Н={int(CreatePZ.pervoration_min - 8)}м,' \
+                   f'шаблон; Ф-{template_diam_ek()[1]}мм до гл.{int(CreatePZ.pervoration_min - 18)}м)'
+        CreatePZ.template_depth = math.ceil(CreatePZ.pervoration_min - 18)
     elif CreatePZ.column_additional == False and open_trunk_well == False and CreatePZ.work_pervorations_approved == True:
         template_str = f'перо + СКМ-{int(CreatePZ.column_diametr)} +10м ' \
                        f'НКТ{nkt_diam}мм + шаблон-{template_diam_ek()[1]}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can]}м '
         ckm_teml = f'(СКМ-{int(CreatePZ.column_diametr)} до Н={int(min(list(CreatePZ.current_bottom)))}м,' \
                    f'шаблон; Ф-{template_diam_ek()[1]}мм до гл.{int(min(list(CreatePZ.current_bottom)) - 10)}м)'
-        CreatePZ.template_depth = int(min(list(CreatePZ.current_bottom)) - 10)
+        CreatePZ.template_depth = math.ceil(min(list(CreatePZ.current_bottom)) - 10)
     elif CreatePZ.column_additional == True and open_trunk_well == False and CreatePZ.work_pervorations_approved == False:
-        template_str = f'обточная муфта + шаблон-{template_diam_additional_ek()[0]}мм L-2м + НКТ{nkt_pod}мм {int(CreatePZ.current_bottom - min(list(CreatePZ.work_pervorations_dict)) + 8)}м ' \
-               f'+ СКМ-{int(CreatePZ.column_additional_diametr)} +10м НКТ{nkt_pod}мм + шаблон-{template_diam_additional_ek()[1]}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can]}м '
-        ckm_teml = f'(СКМ-{int(CreatePZ.column_diametr)} до Н={int(min(list(CreatePZ.work_pervorations_dict)) - 8)}м,' \
-                   f'шаблон; Ф-{template_diam_additional_ek()[1]}мм до гл.{int(min(list(CreatePZ.work_pervorations_dict)) - 18)}м)'
-        CreatePZ.template_depth = int(min(list(CreatePZ.work_pervorations_dict)) - 18)
+        template_str = f'обточная муфта + НКТ{nkt_pod} {int(CreatePZ.current_bottom - math.ceil(CreatePZ.pervoration_min) + 10)}м ' \
+               f'+ СКМ-{int(CreatePZ.column_additional_diametr)} +10м НКТ{nkt_pod} + шаблон-{template_diam_additional_ek()[0]}мм L-{length_template_addition}м' \
+               f' + НКТ{nkt_pod} {int(CreatePZ.current_bottom - (int(CreatePZ.current_bottom - math.ceil(CreatePZ.pervoration_min) + 10)) - length_template_addition - CreatePZ.head_column_additional)}м + ' \
+               f'шаблон-{template_diam_additional_ek()[1]}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can]}м '
+        ckm_teml = f'(СКМ-{int(CreatePZ.column_additional_diametr)} до Н={int(CreatePZ.pervoration_min - 10)}м,' \
+                   f'шаблон; Ф-{template_diam_additional_ek()[0]}мм до гл.{int(CreatePZ.pervoration_min - 20)}м, ' \
+                   f'шаблон; Ф-{template_diam_additional_ek()[1]}мм до гл.{int(CreatePZ.head_column_additional - 10)}м))'
+        CreatePZ.template_depth = math.ceil(CreatePZ.pervoration_min - 18)
     elif CreatePZ.column_additional == True and open_trunk_well == True and CreatePZ.work_pervorations_approved == False:
-        template_str = f'фильтр направление L-2м + НКТ{nkt_pod}мм {int(CreatePZ.current_bottom - min(list(CreatePZ.work_pervorations_dict)) + 8)}м ' \
-                       f'+ СКМ-{int(CreatePZ.column_additional_diametr)} +10м НКТ{nkt_pod}мм + шаблон-{template_diam_additional_ek()[1]}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can]}м '
-        ckm_teml = f'(СКМ-{int(CreatePZ.column_diametr)} до Н={int(min(list(CreatePZ.work_pervorations_dict)) - 8)}м,' \
-                   f'шаблон; Ф-{template_diam_additional_ek()[1]}мм до гл.{int(min(list(CreatePZ.work_pervorations_dict)) - 18)}м)'
-        CreatePZ.template_depth = int(min(list(CreatePZ.work_pervorations_dict)) - 18)
+        template_str = f'фильтр направление L-2м + НКТ{nkt_pod} {math.ceil(CreatePZ.current_bottom - CreatePZ.pervoration_min + 10)}м ' \
+                       f'+ СКМ-{int(CreatePZ.column_additional_diametr)} +10м НКТ{nkt_pod} + шаблон-{template_diam_additional_ek()[0]}мм L-{length_template_addition}м' \
+                    f' + НКТ{nkt_pod} {int(CreatePZ.current_bottom - (int(CreatePZ.current_bottom - CreatePZ.pervoration_min + 10)) - 13 - length_template_addition  - CreatePZ.head_column_additional+10)}м' \
+                       f' шаблон-{template_diam_additional_ek()[1]}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can]}м '
+        ckm_teml = f'(СКМ-{int(CreatePZ.column_additional_diametr)} до Н={int(CreatePZ.pervoration_min - 8)}м,' \
+                   f'шаблон; Ф-{template_diam_additional_ek()[0]}мм до гл.{int(CreatePZ.pervoration_min - 18)}м) ' \
+                   f'шаблон; Ф-{template_diam_additional_ek()[1]}мм до гл.{int(CreatePZ.head_column_additional - 8)}м))'
+        CreatePZ.template_depth = math.ceil(CreatePZ.pervoration_min - 18)
     elif CreatePZ.column_additional == True and CreatePZ.work_pervorations_approved == True:
-        template_str = f'обточная муфта + СКМ-{int(CreatePZ.column_additional_diametr)} +10м НКТ{nkt_pod}мм + шаблон-{template_diam_additional_ek()[1]}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can]}м '
-        ckm_teml = f'(СКМ-{int(CreatePZ.column_diametr)} до Н={int(min(list(CreatePZ.current_bottom)))}м,' \
-                   f'шаблон; Ф-{template_diam_additional_ek()[1]}мм до гл.{int(min(list(CreatePZ.current_bottom)) - 10)}м)'
-        CreatePZ.template_depth = int(min(list(CreatePZ.current_bottom)) - 10)
+        template_str = f'обточная муфта + СКМ-{int(CreatePZ.column_additional_diametr)} +10м НКТ{nkt_pod} + шаблон-{template_diam_additional_ek()[1]}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can]}м '
+        ckm_teml = f'(СКМ-{int(CreatePZ.column_additional_diametr)} до Н={int(min(list(CreatePZ.current_bottom)))}м,' \
+                   f'шаблон; Ф-{template_diam_additional_ek()[0]}мм до гл.{int(min(list(CreatePZ.current_bottom)) - 10)}м)'\
+                   f'шаблон; Ф-{template_diam_additional_ek()[1]}мм до гл.{int(CreatePZ.head_column_additional - 8)}м))'
+        CreatePZ.template_depth = math.ceil(min(list(CreatePZ.current_bottom)) - 10)
     list_template_ek = [
         [None, None, f'Спустить  {template_str}на 'f'НКТ{nkt_diam}мм {ckm_teml} с замером, шаблонированием НКТ. \n'
                      f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
          None, None, None, None, None, None, None,
          'мастер КРС', round(CreatePZ.current_bottom/9.52*1.51/60*1.2*1.04 +0.18+0.008*CreatePZ.current_bottom/9.52 +0.003 *CreatePZ.current_bottom/9.52,2)],
-        [None, None, f'Произвести скреперование э/к в интервале  {int(min(list(CreatePZ.work_pervorations_dict))-8-90)}-{int(min(list(CreatePZ.work_pervorations_dict))-8)}м  обратной промывкой и проработкой 5 раз каждого '
+        [None, None, f'Произвести скреперование э/к в интервале  {int(CreatePZ.pervoration_min-8-90)}-{int(CreatePZ.pervoration_min-8)}м  обратной промывкой и проработкой 5 раз каждого '
                      'наращивания. Работы производить согласно сборника технологических регламентов и инструкций в присутствии '
                      f'представителя Заказчика. Допустить компоновку до гл. {CreatePZ.current_bottom}м (НИЗ) Составить акт. \n'
                      '(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ). ',
@@ -363,7 +380,7 @@ def template_ek():
                      f'текущего забоя с плановым, при необходимости нормализовать забой обратной промывкой тех жидкостью '
                      f'уд.весом {CreatePZ.fluid_work}   до глубины {CreatePZ.current_bottom}м',
                      None, None, None, None, None, None, None, 'Мастер КРС', None, None]
-    if CreatePZ.current_bottom - max(list(CreatePZ.work_pervorations_dict.values())) <=10:
+    if CreatePZ.current_bottom - CreatePZ.pervoration_max <=10:
         list_template_ek.insert(-1, privyazka_nkt)
 
 
