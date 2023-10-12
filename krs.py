@@ -1,7 +1,7 @@
 from PyQt6.QtWidgets import QInputDialog, QMessageBox
 import H2S
 from work_py import template_work, opressovka
-
+# from work_py.perforation import Perfarotions
 
 # Выбор вида спущенного оборудования
 # def lift_select(self):
@@ -947,7 +947,10 @@ def work_krs(self):
         if ok and lift_sel:
             self.le.setText(lift)
         lift_select = lift_dict[lift]
-    return krs_begin + lift_select + posle_lift + template_work.template_ek_without_skm()
+        Perfarotions()
+    return krs_begin + lift_select + posle_lift + template_work.template_ek_without_skm() \
+           +opressovka.paker_list(QInputDialog.getInt(None, 'опрессовка ЭК',
+                                      'Введите глубину посадки пакера', 500, 0, 10000)[0], QInputDialog.getInt(None, 'опрессовка ЭК', 'Введите длину хвостовика', 10, 0, 3000)[0])
 
 
 def pvo():

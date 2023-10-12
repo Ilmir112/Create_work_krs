@@ -1,26 +1,44 @@
 import openpyxl
 import sys
 
+from PyQt6.QtCore import Qt
 from openpyxl.utils import get_column_letter
-
+# from work_py.perforation import Perfarotions
+from PyQt6.QtGui import QAction
 import open_pz
-# import plan.py
-from PyQt5.QtWidgets import QTextEdit
+from work_py.perforation import PervorationWindow
+
+
 from PyQt6 import QtWidgets, QtCore
-from PyQt6.QtWidgets import QApplication, QMainWindow, QTableWidget, QTableWidgetItem, QMenu, QMenuBar, QFileDialog,QLineEdit
+
+from PyQt6.QtWidgets import QApplication, QMainWindow, QLabel, QTableWidget, QTableWidgetItem, QMenu, QMenuBar, QFileDialog, QPushButton, QLineEdit
+from work_py.mouse import TableWidget
 
 class MyWindow(QMainWindow):
-    fname = ''
 
-    def __init__(self, parent = None, *args, **kwargs):
-        super(MyWindow, self).__init__(parent, *args, **kwargs)
-        self.setWindowTitle('Создание')
-        self.setGeometry(500, 450, 550, 400)
-        self.table_widget = QtWidgets.QTableWidget(self)
+    fname = ''
+    ind_ser_mouse = None
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle('приложение ')
+        self.setGeometry(500, 500, 500, 500)
+        self.table_widget = TableWidget()
         self.setCentralWidget(self.table_widget)
         self.createMenuBar()
+        # self.createMenuBarMouse()
         self.le = QLineEdit()
-        # self.line_edit = QtWidgets.QLineEdit(self)
+
+
+
+        self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.customContextMenuRequested.connect(TableWidget.mousePressEvent)
+
+        # Этот сигнал испускается всякий раз, когда ячейка в таблице нажата.
+        # Указанная строка и столбец - это ячейка, которая была нажата.
+        self.table_widget.cellPressed[int, int].connect(self.clickedRowColumn)
+
+
+
 
     def createMenuBar(self):
         self.menuBar = QMenuBar(self)
@@ -83,7 +101,6 @@ class MyWindow(QMainWindow):
 
         elif action == self.save_file_as:
             self.saveFileDialog()
-
     def saveFileDialog(self):
 
         fname, _ = QFileDialog.getSaveFileName(self, "QFileDialog.getSaveFileName()", "",
@@ -105,7 +122,6 @@ class MyWindow(QMainWindow):
             if row > 1 and row < rows -1:
                 self.table_widget.setRowHeight(row, int(rowHeights_exit[row]))
             for col in range(1, cols + 1):
-
                 if sheet.cell(row=row, column=col).value != None:
                     cell_value = str(sheet.cell(row=row, column=col).value)
                     item = QtWidgets.QTableWidgetItem(cell_value)
@@ -119,8 +135,14 @@ class MyWindow(QMainWindow):
                                                       merged_cell.max_row - merged_cell.min_row + 1,
                                                       merged_cell.max_col - merged_cell.min_col + 1)
         # self.table_widget.resizeColumnsToContents()
+        # self.connect(self.table_widget, QtCore.SIGNAL('customContextMenuRequested(const QPoint&)'), self.openContextMenu)
 
+    def clickedRowColumn(self, r, c):
 
+        print("{}: row={}, column={}".format(self.table_widget.mouse_press, r, c))
+    def openPerforation():
+        perforation_window = PervorationWindow()
+        perforation_window.show()
 
 def application():
     app = QApplication(sys.argv)

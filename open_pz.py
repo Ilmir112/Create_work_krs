@@ -190,6 +190,12 @@ class CreatePZ(MyWindow):
                 elif 'Текущий забой ' == value:
                     try:
                         CreatePZ.current_bottom = float(row[col + 2])
+                        n = 1
+                        while CreatePZ.current_bottom == None:
+                            CreatePZ.current_bottom = row[col  + n]
+                            n += 1
+                            CreatePZ.current_bottom = float(row[col + n])
+                        print(f'Текущий забой {CreatePZ.current_bottom}')
                     except:
                         CreatePZ.current_bottom, ok = QInputDialog.getDouble(self,'Текущий забоя', 'Введите Текущий забой равен', 1000, 1, 4000, 1)
                 elif 'месторождение ' == value:
@@ -429,7 +435,7 @@ class CreatePZ(MyWindow):
                             n += 1
                             Qpr = ws.cell(row=row, column=col + 1).value
 
-                        expected_list.append(Qpr)
+
 
                     elif ws.cell(row=row, column=col).value== 'Рзак ' or ws.cell(row=row, column=col).value == 'Давление закачки ' \
                             or ws.cell(row=row, column=col).value == 'Рзак (Нагнет)' or ws.cell(row=row, column=col).value == 'Рзак':
@@ -442,7 +448,7 @@ class CreatePZ(MyWindow):
                         expected_list.append(Pzak)
 
             try:
-                CreatePZ.expected_pick_up[expected_list[0]] = expected_list[1]
+                CreatePZ.expected_pick_up[Qpr] = expected_list[Pzak]
             except:
                 expected_Q, ok = QInputDialog.getInt(self, 'Ожидаемая приемистость',
                                                          'Ожидаемая приемистость', 100, 0,
@@ -450,9 +456,9 @@ class CreatePZ(MyWindow):
                 expected_P, ok = QInputDialog.getInt(self, 'Ожидаемое Давление закачки',
                                                      'Ожидаемое Давление закачки', 100, 0,
                                                      250)
-                expected_list = [expected_Q, expected_P]
-                CreatePZ.expected_pick_up[expected_list[0]] = expected_list[1]
-            print(f' Ожидаемык {CreatePZ.expected_pick_up}')
+                CreatePZ.expected_pick_up[expected_Q] = expected_P
+
+            print(f' Ожидаемые {CreatePZ.expected_pick_up}')
         # print(f' индекс нкт {pipes_ind + 1, condition_of_wells}')p
         for row in range(pipes_ind + 1, condition_of_wells):  # словарь  количества НКТ и метраж
             if ws.cell(row=row, column=3).value == 'План':
@@ -512,7 +518,7 @@ class CreatePZ(MyWindow):
 
         perf_dict = {'вертикаль':None, 'кровля': None, 'подошва': None, 'вскрытие': None, 'отключение': None, 'отв': None, 'заряд': None, 'удлинение': None, 'давление': None, 'замер': None }
         for ind, row in enumerate(perforations_intervals):
-            if any([str((i)).lower() == 'проект' for i in row]) == False:
+            if any([str((i)).lower() == 'проект' for i in row]) == False and all([i == None for i in row]) == False:
                 CreatePZ.dict_perforation.setdefault(row[0], {}).setdefault(list(perf_dict.keys())[0], []).append(row[1])
                 CreatePZ.dict_perforation.setdefault(row[0], {}).setdefault(list(perf_dict.keys())[1], []).append(row[2])
                 CreatePZ.dict_perforation.setdefault(row[0], {}).setdefault(list(perf_dict.keys())[2], []).append(row[3])
@@ -534,37 +540,41 @@ class CreatePZ(MyWindow):
             # print(type(data_plast['вскрытие'][0])== datetime)
             # print(min(data_plast['кровля']) >= CreatePZ.H_F_paker_do['do'], data_plast['отключение'] ==  None, \
             #         CreatePZ.old_version == False, max(data_plast['подошва']) <= CreatePZ.current_bottom)
-            if min(data_plast['кровля']) >= CreatePZ.H_F_paker_do['do'] and data_plast['отключение'] !=  None and CreatePZ.old_version == False and max(data_plast['подошва']) <= CreatePZ.current_bottom:
-                CreatePZ.dict_work_pervorations[plast] = data_plast
+            # print(data_plast['кровля'], CreatePZ.H_F_paker_do['do'],  data_plast['отключение'] !=  None)
+            for i in data_plast['кровля']:
+                if i > CreatePZ.H_F_paker_do['do'] and data_plast['отключение'] !=  None and CreatePZ.old_version == False and max(data_plast['подошва']) <= CreatePZ.current_bottom:
+                    CreatePZ.dict_work_pervorations.setdefault(plast, []).append(i)
 
-            elif min(data_plast['кровля']) >= CreatePZ.H_F_paker_do['do'] and type(data_plast['вскрытие'][0]) == datetime  \
-                    and CreatePZ.old_version == True and max(data_plast['подошва']) <= CreatePZ.current_bottom:
-                CreatePZ.dict_work_pervorations[plast] = data_plast
 
+                elif i > CreatePZ.H_F_paker_do['do'] and type(data_plast['вскрытие'][0]) == datetime  \
+                        and CreatePZ.old_version == True and max(data_plast['подошва']) <= CreatePZ.current_bottom:
+                    CreatePZ.dict_work_pervorations.setdefault(plast, []).append(i)
+        print(f' работающие интервалы {CreatePZ.dict_work_pervorations}')
         CreatePZ.plast_work = list(CreatePZ.dict_work_pervorations.keys())
         CreatePZ.plast_all = list(CreatePZ.dict_perforation.keys())
-        CreatePZ.pervoration_min = min([CreatePZ.dict_perforation[i]['кровля'] for i in CreatePZ.plast_all])[0]
-        CreatePZ.pervoration_max = max([CreatePZ.dict_perforation[i]['подошва'] for i in CreatePZ.plast_work])[0]
+        CreatePZ.pervoration_min = min([min(CreatePZ.dict_perforation[i]['кровля']) for i in CreatePZ.plast_all])
+        CreatePZ.pervoration_max =max([max(CreatePZ.dict_perforation[i]['подошва']) for i in CreatePZ.plast_work])
+        print(f'мин {CreatePZ.pervoration_min}, мак {CreatePZ.pervoration_max}')
         # print(f' работающие ПВР {CreatePZ.work_pervorations_dict}')
-        for row in perforations_intervals:
-            if CreatePZ.H_F_paker_do['do'] != None and row[2] != None:
-                if CreatePZ.without_b(row[2]) > CreatePZ.H_F_paker_do['do'] and row[5] == None and \
-                        CreatePZ.without_b(row[3]) <= CreatePZ.current_bottom and CreatePZ.old_version == False:
-                    CreatePZ.work_pervorations.append(row)
-                    CreatePZ.work_pervorations_dict[row[2]] = row[3]
-                elif CreatePZ.without_b(row[2]) > CreatePZ.H_F_paker_do['do'] and CreatePZ.old_version == True and CreatePZ.without_b(row[3]) <= CreatePZ.current_bottom:
-                    CreatePZ.work_pervorations.append(row)
-                    CreatePZ.work_pervorations_dict[row[2]] = row[3]
-            elif row[2] != None:
-                if row[5] == None and CreatePZ.without_b(
-                        row[2]) <= CreatePZ.current_bottom and CreatePZ.old_version == False:
-                    CreatePZ.work_pervorations.append(row)
-                    CreatePZ.work_pervorations_dict[row[2]] = row[3]
-                elif CreatePZ.old_version == True and CreatePZ.without_b(row[2]) <= CreatePZ.current_bottom:
-                    CreatePZ.work_pervorations.append(row)
-                    CreatePZ.work_pervorations_dict[row[2]] = row[3]
-        print(CreatePZ.work_pervorations)
-        print(CreatePZ.work_pervorations_dict)
+        # for row in perforations_intervals:
+        #     if CreatePZ.H_F_paker_do['do'] != None and row[2] != None:
+        #         if CreatePZ.without_b(row[2]) > CreatePZ.H_F_paker_do['do'] and row[5] == None and \
+        #                 CreatePZ.without_b(row[3]) <= CreatePZ.current_bottom and CreatePZ.old_version == False:
+        #             CreatePZ.work_pervorations.append(row)
+        #             CreatePZ.work_pervorations_dict[row[2]] = row[3]
+        #         elif CreatePZ.without_b(row[2]) > CreatePZ.H_F_paker_do['do'] and CreatePZ.old_version == True and CreatePZ.without_b(row[3]) <= CreatePZ.current_bottom:
+        #             CreatePZ.work_pervorations.append(row)
+        #             CreatePZ.work_pervorations_dict[row[2]] = row[3]
+        #     elif row[2] != None:
+        #         if row[5] == None and CreatePZ.without_b(
+        #                 row[2]) <= CreatePZ.current_bottom and CreatePZ.old_version == False:
+        #             CreatePZ.work_pervorations.append(row)
+        #             CreatePZ.work_pervorations_dict[row[2]] = row[3]
+        #         elif CreatePZ.old_version == True and CreatePZ.without_b(row[2]) <= CreatePZ.current_bottom:
+        #             CreatePZ.work_pervorations.append(row)
+        #             CreatePZ.work_pervorations_dict[row[2]] = row[3]
+        # print(CreatePZ.work_pervorations)
+        # print(CreatePZ.work_pervorations_dict)
 
         for j in range(CreatePZ.data_x_min, CreatePZ.data_x_max):  # Ожидаемые показатели после ремонта
             lst = []
