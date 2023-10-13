@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QInputDialog, QMessageBox
+from PyQt5.QtWidgets import QInputDialog, QMessageBox
 import H2S
 from work_py import template_work, opressovka
 # from work_py.perforation import Perfarotions
@@ -10,7 +10,9 @@ from work_py import template_work, opressovka
 
 def work_krs(self):
     from open_pz import CreatePZ
-
+    # fluid_work_insert = 1.25
+    CreatePZ.current_bottom, ok = QInputDialog.getDouble(self, 'Необходимый забой',
+                                                         'Введите забой до которого нужно нормализовать')
     fluid_work_insert, ok = QInputDialog.getDouble(self, 'Рабочая жидкость', 'Введите удельный вес рабочей жидкости',
                                                    1.02, 0.87, 2, 2)
     nkt_diam_fond_list = list(CreatePZ.dict_nkt.keys())
@@ -947,10 +949,10 @@ def work_krs(self):
         if ok and lift_sel:
             self.le.setText(lift)
         lift_select = lift_dict[lift]
-        Perfarotions()
+
     return krs_begin + lift_select + posle_lift + template_work.template_ek_without_skm() \
-           +opressovka.paker_list(QInputDialog.getInt(None, 'опрессовка ЭК',
-                                      'Введите глубину посадки пакера', 500, 0, 10000)[0], QInputDialog.getInt(None, 'опрессовка ЭК', 'Введите длину хвостовика', 10, 0, 3000)[0])
+           # +opressovka.paker_list(QInputDialog.getInt(None, 'опрессовка ЭК',
+           #                            'Введите глубину посадки пакера', 500, 0, 10000)[0], QInputDialog.getInt(None, 'опрессовка ЭК', 'Введите длину хвостовика', 10, 0, 3000)[0])
 
 
 def pvo():

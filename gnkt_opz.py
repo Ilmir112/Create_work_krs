@@ -13,6 +13,8 @@ def gnkt_work(self):
     pervoration_min = round(min([CreatePZ.dict_perforation[i]['кровля'] for i in CreatePZ.plast_work])[0], 1)
     pervoration_max = round(max([CreatePZ.dict_perforation[i]['подошва'] for i in CreatePZ.plast_work])[0], 1)
 
+    CreatePZ.current_bottom, ok = QInputDialog.getDouble(self, 'Необходимый забой',
+                                                         'Введите забой до которого нужно нормализовать')
 
     acid_true_quest  = QMessageBox.question(self, 'Необходимость кислоты', 'Планировать кислоту?')
     if acid_true_quest == QMessageBox.StandardButton.Yes:

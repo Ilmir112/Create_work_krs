@@ -49,6 +49,7 @@ class TabPage_SO(QWidget):
         grid.addWidget(self.lineEditIndexFormation, 1, 4)
 
 
+
         # grid.setRowStretch(4, 1)
 
 
@@ -56,8 +57,6 @@ class TabWidget(QTabWidget):
     def __init__(self):
         super().__init__()
         self.addTab(TabPage_SO(self), 'Перфорация')
-
-
 
 class PervorationWindow(QMainWindow):
     # from open_pz import CreatePZ
@@ -171,11 +170,11 @@ QSpinBox {
 }
 """
 
-# if __name__ == "__main__":
-#     import sys
-#
-#     app = QApplication(sys.argv)
-#     app.setStyleSheet(qss)
-#     window = MainWindow()
-#     window.show()
-#     sys.exit(app.exec_())
+if __name__ == "__main__":
+    import sys
+
+    app = QtWidgets.QApplication(sys.argv)
+    app.setStyleSheet(qss)
+    window = PervorationWindow()
+    window.show()
+    sys.exit(app.exec_())

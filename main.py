@@ -1,44 +1,35 @@
-import openpyxl
 import sys
-
-from PyQt6.QtCore import Qt
-from openpyxl.utils import get_column_letter
-# from work_py.perforation import Perfarotions
-from PyQt6.QtGui import QAction
-import open_pz
+import openpyxl
+from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu, QMenuBar, QAction, QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget
+from PyQt5 import QtCore, QtWidgets
 from work_py.perforation import PervorationWindow
-
-
-from PyQt6 import QtWidgets, QtCore
-
-from PyQt6.QtWidgets import QApplication, QMainWindow, QLabel, QTableWidget, QTableWidgetItem, QMenu, QMenuBar, QFileDialog, QPushButton, QLineEdit
 from work_py.mouse import TableWidget
+
+
+
+
 
 class MyWindow(QMainWindow):
 
-    fname = ''
-    ind_ser_mouse = None
     def __init__(self):
         super().__init__()
-        self.setWindowTitle('приложение ')
-        self.setGeometry(500, 500, 500, 500)
+        self.initUI()
+        self.new_window =None
+
+
+    def initUI(self):
+        self.setWindowTitle("Main Window")
+        self.setGeometry(500, 500, 800, 800)
+
         self.table_widget = TableWidget()
+        self.table_widget.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+        self.table_widget.customContextMenuRequested.connect(self.openContextMenu)
         self.setCentralWidget(self.table_widget)
         self.createMenuBar()
-        # self.createMenuBarMouse()
-        self.le = QLineEdit()
-
-
-
-        self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-        self.customContextMenuRequested.connect(TableWidget.mousePressEvent)
 
         # Этот сигнал испускается всякий раз, когда ячейка в таблице нажата.
         # Указанная строка и столбец - это ячейка, которая была нажата.
         self.table_widget.cellPressed[int, int].connect(self.clickedRowColumn)
-
-
-
 
     def createMenuBar(self):
         self.menuBar = QMenuBar(self)
@@ -48,34 +39,31 @@ class MyWindow(QMainWindow):
         self.menuBar.addMenu(self.fileMenu)
         self.menuBar.addMenu(self.classifierMenu)
 
-        self.create_file =self.fileMenu.addMenu('&Создать')
+        self.create_file = self.fileMenu.addMenu('&Создать')
         self.create_KRS = self.create_file.addAction('План КРС', self.action_clicked)
         self.create_GNKT = self.create_file.addMenu('&План ГНКТ')
         self.create_GNKT_OPZ = self.create_GNKT.addAction('ОПЗ', self.action_clicked)
         self.create_GNKT_frez = self.create_GNKT.addAction('Фрезерование', self.action_clicked)
         self.create_GNKT_GRP = self.create_GNKT.addAction('Освоение после ГРП', self.action_clicked)
         self.create_PRS = self.create_file.addAction('План ПРС', self.action_clicked)
-        self.open_file = self.fileMenu.addAction('Открыть', self.action_clicked )
+        self.open_file = self.fileMenu.addAction('Открыть', self.action_clicked)
         self.save_file = self.fileMenu.addAction('Сохранить', self.action_clicked)
         self.save_file_as = self.fileMenu.addAction('Сохранить как', self.action_clicked)
-
-
 
         class_well = self.classifierMenu.addAction('&классификатор')
         list_without_jamming = self.classifierMenu.addAction('&Перечень без глушения')
 
-
-
     @QtCore.pyqtSlot()
     def action_clicked(self):
+        from open_pz import CreatePZ
         action = self.sender()
         if action == self.create_KRS:
             self.fname = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
-        "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
+                                                               "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
 
             try:
-                work_plan= 'krs'
-                sheet = open_pz.CreatePZ.open_excel_file(self, self.fname[0], work_plan)
+                work_plan = 'krs'
+                sheet = CreatePZ.open_excel_file(self, self.fname[0], work_plan)
 
                 self.copy_pz(sheet)
 
@@ -89,9 +77,8 @@ class MyWindow(QMainWindow):
 
             try:
                 work_plan = 'gnkt_opz'
-                sheet = open_pz.CreatePZ.open_excel_file(self, self.fname[0], work_plan)
+                sheet = CreatePZ.open_excel_file(self, self.fname[0], work_plan)
                 self.copy_pz(sheet)
-
 
             except FileNotFoundError:
                 print('Файл не найден')
@@ -101,12 +88,31 @@ class MyWindow(QMainWindow):
 
         elif action == self.save_file_as:
             self.saveFileDialog()
-    def saveFileDialog(self):
 
-        fname, _ = QFileDialog.getSaveFileName(self, "QFileDialog.getSaveFileName()", "",
-                                                   "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
-        if fname:
-            print(fname)
+    def openContextMenu(self, position):
+        context_menu = QMenu(self)
+
+        new_window_action = QAction("Open New Window", self)
+        new_window_action.triggered.connect(self.openNewWindow)
+        context_menu.addAction(new_window_action)
+
+        context_menu.exec_(self.mapToGlobal(position))
+
+    def clickedRowColumn(self, r, c):
+
+        print("{}: row={}, column={}".format(self.table_widget.mouse_press, r, c))
+
+    def openNewWindow(self):
+        if self.new_window is None:
+            self.new_window = PervorationWindow()
+
+            self.new_window.setWindowTitle("New Window")
+            self.new_window.setGeometry(200, 200, 300, 200)
+            self.new_window.show()
+
+        else:
+            self.new_window.close()  # Close window.
+            self.new_window = None  # Discard reference.
 
     def copy_pz(self, sheet):
         from open_pz import CreatePZ
@@ -115,11 +121,11 @@ class MyWindow(QMainWindow):
         cols = 13
         self.table_widget.setRowCount(rows)
         self.table_widget.setColumnCount(cols)
-        rowHeights_exit = [sheet.row_dimensions[i + 1].height if sheet.row_dimensions[i + 1].height != None else 18 for i in range(sheet.max_row)]
-
+        rowHeights_exit = [sheet.row_dimensions[i + 1].height if sheet.row_dimensions[i + 1].height != None else 18 for
+                           i in range(sheet.max_row)]
 
         for row in range(1, rows + 1):
-            if row > 1 and row < rows -1:
+            if row > 1 and row < rows - 1:
                 self.table_widget.setRowHeight(row, int(rowHeights_exit[row]))
             for col in range(1, cols + 1):
                 if sheet.cell(row=row, column=col).value != None:
@@ -134,21 +140,10 @@ class MyWindow(QMainWindow):
                             self.table_widget.setSpan(row - 1, col - 1,
                                                       merged_cell.max_row - merged_cell.min_row + 1,
                                                       merged_cell.max_col - merged_cell.min_col + 1)
-        # self.table_widget.resizeColumnsToContents()
-        # self.connect(self.table_widget, QtCore.SIGNAL('customContextMenuRequested(const QPoint&)'), self.openContextMenu)
 
-    def clickedRowColumn(self, r, c):
 
-        print("{}: row={}, column={}".format(self.table_widget.mouse_press, r, c))
-    def openPerforation():
-        perforation_window = PervorationWindow()
-        perforation_window.show()
-
-def application():
+if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = MyWindow()
     window.show()
-    sys.exit(app.exec())
-
-if __name__ == "__main__":
-    application()
+    sys.exit(app.exec_())

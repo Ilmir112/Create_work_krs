@@ -9,7 +9,7 @@ from datetime import datetime
 from openpyxl import Workbook, load_workbook
 from openpyxl.utils import get_column_letter
 from PyQt6.QtWidgets import QInputDialog, QMessageBox
-import main
+import proverka
 
 from copy import copy
 from openpyxl.utils.cell import range_boundaries
@@ -128,13 +128,13 @@ class CreatePZ(MyWindow):
         #     ws._pictures.remove(i)
         #     del ws._image_parts[i.id]
         curator_list = ['ОР', 'ГТМ', 'ГРР', 'ГО']
-        # curator = 'ОР'
-        curator, ok = QInputDialog.getItem(self, 'Выбор кураторов ремонта', 'Введите сектор кураторов региона',
-                                            curator_list, 0, False)
-        if ok and curator:
-           CreatePZ.curator = curator
-        else:
-            QMessageBox.information(self, 'fdf', 'qqwq')
+        CreatePZ.curator = 'ГТМ'
+        # curator, ok = QInputDialog.getItem(self, 'Выбор кураторов ремонта', 'Введите сектор кураторов региона',
+        #                                     curator_list, 0, False)
+        # if ok and curator:
+        #    CreatePZ.curator = curator
+        # else:
+        #     QMessageBox.information(self, 'fdf', 'qqwq')
 
         for row_ind, row in enumerate(ws.iter_rows(values_only=True)):
             ws.row_dimensions[row_ind].hidden = False
@@ -422,7 +422,7 @@ class CreatePZ(MyWindow):
         except:
             print('ЭЦН отсутствует')
         # print(f'fh {len(CreatePZ.H2S_mg)}')
-        if curator == 'ОР':
+        if CreatePZ.curator == 'ОР':
             # print(data_x_min, data_x_max)
             expected_list = []
             for row in range(CreatePZ.data_x_min+1, CreatePZ.data_x_max+1):
@@ -686,16 +686,15 @@ class CreatePZ(MyWindow):
 
 
         elif work_plan == 'krs':
-            leakiness_quest = QMessageBox.question(self, 'нарушение колонны', 'Есть ли нарушение по скважине?')
-            if leakiness_quest == QMessageBox.StandardButton.Yes:
-                CreatePZ.column_leakiness = True
-                CreatePZ.leakiness = krs.get_leakiness(self)
+            # leakiness_quest = QMessageBox.question(self, 'нарушение колонны', 'Есть ли нарушение по скважине?')
+            # if leakiness_quest == QMessageBox.StandardButton.Yes:
+            #     CreatePZ.column_leakiness = True
+            #     CreatePZ.leakiness = krs.get_leakiness(self)
+            #
+            # else:
+            #     CreatePZ.column_leakiness = False
+            # print(f'нарушения {CreatePZ.leakiness}')
 
-            else:
-                CreatePZ.column_leakiness = False
-            print(f'нарушения {CreatePZ.leakiness}')
-            CreatePZ.current_bottom, ok = QInputDialog.getDouble(self, 'Необходимый забой',
-                                                                 'Введите забой до которого нужно нормализовать')
             krs_work1 = krs.work_krs(self)
 
             CreatePZ.count_row_height(ws, krs_work1, CreatePZ.ins_ind)

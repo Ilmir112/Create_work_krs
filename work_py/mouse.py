@@ -1,17 +1,14 @@
-from PyQt6.QtWidgets import  QTableWidget
-from PyQt6 import QtWidgets
+from PyQt5.QtWidgets import QTableWidget, QApplication
+from PyQt5 import QtWidgets
 from PyQt5 import QtCore
-from PyQt6.QtCore import Qt
-
+from PyQt5.QtCore import Qt
+from work_py.perforation import PervorationWindow
 
 
 class TableWidget(QTableWidget):
-
-
-
+    perforation_window = None
     def __init__(self, parent=None):
         super(TableWidget, self).__init__(parent)
-
         self.mouse_press = None
 
         # self.on_context_menu()
@@ -21,24 +18,25 @@ class TableWidget(QTableWidget):
             self.mouse_press = "mouse left press"
         elif event.button() == Qt.MouseButton.RightButton:
             self.mouse_press = "mouse right press"
-        elif event.button() == Qt.MouseButton.MidButton:
-            self.mouse_press = "mouse middle press"
+
+        # elif event.button() == Qt.MouseButton.MidButton:
+        #     self.mouse_press = "mouse middle press"
         super(TableWidget, self).mousePressEvent(event)
 
 
 
-    def contextMenuEvent(self, event):
-        from main import MyWindow
-        print("Context menu event")
-        menu = QtWidgets.QMenu(self)
-        pervoration_action = menu.addAction("перфорация")
-        pervoration_action.triggered.connect(lambda: MyWindow.openPerforation())
-        about_action = menu.addAction("About")
-        about_action.triggered.connect(
-            lambda: print("About action triggered")
-        )
-        menu.exec(event.globalPos())
-        return super().contextMenuEvent(event)
+    # def openPerforation(self):
+    #     import sys
+    #     if TableWidget.perforation_window is None:
+    #         app = QtWidgets.QApplication(sys.argv)
+    #         self.perforation_window = PervorationWindow()
+    #         self.perforation_window.show()
+    #         sys.exit(app.exec_())
+    #
+    #     else:
+    #         self.perforation_window.close()  # Close window.
+    #         self.perforation_window = None  # Discard reference.
+
 
 
 
