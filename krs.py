@@ -11,8 +11,8 @@ from work_py import template_work, opressovka
 def work_krs(self):
     from open_pz import CreatePZ
     # fluid_work_insert = 1.25
-    CreatePZ.current_bottom, ok = QInputDialog.getDouble(self, 'Необходимый забой',
-                                                         'Введите забой до которого нужно нормализовать')
+    # CreatePZ.current_bottom, ok = QInputDialog.getDouble(self, 'Необходимый забой',
+    #                                                      'Введите забой до которого нужно нормализовать')
     fluid_work_insert, ok = QInputDialog.getDouble(self, 'Рабочая жидкость', 'Введите удельный вес рабочей жидкости',
                                                    1.02, 0.87, 2, 2)
     nkt_diam_fond_list = list(CreatePZ.dict_nkt.keys())

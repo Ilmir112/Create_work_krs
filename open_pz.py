@@ -8,8 +8,8 @@ import self
 from datetime import datetime
 from openpyxl import Workbook, load_workbook
 from openpyxl.utils import get_column_letter
-from PyQt6.QtWidgets import QInputDialog, QMessageBox
-import proverka
+from PyQt5.QtWidgets import QInputDialog, QMessageBox
+
 
 from copy import copy
 from openpyxl.utils.cell import range_boundaries
@@ -77,13 +77,12 @@ class CreatePZ(MyWindow):
     column_additional = False
 
     values = []
-    H_F_paker_do = {}
-    H_F_paker_do['do'] = 0
-    H_F_paker_do['posle'] = 0
+    H_F_paker_do = {'do': 0, 'posle': 0}
+
     dict_pump = {'do': '0', 'posle': '0'}
     lift_ecn_can = False
     dict_pump_h = {'do': 0, 'posle': 0}
-
+    ins_ind = 0
     len_razdel_1 = 0
     cat_P_1 = []
     dict_sucker_rod = {32: 0, 25: 0, 22: 0, 19: 0}
@@ -128,9 +127,9 @@ class CreatePZ(MyWindow):
         #     ws._pictures.remove(i)
         #     del ws._image_parts[i.id]
         curator_list = ['ОР', 'ГТМ', 'ГРР', 'ГО']
-        CreatePZ.curator = 'ГТМ'
-        # curator, ok = QInputDialog.getItem(self, 'Выбор кураторов ремонта', 'Введите сектор кураторов региона',
-        #                                     curator_list, 0, False)
+        # CreatePZ.curator = 'ГТМ'
+        CreatePZ.curator, ok = QInputDialog.getItem(self, 'Выбор кураторов ремонта', 'Введите сектор кураторов региона',
+                                            curator_list, 0, False)
         # if ok and curator:
         #    CreatePZ.curator = curator
         # else:
@@ -369,6 +368,7 @@ class CreatePZ(MyWindow):
                 elif value == 'Н посадки, м' and CreatePZ.paker_do['do'] != 0:
                     try:
                         CreatePZ.H_F_paker_do['do'] = CreatePZ.without_b(row[col + 2])
+                        print(f'Глубина посадки пакера {CreatePZ.H_F_paker_do["do"]}')
 
                     except:
                         H_F_paker_do_2, ok = QInputDialog.getInt(self, 'Глубина посадки фондового пакера',
@@ -497,6 +497,8 @@ class CreatePZ(MyWindow):
             print('штанги отсутствуют')
         perforations_intervals = []
         pervoration_list = []
+        CreatePZ.current_bottom, ok = QInputDialog.getDouble(self, 'Необходимый забой',
+                                                             'Введите забой до которого нужно нормализовать')
         # print(f' индекс ПВР{data_pvr_min+2, data_pvr_max+1}')
         for row in range(data_pvr_min + 2, data_pvr_max + 2):  # Сортировка интервала перфорации
             lst = []
@@ -519,6 +521,7 @@ class CreatePZ(MyWindow):
         perf_dict = {'вертикаль':None, 'кровля': None, 'подошва': None, 'вскрытие': None, 'отключение': None, 'отв': None, 'заряд': None, 'удлинение': None, 'давление': None, 'замер': None }
         for ind, row in enumerate(perforations_intervals):
             if any([str((i)).lower() == 'проект' for i in row]) == False and all([i == None for i in row]) == False:
+                print(any([str((i)).lower() == 'проект' for i in row]) == False and all([i == None for i in row]))
                 CreatePZ.dict_perforation.setdefault(row[0], {}).setdefault(list(perf_dict.keys())[0], []).append(row[1])
                 CreatePZ.dict_perforation.setdefault(row[0], {}).setdefault(list(perf_dict.keys())[1], []).append(row[2])
                 CreatePZ.dict_perforation.setdefault(row[0], {}).setdefault(list(perf_dict.keys())[2], []).append(row[3])
@@ -536,45 +539,61 @@ class CreatePZ(MyWindow):
                     CreatePZ.dict_perforation.setdefault(row[0], {}).setdefault(list(perf_dict.keys())[8], []).append(row[8])
                     CreatePZ.dict_perforation.setdefault(row[0], {}).setdefault(list(perf_dict.keys())[9], []).append(row[9])
         print(f' все интервалы {CreatePZ.dict_perforation}')
-        for plast, data_plast in CreatePZ.dict_perforation.items():
-            # print(type(data_plast['вскрытие'][0])== datetime)
-            # print(min(data_plast['кровля']) >= CreatePZ.H_F_paker_do['do'], data_plast['отключение'] ==  None, \
-            #         CreatePZ.old_version == False, max(data_plast['подошва']) <= CreatePZ.current_bottom)
-            # print(data_plast['кровля'], CreatePZ.H_F_paker_do['do'],  data_plast['отключение'] !=  None)
-            for i in data_plast['кровля']:
-                if i > CreatePZ.H_F_paker_do['do'] and data_plast['отключение'] !=  None and CreatePZ.old_version == False and max(data_plast['подошва']) <= CreatePZ.current_bottom:
-                    CreatePZ.dict_work_pervorations.setdefault(plast, []).append(i)
+        try:
+            for plast, data_plast in CreatePZ.dict_perforation.items():
+                # print(type(data_plast['вскрытие'][0])== datetime)
+                # print(min(data_plast['кровля']) >= CreatePZ.H_F_paker_do['do'], data_plast['отключение'] ==  None, \
+                #         CreatePZ.old_version == False, max(data_plast['подошва']) <= CreatePZ.current_bottom)
+                # print(data_plast['кровля'], CreatePZ.H_F_paker_do['do'],  data_plast['отключение'] !=  None)
+                print(plast, data_plast['кровля'])
+                for i in data_plast['кровля']:
+                    if i > CreatePZ.H_F_paker_do['do'] and data_plast['отключение'] !=  None and CreatePZ.old_version == False and max(data_plast['подошва']) <= CreatePZ.current_bottom:
+                        CreatePZ.dict_work_pervorations.setdefault(plast, []).append(i)
 
+                    elif i > CreatePZ.H_F_paker_do['do'] and type(data_plast['вскрытие'][0]) == datetime  \
+                            and CreatePZ.old_version == True and max(data_plast['подошва']) <= CreatePZ.current_bottom:
+                        CreatePZ.dict_work_pervorations.setdefault(plast, []).append(i)
+            print(f' работающие интервалы {CreatePZ.dict_work_pervorations}')
+            CreatePZ.plast_work = list(CreatePZ.dict_work_pervorations.keys())
+            CreatePZ.plast_all = list(CreatePZ.dict_perforation.keys())
+            CreatePZ.pervoration_min = min([min(CreatePZ.dict_perforation[i]['кровля']) for i in CreatePZ.plast_all])
+            CreatePZ.pervoration_max =max([max(CreatePZ.dict_perforation[i]['подошва']) for i in CreatePZ.plast_work])
+            print(f'мин {CreatePZ.pervoration_min}, мак {CreatePZ.pervoration_max}')
+        except:
+            acid_true_quest = QMessageBox.question(self, 'Программа', 'Программа определили,что в скважине интервалов перфорации нет, верно ли?')
+            if acid_true_quest == QMessageBox.StandardButton.Yes:
+                acid_true_quest = True
+                CreatePZ.dict_work_pervorations = {}
+            else:
+                acid_true_quest = False
+                CreatePZ.current_bottom, ok = QInputDialog.getDouble(self, 'Необходимый забой',
+                                                                     'Введите забой до которого нужно нормализовать')
 
-                elif i > CreatePZ.H_F_paker_do['do'] and type(data_plast['вскрытие'][0]) == datetime  \
-                        and CreatePZ.old_version == True and max(data_plast['подошва']) <= CreatePZ.current_bottom:
-                    CreatePZ.dict_work_pervorations.setdefault(plast, []).append(i)
-        print(f' работающие интервалы {CreatePZ.dict_work_pervorations}')
-        CreatePZ.plast_work = list(CreatePZ.dict_work_pervorations.keys())
-        CreatePZ.plast_all = list(CreatePZ.dict_perforation.keys())
-        CreatePZ.pervoration_min = min([min(CreatePZ.dict_perforation[i]['кровля']) for i in CreatePZ.plast_all])
-        CreatePZ.pervoration_max =max([max(CreatePZ.dict_perforation[i]['подошва']) for i in CreatePZ.plast_work])
-        print(f'мин {CreatePZ.pervoration_min}, мак {CreatePZ.pervoration_max}')
-        # print(f' работающие ПВР {CreatePZ.work_pervorations_dict}')
-        # for row in perforations_intervals:
-        #     if CreatePZ.H_F_paker_do['do'] != None and row[2] != None:
-        #         if CreatePZ.without_b(row[2]) > CreatePZ.H_F_paker_do['do'] and row[5] == None and \
-        #                 CreatePZ.without_b(row[3]) <= CreatePZ.current_bottom and CreatePZ.old_version == False:
-        #             CreatePZ.work_pervorations.append(row)
-        #             CreatePZ.work_pervorations_dict[row[2]] = row[3]
-        #         elif CreatePZ.without_b(row[2]) > CreatePZ.H_F_paker_do['do'] and CreatePZ.old_version == True and CreatePZ.without_b(row[3]) <= CreatePZ.current_bottom:
-        #             CreatePZ.work_pervorations.append(row)
-        #             CreatePZ.work_pervorations_dict[row[2]] = row[3]
-        #     elif row[2] != None:
-        #         if row[5] == None and CreatePZ.without_b(
-        #                 row[2]) <= CreatePZ.current_bottom and CreatePZ.old_version == False:
-        #             CreatePZ.work_pervorations.append(row)
-        #             CreatePZ.work_pervorations_dict[row[2]] = row[3]
-        #         elif CreatePZ.old_version == True and CreatePZ.without_b(row[2]) <= CreatePZ.current_bottom:
-        #             CreatePZ.work_pervorations.append(row)
-        #             CreatePZ.work_pervorations_dict[row[2]] = row[3]
-        # print(CreatePZ.work_pervorations)
-        # print(CreatePZ.work_pervorations_dict)
+                for plast, data_plast in CreatePZ.dict_perforation.items():
+                    # print(type(data_plast['вскрытие'][0])== datetime)
+                    # print(min(data_plast['кровля']) >= CreatePZ.H_F_paker_do['do'], data_plast['отключение'] ==  None, \
+                    #         CreatePZ.old_version == False, max(data_plast['подошва']) <= CreatePZ.current_bottom)
+                    # print(data_plast['кровля'], CreatePZ.H_F_paker_do['do'],  data_plast['отключение'] !=  None)
+                    print(plast, data_plast['кровля'])
+                    for i in data_plast['кровля']:
+                        if i > CreatePZ.H_F_paker_do['do'] and data_plast[
+                            'отключение'] != None and CreatePZ.old_version == False and max(
+                                data_plast['подошва']) <= CreatePZ.current_bottom:
+                            CreatePZ.dict_work_pervorations.setdefault(plast, []).append(i)
+
+                        elif i > CreatePZ.H_F_paker_do['do'] and type(data_plast['вскрытие'][0]) == datetime \
+                                and CreatePZ.old_version == True and max(
+                            data_plast['подошва']) <= CreatePZ.current_bottom:
+                            CreatePZ.dict_work_pervorations.setdefault(plast, []).append(i)
+                print(f' работающие интервалы {CreatePZ.dict_work_pervorations}')
+                CreatePZ.plast_work = list(CreatePZ.dict_work_pervorations.keys())
+                CreatePZ.plast_all = list(CreatePZ.dict_perforation.keys())
+                CreatePZ.pervoration_min = min(
+                    [min(CreatePZ.dict_perforation[i]['кровля']) for i in CreatePZ.plast_all])
+                CreatePZ.pervoration_max = max(
+                    [max(CreatePZ.dict_perforation[i]['подошва']) for i in CreatePZ.plast_work])
+                print(f'мин {CreatePZ.pervoration_min}, мак {CreatePZ.pervoration_max}')
+
 
         for j in range(CreatePZ.data_x_min, CreatePZ.data_x_max):  # Ожидаемые показатели после ремонта
             lst = []
@@ -677,8 +696,7 @@ class CreatePZ(MyWindow):
         CreatePZ.ins_ind += len(CreatePZ.row_expected)
         # print(f' индекс до работ {CreatePZ.ins_ind}')
         if work_plan == 'gnkt_opz':
-            CreatePZ.current_bottom, ok = QInputDialog.getDouble(self, 'Необходимый забой',
-                                                                 'Введите забой до которого нужно нормализовать')
+
             gnkt_work1 = gnkt_work(self)
             CreatePZ.count_row_height(ws, gnkt_work1, CreatePZ.ins_ind)
             CreatePZ.itog_ind_min = CreatePZ.ins_ind
@@ -748,17 +766,7 @@ class CreatePZ(MyWindow):
                 if i == 1 + CreatePZ.ins_ind + 11:
                     ws.row_dimensions[i].height = 55
         CreatePZ.ins_ind += len(podp_down)
-        # for row in range(1, 16):
-        #    for col in range(1, 13):
-        #         ws2.cell(row = row, column = col).alignment = ws2.cell(row = row, column = col).alignment.copy(wrapText=True)
-        #         ws2.cell(row= row, column=j + col).font = 'Arial'
-        # lst2 = []
-        # for j in range(1, max_rows):
-        #     lst3 = []
-        #     for i in range(1, 13):
-        #         lst3.append(ws2.cell(row=j, column = i).value)
-        #     lst2.append(lst3)
-        #
+
 
         if 2 in CreatePZ.cat_H2S_list or 1 in CreatePZ.cat_H2S_list:
             ws3 = wb.create_sheet('Sheet1')
@@ -789,9 +797,10 @@ class CreatePZ(MyWindow):
         except:
             print('нет скрытых ячеек')
 
+        self.ws = ws
 
         wb.save(f'{CreatePZ.well_number} {CreatePZ.well_area} {work_plan}.xlsx')
-        return ws
+        return self.ws
 
 
     def insert_gnvp(ws, work_plan, ins_gnvp):

@@ -1,6 +1,7 @@
 import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.Qt import *
+from main import MyWindow
 
 
 class TabPage_SO(QWidget):
@@ -58,8 +59,9 @@ class TabWidget(QTabWidget):
         super().__init__()
         self.addTab(TabPage_SO(self), 'Перфорация')
 
-class PervorationWindow(QMainWindow):
+class PervorationWindow(MyWindow):
     # from open_pz import CreatePZ
+    perforation_list = []
     def __init__(self):
         super().__init__()
         self.centralWidget = QWidget()
@@ -111,6 +113,8 @@ class PervorationWindow(QMainWindow):
         # print(editType, spinYearOfIssue, editSerialNumber, editSpecifications)
 
     def addWork(self):
+        from main import MyWindow
+        from open_pz import CreatePZ
         rows = self.tableWidget.rowCount()
 
         interval = [["Кровля перфорации", "-", "Подошва Перфорации", "Тип заряда", "отв на 1 п.м.", "Количество отверстий",
@@ -127,6 +131,7 @@ class PervorationWindow(QMainWindow):
                                      f'не менее 30атм в течении 30мин (ОПРЕССОВКУ ПВО ЗАФИКСИРОВАТЬ В ВАХТОВОМ ЖУРНАЛЕ).',
                          None, None, None, None, None, None, None,
                           'Мастер КРС, подрядчик по ГИС', 15, None]]
+
 
         for row in range(rows):
             perf_list = [None, None]
@@ -148,7 +153,16 @@ class PervorationWindow(QMainWindow):
         perforation.append([None, None, 'Произвести контрольную запись ЛМ;ТМ. Составить АКТ на перфорацию.',
                          None, None, None, None, None, None, None,
                           'Подрядчик по ГИС', None, None])
-        print(perforation)
+        print(CreatePZ.ins_ind)
+
+        MyWindow.perforation_list = perforation
+
+        self.close()
+        acid_true_quest = QMessageBox.question(self, 'вставить данные?')
+        if acid_true_quest == QMessageBox.StandardButton.Yes:
+            acid_true_quest = True
+        else:
+            acid_true_quest = False
     def delRowTable(self):
         row = self.tableWidget.currentRow()
         if row == -1:
@@ -163,10 +177,10 @@ QLabel {
     font: 8pt "MS Shell Dlg 2";
 }
 QLineEdit {
-    font: 12pt "Calibri";
+    font: 12pt "Arial";
 }
 QSpinBox {
-    font: 12pt "Calibri";
+    font: 12pt "Arial";
 }
 """
 

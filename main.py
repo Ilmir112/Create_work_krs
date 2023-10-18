@@ -1,11 +1,10 @@
 import sys
 import openpyxl
-from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu, QMenuBar, QAction, QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget
-from PyQt5 import QtCore, QtWidgets
-from work_py.perforation import PervorationWindow
-from work_py.mouse import TableWidget
+from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu, QMenuBar, QAction, QTableWidget, QTableWidgetItem, \
+    QVBoxLayout, QWidget, QLineEdit
+from PyQt5 import QtCore, QtWidgets, QtGui
 
-
+import work_py.opressovka
 
 
 
@@ -14,19 +13,23 @@ class MyWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.initUI()
-        self.new_window =None
-
+        self.new_window = None
+        self.ws = None
+        self.ins_ind = None
+        self.perforation_list = []
 
     def initUI(self):
+        from work_py.mouse import TableWidget
         self.setWindowTitle("Main Window")
-        self.setGeometry(500, 500, 800, 800)
+        self.setGeometry(500, 500, 600, 600)
 
         self.table_widget = TableWidget()
         self.table_widget.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.table_widget.customContextMenuRequested.connect(self.openContextMenu)
         self.setCentralWidget(self.table_widget)
         self.createMenuBar()
-
+        self.le = QLineEdit()
+        self.model = self.table_widget.model()
         # Этот сигнал испускается всякий раз, когда ячейка в таблице нажата.
         # Указанная строка и столбец - это ячейка, которая была нажата.
         self.table_widget.cellPressed[int, int].connect(self.clickedRowColumn)
@@ -89,23 +92,69 @@ class MyWindow(QMainWindow):
         elif action == self.save_file_as:
             self.saveFileDialog()
 
+
     def openContextMenu(self, position):
+        from open_pz import CreatePZ
+
         context_menu = QMenu(self)
 
-        new_window_action = QAction("Open New Window", self)
-        new_window_action.triggered.connect(self.openNewWindow)
-        context_menu.addAction(new_window_action)
+        action_menu =  context_menu.addMenu("вид работ")
+
+        perforation_action = QAction("Перфорация", self)
+        action_menu.addAction(perforation_action)
+        perforation_action.triggered.connect(self.openNewWindow)
+
+
+        opressovka_action = QAction("Опрессовка колонны", self)
+        action_menu.addAction(opressovka_action)
+        opressovka_action.triggered.connect(self.pressureTest)
 
         context_menu.exec_(self.mapToGlobal(position))
 
     def clickedRowColumn(self, r, c):
+        from open_pz import CreatePZ
+        self.ins_ind = r
 
-        print("{}: row={}, column={}".format(self.table_widget.mouse_press, r, c))
+
+    def pressureTest(self):
+        from work_py.opressovka import paker_list
+        from open_pz import CreatePZ
+
+        pressure_work1 = paker_list(1000, 10)
+        print(f'индекс {self.ins_ind, len(pressure_work1)}')
+        self.populate_row(self.ins_ind, pressure_work1)
+        CreatePZ.ins_ind += len(pressure_work1) + 1
+
+    def populate_row(self, ins_ind, work_list):
+
+        text_width_dict = {20: (0, 100), 40: (101, 200), 60: (201, 300), 80: (301, 400), 100: (401, 500), 120: (501, 600), 140: (601, 700)}
+
+        for i, row_data in enumerate(work_list):
+            row = ins_ind + i
+            self.table_widget.insertRow(row)
+            self.table_widget.setSpan(i+ins_ind, 2, 1, 8)
+            for column, data in enumerate(row_data):
+                # item = QtWidgets.QTableWidgetItem(data)
+                widget = QtWidgets.QLabel(str( ))
+                widget.setStyleSheet('border: 0.5px solid black; font: Arial 14px')
+                self.table_widget.setCellWidget(row, column, widget)
+                self.table_widget.setItem(row, column, QtWidgets.QTableWidgetItem(str(data)))
+                if column == 2:
+                    if data != None:
+                        text = data
+                        for key, value in text_width_dict.items():
+                            if value[0] <= len(text) <= value[1]:
+                                text_width = key
+                                self.table_widget.setRowHeight(row, int(text_width))
+            # self.table_widget.resizeColumnsToContents()
+            # self.table_widget.resizeRowsToContents()
+
+
 
     def openNewWindow(self):
+        from work_py.perforation import PervorationWindow
         if self.new_window is None:
             self.new_window = PervorationWindow()
-
             self.new_window.setWindowTitle("New Window")
             self.new_window.setGeometry(200, 200, 300, 200)
             self.new_window.show()
@@ -113,6 +162,10 @@ class MyWindow(QMainWindow):
         else:
             self.new_window.close()  # Close window.
             self.new_window = None  # Discard reference.
+
+        def insertPerf(self):
+            print(f'перф{self.perforation_list}')
+            self.populate_row(self.ins_ind, self.perforation_list)
 
     def copy_pz(self, sheet):
         from open_pz import CreatePZ
@@ -130,7 +183,7 @@ class MyWindow(QMainWindow):
             for col in range(1, cols + 1):
                 if sheet.cell(row=row, column=col).value != None:
                     cell_value = str(sheet.cell(row=row, column=col).value)
-                    item = QtWidgets.QTableWidgetItem(cell_value)
+                    item = QtWidgets.QTableWidgetItem(str(cell_value))
                     self.table_widget.setItem(row - 1, col - 1, item)
                     # Проверяем, является ли текущая ячейка объединенной
                     for merged_cell in merged_cells:
