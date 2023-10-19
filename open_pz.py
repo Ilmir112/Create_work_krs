@@ -10,7 +10,6 @@ from openpyxl import Workbook, load_workbook
 from openpyxl.utils import get_column_letter
 from PyQt5.QtWidgets import QInputDialog, QMessageBox
 
-
 from copy import copy
 from openpyxl.utils.cell import range_boundaries
 # from main import MyWindow
@@ -25,7 +24,7 @@ from gnkt_opz import gnkt_work
 
 class CreatePZ(MyWindow):
     def __init__(self, num, parent=None):
-        super(CreatePZ, self).__init__(parent)
+        super(MyWindow, self).__init__(parent)
 
     lift_ecn_can_addition = False
     column_passability = False
@@ -33,8 +32,10 @@ class CreatePZ(MyWindow):
     template_depth = 0
     column_leakiness = False
     dict_perforation = {}
+    dict_perforation_project = {}
     pervoration_min = 5000
     pervoration_max = 0
+    gaz_f_pr = []
     paker_diam_dict = {
         82: (88, 92),
         88: (92.1, 97),
@@ -59,7 +60,7 @@ class CreatePZ(MyWindow):
     column_diametr = 0
     column_wall_thickness = 0
     shoe_column = 0
-    bottomhole_artificial =0
+    bottomhole_artificial = 0
     max_expected_pressure = 0
     head_column_additional = 0
     shoe_column_additional = 0
@@ -106,8 +107,6 @@ class CreatePZ(MyWindow):
                          top=Side(style='thin'),
                          bottom=Side(style='thin'))
 
-
-
     def open_excel_file(self, fname, work_plan):
 
         wb = load_workbook(fname, data_only=True)
@@ -129,7 +128,7 @@ class CreatePZ(MyWindow):
         curator_list = ['ОР', 'ГТМ', 'ГРР', 'ГО']
         # CreatePZ.curator = 'ГТМ'
         CreatePZ.curator, ok = QInputDialog.getItem(self, 'Выбор кураторов ремонта', 'Введите сектор кураторов региона',
-                                            curator_list, 0, False)
+                                                    curator_list, 0, False)
         # if ok and curator:
         #    CreatePZ.curator = curator
         # else:
@@ -185,18 +184,21 @@ class CreatePZ(MyWindow):
                             CreatePZ.bottomhole_artificial = float(row[col + 5 + n])
 
                     except:
-                        CreatePZ.bottomhole_artificial, ok = QInputDialog.getDouble(self, 'Искусственный забой', 'Введите искусственный забой по скважине, 1000, 50, 4000, 1)  ')
+                        CreatePZ.bottomhole_artificial, ok = QInputDialog.getDouble(self, 'Искусственный забой',
+                                                                                    'Введите искусственный забой по скважине, 1000, 50, 4000, 1)  ')
                 elif 'Текущий забой ' == value:
                     try:
                         CreatePZ.current_bottom = float(row[col + 2])
                         n = 1
                         while CreatePZ.current_bottom == None:
-                            CreatePZ.current_bottom = row[col  + n]
+                            CreatePZ.current_bottom = row[col + n]
                             n += 1
                             CreatePZ.current_bottom = float(row[col + n])
                         print(f'Текущий забой {CreatePZ.current_bottom}')
                     except:
-                        CreatePZ.current_bottom, ok = QInputDialog.getDouble(self,'Текущий забоя', 'Введите Текущий забой равен', 1000, 1, 4000, 1)
+                        CreatePZ.current_bottom, ok = QInputDialog.getDouble(self, 'Текущий забоя',
+                                                                             'Введите Текущий забой равен', 1000, 1,
+                                                                             4000, 1)
                 elif 'месторождение ' == value:
                     CreatePZ.oilfield = row[col + 2]
 
@@ -208,29 +210,35 @@ class CreatePZ(MyWindow):
                         try:
                             CreatePZ.column_diametr = float(data_main_production_string[0])
                         except:
-                            CreatePZ.column_diametr = QInputDialog.getInt(self, 'диаметр основной колонны', 'Введите диаметр основной колонны', 146, 80, 276)
+                            CreatePZ.column_diametr = QInputDialog.getInt(self, 'диаметр основной колонны',
+                                                                          'Введите диаметр основной колонны', 146, 80,
+                                                                          276)
                         try:
                             CreatePZ.column_wall_thickness = float(data_main_production_string[1][1:])
                         except:
-                            CreatePZ.column_wall_thickness = QInputDialog.getDouble(self, 'Толщина стенки', 'Введите толщины стенки ЭК', 7.7, 5, 15, 1)
-
+                            CreatePZ.column_wall_thickness = QInputDialog.getDouble(self, 'Толщина стенки',
+                                                                                    'Введите толщины стенки ЭК', 7.7, 5,
+                                                                                    15, 1)[0]
+                            print(CreatePZ.column_wall_thickness)
                         print(CreatePZ.without_b(data_main_production_string[-1].split('-')[-1]))
                         try:
                             if len(data_main_production_string[-1].split('-')) == 2:
                                 print(len(data_main_production_string[-1].split('-')))
 
-                                CreatePZ.shoe_column = CreatePZ.without_b(data_main_production_string[-1].split('-')[-1])
+                                CreatePZ.shoe_column = CreatePZ.without_b(
+                                    data_main_production_string[-1].split('-')[-1])
 
                         except:
-                            CreatePZ.shoe_column = QInputDialog.getInt(self, 'Башмак колонны: ',  'Башмак колонны: ', 1000, 20, 4000, 1)
+                            CreatePZ.shoe_column = QInputDialog.getInt(self, 'Башмак колонны: ', 'Башмак колонны: ',
+                                                                       1000, 20, 4000, 1)
                     else:
                         CreatePZ.column_diametr = QInputDialog.getInt(self, 'диаметр основной колонны',
                                                                       'Введите диаметр основной колонны', 146, 80, 276)
                         CreatePZ.column_wall_thickness = QInputDialog.getDouble(self, 'Толщина стенки',
-                                                                                    'Введите толщины стенки ЭК', 7.7, 5,
-                                                                                    15, 1)
+                                                                                'Введите толщины стенки ЭК', 7.7, 5,
+                                                                                15, 1)
                         CreatePZ.shoe_column = QInputDialog.getInt(self, 'Башмак колонны: ', 'Башмак колонны: ',
-                                                                       1000, 20, 4000, 1)
+                                                                   1000, 20, 4000, 1)
 
 
                 elif '9. Максимальный зенитный угол' == value:
@@ -242,25 +250,30 @@ class CreatePZ(MyWindow):
                             n += 1
                     except:
                         CreatePZ.max_angle, ok = QInputDialog.getDouble(self, 'Максимальный зенитный угол /'
-                                                                          '','Введите максимальный зенитный угол', 25, 1, 100, 2)
+                                                                              '', 'Введите максимальный зенитный угол',
+                                                                        25, 1, 100, 2)
 
                 elif '9. Максимальный зенитный угол' in row and value == 'на глубине':
                     try:
                         CreatePZ.max_h_angle = row[col + 1]
                     except:
-                        CreatePZ.max_h_angle, ok = QInputDialog.getint(self, 'Глубина максимального угла', 'Введите глубину максимального зетного угла: ', 500, 1, 4000)
+                        CreatePZ.max_h_angle, ok = QInputDialog.getint(self, 'Глубина максимального угла',
+                                                                       'Введите глубину максимального зетного угла: ',
+                                                                       500, 1, 4000)
                 elif 'цех' == value and 'назначение ' in row:
                     cdng = row[col + 1]
                     CreatePZ.cdng = cdng
 
                 elif 'плотн.воды' == value:
                     if CreatePZ.curator == 'ОР':
-                        CreatePZ.water_cut = 100 # Обводненность скважины
+                        CreatePZ.water_cut = 100  # Обводненность скважины
                     else:
                         try:
                             CreatePZ.water_cut = float(row[col - 1])  # обводненность
                         except:
-                            CreatePZ.water_cut = QInputDialog.getInt(self, 'Обводненность', 'Введите обводненность скважинной продукции', 50, 0, 100)
+                            CreatePZ.water_cut = QInputDialog.getInt(self, 'Обводненность',
+                                                                     'Введите обводненность скважинной продукции', 50,
+                                                                     0, 100)
                 elif 'по Pпл' == value:
                     cat_P_1 = row[col + 1]
                     n = 1
@@ -284,35 +297,45 @@ class CreatePZ(MyWindow):
                         n += 1
 
                 elif value == 'м3/т':
-                    CreatePZ.gaz_f_pr = row[col - 1]
+                    CreatePZ.gaz_f_pr.append(row[col - 1])
+
 
                 elif '6. Конструкция хвостовика' == value:
                     column_add_index = row_ind + 3
                     CreatePZ.data_column_additional = ws.cell(row=row_ind + 3, column=col + 2).value
 
                     # print(f'хв{CreatePZ.data_column_additional}, {CreatePZ.column_additional}')
-                    if len(CreatePZ.without_b(CreatePZ.data_column_additional))>2:
-                            CreatePZ.column_additional = True
-                            print(f' в скважине дополнительная колонны {CreatePZ.data_column_additional}')
+                    if len(CreatePZ.without_b(CreatePZ.data_column_additional)) > 2:
+                        CreatePZ.column_additional = True
+                        print(f' в скважине дополнительная колонны {CreatePZ.data_column_additional}')
 
                     print(CreatePZ.column_additional)
                     if CreatePZ.column_additional == True:
                         try:
                             CreatePZ.head_column_additional = float(CreatePZ.data_column_additional.split('-')[0])
                         except:
-                            CreatePZ.head_column_additional, ok = QInputDialog.getInt(self, 'голова доп колонны', 'введите глубину головы доп колонны', 600, 0, 3500)
+                            CreatePZ.head_column_additional, ok = QInputDialog.getInt(self, 'голова доп колонны',
+                                                                                      'введите глубину головы доп колонны',
+                                                                                      600, 0, 3500)
                         try:
                             CreatePZ.shoe_column_additional = float(CreatePZ.data_column_additional.split('-')[1])
                         except:
-                            CreatePZ.shoe_column_additional, ok = QInputDialog.getInt(self, ',башмак доп колонны', 'введите глубину башмак доп колонны', 600, 0, 3500)
+                            CreatePZ.shoe_column_additional, ok = QInputDialog.getInt(self, ',башмак доп колонны',
+                                                                                      'введите глубину башмак доп колонны',
+                                                                                      600, 0, 3500)
                         try:
                             CreatePZ.column_additional_diametr = ws.cell(row=row_ind + 3, column=col + 4).value
                         except:
-                            CreatePZ.column_additional_diametr, ok = QInputDialog.getInt(self, ',диаметр доп колонны', 'введите внешний диаметр доп колонны', 600, 0, 3500)
+                            CreatePZ.column_additional_diametr, ok = QInputDialog.getInt(self, ',диаметр доп колонны',
+                                                                                         'введите внешний диаметр доп колонны',
+                                                                                         600, 0, 3500)
                         try:
                             CreatePZ.column_additional_wall_thickness = ws.cell(row=row_ind + 3, column=col + 6).value
                         except:
-                            CreatePZ.column_additional_wall_thickness, ok = QInputDialog.getInt(self, ',толщина стенки доп колонны', 'введите толщину стенки доп колонны', 600, 0, 3500)
+                            CreatePZ.column_additional_wall_thickness, ok = QInputDialog.getInt(self,
+                                                                                                ',толщина стенки доп колонны',
+                                                                                                'введите толщину стенки доп колонны',
+                                                                                                600, 0, 3500)
                 elif 'Дата вскрытия/отключения' == value:
                     CreatePZ.old_version = True
                 elif 'Максимально ожидаемое давление на устье' == value:
@@ -323,7 +346,10 @@ class CreatePZ(MyWindow):
                             CreatePZ.max_expected_pressure = row[col + n]
                             n += 1
                     except:
-                        CreatePZ.max_expected_pressure, ok = QInputDialog.getInt(self, 'Максимальное ожидаемое давление', 'Введите максимально ожидамое давление на устье: ', 80, 0, 200)
+                        CreatePZ.max_expected_pressure, ok = QInputDialog.getInt(self,
+                                                                                 'Максимальное ожидаемое давление',
+                                                                                 'Введите максимально ожидамое давление на устье: ',
+                                                                                 80, 0, 200)
 
                 elif 'Максимально допустимое давление опрессовки э/колонны' == value or 'Максимально допустимое давление на э/колонну' == value:
                     try:
@@ -333,7 +359,10 @@ class CreatePZ(MyWindow):
                             CreatePZ.max_admissible_pressure = row[col + n]
                             n += 1
                     except:
-                        CreatePZ.max_admissible_pressure, ok = QInputDialog.getInt(self, 'Максимальное допустимое давление опрессовки э/колонны', 'Введите максимально допустимое давление опрессовки э/колонны: ', 80, 0, 200)
+                        CreatePZ.max_admissible_pressure, ok = QInputDialog.getInt(self,
+                                                                                   'Максимальное допустимое давление опрессовки э/колонны',
+                                                                                   'Введите максимально допустимое давление опрессовки э/колонны: ',
+                                                                                   80, 0, 200)
 
                 elif value == 'Пакер' and row[col + 2] == 'типоразмер':
                     CreatePZ.paker_do['do'] = CreatePZ.if_None(row[col + 4])
@@ -354,26 +383,27 @@ class CreatePZ(MyWindow):
                     else:
                         CreatePZ.dict_pump['posle'] = CreatePZ.if_None(row[col + 9])
 
-
                     print(f' ячейка {ws.cell(row=row_ind + 5, column=col + 3).value}')
                     if ws.cell(row=row_ind + 5, column=col + 3).value == 'Нсп, м':
                         CreatePZ.dict_pump_h['do'] = CreatePZ.without_b(ws.cell(row=row_ind + 5, column=col + 5).value)
                         print(f'глубина насоса {CreatePZ.dict_pump_h["do"]}')
 
                         if CreatePZ.old_version == True:
-                            CreatePZ.dict_pump_h['posle'] = CreatePZ.without_b(ws.cell(row=row_ind + 5, column=col + 9).value)
+                            CreatePZ.dict_pump_h['posle'] = CreatePZ.without_b(
+                                ws.cell(row=row_ind + 5, column=col + 9).value)
                         else:
-                            CreatePZ.dict_pump_h['posle'] = CreatePZ.without_b(ws.cell(row=row_ind + 5, column=col + 10).value)
+                            CreatePZ.dict_pump_h['posle'] = CreatePZ.without_b(
+                                ws.cell(row=row_ind + 5, column=col + 10).value)
 
-                elif value == 'Н посадки, м' and CreatePZ.paker_do['do'] != 0:
+                elif value == 'Н посадки, м' and CreatePZ.paker_do['do'] != 0 and  CreatePZ.paker_do['do'] != '-':
                     try:
                         CreatePZ.H_F_paker_do['do'] = CreatePZ.without_b(row[col + 2])
                         print(f'Глубина посадки пакера {CreatePZ.H_F_paker_do["do"]}')
 
                     except:
                         H_F_paker_do_2, ok = QInputDialog.getInt(self, 'Глубина посадки фондового пакера',
-                                                                            'Глубина посадки фондового пакера до ремонта', 1000, 0,
-                                                                            int(CreatePZ.bottomhole_artificial))
+                                                                 'Глубина посадки фондового пакера до ремонта', 1000, 0,
+                                                                 int(CreatePZ.bottomhole_artificial))
                         CreatePZ.H_F_paker_do['do'] = H_F_paker_do_2
 
 
@@ -385,8 +415,8 @@ class CreatePZ(MyWindow):
                             CreatePZ.H_F_paker_do['posle'] = CreatePZ.without_b(row[col + 7])
                     except:
                         H_F_paker_do_2, ok = QInputDialog.getInt(self, 'Глубина посадки фондового пакера',
-                                                                            'Глубина посадки фондового пакера до ремонта', 1000, 0,
-                                                                            int(CreatePZ.bottomhole_artificial))
+                                                                 'Глубина посадки фондового пакера до ремонта', 1000, 0,
+                                                                 int(CreatePZ.bottomhole_artificial))
                         CreatePZ.paker_do['posle'] = H_F_paker_do_2
 
                 elif 2 in CreatePZ.cat_H2S_list or 1 in CreatePZ.cat_H2S_list:
@@ -394,15 +424,18 @@ class CreatePZ(MyWindow):
                         try:
                             CreatePZ.H2S_mg.append(float(row[col - 1]))
                         except:
-                            H2S_mg = QInputDialog.getDouble(self, 'Сероводород', 'Введите содержание сероводорода в мг/л', 50, 0, 1000, 2)
+                            H2S_mg = QInputDialog.getDouble(self, 'Сероводород',
+                                                            'Введите содержание сероводорода в мг/л', 50, 0, 1000, 2)
                             CreatePZ.H2S_mg.append(float(H2S_mg[0]))
                     elif '%' == value:
                         try:
                             CreatePZ.H2S_pr.append(float(row[col - 1]))
                         except:
-                            CreatePZ.H2S_pr.append(float(QInputDialog.getDouble(self, 'Сероводород', 'Введите содержание сероводорода в %', 50, 0, 1000, 2)[0]))
+                            CreatePZ.H2S_pr.append(float(
+                                QInputDialog.getDouble(self, 'Сероводород', 'Введите содержание сероводорода в %', 50,
+                                                       0, 1000, 2)[0]))
                     elif len(CreatePZ.H2S_mg) == 0 and 'мг/м3' == value:
-                            CreatePZ.H2S_mg.append(float(row[col - 1]/1000))
+                        CreatePZ.H2S_mg.append(float(row[col - 1] / 1000))
 
         print(CreatePZ.dict_pump_h)
         print(CreatePZ.dict_pump)
@@ -412,10 +445,12 @@ class CreatePZ(MyWindow):
                     CreatePZ.lift_ecn_can == True
             else:
                 print(CreatePZ.dict_pump['posle'])
-                if 'ЭЦН' in CreatePZ.dict_pump['posle'].upper() or 'ВНН' in CreatePZ.dict_pump['posle'].upper() and  CreatePZ.dict_pump_h > CreatePZ.head_column_additional:
+                if 'ЭЦН' in CreatePZ.dict_pump['posle'].upper() or 'ВНН' in CreatePZ.dict_pump[
+                    'posle'].upper() and CreatePZ.dict_pump_h > CreatePZ.head_column_additional:
                     CreatePZ.lift_ecn_can == True
                     CreatePZ.lift_ecn_can_addition = False
-                elif 'ЭЦН' in CreatePZ.dict_pump['posle'].upper() or 'ВНН' in CreatePZ.dict_pump['posle'].upper() and  CreatePZ.dict_pump_h < CreatePZ.head_column_additional:
+                elif 'ЭЦН' in CreatePZ.dict_pump['posle'].upper() or 'ВНН' in CreatePZ.dict_pump[
+                    'posle'].upper() and CreatePZ.dict_pump_h < CreatePZ.head_column_additional:
                     CreatePZ.lift_ecn_can == False
                     CreatePZ.lift_ecn_can_addition = True
 
@@ -425,20 +460,24 @@ class CreatePZ(MyWindow):
         if CreatePZ.curator == 'ОР':
             # print(data_x_min, data_x_max)
             expected_list = []
-            for row in range(CreatePZ.data_x_min+1, CreatePZ.data_x_max+1):
+            for row in range(CreatePZ.data_x_min + 1, CreatePZ.data_x_max + 1):
                 for col in range(1, 12):
-                    if 'Qж =' == ws.cell(row=row, column=col).value or 'Qж = ' == ws.cell(row=row, column=col).value or ws.cell(row=row, column=col).value == 'Приемистость ':
-                        Qpr = ws.cell(row=row, column=col+1).value
+                    if 'Qж =' == ws.cell(row=row, column=col).value or 'Qж = ' == ws.cell(row=row,
+                                                                                          column=col).value or ws.cell(
+                            row=row, column=col).value == 'Приемистость ':
+                        Qpr = ws.cell(row=row, column=col + 1).value
                         n = 1
-                        while ws.cell(row=row, column=col+n).value == None:
-                            ws.cell(row=row, column=col+n).value
+                        while ws.cell(row=row, column=col + n).value == None:
+                            ws.cell(row=row, column=col + n).value
                             n += 1
                             Qpr = ws.cell(row=row, column=col + 1).value
 
 
 
-                    elif ws.cell(row=row, column=col).value== 'Рзак ' or ws.cell(row=row, column=col).value == 'Давление закачки ' \
-                            or ws.cell(row=row, column=col).value == 'Рзак (Нагнет)' or ws.cell(row=row, column=col).value == 'Рзак':
+                    elif ws.cell(row=row, column=col).value == 'Рзак ' or ws.cell(row=row,
+                                                                                  column=col).value == 'Давление закачки ' \
+                            or ws.cell(row=row, column=col).value == 'Рзак (Нагнет)' or ws.cell(row=row,
+                                                                                                column=col).value == 'Рзак':
                         Pzak = ws.cell(row=row, column=col + 1).value
                         n = 1
                         while ws.cell(row=row, column=col + n).value == None:
@@ -451,8 +490,8 @@ class CreatePZ(MyWindow):
                 CreatePZ.expected_pick_up[Qpr] = expected_list[Pzak]
             except:
                 expected_Q, ok = QInputDialog.getInt(self, 'Ожидаемая приемистость',
-                                                         'Ожидаемая приемистость', 100, 0,
-                                                         1600)
+                                                     'Ожидаемая приемистость', 100, 0,
+                                                     1600)
                 expected_P, ok = QInputDialog.getInt(self, 'Ожидаемое Давление закачки',
                                                      'Ожидаемое Давление закачки', 100, 0,
                                                      250)
@@ -467,7 +506,7 @@ class CreatePZ(MyWindow):
         # print(f'индекс {CreatePZ.a_plan}')
         for row in range(pipes_ind + 1, condition_of_wells):
             key = ws.cell(row=row, column=4).value
-            value = ws.cell(row=row, column=7).value
+            value = CreatePZ.without_b(ws.cell(row=row, column=7).value)
             if key != None and row < CreatePZ.a_plan:
                 CreatePZ.dict_nkt[key] = CreatePZ.dict_nkt.get(key, 0) + value
             if key != None and row >= CreatePZ.a_plan:
@@ -503,64 +542,107 @@ class CreatePZ(MyWindow):
         for row in range(data_pvr_min + 2, data_pvr_max + 2):  # Сортировка интервала перфорации
             lst = []
             for i in range(2, 13):
-                if ws.cell(row=row, column=i).value == None:
-                    lst.append(ws.cell(row=row-1, column=i).value)
-                else:
-                    lst.append(ws.cell(row=row, column=i).value)
-            perforations_intervals.append(lst)
+                lst.append(ws.cell(row=row, column=i).value)
+            if all([str(i).strip() == 'None' or i == None for i in lst]) == False:
+                perforations_intervals.append(lst)
             # perforations_intervals = sorted(perforations_intervals, key=lambda x: x[3])
 
-        for row in range(len(perforations_intervals)):
 
-            if all([i == None for i in perforations_intervals[row]]) == False:
 
-                for col in range(len(perforations_intervals[row])):
-                    if perforations_intervals[row][col] == None and col == 0:
-                        perforations_intervals[row][col] = perforations_intervals[row-1][col]
+        perf_dict = {'вертикаль': None, 'кровля': None, 'подошва': None, 'вскрытие': None, 'отключение': None,
+                     'отв': None, 'заряд': None, 'удлинение': None, 'давление': None, 'замер': None}
 
-        perf_dict = {'вертикаль':None, 'кровля': None, 'подошва': None, 'вскрытие': None, 'отключение': None, 'отв': None, 'заряд': None, 'удлинение': None, 'давление': None, 'замер': None }
         for ind, row in enumerate(perforations_intervals):
-            if any([str((i)).lower() == 'проект' for i in row]) == False and all([i == None for i in row]) == False:
-                print(any([str((i)).lower() == 'проект' for i in row]) == False and all([i == None for i in row]))
-                CreatePZ.dict_perforation.setdefault(row[0], {}).setdefault(list(perf_dict.keys())[0], []).append(row[1])
-                CreatePZ.dict_perforation.setdefault(row[0], {}).setdefault(list(perf_dict.keys())[1], []).append(row[2])
-                CreatePZ.dict_perforation.setdefault(row[0], {}).setdefault(list(perf_dict.keys())[2], []).append(row[3])
-                CreatePZ.dict_perforation.setdefault(row[0], {}).setdefault(list(perf_dict.keys())[3], []).append(row[4])
-                CreatePZ.dict_perforation.setdefault(row[0], {}).setdefault(list(perf_dict.keys())[4], []).append(row[5])
-                if CreatePZ.old_version == False and ind >5:
-                    CreatePZ.dict_perforation.setdefault(row[0], {}).setdefault(list(perf_dict.keys())[5], []).append(row[6])
-                    CreatePZ.dict_perforation.setdefault(row[0], {}).setdefault(list(perf_dict.keys())[6], []).append(row[7])
-                    CreatePZ.dict_perforation.setdefault(row[0], {}).setdefault(list(perf_dict.keys())[7], []).append(row[8])
-                    CreatePZ.dict_perforation.setdefault(row[0], {}).setdefault(list(perf_dict.keys())[8], []).append(row[9])
-                    CreatePZ.dict_perforation.setdefault(row[0], {}).setdefault(list(perf_dict.keys())[9], []).append(row[10])
-                elif CreatePZ.old_version == True and ind >5:
-                    CreatePZ.dict_perforation.setdefault(row[0], {}).setdefault(list(perf_dict.keys())[6], []).append(row[6])
-                    CreatePZ.dict_perforation.setdefault(row[0], {}).setdefault(list(perf_dict.keys())[7], []).append(row[7])
-                    CreatePZ.dict_perforation.setdefault(row[0], {}).setdefault(list(perf_dict.keys())[8], []).append(row[8])
-                    CreatePZ.dict_perforation.setdefault(row[0], {}).setdefault(list(perf_dict.keys())[9], []).append(row[9])
+            print(row, any([str((i)).lower() == 'проект' for i in row]), all([str(i).strip() == None for i in row]) == False)
+            if any([str((i)).lower() == 'проект' for i in row]) == False and all([str(i).strip() == None for i in row]) == False:
+
+                CreatePZ.dict_perforation.setdefault(row[0], {}).setdefault(list(perf_dict.keys())[0], []).append(
+                    row[1])
+                CreatePZ.dict_perforation.setdefault(row[0], {}).setdefault(list(perf_dict.keys())[1], []).append(
+                    row[2])
+                CreatePZ.dict_perforation.setdefault(row[0], {}).setdefault(list(perf_dict.keys())[2], []).append(
+                    row[3])
+                CreatePZ.dict_perforation.setdefault(row[0], {}).setdefault(list(perf_dict.keys())[3], []).append(
+                    row[4])
+                CreatePZ.dict_perforation.setdefault(row[0], {}).setdefault(list(perf_dict.keys())[4], []).append(
+                    row[5])
+                if CreatePZ.old_version == False and ind > 5:
+                    CreatePZ.dict_perforation.setdefault(row[0], {}).setdefault(list(perf_dict.keys())[5], []).append(
+                        row[6])
+                    CreatePZ.dict_perforation.setdefault(row[0], {}).setdefault(list(perf_dict.keys())[6], []).append(
+                        row[7])
+                    CreatePZ.dict_perforation.setdefault(row[0], {}).setdefault(list(perf_dict.keys())[7], []).append(
+                        row[8])
+                    CreatePZ.dict_perforation.setdefault(row[0], {}).setdefault(list(perf_dict.keys())[8], []).append(
+                        row[9])
+                    CreatePZ.dict_perforation.setdefault(row[0], {}).setdefault(list(perf_dict.keys())[9], []).append(
+                        row[10])
+                elif CreatePZ.old_version == True and ind > 5:
+                    CreatePZ.dict_perforation.setdefault(row[0], {}).setdefault(list(perf_dict.keys())[6], []).append(
+                        row[6])
+                    CreatePZ.dict_perforation.setdefault(row[0], {}).setdefault(list(perf_dict.keys())[7], []).append(
+                        row[7])
+                    CreatePZ.dict_perforation.setdefault(row[0], {}).setdefault(list(perf_dict.keys())[8], []).append(
+                        row[8])
+                    CreatePZ.dict_perforation.setdefault(row[0], {}).setdefault(list(perf_dict.keys())[9], []).append(
+                        row[9])
+            elif any([str((i)).lower() == 'проект' for i in row]) == True and all([str(i).strip() == None for i in row]) == False:
+
+                CreatePZ.dict_perforation_project.setdefault(row[0], {}).setdefault(list(perf_dict.keys())[0], []).append(
+                    row[1])
+                CreatePZ.dict_perforation_project.setdefault(row[0], {}).setdefault(list(perf_dict.keys())[1], []).append(
+                    row[2])
+                CreatePZ.dict_perforation_project.setdefault(row[0], {}).setdefault(list(perf_dict.keys())[2], []).append(
+                    row[3])
+                CreatePZ.dict_perforation_project.setdefault(row[0], {}).setdefault(list(perf_dict.keys())[3], []).append(
+                    row[4])
+                CreatePZ.dict_perforation_project.setdefault(row[0], {}).setdefault(list(perf_dict.keys())[4], []).append(
+                    row[5])
+                if CreatePZ.old_version == False and ind > 5:
+                    CreatePZ.dict_perforation_project.setdefault(row[0], {}).setdefault(list(perf_dict.keys())[5], []).append(
+                        row[6])
+                    CreatePZ.dict_perforation_project.setdefault(row[0], {}).setdefault(list(perf_dict.keys())[6], []).append(
+                        row[7])
+                    CreatePZ.dict_perforation_project.setdefault(row[0], {}).setdefault(list(perf_dict.keys())[7], []).append(
+                        row[8])
+                    CreatePZ.dict_perforation_project.setdefault(row[0], {}).setdefault(list(perf_dict.keys())[8], []).append(
+                        row[9])
+                    CreatePZ.dict_perforation_project.setdefault(row[0], {}).setdefault(list(perf_dict.keys())[9], []).append(
+                        row[10])
+                elif CreatePZ.old_version == True and ind > 5:
+                    CreatePZ.dict_perforation_project.setdefault(row[0], {}).setdefault(list(perf_dict.keys())[6], []).append(
+                        row[6])
+                    CreatePZ.dict_perforation_project.setdefault(row[0], {}).setdefault(list(perf_dict.keys())[7], []).append(
+                        row[7])
+                    CreatePZ.dict_perforation_project.setdefault(row[0], {}).setdefault(list(perf_dict.keys())[8], []).append(
+                        row[8])
+                    CreatePZ.dict_perforation_project.setdefault(row[0], {}).setdefault(list(perf_dict.keys())[9], []).append(
+                        row[9])
+        print(f'проект ПВР {CreatePZ.dict_perforation_project}')
         print(f' все интервалы {CreatePZ.dict_perforation}')
+
         try:
             for plast, data_plast in CreatePZ.dict_perforation.items():
-                # print(type(data_plast['вскрытие'][0])== datetime)
-                # print(min(data_plast['кровля']) >= CreatePZ.H_F_paker_do['do'], data_plast['отключение'] ==  None, \
-                #         CreatePZ.old_version == False, max(data_plast['подошва']) <= CreatePZ.current_bottom)
-                # print(data_plast['кровля'], CreatePZ.H_F_paker_do['do'],  data_plast['отключение'] !=  None)
-                print(plast, data_plast['кровля'])
+
+                # print(plast, data_plast['кровля'])
                 for i in data_plast['кровля']:
-                    if i > CreatePZ.H_F_paker_do['do'] and data_plast['отключение'] !=  None and CreatePZ.old_version == False and max(data_plast['подошва']) <= CreatePZ.current_bottom:
+                    if i > CreatePZ.H_F_paker_do['do'] and data_plast[
+                        'отключение'] != None and CreatePZ.old_version == False and max(
+                            data_plast['подошва']) <= CreatePZ.current_bottom:
                         CreatePZ.dict_work_pervorations.setdefault(plast, []).append(i)
 
-                    elif i > CreatePZ.H_F_paker_do['do'] and type(data_plast['вскрытие'][0]) == datetime  \
+                    elif i > CreatePZ.H_F_paker_do['do'] and type(data_plast['вскрытие'][0]) == datetime \
                             and CreatePZ.old_version == True and max(data_plast['подошва']) <= CreatePZ.current_bottom:
                         CreatePZ.dict_work_pervorations.setdefault(plast, []).append(i)
             print(f' работающие интервалы {CreatePZ.dict_work_pervorations}')
             CreatePZ.plast_work = list(CreatePZ.dict_work_pervorations.keys())
             CreatePZ.plast_all = list(CreatePZ.dict_perforation.keys())
             CreatePZ.pervoration_min = min([min(CreatePZ.dict_perforation[i]['кровля']) for i in CreatePZ.plast_all])
-            CreatePZ.pervoration_max =max([max(CreatePZ.dict_perforation[i]['подошва']) for i in CreatePZ.plast_work])
+            CreatePZ.pervoration_max = max([max(CreatePZ.dict_perforation[i]['подошва']) for i in CreatePZ.plast_work])
             print(f'мин {CreatePZ.pervoration_min}, мак {CreatePZ.pervoration_max}')
         except:
-            acid_true_quest = QMessageBox.question(self, 'Программа', 'Программа определили,что в скважине интервалов перфорации нет, верно ли?')
+            acid_true_quest = QMessageBox.question(self, 'Программа',
+                                                   'Программа определили,что в скважине интервалов перфорации нет, верно ли?')
             if acid_true_quest == QMessageBox.StandardButton.Yes:
                 acid_true_quest = True
                 CreatePZ.dict_work_pervorations = {}
@@ -578,7 +660,7 @@ class CreatePZ(MyWindow):
                     for i in data_plast['кровля']:
                         if i > CreatePZ.H_F_paker_do['do'] and data_plast[
                             'отключение'] != None and CreatePZ.old_version == False and max(
-                                data_plast['подошва']) <= CreatePZ.current_bottom:
+                            data_plast['подошва']) <= CreatePZ.current_bottom:
                             CreatePZ.dict_work_pervorations.setdefault(plast, []).append(i)
 
                         elif i > CreatePZ.H_F_paker_do['do'] and type(data_plast['вскрытие'][0]) == datetime \
@@ -593,7 +675,6 @@ class CreatePZ(MyWindow):
                 CreatePZ.pervoration_max = max(
                     [max(CreatePZ.dict_perforation[i]['подошва']) for i in CreatePZ.plast_work])
                 print(f'мин {CreatePZ.pervoration_min}, мак {CreatePZ.pervoration_max}')
-
 
         for j in range(CreatePZ.data_x_min, CreatePZ.data_x_max):  # Ожидаемые показатели после ремонта
             lst = []
@@ -641,7 +722,7 @@ class CreatePZ(MyWindow):
         # head = plan.head_ind(cat_well_min, CreatePZ.data_well_max + 1)
         #
         # plan.copy_row(ws, ws2, CreatePZ.ins_ind, head)
-        CreatePZ.ins_ind += CreatePZ.data_well_max  - CreatePZ.cat_well_min + 19
+        CreatePZ.ins_ind += CreatePZ.data_well_max - CreatePZ.cat_well_min + 19
         # print(f' индекс вставки ГНВП{CreatePZ.ins_ind}')
         dict_events_gnvp = {}
         dict_events_gnvp['krs'] = events_gnvp
@@ -653,23 +734,23 @@ class CreatePZ(MyWindow):
             if i == (CreatePZ.ins_ind + 13 or i == CreatePZ.ins_ind + 28) and work_plan == 'krs':
 
                 ws.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='center',
-                                                                vertical='center')
+                                                               vertical='center')
                 ws.cell(row=i, column=2).font = Font(name='Arial', size=13, bold=True)
                 ws.cell(row=i, column=2).value = dict_events_gnvp[work_plan][i - CreatePZ.ins_ind][1]
             elif i == CreatePZ.ins_ind + 11 and work_plan == 'gnkt_opz':
                 # print(work_plan)
                 ws.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='center',
-                                                                vertical='center')
+                                                               vertical='center')
                 ws.cell(row=i, column=2).font = Font(name='Arial', size=11, bold=True)
                 ws.cell(row=i, column=2).value = dict_events_gnvp[work_plan][i - CreatePZ.ins_ind][1]
             else:
                 ws.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='left',
-                                                                vertical='top')
+                                                               vertical='top')
                 ws.cell(row=i, column=2).font = Font(name='Arial', size=12)
 
                 ws.cell(row=i, column=2).value = dict_events_gnvp[work_plan][i - CreatePZ.ins_ind][1]
         ins_gnvp = CreatePZ.ins_ind
-        CreatePZ.ins_ind += len(dict_events_gnvp[work_plan])-1
+        CreatePZ.ins_ind += len(dict_events_gnvp[work_plan]) - 1
 
         ws.row_dimensions[2].height = 30
         ws.row_dimensions[6].height = 30
@@ -677,20 +758,21 @@ class CreatePZ(MyWindow):
         # data_main_production_string = ws.cell(row=int(ind_data_main_production_string[1:])+1, column=int(ind_data_main_production_string[0])+2).value
         CreatePZ.insert_gnvp(ws, work_plan, ins_gnvp)
 
-
         print(CreatePZ.row_expected)
-        for i in range(1, len(CreatePZ.row_expected) +1):  # Добавление  показатели после ремонта
+        for i in range(1, len(CreatePZ.row_expected) + 1):  # Добавление  показатели после ремонта
             ws.row_dimensions[CreatePZ.ins_ind + i - 1].height = None
             for j in range(1, 12):
                 if i == 1:
                     ws.cell(row=i + CreatePZ.ins_ind, column=j).font = Font(name='Arial', size=13, bold=True)
-                    ws.cell(row=i + CreatePZ.ins_ind, column=j).alignment = Alignment(wrap_text=False, horizontal='center',
-                                                                              vertical='center')
+                    ws.cell(row=i + CreatePZ.ins_ind, column=j).alignment = Alignment(wrap_text=False,
+                                                                                      horizontal='center',
+                                                                                      vertical='center')
                     ws.cell(row=i + CreatePZ.ins_ind, column=j).value = CreatePZ.row_expected[i - 1][j - 1]
                 else:
                     ws.cell(row=i + CreatePZ.ins_ind, column=j).font = Font(name='Arial', size=13, bold=True)
-                    ws.cell(row=i + CreatePZ.ins_ind, column=j).alignment = Alignment(wrap_text=False, horizontal='left',
-                                                                              vertical='center')
+                    ws.cell(row=i + CreatePZ.ins_ind, column=j).alignment = Alignment(wrap_text=False,
+                                                                                      horizontal='left',
+                                                                                      vertical='center')
                     ws.cell(row=i + CreatePZ.ins_ind, column=j).value = CreatePZ.row_expected[i - 1][j - 1]
         ws.merge_cells(start_column=2, start_row=CreatePZ.ins_ind + 1, end_column=12, end_row=CreatePZ.ins_ind + 1)
         CreatePZ.ins_ind += len(CreatePZ.row_expected)
@@ -735,7 +817,7 @@ class CreatePZ(MyWindow):
                         ws.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=False)
                 ws.merge_cells(start_row=i, start_column=2, end_row=i, end_column=11)
                 ws.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='left',
-                                                                vertical='center')
+                                                               vertical='center')
             else:
                 for j in range(1, 13):
                     ws.row_dimensions[i].height = 55
@@ -744,11 +826,11 @@ class CreatePZ(MyWindow):
                     ws.cell(row=i, column=j).border = CreatePZ.thin_border
                     ws.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=False)
                     ws.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='left',
-                                                                    vertical='center')
+                                                                   vertical='center')
 
                 ws.merge_cells(start_row=i, start_column=2, end_row=i, end_column=12)
                 ws.cell(row=i + CreatePZ.ins_ind, column=2).alignment = Alignment(wrap_text=True, horizontal='left',
-                                                                          vertical='center')
+                                                                                  vertical='center')
 
         CreatePZ.ins_ind += len(itog_1()) + 2
 
@@ -759,14 +841,14 @@ class CreatePZ(MyWindow):
             for j in range(1, 13):
                 ws.cell(row=i, column=j).value = podp_down[i - 1 - CreatePZ.ins_ind][j - 1]
                 ws.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=False)
-            if i in [1 + CreatePZ.ins_ind + 7, 1 + CreatePZ.ins_ind + 8, 1 + CreatePZ.ins_ind + 9, 1 + CreatePZ.ins_ind + 10, 1 + CreatePZ.ins_ind + 11,
+            if i in [1 + CreatePZ.ins_ind + 7, 1 + CreatePZ.ins_ind + 8, 1 + CreatePZ.ins_ind + 9,
+                     1 + CreatePZ.ins_ind + 10, 1 + CreatePZ.ins_ind + 11,
                      1 + CreatePZ.ins_ind + 12, 1 + CreatePZ.ins_ind + 13, 1 + CreatePZ.ins_ind + 14]:
                 ws.merge_cells(start_row=i, start_column=2, end_row=i, end_column=6)
                 ws.cell(row=i, column=2).alignment = Alignment(wrap_text=True, vertical='top', horizontal='left')
                 if i == 1 + CreatePZ.ins_ind + 11:
                     ws.row_dimensions[i].height = 55
         CreatePZ.ins_ind += len(podp_down)
-
 
         if 2 in CreatePZ.cat_H2S_list or 1 in CreatePZ.cat_H2S_list:
             ws3 = wb.create_sheet('Sheet1')
@@ -790,7 +872,7 @@ class CreatePZ(MyWindow):
 
         try:
             for row_index, row in enumerate(ws.iter_rows()):
-                if row_index in [i for i in range(column_add_index+4, index_bottomhole+5)]:
+                if row_index in [i for i in range(column_add_index + 4, index_bottomhole + 5)]:
                     if all(cell.value == None for cell in row):
                         ws.row_dimensions[row_index].hidden = True
             print(' Скрытие ячеек сделано')
@@ -802,9 +884,9 @@ class CreatePZ(MyWindow):
         wb.save(f'{CreatePZ.well_number} {CreatePZ.well_area} {work_plan}.xlsx')
         return self.ws
 
-
     def insert_gnvp(ws, work_plan, ins_gnvp):
-        rowHeights_gnvp = [None,115.0, 155.5, 110.25, 36.0, 52.25, 36.25, 36.0, 45.25, 36.25, 165.75, 38.5, 30.25, 30.5,
+        rowHeights_gnvp = [None, 115.0, 155.5, 110.25, 36.0, 52.25, 36.25, 36.0, 45.25, 36.25, 165.75, 38.5, 30.25,
+                           30.5,
                            18.0, 36, 281.75, 115.75, 65.0, 55.75, 33.0, 33.0, 30.25, 47.0, 57.25, 45.75, 30.75, 350.25,
                            31.0, 51.75, 51.25, 87.25]
         rowHeights_gnvp_opz = [None, 95.0, 145.5, 25, 25.0, 52.25, 25.25, 20.0, 140.25, 36.25, 36.75, 20.5, 20.25, 20.5,
@@ -819,13 +901,12 @@ class CreatePZ(MyWindow):
         # print(f' индекс вставки высоты {ins_gnvp-2}')
         for index_row, row in enumerate(ws.iter_rows()):  # Копирование высоты строки
             if index_row + ins_gnvp <= len(dict_rowHeights[work_plan]) + ins_gnvp:
-                ws.row_dimensions[index_row + ins_gnvp -2].height = dict_rowHeights[work_plan][index_row - 1]
+                ws.row_dimensions[index_row + ins_gnvp - 2].height = dict_rowHeights[work_plan][index_row - 1]
             for col_ind, col in enumerate(row):
                 if col_ind <= 12:
                     ws.column_dimensions[get_column_letter(col_ind + 1)].width = colWidth[col_ind]
                 else:
                     break
-
 
     def is_valid_date(date):
         try:
@@ -833,11 +914,13 @@ class CreatePZ(MyWindow):
             return True
         except ValueError:
             return False
+
     def if_None(value):
         if value == None or value == 'Отсутствует':
             return 'отс'
         else:
             return value
+
     def without_b(a):
 
         if isinstance(a, int) == True or isinstance(a, float):
@@ -867,18 +950,18 @@ class CreatePZ(MyWindow):
             if i == ins_ind + 1:
                 ws.merge_cells(start_row=i, start_column=2, end_row=i, end_column=12)
                 ws.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='center',
-                                                                vertical='center')
+                                                               vertical='center')
 
             else:
                 ws.merge_cells(start_row=i, start_column=3, end_row=i, end_column=10)
             ws.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='center',
-                                                            vertical='center')
+                                                           vertical='center')
             ws.cell(row=i, column=11).alignment = Alignment(wrap_text=True, horizontal='center',
-                                                             vertical='center')
-            ws.cell(row=i, column=12).alignment = Alignment(wrap_text=True, horizontal='center',
-                                                             vertical='center')
-            ws.cell(row=i, column=3).alignment = Alignment(wrap_text=True, horizontal='left',
                                                             vertical='center')
+            ws.cell(row=i, column=12).alignment = Alignment(wrap_text=True, horizontal='center',
+                                                            vertical='center')
+            ws.cell(row=i, column=3).alignment = Alignment(wrap_text=True, horizontal='left',
+                                                           vertical='center')
 
         row_count = []
         for row in work_list:
@@ -894,7 +977,7 @@ class CreatePZ(MyWindow):
         for index_row, row in enumerate(row_count):  # Копирование высоты строки
             if index_row >= 3:
                 if row_count[index_row - 1] < 80:
-                    ws.row_dimensions[index_row + ins_ind].height =50
+                    ws.row_dimensions[index_row + ins_ind].height = 50
                 elif 80 <= row_count[index_row - 1] < 160:
                     ws.row_dimensions[index_row + ins_ind].height = 130
                 elif 160 <= row_count[index_row - 1] < 240:
@@ -907,7 +990,6 @@ class CreatePZ(MyWindow):
                     ws.row_dimensions[index_row + ins_ind].height = 450
                 elif 480 <= row_count[index_row - 1] < 540:
                     ws.row_dimensions[index_row + ins_ind].height = 580
-
 
         ws.column_dimensions[get_column_letter(11)].width = 20
         ws.column_dimensions[get_column_letter(12)].width = 20

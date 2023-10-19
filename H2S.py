@@ -105,7 +105,7 @@ def calc_H2S(ws3, H2S_pr, H2S_mg):
          'формула'],
         [None, None, None, None, None, None],
         [None, 4, 'Параметры добываемой жидкости и газа', None, None, None, None],
-        [None, 4.1, 'Газосодержание нефти', 'м3/тонну', CreatePZ.gaz_f_pr, 'ввод'],
+        [None, 4.1, 'Газосодержание нефти', 'м3/тонну', CreatePZ.gaz_f_pr[0], 'ввод'],
         [None, 4.2, 'Содержание сероводорода в газе (по данным проекта разработки)', '% (об)', CreatePZ.H2S_pr[0], 'ввод'],
         [None, 4.3, 'Обводенность продукции', '% (масс.)',CreatePZ.water_cut, 'ввод'],
         [None, 4.4, 'Содержание сероводорода в пластовом флюиде (устьевая проба, вода+нефть)', 'мг/дм3', CreatePZ.H2S_mg[0], 'ввод'],
@@ -252,13 +252,13 @@ def calv_h2s(self):
 
         oil_mass = v_pod_gno*(100- CreatePZ.water_cut) * 0.9/100
         # print(f'oil {oil_mass}')
-        volume_h2s = CreatePZ.gaz_f_pr*oil_mass* (float(CreatePZ.H2S_pr[0]))/100
+        volume_h2s = CreatePZ.gaz_f_pr[0]*oil_mass* (float(CreatePZ.H2S_pr[0]))/100
 
         h2s_mass_in_oil = (34*volume_h2s*1000/22.14)
         h2s_mass_in_water = (vodoiz_sucker+vodoiz_nkt)*CreatePZ.H2S_mg[0]
         # print(f'h2a{h2s_mass_in_water}')
         mass_oil_pog_gno = (vodoiz_sucker+vodoiz_nkt) * (100-CreatePZ.water_cut)*0.9/100
-        h2s_volume_pod_gno = mass_oil_pog_gno* CreatePZ.gaz_f_pr*CreatePZ.H2S_pr[0]/100
+        h2s_volume_pod_gno = mass_oil_pog_gno* CreatePZ.gaz_f_pr[0]*CreatePZ.H2S_pr[0]/100
         mass_h2s_gas = 34*h2s_volume_pod_gno/22.14
         mass_h2s_water = v_pod_gno*CreatePZ.H2S_mg[0]
         # print(f'mass{mass_h2s_water}')

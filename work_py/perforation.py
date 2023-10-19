@@ -61,12 +61,13 @@ class TabWidget(QTabWidget):
 
 class PervorationWindow(MyWindow):
     # from open_pz import CreatePZ
-    perforation_list = []
-    def __init__(self):
-        super().__init__()
+
+    def __init__(self, table_widget, ins_ind, parent=None):
+        super(MyWindow, self).__init__(parent)
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
-
+        self.table_widget = table_widget
+        self.ins_ind = ins_ind
         self.tabWidget = TabWidget()
         self.tableWidget = QTableWidget(0, 6)
         self.tableWidget.setHorizontalHeaderLabels(
@@ -118,7 +119,7 @@ class PervorationWindow(MyWindow):
         rows = self.tableWidget.rowCount()
 
         interval = [["Кровля перфорации", "-", "Подошва Перфорации", "Тип заряда", "отв на 1 п.м.", "Количество отверстий",
-                      "Вскрываемые пласты"]]
+                      "Вскрываемые пласты", 'Дополнительные данные']]
 
         perforation = [[None, None, f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС "Ойл-сервис". '
                                      f'При необходимости  подготовить место для установки партии ГИС напротив мостков. '
@@ -130,7 +131,12 @@ class PervorationWindow(MyWindow):
                                      f'не ниже максимального ожидаемого давления на устье) 80атм, по невозможности на давление поглощения, но '
                                      f'не менее 30атм в течении 30мин (ОПРЕССОВКУ ПВО ЗАФИКСИРОВАТЬ В ВАХТОВОМ ЖУРНАЛЕ).',
                          None, None, None, None, None, None, None,
-                          'Мастер КРС, подрядчик по ГИС', 15, None]]
+                          'Мастер КРС, подрядчик по ГИС', 15, None],
+                       [None, None, "ГИС (Перфорация ЗАДАЧА 2.9.1)", None, None, None, None,
+                        None,None, None, None, None, None],
+                       [None, None, "Кровля перфорации", "-", "Подошва Перфорации", "Тип заряда", "отв на 1 п.м.", "Количество отверстий",
+                      "Вскрываемые пласты", "Дополнительные данные", None, None, None]
+                       ]
 
 
         for row in range(rows):
@@ -142,27 +148,56 @@ class PervorationWindow(MyWindow):
                     value = item.text()
                     if col == 1:
                         perf_list.append("-")
+                        perf_list.append(value)
                     else:
                         perf_list.append(value)
 
-            perf_list.insert(5, None)
-            perf_list.append(None)
-            perf_list.append(None)
             perforation.append(perf_list)
+
 
         perforation.append([None, None, 'Произвести контрольную запись ЛМ;ТМ. Составить АКТ на перфорацию.',
                          None, None, None, None, None, None, None,
                           'Подрядчик по ГИС', None, None])
-        print(CreatePZ.ins_ind)
 
-        MyWindow.perforation_list = perforation
+        print(perforation)
+        text_width_dict = {20: (0, 100), 40: (101, 200), 60: (201, 300), 80: (301, 400), 100: (401, 500),
+                           120: (501, 600), 140: (601, 700)}
+
+        for i, row_data in enumerate(perforation):
+            row = self.ins_ind + i
+            self.table_widget.insertRow(row)
+
+            if i in [1, 0, 2, len(perforation)-1]:
+                self.table_widget.setSpan(i + self.ins_ind, 2, 1, 8)
+            for column, data in enumerate(row_data):
+                # item = QtWidgets.QTableWidgetItem(data)
+                widget = QtWidgets.QLabel(str())
+                if column != 0:
+                    widget.setStyleSheet("""QLabel { 
+                                                        border: 1px solid black;
+                                                        font-size: 12px; 
+                                                        font-family: Arial;
+                                                        
+                                                    }
+                                                    """)
+                    self.table_widget.setCellWidget(row, column, widget)
+                if data != None:
+                    self.table_widget.setItem(row, column, QtWidgets.QTableWidgetItem(str(data)))
+                if column == 2 or column == 10:
+                    if data != None:
+                        text = data
+                        for key, value in text_width_dict.items():
+                            if value[0] <= len(text) <= value[1]:
+                                text_width = key
+                                self.table_widget.setRowHeight(row, int(text_width))
+        self.table_widget.setSpan(1 + self.ins_ind, 10, len(perforation)-2, 1)
+        self.table_widget.setSpan(1 + self.ins_ind, 11, len(perforation) - 2, 1)
+
+
 
         self.close()
-        acid_true_quest = QMessageBox.question(self, 'вставить данные?')
-        if acid_true_quest == QMessageBox.StandardButton.Yes:
-            acid_true_quest = True
-        else:
-            acid_true_quest = False
+
+
     def delRowTable(self):
         row = self.tableWidget.currentRow()
         if row == -1:
@@ -172,17 +207,7 @@ class PervorationWindow(MyWindow):
 
 
 
-qss = """
-QLabel {
-    font: 8pt "MS Shell Dlg 2";
-}
-QLineEdit {
-    font: 12pt "Arial";
-}
-QSpinBox {
-    font: 12pt "Arial";
-}
-"""
+
 
 if __name__ == "__main__":
     import sys

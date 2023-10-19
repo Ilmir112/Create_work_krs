@@ -9,6 +9,8 @@ import work_py.opressovka
 
 
 class MyWindow(QMainWindow):
+    perforation_list = []
+    ins_ind = 0
 
     def __init__(self):
         super().__init__()
@@ -95,19 +97,28 @@ class MyWindow(QMainWindow):
 
     def openContextMenu(self, position):
         from open_pz import CreatePZ
+        from work_py.template_work import template_ek_without_skm
 
         context_menu = QMenu(self)
 
-        action_menu =  context_menu.addMenu("вид работ")
-
+        action_menu = context_menu.addMenu("вид работ")
+        pervoration_ins = action_menu.addMenu("окно перфорации")
         perforation_action = QAction("Перфорация", self)
-        action_menu.addAction(perforation_action)
+        pervoration_ins.addAction(perforation_action)
         perforation_action.triggered.connect(self.openNewWindow)
-
+        perforation_action1 = QAction("добавление в план", self)
+        pervoration_ins.addAction(perforation_action1)
+        perforation_action1.triggered.connect(self.insertPerf)
 
         opressovka_action = QAction("Опрессовка колонны", self)
         action_menu.addAction(opressovka_action)
         opressovka_action.triggered.connect(self.pressureTest)
+
+        template_action = QAction("шаблоны", self)
+        action_menu.addAction(template_action)
+        opressovka_action.triggered.connect(template_ek_without_skm)
+
+
 
         context_menu.exec_(self.mapToGlobal(position))
 
@@ -154,7 +165,7 @@ class MyWindow(QMainWindow):
     def openNewWindow(self):
         from work_py.perforation import PervorationWindow
         if self.new_window is None:
-            self.new_window = PervorationWindow()
+            self.new_window = PervorationWindow(self.table_widget, self.ins_ind)
             self.new_window.setWindowTitle("New Window")
             self.new_window.setGeometry(200, 200, 300, 200)
             self.new_window.show()
@@ -163,9 +174,9 @@ class MyWindow(QMainWindow):
             self.new_window.close()  # Close window.
             self.new_window = None  # Discard reference.
 
-        def insertPerf(self):
-            print(f'перф{self.perforation_list}')
-            self.populate_row(self.ins_ind, self.perforation_list)
+    def insertPerf(self):
+        print(f'перф{MyWindow.perforation_list}')
+        self.populate_row(self.ins_ind, self.perforation_list)
 
     def copy_pz(self, sheet):
         from open_pz import CreatePZ
