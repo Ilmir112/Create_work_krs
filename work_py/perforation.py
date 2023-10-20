@@ -36,6 +36,10 @@ class TabPage_SO(QWidget):
         self.lineEditIndexFormation = QLineEdit(self)
         self.lineEditIndexFormation.setClearButtonEnabled(True)
 
+        self.labelDopInformation = QLabel("Доп информация", self)
+        self.lineEditDopInformation = QLineEdit(self)
+        self.lineEditDopInformation.setClearButtonEnabled(True)
+
         grid = QGridLayout(self)
         grid.addWidget(self.labelType, 0, 0)
         grid.addWidget(self.labelType2, 0, 1)
@@ -43,11 +47,13 @@ class TabPage_SO(QWidget):
         grid.addWidget(self.labelHolesMetr, 0, 3)
 
         grid.addWidget(self.labelIndexFormation, 0, 4)
+        grid.addWidget(self.labelDopInformation, 0, 5)
         grid.addWidget(self.lineEditType, 1, 0)
         grid.addWidget(self.lineEditType2, 1, 1)
         grid.addWidget(self.ComboBoxCharges, 1, 2)
         grid.addWidget(self.lineEditHolesMetr, 1, 3)
         grid.addWidget(self.lineEditIndexFormation, 1, 4)
+        grid.addWidget(self.lineEditDopInformation, 1, 5)
 
 
 
@@ -60,18 +66,22 @@ class TabWidget(QTabWidget):
         self.addTab(TabPage_SO(self), 'Перфорация')
 
 class PervorationWindow(MyWindow):
-    # from open_pz import CreatePZ
 
-    def __init__(self, table_widget, ins_ind, parent=None):
+
+    def __init__(self, table_widget, ins_ind, dict_work_pervorations, dict_perforation_project, parent=None):
+        from open_pz import CreatePZ
         super(MyWindow, self).__init__(parent)
+
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
         self.table_widget = table_widget
         self.ins_ind = ins_ind
+        self.dict_work_pervorations = CreatePZ.dict_work_pervorations
+        self.dict_perforation_project = CreatePZ.dict_perforation_project
         self.tabWidget = TabWidget()
         self.tableWidget = QTableWidget(0, 6)
         self.tableWidget.setHorizontalHeaderLabels(
-            ["Кровля перфорации", "Подошва Перфорации", "Тип заряда", "отв на 1 п.м.", "Количество отверстий", "Вскрываемые пласты"])
+            ["Кровля перфорации", "Подошва Перфорации", "Тип заряда", "отв на 1 п.м.", "Количество отверстий", "Вскрываемые пласты", "доп информация"])
         for i in range(6):
             self.tableWidget.horizontalHeader().setSectionResizeMode(i, QHeaderView.Stretch)
 
@@ -84,6 +94,9 @@ class PervorationWindow(MyWindow):
         self.buttonDel.clicked.connect(self.delRowTable)
         self.buttonAddWork = QPushButton('Добавить в план работ')
         self.buttonAddWork.clicked.connect(self.addWork)
+        self.buttonAddProject = QPushButton('Добавить проектные интервалы перфорации')
+        self.buttonAddProject.clicked.connect(self.addPerfProject)
+
 
         vbox = QGridLayout(self.centralWidget)
         vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
@@ -91,16 +104,84 @@ class PervorationWindow(MyWindow):
         vbox.addWidget(self.buttonAdd, 2, 0)
         vbox.addWidget(self.buttonDel, 2, 1)
         vbox.addWidget(self.buttonAddWork, 3, 0)
+        vbox.addWidget(self.buttonAddProject, 3, 1)
+
+
+
+
+
+    def addPerfProject(self):
+
+        chargePM = QInputDialog.getInt(self, 'кол-во отверстий на 1 п.м.',
+                                                      'кол-во отверстий на 1 п.м.', 20, 5,
+                                                     50)[0]
+
+        self.tableWidget.setSortingEnabled(False)
+        print(self.dict_work_pervorations)
+        print(f' ghj {self.dict_work_pervorations}')
+        rows = self.tableWidget.rowCount()
+        if len(self.dict_perforation_project) != 0:
+
+            for plast, data in self.dict_perforation_project.items():
+                n = 0
+                for i in data['интервал']:
+                    print(i)
+                    for j in range(len(i)):
+                        self.tableWidget.insertRow(rows)
+                        self.tableWidget.setItem(rows, 0, QTableWidgetItem(str(min(i[j]))))
+                        self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(max(i[j]))))
+                        self.tableWidget.setItem(rows, 2, QTableWidgetItem(self.charge(i)))
+                        self.tableWidget.setItem(rows, 3, QTableWidgetItem(str(chargePM)))
+
+                        self.tableWidget.setItem(n, 5, QTableWidgetItem(plast))
+
+        else:
+            for plast, data in self.dict_work_pervorations.items():
+                n = 0
+                for i in data['интервал']:
+                    print(i)
+
+                    self.tableWidget.insertRow(rows)
+                    self.tableWidget.setItem(rows, 0, QTableWidgetItem(str(min(i))))
+                    self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(max(i))))
+                    self.tableWidget.setItem(rows, 2, QTableWidgetItem(self.charge(i)))
+                    self.tableWidget.setItem(rows, 3, QTableWidgetItem(str(chargePM)))
+
+                    self.tableWidget.setItem(n, 5, QTableWidgetItem(plast))
+
+        self.tableWidget.setSortingEnabled(True)
+    def charge(self, pvr):
+        from open_pz import CreatePZ
+        charge_diam_dict = {73: (0, 110), 89: (111, 135), 102: (136, 160), 114: (160, 250)}
+        if CreatePZ.column_additional == False or (
+                CreatePZ.column_additional == True and pvr < CreatePZ.head_column_additional):
+            diam_internal_ek = CreatePZ.column_diametr
+        else:
+            diam_internal_ek = CreatePZ.column_additional_diametr
+
+        for diam, diam_internal_paker in charge_diam_dict.items():
+            if diam_internal_paker[0] <= diam_internal_ek <= diam_internal_paker[1]:
+
+                zar = [25 if diam == 73 else 32]
+                return f'{diam} ПП{zar}ГП'
 
     def addRowTable(self):
+
         editType = self.tabWidget.currentWidget().lineEditType.text()
         editType2 = self.tabWidget.currentWidget().lineEditType2.text()
         chargesx= str(self.tabWidget.currentWidget().ComboBoxCharges.currentText())
         editHolesMetr = self.tabWidget.currentWidget().lineEditHolesMetr.text()
         editIndexFormation = self.tabWidget.currentWidget().lineEditIndexFormation.text()
+        dopInformation = self.tabWidget.currentWidget().lineEditDopInformation.text()
         if not editType or not editType2 or not chargesx or not editHolesMetr or not editIndexFormation:
             msg = QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
             return
+
+
+
+
+
+
         self.tableWidget.setSortingEnabled(False)
         rows = self.tableWidget.rowCount()
         self.tableWidget.insertRow(rows)
@@ -110,6 +191,7 @@ class PervorationWindow(MyWindow):
         self.tableWidget.setItem(rows, 3, QTableWidgetItem(editHolesMetr))
         self.tableWidget.setItem(rows, 4, QTableWidgetItem(str(int((float(editType2)-float(editType))*float(editHolesMetr)))))
         self.tableWidget.setItem(rows, 5, QTableWidgetItem(editIndexFormation))
+        self.tableWidget.setItem(rows, 6, QTableWidgetItem(dopInformation))
         self.tableWidget.setSortingEnabled(True)
         # print(editType, spinYearOfIssue, editSerialNumber, editSpecifications)
 
@@ -159,7 +241,7 @@ class PervorationWindow(MyWindow):
                          None, None, None, None, None, None, None,
                           'Подрядчик по ГИС', None, None])
 
-        print(perforation)
+        print(f'принято {self.dict_perforation_project}')
         text_width_dict = {20: (0, 100), 40: (101, 200), 60: (201, 300), 80: (301, 400), 100: (401, 500),
                            120: (501, 600), 140: (601, 700)}
 
@@ -177,7 +259,6 @@ class PervorationWindow(MyWindow):
                                                         border: 1px solid black;
                                                         font-size: 12px; 
                                                         font-family: Arial;
-                                                        
                                                     }
                                                     """)
                     self.table_widget.setCellWidget(row, column, widget)

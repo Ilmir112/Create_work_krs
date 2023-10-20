@@ -9,16 +9,15 @@ import work_py.opressovka
 
 
 class MyWindow(QMainWindow):
-    perforation_list = []
-    ins_ind = 0
-
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         super().__init__()
         self.initUI()
         self.new_window = None
         self.ws = None
         self.ins_ind = None
         self.perforation_list = []
+        self.dict_perforation_project = {}
+        self.dict_work_pervorations = {}
 
     def initUI(self):
         from work_py.mouse import TableWidget
@@ -164,8 +163,10 @@ class MyWindow(QMainWindow):
 
     def openNewWindow(self):
         from work_py.perforation import PervorationWindow
+        from open_pz import CreatePZ
         if self.new_window is None:
-            self.new_window = PervorationWindow(self.table_widget, self.ins_ind)
+            print(f' проект перфорации {self.dict_perforation_project}')
+            self.new_window = PervorationWindow(self.table_widget, self.ins_ind, self.dict_work_pervorations, self.dict_perforation_project)
             self.new_window.setWindowTitle("New Window")
             self.new_window.setGeometry(200, 200, 300, 200)
             self.new_window.show()
@@ -175,7 +176,7 @@ class MyWindow(QMainWindow):
             self.new_window = None  # Discard reference.
 
     def insertPerf(self):
-        print(f'перф{MyWindow.perforation_list}')
+
         self.populate_row(self.ins_ind, self.perforation_list)
 
     def copy_pz(self, sheet):
