@@ -1,6 +1,8 @@
 import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.Qt import *
+
+import main
 from main import MyWindow
 
 
@@ -79,10 +81,10 @@ class PervorationWindow(MyWindow):
         self.dict_work_pervorations = CreatePZ.dict_work_pervorations
         self.dict_perforation_project = CreatePZ.dict_perforation_project
         self.tabWidget = TabWidget()
-        self.tableWidget = QTableWidget(0, 6)
+        self.tableWidget = QTableWidget(0, 7)
         self.tableWidget.setHorizontalHeaderLabels(
             ["Кровля перфорации", "Подошва Перфорации", "Тип заряда", "отв на 1 п.м.", "Количество отверстий", "Вскрываемые пласты", "доп информация"])
-        for i in range(6):
+        for i in range(7):
             self.tableWidget.horizontalHeader().setSectionResizeMode(i, QHeaderView.Stretch)
 
         self.tableWidget.setSortingEnabled(True)
@@ -117,42 +119,42 @@ class PervorationWindow(MyWindow):
                                                      50)[0]
 
         self.tableWidget.setSortingEnabled(False)
-        print(self.dict_work_pervorations)
-        print(f' ghj {self.dict_work_pervorations}')
+        print(f' проект {self.dict_perforation_project}')
+        print(f' текущий ПВР {self.dict_work_pervorations}')
         rows = self.tableWidget.rowCount()
         if len(self.dict_perforation_project) != 0:
 
             for plast, data in self.dict_perforation_project.items():
-                n = 0
-                for i in data['интервал']:
-                    print(i)
-                    for j in range(len(i)):
-                        self.tableWidget.insertRow(rows)
-                        self.tableWidget.setItem(rows, 0, QTableWidgetItem(str(min(i[j]))))
-                        self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(max(i[j]))))
-                        self.tableWidget.setItem(rows, 2, QTableWidgetItem(self.charge(i)))
-                        self.tableWidget.setItem(rows, 3, QTableWidgetItem(str(chargePM)))
-
-                        self.tableWidget.setItem(n, 5, QTableWidgetItem(plast))
-
-        else:
-            for plast, data in self.dict_work_pervorations.items():
-                n = 0
                 for i in data['интервал']:
                     print(i)
 
                     self.tableWidget.insertRow(rows)
                     self.tableWidget.setItem(rows, 0, QTableWidgetItem(str(min(i))))
                     self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(max(i))))
-                    self.tableWidget.setItem(rows, 2, QTableWidgetItem(self.charge(i)))
+                    self.tableWidget.setItem(rows, 2, QTableWidgetItem(self.charge(max(i))))
                     self.tableWidget.setItem(rows, 3, QTableWidgetItem(str(chargePM)))
 
-                    self.tableWidget.setItem(n, 5, QTableWidgetItem(plast))
+                    self.tableWidget.setItem(rows, 5, QTableWidgetItem(plast))
+                    self.tableWidget.setItem(rows, 6, QTableWidgetItem(' '))
 
+        else:
+            for plast, data in self.dict_work_pervorations.items():
+                for i in data['интервал']:
+                    print(i)
+                    print(str(min(i)))
+                    self.tableWidget.insertRow(rows)
+                    self.tableWidget.setItem(rows, 0, QTableWidgetItem(str(min(i))))
+                    self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(max(i))))
+                    self.tableWidget.setItem(rows, 2, QTableWidgetItem(self.charge(max(i))))
+                    self.tableWidget.setItem(rows, 3, QTableWidgetItem(str(chargePM)))
+
+                    self.tableWidget.setItem(rows, 5, QTableWidgetItem(plast))
+                    self.tableWidget.setItem(rows, 6, QTableWidgetItem(' '))
         self.tableWidget.setSortingEnabled(True)
     def charge(self, pvr):
         from open_pz import CreatePZ
         charge_diam_dict = {73: (0, 110), 89: (111, 135), 102: (136, 160), 114: (160, 250)}
+
         if CreatePZ.column_additional == False or (
                 CreatePZ.column_additional == True and pvr < CreatePZ.head_column_additional):
             diam_internal_ek = CreatePZ.column_diametr
@@ -200,9 +202,6 @@ class PervorationWindow(MyWindow):
         from open_pz import CreatePZ
         rows = self.tableWidget.rowCount()
 
-        interval = [["Кровля перфорации", "-", "Подошва Перфорации", "Тип заряда", "отв на 1 п.м.", "Количество отверстий",
-                      "Вскрываемые пласты", 'Дополнительные данные']]
-
         perforation = [[None, None, f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС "Ойл-сервис". '
                                      f'При необходимости  подготовить место для установки партии ГИС напротив мостков. '
                                      f'Произвести  монтаж ГИС согласно схемы  №8а утвержденной главным инженером от  14.10.2021г',
@@ -223,7 +222,7 @@ class PervorationWindow(MyWindow):
 
         for row in range(rows):
             perf_list = [None, None]
-            for col in range(0, 6):
+            for col in range(0, 9):
                 item = self.tableWidget.item(row, col)
 
                 if item:
@@ -233,9 +232,10 @@ class PervorationWindow(MyWindow):
                         perf_list.append(value)
                     else:
                         perf_list.append(value)
-
+            print(perf_list)
+            perf_list.insert(7, (round((float(perf_list[4]) - float(perf_list[2])) * int(perf_list[6]), 1)))
             perforation.append(perf_list)
-
+        print(perf_list)
 
         perforation.append([None, None, 'Произвести контрольную запись ЛМ;ТМ. Составить АКТ на перфорацию.',
                          None, None, None, None, None, None, None,
@@ -249,7 +249,7 @@ class PervorationWindow(MyWindow):
             row = self.ins_ind + i
             self.table_widget.insertRow(row)
 
-            if i in [1, 0, 2, len(perforation)-1]:
+            if i in [1, 0, 2, len(perforation)-1]: # Объединение ячеек по вертикале в столбце "отвественные и норма"
                 self.table_widget.setSpan(i + self.ins_ind, 2, 1, 8)
             for column, data in enumerate(row_data):
                 # item = QtWidgets.QTableWidgetItem(data)
@@ -271,12 +271,15 @@ class PervorationWindow(MyWindow):
                             if value[0] <= len(text) <= value[1]:
                                 text_width = key
                                 self.table_widget.setRowHeight(row, int(text_width))
-        self.table_widget.setSpan(1 + self.ins_ind, 10, len(perforation)-2, 1)
+        self.table_widget.setSpan(1 + self.ins_ind, 10, len(perforation) - 2, 1)
         self.table_widget.setSpan(1 + self.ins_ind, 11, len(perforation) - 2, 1)
 
+        self.table_widget.setRowHeight(self.ins_ind, 60)
+        self.table_widget.setRowHeight(self.ins_ind + 1, 60)
 
 
         self.close()
+
 
 
     def delRowTable(self):

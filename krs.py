@@ -1,6 +1,8 @@
 from PyQt5.QtWidgets import QInputDialog, QMessageBox
 import H2S
 from work_py import template_work, opressovka
+
+
 # from work_py.perforation import Perfarotions
 
 # Выбор вида спущенного оборудования
@@ -20,7 +22,7 @@ def work_krs(self):
     for i in nkt_diam_fond_list:
         nkt_diam_fond += str(i) + ', '
     nkt_diam_fond = nkt_diam_fond[:-2]
-
+    print(f' КРС {CreatePZ.dict_pump, CreatePZ.H_F_paker_do}')
     if 2 in CreatePZ.cat_H2S_list or '2' in CreatePZ.cat_H2S_list:
         fluid_work = f'{fluid_work_insert}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из расчета {H2S.calv_h2s(self)}кг/м3 '
     else:
@@ -128,7 +130,7 @@ def work_krs(self):
                    pvo(), None, None,
                    None, None, None, None, None,
                    ''.join([
-                               'Мастер КРС, представ-ли ПАСФ и Заказчика, Пуск. ком' if CreatePZ.bvo == True else 'Мастер КРС, представ-ли  Заказчика']),
+                       'Мастер КРС, представ-ли ПАСФ и Заказчика, Пуск. ком' if CreatePZ.bvo == True else 'Мастер КРС, представ-ли  Заказчика']),
                    2.67],
                   [None, None,
                    f'Мастеру бригады КРС осуществлять входной контроль за плотностью ввозимой жидкости глушения и промывки с записью удельного веса в вахтовом журнале. ',
@@ -141,7 +143,7 @@ def work_krs(self):
                    None, None],
                   [None, None,
                    f'Поднять  пакер {CreatePZ.paker_do["do"]} на НКТ{nkt_diam_fond}мм с глубины {CreatePZ.H_F_paker_do["do"]}м + '
-                   f'хвостовиком {round(sum(list(CreatePZ.dict_nkt.values()))-CreatePZ.H_F_paker_do["do"])}м на поверхность с замером, накручиванием колпачков с доливом скважины тех.жидкостью уд. весом{fluid_work}  '
+                   f'хвостовиком {round(sum(list(CreatePZ.dict_nkt.values())) - int(CreatePZ.H_F_paker_do["do"]))}м на поверхность с замером, накручиванием колпачков с доливом скважины тех.жидкостью уд. весом{fluid_work}  '
                    f'в объеме 1,7м3 с контролем АСПО на стенках НКТ.', None, None,
                    None, None, None, None, None,
                    'Мастер КРС', round(0.0041 * sum(list(CreatePZ.dict_nkt.values())) * 1.2, 2)]
@@ -190,7 +192,7 @@ def work_krs(self):
                      pvo_gno(), None, None,
                      None, None, None, None, None,
                      ''.join([
-                                 'Мастер КРС, представ-ли ПАСФ и Заказчика, Пуск. ком' if CreatePZ.bvo == True else 'Мастер КРС, представ-ли  Заказчика']),
+                         'Мастер КРС, представ-ли ПАСФ и Заказчика, Пуск. ком' if CreatePZ.bvo == True else 'Мастер КРС, представ-ли  Заказчика']),
                      2.67],
                     [None, None,
                      f'Опрессовку ПВО проводить после каждого монтажа. (ОПРЕССОВКУ ПВО ЗАФИКСИРОВАТЬ В ВАХТОВОМ ЖУРНАЛЕ).',
@@ -294,7 +296,7 @@ def work_krs(self):
          'Заглубить оставшийся  кабель в скважину на 1-3 технологических НКТ' + pvo_gno(), None, None,
          None, None, None, None, None,
          ''.join([
-                     'Мастер КРС, представ-ли ПАСФ и Заказчика, Пуск. ком' if CreatePZ.bvo == True else 'Мастер КРС, представ-ли  Заказчика']),
+             'Мастер КРС, представ-ли ПАСФ и Заказчика, Пуск. ком' if CreatePZ.bvo == True else 'Мастер КРС, представ-ли  Заказчика']),
          2.67],
         [None, None,
          f'Опрессовку ПВО проводить после каждого монтажа. (ОПРЕССОВКУ ПВО ЗАФИКСИРОВАТЬ В ВАХТОВОМ ЖУРНАЛЕ).',
@@ -378,7 +380,7 @@ def work_krs(self):
          pvo_gno(), None, None,
          None, None, None, None, None,
          ''.join([
-                     'Мастер КРС, представ-ли ПАСФ и Заказчика, Пуск. ком' if CreatePZ.bvo == True else 'Мастер КРС, представ-ли  Заказчика']),
+             'Мастер КРС, представ-ли ПАСФ и Заказчика, Пуск. ком' if CreatePZ.bvo == True else 'Мастер КРС, представ-ли  Заказчика']),
          2.67],
         [None, None,
          f'Опрессовку ПВО проводить после каждого монтажа. (ОПРЕССОВКУ ПВО ЗАФИКСИРОВАТЬ В ВАХТОВОМ ЖУРНАЛЕ).',
@@ -502,7 +504,7 @@ def work_krs(self):
          f'штанг в  0,9т. При отрицательном результате согласов технологической службой ЦДНГ или ПТО региона  постепенное увеличение нагрузки до 15тн ( по 1т - 1 час),  либо искусственный  отворот НШ с последующим комбинированным подъемом ГНО НВ. В случае невозможности отворота колонны НШ с подтверждением супервайзера, распиловку НШ согласовать с ПТО по направлению сектора учета НКТ и НШ.',
          None, None, None, None, None, None, None,
          'Мастер КРС представитель Заказчика, пусков. Ком. ',
-         round((0.17 + 0.015 *sum(list(CreatePZ.dict_nkt.values())) / 8.5 + 0.12 + 1.02), 1)],
+         round((0.17 + 0.015 * sum(list(CreatePZ.dict_nkt.values())) / 8.5 + 0.12 + 1.02), 1)],
 
         [None, None,
          f'Разобрать устьевое оборудование.  Сорвать планшайбу и пакер с поэтапным увеличением нагрузки с выдержкой 30мин для возврата резиновых элементов в исходное положение'
@@ -900,41 +902,43 @@ def work_krs(self):
         ]
     except:
         print('ОРЗ нет')
-    print(CreatePZ.dict_pump['do'])
 
-    if 'ЭЦН' in CreatePZ.dict_pump['do'].upper() or 'ВНН' in CreatePZ.dict_pump['do'].upper() and (
-            CreatePZ.dict_sucker_rod[19] != 0 or CreatePZ.dict_sucker_rod[
-        22] != 0) and CreatePZ.paker_do != None and CreatePZ.paker_do != 'отс':
+
+
+    if ('ЭЦН' in CreatePZ.dict_pump['do'].upper() or 'ВНН' in CreatePZ.dict_pump['do'].upper()) and (
+            CreatePZ.dict_sucker_rod != None and str(CreatePZ.paker_do['do']) != '0'):
+
         lift_select = lift_ord
-        print('Подьем орд')
-    elif 'ЭЦН' in CreatePZ.dict_pump['do'].upper() or 'ВНН' in CreatePZ.dict_pump['do'].upper() and CreatePZ.paker_do == 'отс':
+        print(f'Подьем орд')
+    elif 'ЭЦН' in CreatePZ.dict_pump['do'].upper() or 'ВНН' in CreatePZ.dict_pump['do'].upper() and str(CreatePZ.paker_do[
+        'do']) == '0':
         lift_select = lift_ecn
         print('Подьем ЭЦН')
     elif ('ЭЦН' in CreatePZ.dict_pump['do'].upper() or 'ВНН' in CreatePZ.dict_pump['do'].upper()) and (
-            CreatePZ.paker_do != 'отс'):
+            str(CreatePZ.paker_do['do']) != '0'):
         lift_select = lift_ecn_with_paker
         print('Подьем ЭЦН с пакером ')
 
-    elif 'НВ' in CreatePZ.dict_pump['do'].upper() and CreatePZ.paker_do == 'отс':
+    elif 'НВ' in CreatePZ.dict_pump['do'].upper() and str(CreatePZ.paker_do['do']) == '0':
         lift_select = lift_pump_nv
         print('Подьем НВ')
-    elif 'НВ' in CreatePZ.dict_pump['do'].upper() and CreatePZ.paker_do != 'отс':
+    elif 'НВ' in CreatePZ.dict_pump['do'].upper() and str(CreatePZ.paker_do['do']) != '0':
         lift_select = lift_pump_nv_with_paker
         print('Подьем НВ с пакером ')
-    elif 'НН' in CreatePZ.dict_pump['do'].upper() and CreatePZ.paker_do == 'отс':
+    elif 'НН' in CreatePZ.dict_pump['do'].upper() and str(CreatePZ.paker_do['do']) == '0':
         lift_select = lift_pump_nn
         print('Подьем НН')
-    elif 'НН' in CreatePZ.dict_pump['do'].upper() and CreatePZ.paker_do != 'отс':
+    elif 'НН' in CreatePZ.dict_pump['do'].upper() and str(CreatePZ.paker_do['do']) != '0':
         lift_select = lift_pump_nn_with_paker
         print('Подьем НН с пакером ')
 
-    elif CreatePZ.dict_pump['do'] == 'отс' and CreatePZ.paker_do == 'отс':
+    elif str(CreatePZ.dict_pump['do']) == '0' and str(CreatePZ.paker_do['do']) == '0':
         lift_select = lift_voronka
         print('Подьем  воронки')
-    elif CreatePZ.dict_pump['do'] == 'отс' and CreatePZ.paker_do != 'отс':
+    elif str(CreatePZ.dict_pump['do']) == '0' and str(CreatePZ.paker_do['do']) != '0':
         lift_select = lift_paker
         print('Подьем пакера')
-    elif 89 in CreatePZ.dict_nkt.keys() and 48 in CreatePZ.dict_nkt.keys() and CreatePZ.paker_do != 'отс':
+    elif 89 in CreatePZ.dict_nkt.keys() and 48 in CreatePZ.dict_nkt.keys() and str(CreatePZ.paker_do['do']) != '0':
         lift_select = lift_orz
         print('Подьем ОРЗ')
     else:
@@ -942,17 +946,17 @@ def work_krs(self):
                      'НН с пакером': lift_pump_nn_with_paker, 'НВ с пакером': lift_pump_nv_with_paker,
                      'ЭЦН с пакером': lift_ecn_with_paker, 'ЭЦН': lift_ecn, 'НВ': lift_pump_nv, 'НН': lift_pump_nn}
         lift_sel = ['пакер', 'ОРЗ', 'ОРД', 'Воронка', 'НН с пакером', 'НВ с пакером',
-                     'ЭЦН с пакером', 'ЭЦН', 'НВ', 'НН']
+                    'ЭЦН с пакером', 'ЭЦН', 'НВ', 'НН']
         lift, ok = QInputDialog.getItem(self, 'Спущенное оборудование', 'выбор спущенного оборудования',
-                                               lift_sel, 1, False)
+                                        lift_sel, 1, False)
 
         if ok and lift_sel:
             self.le.setText(lift)
         lift_select = lift_dict[lift]
 
     return krs_begin + lift_select + posle_lift
-           # +opressovka.paker_list(QInputDialog.getInt(None, 'опрессовка ЭК',
-           #                            'Введите глубину посадки пакера', 500, 0, 10000)[0], QInputDialog.getInt(None, 'опрессовка ЭК', 'Введите длину хвостовика', 10, 0, 3000)[0])
+    # +opressovka.paker_list(QInputDialog.getInt(None, 'опрессовка ЭК',
+    #                            'Введите глубину посадки пакера', 500, 0, 10000)[0], QInputDialog.getInt(None, 'опрессовка ЭК', 'Введите длину хвостовика', 10, 0, 3000)[0])
 
 
 def pvo():
@@ -1103,7 +1107,7 @@ def well_volume():
     else:
 
         volume_well = (3.14 * (
-                    CreatePZ.column_additional_diametr - CreatePZ.column_wall_thickness * 2) ** 2 / 4 / 1000 * (
+                CreatePZ.column_additional_diametr - CreatePZ.column_wall_thickness * 2) ** 2 / 4 / 1000 * (
                                CreatePZ.current_bottom - CreatePZ.head_column_additional) / 1000) + (
                               3.14 * (CreatePZ.column_diametr - CreatePZ.column_wall_thickness * 2) ** 2 / 4 / 1000 * (
                           CreatePZ.head_column_additional) / 1000)
@@ -1125,7 +1129,7 @@ def volume_pod_NKT():  # Расчет необходимого объема вн
                             CreatePZ.current_bottom - CreatePZ.head_column_additional) / 1000
     elif nkt_l < CreatePZ.head_column_additional:
         v_pod_gno = 3.14 * (
-                    CreatePZ.column_additional_diametr - CreatePZ.column_additional_wall_thickness * 2) ** 2 / 4 / 1000 * (
+                CreatePZ.column_additional_diametr - CreatePZ.column_additional_wall_thickness * 2) ** 2 / 4 / 1000 * (
                             CreatePZ.current_bottom - nkt_l) / 1000
     volume_in_nkt = v_pod_gno + volume_vn_nkt(CreatePZ.dict_nkt) - volume_rod(CreatePZ.dict_sucker_rod)
     # print(f'Внутренный объем + Зумпф{volume_in_nkt}')

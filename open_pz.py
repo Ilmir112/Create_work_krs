@@ -71,7 +71,7 @@ class CreatePZ(MyWindow):
     dict_work_pervorations = {}
     work_pervorations = []
     work_pervorations_dict = {}
-    paker_do = {}
+    paker_do = {'do': 0, 'posle': 0}
     column_additional = False
 
     values = []
@@ -277,7 +277,7 @@ class CreatePZ(MyWindow):
                         except:
                             CreatePZ.water_cut = QInputDialog.getInt(self, 'Обводненность',
                                                                      'Введите обводненность скважинной продукции', 50,
-                                                                     0, 100)
+                                                                     0, 100)[0]
                 elif 'по Pпл' == value:
                     cat_P_1 = row[col + 1]
                     n = 1
@@ -310,9 +310,10 @@ class CreatePZ(MyWindow):
 
                     # print(f'хв{CreatePZ.data_column_additional}, {CreatePZ.column_additional}')
 
-                    if len(CreatePZ.data_column_additional.split('-')) > 1:
-                        CreatePZ.column_additional = True
-                        print(f' в скважине дополнительная колонны {CreatePZ.data_column_additional}')
+                    if CreatePZ.if_None(CreatePZ.data_column_additional) != 'отсут':
+                        if len(CreatePZ.data_column_additional.split('-')) > 1:
+                            CreatePZ.column_additional = True
+                            print(f' в скважине дополнительная колонны {CreatePZ.data_column_additional}')
 
 
                     print(CreatePZ.column_additional)
@@ -371,28 +372,29 @@ class CreatePZ(MyWindow):
                                                                                    80, 0, 200)
 
                 elif value == 'Пакер' and row[col + 2] == 'типоразмер':
-                    CreatePZ.paker_do['do'] = CreatePZ.if_None(row[col + 4])
-                    if CreatePZ.old_version == True:
+                    if CreatePZ.if_None(row[col + 4]) != 'отсут':
+                        CreatePZ.paker_do['do'] = CreatePZ.if_None(row[col + 4])
+                    elif CreatePZ.old_version == True and CreatePZ.if_None(row[col + 8]) != 'отсут':
                         CreatePZ.paker_do['posle'] = CreatePZ.if_None(row[col + 8])
 
 
-                    else:
+                    elif CreatePZ.old_version == True and CreatePZ.if_None(row[col + 9]) != 'отсут':
                         CreatePZ.paker_do['posle'] = CreatePZ.if_None(row[col + 9])
 
 
 
                 elif value == 'Насос' and row[col + 2] == 'типоразмер':
-                    CreatePZ.dict_pump['do'] = CreatePZ.if_None(row[col + 4])
+                    if CreatePZ.if_None(row[col + 4]) != 'отсут':
+                        CreatePZ.dict_pump['do'] = CreatePZ.if_None(row[col + 4])
 
-                    if CreatePZ.old_version == True:
+                    if CreatePZ.old_version == True and CreatePZ.if_None(row[col + 8]) != 'отсут':
                         CreatePZ.dict_pump['posle'] = CreatePZ.if_None(row[col + 8])
-                    else:
+                    elif CreatePZ.old_version == False and CreatePZ.if_None(row[col + 9]) != 'отсут':
                         CreatePZ.dict_pump['posle'] = CreatePZ.if_None(row[col + 9])
 
-                    print(f' ячейка {ws.cell(row=row_ind + 5, column=col + 3).value}')
+                    # print(f' ячейка {ws.cell(row=row_ind + 5, column=col + 3).value}')
                     if ws.cell(row=row_ind + 5, column=col + 3).value == 'Нсп, м':
                         CreatePZ.dict_pump_h['do'] = CreatePZ.without_b(ws.cell(row=row_ind + 5, column=col + 5).value)
-                        print(f'глубина насоса {CreatePZ.dict_pump_h["do"]}')
 
                         if CreatePZ.old_version == True:
                             CreatePZ.dict_pump_h['posle'] = CreatePZ.without_b(
@@ -401,10 +403,10 @@ class CreatePZ(MyWindow):
                             CreatePZ.dict_pump_h['posle'] = CreatePZ.without_b(
                                 ws.cell(row=row_ind + 5, column=col + 10).value)
 
-                elif value == 'Н посадки, м' and CreatePZ.paker_do['do'] != 0 and  CreatePZ.paker_do['do'] != '-':
+                elif value == 'Н посадки, м' and CreatePZ.paker_do['do'] != None:
                     try:
                         CreatePZ.H_F_paker_do['do'] = CreatePZ.without_b(row[col + 2])
-                        print(f'Глубина посадки пакера {CreatePZ.H_F_paker_do["do"]}')
+
 
                     except:
                         H_F_paker_do_2, ok = QInputDialog.getInt(self, 'Глубина посадки фондового пакера',
@@ -413,7 +415,7 @@ class CreatePZ(MyWindow):
                         CreatePZ.H_F_paker_do['do'] = H_F_paker_do_2
 
 
-                elif value == 'Н посадки, м' and CreatePZ.paker_do['posle'] != 0:
+                elif value == 'Н посадки, м' and CreatePZ.paker_do['posle'] != None:
                     try:
                         if CreatePZ.old_version == True:
                             CreatePZ.H_F_paker_do['posle'] = CreatePZ.without_b(row[col + 6])
@@ -442,15 +444,16 @@ class CreatePZ(MyWindow):
                                                        0, 1000, 2)[0]))
                     elif len(CreatePZ.H2S_mg) == 0 and 'мг/м3' == value:
                         CreatePZ.H2S_mg.append(float(row[col - 1] / 1000))
-
-        print(CreatePZ.dict_pump_h)
-        print(CreatePZ.dict_pump)
+        print(f'Глубина посадки пакера {CreatePZ.H_F_paker_do["do"]}')
+        print(f' глубина насоса {CreatePZ.dict_pump_h}')
+        print(f' насоса {CreatePZ.dict_pump}')
+        print(f'пакер {CreatePZ.paker_do}')
         try:
-            if CreatePZ.column_additional == False:
+            if CreatePZ.column_additional == False and CreatePZ.dict_pump['posle'] != 0:
                 if 'ЭЦН' in CreatePZ.dict_pump['posle'].upper() or 'ВНН' in CreatePZ.dict_pump['posle'].upper():
                     CreatePZ.lift_ecn_can == True
-            else:
-                print(CreatePZ.dict_pump['posle'])
+            elif CreatePZ.column_additional == True and CreatePZ.dict_pump['posle'] != 0:
+                # print(CreatePZ.dict_pump['posle'])
                 if 'ЭЦН' in CreatePZ.dict_pump['posle'].upper() or 'ВНН' in CreatePZ.dict_pump[
                     'posle'].upper() and CreatePZ.dict_pump_h > CreatePZ.head_column_additional:
                     CreatePZ.lift_ecn_can == True
@@ -468,32 +471,32 @@ class CreatePZ(MyWindow):
             expected_list = []
             for row in range(CreatePZ.data_x_min + 1, CreatePZ.data_x_max + 1):
                 for col in range(1, 12):
-                    if 'Qж =' == ws.cell(row=row, column=col).value or 'Qж = ' == ws.cell(row=row,
-                                                                                          column=col).value or ws.cell(
-                            row=row, column=col).value == 'Приемистость ':
+                    # print(str(ws.cell(row=row, column=col).value).strip().lower())
+                    # print(str(ws.cell(row=row, column=col).value).strip().lower() in ['приемистость', 'qприем =', 'qж =', 'qж = ', 'qприем ='])
+                    if str(ws.cell(row=row, column=col).value).strip().lower() in ['приемистость', 'qприем =', 'qж =', 'qж = ', 'qприем =']:
                         Qpr = ws.cell(row=row, column=col + 1).value
+                        # print(Qpr)
                         n = 1
                         while ws.cell(row=row, column=col + n).value == None:
                             ws.cell(row=row, column=col + n).value
                             n += 1
                             Qpr = ws.cell(row=row, column=col + 1).value
+                        # print(f'после {Qpr}')
 
 
-
-                    elif ws.cell(row=row, column=col).value == 'Рзак ' or ws.cell(row=row,
-                                                                                  column=col).value == 'Давление закачки ' \
-                            or ws.cell(row=row, column=col).value == 'Рзак (Нагнет)' or ws.cell(row=row,
-                                                                                                column=col).value == 'Рзак':
+                    elif str(ws.cell(row=row, column=col).value).strip() in ['Рзак','Давление закачки ','Рзак (Нагнет)']:
                         Pzak = ws.cell(row=row, column=col + 1).value
                         n = 1
-                        while ws.cell(row=row, column=col + n).value == None:
+                        while ws.cell(row=row, column=col + n).value != None:
                             ws.cell(row=row, column=col + n).value
                             n += 1
                             Pzak = ws.cell(row=row, column=col + 1).value
                         expected_list.append(Pzak)
-
+            print(f'приеми{Qpr, Pzak}')
+            CreatePZ.expected_pick_up[Qpr] = Pzak
+            print(CreatePZ.expected_pick_up)
             try:
-                CreatePZ.expected_pick_up[Qpr] = expected_list[Pzak]
+                CreatePZ.expected_pick_up[Qpr] = Pzak
             except:
                 expected_Q, ok = QInputDialog.getInt(self, 'Ожидаемая приемистость',
                                                      'Ожидаемая приемистость', 100, 0,
@@ -549,88 +552,82 @@ class CreatePZ(MyWindow):
             lst = []
             for i in range(2, 13):
                 lst.append(ws.cell(row=row, column=i).value)
+            # print(ws.cell(row=row, column=6).value)
+            if CreatePZ.old_version == True and isinstance(ws.cell(row=row, column=6).value, datetime) == True:
+                lst.insert(5, None)
+            elif CreatePZ.old_version == True and isinstance(ws.cell(row=row, column=6).value, datetime) == False and ws.cell(row=row, column=5).value!= None:
+                lst.insert(5, 'отключен')
             if all([str(i).strip() == 'None' or i == None for i in lst]) == False:
                 perforations_intervals.append(lst)
             # perforations_intervals = sorted(perforations_intervals, key=lambda x: x[3])
         
 
 
-        perf_dict = {'вертикаль': None, 'кровля': None, 'подошва': None, 'вскрытие': None, 'отключение': None,
-                     'отв': None, 'заряд': None, 'удлинение': None, 'давление': None, 'замер': None}
+        # perf_dict = {'вертикаль': None, 'кровля': None, 'подошва': None, 'вскрытие': None, 'отключение': None,
+        #              'отв': None, 'заряд': None, 'удлинение': None, 'давление': None, 'замер': None}
 
         for ind, row in enumerate(perforations_intervals):
-            print(row, any([str((i)).lower() == 'проект' for i in row]), all([str(i).strip() == None for i in row]) == False)
+            try:
+                krovlya_perf = float(row[2])
+            except:
+                krovlya_perf = 0
+            plast = row[0]
+            if plast == None:
+                plast = perforations_intervals[ind-1][0]
+                # print(f' после {plast}')
+                perforations_intervals[ind][0] = perforations_intervals[ind-1][0]
+
+            # print(row, any([str((i)).lower() == 'проект' for i in row]), all([str(i).strip() == None for i in row]) == False)
             if any([str((i)).lower() == 'проект' for i in row]) == False and all([str(i).strip() == None for i in row]) == False:
 
-                CreatePZ.dict_perforation.setdefault(row[0], {}).setdefault('вертикаль', []).append(row[1])
+                CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('вертикаль', []).append(row[1])
 
-                CreatePZ.dict_perforation.setdefault(row[0], {}).setdefault('интервал', []).append([row[2], row[3]])
+                CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('интервал', []).append([row[2], row[3]])
+                # print(f'отклю{row[5], CreatePZ.current_bottom, krovlya_perf}')
+                # print(f'{CreatePZ.current_bottom > krovlya_perf, row[5] == None}')
+                CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('вскрытие', []).append(row[4])
+                CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('отключение', []).append(row[5])
+                if ind > 5:
+                    CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('отв', []).append(row[6])
+                    CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('заряд', []).append(row[7])
+                    CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('удлинение', []).append(row[8])
+                    CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('давление', []).append(row[9])
+                    CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('замер', []).append(row[10])
 
-                CreatePZ.dict_perforation.setdefault(row[0], {}).setdefault('вскрытие', []).append(row[4])
-                CreatePZ.dict_perforation.setdefault(row[0], {}).setdefault('отключение', []).append(row[5])
-                if CreatePZ.old_version == False and ind > 5:
-                    CreatePZ.dict_perforation.setdefault(row[0], {}).setdefault('отв', []).append(row[6])
-                    CreatePZ.dict_perforation.setdefault(row[0], {}).setdefault('заряд', []).append(row[7])
-                    CreatePZ.dict_perforation.setdefault(row[0], {}).setdefault('удлинение', []).append(row[8])
-                    CreatePZ.dict_perforation.setdefault(row[0], {}).setdefault('давление', []).append(row[9])
-                    CreatePZ.dict_perforation.setdefault(row[0], {}).setdefault('замер', []).append(row[10])
-                elif CreatePZ.old_version == True and ind > 5:
-                    CreatePZ.dict_perforation.setdefault(row[0], {}).setdefault('заряд', []).append(
-                        row[6])
-                    CreatePZ.dict_perforation.setdefault(row[0], {}).setdefault('удлинение', []).append(
-                        row[7])
-                    CreatePZ.dict_perforation.setdefault(row[0], {}).setdefault('давление', []).append(
-                        row[8])
-                    CreatePZ.dict_perforation.setdefault(row[0], {}).setdefault('замер', []).append(
-                        row[9])
-            elif any([str((i)).lower() == 'проект' for i in row]) == True and all([str(i).strip() == None for i in row]) == False:
+                elif CreatePZ.current_bottom > krovlya_perf and row[5] == None: #Определение работающих интервалов перфораци
+                    # print(f'отклю{row[5], CreatePZ.current_bottom, row[2]}')
 
-                self.dict_perforation_project.setdefault(row[0], {}).setdefault('вертикаль', []).append(row[1])
-                self.dict_perforation_project.setdefault(row[0], {}).setdefault('интервал', []).append([row[2], row[3]])
+                    CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('вертикаль', []).append(row[1])
 
-                self.dict_perforation_project.setdefault(row[0], {}).setdefault('вскрытие', []).append(row[4])
-                self.dict_perforation_project.setdefault(row[0], {}).setdefault('отключение', []).append(row[5])
-                print(f'отклю{row[5], CreatePZ.current_bottom-100, row[2]-100}')
-                print(f'{CreatePZ.current_bottom > row[2], CreatePZ.old_version == False, row[5] == None}')
-                if CreatePZ.old_version == False and ind > 5:
-                    self.dict_perforation_project.setdefault(row[0], {}).setdefault('отв', []).append(row[6])
-                    self.dict_perforation_project.setdefault(row[0], {}).setdefault('заряд', []).append(row[7])
-                    self.dict_perforation_project.setdefault(row[0], {}).setdefault('удлинение', []).append(row[8])
-                    self.dict_perforation_project.setdefault(row[0], {}).setdefault('давление', []).append(row[9])
-                    self.dict_perforation_project.setdefault(row[0], {}).setdefault('замер', []).append(row[10])
-                elif CreatePZ.old_version == True and ind > 5:
-                    self.dict_perforation_project.setdefault(row[0], {}).setdefault('заряд', []).append(row[6])
-                    self.dict_perforation_project.setdefault(row[0], {}).setdefault('удлинение', []).append(row[7])
-                    self.dict_perforation_project.setdefault(row[0], {}).setdefault('давление', []).append(row[8])
-                    self.dict_perforation_project.setdefault(row[0], {}).setdefault('замер', []).append(row[9])
-                elif CreatePZ.current_bottom > row[2] and CreatePZ.old_version == False and row[5] == None:
-                    print(f'отклю{row[5], CreatePZ.current_bottom, row[2]}')
-                    CreatePZ.dict_work_pervorations.setdefault(row[0], {}).setdefault('вертикаль', []).append(row[1])
+                    CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('интервал', []).append([row[2], row[3]])
 
-                    CreatePZ.dict_work_pervorations.setdefault(row[0], {}).setdefault('интервал', []).append([row[2], row[3]])
-
-                    CreatePZ.dict_work_pervorations.setdefault(row[0], {}).setdefault('вскрытие', []).append(row[4])
-                    CreatePZ.dict_work_pervorations.setdefault(row[0], {}).setdefault('отключение', []).append(row[5])
+                    CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('вскрытие', []).append(row[4])
+                    CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('отключение', []).append(row[5])
                     if ind > 5:
-                        CreatePZ.dict_work_pervorations.setdefault(row[0], {}).setdefault('отв', []).append(row[6])
-                        CreatePZ.dict_work_pervorations.setdefault(row[0], {}).setdefault('заряд', []).append(row[7])
-                        CreatePZ.dict_work_pervorations.setdefault(row[0], {}).setdefault('удлинение', []).append(row[8])
-                        CreatePZ.dict_work_pervorations.setdefault(row[0], {}).setdefault('давление', []).append(row[9])
-                        CreatePZ.dict_work_pervorations.setdefault(row[0], {}).setdefault('замер', []).append(row[10])
-                elif CreatePZ.current_bottom >= row[2] and CreatePZ.old_version == True and row[5] == None:
-                    CreatePZ.dict_work_pervorations.setdefault(row[0], {}).setdefault('вертикаль', []).append(row[1])
-                    CreatePZ.dict_work_pervorations.setdefault(row[0], {}).setdefault('интервал', []).append([row[2], row[3]])
-                    CreatePZ.dict_work_pervorations.setdefault(row[0], {}).setdefault('вскрытие', []).append(row[4])
-                    CreatePZ.dict_work_pervorations.setdefault(row[0], {}).setdefault('отключение', []).append(row[5])
-                    if CreatePZ.old_version == True and ind > 5:
-                        CreatePZ.dict_work_pervorations.setdefault(row[0], {}).setdefault('заряд', []).append(row[6])
-                        CreatePZ.dict_work_pervorations.setdefault(row[0], {}).setdefault('удлинение', []).append(row[7])
-                        CreatePZ.dict_work_pervorations.setdefault(row[0], {}).setdefault('давление', []).append(row[8])
-                        CreatePZ.dict_work_pervorations.setdefault(row[0], {}).setdefault('замер', []).append(row[9])
+                        CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('отв', []).append(row[6])
+                        CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('заряд', []).append(row[7])
+                        CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('удлинение', []).append(row[8])
+                        CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('давление', []).append(row[9])
+                        CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('замер', []).append(row[10])
 
-            print(f'проект {self.dict_perforation_project}')
-            print(f'ПВР {CreatePZ.dict_perforation}')
-            print(f'работающие интервалы {CreatePZ.dict_work_pervorations}')
+            elif any([str((i)).lower() == 'проект' for i in row]) == True and all([str(i).strip() == None for i in row]) == False: # Определениепроеткных интервалов перфорации
+
+                self.dict_perforation_project.setdefault(plast, {}).setdefault('вертикаль', []).append(row[1])
+                self.dict_perforation_project.setdefault(plast, {}).setdefault('интервал', []).append([row[2], row[3]])
+                self.dict_perforation_project.setdefault(plast, {}).setdefault('вскрытие', []).append(row[4])
+                self.dict_perforation_project.setdefault(plast, {}).setdefault('отключение', []).append(row[5])
+                if ind > 5:
+                    self.dict_perforation_project.setdefault(plast, {}).setdefault('отв', []).append(row[6])
+                    self.dict_perforation_project.setdefault(plast, {}).setdefault('заряд', []).append(row[7])
+                    self.dict_perforation_project.setdefault(plast, {}).setdefault('удлинение', []).append(row[8])
+                    self.dict_perforation_project.setdefault(plast, {}).setdefault('давление', []).append(row[9])
+                    self.dict_perforation_project.setdefault(plast, {}).setdefault('замер', []).append(row[10])
+
+
+        CreatePZ.dict_perforation_project = self.dict_perforation_project
+        print(f'проект {self.dict_perforation_project}')
+        print(f'все ПВР {CreatePZ.dict_perforation}')
+        print(f'работающие интервалы {CreatePZ.dict_work_pervorations}')
 
 
         # Определение работающих интервалов перфорации и заполнения в словарь
@@ -639,7 +636,7 @@ class CreatePZ(MyWindow):
 
             CreatePZ.plast_work = list(CreatePZ.dict_work_pervorations.keys())
             CreatePZ.plast_all = list(CreatePZ.dict_perforation.keys())
-            print(CreatePZ.plast_all)
+            # print(CreatePZ.plast_all)
             print(f' vf{CreatePZ.dict_perforation[CreatePZ.plast_all[0]]["интервал"][0][0]}')
             CreatePZ.pervoration_min = min([min(CreatePZ.dict_perforation[i]['интервал'][0]) for i in CreatePZ.plast_all])
             CreatePZ.pervoration_max = max([max(CreatePZ.dict_perforation[i]['интервал'][0]) for i in CreatePZ.plast_all])
@@ -674,26 +671,6 @@ class CreatePZ(MyWindow):
         plan.delete_rows_pz(self, ws)
         CreatePZ.region = block_name.region(cdng)
         razdel_1 = block_name.razdel_1(self)
-
-        # wb2 = op.Workbook()
-        # ws2 = wb2.get_sheet_by_name('Sheet')
-        # ws2.title = "План работ"
-        #
-        # bound = []
-        # for _range in ws.merged_cells.ranges:
-        #     boundaries = range_boundaries(str(_range))
-        #     # elif data_pvr_min + 2 <= boundaries[1] <= data_pvr_max + 2:
-        #     #     bound.append(boundaries)
-        #     #     # ws2.unmerge_cells(start_column=boundaries[0], start_row=boundaries[1] + len(self.razdel_1) + 1,
-        #     #     #                end_column=boundaries[2], end_row=boundaries[3] + len(self.razdel_1) + 1)
-        #
-        #     if boundaries[1] > CreatePZ.data_well_max + 1 and boundaries[1] >= cat_well_min:
-        #
-        #         bound.append(boundaries)
-        #     else:
-        #         ws2.merge_cells(start_column=boundaries[0], start_row=boundaries[1] + len(razdel_1) + 1,
-        #                         end_column=boundaries[2], end_row=boundaries[3] + len(razdel_1) + 1)
-        #
 
         for i in range(1, len(razdel_1)):  # Добавлением подписантов на вверху
             for j in range(1, 13):
@@ -744,7 +721,7 @@ class CreatePZ(MyWindow):
         # data_main_production_string = ws.cell(row=int(ind_data_main_production_string[1:])+1, column=int(ind_data_main_production_string[0])+2).value
         CreatePZ.insert_gnvp(ws, work_plan, ins_gnvp)
 
-        print(CreatePZ.row_expected)
+        # print(CreatePZ.row_expected)
         for i in range(1, len(CreatePZ.row_expected) + 1):  # Добавление  показатели после ремонта
             ws.row_dimensions[CreatePZ.ins_ind + i - 1].height = None
             for j in range(1, 12):
@@ -902,8 +879,8 @@ class CreatePZ(MyWindow):
             return False
 
     def if_None(value):
-        if value == None or value == 'Отсутствует':
-            return 'отс'
+        if value == None or 'отсут' in value.lower() or value == '-':
+            return 'отсут'
         else:
             return value
 
