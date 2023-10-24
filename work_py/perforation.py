@@ -207,24 +207,25 @@ class PervorationWindow(MyWindow):
                                      f'Произвести  монтаж ГИС согласно схемы  №8а утвержденной главным инженером от  14.10.2021г',
                          None, None, None, None, None, None, None,
                           'Мастер КРС', None, None],
-                       [None, None, f'Долить скважину до устья тех жидкостью уд.весом 1,26г/см3 ОШИБКА .Установить ПВО по схеме №8а утвержденной '
+                       [None, None, f'Долить скважину до устья тех жидкостью уд.весом {CreatePZ.fluid_work} .Установить ПВО по схеме №8а утвержденной '
                                      f'главным инженером ООО "Ойл-сервис" от 14.10.2021г. Опрессовать  плашки  ПВО (на давление опрессовки ЭК, но '
-                                     f'не ниже максимального ожидаемого давления на устье) 80атм, по невозможности на давление поглощения, но '
-                                     f'не менее 30атм в течении 30мин (ОПРЕССОВКУ ПВО ЗАФИКСИРОВАТЬ В ВАХТОВОМ ЖУРНАЛЕ).',
+                                     f'не ниже максимального ожидаемого давления на устье) {CreatePZ.max_admissible_pressure}атм, по невозможности на давление поглощения, но '
+                                     f'не менее 30атм в течении 30мин (ОПРЕССОВКУ ПВО ЗАФИКСИРОВАТЬ В ВАХТОВОМ ЖУРНАЛЕ). '
+                                    f'Передать по сводке уровня жидкости до перфорации и после перфорации.'
+                                    f'(Произвести фотографию перфоратора в заряженном состоянии, и после проведения перфорации,'
+                                    f' фотографии предоставить в ЦИТС Ойл-сервис',
                          None, None, None, None, None, None, None,
-                          'Мастер КРС, подрядчик по ГИС', 15, None],
-                       [None, None, "ГИС (Перфорация ЗАДАЧА 2.9.1)", None, None, None, None,
+                          'Мастер КРС, подрядчик по ГИС', 15,  ],
+                       [None, None, ''.join(["ГИС (Перфорация на кабеле ЗАДАЧА 2.9.1)" if float(CreatePZ.max_angle) <= 50 else "ГИС ( Трубная Перфорация ЗАДАЧА 2.9.2)"]), None, None, None, None,
                         None,None, None, None, None, None],
                        [None, None, "Кровля перфорации", "-", "Подошва Перфорации", "Тип заряда", "отв на 1 п.м.", "Количество отверстий",
                       "Вскрываемые пласты", "Дополнительные данные", None, None, None]
                        ]
 
-
         for row in range(rows):
             perf_list = [None, None]
             for col in range(0, 9):
                 item = self.tableWidget.item(row, col)
-
                 if item:
                     value = item.text()
                     if col == 1:
@@ -232,14 +233,33 @@ class PervorationWindow(MyWindow):
                         perf_list.append(value)
                     else:
                         perf_list.append(value)
-            print(perf_list)
+
             perf_list.insert(7, (round((float(perf_list[4]) - float(perf_list[2])) * int(perf_list[6]), 1)))
             perforation.append(perf_list)
-        print(perf_list)
 
-        perforation.append([None, None, 'Произвести контрольную запись ЛМ;ТМ. Составить АКТ на перфорацию.',
+
+        perforation.append([None, None, ''.join(["Произвести контрольную запись ЛМ;ТМ. Составить АКТ на "
+                                                 "перфорацию." if float(CreatePZ.max_angle) <= 50 else ""
+                                               "Подъем последних 5-ти НКТ73мм и демонтаж перфоратора производить в присутствии ответственного "
+                                           "представителя подрядчика по ГИС» (руководителя взрывных работ или взрывника)."]),
                          None, None, None, None, None, None, None,
                           'Подрядчик по ГИС', None, None])
+
+        pipe_perforation = [
+           [None, None, f'Произвести монтаж трубного перфоратора + 2шт/20м НКТ + реперный патрубок L=2м до намеченного интервала перфорации '
+                        f'(с шаблонировкой НКТ73мм шаблоном.  Спуск компоновки производить  со скоростью не более 0,30 м/с, не допуская резких ударов и вращения.'
+                        f'(Произвести фотографию перфоратора в заряженном состоянии, и после проведения перфорации, фотографии предоставить в ЦИТС Ойл-сервис, передать по сводке уровня '
+                        f'жидкости до перфорации и после перфорации) '
+                        f'(При СПО первых десяти НКТ на спайдере дополнительно '
+                        f'устанавливать элеватор ЭХЛ).' ,
+                 None, None, None, None, None, None, None,
+                  'Подрядчик по ГИС, мастер КРС', None, None],
+            [None, None, 'Произвести ГИС привязку трубного перфоратора по ГК, ЛМ.',
+            None, None, None, None, None, None, None,
+            'Подрядчик по ГИС', None, None]]
+        if float(CreatePZ.max_angle) >= 50:
+            for i in range(len(pipe_perforation)):
+                perforation.insert(i + 1, pipe_perforation[i])
 
         print(f'принято {self.dict_perforation_project}')
         text_width_dict = {20: (0, 100), 40: (101, 200), 60: (201, 300), 80: (301, 400), 100: (401, 500),
@@ -248,8 +268,10 @@ class PervorationWindow(MyWindow):
         for i, row_data in enumerate(perforation):
             row = self.ins_ind + i
             self.table_widget.insertRow(row)
-
-            if i in [1, 0, 2, len(perforation)-1]: # Объединение ячеек по вертикале в столбце "отвественные и норма"
+            lst = [1, 0, 2, len(perforation)-1]
+            if float(CreatePZ.max_angle) >= 50:
+                lst.extend([3, 4])
+            if i in lst: # Объединение ячеек по вертикале в столбце "отвественные и норма"
                 self.table_widget.setSpan(i + self.ins_ind, 2, 1, 8)
             for column, data in enumerate(row_data):
                 # item = QtWidgets.QTableWidgetItem(data)
@@ -273,6 +295,8 @@ class PervorationWindow(MyWindow):
                                 self.table_widget.setRowHeight(row, int(text_width))
         self.table_widget.setSpan(1 + self.ins_ind, 10, len(perforation) - 2, 1)
         self.table_widget.setSpan(1 + self.ins_ind, 11, len(perforation) - 2, 1)
+
+
 
         self.table_widget.setRowHeight(self.ins_ind, 60)
         self.table_widget.setRowHeight(self.ins_ind + 1, 60)

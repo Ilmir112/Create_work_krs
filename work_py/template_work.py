@@ -1,5 +1,9 @@
 import H2S
 import math
+
+import main
+
+
 def well_volume():
     from open_pz import CreatePZ
     # print(CreatePZ.column_additional)
@@ -18,6 +22,7 @@ def well_volume():
 
 def template_diam_ek():
     from open_pz import CreatePZ
+
     diam_internal_ek = CreatePZ.column_diametr - 2 * CreatePZ.column_wall_thickness
     template_second_diam_dict = {
         84: (88, 92),
@@ -95,7 +100,7 @@ def template_diam_additional_ek():
             template_first_diam = diam
     return (template_first_diam, template_second_diam)
 
-def template_ek_without_skm():
+def template_ek_without_skm(self):
     from open_pz import CreatePZ
     open_trunk_well = False
     # print(f' Башмака {CreatePZ.shoe_column, CreatePZ.current_bottom}')
@@ -230,18 +235,20 @@ def template_ek_without_skm():
     if CreatePZ.current_bottom - CreatePZ.pervoration_max <= 10:
         list_template_ek.insert(-1, privyazka_nkt)
 
+
     return list_template_ek + notes_list
 
-def template_ek():
+def template_ek(self):
     from open_pz import CreatePZ
+    from main import MyWindow
     open_trunk_well = False
     print(f' Башмака {CreatePZ.shoe_column, CreatePZ.current_bottom}')
     if CreatePZ.column_additional == False and CreatePZ.shoe_column <= CreatePZ.current_bottom:
         open_trunk_well = True
+
     elif CreatePZ.column_additional == True and CreatePZ.shoe_column_additional <= CreatePZ.current_bottom:
         open_trunk_well = True
-    else:
-        open_trunk_well = False
+    print(f' наличие открытого ствола {CreatePZ.shoe_column_additional, open_trunk_well,CreatePZ.shoe_column,  CreatePZ.current_bottom, CreatePZ.column_additional  }')
 
     if CreatePZ.column_additional == True:
         nkt_pod = ['60мм' if CreatePZ.column_additional_diametr <110 else '73мм со снятыми фасками']
@@ -382,9 +389,10 @@ def template_ek():
                      None, None, None, None, None, None, None, 'Мастер КРС', None, None]
     if CreatePZ.current_bottom - CreatePZ.pervoration_max <=10:
         list_template_ek.insert(-1, privyazka_nkt)
-
-
+    print(CreatePZ.ins_ind)
+    # print(self.ins_ind)
     return list_template_ek + notes_list
+
 
 
 def paker_diametr_select(depth_landing):

@@ -13,26 +13,29 @@ def paker_diametr_select(depth_landing):
         if diam_internal_paker[0] <= diam_internal_ek <= diam_internal_paker[1]:
             return diam
 # Добавление строк с опрессовкой ЭК
-def paker_list(paker_depth, paker_khost):
+def paker_list(self):
     from open_pz import CreatePZ
     from PyQt5.QtWidgets import QInputDialog
+    print(f' кровля перфорации {CreatePZ.perforation_roof}')
     nkt_diam = ''.join(['73' if CreatePZ.column_diametr > 110 else '60'])
-    # paker_depth, ok =
-    # paker_khost, ok =
-
-    if CreatePZ.column_additional == False or CreatePZ.column_additional == True and paker_depth< CreatePZ.head_column_additional:
-        paker_select = f'воронку + НКТ{nkt_diam}м {paker_khost}м + пакер ПРО-ЯМО-{paker_diametr_select(paker_depth)}мм (либо аналог) ' \
-                       f'для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм + НКТ 10м'
-    elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr < 110 and paker_depth> CreatePZ.head_column_additional:
-        paker_select = f'воронку + НКТ{60}мм {paker_khost}м + пакер ПРО-ЯМО-{paker_diametr_select(paker_depth)}мм (либо аналог) ' \
-                       f'для ЭК {CreatePZ.column_additional_diametr}мм х {CreatePZ.column_additional_wall_thickness}мм + НКТ60мм 10м '
-    elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr > 110 and paker_depth> CreatePZ.head_column_additional:
-        paker_select = f'воронку + НКТ73мм со снятыми фасками {paker_khost}м + пакер ПРО-ЯМО-{paker_diametr_select(paker_depth)}мм (либо аналог) ' \
-                       f'для ЭК {CreatePZ.column_additional_diametr}мм х {CreatePZ.column_additional_wall_thickness}мм + НКТ73мм со снятыми фасками 10м'
+    paker_depth, ok = QInputDialog.getInt(None, 'опрессовка ЭК',
+                                          'Введите глубину посадки пакера', int(CreatePZ.perforation_roof - 20), 0, 5000)
+    paker_khost, ok = QInputDialog.getInt(None, 'опрессовка ЭК', 'Введите длину хвостовика', 10, 0, 3000)
+    def paker_select(self):
+        if CreatePZ.column_additional == False or CreatePZ.column_additional == True and paker_depth< CreatePZ.head_column_additional:
+            paker_select = f'воронку + НКТ{nkt_diam}м {paker_khost}м + пакер ПРО-ЯМО-{paker_diametr_select(paker_depth)}мм (либо аналог) ' \
+                           f'для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм + НКТ 10м'
+        elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr < 110 and paker_depth> CreatePZ.head_column_additional:
+            paker_select = f'воронку + НКТ{60}мм {paker_khost}м + пакер ПРО-ЯМО-{paker_diametr_select(paker_depth)}мм (либо аналог) ' \
+                           f'для ЭК {CreatePZ.column_additional_diametr}мм х {CreatePZ.column_additional_wall_thickness}мм + НКТ60мм 10м '
+        elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr > 110 and paker_depth> CreatePZ.head_column_additional:
+            paker_select = f'воронку + НКТ73мм со снятыми фасками {paker_khost}м + пакер ПРО-ЯМО-{paker_diametr_select(paker_depth)}мм (либо аналог) ' \
+                           f'для ЭК {CreatePZ.column_additional_diametr}мм х {CreatePZ.column_additional_wall_thickness}мм + НКТ73мм со снятыми фасками 10м'
+        return paker_select
 
     paker_list = [
         [None, None,
-                   f'Спустить {paker_select} на НКТ{nkt_diam}мм до глубины {paker_depth}м, воронкой до {paker_depth+ paker_khost}м'
+                   f'Спустить {paker_select(self)} на НКТ{nkt_diam}мм до глубины {paker_depth}м, воронкой до {paker_depth+ paker_khost}м'
                     f' с замером, шаблонированием шаблоном. {("Произвести пробную посадку на глубине 50м" if CreatePZ.column_additional == False else "")} '
                    f'ПРИ ОТСУТСТВИИ ЦИРКУЛЯЦИИ ПРЕДУСМОТРЕТЬ НАЛИЧИИ В КОМПОНОВКЕ УРАВНИТЕЛЬНЫХ КЛАПАНОВ ИЛИ СБИВНОГО '
                    f'КЛАПАНА С ВВЕРТЫШЕМ НАД ПАКЕРОМ',
@@ -61,7 +64,7 @@ def paker_list(paker_depth, paker_khost):
          None, None, None, None, None, None, None,
          'мастер КРС', 0.7],
         [None, None,
-         f'Поднять {paker_select} на НКТ{nkt_diam} c глубины {paker_depth}м с доливом скважины в '
+         f'Поднять {paker_select(self)} на НКТ{nkt_diam} c глубины {paker_depth}м с доливом скважины в '
          f'объеме {round(paker_depth*1.12/1000,1)}м3 удельным весом {CreatePZ.fluid_work}',
          None, None, None, None, None, None, None,
          'мастер КРС', round(0.25+0.033*1.2*(paker_depth+paker_khost)/9.5*1.04,1) ]]

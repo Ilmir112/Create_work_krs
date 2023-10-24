@@ -96,27 +96,41 @@ class MyWindow(QMainWindow):
 
     def openContextMenu(self, position):
         from open_pz import CreatePZ
-        from work_py.template_work import template_ek_without_skm
+        from work_py.template_work import template_ek_without_skm, template_ek
 
         context_menu = QMenu(self)
 
         action_menu = context_menu.addMenu("вид работ")
-        pervoration_ins = action_menu.addMenu("окно перфорации")
+        # pervoration_ins = action_menu.addMenu("окно перфорации")
         perforation_action = QAction("Перфорация", self)
-        pervoration_ins.addAction(perforation_action)
+        action_menu.addAction(perforation_action)
         perforation_action.triggered.connect(self.openNewWindow)
-        perforation_action1 = QAction("добавление в план", self)
-        pervoration_ins.addAction(perforation_action1)
-        perforation_action1.triggered.connect(self.insertPerf)
+
 
         opressovka_action = QAction("Опрессовка колонны", self)
         action_menu.addAction(opressovka_action)
         opressovka_action.triggered.connect(self.pressureTest)
 
-        template_action = QAction("шаблоны", self)
-        action_menu.addAction(template_action)
-        opressovka_action.triggered.connect(template_ek_without_skm)
+        template_with_skm = QAction("шаблон c СКМ", self)
+        template_menu = action_menu.addMenu('Шаблоны')
+        template_menu.addAction(template_with_skm)
+        template_with_skm.triggered.connect(self.template_with_skm)
 
+        template_without_skm = QAction("шаблон без СКМ", self)
+        template_menu.addAction(template_without_skm)
+        template_without_skm.triggered.connect(self.template_without_skm)
+
+
+        acid_menu = action_menu.addMenu('Кислотная обработка')
+
+        acid_action_1paker = QAction("на одном пакере", self)
+        acid_menu.addAction(acid_action_1paker)
+        acid_action_1paker.triggered.connect(self.acid_action_1paker)
+
+        gno_menu = action_menu.addMenu('Спуск фондового оборудования')
+        gno_action = QAction('пакер')
+        gno_menu.addAction(gno_action)
+        gno_action.triggered.connect(self.gno_bottom)
 
 
         context_menu.exec_(self.mapToGlobal(position))
@@ -124,16 +138,49 @@ class MyWindow(QMainWindow):
     def clickedRowColumn(self, r, c):
         from open_pz import CreatePZ
         self.ins_ind = r
+        CreatePZ.ins_ind = r
+        print(f' выбранная строка {self.ins_ind}')
 
+    def gno_bottom(self):
+        from work_py.descent_gno import gno_down
+
+        print('Вставился ГНО')
+        gno_work_list = gno_down(self)
+        self.populate_row(self.ins_ind, gno_work_list)
+
+    def acid_action_1paker(self):
+        from work_py.acids_work import acid_work
+        print('Вставился кислотная обработка на одном пакере ')
+        acid_work_list = acid_work(self)
+        self.populate_row(self.ins_ind, acid_work_list)
 
     def pressureTest(self):
         from work_py.opressovka import paker_list
-        from open_pz import CreatePZ
 
-        pressure_work1 = paker_list(1000, 10)
+        print('Вставился опрессовка пакером')
+        pressure_work1 = paker_list(self)
         print(f'индекс {self.ins_ind, len(pressure_work1)}')
         self.populate_row(self.ins_ind, pressure_work1)
-        CreatePZ.ins_ind += len(pressure_work1) + 1
+
+
+    def template_with_skm(self):
+        from work_py.template_work import template_ek
+        from open_pz import CreatePZ
+        template_ek_list = template_ek(self)
+        print(f'индекс {self.ins_ind, len(template_ek_list)}')
+        self.populate_row(self.ins_ind,  template_ek_list)
+        CreatePZ.ins_ind += len(template_ek_list) + 1
+
+    def template_without_skm(self):
+        from work_py.template_work import template_ek_without_skm
+        from open_pz import CreatePZ
+
+        template_ek_list = template_ek_without_skm(self)
+        print()
+        print(f'индекс {self.ins_ind, len(template_ek_list)}')
+        self.populate_row(self.ins_ind,  template_ek_list)
+        CreatePZ.ins_ind += len(template_ek_list) + 1
+
 
     def populate_row(self, ins_ind, work_list):
 
@@ -183,16 +230,16 @@ class MyWindow(QMainWindow):
         from open_pz import CreatePZ
         rows = sheet.max_row
         merged_cells = sheet.merged_cells
-        cols = 13
+
         self.table_widget.setRowCount(rows)
-        self.table_widget.setColumnCount(cols)
+        self.table_widget.setColumnCount(12)
         rowHeights_exit = [sheet.row_dimensions[i + 1].height if sheet.row_dimensions[i + 1].height != None else 18 for
                            i in range(sheet.max_row)]
 
         for row in range(1, rows + 1):
             if row > 1 and row < rows - 1:
                 self.table_widget.setRowHeight(row, int(rowHeights_exit[row]))
-            for col in range(1, cols + 1):
+            for col in range(1, 12 + 1):
                 if sheet.cell(row=row, column=col).value != None:
                     cell_value = str(sheet.cell(row=row, column=col).value)
                     item = QtWidgets.QTableWidgetItem(str(cell_value))
