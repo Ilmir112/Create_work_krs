@@ -15,6 +15,7 @@ def gnkt_work(self):
 
 
 
+
     acid_true_quest  = QMessageBox.question(self, 'Необходимость кислоты', 'Планировать кислоту?')
     if acid_true_quest == QMessageBox.StandardButton.Yes:
         acid_true_quest = True

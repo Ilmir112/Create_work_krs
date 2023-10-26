@@ -94,11 +94,11 @@ def acid_work(self):
                                                                          f"объеме {round(acid_V,1)}м3, "
                                                                          f"довести кислоту тех жидкостью в объеме {round(volume_vn_nkt(dict_nkt)-acid_V,1)}м3 "]),
          None, None, None, None, None, None, None,
-         'мастер КРС', ],
+         'мастер КРС', None],
         [None, None,
          f'посадить пакер на глубине {paker_depth}м',
          None, None, None, None, None, None, None,
-         'мастер КРС', ],
+         'мастер КРС', None],
         [None, None,
          ''.join([f'продавить  кислоту тех жидкостью в объеме {round(volume_vn_nkt(dict_nkt) + 0.5,1)}м3 при давлении не '
                   f'более {CreatePZ.max_expected_pressure}атм. Увеличение давления согласовать'

@@ -3,7 +3,9 @@ import openpyxl
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu, QMenuBar, QAction, QTableWidget, QTableWidgetItem, \
     QVBoxLayout, QWidget, QLineEdit
 from PyQt5 import QtCore, QtWidgets, QtGui
+from openpyxl.workbook import Workbook
 
+import krs
 import work_py.opressovka
 
 
@@ -18,7 +20,7 @@ class MyWindow(QMainWindow):
         self.perforation_list = []
         self.dict_perforation_project = {}
         self.dict_work_pervorations = {}
-
+        self.ins_ind_border = None
     def initUI(self):
         from work_py.mouse import TableWidget
         self.setWindowTitle("Main Window")
@@ -89,11 +91,72 @@ class MyWindow(QMainWindow):
 
             # if action == self.save_file:
             #     open_pz.open_excel_file().wb.save("test_unmerge.xlsx")
+        elif action == self.save_file:
+
+            self.save_to_excel(self.wb, self.ws)
 
         elif action == self.save_file_as:
             self.saveFileDialog()
 
+    def save_to_excel(self, wb, ws):
+        from open_pz import CreatePZ
+        # print(f'граница {self.ins_ind_border}')
+        ins_ind =  self.ins_ind_border
 
+        for row in range(self.table_widget.rowCount()):
+            for column in range(self.table_widget.columnCount()):
+
+                item = self.table_widget.item(row, column)
+                if item is not None:
+                    if item.text() == 'ИТОГО:':
+                        ins_int_border_bottom = row
+
+        # ws.insert_rows(self.ins_ind_border, self.table_widget.rowCount()-self.ins_ind_border)
+        work_list = []
+        for row in range(self.table_widget.rowCount()):
+            if row >= self.ins_ind_border:
+                row_lst = []
+                self.ins_ind_border += 1
+                # ws.merge_cells(start_row=row, start_column=2, end_row=row, end_column=12)
+                for column in range(self.table_widget.columnCount()):
+                    item = self.table_widget.item(row, column)
+                    if item is not None:
+                        row_lst.append(item.text())
+
+                    #     ws.cell(row=row + 1, column=column + 1).value = item.text()
+                work_list.append(row_lst)
+
+        # print(ins_ind)
+        # print(self.table_widget.rowCount())
+
+        for i in range(2, len(work_list)):  # нумерация работ
+
+            work_list[i][1] = i - 1
+            if self.is_number(work_list[i][11]) == True:
+
+                CreatePZ.normOfTime += float(work_list[i][11])
+
+        print(f' норма {CreatePZ.normOfTime}')
+
+        CreatePZ.count_row_height(ws, work_list, ins_ind)
+        itog_ind_min = CreatePZ.itog_ind_min + len(work_list)
+        CreatePZ.addItog(self, ws, self.table_widget.rowCount()+1, ins_ind + itog_ind_min)
+
+        ws.print_area = f'B1:L{self.table_widget.rowCount()+45}'
+        # ws.page_setup.fitToPage = True
+        ws.page_setup.fitToHeight = False
+        ws.page_setup.fitToWidth = True
+        ws.print_options.horizontalCentered = True
+        wb.save(f"{ CreatePZ.well_number} { CreatePZ.well_area} { CreatePZ.cat_P_1} категории.xlsx")
+
+        print("Table data saved to Excel")
+
+    def is_number(self, str):
+        try:
+            float(str)
+            return True
+        except ValueError:
+            return False
     def openContextMenu(self, position):
         from open_pz import CreatePZ
         from work_py.template_work import template_ek_without_skm, template_ek
@@ -116,6 +179,10 @@ class MyWindow(QMainWindow):
         template_menu.addAction(template_with_skm)
         template_with_skm.triggered.connect(self.template_with_skm)
 
+        ryber_action = QAction("Райбирование", self)
+        action_menu.addAction(ryber_action)
+        ryber_action.triggered.connect(self.ryberAdd)
+
         template_without_skm = QAction("шаблон без СКМ", self)
         template_menu.addAction(template_without_skm)
         template_without_skm.triggered.connect(self.template_without_skm)
@@ -137,10 +204,16 @@ class MyWindow(QMainWindow):
 
     def clickedRowColumn(self, r, c):
         from open_pz import CreatePZ
-        self.ins_ind = r
-        CreatePZ.ins_ind = r
+        self.ins_ind = r+1
+        CreatePZ.ins_ind = r+1
         print(f' выбранная строка {self.ins_ind}')
 
+    def ryberAdd(self):
+        from work_py.raiding import raidingColumn
+
+        print('Вставился райбер')
+        ryber_work_list = raidingColumn(self)
+        self.populate_row(self.ins_ind, ryber_work_list)
     def gno_bottom(self):
         from work_py.descent_gno import gno_down
 
@@ -189,13 +262,17 @@ class MyWindow(QMainWindow):
         for i, row_data in enumerate(work_list):
             row = ins_ind + i
             self.table_widget.insertRow(row)
-            self.table_widget.setSpan(i+ins_ind, 2, 1, 8)
+            self.table_widget.setSpan(i + ins_ind, 2, 1, 8)
             for column, data in enumerate(row_data):
                 # item = QtWidgets.QTableWidgetItem(data)
-                widget = QtWidgets.QLabel(str( ))
+                widget = QtWidgets.QLabel(str())
                 widget.setStyleSheet('border: 0.5px solid black; font: Arial 14px')
                 self.table_widget.setCellWidget(row, column, widget)
-                self.table_widget.setItem(row, column, QtWidgets.QTableWidgetItem(str(data)))
+                if data != None:
+                    self.table_widget.setItem(row, column, QtWidgets.QTableWidgetItem(str(data)))
+                else:
+                    self.table_widget.setItem(row, column, QtWidgets.QTableWidgetItem(str('')))
+
                 if column == 2:
                     if data != None:
                         text = data
@@ -203,8 +280,9 @@ class MyWindow(QMainWindow):
                             if value[0] <= len(text) <= value[1]:
                                 text_width = key
                                 self.table_widget.setRowHeight(row, int(text_width))
-            # self.table_widget.resizeColumnsToContents()
-            # self.table_widget.resizeRowsToContents()
+
+        # self.table_widget.resizeColumnsToContents()
+        # self.table_widget.resizeRowsToContents()
 
 
 
@@ -252,6 +330,7 @@ class MyWindow(QMainWindow):
                             self.table_widget.setSpan(row - 1, col - 1,
                                                       merged_cell.max_row - merged_cell.min_row + 1,
                                                       merged_cell.max_col - merged_cell.min_col + 1)
+        self.populate_row(self.table_widget.rowCount(), krs.work_krs(self))
 
 
 if __name__ == "__main__":

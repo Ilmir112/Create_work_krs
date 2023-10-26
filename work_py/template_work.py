@@ -116,9 +116,6 @@ def template_ek_without_skm(self):
     if CreatePZ.column_additional == True:
         nkt_pod = ['60мм' if CreatePZ.column_additional_diametr <110 else '73мм со снятыми фасками']
         nkt_pod = ''.join(nkt_pod)
-        # temlate_ek = template_ek()
-    else:
-        template_ek = template_diam_ek()
 
     lift_ecn_can = {True: 30, False: 4}
 

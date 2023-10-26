@@ -119,14 +119,14 @@ class PervorationWindow(MyWindow):
                                                      50)[0]
 
         self.tableWidget.setSortingEnabled(False)
-        print(f' проект {self.dict_perforation_project}')
-        print(f' текущий ПВР {self.dict_work_pervorations}')
+        # print(f' проект {self.dict_perforation_project}')
+        # print(f' текущий ПВР {self.dict_work_pervorations}')
         rows = self.tableWidget.rowCount()
         if len(self.dict_perforation_project) != 0:
 
             for plast, data in self.dict_perforation_project.items():
                 for i in data['интервал']:
-                    print(i)
+                    # print(i)
 
                     self.tableWidget.insertRow(rows)
                     self.tableWidget.setItem(rows, 0, QTableWidgetItem(str(min(i))))
@@ -140,8 +140,8 @@ class PervorationWindow(MyWindow):
         else:
             for plast, data in self.dict_work_pervorations.items():
                 for i in data['интервал']:
-                    print(i)
-                    print(str(min(i)))
+                    # print(i)
+                    # print(str(min(i)))
                     self.tableWidget.insertRow(rows)
                     self.tableWidget.setItem(rows, 0, QTableWidgetItem(str(min(i))))
                     self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(max(i))))
@@ -206,7 +206,7 @@ class PervorationWindow(MyWindow):
                                      f'При необходимости  подготовить место для установки партии ГИС напротив мостков. '
                                      f'Произвести  монтаж ГИС согласно схемы  №8а утвержденной главным инженером от  14.10.2021г',
                          None, None, None, None, None, None, None,
-                          'Мастер КРС', None, None],
+                          'Мастер КРС', None, None,  None],
                        [None, None, f'Долить скважину до устья тех жидкостью уд.весом {CreatePZ.fluid_work} .Установить ПВО по схеме №8а утвержденной '
                                      f'главным инженером ООО "Ойл-сервис" от 14.10.2021г. Опрессовать  плашки  ПВО (на давление опрессовки ЭК, но '
                                      f'не ниже максимального ожидаемого давления на устье) {CreatePZ.max_admissible_pressure}атм, по невозможности на давление поглощения, но '
@@ -215,7 +215,7 @@ class PervorationWindow(MyWindow):
                                     f'(Произвести фотографию перфоратора в заряженном состоянии, и после проведения перфорации,'
                                     f' фотографии предоставить в ЦИТС Ойл-сервис',
                          None, None, None, None, None, None, None,
-                          'Мастер КРС, подрядчик по ГИС', 15,  ],
+                          'Мастер КРС, подрядчик по ГИС', 15,  None, None],
                        [None, None, ''.join(["ГИС (Перфорация на кабеле ЗАДАЧА 2.9.1)" if float(CreatePZ.max_angle) <= 50 else "ГИС ( Трубная Перфорация ЗАДАЧА 2.9.2)"]), None, None, None, None,
                         None,None, None, None, None, None],
                        [None, None, "Кровля перфорации", "-", "Подошва Перфорации", "Тип заряда", "отв на 1 п.м.", "Количество отверстий",
@@ -235,7 +235,11 @@ class PervorationWindow(MyWindow):
                         perf_list.append(value)
 
             perf_list.insert(7, (round((float(perf_list[4]) - float(perf_list[2])) * int(perf_list[6]), 1)))
+            perf_list.extend([None, None])
             perforation.append(perf_list)
+
+
+
 
 
         perforation.append([None, None, ''.join(["Произвести контрольную запись ЛМ;ТМ. Составить АКТ на "
@@ -261,10 +265,10 @@ class PervorationWindow(MyWindow):
             for i in range(len(pipe_perforation)):
                 perforation.insert(i + 1, pipe_perforation[i])
 
-        print(f'принято {self.dict_perforation_project}')
+        # print(f'принято {self.dict_perforation_project}')
         text_width_dict = {20: (0, 100), 40: (101, 200), 60: (201, 300), 80: (301, 400), 100: (401, 500),
                            120: (501, 600), 140: (601, 700)}
-
+        # print(perf_list)
         for i, row_data in enumerate(perforation):
             row = self.ins_ind + i
             self.table_widget.insertRow(row)
@@ -274,9 +278,9 @@ class PervorationWindow(MyWindow):
             if i in lst: # Объединение ячеек по вертикале в столбце "отвественные и норма"
                 self.table_widget.setSpan(i + self.ins_ind, 2, 1, 8)
             for column, data in enumerate(row_data):
-                # item = QtWidgets.QTableWidgetItem(data)
+
                 widget = QtWidgets.QLabel(str())
-                if column != 0:
+                if column != 25:
                     widget.setStyleSheet("""QLabel { 
                                                         border: 1px solid black;
                                                         font-size: 12px; 
@@ -284,8 +288,8 @@ class PervorationWindow(MyWindow):
                                                     }
                                                     """)
                     self.table_widget.setCellWidget(row, column, widget)
-                if data != None:
-                    self.table_widget.setItem(row, column, QtWidgets.QTableWidgetItem(str(data)))
+                self.table_widget.setItem(row, column, QtWidgets.QTableWidgetItem(str(data)))
+
                 if column == 2 or column == 10:
                     if data != None:
                         text = data
