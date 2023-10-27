@@ -2,7 +2,7 @@ def raidingColumn(self):
     from open_pz import CreatePZ
     from work_py.opressovka import paker_diametr_select
     from work_py.template_work import well_volume
-    ryber_diam = paker_diametr_select(CreatePZ.current_bottom)
+    ryber_diam = paker_diametr_select(CreatePZ.current_bottom) + 3
 
     if CreatePZ.column_additional == True:
         nkt_pod = ['60мм' if CreatePZ.column_additional_diametr <110 else '73мм со снятыми фасками']
@@ -16,7 +16,7 @@ def raidingColumn(self):
 
     nkt_diam = ''.join(['73' if CreatePZ.column_diametr >110 else '60'])
     if CreatePZ.column_additional == False:
-        ryber_str = f'Спустить  райбер-{ryber_diam} для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм +' \
+        ryber_str = f'райбер-{ryber_diam} для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм +' \
                     f' забойный двигатель Д-106 +НКТ{nkt_diam}м 20м + репер '
 
 

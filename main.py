@@ -1,7 +1,7 @@
 import sys
 import openpyxl
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu, QMenuBar, QAction, QTableWidget, QTableWidgetItem, \
-    QVBoxLayout, QWidget, QLineEdit
+    QVBoxLayout, QWidget, QLineEdit, QMessageBox
 from PyQt5 import QtCore, QtWidgets, QtGui
 from openpyxl.workbook import Workbook
 
@@ -21,6 +21,7 @@ class MyWindow(QMainWindow):
         self.dict_perforation_project = {}
         self.dict_work_pervorations = {}
         self.ins_ind_border = None
+        self.work_plan = 0
     def initUI(self):
         from work_py.mouse import TableWidget
         self.setWindowTitle("Main Window")
@@ -68,8 +69,8 @@ class MyWindow(QMainWindow):
                                                                "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
 
             try:
-                work_plan = 'krs'
-                sheet = CreatePZ.open_excel_file(self, self.fname[0], work_plan)
+                self.work_plan = 'krs'
+                sheet = CreatePZ.open_excel_file(self, self.fname[0], self.work_plan)
 
                 self.copy_pz(sheet)
 
@@ -82,8 +83,8 @@ class MyWindow(QMainWindow):
                                                                "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
 
             try:
-                work_plan = 'gnkt_opz'
-                sheet = CreatePZ.open_excel_file(self, self.fname[0], work_plan)
+                self.work_plan = 'gnkt_opz'
+                sheet = CreatePZ.open_excel_file(self, self.fname[0], self.work_plan)
                 self.copy_pz(sheet)
 
             except FileNotFoundError:
@@ -105,13 +106,13 @@ class MyWindow(QMainWindow):
 
         for row in range(self.table_widget.rowCount()):
             for column in range(self.table_widget.columnCount()):
-
                 item = self.table_widget.item(row, column)
                 if item is not None:
                     if item.text() == 'ИТОГО:':
                         ins_int_border_bottom = row
 
         # ws.insert_rows(self.ins_ind_border, self.table_widget.rowCount()-self.ins_ind_border)
+
         work_list = []
         for row in range(self.table_widget.rowCount()):
             if row >= self.ins_ind_border:
@@ -133,6 +134,7 @@ class MyWindow(QMainWindow):
 
             work_list[i][1] = i - 1
             if self.is_number(work_list[i][11]) == True:
+                print(work_list[i])
 
                 CreatePZ.normOfTime += float(work_list[i][11])
 
@@ -164,10 +166,30 @@ class MyWindow(QMainWindow):
         context_menu = QMenu(self)
 
         action_menu = context_menu.addMenu("вид работ")
-        # pervoration_ins = action_menu.addMenu("окно перфорации")
+        geophysical = action_menu.addMenu("Геофизические работы")
+
         perforation_action = QAction("Перфорация", self)
-        action_menu.addAction(perforation_action)
-        perforation_action.triggered.connect(self.openNewWindow)
+        geophysical.addAction(perforation_action)
+        perforation_action.triggered.connect(self.PerforationNewWindow)
+
+        geophysical_action = QAction("Геофизические исследования", self)
+        geophysical.addAction(geophysical_action)
+        geophysical_action.triggered.connect(self.GeophysicalNewWindow)
+
+
+        emptyString_action = QAction("добавить пустую строку", self)
+        context_menu.addAction(emptyString_action)
+        emptyString_action.triggered.connect(self.emptyString)
+
+        gnkt_opz_action = QAction("ГНКТ ОПЗ", self)
+        context_menu.addAction(gnkt_opz_action)
+        gnkt_opz_action.triggered.connect(self.gnkt_opz)
+
+
+
+        deleteString_action = QAction("Удалить строку", self)
+        context_menu.addAction(deleteString_action)
+        deleteString_action.triggered.connect(self.deleteString)
 
 
         opressovka_action = QAction("Опрессовка колонны", self)
@@ -208,11 +230,39 @@ class MyWindow(QMainWindow):
         CreatePZ.ins_ind = r+1
         print(f' выбранная строка {self.ins_ind}')
 
+    def deleteString(self):
+        selected_ranges = self.table_widget.selectedRanges()
+        selected_rows = []
+
+        # Получение индексов выбранных строк
+        for selected_range in selected_ranges:
+            top_row = selected_range.topRow()
+            bottom_row = selected_range.bottomRow()
+
+            for row in range(top_row, bottom_row + 1):
+                selected_rows.append(row)
+
+        # Удаление выбранных строк в обратном порядке
+        selected_rows.sort(reverse=True)
+        for row in selected_rows:
+            self.table_widget.removeRow(row)
+
+    def emptyString(self):
+        ryber_work_list = [[None, None, None, None, None, None, None, None, None, None,None, None]]
+        self.populate_row(self.ins_ind, ryber_work_list)
+
     def ryberAdd(self):
         from work_py.raiding import raidingColumn
 
         print('Вставился райбер')
         ryber_work_list = raidingColumn(self)
+        self.populate_row(self.ins_ind, ryber_work_list)
+
+    def gnkt_opz(self):
+        from gnkt_opz import gnkt_work
+
+        print('Вставился ГНКТ')
+        ryber_work_list = gnkt_work(self)
         self.populate_row(self.ins_ind, ryber_work_list)
     def gno_bottom(self):
         from work_py.descent_gno import gno_down
@@ -284,9 +334,21 @@ class MyWindow(QMainWindow):
         # self.table_widget.resizeColumnsToContents()
         # self.table_widget.resizeRowsToContents()
 
+    def GeophysicalNewWindow(self):
+        from work_py.geophysic import GeophysicWindow
+        from open_pz import CreatePZ
+        if self.new_window is None:
 
+            self.new_window = GeophysicWindow(self.table_widget, self.ins_ind)
+            self.new_window.setWindowTitle("New Window")
+            self.new_window.setGeometry(200, 200, 300, 200)
+            self.new_window.show()
 
-    def openNewWindow(self):
+        else:
+            self.new_window.close()  # Close window.
+            self.new_window = None  # Discard reference.
+
+    def  PerforationNewWindow(self):
         from work_py.perforation import PervorationWindow
         from open_pz import CreatePZ
         if self.new_window is None:
@@ -305,7 +367,7 @@ class MyWindow(QMainWindow):
         self.populate_row(self.ins_ind, self.perforation_list)
 
     def copy_pz(self, sheet):
-        from open_pz import CreatePZ
+        from gnkt_opz import gnkt_work
         rows = sheet.max_row
         merged_cells = sheet.merged_cells
 
@@ -330,7 +392,13 @@ class MyWindow(QMainWindow):
                             self.table_widget.setSpan(row - 1, col - 1,
                                                       merged_cell.max_row - merged_cell.min_row + 1,
                                                       merged_cell.max_col - merged_cell.min_col + 1)
-        self.populate_row(self.table_widget.rowCount(), krs.work_krs(self))
+        print(f' njj {self.work_plan}')
+        if self.work_plan == 'krs':
+            self.populate_row(self.table_widget.rowCount(), krs.work_krs(self))
+        # elif self.work_plan == 'gnkt-opz':
+        #     from open_pz import CreatePZ
+        #     # print(CreatePZ.gnkt_work1)
+        #     # self.populate_row(self.table_widget.rowCount(),  CreatePZ.gnkt_work1)
 
 
 if __name__ == "__main__":

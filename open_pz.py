@@ -469,38 +469,38 @@ class CreatePZ(MyWindow):
             print('ЭЦН отсутствует')
         # print(f'fh {len(CreatePZ.H2S_mg)}')
         if CreatePZ.curator == 'ОР':
-            # print(data_x_min, data_x_max)
-            expected_list = []
-            for row in range(CreatePZ.data_x_min + 1, CreatePZ.data_x_max + 1):
-                for col in range(1, 12):
-                    # print(str(ws.cell(row=row, column=col).value).strip().lower())
-                    # print(str(ws.cell(row=row, column=col).value).strip().lower() in ['приемистость', 'qприем =', 'qж =', 'qж = ', 'qприем ='])
-                    if str(ws.cell(row=row, column=col).value).strip().lower() in ['приемистость', 'qприем =', 'qж =',
-                                                                                   'qж = ', 'qприем =']:
-                        Qpr = ws.cell(row=row, column=col + 1).value
-                        # print(Qpr)
-                        n = 1
-                        while ws.cell(row=row, column=col + n).value == None:
-                            ws.cell(row=row, column=col + n).value
-                            n += 1
-                            Qpr = ws.cell(row=row, column=col + 1).value
-                        # print(f'после {Qpr}')
-
-
-                    elif str(ws.cell(row=row, column=col).value).strip() in ['Рзак', 'Давление закачки ',
-                                                                             'Рзак (Нагнет)']:
-                        Pzak = ws.cell(row=row, column=col + 1).value
-                        n = 1
-                        while ws.cell(row=row, column=col + n).value != None:
-                            ws.cell(row=row, column=col + n).value
-                            n += 1
-                            Pzak = ws.cell(row=row, column=col + 1).value
-                        expected_list.append(Pzak)
-            print(f'приеми{Qpr, Pzak}')
-            CreatePZ.expected_pick_up[Qpr] = Pzak
-            print(CreatePZ.expected_pick_up)
             try:
+                print(CreatePZ.data_x_min, CreatePZ.data_x_max)
+                expected_list = []
+                for row in range(CreatePZ.data_x_min + 2, CreatePZ.data_x_max + 1):
+                    for col in range(1, 12):
+                        print(str(ws.cell(row=row, column=col).value).strip().lower())
+                        # print(str(ws.cell(row=row, column=col).value).strip().lower() in ['приемистость', 'qприем =', 'qж =', 'qж = ', 'qприем ='])
+                        if str(ws.cell(row=row, column=col).value).strip().lower() in ['приемистость', 'qприем =', 'qж =',
+                                                                                       'qж = ', 'Qприема = ']:
+                            Qpr = ws.cell(row=row, column=col + 1).value
+                            print(f' приемис {Qpr}')
+                            n = 1
+                            while ws.cell(row=row, column=col + n).value == None:
+                                ws.cell(row=row, column=col + n).value
+                                n += 1
+                                Qpr = ws.cell(row=row, column=col + 1).value
+                            print(f'после {Qpr}')
+
+
+                        elif str(ws.cell(row=row, column=col).value).strip() in ['Рзак', 'Давление закачки ',
+                                                                                 'Рзак (Нагнет)', 'Рзак (Нагнет)']:
+                            Pzak = ws.cell(row=row, column=col + 1).value
+                            n = 1
+                            while ws.cell(row=row, column=col + n).value != None:
+                                ws.cell(row=row, column=col + n).value
+                                n += 1
+                                Pzak = ws.cell(row=row, column=col + 1).value
+                    expected_list.append(Pzak)
+                    print(f'приеми{Qpr, Pzak}')
                 CreatePZ.expected_pick_up[Qpr] = Pzak
+                print(CreatePZ.expected_pick_up)
+
             except:
                 expected_Q, ok = QInputDialog.getInt(self, 'Ожидаемая приемистость',
                                                      'Ожидаемая приемистость', 100, 0,
@@ -599,8 +599,7 @@ class CreatePZ(MyWindow):
                     CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('давление', []).append(row[9])
                     CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('замер', []).append(row[10])
 
-                elif CreatePZ.current_bottom > krovlya_perf and CreatePZ.if_None(
-                        row[5]) == 'отсут':  # Определение работающих интервалов перфораци
+                elif CreatePZ.current_bottom > krovlya_perf and CreatePZ.if_None(row[5]) == 'отсут':  # Определение работающих интервалов перфораци
                     # print(f'отклю{row[5], CreatePZ.current_bottom, row[2]}')
                     if CreatePZ.perforation_roof <= krovlya_perf:
                         CreatePZ.perforation_roof = krovlya_perf
@@ -701,8 +700,8 @@ class CreatePZ(MyWindow):
         CreatePZ.ins_ind += CreatePZ.data_well_max - CreatePZ.cat_well_min + 19
         # print(f' индекс вставки ГНВП{CreatePZ.ins_ind}')
         dict_events_gnvp = {}
-        dict_events_gnvp['krs'] = events_gnvp
-        dict_events_gnvp['gnkt_opz'] = events_gnvp_gnkt
+        dict_events_gnvp['krs'] = events_gnvp()
+        dict_events_gnvp['gnkt_opz'] = events_gnvp_gnkt()
 
         for i in range(CreatePZ.ins_ind, CreatePZ.ins_ind + len(dict_events_gnvp[work_plan]) - 1):
             ws.merge_cells(start_row=i, start_column=2, end_row=i, end_column=12)
@@ -755,11 +754,13 @@ class CreatePZ(MyWindow):
         # print(f' индекс до работ {CreatePZ.ins_ind}')
         if work_plan == 'gnkt_opz':
 
-            gnkt_work1 = gnkt_work(self)
-            CreatePZ.count_row_height(ws, gnkt_work1, CreatePZ.ins_ind)
-            CreatePZ.itog_ind_min = CreatePZ.ins_ind
-            CreatePZ.ins_ind += len(gnkt_work1)
-            self.addItog(self, ws, CreatePZ.ins_ind )
+            # CreatePZ.gnkt_work1 = gnkt_work(self)
+            self.ins_ind_border = CreatePZ.ins_ind
+            # CreatePZ.count_row_height(ws, gnkt_work1, CreatePZ.ins_ind)
+            # CreatePZ.itog_ind_min = CreatePZ.ins_ind
+            # CreatePZ.ins_ind += len(gnkt_work1)
+            #
+            # CreatePZ.addItog(self, ws, CreatePZ.ins_ind, CreatePZ.itog_ind_min)
 
 
         elif work_plan == 'krs':
@@ -772,7 +773,7 @@ class CreatePZ(MyWindow):
             #     CreatePZ.column_leakiness = False
             # print(f'нарушения {CreatePZ.leakiness}')
 
-            krs_work1 = krs.work_krs(self)
+            CreatePZ.gnkt_work1 = krs.work_krs(self)
 
             # CreatePZ.count_row_height(ws, krs_work1, CreatePZ.ins_ind)
             # CreatePZ.itog_ind_min = CreatePZ.ins_ind
@@ -897,7 +898,9 @@ class CreatePZ(MyWindow):
             return False
 
     def if_None(value):
-        if value == None or 'отсут' in value.lower() or value == '-':
+        if isinstance(value, datetime):
+            return value
+        elif value == None or 'отсут' in value.lower() or value == '-':
             return 'отсут'
         else:
             return value

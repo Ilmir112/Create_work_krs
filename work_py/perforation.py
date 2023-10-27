@@ -325,7 +325,7 @@ if __name__ == "__main__":
     import sys
 
     app = QtWidgets.QApplication(sys.argv)
-    app.setStyleSheet(qss)
+    app.setStyleSheet()
     window = PervorationWindow()
     window.show()
     sys.exit(app.exec_())
