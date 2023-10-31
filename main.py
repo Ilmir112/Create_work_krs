@@ -6,8 +6,6 @@ from PyQt5 import QtCore, QtWidgets, QtGui
 from openpyxl.workbook import Workbook
 from PyQt5.QtCore import Qt
 
-import block_name
-import cdng
 import krs
 import work_py.opressovka
 
@@ -26,7 +24,6 @@ class MyWindow(QMainWindow):
         self.dict_work_pervorations = {}
         self.ins_ind_border = None
         self.work_plan = 0
-        self.merged_cells_dict = {}
     def initUI(self):
         from work_py.mouse import TableWidget
         self.setWindowTitle("Main Window")
@@ -128,31 +125,23 @@ class MyWindow(QMainWindow):
 
                     #     ws.cell(row=row + 1, column=column + 1).value = item.text()
                 work_list.append(row_lst)
-        ins_ind += len(work_list)
+
+
         merged_cells_dict = {}
+
         for row in merged_cells:
             merged_cells_dict.setdefault(row[0], []).append(row[1])
 
+        # print(merged_cells_dict)
 
-        print(ins_ind)
         for i in range(2, len(work_list)):  # нумерация работ
             work_list[i][1] = i - 1
             if krs.is_number(work_list[i][11]) == True:
                 CreatePZ.normOfTime += float(work_list[i][11])
 
-
-        itog = cdng.itog_1(self)
-        self.populate_row(ins_ind, itog)
-        ins_ind += len(itog)
-
-        curator_sel = block_name.curator_sel(self, CreatePZ.curator, CreatePZ.region)
-        curator_ved_sel = block_name.curator_sel(self, CreatePZ.curator, CreatePZ.region)
-        podp_down = block_name.pop_down(self, CreatePZ.region, curator_sel)
-        self.populate_row(ins_ind, podp_down)
-
         CreatePZ.count_row_height(ws, work_list, ins_ind, merged_cells_dict)
         itog_ind_min = CreatePZ.itog_ind_min + len(work_list)
-        # CreatePZ.addItog(self, ws, self.table_widget.rowCount()+1, ins_ind + itog_ind_min)
+        CreatePZ.addItog(self, ws, self.table_widget.rowCount()+1)
 
         ws.print_area = f'B1:L{self.table_widget.rowCount()+45}'
         # ws.page_setup.fitToPage = True

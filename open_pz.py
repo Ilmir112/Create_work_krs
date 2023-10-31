@@ -826,12 +826,13 @@ class CreatePZ(MyWindow):
         wb.save(f'{CreatePZ.well_number} {CreatePZ.well_area} {work_plan}.xlsx')
         return self.ws
 
-    def addItog(self, ws, ins_ind, ins_ind_2):
-
-        for i in range(ins_ind, len(itog_1(ins_ind,  ins_ind_2)) + ins_ind):  # Добавлением итогов
+    def addItog(self, ws, ins_ind):
+        print(ins_ind, self.table_widget.rowCount()-ins_ind+1)
+        ws.delete_rows(ins_ind, self.table_widget.rowCount()-ins_ind+1)
+        for i in range(ins_ind, len(itog_1(self)) + ins_ind):  # Добавлением итогов
             if i < ins_ind + 6:
                 for j in range(1, 13):
-                    ws.cell(row=i, column=j).value = itog_1(ins_ind,  ins_ind_2)[i - ins_ind][j - 1]
+                    ws.cell(row=i, column=j).value = itog_1(self)[i - ins_ind][j - 1]
                     if j != 1:
                         ws.cell(row=i, column=j).border = CreatePZ.thin_border
                         ws.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=False)
@@ -842,7 +843,7 @@ class CreatePZ(MyWindow):
                 for j in range(1, 13):
                     ws.row_dimensions[i].height = 55
 
-                    ws.cell(row=i, column=j).value = itog_1(ins_ind,  ins_ind_2)[i - ins_ind][j - 1]
+                    ws.cell(row=i, column=j).value = itog_1(self)[i - ins_ind][j - 1]
                     ws.cell(row=i, column=j).border = CreatePZ.thin_border
                     ws.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=False)
                     ws.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='left',
@@ -852,7 +853,7 @@ class CreatePZ(MyWindow):
                 ws.cell(row=i + ins_ind, column=2).alignment = Alignment(wrap_text=True, horizontal='left',
                                                                                   vertical='center')
 
-        ins_ind += len(itog_1(ins_ind,  ins_ind_2)) + 2
+        ins_ind += len(itog_1(self)) + 2
 
         curator_sel = block_name.curator_sel(self, CreatePZ.curator, CreatePZ.region)
         curator_ved_sel = block_name.curator_sel(self, CreatePZ.curator, CreatePZ.region)
@@ -938,10 +939,8 @@ class CreatePZ(MyWindow):
                     ws.cell(row=i, column=j).font = Font(name='Arial', size=11, bold=False)
                 else:
                     ws.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=False)
-            #
-            for row, col in merged_cells_dict.items():
-                if len(col)>3:
-                    ws.merge_cells(start_row=row, start_column=3, end_row=row, end_column=10)
+
+
             ws.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='center',
                                                            vertical='center')
             ws.cell(row=i, column=11).alignment = Alignment(wrap_text=True, horizontal='center',
@@ -951,7 +950,6 @@ class CreatePZ(MyWindow):
             ws.cell(row=i, column=3).alignment = Alignment(wrap_text=True, horizontal='left',
                                                            vertical='center')
         for i, row_data in enumerate(work_list):
-
             for column, data in enumerate(row_data):
                 if column == 2:
                     if data != None:
@@ -960,7 +958,10 @@ class CreatePZ(MyWindow):
                             if value[0] <= len(text) <= value[1]:
 
                                 ws.row_dimensions[i + 1 + ins_ind].height = int(key)
-
+        for row, col in merged_cells_dict.items():
+            if len(col) != 2:
+                # print(row)
+                ws.merge_cells(start_row=row+1, start_column=3, end_row=row+1, end_column=10)
         # print(f'высота строк работ {ins_ind}')
 
 
