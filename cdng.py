@@ -386,20 +386,22 @@ region_dict = {
         'ЧГМ': ['УЦДНГ 01', 'УЦДНГ 02', 'УЦДНГ 03', 'УЦДНГ 04', 'ЧЦДНГ 01', 'ЧЦДНГ 02', 'ЧЦДНГ 03', 'ЧЦППД'],
         'АГМ': ['АЦДНГ 01', 'АЦДНГ 02', 'АЦДНГ 03', 'АЦДНГ 04', 'ЮЦДНГ 01', 'ЮЦДНГ 02', 'ЮЦДНГ 03', 'АЦППД']
     }
-def itog_1(itog_ind_min, itog_ind_max):
+def itog_1(self):
     from open_pz import CreatePZ
     itog_1 = [
         [None, 'ИТОГО:', None, None, None, None, None, None, None, None, None, CreatePZ.normOfTime],
                   [None, 'Герметизация ,  разгерметизация  устья  скважины', None, None, None, None, None, None, None,
-                   None, None, f'=ROUND(L{itog_ind_max+1}/11.5*11/60 ,1)'],
-                  [None, 'Заправка ДВС', None, None, None, None, None, None, None, None, None, f'=ROUND(L{itog_ind_max+1}/23*0.13 ,1)'],
+                   None, None, round(CreatePZ.normOfTime/11.5*11/60 ,1)],
+                  [None, 'Заправка ДВС', None, None, None, None, None, None, None, None, None, round(CreatePZ.normOfTime/23*0.13 ,1)],
                   [None, 'ПЗР в начале и конце смены с заполнением вахтового журнала', None, None, None, None, None,
-                   None, None, None, None, f'=ROUND(L{itog_ind_max+1}/11.5*0.3,1)'],
-                  [None, 'Непредвиденные  работы  : ', None, None, None, None, None, None, None, None, None, f'=ROUND(L{itog_ind_max+1}*{CreatePZ.bottomhole_artificial}/100*0.0004 ,1)'],
+                   None, None, None, None, round(CreatePZ.normOfTime/11.5*0.3,1)],
+                  [None, 'Непредвиденные  работы  : ', None, None, None, None, None, None, None, None, None, round(CreatePZ.normOfTime*CreatePZ.bottomhole_artificial/100*0.0004 ,1)],
                   [None, 'ВСЕГО  :', None, None, None, None, None, None, None, None, None, \
-                   f'=ROUND(l{itog_ind_max+1} + l{itog_ind_max+2} + l{itog_ind_max+3} + l{itog_ind_max+4} +l{itog_ind_max+5}, 1)'],
+                   round(CreatePZ.normOfTime + CreatePZ.normOfTime/11.5*11/60 + CreatePZ.normOfTime/11.5*0.3 + CreatePZ.normOfTime*CreatePZ.bottomhole_artificial/100*0.0004, 1)],
                   [None,
-                   'Примечания: В соответствии с регламентом на производство КРС – заблаговременно подавать заявки на необходимое оборудование, а так же вызывать представителя Заказчика на геофизические работы, ПВР, установку пакера, срыв планшайбы, опрессовку колонны и другие технологические операции, прием скважины в ремонт и сдача из ремонта.',
+                   'Примечания: В соответствии с регламентом на производство КРС – заблаговременно подавать заявки на '
+                   'необходимое оборудование, а так же вызывать представителя Заказчика на геофизические работы, ПВР, '
+                   'установку пакера, срыв планшайбы, опрессовку колонны и другие технологические операции, прием скважины в ремонт и сдача из ремонта.',
                    None, None, None, None, None, None, None, None, None, None],
                   [None, 'ПРИМЕЧАНИЕ:', None, ' ', None, None, None, None, None, None, None, None],
                   [None,

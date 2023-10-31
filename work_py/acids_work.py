@@ -1,24 +1,29 @@
+from PyQt5.QtWidgets import QInputDialog, QMessageBox
+
 
 def acid_work(self):
     from work_py.opressovka import paker_diametr_select
+    from work_py.swabbing import swabbing_with_paker
     from open_pz import CreatePZ
-    from PyQt5.QtWidgets import QInputDialog
-    from krs import volume_vn_nkt
 
-    paker_depth, ok = QInputDialog.getInt(None, 'опрессовка ЭК',
+    swabbing_true_quest = QMessageBox.question(self, 'Свабирование на данной компоновке',
+                                               'Нужно ли Свабировать на данной компоновке?')
+
+    if swabbing_true_quest == QMessageBox.StandardButton.Yes:
+        swabbing_true_quest = True
+    else:
+        swabbing_true_quest = False
+
+    paker_layout = 1
+    paker_depth, ok = QInputDialog.getInt(None, 'посадка пакера',
                                           'Введите глубину посадки пакера', int(CreatePZ.perforation_roof - 20), 0,
                                           5000)
     paker_khost1 = int(CreatePZ.perforation_sole - paker_depth)
     print(f'хвостовик {paker_khost1}')
-    paker_khost, ok = QInputDialog.getInt(None, 'хвостовик', f'Введите длину хвостовика для подошвы ИП{CreatePZ.perforation_sole} и глубины посадки пакера {paker_depth}',
+    paker_khost, ok = QInputDialog.getInt(None, 'хвостовик',
+                                          f'Введите длину хвостовика для подошвы ИП{CreatePZ.perforation_sole} и глубины посадки пакера {paker_depth}',
                                           paker_khost1, 0, 4000)
 
-    acid_list = ['HCl', 'HF', 'ВТ']
-    acid, ok = QInputDialog.getItem(self, 'Вид кислоты', 'Введите вид кислоты:', acid_list, 0, False)
-    if ok and acid_list:
-        self.le.setText(acid)
-    acid_V, ok = QInputDialog.getDouble(self, 'Объем кислоты', 'Введите объем кислоты:', 10, 0.5, 300, 1)
-    acid_pr, ok = QInputDialog.getInt(self, 'концентрация кислоты', 'Введите концентрацию кислоты', 15, 2, 24)
 
     nkt_diam = ''.join(['73' if CreatePZ.column_diametr > 110 else '60'])
 
@@ -36,20 +41,6 @@ def acid_work(self):
         dict_nkt = {73: paker_depth + paker_khost}
     elif nkt_diam == 60:
         dict_nkt = {60: paker_depth + paker_khost}
-    if acid == 'HCl':
-        acid_sel = f'Произвести  солянокислотную обработку {",".join(CreatePZ.plast_work)}  в объеме  {acid_V}м3  ({acid} - {acid_pr} %) ' \
-                   f'с добавлением стабилизатора железа HiRon в объеме 70кг и деэмульгатора в объеме 50л. в ' \
-                   f'присутствии представителя Заказчика с составлением акта, не превышая давления закачки не более Р={CreatePZ.max_admissible_pressure}атм.\n' \
-                   f'(для приготовления соляной кислоты в объеме {acid_V}м3 - {acid_pr}% необходимо замешать {round(acid_V*acid_pr/24*1.118,1)}т HCL 24% и' \
-                   f' пресной воды {round(acid_V-acid_V*acid_pr/24*1.118,1)}м3)' \
-                   f'Согласовать с Заказчиком проведение кислотной обработки силами ООО Крезол. '
-    elif acid == 'ВТ':
-        vt, ok = QInputDialog.getText(None, 'Высокотехнологическая кислоты', 'Нужно расписать вид кислоты и объем')
-        acid_sel = f'Произвести кислотную обработку {" ".join(CreatePZ.plast_work)} {vt}  в присутствии представителя '\
-           f'Заказчика с составлением акта, не превышая давления закачки не более Р={CreatePZ.max_admissible_pressure}атм.'
-    elif acid == 'HF':
-        acid_sel = f'Произвести кислотную обработку пласта {",".join(CreatePZ.plast_work)}  в объеме  {acid_V}м3  ({acid} - {acid_pr} %) силами СК Крезол '\
-           f'в присутствии представителя заказчика с составлением акта, не превышая давления закачки не более Р={CreatePZ.max_admissible_pressure}атм.'
 
     paker_list = [
         [None, None,
@@ -83,79 +74,144 @@ def acid_work(self):
          f'Определить приемистость НЭК.',
          None, None, None, None, None, None, None,
          'мастер КРС', 0.4],
-        [None, None,
-         f'{acid_sel}'
-         f'ОБЕСПЕЧИТЬ НАЛИЧИЕ У СОСТАВА ВАХТЫ И СИЗ ПРИ КИСЛОТНОЙ ОБРАБОТКИ',
-         None, None, None, None, None, None, None,
-         'мастер КРС, УСРСиСТ', 8],
-        [None, None,
-         ''.join([f"Закачать кислоту в объеме V={round(volume_vn_nkt(dict_nkt),1)}м3 (внутренний "
-                  f"объем НКТ)" if acid_V > volume_vn_nkt(dict_nkt) else f"Закачать кислоту в "
-                                                                         f"объеме {round(acid_V,1)}м3, "
-                                                                         f"довести кислоту тех жидкостью в объеме {round(volume_vn_nkt(dict_nkt)-acid_V,1)}м3 "]),
-         None, None, None, None, None, None, None,
-         'мастер КРС', None],
-        [None, None,
-         f'посадить пакер на глубине {paker_depth}м',
-         None, None, None, None, None, None, None,
-         'мастер КРС', None],
-        [None, None,
-         ''.join([f'продавить  кислоту тех жидкостью в объеме {round(volume_vn_nkt(dict_nkt) + 0.5,1)}м3 при давлении не '
-                  f'более {CreatePZ.max_expected_pressure}атм. Увеличение давления согласовать'
-                  f' с заказчиком'if acid_V < volume_vn_nkt(dict_nkt) else f'продавить кислоту оставшейся кислотой в объеме {round(acid_V-volume_vn_nkt(dict_nkt),1)}м3 и тех жидкостью '
-                  f'в объеме {round(volume_vn_nkt(dict_nkt) + 0.5, 1)}м3 при давлении не более {CreatePZ.max_expected_pressure}атм. '
-         f'Увеличение давления согласовать с заказчиком']),
-         None, None, None, None, None, None, None,
-         'мастер КРС', None],
-        [None, None,
-         f'реагирование 2 часа.',
-         None, None, None, None, None, None, None,
-         'мастер КРС', 2],
 
-        [None, None,
-         f'Произвести срыв пакера с поэтапным увеличением нагрузки на 3-4т выше веса НКТ в течении 30мин и с '
-         f'выдержкой 1ч для возврата резиновых элементов в исходное положение. ',
-         None, None, None, None, None, None, None,
-         'мастер КРС', 0.7],
-        [None, None,
-         flushingDownhole(self, paker_depth, paker_khost),
-         None, None, None, None, None, None, None,
-         'мастер КРС', 1.5],
-        [None, None,
-         f'Произвести срыв пакера с поэтапным увеличением нагрузки на 3-4т выше веса НКТ в течении 30мин и с '
-         f'выдержкой 1ч для возврата резиновых элементов в исходное положение. ',
-         None, None, None, None, None, None, None,
-         'мастер КРС', 0.7],
-        [None, None,
-         f'Поднять {paker_select} на НКТ{nkt_diam} c глубины {paker_depth}м с доливом скважины в '
-         f'объеме {round(paker_depth * 1.12 / 1000, 1)}м3 удельным весом {CreatePZ.fluid_work}',
-         None, None, None, None, None, None, None,
-         'мастер КРС', round(0.25 + 0.033 * 1.2 * (paker_depth + paker_khost) / 9.5 * 1.04, 1)]]
+        ]
 
-    if CreatePZ.curator == 'ОР' and CreatePZ.dict_pump['posle'] == 'отсут':
-        paker_list.insert(-2, [None, None,
+
+    for row in acid_work_list(self, paker_depth, paker_khost, dict_nkt, paker_layout):
+        paker_list.append(row)
+
+    if swabbing_true_quest:
+        for row in swabbing_with_paker(self):
+            paker_list.append(row)
+    else:
+        paker_list.append([None, None,
+                                 f'Поднять {paker_select} на НКТ{nkt_diam} c глубины {paker_depth}м с доливом скважины в '
+                                 f'объеме {round(paker_depth * 1.12 / 1000, 1)}м3 удельным весом {CreatePZ.fluid_work}',
+                                 None, None, None, None, None, None, None,
+                                 'мастер КРС',
+                                 round(0.25 + 0.033 * 1.2 * (paker_depth + paker_khost) / 9.5 * 1.04, 1)])
+
+
+    return paker_list
+def acid_work_list(self, paker_depth, paker_khost, dict_nkt, paker_layout):
+    from open_pz import CreatePZ
+    from krs import volume_vn_nkt
+
+    plast, ok = QInputDialog.getItem(self, 'выбор пласта для ОПЗ ', 'выберете пласта дл перфорации',
+                                     CreatePZ.plast_work, 0, False)
+    if ok and plast:
+        self.le.setText(plast)
+
+    acid_list = ['HCl', 'HF', 'ВТ']
+    acid, ok = QInputDialog.getItem(self, 'Вид кислоты', 'Введите вид кислоты:', acid_list, 0, False)
+    if ok and acid_list:
+        self.le.setText(acid)
+    acid_V, ok = QInputDialog.getDouble(self, 'Объем кислоты', 'Введите объем кислоты:', 10, 0.5, 300, 1)
+    acid_pr, ok = QInputDialog.getInt(self, 'концентрация кислоты', 'Введите концентрацию кислоты', 15, 2, 24)
+
+
+
+
+    if acid == 'HCl':
+        acid_sel = f'Произвести  солянокислотную обработку {plast}  в объеме  {acid_V}м3  ({acid} - {acid_pr} %) ' \
+                   f'с добавлением стабилизатора железа HiRon в объеме 70кг и деэмульгатора в объеме 50л. в ' \
+                   f'присутствии представителя Заказчика с составлением акта, не превышая давления закачки не более Р={CreatePZ.max_admissible_pressure}атм.\n' \
+                   f'(для приготовления соляной кислоты в объеме {acid_V}м3 - {acid_pr}% необходимо замешать {round(acid_V * acid_pr / 24 * 1.118, 1)}т HCL 24% и' \
+                   f' пресной воды {round(acid_V - acid_V * acid_pr / 24 * 1.118, 1)}м3)' \
+                   f'Согласовать с Заказчиком проведение кислотной обработки силами ООО Крезол. '
+    elif acid == 'ВТ':
+        vt, ok = QInputDialog.getText(None, 'Высокотехнологическая кислоты', 'Нужно расписать вид кислоты и объем')
+        acid_sel = f'Произвести кислотную обработку {" ".join(CreatePZ.plast_work)} {vt}  в присутствии представителя ' \
+                   f'Заказчика с составлением акта, не превышая давления закачки не более Р={CreatePZ.max_admissible_pressure}атм.'
+    elif acid == 'HF':
+        acid_sel = f'Произвести кислотную обработку пласта {",".join(CreatePZ.plast_work)}  в объеме  {acid_V}м3  ({acid} - {acid_pr} %) силами СК Крезол ' \
+                   f'в присутствии представителя заказчика с составлением акта, не превышая давления закачки не более Р={CreatePZ.max_admissible_pressure}атм.'
+
+    acid_list = [[None, None,
+     f'{acid_sel}'
+     f'ОБЕСПЕЧИТЬ НАЛИЧИЕ У СОСТАВА ВАХТЫ И СИЗ ПРИ КИСЛОТНОЙ ОБРАБОТКИ',
+     None, None, None, None, None, None, None,
+     'мастер КРС, УСРСиСТ', 8],
+    [None, None,
+     ''.join([f"Закачать кислоту в объеме V={round(volume_vn_nkt(dict_nkt), 1)}м3 (внутренний "
+              f"объем НКТ)" if acid_V > volume_vn_nkt(dict_nkt) else f"Закачать кислоту в "
+                                                                     f"объеме {round(acid_V, 1)}м3, "
+                                                                     f"довести кислоту тех жидкостью в объеме {round(volume_vn_nkt(dict_nkt) - acid_V, 1)}м3 "]),
+     None, None, None, None, None, None, None,
+     'мастер КРС', None],
+    [None, None,
+     f'посадить пакер на глубине {paker_depth}м',
+     None, None, None, None, None, None, None,
+     'мастер КРС', None],
+    [None, None,
+     ''.join(
+         [f'продавить  кислоту тех жидкостью в объеме {round(volume_vn_nkt(dict_nkt) + 0.5, 1)}м3 при давлении не '
+          f'более {CreatePZ.max_expected_pressure}атм. Увеличение давления согласовать'
+          f' с заказчиком' if acid_V < volume_vn_nkt(
+             dict_nkt) else f'продавить кислоту оставшейся кислотой в объеме {round(acid_V - volume_vn_nkt(dict_nkt), 1)}м3 и тех жидкостью '
+                            f'в объеме {round(volume_vn_nkt(dict_nkt) + 0.5, 1)}м3 при давлении не более {CreatePZ.max_expected_pressure}атм. '
+                            f'Увеличение давления согласовать с заказчиком']),
+     None, None, None, None, None, None, None,
+     'мастер КРС', None],
+    [None, None,
+     f'реагирование 2 часа.',
+     None, None, None, None, None, None, None,
+     'мастер КРС', 2],
+
+    [None, None,
+     f'Произвести срыв пакера с поэтапным увеличением нагрузки на 3-4т выше веса НКТ в течении 30мин и с '
+     f'выдержкой 1ч для возврата резиновых элементов в исходное положение. ',
+     None, None, None, None, None, None, None,
+     'мастер КРС', 0.7],
+    [None, None,
+     flushingDownhole(self, paker_depth, paker_khost, plast, paker_layout),
+     None, None, None, None, None, None, None,
+     'мастер КРС', 1.5]]
+    if CreatePZ.curator == 'ОР' and CreatePZ.if_None(CreatePZ.dict_pump['posle']) == 'отсут':
+        acid_list.insert(-2, [None, None,
          f'Посадить пакер на {paker_depth}м. Произвести насыщение скважины до стабилизации давления закачки не менее 5м3. Опробовать  '
-         f'пласты {CreatePZ.plast_work} на приемистость в трех режимах при Р={40, 50, 60}атм в присутствии представителя ЦДНГ. '
+         f'пласты {CreatePZ.plast_work} на приемистость в трех режимах при Р={pressure_mode(CreatePZ.expected_pick_up.values()[1])}атм в присутствии представителя ЦДНГ. '
          f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до '
          f'начала работ). В СЛУЧАЕ ПРИЕМИСТОСТИ НИЖЕ {CreatePZ.expected_pick_up.keys()[0]}м3/сут при давлении {CreatePZ.expected_pick_up.values()[1]}атм '
          f'ДАЛЬНЕЙШИЕ РАБОТЫ СОГЛАСОВАТЬ С ЗАКАЗЧИКОМ',
          None, None, None, None, None, None, None,
          'мастер КРС', 2.25])
-    return paker_list
+    return acid_list
+
+# Определение трех режимов давлений при определении приемистости
+def pressure_mode(mode):
+    from open_pz import CreatePZ
+    mode = round(mode / 10, 0) * 10
+    if mode > CreatePZ.max_admissible_pressure:
+        mode_str = f'{mode}, {mode-10}, {mode-20}'
+    else:
+        mode_str = f'{mode+10}, {mode}, {mode - 10}'
+    return mode_str
+
 
 # промывка скважины после кислотной обработки в зависимости от интервала перфорации и комповноки и текущего забоя
-def flushingDownhole(self, paker_depth, paker_khost):
+def flushingDownhole(self, paker_depth, paker_khost, plast, paker_layout):
     from open_pz import CreatePZ
     from krs import well_volume
-    if paker_depth + paker_khost >= CreatePZ.current_bottom and (paker_depth + paker_khost < CreatePZ.current_bottomCreatePZ.work_pervorations_approved == True):
+
+    if paker_layout == 2:
+        flushingDownhole_list = f'Только при наличии избыточного давления или когда при проведении ОПЗ получен технологический ""СТОП":' \
+                                f'произвести промывку скважину обратной промывкой ' \
+                                f'по круговой циркуляции  жидкостью уд.весом {CreatePZ.fluid_work} при расходе жидкости не ' \
+                                f'менее 6-8 л/сек в объеме не менее {round(well_volume(self, paker_depth) * 1.5, 1)}м3 ' \
+                                f'в присутствии представителя заказчика ДО ЧИСТОЙ ВОДЫ.'
+    elif paker_depth + paker_khost >= CreatePZ.current_bottom or (paker_depth + paker_khost < CreatePZ.current_bottom and CreatePZ.work_pervorations_approved == True):
         flushingDownhole_list = f'Допустить компоновку до глубины {CreatePZ.current_bottom}м. Промыть скважину обратной промывкой ' \
                                 f'по круговой циркуляции  жидкостью уд.весом {CreatePZ.fluid_work} при расходе жидкости не '\
                                 f'менее 6-8 л/сек в объеме не менее {round(well_volume(paker_depth + paker_khost)*1.5,1)}м3 '\
                                 f'в присутствии представителя заказчика ДО ЧИСТОЙ ВОДЫ.'
-    elif paker_depth + paker_khost < CreatePZ.current_bottom:
+    elif paker_depth + paker_khost < CreatePZ.current_bottom and CreatePZ.work_pervorations_approved == False:
         flushingDownhole_list = f'Допустить пакер до глубины {int(CreatePZ.perforation_roof-5)}м. (на 5м выше кровли интервала перфорации), ' \
                                 f'низ НКТ до глубины {CreatePZ.perforation_roof - 5 + paker_khost}м) ' \
                                 f'Промыть скважину обратной промывкой по круговой циркуляции  жидкостью уд.весом {CreatePZ.fluid_work} при расходе жидкости не ' \
                                 f'менее 6-8 л/сек в объеме не менее {round(well_volume(self, paker_depth + paker_khost) * 1.5, 1)}м3 ' \
                                 f'в присутствии представителя заказчика ДО ЧИСТОЙ ВОДЫ.'
-        return flushingDownhole_list
+
+
+    return flushingDownhole_list

@@ -227,14 +227,16 @@ class CreatePZ(MyWindow):
                             CreatePZ.column_wall_thickness = QInputDialog.getDouble(self, 'Толщина стенки',
                                                                                     'Введите толщины стенки ЭК', 7.7, 5,
                                                                                     15, 1)[0]
-                            print(CreatePZ.column_wall_thickness)
-                        print(CreatePZ.without_b(data_main_production_string[-1].split('-')[-1]))
+                        #     print(CreatePZ.column_wall_thickness)
+                        print(len(data_main_production_string[-1].split('(м)')), data_main_production_string[-1].split('(м)'))
 
                         if len(data_main_production_string[-1].split('-')) == 2:
-                            print(len(data_main_production_string[-1].split('-')))
+                            # print(len(data_main_production_string[-1].split('-')))
 
                             CreatePZ.shoe_column = CreatePZ.without_b(
                                 data_main_production_string[-1].split('-')[-1])
+                        elif len(data_main_production_string[-1].split('(м)')) == 2:
+                            CreatePZ.shoe_column = CreatePZ.without_b(data_main_production_string[-1])
 
                         else:
                             CreatePZ.shoe_column = QInputDialog.getInt(self, 'Башмак колонны: ', 'Башмак колонны: ',
@@ -583,56 +585,57 @@ class CreatePZ(MyWindow):
 
             # print(row, any([str((i)).lower() == 'проект' for i in row]), all([str(i).strip() == None for i in row]) == False)
             if any([str((i)).lower() == 'проект' for i in row]) == False and all(
-                    [str(i).strip() == None for i in row]) == False:
+                    [str(i).strip() == None for i in row]) == False and krs.is_number(row[2]) == True and krs.is_number(float(row[3])) == True:
 
-                CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('вертикаль', []).append(row[1])
+                CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('вертикаль', set()).add(row[1])
 
-                CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('интервал', []).append([row[2], row[3]])
+                CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('интервал', set()).add((float(row[2]),float(row[3])))
                 # print(f'отклю{row[5], CreatePZ.current_bottom, krovlya_perf}')
                 # print(f'{CreatePZ.current_bottom > krovlya_perf, row[5] == None}')
-                CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('вскрытие', []).append(row[4])
-                CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('отключение', []).append(row[5])
+                CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('вскрытие', set()).add(row[4])
+                CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('отключение', set()).add(row[5])
                 if ind > 5:
-                    CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('отв', []).append(row[6])
-                    CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('заряд', []).append(row[7])
-                    CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('удлинение', []).append(row[8])
-                    CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('давление', []).append(row[9])
-                    CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('замер', []).append(row[10])
+                    CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('отв', set()).add(row[6])
+                    CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('заряд', set()).add(row[7])
+                    CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('удлинение', set()).add(row[8])
+                    CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('давление', set()).add(row[9])
+                    CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('замер', set()).add(row[10])
 
-                elif CreatePZ.current_bottom > krovlya_perf and CreatePZ.if_None(row[5]) == 'отсут':  # Определение работающих интервалов перфораци
+                elif CreatePZ.current_bottom > krovlya_perf and CreatePZ.if_None(row[5]) == 'отсут' and \
+                        krs.is_number(row[2]) == True and krs.is_number(float(row[3])) == True:  # Определение работающих интервалов перфораци
                     # print(f'отклю{row[5], CreatePZ.current_bottom, row[2]}')
                     if CreatePZ.perforation_roof <= krovlya_perf:
                         CreatePZ.perforation_roof = krovlya_perf
                     if CreatePZ.perforation_sole <= float(row[3]):
                         CreatePZ.perforation_sole = float(row[3])
-                    CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('вертикаль', []).append(row[1])
+                    CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('вертикаль', set()).add(row[1])
 
-                    CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('интервал', []).append(
-                        [row[2], row[3]])
+                    CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('интервал', set()).add(
+                        (float(row[2]),float(row[3])))
 
-                    CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('вскрытие', []).append(row[4])
-                    CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('отключение', []).append(row[5])
+                    CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('вскрытие', set()).add(row[4])
+                    CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('отключение', set()).add(row[5])
                     if ind > 5:
-                        CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('отв', []).append(row[6])
-                        CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('заряд', []).append(row[7])
-                        CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('удлинение', []).append(row[8])
-                        CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('давление', []).append(row[9])
-                        CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('замер', []).append(row[10])
+                        CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('отв', set()).add(row[6])
+                        CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('заряд', set()).add(row[7])
+                        CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('удлинение', set()).add(row[8])
+                        CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('давление', set()).add(row[9])
+                        CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('замер', set()).add(row[10])
 
 
             elif any([str((i)).lower() == 'проект' for i in row]) == True and all(
-                    [str(i).strip() == None for i in row]) == False:  # Определениепроеткных интервалов перфорации
+                    [str(i).strip() == None for i in row]) == False and krs.is_number(row[2]) == True and krs.is_number(float(row[3])) == True:  # Определение проеткных интервалов перфорации
 
-                self.dict_perforation_project.setdefault(plast, {}).setdefault('вертикаль', []).append(row[1])
-                self.dict_perforation_project.setdefault(plast, {}).setdefault('интервал', []).append([row[2], row[3]])
-                self.dict_perforation_project.setdefault(plast, {}).setdefault('вскрытие', []).append(row[4])
-                self.dict_perforation_project.setdefault(plast, {}).setdefault('отключение', []).append(row[5])
+                self.dict_perforation_project.setdefault(plast, {}).setdefault('вертикаль', set()).add(row[1])
+                self.dict_perforation_project.setdefault(plast, {}).setdefault('интервал', set()).add((float(row[2]),float(row[3])))
+                self.dict_perforation_project.setdefault(plast, {}).setdefault('вскрытие', set()).add(row[4])
+                self.dict_perforation_project.setdefault(plast, {}).setdefault('отключение', set()).add(row[5])
                 if ind > 5:
-                    self.dict_perforation_project.setdefault(plast, {}).setdefault('отв', []).append(row[6])
-                    self.dict_perforation_project.setdefault(plast, {}).setdefault('заряд', []).append(row[7])
-                    self.dict_perforation_project.setdefault(plast, {}).setdefault('удлинение', []).append(row[8])
-                    self.dict_perforation_project.setdefault(plast, {}).setdefault('давление', []).append(row[9])
-                    self.dict_perforation_project.setdefault(plast, {}).setdefault('замер', []).append(row[10])
+                    self.dict_perforation_project.setdefault(plast, {}).setdefault('отв', set()).add(row[6])
+                    self.dict_perforation_project.setdefault(plast, {}).setdefault('заряд', set()).add(row[7])
+                    self.dict_perforation_project.setdefault(plast, {}).setdefault('удлинение', set()).add(row[8])
+                    self.dict_perforation_project.setdefault(plast, {}).setdefault('давление', set()).add(row[9])
+                    self.dict_perforation_project.setdefault(plast, {}).setdefault('замер', set()).add(row[10])
 
         CreatePZ.dict_perforation_project = self.dict_perforation_project
         print(f'проект {self.dict_perforation_project}')
@@ -646,11 +649,11 @@ class CreatePZ(MyWindow):
             CreatePZ.plast_work = list(CreatePZ.dict_work_pervorations.keys())
             CreatePZ.plast_all = list(CreatePZ.dict_perforation.keys())
             # print(CreatePZ.plast_all)
-            print(f' vf{CreatePZ.dict_perforation[CreatePZ.plast_all[0]]["интервал"][0][0]}')
+            # print(f' vf{CreatePZ.dict_perforation[CreatePZ.plast_all[0]]["интервал"][0][0]}')
             CreatePZ.pervoration_min = min(
-                [min(CreatePZ.dict_perforation[i]['интервал'][0]) for i in CreatePZ.plast_all])
+                [min(CreatePZ.dict_perforation[i]['интервал']) for i in CreatePZ.plast_all])
             CreatePZ.pervoration_max = max(
-                [max(CreatePZ.dict_perforation[i]['интервал'][0]) for i in CreatePZ.plast_all])
+                [max(CreatePZ.dict_perforation[i]['интервал']) for i in CreatePZ.plast_all])
             print(f'мин {CreatePZ.pervoration_min}, мак {CreatePZ.pervoration_max}')
         except:
             acid_true_quest = QMessageBox.question(self, 'Программа',
@@ -666,9 +669,9 @@ class CreatePZ(MyWindow):
                 CreatePZ.plast_work = list(CreatePZ.dict_work_pervorations.keys())
                 CreatePZ.plast_all = list(CreatePZ.dict_perforation.keys())
                 CreatePZ.pervoration_min = min(
-                    [min(CreatePZ.dict_perforation[i]['интервал'][0]) for i in CreatePZ.plast_all])
+                    [min(CreatePZ.dict_perforation[i]['интервал']) for i in CreatePZ.plast_all])
                 CreatePZ.pervoration_max = max(
-                    [max(CreatePZ.dict_perforation[i]['интервал'][1]) for i in CreatePZ.plast_work])
+                    [max(CreatePZ.dict_perforation[i]['интервал']) for i in CreatePZ.plast_work])
                 print(f'мин {CreatePZ.pervoration_min}, мак {CreatePZ.pervoration_max}')
 
         for j in range(CreatePZ.data_x_min, CreatePZ.data_x_max):  # Ожидаемые показатели после ремонта
@@ -752,10 +755,10 @@ class CreatePZ(MyWindow):
         ws.merge_cells(start_column=2, start_row=CreatePZ.ins_ind + 1, end_column=12, end_row=CreatePZ.ins_ind + 1)
         CreatePZ.ins_ind += len(CreatePZ.row_expected)
         # print(f' индекс до работ {CreatePZ.ins_ind}')
-        if work_plan == 'gnkt_opz':
+        # if work_plan == 'gnkt_opz':
 
             # CreatePZ.gnkt_work1 = gnkt_work(self)
-            self.ins_ind_border = CreatePZ.ins_ind
+        self.ins_ind_border = CreatePZ.ins_ind
             # CreatePZ.count_row_height(ws, gnkt_work1, CreatePZ.ins_ind)
             # CreatePZ.itog_ind_min = CreatePZ.ins_ind
             # CreatePZ.ins_ind += len(gnkt_work1)
@@ -763,7 +766,7 @@ class CreatePZ(MyWindow):
             # CreatePZ.addItog(self, ws, CreatePZ.ins_ind, CreatePZ.itog_ind_min)
 
 
-        elif work_plan == 'krs':
+        # elif work_plan == 'krs':
             # leakiness_quest = QMessageBox.question(self, 'нарушение колонны', 'Есть ли нарушение по скважине?')
             # if leakiness_quest == QMessageBox.StandardButton.Yes:
             #     CreatePZ.column_leakiness = True
@@ -773,20 +776,20 @@ class CreatePZ(MyWindow):
             #     CreatePZ.column_leakiness = False
             # print(f'нарушения {CreatePZ.leakiness}')
 
-            CreatePZ.gnkt_work1 = krs.work_krs(self)
+            # CreatePZ.gnkt_work1 = krs.work_krs(self)
 
             # CreatePZ.count_row_height(ws, krs_work1, CreatePZ.ins_ind)
             # CreatePZ.itog_ind_min = CreatePZ.ins_ind
             # CreatePZ.ins_ind += len(krs_work1)
-            self.ins_ind_border = CreatePZ.ins_ind
+            # self.ins_ind_border = CreatePZ.ins_ind
 
             # print('План работ на КРС')
-        else:
-            print('План другого')
+        # else:
+        #     print('План другого')
         # print(f' индекс до итогов {CreatePZ.ins_ind}')
         # wb.save(f'a.xlsx')
-        CreatePZ.itog_ind_max = CreatePZ.ins_ind
-        CreatePZ.ins_ind += 1
+        # CreatePZ.itog_ind_max = CreatePZ.ins_ind
+        # CreatePZ.ins_ind += 1
 
 
         if 2 in CreatePZ.cat_H2S_list or 1 in CreatePZ.cat_H2S_list:
@@ -919,8 +922,8 @@ class CreatePZ(MyWindow):
 
             return float(b)
 
-    def count_row_height(ws, work_list, ins_ind):
-
+    def count_row_height(ws, work_list, ins_ind, merged_cells_dict):
+        from main import MyWindow
 
         text_width_dict = {35: (0, 100), 50: (101, 200), 70: (201, 300), 90: (301, 400), 110: (401, 500),
                            130: (501, 600), 150: (601, 700), 170: (701, 800), 190: (801, 900),  210: (901, 1500)}
@@ -928,7 +931,6 @@ class CreatePZ(MyWindow):
         for i in range(ins_ind + 1, len(work_list) + ins_ind + 1):  # Добавлением работ
             # print(f'кол-ство строк рабочих{ins_ind, len(work_list), i - ins_ind, i}')
             for j in range(1, 13):
-
                 ws.cell(row=i, column=j).value = work_list[i - ins_ind - 1][j - 1]
                 if j != 1:
                     ws.cell(row=i, column=j).border = CreatePZ.thin_border
@@ -936,14 +938,10 @@ class CreatePZ(MyWindow):
                     ws.cell(row=i, column=j).font = Font(name='Arial', size=11, bold=False)
                 else:
                     ws.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=False)
-
-            # if i == ins_ind + 1:
-            #     ws.merge_cells(start_row=i, start_column=2, end_row=i, end_column=12)
-            #     ws.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='center',
-            #                                                    vertical='center')
             #
-            # else:
-            ws.merge_cells(start_row=i, start_column=3, end_row=i, end_column=10)
+            for row, col in merged_cells_dict.items():
+                if len(col)>3:
+                    ws.merge_cells(start_row=row, start_column=3, end_row=row, end_column=10)
             ws.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='center',
                                                            vertical='center')
             ws.cell(row=i, column=11).alignment = Alignment(wrap_text=True, horizontal='center',

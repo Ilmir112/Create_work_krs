@@ -4,13 +4,17 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu, QMenuBar, QAction,
     QVBoxLayout, QWidget, QLineEdit, QMessageBox
 from PyQt5 import QtCore, QtWidgets, QtGui
 from openpyxl.workbook import Workbook
+from PyQt5.QtCore import Qt
 
+import block_name
+import cdng
 import krs
 import work_py.opressovka
 
 
 
 class MyWindow(QMainWindow):
+
     def __init__(self, *args, **kwargs):
         super().__init__()
         self.initUI()
@@ -22,12 +26,14 @@ class MyWindow(QMainWindow):
         self.dict_work_pervorations = {}
         self.ins_ind_border = None
         self.work_plan = 0
+        self.merged_cells_dict = {}
     def initUI(self):
         from work_py.mouse import TableWidget
         self.setWindowTitle("Main Window")
         self.setGeometry(500, 500, 600, 600)
 
         self.table_widget = TableWidget()
+        # self.table_widget.setEditTriggers(Qt.EditTrigger.AllEditTriggers)
         self.table_widget.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.table_widget.customContextMenuRequested.connect(self.openContextMenu)
         self.setCentralWidget(self.table_widget)
@@ -101,17 +107,11 @@ class MyWindow(QMainWindow):
 
     def save_to_excel(self, wb, ws):
         from open_pz import CreatePZ
+        from krs import is_number
         # print(f'граница {self.ins_ind_border}')
         ins_ind =  self.ins_ind_border
 
-        for row in range(self.table_widget.rowCount()):
-            for column in range(self.table_widget.columnCount()):
-                item = self.table_widget.item(row, column)
-                if item is not None:
-                    if item.text() == 'ИТОГО:':
-                        ins_int_border_bottom = row
-
-        # ws.insert_rows(self.ins_ind_border, self.table_widget.rowCount()-self.ins_ind_border)
+        merged_cells = []  # Список индексов объединения ячеек
 
         work_list = []
         for row in range(self.table_widget.rowCount()):
@@ -120,29 +120,39 @@ class MyWindow(QMainWindow):
                 self.ins_ind_border += 1
                 # ws.merge_cells(start_row=row, start_column=2, end_row=row, end_column=12)
                 for column in range(self.table_widget.columnCount()):
+                    if self.table_widget.rowSpan(row, column) > 1 or self.table_widget.columnSpan(row, column) > 1:
+                        merged_cells.append((row, column))
                     item = self.table_widget.item(row, column)
                     if item is not None:
                         row_lst.append(item.text())
 
                     #     ws.cell(row=row + 1, column=column + 1).value = item.text()
                 work_list.append(row_lst)
+        ins_ind += len(work_list)
+        merged_cells_dict = {}
+        for row in merged_cells:
+            merged_cells_dict.setdefault(row[0], []).append(row[1])
 
-        # print(ins_ind)
-        # print(self.table_widget.rowCount())
 
+        print(ins_ind)
         for i in range(2, len(work_list)):  # нумерация работ
-
             work_list[i][1] = i - 1
-            if self.is_number(work_list[i][11]) == True:
-                print(work_list[i])
-
+            if krs.is_number(work_list[i][11]) == True:
                 CreatePZ.normOfTime += float(work_list[i][11])
 
-        print(f' норма {CreatePZ.normOfTime}')
 
-        CreatePZ.count_row_height(ws, work_list, ins_ind)
+        itog = cdng.itog_1(self)
+        self.populate_row(ins_ind, itog)
+        ins_ind += len(itog)
+
+        curator_sel = block_name.curator_sel(self, CreatePZ.curator, CreatePZ.region)
+        curator_ved_sel = block_name.curator_sel(self, CreatePZ.curator, CreatePZ.region)
+        podp_down = block_name.pop_down(self, CreatePZ.region, curator_sel)
+        self.populate_row(ins_ind, podp_down)
+
+        CreatePZ.count_row_height(ws, work_list, ins_ind, merged_cells_dict)
         itog_ind_min = CreatePZ.itog_ind_min + len(work_list)
-        CreatePZ.addItog(self, ws, self.table_widget.rowCount()+1, ins_ind + itog_ind_min)
+        # CreatePZ.addItog(self, ws, self.table_widget.rowCount()+1, ins_ind + itog_ind_min)
 
         ws.print_area = f'B1:L{self.table_widget.rowCount()+45}'
         # ws.page_setup.fitToPage = True
@@ -153,12 +163,8 @@ class MyWindow(QMainWindow):
 
         print("Table data saved to Excel")
 
-    def is_number(self, str):
-        try:
-            float(str)
-            return True
-        except ValueError:
-            return False
+
+
     def openContextMenu(self, position):
         from open_pz import CreatePZ
         from work_py.template_work import template_ek_without_skm, template_ek
@@ -175,6 +181,10 @@ class MyWindow(QMainWindow):
         geophysical_action = QAction("Геофизические исследования", self)
         geophysical.addAction(geophysical_action)
         geophysical_action.triggered.connect(self.GeophysicalNewWindow)
+
+        swibbing_action = QAction("Свабирование со свабом", self)
+        geophysical.addAction(swibbing_action)
+        swibbing_action.triggered.connect(self.swibbing_with_paker)
 
 
         emptyString_action = QAction("добавить пустую строку", self)
@@ -209,12 +219,15 @@ class MyWindow(QMainWindow):
         template_menu.addAction(template_without_skm)
         template_without_skm.triggered.connect(self.template_without_skm)
 
-
         acid_menu = action_menu.addMenu('Кислотная обработка')
 
         acid_action_1paker = QAction("на одном пакере", self)
         acid_menu.addAction(acid_action_1paker)
         acid_action_1paker.triggered.connect(self.acid_action_1paker)
+
+        acid_action_2paker = QAction("на двух пакерах", self)
+        acid_menu.addAction(acid_action_2paker)
+        acid_action_2paker.triggered.connect(self.acid_action_2paker)
 
         gno_menu = action_menu.addMenu('Спуск фондового оборудования')
         gno_action = QAction('пакер')
@@ -251,6 +264,13 @@ class MyWindow(QMainWindow):
         ryber_work_list = [[None, None, None, None, None, None, None, None, None, None,None, None]]
         self.populate_row(self.ins_ind, ryber_work_list)
 
+    def swibbing_with_paker(self):
+        from work_py.swabbing import swabbing_with_paker
+
+        print('Вставился Сваб с пакером')
+        swab_work_list = swabbing_with_paker(self)
+        self.populate_row(self.ins_ind, swab_work_list)
+
     def ryberAdd(self):
         from work_py.raiding import raidingColumn
 
@@ -276,6 +296,16 @@ class MyWindow(QMainWindow):
         print('Вставился кислотная обработка на одном пакере ')
         acid_work_list = acid_work(self)
         self.populate_row(self.ins_ind, acid_work_list)
+
+    def acid_action_2paker(self):
+        from work_py.acids import acid_work
+        print('Вставился кислотная обработка на одном пакере ')
+        acid_work_list = acid_work(self)
+        self.populate_row(self.ins_ind, acid_work_list)
+
+
+
+
 
     def pressureTest(self):
         from work_py.opressovka import paker_list
@@ -330,7 +360,7 @@ class MyWindow(QMainWindow):
                             if value[0] <= len(text) <= value[1]:
                                 text_width = key
                                 self.table_widget.setRowHeight(row, int(text_width))
-
+        self.table_widget.setEditTriggers(QtWidgets.QAbstractItemView.DoubleClicked)
         # self.table_widget.resizeColumnsToContents()
         # self.table_widget.resizeRowsToContents()
 
@@ -368,6 +398,7 @@ class MyWindow(QMainWindow):
 
     def copy_pz(self, sheet):
         from gnkt_opz import gnkt_work
+        from krs import work_krs
         rows = sheet.max_row
         merged_cells = sheet.merged_cells
 
@@ -392,9 +423,9 @@ class MyWindow(QMainWindow):
                             self.table_widget.setSpan(row - 1, col - 1,
                                                       merged_cell.max_row - merged_cell.min_row + 1,
                                                       merged_cell.max_col - merged_cell.min_col + 1)
-        print(f' njj {self.work_plan}')
+        # print(f' njj {self.work_plan}')
         if self.work_plan == 'krs':
-            self.populate_row(self.table_widget.rowCount(), krs.work_krs(self))
+            self.populate_row(self.table_widget.rowCount(), work_krs(self))
         # elif self.work_plan == 'gnkt-opz':
         #     from open_pz import CreatePZ
         #     # print(CreatePZ.gnkt_work1)

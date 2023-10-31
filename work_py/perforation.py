@@ -151,6 +151,8 @@ class PervorationWindow(MyWindow):
                     self.tableWidget.setItem(rows, 5, QTableWidgetItem(plast))
                     self.tableWidget.setItem(rows, 6, QTableWidgetItem(' '))
         self.tableWidget.setSortingEnabled(True)
+
+
     def charge(self, pvr):
         from open_pz import CreatePZ
         charge_diam_dict = {73: (0, 110), 89: (111, 135), 102: (136, 160), 114: (160, 250)}
@@ -221,7 +223,7 @@ class PervorationWindow(MyWindow):
                        [None, None, "Кровля перфорации", "-", "Подошва Перфорации", "Тип заряда", "отв на 1 п.м.", "Количество отверстий",
                       "Вскрываемые пласты", "Дополнительные данные", None, None, None]
                        ]
-
+        print(f'до {CreatePZ.dict_work_pervorations}')
         for row in range(rows):
             perf_list = [None, None]
             for col in range(0, 9):
@@ -230,15 +232,25 @@ class PervorationWindow(MyWindow):
                     value = item.text()
                     if col == 1:
                         perf_list.append("-")
-                        perf_list.append(value)
+                        perf_list.append(float(value))
+                    elif col == 0:
+                        perf_list.append(float(value))
+                    elif col == 4:
+                        perf_list.append(int(value))
                     else:
                         perf_list.append(value)
 
             perf_list.insert(7, (round((float(perf_list[4]) - float(perf_list[2])) * int(perf_list[6]), 1)))
             perf_list.extend([None, None])
+
+            for i in CreatePZ.plast_work:
+                if CreatePZ.dict_work_pervorations[i]['интервал'] != (perf_list[1], perf_list[3]):
+                    CreatePZ.dict_work_pervorations.setdefault(perf_list[8], {}).setdefault('интервал', set()).add((perf_list[2], perf_list[4]))
+            # print(perf_list)
             perforation.append(perf_list)
 
 
+        # print(f'после {CreatePZ.dict_work_pervorations}')
 
 
 
@@ -265,48 +277,60 @@ class PervorationWindow(MyWindow):
             for i in range(len(pipe_perforation)):
                 perforation.insert(i + 1, pipe_perforation[i])
 
+
+
         # print(f'принято {self.dict_perforation_project}')
         text_width_dict = {20: (0, 100), 40: (101, 200), 60: (201, 300), 80: (301, 400), 100: (401, 500),
                            120: (501, 600), 140: (601, 700)}
         # print(perf_list)
-        for i, row_data in enumerate(perforation):
-            row = self.ins_ind + i
-            self.table_widget.insertRow(row)
-            lst = [1, 0, 2, len(perforation)-1]
-            if float(CreatePZ.max_angle) >= 50:
-                lst.extend([3, 4])
-            if i in lst: # Объединение ячеек по вертикале в столбце "отвественные и норма"
-                self.table_widget.setSpan(i + self.ins_ind, 2, 1, 8)
-            for column, data in enumerate(row_data):
+        row_list = len(perforation)
+        if row_list < 6:
+            msg = QMessageBox.information(self, 'Внимание', 'Не добавлены интервалы перфорации!!!')
+        else:
+            for i, row_data in enumerate(perforation):
+                row = self.ins_ind + i
+                self.table_widget.insertRow(row)
+                lst = [0, 1, 2, len(perforation)-1]
+                if float(CreatePZ.max_angle) >= 50:
+                    lst.extend([3, 4])
+                if i in lst: # Объединение ячеек по вертикале в столбце "отвественные и норма"
+                    self.table_widget.setSpan(i + self.ins_ind, 2, 1, 8)
+                for column, data in enumerate(row_data):
 
-                widget = QtWidgets.QLabel(str())
-                if column != 25:
-                    widget.setStyleSheet("""QLabel { 
-                                                        border: 1px solid black;
-                                                        font-size: 12px; 
-                                                        font-family: Arial;
-                                                    }
-                                                    """)
-                    self.table_widget.setCellWidget(row, column, widget)
-                self.table_widget.setItem(row, column, QtWidgets.QTableWidgetItem(str(data)))
+                    widget = QtWidgets.QLabel(str())
+                    if column != 25:
+                        widget.setStyleSheet("""QLabel { 
+                                                            border: 1px solid black;
+                                                            font-size: 12px; 
+                                                            font-family: Arial;
+                                                        }
+                                                        """)
+                        self.table_widget.setCellWidget(row, column, widget)
+                    self.table_widget.setItem(row, column, QtWidgets.QTableWidgetItem(str(data)))
 
-                if column == 2 or column == 10:
-                    if data != None:
-                        text = data
-                        for key, value in text_width_dict.items():
-                            if value[0] <= len(text) <= value[1]:
-                                text_width = key
-                                self.table_widget.setRowHeight(row, int(text_width))
-        self.table_widget.setSpan(1 + self.ins_ind, 10, len(perforation) - 2, 1)
-        self.table_widget.setSpan(1 + self.ins_ind, 11, len(perforation) - 2, 1)
+                    if column == 2 or column == 10:
+                        if data != None:
+                            text = data
+                            for key, value in text_width_dict.items():
+                                if value[0] <= len(str(text)) <= value[1]:
+                                    text_width = key
+                                    self.table_widget.setRowHeight(row, int(text_width))
+            self.table_widget.setSpan(1 + self.ins_ind, 10, len(perforation) - 2, 1)
+            self.table_widget.setSpan(1 + self.ins_ind, 11, len(perforation) - 2, 1)
+
+            CreatePZ.plast_work = list(CreatePZ.dict_work_pervorations.keys())
+            CreatePZ.plast_all = list(CreatePZ.dict_perforation.keys())
+
+            CreatePZ.perforation_roof = min([min(CreatePZ.dict_work_pervorations[i]['интервал']) for i in CreatePZ.plast_work])
+
+            CreatePZ.perforation_sole = max([max(CreatePZ.dict_work_pervorations[i]['интервал']) for i in CreatePZ.plast_work])
+            print(f'мин {CreatePZ.perforation_roof}, мак {CreatePZ.perforation_sole}')
+
+            self.table_widget.setRowHeight(self.ins_ind, 60)
+            self.table_widget.setRowHeight(self.ins_ind + 1, 60)
 
 
-
-        self.table_widget.setRowHeight(self.ins_ind, 60)
-        self.table_widget.setRowHeight(self.ins_ind + 1, 60)
-
-
-        self.close()
+            self.close()
 
 
 

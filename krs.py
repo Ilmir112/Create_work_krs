@@ -906,7 +906,7 @@ def work_krs(self):
 
 
     if ('ЭЦН' in CreatePZ.dict_pump['do'].upper() or 'ВНН' in CreatePZ.dict_pump['do'].upper()) and (
-            CreatePZ.dict_sucker_rod != None and str(CreatePZ.paker_do['do']) != '0'):
+            CreatePZ.dict_sucker_rod != None and CreatePZ.if_None(CreatePZ.paker_do['do']) != 'отсут'):
 
         lift_select = lift_ord
         print(f'Подьем орд')
@@ -915,30 +915,30 @@ def work_krs(self):
         lift_select = lift_ecn
         print('Подьем ЭЦН')
     elif ('ЭЦН' in CreatePZ.dict_pump['do'].upper() or 'ВНН' in CreatePZ.dict_pump['do'].upper()) and (
-            str(CreatePZ.paker_do['do']) != '0'):
+            CreatePZ.if_None(CreatePZ.paker_do['do']) != 'отсут'):
         lift_select = lift_ecn_with_paker
         print('Подьем ЭЦН с пакером ')
 
-    elif 'НВ' in CreatePZ.dict_pump['do'].upper() and str(CreatePZ.paker_do['do']) == '0':
+    elif 'НВ' in CreatePZ.dict_pump['do'].upper() and CreatePZ.if_None(CreatePZ.paker_do['do']) == 'отсут':
         lift_select = lift_pump_nv
         print('Подьем НВ')
-    elif 'НВ' in CreatePZ.dict_pump['do'].upper() and str(CreatePZ.paker_do['do']) != '0':
+    elif 'НВ' in CreatePZ.dict_pump['do'].upper() and CreatePZ.if_None(CreatePZ.paker_do['do']) != 'отсут':
         lift_select = lift_pump_nv_with_paker
         print('Подьем НВ с пакером ')
-    elif 'НН' in CreatePZ.dict_pump['do'].upper() and str(CreatePZ.paker_do['do']) == '0':
+    elif 'НН' in CreatePZ.dict_pump['do'].upper() and CreatePZ.if_None(CreatePZ.paker_do['do']) == 'отсут':
         lift_select = lift_pump_nn
         print('Подьем НН')
-    elif 'НН' in CreatePZ.dict_pump['do'].upper() and str(CreatePZ.paker_do['do']) != '0':
+    elif 'НН' in CreatePZ.dict_pump['do'].upper() and CreatePZ.if_None(CreatePZ.paker_do['do']) != 'отсут':
         lift_select = lift_pump_nn_with_paker
         print('Подьем НН с пакером ')
 
-    elif str(CreatePZ.dict_pump['do']) == '0' and str(CreatePZ.paker_do['do']) == '0':
+    elif str(CreatePZ.dict_pump['do']) == '0' and CreatePZ.if_None(CreatePZ.paker_do['do']) == 'отсут':
         lift_select = lift_voronka
         print('Подьем  воронки')
-    elif str(CreatePZ.dict_pump['do']) == '0' and str(CreatePZ.paker_do['do']) != '0':
+    elif str(CreatePZ.dict_pump['do']) == '0' and CreatePZ.if_None(CreatePZ.paker_do['do']) != 'отсут':
         lift_select = lift_paker
         print('Подьем пакера')
-    elif 89 in CreatePZ.dict_nkt.keys() and 48 in CreatePZ.dict_nkt.keys() and str(CreatePZ.paker_do['do']) != '0':
+    elif 89 in CreatePZ.dict_nkt.keys() and 48 in CreatePZ.dict_nkt.keys() and CreatePZ.if_None(CreatePZ.paker_do['do']) != 'отсут':
         lift_select = lift_orz
         print('Подьем ОРЗ')
     else:
@@ -1162,3 +1162,10 @@ def get_leakiness(self):
             return leakiness
 
     return leakiness
+
+def is_number(num):
+    try:
+        float(num)
+        return True
+    except ValueError or TypeError:
+        return False
