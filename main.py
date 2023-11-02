@@ -223,6 +223,10 @@ class MyWindow(QMainWindow):
         gno_menu.addAction(gno_action)
         gno_action.triggered.connect(self.gno_bottom)
 
+        nv_action = QAction('НВ')
+        gno_menu.addAction(nv_action)
+        nv_action.triggered.connect(self.nv_bottom)
+
 
         context_menu.exec_(self.mapToGlobal(position))
 
@@ -280,15 +284,28 @@ class MyWindow(QMainWindow):
         gno_work_list = gno_down(self)
         self.populate_row(self.ins_ind, gno_work_list)
 
+    def nv_bottom(self):
+        from work_py.descent_gno import descentGNO
+
+        print('Вставился ГНО')
+        gno_work_list = descentGNO(self)
+        self.populate_row(self.ins_ind, gno_work_list)
+
     def acid_action_1paker(self):
         from work_py.acids_work import acid_work
+        from open_pz import CreatePZ
+
+        CreatePZ.paker_layout = 1
         print('Вставился кислотная обработка на одном пакере ')
         acid_work_list = acid_work(self)
         self.populate_row(self.ins_ind, acid_work_list)
 
     def acid_action_2paker(self):
         from work_py.acids import acid_work
-        print('Вставился кислотная обработка на одном пакере ')
+        from open_pz import CreatePZ
+
+        CreatePZ.paker_layout = 2
+        print('Вставился кислотная обработка на двух пакере ')
         acid_work_list = acid_work(self)
         self.populate_row(self.ins_ind, acid_work_list)
 

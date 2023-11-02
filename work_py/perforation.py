@@ -219,9 +219,9 @@ class PervorationWindow(MyWindow):
                          None, None, None, None, None, None, None,
                           'Мастер КРС, подрядчик по ГИС', 15,  None, None],
                        [None, None, ''.join(["ГИС (Перфорация на кабеле ЗАДАЧА 2.9.1)" if float(CreatePZ.max_angle) <= 50 else "ГИС ( Трубная Перфорация ЗАДАЧА 2.9.2)"]), None, None, None, None,
-                        None,None, None, None, None, None],
+                        None,None, None, None, 'подрядчик по ГИС', None],
                        [None, None, "Кровля", "-", "Подошва", "Тип заряда", "отв на 1 п.м.", "Кол-во отв",
-                      "пласт", "Доп.данные", None, None, None]
+                      "пласт", "Доп.данные", 'подрядчик по ГИС', None, None]
                        ]
         print(f'до {CreatePZ.dict_work_pervorations}')
         for row in range(rows):
@@ -308,13 +308,13 @@ class PervorationWindow(MyWindow):
                         self.table_widget.setCellWidget(row, column, widget)
                     self.table_widget.setItem(row, column, QtWidgets.QTableWidgetItem(str(data)))
 
-                    if column == 2 or column == 10:
-                        if data != None:
-                            text = data
-                            for key, value in text_width_dict.items():
-                                if value[0] <= len(str(text)) <= value[1]:
-                                    text_width = key
-                                    self.table_widget.setRowHeight(row, int(text_width))
+                    # if column == 2 or column == 10 or column == 11:
+                    if data != None:
+                        text = data
+                        for key, value in text_width_dict.items():
+                            if value[0] <= len(str(text)) <= value[1]:
+                                text_width = key
+                                self.table_widget.setRowHeight(row, int(text_width))
 
             self.table_widget.setSpan(1 + self.ins_ind, 10, len(perforation) - 2, 1)
             self.table_widget.setSpan(1 + self.ins_ind, 11, len(perforation) - 2, 1)

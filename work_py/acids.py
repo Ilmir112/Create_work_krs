@@ -5,7 +5,7 @@ def acid_work(self):
     from work_py.opressovka import paker_diametr_select
     from open_pz import CreatePZ
 
-    paker_layout = 1
+
 
 
     paker_depth_bottom, ok = QInputDialog.getInt(None, 'опрессовка ЭК',
@@ -41,6 +41,8 @@ def acid_work(self):
         dict_nkt = {73: paker_depth_bottom}
     elif nkt_diam == 60:
         dict_nkt = {60: paker_depth_bottom}
+
+
 
     paker_list = [
         [None, None,
@@ -85,7 +87,7 @@ def acid_work(self):
         ]
 
     n = 0
-    for row in acid_work_list(self, paker_depth_bottom, paker_khost, dict_nkt, paker_layout):
+    for row in acid_work_list(self, paker_depth_bottom, paker_khost, dict_nkt, CreatePZ.paker_layout):
         paker_list.append(row)
         n += 1
 
@@ -115,7 +117,7 @@ def reply_acid(self, difference_paker,  paker_khost, dict_nkt, paker_select, nkt
         acid_true_quest_list.append([None, None, f'Приподнять пакера на глубине {paker_depth_bottom}/{paker_depth_bottom-difference_paker}м', None, None, None, None, None, None, None,
                            'мастер КРС', None])
 
-        for row in acid_work_list(self, paker_depth_bottom, paker_khost, dict_nkt):
+        for row in acid_work_list(self,  paker_depth_bottom, paker_khost, dict_nkt, CreatePZ.paker_layout):
             acid_true_quest_list.append(row)
 
         # print(reply_acid(self, difference_paker, paker_khost, dict_nkt, paker_select, nkt_diam, paker_depth_bottom))

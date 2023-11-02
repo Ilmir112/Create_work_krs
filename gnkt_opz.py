@@ -53,8 +53,8 @@ def gnkt_work(self):
            f'Заказчика с составлением акта, не превышая давления закачки не более Р={CreatePZ.max_admissible_pressure}атм.'
     elif acid == 'HF':
         acid_sel = f'Произвести  солянокислотную обработку пласта {" ".join(CreatePZ.plast_work)}  в объеме  {acid_V}м3  ({acid} - {acid_pr} %) силами Крезол '\
-           f'НС с протяжкой БДТ вдоль интервалов перфорации {CreatePZ.pervoration_min}-'\
-           f'{CreatePZ.pervoration_max}м (снизу вверх) в присутствии представителя '\
+           f'НС с протяжкой БДТ вдоль интервалов перфорации {CreatePZ.perforation_roof}-'\
+           f'{CreatePZ.perforation_sole}м (снизу вверх) в присутствии представителя '\
            f'Заказчика с составлением акта, не превышая давления закачки не более Р={CreatePZ.max_admissible_pressure}атм.'
     paker_opr = [None, 5, f'Опрессовать пакер на {CreatePZ.max_admissible_pressure}атм с выдержкой 30 мин с оформлением соответствующего акта в присутствии '\
     f'представителя представителя ЦДНГ',
@@ -163,8 +163,8 @@ def gnkt_work(self):
                f'ИНТЕНСИВНУЮ ПРОМЫВКУ ОСЛОЖНЕННОГО УЧАСТКА СКВАЖИНЫ ',
         None, None, None, None, None, None, None,
             'Мастер ГНКТ, состав бригады, представитель Заказчика', 0.93],
-    [None, 23, f'Произвести гидросвабирование пласта в интервале {pervoration_min}-'
-               f'{pervoration_max}м (закрыть затруб, произвести задавку в пласт'
+    [None, 23, f'Произвести гидросвабирование пласта в интервале {CreatePZ.perforation_roof}-'
+               f'{CreatePZ.perforation_sole}м (закрыть затруб, произвести задавку в пласт'
                f'жидкости при не более Рзак={CreatePZ.max_admissible_pressure}атм при установленном герметичном пакере. '
                f'Операции по задавке и изливу произвести 3-4 раза в зависимости от приёмистости). ',
         None, None, None, None, None, None, None,

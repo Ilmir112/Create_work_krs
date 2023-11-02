@@ -28,6 +28,7 @@ class CreatePZ(MyWindow):
     column_passability = False
     column_additional_passability = False
     template_depth = 0
+    b_plan = 0
     column_leakiness = False
     dict_perforation = {}
     dict_perforation_project = {}
@@ -35,6 +36,7 @@ class CreatePZ(MyWindow):
     pervoration_max = 0
     itog_ind_min = 0
     gaz_f_pr = []
+    paker_layout = 0
     paker_diam_dict = {
         82: (88, 92),
         88: (92.1, 97),
@@ -217,10 +219,12 @@ class CreatePZ(MyWindow):
                     if len(data_main_production_string) == 3:
                         try:
                             CreatePZ.column_diametr = float(data_main_production_string[0])
+                            print('хкрня')
                         except:
                             CreatePZ.column_diametr = QInputDialog.getInt(self, 'диаметр основной колонны',
                                                                           'Введите диаметр основной колонны', 146, 80,
-                                                                          276)
+                                                                          276)[0]
+                            print(f'диаметр ЭК {CreatePZ.column_diametr}')
                         try:
                             CreatePZ.column_wall_thickness = float(data_main_production_string[1][1:])
                         except:
@@ -243,12 +247,12 @@ class CreatePZ(MyWindow):
                                                                        1000, 20, 4000, 1)[0]
                     else:
                         CreatePZ.column_diametr = QInputDialog.getInt(self, 'диаметр основной колонны',
-                                                                      'Введите диаметр основной колонны', 146, 80, 276)
+                                                                      'Введите диаметр основной колонны', 146, 80, 276)[0]
                         CreatePZ.column_wall_thickness = QInputDialog.getDouble(self, 'Толщина стенки',
                                                                                 'Введите толщины стенки ЭК', 7.7, 5,
-                                                                                15, 1)
+                                                                                15, 1)[0]
                         CreatePZ.shoe_column = QInputDialog.getInt(self, 'Башмак колонны: ', 'Башмак колонны: ',
-                                                                   1000, 20, 4000, 1)
+                                                                   1000, 20, 4000, 1)[0]
 
 
                 elif '9. Максимальный зенитный угол' == value:
@@ -270,10 +274,10 @@ class CreatePZ(MyWindow):
                         CreatePZ.max_h_angle, ok = QInputDialog.getint(self, 'Глубина максимального угла',
                                                                        'Введите глубину максимального зетного угла: ',
                                                                        500, 1, 4000)
-                elif 'цех' == value and 'назначение ' in row:
+                elif 'цех' == value:
                     cdng = row[col + 1]
                     CreatePZ.cdng = cdng
-
+                    print(f' ЦДНГ {CreatePZ.cdng}')
                 elif 'плотн.воды' == value:
                     if CreatePZ.curator == 'ОР':
                         CreatePZ.water_cut = 100  # Обводненность скважины
@@ -321,7 +325,7 @@ class CreatePZ(MyWindow):
                             CreatePZ.column_additional = True
                             print(f' в скважине дополнительная колонны {CreatePZ.data_column_additional}')
 
-                    print(CreatePZ.column_additional)
+                    # print(CreatePZ.column_additional)
                     if CreatePZ.column_additional == True:
                         try:
                             CreatePZ.head_column_additional = float(CreatePZ.data_column_additional[0])
@@ -452,6 +456,7 @@ class CreatePZ(MyWindow):
         print(f' насоса {CreatePZ.dict_pump}')
         print(f'пакер {CreatePZ.paker_do}')
         print(f'глубина пакер {CreatePZ.H_F_paker_do}')
+        print(f' диам колонны {CreatePZ.column_diametr}')
         try:
             if CreatePZ.column_additional == False and CreatePZ.dict_pump['posle'] != 0:
                 if 'ЭЦН' in CreatePZ.dict_pump['posle'].upper() or 'ВНН' in CreatePZ.dict_pump['posle'].upper():
@@ -472,12 +477,10 @@ class CreatePZ(MyWindow):
         # print(f'fh {len(CreatePZ.H2S_mg)}')
         if CreatePZ.curator == 'ОР':
             try:
-                print(CreatePZ.data_x_min, CreatePZ.data_x_max)
+                    # print(CreatePZ.data_x_min, CreatePZ.data_x_max)
                 expected_list = []
                 for row in range(CreatePZ.data_x_min + 2, CreatePZ.data_x_max + 1):
                     for col in range(1, 12):
-                        print(str(ws.cell(row=row, column=col).value).strip().lower())
-                        # print(str(ws.cell(row=row, column=col).value).strip().lower() in ['приемистость', 'qприем =', 'qж =', 'qж = ', 'qприем ='])
                         if str(ws.cell(row=row, column=col).value).strip().lower() in ['приемистость', 'qприем =', 'qж =',
                                                                                        'qж = ', 'Qприема = ']:
                             Qpr = ws.cell(row=row, column=col + 1).value
@@ -491,26 +494,20 @@ class CreatePZ(MyWindow):
 
 
                         elif str(ws.cell(row=row, column=col).value).strip() in ['Рзак', 'Давление закачки ',
-                                                                                 'Рзак (Нагнет)', 'Рзак (Нагнет)']:
+                                                                                 'Рзак (Нагнет)', 'Рзак (Нагнет)', 'Давление']:
                             Pzak = ws.cell(row=row, column=col + 1).value
                             n = 1
                             while ws.cell(row=row, column=col + n).value != None:
                                 ws.cell(row=row, column=col + n).value
                                 n += 1
                                 Pzak = ws.cell(row=row, column=col + 1).value
-                    expected_list.append(Pzak)
-                    print(f'приеми{Qpr, Pzak}')
+
+
                 CreatePZ.expected_pick_up[Qpr] = Pzak
-                print(CreatePZ.expected_pick_up)
+                    # print(CreatePZ.expected_pick_up)
 
             except:
-                expected_Q, ok = QInputDialog.getInt(self, 'Ожидаемая приемистость',
-                                                     'Ожидаемая приемистость', 100, 0,
-                                                     1600)
-                expected_P, ok = QInputDialog.getInt(self, 'Ожидаемое Давление закачки',
-                                                     'Ожидаемое Давление закачки', 100, 0,
-                                                     250)
-                CreatePZ.expected_pick_up[expected_Q] = expected_P
+                print('ошибка при определении плановых показателей')
 
             print(f' Ожидаемые {CreatePZ.expected_pick_up}')
         # print(f' индекс нкт {pipes_ind + 1, condition_of_wells}')p
@@ -532,21 +529,24 @@ class CreatePZ(MyWindow):
             CreatePZ.shoe_nkt > CreatePZ.bottomhole_artificial
         except:
             print('НКТ ниже забоя')
-        # print(f' индекс штанг{sucker_rod_ind, pipes_ind}')
+        print(f' индекс штанг{sucker_rod_ind, pipes_ind}')
         try:
             for row in range(sucker_rod_ind, pipes_ind - 1):
                 if ws.cell(row=row, column=3).value == 'План':
-                    b_plan = row
+                    CreatePZ.b_plan = row
+                    print(f'b_plan {CreatePZ.b_plan}')
+
             for row in range(sucker_rod_ind + 1, pipes_ind - 1):
                 key = ws.cell(row=row, column=4).value
                 value = ws.cell(row=row, column=7).value
-                if key != None and row < b_plan:
+                if key != None and row < CreatePZ.b_plan:
 
                     CreatePZ.dict_sucker_rod[key] = CreatePZ.dict_sucker_rod.get(key, 0) + value
-                    if key != None and row >= b_plan:
-                        CreatePZ.dict_sucker_rod_po[key] = CreatePZ.dict_sucker_rod_po.get(key, 0) + value
+                elif key != None and row >= CreatePZ.b_plan:
+                    CreatePZ.dict_sucker_rod_po[key] = CreatePZ.dict_sucker_rod_po.get(key, 0) + value
                 # self.dict_sucker_rod = dict_sucker_rod
                 # self.dict_sucker_rod_po = dict_sucker_rod_po
+                print(f' штанги на спуск {CreatePZ.dict_sucker_rod_po}')
         except:
             print('штанги отсутствуют')
         perforations_intervals = []
@@ -650,29 +650,31 @@ class CreatePZ(MyWindow):
             CreatePZ.plast_all = list(CreatePZ.dict_perforation.keys())
             # print(CreatePZ.plast_all)
             # print(f' vf{CreatePZ.dict_perforation[CreatePZ.plast_all[0]]["интервал"][0][0]}')
-            CreatePZ.pervoration_min = min(
-                [min(CreatePZ.dict_perforation[i]['интервал']) for i in CreatePZ.plast_all])
-            CreatePZ.pervoration_max = max(
-                [max(CreatePZ.dict_perforation[i]['интервал']) for i in CreatePZ.plast_all])
-            print(f'мин {CreatePZ.pervoration_min}, мак {CreatePZ.pervoration_max}')
+            CreatePZ.perforation_rooforation_roof = min(min(
+                [min(CreatePZ.dict_work_pervorations[i]['интервал']) for i in CreatePZ.plast_work]))
+            CreatePZ.perforation_sole = max(max(
+                [max(CreatePZ.dict_work_pervorations[i]['интервал']) for i in CreatePZ.plast_work]))
+            print(f'мин {CreatePZ.perforation_roof}, мак {CreatePZ.perforation_sole}')
         except:
-            acid_true_quest = QMessageBox.question(self, 'Программа',
+            perf_true_quest = QMessageBox.question(self, 'Программа',
                                                    'Программа определили,что в скважине интервалов перфорации нет, верно ли?')
-            if acid_true_quest == QMessageBox.StandardButton.Yes:
+            if perf_true_quest == QMessageBox.StandardButton.Yes:
                 acid_true_quest = True
                 self.dict_work_pervorations = {}
             else:
-                acid_true_quest = False
+                perf_true_quest = False
                 CreatePZ.current_bottom, ok = QInputDialog.getDouble(self, 'Необходимый забой',
                                                                      'Введите забой до которого нужно нормализовать')
 
                 CreatePZ.plast_work = list(CreatePZ.dict_work_pervorations.keys())
                 CreatePZ.plast_all = list(CreatePZ.dict_perforation.keys())
-                CreatePZ.pervoration_min = min(
-                    [min(CreatePZ.dict_perforation[i]['интервал']) for i in CreatePZ.plast_all])
-                CreatePZ.pervoration_max = max(
-                    [max(CreatePZ.dict_perforation[i]['интервал']) for i in CreatePZ.plast_work])
-                print(f'мин {CreatePZ.pervoration_min}, мак {CreatePZ.pervoration_max}')
+                # print(CreatePZ.plast_all)
+                # print(f' vf{CreatePZ.dict_perforation[CreatePZ.plast_all[0]]["интервал"][0][0]}')
+                CreatePZ.perforation_roof = min(min(
+                    [min(CreatePZ.dict_work_pervorations[i]['интервал']) for i in CreatePZ.plast_work]))
+                CreatePZ.perforation_sole = max(max(
+                    [max(CreatePZ.dict_work_pervorations[i]['интервал']) for i in CreatePZ.plast_work]))
+                print(f'мин {CreatePZ.perforation_roof}, мак {CreatePZ.perforation_sole}')
 
         for j in range(CreatePZ.data_x_min, CreatePZ.data_x_max):  # Ожидаемые показатели после ремонта
             lst = []
