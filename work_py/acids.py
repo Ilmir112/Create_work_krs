@@ -9,10 +9,10 @@ def acid_work(self):
 
 
     paker_depth_bottom, ok = QInputDialog.getInt(None, 'опрессовка ЭК',
-                                          'Введите глубину посадки нижнего пакера', int(CreatePZ.perforation_sole + 10), 0,
+                                          'Введите глубину посадки нижнего пакера {CreatePZ.work_pervorations["интервал"]}', int(CreatePZ.perforation_sole + 10), 0,
                                           int(CreatePZ.current_bottom))
     paker_depth_top, ok = QInputDialog.getInt(None, 'опрессовка ЭК',
-                                                 'Введите глубину посадки вверхнего пакера', int(CreatePZ.perforation_sole- 10),
+                                                 'Введите глубину посадки вверхнего пакера {CreatePZ.work_pervorations["интервал"]}', int(CreatePZ.perforation_sole- 10),
                                                  0, paker_depth_bottom)
     difference_paker =  paker_depth_bottom - paker_depth_top
     paker_khost_top = int(CreatePZ.perforation_sole - paker_depth_bottom)
@@ -23,7 +23,7 @@ def acid_work(self):
 
     nkt_diam = ''.join(['73' if CreatePZ.column_diametr > 110 else '60'])
 
-    if CreatePZ.column_additional == False or CreatePZ.column_additional == True and paker_depth_bottom < CreatePZ.head_column_additional:
+    if CreatePZ.column_additional == False or (CreatePZ.column_additional == True and paker_depth_bottom < CreatePZ.head_column_additional):
         paker_select = f'заглушку + сбивной с ввертышем + НКТ{nkt_diam}м {paker_khost}м  + пакер ПРО-ЯМО-{paker_diametr_select(paker_depth_bottom)}мм (либо аналог) ' \
                        f'для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм + щелевой фильтр НКТ {difference_paker}м ' \
                        f'+ пакер ПУ - {paker_diametr_select(paker_depth_bottom)} + НКТ{nkt_diam}мм 20м +реперный патрубок на НКТ{nkt_diam}'
@@ -111,7 +111,7 @@ def reply_acid(self, difference_paker,  paker_khost, dict_nkt, paker_select, nkt
     if acid_true_quest == QMessageBox.StandardButton.Yes:
 
         paker_depth_bottom, ok = QInputDialog.getInt(None, 'опрессовка ЭК',
-                                                     'Введите глубину нижнего пакера посадки пакера',
+                                                     f'Введите глубину нижнего пакера посадки пакера ',
                                                      int(CreatePZ.perforation_roof - 20), 0,
                                                      5000)
         acid_true_quest_list.append([None, None, f'Приподнять пакера на глубине {paker_depth_bottom}/{paker_depth_bottom-difference_paker}м', None, None, None, None, None, None, None,

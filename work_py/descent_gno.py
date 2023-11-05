@@ -1,3 +1,6 @@
+from PyQt5.QtWidgets import QMessageBox, QInputDialog
+
+
 def gno_down(self):
     from open_pz import CreatePZ
 
@@ -48,23 +51,9 @@ def gno_down(self):
          f' согласно утвержденному плану. Демонтировать подьемный агрегат и оборудование. Пустить скважину в работу.',
          None, None, None, None, None, None, None,
          'мастер КРС', float(8.5)],
-        [None, None,
-         f'При всех работах не допускать утечек пластовой жидкости и жидкости глушения. В случае пропуска, разлива,'
-         f' немедленно производить зачистку территории.',
-         None, None, None, None, None, None, None,
-         'мастер КРС', 1],
-        [None, None,
-         f'Произвести заключительные работы  после ремонта скважины.',
-         None, None, None, None, None, None, None,
-         'мастер КРС', 1],
-        [None, None,
-         f'Сдать скважину представителю ЦДНГ.',
-         None, None, None, None, None, None, None,
-         'Мастер КРС, предст. заказчика', 1]
+
        ]
-    return paker_descent
-def descentGNO(self):
-    from open_pz import CreatePZ
+
     gno_list = [[None, None,
          f'За 48 часов до спуска запросить КАРТУ спуска на ГНО и заказать.',
          None, None, None, None, None, None, None,
@@ -95,10 +84,7 @@ def descentGNO(self):
          f' оборудование (переводники, муфты, переходные катушки). МОНТАЖ БЕЗ ПОДВЕСНОГО ПАТРУБКА ЗАПРЕЩЕН.  ',
          None, None, None, None, None, None, None,
          'Мастер КРС, предст. заказчика', 2.5],
-        [None, None,
-         f'За 48 часов до спуска запросить КАРТУ спуска на ГНО и заказать.',
-         None, None, None, None, None, None, None,
-         'Мастер КРС, предст. заказчика', 0],
+
         [None, None,
          f'Спустить {CreatePZ.dict_pump["posle"]} на компоновке штанг: {gno_nkt_opening(CreatePZ.dict_sucker_rod_po)}  Окончательный компоновку штанг производить по расчету '
          f'ГНО после утверждения заказчиком. ПРИ НЕОБХОДИМОСТИ ПОИНТЕРВАЛЬНОЙ ОПРЕССОВКИ: АВТОСЦЕП УСТАНАВЛИВАТЬ '
@@ -127,10 +113,7 @@ def descentGNO(self):
          f' оборудование (переводники, муфты, переходные катушки). МОНТАЖ БЕЗ ПОДВЕСНОГО ПАТРУБКА ЗАПРЕЩЕН.  ',
          None, None, None, None, None, None, None,
          'Мастер КРС, предст. заказчика', 2.5],
-        [None, None,
-         f'За 48 часов до спуска запросить КАРТУ спуска на ГНО и заказать.',
-         None, None, None, None, None, None, None,
-         'Мастер КРС, предст. заказчика', 0],
+
         [None, None,
          f'Спустить плунжер на компоновке штанг: {gno_nkt_opening(CreatePZ.dict_sucker_rod_po)}  Окончательный компоновку штанг производить по расчету '
          f'ГНО после утверждения заказчиком. ПРИ НЕОБХОДИМОСТИ ПОИНТЕРВАЛЬНОЙ ОПРЕССОВКИ: АВТОСЦЕП УСТАНАВЛИВАТЬ '
@@ -145,14 +128,118 @@ def descentGNO(self):
 
     ]
 
-    for row in descent_nv:
+    descent_ecn = [
+        [None, None,'Опрессовать НКТ между УЭЦН и обратным клапаном, отдельно до спуска УЭЦН (составить акт).  '
+                    'При монтаже УЭЦН провести калибровку резьбы: ловильной головки ЭЦН, обратного и сбивного клапанов. ',
+         None, None, None, None, None, None, None,
+         'Мастер КРС, предст. заказчика', 0.3],
+        [None, None,
+         f'Спустить предварительно {CreatePZ.dict_pump["posle"]} на НКТ{gno_nkt_opening(CreatePZ.dict_nkt_po)} (завоз с УСО ГНО, ремонтные/новые) на гл. {CreatePZ.dict_pump_h["posle"]}м. Спуск НКТ производить с шаблонированием и '
+         f'смазкой резьбовых соединений, замером изоляции каждые 100м.  ',
+         None, None, None, None, None, None, None,
+         'Мастер КРС, предст. заказчика', 2.5],
+        [None, None,
+         f'Демонтировать превентор.   Монтаж  устьевой арматуры. При монтаже использовать только сертифицированное'
+         f' оборудование (переводники, муфты, переходные катушки). МОНТАЖ БЕЗ ПОДВЕСНОГО ПАТРУБКА ЗАПРЕЩЕН. произвести разделку'
+         f' кабеля под устьевой сальник '
+         f'произвести герметизацию устья. Опрессовать кабельный ввод устьевой арматуры',
+         None, None, None, None, None, None, None,
+         'Мастер КРС, предст. заказчика', 2.5],
+        [None, None,
+         f'Перед пуском УЭЦН опрессовать ГНО на 50атм в течении 30 минут в присутствии представителя заказчика с помощью ЦА-320 '
+         f'(составить акт). Предоставить Заказчику замер НКТ.',
+         None, None, None, None, None, None, None,
+         'Мастер КРС, предст. заказчика', 1],
+        ]
+
+
+    lift_dict = {'пакер': paker_descent,  'ЭЦН': descent_ecn, 'НВ': descent_nv, 'НН': descent_nn} #'ОРЗ': lift_orz, 'ОРД': lift_ord, 'Воронка': lift_voronka,
+                 # 'НН с пакером': lift_pump_nn_with_paker, 'НВ с пакером': lift_pump_nv_with_paker,
+                 # 'ЭЦН с пакером': lift_ecn_with_paker,
+    lift_sel = ['ЭЦН', 'НВ', 'НН', 'пакер'] #  'ОРЗ', 'ОРД', 'Воронка', 'НН с пакером', 'НВ с пакером', 'ЭЦН с пакером',
+
+
+
+    if 'ЭЦН' in CreatePZ.dict_pump["posle"].upper() or 'ВНН' in CreatePZ.dict_pump["posle"].upper() and str(
+            CreatePZ.paker_do[
+                "posle"]) == '0':
+        lift_select = descent_ecn
+        lift_s = CreatePZ.dict_pump["posle"]
+    # elif ('ЭЦН' in CreatePZ.dict_pump["posle"].upper() or 'ВНН' in CreatePZ.dict_pump["posle"].upper()) and (
+    #         CreatePZ.dict_sucker_rod != None and CreatePZ.if_None(CreatePZ.paker_do["posle"]) != 'отсут'):
+    #
+    #     lift_select = lift_ord
+    #     print(f'Подьем орд')
+    # elif ('ЭЦН' in CreatePZ.dict_pump["posle"].upper() or 'ВНН' in CreatePZ.dict_pump["posle"].upper()) and (
+    #         CreatePZ.if_None(CreatePZ.paker_do["posle"]) != 'отсут'):
+    #     lift_select = lift_ecn_with_paker
+    #     print('Подьем ЭЦН с пакером ')
+
+    elif 'НВ' in CreatePZ.dict_pump["posle"].upper() and CreatePZ.if_None(CreatePZ.paker_do["posle"]) == 'отсут':
+        lift_select = descent_nv
+        lift_s = CreatePZ.dict_pump["posle"]
+    # elif 'НВ' in CreatePZ.dict_pump["posle"].upper() and CreatePZ.if_None(CreatePZ.paker_do["posle"]) != 'отсут':
+    #     lift_select = lift_pump_nv_with_paker
+    #     print('Подьем НВ с пакером ')
+    elif 'НН' in CreatePZ.dict_pump["posle"].upper() and CreatePZ.if_None(CreatePZ.paker_do["posle"]) == 'отсут':
+        lift_select = descent_nn
+        lift_s = CreatePZ.dict_pump["posle"]
+    # elif 'НН' in CreatePZ.dict_pump["posle"].upper() and CreatePZ.if_None(CreatePZ.paker_do["posle"]) != 'отсут':
+    #     lift_select = lift_pump_nn_with_paker
+    #     print('Подьем НН с пакером ')
+
+    # elif str(CreatePZ.dict_pump["posle"]) == '0' and CreatePZ.if_None(CreatePZ.paker_do["posle"]) == 'отсут':
+    #     lift_select = lift_voronka
+    #     print('Подьем  воронки')
+    elif str(CreatePZ.dict_pump["posle"]) == '0' and CreatePZ.if_None(CreatePZ.paker_do["posle"]) != 'отсут':
+        lift_select = paker_descent
+        lift_s = f'пакер ППД  {CreatePZ.dict_pump["posle"]}'
+    # elif 89 in CreatePZ.dict_nkt.keys() and 48 in CreatePZ.dict_nkt.keys() and CreatePZ.if_None(
+    #         CreatePZ.paker_do["posle"]) != 'отсут':
+    #     lift_select = lift_orz
+    #     print('Подьем ОРЗ')
+    descent_gno_quest = QMessageBox.question(self, 'Спуск ГНО', f'Программа определил что спускать будем {lift_s}')
+    if descent_gno_quest == QMessageBox.StandardButton.Yes:
+        gno_list = lift_select
+
+
+    else:
+
+        lift, ok = QInputDialog.getItem(self, 'Спущенное оборудование', 'выбор спущенного оборудования',
+                                        lift_sel, 1, False)
+
+        if ok and lift_sel:
+            self.le.setText(lift)
+        lift_select = lift_dict[lift]
+        for row in lift_select:
+            gno_list.append(row)
+
+
+    end_list =   [[None, None,
+         f'Все работы производить с соблюдением т/б и технологии'
+         f' согласно утвержденному плану. Демонтировать подьемный агрегат и оборудование. Пустить скважину в работу.',
+         None, None, None, None, None, None, None,
+         'мастер КРС', float(8.5)],
+        [None, None,
+         f'При всех работах не допускать утечек пластовой жидкости и жидкости глушения. В случае пропуска, разлива,'
+         f' немедленно производить зачистку территории.',
+         None, None, None, None, None, None, None,
+         'мастер КРС', 1],
+        [None, None,
+         f'Произвести заключительные работы  после ремонта скважины.',
+         None, None, None, None, None, None, None,
+         'мастер КРС', 1],
+        [None, None,
+         f'Сдать скважину представителю ЦДНГ.',
+         None, None, None, None, None, None, None,
+         'Мастер КРС, предст. заказчика', 1]]
+
+    for row in end_list:
         gno_list.append(row)
 
-    a =     [None, None,
-         f' Произвести заключительные работы. Демонтаж подъемника. Сдать скважину представителю Заказчика по акту.',
-         None, None, None, None, None, None, None,
-         'Мастер КРС, предст. заказчика', 5.5]
     return gno_list
+
+
 
 
 

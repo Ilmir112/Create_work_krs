@@ -166,7 +166,8 @@ class CreatePZ(MyWindow):
             elif 'НКТ' in row:
                 pipes_ind = row_ind
                 # pipes_ind = self.pipes_ind
-            elif 'ХI Планируемый объём работ:' in row or 'ХI. Планируемый объём работ:' in row or 'ХIII Планируемый объём работ:' in row:
+            elif 'ХI Планируемый объём работ:' in row or 'ХI. Планируемый объём работ:' in row or 'ХIII Планируемый объём работ:' in row \
+                    or 'ХI Планируемый объём работ:' in row:
                 CreatePZ.data_x_max = row_ind
             elif 'II. История эксплуатации скважины' in row:
                 data_pvr_max = row_ind - 2
@@ -478,11 +479,11 @@ class CreatePZ(MyWindow):
         if CreatePZ.curator == 'ОР':
             try:
                     # print(CreatePZ.data_x_min, CreatePZ.data_x_max)
-                expected_list = []
+                # expected_list = []
                 for row in range(CreatePZ.data_x_min + 2, CreatePZ.data_x_max + 1):
                     for col in range(1, 12):
                         if str(ws.cell(row=row, column=col).value).strip().lower() in ['приемистость', 'qприем =', 'qж =',
-                                                                                       'qж = ', 'Qприема = ']:
+                                                                                       'qж = ', 'qприема = ', 'Приемистость ']:
                             Qpr = ws.cell(row=row, column=col + 1).value
                             print(f' приемис {Qpr}')
                             n = 1
@@ -501,19 +502,20 @@ class CreatePZ(MyWindow):
                                 ws.cell(row=row, column=col + n).value
                                 n += 1
                                 Pzak = ws.cell(row=row, column=col + 1).value
+                                print(f' зака {Pzak}')
 
 
                 CreatePZ.expected_pick_up[Qpr] = Pzak
-                    # print(CreatePZ.expected_pick_up)
+                # print(CreatePZ.expected_pick_up)
 
             except:
                 print('ошибка при определении плановых показателей')
 
             print(f' Ожидаемые {CreatePZ.expected_pick_up}')
-        # print(f' индекс нкт {pipes_ind + 1, condition_of_wells}')p
+        # print(f' индекс нкт {pipes_ind + 1, condition_of_wells}')
         for row in range(pipes_ind + 1, condition_of_wells):  # словарь  количества НКТ и метраж
             if ws.cell(row=row, column=3).value == 'План':
-                # print(row)
+
                 CreatePZ.a_plan = row
         # print(f'индекс {CreatePZ.a_plan}')
         for row in range(pipes_ind + 1, condition_of_wells):
@@ -650,7 +652,7 @@ class CreatePZ(MyWindow):
             CreatePZ.plast_all = list(CreatePZ.dict_perforation.keys())
             # print(CreatePZ.plast_all)
             # print(f' vf{CreatePZ.dict_perforation[CreatePZ.plast_all[0]]["интервал"][0][0]}')
-            CreatePZ.perforation_rooforation_roof = min(min(
+            CreatePZ.perforation_roof = min(min(
                 [min(CreatePZ.dict_work_pervorations[i]['интервал']) for i in CreatePZ.plast_work]))
             CreatePZ.perforation_sole = max(max(
                 [max(CreatePZ.dict_work_pervorations[i]['интервал']) for i in CreatePZ.plast_work]))
