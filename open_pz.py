@@ -77,7 +77,8 @@ class CreatePZ(MyWindow):
     work_pervorations_dict = {}
     paker_do = {'do': 0, 'posle': 0}
     column_additional = False
-
+    well_number = None
+    well_area = None
     values = []
     H_F_paker_do = {'do': 0, 'posle': 0}
     perforation_roof = current_bottom
