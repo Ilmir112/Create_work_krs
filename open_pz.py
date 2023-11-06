@@ -136,14 +136,13 @@ class CreatePZ(MyWindow):
         # for i in ws._images:
         #     ws._pictures.remove(i)
         #     del ws._image_parts[i.id]
-        curator_list = ['ОР', 'ГТМ', 'ГРР', 'ГО']
-        # CreatePZ.curator = 'ГТМ'
+        curator_list = ['ОР', 'ГТМ', 'ГРР', 'ГО', 'ВНС']
+        curator = ['ОР' if CreatePZ.if_None(CreatePZ.dict_pump['do']) == 'отсут' else 'ГТМ'][0]
+        print(f'куратор {curator}')
+
         CreatePZ.curator, ok = QInputDialog.getItem(self, 'Выбор кураторов ремонта', 'Введите сектор кураторов региона',
-                                                    curator_list, 0, False)
-        # if ok and curator:
-        #    CreatePZ.curator = curator
-        # else:
-        #     QMessageBox.information(self, 'fdf', 'qqwq')
+                                                    curator_list, curator_list.index(curator), False)
+
 
         for row_ind, row in enumerate(ws.iter_rows(values_only=True)):
             ws.row_dimensions[row_ind].hidden = False
@@ -555,7 +554,7 @@ class CreatePZ(MyWindow):
         perforations_intervals = []
         pervoration_list = []
         CreatePZ.current_bottom, ok = QInputDialog.getDouble(self, 'Необходимый забой',
-                                                             'Введите забой до которого нужно нормализовать')
+                                                             'Введите забой до которого нужно нормализовать', CreatePZ.current_bottom)
         # print(f' индекс ПВР{data_pvr_min+2, data_pvr_max+1}')
         for row in range(data_pvr_min + 2, data_pvr_max + 2):  # Сортировка интервала перфорации
             lst = []
