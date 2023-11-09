@@ -126,6 +126,7 @@ class PervorationWindow(MyWindow):
 
             for plast, data in self.dict_perforation_project.items():
                 for i in data['интервал']:
+                    count_charge = (max(i) - min(i)) * chargePM
                     # print(i)
 
                     self.tableWidget.insertRow(rows)
@@ -133,6 +134,7 @@ class PervorationWindow(MyWindow):
                     self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(max(i))))
                     self.tableWidget.setItem(rows, 2, QTableWidgetItem(self.charge(max(i))))
                     self.tableWidget.setItem(rows, 3, QTableWidgetItem(str(chargePM)))
+                    self.tableWidget.setItem(rows, 4, QTableWidgetItem(str(count_charge)))
 
                     self.tableWidget.setItem(rows, 5, QTableWidgetItem(plast))
                     self.tableWidget.setItem(rows, 6, QTableWidgetItem(' '))
@@ -140,6 +142,7 @@ class PervorationWindow(MyWindow):
         else:
             for plast, data in self.dict_work_pervorations.items():
                 for i in data['интервал']:
+                    count_charge = int((max(i)-min(i))*chargePM)
                     # print(i)
                     # print(str(min(i)))
                     self.tableWidget.insertRow(rows)
@@ -147,6 +150,7 @@ class PervorationWindow(MyWindow):
                     self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(max(i))))
                     self.tableWidget.setItem(rows, 2, QTableWidgetItem(self.charge(max(i))))
                     self.tableWidget.setItem(rows, 3, QTableWidgetItem(str(chargePM)))
+                    self.tableWidget.setItem(rows, 4, QTableWidgetItem(str(count_charge)))
 
                     self.tableWidget.setItem(rows, 5, QTableWidgetItem(plast))
                     self.tableWidget.setItem(rows, 6, QTableWidgetItem(' '))
@@ -239,8 +243,8 @@ class PervorationWindow(MyWindow):
                         perf_list.append(int(value))
                     else:
                         perf_list.append(value)
-
-            perf_list.insert(7, (round((float(perf_list[4]) - float(perf_list[2])) * int(perf_list[6]), 1)))
+            # plast
+            # perf_list.insert(7, (round((float(perf_list[4]) - float(perf_list[2])) * int(perf_list[6]), 1)))
             perf_list.extend(['подрядчик по ГИС', " "])
 
             for i in CreatePZ.plast_work:

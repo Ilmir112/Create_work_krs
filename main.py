@@ -148,7 +148,7 @@ class MyWindow(QMainWindow):
         ws.page_setup.fitToHeight = False
         ws.page_setup.fitToWidth = True
         ws.print_options.horizontalCentered = True
-        wb.save(f"{ CreatePZ.well_number} { CreatePZ.well_area} { CreatePZ.cat_P_1} категории.xlsx")
+        wb.save(f"{CreatePZ.well_number} {CreatePZ.well_area} {CreatePZ.cat_P_1} категории.xlsx")
 
         print("Table data saved to Excel")
 
@@ -218,14 +218,26 @@ class MyWindow(QMainWindow):
         acid_menu.addAction(acid_action_2paker)
         acid_action_2paker.triggered.connect(self.acid_action_2paker)
 
-        gno_menu = action_menu.addMenu('Спуск фондового оборудования')
-        gno_action = QAction('пакер')
-        gno_menu.addAction(gno_action)
-        gno_action.triggered.connect(self.gno_bottom)
+        sand_menu = action_menu.addMenu('песчанный мост')
+        filling_action = QAction('Отсыпка песком')
+        sand_menu.addAction(filling_action)
+        filling_action.triggered.connect(self.filling_sand)
 
-        nv_action = QAction('НВ')
-        gno_menu.addAction(nv_action)
-        nv_action.triggered.connect(self.nv_bottom)
+        washing_action = QAction('вымыв песка')
+        sand_menu.addAction(washing_action)
+        washing_action.triggered.connect(self.washing_sand)
+
+        grp_menu = action_menu.addMenu('ГРП')
+        grpWithPaker_action = QAction('ГРП с одним пакером')
+        grp_menu.addAction(grpWithPaker_action)
+        grpWithPaker_action.triggered.connect(self.grpWithPaker)
+
+        gno_menu = action_menu.addAction('Спуск фондового оборудования')
+        gno_menu.triggered.connect(self.gno_bottom)
+
+
+
+
 
 
         context_menu.exec_(self.mapToGlobal(position))
@@ -235,6 +247,27 @@ class MyWindow(QMainWindow):
         self.ins_ind = r+1
         CreatePZ.ins_ind = r+1
         print(f' выбранная строка {self.ins_ind}')
+
+    def grpWithPaker(self):
+        from work_py.grp import grpPaker
+
+        print('Вставился отсыпка песком')
+        grpPaker_work_list = grpPaker(self)
+        self.populate_row(self.ins_ind,grpPaker_work_list)
+
+    def filling_sand(self):
+        from work_py.sand_filling import sandFilling
+
+        print('Вставился отсыпка песком')
+        filling_work_list = sandFilling(self)
+        self.populate_row(self.ins_ind,  filling_work_list)
+
+    def washing_sand(self):
+        from work_py.sand_filling import sandWashing
+
+        print('Вставился отсыпка песком')
+        washing_work_list = sandWashing(self)
+        self.populate_row(self.ins_ind, washing_work_list)
 
     def deleteString(self):
         selected_ranges = self.table_widget.selectedRanges()
@@ -284,12 +317,7 @@ class MyWindow(QMainWindow):
         gno_work_list = gno_down(self)
         self.populate_row(self.ins_ind, gno_work_list)
 
-    def nv_bottom(self):
-        from work_py.descent_gno import descentGNO
 
-        print('Вставился ГНО')
-        gno_work_list = descentGNO(self)
-        self.populate_row(self.ins_ind, gno_work_list)
 
     def acid_action_1paker(self):
         from work_py.acids_work import acid_work

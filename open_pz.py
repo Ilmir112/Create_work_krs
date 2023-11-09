@@ -1,5 +1,7 @@
 import sys
+from zipfile import ZipFile
 
+import PIL
 import block_name
 from main import MyWindow
 import krs
@@ -94,6 +96,7 @@ class CreatePZ(MyWindow):
     H2S_pr = []
     cat_H2S_list = []
     H2S_mg = []
+    lift_key = 0
     max_admissible_pressure = 0
     dict_nkt = {}
     dict_nkt_po = {}
@@ -129,20 +132,21 @@ class CreatePZ(MyWindow):
                 wb.remove(wb[sheet])
         # print(wb.sheetnames)
 
-        # CreatePZ.image_finder = wb.drawing.drawings_finder
-        sucker_rod_ind = 0
-        images = []
+        # zip = ZipFile(fname)
+        # zip.extractall()
 
-        # for i in ws._images:
-        #     ws._pictures.remove(i)
-        #     del ws._image_parts[i.id]
         curator_list = ['ОР', 'ГТМ', 'ГРР', 'ГО', 'ВНС']
-        curator = ['ОР' if CreatePZ.if_None(CreatePZ.dict_pump['do']) == 'отсут' else 'ГТМ'][0]
-        print(f'куратор {curator}')
+        curator = ['ОР' if CreatePZ.if_None(CreatePZ.dict_pump['do']) == '0' else 'ГТМ'][0]
+        print(f'куратор {curator, CreatePZ.if_None(CreatePZ.dict_pump["do"])}')
 
         CreatePZ.curator, ok = QInputDialog.getItem(self, 'Выбор кураторов ремонта', 'Введите сектор кураторов региона',
                                                     curator_list, curator_list.index(curator), False)
 
+        # for cell in ws:
+        #     if cell.has_image:
+        #         image_cell_coordinate = cell.coordinate
+        #         print(f'координаты изображениея {image_cell_coordinate}')
+        #         break
 
         for row_ind, row in enumerate(ws.iter_rows(values_only=True)):
             ws.row_dimensions[row_ind].hidden = False
@@ -827,7 +831,7 @@ class CreatePZ(MyWindow):
 
         self.ws = ws
         self.wb = wb
-        wb.save(f'{CreatePZ.well_number} {CreatePZ.well_area} {work_plan}.xlsx')
+        # wb.save(f'{CreatePZ.well_number} {CreatePZ.well_area} {work_plan}.xlsx')
         return self.ws
 
     def addItog(self, ws, ins_ind):

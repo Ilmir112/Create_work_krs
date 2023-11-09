@@ -117,7 +117,7 @@ def acid_work(self):
 def acid_work_list(self, paker_depth, paker_khost, dict_nkt, paker_layout):
     from open_pz import CreatePZ
     from krs import volume_vn_nkt
-
+    # print(f'пласты {CreatePZ.plast}')
     plast, ok = QInputDialog.getItem(self, 'выбор пласта для ОПЗ ', 'выберете пласта дл перфорации',
                                      CreatePZ.plast_work, 0, False)
     if ok and plast:
