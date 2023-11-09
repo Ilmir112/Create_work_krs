@@ -10,7 +10,7 @@ def grpPaker(self):
     nkt_diam = ''.join(['89' if CreatePZ.column_diametr > 110 else '60'])
 
     paker_depth, ok = QInputDialog.getInt(None, 'опрессовка ЭК',
-                                          'Введите глубину посадки пакера для опрессовки колонны',
+                                          'Введите глубину посадки пакера ГРП',
                                           int(CreatePZ.perforation_roof - 50), 0, int(CreatePZ.current_bottom - 10))
 
 

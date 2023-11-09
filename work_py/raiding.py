@@ -42,7 +42,7 @@ def raidingColumn(self):
          None, None, None, None, None, None, None,
          'Мастер КРС, УСРСиСТ', 8],
         [None, None,
-         f'Произвести райбирование ЭК в инт. {raiding_interval()}м с наращиванием, с промывкой и проработкой 5 раз каждого наращивания. '
+         f'Произвести райбирование ЭК в инт. {raiding_interval(self)}м с наращиванием, с промывкой и проработкой 5 раз каждого наращивания. '
          f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа '
          f'до начала работ) Работы производить согласно сборника технологических регламентов и инструкций в присутствии'
          f' представителя заказчика. Допустить до текущего забоя {CreatePZ.current_bottom}м.',
@@ -66,13 +66,20 @@ def raidingColumn(self):
          None, None, None, None, None, None, None,
          'мастер КРС', round(0.25 + 0.033 * 1.2 * (CreatePZ.current_bottom) / 9.5 * 1.04*0.9, 1)]]
 
+    CreatePZ.work_pervorations_approved = True
+    for plast in CreatePZ.plast_work:
+
+        if min(min(CreatePZ.dict_work_pervorations[plast]['интервал'])) > CreatePZ.current_bottom:
+            del CreatePZ.dict_work_pervorations[plast]
+
+
     return ryber_list
 
 
-def raiding_interval():
+def raiding_interval(self):
     from open_pz import CreatePZ
     if CreatePZ.perforation_sole + 30 < CreatePZ.current_bottom:
         str_raid = f'{round(CreatePZ.perforation_roof-30,1)} - {round(CreatePZ.perforation_sole + 30,1)}'
     else:
         str_raid = f'{round(CreatePZ.perforation_roof - 30, 1)} - {CreatePZ.current_bottom}'
-        return str_raid
+    return str_raid

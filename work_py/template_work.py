@@ -269,9 +269,9 @@ def template_ek(self):
     elif CreatePZ.column_additional == False and open_trunk_well == False and CreatePZ.work_pervorations_approved == True:
         template_str = f'перо + СКМ-{int(CreatePZ.column_diametr)} +10м ' \
                        f'НКТ{nkt_diam}мм + шаблон-{template_diam_ek()[1]}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can]}м '
-        ckm_teml = f'(СКМ-{int(CreatePZ.column_diametr)} до Н={int(min(list(CreatePZ.current_bottom)))}м,' \
-                   f'шаблон; Ф-{template_diam_ek()[1]}мм до гл.{int(min(list(CreatePZ.current_bottom)) - 10)}м)'
-        CreatePZ.template_depth = math.ceil(min(list(CreatePZ.current_bottom)) - 10)
+        ckm_teml = f'(СКМ-{int(CreatePZ.column_diametr)} до Н={int(CreatePZ.perforation_roof - 8)}м,' \
+                   f'шаблон; Ф-{template_diam_ek()[1]}мм до гл.{int(CreatePZ.perforation_roof - 18)}м)'
+        CreatePZ.template_depth = math.ceil(CreatePZ.current_bottom - 10)
     elif CreatePZ.column_additional == True and open_trunk_well == False and CreatePZ.work_pervorations_approved == False:
         template_str = f'обточная муфта + НКТ{nkt_pod} {int(CreatePZ.current_bottom - math.ceil(CreatePZ.perforation_roof) + 10)}м ' \
                f'+ СКМ-{int(CreatePZ.column_additional_diametr)} +10м НКТ{nkt_pod} + шаблон-{template_diam_additional_ek()[0]}мм L-{length_template_addition}м' \

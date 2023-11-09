@@ -57,19 +57,21 @@ def paker_list(self):
     def paker_select(self):
         if CreatePZ.column_additional == False or CreatePZ.column_additional == True and paker_depth< CreatePZ.head_column_additional:
             paker_select = f'воронку + НКТ{nkt_diam}м {paker_khost}м + пакер ПРО-ЯМО-{paker_diametr_select(paker_depth)}мм (либо аналог) ' \
-                           f'для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм + НКТ 10м'
+                           f'для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм + {nktOpress(self)[0]}'
         elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr < 110 and paker_depth> CreatePZ.head_column_additional:
-            paker_select = f'воронку + НКТ{60}мм {paker_khost}м + пакер ПРО-ЯМО-{paker_diametr_select(paker_depth)}мм (либо аналог) ' \
-                           f'для ЭК {CreatePZ.column_additional_diametr}мм х {CreatePZ.column_additional_wall_thickness}мм + НКТ60мм 10м '
+            paker_select = f'воронку + НКТ{60}мм {paker_khost}м + пакер ПРО-ЯМО-{paker_diametr_select(paker_depth)}мм (либо аналог)  ' \
+                           f'для ЭК {CreatePZ.column_additional_diametr}мм х {CreatePZ.column_additional_wall_thickness}мм  + {nktOpress(self)[0]} ' \
+                           f'+ НКТ60мм L- {paker_depth-CreatePZ.head_column_additional}м'
         elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr > 110 and paker_depth> CreatePZ.head_column_additional:
             paker_select = f'воронку + НКТ73мм со снятыми фасками {paker_khost}м + пакер ПРО-ЯМО-{paker_diametr_select(paker_depth)}мм (либо аналог) ' \
-                           f'для ЭК {CreatePZ.column_additional_diametr}мм х {CreatePZ.column_additional_wall_thickness}мм + НКТ73мм со снятыми фасками 10м'
+                           f'для ЭК {CreatePZ.column_additional_diametr}мм х {CreatePZ.column_additional_wall_thickness}мм  + {nktOpress(self)[0]}' \
+                           f'+ НКТ73мм со снятыми фасками L- {paker_depth-CreatePZ.head_column_additional}м'
         return paker_select
-
+    nktOpress_list = nktOpress(self)
     paker_list = [
         [None, None,
                    f'Спустить {paker_select(self)} на НКТ{nkt_diam}мм до глубины {paker_depth}м, воронкой до {paker_depth+ paker_khost}м'
-                    f' с замером, шаблонированием шаблоном. {("Произвести пробную посадку на глубине 50м" if CreatePZ.column_additional == False else "")} '
+                    f' с замером, шаблонированием шаблоном. {nktOpress_list[1]} {("Произвести пробную посадку на глубине 50м" if CreatePZ.column_additional == False else "")} '
                    f'ПРИ ОТСУТСТВИИ ЦИРКУЛЯЦИИ ПРЕДУСМОТРЕТЬ НАЛИЧИИ В КОМПОНОВКЕ УРАВНИТЕЛЬНЫХ КЛАПАНОВ ИЛИ СБИВНОГО '
                    f'КЛАПАНА С ВВЕРТЫШЕМ НАД ПАКЕРОМ',
     None, None, None, None, None, None, None,
@@ -109,7 +111,7 @@ def paker_list(self):
          None, None, None, None, None, None, None,
          'мастер КРС', 0.4],
         [None, None,
-         f'Посадить пакер. Опрессовать ЗУМПФ в интервале {pakerDepthZumpf} - {CreatePZ.current_bottom}м на Р={CreatePZ.max_admissible_pressure}атм в течение 30 минут в присутствии представителя заказчика, составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ)',
+         f'{nktOpress_list[1]}. Посадить пакер. Опрессовать ЗУМПФ в интервале {pakerDepthZumpf} - {CreatePZ.current_bottom}м на Р={CreatePZ.max_admissible_pressure}атм в течение 30 минут в присутствии представителя заказчика, составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ)',
          None, None, None, None, None, None, None,
          'мастер КРС', 0.4],
           [None, None,
@@ -122,5 +124,11 @@ def paker_list(self):
 
     return paker_list
 
-
+def nktOpress(self):
+    from open_pz import CreatePZ
+    if CreatePZ.nktOpressTrue == False:
+        CreatePZ.nktOpressTrue == True
+        return 'НКТ + опрессовочное седло', 'Опрессовать НКТ на 200атм. Вымыть шар.'
+    else:
+        return 'НКТ', ''
 

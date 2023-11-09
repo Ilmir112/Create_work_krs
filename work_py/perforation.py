@@ -126,7 +126,7 @@ class PervorationWindow(MyWindow):
 
             for plast, data in self.dict_perforation_project.items():
                 for i in data['интервал']:
-                    count_charge = (max(i) - min(i)) * chargePM
+                    count_charge = int((max(i) - min(i)) * chargePM)
                     # print(i)
 
                     self.tableWidget.insertRow(rows)
@@ -197,7 +197,7 @@ class PervorationWindow(MyWindow):
         self.tableWidget.setItem(rows, 1, QTableWidgetItem(editType2))
         self.tableWidget.setItem(rows, 2, QTableWidgetItem(chargesx))
         self.tableWidget.setItem(rows, 3, QTableWidgetItem(editHolesMetr))
-        self.tableWidget.setItem(rows, 4, QTableWidgetItem(str(int((float(editType2)-float(editType))*float(editHolesMetr)))))
+        self.tableWidget.setItem(rows, 4, QTableWidgetItem(str(int((float(editType2)-float(editType))*int(editHolesMetr)))))
         self.tableWidget.setItem(rows, 5, QTableWidgetItem(editIndexFormation))
         self.tableWidget.setItem(rows, 6, QTableWidgetItem(dopInformation))
         self.tableWidget.setSortingEnabled(True)
@@ -330,7 +330,7 @@ class PervorationWindow(MyWindow):
 
             CreatePZ.perforation_sole = max(max([max(CreatePZ.dict_work_pervorations[i]['интервал']) for i in CreatePZ.plast_work]))
             print(f'мин {CreatePZ.perforation_roof}, мак {CreatePZ.perforation_sole}')
-
+            CreatePZ.work_pervorations_approved = False
             self.table_widget.setRowHeight(self.ins_ind, 60)
             self.table_widget.setRowHeight(self.ins_ind + 1, 60)
 

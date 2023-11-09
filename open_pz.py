@@ -25,6 +25,7 @@ from gnkt_opz import gnkt_work
 
 
 class CreatePZ(MyWindow):
+    nktOpressTrue = False
     normOfTime = 0
     lift_ecn_can_addition = False
     column_passability = False

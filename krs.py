@@ -689,7 +689,7 @@ def work_krs(self):
                    None, None, None, None, None, None, None,
                    None, None],
                   [None, None,
-                   f'Произвести определение приемистости скважины при давлении {CreatePZ.max_expected_pressure}атм. '
+                   f'Произвести определение приемистости скважины при давлении {CreatePZ.max_admissible_pressure}атм. '
                    f'{"".join([" " if without_damping_True == True else f"По результату приемистости произвести глушение скважины в НКТ тех.жидкостью в объеме обеспечивающим заполнение трубного пространства и скважины в подпакерной зоне в объеме {volume_pod_NKT()} м3 жидкостью уд.веса {fluid_work} на давление поглощения до {CreatePZ.max_admissible_pressure}атм. Тех отстой 1-2 часа. Произвести замер избыточного давления в скважине."])}',
                    None, None,
                    None, None, None, None, None,

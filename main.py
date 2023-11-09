@@ -232,6 +232,11 @@ class MyWindow(QMainWindow):
         grp_menu.addAction(grpWithPaker_action)
         grpWithPaker_action.triggered.connect(self.grpWithPaker)
 
+        rir_menu = action_menu.addMenu('РИР')
+        rirWithRpk_action = QAction('РИР с РПК')
+        rir_menu.addAction(rirWithRpk_action)
+        rirWithRpk_action.triggered.connect(self.rirWithRpk)
+
         gno_menu = action_menu.addAction('Спуск фондового оборудования')
         gno_menu.triggered.connect(self.gno_bottom)
 
@@ -248,10 +253,14 @@ class MyWindow(QMainWindow):
         CreatePZ.ins_ind = r+1
         print(f' выбранная строка {self.ins_ind}')
 
+    def rirWithRpk(self):
+        from work_py.rir import rir_rpk
+        rirRpk_work_list = rir_rpk(self)
+        self.populate_row(self.ins_ind, rirRpk_work_list)
     def grpWithPaker(self):
         from work_py.grp import grpPaker
 
-        print('Вставился отсыпка песком')
+        print('Вставился ГРП с пакером')
         grpPaker_work_list = grpPaker(self)
         self.populate_row(self.ins_ind,grpPaker_work_list)
 
