@@ -20,6 +20,12 @@ def rir_rpk(self):
     if rir_rpk_question == QMessageBox.StandardButton.Yes:
         rir_rpk_plast_true = True
         rir_q_list = [[None, None,
+      f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС "Ойл-сервис". '
+      f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером от 14.10.2021г. '
+      f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины Отбить забой по ГК и ЛМ',
+      None, None, None, None, None, None, None,
+      'Мастер КРС, подрядчик по ГИС', 4],
+      [None, None,
                    f'посадить пакер на глубину {rpkDepth}м',
                     None, None, None, None, None, None, None,
                     'мастер КРС', 1],
@@ -31,8 +37,8 @@ def rir_rpk(self):
                    f'приемистости по технологическому плану',
         None, None, None, None, None, None, None,
     'мастер КРС', 2.5]]
-        rir_list.insert(-1, rir_q_list[0])
-        rir_list.insert(-1, rir_q_list[1])
+        for row in rir_q_list:
+            rir_list.insert(-1, row)
     else:
         rir_rpk_plast_true = False
         rir_q_list = [[None, None,
@@ -47,8 +53,8 @@ def rir_rpk(self):
                        f'приемистости по технологическому плану',
                        None, None, None, None, None, None, None,
                        'мастер КРС', 2.5]]
-        rir_list.insert(-1, rir_q_list[0])
-        rir_list.insert(-1, rir_q_list[1])
+        for row in rir_q_list[::-1]:
+            rir_list.insert(-1, row)
 
     rir_work_list = [[None, None,
                    f'Спустить   пакера РПК  + {rpk_nkt(self, rpkDepth)}  на тНКТ{nkt_diam}мм до глубины {rpkDepth}м с замером, шаблонированием шаблоном. '
@@ -90,6 +96,24 @@ def rir_rpk(self):
     for row in rir_work_list:
         rir_list.append(row)
     CreatePZ.current_bottom = rpkDepth
+    for plast in CreatePZ.plast_work:
+        for i in list(CreatePZ.dict_work_pervorations[plast]['интервал']):
+            if i[0] > CreatePZ.current_bottom:
+                print(CreatePZ.dict_work_pervorations[plast]['интервал'])
+                CreatePZ.dict_work_pervorations[plast]['интервал'].discard(i)
+        if CreatePZ.dict_work_pervorations[plast]['интервал'] == set():
+            del CreatePZ.dict_work_pervorations[plast]
+
+    CreatePZ.plast_work = list(CreatePZ.dict_work_pervorations.keys())
+    try:
+        CreatePZ.perforation_roof = min(min(
+            [min(CreatePZ.dict_work_pervorations[i]['интервал']) for i in CreatePZ.plast_work]))
+        CreatePZ.perforation_sole = max(max(
+            [max(CreatePZ.dict_work_pervorations[i]['интервал']) for i in CreatePZ.plast_work]))
+        print(f'мин {CreatePZ.perforation_roof}, мак {CreatePZ.perforation_sole}')
+    except:
+        CreatePZ.perforation_roof = CreatePZ.current_bottom
+        CreatePZ.perforation_sole = CreatePZ.current_bottom
     return rir_list
 
 

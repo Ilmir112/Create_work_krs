@@ -3,8 +3,25 @@ from PyQt5.QtWidgets import QMessageBox, QInputDialog
 
 def gno_down(self):
     from open_pz import CreatePZ
-
-    paker_descent = [
+    dict_pump = ''
+    dict_pump_nv = ''
+    dict_pump_ecn = ''
+    dict_pump_h = 0
+    try:
+        print( CreatePZ.dict_pump["posle"])
+        if 'ЭЦН' in CreatePZ.dict_pump["posle"][1]:
+            dict_pump_nv = CreatePZ.dict_pump["posle"][0]
+            dict_pump_ecn = CreatePZ.dict_pump["posle"][1]
+        else:
+            dict_pump_nv = CreatePZ.dict_pump["posle"][1]
+            dict_pump_ecn = CreatePZ.dict_pump["posle"][0]
+            dict_pump_h = CreatePZ.dict_pump_h["posle"][0]
+        print(f' НВ {dict_pump_nv}')
+    except:
+        dict_pump = CreatePZ.dict_pump["posle"]
+    paker_descent = []
+    try:
+        paker_descent = [
         [None, None,
          f'Заменить технологические НКТ на опрессованные эксплуатационные НКТ. Заменить подвесной патрубок на '
          f'сертифицированный. Для опрессовки фондовых НКТ необходимо заявить в ЦДНГ за 24 часа клапан А-КСШ-89-48-30. '
@@ -31,7 +48,7 @@ def gno_down(self):
          'мастер КРС, предст. заказчика', float(1.2)],
         [None, None, ''.join(['ОВТР 10ч' if CreatePZ.curator == 'ЧР' else 'ОВТР 4ч']),
          None, None, None, None, None, None, None,
-         'мастер КРС', ''.join(['10' if CreatePZ.curator == 'ЧР' else '4'])],
+         'мастер КРС', ''.join(['10' if CreatePZ.region != 'ЧГМ' else '4'])],
         [None, None, 'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС "Ойл-сервис".  Составить'
                      ' акт готовности скважины и передать его начальнику партии. При необходимости подготовить площадку'
                      ' напротив мостков для постановки партии ГИС.',
@@ -39,7 +56,9 @@ def gno_down(self):
          'мастер КРС', None],
         [None, None,
          f'Произвести запись по техкарте 2.3.2: определение профиля приемистости и оценку технического состояния '
-         f'эксплуатационной колонны и НКТ при закачке не менее 80атм при открытой затрубной задвижке',
+         f'эксплуатационной колонны и НКТ при закачке не менее '
+         f'{"".join(["80" if CreatePZ.region == "ЧГМ" and list(CreatePZ.expected_pick_up.values())[0] < 80 else list(CreatePZ.expected_pick_up.values())[0]])}атм '
+         f'при открытой затрубной задвижке',
          None, None, None, None, None, None, None,
          'Мастер КРС, подрядчик по ГИС', 20],
         [None, None,
@@ -53,7 +72,8 @@ def gno_down(self):
          'мастер КРС', float(8.5)],
 
        ]
-
+    except:
+        pass
     gno_list = [[None, None,
          f'За 48 часов до спуска запросить КАРТУ спуска на ГНО и заказать.',
          None, None, None, None, None, None, None,
@@ -73,7 +93,7 @@ def gno_down(self):
         [None, None,
          f'Заявить  комплект подгоночных штанг,полированный шток (вывоз согласовать с ТС ЦДНГ). В ЦДНГ заявить сальниковые '
          f'уплотнения, подвесной патрубок, штанговые переводники, ЯГ-73мм.  \n'
-         f'Предварительно, по согласованию с ЦДНГ, спустить замковую опору на гл {CreatePZ.dict_pump_h["posle"]}м. (в компоновке предусмотреть установку '
+         f'Предварительно, по согласованию с ЦДНГ, спустить замковую опору на гл {dict_pump_h}м. (в компоновке предусмотреть установку '
          f'противополетных узлов (з.о. меньшего диаметра или заглушка с щелевым фильтром)) '
          f'компоновка НКТ: {gno_nkt_opening(CreatePZ.dict_nkt_po)} (завоз с УСО ГНО, ремонтные/новые).\n'
          f' спуск ФНКТ произвести с шаблонированием  сотбраковкой с калибровкой резьб.  ',
@@ -86,7 +106,7 @@ def gno_down(self):
          'Мастер КРС, предст. заказчика', 2.5],
 
         [None, None,
-         f'Спустить {CreatePZ.dict_pump["posle"]} на компоновке штанг: {gno_nkt_opening(CreatePZ.dict_sucker_rod_po)}  Окончательный компоновку штанг производить по расчету '
+         f'Спустить {dict_pump} на компоновке штанг: {gno_nkt_opening(CreatePZ.dict_sucker_rod_po)}  Окончательный компоновку штанг производить по расчету '
          f'ГНО после утверждения заказчиком. ПРИ НЕОБХОДИМОСТИ ПОИНТЕРВАЛЬНОЙ ОПРЕССОВКИ: АВТОСЦЕП УСТАНАВЛИВАТЬ '
          f'НЕ МЕНЕЕ ЧЕМ ЧЕРЕЗ ОДНУ ШТАНГУ ОТ ПЛУНЖЕРА ИЛИ ПЕРЕВОДНИКА ШТОКА НАСОСА!',
          None, None, None, None, None, None, None,
@@ -102,7 +122,7 @@ def gno_down(self):
         [None, None,
          f'Заявить  комплект подгоночных штанг,полированный шток (вывоз согласовать с ТС ЦДНГ). В ЦДНГ заявить сальниковые '
          f'уплотнения, подвесной патрубок, штанговые переводники, ЯГ-73мм.  \n'
-         f'Предварительно, по согласованию с ЦДНГ, спустить {CreatePZ.dict_pump["posle"]} на гл {CreatePZ.dict_pump_h["posle"]}м. (в компоновке предусмотреть установку '
+         f'Предварительно, по согласованию с ЦДНГ, спустить {dict_pump} на гл {dict_pump_h}м. (в компоновке предусмотреть установку '
          f'противополетных узлов (з.о. меньшего диаметра или заглушка с щелевым фильтром)) '
          f'компоновка НКТ: {gno_nkt_opening(CreatePZ.dict_nkt_po)} (завоз с УСО ГНО, ремонтные/новые).\n'
          f' спуск ФНКТ произвести с шаблонированием  сотбраковкой с калибровкой резьб.  ',
@@ -125,8 +145,43 @@ def gno_down(self):
          f'опрессовать ГНО на давление 40атм в течении 30 минут в присутствии представителя заказчика',
          None, None, None, None, None, None, None,
          'Мастер КРС, предст. заказчика', 1.5],
-
     ]
+
+    descentORD = [ [None, None,
+         f'Заявить  комплект подгоночных штанг,полированный шток (вывоз согласовать с ТС ЦДНГ), комплект НКТ.  В ЦДНГ заявить сальниковые '
+         f'уплотнения, подвесной патрубок, штанговые переводники, ЯГ-73мм.  \n',
+         None, None, None, None, None, None, None,
+         'Мастер КРС', None],
+        [None, None,
+         f'Спустить предварительно ЭЦН на НКТ{gno_nkt_opening(CreatePZ.dict_nkt_po)} c пакером {CreatePZ.paker_do["posle"]} на'
+         f' глубину {CreatePZ.H_F_paker_do["posle"]}м'
+         f'(завоз с УСО ГНО, ремонтные/новые) на гл. {dict_pump_h}м. Спуск НКТ производить с шаблонированием и '
+         f'смазкой резьбовых соединений, замером изоляции каждые 100м.  ',
+         None, None, None, None, None, None, None,
+         'Мастер КРС, предст. заказчика', 2.5],
+        [None, None,
+         f'Демонтировать превентор. Посадить пакер на глубине {CreatePZ.H_F_paker_do["posle"]}м.  Монтаж  устьевой арматуры. При монтаже использовать только сертифицированное'
+         f' оборудование (переводники, муфты, переходные катушки). МОНТАЖ БЕЗ ПОДВЕСНОГО ПАТРУБКА ЗАПРЕЩЕН. произвести разделку'
+         f' кабеля под устьевой сальник '
+         f'произвести герметизацию устья. \nОпрессовать эксплуатационную колонну в интервале {CreatePZ.H_F_paker_do["posle"]}-0м на Р={CreatePZ.max_admissible_pressure}атм'
+         f' в течение 30 минут на наличие перетоков в НКТ. Опрессовать кабельный ввод устьевой арматуры',
+         None, None, None, None, None, None, None,
+         'Мастер КРС, предст. заказчика', 2.5],
+           [None, None,
+            f'Спустить {dict_pump} на компоновке штанг: {gno_nkt_opening(CreatePZ.dict_sucker_rod_po)}  Окончательный компоновку штанг производить по расчету '
+            f'ГНО после утверждения заказчиком. ПРИ НЕОБХОДИМОСТИ ПОИНТЕРВАЛЬНОЙ ОПРЕССОВКИ: АВТОСЦЕП УСТАНАВЛИВАТЬ '
+            f'НЕ МЕНЕЕ ЧЕМ ЧЕРЕЗ ОДНУ ШТАНГУ ОТ ПЛУНЖЕРА ИЛИ ПЕРЕВОДНИКА ШТОКА НАСОСА!',
+            None, None, None, None, None, None, None,
+            'Мастер КРС, предст. заказчика', 5.5],
+           [None, None,
+            f'Перед пуском  произвести подгонку штанг и '
+            f'опрессовать ГНО на давление 40атм в течении 30 минут в присутствии представителя заказчика с помощью ЦА-320 '
+         f'(составить акт). Предоставить Заказчику замер НКТ.',
+            None, None, None, None, None, None, None,
+            'Мастер КРС, предст. заказчика', 1.5],
+
+        ]
+
 
     descent_ecn = [
         [None, None,'Опрессовать НКТ между УЭЦН и обратным клапаном, отдельно до спуска УЭЦН (составить акт).  '
@@ -134,7 +189,7 @@ def gno_down(self):
          None, None, None, None, None, None, None,
          'Мастер КРС, предст. заказчика', 0.3],
         [None, None,
-         f'Спустить предварительно {CreatePZ.dict_pump["posle"]} на НКТ{gno_nkt_opening(CreatePZ.dict_nkt_po)} (завоз с УСО ГНО, ремонтные/новые) на гл. {CreatePZ.dict_pump_h["posle"]}м. Спуск НКТ производить с шаблонированием и '
+         f'Спустить предварительно {dict_pump} на НКТ{gno_nkt_opening(CreatePZ.dict_nkt_po)} (завоз с УСО ГНО, ремонтные/новые) на гл. {dict_pump_h}м. Спуск НКТ производить с шаблонированием и '
          f'смазкой резьбовых соединений, замером изоляции каждые 100м.  ',
          None, None, None, None, None, None, None,
          'Мастер КРС, предст. заказчика', 2.5],
@@ -153,66 +208,65 @@ def gno_down(self):
         ]
 
 
-    lift_dict = {'пакер': paker_descent,  'ЭЦН': descent_ecn, 'НВ': descent_nv, 'НН': descent_nn} #'ОРЗ': lift_orz, 'ОРД': lift_ord, 'Воронка': lift_voronka,
+    lift_dict = {'пакер': paker_descent,  'ЭЦН': descent_ecn, 'НВ': descent_nv, 'НН': descent_nn, 'ОРД': descentORD} #'ОРЗ': lift_orz, 'ОРД': lift_ord, 'Воронка': lift_voronka,
                  # 'НН с пакером': lift_pump_nn_with_paker, 'НВ с пакером': lift_pump_nv_with_paker,
                  # 'ЭЦН с пакером': lift_ecn_with_paker,
-    lift_sel = ['ЭЦН', 'НВ', 'НН', 'пакер'] #  'ОРЗ', 'ОРД', 'Воронка', 'НН с пакером', 'НВ с пакером', 'ЭЦН с пакером',
+    lift_sel = ['ЭЦН', 'НВ', 'НН', 'пакер', 'ОРД'] #  'ОРЗ', 'ОРД', 'Воронка', 'НН с пакером', 'НВ с пакером', 'ЭЦН с пакером',
+    dict_pump = ''
 
 
-
-    if 'ЭЦН' in CreatePZ.dict_pump["posle"].upper() or 'ВНН' in CreatePZ.dict_pump["posle"].upper() and str(
+    if 'ЭЦН' in dict_pump.upper() or 'ВНН' in dict_pump.upper() and str(
             CreatePZ.paker_do[
                 "posle"]) == '0':
         lift_select = descent_ecn
-        lift_s = CreatePZ.dict_pump["posle"]
-    # elif ('ЭЦН' in CreatePZ.dict_pump["posle"].upper() or 'ВНН' in CreatePZ.dict_pump["posle"].upper()) and (
+        lift_s = dict_pump
+    # elif ('ЭЦН' in dict_pump.upper() or 'ВНН' in dict_pump.upper()) and (
     #         CreatePZ.dict_sucker_rod != None and CreatePZ.if_None(CreatePZ.paker_do["posle"]) != 'отсут'):
     #
     #     lift_select = lift_ord
     #     print(f'Подьем орд')
-    # elif ('ЭЦН' in CreatePZ.dict_pump["posle"].upper() or 'ВНН' in CreatePZ.dict_pump["posle"].upper()) and (
+    # elif ('ЭЦН' in dict_pump.upper() or 'ВНН' in dict_pump.upper()) and (
     #         CreatePZ.if_None(CreatePZ.paker_do["posle"]) != 'отсут'):
     #     lift_select = lift_ecn_with_paker
     #     print('Подьем ЭЦН с пакером ')
 
-    elif 'НВ' in CreatePZ.dict_pump["posle"].upper() and CreatePZ.if_None(CreatePZ.paker_do["posle"]) == 'отсут':
+    elif 'НВ' in dict_pump.upper() or 'ШГН' in dict_pump.upper() and CreatePZ.if_None(CreatePZ.paker_do["posle"]) == 'отсут':
         lift_select = descent_nv
-        lift_s = CreatePZ.dict_pump["posle"]
-    # elif 'НВ' in CreatePZ.dict_pump["posle"].upper() and CreatePZ.if_None(CreatePZ.paker_do["posle"]) != 'отсут':
+        lift_s = dict_pump
+    # elif 'НВ' in dict_pump.upper() and CreatePZ.if_None(CreatePZ.paker_do["posle"]) != 'отсут':
     #     lift_select = lift_pump_nv_with_paker
     #     print('Подьем НВ с пакером ')
-    elif 'НН' in CreatePZ.dict_pump["posle"].upper() and CreatePZ.if_None(CreatePZ.paker_do["posle"]) == 'отсут':
+    elif 'НН' in dict_pump.upper() and CreatePZ.if_None(CreatePZ.paker_do["posle"]) == 'отсут':
         lift_select = descent_nn
-        lift_s = CreatePZ.dict_pump["posle"]
-    # elif 'НН' in CreatePZ.dict_pump["posle"].upper() and CreatePZ.if_None(CreatePZ.paker_do["posle"]) != 'отсут':
+        lift_s = dict_pump
+    elif 'НВ' in dict_pump_nv.upper() and 'ЭЦН' in dict_pump_ecn.upper() \
+            and  CreatePZ.if_None(CreatePZ.paker_do["posle"]) != 'отсут':
+        lift_select = descentORD
+        lift_s = "ОРД"
+    # elif 'НН' in dict_pump.upper() and CreatePZ.if_None(CreatePZ.paker_do["posle"]) != 'отсут':
     #     lift_select = lift_pump_nn_with_paker
     #     print('Подьем НН с пакером ')
 
-    # elif str(CreatePZ.dict_pump["posle"]) == '0' and CreatePZ.if_None(CreatePZ.paker_do["posle"]) == 'отсут':
+    # elif str(dict_pump) == '0' and CreatePZ.if_None(CreatePZ.paker_do["posle"]) == 'отсут':
     #     lift_select = lift_voronka
     #     print('Подьем  воронки')
-    elif str(CreatePZ.dict_pump["posle"]) == '0' and CreatePZ.if_None(CreatePZ.paker_do["posle"]) != 'отсут':
+    elif str(dict_pump) == '0' and CreatePZ.if_None(CreatePZ.paker_do["posle"]) != 'отсут':
         lift_select = paker_descent
-        lift_s = f'пакер ППД  {CreatePZ.dict_pump["posle"]}'
+        lift_s = f'пакер ППД  {CreatePZ.paker_do["posle"]}'
     # elif 89 in CreatePZ.dict_nkt.keys() and 48 in CreatePZ.dict_nkt.keys() and CreatePZ.if_None(
     #         CreatePZ.paker_do["posle"]) != 'отсут':
     #     lift_select = lift_orz
     #     print('Подьем ОРЗ')
-    descent_gno_quest = QMessageBox.question(self, 'Спуск ГНО', f'Программа определил что спускать будем {lift_s}')
-    if descent_gno_quest == QMessageBox.StandardButton.Yes:
-        gno_list = lift_select
 
 
-    else:
+    lift, ok = QInputDialog.getItem(self, 'Спуcкаемое  оборудование', 'выбор спукаемого оборудования',
+                                    lift_sel, 1, False)
 
-        lift, ok = QInputDialog.getItem(self, 'Спущенное оборудование', 'выбор спущенного оборудования',
-                                        lift_sel, 1, False)
-
-        if ok and lift_sel:
-            self.le.setText(lift)
-        lift_select = lift_dict[lift]
-        for row in lift_select:
-            gno_list.append(row)
+    if ok and lift_sel:
+        self.le.setText(lift)
+    lift_select = lift_dict[lift]
+    for row in lift_select:
+        gno_list.append(row)
 
 
     end_list =   [[None, None,

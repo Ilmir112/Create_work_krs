@@ -204,6 +204,12 @@ class MyWindow(QMainWindow):
         action_menu.addAction(ryber_action)
         ryber_action.triggered.connect(self.ryberAdd)
 
+        drilling_menu = action_menu.addMenu('Бурение')
+
+        drilling_action_nkt = QAction("бурение на НКТ", self)
+        drilling_menu.addAction(drilling_action_nkt)
+        drilling_action_nkt.triggered.connect(self.drilling_action_nkt)
+
         template_without_skm = QAction("шаблон без СКМ", self)
         template_menu.addAction(template_without_skm)
         template_without_skm.triggered.connect(self.template_without_skm)
@@ -217,6 +223,10 @@ class MyWindow(QMainWindow):
         acid_action_2paker = QAction("на двух пакерах", self)
         acid_menu.addAction(acid_action_2paker)
         acid_action_2paker.triggered.connect(self.acid_action_2paker)
+
+        acid_action_gons = QAction("ГОНС", self)
+        acid_menu.addAction(acid_action_gons)
+        acid_action_gons.triggered.connect(self.acid_action_gons)
 
         sand_menu = action_menu.addMenu('песчанный мост')
         filling_action = QAction('Отсыпка песком')
@@ -253,6 +263,14 @@ class MyWindow(QMainWindow):
         CreatePZ.ins_ind = r+1
         print(f' выбранная строка {self.ins_ind}')
 
+    def drilling_action_nkt(self):
+        from work_py.drilling import drilling_nkt
+        drilling_work_list = drilling_nkt(self)
+        self.populate_row(self.ins_ind, drilling_work_list)
+    def acid_action_gons(self):
+        from work_py.acids import acidGons
+        acidGons_work_list = acidGons(self)
+        self.populate_row(self.ins_ind, acidGons_work_list)
     def rirWithRpk(self):
         from work_py.rir import rir_rpk
         rirRpk_work_list = rir_rpk(self)

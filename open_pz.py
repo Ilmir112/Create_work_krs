@@ -25,12 +25,14 @@ from gnkt_opz import gnkt_work
 
 
 class CreatePZ(MyWindow):
+    grpPlan = False
     nktOpressTrue = False
     normOfTime = 0
     lift_ecn_can_addition = False
     column_passability = False
     column_additional_passability = False
     template_depth = 0
+    nkt_diam = 73
     b_plan = 0
     column_leakiness = False
     dict_perforation = {}
@@ -178,7 +180,8 @@ class CreatePZ(MyWindow):
                 data_pvr_max = row_ind - 2
             elif 'III. Состояние скважины к началу ремонта ' in row:
                 condition_of_wells = row_ind
-
+            elif 'КР13-1 - Подготовительные работы к ГРП' in row:
+                CreatePZ.grpPlan == True
             for col, value in enumerate(row):
 
                 if 'площадь' == value:  # определение номера скважины
@@ -397,24 +400,45 @@ class CreatePZ(MyWindow):
 
                 elif value == 'Насос' and row[col + 2] == 'типоразмер':
                     if CreatePZ.if_None(row[col + 4]) != 'отсут':
-                        CreatePZ.dict_pump['do'] = CreatePZ.if_None(row[col + 4])
+                        try:
+                            CreatePZ.dict_pump['do'] = CreatePZ.if_None(row[col + 4]).split('/')
+                        except:
+                            CreatePZ.dict_pump['do'] = CreatePZ.if_None(row[col + 4])
 
                     if CreatePZ.old_version == True and CreatePZ.if_None(row[col + 8]) != 'отсут':
-                        CreatePZ.dict_pump['posle'] = CreatePZ.if_None(row[col + 8])
+                        try:
+                            CreatePZ.dict_pump['posle'] = CreatePZ.if_None(row[col + 8]).split('/')
+                        except:
+                            CreatePZ.dict_pump['posle'] = CreatePZ.if_None(row[col + 8])
                     elif CreatePZ.old_version == False and CreatePZ.if_None(row[col + 9]) != 'отсут':
-                        CreatePZ.dict_pump['posle'] = CreatePZ.if_None(row[col + 9])
+                        try:
+                            CreatePZ.dict_pump['posle'] = CreatePZ.if_None(row[col + 9]).split('/')
+                        except:
+                            CreatePZ.dict_pump['posle'] = CreatePZ.if_None(row[col + 9])
 
                     # print(f' ячейка {ws.cell(row=row_ind + 5, column=col + 3).value}')
                     if ws.cell(row=row_ind + 5, column=col + 3).value == 'Нсп, м':
-                        CreatePZ.dict_pump_h['do'] = CreatePZ.without_b(ws.cell(row=row_ind + 5, column=col + 5).value)
+                        try:
 
+                            CreatePZ.dict_pump_h['do'] = CreatePZ.without_b(ws.cell(row=row_ind + 5, column=col + 5).value)
+                            print(f' глубина насос до {CreatePZ.dict_pump_h["do"]}')
+                        except:
+                            CreatePZ.dict_pump_h['do'] = CreatePZ.without_b(
+                                ws.cell(row=row_ind + 5, column=col + 5).value)
                         if CreatePZ.old_version == True:
-                            CreatePZ.dict_pump_h['posle'] = CreatePZ.without_b(
-                                ws.cell(row=row_ind + 5, column=col + 9).value)
+                            try:
+                                CreatePZ.dict_pump_h['posle'] = CreatePZ.without_b(
+                                    ws.cell(row=row_ind + 5, column=col + 9).value).split('/')
+                            except:
+                                CreatePZ.dict_pump_h['posle'] = CreatePZ.without_b(
+                                    ws.cell(row=row_ind + 5, column=col + 9).value)
                         else:
-                            CreatePZ.dict_pump_h['posle'] = CreatePZ.without_b(
-                                ws.cell(row=row_ind + 5, column=col + 10).value)
-
+                            try:
+                                CreatePZ.dict_pump_h['posle'] = CreatePZ.without_b(
+                                    ws.cell(row=row_ind + 5, column=col + 10).value).split('/')
+                            except:
+                                CreatePZ.dict_pump_h['posle'] = CreatePZ.without_b(
+                                    ws.cell(row=row_ind + 5, column=col + 10).value)
                 elif value == 'Н посадки, м':
                     if CreatePZ.paker_do['do'] != 'отсут':
                         try:
@@ -548,9 +572,9 @@ class CreatePZ(MyWindow):
                 value = ws.cell(row=row, column=7).value
                 if key != None and row < CreatePZ.b_plan:
 
-                    CreatePZ.dict_sucker_rod[key] = CreatePZ.dict_sucker_rod.get(key, 0) + value
+                    CreatePZ.dict_sucker_rod[key] = CreatePZ.dict_sucker_rod.get(key, 0) + int(CreatePZ.without_b(value))
                 elif key != None and row >= CreatePZ.b_plan:
-                    CreatePZ.dict_sucker_rod_po[key] = CreatePZ.dict_sucker_rod_po.get(key, 0) + value
+                    CreatePZ.dict_sucker_rod_po[key] = CreatePZ.dict_sucker_rod_po.get(key, 0) + int(CreatePZ.without_b(value))
                 # self.dict_sucker_rod = dict_sucker_rod
                 # self.dict_sucker_rod_po = dict_sucker_rod_po
                 print(f' штанги на спуск {CreatePZ.dict_sucker_rod_po}')
@@ -924,10 +948,16 @@ class CreatePZ(MyWindow):
             return a
         elif a == '-' or a == 'отсутствует' or a == 'отсутв' or a == 'отсут' or a == None:
             return '0'
+        elif len(a.split('/')) == 2:
+            lst = []
+            for i in a.split('/'):
+                print(i)
+                lst.append(float(i.replace(',','.').strip()))
+            return lst
         else:
             b = 0
             for i in a:
-                if i in '0123456789.,':
+                if i in '0123456789,./':
                     b = str(b) + i
 
             return float(b)
