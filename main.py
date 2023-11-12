@@ -243,6 +243,10 @@ class MyWindow(QMainWindow):
         grpWithPaker_action.triggered.connect(self.grpWithPaker)
 
         rir_menu = action_menu.addMenu('РИР')
+        rirWithPero_action = QAction('РИР на пере')
+        rir_menu.addAction(rirWithPero_action)
+        rirWithPero_action.triggered.connect(self.rirWithPero)
+
         rirWithRpk_action = QAction('РИР с РПК')
         rir_menu.addAction(rirWithRpk_action)
         rirWithRpk_action.triggered.connect(self.rirWithRpk)
@@ -275,6 +279,10 @@ class MyWindow(QMainWindow):
         from work_py.rir import rir_rpk
         rirRpk_work_list = rir_rpk(self)
         self.populate_row(self.ins_ind, rirRpk_work_list)
+    def rirWithPero(self):
+        from work_py.rir import rirWithPero
+        rirWithPero_work_list = rirWithPero(self)
+        self.populate_row(self.ins_ind, rirWithPero_work_list)
     def grpWithPaker(self):
         from work_py.grp import grpPaker
 

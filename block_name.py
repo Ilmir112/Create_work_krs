@@ -161,6 +161,7 @@ def razdel_1(self):
          for row in range(len(podp_bvo)):
              for col in range(len(podp_bvo[row])):
                  razdel_1[row+9][col] = podp_bvo[row][col]
+
     if CreatePZ.grpPlan == True:
         for row in range(len(podp_grp)):
             for col in range(len(podp_grp[row])):
