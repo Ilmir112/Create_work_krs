@@ -363,13 +363,13 @@ class CreatePZ(MyWindow):
                                                                                           'введите глубину башмак доп колонны',
                                                                                           600, 0, 3500)
                             try:
-                                CreatePZ.column_additional_diametr = ws.cell(row=row_ind + 3, column=col + 4).value
+                                CreatePZ.column_additional_diametr = CreatePZ.without_b(ws.cell(row=row_ind + 3, column=col + 4).value)
                             except:
                                 CreatePZ.column_additional_diametr, ok = QInputDialog.getInt(self, ',диаметр доп колонны',
                                                                                              'введите внешний диаметр доп колонны',
                                                                                              600, 0, 3500)
                             try:
-                                CreatePZ.column_additional_wall_thickness = ws.cell(row=row_ind + 3, column=col + 6).value
+                                CreatePZ.column_additional_wall_thickness = CreatePZ.without_b(ws.cell(row=row_ind + 3, column=col + 6).value)
                             except:
                                 CreatePZ.column_additional_wall_thickness, ok = QInputDialog.getInt(self,
                                                                                                     ',толщина стенки доп колонны',
@@ -530,30 +530,38 @@ class CreatePZ(MyWindow):
                             Qpr = ws.cell(row=row, column=col + 1).value
                             print(f' приемис {Qpr}')
                             n = 1
-                            while ws.cell(row=row, column=col + n).value == None:
+                            while Qpr == None:
                                 ws.cell(row=row, column=col + n).value
                                 n += 1
-                                Qpr = ws.cell(row=row, column=col + 1).value
+                                Qpr = ws.cell(row=row, column=col +n).value
                             print(f'после {Qpr}')
 
 
-                        elif str(ws.cell(row=row, column=col).value).strip() in ['Рзак', 'Давление закачки ',
+                        elif str(ws.cell(row=row, column=col).value).strip().lower() in ['Рзак', 'давление закачки',
                                                                                  'Рзак (Нагнет)', 'Рзак (Нагнет)', 'Давление']:
                             Pzak = ws.cell(row=row, column=col + 1).value
                             n = 1
-                            while ws.cell(row=row, column=col + n).value != None:
-                                ws.cell(row=row, column=col + n).value
+                            while Pzak == None:
+
                                 n += 1
-                                Pzak = ws.cell(row=row, column=col + 1).value
-                                print(f' зака {Pzak}')
+                                Pzak = ws.cell(row=row, column=col + n).value
+                                print(f'pзака {Pzak}')
 
 
                 CreatePZ.expected_pick_up[Qpr] = Pzak
-                # print(CreatePZ.expected_pick_up)
+                print(f' ожидаемые показатели {CreatePZ.expected_pick_up}')
 
             except:
                 print('ошибка при определении плановых показателей')
-
+                expected_Q, ok = QInputDialog.getInt(self, 'Ожидаемая приемистость ',
+                                                     f'Ожидаемая приемистость по пласту ',
+                                                     100, 0,
+                                                     1600)
+                expected_P, ok = QInputDialog.getInt(self, f'Ожидаемое Давление закачки',
+                                                     f'Ожидаемое Давление закачки по пласту ',
+                                                     100, 0,
+                                                     250)
+                CreatePZ.expected_pick_up[expected_Q] = expected_P
             print(f' Ожидаемые {CreatePZ.expected_pick_up}')
         # print(f' индекс нкт {pipes_ind + 1, condition_of_wells}')
         for row in range(pipes_ind + 1, condition_of_wells):  # словарь  количества НКТ и метраж
@@ -574,7 +582,7 @@ class CreatePZ(MyWindow):
             CreatePZ.shoe_nkt > CreatePZ.bottomhole_artificial
         except:
             print('НКТ ниже забоя')
-        print(f' индекс штанг{sucker_rod_ind, pipes_ind}')
+        # print(f' индекс штанг{sucker_rod_ind, pipes_ind}')
         try:
             for row in range(sucker_rod_ind, pipes_ind - 1):
                 if ws.cell(row=row, column=3).value == 'План':
@@ -700,6 +708,9 @@ class CreatePZ(MyWindow):
             CreatePZ.perforation_sole = max(max(
                 [max(CreatePZ.dict_work_pervorations[i]['интервал']) for i in CreatePZ.plast_work]))
             print(f'мин {CreatePZ.perforation_roof}, мак {CreatePZ.perforation_sole}')
+            CreatePZ.perforation_roof_all = min(min(
+                [min(CreatePZ.dict_perforation[i]['интервал']) for i in CreatePZ.plast_all]))
+            print(CreatePZ.perforation_roof_all)
         except:
             perf_true_quest = QMessageBox.question(self, 'Программа',
                                                    'Программа определили,что в скважине интервалов перфорации нет, верно ли?')
@@ -971,10 +982,10 @@ class CreatePZ(MyWindow):
         else:
             b = 0
             for i in a:
-                if i in '0123456789,./':
+                if i in '0123456789,.':
                     b = str(b) + i
 
-            return float(b)
+            return float(b.replace(',','.'))
 
     def count_row_height(ws, work_list, ins_ind, merged_cells_dict):
         from main import MyWindow

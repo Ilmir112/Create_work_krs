@@ -98,7 +98,7 @@ def paker_list(self):
          f'целью определения места нарушения в присутствии представителя заказчика, составить акт. '
          f'Определить приемистость НЭК.',
          None, None, None, None, None, None, None,
-         'мастер КРС',None ],
+         'мастер КРС', None],
         [None, None,
          f'Поднять {paker_select(self)} на НКТ{CreatePZ.nkt_diam} c глубины {paker_depth}м с доливом скважины в '
          f'объеме {round(paker_depth*1.12/1000,1)}м3 удельным весом {CreatePZ.fluid_work}',
@@ -121,6 +121,11 @@ def paker_list(self):
            'мастер КРС', 0.7]]
         for i in range(len(pressureZUMPF_list)):
             paker_list.insert(4 + i, pressureZUMPF_list[i])
+        paker_list[-1] = [None, None,
+         f'Поднять {paker_select(self)} на НКТ{CreatePZ.nkt_diam} c глубины {pakerDepthZumpf}м с доливом скважины в '
+         f'объеме {round(paker_depth*1.12/1000,1)}м3 удельным весом {CreatePZ.fluid_work}',
+         None, None, None, None, None, None, None,
+         'мастер КРС', round(0.25+0.033*1.2*(paker_depth+paker_khost)/9.5*1.04,1)]
 
     return paker_list
 

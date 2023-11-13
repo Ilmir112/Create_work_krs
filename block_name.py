@@ -25,7 +25,7 @@ current_datetime = datetime.today()
 # Выбор подписантов в зависимости от региона
 def pop_down(self, region, curator_sel):
     from open_pz import CreatePZ
-    nach_tkrs_list = ['А.Р.Габдулхаков ', 'З.К. Алиев', 'М.К.Алиев']
+    nach_tkrs_list = ['Яушев Р.Р.', 'З.К. Алиев', 'М.К.Алиев']
     if region == 'ЧГМ' or region == 'ТГМ':
         nach_tkrs = nach_tkrs_list[0]
     elif region == 'КГМ' or region == 'АГМ':

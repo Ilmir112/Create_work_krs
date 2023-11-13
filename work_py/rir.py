@@ -1,5 +1,7 @@
 from PyQt5.QtWidgets import QMessageBox, QInputDialog
 
+from krs import volume_vn_ek,volume_vn_nkt
+
 
 def rir_rpk(self):
     from open_pz import CreatePZ
@@ -139,6 +141,7 @@ def rpk_nkt(self, paker_depth):
 def rirWithPero(self):
     from open_pz import CreatePZ
     from work_py.opressovka import paker_list, paker_diametr_select
+    from krs import volume_vn_nkt
     rir_list = []
     for row in paker_list(self):
         rir_list.append(row)
@@ -148,7 +151,13 @@ def rirWithPero(self):
                                      CreatePZ.plast_work, 0, False)
     if ok and plast:
         self.le.setText(plast)
-
+    rirSole, ok = QInputDialog.getInt(None, 'Подошва цементного моста',
+                                      'Введите глубину подошвы цементного моста ',
+                                      int(CreatePZ.current_bottom), 0, int(CreatePZ.bottomhole_drill))
+    rirRoof, ok = QInputDialog.getInt(None, 'Кровля цементного моста',
+                                      'Введите глубину кровлю цементного моста ',
+                                      int(CreatePZ.perforation_roof-50), 0, int(CreatePZ.bottomhole_drill))
+    dict_nkt = {73: rirSole}
 
     glin_list = [
         [None, None,
@@ -160,21 +169,21 @@ def rirWithPero(self):
                None, None, None, None, None, None, None,
                'мастер КРС', 2.5],
                  [None, None,
-               f'По результатам определения приёмистости выполнить следующие работы: /n'
+               f'По результатам определения приёмистости выполнить следующие работы: \n'
                f'В случае приёмистости свыше 480 м3/сут при Р=100атм выполнить работы по п.п.11-14 '
-               f'(по согласованию с ГС и ПТО ООО Ойл-сервис и заказчика). /тn'
+               f'(по согласованию с ГС и ПТО ООО Ойл-сервис и заказчика). \n'
                f'В случае приёмистости менее 480 м3/сут при Р=100атм и более 120м3/сут при Р=100атм продолжить работы с п. 17',
                None, None, None, None, None, None, None,
                'мастер КРС, заказчик', None],
                  [None, None,
-                  f'Объём глинистого р-ра скорректировать на устье на основании тех.возможности. /n'
+                  f'Объём глинистого р-ра скорректировать на устье на основании тех.возможности. \n'
                   f'Приготовить глинистый раствор в объёме 5м3 (расчет на 1 м3 - сухой глинопорошок массой 0,3т + '
                   f'вода у=1,00г/см3 в объёме 0,9м3) плотностью у=1,24г/см3',
                   None, None, None, None, None, None, None,
                   'мастер КРС', 2.5],
                  [None, None,
-                  f'Закачать в НКТ при открытом затрубном пространстве глинистый раствор в объеме 5м3. Закрыть затруб. '
-                  f'Продавить в НКТ  тех. воду  в объёме 2,2м3 при давлении не более 150атм.',
+                  f'Закачать в НКТ при открытом затрубном пространстве глинистый раствор в объеме 5м3 + тех. воду  в объёме {volume_vn_nkt(dict_nkt)-5}м3. Закрыть затруб. '
+                  f'Продавить в НКТ  тех. воду  в объёме {volume_vn_nkt(dict_nkt)}м3 при давлении не более {CreatePZ.max_admissible_pressure}атм.',
                   None, None, None, None, None, None, None,
                   'мастер КРС', 0.5],
                  [None, None,
@@ -197,19 +206,22 @@ def rirWithPero(self):
                   None, None, None, None, None, None, None,
                   'мастер КРС', 0.35]
                  ]
-    for row in sorted(glin_list, reverse=True):
-        rir_list.insert(-1, row)
+    if volume_vn_nkt(dict_nkt)<=5:
+        glin_list[3] =  [None, None,
+                  f'Закачать в НКТ при открытом затрубном пространстве глинистый раствор в объеме {volume_vn_nkt(dict_nkt)}м3. Закрыть затруб. '
+                  f'Продавить в НКТ остаток глинистого раствора в объеме {round(5-volume_vn_nkt(dict_nkt),1)} и тех. воду  в объёме {volume_vn_nkt(dict_nkt)}м3 при давлении не более {CreatePZ.max_admissible_pressure}атм.',
+                  None, None, None, None, None, None, None,
+                  'мастер КРС', 0.5]
 
-    rirSole, ok = QInputDialog.getInt(None, 'Подошва цементного моста',
-                                       'Введите глубину подошвы цементного моста ',
-                                       int(CreatePZ.current_bottom), 0, int(CreatePZ.bottomhole_drill))
-    rirRoof, ok = QInputDialog.getInt(None, 'Кровля цементного моста',
-                                      'Введите глубину кровлю цементного моста ',
-                                      int(CreatePZ.current_bottom), 0, int(CreatePZ.bottomhole_drill))
-    rirPero_list =[
+    for row in glin_list:
+        rir_list.insert(-2, row)
+
+    volume_cement = round(volume_vn_ek(self) * (rirSole - rirRoof)/1000, 1)
+
+    rirPero_list = [
         [None, None,
-         f'Спустить перо   + НКТ + опрессовочное седло  на тНКТ73мм до глубины {rirSole}м с замером, шаблонированием '
-         f'шаблоном 59,6мм. Опрессовать НКТ на 150атм. Вымыть шар. /n'
+         f'Спустить перо   + НКТ + опрессовочное седло  на тНКТ{nkt_diam}мм до глубины {rirSole}м с замером, шаблонированием '
+         f'шаблоном 59,6мм. Опрессовать НКТ на 150атм. Вымыть шар. \n'
          f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
          None, None, None, None, None, None, None,
          'мастер КРС', 2.5],
@@ -218,13 +230,13 @@ def rirWithPero(self):
          None, None, None, None, None, None, None,
          'мастер КРС', 2.5],
         [None, None,
-         f'Приготовить цементный раствор у=1,82г/см3 в объёме 0,4 м3 (сухой цемент 0,5т) '
-         f'с добавление 3% CaCl весом  15кг в соотношении (на 1т. цем. – 30кг.)',
+         f'Приготовить цементный раствор у=1,82г/см3 в объёме {volume_cement}м3'
+         f' (сухой цемент{round(volume_cement*1.25,1)}т) ',
          None, None, None, None, None, None, None,
          'мастер КРС', 0.5],
         [None, None,
-         f'Вызвать циркуляцию. Закачать в НКТ тех. воду у=1,00г/см3 в объеме 0,5м3, цементный раствор в объеме 0,4м3, '
-         f'довести тех.жидкостью у=1,00г/см3 в объёме 1,5м3, тех. жидкостью  в объёме 4,2м3. '
+         f'Вызвать циркуляцию. Закачать в НКТ тех. воду у=1,00г/см3 в объеме 0,5м3, цементный раствор в объеме {volume_cement}м3, '
+         f'довести тех.жидкостью у=1,00г/см3 в объёме 1,5м3, тех. жидкостью  в объёме {round(volume_vn_nkt(dict_nkt)-1.5,1)}м3. '
          f'Уравновешивание цементного раствора',
          None, None, None, None, None, None, None,
          'мастер КРС', 0.5],
@@ -234,7 +246,7 @@ def rirWithPero(self):
          'мастер КРС', 0.5],
         [None, None,
          f'Открыть трубное пространство. Промыть скважину обратной промывкой (срезка) по круговой циркуляции '
-         f'тех.жидкостью  в объеме не менее 12м3 уд.весом {CreatePZ.fluid_work} (Полуторакратный объем НКТ) '
+         f'тех.жидкостью  в объеме не менее {round(volume_vn_nkt(dict_nkt) * 1.5, 1)}м3 уд.весом {CreatePZ.fluid_work} (Полуторакратный объем НКТ) '
          f'с расходом жидкости 8л/с (срезка) до чистой воды.',
          None, None, None, None, None, None, None,
          'мастер КРС', 0.5],
@@ -270,3 +282,5 @@ def rirWithPero(self):
         rir_list.append(row)
 
     return rir_list
+
+

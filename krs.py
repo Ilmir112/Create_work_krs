@@ -974,6 +974,13 @@ def lifting_unit(self):
 
     return upa_60 if CreatePZ.bottomhole_artificial >= 2300 else aprs_40
 
+def volume_vn_ek(self):
+    from open_pz import CreatePZ
+    if CreatePZ.column_additional == False:
+        volume = round((CreatePZ.column_diametr - 2 * CreatePZ.column_wall_thickness)**2 * 3.14/4/1000,2)
+    else:
+        volume = round((CreatePZ.column_additional_diametr - 2 * CreatePZ.column_additional_wall_thickness) ** 2 * 3.14 / 4/1000,2)
+    return volume
 
 def volume_vn_nkt(dict_nkt):  # Внутренний объем одного погонного местра НКТ
     for nkt, lenght_nkt in dict_nkt.items():
@@ -991,7 +998,7 @@ def volume_vn_nkt(dict_nkt):  # Внутренний объем одного п�
             t_nkt = 4.5
             volume_vn_nkt += round(3.14 * (nkt - 2 * t_nkt) ** 2 / 4000000 * lenght_nkt * 1.1, 5)
 
-    return volume_vn_nkt
+    return round(volume_vn_nkt,1)
 
 
 def volume_rod(dict_sucker_rod):  # Объем штанг
@@ -1061,9 +1068,9 @@ def well_volume(self, current_bottom):
             current_bottom)
 
     else:
-
+        print(f' ghb [{CreatePZ.column_additional_diametr, CreatePZ.column_additional_wall_thickness}]')
         volume_well = (3.14 * (
-                CreatePZ.column_additional_diametr - CreatePZ.column_wall_thickness * 2) ** 2 / 4 / 1000 * (
+                CreatePZ.column_additional_diametr - CreatePZ.column_additional_wall_thickness * 2) ** 2 / 4 / 1000 * (
                                current_bottom - CreatePZ.head_column_additional) / 1000) + (
                               3.14 * (CreatePZ.column_diametr - CreatePZ.column_wall_thickness * 2) ** 2 / 4 / 1000 * (
                           CreatePZ.head_column_additional) / 1000)
@@ -1152,7 +1159,7 @@ def well_jamming(self, without_damping, lift_key):
 
 def is_number(num):
     try:
-        float(num)
+        float(str(num))
         return True
     except ValueError or TypeError:
         return False

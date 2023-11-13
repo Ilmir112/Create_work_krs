@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QInputDialog
 from krs import well_volume
 
 
-def swabbing_with_paker(self):
+def swabbing_with_paker(self, paker_khost):
     from open_pz import CreatePZ
     from work_py.opressovka import paker_diametr_select
 
@@ -32,13 +32,13 @@ def swabbing_with_paker(self):
                       f'Обязательная сдача в этот день в ЦДНГ'
 
     paker_depth, ok = QInputDialog.getInt(None, 'посадка пакера',
-                                          'Введите глубину посадки пакера', int(CreatePZ.perforation_roof - 40), 0,
+                                          f'Введите глубину посадки пакера при освоении для перфорации {CreatePZ.dict_work_pervorations}', int(CreatePZ.perforation_roof - 40), 0,
                                           5000)
     paker_khost1 = int(CreatePZ.perforation_sole - paker_depth)
     print(f'хвостовик {paker_khost1}')
-    paker_khost, ok = QInputDialog.getInt(None, 'хвостовик',
-                                          f'Введите длину хвостовика кровли ИП{CreatePZ.perforation_roof} и глубины посадки пакера {paker_depth}',
-                                          10, 0, 4000)
+    # paker_khost, ok = QInputDialog.getInt(None, 'хвостовик',
+    #                                       f'Введите длину хвостовика кровли ИП{CreatePZ.perforation_roof} и глубины посадки пакера {paker_depth}',
+    #                                       10, 0, 4000)
 
     nkt_diam = ''.join(['73' if CreatePZ.column_diametr > 110 else '60'])
 
@@ -66,7 +66,7 @@ def swabbing_with_paker(self):
          'мастер КРС', round(
             CreatePZ.current_bottom / 9.52 * 1.51 / 60 * 1.2 * 1.2 * 1.04 + 0.18 + 0.008 * CreatePZ.current_bottom / 9.52 + 0.003 * CreatePZ.current_bottom / 9.52,
             2)],
-        [None, None, f'Посадить пакер на глубине {paker_depth}м'
+        [None, None, f'Посадить пакер на глубине {paker_depth}м, воронку на глубине {paker_khost+paker_depth}м'
             ,
          None, None, None, None, None, None, None,
          'мастер КРС', 0.4],

@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu, QMenuBar, QAction,
 from PyQt5 import QtCore, QtWidgets, QtGui
 from openpyxl.workbook import Workbook
 from PyQt5.QtCore import Qt
-
+from PyQt5.QtGui import QColor, QBrush
 import krs
 import work_py.opressovka
 
@@ -411,14 +411,19 @@ class MyWindow(QMainWindow):
         for i, row_data in enumerate(work_list):
             row = ins_ind + i
             self.table_widget.insertRow(row)
+
             self.table_widget.setSpan(i + ins_ind, 2, 1, 8)
             for column, data in enumerate(row_data):
-                # item = QtWidgets.QTableWidgetItem(data)
-                widget = QtWidgets.QLabel(str())
-                widget.setStyleSheet('border: 0.5px solid black; font: Arial 14px')
-                self.table_widget.setCellWidget(row, column, widget)
+                item = QtWidgets.QTableWidgetItem(str(data))
+                item.setFlags(item.flags() | Qt.ItemIsEditable)
+                # widget = QtWidgets.QLabel(str())
+                # widget.setStyleSheet('border: 0.5px solid black; font: Arial 14px')
+
+                # self.table_widget.setCellWidget(row, column, widget)
+
                 if data != None:
-                    self.table_widget.setItem(row, column, QtWidgets.QTableWidgetItem(str(data)))
+                    self.table_widget.setItem(row, column, item)
+
                 else:
                     self.table_widget.setItem(row, column, QtWidgets.QTableWidgetItem(str('')))
 
@@ -429,7 +434,9 @@ class MyWindow(QMainWindow):
                             if value[0] <= len(text) <= value[1]:
                                 text_width = key
                                 self.table_widget.setRowHeight(row, int(text_width))
-        self.table_widget.setEditTriggers(QtWidgets.QAbstractItemView.DoubleClicked)
+
+
+        # self.table_widget.setEditTriggers(QTableWidget.AnyKeyPressed)
         # self.table_widget.resizeColumnsToContents()
         # self.table_widget.resizeRowsToContents()
 
