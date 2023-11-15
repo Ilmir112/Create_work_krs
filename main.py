@@ -214,6 +214,12 @@ class MyWindow(QMainWindow):
         template_menu.addAction(template_without_skm)
         template_without_skm.triggered.connect(self.template_without_skm)
 
+        emergency_menu = action_menu.addMenu('Аварийные работы')
+
+        magnet_action = QAction("магнит", self)
+        emergency_menu.addAction(magnet_action)
+        magnet_action.triggered.connect(self.magnet_action)
+
         acid_menu = action_menu.addMenu('Кислотная обработка')
 
         acid_action_1paker = QAction("на одном пакере", self)
@@ -242,10 +248,25 @@ class MyWindow(QMainWindow):
         grp_menu.addAction(grpWithPaker_action)
         grpWithPaker_action.triggered.connect(self.grpWithPaker)
 
+        grpWithGpp_action = QAction('ГРП с ГПП')
+        grp_menu.addAction(grpWithGpp_action )
+        grpWithGpp_action .triggered.connect(self.grpWithGpp)
+
+        alone_menu = action_menu.addMenu('одиночные операции')
+
+        kot_action = QAction('Система обратных клапанов')
+        alone_menu.addAction(kot_action)
+        kot_action.triggered.connect(self.kot_work)
+
         rir_menu = action_menu.addMenu('РИР')
+
         rirWithPero_action = QAction('РИР на пере')
         rir_menu.addAction(rirWithPero_action)
         rirWithPero_action.triggered.connect(self.rirWithPero)
+
+        rirWithPaker_action = QAction('РИР на пакере')
+        rir_menu.addAction(rirWithPaker_action)
+        rirWithPaker_action.triggered.connect(self.rirWithPaker)
 
         rirWithRpk_action = QAction('РИР с РПК')
         rir_menu.addAction(rirWithRpk_action)
@@ -253,11 +274,6 @@ class MyWindow(QMainWindow):
 
         gno_menu = action_menu.addAction('Спуск фондового оборудования')
         gno_menu.triggered.connect(self.gno_bottom)
-
-
-
-
-
 
         context_menu.exec_(self.mapToGlobal(position))
 
@@ -271,6 +287,16 @@ class MyWindow(QMainWindow):
         from work_py.drilling import drilling_nkt
         drilling_work_list = drilling_nkt(self)
         self.populate_row(self.ins_ind, drilling_work_list)
+
+    def magnet_action(self):
+        from work_py.emergencyWork import magnetWork
+        magnet_work_list = magnetWork(self)
+        self.populate_row(self.ins_ind, magnet_work_list)
+
+    def kot_work(self):
+        from work_py.alone_oreration import kot_work
+        kot_work_list = kot_work(self)
+        self.populate_row(self.ins_ind, kot_work_list)
     def acid_action_gons(self):
         from work_py.acids import acidGons
         acidGons_work_list = acidGons(self)
@@ -279,6 +305,12 @@ class MyWindow(QMainWindow):
         from work_py.rir import rir_rpk
         rirRpk_work_list = rir_rpk(self)
         self.populate_row(self.ins_ind, rirRpk_work_list)
+
+    def rirWithPaker(self):
+        from work_py.rir import rir_paker
+        rir_paker_work_list = rir_paker(self)
+        self.populate_row(self.ins_ind, rir_paker_work_list)
+
     def rirWithPero(self):
         from work_py.rir import rirWithPero
         rirWithPero_work_list = rirWithPero(self)
@@ -289,6 +321,13 @@ class MyWindow(QMainWindow):
         print('Вставился ГРП с пакером')
         grpPaker_work_list = grpPaker(self)
         self.populate_row(self.ins_ind,grpPaker_work_list)
+
+    def grpWithGpp(self):
+        from work_py.grp import grpGpp
+
+        print('Вставился ГРП с ГПП')
+        grpGpp_work_list = grpGpp(self)
+        self.populate_row(self.ins_ind, grpGpp_work_list)
 
     def filling_sand(self):
         from work_py.sand_filling import sandFilling

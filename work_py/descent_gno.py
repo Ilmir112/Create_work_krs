@@ -8,6 +8,7 @@ def gno_down(self):
     dict_pump_ecn = ''
     dict_pump_h = 0
     try:
+        dict_pump = [dict_pump]
         print( CreatePZ.dict_pump["posle"])
         if 'ЭЦН' in CreatePZ.dict_pump["posle"][1]:
             dict_pump_nv = CreatePZ.dict_pump["posle"][0]
@@ -18,7 +19,7 @@ def gno_down(self):
             dict_pump_h = CreatePZ.dict_pump_h["posle"][0]
         print(f' НВ {dict_pump_nv}')
     except:
-        dict_pump = CreatePZ.dict_pump["posle"]
+        dict_pump = CreatePZ.dict_pump["posle"][0]
         dict_pump_h = CreatePZ.dict_pump_h["posle"]
     paker_descent = []
     try:
@@ -274,7 +275,7 @@ def gno_down(self):
          None, None, None, None, None, None, None,
          'Мастер КРС, предст. заказчика', 2.5],
            [None, None,
-            f'Спустить {dict_pump} на компоновке штанг: {gno_nkt_opening(CreatePZ.dict_sucker_rod_po)}  Окончательный компоновку штанг производить по расчету '
+            f'Спустить {dict_pump_nv} на компоновке штанг: {gno_nkt_opening(CreatePZ.dict_sucker_rod_po)}  Окончательный компоновку штанг производить по расчету '
             f'ГНО после утверждения заказчиком. ПРИ НЕОБХОДИМОСТИ ПОИНТЕРВАЛЬНОЙ ОПРЕССОВКИ: АВТОСЦЕП УСТАНАВЛИВАТЬ '
             f'НЕ МЕНЕЕ ЧЕМ ЧЕРЕЗ ОДНУ ШТАНГУ ОТ ПЛУНЖЕРА ИЛИ ПЕРЕВОДНИКА ШТОКА НАСОСА!',
             None, None, None, None, None, None, None,
@@ -388,47 +389,48 @@ def gno_down(self):
                  # 'НН с пакером': lift_pump_nn_with_paker, 'НВ с пакером': lift_pump_nv_with_paker,
                  # 'ЭЦН с пакером': lift_ecn_with_paker,
     lift_sel = ['ЭЦН', 'НВ', 'НН', 'пакер', 'ОРД', 'НН с пакером', 'ЭЦН с пакером', 'НВ с пакером', 'воронка'] #  'ОРЗ', 'Воронка',
-    dict_pump = ''
 
-
+    lift_key = 'НВ'
+    dict_pump = dict_pump[0]
+    print(('НВ' in dict_pump.upper() or 'ШГН' in dict_pump.upper()), CreatePZ.if_None(CreatePZ.paker_do["posle"]) != 'отсут')
     if 'ЭЦН' in dict_pump.upper() or 'ВНН' in dict_pump.upper() and str(CreatePZ.paker_do["posle"]) == '0':
         lift_select = descent_ecn
-        lift_s = dict_pump
+        lift_key = 'ЭЦН'
 
     elif ('ЭЦН' in dict_pump.upper() or 'ВНН' in dict_pump.upper()) and (CreatePZ.if_None(CreatePZ.paker_do["posle"]) != 'отсут'):
         lift_select = descent_ecn
+        lift_key = 'ЭЦН с пакером'
         print('Подьем ЭЦН с пакером ')
 
-    elif 'НВ' in dict_pump.upper() or 'ШГН' in dict_pump.upper() and CreatePZ.if_None(CreatePZ.paker_do["posle"]) == 'отсут':
+    elif ('НВ' in dict_pump.upper() or 'ШГН' in dict_pump.upper()) and CreatePZ.if_None(CreatePZ.paker_do["posle"]) == 'отсут':
         lift_select = descent_nv
-        lift_s = dict_pump
-    elif 'НВ' in dict_pump.upper() or 'ШГН' in dict_pump.upper() and CreatePZ.if_None(CreatePZ.paker_do["posle"]) != 'отсут':
+        lift_key = 'НВ'
+    elif ('НВ' in dict_pump.upper() or 'ШГН' in dict_pump.upper()) and CreatePZ.if_None(CreatePZ.paker_do["posle"]) != 'отсут':
         lift_select = descent_nv_with_paker
-        lift_s = dict_pump
-    elif CreatePZ.if_None(dict_pump.upper()) == 'отсут' and CreatePZ.if_None(CreatePZ.paker_do["posle"]) != 'отсут':
-        lift_select = paker_descent
+        lift_key = 'НВ с пакером'
 
-        print('Подьем пакером ')
     elif 'НН' in dict_pump.upper() and CreatePZ.if_None(CreatePZ.paker_do["posle"]) == 'отсут':
         lift_select = descent_nn
-        lift_s = dict_pump
+        lift_key = 'НН'
     elif 'НН' in dict_pump.upper() and CreatePZ.if_None(CreatePZ.paker_do["posle"]) != 'отсут':
         lift_select = descent_nn_with_paker
-        lift_s = dict_pump
+        lift_key = 'НН с пакером'
     elif 'НВ' in dict_pump_nv.upper() and 'ЭЦН' in dict_pump_ecn.upper() \
             and  CreatePZ.if_None(CreatePZ.paker_do["posle"]) != 'отсут':
         lift_select = descentORD
-        lift_s = "ОРД"
+        lift_key = "ОРД"
     elif 'НН' in dict_pump.upper() and CreatePZ.if_None(CreatePZ.paker_do["posle"]) != 'отсут':
         lift_select = descent_nn_with_paker
-        lift_s = "НН с пакером"
+        lift_key = "НН с пакером"
         print('Подьем НН с пакером ')
 
     elif str(dict_pump) == '0' and CreatePZ.if_None(CreatePZ.paker_do["posle"]) == 'отсут':
         lift_select = descent_voronka
+        lift_key = 'воронка'
         print('Подьем  воронки')
     elif str(dict_pump) == '0' and CreatePZ.if_None(CreatePZ.paker_do["posle"]) != 'отсут':
         lift_select = paker_descent
+        lift_key = 'пакер'
         lift_s = f'пакер ППД  {CreatePZ.paker_do["posle"]}'
     # elif 89 in CreatePZ.dict_nkt.keys() and 48 in CreatePZ.dict_nkt.keys() and CreatePZ.if_None(
     #         CreatePZ.paker_do["posle"]) != 'отсут':
@@ -437,11 +439,11 @@ def gno_down(self):
 
 
     lift, ok = QInputDialog.getItem(self, 'Спуcкаемое  оборудование', 'выбор спуcкаемого оборудования',
-                                    lift_sel, 1, False)
+                                    lift_sel, lift_sel.index(lift_key), False)
 
     if ok and lift_sel:
         self.le.setText(lift)
-    lift_select = lift_dict[lift]
+    lift_select = lift_dict[lift_key]
     for row in lift_select:
         gno_list.append(row)
 

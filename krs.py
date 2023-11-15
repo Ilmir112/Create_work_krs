@@ -28,6 +28,7 @@ def work_krs(self):
                                                    1.02, 0.87, 2, 2)
     nkt_diam_fond_list = list(CreatePZ.dict_nkt.keys())
     nkt_diam_fond = ''
+    lift_key = "ЭЦН"
     for i in nkt_diam_fond_list:
         nkt_diam_fond += str(i) + ', '
     nkt_diam_fond = nkt_diam_fond[:-2]
@@ -46,6 +47,7 @@ def work_krs(self):
         dict_pump1 = CreatePZ.dict_pump['do'][1]
         dict_pump_nv = min(CreatePZ.dict_pump_h["do"])
         dict_pump_ecn = max(CreatePZ.dict_pump_h["do"])
+        print(f'ввв {CreatePZ.dict_pump["do"][0]}')
     except:
         dict_pump = CreatePZ.dict_pump['do'][0]
         dict_pump_h = CreatePZ.dict_pump_h["do"]
@@ -199,7 +201,8 @@ def work_krs(self):
          None, None, None, None, None,
          None, None],
         [None, None,
-         f'Поднять  ЭЦН с пакером {max(CreatePZ.paker_do["do"])} на НКТ{nkt_diam_fond}мм с глубины {sum(list(CreatePZ.dict_nkt.values()))}м на поверхность с замером, накручиванием колпачков с доливом скважины тех.жидкостью уд. весом{fluid_work}  '
+         f'Поднять  ЭЦН с пакером {CreatePZ.paker_do["do"]} на НКТ{nkt_diam_fond}мм с глубины {sum(list(CreatePZ.dict_nkt.values()))}м на поверхность '
+         f'с замером, накручиванием колпачков с доливом скважины тех.жидкостью уд. весом{fluid_work}  '
          f'в объеме {round(sum(list(CreatePZ.dict_nkt.values())) * 1.12 / 1000, 1)}м3 с контролем АСПО на стенках НКТ.',
          None, None,
          None, None, None, None, None,
@@ -407,7 +410,7 @@ def work_krs(self):
          None, None, None, None, None,
          None, None],
         [None, None,
-         f'Поднять  замковую опору  на НКТ{nkt_diam_fond}мм с глубины {sum(list(CreatePZ.dict_nkt.values()))}м на поверхность с замером, накручиванием колпачков с доливом скважины тех.жидкостью уд. весом{fluid_work}  '
+         f'{"".join(["Допустить фНКТ для определения текущего забоя. " if CreatePZ.gipsInWell == True else ""])}Поднять  замковую опору  на НКТ{nkt_diam_fond}мм с глубины {sum(list(CreatePZ.dict_nkt.values()))}м на поверхность с замером, накручиванием колпачков с доливом скважины тех.жидкостью уд. весом{fluid_work}  '
          f'в объеме {round(sum(list(CreatePZ.dict_nkt.values())) * 1.12 / 1000, 1)}м3 с контролем АСПО на стенках НКТ.',
          None, None,
          None, None, None, None, None,
@@ -898,7 +901,7 @@ def work_krs(self):
         # if ok and lift_sel:
         #     self.le.setText(lift)
         # lift_select = lift_dict[lift]
-
+    print(f'Лифт ключ {lift_key}')
     lift_dict = {'пакер': lift_paker, 'ОРЗ': lift_orz, 'ОРД': lift_ord, 'Воронка': lift_voronka,
                  'НН с пакером': lift_pump_nn_with_paker, 'НВ с пакером': lift_pump_nv_with_paker,
                  'ЭЦН с пакером': lift_ecn_with_paker, 'ЭЦН': lift_ecn, 'НВ': lift_pump_nv, 'НН': lift_pump_nn}

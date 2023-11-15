@@ -1,6 +1,8 @@
 from PyQt5.QtWidgets import QInputDialog, QMessageBox
 
 
+
+
 def acid_work(self):
     from work_py.opressovka import paker_diametr_select
     from work_py.swabbing import swabbing_with_paker
@@ -100,11 +102,15 @@ def acid_work(self):
     for row in acid_work_list(self, paker_depth, paker_khost, dict_nkt, CreatePZ.paker_layout):
         paker_list.append(row)
 
+    reply_acid(self, paker_khost)
+    paker_list.extend(acid_true_quest_list)
+
     if swabbing_true_quest:
         swabbing_with_paker = swabbing_with_paker(self, paker_khost)[1:]
         for row in swabbing_with_paker:
             paker_list.append(row)
     else:
+
         paker_list.append([None, None,
                                  f'Поднять {paker_select} на НКТ{nkt_diam} c глубины {paker_depth}м с доливом скважины в '
                                  f'объеме {round(paker_depth * 1.12 / 1000, 1)}м3 удельным весом {CreatePZ.fluid_work}',
@@ -117,6 +123,7 @@ def acid_work(self):
 def acid_work_list(self, paker_depth, paker_khost, dict_nkt, paker_layout):
     from open_pz import CreatePZ
     from krs import volume_vn_nkt
+
     # print(f'пласты {CreatePZ.plast}')
     plast, ok = QInputDialog.getItem(self, 'выбор пласта для ОПЗ ', 'выберете пласта дл перфорации',
                                      CreatePZ.plast_work, 0, False)
@@ -156,18 +163,20 @@ def acid_work_list(self, paker_depth, paker_khost, dict_nkt, paker_layout):
     else:
         acid_work = []
 
-    acid_list = ['HCl', 'HF', 'ВТ', 'Нефтекислотка']
+    acid_list = ['HCl', 'HF', 'ВТ', 'Нефтекислотка', 'Противогипсовая обработка']
     acid, ok = QInputDialog.getItem(self, 'Вид кислоты', 'Введите вид кислоты:', acid_list, 0, False)
     if ok and acid_list:
         self.le.setText(acid)
-    acid_V, ok = QInputDialog.getDouble(self, 'Объем кислоты', 'Введите объем кислоты:', 10, 0.5, 300, 1)
-    acid_pr, ok = QInputDialog.getInt(self, 'концентрация кислоты', 'Введите концентрацию кислоты', 15, 2, 24)
+
+
 
 
 
 
 
     if acid == 'HCl':
+        acid_V, ok = QInputDialog.getDouble(self, 'Объем кислоты', 'Введите объем кислоты:', 10, 0.5, 300, 1)
+        acid_pr, ok = QInputDialog.getInt(self, 'концентрация кислоты', 'Введите концентрацию кислоты', 15, 2, 24)
         acid_sel = f'Произвести  солянокислотную обработку {plast}  в объеме  {acid_V}м3  ({acid} - {acid_pr} %) ' \
                    f'с добавлением стабилизатора железа HiRon в объеме 70кг и деэмульгатора в объеме 50л. в ' \
                    f'присутствии представителя Заказчика с составлением акта, не превышая давления закачки не более Р={CreatePZ.max_admissible_pressure}атм.\n' \
@@ -175,16 +184,28 @@ def acid_work_list(self, paker_depth, paker_khost, dict_nkt, paker_layout):
                    f' пресной воды {round(acid_V - acid_V * acid_pr / 24 * 1.118, 1)}м3)' \
                    f'Согласовать с Заказчиком проведение кислотной обработки силами ООО Крезол. '
     elif acid == 'ВТ':
+        acid_V, ok = QInputDialog.getDouble(self, 'Объем кислоты', 'Введите объем кислоты:', 10, 0.5, 300, 1)
         vt, ok = QInputDialog.getText(None, 'Высокотехнологическая кислоты', 'Нужно расписать вид кислоты и объем')
         acid_sel = f'Произвести кислотную обработку {" ".join(CreatePZ.plast_work)} {vt}  в присутствии представителя ' \
                    f'Заказчика с составлением акта, не превышая давления закачки не более Р={CreatePZ.max_admissible_pressure}атм.'
     elif acid == 'HF':
+        acid_V, ok = QInputDialog.getDouble(self, 'Объем кислоты', 'Введите объем кислоты:', 10, 0.5, 300, 1)
+        acid_pr, ok = QInputDialog.getInt(self, 'концентрация кислоты', 'Введите концентрацию кислоты', 15, 2, 24)
         acid_sel = f'Произвести кислотную обработку пласта {plast}  в объеме  {acid_V}м3  ({acid} - {acid_pr} %) силами СК Крезол ' \
                    f'в присутствии представителя заказчика с составлением акта, не превышая давления закачки не более Р={CreatePZ.max_admissible_pressure}атм.'
     elif acid == 'Нефтекислотка':
+        acid_V, ok = QInputDialog.getDouble(self, 'Объем кислоты', 'Введите объем кислоты:', 10, 0.5, 300, 1)
+        acid_pr, ok = QInputDialog.getInt(self, 'концентрация кислоты', 'Введите концентрацию кислоты', 15, 2, 24)
         acid_oil, ok = QInputDialog.getInt(self, 'нефтекислотка', 'Введите объем нефти', 10, 0, 24)
         acid_sel = f'Произвести нефтекислотную обработку пласта{plast} в V=2тн товарной нефти + {acid_V}м3  (HCl - {acid_pr} %) + {acid_oil-2}т товарной нефти силами СК Крезол ' \
                    f'в присутствии представителя заказчика с составлением акта, не превышая давления закачки не более Р={CreatePZ.max_admissible_pressure}атм.'
+    elif acid == 'Противогипсовая обработка':
+
+        acid_V, ok = QInputDialog.getInt(self, 'противокислотная обработка', 'Введите объем едкого натрия', 10, 0, 24)
+        acid_sel = f'Произвести противогипсовую обработку пласта{plast} в объеме {acid_V}м3 - {20}% раствором каустической соды' \
+                   f'в присутствии представителя заказчика с составлением акта, не превышая давления закачки не ' \
+                   f'более Р={CreatePZ.max_admissible_pressure}атм.\n' \
+
 
     print(f'Ожидаемое показатели {CreatePZ.expected_pick_up.values()}')
     acid_list_1 = [[None, None,
@@ -260,7 +281,35 @@ def acid_work_list(self, paker_depth, paker_khost, dict_nkt, paker_layout):
                           f'ДАЛЬНЕЙШИЕ РАБОТЫ СОГЛАСОВАТЬ С ЗАКАЗЧИКОМ',
                           None, None, None, None, None, None, None,
                           'мастер КРС', 2.25])
+
     return acid_work
+
+acid_true_quest_list = []
+def reply_acid(self, paker_khost):
+    from open_pz import CreatePZ
+    acid_true_quest = QMessageBox.question(self, 'Необходимость кислоты',
+                                           'Нужно ли планировать кислоту на следующий объет?')
+
+    if acid_true_quest == QMessageBox.StandardButton.Yes:
+        paker_layout = 2
+        paker_depth, ok = QInputDialog.getInt(None, 'посадка пакера',
+                                          'Введите глубину посадки пакера', int(CreatePZ.perforation_roof - 20), 0,
+                                          5000)
+
+        acid_true_quest_list.append(
+            [None, None, f'установить пакер на глубине {paker_depth}м', None, None, None, None, None, None, None,
+             'мастер КРС', None])
+
+        for row in acid_work_list(self, paker_depth, paker_khost, CreatePZ.dict_nkt, paker_layout):
+            acid_true_quest_list.append(row)
+
+
+        # print(reply_acid(self, difference_paker, paker_khost, dict_nkt, paker_select, nkt_diam, paker_depth_bottom))
+
+        reply_acid(self, paker_khost)
+    else:
+
+        return acid_true_quest_list
 
 # Определение трех режимов давлений при определении приемистости
 def pressure_mode(mode, plast):

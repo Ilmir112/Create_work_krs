@@ -8,10 +8,7 @@ def gnkt_work(self):
     acid_V = 0
     acid_pr = 0
     acid = 0
-    V_rast = 0
-    fluid_work = 0
-    pervoration_min = CreatePZ.pervoration_min
-    pervoration_max = CreatePZ.pervoration_max
+
 
     try:
         expected_Q, ok = QInputDialog.getInt(self, 'Ожидаемая приемистость ',
@@ -60,13 +57,14 @@ def gnkt_work(self):
     acid_sel = 0
     if acid == 'HCl':
         acid_sel = f'Произвести  солянокислотную обработку {" ".join(CreatePZ.plast_work)}  в объеме  {acid_V}м3  ({acid} - {acid_pr} %) силами/' \
-                   f' Крезол НС с протяжкой БДТ вдоль интервалов перфорации {CreatePZ.pervoration_min}-{CreatePZ.pervoration_max}м (снизу вверх) в ' \
+                   f' Крезол НС с протяжкой БДТ вдоль интервалов перфорации {CreatePZ.perforation_roof}-{CreatePZ.perforation_sole}м (снизу вверх) в ' \
                    f'присутствии представителя Заказчика с составлением акта, не превышая давления закачки не более Р={CreatePZ.max_admissible_pressure}атм.\n' \
                    f' (для приготовления соляной кислоты в объеме {acid_V}м3 - {acid_pr}% необходимо замешать {round(acid_V*acid_pr/24*1.118,1)}т HCL 24% и пресной воды {round(acid_V-acid_V*acid_pr/24*1.118,1)}м3)'
     elif acid == 'ВТ':
         vt, ok = QInputDialog.getText(None, 'Высокотехнологическая кислоты', 'Нужно расписать вид кислоты и объем')
         acid_sel = f'Произвести кислотную обработку пласта {" ".join(CreatePZ.plast_work)} {vt}  силами Крезол ' \
-                   f'НС с протяжкой БДТ вдоль интервалов перфорации {pervoration_min}-{pervoration_max}м (снизу вверх) в присутствии представителя '\
+                   f'НС с протяжкой БДТ вдоль интервалов перфорации {CreatePZ.perforation_roof}-'\
+           f'{CreatePZ.perforation_sole}м (снизу вверх) в присутствии представителя '\
            f'Заказчика с составлением акта, не превышая давления закачки не более Р={CreatePZ.max_admissible_pressure}атм.'
     elif acid == 'HF':
         acid_sel = f'Произвести  солянокислотную обработку пласта {" ".join(CreatePZ.plast_work)}  в объеме  {acid_V}м3  ({acid} - {acid_pr} %) силами Крезол '\
@@ -80,13 +78,14 @@ def gnkt_work(self):
     if CreatePZ.H_F_paker_do['do'] == 0:
         print(25)
         H_F_paker_do = sum(list(CreatePZ.dict_nkt.values()))
+        print(H_F_paker_do)
         if H_F_paker_do >= CreatePZ.current_bottom:
             H_F_paker_do, ok = QInputDialog.getDouble(self, 'глубина НКТ',
                                                         'Введите Глубины башмака НКТ',500 , 0, CreatePZ.current_bottom)
     else:
         H_F_paker_do = CreatePZ.H_F_paker_do['do']
     gnkt_opz =[
-     [None, 'Порядок работы', None, None, None, None, None, None, None, None, None, None],
+     [None,  None, 'Порядок работы', None, None, None, None, None, None, None, None, None],
         [None, 'п/п', 'Наименование работ', None, None, None, None, None, None, None,
          'Ответственный', 'Нормы'],
      [None,
@@ -181,7 +180,7 @@ def gnkt_work(self):
         None, None, None, None, None, None, None,
             'Мастер ГНКТ, состав бригады, представитель Заказчика', 0.93],
     [None, 23, f'Произвести гидросвабирование пласта в интервале {CreatePZ.perforation_roof}-'
-               f'{CreatePZ.perforation_sole}м (закрыть затруб, произвести задавку в пласт'
+               f'{CreatePZ.perforation_sole}м (закрыть затруб, произвести задавку в пласт '
                f'жидкости при не более Рзак={CreatePZ.max_admissible_pressure}атм при установленном герметичном пакере. '
                f'Операции по задавке и изливу произвести 3-4 раза в зависимости от приёмистости). ',
         None, None, None, None, None, None, None,

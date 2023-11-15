@@ -8,12 +8,6 @@ def raidingColumn(self):
         nkt_pod = ['60мм' if CreatePZ.column_additional_diametr <110 else '73мм со снятыми фасками']
         nkt_pod = ''.join(nkt_pod)
 
-
-
-    lift_ecn_can = {True: 30, False: 4}
-
-    print(f' кровля ПВР {CreatePZ.pervoration_min}')
-
     nkt_diam = ''.join(['73' if CreatePZ.column_diametr >110 else '60'])
     if CreatePZ.column_additional == False:
         ryber_str = f'райбер-{ryber_diam} для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм +' \
@@ -28,14 +22,14 @@ def raidingColumn(self):
 
     ryber_list = [
         [None, None,
-         f'Спустить {ryber_str}  на НКТ{nkt_diam}мм до Н={min(min(raiding_interval(self)))-30}м с замером, '
+         f'Спустить {ryber_str}  на НКТ{nkt_diam}мм до Н={CreatePZ.perforation_roof-30}м с замером, '
          f'шаблонированием шаблоном 59,6мм (При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ). '
          f'В случае разгрузки инструмента  при спуске, проработать место посадки с промывкой скв., составить акт.'
          f'СКОРОСТЬ СПУСКА НЕ БОЛЕЕ 1 М/С (НЕ ДОХОДЯ 40 - 50 М ДО ПЛАНОВОГО ИНТЕРВАЛА СКОРОСТЬ СПУСКА СНИЗИТЬ ДО 0,25 М/С). '
          f'ЗА 20 М ДО ЗАБОЯ СПУСК ПРОИЗВОДИТЬ С ПРОМЫВКОЙ',
          None, None, None, None, None, None, None,
          'мастер КРС', round(
-            (min(min(raiding_interval(self)))-30) / 9.52 * 1.51 / 60 * 1.2 * 1.2 * 1.04*0.9 + 0.18 + 0.008 * (CreatePZ.perforation_roof-30) / 9.52 + 0.003 * CreatePZ.current_bottom / 9.52,
+            (CreatePZ.perforation_roof-30) / 9.52 * 1.51 / 60 * 1.2 * 1.2 * 1.04*0.9 + 0.18 + 0.008 * (CreatePZ.perforation_roof-30) / 9.52 + 0.003 * CreatePZ.current_bottom / 9.52,
             2)],
         [None, None, f'Собрать промывочное оборудование: вертлюг, ведущая труба (установить вставной фильтр под ведущей трубой), '
                      f'буровой рукав, устьевой герметизатор, нагнетательная линия. Застраховать буровой рукав за вертлюг. ',
@@ -114,6 +108,7 @@ def raiding_interval(self):
     # else:
     #     str_raid = f'{round(CreatePZ.perforation_roof - 30, 0)} - {CreatePZ.current_bottom}'
     a = sorted(a)
+    print(a)
     return a
 def raid(a):
     d = ''

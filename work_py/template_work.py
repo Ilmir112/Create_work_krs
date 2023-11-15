@@ -1,3 +1,5 @@
+from PyQt5.QtWidgets import QMessageBox
+
 import H2S
 import math
 
@@ -93,16 +95,12 @@ def template_diam_additional_ek():
 
 def template_ek_without_skm(self):
     from open_pz import CreatePZ
-    open_trunk_well = False
-    # print(f' Башмака {CreatePZ.shoe_column, CreatePZ.current_bottom}')
+    print(f' Башмака {CreatePZ.shoe_column, CreatePZ.current_bottom}')
+
+    print(f' наличие открытого ствола {CreatePZ.shoe_column_additional, CreatePZ.open_trunk_well, CreatePZ.shoe_column, CreatePZ.current_bottom, CreatePZ.column_additional}')
 
     length_template_addition = int(''.join(['30' if CreatePZ.lift_ecn_can_addition == True else '2']))
-    if CreatePZ.column_additional == False and CreatePZ.shoe_column <= CreatePZ.current_bottom:
-        open_trunk_well = True
-    elif CreatePZ.column_additional == True and CreatePZ.shoe_column_additional <= CreatePZ.current_bottom:
-        open_trunk_well = True
-    else:
-        open_trunk_well = False
+    
 
     if CreatePZ.column_additional == True:
         nkt_pod = ['60мм' if CreatePZ.column_additional_diametr <110 else '73мм со снятыми фасками']
@@ -113,28 +111,28 @@ def template_ek_without_skm(self):
     print(f' кровля ПВР {CreatePZ.perforation_roof}')
 
     CreatePZ.nkt_diam = ''.join(['73' if CreatePZ.column_diametr >110 else '60'])
-    if CreatePZ.column_additional == False and open_trunk_well == False and CreatePZ.work_pervorations_approved == False:
+    if CreatePZ.column_additional == False and CreatePZ.open_trunk_well == False and CreatePZ.work_pervorations_approved == False:
         template_str = f'перо + шаблон-{template_diam_ek()[0]}мм L-2м + НКТ{CreatePZ.nkt_diam}мм {int(CreatePZ.current_bottom - math.ceil(CreatePZ.perforation_roof)+8)}м ' \
                        f'+  НКТ{CreatePZ.nkt_diam}мм + шаблон-{template_diam_ek()[1]}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can]}м '
         ckm_teml = f'шаблон; Ф-{template_diam_ek()[1]}мм до гл.{math.ceil(CreatePZ.perforation_roof-8)}м)'
         CreatePZ.template_depth = math.ceil(CreatePZ.perforation_roof-8)
-    elif CreatePZ.column_additional == False and open_trunk_well ==  True and CreatePZ.work_pervorations_approved == False:
+    elif CreatePZ.column_additional == False and CreatePZ.open_trunk_well ==  True and CreatePZ.work_pervorations_approved == False:
         template_str = f'фильтр-направление L-2м + НКТ{CreatePZ.nkt_diam}мм {math.ceil(CreatePZ.current_bottom - CreatePZ.perforation_roof+8)}м' \
                        f'НКТ{CreatePZ.nkt_diam}мм + шаблон-{template_diam_ek()[1]}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can]}м '
         ckm_teml = f'шаблон; Ф-{template_diam_ek()[1]}мм до гл.{math.ceil(CreatePZ.perforation_roof - 8)}м)'
         CreatePZ.template_depth = math.ceil(CreatePZ.perforation_roof - 8)
-    elif CreatePZ.column_additional == False and open_trunk_well == False and CreatePZ.work_pervorations_approved == True:
+    elif CreatePZ.column_additional == False and CreatePZ.open_trunk_well == False and CreatePZ.work_pervorations_approved == True:
         template_str = f'перо +НКТ{CreatePZ.nkt_diam}мм + шаблон-{template_diam_ek()[1]}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can]}м '
-        ckm_teml = f'шаблон; Ф-{template_diam_ek()[1]}мм до гл.{math.ceil(min(list(CreatePZ.current_bottom)) - 8)}м)'
-        CreatePZ.template_depth = math.ceil(min(list(CreatePZ.current_bottom)) - 8)
-    elif CreatePZ.column_additional == True and open_trunk_well == False and CreatePZ.work_pervorations_approved == False:
-        template_str = f'обточная муфта + НКТ{nkt_pod} {math.ceil(CreatePZ.current_bottom-math.ceil(CreatePZ.perforation_roof - 10))} +' \
-                       f' шаблон-{template_diam_additional_ek()[0]}мм L-{length_template_addition}м + НКТ{nkt_pod}' \
-                       f' {math.ceil(CreatePZ.current_bottom + (math.ceil(CreatePZ.current_bottom-math.ceil(CreatePZ.perforation_roof - 10)))- length_template_addition - 30- CreatePZ.head_column_additional)}м ' \
-               f' + шаблон-{template_diam_additional_ek()[1]}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can]}м '
-        ckm_teml = f'(шаблон; Ф-{template_diam_additional_ek()[0]}мм до гл.{math.ceil(CreatePZ.perforation_roof - 10)}м, шаблон; Ф-{template_diam_additional_ek()[0]}мм до гл.{CreatePZ.head_column_additional-10}м)'
+        ckm_teml = f'шаблон; Ф-{template_diam_ek()[1]}мм до гл.{math.ceil(CreatePZ.current_bottom - 8)}м)'
+        CreatePZ.template_depth = math.ceil(CreatePZ.current_bottom - 8)
+    elif CreatePZ.column_additional == True and CreatePZ.open_trunk_well == False and CreatePZ.work_pervorations_approved == False:
+        template_str = f'обточная муфта + НКТ{nkt_pod}мм {math.ceil(CreatePZ.current_bottom-math.ceil(CreatePZ.perforation_roof - 10))}м +' \
+                       f' шаблон-{template_diam_additional_ek()[0]}мм L-{length_template_addition}м + НКТ{nkt_pod}мм' \
+                       f' {math.ceil(CreatePZ.perforation_roof - CreatePZ.head_column_additional -20 -length_template_addition)}м ' \
+               f' + шаблон-{template_diam_ek()[1]}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can]}м '
+        ckm_teml = f'(шаблон; Ф-{template_diam_additional_ek()[0]}мм до гл.{math.ceil(CreatePZ.perforation_roof - 10)}м, шаблон; Ф-{template_diam_ek()[0]}мм до гл.{CreatePZ.head_column_additional-10}м)'
         CreatePZ.template_depth = math.ceil(CreatePZ.perforation_roof - 8)
-    elif CreatePZ.column_additional == True and open_trunk_well == True and CreatePZ.work_pervorations_approved == False:
+    elif CreatePZ.column_additional == True and CreatePZ.open_trunk_well == True and CreatePZ.work_pervorations_approved == False:
         template_str = f'фильтр направление L-2м + НКТ{nkt_pod} {math.ceil(CreatePZ.current_bottom - math.ceil(CreatePZ.perforation_roof) + 8)}м ' \
                         f'шаблон-{template_diam_additional_ek()[0]}мм L-{length_template_addition} + {math.ceil(CreatePZ.perforation_roof) + 8- CreatePZ.head_column_additional-length_template_addition -6}'\
                       f'+ шаблон-{template_diam_additional_ek()[1]}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can]}м '
@@ -159,10 +157,10 @@ def template_ek_without_skm(self):
          f'пространство. Реагирование 2 часа.',
          None, None, None, None, None, None, None,
          'Мастер КРС, предст. заказчика', 4],
-        [None, '№ п/п', f'При необходимости нормализовать забой обратной промывкой тех жидкостью уд.весом '
+        [None, None, f'При необходимости нормализовать забой обратной промывкой тех жидкостью уд.весом '
                         f'{CreatePZ.fluid_work} до глубины {CreatePZ.current_bottom}м.', None, None, None, None, None, None, None,
          'Мастер КРС', None],
-        [None, '№ п/п',
+        [None, None,
          f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {CreatePZ.fluid_work}  при расходе жидкости 6-8 л/сек '
          f'в присутствии представителя Заказчика в объеме {round(well_volume()*1.5,1)}м3. ПРИ ПРОМЫВКЕ НЕ ПРЕВЫШАТЬ ДАВЛЕНИЕ {CreatePZ.max_admissible_pressure}АТМ, ДОПУСТИМАЯ ОСЕВАЯ НАГРУЗКА НА ИНСТРУМЕНТ: 0,5-1,0 ТН',
          None, None, None, None, None, None, None,
@@ -222,21 +220,21 @@ def template_ek_without_skm(self):
 
     if CreatePZ.current_bottom - CreatePZ.perforation_sole <= 10:
         list_template_ek.insert(-1, privyazka_nkt)
+    if CreatePZ.gipsInWell == True: # and 'НВ' in str(CreatePZ.dict_pump["do"][0]).upper() and CreatePZ.if_None(CreatePZ.paker_do['do']) == 'отсут':
+        gips = pero(self)
+        for row in gips[::-1]:
+            list_template_ek.insert(0,row)
 
 
     return list_template_ek + notes_list
 
 def template_ek(self):
     from open_pz import CreatePZ
-    from main import MyWindow
-    open_trunk_well = False
-    print(f' Башмака {CreatePZ.shoe_column, CreatePZ.current_bottom}')
-    if CreatePZ.column_additional == False and CreatePZ.shoe_column <= CreatePZ.current_bottom:
-        open_trunk_well = True
 
-    elif CreatePZ.column_additional == True and CreatePZ.shoe_column_additional <= CreatePZ.current_bottom:
-        open_trunk_well = True
-    print(f' наличие открытого ствола {CreatePZ.shoe_column_additional, open_trunk_well,CreatePZ.shoe_column,  CreatePZ.current_bottom, CreatePZ.column_additional  }')
+
+    print(f' Башмака {CreatePZ.shoe_column, CreatePZ.current_bottom}')
+
+    print(f' наличие открытого ствола {CreatePZ.shoe_column_additional, CreatePZ.open_trunk_well,CreatePZ.shoe_column,  CreatePZ.current_bottom, CreatePZ.column_additional  }')
 
     if CreatePZ.column_additional == True:
         nkt_pod = ['60мм' if CreatePZ.column_additional_diametr <110 else '73мм со снятыми фасками']
@@ -253,26 +251,26 @@ def template_ek(self):
 
     CreatePZ.nkt_diam = ''.join(['73' if CreatePZ.column_diametr >110 else '60'])
     length_template_addition = int(''.join(['30' if CreatePZ.lift_ecn_can_addition == True else '2']))
-    if CreatePZ.column_additional == False and open_trunk_well == False and CreatePZ.work_pervorations_approved == False:
+    if CreatePZ.column_additional == False and CreatePZ.open_trunk_well == False and CreatePZ.work_pervorations_approved == False:
         template_str = f'перо + шаблон-{template_diam_ek()[0]}мм L-2м + НКТ{CreatePZ.nkt_diam}мм {int(CreatePZ.current_bottom - CreatePZ.perforation_roof+8)}м ' \
                        f'+ СКМ-{int(CreatePZ.column_diametr)} +10м НКТ{CreatePZ.nkt_diam}мм + шаблон-{template_diam_ek()[1]}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can]}м '
         ckm_teml = f'(СКМ-{int(CreatePZ.column_diametr)} до Н={int(CreatePZ.perforation_roof-8)}м,' \
                    f'шаблон; Ф-{template_diam_ek()[1]}мм до гл.{int(CreatePZ.perforation_roof-18)}м)'
         CreatePZ.template_depth = math.ceil(CreatePZ.perforation_roof - 18)
-    elif CreatePZ.column_additional == False and open_trunk_well ==  True and CreatePZ.work_pervorations_approved == False:
+    elif CreatePZ.column_additional == False and CreatePZ.open_trunk_well ==  True and CreatePZ.work_pervorations_approved == False:
         template_str = f'фильтр-направление L-2м + НКТ{CreatePZ.nkt_diam}мм {int(CreatePZ.current_bottom - CreatePZ.perforation_roof+8)}м' \
                        f'+ СКМ-{int(CreatePZ.column_diametr)} +10м ' \
                        f'НКТ{CreatePZ.nkt_diam}мм + шаблон-{template_diam_ek()[1]}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can]}м '
         ckm_teml = f'(СКМ-{int(CreatePZ.column_diametr)} до Н={int(CreatePZ.perforation_roof - 8)}м,' \
                    f'шаблон; Ф-{template_diam_ek()[1]}мм до гл.{int(CreatePZ.perforation_roof - 18)}м)'
         CreatePZ.template_depth = math.ceil(CreatePZ.perforation_roof - 18)
-    elif CreatePZ.column_additional == False and open_trunk_well == False and CreatePZ.work_pervorations_approved == True:
+    elif CreatePZ.column_additional == False and CreatePZ.open_trunk_well == False and CreatePZ.work_pervorations_approved == True:
         template_str = f'перо + СКМ-{int(CreatePZ.column_diametr)} +10м ' \
                        f'НКТ{CreatePZ.nkt_diam}мм + шаблон-{template_diam_ek()[1]}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can]}м '
         ckm_teml = f'(СКМ-{int(CreatePZ.column_diametr)} до Н={int(CreatePZ.perforation_roof - 8)}м,' \
                    f'шаблон; Ф-{template_diam_ek()[1]}мм до гл.{int(CreatePZ.perforation_roof - 18)}м)'
         CreatePZ.template_depth = math.ceil(CreatePZ.current_bottom - 10)
-    elif CreatePZ.column_additional == True and open_trunk_well == False and CreatePZ.work_pervorations_approved == False:
+    elif CreatePZ.column_additional == True and CreatePZ.open_trunk_well == False and CreatePZ.work_pervorations_approved == False:
         template_str = f'обточная муфта + НКТ{nkt_pod} {int(CreatePZ.current_bottom - math.ceil(CreatePZ.perforation_roof) + 10)}м ' \
                f'+ СКМ-{int(CreatePZ.column_additional_diametr)} +10м НКТ{nkt_pod} + шаблон-{template_diam_additional_ek()[0]}мм L-{length_template_addition}м' \
                f' + НКТ{nkt_pod} {int(CreatePZ.current_bottom - (int(CreatePZ.current_bottom - math.ceil(CreatePZ.perforation_roof) + 10)) - length_template_addition - CreatePZ.head_column_additional)}м + ' \
@@ -281,7 +279,7 @@ def template_ek(self):
                    f'шаблон; Ф-{template_diam_additional_ek()[0]}мм до гл.{int(CreatePZ.perforation_roof - 20)}м, ' \
                    f'шаблон; Ф-{template_diam_additional_ek()[1]}мм до гл.{int(CreatePZ.head_column_additional - 10)}м))'
         CreatePZ.template_depth = math.ceil(CreatePZ.perforation_roof - 18)
-    elif CreatePZ.column_additional == True and open_trunk_well == True and CreatePZ.work_pervorations_approved == False:
+    elif CreatePZ.column_additional == True and CreatePZ.open_trunk_well == True and CreatePZ.work_pervorations_approved == False:
         template_str = f'фильтр направление L-2м + НКТ{nkt_pod} {math.ceil(CreatePZ.current_bottom - CreatePZ.perforation_roof + 10)}м ' \
                        f'+ СКМ-{int(CreatePZ.column_additional_diametr)} +10м НКТ{nkt_pod} + шаблон-{template_diam_additional_ek()[0]}мм L-{length_template_addition}м' \
                     f' + НКТ{nkt_pod} {int(CreatePZ.current_bottom - (int(CreatePZ.current_bottom - CreatePZ.perforation_roof + 10)) - 13 - length_template_addition  - CreatePZ.head_column_additional+10)}м' \
@@ -377,8 +375,10 @@ def template_ek(self):
                      None, None, None, None, None, None, None, 'Мастер КРС', None, None]
     if CreatePZ.current_bottom - CreatePZ.perforation_sole <=10:
         list_template_ek.insert(-1, privyazka_nkt)
-    print(CreatePZ.ins_ind)
-    # print(self.ins_ind)
+    if CreatePZ.gipsInWell == True: # and 'НВ' in str(CreatePZ.dict_pump["do"][0]).upper() and CreatePZ.if_None(CreatePZ.paker_do['do']) == 'отсут':
+        gips = pero(self)
+        for row in gips[::-1]:
+            list_template_ek.insert(0, row)
     return list_template_ek + notes_list
 
 
@@ -395,6 +395,72 @@ def paker_diametr_select(depth_landing):
         if diam_internal_paker[0] <= diam_internal_ek << diam_internal_paker[1]:
             return diam
 
+def pero(self):
+    from work_py.rir import pero_select
+    from open_pz import CreatePZ
+    from work_py.drilling import drilling_nkt
+    pero_list = pero_select(self, CreatePZ.current_bottom)
+    gipsPero_list = [
+        [None, None,
+         f'Спустить {pero_list}  на тНКТ{CreatePZ.nkt_diam}мм до глубины {CreatePZ.current_bottom}м '
+         f'с замером, шаблонированием шаблоном. Опрессовать НКТ на 150атм. Вымыть шар. \n'
+         f'С ГЛУБИНЫ 1100м СНИЗИТЬ СКОРОСТЬ  СПУСКА до 0.25м/с ВОЗМОЖНО ОТЛОЖЕНИЕ ГИПСА'
+         f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
+         None, None, None, None, None, None, None,
+         'мастер КРС', 2.5],
+        [None, None,
+         f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {CreatePZ.fluid_work}  при расходе жидкости 6-8 л/сек '
+         f'в присутствии представителя Заказчика в объеме {round(well_volume() * 1.5, 1)}м3. ПРИ ПРОМЫВКЕ НЕ ПРЕВЫШАТЬ ДАВЛЕНИЕ {CreatePZ.max_admissible_pressure}АТМ, ДОПУСТИМАЯ ОСЕВАЯ НАГРУЗКА НА ИНСТРУМЕНТ: 0,5-1,0 ТН',
+         None, None, None, None, None, None, None,
+         'Мастер КРС, представитель ЦДНГ', 1.5],
+        [None, None,
+         f'Приподнять до глубины {CreatePZ.current_bottom - 20}м. Тех отстой 2ч. Определение текущего забоя, при необходимости повторная промывка.',
+         None, None, None, None, None, None, None,
+         'Мастер КРС, представитель ЦДНГ', 2.49],
+        [None, None,
+         f'Поднять {pero_list} на НКТ{CreatePZ.nkt_diam}мм с глубины {CreatePZ.current_bottom}м с доливом скважины в '
+         f'объеме {round(CreatePZ.current_bottom * 1.12 / 1000, 1)}м3 тех. жидкостью  уд.весом {CreatePZ.fluid_work}',
+         None, None, None, None, None, None, None,
+         'Мастер КРС',
+         round(CreatePZ.current_bottom / 9.5 * 0.028 * 1.2 * 1.04 + 0.005 * CreatePZ.current_bottom / 9.5 + 0.17 + 0.5,
+               2)],
+        [None, None,
+         f'В случае недохождения пера до текущего забоя работы продолжить:',
+         None, None, None, None, None, None, None,
+         'Мастер КРС',
+         None]
+    ]
+
+    if 'ЭЦН' not in str(CreatePZ.dict_pump["posle"]).upper():
+
+        gipsPero_list = [gipsPero_list[-1]]
+        drilling_list = drilling_nkt(self)
+        drilling_list[2] = [None, None,
+                            f'Произвести нормализацию забоя до Н= {CreatePZ.current_bottom}м с наращиванием, промывкой тех жидкостью уд.весом {CreatePZ.fluid_work}.'
+                            'При отсутствии проходки более 4ч, согласовать с УСРСиСТ подьем компоновки на ревизию. '
+                            'При наработке долото более 80ч, произвести подьем и заменить долото и (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа '
+                            f'до начала работ). Работы производить согласно сборника технологических регламентов и инструкций в присутствии'
+                            f' представителя заказчика.',
+                            None, None, None, None, None, None, None,
+                            'Мастер КРС, УСРСиСТ', 16, ]
+
+        for row in drilling_list:
+            gipsPero_list.append(row)
+    else:
+        drilling_list = drilling_nkt(self)
+        drilling_list[2] = [None, None,
+                            f'Произвести нормализацию забоя до Н= {CreatePZ.current_bottom}м с наращиванием, промывкой тех жидкостью уд.весом {CreatePZ.fluid_work}.'
+                            'При отсутствии проходки более 4ч, согласовать с УСРСиСТ подьем компоновки на ревизию. '
+                            'При наработке долото более 80ч, произвести подьем и заменить долото и (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа '
+                            f'до начала работ). Работы производить согласно сборника технологических регламентов и инструкций в присутствии'
+                            f' представителя заказчика.',
+                            None, None, None, None, None, None, None,
+                            'Мастер КРС, УСРСиСТ', 16, ]
+        for row in drilling_list:
+            gipsPero_list.append(row)
+
+
+    return gipsPero_list
 
 
 
