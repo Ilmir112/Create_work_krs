@@ -33,8 +33,9 @@ def work_krs(self):
         nkt_diam_fond += str(i) + ', '
     nkt_diam_fond = nkt_diam_fond[:-2]
     print(f' КРС {CreatePZ.dict_pump, CreatePZ.H_F_paker_do}')
-    if 2 in CreatePZ.cat_H2S_list or '2' in CreatePZ.cat_H2S_list:
-        fluid_work = f'{fluid_work_insert}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из расчета {H2S.calv_h2s(self)}кг/м3 '
+    if '2' in str(CreatePZ.cat_H2S_list[0]):
+        fluid_work = f'{fluid_work_insert}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
+                     f'расчета {H2S.calv_h2s(self,CreatePZ.cat_H2S_list[0], CreatePZ.H2S_mg[0], CreatePZ.H2S_pr[0])}кг/м3 '
     else:
         fluid_work = f'{fluid_work_insert}г/см3 '
     CreatePZ.fluid_work = fluid_work
@@ -953,7 +954,7 @@ def pvo_gno():
             f'эксплуатационной колонны в течении 30мин), сорвать и извлечь пакер. В случае невозможности опрессовки по результатам определения приемистости и по согласованию с ' \
             f'заказчиком  опрессовать трубные плашки ПВО на давление поглощения, но не менее 30атм. Опрессовать выкидную линию после концевых задвижек на ' \
             f'Р - 50 кгс/см2 (5 МПа) - для противовыбросового оборудования, рассчитанного на давление до 210 кгс/см2 ((21 МПа)'
-    if CreatePZ.bvo == True:
+    if '1' in [str(CreatePZ.cat_H2S_list[0]), str(CreatePZ.cat_P_1[0]), str(CreatePZ.gaz_f_pr)]:
         return pvo_1
     else:
         return pvo_2
@@ -1005,10 +1006,12 @@ def volume_vn_nkt(dict_nkt):  # Внутренний объем одного п�
 
 
 def volume_rod(dict_sucker_rod):  # Объем штанг
-
+    from open_pz import CreatePZ
     volume_rod = 0
+    print(dict_sucker_rod)
     for diam_rod, lenght_rod in dict_sucker_rod.items():
-        volume_rod += (3.14 * (lenght_rod * (diam_rod / 1000) / lenght_rod) ** 2) / 4 * lenght_rod
+        print(f' диматер  {diam_rod}')
+        volume_rod += (3.14 * (lenght_rod * (CreatePZ.without_b(diam_rod) / 1000) / lenght_rod) ** 2) / 4 * lenght_rod
     return round(volume_rod, 5)
 
 
@@ -1114,19 +1117,35 @@ def volume_jamming_well(self):
 def get_leakiness(self):
     from PyQt5.QtWidgets import QLineEdit
     from open_pz import CreatePZ
-    while True:
 
-        leakiness = []
-        leakiness_column, ok = QInputDialog.getText(self, 'Нарушение колонны',
-                                                    'Введите нарушение колонны через тире')
-        leakiness.append(leakiness_column.split('-'))
-        print(ok)
-        if not ok and len(leakiness) != 0:
-            return
-        else:
-            return leakiness
+    leakiness = []
+    leakiness_column, ok = QInputDialog.getText(self, 'Нарушение колонны',
+                                                'Введите нарушение колонны через тире')
+    leakiness.append(leakiness_column.split('-'))
+    CreatePZ.leakiness_number += 1
+    plast = f'НЭК № {CreatePZ.leakiness_number}'
+    leakiness_rir = QMessageBox.question(self, 'изолированы ли',
+                                                'изолировано ли нарушение')
 
-    return leakiness
+    if leakiness_rir == QMessageBox.StandardButton.Yes:
+        CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('интервал', set()).add(
+            (float(leakiness_column.split('-')[0]), float(leakiness_column.split('-')[1])))
+        CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('отрайбироно', False)
+        CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('Прошаблонировано', False)
+    else:
+        CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('интервал', set()).add(
+                        (float(leakiness_column.split('-')[0]),float(leakiness_column.split('-')[1])))
+        CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('отрайбироно', False)
+        CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('Прошаблонировано', False)
+
+    leakiness_quest = QMessageBox.question(self, 'Нарушение колонны',
+                                           'Есть ли еще нарушения?')
+    if leakiness_quest == QMessageBox.StandardButton.Yes:
+        get_leakiness(self)
+    else:
+        pass
+
+
 
 def well_jamming(self, without_damping, lift_key):
     from open_pz import CreatePZ
@@ -1173,8 +1192,12 @@ def without_damping(self):
     fname = 'data_klassifer/Перечень скважин без глушения.xlsx'
     workb = load_workbook(fname, data_only=True)
     sheet = workb.active
+    without_damping = False
     for row in sheet.iter_rows(values_only=True):
-        if CreatePZ.well_area == row[4] and CreatePZ.well_number == row[5]:
-            return True
-        else:
-            return False
+
+        if CreatePZ.well_area == row[4] and str(CreatePZ.well_number) == str(row[5]):
+            without_damping =  True
+    if without_damping:
+        return True
+    else:
+        return False

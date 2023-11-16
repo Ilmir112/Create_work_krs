@@ -79,7 +79,7 @@ def acid_work(self):
          'мастер КРС', 0.4],
         [None, None,
          f'Опрессовать эксплуатационную колонну в интервале {paker_depth}-0м на Р={CreatePZ.max_admissible_pressure}атм'
-         f' в течение 30 минут {"".join(["на наличие перетоков " if len(CreatePZ.leakiness) != 0 and min(CreatePZ.leakiness[0]) <= paker_depth else " "])} в присутствии представителя заказчика, составить акт.  '
+         f' в течение 30 минут  в присутствии представителя заказчика, составить акт.  '
          f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ)',
          None, None, None, None, None, None, None,
          'мастер КРС, предст. заказчика', 1.],
@@ -106,7 +106,7 @@ def acid_work(self):
     paker_list.extend(acid_true_quest_list)
 
     if swabbing_true_quest:
-        swabbing_with_paker = swabbing_with_paker(self, paker_khost)[1:]
+        swabbing_with_paker = swabbing_with_paker(self, paker_khost, 2)[1:]
         for row in swabbing_with_paker:
             paker_list.append(row)
     else:

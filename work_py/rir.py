@@ -9,20 +9,25 @@ def rir_rpk(self):
     from open_pz import CreatePZ
     from work_py.opressovka import paker_list, paker_diametr_select
     rir_list = []
-    for row in paker_list(self):
-        rir_list.append(row)
-    nkt_diam = ''.join(['73' if CreatePZ.column_diametr > 110 else '60'])
-    rpkDepth, ok = QInputDialog.getInt(None, 'Определение приемистости',
-                                       'Введите глубину посадки пакера РПК для определения приемистости',
-                                       int(CreatePZ.perforation_roof+10), 0, int(CreatePZ.bottomhole_artificial))
     plast, ok = QInputDialog.getItem(self, 'выбор пласта или НЭК для РИР ', 'выберете пласт или НЭК для изоляции',
                                      CreatePZ.plast_work, 0, False)
-    if ok and plast:
-        self.le.setText(plast)
-
     rir_rpk_question = QMessageBox.question(self, 'посадку между пластами?', 'посадку между пластами?')
     if rir_rpk_question == QMessageBox.StandardButton.Yes:
         rir_rpk_plast_true = True
+    else:
+        rir_rpk_plast_true = False
+    rpkDepth, ok = QInputDialog.getInt(None, 'Определение приемистости',
+                                       'Введите глубину посадки пакера РПК для определения приемистости',
+                                       int(CreatePZ.perforation_roof + 10), 0, int(CreatePZ.bottomhole_artificial))
+    for row in paker_list(self):
+        rir_list.append(row)
+    nkt_diam = ''.join(['73' if CreatePZ.column_diametr > 110 else '60'])
+
+
+    if ok and plast:
+        self.le.setText(plast)
+
+    if rir_rpk_question:
         rir_q_list = [[None, None,
       f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС "Ойл-сервис". '
       f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером от 14.10.2021г. '
@@ -45,10 +50,8 @@ def rir_rpk(self):
             rir_list.insert(-1, row)
     else:
         rir_rpk_plast_true = False
-        rir_q_list = [[None, None,
-                   f'посадить пакер на глубину {rpkDepth}м',
-                    None, None, None, None, None, None, None,
-                    'мастер КРС', 1],
+
+        rir_q_list = [
                       [None, None,
                        f'Произвести насыщение скважины в объеме 5м3. Определить приемистость {plast} при Р-80, 100, 120атм '
                        f'в присутствии представителя УСРСиСТ или подрядчика по РИР. (Вести контроль за отдачей жидкости '

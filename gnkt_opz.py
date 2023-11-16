@@ -39,7 +39,8 @@ def gnkt_work(self):
 
 
     if 2 in CreatePZ.cat_H2S_list or '2' in CreatePZ.cat_H2S_list:
-        fluid_work = f'{fluid_work_insert}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из расчета {H2S.calv_h2s(self)}кг/м3 '
+        fluid_work = f'{fluid_work_insert}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из' \
+                     f' расчета {H2S.calv_h2s(self,CreatePZ.cat_H2S[0], CreatePZ.H2S_mg[0], CreatePZ.H2S_pr[0])}кг/м3 '
     else:
         fluid_work = f'{fluid_work_insert}г/см3 '
     if acid_true_quest == False:

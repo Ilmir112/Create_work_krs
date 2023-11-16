@@ -6,7 +6,15 @@ from work_py.acids_work import acid_work_list
 def acid_work(self):
     from work_py.opressovka import paker_diametr_select
     from open_pz import CreatePZ
+    from work_py.swabbing import swabbing_with_paker
 
+    swabbing_true_quest = QMessageBox.question(self, 'Свабирование на данной компоновке',
+                                               'Нужно ли Свабировать на данной компоновке?')
+
+    if swabbing_true_quest == QMessageBox.StandardButton.Yes:
+        swabbing_true_quest = True
+    else:
+        swabbing_true_quest = False
 
 
 
@@ -22,7 +30,6 @@ def acid_work(self):
     paker_khost, ok = QInputDialog.getInt(None, 'хвостовик',
                                           f'Введите длину хвостовика при посадке пакера нижнего пакера на {paker_depth_bottom} и текущем забое {CreatePZ.current_bottom}',
                                           paker_khost_top, 0, 4000)
-
 
     if CreatePZ.column_additional == False or (CreatePZ.column_additional == True and paker_depth_bottom < CreatePZ.head_column_additional):
         paker_select = f'заглушку + сбивной с ввертышем + НКТ{CreatePZ.nkt_diam}м {paker_khost}м  + пакер ПРО-ЯМО-{paker_diametr_select(paker_depth_bottom)}мм (либо аналог) ' \
@@ -95,7 +102,15 @@ def acid_work(self):
     reply_acid(self, difference_paker, paker_khost, dict_nkt, paker_select, CreatePZ.nkt_diam, paker_depth_bottom)
 
     paker_list.extend(acid_true_quest_list)
-    paker_list.append([None, None,
+
+    if swabbing_true_quest:
+
+        swabbing_with_paker = swabbing_with_paker(self, paker_khost, 1)[1:]
+        for row in swabbing_with_paker:
+            paker_list.append(row)
+    else:
+
+        paker_list.append([None, None,
                                  f'Поднять {paker_select} на НКТ{CreatePZ.nkt_diam} c глубины {paker_depth_bottom}м с доливом скважины в '
                                  f'объеме {round(paker_depth_bottom * 1.12 / 1000, 1)}м3 удельным весом {CreatePZ.fluid_work}',
                                  None, None, None, None, None, None, None,

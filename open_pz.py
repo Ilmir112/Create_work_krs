@@ -38,7 +38,7 @@ class CreatePZ(MyWindow):
     template_depth = 0
     nkt_diam = 73
     b_plan = 0
-    column_leakiness = False
+
     dict_perforation = {}
     dict_perforation_project = {}
     itog_ind_min = 0
@@ -71,12 +71,12 @@ class CreatePZ(MyWindow):
     bottomhole_artificial = 0
     max_expected_pressure = 0
     head_column_additional = 0
-
+    leakiness_Count = 0
     expected_pick_up = {}
     current_bottom = 0
     fluid_work = 0
     work_pervorations_approved = False
-    leakiness = []
+    leakiness = False
     dict_work_pervorations = {}
     work_pervorations = []
     work_pervorations_dict = {}
@@ -89,7 +89,7 @@ class CreatePZ(MyWindow):
     perforation_roof = current_bottom
     perforation_sole = 0
     dict_pump = {'do': '0', 'posle': '0'}
-
+    leakiness_number = 0
     dict_pump_h = {'do': 0, 'posle': 0}
     ins_ind = 0
     len_razdel_1 = 0
@@ -154,7 +154,7 @@ class CreatePZ(MyWindow):
 
             elif 'План-заказ' in row:
                 ws.cell(row=row_ind + 1, column=2).value = 'ПЛАН РАБОТ'
-                cat_well_max = row_ind - 1
+                CreatePZ.cat_well_max = row_ind - 1
                 data_well_min = row_ind + 1
 
             elif 'IX. Мероприятия по предотвращению аварий, инцидентов и осложнений::' in row or 'IX. Мероприятия по предотвращению аварий, инцидентов и осложнений:' in row:
@@ -273,6 +273,9 @@ class CreatePZ(MyWindow):
                     elif 'гипс' in str(value):
 
                         CreatePZ.gipsInWell = True
+                    elif 'нэк' in str(value).lower() or 'негерм' in str(value).lower() or 'нарушение э' in str(value).lower():
+                        CreatePZ.leakiness_Count += 1
+                        CreatePZ.leakiness = True
 
                     elif '9. Максимальный зенитный угол' == value:
                         try:
@@ -285,6 +288,28 @@ class CreatePZ(MyWindow):
                             CreatePZ.max_angle, ok = QInputDialog.getDouble(self, 'Максимальный зенитный угол /'
                                                                                   '', 'Введите максимальный зенитный угол',
                                                                             25, 1, 100, 2)[0]
+                    elif 'по H2S' in row and ('мг/л' in row or 'мг/дм3' in row):
+                        for col, value in enumerate(row):
+                            if value == 'мг/л' or 'мг/дм3':
+                                if CreatePZ.if_None(row[col - 1]) == 'отсут':
+                                    CreatePZ.H2S_mg.append(0)
+                                else:
+                                    CreatePZ.H2S_mg.append(row[col - 1])
+                    elif '%' in row:
+                        for col, value in enumerate(row):
+                            if value == '%':
+                                print(row_ind)
+                                if CreatePZ.if_None(row[col - 1]) == 'отсут':
+                                    CreatePZ.H2S_pr.append(0)
+                                else:
+                                    CreatePZ.H2S_pr.append(row[col - 1])
+                        break
+                        print(f'H2s % {CreatePZ.H2S_pr}')
+                    elif 'по H2S' in row and ('мг/м3' in row):
+                        for col, value in enumerate(row):
+                            if len(CreatePZ.H2S_mg) == 0 and 'мг/м3' == value:
+                                CreatePZ.H2S_mg.append(float(row[col - 1] / 1000))
+
 
                     elif '9. Максимальный зенитный угол' in row and value == 'на глубине':
                         try:
@@ -305,27 +330,21 @@ class CreatePZ(MyWindow):
                             CreatePZ.water_cut = QInputDialog.getInt(self, 'Обводненность',
                                                                      'Введите обводненность скважинной продукции', 50,
                                                                      0, 100)[0]
-                    elif 'по Pпл' == value:
-                        cat_P_1 = row[col + 2]
-                        n = 1
-                        while cat_P_1 == None:
-                            cat_P_1 = row[col + n]
-                            n += 1
-                        CreatePZ.cat_P_1.append(cat_P_1)
-                    elif 'по H2S' == value:
 
-                        CreatePZ.cat_H2S_1 = row[col + 1]
-                        n = 1
-                        while CreatePZ.cat_H2S_1 == None:
-                            CreatePZ.cat_H2S_1 = row[col + n]
-                            n += 1
-                        CreatePZ.cat_H2S_list.append(int(CreatePZ.cat_H2S_1))
-                    elif 'по газовому фактору' == value:
-                        CreatePZ.cat_GF_1 = row[col + 1]
-                        n = 1
-                        while CreatePZ.cat_GF_1 == None:
-                            CreatePZ.cat_GF_1 = row[col + n]
-                            n += 1
+                    # elif 'по H2S' == value:
+                    #
+                    #     CreatePZ.cat_H2S_1 = row[col + 1]
+                    #     n = 1
+                    #     while CreatePZ.cat_H2S_1 == None:
+                    #         CreatePZ.cat_H2S_1 = row[col + n]
+                    #         n += 1
+                    #     CreatePZ.cat_H2S_list.append(int(CreatePZ.cat_H2S_1))
+                    # elif 'по газовому фактору' == value:
+                    #     CreatePZ.cat_GF_1 = row[col + 1]
+                    #     n = 1
+                    #     while CreatePZ.cat_GF_1 == None:
+                    #         CreatePZ.cat_GF_1 = row[col + n]
+                    #         n += 1
 
                     elif value == 'м3/т':
                         CreatePZ.gaz_f_pr.append(row[col - 1])
@@ -474,23 +493,19 @@ class CreatePZ(MyWindow):
                                                                          int(CreatePZ.bottomhole_artificial))
                                 CreatePZ.paker_do['posle'] = H_F_paker_do_2
 
-                    elif 2 in CreatePZ.cat_H2S_list or 1 in CreatePZ.cat_H2S_list:
-                        if 'мг/дм3' == value or 'мг/л' == value:
-                            try:
-                                CreatePZ.H2S_mg.append(float(row[col - 1]))
-                            except:
-                                H2S_mg = QInputDialog.getDouble(self, 'Сероводород',
-                                                                'Введите содержание сероводорода в мг/л', 50, 0, 1000, 2)
-                                CreatePZ.H2S_mg.append(float(H2S_mg[0]))
-                        elif '%' == value:
-                            try:
-                                CreatePZ.H2S_pr.append(float(row[col - 1]))
-                            except:
-                                CreatePZ.H2S_pr.append(float(
-                                    QInputDialog.getDouble(self, 'Сероводород', 'Введите содержание сероводорода в %', 50,
-                                                           0, 1000, 2)[0]))
-                        elif len(CreatePZ.H2S_mg) == 0 and 'мг/м3' == value:
-                            CreatePZ.H2S_mg.append(float(row[col - 1] / 1000))
+
+
+        print(f'CreatePZ {CreatePZ.H2S_pr}')
+        if CreatePZ.leakiness == True:
+            leakiness_quest = QMessageBox.question(self, 'нарушение колонны', 'Программа определела что в скважине'
+                                                                              f'есть нарушение - {CreatePZ.leakiness_Count}, верно ли?')
+            if leakiness_quest == QMessageBox.StandardButton.Yes:
+
+                CreatePZ.leakiness = krs.get_leakiness(self)
+
+            else:
+                CreatePZ.leakiness = False
+
         if CreatePZ.gipsInWell == True:
             gips_true_quest = QMessageBox.question(self, 'Гипсовые отложения',
                                                    'Программа определела что скважина осложнена гипсовыми отложениями '
@@ -539,6 +554,26 @@ class CreatePZ(MyWindow):
         except:
             print('ЭЦН отсутствует')
         # print(f'fh {len(CreatePZ.H2S_mg)}')
+        for row in range(CreatePZ.cat_well_min, CreatePZ.cat_well_max+1):
+            if 'по Pпл' == ws.cell(row=row, column=2).value:
+                for column in range(1, 13):
+                    col = ws.cell(row=row, column=column).value
+
+                    if str(col) in ['1', '2', '3']:
+                        CreatePZ.cat_P_1.append(int(col))
+            if 'по H2S' == ws.cell(row=row, column=2).value:
+                CreatePZ.cat_H2S_list = []
+                for column in range(1, 13):
+                    col = ws.cell(row=row, column=column).value
+
+                    if str(col) in ['1', '2', '3']:
+                        CreatePZ.cat_H2S_list.append(int(col))
+                #
+                # elif 'по газовому фактору' in str(col):
+                #
+                #     if str(col) in ['1', '2', '3']:
+                #         CreatePZ.gaz_f_pr.append(int(col))
+
         if CreatePZ.curator == 'ОР':
             try:
                     # print(CreatePZ.data_x_min, CreatePZ.data_x_max)
@@ -582,6 +617,8 @@ class CreatePZ(MyWindow):
                 CreatePZ.expected_pick_up[expected_Q] = expected_P
             print(f' Ожидаемые {CreatePZ.expected_pick_up}')
         # print(f' индекс нкт {pipes_ind + 1, condition_of_wells}')
+
+
         for row in range(pipes_ind + 1, condition_of_wells):  # словарь  количества НКТ и метраж
             if ws.cell(row=row, column=3).value == 'План':
 
@@ -608,12 +645,13 @@ class CreatePZ(MyWindow):
                     print(f'b_plan {CreatePZ.b_plan}')
 
             for row in range(sucker_rod_ind + 1, pipes_ind - 1):
+
                 key = ws.cell(row=row, column=4).value
                 value = ws.cell(row=row, column=7).value
-                if key != None and row < CreatePZ.b_plan:
+                if CreatePZ.if_None(key) != 'отсут' and row < CreatePZ.b_plan:
 
                     CreatePZ.dict_sucker_rod[key] = CreatePZ.dict_sucker_rod.get(key, 0) + int(CreatePZ.without_b(value))
-                elif key != None and row >= CreatePZ.b_plan:
+                elif CreatePZ.if_None(key) != 'отсут' and row >= CreatePZ.b_plan:
                     CreatePZ.dict_sucker_rod_po[key] = CreatePZ.dict_sucker_rod_po.get(key, 0) + int(CreatePZ.without_b(value))
                 # self.dict_sucker_rod = dict_sucker_rod
                 # self.dict_sucker_rod_po = dict_sucker_rod_po
@@ -646,8 +684,11 @@ class CreatePZ(MyWindow):
         for ind, row in enumerate(perforations_intervals):
             try:
                 krovlya_perf = float(row[2])
+
             except:
+
                 krovlya_perf = 0
+
             plast = row[0]
             if plast == None:
                 plast = perforations_intervals[ind - 1][0]
@@ -659,8 +700,9 @@ class CreatePZ(MyWindow):
                     [str(i).strip() == None for i in row]) == False and krs.is_number(row[2]) == True and krs.is_number(float(row[3])) == True:
 
                 CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('вертикаль', set()).add(row[1])
-
-                CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('интервал', set()).add((float(row[2]),float(row[3])))
+                CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('отрайбироно', False)
+                CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('Прошаблонировано', False)
+                CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('интервал', set()).add((round(float(row[2]), 1), round(float(row[3]), 1)))
                 # print(f'отклю{row[5], CreatePZ.current_bottom, krovlya_perf}')
                 # print(f'{CreatePZ.current_bottom > krovlya_perf, row[5] == None}')
                 CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('вскрытие', set()).add(row[4])
@@ -672,7 +714,7 @@ class CreatePZ(MyWindow):
                     CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('давление', set()).add(row[9])
                     CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('замер', set()).add(row[10])
 
-                elif CreatePZ.current_bottom > krovlya_perf and CreatePZ.if_None(row[5]) == 'отсут' and \
+                if CreatePZ.current_bottom > krovlya_perf and CreatePZ.if_None(row[5]) == 'отсут' and \
                         krs.is_number(row[2]) == True and krs.is_number(float(row[3])) == True:  # Определение работающих интервалов перфораци
                     # print(f'отклю{row[5], CreatePZ.current_bottom, row[2]}')
                     if CreatePZ.perforation_roof <= krovlya_perf:
@@ -682,8 +724,9 @@ class CreatePZ(MyWindow):
                     CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('вертикаль', set()).add(row[1])
 
                     CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('интервал', set()).add(
-                        (float(row[2]),float(row[3])))
-
+                        (round(float(row[2]), 1), round(float(row[3]), 1)))
+                    CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('отрайбироно', False)
+                    CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('Прошаблонировано', False)
                     CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('вскрытие', set()).add(row[4])
                     CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('отключение', set()).add(row[5])
                     if ind > 5:
@@ -698,7 +741,7 @@ class CreatePZ(MyWindow):
                     [str(i).strip() == None for i in row]) == False and krs.is_number(row[2]) == True and krs.is_number(float(row[3])) == True:  # Определение проеткных интервалов перфорации
 
                 self.dict_perforation_project.setdefault(plast, {}).setdefault('вертикаль', set()).add(row[1])
-                self.dict_perforation_project.setdefault(plast, {}).setdefault('интервал', set()).add((float(row[2]),float(row[3])))
+                self.dict_perforation_project.setdefault(plast, {}).setdefault('интервал', set()).add((round(float(row[2]), 1), round(float(row[3]), 1)))
                 self.dict_perforation_project.setdefault(plast, {}).setdefault('вскрытие', set()).add(row[4])
                 self.dict_perforation_project.setdefault(plast, {}).setdefault('отключение', set()).add(row[5])
                 if ind > 5:
@@ -759,6 +802,7 @@ class CreatePZ(MyWindow):
         if '1' in CreatePZ.cat_P_1 or '1' in CreatePZ.cat_H2S_list or 1 in CreatePZ.cat_P_1 or 1 in CreatePZ.cat_H2S_list:
             CreatePZ.bvo = True
         print(f'БВО {CreatePZ.bvo}')
+        print(CreatePZ.cat_P_1, CreatePZ.cat_H2S_list)
 
         plan.delete_rows_pz(self, ws)
         CreatePZ.region = block_name.region(cdng)

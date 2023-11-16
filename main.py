@@ -258,6 +258,14 @@ class MyWindow(QMainWindow):
         alone_menu.addAction(kot_action)
         kot_action.triggered.connect(self.kot_work)
 
+        fluid_change_action = QAction('Изменение удельного веса')
+        alone_menu.addAction(fluid_change_action)
+        fluid_change_action.triggered.connect(self.fluid_change_action)
+
+        pvo_cat1_action = QAction('Монтаж первой категории')
+        alone_menu.addAction(pvo_cat1_action)
+        pvo_cat1_action.triggered.connect(self.pvo_cat1)
+
         rir_menu = action_menu.addMenu('РИР')
 
         rirWithPero_action = QAction('РИР на пере')
@@ -301,6 +309,15 @@ class MyWindow(QMainWindow):
         from work_py.acids import acidGons
         acidGons_work_list = acidGons(self)
         self.populate_row(self.ins_ind, acidGons_work_list)
+
+    def pvo_cat1(self):
+        from work_py.alone_oreration import pvo_cat1
+        pvo_cat1_work_list = pvo_cat1(self)
+        self.populate_row(self.ins_ind, pvo_cat1_work_list)
+    def fluid_change_action(self):
+        from work_py.alone_oreration import fluid_change
+        fluid_change_work_list = fluid_change(self)
+        self.populate_row(self.ins_ind, fluid_change_work_list)
     def rirWithRpk(self):
         from work_py.rir import rir_rpk
         rirRpk_work_list = rir_rpk(self)

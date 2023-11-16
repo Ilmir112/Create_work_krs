@@ -246,11 +246,13 @@ class PervorationWindow(MyWindow):
             # plast
             # perf_list.insert(7, (round((float(perf_list[4]) - float(perf_list[2])) * int(perf_list[6]), 1)))
             perf_list.extend(['подрядчик по ГИС', " "])
+            print(perf_list)
+            plast = perf_list[8]
+            CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('интервал', set()).add(
+                (float(perf_list[2]), float(perf_list[4])))
+            CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('интервал', set()).add(
+                (float(perf_list[2]), float(perf_list[4])))
 
-            for i in CreatePZ.plast_work:
-                if CreatePZ.dict_work_pervorations[i]['интервал'] != (perf_list[1], perf_list[3]):
-                    CreatePZ.dict_work_pervorations.setdefault(perf_list[8], {}).setdefault('интервал', set()).add((perf_list[2], perf_list[4]))
-            # print(perf_list)
             perforation.append(perf_list)
 
 

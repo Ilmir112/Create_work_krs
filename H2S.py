@@ -186,10 +186,10 @@ def well_volume(self):
                                   3.14 * (CreatePZ.column_diametr - CreatePZ.column_wall_thickness * 2) ** 2 / 4 / 1000 * (
                               CreatePZ.head_column_additional) / 1000)
         return volume_well
-def calv_h2s(self):
+def calv_h2s(self, cat_H2S, H2S_mg, H2S_pr):
 
     from open_pz import CreatePZ
-    if 2 in CreatePZ.cat_H2S_list or 1 in CreatePZ.cat_H2S_list:
+    if '2' == str(cat_H2S) or '1' in str(cat_H2S):
         nkt_l = sum(list(CreatePZ.dict_nkt.values()))
 
         udel_vnutr_v = 10 *3.14 *((CreatePZ.column_diametr - CreatePZ.column_wall_thickness*2)*0.01)**2/4
@@ -252,15 +252,15 @@ def calv_h2s(self):
 
         oil_mass = v_pod_gno*(100- CreatePZ.water_cut) * 0.9/100
         # print(f'oil {oil_mass}')
-        volume_h2s = CreatePZ.gaz_f_pr[0]*oil_mass* (float(CreatePZ.H2S_pr[0]))/100
+        volume_h2s = CreatePZ.gaz_f_pr[0]*oil_mass* (float(H2S_pr))/100
 
         h2s_mass_in_oil = (34*volume_h2s*1000/22.14)
-        h2s_mass_in_water = (vodoiz_sucker+vodoiz_nkt)*CreatePZ.H2S_mg[0]
+        h2s_mass_in_water = (vodoiz_sucker+vodoiz_nkt)*H2S_mg
         # print(f'h2a{h2s_mass_in_water}')
         mass_oil_pog_gno = (vodoiz_sucker+vodoiz_nkt) * (100-CreatePZ.water_cut)*0.9/100
-        h2s_volume_pod_gno = mass_oil_pog_gno* CreatePZ.gaz_f_pr[0]*CreatePZ.H2S_pr[0]/100
+        h2s_volume_pod_gno = mass_oil_pog_gno* CreatePZ.gaz_f_pr[0]*H2S_pr/100
         mass_h2s_gas = 34*h2s_volume_pod_gno/22.14
-        mass_h2s_water = v_pod_gno*CreatePZ.H2S_mg[0]
+        mass_h2s_water = v_pod_gno*H2S_mg
         # print(f'mass{mass_h2s_water}')
         mass_h2s_all = h2s_mass_in_water + h2s_mass_in_oil + mass_h2s_gas + mass_h2s_water
         # print(f'mass_h2 {mass_h2s_all}')

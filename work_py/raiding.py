@@ -22,7 +22,7 @@ def raidingColumn(self):
 
     ryber_list = [
         [None, None,
-         f'Спустить {ryber_str}  на НКТ{nkt_diam}мм до Н={CreatePZ.perforation_roof-30}м с замером, '
+         f'Спустить {ryber_str}  на НКТ{nkt_diam}мм до Н={round(CreatePZ.perforation_roof-30,0)}м с замером, '
          f'шаблонированием шаблоном 59,6мм (При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ). '
          f'В случае разгрузки инструмента  при спуске, проработать место посадки с промывкой скв., составить акт.'
          f'СКОРОСТЬ СПУСКА НЕ БОЛЕЕ 1 М/С (НЕ ДОХОДЯ 40 - 50 М ДО ПЛАНОВОГО ИНТЕРВАЛА СКОРОСТЬ СПУСКА СНИЗИТЬ ДО 0,25 М/С). '
@@ -72,6 +72,10 @@ def raidingColumn(self):
 
 def raiding_interval(self):
     from open_pz import CreatePZ
+    if len(CreatePZ.dict_perforation) == 1 and CreatePZ.perforation_sole + 30 <= CreatePZ.current_bottom:
+        return [CreatePZ.perforation_roof-30, CreatePZ.perforation_sole+30]
+    if len(CreatePZ.dict_perforation) == 1 and CreatePZ.perforation_sole + 30 >= CreatePZ.current_bottom:
+        return [CreatePZ.perforation_roof-30, CreatePZ.current_bottom]
 
     str_raid = []
     for plast in CreatePZ.dict_perforation.keys():
@@ -79,6 +83,7 @@ def raiding_interval(self):
         str_min = 10000
         str_max = 0
         for i in CreatePZ.dict_perforation[plast]['интервал']:
+
             if i[0] <= str_min:
                 str_min = i[0]
             if i[1] >= str_max:
@@ -94,14 +99,19 @@ def raiding_interval(self):
     b = 0
     c = 0
     for i in range(1, len(str_raid)):
-        if str_raid[i][0] <= str_raid[i - 1][0] <= str_raid[i][1]:
-            b = str_raid[i][0]
+        min1 = str_raid[i - 1][0]
+        max1 = str_raid[i - 1][1]
+        min2 = str_raid[i][0]
+        max2 = str_raid[i][1]
+        if min2 <= min1 <= max2:
+            b = min2
         else:
-            b = str_raid[i - 1][0]
-        if str_raid[i][0] <= str_raid[i - 1][1] <= str_raid[i][1]:
-            c = str_raid[i][1]
+            b = min1
+        if min2 <= max1 <=max2:
+            c = max2
         else:
-            c = str_raid[i - 1][1]
+            c = max1
+
         a.append([b, c])
     # if CreatePZ.perforation_sole + 30 < CreatePZ.current_bottom:
     #     str_raid = f'{round(CreatePZ.perforation_roof-30,0)} - {round(CreatePZ.perforation_sole + 30,0)}'
@@ -112,6 +122,6 @@ def raiding_interval(self):
     return a
 def raid(a):
     d = ''
-    for i in a:
+    for i in list(a):
         d += f'{i[0]} - {i[1]}, '
     return d

@@ -2,28 +2,28 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox
 
 import krs
 
+
 def grpGpp(self):
     from open_pz import CreatePZ
-
 
     nkt_diam = ''.join(['89' if CreatePZ.column_diametr > 110 else '60'])
 
     gPP_depth, ok = QInputDialog.getInt(None, 'глубина ',
-                                          'Введите глубину установки',
-                                          int(CreatePZ.perforation_roof - 50), 0, int(CreatePZ.bottomhole_drill))
-
+                                        'Введите глубину установки',
+                                        int(CreatePZ.perforation_roof - 50), 0, int(CreatePZ.bottomhole_drill))
 
     gpp_list = [
         [None, None, f'За 48 часов оформить заявку на завоз оборудования ГРП. Уложить НКТ на дополнительные стеллажи',
          None, None, None, None, None, None, None,
-         'мастер КРС',  None],
-        [None, None, f'Спуск производить с применением спец.смазки  и рекомендуемым моментом свинчивания для НКТ{nkt_diam}мм(N-80)'
-                     f' согласно плана от подрядчика по ГРП.',
+         'мастер КРС', None],
+        [None, None,
+         f'Спуск производить с применением спец.смазки  и рекомендуемым моментом свинчивания для НКТ{nkt_diam}мм(N-80)'
+         f' согласно плана от подрядчика по ГРП.',
          None, None, None, None, None, None, None,
          'мастер КРС', None],
         [None, None,
          f'Спустить компоновку с замером и шаблонированием НКТ: {gpp_select(self, gPP_depth)} на НКТ{nkt_diam} на глубину {gPP_depth}м, с замером, шаблонированием НКТ. '
-        ,
+            ,
          None, None, None, None, None, None, None,
          'мастер КРС', round(
             CreatePZ.current_bottom / 9.52 * 1.51 / 60 * 1.2 * 1.2 * 1.04 + 0.18 + 0.008 * CreatePZ.current_bottom / 9.52 + 0.003 * CreatePZ.current_bottom / 9.52,
@@ -94,11 +94,12 @@ def grpGpp(self):
          krs.lifting_unit(self),
          None, None, None, None, None, None, None,
          'Мастер КРС, представ. заказчика', 4.2],
-        [None, None, f'Произвести смену объема обратной промывкой тех жидкостью уд.весом {CreatePZ.fluid_work} на циркуляцию '
-                     f'в объеме {krs.volume_jamming_well(self)}м3. Закрыть скважину на стабилизацию не менее 2 часов. \n'
-                     f'(согласовать глушение в коллектор, в случае отсутствия на желобную емкость)',
+        [None, None,
+         f'Произвести смену объема обратной промывкой тех жидкостью уд.весом {CreatePZ.fluid_work} на циркуляцию '
+         f'в объеме {krs.volume_jamming_well(self)}м3. Закрыть скважину на стабилизацию не менее 2 часов. \n'
+         f'(согласовать глушение в коллектор, в случае отсутствия на желобную емкость)',
          None, None, None, None, None, None, None,
-         'Мастер КРС, представ. заказчика',3.2],
+         'Мастер КРС, представ. заказчика', 3.2],
         [None, None,
          f'Вести контроль плотности на  выходе в конце глушения. В случае отсутствия циркуляции на выходе жидкости '
          f'глушения уд.весом  или Рбуф при глушении скважины, дальнейшие промывки и удельный вес жидкостей промывок '
@@ -112,14 +113,14 @@ def grpGpp(self):
         [None, None,
          f'Провести практическое обучение вахт по сигналу ВЫБРОС.',
          None, None, None, None, None, None, None,
-         'Мастер КРС, представ. заказчика',1],
+         'Мастер КРС, представ. заказчика', 1],
         [None, None,
          f'Поднять устройство ГПП на НКТ{nkt_diam}мм с глубины {gPP_depth}м на поверхность, '
          f'с доливом скважины тех.жидкостью уд. весом {CreatePZ.fluid_work}  в объеме '
-         f'{round(gPP_depth*1.12/1000, 1)}м3. \n'
+         f'{round(gPP_depth * 1.12 / 1000, 1)}м3. \n'
          f'На демонтаж пригласить представителя подрядчика по ГРП',
          None, None, None, None, None, None, None,
-         'Мастер КРС, представ. заказчика', round(0.25 + 0.033 * 1.2 * (gPP_depth) / 9.5 * 1.04*0.9, 1)],
+         'Мастер КРС, представ. заказчика', round(0.25 + 0.033 * 1.2 * (gPP_depth) / 9.5 * 1.04 * 0.9, 1)],
 
         [None, None,
          f'За 48 часов запросить КАРТУ спуска на ГНО и заказать  ГНО.', None,
@@ -128,26 +129,27 @@ def grpGpp(self):
          'Мастер КРС', 1],
     ]
 
-
     gisOTZ_true_quest = QMessageBox.question(self, 'отбивка забоя ',
-                                               'Нужно ли отбивать забой после подьема пакера ГРП?')
+                                             'Нужно ли отбивать забой после подьема пакера ГРП?')
 
     if gisOTZ_true_quest == QMessageBox.StandardButton.Yes:
-         gpp_list.append([None, None, f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС "Ойл-сервис". '
-                     f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером от 14.10.2021г. '
-                     f'ЗАДАЧА 2.8.2 Отбить забой по ГК и ЛМ',
-         None, None, None, None, None, None, None,
-         'Мастер КРС, подрядчик по ГИС', 4])
+        gpp_list.append(
+            [None, None, f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС "Ойл-сервис". '
+                         f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером от 14.10.2021г. '
+                         f'ЗАДАЧА 2.8.2 Отбить забой по ГК и ЛМ',
+             None, None, None, None, None, None, None,
+             'Мастер КРС, подрядчик по ГИС', 4])
     else:
         pass
     normalization_true_quest = QMessageBox.question(self, 'Нормализация забоя ',
-                                             'Нужно ли нормализовывать забой после подьема пакера ГРП?')
+                                                    'Нужно ли нормализовывать забой после подьема пакера ГРП?')
     if normalization_true_quest == QMessageBox.StandardButton.Yes:
-         for row in normalization(self):
-             gpp_list.append(row)
+        for row in normalization(self):
+            gpp_list.append(row)
     else:
         pass
     return gpp_list
+
 
 def normalization(self):
     from open_pz import CreatePZ
@@ -155,8 +157,8 @@ def normalization(self):
     nkt_diam = ''.join(['73' if CreatePZ.column_diametr > 110 else '60'])
 
     current_depth, ok = QInputDialog.getInt(None, 'Нормализация забоя',
-                                          'Введите глубину необходмого забоя',
-                                          int(CreatePZ.current_bottom), 0, int(CreatePZ.bottomhole_artificial+500))
+                                            'Введите глубину необходмого забоя',
+                                            int(CreatePZ.current_bottom), 0, int(CreatePZ.bottomhole_artificial + 500))
     normalization_list = [
         [None, None, f'Алгоритм работ согласовать с Заказчиком: \n'
                      f'В случае освоения скважины ГНКТ и дохождение до гл. не ниже {CreatePZ.current_bottom}м перейти к отбивки забоя '
@@ -170,7 +172,7 @@ def normalization(self):
          f'Спустить компоновку с замером и шаблонированием НКТ: перо (1м), {nktGrp(self)} на НКТ{nkt_diam} до гл.текущего забоя.'
          f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ) ',
          None, None, None, None, None, None, None,
-         'Мастер КРС', round(0.25 + 0.033  * (current_depth) / 9.5 * 1.04*0.9, 1)],
+         'Мастер КРС', round(0.25 + 0.033 * (current_depth) / 9.5 * 1.04 * 0.9, 1)],
         [None, None,
          f'Произвести нормализацию забоя  с наращиванием, комбинированной  промывкой по круговой циркуляции  жидкостью '
          f'с расходом жидкости не менее 8 л/с до гл. {current_depth}м. Тех отстой 2ч. Повторное определение '
@@ -179,9 +181,9 @@ def normalization(self):
          'Мастер КРС', 2.5],
         [None, None,
          f'Поднять перо с глубины {current_depth}м с доливом скважины тех.жидкостью уд. весом {CreatePZ.fluid_work}  в объеме '
-         f'{round(current_depth*1.12/1000, 1)}м3',
+         f'{round(current_depth * 1.12 / 1000, 1)}м3',
          None, None, None, None, None, None, None,
-         'Мастер КРС', round(0.25 + 0.033  * (current_depth) / 9.5 * 1.04*0.9, 1)],
+         'Мастер КРС', round(0.25 + 0.033 * (current_depth) / 9.5 * 1.04 * 0.9, 1)],
         [None, None,
          f'Спустить компоновку с замером и шаблонированием НКТ:  рыхлитель(коронка ) (1м) 73мм, хлопушка, НКТ - 10м, '
          f'обратный клапан (увеличенный), НКТ -100м, гидрожелонка, НКТ - 20м, ограничитель, НКТ - 10м, сбивной клапан, на НКТ {nkt_diam} '
@@ -208,7 +210,7 @@ def normalization(self):
          None, None, None, None, None, None, None,
          'Мастер КРС', None],
         [None, None,
-         f'Спустить компоновку с замером и шаблонированием НКТ:  долото Д={paker_diametr_select(self)+2}мм, забойный двигатель,'
+         f'Спустить компоновку с замером и шаблонированием НКТ:  долото Д={paker_diametr_select(self) + 2}мм, забойный двигатель,'
          f' НКТ  - 20м, вставной фильтр, НКТмм до кровли проппантной пробки. '
          f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ) ',
          None, None, None, None, None, None, None,
@@ -231,6 +233,7 @@ def normalization(self):
          'Мастер КРС, подрядчик по ГИС', 4]]
     return normalization_list
 
+
 def gpp_select(self, paker_depth):
     from open_pz import CreatePZ
     from work_py.opressovka import paker_diametr_select
@@ -241,16 +244,19 @@ def gpp_select(self, paker_depth):
     if CreatePZ.column_additional == True and CreatePZ.column_additional_diametr <= 120:
         nkt_diam_add = '60'
 
-    if CreatePZ.column_additional == False or (CreatePZ.column_additional == True and paker_depth< CreatePZ.head_column_additional):
+    if CreatePZ.column_additional == False or (
+            CreatePZ.column_additional == True and paker_depth < CreatePZ.head_column_additional):
         paker_select = f'гидропескоструйный перфоратор под ЭК {CreatePZ.column_diametr}мм-{CreatePZ.column_wall_thickness}мм+' \
                        f'опрессовочный узел +НКТ{nkt_diam}мм - 10м, реперный патрубок НКТ{nkt_diam}мм - 2м,'
     else:
 
         paker_select = f'гидропескоструйный перфоратор под ЭК {CreatePZ.column_additional_diametr}мм-{CreatePZ.column_additional_wall_thickness}мм +' \
                        f'опрессовочный узел +НКТ{nkt_diam_add}мм - 10м, реперный патрубок НКТ{nkt_diam_add}мм - 2м, + НКТ{nkt_diam_add} L-' \
-                       f'{round(paker_depth-CreatePZ.head_column_additional, 0)}м'
+                       f'{round(paker_depth - CreatePZ.head_column_additional, 0)}м'
 
     return paker_select
+
+
 def paker_select(self, paker_depth):
     from open_pz import CreatePZ
     from work_py.opressovka import paker_diametr_select
@@ -260,23 +266,23 @@ def paker_select(self, paker_depth):
         nkt_diam = '73'
     else:
         nkt_diam = '60'
-
-    if CreatePZ.column_additional == False or CreatePZ.column_additional == True and paker_depth< CreatePZ.head_column_additional:
-        paker_select = f'воронка, НКТ{nkt_diam}мм - 1,5м, пакер ПРО-ЯМО-{paker_diametr_select} (либо аналог) +' \
+    paker_select = ''
+    if CreatePZ.column_additional == False or CreatePZ.column_additional == True and paker_depth < CreatePZ.head_column_additional:
+        paker_select = f'воронка, НКТ{nkt_diam}мм - 1,5м, пакер ПРО-ЯМО-{paker_diametr_select(paker_depth)} (либо аналог) +' \
                        f'опрессовочный узел +НКТ{nkt_diam}мм - 10м, реперный патрубок НКТ{nkt_diam}мм - 2м,'
-    elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr < 110 and paker_depth> CreatePZ.head_column_additional:
-        paker_select = f'воронка, НКТ{nkt_diam}мм - 1,5м, пакер ПРО-ЯМО-{paker_diametr_select} (либо аналог) +' \
+    elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr < 110 and paker_depth > CreatePZ.head_column_additional:
+        paker_select = f'воронка, НКТ{nkt_diam}мм - 1,5м, пакер ПРО-ЯМО-{paker_diametr_select(paker_depth)} (либо аналог) +' \
                        f'опрессовочный узел +НКТ{nkt_diam}мм - 10м, реперный патрубок НКТ{nkt_diam}мм - 2м, + НКТ{nkt_diam} L-' \
-                       f'{round(paker_depth-CreatePZ.head_column_additional, 0)}м'
-    elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr > 110 and paker_depth> CreatePZ.head_column_additional:
-        paker_select = f'воронка, НКТ{nkt_diam}мм - 1,5м, пакер ПРО-ЯМО-{paker_diametr_select} (либо аналог) +' \
+                       f'{round(paker_depth - CreatePZ.head_column_additional, 0)}м'
+    elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr > 110 and paker_depth > CreatePZ.head_column_additional:
+        paker_select = f'воронка, НКТ{nkt_diam}мм - 1,5м, пакер ПРО-ЯМО-{paker_diametr_select(paker_depth)} (либо аналог) +' \
                        f'опрессовочный узел +НКТ{nkt_diam}мм со снятыми фасками - 10м, реперный патрубок НКТ{nkt_diam}мм - 2м, + НКТ{nkt_diam} ' \
                        f'со снятыми фасками L-{round(paker_depth - CreatePZ.head_column_additional, 0)}м'
     return paker_select
 
+
 def grpPaker(self):
     from open_pz import CreatePZ
-
 
     nkt_diam = ''.join(['89' if CreatePZ.column_diametr > 110 else '60'])
 
@@ -284,18 +290,20 @@ def grpPaker(self):
                                           'Введите глубину посадки пакера ГРП',
                                           int(CreatePZ.perforation_roof - 50), 0, int(CreatePZ.current_bottom - 10))
 
-
     paker_list = [
         [None, None, f'За 48 часов оформить заявку на завоз оборудования ГРП. Уложить НКТ на дополнительные стеллажи',
          None, None, None, None, None, None, None,
-         'мастер КРС',  None],
-        [None, None, f'Спуск производить с применением спец.смазки  и рекомендуемым моментом свинчивания для НКТ{nkt_diam}мм(N-80)'
-                     f' согласно плана от подрядчика по ГРП.',
+         'мастер КРС', None],
+
+        [None, None,
+         f'Спуск производить с применением спец.смазки  и рекомендуемым моментом свинчивания для НКТ{nkt_diam}мм(N-80)'
+         f' согласно плана от подрядчика по ГРП.',
          None, None, None, None, None, None, None,
          'мастер КРС', None],
+
         [None, None,
-         f'Спустить компоновку с замером и шаблонированием НКТ: {paker_select(paker_depth)} на глубину {CreatePZ.perforation_roof-50}м, с замером, шаблонированием НКТ. '
-         f'{["(Произвести пробную посадку на глубине 50м)" if CreatePZ.column_additional == False else " "]}',
+         f'Спустить компоновку с замером и шаблонированием НКТ: {paker_select(self, paker_depth)} на НКТ{nkt_diam}мм на глубину {paker_depth}м, с замером, шаблонированием НКТ. '
+         f'{"".join(["(Произвести пробную посадку на глубине 50м)" if CreatePZ.column_additional == False else " "])}',
          None, None, None, None, None, None, None,
          'мастер КРС', round(
             CreatePZ.current_bottom / 9.52 * 1.51 / 60 * 1.2 * 1.2 * 1.04 + 0.18 + 0.008 * CreatePZ.current_bottom / 9.52 + 0.003 * CreatePZ.current_bottom / 9.52,
@@ -311,9 +319,10 @@ def grpPaker(self):
                      f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины Отбить забой по ГК и ЛМ',
          None, None, None, None, None, None, None,
          'Мастер КРС, подрядчик по ГИС', 4],
-        [None, None, f'Посадить пакер с учетом расположения муфтовых соединений э/колонны под руководством представителя '
-                     f'подрядчика по ГРП. на гл. {paker_depth}м. В случае отсутствия представителя подрядчика по ГРП ltd '
-                     f'оповестить Заказчика письменной телефонограммой и выйти в вынужденный простой.',
+        [None, None,
+         f'Посадить пакер с учетом расположения муфтовых соединений э/колонны под руководством представителя '
+         f'подрядчика по ГРП. на гл. {paker_depth}м. В случае отсутствия представителя подрядчика по ГРП ltd '
+         f'оповестить Заказчика письменной телефонограммой и выйти в вынужденный простой.',
          None, None, None, None, None, None, None,
          'Мастер КРС, подрядчик по ГРП', 1.2],
         [None, None,
@@ -373,11 +382,12 @@ def grpPaker(self):
          krs.lifting_unit(self),
          None, None, None, None, None, None, None,
          'Мастер КРС, представ. заказчика', 4.2],
-        [None, None, f'Произвести смену объема обратной промывкой тех жидкостью уд.весом {CreatePZ.fluid_work} на циркуляцию '
-                     f'в объеме {krs.volume_jamming_well(self)}м3. Закрыть скважину на стабилизацию не менее 2 часов. \n'
-                     f'(согласовать глушение в коллектор, в случае отсутствия на желобную емкость)',
+        [None, None,
+         f'Произвести смену объема обратной промывкой тех жидкостью уд.весом {CreatePZ.fluid_work} на циркуляцию '
+         f'в объеме {krs.volume_jamming_well(self)}м3. Закрыть скважину на стабилизацию не менее 2 часов. \n'
+         f'(согласовать глушение в коллектор, в случае отсутствия на желобную емкость)',
          None, None, None, None, None, None, None,
-         'Мастер КРС, представ. заказчика',3.2],
+         'Мастер КРС, представ. заказчика', 3.2],
         [None, None,
          f'Вести контроль плотности на  выходе в конце глушения. В случае отсутствия циркуляции на выходе жидкости '
          f'глушения уд.весом  или Рбуф при глушении скважины, дальнейшие промывки и удельный вес жидкостей промывок '
@@ -391,14 +401,14 @@ def grpPaker(self):
         [None, None,
          f'Провести практическое обучение вахт по сигналу ВЫБРОС.',
          None, None, None, None, None, None, None,
-         'Мастер КРС, представ. заказчика',1],
+         'Мастер КРС, представ. заказчика', 1],
         [None, None,
          f'Поднять пакер ГРП на НКТ{nkt_diam}мм с глубины {paker_depth}м на поверхность, '
          f'с доливом скважины тех.жидкостью уд. весом {CreatePZ.fluid_work}  в объеме '
-         f'{round(CreatePZ.current_bottom*1.12/1000, 1)}м3. \n'
+         f'{round(CreatePZ.current_bottom * 1.12 / 1000, 1)}м3. \n'
          f'На демонтаж пригласить представителя подрядчика по ГРП',
          None, None, None, None, None, None, None,
-         'Мастер КРС, представ. заказчика', round(0.25 + 0.033 * 1.2 * (paker_depth) / 9.5 * 1.04*0.9, 1)],
+         'Мастер КРС, представ. заказчика', round(0.25 + 0.033 * 1.2 * (paker_depth) / 9.5 * 1.04 * 0.9, 1)],
         [None, None,
          f'Опрессовать глухие плашки превентора на максимально ожидаемое давление {CreatePZ.max_expected_pressure}атм, но не выше '
          f'максимально допустимого давления опрессовки эксплуатационной колонны с выдержкой в течении 30 минут,в случае невозможности '
@@ -414,26 +424,27 @@ def grpPaker(self):
          'Мастер КРС', 1],
     ]
 
-
     gisOTZ_true_quest = QMessageBox.question(self, 'отбивка забоя ',
-                                               'Нужно ли отбивать забой после подьема пакера ГРП?')
+                                             'Нужно ли отбивать забой после подьема пакера ГРП?')
 
     if gisOTZ_true_quest == QMessageBox.StandardButton.Yes:
-         paker_list.append([None, None, f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС "Ойл-сервис". '
-                     f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером от 14.10.2021г. '
-                     f'ЗАДАЧА 2.8.2 Отбить забой по ГК и ЛМ',
-         None, None, None, None, None, None, None,
-         'Мастер КРС, подрядчик по ГИС', 4])
+        paker_list.append(
+            [None, None, f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС "Ойл-сервис". '
+                         f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером от 14.10.2021г. '
+                         f'ЗАДАЧА 2.8.2 Отбить забой по ГК и ЛМ',
+             None, None, None, None, None, None, None,
+             'Мастер КРС, подрядчик по ГИС', 4])
     else:
         pass
     normalization_true_quest = QMessageBox.question(self, 'Нормализация забоя ',
-                                             'Нужно ли нормализовывать забой после подьема пакера ГРП?')
+                                                    'Нужно ли нормализовывать забой после подьема пакера ГРП?')
     if normalization_true_quest == QMessageBox.StandardButton.Yes:
-         for row in normalization(self):
-             paker_list.append(row)
+        for row in normalization(self):
+            paker_list.append(row)
     else:
         pass
     return paker_list
+
 
 def normalization(self):
     from open_pz import CreatePZ
@@ -441,8 +452,8 @@ def normalization(self):
     nkt_diam = ''.join(['73' if CreatePZ.column_diametr > 110 else '60'])
 
     current_depth, ok = QInputDialog.getInt(None, 'Нормализация забоя',
-                                          'Введите глубину необходмого забоя',
-                                          int(CreatePZ.current_bottom), 0, int(CreatePZ.bottomhole_artificial+500))
+                                            'Введите глубину необходмого забоя',
+                                            int(CreatePZ.current_bottom), 0, int(CreatePZ.bottomhole_artificial + 500))
     normalization_list = [
         [None, None, f'Алгоритм работ согласовать с Заказчиком: \n'
                      f'В случае освоения скважины ГНКТ и дохождение до гл. не ниже {CreatePZ.current_bottom}м перейти к отбивки забоя '
@@ -456,7 +467,7 @@ def normalization(self):
          f'Спустить компоновку с замером и шаблонированием НКТ: перо (1м), {nktGrp(self)} на НКТ{nkt_diam} до гл.текущего забоя.'
          f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ) ',
          None, None, None, None, None, None, None,
-         'Мастер КРС', round(0.25 + 0.033  * (current_depth) / 9.5 * 1.04*0.9, 1)],
+         'Мастер КРС', round(0.25 + 0.033 * (current_depth) / 9.5 * 1.04 * 0.9, 1)],
         [None, None,
          f'Произвести нормализацию забоя  с наращиванием, комбинированной  промывкой по круговой циркуляции  жидкостью '
          f'с расходом жидкости не менее 8 л/с до гл. {current_depth}м. Тех отстой 2ч. Повторное определение '
@@ -465,9 +476,9 @@ def normalization(self):
          'Мастер КРС', 2.5],
         [None, None,
          f'Поднять перо с глубины {current_depth}м с доливом скважины тех.жидкостью уд. весом {CreatePZ.fluid_work}  в объеме '
-         f'{round(current_depth*1.12/1000, 1)}м3',
+         f'{round(current_depth * 1.12 / 1000, 1)}м3',
          None, None, None, None, None, None, None,
-         'Мастер КРС', round(0.25 + 0.033  * (current_depth) / 9.5 * 1.04*0.9, 1)],
+         'Мастер КРС', round(0.25 + 0.033 * (current_depth) / 9.5 * 1.04 * 0.9, 1)],
         [None, None,
          f'Спустить компоновку с замером и шаблонированием НКТ:  рыхлитель(коронка ) (1м) 73мм, хлопушка, НКТ - 10м, '
          f'обратный клапан (увеличенный), НКТ -100м, гидрожелонка, НКТ - 20м, ограничитель, НКТ - 10м, сбивной клапан, на НКТ {nkt_diam} '
@@ -494,7 +505,7 @@ def normalization(self):
          None, None, None, None, None, None, None,
          'Мастер КРС', None],
         [None, None,
-         f'Спустить компоновку с замером и шаблонированием НКТ:  долото Д={paker_diametr_select(CreatePZ.current_bottom)+2}мм, забойный двигатель,'
+         f'Спустить компоновку с замером и шаблонированием НКТ:  долото Д={paker_diametr_select(CreatePZ.current_bottom) + 2}мм, забойный двигатель,'
          f' НКТ  - 20м, вставной фильтр, НКТмм до кровли проппантной пробки. '
          f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ) ',
          None, None, None, None, None, None, None,
@@ -517,6 +528,7 @@ def normalization(self):
          'Мастер КРС, подрядчик по ГИС', 4]]
     return normalization_list
 
+
 def paker_select(self, paker_depth):
     from open_pz import CreatePZ
     from work_py.opressovka import paker_diametr_select
@@ -527,25 +539,27 @@ def paker_select(self, paker_depth):
     else:
         nkt_diam = '60'
 
-    if CreatePZ.column_additional == False or CreatePZ.column_additional == True and paker_depth< CreatePZ.head_column_additional:
+    if CreatePZ.column_additional == False or CreatePZ.column_additional == True and paker_depth < CreatePZ.head_column_additional:
         paker_select = f'воронка, НКТ{nkt_diam}мм - 1,5м, пакер ПРО-ЯМО-{paker_diametr_select} (либо аналог) +' \
                        f'опрессовочный узел +НКТ{nkt_diam}мм - 10м, реперный патрубок НКТ{nkt_diam}мм - 2м,'
-    elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr < 110 and paker_depth> CreatePZ.head_column_additional:
+    elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr < 110 and paker_depth > CreatePZ.head_column_additional:
         paker_select = f'воронка, НКТ{nkt_diam}мм - 1,5м, пакер ПРО-ЯМО-{paker_diametr_select} (либо аналог) +' \
                        f'опрессовочный узел +НКТ{nkt_diam}мм - 10м, реперный патрубок НКТ{nkt_diam}мм - 2м, + НКТ{nkt_diam} L-' \
-                       f'{round(paker_depth-CreatePZ.head_column_additional, 0)}м'
-    elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr > 110 and paker_depth> CreatePZ.head_column_additional:
+                       f'{round(paker_depth - CreatePZ.head_column_additional, 0)}м'
+    elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr > 110 and paker_depth > CreatePZ.head_column_additional:
         paker_select = f'воронка, НКТ{nkt_diam}мм - 1,5м, пакер ПРО-ЯМО-{paker_diametr_select} (либо аналог) +' \
                        f'опрессовочный узел +НКТ{nkt_diam}мм со снятыми фасками - 10м, реперный патрубок НКТ{nkt_diam}мм - 2м, + НКТ{nkt_diam} ' \
                        f'со снятыми фасками L-{round(paker_depth - CreatePZ.head_column_additional, 0)}м'
     return paker_select
 
+
 def nktGrp(self):
     from open_pz import CreatePZ
 
-    if CreatePZ.column_additional == False or (CreatePZ.column_additional == True and CreatePZ.current_bottom > CreatePZ.head_column_additional):
+    if CreatePZ.column_additional == False or (
+            CreatePZ.column_additional == True and CreatePZ.current_bottom > CreatePZ.head_column_additional):
         return f'НКТ73мм'
-    elif  CreatePZ.column_additional == True and CreatePZ.column_additional_diametr < 110:
-        return f'НКТ60мм L- {round(CreatePZ.current_bottom-CreatePZ.head_column_additional+20,0)}'
+    elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr < 110:
+        return f'НКТ60мм L- {round(CreatePZ.current_bottom - CreatePZ.head_column_additional + 20, 0)}'
     elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr > 110:
-        return f'НКТ73мм со снятыми фасками L- {round(CreatePZ.current_bottom-CreatePZ.head_column_additional+20,0)}'
+        return f'НКТ73мм со снятыми фасками L- {round(CreatePZ.current_bottom - CreatePZ.head_column_additional + 20, 0)}'

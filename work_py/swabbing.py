@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QInputDialog
 from krs import well_volume
 
 
-def swabbing_with_paker(self, paker_khost):
+def swabbing_with_paker(self, paker_khost, pakerKompo):
     from open_pz import CreatePZ
     from work_py.opressovka import paker_diametr_select
 
@@ -72,7 +72,7 @@ def swabbing_with_paker(self, paker_khost):
          'мастер КРС', 0.4],
         [None, None,
          f'Опрессовать эксплуатационную колонну в интервале {paker_depth}-0м на Р={CreatePZ.max_admissible_pressure}атм'
-         f' в течение 30 минут {"".join(["на наличие перетоков " if len(CreatePZ.leakiness) != 0 and min(CreatePZ.leakiness[0]) <= paker_depth else " "])} в присутствии представителя заказчика, составить акт.  '
+         f' в течение 30 минут в присутствии представителя заказчика, составить акт.  '
          f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ)',
          None, None, None, None, None, None, None,
          'мастер КРС, предст. заказчика', 1.],
@@ -129,4 +129,9 @@ def swabbing_with_paker(self, paker_khost):
            'мастер КРС',
            round(0.25 + 0.033 * 1.2 * (paker_depth + paker_khost) / 9.5 * 1.04, 1)]
     ]
+    if pakerKompo == 2:
+        paker_list[2] = [None, None, f'Посадить пакера на глубине {paker_depth}/{paker_khost}м'
+            ,
+         None, None, None, None, None, None, None,
+         'мастер КРС', 0.4]
     return paker_list
