@@ -105,9 +105,12 @@ def pop_down(self, region, curator_sel):
     ved_gtm_list = [None, podpis_dict[region]['ved_gtm']['post'], None, None, None, None,  '"___"___________' , None, None, podpis_dict[region]['ved_gtm']['surname'], None, None]
 
     ved_orm_list = [None, podpis_dict[region]['ved_orm']['post'], None, None, None, None, '"___"___________', None, None, podpis_dict[region]['ved_orm']['surname'], None, None]
-    if (region == 'ЧГМ' or region == 'КГМ') and CreatePZ.curator == 'ОР':
+    if (region == 'ЧГМ') and CreatePZ.curator == 'ОР':
 
         podp_down.insert(13, ved_orm_list)
+    elif (region == 'КГМ') and CreatePZ.curator == 'ОР':
+
+        podp_down.insert(13, ved_gtm_list)
     elif region == 'КГМ' or region == 'ЧГМ' and CreatePZ.curator == 'ГТМ':
         podp_down.insert(13, ved_gtm_list)
     return podp_down

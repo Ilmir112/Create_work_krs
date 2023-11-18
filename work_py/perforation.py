@@ -303,15 +303,15 @@ class PervorationWindow(MyWindow):
                     self.table_widget.setSpan(i + self.ins_ind, 2, 1, 8)
                 for column, data in enumerate(row_data):
 
-                    widget = QtWidgets.QLabel(str())
-                    if column != 25:
-                        widget.setStyleSheet("""QLabel { 
-                                                            border: 1px solid black;
-                                                            font-size: 12px; 
-                                                            font-family: Arial;
-                                                        }
-                                                        """)
-                        self.table_widget.setCellWidget(row, column, widget)
+                    # widget = QtWidgets.QLabel(str())
+                    # if column != 25:
+                    #     widget.setStyleSheet("""QLabel {
+                    #                                         border: 1px solid black;
+                    #                                         font-size: 12px;
+                    #                                         font-family: Arial;
+                    #                                     }
+                    #                                     """)
+                    #     self.table_widget.setCellWidget(row, column, widget)
                     self.table_widget.setItem(row, column, QtWidgets.QTableWidgetItem(str(data)))
 
                     # if column == 2 or column == 10 or column == 11:

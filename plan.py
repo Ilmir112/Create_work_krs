@@ -17,28 +17,28 @@ def delete_rows_pz(self, ws):
         boundaries_dict[ind] = range_boundaries(str(_range))
 
     # rowHeights_top = [None, 18.0, 18, 18,None, 18.0, 18, 18,None, 18.0, 18, 18, 18.0, 18, 18, 18.0, 18, 18, 18.0, 18, 18]
-    rowHeights1 = [ws.row_dimensions[i + 1].height for i in range(CreatePZ.cat_well_min, ws.max_row)]
+    rowHeights1 = [ws.row_dimensions[i + 1].height for i in range(CreatePZ.cat_well_min[0], ws.max_row)]
     for key, value in boundaries_dict.items():
         ws.unmerge_cells(start_column=value[0], start_row=value[1],
                          end_column=value[2], end_row=value[3])
     print(
-        f'индекс удаления {1, CreatePZ.cat_well_min - 1} ,  {CreatePZ.data_well_max + 2, ws.max_row - CreatePZ.data_well_max}')
+        f'индекс удаления {1, CreatePZ.cat_well_min[0] - 1} ,  {CreatePZ.data_well_max + 2, ws.max_row - CreatePZ.data_well_max}')
 
     ws.delete_rows(CreatePZ.data_x_max, ws.max_row - CreatePZ.data_x_max)
 
-    ws.delete_rows(1, CreatePZ.cat_well_min - 1)
+    ws.delete_rows(1, CreatePZ.cat_well_min[0] - 1)
 
     # print(sorted(boundaries_dict))
     CreatePZ.rowHeights = rowHeights1
-    # print(rowHeights1[CreatePZ.cat_well_min:])
+    # print(rowHeights1[CreatePZ.cat_well_min[0]:])
     # print(len(CreatePZ.rowHeights))
     # print(f'251po {16}')
     for _ in range(16):
         ws.insert_rows(1, 1)
     for key, value in boundaries_dict.items():
-        if value[1] <= CreatePZ.data_well_max + 1 and value[1] >= CreatePZ.cat_well_min:
-            ws.merge_cells(start_column=value[0], start_row=value[1] + 16 - CreatePZ.cat_well_min + 1,
-                           end_column=value[2], end_row=value[3] + 16 - CreatePZ.cat_well_min + 1)
+        if value[1] <= CreatePZ.data_well_max + 1 and value[1] >= CreatePZ.cat_well_min[0]:
+            ws.merge_cells(start_column=value[0], start_row=value[1] + 16 - CreatePZ.cat_well_min[0] + 1,
+                           end_column=value[2], end_row=value[3] + 16 - CreatePZ.cat_well_min[0] + 1)
 
     # print(f'{ws.max_row, len(CreatePZ.rowHeights)}dd')
     for index_row, row in enumerate(ws.iter_rows()):  # Копирование высоты строки

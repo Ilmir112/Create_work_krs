@@ -1,7 +1,7 @@
 import sys
 from zipfile import ZipFile
 
-import PIL
+from PIL import Image
 import block_name
 from main import MyWindow
 import krs
@@ -109,6 +109,7 @@ class CreatePZ(MyWindow):
     rowHeights = []
     plast_work = []
     plast_all = []
+    cat_well_min = []
     bvo = False
     old_version = False
     thin_border = Border(left=Side(style='thin'),
@@ -149,8 +150,8 @@ class CreatePZ(MyWindow):
         for row_ind, row in enumerate(ws.iter_rows(values_only=True)):
             ws.row_dimensions[row_ind].hidden = False
             if 'Категория скважины' in row:
-                CreatePZ.cat_well_min = row_ind + 1  # индекс начала категории
-                # print(f'индекс категории {CreatePZ.cat_well_min}')
+                CreatePZ.cat_well_min.append(row_ind + 1)  # индекс начала категории
+                # print(f'индекс категории {CreatePZ.cat_well_min[0]}')
 
             elif 'План-заказ' in row:
                 ws.cell(row=row_ind + 1, column=2).value = 'ПЛАН РАБОТ'
@@ -289,26 +290,25 @@ class CreatePZ(MyWindow):
                                                                                   '', 'Введите максимальный зенитный угол',
                                                                             25, 1, 100, 2)[0]
                     elif 'по H2S' in row and ('мг/л' in row or 'мг/дм3' in row):
-                        for col, value in enumerate(row):
-                            if value == 'мг/л' or 'мг/дм3':
-                                if CreatePZ.if_None(row[col - 1]) == 'отсут':
-                                    CreatePZ.H2S_mg.append(0)
-                                else:
-                                    CreatePZ.H2S_mg.append(row[col - 1])
+                        if value == 'мг/л' or 'мг/дм3':
+                            if CreatePZ.if_None(row[col - 1]) == 'отсут':
+                                CreatePZ.H2S_mg.append(0)
+                            else:
+                                CreatePZ.H2S_mg.append(row[col - 1])
                     elif '%' in row:
-                        for col, value in enumerate(row):
-                            if value == '%':
-                                print(row_ind)
-                                if CreatePZ.if_None(row[col - 1]) == 'отсут':
-                                    CreatePZ.H2S_pr.append(0)
-                                else:
-                                    CreatePZ.H2S_pr.append(row[col - 1])
-                        break
+
+                        if value == '%':
+                            print(row_ind)
+                            if CreatePZ.if_None(row[col - 1]) == 'отсут':
+                                CreatePZ.H2S_pr.append(0)
+                            else:
+                                CreatePZ.H2S_pr.append(row[col - 1])
+
                         print(f'H2s % {CreatePZ.H2S_pr}')
                     elif 'по H2S' in row and ('мг/м3' in row):
-                        for col, value in enumerate(row):
-                            if len(CreatePZ.H2S_mg) == 0 and 'мг/м3' == value:
-                                CreatePZ.H2S_mg.append(float(row[col - 1] / 1000))
+
+                        if len(CreatePZ.H2S_mg) == 0 and 'мг/м3' == value:
+                            CreatePZ.H2S_mg.append(float(row[col - 1] / 1000))
 
 
                     elif '9. Максимальный зенитный угол' in row and value == 'на глубине':
@@ -331,20 +331,6 @@ class CreatePZ(MyWindow):
                                                                      'Введите обводненность скважинной продукции', 50,
                                                                      0, 100)[0]
 
-                    # elif 'по H2S' == value:
-                    #
-                    #     CreatePZ.cat_H2S_1 = row[col + 1]
-                    #     n = 1
-                    #     while CreatePZ.cat_H2S_1 == None:
-                    #         CreatePZ.cat_H2S_1 = row[col + n]
-                    #         n += 1
-                    #     CreatePZ.cat_H2S_list.append(int(CreatePZ.cat_H2S_1))
-                    # elif 'по газовому фактору' == value:
-                    #     CreatePZ.cat_GF_1 = row[col + 1]
-                    #     n = 1
-                    #     while CreatePZ.cat_GF_1 == None:
-                    #         CreatePZ.cat_GF_1 = row[col + n]
-                    #         n += 1
 
                     elif value == 'м3/т':
                         CreatePZ.gaz_f_pr.append(row[col - 1])
@@ -493,6 +479,15 @@ class CreatePZ(MyWindow):
                                                                          int(CreatePZ.bottomhole_artificial))
                                 CreatePZ.paker_do['posle'] = H_F_paker_do_2
 
+        if CreatePZ.grpPlan:
+            grpPlan_quest = QMessageBox.question(self, 'Подготовка к ГРП', 'Программа определела что в скважине'
+                                                                              f'планируется ГРП, верно ли?')
+            if grpPlan_quest == QMessageBox.StandardButton.Yes:
+
+                CreatePZ.grpPlan = krs.get_leakiness(self)
+
+            else:
+                CreatePZ.grpPlan = False
 
 
         print(f'CreatePZ {CreatePZ.H2S_pr}')
@@ -554,7 +549,7 @@ class CreatePZ(MyWindow):
         except:
             print('ЭЦН отсутствует')
         # print(f'fh {len(CreatePZ.H2S_mg)}')
-        for row in range(CreatePZ.cat_well_min, CreatePZ.cat_well_max+1):
+        for row in range(CreatePZ.cat_well_min[0], CreatePZ.cat_well_max+1):
             if 'по Pпл' == ws.cell(row=row, column=2).value:
                 for column in range(1, 13):
                     col = ws.cell(row=row, column=column).value
@@ -573,7 +568,29 @@ class CreatePZ(MyWindow):
                 #
                 #     if str(col) in ['1', '2', '3']:
                 #         CreatePZ.gaz_f_pr.append(int(col))
+            if '1' in CreatePZ.cat_H2S_list or '2' in CreatePZ.cat_H2S_list:
+                if len(CreatePZ.H2S_mg) == 0:
 
+                    H2S_mg = QInputDialog.getDouble(self, 'Сероводород',
+                                                    'Введите содержание сероводорода в мг/л', 50, 0, 1000, 2)
+                    H2S_mg_true_quest = QMessageBox.question(self, 'Необходимость кислоты', 'Планировать кислоту?')
+                    CreatePZ.H2S_mg.append(H2S_mg)
+                    while  H2S_mg_true_quest == QMessageBox.StandardButton.Yes:
+                        H2S_mg = QInputDialog.getDouble(self, 'Сероводород',
+                                                        'Введите содержание сероводорода в мг/л', 50, 0, 1000, 2)
+                        H2S_mg_true_quest = QMessageBox.question(self, 'Необходимость кислоты', 'Планировать кислоту?')
+                        CreatePZ.H2S_mg.append(H2S_mg)
+                if len(CreatePZ.H2S_pr) == 0:
+
+                    H2S_pr = QInputDialog.getDouble(self, 'Сероводород',
+                                                    'Введите содержание сероводорода в мг/л', 50, 0, 1000, 2)
+                    H2S_pr_true_quest = QMessageBox.question(self, 'Необходимость кислоты', 'Планировать кислоту?')
+                    CreatePZ.H2S_mg.append(H2S_pr)
+                    while H2S_pr_true_quest == QMessageBox.StandardButton.Yes:
+                        H2S_pr = QInputDialog.getDouble(self, 'Сероводород',
+                                                        'Введите содержание сероводорода в мг/л', 50, 0, 1000, 2)
+                        H2S_pr_true_quest = QMessageBox.question(self, 'Необходимость кислоты', 'Планировать кислоту?')
+                        CreatePZ.H2S_mg.append(H2S_pr)
         if CreatePZ.curator == 'ОР':
             try:
                     # print(CreatePZ.data_x_min, CreatePZ.data_x_max)
@@ -794,11 +811,14 @@ class CreatePZ(MyWindow):
                     [max(CreatePZ.dict_work_pervorations[i]['интервал']) for i in CreatePZ.plast_work]))
                 print(f'мин {CreatePZ.perforation_roof}, мак {CreatePZ.perforation_sole}')
 
-        for j in range(CreatePZ.data_x_min, CreatePZ.data_x_max):  # Ожидаемые показатели после ремонта
-            lst = []
-            for i in range(0, 12):
-                lst.append(ws.cell(row=j + 1, column=i + 1).value)
-            CreatePZ.row_expected.append(lst)
+        try:
+            for j in range(CreatePZ.data_x_min, CreatePZ.data_x_max):  # Ожидаемые показатели после ремонта
+                lst = []
+                for i in range(0, 12):
+                    lst.append(ws.cell(row=j + 1, column=i + 1).value)
+                CreatePZ.row_expected.append(lst)
+        except:
+            pass
         if '1' in CreatePZ.cat_P_1 or '1' in CreatePZ.cat_H2S_list or 1 in CreatePZ.cat_P_1 or 1 in CreatePZ.cat_H2S_list:
             CreatePZ.bvo = True
         print(f'БВО {CreatePZ.bvo}')
@@ -821,7 +841,7 @@ class CreatePZ(MyWindow):
         # head = plan.head_ind(cat_well_min, CreatePZ.data_well_max + 1)
         #
         # plan.copy_row(ws, ws2, CreatePZ.ins_ind, head)
-        CreatePZ.ins_ind += CreatePZ.data_well_max - CreatePZ.cat_well_min + 19
+        CreatePZ.ins_ind += CreatePZ.data_well_max - CreatePZ.cat_well_min[0] + 19
         # print(f' индекс вставки ГНВП{CreatePZ.ins_ind}')
         dict_events_gnvp = {}
         dict_events_gnvp['krs'] = events_gnvp()
@@ -858,25 +878,26 @@ class CreatePZ(MyWindow):
         CreatePZ.insert_gnvp(ws, work_plan, ins_gnvp)
 
         # print(CreatePZ.row_expected)
-        for i in range(1, len(CreatePZ.row_expected) + 1):  # Добавление  показатели после ремонта
-            ws.row_dimensions[CreatePZ.ins_ind + i - 1].height = None
-            for j in range(1, 12):
-                if i == 1:
-                    ws.cell(row=i + CreatePZ.ins_ind, column=j).font = Font(name='Arial', size=13, bold=True)
-                    ws.cell(row=i + CreatePZ.ins_ind, column=j).alignment = Alignment(wrap_text=False,
-                                                                                      horizontal='center',
-                                                                                      vertical='center')
-                    ws.cell(row=i + CreatePZ.ins_ind, column=j).value = CreatePZ.row_expected[i - 1][j - 1]
-                else:
-                    ws.cell(row=i + CreatePZ.ins_ind, column=j).font = Font(name='Arial', size=13, bold=True)
-                    ws.cell(row=i + CreatePZ.ins_ind, column=j).alignment = Alignment(wrap_text=False,
-                                                                                      horizontal='left',
-                                                                                      vertical='center')
-                    ws.cell(row=i + CreatePZ.ins_ind, column=j).value = CreatePZ.row_expected[i - 1][j - 1]
-        ws.merge_cells(start_column=2, start_row=CreatePZ.ins_ind + 1, end_column=12, end_row=CreatePZ.ins_ind + 1)
-        CreatePZ.ins_ind += len(CreatePZ.row_expected)
-        # print(f' индекс до работ {CreatePZ.ins_ind}')
-        # if work_plan == 'gnkt_opz':
+        if len(CreatePZ.row_expected) !=0:
+            for i in range(1, len(CreatePZ.row_expected) + 1):  # Добавление  показатели после ремонта
+                ws.row_dimensions[CreatePZ.ins_ind + i - 1].height = None
+                for j in range(1, 12):
+                    if i == 1:
+                        ws.cell(row=i + CreatePZ.ins_ind, column=j).font = Font(name='Arial', size=13, bold=True)
+                        ws.cell(row=i + CreatePZ.ins_ind, column=j).alignment = Alignment(wrap_text=False,
+                                                                                          horizontal='center',
+                                                                                          vertical='center')
+                        ws.cell(row=i + CreatePZ.ins_ind, column=j).value = CreatePZ.row_expected[i - 1][j - 1]
+                    else:
+                        ws.cell(row=i + CreatePZ.ins_ind, column=j).font = Font(name='Arial', size=13, bold=True)
+                        ws.cell(row=i + CreatePZ.ins_ind, column=j).alignment = Alignment(wrap_text=False,
+                                                                                          horizontal='left',
+                                                                                          vertical='center')
+                        ws.cell(row=i + CreatePZ.ins_ind, column=j).value = CreatePZ.row_expected[i - 1][j - 1]
+            ws.merge_cells(start_column=2, start_row=CreatePZ.ins_ind + 1, end_column=12, end_row=CreatePZ.ins_ind + 1)
+            CreatePZ.ins_ind += len(CreatePZ.row_expected)
+            # print(f' индекс до работ {CreatePZ.ins_ind}')
+            # if work_plan == 'gnkt_opz':
 
             # CreatePZ.gnkt_work1 = gnkt_work(self)
         self.ins_ind_border = CreatePZ.ins_ind
@@ -918,7 +939,7 @@ class CreatePZ(MyWindow):
             ws3.title = "Расчет необходимого количества поглотителя H2S"
             ws3 = wb["Расчет необходимого количества поглотителя H2S"]
             calc_H2S(ws3, CreatePZ.H2S_pr, CreatePZ.H2S_mg)
-
+            ws3.sheet_visibility = 'hidden'
             # ws3.page_setup.fitToPage = True
             # ws3.page_setup.fitToHeight = True
             # ws3.page_setup.fitToWidth = True

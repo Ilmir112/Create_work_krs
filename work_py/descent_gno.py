@@ -66,12 +66,6 @@ def gno_down(self):
              f'Интерпретация данных ГИС',
              None, None, None, None, None, None, None,
              'мастер КРС, подрядчик по ГИС', 8],
-            [None, None,
-             f'Все работы производить с соблюдением т/б и технологии'
-             f' согласно утвержденному плану. Демонтировать подьемный агрегат и оборудование. Пустить скважину в работу.',
-             None, None, None, None, None, None, None,
-             'мастер КРС', float(8.5)],
-
            ]
     except:
         pass
@@ -443,7 +437,7 @@ def gno_down(self):
 
     if ok and lift_sel:
         self.le.setText(lift)
-    lift_select = lift_dict[lift_key]
+    lift_select = lift_dict[lift]
     for row in lift_select:
         gno_list.append(row)
 

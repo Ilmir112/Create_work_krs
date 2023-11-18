@@ -57,23 +57,23 @@ def fluid_change(self):
             CreatePZ.fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
                                   f'расчета {H2S.calv_h2s(self, CreatePZ.cat_H2S_list[1], CreatePZ.H2S_mg[1], CreatePZ.H2S_pr[1])}кг/м3 '
         else:
-            CreatePZ.fluid_work = fluid_new
+            CreatePZ.fluid_work = f'{fluid_new}г/см3 '
     else:
         if ('2' in str(CreatePZ.cat_H2S_list[1]) or '1' in str(CreatePZ.cat_H2S_list[1])) and (
                 '2' not in str(CreatePZ.cat_H2S_list[0]) or '1' not in str(CreatePZ.cat_H2S_list[0])):
             CreatePZ.fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
-                                  f'расчета {H2S.calv_h2s(self, CreatePZ.cat_H2S[1], CreatePZ.H2S_mg[1], CreatePZ.H2S_pr[1])}кг/м3 '
+                                  f'расчета {H2S.calv_h2s(self, CreatePZ.cat_H2S_list[1], CreatePZ.H2S_mg[1], CreatePZ.H2S_pr[1])}кг/м3 '
         elif ('2' in str(CreatePZ.cat_H2S_list[0]) or '1' in str(CreatePZ.cat_H2S_list[0])) and (
                 '2' not in str(CreatePZ.cat_H2S_list[1]) or '1' not in str(CreatePZ.cat_H2S_list[1])):
             CreatePZ.fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
                                   f'расчета {H2S.calv_h2s(self, CreatePZ.cat_H2S_list[0], CreatePZ.H2S_mg[0], CreatePZ.H2S_pr[0])}кг/м3 '
         else:
-            CreatePZ.fluid_work = fluid_new
+            CreatePZ.fluid_work = f'{fluid_new}г/см3 '
 
     fluid_change_list = [[None, None,
                           f'Произвести смену объема обратной промывкой по круговой циркуляции  жидкостью  {CreatePZ.fluid_work} '
                           f'(по расчету по вскрываемому пласта Рожид- {expected_pressure}атм) в объеме не '
-                          f'менее {krs.well_volume(self,CreatePZ.current_bottom)}м3  в присутствии представителя заказчика, Составить акт. '
+                          f'менее {round(krs.well_volume(self,CreatePZ.current_bottom),1)}м3  в присутствии представителя заказчика, Составить акт. '
                           f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ)',
                           None, None, None, None, None, None, None,
                           'мастер КРС', round(2.5, 1)]

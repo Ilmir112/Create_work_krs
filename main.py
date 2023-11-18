@@ -171,9 +171,18 @@ class MyWindow(QMainWindow):
         geophysical.addAction(geophysical_action)
         geophysical_action.triggered.connect(self.GeophysicalNewWindow)
 
-        swibbing_action = QAction("Свабирование со свабом", self)
+        vp_action = QAction("Установка ВП", self)
+        geophysical.addAction(vp_action)
+        vp_action.triggered.connect(self.vp_action)
+
+        swibbing_action = QAction("Свабирование со пакером", self)
         geophysical.addAction(swibbing_action)
         swibbing_action.triggered.connect(self.swibbing_with_paker)
+
+        swibbingVoronka_action = QAction("Свабирование со воронкой", self)
+        geophysical.addAction(swibbingVoronka_action)
+        swibbingVoronka_action.triggered.connect(self.swibbing_with_voronka)
+
 
 
         emptyString_action = QAction("добавить пустую строку", self)
@@ -280,6 +289,10 @@ class MyWindow(QMainWindow):
         rir_menu.addAction(rirWithRpk_action)
         rirWithRpk_action.triggered.connect(self.rirWithRpk)
 
+        rirWithRpp_action = QAction('РИР с глухим пакером')
+        rir_menu.addAction(rirWithRpp_action)
+        rirWithRpp_action.triggered.connect(self.rirWithRpp)
+
         gno_menu = action_menu.addAction('Спуск фондового оборудования')
         gno_menu.triggered.connect(self.gno_bottom)
 
@@ -322,6 +335,11 @@ class MyWindow(QMainWindow):
         from work_py.rir import rir_rpk
         rirRpk_work_list = rir_rpk(self)
         self.populate_row(self.ins_ind, rirRpk_work_list)
+
+    def rirWithRpp(self):
+        from work_py.rir import rir_rpp
+        rirRpp_work_list = rir_rpp(self)
+        self.populate_row(self.ins_ind, rirRpp_work_list)
 
     def rirWithPaker(self):
         from work_py.rir import rir_paker
@@ -370,10 +388,12 @@ class MyWindow(QMainWindow):
             bottom_row = selected_range.bottomRow()
 
             for row in range(top_row, bottom_row + 1):
-                selected_rows.append(row)
+                if row not in selected_rows:
+                    selected_rows.append(row)
 
         # Удаление выбранных строк в обратном порядке
         selected_rows.sort(reverse=True)
+        print(selected_rows)
         for row in selected_rows:
             self.table_widget.removeRow(row)
 
@@ -381,11 +401,23 @@ class MyWindow(QMainWindow):
         ryber_work_list = [[None, None, None, None, None, None, None, None, None, None,None, None]]
         self.populate_row(self.ins_ind, ryber_work_list)
 
+    def vp_action(self):
+        from work_py.vp_cm import vp
+
+        print('Вставился ВП')
+        vp_work_list = vp(self)
+        self.populate_row(self.ins_ind, vp_work_list)
     def swibbing_with_paker(self):
         from work_py.swabbing import swabbing_with_paker
 
         print('Вставился Сваб с пакером')
-        swab_work_list = swabbing_with_paker(self)
+        swab_work_list = swabbing_with_paker(self, 1600, 1)
+        self.populate_row(self.ins_ind, swab_work_list)
+    def swibbing_with_voronka(self):
+        from work_py.swabbing import swabbing_with_voronka
+
+        print('Вставился Сваб с воронкой')
+        swab_work_list = swabbing_with_voronka(self)
         self.populate_row(self.ins_ind, swab_work_list)
 
     def ryberAdd(self):
@@ -462,7 +494,7 @@ class MyWindow(QMainWindow):
 
     def populate_row(self, ins_ind, work_list):
 
-        text_width_dict = {20: (0, 100), 40: (101, 200), 60: (201, 300), 80: (301, 400), 100: (401, 500), 120: (501, 600), 140: (601, 700)}
+        text_width_dict = {20: (0, 100), 40: (101, 200), 60: (201, 300), 80: (301, 400), 100: (401, 500), 120: (501, 600), 140: (601, 700), 160: (701, 800), 180: (801, 1500) }
 
         for i, row_data in enumerate(work_list):
             row = ins_ind + i
@@ -472,10 +504,10 @@ class MyWindow(QMainWindow):
             for column, data in enumerate(row_data):
                 item = QtWidgets.QTableWidgetItem(str(data))
                 item.setFlags(item.flags() | Qt.ItemIsEditable)
-                # widget = QtWidgets.QLabel(str())
-                # widget.setStyleSheet('border: 0.5px solid black; font: Arial 14px')
+                widget = QtWidgets.QLabel(str())
+                widget.setStyleSheet('border: 0.5px solid black; font: Arial 14px')
 
-                # self.table_widget.setCellWidget(row, column, widget)
+                self.table_widget.setCellWidget(row, column, widget)
 
                 if data != None:
                     self.table_widget.setItem(row, column, item)
@@ -498,12 +530,12 @@ class MyWindow(QMainWindow):
 
     def GeophysicalNewWindow(self):
         from work_py.geophysic import GeophysicWindow
-        from open_pz import CreatePZ
+
         if self.new_window is None:
 
             self.new_window = GeophysicWindow(self.table_widget, self.ins_ind)
-            self.new_window.setWindowTitle("New Window")
-            self.new_window.setGeometry(200, 200, 300, 200)
+            self.new_window.setWindowTitle("Геофизические исследования")
+            self.new_window.setGeometry(200, 400, 300, 400)
             self.new_window.show()
 
         else:
@@ -514,10 +546,10 @@ class MyWindow(QMainWindow):
         from work_py.perforation import PervorationWindow
         from open_pz import CreatePZ
         if self.new_window is None:
-            print(f' проект перфорации {self.dict_perforation_project}')
+            # print(f' проект перфорации {self.dict_perforation_project}')
             self.new_window = PervorationWindow(self.table_widget, self.ins_ind, self.dict_work_pervorations, self.dict_perforation_project)
-            self.new_window.setWindowTitle("New Window")
-            self.new_window.setGeometry(200, 200, 300, 200)
+            self.new_window.setWindowTitle("Перфорация")
+            self.new_window.setGeometry(200, 400, 300, 400)
             self.new_window.show()
 
         else:

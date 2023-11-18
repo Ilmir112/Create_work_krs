@@ -4,6 +4,69 @@ from krs import volume_vn_ek,volume_vn_nkt
 
 
 
+def rir_rpp(self):
+    from open_pz import CreatePZ
+    from work_py.opressovka import paker_list, paker_diametr_select
+    rir_list = []
+    plast, ok = QInputDialog.getItem(self, 'выбор пласта или НЭК для РИР ', 'выберете пласт или НЭК для изоляции',
+                                     CreatePZ.plast_work, 0, False)
+    rir_rpk_question = QMessageBox.question(self, 'посадку между пластами?', 'посадку между пластами?')
+    if rir_rpk_question == QMessageBox.StandardButton.Yes:
+        rir_rpk_plast_true = True
+    else:
+        rir_rpk_plast_true = False
+    rpkDepth, ok = QInputDialog.getInt(None, 'глубина посадки глухого пакера',
+                                       'Введите глубину посадки  глухого пакера',
+                                       int(CreatePZ.perforation_roof + 10), 0, int(CreatePZ.bottomhole_artificial))
+    for row in paker_list(self):
+        rir_list.append(row)
+    nkt_diam = ''.join(['73' if CreatePZ.column_diametr > 110 else '60'])
+
+
+    if ok and plast:
+        self.le.setText(plast)
+
+
+    rir_work_list = [[None, None,
+                   f'Спустить   пакер глухой {rpk_nkt(self, rpkDepth)}  на тНКТ{nkt_diam}мм до глубины {rpkDepth}м с замером, шаблонированием шаблоном. '
+                   f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ) \n'
+                   f'Перед спуском технологического пакера произвести визуальный осмотр в присутствии представителя РИР или УСРСиСТ.',
+        None, None, None, None, None, None, None,
+    'мастер КРС', 2.5],
+     [None, None,
+      f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС "Ойл-сервис". '
+      f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером от 14.10.2021г. '
+      f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины Отбить забой по ГК и ЛМ',
+      None, None, None, None, None, None, None,
+      'Мастер КРС, подрядчик по ГИС', 4],
+     [None, None,
+      f'При наличии циркуляции опрессовать НКТ на 200атм '
+      f'в присутствии порядчика по РИР. Составить акт. Вымыть шар обратной промывкой ',
+      None, None, None, None, None, None, None,
+      'Мастер КРС, подрядчик РИР, УСРСиСТ', 4],
+     [None, None,
+      f'Произвести установку глухого пакера по технологическому плану подрядчика по РИР силами подрядчика по РИР '
+      f'с установкой пакера  на глубине {rpkDepth}м',
+      None, None, None, None, None, None, None,
+      'Мастер КРС, подрядчик РИР, УСРСиСТ', 16],
+
+     [None, None,
+      f'{"".join([f"Опрессовать эксплуатационную колонну на Р={CreatePZ.max_admissible_pressure}атм в присутствии представителя заказчика" if rir_rpk_question == False else ""])} '
+      f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ) ',
+      None, None, None, None, None, None, None,
+      'Мастер КРС, подрядчик РИР, УСРСиСТ', 1.2],
+     [None, None,
+      f'Поднять стыковочное устройство с глубины {rpkDepth}м с доливом скважины в объеме '
+      f'{round(CreatePZ.current_bottom*1.12/1000, 1)}м3 тех. жидкостью  уд.весом {CreatePZ.fluid_work} ',
+      None, None, None, None, None, None, None,
+      'Мастер КРС, подрядчик РИР, УСРСиСТ', round(0.25+0.033*1.2*(rpkDepth)/9.5*1.04,1)]]
+    for row in rir_work_list:
+        rir_list.append(row)
+    CreatePZ.current_bottom = rpkDepth
+    perf_new(self)
+    return rir_list
+
+
 
 def rir_rpk(self):
     from open_pz import CreatePZ
@@ -64,7 +127,7 @@ def rir_rpk(self):
             rir_list.insert(-1, row)
 
     rir_work_list = [[None, None,
-                   f'Спустить   пакера РПК  + {rpk_nkt(self, rpkDepth)}  на тНКТ{nkt_diam}мм до глубины {rpkDepth}м с замером, шаблонированием шаблоном. '
+                   f'Спустить   пакера РПК {rpk_nkt(self, rpkDepth)}  на тНКТ{nkt_diam}мм до глубины {rpkDepth}м с замером, шаблонированием шаблоном. '
                    f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ) \n'
                    f'Перед спуском технологического пакера произвести визуальный осмотр в присутствии представителя РИР или УСРСиСТ.',
         None, None, None, None, None, None, None,
@@ -135,13 +198,13 @@ def rpk_nkt(self, paker_depth):
 
 
     if CreatePZ.column_additional == False or CreatePZ.column_additional == True and paker_depth< CreatePZ.head_column_additional:
-        rpk_nkt_select = f'РПК (либо аналог) для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм ' \
+        rpk_nkt_select = f' для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм ' \
                        f'+ {nktOpress(self)[0]} + НКТ + репер'
     elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr < 110 and paker_depth> CreatePZ.head_column_additional:
-        rpk_nkt_select = f'РПК (либо аналог) для ЭК {CreatePZ.column_additional_diametr}мм х {CreatePZ.column_additional_wall_thickness}мм  + {nktOpress(self)[0]} ' \
+        rpk_nkt_select = f' для ЭК {CreatePZ.column_additional_diametr}мм х {CreatePZ.column_additional_wall_thickness}мм  + {nktOpress(self)[0]} ' \
                        f'+ НКТ60мм + репер + НКТ60мм L- {paker_depth-CreatePZ.head_column_additional}м '
     elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr > 110 and paker_depth> CreatePZ.head_column_additional:
-        rpk_nkt_select = f'РПК (либо аналог) для ЭК {CreatePZ.column_additional_diametr}мм х {CreatePZ.column_additional_wall_thickness}мм  + {nktOpress(self)[0]}' \
+        rpk_nkt_select = f' для ЭК {CreatePZ.column_additional_diametr}мм х {CreatePZ.column_additional_wall_thickness}мм  + {nktOpress(self)[0]}' \
                        f'+ НКТ + репер + НКТ73мм со снятыми фасками L- {paker_depth-CreatePZ.head_column_additional}м '
     return rpk_nkt_select
 
@@ -296,12 +359,13 @@ def rirWithPero(self):
          'мастер КРС', 0.5],
     ]
     print(f'количество пластов {len(CreatePZ.dict_work_pervorations)}')
+
     if len(CreatePZ.dict_work_pervorations) == 0:
         rir_list = []
         for row in uzmPero_list:
             rir_list.append(row)
 
-        CreatePZ.current_bottom = rirSole
+        CreatePZ.current_bottom = rirRoof
         perf_new(self)
         if len(CreatePZ.dict_work_pervorations) != 0:
             rir_list.pop(-2)
@@ -370,7 +434,7 @@ def rirWithPero(self):
         for row in rirPero_list:
             rir_list.append(row)
 
-        CreatePZ.current_bottom = rirSole
+        CreatePZ.current_bottom = rirRoof
         perf_new(self)
         if len(CreatePZ.dict_work_pervorations) != 0:
             rir_list.pop(-2)
