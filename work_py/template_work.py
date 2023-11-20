@@ -373,7 +373,7 @@ def template_ek(self):
                      f'текущего забоя с плановым, при необходимости нормализовать забой обратной промывкой тех жидкостью '
                      f'уд.весом {CreatePZ.fluid_work}   до глубины {CreatePZ.current_bottom}м',
                      None, None, None, None, None, None, None, 'Мастер КРС', None, None]
-    if CreatePZ.current_bottom - CreatePZ.perforation_sole <=10:
+    if CreatePZ.current_bottom - CreatePZ.perforation_sole <=10 and CreatePZ.open_trunk_well == False:
         list_template_ek.insert(-1, privyazka_nkt)
     if CreatePZ.gipsInWell == True: # and 'НВ' in str(CreatePZ.dict_pump["do"][0]).upper() and CreatePZ.if_None(CreatePZ.paker_do['do']) == 'отсут':
         gips = pero(self)

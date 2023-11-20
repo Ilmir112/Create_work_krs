@@ -1,5 +1,7 @@
 from PyQt5.QtWidgets import QInputDialog, QMessageBox
 
+from work_py.rir import perf_new
+
 
 def sand_select(self):
     from open_pz import CreatePZ
@@ -78,7 +80,7 @@ def sandFilling(self):
 
 
     CreatePZ.current_bottom = filling_depth
-
+    perf_new(self)
     return filling_list
 
 def sandWashing(self):
@@ -113,4 +115,5 @@ def sandWashing(self):
             CreatePZ.current_bottom / 9.52 * 1.51 / 60 * 1.2 * 1.04 + 0.18 + 0.008 * CreatePZ.current_bottom / 9.52 + 0.003 * CreatePZ.current_bottom / 9.52,
             2)]]
     CreatePZ.current_bottom = washingDepth
+    perf_new(self)
     return washingOut_list

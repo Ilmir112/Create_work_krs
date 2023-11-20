@@ -76,6 +76,7 @@ class CreatePZ(MyWindow):
     current_bottom = 0
     fluid_work = 0
     work_pervorations_approved = False
+    dict_leakiness = {}
     leakiness = False
     dict_work_pervorations = {}
     work_pervorations = []
@@ -126,7 +127,7 @@ class CreatePZ(MyWindow):
         self.wb = wb
         self.ws = ws
     def open_excel_file(self, fname, work_plan):
-
+        global wb, ws
         wb = load_workbook(fname, data_only=True)
         name_list = wb.sheetnames
         # print(name_list)
@@ -362,19 +363,33 @@ class CreatePZ(MyWindow):
                                 CreatePZ.shoe_column_additional, ok = QInputDialog.getInt(self, ',башмак доп колонны',
                                                                                           'введите глубину башмак доп колонны',
                                                                                           600, 0, 3500)
-                            try:
-                                CreatePZ.column_additional_diametr = CreatePZ.without_b(ws.cell(row=row_ind + 3, column=col + 4).value)
-                            except:
-                                CreatePZ.column_additional_diametr, ok = QInputDialog.getInt(self, ',диаметр доп колонны',
-                                                                                             'введите внешний диаметр доп колонны',
-                                                                                             600, 0, 3500)
-                            try:
-                                CreatePZ.column_additional_wall_thickness = CreatePZ.without_b(ws.cell(row=row_ind + 3, column=col + 6).value)
-                            except:
-                                CreatePZ.column_additional_wall_thickness, ok = QInputDialog.getInt(self,
-                                                                                                    ',толщина стенки доп колонны',
-                                                                                                    'введите толщину стенки доп колонны',
-                                                                                                    600, 0, 3500)
+                            if ws.cell(row=row_ind + 3, column=col + 4).value.split('x') == 2:
+                                CreatePZ.column_additional_diametr = CreatePZ.without_b(ws.cell(row=row_ind + 3, column=col + 4).value.split('x')[0])
+                                CreatePZ.column_additional_wall_thickness = CreatePZ.without_b(ws.cell(row=row_ind + 3, column=col + 4).value.split('x')[1])
+                        try:
+                            CreatePZ.column_additional_diametr = float(CreatePZ.without_b(ws.cell(row=row_ind + 3, column=col + 4).value))
+                            print(f' диаметр доп колонны {CreatePZ.column_additional_diametr}')
+                        except:
+                            CreatePZ.column_additional_diametr, ok = QInputDialog.getInt(self, ',диаметр доп колонны',
+                                                                                         'введите внешний диаметр доп колонны',
+                                                                                         600, 0, 3500)
+                        try:
+                            CreatePZ.column_additional_wall_thickness = float(CreatePZ.without_b(ws.cell(row=row_ind + 3, column=col + 6).value))
+                            print(f'толщина стенки доп колонны {CreatePZ.column_additional_wall_thickness} ')
+                        except:
+                            CreatePZ.column_additional_wall_thickness, ok = QInputDialog.getInt(self,
+                                                                                                ',толщина стенки доп колонны',
+                                                                                                'введите толщину стенки доп колонны',
+                                                                                                600, 0, 3500)
+                        if CreatePZ.column_additional_diametr >= 170 or str(CreatePZ.column_additional_wall_thickness) == '0':
+                            CreatePZ.column_additional_diametr, ok = QInputDialog.getInt(self, ',диаметр доп колонны',
+                                                                                         'введите внешний диаметр доп колонны',
+                                                                                         114, 70, 170)
+                            CreatePZ.column_additional_wall_thickness, ok = QInputDialog.getDouble(self,
+                                                                                                ',толщина стенки доп колонны',
+                                                                                                'введите толщину стенки доп колонны',
+                                                                                                6.4, 4, 12, 1)
+
                     elif 'Дата вскрытия/отключения' == value:
                         CreatePZ.old_version = True
                     elif 'Максимально ожидаемое давление на устье' == value:
@@ -1060,8 +1075,11 @@ class CreatePZ(MyWindow):
         elif len(a.split('/')) == 2:
             lst = []
             for i in a.split('/'):
-                print(i)
-                lst.append(float(i.replace(',','.').strip()))
+                b = ''
+                for i in a:
+                    if i in '0123456789.x':
+                        b = str(b) + i
+                    lst.append(b)
             return lst
         elif len(a.split('-')) == 2:
             lst = []
@@ -1072,7 +1090,7 @@ class CreatePZ(MyWindow):
         else:
             b = 0
             for i in a:
-                if i in '0123456789,.':
+                if i in '0123456789,.x':
                     b = str(b) + i
 
             return float(b.replace(',','.'))

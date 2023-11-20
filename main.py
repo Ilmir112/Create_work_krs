@@ -1,7 +1,7 @@
 import sys
 import openpyxl
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu, QMenuBar, QAction, QTableWidget, QTableWidgetItem, \
-    QVBoxLayout, QWidget, QLineEdit, QMessageBox
+    QVBoxLayout, QWidget, QLineEdit, QMessageBox, QFileDialog
 from PyQt5 import QtCore, QtWidgets, QtGui
 from openpyxl.workbook import Workbook
 from PyQt5.QtCore import Qt
@@ -27,7 +27,7 @@ class MyWindow(QMainWindow):
     def initUI(self):
         from work_py.mouse import TableWidget
         self.setWindowTitle("Main Window")
-        self.setGeometry(500, 500, 600, 600)
+        self.setGeometry(500, 500, 400, 400)
 
         self.table_widget = TableWidget()
         # self.table_widget.setEditTriggers(Qt.EditTrigger.AllEditTriggers)
@@ -100,8 +100,13 @@ class MyWindow(QMainWindow):
             self.save_to_excel(self.wb, self.ws)
 
         elif action == self.save_file_as:
-            self.saveFileDialog()
+            self.saveFileDialog(self.wb)
 
+    def saveFileDialog(self, wb):
+        from open_pz import CreatePZ
+        fileName, _ = QFileDialog.getSaveFileName(self, "Save excel-file", "", "Excel Files (*.xls)")
+        if fileName:
+            wb.save(f"{CreatePZ.well_number} {CreatePZ.well_area} {CreatePZ.cat_P_1} категории.xlsx)")
     def save_to_excel(self, wb, ws):
         from open_pz import CreatePZ
         from krs import is_number
@@ -142,14 +147,18 @@ class MyWindow(QMainWindow):
         CreatePZ.count_row_height(ws, work_list, ins_ind, merged_cells_dict)
         itog_ind_min = CreatePZ.itog_ind_min + len(work_list)
         CreatePZ.addItog(self, ws, self.table_widget.rowCount()+1)
-
-        ws.print_area = f'B1:L{self.table_widget.rowCount()+45}'
-        # ws.page_setup.fitToPage = True
-        ws.page_setup.fitToHeight = False
-        ws.page_setup.fitToWidth = True
-        ws.print_options.horizontalCentered = True
-        wb.save(f"{CreatePZ.well_number} {CreatePZ.well_area} {CreatePZ.cat_P_1} категории.xlsx")
-
+        try:
+            ws.print_area = f'B1:L{self.table_widget.rowCount()+45}'
+            # ws.page_setup.fitToPage = True
+            ws.page_setup.fitToHeight = False
+            ws.page_setup.fitToWidth = True
+            ws.print_options.horizontalCentered = True
+            wb.save(f"{CreatePZ.well_number} {CreatePZ.well_area} {CreatePZ.cat_P_1} категории.xlsx")
+        except Exception as e:
+            print(e)
+        finally:
+            if wb:
+                wb.close()
         print("Table data saved to Excel")
 
 
@@ -504,10 +513,10 @@ class MyWindow(QMainWindow):
             for column, data in enumerate(row_data):
                 item = QtWidgets.QTableWidgetItem(str(data))
                 item.setFlags(item.flags() | Qt.ItemIsEditable)
-                widget = QtWidgets.QLabel(str())
-                widget.setStyleSheet('border: 0.5px solid black; font: Arial 14px')
+                # widget = QtWidgets.QLabel(str())
+                # widget.setStyleSheet('border: 0.5px solid black; font: Arial 14px')
 
-                self.table_widget.setCellWidget(row, column, widget)
+                # self.table_widget.setCellWidget(row, column, widget)
 
                 if data != None:
                     self.table_widget.setItem(row, column, item)

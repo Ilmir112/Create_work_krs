@@ -509,7 +509,9 @@ def rir_paker(self):
        None, None, None, None, None, None, None,
        'Мастер КРС, подрядчик РИР, УСРСиСТ', 1.2]
         ]
-    if len(CreatePZ.dict_work_pervorations) == 0:
+    CreatePZ.current_bottom = rirRoof
+    perf_new(self)
+    if len(CreatePZ.dict_work_pervorations) != 0:
         rir_paker_list.pop(-2)
     for row in rir_paker_list:
         rir_list.append(row)

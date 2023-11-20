@@ -75,7 +75,7 @@ def raiding_interval(self):
     if len(CreatePZ.dict_perforation) == 1 and CreatePZ.perforation_sole + 30 <= CreatePZ.current_bottom:
         return [CreatePZ.perforation_roof-30, CreatePZ.perforation_sole+30]
     if len(CreatePZ.dict_perforation) == 1 and CreatePZ.perforation_sole + 30 >= CreatePZ.current_bottom:
-        return [CreatePZ.perforation_roof-30, CreatePZ.current_bottom]
+        return [[CreatePZ.perforation_roof-30, CreatePZ.current_bottom]]
 
     str_raid = []
     for plast in CreatePZ.dict_perforation.keys():
@@ -84,44 +84,37 @@ def raiding_interval(self):
         str_max = 0
         for i in CreatePZ.dict_perforation[plast]['интервал']:
 
-            if i[0] <= str_min:
-                str_min = i[0]
+            if i[0] <= str_min and i[0]:
+
+                str_min = int(i[0])
+                print(str_min)
             if i[1] >= str_max:
-                str_max = i[1]
+                str_max = int(i[1])
             if str_max + 30 <= CreatePZ.current_bottom:
                 crt = [str_min - 30, str_max + 30]
             else:
                 crt = [str_min - 30, CreatePZ.current_bottom]
-
-        str_raid.append(crt)
-
-    a = []
-    b = 0
-    c = 0
-    for i in range(1, len(str_raid)):
-        min1 = str_raid[i - 1][0]
-        max1 = str_raid[i - 1][1]
-        min2 = str_raid[i][0]
-        max2 = str_raid[i][1]
-        if min2 <= min1 <= max2:
-            b = min2
+        if crt[0] < CreatePZ.current_bottom:
+            str_raid.append(crt)
+    print(str_raid)
+    merged_segments=merge_overlapping_intervals(str_raid)
+    return merged_segments
+def merge_overlapping_intervals(intervals):
+    merged = []
+    intervals = sorted(intervals, key=lambda x: x[0])
+    for interval in intervals:
+        if not merged or interval[0] > merged[-1][1]:
+            merged.append(interval)
         else:
-            b = min1
-        if min2 <= max1 <=max2:
-            c = max2
-        else:
-            c = max1
-
-        a.append([b, c])
-    # if CreatePZ.perforation_sole + 30 < CreatePZ.current_bottom:
-    #     str_raid = f'{round(CreatePZ.perforation_roof-30,0)} - {round(CreatePZ.perforation_sole + 30,0)}'
-    # else:
-    #     str_raid = f'{round(CreatePZ.perforation_roof - 30, 0)} - {CreatePZ.current_bottom}'
-    a = sorted(a)
-    print(a)
-    return a
+            merged[-1] = (merged[-1][0], max(merged[-1][1], interval[1]))
+    print(merged)
+    return merged
 def raid(a):
-    d = ''
-    for i in list(a):
-        d += f'{i[0]} - {i[1]}, '
+    print(a, len(a))
+    if len(a)<2:
+        return f'{a[0]} - {a[1]}, '
+    else:
+        d = ''
+        for i in list(a):
+            d += f'{i[0]} - {i[1]}, '
     return d

@@ -24,7 +24,7 @@ def paker_list(self):
     pressureZUMPF_question = QMessageBox.question(self, 'ЗУМПФ', 'Нужно ли опрессовывать ЗУМПФ?')
     if pressureZUMPF_question == QMessageBox.StandardButton.Yes:
         pakerDepthZumpf, ok = QInputDialog.getInt(None, 'опрессовка ЭК',
-                                          'Введите глубину посадки пакера для опрессовки ЗУМПФА', int(CreatePZ.perforation_sole + 10), int(CreatePZ.perforation_sole))
+                                          'Введите глубину посадки пакера для опрессовки ЗУМПФА', int(CreatePZ.perforation_sole + 10), 0, int(CreatePZ.current_bottom))
         pressureZUMPF_answer = True
     else:
         pressureZUMPF_answer = False
@@ -53,6 +53,8 @@ def paker_list(self):
             QMessageBox.warning(self, 'Некорректные данные', f'Компоновка НКТ пакер на глубине {paker_depth} и хв '
                                                              f'{paker_khost}  и ниже текущего забоя - {CreatePZ.current_bottom}')
             paker_khost, ok = QInputDialog.getInt(None, 'опрессовка ЭК', 'Введите длину хвостовика', 10, 0, 3000)
+
+
 
     def paker_select(self):
         if CreatePZ.column_additional == False or CreatePZ.column_additional == True and paker_depth< CreatePZ.head_column_additional:
@@ -104,6 +106,34 @@ def paker_list(self):
          f'объеме {round(paker_depth*1.12/1000,1)}м3 удельным весом {CreatePZ.fluid_work}',
          None, None, None, None, None, None, None,
          'мастер КРС', round(0.25+0.033*1.2*(paker_depth+paker_khost)/9.5*1.04,1) ]]
+    if 'НЭК № 1' in list(CreatePZ.dict_work_pervorations.keys()):
+        print(list(CreatePZ.dict_work_pervorations['НЭК № 1']['интервал']))
+        pakerNEK, ok = QInputDialog.getInt(None, 'опрессовка ЭК',
+                                                  'Введите глубину посадки пакера для опрессовки ЗУМПФА',
+                                                  int(list(CreatePZ.dict_work_pervorations['НЭК № 1']['интервал'])[0][1]+10),0,
+                                                  int(CreatePZ.perforation_sole))
+        pressureNEK_list = [[None, None,
+                               f'При герметичности колонны в интервале 0 - {paker_depth}м:  Допустить пакер до глубины {pakerNEK}м',
+                               None, None, None, None, None, None, None,
+                               'мастер КРС', 0.4],
+                              [None, None,
+                               f'{nktOpress_list[1]}. Посадить пакер. Опрессовать ЗУМПФ в интервале {pakerNEK} - {CreatePZ.current_bottom}м на Р={CreatePZ.max_admissible_pressure}атм в течение 30 минут в присутствии представителя заказчика, составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ)',
+                               None, None, None, None, None, None, None,
+                               'мастер КРС', 0.4],
+                            [None, None,
+                             f'Произвести насыщение скважины в объеме 5м3 по затрубному пространству. Определить приемистость '
+                             f'НЭК {CreatePZ.dict_work_pervorations["НЭК № 1"]["интервал"][0]} при Р-80атм по затрубному пространству'
+                             f'в присутствии представителя УСРСиСТ или подрядчика по РИР. (Вести контроль за отдачей жидкости '
+                             f'после закачки, объем согласовать с подрядчиком по РИР).',
+                             None, None, None, None, None, None, None,
+                             'мастер КРС', 1.5],
+                              [None, None,
+                               f'Произвести срыв пакера с поэтапным увеличением нагрузки на 3-4т выше веса НКТ в течении 30мин и с '
+                               f'выдержкой 1ч для возврата резиновых элементов в исходное положение. ',
+                               None, None, None, None, None, None, None,
+                               'мастер КРС', 0.7]]
+        for i in range(len(pressureNEK_list)):
+            paker_list.insert(4 + i, pressureNEK_list[i])
 
     if pressureZUMPF_answer:
         pressureZUMPF_list = [[None, None,
