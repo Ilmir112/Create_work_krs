@@ -51,7 +51,7 @@ def rir_rpp(self):
       'Мастер КРС, подрядчик РИР, УСРСиСТ', 16],
 
      [None, None,
-      f'{"".join([f"Опрессовать эксплуатационную колонну на Р={CreatePZ.max_admissible_pressure}атм в присутствии представителя заказчика" if rir_rpk_question == False else ""])} '
+      f'{"".join([f"Опрессовать эксплуатационную колонну на Р={CreatePZ.max_admissible_pressure}атм в присутствии представителя заказчика" if  rir_rpk_plast_true == False else ""])} '
       f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ) ',
       None, None, None, None, None, None, None,
       'Мастер КРС, подрядчик РИР, УСРСиСТ', 1.2],
@@ -90,7 +90,7 @@ def rir_rpk(self):
     if ok and plast:
         self.le.setText(plast)
 
-    if rir_rpk_question:
+    if rir_rpk_plast_true:
         rir_q_list = [[None, None,
       f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС "Ойл-сервис". '
       f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером от 14.10.2021г. '
@@ -108,7 +108,7 @@ def rir_rpk(self):
                    f'при Р=100атм произвести соляно-кислотную обработку скважины в объеме 1м3 HCl-12% с целью увеличения '
                    f'приемистости по технологическому плану',
         None, None, None, None, None, None, None,
-    'мастер КРС', 2.5]]
+        'мастер КРС', 2.5]]
         for row in rir_q_list:
             rir_list.insert(-1, row)
     else:
@@ -154,7 +154,7 @@ def rir_rpk(self):
       None, None, None, None, None, None, None,
       'Мастер КРС, подрядчик РИР, УСРСиСТ', 16],
      [None, None,
-      f'{"".join([f"Опрессовать цементный мост на Р={CreatePZ.max_admissible_pressure}атм в присутствии представителя заказчика" if rir_rpk_question == False else ""])} '
+      f'{"".join([f"Опрессовать цементный мост на Р={CreatePZ.max_admissible_pressure}атм в присутствии представителя заказчика" if rir_rpk_plast_true == False else ""])} '
       f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ) ',
       None, None, None, None, None, None, None,
       'Мастер КРС, подрядчик РИР, УСРСиСТ', 1.2],
@@ -171,14 +171,22 @@ def rir_rpk(self):
 
 def perf_new(self):
     from open_pz import CreatePZ
-    for plast in CreatePZ.plast_work:
-        for i in list(CreatePZ.dict_work_pervorations[plast]['интервал']):
+    print(f' пласта до изоляции {CreatePZ.dict_work_pervorations}')
+    for plast in CreatePZ.plast_all:
+        for i in list(CreatePZ.dict_perforation[plast]['интервал']):
             if i[0] > CreatePZ.current_bottom:
-                print(CreatePZ.dict_work_pervorations[plast]['интервал'])
-                CreatePZ.dict_work_pervorations[plast]['интервал'].discard(i)
-        if CreatePZ.dict_work_pervorations[plast]['интервал'] == set():
-            del CreatePZ.dict_work_pervorations[plast]
-
+                print(CreatePZ.dict_perforation[plast]['интервал'])
+                CreatePZ.dict_perforation[plast]['интервал'].discard(i)
+        if CreatePZ.dict_perforation[plast]['интервал'] == set():
+            del CreatePZ.dict_perforation[plast]
+        if plast in CreatePZ.plast_work:
+            for i in list(CreatePZ.dict_work_pervorations[plast]['интервал']):
+                if i[0] > CreatePZ.current_bottom:
+                    print(CreatePZ.dict_work_pervorations[plast]['интервал'])
+                    CreatePZ.dict_work_pervorations[plast]['интервал'].discard(i)
+            if CreatePZ.dict_work_pervorations[plast]['интервал'] == set():
+                del CreatePZ.dict_work_pervorations[plast]
+    print(f' пласта рабоче {CreatePZ.dict_work_pervorations, CreatePZ.dict_perforation}')
     CreatePZ.plast_work = list(CreatePZ.dict_work_pervorations.keys())
     try:
         CreatePZ.perforation_roof = min(min(
@@ -206,6 +214,7 @@ def rpk_nkt(self, paker_depth):
     elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr > 110 and paker_depth> CreatePZ.head_column_additional:
         rpk_nkt_select = f' для ЭК {CreatePZ.column_additional_diametr}мм х {CreatePZ.column_additional_wall_thickness}мм  + {nktOpress(self)[0]}' \
                        f'+ НКТ + репер + НКТ73мм со снятыми фасками L- {paker_depth-CreatePZ.head_column_additional}м '
+
     return rpk_nkt_select
 
 

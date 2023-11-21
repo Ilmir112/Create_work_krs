@@ -420,7 +420,7 @@ class MyWindow(QMainWindow):
         from work_py.swabbing import swabbing_with_paker
 
         print('Вставился Сваб с пакером')
-        swab_work_list = swabbing_with_paker(self, 1600, 1)
+        swab_work_list = swabbing_with_paker(self, 10, 1)
         self.populate_row(self.ins_ind, swab_work_list)
     def swibbing_with_voronka(self):
         from work_py.swabbing import swabbing_with_voronka

@@ -34,15 +34,18 @@ def swabbing_with_paker(self, paker_khost, pakerKompo):
     paker_depth, ok = QInputDialog.getInt(None, 'посадка пакера',
                                           f'Введите глубину посадки пакера при освоении для перфорации {CreatePZ.dict_work_pervorations}', int(CreatePZ.perforation_roof - 40), 0,
                                           5000)
+
+
     paker_khost1 = int(CreatePZ.perforation_sole - paker_depth)
     print(f'хвостовик {paker_khost1}')
-    # paker_khost, ok = QInputDialog.getInt(None, 'хвостовик',
-    #                                       f'Введите длину хвостовика кровли ИП{CreatePZ.perforation_roof} и глубины посадки пакера {paker_depth}',
-    #                                       10, 0, 4000)
+    if pakerKompo == 1:
+        paker_khost, ok = QInputDialog.getInt(None, 'хвостовик',
+                                              f'Введите длину хвостовика кровли ИП{CreatePZ.perforation_roof} и глубины посадки пакера {paker_depth}',
+                                              10, 0, 4000)
 
-    nkt_diam = ''.join(['73' if CreatePZ.column_diametr > 110 else '60'])
+    nkt_diam = ''.join(['73' if CreatePZ.column_diametr > 110 or (CreatePZ.column_diametr > 110 and CreatePZ.column_additional == True and CreatePZ.head_column_additional > 700) else '60'])
 
-    if CreatePZ.column_additional == False or CreatePZ.column_additional == True and paker_depth < CreatePZ.head_column_additional:
+    if CreatePZ.column_additional == False or CreatePZ.column_additional == True and paker_depth < CreatePZ.head_column_additional and CreatePZ.head_column_additional>600:
         paker_select = f'воронку + НКТ{nkt_diam}м {paker_khost}м + пакер ПРО-ЯМО-{paker_diametr_select(paker_depth)}мм (либо аналог) ' \
                        f'для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм + НКТ 10м'
         dict_nkt = {73: paker_depth + paker_khost}

@@ -90,7 +90,7 @@ class CreatePZ(MyWindow):
     perforation_roof = current_bottom
     perforation_sole = 0
     dict_pump = {'do': '0', 'posle': '0'}
-    leakiness_number = 0
+    leakiness_interval = []
     dict_pump_h = {'do': 0, 'posle': 0}
     ins_ind = 0
     len_razdel_1 = 0
@@ -363,9 +363,12 @@ class CreatePZ(MyWindow):
                                 CreatePZ.shoe_column_additional, ok = QInputDialog.getInt(self, ',башмак доп колонны',
                                                                                           'введите глубину башмак доп колонны',
                                                                                           600, 0, 3500)
-                            if ws.cell(row=row_ind + 3, column=col + 4).value.split('x') == 2:
-                                CreatePZ.column_additional_diametr = CreatePZ.without_b(ws.cell(row=row_ind + 3, column=col + 4).value.split('x')[0])
-                                CreatePZ.column_additional_wall_thickness = CreatePZ.without_b(ws.cell(row=row_ind + 3, column=col + 4).value.split('x')[1])
+                            try:
+                                if ws.cell(row=row_ind + 3, column=col + 4).value.split('x') == 2:
+                                    CreatePZ.column_additional_diametr = CreatePZ.without_b(ws.cell(row=row_ind + 3, column=col + 4).value.split('x')[0])
+                                    CreatePZ.column_additional_wall_thickness = CreatePZ.without_b(ws.cell(row=row_ind + 3, column=col + 4).value.split('x')[1])
+                            except:
+                                pass
                         try:
                             CreatePZ.column_additional_diametr = float(CreatePZ.without_b(ws.cell(row=row_ind + 3, column=col + 4).value))
                             print(f' диаметр доп колонны {CreatePZ.column_additional_diametr}')
@@ -553,7 +556,7 @@ class CreatePZ(MyWindow):
                 CreatePZ.lift_ecn_can = True
             elif CreatePZ.column_additional == True:
                 if ('ЭЦН' in str(CreatePZ.dict_pump['posle'][0]).upper() or 'ВНН' in str(CreatePZ.dict_pump['posle'][0]).upper())\
-                        and CreatePZ.dict_pump_h["posle"] > CreatePZ.head_column_additional:
+                        and CreatePZ.dict_pump_h["posle"] < CreatePZ.head_column_additional:
                     CreatePZ.lift_ecn_can = True
 
                 elif ('ЭЦН' in str(CreatePZ.dict_pump['posle'][0].upper()) or 'ВНН' in str(CreatePZ.dict_pump[
@@ -656,7 +659,7 @@ class CreatePZ(MyWindow):
 
                 CreatePZ.a_plan = row
         # print(f'индекс {CreatePZ.a_plan}')
-        for row in range(pipes_ind + 1, condition_of_wells):
+        for row in range(pipes_ind + 1, condition_of_wells+1):
             key = ws.cell(row=row, column=4).value
             value = CreatePZ.without_b(ws.cell(row=row, column=7).value)
             if key != None and row < CreatePZ.a_plan:
@@ -729,10 +732,11 @@ class CreatePZ(MyWindow):
 
             # print(row, any([str((i)).lower() == 'проект' for i in row]), all([str(i).strip() == None for i in row]) == False)
             if any([str((i)).lower() == 'проект' for i in row]) == False and all(
-                    [str(i).strip() == None for i in row]) == False and krs.is_number(row[2]) == True and krs.is_number(float(row[3])) == True:
+                    [str(i).strip() == None for i in row]) == False and krs.is_number(row[2]) == True and krs.is_number(float(row[3])) == True and CreatePZ.current_bottom>=float(row[3]):
 
                 CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('вертикаль', set()).add(row[1])
-                CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('отрайбироно', False)
+
+                CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('отрайбировано', False)
                 CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('Прошаблонировано', False)
                 CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('интервал', set()).add((round(float(row[2]), 1), round(float(row[3]), 1)))
                 # print(f'отклю{row[5], CreatePZ.current_bottom, krovlya_perf}')
@@ -757,7 +761,7 @@ class CreatePZ(MyWindow):
 
                     CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('интервал', set()).add(
                         (round(float(row[2]), 1), round(float(row[3]), 1)))
-                    CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('отрайбироно', False)
+                    CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('отрайбировано', False)
                     CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('Прошаблонировано', False)
                     CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('вскрытие', set()).add(row[4])
                     CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('отключение', set()).add(row[5])
@@ -784,9 +788,10 @@ class CreatePZ(MyWindow):
                     self.dict_perforation_project.setdefault(plast, {}).setdefault('замер', set()).add(row[10])
 
         CreatePZ.dict_perforation_project = self.dict_perforation_project
-        print(f'проект {self.dict_perforation_project}')
-        print(f'все ПВР {CreatePZ.dict_perforation}')
-        print(f'работающие интервалы {CreatePZ.dict_work_pervorations}')
+        print(f'НКТ на спуск  {CreatePZ.dict_nkt_po}')
+        # print(f'проект {self.dict_perforation_project}')
+        # print(f'все ПВР {CreatePZ.dict_perforation}')
+        # print(f'работающие интервалы {CreatePZ.dict_work_pervorations}')
         if CreatePZ.column_diametr < 110:
             CreatePZ.nkt_diam = 60
         # Определение работающих интервалов перфорации и заполнения в словарь

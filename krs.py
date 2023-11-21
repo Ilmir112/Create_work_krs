@@ -1121,27 +1121,21 @@ def get_leakiness(self):
     leakiness = []
     leakiness_column, ok = QInputDialog.getText(self, 'Нарушение колонны',
                                                 'Введите нарушение колонны через тире')
-    # leakiness.append(leakiness_column.split('-'))
-    CreatePZ.leakiness_number += 1
-    plast = f'НЭК № {CreatePZ.leakiness_number}'
+    CreatePZ.leakiness_interval.append(leakiness_column)
+    print(f'Наруше {CreatePZ.leakiness_interval}')
+
     leakiness_rir = QMessageBox.question(self, 'изолированы ли',
                                                 'изолировано ли нарушение')
     leakiness_True = {}
     if leakiness_rir == QMessageBox.StandardButton.Yes:
-        leakiness_True[leakiness_column] = False
-        CreatePZ.dict_leakiness.setdefault('НЭК', {}).setdefault('интервал', {}).setdefault(leakiness_column, False)
 
-
-        CreatePZ.dict_leakiness.setdefault('НЭК', {}).setdefault('отрайбироно', False)
-        CreatePZ.dict_leakiness.setdefault('НЭК', {}).setdefault('Прошаблонировано', False)
-
+        CreatePZ.dict_leakiness.setdefault(leakiness_column, {}).setdefault('изолирован', True)
+        CreatePZ.dict_leakiness.setdefault(leakiness_column, {}).setdefault('отрайбировано', False)
+        CreatePZ.dict_leakiness.setdefault(leakiness_column, {}).setdefault('Прошаблонировано', False)
     else:
-        leakiness_True[leakiness_column] = True
-        CreatePZ.dict_leakiness.setdefault('НЭК', {}).setdefault('интервал', {}).setdefault(leakiness_column, True)
-
-        CreatePZ.dict_leakiness.setdefault('НЭК', {}).setdefault('отключение', False)
-        CreatePZ.dict_leakiness.setdefault('НЭК', {}).setdefault('отрайбироно', False)
-        CreatePZ.dict_leakiness.setdefault('НЭК', {}).setdefault('Прошаблонировано', False)
+        CreatePZ.dict_leakiness.setdefault(leakiness_column, {}).setdefault('изолирован', False)
+        CreatePZ.dict_leakiness.setdefault(leakiness_column, {}).setdefault('отрайбировано', False)
+        CreatePZ.dict_leakiness.setdefault(leakiness_column, {}).setdefault('Прошаблонировано', False)
 
     leakiness_quest = QMessageBox.question(self, 'Нарушение колонны',
                                            'Есть ли еще нарушения?')

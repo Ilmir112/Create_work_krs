@@ -215,7 +215,7 @@ class PervorationWindow(MyWindow):
                           'Мастер КРС', None, None,  None],
                        [None, None, f'Долить скважину до устья тех жидкостью уд.весом {CreatePZ.fluid_work} .Установить ПВО по схеме №8а утвержденной '
                                      f'главным инженером ООО "Ойл-сервис" от 14.10.2021г. Опрессовать  плашки  ПВО (на давление опрессовки ЭК, но '
-                                     f'не ниже максимального ожидаемого давления на устье) {CreatePZ.max_admissible_pressure}атм, по невозможности на давление поглощения, но '
+                                     f'не ниже максимального ожидаемого давления на устье) {CreatePZ.max_expected_pressure}атм, по невозможности на давление поглощения, но '
                                      f'не менее 30атм в течении 30мин (ОПРЕССОВКУ ПВО ЗАФИКСИРОВАТЬ В ВАХТОВОМ ЖУРНАЛЕ). '
                                     f'Передать по сводке уровня жидкости до перфорации и после перфорации.'
                                     f'(Произвести фотографию перфоратора в заряженном состоянии, и после проведения перфорации,'
@@ -252,6 +252,16 @@ class PervorationWindow(MyWindow):
                 (float(perf_list[2]), float(perf_list[4])))
             CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('интервал', set()).add(
                 (float(perf_list[2]), float(perf_list[4])))
+            CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('отрайбировано', False)
+            CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('Прошаблонировано', False)
+
+            CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('интервал', set()).add(
+                (float(perf_list[2]), float(perf_list[4])))
+            CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('интервал', set()).add(
+                (float(perf_list[2]), float(perf_list[4])))
+            CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('отрайбировано', False)
+            CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('Прошаблонировано', False)
+
 
             perforation.append(perf_list)
 
@@ -321,7 +331,8 @@ class PervorationWindow(MyWindow):
                             if value[0] <= len(str(text)) <= value[1]:
                                 text_width = key
                                 self.table_widget.setRowHeight(row, int(text_width))
-
+                    else:
+                        self.table_widget.setItem(row, column, QtWidgets.QTableWidgetItem(str('')))
             self.table_widget.setSpan(1 + self.ins_ind, 10, len(perforation) - 2, 1)
             self.table_widget.setSpan(1 + self.ins_ind, 11, len(perforation) - 2, 1)
 
@@ -332,7 +343,7 @@ class PervorationWindow(MyWindow):
 
             CreatePZ.perforation_sole = max(max([max(CreatePZ.dict_work_pervorations[i]['интервал']) for i in CreatePZ.plast_work]))
             print(f'мин {CreatePZ.perforation_roof}, мак {CreatePZ.perforation_sole}')
-            CreatePZ.work_pervorations_approved = False
+
             self.table_widget.setRowHeight(self.ins_ind, 60)
             self.table_widget.setRowHeight(self.ins_ind + 1, 60)
 

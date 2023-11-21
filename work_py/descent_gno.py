@@ -385,14 +385,15 @@ def gno_down(self):
     lift_sel = ['ЭЦН', 'НВ', 'НН', 'пакер', 'ОРД', 'НН с пакером', 'ЭЦН с пакером', 'НВ с пакером', 'воронка'] #  'ОРЗ', 'Воронка',
 
     lift_key = 'НВ'
-    dict_pump = dict_pump[0]
+    dict_pump = str(dict_pump[0])
     print(('НВ' in dict_pump.upper() or 'ШГН' in dict_pump.upper()), CreatePZ.if_None(CreatePZ.paker_do["posle"]) != 'отсут')
-    if 'ЭЦН' in dict_pump.upper() or 'ВНН' in dict_pump.upper() and str(CreatePZ.paker_do["posle"]) == '0':
+    if ('ЭЦН' in dict_pump.upper() or 'ВНН' in dict_pump.upper()) and str(CreatePZ.paker_do["posle"]) == 'отсут':
         lift_select = descent_ecn
         lift_key = 'ЭЦН'
 
-    elif ('ЭЦН' in dict_pump.upper() or 'ВНН' in dict_pump.upper()) and (CreatePZ.if_None(CreatePZ.paker_do["posle"]) != 'отсут'):
-        lift_select = descent_ecn
+    elif ('ЭЦН' in dict_pump.upper() or 'ВНН' in dict_pump.upper()) and (CreatePZ.if_None(CreatePZ.paker_do["posle"]) == 'отсут'):
+
+        lift_select = descent_ecn_with_paker
         lift_key = 'ЭЦН с пакером'
         print('Подьем ЭЦН с пакером ')
 

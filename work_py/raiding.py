@@ -1,7 +1,12 @@
+from PyQt5.QtWidgets import QInputDialog
+
+
 def raidingColumn(self):
     from open_pz import CreatePZ
     from work_py.opressovka import paker_diametr_select
     from work_py.template_work import well_volume
+    from work_py.advanted_file import raiding_interval,raid
+
     ryber_diam = paker_diametr_select(CreatePZ.current_bottom) + 3
 
     if CreatePZ.column_additional == True:
@@ -18,32 +23,36 @@ def raidingColumn(self):
         ryber_str = f'райбер-{ryber_diam} для ЭК {CreatePZ.column_additional_diametr}мм х ' \
                        f'{CreatePZ.column_additional_wall_thickness}мм + забойный двигатель Д-76 +НКТ{nkt_pod}мм 20м + репер + ' \
                        f'НКТ{nkt_pod} {CreatePZ.current_bottom - CreatePZ.head_column_additional}м'
+    raiding_interval_tuple = raiding_interval()
+    print(f' интервал райбирования {raiding_interval_tuple, len(raiding_interval_tuple)}')
 
+    krovly_raiding = int(raiding_interval_tuple[0][0])
 
+    raiding_interval = raid(raiding_interval_tuple)
     ryber_list = [
         [None, None,
-         f'Спустить {ryber_str}  на НКТ{nkt_diam}мм до Н={round(CreatePZ.perforation_roof-30,0)}м с замером, '
+         f'Спустить {ryber_str}  на НКТ{nkt_diam}мм до Н={krovly_raiding}м с замером, '
          f'шаблонированием шаблоном 59,6мм (При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ). '
          f'В случае разгрузки инструмента  при спуске, проработать место посадки с промывкой скв., составить акт.'
          f'СКОРОСТЬ СПУСКА НЕ БОЛЕЕ 1 М/С (НЕ ДОХОДЯ 40 - 50 М ДО ПЛАНОВОГО ИНТЕРВАЛА СКОРОСТЬ СПУСКА СНИЗИТЬ ДО 0,25 М/С). '
          f'ЗА 20 М ДО ЗАБОЯ СПУСК ПРОИЗВОДИТЬ С ПРОМЫВКОЙ',
          None, None, None, None, None, None, None,
          'мастер КРС', round(
-            (CreatePZ.perforation_roof-30) / 9.52 * 1.51 / 60 * 1.2 * 1.2 * 1.04*0.9 + 0.18 + 0.008 * (CreatePZ.perforation_roof-30) / 9.52 + 0.003 * CreatePZ.current_bottom / 9.52,
+            (krovly_raiding) / 9.52 * 1.51 / 60 * 1.2 * 1.2 * 1.04*0.9 + 0.18 + 0.008 * (krovly_raiding) / 9.52 + 0.003 * krovly_raiding / 9.52,
             2)],
         [None, None, f'Собрать промывочное оборудование: вертлюг, ведущая труба (установить вставной фильтр под ведущей трубой), '
                      f'буровой рукав, устьевой герметизатор, нагнетательная линия. Застраховать буровой рукав за вертлюг. ',
          None, None, None, None, None, None, None,
-         'Мастер КРС, УСРСиСТ', 8],
+         'Мастер КРС, УСРСиСТ', 1.5],
         [None, None,
-         f'Произвести райбирование ЭК в инт. {raid(raiding_interval(self))}м с наращиванием, с промывкой и проработкой 5 раз каждого наращивания. '
+         f'Произвести райбирование ЭК в инт. {raiding_interval}м с наращиванием, с промывкой и проработкой 5 раз каждого наращивания. '
          f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа '
          f'до начала работ) Работы производить согласно сборника технологических регламентов и инструкций в присутствии'
          f' представителя заказчика. Допустить до текущего забоя {CreatePZ.current_bottom}м.',
          None, None, None, None, None, None, None,
          'Мастер КРС, УСРСиСТ', 8],
         [None, None,
-         f' ПРИМЕЧАНИЕ: РАСХОД РАБОЧЕЙ ЖИДКОСТИ 8-10 Л/С;'
+         f'ПРИМЕЧАНИЕ: РАСХОД РАБОЧЕЙ ЖИДКОСТИ 8-10 Л/С;'
          f' ОСЕВАЯ НАГРУЗКА НЕ БОЛЕЕ 75% ОТ ДОПУСТИМОЙ НАГРУЗКИ (УТОЧНИТЬ ПО ПАСПОРТУ ЗАВЕЗЁННОГО ГЗД И ДОЛОТА);'
          f' РАБОЧЕЕ ДАВЛЕНИЕ 4-10 МПА (УТОЧНИТЬ ПО ПАСПОРТУ ЗАВЕЗЁННОГО ВЗД);'
          f' ПРЕДУСМОТРЕТЬ КОМПЕНСАЦИЮ РЕАКТИВНОГО МОМЕНТА НА ВЕДУЩЕЙ ТРУБЕ))',
@@ -60,61 +69,10 @@ def raidingColumn(self):
          None, None, None, None, None, None, None,
          'мастер КРС', round(0.25 + 0.033 * 1.2 * (CreatePZ.current_bottom) / 9.5 * 1.04*0.9, 1)]]
 
-    CreatePZ.work_pervorations_approved = True
-    for plast in CreatePZ.plast_work:
 
-        if min(min(CreatePZ.dict_work_pervorations[plast]['интервал'])) > CreatePZ.current_bottom:
-            del CreatePZ.dict_work_pervorations[plast]
 
 
     return ryber_list
 
 
-def raiding_interval(self):
-    from open_pz import CreatePZ
-    if len(CreatePZ.dict_perforation) == 1 and CreatePZ.perforation_sole + 30 <= CreatePZ.current_bottom:
-        return [CreatePZ.perforation_roof-30, CreatePZ.perforation_sole+30]
-    if len(CreatePZ.dict_perforation) == 1 and CreatePZ.perforation_sole + 30 >= CreatePZ.current_bottom:
-        return [[CreatePZ.perforation_roof-30, CreatePZ.current_bottom]]
 
-    str_raid = []
-    for plast in CreatePZ.dict_perforation.keys():
-        crt = []
-        str_min = 10000
-        str_max = 0
-        for i in CreatePZ.dict_perforation[plast]['интервал']:
-
-            if i[0] <= str_min and i[0]:
-
-                str_min = int(i[0])
-                print(str_min)
-            if i[1] >= str_max:
-                str_max = int(i[1])
-            if str_max + 30 <= CreatePZ.current_bottom:
-                crt = [str_min - 30, str_max + 30]
-            else:
-                crt = [str_min - 30, CreatePZ.current_bottom]
-        if crt[0] < CreatePZ.current_bottom:
-            str_raid.append(crt)
-    print(str_raid)
-    merged_segments=merge_overlapping_intervals(str_raid)
-    return merged_segments
-def merge_overlapping_intervals(intervals):
-    merged = []
-    intervals = sorted(intervals, key=lambda x: x[0])
-    for interval in intervals:
-        if not merged or interval[0] > merged[-1][1]:
-            merged.append(interval)
-        else:
-            merged[-1] = (merged[-1][0], max(merged[-1][1], interval[1]))
-    print(merged)
-    return merged
-def raid(a):
-    print(a, len(a))
-    if len(a)<2:
-        return f'{a[0]} - {a[1]}, '
-    else:
-        d = ''
-        for i in list(a):
-            d += f'{i[0]} - {i[1]}, '
-    return d
