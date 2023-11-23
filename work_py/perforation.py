@@ -99,7 +99,6 @@ class PervorationWindow(MyWindow):
         self.buttonAddProject = QPushButton('Добавить проектные интервалы перфорации')
         self.buttonAddProject.clicked.connect(self.addPerfProject)
 
-
         vbox = QGridLayout(self.centralWidget)
         vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
         vbox.addWidget(self.tableWidget, 1, 0, 1, 2)
@@ -204,7 +203,7 @@ class PervorationWindow(MyWindow):
         # print(editType, spinYearOfIssue, editSerialNumber, editSpecifications)
 
     def addWork(self):
-        from main import MyWindow
+
         from open_pz import CreatePZ
         rows = self.tableWidget.rowCount()
 
@@ -221,11 +220,11 @@ class PervorationWindow(MyWindow):
                                     f'(Произвести фотографию перфоратора в заряженном состоянии, и после проведения перфорации,'
                                     f' фотографии предоставить в ЦИТС Ойл-сервис',
                          None, None, None, None, None, None, None,
-                          'Мастер КРС, подрядчик по ГИС', 15,  None, None],
+                          'Мастер КРС, подрядчик по ГИС', None, None],
                        [None, None, ''.join(["ГИС (Перфорация на кабеле ЗАДАЧА 2.9.1)" if float(CreatePZ.max_angle) <= 50 else "ГИС ( Трубная Перфорация ЗАДАЧА 2.9.2)"]), None, None, None, None,
-                        None,None, None, 'подрядчик по ГИС', " "],
+                        None,None, None, 'подрядчик по ГИС',  15],
                        [None, None, "Кровля", "-", "Подошва", "Тип заряда", "отв на 1 п.м.", "Кол-во отв",
-                      "пласт", "Доп.данные", 'подрядчик по ГИС', " "]
+                      "пласт", "Доп.данные", 'подрядчик по ГИС', None]
                        ]
         print(f'до {CreatePZ.dict_work_pervorations}')
         for row in range(rows):
@@ -248,27 +247,27 @@ class PervorationWindow(MyWindow):
             perf_list.extend(['подрядчик по ГИС', " "])
             print(perf_list)
             plast = perf_list[8]
-            CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('интервал', set()).add(
-                (float(perf_list[2]), float(perf_list[4])))
-            CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('интервал', set()).add(
-                (float(perf_list[2]), float(perf_list[4])))
-            CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('отрайбировано', False)
-            CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('Прошаблонировано', False)
+            if (float(perf_list[2]), float(perf_list[4])) in CreatePZ.dict_perforation[plast]['интервал']:
+                CreatePZ.dict_perforation[plast]['отрайбировано'] = False
+                CreatePZ.dict_perforation[plast]['Прошаблонировано'] = False
+            else:
 
-            CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('интервал', set()).add(
-                (float(perf_list[2]), float(perf_list[4])))
-            CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('интервал', set()).add(
-                (float(perf_list[2]), float(perf_list[4])))
-            CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('отрайбировано', False)
-            CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('Прошаблонировано', False)
+                CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('интервал', set()).add(
+                    (float(perf_list[2]), float(perf_list[4])))
+                CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('интервал', set()).add(
+                    (float(perf_list[2]), float(perf_list[4])))
+                CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('отрайбировано', False)
+                CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('Прошаблонировано', False)
+
+                CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('интервал', set()).add(
+                    (float(perf_list[2]), float(perf_list[4])))
+                CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('интервал', set()).add(
+                    (float(perf_list[2]), float(perf_list[4])))
+                CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('отрайбировано', False)
+                CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('Прошаблонировано', False)
 
 
             perforation.append(perf_list)
-
-
-        # print(f'после {CreatePZ.dict_work_pervorations}')
-
-
 
         perforation.append([None, None, ''.join(["Произвести контрольную запись ЛМ;ТМ. Составить АКТ на "
                                                  "перфорацию." if float(CreatePZ.max_angle) <= 50 else ""

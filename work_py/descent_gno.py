@@ -7,8 +7,9 @@ def gno_down(self):
     dict_pump_nv = ''
     dict_pump_ecn = ''
     dict_pump_h = 0
+
     try:
-        dict_pump = [dict_pump]
+        dict_pump = dict_pump["posle"].split('/')
         print( CreatePZ.dict_pump["posle"])
         if 'ЭЦН' in CreatePZ.dict_pump["posle"][1]:
             dict_pump_nv = CreatePZ.dict_pump["posle"][0]
@@ -18,8 +19,10 @@ def gno_down(self):
             dict_pump_ecn = CreatePZ.dict_pump["posle"][0]
             dict_pump_h = CreatePZ.dict_pump_h["posle"][0]
         print(f' НВ {dict_pump_nv}')
+        print(f'yfcjcf{dict_pump}')
     except:
-        dict_pump = CreatePZ.dict_pump["posle"][0]
+        dict_pump = CreatePZ.dict_pump["posle"]
+        print(f'yfcjcf{dict_pump}')
         dict_pump_h = CreatePZ.dict_pump_h["posle"]
     paker_descent = []
     try:
@@ -385,7 +388,7 @@ def gno_down(self):
     lift_sel = ['ЭЦН', 'НВ', 'НН', 'пакер', 'ОРД', 'НН с пакером', 'ЭЦН с пакером', 'НВ с пакером', 'воронка'] #  'ОРЗ', 'Воронка',
 
     lift_key = 'НВ'
-    dict_pump = str(dict_pump[0])
+    dict_pump = str(dict_pump)
     print(('НВ' in dict_pump.upper() or 'ШГН' in dict_pump.upper()), CreatePZ.if_None(CreatePZ.paker_do["posle"]) != 'отсут')
     if ('ЭЦН' in dict_pump.upper() or 'ВНН' in dict_pump.upper()) and str(CreatePZ.paker_do["posle"]) == 'отсут':
         lift_select = descent_ecn

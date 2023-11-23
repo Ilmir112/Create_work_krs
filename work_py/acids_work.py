@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QInputDialog, QMessageBox
 
-
+from selectPlast import CheckBoxDialog
 
 
 def acid_work(self):
@@ -8,10 +8,10 @@ def acid_work(self):
     from work_py.swabbing import swabbing_with_paker
     from open_pz import CreatePZ
 
-    swabbing_true_quest = QMessageBox.question(self, 'Свабирование на данной компоновке',
+    swabbing_true_quest1 = QMessageBox.question(self, 'Свабирование на данной компоновке',
                                                'Нужно ли Свабировать на данной компоновке?')
 
-    if swabbing_true_quest == QMessageBox.StandardButton.Yes:
+    if swabbing_true_quest1 == QMessageBox.StandardButton.Yes:
         swabbing_true_quest = True
     else:
         swabbing_true_quest = False
@@ -21,14 +21,14 @@ def acid_work(self):
                                           'Введите глубину посадки пакера', int(CreatePZ.perforation_roof - 20), 0,
                                           5000)
     paker_khost1 = int(CreatePZ.perforation_sole - paker_depth)
-    print(f'хвостовик {paker_khost1}')
+    # print(f'хвостовик {paker_khost1}')
     paker_khost, ok = QInputDialog.getInt(None, 'хвостовик',
                                           f'Введите длину хвостовика для подошвы ИП{CreatePZ.perforation_sole} и глубины посадки пакера {paker_depth}',
                                           paker_khost1, 1, 4000)
 
 
     nkt_diam = ''.join(['73' if CreatePZ.column_diametr > 110 else '60'])
-    print(f' 5 {CreatePZ.column_additional == False, (CreatePZ.column_additional == True and paker_depth < CreatePZ.head_column_additional), swabbing_true_quest == False}')
+    # print(f' 5 {CreatePZ.column_additional == False, (CreatePZ.column_additional == True and paker_depth < CreatePZ.head_column_additional), swabbing_true_quest == False}')
 
     if (CreatePZ.column_additional == False and swabbing_true_quest == True) or (CreatePZ.column_additional == True \
             and paker_depth < CreatePZ.head_column_additiona and swabbing_true_quest == True):
@@ -106,7 +106,7 @@ def acid_work(self):
     paker_list.extend(acid_true_quest_list)
 
     if swabbing_true_quest:
-        swabbing_with_paker = swabbing_with_paker(self, paker_khost, 2)[1:]
+        swabbing_with_paker = swabbing_with_paker(self, paker_khost, 1)[1:]
         for row in swabbing_with_paker:
             paker_list.append(row)
     else:
@@ -120,16 +120,16 @@ def acid_work(self):
 
 
     return paker_list
+
+def open_checkbox_dialog():
+    dialog = CheckBoxDialog()
+    dialog.exec_()
 def acid_work_list(self, paker_depth, paker_khost, dict_nkt, paker_layout):
     from open_pz import CreatePZ
     from krs import volume_vn_nkt
+    open_checkbox_dialog()
 
-    # print(f'пласты {CreatePZ.plast}')
-    plast, ok = QInputDialog.getItem(self, 'выбор пласта для ОПЗ ', 'выберете пласта дл перфорации',
-                                     CreatePZ.plast_work, 0, False)
-    if ok and plast:
-        self.le.setText(plast)
-
+    plast = CreatePZ.plast_select
     acid_true_quest_scv = QMessageBox.question(self, 'Необходимость кислотная ванна', 'Планировать кислотную ванну?')
     if acid_true_quest_scv == QMessageBox.StandardButton.Yes:
         acid_true_scv = True

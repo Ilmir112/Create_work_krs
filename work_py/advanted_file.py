@@ -12,7 +12,7 @@ def raiding_interval():
     # print(str_raid)
     if len(CreatePZ.dict_perforation) > 1:
         for plast in CreatePZ.dict_perforation.keys():
-            if plast in CreatePZ.plast_work:
+            if plast in CreatePZ.plast_all:
                 print(f' отрай {CreatePZ.dict_perforation[plast]["Прошаблонировано"]}')
                 crt = []
                 if CreatePZ.dict_perforation[plast]['отрайбировано'] == False:
@@ -25,8 +25,10 @@ def raiding_interval():
                     if int(i[1]) < CreatePZ.current_bottom:
                         str_raid.append(crt)
                     print(CreatePZ.dict_work_pervorations.keys())
-                    CreatePZ.dict_work_pervorations[plast]['отрайбировано'] = True
+
                     CreatePZ.dict_perforation[plast]['отрайбировано'] = True
+                    if plast in CreatePZ.plast_work:
+                        CreatePZ.dict_work_pervorations[plast]['отрайбировано'] = True
 
     try:
         roof_leakiness = int(list(CreatePZ.dict_leakiness.keys())[0].split('-')[0])

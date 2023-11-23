@@ -161,6 +161,7 @@ def calc_H2S(ws3, H2S_pr, H2S_mg):
     ws3.column_dimensions['B'].width = 15
     ws3.column_dimensions['C'].width = 80
     ws3.column_dimensions['D'].width = 25
+    ws3.column_dimensions['f'].width = 30
     ws3.column_dimensions['e'].width = 25
     for row in range(1, max_row_H2S):
         for col in range(1, 7):

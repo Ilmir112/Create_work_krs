@@ -1,12 +1,15 @@
 import sys
 import openpyxl
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu, QMenuBar, QAction, QTableWidget, QTableWidgetItem, \
-    QVBoxLayout, QWidget, QLineEdit, QMessageBox, QFileDialog
+    QVBoxLayout, QWidget, QLineEdit, QMessageBox, QFileDialog, QToolBar, QPushButton
 from PyQt5 import QtCore, QtWidgets, QtGui
 from openpyxl.workbook import Workbook
+from openpyxl.utils import get_column_letter
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor, QBrush
 import krs
+from PIL import Image as PILImage
+from openpyxl.drawing.image import Image
 import work_py.opressovka
 
 
@@ -29,17 +32,19 @@ class MyWindow(QMainWindow):
         self.setWindowTitle("Main Window")
         self.setGeometry(500, 500, 400, 400)
 
-        self.table_widget = TableWidget()
-        # self.table_widget.setEditTriggers(Qt.EditTrigger.AllEditTriggers)
-        self.table_widget.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
-        self.table_widget.customContextMenuRequested.connect(self.openContextMenu)
-        self.setCentralWidget(self.table_widget)
+        self.table_widget = None
+
+
         self.createMenuBar()
         self.le = QLineEdit()
-        self.model = self.table_widget.model()
-        # Этот сигнал испускается всякий раз, когда ячейка в таблице нажата.
-        # Указанная строка и столбец - это ячейка, которая была нажата.
-        self.table_widget.cellPressed[int, int].connect(self.clickedRowColumn)
+
+
+        self.toolbar = QToolBar()
+        self.addToolBar(self.toolbar)
+        self.closeFileButton = QPushButton("Close File")
+        self.closeFileButton.clicked.connect(self.close_file)
+        self.toolbar.addWidget(self.closeFileButton)
+
 
     def createMenuBar(self):
         self.menuBar = QMenuBar(self)
@@ -68,6 +73,7 @@ class MyWindow(QMainWindow):
         from open_pz import CreatePZ
         action = self.sender()
         if action == self.create_KRS:
+            self.tableWidgetOpen()
             self.fname = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
                                                                "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
 
@@ -81,7 +87,8 @@ class MyWindow(QMainWindow):
                 print('Файл не найден')
 
         elif action == self.create_GNKT_OPZ:
-            print('кнопка нажата')
+            self.tableWidgetOpen()
+
             self.fname = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
                                                                "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
 
@@ -101,7 +108,18 @@ class MyWindow(QMainWindow):
 
         elif action == self.save_file_as:
             self.saveFileDialog(self.wb)
+    def tableWidgetOpen(self):
+        if self.table_widget is None:
+            self.table_widget = QTableWidget()
+            # self.table_widget.setEditTriggers(Qt.EditTrigger.AllEditTriggers)
+            self.table_widget.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+            self.table_widget.customContextMenuRequested.connect(self.openContextMenu)
+            self.setCentralWidget(self.table_widget)
+            self.model = self.table_widget.model()
 
+            # Этот сигнал испускается всякий раз, когда ячейка в таблице нажата.
+            # Указанная строка и столбец - это ячейка, которая была нажата.
+            self.table_widget.cellPressed[int, int].connect(self.clickedRowColumn)
     def saveFileDialog(self, wb):
         from open_pz import CreatePZ
         fileName, _ = QFileDialog.getSaveFileName(self, "Save excel-file", "", "Excel Files (*.xls)")
@@ -153,15 +171,35 @@ class MyWindow(QMainWindow):
             ws.page_setup.fitToHeight = False
             ws.page_setup.fitToWidth = True
             ws.print_options.horizontalCentered = True
-            wb.save(f"{CreatePZ.well_number} {CreatePZ.well_area} {CreatePZ.cat_P_1} категории.xlsx")
+            for row_ind, row in enumerate(ws.iter_rows(values_only=True)):
+                for col, value in enumerate(row):
+                    if 'Зуфаров' in str(value):
+                        coordinate = f'{get_column_letter(col-2)}{row_ind-1}'
+                        break
+
+            self.insert_image(ws, 'imageFiles/Зуфаров.png', coordinate)
+            self.insert_image(ws, 'imageFiles/Хасаншин.png', 'H1')
+            self.insert_image(ws, 'imageFiles/Шамигулов.png', 'H4')
+            wb.save(f"{CreatePZ.well_number} {CreatePZ.well_area} {CreatePZ.cat_P_1}.xlsx")
         except Exception as e:
             print(e)
         finally:
             if wb:
                 wb.close()
-        print("Table data saved to Excel")
+            print("Table data saved to Excel")
 
-
+    def close_file(self):
+        if self.table_widget is not None:
+            self.table_widget.close()
+            self.table_widget = None
+        print("Closing current file")
+    def insert_image(self, ws, file, coordinate):
+        # Загружаем изображение с помощью библиотеки Pillow
+        img = openpyxl.drawing.image.Image(file)
+        img.width = 200
+        img.height = 180
+        img.anchor = coordinate
+        ws.add_image(img, coordinate)
 
     def openContextMenu(self, position):
         from open_pz import CreatePZ
@@ -184,9 +222,17 @@ class MyWindow(QMainWindow):
         geophysical.addAction(vp_action)
         vp_action.triggered.connect(self.vp_action)
 
+        czh_action = QAction("Установка цементными желонками", self)
+        geophysical.addAction(czh_action)
+        czh_action.triggered.connect(self.czh_action)
+
         swibbing_action = QAction("Свабирование со пакером", self)
         geophysical.addAction(swibbing_action)
         swibbing_action.triggered.connect(self.swibbing_with_paker)
+
+        swabbing_opy_action = QAction("ГИС ОПУ", self)
+        geophysical.addAction(swabbing_opy_action)
+        swabbing_opy_action.triggered.connect(self.swabbing_opy)
 
         swibbingVoronka_action = QAction("Свабирование со воронкой", self)
         geophysical.addAction(swibbingVoronka_action)
@@ -272,6 +318,10 @@ class MyWindow(QMainWindow):
 
         alone_menu = action_menu.addMenu('одиночные операции')
 
+        mkp_action = QAction('Система обратных клапанов')
+        alone_menu.addAction(mkp_action)
+        mkp_action.triggered.connect(self.mkp_revision)
+
         kot_action = QAction('Система обратных клапанов')
         alone_menu.addAction(kot_action)
         kot_action.triggered.connect(self.kot_work)
@@ -327,6 +377,11 @@ class MyWindow(QMainWindow):
         from work_py.alone_oreration import kot_work
         kot_work_list = kot_work(self)
         self.populate_row(self.ins_ind, kot_work_list)
+
+    def mkp_revision(self):
+        from work_py.mkp import mkp_revision
+        mkp_work_list = mkp_revision(self)
+        self.populate_row(self.ins_ind, mkp_work_list)
     def acid_action_gons(self):
         from work_py.acids import acidGons
         acidGons_work_list = acidGons(self)
@@ -416,13 +471,28 @@ class MyWindow(QMainWindow):
         print('Вставился ВП')
         vp_work_list = vp(self)
         self.populate_row(self.ins_ind, vp_work_list)
+
+    def czh_action(self):
+        from work_py.vp_cm import czh
+
+        print('Вставился ВП')
+        vp_work_list = czh(self)
+        self.populate_row(self.ins_ind, vp_work_list)
     def swibbing_with_paker(self):
         from work_py.swabbing import swabbing_with_paker
 
         print('Вставился Сваб с пакером')
         swab_work_list = swabbing_with_paker(self, 10, 1)
         self.populate_row(self.ins_ind, swab_work_list)
+
+    def swabbing_opy(self):
+        from work_py.swabbing import swabbing_opy
+
+        print('Вставился ОПУ')
+        swabbing_opy_list = swabbing_opy(self)
+        self.populate_row(self.ins_ind, swabbing_opy_list)
     def swibbing_with_voronka(self):
+
         from work_py.swabbing import swabbing_with_voronka
 
         print('Вставился Сваб с воронкой')

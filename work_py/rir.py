@@ -1,15 +1,16 @@
 from PyQt5.QtWidgets import QMessageBox, QInputDialog
 
 from krs import volume_vn_ek,volume_vn_nkt
-
+from work_py.acids_work import open_checkbox_dialog
 
 
 def rir_rpp(self):
     from open_pz import CreatePZ
     from work_py.opressovka import paker_list, paker_diametr_select
     rir_list = []
-    plast, ok = QInputDialog.getItem(self, 'выбор пласта или НЭК для РИР ', 'выберете пласт или НЭК для изоляции',
-                                     CreatePZ.plast_work, 0, False)
+    open_checkbox_dialog()
+
+    plast = CreatePZ.plast_select
     rir_rpk_question = QMessageBox.question(self, 'посадку между пластами?', 'посадку между пластами?')
     if rir_rpk_question == QMessageBox.StandardButton.Yes:
         rir_rpk_plast_true = True
@@ -22,9 +23,6 @@ def rir_rpp(self):
         rir_list.append(row)
     nkt_diam = ''.join(['73' if CreatePZ.column_diametr > 110 else '60'])
 
-
-    if ok and plast:
-        self.le.setText(plast)
 
 
     rir_work_list = [[None, None,
@@ -72,8 +70,9 @@ def rir_rpk(self):
     from open_pz import CreatePZ
     from work_py.opressovka import paker_list, paker_diametr_select
     rir_list = []
-    plast, ok = QInputDialog.getItem(self, 'выбор пласта или НЭК для РИР ', 'выберете пласт или НЭК для изоляции',
-                                     CreatePZ.plast_work, 0, False)
+    open_checkbox_dialog()
+
+    plast = CreatePZ.plast_select
     rir_rpk_question = QMessageBox.question(self, 'посадку между пластами?', 'посадку между пластами?')
     if rir_rpk_question == QMessageBox.StandardButton.Yes:
         rir_rpk_plast_true = True
@@ -87,8 +86,7 @@ def rir_rpk(self):
     nkt_diam = ''.join(['73' if CreatePZ.column_diametr > 110 else '60'])
 
 
-    if ok and plast:
-        self.le.setText(plast)
+
 
     if rir_rpk_plast_true:
         rir_q_list = [[None, None,
@@ -225,10 +223,9 @@ def rirWithPero(self):
 
     nkt_diam = ''.join(['73' if CreatePZ.column_diametr > 110 else '60'])
 
-    plast, ok = QInputDialog.getItem(self, 'выбор пласта или НЭК для РИР ', 'выберете пласт или НЭК для изоляции',
-                                     CreatePZ.plast_work, 0, False)
-    if ok and plast:
-        self.le.setText(plast)
+    open_checkbox_dialog()
+
+    plast = CreatePZ.plast_select
     rirSole, ok = QInputDialog.getInt(None, 'Подошва цементного моста',
                                       'Введите глубину подошвы цементного моста ',
                                       int(CreatePZ.current_bottom), 0, int(CreatePZ.bottomhole_drill))
@@ -474,10 +471,8 @@ def rir_paker(self):
                                       'Введите глубину кровлю цементного моста ',
                                       int(CreatePZ.perforation_roof - 20), 0, int(CreatePZ.bottomhole_drill))
 
-    plast, ok = QInputDialog.getItem(self, 'выбор пласта или НЭК для РИР ', 'выберете пласт или НЭК для изоляции',
-                                     CreatePZ.plast_work, 0, False)
-    if ok and plast:
-        self.le.setText(plast)
+    open_checkbox_dialog()
+    plast = CreatePZ.plast_select
 
 
 

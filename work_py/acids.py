@@ -105,7 +105,7 @@ def acid_work(self):
 
     if swabbing_true_quest:
 
-        swabbing_with_paker = swabbing_with_paker(self, paker_khost, 2)[1:]
+        swabbing_with_paker = swabbing_with_paker(self, difference_paker, 2)[1:]
         for row in swabbing_with_paker:
             paker_list.append(row)
     else:

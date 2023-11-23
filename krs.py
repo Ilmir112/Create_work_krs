@@ -12,27 +12,64 @@ from work_py import template_work, opressovka
 # def lift_select(self):
 #     from open_pz import CreatePZ
 
+def calculationFluidWork(self):
 
+    from open_pz import CreatePZ
+    print(f' все пласты  {CreatePZ.plast_all}')
+    for plast in CreatePZ.plast_all:
+        print(CreatePZ.dict_perforation[plast]['давление'])
+
+
+        # try:
+
+        print(list(CreatePZ.dict_perforation[plast]['давление']), CreatePZ.dict_perforation[plast])
+        pressure = [x for x in list(CreatePZ.dict_perforation[plast]['давление']) if x is not None][0]
+
+        vertical = [x for x in list(CreatePZ.dict_perforation[plast]['вертикаль']) if x is not None][0]
+
+        if vertical <= 1200:
+            stockRatio = 0.1
+        else:
+            stockRatio = 0.05
+        print(f' {stockRatio, pressure, vertical}')
+        fluidWork = round(float(pressure) * (1 + stockRatio) / float(vertical) / 0.0981, 2)
+        if fluidWork < 1.02 and (CreatePZ.region == 'КГМ' or CreatePZ.region == 'АГМ'):
+            fluidWork = 1.02
+        elif fluidWork < 1.02 and CreatePZ.region == 'ИГМ' or CreatePZ.region == 'ТГМ' or CreatePZ.region == 'ЧГМ':
+            fluidWork = 1.01
+
+        # except:
+        #     fluidWork = 0
+        print(f' ЖГС {plast} - {fluidWork}')
+        CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('рабочая жидкость', fluidWork)
+
+        if plast in CreatePZ.plast_work:
+            CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('рабочая жидкость', fluidWork)
+        if plast in CreatePZ.plast_project:
+            CreatePZ.dict_perforation_project.setdefault(plast, {}).setdefault('рабочая жидкость', fluidWork)
 
 
 def work_krs(self):
     from open_pz import CreatePZ
 
     without_damping_True = krs.without_damping(self)
-    # without_damping_True = True
+    calculationFluidWork(self)
     print(f'Скважина в неглушении {without_damping_True}')
-    # fluid_work_insert = 1.25
-    # CreatePZ.current_bottom, ok = QInputDialog.getDouble(self, 'Необходимый забой',
-    #                                                      'Введите забой до которого нужно нормализовать')
+    # print(f' {CreatePZ.dict_perforation}')
+    fluid_list = []
+    for plast in CreatePZ.plast_work:
+        # print(f' жидкость глушения {plast, fluid_list}')
+        fluid_list.append(CreatePZ.dict_perforation[plast]['рабочая жидкость'])
+
     fluid_work_insert, ok = QInputDialog.getDouble(self, 'Рабочая жидкость', 'Введите удельный вес рабочей жидкости',
-                                                   1.02, 0.87, 2, 2)
+                                                   max(fluid_list), 0.87, 2, 2)
     nkt_diam_fond_list = list(CreatePZ.dict_nkt.keys())
     nkt_diam_fond = ''
     lift_key = "ЭЦН"
     for i in nkt_diam_fond_list:
         nkt_diam_fond += str(i) + ', '
     nkt_diam_fond = nkt_diam_fond[:-2]
-    print(f' КРС {CreatePZ.dict_pump, CreatePZ.H_F_paker_do}')
+    # print(f' КРС {CreatePZ.dict_pump, CreatePZ.H_F_paker_do}')
     if '2' in str(CreatePZ.cat_H2S_list[0]):
         fluid_work = f'{fluid_work_insert}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
                      f'расчета {H2S.calv_h2s(self,CreatePZ.cat_H2S_list[0], CreatePZ.H2S_mg[0], CreatePZ.H2S_pr[0])}кг/м3 '
@@ -44,18 +81,19 @@ def work_krs(self):
     dict_pump_h = 0
     try:
 
-        dict_pump = CreatePZ.dict_pump['do'][0]
-        dict_pump1 = CreatePZ.dict_pump['do'][1]
+        dict_pump = CreatePZ.dict_pump['do']
+
         dict_pump_nv = min(CreatePZ.dict_pump_h["do"])
+        # print(dict_pump_nv)
         dict_pump_ecn = max(CreatePZ.dict_pump_h["do"])
-        print(f'ввв {CreatePZ.dict_pump["do"][0]}')
+        # print(f'ввв {CreatePZ.dict_pump["do"][0]}')
     except:
-        dict_pump = CreatePZ.dict_pump['do'][0]
+        dict_pump = CreatePZ.dict_pump['do']
         dict_pump_h = CreatePZ.dict_pump_h["do"]
         print(f'насоста уау {dict_pump}')
     krs_begin = [
         [None, None,  'Порядок работы', None, None, None, None, None, None, None, None, None],
-        [None, '№ п/п', 'Наименование работ', None, None, None, None, None, None, None, 'Ответственный',
+        [None, None, 'Наименование работ', None, None, None, None, None, None, None, 'Ответственный',
          'Нормы времени \n мин/час.'],
         [None, 1,
          'Начальнику смены ЦТКРС, вызвать телефонограммой представителя Заказчика для оформления АКТа приёма-передачи скважины в ремонт. \
@@ -91,7 +129,7 @@ def work_krs(self):
          f'наличии риска поглощения жидкости глушения. произвести замер статического уровня силами ЦДНГ перед началом работ и в '
          f'процессе ремонта (с периодичностью определяемой ответственным руководителем работ, по согласованию с представителем Заказчика '
          f'Результаты замеров статического уровня фиксировать в вахтовом журнале и передавать в сводке При изменении '
-         f'уровня в скважине от первоначально замеренного на 100 и более метров в сторону уменьшения или возрастания, '
+         f'уровня в скважине от первоначально замеренного на 100м и более метров в сторону уменьшения или возрастания, '
          f'необходимо скорректировать объем долива идобиться стабилизации уровня в скважине. Если по данным замера уровень в '
          f'скважине растет, необходимо выполнить повторноеглушение скважины, сделав перерасчет плотности жидкости глушения в '
          f'соответствии суточненными геологической службой данными по пластовому давлению.',
