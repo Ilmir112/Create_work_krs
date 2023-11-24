@@ -82,7 +82,7 @@ def drilling_nkt(self):
                               'Мастер КРС, УСРСиСТ', None])
     else:
         drilling_list.pop(2)
-
+    CreatePZ.current_bottom = current_depth
     reply_drilling(self, drilling_str, nkt_diam, drilling_work_list)
     for row in drilling_work_list:
         drilling_list.append(row)

@@ -27,8 +27,8 @@ class TabPage_SO(QWidget):
         self.ComboBoxCharges.setProperty("value", 'ГП')
 
         self.labelHolesMetr = QLabel("отверстий на 1п.м", self)
-        self.lineEditHolesMetr = QLineEdit(self)
-        self.lineEditHolesMetr.setClearButtonEnabled(True)
+        self.lineEditHolesMetr = QSpinBox(self)
+        # self.lineEditHolesMetr.setClearButtonEnabled(True)
 
         # self.labelCountHoles = QLabel("Количество отверстий", self)
         # self.lineEditCountHoles = QLineEdit(self)
@@ -177,7 +177,7 @@ class PervorationWindow(MyWindow):
         editType = self.tabWidget.currentWidget().lineEditType.text()
         editType2 = self.tabWidget.currentWidget().lineEditType2.text()
         chargesx= str(self.tabWidget.currentWidget().ComboBoxCharges.currentText())
-        editHolesMetr = self.tabWidget.currentWidget().lineEditHolesMetr.text()
+        editHolesMetr = self.tabWidget.currentWidget().lineEditHolesMetr.setRange(8, 30)
         editIndexFormation = self.tabWidget.currentWidget().lineEditIndexFormation.text()
         dopInformation = self.tabWidget.currentWidget().lineEditDopInformation.text()
         if not editType or not editType2 or not chargesx or not editHolesMetr or not editIndexFormation:
@@ -247,11 +247,27 @@ class PervorationWindow(MyWindow):
             perf_list.extend(['подрядчик по ГИС', " "])
             print(perf_list)
             plast = perf_list[8]
-            if (float(perf_list[2]), float(perf_list[4])) in CreatePZ.dict_perforation[plast]['интервал']:
-                CreatePZ.dict_perforation[plast]['отрайбировано'] = False
-                CreatePZ.dict_perforation[plast]['Прошаблонировано'] = False
-            else:
+            print(f' раб ПВР {len(CreatePZ.dict_work_pervorations), CreatePZ.dict_work_pervorations}')
+            if plast in CreatePZ.plast_all:
+                if (float(perf_list[2]), float(perf_list[4])) in CreatePZ.dict_perforation[plast]['интервал']:
+                    CreatePZ.dict_perforation[plast]['отрайбировано'] = False
+                    CreatePZ.dict_perforation[plast]['Прошаблонировано'] = False
+                else:
 
+                    CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('интервал', set()).add(
+                        (float(perf_list[2]), float(perf_list[4])))
+                    CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('интервал', set()).add(
+                        (float(perf_list[2]), float(perf_list[4])))
+                    CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('отрайбировано', False)
+                    CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('Прошаблонировано', False)
+
+                    CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('интервал', set()).add(
+                        (float(perf_list[2]), float(perf_list[4])))
+                    CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('интервал', set()).add(
+                        (float(perf_list[2]), float(perf_list[4])))
+                    CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('отрайбировано', False)
+                    CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('Прошаблонировано', False)
+            else:
                 CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('интервал', set()).add(
                     (float(perf_list[2]), float(perf_list[4])))
                 CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('интервал', set()).add(
@@ -265,7 +281,6 @@ class PervorationWindow(MyWindow):
                     (float(perf_list[2]), float(perf_list[4])))
                 CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('отрайбировано', False)
                 CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('Прошаблонировано', False)
-
 
             perforation.append(perf_list)
 
@@ -324,7 +339,7 @@ class PervorationWindow(MyWindow):
                     self.table_widget.setItem(row, column, QtWidgets.QTableWidgetItem(str(data)))
 
                     # if column == 2 or column == 10 or column == 11:
-                    if data != None:
+                    if not data  is  None:
                         text = data
                         for key, value in text_width_dict.items():
                             if value[0] <= len(str(text)) <= value[1]:

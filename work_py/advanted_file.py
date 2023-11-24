@@ -1,13 +1,14 @@
 from PyQt5.QtWidgets import QInputDialog
-
-
+import main
 def raiding_interval():
+
 
     from open_pz import CreatePZ
     str_raid = []
-    if len(CreatePZ.dict_perforation) == 1 and CreatePZ.perforation_sole + 30 <= CreatePZ.current_bottom:
+    if len(CreatePZ.dict_perforation) == 1 and CreatePZ.perforation_sole + 30 <= CreatePZ.current_bottom and CreatePZ.perforation_roof <= CreatePZ.current_bottom:
         str_raid.append([CreatePZ.perforation_roof-30, CreatePZ.perforation_sole+30])
-    elif len(CreatePZ.dict_perforation) == 1 and CreatePZ.perforation_sole + 30 >= CreatePZ.current_bottom:
+    elif len(CreatePZ.dict_perforation) == 1 and CreatePZ.perforation_sole + 30 >= CreatePZ.current_bottom and CreatePZ.perforation_roof <= CreatePZ.current_bottom:
+
         str_raid.append([CreatePZ.perforation_roof-30, CreatePZ.current_bottom])
     # print(str_raid)
     if len(CreatePZ.dict_perforation) > 1:
@@ -31,34 +32,40 @@ def raiding_interval():
                         CreatePZ.dict_work_pervorations[plast]['отрайбировано'] = True
 
     try:
-        roof_leakiness = int(list(CreatePZ.dict_leakiness.keys())[0].split('-')[0])
-        if len(CreatePZ.dict_leakiness) == 1 and roof_leakiness + 30 <= CreatePZ.current_bottom:
+        roof_leakiness = float(list(CreatePZ.dict_leakiness['НЭК']['интервал'].keys())[0].split('-')[1])
+        if len(CreatePZ.dict_leakiness['НЭК']['интервал']) == 1 and roof_leakiness + 30 <= CreatePZ.current_bottom:
             str_raid.append([roof_leakiness-30, roof_leakiness+30])
-        elif len(CreatePZ.dict_leakiness) == 1 and roof_leakiness + 30 >= CreatePZ.current_bottom:
+        elif len(CreatePZ.dict_leakiness['НЭК']['интервал']) == 1 and roof_leakiness + 30 >= CreatePZ.current_bottom:
             str_raid.append([roof_leakiness-30, CreatePZ.current_bottom])
 
-        if len(CreatePZ.dict_leakiness) >= 1:
-            for nek in CreatePZ.dict_leakiness.keys():
-                # print(CreatePZ.dict_leakiness[nek])
-                if CreatePZ.dict_leakiness[nek]['отрайбировано'] == False:
+
+        if CreatePZ.leakiness == True:
+            for nek in CreatePZ.dict_leakiness['НЭК']['интервал'].keys():
+                # print(CreatePZ.dict_leakiness['НЭК']['интервал'][nek]['отрайбировано'])
+                if CreatePZ.dict_leakiness['НЭК']['интервал'][nek]['отрайбировано'] == False:
                     i = nek.split('-')
-                    print(i)
+                    # print(i)
 
                     if int(i[1]) + 30 <= CreatePZ.current_bottom:
-                        crt = [int(i[0]) - 30, int(i[1]) + 30]
+                        crt = (int(i[0]) - 30, int(i[1]) + 30)
                     else:
-                        crt = [int(i[0]) - 30, CreatePZ.current_bottom]
+                        crt = (int(i[0]) - 30, CreatePZ.current_bottom)
                     str_raid.append(crt)
-                CreatePZ.dict_leakiness[nek]['отрайбировано'] = True
+                CreatePZ.dict_leakiness['НЭК']['интервал'][nek]['отрайбировано'] = True
+        print(f' НЭК {CreatePZ.dict_leakiness["НЭК"]}')
+        merged_segments = merge_overlapping_intervals(str_raid)
     except:
-        pass
 
-    try:
-        merged_segments=merge_overlapping_intervals(str_raid)
-    except:
-        str_raid1, ok = QInputDialog.getText(self, 'Райбирование ЭК',
+        str_raid1, ok = QInputDialog.getText(None, 'Райбирование ЭК',
                                              'Введите интервал райбирования через тире')
-        str_raid = [str_raid1.split('-')]
+        try:
+            str = []
+            for i in str_raid1.split(','):
+                str.append(i.split('-'))
+            str_raid1 = str
+
+        except:
+            str_raid = [str_raid1.split('-')]
         merged_segments = merge_overlapping_intervals(str_raid)
     return merged_segments
 def merge_overlapping_intervals(intervals):

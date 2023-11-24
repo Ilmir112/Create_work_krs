@@ -1,8 +1,6 @@
-import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.Qt import *
 
-import main
 from main import MyWindow
 
 
@@ -20,9 +18,9 @@ class TabPage_SO(QWidget):
 
         self.labelGeores = QLabel("вид исследования", self)
         self.ComboBoxGeophygist = QComboBox(self)
-        self.ComboBoxGeophygist.addItems(['Гироскоп', 'АКЦ', 'АКЦ + СГДТ', 'СГДТ', 'ИНГК', 'ЭМДС', 'ПТС', 'РК', 'ГК и ЛМ'])
+        self.ComboBoxGeophygist.addItems(
+            ['Гироскоп', 'АКЦ', 'АКЦ + СГДТ', 'СГДТ', 'ИНГК', 'ЭМДС', 'ПТС', 'РК', 'ГК и ЛМ'])
         self.ComboBoxGeophygist.setProperty("value", 'ГП')
-
 
         self.labelDopInformation = QLabel("Доп информация", self)
         self.lineEditDopInformation = QLineEdit(self)
@@ -40,25 +38,21 @@ class TabPage_SO(QWidget):
         grid.addWidget(self.lineEditDopInformation, 1, 3)
 
 
-
-
 class TabWidget(QTabWidget):
     def __init__(self):
         super().__init__()
         self.addTab(TabPage_SO(self), 'Перфорация')
 
+
 class GeophysicWindow(MyWindow):
 
-
     def __init__(self, table_widget, ins_ind, parent=None):
-        from open_pz import CreatePZ
-        super(MyWindow, self).__init__(parent)
 
+        super(MyWindow, self).__init__(parent)
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
         self.table_widget = table_widget
         self.ins_ind = ins_ind
-
         self.tabWidget = TabWidget()
         self.tableWidget = QTableWidget(0, 4)
         self.tableWidget.setHorizontalHeaderLabels(
@@ -75,9 +69,6 @@ class GeophysicWindow(MyWindow):
         self.buttonDel.clicked.connect(self.delRowTable)
         self.buttonAddWork = QPushButton('Добавить в план работ')
         self.buttonAddWork.clicked.connect(self.addWork)
-
-
-
         vbox = QGridLayout(self.centralWidget)
         vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
         vbox.addWidget(self.tableWidget, 1, 0, 1, 2)
@@ -86,7 +77,6 @@ class GeophysicWindow(MyWindow):
         vbox.addWidget(self.buttonAddWork, 3, 0)
 
     def geophysicalSelect(self, geophysic, editType, editType2):
-
         if geophysic == 'АКЦ':
             research = f'ЗАДАЧА 2.7.1 Определение состояния цементного камня (АКЦ, АК-сканирование) в интервале {editType}-{editType2}м. '
         elif geophysic == 'СГДТ':
@@ -95,7 +85,7 @@ class GeophysicWindow(MyWindow):
             research = f'ЗАДАЧА 2.7.3  Определение состояния цементного камня (АКЦ, АК-сканирование). в интервале {editType}-{editType2}м,' \
                        f'Определение плотности, дефектов цементного камня, эксцентриситета колонны (СГДТ) в интервале 0 - 20м выше интервала перфорации '
 
-            ['АКЦ', 'АКЦ + СГДТ', 'СГДТ', 'ИНГК', 'ЭМДС', 'ПТС', 'РК', 'ГК и ЛМ']
+
         elif geophysic == 'ИНГК':
             research = f'ЗАДАЧА 2.4.3 Определение текущей нефтенасыщенности по данным интегрального импульсного нейтронного' \
                        f'каротажа пласта  в интервале {editType}-{editType2}м. '
@@ -112,23 +102,15 @@ class GeophysicWindow(MyWindow):
             research = f'Произвести записи ГК и ЛМ интервале {editType}-{editType2}м. '
         return research
 
-
     def addRowTable(self):
-
         editType = self.tabWidget.currentWidget().lineEditType.text()
         editType2 = self.tabWidget.currentWidget().lineEditType2.text()
-        researchGis= self.geophysicalSelect(str(self.tabWidget.currentWidget().ComboBoxGeophygist.currentText()), editType, editType2)
-
-
+        researchGis = self.geophysicalSelect(str(self.tabWidget.currentWidget().ComboBoxGeophygist.currentText()),
+                                             editType, editType2)
         dopInformation = self.tabWidget.currentWidget().lineEditDopInformation.text()
         if not editType or not editType2 or not researchGis:
             msg = QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
             return
-
-
-
-
-
 
         self.tableWidget.setSortingEnabled(False)
         rows = self.tableWidget.rowCount()
@@ -137,17 +119,14 @@ class GeophysicWindow(MyWindow):
         self.tableWidget.setItem(rows, 0, QTableWidgetItem(researchGis))
         self.tableWidget.setItem(rows, 1, QTableWidgetItem(editType))
         self.tableWidget.setItem(rows, 2, QTableWidgetItem(editType2))
-
-
         self.tableWidget.setItem(rows, 3, QTableWidgetItem(dopInformation))
         self.tableWidget.setSortingEnabled(True)
 
-
     def addWork(self):
-        from main import MyWindow
-        from open_pz import CreatePZ
-        rows = self.tableWidget.rowCount()
 
+        from open_pz import CreatePZ
+
+        rows = self.tableWidget.rowCount()
         geophysicalResearch = [
             [None, None, f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС "Ойл-сервис". '
                          f'При необходимости  подготовить место для установки партии ГИС напротив мостков. '
@@ -172,19 +151,17 @@ class GeophysicWindow(MyWindow):
                         value = item.text()
                         researchGis_list.append(value)
 
-
-
             researchGis_list.extend([None, None, None, None, None, None, None, 'подр по ГИС', 4])
             geophysicalResearch.append(researchGis_list)
-            print(geophysicalResearch)
 
-
-
-
-
-
-
-
+        ori = QMessageBox.question(self, 'ОРИ', 'Нужна ли интерпретация?')
+        if ori == QMessageBox.StandardButton.Yes:
+            geophysicalResearch.append([None, None,
+                                        f'Интерпретация данных ГИС, согласовать с ПТО и Ведущим инженером ЦДНГ опрессовку фНКТ ',
+                                        None, None, None, None, None, None, None,
+                                        'Мастер КРС, подрядчик по ГИС', 8])
+        else:
+            pass
 
         text_width_dict = {20: (0, 100), 40: (101, 200), 60: (201, 300), 80: (301, 400), 100: (401, 500),
                            120: (501, 600), 140: (601, 700)}
@@ -195,40 +172,24 @@ class GeophysicWindow(MyWindow):
             # lst = [1, 0, 2, len(geophysicalResearch)-1]
             # if float(CreatePZ.max_angle) >= 50:
             #     lst.extend([3, 4])
-             # Объединение ячеек по горизонтали в столбце "отвественные и норма"
+            # Объединение ячеек по горизонтали в столбце "отвественные и норма"
             self.table_widget.setSpan(i + self.ins_ind, 2, 1, 8)
             for column, data in enumerate(row_data):
 
-                # widget = QtWidgets.QLabel(str())
-                # if column != 25:
-                #     widget.setStyleSheet("""QLabel {
-                #                                         border: 1px solid black;
-                #                                         font-size: 12px;
-                #                                         font-family: Arial;
-                #                                     }
-                #                                     """)
-                #     self.table_widget.setCellWidget(row, column, widget)
                 self.table_widget.setItem(row, column, QtWidgets.QTableWidgetItem(str(data)))
 
                 if column == 2 or column == 10:
-                    if data != None:
+                    if not data is None:
                         text = data
                         for key, value in text_width_dict.items():
                             if value[0] <= len(text) <= value[1]:
                                 text_width = key
                                 self.table_widget.setRowHeight(row, int(text_width))
-        # self.table_widget.setSpan(1 + self.ins_ind, 10, len(geophysicalResearch) - 2, 1)
-        # self.table_widget.setSpan(1 + self.ins_ind, 11, len(geophysicalResearch) - 2, 1)
-
-
 
         self.table_widget.setRowHeight(self.ins_ind, 60)
         self.table_widget.setRowHeight(self.ins_ind + 1, 60)
 
-
         self.close()
-
-
 
     def delRowTable(self):
         row = self.tableWidget.currentRow()
@@ -238,14 +199,11 @@ class GeophysicWindow(MyWindow):
         self.tableWidget.removeRow(row)
 
 
-
-
-
 if __name__ == "__main__":
     import sys
 
     app = QtWidgets.QApplication(sys.argv)
     app.setStyleSheet()
-    window =  GeophysicWindow()
+    window = GeophysicWindow()
     window.show()
     sys.exit(app.exec_())

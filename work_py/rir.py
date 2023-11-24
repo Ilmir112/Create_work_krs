@@ -169,21 +169,18 @@ def rir_rpk(self):
 
 def perf_new(self):
     from open_pz import CreatePZ
+
     print(f' пласта до изоляции {CreatePZ.dict_work_pervorations}')
-    for plast in CreatePZ.plast_all:
-        for i in list(CreatePZ.dict_perforation[plast]['интервал']):
-            if i[0] > CreatePZ.current_bottom:
-                print(CreatePZ.dict_perforation[plast]['интервал'])
-                CreatePZ.dict_perforation[plast]['интервал'].discard(i)
-        if CreatePZ.dict_perforation[plast]['интервал'] == set():
-            del CreatePZ.dict_perforation[plast]
+    for plast in CreatePZ.plast_select:
+        if plast in CreatePZ.plast_all:
+            CreatePZ.dict_perforation[plast]['отключение'] = True
+
         if plast in CreatePZ.plast_work:
-            for i in list(CreatePZ.dict_work_pervorations[plast]['интервал']):
-                if i[0] > CreatePZ.current_bottom:
-                    print(CreatePZ.dict_work_pervorations[plast]['интервал'])
-                    CreatePZ.dict_work_pervorations[plast]['интервал'].discard(i)
-            if CreatePZ.dict_work_pervorations[plast]['интервал'] == set():
-                del CreatePZ.dict_work_pervorations[plast]
+            CreatePZ.dict_work_pervorations[plast]['отключение'] = True
+    for nek in CreatePZ.plast_select:
+        if nek.replace('НЭК ', '') in list(CreatePZ.dict_leakiness['НЭК'].keys()):
+            CreatePZ.dict_leakiness['НЭК'][nek]['отключение'] == True
+
     print(f' пласта рабоче {CreatePZ.dict_work_pervorations, CreatePZ.dict_perforation}')
     CreatePZ.plast_work = list(CreatePZ.dict_work_pervorations.keys())
     try:

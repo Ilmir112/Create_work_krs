@@ -143,7 +143,7 @@ class MyWindow(QMainWindow):
                     if self.table_widget.rowSpan(row, column) > 1 or self.table_widget.columnSpan(row, column) > 1:
                         merged_cells.append((row, column))
                     item = self.table_widget.item(row, column)
-                    if item is not None:
+                    if not item is None:
                         row_lst.append(item.text())
 
                     #     ws.cell(row=row + 1, column=column + 1).value = item.text()
@@ -189,7 +189,7 @@ class MyWindow(QMainWindow):
             print("Table data saved to Excel")
 
     def close_file(self):
-        if self.table_widget is not None:
+        if not self.table_widget is None:
             self.table_widget.close()
             self.table_widget = None
         print("Closing current file")
@@ -318,7 +318,7 @@ class MyWindow(QMainWindow):
 
         alone_menu = action_menu.addMenu('одиночные операции')
 
-        mkp_action = QAction('Система обратных клапанов')
+        mkp_action = QAction('Ревизия МКП')
         alone_menu.addAction(mkp_action)
         mkp_action.triggered.connect(self.mkp_revision)
 
@@ -588,14 +588,14 @@ class MyWindow(QMainWindow):
 
                 # self.table_widget.setCellWidget(row, column, widget)
 
-                if data != None:
+                if not data  is  None:
                     self.table_widget.setItem(row, column, item)
 
                 else:
                     self.table_widget.setItem(row, column, QtWidgets.QTableWidgetItem(str('')))
 
                 if column == 2:
-                    if data != None:
+                    if not data  is  None:
                         text = data
                         for key, value in text_width_dict.items():
                             if value[0] <= len(text) <= value[1]:
@@ -647,14 +647,14 @@ class MyWindow(QMainWindow):
 
         self.table_widget.setRowCount(rows)
         self.table_widget.setColumnCount(12)
-        rowHeights_exit = [sheet.row_dimensions[i + 1].height if sheet.row_dimensions[i + 1].height != None else 18 for
+        rowHeights_exit = [sheet.row_dimensions[i + 1].height if sheet.row_dimensions[i + 1].height is not None else 18 for
                            i in range(sheet.max_row)]
 
         for row in range(1, rows + 1):
             if row > 1 and row < rows - 1:
                 self.table_widget.setRowHeight(row, int(rowHeights_exit[row]))
             for col in range(1, 12 + 1):
-                if sheet.cell(row=row, column=col).value != None:
+                if not sheet.cell(row=row, column=col).value is None:
                     cell_value = str(sheet.cell(row=row, column=col).value)
                     item = QtWidgets.QTableWidgetItem(str(cell_value))
                     self.table_widget.setItem(row - 1, col - 1, item)

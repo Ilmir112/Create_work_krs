@@ -80,7 +80,7 @@ def sandFilling(self):
 
 
     CreatePZ.current_bottom = filling_depth
-    perf_new(self)
+
     return filling_list
 
 def sandWashing(self):
@@ -90,12 +90,12 @@ def sandWashing(self):
 
 
 
-    washingDepth, ok = QInputDialog.getInt(None, 'Отсыпка песком',
-                                                'Введите кровлю необходимого песчанного моста',
+    washingDepth, ok = QInputDialog.getInt(None, 'вымыв песка',
+                                                'Введите глубину вымыва песчанного моста',
                                                 int(CreatePZ.perforation_roof - 20), 0, 3500)
     washingOut_list = [
         [None, None,
-     f' Спустить  {sand_select(self)}  на НКТ{nkt_diam}мм до глубины {round(CreatePZ.current_bottom-100,0)}м с замером, шаблонированием шаблоном. '
+     f' Спустить  {sand_select(self)}  на НКТ{nkt_diam}мм до глубины {round(CreatePZ.current_bottom,0)}м с замером, шаблонированием шаблоном. '
      f'(При СПО первых десяти НКТ на '
      f'спайдере дополнительно устанавливать элеватор ЭХЛ)',
      None, None, None, None, None, None, None,
@@ -115,5 +115,5 @@ def sandWashing(self):
             CreatePZ.current_bottom / 9.52 * 1.51 / 60 * 1.2 * 1.04 + 0.18 + 0.008 * CreatePZ.current_bottom / 9.52 + 0.003 * CreatePZ.current_bottom / 9.52,
             2)]]
     CreatePZ.current_bottom = washingDepth
-    perf_new(self)
+
     return washingOut_list

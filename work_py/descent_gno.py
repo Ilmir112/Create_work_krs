@@ -381,7 +381,7 @@ def gno_down(self):
                     'Мастер КРС, предст. заказчика', 1],
                    ]
 
-    lift_dict = {'НН с пакером': descent_nn_with_paker, 'ЭЦН с пакером': descent_ecn_with_paker, 'пакер': paker_descent,
+    lift_dict = {'НН с пакером': descent_nn_with_paker, 'НВ с пакером': descent_nv_with_paker, 'ЭЦН с пакером': descent_ecn_with_paker, 'пакер': paker_descent,
                  'ЭЦН': descent_ecn, 'НВ': descent_nv, 'НН': descent_nn, 'ОРД': descentORD, 'воронка': descent_voronka } #'ОРЗ': lift_orz, 'ОРД': lift_ord, 'Воронка': lift_voronka,
                  # 'НН с пакером': lift_pump_nn_with_paker, 'НВ с пакером': lift_pump_nv_with_paker,
                  # 'ЭЦН с пакером': lift_ecn_with_paker,

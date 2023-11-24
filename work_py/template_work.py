@@ -139,9 +139,11 @@ def template_ek_without_skm(self):
         ckm_teml = f'(шаблон-{template_diam_additional_ek()[0]}мм до {math.ceil(CreatePZ.perforation_roof) - 10}м, шаблон Ф-{template_diam_additional_ek()[1]}мм до гл.{CreatePZ.head_column_additional- 10}м)'
         CreatePZ.template_depth = math.ceil(CreatePZ.perforation_roof - 8)
     elif CreatePZ.column_additional == True and all([CreatePZ.dict_work_pervorations[plast]['отрайбировано'] for plast in list(CreatePZ.dict_work_pervorations.keys())]) == True:
-        template_str = f'обточная муфта + шаблон-{template_diam_additional_ek()[1]}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can]}м '
-        ckm_teml = f'шаблон; Ф-{template_diam_additional_ek()[1]}мм до гл.{math.ceil(min(list(CreatePZ.current_bottom)))}м)'
-        CreatePZ.template_depth = math.ceil(min(list(CreatePZ.current_bottom)))
+        template_str = f'обточная муфта + шаблон-{template_diam_additional_ek()[0]}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can_addition]}м + НКТ{nkt_pod} ' \
+                       f'{round(CreatePZ.current_bottom-CreatePZ.head_column_additional, 0)}м + шаблон-{template_diam_additional_ek()[1]}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can]}м '
+        ckm_teml = f'(шаблон-{template_diam_additional_ek()[0]}мм до гл.{math.ceil(CreatePZ.current_bottom)}м, шаблон-{template_diam_additional_ek()[1]}мм' \
+                   f' до глубины {round(CreatePZ.current_bottom-lift_ecn_can[CreatePZ.lift_ecn_can_addition]-(CreatePZ.current_bottom-CreatePZ.head_column_additional), 0)}м'
+        CreatePZ.template_depth = math.ceil(CreatePZ.current_bottom)
 
 
     list_template_ek = [
@@ -291,11 +293,12 @@ def template_ek(self):
                    f'шаблон; Ф-{template_diam_additional_ek()[1]}мм до гл.{int(CreatePZ.head_column_additional - 8)}м))'
         CreatePZ.template_depth = math.ceil(CreatePZ.perforation_roof - 18)
     elif CreatePZ.column_additional == True and all([CreatePZ.dict_work_pervorations[plast]['отрайбировано'] for plast in list(CreatePZ.dict_work_pervorations.keys())]) == True:
-        template_str = f'обточная муфта + СКМ-{int(CreatePZ.column_additional_diametr)} +10м НКТ{nkt_pod} + шаблон-{template_diam_additional_ek()[1]}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can]}м '
-        ckm_teml = f'(СКМ-{int(CreatePZ.column_additional_diametr)} до Н={int(min(list(CreatePZ.current_bottom)))}м,' \
-                   f'шаблон; Ф-{template_diam_additional_ek()[0]}мм до гл.{int(min(list(CreatePZ.current_bottom)) - 10)}м)'\
-                   f'шаблон; Ф-{template_diam_additional_ek()[1]}мм до гл.{int(CreatePZ.head_column_additional - 8)}м))'
-        CreatePZ.template_depth = math.ceil(min(list(CreatePZ.current_bottom)) - 10)
+        template_str = f'обточная муфта + СКМ-{int(CreatePZ.column_additional_diametr)} +10м НКТ{nkt_pod} + шаблон-{template_diam_additional_ek()[0]}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can_addition]}м + НКТ{nkt_pod} ' \
+                       f'{round(CreatePZ.current_bottom-CreatePZ.head_column_additional - 10, 0)}м + шаблон-{template_diam_additional_ek()[1]}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can]}м '
+        ckm_teml = f'(СКМ-{int(CreatePZ.column_additional_diametr)} до Н={int(CreatePZ.current_bottom)}м,' \
+                   f'шаблон-{template_diam_additional_ek()[0]}мм до гл.{int(CreatePZ.current_bottom - 10)}м, '\
+                   f'шаблон-{template_diam_additional_ek()[1]}мм до гл.{int(CreatePZ.current_bottom - 10 - lift_ecn_can[CreatePZ.lift_ecn_can_addition]- (CreatePZ.current_bottom-CreatePZ.head_column_additional - 10))}м))'
+        CreatePZ.template_depth = math.ceil(CreatePZ.current_bottom - 10)
     list_template_ek = [
         [None, None, f'Спустить  {template_str}на 'f'НКТ{CreatePZ.nkt_diam}мм {ckm_teml} с замером, шаблонированием НКТ. \n'
                      f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
