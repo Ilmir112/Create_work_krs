@@ -70,7 +70,7 @@ def raidingColumn(self):
          'мастер КРС', round(0.25 + 0.033 * 1.2 * (CreatePZ.current_bottom) / 9.5 * 1.04*0.9, 1)]]
 
 
-
+    print(CreatePZ.dict_work_pervorations)
 
     return ryber_list
 

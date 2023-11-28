@@ -1,16 +1,17 @@
 import sys
 import openpyxl
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu, QMenuBar, QAction, QTableWidget, QTableWidgetItem, \
-    QVBoxLayout, QWidget, QLineEdit, QMessageBox, QFileDialog, QToolBar, QPushButton
+    QVBoxLayout, QWidget, QLineEdit, QMessageBox, QFileDialog, QToolBar, QPushButton, QShortcut
 from PyQt5 import QtCore, QtWidgets, QtGui
 from openpyxl.workbook import Workbook
 from openpyxl.utils import get_column_letter
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QColor, QBrush
+from PyQt5.QtGui import QColor, QBrush, QKeySequence
 import krs
 from PIL import Image as PILImage
 from openpyxl.drawing.image import Image
 import work_py.opressovka
+
 
 
 
@@ -27,6 +28,7 @@ class MyWindow(QMainWindow):
         self.dict_work_pervorations = {}
         self.ins_ind_border = None
         self.work_plan = 0
+
     def initUI(self):
         from work_py.mouse import TableWidget
         self.setWindowTitle("Main Window")
@@ -41,9 +43,15 @@ class MyWindow(QMainWindow):
 
         self.toolbar = QToolBar()
         self.addToolBar(self.toolbar)
-        self.closeFileButton = QPushButton("Close File")
+
+        self.saveFileButton = QPushButton("Сохранить проект")
+        self.saveFileButton.clicked.connect(self.save_to_excel)
+        self.toolbar.addWidget(self.saveFileButton)
+
+        self.closeFileButton = QPushButton("Закрыть проект")
         self.closeFileButton.clicked.connect(self.close_file)
         self.toolbar.addWidget(self.closeFileButton)
+
 
 
     def createMenuBar(self):
@@ -104,7 +112,7 @@ class MyWindow(QMainWindow):
             #     open_pz.open_excel_file().wb.save("test_unmerge.xlsx")
         elif action == self.save_file:
 
-            self.save_to_excel(self.wb, self.ws)
+            self.save_to_excel
 
         elif action == self.save_file_as:
             self.saveFileDialog(self.wb)
@@ -117,6 +125,7 @@ class MyWindow(QMainWindow):
             self.setCentralWidget(self.table_widget)
             self.model = self.table_widget.model()
 
+
             # Этот сигнал испускается всякий раз, когда ячейка в таблице нажата.
             # Указанная строка и столбец - это ячейка, которая была нажата.
             self.table_widget.cellPressed[int, int].connect(self.clickedRowColumn)
@@ -125,7 +134,7 @@ class MyWindow(QMainWindow):
         fileName, _ = QFileDialog.getSaveFileName(self, "Save excel-file", "", "Excel Files (*.xls)")
         if fileName:
             wb.save(f"{CreatePZ.well_number} {CreatePZ.well_area} {CreatePZ.cat_P_1} категории.xlsx)")
-    def save_to_excel(self, wb, ws):
+    def save_to_excel(self):
         from open_pz import CreatePZ
         from krs import is_number
         # print(f'граница {self.ins_ind_border}')
@@ -162,30 +171,31 @@ class MyWindow(QMainWindow):
             if krs.is_number(work_list[i][11]) == True:
                 CreatePZ.normOfTime += float(work_list[i][11])
 
-        CreatePZ.count_row_height(ws, work_list, ins_ind, merged_cells_dict)
+        CreatePZ.count_row_height(self.ws, work_list, ins_ind, merged_cells_dict)
         itog_ind_min = CreatePZ.itog_ind_min + len(work_list)
-        CreatePZ.addItog(self, ws, self.table_widget.rowCount()+1)
+        CreatePZ.addItog(self, self.ws, self.table_widget.rowCount()+1)
         try:
-            ws.print_area = f'B1:L{self.table_widget.rowCount()+45}'
+            self.ws.print_area = f'B1:L{self.table_widget.rowCount()+45}'
             # ws.page_setup.fitToPage = True
-            ws.page_setup.fitToHeight = False
-            ws.page_setup.fitToWidth = True
-            ws.print_options.horizontalCentered = True
-            for row_ind, row in enumerate(ws.iter_rows(values_only=True)):
+            self.ws.page_setup.fitToHeight = False
+            self.ws.page_setup.fitToWidth = True
+            self.ws.print_options.horizontalCentered = True
+            for row_ind, row in enumerate(self.ws.iter_rows(values_only=True)):
                 for col, value in enumerate(row):
                     if 'Зуфаров' in str(value):
                         coordinate = f'{get_column_letter(col-2)}{row_ind-1}'
                         break
 
-            self.insert_image(ws, 'imageFiles/Зуфаров.png', coordinate)
-            self.insert_image(ws, 'imageFiles/Хасаншин.png', 'H1')
-            self.insert_image(ws, 'imageFiles/Шамигулов.png', 'H4')
-            wb.save(f"{CreatePZ.well_number} {CreatePZ.well_area} {CreatePZ.cat_P_1}.xlsx")
+            self.insert_image(self.ws, 'imageFiles/Зуфаров.png', coordinate)
+            self.insert_image(self.ws, 'imageFiles/Хасаншин.png', 'H1')
+            self.insert_image(self.ws, 'imageFiles/Шамигулов.png', 'H4')
+            self.wb.save(f"{CreatePZ.well_number} {CreatePZ.well_area} {CreatePZ.cat_P_1}.xlsx")
         except Exception as e:
             print(e)
+            print(e)
         finally:
-            if wb:
-                wb.close()
+            if self.wb:
+                self.wb.close()
             print("Table data saved to Excel")
 
     def close_file(self):
@@ -200,6 +210,8 @@ class MyWindow(QMainWindow):
         img.height = 180
         img.anchor = coordinate
         ws.add_image(img, coordinate)
+
+
 
     def openContextMenu(self, position):
         from open_pz import CreatePZ
@@ -238,10 +250,9 @@ class MyWindow(QMainWindow):
         geophysical.addAction(swibbingVoronka_action)
         swibbingVoronka_action.triggered.connect(self.swibbing_with_voronka)
 
-
-
+        del_menu = context_menu.addMenu('удаление строки')
         emptyString_action = QAction("добавить пустую строку", self)
-        context_menu.addAction(emptyString_action)
+        del_menu.addAction(emptyString_action)
         emptyString_action.triggered.connect(self.emptyString)
 
         gnkt_opz_action = QAction("ГНКТ ОПЗ", self)
@@ -251,7 +262,7 @@ class MyWindow(QMainWindow):
 
 
         deleteString_action = QAction("Удалить строку", self)
-        context_menu.addAction(deleteString_action)
+        del_menu.addAction(deleteString_action)
         deleteString_action.triggered.connect(self.deleteString)
 
 
@@ -673,6 +684,7 @@ class MyWindow(QMainWindow):
         #     from open_pz import CreatePZ
         #     # print(CreatePZ.gnkt_work1)
         #     # self.populate_row(self.table_widget.rowCount(),  CreatePZ.gnkt_work1)
+
 
 
 if __name__ == "__main__":

@@ -51,7 +51,7 @@ def gno_down(self):
              f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ)',
              None, None, None, None, None, None, None,
              'мастер КРС, предст. заказчика', float(1.2)],
-            [None, None, ''.join(['ОВТР 10ч' if CreatePZ.curator != 'ЧР' else 'ОВТР 4ч']),
+            [None, None, ''.join(['ОВТР 10ч' if CreatePZ.curator != 'ЧГМ' else 'ОВТР 4ч']),
              None, None, None, None, None, None, None,
              'мастер КРС', ''.join(['10' if CreatePZ.region != 'ЧГМ' else '4'])],
             [None, None, 'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС "Ойл-сервис".  Составить'
@@ -73,7 +73,7 @@ def gno_down(self):
     except:
         pass
     gno_list = [[None, None,
-         f'За 48 часов до спуска запросить КАРТУ спуска на ГНО и заказать.',
+         f'За 48 часов до спуска запросить КАРТУ спуска на ГНО и заказать оборудование согласно карты спуска.',
          None, None, None, None, None, None, None,
          'Мастер КРС, предст. заказчика', None],
     ]

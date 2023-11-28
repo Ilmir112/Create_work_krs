@@ -6,11 +6,6 @@ import krs
 from work_py import template_work, opressovka
 
 
-# from work_py.perforation import Perfarotions
-
-# Выбор вида спущенного оборудования
-# def lift_select(self):
-#     from open_pz import CreatePZ
 
 def calculationFluidWork(self):
 
@@ -245,12 +240,12 @@ def work_krs(self):
          None, None, None, None, None,
          None, None],
         [None, None,
-         f'Поднять  ЭЦН с пакером {CreatePZ.paker_do["do"]} на НКТ{nkt_diam_fond}мм с глубины {sum(list(CreatePZ.dict_nkt.values()))}м на поверхность '
+         f'Поднять  ЭЦН с пакером {CreatePZ.paker_do["do"]} на НКТ{nkt_diam_fond}мм с глубины {round(sum(list(CreatePZ.dict_nkt.values())),1)}м на поверхность '
          f'с замером, накручиванием колпачков с доливом скважины тех.жидкостью уд. весом {fluid_work}  '
-         f'в объеме {round(sum(list(CreatePZ.dict_nkt.values())) * 1.12 / 1000, 1)}м3 с контролем АСПО на стенках НКТ.',
+         f'в объеме {round(round(sum(list(CreatePZ.dict_nkt.values())),1) * 1.12 / 1000, 1)}м3 с контролем АСПО на стенках НКТ.',
          None, None,
          None, None, None, None, None,
-         'Мастер КРС', round(0.0044 * 1.2 * sum(list(CreatePZ.dict_nkt.values())), 2)],
+         'Мастер КРС', round(0.0044 * 1.2 * round(sum(list(CreatePZ.dict_nkt.values())),1), 2)],
     ]
     lift_ecn = [
         [None, None,
@@ -309,11 +304,11 @@ def work_krs(self):
          None, None, None, None, None,
          None, None],
         [None, None,
-         f'Поднять  {dict_pump}  на НКТ{nkt_diam_fond}мм с глубины {sum(list(CreatePZ.dict_nkt.values()))}м на поверхность с замером, накручиванием колпачков с доливом скважины тех.жидкостью уд. весом {fluid_work}  '
-         f'в объеме {round(sum(list(CreatePZ.dict_nkt.values())) * 1.12 / 1000, 1)}м3 с контролем АСПО на стенках НКТ.',
+         f'Поднять  {dict_pump}  на НКТ{nkt_diam_fond}мм с глубины {round(sum(list(CreatePZ.dict_nkt.values())),1)}м на поверхность с замером, накручиванием колпачков с доливом скважины тех.жидкостью уд. весом {fluid_work}  '
+         f'в объеме {round(round(sum(list(CreatePZ.dict_nkt.values())),1) * 1.12 / 1000, 1)}м3 с контролем АСПО на стенках НКТ.',
          None, None,
          None, None, None, None, None,
-         'Мастер КРС', round(0.0044 * sum(list(CreatePZ.dict_nkt.values())), 2)],
+         'Мастер КРС', round(0.0044 * round(sum(list(CreatePZ.dict_nkt.values())),1), 2)],
     ]
 
     lift_ecn_with_paker = [
@@ -381,11 +376,11 @@ def work_krs(self):
          None, None, None, None, None,
          None, None],
         [None, None,
-         f'Поднять  {dict_pump} с пакером {CreatePZ.paker_do["do"]} на НКТ{nkt_diam_fond}мм с глубины {sum(list(CreatePZ.dict_nkt.values()))}м на поверхность с замером, накручиванием колпачков с доливом скважины тех.жидкостью уд. весом {fluid_work}  '
-         f'в объеме {round(sum(list(CreatePZ.dict_nkt.values())) * 1.22 / 1000, 1)}м3 с контролем АСПО на стенках НКТ.',
+         f'Поднять  {dict_pump} с пакером {CreatePZ.paker_do["do"]} на НКТ{nkt_diam_fond}мм с глубины {round(sum(list(CreatePZ.dict_nkt.values())),1)}м на поверхность с замером, накручиванием колпачков с доливом скважины тех.жидкостью уд. весом {fluid_work}  '
+         f'в объеме {round(round(sum(list(CreatePZ.dict_nkt.values())),1) * 1.22 / 1000, 1)}м3 с контролем АСПО на стенках НКТ.',
          None, None,
          None, None, None, None, None,
-         'Мастер КРС', round(0.0044 * 1.3 * sum(list(CreatePZ.dict_nkt.values())), 2)],
+         'Мастер КРС', round(0.0044 * 1.3 * round(sum(list(CreatePZ.dict_nkt.values())),1), 2)],
     ]
     lift_pump_nv = [
         [None, None,
@@ -412,7 +407,7 @@ def work_krs(self):
          f'штанг в  0,9т. При отрицательном результате согласов технологической службой ЦДНГ или ПТО региона  постепенное увеличение нагрузки до 15тн ( по 1т - 1 час),  либо искусственный  отворот НШ с последующим комбинированным подъемом ГНО НВ. В случае невозможности отворота колонны НШ с подтверждением супервайзера, распиловку НШ согласовать с ПТО по направлению сектора учета НКТ и НШ.',
          None, None, None, None, None, None, None,
          'Мастер КРС представитель Заказчика, пусков. Ком. ',
-         round((0.17 + 0.015 * sum(list(CreatePZ.dict_nkt.values())) / 8.5 + 0.12 + 1.02), 1)],
+         round((0.17 + 0.015 * round(sum(list(CreatePZ.dict_nkt.values())),1) / 8.5 + 0.12 + 1.02), 1)],
         [None, None,
          f'Разобрать устьевое оборудование.  Сорвать планшайбу в присутствии представителя ЦДНГ, с '
          f'составлением акта. При срыве нагрузка не должна превышать предельно допустимую нагрузку на НКТ  не более {round(weigth_pipe(CreatePZ.dict_nkt) * 1.2, 1)}т. '
@@ -454,11 +449,11 @@ def work_krs(self):
          None, None, None, None, None,
          None, None],
         [None, None,
-         f'{"".join(["Допустить фНКТ для определения текущего забоя. " if CreatePZ.gipsInWell == True else ""])}Поднять  замковую опору  на НКТ{nkt_diam_fond}мм с глубины {sum(list(CreatePZ.dict_nkt.values()))}м на поверхность с замером, накручиванием колпачков с доливом скважины тех.жидкостью уд. весом {fluid_work}  '
-         f'в объеме {round(sum(list(CreatePZ.dict_nkt.values())) * 1.12 / 1000, 1)}м3 с контролем АСПО на стенках НКТ.',
+         f'{"".join(["Допустить фНКТ для определения текущего забоя. " if CreatePZ.gipsInWell == True else ""])}Поднять  замковую опору  на НКТ{nkt_diam_fond}мм с глубины {round(sum(list(CreatePZ.dict_nkt.values())),1)}м на поверхность с замером, накручиванием колпачков с доливом скважины тех.жидкостью уд. весом {fluid_work}  '
+         f'в объеме {round(round(sum(list(CreatePZ.dict_nkt.values())),1) * 1.12 / 1000, 1)}м3 с контролем АСПО на стенках НКТ.',
          None, None,
          None, None, None, None, None,
-         'Мастер КРС', round(0.0044 * sum(list(CreatePZ.dict_nkt.values())), 2)],
+         'Мастер КРС', round(0.0044 * round(sum(list(CreatePZ.dict_nkt.values())),1), 2)],
     ]
     lift_pump_nv_with_paker = [
         [None, None,
@@ -478,7 +473,7 @@ def work_krs(self):
          f'штанг в  0,9т. При отрицательном результате согласов технологической службой ЦДНГ или ПТО региона  постепенное увеличение нагрузки до 15тн ( по 1т - 1 час),  либо искусственный  отворот НШ с последующим комбинированным подъемом ГНО НВ. В случае невозможности отворота колонны НШ с подтверждением супервайзера, распиловку НШ согласовать с ПТО по направлению сектора учета НКТ и НШ.',
          None, None, None, None, None, None, None,
          'Мастер КРС представитель Заказчика, пусков. Ком. ',
-         round((0.17 + 0.015 * sum(list(CreatePZ.dict_nkt.values())) / 8.5 + 0.12 + 1.02), 1)],
+         round((0.17 + 0.015 * round(sum(list(CreatePZ.dict_nkt.values())),1) / 8.5 + 0.12 + 1.02), 1)],
         [None, None,
          f'Разобрать устьевое оборудование.  Сорвать планшайбу и пакер с поэтапным увеличением нагрузки с выдержкой 30мин для возврата резиновых элементов в исходное положение'
          f'в присутствии представителя ЦДНГ, с '
@@ -529,12 +524,12 @@ def work_krs(self):
          None, None, None, None, None,
          None, None],
         [None, None,
-         f'Поднять  замковую опору с пакером {CreatePZ.paker_do["do"]} на НКТ{nkt_diam_fond}мм с глубины {sum(list(CreatePZ.dict_nkt.values()))}м на '
+         f'Поднять  замковую опору с пакером {CreatePZ.paker_do["do"]} на НКТ{nkt_diam_fond}мм с глубины {round(sum(list(CreatePZ.dict_nkt.values())),1)}м на '
          f'поверхность с замером, накручиванием колпачков с доливом скважины тех.жидкостью уд. весом {fluid_work}  '
-         f'в объеме {round(sum(list(CreatePZ.dict_nkt.values())) * 1.12 / 1000, 1)}м3 с контролем АСПО на стенках НКТ.',
+         f'в объеме {round(round(sum(list(CreatePZ.dict_nkt.values())),1) * 1.12 / 1000, 1)}м3 с контролем АСПО на стенках НКТ.',
          None, None,
          None, None, None, None, None,
-         'Мастер КРС', round(0.0044 * 1.2 * sum(list(CreatePZ.dict_nkt.values())), 2)],
+         'Мастер КРС', round(0.0044 * 1.2 * round(sum(list(CreatePZ.dict_nkt.values())),1), 2)],
     ]
     lift_pump_nn = [
         [None, None,
@@ -603,11 +598,11 @@ def work_krs(self):
          None, None, None, None, None,
          None, None],
         [None, None,
-         f'Поднять  {dict_pump}  на НКТ{nkt_diam_fond}мм с глубины {sum(list(CreatePZ.dict_nkt.values()))}м на поверхность с замером, накручиванием колпачков с доливом скважины тех.жидкостью уд. весом {fluid_work}  '
-         f'в объеме {round(sum(list(CreatePZ.dict_nkt.values())) * 1.12 / 1000, 1)}м3 с контролем АСПО на стенках НКТ.',
+         f'Поднять  {dict_pump}  на НКТ{nkt_diam_fond}мм с глубины {round(sum(list(CreatePZ.dict_nkt.values())),1)}м на поверхность с замером, накручиванием колпачков с доливом скважины тех.жидкостью уд. весом {fluid_work}  '
+         f'в объеме {round(round(sum(list(CreatePZ.dict_nkt.values())),1) * 1.12 / 1000, 1)}м3 с контролем АСПО на стенках НКТ.',
          None, None,
          None, None, None, None, None,
-         'Мастер КРС', round(0.0044 * sum(list(CreatePZ.dict_nkt.values())), 2)],
+         'Мастер КРС', round(0.0044 * round(sum(list(CreatePZ.dict_nkt.values())),1), 2)],
     ]
     lift_pump_nn_with_paker = [
         [None, None,
@@ -678,11 +673,11 @@ def work_krs(self):
          None, None, None, None, None,
          None, None],
         [None, None,
-         f'Поднять  насос {dict_pump} с пакером {CreatePZ.paker_do["do"]} на НКТ{nkt_diam_fond}мм с глубины {sum(list(CreatePZ.dict_nkt.values()))}м на поверхность с замером, накручиванием колпачков с доливом скважины тех.жидкостью уд. весом {fluid_work}  '
-         f'в объеме {round(sum(list(CreatePZ.dict_nkt.values())) * 1.12 / 1000, 1)}м3 с контролем АСПО на стенках НКТ.',
+         f'Поднять  насос {dict_pump} с пакером {CreatePZ.paker_do["do"]} на НКТ{nkt_diam_fond}мм с глубины {round(sum(list(CreatePZ.dict_nkt.values())),1)}м на поверхность с замером, накручиванием колпачков с доливом скважины тех.жидкостью уд. весом {fluid_work}  '
+         f'в объеме {round(round(sum(list(CreatePZ.dict_nkt.values())),1) * 1.12 / 1000, 1)}м3 с контролем АСПО на стенках НКТ.',
          None, None,
          None, None, None, None, None,
-         'Мастер КРС', round(0.0044 * 1.2 * sum(list(CreatePZ.dict_nkt.values())), 2)],
+         'Мастер КРС', round(0.0044 * 1.2 * round(sum(list(CreatePZ.dict_nkt.values())),1), 2)],
     ]
     lift_voronka = [[None, None, well_jamming[0],
                      None, None, None, None, None, None, None,
@@ -735,11 +730,11 @@ def work_krs(self):
                      None, None, None, None, None,
                      None, None],
                     [None, None,
-                     f'Поднять  воронку  на НКТ{nkt_diam_fond}мм с глубины {sum(list(CreatePZ.dict_nkt.values()))}м на поверхность с замером, накручиванием колпачков с доливом скважины тех.жидкостью уд. весом {fluid_work}  '
-                     f'в объеме {round(sum(list(CreatePZ.dict_nkt.values())) * 1.12 / 1000, 1)}м3 с контролем АСПО на стенках НКТ.',
+                     f'Поднять  воронку  на НКТ{nkt_diam_fond}мм с глубины {round(sum(list(CreatePZ.dict_nkt.values())),1)}м на поверхность с замером, накручиванием колпачков с доливом скважины тех.жидкостью уд. весом {fluid_work}  '
+                     f'в объеме {round(round(sum(list(CreatePZ.dict_nkt.values())),1) * 1.12 / 1000, 1)}м3 с контролем АСПО на стенках НКТ.',
                      None, None,
                      None, None, None, None, None,
-                     'Мастер КРС', round(0.0041 * sum(list(CreatePZ.dict_nkt.values())), 2)],
+                     'Мастер КРС', round(0.0041 * round(sum(list(CreatePZ.dict_nkt.values())),1), 2)],
                     ]
     lift_paker = [[None, None,
                    f'Опрессовать эксплуатационную колонну и пакер на Р={CreatePZ.max_admissible_pressure}атм в присутствии представителя ЦДНГ. '
@@ -800,10 +795,10 @@ def work_krs(self):
                    None, None],
                   [None, None,
                    f'Поднять  пакер {CreatePZ.paker_do["do"]} на НКТ{nkt_diam_fond}мм с глубины {CreatePZ.H_F_paker_do["do"]}м + '
-                   f'хвостовиком {round(sum(list(CreatePZ.dict_nkt.values())) - int(CreatePZ.H_F_paker_do["do"]))}м на поверхность с замером, накручиванием колпачков с доливом скважины тех.жидкостью уд. весом {fluid_work}  '
+                   f'хвостовиком {round(round(sum(list(CreatePZ.dict_nkt.values())),1) - int(CreatePZ.H_F_paker_do["do"]))}м на поверхность с замером, накручиванием колпачков с доливом скважины тех.жидкостью уд. весом {fluid_work}  '
                    f'в объеме 1,7м3 с контролем АСПО на стенках НКТ.', None, None,
                    None, None, None, None, None,
-                   'Мастер КРС', round(0.0041 * sum(list(CreatePZ.dict_nkt.values())) * 1.2, 2)]
+                   'Мастер КРС', round(0.0041 * round(sum(list(CreatePZ.dict_nkt.values())),1) * 1.2, 2)]
                   ]
     lift_orz = []
 
@@ -1131,12 +1126,12 @@ def well_volume(self, current_bottom):
 def volume_pod_NKT():  # Расчет необходимого объема внутри НКТ и между башмаком НКТ и забоем
 
     from open_pz import CreatePZ
-    nkt_l = sum(list(CreatePZ.dict_nkt.values()))
+    nkt_l = round(sum(list(CreatePZ.dict_nkt.values())),1)
     if CreatePZ.column_additional == False:
 
         v_pod_gno = 3.14 * (int(CreatePZ.column_diametr) - int(CreatePZ.column_wall_thickness) * 2) ** 2 / 4 / 1000 * (
                 CreatePZ.current_bottom - int(nkt_l)) / 1000
-    elif sum(list(CreatePZ.dict_nkt.values())) > CreatePZ.head_column_additional:
+    elif round(sum(list(CreatePZ.dict_nkt.values())),1) > CreatePZ.head_column_additional:
         v_pod_gno = 3.14 * (CreatePZ.column_diametr - CreatePZ.column_wall_thickness * 2) ** 2 / 4 / 1000 * (
                 CreatePZ.head_column_additional - nkt_l) / 1000 + 3.14 * (
                             CreatePZ.column_additional_diametr - CreatePZ.column_additional_wall_thickness * 2) ** 2 / 4 / 1000 * (

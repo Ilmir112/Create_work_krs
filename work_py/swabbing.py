@@ -4,21 +4,23 @@ import H2S
 import krs
 from krs import well_volume
 
+
 def swabbing_opy(self):
     from open_pz import CreatePZ
 
     depth_opy, ok = QInputDialog.getInt(self, 'Понижение уровня', 'Введите глубину понижения уровня:', 1000, 0, 3000)
     nkt_diam = ''.join(['73' if CreatePZ.column_diametr > 110 or (
-                CreatePZ.column_diametr > 110 and CreatePZ.column_additional == True and CreatePZ.head_column_additional < depth_opy == True) else '60'])
+            CreatePZ.column_diametr > 110 and CreatePZ.column_additional == True and CreatePZ.head_column_additional < depth_opy == True) else '60'])
 
-    if CreatePZ.column_additional == False or CreatePZ.column_additional == True and CreatePZ.current_bottom < CreatePZ.head_column_additional and CreatePZ.head_column_additional>600:
+    if CreatePZ.column_additional == False or CreatePZ.column_additional == True and CreatePZ.current_bottom < CreatePZ.head_column_additional and CreatePZ.head_column_additional > 600:
         paker_select = f'воронку со свабоограничителем + НКТ{nkt_diam}м  + НКТ 10м + репер'
         dict_nkt = {73: depth_opy}
     elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr < 110 and CreatePZ.current_bottom > CreatePZ.head_column_additional:
-        paker_select = f'воронку со свабоограничителем + НКТ60мм 10м + репер +НКТ60мм {round(CreatePZ.current_bottom-CreatePZ.head_column_additional+10, 0)}м'
-        dict_nkt = {73: CreatePZ.head_column_additional, 60: int(CreatePZ.current_bottom - CreatePZ.head_column_additional)}
+        paker_select = f'воронку со свабоограничителем + НКТ60мм 10м + репер +НКТ60мм {round(CreatePZ.current_bottom - CreatePZ.head_column_additional + 10, 0)}м'
+        dict_nkt = {73: CreatePZ.head_column_additional,
+                    60: int(CreatePZ.current_bottom - CreatePZ.head_column_additional)}
     elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr > 110 and CreatePZ.current_bottom > CreatePZ.head_column_additional:
-        paker_select = f'воронку со свабоограничителем+ НКТ73мм со снятыми фасками  + НКТ73мм со снятыми фасками 10м {round(CreatePZ.current_bottom-CreatePZ.head_column_additional+10, 0)}м'
+        paker_select = f'воронку со свабоограничителем+ НКТ73мм со снятыми фасками  + НКТ73мм со снятыми фасками 10м {round(CreatePZ.current_bottom - CreatePZ.head_column_additional + 10, 0)}м'
         dict_nkt = {73: depth_opy}
     elif nkt_diam == 60:
         dict_nkt = {60: depth_opy}
@@ -40,7 +42,7 @@ def swabbing_opy(self):
                      f'{CreatePZ.fluid_work} до глубины {CreatePZ.current_bottom}м.', None, None, None, None, None,
          None, None,
          'Мастер КРС', None],
-        [None, None, f'Приподнять  воронку до глубины {depth_opy+200}м',
+        [None, None, f'Приподнять  воронку до глубины {depth_opy + 200}м',
          None, None, None, None, None, None, None,
          'мастер КРС', 0.4],
         [None, None,
@@ -68,7 +70,7 @@ def swabbing_opy(self):
          'Мастер КРС, подрядчик по ГИС', None]]
 
     fluid_change_quest = QMessageBox.question(self, 'Смена объема',
-                                               'Нужна ли смена удельного веса рабочей жидкости?')
+                                              'Нужна ли смена удельного веса рабочей жидкости?')
     if fluid_change_quest == QMessageBox.StandardButton.Yes:
 
         expected_pressure, ok = QInputDialog.getDouble(self, 'Ожидаемое давление по пласту',
@@ -83,9 +85,12 @@ def swabbing_opy(self):
                 CreatePZ.fluid_work = f'{fluid_new}г/см3 '
         else:
             if len(CreatePZ.cat_H2S_list) == 1:
-                CreatePZ.cat_H2S_list.append(QInputDialog.getInt(self, 'Категория', 'Введите категорию скважины по H2S на вскрываемый пласт', 2,1,3))
+                CreatePZ.cat_H2S_list.append(
+                    QInputDialog.getInt(self, 'Категория', 'Введите категорию скважины по H2S на вскрываемый пласт', 2,
+                                        1, 3))
                 CreatePZ.H2S_pr.append(float(
-                    QInputDialog.getDouble(self, 'Сероводород', 'Введите содержание сероводорода в %', 50, 0, 1000, 2)[0]))
+                    QInputDialog.getDouble(self, 'Сероводород', 'Введите содержание сероводорода в %', 50, 0, 1000, 2)[
+                        0]))
                 CreatePZ.H2S_mg.append(float(
                     QInputDialog.getDouble(self, 'Сероводород', 'Введите содержание сероводорода в мг/л', 50, 0, 1000,
                                            2)[0]))
@@ -102,19 +107,19 @@ def swabbing_opy(self):
                     CreatePZ.fluid_work = f'{fluid_new}г/см3 '
         if len(CreatePZ.dict_perforation_project) != 0:
             plast, ok = QInputDialog.getItem(self, 'выбор пласта для расчета ЖГС ', 'выберете пласта для перфорации',
-                                     CreatePZ.plast_all, -1, False)
+                                             CreatePZ.plast_all, -1, False)
             expected_pressure = CreatePZ.dict_perforation_project[plast]['давление']
             CreatePZ.fluid_work = CreatePZ.dict_perforation_project[plast]['рабочая жидкость']
         else:
             plast, ok = QInputDialog.getText(self, 'выбор пласта для расчета ЖГС ', 'введите пласт для перфорации')
 
         fluid_change_list = [[None, None,
-                          f'Допустить до {CreatePZ.current_bottom}м. Произвести смену объема обратной промывкой по круговой циркуляции  жидкостью  {CreatePZ.fluid_work} '
-                          f'(по расчету по вскрываемому пласта {plast} Рожид- {expected_pressure}атм) в объеме не '
-                          f'менее {round(krs.well_volume(self, CreatePZ.current_bottom), 1)}м3  в присутствии представителя заказчика, Составить акт. '
-                          f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ)',
-                          None, None, None, None, None, None, None,
-                          'мастер КРС', round(2.5, 1)],
+                              f'Допустить до {CreatePZ.current_bottom}м. Произвести смену объема обратной промывкой по круговой циркуляции  жидкостью  {CreatePZ.fluid_work} '
+                              f'(по расчету по вскрываемому пласта {plast} Рожид- {expected_pressure}атм) в объеме не '
+                              f'менее {round(krs.well_volume(self, CreatePZ.current_bottom), 1)}м3  в присутствии представителя заказчика, Составить акт. '
+                              f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ)',
+                              None, None, None, None, None, None, None,
+                              'мастер КРС', round(2.5, 1)],
                              [None, None,
                               f'Поднять {paker_select} на НКТ{nkt_diam} c глубины {CreatePZ.current_bottom}м с доливом скважины в '
                               f'объеме {round((CreatePZ.current_bottom) * 1.12 / 1000, 1)}м3 удельным весом {CreatePZ.fluid_work}',
@@ -127,12 +132,14 @@ def swabbing_opy(self):
             paker_list.append(row)
     else:
         paker_list.append([None, None,
-         f'Поднять {paker_select} на НКТ{nkt_diam} c глубины {depth_opy + 200}м с доливом скважины в '
-         f'объеме {round((depth_opy + 200) * 1.12 / 1000, 1)}м3 удельным весом {CreatePZ.fluid_work}',
-         None, None, None, None, None, None, None,
-         'мастер КРС',
-         round(0.25 + 0.033 * 1.2 * (depth_opy + 200) / 9.5 * 1.04, 1)])
+                           f'Поднять {paker_select} на НКТ{nkt_diam} c глубины {depth_opy + 200}м с доливом скважины в '
+                           f'объеме {round((depth_opy + 200) * 1.12 / 1000, 1)}м3 удельным весом {CreatePZ.fluid_work}',
+                           None, None, None, None, None, None, None,
+                           'мастер КРС',
+                           round(0.25 + 0.033 * 1.2 * (depth_opy + 200) / 9.5 * 1.04, 1)])
     return paker_list
+
+
 def swabbing_with_paker(self, paker_khost, pakerKompo):
     from open_pz import CreatePZ
     from work_py.opressovka import paker_diametr_select
@@ -143,17 +150,17 @@ def swabbing_with_paker(self, paker_khost, pakerKompo):
         self.le.setText(swab)
     swab_volume, ok = QInputDialog.getInt(self, 'объем освоения', 'Введите Объем освоения', 20, 2, 60)
 
-    if swab ==  'Задача №2.1.13':#, 'Задача №2.1.16', 'Задача №2.1.11', 'своя задача']'
-        swab_select = f'Произвести  геофизические исследования по технологической задаче № 2.1.13 Определение профиля '\
-         f'и состава притока, дебита, источника обводнения и технического состояния эксплуатационной колонны и НКТ '\
-         f'после свабирования с отбором жидкости не менее {swab_volume}м3. \n'\
-         f'Пробы при свабировании отбирать в стандартной таре на {swab_volume-10}, {swab_volume-5}, {swab_volume}м3,' \
-          f' своевременно подавать телефонограммы на завоз тары и вывоз проб'
+    if swab == 'Задача №2.1.13':  # , 'Задача №2.1.16', 'Задача №2.1.11', 'своя задача']'
+        swab_select = f'Произвести  геофизические исследования по технологической задаче № 2.1.13 Определение профиля ' \
+                      f'и состава притока, дебита, источника обводнения и технического состояния эксплуатационной колонны и НКТ ' \
+                      f'после свабирования с отбором жидкости не менее {swab_volume}м3. \n' \
+                      f'Пробы при свабировании отбирать в стандартной таре на {swab_volume - 10}, {swab_volume - 5}, {swab_volume}м3,' \
+                      f' своевременно подавать телефонограммы на завоз тары и вывоз проб'
     elif swab == 'Задача №2.1.16':
-        swab_select = f'Произвести  геофизические исследования по технологической задаче № 2.1.16 Определение дебита и '\
-                       f'обводнённости по прослеживанию уровней, ВНР и по регистрации забойного давления после освоения '\
-                       f'свабированием  не менее не менее {swab_volume}м3. \n'\
-                       f'Пробы при свабировании отбирать в стандартной таре на {swab_volume - 10}, {swab_volume - 5}, {swab_volume}м3,' \
+        swab_select = f'Произвести  геофизические исследования по технологической задаче № 2.1.16 Определение дебита и ' \
+                      f'обводнённости по прослеживанию уровней, ВНР и по регистрации забойного давления после освоения ' \
+                      f'свабированием  не менее не менее {swab_volume}м3. \n' \
+                      f'Пробы при свабировании отбирать в стандартной таре на {swab_volume - 10}, {swab_volume - 5}, {swab_volume}м3,' \
                       f' своевременно подавать телефонограммы на завоз тары и вывоз проб'
     elif swab == 'Задача №2.1.11':
         swab_select = f'Произвести  геофизические исследования по технологической задаче № 2.1.11  свабирование в объеме не ' \
@@ -162,9 +169,9 @@ def swabbing_with_paker(self, paker_khost, pakerKompo):
                       f'Обязательная сдача в этот день в ЦДНГ'
 
     paker_depth, ok = QInputDialog.getInt(None, 'посадка пакера',
-                                          f'Введите глубину посадки пакера при освоении для перфорации ', int(CreatePZ.perforation_roof - 40), 0,
+                                          f'Введите глубину посадки пакера при освоении для перфорации ',
+                                          int(CreatePZ.perforation_roof - 40), 0,
                                           5000)
-
 
     paker_khost1 = int(CreatePZ.perforation_sole - paker_depth)
     print(f'хвостовик {paker_khost1}')
@@ -173,9 +180,10 @@ def swabbing_with_paker(self, paker_khost, pakerKompo):
                                               f'Введите длину хвостовика кровли ИП{CreatePZ.perforation_roof} и глубины посадки пакера {paker_depth}',
                                               10, 0, 4000)
 
-    nkt_diam = ''.join(['73' if CreatePZ.column_diametr > 110 or (CreatePZ.column_diametr > 110 and CreatePZ.column_additional == True and CreatePZ.head_column_additional > 700) else '60'])
+    nkt_diam = ''.join(['73' if CreatePZ.column_diametr > 110 or (
+                CreatePZ.column_diametr > 110 and CreatePZ.column_additional == True and CreatePZ.head_column_additional > 700) else '60'])
 
-    if CreatePZ.column_additional == False or CreatePZ.column_additional == True and paker_depth < CreatePZ.head_column_additional and CreatePZ.head_column_additional>600:
+    if CreatePZ.column_additional == False or CreatePZ.column_additional == True and paker_depth < CreatePZ.head_column_additional and CreatePZ.head_column_additional > 600:
         paker_select = f'воронку со свабоограничителем + НКТ{nkt_diam}м {paker_khost}м + пакер ПРО-ЯМО-{paker_diametr_select(paker_depth)}мм (либо аналог) ' \
                        f'для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм + НКТ 10м'
         dict_nkt = {73: paker_depth + paker_khost}
@@ -199,7 +207,7 @@ def swabbing_with_paker(self, paker_khost, pakerKompo):
          'мастер КРС', round(
             CreatePZ.current_bottom / 9.52 * 1.51 / 60 * 1.2 * 1.2 * 1.04 + 0.18 + 0.008 * CreatePZ.current_bottom / 9.52 + 0.003 * CreatePZ.current_bottom / 9.52,
             2)],
-        [None, None, f'Посадить пакер на глубине {paker_depth}м, воронку на глубине {paker_khost+paker_depth}м'
+        [None, None, f'Посадить пакер на глубине {paker_depth}м, воронку на глубине {paker_khost + paker_depth}м'
             ,
          None, None, None, None, None, None, None,
          'мастер КРС', 0.4],
@@ -256,22 +264,38 @@ def swabbing_with_paker(self, paker_khost, pakerKompo):
          None, None, None, None, None, None, None,
          'Мастер КРС', 0.5],
         [None, None,
-           f'Поднять {paker_select} на НКТ{nkt_diam} c глубины {paker_depth}м с доливом скважины в '
-           f'объеме {round(paker_depth * 1.12 / 1000, 1)}м3 удельным весом {CreatePZ.fluid_work}',
-           None, None, None, None, None, None, None,
-           'мастер КРС',
-           round(0.25 + 0.033 * 1.2 * (paker_depth + paker_khost) / 9.5 * 1.04, 1)]
+         f'Поднять {paker_select} на НКТ{nkt_diam} c глубины {paker_depth}м с доливом скважины в '
+         f'объеме {round(paker_depth * 1.12 / 1000, 1)}м3 удельным весом {CreatePZ.fluid_work}',
+         None, None, None, None, None, None, None,
+         'мастер КРС',
+         round(0.25 + 0.033 * 1.2 * (paker_depth + paker_khost) / 9.5 * 1.04, 1)]
     ]
     if pakerKompo == 2:
-        paker_list[1] = [None, None, f'Посадить пакера на глубине {paker_depth}/{paker_depth-paker_khost}м'
+        paker_list[1] = [None, None, f'Посадить пакера на глубине {paker_depth}/{paker_depth - paker_khost}м'
             ,
-         None, None, None, None, None, None, None,
-         'мастер КРС', 0.4]
+                         None, None, None, None, None, None, None,
+                         'мастер КРС', 0.4]
+    # Добавление привязки компоновки при посадке пакера близко к интервалу перфорации
+    for plast in list(CreatePZ.dict_perforation.keys()):
+        for interval in CreatePZ.dict_perforation[plast]['интервал']:
+            if abs(float(interval[1] - paker_depth)) > 10 or abs(float(interval[0] - paker_depth)) > 10:
+                if [None, None,f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС "Ойл-сервис". '
+                                      f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером от 14.10.2021г. '
+                                      f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины',
+                                      None, None, None, None, None, None, None,
+                                      'Мастер КРС, подрядчик по ГИС', 4] not in paker_list:
+                    paker_list.insert(1, [None, None,
+                                      f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС "Ойл-сервис". '
+                                      f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером от 14.10.2021г. '
+                                      f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины',
+                                      None, None, None, None, None, None, None,
+                                      'Мастер КРС, подрядчик по ГИС', 4])
+
     return paker_list
+
 
 def swabbing_with_voronka(self):
     from open_pz import CreatePZ
-    from work_py.opressovka import paker_diametr_select
 
     swab_list = ['Задача №2.1.13', 'Задача №2.1.16', 'Задача №2.1.11', 'своя задача']
     swab, ok = QInputDialog.getItem(self, 'Вид освоения', 'Введите задачу при свабе:', swab_list, 0, False)
@@ -279,17 +303,17 @@ def swabbing_with_voronka(self):
         self.le.setText(swab)
     swab_volume, ok = QInputDialog.getInt(self, 'объем освоения', 'Введите Объем освоения', 20, 2, 60)
 
-    if swab ==  'Задача №2.1.13':#, 'Задача №2.1.16', 'Задача №2.1.11', 'своя задача']'
-        swab_select = f'Произвести  геофизические исследования по технологической задаче № 2.1.13 Определение профиля '\
-         f'и состава притока, дебита, источника обводнения и технического состояния эксплуатационной колонны и НКТ '\
-         f'после свабирования с отбором жидкости не менее {swab_volume}м3. \n'\
-         f'Пробы при свабировании отбирать в стандартной таре на {swab_volume-10}, {swab_volume-5}, {swab_volume}м3,' \
-          f' своевременно подавать телефонограммы на завоз тары и вывоз проб'
+    if swab == 'Задача №2.1.13':  # , 'Задача №2.1.16', 'Задача №2.1.11', 'своя задача']'
+        swab_select = f'Произвести  геофизические исследования по технологической задаче № 2.1.13 Определение профиля ' \
+                      f'и состава притока, дебита, источника обводнения и технического состояния эксплуатационной колонны и НКТ ' \
+                      f'после свабирования с отбором жидкости не менее {swab_volume}м3. \n' \
+                      f'Пробы при свабировании отбирать в стандартной таре на {swab_volume - 10}, {swab_volume - 5}, {swab_volume}м3,' \
+                      f' своевременно подавать телефонограммы на завоз тары и вывоз проб'
     elif swab == 'Задача №2.1.16':
-        swab_select = f'Произвести  геофизические исследования по технологической задаче № 2.1.16 Определение дебита и '\
-                       f'обводнённости по прослеживанию уровней, ВНР и по регистрации забойного давления после освоения '\
-                       f'свабированием  не менее не менее {swab_volume}м3. \n'\
-                       f'Пробы при свабировании отбирать в стандартной таре на {swab_volume - 10}, {swab_volume - 5}, {swab_volume}м3,' \
+        swab_select = f'Произвести  геофизические исследования по технологической задаче № 2.1.16 Определение дебита и ' \
+                      f'обводнённости по прослеживанию уровней, ВНР и по регистрации забойного давления после освоения ' \
+                      f'свабированием  не менее не менее {swab_volume}м3. \n' \
+                      f'Пробы при свабировании отбирать в стандартной таре на {swab_volume - 10}, {swab_volume - 5}, {swab_volume}м3,' \
                       f' своевременно подавать телефонограммы на завоз тары и вывоз проб'
     elif swab == 'Задача №2.1.11':
         swab_select = f'Произвести  геофизические исследования по технологической задаче № 2.1.11  свабирование в объеме не ' \
@@ -298,7 +322,8 @@ def swabbing_with_voronka(self):
                       f'Обязательная сдача в этот день в ЦДНГ'
 
     paker_depth, ok = QInputDialog.getInt(None, 'посадка пакера',
-                                          f'Введите глубину посадки пакера при освоении для перфорации {CreatePZ.dict_work_pervorations}', int(CreatePZ.perforation_roof - 40), 0,
+                                          f'Введите глубину посадки пакера при освоении для перфорации {CreatePZ.dict_work_pervorations}',
+                                          int(CreatePZ.perforation_roof - 40), 0,
                                           5000)
     paker_khost1 = int(CreatePZ.perforation_sole - paker_depth)
     print(f'хвостовик {paker_khost1}')
@@ -314,12 +339,6 @@ def swabbing_with_voronka(self):
     elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr < 110 and paker_depth > CreatePZ.head_column_additional:
         paker_select = f'воронку + НКТ{60}мм  + НКТ60мм 10м '
         dict_nkt = {73: CreatePZ.head_column_additional, 60: int(paker_depth - CreatePZ.head_column_additional)}
-    # elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr > 110 and paker_depth > CreatePZ.head_column_additional:
-    #     paker_select = f'воронку + НКТ73мм со снятыми фасками {paker_khost}м + пакер ПРО-ЯМО-{paker_diametr_select(paker_depth)}мм (либо аналог) ' \
-    #                    f'для ЭК {CreatePZ.column_additional_diametr}мм х {CreatePZ.column_additional_wall_thickness}мм + НКТ73мм со снятыми фасками 10м'
-    #     dict_nkt = {73: paker_depth + paker_khost}
-    # elif nkt_diam == 60:
-    #     dict_nkt = {60: paker_depth + paker_khost}
 
     paker_list = [
         [None, None,
@@ -368,11 +387,11 @@ def swabbing_with_voronka(self):
          None, None, None, None, None, None, None,
          'Мастер КРС', 0.5],
         [None, None,
-           f'Поднять {paker_select} на НКТ{nkt_diam} c глубины {paker_depth}м с доливом скважины в '
-           f'объеме {round(paker_depth * 1.12 / 1000, 1)}м3 удельным весом {CreatePZ.fluid_work}',
-           None, None, None, None, None, None, None,
-           'мастер КРС',
-           round(0.25 + 0.033 * 1.2 * (paker_depth) / 9.5 * 1.04, 1)]
+         f'Поднять {paker_select} на НКТ{nkt_diam} c глубины {paker_depth}м с доливом скважины в '
+         f'объеме {round(paker_depth * 1.12 / 1000, 1)}м3 удельным весом {CreatePZ.fluid_work}',
+         None, None, None, None, None, None, None,
+         'мастер КРС',
+         round(0.25 + 0.033 * 1.2 * (paker_depth) / 9.5 * 1.04, 1)]
     ]
 
     return paker_list

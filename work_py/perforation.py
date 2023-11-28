@@ -27,7 +27,9 @@ class TabPage_SO(QWidget):
         self.ComboBoxCharges.setProperty("value", 'ГП')
 
         self.labelHolesMetr = QLabel("отверстий на 1п.м", self)
-        self.lineEditHolesMetr = QSpinBox(self)
+        self.lineEditHolesMetr = QComboBox(self)
+        self.lineEditHolesMetr.addItems(['6', '8', '10', '16', '18', '20', '30'])
+        self.ComboBoxCharges.setProperty("value", '20')
         # self.lineEditHolesMetr.setClearButtonEnabled(True)
 
         # self.labelCountHoles = QLabel("Количество отверстий", self)
@@ -112,6 +114,7 @@ class PervorationWindow(MyWindow):
 
 
     def addPerfProject(self):
+        from open_pz import CreatePZ
 
         chargePM = QInputDialog.getInt(self, 'кол-во отверстий на 1 п.м.',
                                                       'кол-во отверстий на 1 п.м.', 20, 5,
@@ -122,6 +125,7 @@ class PervorationWindow(MyWindow):
         # print(f' текущий ПВР {self.dict_work_pervorations}')
         rows = self.tableWidget.rowCount()
         if len(self.dict_perforation_project) != 0:
+
 
             for plast, data in self.dict_perforation_project.items():
                 for i in data['интервал']:
@@ -139,20 +143,22 @@ class PervorationWindow(MyWindow):
                     self.tableWidget.setItem(rows, 6, QTableWidgetItem(' '))
 
         else:
-            for plast, data in self.dict_work_pervorations.items():
-                for i in data['интервал']:
-                    count_charge = int((max(i)-min(i))*chargePM)
-                    # print(i)
-                    # print(str(min(i)))
-                    self.tableWidget.insertRow(rows)
-                    self.tableWidget.setItem(rows, 0, QTableWidgetItem(str(min(i))))
-                    self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(max(i))))
-                    self.tableWidget.setItem(rows, 2, QTableWidgetItem(self.charge(max(i))))
-                    self.tableWidget.setItem(rows, 3, QTableWidgetItem(str(chargePM)))
-                    self.tableWidget.setItem(rows, 4, QTableWidgetItem(str(count_charge)))
 
-                    self.tableWidget.setItem(rows, 5, QTableWidgetItem(plast))
-                    self.tableWidget.setItem(rows, 6, QTableWidgetItem(' '))
+            for plast, data in self.dict_work_pervorations.items():
+                if self.dict_work_pervorations[plast]['отключение'] == False:
+                    for i in data['интервал']:
+                        count_charge = int((max(i)-min(i))*chargePM)
+                        # print(i)
+                        # print(str(min(i)))
+                        self.tableWidget.insertRow(rows)
+                        self.tableWidget.setItem(rows, 0, QTableWidgetItem(str(min(i))))
+                        self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(max(i))))
+                        self.tableWidget.setItem(rows, 2, QTableWidgetItem(self.charge(max(i))))
+                        self.tableWidget.setItem(rows, 3, QTableWidgetItem(str(chargePM)))
+                        self.tableWidget.setItem(rows, 4, QTableWidgetItem(str(count_charge)))
+
+                        self.tableWidget.setItem(rows, 5, QTableWidgetItem(plast))
+                        self.tableWidget.setItem(rows, 6, QTableWidgetItem(' '))
         self.tableWidget.setSortingEnabled(True)
 
 
@@ -177,16 +183,12 @@ class PervorationWindow(MyWindow):
         editType = self.tabWidget.currentWidget().lineEditType.text()
         editType2 = self.tabWidget.currentWidget().lineEditType2.text()
         chargesx= str(self.tabWidget.currentWidget().ComboBoxCharges.currentText())
-        editHolesMetr = self.tabWidget.currentWidget().lineEditHolesMetr.setRange(8, 30)
+        editHolesMetr = self.tabWidget.currentWidget().lineEditHolesMetr.currentText()
         editIndexFormation = self.tabWidget.currentWidget().lineEditIndexFormation.text()
         dopInformation = self.tabWidget.currentWidget().lineEditDopInformation.text()
-        if not editType or not editType2 or not chargesx or not editHolesMetr or not editIndexFormation:
+        if not editType or not editType2 or not chargesx or not editIndexFormation:
             msg = QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
             return
-
-
-
-
 
 
         self.tableWidget.setSortingEnabled(False)

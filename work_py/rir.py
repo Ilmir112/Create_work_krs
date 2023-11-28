@@ -61,7 +61,7 @@ def rir_rpp(self):
     for row in rir_work_list:
         rir_list.append(row)
     CreatePZ.current_bottom = rpkDepth
-    perf_new(self)
+    perf_new(self, rpkDepth, rpkDepth)
     return rir_list
 
 
@@ -164,34 +164,36 @@ def rir_rpk(self):
     for row in rir_work_list:
         rir_list.append(row)
     CreatePZ.current_bottom = rpkDepth
-    perf_new(self)
+    perf_new(self, rpkDepth, CreatePZ.current_bottom)
     return rir_list
 
-def perf_new(self):
+def perf_new(self, roofRir, solePir):
     from open_pz import CreatePZ
 
-    print(f' пласта до изоляции {CreatePZ.dict_work_pervorations}')
-    for plast in CreatePZ.plast_select:
-        if plast in CreatePZ.plast_all:
-            CreatePZ.dict_perforation[plast]['отключение'] = True
+    print(f' пласта до изоляции {CreatePZ.plast_work}')
+    for plast in CreatePZ.plast_work:
+        for interval in list((CreatePZ.dict_work_pervorations[plast]['интервал'])):
+           if roofRir <= list(interval)[0] <= solePir:
+                    CreatePZ.dict_work_pervorations[plast]['отключение'] = True
+    for plast in CreatePZ.plast_all:
+        for interval in list((CreatePZ.dict_perforation[plast]['интервал'])):
+            if roofRir <= list(interval)[0] <= solePir:
+                CreatePZ.dict_perforation[plast]['отключение'] = True
 
-        if plast in CreatePZ.plast_work:
-            CreatePZ.dict_work_pervorations[plast]['отключение'] = True
-    for nek in CreatePZ.plast_select:
-        if nek.replace('НЭК ', '') in list(CreatePZ.dict_leakiness['НЭК'].keys()):
-            CreatePZ.dict_leakiness['НЭК'][nek]['отключение'] == True
 
-    print(f' пласта рабоче {CreatePZ.dict_work_pervorations, CreatePZ.dict_perforation}')
     CreatePZ.plast_work = list(CreatePZ.dict_work_pervorations.keys())
-    try:
-        CreatePZ.perforation_roof = min(min(
-            [min(CreatePZ.dict_work_pervorations[i]['интервал']) for i in CreatePZ.plast_work]))
-        CreatePZ.perforation_sole = max(max(
-            [max(CreatePZ.dict_work_pervorations[i]['интервал']) for i in CreatePZ.plast_work]))
-        print(f'мин {CreatePZ.perforation_roof}, мак {CreatePZ.perforation_sole}')
-    except:
-        CreatePZ.perforation_roof = CreatePZ.current_bottom
-        CreatePZ.perforation_sole = CreatePZ.current_bottom
+    if len(CreatePZ.dict_leakiness) != 0:
+        for nek in list(CreatePZ.dict_leakiness['НЭК']['интервал'].keys()):
+            if roofRir <= float(nek.split('-')[0]) <= solePir:
+                CreatePZ.dict_leakiness['НЭК']['интервал'][nek] = True
+
+    CreatePZ.plast_work = []
+    CreatePZ.plast_all = list(CreatePZ.dict_perforation.keys())
+    for plast in CreatePZ.plast_all:
+        if CreatePZ.dict_perforation[plast]['отключение'] == False:
+            CreatePZ.plast_work.append(plast)
+    print(f' пласта рабоче {CreatePZ.plast_work}')
+
 
 
 def rpk_nkt(self, paker_depth):
@@ -369,7 +371,7 @@ def rirWithPero(self):
             rir_list.append(row)
 
         CreatePZ.current_bottom = rirRoof
-        perf_new(self)
+        perf_new(self,rirRoof,rirSole)
         if len(CreatePZ.dict_work_pervorations) != 0:
             rir_list.pop(-2)
 
@@ -438,7 +440,7 @@ def rirWithPero(self):
             rir_list.append(row)
 
         CreatePZ.current_bottom = rirRoof
-        perf_new(self)
+        perf_new(self,rirRoof, CreatePZ.current_bottom)
         if len(CreatePZ.dict_work_pervorations) != 0:
             rir_list.pop(-2)
 
@@ -511,7 +513,7 @@ def rir_paker(self):
        'Мастер КРС, подрядчик РИР, УСРСиСТ', 1.2]
         ]
     CreatePZ.current_bottom = rirRoof
-    perf_new(self)
+    perf_new(self, rirRoof, CreatePZ.current_bottom)
     if len(CreatePZ.dict_work_pervorations) != 0:
         rir_paker_list.pop(-2)
     for row in rir_paker_list:

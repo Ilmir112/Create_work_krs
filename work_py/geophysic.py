@@ -185,6 +185,8 @@ class GeophysicWindow(MyWindow):
                             if value[0] <= len(text) <= value[1]:
                                 text_width = key
                                 self.table_widget.setRowHeight(row, int(text_width))
+                    else:
+                        self.table_widget.setItem(row, column, QtWidgets.QTableWidgetItem(str('')))
 
         self.table_widget.setRowHeight(self.ins_ind, 60)
         self.table_widget.setRowHeight(self.ins_ind + 1, 60)
