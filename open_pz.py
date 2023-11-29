@@ -10,7 +10,7 @@ import krs
 from datetime import datetime
 from openpyxl import Workbook, load_workbook
 
-from PyQt5.QtWidgets import QInputDialog, QMessageBox
+from PyQt5.QtWidgets import QInputDialog, QMessageBox, QDialog
 
 from openpyxl.utils.cell import get_column_letter
 from openpyxl.styles import Border, Side, PatternFill, Font, GradientFill, Alignment
@@ -76,20 +76,22 @@ class CreatePZ(MyWindow):
     dict_work_pervorations = {}
     work_pervorations = []
     work_pervorations_dict = {}
-    paker_do = {'do': 0, 'posle': 0}
+    paker_do = {'do': 0, "posle": 0}
     column_additional = False
     well_number = None
     well_area = None
     values = []
-    H_F_paker_do = {'do': 0, 'posle': 0}
+    H_F_paker_do = {'do': 0, "posle": 0}
     perforation_roof = current_bottom
     perforation_sole = 0
-    dict_pump = {'do': '0', 'posle': '0'}
+    dict_pump = {'do': '0', "posle": '0'}
     leakiness_interval = []
-    dict_pump_h = {'do': 0, 'posle': 0}
+    dict_pump_h = {'do': 0, "posle": 0}
     ins_ind = 0
     len_razdel_1 = 0
     cat_P_1 = []
+
+    max_angle = 0
 
     H2S_pr = []
     cat_H2S_list = []
@@ -225,7 +227,7 @@ class CreatePZ(MyWindow):
                         except:
                             CreatePZ.current_bottom, ok = QInputDialog.getDouble(self, 'Текущий забоя',
                                                                                  'Введите Текущий забой равен', 1000, 1,
-                                                                                 4000, 1)
+                                                                                 CreatePZ.bottomhole_drill, 1)
                     elif 'месторождение ' == value:
                         CreatePZ.oilfield = row[col + 2]
 
@@ -344,9 +346,8 @@ class CreatePZ(MyWindow):
                         # print(f'хв{CreatePZ.data_column_additional}, {CreatePZ.column_additional}')
 
                         if CreatePZ.if_None(CreatePZ.data_column_additional) != 'отсут':
-                            if len(CreatePZ.data_column_additional.split('-')) > 1:
-                                CreatePZ.column_additional = True
-                                print(f' в скважине дополнительная колонны {CreatePZ.data_column_additional}')
+                            CreatePZ.column_additional = True
+                            print(f' в скважине дополнительная колонны {CreatePZ.data_column_additional}')
 
                         # print(CreatePZ.column_additional)
                         if CreatePZ.column_additional == True:
@@ -433,22 +434,21 @@ class CreatePZ(MyWindow):
                         CreatePZ.paker_do['do'] = CreatePZ.if_None(row[col + 4])
                         if CreatePZ.old_version == False:
 
-                            CreatePZ.paker_do['posle'] = CreatePZ.if_None(row[col + 9])
+                            CreatePZ.paker_do["posle"] = CreatePZ.if_None(row[col + 9])
                         elif CreatePZ.old_version == True:
-                            CreatePZ.paker_do['posle'] = CreatePZ.if_None(row[col +8])
+                            CreatePZ.paker_do["posle"] = CreatePZ.if_None(row[col +8])
 
                     elif value == 'Насос' and row[col + 2] == 'типоразмер':
                         if CreatePZ.if_None(row[col + 4]) != 'отсут':
                             CreatePZ.dict_pump['do'] = CreatePZ.if_None(row[col + 4])
 
                         if CreatePZ.old_version == True and CreatePZ.if_None(row[col + 8]) != 'отсут':
-                            try:
-                                CreatePZ.dict_pump['posle'] = CreatePZ.if_None(row[col + 8])
-                            except:
-                                CreatePZ.dict_pump['posle'] = CreatePZ.if_None(row[col + 8])
-                        elif CreatePZ.old_version == False and CreatePZ.if_None(row[col + 9]) != 'отсут':
-                            CreatePZ.dict_pump['posle'] = CreatePZ.if_None(row[col + 9])
+                            CreatePZ.dict_pump["posle"] = CreatePZ.if_None(row[col + 8])
 
+
+                        elif CreatePZ.old_version == False and CreatePZ.if_None(row[col + 9]) != 'отсут':
+                            CreatePZ.dict_pump["posle"] = CreatePZ.if_None(row[col + 9])
+                            print(f' насос спуск {CreatePZ.dict_pump["posle"]}')
 
                         # print(f' ячейка {ws.cell(row=row_ind + 5, column=col + 3).value}')
                         if ws.cell(row=row_ind + 5, column=col + 3).value == 'Нсп, м':
@@ -461,17 +461,18 @@ class CreatePZ(MyWindow):
                                     ws.cell(row=row_ind + 5, column=col + 5).value)
                             if CreatePZ.old_version == True:
                                 try:
-                                    CreatePZ.dict_pump_h['posle'] = CreatePZ.without_b(
+                                    CreatePZ.dict_pump_h["posle"] = CreatePZ.without_b(
                                         ws.cell(row=row_ind + 5, column=col + 9).value).split('/')
                                 except:
-                                    CreatePZ.dict_pump_h['posle'] = CreatePZ.without_b(
+                                    CreatePZ.dict_pump_h["posle"] = CreatePZ.without_b(
                                         ws.cell(row=row_ind + 5, column=col + 9).value)
                             else:
                                 try:
-                                    CreatePZ.dict_pump_h['posle'] = CreatePZ.without_b(
-                                        ws.cell(row=row_ind + 5, column=col + 10).value).split('/')
+                                    CreatePZ.dict_pump_h["posle"] = CreatePZ.without_b(
+                                        ws.cell(row=row_ind + 5, column=col + 10).value)
+                                    print(f' глубина насоса {CreatePZ.dict_pump_h["posle"]}')
                                 except:
-                                    CreatePZ.dict_pump_h['posle'] = CreatePZ.without_b(
+                                    CreatePZ.dict_pump_h["posle"] = CreatePZ.without_b(
                                         ws.cell(row=row_ind + 5, column=col + 10).value)
 
                     elif value == 'Н посадки, м':
@@ -485,29 +486,29 @@ class CreatePZ(MyWindow):
                                                                          1000, 0,
                                                                          int(CreatePZ.bottomhole_artificial))
                                 CreatePZ.H_F_paker_do['do'] = H_F_paker_do_2
-                        if CreatePZ.paker_do['posle'] != 'отсут':
+                        if CreatePZ.paker_do["posle"] != 'отсут':
                             try:
                                 if CreatePZ.old_version:
-                                    CreatePZ.H_F_paker_do['posle'] = CreatePZ.without_b(row[col + 6])
+                                    CreatePZ.H_F_paker_do["posle"] = CreatePZ.without_b(row[col + 6])
 
                                 else:
-                                    CreatePZ.H_F_paker_do['posle'] = CreatePZ.without_b(row[col + 7])
+                                    CreatePZ.H_F_paker_do["posle"] = CreatePZ.without_b(row[col + 7])
 
                             except:
                                 H_F_paker_do_2, ok = QInputDialog.getInt(self, 'Глубина посадки фондового пакера',
                                                                          'Глубина посадки фондового пакера после ремонта',
                                                                          1000, 0,
                                                                          int(CreatePZ.bottomhole_artificial))
-                                CreatePZ.paker_do['posle'] = H_F_paker_do_2
+                                CreatePZ.paker_do["posle"] = H_F_paker_do_2
         # вызов окна для проверки корректности данных
-        dialog = DataWindow()
-        dialog.show()
+        if self.data_window is None:
 
+            self.data_window = DataWindow(self)
+            self.data_window.setWindowTitle("Сверка данных")
+            self.data_window.setGeometry(200, 400, 300, 400)
 
+            self.data_window.show()
 
-        cat_well_mn, ok = QInputDialog.getInt(self, 'индекс начала копирования',
-                                               'Программа не смогла определить строку начала копирования',
-                                               0, 0, 800)
         if len(CreatePZ.cat_well_min) == 0:
             cat_well_min, ok = QInputDialog.getInt(self, 'индекс начала копирования',
                                                      'Программа не смогла определить строку начала копирования',
@@ -560,9 +561,9 @@ class CreatePZ(MyWindow):
                 CreatePZ.gipsInWell = False
 
         curator_list = ['ОР', 'ГТМ', 'ГРР', 'ГО', 'ВНС']
-        curator = ['ОР' if CreatePZ.if_None(CreatePZ.dict_pump['posle'][0]) == '0' else 'ГТМ'][0]
-        curator = ['ОР' if CreatePZ.if_None(CreatePZ.dict_pump['posle'][0]) == '0' else 'ГТМ'][0]
-        print(f'куратор {curator, CreatePZ.if_None(CreatePZ.dict_pump["do"][0])}')
+        curator = ['ОР' if CreatePZ.if_None(CreatePZ.dict_pump["posle"]) == '0' else 'ГТМ'][0]
+
+        print(f'куратор {curator, CreatePZ.if_None(CreatePZ.dict_pump["posle"])}')
 
         CreatePZ.curator, ok = QInputDialog.getItem(self, 'Выбор кураторов ремонта', 'Введите сектор кураторов региона',
                                                     curator_list, curator_list.index(curator), False)
@@ -587,11 +588,11 @@ class CreatePZ(MyWindow):
 
             CreatePZ.lift_ecn_can = True
         elif CreatePZ.column_additional == True:
-            if ('ЭЦН' in str(CreatePZ.dict_pump['posle']).upper() or 'ВНН' in str(CreatePZ.dict_pump['posle']).upper()) and CreatePZ.dict_pump_h["posle"] < CreatePZ.head_column_additional:
+            if ('ЭЦН' in str(CreatePZ.dict_pump["posle"]).upper() or 'ВНН' in str(CreatePZ.dict_pump["posle"]).upper()) and CreatePZ.dict_pump_h["posle"] < CreatePZ.head_column_additional:
                 CreatePZ.lift_ecn_can = True
 
-            elif ('ЭЦН' in str(CreatePZ.dict_pump['posle'].upper()) or 'ВНН' in str(CreatePZ.dict_pump[
-                'posle'].upper())) and CreatePZ.dict_pump_h["posle"] > CreatePZ.head_column_additional:
+            elif ('ЭЦН' in str(CreatePZ.dict_pump["posle"].upper()) or 'ВНН' in str(CreatePZ.dict_pump[
+                "posle"].upper())) and CreatePZ.dict_pump_h["posle"] > CreatePZ.head_column_additional:
 
                 CreatePZ.lift_ecn_can_addition = True
             # print(f' ЭЦН длина" {CreatePZ.lift_ecn_can, CreatePZ.lift_ecn_can_addition, "ЭЦН" in str(CreatePZ.dict_pump["posle"][0]).upper()}')
@@ -605,7 +606,7 @@ class CreatePZ(MyWindow):
                     if str(col) in ['1', '2', '3']:
                         CreatePZ.cat_P_1.append(int(col))
             if 'по H2S' == ws.cell(row=row, column=2).value:
-                CreatePZ.cat_H2S_list = []
+
                 for column in range(1, 13):
                     col = ws.cell(row=row, column=column).value
 

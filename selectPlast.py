@@ -34,6 +34,10 @@ class CheckBoxDialog(QDialog):
                 if self.plast.text() not in selected_options:
                     selected_options.append(self.plast.text())
 
+        for plast in CreatePZ.plast_project:
+            if self.plast.isChecked():
+                if self.plast.text() not in selected_options:
+                    selected_options.append(self.plast.text())
 
         print("Selected options:", selected_options)
         CreatePZ.plast_select = ', '.join(selected_options)

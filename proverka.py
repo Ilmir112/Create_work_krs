@@ -1,25 +1,25 @@
-from openpyxl import Workbook
-from openpyxl.drawing.image import Image
-from PIL import Image as PILImage
+from PyQt5.QtWidgets import QApplication, QDialog, QVBoxLayout, QPushButton, QLabel
 
-# Создаем новую книгу
-workbook = Workbook()
-sheet = workbook.active
+class SecondWindow(QDialog):
+    def __init__(self, parent=None):
+        super(SecondWindow, self).__init__(parent)
+        self.setWindowTitle('Second Window')
 
-# Загружаем изображение с помощью библиотеки Pillow
-img = PILImage.open('example.png')
+        save_button = QPushButton("Сохранить", self)
+        save_button.clicked.connect(self.save_button_clicked)
 
-# Сохраняем изображение во временном файле
-img_path = 'temp.png'
-img.save(img_path)
+        layout = QVBoxLayout()
+        layout.addWidget(QLabel("Дополнительное окно"))
+        layout.addWidget(save_button)
+        self.setLayout(layout)
 
-# Вставляем изображение в Excel-документ
-img = Image(img_path)
-sheet.add_image(img, 'A1')
+    def save_button_clicked(self):
+        self.accept()
 
-# Сохраняем книгу в файл
-workbook.save('example.xlsx')
-filename = 'imageFiles/Зуфаров.png'
-insert_image(filename, cell_coordinates='B3')
+app = QApplication()
 
-wb.save('example.xlsx') # сохраняем файл
+second_window = SecondWindow()
+second_window.setModal(True) # Сделать окно модальным
+second_window.show()
+
+sys.exit(app.exec_())

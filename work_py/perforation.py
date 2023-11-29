@@ -145,7 +145,9 @@ class PervorationWindow(MyWindow):
         else:
 
             for plast, data in self.dict_work_pervorations.items():
-                if self.dict_work_pervorations[plast]['отключение'] == False:
+                print(plast)
+
+                if self.dict_work_pervorations[plast]['отключение'] == True:
                     for i in data['интервал']:
                         count_charge = int((max(i)-min(i))*chargePM)
                         # print(i)

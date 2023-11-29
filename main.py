@@ -21,6 +21,7 @@ class MyWindow(QMainWindow):
         super().__init__()
         self.initUI()
         self.new_window = None
+        self.data_window = None
         self.ws = None
         self.ins_ind = None
         self.perforation_list = []
@@ -32,7 +33,7 @@ class MyWindow(QMainWindow):
     def initUI(self):
         from work_py.mouse import TableWidget
         self.setWindowTitle("Main Window")
-        self.setGeometry(500, 500, 400, 400)
+        self.setGeometry(200, 400, 400, 400)
 
         self.table_widget = None
 
@@ -295,6 +296,10 @@ class MyWindow(QMainWindow):
         emergency_menu.addAction(magnet_action)
         magnet_action.triggered.connect(self.magnet_action)
 
+        larNKT_action = QAction("печать + ЛАР", self)
+        emergency_menu.addAction(larNKT_action)
+        larNKT_action.triggered.connect(self.larNKT_action)
+
         acid_menu = action_menu.addMenu('Кислотная обработка')
 
         acid_action_1paker = QAction("на одном пакере", self)
@@ -383,6 +388,12 @@ class MyWindow(QMainWindow):
         from work_py.emergencyWork import magnetWork
         magnet_work_list = magnetWork(self)
         self.populate_row(self.ins_ind, magnet_work_list)
+
+    def larNKT_action(self):
+        from work_py.emergencyWork import emergencyNKT
+        emergencyNKT_list =emergencyNKT(self)
+        self.populate_row(self.ins_ind, emergencyNKT_list)
+
 
     def kot_work(self):
         from work_py.alone_oreration import kot_work

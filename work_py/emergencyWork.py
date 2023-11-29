@@ -1,3 +1,6 @@
+from PyQt5.QtWidgets import QInputDialog
+
+
 def magnet_select(self):
     from open_pz import CreatePZ
     if CreatePZ.column_additional == False or CreatePZ.column_additional == True and CreatePZ.current_bottom <= CreatePZ.head_column_additional:
@@ -68,3 +71,41 @@ def emergencyECN(self):
                        None, None, None, None, None, None, None,
                        'мастер КРС', 1.7],
     ]
+    return emergency_list
+
+def emergencyNKT(self):
+    from open_pz import  CreatePZ
+    emergenceBottom, ok  = QInputDialog.getDouble(self, 'Аварийный забой',
+                                  'Введите глубину аварийного забоя:', int(CreatePZ.current_bottom), 2, int(CreatePZ.bottomhole_drill),1)
+    emergencyNKT_list = emergency_list = [[None, None,
+         f'Спустить с замером торцевую печать на НКТ до Н={emergenceBottom}м (Аварийная голова) с замером . (При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ) ',
+         None, None, None, None, None, None, None,
+         'мастер КРС', None],
+                      [None, None,
+                       f'Произвести работу печатью на глубине {emergenceBottom}м с обратной промывкой с разгрузкой до 5т.',None, None, None, None, None, None, None,
+                       'мастер КРС', None],
+                      [None, None,
+                       f'Поднять компоновку с доливом тех жидкости в объеме 1,8м3.',
+                       None, None, None, None, None, None, None,
+                       'Мастер, подрядчик по ГИС', 6],
+                      [None, None,
+                       f'По результату ревизии печати, согласовать с ПТО  и УСРСиСТ  ООО "Башнефть-добыча" и подобрать ловильный инструмент',
+                       None, None, None, None, None, None, None,
+                       'мастер КРС', None],
+                      [None, None,
+                       f'Спустить с замером ловильный инструмент НКТдо Н= {emergenceBottom}м с замером . ',
+                       None, None, None, None, None, None, None,
+                       'мастер КРС', 6.5],
+                      [None, None,
+                       f'Произвести  ловильные работы при представителе заказчика на глубине {emergenceBottom}м.',
+                       None, None, None, None, None, None, None,
+                       'мастер КРС', 1.7],
+                      [None, None,
+                       f'Рассхадить и извлечь аварийный инструмент.',
+                       None, None, None, None, None, None, None,
+                       'мастер КРС', 7.2]]
+    CreatePZ.current_bottom, ok = QInputDialog.getDouble(self, 'Текущий забой',
+                                                         'Введите Текущий забой после ЛАР', CreatePZ.bottomhole_artificial, 1,
+                                                         CreatePZ.bottomhole_drill, 1)
+    return emergencyNKT_list
+

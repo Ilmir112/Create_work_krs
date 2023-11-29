@@ -108,10 +108,10 @@ def template_ek_without_skm(self):
 
     lift_ecn_can = {True: 30, False: 4}
     print(f' кровля ПВР {CreatePZ.perforation_roof}')
-    print(CreatePZ.dict_work_pervorations)
+    # print(CreatePZ.dict_work_pervorations)
     CreatePZ.nkt_diam = ''.join(['73' if CreatePZ.column_diametr > 110 else '60'])
     if CreatePZ.column_additional == False and CreatePZ.open_trunk_well == False and all([CreatePZ.dict_work_pervorations[plast]['отрайбировано'] for plast in CreatePZ.plast_work]) == False:
-
+        print(f'приветствие')
         template_str = f'перо + шаблон-{template_diam_ek()[0]}мм L-2м + НКТ{CreatePZ.nkt_diam}мм {int(CreatePZ.current_bottom - math.ceil(CreatePZ.perforation_roof)+8)}м ' \
                        f'+  НКТ{CreatePZ.nkt_diam}мм + шаблон-{template_diam_ek()[1]}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can]}м '
         ckm_teml = f'шаблон-{template_diam_ek()[1]}мм до гл.{math.ceil(CreatePZ.perforation_roof-8)}м)'

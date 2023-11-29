@@ -72,46 +72,47 @@ def swabbing_opy(self):
     fluid_change_quest = QMessageBox.question(self, 'Смена объема',
                                               'Нужна ли смена удельного веса рабочей жидкости?')
     if fluid_change_quest == QMessageBox.StandardButton.Yes:
+        if len(CreatePZ.dict_perforation_project) != 0:
+            plast, ok = QInputDialog.getItem(self, 'выбор пласта для расчета ЖГС ', 'выберете пласта для перфорации',
+                                             CreatePZ.plast_project, -1, False)
+            # expected_pressure = CreatePZ.dict_perforation_project[plast]['давление']
+            fluid_new = CreatePZ.dict_perforation_project[plast]['рабочая жидкость']
+        else:
+            plast, ok = QInputDialog.getText(self, 'выбор пласта для расчета ЖГС ', 'введите пласт для перфорации')
 
-        expected_pressure, ok = QInputDialog.getDouble(self, 'Ожидаемое давление по пласту',
-                                                       'Введите Ожидаемое давление по пласту', 0, 0, 300, 1)
-        fluid_new, ok = QInputDialog.getDouble(self, 'Новое значение удельного веса жидкости',
-                                               'Введите значение удельного веса жидкости', 1.02, 1, 1.72, 2)
+            expected_pressure, ok = QInputDialog.getDouble(self, 'Ожидаемое давление по пласту',
+                                                           'Введите Ожидаемое давление по пласту', 0, 0, 300, 1)
+            fluid_new, ok = QInputDialog.getDouble(self, 'Новое значение удельного веса жидкости',
+                                                   'Введите значение удельного веса жидкости', 1.02, 1, 1.72, 2)
         if len(CreatePZ.dict_work_pervorations) == 0 and len(CreatePZ.cat_H2S_list) > 1:
             if '2' in str(CreatePZ.cat_H2S_list[1]):
                 CreatePZ.fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
                                       f'расчета {H2S.calv_h2s(self, CreatePZ.cat_H2S_list[1], CreatePZ.H2S_mg[1], CreatePZ.H2S_pr[1])}кг/м3 '
             else:
                 CreatePZ.fluid_work = f'{fluid_new}г/см3 '
+
+        if len(CreatePZ.cat_H2S_list) == 1:
+            CreatePZ.cat_H2S_list.append(
+                QInputDialog.getInt(self, 'Категория', 'Введите категорию скважины по H2S на вскрываемый пласт', 2,
+                                    1, 3))
+            CreatePZ.H2S_pr.append(float(
+                QInputDialog.getDouble(self, 'Сероводород', 'Введите содержание сероводорода в %', 50, 0, 1000, 2)[
+                    0]))
+            CreatePZ.H2S_mg.append(float(
+                QInputDialog.getDouble(self, 'Сероводород', 'Введите содержание сероводорода в мг/л', 50, 0, 1000,
+                                       2)[0]))
+
+        if ('2' in str(CreatePZ.cat_H2S_list[1]) or '1' in str(CreatePZ.cat_H2S_list[1])) and (
+                '2' not in str(CreatePZ.cat_H2S_list[0]) or '1' not in str(CreatePZ.cat_H2S_list[0])):
+            CreatePZ.fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
+                                  f'расчета {H2S.calv_h2s(self, CreatePZ.cat_H2S_list[1], CreatePZ.H2S_mg[1], CreatePZ.H2S_pr[1])}кг/м3 '
+        elif ('2' in str(CreatePZ.cat_H2S_list[0]) or '1' in str(CreatePZ.cat_H2S_list[0])) and (
+                '2' not in str(CreatePZ.cat_H2S_list[1]) or '1' not in str(CreatePZ.cat_H2S_list[1])):
+            CreatePZ.fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
+                                  f'расчета {H2S.calv_h2s(self, CreatePZ.cat_H2S_list[0], CreatePZ.H2S_mg[0], CreatePZ.H2S_pr[0])}кг/м3 '
         else:
-            if len(CreatePZ.cat_H2S_list) == 1:
-                CreatePZ.cat_H2S_list.append(
-                    QInputDialog.getInt(self, 'Категория', 'Введите категорию скважины по H2S на вскрываемый пласт', 2,
-                                        1, 3))
-                CreatePZ.H2S_pr.append(float(
-                    QInputDialog.getDouble(self, 'Сероводород', 'Введите содержание сероводорода в %', 50, 0, 1000, 2)[
-                        0]))
-                CreatePZ.H2S_mg.append(float(
-                    QInputDialog.getDouble(self, 'Сероводород', 'Введите содержание сероводорода в мг/л', 50, 0, 1000,
-                                           2)[0]))
-            else:
-                if ('2' in str(CreatePZ.cat_H2S_list[1]) or '1' in str(CreatePZ.cat_H2S_list[1])) and (
-                        '2' not in str(CreatePZ.cat_H2S_list[0]) or '1' not in str(CreatePZ.cat_H2S_list[0])):
-                    CreatePZ.fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
-                                          f'расчета {H2S.calv_h2s(self, CreatePZ.cat_H2S_list[1], CreatePZ.H2S_mg[1], CreatePZ.H2S_pr[1])}кг/м3 '
-                elif ('2' in str(CreatePZ.cat_H2S_list[0]) or '1' in str(CreatePZ.cat_H2S_list[0])) and (
-                        '2' not in str(CreatePZ.cat_H2S_list[1]) or '1' not in str(CreatePZ.cat_H2S_list[1])):
-                    CreatePZ.fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
-                                          f'расчета {H2S.calv_h2s(self, CreatePZ.cat_H2S_list[0], CreatePZ.H2S_mg[0], CreatePZ.H2S_pr[0])}кг/м3 '
-                else:
-                    CreatePZ.fluid_work = f'{fluid_new}г/см3 '
-        if len(CreatePZ.dict_perforation_project) != 0:
-            plast, ok = QInputDialog.getItem(self, 'выбор пласта для расчета ЖГС ', 'выберете пласта для перфорации',
-                                             CreatePZ.plast_all, -1, False)
-            expected_pressure = CreatePZ.dict_perforation_project[plast]['давление']
-            CreatePZ.fluid_work = CreatePZ.dict_perforation_project[plast]['рабочая жидкость']
-        else:
-            plast, ok = QInputDialog.getText(self, 'выбор пласта для расчета ЖГС ', 'введите пласт для перфорации')
+            CreatePZ.fluid_work = f'{fluid_new}г/см3 '
+
 
         fluid_change_list = [[None, None,
                               f'Допустить до {CreatePZ.current_bottom}м. Произвести смену объема обратной промывкой по круговой циркуляции  жидкостью  {CreatePZ.fluid_work} '
