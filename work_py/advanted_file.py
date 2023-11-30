@@ -22,14 +22,14 @@ def skm_interval():
             str_raid.append([float(CreatePZ.H_F_paker_do["posle"]) - 20, float(CreatePZ.H_F_paker_do["posle"]) + 20])
         if CreatePZ.leakiness:
             for nek in list(CreatePZ.dict_leakiness['НЭК']['интервал'].keys()):
-                if int(nek.split('-')[1]) + 20 < CreatePZ.current_bottom:
-                    str_raid.append([int(nek.split('-')[0]) - 90, int(nek.split('-')[1]) + 20])
+                if int(float(nek.split('-')[1])) + 20 < CreatePZ.current_bottom:
+                    str_raid.append([int(float(nek.split('-')[0])) - 90, int(float(nek.split('-')[1])) + 20])
                 else:
-                    str_raid.append([int(nek.split('-')[0]) - 90,
+                    str_raid.append([int(float(nek.split('-')[0])) - 90,
                                      CreatePZ.CreatePZ.current_bottom - 2])
 
         for plast in CreatePZ.plast_all:
-            intervalPvr = list(CreatePZ.dict_work_pervorations[plast]['интервал'])
+            intervalPvr = list(CreatePZ.dict_perforation[plast]['интервал'])
             for pvr in intervalPvr:
                 print(pvr)
                 str_raid.append([pvr[0] - 90, pvr[1] - 10])
@@ -55,13 +55,13 @@ def skm_interval():
             if ',' not in skm_column:
                 a = []
                 for i in skm_column.split('-'):
-                    a.append(int(i))
+                    a.append(int(float(i)))
                 str_raid.append(a)
             else:
                 for skm in skm_column.split(','):
                     a = []
                     for i in skm.split('-'):
-                        a.append(int(i))
+                        a.append(int(float(i)))
                     str_raid.append(a)
 
     print(f' Скрепер {str_raid}')
@@ -148,14 +148,16 @@ def raid(a):
     from open_pz import CreatePZ
     print(a, len(a))
     if len(a) < 2:
-        return f'{int(a[0][0])} - {int(a[0][1])}'
+        return f'{int(float(a[0][0]))} - {int(float(a[0][1]))}'
+    if len(a) == 0:
+        return 'разбуренного цем моста'
     elif len(a) > 1 and CreatePZ.column_additional == True:
         d = ''
         for i in list(a):
             if CreatePZ.head_column_additional <= i[0]:
-                d += f'{int(i[0])} - {int(i[1])}, '
+                d += f'{int(float(i[0]))} - {int(float(i[1]))}, '
     else:
         d = ''
         for i in list(a):
-            d += f'{int(i[0])} - {int(i[1])}, '
+            d += f'{int(float(i[0]))} - {int(float(i[1]))}, '
     return d[:-2]

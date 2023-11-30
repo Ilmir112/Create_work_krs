@@ -11,17 +11,17 @@ class TabPage_SO(QWidget):
 
         self.columnLabel = QLabel("диаметр ЭК", self)
         self.columnType = QLineEdit(self)
-        self.columnType.setText(f"{CreatePZ.column_diametr}")
+        self.columnType.setText(f"{self.ifNone(CreatePZ.column_diametr)}")
         # self.columnType.setClearButtonEnabled(True)
 
         self.column_wall_thicknessLabel = QLabel("Толщина стенки ЭК", self)
         self.column_wall_thicknessEditType2 = QLineEdit(self)
-        self.column_wall_thicknessEditType2.setText(f"{CreatePZ.column_wall_thickness}")
+        self.column_wall_thicknessEditType2.setText(f"{self.ifNone(CreatePZ.column_wall_thickness)}")
         # self.column_wall_thicknessEditType2.setClearButtonEnabled(True)
 
         self.shoe_columnLabel = QLabel("башмак ЭК", self)
         self.shoe_columnEditType2 = QLineEdit(self)
-        self.shoe_columnEditType2.setText(f"{CreatePZ.shoe_column}")
+        self.shoe_columnEditType2.setText(f"{self.ifNone(CreatePZ.shoe_column)}")
         # self.shoe_columnEditType2.setClearButtonEnabled(True)
 
         self.column_add_trueLabel = QLabel("наличие Доп. колонны", self)
@@ -35,80 +35,81 @@ class TabPage_SO(QWidget):
 
         self.column_addLabel = QLabel("диаметр Доп. колонны", self)
         self.column_addEditType = QLineEdit(self)
-        self.column_addEditType.setText(f"{CreatePZ.column_additional_diametr}")
+        self.column_addEditType.setText(f"{self.ifNone(CreatePZ.column_additional_diametr)}")
         # self.column_addEditType.setClearButtonEnabled(True)
 
         self.column_add_wall_thicknessLabel = QLabel("Толщина стенки доп.колонны", self)
         self.column_add_wall_thicknessEditType2 = QLineEdit(self)
-        self.column_add_wall_thicknessEditType2.setText(F'{CreatePZ.column_additional_wall_thickness}')
+        self.column_add_wall_thicknessEditType2.setText(F'{self.ifNone(CreatePZ.column_additional_wall_thickness)}')
         # self.column_add_wall_thicknessEditType2.setClearButtonEnabled(True)
 
         self.head_column_addLabel = QLabel("Голова доп колонны", self)
         self.head_column_add_EditType2 = QLineEdit(self)
-        self.head_column_add_EditType2.setText(f'{CreatePZ.head_column_additional}')
+        self.head_column_add_EditType2.setText(f'{self.ifNone(CreatePZ.head_column_additional)}')
 
         self.shoe_column_addLabel = QLabel("башмак доп колонны", self)
         self.shoe_column_add_EditType2 = QLineEdit(self)
-        self.shoe_column_add_EditType2.setText(f'{CreatePZ.shoe_column_additional}')
+        self.shoe_column_add_EditType2.setText(f'{self.ifNone(CreatePZ.shoe_column_additional)}')
         # self.shoe_column_add_EditType2.setClearButtonEnabled(True)
 
         self.bottomhole_drill_Label = QLabel('Пробуренный забой')
         self.bottomhole_drill_EditType = QLineEdit(self)
-        self.bottomhole_drill_EditType.setText(f'{CreatePZ.bottomhole_drill}')
+        self.bottomhole_drill_EditType.setText(f'{self.ifNone(CreatePZ.bottomhole_drill)}')
 
         self.bottomhole_artificial_Label = QLabel('Искусственный забой')
         self.bottomhole_artificial_EditType = QLineEdit(self)
-        self.bottomhole_artificial_EditType.setText(f'{CreatePZ.bottomhole_artificial}')
+        self.bottomhole_artificial_EditType.setText(f'{self.ifNone(CreatePZ.bottomhole_artificial)}')
 
         self.current_bottom_Label = QLabel('Текущий забой')
         self.current_bottom_EditType = QLineEdit(self)
-        self.current_bottom_EditType.setText(f'{CreatePZ.current_bottom}')
+        self.current_bottom_EditType.setText(f'{self.ifNone(CreatePZ.current_bottom)}')
 
         self.max_angle_Label = QLabel('Максимальный угол')
         self.max_angle_EditType = QLineEdit(self)
-        self.max_angle_EditType.setText(f'{CreatePZ.max_angle}')
+        self.max_angle_EditType.setText(f'{self.ifNone(CreatePZ.max_angle)}')
 
         self.max_expected_pressure_Label = QLabel('Максимальный ожидаемое давление')
         self.max_expected_pressure_EditType = QLineEdit(self)
-        self.max_expected_pressure_EditType.setText(f'{CreatePZ.max_expected_pressure}')
+        self.max_expected_pressure_EditType.setText(f'{self.ifNone(CreatePZ.max_expected_pressure)}')
 
         self.max_admissible_pressure_Label = QLabel('Максимальный допустимое давление')
         self.max_admissible_pressure_EditType = QLineEdit(self)
-        self.max_admissible_pressure_EditType.setText(f'{CreatePZ.max_admissible_pressure}')
+        self.max_admissible_pressure_EditType.setText(f'{self.ifNone(CreatePZ.max_admissible_pressure)}')
 
         self.pump_do_Label = QLabel('Спущенный Насос')
         self.pump_do_EditType = QLineEdit(self)
-        self.pump_do_EditType.setText(f'{CreatePZ.dict_pump["do"]}')
+        self.pump_do_EditType.setText(f'{self.ifNone(CreatePZ.dict_pump["do"])}')
 
         self.pump_depth_do_Label = QLabel('Глубина спуска насоса')
         self.pump_depth_do_EditType = QLineEdit(self)
-        self.pump_depth_do_EditType.setText(f'{CreatePZ.dict_pump_h["do"]}')
+        self.pump_depth_do_EditType.setText(f'{self.ifNone(CreatePZ.dict_pump_h["do"])}')
 
         self.pump_posle_Label = QLabel('Насос на спуск')
         self.pump_posle_EditType = QLineEdit(self)
-        self.pump_posle_EditType.setText(f'{CreatePZ.dict_pump["posle"]}')
+        self.pump_posle_EditType.setText(f'{self.ifNone(CreatePZ.dict_pump["posle"])}')
 
         self.pump_depth_posle_Label = QLabel('Глубина спуска насоса')
         self.pump_depth_posle_EditType = QLineEdit(self)
-        self.pump_depth_posle_EditType.setText(f'{CreatePZ.dict_pump_h["posle"]}')
+        self.pump_depth_posle_EditType.setText(f'{self.ifNone(CreatePZ.dict_pump_h["posle"])}')
+
 
         self.paker_do_Label = QLabel('Спущенный пакер')
         self.paker_do_EditType = QLineEdit(self)
-        self.paker_do_EditType.setText(f'{CreatePZ.paker_do["do"]}')
+        self.paker_do_EditType.setText(f'{self.ifNone(CreatePZ.paker_do["do"])}')
 
         self.paker_depth_do_Label = QLabel('Глубина спуска пакера')
         self.paker_depth_do_EditType = QLineEdit(self)
-        self.paker_depth_do_EditType.setText(f'{CreatePZ.H_F_paker_do["do"]}')
+        self.paker_depth_do_EditType.setText(f'{self.ifNone(CreatePZ.H_F_paker_do["do"])}')
 
         self.paker_posle_Label = QLabel('пакер на спуск')
         self.paker_posle_EditType = QLineEdit(self)
-        self.paker_posle_EditType.setText(f'{CreatePZ.paker_do["posle"]}')
+        self.paker_posle_EditType.setText(f'{self.ifNone(CreatePZ.paker_do["posle"])}')
 
         self.paker_depth_posle_Label = QLabel('Глубина спуска пакера')
         self.paker_depth_posle_EditType = QLineEdit(self)
-        self.paker_depth_posle_EditType.setText(f'{CreatePZ.H_F_paker_do["posle"]}')
+        self.paker_depth_posle_EditType.setText(f'{self.ifNone(CreatePZ.H_F_paker_do["posle"])}')
 
-        print(f' насос спуск {CreatePZ.dict_pump["posle"]}')
+        # print(f' насос спуск {CreatePZ.dict_pump["posle"]}')
 
         grid = QGridLayout(self)
         grid.addWidget(self.columnLabel, 0, 0)
@@ -157,7 +158,12 @@ class TabPage_SO(QWidget):
         grid.addWidget(self.paker_depth_posle_Label, 6, 5)
         grid.addWidget(self.paker_depth_posle_EditType, 7, 5)
 
-        #
+    def ifNone(self, string):
+        if str(string) != '0':
+            return string
+        else:
+            return 'отсут'
+    #
 
 
 class TabWidget(QTabWidget):
@@ -169,11 +175,11 @@ class TabWidget(QTabWidget):
 class DataWindow(MyWindow):
 
     def __init__(self, parent=None):
-        super(MyWindow, self).__init__(parent)
+        super(DataWindow, self).__init__()
 
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
-        self.setWindowModality(QtCore.Qt.ApplicationModal)
+        self.setWindowModality(QtCore.Qt.ApplicationModal) # Устанавливаем модальность окна
 
         self.tabWidget = TabWidget()
         # self.tableWidget = QTableWidget(0, 4)
@@ -188,6 +194,7 @@ class DataWindow(MyWindow):
 
     def addRowTable(self):
         from open_pz import CreatePZ
+        CreatePZ.pause = False
 
         columnType = self.tabWidget.currentWidget().columnType.text()
         column_wall_thickness = self.tabWidget.currentWidget().column_wall_thicknessEditType2.text()
@@ -211,12 +218,12 @@ class DataWindow(MyWindow):
         dict_pump_do = str(self.tabWidget.currentWidget().pump_do_EditType.text())
         dict_pump_h_do = self.tabWidget.currentWidget().pump_depth_do_EditType.text()
 
-        dict_pump_do = str(self.tabWidget.currentWidget().pump_posle_EditType.text())
+        dict_pump_posle = str(self.tabWidget.currentWidget().pump_posle_EditType.text())
         dict_pump_h_posle = self.tabWidget.currentWidget().pump_depth_posle_EditType.text()
         paker_do = str(self.tabWidget.currentWidget().paker_do_EditType.text())
         H_F_paker_do = self.tabWidget.currentWidget().paker_depth_do_EditType.text()
-        paker_posle = self.tabWidget.currentWidget().paker_do_EditType.text()
-        H_F_paker_posle = self.tabWidget.currentWidget().paker_depth_do_EditType.text()
+        paker_posle = self.tabWidget.currentWidget().paker_posle_EditType.text()
+        H_F_paker_posle = self.tabWidget.currentWidget().paker_depth_posle_EditType.text()
 
         if self.ifNum(columnType) == False \
                 or self.ifNum(column_wall_thickness) == False \
@@ -231,7 +238,7 @@ class DataWindow(MyWindow):
                 or self.ifNum(max_angle) == False \
                 or self.ifNum(max_admissible_pressure) == False \
                 or self.ifNum(max_expected_pressure) == False \
-                or self.ifNum(dict_pump_h_do) == False \
+                or self.ifNum(dict_pump_h_do) == False\
                 or self.ifNum(dict_pump_h_posle) == False \
                 or self.ifNum(H_F_paker_do) == False \
                 or self.ifNum(H_F_paker_posle) == False:
@@ -240,22 +247,30 @@ class DataWindow(MyWindow):
         else:
             CreatePZ.column_diametr = float(columnType)
             CreatePZ.column_wall_thickness = float(column_wall_thickness)
-            CreatePZ.shoe_column = float(shoe)}')
-        print(CreatePZ.column_additional, CreatePZ.column_additional_diametr, CreatePZ.column_additional_wall_thickness,
-              CreatePZ.shoe_column_additional, CreatePZ.head_column_additional,
-              CreatePZ.bottomhole_drill)  # bWidget.currentWidget().bottomhole_drill_EditType.text())
-        print(CreatePZ.bottomhole_artificial, CreatePZ.current_bottom, CreatePZ.max_angle,
-              CreatePZ.max_expected_pressure,
-              CreatePZ.max_admissible_pressure)  # = float(self.tabWidget.currentWidget().max_admissible_pressure_EditType.text())
-        print(CreatePZ.dict_pump["do"], CreatePZ.dict_pump_h["do"], CreatePZ.dict_pump["posle"],
-              CreatePZ.dict_pump_h["posle"])
-        print(CreatePZ.paker_do["do"], CreatePZ.H_F_paker_do["do"], CreatePZ.paker_do["posle"],
-              CreatePZ.H_F_paker_do["posle"])
+            CreatePZ.shoe_column = float(shoe_column)
+            CreatePZ.column_additional_diametr = [0 if column_additional_diametr == 'отсут' else float(column_additional_diametr)][0]
+            CreatePZ.column_additional_wall_thickness = [0 if column_additional_wall_thickness == 'отсут' else float(column_additional_wall_thickness)][0]
+            CreatePZ.shoe_column_additional = [0 if shoe_column_additional == 'отсут' else float(shoe_column_additional)][0]
+            CreatePZ.head_column_additional = [0 if head_column_additional == 'отсут' else float(head_column_additional)][0]
+            CreatePZ.bottomhole_drill =  [0 if bottomhole_drill == 'отсут' else float(bottomhole_drill)][0]
+            CreatePZ.bottomhole_artificial =  [0 if bottomhole_artificial == 'отсут' else float(bottomhole_artificial)][0]
+            CreatePZ.current_bottom =  [0 if current_bottom == 'отсут' else float(current_bottom)][0]
+            CreatePZ.max_angle =  [0 if max_angle == 'отсут' else float(max_angle)][0]
+            CreatePZ.max_expected_pressure = [0 if max_expected_pressure == 'отсут' else float(max_expected_pressure)][0]
+            CreatePZ.max_admissible_pressure = [0 if max_admissible_pressure == 'отсут' else float(max_admissible_pressure)][0]
+            CreatePZ.dict_pump["do"] = dict_pump_do
+            CreatePZ.dict_pump_h["do"] = [0 if dict_pump_h_do == 'отсут' else float(dict_pump_h_do)][0]
+            CreatePZ.dict_pump["posle"] = dict_pump_posle
+            CreatePZ.dict_pump_h["posle"] = [0 if dict_pump_h_posle == 'отсут' else float(dict_pump_h_posle)][0]
+            CreatePZ.paker_do["do"] = paker_do
+            CreatePZ.H_F_paker_do["do"] = [0 if H_F_paker_do == 'отсут' else float(H_F_paker_do)][0]
+            CreatePZ.paker_do["posle"] = paker_posle
+            CreatePZ.H_F_paker_do["posle"] = [0 if H_F_paker_posle == 'отсут' else float(H_F_paker_posle)][0]
 
-        self.close()
+            self.close()
 
     def ifNum(self, string):
-        if re.search(r'\d+(,\d+){0,2}', string):
+        if re.search(r'\d+(,\d+){0,2}', string) or string == 'отсут':
             return True
         else:
             return False
@@ -268,4 +283,4 @@ if __name__ == "__main__":
     # app.setStyleSheet()
     window = DataWindow()
     # window.show()
-    sys.exit(app.exec_())
+    app.exec_()

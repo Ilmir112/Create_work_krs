@@ -1,17 +1,15 @@
 import sys
 import openpyxl
-from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu, QMenuBar, QAction, QTableWidget, QTableWidgetItem, \
-    QVBoxLayout, QWidget, QLineEdit, QMessageBox, QFileDialog, QToolBar, QPushButton, QShortcut
-from PyQt5 import QtCore, QtWidgets, QtGui
-from openpyxl.workbook import Workbook
+from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu, QMenuBar, QAction, QTableWidget, \
+    QLineEdit, QFileDialog, QToolBar, QPushButton
+from PyQt5 import QtCore, QtWidgets
+
 from openpyxl.utils import get_column_letter
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QColor, QBrush, QKeySequence
-import krs
-from PIL import Image as PILImage
-from openpyxl.drawing.image import Image
-import work_py.opressovka
 
+import krs
+
+from openpyxl.drawing.image import Image
 
 
 
@@ -31,16 +29,14 @@ class MyWindow(QMainWindow):
         self.work_plan = 0
 
     def initUI(self):
-        from work_py.mouse import TableWidget
+
         self.setWindowTitle("Main Window")
-        self.setGeometry(200, 400, 400, 400)
+        self.setGeometry(100, 400, 500, 400)
 
         self.table_widget = None
 
-
         self.createMenuBar()
         self.le = QLineEdit()
-
 
         self.toolbar = QToolBar()
         self.addToolBar(self.toolbar)
@@ -52,8 +48,6 @@ class MyWindow(QMainWindow):
         self.closeFileButton = QPushButton("Закрыть проект")
         self.closeFileButton.clicked.connect(self.close_file)
         self.toolbar.addWidget(self.closeFileButton)
-
-
 
     def createMenuBar(self):
         self.menuBar = QMenuBar(self)
@@ -117,29 +111,30 @@ class MyWindow(QMainWindow):
 
         elif action == self.save_file_as:
             self.saveFileDialog(self.wb)
+
     def tableWidgetOpen(self):
         if self.table_widget is None:
             self.table_widget = QTableWidget()
-            # self.table_widget.setEditTriggers(Qt.EditTrigger.AllEditTriggers)
+
             self.table_widget.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
             self.table_widget.customContextMenuRequested.connect(self.openContextMenu)
             self.setCentralWidget(self.table_widget)
             self.model = self.table_widget.model()
 
-
             # Этот сигнал испускается всякий раз, когда ячейка в таблице нажата.
             # Указанная строка и столбец - это ячейка, которая была нажата.
             self.table_widget.cellPressed[int, int].connect(self.clickedRowColumn)
+
     def saveFileDialog(self, wb):
         from open_pz import CreatePZ
         fileName, _ = QFileDialog.getSaveFileName(self, "Save excel-file", "", "Excel Files (*.xls)")
         if fileName:
             wb.save(f"{CreatePZ.well_number} {CreatePZ.well_area} {CreatePZ.cat_P_1} категории.xlsx)")
+
     def save_to_excel(self):
         from open_pz import CreatePZ
-        from krs import is_number
-        # print(f'граница {self.ins_ind_border}')
-        ins_ind =  self.ins_ind_border
+
+        ins_ind = self.ins_ind_border
 
         merged_cells = []  # Список индексов объединения ячеек
 
@@ -148,24 +143,19 @@ class MyWindow(QMainWindow):
             if row >= self.ins_ind_border:
                 row_lst = []
                 self.ins_ind_border += 1
-                # ws.merge_cells(start_row=row, start_column=2, end_row=row, end_column=12)
                 for column in range(self.table_widget.columnCount()):
                     if self.table_widget.rowSpan(row, column) > 1 or self.table_widget.columnSpan(row, column) > 1:
                         merged_cells.append((row, column))
                     item = self.table_widget.item(row, column)
                     if not item is None:
                         row_lst.append(item.text())
-
-                    #     ws.cell(row=row + 1, column=column + 1).value = item.text()
                 work_list.append(row_lst)
-
 
         merged_cells_dict = {}
 
         for row in merged_cells:
             merged_cells_dict.setdefault(row[0], []).append(row[1])
 
-        # print(merged_cells_dict)
 
         for i in range(2, len(work_list)):  # нумерация работ
             work_list[i][1] = i - 1
@@ -174,9 +164,9 @@ class MyWindow(QMainWindow):
 
         CreatePZ.count_row_height(self.ws, work_list, ins_ind, merged_cells_dict)
         itog_ind_min = CreatePZ.itog_ind_min + len(work_list)
-        CreatePZ.addItog(self, self.ws, self.table_widget.rowCount()+1)
+        CreatePZ.addItog(self, self.ws, self.table_widget.rowCount() + 1)
         try:
-            self.ws.print_area = f'B1:L{self.table_widget.rowCount()+45}'
+            self.ws.print_area = f'B1:L{self.table_widget.rowCount() + 45}'
             # ws.page_setup.fitToPage = True
             self.ws.page_setup.fitToHeight = False
             self.ws.page_setup.fitToWidth = True
@@ -184,7 +174,7 @@ class MyWindow(QMainWindow):
             for row_ind, row in enumerate(self.ws.iter_rows(values_only=True)):
                 for col, value in enumerate(row):
                     if 'Зуфаров' in str(value):
-                        coordinate = f'{get_column_letter(col-2)}{row_ind-1}'
+                        coordinate = f'{get_column_letter(col - 2)}{row_ind - 1}'
                         break
 
             self.insert_image(self.ws, 'imageFiles/Зуфаров.png', coordinate)
@@ -204,6 +194,7 @@ class MyWindow(QMainWindow):
             self.table_widget.close()
             self.table_widget = None
         print("Closing current file")
+
     def insert_image(self, ws, file, coordinate):
         # Загружаем изображение с помощью библиотеки Pillow
         img = openpyxl.drawing.image.Image(file)
@@ -211,8 +202,6 @@ class MyWindow(QMainWindow):
         img.height = 180
         img.anchor = coordinate
         ws.add_image(img, coordinate)
-
-
 
     def openContextMenu(self, position):
         from open_pz import CreatePZ
@@ -230,6 +219,10 @@ class MyWindow(QMainWindow):
         geophysical_action = QAction("Геофизические исследования", self)
         geophysical.addAction(geophysical_action)
         geophysical_action.triggered.connect(self.GeophysicalNewWindow)
+
+        privyazka_action = QAction("Привязка НКТ", self)
+        geophysical.addAction(privyazka_action)
+        privyazka_action.triggered.connect(self.privyazkaNKT)
 
         vp_action = QAction("Установка ВП", self)
         geophysical.addAction(vp_action)
@@ -260,12 +253,9 @@ class MyWindow(QMainWindow):
         context_menu.addAction(gnkt_opz_action)
         gnkt_opz_action.triggered.connect(self.gnkt_opz)
 
-
-
         deleteString_action = QAction("Удалить строку", self)
         del_menu.addAction(deleteString_action)
         deleteString_action.triggered.connect(self.deleteString)
-
 
         opressovka_action = QAction("Опрессовка колонны", self)
         action_menu.addAction(opressovka_action)
@@ -329,8 +319,8 @@ class MyWindow(QMainWindow):
         grpWithPaker_action.triggered.connect(self.grpWithPaker)
 
         grpWithGpp_action = QAction('ГРП с ГПП')
-        grp_menu.addAction(grpWithGpp_action )
-        grpWithGpp_action .triggered.connect(self.grpWithGpp)
+        grp_menu.addAction(grpWithGpp_action)
+        grpWithGpp_action.triggered.connect(self.grpWithGpp)
 
         alone_menu = action_menu.addMenu('одиночные операции')
 
@@ -375,8 +365,8 @@ class MyWindow(QMainWindow):
 
     def clickedRowColumn(self, r, c):
         from open_pz import CreatePZ
-        self.ins_ind = r+1
-        CreatePZ.ins_ind = r+1
+        self.ins_ind = r + 1
+        CreatePZ.ins_ind = r + 1
         print(f' выбранная строка {self.ins_ind}')
 
     def drilling_action_nkt(self):
@@ -391,9 +381,13 @@ class MyWindow(QMainWindow):
 
     def larNKT_action(self):
         from work_py.emergencyWork import emergencyNKT
-        emergencyNKT_list =emergencyNKT(self)
+        emergencyNKT_list = emergencyNKT(self)
         self.populate_row(self.ins_ind, emergencyNKT_list)
 
+    def privyazkaNKT(self):
+        from work_py.alone_oreration import privyazkaNKT
+        privyazkaNKT_list = privyazkaNKT(self)
+        self.populate_row(self.ins_ind, privyazkaNKT_list)
 
     def kot_work(self):
         from work_py.alone_oreration import kot_work
@@ -404,6 +398,7 @@ class MyWindow(QMainWindow):
         from work_py.mkp import mkp_revision
         mkp_work_list = mkp_revision(self)
         self.populate_row(self.ins_ind, mkp_work_list)
+
     def acid_action_gons(self):
         from work_py.acids import acidGons
         acidGons_work_list = acidGons(self)
@@ -413,10 +408,12 @@ class MyWindow(QMainWindow):
         from work_py.alone_oreration import pvo_cat1
         pvo_cat1_work_list = pvo_cat1(self)
         self.populate_row(self.ins_ind, pvo_cat1_work_list)
+
     def fluid_change_action(self):
         from work_py.alone_oreration import fluid_change
         fluid_change_work_list = fluid_change(self)
         self.populate_row(self.ins_ind, fluid_change_work_list)
+
     def rirWithRpk(self):
         from work_py.rir import rir_rpk
         rirRpk_work_list = rir_rpk(self)
@@ -436,12 +433,13 @@ class MyWindow(QMainWindow):
         from work_py.rir import rirWithPero
         rirWithPero_work_list = rirWithPero(self)
         self.populate_row(self.ins_ind, rirWithPero_work_list)
+
     def grpWithPaker(self):
         from work_py.grp import grpPaker
 
         print('Вставился ГРП с пакером')
         grpPaker_work_list = grpPaker(self)
-        self.populate_row(self.ins_ind,grpPaker_work_list)
+        self.populate_row(self.ins_ind, grpPaker_work_list)
 
     def grpWithGpp(self):
         from work_py.grp import grpGpp
@@ -455,7 +453,7 @@ class MyWindow(QMainWindow):
 
         print('Вставился отсыпка песком')
         filling_work_list = sandFilling(self)
-        self.populate_row(self.ins_ind,  filling_work_list)
+        self.populate_row(self.ins_ind, filling_work_list)
 
     def washing_sand(self):
         from work_py.sand_filling import sandWashing
@@ -484,7 +482,7 @@ class MyWindow(QMainWindow):
             self.table_widget.removeRow(row)
 
     def emptyString(self):
-        ryber_work_list = [[None, None, None, None, None, None, None, None, None, None,None, None]]
+        ryber_work_list = [[None, None, None, None, None, None, None, None, None, None, None, None]]
         self.populate_row(self.ins_ind, ryber_work_list)
 
     def vp_action(self):
@@ -500,6 +498,7 @@ class MyWindow(QMainWindow):
         print('Вставился ВП')
         vp_work_list = czh(self)
         self.populate_row(self.ins_ind, vp_work_list)
+
     def swibbing_with_paker(self):
         from work_py.swabbing import swabbing_with_paker
 
@@ -513,6 +512,7 @@ class MyWindow(QMainWindow):
         print('Вставился ОПУ')
         swabbing_opy_list = swabbing_opy(self)
         self.populate_row(self.ins_ind, swabbing_opy_list)
+
     def swibbing_with_voronka(self):
 
         from work_py.swabbing import swabbing_with_voronka
@@ -534,14 +534,13 @@ class MyWindow(QMainWindow):
         print('Вставился ГНКТ')
         ryber_work_list = gnkt_work(self)
         self.populate_row(self.ins_ind, ryber_work_list)
+
     def gno_bottom(self):
         from work_py.descent_gno import gno_down
 
         print('Вставился ГНО')
         gno_work_list = gno_down(self)
         self.populate_row(self.ins_ind, gno_work_list)
-
-
 
     def acid_action_1paker(self):
         from work_py.acids_work import acid_work
@@ -561,10 +560,6 @@ class MyWindow(QMainWindow):
         acid_work_list = acid_work(self)
         self.populate_row(self.ins_ind, acid_work_list)
 
-
-
-
-
     def pressureTest(self):
         from work_py.opressovka import paker_list
 
@@ -573,13 +568,12 @@ class MyWindow(QMainWindow):
         print(f'индекс {self.ins_ind, len(pressure_work1)}')
         self.populate_row(self.ins_ind, pressure_work1)
 
-
     def template_with_skm(self):
         from work_py.template_work import template_ek
         from open_pz import CreatePZ
         template_ek_list = template_ek(self)
         print(f'индекс {self.ins_ind, len(template_ek_list)}')
-        self.populate_row(self.ins_ind,  template_ek_list)
+        self.populate_row(self.ins_ind, template_ek_list)
         CreatePZ.ins_ind += len(template_ek_list) + 1
 
     def template_without_skm(self):
@@ -589,13 +583,13 @@ class MyWindow(QMainWindow):
         template_ek_list = template_ek_without_skm(self)
         print()
         print(f'индекс {self.ins_ind, len(template_ek_list)}')
-        self.populate_row(self.ins_ind,  template_ek_list)
+        self.populate_row(self.ins_ind, template_ek_list)
         CreatePZ.ins_ind += len(template_ek_list) + 1
-
 
     def populate_row(self, ins_ind, work_list):
 
-        text_width_dict = {20: (0, 100), 40: (101, 200), 60: (201, 300), 80: (301, 400), 100: (401, 500), 120: (501, 600), 140: (601, 700), 160: (701, 800), 180: (801, 1500) }
+        text_width_dict = {20: (0, 100), 40: (101, 200), 60: (201, 300), 80: (301, 400), 100: (401, 500),
+                           120: (501, 600), 140: (601, 700), 160: (701, 800), 180: (801, 1500)}
 
         for i, row_data in enumerate(work_list):
             row = ins_ind + i
@@ -610,20 +604,19 @@ class MyWindow(QMainWindow):
 
                 # self.table_widget.setCellWidget(row, column, widget)
 
-                if not data  is  None:
+                if not data is None:
                     self.table_widget.setItem(row, column, item)
 
                 else:
                     self.table_widget.setItem(row, column, QtWidgets.QTableWidgetItem(str('')))
 
                 if column == 2:
-                    if not data  is  None:
+                    if not data is None:
                         text = data
                         for key, value in text_width_dict.items():
                             if value[0] <= len(text) <= value[1]:
                                 text_width = key
                                 self.table_widget.setRowHeight(row, int(text_width))
-
 
         # self.table_widget.setEditTriggers(QTableWidget.AnyKeyPressed)
         # self.table_widget.resizeColumnsToContents()
@@ -643,12 +636,13 @@ class MyWindow(QMainWindow):
             self.new_window.close()  # Close window.
             self.new_window = None  # Discard reference.
 
-    def  PerforationNewWindow(self):
+    def PerforationNewWindow(self):
         from work_py.perforation import PervorationWindow
         from open_pz import CreatePZ
         if self.new_window is None:
             # print(f' проект перфорации {self.dict_perforation_project}')
-            self.new_window = PervorationWindow(self.table_widget, self.ins_ind, self.dict_work_pervorations, self.dict_perforation_project)
+            self.new_window = PervorationWindow(self.table_widget, self.ins_ind, self.dict_work_pervorations,
+                                                self.dict_perforation_project)
             self.new_window.setWindowTitle("Перфорация")
             self.new_window.setGeometry(200, 400, 300, 400)
             self.new_window.show()
@@ -669,7 +663,8 @@ class MyWindow(QMainWindow):
 
         self.table_widget.setRowCount(rows)
         self.table_widget.setColumnCount(12)
-        rowHeights_exit = [sheet.row_dimensions[i + 1].height if sheet.row_dimensions[i + 1].height is not None else 18 for
+        rowHeights_exit = [sheet.row_dimensions[i + 1].height if sheet.row_dimensions[i + 1].height is not None else 18
+                           for
                            i in range(sheet.max_row)]
 
         for row in range(1, rows + 1):
@@ -695,7 +690,6 @@ class MyWindow(QMainWindow):
         #     from open_pz import CreatePZ
         #     # print(CreatePZ.gnkt_work1)
         #     # self.populate_row(self.table_widget.rowCount(),  CreatePZ.gnkt_work1)
-
 
 
 if __name__ == "__main__":

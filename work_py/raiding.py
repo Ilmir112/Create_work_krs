@@ -6,6 +6,7 @@ def raidingColumn(self):
     from work_py.opressovka import paker_diametr_select
     from work_py.template_work import well_volume
     from work_py.advanted_file import raiding_interval,raid
+    print(f'До отрайбирования {[CreatePZ.dict_work_pervorations[plast]["отрайбировано"] for plast in CreatePZ.plast_work]}')
 
     ryber_diam = paker_diametr_select(CreatePZ.current_bottom) + 3
 
@@ -25,9 +26,14 @@ def raidingColumn(self):
                        f'НКТ{nkt_pod} {CreatePZ.current_bottom - CreatePZ.head_column_additional}м'
     raiding_interval_tuple = raiding_interval()
     print(f' интервал райбирования {raiding_interval_tuple, len(raiding_interval_tuple)}')
-
-    krovly_raiding = int(raiding_interval_tuple[0][0])
-
+    if len(raiding_interval_tuple) == 0:
+        raiding_interval_tuple, ok = QInputDialog.getText(self,'интервал райбирование', 'Введите интервал райбирования')
+        raiding_interval_tuple = [raiding_interval_tuple.split('-')]
+    if len(raiding_interval_tuple) != 0:
+        krovly_raiding = int(raiding_interval_tuple[0][0])
+    else:
+        krovly_raiding = CreatePZ.perforation_roof
+    print()
     raiding_interval = raid(raiding_interval_tuple)
     ryber_list = [
         [None, None,
@@ -69,8 +75,7 @@ def raidingColumn(self):
          None, None, None, None, None, None, None,
          'мастер КРС', round(0.25 + 0.033 * 1.2 * (CreatePZ.current_bottom) / 9.5 * 1.04*0.9, 1)]]
 
-
-    print(CreatePZ.dict_work_pervorations)
+    print(f' после отрайбирования {[CreatePZ.dict_work_pervorations[plast]["отрайбировано"] for plast in CreatePZ.plast_work]}')
 
     return ryber_list
 

@@ -7,6 +7,8 @@ def acid_work(self):
     from work_py.opressovka import paker_diametr_select
     from work_py.swabbing import swabbing_with_paker
     from open_pz import CreatePZ
+    from work_py.alone_oreration import privyazkaNKT
+
     if len(CreatePZ.plast_work) == 0:
         msc = QMessageBox.information(self, 'Внимание', 'Отсутствуют рабочие интервалы перфорации')
     else:
@@ -97,9 +99,45 @@ def acid_work(self):
              f'Определить приемистость НЭК.',
              None, None, None, None, None, None, None,
              'мастер КРС', 0.4],
-
             ]
+        for plast in list(CreatePZ.dict_perforation.keys()):
+            for interval in CreatePZ.dict_perforation[plast]['интервал']:
+                if abs(float(interval[1] - paker_depth)) < 10 or abs(float(interval[0] - paker_depth)) < 10:
+                    if privyazkaNKT(self) not in paker_list and CreatePZ.privyazkaSKO == 0:
+                        CreatePZ.privyazkaSKO += 1
+                        paker_list.insert(1, privyazkaNKT(self))
+        if CreatePZ.curator == 'ОР':
+            definition_Q_quest = QMessageBox.question(self, 'Определение приемистости',
+                                                       'Планировать опредение приемистости до СКО?')
+            try:
+                CreatePZ.expected_Q, ok = QInputDialog.getInt(self, 'Ожидаемая приемистость ',
+                                                     f'Ожидаемая приемистость по пласту {plast} ',
+                                                     list(CreatePZ.expected_pick_up.keys())[0], 0,
+                                                     1600)
+                CreatePZ.expected_P, ok = QInputDialog.getInt(self, 'Ожидаемое Давление закачки',
+                                                     f'Ожидаемое Давление закачки по пласту {plast}',
+                                                     list(CreatePZ.expected_pick_up.values())[0], 0,
+                                                     250)
+            except:
+                CreatePZ.expected_Q, ok = QInputDialog.getInt(self, 'Ожидаемая приемистость ',
+                                                     f'Ожидаемая приемистость по пласту {plast} ',
+                                                     100, 0,
+                                                     1600)
+                CreatePZ.expected_P, ok = QInputDialog.getInt(self, f'Ожидаемое Давление закачки',
+                                                     f'Ожидаемое Давление закачки по пласту {plast}',
+                                                     100, 0,
+                                                     250)
 
+            if definition_Q_quest == QMessageBox.StandardButton.Yes:
+
+                paker_list.insert(-3, [None, None,
+                              f'Произвести насыщение скважины до стабилизации давления закачки не менее 5м3. Опробовать  '
+                              f'пласт {plast} на приемистость в трех режимах при Р={pressure_mode(CreatePZ.expected_P, plast)}атм в присутствии представителя ЦДНГ. '
+                              f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до '
+                              f'начала работ). В СЛУЧАЕ ПРИЕМИСТОСТИ НИЖЕ {CreatePZ.expected_Q}м3/сут при давлении {CreatePZ.expected_P}атм '
+                              f'ДАЛЬНЕЙШИЕ РАБОТЫ СОГЛАСОВАТЬ С ЗАКАЗЧИКОМ',
+                              None, None, None, None, None, None, None,
+                              'мастер КРС', 2.25])
 
         for row in acid_work_list(self, paker_depth, paker_khost, dict_nkt, CreatePZ.paker_layout):
             paker_list.append(row)
@@ -176,11 +214,12 @@ def acid_work_list(self, paker_depth, paker_khost, dict_nkt, paker_layout):
 
 
 
+
     if acid == 'HCl':
         acid_V, ok = QInputDialog.getDouble(self, 'Объем кислоты', 'Введите объем кислоты:', 10, 0.5, 300, 1)
         acid_pr, ok = QInputDialog.getInt(self, 'концентрация кислоты', 'Введите концентрацию кислоты', 15, 2, 24)
         acid_sel = f'Произвести  солянокислотную обработку {plast}  в объеме  {acid_V}м3  ({acid} - {acid_pr} %) ' \
-                   f'с добавлением стабилизатора железа HiRon в объеме 70кг и деэмульгатора в объеме 50л. в ' \
+                   f' в ' \
                    f'присутствии представителя Заказчика с составлением акта, не превышая давления закачки не более Р={CreatePZ.max_admissible_pressure}атм.\n' \
                    f'(для приготовления соляной кислоты в объеме {acid_V}м3 - {acid_pr}% необходимо замешать {round(acid_V * acid_pr / 24 * 1.118, 1)}т HCL 24% и' \
                    f' пресной воды {round(acid_V - acid_V * acid_pr / 24 * 1.118, 1)}м3)' \
@@ -250,26 +289,6 @@ def acid_work_list(self, paker_depth, paker_khost, dict_nkt, paker_layout):
      flushingDownhole(self, paker_depth, paker_khost, paker_layout),
      None, None, None, None, None, None, None,
      'мастер КРС', 1.5]]
-    if CreatePZ.curator == 'ОР':
-        try:
-            expected_Q, ok = QInputDialog.getInt(self, 'Ожидаемая приемистость ',
-                                             f'Ожидаемая приемистость по пласту {plast} ', list(CreatePZ.expected_pick_up.keys())[0], 0,
-                                             1600)
-            expected_P, ok = QInputDialog.getInt(self, 'Ожидаемое Давление закачки',
-                                             f'Ожидаемое Давление закачки по пласту {plast}', list(CreatePZ.expected_pick_up.values())[0], 0,
-                                             250)
-        except:
-            expected_Q, ok = QInputDialog.getInt(self, 'Ожидаемая приемистость ',
-                                                 f'Ожидаемая приемистость по пласту {plast} ',
-                                                 100, 0,
-                                                 1600)
-            expected_P, ok = QInputDialog.getInt(self, f'Ожидаемое Давление закачки',
-                                                 f'Ожидаемое Давление закачки по пласту {plast}',
-                                                 100, 0,
-                                                 250)
-
-
-
 
     for row in acid_list_1:
         acid_work.append(row)
@@ -277,9 +296,9 @@ def acid_work_list(self, paker_depth, paker_khost, dict_nkt, paker_layout):
     if CreatePZ.curator == 'ОР':
         acid_work.append([None, None,
                           f'Посадить пакер на {paker_depth}м. Произвести насыщение скважины до стабилизации давления закачки не менее 5м3. Опробовать  '
-                          f'пласт {plast} на приемистость в трех режимах при Р={pressure_mode(expected_P, plast)}атм в присутствии представителя ЦДНГ. '
+                          f'пласт {plast} на приемистость в трех режимах при Р={pressure_mode(CreatePZ.expected_P, plast)}атм в присутствии представителя ЦДНГ. '
                           f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до '
-                          f'начала работ). В СЛУЧАЕ ПРИЕМИСТОСТИ НИЖЕ {expected_Q}м3/сут при давлении {expected_P}атм '
+                          f'начала работ). В СЛУЧАЕ ПРИЕМИСТОСТИ НИЖЕ {CreatePZ.expected_Q}м3/сут при давлении {CreatePZ.expected_P}атм '
                           f'ДАЛЬНЕЙШИЕ РАБОТЫ СОГЛАСОВАТЬ С ЗАКАЗЧИКОМ',
                           None, None, None, None, None, None, None,
                           'мастер КРС', 2.25])

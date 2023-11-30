@@ -1,25 +1,17 @@
-from PyQt5.QtWidgets import QApplication, QDialog, QVBoxLayout, QPushButton, QLabel
+import time
+from PyQt5 import QtCore, QtWidgets
 
-class SecondWindow(QDialog):
-    def __init__(self, parent=None):
-        super(SecondWindow, self).__init__(parent)
-        self.setWindowTitle('Second Window')
+app = QtWidgets.QApplication([])
+w = QtWidgets.QPushButton('Pause')
+w.show()
 
-        save_button = QPushButton("Сохранить", self)
-        save_button.clicked.connect(self.save_button_clicked)
+def pause_app():
+    while True:
+        QtCore.QCoreApplication.instance().processEvents()
+        time.sleep(0.01)
 
-        layout = QVBoxLayout()
-        layout.addWidget(QLabel("Дополнительное окно"))
-        layout.addWidget(save_button)
-        self.setLayout(layout)
-
-    def save_button_clicked(self):
-        self.accept()
-
-app = QApplication()
-
-second_window = SecondWindow()
-second_window.setModal(True) # Сделать окно модальным
-second_window.show()
-
-sys.exit(app.exec_())
+thread = QtCore.QThread()
+w.clicked.connect(thread.started)
+thread.finished.connect(app.quit)
+thread.start()
+pause_app()

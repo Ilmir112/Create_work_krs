@@ -3,13 +3,14 @@ from zipfile import ZipFile
 
 from PIL import Image
 import block_name
+
 import main
 from main import MyWindow
 import krs
 
-from datetime import datetime
+from datetime import datetime, time
 from openpyxl import Workbook, load_workbook
-
+from PyQt5 import QtCore
 from PyQt5.QtWidgets import QInputDialog, QMessageBox, QDialog
 
 from openpyxl.utils.cell import get_column_letter
@@ -27,12 +28,15 @@ class CreatePZ(MyWindow):
     open_trunk_well = False
     normOfTime = 0
     lift_ecn_can = False
+    pause = True
     lift_ecn_can_addition = False
     column_passability = False
     column_additional_passability = False
     template_depth = 0
     nkt_diam = 73
     b_plan = 0
+    expected_Q = 0
+    expected_P = 0
     plast_select = ''
     dict_perforation = {}
     dict_perforation_project = {}
@@ -92,7 +96,7 @@ class CreatePZ(MyWindow):
     cat_P_1 = []
 
     max_angle = 0
-
+    privyazkaSKO = 0
     H2S_pr = []
     cat_H2S_list = []
     H2S_mg = []
@@ -508,7 +512,7 @@ class CreatePZ(MyWindow):
             self.data_window.setGeometry(200, 400, 300, 400)
 
             self.data_window.show()
-
+        CreatePZ.pause_app()
         if len(CreatePZ.cat_well_min) == 0:
             cat_well_min, ok = QInputDialog.getInt(self, 'индекс начала копирования',
                                                      'Программа не смогла определить строку начала копирования',
@@ -699,7 +703,7 @@ class CreatePZ(MyWindow):
                 CreatePZ.dict_nkt_po[key] = CreatePZ.dict_nkt_po.get(key, 0) + float(value)
 
         try:
-            CreatePZ.shoe_nkt = int(sum(CreatePZ.dict_nkt.values()))
+            CreatePZ.shoe_nkt = float(sum(CreatePZ.dict_nkt.values()))
             CreatePZ.shoe_nkt > CreatePZ.bottomhole_artificial
         except:
             print('НКТ ниже забоя')
@@ -1095,7 +1099,7 @@ class CreatePZ(MyWindow):
     def if_None(value):
         if isinstance(value, datetime):
             return value
-        elif value is None or 'отсут' in str(value).lower() or value == '-' or value == 0:
+        elif value is None or 'отс' in str(value).lower() or value == '-' or value == 0:
             return 'отсут'
         else:
             return value
@@ -1137,6 +1141,10 @@ class CreatePZ(MyWindow):
 
             return float(b)
 
+    def pause_app():
+        while CreatePZ.pause == True:
+            QtCore.QCoreApplication.instance().processEvents()
+
     def count_row_height(ws, work_list, ins_ind, merged_cells_dict):
         from main import MyWindow
 
@@ -1150,9 +1158,18 @@ class CreatePZ(MyWindow):
                 if j != 1:
                     ws.cell(row=i, column=j).border = CreatePZ.thin_border
                 if j == 11:
-                    ws.cell(row=i, column=j).font = Font(name='Arial', size=11, bold=False)
+                    ws.cell(row=i, column=j).font = Font(name='Arial', size=11, bold = False)
                 else:
-                    ws.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=False)
+                    ws.cell(row=i, column=j).font = Font(name='Arial', size=13, bold = False)
+                if 'примечание' in str(ws.cell(row=i, column=j).value).lower() \
+                        or 'заявку оформить за 16 часов' in str(ws.cell(row=i, column=j).value).lower()\
+                        or 'ЗАДАЧА 2.9.' in str(ws.cell(row=i, column=j).value).upper()\
+                        or 'порядок работы' in str(ws.cell(row=i, column=j).value).lower()\
+                        or 'ВСЕ ТЕХНОЛОГИЧЕСКИЕ ОПЕРАЦИИ' in str(ws.cell(row=i, column=j).value).upper()\
+                        or 'за 48 часов до спуска' in str(ws.cell(row=i, column=j).value).upper():
+                    ws.cell(row=i, column=j).font = Font(name='Arial', size=13, bold = True)
+
+
 
 
             ws.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='center',

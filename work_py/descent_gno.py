@@ -1,5 +1,7 @@
 from PyQt5.QtWidgets import QMessageBox, QInputDialog
 
+from work_py.alone_oreration import privyazkaNKT
+
 
 def gno_down(self):
     from open_pz import CreatePZ
@@ -70,6 +72,11 @@ def gno_down(self):
              None, None, None, None, None, None, None,
              'мастер КРС, подрядчик по ГИС', 8],
            ]
+        for plast in list(CreatePZ.dict_perforation.keys()):
+            for interval in CreatePZ.dict_perforation[plast]['интервал']:
+                if abs(float(interval[1] - float(CreatePZ.H_F_paker_do["posle"]))) < 10 or abs(float(interval[0] - float(CreatePZ.H_F_paker_do["posle"]))) < 10:
+                    if privyazkaNKT(self) not in paker_descent:
+                        paker_descent.insert(2, privyazkaNKT(self))
     except:
         pass
     gno_list = [[None, None,

@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox
 import H2S
 import krs
 from krs import well_volume
+from work_py.alone_oreration import privyazkaNKT
 
 
 def swabbing_opy(self):
@@ -279,18 +280,10 @@ def swabbing_with_paker(self, paker_khost, pakerKompo):
     # Добавление привязки компоновки при посадке пакера близко к интервалу перфорации
     for plast in list(CreatePZ.dict_perforation.keys()):
         for interval in CreatePZ.dict_perforation[plast]['интервал']:
-            if abs(float(interval[1] - paker_depth)) > 10 or abs(float(interval[0] - paker_depth)) > 10:
-                if [None, None,f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС "Ойл-сервис". '
-                                      f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером от 14.10.2021г. '
-                                      f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины',
-                                      None, None, None, None, None, None, None,
-                                      'Мастер КРС, подрядчик по ГИС', 4] not in paker_list:
-                    paker_list.insert(1, [None, None,
-                                      f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС "Ойл-сервис". '
-                                      f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером от 14.10.2021г. '
-                                      f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины',
-                                      None, None, None, None, None, None, None,
-                                      'Мастер КРС, подрядчик по ГИС', 4])
+            if abs(float(interval[1] - paker_depth)) < 10 or abs(float(interval[0] - paker_depth)) < 10:
+                if privyazkaNKT(self) not in paker_list and CreatePZ.privyazkaSKO == 0:
+                    CreatePZ.privyazkaSKO += 1
+                    paker_list.insert(1, privyazkaNKT(self))
 
     return paker_list
 

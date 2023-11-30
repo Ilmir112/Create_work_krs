@@ -194,8 +194,8 @@ def calv_h2s(self, cat_H2S, H2S_mg, H2S_pr):
         nkt_l = sum(list(CreatePZ.dict_nkt.values()))
 
         udel_vnutr_v = 10 *3.14 *((CreatePZ.column_diametr - CreatePZ.column_wall_thickness*2)*0.01)**2/4
-
-        udel_vn__khv = 10 *3.14 *((CreatePZ.column_additional_diametr - CreatePZ.column_additional_wall_thickness*2)*0.01)**2/4
+        if CreatePZ.column_additional == True:
+            udel_vn__khv = 10 *3.14 *((CreatePZ.column_additional_diametr - CreatePZ.column_additional_wall_thickness*2)*0.01)**2/4
         # print(f'ff{udel_vn__khv}')
         # print(f' НКТ{CreatePZ.column_diametr}2 {nkt_l, CreatePZ.head_column_additional}88{CreatePZ.column_diametr, CreatePZ.column_wall_thickness}0{CreatePZ.head_column_additional, CreatePZ.bottomhole_artificial}')
         if CreatePZ.column_additional == False:
