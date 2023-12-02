@@ -98,7 +98,7 @@ def acid_work(self):
              f'целью определения места нарушения в присутствии представителя заказчика, составить акт. '
              f'Определить приемистость НЭК.',
              None, None, None, None, None, None, None,
-             'мастер КРС', 0.4],
+             'мастер КРС', None],
             ]
         for plast in list(CreatePZ.dict_perforation.keys()):
             for interval in CreatePZ.dict_perforation[plast]['интервал']:
@@ -130,7 +130,7 @@ def acid_work(self):
 
             if definition_Q_quest == QMessageBox.StandardButton.Yes:
 
-                paker_list.insert(-3, [None, None,
+                paker_list.insert(-2, [None, None,
                               f'Произвести насыщение скважины до стабилизации давления закачки не менее 5м3. Опробовать  '
                               f'пласт {plast} на приемистость в трех режимах при Р={pressure_mode(CreatePZ.expected_P, plast)}атм в присутствии представителя ЦДНГ. '
                               f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до '

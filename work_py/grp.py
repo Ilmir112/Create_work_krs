@@ -234,7 +234,7 @@ def normalization(self):
     return normalization_list
 
 
-def gpp_select(self, paker_depth):
+def gpp_select(paker_depth):
     from open_pz import CreatePZ
     from work_py.opressovka import paker_diametr_select
     if CreatePZ.column_diametr > 120:
@@ -257,7 +257,7 @@ def gpp_select(self, paker_depth):
     return paker_select
 
 
-def paker_select(self, paker_depth):
+def paker_select(paker_depth):
     from open_pz import CreatePZ
     from work_py.opressovka import paker_diametr_select
     if CreatePZ.column_diametr > 120:
@@ -267,15 +267,13 @@ def paker_select(self, paker_depth):
     else:
         nkt_diam = '60'
     paker_select = ''
-    if CreatePZ.column_additional == False or CreatePZ.column_additional == True and paker_depth < CreatePZ.head_column_additional:
-        paker_select = f'воронка, НКТ{nkt_diam}мм - 1,5м, пакер ПРО-ЯМО-{paker_diametr_select(paker_depth)} (либо аналог) +' \
-                       f'опрессовочный узел +НКТ{nkt_diam}мм - 10м, реперный патрубок НКТ{nkt_diam}мм - 2м,'
-    elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr < 110 and paker_depth > CreatePZ.head_column_additional:
-        paker_select = f'воронка, НКТ{nkt_diam}мм - 1,5м, пакер ПРО-ЯМО-{paker_diametr_select(paker_depth)} (либо аналог) +' \
-                       f'опрессовочный узел +НКТ{nkt_diam}мм - 10м, реперный патрубок НКТ{nkt_diam}мм - 2м, + НКТ{nkt_diam} L-' \
-                       f'{round(paker_depth - CreatePZ.head_column_additional, 0)}м'
-    elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr > 110 and paker_depth > CreatePZ.head_column_additional:
-        paker_select = f'воронка, НКТ{nkt_diam}мм - 1,5м, пакер ПРО-ЯМО-{paker_diametr_select(paker_depth)} (либо аналог) +' \
+    print(f'пакер ГРП {paker_diametr_select(paker_depth)}')
+    if CreatePZ.column_additional == False or (CreatePZ.column_additional == True and paker_depth < CreatePZ.head_column_additional):
+        paker_select = f'воронка, НКТ{nkt_diam}мм - 1,5м, пакер ГРП для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм +' \
+                       f'опрессовочный узел +НКТ{nkt_diam}мм - 10м, реперный патрубок НКТ{nkt_diam}мм - 2м'
+
+    else:
+        paker_select = f'воронка, НКТ{nkt_diam}мм - 1,5м, пакер ГРП для ЭК {CreatePZ.column_additional_diametr}мм х {CreatePZ.column_additional_wall_thickness}мм+' \
                        f'опрессовочный узел +НКТ{nkt_diam}мм со снятыми фасками - 10м, реперный патрубок НКТ{nkt_diam}мм - 2м, + НКТ{nkt_diam} ' \
                        f'со снятыми фасками L-{round(paker_depth - CreatePZ.head_column_additional, 0)}м'
     return paker_select
@@ -540,14 +538,14 @@ def paker_select(self, paker_depth):
         nkt_diam = '60'
 
     if CreatePZ.column_additional == False or CreatePZ.column_additional == True and paker_depth < CreatePZ.head_column_additional:
-        paker_select = f'воронка, НКТ{nkt_diam}мм - 1,5м, пакер ПРО-ЯМО-{paker_diametr_select} (либо аналог) +' \
+        paker_select = f'воронка, НКТ{nkt_diam}мм - 1,5м, пакер ПРО-ЯМО-{paker_diametr_select(paker_depth)} (либо аналог) +' \
                        f'опрессовочный узел +НКТ{nkt_diam}мм - 10м, реперный патрубок НКТ{nkt_diam}мм - 2м,'
     elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr < 110 and paker_depth > CreatePZ.head_column_additional:
-        paker_select = f'воронка, НКТ{nkt_diam}мм - 1,5м, пакер ПРО-ЯМО-{paker_diametr_select} (либо аналог) +' \
+        paker_select = f'воронка, НКТ{nkt_diam}мм - 1,5м, пакер ПРО-ЯМО-{paker_diametr_select(paker_depth)} (либо аналог) +' \
                        f'опрессовочный узел +НКТ{nkt_diam}мм - 10м, реперный патрубок НКТ{nkt_diam}мм - 2м, + НКТ{nkt_diam} L-' \
                        f'{round(paker_depth - CreatePZ.head_column_additional, 0)}м'
     elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr > 110 and paker_depth > CreatePZ.head_column_additional:
-        paker_select = f'воронка, НКТ{nkt_diam}мм - 1,5м, пакер ПРО-ЯМО-{paker_diametr_select} (либо аналог) +' \
+        paker_select = f'воронка, НКТ{nkt_diam}мм - 1,5м, пакер ПРО-ЯМО-{paker_diametr_select(paker_depth)} (либо аналог) +' \
                        f'опрессовочный узел +НКТ{nkt_diam}мм со снятыми фасками - 10м, реперный патрубок НКТ{nkt_diam}мм - 2м, + НКТ{nkt_diam} ' \
                        f'со снятыми фасками L-{round(paker_depth - CreatePZ.head_column_additional, 0)}м'
     return paker_select

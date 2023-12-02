@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import QInputDialog
 
 import krs
+from work_py.acids_work import pressure_mode
 
 
 def kot_select(self):
@@ -80,6 +81,31 @@ def fluid_change(self):
                          ]
     return fluid_change_list
 
+def konte(self):
+
+    konte_list = [[None, None,
+                          f'Скважина согласована на проведение работ по технологии контейнерно-канатных технологий по технологическому плану Таграс-РС.'
+                          f'Вызвать геофизическую партию. Заявку оформить за 24 часов сутки через геологическую службу "Ойл-сервис". '
+                          f'Произвести  монтаж ПАРТИИ ГИС согласно утвержденной главным инженером от 14.10.2021г.',
+                          None, None, None, None, None, None, None,
+                          'мастер КРС', 1.25],
+                  [None, None, f'Произвести работы указанные в плане работ силами спец подрядчика, при выполнении '
+                               f'из основного плана работ работы исключить'
+                   f'Ghjbpd',
+                   None, None, None, None, None, None, None,
+                   'мастер КРС', 12]
+                  ]
+    return konte_list
+def definition_Q(self):
+    from open_pz import CreatePZ
+    definition_Q_list = [[None, None,
+                           f'Произвести насыщение скважины до стабилизации давления закачки не менее 5м3. Опробовать  '
+                           f' на приемистость в трех режимах при Р={pressure_mode(CreatePZ.expected_P, "пласт")}атм в присутствии представителя ЦДНГ. '
+                           f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до '
+                           f'начала работ). ',
+                           None, None, None, None, None, None, None,
+                           'мастер КРС', 1.25]]
+    return definition_Q_list
 def privyazkaNKT(self):
     priv_list = [None, None, f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС "Ойл-сервис". '
                  f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером от 14.10.2021г. '

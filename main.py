@@ -220,9 +220,16 @@ class MyWindow(QMainWindow):
         geophysical.addAction(geophysical_action)
         geophysical_action.triggered.connect(self.GeophysicalNewWindow)
 
+        rgd_menu  = geophysical.addMenu("РГД")
+        rgdWithoutPaker_action = QAction("РГД по колонне", self)
+        rgd_menu.addAction(rgdWithoutPaker_action)
+        rgdWithoutPaker_action.triggered.connect(self.rgdWithoutPaker_action)
+
         privyazka_action = QAction("Привязка НКТ", self)
         geophysical.addAction(privyazka_action)
         privyazka_action.triggered.connect(self.privyazkaNKT)
+
+
 
         vp_action = QAction("Установка ВП", self)
         geophysical.addAction(vp_action)
@@ -328,6 +335,16 @@ class MyWindow(QMainWindow):
         alone_menu.addAction(mkp_action)
         mkp_action.triggered.connect(self.mkp_revision)
 
+        konte_action = QAction('Канатные технологии')
+        alone_menu.addAction(konte_action)
+        konte_action.triggered.connect(self.konte_action)
+
+
+
+        definition_Q_action = QAction("Определение приемитости по НКТ", self)
+        alone_menu.addAction(definition_Q_action)
+        definition_Q_action.triggered.connect(self.definition_Q)
+
         kot_action = QAction('Система обратных клапанов')
         alone_menu.addAction(kot_action)
         kot_action.triggered.connect(self.kot_work)
@@ -384,16 +401,29 @@ class MyWindow(QMainWindow):
         emergencyNKT_list = emergencyNKT(self)
         self.populate_row(self.ins_ind, emergencyNKT_list)
 
+    def rgdWithoutPaker_action(self):
+        from work_py.rgdVcht import rgdWithoutPaker
+        rgdWithoutPaker_list = rgdWithoutPaker(self)
+        self.populate_row(self.ins_ind, rgdWithoutPaker_list)
     def privyazkaNKT(self):
         from work_py.alone_oreration import privyazkaNKT
         privyazkaNKT_list = privyazkaNKT(self)
         self.populate_row(self.ins_ind, privyazkaNKT_list)
+
+    def definition_Q(self):
+        from work_py.alone_oreration import definition_Q
+        definition_Q_list = definition_Q(self)
+        self.populate_row(self.ins_ind, definition_Q_list)
 
     def kot_work(self):
         from work_py.alone_oreration import kot_work
         kot_work_list = kot_work(self)
         self.populate_row(self.ins_ind, kot_work_list)
 
+    def konte_action(self):
+        from work_py.alone_oreration import konte
+        konte_work_list = konte(self)
+        self.populate_row(self.ins_ind, konte_work_list)
     def mkp_revision(self):
         from work_py.mkp import mkp_revision
         mkp_work_list = mkp_revision(self)

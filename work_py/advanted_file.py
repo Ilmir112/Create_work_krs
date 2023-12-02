@@ -6,8 +6,8 @@ def skm_interval():
     str_raid = []
     if all([CreatePZ.dict_work_pervorations[plast]['отрайбировано'] == False for plast in CreatePZ.plast_work]):
         str_raid.append([CreatePZ.perforation_roof - 90, CreatePZ.perforation_roof - 10])
-        if CreatePZ.if_None(CreatePZ.paker_do["posle"]) != 'отсут' and CreatePZ.if_None(CreatePZ.H_F_paker_do["posle"]) != 'отсут' :
-            str_raid.append([CreatePZ.H_F_paker_do["posle"] - 20, CreatePZ.H_F_paker_do["posle"] + 20])
+        if CreatePZ.if_None(CreatePZ.paker_do["posle"]) != '0' and CreatePZ.if_None(CreatePZ.H_F_paker_do["posle"]) != '0' :
+            str_raid.append([float(CreatePZ.H_F_paker_do["posle"]) - 20, float(CreatePZ.H_F_paker_do["posle"]) + 20])
         if CreatePZ.leakiness:
 
             for nek in list(CreatePZ.dict_leakiness['НЭК']['интервал'].keys()):
@@ -18,7 +18,7 @@ def skm_interval():
                     str_raid.append([int(float(nek.split('-')[0])) - 90,
                                      CreatePZ.CreatePZ.current_bottom - 2])
     else:
-        if CreatePZ.paker_do["posle"] != 'отсут':
+        if CreatePZ.paker_do["posle"] != '0':
             str_raid.append([float(CreatePZ.H_F_paker_do["posle"]) - 20, float(CreatePZ.H_F_paker_do["posle"]) + 20])
         if CreatePZ.leakiness:
             for nek in list(CreatePZ.dict_leakiness['НЭК']['интервал'].keys()):

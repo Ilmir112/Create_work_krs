@@ -9,7 +9,7 @@ def gno_down(self):
     dict_pump_nv = ''
     dict_pump_ecn = ''
     dict_pump_h = 0
-
+    print(CreatePZ.dict_pump, CreatePZ.paker_do)
     try:
         dict_pump = dict_pump["posle"].split('/')
         print( CreatePZ.dict_pump["posle"])
@@ -27,8 +27,7 @@ def gno_down(self):
         print(f'yfcjcf{dict_pump}')
         dict_pump_h = CreatePZ.dict_pump_h["posle"]
     paker_descent = []
-    try:
-        paker_descent = [
+    paker_descent = [
             [None, None,
              f'Заменить технологические НКТ на опрессованные эксплуатационные НКТ. Заменить подвесной патрубок на '
              f'сертифицированный. Для опрессовки фондовых НКТ необходимо заявить в ЦДНГ за 24 часа клапан А-КСШ-89-48-30. '
@@ -37,7 +36,7 @@ def gno_down(self):
              None, None, None, None, None, None, None,
              'мастер КРС', None],
             [None, None,
-             f'Спустить подземное оборудование  согласно расчету и карте спуска ЦДНГ НКТ{list(CreatePZ.dict_nkt_po.keys())[0]}мм с пакером {CreatePZ.paker_do["posle"]} '
+             f'Спустить подземное оборудование  согласно расчету и карте спуска ЦДНГ НКТ{gno_nkt_opening(CreatePZ.dict_nkt_po)}мм с пакером {CreatePZ.paker_do["posle"]} '
              f'на глубину {CreatePZ.H_F_paker_do["posle"]}м, воронку на глубину {sum(CreatePZ.dict_nkt_po.values())}м. НКТ прошаблонировать для проведения ГИС.',
              None, None, None, None, None, None, None,
              'мастер КРС', float(round(
@@ -53,7 +52,7 @@ def gno_down(self):
              f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ)',
              None, None, None, None, None, None, None,
              'мастер КРС, предст. заказчика', float(1.2)],
-            [None, None, ''.join(['ОВТР 10ч' if CreatePZ.curator != 'ЧГМ' else 'ОВТР 4ч']),
+            [None, None, ''.join(['ОВТР 10ч' if CreatePZ.region != 'ЧГМ' else 'ОВТР 4ч']),
              None, None, None, None, None, None, None,
              'мастер КРС', ''.join(['10' if CreatePZ.region != 'ЧГМ' else '4'])],
             [None, None, 'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС "Ойл-сервис".  Составить'
@@ -72,13 +71,12 @@ def gno_down(self):
              None, None, None, None, None, None, None,
              'мастер КРС, подрядчик по ГИС', 8],
            ]
-        for plast in list(CreatePZ.dict_perforation.keys()):
-            for interval in CreatePZ.dict_perforation[plast]['интервал']:
-                if abs(float(interval[1] - float(CreatePZ.H_F_paker_do["posle"]))) < 10 or abs(float(interval[0] - float(CreatePZ.H_F_paker_do["posle"]))) < 10:
-                    if privyazkaNKT(self) not in paker_descent:
-                        paker_descent.insert(2, privyazkaNKT(self))
-    except:
-        pass
+    for plast in list(CreatePZ.dict_perforation.keys()):
+        for interval in CreatePZ.dict_perforation[plast]['интервал']:
+            if abs(float(interval[1] - float(CreatePZ.H_F_paker_do["posle"]))) < 10 or abs(float(interval[0] - float(CreatePZ.H_F_paker_do["posle"]))) < 10:
+                if privyazkaNKT(self) not in paker_descent:
+                    paker_descent.insert(2, privyazkaNKT(self))
+
     gno_list = [[None, None,
          f'За 48 часов до спуска запросить КАРТУ спуска на ГНО и заказать оборудование согласно карты спуска.',
          None, None, None, None, None, None, None,
@@ -396,49 +394,49 @@ def gno_down(self):
 
     lift_key = 'НВ'
     dict_pump = str(dict_pump)
-    print(('НВ' in dict_pump.upper() or 'ШГН' in dict_pump.upper()), CreatePZ.if_None(CreatePZ.paker_do["posle"]) != 'отсут')
-    if ('ЭЦН' in dict_pump.upper() or 'ВНН' in dict_pump.upper()) and str(CreatePZ.paker_do["posle"]) == 'отсут':
+    print(('НВ' in dict_pump.upper() or 'ШГН' in dict_pump.upper()), CreatePZ.if_None(CreatePZ.paker_do["posle"]) != '0')
+    if ('ЭЦН' in dict_pump.upper() or 'ВНН' in dict_pump.upper()) and str(CreatePZ.paker_do["posle"]) == '0':
         lift_select = descent_ecn
         lift_key = 'ЭЦН'
 
-    elif ('ЭЦН' in dict_pump.upper() or 'ВНН' in dict_pump.upper()) and (CreatePZ.if_None(CreatePZ.paker_do["posle"]) == 'отсут'):
+    elif ('ЭЦН' in dict_pump.upper() or 'ВНН' in dict_pump.upper()) and (CreatePZ.if_None(CreatePZ.paker_do["posle"]) == '0'):
 
         lift_select = descent_ecn_with_paker
         lift_key = 'ЭЦН с пакером'
         print('Подьем ЭЦН с пакером ')
 
-    elif ('НВ' in dict_pump.upper() or 'ШГН' in dict_pump.upper()) and CreatePZ.if_None(CreatePZ.paker_do["posle"]) == 'отсут':
+    elif ('НВ' in dict_pump.upper() or 'ШГН' in dict_pump.upper()) and CreatePZ.if_None(CreatePZ.paker_do["posle"]) == '0':
         lift_select = descent_nv
         lift_key = 'НВ'
-    elif ('НВ' in dict_pump.upper() or 'ШГН' in dict_pump.upper()) and CreatePZ.if_None(CreatePZ.paker_do["posle"]) != 'отсут':
+    elif ('НВ' in dict_pump.upper() or 'ШГН' in dict_pump.upper()) and CreatePZ.if_None(CreatePZ.paker_do["posle"]) != '0':
         lift_select = descent_nv_with_paker
         lift_key = 'НВ с пакером'
 
-    elif 'НН' in dict_pump.upper() and CreatePZ.if_None(CreatePZ.paker_do["posle"]) == 'отсут':
+    elif 'НН' in dict_pump.upper() and CreatePZ.if_None(CreatePZ.paker_do["posle"]) == '0':
         lift_select = descent_nn
         lift_key = 'НН'
-    elif 'НН' in dict_pump.upper() and CreatePZ.if_None(CreatePZ.paker_do["posle"]) != 'отсут':
+    elif 'НН' in dict_pump.upper() and CreatePZ.if_None(CreatePZ.paker_do["posle"]) != '0':
         lift_select = descent_nn_with_paker
         lift_key = 'НН с пакером'
     elif 'НВ' in dict_pump_nv.upper() and 'ЭЦН' in dict_pump_ecn.upper() \
-            and  CreatePZ.if_None(CreatePZ.paker_do["posle"]) != 'отсут':
+            and  CreatePZ.if_None(CreatePZ.paker_do["posle"]) != '0':
         lift_select = descentORD
         lift_key = "ОРД"
-    elif 'НН' in dict_pump.upper() and CreatePZ.if_None(CreatePZ.paker_do["posle"]) != 'отсут':
+    elif 'НН' in dict_pump.upper() and CreatePZ.if_None(CreatePZ.paker_do["posle"]) != '0':
         lift_select = descent_nn_with_paker
         lift_key = "НН с пакером"
         print('Подьем НН с пакером ')
 
-    elif str(dict_pump) == '0' and CreatePZ.if_None(CreatePZ.paker_do["posle"]) == 'отсут':
+    elif str(dict_pump) == '0' and CreatePZ.if_None(CreatePZ.paker_do["posle"]) == '0':
         lift_select = descent_voronka
         lift_key = 'воронка'
         print('Подьем  воронки')
-    elif str(dict_pump) == '0' and CreatePZ.if_None(CreatePZ.paker_do["posle"]) != 'отсут':
+    elif str(dict_pump) == '0' and CreatePZ.if_None(CreatePZ.paker_do["posle"]) != '0':
         lift_select = paker_descent
         lift_key = 'пакер'
         lift_s = f'пакер ППД  {CreatePZ.paker_do["posle"]}'
     # elif 89 in CreatePZ.dict_nkt.keys() and 48 in CreatePZ.dict_nkt.keys() and CreatePZ.if_None(
-    #         CreatePZ.paker_do["posle"]) != 'отсут':
+    #         CreatePZ.paker_do["posle"]) != '0':
     #     lift_select = lift_orz
     #     print('Подьем ОРЗ')
 
@@ -487,9 +485,9 @@ def gno_nkt_opening(dict_nkt_po):
 
 def PzakPriGis(self):
     from open_pz import CreatePZ
-    if CreatePZ.region == 'ЧГМ' and list(CreatePZ.expected_pick_up.values())[0] < 80:
+    if CreatePZ.region == 'ЧГМ' and CreatePZ.expected_P < 80:
         return 80
     else:
-        return list(CreatePZ.expected_pick_up.values())[0]
+        return CreatePZ.expected_P
 
 

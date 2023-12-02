@@ -245,30 +245,38 @@ class DataWindow(MyWindow):
             msg = QMessageBox.information(self, 'Внимание', 'Не все поля соответствуют значениям')
             return
         else:
-            CreatePZ.column_diametr = float(columnType)
-            CreatePZ.column_wall_thickness = float(column_wall_thickness)
-            CreatePZ.shoe_column = float(shoe_column)
-            CreatePZ.column_additional_diametr = [0 if column_additional_diametr == 'отсут' else float(column_additional_diametr)][0]
-            CreatePZ.column_additional_wall_thickness = [0 if column_additional_wall_thickness == 'отсут' else float(column_additional_wall_thickness)][0]
-            CreatePZ.shoe_column_additional = [0 if shoe_column_additional == 'отсут' else float(shoe_column_additional)][0]
-            CreatePZ.head_column_additional = [0 if head_column_additional == 'отсут' else float(head_column_additional)][0]
-            CreatePZ.bottomhole_drill =  [0 if bottomhole_drill == 'отсут' else float(bottomhole_drill)][0]
-            CreatePZ.bottomhole_artificial =  [0 if bottomhole_artificial == 'отсут' else float(bottomhole_artificial)][0]
-            CreatePZ.current_bottom =  [0 if current_bottom == 'отсут' else float(current_bottom)][0]
-            CreatePZ.max_angle =  [0 if max_angle == 'отсут' else float(max_angle)][0]
-            CreatePZ.max_expected_pressure = [0 if max_expected_pressure == 'отсут' else float(max_expected_pressure)][0]
-            CreatePZ.max_admissible_pressure = [0 if max_admissible_pressure == 'отсут' else float(max_admissible_pressure)][0]
-            CreatePZ.dict_pump["do"] = dict_pump_do
-            CreatePZ.dict_pump_h["do"] = [0 if dict_pump_h_do == 'отсут' else float(dict_pump_h_do)][0]
-            CreatePZ.dict_pump["posle"] = dict_pump_posle
-            CreatePZ.dict_pump_h["posle"] = [0 if dict_pump_h_posle == 'отсут' else float(dict_pump_h_posle)][0]
-            CreatePZ.paker_do["do"] = paker_do
-            CreatePZ.H_F_paker_do["do"] = [0 if H_F_paker_do == 'отсут' else float(H_F_paker_do)][0]
-            CreatePZ.paker_do["posle"] = paker_posle
-            CreatePZ.H_F_paker_do["posle"] = [0 if H_F_paker_posle == 'отсут' else float(H_F_paker_posle)][0]
-
+            CreatePZ.column_diametr = self.if_None(columnType)
+            CreatePZ.column_wall_thickness = self.if_None(column_wall_thickness)
+            CreatePZ.shoe_column = self.if_None(shoe_column)
+            CreatePZ.column_additional_diametr = self.if_None(column_additional_diametr)
+            CreatePZ.column_additional_wall_thickness = self.if_None(column_additional_wall_thickness)
+            CreatePZ.shoe_column_additional = self.if_None(shoe_column_additional)
+            CreatePZ.head_column_additional = self.if_None(head_column_additional)
+            CreatePZ.bottomhole_drill = self.if_None(bottomhole_drill)
+            CreatePZ.bottomhole_artificial =  self.if_None(bottomhole_artificial)
+            CreatePZ.current_bottom =  self.if_None(current_bottom)
+            CreatePZ.max_angle =  self.if_None(max_angle)
+            CreatePZ.max_expected_pressure = self.if_None(max_expected_pressure)
+            CreatePZ.max_admissible_pressure = self.if_None(max_admissible_pressure)
+            CreatePZ.dict_pump["do"] = self.if_None(dict_pump_do)
+            CreatePZ.dict_pump_h["do"] = self.if_None(dict_pump_h_do)
+            CreatePZ.dict_pump["posle"] = self.if_None(dict_pump_posle)
+            CreatePZ.dict_pump_h["posle"] = self.if_None(dict_pump_h_posle)
+            CreatePZ.paker_do["do"] = self.if_None(paker_do)
+            CreatePZ.H_F_paker_do["do"] = self.if_None(H_F_paker_do)
+            CreatePZ.paker_do["posle"] = self.if_None(paker_posle)
+            CreatePZ.H_F_paker_do["posle"] = self.if_None(H_F_paker_posle)
+            print(f' после ок {CreatePZ.dict_pump, CreatePZ.paker_do, CreatePZ.H_F_paker_do, CreatePZ.dict_pump_h}')
             self.close()
-
+    
+    def if_None(self, value):
+        
+        if value is None or 'отс' in str(value).lower() or value == '-' or value == 0:
+            return '0'
+        try:
+            return round(float(value), 1)
+        except:
+            return value
     def ifNum(self, string):
         if re.search(r'\d+(,\d+){0,2}', string) or string == 'отсут':
             return True

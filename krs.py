@@ -7,56 +7,45 @@ from work_py import template_work, opressovka
 
 
 
-def calculationFluidWork(self):
+def calculationFluidWork(self, vertical, pressure):
 
     from open_pz import CreatePZ
-    print(f' все пласты  {CreatePZ.plast_all}')
-    for plast in CreatePZ.plast_all:
-        print(CreatePZ.dict_perforation[plast]['давление'])
+    if vertical != None and pressure != None:
 
+        print(vertical)
+        stockRatio = [0.1 if float(vertical) <= 1200 else 0.05][0]
 
-        # try:
-
-        print(list(CreatePZ.dict_perforation[plast]['давление']), CreatePZ.dict_perforation[plast])
-        pressure = [x for x in list(CreatePZ.dict_perforation[plast]['давление']) if not x is None][0]
-
-        vertical = [x for x in list(CreatePZ.dict_perforation[plast]['вертикаль']) if not x is None][0]
-
-        if vertical <= 1200:
-            stockRatio = 0.1
-        else:
-            stockRatio = 0.05
-        print(f' {stockRatio, pressure, vertical}')
-        fluidWork = round(float(pressure) * (1 + stockRatio) / float(vertical) / 0.0981, 2)
+        fluidWork = round(float(str(pressure).replace(',', '.')) * (1 + stockRatio) / float(vertical) / 0.0981, 2)
         if fluidWork < 1.02 and (CreatePZ.region == 'КГМ' or CreatePZ.region == 'АГМ'):
             fluidWork = 1.02
         elif fluidWork < 1.02 and CreatePZ.region == 'ИГМ' or CreatePZ.region == 'ТГМ' or CreatePZ.region == 'ЧГМ':
             fluidWork = 1.01
+        print(f' ЖГС {fluidWork}')
+        return fluidWork
+    else:
+        pass
 
-        # except:
-        #     fluidWork = 0
-        print(f' ЖГС {plast} - {fluidWork}')
-        CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('рабочая жидкость', fluidWork)
-
-        if plast in CreatePZ.plast_work:
-            CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('рабочая жидкость', fluidWork)
-        if plast in CreatePZ.plast_project:
-            CreatePZ.dict_perforation_project.setdefault(plast, {}).setdefault('рабочая жидкость', fluidWork)
 
 
 def work_krs(self):
     from open_pz import CreatePZ
 
     without_damping_True = krs.without_damping(self)
-    calculationFluidWork(self)
+
     print(f'Скважина в неглушении {without_damping_True}')
     # print(f' {CreatePZ.dict_perforation}')
     fluid_list = []
-    for plast in CreatePZ.plast_work:
-        # print(f' жидкость глушения {plast, fluid_list}')
-        fluid_list.append(CreatePZ.dict_perforation[plast]['рабочая жидкость'])
+
+    CreatePZ.current_bottom, ok = QInputDialog.getDouble(self, 'Необходимый забой',
+                                                         'Введите забой до которого нужно нормализовать',
+                                                         float(CreatePZ.current_bottom))
 
     try:
+        for plast in CreatePZ.plast_work:
+            print(f' жидкость глушения {plast, fluid_list}')
+            fluid_list.append(
+                max([max(CreatePZ.dict_perforation[plast]['рабочая жидкость']) for plast in CreatePZ.plast_work]))
+            print(f'прини {fluid_list}')
         fluid_work_insert, ok = QInputDialog.getDouble(self, 'Рабочая жидкость', 'Введите удельный вес рабочей жидкости',
                                                    max(fluid_list), 0.87, 2, 2)
     except:
@@ -96,25 +85,24 @@ def work_krs(self):
         [None, None, 'Наименование работ', None, None, None, None, None, None, None, 'Ответственный',
          'Нормы времени \n мин/час.'],
         [None, 1,
-         'Начальнику смены ЦТКРС, вызвать телефонограммой представителя Заказчика для оформления АКТа приёма-передачи скважины в ремонт. \
-        Совместно с представителем Заказчика оформить схему расстановки оборудования при КРС с обязательной подписью представителя Заказчика на \
-        схеме.',
+         f'Начальнику смены ЦТКРС, вызвать телефонограммой представителя Заказчика для оформления АКТа приёма-передачи скважины в ремонт. \n'
+         f'Совместно с представителем Заказчика оформить схему расстановки оборудования при КРС с обязательной подписью представителя Заказчика на схеме.',
          None, None, None, None, None, None, None,
-         'Мастер КРС,  предст-ль Заказчика.', float(0.5)],
+         'Мастер КРС, предст-ль Заказчика.', float(0.5)],
         [None, 2,
-         'Принять скважину в ремонт у Заказчика с составлением АКТа. Переезд  бригады. Подготовительные  работы к КРС. Определить технологические \
-         точки откачки жидкости у Заказчика согласно Договора.',
+         f'Принять скважину в ремонт у Заказчика с составлением АКТа. Переезд  бригады. Подготовительные работы к КРС. Определить технологические '
+         f'точки откачки жидкости у Заказчика согласно Договора.',
          None, None, None, None, None, None, None,
          ' Предст-тель Заказчика, мастер КРС', float(0.5)],
         [None, 3,
-         'Перед началом работ по освоению, капитальному и текущему ремонту скважин бригада должна быть ознакомлена с возможными осложнениями и авариями\
-          в процессе работ, планом локализации и ликвидации аварии (ПЛА) и планом работ. С работниками должен быть проведен инструктаж по выполнению работ,\
-           связанных с применением новых технических устройств и технологий с соответствующим оформлением в журнал инструктажей на рабочем месте ',
+         f'Перед началом работ по освоению, капитальному и текущему ремонту скважин бригада должна быть ознакомлена с возможными осложнениями и авариями'
+         f'в процессе работ, планом локализации и ликвидации аварии (ПЛА) и планом работ. С работниками должен быть проведен инструктаж по выполнению работ, '
+         f'связанных с применением новых технических устройств и технологий с соответствующим оформлением в журнал инструктажей на рабочем месте ',
          None, None, None, None, None, None, None,
          'Мастер КРС', float(0.75)],
-        [None, 4, f'При подъеме труб из скважины производить долив тех. жидкостью Y- {fluid_work}. Долив скважины должен быть равен объему извлекаемого металла.\
-         По мере расхода жидкости из ёмкости, производить своевременное её заполнение. При всех технологических спусках НКТ 73мм х 5,5мм и 60мм х 5мм производить \
-         контрольный замер и отбраковку + шаблонирование шаблоном d=59,6мм и 47,9мм соответственно.',
+        [None, 4, f'При подъеме труб из скважины производить долив тех. жидкостью Y- {fluid_work}. Долив скважины должен быть равен объему извлекаемого металла.'
+                  f'По мере расхода жидкости из ёмкости, производить своевременное её заполнение. При всех технологических спусках НКТ 73мм х 5,5мм и 60мм х 5мм производить '
+                  f'контрольный замер и отбраковку + шаблонирование шаблоном d=59,6мм и 47,9мм соответственно.',
          None, None, None, None, None, None, None,
          ' Мастер КРС.', None],
         [None, None, f'ВСЕ ТЕХНОЛОГИЧЕСКИЕ ОПЕРАЦИИ ПРОИЗВОДИТЬ НА ТЕХ ЖИДКОСТИ УД. ВЕСОМ РАВНОЙ {fluid_work}', None,
@@ -742,7 +730,7 @@ def work_krs(self):
                    None, None, None, None, None, None, None,
                    'Мастер КРС, Представ заказчика', 1.2],
                   [None, None,
-                   f'Произвести определение приемистости скважины при давлении {CreatePZ.max_admissible_pressure}атм. '
+                   f'Произвести определение приемистости скважины при давлении не более     {CreatePZ.max_admissible_pressure}атм. '
                    f'{"".join([" " if without_damping_True == True else f"По результату приемистости произвести глушение скважины в НКТ тех.жидкостью в объеме обеспечивающим заполнение трубного пространства и скважины в подпакерной зоне в объеме {volume_pod_NKT()} м3 жидкостью уд.веса {fluid_work} на давление поглощения до {CreatePZ.max_admissible_pressure}атм. Тех отстой 1-2 часа. Произвести замер избыточного давления в скважине."])}',
                    None, None,
                    None, None, None, None, None,
@@ -804,7 +792,7 @@ def work_krs(self):
 
 
     if ('ЭЦН' in dict_pump.upper() or 'ВНН' in dict_pump.upper()) and (
-            not CreatePZ.dict_sucker_rod is None and CreatePZ.if_None(CreatePZ.paker_do['do']) != 'отсут'):
+            not CreatePZ.dict_sucker_rod is None and CreatePZ.if_None(CreatePZ.paker_do['do']) != '0'):
         lift_key = 'ОРД'
         lift_select = lift_ord
         print(f'Подьем орд')
@@ -815,40 +803,40 @@ def work_krs(self):
         lift_select = lift_ecn
         print('Подьем ЭЦН')
     elif ('ЭЦН' in dict_pump.upper() or 'ВНН' in dict_pump.upper()) and (
-            CreatePZ.if_None(CreatePZ.paker_do['do']) != 'отсут'):
+            CreatePZ.if_None(CreatePZ.paker_do['do']) != '0'):
         lift_key = 'ЭЦН с пакером'
         lift_select = lift_ecn_with_paker
         print('Подьем ЭЦН с пакером ')
-    elif ('НВ' in dict_pump.upper() or 'ШГН' in dict_pump.upper()) and CreatePZ.if_None(CreatePZ.paker_do['do']) == 'отсут':
+    elif ('НВ' in dict_pump.upper() or 'ШГН' in dict_pump.upper()) and CreatePZ.if_None(CreatePZ.paker_do['do']) == '0':
 
         lift_key = 'НВ'
         lift_select = lift_pump_nv
         print('Подьем НВ')
-    elif ('НВ' in dict_pump.upper() or 'ШГН' in dict_pump.upper()) and CreatePZ.if_None(CreatePZ.paker_do['do']) != 'отсут':
+    elif ('НВ' in dict_pump.upper() or 'ШГН' in dict_pump.upper()) and CreatePZ.if_None(CreatePZ.paker_do['do']) != '0':
 
         lift_key = 'НВ с пакером'
         lift_select = lift_pump_nv_with_paker
         print('Подьем НВ с пакером ')
-    elif 'НН' in dict_pump.upper() and CreatePZ.if_None(CreatePZ.paker_do['do']) == 'отсут':
+    elif 'НН' in dict_pump.upper() and CreatePZ.if_None(CreatePZ.paker_do['do']) == '0':
 
         lift_key = 'НН'
         lift_select = lift_pump_nn
         print('Подьем НН')
-    elif 'НН' in dict_pump.upper() and CreatePZ.if_None(CreatePZ.paker_do['do']) != 'отсут':
+    elif 'НН' in dict_pump.upper() and CreatePZ.if_None(CreatePZ.paker_do['do']) != '0':
         lift_key = 'НН с пакером'
 
         lift_select = lift_pump_nn_with_paker
         print('Подьем НН с пакером ')
-    elif str(dict_pump) == '0' and CreatePZ.if_None(CreatePZ.paker_do['do']) == 'отсут':
+    elif str(dict_pump) == '0' and CreatePZ.if_None(CreatePZ.paker_do['do']) == '0':
 
         lift_key = 'воронка'
         lift_select = lift_voronka
         print('Подьем  воронки')
-    elif str(dict_pump) == '0' and CreatePZ.if_None(CreatePZ.paker_do['do']) != 'отсут':
+    elif str(dict_pump) == '0' and CreatePZ.if_None(CreatePZ.paker_do['do']) != '0':
         lift_key = 'пакер'
         lift_select = lift_paker
         print('Подьем пакера')
-    elif 89 in CreatePZ.dict_nkt.keys() and 48 in CreatePZ.dict_nkt.keys() and CreatePZ.if_None(CreatePZ.paker_do['do']) != 'отсут':
+    elif 89 in CreatePZ.dict_nkt.keys() and 48 in CreatePZ.dict_nkt.keys() and CreatePZ.if_None(CreatePZ.paker_do['do']) != '0':
 
         try:
             lift_key = 'ОРЗ'
@@ -931,15 +919,7 @@ def work_krs(self):
         lift_select = lift_orz
         print('Подьем ОРЗ')
 
-        # lift_dict = {'пакер': lift_paker, 'ОРЗ': lift_orz, 'ОРД': lift_ord, 'Воронка': lift_voronka,
-        #              'НН с пакером': lift_pump_nn_with_paker, 'НВ с пакером': lift_pump_nv_with_paker,
-        #              'ЭЦН с пакером': lift_ecn_with_paker, 'ЭЦН': lift_ecn, 'НВ': lift_pump_nv, 'НН': lift_pump_nn}
-        # lift_sel = ['пакер', 'ОРЗ', 'ОРД', 'Воронка', 'НН с пакером', 'НВ с пакером',
-        #             'ЭЦН с пакером', 'ЭЦН', 'НВ', 'НН']
-        # lift, ok = QInputDialog.getItem(self, 'Спущенное оборудование', 'выбор спущенного оборудования',
-        #                                 lift_sel, 1, False)
-        # if ok and lift_sel:
-        #     self.le.setText(lift)
+
         # lift_select = lift_dict[lift]
     print(f'Лифт ключ {lift_key}')
     lift_dict = {'пакер': lift_paker, 'ОРЗ': lift_orz, 'ОРД': lift_ord, 'воронка': lift_voronka,
