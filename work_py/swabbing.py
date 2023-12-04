@@ -4,6 +4,7 @@ import H2S
 import krs
 from krs import well_volume
 from work_py.alone_oreration import privyazkaNKT
+from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm,well_volume_norm
 
 
 def swabbing_opy(self):
@@ -31,9 +32,7 @@ def swabbing_opy(self):
          f'Спустить {paker_select} на НКТ{nkt_diam}мм  до глубины {CreatePZ.current_bottom}м'
          f' с замером, шаблонированием шаблоном. ',
          None, None, None, None, None, None, None,
-         'мастер КРС', round(
-            CreatePZ.current_bottom / 9.52 * 1.51 / 60 * 1.2 * 1.2 * 1.04 + 0.18 + 0.008 * CreatePZ.current_bottom / 9.52 + 0.003 * CreatePZ.current_bottom / 9.52,
-            2)],
+         'мастер КРС', descentNKT_norm(CreatePZ.current_bottom, 1)],
         [None, None,
          f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {CreatePZ.fluid_work}  при расходе жидкости 6-8 л/сек '
          f'в присутствии представителя Заказчика в объеме {round(well_volume(self, CreatePZ.current_bottom) * 1.5, 1)}м3 ПРИ ПРОМЫВКЕ НЕ ПРЕВЫШАТЬ ДАВЛЕНИЕ {CreatePZ.max_admissible_pressure}АТМ, ДОПУСТИМАЯ ОСЕВАЯ НАГРУЗКА НА ИНСТРУМЕНТ: 0,5-1,0 ТН',
@@ -45,7 +44,7 @@ def swabbing_opy(self):
          'Мастер КРС', None],
         [None, None, f'Приподнять  воронку до глубины {depth_opy + 200}м',
          None, None, None, None, None, None, None,
-         'мастер КРС', 0.4],
+         'мастер КРС', liftingNKT_norm(CreatePZ-(depth_opy + 200),1)],
         [None, None,
          f'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС "Ойл-сервис". '
          f' Составить акт готовности скважины и передать его начальнику партии',
@@ -57,7 +56,7 @@ def swabbing_opy(self):
          f' по невозможности на давление поглощения, но не менее 30атм в течении 30мин Провести практическое обучение вахт по '
          f'сигналу "выброс" с записью в журнале проведения учебных тревог',
          None, None, None, None, None, None, None,
-         'Мастер КРС, подрядчик по ГИС', None],
+         'Мастер КРС, подрядчик по ГИС', 1.35],
         [None, None,
          f'Фоновая запись. Произвести  опрессовку колонны снижением уровня свабированием по Задаче №2.1.17 Понижение уровня '
          f'до глубины {depth_opy}м, тех отстой 3ч.  КВУ в течение 3 часов после тех.отстоя. Интервал времени между  замерами '
@@ -85,7 +84,7 @@ def swabbing_opy(self):
                                                            'Введите Ожидаемое давление по пласту', 0, 0, 300, 1)
             fluid_new, ok = QInputDialog.getDouble(self, 'Новое значение удельного веса жидкости',
                                                    'Введите значение удельного веса жидкости', 1.02, 1, 1.72, 2)
-        if len(CreatePZ.dict_work_pervorations) == 0 and len(CreatePZ.cat_H2S_list) > 1:
+        if len(CreatePZ.plast_work) == 0 and len(CreatePZ.cat_H2S_list) > 1:
             if '2' in str(CreatePZ.cat_H2S_list[1]):
                 CreatePZ.fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
                                       f'расчета {H2S.calv_h2s(self, CreatePZ.cat_H2S_list[1], CreatePZ.H2S_mg[1], CreatePZ.H2S_pr[1])}кг/м3 '
@@ -121,13 +120,13 @@ def swabbing_opy(self):
                               f'менее {round(krs.well_volume(self, CreatePZ.current_bottom), 1)}м3  в присутствии представителя заказчика, Составить акт. '
                               f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ)',
                               None, None, None, None, None, None, None,
-                              'мастер КРС', round(2.5, 1)],
+                              'мастер КРС', well_volume_norm(well_volume(self, CreatePZ.current_bottom)) +  descentNKT_norm()],
                              [None, None,
                               f'Поднять {paker_select} на НКТ{nkt_diam} c глубины {CreatePZ.current_bottom}м с доливом скважины в '
                               f'объеме {round((CreatePZ.current_bottom) * 1.12 / 1000, 1)}м3 удельным весом {CreatePZ.fluid_work}',
                               None, None, None, None, None, None, None,
                               'мастер КРС',
-                              round(0.25 + 0.033 * 1.2 * (CreatePZ.current_bottom) / 9.5 * 1.04, 1)]
+                              liftingNKT_norm(CreatePZ.current_bottom,1)]
                              ]
 
         for row in fluid_change_list:
@@ -138,7 +137,7 @@ def swabbing_opy(self):
                            f'объеме {round((depth_opy + 200) * 1.12 / 1000, 1)}м3 удельным весом {CreatePZ.fluid_work}',
                            None, None, None, None, None, None, None,
                            'мастер КРС',
-                           round(0.25 + 0.033 * 1.2 * (depth_opy + 200) / 9.5 * 1.04, 1)])
+                           liftingNKT_norm(depth_opy + 200)])
     return paker_list
 
 
@@ -206,9 +205,7 @@ def swabbing_with_paker(self, paker_khost, pakerKompo):
          f' с замером, шаблонированием шаблоном. {("Произвести пробную посадку на глубине 50м" if CreatePZ.column_additional == False else "")} '
          f'ПРИ ОТСУТСТВИИ ЦИРКУЛЯЦИИ ПРЕДУСМОТРЕТЬ НАЛИЧИИ В КОМПОНОВКЕ УРАВНИТЕЛЬНЫХ КЛАПАНОВ',
          None, None, None, None, None, None, None,
-         'мастер КРС', round(
-            CreatePZ.current_bottom / 9.52 * 1.51 / 60 * 1.2 * 1.2 * 1.04 + 0.18 + 0.008 * CreatePZ.current_bottom / 9.52 + 0.003 * CreatePZ.current_bottom / 9.52,
-            2)],
+         'мастер КРС', descentNKT_norm(paker_depth,1.2)],
         [None, None, f'Посадить пакер на глубине {paker_depth}м, воронку на глубине {paker_khost + paker_depth}м'
             ,
          None, None, None, None, None, None, None,
@@ -218,7 +215,7 @@ def swabbing_with_paker(self, paker_khost, pakerKompo):
          f' в течение 30 минут в присутствии представителя заказчика, составить акт.  '
          f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ)',
          None, None, None, None, None, None, None,
-         'мастер КРС, предст. заказчика', 1.],
+         'мастер КРС, предст. заказчика', 0.67],
 
         [None, None,
          f'В случае негерметичности э/к, по согласованию с заказчиком произвести ОТСЭК для определения интервала '
@@ -226,7 +223,7 @@ def swabbing_with_paker(self, paker_khost, pakerKompo):
          f'целью определения места нарушения в присутствии представителя заказчика, составить акт. '
          f'Определить приемистость НЭК.',
          None, None, None, None, None, None, None,
-         'мастер КРС', 0.4],
+         'мастер КРС', None],
         [None, None,
          f'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС "Ойл-сервис". '
          f' Составить акт готовности скважины и передать его начальнику партии',
@@ -238,7 +235,7 @@ def swabbing_with_paker(self, paker_khost, pakerKompo):
          f' по невозможности на давление поглощения, но не менее 30атм в течении 30мин Провести практическое обучение вахт по '
          f'сигналу "выброс" с записью в журнале проведения учебных тревог',
          None, None, None, None, None, None, None,
-         'Мастер КРС, подрядчик по ГИС', None],
+         'Мастер КРС, подрядчик по ГИС', 1.3],
         [None, None,
          swab_select,
          None, None, None, None, None, None, None,
@@ -270,7 +267,7 @@ def swabbing_with_paker(self, paker_khost, pakerKompo):
          f'объеме {round(paker_depth * 1.12 / 1000, 1)}м3 удельным весом {CreatePZ.fluid_work}',
          None, None, None, None, None, None, None,
          'мастер КРС',
-         round(0.25 + 0.033 * 1.2 * (paker_depth + paker_khost) / 9.5 * 1.04, 1)]
+         liftingNKT_norm(paker_depth, 1.2)]
     ]
     if pakerKompo == 2:
         paker_list[1] = [None, None, f'Посадить пакера на глубине {paker_depth}/{paker_depth - paker_khost}м'
@@ -316,7 +313,7 @@ def swabbing_with_voronka(self):
                       f'Обязательная сдача в этот день в ЦДНГ'
 
     paker_depth, ok = QInputDialog.getInt(None, 'посадка пакера',
-                                          f'Введите глубину посадки пакера при освоении для перфорации {CreatePZ.dict_work_pervorations}',
+                                          f'Введите глубину посадки пакера при освоении для перфорации ',
                                           int(CreatePZ.perforation_roof - 40), 0,
                                           5000)
     paker_khost1 = int(CreatePZ.perforation_sole - paker_depth)
@@ -354,7 +351,7 @@ def swabbing_with_voronka(self):
          f' по невозможности на давление поглощения, но не менее 30атм в течении 30мин Провести практическое обучение вахт по '
          f'сигналу "выброс" с записью в журнале проведения учебных тревог',
          None, None, None, None, None, None, None,
-         'Мастер КРС, подрядчик по ГИС', None],
+         'Мастер КРС, подрядчик по ГИС', 1.2],
         [None, None,
          swab_select,
          None, None, None, None, None, None, None,
@@ -372,7 +369,7 @@ def swabbing_with_voronka(self):
          f'менее 6-8 л/сек в объеме не менее {round(well_volume(self, paker_depth) * 1.5, 1)}м3 ' \
          f'в присутствии представителя заказчика ДО ЧИСТОЙ ВОДЫ.Составить акт.',
          None, None, None, None, None, None, None,
-         'Мастер КРС', 1.26],
+         'Мастер КРС', well_volume_norm(well_volume(self, paker_depth))],
         [None, None,
          f'Перед подъемом подземного оборудования, после проведённых работ по освоениювыполнить снятие КВУ в '
          f'течение часа с интервалом 15 минут для определения стабильного стистатического уровня в скважине. '
@@ -385,7 +382,7 @@ def swabbing_with_voronka(self):
          f'объеме {round(paker_depth * 1.12 / 1000, 1)}м3 удельным весом {CreatePZ.fluid_work}',
          None, None, None, None, None, None, None,
          'мастер КРС',
-         round(0.25 + 0.033 * 1.2 * (paker_depth) / 9.5 * 1.04, 1)]
+         liftingNKT_norm(paker_depth)]
     ]
 
     return paker_list

@@ -33,7 +33,7 @@ class TabPage_SO(QWidget):
             column_add = 1
         self.column_add_true_comboBox.setCurrentIndex(column_add)
 
-        self.column_addLabel = QLabel("диаметр Доп. колонны", self)
+        self.column_addLabel = QLabel("диаметр доп. колонны", self)
         self.column_addEditType = QLineEdit(self)
         self.column_addEditType.setText(f"{self.ifNone(CreatePZ.column_additional_diametr)}")
         # self.column_addEditType.setClearButtonEnabled(True)
@@ -76,21 +76,37 @@ class TabPage_SO(QWidget):
         self.max_admissible_pressure_EditType = QLineEdit(self)
         self.max_admissible_pressure_EditType.setText(f'{self.ifNone(CreatePZ.max_admissible_pressure)}')
 
-        self.pump_do_Label = QLabel('Спущенный Насос')
-        self.pump_do_EditType = QLineEdit(self)
-        self.pump_do_EditType.setText(f'{self.ifNone(CreatePZ.dict_pump["do"])}')
+        self.pump_SHGN_do_Label = QLabel('Штанговый насос')
+        self.pump_SHGN_do_EditType = QLineEdit(self)
+        self.pump_SHGN_do_EditType.setText(f'{self.ifNone(CreatePZ.dict_pump_SHGN["do"])}')
 
-        self.pump_depth_do_Label = QLabel('Глубина спуска насоса')
-        self.pump_depth_do_EditType = QLineEdit(self)
-        self.pump_depth_do_EditType.setText(f'{self.ifNone(CreatePZ.dict_pump_h["do"])}')
+        self.pump_SHGN_depth_do_Label = QLabel('Глубина штангового насоса')
+        self.pump_SHGN_depth_do_EditType = QLineEdit(self)
+        self.pump_SHGN_depth_do_EditType.setText(f'{self.ifNone(CreatePZ.dict_pump_SHGN_h["do"])}')
 
-        self.pump_posle_Label = QLabel('Насос на спуск')
-        self.pump_posle_EditType = QLineEdit(self)
-        self.pump_posle_EditType.setText(f'{self.ifNone(CreatePZ.dict_pump["posle"])}')
+        self.pump_SHGN_posle_Label = QLabel('Плановый штанговый насос')
+        self.pump_SHGN_posle_EditType = QLineEdit(self)
+        self.pump_SHGN_posle_EditType.setText(f'{self.ifNone(CreatePZ.dict_pump_SHGN["posle"])}')
 
-        self.pump_depth_posle_Label = QLabel('Глубина спуска насоса')
-        self.pump_depth_posle_EditType = QLineEdit(self)
-        self.pump_depth_posle_EditType.setText(f'{self.ifNone(CreatePZ.dict_pump_h["posle"])}')
+        self.pump_SHGN_depth_posle_Label = QLabel('Плановая глубина спуска насоса')
+        self.pump_SHGN_depth_posle_EditType = QLineEdit(self)
+        self.pump_SHGN_depth_posle_EditType.setText(f'{self.ifNone(CreatePZ.dict_pump_SHGN_h["posle"])}')
+
+        self.pump_ECN_do_Label = QLabel('Спущенный ЭЦН')
+        self.pump_ECN_do_EditType = QLineEdit(self)
+        self.pump_ECN_do_EditType.setText(f'{self.ifNone(CreatePZ.dict_pump_ECN["do"])}')
+
+        self.pump_ECN_depth_do_Label = QLabel('Глубина спуска ЭЦН')
+        self.pump_ECN_depth_do_EditType = QLineEdit(self)
+        self.pump_ECN_depth_do_EditType.setText(f'{self.ifNone(CreatePZ.dict_pump_ECN_h["do"])}')
+
+        self.pump_ECN_posle_Label = QLabel('Плановый ЭЦН на спуск')
+        self.pump_ECN_posle_EditType = QLineEdit(self)
+        self.pump_ECN_posle_EditType.setText(f'{self.ifNone(CreatePZ.dict_pump_ECN["posle"])}')
+
+        self.pump_ECN_depth_posle_Label = QLabel('Плановая глубина спуска ЭЦН')
+        self.pump_ECN_depth_posle_EditType = QLineEdit(self)
+        self.pump_ECN_depth_posle_EditType.setText(f'{self.ifNone(CreatePZ.dict_pump_ECN_h["posle"])}')
 
 
         self.paker_do_Label = QLabel('Спущенный пакер')
@@ -109,6 +125,21 @@ class TabPage_SO(QWidget):
         self.paker_depth_posle_EditType = QLineEdit(self)
         self.paker_depth_posle_EditType.setText(f'{self.ifNone(CreatePZ.H_F_paker_do["posle"])}')
 
+        self.paker2_do_Label = QLabel('Спущенный пакер')
+        self.paker2_do_EditType = QLineEdit(self)
+        self.paker2_do_EditType.setText(f'{self.ifNone(CreatePZ.paker2_do["do"])}')
+
+        self.paker2_depth_do_Label = QLabel('Глубина спуска пакера')
+        self.paker2_depth_do_EditType = QLineEdit(self)
+        self.paker2_depth_do_EditType.setText(self.ifNone(CreatePZ.H_F_paker2_do["do"]))
+
+        self.paker2_posle_Label = QLabel('пакер на спуск')
+        self.paker2_posle_EditType = QLineEdit(self)
+        self.paker2_posle_EditType.setText(self.ifNone(CreatePZ.paker2_do["posle"]))
+
+        self.paker2_depth_posle_Label = QLabel('Глубина спуска пакера')
+        self.paker2_depth_posle_EditType = QLineEdit(self)
+        self.paker2_depth_posle_EditType.setText(self.ifNone(CreatePZ.H_F_paker2_do["posle"]))
         # print(f' насос спуск {CreatePZ.dict_pump["posle"]}')
 
         grid = QGridLayout(self)
@@ -141,22 +172,41 @@ class TabPage_SO(QWidget):
         grid.addWidget(self.max_expected_pressure_EditType, 3, 4)
         grid.addWidget(self.max_admissible_pressure_Label, 2, 5)
         grid.addWidget(self.max_admissible_pressure_EditType, 3, 5)
-        grid.addWidget(self.pump_do_Label, 4, 0)
-        grid.addWidget(self.pump_do_EditType, 5, 0)
-        grid.addWidget(self.pump_depth_do_Label, 4, 1)
-        grid.addWidget(self.pump_depth_do_EditType, 5, 1)
-        grid.addWidget(self.pump_posle_Label, 4, 4)
-        grid.addWidget(self.pump_posle_EditType, 5, 4)
-        grid.addWidget(self.pump_depth_posle_Label, 4, 5)
-        grid.addWidget(self.pump_depth_posle_EditType, 5, 5)
-        grid.addWidget(self.paker_do_Label, 6, 0)
-        grid.addWidget(self.paker_do_EditType, 7, 0)
-        grid.addWidget(self.paker_depth_do_Label, 6, 1)
-        grid.addWidget(self.paker_depth_do_EditType, 7, 1)
-        grid.addWidget(self.paker_posle_Label, 6, 4)
-        grid.addWidget(self.paker_posle_EditType, 7, 4)
-        grid.addWidget(self.paker_depth_posle_Label, 6, 5)
-        grid.addWidget(self.paker_depth_posle_EditType, 7, 5)
+        grid.addWidget(self.pump_ECN_do_Label, 4, 0)
+        grid.addWidget(self.pump_ECN_do_EditType, 5, 0)
+        grid.addWidget(self.pump_ECN_depth_do_Label, 4, 1)
+        grid.addWidget(self.pump_ECN_depth_do_EditType, 5, 1)
+        grid.addWidget(self.pump_ECN_posle_Label, 4, 4)
+        grid.addWidget(self.pump_ECN_posle_EditType, 5, 4)
+        grid.addWidget(self.pump_ECN_depth_posle_Label, 4, 5)
+        grid.addWidget(self.pump_ECN_depth_posle_EditType, 5, 5)
+
+        grid.addWidget(self.pump_SHGN_do_Label, 6, 0)
+        grid.addWidget(self.pump_SHGN_do_EditType, 7, 0)
+        grid.addWidget(self.pump_SHGN_depth_do_Label, 6, 1)
+        grid.addWidget(self.pump_SHGN_depth_do_EditType, 7, 1)
+        grid.addWidget(self.pump_SHGN_posle_Label, 6, 4)
+        grid.addWidget(self.pump_SHGN_posle_EditType, 7, 4)
+        grid.addWidget(self.pump_SHGN_depth_posle_Label, 6, 5)
+        grid.addWidget(self.pump_SHGN_depth_posle_EditType, 7, 5)
+
+        grid.addWidget(self.paker_do_Label, 8, 0)
+        grid.addWidget(self.paker_do_EditType, 9, 0)
+        grid.addWidget(self.paker_depth_do_Label, 8, 1)
+        grid.addWidget(self.paker_depth_do_EditType, 9, 1)
+        grid.addWidget(self.paker_posle_Label, 8, 4)
+        grid.addWidget(self.paker_posle_EditType, 9, 4)
+        grid.addWidget(self.paker_depth_posle_Label, 8, 5)
+        grid.addWidget(self.paker_depth_posle_EditType, 9, 5)
+
+        grid.addWidget(self.paker2_do_Label, 10, 0)
+        grid.addWidget(self.paker2_do_EditType, 11, 0)
+        grid.addWidget(self.paker2_depth_do_Label, 10, 1)
+        grid.addWidget(self.paker2_depth_do_EditType, 11, 1)
+        grid.addWidget(self.paker2_posle_Label, 10, 4)
+        grid.addWidget(self.paker2_posle_EditType, 11, 4)
+        grid.addWidget(self.paker2_depth_posle_Label, 10, 5)
+        grid.addWidget(self.paker2_depth_posle_EditType, 11, 5)
 
     def ifNone(self, string):
         if str(string) != '0':
@@ -194,7 +244,7 @@ class DataWindow(MyWindow):
 
     def addRowTable(self):
         from open_pz import CreatePZ
-        CreatePZ.pause = False
+
 
         columnType = self.tabWidget.currentWidget().columnType.text()
         column_wall_thickness = self.tabWidget.currentWidget().column_wall_thicknessEditType2.text()
@@ -215,16 +265,31 @@ class DataWindow(MyWindow):
         max_expected_pressure = self.tabWidget.currentWidget().max_expected_pressure_EditType.text()
         max_admissible_pressure = self.tabWidget.currentWidget().max_admissible_pressure_EditType.text()
 
-        dict_pump_do = str(self.tabWidget.currentWidget().pump_do_EditType.text())
-        dict_pump_h_do = self.tabWidget.currentWidget().pump_depth_do_EditType.text()
+        dict_pump_SHGN_do = str(self.tabWidget.currentWidget().pump_SHGN_do_EditType.text())
+        dict_pump_SHGN_h_do = self.tabWidget.currentWidget().pump_SHGN_depth_do_EditType.text()
 
-        dict_pump_posle = str(self.tabWidget.currentWidget().pump_posle_EditType.text())
-        dict_pump_h_posle = self.tabWidget.currentWidget().pump_depth_posle_EditType.text()
+        dict_pump_SHGN_posle = str(self.tabWidget.currentWidget().pump_SHGN_posle_EditType.text())
+        dict_pump_SHGN_h_posle = str(self.tabWidget.currentWidget().pump_SHGN_depth_posle_EditType.text())
+
+        dict_pump_ECN_do = str(self.tabWidget.currentWidget().pump_ECN_do_EditType.text())
+        dict_pump_ECN_h_do = self.tabWidget.currentWidget().pump_ECN_depth_do_EditType.text()
+
+        dict_pump_ECN_posle = str(self.tabWidget.currentWidget().pump_ECN_posle_EditType.text())
+        dict_pump_ECN_h_posle = str(self.tabWidget.currentWidget().pump_ECN_depth_posle_EditType.text())
+
+        # print(f'прио {type(dict_pump_h_posle)}')
         paker_do = str(self.tabWidget.currentWidget().paker_do_EditType.text())
         H_F_paker_do = self.tabWidget.currentWidget().paker_depth_do_EditType.text()
         paker_posle = self.tabWidget.currentWidget().paker_posle_EditType.text()
         H_F_paker_posle = self.tabWidget.currentWidget().paker_depth_posle_EditType.text()
 
+        paker2_do = str(self.tabWidget.currentWidget().paker2_do_EditType.text())
+        H_F_paker2_do = self.tabWidget.currentWidget().paker2_depth_do_EditType.text()
+        paker2_posle = self.tabWidget.currentWidget().paker2_posle_EditType.text()
+        H_F_paker2_posle = self.tabWidget.currentWidget().paker2_depth_posle_EditType.text()
+        print(any(['ЭЦН' in dict_pump_ECN_posle.upper(), 'ВНН' in dict_pump_ECN_posle.upper(),
+                        dict_pump_ECN_posle == 'отсут']))
+        print(dict_pump_ECN_posle)
         if self.ifNum(columnType) == False \
                 or self.ifNum(column_wall_thickness) == False \
                 or self.ifNum(shoe_column) == False \
@@ -238,10 +303,22 @@ class DataWindow(MyWindow):
                 or self.ifNum(max_angle) == False \
                 or self.ifNum(max_admissible_pressure) == False \
                 or self.ifNum(max_expected_pressure) == False \
-                or self.ifNum(dict_pump_h_do) == False\
-                or self.ifNum(dict_pump_h_posle) == False \
+                or self.ifNum(dict_pump_ECN_h_do) == False\
+                or self.ifNum(dict_pump_ECN_h_posle) == False \
+                or self.ifNum(dict_pump_SHGN_h_do) == False \
+                or self.ifNum(dict_pump_SHGN_h_posle) == False \
                 or self.ifNum(H_F_paker_do) == False \
-                or self.ifNum(H_F_paker_posle) == False:
+                or self.ifNum(H_F_paker_posle) == False \
+                or self.ifNum(H_F_paker2_do) == False \
+                or self.ifNum(H_F_paker2_posle) == False \
+                or any(['НВ' in dict_pump_SHGN_do.upper(), 'ШГН' in dict_pump_SHGN_do.upper(),
+                    'НН' in dict_pump_SHGN_do.upper(), dict_pump_SHGN_do == 'отсут']) == False\
+                or any(['НВ' in dict_pump_SHGN_posle.upper(), 'ШГН' in dict_pump_SHGN_posle.upper(),
+                       'НН' in dict_pump_SHGN_posle.upper(), dict_pump_SHGN_posle == 'отсут']) == False \
+                or any(['ЭЦН' in dict_pump_ECN_posle.upper(), 'ВНН' in dict_pump_ECN_posle.upper(),
+                        dict_pump_ECN_posle == 'отсут']) == False \
+                or any(['ЭЦН' in dict_pump_ECN_do.upper(), 'ВНН' in dict_pump_ECN_do.upper(),
+                        dict_pump_ECN_do == 'отсут']) == False:
             msg = QMessageBox.information(self, 'Внимание', 'Не все поля соответствуют значениям')
             return
         else:
@@ -258,28 +335,46 @@ class DataWindow(MyWindow):
             CreatePZ.max_angle =  self.if_None(max_angle)
             CreatePZ.max_expected_pressure = self.if_None(max_expected_pressure)
             CreatePZ.max_admissible_pressure = self.if_None(max_admissible_pressure)
-            CreatePZ.dict_pump["do"] = self.if_None(dict_pump_do)
-            CreatePZ.dict_pump_h["do"] = self.if_None(dict_pump_h_do)
-            CreatePZ.dict_pump["posle"] = self.if_None(dict_pump_posle)
-            CreatePZ.dict_pump_h["posle"] = self.if_None(dict_pump_h_posle)
+            CreatePZ.dict_pump_SHGN["do"] = self.if_None(dict_pump_SHGN_do)
+            CreatePZ.dict_pump_ECN["do"] = self.if_None(dict_pump_ECN_do)
+            CreatePZ.dict_pump_ECN_h["do"] = self.if_None(dict_pump_SHGN_h_do)
+            CreatePZ.dict_pump_SHGN["posle"] = self.if_None(dict_pump_SHGN_posle)
+            CreatePZ.dict_pump_ECN["posle"] = self.if_None(dict_pump_ECN_posle)
+            CreatePZ.dict_pump_ECN_h["posle"] = self.if_None(dict_pump_SHGN_h_posle)
             CreatePZ.paker_do["do"] = self.if_None(paker_do)
             CreatePZ.H_F_paker_do["do"] = self.if_None(H_F_paker_do)
             CreatePZ.paker_do["posle"] = self.if_None(paker_posle)
             CreatePZ.H_F_paker_do["posle"] = self.if_None(H_F_paker_posle)
-            print(f' после ок {CreatePZ.dict_pump, CreatePZ.paker_do, CreatePZ.H_F_paker_do, CreatePZ.dict_pump_h}')
+
+            CreatePZ.paker2_do["do"] = self.if_None(paker2_do)
+            CreatePZ.H_F_paker2_do["do"] = self.if_None(H_F_paker2_do)
+            CreatePZ.paker2_do["posle"] = self.if_None(paker2_posle)
+            CreatePZ.H_F_paker2_do["posle"] = self.if_None(H_F_paker2_posle)
+            # print(f' после ок {CreatePZ.dict_pump, CreatePZ.paker_do, CreatePZ.H_F_paker_do, CreatePZ.dict_pump_h}')
+            CreatePZ.pause = False
             self.close()
     
     def if_None(self, value):
         
         if value is None or 'отс' in str(value).lower() or value == '-' or value == 0:
             return '0'
-        try:
+        elif isinstance(value, int):
+            return int(value)
+        elif str(value).replace('.','').replace(',','').isdigit():
             return round(float(value), 1)
-        except:
+        else:
             return value
     def ifNum(self, string):
-        if re.search(r'\d+(,\d+){0,2}', string) or string == 'отсут':
+
+        if str(string) == "['0']":
+            return False
+        elif str(string) == 'отсут':
             return True
+        elif re.search(r'\d+(,\d+){0,2}', string):
+            if float(string) < 5000:
+                return True
+            else:
+                return False
         else:
             return False
 

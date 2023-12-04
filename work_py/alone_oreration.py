@@ -1,7 +1,8 @@
 from PyQt5.QtWidgets import QInputDialog
 
-import krs
+from krs import well_volume
 from work_py.acids_work import pressure_mode
+from work_py.rationingKRS import liftingNKT_norm, descentNKT_norm, well_volume_norm
 
 
 def kot_select(self):
@@ -24,9 +25,7 @@ def kot_work(self):
                  f'Спустить {kot_select(self)} на НКТ{CreatePZ.nkt_diam}мм до глубины {CreatePZ.current_bottom}м'
                  f' с замером, шаблонированием шаблоном.',
                  None, None, None, None, None, None, None,
-                 'мастер КРС', round(
-            CreatePZ.current_bottom / 9.52 * 1.51 / 60 * 1.2 * 1.2 * 1.04 + 0.18 + 0.008 * CreatePZ.current_bottom / 9.52 + 0.003 * CreatePZ.current_bottom / 9.52,
-            2)],
+                 'мастер КРС', descentNKT_norm(CreatePZ.current_bottom, 1)],
                 [None, None,
                  f'Произвести очистку забоя скважины до гл.{CreatePZ.current_bottom}м закачкой обратной промывкой тех жидкости уд.весом {CreatePZ.fluid_work}, по согласованию с Заказчиком',
                  None, None, None, None, None, None, None,
@@ -34,13 +33,13 @@ def kot_work(self):
                 [None, None,
                  f'При необходимости согласовать закачку блок пачки по технологическому плану работ подрядчика',
                  None, None, None, None, None, None, None,
-                 'мастер КРС, предст. заказчика', 1],
+                 'мастер КРС, предст. заказчика', None],
 
                 [None, None,
                  f'Поднять {kot_select(self)} на НКТ{CreatePZ.nkt_diam} c глубины {CreatePZ.current_bottom}м с доливом скважины в '
                  f'объеме {round(CreatePZ.current_bottom * 1.12 / 1000, 1)}м3 удельным весом {CreatePZ.fluid_work}',
                  None, None, None, None, None, None, None,
-                 'мастер КРС', round(0.25 + 0.033 * 1.2 * (CreatePZ.current_bottom) / 9.5 * 1.04, 1)]
+                 'мастер КРС', liftingNKT_norm(CreatePZ.current_bottom, 1)]
                 ]
     return kot_list
 
@@ -53,7 +52,7 @@ def fluid_change(self):
                                                    'Введите Ожидаемое давление по пласту', 0, 0, 300, 1)
     fluid_new, ok = QInputDialog.getDouble(self, 'Новое значение удельного веса жидкости',
                                            'Введите значение удельного веса жидкости',  1.02, 1, 1.72, 2)
-    if len(CreatePZ.dict_work_pervorations) == 0 and len(CreatePZ.cat_H2S_list) > 1:
+    if len(CreatePZ.plast_work) == 0 and len(CreatePZ.cat_H2S_list) > 1:
         if '2' in str(CreatePZ.cat_H2S_list[1]):
             CreatePZ.fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
                                   f'расчета {H2S.calv_h2s(self, CreatePZ.cat_H2S_list[1], CreatePZ.H2S_mg[1], CreatePZ.H2S_pr[1])}кг/м3 '
@@ -74,10 +73,10 @@ def fluid_change(self):
     fluid_change_list = [[None, None,
                           f'Произвести смену объема обратной промывкой по круговой циркуляции  жидкостью  {CreatePZ.fluid_work} '
                           f'(по расчету по вскрываемому пласта Рожид- {expected_pressure}атм) в объеме не '
-                          f'менее {round(krs.well_volume(self,CreatePZ.current_bottom),1)}м3  в присутствии представителя заказчика, Составить акт. '
+                          f'менее {round(well_volume(self,CreatePZ.current_bottom),1)}м3  в присутствии представителя заказчика, Составить акт. '
                           f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ)',
                           None, None, None, None, None, None, None,
-                          'мастер КРС', round(2.5, 1)]
+                          'мастер КРС',well_volume_norm(well_volume(self,CreatePZ.current_bottom))]
                          ]
     return fluid_change_list
 
@@ -90,8 +89,7 @@ def konte(self):
                           None, None, None, None, None, None, None,
                           'мастер КРС', 1.25],
                   [None, None, f'Произвести работы указанные в плане работ силами спец подрядчика, при выполнении '
-                               f'из основного плана работ работы исключить'
-                   f'Ghjbpd',
+                               f'из основного плана работ работы исключить',
                    None, None, None, None, None, None, None,
                    'мастер КРС', 12]
                   ]
@@ -104,7 +102,7 @@ def definition_Q(self):
                            f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до '
                            f'начала работ). ',
                            None, None, None, None, None, None, None,
-                           'мастер КРС', 1.25]]
+                           'мастер КРС', 0.17+0.2+0.2+0.2+0.15+0.52]]
     return definition_Q_list
 def privyazkaNKT(self):
     priv_list = [None, None, f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС "Ойл-сервис". '
@@ -136,5 +134,5 @@ def pvo_cat1(self):
     [None, None,
      pvo_1, None, None,
      None, None, None, None, None,
-     'Мастер КРС, представ-ли ПАСФ и Заказчика, Пуск. ком',  2.67]]
+     'Мастер КРС, представ-ли ПАСФ и Заказчика, Пуск. ком',  4.67]]
     return pvo_list

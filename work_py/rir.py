@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QMessageBox, QInputDialog
 
 from krs import volume_vn_ek,volume_vn_nkt
 from work_py.acids_work import open_checkbox_dialog
+from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm,well_volume_norm
 
 
 def rir_rpp(self):
@@ -30,7 +31,7 @@ def rir_rpp(self):
                    f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ) \n'
                    f'Перед спуском технологического пакера произвести визуальный осмотр в присутствии представителя РИР или УСРСиСТ.',
         None, None, None, None, None, None, None,
-    'мастер КРС', 2.5],
+    'мастер КРС', descentNKT_norm(rpkDepth,1.2)],
      [None, None,
       f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС "Ойл-сервис". '
       f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером от 14.10.2021г. '
@@ -41,23 +42,23 @@ def rir_rpp(self):
       f'При наличии циркуляции опрессовать НКТ на 200атм '
       f'в присутствии порядчика по РИР. Составить акт. Вымыть шар обратной промывкой ',
       None, None, None, None, None, None, None,
-      'Мастер КРС, подрядчик РИР, УСРСиСТ', 4],
+      'Мастер КРС, подрядчик РИР, УСРСиСТ', 0.5+0.6],
      [None, None,
       f'Произвести установку глухого пакера по технологическому плану подрядчика по РИР силами подрядчика по РИР '
       f'с установкой пакера  на глубине {rpkDepth}м',
       None, None, None, None, None, None, None,
-      'Мастер КРС, подрядчик РИР, УСРСиСТ', 16],
+      'Мастер КРС, подрядчик РИР, УСРСиСТ', 8],
 
      [None, None,
       f'{"".join([f"Опрессовать эксплуатационную колонну на Р={CreatePZ.max_admissible_pressure}атм в присутствии представителя заказчика" if  rir_rpk_plast_true == False else ""])} '
       f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ) ',
       None, None, None, None, None, None, None,
-      'Мастер КРС, подрядчик РИР, УСРСиСТ', 1.2],
+      'Мастер КРС, подрядчик РИР, УСРСиСТ', 0.67],
      [None, None,
       f'Поднять стыковочное устройство с глубины {rpkDepth}м с доливом скважины в объеме '
       f'{round(CreatePZ.current_bottom*1.12/1000, 1)}м3 тех. жидкостью  уд.весом {CreatePZ.fluid_work} ',
       None, None, None, None, None, None, None,
-      'Мастер КРС, подрядчик РИР, УСРСиСТ', round(0.25+0.033*1.2*(rpkDepth)/9.5*1.04,1)]]
+      'Мастер КРС, подрядчик РИР, УСРСиСТ', liftingNKT_norm(rpkDepth, 1.2)]]
     for row in rir_work_list:
         rir_list.append(row)
     CreatePZ.current_bottom = rpkDepth
@@ -106,7 +107,7 @@ def rir_rpk(self):
                    f'при Р=100атм произвести соляно-кислотную обработку скважины в объеме 1м3 HCl-12% с целью увеличения '
                    f'приемистости по технологическому плану',
         None, None, None, None, None, None, None,
-        'мастер КРС', 2.5]]
+        'мастер КРС', 1.35]]
         for row in rir_q_list:
             rir_list.insert(-1, row)
     else:
@@ -120,7 +121,7 @@ def rir_rpk(self):
                        f'при Р=100атм произвести соляно-кислотную обработку скважины в объеме 1м3 HCl-12% с целью увеличения '
                        f'приемистости по технологическому плану',
                        None, None, None, None, None, None, None,
-                       'мастер КРС', 2.5]]
+                       'мастер КРС', 1.35]]
         for row in rir_q_list[::-1]:
             rir_list.insert(-1, row)
 
@@ -129,7 +130,7 @@ def rir_rpk(self):
                    f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ) \n'
                    f'Перед спуском технологического пакера произвести визуальный осмотр в присутствии представителя РИР или УСРСиСТ.',
         None, None, None, None, None, None, None,
-    'мастер КРС', 2.5],
+    'мастер КРС', descentNKT_norm(rpkDepth,1.2)],
      [None, None,
       f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС "Ойл-сервис". '
       f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером от 14.10.2021г. '
@@ -140,12 +141,12 @@ def rir_rpk(self):
       f'При наличии циркуляции опрессовать НКТ на 200атм '
       f'в присутствии порядчика по РИР. Составить акт. Вымыть шар обратной промывкой ',
       None, None, None, None, None, None, None,
-      'Мастер КРС, подрядчик РИР, УСРСиСТ', 4],
+      'Мастер КРС, подрядчик РИР, УСРСиСТ', 1.2],
      [None, None,
       f'Произвести РИР {plast} по технологическому плану подрядчика по РИР силами подрядчика по РИР '
       f'с установкой пакера РПК на глубине {rpkDepth}м',
       None, None, None, None, None, None, None,
-      'Мастер КРС, подрядчик РИР, УСРСиСТ', 16],
+      'Мастер КРС, подрядчик РИР, УСРСиСТ', 8],
      [None, None,
       f'ОЗЦ 16-24 часа: (по качеству пробы) с момента отстыковки пакера В случае не получения '
       f'технологического "СТОП" ОЗЦ без давления.',
@@ -155,12 +156,12 @@ def rir_rpk(self):
       f'{"".join([f"Опрессовать цементный мост на Р={CreatePZ.max_admissible_pressure}атм в присутствии представителя заказчика" if rir_rpk_plast_true == False else ""])} '
       f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ) ',
       None, None, None, None, None, None, None,
-      'Мастер КРС, подрядчик РИР, УСРСиСТ', 1.2],
+      'Мастер КРС, подрядчик РИР, УСРСиСТ',0.67],
      [None, None,
       f'Во время ОЗЦ поднять стыковочное устройство с глубины {rpkDepth}м с доливом скважины в объеме '
       f'{round(CreatePZ.current_bottom*1.12/1000, 1)}м3 тех. жидкостью  уд.весом {CreatePZ.fluid_work} ',
       None, None, None, None, None, None, None,
-      'Мастер КРС, подрядчик РИР, УСРСиСТ', round(0.25+0.033*1.2*(rpkDepth)/9.5*1.04,1)]]
+      'Мастер КРС, подрядчик РИР, УСРСиСТ', liftingNKT_norm(rpkDepth,1)]]
     for row in rir_work_list:
         rir_list.append(row)
     CreatePZ.current_bottom = rpkDepth
@@ -172,16 +173,16 @@ def perf_new(self, roofRir, solePir):
 
     print(f' пласта до изоляции {CreatePZ.plast_work}')
     for plast in CreatePZ.plast_work:
-        for interval in list((CreatePZ.dict_work_pervorations[plast]['интервал'])):
+        for interval in list((CreatePZ.dict_perforation[plast]['интервал'])):
            if roofRir <= list(interval)[0] <= solePir:
-                    CreatePZ.dict_work_pervorations[plast]['отключение'] = True
+                    CreatePZ.dict_perforation[plast]['отключение'] = True
     for plast in CreatePZ.plast_all:
         for interval in list((CreatePZ.dict_perforation[plast]['интервал'])):
             if roofRir <= list(interval)[0] <= solePir:
                 CreatePZ.dict_perforation[plast]['отключение'] = True
 
 
-    CreatePZ.plast_work = list(CreatePZ.dict_work_pervorations.keys())
+    CreatePZ.definition_plast_work(self)
     if len(CreatePZ.dict_leakiness) != 0:
         for nek in list(CreatePZ.dict_leakiness['НЭК']['интервал'].keys()):
             if roofRir <= float(nek.split('-')[0]) <= solePir:
@@ -245,7 +246,7 @@ def rirWithPero(self):
          f'шаблоном. Опрессовать НКТ на 150атм. Вымыть шар. \n'
          f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
          None, None, None, None, None, None, None,
-         'мастер КРС', 2.5],
+         'мастер КРС',descentNKT_norm(rirSole, 1)],
         [None, None,
          f'Произвести установку  цементного моста  в интервале {rirRoof}-{rirSole}м в присутствии представителя УСРСиСТ',
          None, None, None, None, None, None, None,
@@ -270,7 +271,7 @@ def rirWithPero(self):
          f'тех.жидкостью  в объеме не менее {round(volume_vn_nkt(dict_nkt) * 1.5, 1)}м3 уд.весом {CreatePZ.fluid_work} (Полуторакратный объем НКТ) '
          f'с расходом жидкости 8л/с (срезка) до чистой воды.',
          None, None, None, None, None, None, None,
-         'мастер КРС', 0.5],
+         'мастер КРС', well_volume_norm(16)],
         [None, None,
          f'Поднять перо на безопасную зону до гл. {rirRoof-300}м с доливом скважины в объеме 0,3м3 тех. жидкостью '
          f'уд.весом {CreatePZ.fluid_work}.',
@@ -280,24 +281,24 @@ def rirWithPero(self):
          f'ОЗЦ - 23 часа (с момента завершения срезки цементного раствора - 24 часа (по качеству пробы))) \n'
          f'ОЗЦ без давления.',
          None, None, None, None, None, None, None,
-         'мастер КРС', 0.5],
+         'мастер КРС',24],
         [None, None,
          f'Допустить компоновку с замером и шаблонированием НКТ до кровли цементного моста (плановый на гл. {rirRoof}м'
          f' с прямой промывкой и разгрузкой на забой 3т. Текущий забой согласовать с Заказчиком письменной телефонограммой.',
          None, None, None, None, None, None, None,
-         'мастер КРС', 0.5],
+         'мастер КРС', 1.2],
         [None, None,
          f'Опрессовать цементный мост на Р={CreatePZ.max_admissible_pressure}атм в присутствии представителя '
          f'УСРСиСТ Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до '
          f'начала работ) В случае негерметичности цементного моста дальнейшие работы согласовать с Заказчиком '
          f'В случае головы ЦМ ниже планового п.17-23 повторить  с учетом корректировки мощности моста ',
          None, None, None, None, None, None, None,
-         'мастер КРС', 0.5],
+         'мастер КРС', 0.67],
         [None, None,
          f'Поднять перо на тНКТ{nkt_diam}мм с глубины {rirRoof}м с доливом скважины в объеме 2,2м3 тех. жидкостью '
          f'уд.весом {CreatePZ.fluid_work}',
          None, None, None, None, None, None, None,
-         'мастер КРС', 0.5],
+         'мастер КРС',descentNKT_norm(rirRoof, 1)],
     ]
 
     rirPero_list = [
@@ -306,7 +307,7 @@ def rirWithPero(self):
          f'шаблоном. Опрессовать НКТ на 150атм. Вымыть шар. \n'
          f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
          None, None, None, None, None, None, None,
-         'мастер КРС', 2.5],
+         'мастер КРС', descentNKT_norm(rirSole, 1)],
         [None, None,
          f'Произвести цементную заливку с целью изоляции пласта  в интервале {rirRoof}-{rirSole}м в присутствии '
          f'представителя УСРС и СТ',
@@ -334,45 +335,45 @@ def rirWithPero(self):
          f'(Полуторакратный объем НКТ) '
          f'с расходом жидкости 8л/с (срезка) до чистой воды.',
          None, None, None, None, None, None, None,
-         'мастер КРС', 0.5],
+         'мастер КРС', well_volume_norm(16)],
         [None, None,
          f'Поднять перо на безопасную зону до гл. {rirRoof - 300}м с доливом скважины в объеме 0,3м3 тех. жидкостью '
          f'уд.весом {CreatePZ.fluid_work}.',
          None, None, None, None, None, None, None,
-         'мастер КРС', 0.5],
+         'мастер КРС', 1.2],
         [None, None,
          f'ОЗЦ - 23 часа (с момента завершения срезки цементного раствора - 24 часа (по качеству пробы))) \n'
          f'ОЗЦ без давления.',
          None, None, None, None, None, None, None,
-         'мастер КРС', 0.5],
+         'мастер КРС', 24],
         [None, None,
          f'Допустить компоновку с замером и шаблонированием НКТ до кровли цементного моста (плановый на гл. {rirRoof}м'
          f' с прямой промывкой и разгрузкой на забой 3т. Текущий забой согласовать с Заказчиком письменной телефонограммой.',
          None, None, None, None, None, None, None,
-         'мастер КРС', 0.5],
+         'мастер КРС', 1.2],
         [None, None,
          f'Опрессовать цементный мост на Р={CreatePZ.max_admissible_pressure}атм в присутствии представителя '
          f'УСРСиСТ Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до '
          f'начала работ) В случае негерметичности цементного моста дальнейшие работы согласовать с Заказчиком '
          f'В случае головы ЦМ ниже планового п.17-23 повторить  с учетом корректировки мощности моста ',
          None, None, None, None, None, None, None,
-         'мастер КРС', 0.5],
+         'мастер КРС', 0.67],
         [None, None,
          f'Поднять перо на тНКТ{nkt_diam}мм с глубины {rirRoof}м с доливом скважины в объеме {round(rirRoof * 1.12 / 1000, 1)}м3 тех. жидкостью '
          f'уд.весом {CreatePZ.fluid_work}',
          None, None, None, None, None, None, None,
-         'мастер КРС', 0.5],
+         'мастер КРС', liftingNKT_norm(rirRoof, 1)],
     ]
-    print(f'количество пластов {len(CreatePZ.dict_work_pervorations)}')
+    print(f'количество пластов {len(CreatePZ.plast_work)}')
 
-    if len(CreatePZ.dict_work_pervorations) == 0:
+    if len(CreatePZ.plast_work) == 0:
         rir_list = []
         for row in uzmPero_list:
             rir_list.append(row)
 
         CreatePZ.current_bottom = rirRoof
         perf_new(self,rirRoof,rirSole)
-        if len(CreatePZ.dict_work_pervorations) != 0:
+        if len(CreatePZ.plast_work) != 0:
             rir_list.pop(-2)
 
     else:
@@ -387,7 +388,7 @@ def rirWithPero(self):
              f'при Р=100атм произвести соляно-кислотную обработку скважины в объеме 1м3 HCl-12% с целью увеличения '
              f'приемистости по технологическому плану',
              None, None, None, None, None, None, None,
-             'мастер КРС', 2.5],
+             'мастер КРС', 1.77],
             [None, None,
              f'По результатам определения приёмистости выполнить следующие работы: \n'
              f'В случае приёмистости свыше 480 м3/сут при Р=100атм выполнить работы по п.п.11-14 '
@@ -400,7 +401,7 @@ def rirWithPero(self):
              f'Приготовить глинистый раствор в объёме 5м3 (расчет на 1 м3 - сухой глинопорошок массой 0,3т + '
              f'вода у=1,00г/см3 в объёме 0,9м3) плотностью у=1,24г/см3',
              None, None, None, None, None, None, None,
-             'мастер КРС', 2.5],
+             'мастер КРС', 3.5],
             [None, None,
              f'Закачать в НКТ при открытом затрубном пространстве глинистый раствор в объеме 5м3 + тех. воду  в объёме {volume_vn_nkt(dict_nkt) - 5}м3. Закрыть затруб. '
              f'Продавить в НКТ  тех. воду  в объёме {volume_vn_nkt(dict_nkt)}м3 при давлении не более {CreatePZ.max_admissible_pressure}атм.',
@@ -419,12 +420,12 @@ def rirWithPero(self):
             [None, None,
              f'В случае необходимости выполнить работы по п.11-14, с корректировкой по объёму раствора.',
              None, None, None, None, None, None, None,
-             'мастер КРС', 0.35],
+             'мастер КРС', ],
             [None, None,
              f'Промыть скважину обратной промывкой по круговой циркуляции  жидкостью '
              f'в объеме не менее 24м3 с расходом жидкости не менее 8 л/с.',
              None, None, None, None, None, None, None,
-             'мастер КРС', 0.35]
+             'мастер КРС', well_volume_norm(24)]
         ]
         if volume_vn_nkt(dict_nkt) <= 5:
             glin_list[3] = [None, None,
@@ -441,7 +442,7 @@ def rirWithPero(self):
 
         CreatePZ.current_bottom = rirRoof
         perf_new(self,rirRoof, CreatePZ.current_bottom)
-        if len(CreatePZ.dict_work_pervorations) != 0:
+        if len(CreatePZ.plast_work) != 0:
             rir_list.pop(-2)
 
     return rir_list
@@ -482,7 +483,7 @@ def rir_paker(self):
                    f'при Р=100атм произвести соляно-кислотную обработку скважины в объеме 1м3 HCl-12% с целью увеличения '
                    f'приемистости по технологическому плану',
                    None, None, None, None, None, None, None,
-                   'мастер КРС', 2.5]
+                   'мастер КРС', 1.77]
     rir_list.insert(-3, rir_q_list)
 
     rir_paker_list = [[None, None,
@@ -494,27 +495,27 @@ def rir_paker(self):
       f'ОЗЦ 16-24 часа: (по качеству пробы) с момента отстыковки пакера В случае не получения '
       f'технологического "СТОП" ОЗЦ без давления.',
       None, None, None, None, None, None, None,
-      'Мастер КРС, подрядчик РИР, УСРСиСТ', 16],
+      'Мастер КРС, подрядчик РИР, УСРСиСТ', 24],
       [None, None,
        f'Допустить компоновку с замером и шаблонированием НКТ до кровли цементного моста (плановый на гл. {rirRoof}м'
        f' с прямой промывкой и разгрузкой на забой 3т',
        None, None, None, None, None, None, None,
-       'Мастер КРС, подрядчик РИР, УСРСиСТ', 16],
+       'Мастер КРС, подрядчик РИР, УСРСиСТ', 1.2],
      [None, None,
       f'Опрессовать цементный мост на Р={CreatePZ.max_admissible_pressure}атм в присутствии представителя заказчика '
       f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала '
       f'работ) В случае негерметичности цементного моста дальнейшие работы согласовать с Заказчиком.',
       None, None, None, None, None, None, None,
-      'Мастер КРС, подрядчик РИР, УСРСиСТ', 1.2],
+      'Мастер КРС, подрядчик РИР, УСРСиСТ', 0.67],
       [None, None,
        f'Поднять компоновку РИР на тНКТ{CreatePZ.nkt_diam}мм с глубины {rirRoof}м с доливом скважины в объеме '
        f'{round(rirRoof * 1.12 / 1000, 1)}м3 тех. жидкостью  уд.весом {CreatePZ.fluid_work}',
        None, None, None, None, None, None, None,
-       'Мастер КРС, подрядчик РИР, УСРСиСТ', 1.2]
+       'Мастер КРС, подрядчик РИР, УСРСиСТ', liftingNKT_norm(rirRoof,1.2)]
         ]
     CreatePZ.current_bottom = rirRoof
     perf_new(self, rirRoof, CreatePZ.current_bottom)
-    if len(CreatePZ.dict_work_pervorations) != 0:
+    if len(CreatePZ.plast_work) != 0:
         rir_paker_list.pop(-2)
     for row in rir_paker_list:
         rir_list.append(row)

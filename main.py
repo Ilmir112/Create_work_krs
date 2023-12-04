@@ -24,7 +24,7 @@ class MyWindow(QMainWindow):
         self.ins_ind = None
         self.perforation_list = []
         self.dict_perforation_project = {}
-        self.dict_work_pervorations = {}
+
         self.ins_ind_border = None
         self.work_plan = 0
 
@@ -579,7 +579,8 @@ class MyWindow(QMainWindow):
         CreatePZ.paker_layout = 1
         print('Вставился кислотная обработка на одном пакере ')
         acid_work_list = acid_work(self)
-        self.populate_row(self.ins_ind, acid_work_list)
+        if acid_work_list != None:
+            self.populate_row(self.ins_ind, acid_work_list)
 
     def acid_action_2paker(self):
         from work_py.acids import acid_work
@@ -588,7 +589,8 @@ class MyWindow(QMainWindow):
         CreatePZ.paker_layout = 2
         print('Вставился кислотная обработка на двух пакере ')
         acid_work_list = acid_work(self)
-        self.populate_row(self.ins_ind, acid_work_list)
+        if acid_work_list != None:
+            self.populate_row(self.ins_ind, acid_work_list)
 
     def pressureTest(self):
         from work_py.opressovka import paker_list
@@ -671,7 +673,7 @@ class MyWindow(QMainWindow):
         from open_pz import CreatePZ
         if self.new_window is None:
             # print(f' проект перфорации {self.dict_perforation_project}')
-            self.new_window = PervorationWindow(self.table_widget, self.ins_ind, self.dict_work_pervorations,
+            self.new_window = PervorationWindow(self.table_widget, self.ins_ind,
                                                 self.dict_perforation_project)
             self.new_window.setWindowTitle("Перфорация")
             self.new_window.setGeometry(200, 400, 300, 400)

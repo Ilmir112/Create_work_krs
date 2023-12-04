@@ -1,4 +1,5 @@
 from PyQt5.QtWidgets import QInputDialog
+from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm,well_volume_norm
 
 
 def raidingColumn(self):
@@ -6,10 +7,15 @@ def raidingColumn(self):
     from work_py.opressovka import paker_diametr_select
     from work_py.template_work import well_volume
     from work_py.advanted_file import raiding_interval,raid
-    print(f'До отрайбирования {[CreatePZ.dict_work_pervorations[plast]["отрайбировано"] for plast in CreatePZ.plast_work]}')
+    print(f'До отрайбирования {[CreatePZ.dict_perforation[plast]["отрайбировано"] for plast in CreatePZ.plast_work]}')
 
     ryber_diam = paker_diametr_select(CreatePZ.current_bottom) + 3
-
+    if 'ПОМ' in str(CreatePZ.paker_do["posle"]).upper() and '122' in str(CreatePZ.paker_do["posle"]):
+        ryber_diam = 126
+    ryber_diam, ok = QInputDialog.getInt(None, 'Диаметр райбера',
+                                              f'Введите диаметр райбера',
+                                              int(ryber_diam), 70,
+                                              200)
     if CreatePZ.column_additional == True:
         nkt_pod = ['60мм' if CreatePZ.column_additional_diametr <110 else '73мм со снятыми фасками']
         nkt_pod = ''.join(nkt_pod)
@@ -43,13 +49,11 @@ def raidingColumn(self):
          f'СКОРОСТЬ СПУСКА НЕ БОЛЕЕ 1 М/С (НЕ ДОХОДЯ 40 - 50 М ДО ПЛАНОВОГО ИНТЕРВАЛА СКОРОСТЬ СПУСКА СНИЗИТЬ ДО 0,25 М/С). '
          f'ЗА 20 М ДО ЗАБОЯ СПУСК ПРОИЗВОДИТЬ С ПРОМЫВКОЙ',
          None, None, None, None, None, None, None,
-         'мастер КРС', round(
-            (krovly_raiding) / 9.52 * 1.51 / 60 * 1.2 * 1.2 * 1.04*0.9 + 0.18 + 0.008 * (krovly_raiding) / 9.52 + 0.003 * krovly_raiding / 9.52,
-            2)],
+         'мастер КРС', descentNKT_norm(krovly_raiding, 1.2)],
         [None, None, f'Собрать промывочное оборудование: вертлюг, ведущая труба (установить вставной фильтр под ведущей трубой), '
                      f'буровой рукав, устьевой герметизатор, нагнетательная линия. Застраховать буровой рукав за вертлюг. ',
          None, None, None, None, None, None, None,
-         'Мастер КРС, УСРСиСТ', 1.5],
+         'Мастер КРС, УСРСиСТ', 0.6],
         [None, None,
          f'Произвести райбирование ЭК в инт. {raiding_interval}м с наращиванием, с промывкой и проработкой 5 раз каждого наращивания. '
          f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа '
@@ -68,14 +72,14 @@ def raidingColumn(self):
          f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {CreatePZ.fluid_work}  '
          f'в присутствии представителя заказчика в объеме {round(well_volume()*2,1)}м3. Составить акт.',
          None, None, None, None, None, None, None,
-         'мастер КРС, предст. заказчика', 1.5],
+         'мастер КРС, предст. заказчика', well_volume_norm(well_volume())],
         [None, None,
          f'Поднять  {ryber_str} на НКТ{nkt_diam}мм с глубины {CreatePZ.current_bottom}м с доливом скважины в '
          f'объеме {round(CreatePZ.current_bottom*1.12/1000, 1)}м3 тех. жидкостью  уд.весом {CreatePZ.fluid_work}',
          None, None, None, None, None, None, None,
-         'мастер КРС', round(0.25 + 0.033 * 1.2 * (CreatePZ.current_bottom) / 9.5 * 1.04*0.9, 1)]]
+         'мастер КРС', liftingNKT_norm(CreatePZ.current_bottom,1.2)]]
 
-    print(f' после отрайбирования {[CreatePZ.dict_work_pervorations[plast]["отрайбировано"] for plast in CreatePZ.plast_work]}')
+    print(f' после отрайбирования {[CreatePZ.dict_perforation[plast]["отрайбировано"] for plast in CreatePZ.plast_work]}')
 
     return ryber_list
 

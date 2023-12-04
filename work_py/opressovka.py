@@ -1,4 +1,5 @@
 from PyQt5.QtWidgets import QMessageBox
+from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm,well_volume_norm
 
 
 def paker_diametr_select(depth_landing):
@@ -77,9 +78,7 @@ def paker_list(self):
                    f'ПРИ ОТСУТСТВИИ ЦИРКУЛЯЦИИ ПРЕДУСМОТРЕТЬ НАЛИЧИИ В КОМПОНОВКЕ УРАВНИТЕЛЬНЫХ КЛАПАНОВ ИЛИ СБИВНОГО '
                    f'КЛАПАНА С ВВЕРТЫШЕМ НАД ПАКЕРОМ',
     None, None, None, None, None, None, None,
-    'мастер КРС', round(
-        CreatePZ.current_bottom / 9.52 * 1.51 / 60 * 1.2 *1.2* 1.04 + 0.18 + 0.008 * CreatePZ.current_bottom / 9.52 + 0.003 * CreatePZ.current_bottom / 9.52,
-        2)],
+    'мастер КРС', descentNKT_norm(paker_depth,1.2)],
         [None, None, f'Посадить пакер на глубине {paker_depth}м',
                    None, None, None, None, None, None, None,
                    'мастер КРС', 0.4],
@@ -87,7 +86,7 @@ def paker_list(self):
                      f' в течение 30 минут  в присутствии представителя заказчика, составить акт.  '
                      f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ)',
          None, None, None, None, None, None, None,
-         'мастер КРС, предст. заказчика', 1.],
+         'мастер КРС, предст. заказчика', 0.67],
         [None, None,
          f'Произвести срыв пакера с поэтапным увеличением нагрузки на 3-4т выше веса НКТ в течении 30мин и с '
          f'выдержкой 1ч для возврата резиновых элементов в исходное положение. ',
@@ -105,12 +104,12 @@ def paker_list(self):
          f'Поднять {paker_select(self)} на НКТ{CreatePZ.nkt_diam} c глубины {paker_depth}м с доливом скважины в '
          f'объеме {round(paker_depth*1.12/1000,1)}м3 удельным весом {CreatePZ.fluid_work}',
          None, None, None, None, None, None, None,
-         'мастер КРС', round(0.25+0.033*1.2*(paker_depth+paker_khost)/9.5*1.04,1) ]]
-    if 'НЭК № 1' in list(CreatePZ.dict_work_pervorations.keys()):
-        print(list(CreatePZ.dict_work_pervorations['НЭК № 1']['интервал']))
+         'мастер КРС', liftingNKT_norm(paker_depth, 1.2)]]
+    if 'НЭК № 1' in list(CreatePZ.dict_perforation.keys()):
+        print(list(CreatePZ.dict_perforation['НЭК № 1']['интервал']))
         pakerNEK, ok = QInputDialog.getInt(None, 'опрессовка ЭК',
                                                   'Введите глубину посадки пакера для опрессовки ЗУМПФА',
-                                                  int(list(CreatePZ.dict_work_pervorations['НЭК № 1']['интервал'])[0][1]+10),0,
+                                                  int(list(CreatePZ.dict_perforation['НЭК № 1']['интервал'])[0][1]+10),0,
                                                   int(CreatePZ.perforation_sole))
         pressureNEK_list = [[None, None,
                                f'При герметичности колонны в интервале 0 - {paker_depth}м:  Допустить пакер до глубины {pakerNEK}м',
@@ -119,10 +118,10 @@ def paker_list(self):
                               [None, None,
                                f'{nktOpress_list[1]}. Посадить пакер. Опрессовать ЗУМПФ в интервале {pakerNEK} - {CreatePZ.current_bottom}м на Р={CreatePZ.max_admissible_pressure}атм в течение 30 минут в присутствии представителя заказчика, составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ)',
                                None, None, None, None, None, None, None,
-                               'мастер КРС', 0.4],
+                               'мастер КРС', 0.77],
                             [None, None,
                              f'Произвести насыщение скважины в объеме 5м3 по затрубному пространству. Определить приемистость '
-                             f'НЭК {CreatePZ.dict_work_pervorations["НЭК № 1"]["интервал"][0]} при Р-80атм по затрубному пространству'
+                             f'НЭК {CreatePZ.dict_perforation["НЭК № 1"]["интервал"][0]} при Р-80атм по затрубному пространству'
                              f'в присутствии представителя УСРСиСТ или подрядчика по РИР. (Вести контроль за отдачей жидкости '
                              f'после закачки, объем согласовать с подрядчиком по РИР).',
                              None, None, None, None, None, None, None,
@@ -143,7 +142,7 @@ def paker_list(self):
         [None, None,
          f'{nktOpress_list[1]}. Посадить пакер. Опрессовать ЗУМПФ в интервале {pakerDepthZumpf} - {CreatePZ.current_bottom}м на Р={CreatePZ.max_admissible_pressure}атм в течение 30 минут в присутствии представителя заказчика, составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ)',
          None, None, None, None, None, None, None,
-         'мастер КРС', 0.4],
+         'мастер КРС', 0.77],
           [None, None,
            f'Произвести срыв пакера с поэтапным увеличением нагрузки на 3-4т выше веса НКТ в течении 30мин и с '
            f'выдержкой 1ч для возврата резиновых элементов в исходное положение. ',
@@ -155,7 +154,7 @@ def paker_list(self):
          f'Поднять {paker_select(self)} на НКТ{CreatePZ.nkt_diam} c глубины {pakerDepthZumpf}м с доливом скважины в '
          f'объеме {round(paker_depth*1.12/1000,1)}м3 удельным весом {CreatePZ.fluid_work}',
          None, None, None, None, None, None, None,
-         'мастер КРС', round(0.25+0.033*1.2*(paker_depth+paker_khost)/9.5*1.04,1)]
+         'мастер КРС',liftingNKT_norm(pakerDepthZumpf, 1.2)]
 
     return paker_list
 

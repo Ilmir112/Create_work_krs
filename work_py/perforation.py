@@ -72,7 +72,7 @@ class TabWidget(QTabWidget):
 class PervorationWindow(MyWindow):
 
 
-    def __init__(self, table_widget, ins_ind, dict_work_pervorations, dict_perforation_project, parent=None):
+    def __init__(self, table_widget, ins_ind, dict_perforation_project, parent=None):
         from open_pz import CreatePZ
         super(MyWindow, self).__init__(parent)
 
@@ -80,7 +80,7 @@ class PervorationWindow(MyWindow):
         self.setCentralWidget(self.centralWidget)
         self.table_widget = table_widget
         self.ins_ind = ins_ind
-        self.dict_work_pervorations = CreatePZ.dict_work_pervorations
+        self.dict_perforation = CreatePZ.dict_perforation
         self.dict_perforation_project = CreatePZ.dict_perforation_project
         self.tabWidget = TabWidget()
         self.tableWidget = QTableWidget(0, 7)
@@ -122,15 +122,12 @@ class PervorationWindow(MyWindow):
 
         self.tableWidget.setSortingEnabled(False)
         # print(f' проект {self.dict_perforation_project}')
-        # print(f' текущий ПВР {self.dict_work_pervorations}')
+        # print(f' текущий ПВР {self.dict_perforation}')
         rows = self.tableWidget.rowCount()
         if len(self.dict_perforation_project) != 0:
-
-
             for plast, data in self.dict_perforation_project.items():
                 for i in data['интервал']:
                     count_charge = int((max(i) - min(i)) * chargePM)
-                    # print(i)
 
                     self.tableWidget.insertRow(rows)
                     self.tableWidget.setItem(rows, 0, QTableWidgetItem(str(min(i))))
@@ -144,10 +141,9 @@ class PervorationWindow(MyWindow):
 
         else:
 
-            for plast, data in self.dict_work_pervorations.items():
+            for plast, data in self.dict_perforation.items():
                 print(plast)
-
-                if self.dict_work_pervorations[plast]['отключение'] == True:
+                if self.dict_perforation[plast]['отключение'] == False:
                     for i in data['интервал']:
                         count_charge = int((max(i)-min(i))*chargePM)
                         # print(i)
@@ -176,11 +172,11 @@ class PervorationWindow(MyWindow):
 
         for diam, diam_internal_paker in charge_diam_dict.items():
             if diam_internal_paker[0] <= diam_internal_ek <= diam_internal_paker[1]:
-
                 zar = [25 if diam == 73 else 32]
                 return f'{diam} ПП{zar}ГП'
 
     def addRowTable(self):
+        from open_pz import CreatePZ
 
         editType = self.tabWidget.currentWidget().lineEditType.text()
         editType2 = self.tabWidget.currentWidget().lineEditType2.text()
@@ -191,7 +187,9 @@ class PervorationWindow(MyWindow):
         if not editType or not editType2 or not chargesx or not editIndexFormation:
             msg = QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
             return
-
+        if float(editType2) >= float(CreatePZ.current_bottom):
+            msg = QMessageBox.information(self, 'Внимание', 'Подошва интервала перфорации ниже текущего забоя')
+            return
 
         self.tableWidget.setSortingEnabled(False)
         rows = self.tableWidget.rowCount()
@@ -230,7 +228,15 @@ class PervorationWindow(MyWindow):
                        [None, None, "Кровля", "-", "Подошва", "Тип заряда", "отв на 1 п.м.", "Кол-во отв",
                       "пласт", "Доп.данные", 'подрядчик по ГИС', None]
                        ]
-        print(f'до {CreatePZ.dict_work_pervorations}')
+        print(f'до {CreatePZ.plast_work}')
+        for row in range(rows):
+            item = self.tableWidget.item(row, 1)
+            if item:
+                value = item.text()
+                print(f'dff{value}')
+                if float(value) >= CreatePZ.current_bottom:
+                    msg = QMessageBox.information(self, 'Внимание', 'Подошва интервала перфорации ниже текущего забоя')
+                    return
         for row in range(rows):
             perf_list = [None, None]
             for col in range(0, 9):
@@ -251,40 +257,14 @@ class PervorationWindow(MyWindow):
             perf_list.extend(['подрядчик по ГИС', " "])
             print(perf_list)
             plast = perf_list[8]
-            print(f' раб ПВР {len(CreatePZ.dict_work_pervorations), CreatePZ.dict_work_pervorations}')
-            if plast in CreatePZ.plast_all:
-                if (float(perf_list[2]), float(perf_list[4])) in CreatePZ.dict_perforation[plast]['интервал']:
-                    CreatePZ.dict_perforation[plast]['отрайбировано'] = False
-                    CreatePZ.dict_perforation[plast]['Прошаблонировано'] = False
-                else:
+            print(f' раб ПВР {CreatePZ.plast_work, plast}')
 
-                    CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('интервал', set()).add(
-                        (float(perf_list[2]), float(perf_list[4])))
-                    CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('интервал', set()).add(
-                        (float(perf_list[2]), float(perf_list[4])))
-                    CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('отрайбировано', False)
-                    CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('Прошаблонировано', False)
+            CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('интервал', set()).add(
+                (float(perf_list[2]), float(perf_list[4])))
+            CreatePZ.dict_perforation[plast]['отрайбировано'] = False
+            CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('отключение', False)
 
-                    CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('интервал', set()).add(
-                        (float(perf_list[2]), float(perf_list[4])))
-                    CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('интервал', set()).add(
-                        (float(perf_list[2]), float(perf_list[4])))
-                    CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('отрайбировано', False)
-                    CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('Прошаблонировано', False)
-            else:
-                CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('интервал', set()).add(
-                    (float(perf_list[2]), float(perf_list[4])))
-                CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('интервал', set()).add(
-                    (float(perf_list[2]), float(perf_list[4])))
-                CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('отрайбировано', False)
-                CreatePZ.dict_work_pervorations.setdefault(plast, {}).setdefault('Прошаблонировано', False)
 
-                CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('интервал', set()).add(
-                    (float(perf_list[2]), float(perf_list[4])))
-                CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('интервал', set()).add(
-                    (float(perf_list[2]), float(perf_list[4])))
-                CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('отрайбировано', False)
-                CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('Прошаблонировано', False)
 
             perforation.append(perf_list)
 
@@ -294,7 +274,7 @@ class PervorationWindow(MyWindow):
                                            "представителя подрядчика по ГИС» (руководителя взрывных работ или взрывника)."]),
                          None, None, None, None, None, None, None,
                           'Подрядчик по ГИС', None, None])
-
+        print([CreatePZ.dict_perforation[plast] for plast in CreatePZ.plast_work])
         pipe_perforation = [
            [None, None, f'Произвести монтаж трубного перфоратора + 2шт/20м НКТ + реперный патрубок L=2м до намеченного интервала перфорации '
                         f'(с шаблонировкой НКТ73мм шаблоном.  Спуск компоновки производить  со скоростью не более 0,30 м/с, не допуская резких ударов и вращения.'
@@ -311,12 +291,9 @@ class PervorationWindow(MyWindow):
             for i in range(len(pipe_perforation)):
                 perforation.insert(i + 1, pipe_perforation[i])
 
-
-
-        # print(f'принято {self.dict_perforation_project}')
         text_width_dict = {20: (0, 100), 40: (101, 200), 60: (201, 300), 80: (301, 400), 100: (401, 500),
                            120: (501, 600), 140: (601, 700)}
-        # print(perf_list)
+        print(perf_list)
         row_list = len(perforation)
         if row_list < 6:
             msg = QMessageBox.information(self, 'Внимание', 'Не добавлены интервалы перфорации!!!')
@@ -354,18 +331,12 @@ class PervorationWindow(MyWindow):
             self.table_widget.setSpan(1 + self.ins_ind, 10, len(perforation) - 2, 1)
             self.table_widget.setSpan(1 + self.ins_ind, 11, len(perforation) - 2, 1)
 
-            CreatePZ.plast_work = list(CreatePZ.dict_work_pervorations.keys())
-            CreatePZ.plast_all = list(CreatePZ.dict_perforation.keys())
-
-            CreatePZ.perforation_roof = min(min([min(CreatePZ.dict_work_pervorations[i]['интервал']) for i in CreatePZ.plast_work]))
-
-            CreatePZ.perforation_sole = max(max([max(CreatePZ.dict_work_pervorations[i]['интервал']) for i in CreatePZ.plast_work]))
             print(f'мин {CreatePZ.perforation_roof}, мак {CreatePZ.perforation_sole}')
 
             self.table_widget.setRowHeight(self.ins_ind, 60)
             self.table_widget.setRowHeight(self.ins_ind + 1, 60)
 
-
+            CreatePZ.definition_plast_work(self)
             self.close()
 
 

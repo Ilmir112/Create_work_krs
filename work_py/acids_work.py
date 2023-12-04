@@ -1,8 +1,8 @@
 from PyQt5.QtWidgets import QInputDialog, QMessageBox
 
 from selectPlast import CheckBoxDialog
-
-
+from work_py.rationingKRS import liftingNKT_norm, descentNKT_norm,well_volume_norm
+from krs import well_volume
 def acid_work(self):
     from work_py.opressovka import paker_diametr_select
     from work_py.swabbing import swabbing_with_paker
@@ -11,6 +11,7 @@ def acid_work(self):
 
     if len(CreatePZ.plast_work) == 0:
         msc = QMessageBox.information(self, 'Внимание', 'Отсутствуют рабочие интервалы перфорации')
+        return None
     else:
         swabbing_true_quest1 = QMessageBox.question(self, 'Свабирование на данной компоновке',
                                                    'Нужно ли Свабировать на данной компоновке?')
@@ -74,19 +75,17 @@ def acid_work(self):
              f' с замером, шаблонированием шаблоном. {("Произвести пробную посадку на глубине 50м" if CreatePZ.column_additional == False else "")} '
              ,
              None, None, None, None, None, None, None,
-             'мастер КРС', round(
-                CreatePZ.current_bottom / 9.52 * 1.51 / 60 * 1.2 * 1.2 * 1.04 + 0.18 + 0.008 * CreatePZ.current_bottom / 9.52 + 0.003 * CreatePZ.current_bottom / 9.52,
-                2)],
+             'мастер КРС', descentNKT_norm(paker_depth,1.2)],
             [None, None, f'Посадить пакер на глубине {paker_depth}м'
                 ,
              None, None, None, None, None, None, None,
-             'мастер КРС', 0.4],
+             'мастер КРС', 0.5],
             [None, None,
              f'Опрессовать эксплуатационную колонну в интервале {paker_depth}-0м на Р={CreatePZ.max_admissible_pressure}атм'
              f' в течение 30 минут  в присутствии представителя заказчика, составить акт.  '
              f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ)',
              None, None, None, None, None, None, None,
-             'мастер КРС, предст. заказчика', 1.],
+             'мастер КРС, предст. заказчика', 0.83+0.58],
             [None, None,
              f'Произвести срыв пакера с поэтапным увеличением нагрузки на 3-4т выше веса НКТ в течении 30мин и с '
              f'выдержкой 1ч для возврата резиновых элементов в исходное положение. ',
@@ -137,7 +136,7 @@ def acid_work(self):
                               f'начала работ). В СЛУЧАЕ ПРИЕМИСТОСТИ НИЖЕ {CreatePZ.expected_Q}м3/сут при давлении {CreatePZ.expected_P}атм '
                               f'ДАЛЬНЕЙШИЕ РАБОТЫ СОГЛАСОВАТЬ С ЗАКАЗЧИКОМ',
                               None, None, None, None, None, None, None,
-                              'мастер КРС', 2.25])
+                              'мастер КРС', 0.17+0.52+0.2+0.2+0.2])
 
         for row in acid_work_list(self, paker_depth, paker_khost, dict_nkt, CreatePZ.paker_layout):
             paker_list.append(row)
@@ -156,7 +155,7 @@ def acid_work(self):
                                      f'объеме {round(paker_depth * 1.12 / 1000, 1)}м3 удельным весом {CreatePZ.fluid_work}',
                                      None, None, None, None, None, None, None,
                                      'мастер КРС',
-                                     round(0.25 + 0.033 * 1.2 * (paker_depth + paker_khost) / 9.5 * 1.04, 1)])
+                                     liftingNKT_norm(paker_depth, 1.2)])
 
 
     return paker_list
@@ -191,14 +190,12 @@ def acid_work_list(self, paker_depth, paker_khost, dict_nkt, paker_layout):
                       None, None, None, None, None, None, None,
                       'мастер КРС, УСРСиСТ', 2],
                      [None, None, f'Промыть скважину тех.жидкостью круговой циркуляцией обратной промывкой в 1,5 '
-                                  f'кратном обьеме. Посадить пакер на Н=2310м. Определить приемистость пласта в присутствии '
+                                  f'кратном обьеме. Посадить пакер. Определить приемистость пласта в присутствии '
                                   f'представителя ЦДНГ (составить акт). Сорвать пакер. '
                                   f'При отсутствии приемистости СКВ повторить. При необходимости увеличить приемистость '
                                   f'методом дренирования.',
                       None, None, None, None, None, None, None,
-                      'мастер КРС, УСРСиСТ', 2]]
-
-
+                      'мастер КРС, УСРСиСТ', 0.83+0.2+0.83+0.5+0.5]]
 
     else:
         acid_work = []
@@ -288,7 +285,7 @@ def acid_work_list(self, paker_depth, paker_khost, dict_nkt, paker_layout):
     [None, None,
      flushingDownhole(self, paker_depth, paker_khost, paker_layout),
      None, None, None, None, None, None, None,
-     'мастер КРС', 1.5]]
+     'мастер КРС', well_volume_norm(well_volume(self, CreatePZ.current_bottom))]]
 
     for row in acid_list_1:
         acid_work.append(row)
@@ -301,7 +298,7 @@ def acid_work_list(self, paker_depth, paker_khost, dict_nkt, paker_layout):
                           f'начала работ). В СЛУЧАЕ ПРИЕМИСТОСТИ НИЖЕ {CreatePZ.expected_Q}м3/сут при давлении {CreatePZ.expected_P}атм '
                           f'ДАЛЬНЕЙШИЕ РАБОТЫ СОГЛАСОВАТЬ С ЗАКАЗЧИКОМ',
                           None, None, None, None, None, None, None,
-                          'мастер КРС', 2.25])
+                          'мастер КРС', 0.5 + 0.17 + 0.15+0.52+0.2+0.2+0.2])
 
     return acid_work
 
@@ -315,11 +312,11 @@ def reply_acid(self, paker_khost):
         paker_layout = 2
         paker_depth, ok = QInputDialog.getInt(None, 'посадка пакера',
                                           'Введите глубину посадки пакера', int(CreatePZ.perforation_roof - 20), 0,
-                                          5000)
+                                          CreatePZ.current_bottom)
 
         acid_true_quest_list.append(
             [None, None, f'установить пакер на глубине {paker_depth}м', None, None, None, None, None, None, None,
-             'мастер КРС', None])
+             'мастер КРС', 1.2])
 
         for row in acid_work_list(self, paker_depth, paker_khost, CreatePZ.dict_nkt, paker_layout):
             acid_true_quest_list.append(row)
@@ -349,7 +346,7 @@ def pressure_mode(mode, plast):
 # промывка скважины после кислотной обработки в зависимости от интервала перфорации и комповноки и текущего забоя
 def flushingDownhole(self, paker_depth, paker_khost, paker_layout):
     from open_pz import CreatePZ
-    from krs import well_volume
+
 
     if paker_layout == 2:
         flushingDownhole_list = f'Только при наличии избыточного давления или когда при проведении ОПЗ получен технологический ""СТОП":' \
