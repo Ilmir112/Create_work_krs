@@ -335,12 +335,17 @@ class DataWindow(MyWindow):
             CreatePZ.max_angle =  self.if_None(max_angle)
             CreatePZ.max_expected_pressure = self.if_None(max_expected_pressure)
             CreatePZ.max_admissible_pressure = self.if_None(max_admissible_pressure)
+
             CreatePZ.dict_pump_SHGN["do"] = self.if_None(dict_pump_SHGN_do)
+            CreatePZ.dict_pump_SHGN_h["do"] = self.if_None(dict_pump_SHGN_h_do)
+            CreatePZ.dict_pump_SHGN_h["posle"] = self.if_None(dict_pump_SHGN_h_posle)
+            CreatePZ.dict_pump_SHGN["posle"] = self.if_None(dict_pump_SHGN_posle)
+
             CreatePZ.dict_pump_ECN["do"] = self.if_None(dict_pump_ECN_do)
             CreatePZ.dict_pump_ECN_h["do"] = self.if_None(dict_pump_SHGN_h_do)
-            CreatePZ.dict_pump_SHGN["posle"] = self.if_None(dict_pump_SHGN_posle)
             CreatePZ.dict_pump_ECN["posle"] = self.if_None(dict_pump_ECN_posle)
             CreatePZ.dict_pump_ECN_h["posle"] = self.if_None(dict_pump_SHGN_h_posle)
+
             CreatePZ.paker_do["do"] = self.if_None(paker_do)
             CreatePZ.H_F_paker_do["do"] = self.if_None(H_F_paker_do)
             CreatePZ.paker_do["posle"] = self.if_None(paker_posle)
@@ -361,7 +366,7 @@ class DataWindow(MyWindow):
         elif isinstance(value, int):
             return int(value)
         elif str(value).replace('.','').replace(',','').isdigit():
-            return round(float(value), 1)
+            return round(float(value.replace(',','.')), 1)
         else:
             return value
     def ifNum(self, string):
@@ -370,8 +375,8 @@ class DataWindow(MyWindow):
             return False
         elif str(string) == 'отсут':
             return True
-        elif re.search(r'\d+(,\d+){0,2}', string):
-            if float(string) < 5000:
+        elif str(string).replace('.','').replace(',','').isdigit():
+            if float(string.replace(',','.')) < 5000:
                 return True
             else:
                 return False

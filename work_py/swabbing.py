@@ -22,7 +22,7 @@ def swabbing_opy(self):
         dict_nkt = {73: CreatePZ.head_column_additional,
                     60: int(CreatePZ.current_bottom - CreatePZ.head_column_additional)}
     elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr > 110 and CreatePZ.current_bottom > CreatePZ.head_column_additional:
-        paker_select = f'воронку со свабоограничителем+ НКТ73мм со снятыми фасками  + НКТ73мм со снятыми фасками 10м {round(CreatePZ.current_bottom - CreatePZ.head_column_additional + 10, 0)}м'
+        paker_select = f'воронку со свабоограничителем+ НКТ{CreatePZ.nkt_diam}мм со снятыми фасками  + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками 10м {round(CreatePZ.current_bottom - CreatePZ.head_column_additional + 10, 0)}м'
         dict_nkt = {73: depth_opy}
     elif nkt_diam == 60:
         dict_nkt = {60: depth_opy}
@@ -193,8 +193,8 @@ def swabbing_with_paker(self, paker_khost, pakerKompo):
                        f'для ЭК {CreatePZ.column_additional_diametr}мм х {CreatePZ.column_additional_wall_thickness}мм + НКТ60мм 10м '
         dict_nkt = {73: CreatePZ.head_column_additional, 60: int(paker_depth - CreatePZ.head_column_additional)}
     elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr > 110 and paker_depth > CreatePZ.head_column_additional:
-        paker_select = f'воронку со свабоограничителем+ НКТ73мм со снятыми фасками {paker_khost}м + пакер ПРО-ЯМО-{paker_diametr_select(paker_depth)}мм (либо аналог) ' \
-                       f'для ЭК {CreatePZ.column_additional_diametr}мм х {CreatePZ.column_additional_wall_thickness}мм + НКТ73мм со снятыми фасками 10м'
+        paker_select = f'воронку со свабоограничителем+ НКТ{CreatePZ.nkt_diam}мм со снятыми фасками {paker_khost}м + пакер ПРО-ЯМО-{paker_diametr_select(paker_depth)}мм (либо аналог) ' \
+                       f'для ЭК {CreatePZ.column_additional_diametr}мм х {CreatePZ.column_additional_wall_thickness}мм + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками 10м'
         dict_nkt = {73: paker_depth + paker_khost}
     elif nkt_diam == 60:
         dict_nkt = {60: paker_depth + paker_khost}
@@ -231,7 +231,7 @@ def swabbing_with_paker(self, paker_khost, pakerKompo):
          'мастер КРС', None],
         [None, None,
          f'Произвести  монтаж СВАБа согласно схемы  №8 при свабированиии утвержденной главным инженером от 14.10.2021г. '
-         f'Обвязать устье скважины с ЕДК на жесткую линию. Опрессовать ПВО на максимально ожидаемое давление на устье {CreatePZ.max_admissible_pressure}атм,'
+         f'Обвязать устье скважины с ЕДК на жесткую линию. Опрессовать ПВО на максимально ожидаемое давление на устье {CreatePZ.max_expected_pressure}атм,'
          f' по невозможности на давление поглощения, но не менее 30атм в течении 30мин Провести практическое обучение вахт по '
          f'сигналу "выброс" с записью в журнале проведения учебных тревог',
          None, None, None, None, None, None, None,
@@ -347,7 +347,8 @@ def swabbing_with_voronka(self):
          'мастер КРС', None],
         [None, None,
          f'Произвести  монтаж СВАБа согласно схемы  №8 при свабированиии утвержденной главным инженером от 14.10.2021г. '
-         f'Обвязать устье скважины с ЕДК на жесткую линию. Опрессовать ПВО на максимально ожидаемое давление на устье {CreatePZ.max_admissible_pressure}атм,'
+         f'Обвязать устье скважины с ЕДК на жесткую линию. Опрессовать ПВО на максимально ожидаемое давление на устье '
+         f'{CreatePZ.max_expected_pressure}атм,'
          f' по невозможности на давление поглощения, но не менее 30атм в течении 30мин Провести практическое обучение вахт по '
          f'сигналу "выброс" с записью в журнале проведения учебных тревог',
          None, None, None, None, None, None, None,

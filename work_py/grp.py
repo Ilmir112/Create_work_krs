@@ -314,7 +314,7 @@ def grpPaker(self):
          None, None, None, None, None, None, None,
          'Мастер КРС, подрядчик по ГРП', 0.77],
         [None, None,
-         f'Опрессовать пакер по затрубному пространству на Р={CreatePZ.max_expected_pressure}атм в присутствии следующих '
+         f'Опрессовать пакер по затрубному пространству на Р={CreatePZ.max_admissible_pressure}атм в присутствии следующих '
          f'представителей: УСРСиСТ  (супервайзер), подрядчика по ГРП. \n В случае негерметичности пакера, дальнейшие '
          f'работы согласовать с Заказчиком. ',
          None, None, None, None, None, None, None,
@@ -466,8 +466,8 @@ def nktGrp(self):
 
     if CreatePZ.column_additional == False or (
             CreatePZ.column_additional == True and CreatePZ.current_bottom > CreatePZ.head_column_additional):
-        return f'НКТ73мм'
+        return f'НКТ{CreatePZ.nkt_diam}мм'
     elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr < 110:
         return f'НКТ60мм L- {round(CreatePZ.current_bottom - CreatePZ.head_column_additional + 20, 0)}'
     elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr > 110:
-        return f'НКТ73мм со снятыми фасками L- {round(CreatePZ.current_bottom - CreatePZ.head_column_additional + 20, 0)}'
+        return f'НКТ{CreatePZ.nkt_diam}мм со снятыми фасками L- {round(CreatePZ.current_bottom - CreatePZ.head_column_additional + 20, 0)}'

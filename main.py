@@ -1,7 +1,7 @@
 import sys
 import openpyxl
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu, QMenuBar, QAction, QTableWidget, \
-    QLineEdit, QFileDialog, QToolBar, QPushButton
+    QLineEdit, QFileDialog, QToolBar, QPushButton, QMessageBox, QInputDialog
 from PyQt5 import QtCore, QtWidgets
 
 from openpyxl.utils import get_column_letter
@@ -10,7 +10,6 @@ from PyQt5.QtCore import Qt
 import krs
 
 from openpyxl.drawing.image import Image
-
 
 
 class MyWindow(QMainWindow):
@@ -44,6 +43,15 @@ class MyWindow(QMainWindow):
         self.saveFileButton = QPushButton("Сохранить проект")
         self.saveFileButton.clicked.connect(self.save_to_excel)
         self.toolbar.addWidget(self.saveFileButton)
+
+        self.correctDataButton = QPushButton("Скорректировать данные")
+        self.correctDataButton.clicked.connect(self.correctData)
+        self.toolbar.addWidget(self.correctDataButton)
+
+        self.correctPVRButton = QPushButton("Скорректировать раотающие ПВР")
+        self.correctPVRButton.clicked.connect(self.correctPVR)
+        self.toolbar.addWidget(self.correctPVRButton)
+
 
         self.closeFileButton = QPushButton("Закрыть проект")
         self.closeFileButton.clicked.connect(self.close_file)
@@ -156,9 +164,9 @@ class MyWindow(QMainWindow):
         for row in merged_cells:
             merged_cells_dict.setdefault(row[0], []).append(row[1])
 
-
         for i in range(2, len(work_list)):  # нумерация работ
             work_list[i][1] = i - 1
+            print(work_list[i][11])
             if krs.is_number(work_list[i][11]) == True:
                 CreatePZ.normOfTime += float(work_list[i][11])
 
@@ -214,13 +222,13 @@ class MyWindow(QMainWindow):
 
         perforation_action = QAction("Перфорация", self)
         geophysical.addAction(perforation_action)
-        perforation_action.triggered.connect(self.PerforationNewWindow)
+        perforation_action.triggered.connect(self.perforationNewWindow)
 
         geophysical_action = QAction("Геофизические исследования", self)
         geophysical.addAction(geophysical_action)
         geophysical_action.triggered.connect(self.GeophysicalNewWindow)
 
-        rgd_menu  = geophysical.addMenu("РГД")
+        rgd_menu = geophysical.addMenu("РГД")
         rgdWithoutPaker_action = QAction("РГД по колонне", self)
         rgd_menu.addAction(rgdWithoutPaker_action)
         rgdWithoutPaker_action.triggered.connect(self.rgdWithoutPaker_action)
@@ -228,8 +236,6 @@ class MyWindow(QMainWindow):
         privyazka_action = QAction("Привязка НКТ", self)
         geophysical.addAction(privyazka_action)
         privyazka_action.triggered.connect(self.privyazkaNKT)
-
-
 
         vp_action = QAction("Установка ВП", self)
         geophysical.addAction(vp_action)
@@ -250,6 +256,10 @@ class MyWindow(QMainWindow):
         swibbingVoronka_action = QAction("Свабирование со воронкой", self)
         geophysical.addAction(swibbingVoronka_action)
         swibbingVoronka_action.triggered.connect(self.swibbing_with_voronka)
+
+        kompressVoronka_action = QAction("Освоение компрессором с воронкой", self)
+        geophysical.addAction(kompressVoronka_action)
+        kompressVoronka_action.triggered.connect(self.kompress_with_voronka)
 
         del_menu = context_menu.addMenu('удаление строки')
         emptyString_action = QAction("добавить пустую строку", self)
@@ -339,8 +349,6 @@ class MyWindow(QMainWindow):
         alone_menu.addAction(konte_action)
         konte_action.triggered.connect(self.konte_action)
 
-
-
         definition_Q_action = QAction("Определение приемитости по НКТ", self)
         alone_menu.addAction(definition_Q_action)
         definition_Q_action.triggered.connect(self.definition_Q)
@@ -405,6 +413,7 @@ class MyWindow(QMainWindow):
         from work_py.rgdVcht import rgdWithoutPaker
         rgdWithoutPaker_list = rgdWithoutPaker(self)
         self.populate_row(self.ins_ind, rgdWithoutPaker_list)
+
     def privyazkaNKT(self):
         from work_py.alone_oreration import privyazkaNKT
         privyazkaNKT_list = privyazkaNKT(self)
@@ -424,6 +433,7 @@ class MyWindow(QMainWindow):
         from work_py.alone_oreration import konte
         konte_work_list = konte(self)
         self.populate_row(self.ins_ind, konte_work_list)
+
     def mkp_revision(self):
         from work_py.mkp import mkp_revision
         mkp_work_list = mkp_revision(self)
@@ -543,6 +553,12 @@ class MyWindow(QMainWindow):
         swabbing_opy_list = swabbing_opy(self)
         self.populate_row(self.ins_ind, swabbing_opy_list)
 
+    def kompress_with_voronka(self):
+        from work_py.kompress import kompress
+
+        print('Вставился компрессор с воронкой')
+        kompress_work_list = kompress(self)
+        self.populate_row(self.ins_ind, kompress_work_list)
     def swibbing_with_voronka(self):
 
         from work_py.swabbing import swabbing_with_voronka
@@ -575,7 +591,9 @@ class MyWindow(QMainWindow):
     def acid_action_1paker(self):
         from work_py.acids_work import acid_work
         from open_pz import CreatePZ
-
+        if len(CreatePZ.plast_work) == 0:
+            msc = QMessageBox.information(self, 'Внимание', 'Отсутствуют рабочие интервалы перфорации')
+            return
         CreatePZ.paker_layout = 1
         print('Вставился кислотная обработка на одном пакере ')
         acid_work_list = acid_work(self)
@@ -586,6 +604,9 @@ class MyWindow(QMainWindow):
         from work_py.acids import acid_work
         from open_pz import CreatePZ
 
+        if len(CreatePZ.plast_work) == 0:
+            msc = QMessageBox.information(self, 'Внимание', 'Отсутствуют рабочие интервалы перфорации')
+            return
         CreatePZ.paker_layout = 2
         print('Вставился кислотная обработка на двух пакере ')
         acid_work_list = acid_work(self)
@@ -667,12 +688,51 @@ class MyWindow(QMainWindow):
         else:
             self.new_window.close()  # Close window.
             self.new_window = None  # Discard reference.
-
-    def PerforationNewWindow(self):
-        from work_py.perforation import PervorationWindow
+    def correctPVR(self):
         from open_pz import CreatePZ
+        plast_work = set()
+        CreatePZ.current_bottom, ok = QInputDialog.getDouble(self, 'Необходимый забой',
+                                                             'Введите забой до которого нужно нормализовать')
+        for plast, value in CreatePZ.dict_perforation.items():
+            for interval in value['интервал']:
+                if CreatePZ.current_bottom >= interval[0]:
+                    perf_work_quest = QMessageBox.question(self, 'Добавление работающих интервалов перфорации',
+                                                           f'Является ли данный интервал {CreatePZ.dict_perforation[plast]["интервал"]} работающим?')
+                    if perf_work_quest == QMessageBox.StandardButton.No:
+                        CreatePZ.dict_perforation[plast]['отключение'] = True
+                    else:
+                        plast_work.add(plast)
+                        CreatePZ.dict_perforation[plast]['отключение'] = False
+                elif CreatePZ.perforation_roof <= interval[0] and CreatePZ.dict_perforation[plast][
+                    "отключение"] == False:
+                    CreatePZ.perforation_roof = interval[0]
+                elif CreatePZ.perforation_sole >= interval[1] and CreatePZ.dict_perforation[plast][
+                    "отключение"] == False:
+                    CreatePZ.perforation_sole = interval[1]
+                elif CreatePZ.perforation_roof_all <= interval[0]:
+                    CreatePZ.perforation_roof_all = interval[0]
+                break
+        CreatePZ.plast_work = list(plast_work)
+        print(f'работающий пласты  {CreatePZ.plast_work}')
+    def correctData(self):
+        from data_correct import DataWindow
+
         if self.new_window is None:
-            # print(f' проект перфорации {self.dict_perforation_project}')
+
+            self.new_window = DataWindow()
+            self.new_window.setWindowTitle("Окно корректировки")
+            self.new_window.setGeometry(100, 400, 300, 400)
+            self.new_window.show()
+
+        else:
+            self.new_window.close()  # Close window.
+            self.new_window = None  # Discard reference.
+
+    def perforationNewWindow(self):
+        from work_py.perforation import PervorationWindow
+
+        if self.new_window is None:
+
             self.new_window = PervorationWindow(self.table_widget, self.ins_ind,
                                                 self.dict_perforation_project)
             self.new_window.setWindowTitle("Перфорация")

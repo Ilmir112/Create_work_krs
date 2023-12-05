@@ -7,11 +7,11 @@ from work_py.rir import perf_new
 def sand_select(self):
     from open_pz import CreatePZ
     if CreatePZ.column_additional == False or CreatePZ.column_additional == True and CreatePZ.current_bottom < CreatePZ.head_column_additional:
-        sand_select = f'перо +  НКТ73мм 20м + реперный патрубок'
+        sand_select = f'перо +  НКТ{CreatePZ.nkt_diam}мм 20м + реперный патрубок'
     elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr < 110 and CreatePZ.current_bottom > CreatePZ.head_column_additional:
         sand_select = f'перо + НКТ{60}мм 20м + реперный патрубок + НКТ60мм {round(CreatePZ.current_bottom - CreatePZ.head_column_additional, 0)}м '
     elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr > 110 and CreatePZ.current_bottom > CreatePZ.head_column_additional:
-        sand_select = f'перо + НКТ73мм со снятыми фасками {20}м + реперный патрубок + НКТ73мм со снятыми фасками {round(CreatePZ.current_bottom - CreatePZ.head_column_additional, 0)}м'
+        sand_select = f'перо + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками {20}м + реперный патрубок + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками {round(CreatePZ.current_bottom - CreatePZ.head_column_additional, 0)}м'
     return sand_select
 
 def sandFilling(self):

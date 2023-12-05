@@ -175,10 +175,10 @@ def template_ek_without_skm(self):
         [None, None, f'Приподнять до глубины {CreatePZ.current_bottom-20}м. Тех отстой 2ч. Определение текущего забоя, при необходимости повторная промывка.',
          None, None, None, None, None, None, None,
          'Мастер КРС, представитель ЦДНГ', 2.49],
-        [None, None, f'Поднять {template_str} на НКТ73мм с глубины {CreatePZ.current_bottom}м с доливом скважины в '
+        [None, None, f'Поднять {template_str} на НКТ{CreatePZ.nkt_diam}мм с глубины {CreatePZ.current_bottom}м с доливом скважины в '
                         f'объеме {round(CreatePZ.current_bottom*1.12/1000, 1)}м3 тех. жидкостью  уд.весом {CreatePZ.fluid_work}',
          None, None, None, None, None, None, None,
-         'Мастер КРС', liftingNKT_norm(CreatePZ.current_bottom)]
+         'Мастер КРС', liftingNKT_norm(CreatePZ.current_bottom, 1.2)]
     ]
     if CreatePZ.column_additional == False:
         temlate_ek = second_template
@@ -343,7 +343,7 @@ def template_ek(self):
         [None, None, f'Приподнять до глубины {CreatePZ.current_bottom-20}м. Тех отстой 2ч. Определение текущего забоя, при необходимости повторная промывка.',
          None, None, None, None, None, None, None,
          'Мастер КРС, представитель ЦДНГ', 2.49],
-        [None, None, f'Поднять {template_str} на НКТ73мм с глубины {CreatePZ.current_bottom}м с доливом скважины в '
+        [None, None, f'Поднять {template_str} на НКТ{CreatePZ.nkt_diam}мм с глубины {CreatePZ.current_bottom}м с доливом скважины в '
                         f'объеме {round(CreatePZ.current_bottom*1.12/1000, 1)}м3 тех. жидкостью  уд.весом {CreatePZ.fluid_work}',
          None, None, None, None, None, None, None,
          'Мастер КРС', liftingNKT_norm(CreatePZ.current_bottom, 1.2)]

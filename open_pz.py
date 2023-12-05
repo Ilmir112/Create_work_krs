@@ -125,6 +125,7 @@ class CreatePZ(MyWindow):
     plast_project = []
     plast_work = []
     plast_all = []
+    condition_of_wells = 0
     cat_well_min = []
     bvo = False
     old_version = False
@@ -193,7 +194,7 @@ class CreatePZ(MyWindow):
             elif 'II. История эксплуатации скважины' in row:
                 data_pvr_max = row_ind - 1
             elif 'III. Состояние скважины к началу ремонта ' in row:
-                condition_of_wells = row_ind
+                CreatePZ.condition_of_wells = row_ind
 
             for col, value in enumerate(row):
                 if not value is None and col <= 12:
@@ -385,36 +386,63 @@ class CreatePZ(MyWindow):
                             CreatePZ.paker2_do["do"] = (row[col + 4]).split('/')[1]
                         except:
                             CreatePZ.paker_do["do"] = CreatePZ.if_None(row[col + 4])
+                            n = 1
+                            while CreatePZ.paker_do["do"] is None:
+                                CreatePZ.max_admissible_pressure = row[col + 4 + n]
+                                n += 1
                         try:
                             CreatePZ.paker_do["posle"] = CreatePZ.paker_do["posle"].split('/')[0]
                             CreatePZ.paker2_do["posle"] = CreatePZ.paker_do["posle"].split('/')[1]
                         except:
                             CreatePZ.paker_do["posle"] = CreatePZ.if_None(row[col + 8 + old_index])
+                            n = 0
+                            while CreatePZ.paker_do["posle"] is None:
+                                CreatePZ.CreatePZ.paker_do["posle"] = row[col + 8 + old_index + n]
+                                n += 1
 
                     elif value == 'Насос' and row[col + 2] == 'типоразмер':
                         if CreatePZ.if_None(row[col + 4]) != 'отсут':
                             if ('НВ' in str(row[col + 4]).upper() or 'ШГН' in str(row[col + 4]).upper() \
                                     or 'НН' in str(row[col + 4]).upper()):
-                                CreatePZ.dict_pump_SHGN['do'] = row[col + 4]
+                                CreatePZ.dict_pump_SHGN["do"] = row[col + 4]
+                                n = 0
+                                while CreatePZ.dict_pump_SHGN["do"] is None:
+                                    CreatePZ.dict_pump_SHGN["do"] = row[col + 4 + n]
+                                    n += 1
+
                             if ('ЭЦН' in str(row[col + 4]).upper() or 'ВНН' in str(row[col + 4]).upper()):
-                                CreatePZ.dict_pump_ECN['do'] = row[col + 4]
-                            CreatePZ.dict_pump['do'] = CreatePZ.if_None(row[col + 4])
+                                CreatePZ.dict_pump_ECN["do"] = row[col + 4]
+                                n = 0
+                                while CreatePZ.dict_pump_ECN["do"] is None:
+                                    CreatePZ.dict_pump_ECN["do"] = row[col + 4 + n]
+                                    n += 1
+
 
                         if CreatePZ.if_None(row[col + 8 + old_index]) != 'отсут':
-                            CreatePZ.dict_pump["posle"] = CreatePZ.if_None(row[col + 8 + old_index])
+
                             if ('НВ' in str(row[col + 8 + old_index]).upper() or 'ШГН' in str(
                                     row[col + 8 + old_index]).upper() \
                                     or 'НН' in str(row[col + 8 + old_index]).upper()):
                                 CreatePZ.dict_pump_SHGN["posle"] = row[col + 8 + old_index]
+                                n = 0
+                                while CreatePZ.dict_pump_SHGN["posle"] is None or n ==12:
+                                    CreatePZ.dict_pump_SHGN["posle"] = row[col + 8 + old_index + n]
+                                    n += 1
                             if ('ЭЦН' in str(row[col + 8 + old_index]).upper() or 'ВНН' in str(
                                     row[col + 8 + old_index]).upper()):
                                 CreatePZ.dict_pump_ECN["posle"] = row[col + 8 + old_index]
+                                n = 0
+                                while CreatePZ.dict_pump_ECN["posle"] is None or n ==12:
+                                    CreatePZ.dict_pump_ECN["posle"] = row[col + 8 + old_index + n]
+                                    n += 1
 
                         # print(f' ячейка {ws.cell(row=row_ind + 5, column=col + 3).value}')
+
                         if ws.cell(row=row_ind + 5, column=col + 3).value == 'Нсп, м':
                             if CreatePZ.dict_pump_ECN["do"] != '0':
                                 # print(f' Спуск ЭЦН ТРУ {CreatePZ.if_None(CreatePZ.dict_pump_ECN["do"])}')
                                 CreatePZ.dict_pump_ECN_h["do"] = ws.cell(row=row_ind + 5, column=col + 5).value
+
                             if CreatePZ.dict_pump_SHGN["do"] != '0':
                                 CreatePZ.dict_pump_SHGN_h["do"] = ws.cell(row=row_ind + 5, column=col + 5).value
                             if CreatePZ.dict_pump_ECN["posle"] != '0':
@@ -453,6 +481,12 @@ class CreatePZ(MyWindow):
 
             self.data_window.show()
         CreatePZ.pause_app(self)
+
+        if CreatePZ.condition_of_wells == 0:
+            CreatePZ.condition_of_wells, ok = QInputDialog.getInt(self, 'индекс Окончания копирования',
+                                                   'Программа не смогла определить строку n\ III. Состояние скважины к началу ремонта ',
+                                                   0, 0, 800)
+
         if len(CreatePZ.cat_well_min) == 0:
             cat_well_min, ok = QInputDialog.getInt(self, 'индекс начала копирования',
                                                    'Программа не смогла определить строку начала копирования',
@@ -478,7 +512,8 @@ class CreatePZ(MyWindow):
 
             else:
                 CreatePZ.grpPlan = False
-
+        print(CreatePZ.dict_pump_ECN, CreatePZ.dict_pump_SHGN, CreatePZ.dict_pump_ECN_h, CreatePZ.H_F_paker_do)
+        print()
         # Определение наличия по скважине нарушений
         for row in range(data_pvr_max, CreatePZ.data_well_max):
             for col in range(1, 13):
@@ -535,8 +570,8 @@ class CreatePZ(MyWindow):
             CreatePZ.open_trunk_well = True
 
         print(f' ГРП - {CreatePZ.grpPlan}')
-        print(f' глубина насоса {CreatePZ.dict_pump_h}')
-        print(f' насоса {CreatePZ.dict_pump}')
+        print(f' глубина насоса ШГН {CreatePZ.dict_pump_SHGN_h}')
+        print(f' насоса {CreatePZ.dict_pump_SHGN}')
         print(f'пакер {CreatePZ.paker_do}')
         print(f'глубина пакер {CreatePZ.H_F_paker_do}')
         print(f' диам колонны {CreatePZ.column_diametr}')
@@ -544,9 +579,8 @@ class CreatePZ(MyWindow):
         print(
             f'{CreatePZ.column_additional == False},{("ЭЦН" in str(CreatePZ.dict_pump["posle"]).upper() or "ВНН" in str(CreatePZ.dict_pump["posle"][0]).upper())}')
         print(f'Pdd {str(CreatePZ.dict_pump["posle"]).upper()}')
-        if CreatePZ.column_additional == False and CreatePZ.dict_pump_ECN["posle"] != 0:
-            print(
-                f'{CreatePZ.column_additional == False},{("ЭЦН" in str(CreatePZ.dict_pump["posle"]).upper(), "ВНН" in str(CreatePZ.dict_pump["posle"]).upper())}')
+        if CreatePZ.column_additional == False and CreatePZ.dict_pump_ECN["posle"] != '0':
+            print(                f'{CreatePZ.column_additional == False},{("ЭЦН" in str(CreatePZ.dict_pump["posle"]).upper(), "ВНН" in str(CreatePZ.dict_pump["posle"]).upper())}')
 
             CreatePZ.lift_ecn_can = True
         elif CreatePZ.column_additional == True:
@@ -640,13 +674,13 @@ class CreatePZ(MyWindow):
                                                      250)
                 CreatePZ.expected_pick_up[expected_Q] = expected_P
             print(f' Ожидаемые {CreatePZ.expected_pick_up}')
-        # print(f' индекс нкт {pipes_ind + 1, condition_of_wells}')
+        # print(f' индекс нкт {pipes_ind + 1, CreatePZ.condition_of_wells}')
 
-        for row in range(pipes_ind + 1, condition_of_wells):  # словарь  количества НКТ и метраж
+        for row in range(pipes_ind + 1, CreatePZ.condition_of_wells):  # словарь  количества НКТ и метраж
             if ws.cell(row=row, column=3).value == 'План':
                 CreatePZ.a_plan = row
         # print(f'индекс {CreatePZ.a_plan}')
-        for row in range(pipes_ind + 1, condition_of_wells + 1):
+        for row in range(pipes_ind + 1, CreatePZ.condition_of_wells + 1):
             key = ws.cell(row=row, column=4).value
             value = CreatePZ.without_b(ws.cell(row=row, column=7).value)
             if not key is None and row < CreatePZ.a_plan:
@@ -768,6 +802,7 @@ class CreatePZ(MyWindow):
 
         if float(CreatePZ.column_diametr) < 110:
             CreatePZ.nkt_diam = 60
+            print(f'диаметр НКТ {CreatePZ.nkt_diam}')
         # Определение работающих интервалов перфорации и заполнения в словарь
 
         if len(CreatePZ.plast_work) == 0:

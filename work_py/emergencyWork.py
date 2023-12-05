@@ -9,7 +9,7 @@ def magnet_select(self):
     elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr < 110 and CreatePZ.current_bottom > CreatePZ.head_column_additional:
         magnet_select = f'перо + опрессовочное седло + НКТ60мм 20м + репер + НКТ60мм L- {CreatePZ.current_bottom - CreatePZ.head_column_additional}м'
     elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr > 110 and CreatePZ.current_bottom > CreatePZ.head_column_additional:
-        magnet_select = f'воронку + опрессовочное седло + НКТ73мм со снятыми фасками 20м + НКТ73мм со снятыми фасками' \
+        magnet_select = f'воронку + опрессовочное седло + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками 20м + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками' \
                       f' L- {CreatePZ.current_bottom - CreatePZ.head_column_additional}м'
     return magnet_select
 

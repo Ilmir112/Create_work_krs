@@ -98,11 +98,13 @@ def raiding_interval():
 
 
     if len(CreatePZ.drilling_interval) != 0:
+        # print(CreatePZ.drilling_interval)
         for interval in CreatePZ.drilling_interval:
-            if interval + 20 <= CreatePZ.current_bottom:
-                str_raid.append(interval-20, interval +20)
+            # print(interval)
+            if float(interval[1]) + 20 <= CreatePZ.current_bottom:
+                str_raid.append((float(interval[0])-20, float(interval[1]) +20))
             else:
-                str_raid.append(interval - 20, CreatePZ.current_bottom)
+                str_raid.append((float(interval[0]) - 20, CreatePZ.current_bottom))
 
     if CreatePZ.leakiness == True:
         roof_leakiness = float(list(CreatePZ.dict_leakiness['НЭК']['интервал'].keys())[0].split('-')[1])

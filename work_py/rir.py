@@ -211,7 +211,7 @@ def rpk_nkt(self, paker_depth):
                        f'+ НКТ60мм + репер + НКТ60мм L- {paker_depth-CreatePZ.head_column_additional}м '
     elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr > 110 and paker_depth> CreatePZ.head_column_additional:
         rpk_nkt_select = f' для ЭК {CreatePZ.column_additional_diametr}мм х {CreatePZ.column_additional_wall_thickness}мм  + {nktOpress(self)[0]}' \
-                       f'+ НКТ + репер + НКТ73мм со снятыми фасками L- {paker_depth-CreatePZ.head_column_additional}м '
+                       f'+ НКТ + репер + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками L- {paker_depth-CreatePZ.head_column_additional}м '
 
     return rpk_nkt_select
 
@@ -456,7 +456,7 @@ def pero_select(self, rirSole):
     elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr < 110 and rirSole > CreatePZ.head_column_additional:
         pero_select = f'перо + опрессовочное седло + НКТ60мм 20м + репер + НКТ60мм L- {rirSole - CreatePZ.head_column_additional}м'
     elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr > 110 and rirSole > CreatePZ.head_column_additional:
-        pero_select  = f'воронку + опрессовочное седло + НКТ73мм со снятыми фасками 20м + НКТ73мм со снятыми фасками' \
+        pero_select  = f'воронку + опрессовочное седло + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками 20м + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками' \
                        f' L- {rirSole - CreatePZ.head_column_additional}м'
     return pero_select
 

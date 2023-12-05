@@ -183,6 +183,8 @@ def gno_down(self):
                               None, None, None, None, None, None, None,
                               'Мастер КРС, предст. заказчика', 1.5],
                              ]
+    if privyazkaNKT(self) not in descent_nv_with_paker:
+        descent_nv_with_paker.insert(3, privyazkaNKT(self))
 
     descent_nn_with_paker = [[None, None,
                               f'Заменить технологические НКТ на опрессованные эксплуатационные НКТ. Заменить подвесной патрубок на сертифицированный.',
@@ -227,7 +229,8 @@ def gno_down(self):
                               None, None, None, None, None, None, None,
                               'Мастер КРС, предст. заказчика', 1.5],
                              ]
-
+    if privyazkaNKT(self) not in descent_nn_with_paker:
+        descent_nn_with_paker.insert(3, privyazkaNKT(self))
     descentORD = [[None, None,
                    f'Заменить технологические НКТ на опрессованные эксплуатационные НКТ. Заменить подвесной патрубок на сертифицированный.',
                    None, None, None, None, None, None, None,
@@ -324,7 +327,7 @@ def gno_down(self):
          None, None, None, None, None, None, None,
          'Мастер КРС, предст. заказчика', 1.77],
         [None, None,
-         f'Опрессовать пакер и ЭК и арматуру ППД на Р= {CreatePZ.max_expected_pressure}атм с открытым трубном пространством '
+         f'Опрессовать пакер и ЭК и арматуру ППД на Р= {CreatePZ.max_admissible_pressure}атм с открытым трубном пространством '
          f'в присутствии представителя заказчика на наличие перетоков.',
          None, None, None, None, None, None, None,
          'Мастер КРС, предст. заказчика', 0.67],
@@ -334,7 +337,7 @@ def gno_down(self):
          'Мастер КРС, предст. заказчика', descentNKT_norm(float(CreatePZ.H_F_paker2_do["posle"]),1)],
         [None, None,
          f'Произвести стыковку. Смонтировать арматуру ОРЗ. Опрессовать пакер и арматуру ОРЗ в межтрубное пространство'
-         f' на Р= {CreatePZ.max_expected_pressure}атм с открытым трубном пространством '
+         f' на Р= {CreatePZ.max_admissible_pressure}атм с открытым трубном пространством '
          f'в присутствии представителя заказчика на наличие перетоков.',
          None, None, None, None, None, None, None,
          'Мастер КРС, предст. заказчика', 0.67],

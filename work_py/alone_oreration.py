@@ -12,7 +12,7 @@ def kot_select(self):
     elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr < 110 and CreatePZ.current_bottom > CreatePZ.head_column_additional:
         kot_select = f'КОТ-50 (клапан обратный тарельчатый) +НКТ{60}мм 10м + репер + НКТ60мм L- {round(CreatePZ.current_bottom - CreatePZ.head_column_additional, 0)}м'
     elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr > 110 and CreatePZ.current_bottom > CreatePZ.head_column_additional:
-        kot_select = f'КОТ-50 (клапан обратный тарельчатый) +НКТ{73}мм со снятыми фасками 10м + репер + НКТ73мм со снятыми фасками' \
+        kot_select = f'КОТ-50 (клапан обратный тарельчатый) +НКТ{73}мм со снятыми фасками 10м + репер + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками' \
                      f' L- {round(CreatePZ.current_bottom - CreatePZ.head_column_additional, 0)}м'
 
     return kot_select
