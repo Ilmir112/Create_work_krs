@@ -239,7 +239,7 @@ class CreatePZ(MyWindow):
                             elif len(data_main_production_string[-1].split('(м)')) == 2:
                                 CreatePZ.shoe_column = CreatePZ.without_b(data_main_production_string[-1])
 
-                    elif 'гипс' in str(value) and row_ind < CreatePZ.data_well_max:
+                    elif 'гипс' in str(value).lower() or 'гидратн' in str(value).lower():
                         CreatePZ.gipsInWell = True
 
                     elif '9. Максимальный зенитный угол' == value:
@@ -556,7 +556,11 @@ class CreatePZ(MyWindow):
                 CreatePZ.gipsInWell = False
 
         curator_list = ['ОР', 'ГТМ', 'ГРР', 'ГО', 'ВНС']
-        curator = ['ОР' if CreatePZ.if_None(CreatePZ.dict_pump["posle"]) == '0' else 'ГТМ'][0]
+        curator = ['ГТМ'
+                   if (CreatePZ.dict_pump_SHGN["posle"] != '0' and CreatePZ.dict_pump_ECN["posle"] == '0')
+                            or (CreatePZ.dict_pump_SHGN["posle"] == '0' and CreatePZ.dict_pump_ECN["posle"] != '0')
+                            or (CreatePZ.dict_pump_SHGN["posle"] != '0' and CreatePZ.dict_pump_ECN["posle"] != '0')
+                   else 'ОР'][0]
 
         CreatePZ.region = block_name.region(cdng)
 
@@ -649,6 +653,7 @@ class CreatePZ(MyWindow):
 
 
                         elif 'зак' in str(ws.cell(row=row, column=col).value).strip().lower() or 'давл' in str(
+                                ws.cell(row=row, column=col).value).strip().lower() or 'P' in str(
                                 ws.cell(row=row, column=col).value).strip().lower():
                             Pzak = ws.cell(row=row, column=col + 1).value
                             n = 1
@@ -673,12 +678,15 @@ class CreatePZ(MyWindow):
                                                      100, 0,
                                                      250)
                 CreatePZ.expected_pick_up[expected_Q] = expected_P
-            print(f' Ожидаемые {CreatePZ.expected_pick_up}')
+                print(f' Ожидаемые {CreatePZ.expected_pick_up}')
         # print(f' индекс нкт {pipes_ind + 1, CreatePZ.condition_of_wells}')
 
         for row in range(pipes_ind + 1, CreatePZ.condition_of_wells):  # словарь  количества НКТ и метраж
-            if ws.cell(row=row, column=3).value == 'План':
+            if ws.cell(row=row, column=3).value == 'План' or  str(ws.cell(row=row, column=3).value).lower() == 'после ремонта':
                 CreatePZ.a_plan = row
+        if CreatePZ.a_plan == 0:
+            CreatePZ.a_plan, ok = QInputDialog.getDouble(self, 'Индекс планового НКТ',
+                                                                 'Программа не могла определить начала строку с ПЗ НКТ - план')
         # print(f'индекс {CreatePZ.a_plan}')
         for row in range(pipes_ind + 1, CreatePZ.condition_of_wells + 1):
             key = ws.cell(row=row, column=4).value
@@ -696,9 +704,12 @@ class CreatePZ(MyWindow):
         # print(f' индекс штанг{sucker_rod_ind, pipes_ind}')
         try:
             for row in range(sucker_rod_ind, pipes_ind - 1):
-                if ws.cell(row=row, column=3).value == 'План':
+                if ws.cell(row=row, column=3).value == 'План' or str(ws.cell(row=row, column=3).value).lower() == 'после ремонта':
                     CreatePZ.b_plan = row
                     # print(f'b_plan {CreatePZ.b_plan}')
+            if CreatePZ.b_plan == 0:
+                CreatePZ.b_plan, ok = QInputDialog.getDouble(self, 'Индекс плановго НКТ',
+                                                             'Программа не могла определить начала строку с ПЗ штанги - план')
 
             for row in range(sucker_rod_ind + 1, pipes_ind - 1):
 
@@ -760,20 +771,20 @@ class CreatePZ(MyWindow):
 
                 CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('вскрытие', set()).add(row[4])
                 print(
-                    f'отключе {isinstance(row[5], datetime) == True, CreatePZ.old_version == True} {isinstance(row[6], datetime) == True, CreatePZ.old_version == False}')
+                    f'отключе {isinstance(row[5], datetime) == True, old_index} ggg {isinstance(row[6], datetime) == True, CreatePZ.old_version}')
                 if (isinstance(row[5], datetime) == True and CreatePZ.old_version == True) or (
                         isinstance(row[6], datetime) == True and CreatePZ.old_version == False):
                     CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('отключение', True)
                 else:
                     CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('отключение', False)
 
-                CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('отв', set()).add(row[6 - old_index])
-                CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('заряд', set()).add(row[7 - old_index])
-                CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('удлинение', set()).add(row[8 - old_index])
-                CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('давление', set()).add(row[9 - old_index])
-                CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('замер', set()).add(row[10 - old_index])
+                CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('отв', set()).add(row[5 + old_index])
+                CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('заряд', set()).add(row[6 + old_index])
+                CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('удлинение', set()).add(row[7 + old_index])
+                CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('давление', set()).add(row[8 + old_index])
+                CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('замер', set()).add(row[9 + old_index])
                 CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('рабочая жидкость', set()).add(
-                    krs.calculationFluidWork(row[1], row[9 - old_index]))
+                    krs.calculationFluidWork(row[1], row[8 + old_index]))
 
 
 

@@ -308,6 +308,9 @@ class MyWindow(QMainWindow):
         larNKT_action.triggered.connect(self.larNKT_action)
 
         acid_menu = action_menu.addMenu('Кислотная обработка')
+        acid_action1paker = QAction("окно на одном пакере", self)
+        acid_menu.addAction(acid_action1paker)
+        acid_action1paker.triggered.connect(self.acidPakerNewWindow)
 
         acid_action_1paker = QAction("на одном пакере", self)
         acid_menu.addAction(acid_action_1paker)
@@ -539,6 +542,7 @@ class MyWindow(QMainWindow):
         vp_work_list = czh(self)
         self.populate_row(self.ins_ind, vp_work_list)
 
+
     def swibbing_with_paker(self):
         from work_py.swabbing import swabbing_with_paker
 
@@ -675,11 +679,18 @@ class MyWindow(QMainWindow):
         # self.table_widget.resizeColumnsToContents()
         # self.table_widget.resizeRowsToContents()
 
+    def acidPakerNewWindow(self):
+        from work_py.acid_paker import AcidPakerWindow
+        print(f' окно СКО ')
+        if self.new_window is None:
+            print(f' окно2 СКО ')
+            self.new_window = AcidPakerWindow(self.table_widget, self.ins_ind)
+            self.new_window.setGeometry(200, 400, 300, 400)
+            self.new_window.show()
     def GeophysicalNewWindow(self):
         from work_py.geophysic import GeophysicWindow
 
         if self.new_window is None:
-
             self.new_window = GeophysicWindow(self.table_widget, self.ins_ind)
             self.new_window.setWindowTitle("Геофизические исследования")
             self.new_window.setGeometry(200, 400, 300, 400)

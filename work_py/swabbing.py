@@ -383,7 +383,7 @@ def swabbing_with_voronka(self):
          f'объеме {round(paker_depth * 1.12 / 1000, 1)}м3 удельным весом {CreatePZ.fluid_work}',
          None, None, None, None, None, None, None,
          'мастер КРС',
-         liftingNKT_norm(paker_depth)]
+         liftingNKT_norm(paker_depth, 1)]
     ]
 
     return paker_list
