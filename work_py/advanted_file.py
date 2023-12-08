@@ -94,7 +94,7 @@ def raiding_interval():
 
                     if float(i[1]) < CreatePZ.current_bottom:
                         str_raid.append(crt)
-                    # print(CreatePZ.dict_work_pervorations.keys())
+                    # print(CreatePZ.dict_work_perforations.keys())
 
 
     if len(CreatePZ.drilling_interval) != 0:

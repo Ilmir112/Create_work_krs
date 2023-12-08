@@ -1,8 +1,11 @@
 from PyQt5.QtWidgets import QMessageBox, QInputDialog
 
-from krs import volume_vn_ek,volume_vn_nkt
+from krs import volume_vn_ek, volume_vn_nkt, well_volume
 from work_py.acids_work import open_checkbox_dialog
+from work_py.drilling import drilling_nkt
+from work_py.raiding import raidingColumn
 from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm,well_volume_norm
+from work_py.sand_filling import sandFilling, sand_select, sandWashing
 
 
 def rir_rpp(self):
@@ -291,14 +294,14 @@ def rirWithPero(self):
          f'Опрессовать цементный мост на Р={CreatePZ.max_admissible_pressure}атм в присутствии представителя '
          f'УСРСиСТ Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до '
          f'начала работ) В случае негерметичности цементного моста дальнейшие работы согласовать с Заказчиком '
-         f'В случае головы ЦМ ниже планового п.17-23 повторить  с учетом корректировки мощности моста ',
+         f'В случае головы ЦМ ниже планового РИР повторить  с учетом корректировки мощности моста ',
          None, None, None, None, None, None, None,
          'мастер КРС', 0.67],
         [None, None,
          f'Поднять перо на тНКТ{nkt_diam}мм с глубины {rirRoof}м с доливом скважины в объеме 2,2м3 тех. жидкостью '
          f'уд.весом {CreatePZ.fluid_work}',
          None, None, None, None, None, None, None,
-         'мастер КРС',descentNKT_norm(rirRoof, 1)],
+         'мастер КРС', descentNKT_norm(rirRoof, 1)],
     ]
 
     rirPero_list = [
@@ -355,7 +358,7 @@ def rirWithPero(self):
          f'Опрессовать цементный мост на Р={CreatePZ.max_admissible_pressure}атм в присутствии представителя '
          f'УСРСиСТ Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до '
          f'начала работ) В случае негерметичности цементного моста дальнейшие работы согласовать с Заказчиком '
-         f'В случае головы ЦМ ниже планового п.17-23 повторить  с учетом корректировки мощности моста ',
+         f'В случае головы ЦМ ниже планового РИР повторить  с учетом корректировки мощности моста ',
          None, None, None, None, None, None, None,
          'мастер КРС', 0.67],
         [None, None,
@@ -420,7 +423,7 @@ def rirWithPero(self):
             [None, None,
              f'В случае необходимости выполнить работы по п.11-14, с корректировкой по объёму раствора.',
              None, None, None, None, None, None, None,
-             'мастер КРС', ],
+             'мастер КРС', None ],
             [None, None,
              f'Промыть скважину обратной промывкой по круговой циркуляции  жидкостью '
              f'в объеме не менее 24м3 с расходом жидкости не менее 8 л/с.',
@@ -519,4 +522,121 @@ def rir_paker(self):
         rir_paker_list.pop(-2)
     for row in rir_paker_list:
         rir_list.append(row)
+    return rir_list
+
+def rir_izvelPaker(self):
+    from open_pz import CreatePZ
+    pakerIzvPaker, ok = QInputDialog.getInt(None, 'Глубина извлекаемого пакера',
+                                      'Введите глубину установки извлекаемого пакера ',
+                                      int(CreatePZ.perforation_roof-50), 0, int(CreatePZ.bottomhole_drill))
+    CreatePZ.pakerIzvPaker = pakerIzvPaker
+    rir_list = [[None, None,
+       f'Спустить   пакера извлекаемый компании НЕОИНТЕХ +НКТ73мм 20м + реперный патрубок 2м на тНКТ73мм до'
+       f' глубины {pakerIzvPaker}м с замером, шаблонированием шаблоном 59,6мм.'
+       f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
+       None, None, None, None, None, None, None,
+       'Мастер КРС, подрядчик РИР, УСРСиСТ', liftingNKT_norm(pakerIzvPaker,1.2)],
+    [None, None,
+     f'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС "Ойл-сервис". '
+     f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины',
+     None, None, None, None, None, None, None,
+     'Мастер КРС, подрядчик по ГИС', 4],
+    [None, None,
+     f'Произвести установку извлекаемого пакера на глубине {pakerIzvPaker}м по технологическому плану работ плана подрядчика.',
+     None, None, None, None, None, None, None,
+     'Мастер КРС, подрядчик по ГИС', 4 ],
+    [None, None,
+     f'Поднять ИУГ с доливом тех жидкости в объеме  {round(pakerIzvPaker * 1.12 / 1000, 1)}м3 уд.весом {CreatePZ.fluid_work}',
+     None, None, None, None, None, None, None,
+     'Мастер КРС, подрядчик по ГИС', 4]]
+    CreatePZ.current_bottom2 = CreatePZ.current_bottom
+
+    filling_list = [
+        [None, None,
+         f' Спустить  {sand_select(self)}  на НКТ{CreatePZ.nkt_diam}мм до глубины {round(pakerIzvPaker - 100, 0)}м с замером, шаблонированием шаблоном. (При СПО первых десяти НКТ на '
+         f'спайдере дополнительно устанавливать элеватор ЭХЛ)',
+         None, None, None, None, None, None, None,
+         'Мастер КР', descentNKT_norm(CreatePZ.current_bottom, 1)],
+        [None, None, f'Произвести отсыпку кварцевым песком в инт. {pakerIzvPaker-20} - {pakerIzvPaker} '
+                     f' в объеме {round(well_volume(self, pakerIzvPaker) / pakerIzvPaker * 1000 * (20), 0)}л '
+                     f'Закачать в НКТ кварцевый песок  с доводкой тех.жидкостью {CreatePZ.fluid_work}',
+         None, None, None, None, None, None, None,
+         'мастер КРС', 3.5],
+        [None, None, f'Ожидание оседания песка 4 часа.',
+         None, None, None, None, None, None, None,
+         'мастер КРС', 4],
+        [None, None,
+         f'Допустить компоновку с замером и шаблонированием НКТ до кровли песчаного моста (плановый забой - {pakerIzvPaker-20}м).'
+         f' Определить текущий забой скважины (перо от песчаного моста не поднимать, упереться в песчаный мост).',
+         None, None, None, None, None, None, None,
+         'мастер КРС', 1.2],
+
+        [None, None,
+         f'В случае если кровля песчаного моста на гл.{pakerIzvPaker-20}м дальнейшие работы продолжить дальше по плану'
+         f'В случае пеcчаного моста ниже гл.{pakerIzvPaker-20}м работы повторить с корректировкой обьема и технологических глубин.',
+         None, None, None, None, None, None, None,
+         'мастер КРС', None],
+        [None, None,
+         f'Поднять {sand_select(self)} НКТ{CreatePZ.nkt_diam}мм с глубины {pakerIzvPaker-20 }м с доливом скважины в '
+         f'объеме {round(pakerIzvPaker * 1.12 / 1000, 1)}м3 тех. жидкостью  уд.весом {CreatePZ.fluid_work}',
+         None, None, None, None, None, None, None,
+         'мастер КРС', liftingNKT_norm(pakerIzvPaker, 1)]
+    ]
+
+    sand_question = QMessageBox.question(None, 'Отсыпка', 'Нужна ли отсыпка головы пакера?')
+    if sand_question == QMessageBox.StandardButton.Yes:
+        for row in filling_list:
+            rir_list.append(row)
+        CreatePZ.current_bottom = pakerIzvPaker-20
+        for row in rir_paker(self):
+            rir_list.append()
+        for row in drilling_nkt(self):
+            rir_list.append(row)
+        for row in raidingColumn(self):
+            rir_list.append(row)
+        for row in izvlech_paker(self):
+            rir_list.append(row)
+    else:
+        CreatePZ.current_bottom = pakerIzvPaker
+
+    return rir_list
+
+def izvlech_paker(self):
+    from open_pz import CreatePZ
+    rir_list = [[None, None,
+     f' Спустить  {sand_select(self).replace("перо", "перо-110мм")}  на НКТ{CreatePZ.nkt_diam}мм до глубины {round(CreatePZ.current_bottom,0)}м с замером, шаблонированием шаблоном. '
+     f'(При СПО первых десяти НКТ на '
+     f'спайдере дополнительно устанавливать элеватор ЭХЛ)',
+     None, None, None, None, None, None, None,
+     'Мастер КР', descentNKT_norm(CreatePZ.current_bottom, 1)],
+        [None, None, f'Произвести нормализацию забоя (вымыв кварцевого песка) с наращиванием, комбинированной  промывкой по круговой циркуляции '
+                     f'жидкостью  с расходом жидкости не менее 8 л/с до гл.{CreatePZ.pakerIzvPaker-10}м. \n'
+                     f'Тех отстой 2ч. Повторное определение текущего забоя, при необходимости повторно вымыть.',
+         None, None, None, None, None, None, None,
+         'мастер КРС', 3.5],
+        [None, None,
+         f'Поднять {sand_select(self)} НКТ{CreatePZ.nkt_diam}мм с глубины {CreatePZ.pakerIzvPaker-10}м с доливом скважины'
+         f' в объеме {round(CreatePZ.pakerIzvPaker-10 * 1.12 / 1000, 1)}м3 тех. '
+         f'жидкостью  уд.весом {CreatePZ.fluid_work}',
+         None, None, None, None, None, None, None,
+         'мастер КРС', liftingNKT_norm(CreatePZ.pakerIzvPaker-10, 1)]]
+
+    emer_list = [[None, None,
+         f'Спустить с замером ловильный инструмент на НКТ73 до Н= {CreatePZ.current_bottom}м с замером. ',
+         None, None, None, None, None, None, None,
+         'мастер КРС', liftingNKT_norm(CreatePZ.current_bottom, 1)],
+                 [None, None,
+                  f'Произвести нормализацию (вымыв кварцевого песка) на ловильном инструменте до глубины {CreatePZ.pakerIzvPaker}м обратной '
+                  f'промывкой уд.весом {CreatePZ.fluid_work} \n'
+                  f'Произвести  ловильный работы при представителе заказчика на глубине {CreatePZ.pakerIzvPaker}м.',
+                  None, None, None, None, None, None, None,
+                  'мастер КРС', liftingNKT_norm(CreatePZ.pakerIzvPaker, 1)],
+                 [None, None,
+                  f'Рассхадить и поднять компоновку НКТ{CreatePZ.nkt_diam}мм с глубины {CreatePZ.pakerIzvPaker}м с доливом скважины в объеме {round(CreatePZ.pakerIzvPaker * 1.12 / 1000, 1)}м3 тех. жидкостью  уд.весом {CreatePZ.fluid_work}',
+                  None, None, None, None, None, None, None,
+                  'мастер КРС', liftingNKT_norm(CreatePZ.pakerIzvPaker, 1)]]
+    for row in emer_list:
+        rir_list.append(row)
+
+    CreatePZ.current_bottom = CreatePZ.current_bottom2
     return rir_list

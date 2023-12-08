@@ -22,7 +22,7 @@ def grpGpp(self):
          None, None, None, None, None, None, None,
          'мастер КРС', None],
         [None, None,
-         f'Спустить компоновку с замером и шаблонированием НКТ: {gpp_select(self, gPP_depth)} на НКТ{nkt_diam} на глубину {gPP_depth}м, с замером, шаблонированием НКТ. '
+         f'Спустить компоновку с замером и шаблонированием НКТ: {gpp_select(gPP_depth)} на НКТ{nkt_diam} на глубину {gPP_depth}м, с замером, шаблонированием НКТ. '
             ,
          None, None, None, None, None, None, None,
          'мастер КРС', descentNKT_norm(gPP_depth, 1.2)],
@@ -105,7 +105,7 @@ def grpGpp(self):
          None, None, None, None, None, None, None,
          'Мастер КРС, представ. заказчика', None],
         [None, None,
-         krs.pvo(),
+         krs.pvo_gno(CreatePZ.kat_pvo),
          None, None, None, None, None, None, None,
          'Мастер КРС, представ. заказчика', 4.67],
         [None, None,
@@ -202,7 +202,7 @@ def normalization(self):
          None, None, None, None, None, None, None,
          'Мастер КРС', None],
         [None, None,
-         f'Спустить компоновку с замером и шаблонированием НКТ:  долото Д={paker_diametr_select(self) + 2}мм, забойный двигатель,'
+         f'Спустить компоновку с замером и шаблонированием НКТ:  долото Д={paker_diametr_select(CreatePZ.current_bottom) + 2}мм, забойный двигатель,'
          f' НКТ  - 20м, вставной фильтр, НКТмм до кровли проппантной пробки. '
          f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ) ',
          None, None, None, None, None, None, None,
@@ -383,7 +383,7 @@ def grpPaker(self):
          None, None, None, None, None, None, None,
          'Мастер КРС, представ. заказчика', None],
         [None, None,
-         krs.pvo(),
+         krs.pvo_gno(CreatePZ.kat_pvo),
          None, None, None, None, None, None, None,
          'Мастер КРС, представ. заказчика', 1.67],
         [None, None,
@@ -465,7 +465,7 @@ def nktGrp(self):
     from open_pz import CreatePZ
 
     if CreatePZ.column_additional == False or (
-            CreatePZ.column_additional == True and CreatePZ.current_bottom > CreatePZ.head_column_additional):
+            CreatePZ.column_additional == True and CreatePZ.current_bottom >= CreatePZ.head_column_additional):
         return f'НКТ{CreatePZ.nkt_diam}мм'
     elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr < 110:
         return f'НКТ60мм L- {round(CreatePZ.current_bottom - CreatePZ.head_column_additional + 20, 0)}'

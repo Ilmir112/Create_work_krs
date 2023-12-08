@@ -5,7 +5,7 @@ from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm,well_volume_no
 def paker_diametr_select(depth_landing):
     from open_pz import CreatePZ
 
-    if CreatePZ.column_additional == False or (CreatePZ.column_additional == True and depth_landing < CreatePZ.head_column_additional):
+    if CreatePZ.column_additional == False or (CreatePZ.column_additional == True and depth_landing <= CreatePZ.head_column_additional):
         diam_internal_ek = CreatePZ.column_diametr - 2 * CreatePZ.column_wall_thickness
     else:
         diam_internal_ek = CreatePZ.column_additional_diametr - 2 * CreatePZ.column_additional_wall_thickness

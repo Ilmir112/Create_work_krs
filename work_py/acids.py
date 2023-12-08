@@ -21,10 +21,10 @@ def acid_work(self):
 
 
     paker_depth_bottom, ok = QInputDialog.getInt(None, 'опрессовка ЭК',
-                                          'Введите глубину посадки нижнего пакера {CreatePZ.work_pervorations["интервал"]}', int(CreatePZ.perforation_sole + 10), 0,
+                                          'Введите глубину посадки нижнего пакера {CreatePZ.work_perforations["интервал"]}', int(CreatePZ.perforation_sole + 10), 0,
                                           int(CreatePZ.current_bottom))
     paker_depth_top, ok = QInputDialog.getInt(None, 'опрессовка ЭК',
-                                                 'Введите глубину посадки вверхнего пакера {CreatePZ.work_pervorations["интервал"]}', int(CreatePZ.perforation_sole- 10),
+                                                 'Введите глубину посадки вверхнего пакера {CreatePZ.work_perforations["интервал"]}', int(CreatePZ.perforation_sole- 10),
                                                  0, paker_depth_bottom)
     difference_paker =  paker_depth_bottom - paker_depth_top
     paker_khost_top = int(CreatePZ.perforation_sole - paker_depth_bottom)

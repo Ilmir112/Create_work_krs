@@ -155,10 +155,11 @@ class TabPage_SO(QWidget):
         grid.addWidget(self.column_addEditType, 1, 4)
         grid.addWidget(self.column_add_wall_thicknessLabel, 0, 5)
         grid.addWidget(self.column_add_wall_thicknessEditType2, 1, 5)
-        grid.addWidget(self.shoe_column_addLabel, 0, 6)
-        grid.addWidget(self.shoe_column_add_EditType2, 1, 6)
-        grid.addWidget(self.head_column_addLabel, 0, 7)
-        grid.addWidget(self.head_column_add_EditType2, 1, 7)
+        grid.addWidget(self.head_column_addLabel, 0, 6)
+        grid.addWidget(self.head_column_add_EditType2, 1, 6)
+        grid.addWidget(self.shoe_column_addLabel, 0, 7)
+        grid.addWidget(self.shoe_column_add_EditType2, 1, 7)
+
 
         grid.addWidget(self.bottomhole_drill_Label, 2, 0)
         grid.addWidget(self.bottomhole_drill_EditType, 3, 0)
@@ -287,9 +288,9 @@ class DataWindow(MyWindow):
         H_F_paker2_do = self.tabWidget.currentWidget().paker2_depth_do_EditType.text()
         paker2_posle = self.tabWidget.currentWidget().paker2_posle_EditType.text()
         H_F_paker2_posle = self.tabWidget.currentWidget().paker2_depth_posle_EditType.text()
-        print(any(['ЭЦН' in dict_pump_ECN_posle.upper(), 'ВНН' in dict_pump_ECN_posle.upper(),
-                        dict_pump_ECN_posle == 'отсут']))
-        print(dict_pump_ECN_posle)
+        # print(any(['ЭЦН' in dict_pump_ECN_posle.upper(), 'ВНН' in dict_pump_ECN_posle.upper(),
+        #                 dict_pump_ECN_posle == 'отсут']))
+        # print(dict_pump_ECN_posle)
         if self.ifNum(columnType) == False \
                 or self.ifNum(column_wall_thickness) == False \
                 or self.ifNum(shoe_column) == False \
@@ -358,6 +359,7 @@ class DataWindow(MyWindow):
             # print(f' после ок {CreatePZ.dict_pump, CreatePZ.paker_do, CreatePZ.H_F_paker_do, CreatePZ.dict_pump_h}')
             CreatePZ.pause = False
             self.close()
+
     
     def if_None(self, value):
         

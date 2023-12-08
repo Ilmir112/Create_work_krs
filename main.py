@@ -18,6 +18,7 @@ class MyWindow(QMainWindow):
         super().__init__()
         self.initUI()
         self.new_window = None
+        self.acid_windowPaker = None
         self.data_window = None
         self.ws = None
         self.ins_ind = None
@@ -166,7 +167,7 @@ class MyWindow(QMainWindow):
 
         for i in range(2, len(work_list)):  # нумерация работ
             work_list[i][1] = i - 1
-            print(work_list[i][11])
+            print(work_list[i])
             if krs.is_number(work_list[i][11]) == True:
                 CreatePZ.normOfTime += float(work_list[i][11])
 
@@ -237,6 +238,11 @@ class MyWindow(QMainWindow):
         geophysical.addAction(privyazka_action)
         privyazka_action.triggered.connect(self.privyazkaNKT)
 
+        definitionBottomGKLM_action = QAction("Отбивка забоя по ЭК", self)
+        geophysical.addAction(definitionBottomGKLM_action)
+        definitionBottomGKLM_action.triggered.connect(self.definitionBottomGKLM)
+
+
         vp_action = QAction("Установка ВП", self)
         geophysical.addAction(vp_action)
         vp_action.triggered.connect(self.vp_action)
@@ -292,6 +298,10 @@ class MyWindow(QMainWindow):
         drilling_action_nkt = QAction("бурение на НКТ", self)
         drilling_menu.addAction(drilling_action_nkt)
         drilling_action_nkt.triggered.connect(self.drilling_action_nkt)
+
+        drilling_SBT_action = QAction("бурение на СБТ", self)
+        drilling_menu.addAction(drilling_SBT_action)
+        drilling_SBT_action.triggered.connect(self.drilling_SBT_action)
 
         template_without_skm = QAction("шаблон без СКМ", self)
         template_menu.addAction(template_without_skm)
@@ -370,6 +380,15 @@ class MyWindow(QMainWindow):
 
         rir_menu = action_menu.addMenu('РИР')
 
+        pakerIzvlek_menu = rir_menu.addMenu('извлекаемый пакер')
+        pakerIzvlek_action = QAction('Установка пакера')
+        pakerIzvlek_menu.addAction(pakerIzvlek_action)
+        pakerIzvlek_action.triggered.connect(self.pakerIzvlek_action)
+
+        izvlek_action = QAction('извлечение')
+        pakerIzvlek_menu.addAction(izvlek_action)
+        izvlek_action.triggered.connect(self.izvlek_action)
+
         rirWithPero_action = QAction('РИР на пере')
         rir_menu.addAction(rirWithPero_action)
         rirWithPero_action.triggered.connect(self.rirWithPero)
@@ -397,6 +416,11 @@ class MyWindow(QMainWindow):
         CreatePZ.ins_ind = r + 1
         print(f' выбранная строка {self.ins_ind}')
 
+    def drilling_SBT_action(self):
+        from work_py.drilling import drilling_sbt
+        drilling_work_list = drilling_sbt(self)
+        self.populate_row(self.ins_ind, drilling_work_list)
+
     def drilling_action_nkt(self):
         from work_py.drilling import drilling_nkt
         drilling_work_list = drilling_nkt(self)
@@ -416,6 +440,11 @@ class MyWindow(QMainWindow):
         from work_py.rgdVcht import rgdWithoutPaker
         rgdWithoutPaker_list = rgdWithoutPaker(self)
         self.populate_row(self.ins_ind, rgdWithoutPaker_list)
+
+    def definitionBottomGKLM(self):
+        from work_py.alone_oreration import definitionBottomGKLM
+        definitionBottomGKLM_list = definitionBottomGKLM(self)
+        self.populate_row(self.ins_ind, definitionBottomGKLM_list)
 
     def privyazkaNKT(self):
         from work_py.alone_oreration import privyazkaNKT
@@ -446,6 +475,16 @@ class MyWindow(QMainWindow):
         from work_py.acids import acidGons
         acidGons_work_list = acidGons(self)
         self.populate_row(self.ins_ind, acidGons_work_list)
+
+    def izvlek_action(self):
+        from work_py.rir import izvlech_paker
+        izvlech_paker_work_list = izvlech_paker(self)
+        self.populate_row(self.ins_ind, izvlech_paker_work_list)
+
+    def pakerIzvlek_action(self):
+        from work_py.rir import rir_izvelPaker
+        rir_izvelPaker_work_list = rir_izvelPaker(self)
+        self.populate_row(self.ins_ind, rir_izvelPaker_work_list)
 
     def pvo_cat1(self):
         from work_py.alone_oreration import pvo_cat1
@@ -682,11 +721,12 @@ class MyWindow(QMainWindow):
     def acidPakerNewWindow(self):
         from work_py.acid_paker import AcidPakerWindow
         print(f' окно СКО ')
-        if self.new_window is None:
+        
+        if self.acid_windowPaker is None:
             print(f' окно2 СКО ')
-            self.new_window = AcidPakerWindow(self.table_widget, self.ins_ind)
-            self.new_window.setGeometry(200, 400, 300, 400)
-            self.new_window.show()
+            self.acid_windowPaker = AcidPakerWindow(self.table_widget, self.ins_ind)
+            self.acid_windowPaker.setGeometry(200, 400, 300, 400)
+            self.acid_windowPaker.show()
     def GeophysicalNewWindow(self):
         from work_py.geophysic import GeophysicWindow
 
@@ -740,11 +780,18 @@ class MyWindow(QMainWindow):
             self.new_window = None  # Discard reference.
 
     def perforationNewWindow(self):
-        from work_py.perforation import PervorationWindow
+        from work_py.perforation import PerforationWindow
+        from open_pz import CreatePZ
+
+        if len(CreatePZ.cat_P_1) > 1:
+            if CreatePZ.cat_P_1[1] == 1 and CreatePZ.kat_pvo != 1:
+                msc = QMessageBox.information(self, 'Внимание', 'Не произведен монтаж первой категории')
+                return
+
 
         if self.new_window is None:
 
-            self.new_window = PervorationWindow(self.table_widget, self.ins_ind,
+            self.new_window = PerforationWindow(self.table_widget, self.ins_ind,
                                                 self.dict_perforation_project)
             self.new_window.setWindowTitle("Перфорация")
             self.new_window.setGeometry(200, 400, 300, 400)

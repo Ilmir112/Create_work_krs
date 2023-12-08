@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import QTableWidget, QApplication
 from PyQt5 import QtWidgets
 from PyQt5 import QtCore
 from PyQt5.QtCore import Qt
-from work_py.perforation import PervorationWindow
+from work_py.perforation import PerforationWindow
 
 
 class TableWidget(QTableWidget):
@@ -29,7 +29,7 @@ class TableWidget(QTableWidget):
     #     import sys
     #     if TableWidget.perforation_window is None:
     #         app = QtWidgets.QApplication(sys.argv)
-    #         self.perforation_window = PervorationWindow()
+    #         self.perforation_window = PerforationWindow()
     #         self.perforation_window.show()
     #         sys.exit(app.exec_())
     #

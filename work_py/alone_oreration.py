@@ -7,11 +7,12 @@ from work_py.rationingKRS import liftingNKT_norm, descentNKT_norm, well_volume_n
 
 def kot_select(self):
     from open_pz import CreatePZ
-    if CreatePZ.column_additional == False or CreatePZ.column_additional == True and CreatePZ.current_bottom > CreatePZ.head_column_additional:
+    
+    if CreatePZ.column_additional == False or (CreatePZ.column_additional == True and CreatePZ.current_bottom <= CreatePZ.head_column_additional):
         kot_select = f'КОТ-50 (клапан обратный тарельчатый) +НКТ{CreatePZ.nkt_diam}мм 10м + репер '
-    elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr < 110 and CreatePZ.current_bottom > CreatePZ.head_column_additional:
+    elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr < 110 and CreatePZ.current_bottom >= CreatePZ.head_column_additional:
         kot_select = f'КОТ-50 (клапан обратный тарельчатый) +НКТ{60}мм 10м + репер + НКТ60мм L- {round(CreatePZ.current_bottom - CreatePZ.head_column_additional, 0)}м'
-    elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr > 110 and CreatePZ.current_bottom > CreatePZ.head_column_additional:
+    elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr > 110 and CreatePZ.current_bottom >= CreatePZ.head_column_additional:
         kot_select = f'КОТ-50 (клапан обратный тарельчатый) +НКТ{73}мм со снятыми фасками 10м + репер + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками' \
                      f' L- {round(CreatePZ.current_bottom - CreatePZ.head_column_additional, 0)}м'
 
@@ -20,6 +21,9 @@ def kot_select(self):
 
 def kot_work(self):
     from open_pz import CreatePZ
+    current_bottom, ok = QInputDialog.getDouble(self, 'Необходимый забой',
+                                                         'Введите забой до которого нужно нормализовать',
+                                                         float(CreatePZ.current_bottom))
 
     kot_list = [[None, None,
                  f'Спустить {kot_select(self)} на НКТ{CreatePZ.nkt_diam}мм до глубины {CreatePZ.current_bottom}м'
@@ -27,7 +31,7 @@ def kot_work(self):
                  None, None, None, None, None, None, None,
                  'мастер КРС', descentNKT_norm(CreatePZ.current_bottom, 1)],
                 [None, None,
-                 f'Произвести очистку забоя скважины до гл.{CreatePZ.current_bottom}м закачкой обратной промывкой тех жидкости уд.весом {CreatePZ.fluid_work}, по согласованию с Заказчиком',
+                 f'Произвести очистку забоя скважины до гл.{current_bottom}м закачкой обратной промывкой тех жидкости уд.весом {CreatePZ.fluid_work}, по согласованию с Заказчиком',
                  None, None, None, None, None, None, None,
                  'мастер КРС', 0.4],
                 [None, None,
@@ -36,11 +40,12 @@ def kot_work(self):
                  'мастер КРС, предст. заказчика', None],
 
                 [None, None,
-                 f'Поднять {kot_select(self)} на НКТ{CreatePZ.nkt_diam} c глубины {CreatePZ.current_bottom}м с доливом скважины в '
+                 f'Поднять {kot_select(self)} на НКТ{CreatePZ.nkt_diam} c глубины {current_bottom}м с доливом скважины в '
                  f'объеме {round(CreatePZ.current_bottom * 1.12 / 1000, 1)}м3 удельным весом {CreatePZ.fluid_work}',
                  None, None, None, None, None, None, None,
                  'мастер КРС', liftingNKT_norm(CreatePZ.current_bottom, 1)]
                 ]
+    CreatePZ.current_bottom = current_bottom
     return kot_list
 
 
@@ -59,17 +64,24 @@ def fluid_change(self):
         else:
             CreatePZ.fluid_work = f'{fluid_new}г/см3 '
     else:
-        if ('2' in str(CreatePZ.cat_H2S_list[1]) or '1' in str(CreatePZ.cat_H2S_list[1])) and (
-                '2' not in str(CreatePZ.cat_H2S_list[0]) or '1' not in str(CreatePZ.cat_H2S_list[0])):
-            CreatePZ.fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
-                                  f'расчета {H2S.calv_h2s(self, CreatePZ.cat_H2S_list[1], CreatePZ.H2S_mg[1], CreatePZ.H2S_pr[1])}кг/м3 '
-        elif ('2' in str(CreatePZ.cat_H2S_list[0]) or '1' in str(CreatePZ.cat_H2S_list[0])) and (
-                '2' not in str(CreatePZ.cat_H2S_list[1]) or '1' not in str(CreatePZ.cat_H2S_list[1])):
-            CreatePZ.fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
-                                  f'расчета {H2S.calv_h2s(self, CreatePZ.cat_H2S_list[0], CreatePZ.H2S_mg[0], CreatePZ.H2S_pr[0])}кг/м3 '
+        if len(CreatePZ.cat_H2S_list)>1:
+            if ('2' in str(CreatePZ.cat_H2S_list[1]) or '1' in str(CreatePZ.cat_H2S_list[1])) and (
+                    '2' not in str(CreatePZ.cat_H2S_list[0]) or '1' not in str(CreatePZ.cat_H2S_list[0])):
+                CreatePZ.fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
+                                      f'расчета {H2S.calv_h2s(self, CreatePZ.cat_H2S_list[1], CreatePZ.H2S_mg[1], CreatePZ.H2S_pr[1])}кг/м3 '
+            elif ('2' in str(CreatePZ.cat_H2S_list[0]) or '1' in str(CreatePZ.cat_H2S_list[0])) and (
+                    '2' not in str(CreatePZ.cat_H2S_list[1]) or '1' not in str(CreatePZ.cat_H2S_list[1])):
+                CreatePZ.fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
+                                      f'расчета {H2S.calv_h2s(self, CreatePZ.cat_H2S_list[0], CreatePZ.H2S_mg[0], CreatePZ.H2S_pr[0])}кг/м3 '
+            else:
+                CreatePZ.fluid_work = f'{fluid_new}г/см3 '
         else:
-            CreatePZ.fluid_work = f'{fluid_new}г/см3 '
+            if ('2' in str(CreatePZ.cat_H2S_list[0]) or '1' in str(CreatePZ.cat_H2S_list[0])):
+                CreatePZ.fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
+                                      f'расчета {H2S.calv_h2s(self, CreatePZ.cat_H2S_list[0], CreatePZ.H2S_mg[0], CreatePZ.H2S_pr[0])}кг/м3 '
 
+            else:
+                CreatePZ.fluid_work = f'{fluid_new}г/см3 '
     fluid_change_list = [[None, None,
                           f'Произвести смену объема обратной промывкой по круговой циркуляции  жидкостью  {CreatePZ.fluid_work} '
                           f'(по расчету по вскрываемому пласта Рожид- {expected_pressure}атм) в объеме не '
@@ -105,11 +117,20 @@ def definition_Q(self):
                            'мастер КРС', 0.17+0.2+0.2+0.2+0.15+0.52]]
     return definition_Q_list
 def privyazkaNKT(self):
-    priv_list = [None, None, f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС "Ойл-сервис". '
+    priv_list = [[None, None, f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС "Ойл-сервис". '
                  f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером от 14.10.2021г. '
-                 f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины Отбить забой по ГК и ЛМ',
+                 f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины',
      None, None, None, None, None, None, None,
-     'Мастер КРС, подрядчик по ГИС', 4]
+     'Мастер КРС, подрядчик по ГИС', 4]]
+    return priv_list
+
+def definitionBottomGKLM(self):
+    priv_list = [[None, None,
+                 f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС "Ойл-сервис". '
+                 f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером от 14.10.2021г. '
+                 f'ЗАДАЧА 2.8.2 Отбить забой по ГК и ЛМ',
+                 None, None, None, None, None, None, None,
+                 'Мастер КРС, подрядчик по ГИС', 4]]
     return priv_list
 
 def pvo_cat1(self):
@@ -135,4 +156,5 @@ def pvo_cat1(self):
      pvo_1, None, None,
      None, None, None, None, None,
      'Мастер КРС, представ-ли ПАСФ и Заказчика, Пуск. ком',  4.67]]
+    CreatePZ.kat_pvo = 1
     return pvo_list

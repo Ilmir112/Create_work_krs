@@ -21,7 +21,7 @@ def raidingColumn(self):
         nkt_pod = ''.join(nkt_pod)
 
     nkt_diam = ''.join(['73' if CreatePZ.column_diametr >110 else '60'])
-    if CreatePZ.column_additional == False:
+    if CreatePZ.column_additional == False or (CreatePZ.column_additional == True and CreatePZ.head_column_additional >= CreatePZ.current_bottom):
         ryber_str = f'райбер-{ryber_diam} для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм +' \
                     f' забойный двигатель Д-106 +НКТ{nkt_diam}м 20м + репер '
 

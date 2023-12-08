@@ -69,7 +69,7 @@ class TabWidget(QTabWidget):
         super().__init__()
         self.addTab(TabPage_SO(self), 'Перфорация')
 
-class PervorationWindow(MyWindow):
+class PerforationWindow(MyWindow):
 
 
     def __init__(self, table_widget, ins_ind, dict_perforation_project, parent=None):
@@ -208,6 +208,11 @@ class PervorationWindow(MyWindow):
 
         from open_pz import CreatePZ
         rows = self.tableWidget.rowCount()
+        if len(CreatePZ.cat_P_1) > 1:
+            kateg2 = [1 if str(CreatePZ.cat_P_1[1]) == '1' or str(CreatePZ.cat_H2S_list[1]) == '1' else 2][0]
+
+            if CreatePZ.kat_pvo <  kateg2:
+                CreatePZ.kat_pvo = kateg2
 
         perforation = [[None, None, f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС "Ойл-сервис". '
                                      f'При необходимости  подготовить место для установки партии ГИС напротив мостков. '
@@ -357,6 +362,6 @@ if __name__ == "__main__":
 
     app = QtWidgets.QApplication(sys.argv)
     app.setStyleSheet()
-    window = PervorationWindow()
+    window = PerforationWindow()
     window.show()
     sys.exit(app.exec_())

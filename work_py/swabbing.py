@@ -17,11 +17,11 @@ def swabbing_opy(self):
     if CreatePZ.column_additional == False or CreatePZ.column_additional == True and CreatePZ.current_bottom < CreatePZ.head_column_additional and CreatePZ.head_column_additional > 600:
         paker_select = f'воронку со свабоограничителем + НКТ{nkt_diam}м  + НКТ 10м + репер'
         dict_nkt = {73: depth_opy}
-    elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr < 110 and CreatePZ.current_bottom > CreatePZ.head_column_additional:
+    elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr < 110 and CreatePZ.current_bottom >= CreatePZ.head_column_additional:
         paker_select = f'воронку со свабоограничителем + НКТ60мм 10м + репер +НКТ60мм {round(CreatePZ.current_bottom - CreatePZ.head_column_additional + 10, 0)}м'
         dict_nkt = {73: CreatePZ.head_column_additional,
                     60: int(CreatePZ.current_bottom - CreatePZ.head_column_additional)}
-    elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr > 110 and CreatePZ.current_bottom > CreatePZ.head_column_additional:
+    elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr > 110 and CreatePZ.current_bottom >= CreatePZ.head_column_additional:
         paker_select = f'воронку со свабоограничителем+ НКТ{CreatePZ.nkt_diam}мм со снятыми фасками  + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками 10м {round(CreatePZ.current_bottom - CreatePZ.head_column_additional + 10, 0)}м'
         dict_nkt = {73: depth_opy}
     elif nkt_diam == 60:

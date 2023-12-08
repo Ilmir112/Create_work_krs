@@ -333,13 +333,13 @@ def reply_acid(self, paker_khost):
 def pressure_mode(mode, plast):
     from open_pz import CreatePZ
 
-    mode = int(mode / 10) * 10
+    mode = float(mode) / 10 * 10
     if mode > CreatePZ.max_admissible_pressure and (plast != 'D2ps' or plast.lower() != 'дпаш'):
-        mode_str = f'{mode}, {mode-10}, {mode-20}'
+        mode_str = f'{float(mode)}, {float(mode)-10}, {float(mode)-20}'
     elif (plast == 'D2ps' or plast.lower() == 'дпаш') and CreatePZ.region == 'ИГМ':
         mode_str = f'{120}, {140}, {160}'
     else:
-        mode_str = f'{mode-10}, {mode}, {mode + 10}'
+        mode_str = f'{float(mode)-10}, {float(mode)}, {float(mode) + 10}'
     return mode_str
 
 
@@ -354,12 +354,12 @@ def flushingDownhole(self, paker_depth, paker_khost, paker_layout):
                                 f'по круговой циркуляции  жидкостью уд.весом {CreatePZ.fluid_work} при расходе жидкости не ' \
                                 f'менее 6-8 л/сек в объеме не менее {round(well_volume(self, paker_depth) * 1.5, 1)}м3 ' \
                                 f'в присутствии представителя заказчика ДО ЧИСТОЙ ВОДЫ.'
-    elif paker_depth + paker_khost >= CreatePZ.current_bottom or (paker_depth + paker_khost < CreatePZ.current_bottom and CreatePZ.work_pervorations_approved == True):
+    elif paker_depth + paker_khost >= CreatePZ.current_bottom or (paker_depth + paker_khost < CreatePZ.current_bottom):
         flushingDownhole_list = f'Допустить компоновку до глубины {CreatePZ.current_bottom}м. Промыть скважину обратной промывкой ' \
                                 f'по круговой циркуляции  жидкостью уд.весом {CreatePZ.fluid_work} при расходе жидкости не '\
                                 f'менее 6-8 л/сек в объеме не менее {round(well_volume(self, paker_depth + paker_khost)*1.5,1)}м3 '\
                                 f'в присутствии представителя заказчика ДО ЧИСТОЙ ВОДЫ.'
-    elif paker_depth + paker_khost < CreatePZ.current_bottom and CreatePZ.work_pervorations_approved == False:
+    elif paker_depth + paker_khost < CreatePZ.current_bottom:
         flushingDownhole_list = f'Допустить пакер до глубины {int(CreatePZ.perforation_roof-5)}м. (на 5м выше кровли интервала перфорации), ' \
                                 f'низ НКТ до глубины {CreatePZ.perforation_roof - 5 + paker_khost}м) ' \
                                 f'Промыть скважину обратной промывкой по круговой циркуляции  жидкостью уд.весом {CreatePZ.fluid_work} при расходе жидкости не ' \

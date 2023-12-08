@@ -1,16 +1,16 @@
 from PyQt5.QtWidgets import QInputDialog, QMessageBox
 from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm,well_volume_norm
 
-from work_py.rir import perf_new
+
 
 
 def sand_select(self):
     from open_pz import CreatePZ
-    if CreatePZ.column_additional == False or CreatePZ.column_additional == True and CreatePZ.current_bottom < CreatePZ.head_column_additional:
+    if CreatePZ.column_additional == False or (CreatePZ.column_additional == True and CreatePZ.current_bottom <= CreatePZ.head_column_additional):
         sand_select = f'перо +  НКТ{CreatePZ.nkt_diam}мм 20м + реперный патрубок'
-    elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr < 110 and CreatePZ.current_bottom > CreatePZ.head_column_additional:
+    elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr < 110 and CreatePZ.current_bottom >= CreatePZ.head_column_additional:
         sand_select = f'перо + НКТ{60}мм 20м + реперный патрубок + НКТ60мм {round(CreatePZ.current_bottom - CreatePZ.head_column_additional, 0)}м '
-    elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr > 110 and CreatePZ.current_bottom > CreatePZ.head_column_additional:
+    elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr > 110 and CreatePZ.current_bottom >= CreatePZ.head_column_additional:
         sand_select = f'перо + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками {20}м + реперный патрубок + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками {round(CreatePZ.current_bottom - CreatePZ.head_column_additional, 0)}м'
     return sand_select
 
@@ -108,7 +108,7 @@ def sandWashing(self):
      f'(При СПО первых десяти НКТ на '
      f'спайдере дополнительно устанавливать элеватор ЭХЛ)',
      None, None, None, None, None, None, None,
-     'Мастер КР', descentNKT_norm(CreatePZ.current_bottom)],
+     'Мастер КР', descentNKT_norm(CreatePZ.current_bottom, 1)],
         [None, None, f'Произвести нормализацию забоя (вымыв кварцевого песка) с наращиванием, комбинированной  промывкой по круговой циркуляции '
                      f'жидкостью  с расходом жидкости не менее 8 л/с до гл.{washingDepth}м. \n'
                      f'Тех отстой 2ч. Повторное определение текущего забоя, при необходимости повторно вымыть.',
@@ -118,7 +118,7 @@ def sandWashing(self):
          f'Поднять {sand_select(self)} НКТ{nkt_diam}мм с глубины {washingDepth}м с доливом скважины в объеме {round(washingDepth * 1.12 / 1000, 1)}м3 тех. '
          f'жидкостью  уд.весом {CreatePZ.fluid_work}',
          None, None, None, None, None, None, None,
-         'мастер КРС', liftingNKT_norm(washingDepth)]]
+         'мастер КРС', liftingNKT_norm(washingDepth, 1.2)]]
     CreatePZ.current_bottom = washingDepth
 
     return washingOut_list
