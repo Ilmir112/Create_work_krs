@@ -14,8 +14,9 @@ from openpyxl.drawing.image import Image
 
 class MyWindow(QMainWindow):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self,  *args, **kwargs):
         super().__init__()
+
         self.initUI()
         self.new_window = None
         self.acid_windowPaker = None
@@ -720,6 +721,7 @@ class MyWindow(QMainWindow):
 
     def acidPakerNewWindow(self):
         from work_py.acid_paker import AcidPakerWindow
+        from open_pz import CreatePZ
         print(f' окно СКО ')
         
         if self.acid_windowPaker is None:
@@ -727,6 +729,33 @@ class MyWindow(QMainWindow):
             self.acid_windowPaker = AcidPakerWindow(self.table_widget, self.ins_ind)
             self.acid_windowPaker.setGeometry(200, 400, 300, 400)
             self.acid_windowPaker.show()
+            CreatePZ.pause_app(self)
+            CreatePZ.pause = True
+            self.reply_acid()
+
+
+    acid_true_quest_list = []
+
+    def reply_acid(self):
+        from open_pz import CreatePZ
+        from work_py.acid_paker import AcidPakerWindow
+
+        acid_true_quest = QMessageBox.question(self, 'Необходимость кислоты',
+                                               'Нужно ли планировать кислоту на следующий объет?')
+        if acid_true_quest == QMessageBox.StandardButton.Yes:
+            if self.acid_windowPaker is None:
+                print(f' окно2 СКО ')
+                self.acid_windowPaker = AcidPakerWindow(self.table_widget, self.ins_ind)
+                self.acid_windowPaker.setGeometry(200, 400, 300, 400)
+                CreatePZ.pause_app(self)
+                self.acid_windowPaker.show()
+
+            # print(reply_acid(self, difference_paker, paker_khost, dict_nkt, paker_select, nkt_diam, paker_depth_bottom))
+
+                self.reply_acid()
+        else:
+            pass
+
     def GeophysicalNewWindow(self):
         from work_py.geophysic import GeophysicWindow
 

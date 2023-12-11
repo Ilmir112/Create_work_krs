@@ -246,7 +246,6 @@ class DataWindow(MyWindow):
     def addRowTable(self):
         from open_pz import CreatePZ
 
-
         columnType = self.tabWidget.currentWidget().columnType.text()
         column_wall_thickness = self.tabWidget.currentWidget().column_wall_thicknessEditType2.text()
         shoe_column = self.tabWidget.currentWidget().shoe_columnEditType2.text()
@@ -294,6 +293,8 @@ class DataWindow(MyWindow):
         if self.ifNum(columnType) == False \
                 or self.ifNum(column_wall_thickness) == False \
                 or self.ifNum(shoe_column) == False \
+                or shoe_column == 'отсут' \
+                or columnType == 'отсут' \
                 or self.ifNum(column_additional_diametr) == False \
                 or self.ifNum(column_additional_wall_thickness) == False \
                 or self.ifNum(shoe_column_additional) == False \
@@ -318,6 +319,11 @@ class DataWindow(MyWindow):
                        'НН' in dict_pump_SHGN_posle.upper(), dict_pump_SHGN_posle == 'отсут']) == False \
                 or any(['ЭЦН' in dict_pump_ECN_posle.upper(), 'ВНН' in dict_pump_ECN_posle.upper(),
                         dict_pump_ECN_posle == 'отсут']) == False \
+                or (dict_pump_ECN_do.upper() != 'отсут' and dict_pump_ECN_h_do.upper() == 'отсут') \
+                or (dict_pump_ECN_posle.upper() != 'отсут' and dict_pump_ECN_h_posle.upper() == 'отсут') \
+                or (dict_pump_SHGN_do.upper() != 'отсут' and dict_pump_SHGN_h_do.upper() == 'отсут') \
+                or (dict_pump_SHGN_posle.upper() != 'отсут' and dict_pump_SHGN_h_posle.upper() == 'отсут') \
+ \
                 or any(['ЭЦН' in dict_pump_ECN_do.upper(), 'ВНН' in dict_pump_ECN_do.upper(),
                         dict_pump_ECN_do == 'отсут']) == False:
             msg = QMessageBox.information(self, 'Внимание', 'Не все поля соответствуют значениям')
@@ -363,7 +369,7 @@ class DataWindow(MyWindow):
     
     def if_None(self, value):
         
-        if value is None or 'отс' in str(value).lower() or value == '-' or value == 0:
+        if value is None or 'отс' in str(value).lower() or value == '-' or str(value) == '0' :
             return '0'
         elif isinstance(value, int):
             return int(value)

@@ -798,13 +798,13 @@ class CreatePZ(MyWindow):
                 else:
                     CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('отключение', False)
 
-                CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('отв', set()).add(row[5 + old_index])
-                CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('заряд', set()).add(row[6 + old_index])
-                CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('удлинение', set()).add(row[7 + old_index])
-                CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('давление', set()).add(row[8 + old_index])
-                CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('замер', set()).add(row[9 + old_index])
+                CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('отв', set()).add(row[6 - old_index])
+                CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('заряд', set()).add(row[7 - old_index])
+                CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('удлинение', set()).add(row[8 - old_index])
+                CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('давление', set()).add(row[9 - old_index])
+                CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('замер', set()).add(row[10 - old_index])
                 CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('рабочая жидкость', set()).add(
-                    krs.calculationFluidWork(row[1], row[8 + old_index]))
+                    krs.calculationFluidWork(row[1], row[9 - old_index]))
 
 
 

@@ -37,7 +37,7 @@ def liftingNKT_norm(depth, layout):
 #Спуск труб
 def descentNKT_norm(depth, layout):
     norm = 0.17 + 1.25 + 0.14 +0.7
-    norm += depth/10 * 0.026
+    norm += float(depth)/10 * 0.026
     norm *= layout
     return round(norm, 2)
 

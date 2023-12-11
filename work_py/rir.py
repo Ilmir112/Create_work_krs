@@ -211,10 +211,10 @@ def rpk_nkt(self, paker_depth):
                        f'+ {nktOpress(self)[0]} + НКТ + репер'
     elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr < 110 and paker_depth> CreatePZ.head_column_additional:
         rpk_nkt_select = f' для ЭК {CreatePZ.column_additional_diametr}мм х {CreatePZ.column_additional_wall_thickness}мм  + {nktOpress(self)[0]} ' \
-                       f'+ НКТ60мм + репер + НКТ60мм L- {paker_depth-CreatePZ.head_column_additional}м '
+                       f'+ НКТ60мм + репер + НКТ60мм L- {round(paker_depth-CreatePZ.head_column_additional, 0)}м '
     elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr > 110 and paker_depth> CreatePZ.head_column_additional:
         rpk_nkt_select = f' для ЭК {CreatePZ.column_additional_diametr}мм х {CreatePZ.column_additional_wall_thickness}мм  + {nktOpress(self)[0]}' \
-                       f'+ НКТ + репер + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками L- {paker_depth-CreatePZ.head_column_additional}м '
+                       f'+ НКТ + репер + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками L- {round(paker_depth-CreatePZ.head_column_additional, 0)}м '
 
     return rpk_nkt_select
 
@@ -388,13 +388,13 @@ def rirWithPero(self):
              f'Произвести насыщение скважины в объеме 5м3. Определить приемистость {plast} при Р-80, 100, 120атм '
              f'в присутствии представителя УСРСиСТ или подрядчика по РИР. (Вести контроль за отдачей жидкости '
              f'после закачки, объем согласовать с подрядчиком по РИР). В случае приёмистости менее  250м3/сут '
-             f'при Р=100атм произвести соляно-кислотную обработку скважины в объеме 1м3 HCl-12% с целью увеличения '
+             f'при Р={CreatePZ.max_admissible_pressure}атм произвести соляно-кислотную обработку скважины в объеме 1м3 HCl-12% с целью увеличения '
              f'приемистости по технологическому плану',
              None, None, None, None, None, None, None,
              'мастер КРС', 1.77],
             [None, None,
              f'По результатам определения приёмистости выполнить следующие работы: \n'
-             f'В случае приёмистости свыше 480 м3/сут при Р=100атм выполнить работы по п.п.11-14 '
+             f'В случае приёмистости свыше 480 м3/сут при Р=100атм выполнить работы по закачке гдинистого раствора '
              f'(по согласованию с ГС и ПТО ООО Ойл-сервис и заказчика). \n'
              f'В случае приёмистости менее 480 м3/сут при Р=100атм и более 120м3/сут при Р=100атм продолжить работы с п. 17',
              None, None, None, None, None, None, None,
@@ -421,7 +421,7 @@ def rirWithPero(self):
              None, None, None, None, None, None, None,
              'мастер КРС', 0.35],
             [None, None,
-             f'В случае необходимости выполнить работы по п.11-14, с корректировкой по объёму раствора.',
+             f'В случае необходимости выполнить работы по закачке глнистого раствора, с корректировкой по объёму раствора.',
              None, None, None, None, None, None, None,
              'мастер КРС', None ],
             [None, None,

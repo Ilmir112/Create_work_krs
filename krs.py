@@ -971,6 +971,7 @@ def volume_vn_ek(self):
 
 
 def volume_vn_nkt(dict_nkt):  # Внутренний объем одного погонного местра НКТ
+    print(dict_nkt)
     for nkt, lenght_nkt in dict_nkt.items():
         volume_vn_nkt = 0
         if nkt == 73:
@@ -1059,9 +1060,9 @@ def well_volume(self, current_bottom):
         # print(f' ghb [{CreatePZ.column_additional_diametr, CreatePZ.column_additional_wall_thickness}]')
         volume_well = (3.14 * (
                 CreatePZ.column_additional_diametr - CreatePZ.column_additional_wall_thickness * 2) ** 2 / 4 / 1000 * (
-                               current_bottom - CreatePZ.head_column_additional) / 1000) + (
+                               current_bottom -float(CreatePZ.head_column_additional)) / 1000) + (
                               3.14 * (CreatePZ.column_diametr - CreatePZ.column_wall_thickness * 2) ** 2 / 4 / 1000 * (
-                          CreatePZ.head_column_additional) / 1000)
+                         float(CreatePZ.head_column_additional)) / 1000)
     # print(f'Объем скважины {volume_well}')
     return volume_well
 
@@ -1074,12 +1075,12 @@ def volume_pod_NKT():  # Расчет необходимого объема вн
 
         v_pod_gno = 3.14 * (int(CreatePZ.column_diametr) - int(CreatePZ.column_wall_thickness) * 2) ** 2 / 4 / 1000 * (
                 CreatePZ.current_bottom - int(nkt_l)) / 1000
-    elif round(sum(list(CreatePZ.dict_nkt.values())), 1) > CreatePZ.head_column_additional:
+    elif round(sum(list(CreatePZ.dict_nkt.values())), 1) >float(CreatePZ.head_column_additional):
         v_pod_gno = 3.14 * (CreatePZ.column_diametr - CreatePZ.column_wall_thickness * 2) ** 2 / 4 / 1000 * (
-                CreatePZ.head_column_additional - nkt_l) / 1000 + 3.14 * (
+               float(CreatePZ.head_column_additional) - nkt_l) / 1000 + 3.14 * (
                             CreatePZ.column_additional_diametr - CreatePZ.column_additional_wall_thickness * 2) ** 2 / 4 / 1000 * (
-                            CreatePZ.current_bottom - CreatePZ.head_column_additional) / 1000
-    elif nkt_l < CreatePZ.head_column_additional:
+                            CreatePZ.current_bottom -float(CreatePZ.head_column_additional)) / 1000
+    elif nkt_l <float(CreatePZ.head_column_additional):
         v_pod_gno = 3.14 * (
                 CreatePZ.column_additional_diametr - CreatePZ.column_additional_wall_thickness * 2) ** 2 / 4 / 1000 * (
                             CreatePZ.current_bottom - nkt_l) / 1000
