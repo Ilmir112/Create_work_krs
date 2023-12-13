@@ -1,16 +1,17 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.Qt import *
+from PyQt5.Qt import QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QInputDialog, QTabWidget, QPushButton, Qt
 
-from krs import volume_vn_nkt, well_volume
+from krs import well_volume
 from main import MyWindow
 from open_pz import CreatePZ
 from work_py.acids_work import flushingDownhole, pressure_mode
-from work_py.rationingKRS import descentNKT_norm, well_volume_norm
+from work_py.rationingKRS import descentNKT_norm, well_volume_norm, liftingNKT_norm
 
 
 class TabPage_SO(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
+
 
         self.swabTruelabelType = QLabel("необходимость освоения", self)
         self.swabTrueEditType = QComboBox(self)
@@ -22,7 +23,7 @@ class TabPage_SO(QWidget):
 
         self.pakerLabel = QLabel("глубина пакера", self)
         self.pakerEdit = QLineEdit(self)
-        self.pakerEdit.setText(f"{CreatePZ.perforation_roof - 10}")
+        self.pakerEdit.setText(f"{round(CreatePZ.perforation_roof - 10,0)}")
         self.pakerEdit.setClearButtonEnabled(True)
 
         self.khovstLabel = QLabel("Длина хвостовики", self)
@@ -39,11 +40,11 @@ class TabPage_SO(QWidget):
         self.plastCombo.setCurrentIndex(0)
         # self.ComboBoxGeophygist.setProperty("value", 'ГП')
 
-        self.privyazkaTrueLabelType = QLabel("необходимость освоения", self)
-        self.privyazkaTrueEdit = QComboBox(self)
-        self.privyazkaTrueEdit.addItems(['Нужна привязка', 'без привязки'])
-        self.privyazkaTrueEdit.setCurrentIndex(1)
-        self.privyazkaTrueEdit.setProperty('value', 'без привязки')
+        # self.privyazkaTrueLabelType = QLabel("необходимость освоения", self)
+        # self.privyazkaTrueEdit = QComboBox(self)
+        # self.privyazkaTrueEdit.addItems(['Нужна привязка', 'без привязки'])
+        # self.privyazkaTrueEdit.setCurrentIndex(1)
+        # self.privyazkaTrueEdit.setProperty('value', 'без привязки')
 
         self.skvTrueLabelType = QLabel("необходимость кислотной ванны", self)
         self.svkTrueEdit = QComboBox(self)
@@ -94,36 +95,79 @@ class TabPage_SO(QWidget):
         self.acidOilProcEdit.setClearButtonEnabled(True)
 
         grid = QGridLayout(self)
-        grid.addWidget(self.swabTruelabelType, 0, 0)
-        grid.addWidget(self.swabTrueEditType, 1, 0)
-        grid.addWidget(self.plastLabel, 0, 1)
-        grid.addWidget(self.plastCombo, 1, 1)
-        grid.addWidget(self.pakerLabel, 0, 2)
-        grid.addWidget(self.pakerEdit, 1, 2)
-        grid.addWidget(self.khovstLabel, 0, 3)
-        grid.addWidget(self.khovstEdit, 1, 3)
-        grid.addWidget(self.privyazkaTrueLabelType, 0, 4)
-        grid.addWidget(self.privyazkaTrueEdit, 1, 4)
+        if CreatePZ.countAcid == 0:
+            grid.addWidget(self.swabTruelabelType, 0, 0)
+            grid.addWidget(self.swabTrueEditType, 1, 0)
+            grid.addWidget(self.khovstLabel, 0, 3)
+            grid.addWidget(self.khovstEdit, 1, 3)
+            grid.addWidget(self.plastLabel, 0, 1)
+            grid.addWidget(self.plastCombo, 1, 1)
+            grid.addWidget(self.pakerLabel, 0, 2)
+            grid.addWidget(self.pakerEdit, 1, 2)
+            # grid.addWidget(self.privyazkaTrueLabelType, 0, 4)
+            # grid.addWidget(self.privyazkaTrueEdit, 1, 4)
 
-        grid.addWidget(self.skvTrueLabelType, 2, 0)
-        grid.addWidget(self.svkTrueEdit, 3, 0)
-        grid.addWidget(self.skvAcidLabelType, 2, 1)
-        grid.addWidget(self.skvAcidEdit, 3, 1)
-        grid.addWidget(self.skvVolumeLabel, 2, 2)
-        grid.addWidget(self.skvVolumeEdit, 3, 2)
-        grid.addWidget(self.skvProcLabel, 2, 3)
-        grid.addWidget(self.skvProcEdit, 3, 3)
+            grid.addWidget(self.skvTrueLabelType, 2, 0)
+            grid.addWidget(self.svkTrueEdit, 3, 0)
+            grid.addWidget(self.skvAcidLabelType, 2, 1)
+            grid.addWidget(self.skvAcidEdit, 3, 1)
+            grid.addWidget(self.skvVolumeLabel, 2, 2)
+            grid.addWidget(self.skvVolumeEdit, 3, 2)
+            grid.addWidget(self.skvProcLabel, 2, 3)
+            grid.addWidget(self.skvProcEdit, 3, 3)
 
-        grid.addWidget(self.acidLabelType, 4, 1)
-        grid.addWidget(self.acidEdit, 5, 1)
-        grid.addWidget(self.acidVolumeLabel, 4, 2)
-        grid.addWidget(self.acidVolumeEdit, 5, 2)
-        grid.addWidget(self.acidProcLabel, 4, 3)
-        grid.addWidget(self.acidProcEdit, 5, 3)
-        grid.addWidget(self.acidOilProcLabel, 4, 4)
-        grid.addWidget(self.acidOilProcEdit, 5, 4)
-        grid.addWidget(self.QplastLabelType, 6, 0)
-        grid.addWidget(self.QplastEdit, 7, 0)
+            grid.addWidget(self.acidLabelType, 4, 1)
+            grid.addWidget(self.acidEdit, 5, 1)
+            grid.addWidget(self.acidVolumeLabel, 4, 2)
+            grid.addWidget(self.acidVolumeEdit, 5, 2)
+            grid.addWidget(self.acidProcLabel, 4, 3)
+            grid.addWidget(self.acidProcEdit, 5, 3)
+            grid.addWidget(self.acidOilProcLabel, 4, 4)
+            grid.addWidget(self.acidOilProcEdit, 5, 4)
+            grid.addWidget(self.QplastLabelType, 6, 0)
+            grid.addWidget(self.QplastEdit, 7, 0)
+
+        elif CreatePZ.countAcid == 1:
+
+            # grid.addWidget(self.khovstLabel, 0, 3)
+            # grid.addWidget(self.khovstEdit, 1, 3)
+            grid.addWidget(self.plastLabel, 0, 1)
+            grid.addWidget(self.plastCombo, 1, 1)
+            grid.addWidget(self.pakerLabel, 0, 2)
+            grid.addWidget(self.pakerEdit, 1, 2)
+            # grid.addWidget(self.privyazkaTrueLabelType, 0, 4)
+            # grid.addWidget(self.privyazkaTrueEdit, 1, 4)
+
+            grid.addWidget(self.skvTrueLabelType, 2, 0)
+            grid.addWidget(self.svkTrueEdit, 3, 0)
+            grid.addWidget(self.skvAcidLabelType, 2, 1)
+            grid.addWidget(self.skvAcidEdit, 3, 1)
+            grid.addWidget(self.skvVolumeLabel, 2, 2)
+            grid.addWidget(self.skvVolumeEdit, 3, 2)
+            grid.addWidget(self.skvProcLabel, 2, 3)
+            grid.addWidget(self.skvProcEdit, 3, 3)
+
+            grid.addWidget(self.acidLabelType, 4, 1)
+            grid.addWidget(self.acidEdit, 5, 1)
+            grid.addWidget(self.acidVolumeLabel, 4, 2)
+            grid.addWidget(self.acidVolumeEdit, 5, 2)
+            grid.addWidget(self.acidProcLabel, 4, 3)
+            grid.addWidget(self.acidProcEdit, 5, 3)
+            grid.addWidget(self.acidOilProcLabel, 4, 4)
+            grid.addWidget(self.acidOilProcEdit, 5, 4)
+            grid.addWidget(self.QplastLabelType, 6, 0)
+            grid.addWidget(self.QplastEdit, 7, 0)
+        elif CreatePZ.countAcid == 2:
+            grid.addWidget(self.swabTruelabelType, 0, 0)
+            grid.addWidget(self.swabTrueEditType, 1, 0)
+            grid.addWidget(self.khovstLabel, 0, 3)
+            grid.addWidget(self.khovstEdit, 1, 3)
+
+            grid.addWidget(self.pakerLabel, 0, 2)
+            grid.addWidget(self.pakerEdit, 1, 2)
+            # grid.addWidget(self.privyazkaTrueLabelType, 0, 4)
+            # grid.addWidget(self.privyazkaTrueEdit, 1, 4)
+
 
 
 class TabWidget(QTabWidget):
@@ -134,78 +178,65 @@ class TabWidget(QTabWidget):
 
 class AcidPakerWindow(MyWindow):
 
-    def __init__(self, table_widget, ins_ind, parent=None):
+    def __init__(self, table_widget, ins_ind, countAcid, parent=None):
 
         super(MyWindow, self).__init__(parent)
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
         self.table_widget = table_widget
         self.ins_ind = ins_ind
+        self.countAcid = countAcid
+        self.paker_select = None
         self.tabWidget = TabWidget()
         self.dict_nkt = {}
-        # self.tableWidget = QTableWidget(0, 2)
-        # self.tableWidget.setHorizontalHeaderLabels(
-        #     ["Ход работ", "ответственные", "нормы"])
-        # for i in range(3):
-        #     self.tableWidget.horizontalHeader().setSectionResizeMode(i, QHeaderView.Stretch)
-        #
-        # self.tableWidget.setSortingEnabled(True)
-        # self.tableWidget.setAlternatingRowColors(True)
 
-        self.buttonAdd = QPushButton('Добавить данные в таблицу')
+
+        self.buttonAdd = QPushButton('Добавить данные в план работ')
         self.buttonAdd.clicked.connect(self.addRowTable)
-        self.buttonDel = QPushButton('Удалить строку из таблице')
-        self.buttonDel.clicked.connect(self.delRowTable)
-        self.buttonAddWork = QPushButton('Добавить в план работ')
-        self.buttonAddWork.clicked.connect(self.addWork)
         vbox = QGridLayout(self.centralWidget)
         vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
-        # vbox.addWidget(self.tableWidget, 1, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
-        vbox.addWidget(self.buttonDel, 2, 1)
-        vbox.addWidget(self.buttonAddWork, 3, 0)
 
     def addWork(self):
         pass
-    def acidSelect(self, swabTrueEditType, acidProcEdit, khovstEdit, pakerEdit, skvAcidEdit, acidEdit, skvVolumeEdit,
-                   QplastEdit, skvProcEdit, plastCombo, acidOilProcEdit, acidVolumeEdit, svkTrueEdit):
+    def acidSelect(self, swabTrueEditType, khovstEdit, pakerEdit):
         from work_py.opressovka import paker_diametr_select
-        print(swabTrueEditType, acidProcEdit, khovstEdit, pakerEdit, skvAcidEdit, acidEdit, skvVolumeEdit,
-                   QplastEdit, skvProcEdit, plastCombo, acidOilProcEdit, acidVolumeEdit, svkTrueEdit)
+
+
         swabTrueEditType = [True if swabTrueEditType == 'Нужно освоение' else False][0]
-        svkTrueEdit = [False if swabTrueEditType == 'без СКВ' else False][0]
-        print(CreatePZ.column_additional == False, swabTrueEditType == True)
+
+
         if (CreatePZ.column_additional == False and swabTrueEditType == True) or (CreatePZ.column_additional == True \
                                                                                   and pakerEdit < CreatePZ.head_column_additional and swabTrueEditType == True):
-            paker_select = f'воронку + НКТ{CreatePZ.nkt_diam}мм {khovstEdit}м + пакер ПРО-ЯМО-{paker_diametr_select(pakerEdit)}мм (либо аналог) ' \
+            self.paker_select = f'воронку + НКТ{CreatePZ.nkt_diam}мм {khovstEdit}м + пакер ПРО-ЯМО-{paker_diametr_select(pakerEdit)}мм (либо аналог) ' \
                            f'для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм + НКТ{CreatePZ.nkt_diam} 10м + репер'
             self.dict_nkt = {73: float(khovstEdit) + float(pakerEdit)}
 
         elif CreatePZ.column_additional == True and float(CreatePZ.column_additional_diametr) < 110 and \
                 pakerEdit > CreatePZ.head_column_additional and swabTrueEditType == True:
-            paker_select = f'воронку + НКТ{60}мм {float(khovstEdit)}м + пакер ПРО-ЯМО-{paker_diametr_select(float(pakerEdit))}мм (либо аналог) ' \
+            self.paker_select = f'воронку + НКТ{60}мм {float(khovstEdit)}м + пакер ПРО-ЯМО-{paker_diametr_select(float(pakerEdit))}мм (либо аналог) ' \
                            f'для ЭК {float(CreatePZ.column_additional_diametr)}мм х {CreatePZ.column_additional_wall_thickness}мм + НКТ60мм 10м + репер'
             self.dict_nkt = {73: CreatePZ.head_column_additional,
                         60: int(float(pakerEdit) + float(khovstEdit) - float(CreatePZ.head_column_additional))}
         elif CreatePZ.column_additional == True and float(CreatePZ.column_additional_diametr) > 110 and pakerEdit > CreatePZ.head_column_additional and swabTrueEditType == True:
-            paker_select = f'воронку + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками {float(khovstEdit)}м + пакер ПРО-ЯМО-{paker_diametr_select(pakerEdit)}мм (либо аналог) ' \
+            self.paker_select = f'воронку + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками {float(khovstEdit)}м + пакер ПРО-ЯМО-{paker_diametr_select(pakerEdit)}мм (либо аналог) ' \
                            f'для ЭК {float(CreatePZ.column_additional_diametr)}мм х {CreatePZ.column_additional_wall_thickness}мм + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками 10м'
             self.dict_nkt = {73: float(pakerEdit) + float(khovstEdit)}
         elif (CreatePZ.column_additional == False and swabTrueEditType == False) or (
                 CreatePZ.column_additional == True
                 and pakerEdit < float(CreatePZ.head_column_additiona) and swabTrueEditType == False):
-            paker_select = f'Заглушку + щелевой фильтр + НКТ{CreatePZ.nkt_diam}м {float(khovstEdit)}м + пакер ПРО-ЯМО-{paker_diametr_select(pakerEdit)}мм (либо аналог) ' \
+            self.paker_select = f'Заглушку + щелевой фильтр + НКТ{CreatePZ.nkt_diam}м {float(khovstEdit)}м + пакер ПРО-ЯМО-{paker_diametr_select(pakerEdit)}мм (либо аналог) ' \
                            f'для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм + НКТ 10м + сбивной клапан с ввертышем'
             self.dict_nkt = {73: float(pakerEdit) + float(khovstEdit)}
             # print(f' 5 {CreatePZ.column_additional == False, (CreatePZ.column_additional == True and pakerEdit < CreatePZ.head_column_additional), swabTrueEditType == False}')
         elif CreatePZ.column_additional == True or (float(CreatePZ.column_additional_diametr) < 110 and (
                 pakerEdit > CreatePZ.head_column_additional) and swabTrueEditType == False):
-            paker_select = f'Заглушку + щелевой фильтр + НКТ{60}мм {float(khovstEdit)}м + пакер ПРО-ЯМО-{paker_diametr_select(pakerEdit)}мм (либо аналог) ' \
+            self.paker_select = f'Заглушку + щелевой фильтр + НКТ{60}мм {float(khovstEdit)}м + пакер ПРО-ЯМО-{paker_diametr_select(pakerEdit)}мм (либо аналог) ' \
                            f'для ЭК {float(CreatePZ.column_additional_diametr)}мм х {CreatePZ.column_additional_wall_thickness}мм + НКТ60мм 10м + сбивной клапан с ввертышем'
             self.dict_nkt = {73: float(CreatePZ.head_column_additional), 60: int(pakerEdit - float(CreatePZ.head_column_additional))}
         elif CreatePZ.column_additional == True and float(CreatePZ.column_additional_diametr) > 110 and pakerEdit > float(CreatePZ.head_column_additional) \
                 and swabTrueEditType == False:
-            paker_select = f'Заглушку + щелевой фильтр + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками {khovstEdit}м + пакер ПРО-ЯМО-{paker_diametr_select(pakerEdit)}мм (либо аналог) ' \
+            self.paker_select = f'Заглушку + щелевой фильтр + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками {khovstEdit}м + пакер ПРО-ЯМО-{paker_diametr_select(pakerEdit)}мм (либо аналог) ' \
                            f'для ЭК {float(CreatePZ.column_additional_diametr)}мм х {CreatePZ.column_additional_wall_thickness}мм + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками 10м + сбивной клапан с ввертышем'
             self.dict_nkt = {73: float(pakerEdit) + float(khovstEdit)}
 
@@ -214,7 +245,7 @@ class AcidPakerWindow(MyWindow):
 
         paker_list = [
             [None, None,
-             f'Спустить {paker_select} на НКТ{CreatePZ.nkt_diam}мм до глубины {pakerEdit}м, воронкой до {pakerEdit + khovstEdit}м'
+             f'Спустить {self.paker_select} на НКТ{CreatePZ.nkt_diam}мм до глубины {pakerEdit}м, воронкой до {pakerEdit + khovstEdit}м'
              f' с замером, шаблонированием шаблоном. {("Произвести пробную посадку на глубине 50м" if CreatePZ.column_additional == False else "")} '
                 ,
              None, None, None, None, None, None, None,
@@ -244,8 +275,9 @@ class AcidPakerWindow(MyWindow):
         return paker_list
     def acid_work(self, swabTrueEditType, acidProcEdit, khovstEdit, pakerEdit, skvAcidEdit, acidEdit, skvVolumeEdit,
                    QplastEdit, skvProcEdit, plastCombo, acidOilProcEdit, acidVolumeEdit, svkTrueEdit, dict_nkt):
+        from krs import volume_vn_nkt
         paker_list = []
-
+        swabTrueEditType = [False if swabTrueEditType == 'без СКВ' else False][0]
         skv_list = [[None, None,
                      f'Определить приемистость при Р-{CreatePZ.max_admissible_pressure}атм в присутствии представителя заказчика.'
                      f'при отсутствии приемистости произвести установку СКВ по согласованию с заказчиком',
@@ -270,8 +302,8 @@ class AcidPakerWindow(MyWindow):
                                  f'методом дренирования.',
                      None, None, None, None, None, None, None,
                      'мастер КРС, УСРСиСТ', 0.83 + 0.2 + 0.83 + 0.5 + 0.5]]
-
-        if svkTrueEdit == 'ДА':
+        print(f'СКВ {svkTrueEdit}')
+        if svkTrueEdit == 'Нужно СКВ':
             for row in skv_list:
                 paker_list.append(row)
 
@@ -292,7 +324,7 @@ class AcidPakerWindow(MyWindow):
             acid_sel = f'Произвести кислотную обработку пласта {plastCombo}  в объеме  {acidVolumeEdit}м3  ({acidEdit} - {acidProcEdit} %) силами СК Крезол ' \
                        f'в присутствии представителя заказчика с составлением акта, не превышая давления закачки не более Р={CreatePZ.max_admissible_pressure}атм.'
         elif acidEdit == 'Нефтекислотка':
-            acid_sel = f'Произвести нефтекислотную обработку пласта {plastCombo} в V=2тн товарной нефти + {acidVolumeEdit}м3  (HCl - {acidProcEdit} %) + {acidOilProcEdit - 2}т товарной нефти силами СК Крезол ' \
+            acid_sel = f'Произвести нефтекислотную обработку пласта {plastCombo} в V=2тн товарной нефти + {acidVolumeEdit}м3  (HCl - {acidProcEdit} %) + {float(acidOilProcEdit) - 2}т товарной нефти силами СК Крезол ' \
                        f'в присутствии представителя заказчика с составлением акта, не превышая давления закачки не более Р={CreatePZ.max_admissible_pressure}атм.'
         elif acidEdit == 'Противогипсовая обработка':
             acid_sel = f'Произвести противогипсовую обработку пласта{plastCombo} в объеме {acidVolumeEdit}м3 - {20}% раствором каустической соды' \
@@ -336,43 +368,52 @@ class AcidPakerWindow(MyWindow):
                         f'выдержкой 1ч для возврата резиновых элементов в исходное положение. ',
                         None, None, None, None, None, None, None,
                         'мастер КРС', 0.7],
-                       # [None, None,
-                       #  flushingDownhole(self, pakerEdit, khovstEdit, 1),
-                       #  None, None, None, None, None, None, None,
-                       #  'мастер КРС', well_volume_norm(well_volume(self, CreatePZ.current_bottom))]
+                       [None, None,
+                        flushingDownhole(self, pakerEdit, khovstEdit, 1),
+                        None, None, None, None, None, None, None,
+                        'мастер КРС', well_volume_norm(well_volume(self, CreatePZ.current_bottom))]
                        ]
 
         for row in acid_list_1:
             paker_list.append(row)
 
         if CreatePZ.curator == 'ОР':
-            if QplastEdit == True:
-                try:
-                    CreatePZ.expected_Q, ok = QInputDialog.getInt(self, 'Ожидаемая приемистость ',
-                                                                  f'Ожидаемая приемистость по пласту {plastCombo} ',
-                                                                  list(CreatePZ.expected_pick_up.keys())[0], 0,
-                                                                  1600)
-                    CreatePZ.expected_P, ok = QInputDialog.getInt(self, 'Ожидаемое Давление закачки',
-                                                                  f'Ожидаемое Давление закачки по пласту {plastCombo}',
-                                                                  list(CreatePZ.expected_pick_up.values())[0], 0,
-                                                                  250)
-                except:
-                    CreatePZ.expected_Q, ok = QInputDialog.getInt(self, 'Ожидаемая приемистость ',
-                                                                  f'Ожидаемая приемистость по пласту {plastCombo} ',
-                                                                  100, 0,
-                                                                  1600)
-                    CreatePZ.expected_P, ok = QInputDialog.getInt(self, f'Ожидаемое Давление закачки',
-                                                                  f'Ожидаемое Давление закачки по пласту {plastCombo}',
-                                                                  100, 0,
-                                                                  250)
+            try:
+                CreatePZ.expected_Q, ok = QInputDialog.getInt(self, 'Ожидаемая приемистость ',
+                                                              f'Ожидаемая приемистость по пласту {plastCombo} ',
+                                                              list(CreatePZ.expected_pick_up.keys())[0], 0,
+                                                              1600)
+                CreatePZ.expected_P, ok = QInputDialog.getInt(self, 'Ожидаемое Давление закачки',
+                                                              f'Ожидаемое Давление закачки по пласту {plastCombo}',
+                                                              list(CreatePZ.expected_pick_up.values())[0], 0,
+                                                              250)
+            except:
+                CreatePZ.expected_Q, ok = QInputDialog.getInt(self, 'Ожидаемая приемистость ',
+                                                              f'Ожидаемая приемистость по пласту {plastCombo} ',
+                                                              100, 0,
+                                                              1600)
+                CreatePZ.expected_P, ok = QInputDialog.getInt(self, f'Ожидаемое Давление закачки',
+                                                              f'Ожидаемое Давление закачки по пласту {plastCombo}',
+                                                              100, 0,
+                                                              250)
+            if QplastEdit == 'ДА':
+                paker_list.insert(-2, [None, None,
+                                       f'Произвести насыщение скважины до стабилизации давления закачки не менее 5м3. Опробовать  '
+                                       f'пласт {plastCombo} на приемистость в трех режимах при Р={pressure_mode(CreatePZ.expected_P, plastCombo)}атм в присутствии представителя ЦДНГ. '
+                                       f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до '
+                                       f'начала работ). В СЛУЧАЕ ПРИЕМИСТОСТИ НИЖЕ {CreatePZ.expected_Q}м3/сут при давлении {CreatePZ.expected_P}атм '
+                                       f'ДАЛЬНЕЙШИЕ РАБОТЫ СОГЛАСОВАТЬ С ЗАКАЗЧИКОМ',
+                                       None, None, None, None, None, None, None,
+                                       'мастер КРС', 0.17 + 0.52 + 0.2 + 0.2 + 0.2])
+
             paker_list.append([None, None,
-                               f'Посадить пакер на {pakerEdit}м. Произвести насыщение скважины до стабилизации давления закачки не менее 5м3. Опробовать  '
-                               f'пласт {plastCombo} на приемистость в трех режимах при Р={pressure_mode(CreatePZ.expected_P, plastCombo)}атм в присутствии представителя ЦДНГ. '
-                               f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до '
-                               f'начала работ). В СЛУЧАЕ ПРИЕМИСТОСТИ НИЖЕ {CreatePZ.expected_Q}м3/сут при давлении {CreatePZ.expected_P}атм '
-                               f'ДАЛЬНЕЙШИЕ РАБОТЫ СОГЛАСОВАТЬ С ЗАКАЗЧИКОМ',
-                               None, None, None, None, None, None, None,
-                               'мастер КРС', 0.5 + 0.17 + 0.15 + 0.52 + 0.2 + 0.2 + 0.2])
+                           f'Посадить пакер на {pakerEdit}м. Произвести насыщение скважины до стабилизации давления закачки не менее 5м3. Опробовать  '
+                           f'пласт {plastCombo} на приемистость в трех режимах при Р={pressure_mode(CreatePZ.expected_P, plastCombo)}атм в присутствии представителя ЦДНГ. '
+                           f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до '
+                           f'начала работ). В СЛУЧАЕ ПРИЕМИСТОСТИ НИЖЕ {CreatePZ.expected_Q}м3/сут при давлении {CreatePZ.expected_P}атм '
+                           f'ДАЛЬНЕЙШИЕ РАБОТЫ СОГЛАСОВАТЬ С ЗАКАЗЧИКОМ',
+                           None, None, None, None, None, None, None,
+                           'мастер КРС', 0.5 + 0.17 + 0.15 + 0.52 + 0.2 + 0.2 + 0.2])
 
         return paker_list
 
@@ -419,6 +460,7 @@ class AcidPakerWindow(MyWindow):
 
     #
     def addRowTable(self):
+        from work_py.swabbing import swabbing_with_paker
         swabTrueEditType = self.tabWidget.currentWidget().swabTrueEditType.currentText()
         acidEdit = self.tabWidget.currentWidget().acidEdit.currentText()
         khovstEdit = float(self.tabWidget.currentWidget().khovstEdit.text())
@@ -435,18 +477,56 @@ class AcidPakerWindow(MyWindow):
         skvAcidEdit = str(self.tabWidget.currentWidget().skvAcidEdit.currentText())
         QplastEdit = str(self.tabWidget.currentWidget().QplastEdit.currentText())
         # privyazka = str(self.tabWidget.currentWidget().privyazka.currentText())
+        if self.countAcid == 0:
+            work_list = self.acidSelect(swabTrueEditType, acidProcEdit, khovstEdit)
 
-        work_list = self.acidSelect(swabTrueEditType, acidProcEdit, khovstEdit, pakerEdit, skvAcidEdit, acidEdit,
-                                    skvVolumeEdit, QplastEdit, skvProcEdit, plastCombo,
-                                    acidOilProcEdit, acidVolumeEdit, svkTrueEdit)
 
-        for row in self.acid_work(swabTrueEditType, acidProcEdit, khovstEdit, pakerEdit, skvAcidEdit, acidEdit, skvVolumeEdit,
-                   QplastEdit, skvProcEdit, plastCombo, acidOilProcEdit, acidVolumeEdit, svkTrueEdit, self.dict_nkt):
-            work_list.append(row)
-        self.populate_row(self.ins_ind, work_list)
-        self.ins_ind += len(work_list)
+            for row in self.acid_work(swabTrueEditType, acidProcEdit, khovstEdit, pakerEdit, skvAcidEdit, acidEdit, skvVolumeEdit,
+                       QplastEdit, skvProcEdit, plastCombo, acidOilProcEdit, acidVolumeEdit, svkTrueEdit, self.dict_nkt):
+                work_list.append(row)
+            self.populate_row(CreatePZ.ins_ind, work_list)
+            CreatePZ.ins_ind += len(work_list)
+        elif self.countAcid == 1:
+            # paker_depth, ok = QInputDialog.getInt(None, 'посадка пакера',
+            #                                       'Введите глубину посадки пакера', int(CreatePZ.perforation_roof - 20),
+            #                                       0,
+            #                                       int(CreatePZ.current_bottom))
+            self.acidSelect(swabTrueEditType, khovstEdit, pakerEdit)
+            work_list = [[None, None, f'установить пакер на глубине {pakerEdit}м', None, None, None, None, None, None, None,
+             'мастер КРС', 1.2]]
+            for row in self.acid_work(swabTrueEditType, acidProcEdit, khovstEdit, pakerEdit, skvAcidEdit, acidEdit,
+                                      skvVolumeEdit,
+                                      QplastEdit, skvProcEdit, plastCombo, acidOilProcEdit, acidVolumeEdit, svkTrueEdit,
+                                      self.dict_nkt):
+                work_list.append(row)
+            self.populate_row(CreatePZ.ins_ind, work_list)
+            print(f' индекс строк {CreatePZ.ins_ind}')
+            CreatePZ.ins_ind += len(work_list)
+            print(f'второй индекс строк {CreatePZ.ins_ind}')
+
+        elif self.countAcid == 2:
+            self.acidSelect(swabTrueEditType, khovstEdit, pakerEdit)
+            swabTrueEditType = [True if swabTrueEditType == 'Нужно освоение' else False][0]
+            if swabTrueEditType:
+                work_list = []
+                swabbing_with_paker = swabbing_with_paker(self,  pakerEdit, 1)[1:]
+                for row in swabbing_with_paker:
+                    work_list.append(row)
+            else:
+
+                work_list = [[None, None,
+                                         f'Поднять {self.paker_select} на НКТ c глубины {pakerEdit}м с доливом скважины в '
+                                         f'объеме {round(pakerEdit * 1.12 / 1000, 1)}м3 удельным весом {CreatePZ.fluid_work}',
+                                         None, None, None, None, None, None, None,
+                                         'мастер КРС',
+                                         liftingNKT_norm(pakerEdit, 1.2)]]
+            self.populate_row(CreatePZ.ins_ind, work_list)
+            print(f' индекс строк {CreatePZ.ins_ind}')
+            CreatePZ.ins_ind += len(work_list)
+            print(f'  третья индекс строк {CreatePZ.ins_ind}')
         CreatePZ.pause = False
         self.close()
+
 
 
 

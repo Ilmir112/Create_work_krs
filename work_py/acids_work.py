@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import QInputDialog, QMessageBox
 
+import main
 from selectPlast import CheckBoxDialog
 from work_py.rationingKRS import liftingNKT_norm, descentNKT_norm,well_volume_norm
 from krs import well_volume
@@ -8,80 +9,89 @@ def acid_work(self):
     from work_py.swabbing import swabbing_with_paker
     from open_pz import CreatePZ
     from work_py.alone_oreration import privyazkaNKT
+    from work_py.acid_paker import AcidPakerWindow
 
     if len(CreatePZ.plast_work) == 0:
         msc = QMessageBox.information(self, 'Внимание', 'Отсутствуют рабочие интервалы перфорации')
         return None
     else:
-        swabbing_true_quest1 = QMessageBox.question(self, 'Свабирование на данной компоновке',
-                                                   'Нужно ли Свабировать на данной компоновке?')
+        # swabbing_true_quest1 = QMessageBox.question(self, 'Свабирование на данной компоновке',
+        #                                            'Нужно ли Свабировать на данной компоновке?')
+        # 
+        if self.acid_windowPaker is None:
+            print(f' окно2 СКО ')
+            self.acid_windowPaker = AcidPakerWindow()
+            self.acid_windowPaker.setGeometry(200, 400, 300, 400)
+            self.acid_windowPaker.show()
+            CreatePZ.pause_app(self)
+            CreatePZ.pause = True
+        
+        # if CreatePZswabbing_true_quest1 == QMessageBox.StandardButton.Yes:
+        #     swabbing_true_quest = True
+        # else:
+        #     swabbing_true_quest = False
 
-        if swabbing_true_quest1 == QMessageBox.StandardButton.Yes:
-            swabbing_true_quest = True
-        else:
-            swabbing_true_quest = False
 
-
-        paker_depth, ok = QInputDialog.getInt(None, 'посадка пакера',
-                                              'Введите глубину посадки пакера', int(CreatePZ.perforation_roof - 20), 0,
-                                              5000)
-        paker_khost1 = int(CreatePZ.perforation_sole - paker_depth)
+        # paker_depth, ok = QInputDialog.getInt(None, 'посадка пакера',
+        #                                       'Введите глубину посадки пакера', int(CreatePZ.perforation_roof - 20), 0,
+        #                                       5000)
+        # paker_khost1 = int(CreatePZ.perforation_sole - paker_depth)
         # print(f'хвостовик {paker_khost1}')
-        paker_khost, ok = QInputDialog.getInt(None, 'хвостовик',
-                                              f'Введите длину хвостовика для подошвы ИП{CreatePZ.perforation_sole} и глубины посадки пакера {paker_depth}',
-                                              paker_khost1, 1, 4000)
+        # paker_khost, ok = QInputDialog.getInt(None, 'хвостовик',
+        #                                       f'Введите длину хвостовика для подошвы ИП{CreatePZ.perforation_sole} и глубины посадки пакера {paker_depth}',
+        #                                       paker_khost1, 1, 4000)
 
 
         nkt_diam = ''.join(['73' if CreatePZ.column_diametr > 110 else '60'])
         # print(f' 5 {CreatePZ.column_additional == False, (CreatePZ.column_additional == True and paker_depth < CreatePZ.head_column_additional), swabbing_true_quest == False}')
 
-        if (CreatePZ.column_additional == False and swabbing_true_quest == True) or (CreatePZ.column_additional == True \
-                and paker_depth < CreatePZ.head_column_additional and swabbing_true_quest == True):
-            paker_select = f'воронку + НКТ{nkt_diam}мм {paker_khost}м + пакер ПРО-ЯМО-{paker_diametr_select(paker_depth)}мм (либо аналог) ' \
+        if (CreatePZ.column_additional == False and CreatePZ.swabbing_true_quest == True) or (CreatePZ.column_additional == True \
+                and CreatePZ.paker_depth < CreatePZ.head_column_additional and CreatePZ.swabbing_true_quest == True):
+            paker_select = f'воронку + НКТ{nkt_diam}мм {CreatePZ.paker_khost}м + пакер ПРО-ЯМО-{paker_diametr_select(CreatePZ.paker_depth)}мм (либо аналог) ' \
                            f'для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм + НКТ 10м'
-            dict_nkt = {73: paker_depth + paker_khost}
+            dict_nkt = {73: CreatePZ.paker_depth + CreatePZ.paker_khost}
 
         elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr < 110 and \
-                paker_depth > CreatePZ.head_column_additional and swabbing_true_quest == True:
-            paker_select = f'воронку + НКТ{60}мм {paker_khost}м + пакер ПРО-ЯМО-{paker_diametr_select(paker_depth)}мм (либо аналог) ' \
+                CreatePZ.paker_depth > CreatePZ.head_column_additional and CreatePZ.swabbing_true_quest == True:
+            paker_select = f'воронку + НКТ{60}мм {CreatePZ.paker_khost}м + пакер ПРО-ЯМО-{paker_diametr_select(CreatePZ.paker_depth)}мм (либо аналог) ' \
                            f'для ЭК {CreatePZ.column_additional_diametr}мм х {CreatePZ.column_additional_wall_thickness}мм + НКТ60мм 10м '
-            dict_nkt = {73: CreatePZ.head_column_additional, 60: int(paker_depth - CreatePZ.head_column_additional)}
-        elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr > 110 and paker_depth > CreatePZ.head_column_additional and swabbing_true_quest == True:
-            paker_select = f'воронку + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками {paker_khost}м + пакер ПРО-ЯМО-{paker_diametr_select(paker_depth)}мм (либо аналог) ' \
+            dict_nkt = {73: CreatePZ.head_column_additional, 60: int(CreatePZ.paker_depth - CreatePZ.head_column_additional)}
+        elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr > 110 and CreatePZ.paker_depth > CreatePZ.head_column_additional and CreatePZ.swabbing_true_quest == True:
+            paker_select = f'воронку + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками {CreatePZ.paker_khost}м + пакер ПРО-ЯМО-{paker_diametr_select(CreatePZ.paker_depth)}мм (либо аналог) ' \
                            f'для ЭК {CreatePZ.column_additional_diametr}мм х {CreatePZ.column_additional_wall_thickness}мм + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками 10м'
-            dict_nkt = {73: paker_depth + paker_khost}
-        elif (CreatePZ.column_additional == False and swabbing_true_quest == False) or (CreatePZ.column_additional == True
-                                                     and paker_depth < CreatePZ.head_column_additional and swabbing_true_quest == False):
-            paker_select = f'Заглушку + щелевой фильтр + НКТ{nkt_diam}м {paker_khost}м + пакер ПРО-ЯМО-{paker_diametr_select(paker_depth)}мм (либо аналог) ' \
+            dict_nkt = {73: CreatePZ.paker_depth + CreatePZ.paker_khost}
+        elif (CreatePZ.column_additional == False and CreatePZ.swabbing_true_quest == False) or (CreatePZ.column_additional == True
+                                                     and CreatePZ.paker_depth < CreatePZ.head_column_additional and CreatePZ.swabbing_true_quest == False):
+            paker_select = f'Заглушку + щелевой фильтр + НКТ{nkt_diam}м {CreatePZ.paker_khost}м + пакер ПРО-ЯМО-{paker_diametr_select(CreatePZ.paker_depth)}мм (либо аналог) ' \
                            f'для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм + НКТ 10м + сбивной клапан с ввертышем'
-            dict_nkt = {73: paker_depth + paker_khost}
+            dict_nkt = {73: CreatePZ.paker_depth + CreatePZ.paker_khost}
             # print(f' 5 {CreatePZ.column_additional == False, (CreatePZ.column_additional == True and paker_depth < CreatePZ.head_column_additional), swabbing_true_quest == False}')
-        elif CreatePZ.column_additional == True or (CreatePZ.column_additional_diametr < 110 and (paker_depth > CreatePZ.head_column_additional) and swabbing_true_quest == False):
-            paker_select = f'Заглушку + щелевой фильтр + НКТ{60}мм {paker_khost}м + пакер ПРО-ЯМО-{paker_diametr_select(paker_depth)}мм (либо аналог) ' \
+        elif CreatePZ.column_additional == True or (CreatePZ.column_additional_diametr < 110 and (CreatePZ.paker_depth > CreatePZ.head_column_additional) and CreatePZ.swabbing_true_quest == False):
+            paker_select = f'Заглушку + щелевой фильтр + НКТ{60}мм {CreatePZ.paker_khost}м + пакер ПРО-ЯМО-{paker_diametr_select(CreatePZ.paker_depth)}мм (либо аналог) ' \
                            f'для ЭК {CreatePZ.column_additional_diametr}мм х {CreatePZ.column_additional_wall_thickness}мм + НКТ60мм 10м + сбивной клапан с ввертышем'
-            dict_nkt = {73: CreatePZ.head_column_additional, 60: int(paker_depth - CreatePZ.head_column_additional)}
-        elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr > 110 and paker_depth > CreatePZ.head_column_additional \
-                and swabbing_true_quest == False:
-            paker_select = f'Заглушку + щелевой фильтр + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками {paker_khost}м + пакер ПРО-ЯМО-{paker_diametr_select(paker_depth)}мм (либо аналог) ' \
+            dict_nkt = {73: CreatePZ.head_column_additional, 60: int(CreatePZ.paker_depth - CreatePZ.head_column_additional)}
+        elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr > 110 and CreatePZ.paker_depth > CreatePZ.head_column_additional \
+                and CreatePZ.swabbing_true_quest == False:
+            paker_select = f'Заглушку + щелевой фильтр + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками {CreatePZ.paker_khost}м + пакер ПРО-ЯМО-{paker_diametr_select(CreatePZ.paker_depth)}мм (либо аналог) ' \
                            f'для ЭК {CreatePZ.column_additional_diametr}мм х {CreatePZ.column_additional_wall_thickness}мм + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками 10м + сбивной клапан с ввертышем'
-            dict_nkt = {73: paker_depth + paker_khost}
+            dict_nkt = {73: CreatePZ.paker_depth + CreatePZ.paker_khost}
 
         elif nkt_diam == 60:
-            dict_nkt = {60: paker_depth + paker_khost}
+            dict_nkt = {60: CreatePZ.paker_depth + CreatePZ.paker_khost}
 
         paker_list = [
             [None, None,
-             f'Спустить {paker_select} на НКТ{nkt_diam}мм до глубины {paker_depth}м, воронкой до {paker_depth + paker_khost}м'
+             f'Спустить {paker_select} на НКТ{nkt_diam}мм до глубины {CreatePZ.paker_depth}м, воронкой до {CreatePZ.paker_depth + CreatePZ.CreatePZ.paker_khost}м'
              f' с замером, шаблонированием шаблоном. {("Произвести пробную посадку на глубине 50м" if CreatePZ.column_additional == False else "")} '
              ,
              None, None, None, None, None, None, None,
-             'мастер КРС', descentNKT_norm(paker_depth,1.2)],
-            [None, None, f'Посадить пакер на глубине {paker_depth}м'
+             'мастер КРС', descentNKT_norm(CreatePZ.paker_depth,1.2)],
+            [None, None, f'Посадить пакер на глубине {CreatePZ.paker_depth}м'
                 ,
              None, None, None, None, None, None, None,
              'мастер КРС', 0.5],
             [None, None,
-             f'Опрессовать эксплуатационную колонну в интервале {paker_depth}-0м на Р={CreatePZ.max_admissible_pressure}атм'
+             f'Опрессовать эксплуатационную колонну в интервале {CreatePZ.paker_depth}-0м на Р={CreatePZ.max_admissible_pressure}атм'
              f' в течение 30 минут  в присутствии представителя заказчика, составить акт.  '
              f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ)',
              None, None, None, None, None, None, None,
@@ -101,7 +111,7 @@ def acid_work(self):
             ]
         for plast in list(CreatePZ.dict_perforation.keys()):
             for interval in CreatePZ.dict_perforation[plast]['интервал']:
-                if abs(float(interval[1] - paker_depth)) < 10 or abs(float(interval[0] - paker_depth)) < 10:
+                if abs(float(interval[1] - CreatePZ.paker_depth)) < 10 or abs(float(interval[0] - CreatePZ.paker_depth)) < 10:
                     if privyazkaNKT(self) not in paker_list and CreatePZ.privyazkaSKO == 0:
                         CreatePZ.privyazkaSKO += 1
                         paker_list.insert(1, privyazkaNKT(self))
@@ -110,7 +120,7 @@ def acid_work(self):
                                                        'Планировать опредение приемистости до СКО?')
             try:
                 CreatePZ.expected_Q, ok = QInputDialog.getInt(self, 'Ожидаемая приемистость ',
-                                                     f'Ожидаемая приемистость по пласту {plast} ',
+                                                     f'Ожидаемая приемистость по пласту {CreatePZ.plast} ',
                                                      list(CreatePZ.expected_pick_up.keys())[0], 0,
                                                      1600)
                 CreatePZ.expected_P, ok = QInputDialog.getInt(self, 'Ожидаемое Давление закачки',
@@ -119,11 +129,11 @@ def acid_work(self):
                                                      250)
             except:
                 CreatePZ.expected_Q, ok = QInputDialog.getInt(self, 'Ожидаемая приемистость ',
-                                                     f'Ожидаемая приемистость по пласту {plast} ',
+                                                     f'Ожидаемая приемистость по пласту {CreatePZ.plast} ',
                                                      100, 0,
                                                      1600)
                 CreatePZ.expected_P, ok = QInputDialog.getInt(self, f'Ожидаемое Давление закачки',
-                                                     f'Ожидаемое Давление закачки по пласту {plast}',
+                                                     f'Ожидаемое Давление закачки по пласту {CreatePZ.plast}',
                                                      100, 0,
                                                      250)
 
@@ -138,24 +148,24 @@ def acid_work(self):
                               None, None, None, None, None, None, None,
                               'мастер КРС', 0.17+0.52+0.2+0.2+0.2])
 
-        for row in acid_work_list(self, paker_depth, paker_khost, dict_nkt, CreatePZ.paker_layout):
+        for row in acid_work_list(self, CreatePZ.paker_depth, CreatePZ.paker_khost, dict_nkt, CreatePZ.paker_layout):
             paker_list.append(row)
 
-        reply_acid(self, paker_khost)
+        reply_acid(self, CreatePZ.paker_khost)
         paker_list.extend(acid_true_quest_list)
 
-        if swabbing_true_quest:
-            swabbing_with_paker = swabbing_with_paker(self, paker_khost, 1)[1:]
+        if CreatePZ.swabbing_true_quest:
+            swabbing_with_paker = swabbing_with_paker(self, CreatePZ.paker_khost, 1)[1:]
             for row in swabbing_with_paker:
                 paker_list.append(row)
         else:
 
             paker_list.append([None, None,
-                                     f'Поднять {paker_select} на НКТ{nkt_diam} c глубины {paker_depth}м с доливом скважины в '
-                                     f'объеме {round(paker_depth * 1.12 / 1000, 1)}м3 удельным весом {CreatePZ.fluid_work}',
+                                     f'Поднять {paker_select} на НКТ{nkt_diam} c глубины {CreatePZ.paker_depth}м с доливом скважины в '
+                                     f'объеме {round(CreatePZ.paker_depth * 1.12 / 1000, 1)}м3 удельным весом {CreatePZ.fluid_work}',
                                      None, None, None, None, None, None, None,
                                      'мастер КРС',
-                                     liftingNKT_norm(paker_depth, 1.2)])
+                                     liftingNKT_norm(CreatePZ.paker_depth, 1.2)])
 
 
     return paker_list
@@ -166,23 +176,26 @@ def open_checkbox_dialog():
 def acid_work_list(self, paker_depth, paker_khost, dict_nkt, paker_layout):
     from open_pz import CreatePZ
     from krs import volume_vn_nkt
+    from work_py.acid_paker import AcidPakerWindow
+
     open_checkbox_dialog()
+    
 
     plast = CreatePZ.plast_select
-    acid_true_quest_scv = QMessageBox.question(self, 'Необходимость кислотная ванна', 'Планировать кислотную ванну?')
-    if acid_true_quest_scv == QMessageBox.StandardButton.Yes:
+    # acid_true_quest_scv = QMessageBox.question(self, 'Необходимость кислотная ванна', 'Планировать кислотную ванну?')
+    if CreatePZ.acid_true_quest_scv == True:
         acid_true_scv = True
-        acid_V_scv, ok = QInputDialog.getDouble(self, 'Объем кислотной ванны', 'Введите объем кислоты:', 1, 0.2, 5, 1)
-        acid_pr_scv, ok = QInputDialog.getInt(self, 'концентрация кислоты', 'Введите концентрацию кислоты', 15, 2, 24)
+        # CreatePZ.acid_V_scv, ok = QInputDialog.getDouble(self, 'Объем кислотной ванны', 'Введите объем кислоты:', 1, 0.2, 5, 1)
+        # CreatePZ.acid_pr_scv, ok = QInputDialog.getInt(self, 'концентрация кислоты', 'Введите концентрацию кислоты', 15, 2, 24)
         acid_work = [[None, None, f'Определить приемистость при Р-100атм в присутствии представителя заказчика.'
                                   f'при отсутствии приемистости произвести установку СКВ по согласованию с заказчиком',
      None, None, None, None, None, None, None,
      'мастер КРС, УСРСиСТ', 1.2],
-                     [None, None, f'Произвести установку СКВ соляной кислотой {acid_pr_scv}% концентрации в объеме'
-                                  f' {acid_V_scv}м3 (0,7т HCL 24%)(по спец. плану, составляет старший мастер)',
+                     [None, None, f'Произвести установку СКВ соляной кислотой {CreatePZ.acid_pr_scv}% концентрации в объеме'
+                                  f' {CreatePZ.acid_V_scv}м3 (0,7т HCL 24%)(по спец. плану, составляет старший мастер)',
                       None, None, None, None, None, None, None,
                       'мастер КРС, УСРСиСТ', 1.2],
-                     [None, None, f'закачать HCL-{acid_pr_scv}% в объеме V={acid_V_scv}м3; довести кислоту до пласта '
+                     [None, None, f'закачать HCL-{CreatePZ.acid_pr_scv}% в объеме V={CreatePZ.acid_V_scv}м3; довести кислоту до пласта '
                                   f'тех.жидкостью в объеме {volume_vn_nkt(dict_nkt)}м3 . ',
                       None, None, None, None, None, None, None,
                       'мастер КРС, УСРСиСТ', 0.6],
@@ -200,10 +213,10 @@ def acid_work_list(self, paker_depth, paker_khost, dict_nkt, paker_layout):
     else:
         acid_work = []
 
-    acid_list = ['HCl', 'HF', 'ВТ', 'Нефтекислотка', 'Противогипсовая обработка']
-    acid, ok = QInputDialog.getItem(self, 'Вид кислоты', 'Введите вид кислоты:', acid_list, 0, False)
-    if ok and acid_list:
-        self.le.setText(acid)
+    # CreatePZ.acid_list = ['HCl', 'HF', 'ВТ', 'Нефтекислотка', 'Противогипсовая обработка']
+    # CreatePZ.acid, ok = QInputDialog.getItem(self, 'Вид кислоты', 'Введите вид кислоты:', CreatePZ.acid_list, 0, False)
+    # if ok and CreatePZ.acid_list:
+    #     self.le.setText(CreatePZ.acid)
 
 
 
@@ -212,35 +225,35 @@ def acid_work_list(self, paker_depth, paker_khost, dict_nkt, paker_layout):
 
 
 
-    if acid == 'HCl':
-        acid_V, ok = QInputDialog.getDouble(self, 'Объем кислоты', 'Введите объем кислоты:', 10, 0.5, 300, 1)
-        acid_pr, ok = QInputDialog.getInt(self, 'концентрация кислоты', 'Введите концентрацию кислоты', 15, 2, 24)
-        acid_sel = f'Произвести  солянокислотную обработку {plast}  в объеме  {acid_V}м3  ({acid} - {acid_pr} %) ' \
+    if CreatePZ.acid == 'HCl':
+        # CreatePZ.acid_V, ok = QInputDialog.getDouble(self, 'Объем кислоты', 'Введите объем кислоты:', 10, 0.5, 300, 1)
+        # CreatePZ.acid_pr, ok = QInputDialog.getInt(self, 'концентрация кислоты', 'Введите концентрацию кислоты', 15, 2, 24)
+        acid_sel = f'Произвести  солянокислотную обработку {plast}  в объеме  {CreatePZ.acid_V}м3  ({CreatePZ.acid} - {CreatePZ.acid_pr} %) ' \
                    f' в ' \
                    f'присутствии представителя Заказчика с составлением акта, не превышая давления закачки не более Р={CreatePZ.max_admissible_pressure}атм.\n' \
-                   f'(для приготовления соляной кислоты в объеме {acid_V}м3 - {acid_pr}% необходимо замешать {round(acid_V * acid_pr / 24 * 1.118, 1)}т HCL 24% и' \
-                   f' пресной воды {round(acid_V - acid_V * acid_pr / 24 * 1.118, 1)}м3)' \
+                   f'(для приготовления соляной кислоты в объеме {CreatePZ.acid_V}м3 - {CreatePZ.acid_pr}% необходимо замешать {round(CreatePZ.acid_V * CreatePZ.acid_pr / 24 * 1.118, 1)}т HCL 24% и' \
+                   f' пресной воды {round(CreatePZ.acid_V - CreatePZ.acid_V * CreatePZ.acid_pr / 24 * 1.118, 1)}м3)' \
                    f'Согласовать с Заказчиком проведение кислотной обработки силами ООО Крезол. '
-    elif acid == 'ВТ':
-        acid_V, ok = QInputDialog.getDouble(self, 'Объем кислоты', 'Введите объем кислоты:', 10, 0.5, 300, 1)
+    elif CreatePZ.acid == 'ВТ':
+        # acid_V, ok = QInputDialog.getDouble(self, 'Объем кислоты', 'Введите объем кислоты:', 10, 0.5, 300, 1)
         vt, ok = QInputDialog.getText(None, 'Высокотехнологическая кислоты', 'Нужно расписать вид кислоты и объем')
         acid_sel = f'Произвести кислотную обработку {" ".join(CreatePZ.plast_work)} {vt}  в присутствии представителя ' \
                    f'Заказчика с составлением акта, не превышая давления закачки не более Р={CreatePZ.max_admissible_pressure}атм.'
-    elif acid == 'HF':
-        acid_V, ok = QInputDialog.getDouble(self, 'Объем кислоты', 'Введите объем кислоты:', 10, 0.5, 300, 1)
-        acid_pr, ok = QInputDialog.getInt(self, 'концентрация кислоты', 'Введите концентрацию кислоты', 15, 2, 24)
-        acid_sel = f'Произвести кислотную обработку пласта {plast}  в объеме  {acid_V}м3  ({acid} - {acid_pr} %) силами СК Крезол ' \
+    elif CreatePZ.acid == 'HF':
+        # CreatePZ.acid_V, ok = QInputDialog.getDouble(self, 'Объем кислоты', 'Введите объем кислоты:', 10, 0.5, 300, 1)
+        # CreatePZ.acid_pr, ok = QInputDialog.getInt(self, 'концентрация кислоты', 'Введите концентрацию кислоты', 15, 2, 24)
+        CreatePZ.acid_sel = f'Произвести кислотную обработку пласта {plast}  в объеме  {CreatePZ.acid_V}м3  ({CreatePZ.acid} - {CreatePZ.acid_pr} %) силами СК Крезол ' \
                    f'в присутствии представителя заказчика с составлением акта, не превышая давления закачки не более Р={CreatePZ.max_admissible_pressure}атм.'
-    elif acid == 'Нефтекислотка':
-        acid_V, ok = QInputDialog.getDouble(self, 'Объем кислоты', 'Введите объем кислоты:', 10, 0.5, 300, 1)
-        acid_pr, ok = QInputDialog.getInt(self, 'концентрация кислоты', 'Введите концентрацию кислоты', 15, 2, 24)
+    elif CreatePZ.acid == 'Нефтекислотка':
+        # CreatePZ.acid_V, ok = QInputDialog.getDouble(self, 'Объем кислоты', 'Введите объем кислоты:', 10, 0.5, 300, 1)
+        # CreatePZ.acid_pr, ok = QInputDialog.getInt(self, 'концентрация кислоты', 'Введите концентрацию кислоты', 15, 2, 24)
         acid_oil, ok = QInputDialog.getInt(self, 'нефтекислотка', 'Введите объем нефти', 10, 0, 24)
-        acid_sel = f'Произвести нефтекислотную обработку пласта{plast} в V=2тн товарной нефти + {acid_V}м3  (HCl - {acid_pr} %) + {acid_oil-2}т товарной нефти силами СК Крезол ' \
+        acid_sel = f'Произвести нефтекислотную обработку пласта{plast} в V=2тн товарной нефти + {CreatePZ.acid_V}м3  (HCl - {CreatePZ.acid_pr} %) + {CreatePZ.acid_oil-2}т товарной нефти силами СК Крезол ' \
                    f'в присутствии представителя заказчика с составлением акта, не превышая давления закачки не более Р={CreatePZ.max_admissible_pressure}атм.'
-    elif acid == 'Противогипсовая обработка':
+    elif CreatePZ.acid == 'Противогипсовая обработка':
 
-        acid_V, ok = QInputDialog.getInt(self, 'противокислотная обработка', 'Введите объем едкого натрия', 10, 0, 24)
-        acid_sel = f'Произвести противогипсовую обработку пласта{plast} в объеме {acid_V}м3 - {20}% раствором каустической соды' \
+        # CreatePZ.acid_V, ok = QInputDialog.getInt(self, 'противокислотная обработка', 'Введите объем едкого натрия', 10, 0, 24)
+        CreatePZ.acid_sel = f'Произвести противогипсовую обработку пласта{plast} в объеме {CreatePZ.acid_V}м3 - {20}% раствором каустической соды' \
                    f'в присутствии представителя заказчика с составлением акта, не превышая давления закачки не ' \
                    f'более Р={CreatePZ.max_admissible_pressure}атм.\n' \
 
@@ -253,9 +266,9 @@ def acid_work_list(self, paker_depth, paker_khost, dict_nkt, paker_layout):
      'мастер КРС, УСРСиСТ', 8],
     [None, None,
      ''.join([f"Закачать кислоту в объеме V={round(volume_vn_nkt(dict_nkt), 1)}м3 (внутренний "
-              f"объем НКТ)" if acid_V > volume_vn_nkt(dict_nkt) else f"Закачать кислоту в "
-                                                                     f"объеме {round(acid_V, 1)}м3, "
-                                                                     f"довести кислоту тех жидкостью в объеме {round(volume_vn_nkt(dict_nkt) - acid_V, 1)}м3 "]),
+              f"объем НКТ)" if CreatePZ.acid_V > volume_vn_nkt(dict_nkt) else f"Закачать кислоту в "
+                                                                     f"объеме {round(CreatePZ.acid_V, 1)}м3, "
+                                                                     f"довести кислоту тех жидкостью в объеме {round(volume_vn_nkt(dict_nkt) - CreatePZ.acid_V, 1)}м3 "]),
      None, None, None, None, None, None, None,
      'мастер КРС', None],
     [None, None,
@@ -266,8 +279,8 @@ def acid_work_list(self, paker_depth, paker_khost, dict_nkt, paker_layout):
      ''.join(
          [f'продавить  кислоту тех жидкостью в объеме {round(volume_vn_nkt(dict_nkt) + 0.5, 1)}м3 при давлении не '
           f'более {CreatePZ.max_admissible_pressure}атм. Увеличение давления согласовать'
-          f' с заказчиком' if acid_V < volume_vn_nkt(
-             dict_nkt) else f'продавить кислоту оставшейся кислотой в объеме {round(acid_V - volume_vn_nkt(dict_nkt), 1)}м3 и тех жидкостью '
+          f' с заказчиком' if CreatePZ.acid_V < volume_vn_nkt(
+             dict_nkt) else f'продавить кислоту оставшейся кислотой в объеме {round(CreatePZ.acid_V - volume_vn_nkt(dict_nkt), 1)}м3 и тех жидкостью '
                             f'в объеме {round(volume_vn_nkt(dict_nkt) + 0.5, 1)}м3 при давлении не более {CreatePZ.max_admissible_pressure}атм. '
                             f'Увеличение давления согласовать с заказчиком']),
      None, None, None, None, None, None, None,
@@ -305,14 +318,22 @@ def acid_work_list(self, paker_depth, paker_khost, dict_nkt, paker_layout):
 acid_true_quest_list = []
 def reply_acid(self, paker_khost):
     from open_pz import CreatePZ
+    from work_py.acid_paker import AcidPakerWindow
     acid_true_quest = QMessageBox.question(self, 'Необходимость кислоты',
                                            'Нужно ли планировать кислоту на следующий объет?')
 
     if acid_true_quest == QMessageBox.StandardButton.Yes:
+        if self.acid_windowPaker is None:
+            print(f' окно2 СКО ')
+            self.acid_windowPaker = AcidPakerWindow()
+            self.acid_windowPaker.setGeometry(200, 400, 300, 400)
+            self.acid_windowPaker.show()
+            CreatePZ.pause_app(self)
+            CreatePZ.pause = True
         paker_layout = 2
         paker_depth, ok = QInputDialog.getInt(None, 'посадка пакера',
                                           'Введите глубину посадки пакера', int(CreatePZ.perforation_roof - 20), 0,
-                                          CreatePZ.current_bottom)
+                                          int(CreatePZ.current_bottom))
 
         acid_true_quest_list.append(
             [None, None, f'установить пакер на глубине {paker_depth}м', None, None, None, None, None, None, None,

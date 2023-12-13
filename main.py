@@ -20,6 +20,7 @@ class MyWindow(QMainWindow):
         self.initUI()
         self.new_window = None
         self.acid_windowPaker = None
+        self.acid_windowPaker2 = None
         self.data_window = None
         self.ws = None
         self.ins_ind = None
@@ -255,6 +256,10 @@ class MyWindow(QMainWindow):
         swibbing_action = QAction("Свабирование со пакером", self)
         geophysical.addAction(swibbing_action)
         swibbing_action.triggered.connect(self.swibbing_with_paker)
+
+        swibbing2_action = QAction("Свабирование с двумя пакерами", self)
+        geophysical.addAction(swibbing2_action)
+        swibbing2_action.triggered.connect(self.swibbing2_with_paker)
 
         swabbing_opy_action = QAction("ГИС ОПУ", self)
         geophysical.addAction(swabbing_opy_action)
@@ -590,6 +595,13 @@ class MyWindow(QMainWindow):
         swab_work_list = swabbing_with_paker(self, 10, 1)
         self.populate_row(self.ins_ind, swab_work_list)
 
+    def swibbing2_with_paker(self):
+        from work_py.swabbing import swabbing_with_2paker
+
+        print('Вставился Сваб с пакером')
+        swab_work_list = swabbing_with_2paker(self)
+        self.populate_row(self.ins_ind, swab_work_list)
+
     def swabbing_opy(self):
         from work_py.swabbing import swabbing_opy
 
@@ -725,16 +737,15 @@ class MyWindow(QMainWindow):
         print(f' окно СКО ')
         
         if self.acid_windowPaker is None:
+            CreatePZ.countAcid = 0
             print(f' окно2 СКО ')
-            self.acid_windowPaker = AcidPakerWindow(self.table_widget, self.ins_ind)
+            self.acid_windowPaker = AcidPakerWindow(self.table_widget, CreatePZ.ins_ind, 0)
             self.acid_windowPaker.setGeometry(200, 400, 300, 400)
             self.acid_windowPaker.show()
             CreatePZ.pause_app(self)
             CreatePZ.pause = True
+            self.acid_windowPaker = None
             self.reply_acid()
-
-
-    acid_true_quest_list = []
 
     def reply_acid(self):
         from open_pz import CreatePZ
@@ -744,17 +755,26 @@ class MyWindow(QMainWindow):
                                                'Нужно ли планировать кислоту на следующий объет?')
         if acid_true_quest == QMessageBox.StandardButton.Yes:
             if self.acid_windowPaker is None:
+                CreatePZ.countAcid = 1
                 print(f' окно2 СКО ')
-                self.acid_windowPaker = AcidPakerWindow(self.table_widget, self.ins_ind)
-                self.acid_windowPaker.setGeometry(200, 400, 300, 400)
-                CreatePZ.pause_app(self)
+                self.acid_windowPaker = AcidPakerWindow(self.table_widget, CreatePZ.ins_ind, 1)
+                self.acid_windowPaker.setGeometry(100, 400, 100, 400)
                 self.acid_windowPaker.show()
-
-            # print(reply_acid(self, difference_paker, paker_khost, dict_nkt, paker_select, nkt_diam, paker_depth_bottom))
-
+                CreatePZ.pause_app(self)
+                CreatePZ.pause = True
+                self.acid_windowPaker = None
                 self.reply_acid()
         else:
-            pass
+            if self.acid_windowPaker is None:
+                CreatePZ.countAcid = 2
+                print(f' окно2 СКО ')
+                self.acid_windowPaker = AcidPakerWindow(self.table_widget, CreatePZ.ins_ind, 2)
+                self.acid_windowPaker.setGeometry(100, 400, 100, 400)
+                self.acid_windowPaker.show()
+                CreatePZ.pause_app(self)
+                CreatePZ.pause = True
+                self.acid_windowPaker2 = None
+
 
     def GeophysicalNewWindow(self):
         from work_py.geophysic import GeophysicWindow

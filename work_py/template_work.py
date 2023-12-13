@@ -17,7 +17,7 @@ def well_volume():
     else:
 
         volume_well = (3.14 * (CreatePZ.column_additional_diametr - CreatePZ.column_wall_thickness * 2) ** 2 / 4 / 1000 * (
-                CreatePZ.current_bottom - CreatePZ.head_column_additional) / 1000) + (
+                CreatePZ.current_bottom - float(CreatePZ.head_column_additional)) / 1000) + (
                                   3.14 * (CreatePZ.column_diametr - CreatePZ.column_wall_thickness * 2) ** 2 / 4 / 1000 * (
                               CreatePZ.head_column_additional) / 1000)
         return volume_well
@@ -134,13 +134,13 @@ def template_ek_without_skm(self):
     elif CreatePZ.column_additional == True and CreatePZ.open_trunk_well == False and all([CreatePZ.dict_perforation[plast]['отрайбировано'] for plast in CreatePZ.plast_work]) == False:
         template_str = f'обточная муфта + НКТ{nkt_pod}мм {math.ceil(CreatePZ.current_bottom-math.ceil(CreatePZ.perforation_roof - 10))}м +' \
                        f' шаблон-{first_template}мм L-{length_template_addition}м + НКТ{nkt_pod}мм' \
-                       f' {math.ceil(CreatePZ.perforation_roof - CreatePZ.head_column_additional -20 -length_template_addition)}м ' \
+                       f' {math.ceil(CreatePZ.perforation_roof - float(CreatePZ.head_column_additional) -20 -length_template_addition)}м ' \
                f' + шаблон-{second_template}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can]}м '
         ckm_teml = f'(шаблон-{first_template}мм до гл.{math.ceil(CreatePZ.perforation_roof - 10)}м, шаблон-{first_template}мм до гл.{CreatePZ.head_column_additional-10}м)'
         CreatePZ.template_depth = math.ceil(CreatePZ.perforation_roof - 8)
     elif CreatePZ.column_additional == True and CreatePZ.open_trunk_well == True and all([CreatePZ.dict_perforation[plast]['отрайбировано'] for plast in CreatePZ.plast_work]) == False:
         template_str = f'фильтр направление L-2м + НКТ{nkt_pod} {math.ceil(CreatePZ.current_bottom - math.ceil(CreatePZ.perforation_roof) + 8)}м ' \
-                        f'шаблон-{first_template}мм L-{length_template_addition} + {math.ceil(CreatePZ.perforation_roof) + 8- CreatePZ.head_column_additional-length_template_addition -6}'\
+                        f'шаблон-{first_template}мм L-{length_template_addition} + {math.ceil(CreatePZ.perforation_roof) + 8- float(CreatePZ.head_column_additional)-length_template_addition -6}'\
                       f'+ шаблон-{template_diam_additional_ek()[1]}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can]}м '
         ckm_teml = f'(шаблон-{first_template}мм до {math.ceil(CreatePZ.perforation_roof) - 10}м, шаблон Ф-{template_diam_additional_ek()[1]}мм до гл.{CreatePZ.head_column_additional- 10}м)'
         CreatePZ.template_depth = math.ceil(CreatePZ.perforation_roof - 8)
@@ -287,40 +287,40 @@ def template_ek(self):
                       f'+ СКМ-{int(CreatePZ.column_diametr)} +10м НКТ{CreatePZ.nkt_diam}мм + шаблон-{second_template}мм L-{liftEcn}м '
     ckm_teml_SKM_EK = f'(СКМ-{int(CreatePZ.column_diametr)} до Н={int(roof_skm)}м,' \
                       f'шаблон-{second_template}мм до гл.{int(CreatePZ.perforation_roof - 20)}м)'
-    template_SKM_EK_open = f'фильтр-направление L-2м + НКТ{CreatePZ.nkt_diam}мм {int(CreatePZ.current_bottom - CreatePZ.perforation_roof + 8)}м' \
+    template_SKM_EK_open = f'фильтр-направление L-2м + НКТ{CreatePZ.nkt_diam}мм {int(CreatePZ.current_bottom) - CreatePZ.perforation_roof + 8}м' \
                            f'+ СКМ-{int(CreatePZ.column_diametr)} +10м ' \
                            f'НКТ{CreatePZ.nkt_diam}мм + шаблон-{second_template}мм L-{liftEcn}м '
     ckm_teml_SKM_EK_open = f'(СКМ-{int(CreatePZ.column_diametr)} до Н={int(roof_skm)}м,' \
-                           f'шаблон-{second_template}мм до гл.{int(roof_skm - 10)}м)'
+                           f'шаблон-{second_template}мм до гл.{int(roof_skm) - 10}м)'
     template_SKM_EK_without = f'перо + СКМ-{int(CreatePZ.column_diametr)} +10м ' \
                               f'НКТ{CreatePZ.nkt_diam}мм + шаблон-{second_template}мм L-{liftEcn}м '
     ckm_teml_SKM_EK_without = f'(СКМ-{int(CreatePZ.column_diametr)} до Н={int(roof_skm)}м,' \
                               f'шаблон-{second_template}мм до гл.{int(roof_skm - 10)}м)'
     template_SKM_DP_EK = f'обточная муфта  + {round(CreatePZ.current_bottom - CreatePZ.perforation_roof + 10, 0)}м НКТ{nkt_pod} + шаблон-{first_template}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can_addition]}м + НКТ{nkt_pod} ' \
-                         f'{round(CreatePZ.current_bottom - CreatePZ.head_column_additional - (CreatePZ.current_bottom - CreatePZ.perforation_roof + 10) - 10, 0)}м ' \
+                         f'{round(float(CreatePZ.current_bottom) - float(CreatePZ.head_column_additional) - (float(CreatePZ.current_bottom) - CreatePZ.perforation_roof + 10) - 10, 0)}м ' \
                          f'+ НКТ{CreatePZ.nkt_diam} 10м + СКМ + шаблон-{second_template}мм L-{liftEcn}м '
-    ckm_teml_SKM_DP_EK = f'(СКМ-{int(CreatePZ.column_diametr)} до Н={int(CreatePZ.head_column_additional - 10)}м, ' \
-                         f'шаблон-{second_template}мм до гл.{int(CreatePZ.head_column_additional - 20)}м))'
-    template_SKM_DP = f'обточная муфта + НКТ{nkt_pod} {int(CreatePZ.current_bottom - math.ceil(CreatePZ.perforation_roof) + 10)}м ' \
+    ckm_teml_SKM_DP_EK = f'(СКМ-{int(CreatePZ.column_diametr)} до Н={int(CreatePZ.head_column_additional) - 10}м, ' \
+                         f'шаблон-{second_template}мм до гл.{int(CreatePZ.head_column_additional) - 20}м))'
+    template_SKM_DP = f'обточная муфта + НКТ{nkt_pod} {int(CreatePZ.current_bottom) - math.ceil(CreatePZ.perforation_roof) + 10}м ' \
                       f'+ СКМ-{int(CreatePZ.column_additional_diametr)} +10м НКТ{nkt_pod} + шаблон-{first_template}мм L-{length_template_addition}м' \
-                      f' + НКТ{nkt_pod} {int(CreatePZ.current_bottom - (int(CreatePZ.current_bottom - math.ceil(CreatePZ.perforation_roof) + 10)) - length_template_addition - CreatePZ.head_column_additional)}м + ' \
+                      f' + НКТ{nkt_pod} {int(CreatePZ.current_bottom) - (int(CreatePZ.current_bottom) - math.ceil(CreatePZ.perforation_roof) + 10 - length_template_addition - float(CreatePZ.head_column_additional))}м + ' \
                       f'шаблон-{second_template}мм L-{liftEcn}м '
     ckm_teml_SKM_DP = f'(СКМ-{int(CreatePZ.column_additional_diametr)} до Н={int(roof_skm)}м,' \
                       f'шаблон-{first_template}мм до гл.{int(roof_skm - 10)}м, ' \
-                      f'шаблон-{second_template}мм до гл.{int(CreatePZ.head_column_additional - 10)}м))'
+                      f'шаблон-{second_template}мм до гл.{int(CreatePZ.head_column_additional) - 10}м))'
     template_SKM_DP_open = f'фильтр направление L-2м + НКТ{nkt_pod} {math.ceil(CreatePZ.current_bottom - CreatePZ.perforation_roof + 10)}м ' \
                            f'+ СКМ-{int(CreatePZ.column_additional_diametr)} +10м НКТ{nkt_pod} + шаблон-{first_template}мм L-{length_template_addition}м' \
-                           f' + НКТ{nkt_pod} {int(CreatePZ.current_bottom - (int(CreatePZ.current_bottom - CreatePZ.perforation_roof + 10)) - 13 - length_template_addition - CreatePZ.head_column_additional + 10)}м' \
+                           f' + НКТ{nkt_pod} {int(CreatePZ.current_bottom - (int(CreatePZ.current_bottom - CreatePZ.perforation_roof + 10)) - 13 - length_template_addition - float(CreatePZ.head_column_additional) + 10)}м' \
                            f' шаблон-{second_template}мм L-{liftEcn}м '
 
     ckm_teml_SKM_DP_open = f'(СКМ-{int(CreatePZ.column_additional_diametr)} до Н={int(CreatePZ.perforation_roof - 8)}м,' \
                            f'шаблон-{first_template}мм до гл.{int(CreatePZ.perforation_roof - 18)}м) ' \
-                           f'шаблон-{second_template}мм до гл.{int(CreatePZ.head_column_additional - 8)}м))'
+                           f'шаблон-{second_template}мм до гл.{int(CreatePZ.head_column_additional) - 8}м))'
     template_SKM_DP_without = f'обточная муфта + СКМ-{int(CreatePZ.column_additional_diametr)} +10м НКТ{nkt_pod} + шаблон-{first_template}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can_addition]}м + НКТ{nkt_pod} ' \
-                              f'{round(CreatePZ.current_bottom - CreatePZ.head_column_additional - 10, 0)}м + шаблон-{second_template}мм L-{liftEcn}м '
+                              f'{round(CreatePZ.current_bottom - float(CreatePZ.head_column_additional) - 10, 0)}м + шаблон-{second_template}мм L-{liftEcn}м '
     ckm_teml_SKM_DP_without = f'(СКМ-{int(CreatePZ.column_additional_diametr)} до Н={int(CreatePZ.current_bottom)}м,' \
                               f'шаблон-{first_template}мм до гл.{int(CreatePZ.current_bottom - 10)}м, ' \
-                              f'шаблон-{second_template}мм до гл.{int(CreatePZ.current_bottom - 10 - lift_ecn_can[CreatePZ.lift_ecn_can_addition] - (CreatePZ.current_bottom - CreatePZ.head_column_additional - 10))}м))'
+                              f'шаблон-{second_template}мм до гл.{int(CreatePZ.current_bottom - 10 - lift_ecn_can[CreatePZ.lift_ecn_can_addition] - (CreatePZ.current_bottom - float(CreatePZ.head_column_additional) - 10))}м))'
 
     if CreatePZ.column_additional == False and CreatePZ.open_trunk_well == False and all([CreatePZ.dict_perforation[plast]['отрайбировано'] for plast in CreatePZ.plast_work]) == False:
         template_str = template_SKM_EK

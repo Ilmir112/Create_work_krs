@@ -971,7 +971,7 @@ def volume_vn_ek(self):
 
 
 def volume_vn_nkt(dict_nkt):  # Внутренний объем одного погонного местра НКТ
-    print(dict_nkt)
+    # print(dict_nkt)
     for nkt, lenght_nkt in dict_nkt.items():
         volume_vn_nkt = 0
         if nkt == 73:

@@ -1,11 +1,13 @@
-from PyQt5.QtWidgets import QInputDialog, QMessageBox
+from PyQt5.QtWidgets import QInputDialog, QMessageBox, QComboBox
 from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm,well_volume_norm
 def drilling_nkt(self):
     from open_pz import CreatePZ
     from work_py.opressovka import paker_diametr_select
     from krs import well_volume
-
-    bottomType = QInputDialog.setComboBoxItems(['ЦМ', 'РПК', 'РПП', 'ВП'])
+    bottomType_list = ['ЦМ', 'РПК', 'РПП', 'ВП']
+    bottomType, ok = QInputDialog.getItem(self, 'забой', 'Чем представлени забой', bottomType_list, 0, False)
+    if ok and bottomType_list:
+        self.le.setText(bottomType)
 
     currentBottom = CreatePZ.current_bottom
 

@@ -106,6 +106,7 @@ class CreatePZ(MyWindow):
     ins_ind = 0
     len_razdel_1 = 0
     cat_P_1 = []
+    countAcid = 0
     drilling_interval = []
     max_angle = 0
     privyazkaSKO = 0
@@ -500,7 +501,7 @@ class CreatePZ(MyWindow):
 
             self.data_window.show()
         CreatePZ.pause_app(self)
-        CreatePZ.pause == True
+        CreatePZ.pause = True
 
         if CreatePZ.condition_of_wells == 0:
             CreatePZ.condition_of_wells, ok = QInputDialog.getInt(self, 'индекс Окончания копирования',
