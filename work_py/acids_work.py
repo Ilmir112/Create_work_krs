@@ -62,8 +62,7 @@ def acid_work(self):
             dict_nkt = {73: CreatePZ.paker_depth + CreatePZ.paker_khost}
         elif (CreatePZ.column_additional == False and CreatePZ.swabbing_true_quest == False) or (CreatePZ.column_additional == True
                                                      and CreatePZ.paker_depth < CreatePZ.head_column_additional and CreatePZ.swabbing_true_quest == False):
-            paker_select = f'Заглушку + щелевой фильтр + НКТ{nkt_diam}м {CreatePZ.paker_khost}м + пакер ПРО-ЯМО-{paker_diametr_select(CreatePZ.paker_depth)}мм (либо аналог) ' \
-                           f'для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм + НКТ 10м + сбивной клапан с ввертышем'
+
             dict_nkt = {73: CreatePZ.paker_depth + CreatePZ.paker_khost}
             # print(f' 5 {CreatePZ.column_additional == False, (CreatePZ.column_additional == True and paker_depth < CreatePZ.head_column_additional), swabbing_true_quest == False}')
         elif CreatePZ.column_additional == True or (CreatePZ.column_additional_diametr < 110 and (CreatePZ.paker_depth > CreatePZ.head_column_additional) and CreatePZ.swabbing_true_quest == False):

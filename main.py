@@ -328,6 +328,11 @@ class MyWindow(QMainWindow):
         acid_menu.addAction(acid_action1paker)
         acid_action1paker.triggered.connect(self.acidPakerNewWindow)
 
+
+        acid_action2paker = QAction("окно на двух пакерах", self)
+        acid_menu.addAction(acid_action2paker)
+        acid_action2paker.triggered.connect(self.acid2PakerNewWindow)
+
         acid_action_1paker = QAction("на одном пакере", self)
         acid_menu.addAction(acid_action_1paker)
         acid_action_1paker.triggered.connect(self.acid_action_1paker)
@@ -731,6 +736,22 @@ class MyWindow(QMainWindow):
         # self.table_widget.resizeColumnsToContents()
         # self.table_widget.resizeRowsToContents()
 
+    def acid2PakerNewWindow(self):
+        from work_py.acid_2paker import AcidPakerWindow
+        from open_pz import CreatePZ
+        print(f' окно СКО ')
+
+        if self.acid_windowPaker is None:
+            CreatePZ.countAcid = 0
+            print(f' окно2 СКО ')
+            self.acid_windowPaker = AcidPakerWindow(self.table_widget, CreatePZ.ins_ind, 0)
+            self.acid_windowPaker.setGeometry(200, 400, 300, 400)
+            self.acid_windowPaker.show()
+            CreatePZ.pause_app(self)
+            CreatePZ.pause = True
+            self.acid_windowPaker = None
+            self.reply2_acid()
+
     def acidPakerNewWindow(self):
         from work_py.acid_paker import AcidPakerWindow
         from open_pz import CreatePZ
@@ -747,6 +768,33 @@ class MyWindow(QMainWindow):
             self.acid_windowPaker = None
             self.reply_acid()
 
+    def reply2_acid(self):
+        from open_pz import CreatePZ
+        from work_py.acid_2paker import AcidPakerWindow
+
+        acid_true_quest = QMessageBox.question(self, 'Необходимость кислоты',
+                                               'Нужно ли планировать кислоту на следующий объет?')
+        if acid_true_quest == QMessageBox.StandardButton.Yes:
+            if self.acid_windowPaker is None:
+                CreatePZ.countAcid = 1
+                print(f' окно2 СКО ')
+                self.acid_windowPaker = AcidPakerWindow(self.table_widget, CreatePZ.ins_ind, CreatePZ.countAcid)
+                self.acid_windowPaker.setGeometry(100, 400, 100, 400)
+                self.acid_windowPaker.show()
+                CreatePZ.pause_app(self)
+                CreatePZ.pause = True
+                self.acid_windowPaker = None
+                self.reply2_acid()
+            else:
+                if self.acid_windowPaker is None:
+                    CreatePZ.countAcid = 2
+                    print(f' окно2 СКО ')
+                    self.acid_windowPaker = AcidPakerWindow(self.table_widget, CreatePZ.ins_ind, CreatePZ.countAcid)
+                    self.acid_windowPaker.setGeometry(100, 400, 100, 400)
+                    self.acid_windowPaker.show()
+                    CreatePZ.pause_app(self)
+                    CreatePZ.pause = True
+                    self.acid_windowPaker = None
     def reply_acid(self):
         from open_pz import CreatePZ
         from work_py.acid_paker import AcidPakerWindow
@@ -757,7 +805,7 @@ class MyWindow(QMainWindow):
             if self.acid_windowPaker is None:
                 CreatePZ.countAcid = 1
                 print(f' окно2 СКО ')
-                self.acid_windowPaker = AcidPakerWindow(self.table_widget, CreatePZ.ins_ind, 1)
+                self.acid_windowPaker = AcidPakerWindow(self.table_widget, CreatePZ.ins_ind, CreatePZ.countAcid)
                 self.acid_windowPaker.setGeometry(100, 400, 100, 400)
                 self.acid_windowPaker.show()
                 CreatePZ.pause_app(self)
@@ -768,7 +816,7 @@ class MyWindow(QMainWindow):
             if self.acid_windowPaker is None:
                 CreatePZ.countAcid = 2
                 print(f' окно2 СКО ')
-                self.acid_windowPaker = AcidPakerWindow(self.table_widget, CreatePZ.ins_ind, 2)
+                self.acid_windowPaker = AcidPakerWindow(self.table_widget, CreatePZ.ins_ind, CreatePZ.countAcid)
                 self.acid_windowPaker.setGeometry(100, 400, 100, 400)
                 self.acid_windowPaker.show()
                 CreatePZ.pause_app(self)
