@@ -12,7 +12,7 @@ from openpyxl import Workbook, load_workbook
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QInputDialog, QMessageBox, QDialog
 
-from openpyxl.utils.cell import get_column_letter
+from openpyxl.utils.cell import get_column_letter, range_boundaries
 from openpyxl.styles import Border, Side, PatternFill, Font, GradientFill, Alignment
 
 from cdng import events_gnvp, itog_1, events_gnvp_gnkt
@@ -107,6 +107,7 @@ class CreatePZ(MyWindow):
     len_razdel_1 = 0
     cat_P_1 = []
     countAcid = 0
+    data_x_max = 0
     drilling_interval = []
     max_angle = 0
     pakerTwoSKO = False
@@ -206,8 +207,6 @@ class CreatePZ(MyWindow):
             elif 'III. Состояние скважины к началу ремонта ' in row:
                 CreatePZ.condition_of_wells = row_ind
 
-            
-        
             for col, value in enumerate(row):
                 if not value is None and col <= 12:
                     if 'площадь' == value:  # определение номера скважины
@@ -231,7 +230,8 @@ class CreatePZ(MyWindow):
                             CreatePZ.bottomhole_artificial = row[col + 5 + n]
                             n += 1
                             CreatePZ.bottomhole_artificial = float(row[col + 5 + n])
-                    elif 'текущий забой ' == str(value).lower(): # and any(['способ' in str(column).lower() for column in row]) == True:
+                    elif 'текущий забой ' == str(
+                            value).lower():  # and any(['способ' in str(column).lower() for column in row]) == True:
                         CreatePZ.current_bottom = row[col + 2]
                         n = 2
                         while CreatePZ.current_bottom is None or n == 6:
@@ -438,7 +438,6 @@ class CreatePZ(MyWindow):
                                     CreatePZ.dict_pump_ECN["do"] = row[col + 4 + n]
                                     n += 1
 
-
                         if CreatePZ.if_None(row[col + 8 + old_index]) != 'отсут':
 
                             if ('НВ' in str(row[col + 8 + old_index]).upper() or 'ШГН' in str(
@@ -446,14 +445,14 @@ class CreatePZ(MyWindow):
                                     or 'НН' in str(row[col + 8 + old_index]).upper()):
                                 CreatePZ.dict_pump_SHGN["posle"] = row[col + 8 + old_index]
                                 n = 0
-                                while CreatePZ.dict_pump_SHGN["posle"] is None or n ==12:
+                                while CreatePZ.dict_pump_SHGN["posle"] is None or n == 12:
                                     CreatePZ.dict_pump_SHGN["posle"] = row[col + 8 + old_index + n]
                                     n += 1
                             if ('ЭЦН' in str(row[col + 8 + old_index]).upper() or 'ВНН' in str(
                                     row[col + 8 + old_index]).upper()):
                                 CreatePZ.dict_pump_ECN["posle"] = row[col + 8 + old_index]
                                 n = 0
-                                while CreatePZ.dict_pump_ECN["posle"] is None or n ==12:
+                                while CreatePZ.dict_pump_ECN["posle"] is None or n == 12:
                                     CreatePZ.dict_pump_ECN["posle"] = row[col + 8 + old_index + n]
                                     n += 1
 
@@ -506,23 +505,22 @@ class CreatePZ(MyWindow):
 
         if CreatePZ.condition_of_wells == 0:
             CreatePZ.condition_of_wells, ok = QInputDialog.getInt(self, 'индекс Окончания копирования',
-                                                   'Программа не смогла определить строку n\ III. Состояние скважины к началу ремонта ',
-                                                   0, 0, 800)
+                                                                  'Программа не смогла определить строку n\ III. Состояние скважины к началу ремонта ',
+                                                                  0, 0, 800)
 
         if len(CreatePZ.cat_well_min) == 0:
             cat_well_min, ok = QInputDialog.getInt(self, 'индекс начала копирования',
                                                    'Программа не смогла определить строку начала копирования',
                                                    0, 0, 800)
             CreatePZ.cat_well_min.append(cat_well_min)
-        if CreatePZ.data_well_max == 0:
-            CreatePZ.data_well_max, ok = QInputDialog.getInt(self, 'индекс окончания копирования',
+        if CreatePZ.data_x_max == 0:
+            CreatePZ.data_x_max, ok = QInputDialog.getInt(self, 'индекс окончания копирования',
                                                              'Программа не смогла определить строку окончания копирования',
                                                              0, 0, 800)
 
         if str(CreatePZ.well_number) in ['1436', '756', '1235', '2517', '2529', '655', '2525', '751',
                                          '1371', '1293', '1420', '296', '321', '351', '186', '815', '135', '226', '377',
                                          '249']:
-
             QMessageBox.warning(self, 'Канатные технологии', f'Скважина согласована на канатные технологии')
 
         if CreatePZ.grpPlan:
@@ -580,8 +578,8 @@ class CreatePZ(MyWindow):
         curator_list = ['ОР', 'ГТМ', 'ГРР', 'ГО', 'ВНС']
         curator = ['ГТМ'
                    if (CreatePZ.dict_pump_SHGN["posle"] != '0' and CreatePZ.dict_pump_ECN["posle"] == '0')
-                            or (CreatePZ.dict_pump_SHGN["posle"] == '0' and CreatePZ.dict_pump_ECN["posle"] != '0')
-                            or (CreatePZ.dict_pump_SHGN["posle"] != '0' and CreatePZ.dict_pump_ECN["posle"] != '0')
+                      or (CreatePZ.dict_pump_SHGN["posle"] == '0' and CreatePZ.dict_pump_ECN["posle"] != '0')
+                      or (CreatePZ.dict_pump_SHGN["posle"] != '0' and CreatePZ.dict_pump_ECN["posle"] != '0')
                    else 'ОР'][0]
 
         CreatePZ.region = block_name.region(cdng)
@@ -606,11 +604,13 @@ class CreatePZ(MyWindow):
             f'{CreatePZ.column_additional == False},{("ЭЦН" in str(CreatePZ.dict_pump["posle"]).upper() or "ВНН" in str(CreatePZ.dict_pump["posle"][0]).upper())}')
         print(f'Pdd {str(CreatePZ.dict_pump["posle"]).upper()}')
         if CreatePZ.column_additional == False and CreatePZ.dict_pump_ECN["posle"] != '0':
-            print(                f'{CreatePZ.column_additional == False},{("ЭЦН" in str(CreatePZ.dict_pump["posle"]).upper(), "ВНН" in str(CreatePZ.dict_pump["posle"]).upper())}')
+            print(
+                f'{CreatePZ.column_additional == False},{("ЭЦН" in str(CreatePZ.dict_pump["posle"]).upper(), "ВНН" in str(CreatePZ.dict_pump["posle"]).upper())}')
 
             CreatePZ.lift_ecn_can = True
         elif CreatePZ.column_additional == True:
-            if CreatePZ.dict_pump_ECN["posle"] != '0' and float(CreatePZ.dict_pump_ECN_h["posle"]) < CreatePZ.head_column_additional:
+            if CreatePZ.dict_pump_ECN["posle"] != '0' and float(
+                    CreatePZ.dict_pump_ECN_h["posle"]) < CreatePZ.head_column_additional:
                 CreatePZ.lift_ecn_can = True
 
             elif CreatePZ.dict_pump_ECN["posle"] != '0' and \
@@ -627,7 +627,7 @@ class CreatePZ(MyWindow):
 
                     if str(col) in ['1', '2', '3']:
                         CreatePZ.cat_P_1.append(int(col))
-            if 'по H2S' == ws.cell(row=row, column=2).value and 'по H2S' != ws.cell(row=row-1, column=2).value:
+            if 'по H2S' == ws.cell(row=row, column=2).value and 'по H2S' != ws.cell(row=row - 1, column=2).value:
                 for column in range(1, 13):
                     col = ws.cell(row=row, column=column).value
                     if str(col) in ['1', '2', '3']:
@@ -676,7 +676,7 @@ class CreatePZ(MyWindow):
 
                         elif 'зак' in str(ws.cell(row=row, column=col).value).strip().lower() or 'давл' in str(
                                 ws.cell(row=row, column=col).value).strip().lower() or 'P' in str(
-                                ws.cell(row=row, column=col).value).strip().lower():
+                            ws.cell(row=row, column=col).value).strip().lower():
                             Pzak = ws.cell(row=row, column=col + 1).value
                             n = 1
                             while Pzak is None:
@@ -704,11 +704,12 @@ class CreatePZ(MyWindow):
         # print(f' индекс нкт {pipes_ind + 1, CreatePZ.condition_of_wells}')
 
         for row in range(pipes_ind + 1, CreatePZ.condition_of_wells):  # словарь  количества НКТ и метраж
-            if ws.cell(row=row, column=3).value == 'План' or  str(ws.cell(row=row, column=3).value).lower() == 'после ремонта':
+            if ws.cell(row=row, column=3).value == 'План' or str(
+                    ws.cell(row=row, column=3).value).lower() == 'после ремонта':
                 CreatePZ.a_plan = row
         if CreatePZ.a_plan == 0:
             CreatePZ.a_plan, ok = QInputDialog.getDouble(self, 'Индекс планового НКТ',
-                                                                 'Программа не могла определить начала строку с ПЗ НКТ - план')
+                                                         'Программа не могла определить начала строку с ПЗ НКТ - план')
         # print(f'индекс {CreatePZ.a_plan}')
         for row in range(pipes_ind + 1, CreatePZ.condition_of_wells + 1):
             key = ws.cell(row=row, column=4).value
@@ -726,7 +727,8 @@ class CreatePZ(MyWindow):
         # print(f' индекс штанг{sucker_rod_ind, pipes_ind}')
         try:
             for row in range(sucker_rod_ind, pipes_ind - 1):
-                if ws.cell(row=row, column=3).value == 'План' or str(ws.cell(row=row, column=3).value).lower() == 'после ремонта':
+                if ws.cell(row=row, column=3).value == 'План' or str(
+                        ws.cell(row=row, column=3).value).lower() == 'после ремонта':
                     CreatePZ.b_plan = row
                     # print(f'b_plan {CreatePZ.b_plan}')
             if CreatePZ.b_plan == 0:
@@ -824,7 +826,7 @@ class CreatePZ(MyWindow):
 
                 CreatePZ.dict_perforation_project.setdefault(plast, {}).setdefault('рабочая жидкость', set()).add(
                     krs.calculationFluidWork(row[1], row[9]))
-        print(CreatePZ.dict_perforation)
+        # print(CreatePZ.dict_perforation)
         CreatePZ.definition_plast_work(self)
         CreatePZ.dict_perforation_project = self.dict_perforation_project
         if len(CreatePZ.dict_perforation_project) != 0:
@@ -892,7 +894,7 @@ class CreatePZ(MyWindow):
 
         # head = plan.head_ind(cat_well_min, CreatePZ.data_well_max + 1)
         #
-        # plan.copy_row(ws, ws2, CreatePZ.ins_ind, head)
+        # plan.copy._row(ws, ws2, CreatePZ.ins_ind, head)
         CreatePZ.ins_ind += CreatePZ.data_well_max - CreatePZ.cat_well_min[0] + 19
         # print(f' индекс вставки ГНВП{CreatePZ.ins_ind}')
         dict_events_gnvp = {}
@@ -950,6 +952,7 @@ class CreatePZ(MyWindow):
             CreatePZ.ins_ind += len(CreatePZ.row_expected)
 
         self.ins_ind_border = CreatePZ.ins_ind
+        # wb.save(f"{CreatePZ.well_number}  1 {CreatePZ.well_area} {CreatePZ.cat_P_1}.xlsx")
 
         if 2 in CreatePZ.cat_H2S_list or 1 in CreatePZ.cat_H2S_list:
             ws3 = wb.create_sheet('Sheet1')
@@ -975,6 +978,7 @@ class CreatePZ(MyWindow):
 
         self.ws = ws
         self.wb = wb
+
         # wb.save(f'{CreatePZ.well_number} {CreatePZ.well_area} {work_plan}.xlsx')
         return self.ws
 
@@ -1124,42 +1128,22 @@ class CreatePZ(MyWindow):
         CreatePZ.plast_work = list(plast_work)
         print(f' работ {CreatePZ.plast_work}')
         print(f' все пласты {CreatePZ.plast_all}')
+
     def pause_app(self):
         while CreatePZ.pause == True:
             QtCore.QCoreApplication.instance().processEvents()
 
-    def count_row_height(ws, work_list, ins_ind, merged_cells_dict):
-        from main import MyWindow
+    def count_row_height(ws, ws2, work_list, merged_cells_dict, ind_ins):
+        from openpyxl.utils.cell import range_boundaries, get_column_letter
+        boundaries_dict = {}
 
         text_width_dict = {35: (0, 100), 50: (101, 200), 70: (201, 300), 90: (301, 400), 110: (401, 500),
                            130: (501, 600), 150: (601, 700), 170: (701, 800), 190: (801, 900), 210: (901, 1500)}
+        for ind, _range in enumerate(ws.merged_cells.ranges):
+            boundaries_dict[ind] = range_boundaries(str(_range))
 
-        for i in range(ins_ind + 1, len(work_list) + ins_ind + 1):  # Добавлением работ
-            # print(f'кол-ство строк рабочих{ins_ind, len(work_list), i - ins_ind, i}')
-            for j in range(1, 13):
-                ws.cell(row=i, column=j).value = work_list[i - ins_ind - 1][j - 1]
-                if j != 1:
-                    ws.cell(row=i, column=j).border = CreatePZ.thin_border
-                if j == 11:
-                    ws.cell(row=i, column=j).font = Font(name='Arial', size=11, bold=False)
-                else:
-                    ws.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=False)
-                if 'примечание' in str(ws.cell(row=i, column=j).value).lower() \
-                        or 'заявку оформить за 16 часов' in str(ws.cell(row=i, column=j).value).lower() \
-                        or 'ЗАДАЧА 2.9.' in str(ws.cell(row=i, column=j).value).upper() \
-                        or 'порядок работы' in str(ws.cell(row=i, column=j).value).lower() \
-                        or 'ВСЕ ТЕХНОЛОГИЧЕСКИЕ ОПЕРАЦИИ' in str(ws.cell(row=i, column=j).value).upper() \
-                        or 'за 48 часов до спуска' in str(ws.cell(row=i, column=j).value).upper():
-                    ws.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=True)
-
-            ws.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='center',
-                                                           vertical='center')
-            ws.cell(row=i, column=11).alignment = Alignment(wrap_text=True, horizontal='center',
-                                                            vertical='center')
-            ws.cell(row=i, column=12).alignment = Alignment(wrap_text=True, horizontal='center',
-                                                            vertical='center')
-            ws.cell(row=i, column=3).alignment = Alignment(wrap_text=True, horizontal='left',
-                                                           vertical='center')
+        rowHeights1 = [ws.row_dimensions[i].height for i in range(ws.max_row)]
+        colWidth = [ws.column_dimensions[get_column_letter(i + 1)].width for i in range(0, 13)] + [None]
         for i, row_data in enumerate(work_list):
             for column, data in enumerate(row_data):
                 if column == 2:
@@ -1167,16 +1151,72 @@ class CreatePZ(MyWindow):
                         text = data
                         for key, value in text_width_dict.items():
                             if value[0] <= len(text) <= value[1]:
-                                ws.row_dimensions[i + 1 + ins_ind].height = int(key)
+                                ws2.row_dimensions[i + 1].height = int(key)
+        # for key, value in boundaries_dict.items():
+        #     ws2.unmerge_cells(start_column=value[0], start_row=value[1],
+        #                       end_column=value[2], end_row=value[3])
+
+        for i in range(1, len(work_list) + 1):  # Добавлением работ
+            # print(f'кол-ство строк рабочих{ins_ind, len(work_list), i - ins_ind, i}')
+            # print(work_list[i - 1])
+            for j in range(1, 13):
+                # print(ws2.cell(row=i, column=j).value)
+                cell = ws2.cell(row=i, column=j)
+
+                if cell and str(cell) != str(work_list[i - 1][j - 1]):
+                    # print(work_list[i - 1][j - 1])
+                    cell.value = work_list[i - 1][j - 1]
+                    if i >= ind_ins:
+                        if 'примечание' in str(cell.value).lower() \
+                                or 'заявку оформить за 16 часов' in str(cell.value).lower() \
+                                or 'ЗАДАЧА 2.9.' in str(cell.value).upper() \
+                                or 'порядок работы' in str(cell.value).lower() \
+                                or 'ВСЕ ТЕХНОЛОГИЧЕСКИЕ ОПЕРАЦИИ' in str(cell.value).upper() \
+                                or 'за 48 часов до спуска' in str(cell.value).upper():
+                            cell.font = Font(name='Arial', size=13, bold=True)
+                        if j != 1:
+                            cell.border = CreatePZ.thin_border
+                        if j == 11:
+                            cell.font = Font(name='Arial', size=11, bold=False)
+                        else:
+                            cell.font = Font(name='Arial', size=13, bold=False)
+                        ws2.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='center',
+                                                                        vertical='center')
+                        ws2.cell(row=i, column=11).alignment = Alignment(wrap_text=True, horizontal='center',
+                                                                         vertical='center')
+                        ws2.cell(row=i, column=12).alignment = Alignment(wrap_text=True, horizontal='center',
+                                                                         vertical='center')
+                        ws2.cell(row=i, column=3).alignment = Alignment(wrap_text=True, horizontal='left',
+                                                            vertical='center')
+
+
+
+        for key, value in boundaries_dict.items():
+            # print(value)
+            ws2.merge_cells(start_column=value[0], start_row=value[1],
+                            end_column=value[2], end_row=value[3])
+
+        head = plan.head_ind(0, ind_ins)
+        plan.copy_true_ws(ws, ws2, head)
         for row, col in merged_cells_dict.items():
             if len(col) != 2:
                 # print(row)
-                ws.merge_cells(start_row=row + 1, start_column=3, end_row=row + 1, end_column=10)
+                ws2.merge_cells(start_row=row + 1, start_column=3, end_row=row + 1, end_column=10)
         # print(f'высота строк работ {ins_ind}')
-
-        ws.column_dimensions[get_column_letter(11)].width = 20
-        ws.column_dimensions[get_column_letter(12)].width = 20
-        ws.column_dimensions[get_column_letter(7)].width = 20
+        print(f'высота строк работ {len(rowHeights1)}')
+        for index_row, row in enumerate(ws2.iter_rows()):  # Копирование высоты строки
+            try:
+                if index_row < ind_ins:
+                    ws2.row_dimensions[index_row].height = rowHeights1[index_row]
+            except:
+                pass
+            if index_row == 2:
+                for col_ind, col in enumerate(row):
+                    if col_ind <= 12:
+                        ws2.column_dimensions[get_column_letter(col_ind + 1)].width = colWidth[col_ind]
+        ws2.column_dimensions[get_column_letter(11)].width = 20
+        ws2.column_dimensions[get_column_letter(12)].width = 20
+        ws2.column_dimensions[get_column_letter(7)].width = 20
 
         return 'Высота изменена'
 

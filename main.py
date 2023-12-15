@@ -6,15 +6,19 @@ from PyQt5 import QtCore, QtWidgets
 
 from openpyxl.utils import get_column_letter
 from PyQt5.QtCore import Qt
+from openpyxl.workbook import Workbook
 
 import krs
+import plan
 
 from openpyxl.drawing.image import Image
+
+import plan
 
 
 class MyWindow(QMainWindow):
 
-    def __init__(self,  *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__()
 
         self.initUI()
@@ -54,7 +58,6 @@ class MyWindow(QMainWindow):
         self.correctPVRButton = QPushButton("Скорректировать раотающие ПВР")
         self.correctPVRButton.clicked.connect(self.correctPVR)
         self.toolbar.addWidget(self.correctPVRButton)
-
 
         self.closeFileButton = QPushButton("Закрыть проект")
         self.closeFileButton.clicked.connect(self.close_file)
@@ -121,7 +124,7 @@ class MyWindow(QMainWindow):
             self.save_to_excel
 
         elif action == self.save_file_as:
-            self.saveFileDialog(self.wb)
+            self.saveFileDialog(self.wb2)
 
     def tableWidgetOpen(self):
         if self.table_widget is None:
@@ -136,14 +139,24 @@ class MyWindow(QMainWindow):
             # Указанная строка и столбец - это ячейка, которая была нажата.
             self.table_widget.cellPressed[int, int].connect(self.clickedRowColumn)
 
-    def saveFileDialog(self, wb):
+    def saveFileDialog(self, wb2):
         from open_pz import CreatePZ
         fileName, _ = QFileDialog.getSaveFileName(self, "Save excel-file", "", "Excel Files (*.xls)")
         if fileName:
-            wb.save(f"{CreatePZ.well_number} {CreatePZ.well_area} {CreatePZ.cat_P_1} категории.xlsx)")
+            wb2.save(f"{CreatePZ.well_number} {CreatePZ.well_area} {CreatePZ.cat_P_1} категории.xlsx)")
 
     def save_to_excel(self):
         from open_pz import CreatePZ
+
+        wb2 = Workbook()
+        ws2 = wb2.get_sheet_by_name('Sheet')
+        ws2.title = "План работ"
+
+        head = plan.head_ind(0, CreatePZ.ins_ind)
+        print(f' сироки {head}')
+        print(f' сироки {head}')
+
+        # plan.copy_row(self.ws, ws2, head)
 
         ins_ind = self.ins_ind_border
 
@@ -151,47 +164,55 @@ class MyWindow(QMainWindow):
 
         work_list = []
         for row in range(self.table_widget.rowCount()):
-            if row >= self.ins_ind_border:
-                row_lst = []
-                self.ins_ind_border += 1
-                for column in range(self.table_widget.columnCount()):
-                    if self.table_widget.rowSpan(row, column) > 1 or self.table_widget.columnSpan(row, column) > 1:
-                        merged_cells.append((row, column))
-                    item = self.table_widget.item(row, column)
-                    if not item is None:
-                        row_lst.append(item.text())
-                work_list.append(row_lst)
+            # if row >= self.ins_ind_border:
+            row_lst = []
+            self.ins_ind_border += 1
+            for column in range(self.table_widget.columnCount()):
+                if self.table_widget.rowSpan(row, column) > 1 or self.table_widget.columnSpan(row, column) > 1:
+                    merged_cells.append((row, column))
+                item = self.table_widget.item(row, column)
 
+                if not item is None:
+                    row_lst.append(item.text())
+                    print(item.text())
+                else:
+                    row_lst.append("")
+
+            work_list.append(row_lst)
+        # print(work_list)
         merged_cells_dict = {}
 
         for row in merged_cells:
-            merged_cells_dict.setdefault(row[0], []).append(row[1])
-
+            if row[0] >= ins_ind:
+                merged_cells_dict.setdefault(row[0], []).append(row[1])
+        print(CreatePZ.ins_ind)
         for i in range(2, len(work_list)):  # нумерация работ
-            work_list[i][1] = i - 1
-            print(work_list[i])
-            if krs.is_number(work_list[i][11]) == True:
-                CreatePZ.normOfTime += float(work_list[i][11])
+            if i >= ins_ind+2:
 
-        CreatePZ.count_row_height(self.ws, work_list, ins_ind, merged_cells_dict)
+                work_list[i][1] = i - 1- ins_ind
+
+                if krs.is_number(work_list[i][11]) == True:
+                    CreatePZ.normOfTime += float(work_list[i][11])
+
+        CreatePZ.count_row_height(self.ws, ws2, work_list, merged_cells_dict,  ins_ind)
         itog_ind_min = CreatePZ.itog_ind_min + len(work_list)
-        CreatePZ.addItog(self, self.ws, self.table_widget.rowCount() + 1)
+        CreatePZ.addItog(self, ws2, self.table_widget.rowCount() + 1)
         try:
-            self.ws.print_area = f'B1:L{self.table_widget.rowCount() + 45}'
+            ws2.print_area = f'B1:L{self.table_widget.rowCount() + 45}'
             # ws.page_setup.fitToPage = True
-            self.ws.page_setup.fitToHeight = False
-            self.ws.page_setup.fitToWidth = True
-            self.ws.print_options.horizontalCentered = True
-            for row_ind, row in enumerate(self.ws.iter_rows(values_only=True)):
+            ws2.page_setup.fitToHeight = False
+            ws2.page_setup.fitToWidth = True
+            ws2.print_options.horizontalCentered = True
+            for row_ind, row in enumerate(ws2.iter_rows(values_only=True)):
                 for col, value in enumerate(row):
                     if 'Зуфаров' in str(value):
                         coordinate = f'{get_column_letter(col - 2)}{row_ind - 1}'
                         break
 
-            self.insert_image(self.ws, 'imageFiles/Зуфаров.png', coordinate)
-            self.insert_image(self.ws, 'imageFiles/Хасаншин.png', 'H1')
-            self.insert_image(self.ws, 'imageFiles/Шамигулов.png', 'H4')
-            self.wb.save(f"{CreatePZ.well_number} {CreatePZ.well_area} {CreatePZ.cat_P_1}.xlsx")
+            self.insert_image(ws2, 'imageFiles/Зуфаров.png', coordinate)
+            self.insert_image(ws2, 'imageFiles/Хасаншин.png', 'H1')
+            self.insert_image(ws2, 'imageFiles/Шамигулов.png', 'H4')
+            wb2.save(f"{CreatePZ.well_number} {CreatePZ.well_area} {CreatePZ.cat_P_1}.xlsx")
         except Exception as e:
             print(e)
             print(e)
@@ -243,7 +264,6 @@ class MyWindow(QMainWindow):
         definitionBottomGKLM_action = QAction("Отбивка забоя по ЭК", self)
         geophysical.addAction(definitionBottomGKLM_action)
         definitionBottomGKLM_action.triggered.connect(self.definitionBottomGKLM)
-
 
         vp_action = QAction("Установка ВП", self)
         geophysical.addAction(vp_action)
@@ -327,7 +347,6 @@ class MyWindow(QMainWindow):
         acid_action1paker = QAction("окно на одном пакере", self)
         acid_menu.addAction(acid_action1paker)
         acid_action1paker.triggered.connect(self.acidPakerNewWindow)
-
 
         acid_action2paker = QAction("окно на двух пакерах", self)
         acid_menu.addAction(acid_action2paker)
@@ -592,7 +611,6 @@ class MyWindow(QMainWindow):
         vp_work_list = czh(self)
         self.populate_row(self.ins_ind, vp_work_list)
 
-
     def swibbing_with_paker(self):
         from work_py.swabbing import swabbing_with_paker
 
@@ -620,6 +638,7 @@ class MyWindow(QMainWindow):
         print('Вставился компрессор с воронкой')
         kompress_work_list = kompress(self)
         self.populate_row(self.ins_ind, kompress_work_list)
+
     def swibbing_with_voronka(self):
 
         from work_py.swabbing import swabbing_with_voronka
@@ -756,7 +775,7 @@ class MyWindow(QMainWindow):
         from work_py.acid_paker import AcidPakerWindow
         from open_pz import CreatePZ
         print(f' окно СКО ')
-        
+
         if self.acid_windowPaker is None:
             CreatePZ.countAcid = 0
             print(f' окно2 СКО ')
@@ -795,6 +814,7 @@ class MyWindow(QMainWindow):
                     CreatePZ.pause_app(self)
                     CreatePZ.pause = True
                     self.acid_windowPaker = None
+
     def reply_acid(self):
         from open_pz import CreatePZ
         from work_py.acid_paker import AcidPakerWindow
@@ -823,7 +843,6 @@ class MyWindow(QMainWindow):
                 CreatePZ.pause = True
                 self.acid_windowPaker2 = None
 
-
     def GeophysicalNewWindow(self):
         from work_py.geophysic import GeophysicWindow
 
@@ -836,6 +855,7 @@ class MyWindow(QMainWindow):
         else:
             self.new_window.close()  # Close window.
             self.new_window = None  # Discard reference.
+
     def correctPVR(self):
         from open_pz import CreatePZ
         plast_work = set()
@@ -862,6 +882,7 @@ class MyWindow(QMainWindow):
                 break
         CreatePZ.plast_work = list(plast_work)
         print(f'работающий пласты  {CreatePZ.plast_work}')
+
     def correctData(self):
         from data_correct import DataWindow
 
@@ -884,7 +905,6 @@ class MyWindow(QMainWindow):
             if CreatePZ.cat_P_1[1] == 1 and CreatePZ.kat_pvo != 1:
                 msc = QMessageBox.information(self, 'Внимание', 'Не произведен монтаж первой категории')
                 return
-
 
         if self.new_window is None:
 
@@ -919,7 +939,10 @@ class MyWindow(QMainWindow):
                 self.table_widget.setRowHeight(row, int(rowHeights_exit[row]))
             for col in range(1, 12 + 1):
                 if not sheet.cell(row=row, column=col).value is None:
-                    cell_value = str(sheet.cell(row=row, column=col).value)
+                    if isinstance(sheet.cell(row=row, column=col).value, float) and row > 25:
+                        cell_value = str(round(sheet.cell(row=row, column=col).value, 1))
+                    else:
+                        cell_value = str(sheet.cell(row=row, column=col).value)
                     item = QtWidgets.QTableWidgetItem(str(cell_value))
                     self.table_widget.setItem(row - 1, col - 1, item)
                     # Проверяем, является ли текущая ячейка объединенной
