@@ -12,6 +12,7 @@ class TabPage_SO(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
 
+        self.le = QLineEdit()
 
         self.swabTruelabelType = QLabel("необходимость освоения", self)
         self.swabTrueEditType = QComboBox(self)

@@ -143,7 +143,7 @@ class PerforationWindow(MyWindow):
 
             for plast, data in self.dict_perforation.items():
                 print(plast)
-                if self.dict_perforation[plast]['отключение'] == False:
+                if plast in CreatePZ.plast_work:
                     for i in data['интервал']:
                         count_charge = int((max(i)-min(i))*chargePM)
                         # print(i)
@@ -178,8 +178,8 @@ class PerforationWindow(MyWindow):
     def addRowTable(self):
         from open_pz import CreatePZ
 
-        editType = self.tabWidget.currentWidget().lineEditType.text()
-        editType2 = self.tabWidget.currentWidget().lineEditType2.text()
+        editType = self.tabWidget.currentWidget().lineEditType.text().replace(',', '.')
+        editType2 = self.tabWidget.currentWidget().lineEditType2.text().replace(',', '.')
         chargesx= str(self.tabWidget.currentWidget().ComboBoxCharges.currentText())
         editHolesMetr = self.tabWidget.currentWidget().lineEditHolesMetr.currentText()
         editIndexFormation = self.tabWidget.currentWidget().lineEditIndexFormation.text()
@@ -187,7 +187,7 @@ class PerforationWindow(MyWindow):
         if not editType or not editType2 or not chargesx or not editIndexFormation:
             msg = QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
             return
-        if float(editType2) >= float(CreatePZ.current_bottom):
+        if float(editType2.replace(',', '.')) >= float(CreatePZ.current_bottom):
             msg = QMessageBox.information(self, 'Внимание', 'Подошва интервала перфорации ниже текущего забоя')
             return
 
@@ -298,9 +298,9 @@ class PerforationWindow(MyWindow):
 
         text_width_dict = {20: (0, 100), 40: (101, 200), 60: (201, 300), 80: (301, 400), 100: (401, 500),
                            120: (501, 600), 140: (601, 700)}
-        print(perf_list)
-        row_list = len(perforation)
-        if row_list < 6:
+        print(len(perforation))
+
+        if len(perforation) < 6:
             msg = QMessageBox.information(self, 'Внимание', 'Не добавлены интервалы перфорации!!!')
         else:
             for i, row_data in enumerate(perforation):

@@ -352,13 +352,13 @@ class MyWindow(QMainWindow):
         acid_menu.addAction(acid_action2paker)
         acid_action2paker.triggered.connect(self.acid2PakerNewWindow)
 
-        acid_action_1paker = QAction("на одном пакере", self)
-        acid_menu.addAction(acid_action_1paker)
-        acid_action_1paker.triggered.connect(self.acid_action_1paker)
-
-        acid_action_2paker = QAction("на двух пакерах", self)
-        acid_menu.addAction(acid_action_2paker)
-        acid_action_2paker.triggered.connect(self.acid_action_2paker)
+        # acid_action_1paker = QAction("на одном пакере", self)
+        # acid_menu.addAction(acid_action_1paker)
+        # acid_action_1paker.triggered.connect(self.acid_action_1paker)
+        #
+        # acid_action_2paker = QAction("на двух пакерах", self)
+        # acid_menu.addAction(acid_action_2paker)
+        # acid_action_2paker.triggered.connect(self.acid_action_2paker)
 
         acid_action_gons = QAction("ГОНС", self)
         acid_menu.addAction(acid_action_gons)

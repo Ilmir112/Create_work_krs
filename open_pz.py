@@ -107,6 +107,7 @@ class CreatePZ(MyWindow):
     len_razdel_1 = 0
     cat_P_1 = []
     countAcid = 0
+    swabTrueEditType = 1
     data_x_max = 0
     drilling_interval = []
     max_angle = 0
@@ -707,7 +708,9 @@ class CreatePZ(MyWindow):
             if ws.cell(row=row, column=3).value == 'План' or str(
                     ws.cell(row=row, column=3).value).lower() == 'после ремонта':
                 CreatePZ.a_plan = row
-        if CreatePZ.a_plan == 0:
+        try:
+            CreatePZ.a_plan == 0
+        except:
             CreatePZ.a_plan, ok = QInputDialog.getDouble(self, 'Индекс планового НКТ',
                                                          'Программа не могла определить начала строку с ПЗ НКТ - план')
         # print(f'индекс {CreatePZ.a_plan}')
@@ -756,9 +759,10 @@ class CreatePZ(MyWindow):
         print(f' индекс ПВР{data_pvr_min + 2, data_pvr_max + 1}')
         for row in range(data_pvr_min, data_pvr_max + 2):  # Сортировка интервала перфорации
             lst = []
-            if isinstance(ws.cell(row=row, column=3).value, float) or isinstance(ws.cell(row=row, column=3).value, int):
+            if isinstance(ws.cell(row=row, column=3).value, int) or isinstance(ws.cell(row=row, column=3).value, float):
                 for i in range(2, 13):
                     lst.append(ws.cell(row=row, column=i).value)
+
                 # print(ws.cell(row=row, column=6).value)
                 if CreatePZ.old_version == True and isinstance(ws.cell(row=row, column=6).value, datetime) == True:
                     lst.insert(5, None)
@@ -770,6 +774,7 @@ class CreatePZ(MyWindow):
                     perforations_intervals.append(lst)
 
         for ind, row in enumerate(perforations_intervals):
+            print(row)
             krovlya_perf = float(row[2])
 
             print(f'кровля ПВР {krovlya_perf}')
@@ -807,7 +812,7 @@ class CreatePZ(MyWindow):
                 CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('замер', set()).add(row[10])
                 CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('рабочая жидкость', set()).add(
                     krs.calculationFluidWork(row[1], row[9]))
-                print(f'пласт {plast} перфор {CreatePZ.dict_perforation[plast]["отключение"]}')
+                # print(f'пласт {plast} перфор {CreatePZ.dict_perforation[plast]["отключение"]}')
 
 
             elif any([str((i)).lower() == 'проект' for i in row]) == True and all(
@@ -1122,12 +1127,12 @@ class CreatePZ(MyWindow):
                         CreatePZ.perforation_sole = interval[1]
                     if CreatePZ.perforation_roof_all >= interval[0]:
                         CreatePZ.perforation_roof_all = interval[0]
-        print(f'кровля -{CreatePZ.perforation_roof, CreatePZ.perforation_roof_all} '
-              f'подошва -{CreatePZ.perforation_sole}')
+        # print(f'кровля -{CreatePZ.perforation_roof, CreatePZ.perforation_roof_all} '
+        #       f'подошва -{CreatePZ.perforation_sole}')
         CreatePZ.plast_all = list(CreatePZ.dict_perforation.keys())
         CreatePZ.plast_work = list(plast_work)
-        print(f' работ {CreatePZ.plast_work}')
-        print(f' все пласты {CreatePZ.plast_all}')
+        # print(f' работ {CreatePZ.plast_work}')
+        # print(f' все пласты {CreatePZ.plast_all}')
 
     def pause_app(self):
         while CreatePZ.pause == True:
