@@ -44,7 +44,7 @@ def swabbing_opy(self):
          'Мастер КРС', None],
         [None, None, f'Приподнять  воронку до глубины {depth_opy + 200}м',
          None, None, None, None, None, None, None,
-         'мастер КРС', liftingNKT_norm(CreatePZ-(depth_opy + 200),1)],
+         'мастер КРС', liftingNKT_norm(float(CreatePZ.current_bottom)-(depth_opy + 200),1)],
         [None, None,
          f'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС "Ойл-сервис". '
          f' Составить акт готовности скважины и передать его начальнику партии',
@@ -120,7 +120,7 @@ def swabbing_opy(self):
                               f'менее {round(krs.well_volume(self, CreatePZ.current_bottom), 1)}м3  в присутствии представителя заказчика, Составить акт. '
                               f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ)',
                               None, None, None, None, None, None, None,
-                              'мастер КРС', well_volume_norm(well_volume(self, CreatePZ.current_bottom)) +  descentNKT_norm()],
+                              'мастер КРС', well_volume_norm(well_volume(self, CreatePZ.current_bottom)) +  descentNKT_norm(200, 1)],
                              [None, None,
                               f'Поднять {paker_select} на НКТ{nkt_diam} c глубины {CreatePZ.current_bottom}м с доливом скважины в '
                               f'объеме {round((CreatePZ.current_bottom) * 1.12 / 1000, 1)}м3 удельным весом {CreatePZ.fluid_work}',
@@ -269,6 +269,12 @@ def swabbing_with_paker(self, paker_khost, pakerKompo):
          'мастер КРС',
          liftingNKT_norm(paker_depth, 1.2)]
     ]
+    ovtr = 'ОВТР 4ч' if CreatePZ.region == 'ЧГМ' else 'ОВТР 10ч'
+    ovtr4 = 4 if CreatePZ.region == 'ЧГМ' else 10
+    if swab == 'Задача №2.1.13' and CreatePZ.region not in ['ИГМ']:
+        paker_list.insert(3, [None, None, ovtr,
+                              None, None, None, None, None, None, None,
+                              'мастер КРС', ovtr4])
     if pakerKompo == 2:
         paker_list[1] = [None, None, f'Посадить пакера на глубине {paker_depth}/{paker_depth - paker_khost}м'
             ,
@@ -532,5 +538,10 @@ def swabbing_with_voronka(self):
          'мастер КРС',
          liftingNKT_norm(paker_depth, 1)]
     ]
-
+    ovtr = 'ОВТР 4ч' if CreatePZ.region == 'ЧГМ' else 'ОВТР 10ч'
+    ovtr4 = 4 if CreatePZ.region == 'ЧГМ' else 10
+    if swab == 'Задача №2.1.13' and CreatePZ.region not in ['ИГМ']:
+        paker_list.insert(1, [None, None, ovtr,
+                              None, None, None, None, None, None, None,
+                              'мастер КРС', ovtr4])
     return paker_list

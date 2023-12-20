@@ -55,8 +55,8 @@ def gno_down(self):
         for interval in CreatePZ.dict_perforation[plast]['интервал']:
             if abs(float(interval[1] - float(CreatePZ.H_F_paker_do["posle"]))) < 10 or abs(
                     float(interval[0] - float(CreatePZ.H_F_paker_do["posle"]))) < 10:
-                if privyazkaNKT(self) not in paker_descent:
-                    paker_descent.insert(2, privyazkaNKT(self))
+                if privyazkaNKT(self)[0] not in paker_descent:
+                    paker_descent.insert(2, privyazkaNKT(self)[0])
 
     gno_list = [[None, None,
                  f'За 48 часов до спуска запросить КАРТУ спуска на ГНО и заказать оборудование согласно карты спуска.',
@@ -189,8 +189,12 @@ def gno_down(self):
                               None, None, None, None, None, None, None,
                               'Мастер КРС, предст. заказчика', 1.5],
                              ]
-    if privyazkaNKT(self) not in descent_nv_with_paker:
-        descent_nv_with_paker.insert(3, privyazkaNKT(self))
+    for plast in list(CreatePZ.dict_perforation.keys()):
+        for interval in CreatePZ.dict_perforation[plast]['интервал']:
+            if abs(float(interval[1] - float(CreatePZ.H_F_paker_do["posle"]))) < 10 or abs(
+                    float(interval[0] - float(CreatePZ.H_F_paker_do["posle"]))) < 10:
+                if privyazkaNKT(self)[0] not in descent_nv_with_paker:
+                    descent_nv_with_paker.insert(3, privyazkaNKT(self)[0])
 
     descent_nn_with_paker = [[None, None,
                               f'Заменить технологические НКТ на опрессованные эксплуатационные НКТ. Заменить подвесной патрубок на сертифицированный.',
@@ -237,8 +241,12 @@ def gno_down(self):
                               None, None, None, None, None, None, None,
                               'Мастер КРС, предст. заказчика', 1.5],
                              ]
-    if privyazkaNKT(self) not in descent_nn_with_paker:
-        descent_nn_with_paker.insert(3, privyazkaNKT(self))
+    for plast in list(CreatePZ.dict_perforation.keys()):
+        for interval in CreatePZ.dict_perforation[plast]['интервал']:
+            if abs(float(interval[1] - float(CreatePZ.H_F_paker_do["posle"]))) < 10 or abs(
+                    float(interval[0] - float(CreatePZ.H_F_paker_do["posle"]))) < 10:
+                if privyazkaNKT(self)[0] not in descent_nn_with_paker:
+                    descent_nn_with_paker.insert(3, privyazkaNKT(self)[0])
     descentORD = [[None, None,
                    f'Заменить технологические НКТ на опрессованные эксплуатационные НКТ. Заменить подвесной патрубок на сертифицированный.',
                    None, None, None, None, None, None, None,

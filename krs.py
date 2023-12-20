@@ -14,7 +14,7 @@ def calculationFluidWork(vertical, pressure):
         fluidWork = round(float(str(pressure)) * (1 + stockRatio) / float(vertical) / 0.0981, 2)
         if fluidWork < 1.02 and (CreatePZ.region == 'КГМ' or CreatePZ.region == 'АГМ'):
             fluidWork = 1.02
-        elif fluidWork < 1.02 and CreatePZ.region == 'ИГМ' or CreatePZ.region == 'ТГМ' or CreatePZ.region == 'ЧГМ':
+        elif fluidWork < 1.02 and (CreatePZ.region == 'ИГМ' or CreatePZ.region == 'ТГМ' or CreatePZ.region == 'ЧГМ'):
             fluidWork = 1.01
         print(f' ЖГС {fluidWork}')
         return fluidWork

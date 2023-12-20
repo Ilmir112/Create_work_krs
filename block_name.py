@@ -102,17 +102,27 @@ def pop_down(self, region, curator_sel):
          None, None, None, None],
         [None, None, None, None, None, None, None, None, None, None, None, None]]
 
-    ved_gtm_list = [None, podpis_dict[region]['ved_gtm']['post'], None, None, None, None,  '"___"___________' , None, None, podpis_dict[region]['ved_gtm']['surname'], None, None]
+    ved_gtm_list = [None, podpis_dict[region]['ved_gtm']['post'], None, None, None, None,  '_______________' , None, None, podpis_dict[region]['ved_gtm']['surname'], None, None]
 
-    ved_orm_list = [None, podpis_dict[region]['ved_orm']['post'], None, None, None, None, '"___"___________', None, None, podpis_dict[region]['ved_orm']['surname'], None, None]
+    ved_orm_list = [None, podpis_dict[region]['ved_orm']['post'], None, None, None, None, '_______________', None, None, podpis_dict[region]['ved_orm']['surname'], None, None]
     if (region == 'ЧГМ') and CreatePZ.curator == 'ОР':
 
         podp_down.insert(13, ved_orm_list)
+        podp_down.insert(14,[None, None, None, None, None, None, '"___"___________', None, None, '     дата подписания', None,
+         None])
     elif (region == 'КГМ') and CreatePZ.curator == 'ОР':
 
         podp_down.insert(13, ved_gtm_list)
+        podp_down.insert(14,
+                         [None, None, None, None, None, None, '"___"___________', None, None, '     дата подписания',
+                          None,
+                          None])
     elif region == 'КГМ' or region == 'ЧГМ' and CreatePZ.curator == 'ГТМ':
         podp_down.insert(13, ved_gtm_list)
+        podp_down.insert(14,
+                         [None, None, None, None, None, None, '"___"___________', None, None, '     дата подписания',
+                          None,
+                          None])
     return podp_down
 def razdel_1(self):
     from open_pz import CreatePZ

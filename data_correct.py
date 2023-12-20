@@ -279,7 +279,7 @@ class DataWindow(MyWindow):
 
         # print(f'прио {type(dict_pump_h_posle)}')
         paker_do = str(self.tabWidget.currentWidget().paker_do_EditType.text())
-        H_F_paker_do = self.tabWidget.currentWidget().paker_depth_do_EditType.text()
+        H_F_paker_do = str(self.tabWidget.currentWidget().paker_depth_do_EditType.text())
         paker_posle = self.tabWidget.currentWidget().paker_posle_EditType.text()
         H_F_paker_posle = self.tabWidget.currentWidget().paker_depth_posle_EditType.text()
 
@@ -290,6 +290,8 @@ class DataWindow(MyWindow):
         # print(any(['ЭЦН' in dict_pump_ECN_posle.upper(), 'ВНН' in dict_pump_ECN_posle.upper(),
         #                 dict_pump_ECN_posle == 'отсут']))
         # print(dict_pump_ECN_posle)
+
+
         if self.ifNum(columnType) == False \
                 or self.ifNum(column_wall_thickness) == False \
                 or self.ifNum(shoe_column) == False \
@@ -319,11 +321,12 @@ class DataWindow(MyWindow):
                        'НН' in dict_pump_SHGN_posle.upper(), dict_pump_SHGN_posle == 'отсут']) == False \
                 or any(['ЭЦН' in dict_pump_ECN_posle.upper(), 'ВНН' in dict_pump_ECN_posle.upper(),
                         dict_pump_ECN_posle == 'отсут']) == False \
-                or (dict_pump_ECN_do.upper() != 'отсут' and dict_pump_ECN_h_do.upper() == 'отсут') \
-                or (dict_pump_ECN_posle.upper() != 'отсут' and dict_pump_ECN_h_posle.upper() == 'отсут') \
-                or (dict_pump_SHGN_do.upper() != 'отсут' and dict_pump_SHGN_h_do.upper() == 'отсут') \
-                or (dict_pump_SHGN_posle.upper() != 'отсут' and dict_pump_SHGN_h_posle.upper() == 'отсут') \
- \
+                or (dict_pump_ECN_do != 'отсут' and dict_pump_ECN_h_do == 'отсут') \
+                or (dict_pump_ECN_posle != 'отсут' and dict_pump_ECN_h_posle == 'отсут') \
+                or (dict_pump_SHGN_do != 'отсут' and dict_pump_SHGN_h_do == 'отсут') \
+                or (dict_pump_SHGN_posle != 'отсут' and dict_pump_SHGN_h_posle == 'отсут') \
+                or (paker_do != 'отсут' and H_F_paker_do == 'отсут') \
+                or (paker_posle != 'отсут' and H_F_paker_posle == 'отсут') \
                 or any(['ЭЦН' in dict_pump_ECN_do.upper(), 'ВНН' in dict_pump_ECN_do.upper(),
                         dict_pump_ECN_do == 'отсут']) == False:
             msg = QMessageBox.information(self, 'Внимание', 'Не все поля соответствуют значениям')
@@ -369,7 +372,7 @@ class DataWindow(MyWindow):
     
     def if_None(self, value):
         
-        if value is None or 'отс' in str(value).lower() or value == '-' or str(value) == '0' :
+        if value is None or 'отс' in str(value).lower() or value == '-' or str(value) == '0':
             return '0'
         elif isinstance(value, int):
             return int(value)

@@ -14,6 +14,7 @@ import plan
 from openpyxl.drawing.image import Image
 
 import plan
+from H2S import calc_H2S
 
 
 class MyWindow(QMainWindow):
@@ -198,16 +199,32 @@ class MyWindow(QMainWindow):
         itog_ind_min = CreatePZ.itog_ind_min + len(work_list)
         CreatePZ.addItog(self, ws2, self.table_widget.rowCount() + 1)
         try:
-            ws2.print_area = f'B1:L{self.table_widget.rowCount() + 45}'
-            # ws.page_setup.fitToPage = True
+            ws2.print_area = f'B1:L{self.table_widget.rowCount()+45}'
+            ws2.page_setup.fitToPage = True
             ws2.page_setup.fitToHeight = False
             ws2.page_setup.fitToWidth = True
             ws2.print_options.horizontalCentered = True
+            if 2 in CreatePZ.cat_H2S_list or 1 in CreatePZ.cat_H2S_list:
+                ws3 = wb2.create_sheet('Sheet1')
+                ws3.title = "Расчет необходимого количества поглотителя H2S"
+                ws3 = wb2["Расчет необходимого количества поглотителя H2S"]
+                calc_H2S(ws3, CreatePZ.H2S_pr, CreatePZ.H2S_mg)
+                ws3.sheet_visibility = 'hidden'
+                # ws3.page_setup.fitToPage = True
+                # ws3.page_setup.fitToHeight = True
+                # ws3.page_setup.fitToWidth = True
+                ws3.print_area = 'A1:A10'
+
+            else:
+                print(f'{CreatePZ.cat_H2S_list} Расчет поглотителя сероводорода не требуется')
             for row_ind, row in enumerate(ws2.iter_rows(values_only=True)):
+                if all(cell in [None, '']  for cell in row) and (30 <= row_ind <= 48 or 53 <= row_ind <= 100):
+                    ws2.row_dimensions[row_ind+1].hidden = True
                 for col, value in enumerate(row):
                     if 'Зуфаров' in str(value):
                         coordinate = f'{get_column_letter(col - 2)}{row_ind - 1}'
                         break
+
 
             self.insert_image(ws2, 'imageFiles/Зуфаров.png', coordinate)
             self.insert_image(ws2, 'imageFiles/Хасаншин.png', 'H1')
@@ -648,10 +665,10 @@ class MyWindow(QMainWindow):
         self.populate_row(self.ins_ind, swab_work_list)
 
     def ryberAdd(self):
-        from work_py.raiding import raidingColumn
+        from work_py.raiding import Raid
 
         print('Вставился райбер')
-        ryber_work_list = raidingColumn(self)
+        ryber_work_list = Raid.raidingColumn(self)
         self.populate_row(self.ins_ind, ryber_work_list)
 
     def gnkt_opz(self):
@@ -760,15 +777,15 @@ class MyWindow(QMainWindow):
         from open_pz import CreatePZ
         print(f' окно СКО ')
 
-        if self.acid_windowPaker is None:
+        if self.acid_windowPaker2 is None:
             CreatePZ.countAcid = 0
             print(f' окно2 СКО ')
-            self.acid_windowPaker = AcidPakerWindow(self.table_widget, CreatePZ.ins_ind, 0)
-            self.acid_windowPaker.setGeometry(200, 400, 300, 400)
-            self.acid_windowPaker.show()
+            self.acid_windowPaker2 = AcidPakerWindow(self.table_widget, CreatePZ.ins_ind, 0)
+            self.acid_windowPaker2.setGeometry(200, 400, 300, 400)
+            self.acid_windowPaker2.show()
             CreatePZ.pause_app(self)
             CreatePZ.pause = True
-            self.acid_windowPaker = None
+            self.acid_windowPaker2 = None
             self.reply2_acid()
 
     def acidPakerNewWindow(self):
@@ -784,6 +801,7 @@ class MyWindow(QMainWindow):
             self.acid_windowPaker.show()
             CreatePZ.pause_app(self)
             CreatePZ.pause = True
+            CreatePZ.countAcid = 0
             self.acid_windowPaker = None
             self.reply_acid()
 
@@ -797,23 +815,23 @@ class MyWindow(QMainWindow):
             if self.acid_windowPaker is None:
                 CreatePZ.countAcid = 1
                 print(f' окно2 СКО ')
-                self.acid_windowPaker = AcidPakerWindow(self.table_widget, CreatePZ.ins_ind, CreatePZ.countAcid)
-                self.acid_windowPaker.setGeometry(100, 400, 100, 400)
-                self.acid_windowPaker.show()
+                self.acid_windowPaker2 = AcidPakerWindow(self.table_widget, CreatePZ.ins_ind, CreatePZ.countAcid)
+                self.acid_windowPaker2.setGeometry(100, 400, 100, 400)
+                self.acid_windowPaker2.show()
                 CreatePZ.pause_app(self)
                 CreatePZ.pause = True
-                self.acid_windowPaker = None
+                self.acid_windowPaker2 = None
                 self.reply2_acid()
-            else:
-                if self.acid_windowPaker is None:
-                    CreatePZ.countAcid = 2
-                    print(f' окно2 СКО ')
-                    self.acid_windowPaker = AcidPakerWindow(self.table_widget, CreatePZ.ins_ind, CreatePZ.countAcid)
-                    self.acid_windowPaker.setGeometry(100, 400, 100, 400)
-                    self.acid_windowPaker.show()
-                    CreatePZ.pause_app(self)
-                    CreatePZ.pause = True
-                    self.acid_windowPaker = None
+        else:
+            if  self.acid_windowPaker2 is None:
+                CreatePZ.countAcid = 2
+                print(f' окно2 СКО ')
+                self.acid_windowPaker2 = AcidPakerWindow(self.table_widget, CreatePZ.ins_ind, CreatePZ.countAcid)
+                self.acid_windowPake2.setGeometry(100, 400, 100, 400)
+                self.acid_windowPaker2.show()
+                CreatePZ.pause_app(self)
+                CreatePZ.pause = True
+                self.acid_windowPaker2 = None
 
     def reply_acid(self):
         from open_pz import CreatePZ
@@ -841,7 +859,7 @@ class MyWindow(QMainWindow):
                 self.acid_windowPaker.show()
                 CreatePZ.pause_app(self)
                 CreatePZ.pause = True
-                self.acid_windowPaker2 = None
+                self.acid_windowPaker = None
 
     def GeophysicalNewWindow(self):
         from work_py.geophysic import GeophysicWindow

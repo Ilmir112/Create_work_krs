@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QMessageBox, QInputDialog
 from krs import volume_vn_ek, volume_vn_nkt, well_volume
 from work_py.acids_work import open_checkbox_dialog
 from work_py.drilling import drilling_nkt
-from work_py.raiding import raidingColumn
+from work_py.raiding import Raid
 from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm,well_volume_norm
 from work_py.sand_filling import sandFilling, sand_select, sandWashing
 
@@ -592,7 +592,7 @@ def rir_izvelPaker(self):
             rir_list.append()
         for row in drilling_nkt(self):
             rir_list.append(row)
-        for row in raidingColumn(self):
+        for row in Raid.raidingColumn(self):
             rir_list.append(row)
         for row in izvlech_paker(self):
             rir_list.append(row)

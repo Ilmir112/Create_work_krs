@@ -1,4 +1,6 @@
 from PyQt5.QtWidgets import QMessageBox
+
+from work_py.alone_oreration import privyazkaNKT
 from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm,well_volume_norm
 
 
@@ -155,6 +157,13 @@ def paker_list(self):
          f'объеме {round(paker_depth*1.12/1000,1)}м3 удельным весом {CreatePZ.fluid_work}',
          None, None, None, None, None, None, None,
          'мастер КРС',liftingNKT_norm(pakerDepthZumpf, 1.2)]
+
+    for plast in list(CreatePZ.dict_perforation.keys()):
+        for interval in CreatePZ.dict_perforation[plast]['интервал']:
+            if abs(float(interval[1] - float(paker_depth))) < 10 or abs(
+                    float(interval[0] - float(paker_depth))) < 10:
+                if privyazkaNKT(self)[0] not in paker_list:
+                    paker_list.insert(1, privyazkaNKT(self)[0])
 
     return paker_list
 

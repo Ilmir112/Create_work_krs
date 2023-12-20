@@ -2,25 +2,22 @@ from zipfile import ZipFile
 
 from PIL import Image
 import block_name
-
-import main
-from main import MyWindow
+import plan
 import krs
 
 from datetime import datetime, time
 from openpyxl import Workbook, load_workbook
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QInputDialog, QMessageBox, QDialog
+from openpyxl.drawing.image import Image
 
 from openpyxl.utils.cell import get_column_letter, range_boundaries
 from openpyxl.styles import Border, Side, PatternFill, Font, GradientFill, Alignment
 
 from cdng import events_gnvp, itog_1, events_gnvp_gnkt
-import plan
-from H2S import calc_H2S
 
 
-class CreatePZ(MyWindow):
+class CreatePZ:
     gipsInWell = False
     grpPlan = False
     nktOpressTrue = False
@@ -107,6 +104,7 @@ class CreatePZ(MyWindow):
     len_razdel_1 = 0
     cat_P_1 = []
     countAcid = 0
+    swabTypeComboIndex = 1
     swabTrueEditType = 1
     data_x_max = 0
     drilling_interval = []
@@ -138,9 +136,10 @@ class CreatePZ(MyWindow):
                          right=Side(style='thin'),
                          top=Side(style='thin'),
                          bottom=Side(style='thin'))
+    image_list =  []
 
     def __init__(self, dict_perforation_project, work_perforations_dict, ins_ind_border, wb, ws, parent=None):
-        super(MyWindow, self).__init__(parent)
+        super().__init__(parent)
         # self.lift_ecn_can_addition = lift_ecn_can_addition
         self.dict_perforation_project = dict_perforation_project
         self.work_perforations_dict = work_perforations_dict
@@ -148,9 +147,10 @@ class CreatePZ(MyWindow):
         self.wb = wb
         self.ws = ws
 
+
     def open_excel_file(self, fname, work_plan):
         from data_correct import DataWindow
-        # print(f'длина {len(fname)}, {fname}')
+
         global wb, ws
         wb = load_workbook(fname, data_only=True)
         name_list = wb.sheetnames
@@ -165,11 +165,10 @@ class CreatePZ(MyWindow):
         # zip = ZipFile(fname)
         # zip.extractall()
 
-        # for cell in ws:
-        #     if cell.has_image:
-        #         image_cell_coordinate = cell.coordinate
-        #         print(f'координаты изображениея {image_cell_coordinate}')
-        #         break
+        # Копирование изображения
+        for image in ws._images:
+            # Получение изображения и его координат
+            CreatePZ.image_list.append(image)
 
         for row_ind, row in enumerate(ws.iter_rows(values_only=True)):
             ws.row_dimensions[row_ind].hidden = False
@@ -528,9 +527,7 @@ class CreatePZ(MyWindow):
             grpPlan_quest = QMessageBox.question(self, 'Подготовка к ГРП', 'Программа определела что в скважине'
                                                                            f'планируется ГРП, верно ли?')
             if grpPlan_quest == QMessageBox.StandardButton.Yes:
-
                 CreatePZ.grpPlan = True
-
             else:
                 CreatePZ.grpPlan = False
         print(CreatePZ.dict_pump_ECN, CreatePZ.dict_pump_SHGN, CreatePZ.dict_pump_ECN_h, CreatePZ.H_F_paker_do)
@@ -542,7 +539,8 @@ class CreatePZ(MyWindow):
                 if 'нэк' in str(value).lower() or 'негерм' in value.lower() or 'нарушение э' in value.lower():
                     CreatePZ.leakiness_Count += 1
                     CreatePZ.leakiness = True
-                if 'авар' in value.lower() or 'не проход' in value.lower() or 'расхаж' in value.lower() or 'лар' in value:
+                if ('авар' in value.lower() or 'не проход' in value.lower() or 'расхаж' in value.lower() or 'лар' in value) \
+                    and 'акт о расследовании аварии прилагается' not in value:
                     CreatePZ.emergency_well = True
                     CreatePZ.emergency_count += 1
 
@@ -561,8 +559,6 @@ class CreatePZ(MyWindow):
                                                                               f'авария - {CreatePZ.emergency_count}, верно ли?')
             if emergency_quest == QMessageBox.StandardButton.Yes:
                 CreatePZ.emergency_well = True
-
-
             else:
                 CreatePZ.emergency_well = False
 
@@ -959,19 +955,6 @@ class CreatePZ(MyWindow):
         self.ins_ind_border = CreatePZ.ins_ind
         # wb.save(f"{CreatePZ.well_number}  1 {CreatePZ.well_area} {CreatePZ.cat_P_1}.xlsx")
 
-        if 2 in CreatePZ.cat_H2S_list or 1 in CreatePZ.cat_H2S_list:
-            ws3 = wb.create_sheet('Sheet1')
-            ws3.title = "Расчет необходимого количества поглотителя H2S"
-            ws3 = wb["Расчет необходимого количества поглотителя H2S"]
-            calc_H2S(ws3, CreatePZ.H2S_pr, CreatePZ.H2S_mg)
-            ws3.sheet_visibility = 'hidden'
-            # ws3.page_setup.fitToPage = True
-            # ws3.page_setup.fitToHeight = True
-            # ws3.page_setup.fitToWidth = True
-            ws3.print_area = 'A1:A10'
-
-        else:
-            print(f'{CreatePZ.cat_H2S_list} Расчет поглотителя сероводорода не требуется')
         try:
             for row_index, row in enumerate(ws.iter_rows()):
                 if row_index in [i for i in range(column_add_index + 4, index_bottomhole + 5)]:
@@ -1221,8 +1204,12 @@ class CreatePZ(MyWindow):
                         ws2.column_dimensions[get_column_letter(col_ind + 1)].width = colWidth[col_ind]
         ws2.column_dimensions[get_column_letter(11)].width = 20
         ws2.column_dimensions[get_column_letter(12)].width = 20
-        ws2.column_dimensions[get_column_letter(7)].width = 20
+        ws2.column_dimensions[get_column_letter(7)].width = 25
 
+
+        # Копирование изображения
+        for image in CreatePZ.image_list:
+            ws2.add_image(image)
         return 'Высота изменена'
 
         # ws2.unmerge_cells(start_column=2, start_row=self.ins_ind, end_column=12, end_row=self.ins_ind)

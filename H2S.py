@@ -209,6 +209,7 @@ def calv_h2s(self, cat_H2S, H2S_mg, H2S_pr):
         volume_well =  H2S.well_volume(self)
         # print(volume_well)
         # print(f'{volume_well} объем скважины')
+        print(CreatePZ.dict_nkt)
         nkt_1 = int(list(CreatePZ.dict_nkt.keys())[0])
 
         nkt_1_l = CreatePZ.dict_nkt[nkt_1]

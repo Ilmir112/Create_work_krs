@@ -103,6 +103,7 @@ class GeophysicWindow(MyWindow):
         return research
 
     def addRowTable(self):
+        from open_pz import CreatePZ
         editType = self.tabWidget.currentWidget().lineEditType.text()
         editType2 = self.tabWidget.currentWidget().lineEditType2.text()
         researchGis = self.geophysicalSelect(str(self.tabWidget.currentWidget().ComboBoxGeophygist.currentText()),
@@ -110,6 +111,9 @@ class GeophysicWindow(MyWindow):
         dopInformation = self.tabWidget.currentWidget().lineEditDopInformation.text()
         if not editType or not editType2 or not researchGis:
             msg = QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
+            return
+        if CreatePZ.current_bottom < float(editType2):
+            msg = QMessageBox.information(self, 'Внимание', 'глубина исследований ниже текущего забоя')
             return
 
         self.tableWidget.setSortingEnabled(False)
@@ -151,7 +155,7 @@ class GeophysicWindow(MyWindow):
                         value = item.text()
                         researchGis_list.append(value)
 
-            researchGis_list.extend([None, None, None, None, None, None, None, 'подр по ГИС', 4])
+            researchGis_list.extend([None, None, None, None, None, None, None, 'подряд по ГИС', 4])
             geophysicalResearch.append(researchGis_list)
 
         ori = QMessageBox.question(self, 'ОРИ', 'Нужна ли интерпретация?')
@@ -160,8 +164,7 @@ class GeophysicWindow(MyWindow):
                                         f'Интерпретация данных ГИС, согласовать с ПТО и Ведущим инженером ЦДНГ опрессовку фНКТ ',
                                         None, None, None, None, None, None, None,
                                         'Мастер КРС, подрядчик по ГИС', 8])
-        else:
-            pass
+
 
         text_width_dict = {20: (0, 100), 40: (101, 200), 60: (201, 300), 80: (301, 400), 100: (401, 500),
                            120: (501, 600), 140: (601, 700)}
@@ -185,8 +188,8 @@ class GeophysicWindow(MyWindow):
                             if value[0] <= len(text) <= value[1]:
                                 text_width = key
                                 self.table_widget.setRowHeight(row, int(text_width))
-                    else:
-                        self.table_widget.setItem(row, column, QtWidgets.QTableWidgetItem(str('')))
+                else:
+                    self.table_widget.setItem(row, column, QtWidgets.QTableWidgetItem(str('')))
 
         self.table_widget.setRowHeight(self.ins_ind, 60)
         self.table_widget.setRowHeight(self.ins_ind + 1, 60)
