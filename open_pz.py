@@ -1110,10 +1110,10 @@ class CreatePZ:
                         CreatePZ.perforation_sole = interval[1]
                     if CreatePZ.perforation_roof_all >= interval[0]:
                         CreatePZ.perforation_roof_all = interval[0]
-        # print(f'кровля -{CreatePZ.perforation_roof, CreatePZ.perforation_roof_all} '
-        #       f'подошва -{CreatePZ.perforation_sole}')
+        print(CreatePZ.dict_perforation[plast])
         CreatePZ.plast_all = list(CreatePZ.dict_perforation.keys())
         CreatePZ.plast_work = list(plast_work)
+        print(f' раб {CreatePZ.plast_work}')
         # print(f' работ {CreatePZ.plast_work}')
         # print(f' все пласты {CreatePZ.plast_all}')
 
@@ -1161,7 +1161,8 @@ class CreatePZ:
                                 or 'порядок работы' in str(cell.value).lower() \
                                 or 'ВСЕ ТЕХНОЛОГИЧЕСКИЕ ОПЕРАЦИИ' in str(cell.value).upper() \
                                 or 'за 48 часов до спуска' in str(cell.value).upper():
-                            cell.font = Font(name='Arial', size=13, bold=True)
+                            print('есть жирный')
+                            ws2.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=True)
                         if j != 1:
                             cell.border = CreatePZ.thin_border
                         if j == 11:

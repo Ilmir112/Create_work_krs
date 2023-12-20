@@ -189,9 +189,7 @@ class MyWindow(QMainWindow):
         print(CreatePZ.ins_ind)
         for i in range(2, len(work_list)):  # нумерация работ
             if i >= ins_ind+2:
-
                 work_list[i][1] = i - 1- ins_ind
-
                 if krs.is_number(work_list[i][11]) == True:
                     CreatePZ.normOfTime += float(work_list[i][11])
 
@@ -452,6 +450,11 @@ class MyWindow(QMainWindow):
         rir_menu.addAction(rirWithRpp_action)
         rirWithRpp_action.triggered.connect(self.rirWithRpp)
 
+        claySolision_action = QAction('Глинистый раствор в ЭК')
+        rir_menu.addAction(claySolision_action)
+        claySolision_action.triggered.connect(self.claySolision)
+
+
         gno_menu = action_menu.addAction('Спуск фондового оборудования')
         gno_menu.triggered.connect(self.gno_bottom)
 
@@ -553,6 +556,10 @@ class MyWindow(QMainWindow):
         rirRpp_work_list = rir_rpp(self)
         self.populate_row(self.ins_ind, rirRpp_work_list)
 
+    def claySolision(self):
+        from work_py.claySolution import claySolutionDef
+        rirRpp_work_list = claySolutionDef(self)
+        self.populate_row(self.ins_ind, rirRpp_work_list)
     def rirWithPaker(self):
         from work_py.rir import rir_paker
         rir_paker_work_list = rir_paker(self)
@@ -812,7 +819,7 @@ class MyWindow(QMainWindow):
         acid_true_quest = QMessageBox.question(self, 'Необходимость кислоты',
                                                'Нужно ли планировать кислоту на следующий объет?')
         if acid_true_quest == QMessageBox.StandardButton.Yes:
-            if self.acid_windowPaker is None:
+            if self.acid_windowPaker2 is None:
                 CreatePZ.countAcid = 1
                 print(f' окно2 СКО ')
                 self.acid_windowPaker2 = AcidPakerWindow(self.table_widget, CreatePZ.ins_ind, CreatePZ.countAcid)
@@ -827,7 +834,7 @@ class MyWindow(QMainWindow):
                 CreatePZ.countAcid = 2
                 print(f' окно2 СКО ')
                 self.acid_windowPaker2 = AcidPakerWindow(self.table_widget, CreatePZ.ins_ind, CreatePZ.countAcid)
-                self.acid_windowPake2.setGeometry(100, 400, 100, 400)
+                self.acid_windowPaker2.setGeometry(100, 400, 100, 400)
                 self.acid_windowPaker2.show()
                 CreatePZ.pause_app(self)
                 CreatePZ.pause = True

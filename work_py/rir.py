@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QMessageBox, QInputDialog
 
 from krs import volume_vn_ek, volume_vn_nkt, well_volume
 from work_py.acids_work import open_checkbox_dialog
+from work_py.alone_oreration import fluid_change
 from work_py.drilling import drilling_nkt
 from work_py.raiding import Raid
 from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm,well_volume_norm
@@ -14,7 +15,7 @@ def rir_rpp(self):
     rir_list = []
     open_checkbox_dialog()
 
-    plast = CreatePZ.plast_select
+
     rir_rpk_question = QMessageBox.question(self, 'посадку между пластами?', 'посадку между пластами?')
     if rir_rpk_question == QMessageBox.StandardButton.Yes:
         rir_rpk_plast_true = True
@@ -65,7 +66,7 @@ def rir_rpp(self):
     for row in rir_work_list:
         rir_list.append(row)
     CreatePZ.current_bottom = rpkDepth
-    perf_new(self, rpkDepth, rpkDepth)
+    perf_new(self, rpkDepth, CreatePZ.current_bottom)
     return rir_list
 
 
@@ -167,8 +168,9 @@ def rir_rpk(self):
       'Мастер КРС, подрядчик РИР, УСРСиСТ', liftingNKT_norm(rpkDepth,1)]]
     for row in rir_work_list:
         rir_list.append(row)
-    CreatePZ.current_bottom = rpkDepth
     perf_new(self, rpkDepth, CreatePZ.current_bottom)
+    CreatePZ.current_bottom = rpkDepth
+
     return rir_list
 
 def perf_new(self, roofRir, solePir):
@@ -188,14 +190,13 @@ def perf_new(self, roofRir, solePir):
     CreatePZ.definition_plast_work(self)
     if len(CreatePZ.dict_leakiness) != 0:
         for nek in list(CreatePZ.dict_leakiness['НЭК']['интервал'].keys()):
+            print(roofRir, float(nek.split('-')[0]), solePir)
             if roofRir <= float(nek.split('-')[0]) <= solePir:
-                CreatePZ.dict_leakiness['НЭК']['интервал'][nek] = True
+                CreatePZ.dict_leakiness['НЭК']['интервал'][nek]['отключение'] = True
+        print(f"при {CreatePZ.dict_leakiness['НЭК']['интервал'][nek]['отключение']}")
 
-    CreatePZ.plast_work = []
-    CreatePZ.plast_all = list(CreatePZ.dict_perforation.keys())
-    for plast in CreatePZ.plast_all:
-        if CreatePZ.dict_perforation[plast]['отключение'] == False:
-            CreatePZ.plast_work.append(plast)
+    print(CreatePZ.dict_leakiness)
+
     print(f' пласта рабоче {CreatePZ.plast_work}')
 
 
@@ -373,9 +374,9 @@ def rirWithPero(self):
         rir_list = []
         for row in uzmPero_list:
             rir_list.append(row)
-
+        perf_new(self, rirRoof, rirSole)
         CreatePZ.current_bottom = rirRoof
-        perf_new(self,rirRoof,rirSole)
+
         if len(CreatePZ.plast_work) != 0:
             rir_list.pop(-2)
 
@@ -442,11 +443,17 @@ def rirWithPero(self):
 
         for row in rirPero_list:
             rir_list.append(row)
-
+        perf_new(self, rirRoof, CreatePZ.current_bottom)
         CreatePZ.current_bottom = rirRoof
-        perf_new(self,rirRoof, CreatePZ.current_bottom)
+
         if len(CreatePZ.plast_work) != 0:
             rir_list.pop(-2)
+        else:
+            acid_true_quest = QMessageBox.question(self, 'Необходимость смены объема',
+                                                   'Нужно ли изменять удельный вес?')
+            if acid_true_quest == QMessageBox.StandardButton.Yes:
+                for row in fluid_change():
+                    rir_list.insert(-2, row)
 
     return rir_list
 
@@ -490,7 +497,7 @@ def rir_paker(self):
     rir_list.insert(-3, rir_q_list)
 
     rir_paker_list = [[None, None,
-      f'Произвести РИР  пласта {plast} c плановой кровлей на глубине {rirRoof}м по технологическому плану подрядчика по РИР силами подрядчика по РИР '
+      f'Произвести РИР {plast} c плановой кровлей на глубине {rirRoof}м по технологическому плану подрядчика по РИР силами подрядчика по РИР '
       f'Перед спуском технологического пакера произвести испытание гидроякоря в присутсвии представителя РИР или УСРСиСТ.',
       None, None, None, None, None, None, None,
       'Мастер КРС, подрядчик РИР, УСРСиСТ', 8],
@@ -516,8 +523,9 @@ def rir_paker(self):
        None, None, None, None, None, None, None,
        'Мастер КРС, подрядчик РИР, УСРСиСТ', liftingNKT_norm(rirRoof,1.2)]
         ]
-    CreatePZ.current_bottom = rirRoof
     perf_new(self, rirRoof, CreatePZ.current_bottom)
+    CreatePZ.current_bottom = rirRoof
+
     if len(CreatePZ.plast_work) != 0:
         rir_paker_list.pop(-2)
     for row in rir_paker_list:

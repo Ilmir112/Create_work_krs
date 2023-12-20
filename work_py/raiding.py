@@ -1,4 +1,6 @@
-from PyQt5.QtWidgets import QInputDialog
+from PyQt5.QtWidgets import QInputDialog, QMessageBox
+
+from work_py.alone_oreration import fluid_change
 from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
 from open_pz import CreatePZ
 class Raid(CreatePZ):
@@ -37,7 +39,9 @@ class Raid(CreatePZ):
         raiding_interval_tuple = raiding_interval()
         print(f' интервал райбирования {raiding_interval_tuple, len(raiding_interval_tuple)}')
         if len(raiding_interval_tuple) == 0:
-            raiding_interval_tuple, ok = QInputDialog.getText(self,'интервал райбирование', 'Введите интервал райбирования')
+            raiding_interval_tuple = ''
+            while raiding_interval_tuple != '':
+                raiding_interval_tuple, ok = QInputDialog.getText(self,'интервал райбирование', 'Введите интервал райбирования')
             raiding_interval_tuple = [raiding_interval_tuple.split('-')]
         if len(raiding_interval_tuple) != 0:
             krovly_raiding = int(raiding_interval_tuple[0][0])
@@ -84,7 +88,12 @@ class Raid(CreatePZ):
              'мастер КРС', liftingNKT_norm(CreatePZ.current_bottom,1.2)]]
 
         print(f' после отрайбирования {[CreatePZ.dict_perforation[plast]["отрайбировано"] for plast in CreatePZ.plast_work]}')
-
+        if len(CreatePZ.plast_work) == 0:
+            acid_true_quest = QMessageBox.question(self, 'Необходимость смены объема',
+                                                   'Нужно ли изменять удельный вес?')
+            if acid_true_quest == QMessageBox.StandardButton.Yes:
+                for row in fluid_change():
+                    ryber_list.insert(-2, row)
         return ryber_list
 
 

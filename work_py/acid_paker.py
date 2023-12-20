@@ -286,6 +286,7 @@ class AcidPakerWindow(MyWindow):
                           f'менее  {swab_volume}м3. \n ' \
                           f'Отобрать пробу на химический анализ воды на ОСТ-39 при последнем рейсе сваба (объем не менее 10литров).' \
                           f'Обязательная сдача в этот день в ЦДНГ'
+        print(paker_khost + paker_depth, paker_khost, paker_depth)
         paker_list = [
 
             [None, None, f'Посадить пакер на глубине {paker_depth}м, воронку на глубине {paker_khost + paker_depth}м'
@@ -626,7 +627,7 @@ class AcidPakerWindow(MyWindow):
 
     #
     def addRowTable(self):
-        from work_py.swabbing import swabbing_with_paker
+
         swabTrueEditType = self.tabWidget.currentWidget().swabTrueEditType.currentText()
         if swabTrueEditType  == 'Нужно освоение':
             CreatePZ.swabTrueEditType = 0
@@ -698,7 +699,7 @@ class AcidPakerWindow(MyWindow):
 
             if swabTrueEditType == 'Нужно освоение':
                 work_list = []
-                swabbing_with_paker = self.swabbing_with_paker(khvostEdit, swab_paker, swabType, swab_volume)
+                swabbing_with_paker = self.swabbing_with_paker(CreatePZ.khvostEdit, swab_paker, swabType, swab_volume)
                 for row in swabbing_with_paker:
                     work_list.append(row)
             else:

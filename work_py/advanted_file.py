@@ -28,7 +28,7 @@ def skm_interval():
                     str_raid.append([int(float(nek.split('-')[0])) - 90, int(float(nek.split('-')[1])) + 20])
                 else:
                     str_raid.append([int(float(nek.split('-')[0])) - 90,
-                                     CreatePZ.CreatePZ.current_bottom - 2])
+                                     CreatePZ.current_bottom - 2])
 
         for plast in CreatePZ.plast_all:
             intervalPvr = list(CreatePZ.dict_perforation[plast]['интервал'])
