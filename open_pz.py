@@ -1140,9 +1140,7 @@ class CreatePZ:
                         for key, value in text_width_dict.items():
                             if value[0] <= len(text) <= value[1]:
                                 ws2.row_dimensions[i + 1].height = int(key)
-        # for key, value in boundaries_dict.items():
-        #     ws2.unmerge_cells(start_column=value[0], start_row=value[1],
-        #                       end_column=value[2], end_row=value[3])
+
 
         for i in range(1, len(work_list) + 1):  # Добавлением работ
             # print(f'кол-ство строк рабочих{ins_ind, len(work_list), i - ins_ind, i}')
@@ -1177,8 +1175,6 @@ class CreatePZ:
                                                                          vertical='center')
                         ws2.cell(row=i, column=3).alignment = Alignment(wrap_text=True, horizontal='left',
                                                             vertical='center')
-
-
 
         for key, value in boundaries_dict.items():
             # print(value)

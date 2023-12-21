@@ -17,6 +17,12 @@ class TabPage_SO(QWidget):
         self.swabTrueEditType = QComboBox(self)
         self.swabTrueEditType.addItems(['Нужно освоение', 'без освоения'])
 
+        self.depthGaugeLabel = QLabel("глубинные манометры", self)
+        self.depthGaugeCombo = QComboBox(self)
+        self.depthGaugeCombo.addItems(['Нет', 'Да'])
+        self.depthGaugeCombo.setProperty("value", "Нет")
+
+
         self.swabTrueEditType.setProperty("value", "без освоения")
         self.swabTrueEditType.setCurrentIndex(int(CreatePZ.swabTrueEditType))
 
@@ -118,127 +124,44 @@ class TabPage_SO(QWidget):
 
 
         grid = QGridLayout(self)
-        if CreatePZ.countAcid == 0:
-            grid.addWidget(self.swabTruelabelType, 0, 0)
-            grid.addWidget(self.swabTrueEditType, 1, 0)
-            grid.addWidget(self.khovstLabel, 0, 3)
-            grid.addWidget(self.khvostEdit, 1, 3)
-            grid.addWidget(self.plastLabel, 0, 1)
-            grid.addWidget(self.plastCombo, 1, 1)
-            grid.addWidget(self.pakerLabel, 0, 2)
-            grid.addWidget(self.pakerEdit, 1, 2)
-            # grid.addWidget(self.privyazkaTrueLabelType, 0, 4)
-            # grid.addWidget(self.privyazkaTrueEdit, 1, 4)
 
-            grid.addWidget(self.skvTrueLabelType, 2, 0)
-            grid.addWidget(self.svkTrueEdit, 3, 0)
-            grid.addWidget(self.skvAcidLabelType, 2, 1)
-            grid.addWidget(self.skvAcidEdit, 3, 1)
-            grid.addWidget(self.skvVolumeLabel, 2, 2)
-            grid.addWidget(self.skvVolumeEdit, 3, 2)
-            grid.addWidget(self.skvProcLabel, 2, 3)
-            grid.addWidget(self.skvProcEdit, 3, 3)
+        grid.addWidget(self.swabTruelabelType, 0, 0)
+        grid.addWidget(self.swabTrueEditType, 1, 0)
+        grid.addWidget(self.khovstLabel, 0, 3)
+        grid.addWidget(self.khvostEdit, 1, 3)
+        grid.addWidget(self.plastLabel, 0, 1)
+        grid.addWidget(self.plastCombo, 1, 1)
+        grid.addWidget(self.pakerLabel, 0, 2)
+        grid.addWidget(self.pakerEdit, 1, 2)
+        # grid.addWidget(self.privyazkaTrueLabelType, 0, 4)
+        # grid.addWidget(self.privyazkaTrueEdit, 1, 4)
 
-            grid.addWidget(self.acidLabelType, 4, 1)
-            grid.addWidget(self.acidEdit, 5, 1)
-            grid.addWidget(self.acidVolumeLabel, 4, 2)
-            grid.addWidget(self.acidVolumeEdit, 5, 2)
-            grid.addWidget(self.acidProcLabel, 4, 3)
-            grid.addWidget(self.acidProcEdit, 5, 3)
-            grid.addWidget(self.acidOilProcLabel, 4, 4)
-            grid.addWidget(self.acidOilProcEdit, 5, 4)
-            grid.addWidget(self.QplastLabelType, 4, 0)
-            grid.addWidget(self.QplastEdit, 5, 0)
-            grid.addWidget(self.swabTypeLabel, 6, 1)
-            grid.addWidget(self.swabTypeCombo, 7, 1)
-            grid.addWidget(self.swab_pakerLabel, 6, 2)
-            grid.addWidget(self.swab_pakerEdit, 7, 2)
-            grid.addWidget(self.swab_volumeLabel, 6, 3)
-            grid.addWidget(self.swab_volumeEdit, 7, 3)
+        grid.addWidget(self.skvTrueLabelType, 2, 0)
+        grid.addWidget(self.svkTrueEdit, 3, 0)
+        grid.addWidget(self.skvAcidLabelType, 2, 1)
+        grid.addWidget(self.skvAcidEdit, 3, 1)
+        grid.addWidget(self.skvVolumeLabel, 2, 2)
+        grid.addWidget(self.skvVolumeEdit, 3, 2)
+        grid.addWidget(self.skvProcLabel, 2, 3)
+        grid.addWidget(self.skvProcEdit, 3, 3)
 
-        elif CreatePZ.countAcid == 1:
-
-            grid.addWidget(self.swabTruelabelType, 0, 0)
-            grid.addWidget(self.swabTrueEditType, 1, 0)
-
-            grid.addWidget(self.khovstLabel, 0, 3)
-            grid.addWidget(self.khvostEdit, 1, 3)
-            grid.addWidget(self.plastLabel, 0, 1)
-            grid.addWidget(self.plastCombo, 1, 1)
-            grid.addWidget(self.pakerLabel, 0, 2)
-            grid.addWidget(self.pakerEdit, 1, 2)
-            # grid.addWidget(self.privyazkaTrueLabelType, 0, 4)
-            # grid.addWidget(self.privyazkaTrueEdit, 1, 4)
-
-            grid.addWidget(self.skvTrueLabelType, 2, 0)
-            grid.addWidget(self.svkTrueEdit, 3, 0)
-            grid.addWidget(self.skvAcidLabelType, 2, 1)
-            grid.addWidget(self.skvAcidEdit, 3, 1)
-            grid.addWidget(self.skvVolumeLabel, 2, 2)
-            grid.addWidget(self.skvVolumeEdit, 3, 2)
-            grid.addWidget(self.skvProcLabel, 2, 3)
-            grid.addWidget(self.skvProcEdit, 3, 3)
-
-            grid.addWidget(self.acidLabelType, 4, 1)
-            grid.addWidget(self.acidEdit, 5, 1)
-            grid.addWidget(self.acidVolumeLabel, 4, 2)
-            grid.addWidget(self.acidVolumeEdit, 5, 2)
-            grid.addWidget(self.acidProcLabel, 4, 3)
-            grid.addWidget(self.acidProcEdit, 5, 3)
-            grid.addWidget(self.acidOilProcLabel, 4, 4)
-            grid.addWidget(self.acidOilProcEdit, 5, 4)
-            grid.addWidget(self.QplastLabelType, 6, 0)
-            grid.addWidget(self.QplastEdit, 7, 0)
-            grid.addWidget(self.swabTypeLabel, 6, 1)
-            grid.addWidget(self.swabTypeCombo, 7, 1)
-            grid.addWidget(self.swab_pakerLabel, 6, 2)
-            grid.addWidget(self.swab_pakerEdit, 7, 2)
-            grid.addWidget(self.swab_volumeLabel, 6, 3)
-            grid.addWidget(self.swab_volumeEdit, 7, 3)
-
-        elif CreatePZ.countAcid == 2:
-            grid.addWidget(self.swabTruelabelType, 0, 0)
-            grid.addWidget(self.swabTrueEditType, 1, 0)
-
-            grid.addWidget(self.khovstLabel, 0, 3)
-            grid.addWidget(self.khvostEdit, 1, 3)
-            grid.addWidget(self.plastLabel, 0, 1)
-            grid.addWidget(self.plastCombo, 1, 1)
-            grid.addWidget(self.pakerLabel, 0, 2)
-            grid.addWidget(self.pakerEdit, 1, 2)
-            # grid.addWidget(self.privyazkaTrueLabelType, 0, 4)
-            # grid.addWidget(self.privyazkaTrueEdit, 1, 4)
-
-            grid.addWidget(self.skvTrueLabelType, 2, 0)
-            grid.addWidget(self.svkTrueEdit, 3, 0)
-            grid.addWidget(self.skvAcidLabelType, 2, 1)
-            grid.addWidget(self.skvAcidEdit, 3, 1)
-            grid.addWidget(self.skvVolumeLabel, 2, 2)
-            grid.addWidget(self.skvVolumeEdit, 3, 2)
-            grid.addWidget(self.skvProcLabel, 2, 3)
-            grid.addWidget(self.skvProcEdit, 3, 3)
-
-            grid.addWidget(self.acidLabelType, 4, 1)
-            grid.addWidget(self.acidEdit, 5, 1)
-            grid.addWidget(self.acidVolumeLabel, 4, 2)
-            grid.addWidget(self.acidVolumeEdit, 5, 2)
-            grid.addWidget(self.acidProcLabel, 4, 3)
-            grid.addWidget(self.acidProcEdit, 5, 3)
-            grid.addWidget(self.acidOilProcLabel, 4, 4)
-            grid.addWidget(self.acidOilProcEdit, 5, 4)
-            grid.addWidget(self.QplastLabelType, 6, 0)
-            grid.addWidget(self.QplastEdit, 7, 0)
-            grid.addWidget(self.swabTypeLabel, 6, 1)
-            grid.addWidget(self.swabTypeCombo, 7, 1)
-            grid.addWidget(self.swab_pakerLabel, 6, 2)
-            grid.addWidget(self.swab_pakerEdit, 7, 2)
-            grid.addWidget(self.swab_volumeLabel, 6, 3)
-            grid.addWidget(self.swab_volumeEdit, 7, 3)
-
-            grid.addWidget(self.pakerLabel, 0, 2)
-            grid.addWidget(self.pakerEdit, 1, 2)
-            # grid.addWidget(self.privyazkaTrueLabelType, 0, 4)
-            # grid.addWidget(self.privyazkaTrueEdit, 1, 4)
+        grid.addWidget(self.acidLabelType, 4, 1)
+        grid.addWidget(self.acidEdit, 5, 1)
+        grid.addWidget(self.acidVolumeLabel, 4, 2)
+        grid.addWidget(self.acidVolumeEdit, 5, 2)
+        grid.addWidget(self.acidProcLabel, 4, 3)
+        grid.addWidget(self.acidProcEdit, 5, 3)
+        grid.addWidget(self.acidOilProcLabel, 4, 4)
+        grid.addWidget(self.acidOilProcEdit, 5, 4)
+        grid.addWidget(self.QplastLabelType, 4, 0)
+        grid.addWidget(self.QplastEdit, 5, 0)
+        grid.addWidget(self.swabTypeLabel, 6, 1)
+        grid.addWidget(self.swabTypeCombo, 7, 1)
+        grid.addWidget(self.swab_pakerLabel, 6, 2)
+        grid.addWidget(self.swab_pakerEdit, 7, 2)
+        grid.addWidget(self.swab_volumeLabel, 6, 3)
+        grid.addWidget(self.swab_volumeEdit, 7, 3)
+        grid.addWidget(self.depthGaugeCombo, 7, 4)
 
 
 class TabWidget(QTabWidget):
@@ -356,11 +279,15 @@ class AcidPakerWindow(MyWindow):
              'мастер КРС', ovtr4])
 
         return paker_list
-    def acidSelect(self, swabTrueEditType, khvostEdit, pakerEdit):
+    def acidSelect(self, swabTrueEditType, khvostEdit, pakerEdit, depthGaugeEdit):
         from work_py.opressovka import paker_diametr_select
         from work_py.alone_oreration import privyazkaNKT
         print(f' при {swabTrueEditType}')
         swabTrueEditType = True if swabTrueEditType == 'Нужно освоение' else False
+        if depthGaugeEdit == 'Да' and CreatePZ.column_additional == False:
+            self.paker_select = f'воронку + контейнер с манометром МТГ + НКТ{CreatePZ.nkt_diam}мм {khvostEdit}м + пакер ПРО-ЯМО-{paker_diametr_select(pakerEdit)}мм (либо аналог) ' \
+                                f'для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм + НКТ{CreatePZ.nkt_diam} 10м + контейнер манометром МТГ-25 +репер'
+            self.dict_nkt = {73: float(khvostEdit) + float(pakerEdit)}
 
         if (CreatePZ.column_additional == False and swabTrueEditType == True) or (CreatePZ.column_additional == True \
                                                                                   and pakerEdit < CreatePZ.head_column_additional and swabTrueEditType == True):
@@ -437,6 +364,11 @@ class AcidPakerWindow(MyWindow):
                         float(interval[0] - float(CreatePZ.H_F_paker_do["posle"]))) < 10:
                     if privyazkaNKT(self)[0] not in paker_list:
                         paker_list.insert(1, privyazkaNKT(self)[0])
+        if depthGaugeEdit == 'Да':
+            paker_list.insert(0, [None, None,
+                                  f'Заявить 3 глубинных манометра подрядчику по ГИС',
+                                  None, None, None, None, None, None, None,
+                                  'мастер КРС', None])
         return paker_list
 
 
@@ -649,13 +581,14 @@ class AcidPakerWindow(MyWindow):
         svkTrueEdit = str(self.tabWidget.currentWidget().svkTrueEdit.currentText())
         skvAcidEdit = str(self.tabWidget.currentWidget().skvAcidEdit.currentText())
         QplastEdit = str(self.tabWidget.currentWidget().QplastEdit.currentText())
-
+        depthGaugeEdit = str(self.tabWidget.currentWidget().depthGaugeCombo.currentText())
         # privyazka = str(self.tabWidget.currentWidget().privyazka.currentText())
         if self.countAcid == 0:
             CreatePZ.khvostEdit = khvostEdit
             CreatePZ.pakerEdit = pakerEdit
             print(f'нужно ли освоение {swabTrueEditType}')
-            work_list = self.acidSelect(swabTrueEditType, pakerEdit = pakerEdit, khvostEdit = khvostEdit)
+            work_list = self.acidSelect(swabTrueEditType, pakerEdit, khvostEdit, depthGaugeEdit)
+            CreatePZ.depthGaugeEdit = depthGaugeEdit
 
             for row in self.acid_work(swabTrueEditType, acidProcEdit, khvostEdit, pakerEdit, skvAcidEdit, acidEdit,
                                       skvVolumeEdit,
@@ -674,7 +607,7 @@ class AcidPakerWindow(MyWindow):
         elif self.countAcid == 1:
 
 
-            self.acidSelect(CreatePZ.swabTrueEditType, CreatePZ.pakerEdit, CreatePZ.khvostEdit)
+            self.acidSelect(CreatePZ.swabTrueEditType, CreatePZ.pakerEdit, CreatePZ.khvostEdit, CreatePZ.depthGaugeEdit)
             work_list = [
                 [None, None, f'установить пакер на глубине {pakerEdit}м', None, None, None, None, None, None, None,
                  'мастер КРС', 1.2]]
@@ -702,6 +635,11 @@ class AcidPakerWindow(MyWindow):
                 swabbing_with_paker = self.swabbing_with_paker(CreatePZ.khvostEdit, swab_paker, swabType, swab_volume)
                 for row in swabbing_with_paker:
                     work_list.append(row)
+                if CreatePZ.depthGaugeEdit == 'Да':
+                    work_list.append([None, None,
+                                      f'Подать заявку на вывоз глубинных манометров',
+                                      None, None, None, None, None, None, None,
+                                      'мастер КРС', None])
             else:
                 work_list = [[None, None,
                               f'Поднять компоновку на НКТ с доливом скважины в '

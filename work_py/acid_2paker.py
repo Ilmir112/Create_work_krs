@@ -632,6 +632,11 @@ class AcidPakerWindow(MyWindow):
 
                 for row in swabbing_with_paker:
                     work_list.append(row)
+                if CreatePZ.depthGaugeEdit == 'Да':
+                    work_list.append([None, None,
+                                      f'Подать заявку на вывоз глубинных манометров',
+                                      None, None, None, None, None, None, None,
+                                      'мастер КРС', None])
             else:
                 work_list = [[None, None,
                               f'Поднять компоновку на НКТ с доливом скважины в '
@@ -639,11 +644,7 @@ class AcidPakerWindow(MyWindow):
                               None, None, None, None, None, None, None,
                               'мастер КРС',
                               liftingNKT_norm(pakerEdit, 1.2)]]
-                if CreatePZ.depthGaugeEdit == 'Да':
-                    work_list.append([None, None,
-             f'Подать заявку на вывоз глубинных манометров',
-             None, None, None, None, None, None, None,
-             'мастер КРС', None])
+
 
             self.populate_row(CreatePZ.ins_ind, work_list)
             print(f' индекс строк {CreatePZ.ins_ind}')

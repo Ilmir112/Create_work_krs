@@ -1,7 +1,8 @@
-from PyQt5.QtWidgets import QInputDialog
+from PyQt5.QtWidgets import QInputDialog, QMessageBox
 
 from krs import volume_vn_ek, volume_vn_nkt
 from work_py.rationingKRS import descentNKT_norm
+from work_py.rir import rirWithPero
 
 
 def claySolutionDef(self):
@@ -15,7 +16,7 @@ def claySolutionDef(self):
                                       int(CreatePZ.current_bottom), 0, int(CreatePZ.bottomhole_drill))
     rirRoof, ok = QInputDialog.getInt(None, 'Кровля глинистого раствора',
                                       'Введите глубину глинистого раствора',
-                                      int(CreatePZ.perforation_roof-50), 0, int(CreatePZ.bottomhole_drill))
+                                      int(CreatePZ.perforation_sole +20), 0, int(CreatePZ.bottomhole_drill))
     if CreatePZ.column_additional == True and CreatePZ.column_additional_diametr <110:
         dict_nkt = {73: CreatePZ.head_column_additional, 60: CreatePZ.head_column_additional-rirSole}
     else:
@@ -32,17 +33,26 @@ def claySolutionDef(self):
          None, None, None, None, None, None, None,
          'мастер КРС',descentNKT_norm(rirSole, 1)],
         [None, None,
-         f'Произвести закачку глинистого раствора с добавлением ингибитора коррозии {volume_cement*11}гр с удельной дозировкой 11гр/м3 '
+         f'Произвести закачку глинистого раствора с добавлением ингибитора коррозии {round(volume_cement*11,1)}гр с удельной дозировкой 11гр/м3 '
          f'удельным весом не менее 1,24г/см3 в интервале {rirSole}-{rirRoof}м.\n'
          f'- Приготовить и закачать в глинистый раствор уд.весом не менее 1,24г/см3 в объеме {volume_cement}м3 ({round(volume_cement*0.45,2)}т'
          f' сухого порошка).\n'
          f'-Продавить тех жидкостью  в объеме {volume_vn_nkt(dict_nkt)}м3.',
          None, None, None, None, None, None, None,
-         'мастер КРС', 2.5],
-        [None, None,
-         f'Поднять перо на тНКТ{nkt_diam}мм с глубины {rirSole}м с доливом скважины в объеме 2,2м3 тех. жидкостью '
+         'мастер КРС', 2.5]]
+    CreatePZ.current_bottom = rirRoof
+    rirPlan_quest = QMessageBox.question(self, 'Планировать ли РИР', 'Нужно ставить "висящий" мост в колонне')
+    if rirPlan_quest  == QMessageBox.StandardButton.No:
+        pero_list.append([None, None,
+         f'Поднять перо на тНКТ{nkt_diam}мм с глубины {rirSole}м с доливом скважины в объеме 1.1м3 тех. жидкостью '
          f'уд.весом {CreatePZ.fluid_work}',
          None, None, None, None, None, None, None,
-         'мастер КРС', descentNKT_norm(rirRoof, 1)],
-    ]
+         'мастер КРС', descentNKT_norm(rirRoof, 1)])
+    else:
+        pero_list.append([None, None,
+                          f'Поднять перо на тНКТ{nkt_diam}мм до глубины {rirRoof}м с доливом скважины в объеме 0.3м3 тех. жидкостью '
+                          f'уд.весом {CreatePZ.fluid_work}',
+                          None, None, None, None, None, None, None,
+                          'мастер КРС', descentNKT_norm(float(rirSole)-float(rirRoof), 1)])
+        pero_list.extend(rirWithPero(self)[-10:])
     return pero_list

@@ -38,8 +38,7 @@ class Raid(CreatePZ):
                            f'НКТ{nkt_pod} {CreatePZ.current_bottom - CreatePZ.head_column_additional}м'
         raiding_interval_tuple = raiding_interval()
         print(f' интервал райбирования {raiding_interval_tuple, len(raiding_interval_tuple)}')
-        if len(raiding_interval_tuple) == 0:
-            raiding_interval_tuple = ''
+        if raiding_interval_tuple == '':
             while raiding_interval_tuple != '':
                 raiding_interval_tuple, ok = QInputDialog.getText(self,'интервал райбирование', 'Введите интервал райбирования')
             raiding_interval_tuple = [raiding_interval_tuple.split('-')]

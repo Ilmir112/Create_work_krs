@@ -87,14 +87,13 @@ def raiding_interval():
                 crt = []
                 if CreatePZ.dict_perforation[plast]['отрайбировано'] == False:
                     for i in CreatePZ.dict_perforation[plast]['интервал']:
-                        if float(i[1]) + 30 <= CreatePZ.current_bottom:
-                            crt = [float(i[0]) - 30, float(i[1]) + 30]
-                        else:
-                            crt = [float(i[0]) - 30, CreatePZ.current_bottom]
+                        if float(i[1]) <= CreatePZ.current_bottom:
+                            if float(i[1]) + 20 <= CreatePZ.current_bottom:
+                                crt = [float(i[0]) - 20, float(i[1]) + 20]
+                            else:
+                                crt = [float(i[0]) - 20, CreatePZ.current_bottom]
+                            str_raid.append(crt)
 
-                    if float(i[1]) < CreatePZ.current_bottom:
-                        str_raid.append(crt)
-                    # print(CreatePZ.dict_work_perforations.keys())
 
 
     if len(CreatePZ.drilling_interval) != 0:
@@ -115,10 +114,8 @@ def raiding_interval():
             str_raid.append([roof_leakiness - 30, CreatePZ.current_bottom])
 
         for nek in CreatePZ.dict_leakiness['НЭК']['интервал'].keys():
-            # print(CreatePZ.dict_leakiness['НЭК']['интервал'][nek]['отрайбировано'])
             if CreatePZ.dict_leakiness['НЭК']['интервал'][nek]['отрайбировано'] == False:
                 i = nek.split('-')
-                print(float(i[0])-30)
 
                 if float(i[1]) + 30 <= CreatePZ.current_bottom:
                     crt = (float(i[0]) - 30, float(i[1]) + 30)
@@ -153,8 +150,8 @@ def merge_overlapping_intervals(intervals):
 
 def raid(a):
     from open_pz import CreatePZ
-    print(a, len(a))
-    if len(a) < 2:
+
+    if len(a) == 1:
         return f'{int(float(a[0][0]))} - {int(float(a[0][1]))}'
     if len(a) == 0:
         return 'разбуренного цем моста'

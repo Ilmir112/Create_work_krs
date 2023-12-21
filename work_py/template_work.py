@@ -92,7 +92,6 @@ def template_diam_additional_ek(): # Выбор диаметра шаблоно�
         if diam_internal[0] <= diam_internal_ek_addition <= diam_internal[1]:
             # print(diam_internal[0] <= diam_internal_ek_addition <= diam_internal[1], diam_internal[0],diam_internal_ek_addition,diam_internal[1])
             template_first_diam = diam
-
     return (template_first_diam, template_second_diam)
 
 def template_ek_without_skm(self):
@@ -357,7 +356,7 @@ def template_ek(self):
         CreatePZ.template_depth = math.ceil(CreatePZ.perforation_roof - 18)
         template_str = template_SKM_DP_open
         ckm_teml = ckm_teml_SKM_DP_open
-        template_key = 'ПСШ ДП без хвоста'
+        template_key = 'ПСШ ДП открытый ствол'
     elif CreatePZ.column_additional == True and all([CreatePZ.dict_perforation[plast]['отрайбировано'] for plast in CreatePZ.plast_work]) == True:
         CreatePZ.template_depth = math.ceil(CreatePZ.current_bottom - 10)
         template_str = template_SKM_DP_without
