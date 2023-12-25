@@ -281,11 +281,11 @@ def template_ek(self):
     # print(f'отрайбировани {[CreatePZ.dict_perforation[plast]["отрайбировано"] for plast in CreatePZ.plast_work]}')
     CreatePZ.nkt_diam = ''.join(['73' if CreatePZ.column_diametr >110 else '60'])
     length_template_addition = int(''.join(['30' if CreatePZ.lift_ecn_can_addition == True else '2']))
-
+    print(f' кровля перфорации {CreatePZ.perforation_roof}')
     template_SKM_EK = f'перо + шаблон-{first_template}мм L-2м + НКТ{CreatePZ.nkt_diam}мм {int(CreatePZ.current_bottom - CreatePZ.perforation_roof + 8)}м ' \
                       f'+ СКМ-{int(CreatePZ.column_diametr)} +10м НКТ{CreatePZ.nkt_diam}мм + шаблон-{second_template}мм L-{liftEcn}м '
     ckm_teml_SKM_EK = f'(СКМ-{int(CreatePZ.column_diametr)} до Н={int(roof_skm)}м,' \
-                      f'шаблон-{second_template}мм до гл.{int(CreatePZ.perforation_roof - 20)}м)'
+                      f'шаблон-{second_template}мм до гл.{int(roof_skm - 10)}м)'
     template_SKM_EK_open = f'фильтр-направление L-2м + НКТ{CreatePZ.nkt_diam}мм {int(CreatePZ.current_bottom) - CreatePZ.perforation_roof + 8}м' \
                            f'+ СКМ-{int(CreatePZ.column_diametr)} +10м ' \
                            f'НКТ{CreatePZ.nkt_diam}мм + шаблон-{second_template}мм L-{liftEcn}м '
@@ -344,7 +344,7 @@ def template_ek(self):
         CreatePZ.template_depth = math.ceil(CreatePZ.current_bottom - 20)
         template_str = template_SKM_DP_EK
         ckm_teml = ckm_teml_SKM_DP_EK
-        template_key = 'ПСШ СКМ в ЭК'
+        template_key = 'ПСШ ДП СКМ в ЭК'
     elif CreatePZ.column_additional == True and CreatePZ.open_trunk_well == False and all([CreatePZ.dict_perforation[plast]['отрайбировано'] for plast in CreatePZ.plast_work]) == False:
 
         CreatePZ.template_depth = math.ceil(CreatePZ.perforation_roof - 18)
@@ -366,16 +366,26 @@ def template_ek(self):
     template_sel = ['ПСШ ЭК', 'ПСШ открытый ствол', 'ПСШ без хвоста', 'ПСШ СКМ в ЭК', 'ПСШ ДП', 'ПСШ ДП без хвоста', 'ПСШ ДП открытый ствол']
     template_dict = {
         'ПСШ ЭК': template_SKM_EK, 'ПСШ открытый ствол': template_SKM_EK_open, 'ПСШ без хвоста': template_SKM_EK_without,
-                    'ПСШ СКМ в ЭК': template_SKM_DP_EK, 'ПСШ ДП': template_SKM_DP, 'ПСШ ДП без хвоста': template_SKM_DP_without,
+                    'ПСШ ДП СКМ в ЭК': template_SKM_DP_EK, 'ПСШ ДП': template_SKM_DP, 'ПСШ ДП без хвоста': template_SKM_DP_without,
         'ПСШ ДП открытый ствол': template_SKM_DP_open
+    }
+    SKM_dict = {
+        'ПСШ ЭК': ckm_teml_SKM_EK,
+        'ПСШ открытый ствол': ckm_teml_SKM_EK_open,
+        'ПСШ без хвоста': ckm_teml_SKM_EK_without,
+        'ПСШ ДП СКМ в ЭК': ckm_teml_SKM_DP_EK,
+        'ПСШ ДП': ckm_teml_SKM_DP,
+        'ПСШ ДП без хвоста': ckm_teml_SKM_DP_without,
+        'ПСШ ДП открытый ствол': ckm_teml_SKM_DP_open
     }
     template, ok = QInputDialog.getItem(self, 'Спуcкаемое  оборудование', 'выбор спуcкаемого оборудования',
                                     template_sel, template_sel.index(template_key), False)
 
     if ok and template_sel:
         self.le.setText(template)
-    template_str = template_dict[template]
 
+    template_str = template_dict[template]
+    ckm_teml = SKM_dict[template]
     list_template_ek = [
         [None, None, f'Спустить  {template_str} на 'f'НКТ{CreatePZ.nkt_diam}мм {ckm_teml} с замером, шаблонированием НКТ. \n'
                      f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
@@ -383,7 +393,7 @@ def template_ek(self):
          'мастер КРС', descentNKT_norm(CreatePZ.current_bottom,1.2)],
         [None, None, f'Произвести скреперование э/к в интервале  {skm_interval}м  обратной промывкой и проработкой 5 раз каждого '
                      'наращивания. Работы производить согласно сборника технологических регламентов и инструкций в присутствии '
-                     f'представителя Заказчика. Допустить низ НКТ до гл. {CreatePZ.current_bottom}м, шаблон-{second_template}мм '
+                     f'представителя Заказчика. Допустить низ НКТ до гл. {CreatePZ.current_bottom}м, шаблон '
                      f'до глубины {CreatePZ.template_depth}м. Составить акт. \n'
                      '(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ). ',
          None, None, None, None, None, None, None,

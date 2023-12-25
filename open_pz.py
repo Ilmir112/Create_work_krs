@@ -1,5 +1,6 @@
 from zipfile import ZipFile
 
+import openpyxl
 from PIL import Image
 import block_name
 import plan
@@ -10,8 +11,11 @@ from openpyxl import Workbook, load_workbook
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QInputDialog, QMessageBox, QDialog
 from openpyxl.drawing.image import Image
+from openpyxl.drawing.spreadsheet_drawing import AbsoluteAnchor
+from openpyxl.drawing.xdr import XDRPoint2D, XDRPositiveSize2D
+from openpyxl.utils.units import pixels_to_EMU, cm_to_EMU
 
-from openpyxl.utils.cell import get_column_letter, range_boundaries
+from openpyxl.utils.cell import get_column_letter
 from openpyxl.styles import Border, Side, PatternFill, Font, GradientFill, Alignment
 
 from cdng import events_gnvp, itog_1, events_gnvp_gnkt
@@ -136,7 +140,7 @@ class CreatePZ:
                          right=Side(style='thin'),
                          top=Side(style='thin'),
                          bottom=Side(style='thin'))
-    image_list =  []
+    image_list = []
 
     def __init__(self, dict_perforation_project, work_perforations_dict, ins_ind_border, wb, ws, parent=None):
         super().__init__(parent)
@@ -166,9 +170,25 @@ class CreatePZ:
         # zip.extractall()
 
         # Копирование изображения
-        for image in ws._images:
-            # Получение изображения и его координат
-            CreatePZ.image_list.append(image)
+        # drawings = ws.drawings
+        for img in ws._images:
+        #     # Получение изображения и его координат
+        #     # print(img.anchor)
+        #     p2e = pixels_to_EMU
+        #     h, w = img.height, img.width
+        #
+        #
+        #
+        #     # position = XDRPoint2D(p2e(), p2e())
+        #     print(img.anchor)
+        #     # print(f'size image {img.height} w-{img.width} ')
+        #     # size = XDRPositiveSize2D(p2e(w*3), p2e(h))
+        #     # img.anchor = AbsoluteAnchor(pos = position, ext = size)
+        #
+        #     # img.width = 200
+        #     # img.height = 180
+        #
+            CreatePZ.image_list.append(img)
 
         for row_ind, row in enumerate(ws.iter_rows(values_only=True)):
             ws.row_dimensions[row_ind].hidden = False
@@ -372,7 +392,7 @@ class CreatePZ:
                                                                                                        ',толщина стенки доп колонны',
                                                                                                        'введите толщину стенки доп колонны',
                                                                                                        6.5, 3, 11, 1)
-                        if CreatePZ.column_additional_diametr >= 170:
+                        if float(CreatePZ.column_additional_diametr) >= 170:
                             CreatePZ.column_additional_diametr, ok = QInputDialog.getDouble(self,
                                                                                             ',диаметр доп колонны',
                                                                                             'введите внешний диаметр доп колонны',
@@ -741,7 +761,7 @@ class CreatePZ:
                 if CreatePZ.if_None(key) != 'отсут' and row < CreatePZ.b_plan:
 
                     CreatePZ.dict_sucker_rod[key] = CreatePZ.dict_sucker_rod.get(key, 0) + int(
-                        CreatePZ.without_b(value))
+                        CreatePZ.without_b(value+1))
                 elif CreatePZ.if_None(key) != 'отсут' and row >= CreatePZ.b_plan:
                     CreatePZ.dict_sucker_rod_po[key] = CreatePZ.dict_sucker_rod_po.get(key, 0) + int(
                         CreatePZ.without_b(value))
@@ -796,10 +816,11 @@ class CreatePZ:
 
                 CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('вскрытие', set()).add(row[4])
                 # print(f'отключе {isinstance(row[5], datetime) == True, old_index} ggg {isinstance(row[6], datetime) == True, CreatePZ.old_version, old_index}')
-                if row[5] is not None:
-                    CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('отключение', True)
-                else:
+                if row[5] is None or row[5] is '-':
+                    print(f'отключение {plast, row[5], row[5] != "-"}')
                     CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('отключение', False)
+                else:
+                    CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('отключение', True)
 
                 CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('отв', set()).add(row[6])
                 CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('заряд', set()).add(row[7])
@@ -824,10 +845,10 @@ class CreatePZ:
                     row[8])
                 self.dict_perforation_project.setdefault(plast, {}).setdefault('давление', set()).add(
                     row[9])
-
                 CreatePZ.dict_perforation_project.setdefault(plast, {}).setdefault('рабочая жидкость', set()).add(
                     krs.calculationFluidWork(row[1], row[9]))
-        # print(CreatePZ.dict_perforation)
+            # print(f'проект{CreatePZ.dict_perforation_project[plast]}')
+        print(f'раб{CreatePZ.dict_perforation}')
         CreatePZ.definition_plast_work(self)
         CreatePZ.dict_perforation_project = self.dict_perforation_project
         if len(CreatePZ.dict_perforation_project) != 0:
@@ -1018,7 +1039,7 @@ class CreatePZ:
     def insert_gnvp(ws, work_plan, ins_gnvp):
         rowHeights_gnvp = [30, 115.0, 155.5, 110.25, 36.0, 52.25, 36.25, 36.0, 45.25, 36.25, 165.75, 38.5, 30.25,
                            30.5,
-                           18.0, 36, 281.75, 115.75, 65.0, 55.75, 33.0, 33.0, 30.25, 47.0, 57.25, 45.75, 30.75, 350.25,
+                           18.0, 36, 281.75, 115.75, 65.0, 55.75, 33.0, 33.0, 30.25, 47.0, 57.25, 45.75, 33.75, 33.75, 350.25,
                            31.0, 51.75, 51.25, 87.25]
         rowHeights_gnvp_opz = [30, 95.0, 145.5, 25, 25.0, 52.25, 25.25, 20.0, 140.25, 36.25, 36.75, 20.5, 20.25, 20.5,
                                110.0, 60.5, 46.75, 36.75, 36.0, 36.75, 48.0, 36.0, 38.25]
@@ -1100,7 +1121,7 @@ class CreatePZ:
             for interval in value['интервал']:
                 print(f' интервалы ПВР {plast, interval[0], CreatePZ.dict_perforation[plast]["отключение"]}')
                 print(CreatePZ.perforation_roof >= interval[0])
-                if CreatePZ.current_bottom >= interval[0]:
+                if CreatePZ.current_bottom >= interval[0] and CreatePZ.dict_perforation[plast]["отключение"] == False:
                     plast_work.add(plast)
 
                 if CreatePZ.dict_perforation[plast]['отключение'] == False:
@@ -1143,8 +1164,6 @@ class CreatePZ:
 
 
         for i in range(1, len(work_list) + 1):  # Добавлением работ
-            # print(f'кол-ство строк рабочих{ins_ind, len(work_list), i - ins_ind, i}')
-            # print(work_list[i - 1])
             for j in range(1, 13):
                 # print(ws2.cell(row=i, column=j).value)
                 cell = ws2.cell(row=i, column=j)
@@ -1153,14 +1172,7 @@ class CreatePZ:
                     # print(work_list[i - 1][j - 1])
                     cell.value = work_list[i - 1][j - 1]
                     if i >= ind_ins:
-                        if 'примечание' in str(cell.value).lower() \
-                                or 'заявку оформить за 16 часов' in str(cell.value).lower() \
-                                or 'ЗАДАЧА 2.9.' in str(cell.value).upper() \
-                                or 'порядок работы' in str(cell.value).lower() \
-                                or 'ВСЕ ТЕХНОЛОГИЧЕСКИЕ ОПЕРАЦИИ' in str(cell.value).upper() \
-                                or 'за 48 часов до спуска' in str(cell.value).upper():
-                            print('есть жирный')
-                            ws2.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=True)
+
                         if j != 1:
                             cell.border = CreatePZ.thin_border
                         if j == 11:
@@ -1175,7 +1187,18 @@ class CreatePZ:
                                                                          vertical='center')
                         ws2.cell(row=i, column=3).alignment = Alignment(wrap_text=True, horizontal='left',
                                                             vertical='center')
-
+                        if 'примечание' in str(cell.value).lower() \
+                                or 'заявку оформить за 16 часов' in str(cell.value).lower() \
+                                or 'ЗАДАЧА 2.9.' in str(cell.value).upper() \
+                                or 'порядок работы' in str(cell.value).lower() \
+                                or 'ВСЕ ТЕХНОЛОГИЧЕСКИЕ ОПЕРАЦИИ' in str(cell.value).upper() \
+                                or 'за 48 часов до спуска' in str(cell.value).upper():
+                            print('есть жирный')
+                            ws2.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=True)
+        for row, col in merged_cells_dict.items():
+            if len(col) != 2:
+                # print(row)
+                ws2.merge_cells(start_row=row + 1, start_column=3, end_row=row + 1, end_column=10)
         for key, value in boundaries_dict.items():
             # print(value)
             ws2.merge_cells(start_column=value[0], start_row=value[1],
@@ -1183,10 +1206,7 @@ class CreatePZ:
 
         head = plan.head_ind(0, ind_ins)
         plan.copy_true_ws(ws, ws2, head)
-        for row, col in merged_cells_dict.items():
-            if len(col) != 2:
-                # print(row)
-                ws2.merge_cells(start_row=row + 1, start_column=3, end_row=row + 1, end_column=10)
+
         # print(f'высота строк работ {ins_ind}')
         print(f'высота строк работ {len(rowHeights1)}')
         for index_row, row in enumerate(ws2.iter_rows()):  # Копирование высоты строки

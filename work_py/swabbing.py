@@ -75,8 +75,15 @@ def swabbing_opy(self):
         if len(CreatePZ.dict_perforation_project) != 0:
             plast, ok = QInputDialog.getItem(self, 'выбор пласта для расчета ЖГС ', 'выберете пласта для перфорации',
                                              CreatePZ.plast_project, -1, False)
-            # expected_pressure = CreatePZ.dict_perforation_project[plast]['давление']
-            fluid_new = CreatePZ.dict_perforation_project[plast]['рабочая жидкость']
+            print(f'раб {plast,CreatePZ.dict_perforation_project}')
+            try:
+                fluid_new = CreatePZ.dict_perforation_project[plast]['рабочая жидкость']
+                expected_pressure = CreatePZ.dict_perforation_project[plast['давление']]
+            except:
+                expected_pressure, ok = QInputDialog.getDouble(self, 'Ожидаемое давление по пласту',
+                                                               'Введите Ожидаемое давление по пласту', 0, 0, 300, 1)
+                fluid_new, ok = QInputDialog.getDouble(self, 'Новое значение удельного веса жидкости',
+                                                       'Введите значение удельного веса жидкости', 1.02, 1, 1.72, 2)
         else:
             plast, ok = QInputDialog.getText(self, 'выбор пласта для расчета ЖГС ', 'введите пласт для перфорации')
 
@@ -120,7 +127,7 @@ def swabbing_opy(self):
                               f'менее {round(krs.well_volume(self, CreatePZ.current_bottom), 1)}м3  в присутствии представителя заказчика, Составить акт. '
                               f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ)',
                               None, None, None, None, None, None, None,
-                              'мастер КРС', well_volume_norm(well_volume(self, CreatePZ.current_bottom)) +  descentNKT_norm(200, 1)],
+                              'мастер КРС', round(well_volume_norm(well_volume(self, CreatePZ.current_bottom)) +  descentNKT_norm(CreatePZ.current_bottom-depth_opy-200, 1),1)],
                              [None, None,
                               f'Поднять {paker_select} на НКТ{nkt_diam} c глубины {CreatePZ.current_bottom}м с доливом скважины в '
                               f'объеме {round((CreatePZ.current_bottom) * 1.12 / 1000, 1)}м3 удельным весом {CreatePZ.fluid_work}',

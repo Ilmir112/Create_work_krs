@@ -180,12 +180,11 @@ def perf_new(self, roofRir, solePir):
     for plast in CreatePZ.plast_work:
         for interval in list((CreatePZ.dict_perforation[plast]['интервал'])):
            if roofRir <= list(interval)[0] <= solePir:
-                    CreatePZ.dict_perforation[plast]['отключение'] = True
+                CreatePZ.dict_perforation[plast]['отключение'] = True
     for plast in CreatePZ.plast_all:
         for interval in list((CreatePZ.dict_perforation[plast]['интервал'])):
             if roofRir <= list(interval)[0] <= solePir:
                 CreatePZ.dict_perforation[plast]['отключение'] = True
-
 
     CreatePZ.definition_plast_work(self)
     if len(CreatePZ.dict_leakiness) != 0:
@@ -227,7 +226,8 @@ def rirWithPero(self):
 
     nkt_diam = ''.join(['73' if CreatePZ.column_diametr > 110 else '60'])
 
-    open_checkbox_dialog()
+    if len(CreatePZ.plast_work) != 0:
+        open_checkbox_dialog()
 
     plast = CreatePZ.plast_select
     rirSole, ok = QInputDialog.getInt(None, 'Подошва цементного моста',
@@ -439,7 +439,7 @@ def rirWithPero(self):
                             'мастер КРС', 0.5]
 
         for row in glin_list:
-            rir_list.insert(-2, row)
+            rir_list.insert(-3, row)
 
         for row in rirPero_list:
             rir_list.append(row)
@@ -596,14 +596,16 @@ def rir_izvelPaker(self):
         for row in filling_list:
             rir_list.append(row)
         CreatePZ.current_bottom = pakerIzvPaker-20
-        for row in rir_paker(self):
-            rir_list.append()
-        for row in drilling_nkt(self):
-            rir_list.append(row)
-        for row in Raid.raidingColumn(self):
-            rir_list.append(row)
-        for row in izvlech_paker(self):
-            rir_list.append(row)
+        rir_question = QMessageBox.question(None, 'РИР', 'Планировать ли РИР на пакере')
+        if rir_question == QMessageBox.StandardButton.Yes:
+            for row in rir_paker(self):
+                rir_list.append(row)
+            for row in drilling_nkt(self):
+                rir_list.append(row)
+            for row in Raid.raidingColumn(self):
+                rir_list.append(row)
+            for row in izvlech_paker(self):
+                rir_list.append(row)
     else:
         CreatePZ.current_bottom = pakerIzvPaker
 
@@ -624,7 +626,7 @@ def izvlech_paker(self):
          'мастер КРС', 3.5],
         [None, None,
          f'Поднять {sand_select(self)} НКТ{CreatePZ.nkt_diam}мм с глубины {CreatePZ.pakerIzvPaker-10}м с доливом скважины'
-         f' в объеме {round(CreatePZ.pakerIzvPaker-10 * 1.12 / 1000, 1)}м3 тех. '
+         f' в объеме {round((CreatePZ.pakerIzvPaker-10) * 1.12 / 1000, 1)}м3 тех. '
          f'жидкостью  уд.весом {CreatePZ.fluid_work}',
          None, None, None, None, None, None, None,
          'мастер КРС', liftingNKT_norm(CreatePZ.pakerIzvPaker-10, 1)]]

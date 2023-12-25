@@ -121,7 +121,6 @@ class MyWindow(QMainWindow):
             # if action == self.save_file:
             #     open_pz.open_excel_file().wb.save("test_unmerge.xlsx")
         elif action == self.save_file:
-
             self.save_to_excel
 
         elif action == self.save_file_as:
@@ -153,11 +152,7 @@ class MyWindow(QMainWindow):
         ws2 = wb2.get_sheet_by_name('Sheet')
         ws2.title = "План работ"
 
-        head = plan.head_ind(0, CreatePZ.ins_ind)
-        print(f' сироки {head}')
-        print(f' сироки {head}')
 
-        # plan.copy_row(self.ws, ws2, head)
 
         ins_ind = self.ins_ind_border
 
@@ -165,28 +160,27 @@ class MyWindow(QMainWindow):
 
         work_list = []
         for row in range(self.table_widget.rowCount()):
-            # if row >= self.ins_ind_border:
+
             row_lst = []
             self.ins_ind_border += 1
             for column in range(self.table_widget.columnCount()):
                 if self.table_widget.rowSpan(row, column) > 1 or self.table_widget.columnSpan(row, column) > 1:
                     merged_cells.append((row, column))
                 item = self.table_widget.item(row, column)
-
                 if not item is None:
                     row_lst.append(item.text())
-                    print(item.text())
+                    # print(item.text())
                 else:
                     row_lst.append("")
 
             work_list.append(row_lst)
-        # print(work_list)
+
         merged_cells_dict = {}
 
         for row in merged_cells:
             if row[0] >= ins_ind:
                 merged_cells_dict.setdefault(row[0], []).append(row[1])
-        print(CreatePZ.ins_ind)
+        # print(CreatePZ.ins_ind)
         for i in range(2, len(work_list)):  # нумерация работ
             if i >= ins_ind+2:
                 work_list[i][1] = i - 1- ins_ind
@@ -212,7 +206,6 @@ class MyWindow(QMainWindow):
                 # ws3.page_setup.fitToHeight = True
                 # ws3.page_setup.fitToWidth = True
                 ws3.print_area = 'A1:A10'
-
             else:
                 print(f'{CreatePZ.cat_H2S_list} Расчет поглотителя сероводорода не требуется')
             for row_ind, row in enumerate(ws2.iter_rows(values_only=True)):
@@ -223,14 +216,13 @@ class MyWindow(QMainWindow):
                         coordinate = f'{get_column_letter(col - 2)}{row_ind - 1}'
                         break
 
-
             self.insert_image(ws2, 'imageFiles/Зуфаров.png', coordinate)
             self.insert_image(ws2, 'imageFiles/Хасаншин.png', 'H1')
             self.insert_image(ws2, 'imageFiles/Шамигулов.png', 'H4')
-            wb2.save(f"{CreatePZ.well_number} {CreatePZ.well_area} {CreatePZ.cat_P_1}.xlsx")
+            wb2.save(f"{CreatePZ.well_number} {CreatePZ.well_area} кат {CreatePZ.cat_P_1}.xlsx")
         except Exception as e:
             print(e)
-            print(e)
+
         finally:
             if self.wb:
                 self.wb.close()

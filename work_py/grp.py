@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import QInputDialog, QMessageBox
 
 import krs
+from work_py.alone_oreration import kot_select
 from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm,well_volume_norm
 
 def grpGpp(self):
@@ -177,23 +178,23 @@ def normalization(self):
          None, None, None, None, None, None, None,
          'Мастер КРС', liftingNKT_norm(current_depth, 1)],
         [None, None,
-         f'Спустить компоновку с замером и шаблонированием НКТ:  рыхлитель(коронка ) (1м) 73мм, хлопушка, НКТ - 10м, '
-         f'обратный клапан (увеличенный), НКТ -100м, гидрожелонка, НКТ - 20м, ограничитель, НКТ - 10м, сбивной клапан, на НКТ {nkt_diam} '
-         f'до гл.текущего забоя.'
-         f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ) ',
+         f'Спустить {kot_select(self)} на НКТ{CreatePZ.nkt_diam}мм до глубины текущего забоя'
+         f' с замером, шаблонированием шаблоном.',
          None, None, None, None, None, None, None,
-         'Мастер КРС', descentNKT_norm(current_depth, 1.15)],
+         'мастер КРС', descentNKT_norm(CreatePZ.current_bottom, 1)],
         [None, None,
-         f'Отбить уровень в НКТ и затрубном пространство силами ЦДНГ (отразить в сводке), составить акт. '
-         f'Долить скважину. Произвести работу гидрожелонкой в присутствии представителя Заказчика. '
-         f'Отбить уровень в НКТ и затрубном пространство силами ЦДНГ (отразить в сводке), составить акт.',
+         f'Произвести очистку забоя скважины до гл.{current_depth}м закачкой обратной промывкой тех жидкости уд.весом {CreatePZ.fluid_work}, по согласованию с Заказчиком',
          None, None, None, None, None, None, None,
-         'Мастер КРС', 2.5],
+         'мастер КРС', 0.4],
         [None, None,
-         f'Поднять компоновку с глубины {current_depth}м с доливом скважины тех.жидкостью уд. весом {CreatePZ.fluid_work}  в объеме '
-         f'{round(current_depth * 1.12 / 1000, 1)}м3',
+         f'При необходимости согласовать закачку блок пачки по технологическому плану работ подрядчика',
          None, None, None, None, None, None, None,
-         'Мастер КРС', liftingNKT_norm(current_depth,1.15)],
+         'мастер КРС, предст. заказчика', None],
+        [None, None,
+         f'Поднять {kot_select(self)} на НКТ{CreatePZ.nkt_diam} c глубины {current_depth}м с доливом скважины в '
+         f'объеме {round(current_depth * 1.12 / 1000, 1)}м3 удельным весом {CreatePZ.fluid_work}',
+         None, None, None, None, None, None, None,
+         'мастер КРС', liftingNKT_norm(current_depth, 1)],
         [None, None,
          f'В случае наличия ЗУМПФа 10м и более продолжить работы с п. по отбивки забоя '
          f'В случае ЗУМПФа менее 10м: и не жесткая посадка компоновки СПО ГВЖ повторить. '
