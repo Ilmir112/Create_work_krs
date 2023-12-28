@@ -117,9 +117,9 @@ def template_ek_without_skm(self):
     CreatePZ.nkt_diam = ''.join(['73' if CreatePZ.column_diametr > 110 else '60'])
     if CreatePZ.column_additional == False and CreatePZ.open_trunk_well == False and all([CreatePZ.dict_perforation[plast]['отрайбировано'] for plast in CreatePZ.plast_work]) == False:
 
-        template_str = f'перо + шаблон-{first_template}мм L-2м + НКТ{CreatePZ.nkt_diam}мм {int(CreatePZ.current_bottom - math.ceil(CreatePZ.perforation_roof)+8)}м ' \
+        template_str = f'перо + шаблон-{first_template}мм L-2м + НКТ{CreatePZ.nkt_diam}мм {int(CreatePZ.current_bottom - math.ceil(CreatePZ.perforation_roof))}м ' \
                        f'+  НКТ{CreatePZ.nkt_diam}мм + шаблон-{second_template}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can]}м '
-        ckm_teml = f'шаблон-{second_template}мм до гл.{math.ceil(CreatePZ.perforation_roof-8)}м)'
+        ckm_teml = f'шаблон-{second_template}мм до гл.{math.ceil(CreatePZ.perforation_roof)}м)'
         CreatePZ.template_depth = math.ceil(CreatePZ.perforation_roof-8)
     elif CreatePZ.column_additional == False and CreatePZ.open_trunk_well ==  True and all([CreatePZ.dict_perforation[plast]['отрайбировано'] for plast in CreatePZ.plast_work]) == False:
         template_str = f'фильтр-направление L-2м + НКТ{CreatePZ.nkt_diam}мм {math.ceil(CreatePZ.current_bottom - CreatePZ.perforation_roof+8)}м' \
@@ -129,12 +129,12 @@ def template_ek_without_skm(self):
     elif CreatePZ.column_additional == False and CreatePZ.open_trunk_well == False and all([CreatePZ.dict_perforation[plast]['отрайбировано'] for plast in CreatePZ.plast_work]) == True:
         template_str = f'перо + шаблон-{second_template}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can]}м + НКТ{CreatePZ.nkt_diam}мм 10м + репер'
         ckm_teml = f'шаблон-{second_template}мм до гл.{math.ceil(CreatePZ.current_bottom)}м)'
-        CreatePZ.template_depth = math.ceil(CreatePZ.current_bottom )
+        CreatePZ.template_depth = math.ceil(CreatePZ.current_bottom)
     elif CreatePZ.column_additional == True and CreatePZ.open_trunk_well == False and all([CreatePZ.dict_perforation[plast]['отрайбировано'] for plast in CreatePZ.plast_work]) == False:
         template_str = f'обточная муфта + НКТ{nkt_pod}мм {math.ceil(CreatePZ.current_bottom-math.ceil(CreatePZ.perforation_roof - 10))}м +' \
                        f' шаблон-{first_template}мм L-{length_template_addition}м + НКТ{nkt_pod}мм' \
                        f' {math.ceil(CreatePZ.perforation_roof - float(CreatePZ.head_column_additional) -20 -length_template_addition)}м ' \
-               f' + шаблон-{second_template}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can]}м '
+                        f' + шаблон-{second_template}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can]}м '
         ckm_teml = f'(шаблон-{first_template}мм до гл.{math.ceil(CreatePZ.perforation_roof - 10)}м, шаблон-{first_template}мм до гл.{CreatePZ.head_column_additional-10}м)'
         CreatePZ.template_depth = math.ceil(CreatePZ.perforation_roof - 8)
     elif CreatePZ.column_additional == True and CreatePZ.open_trunk_well == True and all([CreatePZ.dict_perforation[plast]['отрайбировано'] for plast in CreatePZ.plast_work]) == False:

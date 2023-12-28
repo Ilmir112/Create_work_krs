@@ -77,13 +77,14 @@ class GeophysicWindow(MyWindow):
         vbox.addWidget(self.buttonAddWork, 3, 0)
 
     def geophysicalSelect(self, geophysic, editType, editType2):
+        from open_pz import CreatePZ
         if geophysic == 'АКЦ':
             research = f'ЗАДАЧА 2.7.1 Определение состояния цементного камня (АКЦ, АК-сканирование) в интервале {editType}-{editType2}м. '
         elif geophysic == 'СГДТ':
             research = f'ЗАДАЧА 2.7.2 Определение плотности, дефектов цементного камня, эксцентриситета колонны (СГДТ) в интервале {editType}-{editType2}м.'
         elif geophysic == 'АКЦ + СГДТ':
             research = f'ЗАДАЧА 2.7.3  Определение состояния цементного камня (АКЦ, АК-сканирование). в интервале {editType}-{editType2}м,' \
-                       f'Определение плотности, дефектов цементного камня, эксцентриситета колонны (СГДТ) в интервале 0 - 20м выше интервала перфорации '
+                       f'Определение плотности, дефектов цементного камня, эксцентриситета колонны (СГДТ) в интервале 0 - {CreatePZ.perforation_roof-20} '
 
 
         elif geophysic == 'ИНГК':
@@ -181,11 +182,11 @@ class GeophysicWindow(MyWindow):
 
                 self.table_widget.setItem(row, column, QtWidgets.QTableWidgetItem(str(data)))
 
-                if column == 2 or column == 10:
+                if column == 2 or column == 10 or column == 11 or column == 12:
                     if not data is None:
                         text = data
                         for key, value in text_width_dict.items():
-                            if value[0] <= len(text) <= value[1]:
+                            if value[0] <= len(str(text)) <= value[1]:
                                 text_width = key
                                 self.table_widget.setRowHeight(row, int(text_width))
                 else:

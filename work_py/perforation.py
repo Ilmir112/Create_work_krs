@@ -227,11 +227,11 @@ class PerforationWindow(MyWindow):
                                     f'(Произвести фотографию перфоратора в заряженном состоянии, и после проведения перфорации,'
                                     f' фотографии предоставить в ЦИТС Ойл-сервис',
                          None, None, None, None, None, None, None,
-                          'Мастер КРС, подрядчик по ГИС', None, None],
+                          'Мастер КРС, подрядчик по ГИС', 1.2, None],
                        [None, None, ''.join(["ГИС (Перфорация на кабеле ЗАДАЧА 2.9.1)" if float(CreatePZ.max_angle) <= 50 else "ГИС ( Трубная Перфорация ЗАДАЧА 2.9.2)"]), None, None, None, None,
-                        None,None, None, 'подрядчик по ГИС',  15],
+                        None,None, None, 'подрядчик по ГИС',  None],
                        [None, None, "Кровля", "-", "Подошва", "Тип заряда", "отв на 1 п.м.", "Кол-во отв",
-                      "пласт", "Доп.данные", 'подрядчик по ГИС', None]
+                      "пласт", "Доп.данные", 'подрядчик по ГИС', 2.5]
                        ]
         print(f'до {CreatePZ.plast_work}')
         for row in range(rows):
@@ -259,10 +259,10 @@ class PerforationWindow(MyWindow):
                         perf_list.append(value)
             # plast
             # perf_list.insert(7, (round((float(perf_list[4]) - float(perf_list[2])) * int(perf_list[6]), 1)))
-            perf_list.extend(['подрядчик по ГИС', " "])
-            print(perf_list)
+            perf_list.extend(['подрядчик по ГИС', round((perf_list[2]-perf_list[1]) * 2.25, 1)])
+            # print(perf_list)
             plast = perf_list[8]
-            print(f' раб ПВР {CreatePZ.plast_work, plast}')
+            # print(f' раб ПВР {CreatePZ.plast_work, plast}')
 
             CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('интервал', set()).add(
                 (float(perf_list[2]), float(perf_list[4])))
@@ -298,7 +298,7 @@ class PerforationWindow(MyWindow):
 
         text_width_dict = {20: (0, 100), 40: (101, 200), 60: (201, 300), 80: (301, 400), 100: (401, 500),
                            120: (501, 600), 140: (601, 700)}
-        print(len(perforation))
+        # print(len(perforation))
 
         if len(perforation) < 6:
             msg = QMessageBox.information(self, 'Внимание', 'Не добавлены интервалы перфорации!!!')
@@ -309,8 +309,8 @@ class PerforationWindow(MyWindow):
                 lst = [0, 1, 2, len(perforation)-1]
                 if float(CreatePZ.max_angle) >= 50:
                     lst.extend([3, 4])
-                if i in lst: # Объединение ячеек по вертикале в столбце "отвественные и норма"
-                    self.table_widget.setSpan(i + self.ins_ind, 2, 1, 8)
+                # if i in lst: # Объединение ячеек по вертикале в столбце "отвественные и норма"
+                #     self.table_widget.setSpan(i + self.ins_ind, 2, 1, 8)
                 for column, data in enumerate(row_data):
 
                     # widget = QtWidgets.QLabel(str())
@@ -342,6 +342,7 @@ class PerforationWindow(MyWindow):
             self.table_widget.setRowHeight(self.ins_ind + 1, 60)
 
             CreatePZ.definition_plast_work(self)
+
             self.close()
 
 

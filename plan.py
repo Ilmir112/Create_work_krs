@@ -3,7 +3,7 @@ import datetime
 import openpyxl
 from copy import copy
 
-import xlrd
+
 from openpyxl.workbook import Workbook
 from openpyxl.utils.cell import range_boundaries, get_column_letter
 from openpyxl.styles import  PatternFill, Border, Side

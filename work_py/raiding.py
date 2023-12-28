@@ -46,7 +46,7 @@ class Raid(CreatePZ):
             krovly_raiding = int(raiding_interval_tuple[0][0])
         else:
             krovly_raiding = CreatePZ.perforation_roof
-        print()
+
         raiding_interval = raid(raiding_interval_tuple)
         ryber_list = [
             [None, None,
@@ -91,7 +91,7 @@ class Raid(CreatePZ):
             acid_true_quest = QMessageBox.question(self, 'Необходимость смены объема',
                                                    'Нужно ли изменять удельный вес?')
             if acid_true_quest == QMessageBox.StandardButton.Yes:
-                for row in fluid_change():
+                for row in fluid_change(self):
                     ryber_list.insert(-2, row)
         return ryber_list
 

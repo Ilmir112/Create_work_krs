@@ -1,6 +1,6 @@
 from zipfile import ZipFile
 
-import openpyxl
+
 from PIL import Image
 import block_name
 import plan
@@ -556,7 +556,7 @@ class CreatePZ:
         for row in range(data_pvr_max, CreatePZ.data_well_max):
             for col in range(1, 13):
                 value = str(ws.cell(row=row, column=col).value)
-                if 'нэк' in str(value).lower() or 'негерм' in value.lower() or 'нарушение э' in value.lower():
+                if 'нэк' in str(value).lower() or 'негерм' in value.lower() or 'нарушение э' in value.lower() or 'нарушение г' in value.lower():
                     CreatePZ.leakiness_Count += 1
                     CreatePZ.leakiness = True
                 if ('авар' in value.lower() or 'не проход' in value.lower() or 'расхаж' in value.lower() or 'лар' in value) \
@@ -816,7 +816,7 @@ class CreatePZ:
 
                 CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('вскрытие', set()).add(row[4])
                 # print(f'отключе {isinstance(row[5], datetime) == True, old_index} ggg {isinstance(row[6], datetime) == True, CreatePZ.old_version, old_index}')
-                if row[5] is None or row[5] is '-':
+                if row[5] is None or row[5] == '-':
                     print(f'отключение {plast, row[5], row[5] != "-"}')
                     CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('отключение', False)
                 else:
@@ -976,14 +976,7 @@ class CreatePZ:
         self.ins_ind_border = CreatePZ.ins_ind
         # wb.save(f"{CreatePZ.well_number}  1 {CreatePZ.well_area} {CreatePZ.cat_P_1}.xlsx")
 
-        try:
-            for row_index, row in enumerate(ws.iter_rows()):
-                if row_index in [i for i in range(column_add_index + 4, index_bottomhole + 5)]:
-                    if all(cell.value is None for cell in row):
-                        ws.row_dimensions[row_index].hidden = True
-            print(' Скрытие ячеек сделано')
-        except:
-            print('нет скрытых ячеек')
+
 
         self.ws = ws
         self.wb = wb
@@ -1154,6 +1147,7 @@ class CreatePZ:
         rowHeights1 = [ws.row_dimensions[i].height for i in range(ws.max_row)]
         colWidth = [ws.column_dimensions[get_column_letter(i + 1)].width for i in range(0, 13)] + [None]
         for i, row_data in enumerate(work_list):
+
             for column, data in enumerate(row_data):
                 if column == 2:
                     if not data is None:

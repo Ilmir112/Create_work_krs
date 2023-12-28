@@ -174,6 +174,7 @@ def rir_rpk(self):
     return rir_list
 
 def perf_new(self, roofRir, solePir):
+
     from open_pz import CreatePZ
 
     print(f' пласта до изоляции {CreatePZ.plast_work}')
@@ -197,6 +198,7 @@ def perf_new(self, roofRir, solePir):
     print(CreatePZ.dict_leakiness)
 
     print(f' пласта рабоче {CreatePZ.plast_work}')
+    CreatePZ.definition_plast_work(self)
 
 
 
@@ -397,7 +399,7 @@ def rirWithPero(self):
              f'По результатам определения приёмистости выполнить следующие работы: \n'
              f'В случае приёмистости свыше 480 м3/сут при Р=100атм выполнить работы по закачке гдинистого раствора '
              f'(по согласованию с ГС и ПТО ООО Ойл-сервис и заказчика). \n'
-             f'В случае приёмистости менее 480 м3/сут при Р=100атм и более 120м3/сут при Р=100атм продолжить работы с п. 17',
+             f'В случае приёмистости менее 480 м3/сут при Р=100атм и более 120м3/сут при Р=100атм приступить к выполнению РИР',
              None, None, None, None, None, None, None,
              'мастер КРС, заказчик', None],
             [None, None,
@@ -407,7 +409,7 @@ def rirWithPero(self):
              None, None, None, None, None, None, None,
              'мастер КРС', 3.5],
             [None, None,
-             f'Закачать в НКТ при открытом затрубном пространстве глинистый раствор в объеме 5м3 + тех. воду  в объёме {volume_vn_nkt(dict_nkt) - 5}м3. Закрыть затруб. '
+             f'Закачать в НКТ при открытом затрубном пространстве глинистый раствор в объеме 5м3 + тех. воду  в объёме {round(volume_vn_nkt(dict_nkt) - 5,1)}м3. Закрыть затруб. '
              f'Продавить в НКТ  тех. воду  в объёме {volume_vn_nkt(dict_nkt)}м3 при давлении не более {CreatePZ.max_admissible_pressure}атм.',
              None, None, None, None, None, None, None,
              'мастер КРС', 0.5],
@@ -452,8 +454,8 @@ def rirWithPero(self):
             acid_true_quest = QMessageBox.question(self, 'Необходимость смены объема',
                                                    'Нужно ли изменять удельный вес?')
             if acid_true_quest == QMessageBox.StandardButton.Yes:
-                for row in fluid_change():
-                    rir_list.insert(-2, row)
+                for row in fluid_change(self):
+                    rir_list.insert(-1, row)
 
     return rir_list
 

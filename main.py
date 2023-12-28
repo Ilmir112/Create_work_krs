@@ -97,6 +97,7 @@ class MyWindow(QMainWindow):
 
             try:
                 self.work_plan = 'krs'
+                CreatePZ.pause = True
                 sheet = CreatePZ.open_excel_file(self, self.fname[0], self.work_plan)
 
                 self.copy_pz(sheet)
@@ -151,16 +152,13 @@ class MyWindow(QMainWindow):
         wb2 = Workbook()
         ws2 = wb2.get_sheet_by_name('Sheet')
         ws2.title = "План работ"
-
-
-
+        print(f'открытие wb2')
         ins_ind = self.ins_ind_border
 
         merged_cells = []  # Список индексов объединения ячеек
 
         work_list = []
         for row in range(self.table_widget.rowCount()):
-
             row_lst = []
             self.ins_ind_border += 1
             for column in range(self.table_widget.columnCount()):
@@ -186,7 +184,7 @@ class MyWindow(QMainWindow):
                 work_list[i][1] = i - 1- ins_ind
                 if krs.is_number(work_list[i][11]) == True:
                     CreatePZ.normOfTime += float(work_list[i][11])
-
+        print(f'строки {self.ws.max_row}')
         CreatePZ.count_row_height(self.ws, ws2, work_list, merged_cells_dict,  ins_ind)
         itog_ind_min = CreatePZ.itog_ind_min + len(work_list)
         CreatePZ.addItog(self, ws2, self.table_widget.rowCount() + 1)
@@ -201,7 +199,7 @@ class MyWindow(QMainWindow):
                 ws3.title = "Расчет необходимого количества поглотителя H2S"
                 ws3 = wb2["Расчет необходимого количества поглотителя H2S"]
                 calc_H2S(ws3, CreatePZ.H2S_pr, CreatePZ.H2S_mg)
-                ws3.sheet_visibility = 'hidden'
+                ws3.hide = True
                 # ws3.page_setup.fitToPage = True
                 # ws3.page_setup.fitToHeight = True
                 # ws3.page_setup.fitToWidth = True
@@ -209,8 +207,14 @@ class MyWindow(QMainWindow):
             else:
                 print(f'{CreatePZ.cat_H2S_list} Расчет поглотителя сероводорода не требуется')
             for row_ind, row in enumerate(ws2.iter_rows(values_only=True)):
-                if all(cell in [None, '']  for cell in row) and (30 <= row_ind <= 48 or 53 <= row_ind <= 100):
-                    ws2.row_dimensions[row_ind+1].hidden = True
+
+                if 15 <row_ind < 100:
+
+                    if all(cell in [None, '']  for cell in row) \
+                            and ('Интервалы темпа' not in str(ws2.cell(row=row_ind, column=2).value)\
+                                     and 'Замечания к эксплуатационному периоду' not in str(ws2.cell(row=row_ind, column=2).value)):
+                        # print(row_ind+1, ('Интервалы темпа' not in str(ws2.cell(row=row_ind, column=2).value)), str(ws2.cell(row=row_ind, column=2).value))
+                        ws2.row_dimensions[row_ind+1].hidden = True
                 for col, value in enumerate(row):
                     if 'Зуфаров' in str(value):
                         coordinate = f'{get_column_letter(col - 2)}{row_ind - 1}'
@@ -219,7 +223,13 @@ class MyWindow(QMainWindow):
             self.insert_image(ws2, 'imageFiles/Зуфаров.png', coordinate)
             self.insert_image(ws2, 'imageFiles/Хасаншин.png', 'H1')
             self.insert_image(ws2, 'imageFiles/Шамигулов.png', 'H4')
-            wb2.save(f"{CreatePZ.well_number} {CreatePZ.well_area} кат {CreatePZ.cat_P_1}.xlsx")
+            path = 'D:\Documents\Desktop\ГТМ'
+            filenames = f"{CreatePZ.well_number} {CreatePZ.well_area} кат {CreatePZ.cat_P_1}.xlsx"
+            full_path = path + '/' + filenames
+            print(ws2.max_row)
+            if wb2:
+                wb2.close()
+                wb2.save(full_path)
         except Exception as e:
             print(e)
 
@@ -229,9 +239,12 @@ class MyWindow(QMainWindow):
             print("Table data saved to Excel")
 
     def close_file(self):
+        from open_pz import CreatePZ
         if not self.table_widget is None:
             self.table_widget.close()
             self.table_widget = None
+
+
         print("Closing current file")
 
     def insert_image(self, ws, file, coordinate):
@@ -403,6 +416,10 @@ class MyWindow(QMainWindow):
         alone_menu.addAction(definition_Q_action)
         definition_Q_action.triggered.connect(self.definition_Q)
 
+        definition_Q_NEK_action = QAction("Определение приемитости по затрубу", self)
+        alone_menu.addAction(definition_Q_NEK_action)
+        definition_Q_NEK_action.triggered.connect(self.definition_Q_nek)
+
         kot_action = QAction('Система обратных клапанов')
         alone_menu.addAction(kot_action)
         kot_action.triggered.connect(self.kot_work)
@@ -496,6 +513,11 @@ class MyWindow(QMainWindow):
     def definition_Q(self):
         from work_py.alone_oreration import definition_Q
         definition_Q_list = definition_Q(self)
+        self.populate_row(self.ins_ind, definition_Q_list)
+
+    def definition_Q_nek(self):
+        from work_py.alone_oreration import definition_Q_nek
+        definition_Q_list = definition_Q_nek(self)
         self.populate_row(self.ins_ind, definition_Q_list)
 
     def kot_work(self):

@@ -154,7 +154,7 @@ def acidGons(self):
     acid_pr, ok = QInputDialog.getInt(self, 'концентрация кислоты', 'Введите концентрацию кислоты', 15, 2, 24)
     acid_countOfpoint, ok = QInputDialog.getInt(self, 'концентрация кислоты', 'Введите объем кислоты на точку', 5, 1, 24)
     acid_points, ok = QInputDialog.getText(self, 'точки ГОНС', 'Введите точки ГОНС ')
-    bottom_point = max(list(map(int, acid_points.replace('м', '').replace(',', '').replace('.', '').split())))
+    bottom_point = max(list(map(int, acid_points.replace('м', '').replace(',', '').split())))
     gons_list = [[None, None,
      f'Спустить  гидроманиторную насадку {"".join([f" + НКТ60мм {round(CreatePZ.current_bottom -CreatePZ.head_column_additional, 0)}" if CreatePZ.column_additional == True else ""])} '
      f'на НКТ{CreatePZ.nkt_diam}мм до глубины нижней точки до {bottom_point}'

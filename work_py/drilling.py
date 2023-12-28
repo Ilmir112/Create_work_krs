@@ -34,7 +34,7 @@ def drilling_nkt(self):
     CreatePZ.drilling_interval.append([CreatePZ.current_bottom, current_depth])
     drilling_list = [
         [None, None,
-         f'Спустить {drilling_str}  на НКТ{nkt_diam}мм до Н= {CreatePZ.perforation_roof - 30}м с замером, '
+         f'Спустить {drilling_str}  на НКТ{nkt_diam}мм до ntreotuj pf,jz с замером, '
          f'шаблонированием шаблоном\n'
          f' (При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ). '
          f'В случае разгрузки инструмента  при спуске, проработать место посадки с промывкой скв., составить акт.'

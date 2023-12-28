@@ -116,6 +116,22 @@ def definition_Q(self):
                            None, None, None, None, None, None, None,
                            'мастер КРС', 0.17+0.2+0.2+0.2+0.15+0.52]]
     return definition_Q_list
+
+def definition_Q_nek(self):
+    from open_pz import CreatePZ
+    from work_py.acids_work import open_checkbox_dialog
+
+    open_checkbox_dialog()
+    plast = CreatePZ.plast_select
+    definition_Q_list = [[None, None,
+                           f'Произвести насыщение скважины по затрубу до стабилизации давления закачки не менее 5м3. Опробовать  '
+                           f' на приемистость {plast} при Р={CreatePZ.max_expected_pressure}атм в присутствии представителя ЦДНГ. '
+                           f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до '
+                           f'начала работ). ',
+                           None, None, None, None, None, None, None,
+                           'мастер КРС', 0.17+0.2+0.2+0.2+0.15+0.52]]
+
+    return definition_Q_list
 def privyazkaNKT(self):
     priv_list = [[None, None, f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС "Ойл-сервис". '
                  f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером от 14.10.2021г. '

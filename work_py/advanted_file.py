@@ -4,12 +4,21 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox
 def skm_interval():
     from open_pz import CreatePZ
     str_raid = []
+    if CreatePZ.paker_do["posle"] != '0':
+        str_raid.append([float(CreatePZ.H_F_paker_do["posle"]) - 20, float(CreatePZ.H_F_paker_do["posle"]) + 20])
+
+    if CreatePZ.leakiness:
+        for nek in list(CreatePZ.dict_leakiness['НЭК']['интервал'].keys()):
+            if int(float(nek.split('-')[1])) + 20 < CreatePZ.current_bottom:
+                str_raid.append([int(float(nek.split('-')[0])) - 90, int(float(nek.split('-')[1])) + 20])
+            else:
+                str_raid.append([int(float(nek.split('-')[0])) - 90,
+                                 CreatePZ.current_bottom - 2])
     if all([CreatePZ.dict_perforation[plast]['отрайбировано'] == False for plast in CreatePZ.plast_work]):
         str_raid.append([CreatePZ.perforation_roof - 90, CreatePZ.perforation_roof - 10])
         if CreatePZ.if_None(CreatePZ.paker_do["posle"]) != '0' and CreatePZ.if_None(CreatePZ.H_F_paker_do["posle"]) != '0' :
             str_raid.append([float(CreatePZ.H_F_paker_do["posle"]) - 20, float(CreatePZ.H_F_paker_do["posle"]) + 20])
         if CreatePZ.leakiness:
-
             for nek in list(CreatePZ.dict_leakiness['НЭК']['интервал'].keys()):
                 print(f' наруш {nek}')
                 if float(nek.split('-')[1]) + 20 < CreatePZ.current_bottom:
@@ -17,28 +26,24 @@ def skm_interval():
                 else:
                     str_raid.append([int(float(nek.split('-')[0])) - 90,
                                      CreatePZ.CreatePZ.current_bottom - 2])
-    else:
-        if CreatePZ.paker_do["posle"] != '0':
-            str_raid.append([float(CreatePZ.H_F_paker_do["posle"]) - 20, float(CreatePZ.H_F_paker_do["posle"]) + 20])
-        if CreatePZ.paker2_do["posle"] != '0':
-            str_raid.append([float(CreatePZ.H_F_paker2_do["posle"]) - 20, float(CreatePZ.H_F_paker2_do["posle"]) + 20])
-        if CreatePZ.leakiness:
-            for nek in list(CreatePZ.dict_leakiness['НЭК']['интервал'].keys()):
-                if int(float(nek.split('-')[1])) + 20 < CreatePZ.current_bottom:
-                    str_raid.append([int(float(nek.split('-')[0])) - 90, int(float(nek.split('-')[1])) + 20])
-                else:
-                    str_raid.append([int(float(nek.split('-')[0])) - 90,
-                                     CreatePZ.current_bottom - 2])
+    elif all(
+        [CreatePZ.dict_perforation[plast]['отрайбировано'] == True for plast in CreatePZ.plast_work]):
 
-        for plast in CreatePZ.plast_all:
-            intervalPvr = list(CreatePZ.dict_perforation[plast]['интервал'])
-            for pvr in intervalPvr:
-                print(pvr)
-                str_raid.append([pvr[0] - 90, pvr[1] - 10])
-                if pvr[1] + 50 < CreatePZ.current_bottom:
-                    str_raid.append([pvr[1] + 10, pvr[1] + 50])
-                else:
-                    str_raid.append([pvr[1] + 10, CreatePZ.current_bottom - 2])
+        skipping_intervals = []
+        perforating_intervals = []
+        for plast in CreatePZ.plast_work:
+            perforating_intervals = list(CreatePZ.dict_perforation[plast]['интервал'])
+            for pvr in perforating_intervals:
+                if pvr[1] + 50 < CreatePZ.current_bottom and pvr[0] < CreatePZ.current_bottom:
+                    skipping_intervals.append([pvr[0] - 90, pvr[1] - 3])
+                    skipping_intervals.append([pvr[1] + 5, pvr[1] + 25])
+                elif pvr[1] + 50 > CreatePZ.current_bottom and pvr[0] < CreatePZ.current_bottom:
+                    skipping_intervals.append([pvr[0] - 90, pvr[1] - 5])
+                    if pvr[1] + 5 < CreatePZ.current_bottom - 2:
+                        skipping_intervals.append([pvr[1] + 5, CreatePZ.current_bottom - 2])
+        # print(skipping_intervals)
+        str_raid.extend(remove_overlapping_intervals(skipping_intervals, perforating_intervals))
+    # print(f'скреперо {str_raid}')
     if CreatePZ.dict_perforation_project is None and any(
             [plast in CreatePZ.plast_all for plast in list(CreatePZ.dict_perforation_project.keys())]) == False:
         if CreatePZ.dict_perforation_project[plast]['интервал'][1] < CreatePZ.current_bottom:
@@ -70,6 +75,14 @@ def skm_interval():
     merged_segments = merge_overlapping_intervals(str_raid)
     return merged_segments
 
+# Функция исключения из интервалов скреперования интервалов ПВР
+def remove_overlapping_intervals(skipping_intervals, perforating_intervals):
+    for interval in perforating_intervals:
+        for i in range(len(skipping_intervals)):
+            if interval[0] <= skipping_intervals[i][1] and interval[1] >= skipping_intervals[i][0]:
+                skipping_intervals.remove(skipping_intervals[i])
+                break
+    return skipping_intervals
 
 def raiding_interval():
     from open_pz import CreatePZ
@@ -80,14 +93,14 @@ def raiding_interval():
 
         str_raid.append([CreatePZ.perforation_roof - 30, CreatePZ.current_bottom])
     # print(str_raid)
-    if len(CreatePZ.dict_perforation) > 1:
+    elif len(CreatePZ.dict_perforation) > 1:
         for plast in CreatePZ.dict_perforation.keys():
             if plast in CreatePZ.plast_all:
                 # print(f' отрай {CreatePZ.dict_perforation[plast]["Прошаблонировано"]}')
                 crt = []
                 if CreatePZ.dict_perforation[plast]['отрайбировано'] == False:
                     for i in CreatePZ.dict_perforation[plast]['интервал']:
-                        if float(i[1]) <= CreatePZ.current_bottom:
+                        if float(i[1]) <= CreatePZ.current_bottom and float(i[0]) <= CreatePZ.current_bottom:
                             if float(i[1]) + 20 <= CreatePZ.current_bottom:
                                 crt = [float(i[0]) - 20, float(i[1]) + 20]
                             else:
@@ -117,12 +130,13 @@ def raiding_interval():
             if CreatePZ.dict_leakiness['НЭК']['интервал'][nek]['отрайбировано'] == False:
                 i = nek.split('-')
 
-                if float(i[1]) + 30 <= CreatePZ.current_bottom:
+                if float(i[1]) + 30 <= CreatePZ.current_bottom and float(i[0]) + 30 <= CreatePZ.current_bottom:
                     crt = (float(i[0]) - 30, float(i[1]) + 30)
                 else:
                     crt = (float(i[0]) - 30, CreatePZ.current_bottom)
                 str_raid.append(crt)
     merged_segments = merge_overlapping_intervals(str_raid)
+
     for plast in CreatePZ.plast_work:
         for interval in list((CreatePZ.dict_perforation[plast]['интервал'])):
             for str in str_raid:
