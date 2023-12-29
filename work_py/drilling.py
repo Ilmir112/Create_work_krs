@@ -27,14 +27,14 @@ def drilling_nkt(self):
     elif CreatePZ.column_additional == True:
         drilling_str = f'долото-{drillingBit_diam} для ЭК {CreatePZ.column_additional_diametr}мм х ' \
                        f'{CreatePZ.column_additional_wall_thickness}мм + забойный двигатель Д-76 +НКТ{nkt_pod}мм 20м + репер + ' \
-                       f'НКТ{nkt_pod} {CreatePZ.current_bottom - CreatePZ.head_column_additional}м'
+                       f'НКТ{nkt_pod} {round(CreatePZ.current_bottom - CreatePZ.head_column_additional,0)}м'
     current_depth, ok = QInputDialog.getInt(None, 'Нормализация забоя',
                                             'Введите глубину необходимого забоя',
                                             int(CreatePZ.current_bottom), 0, int(CreatePZ.bottomhole_artificial + 500))
     CreatePZ.drilling_interval.append([CreatePZ.current_bottom, current_depth])
     drilling_list = [
         [None, None,
-         f'Спустить {drilling_str}  на НКТ{nkt_diam}мм до ntreotuj pf,jz с замером, '
+         f'Спустить {drilling_str}  на НКТ{nkt_diam}мм до до текущего забоя с замером, '
          f'шаблонированием шаблоном\n'
          f' (При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ). '
          f'В случае разгрузки инструмента  при спуске, проработать место посадки с промывкой скв., составить акт.'

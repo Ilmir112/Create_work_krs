@@ -105,7 +105,7 @@ def rir_rpk(self):
                     None, None, None, None, None, None, None,
                     'мастер КРС', 1],
       [None, None,
-                   f'Произвести насыщение скважины в объеме 5м3. Определить приемистость {plast} при Р-80, 100, 120атм '
+                   f'Произвести насыщение скважины в объеме 5м3. Определить приемистость {plast} при Р=80-100атм '
                    f'в присутствии представителя УСРСиСТ или подрядчика по РИР. (Вести контроль за отдачей жидкости '
                    f'после закачки, объем согласовать с подрядчиком по РИР).  В случае приёмистости менее  250м3/сут '
                    f'при Р=100атм произвести соляно-кислотную обработку скважины в объеме 1м3 HCl-12% с целью увеличения '
@@ -119,7 +119,7 @@ def rir_rpk(self):
 
         rir_q_list = [
                       [None, None,
-                       f'Произвести насыщение скважины в объеме 5м3. Определить приемистость {plast} при Р-80, 100, 120атм '
+                       f'Произвести насыщение скважины в объеме 5м3. Определить приемистость {plast} при Р=80-100атм '
                        f'в присутствии представителя УСРСиСТ или подрядчика по РИР. (Вести контроль за отдачей жидкости '
                        f'после закачки, объем согласовать с подрядчиком по РИР).  В случае приёмистости менее  250м3/сут '
                        f'при Р=100атм произвести соляно-кислотную обработку скважины в объеме 1м3 HCl-12% с целью увеличения '
@@ -244,7 +244,7 @@ def rirWithPero(self):
         dict_nkt = {73: rirSole}
 
 
-    volume_cement = round(volume_vn_ek(self) * (rirSole - rirRoof)/1000, 1)
+    volume_cement = round(volume_vn_ek(self,rirRoof) * (rirSole - rirRoof)/1000, 1)
 
     uzmPero_list = [
         [None, None,
@@ -372,7 +372,7 @@ def rirWithPero(self):
     ]
     print(f'количество пластов {len(CreatePZ.plast_work)}')
 
-    if len(CreatePZ.plast_work) == 0:
+    if len(CreatePZ.plast_work) == 0 or CreatePZ.perforation_sole < rirRoof:
         rir_list = []
         for row in uzmPero_list:
             rir_list.append(row)
@@ -388,7 +388,7 @@ def rirWithPero(self):
             rir_list.append(row)
         glin_list = [
             [None, None,
-             f'Произвести насыщение скважины в объеме 5м3. Определить приемистость {plast} при Р-80, 100, 120атм '
+             f'Произвести насыщение скважины в объеме 5м3. Определить приемистость {plast} при Р=80-100атм '
              f'в присутствии представителя УСРСиСТ или подрядчика по РИР. (Вести контроль за отдачей жидкости '
              f'после закачки, объем согласовать с подрядчиком по РИР). В случае приёмистости менее  250м3/сут '
              f'при Р={CreatePZ.max_admissible_pressure}атм произвести соляно-кислотную обработку скважины в объеме 1м3 HCl-12% с целью увеличения '
@@ -466,7 +466,7 @@ def pero_select(self, rirSole):
         pero_select = f'перо + опрессовочное седло + НКТ{CreatePZ.nkt_diam} 20м + репер'
 
     elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr < 110 and rirSole > CreatePZ.head_column_additional:
-        pero_select = f'перо + опрессовочное седло + НКТ60мм 20м + репер + НКТ60мм L- {rirSole - CreatePZ.head_column_additional}м'
+        pero_select = f'перо + опрессовочное седло + НКТ60мм 20м + репер + НКТ60мм L- {round(rirSole - CreatePZ.head_column_additional, 1)}м'
     elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr > 110 and rirSole > CreatePZ.head_column_additional:
         pero_select  = f'воронку + опрессовочное седло + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками 20м + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками' \
                        f' L- {rirSole - CreatePZ.head_column_additional}м'
@@ -489,7 +489,7 @@ def rir_paker(self):
 
 
     rir_q_list = [None, None,
-                   f'Произвести насыщение скважины в объеме 5м3. Определить приемистость {plast} при Р-80, 100, 120атм '
+                   f'Произвести насыщение скважины в объеме 5м3. Определить приемистость {plast} при Р=80-100атм '
                    f'в присутствии представителя УСРСиСТ или подрядчика по РИР. (Вести контроль за отдачей жидкости '
                    f'после закачки, объем согласовать с подрядчиком по РИР).  В случае приёмистости менее  250м3/сут '
                    f'при Р=100атм произвести соляно-кислотную обработку скважины в объеме 1м3 HCl-12% с целью увеличения '

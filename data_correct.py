@@ -131,7 +131,7 @@ class TabPage_SO(QWidget):
 
         self.paker2_depth_do_Label = QLabel('Глубина спуска пакера')
         self.paker2_depth_do_EditType = QLineEdit(self)
-        self.paker2_depth_do_EditType.setText(self.ifNone(CreatePZ.H_F_paker2_do["do"]))
+        self.paker2_depth_do_EditType.setText(self.ifNone(str(CreatePZ.H_F_paker2_do["do"])))
 
         self.paker2_posle_Label = QLabel('пакер на спуск')
         self.paker2_posle_EditType = QLineEdit(self)
@@ -139,8 +139,17 @@ class TabPage_SO(QWidget):
 
         self.paker2_depth_posle_Label = QLabel('Глубина спуска пакера')
         self.paker2_depth_posle_EditType = QLineEdit(self)
-        self.paker2_depth_posle_EditType.setText(self.ifNone(CreatePZ.H_F_paker2_do["posle"]))
+        self.paker2_depth_posle_EditType.setText(self.ifNone(str(CreatePZ.H_F_paker2_do["posle"])))
         # print(f' насос спуск {CreatePZ.dict_pump["posle"]}')
+
+        self.static_level_Label = QLabel('Статический уровень в скважине')
+        self.static_level_EditType = QLineEdit(self)
+        self.static_level_EditType.setText(self.ifNone(CreatePZ.static_level))
+
+        self.dinamic_level_Label = QLabel('Динамический уровень в скважине')
+        self.dinamic_level_EditType = QLineEdit(self)
+        self.dinamic_level_EditType.setText(self.ifNone(CreatePZ.dinamic_level))
+
 
         grid = QGridLayout(self)
         grid.addWidget(self.columnLabel, 0, 0)
@@ -208,6 +217,11 @@ class TabPage_SO(QWidget):
         grid.addWidget(self.paker2_posle_EditType, 11, 4)
         grid.addWidget(self.paker2_depth_posle_Label, 10, 5)
         grid.addWidget(self.paker2_depth_posle_EditType, 11, 5)
+
+        grid.addWidget(self.static_level_Label, 12, 2)
+        grid.addWidget(self.static_level_EditType, 13, 2)
+        grid.addWidget(self.dinamic_level_Label, 12, 3)
+        grid.addWidget(self.dinamic_level_EditType, 13, 3)
 
     def ifNone(self, string):
         if str(string) != '0':
@@ -287,6 +301,10 @@ class DataWindow(MyWindow):
         H_F_paker2_do = self.tabWidget.currentWidget().paker2_depth_do_EditType.text()
         paker2_posle = self.tabWidget.currentWidget().paker2_posle_EditType.text()
         H_F_paker2_posle = self.tabWidget.currentWidget().paker2_depth_posle_EditType.text()
+
+        static_level = self.tabWidget.currentWidget().static_level_EditType.text()
+        dinamic_level = self.tabWidget.currentWidget().dinamic_level_EditType.text()
+
         # print(any(['ЭЦН' in dict_pump_ECN_posle.upper(), 'ВНН' in dict_pump_ECN_posle.upper(),
         #                 dict_pump_ECN_posle == 'отсут']))
         # print(dict_pump_ECN_posle)
@@ -308,6 +326,9 @@ class DataWindow(MyWindow):
                 or self.ifNum(max_admissible_pressure) == False \
                 or self.ifNum(max_expected_pressure) == False \
                 or self.ifNum(dict_pump_ECN_h_do) == False\
+                or self.ifNum(static_level) == False \
+                or self.ifNum(static_level) == 'отсут' \
+                or self.ifNum(dinamic_level) == False\
                 or self.ifNum(dict_pump_ECN_h_posle) == False \
                 or self.ifNum(dict_pump_SHGN_h_do) == False \
                 or self.ifNum(dict_pump_SHGN_h_posle) == False \
@@ -327,6 +348,8 @@ class DataWindow(MyWindow):
                 or (dict_pump_SHGN_posle != 'отсут' and dict_pump_SHGN_h_posle == 'отсут') \
                 or (paker_do != 'отсут' and H_F_paker_do == 'отсут') \
                 or (paker_posle != 'отсут' and H_F_paker_posle == 'отсут') \
+                or (paker2_do != 'отсут' and H_F_paker2_do == 'отсут') \
+                or (paker2_posle != 'отсут' and H_F_paker2_posle == 'отсут') \
                 or any(['ЭЦН' in dict_pump_ECN_do.upper(), 'ВНН' in dict_pump_ECN_do.upper(),
                         dict_pump_ECN_do == 'отсут']) == False:
             msg = QMessageBox.information(self, 'Внимание', 'Не все поля соответствуют значениям')

@@ -22,21 +22,41 @@ class Raid(CreatePZ):
                                                   f'Введите диаметр райбера',
                                                   int(ryber_diam), 70,
                                                   200)
+        nkt_pod = 0
         if CreatePZ.column_additional == True:
             nkt_pod = ['60мм' if CreatePZ.column_additional_diametr <110 else '73мм со снятыми фасками']
             nkt_pod = ''.join(nkt_pod)
 
         nkt_diam = ''.join(['73' if CreatePZ.column_diametr > 110 else '60'])
+
+        ryber_str_EK = f'райбер-{ryber_diam} для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм +' \
+                       f' забойный двигатель Д-106 +НКТ{nkt_diam}м 20м + репер '
+        ryber_str_DP = f'райбер-{ryber_diam} для ЭК {CreatePZ.column_additional_diametr}мм х ' \
+                    f'{CreatePZ.column_additional_wall_thickness}мм + забойный двигатель Д-76 +НКТ{nkt_pod}мм 20м + репер + ' \
+                    f'НКТ{nkt_pod} {CreatePZ.current_bottom - float(CreatePZ.head_column_additional)}м'
+
         if CreatePZ.column_additional == False or (CreatePZ.column_additional == True and CreatePZ.head_column_additional >= CreatePZ.current_bottom):
-            ryber_str = f'райбер-{ryber_diam} для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм +' \
-                        f' забойный двигатель Д-106 +НКТ{nkt_diam}м 20м + репер '
-
-
+            ryber_key = 'райбер в ЭК'
+            ryber_str = ryber_str_EK
         elif CreatePZ.column_additional == True:
-            ryber_str = f'райбер-{ryber_diam} для ЭК {CreatePZ.column_additional_diametr}мм х ' \
-                           f'{CreatePZ.column_additional_wall_thickness}мм + забойный двигатель Д-76 +НКТ{nkt_pod}мм 20м + репер + ' \
-                           f'НКТ{nkt_pod} {CreatePZ.current_bottom - CreatePZ.head_column_additional}м'
-        raiding_interval_tuple = raiding_interval()
+            ryber_key = 'райбер в ДП'
+            ryber_str = ryber_str_DP
+
+        rayber_sel = ['райбер в ЭК', 'райбер в ДП']
+        rayber_dict = {'райбер в ЭК': ryber_str_EK, 'райбер в ДП': ryber_str_DP}
+
+        rayber, ok = QInputDialog.getItem(self, 'Спуcкаемое  оборудование', 'выбор спуcкаемого оборудования',
+                                            rayber_sel, rayber_sel.index(ryber_key), False)
+
+        if ok and rayber_sel:
+            self.le.setText(ryber_str)
+
+        ryber_str = rayber_dict[rayber]
+        result = {}
+        for key, value in rayber_dict.items():
+            result[value] = key
+        ryber_key = result[ryber_str]
+        raiding_interval_tuple = raiding_interval(ryber_key)
         print(f' интервал райбирования {raiding_interval_tuple, len(raiding_interval_tuple)}')
         if raiding_interval_tuple == '':
             while raiding_interval_tuple != '':

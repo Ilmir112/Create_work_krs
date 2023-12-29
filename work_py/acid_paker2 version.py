@@ -155,7 +155,7 @@ class AcidPakerWindow(MyWindow):
         self.buttonAdd = QPushButton('Добавить данные в таблицу')
         self.buttonAdd.clicked.connect(self.addRowTable)
         self.buttonDel = QPushButton('Удалить строку из таблице')
-        self.buttonDel.clicked.connect(self.delRowTable)
+        self.buttonDel.clicked.connect(self.del_row_table)
         self.buttonAddWork = QPushButton('Добавить в план работ')
         self.buttonAddWork.clicked.connect(self.addWork)
         vbox = QGridLayout(self.centralWidget)
@@ -497,7 +497,7 @@ class AcidPakerWindow(MyWindow):
 
 
 
-    def delRowTable(self):
+    def del_row_table(self):
         pass
     #     row = self.tableWidget.currentRow()
     #     if row == -1:

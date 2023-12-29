@@ -112,7 +112,7 @@ class TabPage_SO(QWidget):
 
         if CreatePZ.countAcid == 1:
             for enable in [self.khovstLabel, self.khvostEdit, self.swabTruelabelType,
-                           self.swabTrueEditType,   self.swabTypeCombo]:
+                           self.swabTrueEditType, self.swabTypeCombo]:
                 enable.setEnabled(False)
         elif CreatePZ.countAcid == 2:
             listEnabel = [self.khovstLabel, self.khvostEdit, self.swabTruelabelType,
@@ -413,7 +413,7 @@ class AcidPakerWindow(MyWindow):
                      f'в объеме'
                      f' {skvVolumeEdit}м3 (0,7т HCL 24%)(по спец. плану, составляет старший мастер)',
                      None, None, None, None, None, None, None,
-                     'мастер КРС, УСРСиСТ', 1.2],
+                     'мастер КРС, УСРСиСТ', 0.5],
                     [None, None,
                      f'закачать {skvAcidEdit} {skvProcEdit}% в объеме V={skvVolumeEdit}м3; довести кислоту до пласта '
                      f'тех.жидкостью в объеме {volume_vn_nkt(dict_nkt)}м3 . ',
@@ -462,18 +462,18 @@ class AcidPakerWindow(MyWindow):
                         f'{acid_sel}'
                         f'ОБЕСПЕЧИТЬ НАЛИЧИЕ У СОСТАВА ВАХТЫ И СИЗ ПРИ КИСЛОТНОЙ ОБРАБОТКИ',
                         None, None, None, None, None, None, None,
-                        'мастер КРС, УСРСиСТ', 8],
+                        'мастер КРС, УСРСиСТ', None],
                        [None, None,
                         ''.join([f"Закачать кислоту в объеме V={round(volume_vn_nkt(dict_nkt), 1)}м3 (внутренний "
                                  f"объем НКТ)" if acidVolumeEdit > volume_vn_nkt(dict_nkt) else f"Закачать кислоту в "
                                                                                                 f"объеме {round(acidVolumeEdit, 1)}м3, "
                                                                                                 f"довести кислоту тех жидкостью в объеме {round(volume_vn_nkt(dict_nkt) - acidVolumeEdit, 1)}м3 "]),
                         None, None, None, None, None, None, None,
-                        'мастер КРС', None],
+                        'мастер КРС', 1.25],
                        [None, None,
                         f'посадить пакер на глубине {pakerEdit}м',
                         None, None, None, None, None, None, None,
-                        'мастер КРС', None],
+                        'мастер КРС', 0.3],
                        [None, None,
                         ''.join(
                             [
@@ -484,7 +484,7 @@ class AcidPakerWindow(MyWindow):
                                                    f'в объеме {round(volume_vn_nkt(dict_nkt) + 0.5, 1)}м3 при давлении не более {CreatePZ.max_admissible_pressure}атм. '
                                                    f'Увеличение давления согласовать с заказчиком']),
                         None, None, None, None, None, None, None,
-                        'мастер КРС', None],
+                        'мастер КРС', 6],
                        [None, None,
                         f'реагирование 2 часа.',
                         None, None, None, None, None, None, None,
@@ -565,13 +565,16 @@ class AcidPakerWindow(MyWindow):
                 and all(
             [CreatePZ.dict_perforation[plast]['отрайбировано'] == True for plast in CreatePZ.plast_work])) == True:
             flushingDownhole_list = f'Допустить компоновку до глубины {CreatePZ.current_bottom}м. Промыть скважину обратной промывкой ' \
-                                    f'по круговой циркуляции  жидкостью уд.весом {CreatePZ.fluid_work} при расходе жидкости не ' \
+                                    f'по круговой циркуляции  жидкостью уд.весом {CreatePZ.fluid_work} п' \
+                                    f'ри расходе жидкости не ' \
                                     f'менее 6-8 л/сек в объеме не менее {round(well_volume(self, paker_depth + paker_khost) * 1.5, 1)}м3 ' \
                                     f'в присутствии представителя заказчика ДО ЧИСТОЙ ВОДЫ.'
         elif paker_depth + paker_khost < CreatePZ.current_bottom:
-            flushingDownhole_list = f'Допустить пакер до глубины {int(CreatePZ.perforation_roof - 5)}м. (на 5м выше кровли интервала перфорации), ' \
-                                    f'низ НКТ до глубины {CreatePZ.perforation_roof - 5 + paker_khost}м) ' \
-                                    f'Промыть скважину обратной промывкой по круговой циркуляции  жидкостью уд.весом {CreatePZ.fluid_work} при расходе жидкости не ' \
+            flushingDownhole_list = f'Допустить пакер до глубины {int(CreatePZ.perforation_roof - 5)}м. ' \
+                                    f'(на 5м выше кровли интервала перфорации), низ НКТ до глубины' \
+                                    f' {CreatePZ.perforation_roof - 5 + paker_khost}м) ' \
+                                    f'Промыть скважину обратной промывкой по круговой циркуляции ' \
+                                    f'жидкостью уд.весом {CreatePZ.fluid_work} при расходе жидкости не ' \
                                     f'менее 6-8 л/сек в объеме не менее {round(well_volume(self, paker_depth + paker_khost) * 1.5, 1)}м3 ' \
                                     f'в присутствии представителя заказчика ДО ЧИСТОЙ ВОДЫ.'
 
@@ -693,21 +696,21 @@ class AcidPakerWindow(MyWindow):
 
                 # self.table_widget.setCellWidget(row, column, widget)
 
-                if not data is None:
+                if data is not None:
                     self.table_widget.setItem(row, column, item)
 
                 else:
                     self.table_widget.setItem(row, column, QtWidgets.QTableWidgetItem(str('')))
 
                 if column == 2:
-                    if not data is None:
+                    if data is not None:
                         text = data
                         for key, value in text_width_dict.items():
                             if value[0] <= len(text) <= value[1]:
                                 text_width = key
                                 self.table_widget.setRowHeight(row, int(text_width))
 
-    def delRowTable(self):
+    def del_row_table(self):
         pass
     #     row = self.tableWidget.currentRow()
     #     if row == -1:

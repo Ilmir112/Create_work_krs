@@ -23,7 +23,7 @@ def claySolutionDef(self):
         dict_nkt = {73: rirSole}
 
 
-    volume_cement = round(volume_vn_ek(self) * (rirSole - rirRoof)/1000, 1)
+    volume_cement = round(volume_vn_ek(self, rirRoof) * (rirSole - rirRoof)/1000, 1)
     dict_nkt = {73: rirRoof}
     pero_list = [
         [None, None,
@@ -54,5 +54,8 @@ def claySolutionDef(self):
                           f'уд.весом {CreatePZ.fluid_work}',
                           None, None, None, None, None, None, None,
                           'мастер КРС', descentNKT_norm(float(rirSole)-float(rirRoof), 1)])
-        pero_list.extend(rirWithPero(self)[-10:])
+        if (CreatePZ.plast_work) != 0:
+            pero_list.extend(rirWithPero(self)[-9:])
+        else:
+            pero_list.extend(rirWithPero(self)[-10:])
     return pero_list

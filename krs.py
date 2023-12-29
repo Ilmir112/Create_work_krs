@@ -1,7 +1,5 @@
-from PyQt5.QtWidgets import QInputDialog, QMessageBox
 import H2S
-
-
+from PyQt5.QtWidgets import QInputDialog, QMessageBox
 from openpyxl import load_workbook
 def calculationFluidWork(vertical, pressure):
     from open_pz import CreatePZ
@@ -9,7 +7,7 @@ def calculationFluidWork(vertical, pressure):
             isinstance(pressure, float) or isinstance(pressure, int)):
 
         print(vertical, pressure)
-        stockRatio = [0.1 if float(vertical) <= 1200 else 0.05][0]
+        stockRatio = 0.1 if float(vertical) <= 1200 else 0.05
 
         fluidWork = round(float(str(pressure)) * (1 + stockRatio) / float(vertical) / 0.0981, 2)
         if fluidWork < 1.02 and (CreatePZ.region == 'КГМ' or CreatePZ.region == 'АГМ'):
@@ -961,13 +959,12 @@ def lifting_unit(self):
     return upa_60 if CreatePZ.bottomhole_artificial >= 2300 else aprs_40
 
 
-def volume_vn_ek(self):
+def volume_vn_ek(self, current):
     from open_pz import CreatePZ
-    if CreatePZ.column_additional == False:
+    if CreatePZ.column_additional == False or CreatePZ.column_additional == True and current < CreatePZ.head_column_additional:
         volume = round((CreatePZ.column_diametr - 2 * CreatePZ.column_wall_thickness) ** 2 * 3.14 / 4 / 1000, 2)
     else:
-        volume = round(
-            (CreatePZ.column_additional_diametr - 2 * CreatePZ.column_additional_wall_thickness) ** 2 * 3.14 / 4 / 1000,
+        volume = round((CreatePZ.column_additional_diametr - 2 * CreatePZ.column_additional_wall_thickness) ** 2 * 3.14 / 4 / 1000,
             2)
     return volume
 
@@ -1054,7 +1051,6 @@ def well_volume(self, current_bottom):
 
     # print(CreatePZ.column_additional)
     if CreatePZ.column_additional == False:
-
         volume_well = 3.14 * (CreatePZ.column_diametr - CreatePZ.column_wall_thickness * 2) ** 2 / 4 / 1000000 * (
             current_bottom)
 
@@ -1179,7 +1175,7 @@ def is_number(num):
     if num is None:
         return 0
     try:
-        float(str(num))
+        float(str(num).replace(",","."))
         return True
     except ValueError or TypeError:
         return False

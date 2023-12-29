@@ -16,7 +16,7 @@ def sand_select(self):
 
 def sandFilling(self):
     from open_pz import CreatePZ
-    from krs import well_volume
+    from krs import well_volume, volume_vn_ek
     nkt_diam = ''.join(['73' if CreatePZ.column_diametr > 110 else '60'])
 
 
@@ -24,6 +24,8 @@ def sandFilling(self):
                                           'Введите кровлю необходимого песчанного моста',
                                           int(CreatePZ.perforation_roof - 20), 0, int(CreatePZ.current_bottom))
 
+
+    sand_volume= round(volume_vn_ek(self,filling_depth) * (CreatePZ.current_bottom - filling_depth)/1000, 1)
 
 
     filling_list = [
@@ -33,7 +35,7 @@ def sandFilling(self):
      None, None, None, None, None, None, None,
      'Мастер КР', descentNKT_norm(CreatePZ.current_bottom,1)],
         [None, None, f'Произвести отсыпку кварцевым песком в инт. {filling_depth} - {CreatePZ.current_bottom} '
-                     f' в объеме {round(well_volume(self, CreatePZ.current_bottom)/CreatePZ.current_bottom*1000* (CreatePZ.current_bottom-filling_depth),0)}л '
+                     f' в объеме {sand_volume}л '
                      f'Закачать в НКТ кварцевый песок  с доводкой тех.жидкостью {CreatePZ.fluid_work}',
          None, None, None, None, None, None, None,
          'мастер КРС', 3.5],

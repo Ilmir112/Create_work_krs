@@ -1,8 +1,7 @@
-import sys
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtWidgets
 from PyQt5.Qt import *
 
-import main
+
 from main import MyWindow
 
 
@@ -95,7 +94,7 @@ class PerforationWindow(MyWindow):
         self.buttonAdd = QPushButton('Добавить интервалы перфорации в таблицу')
         self.buttonAdd.clicked.connect(self.addRowTable)
         self.buttonDel = QPushButton('Удалить интервалы перфорации в таблице')
-        self.buttonDel.clicked.connect(self.delRowTable)
+        self.buttonDel.clicked.connect(self.del_row_table)
         self.buttonAddWork = QPushButton('Добавить в план работ')
         self.buttonAddWork.clicked.connect(self.addWork)
         self.buttonAddProject = QPushButton('Добавить проектные интервалы перфорации')
@@ -257,9 +256,9 @@ class PerforationWindow(MyWindow):
                         perf_list.append(int(value))
                     else:
                         perf_list.append(value)
-            # plast
+
             # perf_list.insert(7, (round((float(perf_list[4]) - float(perf_list[2])) * int(perf_list[6]), 1)))
-            perf_list.extend(['подрядчик по ГИС', round((perf_list[2]-perf_list[1]) * 2.25, 1)])
+            perf_list.extend(['подрядчик по ГИС', round(perf_list[4]-perf_list[2]) * 1.8, 1])
             # print(perf_list)
             plast = perf_list[8]
             # print(f' раб ПВР {CreatePZ.plast_work, plast}')
@@ -278,7 +277,7 @@ class PerforationWindow(MyWindow):
                                                f"Подъем последних 5-ти НКТ{CreatePZ.nkt_diam}мм и демонтаж перфоратора производить в присутствии ответственного "
                                            f"представителя подрядчика по ГИС» (руководителя взрывных работ или взрывника)."]),
                          None, None, None, None, None, None, None,
-                          'Подрядчик по ГИС', None, None])
+                          'Подрядчик по ГИС', None, 2])
         print([CreatePZ.dict_perforation[plast] for plast in CreatePZ.plast_work])
         pipe_perforation = [
            [None, None, f'Произвести монтаж трубного перфоратора + 2шт/20м НКТ + реперный патрубок L=2м до намеченного интервала перфорации '
@@ -309,8 +308,8 @@ class PerforationWindow(MyWindow):
                 lst = [0, 1, 2, len(perforation)-1]
                 if float(CreatePZ.max_angle) >= 50:
                     lst.extend([3, 4])
-                # if i in lst: # Объединение ячеек по вертикале в столбце "отвественные и норма"
-                #     self.table_widget.setSpan(i + self.ins_ind, 2, 1, 8)
+                if i in lst: # Объединение ячеек по вертикале в столбце "отвественные и норма"
+                    self.table_widget.setSpan(i + self.ins_ind, 2, 1, 8)
                 for column, data in enumerate(row_data):
 
                     # widget = QtWidgets.QLabel(str())
@@ -333,8 +332,8 @@ class PerforationWindow(MyWindow):
                                 self.table_widget.setRowHeight(row, int(text_width))
                     else:
                         self.table_widget.setItem(row, column, QtWidgets.QTableWidgetItem(str('')))
-            self.table_widget.setSpan(1 + self.ins_ind, 10, len(perforation) - 2, 1)
-            self.table_widget.setSpan(1 + self.ins_ind, 11, len(perforation) - 2, 1)
+            # self.table_widget.setSpan(1 + self.ins_ind, 10, len(perforation) - 2, 1)
+            # self.table_widget.setSpan(1 + self.ins_ind, 11, len(perforation) - 2, 1)
 
             print(f'мин {CreatePZ.perforation_roof}, мак {CreatePZ.perforation_sole}')
 
@@ -347,7 +346,7 @@ class PerforationWindow(MyWindow):
 
 
 
-    def delRowTable(self):
+    def del_row_table(self):
         row = self.tableWidget.currentRow()
         if row == -1:
             msg = QMessageBox.information(self, 'Внимание', 'Выберите строку для удаления')

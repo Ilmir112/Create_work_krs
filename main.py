@@ -318,9 +318,14 @@ class MyWindow(QMainWindow):
         del_menu.addAction(emptyString_action)
         emptyString_action.triggered.connect(self.emptyString)
 
+        gnkt_menu = context_menu.addMenu("ГНКТ")
         gnkt_opz_action = QAction("ГНКТ ОПЗ", self)
-        context_menu.addAction(gnkt_opz_action)
+        gnkt_menu.addAction(gnkt_opz_action)
         gnkt_opz_action.triggered.connect(self.gnkt_opz)
+
+        gnkt_opz_action = QAction("ГНКТ Освоение после ГРП", self)
+        gnkt_menu.addAction(gnkt_opz_action)
+        gnkt_opz_action.triggered.connect(self.gnkt_after_grp)
 
         deleteString_action = QAction("Удалить строку", self)
         del_menu.addAction(deleteString_action)
@@ -334,6 +339,11 @@ class MyWindow(QMainWindow):
         template_menu = action_menu.addMenu('Шаблоны')
         template_menu.addAction(template_with_skm)
         template_with_skm.triggered.connect(self.template_with_skm)
+
+        template_pero = QAction("проходиость по перу", self)
+
+        template_menu.addAction(template_pero)
+        template_pero.triggered.connect(self.template_pero)
 
         ryber_action = QAction("Райбирование", self)
         action_menu.addAction(ryber_action)
@@ -692,6 +702,11 @@ class MyWindow(QMainWindow):
         ryber_work_list = Raid.raidingColumn(self)
         self.populate_row(self.ins_ind, ryber_work_list)
 
+    def gnkt_after_grp(self):
+        from gnkt_after_grp import gnkt_work
+        gnkt_work_list = gnkt_work(self)
+        self.populate_row(self.ins_ind, gnkt_work_list)
+
     def gnkt_opz(self):
         from gnkt_opz import gnkt_work
 
@@ -738,6 +753,14 @@ class MyWindow(QMainWindow):
         pressure_work1 = paker_list(self)
         print(f'индекс {self.ins_ind, len(pressure_work1)}')
         self.populate_row(self.ins_ind, pressure_work1)
+
+    def template_pero(self):
+        from work_py.template_work import pero
+
+
+        template_pero_list = pero(self)
+        self.populate_row(self.ins_ind, template_pero_list)
+
 
     def template_with_skm(self):
         from work_py.template_work import template_ek

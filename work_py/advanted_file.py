@@ -35,13 +35,15 @@ def skm_interval():
             perforating_intervals = list(CreatePZ.dict_perforation[plast]['интервал'])
             for pvr in perforating_intervals:
                 if pvr[1] + 50 < CreatePZ.current_bottom and pvr[0] < CreatePZ.current_bottom:
-                    skipping_intervals.append([pvr[0] - 90, pvr[1] - 3])
-                    skipping_intervals.append([pvr[1] + 5, pvr[1] + 25])
+                    skipping_intervals.append([pvr[0] - 90, pvr[0] - 3])
+                    skipping_intervals.append([pvr[1] + 5, pvr[1] + 35])
+                    # print(f'скрепр{skipping_intervals}')
                 elif pvr[1] + 50 > CreatePZ.current_bottom and pvr[0] < CreatePZ.current_bottom:
                     skipping_intervals.append([pvr[0] - 90, pvr[1] - 5])
                     if pvr[1] + 5 < CreatePZ.current_bottom - 2:
                         skipping_intervals.append([pvr[1] + 5, CreatePZ.current_bottom - 2])
-        # print(skipping_intervals)
+                        # print(f'скрепр2{skipping_intervals}')
+
         str_raid.extend(remove_overlapping_intervals(skipping_intervals, perforating_intervals))
     # print(f'скреперо {str_raid}')
     if CreatePZ.dict_perforation_project is None and any(
@@ -84,7 +86,7 @@ def remove_overlapping_intervals(skipping_intervals, perforating_intervals):
                 break
     return skipping_intervals
 
-def raiding_interval():
+def raiding_interval(ryber_key):
     from open_pz import CreatePZ
     str_raid = []
     if len(CreatePZ.dict_perforation) == 1 and CreatePZ.perforation_sole + 30 <= CreatePZ.current_bottom and CreatePZ.perforation_roof <= CreatePZ.current_bottom:
@@ -135,6 +137,20 @@ def raiding_interval():
                 else:
                     crt = (float(i[0]) - 30, CreatePZ.current_bottom)
                 str_raid.append(crt)
+    print(f' интервал райбире {str_raid}')
+    if CreatePZ.column_additional == True and CreatePZ.current_bottom > CreatePZ.head_column_additional:
+        if ryber_key == 'райбер в ЭК':
+            print(ryber_key)
+            for str in str_raid:
+                if str[0] > CreatePZ.head_column_additional or str[1] > CreatePZ.head_column_additional :
+                    str_raid.remove(str)
+        else:
+            print(ryber_key)
+            for str in str_raid:
+                print()
+                if str[0] < CreatePZ.head_column_additional or str[1] < CreatePZ.head_column_additional :
+                    str_raid.remove(str)
+
     merged_segments = merge_overlapping_intervals(str_raid)
 
     for plast in CreatePZ.plast_work:
