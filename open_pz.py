@@ -288,27 +288,17 @@ class CreatePZ:
                             CreatePZ.max_angle = row[col + n]
                             n += 1
 
-                    elif 'по H2S' in row and ('мг/л' in row or 'мг/дм3' in row):
-                        if value == 'мг/л' or 'мг/дм3':
-                            if CreatePZ.if_None(row[col - 1]) == 'отсут':
-                                CreatePZ.H2S_mg.append(0)
-                            else:
-                                CreatePZ.H2S_mg.append(row[col - 1])
-                    elif '%' in row:
 
-                        if value == '%':
-                            # print(row_ind)
-                            if CreatePZ.if_None(row[col - 1]) == 'отсут':
-                                CreatePZ.H2S_pr.append(0)
-                            else:
-                                CreatePZ.H2S_pr.append(row[col - 1])
-
-                        # print(f'H2s % {CreatePZ.H2S_pr}')
-                    elif 'по H2S' in row and ('мг/м3' in row):
-
-                        if len(CreatePZ.H2S_mg) == 0 and 'мг/м3' == value:
-                            if CreatePZ.if_None(row[col - 1]) != 'отсут':
-                                CreatePZ.H2S_mg.append(float(row[col - 1] / 1000))
+                    if value == 'мг/л' or value == 'мг/дм3' :
+                        if CreatePZ.if_None(row[col - 1]) != 'отсут':
+                            CreatePZ.H2S_mg.append(row[col - 1])
+                        print(f'мг/k {CreatePZ.H2S_mg}')
+                    if value == '%':
+                        # print(row_ind)
+                        if CreatePZ.if_None(row[col - 1]) != 'отсут':
+                            CreatePZ.H2S_pr.append(row[col - 1])
+                    if len(CreatePZ.H2S_mg) == 0 and 'мг/м3' == value and CreatePZ.if_None(row[col - 1]) != 'отсут':
+                        CreatePZ.H2S_mg.append(float(row[col - 1] / 1000))
 
 
                     elif '9. Максимальный зенитный угол' in row and value == 'на глубине':
@@ -986,7 +976,7 @@ class CreatePZ:
         return self.ws
 
     def addItog(self, ws, ins_ind):
-        print(ins_ind, self.table_widget.rowCount() - ins_ind + 1)
+
         ws.delete_rows(ins_ind, self.table_widget.rowCount() - ins_ind + 1)
         for i in range(ins_ind, len(itog_1(self)) + ins_ind):  # Добавлением итогов
             if i < ins_ind + 6:
@@ -1130,7 +1120,7 @@ class CreatePZ:
                         CreatePZ.dict_perforation[plast]["подошва"] = CreatePZ.perforation_sole
                     if CreatePZ.perforation_roof_all >= interval[0]:
                         CreatePZ.perforation_roof_all = interval[0]
-        print(CreatePZ.dict_perforation)
+        # print(CreatePZ.dict_perforation[plast]['кровля'])
         CreatePZ.plast_all = list(CreatePZ.dict_perforation.keys())
         CreatePZ.plast_work = list(plast_work)
         print(f' раб {CreatePZ.plast_work}')
@@ -1153,7 +1143,6 @@ class CreatePZ:
         rowHeights1 = [ws.row_dimensions[i].height for i in range(ws.max_row)]
         colWidth = [ws.column_dimensions[get_column_letter(i + 1)].width for i in range(0, 13)] + [None]
         for i, row_data in enumerate(work_list):
-
             for column, data in enumerate(row_data):
                 if column == 2:
                     if not data is None:
@@ -1164,14 +1153,10 @@ class CreatePZ:
 
         for i in range(1, len(work_list) + 1):  # Добавлением работ
             for j in range(1, 13):
-                # print(ws2.cell(row=i, column=j).value)
                 cell = ws2.cell(row=i, column=j)
-
                 if cell and str(cell) != str(work_list[i - 1][j - 1]):
-                    # print(work_list[i - 1][j - 1])
                     cell.value = work_list[i - 1][j - 1]
                     if i >= ind_ins:
-
                         if j != 1:
                             cell.border = CreatePZ.thin_border
                         if j == 11:
@@ -1192,7 +1177,7 @@ class CreatePZ:
                                 or 'порядок работы' in str(cell.value).lower() \
                                 or 'ВСЕ ТЕХНОЛОГИЧЕСКИЕ ОПЕРАЦИИ' in str(cell.value).upper() \
                                 or 'за 48 часов до спуска' in str(cell.value).upper():
-                            print('есть жирный')
+                            # print('есть жирный')
                             ws2.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=True)
         for row, col in merged_cells_dict.items():
             if len(col) != 2:
@@ -1225,6 +1210,7 @@ class CreatePZ:
         # Копирование изображения
         for image in CreatePZ.image_list:
             ws2.add_image(image)
+
         return 'Высота изменена'
 
         # ws2.unmerge_cells(start_column=2, start_row=self.ins_ind, end_column=12, end_row=self.ins_ind)

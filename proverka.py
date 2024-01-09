@@ -1,17 +1,10 @@
-import time
-from PyQt5 import QtCore, QtWidgets
+import sys
+from PyQt5.QtWidgets import QApplication, QTableWidget
 
-app = QtWidgets.QApplication([])
-w = QtWidgets.QPushButton('Pause')
-w.show()
-
-def pause_app():
-    while True:
-        QtCore.QCoreApplication.instance().processEvents()
-        time.sleep(0.01)
-
-thread = QtCore.QThread()
-w.clicked.connect(thread.started)
-thread.finished.connect(app.quit)
-thread.start()
-pause_app()
+app = QApplication(sys.argv)
+table = QTableWidget()
+table.setRowCount(10)
+table.setColumnCount(10)
+table.setStyleSheet("QTableView::item {background-color: black; color: white;}")
+table.show()
+sys.exit(app.exec_())

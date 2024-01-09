@@ -144,11 +144,11 @@ class TabPage_SO(QWidget):
 
         self.static_level_Label = QLabel('Статический уровень в скважине')
         self.static_level_EditType = QLineEdit(self)
-        self.static_level_EditType.setText(self.ifNone(CreatePZ.static_level))
+        self.static_level_EditType.setText(str(self.ifNone(CreatePZ.static_level)))
 
         self.dinamic_level_Label = QLabel('Динамический уровень в скважине')
         self.dinamic_level_EditType = QLineEdit(self)
-        self.dinamic_level_EditType.setText(self.ifNone(CreatePZ.dinamic_level))
+        self.dinamic_level_EditType.setText(str(self.ifNone(CreatePZ.dinamic_level)))
 
 
         grid = QGridLayout(self)

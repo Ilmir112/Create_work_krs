@@ -1,19 +1,20 @@
+
 import sys
 import openpyxl
+import krs
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu, QMenuBar, QAction, QTableWidget, \
     QLineEdit, QFileDialog, QToolBar, QPushButton, QMessageBox, QInputDialog
 from PyQt5 import QtCore, QtWidgets
-
+from datetime import datetime
 from openpyxl.utils import get_column_letter
 from PyQt5.QtCore import Qt
 from openpyxl.workbook import Workbook
+from openpyxl.styles import Border, Side
 
-import krs
-import plan
+
 
 from openpyxl.drawing.image import Image
 
-import plan
 from H2S import calc_H2S
 
 
@@ -99,7 +100,6 @@ class MyWindow(QMainWindow):
                 self.work_plan = 'krs'
                 CreatePZ.pause = True
                 sheet = CreatePZ.open_excel_file(self, self.fname[0], self.work_plan)
-
                 self.copy_pz(sheet)
 
             except FileNotFoundError:
@@ -153,6 +153,7 @@ class MyWindow(QMainWindow):
         ws2 = wb2.get_sheet_by_name('Sheet')
         ws2.title = "План работ"
         print(f'открытие wb2')
+
         ins_ind = self.ins_ind_border
 
         merged_cells = []  # Список индексов объединения ячеек
@@ -160,7 +161,7 @@ class MyWindow(QMainWindow):
         work_list = []
         for row in range(self.table_widget.rowCount()):
             row_lst = []
-            self.ins_ind_border += 1
+            # self.ins_ind_border += 1
             for column in range(self.table_widget.columnCount()):
                 if self.table_widget.rowSpan(row, column) > 1 or self.table_widget.columnSpan(row, column) > 1:
                     merged_cells.append((row, column))
@@ -208,7 +209,7 @@ class MyWindow(QMainWindow):
                 print(f'{CreatePZ.cat_H2S_list} Расчет поглотителя сероводорода не требуется')
             for row_ind, row in enumerate(ws2.iter_rows(values_only=True)):
 
-                if 15 <row_ind < 100:
+                if 15 < row_ind < 100:
 
                     if all(cell in [None, '']  for cell in row) \
                             and ('Интервалы темпа' not in str(ws2.cell(row=row_ind, column=2).value)\
@@ -236,6 +237,7 @@ class MyWindow(QMainWindow):
         finally:
             if self.wb:
                 self.wb.close()
+
             print("Table data saved to Excel")
 
     def close_file(self):
@@ -243,6 +245,104 @@ class MyWindow(QMainWindow):
         if not self.table_widget is None:
             self.table_widget.close()
             self.table_widget = None
+            CreatePZ.gipsInWell = False
+            CreatePZ.grpPlan = False
+            CreatePZ.nktOpressTrue = False
+            CreatePZ.bottomhole_drill = 0
+            CreatePZ.open_trunk_well = False
+            CreatePZ.normOfTime = 0
+            CreatePZ.lift_ecn_can = False
+            CreatePZ.pause = True
+            CreatePZ.curator = '0'
+            CreatePZ.lift_ecn_can_addition = False
+            CreatePZ.column_passability = False
+            CreatePZ.column_additional_passability = False
+            CreatePZ.template_depth = 0
+            CreatePZ.nkt_diam = 73
+            CreatePZ.b_plan = 0
+            CreatePZ.expected_Q = 0
+            CreatePZ.expected_P = 0
+            CreatePZ.plast_select = ''
+            CreatePZ.dict_perforation = {}
+            CreatePZ.dict_perforation_project = {}
+            CreatePZ.itog_ind_min = 0
+            CreatePZ.kat_pvo = 2
+            CreatePZ.gaz_f_pr = []
+            CreatePZ.paker_layout = 0
+
+            CreatePZ.column_additional_diametr = 0
+            CreatePZ.column_additional_wall_thickness = 0
+            CreatePZ.shoe_column_additional = 0
+            CreatePZ.column_diametr = 0
+            CreatePZ.column_wall_thickness = 0
+            CreatePZ.shoe_column = 0
+            CreatePZ.bottomhole_artificial = 0
+            CreatePZ.max_expected_pressure = 0
+            CreatePZ.head_column_additional = 0
+            CreatePZ.leakiness_Count = 0
+            CreatePZ.expected_pick_up = {}
+            CreatePZ.current_bottom = 0
+            CreatePZ.fluid_work = 0
+            CreatePZ.static_level = 0
+            CreatePZ.dinamic_level = 0
+            CreatePZ.work_perforations_approved = False
+            CreatePZ.dict_leakiness = {}
+            CreatePZ.leakiness = False
+            CreatePZ.emergency_well = False
+            CreatePZ.emergency_count = 0
+
+            CreatePZ.work_perforations = []
+            CreatePZ.work_perforations_dict = {}
+            CreatePZ.paker_do = {"do": 0, "posle": 0}
+            CreatePZ.column_additional = False
+            CreatePZ.well_number = None
+            CreatePZ.well_area = None
+            CreatePZ.values = []
+            CreatePZ. H_F_paker_do = {"do": 0, "posle": 0}
+            CreatePZ.paker2_do = {"do": 0, "posle": 0}
+            CreatePZ.H_F_paker2_do = {"do": 0, "posle": 0}
+            CreatePZ.perforation_roof = 50000
+            CreatePZ.perforation_sole = 0
+            CreatePZ.dict_pump_SHGN = {"do": '0', "posle": '0'}
+            CreatePZ.dict_pump_ECN = {"do": '0', "posle": '0'}
+            CreatePZ.dict_pump_SHGN_h = {"do": '0', "posle": '0'}
+            CreatePZ.dict_pump_ECN_h = {"do": '0', "posle": '0'}
+            CreatePZ.dict_pump = {"do": '0', "posle": '0'}
+            CreatePZ.leakiness_interval = []
+            CreatePZ.dict_pump_h = {"do": 0, "posle": 0}
+            CreatePZ.ins_ind = 0
+            CreatePZ.len_razdel_1 = 0
+            CreatePZ.cat_P_1 = []
+            CreatePZ.countAcid = 0
+            CreatePZ.swabTypeComboIndex = 1
+            CreatePZ.swabTrueEditType = 1
+            CreatePZ.data_x_max = 0
+            CreatePZ.drilling_interval = []
+            CreatePZ.max_angle = 0
+            CreatePZ.pakerTwoSKO = False
+            CreatePZ.privyazkaSKO = 0
+            CreatePZ.H2S_pr = []
+            CreatePZ.cat_H2S_list = []
+            CreatePZ.H2S_mg = []
+            CreatePZ.lift_key = 0
+            CreatePZ.max_admissible_pressure = 0
+            CreatePZ.region = ''
+            CreatePZ.dict_nkt = {}
+            CreatePZ.dict_nkt_po = {}
+            CreatePZ.data_well_max = 0
+            CreatePZ.data_pvr_max = 0
+            CreatePZ.dict_sucker_rod = {}
+            CreatePZ.dict_sucker_rod_po = {}
+            CreatePZ.row_expected = []
+            CreatePZ.rowHeights = []
+            CreatePZ.plast_project = []
+            CreatePZ.plast_work = []
+            CreatePZ.plast_all = []
+            CreatePZ.condition_of_wells = 0
+            CreatePZ.cat_well_min = []
+            CreatePZ.bvo = False
+            CreatePZ.old_version = False
+            CreatePZ.image_list = []
 
 
         print("Closing current file")
@@ -993,8 +1093,7 @@ class MyWindow(QMainWindow):
         self.table_widget.setRowCount(rows)
         self.table_widget.setColumnCount(12)
         rowHeights_exit = [sheet.row_dimensions[i + 1].height if sheet.row_dimensions[i + 1].height is not None else 18
-                           for
-                           i in range(sheet.max_row)]
+                           for i in range(sheet.max_row)]
 
         for row in range(1, rows + 1):
             if row > 1 and row < rows - 1:
@@ -1002,10 +1101,18 @@ class MyWindow(QMainWindow):
             for col in range(1, 12 + 1):
                 if not sheet.cell(row=row, column=col).value is None:
                     if isinstance(sheet.cell(row=row, column=col).value, float) and row > 25:
-                        cell_value = str(round(sheet.cell(row=row, column=col).value, 1))
+                        cell_value = str(round(sheet.cell(row=row, column=col).value, 2))
+                    elif isinstance(sheet.cell(row=row, column=col).value, datetime):
+                        cell_value = sheet.cell(row=row, column=col).value.strftime('%d.%m.%Y')
                     else:
                         cell_value = str(sheet.cell(row=row, column=col).value)
+                    cell = sheet[f'{get_column_letter(col + 1)}{row + 1}']
+                    cell_style = cell._style
+
                     item = QtWidgets.QTableWidgetItem(str(cell_value))
+                    # item.setData(10, cell_style)
+                    # item.setData(10, cell_style)
+
                     self.table_widget.setItem(row - 1, col - 1, item)
                     # Проверяем, является ли текущая ячейка объединенной
                     for merged_cell in merged_cells:

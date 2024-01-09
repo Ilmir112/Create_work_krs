@@ -73,90 +73,190 @@ def paker_list(self):
                            f'+ НКТ{CreatePZ.nkt_diam}мм со снятыми фасками L- {round(paker_depth-CreatePZ.head_column_additional,0)}м'
         return paker_select
     nktOpress_list = nktOpress(self)
-    paker_list = [
-        [None, None,
-                   f'Спустить {paker_select(self)} на НКТ{CreatePZ.nkt_diam}мм до глубины {paker_depth}м, воронкой до {paker_depth+ paker_khost}м'
-                    f' с замером, шаблонированием шаблоном. {nktOpress_list[1]} {("Произвести пробную посадку на глубине 50м" if CreatePZ.column_additional == False else "")} '
-                   f'ПРИ ОТСУТСТВИИ ЦИРКУЛЯЦИИ ПРЕДУСМОТРЕТЬ НАЛИЧИИ В КОМПОНОВКЕ УРАВНИТЕЛЬНЫХ КЛАПАНОВ ИЛИ СБИВНОГО '
-                   f'КЛАПАНА С ВВЕРТЫШЕМ НАД ПАКЕРОМ',
-    None, None, None, None, None, None, None,
-    'мастер КРС', descentNKT_norm(paker_depth,1.2)],
-        [None, None, f'Посадить пакер на глубине {paker_depth}м',
-                   None, None, None, None, None, None, None,
-                   'мастер КРС', 0.4],
-        [None, None, f'Опрессовать эксплуатационную колонну в интервале {paker_depth}-0м на Р={CreatePZ.max_admissible_pressure}атм'
-                     f' в течение 30 минут  в присутствии представителя заказчика, составить акт.  '
-                     f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ)',
-         None, None, None, None, None, None, None,
-         'мастер КРС, предст. заказчика', 0.67],
-        [None, None,
-         f'Произвести срыв пакера с поэтапным увеличением нагрузки на 3-4т выше веса НКТ в течении 30мин и с '
-         f'выдержкой 1ч для возврата резиновых элементов в исходное положение. ',
-         None, None, None, None, None, None, None,
-         'мастер КРС', 0.7],
-
-        [None, None,
-         f'В случае негерметичности э/к, по согласованию с заказчиком произвести ОТСЭК для определения интервала '
-         f'негерметичности эксплуатационной колонны с точностью до одного НКТ или запись РГД, ВЧТ с '
-         f'целью определения места нарушения в присутствии представителя заказчика, составить акт. '
-         f'Определить приемистость НЭК.',
-         None, None, None, None, None, None, None,
-         'мастер КРС', None],
-        [None, None,
-         f'Поднять {paker_select(self)} на НКТ{CreatePZ.nkt_diam} c глубины {paker_depth}м с доливом скважины в '
-         f'объеме {round(paker_depth*1.12/1000,1)}м3 удельным весом {CreatePZ.fluid_work}',
-         None, None, None, None, None, None, None,
-         'мастер КРС', liftingNKT_norm(paker_depth, 1.2)]]
-    if 'НЭК № 1' in list(CreatePZ.dict_perforation.keys()):
-        print(list(CreatePZ.dict_perforation['НЭК № 1']['интервал']))
-        pakerNEK, ok = QInputDialog.getInt(None, 'опрессовка ЭК',
-                                                  'Введите глубину посадки пакера для опрессовки ЗУМПФА',
-                                                  int(list(CreatePZ.dict_perforation['НЭК № 1']['интервал'])[0][1]+10),0,
-                                                  int(CreatePZ.perforation_sole))
-        pressureNEK_list = [[None, None,
-                               f'При герметичности колонны в интервале 0 - {paker_depth}м:  Допустить пакер до глубины {pakerNEK}м',
-                               None, None, None, None, None, None, None,
-                               'мастер КРС', 0.4],
-                              [None, None,
-                               f'{nktOpress_list[1]}. Посадить пакер. Опрессовать ЗУМПФ в интервале {pakerNEK} - {CreatePZ.current_bottom}м на Р={CreatePZ.max_admissible_pressure}атм в течение 30 минут в присутствии представителя заказчика, составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ)',
-                               None, None, None, None, None, None, None,
-                               'мастер КРС', 0.77],
-                            [None, None,
-                             f'Произвести насыщение скважины в объеме 5м3 по затрубному пространству. Определить приемистость '
-                             f'НЭК {CreatePZ.dict_perforation["НЭК № 1"]["интервал"][0]} при Р-80атм по затрубному пространству'
-                             f'в присутствии представителя УСРСиСТ или подрядчика по РИР. (Вести контроль за отдачей жидкости '
-                             f'после закачки, объем согласовать с подрядчиком по РИР).',
-                             None, None, None, None, None, None, None,
-                             'мастер КРС', 1.5],
-                              [None, None,
-                               f'Произвести срыв пакера с поэтапным увеличением нагрузки на 3-4т выше веса НКТ в течении 30мин и с '
-                               f'выдержкой 1ч для возврата резиновых элементов в исходное положение. ',
-                               None, None, None, None, None, None, None,
-                               'мастер КРС', 0.7]]
-        for i in range(len(pressureNEK_list)):
-            paker_list.insert(4 + i, pressureNEK_list[i])
-
     if pressureZUMPF_answer:
-        pressureZUMPF_list = [[None, None,
-         f'При герметичности колонны в интервале 0 - {paker_depth}м:  Допустить пакер до глубины {pakerDepthZumpf}м',
-         None, None, None, None, None, None, None,
-         'мастер КРС', 0.4],
-        [None, None,
-         f'{nktOpress_list[1]}. Посадить пакер. Опрессовать ЗУМПФ в интервале {pakerDepthZumpf} - {CreatePZ.current_bottom}м на Р={CreatePZ.max_admissible_pressure}атм в течение 30 минут в присутствии представителя заказчика, составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ)',
-         None, None, None, None, None, None, None,
-         'мастер КРС', 0.77],
-          [None, None,
-           f'Произвести срыв пакера с поэтапным увеличением нагрузки на 3-4т выше веса НКТ в течении 30мин и с '
-           f'выдержкой 1ч для возврата резиновых элементов в исходное положение. ',
-           None, None, None, None, None, None, None,
-           'мастер КРС', 0.7]]
-        for i in range(len(pressureZUMPF_list)):
-            paker_list.insert(4 + i, pressureZUMPF_list[i])
-        paker_list[-1] = [None, None,
-         f'Поднять {paker_select(self)} на НКТ{CreatePZ.nkt_diam} c глубины {pakerDepthZumpf}м с доливом скважины в '
-         f'объеме {round(paker_depth*1.12/1000,1)}м3 удельным весом {CreatePZ.fluid_work}',
-         None, None, None, None, None, None, None,
-         'мастер КРС',liftingNKT_norm(pakerDepthZumpf, 1.2)]
+        paker_list = [
+            [None, None,
+             f'Спустить {paker_select(self)} на НКТ{CreatePZ.nkt_diam}мм до глубины {pakerDepthZumpf}м, воронкой до {pakerDepthZumpf + paker_khost}м'
+             f' с замером, шаблонированием шаблоном. {nktOpress_list[1]} {("Произвести пробную посадку на глубине 50м" if CreatePZ.column_additional == False else "")} '
+             f'ПРИ ОТСУТСТВИИ ЦИРКУЛЯЦИИ ПРЕДУСМОТРЕТЬ НАЛИЧИИ В КОМПОНОВКЕ УРАВНИТЕЛЬНЫХ КЛАПАНОВ ИЛИ СБИВНОГО '
+             f'КЛАПАНА С ВВЕРТЫШЕМ НАД ПАКЕРОМ',
+             None, None, None, None, None, None, None,
+             'мастер КРС', descentNKT_norm(pakerDepthZumpf, 1.2)],
+            [None, None,
+             f'Посадить пакер. Опрессовать ЗУМПФ в интервале {pakerDepthZumpf} - {CreatePZ.current_bottom}м на Р={CreatePZ.max_admissible_pressure}атм в течение 30 минут в присутствии представителя заказчика, составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ)',
+             None, None, None, None, None, None, None,
+             'мастер КРС', 0.77],
+            [None, None,
+             f'Произвести срыв пакера с поэтапным увеличением нагрузки на 3-4т выше веса НКТ в течении 30мин и с '
+             f'выдержкой 1ч для возврата резиновых элементов в исходное положение. ',
+             None, None, None, None, None, None, None,
+             'мастер КРС', 0.7],
+            [None, None, f'Приподнять и посадить пакер на глубине {paker_depth}м',
+             None, None, None, None, None, None, None,
+             'мастер КРС', 0.4],
+            [None, None,
+             f'Опрессовать эксплуатационную колонну в интервале {paker_depth}-0м на Р={CreatePZ.max_admissible_pressure}атм'
+             f' в течение 30 минут  в присутствии представителя заказчика, составить акт.  '
+             f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ)',
+             None, None, None, None, None, None, None,
+             'мастер КРС, предст. заказчика', 0.67],
+            [None, None,
+             f'Произвести срыв пакера с поэтапным увеличением нагрузки на 3-4т выше веса НКТ в течении 30мин и с '
+             f'выдержкой 1ч для возврата резиновых элементов в исходное положение. ',
+             None, None, None, None, None, None, None,
+             'мастер КРС', 0.7],
+
+            [None, None,
+             f'В случае негерметичности э/к, по согласованию с заказчиком произвести ОТСЭК для определения интервала '
+             f'негерметичности эксплуатационной колонны с точностью до одного НКТ или запись РГД, ВЧТ с '
+             f'целью определения места нарушения в присутствии представителя заказчика, составить акт. '
+             f'Определить приемистость НЭК.',
+             None, None, None, None, None, None, None,
+             'мастер КРС', None],
+            [None, None,
+             f'Поднять {paker_select(self)} на НКТ{CreatePZ.nkt_diam} c глубины {paker_depth}м с доливом скважины в '
+             f'объеме {round(paker_depth * 1.12 / 1000, 1)}м3 удельным весом {CreatePZ.fluid_work}',
+             None, None, None, None, None, None, None,
+             'мастер КРС', liftingNKT_norm(paker_depth, 1.2)]]
+
+    else:
+        paker_list = [
+            [None, None,
+                       f'Спустить {paker_select(self)} на НКТ{CreatePZ.nkt_diam}мм до глубины {paker_depth}м, воронкой до {paker_depth+ paker_khost}м'
+                        f' с замером, шаблонированием шаблоном. {nktOpress_list[1]} {("Произвести пробную посадку на глубине 50м" if CreatePZ.column_additional == False else "")} '
+                       f'ПРИ ОТСУТСТВИИ ЦИРКУЛЯЦИИ ПРЕДУСМОТРЕТЬ НАЛИЧИИ В КОМПОНОВКЕ УРАВНИТЕЛЬНЫХ КЛАПАНОВ ИЛИ СБИВНОГО '
+                       f'КЛАПАНА С ВВЕРТЫШЕМ НАД ПАКЕРОМ',
+        None, None, None, None, None, None, None,
+        'мастер КРС', descentNKT_norm(paker_depth,1.2)],
+            [None, None, f'Посадить пакер на глубине {paker_depth}м',
+                       None, None, None, None, None, None, None,
+                       'мастер КРС', 0.4],
+            [None, None, f'Опрессовать эксплуатационную колонну в интервале {paker_depth}-0м на Р={CreatePZ.max_admissible_pressure}атм'
+                         f' в течение 30 минут  в присутствии представителя заказчика, составить акт.  '
+                         f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ)',
+             None, None, None, None, None, None, None,
+             'мастер КРС, предст. заказчика', 0.67],
+            [None, None,
+             f'Произвести срыв пакера с поэтапным увеличением нагрузки на 3-4т выше веса НКТ в течении 30мин и с '
+             f'выдержкой 1ч для возврата резиновых элементов в исходное положение. ',
+             None, None, None, None, None, None, None,
+             'мастер КРС', 0.7],
+
+            [None, None,
+             f'В случае негерметичности э/к, по согласованию с заказчиком произвести ОТСЭК для определения интервала '
+             f'негерметичности эксплуатационной колонны с точностью до одного НКТ или запись РГД, ВЧТ с '
+             f'целью определения места нарушения в присутствии представителя заказчика, составить акт. '
+             f'Определить приемистость НЭК.',
+             None, None, None, None, None, None, None,
+             'мастер КРС', None],
+            [None, None,
+             f'Поднять {paker_select(self)} на НКТ{CreatePZ.nkt_diam} c глубины {paker_depth}м с доливом скважины в '
+             f'объеме {round(paker_depth*1.12/1000,1)}м3 удельным весом {CreatePZ.fluid_work}',
+             None, None, None, None, None, None, None,
+             'мастер КРС', liftingNKT_norm(paker_depth, 1.2)]]
+    dict_leakinest_keys = list(CreatePZ.dict_leakiness['НЭК']['интервал'].keys())
+    if len(CreatePZ.dict_leakiness) != 0 and int(dict_leakinest_keys[0][0]) < paker_depth:
+
+        NEK_question = QMessageBox.question(self, 'Поинтервальная опрессовка НЭК', 'Нужна ли поинтервальная опрессовка НЭК?')
+        if NEK_question == QMessageBox.StandardButton.Yes:
+
+            pakerNEK, ok = QInputDialog.getInt(None, 'опрессовка ЭК',
+                                                      'Введите глубину посадки пакера для под НЭК',
+                                                      int(dict_leakinest_keys[0].split('-')[1]) + 10, 0,  int(CreatePZ.perforation_sole))
+            paker_list = [
+                [None, None,
+                 f'Спустить {paker_select(self)} на НКТ{CreatePZ.nkt_diam}мм до глубины {pakerNEK}м, воронкой до {pakerNEK + paker_khost}м'
+                 f' с замером, шаблонированием шаблоном. {nktOpress_list[1]} {("Произвести пробную посадку на глубине 50м" if CreatePZ.column_additional == False else "")} '
+                 f'ПРИ ОТСУТСТВИИ ЦИРКУЛЯЦИИ ПРЕДУСМОТРЕТЬ НАЛИЧИИ В КОМПОНОВКЕ УРАВНИТЕЛЬНЫХ КЛАПАНОВ ИЛИ СБИВНОГО '
+                 f'КЛАПАНА С ВВЕРТЫШЕМ НАД ПАКЕРОМ',
+                 None, None, None, None, None, None, None,
+                 'мастер КРС', descentNKT_norm(pakerNEK, 1.2)],
+                [None, None, f'Посадить пакер на глубине {pakerNEK}м',
+                 None, None, None, None, None, None, None,
+                 'мастер КРС', 0.4],
+                [None, None,
+                 f'Опрессовать эксплуатационную колонну в интервале {pakerNEK}-0м на Р={CreatePZ.max_admissible_pressure}атм'
+                 f' в течение 30 минут  в присутствии представителя заказчика, составить акт.  '
+                 f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ)',
+                 None, None, None, None, None, None, None,
+                 'мастер КРС, предст. заказчика', 0.67],
+                [None, None,
+                 f'ПРИ НЕГЕРМЕТИЧНОСТИ: \n Произвести насыщение скважины в объеме 5м3 по затрубному пространству. Определить приемистость '
+                 f'НЭК {dict_leakinest_keys[0]} при Р-{CreatePZ.max_admissible_pressure}атм по затрубному пространству'
+                 f'в присутствии представителя УСРСиСТ или подрядчика по РИР. (Вести контроль за отдачей жидкости '
+                 f'после закачки, объем согласовать с подрядчиком по РИР).',
+                 None, None, None, None, None, None, None,
+                 'мастер КРС', 1.5],
+                [None, None,
+                 f'Произвести срыв пакера с поэтапным увеличением нагрузки на 3-4т выше веса НКТ в течении 30мин и с '
+                 f'выдержкой 1ч для возврата резиновых элементов в исходное положение. ',
+                 None, None, None, None, None, None, None,
+                 'мастер КРС', 0.7],
+                [None, None,
+                 f'В случае негерметичности э/к, по согласованию с заказчиком произвести ОТСЭК для определения интервала '
+                 f'негерметичности эксплуатационной колонны с точностью до одного НКТ или запись РГД, ВЧТ с '
+                 f'целью определения места нарушения в присутствии представителя заказчика, составить акт. '
+                 f'Определить приемистость НЭК.',
+                 None, None, None, None, None, None, None,
+                 'мастер КРС', None]]
+            ind_nek = 1
+            while len(dict_leakinest_keys) - ind_nek != 0:
+                print('запуск While')
+
+                pakerNEK1, ok = QInputDialog.getInt(None, 'опрессовка ЭК',
+                                                   'Введите глубину посадки пакера для под НЭК',
+                                                   int(dict_leakinest_keys[ind_nek].split('-')[1]) + 10, 0,
+                                                   int(CreatePZ.current_bottom))
+                pressureNEK_list = [[None, None,
+                                     f'При герметичности колонны в интервале 0 - {pakerNEK}м:  Допустить пакер до глубины {pakerNEK1}м',
+                                     None, None, None, None, None, None, None,
+                                     'мастер КРС', descentNKT_norm(pakerNEK1-pakerNEK, 1.2)],
+                                    [None, None,
+                                     f'{nktOpress_list[1]}. Посадить пакер. Опрессовать эксплуатационную колонну в интервале {pakerNEK1}-0м на Р={CreatePZ.max_admissible_pressure}атм'
+                                     f' в течение 30 минут  в присутствии представителя заказчика, составить акт.',
+                                     None, None, None, None, None, None, None,
+                                     'мастер КРС', 0.77],
+                                    [None, None,
+                                     f'ПРИ НЕГЕРМЕТИЧНОСТИ: \n Произвести насыщение скважины в объеме 5м3 по затрубному пространству. Определить приемистость '
+                                     f'НЭК {dict_leakinest_keys[ind_nek]} при Р-{CreatePZ.max_admissible_pressure}атм по затрубному пространству'
+                                     f'в присутствии представителя УСРСиСТ или подрядчика по РИР. (Вести контроль за отдачей жидкости '
+                                     f'после закачки, объем согласовать с подрядчиком по РИР).',
+                                     None, None, None, None, None, None, None,
+                                     'мастер КРС', 1.5],
+                                    [None, None,
+                                     f'Произвести срыв пакера с поэтапным увеличением нагрузки на 3-4т выше веса НКТ в течении 30мин и с '
+                                     f'выдержкой 1ч для возврата резиновых элементов в исходное положение. ',
+                                     None, None, None, None, None, None, None,
+                                     'мастер КРС', 0.7]]
+
+                for i in pressureNEK_list:
+                    paker_list.append(i)
+                ind_nek += 1
+                pakerNEK = pakerNEK1
+
+            if len(dict_leakinest_keys) - ind_nek == 0:
+                pressureNEK_list = [[None, None,
+                                       f'При герметичности колонны в интервале 0 - {pakerNEK}м:  Допустить пакер до глубины {paker_depth}м',
+                                       None, None, None, None, None, None, None,
+                                       'мастер КРС', 0.4],
+                                      [None, None,
+                                       f'{nktOpress_list[1]}. Посадить пакер. Опрессовать эксплуатационную колонну в интервале {paker_depth}-0м на Р={CreatePZ.max_admissible_pressure}атм'
+                                    f' в течение 30 минут  в присутствии представителя заказчика, составить акт.',
+                                       None, None, None, None, None, None, None,
+                                       'мастер КРС', 0.77],
+                                      [None, None,
+                                       f'Произвести срыв пакера с поэтапным увеличением нагрузки на 3-4т выше веса НКТ в течении 30мин и с '
+                                       f'выдержкой 1ч для возврата резиновых элементов в исходное положение. ',
+                                       None, None, None, None, None, None, None,
+                                       'мастер КРС', 0.7],
+                                    [None, None,
+                                     f'Поднять {paker_select(self)} на НКТ{CreatePZ.nkt_diam} c глубины {paker_depth}м с доливом скважины в '
+                                     f'объеме {round(paker_depth * 1.12 / 1000, 1)}м3 удельным весом {CreatePZ.fluid_work}',
+                                     None, None, None, None, None, None, None,
+                                     'мастер КРС', liftingNKT_norm(paker_depth, 1.2)]
+                                    ]
+                for row in pressureNEK_list:
+                    paker_list.append(row)
 
     for plast in list(CreatePZ.dict_perforation.keys()):
         for interval in CreatePZ.dict_perforation[plast]['интервал']:
@@ -171,7 +271,7 @@ def nktOpress(self):
     from open_pz import CreatePZ
     if CreatePZ.nktOpressTrue == False:
         CreatePZ.nktOpressTrue == True
-        return 'НКТ + опрессовочное седло', 'Опрессовать НКТ на 200атм. Вымыть шар.'
+        return 'НКТ + опрессовочное седло', 'Опрессовать НКТ на 200атм. Вымыть шар'
     else:
         return 'НКТ', ''
 

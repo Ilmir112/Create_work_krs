@@ -76,7 +76,7 @@ def copy_row(ws, ws2, head):
 def copy_true_ws(ws, ws2, head):
     for row_number, row in enumerate(ws[head]):
         for col_number, cell in enumerate(row):
-            ws2.cell(row_number + 1, col_number + 1, cell.value)
+            # ws2.cell(row_number + 1, col_number + 1, cell.value)
             if cell.has_style:
                 ws2.cell(row_number + 1, col_number + 1).font = copy(cell.font)
                 ws2.cell(row_number + 1, col_number + 1).fill = copy(cell.fill)
