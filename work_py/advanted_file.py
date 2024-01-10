@@ -174,7 +174,8 @@ def merge_overlapping_intervals(intervals):
             merged.append(interval)
         else:
             merged[-1] = (merged[-1][0], max(merged[-1][1], interval[1]))
-    print(merged)
+    print(f'интервалы СКМ {merged}')
+
     return merged
 
 

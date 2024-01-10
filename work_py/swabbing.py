@@ -144,7 +144,7 @@ def swabbing_opy(self):
                            f'объеме {round((depth_opy + 200) * 1.12 / 1000, 1)}м3 удельным весом {CreatePZ.fluid_work}',
                            None, None, None, None, None, None, None,
                            'мастер КРС',
-                           liftingNKT_norm(depth_opy + 200)])
+                           liftingNKT_norm(depth_opy + 200, 1)])
     return paker_list
 
 

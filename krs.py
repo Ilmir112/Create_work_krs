@@ -106,7 +106,7 @@ def work_krs(self):
     CreatePZ.fluid_work = fluid_work
     
     
-    CreatePZ.kat_pvo = [1 if str(CreatePZ.cat_P_1[0]) == '1' or str(CreatePZ.cat_H2S_list[0]) == '1' else 2][0]
+
     print(f'выбранная категория ПВО {CreatePZ.kat_pvo}')
     
     krs_begin = [

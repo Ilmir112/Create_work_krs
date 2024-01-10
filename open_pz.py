@@ -1,4 +1,4 @@
-from zipfile import ZipFile
+import os
 
 from PIL import Image
 import block_name
@@ -9,6 +9,7 @@ from datetime import datetime, time
 from openpyxl import Workbook, load_workbook
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QInputDialog, QMessageBox, QDialog
+from openpyxl_image_loader import SheetImageLoader
 from openpyxl.drawing.image import Image
 from openpyxl.drawing.spreadsheet_drawing import AbsoluteAnchor
 from openpyxl.drawing.xdr import XDRPoint2D, XDRPositiveSize2D
@@ -162,31 +163,8 @@ class CreatePZ:
         for sheet in name_list:
             if sheet in wb.sheetnames and sheet != 'наряд-заказ КРС':
                 wb.remove(wb[sheet])
-        # print(wb.sheetnames)
 
-        # zip = ZipFile(fname)
-        # zip.extractall()
 
-        # Копирование изображения
-        # drawings = ws.drawings
-        for img in ws._images:
-            #     # Получение изображения и его координат
-            #     # print(img.anchor)
-            #     p2e = pixels_to_EMU
-            #     h, w = img.height, img.width
-            #
-            #
-            #
-            #     # position = XDRPoint2D(p2e(), p2e())
-            #     print(img.anchor)
-            #     # print(f'size image {img.height} w-{img.width} ')
-            #     # size = XDRPositiveSize2D(p2e(w*3), p2e(h))
-            #     # img.anchor = AbsoluteAnchor(pos = position, ext = size)
-            #
-            #     # img.width = 200
-            #     # img.height = 180
-            #
-            CreatePZ.image_list.append(img)
 
         for row_ind, row in enumerate(ws.iter_rows(values_only=True)):
             ws.row_dimensions[row_ind].hidden = False
@@ -288,8 +266,7 @@ class CreatePZ:
                             CreatePZ.max_angle = row[col + n]
                             n += 1
 
-
-                    if value == 'мг/л' or value == 'мг/дм3' :
+                    if value == 'мг/л' or value == 'мг/дм3':
                         if CreatePZ.if_None(row[col - 1]) != 'отсут':
                             CreatePZ.H2S_mg.append(row[col - 1])
                         print(f'мг/k {CreatePZ.H2S_mg}')
@@ -497,9 +474,10 @@ class CreatePZ:
                             if CreatePZ.paker_do["posle"] != '0':
                                 CreatePZ.H_F_paker_do["posle"] = CreatePZ.without_b(row[col + 6 + old_index])
 
-                    elif " Нст " in str(value):
+                    elif "Hст " in str(value):
                         CreatePZ.static_level = row[col + 1]
-                    elif " Ндин " in str(value):
+                        print()
+                    elif "Ндин " in str(value):
                         CreatePZ.dinamic_level = row[col + 1]
         # вызов окна для проверки корректности данных
         if self.data_window is None:
@@ -538,8 +516,8 @@ class CreatePZ:
                 CreatePZ.grpPlan = True
             else:
                 CreatePZ.grpPlan = False
-        print(CreatePZ.dict_pump_ECN, CreatePZ.dict_pump_SHGN, CreatePZ.dict_pump_ECN_h, CreatePZ.H_F_paker_do)
-        print()
+        # print(CreatePZ.dict_pump_ECN, CreatePZ.dict_pump_SHGN, CreatePZ.dict_pump_ECN_h, CreatePZ.H_F_paker_do)
+        # print()
         # Определение наличия по скважине нарушений
         for row in range(data_pvr_max, CreatePZ.data_well_max):
             for col in range(1, 13):
@@ -600,6 +578,26 @@ class CreatePZ:
                 CreatePZ.current_bottom):
             CreatePZ.open_trunk_well = True
 
+        # Копирование изображения
+        image_loader = SheetImageLoader(ws)
+
+        for row in range(1, CreatePZ.data_well_max):
+            for col in range(1, 12):
+                try:
+                    image = image_loader.get(f'{get_column_letter(col)}{row}')
+                    image.save(f'imageFiles/image_work/image{get_column_letter(col)}{row}.png')
+                    image_size = image.size
+                    image_path = f'imageFiles/image_work/image{get_column_letter(col)}{row}.png'
+
+                    coord = f'{get_column_letter(col)}{row + 17 - CreatePZ.cat_well_min[0]}'
+
+                    CreatePZ.image_list.append((image_path, coord, image_size))
+
+                except:
+                    pass
+
+
+        print(CreatePZ.image_list)
         print(f' ГРП - {CreatePZ.grpPlan}')
         print(f' глубина насоса ШГН {CreatePZ.dict_pump_SHGN_h}')
         print(f' насоса {CreatePZ.dict_pump_SHGN}')
@@ -804,7 +802,6 @@ class CreatePZ:
                 CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('интервал', set()).add(
                     (round(float(row[2]), 1), round(float(row[3]), 1)))
 
-
                 CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('вскрытие', set()).add(row[4])
                 # print(f'отключе {isinstance(row[5], datetime) == True, old_index} ggg {isinstance(row[6], datetime) == True, CreatePZ.old_version, old_index}')
                 if row[5] is None or row[5] == '-':
@@ -838,7 +835,6 @@ class CreatePZ:
                     row[9])
                 CreatePZ.dict_perforation_project.setdefault(plast, {}).setdefault('рабочая жидкость', set()).add(
                     krs.calculationFluidWork(row[1], row[9]))
-
 
             # print(f'проект{CreatePZ.dict_perforation_project[plast]}')
         print(f'раб{CreatePZ.dict_perforation}')
@@ -1133,6 +1129,7 @@ class CreatePZ:
 
     def count_row_height(ws, ws2, work_list, merged_cells_dict, ind_ins):
         from openpyxl.utils.cell import range_boundaries, get_column_letter
+
         boundaries_dict = {}
 
         text_width_dict = {35: (0, 100), 50: (101, 200), 70: (201, 300), 90: (301, 400), 110: (401, 500),
@@ -1161,6 +1158,8 @@ class CreatePZ:
                             cell.border = CreatePZ.thin_border
                         if j == 11:
                             cell.font = Font(name='Arial', size=11, bold=False)
+                        if j == 12:
+                            cell.value = work_list[i - 1][j - 1]
                         else:
                             cell.font = Font(name='Arial', size=13, bold=False)
                         ws2.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='center',
@@ -1191,6 +1190,14 @@ class CreatePZ:
         head = plan.head_ind(0, ind_ins)
         plan.copy_true_ws(ws, ws2, head)
 
+        # вставка сохраненных изображение по координатам ячеек
+        if CreatePZ.image_list:
+            for img in CreatePZ.image_list:
+                logo = Image(img[0])
+                logo.width, logo.height = img[2][0]*0.48, img[2][1]*0.72
+                ws2.add_image(logo, img[1])
+
+
         # print(f'высота строк работ {ins_ind}')
         print(f'высота строк работ {len(rowHeights1)}')
         for index_row, row in enumerate(ws2.iter_rows()):  # Копирование высоты строки
@@ -1205,11 +1212,14 @@ class CreatePZ:
                         ws2.column_dimensions[get_column_letter(col_ind + 1)].width = colWidth[col_ind]
         ws2.column_dimensions[get_column_letter(11)].width = 20
         ws2.column_dimensions[get_column_letter(12)].width = 20
-        ws2.column_dimensions[get_column_letter(6)].width = 25
 
-        # Копирование изображения
-        for image in CreatePZ.image_list:
-            ws2.add_image(image)
+
+
+        # ws2.column_dimensions[get_column_letter(6)].width = 25
+
+        # # Копирование изображения
+        # for image in CreatePZ.image_list:
+        #     ws2.add_image(image)
 
         return 'Высота изменена'
 

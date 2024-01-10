@@ -1,4 +1,4 @@
-
+import os
 import sys
 import openpyxl
 import krs
@@ -57,7 +57,7 @@ class MyWindow(QMainWindow):
         self.correctDataButton.clicked.connect(self.correctData)
         self.toolbar.addWidget(self.correctDataButton)
 
-        self.correctPVRButton = QPushButton("Скорректировать раотающие ПВР")
+        self.correctPVRButton = QPushButton("Скорректировать работающие ПВР")
         self.correctPVRButton.clicked.connect(self.correctPVR)
         self.toolbar.addWidget(self.correctPVRButton)
 
@@ -93,34 +93,35 @@ class MyWindow(QMainWindow):
         action = self.sender()
         if action == self.create_KRS:
             self.tableWidgetOpen()
-            self.fname = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
+            self.fname, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
                                                                "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
+            if self.fname:
+                try:
+                    self.work_plan = 'krs'
+                    CreatePZ.pause = True
+                    sheet = CreatePZ.open_excel_file(self, self.fname, self.work_plan)
 
-            try:
-                self.work_plan = 'krs'
-                CreatePZ.pause = True
-                sheet = CreatePZ.open_excel_file(self, self.fname[0], self.work_plan)
-                self.copy_pz(sheet)
+                    self.copy_pz(sheet)
 
-            except FileNotFoundError:
-                print('Файл не найден')
+                except FileNotFoundError:
+                    print('Файл не найден')
 
         elif action == self.create_GNKT_OPZ:
             self.tableWidgetOpen()
 
-            self.fname = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
-                                                               "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
+            self.fname, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',"Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
 
-            try:
-                self.work_plan = 'gnkt_opz'
-                sheet = CreatePZ.open_excel_file(self, self.fname[0], self.work_plan)
-                self.copy_pz(sheet)
+            if self.fname:
+                try:
+                    self.work_plan = 'gnkt_opz'
+                    sheet = CreatePZ.open_excel_file(self, self.fname, self.work_plan)
+                    self.copy_pz(sheet)
 
-            except FileNotFoundError:
-                print('Файл не найден')
+                except FileNotFoundError:
+                    print('Файл не найден')
 
-            # if action == self.save_file:
-            #     open_pz.open_excel_file().wb.save("test_unmerge.xlsx")
+                # if action == self.save_file:
+                #     open_pz.open_excel_file().wb.save("test_unmerge.xlsx")
         elif action == self.save_file:
             self.save_to_excel
 
@@ -182,12 +183,14 @@ class MyWindow(QMainWindow):
         # print(CreatePZ.ins_ind)
         for i in range(2, len(work_list)):  # нумерация работ
             if i >= ins_ind+2:
-                work_list[i][1] = i - 1- ins_ind
+                work_list[i][1] = i - 1 - ins_ind
                 if krs.is_number(work_list[i][11]) == True:
                     CreatePZ.normOfTime += float(work_list[i][11])
         print(f'строки {self.ws.max_row}')
         CreatePZ.count_row_height(self.ws, ws2, work_list, merged_cells_dict,  ins_ind)
-        itog_ind_min = CreatePZ.itog_ind_min + len(work_list)
+        CreatePZ.itog_ind_min = self.ins_ind_border
+        CreatePZ.itog_ind_max = len(work_list)
+        print(f' длина {len(work_list)}')
         CreatePZ.addItog(self, ws2, self.table_widget.rowCount() + 1)
         try:
             ws2.print_area = f'B1:L{self.table_widget.rowCount()+45}'
@@ -210,11 +213,11 @@ class MyWindow(QMainWindow):
             for row_ind, row in enumerate(ws2.iter_rows(values_only=True)):
 
                 if 15 < row_ind < 100:
-
-                    if all(cell in [None, '']  for cell in row) \
+                    if all(cell in [None, ''] for cell in row) \
                             and ('Интервалы темпа' not in str(ws2.cell(row=row_ind, column=2).value)\
-                                     and 'Замечания к эксплуатационному периоду' not in str(ws2.cell(row=row_ind, column=2).value)):
-                        # print(row_ind+1, ('Интервалы темпа' not in str(ws2.cell(row=row_ind, column=2).value)), str(ws2.cell(row=row_ind, column=2).value))
+                            and 'Замечания к эксплуатационному периоду' not in str(ws2.cell(row=row_ind, column=2).value)\
+                            and 'Замечания к эксплуатационному периоду' not in str(ws2.cell(row=row_ind-2, column=2).value)):
+                        print(row_ind, ('Интервалы темпа' not in str(ws2.cell(row=row_ind, column=2).value)), str(ws2.cell(row=row_ind, column=2).value))
                         ws2.row_dimensions[row_ind+1].hidden = True
                 for col, value in enumerate(row):
                     if 'Зуфаров' in str(value):
@@ -224,10 +227,13 @@ class MyWindow(QMainWindow):
             self.insert_image(ws2, 'imageFiles/Зуфаров.png', coordinate)
             self.insert_image(ws2, 'imageFiles/Хасаншин.png', 'H1')
             self.insert_image(ws2, 'imageFiles/Шамигулов.png', 'H4')
+
+
+
             path = 'D:\Documents\Desktop\ГТМ'
             filenames = f"{CreatePZ.well_number} {CreatePZ.well_area} кат {CreatePZ.cat_P_1}.xlsx"
             full_path = path + '/' + filenames
-            print(ws2.max_row)
+            # print(ws2.max_row)
             if wb2:
                 wb2.close()
                 wb2.save(full_path)
@@ -343,6 +349,11 @@ class MyWindow(QMainWindow):
             CreatePZ.bvo = False
             CreatePZ.old_version = False
             CreatePZ.image_list = []
+            path = "imageFiles/image_work"
+            for file in os.listdir(path):
+                file_path = os.path.join(path, file)
+                if os.path.isfile(file_path):
+                    os.remove(file_path)
 
 
         print("Closing current file")
@@ -469,9 +480,25 @@ class MyWindow(QMainWindow):
         emergency_menu.addAction(magnet_action)
         magnet_action.triggered.connect(self.magnet_action)
 
-        larNKT_action = QAction("печать + ЛАР", self)
+        hook_action = QAction("Удочка-крючок", self)
+        emergency_menu.addAction(hook_action)
+        hook_action.triggered.connect(self.hook_action)
+
+        emergency_sticking_action = QAction("Прихваченное оборудование", self)
+        emergency_menu.addAction(emergency_sticking_action)
+        emergency_sticking_action.triggered.connect(self.emergency_sticking_action)
+
+        larNKT_action = QAction("печать + ЛАР на НКТ", self)
         emergency_menu.addAction(larNKT_action)
         larNKT_action.triggered.connect(self.larNKT_action)
+
+        lar_sbt_action = QAction("ЛАР на СБТ правое", self)
+        emergency_menu.addAction(lar_sbt_action)
+        lar_sbt_action.triggered.connect(self.lar_sbt_action)
+
+        lapel_tubing_action = QAction("Отворот на СБТ левое", self)
+        emergency_menu.addAction(lapel_tubing_action)
+        lapel_tubing_action.triggered.connect(self.lapel_tubing_func)
 
         acid_menu = action_menu.addMenu('Кислотная обработка')
         acid_action1paker = QAction("окно на одном пакере", self)
@@ -600,6 +627,26 @@ class MyWindow(QMainWindow):
         magnet_work_list = magnetWork(self)
         self.populate_row(self.ins_ind, magnet_work_list)
 
+    def emergency_sticking_action(self):
+        from work_py.emergencyWork import emergency_sticking
+        emergency_sticking_list = emergency_sticking(self)
+        self.populate_row(self.ins_ind, emergency_sticking_list)
+
+    def hook_action(self):
+        from work_py.emergencyWork import emergency_hook
+        hook_work_list = emergency_hook(self)
+        self.populate_row(self.ins_ind, hook_work_list)
+
+    def lapel_tubing_func(self):
+        from work_py.emergencyWork import lapel_tubing
+        emergency_sbt_list = lapel_tubing(self)
+        self.populate_row(self.ins_ind, emergency_sbt_list)
+
+
+    def lar_sbt_action(self):
+        from work_py.emergencyWork import emergence_sbt
+        emergency_sbt_list = emergence_sbt(self)
+        self.populate_row(self.ins_ind, emergency_sbt_list)
     def larNKT_action(self):
         from work_py.emergencyWork import emergencyNKT
         emergencyNKT_list = emergencyNKT(self)
