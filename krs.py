@@ -91,6 +91,8 @@ def work_krs(self):
         fluid_work_insert, ok = QInputDialog.getDouble(self, 'Рабочая жидкость',
                                                        'Введите удельный вес рабочей жидкости',
                                                        0, 0.87, 2, 2)
+
+    CreatePZ.fluid = fluid_work_insert
     nkt_diam_fond_list = list(CreatePZ.dict_nkt.keys())
     nkt_diam_fond = ''
     # lift_key = "ЭЦН"

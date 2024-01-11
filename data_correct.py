@@ -375,9 +375,9 @@ class DataWindow(MyWindow):
             CreatePZ.dict_pump_SHGN["posle"] = self.if_None(dict_pump_SHGN_posle)
 
             CreatePZ.dict_pump_ECN["do"] = self.if_None(dict_pump_ECN_do)
-            CreatePZ.dict_pump_ECN_h["do"] = self.if_None(dict_pump_SHGN_h_do)
+            CreatePZ.dict_pump_ECN_h["do"] = self.if_None(dict_pump_ECN_h_do)
             CreatePZ.dict_pump_ECN["posle"] = self.if_None(dict_pump_ECN_posle)
-            CreatePZ.dict_pump_ECN_h["posle"] = self.if_None(dict_pump_SHGN_h_posle)
+            CreatePZ.dict_pump_ECN_h["posle"] = self.if_None(dict_pump_ECN_h_posle)
 
             CreatePZ.paker_do["do"] = self.if_None(paker_do)
             CreatePZ.H_F_paker_do["do"] = self.if_None(H_F_paker_do)

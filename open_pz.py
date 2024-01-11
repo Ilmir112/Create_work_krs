@@ -667,7 +667,7 @@ class CreatePZ:
                 # expected_list = []
                 for row in range(CreatePZ.data_x_min + 2, CreatePZ.data_x_max + 1):
                     for col in range(1, 12):
-                        if 'прием' in str(ws.cell(row=row, column=col).value).strip().lower() or 'q' in str(
+                        if 'прием' in str(ws.cell(row=row, column=col).value).strip().lower() or 'qж' in str(
                                 ws.cell(row=row, column=col).value).strip().lower():
                             Qpr = ws.cell(row=row, column=col + 1).value
                             # print(f' приемис {Qpr}')
@@ -684,15 +684,15 @@ class CreatePZ:
                             ws.cell(row=row, column=col).value).strip().lower():
                             Pzak = ws.cell(row=row, column=col + 1).value
                             n = 1
-                            # while Pzak is None:
-                            #     n += 1
-                            #     Pzak = ws.cell(row=row, column=col + n).value
-                            #     print(f'pзака {Pzak}')
+                            while Pzak is None:
+                                n += 1
+                                Pzak = ws.cell(row=row, column=col + n).value
+                                print(f'pзака {Pzak}')
 
                 CreatePZ.expected_P = Pzak
                 CreatePZ.expected_Q = Qpr
                 CreatePZ.expected_pick_up[Qpr] = Pzak
-                # print(f' ожидаемые показатели {CreatePZ.expected_pick_up}')
+                print(f' ожидаемые показатели {CreatePZ.expected_pick_up}')
 
             except:
                 print('ошибка при определении плановых показателей')
@@ -1158,8 +1158,8 @@ class CreatePZ:
                             cell.border = CreatePZ.thin_border
                         if j == 11:
                             cell.font = Font(name='Arial', size=11, bold=False)
-                        if j == 12:
-                            cell.value = work_list[i - 1][j - 1]
+                        # if j == 12:
+                        #     cell.value = work_list[i - 1][j - 1]
                         else:
                             cell.font = Font(name='Arial', size=13, bold=False)
                         ws2.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='center',
@@ -1212,6 +1212,8 @@ class CreatePZ:
                         ws2.column_dimensions[get_column_letter(col_ind + 1)].width = colWidth[col_ind]
         ws2.column_dimensions[get_column_letter(11)].width = 20
         ws2.column_dimensions[get_column_letter(12)].width = 20
+
+        ws2.column_dimensions[get_column_letter(6)].width = 18
 
 
 

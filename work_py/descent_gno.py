@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QMessageBox, QInputDialog
 
 from work_py.alone_oreration import privyazkaNKT
 from work_py.rationingKRS import well_volume_norm, descentNKT_norm, descent_sucker_pod
+from work_py.calc_fond_nkt import CalcFond
 
 
 def gno_down(self):
@@ -62,7 +63,7 @@ def gno_down(self):
                     float(interval[0] - float(CreatePZ.H_F_paker_do["posle"]))) < 10:
                 if privyazkaNKT(self)[0] not in paker_descent:
                     paker_descent.insert(2, privyazkaNKT(self)[0])
-
+    calc_fond_nkt_str = calc_fond_nkt(self, sum(list(CreatePZ.dict_nkt_po.values())))
     gno_list = [[None, None,
                  f'За 48 часов до спуска запросить КАРТУ спуска на ГНО и заказать оборудование согласно карты спуска.',
                  None, None, None, None, None, None, None,
@@ -79,8 +80,7 @@ def gno_down(self):
                    None, None, None, None, None, None, None,
                    'Мастер КРС, предст. заказчика', None],
                   [None, None,
-                   f'В случае незавоза новых или завоза неопрессованных НКТ, согласовать алгоритм опрессовки с ЦДНГ,  произвести спуск '
-                   f'фондовых НКТ с поинтервальной опрессовкой через каждые 300м  с учетом статического уровня уровня',
+                   calc_fond_nkt_str,
                    None, None, None, None, None, None, None,
                    'Мастер КРС, предст. заказчика', None],
 
@@ -119,8 +119,7 @@ def gno_down(self):
                    None, None, None, None, None, None, None,
                    'Мастер КРС, предст. заказчика', None],
                   [None, None,
-                   f'В случае незавоза новых или завоза неопрессованных НКТ, согласовать алгоритм опрессовки с ЦДНГ,  произвести спуск '
-                   f'фондовых НКТ с поинтервальной опрессовкой через каждые 300м  с учетом статического уровня уровня',
+                   calc_fond_nkt_str,
                    None, None, None, None, None, None, None,
                    'Мастер КРС, предст. заказчика', None],
 
@@ -159,8 +158,7 @@ def gno_down(self):
                               None, None, None, None, None, None, None,
                               'Мастер КРС, предст. заказчика', None],
                              [None, None,
-                              f'В случае незавоза новых или завоза неопрессованных НКТ, согласовать алгоритм опрессовки с ЦДНГ, произвести спуск '
-                              f'фондовых НКТ с поинтервальной опрессовкой через каждые 300м с учетом статического уровня уровня',
+                              calc_fond_nkt_str,
                               None, None, None, None, None, None, None,
                               'Мастер КРС, предст. заказчика', None],
 
@@ -211,8 +209,7 @@ def gno_down(self):
                               None, None, None, None, None, None, None,
                               'Мастер КРС, предст. заказчика', None],
                              [None, None,
-                              f'В случае незавоза новых или завоза неопрессованных НКТ, согласовать алгоритм опрессовки с ЦДНГ,  произвести спуск '
-                              f'фондовых НКТ с поинтервальной опрессовкой через каждые 300м  с учетом статического уровня уровня',
+                              calc_fond_nkt_str,
                               None, None, None, None, None, None, None,
                               'Мастер КРС, предст. заказчика', None],
 
@@ -262,8 +259,7 @@ def gno_down(self):
                    None, None, None, None, None, None, None,
                    'Мастер КРС, предст. заказчика', None],
                   [None, None,
-                   f'В случае незавоза новых или завоза неопрессованных НКТ, согласовать алгоритм опрессовки с ЦДНГ,  произвести спуск '
-                   f'фондовых НКТ с поинтервальной опрессовкой через каждые 300м  с учетом статического уровня уровня',
+                   calc_fond_nkt_str,
                    None, None, None, None, None, None, None,
                    'Мастер КРС, предст. заказчика', None],
                   [None, None,
@@ -394,8 +390,7 @@ def gno_down(self):
                     None, None, None, None, None, None, None,
                     'Мастер КРС, предст. заказчика', None],
                    [None, None,
-                    f'В случае незавоза новых или завоза неопрессованных НКТ, согласовать алгоритм опрессовки с ЦДНГ,  произвести спуск '
-                    f'фондовых НКТ с поинтервальной опрессовкой через каждые 300м  с учетом статического уровня уровня',
+                    calc_fond_nkt_str,
                     None, None, None, None, None, None, None,
                     'Мастер КРС, предст. заказчика', None],
 
@@ -406,7 +401,7 @@ def gno_down(self):
                     'Мастер КРС, предст. заказчика', 0.3],
                    [None, None,
                     f'Спустить предварительно {CreatePZ.dict_pump_ECN["posle"]} на НКТ{gno_nkt_opening(CreatePZ.dict_nkt_po)} (завоз с УСО ГНО, ремонтные/новые) на '
-                    f'гл. {float(CreatePZ.dict_pump_ECN_h["posle"])}м. Спуск НКТ производить с шаблонированием и '
+                    f'гл. {CreatePZ.dict_pump_ECN_h["posle"]}м. Спуск НКТ производить с шаблонированием и '
                     f'смазкой резьбовых соединений, замером изоляции каждые 100м.  ',
                     None, None, None, None, None, None, None,
                     'Мастер КРС, предст. заказчика', descentNKT_norm(float(CreatePZ.dict_pump_ECN_h["posle"]), 1.2)],
@@ -428,8 +423,7 @@ def gno_down(self):
                                None, None, None, None, None, None, None,
                                'Мастер КРС, предст. заказчика', None],
                               [None, None,
-                               f'В случае незавоза новых или завоза неопрессованных НКТ, согласовать алгоритм опрессовки с ЦДНГ,  произвести спуск '
-                               f'фондовых НКТ с поинтервальной опрессовкой через каждые 300м  с учетом статического уровня уровня',
+                               calc_fond_nkt_str,
                                None, None, None, None, None, None, None,
                                'Мастер КРС, предст. заказчика', None],
                               [None, None,
@@ -475,8 +469,10 @@ def gno_down(self):
 
     lift_key = 'НВ'
 
-    print(('НВ' in CreatePZ.dict_pump_SHGN["posle"].upper() or 'ШГН' in CreatePZ.dict_pump_SHGN["posle"].upper()),
-          CreatePZ.if_None(CreatePZ.paker_do["posle"]) != '0')
+
+
+    # print(('НВ' in CreatePZ.dict_pump_SHGN["posle"].upper() or 'ШГН' in CreatePZ.dict_pump_SHGN["posle"].upper()),
+    #       CreatePZ.if_None(CreatePZ.paker_do["posle"]) != '0')
     if CreatePZ.dict_pump_ECN["posle"] != '0' and str(CreatePZ.paker_do["posle"]) == '0':
         lift_select = descent_ecn
         lift_key = 'ЭЦН'
@@ -538,6 +534,8 @@ def gno_down(self):
     for row in lift_select:
         gno_list.append(row)
 
+
+
     end_list = [[None, None,
                  f'Все работы производить с соблюдением т/б и технологии'
                  f' согласно утвержденному плану. Демонтировать подьемный агрегат и оборудование. Пустить скважину в работу.',
@@ -577,3 +575,37 @@ def PzakPriGis(self):
         return 80
     else:
         return CreatePZ.expected_P
+
+def calc_fond_nkt(self, len_nkt):
+
+    from open_pz import CreatePZ
+    # расчет необходимого давления опрессовки НКТ при спуске
+    static_level = CreatePZ.static_level
+    fluid = CreatePZ.fluid
+    distance_between_nkt, ok = QInputDialog.getInt(self, 'Расстояние между НКТ',
+                                                   f'Расстояние между НКТ для опрессовки', 300, 50,
+                                                   501)
+    pressuar = 40
+    if CreatePZ.dict_pump_ECN != 'отсут':
+        pressuar = 50
+
+    pressuar_nkt, ok = QInputDialog.getInt(self, 'Давление опрессовки ГНО ',
+                                          f'Давление опрессовки ГНО расчетное', pressuar, 20, 100)
+
+    calc = CalcFond(static_level, len_nkt, fluid, pressuar_nkt, distance_between_nkt)
+    calc_fond_dict = calc.calc_pressuar_list()
+    press_str = f'В случае незавоза новых или завоза неопрессованных НКТ, согласовать алгоритм опрессовки с ЦДНГ, ' \
+                f'произвести спуск  фондовых НКТ с поинтервальной опрессовкой через каждые {distance_between_nkt}м '\
+                 f'с учетом статического уровня уровня на на глубине {static_level}м  по телефонограмме заказчика '\
+                 f'в следующей последовательности:\n'
+    n = 0
+    for nkt, pressuar in calc_fond_dict.items():
+
+        press_str += f'Опрессовать НКТ в интервале {n} - {nkt} на давление {pressuar}атм \n'
+        n = nkt
+
+    # nkt_list =  [None, None,
+    #              press_str,
+    #              None, None, None, None, None, None, None,
+    #              'Мастер, предст-ль Заказчика', None]
+    return  press_str

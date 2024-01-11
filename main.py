@@ -198,16 +198,21 @@ class MyWindow(QMainWindow):
             ws2.page_setup.fitToHeight = False
             ws2.page_setup.fitToWidth = True
             ws2.print_options.horizontalCentered = True
+            # зададим размер листа
+            ws2.page_setup.paperSize = ws2.PAPERSIZE_A4
+            # содержимое по ширине страницы
+            ws2.sheet_properties.pageSetUpPr.fitToPage = True
+            ws2.page_setup.fitToHeight = False
             if 2 in CreatePZ.cat_H2S_list or 1 in CreatePZ.cat_H2S_list:
                 ws3 = wb2.create_sheet('Sheet1')
                 ws3.title = "Расчет необходимого количества поглотителя H2S"
                 ws3 = wb2["Расчет необходимого количества поглотителя H2S"]
                 calc_H2S(ws3, CreatePZ.H2S_pr, CreatePZ.H2S_mg)
                 ws3.hide = True
-                # ws3.page_setup.fitToPage = True
-                # ws3.page_setup.fitToHeight = True
-                # ws3.page_setup.fitToWidth = True
-                ws3.print_area = 'A1:A10'
+                ws3.page_setup.fitToPage = True
+                ws3.page_setup.fitToHeight = False
+                ws3.page_setup.fitToWidth = True
+                ws3.print_area = 'A1:F77'
             else:
                 print(f'{CreatePZ.cat_H2S_list} Расчет поглотителя сероводорода не требуется')
             for row_ind, row in enumerate(ws2.iter_rows(values_only=True)):

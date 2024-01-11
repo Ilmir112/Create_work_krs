@@ -57,6 +57,7 @@ def fluid_change(self):
                                                    'Введите Ожидаемое давление по пласту', 0, 0, 300, 1)
     fluid_new, ok = QInputDialog.getDouble(self, 'Новое значение удельного веса жидкости',
                                            'Введите значение удельного веса жидкости',  1.02, 1, 1.72, 2)
+    CreatePZ.fluid = fluid_new
     if len(CreatePZ.plast_work) == 0 and len(CreatePZ.cat_H2S_list) > 1:
         if '2' in str(CreatePZ.cat_H2S_list[1]):
             CreatePZ.fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
