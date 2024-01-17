@@ -439,7 +439,7 @@ def swabbing_with_2paker(self):
             if abs(float(interval[1] - paker1_depth)) < 10 or abs(float(interval[0] - paker1_depth)) < 10:
                 if privyazkaNKT(self) not in paker_list and CreatePZ.privyazkaSKO == 0:
                     CreatePZ.privyazkaSKO += 1
-                    paker_list.insert(1, privyazkaNKT(self))
+                    paker_list.insert(1, *privyazkaNKT(self))
 
     return paker_list
 

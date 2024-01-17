@@ -411,7 +411,7 @@ def itog_1(self):
         [None, 'ПЗР в начале и конце смены с заполнением вахтового журнала', None, None, None, None, None,
          None, None, None, None, round(CreatePZ.normOfTime / 11.5 * 0.3, 1)],
         [None, 'Непредвиденные  работы  : ', None, None, None, None, None, None, None, None, None,
-         round(CreatePZ.normOfTime * CreatePZ.bottomhole_artificial / 100 * 0.0004, 1)],
+         round(CreatePZ.normOfTime * float(CreatePZ.bottomhole_artificial) / 100 * 0.0004, 1)],
         [None, 'ВСЕГО  :', None, None, None, None, None, None, None, None, None, \
          round(
              CreatePZ.normOfTime + CreatePZ.normOfTime / 11.5 * 11 / 60 + CreatePZ.normOfTime / 11.5 * 0.3 + CreatePZ.normOfTime * CreatePZ.bottomhole_artificial / 100 * 0.0004,

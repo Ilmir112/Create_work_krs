@@ -1,7 +1,9 @@
 from PyQt5.QtWidgets import QInputDialog, QMessageBox
 
 import krs
+from main import MyWindow
 from work_py.alone_oreration import kot_select
+from work_py.opressovka import testing_pressure
 from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm,well_volume_norm
 
 def grpGpp(self):
@@ -12,6 +14,7 @@ def grpGpp(self):
     gPP_depth, ok = QInputDialog.getInt(None, 'глубина ',
                                         'Введите глубину установки',
                                         int(CreatePZ.perforation_roof - 50), 0, int(CreatePZ.bottomhole_drill))
+
 
     gpp_list = [
         [None, None, f'За 48 часов оформить заявку на завоз оборудования ГРП. Уложить НКТ на дополнительные стеллажи',
@@ -95,10 +98,10 @@ def grpGpp(self):
          'Мастер КРС, представ. заказчика', 4.2],
         [None, None,
          f'Произвести смену объема обратной промывкой тех жидкостью уд.весом {CreatePZ.fluid_work} на циркуляцию '
-         f'в объеме {krs.volume_jamming_well(self)}м3. Закрыть скважину на стабилизацию не менее 2 часов. \n'
+         f'в объеме {krs.volume_jamming_well(self, CreatePZ.current_bottom)}м3. Закрыть скважину на стабилизацию не менее 2 часов. \n'
          f'(согласовать глушение в коллектор, в случае отсутствия на желобную емкость)',
          None, None, None, None, None, None, None,
-         'Мастер КРС, представ. заказчика', well_volume_norm(krs.volume_jamming_well(self))],
+         'Мастер КРС, представ. заказчика', well_volume_norm(krs.volume_jamming_well(self, CreatePZ.current_bottom))],
         [None, None,
          f'Вести контроль плотности на  выходе в конце глушения. В случае отсутствия циркуляции на выходе жидкости '
          f'глушения уд.весом  или Рбуф при глушении скважины, дальнейшие промывки и удельный вес жидкостей промывок '
@@ -280,7 +283,7 @@ def grpPaker(self):
     paker_depth, ok = QInputDialog.getInt(None, 'опрессовка ЭК',
                                           'Введите глубину посадки пакера ГРП',
                                           int(CreatePZ.perforation_roof - 50), 0, int(CreatePZ.current_bottom - 10))
-
+    paker_depth = MyWindow.true_set_Paker(self, paker_depth)
     paker_list = [
         [None, None, f'За 48 часов оформить заявку на завоз оборудования ГРП. Уложить НКТ на дополнительные стеллажи',
          None, None, None, None, None, None, None,
@@ -315,7 +318,7 @@ def grpPaker(self):
          None, None, None, None, None, None, None,
          'Мастер КРС, подрядчик по ГРП', 0.77],
         [None, None,
-         f'Опрессовать пакер по затрубному пространству на Р={CreatePZ.max_admissible_pressure}атм в присутствии следующих '
+         f'{testing_pressure(self, paker_depth)}. Опрессовку производить в присутствии следующих '
          f'представителей: УСРСиСТ  (супервайзер), подрядчика по ГРП. \n В случае негерметичности пакера, дальнейшие '
          f'работы согласовать с Заказчиком. ',
          None, None, None, None, None, None, None,
@@ -373,10 +376,10 @@ def grpPaker(self):
          'Мастер КРС, представ. заказчика', 4.2],
         [None, None,
          f'Произвести смену объема обратной промывкой тех жидкостью уд.весом {CreatePZ.fluid_work} на циркуляцию '
-         f'в объеме {krs.volume_jamming_well(self)}м3. Закрыть скважину на стабилизацию не менее 2 часов. \n'
+         f'в объеме {krs.volume_jamming_well(self, CreatePZ.current_bottom)}м3. Закрыть скважину на стабилизацию не менее 2 часов. \n'
          f'(согласовать глушение в коллектор, в случае отсутствия на желобную емкость)',
          None, None, None, None, None, None, None,
-         'Мастер КРС, представ. заказчика', well_volume_norm((krs.volume_jamming_well(self)))],
+         'Мастер КРС, представ. заказчика', well_volume_norm((krs.volume_jamming_well(self, CreatePZ.current_bottom)))],
         [None, None,
          f'Вести контроль плотности на  выходе в конце глушения. В случае отсутствия циркуляции на выходе жидкости '
          f'глушения уд.весом  или Рбуф при глушении скважины, дальнейшие промывки и удельный вес жидкостей промывок '

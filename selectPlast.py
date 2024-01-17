@@ -40,8 +40,9 @@ class CheckBoxDialog(QDialog):
                     selected_options.append(self.plast.text())
 
         print("Selected options:", selected_options)
-        CreatePZ.plast_select = ', '.join(selected_options)
+        plast_select = ', '.join(selected_options)
         self.close()
+        return CreatePZ.plast_select
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

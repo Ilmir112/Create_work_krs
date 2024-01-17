@@ -27,13 +27,13 @@ class Raid(CreatePZ):
             nkt_pod = ['60мм' if CreatePZ.column_additional_diametr <110 else '73мм со снятыми фасками']
             nkt_pod = ''.join(nkt_pod)
 
-        nkt_diam = ''.join(['73' if CreatePZ.column_diametr > 110 else '60'])
+        nkt_diam = ''.join(['73мм' if CreatePZ.column_diametr > 110 else '60мм'])
 
         ryber_str_EK = f'райбер-{ryber_diam} для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм +' \
                        f' забойный двигатель Д-106 +НКТ{nkt_diam}м 20м + репер '
         ryber_str_DP = f'райбер-{ryber_diam} для ЭК {CreatePZ.column_additional_diametr}мм х ' \
                     f'{CreatePZ.column_additional_wall_thickness}мм + забойный двигатель Д-76 +НКТ{nkt_pod}мм 20м + репер + ' \
-                    f'НКТ{nkt_pod} {CreatePZ.current_bottom - float(CreatePZ.head_column_additional)}м'
+                    f'НКТ{nkt_pod} {round(CreatePZ.current_bottom - float(CreatePZ.head_column_additional))}м'
 
         if CreatePZ.column_additional == False or (CreatePZ.column_additional == True and CreatePZ.head_column_additional >= CreatePZ.current_bottom):
             ryber_key = 'райбер в ЭК'
@@ -70,7 +70,7 @@ class Raid(CreatePZ):
         raiding_interval = raid(raiding_interval_tuple)
         ryber_list = [
             [None, None,
-             f'Спустить {ryber_str}  на НКТ{nkt_diam}мм до Н={krovly_raiding}м с замером, '
+             f'Спустить {ryber_str}  на НКТ{nkt_diam} до Н={krovly_raiding}м с замером, '
              f'шаблонированием шаблоном 59,6мм (При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ). '
              f'В случае разгрузки инструмента  при спуске, проработать место посадки с промывкой скв., составить акт.'
              f'СКОРОСТЬ СПУСКА НЕ БОЛЕЕ 1 М/С (НЕ ДОХОДЯ 40 - 50 М ДО ПЛАНОВОГО ИНТЕРВАЛА СКОРОСТЬ СПУСКА СНИЗИТЬ ДО 0,25 М/С). '

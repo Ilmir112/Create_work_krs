@@ -25,10 +25,10 @@ class CalcFond:
         calc_nkt_list = self.calc_nkt_dict()
         calc_pressuar_dict = {}
         for nkt_l in calc_nkt_list:
-            if nkt_l <= self.static_level:
+            if nkt_l <= float(self.static_level):
                 p = round(self.fluid * 9.81 * nkt_l / 100, 0)
             else:
-                p = round(self.fluid * 9.81 * nkt_l / 100-((nkt_l - self.static_level) * 9.81 * self.fluid) / 100, 0)
+                p = round(self.fluid * 9.81 * nkt_l / 100-((nkt_l - float(self.static_level)) * 9.81 * self.fluid) / 100, 0)
 
             if p >= 150:
                 p = 150

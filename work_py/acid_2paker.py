@@ -4,6 +4,7 @@ from PyQt5.Qt import QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QInputD
 from krs import well_volume
 from main import MyWindow
 from open_pz import CreatePZ
+from work_py.opressovka import testing_pressure
 
 from work_py.rationingKRS import descentNKT_norm, well_volume_norm, liftingNKT_norm
 
@@ -242,9 +243,7 @@ class AcidPakerWindow(MyWindow):
              None, None, None, None, None, None, None,
              'мастер КРС', 0.3],
             [None, None,
-             f'Опрессовать эксплуатационную колонну в интервале {float(paker_depth) - float(deferencePaker)}-0м на Р={CreatePZ.max_admissible_pressure}атм'
-             f' в течение 30 минут в присутствии представителя заказчика, составить акт.  '
-             f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ)',
+             testing_pressure(self, paker_depth),
              None, None, None, None, None, None, None,
              'мастер КРС, предст. заказчика', 0.67],
 
@@ -350,9 +349,7 @@ class AcidPakerWindow(MyWindow):
              None, None, None, None, None, None, None,
              'мастер КРС', 0.3],
             [None, None,
-             f'Опрессовать эксплуатационную колонну в интервале {paker2Edit}-0м на Р={CreatePZ.max_admissible_pressure}атм'
-             f' в течение 30 минут  в присутствии представителя заказчика, составить акт.  '
-             f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ)',
+             testing_pressure(self, pakerEdit),
              None, None, None, None, None, None, None,
              'мастер КРС, предст. заказчика', 0.83 + 0.58],
             [None, None,
@@ -559,15 +556,15 @@ class AcidPakerWindow(MyWindow):
         else:
             CreatePZ.swabTrueEditType = 1
         acidEdit = self.tabWidget.currentWidget().acidEdit.currentText()
-        khvostEdit = float(self.tabWidget.currentWidget().khvostEdit.text())
-        pakerEdit = float(self.tabWidget.currentWidget().pakerEdit.text())
-        paker2Edit = float(self.tabWidget.currentWidget().paker2Edit.text())
-        skvVolumeEdit = float(self.tabWidget.currentWidget().skvVolumeEdit.text())
-        skvProcEdit = float(self.tabWidget.currentWidget().skvProcEdit.text())
-        acidVolumeEdit = float(self.tabWidget.currentWidget().acidVolumeEdit.text())
-        acidProcEdit = float(self.tabWidget.currentWidget().acidProcEdit.text())
-        swab_paker = float(self.tabWidget.currentWidget().swab_pakerEdit.text())
-        swab_volume = float(self.tabWidget.currentWidget().swab_volumeEdit.text())
+        khvostEdit = float(self.tabWidget.currentWidget().khvostEdit.text().replace(',', '.'))
+        pakerEdit = float(self.tabWidget.currentWidget().pakerEdit.text().replace(',', '.'))
+        paker2Edit = float(self.tabWidget.currentWidget().paker2Edit.text().replace(',', '.'))
+        skvVolumeEdit = float(self.tabWidget.currentWidget().skvVolumeEdit.text().replace(',', '.'))
+        skvProcEdit = float(self.tabWidget.currentWidget().skvProcEdit.text().replace(',', '.'))
+        acidVolumeEdit = float(self.tabWidget.currentWidget().acidVolumeEdit.text().replace(',', '.'))
+        acidProcEdit = float(self.tabWidget.currentWidget().acidProcEdit.text().replace(',', '.'))
+        swab_paker = float(self.tabWidget.currentWidget().swab_pakerEdit.text().replace(',', '.'))
+        swab_volume = float(self.tabWidget.currentWidget().swab_volumeEdit.text().replace(',', '.'))
         swabType = str(self.tabWidget.currentWidget().swabTypeCombo.currentText())
 
         acidOilProcEdit = self.tabWidget.currentWidget().acidOilProcEdit.text()
@@ -580,6 +577,8 @@ class AcidPakerWindow(MyWindow):
 
         # privyazka = str(self.tabWidget.currentWidget().privyazka.currentText())
         if self.countAcid == 0:
+            pakerEdit = MyWindow.true_set_Paker(self, pakerEdit)
+            paker2Edit = MyWindow.true_set_Paker(self, paker2Edit)
             work_list = self.acidSelect(swabTrueEditType, khvostEdit, pakerEdit, paker2Edit, depthGaugeEdit)
             CreatePZ.differencePaker = pakerEdit - paker2Edit
             CreatePZ.swabTypeComboIndex = swabType
@@ -601,7 +600,8 @@ class AcidPakerWindow(MyWindow):
         elif self.countAcid == 1:
             paker2Edit = pakerEdit - CreatePZ.difference_paker
             CreatePZ.khvostEdit = paker2Edit
-
+            pakerEdit = MyWindow.true_set_Paker(self, pakerEdit)
+            paker2Edit = MyWindow.true_set_Paker(self, paker2Edit)
             self.acidSelect(CreatePZ.swabTrueEditType, khvostEdit, pakerEdit, paker2Edit, CreatePZ.depthGaugeEdit)
 
             work_list = [
@@ -626,7 +626,7 @@ class AcidPakerWindow(MyWindow):
                 CreatePZ.swabTypeComboIndex = 2
 
         elif self.countAcid == 2:
-            print(f' счет rbckjns {self.countAcid}')
+
             # self.acidSelect(CreatePZ.swabTrueEditType, CreatePZ.khvostEdit, CreatePZ.pakerEdit)
             swabTrueEditType = True if swabTrueEditType == 'Нужно освоение' else False
             if swabTrueEditType:
@@ -650,12 +650,12 @@ class AcidPakerWindow(MyWindow):
                               liftingNKT_norm(pakerEdit, 1.2)]]
 
             self.populate_row(CreatePZ.ins_ind, work_list)
-            print(f' индекс строк {CreatePZ.ins_ind}')
+            # print(f' индекс строк {CreatePZ.ins_ind}')
             CreatePZ.ins_ind += len(work_list)
             CreatePZ.countAcid = 0
             CreatePZ.swabTypeComboIndex = 1
 
-            print(f'  третья индекс строк {CreatePZ.ins_ind}')
+            # print(f'  третья индекс строк {CreatePZ.ins_ind}')
         CreatePZ.pause = False
         self.close()
 

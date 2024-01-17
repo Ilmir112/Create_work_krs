@@ -1,17 +1,19 @@
 from PyQt5.QtWidgets import QInputDialog
-
+from main import MyWindow
 from work_py.rir import perf_new
 
 
 def vp(self):
     from open_pz import CreatePZ
-    vp_1 = ['ВП', 'ГПШ']
+    vp_1 = ['ВП', 'ГПШ', 'ВПШ']
     vp, ok = QInputDialog.getItem(self, 'Вид геофизического прибора',
                                   'Введите вид геофизического прибора:', vp_1, 0, False)
     if ok and vp:
         self.le.setText(vp)
     vp_depth, ok = QInputDialog.getInt(self, 'Глубина посадки ВП', 'Введите глубину посадки ВП',
                                        int(CreatePZ.perforation_roof - 10), 2, int(CreatePZ.bottomhole_drill))
+
+    vp_depth = MyWindow.true_set_Paker(self, vp_depth)
 
     if CreatePZ.perforation_roof > vp_depth:
         vp_list = [
@@ -86,19 +88,8 @@ def vp(self):
              f'6) Над ВП , ГПШ устанавливать цем мост не менее 4 м, (первые две желонки использовать механические, далее '
              f'взрывные желонки).',
              None, None, None, None, None, None, None,
-             'Мастер КРС, подрядчик по ГИС', None],
-            [None, None,
-             f'Опрессовать эксплуатационную колонну на Р={CreatePZ.max_admissible_pressure}атм в присутствии представителя заказчика '
-             f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ) ',
-             None, None, None, None, None, None, None,
-             'Мастер КРС, подрядчик РИР, УСРСиСТ', 1.2],
-            [None, None,
-             f'В случае негерметичности э/к, по согласованию с заказчиком произвести ОТСЭК для определения интервала '
-             f'негерметичности эксплуатационной колонны с точностью до одного НКТ или запись РГД, ВЧТ с '
-             f'целью определения места нарушения в присутствии представителя заказчика, составить акт. '
-             f'Определить приемистость НЭК.',
-             None, None, None, None, None, None, None,
-             'мастер КРС', None]
+             'Мастер КРС, подрядчик по ГИС', None]
+
         ]
 
     CreatePZ.current_bottom = vp_depth - 3

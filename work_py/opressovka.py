@@ -1,4 +1,5 @@
-from PyQt5.QtWidgets import QMessageBox
+from main import MyWindow
+from PyQt5.QtWidgets import QMessageBox, QInputDialog
 
 from work_py.alone_oreration import privyazkaNKT
 from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm
@@ -22,13 +23,14 @@ def paker_list(self):
     from open_pz import CreatePZ
     from PyQt5.QtWidgets import QInputDialog
 
-    print(f' кровля перфорации {CreatePZ.perforation_roof}')
+
 
     pressureZUMPF_question = QMessageBox.question(self, 'ЗУМПФ', 'Нужно ли опрессовывать ЗУМПФ?')
     if pressureZUMPF_question == QMessageBox.StandardButton.Yes:
         pakerDepthZumpf, ok = QInputDialog.getInt(None, 'опрессовка ЭК',
                                                   'Введите глубину посадки пакера для опрессовки ЗУМПФА',
                                                   int(CreatePZ.perforation_sole + 10), 0, int(CreatePZ.current_bottom))
+        pakerDepthZumpf = MyWindow.true_set_Paker(self, pakerDepthZumpf)
         pressureZUMPF_answer = True
     else:
         pressureZUMPF_answer = False
@@ -36,6 +38,9 @@ def paker_list(self):
     paker_depth, ok = QInputDialog.getInt(None, 'опрессовка ЭК',
                                           'Введите глубину посадки пакера для опрессовки колонны',
                                           int(CreatePZ.perforation_roof - 20), 0, int(CreatePZ.current_bottom - 10))
+
+    paker_depth = MyWindow.true_set_Paker(self, paker_depth)
+
     paker_khost, ok = QInputDialog.getInt(None, 'опрессовка ЭК', 'Введите длину хвостовика', 10, 0, 3000)
     try:
 
@@ -110,11 +115,7 @@ def paker_list(self):
              None, None, None, None, None, None, None,
              'мастер КРС', 0.4],
             [None, None,
-             f'Опрессовать эксплуатационную колонну в интервале {paker_depth}-0м на '
-             f'Р={CreatePZ.max_admissible_pressure}атм'
-             f' в течение 30 минут  в присутствии представителя заказчика, составить акт.  '
-             f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа '
-             f'до начала работ)',
+             testing_pressure(self, paker_depth),
              None, None, None, None, None, None, None,
              'мастер КРС, предст. заказчика', 0.67],
             [None, None,
@@ -150,11 +151,7 @@ def paker_list(self):
             [None, None, f'Посадить пакер на глубине {paker_depth}м',
              None, None, None, None, None, None, None,
              'мастер КРС', 0.4],
-            [None, None, f'Опрессовать эксплуатационную колонну в интервале {paker_depth}-0м на '
-                         f'Р={CreatePZ.max_admissible_pressure}атм'
-                         f' в течение 30 минут  в присутствии представителя заказчика, составить акт.  '
-                         f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 '
-                         f'часа до начала работ)',
+            [None, None, testing_pressure(self, paker_depth),
              None, None, None, None, None, None, None,
              'мастер КРС, предст. заказчика', 0.67],
             [None, None,
@@ -317,3 +314,83 @@ def nktOpress(self):
         return 'НКТ + опрессовочное седло', 'Опрессовать НКТ на 200атм. Вымыть шар'
     else:
         return 'НКТ', ''
+
+
+# функция проверки спуска пакера выше прошаблонированной колонны
+def check_for_template_paker(self, depth):
+    from open_pz import CreatePZ
+
+    check_true = False
+
+    while check_true == False:
+        if depth < float(CreatePZ.head_column_additional) and depth <= CreatePZ.template_depth and CreatePZ.column_additional:
+            check_true = True
+        elif depth > float(CreatePZ.head_column_additional) and depth <= CreatePZ.template_depth_addition and CreatePZ.column_additional:
+            check_true = True
+        elif depth <= CreatePZ.template_depth and CreatePZ.column_additional is False:
+            check_true = True
+
+        if check_true == False:
+
+            false_template = QMessageBox.question(None, 'Проверка глубины пакера',
+                                                  f'Проверка показала пакер опускается ниже глубины шаблонирования ЭК'
+                                                  f'изменить глубину ?')
+            if false_template is QMessageBox.StandardButton.Yes:
+                depth, ok = QInputDialog.getInt(None, 'опрессовка ЭК',
+                                                'Введите глубину посадки пакера для опрессовки колонны',
+                                                int(CreatePZ.perforation_roof - 20), 0,
+                                                int(CreatePZ.current_bottom))
+            else:
+                check_true = True
+
+        else:
+            return depth, True
+
+
+
+
+def testing_pressure(self, depth):
+    from open_pz import CreatePZ
+
+
+    interval_list = []
+
+    for plast in CreatePZ.plast_work:
+        for interval in CreatePZ.dict_perforation[plast]['интервал']:
+            interval_list.append(interval)
+
+    if CreatePZ.leakiness == True:
+        for nek in CreatePZ.dict_leakiness['НЭК']:
+            for interval in nek['интервал']:
+                interval_list.append(interval)
+
+
+    if any([float(interval[1]) < float(depth) for interval in interval_list]):
+        testing_pressure_str = f'Закачкой тех жидкости в затрубное пространство при Р=' \
+                               f'{CreatePZ.max_admissible_pressure}атм' \
+                               f' удостоверить в отсутствии выхода тех жидкости и герметичности пакера, составить акт.  ' \
+                               f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа ' \
+                               f'до начала работ)'
+
+    else:
+
+        testing_pressure_str = f'Опрессовать эксплуатационную колонну в интервале {depth}-0м на ' \
+                               f'Р={CreatePZ.max_admissible_pressure}атм' \
+                               f' в течение 30 минут  в присутствии представителя заказчика, составить акт.  ' \
+                               f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа ' \
+                               f'до начала работ)'
+
+    return testing_pressure_str
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import QMessageBox, QInputDialog
 
 from work_py.alone_oreration import privyazkaNKT
+from work_py.opressovka import testing_pressure
 from work_py.rationingKRS import well_volume_norm, descentNKT_norm, descent_sucker_pod
 from work_py.calc_fond_nkt import CalcFond
 
@@ -33,9 +34,7 @@ def gno_down(self):
          None, None, None, None, None, None, None,
          'мастер КРС', 0.25 + 0.5 + 0.5],
         [None, None,
-         f'Опрессовать эксплуатационную колонну в интервале {CreatePZ.H_F_paker_do["posle"]}-0м на Р={CreatePZ.max_admissible_pressure}атм'
-         f' в течение 30 минут в присутствии представителя заказчика, составить акт.  '
-         f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ)',
+         f'{testing_pressure(self, CreatePZ.H_F_paker_do["posle"])}',
          None, None, None, None, None, None, None,
          'мастер КРС, предст. заказчика', 0.67],
         [None, None, ''.join(['ОВТР 10ч' if CreatePZ.region != 'ЧГМ' else 'ОВТР 4ч']),
@@ -178,9 +177,7 @@ def gno_down(self):
                               None, None, None, None, None, None, None,
                               'Мастер КРС, предст. заказчика', 1.27],
                              [None, None,
-                              f'Опрессовать эксплуатационную колонну пакер на Р={CreatePZ.max_admissible_pressure}атм'
-                              f' в течение 30 минут  в присутствии представителя заказчика, составить акт.  '
-                              f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ). Опрессовать кабельный ввод устьевой арматуры',
+                              f'{testing_pressure(self, CreatePZ.H_F_paker_do["posle"])}',
                               None, None, None, None, None, None, None,
                               'Мастер КРС, предст. заказчика', 0.67],
                              [None, None,
@@ -229,9 +226,7 @@ def gno_down(self):
                               None, None, None, None, None, None, None,
                               'Мастер КРС, предст. заказчика', 1.77],
                              [None, None,
-                              f'Опрессовать эксплуатационную колонну пакер на Р={CreatePZ.max_admissible_pressure}атм'
-                              f' в течение 30 минут  в присутствии представителя заказчика, составить акт.  '
-                              f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ). Опрессовать кабельный ввод устьевой арматуры',
+                              f'{testing_pressure(self, CreatePZ.H_F_paker_do["posle"])}',
                               None, None, None, None, None, None, None,
                               'Мастер КРС, предст. заказчика', 0.67],
                              [None, None,
@@ -270,7 +265,7 @@ def gno_down(self):
                   [None, None,
                    f'Спустить предварительно {CreatePZ.dict_pump_ECN["posle"]} на НКТ{gno_nkt_opening(CreatePZ.dict_nkt_po)} c пакером {CreatePZ.paker_do["posle"]} на'
                    f' глубину {CreatePZ.H_F_paker_do["posle"]}м'
-                   f'(завоз с УСО ГНО, ремонтные/новые) на гл. {CreatePZ.dict_pump_ECN["posle"]}м. Спуск НКТ производить с шаблонированием и '
+                   f'(завоз с УСО ГНО, ремонтные/новые) на гл. {CreatePZ.dict_pump_ECN_h["posle"]}м. Спуск НКТ производить с шаблонированием и '
                    f'смазкой резьбовых соединений, замером изоляции каждые 100м.',
                    None, None, None, None, None, None, None,
                    'Мастер КРС, предст. заказчика', descentNKT_norm(sum(list(CreatePZ.dict_nkt_po.values())), 1.2)],
@@ -278,8 +273,7 @@ def gno_down(self):
                    f'Демонтировать превентор. Посадить пакер на глубине {CreatePZ.H_F_paker_do["posle"]}м.  Монтаж  устьевой арматуры. При монтаже использовать только сертифицированное'
                    f' оборудование (переводники, муфты, переходные катушки). МОНТАЖ БЕЗ ПОДВЕСНОГО ПАТРУБКА ЗАПРЕЩЕН. произвести разделку'
                    f' кабеля под устьевой сальник '
-                   f'произвести герметизацию устья. \nОпрессовать эксплуатационную колонну в интервале {CreatePZ.H_F_paker_do["posle"]}-0м на Р={CreatePZ.max_admissible_pressure}атм'
-                   f' в течение 30 минут на наличие перетоков в НКТ. Опрессовать кабельный ввод устьевой арматуры',
+                   f'произвести герметизацию устья. \n{testing_pressure(self, CreatePZ.H_F_paker_do["posle"])}',
                    None, None, None, None, None, None, None,
                    'Мастер КРС, предст. заказчика', 1.77],
                   [None, None,
@@ -446,9 +440,7 @@ def gno_down(self):
                                None, None, None, None, None, None, None,
                                'Мастер КРС, предст. заказчика', 1.77],
                               [None, None,
-                               f'Опрессовать эксплуатационную колонну пакер на Р={CreatePZ.max_admissible_pressure}атм'
-                               f' в течение 30 минут в присутствии представителя заказчика, составить акт.  '
-                               f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ). Опрессовать кабельный ввод устьевой арматуры',
+                               f'{testing_pressure(self, CreatePZ.H_F_paker_do["posle"])} Опрессовать кабельный ввод устьевой арматуры',
                                None, None, None, None, None, None, None,
                                'Мастер КРС, предст. заказчика', 0.67],
                               [None, None,
@@ -586,7 +578,8 @@ def calc_fond_nkt(self, len_nkt):
                                                    f'Расстояние между НКТ для опрессовки', 300, 50,
                                                    501)
     pressuar = 40
-    if CreatePZ.dict_pump_ECN != 'отсут':
+    print(f' ЭЦН {CreatePZ.dict_pump_ECN["do"]}')
+    if CreatePZ.dict_pump_ECN["do"] != "0":
         pressuar = 50
 
     pressuar_nkt, ok = QInputDialog.getInt(self, 'Давление опрессовки ГНО ',
@@ -604,8 +597,4 @@ def calc_fond_nkt(self, len_nkt):
         press_str += f'Опрессовать НКТ в интервале {n} - {nkt} на давление {pressuar}атм \n'
         n = nkt
 
-    # nkt_list =  [None, None,
-    #              press_str,
-    #              None, None, None, None, None, None, None,
-    #              'Мастер, предст-ль Заказчика', None]
     return  press_str

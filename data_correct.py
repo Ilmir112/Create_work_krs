@@ -327,7 +327,7 @@ class DataWindow(MyWindow):
                 or self.ifNum(max_expected_pressure) == False \
                 or self.ifNum(dict_pump_ECN_h_do) == False\
                 or self.ifNum(static_level) == False \
-                or self.ifNum(static_level) == 'отсут' \
+                or self.ifNum(static_level) == False \
                 or self.ifNum(dinamic_level) == False\
                 or self.ifNum(dict_pump_ECN_h_posle) == False \
                 or self.ifNum(dict_pump_SHGN_h_do) == False \
@@ -388,6 +388,8 @@ class DataWindow(MyWindow):
             CreatePZ.H_F_paker2_do["do"] = self.if_None(H_F_paker2_do)
             CreatePZ.paker2_do["posle"] = self.if_None(paker2_posle)
             CreatePZ.H_F_paker2_do["posle"] = self.if_None(H_F_paker2_posle)
+            CreatePZ.static_level = self.if_None(static_level)
+            CreatePZ.dinamic_level = self.if_None(dinamic_level)
             # print(f' после ок {CreatePZ.dict_pump, CreatePZ.paker_do, CreatePZ.H_F_paker_do, CreatePZ.dict_pump_h}')
             CreatePZ.pause = False
             self.close()

@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QMessageBox, QInputDialog
 
 from krs import volume_vn_ek, volume_vn_nkt, well_volume
 from work_py.acids_work import open_checkbox_dialog
+from main import MyWindow
 from work_py.alone_oreration import fluid_change
 from work_py.drilling import drilling_nkt
 from work_py.raiding import Raid
@@ -13,7 +14,8 @@ def rir_rpp(self):
     from open_pz import CreatePZ
     from work_py.opressovka import paker_list, paker_diametr_select
     rir_list = []
-    open_checkbox_dialog()
+    
+    plast = open_checkbox_dialog()
 
 
     rir_rpk_question = QMessageBox.question(self, 'посадку между пластами?', 'посадку между пластами?')
@@ -24,8 +26,13 @@ def rir_rpp(self):
     rpkDepth, ok = QInputDialog.getInt(None, 'глубина посадки глухого пакера',
                                        'Введите глубину посадки  глухого пакера',
                                        int(CreatePZ.perforation_roof + 10), 0, int(CreatePZ.bottomhole_artificial))
-    for row in paker_list(self):
-        rir_list.append(row)
+    rpkDepth = MyWindow.true_set_Paker(self, rpkDepth)
+    rir_paker_question = QMessageBox.question(self, 'Спуск пакера', 'Нужно ли производить СПО пакера для опрессовки НКТ, ЭК и определениия Q')
+    if rir_paker_question == QMessageBox.StandardButton.Yes:
+        for row in paker_list(self):
+         rir_list.append(row)
+    else:
+        rir_list = []
     nkt_diam = ''.join(['73' if CreatePZ.column_diametr > 110 else '60'])
 
 
@@ -63,8 +70,11 @@ def rir_rpp(self):
       f'{round(CreatePZ.current_bottom*1.12/1000, 1)}м3 тех. жидкостью  уд.весом {CreatePZ.fluid_work} ',
       None, None, None, None, None, None, None,
       'Мастер КРС, подрядчик РИР, УСРСиСТ', liftingNKT_norm(rpkDepth, 1.2)]]
-    for row in rir_work_list:
-        rir_list.append(row)
+    
+    if len(rir_list):
+        for row in rir_work_list:
+            rir_list.append(row)
+        
     CreatePZ.current_bottom = rpkDepth
     perf_new(self, rpkDepth, CreatePZ.current_bottom)
     return rir_list
@@ -75,9 +85,9 @@ def rir_rpk(self):
     from open_pz import CreatePZ
     from work_py.opressovka import paker_list, paker_diametr_select
     rir_list = []
-    open_checkbox_dialog()
+    plast = open_checkbox_dialog()
 
-    plast = CreatePZ.plast_select
+    
     rir_rpk_question = QMessageBox.question(self, 'посадку между пластами?', 'посадку между пластами?')
     if rir_rpk_question == QMessageBox.StandardButton.Yes:
         rir_rpk_plast_true = True
@@ -86,6 +96,7 @@ def rir_rpk(self):
     rpkDepth, ok = QInputDialog.getInt(None, 'Определение приемистости',
                                        'Введите глубину посадки пакера РПК для определения приемистости',
                                        int(CreatePZ.perforation_roof + 10), 0, int(CreatePZ.bottomhole_artificial))
+    rpkDepth = MyWindow.true_set_Paker(self, rpkDepth)
     for row in paker_list(self):
         rir_list.append(row)
     nkt_diam = ''.join(['73' if CreatePZ.column_diametr > 110 else '60'])
@@ -229,9 +240,9 @@ def rirWithPero(self):
     nkt_diam = ''.join(['73' if CreatePZ.column_diametr > 110 else '60'])
 
     if len(CreatePZ.plast_work) != 0:
-        open_checkbox_dialog()
+        plast = open_checkbox_dialog()
 
-    plast = CreatePZ.plast_select
+    
     rirSole, ok = QInputDialog.getInt(None, 'Подошва цементного моста',
                                       'Введите глубину подошвы цементного моста ',
                                       int(CreatePZ.current_bottom), 0, int(CreatePZ.bottomhole_drill))
@@ -539,6 +550,9 @@ def rir_izvelPaker(self):
     pakerIzvPaker, ok = QInputDialog.getInt(None, 'Глубина извлекаемого пакера',
                                       'Введите глубину установки извлекаемого пакера ',
                                       int(CreatePZ.perforation_roof-50), 0, int(CreatePZ.bottomhole_drill))
+
+    pakerIzvPaker = MyWindow.true_set_Paker(self, pakerIzvPaker)
+
     CreatePZ.pakerIzvPaker = pakerIzvPaker
     rir_list = [[None, None,
        f'Спустить   пакера извлекаемый компании НЕОИНТЕХ +НКТ73мм 20м + реперный патрубок 2м на тНКТ73мм до'
