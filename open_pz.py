@@ -37,6 +37,7 @@ class CreatePZ:
     template_depth = 0
     nkt_diam = 73
     b_plan = 0
+    template_depth_addition = 0
     expected_Q = 0
     expected_P = 0
     plast_select = ''
@@ -84,7 +85,7 @@ class CreatePZ:
     leakiness = False
     emergency_well = False
     emergency_count = 0
-
+    skm_interval = []
     work_perforations = []
     work_perforations_dict = {}
     paker_do = {"do": 0, "posle": 0}
@@ -106,6 +107,7 @@ class CreatePZ:
     dict_pump_h = {"do": 0, "posle": 0}
     ins_ind = 0
     len_razdel_1 = 0
+    count_template = 0
     cat_P_1 = []
     countAcid = 0
     swabTypeComboIndex = 1
@@ -113,6 +115,7 @@ class CreatePZ:
     data_x_max = 0
     drilling_interval = []
     max_angle = 0
+    data_x_min = 0
     pakerTwoSKO = False
     privyazkaSKO = 0
     H2S_pr = []
@@ -161,7 +164,7 @@ class CreatePZ:
         old_index = 1
         ws = wb.active
         for sheet in name_list:
-            if sheet in wb.sheetnames and sheet != 'наряд-заказ КРС':
+            if sheet in wb.sheetnames and (sheet != 'наряд-заказ КРС' or sheet != 'План работ'):
                 wb.remove(wb[sheet])
 
 
@@ -171,16 +174,25 @@ class CreatePZ:
             if 'Категория скважины' in row:
                 CreatePZ.cat_well_min.append(row_ind + 1)  # индекс начала категории
 
-            elif 'План-заказ' in row or 'ПЛАН РАБОТ' in row:
+            elif 'План-заказ' in row:
                 ws.cell(row=row_ind + 1, column=2).value = 'ПЛАН РАБОТ'
                 CreatePZ.cat_well_max = row_ind - 1
                 data_well_min = row_ind + 1
 
+            elif  any(['ПЛАН РАБОТ' in str(col) for col in row]):
+                number_dp, ok = QInputDialog.getText(None, 'Номер дополнительного плана работ',
+                                                      'Введите номер дополнительного плана работ')
+                ws.cell(row=row_ind + 1, column=2).value = f'ДОПОЛНИТЕЛЬНЫЙ ПЛАН РАБОТ № {number_dp}'
 
-            elif any(['IX. Мероприятия по предотвращению' in str(col) for col in row]):
+                print(f'номер доп плана {number_dp}')
+                CreatePZ.cat_well_max = row_ind - 1
+                data_well_min = row_ind + 1
+
+
+            elif any(['IX. Мероприятия по предотвращению' in str(col) for col in row]) or  any(['Порядок работы' in str(col) for col in row]):
                 CreatePZ.data_well_max = row_ind
 
-            elif 'X. Ожидаемые показатели после ремонта:' in row:
+            elif any(['показатели после ремонта' in str(col) for col in row]):
                 CreatePZ.data_x_min = row_ind
 
 
@@ -490,7 +502,7 @@ class CreatePZ:
         CreatePZ.pause = True
 
         if CreatePZ.condition_of_wells == 0:
-            CreatePZ.condition_of_wells, ok = QInputDialog.getInt(self, 'индекс Окончания копирования',
+            CreatePZ.condition_of_wells, ok = QInputDialog.getInt(self, 'индекс копирования',
                                                                   'Программа не смогла определить строку n\ III. Состояние скважины к началу ремонта ',
                                                                   0, 0, 800)
 
@@ -499,10 +511,23 @@ class CreatePZ:
                                                    'Программа не смогла определить строку начала копирования',
                                                    0, 0, 800)
             CreatePZ.cat_well_min.append(cat_well_min)
-        if CreatePZ.data_x_max == 0:
-            CreatePZ.data_x_max, ok = QInputDialog.getInt(self, 'индекс окончания копирования',
-                                                          'Программа не смогла определить строку окончания копирования',
+
+        if CreatePZ.data_well_max == 0:
+            CreatePZ.data_well_max, ok = QInputDialog.getInt(self, 'индекс окончания копирования ПЗ',
+                                                          'Программа не смогла определить индекс окончания ПЗ',
                                                           0, 0, 800)
+        print(f' индекс окончания копирования {CreatePZ.data_well_max}')
+        if CreatePZ.data_x_min == 0 and work_plan != 'dop_plan':
+            CreatePZ.data_x_min, ok = QInputDialog.getInt(self, 'индекс начала копирования ожидаемых показателей',
+                                                          'Программа не смогла определить начала копирования ожидаемых показателей',
+                                                          0, 0, 800)
+
+        if CreatePZ.data_x_max == 0 and work_plan != 'dop_plan':
+            CreatePZ.data_x_max, ok = QInputDialog.getInt(self, 'индекс окончания копирования ожидаемых показателей',
+                                                          'Программа не смогла определить строку окончания копирования ожидаемых показателей',
+                                                          0, 0, 800)
+
+
 
         if str(CreatePZ.well_number) in ['1436', '756', '1235', '2517', '2529', '655', '2525', '751',
                                          '1371', '1293', '1420', '296', '321', '351', '186', '815', '135', '226', '377',
@@ -516,8 +541,7 @@ class CreatePZ:
                 CreatePZ.grpPlan = True
             else:
                 CreatePZ.grpPlan = False
-        # print(CreatePZ.dict_pump_ECN, CreatePZ.dict_pump_SHGN, CreatePZ.dict_pump_ECN_h, CreatePZ.H_F_paker_do)
-        # print()
+
         # Определение наличия по скважине нарушений
         for row in range(data_pvr_max, CreatePZ.data_well_max):
             for col in range(1, 13):
@@ -605,12 +629,12 @@ class CreatePZ:
         print(f'глубина пакер {CreatePZ.H_F_paker_do}')
         print(f' диам колонны {CreatePZ.column_diametr}')
         print(f' гипс в скважине {CreatePZ.gipsInWell}')
-        print(
-            f'{CreatePZ.column_additional == False},{("ЭЦН" in str(CreatePZ.dict_pump["posle"]).upper() or "ВНН" in str(CreatePZ.dict_pump["posle"][0]).upper())}')
-        print(f'Pdd {str(CreatePZ.dict_pump["posle"]).upper()}')
+        # print(
+        #     f'{CreatePZ.column_additional == False},{("ЭЦН" in str(CreatePZ.dict_pump["posle"]).upper() or "ВНН" in str(CreatePZ.dict_pump["posle"][0]).upper())}')
+        # print(f'Pdd {str(CreatePZ.dict_pump["posle"]).upper()}')
         if CreatePZ.column_additional == False and CreatePZ.dict_pump_ECN["posle"] != '0':
-            print(
-                f'{CreatePZ.column_additional == False},{("ЭЦН" in str(CreatePZ.dict_pump["posle"]).upper(), "ВНН" in str(CreatePZ.dict_pump["posle"]).upper())}')
+            # print(
+            #     f'{CreatePZ.column_additional == False},{("ЭЦН" in str(CreatePZ.dict_pump["posle"]).upper(), "ВНН" in str(CreatePZ.dict_pump["posle"]).upper())}')
 
             CreatePZ.lift_ecn_can = True
         elif CreatePZ.column_additional == True:
@@ -739,7 +763,7 @@ class CreatePZ:
                     CreatePZ.b_plan = row
                     # print(f'b_plan {CreatePZ.b_plan}')
             if CreatePZ.b_plan == 0:
-                CreatePZ.b_plan, ok = QInputDialog.getDouble(self, 'Индекс плановго НКТ',
+                CreatePZ.b_plan, ok = QInputDialog.getDouble(self, 'Индекс планового НКТ',
                                                              'Программа не могла определить начала строку с ПЗ штанги - план')
 
             for row in range(sucker_rod_ind + 1, pipes_ind - 1):
@@ -760,7 +784,7 @@ class CreatePZ:
             print('штанги отсутствуют')
         perforations_intervals = []
 
-        print(f' индекс ПВР{data_pvr_min + 2, data_pvr_max + 1}')
+        # print(f' индекс ПВР{data_pvr_min + 2, data_pvr_max + 1}')
         for row in range(data_pvr_min, data_pvr_max + 2):  # Сортировка интервала перфорации
             lst = []
             if isinstance(ws.cell(row=row, column=3).value, int) or isinstance(ws.cell(row=row, column=3).value, float):
@@ -776,12 +800,12 @@ class CreatePZ:
                     lst.insert(5, 'отключен')
                 if all([str(i).strip() == 'None' or i is None for i in lst]) == False:
                     perforations_intervals.append(lst)
-
+        print(perforations_intervals)
         for ind, row in enumerate(perforations_intervals):
-            print(row)
+            # print(row)
             krovlya_perf = float(row[2])
 
-            print(f'кровля ПВР {krovlya_perf}')
+            # print(f'кровля ПВР {krovlya_perf}')
             plast = row[0]
             if plast is None:
                 plast = perforations_intervals[ind - 1][0]
@@ -876,14 +900,13 @@ class CreatePZ:
                 CreatePZ.plast_work = list(plast_work)
                 print(f'все интервалы {CreatePZ.plast_all}')
                 print(f'раб интервалы {CreatePZ.plast_work}')
-        try:
+        if work_plan != 'dop_plan':
             for j in range(CreatePZ.data_x_min, CreatePZ.data_x_max):  # Ожидаемые показатели после ремонта
                 lst = []
                 for i in range(0, 12):
                     lst.append(ws.cell(row=j + 1, column=i + 1).value)
                 CreatePZ.row_expected.append(lst)
-        except:
-            pass
+
         if '1' in CreatePZ.cat_P_1 or '1' in CreatePZ.cat_H2S_list or 1 in CreatePZ.cat_P_1 or 1 in CreatePZ.cat_H2S_list:
             CreatePZ.bvo = True
         print(f'БВО {CreatePZ.bvo}')
@@ -901,49 +924,45 @@ class CreatePZ:
             ws.merge_cells(start_row=i, start_column=8, end_row=i, end_column=13)
         CreatePZ.ins_ind = 0
 
-        # list_block = [cat_well_min,  CreatePZ.data_well_max]
 
-        # head = plan.head_ind(cat_well_min, CreatePZ.data_well_max + 1)
-        #
-        # plan.copy._row(ws, ws2, CreatePZ.ins_ind, head)
         CreatePZ.ins_ind += CreatePZ.data_well_max - CreatePZ.cat_well_min[0] + 19
         # print(f' индекс вставки ГНВП{CreatePZ.ins_ind}')
         dict_events_gnvp = {}
         dict_events_gnvp['krs'] = events_gnvp()
         dict_events_gnvp['gnkt_opz'] = events_gnvp_gnkt()
+        if work_plan != 'dop_plan':
+            for i in range(CreatePZ.ins_ind, CreatePZ.ins_ind + len(dict_events_gnvp[work_plan]) - 1):
+                ws.merge_cells(start_row=i, start_column=2, end_row=i, end_column=12)
 
-        for i in range(CreatePZ.ins_ind, CreatePZ.ins_ind + len(dict_events_gnvp[work_plan]) - 1):
-            ws.merge_cells(start_row=i, start_column=2, end_row=i, end_column=12)
+                if i == (CreatePZ.ins_ind + 13 or i == CreatePZ.ins_ind + 28) and work_plan == 'krs':
 
-            if i == (CreatePZ.ins_ind + 13 or i == CreatePZ.ins_ind + 28) and work_plan == 'krs':
+                    ws.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='center',
+                                                                   vertical='center')
+                    ws.cell(row=i, column=2).font = Font(name='Arial', size=13, bold=True)
+                    ws.cell(row=i, column=2).value = dict_events_gnvp[work_plan][i - CreatePZ.ins_ind][1]
+                elif i == CreatePZ.ins_ind + 11 and work_plan == 'gnkt_opz':
+                    # print(work_plan)
+                    ws.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='center',
+                                                                   vertical='center')
+                    ws.cell(row=i, column=2).font = Font(name='Arial', size=11, bold=True)
+                    ws.cell(row=i, column=2).value = dict_events_gnvp[work_plan][i - CreatePZ.ins_ind][1]
+                else:
+                    ws.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='left',
+                                                                   vertical='top')
+                    ws.cell(row=i, column=2).font = Font(name='Arial', size=12)
 
-                ws.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='center',
-                                                               vertical='center')
-                ws.cell(row=i, column=2).font = Font(name='Arial', size=13, bold=True)
-                ws.cell(row=i, column=2).value = dict_events_gnvp[work_plan][i - CreatePZ.ins_ind][1]
-            elif i == CreatePZ.ins_ind + 11 and work_plan == 'gnkt_opz':
-                # print(work_plan)
-                ws.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='center',
-                                                               vertical='center')
-                ws.cell(row=i, column=2).font = Font(name='Arial', size=11, bold=True)
-                ws.cell(row=i, column=2).value = dict_events_gnvp[work_plan][i - CreatePZ.ins_ind][1]
-            else:
-                ws.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='left',
-                                                               vertical='top')
-                ws.cell(row=i, column=2).font = Font(name='Arial', size=12)
+                    ws.cell(row=i, column=2).value = dict_events_gnvp[work_plan][i - CreatePZ.ins_ind][1]
+            ins_gnvp = CreatePZ.ins_ind
+            CreatePZ.ins_ind += len(dict_events_gnvp[work_plan]) - 1
 
-                ws.cell(row=i, column=2).value = dict_events_gnvp[work_plan][i - CreatePZ.ins_ind][1]
-        ins_gnvp = CreatePZ.ins_ind
-        CreatePZ.ins_ind += len(dict_events_gnvp[work_plan]) - 1
+            ws.row_dimensions[2].height = 30
+            ws.row_dimensions[6].height = 30
 
-        ws.row_dimensions[2].height = 30
-        ws.row_dimensions[6].height = 30
+            # data_main_production_string = ws.cell(row=int(ind_data_main_production_string[1:])+1, column=int(ind_data_main_production_string[0])+2).value
+            CreatePZ.insert_gnvp(ws, work_plan, ins_gnvp)
 
-        # data_main_production_string = ws.cell(row=int(ind_data_main_production_string[1:])+1, column=int(ind_data_main_production_string[0])+2).value
-        CreatePZ.insert_gnvp(ws, work_plan, ins_gnvp)
-
-        # print(CreatePZ.row_expected)
-        if len(CreatePZ.row_expected) != 0:
+            # print(CreatePZ.row_expected)
+        if len(CreatePZ.row_expected) != 0 and work_plan != 'dop_plan':
             for i in range(1, len(CreatePZ.row_expected) + 1):  # Добавление  показатели после ремонта
                 ws.row_dimensions[CreatePZ.ins_ind + i - 1].height = None
                 for j in range(1, 12):
@@ -1019,29 +1038,31 @@ class CreatePZ:
         ins_ind += len(podp_down)
 
     def insert_gnvp(ws, work_plan, ins_gnvp):
-        rowHeights_gnvp = [30, 115.0, 155.5, 110.25, 36.0, 52.25, 36.25, 36.0, 45.25, 36.25, 165.75, 38.5, 30.25,
-                           30.5,
-                           18.0, 36, 281.75, 115.75, 65.0, 55.75, 33.0, 33.0, 30.25, 47.0, 57.25, 45.75, 33.75, 33.75,
-                           350.25,
-                           31.0, 51.75, 51.25, 87.25]
-        rowHeights_gnvp_opz = [30, 95.0, 145.5, 25, 25.0, 52.25, 25.25, 20.0, 140.25, 36.25, 36.75, 20.5, 20.25, 20.5,
-                               110.0, 60.5, 46.75, 36.75, 36.0, 36.75, 48.0, 36.0, 38.25]
-        dict_rowHeights = {}
-        dict_rowHeights['krs'] = rowHeights_gnvp
-        dict_rowHeights['gnkt_opz'] = rowHeights_gnvp_opz
-        # CreatePZ.rowHeights = CreatePZ.rowHeights + dict_rowHeights[work_plan]
+        if work_plan != 'dop_plan':
+            rowHeights_gnvp = [15, 115.0, 155.5, 110.25, 36.0, 52.25, 36.25, 36.0, 45.25, 36.25, 165.75, 38.5, 30.25,
+                               30.5,
+                               18.0, 36, 281.75, 115.75, 65.0, 55.75, 33.0, 33.0, 30.25, 47.0, 57.25, 45.75, 33.75, 33.75,
+                               350.25,
+                               31.0, 51.75, 51.25, 87.25]
+            rowHeights_gnvp_opz = [30, 95.0, 145.5, 25, 25.0, 52.25, 25.25, 20.0, 140.25, 36.25, 36.75, 20.5, 20.25, 20.5,
+                                   110.0, 60.5, 55.75, 36.75, 36.0, 36.75, 48.0, 36.0, 38.25]
+            dict_rowHeights = {}
+            dict_rowHeights['krs'] = rowHeights_gnvp
+            dict_rowHeights['gnkt_opz'] = rowHeights_gnvp_opz
+            # CreatePZ.rowHeights = CreatePZ.rowHeights + dict_rowHeights[work_plan]
 
-        colWidth = [ws.column_dimensions[get_column_letter(i + 1)].width for i in range(0, 13)] + [None]
-        # print(f' f {len(dict_rowHeights[work_plan])}')
-        # print(f' индекс вставки высоты {ins_gnvp-2}')
-        for index_row, row in enumerate(ws.iter_rows()):  # Копирование высоты строки
-            if index_row + ins_gnvp <= len(dict_rowHeights[work_plan]) + ins_gnvp:
-                ws.row_dimensions[index_row + ins_gnvp - 2].height = dict_rowHeights[work_plan][index_row - 1]
-            for col_ind, col in enumerate(row):
-                if col_ind <= 12:
-                    ws.column_dimensions[get_column_letter(col_ind + 1)].width = colWidth[col_ind]
-                else:
-                    break
+            colWidth = [ws.column_dimensions[get_column_letter(i + 1)].width for i in range(0, 13)] + [None]
+            # print(f' f {len(dict_rowHeights[work_plan])}')
+            # print(f' индекс вставки высоты {ins_gnvp-2}')
+
+            for index_row, row in enumerate(ws.iter_rows()):  # Копирование высоты строки
+                if index_row + ins_gnvp <= len(dict_rowHeights[work_plan]) + ins_gnvp:
+                    ws.row_dimensions[index_row + ins_gnvp - 2].height = dict_rowHeights[work_plan][index_row - 1]
+                for col_ind, col in enumerate(row):
+                    if col_ind <= 12:
+                        ws.column_dimensions[get_column_letter(col_ind + 1)].width = colWidth[col_ind]
+                    else:
+                        break
 
     def is_valid_date(date):
         try:
