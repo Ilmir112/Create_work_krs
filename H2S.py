@@ -212,7 +212,7 @@ def calv_h2s(self, cat_H2S, H2S_mg, H2S_pr):
         print(CreatePZ.dict_nkt)
         nkt_1 = int(list(CreatePZ.dict_nkt.keys())[0])
 
-        nkt_1_l = CreatePZ.dict_nkt[nkt_1]
+        nkt_1_l = CreatePZ.dict_nkt[str(nkt_1)]
 
         try:
             # print(list(CreatePZ.dict_nkt.keys()))

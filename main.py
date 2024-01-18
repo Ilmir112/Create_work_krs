@@ -1204,8 +1204,7 @@ class MyWindow(QMainWindow):
         if self.work_plan == 'krs':
             self.populate_row(self.table_widget.rowCount(), work_krs(self))
 
-        if self.work_plan == 'dop_plan':
-            self.populate_row(self.table_widget.rowCount(), work_krs(self))
+
         # elif self.work_plan == 'gnkt-opz':
         #     from open_pz import CreatePZ
         #     # print(CreatePZ.gnkt_work1)
