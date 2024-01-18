@@ -195,9 +195,9 @@ class MyWindow(QMainWindow):
             work_list.append(row_lst)
 
         merged_cells_dict = {}
-
+        print(f' индекс объ {ins_ind}')
         for row in merged_cells:
-            if row[0] >= ins_ind:
+            if row[0] >= ins_ind-1:
                 merged_cells_dict.setdefault(row[0], []).append(row[1])
         # print(CreatePZ.ins_ind)
         for i in range(2, len(work_list)):  # нумерация работ
@@ -205,36 +205,31 @@ class MyWindow(QMainWindow):
                 work_list[i][1] = i - 1 - ins_ind
                 if krs.is_number(work_list[i][11]) == True:
                     CreatePZ.normOfTime += float(work_list[i][11])
-        print(work_list)
+        print(f'88 - {ws2.max_row}')
         print(f'строки {ins_ind}')
         CreatePZ.count_row_height(self.ws, ws2, work_list, merged_cells_dict,  ins_ind)
+        print(f'3 - {ws2.max_row}')
         CreatePZ.itog_ind_min = self.ins_ind_border
         CreatePZ.itog_ind_max = len(work_list)
         print(f' длина {len(work_list)}')
         CreatePZ.addItog(self, ws2, self.table_widget.rowCount() + 1)
+        print(f'45- {ws2.max_row}')
+
         try:
-            ws2.print_area = f'B1:L{self.table_widget.rowCount()+45}'
-            ws2.page_setup.fitToPage = True
-            ws2.page_setup.fitToHeight = False
-            ws2.page_setup.fitToWidth = True
-            ws2.print_options.horizontalCentered = True
-            # зададим размер листа
-            ws2.page_setup.paperSize = ws2.PAPERSIZE_A4
-            # содержимое по ширине страницы
-            ws2.sheet_properties.pageSetUpPr.fitToPage = True
-            ws2.page_setup.fitToHeight = False
-            if 2 in CreatePZ.cat_H2S_list or 1 in CreatePZ.cat_H2S_list:
-                ws3 = wb2.create_sheet('Sheet1')
-                ws3.title = "Расчет необходимого количества поглотителя H2S"
-                ws3 = wb2["Расчет необходимого количества поглотителя H2S"]
-                calc_H2S(ws3, CreatePZ.H2S_pr, CreatePZ.H2S_mg)
-                ws3.hide = True
-                ws3.page_setup.fitToPage = True
-                ws3.page_setup.fitToHeight = False
-                ws3.page_setup.fitToWidth = True
-                ws3.print_area = 'A1:F77'
-            else:
-                print(f'{CreatePZ.cat_H2S_list} Расчет поглотителя сероводорода не требуется')
+            if self.work_plan != 'dop_plan':
+
+
+                if 2 in CreatePZ.cat_H2S_list or 1 in CreatePZ.cat_H2S_list and self.work_plan != 'dop_plan':
+                    ws3 = wb2.create_sheet('Sheet1')
+                    ws3.title = "Расчет необходимого количества поглотителя H2S"
+                    ws3 = wb2["Расчет необходимого количества поглотителя H2S"]
+                    calc_H2S(ws3, CreatePZ.H2S_pr, CreatePZ.H2S_mg)
+
+
+
+                else:
+                    print(f'{CreatePZ.cat_H2S_list} Расчет поглотителя сероводорода не требуется')
+
             for row_ind, row in enumerate(ws2.iter_rows(values_only=True)):
 
                 if 15 < row_ind < 100:
@@ -253,27 +248,42 @@ class MyWindow(QMainWindow):
                         self.insert_image(ws2, 'imageFiles/Алиев махир.png', coordinate)
                         break
 
+            print(f'9 - {ws2.max_row}')
+            if self.work_plan != 'dop_plan':
+                self.insert_image(ws2, 'imageFiles/Хасаншин.png', 'H1')
+                self.insert_image(ws2, 'imageFiles/Шамигулов.png', 'H4')
 
-            self.insert_image(ws2, 'imageFiles/Хасаншин.png', 'H1')
-            self.insert_image(ws2, 'imageFiles/Шамигулов.png', 'H4')
 
 
 
-            path = 'D:\Documents\Desktop\ГТМ'
-            filenames = f"{CreatePZ.well_number} {CreatePZ.well_area} кат {CreatePZ.cat_P_1}.xlsx"
-            full_path = path + '/' + filenames
-            # print(ws2.max_row)
-            if wb2:
-                wb2.close()
-                wb2.save(full_path)
         except Exception as e:
             print(e)
 
         finally:
+            ws2.print_area = f'B1:L{self.table_widget.rowCount() + 45}'
+            ws2.page_setup.fitToPage = True
+            ws2.page_setup.fitToHeight = False
+            ws2.page_setup.fitToWidth = True
+            ws2.print_options.horizontalCentered = True
+            # зададим размер листа
+            ws2.page_setup.paperSize = ws2.PAPERSIZE_A4
+            # содержимое по ширине страницы
+            ws2.sheet_properties.pageSetUpPr.fitToPage = True
+            ws2.page_setup.fitToHeight = False
+
+            path = 'D:\Documents\Desktop\ГТМ'
+            filenames = f"{CreatePZ.well_number} {CreatePZ.well_area} кат {CreatePZ.cat_P_1}.xlsx"
+            full_path = path + '/' + filenames
+            print(f'10 - {ws2.max_row}')
+            print(wb2.path)
+            if wb2:
+                wb2.close()
+                wb2.save(full_path)
+                print(f"Table data saved to Excel {full_path}")
             if self.wb:
                 self.wb.close()
 
-            print("Table data saved to Excel")
+
 
     def close_file(self):
         from open_pz import CreatePZ
@@ -1172,8 +1182,8 @@ class MyWindow(QMainWindow):
         self.table_widget.setColumnCount(12)
         rowHeights_exit = [sheet.row_dimensions[i + 1].height if sheet.row_dimensions[i + 1].height is not None else 18
                            for i in range(sheet.max_row)]
-
-        for row in range(1, rows + 1):
+        # print(f' Объединенны {merged_cells}')
+        for row in range(1, rows + 2):
             if row > 1 and row < rows - 1:
                 self.table_widget.setRowHeight(row, int(rowHeights_exit[row]))
             for col in range(1, 12 + 1):
@@ -1200,9 +1210,9 @@ class MyWindow(QMainWindow):
                             self.table_widget.setSpan(row - 1, col - 1,
                                                       merged_cell.max_row - merged_cell.min_row + 1,
                                                       merged_cell.max_col - merged_cell.min_col + 1)
-        # print(f' njj {self.work_plan}')
-        if self.work_plan == 'krs':
-            self.populate_row(self.table_widget.rowCount(), work_krs(self))
+        print(f' njj {self.work_plan}')
+        self.populate_row(self.table_widget.rowCount(), work_krs(self, self.work_plan))
+
 
 
         # elif self.work_plan == 'gnkt-opz':

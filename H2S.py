@@ -172,6 +172,13 @@ def calc_H2S(ws3, H2S_pr, H2S_mg):
                 ws3.cell(row=row, column=col).font = Font(name='Arial', size=13, bold=True)
                 ws3.cell(row=row, column=col).alignment = Alignment(wrap_text=True, horizontal='center',
                                                                     vertical='center')
+
+    ws3.hide = True
+    ws3.page_setup.fitToPage = True
+    ws3.page_setup.fitToHeight = False
+
+    ws3.page_setup.fitToWidth = True
+    ws3.print_area = 'A1:F77'
 def well_volume(self):
     from open_pz import CreatePZ
     # print(CreatePZ.column_additional)
@@ -212,7 +219,7 @@ def calv_h2s(self, cat_H2S, H2S_mg, H2S_pr):
         print(CreatePZ.dict_nkt)
         nkt_1 = int(list(CreatePZ.dict_nkt.keys())[0])
 
-        nkt_1_l = CreatePZ.dict_nkt[str(nkt_1)]
+
 
         try:
             # print(list(CreatePZ.dict_nkt.keys()))
@@ -232,6 +239,7 @@ def calv_h2s(self, cat_H2S, H2S_mg, H2S_pr):
         except:
             udel_vodoiz_nkt= udel_vodoiz_nkt
             # print(f'dnjhfzНКТ {udel_vodoiz_nkt}')
+        nkt_1_l = CreatePZ.dict_nkt[nkt_1]
         vodoiz_nkt = nkt_1_l *udel_vodoiz_nkt/1000
         try:
             vodoiz_nkt += nkt_2_l*udel_vodoiz_nkt_2/1000
@@ -252,9 +260,9 @@ def calv_h2s(self, cat_H2S, H2S_mg, H2S_pr):
 
         vodoiz_sucker = (10 * 3.14 *((25*0.01)**2/4)*sucker_rod_l_25/1000) +(10 * 3.14 *((25*0.01)**2/4)*sucker_rod_l_22/1000) +(10 * 3.14 *((25*0.01)**2/4)*sucker_rod_l_19/1000)
 
-        oil_mass = v_pod_gno*(100- CreatePZ.water_cut) * 0.9/100
-        # print(f'oil {oil_mass}')
-        volume_h2s = CreatePZ.gaz_f_pr[0]*oil_mass* (float(H2S_pr))/100
+        oil_mass = float(v_pod_gno*(100 - CreatePZ.water_cut) * 0.9/100)
+        print(f'oil {oil_mass}-{type(oil_mass)} , {CreatePZ.gaz_f_pr[0]}-{type(CreatePZ.gaz_f_pr[0])}')
+        volume_h2s = CreatePZ.gaz_f_pr[0] * oil_mass * (float(H2S_pr))/100
 
         h2s_mass_in_oil = (34*volume_h2s*1000/22.14)
         h2s_mass_in_water = (vodoiz_sucker+vodoiz_nkt)*H2S_mg
