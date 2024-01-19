@@ -30,14 +30,14 @@ def skm_interval():
     elif all(
             [CreatePZ.dict_perforation[plast]['отрайбировано'] == True for plast in CreatePZ.plast_work]):
 
-        skipping_intervals = []
+
         perforating_intervals = []
 
         for plast in CreatePZ.plast_all:
             for interval in CreatePZ.dict_perforation[plast]['интервал']:
                 perforating_intervals.append(list(interval))
         print(f'ПВР {perforating_intervals}')
-        # print(f'скрепр2{skipping_intervals}')
+        print(f'скрепр2{str_raid}')
 
         str_raid.extend(remove_overlapping_intervals(perforating_intervals))
     print(f'скреперо {str_raid}')
@@ -93,57 +93,30 @@ def remove_overlapping_intervals(perforating_intervals):
                 skipping_intervals.append([pvr[0] - 90, pvr[0] - 2])
                 skipping_intervals.append([pvr[1] + 2, CreatePZ.current_bottom - 2])
 
-    # print(f'СКМ на основе ПВР{skipping_intervals}')
+    print(f'СКМ на основе ПВР{sorted(skipping_intervals, key=lambda x: x[0])}')
+    skipping_intervals = merge_overlapping_intervals(sorted(skipping_intervals, key=lambda x: x[0]))
     lll = []
     for skm in sorted(skipping_intervals, key=lambda x: x[0]):
-        kroly_skm = skm[0]
-        pod_skm = skm[1]
+        kroly_skm = int(skm[0])
+        pod_skm = int(skm[1])
+        if CreatePZ.current_bottom > pod_skm:
+            skm_range = list(range(kroly_skm, pod_skm + 1))
 
-        for pvr in sorted(perforating_intervals, key=lambda x: x[0]):
-            if abs(pvr[0] - skm[0]) < 90 or abs(pvr[1] - skm[1]) <= 40:
-                kroly_skm_pvr = pvr[0]
-                pod_skm_pvr = pvr[1]
-                True_pod = kroly_skm <= pod_skm_pvr <= pod_skm
-                true_krov = kroly_skm <= kroly_skm_pvr <= pod_skm
+            for pvr in sorted(perforating_intervals, key=lambda x: x[0]):
+                print(int(pvr[0]) in skm_range, skm_range[0], int(pvr[0]))
+                if int(pvr[0]) in skm_range and int(pvr[1]) in skm_range:
+                    # print(skm_range)
+                    lll.append((skm_range[0]+1, int(pvr[0] - 1)))
+                    # print(lll, skm_range.index(int(pvr[0]-2)))
+                    print(f' range {skm_range}')
 
-                if True_pod and true_krov:
-                    if skm in skipping_intervals:
-                        skipping_intervals.remove(skm)
-                        if any([kroly_skm < pvr[0] < pvr[0] - 2 or pvr[1] < pvr[1] < skm[1] for pvr in
-                                perforating_intervals]) == False and kroly_skm > pod_skm:
-                            skipping_intervals.append((kroly_skm, pvr[0] - 2))
-                            skipping_intervals.append((pvr[1] + 2, pod_skm))
-                    #     lll.append((pvr[1] + 2, skm[1]))
-                    # print(f' {skm} {pvr} перв {lll}')
+                    skm_range = skm_range[skm_range.index(int(pvr[1])):]
+                    print(f' range {skm_range}')
+            lll.append((skm_range[0] + 2, pod_skm))
 
-                elif true_krov is False and True_pod:
-                    if skm in skipping_intervals:
-                        if any([(skm[0] < pvr[0] < skm[1] or skm[0] < pvr[1] < pvr[0] - 2) for pvr in
-                                perforating_intervals]) == False and kroly_skm > pod_skm:
-                            skipping_intervals.remove(skm)
-                            skipping_intervals.append((skm[0], pvr[0] - 2))
-                    # lll.append((skm[0], pvr[0]-2))
-                    #
-                    # print(f' {skm} {pvr} втор {lll}')
+    print(f'после разделения {lll}')
 
-                elif True_pod and true_krov is False:
-                    if skm in skipping_intervals:
-                        if any([(skm[0] < pvr[0] < skm[1] or pvr[1] + 2 < pvr[1] < skm[1]) for pvr in
-                                perforating_intervals]) == False and kroly_skm > pod_skm:
-                            skipping_intervals.remove(skm)
-                            skipping_intervals.append((pvr[1] + 2, skm[1]))
-
-    skipping_intervals = sorted(skipping_intervals, key=lambda x: x[0])
-
-    print(f'после разделения {skipping_intervals}')
-
-    # for skm in sorted(skipping_intervals, key = lambda x: x[0]):
-    #     for pvr in sorted(perforating_intervals, key = lambda x: x[0]):
-    #         if skm in skipping_intervals:
-    #             if skm[0] < pvr[0] or skm[1] > skm[0] or skm[1] > pvr[1]+1:
-    #                 skipping_intervals.remove(skm)
-    # print(f' после удаления {skipping_intervals}')
-    return skipping_intervals
+    return lll
 
 
 def raiding_interval(ryber_key):

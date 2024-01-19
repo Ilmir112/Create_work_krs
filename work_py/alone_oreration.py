@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QInputDialog
+from PyQt5.QtWidgets import QInputDialog, QMessageBox
 
 from krs import well_volume
 from work_py.acids_work import pressure_mode
@@ -60,48 +60,96 @@ def kot_work(self):
 def fluid_change(self):
     from open_pz import CreatePZ
     import H2S
-
     expected_pressure, ok = QInputDialog.getDouble(self, 'Ожидаемое давление по пласту',
                                                    'Введите Ожидаемое давление по пласту', 0, 0, 300, 1)
     fluid_new, ok = QInputDialog.getDouble(self, 'Новое значение удельного веса жидкости',
-                                           'Введите значение удельного веса жидкости',  1.02, 1, 1.72, 2)
+                                           'Введите значение удельного веса жидкости', 1.02, 1, 1.72, 2)
     CreatePZ.fluid = fluid_new
-    if len(CreatePZ.plast_work) == 0 and len(CreatePZ.cat_H2S_list) > 1:
-        if '2' in str(CreatePZ.cat_H2S_list[1]):
-            CreatePZ.fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
-                                  f'расчета {H2S.calv_h2s(self, CreatePZ.cat_H2S_list[1], CreatePZ.H2S_mg[1], CreatePZ.H2S_pr[1])}кг/м3 '
-        else:
-            CreatePZ.fluid_work = f'{fluid_new}г/см3 '
-    else:
-        if len(CreatePZ.cat_H2S_list)>1:
-            if ('2' in str(CreatePZ.cat_H2S_list[1]) or '1' in str(CreatePZ.cat_H2S_list[1])) and (
-                    '2' not in str(CreatePZ.cat_H2S_list[0]) or '1' not in str(CreatePZ.cat_H2S_list[0])):
-                CreatePZ.fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
-                                      f'расчета {H2S.calv_h2s(self, CreatePZ.cat_H2S_list[1], CreatePZ.H2S_mg[1], CreatePZ.H2S_pr[1])}кг/м3 '
-            elif ('2' in str(CreatePZ.cat_H2S_list[0]) or '1' in str(CreatePZ.cat_H2S_list[0])) and (
-                    '2' not in str(CreatePZ.cat_H2S_list[1]) or '1' not in str(CreatePZ.cat_H2S_list[1])):
-                CreatePZ.fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
-                                      f'расчета {H2S.calv_h2s(self, CreatePZ.cat_H2S_list[0], CreatePZ.H2S_mg[0], CreatePZ.H2S_pr[0])}кг/м3 '
-            else:
-                CreatePZ.fluid_work = f'{fluid_new}г/см3 '
-        else:
-            if ('2' in str(CreatePZ.cat_H2S_list[0]) or '1' in str(CreatePZ.cat_H2S_list[0])):
-                CreatePZ.fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
-                                      f'расчета {H2S.calv_h2s(self, CreatePZ.cat_H2S_list[0], CreatePZ.H2S_mg[0], CreatePZ.H2S_pr[0])}кг/м3 '
+    try:
+        CreatePZ.fluid_work = check_h2s(self, fluid_new)
 
-            else:
-                CreatePZ.fluid_work = f'{fluid_new}г/см3 '
+    except:
+        print(CreatePZ.cat_H2S_list, CreatePZ.H2S_mg, CreatePZ.H2S_pr)
+        CreatePZ.H2S_mg = CreatePZ.H2S_mg[:1]
+        print()
+        CreatePZ.H2S_pr = CreatePZ.H2S_pr[:1]
+        CreatePZ.cat_H2S_list = CreatePZ.cat_H2S_list[:1]
+        print(CreatePZ.cat_H2S_list, CreatePZ.H2S_mg, CreatePZ.H2S_pr)
+        cat_H2S = QInputDialog.getInt(self, 'Сероводород',
+                                        'Введите Категорию скважины по сероводороду по вскрываемому пласту', 2, 1, 3)
+        while cat_H2S in [1, 2, 3]:
+            mes = QMessageBox.warning(self, 'Некорретные данные', 'Введены не корректноые данные')
+            cat_H2S = QInputDialog.getDouble(self, 'Сероводород',
+                                                  'Введите Категорию скважины по сероводороду по вскрываемому пласту',
+                                                  50, 0, 1000, 2)
+        CreatePZ.cat_H2S_list.append(cat_H2S[0])
+        if cat_H2S != 3:
+            H2S_mg = QInputDialog.getDouble(self, 'Сероводород',
+                                            'Введите содержание сероводорода в мг/л', 50, 0, 1000, 2)
+            while H2S_mg in [int, float]:
+                mes = QMessageBox.warning(self, 'Некорретные данные', 'Введены не корректноые данные')
+                H2S_mg = QInputDialog.getDouble(self, 'Сероводород',
+                                                'Введите содержание сероводорода в мг/л', 50, 0, 1000, 2)
+
+            CreatePZ.H2S_mg.append(H2S_mg[0])
+            H2S_pr = QInputDialog.getDouble(self, 'Сероводород',
+                                            'Введите содержание сероводорода в %', 0.5, 0, 1000, 6)
+            while H2S_pr in [int, float]:
+                mes = QMessageBox.warning(self, 'Некорретные данные', 'Введены не корректные данные')
+                H2S_pr = QInputDialog.getDouble(self, 'Сероводород',
+                                                'Введите содержание сероводорода в %', 0.5, 0, 1000, 6)
+
+            CreatePZ.H2S_pr.append(H2S_pr[0])
+        print(f' после добавления {CreatePZ.cat_H2S_list, CreatePZ.H2S_mg, CreatePZ.H2S_pr}')
+        CreatePZ.fluid_work = check_h2s(self, fluid_new)
+
+
+
+
+
     fluid_change_list = [[None, None,
                           f'Произвести смену объема обратной промывкой по круговой циркуляции  жидкостью  {CreatePZ.fluid_work} '
                           f'(по расчету по вскрываемому пласта Рожид- {expected_pressure}атм) в объеме не '
-                          f'менее {round(well_volume(self,CreatePZ.current_bottom),1)}м3  в присутствии '
+                          f'менее {round(well_volume(self, CreatePZ.current_bottom), 1)}м3  в присутствии '
                           f'представителя заказчика, Составить акт. '
                           f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за '
                           f'2 часа до начала работ)',
                           None, None, None, None, None, None, None,
-                          'мастер КРС',well_volume_norm(well_volume(self,CreatePZ.current_bottom))]
-                         ]
+                          'мастер КРС', well_volume_norm(well_volume(self, CreatePZ.current_bottom))]]
     return fluid_change_list
+
+def check_h2s(self, fluid_new):
+    from open_pz import CreatePZ
+    from H2S import calv_h2s
+
+    if len(CreatePZ.plast_work) == 0 and len(CreatePZ.cat_H2S_list) > 1:
+        if 3 != str(CreatePZ.cat_H2S_list[1]):
+            fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
+                                  f'расчета {calv_h2s(self, CreatePZ.cat_H2S_list[1], CreatePZ.H2S_mg[1], CreatePZ.H2S_pr[1])}кг/м3 '
+        else:
+            fluid_work = f'{fluid_new}г/см3 '
+    else:
+        if len(CreatePZ.cat_H2S_list) > 1:
+
+
+            if ('2' in str(CreatePZ.cat_H2S_list[1]) or '1' in str(CreatePZ.cat_H2S_list[1])) and (
+                    '2' not in str(CreatePZ.cat_H2S_list[0]) or '1' not in str(CreatePZ.cat_H2S_list[0])):
+                fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
+                                      f'расчета {calv_h2s(self, CreatePZ.cat_H2S_list[1], CreatePZ.H2S_mg[1], CreatePZ.H2S_pr[1])}кг/м3 '
+            elif ('2' in str(CreatePZ.cat_H2S_list[0]) or '1' in str(CreatePZ.cat_H2S_list[0])) and (
+                    '2' not in str(CreatePZ.cat_H2S_list[1]) or '1' not in str(CreatePZ.cat_H2S_list[1])):
+                fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
+                                      f'расчета {calv_h2s(self, CreatePZ.cat_H2S_list[0], CreatePZ.H2S_mg[0], CreatePZ.H2S_pr[0])}кг/м3 '
+            else:
+                fluid_work = f'{fluid_new}г/см3 '
+        else:
+            if ('2' in str(CreatePZ.cat_H2S_list[0]) or '1' in str(CreatePZ.cat_H2S_list[0])):
+                fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
+                                      f'расчета {calv_h2s(self, CreatePZ.cat_H2S_list[0], CreatePZ.H2S_mg[0], CreatePZ.H2S_pr[0])}кг/м3 '
+
+            else:
+                fluid_work = f'{fluid_new}г/см3 '
+    return fluid_work
 
 def konte(self):
 

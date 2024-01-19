@@ -10,12 +10,12 @@ def magnet_select(self):
 
     elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr < 110 and \
             CreatePZ.current_bottom >= CreatePZ.head_column_additional:
-        magnet_select = f'НКТ60мм 20м + репер + НКТ60мм L- {CreatePZ.current_bottom - CreatePZ.head_column_additional}м'
+        magnet_select = f'НКТ60мм 20м + репер + НКТ60мм L- {round(CreatePZ.current_bottom - CreatePZ.head_column_additional, 1)}м'
     elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr > 110 and\
             CreatePZ.current_bottom >= CreatePZ.head_column_additional:
         magnet_select = f'НКТ{CreatePZ.nkt_diam}мм со снятыми фасками 20м +' \
                         f' НКТ{CreatePZ.nkt_diam}мм со снятыми фасками' \
-                        f' L- {CreatePZ.current_bottom - CreatePZ.head_column_additional}м'
+                        f' L- {round(CreatePZ.current_bottom - CreatePZ.head_column_additional, 1)}м'
     return magnet_select
 
 

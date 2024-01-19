@@ -1,8 +1,13 @@
 import H2S
 from PyQt5.QtWidgets import QInputDialog, QMessageBox
 from openpyxl import load_workbook
+
+
+
+
 def calculationFluidWork(vertical, pressure):
     from open_pz import CreatePZ
+
     if (isinstance(vertical, float) or isinstance(vertical, int)) and (
             isinstance(pressure, float) or isinstance(pressure, int)):
 
@@ -24,6 +29,7 @@ def work_krs(self, work_plan):
     from open_pz import CreatePZ
     from work_py.rationingKRS import lifting_sucker_rod, well_jamming_norm, liftingGNO
     from krs import well_jamming, without_damping
+    from work_py.descent_gno import gno_nkt_opening
     # print(f' пакер {CreatePZ.paker_do}), ЭЦН {CreatePZ.dict_pump_ECN}, ШГН {CreatePZ.dict_pump_SHGN}')
 
     fluid_list = []
@@ -51,13 +57,10 @@ def work_krs(self, work_plan):
                                                        0, 0.87, 2, 2)
 
     CreatePZ.fluid = fluid_work_insert
-    nkt_diam_fond_list = list(CreatePZ.dict_nkt.keys())
-    nkt_diam_fond = ''
-    # lift_key = "ЭЦН"
-    for i in nkt_diam_fond_list:
-        nkt_diam_fond += str(i) + ', '
-    nkt_diam_fond = nkt_diam_fond[:-2]
-    # print(f' КРС {CreatePZ.dict_pump, CreatePZ.H_F_paker_do}')
+
+
+    nkt_diam_fond = gno_nkt_opening(CreatePZ.dict_nkt)
+
     if '2' in str(CreatePZ.cat_H2S_list[0]):
         fluid_work = f'{fluid_work_insert}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
                      f'расчета {H2S.calv_h2s(self, CreatePZ.cat_H2S_list[0], CreatePZ.H2S_mg[0], CreatePZ.H2S_pr[0])}кг/м3 '

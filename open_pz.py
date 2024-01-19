@@ -134,6 +134,7 @@ class CreatePZ:
     plast_project = []
     plast_work = []
     plast_all = []
+    template_depth_addition = 0
     condition_of_wells = 0
     cat_well_min = []
     bvo = False
@@ -285,14 +286,14 @@ class CreatePZ:
 
                     if value == 'мг/л' or value == 'мг/дм3':
                         if CreatePZ.if_None(row[col - 1]) != 'отсут':
-                            CreatePZ.H2S_mg.append(float(row[col - 1]))
+                            CreatePZ.H2S_mg.append(float(str(row[col - 1]).replace(',', '.')))
                         print(f'мг/k {CreatePZ.H2S_mg}')
                     if value == '%':
                         # print(row_ind)
                         if CreatePZ.if_None(row[col - 1]) != 'отсут':
-                            CreatePZ.H2S_pr.append(float(row[col - 1]))
+                            CreatePZ.H2S_pr.append(float(str(row[col - 1]).replace(',', '.')))
                     if len(CreatePZ.H2S_mg) == 0 and 'мг/м3' == value and CreatePZ.if_None(row[col - 1]) != 'отсут':
-                        CreatePZ.H2S_mg.append(float(row[col - 1] / 1000))
+                        CreatePZ.H2S_mg.append(float(str(row[col - 1]).replace(',', '.')) / 1000)
 
 
                     elif '9. Максимальный зенитный угол' in row and value == 'на глубине':
@@ -938,9 +939,16 @@ class CreatePZ:
         dict_events_gnvp = {}
         dict_events_gnvp['krs'] = events_gnvp()
         dict_events_gnvp['gnkt_opz'] = events_gnvp_gnkt()
-        dict_events_gnvp[work_plan] = events_gnvp()
+        dict_events_gnvp['dop_plan'] = events_gnvp()
         # if work_plan != 'dop_plan':
+        text_width_dict = {20: (0, 100), 30: (101, 200), 40: (201, 300), 50: (301, 400), 70: (401, 500),
+                           100: (501, 600), 130: (601, 700), 150: (701, 800), 170: (801, 900), 190: (901, 1500)}
+
+
+
         for i in range(CreatePZ.ins_ind, CreatePZ.ins_ind + len(dict_events_gnvp[work_plan]) - 1):
+
+
             ws.merge_cells(start_row=i, start_column=2, end_row=i, end_column=12)
 
             if i == (CreatePZ.ins_ind + 13 or i == CreatePZ.ins_ind + 28) and work_plan == 'krs':
@@ -961,6 +969,15 @@ class CreatePZ:
                 ws.cell(row=i, column=2).font = Font(name='Arial', size=12)
 
                 ws.cell(row=i, column=2).value = dict_events_gnvp[work_plan][i - CreatePZ.ins_ind][1]
+
+            data = ws.cell(row=i, column=2).value
+            print(f'ГНВП -{data, i, len(dict_events_gnvp[work_plan])}')
+            if not data is None:
+                text = data
+                for key, value in text_width_dict.items():
+                    if value[0] <= len(text) <= value[1]:
+                        ws.row_dimensions[i].height = int(key)
+
         ins_gnvp = CreatePZ.ins_ind
         CreatePZ.ins_ind += len(dict_events_gnvp[work_plan]) - 1
 
@@ -968,7 +985,7 @@ class CreatePZ:
         ws.row_dimensions[6].height = 30
 
         # data_main_production_string = ws.cell(row=int(ind_data_main_production_string[1:])+1, column=int(ind_data_main_production_string[0])+2).value
-        CreatePZ.insert_gnvp(ws, work_plan, ins_gnvp)
+
 
         # print(CreatePZ.row_expected)
         if len(CreatePZ.row_expected) != 0:
@@ -1046,30 +1063,9 @@ class CreatePZ:
                     ws.row_dimensions[i].height = 55
         ins_ind += len(podp_down)
 
-    def insert_gnvp(ws, work_plan, ins_gnvp):
-        rowHeights_gnvp = [15, 115.0, 155.5, 110.25, 36.0, 52.25, 36.25, 36.0, 45.25, 36.25, 165.75, 38.5, 30.25,
-                           30.5,
-                           18.0, 36, 281.75, 115.75, 65.0, 55.75, 33.0, 33.0, 30.25, 47.0, 57.25, 45.75, 33.75, 33.75,
-                           350.25,
-                           31.0, 51.75, 51.25, 87.25]
-        rowHeights_gnvp_opz = [30, 95.0, 145.5, 25, 25.0, 52.25, 25.25, 20.0, 140.25, 36.25, 36.75, 20.5, 20.25, 20.5,
-                               110.0, 60.5, 46.75, 36.75, 36.0, 36.75, 48.0, 36.0, 38.25]
-        dict_rowHeights = {}
-        dict_rowHeights['krs'] = rowHeights_gnvp
-        dict_rowHeights['gnkt_opz'] = rowHeights_gnvp_opz
-        dict_rowHeights['dop_plan'] = rowHeights_gnvp
-        # CreatePZ.rowHeights = CreatePZ.rowHeights + dict_rowHeights[work_plan]
 
-        colWidth = [ws.column_dimensions[get_column_letter(i + 1)].width for i in range(0, 13)] + [None]
 
-        for index_row, row in enumerate(ws.iter_rows()):  # Копирование высоты строки
-            if index_row + ins_gnvp <= len(dict_rowHeights[work_plan]) + ins_gnvp:
-                ws.row_dimensions[index_row + ins_gnvp - 2].height = dict_rowHeights[work_plan][index_row - 1]
-            for col_ind, col in enumerate(row):
-                if col_ind <= 12:
-                    ws.column_dimensions[get_column_letter(col_ind + 1)].width = colWidth[col_ind]
-                else:
-                    break
+
 
     def is_valid_date(date):
         try:

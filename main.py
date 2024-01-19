@@ -164,124 +164,124 @@ class MyWindow(QMainWindow):
 
     def save_to_excel(self):
         from open_pz import CreatePZ
+        if not self.table_widget is None:
+            wb2 = Workbook()
+            ws2 = wb2.get_sheet_by_name('Sheet')
+            ws2.title = "План работ"
+            print(f'открытие wb2')
 
-        wb2 = Workbook()
-        ws2 = wb2.get_sheet_by_name('Sheet')
-        ws2.title = "План работ"
-        print(f'открытие wb2')
+            ins_ind = self.ins_ind_border
 
-        ins_ind = self.ins_ind_border
+            print(f'открытие wb2 - {ins_ind}')
 
-        print(f'открытие wb2 - {ins_ind}')
+            merged_cells = []  # Список индексов объединения ячеек
 
-        merged_cells = []  # Список индексов объединения ячеек
+            work_list = []
+            for row in range(self.table_widget.rowCount()):
+                row_lst = []
+                # self.ins_ind_border += 1
+                for column in range(self.table_widget.columnCount()):
+                    if self.table_widget.rowSpan(row, column) > 1 or self.table_widget.columnSpan(row, column) > 1:
+                        merged_cells.append((row, column))
+                    item = self.table_widget.item(row, column)
+                    if not item is None:
+                        if 'Нормы времени' in item.text():
+                            ins_ind = row
+                        row_lst.append(item.text())
+                        # print(item.text())
+                    else:
+                        row_lst.append("")
 
-        work_list = []
-        for row in range(self.table_widget.rowCount()):
-            row_lst = []
-            # self.ins_ind_border += 1
-            for column in range(self.table_widget.columnCount()):
-                if self.table_widget.rowSpan(row, column) > 1 or self.table_widget.columnSpan(row, column) > 1:
-                    merged_cells.append((row, column))
-                item = self.table_widget.item(row, column)
-                if not item is None:
-                    if 'Нормы времени' in item.text():
-                        ins_ind = row
-                    row_lst.append(item.text())
-                    # print(item.text())
-                else:
-                    row_lst.append("")
+                work_list.append(row_lst)
 
-            work_list.append(row_lst)
+            merged_cells_dict = {}
+            print(f' индекс объ {ins_ind}')
+            for row in merged_cells:
+                if row[0] >= ins_ind-1:
+                    merged_cells_dict.setdefault(row[0], []).append(row[1])
+            # print(CreatePZ.ins_ind)
+            for i in range(2, len(work_list)):  # нумерация работ
+                if i >= ins_ind+2:
+                    work_list[i][1] = i - 1 - ins_ind
+                    if krs.is_number(work_list[i][11]) == True:
+                        CreatePZ.normOfTime += float(str(work_list[i][11]).replace(',', '.'))
+            print(f'88 - {ws2.max_row}')
+            print(f'строки {ins_ind}')
+            CreatePZ.count_row_height(self.ws, ws2, work_list, merged_cells_dict,  ins_ind)
+            print(f'3 - {ws2.max_row}')
+            CreatePZ.itog_ind_min = self.ins_ind_border
+            CreatePZ.itog_ind_max = len(work_list)
+            print(f' длина {len(work_list)}')
+            CreatePZ.addItog(self, ws2, self.table_widget.rowCount() + 1)
+            print(f'45- {ws2.max_row}')
 
-        merged_cells_dict = {}
-        print(f' индекс объ {ins_ind}')
-        for row in merged_cells:
-            if row[0] >= ins_ind-1:
-                merged_cells_dict.setdefault(row[0], []).append(row[1])
-        # print(CreatePZ.ins_ind)
-        for i in range(2, len(work_list)):  # нумерация работ
-            if i >= ins_ind+2:
-                work_list[i][1] = i - 1 - ins_ind
-                if krs.is_number(work_list[i][11]) == True:
-                    CreatePZ.normOfTime += float(work_list[i][11])
-        print(f'88 - {ws2.max_row}')
-        print(f'строки {ins_ind}')
-        CreatePZ.count_row_height(self.ws, ws2, work_list, merged_cells_dict,  ins_ind)
-        print(f'3 - {ws2.max_row}')
-        CreatePZ.itog_ind_min = self.ins_ind_border
-        CreatePZ.itog_ind_max = len(work_list)
-        print(f' длина {len(work_list)}')
-        CreatePZ.addItog(self, ws2, self.table_widget.rowCount() + 1)
-        print(f'45- {ws2.max_row}')
-
-        try:
-            if self.work_plan != 'dop_plan':
-
-
-                if 2 in CreatePZ.cat_H2S_list or 1 in CreatePZ.cat_H2S_list and self.work_plan != 'dop_plan':
-                    ws3 = wb2.create_sheet('Sheet1')
-                    ws3.title = "Расчет необходимого количества поглотителя H2S"
-                    ws3 = wb2["Расчет необходимого количества поглотителя H2S"]
-                    calc_H2S(ws3, CreatePZ.H2S_pr, CreatePZ.H2S_mg)
+            try:
+                if self.work_plan != 'dop_plan':
 
 
-
-                else:
-                    print(f'{CreatePZ.cat_H2S_list} Расчет поглотителя сероводорода не требуется')
-
-            for row_ind, row in enumerate(ws2.iter_rows(values_only=True)):
-
-                if 15 < row_ind < 100:
-                    if all(cell in [None, ''] for cell in row) \
-                            and ('Интервалы темпа' not in str(ws2.cell(row=row_ind, column=2).value)\
-                            and 'Замечания к эксплуатационному периоду' not in str(ws2.cell(row=row_ind, column=2).value)\
-                            and 'Замечания к эксплуатационному периоду' not in str(ws2.cell(row=row_ind-2, column=2).value)):
-                        print(row_ind, ('Интервалы темпа' not in str(ws2.cell(row=row_ind, column=2).value)), str(ws2.cell(row=row_ind, column=2).value))
-                        ws2.row_dimensions[row_ind+1].hidden = True
-                for col, value in enumerate(row):
-                    if 'Зуфаров' in str(value):
-                        coordinate = f'{get_column_letter(col)}{row_ind - 2}'
-                        self.insert_image(ws2, 'imageFiles/Зуфаров.png', coordinate)
-                    elif 'М.К.Алиев' in str(value):
-                        coordinate = f'{get_column_letter(col - 2)}{row_ind }'
-                        self.insert_image(ws2, 'imageFiles/Алиев махир.png', coordinate)
-                        break
-
-            print(f'9 - {ws2.max_row}')
-            if self.work_plan != 'dop_plan':
-                self.insert_image(ws2, 'imageFiles/Хасаншин.png', 'H1')
-                self.insert_image(ws2, 'imageFiles/Шамигулов.png', 'H4')
+                    if 2 in CreatePZ.cat_H2S_list or 1 in CreatePZ.cat_H2S_list and self.work_plan != 'dop_plan':
+                        ws3 = wb2.create_sheet('Sheet1')
+                        ws3.title = "Расчет необходимого количества поглотителя H2S"
+                        ws3 = wb2["Расчет необходимого количества поглотителя H2S"]
+                        calc_H2S(ws3, CreatePZ.H2S_pr, CreatePZ.H2S_mg)
 
 
 
+                    else:
+                        print(f'{CreatePZ.cat_H2S_list} Расчет поглотителя сероводорода не требуется')
 
-        except Exception as e:
-            print(e)
+                for row_ind, row in enumerate(ws2.iter_rows(values_only=True)):
 
-        finally:
-            ws2.print_area = f'B1:L{self.table_widget.rowCount() + 45}'
-            ws2.page_setup.fitToPage = True
-            ws2.page_setup.fitToHeight = False
-            ws2.page_setup.fitToWidth = True
-            ws2.print_options.horizontalCentered = True
-            # зададим размер листа
-            ws2.page_setup.paperSize = ws2.PAPERSIZE_A4
-            # содержимое по ширине страницы
-            ws2.sheet_properties.pageSetUpPr.fitToPage = True
-            ws2.page_setup.fitToHeight = False
+                    if 15 < row_ind < 100:
+                        if all(cell in [None, ''] for cell in row) \
+                                and ('Интервалы темпа' not in str(ws2.cell(row=row_ind, column=2).value)\
+                                and 'Замечания к эксплуатационному периоду' not in str(ws2.cell(row=row_ind, column=2).value)\
+                                and 'Замечания к эксплуатационному периоду' not in str(ws2.cell(row=row_ind-2, column=2).value)):
+                            print(row_ind, ('Интервалы темпа' not in str(ws2.cell(row=row_ind, column=2).value)), str(ws2.cell(row=row_ind, column=2).value))
+                            ws2.row_dimensions[row_ind+1].hidden = True
+                    for col, value in enumerate(row):
+                        if 'Зуфаров' in str(value):
+                            coordinate = f'{get_column_letter(col-2)}{row_ind - 2}'
+                            self.insert_image(ws2, 'imageFiles/Зуфаров.png', coordinate)
+                        elif 'М.К.Алиев' in str(value):
+                            coordinate = f'{get_column_letter(col - 1)}{row_ind-1 }'
+                            self.insert_image(ws2, 'imageFiles/Алиев махир.png', coordinate)
+                            break
 
-            path = 'D:\Documents\Desktop\ГТМ'
-            filenames = f"{CreatePZ.well_number} {CreatePZ.well_area} кат {CreatePZ.cat_P_1}.xlsx"
-            full_path = path + '/' + filenames
-            print(f'10 - {ws2.max_row}')
-            print(wb2.path)
-            if wb2:
-                wb2.close()
-                wb2.save(full_path)
-                print(f"Table data saved to Excel {full_path}")
-            if self.wb:
-                self.wb.close()
+                print(f'9 - {ws2.max_row}')
+                if self.work_plan != 'dop_plan':
+                    self.insert_image(ws2, 'imageFiles/Хасаншин.png', 'H1')
+                    self.insert_image(ws2, 'imageFiles/Шамигулов.png', 'H4')
+
+
+
+
+            except Exception as e:
+                print(e)
+
+            finally:
+                ws2.print_area = f'B1:L{self.table_widget.rowCount() + 45}'
+                ws2.page_setup.fitToPage = True
+                ws2.page_setup.fitToHeight = False
+                ws2.page_setup.fitToWidth = True
+                ws2.print_options.horizontalCentered = True
+                # зададим размер листа
+                ws2.page_setup.paperSize = ws2.PAPERSIZE_A4
+                # содержимое по ширине страницы
+                ws2.sheet_properties.pageSetUpPr.fitToPage = True
+                ws2.page_setup.fitToHeight = False
+
+                path = 'D:\Documents\Desktop\ГТМ'
+                filenames = f"{CreatePZ.well_number} {CreatePZ.well_area} кат {CreatePZ.cat_P_1}.xlsx"
+                full_path = path + '/' + filenames
+                print(f'10 - {ws2.max_row}')
+                print(wb2.path)
+                if wb2:
+                    wb2.close()
+                    wb2.save(full_path)
+                    print(f"Table data saved to Excel {full_path}")
+                if self.wb:
+                    self.wb.close()
 
 
 
@@ -1211,7 +1211,8 @@ class MyWindow(QMainWindow):
                                                       merged_cell.max_row - merged_cell.min_row + 1,
                                                       merged_cell.max_col - merged_cell.min_col + 1)
         print(f' njj {self.work_plan}')
-        self.populate_row(self.table_widget.rowCount(), work_krs(self, self.work_plan))
+        if self.work_plan != 'gnkt_opz':
+            self.populate_row(self.table_widget.rowCount(), work_krs(self, self.work_plan))
 
 
 
@@ -1222,7 +1223,7 @@ class MyWindow(QMainWindow):
 
     def true_set_Paker(self, depth):
         from open_pz import CreatePZ
-        from work_py.advanted_file import raid, merge_overlapping_intervals, remove_overlapping_intervals
+        from work_py.advanted_file import raid, remove_overlapping_intervals
         from work_py.opressovka import check_for_template_paker
 
         a = False
@@ -1238,21 +1239,12 @@ class MyWindow(QMainWindow):
                 elif len(CreatePZ.dict_perforation[plast]['интервал']) == 0:
                     a = True
 
-                # elif len(CreatePZ.dict_perforation[plast]['интервал']) > 1:
-                #     print(CreatePZ.dict_perforation[plast]['интервал'])
-                #     for interval in list(CreatePZ.dict_perforation[plast]['интервал']):
-                #         print(interval)
-                #         for interval_ind in interval:
-                #             if interval_ind[0] < depth < interval_ind[1]:
-                #                 a = False
-                #             else:
-                #                 a = True
 
             if a is False:
                 paker_warning = QMessageBox.warning(None, 'Проверка посадки пакера в интервал перфорации',
                                                     f'Проверка посадки показала пакер сажается в интервал перфорации, '
                                                     f'необходимо изменить глубину посадки!!!')
-                print(f'проверка {a}')
+                # print(f'проверка {a}')
                 depth, ok = QInputDialog.getInt(None, 'опрессовка ЭК',
                                                 'Введите глубину посадки пакера для опрессовки колонны',
                                                 int(CreatePZ.perforation_roof - 20), 0,
@@ -1282,7 +1274,7 @@ class MyWindow(QMainWindow):
                             for interval in CreatePZ.dict_perforation[plast]['интервал']:
                                 perforating_intervals.append(list(interval))
                         print(f'интервалы ПВР {perforating_intervals, CreatePZ.skm_interval}')
-                        raid_str = raid(merge_overlapping_intervals(remove_overlapping_intervals(perforating_intervals)))
+                        raid_str = raid(remove_overlapping_intervals(perforating_intervals))
                         for row in range(self.table_widget.rowCount()):
                             for column in range(self.table_widget.columnCount()):
                                 value = self.table_widget.item(row, column)

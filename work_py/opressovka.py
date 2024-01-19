@@ -343,8 +343,10 @@ def check_for_template_paker(self, depth):
             else:
                 check_true = True
 
-        else:
-            return depth, True
+
+
+
+    return depth,  check_true
 
 
 
@@ -360,9 +362,9 @@ def testing_pressure(self, depth):
             interval_list.append(interval)
 
     if CreatePZ.leakiness == True:
-        for nek in CreatePZ.dict_leakiness['НЭК']:
-            for interval in nek['интервал']:
-                interval_list.append(interval)
+        for nek in CreatePZ.dict_leakiness['НЭК']['интервал']:
+            print(nek)
+            interval_list.append(nek.split('-'))
 
 
     if any([float(interval[1]) < float(depth) for interval in interval_list]):

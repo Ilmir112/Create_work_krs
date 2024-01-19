@@ -71,9 +71,9 @@ def rir_rpp(self):
       None, None, None, None, None, None, None,
       'Мастер КРС, подрядчик РИР, УСРСиСТ', liftingNKT_norm(rpkDepth, 1.2)]]
     
-    if len(rir_list):
-        for row in rir_work_list:
-            rir_list.append(row)
+
+    for row in rir_work_list:
+        rir_list.append(row)
         
     CreatePZ.current_bottom = rpkDepth
     perf_new(self, rpkDepth, CreatePZ.current_bottom)

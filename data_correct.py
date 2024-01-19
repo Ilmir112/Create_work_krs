@@ -1,7 +1,31 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.Qt import *
-import re
+from PyQt5.QtGui import QRegExpValidator, QColor, QPalette
 from main import MyWindow
+import re
+
+class FloatLineEdit(QLineEdit):
+    def __init__(self, parent=None):
+        super(FloatLineEdit, self).__init__(parent)
+
+        # Устанавливаем валидатор для проверки на float
+
+
+        reg = QRegExp("[0-9.]*")
+        pValidator = QRegExpValidator(self)
+        pValidator.setRegExp(reg)
+        self.setValidator(pValidator)
+
+    def focusOutEvent(self, event):
+        # При потере фокуса проверяем, является ли текст float
+        if self.validator().validate(self.text(), 0)[0] != QValidator.Acceptable:
+            # Если текст не является числом, меняем цвет фона на красный
+            palette = self.palette()
+            palette.setColor(QPalette.Base, QColor(Qt.red))
+            self.setPalette(palette)
+        else:
+            # Если текст является числом, возвращаем цвет фона по умолчанию
+            self.setPalette(self.parentWidget().palette())
 
 
 class TabPage_SO(QWidget):
@@ -10,17 +34,18 @@ class TabPage_SO(QWidget):
         from open_pz import CreatePZ
 
         self.columnLabel = QLabel("диаметр ЭК", self)
-        self.columnType = QLineEdit(self)
+        self.columnType = FloatLineEdit(self)
         self.columnType.setText(f"{self.ifNone(CreatePZ.column_diametr)}")
+
         # self.columnType.setClearButtonEnabled(True)
 
         self.column_wall_thicknessLabel = QLabel("Толщина стенки ЭК", self)
-        self.column_wall_thicknessEditType2 = QLineEdit(self)
+        self.column_wall_thicknessEditType2 = FloatLineEdit(self)
         self.column_wall_thicknessEditType2.setText(f"{self.ifNone(CreatePZ.column_wall_thickness)}")
         # self.column_wall_thicknessEditType2.setClearButtonEnabled(True)
 
         self.shoe_columnLabel = QLabel("башмак ЭК", self)
-        self.shoe_columnEditType2 = QLineEdit(self)
+        self.shoe_columnEditType2 = FloatLineEdit(self)
         self.shoe_columnEditType2.setText(f"{self.ifNone(CreatePZ.shoe_column)}")
         # self.shoe_columnEditType2.setClearButtonEnabled(True)
 
@@ -34,46 +59,46 @@ class TabPage_SO(QWidget):
         self.column_add_true_comboBox.setCurrentIndex(column_add)
 
         self.column_addLabel = QLabel("диаметр доп. колонны", self)
-        self.column_addEditType = QLineEdit(self)
+        self.column_addEditType = FloatLineEdit(self)
         self.column_addEditType.setText(f"{self.ifNone(CreatePZ.column_additional_diametr)}")
         # self.column_addEditType.setClearButtonEnabled(True)
 
         self.column_add_wall_thicknessLabel = QLabel("Толщина стенки доп.колонны", self)
-        self.column_add_wall_thicknessEditType2 = QLineEdit(self)
+        self.column_add_wall_thicknessEditType2 = FloatLineEdit(self)
         self.column_add_wall_thicknessEditType2.setText(F'{self.ifNone(CreatePZ.column_additional_wall_thickness)}')
         # self.column_add_wall_thicknessEditType2.setClearButtonEnabled(True)
 
         self.head_column_addLabel = QLabel("Голова доп колонны", self)
-        self.head_column_add_EditType2 = QLineEdit(self)
+        self.head_column_add_EditType2 = FloatLineEdit(self)
         self.head_column_add_EditType2.setText(f'{self.ifNone(CreatePZ.head_column_additional)}')
 
         self.shoe_column_addLabel = QLabel("башмак доп колонны", self)
-        self.shoe_column_add_EditType2 = QLineEdit(self)
+        self.shoe_column_add_EditType2 = FloatLineEdit(self)
         self.shoe_column_add_EditType2.setText(f'{self.ifNone(CreatePZ.shoe_column_additional)}')
         # self.shoe_column_add_EditType2.setClearButtonEnabled(True)
 
         self.bottomhole_drill_Label = QLabel('Пробуренный забой')
-        self.bottomhole_drill_EditType = QLineEdit(self)
+        self.bottomhole_drill_EditType = FloatLineEdit(self)
         self.bottomhole_drill_EditType.setText(f'{self.ifNone(CreatePZ.bottomhole_drill)}')
 
         self.bottomhole_artificial_Label = QLabel('Искусственный забой')
-        self.bottomhole_artificial_EditType = QLineEdit(self)
+        self.bottomhole_artificial_EditType = FloatLineEdit(self)
         self.bottomhole_artificial_EditType.setText(f'{self.ifNone(CreatePZ.bottomhole_artificial)}')
 
         self.current_bottom_Label = QLabel('Текущий забой')
-        self.current_bottom_EditType = QLineEdit(self)
+        self.current_bottom_EditType = FloatLineEdit(self)
         self.current_bottom_EditType.setText(f'{self.ifNone(CreatePZ.current_bottom)}')
 
         self.max_angle_Label = QLabel('Максимальный угол')
-        self.max_angle_EditType = QLineEdit(self)
+        self.max_angle_EditType = FloatLineEdit(self)
         self.max_angle_EditType.setText(f'{self.ifNone(CreatePZ.max_angle)}')
 
         self.max_expected_pressure_Label = QLabel('Максимальный ожидаемое давление')
-        self.max_expected_pressure_EditType = QLineEdit(self)
+        self.max_expected_pressure_EditType = FloatLineEdit(self)
         self.max_expected_pressure_EditType.setText(f'{self.ifNone(CreatePZ.max_expected_pressure)}')
 
         self.max_admissible_pressure_Label = QLabel('Максимальный допустимое давление')
-        self.max_admissible_pressure_EditType = QLineEdit(self)
+        self.max_admissible_pressure_EditType = FloatLineEdit(self)
         self.max_admissible_pressure_EditType.setText(f'{self.ifNone(CreatePZ.max_admissible_pressure)}')
 
         self.pump_SHGN_do_Label = QLabel('Штанговый насос')
@@ -81,7 +106,7 @@ class TabPage_SO(QWidget):
         self.pump_SHGN_do_EditType.setText(f'{self.ifNone(CreatePZ.dict_pump_SHGN["do"])}')
 
         self.pump_SHGN_depth_do_Label = QLabel('Глубина штангового насоса')
-        self.pump_SHGN_depth_do_EditType = QLineEdit(self)
+        self.pump_SHGN_depth_do_EditType = FloatLineEdit(self)
         self.pump_SHGN_depth_do_EditType.setText(f'{self.ifNone(CreatePZ.dict_pump_SHGN_h["do"])}')
 
         self.pump_SHGN_posle_Label = QLabel('Плановый штанговый насос')
@@ -89,7 +114,7 @@ class TabPage_SO(QWidget):
         self.pump_SHGN_posle_EditType.setText(f'{self.ifNone(CreatePZ.dict_pump_SHGN["posle"])}')
 
         self.pump_SHGN_depth_posle_Label = QLabel('Плановая глубина спуска насоса')
-        self.pump_SHGN_depth_posle_EditType = QLineEdit(self)
+        self.pump_SHGN_depth_posle_EditType = FloatLineEdit(self)
         self.pump_SHGN_depth_posle_EditType.setText(f'{self.ifNone(CreatePZ.dict_pump_SHGN_h["posle"])}')
 
         self.pump_ECN_do_Label = QLabel('Спущенный ЭЦН')
@@ -97,7 +122,7 @@ class TabPage_SO(QWidget):
         self.pump_ECN_do_EditType.setText(f'{self.ifNone(CreatePZ.dict_pump_ECN["do"])}')
 
         self.pump_ECN_depth_do_Label = QLabel('Глубина спуска ЭЦН')
-        self.pump_ECN_depth_do_EditType = QLineEdit(self)
+        self.pump_ECN_depth_do_EditType = FloatLineEdit(self)
         self.pump_ECN_depth_do_EditType.setText(f'{self.ifNone(CreatePZ.dict_pump_ECN_h["do"])}')
 
         self.pump_ECN_posle_Label = QLabel('Плановый ЭЦН на спуск')
@@ -105,7 +130,7 @@ class TabPage_SO(QWidget):
         self.pump_ECN_posle_EditType.setText(f'{self.ifNone(CreatePZ.dict_pump_ECN["posle"])}')
 
         self.pump_ECN_depth_posle_Label = QLabel('Плановая глубина спуска ЭЦН')
-        self.pump_ECN_depth_posle_EditType = QLineEdit(self)
+        self.pump_ECN_depth_posle_EditType = FloatLineEdit(self)
         self.pump_ECN_depth_posle_EditType.setText(f'{self.ifNone(CreatePZ.dict_pump_ECN_h["posle"])}')
 
 
@@ -114,7 +139,7 @@ class TabPage_SO(QWidget):
         self.paker_do_EditType.setText(f'{self.ifNone(CreatePZ.paker_do["do"])}')
 
         self.paker_depth_do_Label = QLabel('Глубина спуска пакера')
-        self.paker_depth_do_EditType = QLineEdit(self)
+        self.paker_depth_do_EditType = FloatLineEdit(self)
         self.paker_depth_do_EditType.setText(f'{self.ifNone(CreatePZ.H_F_paker_do["do"])}')
 
         self.paker_posle_Label = QLabel('пакер на спуск')
@@ -122,7 +147,7 @@ class TabPage_SO(QWidget):
         self.paker_posle_EditType.setText(f'{self.ifNone(CreatePZ.paker_do["posle"])}')
 
         self.paker_depth_posle_Label = QLabel('Глубина спуска пакера')
-        self.paker_depth_posle_EditType = QLineEdit(self)
+        self.paker_depth_posle_EditType = FloatLineEdit(self)
         self.paker_depth_posle_EditType.setText(f'{self.ifNone(CreatePZ.H_F_paker_do["posle"])}')
 
         self.paker2_do_Label = QLabel('Спущенный пакер')
@@ -130,7 +155,7 @@ class TabPage_SO(QWidget):
         self.paker2_do_EditType.setText(f'{self.ifNone(CreatePZ.paker2_do["do"])}')
 
         self.paker2_depth_do_Label = QLabel('Глубина спуска пакера')
-        self.paker2_depth_do_EditType = QLineEdit(self)
+        self.paker2_depth_do_EditType = FloatLineEdit(self)
         self.paker2_depth_do_EditType.setText(self.ifNone(str(CreatePZ.H_F_paker2_do["do"])))
 
         self.paker2_posle_Label = QLabel('пакер на спуск')
@@ -138,16 +163,16 @@ class TabPage_SO(QWidget):
         self.paker2_posle_EditType.setText(self.ifNone(CreatePZ.paker2_do["posle"]))
 
         self.paker2_depth_posle_Label = QLabel('Глубина спуска пакера')
-        self.paker2_depth_posle_EditType = QLineEdit(self)
+        self.paker2_depth_posle_EditType = FloatLineEdit(self)
         self.paker2_depth_posle_EditType.setText(self.ifNone(str(CreatePZ.H_F_paker2_do["posle"])))
         # print(f' насос спуск {CreatePZ.dict_pump["posle"]}')
 
         self.static_level_Label = QLabel('Статический уровень в скважине')
-        self.static_level_EditType = QLineEdit(self)
+        self.static_level_EditType = FloatLineEdit(self)
         self.static_level_EditType.setText(str(self.ifNone(CreatePZ.static_level)))
 
         self.dinamic_level_Label = QLabel('Динамический уровень в скважине')
-        self.dinamic_level_EditType = QLineEdit(self)
+        self.dinamic_level_EditType = FloatLineEdit(self)
         self.dinamic_level_EditType.setText(str(self.ifNone(CreatePZ.dinamic_level)))
 
 
@@ -226,9 +251,16 @@ class TabPage_SO(QWidget):
     def ifNone(self, string):
         if str(string) != '0':
             return string
+        # elif str(string).replace('.', '').replace(',', '').isdigit():
+        #     return float(string)
+
         else:
             return 'отсут'
-    #
+    def updateLabel(self):
+        # self.dinamic_level_Label
+        # self.columnType
+        self.update()
+
 
 
 class TabWidget(QTabWidget):
@@ -394,6 +426,7 @@ class DataWindow(MyWindow):
             CreatePZ.pause = False
             self.close()
 
+
     
     def if_None(self, value):
         
@@ -426,5 +459,6 @@ if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     # app.setStyleSheet()
     window = DataWindow()
+    QTimer.singleShot(2000, DataWindow.updateLabel)
     # window.show()
     app.exec_()

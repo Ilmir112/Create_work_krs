@@ -236,9 +236,13 @@ class AcidPakerWindow(MyWindow):
                           f'менее  {swab_volume}м3. \n ' \
                           f'Отобрать пробу на химический анализ воды на ОСТ-39 при последнем рейсе сваба (объем не менее 10литров).' \
                           f'Обязательная сдача в этот день в ЦДНГ'
+
+        paker_depth = MyWindow.true_set_Paker(self, paker_depth)
+        paker2_depth = MyWindow.true_set_Paker(self, float(paker_depth) - float(deferencePaker))
+
         paker_list = [
 
-            [None, None, f'Посадить пакер на глубине {paker_depth}/{float(paker_depth) - float(deferencePaker)}м'
+            [None, None, f'Посадить пакер на глубине {paker_depth}/{paker2_depth}м'
                 ,
              None, None, None, None, None, None, None,
              'мастер КРС', 0.3],
@@ -310,7 +314,8 @@ class AcidPakerWindow(MyWindow):
         swabTrueEditType = True if swabTrueEditType == 'Нужно освоение' else False
         difference_paker = round(pakerEdit - paker2Edit, 0)
         CreatePZ.difference_paker = difference_paker
-
+        pakerEdit = MyWindow.true_set_Paker(self, pakerEdit)
+        paker2Edit = MyWindow.true_set_Paker(self, paker2Edit)
         if depthGaugeEdit == 'Да' and CreatePZ.column_additional == False:
             self.paker_select = f'заглушку + сбивной с ввертышем контейнер с манометром МТГ + НКТ{CreatePZ.nkt_diam}м {khvostEdit}м  + пакер ПРО-ЯМО-{paker_diametr_select(pakerEdit)}мм (либо аналог) ' \
                                 f'для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм + щелевой фильтр НКТ {difference_paker}м + сбивной с ввертышем контейнер с манометром МТГ' \
@@ -577,8 +582,7 @@ class AcidPakerWindow(MyWindow):
 
         # privyazka = str(self.tabWidget.currentWidget().privyazka.currentText())
         if self.countAcid == 0:
-            pakerEdit = MyWindow.true_set_Paker(self, pakerEdit)
-            paker2Edit = MyWindow.true_set_Paker(self, paker2Edit)
+
             work_list = self.acidSelect(swabTrueEditType, khvostEdit, pakerEdit, paker2Edit, depthGaugeEdit)
             CreatePZ.differencePaker = pakerEdit - paker2Edit
             CreatePZ.swabTypeComboIndex = swabType
@@ -600,8 +604,7 @@ class AcidPakerWindow(MyWindow):
         elif self.countAcid == 1:
             paker2Edit = pakerEdit - CreatePZ.difference_paker
             CreatePZ.khvostEdit = paker2Edit
-            pakerEdit = MyWindow.true_set_Paker(self, pakerEdit)
-            paker2Edit = MyWindow.true_set_Paker(self, paker2Edit)
+
             self.acidSelect(CreatePZ.swabTrueEditType, khvostEdit, pakerEdit, paker2Edit, CreatePZ.depthGaugeEdit)
 
             work_list = [

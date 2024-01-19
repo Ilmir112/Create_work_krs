@@ -578,8 +578,8 @@ def calc_fond_nkt(self, len_nkt):
                                                    f'Расстояние между НКТ для опрессовки', 300, 50,
                                                    501)
     pressuar = 40
-    print(f' ЭЦН {CreatePZ.dict_pump_ECN["do"]}')
-    if CreatePZ.dict_pump_ECN["do"] != "0":
+    print(f' ЭЦН {CreatePZ.dict_pump_ECN["posle"]}')
+    if CreatePZ.dict_pump_ECN["posle"] != "0":
         pressuar = 50
 
     pressuar_nkt, ok = QInputDialog.getInt(self, 'Давление опрессовки ГНО ',

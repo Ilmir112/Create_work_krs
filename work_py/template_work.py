@@ -239,8 +239,13 @@ def template_ek_without_skm(self):
                      f'уд.весом {CreatePZ.fluid_work}   до глубины {CreatePZ.current_bottom}м',
                      None, None, None, None, None, None, None, 'Мастер КРС', 4, None]
 
-    if CreatePZ.current_bottom - CreatePZ.perforation_sole <= 10:
-        list_template_ek.insert(-1, privyazka_nkt)
+    if CreatePZ.current_bottom - CreatePZ.perforation_sole <= 10 and CreatePZ.open_trunk_well == False:
+        privyazka_question = QMessageBox.question(self, 'Привязка оборудования',
+                                                  f'зумпф составляет {int(CreatePZ.current_bottom - CreatePZ.perforation_sole)}м '
+                                                  f'нужно ли привязывать компоновку?'
+                                                  )
+        if privyazka_question == QMessageBox.StandardButton.Yes:
+            list_template_ek.insert(-1, privyazka_nkt)
     if CreatePZ.gipsInWell == True:
         gips = pero(self)
         for row in gips[::-1]:
@@ -327,7 +332,7 @@ def template_ek(self):
     template_SKM_DP_EK = f'обточная муфта  + {round(CreatePZ.current_bottom - CreatePZ.perforation_roof + 10, 0)}м ' \
                          f'НКТ{nkt_pod} + шаблон-{first_template}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can_addition]}м + ' \
                          f'НКТ{nkt_pod} ' \
-                         f'{round(float(CreatePZ.current_bottom) - float(CreatePZ.head_column_additional) - (float(CreatePZ.current_bottom) - CreatePZ.perforation_roof + 10) - 10, 0)}м ' \
+                         f'{round(float(CreatePZ.current_bottom) - float(CreatePZ.head_column_additional) - lift_ecn_can[CreatePZ.lift_ecn_can_addition] - (float(CreatePZ.current_bottom) - CreatePZ.perforation_roof + 10) - 10, 0)}м ' \
                          f'+ НКТ{CreatePZ.nkt_diam} 10м + СКМ + шаблон-{second_template}мм L-{liftEcn}м '
     ckm_teml_SKM_DP_EK = f'(СКМ-{int(CreatePZ.column_diametr)} до Н={int(CreatePZ.head_column_additional) - 10}м, ' \
                          f'шаблон-{second_template}мм до гл.{int(CreatePZ.head_column_additional) - 20}м))'
@@ -553,7 +558,12 @@ def template_ek(self):
                      f'уд.весом {CreatePZ.fluid_work}   до глубины {CreatePZ.current_bottom}м',
                      None, None, None, None, None, None, None, 'Мастер КРС', None, None]
     if CreatePZ.current_bottom - CreatePZ.perforation_sole <= 10 and CreatePZ.open_trunk_well == False:
-        list_template_ek.insert(-1, privyazka_nkt)
+        privyazka_question = QMessageBox.question(self, 'Привязка оборудования',
+                                                  f'зумпф составляет {int(CreatePZ.current_bottom - CreatePZ.perforation_sole)}м '
+                                                  f'нужно ли привязывать компоновку?'
+                                                                                )
+        if privyazka_question == QMessageBox.StandardButton.Yes:
+            list_template_ek.insert(-1, privyazka_nkt)
 
     if float(CreatePZ.static_level) > 700:
         kot_question = QMessageBox.question(self, 'Низкий Статический уровень', 'Нужно ли произвести СПО '
