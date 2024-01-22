@@ -194,7 +194,7 @@ def well_volume(self):
                                   3.14 * (CreatePZ.column_diametr - CreatePZ.column_wall_thickness * 2) ** 2 / 4 / 1000 * (
                               CreatePZ.head_column_additional) / 1000)
         return volume_well
-def calv_h2s(self, cat_H2S, H2S_mg, H2S_pr):
+def calv_h2s(self, cat_H2S:int, H2S_mg: float, H2S_pr:float):
 
     from open_pz import CreatePZ
     if '2' == str(cat_H2S) or '1' in str(cat_H2S):
@@ -239,7 +239,7 @@ def calv_h2s(self, cat_H2S, H2S_mg, H2S_pr):
         except:
             udel_vodoiz_nkt= udel_vodoiz_nkt
             # print(f'dnjhfzНКТ {udel_vodoiz_nkt}')
-        nkt_1_l = CreatePZ.dict_nkt[nkt_1]
+        nkt_1_l = CreatePZ.dict_nkt[str(nkt_1)]
         vodoiz_nkt = nkt_1_l *udel_vodoiz_nkt/1000
         try:
             vodoiz_nkt += nkt_2_l*udel_vodoiz_nkt_2/1000

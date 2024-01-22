@@ -11,6 +11,7 @@ def kot_select(self):
     if CreatePZ.column_additional == False \
             or (CreatePZ.column_additional == True and CreatePZ.current_bottom <= CreatePZ.head_column_additional):
         kot_select = f'КОТ-50 (клапан обратный тарельчатый) +НКТ{CreatePZ.nkt_diam}мм 10м + репер '
+
     elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr < 110 and\
             CreatePZ.current_bottom >= CreatePZ.head_column_additional:
         kot_select = f'КОТ-50 (клапан обратный тарельчатый) +НКТ{60}мм 10м + репер + ' \
@@ -30,13 +31,13 @@ def kot_work(self):
                                                          'Введите забой до которого нужно нормализовать',
                                                          float(CreatePZ.current_bottom))
 
-    kot_list = [[None, None,
+    kot_list = [[f'Нст {CreatePZ.static_level}', None,
                  f'При отсутствии циркуляции при указанном статическом уровне в ПЗ {CreatePZ.static_level}м:\n'
                  f'Спустить {kot_select(self)} на НКТ{CreatePZ.nkt_diam}мм до глубины {CreatePZ.current_bottom}м'
                  f' с замером, шаблонированием шаблоном.',
                  None, None, None, None, None, None, None,
                  'мастер КРС', descentNKT_norm(CreatePZ.current_bottom, 1)],
-                [None, None,
+                [f'{kot_select(self)} до H-{current_bottom}', None,
                  f'Произвести очистку забоя скважины до гл.{current_bottom}м закачкой обратной промывкой тех '
                  f'жидкости уд.весом {CreatePZ.fluid_work}, по согласованию с Заказчиком',
                  None, None, None, None, None, None, None,
@@ -107,7 +108,8 @@ def fluid_change(self):
 
 
 
-    fluid_change_list = [[None, None,
+    fluid_change_list = [[f'Cмена объема {CreatePZ.fluid}г/см3- {round(well_volume(self, CreatePZ.current_bottom), 1)}м3' ,
+                          None,
                           f'Произвести смену объема обратной промывкой по круговой циркуляции  жидкостью  {CreatePZ.fluid_work} '
                           f'(по расчету по вскрываемому пласта Рожид- {expected_pressure}атм) в объеме не '
                           f'менее {round(well_volume(self, CreatePZ.current_bottom), 1)}м3  в присутствии '
@@ -153,7 +155,8 @@ def check_h2s(self, fluid_new):
 
 def konte(self):
 
-    konte_list = [[None, None,
+    konte_list = [[f'Скважина согласована на проведение работ по технологии контейнерно-канатных технологий',
+                   None,
                           f'Скважина согласована на проведение работ по технологии контейнерно-канатных технологий по '
                           f'технологическому плану Таграс-РС.'
                           f'Вызвать геофизическую партию. Заявку оформить за 24 часов сутки через '
@@ -169,7 +172,7 @@ def konte(self):
     return konte_list
 def definition_Q(self):
     from open_pz import CreatePZ
-    definition_Q_list = [[None, None,
+    definition_Q_list = [[f'Насыщение 5м3 Q-{pressure_mode(CreatePZ.expected_P, "пласт")}', None,
                            f'Произвести насыщение скважины до стабилизации давления закачки не менее 5м3. Опробовать  '
                            f' на приемистость в трех режимах при Р={pressure_mode(CreatePZ.expected_P, "пласт")}атм в '
                            f'присутствии представителя ЦДНГ. '
@@ -186,7 +189,7 @@ def definition_Q_nek(self):
 
     open_checkbox_dialog()
     plast = CreatePZ.plast_select
-    definition_Q_list = [[None, None,
+    definition_Q_list = [[f'Насыщение 5м3 Q-{plast} при {CreatePZ.max_expected_pressure}', None,
                            f'Произвести насыщение скважины по затрубу до стабилизации давления закачки не '
                            f'менее 5м3. Опробовать  '
                            f' на приемистость {plast} при Р={CreatePZ.max_expected_pressure}атм в присутствии '
@@ -199,7 +202,7 @@ def definition_Q_nek(self):
 
     return definition_Q_list
 def privyazkaNKT(self):
-    priv_list = [[None, None, f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС "Ойл-сервис". '
+    priv_list = [[f'Привязка ', None, f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС "Ойл-сервис". '
                  f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером от 14.10.2021г. '
                  f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины',
      None, None, None, None, None, None, None,
@@ -207,7 +210,7 @@ def privyazkaNKT(self):
     return priv_list
 
 def definitionBottomGKLM(self):
-    priv_list = [[None, None,
+    priv_list = [[f'Отбить забой по ГК и ЛМ', None,
                  f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС "Ойл-сервис". '
                  f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером от 14.10.2021г. '
                  f'ЗАДАЧА 2.8.2 Отбить забой по ГК и ЛМ',
@@ -246,7 +249,7 @@ def pvo_cat1(self):
                    "подъёмного агрегата для ремонта скважины.",
      None, None, None, None, None, None, None,
      'Мастер КРС', None],
-    [None, None,
+    [f'монтаж ПВО по схеме № 1', None,
      pvo_1, None, None,
      None, None, None, None, None,
      'Мастер КРС, представ-ли ПАСФ и Заказчика, Пуск. ком',  4.67]]

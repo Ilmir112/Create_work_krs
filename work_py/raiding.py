@@ -30,9 +30,9 @@ class Raid(CreatePZ):
         nkt_diam = ''.join(['73мм' if CreatePZ.column_diametr > 110 else '60мм'])
 
         ryber_str_EK = f'райбер-{ryber_diam} для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм +' \
-                       f' забойный двигатель Д-106 +НКТ{nkt_diam}м 20м + репер '
+                       f' забойный двигатель  +НКТ{nkt_diam}м 20м + репер '
         ryber_str_DP = f'райбер-{ryber_diam} для ЭК {CreatePZ.column_additional_diametr}мм х ' \
-                    f'{CreatePZ.column_additional_wall_thickness}мм + забойный двигатель Д-76 +НКТ{nkt_pod}мм 20м + репер + ' \
+                    f'{CreatePZ.column_additional_wall_thickness}мм + забойный двигатель +НКТ{nkt_pod}мм 20м + репер + ' \
                     f'НКТ{nkt_pod} {round(CreatePZ.current_bottom - float(CreatePZ.head_column_additional))}м'
 
         if CreatePZ.column_additional == False or (CreatePZ.column_additional == True and CreatePZ.head_column_additional >= CreatePZ.current_bottom):

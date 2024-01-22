@@ -826,15 +826,22 @@ def work_krs(self, work_plan):
                        None, None, None, None, None,
                        'Мастер КРС', round(liftingGNO(CreatePZ.dict_nkt)*1.2,2)]
                       ]
-        lift_orz = []
-        try:
-            # lift_key = 'ОРЗ'
+        print(f'ключ НКТ {list(map(int, CreatePZ.dict_nkt.keys())), CreatePZ.dict_nkt}')
+        lift_orz = [[]]
+        if 89 in list(map(int, CreatePZ.dict_nkt.keys())) and 48 in list(map(int, CreatePZ.dict_nkt.keys())):
+            lift_orz = []
+            # try:
+            lift_key = 'ОРЗ'
             lift_orz = [
                 [None, None,
-                 f'Произвести глушение скважины в НКТ48мм тех.жидкостью в объеме обеспечивающим заполнение трубного пространства в объеме {round(1.3 * CreatePZ.dict_nkt[48] / 1000, 1)}м3 жидкостью уд.веса '
-                 f'{fluid_work}на давление поглощения до {CreatePZ.max_admissible_pressure}атм. Произвести глушение скважины в '
-                 f'НКТ89мм тех.жидкостью на поглощение в объеме обеспечивающим заполнение межтрубного и подпакерного пространства '
-                 f'в объеме {round(1.3 * CreatePZ.dict_nkt[89] * 1.1 / 1000, 1)}м3 жидкостью уд.веса {fluid_work}. Тех отстой 1-2 часа. '
+                 f'Произвести глушение скважины в НКТ48мм тех.жидкостью в объеме обеспечивающим заполнение трубного '
+                 f'пространства в объеме {round(1.3 * CreatePZ.dict_nkt["48"] / 1000, 1)}м3 жидкостью уд.веса '
+                 f'{fluid_work}на давление поглощения до {CreatePZ.max_admissible_pressure}атм. '
+                 f'Произвести глушение скважины в '
+                 f'НКТ89мм тех.жидкостью на поглощение в объеме обеспечивающим заполнение '
+                 f'межтрубного и подпакерного пространства '
+                 f'в объеме {round(1.3 * CreatePZ.dict_nkt["89"] * 1.1 / 1000, 1)}м3 '
+                 f'жидкостью уд.веса {fluid_work}. Тех отстой 1-2 часа. '
                  f'Произвести замер избыточного давления в скважине.',
                  None, None, None, None, None, None, None,
                  'Мастер КРС представитель Заказчика ', 0.7],
@@ -842,11 +849,11 @@ def work_krs(self, work_plan):
                  f'{lifting_unit(self)}', None, None, None, None, None, None, None,
                  'Мастер КРС представитель Заказчика, пусков. Ком. ', 4.2],
                 [None, None,
-                 f'Поднять стыковочное устройство на НКТ48мм  с гл. {CreatePZ.dict_nkt[48]}м с доливом тех жидкости '
+                 f'Поднять стыковочное устройство на НКТ48мм  с гл. {CreatePZ.dict_nkt["48"]}м с доливом тех жидкости '
                  f'уд.весом {fluid_work}',
                  None, None, None, None, None, None, None,
                  'Мастер КРС представитель Заказчика, пусков. Ком. ',
-                 round((0.17 + 0.015 * CreatePZ.dict_nkt[48] / 8.5 + 0.12 + 1.02), 1)],
+                 round((0.17 + 0.015 * CreatePZ.dict_nkt["48"] / 8.5 + 0.12 + 1.02), 1)],
                 [None, None,
                  f'Разобрать устьевое оборудование.  Сорвать планшайбу и пакер с поэтапным увеличением нагрузки с выдержкой 30мин для возврата резиновых элементов в исходное положение'
                  f'в присутствии представителя ЦДНГ, с '
@@ -899,14 +906,13 @@ def work_krs(self, work_plan):
                  None, None, None, None, None,
                  None, None],
                 [None, None,
-                 f'Поднять компоновку ОРЗ на НКТ89мм с глубины {CreatePZ.dict_nkt[89]}м на поверхность с замером, накручиванием колпачков с доливом скважины тех.жидкостью уд. весом {fluid_work}  '
-                 f'в объеме {round(CreatePZ.dict_nkt[89] * 1.35 / 1000, 1)}м3 с контролем АСПО на стенках НКТ.',
+                 f'Поднять компоновку ОРЗ на НКТ89мм с глубины {CreatePZ.dict_nkt["89"]}м на поверхность с замером, накручиванием колпачков с доливом скважины тех.жидкостью уд. весом {fluid_work}  '
+                 f'в объеме {round(CreatePZ.dict_nkt["89"] * 1.35 / 1000, 1)}м3 с контролем АСПО на стенках НКТ.',
                  None, None,
                  None, None, None, None, None,
-                 'Мастер КРС', round(liftingGNO(CreatePZ.dict_nkt)*1.2/2,2)],
+                 'Мастер КРС', round(CreatePZ.H_F_paker_do["do"] * 1.2 / 2,2)],
             ]
-        except:
-            print('ОРЗ нет')
+
 
 
         lift_dict = {'пакер': lift_paker, 'ОРЗ': lift_orz, 'ОРД': lift_ord, 'воронка': lift_voronka,
@@ -1120,6 +1126,29 @@ def get_leakiness(self):
 
     leakiness_column, ok = QInputDialog.getText(self, 'Нарушение колонны',
                                                 'Введите нарушение колонны через тире')
+    try:
+        leakiness_column_min = min(map(float,leakiness_column.split('-')))
+        leakiness_column_max = max(map(float,leakiness_column.split('-')))
+
+        leakiness_column_len = len(leakiness_column.split('-'))
+        leakiness_column = leakiness_column_min,  leakiness_column_max
+
+    except:
+        leakiness_column_len = 0
+    print(leakiness_column_len)
+    while leakiness_column_len != 2:
+        mes = QMessageBox.warning(None, 'Некорректные данные', "Введены не корректные данные")
+        leakiness_column, ok = QInputDialog.getText(self, 'Нарушение колонны',
+                                                    'Введите нарушение колонны через тире')
+        try:
+            leakiness_column_min = min(map(float, leakiness_column.split('-')))
+            leakiness_column_max = max(map(float, leakiness_column.split('-')))
+            print(leakiness_column_min, leakiness_column_max)
+            leakiness_column_len = len(leakiness_column.split('-'))
+            leakiness_column = leakiness_column_min, leakiness_column_max
+        except:
+            leakiness_column_len = 0
+
     CreatePZ.leakiness_interval.append(leakiness_column)
     print(f'Наруше {CreatePZ.leakiness_interval}')
 

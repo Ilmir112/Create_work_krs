@@ -15,8 +15,8 @@ def rir_rpp(self):
     from work_py.opressovka import paker_list, paker_diametr_select
     rir_list = []
     
-    plast = open_checkbox_dialog()
-
+    open_checkbox_dialog()
+    plast = CreatePZ.plast_select
 
     rir_rpk_question = QMessageBox.question(self, 'посадку между пластами?', 'посадку между пластами?')
     if rir_rpk_question == QMessageBox.StandardButton.Yes:
@@ -85,9 +85,10 @@ def rir_rpk(self):
     from open_pz import CreatePZ
     from work_py.opressovka import paker_list, paker_diametr_select
     rir_list = []
-    plast = open_checkbox_dialog()
+    open_checkbox_dialog()
+    plast = CreatePZ.plast_select
 
-    
+
     rir_rpk_question = QMessageBox.question(self, 'посадку между пластами?', 'посадку между пластами?')
     if rir_rpk_question == QMessageBox.StandardButton.Yes:
         rir_rpk_plast_true = True
@@ -240,7 +241,8 @@ def rirWithPero(self):
     nkt_diam = ''.join(['73' if CreatePZ.column_diametr > 110 else '60'])
 
     if len(CreatePZ.plast_work) != 0:
-        plast = open_checkbox_dialog()
+        open_checkbox_dialog()
+        plast = CreatePZ.plast_select
 
     
     rirSole, ok = QInputDialog.getInt(None, 'Подошва цементного моста',

@@ -1,46 +1,48 @@
 from PyQt5.QtWidgets import QInputDialog, QMessageBox
 
 
-def skm_interval():
+def skm_interval(self, template):
     from open_pz import CreatePZ
+    template_select = ['ПСШ ЭК', 'ПСШ ЭК без хвост', 'ПСШ ЭК открытый ствол', 'ПСШ СКМ в доп колонне c хвостом', 'ПСШ ДП без хвост',
+                       'ПСШ СКМ в доп колонне + открытый ствол', 'СКМ в открытом стволе', 'ПСШ открытый ствол + ИП отрайбирован']
+
+
     str_raid = []
     if CreatePZ.paker_do["posle"] != '0':
         str_raid.append([float(CreatePZ.H_F_paker_do["posle"]) - 20, float(CreatePZ.H_F_paker_do["posle"]) + 20])
 
     if CreatePZ.leakiness:
         for nek in list(CreatePZ.dict_leakiness['НЭК']['интервал'].keys()):
-            if int(float(nek.split('-')[1])) + 20 < CreatePZ.current_bottom:
-                str_raid.append([int(float(nek.split('-')[0])) - 90, int(float(nek.split('-')[1])) + 20])
+            if int(float(nek[1])) + 20 < CreatePZ.current_bottom:
+                str_raid.append([int(float(nek[0])) - 90, int(float(nek[1])) + 20])
             else:
-                str_raid.append([int(float(nek.split('-')[0])) - 90,
+                str_raid.append([int(float(nek[0])) - 90,
                                  CreatePZ.current_bottom - 2])
-    if all([CreatePZ.dict_perforation[plast]['отрайбировано'] == False for plast in CreatePZ.plast_work]):
+    if all([CreatePZ.dict_perforation[plast]['отрайбировано'] is False for plast in CreatePZ.plast_work]):
         str_raid.append([CreatePZ.perforation_roof - 90, CreatePZ.perforation_roof - 10])
-        if CreatePZ.if_None(CreatePZ.paker_do["posle"]) != '0' and CreatePZ.if_None(
-                CreatePZ.H_F_paker_do["posle"]) != '0':
-            str_raid.append([float(CreatePZ.H_F_paker_do["posle"]) - 20, float(CreatePZ.H_F_paker_do["posle"]) + 20])
+
         if CreatePZ.leakiness:
             for nek in list(CreatePZ.dict_leakiness['НЭК']['интервал'].keys()):
                 print(f' наруш {nek}')
-                if float(nek.split('-')[1]) + 20 < CreatePZ.current_bottom:
-                    str_raid.append([int(float(nek.split('-')[0])) - 90, int(float(nek.split('-')[1])) + 20])
+                if float(nek[1]) + 20 < CreatePZ.current_bottom:
+                    str_raid.append([int(float(nek[0])) - 90, int(float(nek[1])) + 20])
                 else:
-                    str_raid.append([int(float(nek.split('-')[0])) - 90,
+                    str_raid.append([int(float(nek[0])) - 90,
                                      CreatePZ.CreatePZ.current_bottom - 2])
+        print(f'ПВР не отрайбированы {str_raid}')
     elif all(
-            [CreatePZ.dict_perforation[plast]['отрайбировано'] == True for plast in CreatePZ.plast_work]):
-
+            [CreatePZ.dict_perforation[plast]['отрайбировано'] is True for plast in CreatePZ.plast_work]):
+        str_raid = []
 
         perforating_intervals = []
 
         for plast in CreatePZ.plast_all:
             for interval in CreatePZ.dict_perforation[plast]['интервал']:
                 perforating_intervals.append(list(interval))
-        print(f'ПВР {perforating_intervals}')
-        print(f'скрепр2{str_raid}')
+
 
         str_raid.extend(remove_overlapping_intervals(perforating_intervals))
-    print(f'скреперо {str_raid}')
+
     if CreatePZ.dict_perforation_project is None and any(
             [plast in CreatePZ.plast_all for plast in list(CreatePZ.dict_perforation_project.keys())]) == False:
         if CreatePZ.dict_perforation_project[plast]['интервал'][1] < CreatePZ.current_bottom:
@@ -54,11 +56,21 @@ def skm_interval():
                                         'Планируются ли достреливать новые интервалы перфорации')
 
         if pvlg_rir == QMessageBox.StandardButton.Yes:
+
             skm_column, ok = QInputDialog.getText(None, 'Скреперование',
-                                                  'Введите интервал скреперования через тире')
+                                                      'Введите интервал скреперования через тире')
+
+
             while '-' not in skm_column:
+                mes = QMessageBox.warning(None, 'Введены не корректные данные')
                 skm_column, ok = QInputDialog.getText(None, 'Скреперование',
                                                       'Введите интервал скреперования через тире')
+                while skm_column.split('-')[0] >= skm_column.split('-')[1]:
+                    mes = QMessageBox.warning(None, 'Введенны не корректные данные')
+                    skm_column, ok = QInputDialog.getText(None, 'Скреперование',
+                                                          'Введите интервал скреперования через тире')
+
+
 
             if ',' not in skm_column:
                 a = []
@@ -72,9 +84,55 @@ def skm_interval():
                         a.append(int(float(i)))
                     str_raid.append(a)
 
-    print(f' Скрепер {str_raid}')
+    print(f'скреперо {str_raid}')
     merged_segments = merge_overlapping_intervals(str_raid)
-    return merged_segments
+    print(f'скреперо после {str_raid}')
+    merged_segments_new = []
+    print(template)
+
+    for interval in merged_segments:
+        if template in ['ПСШ ЭК', 'ПСШ без хвоста', 'ПСШ открытый ствол']:
+            merged_segments_new = merged_segments
+        elif template in ['ПСШ открытый ствол + ИП отрайбирован']:
+            if interval[0] < float(CreatePZ.shoe_column_additional) and interval[1] < float(
+                    CreatePZ.shoe_column_additional):
+                merged_segments_new.append(interval)
+
+            elif interval[0] < float(CreatePZ.shoe_column_additional) and interval[1] > float(
+                    CreatePZ.shoe_column_additional):
+
+                merged_segments_new.append((interval[1], float(CreatePZ.shoe_column_additional) -3))
+
+        elif template in ['ПСШ СКМ в доп колонне c хвостом', 'ПСШ СКМ в доп колонне без хвоста',
+                          'ПСШ СКМ в доп колонне + открытый ствол']:
+            if interval[0] > float(CreatePZ.head_column_additional) and interval[1] > float(
+                    CreatePZ.head_column_additional):
+                merged_segments_new.append(interval)
+
+            elif interval[0] < float(CreatePZ.head_column_additional) and interval[1] > float(
+                    CreatePZ.head_column_additional):
+
+                merged_segments_new.append((CreatePZ.head_column_additional + 2, interval[1]))
+                # print(f'2 {interval, merged_segments}')
+        elif template in ['ПСШ Доп колонна СКМ в основной колонне']:
+            if interval[0] < float(CreatePZ.head_column_additional) and interval[1] < float(
+                    CreatePZ.head_column_additional):
+                merged_segments_new.append(interval)
+
+            elif interval[0] < float(CreatePZ.head_column_additional) and interval[1] > float(
+                    CreatePZ.head_column_additional):
+                # merged_segments.remove(interval)
+                merged_segments_new.append((interval[0], CreatePZ.head_column_additional - 2))
+                # print(f'4 {interval, merged_segments}')
+    print(f'Новые интервалы {merged_segments_new}')
+    for skip in merged_segments_new:
+        skip_question = QMessageBox.question(None, 'Скреперование интервалов посадки',
+                                             f'Нужно ли скреперованить интервал {skip}?')
+        if skip_question ==  QMessageBox.StandardButton.No:
+            merged_segments_new.pop(merged_segments_new.index(skip))
+
+    CreatePZ.skm_interval.extend(merged_segments_new)
+    return merged_segments_new
 
 
 # Функция исключения из интервалов скреперования интервалов ПВР
@@ -83,6 +141,17 @@ def remove_overlapping_intervals(perforating_intervals):
 
     # print(f' перфорация_ {perforating_intervals}')
     skipping_intervals = []
+    if CreatePZ.paker_do["posle"] != '0':
+        skipping_intervals.append([float(CreatePZ.H_F_paker_do["posle"]) - 20, float(CreatePZ.H_F_paker_do["posle"]) + 20])
+
+    if CreatePZ.leakiness:
+        for nek in list(CreatePZ.dict_leakiness['НЭК']['интервал'].keys()):
+            if int(float(nek[1])) + 20 < CreatePZ.current_bottom:
+                skipping_intervals.append([int(float(nek[0])) - 90, int(float(nek[1])) + 20])
+            else:
+                skipping_intervals.append([int(float(nek[0])) - 90,
+                                 CreatePZ.current_bottom - 2])
+
     for pvr in sorted(perforating_intervals, key=lambda x: x[0]):
         if pvr[1] <= CreatePZ.current_bottom - 3:
             if pvr[1] + 40 < CreatePZ.current_bottom and pvr[0] < CreatePZ.current_bottom:
@@ -95,7 +164,7 @@ def remove_overlapping_intervals(perforating_intervals):
 
     print(f'СКМ на основе ПВР{sorted(skipping_intervals, key=lambda x: x[0])}')
     skipping_intervals = merge_overlapping_intervals(sorted(skipping_intervals, key=lambda x: x[0]))
-    lll = []
+    skipping_intervals_new = []
     for skm in sorted(skipping_intervals, key=lambda x: x[0]):
         kroly_skm = int(skm[0])
         pod_skm = int(skm[1])
@@ -106,17 +175,19 @@ def remove_overlapping_intervals(perforating_intervals):
                 print(int(pvr[0]) in skm_range, skm_range[0], int(pvr[0]))
                 if int(pvr[0]) in skm_range and int(pvr[1]) in skm_range:
                     # print(skm_range)
-                    lll.append((skm_range[0]+1, int(pvr[0] - 1)))
-                    # print(lll, skm_range.index(int(pvr[0]-2)))
+                    skipping_intervals_new.append((skm_range[0]+1, int(pvr[0] - 1)))
+                    # print(skipping_intervals_new, skm_range.index(int(pvr[0]-2)))
                     print(f' range {skm_range}')
 
                     skm_range = skm_range[skm_range.index(int(pvr[1])):]
                     print(f' range {skm_range}')
-            lll.append((skm_range[0] + 2, pod_skm))
+            skipping_intervals_new.append((skm_range[0] + 2, pod_skm))
 
-    print(f'после разделения {lll}')
+    print(f'после разделения {skipping_intervals_new}')
 
-    return lll
+
+
+    return skipping_intervals_new
 
 
 def raiding_interval(ryber_key):
@@ -155,7 +226,7 @@ def raiding_interval(ryber_key):
                 str_raid.append((float(interval[0]) - 20, CreatePZ.current_bottom))
 
     if CreatePZ.leakiness == True:
-        roof_leakiness = float(list(CreatePZ.dict_leakiness['НЭК']['интервал'].keys())[0].split('-')[1])
+        roof_leakiness = float(list(CreatePZ.dict_leakiness['НЭК']['интервал'].keys())[0][0])
         if len(CreatePZ.dict_leakiness['НЭК']['интервал']) == 1 and roof_leakiness + 30 <= CreatePZ.current_bottom:
             str_raid.append([roof_leakiness - 30, roof_leakiness + 30])
         elif len(
@@ -164,12 +235,11 @@ def raiding_interval(ryber_key):
 
         for nek in CreatePZ.dict_leakiness['НЭК']['интервал'].keys():
             if CreatePZ.dict_leakiness['НЭК']['интервал'][nek]['отрайбировано'] == False:
-                i = nek.split('-')
 
-                if float(i[1]) + 30 <= CreatePZ.current_bottom and float(i[0]) + 30 <= CreatePZ.current_bottom:
-                    crt = (float(i[0]) - 30, float(i[1]) + 30)
+                if float(nek[1]) + 30 <= CreatePZ.current_bottom and float(nek[0]) + 30 <= CreatePZ.current_bottom:
+                    crt = (float(nek[0]) - 30, float(nek[1]) + 30)
                 else:
-                    crt = (float(i[0]) - 30, CreatePZ.current_bottom)
+                    crt = (float(nek[0]) - 30, CreatePZ.current_bottom)
                 str_raid.append(crt)
     print(f' интервал райбире {str_raid}')
     if CreatePZ.column_additional == True and CreatePZ.current_bottom > CreatePZ.head_column_additional:
@@ -210,7 +280,7 @@ def merge_overlapping_intervals(intervals):
         else:
             merged[-1] = (merged[-1][0], max(merged[-1][1], interval[1]))
     print(f'интервалы СКМ {merged}')
-    CreatePZ.skm_interval = merged
+
     return merged
 
 

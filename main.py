@@ -214,6 +214,34 @@ class MyWindow(QMainWindow):
             print(f' длина {len(work_list)}')
             CreatePZ.addItog(self, ws2, self.table_widget.rowCount() + 1)
             print(f'45- {ws2.max_row}')
+            for row_ind, row in enumerate(ws2.iter_rows(values_only=True)):
+
+                if 15 < row_ind < 100:
+                    if all(cell in [None, ''] for cell in row) \
+                            and ('Интервалы темпа' not in str(ws2.cell(row=row_ind, column=2).value) \
+                                 and 'Замечания к эксплуатационному периоду' not in str(
+                                ws2.cell(row=row_ind, column=2).value) \
+                                 and 'Замечания к эксплуатационному периоду' not in str(
+                                ws2.cell(row=row_ind - 2, column=2).value)):
+                        print(row_ind, ('Интервалы темпа' not in str(ws2.cell(row=row_ind, column=2).value)),
+                              str(ws2.cell(row=row_ind, column=2).value))
+                        ws2.row_dimensions[row_ind + 1].hidden = True
+                for col, value in enumerate(row):
+                    if 'Зуфаров' in str(value):
+                        coordinate = f'{get_column_letter(col - 2)}{row_ind - 2}'
+                        self.insert_image(ws2, 'imageFiles/Зуфаров.png', coordinate)
+                    elif 'М.К.Алиев' in str(value):
+                        coordinate = f'{get_column_letter(col - 1)}{row_ind - 1}'
+                        self.insert_image(ws2, 'imageFiles/Алиев махир.png', coordinate)
+                    elif 'З.К. Алиев' in str(value):
+                        coordinate = f'{get_column_letter(col - 1)}{row_ind - 1}'
+                        self.insert_image(ws2, 'imageFiles/Алиев Заур.png', coordinate)
+                        break
+
+            print(f'9 - {ws2.max_row}')
+            if self.work_plan != 'dop_plan':
+                self.insert_image(ws2, 'imageFiles/Хасаншин.png', 'H1')
+                self.insert_image(ws2, 'imageFiles/Шамигулов.png', 'H4')
 
             try:
                 if self.work_plan != 'dop_plan':
@@ -224,36 +252,8 @@ class MyWindow(QMainWindow):
                         ws3.title = "Расчет необходимого количества поглотителя H2S"
                         ws3 = wb2["Расчет необходимого количества поглотителя H2S"]
                         calc_H2S(ws3, CreatePZ.H2S_pr, CreatePZ.H2S_mg)
-
-
-
                     else:
                         print(f'{CreatePZ.cat_H2S_list} Расчет поглотителя сероводорода не требуется')
-
-                for row_ind, row in enumerate(ws2.iter_rows(values_only=True)):
-
-                    if 15 < row_ind < 100:
-                        if all(cell in [None, ''] for cell in row) \
-                                and ('Интервалы темпа' not in str(ws2.cell(row=row_ind, column=2).value)\
-                                and 'Замечания к эксплуатационному периоду' not in str(ws2.cell(row=row_ind, column=2).value)\
-                                and 'Замечания к эксплуатационному периоду' not in str(ws2.cell(row=row_ind-2, column=2).value)):
-                            print(row_ind, ('Интервалы темпа' not in str(ws2.cell(row=row_ind, column=2).value)), str(ws2.cell(row=row_ind, column=2).value))
-                            ws2.row_dimensions[row_ind+1].hidden = True
-                    for col, value in enumerate(row):
-                        if 'Зуфаров' in str(value):
-                            coordinate = f'{get_column_letter(col-2)}{row_ind - 2}'
-                            self.insert_image(ws2, 'imageFiles/Зуфаров.png', coordinate)
-                        elif 'М.К.Алиев' in str(value):
-                            coordinate = f'{get_column_letter(col - 1)}{row_ind-1 }'
-                            self.insert_image(ws2, 'imageFiles/Алиев махир.png', coordinate)
-                            break
-
-                print(f'9 - {ws2.max_row}')
-                if self.work_plan != 'dop_plan':
-                    self.insert_image(ws2, 'imageFiles/Хасаншин.png', 'H1')
-                    self.insert_image(ws2, 'imageFiles/Шамигулов.png', 'H4')
-
-
 
 
             except Exception as e:
@@ -386,7 +386,7 @@ class MyWindow(QMainWindow):
             CreatePZ.plast_work = []
             CreatePZ.plast_all = []
             CreatePZ.condition_of_wells = 0
-            CreatePZ.cat_well_min = []
+            CreatePZ.cat_well_min = 0
             CreatePZ.bvo = False
             CreatePZ.old_version = False
             CreatePZ.image_list = []

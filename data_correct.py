@@ -258,7 +258,8 @@ class TabPage_SO(QWidget):
             return 'отсут'
     def updateLabel(self):
         # self.dinamic_level_Label
-        # self.columnType
+        self.columnType.setText()
+        self.column_addEditType.setText()
         self.update()
 
 

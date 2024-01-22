@@ -26,14 +26,16 @@ def claySolutionDef(self):
     volume_cement = round(volume_vn_ek(self, rirRoof) * (rirSole - rirRoof)/1000, 1)
     dict_nkt = {73: rirRoof}
     pero_list = [
-        [None, None,
+        [f'СПО {pero_select(self, rirSole)}  на тНКТ{nkt_diam}мм до {rirSole}м', None,
          f'Спустить {pero_select(self, rirSole)}  на тНКТ{nkt_diam}мм до глубины {rirSole}м с замером, шаблонированием '
          f'шаблоном.  \n'
          f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
          None, None, None, None, None, None, None,
          'мастер КРС',descentNKT_norm(rirSole, 1)],
-        [None, None,
-         f'Произвести закачку глинистого раствора с добавлением ингибитора коррозии {round(volume_cement*11,1)}гр с удельной дозировкой 11гр/м3 '
+        [f'закачку глинистого раствора в интервале {rirSole}-{rirRoof}м в объеме {volume_cement}м3 ({round(volume_cement*0.45,2)}т'
+         f' сухого порошка)', None,
+         f'Произвести закачку глинистого раствора с добавлением ингибитора коррозии {round(volume_cement*11,1)}гр с '
+         f'удельной дозировкой 11гр/м3 '
          f'удельным весом не менее 1,24г/см3 в интервале {rirSole}-{rirRoof}м.\n'
          f'- Приготовить и закачать в глинистый раствор уд.весом не менее 1,24г/см3 в объеме {volume_cement}м3 ({round(volume_cement*0.45,2)}т'
          f' сухого порошка).\n'
