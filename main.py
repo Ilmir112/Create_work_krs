@@ -9,9 +9,7 @@ from datetime import datetime
 from openpyxl.utils import get_column_letter
 from PyQt5.QtCore import Qt
 from openpyxl.workbook import Workbook
-from openpyxl.styles import Border, Side
-
-
+from openpyxl.styles import Border, Side, Alignment, Font
 
 from openpyxl.drawing.image import Image
 
@@ -39,7 +37,7 @@ class MyWindow(QMainWindow):
     def initUI(self):
 
         self.setWindowTitle("Main Window")
-        self.setGeometry(100, 400, 500, 400)
+        self.setGeometry(200, 100, 800, 800)
 
         self.table_widget = None
 
@@ -199,21 +197,25 @@ class MyWindow(QMainWindow):
             for row in merged_cells:
                 if row[0] >= ins_ind-1:
                     merged_cells_dict.setdefault(row[0], []).append(row[1])
-            # print(CreatePZ.ins_ind)
+            plan_short = ''
+
             for i in range(2, len(work_list)):  # нумерация работ
                 if i >= ins_ind+2:
                     work_list[i][1] = i - 1 - ins_ind
                     if krs.is_number(work_list[i][11]) == True:
                         CreatePZ.normOfTime += float(str(work_list[i][11]).replace(',', '.'))
-            print(f'88 - {ws2.max_row}')
-            print(f'строки {ins_ind}')
-            CreatePZ.count_row_height(self.ws, ws2, work_list, merged_cells_dict,  ins_ind)
-            print(f'3 - {ws2.max_row}')
+                    if work_list[i][0]:
+                        plan_short += f'п.{work_list[i][1]} {work_list[i][0]} \n'
+
+            # print(f'88 - {ws2.max_row}')
+            # print(f'строки {ins_ind}')
+            CreatePZ.count_row_height(self.ws, ws2, work_list, merged_cells_dict, ins_ind)
+            # print(f'3 - {ws2.max_row}')
             CreatePZ.itog_ind_min = self.ins_ind_border
             CreatePZ.itog_ind_max = len(work_list)
-            print(f' длина {len(work_list)}')
+            # print(f' длина {len(work_list)}')
             CreatePZ.addItog(self, ws2, self.table_widget.rowCount() + 1)
-            print(f'45- {ws2.max_row}')
+            # print(f'45- {ws2.max_row}')
             for row_ind, row in enumerate(ws2.iter_rows(values_only=True)):
 
                 if 15 < row_ind < 100:
@@ -223,8 +225,8 @@ class MyWindow(QMainWindow):
                                 ws2.cell(row=row_ind, column=2).value) \
                                  and 'Замечания к эксплуатационному периоду' not in str(
                                 ws2.cell(row=row_ind - 2, column=2).value)):
-                        print(row_ind, ('Интервалы темпа' not in str(ws2.cell(row=row_ind, column=2).value)),
-                              str(ws2.cell(row=row_ind, column=2).value))
+                        # print(row_ind, ('Интервалы темпа' not in str(ws2.cell(row=row_ind, column=2).value)),
+                        #       str(ws2.cell(row=row_ind, column=2).value))
                         ws2.row_dimensions[row_ind + 1].hidden = True
                 for col, value in enumerate(row):
                     if 'Зуфаров' in str(value):
@@ -238,7 +240,10 @@ class MyWindow(QMainWindow):
                         self.insert_image(ws2, 'imageFiles/Алиев Заур.png', coordinate)
                         break
 
-            print(f'9 - {ws2.max_row}')
+
+            self.create_short_plan(wb2, plan_short)
+
+            # print(f'9 - {ws2.max_row}')
             if self.work_plan != 'dop_plan':
                 self.insert_image(ws2, 'imageFiles/Хасаншин.png', 'H1')
                 self.insert_image(ws2, 'imageFiles/Шамигулов.png', 'H4')
@@ -254,6 +259,7 @@ class MyWindow(QMainWindow):
                         calc_H2S(ws3, CreatePZ.H2S_pr, CreatePZ.H2S_mg)
                     else:
                         print(f'{CreatePZ.cat_H2S_list} Расчет поглотителя сероводорода не требуется')
+
 
 
             except Exception as e:
@@ -272,14 +278,14 @@ class MyWindow(QMainWindow):
                 ws2.page_setup.fitToHeight = False
 
                 path = 'D:\Documents\Desktop\ГТМ'
-                filenames = f"{CreatePZ.well_number} {CreatePZ.well_area} кат {CreatePZ.cat_P_1}.xlsx"
+                filenames = f"{CreatePZ.well_number} {CreatePZ.well_area} кат {CreatePZ.cat_P_1} {self.work_plan}.xlsx"
                 full_path = path + '/' + filenames
-                print(f'10 - {ws2.max_row}')
-                print(wb2.path)
+                # print(f'10 - {ws2.max_row}')
+                # print(wb2.path)
                 if wb2:
                     wb2.close()
                     wb2.save(full_path)
-                    print(f"Table data saved to Excel {full_path}")
+                    print(f"Table data saved to Excel {full_path} {CreatePZ.number_dp}")
                 if self.wb:
                     self.wb.close()
 
@@ -1219,7 +1225,125 @@ class MyWindow(QMainWindow):
         # elif self.work_plan == 'gnkt-opz':
         #     from open_pz import CreatePZ
         #     # print(CreatePZ.gnkt_work1)
-        #     # self.populate_row(self.table_widget.rowCount(),  CreatePZ.gnkt_work1)
+        #     # self.populate_row(self.table_widget.rowCount(), CreatePZ.gnkt_work1)
+
+
+    def create_short_plan(self, wb2, plan_short):
+        from open_pz import CreatePZ
+        from work_py.descent_gno import gno_nkt_opening
+        ws4 = wb2.create_sheet('Sheet1')
+        ws4.title = "Краткое содержание плана работ"
+        ws4 = wb2["Краткое содержание плана работ"]
+
+        for row in range(15):
+            ws4.insert_rows(ws4.max_row)
+        ws4.cell(row= 1, column=1).value = CreatePZ.well_number
+        ws4.cell(row=2, column=1).value = CreatePZ.well_area
+
+        if CreatePZ.dict_pump_SHGN["do"] != "0" and  CreatePZ.dict_pump_ECN["do"] == "0" and\
+                CreatePZ.paker_do["do"] == '0':
+            ws4.cell(row=3, column=1).value = f'{CreatePZ.dict_pump_SHGN["do"]} -на гл. {CreatePZ.dict_pump_SHGN_h["do"]}м'
+        elif CreatePZ.dict_pump_SHGN["do"] == "0" and CreatePZ.dict_pump_ECN["do"] != "0" and\
+                CreatePZ.paker_do["do"] == '0':
+            ws4.cell(row=3, column=1).value = f'{CreatePZ.dict_pump_ECN["do"]} -на гл. {CreatePZ.dict_pump_ECN_h["do"]}м'
+        elif CreatePZ.dict_pump_SHGN["do"] == "0" and CreatePZ.dict_pump_ECN["do"] != "0" and\
+                CreatePZ.paker_do["do"] != '0':
+            ws4.cell(row=3, column=1).value = f'{CreatePZ.dict_pump_ECN["do"]} -на гл. {CreatePZ.dict_pump_ECN_h["do"]}м \n' \
+                                              f'{CreatePZ.paker_do["do"]} на {CreatePZ.H_F_paker_do["do"]}м'
+        elif CreatePZ.dict_pump_SHGN["do"] != "0" and  CreatePZ.dict_pump_ECN["do"] == "0" and\
+                CreatePZ.paker_do["do"] != '0':
+            ws4.cell(row=3, column=1).value = f'{CreatePZ.dict_pump_SHGN["do"]} -на гл. {CreatePZ.dict_pump_SHGN_h["do"]}м \n' \
+                                              f'{CreatePZ.paker_do["do"]} на {CreatePZ.H_F_paker_do["do"]}м'
+        elif CreatePZ.dict_pump_SHGN["do"] == "0" and  CreatePZ.dict_pump_ECN["do"] == "0" and\
+                CreatePZ.paker_do["do"] != '0':
+            ws4.cell(row=3, column=1).value = f'{CreatePZ.paker_do["do"]} на {CreatePZ.H_F_paker_do["do"]}м'
+        elif CreatePZ.dict_pump_SHGN["do"] == "0" and CreatePZ.dict_pump_ECN["do"] == "0" and\
+                CreatePZ.paker_do["do"] == '0':
+            ws4.cell(row=3, column=1).value = " "
+        elif CreatePZ.dict_pump_SHGN["do"] != "0" and  CreatePZ.dict_pump_ECN["do"] != "0" and\
+                CreatePZ.paker_do["do"] != '0':
+            ws4.cell(row=3, column=1).value = f'{CreatePZ.dict_pump_SHGN["do"]} -на гл. {CreatePZ.dict_pump_SHGN_h["do"]}м \n' \
+                                              f'{CreatePZ.dict_pump_ECN["do"]} -на гл. {CreatePZ.dict_pump_ECN_h["do"]}м \n' \
+                                              f'{CreatePZ.paker_do["do"]} на {CreatePZ.H_F_paker_do["do"]}м ' \
+
+
+        plast_str = ''
+        pressur_set = set()
+
+        for plast in CreatePZ.plast_all:
+            if CreatePZ.dict_perforation_short[plast]['отключение'] == False:
+                for interval in CreatePZ.dict_perforation[plast]["интервал"]:
+                    plast_str += f'{plast[:4]}: {interval[0]}- {interval[1]} \n'
+            else:
+                for interval in CreatePZ.dict_perforation[plast]["интервал"]:
+                    plast_str += f'{plast[:4]} :{interval[0]}- {interval[1]} (изол)\n'
+            filter_list_pressuar = list(filter(lambda x: type(x) in [int, float], list(CreatePZ.dict_perforation_short[plast]["давление"])))
+            print(f'фильтр -{filter_list_pressuar}')
+            if filter_list_pressuar:
+                pressur_set.add(f'{plast[:4]} - {filter_list_pressuar[0]}')
+
+        ws4.cell(row=6, column=1).value = f'НКТ: \n {gno_nkt_opening(CreatePZ.dict_nkt)}'
+        ws4.cell(row=7, column=1).value = f'Рпл- {" ".join(list(pressur_set))}атм'
+        ws4.cell(row=8, column=1).value = f'ЖГС = {CreatePZ.fluid_short}г/см3'
+        ws4.cell(row=9, column=1).value = f'Нст- {CreatePZ.static_level}м / Ндин - {CreatePZ.dinamic_level}м'
+        if CreatePZ.curator == 'ОР':
+            ws4.cell(row=10, column=1).value = f'Ожидаемые {CreatePZ.expected_Q}м3/сут при Р-{CreatePZ.expected_P}'
+        ws4.cell(row=11, column=1).value = f'макс угол {CreatePZ.max_angle}'
+        ws4.cell(row=1, column=2).value = CreatePZ.cdng
+        ws4.cell(row=2, column=3).value = f'Рпл - {CreatePZ.cat_P_1[0]}, H2S -{CreatePZ.cat_H2S_list[0]}, газ факт -{CreatePZ.gaz_f_pr[0]}т/м3'
+        column_well = f'{CreatePZ.column_diametr}х{CreatePZ.column_wall_thickness} в инт 0 - {CreatePZ.shoe_column}м ' \
+            if CreatePZ.column_additional is False else f'{CreatePZ.column_diametr} х {CreatePZ.column_wall_thickness} \n' \
+                                               f'0 - {CreatePZ.shoe_column}м/\n{CreatePZ.column_additional_diametr}' \
+                                               f' х {CreatePZ.column_additional_wall_thickness} в инт ' \
+                                                f'{CreatePZ.head_column_additional}-{CreatePZ.shoe_column_additional}м'
+        ws4.cell(row=1, column=7).value = column_well
+        ws4.cell(row=4, column=7).value = f'Пробур забой {CreatePZ.bottomhole_drill}м'
+        ws4.cell(row=5, column=7).value = f'Исск забой {CreatePZ.bottomhole_artificial}м'
+        ws4.cell(row=6, column=7).value = f'Тек забой {CreatePZ.bottom}м'
+
+
+        ws4.cell(row=7, column=7).value = plast_str
+        ws4.cell(row=11, column=7).value = f'Рмакс {CreatePZ.max_admissible_pressure}атм'
+        ws4.cell(row=3, column=2).value = plan_short
+        nek_str = ''
+        if len(CreatePZ.leakiness_interval) != 0:
+            for nek in CreatePZ.leakiness_interval["НЭК"]:
+                nek_str += f'{nek[0]}-{nek[1]} \n'
+
+        ws4.cell(row=3, column=7).value = nek_str
+
+        ws4.insert_rows(1, 2)
+        ws4.insert_cols(1, 2)
+        ws4.cell(row=2, column=3).value = 'Краткое содержание плана работ'
+        ws4.cell(row=2, column=3).font = Font(name='Arial', size=16, bold=True)
+
+        #объединение ячеек
+        ws4.merge_cells(start_row=2, start_column=3, end_row=2, end_column=9) # Объединение оглавления
+        ws4.merge_cells(start_row=5, start_column=3, end_row=7, end_column=3) # Объединение строк ГНО
+        ws4.merge_cells(start_row=4, start_column=5, end_row=4, end_column=6) # объединение по класси
+        ws4.merge_cells(start_row=3, start_column=9, end_row=4, end_column=9) # Объединение строк данных по колонну
+        ws4.merge_cells(start_row=9, start_column=9, end_row=12, end_column=9)
+        ws4.merge_cells(start_row=5, start_column=4, end_row=13, end_column=8)
+
+
+        for row_ind in range(3, 15):
+            ws4.row_dimensions[row_ind].height = 40
+            for col in range(3, 10):
+                if row_ind == 3:
+                    ws4.column_dimensions[get_column_letter(col)].width = 20
+
+                ws4.cell(row=row_ind, column=col).border = CreatePZ.thin_border
+                ws4.cell(row=row_ind, column=col).font = Font(name='Arial', size=13, bold=False)
+                ws4.cell(row=row_ind, column=col).alignment = Alignment(wrap_text=True, horizontal='left',
+                                                               vertical='center')
+        ws4.cell(row=5, column=4).font = Font(name='Arial', size=11, bold=False)
+        ws4.hide = True
+        ws4.page_setup.fitToPage = True
+        ws4.page_setup.fitToHeight = False
+
+        ws4.page_setup.fitToWidth = True
+        ws4.print_area = 'C2:I14'
+
 
     def true_set_Paker(self, depth):
         from open_pz import CreatePZ
@@ -1256,13 +1380,13 @@ class MyWindow(QMainWindow):
             depth = check_for_template[0]
 
             if any([interval[0] <= depth <= interval[1] for interval in CreatePZ.skm_interval]):
-                return depth
+                return int(depth)
             else:
                 false_question = QMessageBox.question(None, 'Проверка посадки пакера в интервал скреперования',
                                                      f'Проверка посадки показала пакер сажается не в интервал скреперования, '
                                                      f'Посадить ли пакер?')
                 if false_question == QMessageBox.StandardButton.Yes:
-                    return depth
+                    return int(depth)
                 else:
                     skm_question = QMessageBox.question(None, 'Скреперование',
                                                           f'добавить интервал скреперования {depth - 20} - {depth + 20}')
@@ -1273,7 +1397,7 @@ class MyWindow(QMainWindow):
                         for plast in CreatePZ.plast_all:
                             for interval in CreatePZ.dict_perforation[plast]['интервал']:
                                 perforating_intervals.append(list(interval))
-                        print(f'интервалы ПВР {perforating_intervals, CreatePZ.skm_interval}')
+                        # print(f'интервалы ПВР {perforating_intervals, CreatePZ.skm_interval}')
                         raid_str = raid(remove_overlapping_intervals(perforating_intervals))
                         for row in range(self.table_widget.rowCount()):
                             for column in range(self.table_widget.columnCount()):
@@ -1289,11 +1413,11 @@ class MyWindow(QMainWindow):
                                                                                f'{raid_str}м {" ".join(ind_value[ind_max:])}')
 
                                         self.table_widget.setItem(row, column, new_value)
-                        return depth
+                        return int(depth)
                     else:
-                        return depth
+                        return int(depth)
         else:
-            return depth
+            return int(depth)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

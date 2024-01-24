@@ -44,13 +44,18 @@ def kompress(self):
     if CreatePZ.column_additional == False or CreatePZ.column_additional == True and voronka_depth < CreatePZ.head_column_additional:
         paker_select = f'воронку + НКТ{nkt_diam} {round(voronka_depth-mufta1)}м + ПМ с отв 3мм + НКТ{nkt_diam} {round(mufta1-mufta2)}м ' \
                        f'+ ПМ с отв 2мм НКТ{nkt_diam} {round(mufta2-mufta3)}м + ПМ с отв 2мм '
+        paker_short = f'в-ку + НКТ{nkt_diam} {round(voronka_depth - mufta1)}м + ПМ с отв 3мм + НКТ{nkt_diam} {round(mufta1 - mufta2)}м ' \
+                       f'+ ПМ с отв 2мм НКТ{nkt_diam} {round(mufta2 - mufta3)}м + ПМ с отв 2мм '
         dict_nkt = {73: voronka_depth}
     elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr < 110 and voronka_depth > CreatePZ.head_column_additional:
-        paker_select = f'воронку + НКТ{60}мм  + НКТ60мм 10м '
+        paker_select = f'в-ку + НКТ{60} {round(voronka_depth - mufta1)}м + ПМ с отв 3мм + НКТ{nkt_diam} {round(mufta1 - mufta2)}м ' \
+                       f'+ ПМ с отв 2мм НКТ{60} {round(mufta2 - mufta3)}м + ПМ с отв 2мм '
+        paker_short = f'в-ку + НКТ{60} {round(voronka_depth - mufta1)}м + ПМ с отв 3мм + НКТ{nkt_diam} {round(mufta1 - mufta2)}м ' \
+                       f'+ ПМ с отв 2мм НКТ{60} {round(mufta2 - mufta3)}м + ПМ с отв 2мм '
         dict_nkt = {73: CreatePZ.head_column_additional, 60: int(voronka_depth - CreatePZ.head_column_additional)}
 
     paker_list = [
-        [None, None,
+        [f'СПО {paker_short} на НКТ{nkt_diam}мм  воронкой до {voronka_depth}м Пусковые муфты на глубине {mufta1}м, {mufta2}м, {mufta3}м', None,
          f'Спустить {paker_select} на НКТ{nkt_diam}мм  воронкой до {voronka_depth}м'
          f' с замером, шаблонированием шаблоном. Пусковые муфты на глубине {mufta1}м, {mufta2}м, {mufta3}м,',
          None, None, None, None, None, None, None,
@@ -70,7 +75,7 @@ def kompress(self):
          f'сигналу "выброс" с записью в журнале проведения учебных тревог',
          None, None, None, None, None, None, None,
          'Мастер КРС, подрядчик по ГИС', 1.2],
-        [None, None,
+        [f'Компрессирование', None,
          swab_select,
          None, None, None, None, None, None, None,
          'мастер КРС, подрядчика по ГИС', 30],
@@ -80,7 +85,7 @@ def kompress(self):
          None, None, None, None, None, None, None,
          'Мастер КРС, подрядчик по ГИС', None],
 
-        [None, None,
+        [f'Промывка скважины  не менее {round(well_volume() * 1.5, 1)}м3', None,
          f' При наличии избыточного давления: '
          f'произвести промывку скважину обратной промывкой ' \
          f'по круговой циркуляции  жидкостью уд.весом {CreatePZ.fluid_work} при расходе жидкости не ' \
@@ -88,8 +93,9 @@ def kompress(self):
          f'в присутствии представителя заказчика ДО ЧИСТОЙ ВОДЫ.Составить акт.',
          None, None, None, None, None, None, None,
          'Мастер КРС', well_volume_norm(well_volume())],
-        [None, None,
-         f'Перед подъемом подземного оборудования, после проведённых работ по освоениювыполнить снятие КВУ в '
+        [f'выполнить снятие КВУ в течение часа с интервалом 15 минут',
+         None,
+         f'Перед подъемом подземного оборудования, после проведённых работ по освоению выполнить снятие КВУ в '
          f'течение часа с интервалом 15 минут для определения стабильного стистатического уровня в скважине. '
          f'При подъеме уровня в скважине и образовании избыточного давления наустье, выполнить замер пластового давления '
          f'или вычислить его расчетным методом.',

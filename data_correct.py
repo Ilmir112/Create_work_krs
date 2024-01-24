@@ -33,6 +33,11 @@ class TabPage_SO(QWidget):
         super().__init__(parent)
         from open_pz import CreatePZ
 
+        self.labels_nkt = {}
+        self.labels_nkt_po = {}
+        self.labels_sucker = {}
+        self.labels_sucker_po = {}
+
         self.columnLabel = QLabel("диаметр ЭК", self)
         self.columnType = FloatLineEdit(self)
         self.columnType.setText(f"{self.ifNone(CreatePZ.column_diametr)}")
@@ -156,15 +161,16 @@ class TabPage_SO(QWidget):
 
         self.paker2_depth_do_Label = QLabel('Глубина спуска пакера')
         self.paker2_depth_do_EditType = FloatLineEdit(self)
-        self.paker2_depth_do_EditType.setText(self.ifNone(str(CreatePZ.H_F_paker2_do["do"])))
+        self.paker2_depth_do_EditType.setText(str(self.ifNone(str(CreatePZ.H_F_paker2_do["do"]))))
 
         self.paker2_posle_Label = QLabel('пакер на спуск')
         self.paker2_posle_EditType = QLineEdit(self)
+        # print(self.ifNone(CreatePZ.paker2_do["posle"]))
         self.paker2_posle_EditType.setText(self.ifNone(CreatePZ.paker2_do["posle"]))
 
         self.paker2_depth_posle_Label = QLabel('Глубина спуска пакера')
         self.paker2_depth_posle_EditType = FloatLineEdit(self)
-        self.paker2_depth_posle_EditType.setText(self.ifNone(str(CreatePZ.H_F_paker2_do["posle"])))
+        self.paker2_depth_posle_EditType.setText(str(self.ifNone(str(CreatePZ.H_F_paker2_do["posle"]))))
         # print(f' насос спуск {CreatePZ.dict_pump["posle"]}')
 
         self.static_level_Label = QLabel('Статический уровень в скважине')
@@ -174,6 +180,22 @@ class TabPage_SO(QWidget):
         self.dinamic_level_Label = QLabel('Динамический уровень в скважине')
         self.dinamic_level_EditType = FloatLineEdit(self)
         self.dinamic_level_EditType.setText(str(self.ifNone(CreatePZ.dinamic_level)))
+
+        self.nkt_do_label = QLabel('НКТ  до ремонта')
+        self.nkt_posle_label = QLabel('НКТ плановое согласно расчета')
+
+        self.sucker_rod_label = QLabel('Штанги  до ремонта')
+        self.sucker_rod_po_label = QLabel('Штанги плановое согласно расчета')
+
+        dict_nkt = CreatePZ.dict_nkt
+        dict_nkt_po = CreatePZ.dict_nkt_po
+        dict_sucker_rod = CreatePZ.dict_sucker_rod
+        dict_sucker_rod_po = CreatePZ.dict_sucker_rod_po
+        print(f'словарь НКТ {CreatePZ.dict_nkt}')
+        print(f'словарь {CreatePZ.dict_nkt_po}')
+        print(f'словарь НКТ {dict_sucker_rod }')
+        print(f'словарь {dict_sucker_rod }')
+
 
 
         grid = QGridLayout(self)
@@ -248,14 +270,101 @@ class TabPage_SO(QWidget):
         grid.addWidget(self.dinamic_level_Label, 12, 3)
         grid.addWidget(self.dinamic_level_EditType, 13, 3)
 
+        grid.addWidget(self.nkt_do_label, 14, 1)
+        grid.addWidget(self.nkt_posle_label, 14, 5)
+
+        grid.addWidget(self.sucker_rod_label, 19, 1)
+        grid.addWidget(self.sucker_rod_po_label, 19, 5)
+
+        # добавление строк с НКТ спущенных
+        n = 1
+        for nkt, lenght in dict_nkt.items():
+            print(f'штанги {nkt, lenght}')
+            nkt_line_edit = QLineEdit(self)
+            nkt_line_edit.setText(str(self.ifNone(nkt)))
+
+            lenght_line_edit = QLineEdit(self)
+            lenght_line_edit.setText(str(self.ifNone(lenght)))
+
+            grid.addWidget(nkt_line_edit, 14+n, 1)
+            grid.addWidget(lenght_line_edit, 14+n, 2)
+
+            # Переименование атрибута
+            setattr(self, f"{nkt}_{n}_line", nkt_line_edit)
+            setattr(self, f"{lenght}_{n}_line", lenght_line_edit)
+
+            self.labels_nkt[nkt] = (nkt_line_edit, lenght_line_edit)
+            n += 1
+        # добавление строк с штанг спущенных
+        n = 1
+        for sucker, lenght in dict_sucker_rod.items():
+            print(f'штанги {sucker, lenght}')
+
+            sucker_rod_line_edit = QLineEdit(self)
+            sucker_rod_line_edit.setText(str(self.ifNone(sucker)))
+
+            lenght_sucker_line_edit = QLineEdit(self)
+            lenght_sucker_line_edit.setText(str(self.ifNone(lenght)))
+
+            grid.addWidget(sucker_rod_line_edit, 19 + n, 1)
+            grid.addWidget(lenght_sucker_line_edit, 19 + n, 2)
+
+            # Переименование атрибута
+            setattr(self, f"{sucker}_{n}_line", sucker_rod_line_edit)
+            setattr(self, f"{lenght}_{n}_line", lenght_sucker_line_edit)
+
+            self.labels_sucker[sucker] = (sucker_rod_line_edit, lenght_sucker_line_edit)
+            n += 1
+
+        # добавление строк с НКТ плановых
+        n = 1
+        for nkt_po, lenght_po in dict_nkt_po.items():
+            print(f'НКТ план {nkt_po, lenght_po}')
+
+            nkt_po_line_edit = QLineEdit(self)
+            nkt_po_line_edit.setText(str(self.ifNone(nkt_po)))
+
+            lenght_po_line_edit = QLineEdit(self)
+            lenght_po_line_edit.setText(str(self.ifNone(lenght_po)))
+
+            grid.addWidget(nkt_po_line_edit, 14 + n, 5)
+            grid.addWidget(lenght_po_line_edit, 14 + n, 6)
+
+            # Переименование атрибута
+            setattr(self, f"{nkt_po}_{n}_line", nkt_po_line_edit)
+            setattr(self, f"{lenght_po}_{n}_line", lenght_po_line_edit)
+
+            self.labels_nkt_po[nkt_po] = (nkt_po_line_edit, lenght_po_line_edit)
+            n += 1
+
+        # добавление строк с штангами плановых
+
+        n = 1
+        for sucker_po, lenght_po in dict_sucker_rod_po.items():
+            print(f'штанги план {sucker_po, lenght_po}')
+            sucker_rod_po_line_edit = QLineEdit(self)
+            sucker_rod_po_line_edit.setText(str(self.ifNone(sucker_po)))
+
+            lenght_sucker_po_line_edit = QLineEdit(self)
+            lenght_sucker_po_line_edit.setText(str(self.ifNone(lenght_po)))
+
+            grid.addWidget(sucker_rod_po_line_edit, 19 + n, 5)
+            grid.addWidget(lenght_sucker_po_line_edit, 19 + n, 6)
+
+            # Переименование атрибута
+            setattr(self, f"{sucker}_{n}_line", sucker_rod_po_line_edit)
+            setattr(self, f"{lenght}_{n}_line", lenght_sucker_po_line_edit)
+
+            self.labels_sucker_po[sucker] = (sucker_rod_po_line_edit, lenght_sucker_po_line_edit)
+            n += 1
+
     def ifNone(self, string):
-        if str(string) != '0':
-            return string
+        if str(string) in ['0', str(None), '-']:
+            return 'отсут'
         # elif str(string).replace('.', '').replace(',', '').isdigit():
         #     return float(string)
-
         else:
-            return 'отсут'
+            return str(string)
     def updateLabel(self):
         # self.dinamic_level_Label
         self.columnType.setText()
@@ -272,7 +381,7 @@ class TabWidget(QTabWidget):
 
 class DataWindow(MyWindow):
 
-    def __init__(self, parent=None):
+    def __init__(self, labels_nkt, parent=None):
         super(DataWindow, self).__init__()
 
         self.centralWidget = QWidget()
@@ -281,6 +390,7 @@ class DataWindow(MyWindow):
 
         self.tabWidget = TabWidget()
         # self.tableWidget = QTableWidget(0, 4)
+        self.labels_nkt = labels_nkt
 
         self.buttonAdd = QPushButton('сохранить данные')
         self.buttonAdd.clicked.connect(self.addRowTable)
@@ -337,6 +447,15 @@ class DataWindow(MyWindow):
 
         static_level = self.tabWidget.currentWidget().static_level_EditType.text()
         dinamic_level = self.tabWidget.currentWidget().dinamic_level_EditType.text()
+
+
+
+        print(f' словарь лабел {self.tabWidget.currentWidget().labels_nkt_po["73"][1].text()}')
+        # = {},
+        # self.labels_nkt_po = {}
+        # self.labels_sucker = {}
+        # self.labels_sucker_po = {})
+
 
         # print(any(['ЭЦН' in dict_pump_ECN_posle.upper(), 'ВНН' in dict_pump_ECN_posle.upper(),
         #                 dict_pump_ECN_posle == 'отсут']))
@@ -428,15 +547,18 @@ class DataWindow(MyWindow):
             self.close()
 
 
-    
+
     def if_None(self, value):
-        
+
         if value is None or 'отс' in str(value).lower() or value == '-' or str(value) == '0':
             return '0'
         elif isinstance(value, int):
             return int(value)
         elif str(value).replace('.','').replace(',','').isdigit():
-            return round(float(value.replace(',','.')), 1)
+            if str(round(float(value), 1))[-1] == '0':
+                return int(float(value.replace(',','.')))
+            else:
+                return round(float(value.replace(',','.')), 1)
         else:
             return value
     def ifNum(self, string):

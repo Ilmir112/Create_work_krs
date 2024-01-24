@@ -21,7 +21,7 @@ def delete_rows_pz(self, ws):
     for key, value in boundaries_dict.items():
         ws.unmerge_cells(start_column=value[0], start_row=value[1],
                          end_column=value[2], end_row=value[3])
-    print(f'индекс удаления {1, CreatePZ.cat_well_min - 1} ,  {CreatePZ.data_well_max + 2, ws.max_row - CreatePZ.data_well_max}')
+    print(f'индекс удаления {1, CreatePZ.cat_well_min - 1} , {CreatePZ.data_well_max + 2, ws.max_row - CreatePZ.data_well_max}')
 
     ws.delete_rows(CreatePZ.data_x_max, ws.max_row - CreatePZ.data_x_max)
 

@@ -18,7 +18,7 @@ def gnkt_work(self):
         fluid_work = f'{fluid_work_insert}г/см3 '
 
     gnkt_opz =[
-     [None,  None, 'Порядок работы', None, None, None, None, None, None, None, None, None],
+     [None, None, 'Порядок работы', None, None, None, None, None, None, None, None, None],
         [None, 'п/п', 'Наименование работ', None, None, None, None, None, None, None,
          'Ответственный', 'Нормы'],
      [None,
@@ -86,7 +86,7 @@ def gnkt_work(self):
              'Мастер ГНКТ, состав бригады, представит. Заказчика', 2],
     [None, 14, f'Ограничения веса и скоростей при СПО',
         None, None, None, None, None, None, None,
-            'Мастер ГНКТ,  состав бригады, представитель Заказчика', None,],
+            'Мастер ГНКТ, состав бригады, представитель Заказчика', None,],
     [None, 15, f'СПУСК ГНКТ В СКВАЖИНУ',
          None, None, None, None, None, None, None,
             None, None],

@@ -8,6 +8,7 @@ def sand_select(self):
     from open_pz import CreatePZ
     if CreatePZ.column_additional == False or (CreatePZ.column_additional == True and CreatePZ.current_bottom <= CreatePZ.head_column_additional):
         sand_select = f'перо +  НКТ{CreatePZ.nkt_diam}мм 20м + реперный патрубок'
+
     elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr < 110 and CreatePZ.current_bottom >= CreatePZ.head_column_additional:
         sand_select = f'перо + НКТ{60}мм 20м + реперный патрубок + НКТ60мм {round(CreatePZ.current_bottom - CreatePZ.head_column_additional, 0)}м '
     elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr > 110 and CreatePZ.current_bottom >= CreatePZ.head_column_additional:
@@ -29,17 +30,19 @@ def sandFilling(self):
 
 
     filling_list = [
-        [None, None,
+        [f'Спустить  {sand_select(self)}  на НКТ{nkt_diam}мм до глубины {round(CreatePZ.current_bottom-100,0)}м', None,
      f' Спустить  {sand_select(self)}  на НКТ{nkt_diam}мм до глубины {round(CreatePZ.current_bottom-100,0)}м с замером, шаблонированием шаблоном. (При СПО первых десяти НКТ на '
      f'спайдере дополнительно устанавливать элеватор ЭХЛ)',
      None, None, None, None, None, None, None,
      'Мастер КР', descentNKT_norm(CreatePZ.current_bottom,1)],
-        [None, None, f'Произвести отсыпку кварцевым песком в инт. {filling_depth} - {CreatePZ.current_bottom} '
+        [f'отсыпка кварцевым песком в инт. {filling_depth} - {CreatePZ.current_bottom} в объеме {sand_volume}л',
+         None, f'Произвести отсыпку кварцевым песком в инт. {filling_depth} - {CreatePZ.current_bottom} '
                      f' в объеме {sand_volume}л '
                      f'Закачать в НКТ кварцевый песок  с доводкой тех.жидкостью {CreatePZ.fluid_work}',
          None, None, None, None, None, None, None,
          'мастер КРС', 3.5],
-        [None, None, f'Ожидание оседания песка 4 часа.',
+        [f'Ожидание оседания песка 4 часа.',
+         None, f'Ожидание оседания песка 4 часа.',
          None, None, None, None, None, None, None,
          'мастер КРС', 4],
         [None, None, f'Допустить компоновку с замером и шаблонированием НКТ до кровли песчаного моста (плановый забой - {filling_depth}м).'
@@ -49,14 +52,14 @@ def sandFilling(self):
         [None, None,
          f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС "Ойл-сервис". При необходимости '
          f'подготовить место для установки партии ГИС напротив мостков. Произвести  монтаж ГИС согласно схемы  №8 при '
-         f'привязке утвержденной главным инженером от  14.10.2021г.',
+         f'привязке утвержденной главным инженером оТ 14.10.2021г.',
          None, None, None, None, None, None, None,
          'мастер КРС', None],
-        [None, None,
+        [f'Привязка ', None,
          f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины',
          None, None, None, None, None, None, None,
          'Мастер КРС, подрядчик по ГИС', 4],
-        [None, None,
+        [f'Определение кровли', None,
          f'В случае если кровля песчаного моста на гл.{filling_depth}м дальнейшие работы продолжить дальше по плану'
          f'В случае пеcчаного моста ниже гл.{filling_depth}м работы повторить с корректировкой обьема и технологических глубин.'
          f' В случае песчаного моста выше гл.{filling_depth}м вымыть песок до гл.{filling_depth}м',
@@ -68,12 +71,17 @@ def sandFilling(self):
          'мастер КРС', liftingNKT_norm(filling_depth,1)]
     ]
     if CreatePZ.leakiness == False and CreatePZ.perforation_roof > filling_depth:
-        filling_list.insert(-1, [None, None, f'Опрессовать эксплуатационную колонну в интервале {filling_depth}-0м на Р={CreatePZ.max_admissible_pressure}атм'
-                     f' в течение 30 минут  в присутствии представителя заказчика, составить акт.  '
-                     f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ)',
+        filling_list.insert(-1,
+                            [f'Опрессовать в инт{filling_depth}-0м на Р={CreatePZ.max_admissible_pressure}атм',
+                             None, f'Опрессовать эксплуатационную колонну в интервале {filling_depth}-0м на'
+                                   f'Р={CreatePZ.max_admissible_pressure}атм'
+                     f' в течение 30 минуТ в присутствии представителя заказчика, составить акт. '
+                     f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа'
+                                   f' до начала работ)',
          None, None, None, None, None, None, None,
          'мастер КРС, предст. заказчика', 0.67])
-        filling_list.insert(-1, [None, None,
+        filling_list.insert(-1,
+                            [None, None,
                      f'В случае негерметичности э/к, по согласованию с заказчиком произвести ОТСЭК для определения интервала '
                      f'негерметичности эксплуатационной колонны с точностью до одного НКТ или запись РГД, ВЧТ с '
                      f'целью определения места нарушения в присутствии представителя заказчика, составить акт. '
@@ -105,13 +113,14 @@ def sandWashing(self):
                                                 'Введите глубину вымыва песчанного моста',
                                                 int(CreatePZ.perforation_roof - 20), 0, 3500)
     washingOut_list = [
-        [None, None,
+        [f'СПО пера до {round(CreatePZ.current_bottom,0)}м', None,
      f' Спустить  {sand_select(self)}  на НКТ{nkt_diam}мм до глубины {round(CreatePZ.current_bottom,0)}м с замером, шаблонированием шаблоном. '
      f'(При СПО первых десяти НКТ на '
      f'спайдере дополнительно устанавливать элеватор ЭХЛ)',
      None, None, None, None, None, None, None,
      'Мастер КР', descentNKT_norm(CreatePZ.current_bottom, 1)],
-        [None, None, f'Произвести нормализацию забоя (вымыв кварцевого песка) с наращиванием, комбинированной  промывкой по круговой циркуляции '
+        [f'вымыв песка до {washingDepth}м',
+         None, f'Произвести нормализацию забоя (вымыв кварцевого песка) с наращиванием, комбинированной  промывкой по круговой циркуляции '
                      f'жидкостью  с расходом жидкости не менее 8 л/с до гл.{washingDepth}м. \n'
                      f'Тех отстой 2ч. Повторное определение текущего забоя, при необходимости повторно вымыть.',
          None, None, None, None, None, None, None,

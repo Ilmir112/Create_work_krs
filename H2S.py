@@ -26,12 +26,12 @@ def calc_H2S(ws3, H2S_pr, H2S_mg):
         print(nkt_l)
         if CreatePZ.column_additional == True:
 
-            gno_well = 3.14*(CreatePZ.column_diametr-CreatePZ.column_wall_thickness*2)**2/4/1000*(CreatePZ.current_bottom-CreatePZ.head_column_additional)/1000/10
+            gno_well = 3.14*(CreatePZ.column_diametr-CreatePZ.column_wall_thickness*2)**2/4/1000*(CreatePZ.bottom-CreatePZ.head_column_additional)/1000/10
         else:
             if nkt_l < CreatePZ.shoe_column:
-                gno_well = (3.14*(CreatePZ.column_diametr-CreatePZ.column_wall_thickness*2)**2/4/1000*(CreatePZ.current_bottom- CreatePZ.head_column_additional)/1000)+(3.14*(CreatePZ.column_diametr-CreatePZ.column_wall_thickness*2)**2/4/1000*(CreatePZ.shoe_column-nkt_l)/1000)
+                gno_well = (3.14*(CreatePZ.column_diametr-CreatePZ.column_wall_thickness*2)**2/4/1000*(CreatePZ.bottom- CreatePZ.head_column_additional)/1000)+(3.14*(CreatePZ.column_diametr-CreatePZ.column_wall_thickness*2)**2/4/1000*(CreatePZ.shoe_column-nkt_l)/1000)
             else:
-                gno_well = 3.14*(CreatePZ.column_additional_diametr-CreatePZ.column_additional_wall_thickness*2)**2/4/1000*(CreatePZ.current_bottom-nkt_1_l)/10000
+                gno_well = 3.14*(CreatePZ.column_additional_diametr-CreatePZ.column_additional_wall_thickness*2)**2/4/1000*(CreatePZ.bottom-nkt_1_l)/10000
 
         return gno_well
 
@@ -62,7 +62,7 @@ def calc_H2S(ws3, H2S_pr, H2S_mg):
         [None, '№', 'Параметр', None, 'Результат расчета', None],
         [None, 1, 'Параметры скважины', None, f'{CreatePZ.well_number} {CreatePZ.well_area}', None],
         [None, 1.1, 'Забой скважины', 'м', float(CreatePZ.bottomhole_artificial), 'формула'],
-        [None, 1.2, 'текущий забой', 'м', float(CreatePZ.current_bottom), 'ввод'],
+        [None, 1.2, 'текущий забой', 'м', float(CreatePZ.bottom), 'ввод'],
         [None, 1.3, 'Диаметр ЭК (ступень 1 верхняя)', 'мм', int(CreatePZ.column_diametr), 'ввод'],
             [None, '1.3.1.', 'Толщина стенки ЭК (ступень 1 верхняя)', 'мм', float(CreatePZ.column_wall_thickness), 'ввод'],
         [None, '1.3.2.', 'Длина подвески ЭК (ступень 1 верхняя)', 'м', int(CreatePZ.shoe_column), 'ввод'],
@@ -96,7 +96,7 @@ def calc_H2S(ws3, H2S_pr, H2S_mg):
         [None, '3.3.1.', 'Удельное водоизмещение подвески НКТ (ступень 1 верхняя)', 'дм3/м',
          '=10*3.14*((E21*0.01)^2-(E21*0.01-E20*2*0.01)^2)/4',
          'формула'],
-        [None, '3.3.2.', 'Удельное водоизмещение подвески НКТ  (ступень 2 нижняя)', 'дм3/м',
+        [None, '3.3.2.', 'Удельное водоизмещение подвески НКТ (ступень 2 нижняя)', 'дм3/м',
          '=10*3.14*((E24*0.01)^2-(E24*0.01-E23*2*0.01)^2)/4', 'формула',],
         [None, '3.3.3.', 'Водоизмещение подвески НКТ (объем жидкости притока при СПО)', 'м3/СПО',
          '=(E22*E35/1000) +(E25*E36/1000)', 'формула'],
@@ -194,7 +194,7 @@ def well_volume(self):
                                   3.14 * (CreatePZ.column_diametr - CreatePZ.column_wall_thickness * 2) ** 2 / 4 / 1000 * (
                               CreatePZ.head_column_additional) / 1000)
         return volume_well
-def calv_h2s(self, cat_H2S:int, H2S_mg: float, H2S_pr:float):
+def calv_h2s(self, cat_H2S, H2S_mg, H2S_pr):
 
     from open_pz import CreatePZ
     if '2' == str(cat_H2S) or '1' in str(cat_H2S):

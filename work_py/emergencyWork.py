@@ -34,7 +34,9 @@ def sbt_select(self):
 def magnetWork(self):
     from open_pz import CreatePZ
     magnet_list = [
-        [None, None,
+        [f'СПО МАгниТ до '
+         f'глубины {CreatePZ.current_bottom}м',
+         None,
          f'Спустить магнит-ловитель + опрессовочное седло  +{magnet_select(self)} на тНКТ{CreatePZ.nkt_diam}мм до '
          f'глубины {CreatePZ.current_bottom}м с замером, шаблонированием '
          f'шаблоном. Опрессовать НКТ на 150атм. Вымыть шар. \n'
@@ -70,7 +72,7 @@ def emergencyECN(self):
                        f'Составить акт готовности скважины и передать его начальнику партии  ',
                        None, None, None, None, None, None, None,
                        'мастер КРС', None],
-                      [None, None,
+                      [f'Произвести запись ПО по НКТ', None,
                        f'Произвести запись ПО по НКТ, по результатам произвести отстрел тНКТ в внемуфтовое соединие в '
                        f'интервале согласованном с УСРСиСТ. Поднять аварийные НКТ до устья. ЗАДАЧА 2.9.3. \n'
                        f'При выявлении отложений солей и гипса, отобрать шлам. Сдать в лабораторию для проведения хим. '
@@ -82,7 +84,7 @@ def emergencyECN(self):
                        f'Сдать в лабораторию для проведения хим. анализа.',
                        None, None, None, None, None, None, None,
                        'мастер КРС', 6.5],
-                      [None, None,
+                      [f'Завоз на скважину СБТ', None,
                        f'Завоз на скважину СБТф73мм – Укладка труб на стеллажи.',
                        None, None, None, None, None, None, None,
                        'мастер КРС', 6.5],
@@ -100,7 +102,7 @@ def emergencyNKT(self):
     emergenceBottom, ok = QInputDialog.getDouble(self, 'Аварийный забой',
                                                  'Введите глубину аварийного забоя:', int(CreatePZ.current_bottom), 2,
                                                  int(CreatePZ.bottomhole_drill), 1)
-    emergencyNKT_list = [[None, None,
+    emergencyNKT_list = [[f'СПо печати до Н={emergenceBottom}м', None,
                           f'Спустить с замером торцевую печать {magnet_select(self)} до Н={emergenceBottom}м '
                           f'(Аварийная голова) с замером.'
                           f' (При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ) ',
@@ -143,7 +145,7 @@ def emergencyNKT(self):
 def emergency_hook(self):
     from open_pz import CreatePZ
 
-    emergency_list = [[None, None,
+    emergency_list = [[f'СПо кряючка', None,
                        f'Спустить с замером  удочка ловильная либо крючок (типоразмер согласовать с аварийной службой '
                        f'супервайзинга)'
                        f' на НКТ до "головы" аварийной компоновки, с замером длины труб. (При СПО первых десяти НКТ'
@@ -174,7 +176,7 @@ def emergency_hook(self):
 
 def emergence_sbt(self):
     from open_pz import CreatePZ
-    emergence_sbt = [[None, None,
+    emergence_sbt = [[f'СПО ловильного оборудования ', None,
                       f' По согласованию с аварийной службой УСРСиСТ, сборка и спуск компоновки: ловильного инструмента '
                       f'(типоразмер согласовать с аварийной службой УСРСиСТ) + удлинитель (L=2м) + БП {sbt_select(self)} '
                       f'на СБТ 2 7/8 до глубины нахождения аварийной головы. \n '
@@ -186,7 +188,7 @@ def emergence_sbt(self):
                       f'следует производить без вращения труболовки',
                       None, None, None, None, None, None, None,
                       'мастер КРС', None],
-                     [None, None,
+                     [f'монтаж ведущей трубы', None,
                       f'Произвести монтаж ведущей трубы и мех.ротора.\n '
                       f'За 2-5 метров до верхнего конца аварийного объекта при наличии циркуляции рекомендуется '
                       f'восстановить '
@@ -256,7 +258,7 @@ def emergency_sticking(self):
          f'Составить акт готовности скважины и передать его начальнику партии',
          None, None, None, None, None, None, None,
          'Мастер, подрядчик по ГИС', None],
-        [None, None,
+        [f' Запись ПО', None,
          f'Произвести запись по определению прихвата по НКТ',
          None, None, None, None, None, None, None,
          'Мастер, подрядчик по ГИС', 8],
@@ -271,7 +273,7 @@ def emergency_sticking(self):
          f'Сдать в лабораторию для проведения хим. анализа.',
          None, None, None, None, None, None, None,
          'Мастер КРС', liftingNKT_norm(CreatePZ.dict_nkt, 1.2)],
-        [None, None,
+        [f'Завоз на скважину СБТ', None,
          f'Завоз на скважину СБТ – Укладка труб на стеллажи.',
          None, None, None, None, None, None, None,
          'Мастер', None],
@@ -286,7 +288,7 @@ def emergency_sticking(self):
         for row in emergency_hook(self):
             emergency_list.append(row)
 
-    seal_list = [[None, None,
+    seal_list = [[f'СПо печати', None,
                   f'Спустить с замером торцевую печать {magnet_select(self)} до аварийная головы с замером.'
                   f' (При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ) ',
                   None, None, None, None, None, None, None,
@@ -322,7 +324,7 @@ def emergency_sticking(self):
 def lapel_tubing(self):
     from open_pz import CreatePZ
 
-    emergency_list = [[None, None,
+    emergency_list = [[f'Завоз на скважину СБТл', None,
                        f'Завоз на скважину СБТл – Укладка труб на стеллажи.',
                        None, None, None, None, None, None, None,
                        'Мастер', None],
@@ -331,7 +333,7 @@ def lapel_tubing(self):
                        f' Овершот, Внутренние труболовки',
                        None, None, None, None, None, None, None,
                        'Мастер', None],
-                      [None, None,
+                      [f'СПО лов.инстр', None,
                        f' По согласованию с аварийной службой УСРСиСТ, сборка и спуск компоновки: ловильного инструмента '
                        f'(типоразмер согласовать с аварийной службой УСРСиСТ) + '
                        f'удлинитель (L=2м) + БП {sbt_select(self)} '
@@ -339,7 +341,7 @@ def lapel_tubing(self):
                        f'Включение в компоновку ударной компоновки дополнительно согласовать с УСРСиСТ',
                        None, None, None, None, None, None, None,
                        'мастер КРС', descentNKT_norm(CreatePZ.current_bottom, 1)],
-                      [None, None,
+                      [f'монтаж ведущей трубы и мех.ротора', None,
                        f'Произвести монтаж ведущей трубы и мех.ротора.\n '
                        f'За 2-5 метров до верхнего конца аварийного объекта рекомендуется восстановить циркуляцию и '
                        f'промыть скважину тех водой {CreatePZ.fluid_work}. При прокачке промывочной жидкости спустить '
@@ -348,7 +350,7 @@ def lapel_tubing(self):
                        f'инструмента  согласовать с аварийной службой супервайзинга.',
                        None, None, None, None, None, None, None,
                        'мастер КРС, УСРСиСТ', 4.5],
-                      [None, None,
+                      [f'Произвести искусственный отворот ', None,
                        f'Произвести натяжение колонны для заклинивания плашек, затем снизить растягивающую нагрузку на '
                        f'труболовку до значений расчетного веса аварийной компоновки. \n'
                        f'Произвести искусственный отворот '

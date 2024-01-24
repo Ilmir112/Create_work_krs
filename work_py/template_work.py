@@ -172,17 +172,21 @@ def template_ek_without_skm(self):
          f'пространство. Реагирование 2 часа.',
          None, None, None, None, None, None, None,
          'Мастер КРС, предст. заказчика', 4],
-        [None, None, f'При необходимости нормализовать забой обратной промывкой тех жидкостью уд.весом '
+        [f'Нормализовать до глубины {CreatePZ.current_bottom}м.',
+         None, f'При необходимости нормализовать забой обратной промывкой тех жидкостью уд.весом '
                      f'{CreatePZ.fluid_work} до глубины {CreatePZ.current_bottom}м.', None, None, None, None, None,
          None, None,
          'Мастер КРС', None],
-        [None, None,
+        [f'Промыть в объеме {round(well_volume() * 1.5, 1)}м3',
+         None,
          f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {CreatePZ.fluid_work}  при расходе жидкости 6-8 л/сек '
          f'в присутствии представителя Заказчика в объеме {round(well_volume() * 1.5, 1)}м3. ПРИ ПРОМЫВКЕ НЕ ПРЕВЫШАТЬ ДАВЛЕНИЕ {CreatePZ.max_admissible_pressure}АТМ, ДОПУСТИМАЯ ОСЕВАЯ НАГРУЗКА НА ИНСТРУМЕНТ: 0,5-1,0 ТН',
          None, None, None, None, None, None, None,
          'Мастер КРС, представитель ЦДНГ', well_volume_norm(well_volume() * 1.5)],
-        [None, None,
-         f'Приподнять до глубины {CreatePZ.current_bottom - 20}м. Тех отстой 2ч. Определение текущего забоя, при необходимости повторная промывка.',
+        [f'Приподнять до глубины {CreatePZ.current_bottom - 20}м. Тех отстой 2ч. Определение текущего забоя',
+         None,
+         f'Приподнять до глубины {CreatePZ.current_bottom - 20}м. Тех отстой 2ч. Определение текущего забоя, при '
+         f'необходимости повторная промывка.',
          None, None, None, None, None, None, None,
          'Мастер КРС, представитель ЦДНГ', 2.49],
         [None, None,
@@ -206,8 +210,8 @@ def template_ek_without_skm(self):
                   [None, None,
                    f'ПРИМЕЧАНИЕ №2: При отсутствия планового текущего забоя произвести СПО забойного двигателя с долотом {temlate_ek};'
                    f' {temlate_ek - 2}; {temlate_ek - 4}мм  фрезера-{temlate_ek}мм, райбера-{temlate_ek + 1}мм и другого оборудования и '
-                   f'инструмента, (при необходимости  ловильного),  при необходимости на СБТ для восстановления проходимости ствола  '
-                   f'и забоя скважины с применением мех.ротора,  до текущего забоя с последующей нормализацией до планового '
+                   f'инструмента, (при необходимости  ловильного), при необходимости на СБТ для восстановления проходимости ствола  '
+                   f'и забоя скважины с применением мех.ротора, до текущего забоя с последующей нормализацией до планового '
                    f'текущего забоя. Подъем долота с забойным двигателем на  ТНКТ с гл.{CreatePZ.current_bottom}м вести с доливом '
                    f'скважины до устья т/ж удел.весом {CreatePZ.fluid_work} в объеме {round(CreatePZ.current_bottom * 1.12 / 1000, 1)}м3',
                    None, None, None, None, None, None, None, 'Мастер КРС',
@@ -232,7 +236,8 @@ def template_ek_without_skm(self):
                    f' вести с доливом скважины до устья т/ж удел.весом {CreatePZ.fluid_work} в объеме {round(CreatePZ.current_bottom * 1.12 / 1000, 1)}м3',
                    None, None, None, None, None, None, None, 'Мастер КРС', None, None]]
 
-    privyazka_nkt = [None, None,
+    privyazka_nkt = [f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины. По привязому НКТ '
+                     f'удостовериться в наличии', None,
                      f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС "Ойл-сервис".'
                      f' ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины. По привязому НКТ удостовериться в наличии'
                      f'текущего забоя с плановым, при необходимости нормализовать забой обратной промывкой тех жидкостью '
@@ -244,19 +249,22 @@ def template_ek_without_skm(self):
                                                   f'зумпф составляет {int(CreatePZ.current_bottom - CreatePZ.perforation_sole)}м '
                                                   f'нужно ли привязывать компоновку?'
                                                   )
-        if privyazka_question is QMessageBox.StandardButton.Yes:
+        if privyazka_question == QMessageBox.StandardButton.Yes:
             list_template_ek.insert(-1, privyazka_nkt)
+
+    if float(CreatePZ.static_level) > 700:
+        kot_question = QMessageBox.question(self, 'Низкий Статический уровень', 'Нужно ли произвести СПО '
+                                                                                'обратных клапанов перед ПСШ?')
+        if kot_question == QMessageBox.StandardButton.Yes:
+            for row in kot_work(self)[::-1]:
+                list_template_ek.insert(0, row)
+
     if CreatePZ.gipsInWell is True:
         gips = pero(self)
         for row in gips[::-1]:
             list_template_ek.insert(0, row)
 
-    if float(CreatePZ.static_level) > 700:
-        kot_question = QMessageBox.question(self, 'Низкий Статический уровень', 'Нужно ли произвести СПО '
-                                                                                'обратных клапанов перед ПСШ?')
-        if kot_question is QMessageBox.StandardButton.Yes:
-            for row in kot_work(self)[::-1]:
-                list_template_ek.insert(0, row)
+
 
 
     if CreatePZ.count_template is 0:
@@ -467,12 +475,13 @@ def template_ek(self):
     # roof_skm = skm_interval_tuple[0][1]
     skm_interval = raid(skm_interval_tuple)
     list_template_ek = [
-        [None, None,
+        [f'СПО  {template_str} на 'f'НКТ{CreatePZ.nkt_diam}мм', None,
          f'Спустить  {template_str} на 'f'НКТ{CreatePZ.nkt_diam}мм {ckm_teml} с замером, шаблонированием НКТ. \n'
          f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
          None, None, None, None, None, None, None,
          'мастер КРС', descentNKT_norm(CreatePZ.current_bottom, 1.2)],
-        [None, None,
+        [f'скреперование э/к в интервале {skm_interval}м Допустить низ НКТ до гл. {CreatePZ.current_bottom}м',
+         None,
          f'Произвести скреперование э/к в интервале {skm_interval}м обратной промывкой и проработкой 5 раз каждого '
          'наращивания. Работы производить согласно сборника технологических регламентов и инструкций в присутствии '
          f'представителя Заказчика. Допустить низ НКТ до гл. {CreatePZ.current_bottom}м, шаблон '
@@ -480,7 +489,7 @@ def template_ek(self):
          '(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ). ',
          None, None, None, None, None, None, None,
          'Мастер КРС, представитель УСРСиСТ', round(0.012 * 90 * 1.04 + 1.02 + 0.77, 2)],
-        [None, None,
+        [f'Очистить колонну от АСПО растворителем - 2м3', None,
          f'По результатам ревизии ГНО, в случае наличия отложений АСПО:\n'
          f'Очистить колонну от АСПО растворителем - 2м3. При открытом затрубном пространстве закачать в '
          f'трубное пространство растворитель в объеме 2м3, продавить в трубное пространство тех.жидкостью '
@@ -488,7 +497,8 @@ def template_ek(self):
          f'пространство. Реагирование 2 часа.',
          None, None, None, None, None, None, None,
          'Мастер КРС, предст. заказчика', 4],
-        [None, None,
+        [f'Промывка скважину уд.весом {CreatePZ.fluid_work_short} в объеме {round(well_volume() * 1.5, 1)}м3 ',
+         None,
          f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {CreatePZ.fluid_work}  при расходе '
          f'жидкости 6-8 л/сек '
          f'в присутствии представителя Заказчика в объеме {round(well_volume() * 1.5, 1)}м3 ПРИ ПРОМЫВКЕ НЕ '
@@ -500,7 +510,7 @@ def template_ek(self):
                      f'{CreatePZ.fluid_work} до глубины {CreatePZ.current_bottom}м.', None, None, None, None, None,
          None, None,
          'Мастер КРС', None],
-        [None, None,
+        [f'Приподнять до глубины {CreatePZ.current_bottom - 20}м. Тех отстой 2ч', None,
          f'Приподнять до глубины {CreatePZ.current_bottom - 20}м. Тех отстой 2ч. Определение текущего забоя, '
          f'при необходимости повторная промывка.',
          None, None, None, None, None, None, None,
@@ -532,9 +542,9 @@ def template_ek(self):
                    f'долотом {temlate_ek};'
                    f' {temlate_ek - 2}; {temlate_ek - 4}мм  фрезера-{temlate_ek}мм, райбера-{temlate_ek + 1}мм и '
                    f'другого оборудования и '
-                   f'инструмента, (при необходимости  ловильного),  при необходимости на СБТ для восстановления '
+                   f'инструмента, (при необходимости  ловильного), при необходимости на СБТ для восстановления '
                    f'проходимости ствола  '
-                   f'и забоя скважины с применением мех.ротора,  до текущего забоя с последующей нормализацией до '
+                   f'и забоя скважины с применением мех.ротора, до текущего забоя с последующей нормализацией до '
                    f'планового '
                    f'текущего забоя. Подъем долота с забойным двигателем на  ТНКТ с гл.{CreatePZ.current_bottom}м '
                    f'вести с доливом '
@@ -568,7 +578,7 @@ def template_ek(self):
                    f'{round(CreatePZ.current_bottom * 1.12 / 1000, 1)}м3',
                    None, None, None, None, None, None, None, 'Мастер КРС', None, None]]
 
-    privyazka_nkt = [None, None,
+    privyazka_nkt = [f'Привязка по ГК и ЛМ По привязому НКТ удостовериться в наличии текущего забоя', None,
                      f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС "Ойл-сервис".'
                      f' ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины.'
                      f' По привязому НКТ удостовериться в наличии'
@@ -580,13 +590,14 @@ def template_ek(self):
                                                   f'зумпф составляет {int(CreatePZ.current_bottom - CreatePZ.perforation_sole)}м '
                                                   f'нужно ли привязывать компоновку?'
                                                                                 )
-        if privyazka_question is QMessageBox.StandardButton.Yes:
+        if privyazka_question == QMessageBox.StandardButton.Yes:
             list_template_ek.insert(-1, privyazka_nkt)
 
     if float(CreatePZ.static_level) > 700:
         kot_question = QMessageBox.question(self, 'Низкий Статический уровень', 'Нужно ли произвести СПО '
                                                                                 'обратных клапанов перед ПСШ?')
-        if kot_question is QMessageBox.StandardButton.Yes:
+        if kot_question == QMessageBox.StandardButton.Yes:
+            print(f'Нужно вставить коты')
             for row in kot_work(self)[::-1]:
                 list_template_ek.insert(0, row)
 
@@ -629,14 +640,15 @@ def pero(self):
     from work_py.drilling import drilling_nkt
     pero_list = pero_select(self, CreatePZ.current_bottom)
     gipsPero_list = [
-        [None, None,
+        [f'Спустить {pero_list}  на тНКТ{CreatePZ.nkt_diam}мм', None,
          f'Спустить {pero_list}  на тНКТ{CreatePZ.nkt_diam}мм до глубины {CreatePZ.current_bottom}м '
          f'с замером, шаблонированием шаблоном. Опрессовать НКТ на 150атм. Вымыть шар. \n'
          f'С ГЛУБИНЫ 1100м СНИЗИТЬ СКОРОСТЬ  СПУСКА до 0.25м/с ВОЗМОЖНО ОТЛОЖЕНИЕ ГИПСА'
          f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
          None, None, None, None, None, None, None,
          'мастер КРС', 2.5],
-        [None, None,
+        [f'Промывка уд.весом {CreatePZ.fluid_work_short} в объеме {round(well_volume() * 1.5, 1)}м3 ',
+         None,
          f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {CreatePZ.fluid_work} при расходе жидкости '
          f'6-8 л/сек в присутствии представителя Заказчика в объеме {round(well_volume() * 1.5, 1)}м3. ПРИ ПРОМЫВКЕ НЕ '
          f'ПРЕВЫШАТЬ ДАВЛЕНИЕ {CreatePZ.max_admissible_pressure}АТМ, ДОПУСТИМАЯ ОСЕВАЯ '
@@ -661,38 +673,38 @@ def pero(self):
          'Мастер КРС',
          None]
     ]
+    if CreatePZ.gipsInWell == True:
+        if 'ЭЦН' in str(CreatePZ.dict_pump["do"]).upper():
 
-    if 'ЭЦН' in str(CreatePZ.dict_pump["do"]).upper():
+            gipsPero_list = [gipsPero_list[-1]]
+            drilling_list = drilling_nkt(self)
+            drilling_list[2] = [f'нормализацию забоя до Н= {CreatePZ.current_bottom}м', None,
+                                f'Произвести нормализацию забоя до Н= {CreatePZ.current_bottom}м с наращиванием, '
+                                f'промывкой тех жидкостью уд.весом {CreatePZ.fluid_work}.'
+                                'При отсутствии проходки более 4ч, согласовать с УСРСиСТ подьем компоновки на ревизию. '
+                                'При наработке долото более 80ч, произвести подьем и заменить долото и (Вызов представителя '
+                                'осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа '
+                                f'до начала работ). Работы производить согласно сборника технологических регламентов и '
+                                f'инструкций в присутствии'
+                                f' представителя заказчика.',
+                                None, None, None, None, None, None, None,
+                                'Мастер КРС, УСРСиСТ', 16, ]
 
-        gipsPero_list = [gipsPero_list[-1]]
-        drilling_list = drilling_nkt(self)
-        drilling_list[2] = [None, None,
-                            f'Произвести нормализацию забоя до Н= {CreatePZ.current_bottom}м с наращиванием, '
-                            f'промывкой тех жидкостью уд.весом {CreatePZ.fluid_work}.'
-                            'При отсутствии проходки более 4ч, согласовать с УСРСиСТ подьем компоновки на ревизию. '
-                            'При наработке долото более 80ч, произвести подьем и заменить долото и (Вызов представителя '
-                            'осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа '
-                            f'до начала работ). Работы производить согласно сборника технологических регламентов и '
-                            f'инструкций в присутствии'
-                            f' представителя заказчика.',
-                            None, None, None, None, None, None, None,
-                            'Мастер КРС, УСРСиСТ', 16, ]
-
-        for row in drilling_list:
-            gipsPero_list.append(row)
-    else:
-        drilling_list = drilling_nkt(self)
-        drilling_list[2] = [None, None,
-                            f'Произвести нормализацию забоя до Н= {CreatePZ.current_bottom}м с наращиванием, промывкой '
-                            f'тех жидкостью уд.весом {CreatePZ.fluid_work}.'
-                            'При отсутствии проходки более 4ч, согласовать с УСРСиСТ подьем компоновки на ревизию. '
-                            'При наработке долото более 80ч, произвести подьем и заменить долото и (Вызов представителя '
-                            'осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа '
-                            f'до начала работ). Работы производить согласно сборника технологических регламентов и '
-                            f'инструкций в присутствии представителя заказчика.',
-                            None, None, None, None, None, None, None,
-                            'Мастер КРС, УСРСиСТ', 16, ]
-        for row in drilling_list:
-            gipsPero_list.append(row)
+            for row in drilling_list:
+                gipsPero_list.append(row)
+        else:
+            drilling_list = drilling_nkt(self)
+            drilling_list[2] = [f'Произвести нормализацию забоя до Н= {CreatePZ.current_bottom}м', None,
+                                f'Произвести нормализацию забоя до Н= {CreatePZ.current_bottom}м с наращиванием, промывкой '
+                                f'тех жидкостью уд.весом {CreatePZ.fluid_work}.'
+                                'При отсутствии проходки более 4ч, согласовать с УСРСиСТ подьем компоновки на ревизию. '
+                                'При наработке долото более 80ч, произвести подьем и заменить долото и (Вызов представителя '
+                                'осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа '
+                                f'до начала работ). Работы производить согласно сборника технологических регламентов и '
+                                f'инструкций в присутствии представителя заказчика.',
+                                None, None, None, None, None, None, None,
+                                'Мастер КРС, УСРСиСТ', 16, ]
+            for row in drilling_list:
+                gipsPero_list.append(row)
 
     return gipsPero_list

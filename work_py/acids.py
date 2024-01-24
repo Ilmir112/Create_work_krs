@@ -76,7 +76,7 @@ def acid_work(self):
          'мастер КРС', 0.5],
         [None, None,
          f'Опрессовать эксплуатационную колонну в интервале {paker_depth_top}-0м на Р={CreatePZ.max_admissible_pressure}атм'
-         f' в течение 30 минут в присутствии представителя заказчика, составить акт.  '
+         f' в течение 30 минут в присутствии представителя заказчика, составить акт. '
          f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ)',
          None, None, None, None, None, None, None,
          'мастер КРС, предст. заказчика', 0.83+0.58],
@@ -118,7 +118,7 @@ def acid_work(self):
     return paker_list
 
 acid_true_quest_list = []
-def reply_acid(self, difference_paker,  paker_khost, dict_nkt, paker_select, nkt_diam, paker_depth_bottom):
+def reply_acid(self, difference_paker, paker_khost, dict_nkt, paker_select, nkt_diam, paker_depth_bottom):
     from open_pz import CreatePZ
     acid_true_quest = QMessageBox.question(self, 'Необходимость кислоты',
                                            'Нужно ли планировать кислоту на следующий объет?')
@@ -132,7 +132,7 @@ def reply_acid(self, difference_paker,  paker_khost, dict_nkt, paker_select, nkt
         acid_true_quest_list.append([None, None, f'Приподнять пакера на глубине {paker_depth_bottom}/{paker_depth_bottom-difference_paker}м', None, None, None, None, None, None, None,
                            'мастер КРС', 0.83+0.05])
 
-        for row in acid_work_list(self,  paker_depth_bottom, paker_khost, dict_nkt, CreatePZ.paker_layout):
+        for row in acid_work_list(self, paker_depth_bottom, paker_khost, dict_nkt, CreatePZ.paker_layout):
             acid_true_quest_list.append(row)
 
         # print(reply_acid(self, difference_paker, paker_khost, dict_nkt, paker_select, nkt_diam, paker_depth_bottom))
@@ -155,13 +155,13 @@ def acidGons(self):
     acid_countOfpoint, ok = QInputDialog.getInt(self, 'концентрация кислоты', 'Введите объем кислоты на точку', 5, 1, 24)
     acid_points, ok = QInputDialog.getText(self, 'точки ГОНС', 'Введите точки ГОНС ')
     bottom_point = max(list(map(int, acid_points.replace('м', '').replace(',', '').split())))
-    gons_list = [[None, None,
+    gons_list = [[f'Спуск гидроманиторную насадку до глубины нижней точки до {bottom_point}', None,
      f'Спустить  гидроманиторную насадку {"".join([f" + НКТ60мм {round(CreatePZ.current_bottom -CreatePZ.head_column_additional, 0)}" if CreatePZ.column_additional == True else ""])} '
      f'на НКТ{CreatePZ.nkt_diam}мм до глубины нижней точки до {bottom_point}'
      f' с замером, шаблонированием шаблоном.',
      None, None, None, None, None, None, None,
      'мастер КРС', descentNKT_norm(bottom_point,1)],
-     [f' ГОНС (общий объем {acid_V}м3)', None,
+     [f' ГОНС пласта {plast} (общий объем {acid_V}м3) в инт. {acid_points}', None,
       f'Провести ОПЗ пласта {plast} силами СК Крезол по технологии ГОНС в инт. {acid_points} с закачкой HCL '
       f'{acid_pr}% в объеме по {acid_countOfpoint}м3/точке (общий объем {acid_V}м3)  в присутствии представителя '
       f'сектора супервайзерского контроля за текущим и капитальным ремонтом скважин (ГОНС произвести снизу-вверх).',

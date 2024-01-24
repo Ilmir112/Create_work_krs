@@ -4,16 +4,16 @@ from work_py.alone_oreration import fluid_change
 from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
 from open_pz import CreatePZ
 class Raid(CreatePZ):
-    def __init__(self,  parent = None):
+    def __init__(self, parent = None):
         super(CreatePZ, self).__init__(parent)
-        
+
         CreatePZ.raidingColumn()
     def raidingColumn(self):
 
         from work_py.opressovka import paker_diametr_select
         from work_py.template_work import well_volume
         from work_py.advanted_file import raiding_interval,raid
-        print(f'До отрайбирования {[CreatePZ.dict_perforation[plast]["отрайбировано"] for plast in CreatePZ.plast_work]}')
+        # print(f'До отрайбирования {[CreatePZ.dict_perforation[plast]["отрайбировано"] for plast in CreatePZ.plast_work]}')
 
         ryber_diam = paker_diametr_select(CreatePZ.current_bottom) + 3
         if 'ПОМ' in str(CreatePZ.paker_do["posle"]).upper() and '122' in str(CreatePZ.paker_do["posle"]):
@@ -29,13 +29,14 @@ class Raid(CreatePZ):
 
         nkt_diam = ''.join(['73мм' if CreatePZ.column_diametr > 110 else '60мм'])
 
-        ryber_str_EK = f'райбер-{ryber_diam} для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм +' \
+        ryber_str_EK = f'райбер-{ryber_diam} для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм +'\
                        f' забойный двигатель  +НКТ{nkt_diam}м 20м + репер '
         ryber_str_DP = f'райбер-{ryber_diam} для ЭК {CreatePZ.column_additional_diametr}мм х ' \
-                    f'{CreatePZ.column_additional_wall_thickness}мм + забойный двигатель +НКТ{nkt_pod}мм 20м + репер + ' \
-                    f'НКТ{nkt_pod} {round(CreatePZ.current_bottom - float(CreatePZ.head_column_additional))}м'
+                f'{CreatePZ.column_additional_wall_thickness}мм + забойный двигатель +НКТ{nkt_pod}мм 20м + репер + ' \
+                f'НКТ{nkt_pod} {round(CreatePZ.current_bottom - float(CreatePZ.head_column_additional))}м'
 
-        if CreatePZ.column_additional == False or (CreatePZ.column_additional == True and CreatePZ.head_column_additional >= CreatePZ.current_bottom):
+        if CreatePZ.column_additional == False or \
+                (CreatePZ.column_additional == True and CreatePZ.head_column_additional >= CreatePZ.current_bottom):
             ryber_key = 'райбер в ЭК'
             ryber_str = ryber_str_EK
         elif CreatePZ.column_additional == True:
@@ -57,10 +58,11 @@ class Raid(CreatePZ):
             result[value] = key
         ryber_key = result[ryber_str]
         raiding_interval_tuple = raiding_interval(ryber_key)
-        print(f' интервал райбирования {raiding_interval_tuple, len(raiding_interval_tuple)}')
+        # print(f' интервал райбирования {raiding_interval_tuple, len(raiding_interval_tuple)}')
         if raiding_interval_tuple == '':
             while raiding_interval_tuple != '':
-                raiding_interval_tuple, ok = QInputDialog.getText(self,'интервал райбирование', 'Введите интервал райбирования')
+                raiding_interval_tuple, ok = QInputDialog.getText(self,'интервал райбирование',
+                                                                  'Введите интервал райбирования')
             raiding_interval_tuple = [raiding_interval_tuple.split('-')]
         if len(raiding_interval_tuple) != 0:
             krovly_raiding = int(raiding_interval_tuple[0][0])
@@ -69,11 +71,13 @@ class Raid(CreatePZ):
 
         raiding_interval = raid(raiding_interval_tuple)
         ryber_list = [
-            [None, None,
+            [f'СПО{ryber_str}  на НКТ{nkt_diam} до Н={krovly_raiding}м', None,
              f'Спустить {ryber_str}  на НКТ{nkt_diam} до Н={krovly_raiding}м с замером, '
-             f'шаблонированием шаблоном 59,6мм (При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ). '
+             f'шаблонированием шаблоном 59,6мм (При СПО первых десяти НКТ на спайдере дополнительно '
+             f'устанавливать элеватор ЭХЛ). '
              f'В случае разгрузки инструмента  при спуске, проработать место посадки с промывкой скв., составить акт.'
-             f'СКОРОСТЬ СПУСКА НЕ БОЛЕЕ 1 М/С (НЕ ДОХОДЯ 40 - 50 М ДО ПЛАНОВОГО ИНТЕРВАЛА СКОРОСТЬ СПУСКА СНИЗИТЬ ДО 0,25 М/С). '
+             f'СКОРОСТЬ СПУСКА НЕ БОЛЕЕ 1 М/С (НЕ ДОХОДЯ 40 - 50 М ДО ПЛАНОВОГО '
+             f'ИНТЕРВАЛА СКОРОСТЬ СПУСКА СНИЗИТЬ ДО 0,25 М/С). '
              f'ЗА 20 М ДО ЗАБОЯ СПУСК ПРОИЗВОДИТЬ С ПРОМЫВКОЙ',
              None, None, None, None, None, None, None,
              'мастер КРС', descentNKT_norm(krovly_raiding, 1.2)],
@@ -81,7 +85,7 @@ class Raid(CreatePZ):
                          f'буровой рукав, устьевой герметизатор, нагнетательная линия. Застраховать буровой рукав за вертлюг. ',
              None, None, None, None, None, None, None,
              'Мастер КРС, УСРСиСТ', 0.6],
-            [None, None,
+            [f'райбирование ЭК в инт. {raiding_interval}', None,
              f'Произвести райбирование ЭК в инт. {raiding_interval}м с наращиванием, с промывкой и проработкой 5 раз каждого наращивания. '
              f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа '
              f'до начала работ) Работы производить согласно сборника технологических регламентов и инструкций в присутствии'
@@ -95,7 +99,8 @@ class Raid(CreatePZ):
              f' ПРЕДУСМОТРЕТЬ КОМПЕНСАЦИЮ РЕАКТИВНОГО МОМЕНТА НА ВЕДУЩЕЙ ТРУБЕ))',
              None, None, None, None, None, None, None,
              'Мастер КРС, УСРСиСТ', None],
-            [None, None,
+            [f'Промывка уд.весом {CreatePZ.fluid_work[:6]}  в объеме {round(well_volume()*2,1)}м3',
+             None,
              f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {CreatePZ.fluid_work}  '
              f'в присутствии представителя заказчика в объеме {round(well_volume()*2,1)}м3. Составить акт.',
              None, None, None, None, None, None, None,
@@ -106,7 +111,7 @@ class Raid(CreatePZ):
              None, None, None, None, None, None, None,
              'мастер КРС', liftingNKT_norm(CreatePZ.current_bottom,1.2)]]
 
-        print(f' после отрайбирования {[CreatePZ.dict_perforation[plast]["отрайбировано"] for plast in CreatePZ.plast_work]}')
+        # print(f' после отрайбирования {[CreatePZ.dict_perforation[plast]["отрайбировано"] for plast in CreatePZ.plast_work]}')
         if len(CreatePZ.plast_work) == 0:
             acid_true_quest = QMessageBox.question(self, 'Необходимость смены объема',
                                                    'Нужно ли изменять удельный вес?')

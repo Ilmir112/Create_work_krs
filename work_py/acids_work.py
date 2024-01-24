@@ -17,7 +17,7 @@ def acid_work(self):
     else:
         # swabbing_true_quest1 = QMessageBox.question(self, 'Свабирование на данной компоновке',
         #                                            'Нужно ли Свабировать на данной компоновке?')
-        # 
+        #
         if self.acid_windowPaker is None:
             print(f' окно2 СКО ')
             self.acid_windowPaker = AcidPakerWindow()
@@ -25,7 +25,7 @@ def acid_work(self):
             self.acid_windowPaker.show()
             CreatePZ.pause_app(self)
             CreatePZ.pause = True
-        
+
         # if CreatePZswabbing_true_quest1 == QMessageBox.StandardButton.Yes:
         #     swabbing_true_quest = True
         # else:
@@ -91,7 +91,7 @@ def acid_work(self):
              'мастер КРС', 0.5],
             [None, None,
              f'Опрессовать эксплуатационную колонну в интервале {CreatePZ.paker_depth}-0м на Р={CreatePZ.max_admissible_pressure}атм'
-             f' в течение 30 минут  в присутствии представителя заказчика, составить акт.  '
+             f' в течение 30 минуТ в присутствии представителя заказчика, составить акт. '
              f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ)',
              None, None, None, None, None, None, None,
              'мастер КРС, предст. заказчика', 0.83+0.58],

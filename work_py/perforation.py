@@ -213,24 +213,29 @@ class PerforationWindow(MyWindow):
             if CreatePZ.kat_pvo <  kateg2:
                 CreatePZ.kat_pvo = kateg2
 
-        perforation = [[None, None, f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС "Ойл-сервис". '
+        perforation = [[None, None, f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через '
+                                    f'ЦИТС "Ойл-сервис". '
                                      f'При необходимости  подготовить место для установки партии ГИС напротив мостков. '
-                                     f'Произвести  монтаж ГИС согласно схемы  №8а утвержденной главным инженером от  14.10.2021г',
+                                     f'Произвести  монтаж ГИС согласно схемы  №8а утвержденной главным инженером от 14.10.2021г',
                          None, None, None, None, None, None, None,
-                          'Мастер КРС', None, None,  None],
-                       [None, None, f'Долить скважину до устья тех жидкостью уд.весом {CreatePZ.fluid_work} .Установить ПВО по схеме №8а утвержденной '
-                                     f'главным инженером ООО "Ойл-сервис" от 14.10.2021г. Опрессовать  плашки  ПВО (на давление опрессовки ЭК, но '
-                                     f'не ниже максимального ожидаемого давления на устье) {CreatePZ.max_expected_pressure}атм, по невозможности на давление поглощения, но '
+                          'Мастер КРС', None, None, None],
+                       [None, None, f'Долить скважину до устья тех жидкостью уд.весом {CreatePZ.fluid_work}. '
+                                    f'Установить ПВО по схеме №8а утвержденной '
+                                     f'главным инженером ООО "Ойл-сервис" от 14.10.2021г. Опрессовать  плашки  '
+                                    f'ПВО (на давление опрессовки ЭК, но '
+                                     f'не ниже максимального ожидаемого давления на устье) '
+                                    f'{CreatePZ.max_expected_pressure}атм, по невозможности на давление поглощения, но '
                                      f'не менее 30атм в течении 30мин (ОПРЕССОВКУ ПВО ЗАФИКСИРОВАТЬ В ВАХТОВОМ ЖУРНАЛЕ). '
                                     f'Передать по сводке уровня жидкости до перфорации и после перфорации.'
-                                    f'(Произвести фотографию перфоратора в заряженном состоянии, и после проведения перфорации,'
+                                    f'(Произвести фотографию перфоратора в заряженном состоянии, и после проведения '
+                                    f'перфорации,'
                                     f' фотографии предоставить в ЦИТС Ойл-сервис',
                          None, None, None, None, None, None, None,
                           'Мастер КРС, подрядчик по ГИС', 1.2, None],
-                       [None, None, ''.join(["ГИС (Перфорация на кабеле ЗАДАЧА 2.9.1)" if float(CreatePZ.max_angle) <= 50 else "ГИС ( Трубная Перфорация ЗАДАЧА 2.9.2)"]), None, None, None, None,
-                        None,None, None, 'подрядчик по ГИС',  None],
+                       [''.join(["ГИС (Перфорация на кабеле ЗАДАЧА 2.9.1)" if float(CreatePZ.max_angle) <= 50 else "ГИС ( Трубная Перфорация ЗАДАЧА 2.9.2)"]), None, ''.join(["ГИС (Перфорация на кабеле ЗАДАЧА 2.9.1)" if float(CreatePZ.max_angle) <= 50 else "ГИС ( Трубная Перфорация ЗАДАЧА 2.9.2)"]), None, None, None, None,
+                        None,None, None, 'подрядчик по ГИС', None],
                        [None, None, "Кровля", "-", "Подошва", "Тип заряда", "отв на 1 п.м.", "Кол-во отв",
-                      "пласт", "Доп.данные", 'подрядчик по ГИС', 2.5]
+                      "пласт", "Доп.данные", 'подрядчик по ГИС', None]
                        ]
         print(f'до {CreatePZ.plast_work}')
         for row in range(rows):
@@ -242,25 +247,23 @@ class PerforationWindow(MyWindow):
                     msg = QMessageBox.information(self, 'Внимание', 'Подошва интервала перфорации ниже текущего забоя')
                     return
         for row in range(rows):
-            perf_list = [None, None]
-            for col in range(0, 9):
-                item = self.tableWidget.item(row, col)
-                if item:
-                    value = item.text()
-                    if col == 1:
-                        perf_list.append("-")
-                        perf_list.append(float(value))
-                    elif col == 0:
-                        perf_list.append(float(value))
-                    elif col == 4:
-                        perf_list.append(int(value))
-                    else:
-                        perf_list.append(value)
+            perf_list = []
+            ["Кровля перфорации", "Подошва Перфорации", "Тип заряда", "отв на 1 п.м.", "Количество отверстий",
+             "Вскрываемые пласты", "доп информация"]
+            roof = self.tableWidget.item(row, 0).text()
+            sool = self.tableWidget.item(row, 1).text()
+            type_charge = self.tableWidget.item(row, 2).text()
+            count_otv =  self.tableWidget.item(row, 3).text()
+            count_charge = self.tableWidget.item(row, 4).text()
+            plast = self.tableWidget.item(row, 5).text()
+            dop_information = self.tableWidget.item(row, 6).text()
 
-            # perf_list.insert(7, (round((float(perf_list[4]) - float(perf_list[2])) * int(perf_list[6]), 1)))
-            perf_list.extend(['подрядчик по ГИС', round(perf_list[4]-perf_list[2]) * 1.8, 1])
+            pvr_str = f'ПВР {plast} {roof}-{sool}м {count_otv}отв/м'
+
+            perf_list.extend([pvr_str, None, roof, '-', sool, type_charge, count_otv, count_charge, plast, dop_information,
+                              'подрядчик по ГИС', round(float(sool)-float(roof)) * 1.5, 1])
             # print(perf_list)
-            plast = perf_list[8]
+
             # print(f' раб ПВР {CreatePZ.plast_work, plast}')
 
             CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('интервал', set()).add(
@@ -274,15 +277,20 @@ class PerforationWindow(MyWindow):
 
         perforation.append([None, None, ''.join(["Произвести контрольную запись ЛМ;ТМ. Составить АКТ на "
                                                  "перфорацию." if float(CreatePZ.max_angle) <= 50 else ""
-                                               f"Подъем последних 5-ти НКТ{CreatePZ.nkt_diam}мм и демонтаж перфоратора производить в присутствии ответственного "
-                                           f"представителя подрядчика по ГИС» (руководителя взрывных работ или взрывника)."]),
+                                               f"Подъем последних 5-ти НКТ{CreatePZ.nkt_diam}мм и демонтаж перфоратора "
+                                                                   f"производить в присутствии ответственного "
+                                           f"представителя подрядчика по ГИС» (руководителя взрывных"
+                                                                                           f" работ или взрывника)."]),
                          None, None, None, None, None, None, None,
-                          'Подрядчик по ГИС', None, 2])
-        print([CreatePZ.dict_perforation[plast] for plast in CreatePZ.plast_work])
+                          'Подрядчик по ГИС', 2])
+        # print([CreatePZ.dict_perforation[plast] for plast in CreatePZ.plast_work])
         pipe_perforation = [
-           [None, None, f'Произвести монтаж трубного перфоратора + 2шт/20м НКТ + реперный патрубок L=2м до намеченного интервала перфорации '
-                        f'(с шаблонировкой НКТ{CreatePZ.nkt_diam}мм шаблоном.  Спуск компоновки производить  со скоростью не более 0,30 м/с, не допуская резких ударов и вращения.'
-                        f'(Произвести фотографию перфоратора в заряженном состоянии, и после проведения перфорации, фотографии предоставить в ЦИТС Ойл-сервис, передать по сводке уровня '
+           [f'монтаж трубного перфоратора', None, f'Произвести монтаж трубного перфоратора + 2шт/20м НКТ + реперный '
+                                                  f'патрубок L=2м до намеченного интервала перфорации '
+                        f'(с шаблонировкой НКТ{CreatePZ.nkt_diam}мм шаблоном. Спуск компоновки производить  со '
+                                                  f'скоростью не более 0,30 м/с, не допуская резких ударов и вращения.'
+                        f'(Произвести фотографию перфоратора в заряженном состоянии, и после проведения перфорации, '
+                                              f'фотографии предоставить в ЦИТС Ойл-сервис, передать по сводке уровня '
                         f'жидкости до перфорации и после перфорации) '
                         f'(При СПО первых десяти НКТ на спайдере дополнительно '
                         f'устанавливать элеватор ЭХЛ).' ,
@@ -335,7 +343,7 @@ class PerforationWindow(MyWindow):
             # self.table_widget.setSpan(1 + self.ins_ind, 10, len(perforation) - 2, 1)
             # self.table_widget.setSpan(1 + self.ins_ind, 11, len(perforation) - 2, 1)
 
-            print(f'мин {CreatePZ.perforation_roof}, мак {CreatePZ.perforation_sole}')
+            # print(f'мин {CreatePZ.perforation_roof}, мак {CreatePZ.perforation_sole}')
 
             self.table_widget.setRowHeight(self.ins_ind, 60)
             self.table_widget.setRowHeight(self.ins_ind + 1, 60)

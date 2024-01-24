@@ -96,6 +96,12 @@ class TabPage_SO(QWidget):
         self.acidOilProcEdit = QLineEdit(self)
         self.acidOilProcEdit.setClearButtonEnabled(True)
 
+        self.pressure_Label = QLabel("Давление закачки", self)
+
+        self.pressure_Edit = QLineEdit(self)
+        self.pressure_Edit.setClearButtonEnabled(True)
+        self.pressure_Edit.setText(str(CreatePZ.max_admissible_pressure))
+
         self.swabTypeLabel = QLabel("задача при освоении", self)
         self.swabTypeCombo = QComboBox(self)
         self.swabTypeCombo.addItems(['Задача №2.1.13', 'Задача №2.1.16', 'Задача №2.1.11',
@@ -154,6 +160,8 @@ class TabPage_SO(QWidget):
         grid.addWidget(self.acidProcEdit, 5, 3)
         grid.addWidget(self.acidOilProcLabel, 4, 4)
         grid.addWidget(self.acidOilProcEdit, 5, 4)
+        grid.addWidget(self.pressure_Label, 4, 5)
+        grid.addWidget(self.pressure_Edit, 5, 5)
         grid.addWidget(self.QplastLabelType, 4, 0)
         grid.addWidget(self.QplastEdit, 5, 0)
         grid.addWidget(self.swabTypeLabel, 6, 1)
@@ -231,8 +239,8 @@ class AcidPakerWindow(MyWindow):
                 ,
              None, None, None, None, None, None, None,
              'мастер КРС', 0.4],
-            [None, None,
-             testing_pressure(self, paker_depth),
+            [testing_pressure(self, paker_depth)[1], None,
+             testing_pressure(self, paker_depth)[0],
              None, None, None, None, None, None, None,
              'мастер КРС, предст. заказчика', 0.67],
             [None, None,
@@ -264,7 +272,7 @@ class AcidPakerWindow(MyWindow):
              None, None, None, None, None, None, None,
              'Мастер КРС, подрядчик по ГИС', None],
 
-            [f'срыв 30мин', None,
+            [f'срыв 30мин. Промывка не менее {round(well_volume(self, paker_depth) * 1.5, 1)}м3', None,
              f'Произвести срыв пакера с поэтапным увеличением нагрузки на 3-4т выше веса НКТ в течении 30мин и '
              f'с выдержкой 1ч  для возврата резиновых элементов в исходное положение. При наличии избыточного давления: '
              f'произвести промывку скважину обратной промывкой ' \
@@ -386,7 +394,7 @@ class AcidPakerWindow(MyWindow):
             self.dict_nkt = {60: float(pakerEdit) + float(khvostEdit)}
         # print(f'компоновка НКТ{pakerEdit, khvostEdit}')
         paker_list = [
-            [f' СПО {self.paker_short}', None,
+            [f' СПО {self.paker_short} до глубины {pakerEdit}м, воронкой до {pakerEdit + khvostEdit}м', None,
              f'Спустить {self.paker_select} на НКТ{CreatePZ.nkt_diam}мм до глубины {pakerEdit}м, воронкой до {pakerEdit + khvostEdit}м'
              f' с замером, шаблонированием шаблоном. {("Произвести пробную посадку на глубине 50м" if CreatePZ.column_additional == False else "")} '
                 ,
@@ -396,8 +404,8 @@ class AcidPakerWindow(MyWindow):
                 ,
              None, None, None, None, None, None, None,
              'мастер КРС', 0.5],
-            [None, None,
-             testing_pressure(self, pakerEdit),
+            [testing_pressure(self, pakerEdit)[1], None,
+             testing_pressure(self, pakerEdit)[0],
              None, None, None, None, None, None, None,
              'мастер КРС, предст. заказчика', 0.83 + 0.58],
             [f'срыв 30мин', None,
@@ -424,7 +432,7 @@ class AcidPakerWindow(MyWindow):
                                   None, None, None, None, None, None, None,
                                   'мастер КРС', None])
         if QplastEdit == 'ДА':
-            paker_list.insert(-2, [f'Насыщение 5м3. Q  '
+            paker_list.insert(-2, [f'Насыщение 5м3. Определение Q  '
                                    f'пласт {plastCombo}  при '
                                    f'Р={self.pressure_mode(CreatePZ.expected_P, plastCombo)}атм'
                 , None,
@@ -443,7 +451,7 @@ class AcidPakerWindow(MyWindow):
         return paker_list
 
     def acid_work(self, swabTrueEditType, acidProcEdit, khvostEdit, pakerEdit, skvAcidEdit, acidEdit, skvVolumeEdit,
-                  QplastEdit, skvProcEdit, plastCombo, acidOilProcEdit, acidVolumeEdit, svkTrueEdit, dict_nkt):
+                  QplastEdit, skvProcEdit, plastCombo, acidOilProcEdit, acidVolumeEdit, svkTrueEdit, dict_nkt, pressure_Edit):
         from krs import volume_vn_nkt
         paker_list = []
         swabTrueEditType = False if swabTrueEditType == 'без СКВ' else False
@@ -482,7 +490,7 @@ class AcidPakerWindow(MyWindow):
 
         if acidEdit == 'HCl':
 
-            acid_sel = f'Произвести  солянокислотную обработку {plastCombo}  в объеме  {acidVolumeEdit}м3  ' \
+            acid_sel = f'Произвести  солянокислотную обработку {plastCombo} в объеме {acidVolumeEdit}м3 ' \
                        f'({acidEdit} - {acidProcEdit} %) ' \
                        f' в присутствии представителя Заказчика с составлением акта, не превышая давления закачки не ' \
                        f'более Р={CreatePZ.max_admissible_pressure}атм. \n' \
@@ -501,15 +509,17 @@ class AcidPakerWindow(MyWindow):
         elif acidEdit == 'HF':
 
             acid_sel = f'Произвести кислотную обработку пласта {plastCombo}  в объеме  {acidVolumeEdit}м3  ({acidEdit} - {acidProcEdit} %) силами СК Крезол ' \
-                       f'в присутствии представителя заказчика с составлением акта, не превышая давления закачки не более Р={CreatePZ.max_admissible_pressure}атм.'
+                       f'в присутствии представителя заказчика с составлением акта, не превышая давления закачки не более Р={pressure_Edit}атм.'
+            acid_sel_short = f'Произвести ГКО пласта {plastCombo}  в V- {acidVolumeEdit}м3  ({acidEdit} - {acidProcEdit} %) ' \
+                       f'не более Р={pressure_Edit}атм.'
         elif acidEdit == 'Нефтекислотка':
             acid_sel = f'Произвести нефтекислотную обработку пласта {plastCombo} в V=2тн товарной нефти +' \
                        f' {acidVolumeEdit}м3  (HCl - {acidProcEdit} %) + {float(acidOilProcEdit) - 2}т товарной нефти ' \
                        f'силами СК Крезол ' \
                        f'в присутствии представителя заказчика с составлением акта, не превышая давления закачки не ' \
                        f'более Р={CreatePZ.max_admissible_pressure}атм.'
-            acid_sel_short = f'ГКО пласта {plastCombo}  в V {acidVolumeEdit}м3  ' \
-                             f'({acidEdit} - {acidProcEdit} %) '
+            acid_sel_short = f'нефтекислотную обработку пласта {plastCombo} в V=2тн товарной нефти +' \
+                       f' {acidVolumeEdit}м3  (HCl - {acidProcEdit} %) + {float(acidOilProcEdit) - 2}т товарной нефти'
         elif acidEdit == 'Противогипсовая обработка':
             acid_sel = f'Произвести противогипсовую обработку пласта{plastCombo} в объеме {acidVolumeEdit}м3 - {20}% раствором каустической соды' \
                        f'в присутствии представителя заказчика с составлением акта, не превышая давления закачки не ' \
@@ -534,11 +544,14 @@ class AcidPakerWindow(MyWindow):
                        [None, None,
                         ''.join(
                             [
-                                f'продавить кислоту тех жидкостью в объеме {round(volume_vn_nkt(dict_nkt) + 0.5, 1)}м3 при давлении не '
+                                f'продавить кислоту тех жидкостью в объеме {round(volume_vn_nkt(dict_nkt) + 0.5, 1)}м3 '
+                                f'при давлении не '
                                 f'более {CreatePZ.max_admissible_pressure}атм. Увеличение давления согласовать'
                                 f' с заказчиком' if acidVolumeEdit < volume_vn_nkt(
-                                    dict_nkt) else f'продавить кислоту оставшейся кислотой в объеме {round(acidVolumeEdit - volume_vn_nkt(dict_nkt), 1)}м3 и тех жидкостью '
-                                                   f'в объеме {round(volume_vn_nkt(dict_nkt) + 0.5, 1)}м3 при давлении не более {CreatePZ.max_admissible_pressure}атм. '
+                                    dict_nkt) else f'продавить кислоту оставшейся кислотой в объеме '
+                                                   f'{round(acidVolumeEdit - volume_vn_nkt(dict_nkt), 1)}м3 и тех жидкостью '
+                                                   f'в объеме {round(volume_vn_nkt(dict_nkt) + 0.5, 1)}м3 при давлении '
+                                                   f'не более {CreatePZ.max_admissible_pressure}атм. '
                                                    f'Увеличение давления согласовать с заказчиком']),
                         None, None, None, None, None, None, None,
                         'мастер КРС', 6],
@@ -552,8 +565,8 @@ class AcidPakerWindow(MyWindow):
                         f'выдержкой 1ч для возврата резиновых элементов в исходное положение. ',
                         None, None, None, None, None, None, None,
                         'мастер КРС', 0.7],
-                       [f'допуск промыквка', None,
-                        self.flushingDownhole(pakerEdit, khvostEdit, 1),
+                       [self.flushingDownhole(pakerEdit, khvostEdit, 1)[0], None,
+                        self.flushingDownhole(pakerEdit, khvostEdit, 1)[0],
                         None, None, None, None, None, None, None,
                         'мастер КРС', well_volume_norm(well_volume(self, CreatePZ.current_bottom))]
                        ]
@@ -623,6 +636,9 @@ class AcidPakerWindow(MyWindow):
                                     f'ри расходе жидкости не ' \
                                     f'менее 6-8 л/сек в объеме не менее {round(well_volume(self, paker_depth + paker_khost) * 1.5, 1)}м3 ' \
                                     f'в присутствии представителя заказчика ДО ЧИСТОЙ ВОДЫ.'
+            flushingDownhole_short = f'Допустить до Н- {CreatePZ.current_bottom}м. Промыть уд.весом {CreatePZ.fluid_work_short}' \
+                                     f'не менее {round(well_volume(self, paker_depth + paker_khost) * 1.5, 1)}м3 '
+
         elif CreatePZ.perforation_roof - 5 + paker_khost < CreatePZ.current_bottom:
             flushingDownhole_list = f'Допустить пакер до глубины {int(CreatePZ.perforation_roof - 5)}м. ' \
                                     f'(на 5м выше кровли интервала перфорации), низ НКТ до глубины' \
@@ -631,8 +647,12 @@ class AcidPakerWindow(MyWindow):
                                     f'жидкостью уд.весом {CreatePZ.fluid_work} при расходе жидкости не ' \
                                     f'менее 6-8 л/сек в объеме не менее {round(well_volume(self, paker_depth + paker_khost) * 1.5, 1)}м3 ' \
                                     f'в присутствии представителя заказчика ДО ЧИСТОЙ ВОДЫ.'
+            flushingDownhole_short = f'Допустить пакер до H- {int(CreatePZ.perforation_roof - 5)}м. ' \
+                                    f' низ НКТ до H' \
+                                    f' {CreatePZ.perforation_roof - 5 + paker_khost}м) ' \
+                                    f'Промыть уд.весом {CreatePZ.fluid_work} не менее {round(well_volume(self, paker_depth + paker_khost) * 1.5, 1)}м3 '
 
-        return flushingDownhole_list
+        return flushingDownhole_list, flushingDownhole_short
 
     #
     def addRowTable(self):
@@ -643,18 +663,18 @@ class AcidPakerWindow(MyWindow):
         else:
             CreatePZ.swabTrueEditType = 1
         acidEdit = self.tabWidget.currentWidget().acidEdit.currentText()
-        khvostEdit = float(self.tabWidget.currentWidget().khvostEdit.text().replace(',', '.'))
-        pakerEdit = float(self.tabWidget.currentWidget().pakerEdit.text().replace(',', '.'))
+        khvostEdit = int(self.tabWidget.currentWidget().khvostEdit.text().replace(',', '.'))
+        pakerEdit = int(self.tabWidget.currentWidget().pakerEdit.text().replace(',', '.'))
 
         skvVolumeEdit = float(self.tabWidget.currentWidget().skvVolumeEdit.text().replace(',', '.'))
-        skvProcEdit = float(self.tabWidget.currentWidget().skvProcEdit.text().replace(',', '.'))
+        skvProcEdit = int(self.tabWidget.currentWidget().skvProcEdit.text().replace(',', '.'))
         acidVolumeEdit = float(self.tabWidget.currentWidget().acidVolumeEdit.text().replace(',', '.'))
-        acidProcEdit = float(self.tabWidget.currentWidget().acidProcEdit.text().replace(',', '.'))
-        swab_paker = float(self.tabWidget.currentWidget().swab_pakerEdit.text().replace(',', '.'))
-        swab_volume = float(self.tabWidget.currentWidget().swab_volumeEdit.text().replace(',', '.'))
+        acidProcEdit = int(self.tabWidget.currentWidget().acidProcEdit.text().replace(',', '.'))
+        swab_paker = int(self.tabWidget.currentWidget().swab_pakerEdit.text().replace(',', '.'))
+        swab_volume = int(self.tabWidget.currentWidget().swab_volumeEdit.text().replace(',', '.'))
         swabType = str(self.tabWidget.currentWidget().swabTypeCombo.currentText())
-        acidOilProcEdit = self.tabWidget.currentWidget().acidOilProcEdit.text()
-
+        acidOilProcEdit = int(self.tabWidget.currentWidget().acidOilProcEdit.text())
+        pressure_Edit = int(self.tabWidget.currentWidget().pressure_Edit.text())
         plastCombo = str(self.tabWidget.currentWidget().plastCombo.currentText())
         svkTrueEdit = str(self.tabWidget.currentWidget().svkTrueEdit.currentText())
         skvAcidEdit = str(self.tabWidget.currentWidget().skvAcidEdit.currentText())
@@ -672,7 +692,7 @@ class AcidPakerWindow(MyWindow):
             for row in self.acid_work(swabTrueEditType, acidProcEdit, khvostEdit, pakerEdit, skvAcidEdit, acidEdit,
                                       skvVolumeEdit,
                                       QplastEdit, skvProcEdit, plastCombo, acidOilProcEdit, acidVolumeEdit, svkTrueEdit,
-                                      self.dict_nkt):
+                                      self.dict_nkt, pressure_Edit):
                 work_list.append(row)
             self.populate_row(CreatePZ.ins_ind, work_list)
             CreatePZ.ins_ind += len(work_list)
@@ -697,7 +717,7 @@ class AcidPakerWindow(MyWindow):
                                       acidEdit,
                                       skvVolumeEdit,
                                       QplastEdit, skvProcEdit, plastCombo, acidOilProcEdit, acidVolumeEdit, svkTrueEdit,
-                                      self.dict_nkt):
+                                      self.dict_nkt, pressure_Edit):
                 work_list.append(row)
             self.populate_row(CreatePZ.ins_ind, work_list)
             print(f' индекс строк {CreatePZ.ins_ind}')

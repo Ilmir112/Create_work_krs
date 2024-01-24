@@ -17,7 +17,8 @@ def grpGpp(self):
 
 
     gpp_list = [
-        [None, None, f'За 48 часов оформить заявку на завоз оборудования ГРП. Уложить НКТ на дополнительные стеллажи',
+        ['За 48 часов оформить заявку на завоз оборудования ГРП.',
+         None, f'За 48 часов оформить заявку на завоз оборудования ГРП. Уложить НКТ на дополнительные стеллажи',
          None, None, None, None, None, None, None,
          'мастер КРС', None],
         [None, None,
@@ -25,8 +26,8 @@ def grpGpp(self):
          f' согласно плана от подрядчика по ГРП.',
          None, None, None, None, None, None, None,
          'мастер КРС', None],
-        [None, None,
-         f'Спустить компоновку с замером и шаблонированием НКТ: {gpp_select(gPP_depth)} на НКТ{nkt_diam} на глубину {gPP_depth}м, с замером, шаблонированием НКТ. '
+        [f'СПО: {gpp_select(gPP_depth)[0]} на НКТ{nkt_diam} на Н {gPP_depth}м', None,
+         f'Спустить компоновку с замером и шаблонированием НКТ: {gpp_select(gPP_depth)[0]} на НКТ{nkt_diam} на глубину {gPP_depth}м, с замером, шаблонированием НКТ. '
             ,
          None, None, None, None, None, None, None,
          'мастер КРС', descentNKT_norm(gPP_depth, 1.2)],
@@ -36,12 +37,12 @@ def grpGpp(self):
                      f'телефонограммой и выйти в вынужденный простой.',
          None, None, None, None, None, None, None,
          'мастер КРС', ''],
-        [None, None, f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС "Ойл-сервис". '
+        [f'Привязка по ГК и ЛМ', None, f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС "Ойл-сервис". '
                      f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером от 14.10.2021г. '
-                     f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины Отбить забой по ГК и ЛМ',
+                     f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины',
          None, None, None, None, None, None, None,
          'Мастер КРС, подрядчик по ГИС', 4],
-        [None, None, f'Установить ГПП  на гл. {gPP_depth}м. В случае отсутствия представителя подрядчика по ГРП ltd '
+        [f'Установить ГПП  на гл. {gPP_depth}м', None, f'Установить ГПП  на гл. {gPP_depth}м. В случае отсутствия представителя подрядчика по ГРП ltd '
                      f'оповестить Заказчика письменной телефонограммой и выйти в вынужденный простой.',
          None, None, None, None, None, None, None,
          'Мастер КРС, подрядчик по ГРП', 1.2],
@@ -96,7 +97,8 @@ def grpGpp(self):
          krs.lifting_unit(self),
          None, None, None, None, None, None, None,
          'Мастер КРС, представ. заказчика', 4.2],
-        [None, None,
+        [f'смену объема  уд.весом {CreatePZ.fluid_work} на циркуляцию '
+         f'в объеме {krs.volume_jamming_well(self, CreatePZ.current_bottom)}м3', None,
          f'Произвести смену объема обратной промывкой тех жидкостью уд.весом {CreatePZ.fluid_work} на циркуляцию '
          f'в объеме {krs.volume_jamming_well(self, CreatePZ.current_bottom)}м3. Закрыть скважину на стабилизацию не менее 2 часов. \n'
          f'(согласовать глушение в коллектор, в случае отсутствия на желобную емкость)',
@@ -109,7 +111,7 @@ def grpGpp(self):
          None, None, None, None, None, None, None,
          'Мастер КРС, представ. заказчика', None],
         [None, None,
-         krs.pvo_gno(CreatePZ.kat_pvo),
+         krs.pvo_gno(CreatePZ.kat_pvo)[0],
          None, None, None, None, None, None, None,
          'Мастер КРС, представ. заказчика', 4.67],
         [None, None,
@@ -130,7 +132,7 @@ def grpGpp(self):
 
     if gisOTZ_true_quest == QMessageBox.StandardButton.Yes:
         gpp_list.append(
-            [None, None, f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС "Ойл-сервис". '
+            [f'Отбить забой по ГК и ЛМ', None, f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС "Ойл-сервис". '
                          f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером от 14.10.2021г. '
                          f'ЗАДАЧА 2.8.2 Отбить забой по ГК и ЛМ',
              None, None, None, None, None, None, None,
@@ -156,7 +158,7 @@ def normalization(self):
                                             'Введите глубину необходмого забоя',
                                             int(CreatePZ.current_bottom), 0, int(CreatePZ.bottomhole_artificial + 500))
     normalization_list = [
-        [None, None, f'Алгоритм работ согласовать с Заказчиком: \n'
+        [f'Согласовать Алгоритм нормализации до H- {current_depth}м', None, f'Алгоритм работ согласовать с Заказчиком: \n'
                      f'В случае освоения скважины ГНКТ и дохождение до гл. не ниже {CreatePZ.current_bottom}м перейти к отбивки забоя '
                      f'В случае если скважину не осваивали ГНКТ продолжить работы со следующего пункта.\n'
                      f'В случае наличия ЗУМПФА не менее 10м продолжить работы со следующего пункта.\n'
@@ -169,7 +171,7 @@ def normalization(self):
          f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ) ',
          None, None, None, None, None, None, None,
          'Мастер КРС', descentNKT_norm(CreatePZ.current_bottom, 1)],
-        [None, None,
+        [f'нормализацию забоя до гл. {current_depth}м', None,
          f'Произвести нормализацию забоя  с наращиванием, комбинированной  промывкой по круговой циркуляции  жидкостью '
          f'с расходом жидкости не менее 8 л/с до гл. {current_depth}м. Тех отстой 2ч. Повторное определение '
          f'текущего забоя, при необходимости повторно вымыть.',
@@ -207,7 +209,7 @@ def normalization(self):
          'Мастер КРС', None],
         [None, None,
          f'Спустить компоновку с замером и шаблонированием НКТ:  долото Д={paker_diametr_select(CreatePZ.current_bottom) + 2}мм, забойный двигатель,'
-         f' НКТ  - 20м, вставной фильтр, НКТмм до кровли проппантной пробки. '
+         f' НКТ - 20м, вставной фильтр, НКТмм до кровли проппантной пробки. '
          f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ) ',
          None, None, None, None, None, None, None,
          'Мастер КРС', descentNKT_norm(current_depth, 1.2)],
@@ -221,7 +223,7 @@ def normalization(self):
          f'{round(CreatePZ.current_bottom * 1.12 / 1000, 1)}м3',
          None, None, None, None, None, None, None,
          'Мастер КРС', liftingNKT_norm(current_depth,1.2)],
-        [None, None, f'по согласованию с заказчиком: \n'
+        [f'по согласованию с заказчиком: Отбивка забоя', None, f'по согласованию с заказчиком: \n'
                      f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС "Ойл-сервис". '
                      f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером от 14.10.2021г. '
                      f'ЗАДАЧА 2.8.2 Отбить забой по ГК и ЛМ',
@@ -244,13 +246,18 @@ def gpp_select(paker_depth):
             CreatePZ.column_additional == True and paker_depth < CreatePZ.head_column_additional):
         paker_select = f'гидропескоструйный перфоратор под ЭК {CreatePZ.column_diametr}мм-{CreatePZ.column_wall_thickness}мм+' \
                        f'опрессовочный узел +НКТ{nkt_diam}мм - 10м, реперный патрубок НКТ{nkt_diam}мм - 2м,'
+        paker_short = f'ГПП под ЭК {CreatePZ.column_diametr}мм-{CreatePZ.column_wall_thickness}мм+' \
+                       f'опрессовочный узел +НКТ{nkt_diam}мм - 10м, репер НКТ{nkt_diam}мм - 2м,'
     else:
 
         paker_select = f'гидропескоструйный перфоратор под ЭК {CreatePZ.column_additional_diametr}мм-{CreatePZ.column_additional_wall_thickness}мм +' \
                        f'опрессовочный узел +НКТ{nkt_diam_add}мм - 10м, реперный патрубок НКТ{nkt_diam_add}мм - 2м, + НКТ{nkt_diam_add} L-' \
                        f'{round(paker_depth - CreatePZ.head_column_additional, 0)}м'
+        paker_short = f'ГПП под ЭК {CreatePZ.column_additional_diametr}мм-{CreatePZ.column_additional_wall_thickness}мм +' \
+                       f'опрессовочный узел +НКТ{nkt_diam_add}мм - 10м, репер НКТ{nkt_diam_add}мм - 2м, + НКТ{nkt_diam_add} L-' \
+                       f'{round(paker_depth - CreatePZ.head_column_additional, 0)}м'
 
-    return paker_select
+    return paker_select, paker_short
 
 
 def paker_select(paker_depth):
@@ -267,12 +274,17 @@ def paker_select(paker_depth):
     if CreatePZ.column_additional == False or (CreatePZ.column_additional == True and paker_depth < CreatePZ.head_column_additional):
         paker_select = f'воронка, НКТ{nkt_diam}мм - 1,5м, пакер ГРП для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм +' \
                        f'опрессовочный узел +НКТ{nkt_diam}мм - 10м, реперный патрубок НКТ{nkt_diam}мм - 2м'
+        paker_short = f'воронка, НКТ{nkt_diam}мм - 1,5м, пакер ГРП для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм +' \
+                       f'опрессовочный узел +НКТ{nkt_diam}мм - 10м, реперный патрубок НКТ{nkt_diam}мм - 2м'
 
     else:
         paker_select = f'воронка, НКТ{nkt_diam}мм - 1,5м, пакер ГРП для ЭК {CreatePZ.column_additional_diametr}мм х {CreatePZ.column_additional_wall_thickness}мм+' \
-                       f'опрессовочный узел +НКТ{nkt_diam}мм со снятыми фасками - 10м, реперный патрубок НКТ{nkt_diam}мм - 2м, + НКТ{nkt_diam} ' \
-                       f'со снятыми фасками L-{round(paker_depth - CreatePZ.head_column_additional, 0)}м'
-    return paker_select
+                       f'опрессовочный узел +НКТ{nkt_diam}мм - 10м, реперный патрубок НКТ{nkt_diam}мм - 2м, + НКТ{nkt_diam} ' \
+                       f' L-{round(paker_depth - CreatePZ.head_column_additional, 0)}м'
+        paker_short = f'воронка, НКТ{nkt_diam}мм - 1,5м, пакер ГРП для ЭК {CreatePZ.column_additional_diametr}мм х {CreatePZ.column_additional_wall_thickness}мм+' \
+                       f'опрессовочный узел +НКТ{nkt_diam}мм - 10м, реперный патрубок НКТ{nkt_diam}мм - 2м, + НКТ{nkt_diam} ' \
+                       f' L-{round(paker_depth - CreatePZ.head_column_additional, 0)}м'
+    return paker_select, paker_short
 
 
 def grpPaker(self):
@@ -285,7 +297,7 @@ def grpPaker(self):
                                           int(CreatePZ.perforation_roof - 50), 0, int(CreatePZ.current_bottom - 10))
     paker_depth = MyWindow.true_set_Paker(self, paker_depth)
     paker_list = [
-        [None, None, f'За 48 часов оформить заявку на завоз оборудования ГРП. Уложить НКТ на дополнительные стеллажи',
+        [f'За 48 часов оформить заявку на завоз оборудования ГРП.', None, f'За 48 часов оформить заявку на завоз оборудования ГРП. Уложить НКТ на дополнительные стеллажи',
          None, None, None, None, None, None, None,
          'мастер КРС', None],
 
@@ -295,8 +307,8 @@ def grpPaker(self):
          None, None, None, None, None, None, None,
          'мастер КРС', None],
 
-        [None, None,
-         f'Спустить компоновку с замером и шаблонированием НКТ: {paker_select(self, paker_depth)} на НКТ{nkt_diam}мм на глубину {paker_depth}м, с замером, шаблонированием НКТ. '
+        [f'СПО: {paker_select(self, paker_depth)[1]} на НКТ{nkt_diam}мм на Н {paker_depth}м', None,
+         f'Спустить компоновку с замером и шаблонированием НКТ: {paker_select(self, paker_depth)[0]} на НКТ{nkt_diam}мм на глубину {paker_depth}м, с замером, шаблонированием НКТ. '
          f'{"".join(["(Произвести пробную посадку на глубине 50м)" if CreatePZ.column_additional == False else " "])}',
          None, None, None, None, None, None, None,
          'мастер КРС', descentNKT_norm(paker_depth,1.2)],
@@ -306,7 +318,7 @@ def grpPaker(self):
                      f'телефонограммой и выйти в вынужденный простой.',
          None, None, None, None, None, None, None,
          'мастер КРС', ''],
-        [None, None, f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС "Ойл-сервис". '
+        [f'Привязка по ГК и ЛМ', None, f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС "Ойл-сервис". '
                      f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером от 14.10.2021г. '
                      f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины Отбить забой по ГК и ЛМ',
          None, None, None, None, None, None, None,
@@ -317,9 +329,9 @@ def grpPaker(self):
          f'оповестить Заказчика письменной телефонограммой и выйти в вынужденный простой.',
          None, None, None, None, None, None, None,
          'Мастер КРС, подрядчик по ГРП', 0.77],
-        [None, None,
-         f'{testing_pressure(self, paker_depth)}. Опрессовку производить в присутствии следующих '
-         f'представителей: УСРСиСТ  (супервайзер), подрядчика по ГРП. \n В случае негерметичности пакера, дальнейшие '
+        [testing_pressure(self, paker_depth)[1], None,
+         f'{testing_pressure(self, paker_depth)[0]}. Опрессовку производить в присутствии следующих '
+         f'представителей: УСРСиСТ (супервайзер), подрядчика по ГРП. \n В случае негерметичности пакера, дальнейшие '
          f'работы согласовать с Заказчиком. ',
          None, None, None, None, None, None, None,
          'Мастер КРС, подрядчик по ГРП, УСРСиСТ', 0.67],
@@ -363,7 +375,7 @@ def grpPaker(self):
          f'глушения скважины, работы производить в присутствии представителей подрядной организации по проведению ГРП и УСРСиСТ',
          None, None, None, None, None, None, None,
          'Мастер КРС, представ. заказчика', 0.5],
-        [None, None,
+        [f'При избыточном давлении более 10атм - разрядка не более 25м3', None,
          f'После разрядки скважины в объеме не менее 25м3, подтвержденной представителями ЦДНГ согласовать проведение '
          f'ГИС -пластомер для расчета жидкости глушения, произвести перерасчет ЖГ и проглушить скважину соответствующей '
          f'жидкостью. Дальнейшие работы продолжить на жидкости глушения согласно расчета. В случае отрицательных '
@@ -374,7 +386,8 @@ def grpPaker(self):
          krs.lifting_unit(self),
          None, None, None, None, None, None, None,
          'Мастер КРС, представ. заказчика', 4.2],
-        [None, None,
+        [f'сменf объема уд.весом {CreatePZ.fluid_work} на циркуляцию '
+         f'в объеме {krs.volume_jamming_well(self, CreatePZ.current_bottom)}м3', None,
          f'Произвести смену объема обратной промывкой тех жидкостью уд.весом {CreatePZ.fluid_work} на циркуляцию '
          f'в объеме {krs.volume_jamming_well(self, CreatePZ.current_bottom)}м3. Закрыть скважину на стабилизацию не менее 2 часов. \n'
          f'(согласовать глушение в коллектор, в случае отсутствия на желобную емкость)',
@@ -386,8 +399,8 @@ def grpPaker(self):
          f'согласовать с Заказчиком.',
          None, None, None, None, None, None, None,
          'Мастер КРС, представ. заказчика', None],
-        [None, None,
-         krs.pvo_gno(CreatePZ.kat_pvo),
+        [krs.pvo_gno(CreatePZ.kat_pvo)[1], None,
+         krs.pvo_gno(CreatePZ.kat_pvo)[0],
          None, None, None, None, None, None, None,
          'Мастер КРС, представ. заказчика', 1.67],
         [None, None,
@@ -409,11 +422,7 @@ def grpPaker(self):
          None,
          None, None, None, None, None,
          'Мастер КРС', 0.67],
-        [None, None,
-         f'За 48 часов запросить КАРТУ спуска на ГНО и заказать  ГНО.', None,
-         None,
-         None, None, None, None, None,
-         'Мастер КРС', 1],
+
     ]
 
     gisOTZ_true_quest = QMessageBox.question(self, 'отбивка забоя ',
@@ -421,7 +430,7 @@ def grpPaker(self):
 
     if gisOTZ_true_quest == QMessageBox.StandardButton.Yes:
         paker_list.append(
-            [None, None, f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС "Ойл-сервис". '
+            [f'Отбить забой по ГК и ЛМ', None, f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС "Ойл-сервис". '
                          f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером от 14.10.2021г. '
                          f'ЗАДАЧА 2.8.2 Отбить забой по ГК и ЛМ',
              None, None, None, None, None, None, None,
@@ -454,15 +463,18 @@ def paker_select(self, paker_depth):
     if CreatePZ.column_additional == False or CreatePZ.column_additional == True and paker_depth < CreatePZ.head_column_additional:
         paker_select = f'воронка, НКТ{nkt_diam}мм - 1,5м, пакер ПРО-ЯМО-{paker_diametr_select(paker_depth)} (либо аналог) +' \
                        f'опрессовочный узел +НКТ{nkt_diam}мм - 10м, реперный патрубок НКТ{nkt_diam}мм - 2м,'
+        paker_short = f'в-ка, НКТ{nkt_diam}мм - 1,5м, пакер {paker_diametr_select(paker_depth)}  +' \
+                       f'опрессовочный узел +НКТ{nkt_diam}мм - 10м, репер НКТ{nkt_diam}мм - 2м,'
     elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr < 110 and paker_depth > CreatePZ.head_column_additional:
         paker_select = f'воронка, НКТ{nkt_diam}мм - 1,5м, пакер ПРО-ЯМО-{paker_diametr_select(paker_depth)} (либо аналог) +' \
                        f'опрессовочный узел +НКТ{nkt_diam}мм - 10м, реперный патрубок НКТ{nkt_diam}мм - 2м, + НКТ{nkt_diam} L-' \
                        f'{round(paker_depth - CreatePZ.head_column_additional, 0)}м'
-    elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr > 110 and paker_depth > CreatePZ.head_column_additional:
-        paker_select = f'воронка, НКТ{nkt_diam}мм - 1,5м, пакер ПРО-ЯМО-{paker_diametr_select(paker_depth)} (либо аналог) +' \
-                       f'опрессовочный узел +НКТ{nkt_diam}мм со снятыми фасками - 10м, реперный патрубок НКТ{nkt_diam}мм - 2м, + НКТ{nkt_diam} ' \
-                       f'со снятыми фасками L-{round(paker_depth - CreatePZ.head_column_additional, 0)}м'
-    return paker_select
+        paker_short = f'в-ка, НКТ{nkt_diam}мм - 1,5м, пакер ПРО-ЯМО-{paker_diametr_select(paker_depth)}' \
+                      f'опрессовочный узел +НКТ{nkt_diam}мм - 10м, репер НКТ{nkt_diam}мм - 2м,' \
+                      f'{round(paker_depth - CreatePZ.head_column_additional, 0)}м'
+
+
+    return paker_select, paker_short
 
 
 def nktGrp(self):

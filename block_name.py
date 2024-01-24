@@ -107,7 +107,7 @@ def pop_down(self, region, curator_sel):
          '_____________________Пом.бур-ка ООО "Ойл-Сервис"_______________________', None, None, None, None,
          None, None, None],
         [None, None, 'Машинист', None,
-         '_____________________ Машинист                      ________________________', None, None, None,
+         '_____________________ МашинисТ                     ________________________', None, None, None,
          None, None, None, None],
         [None, None, None, None, None, None, None, None, None, None, None, None]]
 

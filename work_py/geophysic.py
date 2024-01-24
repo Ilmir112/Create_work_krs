@@ -76,39 +76,16 @@ class GeophysicWindow(MyWindow):
         vbox.addWidget(self.buttonDel, 2, 1)
         vbox.addWidget(self.buttonAddWork, 3, 0)
 
-    def geophysicalSelect(self, geophysic, editType, editType2):
-        from open_pz import CreatePZ
-        if geophysic == 'АКЦ':
-            research = f'ЗАДАЧА 2.7.1 Определение состояния цементного камня (АКЦ, АК-сканирование) в интервале {editType}-{editType2}м. '
-        elif geophysic == 'СГДТ':
-            research = f'ЗАДАЧА 2.7.2 Определение плотности, дефектов цементного камня, эксцентриситета колонны (СГДТ) в интервале {editType}-{editType2}м.'
-        elif geophysic == 'АКЦ + СГДТ':
-            research = f'ЗАДАЧА 2.7.3  Определение состояния цементного камня (АКЦ, АК-сканирование). в интервале {editType}-{editType2}м,' \
-                       f'Определение плотности, дефектов цементного камня, эксцентриситета колонны (СГДТ) в интервале 0 - {CreatePZ.perforation_roof-20} '
+    def geophysicalSelect(self, geophysic):
 
-
-        elif geophysic == 'ИНГК':
-            research = f'ЗАДАЧА 2.4.3 Определение текущей нефтенасыщенности по данным интегрального импульсного нейтронного' \
-                       f'каротажа пласта  в интервале {editType}-{editType2}м. '
-        elif geophysic == 'Гироскоп':
-            research = f'ЗАДАЧА 2.7.4. Определение траектории ствола скважины гироскопическим инклинометром в интервале {editType}-{editType2}м. '
-        elif geophysic == 'РК':
-            research = f'ЗАДАЧА 2.4.1 РК в интервале {editType}-{editType2}м. '
-        elif geophysic == 'ЭМДС':
-            research = f' ЗАДАЧА 2.6.11.  Определение интервалов дефектов и толщины колонн и НКТ с ' \
-                       f'использованием электромагнитной дефектоскопии  и толщинометрии  в интервале в интервале {editType}-{editType2}м.'
-        elif geophysic == 'ПТС':
-            research = f'ЗАДАЧА 2.6.10 Профилимер в интервале {editType}-{editType2}м.'
-        elif geophysic == 'ГК и ЛМ':
-            research = f'Произвести записи ГК и ЛМ интервале {editType}-{editType2}м. '
-        return research
+        return geophysic
 
     def addRowTable(self):
         from open_pz import CreatePZ
         editType = self.tabWidget.currentWidget().lineEditType.text()
         editType2 = self.tabWidget.currentWidget().lineEditType2.text()
-        researchGis = self.geophysicalSelect(str(self.tabWidget.currentWidget().ComboBoxGeophygist.currentText()),
-                                             editType, editType2)
+        researchGis = self.geophysicalSelect(str(self.tabWidget.currentWidget().ComboBoxGeophygist.currentText()))
+
         dopInformation = self.tabWidget.currentWidget().lineEditDopInformation.text()
         if not editType or not editType2 or not researchGis:
             msg = QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
@@ -126,6 +103,47 @@ class GeophysicWindow(MyWindow):
         self.tableWidget.setItem(rows, 2, QTableWidgetItem(editType2))
         self.tableWidget.setItem(rows, 3, QTableWidgetItem(dopInformation))
         self.tableWidget.setSortingEnabled(True)
+    def geophysic_sel(self, geophysic, editType, editType2):
+        if geophysic == 'АКЦ':
+            research = f'ЗАДАЧА 2.7.1 Определение состояния цементного камня (АКЦ, АК-сканирование) в интервале {editType}-{editType2}м. '
+            research_short = f'АКЦ в интервале {editType}-{editType2}м.'
+        elif geophysic == 'СГДТ':
+            research = f'ЗАДАЧА 2.7.2 Определение плотности, дефектов цементного камня, эксцентриситета колонны (СГДТ) в интервале {editType}-{editType2}м.'
+            research_short = f'СГДТ в интервале {editType}-{editType2}м.'
+        elif geophysic == 'АКЦ + СГДТ':
+            research = f'ЗАДАЧА 2.7.3  Определение состояния цементного камня (АКЦ, АК-сканирование). в интервале {editType}-{editType2}м,' \
+                       f'Определение плотности, дефектов цементного камня, эксцентриситета колонны (СГДТ) в интервале 0 - {CreatePZ.perforation_roof - 20} '
+            research_short = f'АКЦ в интервале {editType}-{editType2}м.' \
+                             f'СГДТ в интервале 0 - {CreatePZ.perforation_roof - 20}'
+
+
+
+        elif geophysic == 'ИНГК':
+            research = f'ЗАДАЧА 2.4.3 Определение текущей нефтенасыщенности по данным интегрального импульсного нейтронного' \
+                       f'каротажа пласта  в интервале {editType}-{editType2}м. '
+            research_short = f'ИНГК в интервале {editType}-{editType2}м.'
+
+        elif geophysic == 'Гироскоп':
+            research = f'ЗАДАЧА 2.7.4. Определение траектории ствола скважины гироскопическим инклинометром ' \
+                       f'в интервале {editType}-{editType2}м. '
+            research_short = f'Гироскоп в интервале {editType}-{editType2}м.'
+        elif geophysic == 'РК':
+            research = f'ЗАДАЧА 2.4.1 РК в интервале {editType}-{editType2}м. '
+            research_short = f'РК в интервале {editType}-{editType2}м.'
+        elif geophysic == 'ЭМДС':
+            research = f' ЗАДАЧА 2.6.11. Определение интервалов дефектов и толщины колонн и НКТ с ' \
+                       f'использованием электромагнитной дефектоскопии  и толщинометрии в ' \
+                       f'интервале {editType}-{editType2}м.'
+            research_short = f'ЭМДС в интервале {editType}-{editType2}м.'
+        elif geophysic == 'ПТС':
+            research = f'ЗАДАЧА 2.6.10 Профилимер в интервале {editType}-{editType2}м.'
+            research_short = f'ПТС в интервале {editType}-{editType2}м.'
+
+        elif geophysic == 'ГК и ЛМ':
+            research = f'Произвести записи ГК и ЛМ интервале {editType}-{editType2}м. '
+            research_short = f'ГК и ЛМ в интервале {editType}-{editType2}м.'
+
+        return research, research_short
 
     def addWork(self):
 
@@ -133,12 +151,12 @@ class GeophysicWindow(MyWindow):
 
         rows = self.tableWidget.rowCount()
         geophysicalResearch = [
-            [None, None, f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС "Ойл-сервис". '
+            [" ", None, f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС "Ойл-сервис". '
                          f'При необходимости  подготовить место для установки партии ГИС напротив мостков. '
-                         f'Произвести  монтаж ГИС согласно схемы  №8а утвержденной главным инженером от  14.10.2021г',
+                         f'Произвести  монтаж ГИС согласно схемы  №8а утвержденной главным инженером оТ 14.10.2021г',
              None, None, None, None, None, None, None,
-             'Мастер КРС', None, None, ' '],
-            [None, None,
+             'Мастер КРС', ' '],
+            [' ', None,
              f'Долить скважину до устья тех жидкостью уд.весом {CreatePZ.fluid_work} .Установить ПВО по схеме №8а утвержденной '
              f'главным инженером ООО "Ойл-сервис" от 14.10.2021г. Опрессовать  плашки  ПВО (на давление опрессовки ЭК, но '
              f'не ниже максимального ожидаемого давления на устье) {CreatePZ.max_expected_pressure}атм, по невозможности на давление поглощения, но '
@@ -148,20 +166,27 @@ class GeophysicWindow(MyWindow):
         ]
 
         for row in range(rows):
-            researchGis_list = [None, None]
-            for col in range(0, 9):
-                item = self.tableWidget.item(row, col)
-                if item:
-                    if col == 0:
-                        value = item.text()
-                        researchGis_list.append(value)
+            researchGis_list = []
 
-            researchGis_list.extend([None, None, None, None, None, None, None, 'подряд по ГИС', 4])
+            item = self.tableWidget.item(row, 0)
+            edit1 = self.tableWidget.item(row, 1)
+            edit2 = self.tableWidget.item(row, 2)
+            if item and edit1 and edit2:
+                value = item.text()
+                edit1_1 = edit1.text()
+                edit2_1 = edit2.text()
+                geo_sel = self.geophysic_sel(value, edit1_1, edit2_1)
+                # print(f'геофои {geo_sel}')
+                researchGis_list.extend([geo_sel[1], None, geo_sel[0], None, None, None, None, None, None, None, 'подряд по ГИС', 4])
+
+
+
             geophysicalResearch.append(researchGis_list)
+        # print(geophysicalResearch)
 
         ori = QMessageBox.question(self, 'ОРИ', 'Нужна ли интерпретация?')
         if ori == QMessageBox.StandardButton.Yes:
-            geophysicalResearch.append([None, None,
+            geophysicalResearch.append([f'ОРИ', None,
                                         f'Интерпретация данных ГИС, согласовать с ПТО и Ведущим инженером ЦДНГ опрессовку фНКТ ',
                                         None, None, None, None, None, None, None,
                                         'Мастер КРС, подрядчик по ГИС', 8])
@@ -182,7 +207,7 @@ class GeophysicWindow(MyWindow):
 
                 self.table_widget.setItem(row, column, QtWidgets.QTableWidgetItem(str(data)))
 
-                if column == 2 or column == 10 or column == 11 or column == 12:
+                if column == 0 or column == 2 or column == 10 or column == 11 or column == 12:
                     if not data is None:
                         text = data
                         for key, value in text_width_dict.items():
