@@ -154,7 +154,7 @@ def gno_down(self):
                    None, None, None, None, None, None, None,
                    'Мастер КРС, предст. заказчика', 1.27],
 
-                  [f'Спустить {CreatePZ.dict_pump_SHGN["posle"]} на компоновке штанг:'
+                  [f'Спустить плунжер на компоновке штанг:'
                    f' {gno_nkt_opening(CreatePZ.dict_sucker_rod_po)}', None,
                    f'Обвязать устье скважины согласно схемы №3 утвержденной главным '
                     f'инженером от 14.10.2021г при СПО штанг (ПМШ 62х21 либо аналог). Опрессовать ПВО на '
@@ -260,7 +260,7 @@ def gno_down(self):
                               f'{testing_pressure(self, CreatePZ.H_F_paker_do["posle"])[0]}',
                               None, None, None, None, None, None, None,
                               'Мастер КРС, предст. заказчика', 0.67],
-                             [None, None,
+                             [f'Спустить плунжер на компоновке штанг: {gno_nkt_opening(CreatePZ.dict_sucker_rod_po)}м', None,
                               f'Обвязать устье скважины согласно схемы №3 утвержденной главным '
                                 f'инженером от 14.10.2021г при СПО штанг (ПМШ 62х21 либо аналог). Опрессовать ПВО на {CreatePZ.max_expected_pressure}атм.'
                               f'Спустить плунжер на компоновке штанг: {gno_nkt_opening(CreatePZ.dict_sucker_rod_po)}  Окончательный компоновку штанг производить по расчету '

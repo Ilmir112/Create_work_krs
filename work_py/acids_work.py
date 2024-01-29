@@ -44,20 +44,20 @@ def acid_work(self):
 
         nkt_diam = ''.join(['73' if CreatePZ.column_diametr > 110 else '60'])
         # print(f' 5 {CreatePZ.column_additional == False, (CreatePZ.column_additional == True and paker_depth < CreatePZ.head_column_additional), swabbing_true_quest == False}')
-
+        paker_diametr = paker_diametr_select(CreatePZ.paker_depth)
         if (CreatePZ.column_additional == False and CreatePZ.swabbing_true_quest == True) or (CreatePZ.column_additional == True \
                 and CreatePZ.paker_depth < CreatePZ.head_column_additional and CreatePZ.swabbing_true_quest == True):
-            paker_select = f'воронку + НКТ{nkt_diam}мм {CreatePZ.paker_khost}м + пакер ПРО-ЯМО-{paker_diametr_select(CreatePZ.paker_depth)}мм (либо аналог) ' \
+            paker_select = f'воронку + НКТ{nkt_diam}мм {CreatePZ.paker_khost}м + пакер ПРО-ЯМО-{paker_diametr}мм (либо аналог) ' \
                            f'для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм + НКТ 10м'
             dict_nkt = {73: CreatePZ.paker_depth + CreatePZ.paker_khost}
 
         elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr < 110 and \
                 CreatePZ.paker_depth > CreatePZ.head_column_additional and CreatePZ.swabbing_true_quest == True:
-            paker_select = f'воронку + НКТ{60}мм {CreatePZ.paker_khost}м + пакер ПРО-ЯМО-{paker_diametr_select(CreatePZ.paker_depth)}мм (либо аналог) ' \
+            paker_select = f'воронку + НКТ{60}мм {CreatePZ.paker_khost}м + пакер ПРО-ЯМО-{paker_diametr}мм (либо аналог) ' \
                            f'для ЭК {CreatePZ.column_additional_diametr}мм х {CreatePZ.column_additional_wall_thickness}мм + НКТ60мм 10м '
             dict_nkt = {73: CreatePZ.head_column_additional, 60: int(CreatePZ.paker_depth - CreatePZ.head_column_additional)}
         elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr > 110 and CreatePZ.paker_depth > CreatePZ.head_column_additional and CreatePZ.swabbing_true_quest == True:
-            paker_select = f'воронку + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками {CreatePZ.paker_khost}м + пакер ПРО-ЯМО-{paker_diametr_select(CreatePZ.paker_depth)}мм (либо аналог) ' \
+            paker_select = f'воронку + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками {CreatePZ.paker_khost}м + пакер ПРО-ЯМО-{paker_diametr}мм (либо аналог) ' \
                            f'для ЭК {CreatePZ.column_additional_diametr}мм х {CreatePZ.column_additional_wall_thickness}мм + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками 10м'
             dict_nkt = {73: CreatePZ.paker_depth + CreatePZ.paker_khost}
         elif (CreatePZ.column_additional == False and CreatePZ.swabbing_true_quest == False) or (CreatePZ.column_additional == True
@@ -66,12 +66,12 @@ def acid_work(self):
             dict_nkt = {73: CreatePZ.paker_depth + CreatePZ.paker_khost}
             # print(f' 5 {CreatePZ.column_additional == False, (CreatePZ.column_additional == True and paker_depth < CreatePZ.head_column_additional), swabbing_true_quest == False}')
         elif CreatePZ.column_additional == True or (CreatePZ.column_additional_diametr < 110 and (CreatePZ.paker_depth > CreatePZ.head_column_additional) and CreatePZ.swabbing_true_quest == False):
-            paker_select = f'Заглушку + щелевой фильтр + НКТ{60}мм {CreatePZ.paker_khost}м + пакер ПРО-ЯМО-{paker_diametr_select(CreatePZ.paker_depth)}мм (либо аналог) ' \
+            paker_select = f'Заглушку + щелевой фильтр + НКТ{60}мм {CreatePZ.paker_khost}м + пакер ПРО-ЯМО-{paker_diametr}мм (либо аналог) ' \
                            f'для ЭК {CreatePZ.column_additional_diametr}мм х {CreatePZ.column_additional_wall_thickness}мм + НКТ60мм 10м + сбивной клапан с ввертышем'
             dict_nkt = {73: CreatePZ.head_column_additional, 60: int(CreatePZ.paker_depth - CreatePZ.head_column_additional)}
         elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr > 110 and CreatePZ.paker_depth > CreatePZ.head_column_additional \
                 and CreatePZ.swabbing_true_quest == False:
-            paker_select = f'Заглушку + щелевой фильтр + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками {CreatePZ.paker_khost}м + пакер ПРО-ЯМО-{paker_diametr_select(CreatePZ.paker_depth)}мм (либо аналог) ' \
+            paker_select = f'Заглушку + щелевой фильтр + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками {CreatePZ.paker_khost}м + пакер ПРО-ЯМО-{paker_diametr}мм (либо аналог) ' \
                            f'для ЭК {CreatePZ.column_additional_diametr}мм х {CreatePZ.column_additional_wall_thickness}мм + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками 10м + сбивной клапан с ввертышем'
             dict_nkt = {73: CreatePZ.paker_depth + CreatePZ.paker_khost}
 
@@ -241,7 +241,7 @@ def acid_work_list(self, paker_depth, paker_khost, dict_nkt, paker_layout):
     elif CreatePZ.acid == 'HF':
         # CreatePZ.acid_V, ok = QInputDialog.getDouble(self, 'Объем кислоты', 'Введите объем кислоты:', 10, 0.5, 300, 1)
         # CreatePZ.acid_pr, ok = QInputDialog.getInt(self, 'концентрация кислоты', 'Введите концентрацию кислоты', 15, 2, 24)
-        CreatePZ.acid_sel = f'Произвести кислотную обработку пласта {plast}  в объеме  {CreatePZ.acid_V}м3  ({CreatePZ.acid} - {CreatePZ.acid_pr} %) силами СК Крезол ' \
+        CreatePZ.acid_sel = f'Произвести кислотную обработку пласта {plast}  в объеме  {CreatePZ.acid_V}м3  (концентрация в смеси HF 3% / HCl 13%) силами СК Крезол ' \
                    f'в присутствии представителя заказчика с составлением акта, не превышая давления закачки не более Р={CreatePZ.max_admissible_pressure}атм.'
     elif CreatePZ.acid == 'Нефтекислотка':
         # CreatePZ.acid_V, ok = QInputDialog.getDouble(self, 'Объем кислоты', 'Введите объем кислоты:', 10, 0.5, 300, 1)

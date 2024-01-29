@@ -1,4 +1,5 @@
 from PyQt5.QtWidgets import QInputDialog, QMessageBox
+from PyQt5.uic.properties import QtWidgets
 
 import krs
 from main import MyWindow
@@ -11,10 +12,21 @@ def grpGpp(self):
 
     nkt_diam = ''.join(['89' if CreatePZ.column_diametr > 110 else '60'])
 
-    gPP_depth, ok = QInputDialog.getInt(None, 'глубина ',
+    gpp_depth, ok = QInputDialog.getInt(None, 'глубина ',
                                         'Введите глубину установки',
                                         int(CreatePZ.perforation_roof - 50), 0, int(CreatePZ.bottomhole_drill))
+    gPP_300 = MyWindow.true_set_Paker(self, 300)
+    gpp_depth = MyWindow.true_set_Paker(self, gpp_depth)
 
+    for row in range(self.table_widget.rowCount()):
+        for column in range(self.table_widget.columnCount()):
+            value = self.table_widget.item(row, column)
+            if value != None:
+                value = value.text()
+                if 'Установить подъёмный агрегат на устье не менее 40т' in value:
+                    new_value = f'Установить подъёмный агрегат на устье не менее 60т. Пусковой комиссией ' \
+                            f'составить акт готовности подьемного агрегата и бригады для проведения ремонта скважины.)'
+                    self.table_widget.setItem(row, column, new_value)
 
     gpp_list = [
         ['За 48 часов оформить заявку на завоз оборудования ГРП.',
@@ -26,11 +38,13 @@ def grpGpp(self):
          f' согласно плана от подрядчика по ГРП.',
          None, None, None, None, None, None, None,
          'мастер КРС', None],
-        [f'СПО: {gpp_select(gPP_depth)[0]} на НКТ{nkt_diam} на Н {gPP_depth}м', None,
-         f'Спустить компоновку с замером и шаблонированием НКТ: {gpp_select(gPP_depth)[0]} на НКТ{nkt_diam} на глубину {gPP_depth}м, с замером, шаблонированием НКТ. '
+        [f'СПО: {gpp_select(gpp_depth)[0]} на НКТ{nkt_diam} на Н {gpp_depth}м', None,
+         f'Спустить компоновку с замером и шаблонированием НКТ: {gpp_select(gpp_depth)[0]} на НКТ{nkt_diam} на '
+         f'глубину {gpp_depth}м, с замером, шаблонированием НКТ. В компоновке предусмотреть пакер с установкой '
+         f'на глубине 300м для внештатных ситуаций во время ГРП'
             ,
          None, None, None, None, None, None, None,
-         'мастер КРС', descentNKT_norm(gPP_depth, 1.2)],
+         'мастер КРС', descentNKT_norm(gpp_depth, 1.2)],
         [None, None, f'При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ) '
                      f'Сборку компоновки производить только под руководством представителя подрядчика по ГРП'
                      f'В случае отсутствия представителя подрядчика по ГРП ltd оповестить Заказчика письменной '
@@ -42,7 +56,7 @@ def grpGpp(self):
                      f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины',
          None, None, None, None, None, None, None,
          'Мастер КРС, подрядчик по ГИС', 4],
-        [f'Установить ГПП  на гл. {gPP_depth}м', None, f'Установить ГПП  на гл. {gPP_depth}м. В случае отсутствия представителя подрядчика по ГРП ltd '
+        [f'Установить ГПП  на гл. {gpp_depth}м', None, f'Установить ГПП  на гл. {gpp_depth}м. В случае отсутствия представителя подрядчика по ГРП ltd '
                      f'оповестить Заказчика письменной телефонограммой и выйти в вынужденный простой.',
          None, None, None, None, None, None, None,
          'Мастер КРС, подрядчик по ГРП', 1.2],
@@ -94,7 +108,8 @@ def grpGpp(self):
          None, None, None, None, None, None, None,
          'Мастер КРС, представ. заказчика', 8],
         [None, None,
-         krs.lifting_unit(self),
+         f'Установить подъёмный агрегат на устье не менее 60т. Пусковой комиссией составить акт готовности '
+         f'подьемного агрегата и бригады для проведения ремонта скважины.',
          None, None, None, None, None, None, None,
          'Мастер КРС, представ. заказчика', 4.2],
         [f'смену объема  уд.весом {CreatePZ.fluid_work} на циркуляцию '
@@ -119,12 +134,12 @@ def grpGpp(self):
          None, None, None, None, None, None, None,
          'Мастер КРС, представ. заказчика', 1],
         [None, None,
-         f'Поднять устройство ГПП на НКТ{nkt_diam}мм с глубины {gPP_depth}м на поверхность, '
+         f'Поднять устройство ГПП на НКТ{nkt_diam}мм с глубины {gpp_depth}м на поверхность, '
          f'с доливом скважины тех.жидкостью уд. весом {CreatePZ.fluid_work}  в объеме '
-         f'{round(gPP_depth * 1.12 / 1000, 1)}м3. \n'
+         f'{round(gpp_depth * 1.12 / 1000, 1)}м3. \n'
          f'На демонтаж пригласить представителя подрядчика по ГРП',
          None, None, None, None, None, None, None,
-         'Мастер КРС, представ. заказчика', liftingNKT_norm(gPP_depth,1.2)],
+         'Мастер КРС, представ. заказчика', liftingNKT_norm(gpp_depth,1.2)],
     ]
 
     gisOTZ_true_quest = QMessageBox.question(self, 'отбивка забоя ',
@@ -270,7 +285,8 @@ def paker_select(paker_depth):
     else:
         nkt_diam = '60'
     paker_select = ''
-    print(f'пакер ГРП {paker_diametr_select(paker_depth)}')
+    
+    
     if CreatePZ.column_additional == False or (CreatePZ.column_additional == True and paker_depth < CreatePZ.head_column_additional):
         paker_select = f'воронка, НКТ{nkt_diam}мм - 1,5м, пакер ГРП для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм +' \
                        f'опрессовочный узел +НКТ{nkt_diam}мм - 10м, реперный патрубок НКТ{nkt_diam}мм - 2м'
@@ -459,17 +475,17 @@ def paker_select(self, paker_depth):
         nkt_diam = '73'
     else:
         nkt_diam = '60'
-
+    paker_diametr = paker_diametr_select(paker_depth)
     if CreatePZ.column_additional == False or CreatePZ.column_additional == True and paker_depth < CreatePZ.head_column_additional:
-        paker_select = f'воронка, НКТ{nkt_diam}мм - 1,5м, пакер ПРО-ЯМО-{paker_diametr_select(paker_depth)} (либо аналог) +' \
+        paker_select = f'воронка, НКТ{nkt_diam}мм - 1,5м, пакер ПРО-ЯМО-{paker_diametr} (либо аналог) +' \
                        f'опрессовочный узел +НКТ{nkt_diam}мм - 10м, реперный патрубок НКТ{nkt_diam}мм - 2м,'
-        paker_short = f'в-ка, НКТ{nkt_diam}мм - 1,5м, пакер {paker_diametr_select(paker_depth)}  +' \
+        paker_short = f'в-ка, НКТ{nkt_diam}мм - 1,5м, пакер {paker_diametr}  +' \
                        f'опрессовочный узел +НКТ{nkt_diam}мм - 10м, репер НКТ{nkt_diam}мм - 2м,'
     elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr < 110 and paker_depth > CreatePZ.head_column_additional:
-        paker_select = f'воронка, НКТ{nkt_diam}мм - 1,5м, пакер ПРО-ЯМО-{paker_diametr_select(paker_depth)} (либо аналог) +' \
+        paker_select = f'воронка, НКТ{nkt_diam}мм - 1,5м, пакер ПРО-ЯМО-{paker_diametr} (либо аналог) +' \
                        f'опрессовочный узел +НКТ{nkt_diam}мм - 10м, реперный патрубок НКТ{nkt_diam}мм - 2м, + НКТ{nkt_diam} L-' \
                        f'{round(paker_depth - CreatePZ.head_column_additional, 0)}м'
-        paker_short = f'в-ка, НКТ{nkt_diam}мм - 1,5м, пакер ПРО-ЯМО-{paker_diametr_select(paker_depth)}' \
+        paker_short = f'в-ка, НКТ{nkt_diam}мм - 1,5м, пакер ПРО-ЯМО-{paker_diametr}' \
                       f'опрессовочный узел +НКТ{nkt_diam}мм - 10м, репер НКТ{nkt_diam}мм - 2м,' \
                       f'{round(paker_depth - CreatePZ.head_column_additional, 0)}м'
 

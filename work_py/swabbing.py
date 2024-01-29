@@ -194,27 +194,27 @@ def swabbing_with_paker(self, paker_khost, pakerKompo):
 
     nkt_diam = ''.join(['73' if CreatePZ.column_diametr > 110 or (
                 CreatePZ.column_diametr > 110 and CreatePZ.column_additional == True and CreatePZ.head_column_additional > 800) else '60'])
-
+    paker_diametr = paker_diametr_select(paker_depth)
     if CreatePZ.column_additional == False or (CreatePZ.column_additional == True and \
             paker_depth < CreatePZ.head_column_additional and CreatePZ.head_column_additional > 800) or \
             (CreatePZ.column_additional_diametr < 110 and paker_depth > CreatePZ.head_column_additional):
-        paker_select = f'воронку со свабоограничителем + НКТ{nkt_diam}м {paker_khost}м + пакер ПРО-ЯМО-{paker_diametr_select(paker_depth)}мм (либо аналог) ' \
+        paker_select = f'воронку со свабоограничителем + НКТ{nkt_diam}м {paker_khost}м + пакер ПРО-ЯМО-{paker_diametr}мм (либо аналог) ' \
                        f'для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм + НКТ 10м'
-        paker_short = f'в/ку со с/о + НКТ{nkt_diam}м {paker_khost}м + пакер ПРО-ЯМО-{paker_diametr_select(paker_depth)}мм + НКТ 10м + репер'
+        paker_short = f'в/ку со с/о + НКТ{nkt_diam}м {paker_khost}м + пакер ПРО-ЯМО-{paker_diametr}мм + НКТ 10м + репер'
 
         dict_nkt = {int(nkt_diam): paker_depth + paker_khost}
     elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr < 110 and paker_depth > CreatePZ.head_column_additional :
-        paker_select = f'воронку со свабоограничителем+ НКТ{60}мм {paker_khost}м + пакер ПРО-ЯМО-{paker_diametr_select(paker_depth)}мм (либо аналог) ' \
+        paker_select = f'воронку со свабоограничителем+ НКТ{60}мм {paker_khost}м + пакер ПРО-ЯМО-{paker_diametr}мм (либо аналог) ' \
                        f'для ЭК {CreatePZ.column_additional_diametr}мм х {CreatePZ.column_additional_wall_thickness}мм + НКТ60мм 10м '
-        paker_short = f'в-ку со свабоогр.+ НКТ{60}мм {paker_khost}м + пакер ПРО-ЯМО-{paker_diametr_select(paker_depth)}мм  + НКТ60мм 10м '
+        paker_short = f'в-ку со свабоогр.+ НКТ{60}мм {paker_khost}м + пакер ПРО-ЯМО-{paker_diametr}мм  + НКТ60мм 10м '
         dict_nkt = {int(nkt_diam): CreatePZ.head_column_additional, 60: int(paker_depth - CreatePZ.head_column_additional)}
     elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr > 110 and paker_depth > CreatePZ.head_column_additional:
         paker_select = f'воронку со свабоограничителем+ НКТ{CreatePZ.nkt_diam}мм со снятыми фасками {paker_khost}м + ' \
-                       f'пакер ПРО-ЯМО-{paker_diametr_select(paker_depth)}мм (либо аналог) ' \
+                       f'пакер ПРО-ЯМО-{paker_diametr}мм (либо аналог) ' \
                        f'для ЭК {CreatePZ.column_additional_diametr}мм х {CreatePZ.column_additional_wall_thickness}мм'\
                        f' + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками 10м'
         paker_short = f'в-ку со свабоогр.+ НКТ{CreatePZ.nkt_diam}мм со снятыми фасками {paker_khost}м + ' \
-                      f'пакер ПРО-ЯМО-{paker_diametr_select(paker_depth)}мм + НКТ{CreatePZ.nkt_diam}мм ' \
+                      f'пакер ПРО-ЯМО-{paker_diametr}мм + НКТ{CreatePZ.nkt_diam}мм ' \
                       f'со снятыми фасками 10м'
         dict_nkt = {int(nkt_diam): paker_depth + paker_khost}
     elif nkt_diam == 60:

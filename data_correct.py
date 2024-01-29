@@ -187,14 +187,11 @@ class TabPage_SO(QWidget):
         self.sucker_rod_label = QLabel('Штанги  до ремонта')
         self.sucker_rod_po_label = QLabel('Штанги плановое согласно расчета')
 
-        dict_nkt = CreatePZ.dict_nkt
-        dict_nkt_po = CreatePZ.dict_nkt_po
-        dict_sucker_rod = CreatePZ.dict_sucker_rod
-        dict_sucker_rod_po = CreatePZ.dict_sucker_rod_po
-        print(f'словарь НКТ {CreatePZ.dict_nkt}')
-        print(f'словарь {CreatePZ.dict_nkt_po}')
-        print(f'словарь НКТ {dict_sucker_rod }')
-        print(f'словарь {dict_sucker_rod }')
+        self.dict_nkt = CreatePZ.dict_nkt
+        self.dict_nkt_po = CreatePZ.dict_nkt_po
+        self.dict_sucker_rod = CreatePZ.dict_sucker_rod
+        self.dict_sucker_rod_po = CreatePZ.dict_sucker_rod_po
+
 
 
 
@@ -277,92 +274,148 @@ class TabPage_SO(QWidget):
         grid.addWidget(self.sucker_rod_po_label, 19, 5)
 
         # добавление строк с НКТ спущенных
-        n = 1
-        for nkt, lenght in dict_nkt.items():
-            print(f'штанги {nkt, lenght}')
+        if len(self.dict_nkt) != 0:
+            n = 1
+            for nkt, lenght in self.dict_nkt.items():
+                print(f'НКТ {nkt, lenght}')
+                nkt_line_edit = QLineEdit(self)
+                nkt_line_edit.setText(str(self.ifNone(nkt)))
+
+                lenght_line_edit = QLineEdit(self)
+                lenght_line_edit.setText(str(self.ifNone(lenght)))
+
+                grid.addWidget(nkt_line_edit, 14+n, 1)
+                grid.addWidget(lenght_line_edit, 14+n, 2)
+
+                # Переименование атрибута
+                setattr(self, f"{nkt}_{n}_line", nkt_line_edit)
+                setattr(self, f"{lenght}_{n}_line", lenght_line_edit)
+
+                self.labels_nkt[n] = (nkt_line_edit, lenght_line_edit)
+                n += 1
+        else:
             nkt_line_edit = QLineEdit(self)
-            nkt_line_edit.setText(str(self.ifNone(nkt)))
-
             lenght_line_edit = QLineEdit(self)
-            lenght_line_edit.setText(str(self.ifNone(lenght)))
 
-            grid.addWidget(nkt_line_edit, 14+n, 1)
-            grid.addWidget(lenght_line_edit, 14+n, 2)
+            setattr(self, f"nkt_line", nkt_line_edit)
+            setattr(self, f"lenght_line", lenght_line_edit)
 
-            # Переименование атрибута
-            setattr(self, f"{nkt}_{n}_line", nkt_line_edit)
-            setattr(self, f"{lenght}_{n}_line", lenght_line_edit)
+            self.labels_nkt[1] = (nkt_line_edit, lenght_line_edit)
 
-            self.labels_nkt[nkt] = (nkt_line_edit, lenght_line_edit)
-            n += 1
+            grid.addWidget(nkt_line_edit, 15, 1)
+            grid.addWidget(lenght_line_edit, 15, 2)
+
         # добавление строк с штанг спущенных
-        n = 1
-        for sucker, lenght in dict_sucker_rod.items():
-            print(f'штанги {sucker, lenght}')
+        if len(self.dict_sucker_rod) != 0:
+            n = 1
+            for sucker, lenght in self.dict_sucker_rod.items():
+                print(f'штанги {sucker, lenght}')
 
+                sucker_rod_line_edit = QLineEdit(self)
+                sucker_rod_line_edit.setText(str(self.ifNone(sucker)))
+
+                lenght_sucker_line_edit = QLineEdit(self)
+                lenght_sucker_line_edit.setText(str(self.ifNone(lenght)))
+
+                grid.addWidget(sucker_rod_line_edit, 19 + n, 1)
+                grid.addWidget(lenght_sucker_line_edit, 19 + n, 2)
+
+                # Переименование атрибута
+                setattr(self, f"sucker_{n}_line", sucker_rod_line_edit)
+                setattr(self, f"lenght_{n}_line", lenght_sucker_line_edit)
+
+                self.labels_sucker[n] = (sucker_rod_line_edit, lenght_sucker_line_edit)
+                n += 1
+        else:
             sucker_rod_line_edit = QLineEdit(self)
-            sucker_rod_line_edit.setText(str(self.ifNone(sucker)))
-
             lenght_sucker_line_edit = QLineEdit(self)
-            lenght_sucker_line_edit.setText(str(self.ifNone(lenght)))
-
-            grid.addWidget(sucker_rod_line_edit, 19 + n, 1)
-            grid.addWidget(lenght_sucker_line_edit, 19 + n, 2)
 
             # Переименование атрибута
-            setattr(self, f"{sucker}_{n}_line", sucker_rod_line_edit)
-            setattr(self, f"{lenght}_{n}_line", lenght_sucker_line_edit)
+            setattr(self, f"sucker_line", sucker_rod_line_edit)
+            setattr(self, f"lenght_line", lenght_sucker_line_edit)
 
-            self.labels_sucker[sucker] = (sucker_rod_line_edit, lenght_sucker_line_edit)
-            n += 1
+            self.labels_sucker[1] = (sucker_rod_line_edit, lenght_sucker_line_edit)
 
-        # добавление строк с НКТ плановых
-        n = 1
-        for nkt_po, lenght_po in dict_nkt_po.items():
-            print(f'НКТ план {nkt_po, lenght_po}')
+            grid.addWidget(sucker_rod_line_edit, 20, 1)
+            grid.addWidget(lenght_sucker_line_edit, 20, 2)
 
+        if len(self.dict_nkt_po) != 0:
+            # добавление строк с НКТ плановых
+            n = 1
+            for nkt_po, lenght_po in self.dict_nkt_po.items():
+                print(f'НКТ план {nkt_po, lenght_po}')
+
+                nkt_po_line_edit = QLineEdit(self)
+                nkt_po_line_edit.setText(str(self.ifNone(nkt_po)))
+
+                lenght_po_line_edit = QLineEdit(self)
+                lenght_po_line_edit.setText(str(self.ifNone(lenght_po)))
+
+                grid.addWidget(nkt_po_line_edit, 14 + n, 5)
+                grid.addWidget(lenght_po_line_edit, 14 + n, 6)
+
+                # Переименование атрибута
+                setattr(self, f"nkt_po_{n}_line", nkt_po_line_edit)
+                setattr(self, f"lenght_po_{n}_line", lenght_po_line_edit)
+
+                self.labels_nkt_po[n] = (nkt_po_line_edit, lenght_po_line_edit)
+                n += 1
+        else:
             nkt_po_line_edit = QLineEdit(self)
-            nkt_po_line_edit.setText(str(self.ifNone(nkt_po)))
-
             lenght_po_line_edit = QLineEdit(self)
-            lenght_po_line_edit.setText(str(self.ifNone(lenght_po)))
-
-            grid.addWidget(nkt_po_line_edit, 14 + n, 5)
-            grid.addWidget(lenght_po_line_edit, 14 + n, 6)
 
             # Переименование атрибута
-            setattr(self, f"{nkt_po}_{n}_line", nkt_po_line_edit)
-            setattr(self, f"{lenght_po}_{n}_line", lenght_po_line_edit)
+            setattr(self, f"nkt_po_line", nkt_po_line_edit)
+            setattr(self, f"lenght_po_line", lenght_po_line_edit)
 
-            self.labels_nkt_po[nkt_po] = (nkt_po_line_edit, lenght_po_line_edit)
-            n += 1
+            self.labels_nkt_po[1] = (nkt_po_line_edit, lenght_po_line_edit)
 
+            grid.addWidget(nkt_po_line_edit, 15, 1)
+            grid.addWidget(lenght_po_line_edit, 15, 2)
         # добавление строк с штангами плановых
 
-        n = 1
-        for sucker_po, lenght_po in dict_sucker_rod_po.items():
-            print(f'штанги план {sucker_po, lenght_po}')
+        if len(self.dict_sucker_rod_po) != 0:
+            n = 1
+            for sucker_po, lenght_po in self.dict_sucker_rod_po.items():
+                print(f'штанги план {sucker_po, lenght_po}')
+                sucker_rod_po_line_edit = QLineEdit(self)
+                sucker_rod_po_line_edit.setText(str(self.ifNone(sucker_po)))
+
+                lenght_sucker_po_line_edit = QLineEdit(self)
+                lenght_sucker_po_line_edit.setText(str(self.ifNone(lenght_po)))
+
+                grid.addWidget(sucker_rod_po_line_edit, 19 + n, 5)
+                grid.addWidget(lenght_sucker_po_line_edit, 19 + n, 6)
+
+                # Переименование атрибута
+                setattr(self, f"sucker_{n}_line", sucker_rod_po_line_edit)
+                setattr(self, f"lenght_{n}_line", lenght_sucker_po_line_edit)
+
+                self.labels_sucker_po[n] = (sucker_rod_po_line_edit, lenght_sucker_po_line_edit)
+                n += 1
+        else:
             sucker_rod_po_line_edit = QLineEdit(self)
-            sucker_rod_po_line_edit.setText(str(self.ifNone(sucker_po)))
-
             lenght_sucker_po_line_edit = QLineEdit(self)
-            lenght_sucker_po_line_edit.setText(str(self.ifNone(lenght_po)))
-
-            grid.addWidget(sucker_rod_po_line_edit, 19 + n, 5)
-            grid.addWidget(lenght_sucker_po_line_edit, 19 + n, 6)
 
             # Переименование атрибута
-            setattr(self, f"{sucker}_{n}_line", sucker_rod_po_line_edit)
-            setattr(self, f"{lenght}_{n}_line", lenght_sucker_po_line_edit)
+            setattr(self, f"sucker_line", sucker_rod_po_line_edit)
+            setattr(self, f"lenght_line", lenght_sucker_po_line_edit)
 
-            self.labels_sucker_po[sucker] = (sucker_rod_po_line_edit, lenght_sucker_po_line_edit)
-            n += 1
+            self.labels_sucker_po[1] = (sucker_rod_po_line_edit, lenght_sucker_po_line_edit)
+
+            grid.addWidget(sucker_rod_po_line_edit, 20, 5)
+            grid.addWidget(lenght_sucker_po_line_edit, 20, 6)
+
+
+
+
 
     def ifNone(self, string):
         if str(string) in ['0', str(None), '-']:
             return 'отсут'
-        # elif str(string).replace('.', '').replace(',', '').isdigit():
-        #     return float(string)
+        elif str(string).replace('.', '').replace(',', '').isdigit():
+            # print(str(round(float(string), 1))[-1] == 0, int(string), float(string))
+            return int(string) if str(round(float(string), 1))[-1] == "0" else float(string)
         else:
             return str(string)
     def updateLabel(self):
@@ -370,18 +423,15 @@ class TabPage_SO(QWidget):
         self.columnType.setText()
         self.column_addEditType.setText()
         self.update()
-
-
-
 class TabWidget(QTabWidget):
     def __init__(self):
         super().__init__()
         self.addTab(TabPage_SO(self), 'Проверка корректности данных')
 
 
-class DataWindow(MyWindow):
+class DataWindow(QMainWindow):
 
-    def __init__(self, labels_nkt, parent=None):
+    def __init__(self, parent=None):
         super(DataWindow, self).__init__()
 
         self.centralWidget = QWidget()
@@ -390,7 +440,8 @@ class DataWindow(MyWindow):
 
         self.tabWidget = TabWidget()
         # self.tableWidget = QTableWidget(0, 4)
-        self.labels_nkt = labels_nkt
+        # self.labels_nkt = labels_nkt
+
 
         self.buttonAdd = QPushButton('сохранить данные')
         self.buttonAdd.clicked.connect(self.addRowTable)
@@ -448,19 +499,48 @@ class DataWindow(MyWindow):
         static_level = self.tabWidget.currentWidget().static_level_EditType.text()
         dinamic_level = self.tabWidget.currentWidget().dinamic_level_EditType.text()
 
+        # Пересохранение данных по НКТ и штангам
+        self.dict_sucker_rod = CreatePZ.dict_sucker_rod
+        self.dict_sucker_rod = CreatePZ.dict_sucker_rod_po
+        self.dict_nkt = CreatePZ.dict_nkt
+        self.dict_nkt_po = CreatePZ.dict_nkt_po
+        if self.dict_nkt:
+            for key in range(1, len(self.dict_nkt)):
+               CreatePZ.dict_nkt[self.tabWidget.currentWidget().labels_nkt[key][0].text()] = self.if_None(
+                   self.tabWidget.currentWidget().labels_nkt[key][1].text())
+        else:
+            if self.tabWidget.currentWidget().labels_nkt[1][1].text():
+                CreatePZ.dict_nkt[self.tabWidget.currentWidget().labels_nkt[1][0].text()] = self.if_None(
+                    self.tabWidget.currentWidget().labels_nkt[1][1].text())
+        if self.dict_nkt_po:
+            for key in range(1, len(self.dict_nkt_po)):
+                dict_nkt_correct = self.tabWidget.currentWidget().labels_nkt_po[key][1].text()
 
+                CreatePZ.dict_nkt_po[self.tabWidget.currentWidget().labels_nkt_po[key][0].text()] = self.if_None(
+                    dict_nkt_correct)
+        else:
+            if self.tabWidget.currentWidget().labels_nkt_po[1][1].text():
+                CreatePZ.dict_nkt[self.tabWidget.currentWidget().labels_nkt_po[1][0].text()] = self.if_None(
+                       self.tabWidget.currentWidget().labels_nkt_po[1][1].text())
 
-        print(f' словарь лабел {self.tabWidget.currentWidget().labels_nkt_po["73"][1].text()}')
-        # = {},
-        # self.labels_nkt_po = {}
-        # self.labels_sucker = {}
-        # self.labels_sucker_po = {})
+        if self.dict_sucker_rod:
+            for key in range(1, len(self.dict_sucker_rod)):
+                print(self.tabWidget.currentWidget().labels_sucker.keys())
+                CreatePZ.dict_sucker_rod[self.tabWidget.currentWidget().labels_sucker[key][0].text()] = self.if_None(
+                    self.tabWidget.currentWidget().labels_sucker[key][1].text())
+        else:
+            if self.tabWidget.currentWidget().labels_sucker[1][1].text():
+                CreatePZ.dict_sucker_rod[self.tabWidget.currentWidget().labels_sucker[1][0].text()] = self.if_None(
+                    self.tabWidget.currentWidget().labels_sucker[1][1].text())
 
-
-        # print(any(['ЭЦН' in dict_pump_ECN_posle.upper(), 'ВНН' in dict_pump_ECN_posle.upper(),
-        #                 dict_pump_ECN_posle == 'отсут']))
-        # print(dict_pump_ECN_posle)
-
+        if self.dict_sucker_rod.items():
+            for key in range(1, len(self.dict_sucker_rod.items())):
+                CreatePZ.dict_sucker_rod_po[self.tabWidget.currentWidget().labels_sucker_po[key][0].text()] = self.if_None(
+                    self.tabWidget.currentWidget().labels_sucker_po[key][1].text())
+        else:
+            if self.tabWidget.currentWidget().labels_sucker_po[1][1].text():
+                CreatePZ.dict_sucker_rod_po[self.tabWidget.currentWidget().labels_sucker_po[1][0].text()] = self.if_None(
+                    self.tabWidget.currentWidget().labels_sucker_po[1][1].text())
 
         if self.ifNum(columnType) == False \
                 or self.ifNum(column_wall_thickness) == False \

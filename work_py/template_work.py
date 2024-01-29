@@ -94,6 +94,13 @@ def template_ek_without_skm(self):
                                               f'диаметр шаблона',
                                               int(second_template), 70,
                                               200)
+    if CreatePZ.column_additional is False and float(CreatePZ.shoe_column) < float(CreatePZ.current_bottom):
+        CreatePZ.open_trunk_well = True
+
+
+    elif CreatePZ.column_additional is True and float(CreatePZ.shoe_column_additional) < float(
+            CreatePZ.current_bottom):
+        CreatePZ.open_trunk_well = True
 
     if CreatePZ.column_additional is True:
         nkt_pod = ['60мм' if CreatePZ.column_additional_diametr < 110 else '73мм со снятыми фасками']
@@ -292,6 +299,14 @@ def template_ek(self):
     lift_ecn_can = {True: 30, False: 4}
     liftEcn = lift_ecn_can[CreatePZ.lift_ecn_can]
 
+    if CreatePZ.column_additional is False and float(CreatePZ.shoe_column) < float(CreatePZ.current_bottom):
+        CreatePZ.open_trunk_well = True
+        # print(CreatePZ.column_additional is False and float(CreatePZ.shoe_column), float(CreatePZ.current_bottom),
+        #       CreatePZ.column_additional is False and float(CreatePZ.shoe_column) < float(CreatePZ.current_bottom))
+
+    elif CreatePZ.column_additional is True and float(CreatePZ.shoe_column_additional) < float(
+            CreatePZ.current_bottom):
+        CreatePZ.open_trunk_well = True
 
     if CreatePZ.column_additional is False or (
             CreatePZ.column_additional is True and CreatePZ.head_column_additional >= CreatePZ.current_bottom):
@@ -458,6 +473,7 @@ def template_ek(self):
         'ПСШ СКМ в доп колонне + открытый ствол': ckm_teml_SKM_DP_open,
         'ПСШ открытый ствол + ИП отрайбирован': ckm_teml_SKM_EK_open_True
     }
+    print(f'открытй ствол {CreatePZ.open_trunk_well} , башмак НКТ {CreatePZ.shoe_column}, забой P{CreatePZ.current_bottom}')
     template, ok = QInputDialog.getItem(self, 'Спуcкаемое  оборудование', 'выбор спуcкаемого оборудования',
                                         template_sel, template_sel.index(template_key), False)
 

@@ -2,7 +2,7 @@ import H2S
 from PyQt5.QtWidgets import QInputDialog, QMessageBox
 from openpyxl import load_workbook
 
-
+from main import ExcelWorker
 
 
 def calculationFluidWork(vertical, pressure):
@@ -128,12 +128,13 @@ def work_krs(self, work_plan):
 
         print(f'Лифт ключ {lift_key}')
 
-        without_damping_True = without_damping(self)
+        without_damping_True = CreatePZ.without_damping
+        print(f'Состоит в вписке без глушения {without_damping_True}')
 
-        well_jamming_str_in_nkt = " " if without_damping_True == True\
+        well_jamming_str_in_nkt = " " if without_damping_True is True\
             else f"По результату приемистости произвести глушение скважины в НКТ тех.жидкостью в объеме обеспечивающим " \
                  f"заполнение трубного пространства и скважины в подпакерной зоне в объеме {volume_pod_NKT()} м3 " \
-                 f"жидкостью уд.веса {fluid_work} на давление поглощения до {CreatePZ.max_admissible_pressure}атм. " \
+                 f"жидкостью уд.веса {fluid_work} при давлении не более {CreatePZ.max_admissible_pressure}атм. " \
                  f"Тех отстой 1-2 часа. Произвести замер избыточного давления в скважине."
 
 
@@ -215,7 +216,7 @@ def work_krs(self, work_plan):
                        f'ПРОТИВОФОНТАННЫЙ ЛИФТ ДЛИНОЙ 300м. ', None, None,
                        None, None, None, None, None,
                        'Мастер КРС представитель Заказчика', None]]
-
+        kvostovik = f' + хвостовиком {round(sum(list(CreatePZ.dict_nkt.values())) - float(CreatePZ.H_F_paker_do["do"]), 1)}м ' if CreatePZ.region == 'ТР' else ''
         well_jamming_str = well_jamming(self, without_damping_True, lift_key) # экземпляр функции расчета глушения
         well_jamming_ord = volume_jamming_well(self, float(CreatePZ.H_F_paker_do["do"]))
         lift_ord = [
@@ -356,7 +357,7 @@ def work_krs(self, work_plan):
              f'Провести практическое обучение вахт по сигналу ВЫБРОС.', None, None,
              None, None, None, None, None,
              None, 1.2],
-            [f'Поднять  {CreatePZ.dict_pump_ECN["do"]}', None,
+            [f'Поднять  {CreatePZ.dict_pump_ECN["do"]} с глубины {round(sum(list(CreatePZ.dict_nkt.values())), 1)}м', None,
              f'Поднять  {CreatePZ.dict_pump_ECN["do"]} с глубины {round(sum(list(CreatePZ.dict_nkt.values())), 1)}м '
              f'(компоновка НКТ{nkt_diam_fond}) на поверхность с замером, накручиванием колпачков с доливом скважины '
              f'тех.жидкостью уд. весом {fluid_work}  '
@@ -541,7 +542,7 @@ def work_krs(self, work_plan):
              None, 1.2],
             [f'{"".join(["Допустить фНКТ для определения текущего забоя. " if CreatePZ.gipsInWell == True else ""])}Поднять  замковую опору с глубины {round(sum(list(CreatePZ.dict_nkt.values())), 1)}м',
              None,
-             f'{"".join(["Допустить фНКТ для определения текущего забоя. " if CreatePZ.gipsInWell == True else ""])}Поднять  замковую опору  на НКТ{nkt_diam_fond}мм с глубины {round(sum(list(CreatePZ.dict_nkt.values())), 1)}м (компоновка НКТ{nkt_diam_fond}) на поверхность с замером, накручиванием колпачков с доливом скважины тех.жидкостью уд. весом {fluid_work}  '
+             f'{"".join(["Допустить фНКТ для определения текущего забоя. " if CreatePZ.gipsInWell == True else ""])}Поднять  замковую опору  на НКТ с глубины {round(sum(list(CreatePZ.dict_nkt.values())), 1)}м (компоновка НКТ{nkt_diam_fond}) на поверхность с замером, накручиванием колпачков с доливом скважины тех.жидкостью уд. весом {fluid_work}  '
              f'в объеме {round(round(sum(list(CreatePZ.dict_nkt.values())), 1) * 1.12 / 1000, 1)}м3 с контролем АСПО на стенках НКТ.',
              None, None,
              None, None, None, None, None,
@@ -885,6 +886,8 @@ def work_krs(self, work_plan):
                          None, None, None, None, None,
                          'Мастер КРС', liftingGNO(CreatePZ.dict_nkt)],
                         ]
+
+
         lift_paker = [[f'Опрессовать эксплуатационную колонну и пакер на Р={CreatePZ.max_admissible_pressure}атм',
                        None,
                        f'Опрессовать эксплуатационную колонну и пакер на Р={CreatePZ.max_admissible_pressure}атм в '
@@ -895,6 +898,7 @@ def work_krs(self, work_plan):
                        'Мастер КРС, Представ заказчика', 1.2],
                       [f'При наличии Избыточного давления не позволяющее сорвать пакера:\n'
                        f'Произвести определение приемистости скважины', None,
+                       f'При наличии Избыточного давления не позволяющее сорвать пакера:\n '
                        f'Произвести определение приемистости скважины при давлении не более {CreatePZ.max_admissible_pressure}атм. '
                        f'{well_jamming_str_in_nkt}',
                        None, None,
@@ -956,8 +960,7 @@ def work_krs(self, work_plan):
                        None, None],
                       [ f'Поднять  пакер {CreatePZ.paker_do["do"]} с глубины {CreatePZ.H_F_paker_do["do"]}м',
                         None,
-                       f'Поднять  пакер {CreatePZ.paker_do["do"]} с глубины {CreatePZ.H_F_paker_do["do"]}м + '
-                       f'хвостовиком {round(sum(list(CreatePZ.dict_nkt.values())) - float(CreatePZ.H_F_paker_do["do"]), 1)}м '
+                       f'Поднять  пакер {CreatePZ.paker_do["do"]} с глубины {CreatePZ.H_F_paker_do["do"]}м {kvostovik}'
                        f'на поверхность с замером, накручиванием колпачков с доливом скважины тех.жидкостью уд. весом {fluid_work}  '
                        f'в объеме 1,7м3 с контролем АСПО на стенках НКТ.', None, None,
                        None, None, None, None, None,
@@ -1114,7 +1117,7 @@ def lifting_unit(self):
               f'ОСНАСТИТЬ ПОДЪЕМНЫЙ АГРЕГАТ ВЕТРОВЫМИ ОТТЯЖКАМИ. ПРИ ЭТОМ МАКСИМАЛЬНУЮ НАГРУЗКА НЕ ДОЛЖНА ПРЕВЫШАТЬ 80% ОТ' \
               f' СТРАГИВАЮЩЕЙ НАГРУЗКИ НА НКТ.ПРИ ИСПОЛЬЗОВАНИИ ПОДЬЕМНОГО АГРЕГАТА  УПА-60/80, БАРС, А-50, АПР 60/80 ' \
               f'РАБОТАТЬ ТОЛЬКО С ПРИМЕНЕНИЕМ  ОТТЯЖЕК МАКСИМАЛЬНУЮ НАГРУЗКА НЕ ДОЛЖНА ПРЕВЫШАТЬ 80% ОТ СТРАГИВАЮЩЕЙ ' \
-              f'НАГРУЗКИ НА НКТ. . После монтажа подъёмника якоря ветровых оттяжек должны быть испытаны на нагрузки, ' \
+              f'НАГРУЗКИ НА НКТ. После монтажа подъёмника якоря ветровых оттяжек должны быть испытаны на нагрузки, ' \
               f'установленные инструкцией по эксплуатации завода - изготовителя в присутствии супервайзера Заказчика. ' \
               f'Составить акт готовности подъемного агрегата. Пусковой комиссией составить акт готовности  подьемного ' \
               f'агрегата и бригады для проведения ремонта скважины. Дальнейшие работы продолжить после проведения пусковой ' \
@@ -1345,21 +1348,23 @@ def well_jamming(self, without_damping, lift_key):
 
 
     if without_damping == True:
-        well_jamming_list1 = f'Скважина состоит в перечне скважин ООО Башнефть-Добыча, на которых допускается проведение ТКРС без предварительного глушения на текущий квартал',
+        well_jamming_str = f'Скважина состоит в перечне скважин ООО Башнефть-Добыча, на которых допускается проведение ТКРС без предварительного глушения на текущий квартал',
         well_jamming_short = f'Скважина без предварительного глушения'
         well_jamming_list2 = f'В случае наличия избыточного давления необходимость повторного глушения скважины дополнительно согласовать со специалистами ПТО  и ЦДНГ.'
     elif without_damping == False and lift_key in ['НН с пакером', 'НВ с пакером', 'ЭЦН с пакером', 'ОРЗ']:
 
         well_after = f'Произвести закачку на поглощение не более {CreatePZ.max_admissible_pressure}атм тех жидкости в ' \
                              f'объеме {round(volume_well_jaming-well_volume(self, sum(list(CreatePZ.dict_nkt_po.values()))),1)}м3.' if round(volume_well_jaming-well_volume(self, sum(list(CreatePZ.dict_nkt_po.values()))),1) > 0.1 else ''
-        well_jamming_list1 = f'Произвести закачку в трубное пространство тех жидкости уд.весом {CreatePZ.fluid_work} в ' \
-                             f'объеме {round(well_volume(self, sum(list(CreatePZ.dict_nkt.values())))-volume_pod_NKT(),1)}м3 на циркуляцию. {well_after} Закрыть затрубное пространство. ' \
-                             f' Закрыть скважину на '
+        well_jamming_str = f'Произвести закачку в трубное пространство тех жидкости уд.весом {CreatePZ.fluid_work} в ' \
+                             f'объеме {round(well_volume(self, sum(list(CreatePZ.dict_nkt.values())))-volume_pod_NKT(),1)}м3 на циркуляцию. ' \
+                           f'{well_after} Закрыть затрубное пространство. ' \
+                             f' Закрыть скважину на  стабилизацию не менее 2 часов. (согласовать ' \
+                             f'глушение в коллектор, в случае отсутствия на желобную емкость)'
         well_jamming_short = f'Глушение в НКТ уд.весом {CreatePZ.fluid_work_short} ' \
                              f'объеме {round(well_volume(self, sum(list(CreatePZ.dict_nkt.values()))) - volume_pod_NKT(), 1)}м3 ' \
                              f'на циркуляцию. {well_after} '
     elif without_damping == False and lift_key in ['ОРД']:
-        well_jamming_list1 = f'Произвести закачку в затрубное пространство тех жидкости уд.весом {CreatePZ.fluid_work_short}в ' \
+        well_jamming_str = f'Произвести закачку в затрубное пространство тех жидкости уд.весом {CreatePZ.fluid_work_short}в ' \
                              f'объеме {round(well_volume(self, CreatePZ.current_bottom) - well_volume(self, CreatePZ.H_F_paker_do["do"]),1)}м3 ' \
                              f'на поглощение при давлении не более {CreatePZ.max_expected_pressure}атм. Закрыть ' \
                              f'затрубное пространство. Закрыть скважину на стабилизацию не менее 2 часов. (согласовать ' \
@@ -1368,7 +1373,7 @@ def well_jamming(self, without_damping, lift_key):
                              f'объеме {round(well_volume(self, CreatePZ.current_bottom) - well_volume(self, CreatePZ.H_F_paker_do["do"]), 1)}м3 ' \
 
     elif abs(sum(list(CreatePZ.dict_nkt.values())) - CreatePZ.perforation_roof) > 150:
-        well_jamming_list1 = f'Произвести глушение скважины обратной промывкой в объеме {volume_well_jaming}м3 тех ' \
+        well_jamming_str = f'Произвести глушение скважины обратной промывкой в объеме {volume_well_jaming}м3 тех ' \
                              f'жидкостью уд.весом {CreatePZ.fluid_work}' \
                              f' на циркуляцию в следующим алгоритме:\n Произвести закачку в затрубное пространство тех жидкости в ' \
                              f'объеме {round(well_volume(self, sum(list(CreatePZ.dict_nkt.values()))),1)}м3 на циркуляцию. Закрыть трубное пространство. ' \
@@ -1378,11 +1383,11 @@ def well_jamming(self, without_damping, lift_key):
         well_jamming_short = f'Глушение в затруб в объеме {volume_well_jaming}м3 тех ' \
                              f'жидкостью уд.весом {CreatePZ.fluid_work_short}',
     elif abs(sum(list(CreatePZ.dict_nkt.values())) - CreatePZ.perforation_roof) <= 150:
-        well_jamming_list1 = f'Произвести глушение скважины обратной промывкой в объеме {volume_well_jaming}м3 тех жидкостью уд.весом {CreatePZ.fluid_work}' \
+        well_jamming_str = f'Произвести глушение скважины обратной промывкой в объеме {volume_well_jaming}м3 тех жидкостью уд.весом {CreatePZ.fluid_work}' \
                              f' на циркуляцию. Закрыть скважину на ' \
                              f'стабилизацию не менее 2 часов. (согласовать глушение в коллектор, в случае отсутствия на желобную емкость)',
         well_jamming_short = f'Глушение в затруб в объеме {volume_well_jaming}м3 уд.весом {CreatePZ.fluid_work_short}'
-    return [well_jamming_list1[0], well_jamming_list2, well_jamming_short]
+    return [well_jamming_str, well_jamming_list2, well_jamming_short]
 
 
 def is_number(num):
@@ -1396,16 +1401,12 @@ def is_number(num):
 
 
 def without_damping(self):
-    from open_pz import CreatePZ
+    print('начался второй поток')
+    self.worker_thread = ExcelWorker()
+    self.worker_thread.finished.connect(self.on_finished)
+    self.worker_thread.start()
 
-    fname = 'data_klassifer/Перечень скважин без глушения.xlsx'
-    workb = load_workbook(fname, data_only=True)
-    sheet = workb.active
-    without_damping = False
-    for row in sheet.iter_rows(values_only=True):
-        if CreatePZ.well_area == row[4] and str(CreatePZ.well_number) == str(row[5]):
-            without_damping = True
-    if without_damping:
-        return True
-    else:
-        return False
+
+def on_finished(self):
+    print("Работа с файлом Excel завершена.")
+

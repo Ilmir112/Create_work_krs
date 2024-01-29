@@ -70,11 +70,12 @@ def gnkt_work(self):
            f'Заказчика с составлением акта, не превышая давления закачки не более Р={CreatePZ.max_admissible_pressure}атм.'
         acid_sel_short = f'{vt} пласта {" ".join(CreatePZ.plast_work)}  в объеме  {acid_V}м3  ({acid} - {acid_pr} %)'
     elif acid == 'HF':
-        acid_sel = f'Произвести глинокислотную обработку пласта {" ".join(CreatePZ.plast_work)}  в объеме  {acid_V}м3  ({acid} - {acid_pr} %) силами Крезол '\
+        acid_sel = f'Произвести глинокислотную обработку пласта {" ".join(CreatePZ.plast_work)}  в объеме  {acid_V}м3 ' \
+                   f'(концентрация в смеси HF 3% / HCl 13%) силами Крезол '\
            f'НС с протяжкой БДТ вдоль интервалов перфорации {CreatePZ.perforation_roof}-'\
            f'{CreatePZ.perforation_sole}м (снизу вверх) в присутствии представителя '\
            f'Заказчика с составлением акта, не превышая давления закачки не более Р={CreatePZ.max_admissible_pressure}атм.'
-        acid_sel_short = f'ГКО пласта {" ".join(CreatePZ.plast_work)}  в объеме  {acid_V}м3  ({acid} - {acid_pr} %)'
+        acid_sel_short = f'ГКО пласта {" ".join(CreatePZ.plast_work)}  в объеме  {acid_V}м3'
     paker_opr = [f'Опрессовать пакер на {CreatePZ.max_admissible_pressure}атм',
                  5, f'Опрессовать пакер на {CreatePZ.max_admissible_pressure}атм с выдержкой 30 мин с оформлением соответствующего акта в присутствии '\
     f'представителя представителя ЦДНГ',

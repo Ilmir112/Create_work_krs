@@ -82,6 +82,7 @@ class CreatePZ:
     dinamic_level = 0
     work_perforations_approved = False
     dict_leakiness = {}
+
     leakiness = False
     emergency_well = False
     emergency_count = 0
@@ -121,8 +122,11 @@ class CreatePZ:
     pakerTwoSKO = False
     privyazkaSKO = 0
     H2S_pr = []
+    pipes_ind = 0
+    sucker_rod_ind = 0
     cat_H2S_list = []
     H2S_mg = []
+    H2S_mg_m3 = []
     lift_key = 0
     max_admissible_pressure = 0
     region = ''
@@ -160,6 +164,7 @@ class CreatePZ:
     def open_excel_file(self, fname, work_plan):
 
         from data_correct import DataWindow
+        from perforation_correct import PerforationCorrect
 
         CreatePZ.work_plan = work_plan
         global wb, ws
@@ -167,6 +172,7 @@ class CreatePZ:
         name_list = wb.sheetnames
         CreatePZ.well_volume_in_PZ = []
         old_index = 1
+
 
         ws = wb.active
 
@@ -206,13 +212,13 @@ class CreatePZ:
                 print(f' индекс Ожидаемые показатели {CreatePZ.data_x_min}')
 
 
-            elif 'ШТАНГИ' in row:
+            elif 'ШТАНГИ' in row and 'До ремонта' in row:
                 sucker_rod = True
-                sucker_rod_ind = row_ind
-                # sucker_rod_ind = self.sucker_rod_ind
+                CreatePZ.sucker_rod_ind = row_ind
+                # CreatePZ.sucker_rod_ind = self.sucker_rod_ind
 
-            elif 'НКТ' in row:
-                pipes_ind = row_ind
+            elif 'НКТ' in row and 'До ремонта' in row:
+                CreatePZ.pipes_ind = row_ind
                 # pipes_ind = self.pipes_ind
 
             elif 'ХI Планируемый объём работ:' in row or 'ХI. Планируемый объём работ:' in row or 'ХIII Планируемый объём работ:' in row \
@@ -221,7 +227,7 @@ class CreatePZ:
 
 
             elif 'II. История эксплуатации скважины' in row:
-                data_pvr_max = row_ind
+                CreatePZ.data_pvr_max = row_ind
 
             elif 'III. Состояние скважины к началу ремонта ' in row:
                 CreatePZ.condition_of_wells = row_ind
@@ -302,41 +308,43 @@ class CreatePZ:
                             CreatePZ.H2S_pr.append(float(str(row[col - 1]).replace(',', '.')))
                         else:
                             CreatePZ.H2S_pr.append(0)
-                    elif len(CreatePZ.H2S_mg) == 0 and 'мг/м3' == value and CreatePZ.if_None(row[col - 1]) != 'отсут':
-                        CreatePZ.H2S_mg.append(float(str(row[col - 1]).replace(',', '.')) / 1000)
+                    elif 'мг/м3' == value:
+                        if CreatePZ.if_None(row[col - 1]) != 'отсут':
+                            CreatePZ.H2S_mg_m3.append(float(str(row[col - 1]).replace(',', '.')) / 1000)
+                        else:
+                            CreatePZ.H2S_mg_m3.append(0)
 
 
                     elif 'Vжг' in str(value):
-                        well_volume_in_PZ = str(row[col + 1]).replace(',', '.')
-                        print(f'строка {well_volume_in_PZ}')
-                        n = 1
-                        while well_volume_in_PZ == None or n < 10:
-                            well = str(row[col + 1 + n]).replace(',', '.')
-                            if well in [int, float]:
-                                well_volume_in_PZ = float(row[col + 1 + n].replace(',', '.'))
-                            n += 1
-                        CreatePZ.well_volume_in_PZ.append(float(well_volume_in_PZ))
+                        try:
+                            well_volume_in_PZ = str(row[col + 1]).replace(',', '.')
+                            print(f'строка {well_volume_in_PZ}')
+                            n = 1
+                            while well_volume_in_PZ == None or n < 10:
+                                well = str(row[col + 1 + n]).replace(',', '.')
+                                if well in [int, float]:
+                                    well_volume_in_PZ = float(row[col + 1 + n].replace(',', '.'))
+                                n += 1
+                            CreatePZ.well_volume_in_PZ.append(float(well_volume_in_PZ))
+                        except:
+                            well_volume_in_PZ = QInputDialog.getDouble(None, 'Объем глушения',
+                                                                       'ВВедите объем глушения согласно ПЗ', 0, 70, 1)
+                            CreatePZ.well_volume_in_PZ.append(well_volume_in_PZ)
 
 
                     elif '9. Максимальный зенитный угол' in row and value == 'на глубине':
                         try:
                             CreatePZ.max_h_angle = row[col + 1]
                         except:
-                            CreatePZ.max_h_angle, ok = QInputDialog.getint(self, 'Глубина максимального угла',
+                            CreatePZ.max_h_angle, ok = QInputDialog.getDouble(self, 'Глубина максимального угла',
                                                                            'Введите глубину максимального зетного угла: ',
-                                                                           500, 1, 4000)
+                                                                           0, 1, 100, 1)
                     elif 'цех' == value:
                         cdng = row[col + 1]
                         CreatePZ.cdng = cdng
                         # print(f' ЦДНГ {CreatePZ.cdng}')
-                    elif 'плотн.воды' == value:
-                        try:
-                            CreatePZ.water_cut = float(row[col - 1])  # обводненность
-                        except:
-                            CreatePZ.water_cut, ok = QInputDialog.getInt(self, 'Обводненность',
-                                                                         'Введите обводненность скважинной продукции',
-                                                                         100,
-                                                                         0, 100)
+
+
                     elif value == 'м3/т':
                         if str(row[col - 1]).replace('.', '').replace(',', '').isdigit():
                             CreatePZ.gaz_f_pr.append(float(row[col - 1]))
@@ -418,6 +426,9 @@ class CreatePZ:
                         while CreatePZ.max_expected_pressure is None:
                             CreatePZ.max_expected_pressure = row[col + n]
                             n += 1
+
+                    elif 'плотн.' in str(value):
+                        CreatePZ.water_cut = row[col - 1]  # обводненность
 
 
                     elif 'Максимально допустимое давление опрессовки э/колонны' == value or 'Максимально допустимое давление на э/колонну' == value:
@@ -520,7 +531,15 @@ class CreatePZ:
                         print()
                     elif "Ндин " in str(value):
                         CreatePZ.dinamic_level = row[col + 1]
-
+        try:
+            CreatePZ.water_cut = float(CreatePZ.water_cut)  # обводненность
+        except:
+            CreatePZ.water_cut, ok = QInputDialog.getInt(self, 'Обводненность',
+                                                         'Введите обводненность скважинной продукции',
+                                                         100,
+                                                         0, 100)
+        if len(CreatePZ.H2S_mg) == 0:
+            CreatePZ.H2S_mg = CreatePZ.H2S_mg_m3
 
         if CreatePZ.condition_of_wells == 0:
             CreatePZ.condition_of_wells, ok = QInputDialog.getInt(self, 'индекс копирования',
@@ -559,10 +578,12 @@ class CreatePZ:
                 CreatePZ.grpPlan = True
             else:
                 CreatePZ.grpPlan = False
+        if CreatePZ.data_pvr_max == 0:
+            CreatePZ.data_pvr_max = QInputDialog.getInt(self, 'Отсутствует строка', 'Отсутствует строка "II. История эксплуатации скважины". необходимо ввести окончания строки с перфорацией', 0, 10, 300)[0]
         # print(CreatePZ.dict_pump_ECN, CreatePZ.dict_pump_SHGN, CreatePZ.dict_pump_ECN_h, CreatePZ.H_F_paker_do)
         # print()
         # Определение наличия по скважине нарушений
-        for row in range(data_pvr_max, CreatePZ.data_well_max):
+        for row in range(CreatePZ.data_pvr_max, CreatePZ.data_well_max):
             for col in range(1, 13):
                 value = str(ws.cell(row=row, column=col).value)
                 if 'нэк' in str(
@@ -615,11 +636,7 @@ class CreatePZ:
         CreatePZ.curator, ok = QInputDialog.getItem(self, 'Выбор кураторов ремонта', 'Введите сектор кураторов региона',
                                                     curator_list, curator_list.index(curator), False)
         print(f'куратор {CreatePZ.curator, CreatePZ.if_None(CreatePZ.dict_pump["posle"])}')
-        if CreatePZ.column_additional == False and float(CreatePZ.shoe_column) < float(CreatePZ.current_bottom):
-            CreatePZ.open_trunk_well = True
-        elif CreatePZ.column_additional == True and float(CreatePZ.shoe_column_additional) < float(
-                CreatePZ.current_bottom):
-            CreatePZ.open_trunk_well = True
+
 
         # Копирование изображения
         image_loader = SheetImageLoader(ws)
@@ -747,9 +764,13 @@ class CreatePZ:
                                                      250)
                 CreatePZ.expected_pick_up[expected_Q] = expected_P
                 print(f' Ожидаемые {CreatePZ.expected_pick_up}')
-        # print(f' индекс нкт {pipes_ind + 1, CreatePZ.condition_of_wells}')
+        # print(f' индекс нкт {CreatePZ.pipes_ind + 1, CreatePZ.condition_of_wells}')
         a_plan = 0
-        for row in range(pipes_ind + 1, CreatePZ.condition_of_wells):  # словарь  количества НКТ и метраж
+
+        if CreatePZ.pipes_ind == 0:
+            CreatePZ.pipes_ind, ok = QInputDialog.getDouble(self, 'Индекс НКТ до ремонта',
+                                                        'Программа не могла определить начала строки с ПЗ НКТ - до ремонта')
+        for row in range(CreatePZ.pipes_ind + 1, CreatePZ.condition_of_wells):  # словарь  количества НКТ и метраж
             if ws.cell(row=row, column=3).value == 'План' or str(
                     ws.cell(row=row, column=3).value).lower() == 'после ремонта':
                 a_plan = row
@@ -757,24 +778,27 @@ class CreatePZ:
             a_plan, ok = QInputDialog.getDouble(self, 'Индекс планового НКТ',
                                                          'Программа не могла определить начала строку с ПЗ НКТ - план')
         print(f'индекс a_plan {a_plan}')
-        for row in range(pipes_ind + 1, CreatePZ.condition_of_wells + 1):
+        for row in range(CreatePZ.pipes_ind + 1, CreatePZ.condition_of_wells + 1):
             # print(str(ws.cell(row=row, column=4).value))
             key = str(ws.cell(row=row, column=4).value)
             if key != str(None) and key != '-':
                 value = CreatePZ.without_b(ws.cell(row=row, column=7).value)
                 if not key is None and row < a_plan:
-                    CreatePZ.dict_nkt[key] = CreatePZ.dict_nkt.get(key, 0) + round(int(value), 1)
+                    CreatePZ.dict_nkt[key] = CreatePZ.dict_nkt.get(key, 0) + round(float(value), 1)
                 elif not key is None and row >= a_plan:
-                    CreatePZ.dict_nkt_po[key] = CreatePZ.dict_nkt_po.get(key, 0) + round(int(value), 1)
+                    CreatePZ.dict_nkt_po[key] = CreatePZ.dict_nkt_po.get(key, 0) + round(float(value), 1)
             # print(f'индекс a_plan {CreatePZ.dict_nkt}')
         CreatePZ.shoe_nkt = float(sum(CreatePZ.dict_nkt.values()))
 
         if CreatePZ.shoe_nkt > CreatePZ.current_bottom:
             mes = QMessageBox.warning(None, 'Ошибка', 'Башмак НКТ ниже забоя')
 
-        # print(f' индекс штанг{sucker_rod_ind, pipes_ind}')
+        print(f' индекс штанг{CreatePZ.sucker_rod_ind, CreatePZ.pipes_ind}')
+        if CreatePZ.sucker_rod_ind == 0:
+            CreatePZ.sucker_rod_ind, ok = QInputDialog.getDouble(self, 'Индекс штанги до ремоант',
+                                                         'Программа не могла определить начала строки с ПЗ штанги - до ремонта')
 
-        for row in range(sucker_rod_ind, pipes_ind - 1):
+        for row in range(CreatePZ.sucker_rod_ind, CreatePZ.pipes_ind - 1):
             if ws.cell(row=row, column=3).value == 'План' or str(
                     ws.cell(row=row, column=3).value).lower() == 'после ремонта':
 
@@ -784,20 +808,23 @@ class CreatePZ:
             CreatePZ.b_plan, ok = QInputDialog.getDouble(self, 'Индекс планового НКТ',
                                                          'Программа не могла определить начала строку с ПЗ штанги - план')
 
-        for row in range(sucker_rod_ind + 1, pipes_ind - 1):
+        for row in range(CreatePZ.sucker_rod_ind + 1, CreatePZ.pipes_ind - 1):
 
-            key = ws.cell(row=row, column=4).value
+            key = str(ws.cell(row=row, column=4).value)
             value = ws.cell(row=row, column=7).value
-            if CreatePZ.if_None(key) != 'отсут' and row < CreatePZ.b_plan:
+            if key != str(None) and key != '-':
+                if CreatePZ.if_None(key) != 'отсут' and row < CreatePZ.b_plan:
 
-                CreatePZ.dict_sucker_rod[key] = CreatePZ.dict_sucker_rod.get(key, 0) + int(
-                    CreatePZ.without_b(value + 1))
-            elif CreatePZ.if_None(key) != 'отсут' and row >= CreatePZ.b_plan:
-                CreatePZ.dict_sucker_rod_po[key] = CreatePZ.dict_sucker_rod_po.get(key, 0) + int(
-                    CreatePZ.without_b(value))
-            # self.dict_sucker_rod = dict_sucker_rod
-            # self.dict_sucker_rod_po = dict_sucker_rod_po
+                    CreatePZ.dict_sucker_rod[key] = CreatePZ.dict_sucker_rod.get(key, 0) + int(
+                        CreatePZ.without_b(value + 1))
+                elif CreatePZ.if_None(key) != 'отсут' and row >= CreatePZ.b_plan and key:
+                    CreatePZ.dict_sucker_rod_po[key] = CreatePZ.dict_sucker_rod_po.get(key, 0) + int(
+                        CreatePZ.without_b(value))
+                # self.dict_sucker_rod = dict_sucker_rod
+                # self.dict_sucker_rod_po = dict_sucker_rod_po
         print(f' штанги на спуск {CreatePZ.dict_sucker_rod_po}')
+        # except:
+        #     mes = QMessageBox.warning(self, 'Штанги отсутствуют', 'блок со штангами отсутствует')
 
 
 
@@ -806,20 +833,20 @@ class CreatePZ:
         perforations_intervals = []
 
         # print(f' индекс ПВР{data_pvr_min+1, data_pvr_max + 1}')
-        for row in range(data_pvr_min, data_pvr_max + 2):  # Сортировка интервала перфорации
+        for row in range(data_pvr_min, CreatePZ.data_pvr_max + 2):  # Сортировка интервала перфорации
             lst = []
             # print(ws.cell(row=row, column=3).value)
-            if ws.cell(row=row, column=3).value in [float, int] or \
-                    str(ws.cell(row=row, column=3).value).replace('.','').replace(',','').isdigit():
+            if ws.cell(row=row, column=4).value in [float, int] or \
+                    str(ws.cell(row=row, column=4).value).replace('.','').replace(',','').isdigit():
 
                 for i in range(2, 13):
                     lst.append(ws.cell(row=row, column=i).value)
 
 
                 # print(ws.cell(row=row, column=6).value)
-                if CreatePZ.old_version == True and isinstance(ws.cell(row=row, column=6).value, datetime) == True:
+                if CreatePZ.old_version is True and isinstance(ws.cell(row=row, column=6).value, datetime) is True:
                     lst.insert(5, None)
-                elif CreatePZ.old_version == True and isinstance(ws.cell(row=row, column=6).value,
+                elif CreatePZ.old_version is True and isinstance(ws.cell(row=row, column=6).value,
                                                                  datetime) == False and not ws.cell(row=row,
                                                                                                     column=5).value is None:
                     lst.insert(5, 'отключен')
@@ -838,16 +865,16 @@ class CreatePZ:
                 perforations_intervals[ind][0] = perforations_intervals[ind - 1][0]
 
             # print(row, any([str((i)).lower() == 'проект' for i in row]), all([str(i).strip() is None for i in row]) == False)
-            if any(['проект' in str((i)).lower() or 'не пер' in str((i)).lower() for i in row]) == False and all(
-                    [str(i).strip() is None for i in row]) == False and krs.is_number(row[2]) == True \
-                    and krs.is_number(float(str(row[3]).replace(',', '.'))) == True:
+            if any(['проект' in str((i)).lower() or 'не пер' in str((i)).lower() for i in row]) is False and all(
+                    [str(i).strip() is None for i in row]) is False and krs.is_number(row[2]) is True \
+                    and krs.is_number(float(str(row[3]).replace(',', '.'))) is True:
                 # print(f'5 {row}')
 
                 if krs.is_number(str(row[1]).replace(',', '.')) == True:
                     CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('вертикаль', set()).add(row[1])
 
                 CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('отрайбировано', False)
-                CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('Прошаблонировано', 0)
+                CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('Прошаблонировано', False)
                 CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('интервал', set()).add(
                     (round(float(str(row[2]).replace(',', '.')), 1), round(float(str(row[3]).replace(',', '.')), 1)))
 
@@ -921,10 +948,11 @@ class CreatePZ:
                     else:
                         plast_work.add(plast)
                         CreatePZ.dict_perforation[plast]['отключение'] = False
-
+                    CreatePZ.dict_perforation[plast]['отрайбировано'] = False
+                    CreatePZ.dict_perforation[plast]['Прошаблонировано'] = False
                 CreatePZ.plast_work = list(plast_work)
-                print(f'все интервалы {CreatePZ.plast_all}')
-                print(f'раб интервалы {CreatePZ.plast_work}')
+                # print(f'все интервалы {CreatePZ.plast_all}')
+                # print(f'раб интервалы {CreatePZ.plast_work}')
                 CreatePZ.perforation_roof = CreatePZ.current_bottom
                 for plast in CreatePZ.plast_work:
                     for interval in CreatePZ.dict_perforation[plast]['интервал']:
@@ -932,8 +960,10 @@ class CreatePZ:
                         if CreatePZ.perforation_roof > interval[0]:
                             CreatePZ.perforation_roof = interval[0]
 
-
                 print(f'кровля ПВР раб {CreatePZ.perforation_roof}')
+
+        without_damping = krs.without_damping(self)
+        print(without_damping)
 
         # вызов окна для проверки корректности данных
         if self.data_window is None:
@@ -942,9 +972,21 @@ class CreatePZ:
             self.data_window.setGeometry(200, 400, 300, 400)
 
             self.data_window.show()
-        CreatePZ.pause_app(self)
-        CreatePZ.pause = True
+            CreatePZ.pause_app(self)
+            CreatePZ.pause = True
+            self.data_window = None
 
+        if self.perforation_correct_window2 is None:
+            self.perforation_correct_window2 = PerforationCorrect(self)
+            self.perforation_correct_window2.setWindowTitle("Сверка данных перфорации")
+            self.perforation_correct_window2.setGeometry(200, 400, 100, 400)
+
+            self.perforation_correct_window2.show()
+            CreatePZ.pause_app(self)
+            CreatePZ.pause = True
+            self.perforation_correct_window2 = None
+
+        CreatePZ.dict_perforation_short = CreatePZ.dict_perforation
         CreatePZ.dict_perforation_short = CreatePZ.dict_perforation
 
 

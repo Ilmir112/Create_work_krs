@@ -1,7 +1,10 @@
 import os
 import sys
 import openpyxl
+from openpyxl.reader.excel import load_workbook
+
 import krs
+import time
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu, QMenuBar, QAction, QTableWidget, \
     QLineEdit, QFileDialog, QToolBar, QPushButton, QMessageBox, QInputDialog
 from PyQt5 import QtCore, QtWidgets
@@ -14,6 +17,27 @@ from openpyxl.styles import Border, Side, Alignment, Font
 from openpyxl.drawing.image import Image
 
 from H2S import calc_H2S
+from PyQt5.QtCore import QThread, pyqtSignal
+from data_correct_position_people import CorrectSignaturesWindow
+
+class ExcelWorker(QThread):
+    finished = pyqtSignal()
+
+    def __init__(self):
+        super().__init__()
+
+    def run(self):
+        from open_pz import CreatePZ
+        fname = 'data_klassifer/Перечень скважин без глушения.xlsx'
+        workb = load_workbook(fname, data_only=True)
+        sheet = workb.active
+        without_damping = False
+        for row in sheet.iter_rows(values_only=True):
+            if CreatePZ.well_area == row[4] and str(CreatePZ.well_number) == str(row[5]):
+                without_damping = True
+
+        CreatePZ.without_damping = without_damping
+
 
 
 class MyWindow(QMainWindow):
@@ -24,8 +48,10 @@ class MyWindow(QMainWindow):
         self.initUI()
         self.new_window = None
         self.acid_windowPaker = None
+        self.signatures_window = None
         self.acid_windowPaker2 = None
         self.data_window = None
+        self.perforation_correct_window2 = None
         self.ws = None
         self.ins_ind = None
         self.perforation_list = []
@@ -68,8 +94,10 @@ class MyWindow(QMainWindow):
         self.setMenuBar(self.menuBar)
         self.fileMenu = QMenu('&Файл', self)
         self.classifierMenu = QMenu('&Классификатор', self)
+        self.signatories = QMenu('&Подписанты ', self)
         self.menuBar.addMenu(self.fileMenu)
         self.menuBar.addMenu(self.classifierMenu)
+        self.menuBar.addMenu(self.signatories)
 
         self.create_file = self.fileMenu.addMenu('&Создать')
         self.create_KRS = self.create_file.addAction('План КРС', self.action_clicked)
@@ -83,8 +111,11 @@ class MyWindow(QMainWindow):
         self.save_file = self.fileMenu.addAction('Сохранить', self.action_clicked)
         self.save_file_as = self.fileMenu.addAction('Сохранить как', self.action_clicked)
 
-        class_well = self.classifierMenu.addAction('&классификатор')
-        list_without_jamming = self.classifierMenu.addAction('&Перечень без глушения')
+        self.class_well = self.classifierMenu.addAction('&классификатор')
+        self.list_without_jamming = self.classifierMenu.addAction('&Перечень без глушения')
+
+        self.signatories_Bnd = self.signatories.addAction('&БашНефть-Добыча', self.action_clicked)
+
 
     @QtCore.pyqtSlot()
     def action_clicked(self):
@@ -104,7 +135,7 @@ class MyWindow(QMainWindow):
 
                 except FileNotFoundError:
                     print('Файл не найден')
-        if action == self.create_KRS_DP:
+        elif action == self.create_KRS_DP:
             self.tableWidgetOpen()
             self.fname, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
                                                                "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
@@ -140,6 +171,21 @@ class MyWindow(QMainWindow):
 
         elif action == self.save_file_as:
             self.saveFileDialog(self.wb2)
+
+        elif action == self.signatories_Bnd:
+            if self.signatures_window is None:
+                print('Подписанты')
+                self.signatures_window = CorrectSignaturesWindow()
+                self.signatures_window.setWindowTitle("Подписанты")
+                # self.signatures_window.setGeometry(200, 400, 300, 400)
+
+            else:
+                self.signatures_window.close()  # Close window.
+                self.signatures_window = None  # Discard reference.
+
+
+
+
 
     def tableWidgetOpen(self):
         if self.table_widget is None:
@@ -248,46 +294,38 @@ class MyWindow(QMainWindow):
                 self.insert_image(ws2, 'imageFiles/Хасаншин.png', 'H1')
                 self.insert_image(ws2, 'imageFiles/Шамигулов.png', 'H4')
 
-            try:
-                if self.work_plan != 'dop_plan':
-
-
-                    if 2 in CreatePZ.cat_H2S_list or 1 in CreatePZ.cat_H2S_list and self.work_plan != 'dop_plan':
-                        ws3 = wb2.create_sheet('Sheet1')
-                        ws3.title = "Расчет необходимого количества поглотителя H2S"
-                        ws3 = wb2["Расчет необходимого количества поглотителя H2S"]
-                        calc_H2S(ws3, CreatePZ.H2S_pr, CreatePZ.H2S_mg)
-                    else:
-                        print(f'{CreatePZ.cat_H2S_list} Расчет поглотителя сероводорода не требуется')
+                if 2 in CreatePZ.cat_H2S_list or 1 in CreatePZ.cat_H2S_list and self.work_plan != 'dop_plan':
+                    ws3 = wb2.create_sheet('Sheet1')
+                    ws3.title = "Расчет необходимого количества поглотителя H2S"
+                    ws3 = wb2["Расчет необходимого количества поглотителя H2S"]
+                    calc_H2S(ws3, CreatePZ.H2S_pr, CreatePZ.H2S_mg)
+                else:
+                    print(f'{CreatePZ.cat_H2S_list} Расчет поглотителя сероводорода не требуется')
 
 
 
-            except Exception as e:
-                print(e)
+            ws2.print_area = f'B1:L{self.table_widget.rowCount() + 45}'
+            ws2.page_setup.fitToPage = True
+            ws2.page_setup.fitToHeight = False
+            ws2.page_setup.fitToWidth = True
+            ws2.print_options.horizontalCentered = True
+            # зададим размер листа
+            ws2.page_setup.paperSize = ws2.PAPERSIZE_A4
+            # содержимое по ширине страницы
+            ws2.sheet_properties.pageSetUpPr.fitToPage = True
+            ws2.page_setup.fitToHeight = False
 
-            finally:
-                ws2.print_area = f'B1:L{self.table_widget.rowCount() + 45}'
-                ws2.page_setup.fitToPage = True
-                ws2.page_setup.fitToHeight = False
-                ws2.page_setup.fitToWidth = True
-                ws2.print_options.horizontalCentered = True
-                # зададим размер листа
-                ws2.page_setup.paperSize = ws2.PAPERSIZE_A4
-                # содержимое по ширине страницы
-                ws2.sheet_properties.pageSetUpPr.fitToPage = True
-                ws2.page_setup.fitToHeight = False
-
-                path = 'D:\Documents\Desktop\ГТМ'
-                filenames = f"{CreatePZ.well_number} {CreatePZ.well_area} кат {CreatePZ.cat_P_1} {self.work_plan}.xlsx"
-                full_path = path + '/' + filenames
-                # print(f'10 - {ws2.max_row}')
-                # print(wb2.path)
-                if wb2:
-                    wb2.close()
-                    wb2.save(full_path)
-                    print(f"Table data saved to Excel {full_path} {CreatePZ.number_dp}")
-                if self.wb:
-                    self.wb.close()
+            path = 'D:\Documents\Desktop\ГТМ'
+            filenames = f"{CreatePZ.well_number} {CreatePZ.well_area} кат {CreatePZ.cat_P_1} {self.work_plan}.xlsx"
+            full_path = path + '/' + filenames
+            # print(f'10 - {ws2.max_row}')
+            # print(wb2.path)
+            if wb2:
+                wb2.close()
+                wb2.save(full_path)
+                print(f"Table data saved to Excel {full_path} {CreatePZ.number_dp}")
+            if self.wb:
+                self.wb.close()
 
 
 
@@ -311,6 +349,8 @@ class MyWindow(QMainWindow):
             CreatePZ.template_depth = 0
             CreatePZ.nkt_diam = 73
             CreatePZ.b_plan = 0
+            CreatePZ.pipes_ind = 0
+            CreatePZ.sucker_rod_ind = 0
             CreatePZ.expected_Q = 0
             CreatePZ.expected_P = 0
             CreatePZ.plast_select = ''
@@ -405,6 +445,8 @@ class MyWindow(QMainWindow):
 
         print("Closing current file")
 
+    def on_finished(self):
+        print("Работа с файлом Excel завершена.")
     def insert_image(self, ws, file, coordinate):
         # Загружаем изображение с помощью библиотеки Pillow
         img = openpyxl.drawing.image.Image(file)
@@ -1113,6 +1155,7 @@ class MyWindow(QMainWindow):
             self.new_window = None  # Discard reference.
 
     def correctPVR(self):
+        from perforation_correct import PerforationCorrect
         from open_pz import CreatePZ
         plast_work = set()
         CreatePZ.current_bottom, ok = QInputDialog.getDouble(self, 'Необходимый забой',
@@ -1136,11 +1179,21 @@ class MyWindow(QMainWindow):
                 elif CreatePZ.perforation_roof_all <= interval[0]:
                     CreatePZ.perforation_roof_all = interval[0]
                 break
-        CreatePZ.plast_work = list(plast_work)
-        print(f'работающий пласты  {CreatePZ.plast_work}')
+
+        if self.perforation_correct_window2 is None:
+            self.perforation_correct_window2 = PerforationCorrect(self)
+            self.perforation_correct_window2.setWindowTitle("Сверка данных перфорации")
+            self.perforation_correct_window2.setGeometry(200, 400, 100, 400)
+
+            self.perforation_correct_window2.show()
+
+            CreatePZ.pause_app(self)
+            CreatePZ.pause = True
+            self.perforation_correct_window2 = None
 
     def correctData(self):
         from data_correct import DataWindow
+        from open_pz import CreatePZ
 
         if self.new_window is None:
 
@@ -1148,6 +1201,7 @@ class MyWindow(QMainWindow):
             self.new_window.setWindowTitle("Окно корректировки")
             self.new_window.setGeometry(100, 400, 300, 400)
             self.new_window.show()
+            CreatePZ.pause = False
 
         else:
             self.new_window.close()  # Close window.
@@ -1164,8 +1218,7 @@ class MyWindow(QMainWindow):
 
         if self.new_window is None:
 
-            self.new_window = PerforationWindow(self.table_widget, self.ins_ind,
-                                                self.dict_perforation_project)
+            self.new_window = PerforationWindow(self.table_widget, self.ins_ind)
             self.new_window.setWindowTitle("Перфорация")
             self.new_window.setGeometry(200, 400, 300, 400)
             self.new_window.show()
@@ -1421,6 +1474,8 @@ class MyWindow(QMainWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+
+
     window = MyWindow()
     window.show()
     sys.exit(app.exec_())

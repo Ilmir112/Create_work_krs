@@ -9,11 +9,11 @@ def calc_H2S(ws3, H2S_pr, H2S_mg):
     from open_pz import CreatePZ
 
     print(CreatePZ.dict_nkt)
-    nkt_1 = int(list(CreatePZ.dict_nkt.keys())[0])
+    nkt_1 = list(CreatePZ.dict_nkt.keys())[0]
     nkt_1_l = CreatePZ.dict_nkt[nkt_1]
 
     try:
-        nkt_2 = int(list(CreatePZ.dict_nkt.keys())[1])
+        nkt_2 = list(CreatePZ.dict_nkt.keys())[1]
         nkt_2_l = CreatePZ.dict_nkt[nkt_2]
     except:
         nkt_2 = 0
@@ -26,10 +26,10 @@ def calc_H2S(ws3, H2S_pr, H2S_mg):
         print(nkt_l)
         if CreatePZ.column_additional == True:
 
-            gno_well = 3.14*(CreatePZ.column_diametr-CreatePZ.column_wall_thickness*2)**2/4/1000*(CreatePZ.bottom-CreatePZ.head_column_additional)/1000/10
+            gno_well = 3.14*(CreatePZ.column_diametr-CreatePZ.column_wall_thickness*2)**2/4/1000*(CreatePZ.bottom-float(CreatePZ.head_column_additional))/1000/10
         else:
             if nkt_l < CreatePZ.shoe_column:
-                gno_well = (3.14*(CreatePZ.column_diametr-CreatePZ.column_wall_thickness*2)**2/4/1000*(CreatePZ.bottom- CreatePZ.head_column_additional)/1000)+(3.14*(CreatePZ.column_diametr-CreatePZ.column_wall_thickness*2)**2/4/1000*(CreatePZ.shoe_column-nkt_l)/1000)
+                gno_well = (3.14*(CreatePZ.column_diametr-CreatePZ.column_wall_thickness*2)**2/4/1000*(CreatePZ.bottom- float(CreatePZ.head_column_additional))/1000)+(3.14*(CreatePZ.column_diametr-CreatePZ.column_wall_thickness*2)**2/4/1000*(CreatePZ.shoe_column-nkt_l)/1000)
             else:
                 gno_well = 3.14*(CreatePZ.column_additional_diametr-CreatePZ.column_additional_wall_thickness*2)**2/4/1000*(CreatePZ.bottom-nkt_1_l)/10000
 
@@ -37,19 +37,19 @@ def calc_H2S(ws3, H2S_pr, H2S_mg):
 
 
     try:
-        nkt_3 = int(list(CreatePZ.dict_nkt.keys())[2])
+        nkt_3 = list(CreatePZ.dict_nkt.keys())[2]
     except:
         nkt_3 = 0
     try:
-        sucker_rod_l_25 =CreatePZ.dict_sucker_rod[25]
+        sucker_rod_l_25 = CreatePZ.dict_sucker_rod['25']
     except:
         sucker_rod_l_25 = 0
     try:
-        sucker_rod_l_22 = CreatePZ.dict_sucker_rod[22]
+        sucker_rod_l_22 = CreatePZ.dict_sucker_rod['22']
     except:
         sucker_rod_l_22 = 0
     try:
-        sucker_rod_l_19 = CreatePZ.dict_sucker_rod[19]
+        sucker_rod_l_19 = CreatePZ.dict_sucker_rod['19']
     except:
         sucker_rod_l_19 = 0
 
@@ -61,10 +61,10 @@ def calc_H2S(ws3, H2S_pr, H2S_mg):
         [None, None, None, None, None, None],
         [None, '№', 'Параметр', None, 'Результат расчета', None],
         [None, 1, 'Параметры скважины', None, f'{CreatePZ.well_number} {CreatePZ.well_area}', None],
-        [None, 1.1, 'Забой скважины', 'м', float(CreatePZ.bottomhole_artificial), 'формула'],
-        [None, 1.2, 'текущий забой', 'м', float(CreatePZ.bottom), 'ввод'],
+        [None, 1.1, 'Забой скважины', 'м', round(float(CreatePZ.bottomhole_artificial), 1), 'формула'],
+        [None, 1.2, 'текущий забой', 'м', round(float(CreatePZ.bottom),1), 'ввод'],
         [None, 1.3, 'Диаметр ЭК (ступень 1 верхняя)', 'мм', int(CreatePZ.column_diametr), 'ввод'],
-            [None, '1.3.1.', 'Толщина стенки ЭК (ступень 1 верхняя)', 'мм', float(CreatePZ.column_wall_thickness), 'ввод'],
+            [None, '1.3.1.', 'Толщина стенки ЭК (ступень 1 верхняя)', 'мм', round(float(CreatePZ.column_wall_thickness), 1), 'ввод'],
         [None, '1.3.2.', 'Длина подвески ЭК (ступень 1 верхняя)', 'м', int(CreatePZ.shoe_column), 'ввод'],
         [None, '1.3.3.', 'Диаметр ЭК (ступень 2 хвостовик)', 'мм', int(CreatePZ.column_additional_diametr), 'ввод'],
         [None, '1.3.4.', 'Толщина стенки ЭК (ступень 2 хвостовик)', 'м', float(CreatePZ.column_additional_wall_thickness),
@@ -89,19 +89,19 @@ def calc_H2S(ws3, H2S_pr, H2S_mg):
         [None, '2.2.2.', 'Длина штанг 22 мм', 'м', sucker_rod_l_22, 'ввод'],
         [None, '2.2.3.', 'Длина штанг 19 мм', 'м', sucker_rod_l_19, 'ввод'],
         [None, 3, 'Расчеты емкости', None, None, None, None],
-        [None, 3.1, 'Удельный  внутренний объем ЭК', 'дм3/м', "=10*3.14*((E9-E10*2)*0.01)^2/4", 'формула'],
-        [None, 3.2, 'Удельный  внутренний объем хвостовика', 'дм3/м', '=10*3.14*((E12-E13*2)*0.01)^2/4', 'формула'],
-        [None, 3.3, 'Объем жидкости под ГНО, в т.ч.:', 'м3', '=if(if(E14=0,(3.14*(E9-E10*2)^2/4/1000*(E8-E19)/1000),if(E19<E15,(3.14*(E12-E13*2)^2/4/1000*(E8-E19)/1000),((3.14*(E12-E13*2)^2/4/1000*(E8-E15)/1000) +3.14*(E9-E10*2)^2/4/1000*(E15-E19)/1000 )))<0, 0, if(E14=0,(3.14*(E9-E10*2)^2/4/1000*(E8-E19)/1000),if(E19<E15,(3.14*(E12-E13*2)^2/4/1000*(E8-E19)/1000),((3.14*(E12-E13*2)^2/4/1000*(E8-E15)/1000) +3.14*(E9-E10*2)^2/4/1000*(E15-E19)/1000 ))))  ', 'формула'],
-        [None, '3.3.1.', 'Объем скважины', 'м3', '=if(E14=0,3.14*(E9-E10*2)^2/4/1000*(E8)/1000,(3.14*(E12-E13*2)^2/4/1000*(E8-E15)/1000)+(3.14*(E9-E10*2)^2/4/1000*(E15)/1000))', 'формула'],
+        [None, 3.1, 'Удельный  внутренний объем ЭК', 'дм3/м', "=ROUND(10*3.14*((E9-E10*2)*0.01)^2/4, 1)", 'формула'],
+        [None, 3.2, 'Удельный  внутренний объем хвостовика', 'дм3/м', '=ROUND(10*3.14*((E12-E13*2)*0.01)^2/4,1)', 'формула'],
+        [None, 3.3, 'Объем жидкости под ГНО, в т.ч.:', 'м3', '=ROUND(if(if(E14=0,(3.14*(E9-E10*2)^2/4/1000*(E8-E19)/1000),if(E19<E15,(3.14*(E12-E13*2)^2/4/1000*(E8-E19)/1000),((3.14*(E12-E13*2)^2/4/1000*(E8-E15)/1000) +3.14*(E9-E10*2)^2/4/1000*(E15-E19)/1000 )))<0, 0, if(E14=0,(3.14*(E9-E10*2)^2/4/1000*(E8-E19)/1000),if(E19<E15,(3.14*(E12-E13*2)^2/4/1000*(E8-E19)/1000),((3.14*(E12-E13*2)^2/4/1000*(E8-E15)/1000) +3.14*(E9-E10*2)^2/4/1000*(E15-E19)/1000 )))),)  ', 'формула'],
+        [None, '3.3.1.', 'Объем скважины', 'м3', '=ROUND(if(E14=0,3.14*(E9-E10*2)^2/4/1000*(E8)/1000,(3.14*(E12-E13*2)^2/4/1000*(E8-E15)/1000)+(3.14*(E9-E10*2)^2/4/1000*(E15)/1000)),1)', 'формула'],
         [None, '3.3.1.', 'Удельное водоизмещение подвески НКТ (ступень 1 верхняя)', 'дм3/м',
-         '=10*3.14*((E21*0.01)^2-(E21*0.01-E20*2*0.01)^2)/4',
+         '=ROUND(10*3.14*((E21*0.01)^2-(E21*0.01-E20*2*0.01)^2)/4,1)',
          'формула'],
         [None, '3.3.2.', 'Удельное водоизмещение подвески НКТ (ступень 2 нижняя)', 'дм3/м',
-         '=10*3.14*((E24*0.01)^2-(E24*0.01-E23*2*0.01)^2)/4', 'формула',],
+         '=ROUND(10*3.14*((E24*0.01)^2-(E24*0.01-E23*2*0.01)^2)/4,1)', 'формула',],
         [None, '3.3.3.', 'Водоизмещение подвески НКТ (объем жидкости притока при СПО)', 'м3/СПО',
-         '=(E22*E35/1000) +(E25*E36/1000)', 'формула'],
+         '=ROUND((E22*E35/1000) +(E25*E36/1000),1)', 'формула'],
         [None, '3.3.4.', 'Водоизмещение подвески штанг (объем жидкости притока при СПО)', 'м3/СПО',
-         '=(10*3.14*((25*0.01)^2/4)*E27/1000)+(10*3.14*((22*0.01)^2/4)*E28/1000)+(10*3.14*((19*0.01)^2/4)*E29/1000)',
+         '=ROUND((10*3.14*((25*0.01)^2/4)*E27/1000)+(10*3.14*((22*0.01)^2/4)*E28/1000)+(10*3.14*((19*0.01)^2/4)*E29/1000),1)',
          'формула'],
         [None, None, None, None, None, None],
         [None, 4, 'Параметры добываемой жидкости и газа', None, None, None, None],
@@ -113,21 +113,21 @@ def calc_H2S(ws3, H2S_pr, H2S_mg):
         [None, 4.6, 'Плотность нефти', 'г/см3', 0.9, 'ввод'],
         [None, None, None, None, None, None],
         [None, 5, 'Расчет массы сероводорода в жидкости притока (в объеме водоизмещения подвески НКТ и штанг)', None, None, None],
-        [None, 5.1, 'Масса нефти ', 'т', '=(E37+E38)*(100-E43)*E46/100', 'формула'],
-        [None, 5.2, 'Объем сероводорода, м3', 'м3', '=E41*E49*E42/100', 'формула'],
+        [None, 5.1, 'Масса нефти ', 'т', '=ROUND((E37+E38)*(100-E43)*E46/100,1)', 'формула'],
+        [None, 5.2, 'Объем сероводорода, м3', 'м3', '=ROUND(E41*E49*E42/100,1)', 'формула'],
         [None, 5.3, 'Масса сероводорода в нефти (выделяющаяся в газовую фазу при снижении давления)', 'г',
          '=(34*E50*1000/22.14)','формула'],
-        [None, 5.4, 'Масса сероводорода в жидкости (остаточная растворенная часть)', 'г', '=(E37+E38)*E44', 'формула'],
+        [None, 5.4, 'Масса сероводорода в жидкости (остаточная растворенная часть)', 'г', '=ROUND((E37+E38)*E44,1)', 'формула'],
         [None, None, None, None, None, None],
         [None, 6, 'Расчет массы сероводорода в поднасосной жидкости (в объеме скважины под ГНО)', None, None, None],
-        [None, 6.1, 'Масса нефти ', 'т', '=E33*(100-E43)*E46/100    ', 'формула'],
-        [None, 6.2, 'Объем сероводорода, м3', 'м3', '=E41*E55*E42/100   ', 'формула'],
+        [None, 6.1, 'Масса нефти ', 'т', '=ROUND(E33*(100-E43)*E46/100,1)    ', 'формула'],
+        [None, 6.2, 'Объем сероводорода, м3', 'м3', '=ROUND(E41*E55*E42/100,1)   ', 'формула'],
         [None, 6.3, 'Масса сероводорода в нефти (доля, выделяющаяся в газовую фазу при снижении давления)', 'г',
-         '=(34*E56*1000/22.14)  ', 'формула'],
-        [None, 6.4, 'Масса сероводорода в жидкости (остаточная растворенная часть)', 'г', '=E33*E44',
+         '=ROUND((34*E56*1000/22.14),1)  ', 'формула'],
+        [None, 6.4, 'Масса сероводорода в жидкости (остаточная растворенная часть)', 'г', '=ROUND(E33*E44,1)',
          'формула'],
         [None, None, None, None, None, None],
-        [None, 7, 'Масса сероводорода общая', 'г', '=E51+E52+E57+E58', 'формула'],
+        [None, 7, 'Масса сероводорода общая', 'г', '=ROUND(E51+E52+E57+E58,1)', 'формула'],
         [None, None, None, None, None, None],
         [None, 8, 'Параметр нейтрализатора сероводорода', None, None, None],
         [None, 8.1, 'Емкость реагента по сероводороду (определяется по результатам ЛИ конкретной марки)', 'г/г H2S',
@@ -135,7 +135,7 @@ def calc_H2S(ws3, H2S_pr, H2S_mg):
         [None, 8.2, 'Плотность товарной формы (марки) реагента (по ТУ)', 'г/см3', 1.065, 'ввод'],
         [None, None, None, None, None, None],
         [None, 9, 'Результат расчета расхода нейтрализатора сероводорода', None, None, None],
-        [None, 9.1, 'Расчетная масса реагента', 'кг', '=E63*E60/1000', 'формула'],
+        [None, 9.1, 'Расчетная масса реагента', 'кг', '=ROUND(E63*E60/1000,1)', 'формула'],
         [None, 9.2, 'Коэффициент запаса по реагенту (решение ОГ)', 'крат', 1.25, 'ввод'],
         [None, 9.3, 'Масса реагента с запасом', 'кг', '=E67*E68', 'формула', None, None, None],
         [None, None, None, None, None, None],
@@ -190,9 +190,9 @@ def well_volume(self):
     else:
 
         volume_well = (3.14 * (CreatePZ.column_additional_diametr - CreatePZ.column_wall_thickness * 2) ** 2 / 4 / 1000 * (
-                CreatePZ.bottomhole_artificial - CreatePZ.head_column_additional) / 1000) + (
+                CreatePZ.bottomhole_artificial - float(CreatePZ.head_column_additional)) / 1000) + (
                                   3.14 * (CreatePZ.column_diametr - CreatePZ.column_wall_thickness * 2) ** 2 / 4 / 1000 * (
-                              CreatePZ.head_column_additional) / 1000)
+                              float(CreatePZ.head_column_additional)) / 1000)
         return volume_well
 def calv_h2s(self, cat_H2S, H2S_mg, H2S_pr):
 
@@ -208,9 +208,9 @@ def calv_h2s(self, cat_H2S, H2S_mg, H2S_pr):
         if CreatePZ.column_additional == False:
 
             v_pod_gno = 3.14 * (int(CreatePZ.column_diametr) - int(CreatePZ.column_wall_thickness)*2)**2/4/1000*(CreatePZ.bottomhole_artificial-int(nkt_l))/1000
-        elif nkt_l > CreatePZ.head_column_additional:
-            v_pod_gno = 3.14 * (CreatePZ.column_diametr - CreatePZ.column_wall_thickness*2)**2/4/1000 * (CreatePZ.head_column_additional-nkt_l)/1000+ 3.14*(CreatePZ.column_additional_diametr - CreatePZ.column_additional_wall_thickness*2)**2/4/1000*(CreatePZ.bottomhole_artificial-CreatePZ.head_column_additional)/1000
-        elif nkt_l < CreatePZ.head_column_additional:
+        elif nkt_l > float(CreatePZ.head_column_additional):
+            v_pod_gno = 3.14 * (CreatePZ.column_diametr - CreatePZ.column_wall_thickness*2)**2/4/1000 * (float(CreatePZ.head_column_additional)-nkt_l)/1000+ 3.14*(CreatePZ.column_additional_diametr - CreatePZ.column_additional_wall_thickness*2)**2/4/1000*(CreatePZ.bottomhole_artificial-float(CreatePZ.head_column_additional))/1000
+        elif nkt_l < float(CreatePZ.head_column_additional):
             v_pod_gno = 3.14 *(CreatePZ.column_additional_diametr-CreatePZ.column_additional_wall_thickness*2)**2/4/1000 * (CreatePZ.bottomhole_artificial-nkt_l)/1000
         # print(f'под ГНО{v_pod_gno}')
         volume_well =  H2S.well_volume(self)
@@ -246,15 +246,15 @@ def calv_h2s(self, cat_H2S, H2S_mg, H2S_pr):
         except:
             vodoiz_nkt = vodoiz_nkt
         try:
-            sucker_rod_l_25 = CreatePZ.dict_sucker_rod[25]
+            sucker_rod_l_25 = CreatePZ.dict_sucker_rod['25']
         except:
             sucker_rod_l_25 = 0
         try:
-            sucker_rod_l_22 = CreatePZ.dict_sucker_rod[22]
+            sucker_rod_l_22 = CreatePZ.dict_sucker_rod['22']
         except:
             sucker_rod_l_22 = 0
         try:
-            sucker_rod_l_19 = CreatePZ.dict_sucker_rod[19]
+            sucker_rod_l_19 = CreatePZ.dict_sucker_rod["19"]
         except:
             sucker_rod_l_19 = 0
 

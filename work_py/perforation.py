@@ -71,7 +71,7 @@ class TabWidget(QTabWidget):
 class PerforationWindow(MyWindow):
 
 
-    def __init__(self, table_widget, ins_ind, dict_perforation_project, parent=None):
+    def __init__(self, table_widget, ins_ind, parent=None):
         from open_pz import CreatePZ
         super(MyWindow, self).__init__(parent)
 
@@ -84,7 +84,8 @@ class PerforationWindow(MyWindow):
         self.tabWidget = TabWidget()
         self.tableWidget = QTableWidget(0, 7)
         self.tableWidget.setHorizontalHeaderLabels(
-            ["Кровля перфорации", "Подошва Перфорации", "Тип заряда", "отв на 1 п.м.", "Количество отверстий", "Вскрываемые пласты", "доп информация"])
+            ["Кровля перфорации", "Подошва Перфорации", "Тип заряда", "отв на 1 п.м.",
+             "Количество отверстий", "Вскрываемые пласты", "доп информация"])
         for i in range(7):
             self.tableWidget.horizontalHeader().setSectionResizeMode(i, QHeaderView.Stretch)
 
@@ -115,7 +116,17 @@ class PerforationWindow(MyWindow):
     def addPerfProject(self):
         from open_pz import CreatePZ
 
-        chargePM = QInputDialog.getInt(self, 'кол-во отверстий на 1 п.м.',
+        if CreatePZ.grpPlan:
+            chargePM_GP = QInputDialog.getInt(self, 'кол-во отверстий на 1 п.м.',
+                                           'кол-во отверстий на 1 п.м. зарядов ГП', 20, 5,
+                                           50)[0]
+            chargePM_BO = QInputDialog.getInt(self, 'кол-во отверстий на 1 п.м.',
+                                              'кол-во отверстий на 1 п.м. зарядов БО', 20, 5,
+                                              50)[0]
+
+        else:
+
+            chargePM = QInputDialog.getInt(self, 'кол-во отверстий на 1 п.м.',
                                                       'кол-во отверстий на 1 п.м.', 20, 5,
                                                      50)[0]
 
@@ -126,17 +137,44 @@ class PerforationWindow(MyWindow):
         if len(self.dict_perforation_project) != 0:
             for plast, data in self.dict_perforation_project.items():
                 for i in data['интервал']:
-                    count_charge = int((max(i) - min(i)) * chargePM)
+                    if CreatePZ.grpPlan:
+                        count_charge = int((max(i) - min(i)) * chargePM_GP)
+                        # Вставка интервалов зарядов ГП
+                        self.tableWidget.insertRow(rows)
+                        self.tableWidget.setItem(rows, 0, QTableWidgetItem(str(min(i))))
+                        self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(max(i))))
+                        self.tableWidget.setItem(rows, 2, QTableWidgetItem(self.charge(max(i))[0]))
+                        self.tableWidget.setItem(rows, 3, QTableWidgetItem(str(chargePM_GP)))
+                        self.tableWidget.setItem(rows, 4, QTableWidgetItem(str(count_charge)))
 
-                    self.tableWidget.insertRow(rows)
-                    self.tableWidget.setItem(rows, 0, QTableWidgetItem(str(min(i))))
-                    self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(max(i))))
-                    self.tableWidget.setItem(rows, 2, QTableWidgetItem(self.charge(max(i))))
-                    self.tableWidget.setItem(rows, 3, QTableWidgetItem(str(chargePM)))
-                    self.tableWidget.setItem(rows, 4, QTableWidgetItem(str(count_charge)))
+                        self.tableWidget.setItem(rows, 5, QTableWidgetItem(plast))
+                        self.tableWidget.setItem(rows, 6, QTableWidgetItem(' '))
 
-                    self.tableWidget.setItem(rows, 5, QTableWidgetItem(plast))
-                    self.tableWidget.setItem(rows, 6, QTableWidgetItem(' '))
+                        # Вставка интервалов зарядов БО
+                        count_charge = int((max(i) - min(i)) * chargePM_BO)
+                        self.tableWidget.insertRow(rows)
+                        self.tableWidget.setItem(rows, 0, QTableWidgetItem(str(min(i))))
+                        self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(max(i))))
+                        self.tableWidget.setItem(rows, 2, QTableWidgetItem(self.charge(max(i))[1]))
+                        self.tableWidget.setItem(rows, 3, QTableWidgetItem(str(chargePM_BO)))
+                        self.tableWidget.setItem(rows, 4, QTableWidgetItem(str(count_charge)))
+
+                        self.tableWidget.setItem(rows, 5, QTableWidgetItem(plast))
+                        self.tableWidget.setItem(rows, 6, QTableWidgetItem(' '))
+
+                    else:
+                        # Вставка интервалов зарядов ГП без ГРП
+                        count_charge = int((max(i) - min(i)) * chargePM)
+
+                        self.tableWidget.insertRow(rows)
+                        self.tableWidget.setItem(rows, 0, QTableWidgetItem(str(min(i))))
+                        self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(max(i))))
+                        self.tableWidget.setItem(rows, 2, QTableWidgetItem(self.charge(max(i))[0]))
+                        self.tableWidget.setItem(rows, 3, QTableWidgetItem(str(chargePM)))
+                        self.tableWidget.setItem(rows, 4, QTableWidgetItem(str(count_charge)))
+
+                        self.tableWidget.setItem(rows, 5, QTableWidgetItem(plast))
+                        self.tableWidget.setItem(rows, 6, QTableWidgetItem(' '))
 
         else:
 
@@ -144,18 +182,43 @@ class PerforationWindow(MyWindow):
                 print(plast)
                 if plast in CreatePZ.plast_work:
                     for i in data['интервал']:
-                        count_charge = int((max(i)-min(i))*chargePM)
-                        # print(i)
-                        # print(str(min(i)))
-                        self.tableWidget.insertRow(rows)
-                        self.tableWidget.setItem(rows, 0, QTableWidgetItem(str(min(i))))
-                        self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(max(i))))
-                        self.tableWidget.setItem(rows, 2, QTableWidgetItem(self.charge(max(i))))
-                        self.tableWidget.setItem(rows, 3, QTableWidgetItem(str(chargePM)))
-                        self.tableWidget.setItem(rows, 4, QTableWidgetItem(str(count_charge)))
+                        if CreatePZ.grpPlan:
+                            # Вставка интервалов зарядов ГП
+                            count_charge = int((max(i) - min(i)) * chargePM_GP)
 
-                        self.tableWidget.setItem(rows, 5, QTableWidgetItem(plast))
-                        self.tableWidget.setItem(rows, 6, QTableWidgetItem(' '))
+                            self.tableWidget.insertRow(rows)
+                            self.tableWidget.setItem(rows, 0, QTableWidgetItem(str(min(i))))
+                            self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(max(i))))
+                            self.tableWidget.setItem(rows, 2, QTableWidgetItem(self.charge(max(i))[0]))
+                            self.tableWidget.setItem(rows, 3, QTableWidgetItem(str(chargePM_GP)))
+                            self.tableWidget.setItem(rows, 4, QTableWidgetItem(str(count_charge)))
+                            self.tableWidget.setItem(rows, 5, QTableWidgetItem(plast))
+                            self.tableWidget.setItem(rows, 6, QTableWidgetItem(' '))
+
+                            # Вставка интервалов зарядов БО
+                            count_charge = int((max(i) - min(i)) * chargePM_BO)
+                            self.tableWidget.insertRow(rows)
+                            self.tableWidget.setItem(rows, 0, QTableWidgetItem(str(min(i))))
+                            self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(max(i))))
+                            self.tableWidget.setItem(rows, 2, QTableWidgetItem(self.charge(max(i))[1]))
+                            self.tableWidget.setItem(rows, 3, QTableWidgetItem(str(chargePM_BO)))
+                            self.tableWidget.setItem(rows, 4, QTableWidgetItem(str(count_charge)))
+
+                            self.tableWidget.setItem(rows, 5, QTableWidgetItem(plast))
+                            self.tableWidget.setItem(rows, 6, QTableWidgetItem(' '))
+                        else:
+                            count_charge = int((max(i)-min(i))*chargePM)
+                            # print(i)
+                            # print(str(min(i)))
+                            self.tableWidget.insertRow(rows)
+                            self.tableWidget.setItem(rows, 0, QTableWidgetItem(str(min(i))))
+                            self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(max(i))))
+                            self.tableWidget.setItem(rows, 2, QTableWidgetItem(self.charge(max(i))[0]))
+                            self.tableWidget.setItem(rows, 3, QTableWidgetItem(str(chargePM)))
+                            self.tableWidget.setItem(rows, 4, QTableWidgetItem(str(count_charge)))
+
+                            self.tableWidget.setItem(rows, 5, QTableWidgetItem(plast))
+                            self.tableWidget.setItem(rows, 6, QTableWidgetItem(' '))
         self.tableWidget.setSortingEnabled(True)
 
 
@@ -163,16 +226,16 @@ class PerforationWindow(MyWindow):
         from open_pz import CreatePZ
         charge_diam_dict = {73: (0, 110), 89: (111, 135), 102: (136, 160), 114: (160, 250)}
 
-        if CreatePZ.column_additional == False or (
-                CreatePZ.column_additional == True and pvr < CreatePZ.head_column_additional):
+        if CreatePZ.column_additional is False or (
+                CreatePZ.column_additional is True and pvr < CreatePZ.head_column_additional):
             diam_internal_ek = CreatePZ.column_diametr
         else:
             diam_internal_ek = CreatePZ.column_additional_diametr
 
         for diam, diam_internal_paker in charge_diam_dict.items():
             if diam_internal_paker[0] <= diam_internal_ek <= diam_internal_paker[1]:
-                zar = [25 if diam == 73 else 32]
-                return f'{diam} ПП{zar}ГП'
+                zar = 25 if diam == 73 else 32
+                return f'{diam} ПП{zar}ГП', f'{diam} ПП{zar}БО'
 
     def addRowTable(self):
         from open_pz import CreatePZ
@@ -190,6 +253,9 @@ class PerforationWindow(MyWindow):
             msg = QMessageBox.information(self, 'Внимание', 'Подошва интервала перфорации ниже текущего забоя')
             return
 
+        chargesx = self.charge(int(editType2))[0][:-2] + chargesx
+
+
         self.tableWidget.setSortingEnabled(False)
         rows = self.tableWidget.rowCount()
         self.tableWidget.insertRow(rows)
@@ -197,7 +263,8 @@ class PerforationWindow(MyWindow):
         self.tableWidget.setItem(rows, 1, QTableWidgetItem(editType2))
         self.tableWidget.setItem(rows, 2, QTableWidgetItem(chargesx))
         self.tableWidget.setItem(rows, 3, QTableWidgetItem(editHolesMetr))
-        self.tableWidget.setItem(rows, 4, QTableWidgetItem(str(int((float(editType2)-float(editType))*int(editHolesMetr)))))
+        self.tableWidget.setItem(rows, 4, QTableWidgetItem(str(int((float(editType2)-float(
+            editType))*int(editHolesMetr)))))
         self.tableWidget.setItem(rows, 5, QTableWidgetItem(editIndexFormation))
         self.tableWidget.setItem(rows, 6, QTableWidgetItem(dopInformation))
         self.tableWidget.setSortingEnabled(True)
