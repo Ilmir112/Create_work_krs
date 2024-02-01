@@ -1,5 +1,6 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.Qt import QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QInputDialog, QTabWidget, QPushButton, Qt
+from PyQt5.QtWidgets import QMessageBox
 
 from krs import well_volume
 from main import MyWindow
@@ -8,7 +9,7 @@ from work_py.opressovka import testing_pressure
 
 from work_py.rationingKRS import descentNKT_norm, well_volume_norm, liftingNKT_norm
 
-
+from work_py.acid_paker import CheckableComboBox
 class TabPage_SO(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -59,10 +60,12 @@ class TabPage_SO(QWidget):
         self.khvostEdit.setText(f"{1}")
         self.khvostEdit.setClearButtonEnabled(True)
 
+        plast_work = CreatePZ.plast_work
+
         self.plastLabel = QLabel("Выбор пласта", self)
-        self.plastCombo = QComboBox(self)
-        self.plastCombo.addItems(CreatePZ.plast_work)
-        self.plastCombo.setCurrentIndex(0)
+        self.plastCombo = CheckableComboBox(self)
+        self.plastCombo.combo_box.addItems(plast_work)
+        self.plastCombo.combo_box.currentTextChanged.connect(self.update_plast_edit)
         # self.ComboBoxGeophygist.setProperty("value", 'ГП')
 
         # self.privyazkaTrueLabelType = QLabel("необходимость освоения", self)
@@ -196,6 +199,55 @@ class TabPage_SO(QWidget):
         grid.addWidget(self.swab_volumeEdit, 7, 3)
         grid.addWidget(self.depthGaugeLabel, 6, 4)
         grid.addWidget(self.depthGaugeCombo, 7, 4)
+
+    def update_plast_edit(self):
+        dict_perforation = CreatePZ.dict_perforation
+
+        plasts = CreatePZ.texts
+        print(f'пласты {plasts, len(CreatePZ.texts), len(plasts), CreatePZ.texts}')
+        roof_plast = CreatePZ.current_bottom
+        sole_plast = 0
+        for plast in CreatePZ.plast_work:
+            for plast_sel in plasts:
+                if plast_sel == plast:
+
+                    if roof_plast >= dict_perforation[plast]['кровля']:
+                        roof_plast = dict_perforation[plast]['кровля']
+                    if sole_plast <= dict_perforation[plast]['подошва']:
+                        sole_plast = dict_perforation[plast]['подошва']
+
+
+
+            self.pakerEdit.setText(f"{int(sole_plast + 10)}")
+            self.paker2Edit.setText(f"{int(sole_plast - 10)}")
+            self.swab_pakerEdit.setText(f"{int(sole_plast + 10)}")
+            self.swab_pakerEdit.setText(f"{int(sole_plast + 10)}")
+
+    def update_paker_edit(self):
+        dict_perforation = CreatePZ.dict_perforation
+
+        plasts = CreatePZ.texts
+        print(plasts)
+        roof_plast = CreatePZ.current_bottom
+        sole_plast = 0
+        for plast in CreatePZ.plast_work:
+            for plast_sel in plasts:
+                if plast_sel == plast:
+
+                    if roof_plast >= dict_perforation[plast]['кровля']:
+                        roof_plast = dict_perforation[plast]['кровля']
+                    if sole_plast <= dict_perforation[plast]['подошва']:
+                        sole_plast = dict_perforation[plast]['подошва']
+
+        if CreatePZ.perforation_roof < roof_plast:
+            paker_depth = int(AcidPakerWindow.if_None(self, self.pakerEdit.text()))
+
+            self.khvostEdit.setText(str(int(sole_plast - paker_depth)))
+            self.swab_pakerEdit.setText(str(int(paker_depth - 30)))
+        else:
+            paker_depth = int(AcidPakerWindow.if_None(self, self.pakerEdit.text()))
+            self.khvostEdit.setText(str(int(sole_plast - paker_depth)))
+            self.swab_pakerEdit.setText(str(int(paker_depth - 30)))
 
 
 class TabWidget(QTabWidget):
@@ -648,12 +700,15 @@ class AcidPakerWindow(MyWindow):
 
         acidOilProcEdit = self.tabWidget.currentWidget().acidOilProcEdit.text()
 
-        plastCombo = str(self.tabWidget.currentWidget().plastCombo.currentText())
+        plastCombo = str(self.tabWidget.currentWidget().plastCombo.combo_box.currentText())
         svkTrueEdit = str(self.tabWidget.currentWidget().svkTrueEdit.currentText())
         skvAcidEdit = str(self.tabWidget.currentWidget().skvAcidEdit.currentText())
         QplastEdit = str(self.tabWidget.currentWidget().QplastEdit.currentText())
         depthGaugeEdit = str(self.tabWidget.currentWidget().depthGaugeCombo.currentText())
 
+        if (self.if_None(khvostEdit) == 0 or self.if_None(pakerEdit) == 0) and CreatePZ.countAcid != 2:
+            msg = QMessageBox.information(self, 'Внимание', 'Не все поля соответствуют значениям')
+            return
         # privyazka = str(self.tabWidget.currentWidget().privyazka.currentText())
         if self.countAcid == 0:
 
@@ -775,6 +830,16 @@ class AcidPakerWindow(MyWindow):
     #         return
     #     self.tableWidget.removeRow(row)
 
+    def if_None(self, value):
+
+        if isinstance(value, int) or isinstance(value, float):
+            return int(value)
+
+        elif str(value).replace('.','').replace(',','').isdigit():
+            if str(round(float(value.replace(',','.')), 1))[-1] == 0:
+                return int(float(value.replace(',','.')))
+        else:
+            return 0
 
 if __name__ == "__main__":
     import sys

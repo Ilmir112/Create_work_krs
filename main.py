@@ -177,12 +177,8 @@ class MyWindow(QMainWindow):
                 print('Подписанты')
                 self.signatures_window = CorrectSignaturesWindow()
                 self.signatures_window.setWindowTitle("Подписанты")
-                # self.signatures_window.setGeometry(200, 400, 300, 400)
-
-            else:
-                self.signatures_window.close()  # Close window.
-                self.signatures_window = None  # Discard reference.
-
+                self.signatures_window.setGeometry(200, 400, 300, 400)
+                self.signatures_window.show()
 
 
 
@@ -212,11 +208,11 @@ class MyWindow(QMainWindow):
             wb2 = Workbook()
             ws2 = wb2.get_sheet_by_name('Sheet')
             ws2.title = "План работ"
-            print(f'открытие wb2')
+            # print(f'открытие wb2')
 
             ins_ind = self.ins_ind_border
 
-            print(f'открытие wb2 - {ins_ind}')
+            # print(f'открытие wb2 - {ins_ind}')
 
             merged_cells = []  # Список индексов объединения ячеек
 
@@ -239,7 +235,7 @@ class MyWindow(QMainWindow):
                 work_list.append(row_lst)
 
             merged_cells_dict = {}
-            print(f' индекс объ {ins_ind}')
+            # print(f' индекс объ {ins_ind}')
             for row in merged_cells:
                 if row[0] >= ins_ind-1:
                     merged_cells_dict.setdefault(row[0], []).append(row[1])
@@ -540,7 +536,7 @@ class MyWindow(QMainWindow):
         template_menu.addAction(template_with_skm)
         template_with_skm.triggered.connect(self.template_with_skm)
 
-        template_pero = QAction("проходиость по перу", self)
+        template_pero = QAction("проходимость по перу", self)
 
         template_menu.addAction(template_pero)
         template_pero.triggered.connect(self.template_pero)
@@ -554,6 +550,10 @@ class MyWindow(QMainWindow):
         drilling_action_nkt = QAction("бурение на НКТ", self)
         drilling_menu.addAction(drilling_action_nkt)
         drilling_action_nkt.triggered.connect(self.drilling_action_nkt)
+
+        frezering_port_action = QAction("Фрезерование портов", self)
+        drilling_menu.addAction(frezering_port_action)
+        frezering_port_action.triggered.connect(self.frezering_port_action)
 
         drilling_SBT_action = QAction("бурение на СБТ", self)
         drilling_menu.addAction(drilling_SBT_action)
@@ -699,13 +699,17 @@ class MyWindow(QMainWindow):
         from open_pz import CreatePZ
         self.ins_ind = r + 1
         CreatePZ.ins_ind = r + 1
-        print(f' выбранная строка {self.ins_ind}')
+        # print(f' выбранная строка {self.ins_ind}')
 
     def drilling_SBT_action(self):
         from work_py.drilling import drilling_sbt
         drilling_work_list = drilling_sbt(self)
         self.populate_row(self.ins_ind, drilling_work_list)
 
+    def frezering_port_action(self):
+        from work_py.drilling import frezer_ports
+        drilling_work_list = frezer_ports(self)
+        self.populate_row(self.ins_ind, drilling_work_list)
     def drilling_action_nkt(self):
         from work_py.drilling import drilling_nkt
         drilling_work_list = drilling_nkt(self)
@@ -873,7 +877,7 @@ class MyWindow(QMainWindow):
 
         # Удаление выбранных строк в обратном порядке
         selected_rows.sort(reverse=True)
-        print(selected_rows)
+        # print(selected_rows)
         for row in selected_rows:
             self.table_widget.removeRow(row)
 
@@ -985,9 +989,9 @@ class MyWindow(QMainWindow):
     def pressureTest(self):
         from work_py.opressovka import paker_list
 
-        print('Вставился опрессовка пакером')
+        # print('Вставился опрессовка пакером')
         pressure_work1 = paker_list(self)
-        print(f'индекс {self.ins_ind, len(pressure_work1)}')
+        # print(f'индекс {self.ins_ind, len(pressure_work1)}')
         self.populate_row(self.ins_ind, pressure_work1)
 
     def template_pero(self):
@@ -1011,8 +1015,8 @@ class MyWindow(QMainWindow):
         from open_pz import CreatePZ
 
         template_ek_list = template_ek_without_skm(self)
-        print()
-        print(f'индекс {self.ins_ind, len(template_ek_list)}')
+        # print()
+        # print(f'индекс {self.ins_ind, len(template_ek_list)}')
         self.populate_row(self.ins_ind, template_ek_list)
         CreatePZ.ins_ind += len(template_ek_list) + 1
 
@@ -1269,7 +1273,7 @@ class MyWindow(QMainWindow):
                             self.table_widget.setSpan(row - 1, col - 1,
                                                       merged_cell.max_row - merged_cell.min_row + 1,
                                                       merged_cell.max_col - merged_cell.min_col + 1)
-        print(f' njj {self.work_plan}')
+
         if self.work_plan != 'gnkt_opz':
             self.populate_row(self.table_widget.rowCount(), work_krs(self, self.work_plan))
 
@@ -1294,27 +1298,27 @@ class MyWindow(QMainWindow):
         ws4.cell(row=2, column=1).value = CreatePZ.well_area
 
         if CreatePZ.dict_pump_SHGN["do"] != "0" and  CreatePZ.dict_pump_ECN["do"] == "0" and\
-                CreatePZ.paker_do["do"] == '0':
+                CreatePZ.paker_do["do"] == 0:
             ws4.cell(row=3, column=1).value = f'{CreatePZ.dict_pump_SHGN["do"]} -на гл. {CreatePZ.dict_pump_SHGN_h["do"]}м'
         elif CreatePZ.dict_pump_SHGN["do"] == "0" and CreatePZ.dict_pump_ECN["do"] != "0" and\
-                CreatePZ.paker_do["do"] == '0':
+                CreatePZ.paker_do["do"] == 0:
             ws4.cell(row=3, column=1).value = f'{CreatePZ.dict_pump_ECN["do"]} -на гл. {CreatePZ.dict_pump_ECN_h["do"]}м'
         elif CreatePZ.dict_pump_SHGN["do"] == "0" and CreatePZ.dict_pump_ECN["do"] != "0" and\
-                CreatePZ.paker_do["do"] != '0':
+                CreatePZ.paker_do["do"] != 0:
             ws4.cell(row=3, column=1).value = f'{CreatePZ.dict_pump_ECN["do"]} -на гл. {CreatePZ.dict_pump_ECN_h["do"]}м \n' \
                                               f'{CreatePZ.paker_do["do"]} на {CreatePZ.H_F_paker_do["do"]}м'
         elif CreatePZ.dict_pump_SHGN["do"] != "0" and  CreatePZ.dict_pump_ECN["do"] == "0" and\
-                CreatePZ.paker_do["do"] != '0':
+                CreatePZ.paker_do["do"] != 0:
             ws4.cell(row=3, column=1).value = f'{CreatePZ.dict_pump_SHGN["do"]} -на гл. {CreatePZ.dict_pump_SHGN_h["do"]}м \n' \
                                               f'{CreatePZ.paker_do["do"]} на {CreatePZ.H_F_paker_do["do"]}м'
-        elif CreatePZ.dict_pump_SHGN["do"] == "0" and  CreatePZ.dict_pump_ECN["do"] == "0" and\
-                CreatePZ.paker_do["do"] != '0':
+        elif CreatePZ.dict_pump_SHGN["do"] == "0" and CreatePZ.dict_pump_ECN["do"] == "0" and\
+                CreatePZ.paker_do["do"] != 0:
             ws4.cell(row=3, column=1).value = f'{CreatePZ.paker_do["do"]} на {CreatePZ.H_F_paker_do["do"]}м'
         elif CreatePZ.dict_pump_SHGN["do"] == "0" and CreatePZ.dict_pump_ECN["do"] == "0" and\
-                CreatePZ.paker_do["do"] == '0':
+                CreatePZ.paker_do["do"] == 0:
             ws4.cell(row=3, column=1).value = " "
-        elif CreatePZ.dict_pump_SHGN["do"] != "0" and  CreatePZ.dict_pump_ECN["do"] != "0" and\
-                CreatePZ.paker_do["do"] != '0':
+        elif CreatePZ.dict_pump_SHGN["do"] != "0" and CreatePZ.dict_pump_ECN["do"] != "0" and\
+                CreatePZ.paker_do["do"] != 0:
             ws4.cell(row=3, column=1).value = f'{CreatePZ.dict_pump_SHGN["do"]} -на гл. {CreatePZ.dict_pump_SHGN_h["do"]}м \n' \
                                               f'{CreatePZ.dict_pump_ECN["do"]} -на гл. {CreatePZ.dict_pump_ECN_h["do"]}м \n' \
                                               f'{CreatePZ.paker_do["do"]} на {CreatePZ.H_F_paker_do["do"]}м ' \
@@ -1322,16 +1326,16 @@ class MyWindow(QMainWindow):
 
         plast_str = ''
         pressur_set = set()
-
-        for plast in CreatePZ.plast_all:
-            if CreatePZ.dict_perforation_short[plast]['отключение'] == False:
-                for interval in CreatePZ.dict_perforation[plast]["интервал"]:
+        # print(f'После {CreatePZ.dict_perforation_short}')
+        for plast in list(CreatePZ.dict_perforation_short.keys()):
+            if CreatePZ.dict_perforation_short[plast]['отключение'] is False and plast in CreatePZ.dict_perforation_short:
+                for interval in CreatePZ.dict_perforation_short[plast]["интервал"]:
                     plast_str += f'{plast[:4]}: {interval[0]}- {interval[1]} \n'
-            else:
-                for interval in CreatePZ.dict_perforation[plast]["интервал"]:
+            elif CreatePZ.dict_perforation_short[plast]['отключение'] and plast in CreatePZ.dict_perforation_short:
+                for interval in CreatePZ.dict_perforation_short[plast]["интервал"]:
                     plast_str += f'{plast[:4]} :{interval[0]}- {interval[1]} (изол)\n'
             filter_list_pressuar = list(filter(lambda x: type(x) in [int, float], list(CreatePZ.dict_perforation_short[plast]["давление"])))
-            print(f'фильтр -{filter_list_pressuar}')
+            # print(f'фильтр -{filter_list_pressuar}')
             if filter_list_pressuar:
                 pressur_set.add(f'{plast[:4]} - {filter_list_pressuar[0]}')
 
@@ -1351,16 +1355,17 @@ class MyWindow(QMainWindow):
                                                 f'{CreatePZ.head_column_additional}-{CreatePZ.shoe_column_additional}м'
         ws4.cell(row=1, column=7).value = column_well
         ws4.cell(row=4, column=7).value = f'Пробур забой {CreatePZ.bottomhole_drill}м'
-        ws4.cell(row=5, column=7).value = f'Исск забой {CreatePZ.bottomhole_artificial}м'
+        ws4.cell(row=5, column=7).value = f'Исскус забой {CreatePZ.bottomhole_artificial}м'
         ws4.cell(row=6, column=7).value = f'Тек забой {CreatePZ.bottom}м'
 
 
         ws4.cell(row=7, column=7).value = plast_str
         ws4.cell(row=11, column=7).value = f'Рмакс {CreatePZ.max_admissible_pressure}атм'
         ws4.cell(row=3, column=2).value = plan_short
-        nek_str = ''
+        nek_str = 'НЭК '
         if len(CreatePZ.leakiness_interval) != 0:
-            for nek in CreatePZ.leakiness_interval["НЭК"]:
+
+            for nek in CreatePZ.leakiness_interval:
                 nek_str += f'{nek[0]}-{nek[1]} \n'
 
         ws4.cell(row=3, column=7).value = nek_str

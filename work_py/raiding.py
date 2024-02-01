@@ -9,13 +9,11 @@ class Raid(CreatePZ):
 
         CreatePZ.raidingColumn()
     def raidingColumn(self):
-
-        from work_py.opressovka import paker_diametr_select
         from work_py.template_work import well_volume
-        from work_py.advanted_file import raiding_interval,raid
+        from work_py.advanted_file import raiding_interval, raid
         # print(f'До отрайбирования {[CreatePZ.dict_perforation[plast]["отрайбировано"] for plast in CreatePZ.plast_work]}')
 
-        ryber_diam = paker_diametr_select(CreatePZ.current_bottom) + 3
+        ryber_diam = raiding_Bit_diam_select(CreatePZ.current_bottom)
         if 'ПОМ' in str(CreatePZ.paker_do["posle"]).upper() and '122' in str(CreatePZ.paker_do["posle"]):
             ryber_diam = 126
         ryber_diam, ok = QInputDialog.getInt(None, 'Диаметр райбера',
@@ -71,7 +69,7 @@ class Raid(CreatePZ):
 
         raiding_interval = raid(raiding_interval_tuple)
         ryber_list = [
-            [f'СПО{ryber_str}  на НКТ{nkt_diam} до Н={krovly_raiding}м', None,
+            [f'СПО {ryber_str}  на НКТ{nkt_diam} до Н={krovly_raiding}м', None,
              f'Спустить {ryber_str}  на НКТ{nkt_diam} до Н={krovly_raiding}м с замером, '
              f'шаблонированием шаблоном 59,6мм (При СПО первых десяти НКТ на спайдере дополнительно '
              f'устанавливать элеватор ЭХЛ). '
@@ -120,5 +118,44 @@ class Raid(CreatePZ):
                     ryber_list.insert(-2, row)
         return ryber_list
 
+
+def raiding_Bit_diam_select(depth_landing):
+    from open_pz import CreatePZ
+
+    raiding_Bit_dict = {
+        85: (88, 92),
+        91: (92.1, 97),
+        95: (97.1, 102),
+        103: (102.1, 109),
+        106: (109, 115),
+        115: (118, 120),
+        117: (120.1, 121.9),
+        120: (122, 123.9),
+        121: (124, 127.9),
+        125: (128, 133),
+        140: (144, 148),
+        144: (148.1, 154),
+        146: (154.1, 164),
+        160: (166, 176),
+        190: (190.6, 203.6),
+        204: (215, 221)
+    }
+
+    if CreatePZ.column_additional is False or (
+            CreatePZ.column_additional is True and depth_landing <= CreatePZ.head_column_additional):
+        diam_internal_ek = CreatePZ.column_diametr - 2 * CreatePZ.column_wall_thickness
+    else:
+        diam_internal_ek = CreatePZ.column_additional_diametr - 2 * CreatePZ.column_additional_wall_thickness
+
+    for diam, diam_internal_bit in raiding_Bit_dict.items():
+        if diam_internal_bit[0] <= diam_internal_ek <= diam_internal_bit[1]:
+            bit_diametr = diam
+
+    bit_diametr, ok = QInputDialog.getInt(None, 'Диаметр пакера ',
+                                          f'Диаметр пакера ',
+                                          int(bit_diametr), 70,
+                                          200)
+
+    return bit_diametr
 
 

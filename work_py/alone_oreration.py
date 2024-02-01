@@ -66,19 +66,14 @@ def fluid_change(self):
     fluid_new, ok = QInputDialog.getDouble(self, 'Новое значение удельного веса жидкости',
                                            'Введите значение удельного веса жидкости', 1.02, 1, 1.72, 2)
     CreatePZ.fluid = fluid_new
-    try:
-        CreatePZ.fluid_work = check_h2s(self, fluid_new)[0]
 
-        CreatePZ.fluid_work_short = CreatePZ.fluid_work[1]
-        CreatePZ.fluid_work = CreatePZ.fluid_work[0]
-
-    except:
-        print(CreatePZ.cat_H2S_list, CreatePZ.H2S_mg, CreatePZ.H2S_pr)
+    if all([2 == len(cat) for cat in [CreatePZ.cat_H2S_list, CreatePZ.H2S_mg, CreatePZ.H2S_pr]]) is False:
+        # print(CreatePZ.cat_H2S_list, CreatePZ.H2S_mg, CreatePZ.H2S_pr)
         CreatePZ.H2S_mg = CreatePZ.H2S_mg[:1]
-        print()
+        # print()
         CreatePZ.H2S_pr = CreatePZ.H2S_pr[:1]
         CreatePZ.cat_H2S_list = CreatePZ.cat_H2S_list[:1]
-        print(CreatePZ.cat_H2S_list, CreatePZ.H2S_mg, CreatePZ.H2S_pr)
+        # print(CreatePZ.cat_H2S_list, CreatePZ.H2S_mg, CreatePZ.H2S_pr)
         cat_H2S = QInputDialog.getInt(self, 'Сероводород',
                                         'Введите Категорию скважины по сероводороду по вскрываемому пласту', 2, 1, 3)
         while cat_H2S in [1, 2, 3]:
@@ -105,14 +100,9 @@ def fluid_change(self):
 
             CreatePZ.H2S_pr.append(H2S_pr[0])
         print(f' после добавления {CreatePZ.cat_H2S_list, CreatePZ.H2S_mg, CreatePZ.H2S_pr}')
-        CreatePZ.fluid_work = check_h2s(self, fluid_new)[0]
+    CreatePZ.fluid_work = check_h2s(self, fluid_new)[0]
 
-        CreatePZ.fluid_work_short = CreatePZ.fluid_work[1]
-        CreatePZ.fluid_work = CreatePZ.fluid_work[0]
-
-
-
-
+    CreatePZ.fluid_work_short = check_h2s(self, fluid_new)[1]
 
     fluid_change_list = [[f'Cмена объема {CreatePZ.fluid}г/см3- {round(well_volume(self, CreatePZ.current_bottom), 1)}м3' ,
                           None,
@@ -164,7 +154,7 @@ def check_h2s(self, fluid_new):
             else:
                 fluid_work = f'{fluid_new}г/см3 '
                 fluid_work_short = f'{fluid_new}г/см3 '
-    return fluid_work,fluid_work_short
+    return (fluid_work, fluid_work_short)
 
 def konte(self):
 

@@ -11,7 +11,7 @@ def calculationFluidWork(vertical, pressure):
     if (isinstance(vertical, float) or isinstance(vertical, int)) and (
             isinstance(pressure, float) or isinstance(pressure, int)):
 
-        print(vertical, pressure)
+        # print(vertical, pressure)
         stockRatio = 0.1 if float(vertical) <= 1200 else 0.05
 
         fluidWork = round(float(str(pressure)) * (1 + stockRatio) / float(vertical) / 0.0981, 2)
@@ -19,7 +19,7 @@ def calculationFluidWork(vertical, pressure):
             fluidWork = 1.02
         elif fluidWork < 1.02 and (CreatePZ.region == 'ИГМ' or CreatePZ.region == 'ТГМ' or CreatePZ.region == 'ЧГМ'):
             fluidWork = 1.01
-        print(f' ЖГС {fluidWork}')
+        # print(f' ЖГС {fluidWork}')
         return fluidWork
     else:
         return 1.01
@@ -39,12 +39,11 @@ def work_krs(self, work_plan):
                                                          float(CreatePZ.current_bottom))
 
     try:
+
+        fluid_p = 0.83
         for plast in CreatePZ.plast_work:
-            print(f' жидкость глушения {plast, fluid_list}')
-            fluid_p = 0.83
-            for plast in CreatePZ.plast_work:
-                if float(list(CreatePZ.dict_perforation[plast]['рабочая жидкость'])[0]) > fluid_p:
-                    fluid_p = list(CreatePZ.dict_perforation[plast]['рабочая жидкость'])[0]
+            if float(list(CreatePZ.dict_perforation[plast]['рабочая жидкость'])[0]) > fluid_p:
+                fluid_p = list(CreatePZ.dict_perforation[plast]['рабочая жидкость'])[0]
         fluid_list.append(fluid_p)
 
 
@@ -71,7 +70,7 @@ def work_krs(self, work_plan):
         fluid_work_short = f'{fluid_work_insert}г/см3'
 
     if len(CreatePZ.cat_H2S_list) > 1:
-        print(CreatePZ.cat_H2S_list, CreatePZ.H2S_mg, CreatePZ.H2S_pr)
+        # print(CreatePZ.cat_H2S_list, CreatePZ.H2S_mg, CreatePZ.H2S_pr)
         if CreatePZ.cat_H2S_list[0] == 3 and CreatePZ.cat_H2S_list[1] == 2:
             data_h2s_Question = QMessageBox.question(None, "Данные по классификатору", "Является ли данные по H2S "
                                                                                        "по второму блоку для работающего пласта")
@@ -85,61 +84,60 @@ def work_krs(self, work_plan):
     CreatePZ.fluid_work = fluid_work
     CreatePZ.fluid_work_short = fluid_work_short
 
-
-
-    print(f'выбранная категория ПВО {CreatePZ.kat_pvo}')
     if work_plan != 'dop_plan':
-        if CreatePZ.dict_pump_ECN["do"] != '0' and CreatePZ.dict_pump_SHGN["do"] != '0':
-            print(CreatePZ.dict_pump_ECN["do"], )
+        if CreatePZ.dict_pump_ECN["do"] != 0 and CreatePZ.dict_pump_SHGN["do"] != 0:
+            # print(CreatePZ.dict_pump_ECN["do"], )
             lift_key = 'ОРД'
             print(f'Подьем орд')
 
-        elif CreatePZ.dict_pump_ECN["do"] != '0' and str(CreatePZ.paker_do["do"]) == '0':
+        elif CreatePZ.dict_pump_ECN["do"] != 0 and str(CreatePZ.paker_do["do"]) == 0:
             lift_key = 'ЭЦН'
             print('Подьем ЭЦН')
-        elif CreatePZ.dict_pump_ECN["do"] != '0' and CreatePZ.if_None(CreatePZ.paker_do['do']) != '0':
+        elif CreatePZ.dict_pump_ECN["do"] != 0 and CreatePZ.if_None(CreatePZ.paker_do['do']) != 0:
             lift_key = 'ЭЦН с пакером'
             print('Подьем ЭЦН с пакером ')
-        elif ('НВ' in str(CreatePZ.dict_pump_SHGN["do"]).upper() or 'ШГН' in CreatePZ.dict_pump_SHGN["do"].upper()) \
-                and CreatePZ.if_None(CreatePZ.paker_do["do"]) == '0':
+        elif CreatePZ.dict_pump_SHGN["do"] != 0 and CreatePZ.dict_pump_SHGN["do"].upper() != 'НН' \
+                and CreatePZ.if_None(CreatePZ.paker_do['do']) == 0:
             lift_key = 'НВ'
             print('Подьем НВ')
-        elif ('НВ' in CreatePZ.dict_pump_SHGN["do"].upper() or 'ШГН' in CreatePZ.dict_pump_SHGN[
-            "do"].upper()) and CreatePZ.if_None(CreatePZ.paker_do['do']) != '0':
+        elif CreatePZ.dict_pump_SHGN["do"] != 0 and CreatePZ.dict_pump_SHGN["do"].upper() != 'НН' \
+                and CreatePZ.if_None(CreatePZ.paker_do['do']) != 0:
             lift_key = 'НВ с пакером'
             print('Подьем НВ с пакером ')
-        elif 'НН' in CreatePZ.dict_pump_SHGN["do"].upper() and CreatePZ.if_None(CreatePZ.paker_do['do']) == '0':
+        elif 'НН' in CreatePZ.dict_pump_SHGN["do"].upper() and CreatePZ.if_None(CreatePZ.paker_do['do']) == 0:
             lift_key = 'НН'
             print('Подьем НН')
-        elif 'НН' in CreatePZ.dict_pump_SHGN["do"].upper() and CreatePZ.if_None(CreatePZ.paker_do['do']) != '0':
+        elif 'НН' in CreatePZ.dict_pump_SHGN["do"].upper() and CreatePZ.if_None(CreatePZ.paker_do['do']) != 0:
             lift_key = 'НН с пакером'
             print('Подьем НН с пакером ')
-        elif CreatePZ.dict_pump_SHGN["do"] == '0' and CreatePZ.if_None(CreatePZ.paker_do['do']) == '0' \
+        elif CreatePZ.dict_pump_SHGN["do"] == 0 and CreatePZ.if_None(CreatePZ.paker_do['do']) == 0 \
                 and CreatePZ.dict_pump_ECN["do"] == "0":
             lift_key = 'воронка'
             print('Подьем  воронки')
-        elif CreatePZ.dict_pump_SHGN["do"] == '0' and CreatePZ.if_None(CreatePZ.paker_do['do']) != '0' \
+        elif CreatePZ.dict_pump_SHGN["do"] == 0 and CreatePZ.if_None(CreatePZ.paker_do['do']) != 0 \
                 and CreatePZ.dict_pump_ECN["do"] == "0":
             lift_key = 'пакер'
             print('Подьем пакера')
         elif '89' in CreatePZ.dict_nkt.keys() and '48' in CreatePZ.dict_nkt.keys() and CreatePZ.if_None(
-                CreatePZ.paker_do['do']) != '0':
+                CreatePZ.paker_do['do']) != 0:
             lift_key = 'ОРЗ'
 
-        print(f'Лифт ключ {lift_key}')
+        # print(f'Лифт ключ {lift_key}')
 
         without_damping_True = CreatePZ.without_damping
         print(f'Состоит в вписке без глушения {without_damping_True}')
+
+        if any([cater == 1 for cater in CreatePZ.cat_P_1]):
+            CreatePZ.kat_pvo, _ = QInputDialog.getInt(None, 'Категория скважины',
+                                                   f'Монтаж схемы № {CreatePZ.kat_pvo}, корректно?',
+                                                   CreatePZ.kat_pvo, 1, 2)
+
 
         well_jamming_str_in_nkt = " " if without_damping_True is True\
             else f"По результату приемистости произвести глушение скважины в НКТ тех.жидкостью в объеме обеспечивающим " \
                  f"заполнение трубного пространства и скважины в подпакерной зоне в объеме {volume_pod_NKT()} м3 " \
                  f"жидкостью уд.веса {fluid_work} при давлении не более {CreatePZ.max_admissible_pressure}атм. " \
                  f"Тех отстой 1-2 часа. Произвести замер избыточного давления в скважине."
-
-
-        print(f'Скважина в неглушении {without_damping_True}')
-        # print(f' {CreatePZ.dict_perforation}')
 
         krs_begin = [
             [None, None, 'Порядок работы', None, None, None, None, None, None, None, None, None],
@@ -260,7 +258,7 @@ def work_krs(self, work_plan):
              None, None, None, None, None, None, None,
              ' Мастер КРС', None],
             [None, None,
-             ''.join(["За 24 часа до готовности вызвать пусковую комиссию" if CreatePZ.bvo == False
+             ''.join(["За 24 часа до готовности вызвать пусковую комиссию" if CreatePZ.kat_pvo == 2
                       else "На скважинах первой категории Подрядчик обязан пригласить представителя ПАСФ " \
                            "для проверки качества м/ж и опрессовки ПВО, документации и выдачи разрешения на производство " \
                            "работ по ремонту скважин. При обнаружении нарушений, которые могут повлечь за собой опасность для жизни людей"
@@ -328,7 +326,7 @@ def work_krs(self, work_plan):
              None, None, None, None, None,
              'Мастер КРС представитель Заказчика', 1.5],
             [None, None,
-             ''.join(["За 24 часа до готовности вызвать пусковую комиссию" if CreatePZ.bvo == False
+             ''.join(["За 24 часа до готовности вызвать пусковую комиссию" if CreatePZ.kat_pvo == 2
                       else "На скважинах первой категории Подрядчик обязан пригласить представителя ПАСФ " \
                            "для проверки качества м/ж и опрессовки ПВО, документации и выдачи разрешения на производство " \
                            "работ по ремонту скважин. При обнаружении нарушений, которые могут повлечь за собой опасность для жизни людей"
@@ -412,7 +410,7 @@ def work_krs(self, work_plan):
              None, None, None, None, None, None, None,
              ' Мастер КРС',None],
             [None, None,
-             ''.join(["За 24 часа до готовности вызвать пусковую комиссию" if CreatePZ.bvo == False
+             ''.join(["За 24 часа до готовности вызвать пусковую комиссию" if CreatePZ.kat_pvo == 2
                       else "На скважинах первой категории Подрядчик обязан пригласить представителя ПАСФ " \
                            "для проверки качества м/ж и опрессовки ПВО, документации и выдачи разрешения на "
                            "производство " \
@@ -507,7 +505,7 @@ def work_krs(self, work_plan):
              None, None, None, None, None,
              'Мастер КРС представитель Заказчика', 1.5],
             [None, None,
-             ''.join(["За 24 часа до готовности вызвать пусковую комиссию" if CreatePZ.bvo == False
+             ''.join(["За 24 часа до готовности вызвать пусковую комиссию" if CreatePZ.kat_pvo == 2
                       else "На скважинах первой категории Подрядчик обязан пригласить представителя ПАСФ " \
                            "для проверки качества м/ж и опрессовки ПВО, документации и выдачи разрешения на производство " \
                            "работ по ремонту скважин. При обнаружении нарушений, которые могут повлечь за собой "
@@ -603,7 +601,7 @@ def work_krs(self, work_plan):
              None, None, None, None, None, None, None,
              ' Мастер КРС', None],
             [None, None,
-             ''.join(["За 24 часа до готовности вызвать пусковую комиссию" if CreatePZ.bvo == False
+             ''.join(["За 24 часа до готовности вызвать пусковую комиссию" if CreatePZ.kat_pvo == 2
                       else "На скважинах первой категории Подрядчик обязан пригласить представителя ПАСФ " \
                            "для проверки качества м/ж и опрессовки ПВО, документации и выдачи разрешения на производство " \
                            "работ по ремонту скважин. При обнаружении нарушений, которые могут повлечь за собой опасность для жизни людей"
@@ -691,7 +689,7 @@ def work_krs(self, work_plan):
              None, None, None, None, None,
              'Мастер КРС представитель Заказчика', 1.5],
             [None, None,
-             ''.join(["За 24 часа до готовности вызвать пусковую комиссию" if CreatePZ.bvo == False
+             ''.join(["За 24 часа до готовности вызвать пусковую комиссию" if CreatePZ.kat_pvo == 2
                       else "На скважинах первой категории Подрядчик обязан пригласить представителя ПАСФ " \
                            "для проверки качества м/ж и опрессовки ПВО, документации и выдачи разрешения на производство " \
                            "работ по ремонту скважин. При обнаружении нарушений, которые могут повлечь за "
@@ -782,7 +780,7 @@ def work_krs(self, work_plan):
              None, None, None, None, None, None, None,
              ' Мастер КРС', None],
             [None, None,
-             ''.join(["За 24 часа до готовности вызвать пусковую комиссию" if CreatePZ.bvo == False
+             ''.join(["За 24 часа до готовности вызвать пусковую комиссию" if CreatePZ.kat_pvo == 2
                       else "На скважинах первой категории Подрядчик обязан пригласить представителя ПАСФ " \
                            "для проверки качества м/ж и опрессовки ПВО, документации и выдачи разрешения на производство " \
                            "работ по ремонту скважин. При обнаружении нарушений, которые могут повлечь за собой опасность для жизни людей"
@@ -846,7 +844,7 @@ def work_krs(self, work_plan):
                          None, None, None, None, None,
                          'Мастер КРС представитель Заказчика', 1.5],
                         [None, None,
-                         ''.join(["За 24 часа до готовности вызвать пусковую комиссию" if CreatePZ.bvo == False
+                         ''.join(["За 24 часа до готовности вызвать пусковую комиссию" if CreatePZ.kat_pvo == 2
                                   else "На скважинах первой категории Подрядчик обязан пригласить представителя ПАСФ " \
                                        "для проверки качества м/ж и опрессовки ПВО, документации и выдачи разрешения на производство " \
                                        "работ по ремонту скважин. При обнаружении нарушений, которые могут повлечь за собой опасность для жизни людей"
@@ -934,7 +932,7 @@ def work_krs(self, work_plan):
                        None, None, None, None, None, None, None,
                        'Мастер КРС', None],
                       [None, None,
-                       ''.join(["За 24 часа до готовности вызвать пусковую комиссию" if CreatePZ.bvo == False
+                       ''.join(["За 24 часа до готовности вызвать пусковую комиссию" if CreatePZ.kat_pvo == 2
                                 else "На скважинах первой категории Подрядчик обязан пригласить представителя ПАСФ " \
                                      "для проверки качества м/ж и опрессовки ПВО, документации и выдачи разрешения на производство " \
                                      "работ по ремонту скважин. При обнаружении нарушений, которые могут повлечь за собой опасность для жизни людей"
@@ -1018,7 +1016,7 @@ def work_krs(self, work_plan):
                  ' Мастер КРС',
                  None],
                 [None, None,
-                 ''.join(["За 24 часа до готовности вызвать пусковую комиссию" if CreatePZ.bvo == False
+                 ''.join(["За 24 часа до готовности вызвать пусковую комиссию" if CreatePZ.kat_pvo == 2
                           else "На скважинах первой категории Подрядчик обязан пригласить представителя ПАСФ " \
                                "для проверки качества м/ж и опрессовки ПВО, документации и выдачи разрешения на производство " \
                                "работ по ремонту скважин. При обнаружении нарушений, которые могут повлечь за собой опасность для жизни людей"
@@ -1213,7 +1211,6 @@ def volume_nkt_metal(dict_nkt):  # Внутренний объем НКТ жел
             volume_nkt_metal += 0.55 * length_nkt / 1000
     return round(volume_nkt_metal, 1)
 
-
 def well_volume(self, current_bottom):
     from open_pz import CreatePZ
 
@@ -1279,7 +1276,7 @@ def get_leakiness(self):
 
     except:
         leakiness_column_len = 0
-    print(leakiness_column_len)
+    # print(leakiness_column_len)
     while leakiness_column_len != 2:
         mes = QMessageBox.warning(None, 'Некорректные данные', "Введены не корректные данные")
         leakiness_column, ok = QInputDialog.getText(self, 'Нарушение колонны',
@@ -1287,14 +1284,14 @@ def get_leakiness(self):
         try:
             leakiness_column_min = min(map(float, leakiness_column.split('-')))
             leakiness_column_max = max(map(float, leakiness_column.split('-')))
-            print(leakiness_column_min, leakiness_column_max)
+            # print(leakiness_column_min, leakiness_column_max)
             leakiness_column_len = len(leakiness_column.split('-'))
             leakiness_column = leakiness_column_min, leakiness_column_max
         except:
             leakiness_column_len = 0
 
     CreatePZ.leakiness_interval.append(leakiness_column)
-    print(f'Наруше {CreatePZ.leakiness_interval}')
+    # print(f'Наруше {CreatePZ.leakiness_interval}')
 
     leakiness_rir = QMessageBox.question(self, 'изолированы ли',
                                          'изолировано ли нарушение')
@@ -1336,8 +1333,8 @@ def well_jamming(self, without_damping, lift_key):
                          f'ПО РЕЗУЛЬТАТАМ ЗАМЕРОВ ПРИНИМАЕТСЯ РЕШЕНИЕ ОБ ПРОДОЛЖЕНИИ ОТБИВКИ УРОВНЯ В СКВАЖИНЕ ДО КРИТИЧЕСКОЙ ГЛУБИНЫ ЗА ' \
                          f'ПРОМЕЖУТОК ВРЕМЕНИ.'
     volume_well_jaming = round((volume_jamming_well(self, CreatePZ.current_bottom) - volume_nkt_metal(CreatePZ.dict_nkt) - volume_rod(CreatePZ.dict_sucker_rod)-0.2) * 1.1, 1)
-    print(f' Глушение {volume_jamming_well(self, CreatePZ.current_bottom), volume_nkt_metal(CreatePZ.dict_nkt), volume_rod(CreatePZ.dict_sucker_rod)}')
-    print(CreatePZ.well_volume_in_PZ)
+    # print(f' Глушение {volume_jamming_well(self, CreatePZ.current_bottom), volume_nkt_metal(CreatePZ.dict_nkt), volume_rod(CreatePZ.dict_sucker_rod)}')
+    # print(CreatePZ.well_volume_in_PZ)
     if abs(float(CreatePZ.well_volume_in_PZ[0]) - volume_well_jaming) > 0.5:
         mes = QMessageBox.warning(None, 'Некорректный объем скважины',
                                      f'Объем скважины указанный в ПЗ -{CreatePZ.well_volume_in_PZ}м3 не совпадает '
@@ -1398,8 +1395,6 @@ def is_number(num):
         return True
     except ValueError or TypeError:
         return False
-
-
 def without_damping(self):
     print('начался второй поток')
     self.worker_thread = ExcelWorker()

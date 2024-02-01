@@ -7,13 +7,32 @@ from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm
 def paker_diametr_select(depth_landing):
     from open_pz import CreatePZ
 
-    if CreatePZ.column_additional == False or (
-            CreatePZ.column_additional == True and depth_landing <= CreatePZ.head_column_additional):
+    paker_diam_dict = {
+        82: (88, 92),
+        88: (92.1, 97),
+        92: (97.1, 102),
+        100: (102.1, 109),
+        104: (109, 115),
+        112: (118, 120),
+        114: (120.1, 121.9),
+        116: (122, 123.9),
+        118: (124, 127.9),
+        122: (128, 133),
+        136: (144, 148),
+        142: (148.1, 154),
+        145: (154.1, 164),
+        158: (166, 176),
+        182: (190.6, 203.6),
+        204: (215, 221)
+    }
+
+    if CreatePZ.column_additional is False or (
+            CreatePZ.column_additional is True and depth_landing <= CreatePZ.head_column_additional):
         diam_internal_ek = CreatePZ.column_diametr - 2 * CreatePZ.column_wall_thickness
     else:
         diam_internal_ek = CreatePZ.column_additional_diametr - 2 * CreatePZ.column_additional_wall_thickness
 
-    for diam, diam_internal_paker in CreatePZ.paker_diam_dict.items():
+    for diam, diam_internal_paker in paker_diam_dict.items():
         if diam_internal_paker[0] <= diam_internal_ek <= diam_internal_paker[1]:
             paker_diametr = diam
 
@@ -21,6 +40,7 @@ def paker_diametr_select(depth_landing):
                                          f'Диаметр пакера ',
                                          int(paker_diametr), 70,
                                          200)
+
     return paker_diametr
 
 
@@ -207,8 +227,9 @@ def paker_list(self):
 
                 pakerNEK, ok = QInputDialog.getInt(None, 'опрессовка ЭК',
                                                    'Введите глубину посадки пакера для под НЭК',
-                                                   int(dict_leakinest_keys[0].split('-')[1]) + 10, 0,
+                                                   int(dict_leakinest_keys[0][1]) + 10, 0,
                                                    int(CreatePZ.perforation_sole))
+                nek1 = "-".join(map(str, list(dict_leakinest_keys[0])))
                 paker_list = [
                     [f'СПО {paker_short} до глубины {pakerNEK}', None,
                      f'Спустить {paker_select} на НКТ{CreatePZ.nkt_diam}мм до глубины {pakerNEK}м, воронкой '
@@ -224,8 +245,9 @@ def paker_list(self):
                      'мастер КРС', 0.4],
                     [None, None,
                      f'Опрессовать эксплуатационную колонну в интервале {pakerNEK}-0м на '
+                     f'Опрессовать эксплуатационную колонну в интервале {pakerNEK}-0м на '
                      f'Р={CreatePZ.max_admissible_pressure}атм'
-                     f' в течение 30 минуТ в присутствии представителя заказчика, составить акт. '
+                     f' в течение 30 минут в присутствии представителя заказчика, составить акт. '
                      f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 '
                      f'часа до начала работ)',
                      None, None, None, None, None, None, None,
@@ -235,7 +257,7 @@ def paker_list(self):
                      None,
                      f'ПРИ НЕГЕРМЕТИЧНОСТИ: \n Произвести насыщение скважины в объеме 5м3 по затрубному пространству. '
                      f'Определить приемистость '
-                     f'НЭК {dict_leakinest_keys[0]} при Р-{CreatePZ.max_admissible_pressure}атм по '
+                     f'НЭК {nek1}м при Р-{CreatePZ.max_admissible_pressure}атм по '
                      f'затрубному пространству'
                      f'в присутствии представителя УСРСиСТ или подрядчика по РИР. (Вести контроль за отдачей жидкости '
                      f'после закачки, объем согласовать с подрядчиком по РИР).',
@@ -272,7 +294,7 @@ def paker_list(self):
                                          None,
                                          f'{nktOpress_list[1]}. Посадить пакер. Опрессовать эксплуатационную колонну в '
                                          f'интервале 0-{pakerNEK1}м на Р={CreatePZ.max_admissible_pressure}атм'
-                                         f' в течение 30 минуТ в присутствии представителя заказчика, составить акт.',
+                                         f' в течение 30 минут в присутствии представителя заказчика, составить акт.',
                                          None, None, None, None, None, None, None,
                                          'мастер КРС', 0.77],
                                         [f'Насыщение 5м3. Определение Q при Р-{CreatePZ.max_admissible_pressure}', None,
@@ -308,7 +330,7 @@ def paker_list(self):
                                          f'в инт {paker_depth}-0м на Р={CreatePZ.max_admissible_pressure}атм', None,
                                          f'{nktOpress_list[1]}. Посадить пакер. Опрессовать эксплуатационную колонну '
                                          f'в интервале {paker_depth}-0м на Р={CreatePZ.max_admissible_pressure}атм'
-                                         f' в течение 30 минуТ в присутствии представителя заказчика, составить акт.',
+                                         f' в течение 30 минут в присутствии представителя заказчика, составить акт.',
                                          None, None, None, None, None, None, None,
                                          'мастер КРС', 0.77],
                                         [f'срыв пакера 30мин', None,
@@ -394,8 +416,9 @@ def testing_pressure(self, depth):
     if CreatePZ.leakiness == True:
 
         for nek in CreatePZ.dict_leakiness['НЭК']['интервал']:
-            if nek['отключение'] == False:
-                interval_list.append(nek.split('-'))
+            print(CreatePZ.dict_leakiness)
+            if CreatePZ.dict_leakiness['НЭК']['интервал'][nek]['отключение'] == False:
+                interval_list.append(nek)
 
 
     if any([float(interval[1]) < float(depth) for interval in interval_list]):
@@ -412,7 +435,7 @@ def testing_pressure(self, depth):
 
         testing_pressure_str = f'Опрессовать эксплуатационную колонну в интервале {depth}-0м на ' \
                                f'Р={CreatePZ.max_admissible_pressure}атм' \
-                               f' в течение 30 минуТ в присутствии представителя заказчика, составить акт. ' \
+                               f' в течение 30 минут в присутствии представителя заказчика, составить акт. ' \
                                f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа ' \
                                f'до начала работ)'
         testing_pressure_short = f'Опрессовать в {depth}-0м на Р={CreatePZ.max_admissible_pressure}атм'

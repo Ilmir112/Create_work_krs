@@ -1,57 +1,75 @@
-from PyQt5.QtWidgets import QApplication, QMainWindow, QTextEdit, QVBoxLayout, QPushButton, QWidget, QFileDialog
-import json
+import sys
+from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QPushButton, QVBoxLayout, QDialog, \
+    QHBoxLayout, QWidget
 
-class MainWindow(QMainWindow):
+
+class LoginWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+        self.setWindowTitle("Вход в приложение")
 
-        self.setWindowTitle("Example")
+        self.label_username = QLabel("Имя пользователя:")
+        self.edit_username = QLineEdit()
+        self.label_password = QLabel("Пароль:")
+        self.edit_password = QLineEdit()
+        self.edit_password.setEchoMode(QLineEdit.Password)
+        self.button_login = QPushButton("Вход")
+        self.button_login.clicked.connect(self.login)
+        self.edit_password.setEchoMode(QLineEdit.Password)
+
 
         layout = QVBoxLayout()
+        layout.addWidget(self.label_username)
+        layout.addWidget(self.edit_username)
+        layout.addWidget(self.label_password)
+        layout.addWidget(self.edit_password)
+        layout.addWidget(self.button_login)
 
-        self.text_edit = QTextEdit()
+        central_widget = QWidget()
+        central_widget.setLayout(layout)
+        self.setCentralWidget(central_widget)
 
-        self.button_load = QPushButton("Загрузить JSON")
-        self.button_load.clicked.connect(self.load_json)
+    def login(self):
+        username = self.edit_username.text()
+        password = self.edit_password.text()
+        print(username, password)
+        # Здесь можно добавить код для проверки имени пользователя и пароля в базе данных
 
-        self.button_save = QPushButton("Сохранить JSON")
-        self.button_save.clicked.connect(self.save_json)
 
-        layout.addWidget(self.text_edit)
-        layout.addWidget(self.button_load)
-        layout.addWidget(self.button_save)
+class RegisterWindow(QDialog):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Регистрация нового пользователя")
 
-        widget = QWidget()
-        widget.setLayout(layout)
-        self.setCentralWidget(widget)
+        self.label_username = QLabel("Имя пользователя:")
+        self.edit_username = QLineEdit()
+        self.label_password = QLabel("Пароль:")
+        self.edit_password = QLineEdit()
+        self.edit_password.setEchoMode(QLineEdit.Password)
+        self.button_register = QPushButton("Регистрация")
+        self.button_register.clicked.connect(self.register)
 
-    def load_json(self):
-        file_dialog = QFileDialog()
-        file_dialog.setNameFilter("JSON files (*.json)")
-        file_dialog.selectNameFilter("JSON files (*.json)")
+        layout = QVBoxLayout()
+        layout.addWidget(self.label_username)
+        layout.addWidget(self.edit_username)
+        layout.addWidget(self.label_password)
+        layout.addWidget(self.edit_password)
+        layout.addWidget(self.button_register)
 
-        if file_dialog.exec_():
-            file_path = file_dialog.selectedFiles()[0]
+        self.setLayout(layout)
 
-            with open(file_path, 'r',  encoding='utf-8') as json_file:
-                json_data = json.load(json_file)
+    def register(self):
+        username = self.edit_username.text()
+        password = self.edit_password.text()
+        # Здесь можно добавить код для регистрации нового пользователя в базе данных
 
-            self.text_edit.setPlainText(json.dumps(json_data, indent=4))
 
-    def save_json(self):
-        file_dialog = QFileDialog()
-        file_dialog.setNameFilter("JSON files (*.json)")
-        file_dialog.selectNameFilter("JSON files (*.json)")
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
 
-        if file_dialog.exec_():
-            file_path = file_dialog.selectedFiles()[0]
+    login_window = LoginWindow()
+    login_window.show()
 
-            json_data = json.loads(self.text_edit.toPlainText())
+    register_window = RegisterWindow()
 
-            with open(file_path, 'w',  encoding='utf-8') as json_file:
-                json.dump(json_data, json_file, indent=4)
-
-app = QApplication([])
-window = MainWindow()
-window.show()
-app.exec_()
+    sys.exit(app.exec_())

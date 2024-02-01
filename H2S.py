@@ -8,7 +8,7 @@ import H2S
 def calc_H2S(ws3, H2S_pr, H2S_mg):
     from open_pz import CreatePZ
 
-    print(CreatePZ.dict_nkt)
+    # print(CreatePZ.dict_nkt)
     nkt_1 = list(CreatePZ.dict_nkt.keys())[0]
     nkt_1_l = CreatePZ.dict_nkt[nkt_1]
 
@@ -23,7 +23,7 @@ def calc_H2S(ws3, H2S_pr, H2S_mg):
 
     def gno_volume():
         nkt_l = sum(list(CreatePZ.dict_nkt.values()))
-        print(nkt_l)
+        # print(nkt_l)
         if CreatePZ.column_additional == True:
 
             gno_well = 3.14*(CreatePZ.column_diametr-CreatePZ.column_wall_thickness*2)**2/4/1000*(CreatePZ.bottom-float(CreatePZ.head_column_additional))/1000/10
@@ -216,7 +216,7 @@ def calv_h2s(self, cat_H2S, H2S_mg, H2S_pr):
         volume_well =  H2S.well_volume(self)
         # print(volume_well)
         # print(f'{volume_well} объем скважины')
-        print(CreatePZ.dict_nkt)
+        # print(CreatePZ.dict_nkt)
         nkt_1 = int(list(CreatePZ.dict_nkt.keys())[0])
 
 
@@ -261,7 +261,7 @@ def calv_h2s(self, cat_H2S, H2S_mg, H2S_pr):
         vodoiz_sucker = (10 * 3.14 *((25*0.01)**2/4)*sucker_rod_l_25/1000) +(10 * 3.14 *((25*0.01)**2/4)*sucker_rod_l_22/1000) +(10 * 3.14 *((25*0.01)**2/4)*sucker_rod_l_19/1000)
 
         oil_mass = float(v_pod_gno*(100 - CreatePZ.water_cut) * 0.9/100)
-        print(f'oil {oil_mass}-{type(oil_mass)} , {CreatePZ.gaz_f_pr[0]}-{type(CreatePZ.gaz_f_pr[0])}')
+        # print(f'oil {oil_mass}-{type(oil_mass)} , {CreatePZ.gaz_f_pr[0]}-{type(CreatePZ.gaz_f_pr[0])}')
         volume_h2s = CreatePZ.gaz_f_pr[0] * oil_mass * (float(H2S_pr))/100
 
         h2s_mass_in_oil = (34*volume_h2s*1000/22.14)

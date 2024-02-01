@@ -79,7 +79,7 @@ class PerforationWindow(MyWindow):
         self.setCentralWidget(self.centralWidget)
         self.table_widget = table_widget
         self.ins_ind = ins_ind
-        self.dict_perforation = CreatePZ.dict_perforation
+        # self.dict_perforation = CreatePZ.dict_perforation
         self.dict_perforation_project = CreatePZ.dict_perforation_project
         self.tabWidget = TabWidget()
         self.tableWidget = QTableWidget(0, 7)
@@ -134,8 +134,10 @@ class PerforationWindow(MyWindow):
         # print(f' проект {self.dict_perforation_project}')
         # print(f' текущий ПВР {self.dict_perforation}')
         rows = self.tableWidget.rowCount()
-        if len(self.dict_perforation_project) != 0:
-            for plast, data in self.dict_perforation_project.items():
+
+        # print(f'проект {CreatePZ.dict_perforation_project}')
+        if len(CreatePZ.dict_perforation_project) != 0:
+            for plast, data in CreatePZ.dict_perforation_project.items():
                 for i in data['интервал']:
                     if CreatePZ.grpPlan:
                         count_charge = int((max(i) - min(i)) * chargePM_GP)
@@ -178,8 +180,8 @@ class PerforationWindow(MyWindow):
 
         else:
 
-            for plast, data in self.dict_perforation.items():
-                print(plast)
+            for plast, data in CreatePZ.dict_perforation.items():
+
                 if plast in CreatePZ.plast_work:
                     for i in data['интервал']:
                         if CreatePZ.grpPlan:
@@ -253,7 +255,7 @@ class PerforationWindow(MyWindow):
             msg = QMessageBox.information(self, 'Внимание', 'Подошва интервала перфорации ниже текущего забоя')
             return
 
-        chargesx = self.charge(int(editType2))[0][:-2] + chargesx
+        chargesx = self.charge(int(float(editType2)))[0][:-2] + chargesx
 
 
         self.tableWidget.setSortingEnabled(False)
@@ -309,7 +311,7 @@ class PerforationWindow(MyWindow):
             item = self.tableWidget.item(row, 1)
             if item:
                 value = item.text()
-                print(f'dff{value}')
+                # print(f'dff{value}')
                 if float(value) >= CreatePZ.current_bottom:
                     msg = QMessageBox.information(self, 'Внимание', 'Подошва интервала перфорации ниже текущего забоя')
                     return
@@ -404,7 +406,7 @@ class PerforationWindow(MyWindow):
                         for key, value in text_width_dict.items():
                             if value[0] <= len(str(text)) <= value[1]:
                                 text_width = key
-                                self.table_widget.setRowHeight(row, int(text_width))
+                                self.table_widget.setRowHeight(row, int(float(text_width)))
                     else:
                         self.table_widget.setItem(row, column, QtWidgets.QTableWidgetItem(str('')))
             # self.table_widget.setSpan(1 + self.ins_ind, 10, len(perforation) - 2, 1)

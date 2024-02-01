@@ -184,23 +184,24 @@ class CorrectSignaturesWindow(QMainWindow):
         selected_region = TabPage_SO.selected_region
         self.podpis_dict = TabPage_SO.podpis_dict
 
-        chiefEngineerEditType = self.tabWidget.currentWidget().chiefEngineerEditType.text().title()
+        chiefEngineerEditType = self.tabWidget.currentWidget().chiefEngineerEditType.text()
         chiefEngineer_nameEditType = self.tabWidget.currentWidget().chiefEngineer_nameEditType.text().title()
-        chiefGeologistEditType = self.tabWidget.currentWidget().chiefGeologistEditType.text().title()
+        chiefGeologistEditType = self.tabWidget.currentWidget().chiefGeologistEditType.text()
         chiefGeologist_nameEditType = self.tabWidget.currentWidget().chiefGeologist_nameEditType.text().title()
-        head_of_ORM_EditType = self.tabWidget.currentWidget().head_of_ORM_EditType.text().title()
+        head_of_ORM_EditType = self.tabWidget.currentWidget().head_of_ORM_EditType.text()
         head_of_ORM_name_EditType = self.tabWidget.currentWidget().head_of_ORM_name_EditType.text().title()
-        representative_of_ORM_EditType = self.tabWidget.currentWidget().representative_of_ORM_EditType.text().title()
+        representative_of_ORM_EditType = self.tabWidget.currentWidget().representative_of_ORM_EditType.text()
         representative_of_ORM_name_EditType = self.tabWidget.currentWidget().representative_of_ORM_name_EditType.text().title()
-        head_of_GTM_EditType = self.tabWidget.currentWidget().head_of_GTM_EditType.text().title()
+        head_of_GTM_EditType = self.tabWidget.currentWidget().head_of_GTM_EditType.text()
         head_of_GTM_name_EditType = self.tabWidget.currentWidget().head_of_GTM_name_EditType.text().title()
-        representative_of_GTM_EditType = self.tabWidget.currentWidget().representative_of_GTM_EditType.text().title()
+        representative_of_GTM_EditType = self.tabWidget.currentWidget().representative_of_GTM_EditType.text()
         representative_of_GTM_name_EditType = self.tabWidget.currentWidget().representative_of_GTM_name_EditType.text().title()
-        representative_of_GO_EditType = self.tabWidget.currentWidget().representative_of_GO_EditType.text().title()
+        representative_of_GO_EditType = self.tabWidget.currentWidget().representative_of_GO_EditType.text()
         representative_of_GO_name_EditType = self.tabWidget.currentWidget().representative_of_GO_name_EditType.text().title()
-        head_of_USRSIST_EditType = self.tabWidget.currentWidget().head_of_USRSIST_EditType.text().title()
+        head_of_USRSIST_EditType = self.tabWidget.currentWidget().head_of_USRSIST_EditType.text()
         head_of_USRSIST_name_EditType = self.tabWidget.currentWidget().head_of_USRSIST_name_EditType.text().title()
-        representative_of_GRR_EditType = self.tabWidget.currentWidget().representative_of_GRR_EditType.text().title()
+        representative_of_GRR_EditType = self.tabWidget.currentWidget().representative_of_GRR_EditType.text()
+
         representative_of_GRR_name_EditType = self.tabWidget.currentWidget().representative_of_GRR_name_EditType.text().title()
 
         name_list = [chiefEngineer_nameEditType, chiefGeologist_nameEditType,
@@ -257,5 +258,5 @@ if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     # app.setStyleSheet()
     window = CorrectSignaturesWindow()
-    window.show()
+    # window.show()
     app.exec_()

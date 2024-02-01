@@ -22,6 +22,8 @@ def curator_sel(self, curator, region):
         return (podpis_dict[region]['go']['post'], podpis_dict[region]["go"]['surname'])
     elif curator == 'ВНС':
         return (podpis_dict[region]['go']['post'], podpis_dict[region]["go"]['surname'])
+    elif curator == 'ГРР':
+        return (podpis_dict[region]['grr']['post'], podpis_dict[region]["grr"]['surname'])
 
 
 current_datetime = datetime.today()

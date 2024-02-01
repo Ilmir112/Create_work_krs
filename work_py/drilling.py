@@ -11,7 +11,10 @@ def drilling_nkt(self):
 
     currentBottom = CreatePZ.current_bottom
 
-    drillingBit_diam = paker_diametr_select(CreatePZ.current_bottom) + 2
+    current_depth, ok = QInputDialog.getInt(None, 'Нормализация забоя',
+                                            'Введите глубину необходимого забоя',
+                                            int(CreatePZ.current_bottom), 0, int(CreatePZ.bottomhole_artificial + 500))
+    drillingBit_diam = drillingBit_diam_select(current_depth)
 
     if CreatePZ.column_additional == True:
         nkt_pod = ['60мм' if CreatePZ.column_additional_diametr < 110 else '73мм со снятыми фасками']
@@ -33,9 +36,7 @@ def drilling_nkt(self):
         drilling_str = f'долото-{drillingBit_diam}  + забойный двигатель Д-76 +НКТ{nkt_pod}мм 20м + репер + ' \
                        f'НКТ{nkt_pod} {round(CreatePZ.current_bottom - CreatePZ.head_column_additional, 0)}м'
 
-    current_depth, ok = QInputDialog.getInt(None, 'Нормализация забоя',
-                                            'Введите глубину необходимого забоя',
-                                            int(CreatePZ.current_bottom), 0, int(CreatePZ.bottomhole_artificial + 500))
+
     CreatePZ.drilling_interval.append([CreatePZ.current_bottom, current_depth])
     drilling_list = [
         [f'СПО {drilling_str} до т.з -', None,
@@ -116,12 +117,17 @@ def drilling_sbt(self):
     from krs import well_volume
 
 
-    drillingBit_diam = paker_diametr_select(CreatePZ.current_bottom) + 2
+    current_depth, ok = QInputDialog.getInt(None, 'Нормализация забоя',
+                                            'Введите глубину необходимого забоя',
+                                            int(CreatePZ.current_bottom), 0, int(CreatePZ.bottomhole_artificial + 500))
+
+    drillingBit_diam = drillingBit_diam_select(current_depth)
+
     nkt_pod = "2' 3/8"
 
     nkt_diam = ''.join(["2 7/8" if CreatePZ.column_diametr > 110 else "2 3/8"])
 
-    if CreatePZ.column_additional == False or (CreatePZ.column_additional == True and CreatePZ.head_column_additional >= CreatePZ.current_bottom):
+    if CreatePZ.column_additional is False or (CreatePZ.column_additional is True and CreatePZ.head_column_additional >= CreatePZ.current_bottom):
         drilling_str = f'долото-{drillingBit_diam} для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм '
         drilling_short = f'долото-{drillingBit_diam} для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм '
 
@@ -131,9 +137,7 @@ def drilling_sbt(self):
                        f'{CreatePZ.column_additional_wall_thickness}мм + СБТ{nkt_pod} ' \
                        f'{CreatePZ.current_bottom - CreatePZ.head_column_additional}м'
         drilling_short = f'долото-{drillingBit_diam}  + СБТ{nkt_pod} {CreatePZ.current_bottom - CreatePZ.head_column_additional}м'
-    current_depth, ok = QInputDialog.getInt(None, 'Нормализация забоя',
-                                            'Введите глубину необходимого забоя',
-                                            int(CreatePZ.current_bottom), 0, int(CreatePZ.bottomhole_artificial + 500))
+
     CreatePZ.drilling_interval.append([CreatePZ.current_bottom, current_depth])
     drilling_list = [
         [f'СПО {drilling_short} на СБТ{nkt_diam} до Н= {CreatePZ.current_bottom - 30}', None,
@@ -242,7 +246,7 @@ def reply_drilling(self, drilling_str, nkt_diam, drilling_work_list):
 
         drilling_list_end = [
             [None, None,
-             f'Поднять  {drilling_str} на СБТ{nkt_diam} с глубины {CreatePZ.current_bottom}м с доливом скважины в '
+             f'Поднять  {drilling_str} на НКТ{nkt_diam} с глубины {CreatePZ.current_bottom}м с доливом скважины в '
              f'объеме {round(CreatePZ.current_bottom * 1.4 / 1000, 1)}м3 тех. жидкостью  уд.весом {CreatePZ.fluid_work}',
              None, None, None, None, None, None, None,
              'мастер КРС', liftingNKT_norm(CreatePZ.current_bottom, 1.3)]]
@@ -259,3 +263,136 @@ def reply_drilling(self, drilling_str, nkt_diam, drilling_work_list):
             drilling_work_list.append(row)
 
         return drilling_work_list
+
+
+def drillingBit_diam_select(depth_landing):
+
+    from open_pz import CreatePZ
+
+    drillingBit_dict = {
+        84: (88, 92),
+        90: (92.1, 97),
+        94: (97.1, 102),
+        102: (102.1, 109),
+        105: (109, 115),
+        114: (118, 120),
+        116: (120.1, 121.9),
+        118: (122, 123.9),
+        120.6: (124, 127.9),
+        124: (128, 133),
+        140: (144, 148),
+        143: (148.1, 154),
+        145: (154.1, 164),
+        160: (166, 176),
+        190: (190.6, 203.6),
+        204: (215, 221)
+    }
+
+    if CreatePZ.column_additional is False or (
+            CreatePZ.column_additional is True and depth_landing <= CreatePZ.head_column_additional):
+        diam_internal_ek = CreatePZ.column_diametr - 2 * CreatePZ.column_wall_thickness
+    else:
+        diam_internal_ek = CreatePZ.column_additional_diametr - 2 * CreatePZ.column_additional_wall_thickness
+
+    for diam, diam_internal_bit in drillingBit_dict.items():
+        if diam_internal_bit[0] <= diam_internal_ek <= diam_internal_bit[1]:
+            bit_diametr = diam
+
+    bit_diametr, ok = QInputDialog.getInt(None, 'Диаметр пакера ',
+                                            f'Диаметр пакера ',
+                                            int(bit_diametr), 70,
+                                            200)
+
+    return bit_diametr
+
+def frezer_ports(self):
+    from open_pz import CreatePZ
+    from krs import well_volume
+    from work_py.alone_oreration import kot_work
+
+    current_depth, ok = QInputDialog.getInt(None, 'Нормализация забоя',
+                                            'Введите глубину необходимого забоя',
+                                            int(CreatePZ.current_bottom), 0, int(CreatePZ.bottomhole_artificial + 500))
+
+    drillingBit_diam = drillingBit_diam_select(current_depth)
+
+    nkt_pod = "2' 3/8"
+
+    nkt_diam = ''.join(["2 7/8" if CreatePZ.column_diametr > 110 else "2 3/8"])
+
+    if CreatePZ.column_additional is False or (
+            CreatePZ.column_additional is True and CreatePZ.head_column_additional >= CreatePZ.current_bottom):
+        drilling_str = f' пилотный фрезер -{drillingBit_diam} + магнит колонный  2⅜ БТ (П) '
+        drilling_short = f' пилотный фрезер -{drillingBit_diam} + магнит колонный  2⅜ БТ (П) '
+
+
+    elif CreatePZ.column_additional == True:
+        drilling_str = f' пилотный фрезер -{drillingBit_diam} + магнит колонный  2⅜ БТ (П) + СБТ{nkt_pod} ' \
+                       f'{CreatePZ.current_bottom - CreatePZ.head_column_additional}м'
+        drilling_short = f' пилотный фрезер -{drillingBit_diam} + магнит колонный  2⅜ БТ (П) + СБТ{nkt_pod} ' \
+                         f'{CreatePZ.current_bottom - CreatePZ.head_column_additional}м'
+
+    CreatePZ.drilling_interval.append([CreatePZ.current_bottom, current_depth])
+    drilling_list = [
+        [f'СПО {drilling_short} на СБТ{nkt_diam} до Н= {CreatePZ.perforation_roof - 30}', None,
+         f'Спустить {drilling_str}  на СБТ{nkt_diam} до Н= {CreatePZ.perforation_roof - 30}м с замером, '
+         f' (При СПО первых десяти СБТ на спайдере дополнительно устанавливать элеватор ЭХЛ). '
+         f'В случае разгрузки инструмента  при спуске, проработать место посадки с промывкой скв., составить акт.'
+         f'СКОРОСТЬ СПУСКА НЕ БОЛЕЕ 1 М/С (НЕ ДОХОДЯ 40 - 50 М ДО ПЛАНОВОГО ИНТЕРВАЛА СКОРОСТЬ СПУСКА СНИЗИТЬ ДО 0,25 М/С). '
+         f'ЗА 20 М ДО ЗАБОЯ СПУСК ПРОИЗВОДИТЬ С ПРОМЫВКОЙ',
+         None, None, None, None, None, None, None,
+         'мастер КРС', descentNKT_norm(CreatePZ.current_bottom, 1.1)],
+        [f'монтаж мех.ротора', None,
+         f'Произвести монтаж мех.ротора. Собрать промывочное оборудование: вертлюг, ведущая труба (установить '
+         f'вставной фильтр под ведущей трубой), '
+         f'буровой рукав, устьевой герметизатор, нагнетательная линия. Застраховать буровой рукав за вертлюг. ',
+         None, None, None, None, None, None, None,
+         'Мастер КРС, УСРСиСТ', round(0.14 + 0.17 + 0.08 + 0.48 + 1.1, 1)],
+        [f'нормализацию до Н= {current_depth}м', None,
+         f'Произвести фрезерование муфт ГРП  с гл.{CreatePZ.perforation_roof}м до '
+         f'гл.{CreatePZ.perforation_sole}м  до первого порта с периодической обратной промывкой, с проработкой э/к в'
+         f' интервале {CreatePZ.perforation_roof}-{CreatePZ.perforation_sole}м (режим работы 60-80 об/мин, расход '
+         f'6-10 литров, нагрузка на фрезерующий инструмент до 3-х тонн. Приподнимаем инструмент после 15-20 минут '
+         f'работы).',
+         None, None, None, None, None, None, None,
+         'Мастер КРС, УСРСиСТ', 20, ],
+        [f'При отсутствии циркуляции заказчка блок пачки', None,
+         f'При отсутствии циркуляции или потери циркуляции согласовать заказчку блок пачки по дополнительному плану',
+         None, None, None, None, None, None, None,
+         'Мастер КРС, УСРСиСТ', None],
+        [None, None,
+         f'ПРИМЕЧАНИЕ: РАСХОД РАБОЧЕЙ ЖИДКОСТИ 8-10 Л/С;'
+         f' ОСЕВАЯ НАГРУЗКА НЕ БОЛЕЕ 75% ОТ ДОПУСТИМОЙ НАГРУЗКИ (УТОЧНИТЬ ПО ПАСПОРТУ  И ДОЛОТА);'
+         f' ПРЕДУСМОТРЕТЬ КОМПЕНСАЦИЮ РЕАКТИВНОГО МОМЕНТА НА ВЕДУЩЕЙ ТРУБЕ)) \n'
+         f'ПРИПОДНИМАЕМ ИНСТРУМЕНТ ПОСЛЕ 15-20 МИНУТ РАБОТЫ',
+         None, None, None, None, None, None, None,
+         'Мастер КРС, УСРСиСТ', None],
+        [f'Промыть  {CreatePZ.fluid_work}  '
+         f'в объеме {round(well_volume(self, CreatePZ.current_bottom) * 2, 1)}м3', None,
+         f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {CreatePZ.fluid_work}  '
+         f'в присутствии представителя заказчика в объеме {round(well_volume(self, CreatePZ.current_bottom) * 2, 1)}м3. Составить акт.',
+         None, None, None, None, None, None, None,
+         'мастер КРС, предст. заказчика', well_volume_norm(well_volume(self, CreatePZ.current_bottom))],
+        [None, None,
+         f'Поднять  {drilling_str} на СБТ {nkt_diam} с глубины {CreatePZ.current_bottom}м с доливом скважины в '
+         f'объеме {round(CreatePZ.current_bottom * 1.4 / 1000, 1)}м3 тех. жидкостью  уд.весом {CreatePZ.fluid_work}',
+         None, None, None, None, None, None, None,
+         'мастер КРС', liftingNKT_norm(CreatePZ.current_bottom, 1.3)],
+        [None, None,
+         f'В случае превышении норм времени на фрезерование портов увеличение продолжительности дополнительно '
+         f'согласовать с супервайзерской службой с составление акта на фактически затраченное время. Или согласовать '
+         f'смену вооружения и повторить работы',
+         None, None, None, None, None, None, None,
+         'мастер КРС', liftingNKT_norm(CreatePZ.current_bottom, 1.3)],
+        [None, None,
+         f'При посадке фреза на глубине выше планируемого порта по согласованию с УСРСиСТ произвести следующие работы:',
+         None, None, None, None, None, None, None,
+         'мастер КРС', liftingNKT_norm(CreatePZ.current_bottom, 1.3)]
+    ]
+    for row in kot_work(self):
+        drilling_list.append(row)
+    return drilling_list
+
+
+
+

@@ -218,8 +218,8 @@ def perf_new(self, roofRir, solePir):
     CreatePZ.definition_plast_work(self)
     if len(CreatePZ.dict_leakiness) != 0:
         for nek in list(CreatePZ.dict_leakiness['НЭК']['интервал'].keys()):
-            print(roofRir, float(nek.split('-')[0]), solePir)
-            if roofRir <= float(nek.split('-')[0]) <= solePir:
+            print(roofRir, float(nek[0]), solePir)
+            if roofRir <= float(nek[0]) <= solePir:
                 CreatePZ.dict_leakiness['НЭК']['интервал'][nek]['отключение'] = True
         print(f"при {CreatePZ.dict_leakiness['НЭК']['интервал'][nek]['отключение']}")
 

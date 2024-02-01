@@ -1,6 +1,12 @@
+from datetime import datetime
+
+import datetime as datetime
 from PyQt5 import QtWidgets
 from PyQt5.Qt import QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, \
-    QInputDialog, QTabWidget, QPushButton, Qt
+    QInputDialog, QTabWidget, QPushButton, Qt, QCheckBox
+from PyQt5.QtCore import QEvent
+from PyQt5.QtGui import QPalette, QFontMetrics, QStandardItem
+from PyQt5.QtWidgets import QVBoxLayout, QStyledItemDelegate, qApp, QMessageBox
 
 from krs import well_volume
 from main import MyWindow
@@ -9,11 +15,156 @@ from work_py.opressovka import testing_pressure
 
 from work_py.rationingKRS import descentNKT_norm, well_volume_norm, liftingNKT_norm
 
+class CheckableComboBox(QWidget):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.combo_box = CheckableComboBoxChild(self)
+
+
+        layout = QVBoxLayout(self)
+        layout.addWidget(self.combo_box)
+
+class CheckableComboBoxChild(QComboBox):
+    # Subclass Delegate to increase item height
+    class Delegate(QStyledItemDelegate):
+        def sizeHint(self, option, index):
+            size = super().sizeHint(option, index)
+            size.setHeight(20)
+            return size
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Make the combo editable to set a custom text
+        self.setEditable(True)
+        self.setInsertPolicy(QComboBox.NoInsert)
+        self.lineEdit().setPlaceholderText("--выбрать пласты--")
+        edit = self.lineEdit()
+        self.setLineEdit(edit)
+        #self.completer = QCompleter()
+        #self.completer.setFilterMode(Qt.MatchContains)
+        #self.completer.setCaseSensitivity(Qt.CaseInsensitive)
+        #edit.setCompleter(self.completer)
+        #self.completer.setModel(self.model())
+        edit.returnPressed.connect(self.insertCustomItem)
+
+        # Make the lineedit the same color as QPushButton
+        palette = qApp.palette()
+        palette.setBrush(QPalette.Base, palette.button())
+        self.lineEdit().setPalette(palette)
+
+        # Use custom delegate
+        self.setItemDelegate(CheckableComboBoxChild.Delegate())
+
+        # Update the text when an item is toggled
+        self.model().dataChanged.connect(self.updateText)
+
+        # Hide and show popup when clicking the line edit
+        self.lineEdit().installEventFilter(self)
+
+        # Prevent popup from closing when clicking on an item
+        self.view().viewport().installEventFilter(self)
+
+    def resizeEvent(self, event):
+        # Recompute text to elide as needed
+        self.updateText()
+        super().resizeEvent(event)
+
+    def eventFilter(self, object, event):
+        if object == self.view().viewport():
+            if event.type() == QEvent.MouseButtonRelease:
+                if self.lineEdit().hasFocus():
+                    return True
+                index = self.view().indexAt(event.pos())
+                item = self.model().item(index.row())
+                if item.checkState() == Qt.Checked:
+                    item.setCheckState(Qt.Unchecked)
+                else:
+                    item.setCheckState(Qt.Checked)
+                return False
+        return False
+
+    def timerEvent(self, event):
+        # After timeout, kill timer, and reenable click on line edit
+        self.killTimer(event.timerId())
+
+    def updateText(self):
+        CreatePZ.texts = []
+
+        for i in range(self.model().rowCount()):
+
+            if self.model().item(i).checkState() == Qt.Checked:
+                print(self.model().item(i).text())
+
+                CreatePZ.texts.append(self.model().item(i).text())
+                print(CreatePZ.texts)
+        text = ", ".join(CreatePZ.texts)
+
+        # Compute elided text (with "...")
+        metrics = QFontMetrics(self.lineEdit().font())
+        elidedText = metrics.elidedText(text, Qt.ElideRight, self.lineEdit().width())
+
+
+        self.lineEdit().setText(elidedText)
+
+
+
+    def addItem(self, text, data=None, checked=False):
+        item = QStandardItem()
+        item.setText(text)
+        if data is None:
+            item.setData(text)
+        else:
+            item.setData(data)
+        item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsUserCheckable)
+        item.setData(Qt.Unchecked if not checked else Qt.Checked, Qt.CheckStateRole)
+        self.model().appendRow(item)
+
+    def addItems(self, texts, datalist=None):
+        for i, text in enumerate(texts):
+            try:
+                data = datalist[i]
+            except (TypeError, IndexError):
+                data = None
+            self.addItem(text, data)
+
+    def insertCustomItem(self):
+        text = self.lineEdit().text().strip()
+        # Split the text by comma, and lowercase and strip() each piece
+        typedItemsOriginal = [item.strip() for item in text.split(",") if item.strip()]
+        typedItemsLower = [item.lower() for item in typedItemsOriginal]
+        # Uncheck all items
+        for i in range(self.model().rowCount()):
+            self.model().item(i).setData(Qt.Unchecked, Qt.CheckStateRole)
+        # Loop through each item in the text and check it, if it exists in
+        # lowercase
+        for i in range(len(typedItemsOriginal)):
+            for j in range(self.model().rowCount()):
+                if self.model().item(j).text().lower() == typedItemsLower[i]:
+                    self.model().item(j).setData(Qt.Checked, Qt.CheckStateRole)
+                    break
+            else:
+                # If the item doesn't exist, add it to the list
+                self.addItem(typedItemsOriginal[i], checked=True)
+        self.updateText()
+        self.showPopup()
+
+    def currentData(self):
+        # Return the list of selected items data
+        res = []
+        for i in range(self.model().rowCount()):
+            if self.model().item(i).checkState() == Qt.Checked:
+                res.append(self.model().item(i).data())
+        return res
+
+
 
 class TabPage_SO(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.le = QLineEdit()
+
 
         self.swabTruelabelType = QLabel("необходимость освоения", self)
         self.swabTrueEditType = QComboBox(self)
@@ -29,19 +180,27 @@ class TabPage_SO(QWidget):
 
         self.pakerLabel = QLabel("глубина пакера", self)
         self.pakerEdit = QLineEdit(self)
-        self.pakerEdit.setText(f"{int(CreatePZ.perforation_roof - 20)}")
+        self.pakerEdit.setText(f"{int(CreatePZ.perforation_sole - 20)}")
+        self.pakerEdit.textChanged.connect(self.update_paker_edit)
+
         self.pakerEdit.setClearButtonEnabled(True)
 
         self.khovstLabel = QLabel("Длина хвостовики", self)
         self.khvostEdit = QLineEdit(self)
-        self.khvostEdit.setText(
-            f"{int(CreatePZ.perforation_sole - float(self.pakerEdit.text().replace(',', '.')))}")
+        try:
+            a = CreatePZ.khvostEdit
+        except:
+            CreatePZ.khvostEdit = CreatePZ.perforation_sole - int(self.pakerEdit.text())
+        self.khvostEdit.setText(str(CreatePZ.khvostEdit))
+
         self.khvostEdit.setClearButtonEnabled(True)
 
+        plast_work = CreatePZ.plast_work
+
         self.plastLabel = QLabel("Выбор пласта", self)
-        self.plastCombo = QComboBox(self)
-        self.plastCombo.addItems(CreatePZ.plast_work)
-        self.plastCombo.setCurrentIndex(0)
+        self.plastCombo = CheckableComboBox(self)
+        self.plastCombo.combo_box.addItems(plast_work)
+        self.plastCombo.combo_box.currentTextChanged.connect(self.update_plast_edit)
 
         self.skvTrueLabelType = QLabel("необходимость кислотной ванны", self)
         self.svkTrueEdit = QComboBox(self)
@@ -111,7 +270,6 @@ class TabPage_SO(QWidget):
 
         self.swab_pakerLabel = QLabel("Глубина посадки пакера при освоении", self)
         self.swab_pakerEdit = QLineEdit(self)
-        self.swab_pakerEdit.setText(str(int(float(self.pakerEdit.text().replace(',', '.')) - 30)))
 
         self.swab_volumeLabel = QLabel("объем освоения", self)
         self.swab_volumeEdit = QLineEdit(self)
@@ -119,14 +277,14 @@ class TabPage_SO(QWidget):
 
         if CreatePZ.countAcid == 1:
             for enable in [self.khovstLabel, self.khvostEdit, self.swabTruelabelType,
-                           self.swabTrueEditType, self.swabTypeCombo]:
+                           self.swabTrueEditType, self.swabTypeCombo, self.depthGaugeCombo]:
                 enable.setEnabled(False)
         elif CreatePZ.countAcid == 2:
             listEnabel = [self.khovstLabel, self.khvostEdit, self.swabTruelabelType,
                           self.swabTrueEditType, self.plastCombo,
                           self.svkTrueEdit, self.QplastEdit, self.skvProcEdit,
                           self.acidEdit, self.acidVolumeEdit,
-                          self.acidProcEdit, self.swabTypeCombo]
+                          self.acidProcEdit, self.depthGaugeCombo, self.pakerEdit, self.acidOilProcEdit]
             for enable in listEnabel:
                 enable.setEnabled(False)
 
@@ -173,6 +331,59 @@ class TabPage_SO(QWidget):
         grid.addWidget(self.depthGaugeLabel, 6, 4)
         grid.addWidget(self.depthGaugeCombo, 7, 4)
 
+    def update_plast_edit(self):
+        dict_perforation = CreatePZ.dict_perforation
+
+        plasts = CreatePZ.texts
+        print(f'пласты {plasts, len(CreatePZ.texts), len(plasts), CreatePZ.texts}')
+        roof_plast = CreatePZ.current_bottom
+        sole_plast = 0
+        for plast in CreatePZ.plast_work:
+            for plast_sel in plasts:
+                if plast_sel == plast:
+
+                    if roof_plast >= dict_perforation[plast]['кровля']:
+                        roof_plast = dict_perforation[plast]['кровля']
+                    if sole_plast <= dict_perforation[plast]['подошва']:
+                        sole_plast = dict_perforation[plast]['подошва']
+
+            if dict_perforation[plast]['отрайбировано']:
+                paker_depth = int(roof_plast - 8)
+                self.pakerEdit.setText(f"{paker_depth}")
+                self.khvostEdit.setText(str(int(sole_plast - paker_depth)))
+                self.swab_pakerEdit.setText(str(int(paker_depth - 30)))
+            else:
+                paker_depth = int(roof_plast - 20)
+                self.pakerEdit.setText(f"{paker_depth}")
+                self.khvostEdit.setText(str(int(sole_plast - paker_depth)))
+                self.swab_pakerEdit.setText(str(int(paker_depth - 30)))
+        print(f'кровля {roof_plast}, подошва {sole_plast}')
+    def update_paker_edit(self):
+        dict_perforation = CreatePZ.dict_perforation
+
+        plasts = CreatePZ.texts
+        print(plasts)
+        roof_plast = CreatePZ.current_bottom
+        sole_plast = 0
+        for plast in CreatePZ.plast_work:
+            for plast_sel in plasts:
+                if plast_sel == plast:
+
+                    if roof_plast >= dict_perforation[plast]['кровля']:
+                        roof_plast = dict_perforation[plast]['кровля']
+                    if sole_plast <= dict_perforation[plast]['подошва']:
+                        sole_plast = dict_perforation[plast]['подошва']
+
+        if CreatePZ.perforation_roof < roof_plast:
+            paker_depth = int(AcidPakerWindow.if_None(self, self.pakerEdit.text()))
+
+            self.khvostEdit.setText(str(int(sole_plast - paker_depth)))
+            self.swab_pakerEdit.setText(str(int(paker_depth - 30)))
+        else:
+            paker_depth = int(AcidPakerWindow.if_None(self, self.pakerEdit.text()))
+            self.khvostEdit.setText(str(int(sole_plast - paker_depth)))
+            self.swab_pakerEdit.setText(str(int(paker_depth - 30)))
+        print(f'кровля {roof_plast}, подошва {sole_plast}')
 
 class TabWidget(QTabWidget):
     def __init__(self):
@@ -557,10 +768,10 @@ class AcidPakerWindow(MyWindow):
                                                    f'Увеличение давления согласовать с заказчиком']),
                         None, None, None, None, None, None, None,
                         'мастер КРС', 6],
-                       [f'реагирование 2 часа.', None,
-                        f'реагирование 2 часа.',
+                       [f'реагирование 2 часа.' if CreatePZ.region != 'ТГМ' and acid_sel != 'HF' else 'без реагирования', None,
+                        f'реагирование 2 часа.' if CreatePZ.region != 'ТГМ' and acid_sel != 'HF' else 'без реагирования',
                         None, None, None, None, None, None, None,
-                        'мастер КРС', 2],
+                        'мастер КРС', 2 if CreatePZ.region != 'ТГМ' and acid_sel != 'HF' else ''],
 
                        [f'Срыв 30мин', None,
                         f'Произвести срыв пакера с поэтапным увеличением нагрузки на 3-4т выше веса НКТ в течении 30мин и с '
@@ -665,33 +876,44 @@ class AcidPakerWindow(MyWindow):
         else:
             CreatePZ.swabTrueEditType = 1
         acidEdit = self.tabWidget.currentWidget().acidEdit.currentText()
-        khvostEdit = int(self.tabWidget.currentWidget().khvostEdit.text())
-        pakerEdit = int(self.tabWidget.currentWidget().pakerEdit.text())
+        khvostEdit = self.if_None((self.tabWidget.currentWidget().khvostEdit.text()))
+        pakerEdit = self.if_None(self.tabWidget.currentWidget().pakerEdit.text())
 
         skvVolumeEdit = float(self.tabWidget.currentWidget().skvVolumeEdit.text().replace(',', '.'))
         skvProcEdit = int(self.tabWidget.currentWidget().skvProcEdit.text().replace(',', '.'))
         acidVolumeEdit = float(self.tabWidget.currentWidget().acidVolumeEdit.text().replace(',', '.'))
         acidProcEdit = int(self.tabWidget.currentWidget().acidProcEdit.text().replace(',', '.'))
-        swab_paker = int(self.tabWidget.currentWidget().swab_pakerEdit.text().replace(',', '.'))
+        swab_paker = self.if_None(self.tabWidget.currentWidget().swab_pakerEdit.text().replace(',', '.'))
         swab_volume = int(self.tabWidget.currentWidget().swab_volumeEdit.text().replace(',', '.'))
         swabType = str(self.tabWidget.currentWidget().swabTypeCombo.currentText())
         acidOilProcEdit = self.tabWidget.currentWidget().acidOilProcEdit.text()
         pressure_Edit = int(self.tabWidget.currentWidget().pressure_Edit.text())
-        plastCombo = str(self.tabWidget.currentWidget().plastCombo.currentText())
+        plastCombo = str(self.tabWidget.currentWidget().plastCombo.combo_box.currentText())
         svkTrueEdit = str(self.tabWidget.currentWidget().svkTrueEdit.currentText())
         skvAcidEdit = str(self.tabWidget.currentWidget().skvAcidEdit.currentText())
         QplastEdit = str(self.tabWidget.currentWidget().QplastEdit.currentText())
         depthGaugeEdit = str(self.tabWidget.currentWidget().depthGaugeCombo.currentText())
         # privyazka = str(self.tabWidget.currentWidget().privyazka.currentText())
+        if (self.if_None(khvostEdit) == 0 or self.if_None(pakerEdit) == 0) and CreatePZ.countAcid != 2:
+            msg = QMessageBox.information(self, 'Внимание', 'Не все поля соответствуют значениям')
+            return
         if self.countAcid == 0:
             CreatePZ.khvostEdit = khvostEdit
-
             CreatePZ.pakerEdit = pakerEdit
+            CreatePZ.depthGaugeEdit = depthGaugeEdit
+            CreatePZ.swabType = swabType
+            CreatePZ.swab_volume = swab_volume
+            CreatePZ.swab_paker = swab_paker
+            if swabTrueEditType == 'Нужно освоение':
+                CreatePZ.swabTrueEditType = 0
+            else:
+                CreatePZ.swabTrueEditType = 1
+
             print(f'нужно ли освоение {swabTrueEditType}')
-            work_list = self.acidSelect(swabTrueEditType, khvostEdit, pakerEdit, depthGaugeEdit, QplastEdit, plastCombo)
+            work_list = self.acidSelect(swabTrueEditType, CreatePZ.khvostEdit, CreatePZ.pakerEdit, depthGaugeEdit, QplastEdit, plastCombo)
             CreatePZ.depthGaugeEdit = depthGaugeEdit
 
-            for row in self.acid_work(swabTrueEditType, acidProcEdit, khvostEdit, pakerEdit, skvAcidEdit, acidEdit,
+            for row in self.acid_work(swabTrueEditType, acidProcEdit, CreatePZ.khvostEdit, CreatePZ.pakerEdit, skvAcidEdit, acidEdit,
                                       skvVolumeEdit,
                                       QplastEdit, skvProcEdit, plastCombo, acidOilProcEdit, acidVolumeEdit, svkTrueEdit,
                                       self.dict_nkt, pressure_Edit):
@@ -715,7 +937,7 @@ class AcidPakerWindow(MyWindow):
             work_list = [
                 [None, None, f'установить пакер на глубине {pakerEdit}м', None, None, None, None, None, None, None,
                  'мастер КРС', 1.2]]
-            for row in self.acid_work(CreatePZ.swabTrueEditType, acidProcEdit, khvostEdit, pakerEdit, skvAcidEdit,
+            for row in self.acid_work(CreatePZ.swabTrueEditType, acidProcEdit, CreatePZ.khvostEdit, CreatePZ.pakerEdit, skvAcidEdit,
                                       acidEdit,
                                       skvVolumeEdit,
                                       QplastEdit, skvProcEdit, plastCombo, acidOilProcEdit, acidVolumeEdit, svkTrueEdit,
@@ -733,12 +955,10 @@ class AcidPakerWindow(MyWindow):
                 CreatePZ.swabTypeComboIndex = 2
 
         elif self.countAcid == 2:
-            self.acidSelect(CreatePZ.swabTrueEditType, CreatePZ.khvostEdit, CreatePZ.pakerEdit, CreatePZ.depthGaugeEdit,
-                            QplastEdit, plastCombo)
 
-            if swabTrueEditType == 'Нужно освоение':
+            if CreatePZ.swabTrueEditType == 'Нужно освоение':
                 work_list = []
-                swabbing_with_paker = self.swabbing_with_paker(CreatePZ.khvostEdit, swab_paker, swabType, swab_volume)
+                swabbing_with_paker = self.swabbing_with_paker(CreatePZ.khvostEdit, CreatePZ.swab_paker, CreatePZ.swabType, CreatePZ.swab_volume)
                 for row in swabbing_with_paker:
                     work_list.append(row)
                 if CreatePZ.depthGaugeEdit == 'Да':
@@ -749,14 +969,15 @@ class AcidPakerWindow(MyWindow):
             else:
                 work_list = [[None, None,
                               f'Поднять компоновку на НКТ с доливом скважины в '
-                              f'объеме {round(pakerEdit * 1.12 / 1000, 1)}м3 удельным весом {CreatePZ.fluid_work}',
+                              f'объеме {round(CreatePZ.pakerEdit * 1.12 / 1000, 1)}м3 удельным весом {CreatePZ.fluid_work}',
                               None, None, None, None, None, None, None,
                               'мастер КРС',
-                              liftingNKT_norm(pakerEdit, 1.2)]]
+                              liftingNKT_norm(CreatePZ.pakerEdit, 1.2)]]
             self.populate_row(CreatePZ.ins_ind, work_list)
             # print(f' индекс строк {CreatePZ.ins_ind}')
             CreatePZ.ins_ind += len(work_list)
             # print(f'третья индекс строк {CreatePZ.ins_ind}')
+            self.close()
         CreatePZ.pause = False
         self.close()
 
@@ -799,12 +1020,27 @@ class AcidPakerWindow(MyWindow):
     #         return
     #     self.tableWidget.removeRow(row)
 
+    def if_None(self, value):
+
+        if isinstance(value, int) or isinstance(value, float):
+            return int(value)
+
+        elif str(value).replace('.','').replace(',','').isdigit():
+            if str(round(float(value.replace(',','.')), 1))[-1] == 0:
+                return int(float(value.replace(',','.')))
+        else:
+            return 0
+
+
+
 
 if __name__ == "__main__":
     import sys
 
     app = QtWidgets.QApplication(sys.argv)
     # app.setStyleSheet()
+
+
     window = AcidPakerWindow()
     window.show()
     sys.exit(app.exec_())

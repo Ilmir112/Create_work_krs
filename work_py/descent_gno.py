@@ -252,7 +252,8 @@ def gno_down(self):
                               None, None, None, None, None, None, None,
                               'Мастер КРС, предст. заказчика', descentNKT_norm(sum(list(CreatePZ.dict_nkt_po.values())), 1)],
                              [f'Посадить пакер на глубине {CreatePZ.paker_do["posle"]}м.', None,
-                              f'Демонтировать превентор. Посадить пакер на глубине {CreatePZ.paker_do["posle"]}м. Монтаж  устьевой арматуры. При монтаже использовать только сертифицированное'
+                              f'Демонтировать превентор. Посадить пакер на глубине {CreatePZ.paker_do["posle"]}м. '
+                              f'Монтаж  устьевой арматуры. При монтаже использовать только сертифицированное'
                               f' оборудование (переводники, муфты, переходные катушки). МОНТАЖ БЕЗ ПОДВЕСНОГО ПАТРУБКА ЗАПРЕЩЕН. ',
                               None, None, None, None, None, None, None,
                               'Мастер КРС, предст. заказчика', 1.77],
@@ -504,56 +505,56 @@ def gno_down(self):
 
 
     # print(('НВ' in CreatePZ.dict_pump_SHGN["posle"].upper() or 'ШГН' in CreatePZ.dict_pump_SHGN["posle"].upper()),
-    #       CreatePZ.if_None(CreatePZ.paker_do["posle"]) != '0')
-    if CreatePZ.dict_pump_ECN["posle"] != '0' and str(CreatePZ.paker_do["posle"]) == '0':
+    #       CreatePZ.if_None(CreatePZ.paker_do["posle"]) != 0)
+    if CreatePZ.dict_pump_ECN["posle"] != 0 and str(CreatePZ.paker_do["posle"]) == 0:
         lift_select = descent_ecn
         lift_key = 'ЭЦН'
     elif 89 in CreatePZ.dict_nkt_po.keys() and 48 in CreatePZ.dict_nkt_po.keys() and CreatePZ.if_None(
-            CreatePZ.paker_do["posle"]) != '0':
+            CreatePZ.paker_do["posle"]) != 0:
         lift_select = descent_orz
         lift_key = 'ОРЗ'
 
-    elif CreatePZ.dict_pump_ECN["posle"] != '0' and (CreatePZ.if_None(CreatePZ.paker_do["posle"]) == '0'):
+    elif CreatePZ.dict_pump_ECN["posle"] != 0 and (CreatePZ.if_None(CreatePZ.paker_do["posle"]) == 0):
 
         lift_select = descent_ecn_with_paker
         lift_key = 'ЭЦН с пакером'
         print('Подьем ЭЦН с пакером ')
 
     elif ('НВ' in CreatePZ.dict_pump_SHGN["posle"].upper() or 'ШГН' in CreatePZ.dict_pump_SHGN[
-        "posle"].upper()) and CreatePZ.if_None(CreatePZ.paker_do["posle"]) == '0':
+        "posle"].upper()) and CreatePZ.if_None(CreatePZ.paker_do["posle"]) == 0:
         lift_select = descent_nv
         lift_key = 'НВ'
     elif ('НВ' in CreatePZ.dict_pump_SHGN["posle"].upper() or 'ШГН' in CreatePZ.dict_pump_SHGN[
-        "posle"].upper()) and CreatePZ.if_None(CreatePZ.paker_do["posle"]) != '0':
+        "posle"].upper()) and CreatePZ.if_None(CreatePZ.paker_do["posle"]) != 0:
         lift_select = descent_nv_with_paker
         lift_key = 'НВ с пакером'
 
-    elif 'НН' in CreatePZ.dict_pump_SHGN["posle"].upper() and CreatePZ.if_None(CreatePZ.paker_do["posle"]) == '0':
+    elif 'НН' in CreatePZ.dict_pump_SHGN["posle"].upper() and CreatePZ.if_None(CreatePZ.paker_do["posle"]) == 0:
         lift_select = descent_nn
         lift_key = 'НН'
-    elif 'НН' in CreatePZ.dict_pump_SHGN["posle"].upper() and CreatePZ.if_None(CreatePZ.paker_do["posle"]) != '0':
+    elif 'НН' in CreatePZ.dict_pump_SHGN["posle"].upper() and CreatePZ.if_None(CreatePZ.paker_do["posle"]) != 0:
         lift_select = descent_nn_with_paker
         lift_key = 'НН с пакером'
-    elif CreatePZ.dict_pump_SHGN["posle"] != '0' and CreatePZ.dict_pump_ECN["posle"] != '0':
+    elif CreatePZ.dict_pump_SHGN["posle"] != 0 and CreatePZ.dict_pump_ECN["posle"] != 0:
         lift_select = descentORD
         lift_key = "ОРД"
-    elif 'НН' in CreatePZ.dict_pump_SHGN["posle"] and CreatePZ.if_None(CreatePZ.paker_do["posle"]) != '0':
+    elif 'НН' in CreatePZ.dict_pump_SHGN["posle"] and CreatePZ.if_None(CreatePZ.paker_do["posle"]) != 0:
         lift_select = descent_nn_with_paker
         lift_key = "НН с пакером"
         print('Подьем НН с пакером ')
 
-    elif CreatePZ.dict_pump_SHGN["posle"] == '0' and CreatePZ.dict_pump_ECN["posle"] == '0' and CreatePZ.if_None(
-            CreatePZ.paker_do["posle"]) == '0':
+    elif CreatePZ.dict_pump_SHGN["posle"] == 0 and CreatePZ.dict_pump_ECN["posle"] == 0 and CreatePZ.if_None(
+            CreatePZ.paker_do["posle"]) == 0:
         lift_select = descent_voronka
         lift_key = 'воронка'
         print('Подьем  воронки')
-    elif CreatePZ.dict_pump_SHGN["posle"] == '0' and CreatePZ.dict_pump_ECN["posle"] == '0' and CreatePZ.if_None(
-            CreatePZ.paker_do["posle"]) != '0':
+    elif CreatePZ.dict_pump_SHGN["posle"] == 0 and CreatePZ.dict_pump_ECN["posle"] == 0 and CreatePZ.if_None(
+            CreatePZ.paker_do["posle"]) != 0:
         lift_select = paker_descent
         lift_key = 'пакер'
         lift_s = f'пакер ППД  {CreatePZ.paker_do["posle"]}'
     # elif 89 in CreatePZ.dict_nkt.keys() and 48 in CreatePZ.dict_nkt.keys() and CreatePZ.if_None(
-    #         CreatePZ.paker_do["posle"]) != '0':
+    #         CreatePZ.paker_do["posle"]) != 0:
     #     lift_select = lift_orz
     #     print('Подьем ОРЗ')
 

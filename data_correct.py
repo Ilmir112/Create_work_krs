@@ -11,7 +11,7 @@ class FloatLineEdit(QLineEdit):
         # Устанавливаем валидатор для проверки на float
 
 
-        reg = QRegExp("[0-9.]*")
+        reg = QRegExp("[0-9.отсут]*")
         pValidator = QRegExpValidator(self)
         pValidator.setRegExp(reg)
         self.setValidator(pValidator)
@@ -277,7 +277,7 @@ class TabPage_SO(QWidget):
         if len(self.dict_nkt) != 0:
             n = 1
             for nkt, lenght in self.dict_nkt.items():
-                print(f'НКТ {nkt, lenght}')
+                # print(f'НКТ {nkt, lenght}')
                 nkt_line_edit = QLineEdit(self)
                 nkt_line_edit.setText(str(self.ifNone(nkt)))
 
@@ -309,7 +309,6 @@ class TabPage_SO(QWidget):
         if len(self.dict_sucker_rod) != 0:
             n = 1
             for sucker, lenght in self.dict_sucker_rod.items():
-                print(f'штанги {sucker, lenght}')
 
                 sucker_rod_line_edit = QLineEdit(self)
                 sucker_rod_line_edit.setText(str(self.ifNone(sucker)))
@@ -343,7 +342,7 @@ class TabPage_SO(QWidget):
             # добавление строк с НКТ плановых
             n = 1
             for nkt_po, lenght_po in self.dict_nkt_po.items():
-                print(f'НКТ план {nkt_po, lenght_po}')
+                # print(f'НКТ план {nkt_po, lenght_po}')
 
                 nkt_po_line_edit = QLineEdit(self)
                 nkt_po_line_edit.setText(str(self.ifNone(nkt_po)))
@@ -377,7 +376,7 @@ class TabPage_SO(QWidget):
         if len(self.dict_sucker_rod_po) != 0:
             n = 1
             for sucker_po, lenght_po in self.dict_sucker_rod_po.items():
-                print(f'штанги план {sucker_po, lenght_po}')
+                # print(f'штанги план {sucker_po, lenght_po}')
                 sucker_rod_po_line_edit = QLineEdit(self)
                 sucker_rod_po_line_edit.setText(str(self.ifNone(sucker_po)))
 
@@ -411,11 +410,13 @@ class TabPage_SO(QWidget):
 
 
     def ifNone(self, string):
+
         if str(string) in ['0', str(None), '-']:
             return 'отсут'
         elif str(string).replace('.', '').replace(',', '').isdigit():
+
             # print(str(round(float(string), 1))[-1] == 0, int(string), float(string))
-            return int(string) if str(round(float(string), 1))[-1] == "0" else float(string)
+            return int(string) if str(round(float(str(string).replace(',', '.')), 1))[-1] == "0" else float(str(string).replace(',', '.'))
         else:
             return str(string)
     def updateLabel(self):
@@ -525,7 +526,7 @@ class DataWindow(QMainWindow):
 
         if self.dict_sucker_rod:
             for key in range(1, len(self.dict_sucker_rod)):
-                print(self.tabWidget.currentWidget().labels_sucker.keys())
+                # print(self.tabWidget.currentWidget().labels_sucker.keys())
                 CreatePZ.dict_sucker_rod[self.tabWidget.currentWidget().labels_sucker[key][0].text()] = self.if_None(
                     self.tabWidget.currentWidget().labels_sucker[key][1].text())
         else:
@@ -542,38 +543,40 @@ class DataWindow(QMainWindow):
                 CreatePZ.dict_sucker_rod_po[self.tabWidget.currentWidget().labels_sucker_po[1][0].text()] = self.if_None(
                     self.tabWidget.currentWidget().labels_sucker_po[1][1].text())
 
-        if self.ifNum(columnType) == False \
-                or self.ifNum(column_wall_thickness) == False \
-                or self.ifNum(shoe_column) == False \
+        if self.ifNum(columnType) is False \
+                or self.ifNum(column_wall_thickness) is False \
+                or self.ifNum(shoe_column) is False \
                 or shoe_column == 'отсут' \
                 or columnType == 'отсут' \
-                or self.ifNum(column_additional_diametr) == False \
-                or self.ifNum(column_additional_wall_thickness) == False \
-                or self.ifNum(shoe_column_additional) == False \
-                or self.ifNum(head_column_additional) == False \
-                or self.ifNum(bottomhole_artificial) == False \
-                or self.ifNum(bottomhole_drill) == False \
-                or self.ifNum(current_bottom) == False \
-                or self.ifNum(max_angle) == False \
-                or self.ifNum(max_admissible_pressure) == False \
-                or self.ifNum(max_expected_pressure) == False \
-                or self.ifNum(dict_pump_ECN_h_do) == False\
-                or self.ifNum(static_level) == False \
-                or self.ifNum(static_level) == False \
-                or self.ifNum(dinamic_level) == False\
-                or self.ifNum(dict_pump_ECN_h_posle) == False \
-                or self.ifNum(dict_pump_SHGN_h_do) == False \
-                or self.ifNum(dict_pump_SHGN_h_posle) == False \
-                or self.ifNum(H_F_paker_do) == False \
-                or self.ifNum(H_F_paker_posle) == False \
-                or self.ifNum(H_F_paker2_do) == False \
-                or self.ifNum(H_F_paker2_posle) == False \
+                or self.ifNum(column_additional_diametr) is False \
+                or self.ifNum(column_additional_wall_thickness) is False \
+                or self.ifNum(shoe_column_additional) is False \
+                or self.ifNum(head_column_additional) is False \
+                or self.ifNum(bottomhole_artificial) is False \
+                or self.ifNum(bottomhole_drill) is False \
+                or self.ifNum(current_bottom) is False \
+                or self.ifNum(max_angle) is False \
+                or self.ifNum(max_admissible_pressure) is False \
+                or self.ifNum(max_expected_pressure) is False \
+                or self.ifNum(dict_pump_ECN_h_do) is False\
+                or self.ifNum(static_level) is False \
+                or self.ifNum(static_level) is False \
+                or self.ifNum(dinamic_level) is False\
+                or self.ifNum(dict_pump_ECN_h_posle) is False \
+                or self.ifNum(dict_pump_SHGN_h_do) is False \
+                or self.ifNum(dict_pump_SHGN_h_posle) is False \
+                or self.ifNum(H_F_paker_do) is False \
+                or self.ifNum(H_F_paker_posle) is False \
+                or self.ifNum(H_F_paker2_do) is False \
+                or self.ifNum(H_F_paker2_posle) is False \
                 or any(['НВ' in dict_pump_SHGN_do.upper(), 'ШГН' in dict_pump_SHGN_do.upper(),
-                    'НН' in dict_pump_SHGN_do.upper(), dict_pump_SHGN_do == 'отсут']) == False\
+                    'НН' in dict_pump_SHGN_do.upper(), dict_pump_SHGN_do == 'отсут',
+                        'RHAM' in dict_pump_SHGN_do]) is False\
                 or any(['НВ' in dict_pump_SHGN_posle.upper(), 'ШГН' in dict_pump_SHGN_posle.upper(),
-                       'НН' in dict_pump_SHGN_posle.upper(), dict_pump_SHGN_posle == 'отсут']) == False \
+                       'НН' in dict_pump_SHGN_posle.upper(), dict_pump_SHGN_posle == 'отсут',
+                        'RHAM' in dict_pump_SHGN_do]) is False \
                 or any(['ЭЦН' in dict_pump_ECN_posle.upper(), 'ВНН' in dict_pump_ECN_posle.upper(),
-                        dict_pump_ECN_posle == 'отсут']) == False \
+                        dict_pump_ECN_posle == 'отсут']) is False \
                 or (dict_pump_ECN_do != 'отсут' and dict_pump_ECN_h_do == 'отсут') \
                 or (dict_pump_ECN_posle != 'отсут' and dict_pump_ECN_h_posle == 'отсут') \
                 or (dict_pump_SHGN_do != 'отсут' and dict_pump_SHGN_h_do == 'отсут') \
@@ -583,9 +586,16 @@ class DataWindow(QMainWindow):
                 or (paker2_do != 'отсут' and H_F_paker2_do == 'отсут') \
                 or (paker2_posle != 'отсут' and H_F_paker2_posle == 'отсут') \
                 or any(['ЭЦН' in dict_pump_ECN_do.upper(), 'ВНН' in dict_pump_ECN_do.upper(),
-                        dict_pump_ECN_do == 'отсут']) == False:
+                        dict_pump_ECN_do == 'отсут']) is False:
             msg = QMessageBox.information(self, 'Внимание', 'Не все поля соответствуют значениям')
             return
+
+        elif self.if_None(20 if self.ifNum(head_column_additional) else head_column_additional) < 5:
+            print(self.if_None(head_column_additional))
+            msg = QMessageBox.information(self, 'Внимание', 'В скважине отсутствует доп колонна')
+            return
+
+
         else:
             CreatePZ.column_diametr = self.if_None(columnType)
             CreatePZ.column_wall_thickness = self.if_None(column_wall_thickness)
@@ -594,6 +604,7 @@ class DataWindow(QMainWindow):
             CreatePZ.column_additional_wall_thickness = self.if_None(column_additional_wall_thickness)
             CreatePZ.shoe_column_additional = self.if_None(shoe_column_additional)
             CreatePZ.head_column_additional = self.if_None(head_column_additional)
+            print(f'fffffff {CreatePZ.head_column_additional}')
             CreatePZ.bottomhole_drill = self.if_None(bottomhole_drill)
             CreatePZ.bottomhole_artificial =  self.if_None(bottomhole_artificial)
             CreatePZ.current_bottom =  self.if_None(current_bottom)
@@ -630,12 +641,12 @@ class DataWindow(QMainWindow):
 
     def if_None(self, value):
 
-        if value is None or 'отс' in str(value).lower() or value == '-' or str(value) == '0':
-            return '0'
+        if value is None or 'отс' in str(value).lower() or value == '-' or str(value) == 0:
+            return 0
         elif isinstance(value, int):
             return int(value)
         elif str(value).replace('.','').replace(',','').isdigit():
-            if str(round(float(value), 1))[-1] == '0':
+            if str(round(float(value.replace(',','.')), 1))[-1] == 0:
                 return int(float(value.replace(',','.')))
             else:
                 return round(float(value.replace(',','.')), 1)
