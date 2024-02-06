@@ -151,10 +151,6 @@ def raiding_Bit_diam_select(depth_landing):
         if diam_internal_bit[0] <= diam_internal_ek <= diam_internal_bit[1]:
             bit_diametr = diam
 
-    bit_diametr, ok = QInputDialog.getInt(None, 'Диаметр пакера ',
-                                          f'Диаметр пакера ',
-                                          int(bit_diametr), 70,
-                                          200)
 
     return bit_diametr
 

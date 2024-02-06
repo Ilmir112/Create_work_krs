@@ -11,7 +11,7 @@ def calculationFluidWork(vertical, pressure):
     if (isinstance(vertical, float) or isinstance(vertical, int)) and (
             isinstance(pressure, float) or isinstance(pressure, int)):
 
-        # print(vertical, pressure)
+        print(vertical, pressure)
         stockRatio = 0.1 if float(vertical) <= 1200 else 0.05
 
         fluidWork = round(float(str(pressure)) * (1 + stockRatio) / float(vertical) / 0.0981, 2)
@@ -19,10 +19,10 @@ def calculationFluidWork(vertical, pressure):
             fluidWork = 1.02
         elif fluidWork < 1.02 and (CreatePZ.region == 'ИГМ' or CreatePZ.region == 'ТГМ' or CreatePZ.region == 'ЧГМ'):
             fluidWork = 1.01
-        # print(f' ЖГС {fluidWork}')
+        print(f' ЖГС {fluidWork}')
         return fluidWork
     else:
-        return 1.01
+        return None
 
 
 def work_krs(self, work_plan):
@@ -85,47 +85,48 @@ def work_krs(self, work_plan):
     CreatePZ.fluid_work_short = fluid_work_short
 
     if work_plan != 'dop_plan':
-        if CreatePZ.dict_pump_ECN["do"] != 0 and CreatePZ.dict_pump_SHGN["do"] != 0:
+        if CreatePZ.if_None(CreatePZ.dict_pump_ECN["do"]) != 'отсут' and CreatePZ.if_None(CreatePZ.dict_pump_SHGN["do"]) != 'отсут':
             # print(CreatePZ.dict_pump_ECN["do"], )
             lift_key = 'ОРД'
             print(f'Подьем орд')
 
-        elif CreatePZ.dict_pump_ECN["do"] != 0 and str(CreatePZ.paker_do["do"]) == 0:
+        elif CreatePZ.if_None(CreatePZ.dict_pump_ECN["do"]) != 'отсут' and CreatePZ.if_None(CreatePZ.paker_do["do"]) == 'отсут':
             lift_key = 'ЭЦН'
+
             print('Подьем ЭЦН')
-        elif CreatePZ.dict_pump_ECN["do"] != 0 and CreatePZ.if_None(CreatePZ.paker_do['do']) != 0:
+        elif CreatePZ.if_None(CreatePZ.dict_pump_ECN["do"]) != 'отсут' and CreatePZ.if_None(CreatePZ.paker_do['do']) != 'отсут':
             lift_key = 'ЭЦН с пакером'
             print('Подьем ЭЦН с пакером ')
-        elif CreatePZ.dict_pump_SHGN["do"] != 0 and CreatePZ.dict_pump_SHGN["do"].upper() != 'НН' \
-                and CreatePZ.if_None(CreatePZ.paker_do['do']) == 0:
+        elif CreatePZ.if_None(CreatePZ.dict_pump_SHGN["do"]) != 'отсут' and CreatePZ.dict_pump_SHGN["do"].upper() != 'НН' \
+                and CreatePZ.if_None(CreatePZ.paker_do['do']) == 'отсут':
             lift_key = 'НВ'
             print('Подьем НВ')
-        elif CreatePZ.dict_pump_SHGN["do"] != 0 and CreatePZ.dict_pump_SHGN["do"].upper() != 'НН' \
-                and CreatePZ.if_None(CreatePZ.paker_do['do']) != 0:
+        elif CreatePZ.if_None(CreatePZ.dict_pump_SHGN["do"]) != 'отсут' and CreatePZ.if_None(CreatePZ.dict_pump_SHGN["do"]).upper() != 'НН' \
+                and CreatePZ.if_None(CreatePZ.paker_do['do']) != 'отсут':
             lift_key = 'НВ с пакером'
             print('Подьем НВ с пакером ')
-        elif 'НН' in CreatePZ.dict_pump_SHGN["do"].upper() and CreatePZ.if_None(CreatePZ.paker_do['do']) == 0:
+        elif 'НН' in CreatePZ.if_None(CreatePZ.dict_pump_SHGN["do"]).upper() and CreatePZ.if_None(CreatePZ.paker_do['do']) == 'отсут':
             lift_key = 'НН'
             print('Подьем НН')
-        elif 'НН' in CreatePZ.dict_pump_SHGN["do"].upper() and CreatePZ.if_None(CreatePZ.paker_do['do']) != 0:
+        elif 'НН' in CreatePZ.if_None(CreatePZ.dict_pump_SHGN["do"]).upper() and \
+                CreatePZ.if_None(CreatePZ.if_None(CreatePZ.paker_do['do'])) != 'отсут':
             lift_key = 'НН с пакером'
             print('Подьем НН с пакером ')
-        elif CreatePZ.dict_pump_SHGN["do"] == 0 and CreatePZ.if_None(CreatePZ.paker_do['do']) == 0 \
-                and CreatePZ.dict_pump_ECN["do"] == "0":
+        elif CreatePZ.if_None(CreatePZ.dict_pump_SHGN["do"]) == 'отсут' and CreatePZ.if_None(CreatePZ.paker_do['do']) == 'отсут' \
+                and CreatePZ.if_None(CreatePZ.dict_pump_ECN["do"]) == 'отсут':
             lift_key = 'воронка'
             print('Подьем  воронки')
-        elif CreatePZ.dict_pump_SHGN["do"] == 0 and CreatePZ.if_None(CreatePZ.paker_do['do']) != 0 \
-                and CreatePZ.dict_pump_ECN["do"] == "0":
+        elif CreatePZ.if_None(CreatePZ.dict_pump_SHGN["do"]) == 'отсут' and CreatePZ.if_None(CreatePZ.paker_do['do']) != 'отсут' \
+                and CreatePZ.if_None(CreatePZ.dict_pump_ECN["do"]) == 'отсут':
             lift_key = 'пакер'
             print('Подьем пакера')
         elif '89' in CreatePZ.dict_nkt.keys() and '48' in CreatePZ.dict_nkt.keys() and CreatePZ.if_None(
-                CreatePZ.paker_do['do']) != 0:
+                CreatePZ.paker_do['do']) != 'отсут':
             lift_key = 'ОРЗ'
 
         # print(f'Лифт ключ {lift_key}')
 
         without_damping_True = CreatePZ.without_damping
-        print(f'Состоит в вписке без глушения {without_damping_True}')
 
         if any([cater == 1 for cater in CreatePZ.cat_P_1]):
             CreatePZ.kat_pvo, _ = QInputDialog.getInt(None, 'Категория скважины',
@@ -934,10 +935,14 @@ def work_krs(self, work_plan):
                       [None, None,
                        ''.join(["За 24 часа до готовности вызвать пусковую комиссию" if CreatePZ.kat_pvo == 2
                                 else "На скважинах первой категории Подрядчик обязан пригласить представителя ПАСФ " \
-                                     "для проверки качества м/ж и опрессовки ПВО, документации и выдачи разрешения на производство " \
-                                     "работ по ремонту скважин. При обнаружении нарушений, которые могут повлечь за собой опасность для жизни людей"
-                                     " и/или возникновению ГНВП и ОФ, дальнейшие работы должны быть прекращены. Представитель ПАСФ приглашается за 24 часа до проведения "
-                                     "проверки монтажа ПВО телефонограммой. произвести практическое обучение по команде ВЫБРОС. Пусковой комиссией составить акт готовности "
+                                     "для проверки качества м/ж и опрессовки ПВО, документации и выдачи разрешения на"
+                                     " производство " \
+                                     "работ по ремонту скважин. При обнаружении нарушений, которые могут повлечь за "
+                                     "собой опасность для жизни людей"
+                                     " и/или возникновению ГНВП и ОФ, дальнейшие работы должны быть прекращены. "
+                                     "Представитель ПАСФ приглашается за 24 часа до проведения "
+                                     "проверки монтажа ПВО телефонограммой. произвести практическое обучение по команде"
+                                     "ВЫБРОС. Пусковой комиссией составить акт готовности "
                                      "подъёмного агрегата для ремонта скважины."]),
                        None, None, None, None, None, None, None,
                        'Мастер КРС', None],
@@ -948,7 +953,8 @@ def work_krs(self, work_plan):
                            'Мастер КРС, представ-ли ПАСФ и Заказчика, Пуск. ком' if CreatePZ.kat_pvo == 1 else 'Мастер КРС, представ-ли  Заказчика']),
                        [4.21 if 'схеме №1' in str(pvo_gno(CreatePZ.kat_pvo)[0]) else 0.23+0.3+0.83+0.67+ 0.14][0]],
                       [None, None,
-                       f'Мастеру бригады КРС осуществлять входной контроль за плотностью ввозимой жидкости глушения и промывки с записью удельного веса в вахтовом журнале. ',
+                       f'Мастеру бригады КРС осуществлять входной контроль за плотностью ввозимой жидкости глушения и'
+                       f'промывки с записью удельного веса в вахтовом журнале. ',
                        None, None,
                        None, None, None, None, None,
                        None, None],
@@ -971,7 +977,8 @@ def work_krs(self, work_plan):
             # try:
             lift_key = 'ОРЗ'
             lift_orz = [
-                [f'глушение скважины в НКТ48мм в объеме {round(1.3 * CreatePZ.dict_nkt["48"] / 1000, 1)}м3, Произвести глушение скважины в '
+                [f'глушение скважины в НКТ48мм в объеме {round(1.3 * CreatePZ.dict_nkt["48"] / 1000, 1)}м3, '
+                 f'Произвести глушение скважины в '
                  f'НКТ89мм тех.жидкостью на поглощение в объеме {round(1.3 * CreatePZ.dict_nkt["89"] * 1.1 / 1000, 1)}м3', None,
                  f'Произвести глушение скважины в НКТ48мм тех.жидкостью в объеме обеспечивающим заполнение трубного '
                  f'пространства в объеме {round(1.3 * CreatePZ.dict_nkt["48"] / 1000, 1)}м3 жидкостью уд.веса '
@@ -997,11 +1004,16 @@ def work_krs(self, work_plan):
                  f'Разобрать устьевое оборудование. Сорвать планшайбу и пакер с поэтапным увеличением нагрузки с '
                  f'выдержкой 30мин для возврата резиновых элементов в исходное положение'
                  f'в присутствии представителя ЦДНГ, с '
-                 f'составлением акта. При срыве нагрузка не должна превышать предельно допустимую нагрузку на НКТ не более {round(weigth_pipe(CreatePZ.dict_nkt) * 1.2, 1)}т. '
-                 f'(вес подвески ({round(weigth_pipe(CreatePZ.dict_nkt), 1)}т) + 20%). ПРИМЕЧАНИЕ: При отрицательном результате согласовать с УСРСиСТ ступенчатое увеличение '
-                 f'нагрузки до 28т ( страг нагрузка НКТ по паспорту), по 3 т – 0,5 час , при необходимости  с противодавлением в НКТ '
-                 f'(время на прибытие СТП ЦА 320 +  АЦ не более 4 часов). Общие время на расхаживание - не более 6 часов, через 5 часов'
-                 f' с момента расхаживания пакера - выйти с согласование на УСРСиСТ, ПТО Региона - для составления алгоритма'
+                 f'составлением акта. При срыве нагрузка не должна превышать предельно допустимую нагрузку на '
+                 f'НКТ не более {round(weigth_pipe(CreatePZ.dict_nkt) * 1.2, 1)}т. '
+                 f'(вес подвески ({round(weigth_pipe(CreatePZ.dict_nkt), 1)}т) + 20%). ПРИМЕЧАНИЕ: '
+                 f'При отрицательном результате согласовать с УСРСиСТ ступенчатое увеличение '
+                 f'нагрузки до 28т ( страг нагрузка НКТ по паспорту), по 3 т – 0,5 час , при необходимости  с '
+                 f'противодавлением в НКТ '
+                 f'(время на прибытие СТП ЦА 320 +  АЦ не более 4 часов). Общие время на расхаживание - не более 6 '
+                 f'часов, через 5 часов'
+                 f' с момента расхаживания пакера - выйти с согласование на УСРСиСТ, ПТО Региона - для составления '
+                 f'алгоритма'
                  f' последующих работ. ', None, None,
                  None, None, None, None, None,
                  'Мастер КРС представитель Заказчика', 1.5],
@@ -1216,6 +1228,7 @@ def well_volume(self, current_bottom):
 
     # print(CreatePZ.column_additional)
     if CreatePZ.column_additional == False:
+        # print(CreatePZ.column_diametr, CreatePZ.column_wall_thickness, current_bottom)
         volume_well = 3.14 * (CreatePZ.column_diametr - CreatePZ.column_wall_thickness * 2) ** 2 / 4 / 1000000 * (
             current_bottom)
 

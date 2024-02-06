@@ -584,7 +584,7 @@ def template_ek(self):
                   [None, None,
                    f'Примечание №4: В случае отсутствия циркуляции при нормализации забоя произвести СПО КОТ-50 '
                    f'до планового '
-                   f'текущего забоя. СПО КОТ-50 или КОС повторить до полной нормализации. При жесткой посадке  '
+                   f'текущего забоя. СПО КОТ-50 повторить до полной нормализации. При жесткой посадке  '
                    f'КОТ-50 или КОС произвести взрыхление с СПО забойного двигателя с долотом . Подъем компоновки '
                    f'на ТНКТ с гл.{CreatePZ.current_bottom}м'
                    f' вести с доливом скважины до устья т/ж удел.весом {CreatePZ.fluid_work} в '
@@ -750,22 +750,32 @@ def definition_roof_not_raiding(self):
     elif CreatePZ.column_additional:
         for plast in plast_all:
             roof = min(list(map(lambda x: x[0], list(dict_perforation[plast]['интервал']))))
+            print(roof)
             if CreatePZ.head_column_additional <= roof:
                 if dict_perforation[plast]['отрайбировано']:
                     roof_add_column_plast = CreatePZ.current_bottom
                     roof_plast = CreatePZ.head_column_additional
                 else:
                     roof_add_column_plast = roof
+                    roof_plast = CreatePZ.head_column_additional
                     break
-
-        for plast in plast_all:
-            roof = min(list(map(lambda x: x[0], list(dict_perforation[plast]['интервал']))))
-            if CreatePZ.head_column_additional > roof:
+            else:
                 if dict_perforation[plast]['отрайбировано']:
+                    roof_add_column_plast = CreatePZ.current_bottom
                     roof_plast = CreatePZ.head_column_additional
                 else:
+                    roof_add_column_plast = CreatePZ.current_bottom
                     roof_plast = roof
                     break
 
-    print(f' кровля отрайбированного интервал {roof_plast, roof_add_column_plast}')
+        # for plast in plast_all:
+        #     roof = min(list(map(lambda x: x[0], list(dict_perforation[plast]['интервал']))))
+        #     if CreatePZ.head_column_additional > roof:
+        #         if dict_perforation[plast]['отрайбировано']:
+        #             roof_plast = CreatePZ.head_column_additional
+        #         else:
+        #             roof_plast = roof
+        #             break
+    print(f' кровля отрайбированного интервал доп кол{roof_add_column_plast}')
+    print(f' кровля отрайбированного интервал {roof_plast}')
     return roof_plast, roof_add_column_plast

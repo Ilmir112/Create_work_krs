@@ -29,30 +29,6 @@ class TabPage_SO(QWidget):
 
         self.pakerLabel = QLabel("глубина Нижнего пакера", self)
         self.pakerEdit = QLineEdit(self)
-        if self.countAcid == 0:
-            self.pakerEdit.setText(f"{int(CreatePZ.perforation_sole + 10)}")
-            self.pakerEdit.setClearButtonEnabled(True)
-            self.paker2Label = QLabel("глубина вверхнего пакера", self)
-            self.paker2Edit = QLineEdit(self)
-            self.paker2Edit.setText(f"{int(CreatePZ.perforation_roof - 10)}")
-            self.paker2Edit.setClearButtonEnabled(True)
-            CreatePZ.differencePakers = int(self.pakerEdit.text()) - int(self.paker2Edit.text())
-            CreatePZ.paker2Edit = int(self.pakerEdit.text())
-        if self.countAcid == 1:
-            self.pakerEdit.setText(f"{int(CreatePZ.paker2Edit)}")
-            self.pakerEdit.setClearButtonEnabled(True)
-
-            self.paker2Label = QLabel("глубина вверхнего пакера", self)
-            self.paker2Edit = QLineEdit(self)
-            self.paker2Edit.setText(f"{int(int(CreatePZ.paker2Edit) - CreatePZ.differencePakers)}")
-            self.paker2Edit.setClearButtonEnabled(True)
-        elif self.countAcid == 2:
-            self.pakerEdit.setText(f"{int(CreatePZ.paker2Edit)}")
-            self.pakerEdit.setClearButtonEnabled(True)
-            self.paker2Label = QLabel("глубина вверхнего пакера", self)
-            self.paker2Edit = QLineEdit(self)
-            self.paker2Edit.setText(f"{int(float(CreatePZ.paker2Edit) - CreatePZ.differencePakers)}")
-            self.paker2Edit.setClearButtonEnabled(True)
 
         self.khovstLabel = QLabel("Длина хвостовики", self)
         self.khvostEdit = QLineEdit(self)
@@ -134,20 +110,53 @@ class TabPage_SO(QWidget):
 
         self.swab_pakerLabel = QLabel("Глубина посадки нижнего пакера при освоении", self)
         self.swab_pakerEdit = QLineEdit(self)
-        self.swab_pakerEdit.setText(str(self.pakerEdit.text()))
+
+
 
         self.swab_volumeLabel = QLabel("объем освоения", self)
         self.swab_volumeEdit = QLineEdit(self)
         self.swab_volumeEdit.setText('20')
+        if self.countAcid == 0:
+            self.swab_pakerEdit.setText(str(self.pakerEdit.text()))
+            self.pakerEdit.setText(f"{int(CreatePZ.perforation_sole + 10)}")
+            self.pakerEdit.setClearButtonEnabled(True)
+            self.paker2Label = QLabel("глубина вверхнего пакера", self)
+            self.paker2Edit = QLineEdit(self)
+            self.paker2Edit.setText(f"{int(CreatePZ.perforation_roof - 10)}")
+            self.paker2Edit.setClearButtonEnabled(True)
+            CreatePZ.differencePakers = int(self.pakerEdit.text()) - int(self.paker2Edit.text())
+            CreatePZ.paker2Edit = int(self.pakerEdit.text())
 
         if CreatePZ.countAcid == 1:
-            for enable in [self.khovstLabel, self.khvostEdit, self.swabTruelabelType, self.swabTrueEditType,
-                           self.swabTrueEditType,
+            self.pakerEdit.setText(f"{int(CreatePZ.paker2Edit)}")
+            self.pakerEdit.setClearButtonEnabled(True)
+            self.swabTrueEditType.setCurrentIndex(CreatePZ.swabTrueEditType)
+            self.swab_pakerEdit.setText(str(self.pakerEdit.text()))
+            self.paker2Label = QLabel("глубина вверхнего пакера", self)
+            self.paker2Edit = QLineEdit(self)
+            self.paker2Edit.setText(f"{int(int(CreatePZ.paker2Edit) - CreatePZ.differencePakers)}")
+            self.paker2Edit.setClearButtonEnabled(True)
+
+            self.swab_pakerEdit.setText(f'{CreatePZ.swab_paker}')
+            self.swab_volumeEdit.setText(f'{CreatePZ.swab_volume}')
+            for enable in [self.khovstLabel, self.khvostEdit,
                            self.paker2Edit]:
                 enable.setEnabled(False)
+
         elif CreatePZ.countAcid == 2:
+            self.pakerEdit.setText(f"{int(CreatePZ.paker2Edit)}")
+            self.pakerEdit.setClearButtonEnabled(True)
+            self.paker2Label = QLabel("глубина вверхнего пакера", self)
+            self.paker2Edit = QLineEdit(self)
+            self.paker2Edit.setText(f"{int(float(CreatePZ.paker2Edit) - CreatePZ.differencePakers)}")
+            self.paker2Edit.setClearButtonEnabled(True)
+
+            self.swabTrueEditType.setCurrentIndex(CreatePZ.swabTrueEditType)
+            print(f' освоение {CreatePZ.swab_paker}')
+            self.swab_pakerEdit.setText(f'{CreatePZ.swab_paker}')
+            self.swab_volumeEdit.setText(f'{CreatePZ.swab_volume}')
             listEnabel = [self.khovstLabel, self.khvostEdit, self.swabTruelabelType, self.swabTrueEditType,
-                          self.plastCombo,
+                          self.plastCombo, self.pakerEdit, self.paker2Edit,
                           self.svkTrueEdit, self.QplastEdit, self.skvProcEdit, self.acidEdit, self.acidVolumeEdit,
                           self.acidProcEdit]
             for enable in listEnabel:
@@ -216,12 +225,11 @@ class TabPage_SO(QWidget):
                     if sole_plast <= dict_perforation[plast]['подошва']:
                         sole_plast = dict_perforation[plast]['подошва']
 
-
-
             self.pakerEdit.setText(f"{int(sole_plast + 10)}")
             self.paker2Edit.setText(f"{int(sole_plast - 10)}")
-            self.swab_pakerEdit.setText(f"{int(sole_plast + 10)}")
-            self.swab_pakerEdit.setText(f"{int(sole_plast + 10)}")
+            if CreatePZ.countAcid != 2:
+                self.swab_pakerEdit.setText(f"{int(sole_plast + 10)}")
+                self.swab_pakerEdit.setText(f"{int(sole_plast + 10)}")
 
     def update_paker_edit(self):
         dict_perforation = CreatePZ.dict_perforation
@@ -695,7 +703,7 @@ class AcidPakerWindow(MyWindow):
         acidProcEdit = int(self.tabWidget.currentWidget().acidProcEdit.text().replace(',', '.'))
         swab_paker = int(self.tabWidget.currentWidget().swab_pakerEdit.text().replace(',', '.'))
         swab_volume = int(self.tabWidget.currentWidget().swab_volumeEdit.text().replace(',', '.'))
-        pressure_Edit = int(self.tabWidget.currentWidget().pressure_Edit.text())
+        pressure_Edit = int(self.tabWidget.currentWidget().pressure_Edit.text().replace('.', ''))
         swabType = str(self.tabWidget.currentWidget().swabTypeCombo.currentText())
 
         acidOilProcEdit = self.tabWidget.currentWidget().acidOilProcEdit.text()
@@ -706,7 +714,7 @@ class AcidPakerWindow(MyWindow):
         QplastEdit = str(self.tabWidget.currentWidget().QplastEdit.currentText())
         depthGaugeEdit = str(self.tabWidget.currentWidget().depthGaugeCombo.currentText())
 
-        if (self.if_None(khvostEdit) == 0 or self.if_None(pakerEdit) == 0) and CreatePZ.countAcid != 2:
+        if ((self.if_None(khvostEdit) == 0 or self.if_None(pakerEdit) == 0 or self.if_None(paker2Edit) == 0) and CreatePZ.countAcid != 2):
             msg = QMessageBox.information(self, 'Внимание', 'Не все поля соответствуют значениям')
             return
         # privyazka = str(self.tabWidget.currentWidget().privyazka.currentText())
@@ -715,7 +723,11 @@ class AcidPakerWindow(MyWindow):
             work_list = self.acidSelect(swabTrueEditType, khvostEdit, pakerEdit, paker2Edit, depthGaugeEdit)
             CreatePZ.differencePaker = pakerEdit - paker2Edit
             CreatePZ.swabTypeComboIndex = swabType
+            CreatePZ.swab_paker = swab_paker
+            CreatePZ.swab_volume = swab_volume
             CreatePZ.depthGaugeEdit = depthGaugeEdit
+            CreatePZ.khvostEdit = khvostEdit
+            CreatePZ.swabType = swabType
             for row in self.acid_work(swabTrueEditType, acidProcEdit, khvostEdit, pakerEdit, paker2Edit, skvAcidEdit,
                                       acidEdit, skvVolumeEdit,
                                       QplastEdit, skvProcEdit, plastCombo, acidOilProcEdit, acidVolumeEdit, svkTrueEdit,
@@ -731,16 +743,21 @@ class AcidPakerWindow(MyWindow):
                 CreatePZ.swabTypeComboIndex = 2
 
         elif self.countAcid == 1:
+            CreatePZ.swab_paker = swab_paker
+            CreatePZ.swab_volume = swab_volume
             paker2Edit = pakerEdit - CreatePZ.difference_paker
-            CreatePZ.khvostEdit = paker2Edit
+            CreatePZ.depthGaugeEdit = depthGaugeEdit
+            CreatePZ.khvostEdit = khvostEdit
+            CreatePZ.swabType = swabType
 
-            self.acidSelect(CreatePZ.swabTrueEditType, khvostEdit, pakerEdit, paker2Edit, CreatePZ.depthGaugeEdit)
+
+            self.acidSelect(swabTrueEditType, khvostEdit, pakerEdit, paker2Edit, CreatePZ.depthGaugeEdit)
 
             work_list = [
                 [f'пакер на глубине {pakerEdit}/{paker2Edit}м', None, f'установить пакер на глубине {pakerEdit}/{paker2Edit}м', None, None, None, None, None,
                  None, None,
                  'мастер КРС', 1.2]]
-            for row in self.acid_work(CreatePZ.swabTrueEditType, acidProcEdit, khvostEdit, pakerEdit, paker2Edit,
+            for row in self.acid_work(swabTrueEditType, acidProcEdit, khvostEdit, pakerEdit, paker2Edit,
                                       skvAcidEdit, acidEdit, skvVolumeEdit,
                                       QplastEdit, skvProcEdit, plastCombo, acidOilProcEdit, acidVolumeEdit, svkTrueEdit,
                                       CreatePZ.dict_nkt, pressure_Edit):
@@ -763,7 +780,7 @@ class AcidPakerWindow(MyWindow):
             swabTrueEditType = True if swabTrueEditType == 'Нужно освоение' else False
             if swabTrueEditType:
                 work_list = []
-                swabbing_with_paker = self.swabbing_with_paker(khvostEdit, swab_paker, CreatePZ.differencePaker,
+                swabbing_with_paker = self.swabbing_with_paker(CreatePZ.khvostEdit, swab_paker, CreatePZ.differencePaker,
                                                                swabType, swab_volume)
 
                 for row in swabbing_with_paker:

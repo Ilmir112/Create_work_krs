@@ -90,41 +90,41 @@ def paker_list(self):
             paker_khost, ok = QInputDialog.getInt(None, 'опрессовка ЭК', 'Введите длину хвостовика', 10, 0, 3000)
 
 
-        paker_diametr = paker_diametr_select(paker_depth)
-        if CreatePZ.column_additional == False or CreatePZ.column_additional == True \
-                and paker_depth < CreatePZ.head_column_additional:
+    paker_diametr = paker_diametr_select(paker_depth)
+    if CreatePZ.column_additional is False or CreatePZ.column_additional is True \
+            and paker_depth < CreatePZ.head_column_additional:
 
-            paker_select = f'воронку + НКТ{CreatePZ.nkt_diam}м {paker_khost}м +' \
-                           f' пакер ПРО-ЯМО-{paker_diametr}мм (либо аналог) ' \
-                           f'для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм +' \
-                           f' {nktOpress(self)[0]}'
-            paker_short = f'в-у + НКТ{CreatePZ.nkt_diam}м {paker_khost}м +' \
-                           f' пакер ПРО-ЯМО-{paker_diametr}мм  +' \
-                           f' {nktOpress(self)[0]}'
-        elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr < 110 and \
-                paker_depth > CreatePZ.head_column_additional:
-            paker_select = f'воронку + НКТ{60}мм {paker_khost}м + пакер ПРО-ЯМО-' \
-                           f'{paker_diametr}мм ' \
-                           f'(либо аналог)  ' \
-                           f'для ЭК {CreatePZ.column_additional_diametr}мм х ' \
-                           f'{CreatePZ.column_additional_wall_thickness}мм  + {nktOpress(self)[0]} ' \
-                           f'+ НКТ60мм L- {round(paker_depth - CreatePZ.head_column_additional, 0)}м'
-            paker_short = f'в-у + НКТ{60}мм {paker_khost}м + пакер ПРО-ЯМО-' \
-                           f'{paker_diametr}мм ' \
-                           f' + {nktOpress(self)[0]} ' \
-                           f'+ НКТ60мм L- {round(paker_depth - CreatePZ.head_column_additional, 0)}м'
-        elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr > 110 and \
-                paker_depth > CreatePZ.head_column_additional:
-            paker_select = f'воронку + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками {paker_khost}м + ' \
-                           f'пакер ПРО-ЯМО-{paker_diametr}мм (либо аналог) ' \
-                           f'для ЭК {CreatePZ.column_additional_diametr}мм х ' \
-                           f'{CreatePZ.column_additional_wall_thickness}мм  + {nktOpress(self)[0]}' \
-                           f'+ НКТ{CreatePZ.nkt_diam}мм со снятыми фасками L- ' \
-                           f'{round(paker_depth - CreatePZ.head_column_additional, 0)}м'
-            paker_short = f'в-у + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками {paker_khost}м + ' \
-                           f'пакер ПРО-ЯМО-{paker_diametr}мм + {nktOpress(self)[0]}' \
-                           f'+ НКТ{CreatePZ.nkt_diam}мм со снятыми фасками L- ' \
-                           f'{round(paker_depth - CreatePZ.head_column_additional, 0)}м'
+        paker_select = f'воронку + НКТ{CreatePZ.nkt_diam}м {paker_khost}м +' \
+                       f' пакер ПРО-ЯМО-{paker_diametr}мм (либо аналог) ' \
+                       f'для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм +' \
+                       f' {nktOpress(self)[0]}'
+        paker_short = f'в-у + НКТ{CreatePZ.nkt_diam}м {paker_khost}м +' \
+                       f' пакер ПРО-ЯМО-{paker_diametr}мм  +' \
+                       f' {nktOpress(self)[0]}'
+    elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr < 110 and \
+            paker_depth > CreatePZ.head_column_additional:
+        paker_select = f'воронку + НКТ{60}мм {paker_khost}м + пакер ПРО-ЯМО-' \
+                       f'{paker_diametr}мм ' \
+                       f'(либо аналог)  ' \
+                       f'для ЭК {CreatePZ.column_additional_diametr}мм х ' \
+                       f'{CreatePZ.column_additional_wall_thickness}мм  + {nktOpress(self)[0]} ' \
+                       f'+ НКТ60мм L- {round(paker_depth - CreatePZ.head_column_additional, 0)}м'
+        paker_short = f'в-у + НКТ{60}мм {paker_khost}м + пакер ПРО-ЯМО-' \
+                       f'{paker_diametr}мм ' \
+                       f' + {nktOpress(self)[0]} ' \
+                       f'+ НКТ60мм L- {round(paker_depth - CreatePZ.head_column_additional, 0)}м'
+    elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr > 110 and \
+            paker_depth > CreatePZ.head_column_additional:
+        paker_select = f'воронку + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками {paker_khost}м + ' \
+                       f'пакер ПРО-ЯМО-{paker_diametr}мм (либо аналог) ' \
+                       f'для ЭК {CreatePZ.column_additional_diametr}мм х ' \
+                       f'{CreatePZ.column_additional_wall_thickness}мм  + {nktOpress(self)[0]}' \
+                       f'+ НКТ{CreatePZ.nkt_diam}мм со снятыми фасками L- ' \
+                       f'{round(paker_depth - CreatePZ.head_column_additional, 0)}м'
+        paker_short = f'в-у + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками {paker_khost}м + ' \
+                       f'пакер ПРО-ЯМО-{paker_diametr}мм + {nktOpress(self)[0]}' \
+                       f'+ НКТ{CreatePZ.nkt_diam}мм со снятыми фасками L- ' \
+                       f'{round(paker_depth - CreatePZ.head_column_additional, 0)}м'
 
 
 
@@ -227,8 +227,8 @@ def paker_list(self):
 
                 pakerNEK, ok = QInputDialog.getInt(None, 'опрессовка ЭК',
                                                    'Введите глубину посадки пакера для под НЭК',
-                                                   int(dict_leakinest_keys[0][1]) + 10, 0,
-                                                   int(CreatePZ.perforation_sole))
+                                                   int(dict_leakinest_keys[0][0]) + 10, 0,
+                                                   int(CreatePZ.current_bottom))
                 nek1 = "-".join(map(str, list(dict_leakinest_keys[0])))
                 paker_list = [
                     [f'СПО {paker_short} до глубины {pakerNEK}', None,

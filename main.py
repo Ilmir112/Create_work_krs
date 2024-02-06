@@ -1,4 +1,5 @@
 import os
+import sqlite3
 import sys
 import openpyxl
 from openpyxl.reader.excel import load_workbook
@@ -19,6 +20,8 @@ from openpyxl.drawing.image import Image
 from H2S import calc_H2S
 from PyQt5.QtCore import QThread, pyqtSignal
 from data_correct_position_people import CorrectSignaturesWindow
+from data_base.work_with_base import export_to_sqlite_without_juming, open_to_sqlite_without_juming, \
+    export_to_sqlite_class_well, open_to_sqlite_class_well
 
 class ExcelWorker(QThread):
     finished = pyqtSignal()
@@ -26,20 +29,143 @@ class ExcelWorker(QThread):
     def __init__(self):
         super().__init__()
 
-    def run(self):
+    def check_well_existence(self, well_number, deposit_area, region):
         from open_pz import CreatePZ
-        fname = 'data_klassifer/Перечень скважин без глушения.xlsx'
-        workb = load_workbook(fname, data_only=True)
-        sheet = workb.active
-        without_damping = False
-        for row in sheet.iter_rows(values_only=True):
-            if CreatePZ.well_area == row[4] and str(CreatePZ.well_number) == str(row[5]):
-                without_damping = True
+        # Подключение к базе данных SQLite
+        conn = sqlite3.connect('data_base/database_without_juming.db')
+        cursor = conn.cursor()
+        current_year = datetime.now().year
+        month = datetime.now().month
+        print(f'месяц {month}')
+        if 1 <= month < 4:
+            date_string = datetime(current_year, 1, 1).strftime('%d.%m.%Y')
+            print(f'Корректная таблица перечня без глушения от {date_string}')
+        elif 4 <= month < 7:
+            date_string = datetime(current_year, 4, 1).strftime('%d.%m.%Y')
+            print(f'Корректная таблица перечня без глушения от {date_string}')
+        elif 7 <= month < 10:
+            date_string = datetime(current_year, 7, 1).strftime('%d.%m.%Y')
+            print(f'Корректная таблица перечня без глушения от {date_string}')
+        elif 10 >= month <= 12:
+            date_string = datetime(current_year, 10, 1).strftime('%d.%m.%Y')
+            print(f'Корректная таблица перечня без глушения от {date_string}')
 
-        CreatePZ.without_damping = without_damping
 
+        if region == 'КГМ':
+            # Проверка наличия записи в базе данных
+            cursor.execute(f"SELECT *  FROM КГМ WHERE today =?", (date_string,))
 
+            result = cursor.fetchone()
+            if result is None:
+                mes = QMessageBox.warning(self, 'Некорректная дата перечня',
+                                          f'Необходимо обновить перечень скважин без глушения на текущий квартал {region}')
+            # Проверка наличия записи в базе данных
+            cursor.execute(f"SELECT * FROM КГМ WHERE well_number=? AND deposit_area=?", (well_number, deposit_area))
+            result = cursor.fetchone()
+            # Закрытие соединения с базой данных
+            conn.close()
+            # Если запись найдена, возвращается True, в противном случае возвращается False
+            if result:
+                date_reload = result[2]
+                mes = QMessageBox.information(self, 'перечень без глушения',
+                                              f'Скважина состоит в перечне скважин без глушения на текущий квартал, '
+                                              f'в перечне от {date_reload} {region}')
+                return True
+            else:
+                return False
+        if region == 'ЧГМ':
+            # Проверка наличия записи в базе данных
+            cursor.execute(f"SELECT *  FROM ЧГМ WHERE today =?", (date_string,))
+            result = cursor.fetchone()
+            if result is None:
+                mes = QMessageBox.warning(self, 'Некорректная дата перечня',
+                                          f'Необходимо обновить перечень скважин без глушения на текущий квартал {region}')
+            # Проверка наличия записи в базе данных
+            cursor.execute(f"SELECT * FROM ЧГМ WHERE well_number=? AND deposit_area=?", (well_number, deposit_area))
+            result = cursor.fetchone()
+            # Закрытие соединения с базой данных
+            conn.close()
 
+            # Если запись найдена, возвращается True, в противном случае возвращается False
+            if result:
+                date_reload = result[2]
+                mes = QMessageBox.information(self, 'перечень без глушения',
+                                              f'Скважина состоит в перечне скважин без глушения на текущий квартал, '
+                                              f'в перечне от {date_reload} {region}')
+                return True
+            else:
+                return False
+
+        if region == 'ТГМ':
+            # Проверка наличия записи в базе данных
+            cursor.execute(f"SELECT *  FROM ТГМ WHERE today =?", (date_string,))
+            result = cursor.fetchone()
+            if result is None:
+                mes = QMessageBox.warning(self, 'Некорректная дата перечня',
+                                          'Необходимо обновить перечень скважин без глушения на текущий квартал')
+
+            # Проверка наличия записи в базе данных
+            cursor.execute(f"SELECT * FROM ТГМ WHERE well_number=? AND deposit_area=?", (well_number, deposit_area))
+            result = cursor.fetchone()
+
+            # Закрытие соединения с базой данных
+            conn.close()
+            # Если запись найдена, возвращается True, в противном случае возвращается False
+            if result:
+                date_reload = result[2]
+                mes = QMessageBox.information(self, 'перечень без глушения',
+                                              f'Скважина состоит в перечне скважин без глушения на текущий квартал, '
+                                              f'в перечне от {date_reload} {region}')
+                return True
+            else:
+                return False
+
+        if region == 'ИГМ':
+            # Проверка наличия записи в базе данных
+            cursor.execute(f"SELECT *  FROM ИГМ WHERE today =?", (date_string,))
+
+            result = cursor.fetchone()
+            if result is None:
+                mes = QMessageBox.warning(self, 'Некорректная дата перечня',
+                                          'Необходимо обновить перечень скважин без глушения на текущий квартал')
+            # Проверка наличия записи в базе данных
+            cursor.execute(f"SELECT * FROM ИГМ WHERE well_number=? AND deposit_area=?", (well_number, deposit_area))
+            result = cursor.fetchone()
+            # Закрытие соединения с базой данных
+            conn.close()
+
+            # Если запись найдена, возвращается True, в противном случае возвращается False
+            if result:
+                date_reload = result[2]
+                mes = QMessageBox.information(self, 'перечень без глушения',
+                                              f'Скважина состоит в перечне скважин без глушения на текущий квартал, '
+                                              f'в перечне от {date_reload} {region}')
+                return True
+            else:
+                return False
+
+        if region == 'АГМ':
+            # Проверка наличия записи в базе данных
+            cursor.execute(f"SELECT *  FROM АГМ WHERE today =?", (date_string,))
+            result = cursor.fetchone()
+            if result is None:
+                mes = QMessageBox.warning(self, 'Некорректная дата перечня',
+                                          'Необходимо обновить перечень скважин без глушения на текущий квартал')
+            # Проверка наличия записи в базе данных
+            cursor.execute(f"SELECT * FROM АГМ WHERE well_number=? AND deposit_area=?", (well_number, deposit_area))
+            result = cursor.fetchone()
+            # Закрытие соединения с базой данных
+            conn.close()
+
+            # Если запись найдена, возвращается True, в противном случае возвращается False
+            if result:
+                date_reload = result[2]
+                mes = QMessageBox.information(self, 'перечень без глушения',
+                                              f'Скважина состоит в перечне скважин без глушения на текущий квартал, '
+                                              f'в перечне от {date_reload} {region}')
+                return True
+            else:
+                return False
 class MyWindow(QMainWindow):
 
     def __init__(self, table_widget = None):
@@ -51,6 +177,11 @@ class MyWindow(QMainWindow):
         self.signatures_window = None
         self.acid_windowPaker2 = None
         self.data_window = None
+        self.filter_widgets = []
+        self.table_class = None
+        self.table_juming = None
+
+
         self.perforation_correct_window2 = None
         self.ws = None
         self.ins_ind = None
@@ -111,8 +242,49 @@ class MyWindow(QMainWindow):
         self.save_file = self.fileMenu.addAction('Сохранить', self.action_clicked)
         self.save_file_as = self.fileMenu.addAction('Сохранить как', self.action_clicked)
 
-        self.class_well = self.classifierMenu.addAction('&классификатор')
-        self.list_without_jamming = self.classifierMenu.addAction('&Перечень без глушения')
+        self.class_well = self.classifierMenu.addMenu('&ООО Башнефть-Добыча')
+        self.costumer_class_well = self.class_well.addMenu('Классификатор')
+        self.costumer_select = self.class_well.addMenu('Перечень скважин без глушения')
+
+        self.class_well_TGM = self.costumer_class_well.addMenu('&Туймазинский регион')
+        self.class_well_TGM_open = self.class_well_TGM.addAction('&открыть перечень', self.action_clicked)
+        self.class_well_TGM_reload = self.class_well_TGM.addAction('&обновить', self.action_clicked)
+
+        self.class_well_IGM = self.costumer_class_well.addMenu('&Ишимбайский регион')
+        self.class_well_IGM_open = self.class_well_IGM.addAction('&открыть перечень', self.action_clicked)
+        self.class_well_IGM_reload = self.class_well_IGM.addAction('&обновить', self.action_clicked)
+
+        self.class_well_CHGM = self.costumer_class_well.addMenu('&Чекмагушевский регион')
+        self.class_well_CHGM_open = self.class_well_CHGM.addAction('&открыть перечень', self.action_clicked)
+        self.class_well_CHGM_reload = self.class_well_CHGM.addAction('&обновить', self.action_clicked)
+
+        self.class_well_KGM = self.costumer_class_well.addMenu('&Краснохолмский регион')
+        self.class_well_KGM_open = self.class_well_KGM.addAction('&открыть перечень', self.action_clicked)
+        self.class_well_KGM_reload = self.class_well_KGM.addAction('&обновить', self.action_clicked)
+
+        self.class_well_AGM = self.costumer_class_well.addMenu('&Арланский регион')
+        self.class_well_AGM_open = self.class_well_AGM.addAction('&открыть перечень', self.action_clicked)
+        self.class_well_AGM_reload = self.class_well_AGM.addAction('&обновить', self.action_clicked)
+
+        self.without_jamming_TGM = self.costumer_select.addMenu('&Туймазинский регион')
+        self.without_jamming_TGM_open = self.without_jamming_TGM.addAction('&открыть перечень', self.action_clicked)
+        self.without_jamming_TGM_reload = self.without_jamming_TGM.addAction('&обновить', self.action_clicked)
+
+        self.without_jamming_IGM = self.costumer_select.addMenu('&Ишимбайский регион')
+        self.without_jamming_IGM_open = self.without_jamming_IGM.addAction('&открыть перечень', self.action_clicked)
+        self.without_jamming_IGM_reload = self.without_jamming_IGM.addAction('&обновить', self.action_clicked)
+
+        self.without_jamming_CHGM = self.costumer_select.addMenu('&Чекмагушевский регион')
+        self.without_jamming_CHGM_open = self.without_jamming_CHGM.addAction('&открыть перечень', self.action_clicked)
+        self.without_jamming_CHGM_reload = self.without_jamming_CHGM.addAction('&обновить', self.action_clicked)
+
+        self.without_jamming_KGM = self.costumer_select.addMenu('&Краснохолмский регион')
+        self.without_jamming_KGM_open = self.without_jamming_KGM.addAction('&открыть перечень', self.action_clicked)
+        self.without_jamming_KGM_reload = self.without_jamming_KGM.addAction('&обновить', self.action_clicked)
+
+        self.without_jamming_AGM = self.costumer_select.addMenu('&Арланский регион')
+        self.without_jamming_AGM_open = self.without_jamming_AGM.addAction('&открыть перечень', self.action_clicked)
+        self.without_jamming_AGM_reload = self.without_jamming_AGM.addAction('&обновить', self.action_clicked)
 
         self.signatories_Bnd = self.signatories.addAction('&БашНефть-Добыча', self.action_clicked)
 
@@ -166,6 +338,25 @@ class MyWindow(QMainWindow):
 
                 # if action == self.save_file:
                 #     open_pz.open_excel_file().wb.save("test_unmerge.xlsx")
+
+        elif action == self.create_GNKT_frez:
+            self.tableWidgetOpen()
+
+            self.fname, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
+                                                                  "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
+
+            if self.fname:
+                try:
+                    self.work_plan = 'gnkt_frez'
+                    sheet = CreatePZ.open_excel_file(self, self.fname, self.work_plan)
+                    # self.copy_pz(sheet)
+
+                except FileNotFoundError:
+                    print('Файл не найден')
+
+                # if action == self.save_file:
+                #     open_pz.open_excel_file().wb.save("test_unmerge.xlsx")
+
         elif action == self.save_file:
             self.save_to_excel
 
@@ -180,7 +371,157 @@ class MyWindow(QMainWindow):
                 self.signatures_window.setGeometry(200, 400, 300, 400)
                 self.signatures_window.show()
 
+        elif action == self.without_jamming_TGM_reload:
+            costumer = 'ООО Башнефть-добыча'
+            self.reload_without_damping(costumer, 'ТГМ')
+        elif action == self.without_jamming_IGM_reload:
+            costumer = 'ООО Башнефть-добыча'
+            self.reload_without_damping(costumer, 'ИГМ')
+        elif action == self.without_jamming_CHGM_reload:
+            costumer = 'ООО Башнефть-добыча'
+            self.reload_without_damping(costumer, 'ЧГМ')
+        elif action == self.without_jamming_KGM_reload:
+            costumer = 'ООО Башнефть-добыча'
+            self.reload_without_damping(costumer, 'КГМ')
+        elif action == self.without_jamming_AGM_reload:
+            costumer = 'ООО Башнефть-добыча'
+            self.reload_without_damping(costumer, 'АГМ')
 
+        elif action == self.without_jamming_TGM_open:
+            costumer = 'ООО Башнефть-добыча'
+            self.open_without_damping(costumer, 'ТГМ')
+        elif action == self.without_jamming_IGM_open:
+            costumer = 'ООО Башнефть-добыча'
+            self.open_without_damping(costumer, 'ИГМ')
+        elif action == self.without_jamming_CHGM_open:
+            costumer = 'ООО Башнефть-добыча'
+            self.open_without_damping(costumer, 'ЧГМ')
+        elif action == self.without_jamming_KGM_open:
+            costumer = 'ООО Башнефть-добыча'
+            self.open_without_damping(costumer, 'КГМ')
+        elif action == self.without_jamming_AGM_open:
+            costumer = 'ООО Башнефть-добыча'
+            self.open_without_damping(costumer, 'АГМ')
+
+
+        elif action == self.class_well_TGM_reload:
+            costumer = 'ООО Башнефть-добыча'
+            self.reload_class_well(costumer, 'ТГМ')
+
+        elif action == self.class_well_IGM_reload:
+            costumer = 'ООО Башнефть-добыча'
+            self.reload_class_well(costumer, 'ИГМ')
+        elif action == self.class_well_CHGM_reload:
+            costumer = 'ООО Башнефть-добыча'
+            self.reload_class_well(costumer, 'ЧГМ')
+        elif action == self.class_well_KGM_reload:
+            costumer = 'ООО Башнефть-добыча'
+            self.reload_class_well(costumer, 'КГМ')
+        elif action == self.class_well_AGM_reload:
+            costumer = 'ООО Башнефть-добыча'
+            self.reload_class_well(costumer, 'АГМ')
+
+        elif action == self.class_well_TGM_open:
+            costumer = 'ООО Башнефть-добыча'
+            self.open_class_well(costumer, 'ТГМ')
+        elif action == self.class_well_IGM_open:
+            costumer = 'ООО Башнефть-добыча'
+            self.open_class_well(costumer, 'ИГМ')
+        elif action == self.class_well_CHGM_open:
+            costumer = 'ООО Башнефть-добыча'
+            self.open_class_well(costumer, 'ЧГМ')
+        elif action == self.class_well_KGM_open:
+            costumer = 'ООО Башнефть-добыча'
+            self.open_class_well(costumer, 'КГМ')
+        elif action == self.class_well_AGM_open:
+            costumer = 'ООО Башнефть-добыча'
+            self.open_class_well(costumer, 'АГМ')
+
+    def reload_class_well(self, costumer, region):
+        self.fname, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
+                                                              "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
+        if self.fname:
+            try:
+                copy = export_to_sqlite_class_well(self, self.fname, costumer, region)
+
+            except FileNotFoundError:
+                print('Файл не найден')
+
+    def open_without_damping(self, costumer, region):
+        self.tableDampingWidgetOpen()
+
+        copy = open_to_sqlite_without_juming(self, self.table_juming, costumer, region)
+
+    def open_class_well(self, costumer, region):
+        self.tableClassifisierOpen()
+        region = f'{region}_классификатор'
+        copy = open_to_sqlite_class_well(self, self.table_class, costumer, region)
+
+
+    def reload_without_damping(self, costumer, region):
+
+        self.fname, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
+                                                              "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
+        if self.fname:
+            try:
+                copy = export_to_sqlite_without_juming(self, self.fname, costumer, region)
+
+            except FileNotFoundError:
+                print('Файл не найден')
+
+    def tableDampingWidgetOpen(self):
+        if self.table_juming is None:
+            self.table_juming = QTableWidget()
+
+            self.table_juming.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+            self.table_juming.customContextMenuRequested.connect(self.openContextMenu)
+            self.setCentralWidget(self.table_juming)
+            self.model = self.table_juming.model()
+
+            # Этот сигнал испускается всякий раз, когда ячейка в таблице нажата.
+            # Указанная строка и столбец - это ячейка, которая была нажата.
+            self.table_juming.cellPressed[int, int].connect(self.clickedRowColumn)
+
+    def tableClassifisierOpen(self):
+        if self.table_class is None:
+            self.table_class = QTableWidget()
+
+            self.table_class.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+            self.table_class.customContextMenuRequested.connect(self.openContextMenu)
+            self.setCentralWidget(self.table_class)
+            self.model = self.table_class.model()
+
+            # Этот сигнал испускается всякий раз, когда ячейка в таблице нажата.
+            # Указанная строка и столбец - это ячейка, которая была нажата.
+            self.table_class.cellPressed[int, int].connect(self.clickedRowColumn)
+
+    def filter(self, filter_text):
+        for i in range(1, self.table_juming.rowCount() + 1):
+            for j in range(0, 1, 2):
+                item = self.table_juming.item(i, j)
+                if item:
+                    match = filter_text.lower() not in item.text().lower()
+                    self.table_juming.setRowHidden(i, match)
+                    if not match:
+                        break
+    def filter_class(self, filter_text):
+        for i in range(1, self.table_class.rowCount() + 1):
+            for j in range(1, 2):
+                item = self.table_class.item(i, j)
+                if item:
+                    match = filter_text.lower() not in item.text().lower()
+                    self.table_class.setRowHidden(i, match)
+                    if not match:
+                        break
+    def filter_class_area(self, filter_text):
+        for i in range(1, self.table_class.rowCount() + 1):
+            for j in range(2):
+                item = self.table_class.item(i, j)
+                if item:
+                    match = filter_text.lower() not in item.text().lower()
+                    self.table_class.setRowHidden(i, match)
+                    if not match:
+                        break
 
 
     def tableWidgetOpen(self):
@@ -1297,27 +1638,27 @@ class MyWindow(QMainWindow):
         ws4.cell(row= 1, column=1).value = CreatePZ.well_number
         ws4.cell(row=2, column=1).value = CreatePZ.well_area
 
-        if CreatePZ.dict_pump_SHGN["do"] != "0" and  CreatePZ.dict_pump_ECN["do"] == "0" and\
+        if CreatePZ.dict_pump_SHGN["do"] != 0 and  CreatePZ.dict_pump_ECN["do"] == 0 and\
                 CreatePZ.paker_do["do"] == 0:
             ws4.cell(row=3, column=1).value = f'{CreatePZ.dict_pump_SHGN["do"]} -на гл. {CreatePZ.dict_pump_SHGN_h["do"]}м'
-        elif CreatePZ.dict_pump_SHGN["do"] == "0" and CreatePZ.dict_pump_ECN["do"] != "0" and\
+        elif CreatePZ.dict_pump_SHGN["do"] == 0 and CreatePZ.dict_pump_ECN["do"] != 0 and\
                 CreatePZ.paker_do["do"] == 0:
             ws4.cell(row=3, column=1).value = f'{CreatePZ.dict_pump_ECN["do"]} -на гл. {CreatePZ.dict_pump_ECN_h["do"]}м'
-        elif CreatePZ.dict_pump_SHGN["do"] == "0" and CreatePZ.dict_pump_ECN["do"] != "0" and\
+        elif CreatePZ.dict_pump_SHGN["do"] == 0 and CreatePZ.dict_pump_ECN["do"] != 0 and\
                 CreatePZ.paker_do["do"] != 0:
             ws4.cell(row=3, column=1).value = f'{CreatePZ.dict_pump_ECN["do"]} -на гл. {CreatePZ.dict_pump_ECN_h["do"]}м \n' \
                                               f'{CreatePZ.paker_do["do"]} на {CreatePZ.H_F_paker_do["do"]}м'
-        elif CreatePZ.dict_pump_SHGN["do"] != "0" and  CreatePZ.dict_pump_ECN["do"] == "0" and\
+        elif CreatePZ.dict_pump_SHGN["do"] != 0 and  CreatePZ.dict_pump_ECN["do"] == 0 and\
                 CreatePZ.paker_do["do"] != 0:
             ws4.cell(row=3, column=1).value = f'{CreatePZ.dict_pump_SHGN["do"]} -на гл. {CreatePZ.dict_pump_SHGN_h["do"]}м \n' \
                                               f'{CreatePZ.paker_do["do"]} на {CreatePZ.H_F_paker_do["do"]}м'
-        elif CreatePZ.dict_pump_SHGN["do"] == "0" and CreatePZ.dict_pump_ECN["do"] == "0" and\
+        elif CreatePZ.dict_pump_SHGN["do"] == 0 and CreatePZ.dict_pump_ECN["do"] == 0 and\
                 CreatePZ.paker_do["do"] != 0:
             ws4.cell(row=3, column=1).value = f'{CreatePZ.paker_do["do"]} на {CreatePZ.H_F_paker_do["do"]}м'
-        elif CreatePZ.dict_pump_SHGN["do"] == "0" and CreatePZ.dict_pump_ECN["do"] == "0" and\
+        elif CreatePZ.dict_pump_SHGN["do"] == 0 and CreatePZ.dict_pump_ECN["do"] == 0 and\
                 CreatePZ.paker_do["do"] == 0:
             ws4.cell(row=3, column=1).value = " "
-        elif CreatePZ.dict_pump_SHGN["do"] != "0" and CreatePZ.dict_pump_ECN["do"] != "0" and\
+        elif CreatePZ.dict_pump_SHGN["do"] != 0 and CreatePZ.dict_pump_ECN["do"] != 0 and\
                 CreatePZ.paker_do["do"] != 0:
             ws4.cell(row=3, column=1).value = f'{CreatePZ.dict_pump_SHGN["do"]} -на гл. {CreatePZ.dict_pump_SHGN_h["do"]}м \n' \
                                               f'{CreatePZ.dict_pump_ECN["do"]} -на гл. {CreatePZ.dict_pump_ECN_h["do"]}м \n' \

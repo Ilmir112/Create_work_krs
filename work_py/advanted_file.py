@@ -212,6 +212,14 @@ def raiding_interval(ryber_key):
                         if float(i[1]) <= CreatePZ.current_bottom and float(i[0]) <= CreatePZ.current_bottom:
                             if float(i[1]) + 20 <= CreatePZ.current_bottom:
                                 crt = [float(i[0]) - 20, float(i[1]) + 20]
+                            elif float(i[1]) + 20 >= CreatePZ.shoe_column and CreatePZ.column_additional is False:
+                                crt = [float(i[0]) - 20, CreatePZ.shoe_column]
+                            elif float(i[1]) + 20 >= CreatePZ.shoe_column_additional and CreatePZ.column_additional:
+                                crt = [float(i[0]) - 20, CreatePZ.shoe_column]
+                            elif int(i[0]) == int(CreatePZ.shoe_column) and CreatePZ.column_additional is False:
+                                pass
+                            elif int(i[1]) == int(CreatePZ.shoe_column_additional) and CreatePZ.column_additional:
+                                pass
                             else:
                                 crt = [float(i[0]) - 20, CreatePZ.current_bottom]
                             str_raid.append(crt)
@@ -227,14 +235,10 @@ def raiding_interval(ryber_key):
 
     if CreatePZ.leakiness == True:
         roof_leakiness = float(list(CreatePZ.dict_leakiness['НЭК']['интервал'].keys())[0][0])
-        if len(CreatePZ.dict_leakiness['НЭК']['интервал']) == 1 and roof_leakiness + 30 <= CreatePZ.current_bottom:
-            str_raid.append([roof_leakiness - 30, roof_leakiness + 30])
-        elif len(
-                CreatePZ.dict_leakiness['НЭК']['интервал']) == 1 and roof_leakiness + 30 >= CreatePZ.current_bottom:
-            str_raid.append([roof_leakiness - 30, CreatePZ.current_bottom])
 
-        for nek in CreatePZ.dict_leakiness['НЭК']['интервал'].keys():
-            if CreatePZ.dict_leakiness['НЭК']['интервал'][nek]['отрайбировано'] == False:
+
+        for nek in list(CreatePZ.dict_leakiness['НЭК']['интервал'].keys()):
+            if CreatePZ.dict_leakiness['НЭК']['интервал'][nek]['отрайбировано'] is False:
 
                 if float(nek[1]) + 30 <= CreatePZ.current_bottom and float(nek[0]) + 30 <= CreatePZ.current_bottom:
                     crt = (float(nek[0]) - 30, float(nek[1]) + 30)
@@ -270,20 +274,21 @@ def raiding_interval(ryber_key):
                 mes = QMessageBox.warning(None, 'Введенны не корректные данные')
                 skm_column, ok = QInputDialog.getText(None, 'Райбирование',
                                                       'Введите интервал райбирования через тире')
-        str_raid.append((skm_column.split('-')[0], skm_column.split('-')[1]))
+        str_raid.append((int(skm_column.split('-')[0]), int(skm_column.split('-')[1])))
 
     merged_segments = merge_overlapping_intervals(str_raid)
-
-    for plast in CreatePZ.plast_work:
-        for interval in list((CreatePZ.dict_perforation[plast]['интервал'])):
+    if CreatePZ.dict_leakiness:
+        for nek in list(CreatePZ.dict_leakiness['НЭК']['интервал'].keys()):
             for str in str_raid:
-                if str[0] <= list(interval)[0] <= str[1]:
-                    CreatePZ.dict_perforation[plast]['отрайбировано'] = True
-    for plast in CreatePZ.plast_all:
-        for interval in list((CreatePZ.dict_perforation[plast]['интервал'])):
-            for str in str_raid:
-                if str[0] <= list(interval)[0] <= str[1]:
-                    CreatePZ.dict_perforation[plast]['отрайбировано'] = True
+                print(str[0], list(nek)[0], str[1])
+                if str[0] <= list(nek)[0] <= str[1]:
+                    CreatePZ.dict_leakiness['НЭК']['интервал'][nek]['отрайбировано'] = True
+    if CreatePZ.plast_all:
+        for plast in CreatePZ.plast_all:
+            for interval in list((CreatePZ.dict_perforation[plast]['интервал'])):
+                for str in str_raid:
+                    if str[0] <= list(interval)[0] <= str[1]:
+                        CreatePZ.dict_perforation[plast]['отрайбировано'] = True
 
 
     return merged_segments
@@ -292,6 +297,7 @@ def raiding_interval(ryber_key):
 def merge_overlapping_intervals(intervals):
     from open_pz import CreatePZ
     merged = []
+    print(intervals)
     intervals = sorted(intervals, key=lambda x: x[0])
     for interval in intervals:
         if not merged or interval[0] > merged[-1][1]:

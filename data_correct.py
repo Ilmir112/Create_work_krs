@@ -112,7 +112,10 @@ class TabPage_SO(QWidget):
 
         self.pump_SHGN_depth_do_Label = QLabel('Глубина штангового насоса')
         self.pump_SHGN_depth_do_EditType = FloatLineEdit(self)
-        self.pump_SHGN_depth_do_EditType.setText(f'{self.ifNone(CreatePZ.dict_pump_SHGN_h["do"])}')
+        if self.pump_SHGN_do_EditType.text() != 'отсут':
+            self.pump_SHGN_depth_do_EditType.setText(f'{self.ifNone(CreatePZ.dict_pump_SHGN_h["do"])}')
+        else:
+            self.pump_SHGN_depth_do_EditType.setText('отсут')
 
         self.pump_SHGN_posle_Label = QLabel('Плановый штанговый насос')
         self.pump_SHGN_posle_EditType = QLineEdit(self)
@@ -120,7 +123,10 @@ class TabPage_SO(QWidget):
 
         self.pump_SHGN_depth_posle_Label = QLabel('Плановая глубина спуска насоса')
         self.pump_SHGN_depth_posle_EditType = FloatLineEdit(self)
-        self.pump_SHGN_depth_posle_EditType.setText(f'{self.ifNone(CreatePZ.dict_pump_SHGN_h["posle"])}')
+        if self.pump_SHGN_posle_EditType.text() != 'отсут':
+            self.pump_SHGN_depth_posle_EditType.setText(f'{self.ifNone(CreatePZ.dict_pump_SHGN_h["posle"])}')
+        else:
+            self.pump_SHGN_depth_posle_EditType.setText('отсут')
 
         self.pump_ECN_do_Label = QLabel('Спущенный ЭЦН')
         self.pump_ECN_do_EditType = QLineEdit(self)
@@ -128,7 +134,10 @@ class TabPage_SO(QWidget):
 
         self.pump_ECN_depth_do_Label = QLabel('Глубина спуска ЭЦН')
         self.pump_ECN_depth_do_EditType = FloatLineEdit(self)
-        self.pump_ECN_depth_do_EditType.setText(f'{self.ifNone(CreatePZ.dict_pump_ECN_h["do"])}')
+        if self.pump_ECN_do_EditType.text() != 'отсут':
+            self.pump_ECN_depth_do_EditType.setText(f'{self.ifNone(CreatePZ.dict_pump_ECN_h["do"])}')
+        else:
+            self.pump_ECN_depth_do_EditType.setText('отсут')
 
         self.pump_ECN_posle_Label = QLabel('Плановый ЭЦН на спуск')
         self.pump_ECN_posle_EditType = QLineEdit(self)
@@ -136,7 +145,10 @@ class TabPage_SO(QWidget):
 
         self.pump_ECN_depth_posle_Label = QLabel('Плановая глубина спуска ЭЦН')
         self.pump_ECN_depth_posle_EditType = FloatLineEdit(self)
-        self.pump_ECN_depth_posle_EditType.setText(f'{self.ifNone(CreatePZ.dict_pump_ECN_h["posle"])}')
+        if self.pump_ECN_posle_EditType.text() != 'отсут':
+            self.pump_ECN_depth_posle_EditType.setText(f'{self.ifNone(CreatePZ.dict_pump_ECN_h["posle"])}')
+        else:
+            self.pump_ECN_depth_posle_EditType.setText('отсут')
 
 
         self.paker_do_Label = QLabel('Спущенный пакер')
@@ -415,8 +427,9 @@ class TabPage_SO(QWidget):
             return 'отсут'
         elif str(string).replace('.', '').replace(',', '').isdigit():
 
-            # print(str(round(float(string), 1))[-1] == 0, int(string), float(string))
-            return int(string) if str(round(float(str(string).replace(',', '.')), 1))[-1] == "0" else float(str(string).replace(',', '.'))
+            # print(str(round(float(string), 1))[-1] == '0', int(string), float(string))
+            return int(float(string)) if str(round(float(str(string).replace(',', '.')), 1))[-1] == "0" else\
+                round(float(str(string).replace(',', '.')), 1)
         else:
             return str(string)
     def updateLabel(self):
@@ -546,8 +559,6 @@ class DataWindow(QMainWindow):
         if self.ifNum(columnType) is False \
                 or self.ifNum(column_wall_thickness) is False \
                 or self.ifNum(shoe_column) is False \
-                or shoe_column == 'отсут' \
-                or columnType == 'отсут' \
                 or self.ifNum(column_additional_diametr) is False \
                 or self.ifNum(column_additional_wall_thickness) is False \
                 or self.ifNum(shoe_column_additional) is False \
@@ -591,7 +602,7 @@ class DataWindow(QMainWindow):
             return
 
         elif self.if_None(20 if self.ifNum(head_column_additional) else head_column_additional) < 5:
-            print(self.if_None(head_column_additional))
+            # print(self.if_None(head_column_additional))
             msg = QMessageBox.information(self, 'Внимание', 'В скважине отсутствует доп колонна')
             return
 
@@ -604,7 +615,7 @@ class DataWindow(QMainWindow):
             CreatePZ.column_additional_wall_thickness = self.if_None(column_additional_wall_thickness)
             CreatePZ.shoe_column_additional = self.if_None(shoe_column_additional)
             CreatePZ.head_column_additional = self.if_None(head_column_additional)
-            print(f'fffffff {CreatePZ.head_column_additional}')
+
             CreatePZ.bottomhole_drill = self.if_None(bottomhole_drill)
             CreatePZ.bottomhole_artificial =  self.if_None(bottomhole_artificial)
             CreatePZ.current_bottom =  self.if_None(current_bottom)
@@ -612,6 +623,7 @@ class DataWindow(QMainWindow):
             CreatePZ.max_expected_pressure = self.if_None(max_expected_pressure)
             CreatePZ.max_admissible_pressure = self.if_None(max_admissible_pressure)
 
+            # print(f'макс {CreatePZ.max_expected_pressure}')
             CreatePZ.dict_pump_SHGN["do"] = self.if_None(dict_pump_SHGN_do)
             CreatePZ.dict_pump_SHGN_h["do"] = self.if_None(dict_pump_SHGN_h_do)
             CreatePZ.dict_pump_SHGN_h["posle"] = self.if_None(dict_pump_SHGN_h_posle)
@@ -646,9 +658,12 @@ class DataWindow(QMainWindow):
         elif isinstance(value, int):
             return int(value)
         elif str(value).replace('.','').replace(',','').isdigit():
-            if str(round(float(value.replace(',','.')), 1))[-1] == 0:
+
+            if str(round(float(value.replace(',','.')), 1))[-1] == "0":
+
                 return int(float(value.replace(',','.')))
             else:
+
                 return round(float(value.replace(',','.')), 1)
         else:
             return value

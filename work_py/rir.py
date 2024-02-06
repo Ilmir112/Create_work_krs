@@ -17,7 +17,7 @@ def rir_rpp(self):
     rir_list = []
 
     open_checkbox_dialog()
-    CreatePZ.plast_select =  plast
+    plast = CreatePZ.plast_select
 
     rir_rpk_question = QMessageBox.question(self, 'посадку между пластами?', 'посадку между пластами?')
     if rir_rpk_question == QMessageBox.StandardButton.Yes:
@@ -337,72 +337,7 @@ def rirWithPero(self):
          'мастер КРС', descentNKT_norm(rirRoof, 1)],
     ]
 
-    rirPero_list = [
-        [f'СПО пера до глубины {rirSole}м. Опрессовать НКТ на 200атм', None,
-         f'Спустить {pero_select(self, rirSole)}  на тНКТ{nkt_diam}мм до глубины {rirSole}м с замером, шаблонированием '
-         f'шаблоном. Опрессовать НКТ на 200атм. Вымыть шар. \n'
-         f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
-         None, None, None, None, None, None, None,
-         'мастер КРС', descentNKT_norm(rirSole, 1)],
-        [f'УЦМ в инт {rirRoof}-{rirSole}м',
-         None,
-         f'Произвести цементную заливку с целью изоляции пласта {plast}  в интервале {rirRoof}-{rirSole}м в присутствии '
-         f'представителя УСРС и СТ',
-         None, None, None, None, None, None, None,
-         'мастер КРС', 2.5],
-        [None, None,
-         f'Приготовить цементный раствор у=1,82г/см3 в объёме {volume_cement}м3'
-         f' (сухой цемент{round(volume_cement * 1.25, 1)}т) ',
-         None, None, None, None, None, None, None,
-         'мастер КРС', 0.5],
-        [None, None,
-         f'Вызвать циркуляцию. Закачать в НКТ тех. воду у=1,00г/см3 в объеме 0,5м3, цементный раствор в объеме {volume_cement}м3, '
-         f'довести тех.жидкостью у=1,00г/см3 в объёме 1,5м3, тех. жидкостью  в объёме {round(volume_vn_nkt(dict_nkt) - 1.5, 1)}м3. '
-         f'Уравновешивание цементного раствора',
-         None, None, None, None, None, None, None,
-         'мастер КРС', 0.5],
-        [None, None,
-         f'Приподнять перо до гл.{rirRoof}м. Закрыть трубное простанство. Продавить по затрубному пространству '
-         f'тех.жидкостью  при давлении не более {CreatePZ.max_admissible_pressure}атм (до получения технологического СТОП).',
-         None, None, None, None, None, None, None,
-         'мастер КРС', 0.5],
-        [None, None,
-         f'Открыть трубное пространство. Промыть скважину обратной промывкой (срезка) по круговой циркуляции '
-         f'тех.жидкостью  в объеме не менее {round(volume_vn_nkt(dict_nkt) * 1.5, 1)}м3 уд.весом {CreatePZ.fluid_work} '
-         f'(Полуторакратный объем НКТ) '
-         f'с расходом жидкости 8л/с (срезка) до чистой воды.',
-         None, None, None, None, None, None, None,
-         'мастер КРС', well_volume_norm(16)],
-        [None, None,
-         f'Поднять перо на безопасную зону до гл. {rirRoof - 300}м с доливом скважины в объеме 0,3м3 тех. жидкостью '
-         f'уд.весом {CreatePZ.fluid_work}.',
-         None, None, None, None, None, None, None,
-         'мастер КРС', 1.2],
-        [None, None,
-         f'ОЗЦ - 23 часа (с момента завершения срезки цементного раствора - 24 часа (по качеству пробы))) \n'
-         f'ОЗЦ без давления.',
-         None, None, None, None, None, None, None,
-         'мастер КРС', 24],
-        [None, None,
-         f'Допустить компоновку с замером и шаблонированием НКТ до кровли цементного моста (плановый на гл. {rirRoof}м'
-         f' с прямой промывкой и разгрузкой на забой 3т. Текущий забой согласовать с Заказчиком письменной телефонограммой.',
-         None, None, None, None, None, None, None,
-         'мастер КРС', 1.2],
-        [f'Опрессовать цементный мост на Р={CreatePZ.max_admissible_pressure}атм',
-         None,
-         f'Опрессовать цементный мост на Р={CreatePZ.max_admissible_pressure}атм в присутствии представителя '
-         f'УСРСиСТ Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до '
-         f'начала работ) В случае негерметичности цементного моста дальнейшие работы согласовать с Заказчиком '
-         f'В случае головы ЦМ ниже планового РИР повторить  с учетом корректировки мощности моста ',
-         None, None, None, None, None, None, None,
-         'мастер КРС', 0.67],
-        [None, None,
-         f'Поднять перо на тНКТ{nkt_diam}мм с глубины {rirRoof}м с доливом скважины в объеме '
-         f'{round(rirRoof * 1.12 / 1000, 1)}м3 тех. жидкостью '
-         f'уд.весом {CreatePZ.fluid_work}',
-         None, None, None, None, None, None, None,
-         'мастер КРС', liftingNKT_norm(rirRoof, 1)],
-    ]
+
     print(f'количество пластов {len(CreatePZ.plast_work)}')
 
     if len(CreatePZ.plast_work) == 0 or CreatePZ.perforation_sole < rirRoof:
@@ -417,6 +352,72 @@ def rirWithPero(self):
 
     else:
         rir_list = []
+        rirPero_list = [
+            [f'СПО пера до глубины {rirSole}м. Опрессовать НКТ на 200атм', None,
+             f'Спустить {pero_select(self, rirSole)}  на тНКТ{nkt_diam}мм до глубины {rirSole}м с замером, шаблонированием '
+             f'шаблоном. Опрессовать НКТ на 200атм. Вымыть шар. \n'
+             f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
+             None, None, None, None, None, None, None,
+             'мастер КРС', descentNKT_norm(rirSole, 1)],
+            [f'УЦМ в инт {rirRoof}-{rirSole}м',
+             None,
+             f'Произвести цементную заливку с целью изоляции пласта {plast}  в интервале {rirRoof}-{rirSole}м в присутствии '
+             f'представителя УСРС и СТ',
+             None, None, None, None, None, None, None,
+             'мастер КРС', 2.5],
+            [None, None,
+             f'Приготовить цементный раствор у=1,82г/см3 в объёме {volume_cement}м3'
+             f' (сухой цемент{round(volume_cement * 1.25, 1)}т) ',
+             None, None, None, None, None, None, None,
+             'мастер КРС', 0.5],
+            [None, None,
+             f'Вызвать циркуляцию. Закачать в НКТ тех. воду у=1,00г/см3 в объеме 0,5м3, цементный раствор в объеме {volume_cement}м3, '
+             f'довести тех.жидкостью у=1,00г/см3 в объёме 1,5м3, тех. жидкостью  в объёме {round(volume_vn_nkt(dict_nkt) - 1.5, 1)}м3. '
+             f'Уравновешивание цементного раствора',
+             None, None, None, None, None, None, None,
+             'мастер КРС', 0.5],
+            [None, None,
+             f'Приподнять перо до гл.{rirRoof}м. Закрыть трубное простанство. Продавить по затрубному пространству '
+             f'тех.жидкостью  при давлении не более {CreatePZ.max_admissible_pressure}атм (до получения технологического СТОП).',
+             None, None, None, None, None, None, None,
+             'мастер КРС', 0.5],
+            [None, None,
+             f'Открыть трубное пространство. Промыть скважину обратной промывкой (срезка) по круговой циркуляции '
+             f'тех.жидкостью  в объеме не менее {round(volume_vn_nkt(dict_nkt) * 1.5, 1)}м3 уд.весом {CreatePZ.fluid_work} '
+             f'(Полуторакратный объем НКТ) '
+             f'с расходом жидкости 8л/с (срезка) до чистой воды.',
+             None, None, None, None, None, None, None,
+             'мастер КРС', well_volume_norm(16)],
+            [None, None,
+             f'Поднять перо на безопасную зону до гл. {rirRoof - 300}м с доливом скважины в объеме 0,3м3 тех. жидкостью '
+             f'уд.весом {CreatePZ.fluid_work}.',
+             None, None, None, None, None, None, None,
+             'мастер КРС', 1.2],
+            [None, None,
+             f'ОЗЦ - 23 часа (с момента завершения срезки цементного раствора - 24 часа (по качеству пробы))) \n'
+             f'ОЗЦ без давления.',
+             None, None, None, None, None, None, None,
+             'мастер КРС', 24],
+            [None, None,
+             f'Допустить компоновку с замером и шаблонированием НКТ до кровли цементного моста (плановый на гл. {rirRoof}м'
+             f' с прямой промывкой и разгрузкой на забой 3т. Текущий забой согласовать с Заказчиком письменной телефонограммой.',
+             None, None, None, None, None, None, None,
+             'мастер КРС', 1.2],
+            [f'Опрессовать цементный мост на Р={CreatePZ.max_admissible_pressure}атм',
+             None,
+             f'Опрессовать цементный мост на Р={CreatePZ.max_admissible_pressure}атм в присутствии представителя '
+             f'УСРСиСТ Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до '
+             f'начала работ) В случае негерметичности цементного моста дальнейшие работы согласовать с Заказчиком '
+             f'В случае головы ЦМ ниже планового РИР повторить  с учетом корректировки мощности моста ',
+             None, None, None, None, None, None, None,
+             'мастер КРС', 0.67],
+            [None, None,
+             f'Поднять перо на тНКТ{nkt_diam}мм с глубины {rirRoof}м с доливом скважины в объеме '
+             f'{round(rirRoof * 1.12 / 1000, 1)}м3 тех. жидкостью '
+             f'уд.весом {CreatePZ.fluid_work}',
+             None, None, None, None, None, None, None,
+             'мастер КРС', liftingNKT_norm(rirRoof, 1)],
+        ]
         for row in paker_list(self):
             rir_list.append(row)
         glin_list = [
@@ -682,7 +683,7 @@ def izvlech_paker(self):
          f'Спустить с замером ловильный инструмент на НКТ до Н= {CreatePZ.current_bottom}м с замером. ',
          None, None, None, None, None, None, None,
          'мастер КРС', liftingNKT_norm(CreatePZ.current_bottom, 1)],
-                 [f'Вымыв песка до {CreatePZ.pakerIzvPaker}м. Лар', None,
+                 [f'Вымыв песка до {CreatePZ.pakerIzvPaker}м. Извлечение пакера', None,
                   f'Произвести нормализацию (вымыв кварцевого песка) на ловильном инструменте до глубины {CreatePZ.pakerIzvPaker}м обратной '
                   f'промывкой уд.весом {CreatePZ.fluid_work} \n'
                   f'Произвести  ловильный работы при представителе заказчика на глубине {CreatePZ.pakerIzvPaker}м.',

@@ -161,24 +161,24 @@ def pop_down(self, region, curator_sel):
     return podp_down
 
 
-def razdel_1(self):
+def razdel_1(self, region):
     from open_pz import CreatePZ
 
     with open('podpisant.json', 'r', encoding='utf-8') as file:
         podpis_dict = json.load(file)
 
     razdel_1 = [[None, 'СОГЛАСОВАНО:', None, None, None, None, None, 'УТВЕРЖДАЕМ:', None, None, None, None],
-                [None, podpis_dict[CreatePZ.region]['gi']['post'], None, None, None, None, None,
+                [None, podpis_dict[region]['gi']['post'], None, None, None, None, None,
                  'Главный Инженер ООО "Ойл-Сервис"', None, None, None, None],
-                [None, f'____________{podpis_dict[CreatePZ.region]["gi"]["surname"]}', None, None, None, None, None,
+                [None, f'____________{podpis_dict[region]["gi"]["surname"]}', None, None, None, None, None,
                  '_____________А.Р. Хасаншин', None, None, None, None],
                 [None, f'"____"_____________________{current_datetime.year}г.', None, None, None, None, None,
                  f'"____"_____________________{current_datetime.year}г.', None, None, None, None],
                 [None, None, None, None, None, None, None, None, None, None, None, None],
-                [None, podpis_dict[CreatePZ.region]['gg']['post'], None, None, None,
+                [None, podpis_dict[region]['gg']['post'], None, None, None,
                  None,
                  None, 'Главный геолог ООО "Ойл-Сервис"', None, None, None, None],
-                [None, f'_____________{podpis_dict[CreatePZ.region]["gg"]["surname"]}', None, None, None, None, None,
+                [None, f'_____________{podpis_dict[region]["gg"]["surname"]}', None, None, None, None, None,
                  '_____________Д.Д. Шамигулов', None, None, '',
                  None],
                 [None, f'"____"_____________________{current_datetime.year}г.', None, None, '', None, None,

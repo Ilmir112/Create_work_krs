@@ -375,14 +375,15 @@ class TabPage_SO(QWidget):
                         sole_plast = dict_perforation[plast]['подошва']
 
         if CreatePZ.perforation_roof < roof_plast:
-            paker_depth = int(AcidPakerWindow.if_None(self, self.pakerEdit.text()))
+            paker_depth = self.pakerEdit.text()
 
-            self.khvostEdit.setText(str(int(sole_plast - paker_depth)))
-            self.swab_pakerEdit.setText(str(int(paker_depth - 30)))
+            self.khvostEdit.setText(str(int(sole_plast - int(paker_depth))))
+            self.swab_pakerEdit.setText(str(int(paker_depth) - 30))
         else:
-            paker_depth = int(AcidPakerWindow.if_None(self, self.pakerEdit.text()))
-            self.khvostEdit.setText(str(int(sole_plast - paker_depth)))
-            self.swab_pakerEdit.setText(str(int(paker_depth - 30)))
+            paker_depth = self.pakerEdit.text()
+            if paker_depth:
+                self.khvostEdit.setText(str(int(sole_plast - int(paker_depth))))
+                self.swab_pakerEdit.setText(str(int(paker_depth) - 30))
         print(f'кровля {roof_plast}, подошва {sole_plast}')
 
 class TabWidget(QTabWidget):
@@ -894,9 +895,10 @@ class AcidPakerWindow(MyWindow):
         QplastEdit = str(self.tabWidget.currentWidget().QplastEdit.currentText())
         depthGaugeEdit = str(self.tabWidget.currentWidget().depthGaugeCombo.currentText())
         # privyazka = str(self.tabWidget.currentWidget().privyazka.currentText())
-        if (self.if_None(khvostEdit) == 0 or self.if_None(pakerEdit) == 0) and CreatePZ.countAcid != 2:
-            msg = QMessageBox.information(self, 'Внимание', 'Не все поля соответствуют значениям')
-            return
+        print(khvostEdit, pakerEdit )
+        # if (self.if_None(khvostEdit) == 0 or self.if_None(pakerEdit) == 0):
+        #     msg = QMessageBox.information(self, 'Внимание', 'Не все поля соответствуют значениям')
+        #     return
         if self.countAcid == 0:
             CreatePZ.khvostEdit = khvostEdit
             CreatePZ.pakerEdit = pakerEdit
@@ -1027,7 +1029,10 @@ class AcidPakerWindow(MyWindow):
 
         elif str(value).replace('.','').replace(',','').isdigit():
             if str(round(float(value.replace(',','.')), 1))[-1] == 0:
+                print(str(round(float(value.replace(',','.')), 1)))
                 return int(float(value.replace(',','.')))
+            else:
+                return float(value.replace(',','.'))
         else:
             return 0
 
