@@ -166,11 +166,11 @@ class PerforationCorrect(QMainWindow):
                     CreatePZ.dict_perforation[plast]['отрайбировано'] is False
 
 
-        # print(f' интервалы ПВР после корректировки {CreatePZ.dict_perforation}')
+        print(f' интервалы ПВР после корректировки {CreatePZ.dict_perforation}')
 
         # self.labels_plast[index] = (plast_edit, roof_edit, sole_edit, plast_status_ComboBox,
         #                             template_status_ComboBox, raiding_status_ComboBox)
-
+        CreatePZ.definition_plast_work(self)
         CreatePZ.pause = False
         self.close()
 

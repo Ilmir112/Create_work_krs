@@ -556,6 +556,8 @@ class DataWindow(QMainWindow):
                 CreatePZ.dict_sucker_rod_po[self.tabWidget.currentWidget().labels_sucker_po[1][0].text()] = self.if_None(
                     self.tabWidget.currentWidget().labels_sucker_po[1][1].text())
 
+        voronka_question = True
+
         if self.ifNum(columnType) is False \
                 or self.ifNum(column_wall_thickness) is False \
                 or self.ifNum(shoe_column) is False \
@@ -606,48 +608,61 @@ class DataWindow(QMainWindow):
             msg = QMessageBox.information(self, 'Внимание', 'В скважине отсутствует доп колонна')
             return
 
-
         else:
-            CreatePZ.column_diametr = self.if_None(columnType)
-            CreatePZ.column_wall_thickness = self.if_None(column_wall_thickness)
-            CreatePZ.shoe_column = self.if_None(shoe_column)
-            CreatePZ.column_additional_diametr = self.if_None(column_additional_diametr)
-            CreatePZ.column_additional_wall_thickness = self.if_None(column_additional_wall_thickness)
-            CreatePZ.shoe_column_additional = self.if_None(shoe_column_additional)
-            CreatePZ.head_column_additional = self.if_None(head_column_additional)
+            print(dict_pump_ECN_do, paker2_do, dict_pump_SHGN_do, paker_do)
+            if all(['отсут' == pump for pump in [dict_pump_ECN_do, paker2_do, dict_pump_SHGN_do, paker_do]]):
+                voronka_question = QMessageBox.question(self, 'Внимание',
+                                           'Программа определила что в скважине до ремонта воронка, верно ли')
+                if voronka_question == QMessageBox.StandardButton.No:
+                    voronka_question = False
+                    return
+            elif all(['отсут' == pump for pump in [dict_pump_ECN_posle, paker2_posle, dict_pump_SHGN_posle, paker_posle]]):
+                voronka_question = QMessageBox.question(self, 'Внимание',
+                                           'Программа определила что в скважине После ремонта воронка, верно ли')
+                if voronka_question == QMessageBox.StandardButton.No:
+                    voronka_question = False
+                    return
+            else:
+                CreatePZ.column_diametr = self.if_None(columnType)
+                CreatePZ.column_wall_thickness = self.if_None(column_wall_thickness)
+                CreatePZ.shoe_column = self.if_None(shoe_column)
+                CreatePZ.column_additional_diametr = self.if_None(column_additional_diametr)
+                CreatePZ.column_additional_wall_thickness = self.if_None(column_additional_wall_thickness)
+                CreatePZ.shoe_column_additional = self.if_None(shoe_column_additional)
+                CreatePZ.head_column_additional = self.if_None(head_column_additional)
 
-            CreatePZ.bottomhole_drill = self.if_None(bottomhole_drill)
-            CreatePZ.bottomhole_artificial =  self.if_None(bottomhole_artificial)
-            CreatePZ.current_bottom =  self.if_None(current_bottom)
-            CreatePZ.max_angle =  self.if_None(max_angle)
-            CreatePZ.max_expected_pressure = self.if_None(max_expected_pressure)
-            CreatePZ.max_admissible_pressure = self.if_None(max_admissible_pressure)
+                CreatePZ.bottomhole_drill = self.if_None(bottomhole_drill)
+                CreatePZ.bottomhole_artificial =  self.if_None(bottomhole_artificial)
+                CreatePZ.current_bottom =  self.if_None(current_bottom)
+                CreatePZ.max_angle =  self.if_None(max_angle)
+                CreatePZ.max_expected_pressure = self.if_None(max_expected_pressure)
+                CreatePZ.max_admissible_pressure = self.if_None(max_admissible_pressure)
 
-            # print(f'макс {CreatePZ.max_expected_pressure}')
-            CreatePZ.dict_pump_SHGN["do"] = self.if_None(dict_pump_SHGN_do)
-            CreatePZ.dict_pump_SHGN_h["do"] = self.if_None(dict_pump_SHGN_h_do)
-            CreatePZ.dict_pump_SHGN_h["posle"] = self.if_None(dict_pump_SHGN_h_posle)
-            CreatePZ.dict_pump_SHGN["posle"] = self.if_None(dict_pump_SHGN_posle)
+                # print(f'макс {CreatePZ.max_expected_pressure}')
+                CreatePZ.dict_pump_SHGN["do"] = self.if_None(dict_pump_SHGN_do)
+                CreatePZ.dict_pump_SHGN_h["do"] = self.if_None(dict_pump_SHGN_h_do)
+                CreatePZ.dict_pump_SHGN_h["posle"] = self.if_None(dict_pump_SHGN_h_posle)
+                CreatePZ.dict_pump_SHGN["posle"] = self.if_None(dict_pump_SHGN_posle)
 
-            CreatePZ.dict_pump_ECN["do"] = self.if_None(dict_pump_ECN_do)
-            CreatePZ.dict_pump_ECN_h["do"] = self.if_None(dict_pump_ECN_h_do)
-            CreatePZ.dict_pump_ECN["posle"] = self.if_None(dict_pump_ECN_posle)
-            CreatePZ.dict_pump_ECN_h["posle"] = self.if_None(dict_pump_ECN_h_posle)
+                CreatePZ.dict_pump_ECN["do"] = self.if_None(dict_pump_ECN_do)
+                CreatePZ.dict_pump_ECN_h["do"] = self.if_None(dict_pump_ECN_h_do)
+                CreatePZ.dict_pump_ECN["posle"] = self.if_None(dict_pump_ECN_posle)
+                CreatePZ.dict_pump_ECN_h["posle"] = self.if_None(dict_pump_ECN_h_posle)
 
-            CreatePZ.paker_do["do"] = self.if_None(paker_do)
-            CreatePZ.H_F_paker_do["do"] = self.if_None(H_F_paker_do)
-            CreatePZ.paker_do["posle"] = self.if_None(paker_posle)
-            CreatePZ.H_F_paker_do["posle"] = self.if_None(H_F_paker_posle)
+                CreatePZ.paker_do["do"] = self.if_None(paker_do)
+                CreatePZ.H_F_paker_do["do"] = self.if_None(H_F_paker_do)
+                CreatePZ.paker_do["posle"] = self.if_None(paker_posle)
+                CreatePZ.H_F_paker_do["posle"] = self.if_None(H_F_paker_posle)
 
-            CreatePZ.paker2_do["do"] = self.if_None(paker2_do)
-            CreatePZ.H_F_paker2_do["do"] = self.if_None(H_F_paker2_do)
-            CreatePZ.paker2_do["posle"] = self.if_None(paker2_posle)
-            CreatePZ.H_F_paker2_do["posle"] = self.if_None(H_F_paker2_posle)
-            CreatePZ.static_level = self.if_None(static_level)
-            CreatePZ.dinamic_level = self.if_None(dinamic_level)
-            # print(f' после ок {CreatePZ.dict_pump, CreatePZ.paker_do, CreatePZ.H_F_paker_do, CreatePZ.dict_pump_h}')
-            CreatePZ.pause = False
-            self.close()
+                CreatePZ.paker2_do["do"] = self.if_None(paker2_do)
+                CreatePZ.H_F_paker2_do["do"] = self.if_None(H_F_paker2_do)
+                CreatePZ.paker2_do["posle"] = self.if_None(paker2_posle)
+                CreatePZ.H_F_paker2_do["posle"] = self.if_None(H_F_paker2_posle)
+                CreatePZ.static_level = self.if_None(static_level)
+                CreatePZ.dinamic_level = self.if_None(dinamic_level)
+                # print(f' после ок {CreatePZ.dict_pump, CreatePZ.paker_do, CreatePZ.H_F_paker_do, CreatePZ.dict_pump_h}')
+                CreatePZ.pause = False
+                self.close()
 
 
 

@@ -1743,6 +1743,18 @@ class MyWindow(QMainWindow):
         ws4.page_setup.fitToWidth = True
         ws4.print_area = 'C2:I14'
 
+    def check_gpp_upa(self):
+        for row in range(self.table_widget.rowCount()):
+            for column in range(self.table_widget.columnCount()):
+                value = self.table_widget.item(row, column)
+                if value != None:
+                    value = value.text()
+                    if 'Установить подъёмный агрегат на устье не менее 40т' in value:
+                        new_value = QtWidgets.QTableWidgetItem(f'Установить подъёмный агрегат на устье не менее 60т. '
+                                                               f'Пусковой комиссией составить акт готовности подьемного '
+                                                               f'агрегата и бригады для проведения ремонта скважины.')
+
+                        self.table_widget.setItem(row, column, new_value)
 
     def true_set_Paker(self, depth):
         from open_pz import CreatePZ

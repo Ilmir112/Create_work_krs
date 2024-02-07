@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox
 from PyQt5.uic.properties import QtWidgets
 
 import krs
+import main
 from main import MyWindow
 from work_py.alone_oreration import kot_select
 from work_py.opressovka import testing_pressure
@@ -16,17 +17,8 @@ def grpGpp(self):
                                         'Введите глубину установки',
                                         int(CreatePZ.perforation_roof - 50), 0, int(CreatePZ.bottomhole_drill))
     gPP_300 = MyWindow.true_set_Paker(self, 300)
-    gpp_depth = MyWindow.true_set_Paker(self, gpp_depth)
 
-    for row in range(self.table_widget.rowCount()):
-        for column in range(self.table_widget.columnCount()):
-            value = self.table_widget.item(row, column)
-            if value != None:
-                value = value.text()
-                if 'Установить подъёмный агрегат на устье не менее 40т' in value:
-                    new_value = f'Установить подъёмный агрегат на устье не менее 60т. Пусковой комиссией ' \
-                            f'составить акт готовности подьемного агрегата и бригады для проведения ремонта скважины.)'
-                    self.table_widget.setItem(row, column, new_value)
+    main.MyWindow.check_gpp_upa(self)
 
     gpp_list = [
         ['За 48 часов оформить заявку на завоз оборудования ГРП.',
@@ -163,6 +155,19 @@ def grpGpp(self):
         pass
     return gpp_list
 
+
+def check_gpp_upa(self):
+    for row in range(self.table_widget.rowCount()):
+        for column in range(self.table_widget.columnCount()):
+            value = self.table_widget.item(row, column)
+            if value != None:
+                value = value.text()
+                if 'Установить подъёмный агрегат на устье не менее 40т' in value:
+                    new_value = QtWidgets.QTableWidgetItem(f'Установить подъёмный агрегат на устье не менее 60т. '
+                                                           f'Пусковой комиссией составить акт готовности подьемного '
+                                                           f'агрегата и бригады для проведения ремонта скважины.')
+
+                    self.table_widget.setItem(row, column, new_value)
 
 def normalization(self):
     from open_pz import CreatePZ

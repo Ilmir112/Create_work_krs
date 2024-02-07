@@ -266,8 +266,10 @@ class CreatePZ:
                     elif 'месторождение ' == value:
                         CreatePZ.oilfield = row[col + 2]
 
-                    elif 'Направление' in str(value) and 'Шахтное направление' not in str(value):
-                        print(row_ind, value, 'Шахтное направление' not in str(value))
+                    elif 'Направление' in str(value) and 'Шахтное направление' not in str(value) and \
+                            ws.cell(row=row_ind + 1, column=col + 4).value not in ['-', '(мм), (мм), -(м)', None]:
+                        # print(row_ind, value, 'Шахтное направление' not in str(value)) and \
+
                         try:
                             column_direction_data = (ws.cell(row=row_ind + 1, column=col + 4).value).split('(мм),', )
                             print(f'направление {column_direction_data}')
@@ -285,7 +287,8 @@ class CreatePZ:
                             column_direction_wall_thickness, _ = \
                                 QInputDialog.getInt(self, 'Направление', 'Введите башмак направления',
                                                     0, 0, 700)
-                    elif 'Кондуктор' in str(value):
+                    elif 'Кондуктор' in str(value) and \
+                            ws.cell(row=row_ind + 1, column=col + 4).value not in ['-', '(мм), (мм), -(м)', None]:
 
                         try:
                             column_conductor_data = (ws.cell(row=row_ind + 1, column=col + 4).value).split('(мм),', )
@@ -304,13 +307,13 @@ class CreatePZ:
                                 QInputDialog.getInt(self, 'Кондуктор', 'Введите башмак Кондуктор',
                                                     0, 0, 700)
                     elif any(['Кондуктор' in str(value) for value in row]):
-                        for value in row:
+                        for ind, value in enumerate(row):
                             if 'Уровень цемента' in str(value):
-                                CreatePZ.level_cement_conductor = row[row_ind + 2]
+                                CreatePZ.level_cement_conductor = row[ind + 2]
                     elif any(['Направление' in str(value) for value in row]):
-                        for value in row:
+                        for ind, value in enumerate(row):
                             if 'Уровень цемента' in str(value):
-                                CreatePZ.level_cement_direction = row[row_ind +2 ]
+                                CreatePZ.level_cement_direction = row[ind + 2]
 
                     elif 'колонная головка' in str(value):
                         CreatePZ.column_head_m = row[col + 4]
@@ -715,18 +718,6 @@ class CreatePZ:
                 CreatePZ.gipsInWell = False
 
 
-
-
-        curator_list = ['ОР', 'ГТМ', 'ГРР', 'ГО', 'ВНС']
-        curator = ['ГТМ'
-                   if (CreatePZ.dict_pump_SHGN["posle"] != 0 and CreatePZ.dict_pump_ECN["posle"] == 0)
-                      or (CreatePZ.dict_pump_SHGN["posle"] == 0 and CreatePZ.dict_pump_ECN["posle"] != 0)
-                      or (CreatePZ.dict_pump_SHGN["posle"] != 0 and CreatePZ.dict_pump_ECN["posle"] != 0)
-                   else 'ОР'][0]
-
-
-
-
         # Копирование изображения
         image_loader = SheetImageLoader(ws)
 
@@ -745,6 +736,7 @@ class CreatePZ:
                 except:
                     pass
 
+        CreatePZ.region = block_name.region(cdng)
 
         print(CreatePZ.image_list)
         print(f' ГРП - {CreatePZ.grpPlan}')
@@ -963,8 +955,10 @@ class CreatePZ:
 
                 if krs.is_number(str(row[1]).replace(',', '.')) is True:
                     CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('вертикаль', set()).add(row[1])
-
-                CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('отрайбировано', False)
+                if  any(['фильтр' in str(i).lower() for i in row]):
+                    CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('отрайбировано', True)
+                else:
+                    CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('отрайбировано', False)
                 CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('Прошаблонировано', False)
                 roof_int = round(float(str(row[2]).replace(',', '.')), 1)
                 sole_int = round(float(str(row[3]).replace(',', '.')), 1)
@@ -1089,7 +1083,12 @@ class CreatePZ:
             CreatePZ.pause = True
             self.data_window = None
 
-        CreatePZ.region = block_name.region(cdng)
+        curator_list = ['ОР', 'ГТМ', 'ГРР', 'ГО', 'ВНС']
+        curator = ['ГТМ'
+                   if (CreatePZ.dict_pump_SHGN["posle"] != 0 and CreatePZ.dict_pump_ECN["posle"] == 0)
+                      or (CreatePZ.dict_pump_SHGN["posle"] == 0 and CreatePZ.dict_pump_ECN["posle"] != 0)
+                      or (CreatePZ.dict_pump_SHGN["posle"] != 0 and CreatePZ.dict_pump_ECN["posle"] != 0)
+                   else 'ОР'][0]
 
         CreatePZ.curator, ok = QInputDialog.getItem(self, 'Выбор кураторов ремонта', 'Введите сектор кураторов региона',
                                                     curator_list, curator_list.index(curator), False)

@@ -192,9 +192,9 @@ def template_ek_without_skm(self):
          f'в присутствии представителя Заказчика в объеме {round(well_volume() * 1.5, 1)}м3. ПРИ ПРОМЫВКЕ НЕ ПРЕВЫШАТЬ ДАВЛЕНИЕ {CreatePZ.max_admissible_pressure}АТМ, ДОПУСТИМАЯ ОСЕВАЯ НАГРУЗКА НА ИНСТРУМЕНТ: 0,5-1,0 ТН',
          None, None, None, None, None, None, None,
          'Мастер КРС, представитель ЦДНГ', well_volume_norm(well_volume() * 1.5)],
-        [f'Приподнять до глубины {CreatePZ.current_bottom - 20}м. Тех отстой 2ч. Определение текущего забоя',
+        [f'Приподнять до глубины {round(CreatePZ.current_bottom - 20, 1)}м. Тех отстой 2ч. Определение текущего забоя',
          None,
-         f'Приподнять до глубины {CreatePZ.current_bottom - 20}м. Тех отстой 2ч. Определение текущего забоя, при '
+         f'Приподнять до глубины {round(CreatePZ.current_bottom - 20, 1)}м. Тех отстой 2ч. Определение текущего забоя, при '
          f'необходимости повторная промывка.',
          None, None, None, None, None, None, None,
          'Мастер КРС, представитель ЦДНГ', 2.49],
@@ -360,7 +360,7 @@ def template_ek(self):
     template_SKM_DP_EK = f'обточная муфта  + {round(CreatePZ.current_bottom - roof_add_column_plast + 10, 0)}м ' \
                          f'НКТ{nkt_pod} + шаблон-{first_template}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can_addition]}м + ' \
                          f'НКТ{nkt_pod} ' \
-                         f'{round(float(CreatePZ.current_bottom) - float(CreatePZ.head_column_additional) - lift_ecn_can[CreatePZ.lift_ecn_can_addition] - (float(CreatePZ.current_bottom) - roof_add_column_plast + 10) - 10, 0)}м ' \
+                         f'{round(float(CreatePZ.current_bottom) - float(CreatePZ.head_column_additional) - lift_ecn_can[CreatePZ.lift_ecn_can_addition] - (float(CreatePZ.current_bottom) - roof_add_column_plast + 10), 0)}м ' \
                          f'+ НКТ{CreatePZ.nkt_diam} {CreatePZ.head_column_additional - roof_plast +10}м + СКМ + шаблон-{second_template}мм L-{liftEcn}м '
 
     template_SKM_DP = f'обточная муфта + НКТ{nkt_pod} {int(CreatePZ.current_bottom) - math.ceil(roof_add_column_plast) + 10}м ' \
@@ -531,8 +531,8 @@ def template_ek(self):
                      f'{CreatePZ.fluid_work} до глубины {CreatePZ.current_bottom}м.', None, None, None, None, None,
          None, None,
          'Мастер КРС', None],
-        [f'Приподнять до глубины {CreatePZ.current_bottom - 20}м. Тех отстой 2ч', None,
-         f'Приподнять до глубины {CreatePZ.current_bottom - 20}м. Тех отстой 2ч. Определение текущего забоя, '
+        [f'Приподнять до глубины {round(CreatePZ.current_bottom - 20, 1)}м. Тех отстой 2ч', None,
+         f'Приподнять до глубины {round(CreatePZ.current_bottom - 20, 1)}м. Тех отстой 2ч. Определение текущего забоя, '
          f'при необходимости повторная промывка.',
          None, None, None, None, None, None, None,
          'Мастер КРС, представитель ЦДНГ', 2.49],
@@ -622,7 +622,7 @@ def template_ek(self):
             for row in kot_work(self)[::-1]:
                 list_template_ek.insert(0, row)
 
-    if CreatePZ.gipsInWell is True:  # Добавление работ при наличии Гипсово-солевх отложений
+    if CreatePZ.gipsInWell is True :  # Добавление работ при наличии Гипсово-солевх отложений
         gips = pero(self)
         for row in gips[::-1]:
             list_template_ek.insert(0, row)
@@ -677,7 +677,7 @@ def pero(self):
          None, None, None, None, None, None, None,
          'Мастер КРС, представитель ЦДНГ', 1.5],
         [None, None,
-         f'Приподнять до глубины {CreatePZ.current_bottom - 20}м. Тех отстой 2ч. Определение текущего забоя, '
+         f'Приподнять до глубины {round(CreatePZ.current_bottom - 20, 1)}м. Тех отстой 2ч. Определение текущего забоя, '
          f'при необходимости повторная промывка.',
          None, None, None, None, None, None, None,
          'Мастер КРС, представитель ЦДНГ', 2.49],
@@ -694,8 +694,8 @@ def pero(self):
          'Мастер КРС',
          None]
     ]
-    if CreatePZ.gipsInWell == True:
-        if 'ЭЦН' in str(CreatePZ.dict_pump["do"]).upper():
+    if CreatePZ.gipsInWell is True:
+        if CreatePZ.dict_pump_SHGN["do"] != 0:
 
             gipsPero_list = [gipsPero_list[-1]]
             drilling_list = drilling_nkt(self)
@@ -752,7 +752,10 @@ def definition_roof_not_raiding(self):
             roof = min(list(map(lambda x: x[0], list(dict_perforation[plast]['интервал']))))
             print(roof)
             if CreatePZ.head_column_additional <= roof:
+
                 if dict_perforation[plast]['отрайбировано']:
+                    print('приветствуууу')
+                    print(dict_perforation[plast]['отрайбировано'])
                     roof_add_column_plast = CreatePZ.current_bottom
                     roof_plast = CreatePZ.head_column_additional
                 else:
@@ -761,6 +764,8 @@ def definition_roof_not_raiding(self):
                     break
             else:
                 if dict_perforation[plast]['отрайбировано']:
+                    print('приветств')
+                    print(dict_perforation[plast]['отрайбировано'])
                     roof_add_column_plast = CreatePZ.current_bottom
                     roof_plast = CreatePZ.head_column_additional
                 else:

@@ -267,7 +267,7 @@ def raiding_interval(ryber_key):
                                               'Введите интервал райбирования через тире')
 
         while '-' not in skm_column:
-            mes = QMessageBox.warning(None, 'Введены не корректные данные')
+            mes = QMessageBox.warning(None, 'Введены не корректные данные', 'Введены не корректные данные')
             skm_column, ok = QInputDialog.getText(None, 'Райбирование',
                                                   'Введите интервал райбирования через тире')
             while skm_column.split('-')[0] >= skm_column.split('-')[1]:

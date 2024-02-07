@@ -82,8 +82,9 @@ class GeophysicWindow(MyWindow):
 
     def addRowTable(self):
         from open_pz import CreatePZ
-        editType = self.tabWidget.currentWidget().lineEditType.text()
-        editType2 = self.tabWidget.currentWidget().lineEditType2.text()
+
+        editType = self.tabWidget.currentWidget().lineEditType.text().replace(',', '.')
+        editType2 = self.tabWidget.currentWidget().lineEditType2.text().replace(',', '.')
         researchGis = self.geophysicalSelect(str(self.tabWidget.currentWidget().ComboBoxGeophygist.currentText()))
 
         dopInformation = self.tabWidget.currentWidget().lineEditDopInformation.text()
@@ -104,6 +105,7 @@ class GeophysicWindow(MyWindow):
         self.tableWidget.setItem(rows, 3, QTableWidgetItem(dopInformation))
         self.tableWidget.setSortingEnabled(True)
     def geophysic_sel(self, geophysic, editType, editType2):
+        from open_pz import CreatePZ
         if geophysic == 'АКЦ':
             research = f'ЗАДАЧА 2.7.1 Определение состояния цементного камня (АКЦ, АК-сканирование) в интервале {editType}-{editType2}м. '
             research_short = f'АКЦ в интервале {editType}-{editType2}м.'
@@ -145,6 +147,16 @@ class GeophysicWindow(MyWindow):
 
         return research, research_short
 
+    def if_None_gis(self, value):
+
+        if isinstance(value, int) or isinstance(value, float):
+            return int(value)
+
+        elif str(value).replace('.','').replace(',','').isdigit():
+            if str(round(float(value.replace(',','.')), 1))[-1] == 0:
+                return int(float(value.replace(',','.')))
+        else:
+            return 0
     def addWork(self):
 
         from open_pz import CreatePZ

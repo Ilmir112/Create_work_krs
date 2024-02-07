@@ -26,7 +26,7 @@ def sandFilling(self):
                                           int(CreatePZ.perforation_roof - 20), 0, int(CreatePZ.current_bottom))
 
 
-    sand_volume= round(volume_vn_ek(self,filling_depth) * (CreatePZ.current_bottom - filling_depth)/1000, 1)
+    sand_volume = round(volume_vn_ek(self,filling_depth) * (CreatePZ.current_bottom - filling_depth)/1000, 1)
 
 
     filling_list = [
@@ -109,9 +109,9 @@ def sandWashing(self):
 
 
 
-    washingDepth, ok = QInputDialog.getInt(None, 'вымыв песка',
+    washingDepth, ok = QInputDialog.getDouble(None, 'вымыв песка',
                                                 'Введите глубину вымыва песчанного моста',
-                                                int(CreatePZ.perforation_roof - 20), 0, 3500)
+                                                CreatePZ.current_bottom, 0, 6000, 1)
     washingOut_list = [
         [f'СПО пера до {round(CreatePZ.current_bottom,0)}м', None,
      f' Спустить  {sand_select(self)}  на НКТ{nkt_diam}мм до глубины {round(CreatePZ.current_bottom,0)}м с замером, шаблонированием шаблоном. '

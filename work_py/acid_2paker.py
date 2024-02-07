@@ -119,16 +119,19 @@ class TabPage_SO(QWidget):
         if self.countAcid == 0:
             self.swab_pakerEdit.setText(str(self.pakerEdit.text()))
             self.pakerEdit.setText(f"{int(CreatePZ.perforation_sole + 10)}")
+            self.pakerEdit.textChanged.connect(self.update_paker_edit)
             self.pakerEdit.setClearButtonEnabled(True)
             self.paker2Label = QLabel("глубина вверхнего пакера", self)
             self.paker2Edit = QLineEdit(self)
             self.paker2Edit.setText(f"{int(CreatePZ.perforation_roof - 10)}")
             self.paker2Edit.setClearButtonEnabled(True)
+
             CreatePZ.differencePakers = int(self.pakerEdit.text()) - int(self.paker2Edit.text())
             CreatePZ.paker2Edit = int(self.pakerEdit.text())
 
         if CreatePZ.countAcid == 1:
             self.pakerEdit.setText(f"{int(CreatePZ.paker2Edit)}")
+            self.pakerEdit.textChanged.connect(self.update_paker_edit)
             self.pakerEdit.setClearButtonEnabled(True)
             self.swabTrueEditType.setCurrentIndex(CreatePZ.swabTrueEditType)
             self.swab_pakerEdit.setText(str(self.pakerEdit.text()))
@@ -139,8 +142,7 @@ class TabPage_SO(QWidget):
 
             self.swab_pakerEdit.setText(f'{CreatePZ.swab_paker}')
             self.swab_volumeEdit.setText(f'{CreatePZ.swab_volume}')
-            for enable in [self.khovstLabel, self.khvostEdit,
-                           self.paker2Edit]:
+            for enable in [self.khovstLabel, self.khvostEdit,]:
                 enable.setEnabled(False)
 
         elif CreatePZ.countAcid == 2:
@@ -152,7 +154,7 @@ class TabPage_SO(QWidget):
             self.paker2Edit.setClearButtonEnabled(True)
 
             self.swabTrueEditType.setCurrentIndex(CreatePZ.swabTrueEditType)
-            print(f' освоение {CreatePZ.swab_paker}')
+            # print(f' освоение {CreatePZ.swab_paker}')
             self.swab_pakerEdit.setText(f'{CreatePZ.swab_paker}')
             self.swab_volumeEdit.setText(f'{CreatePZ.swab_volume}')
             listEnabel = [self.khovstLabel, self.khvostEdit, self.swabTruelabelType, self.swabTrueEditType,
@@ -233,31 +235,34 @@ class TabPage_SO(QWidget):
 
     def update_paker_edit(self):
         dict_perforation = CreatePZ.dict_perforation
+        if CreatePZ.countAcid == 0:
+            plasts = CreatePZ.texts
 
-        plasts = CreatePZ.texts
-        print(plasts)
-        roof_plast = CreatePZ.current_bottom
-        sole_plast = 0
-        for plast in CreatePZ.plast_work:
-            for plast_sel in plasts:
-                if plast_sel == plast:
+            roof_plast = CreatePZ.current_bottom
+            sole_plast = 0
+            for plast in CreatePZ.plast_work:
+                for plast_sel in plasts:
+                    if plast_sel == plast:
 
-                    if roof_plast >= dict_perforation[plast]['кровля']:
-                        roof_plast = dict_perforation[plast]['кровля']
-                    if sole_plast <= dict_perforation[plast]['подошва']:
-                        sole_plast = dict_perforation[plast]['подошва']
+                        if roof_plast >= dict_perforation[plast]['кровля']:
+                            roof_plast = dict_perforation[plast]['кровля']
+                        if sole_plast <= dict_perforation[plast]['подошва']:
+                            sole_plast = dict_perforation[plast]['подошва']
 
-        if CreatePZ.perforation_roof < roof_plast:
-            paker_depth = int(AcidPakerWindow.if_None(self, self.pakerEdit.text()))
+            if CreatePZ.perforation_roof < roof_plast:
+                if self.pakerEdit.text():
+                    paker_depth = int(self.pakerEdit.text())
 
-            self.khvostEdit.setText(str(int(sole_plast - paker_depth)))
-            self.swab_pakerEdit.setText(str(int(paker_depth - 30)))
-        else:
-            paker_depth = int(AcidPakerWindow.if_None(self, self.pakerEdit.text()))
-            self.khvostEdit.setText(str(int(sole_plast - paker_depth)))
-            self.swab_pakerEdit.setText(str(int(paker_depth - 30)))
-
-
+                    # self.khvostEdit.setText(str(int(sole_plast - paker_depth)))
+                    self.swab_pakerEdit.setText(str(int(paker_depth - 30)))
+            else:
+                if self.pakerEdit.text():
+                    paker_depth = int(self.pakerEdit.text())
+                    # self.khvostEdit.setText(str(int(sole_plast - paker_depth)))
+                    self.swab_pakerEdit.setText(str(int(paker_depth - 30)))
+        elif CreatePZ.countAcid == 1:
+            paker_depth = int(self.pakerEdit.text())
+            self.paker2Edit.setText(str(paker_depth-CreatePZ.difference_paker))
 class TabWidget(QTabWidget):
     def __init__(self):
         super().__init__()
@@ -728,6 +733,7 @@ class AcidPakerWindow(MyWindow):
             CreatePZ.depthGaugeEdit = depthGaugeEdit
             CreatePZ.khvostEdit = khvostEdit
             CreatePZ.swabType = swabType
+            CreatePZ.pakerEdit = pakerEdit
             for row in self.acid_work(swabTrueEditType, acidProcEdit, khvostEdit, pakerEdit, paker2Edit, skvAcidEdit,
                                       acidEdit, skvVolumeEdit,
                                       QplastEdit, skvProcEdit, plastCombo, acidOilProcEdit, acidVolumeEdit, svkTrueEdit,
@@ -749,6 +755,8 @@ class AcidPakerWindow(MyWindow):
             CreatePZ.depthGaugeEdit = depthGaugeEdit
             CreatePZ.khvostEdit = khvostEdit
             CreatePZ.swabType = swabType
+            CreatePZ.pakerEdit = pakerEdit
+
 
 
             self.acidSelect(swabTrueEditType, khvostEdit, pakerEdit, paker2Edit, CreatePZ.depthGaugeEdit)
@@ -780,8 +788,8 @@ class AcidPakerWindow(MyWindow):
             swabTrueEditType = True if swabTrueEditType == 'Нужно освоение' else False
             if swabTrueEditType:
                 work_list = []
-                swabbing_with_paker = self.swabbing_with_paker(CreatePZ.khvostEdit, swab_paker, CreatePZ.differencePaker,
-                                                               swabType, swab_volume)
+                swabbing_with_paker = self.swabbing_with_paker(CreatePZ.khvostEdit, CreatePZ.swab_paker, CreatePZ.differencePaker,
+                                                               CreatePZ.swabType, CreatePZ.swab_volume)
 
                 for row in swabbing_with_paker:
                     work_list.append(row)
@@ -793,7 +801,7 @@ class AcidPakerWindow(MyWindow):
             else:
                 work_list = [[None, None,
                               f'Поднять компоновку на НКТ с доливом скважины в '
-                              f'объеме {round(pakerEdit * 1.12 / 1000, 1)}м3 удельным весом {CreatePZ.fluid_work}',
+                              f'объеме {round(CreatePZ.pakerEdit * 1.12 / 1000, 1)}м3 удельным весом {CreatePZ.fluid_work}',
                               None, None, None, None, None, None, None,
                               'мастер КРС',
                               liftingNKT_norm(pakerEdit, 1.2)]]

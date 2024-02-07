@@ -72,13 +72,7 @@ def gno_down(self):
     gno_list = [[None, None,
                  f'За 48 часов до спуска запросить КАРТУ спуска на ГНО и заказать оборудование согласно карты спуска.',
                  None, None, None, None, None, None, None,
-                 'Мастер КРС, предст. заказчика', None],
-                [None, None,
-                 f'До спуска ГНО произвести опрессовку фонтанной арматуры после монтажа на устье скважины '
-                 f'на давление {CreatePZ.max_admissible_pressure}атм'
-                 f'(давление на максимальное возможное давление опрессовки эскплуатационной колонны)',
-                 None, None, None, None, None, None, None,
-                 'Мастер КРС, предст. заказчика', None],
+                 'Мастер КРС, предст. заказчика', None]
                 ]
 
     descent_nv = [[None, None,
@@ -108,6 +102,12 @@ def gno_down(self):
                    f' оборудование (переводники, муфты, переходные катушки). МОНТАЖ БЕЗ ПОДВЕСНОГО ПАТРУБКА ЗАПРЕЩЕН.',
                    None, None, None, None, None, None, None,
                    'Мастер КРС, предст. заказчика', 0.67+0.5],
+                  [None, None,
+                   f'Произвести опрессовку фонтанной арматуры после монтажа на устье скважины '
+                   f'на давление {CreatePZ.max_admissible_pressure}атм в присутствии представителя заказчика'
+                   f'(давление на максимальное возможное давление опрессовки эскплуатационной колонны)',
+                   None, None, None, None, None, None, None,
+                   'Мастер КРС, предст. заказчика', 0.7],
 
                   [f'Спустить {CreatePZ.dict_pump_SHGN["posle"]} на'
                    f' {gno_nkt_opening(CreatePZ.dict_sucker_rod_po)}'
@@ -153,7 +153,12 @@ def gno_down(self):
                    f' оборудование (переводники, муфты, переходные катушки). МОНТАЖ БЕЗ ПОДВЕСНОГО ПАТРУБКА ЗАПРЕЩЕН. ',
                    None, None, None, None, None, None, None,
                    'Мастер КРС, предст. заказчика', 1.27],
-
+                  [None, None,
+                   f'Произвести опрессовку фонтанной арматуры после монтажа на устье скважины '
+                   f'на давление {CreatePZ.max_admissible_pressure}атм в присутствии представителя заказчика'
+                   f'(давление на максимальное возможное давление опрессовки эскплуатационной колонны)',
+                   None, None, None, None, None, None, None,
+                   'Мастер КРС, предст. заказчика', 0.7],
                   [f'Спустить плунжер на компоновке штанг:'
                    f' {gno_nkt_opening(CreatePZ.dict_sucker_rod_po)}', None,
                    f'Обвязать устье скважины согласно схемы №3 утвержденной главным '
@@ -203,6 +208,12 @@ def gno_down(self):
                               f'{testing_pressure(self, CreatePZ.H_F_paker_do["posle"])[1]}',
                               None, None, None, None, None, None, None,
                               'Мастер КРС, предст. заказчика', 0.67],
+                             [None, None,
+                              f'Произвести опрессовку фонтанной арматуры после монтажа на устье скважины '
+                              f'на давление {CreatePZ.max_admissible_pressure}атм в присутствии представителя заказчика'
+                              f'(давление на максимальное возможное давление опрессовки эскплуатационной колонны)',
+                              None, None, None, None, None, None, None,
+                              'Мастер КРС, предст. заказчика', 0.7],
                              [f'Спустить {CreatePZ.dict_pump_SHGN["posle"]} на компоновке штанг:'
                    f' {gno_nkt_opening(CreatePZ.dict_sucker_rod_po)}', None,
                               f'Обвязать устье скважины согласно схемы №3 утвержденной главным '
@@ -261,6 +272,12 @@ def gno_down(self):
                               f'{testing_pressure(self, CreatePZ.H_F_paker_do["posle"])[0]}',
                               None, None, None, None, None, None, None,
                               'Мастер КРС, предст. заказчика', 0.67],
+                             [None, None,
+                              f'Произвести опрессовку фонтанной арматуры после монтажа на устье скважины '
+                              f'на давление {CreatePZ.max_admissible_pressure}атм в присутствии представителя заказчика'
+                              f'(давление на максимальное возможное давление опрессовки эскплуатационной колонны)',
+                              None, None, None, None, None, None, None,
+                              'Мастер КРС, предст. заказчика', 0.7],
                              [f'Спустить плунжер на компоновке штанг: {gno_nkt_opening(CreatePZ.dict_sucker_rod_po)}м', None,
                               f'Обвязать устье скважины согласно схемы №3 утвержденной главным '
                                 f'инженером от 14.10.2021г при СПО штанг (ПМШ 62х21 либо аналог). Опрессовать ПВО на {CreatePZ.max_expected_pressure}атм.'
@@ -308,6 +325,12 @@ def gno_down(self):
                    f'произвести герметизацию устья. \n{testing_pressure(self, CreatePZ.H_F_paker_do["posle"])[1]}',
                    None, None, None, None, None, None, None,
                    'Мастер КРС, предст. заказчика', 1.77],
+                  [None, None,
+                   f'Произвести опрессовку фонтанной арматуры после монтажа на устье скважины '
+                   f'на давление {CreatePZ.max_admissible_pressure}атм в присутствии представителя заказчика'
+                   f'(давление на максимальное возможное давление опрессовки эскплуатационной колонны)',
+                   None, None, None, None, None, None, None,
+                   'Мастер КРС, предст. заказчика', 0.7],
                   [f'СПО {CreatePZ.dict_pump_SHGN["posle"]} на компоновке штанг', None,
                    f'Обвязать устье скважины согласно схемы №3 утвержденной главным '
                     f'инженером от 14.10.2021г при СПО штанг (ПМШ 62х21 либо аналог). Опрессовать ПВО на {CreatePZ.max_expected_pressure}атм.'
@@ -346,7 +369,14 @@ def gno_down(self):
          f' оборудование (переводники, муфты, переходные катушки). МОНТАЖ БЕЗ ПОДВЕСНОГО ПАТРУБКА ЗАПРЕЩЕН. произвести разделку'
          f' кабеля под устьевой сальник произвести герметизацию устья. ',
          None, None, None, None, None, None, None,
-         'Мастер КРС, предст. заказчика', 1.27]]
+         'Мастер КРС, предст. заказчика', 1.27],
+        [None, None,
+         f'Произвести опрессовку фонтанной арматуры после монтажа на устье скважины '
+         f'на давление {CreatePZ.max_admissible_pressure}атм в присутствии представителя заказчика'
+         f'(давление на максимальное возможное давление опрессовки эскплуатационной колонны)',
+         None, None, None, None, None, None, None,
+         'Мастер КРС, предст. заказчика', 0.7],
+    ]
 
     descent_orz = [
         [None, None,
@@ -381,6 +411,12 @@ def gno_down(self):
          f'в присутствии представителя заказчика на наличие перетоков.',
          None, None, None, None, None, None, None,
          'Мастер КРС, предст. заказчика', 0.67],
+        [None, None,
+         f'Произвести опрессовку фонтанной арматуры после монтажа на устье скважины '
+         f'на давление {CreatePZ.max_admissible_pressure}атм в присутствии представителя заказчика'
+         f'(давление на максимальное возможное давление опрессовки эскплуатационной колонны)',
+         None, None, None, None, None, None, None,
+         'Мастер КРС, предст. заказчика', 0.7],
         [None, None,
          f'Спустить стыковочное устройство на НКТ48мм до глубины {float(CreatePZ.H_F_paker2_do["posle"])}м с замером и шаблонированием. ',
          None, None, None, None, None, None, None,
@@ -440,6 +476,12 @@ def gno_down(self):
                     None, None, None, None, None, None, None,
                     'Мастер КРС, предст. заказчика', 1.27],
                    [None, None,
+                    f'Произвести опрессовку фонтанной арматуры после монтажа на устье скважины '
+                    f'на давление {CreatePZ.max_admissible_pressure}атм в присутствии представителя заказчика'
+                    f'(давление на максимальное возможное давление опрессовки эскплуатационной колонны)',
+                    None, None, None, None, None, None, None,
+                    'Мастер КРС, предст. заказчика', 0.7],
+                   [None, None,
                     f'Перед пуском УЭЦН опрессовать ГНО на 50атм в течении 30 минут в присутствии представителя заказчика с помощью ЦА-320 '
                     f'(составить акт). Предоставить Заказчику замер НКТ.',
                     None, None, None, None, None, None, None,
@@ -479,6 +521,12 @@ def gno_down(self):
            f'произвести герметизацию устья. Опрессовать кабельный ввод устьевой арматуры',
            None, None, None, None, None, None, None,
            'Мастер КРС, предст. заказчика', 1.77],
+        [None, None,
+         f'Произвести опрессовку фонтанной арматуры после монтажа на устье скважины '
+         f'на давление {CreatePZ.max_admissible_pressure}атм в присутствии представителя заказчика'
+         f'(давление на максимальное возможное давление опрессовки эскплуатационной колонны)',
+         None, None, None, None, None, None, None,
+         'Мастер КРС, предст. заказчика', 0.7],
           [testing_pressure(self, CreatePZ.H_F_paker_do["posle"])[1], None,
            f'{testing_pressure(self, CreatePZ.H_F_paker_do["posle"])[0]} Опрессовать кабельный ввод устьевой арматуры',
            None, None, None, None, None, None, None,
@@ -506,50 +554,49 @@ def gno_down(self):
 
     # print(('НВ' in CreatePZ.dict_pump_SHGN["posle"].upper() or 'ШГН' in CreatePZ.dict_pump_SHGN["posle"].upper()),
     #       CreatePZ.if_None(CreatePZ.paker_do["posle"]) != 'отсут')
-    if CreatePZ.dict_pump_ECN["posle"] != 'отсут' and str(CreatePZ.paker_do["posle"]) == 'отсут':
+    if CreatePZ.dict_pump_ECN["posle"] != 0 and CreatePZ.paker_do["posle"]== 0:
         lift_select = descent_ecn
         lift_key = 'ЭЦН'
-    elif 89 in CreatePZ.dict_nkt_po.keys() and 48 in CreatePZ.dict_nkt_po.keys() and CreatePZ.if_None(
-            CreatePZ.paker_do["posle"]) != 'отсут':
+    elif '89' in CreatePZ.dict_nkt_po.keys() and '48' in CreatePZ.dict_nkt_po.keys() and CreatePZ.paker_do["posle"] != 0:
         lift_select = descent_orz
         lift_key = 'ОРЗ'
 
-    elif CreatePZ.dict_pump_ECN["posle"] != 'отсут' and (CreatePZ.if_None(CreatePZ.paker_do["posle"]) == 'отсут'):
+    elif CreatePZ.dict_pump_ECN["posle"] != 0 and CreatePZ.paker_do["posle"] == 0:
 
         lift_select = descent_ecn_with_paker
         lift_key = 'ЭЦН с пакером'
         print('Подьем ЭЦН с пакером ')
 
     elif ('НВ' in CreatePZ.if_None(CreatePZ.dict_pump_SHGN["posle"]).upper() or 'ШГН' in CreatePZ.if_None(CreatePZ.dict_pump_SHGN[
-        "posle"]).upper()) and CreatePZ.if_None(CreatePZ.paker_do["posle"]) == 'отсут':
+        "posle"]).upper()) and CreatePZ.paker_do["posle"] == 0:
         lift_select = descent_nv
         lift_key = 'НВ'
     elif ('НВ' in CreatePZ.if_None(CreatePZ.dict_pump_SHGN["posle"]).upper() or 'ШГН' in CreatePZ.if_None(CreatePZ.dict_pump_SHGN[
-        "posle"]).upper()) and CreatePZ.if_None(CreatePZ.paker_do["posle"]) != 'отсут':
+        "posle"]).upper()) and CreatePZ.paker_do["posle"] != 0:
         lift_select = descent_nv_with_paker
         lift_key = 'НВ с пакером'
 
-    elif 'НН' in CreatePZ.if_None(CreatePZ.dict_pump_SHGN["posle"]).upper() and CreatePZ.if_None(CreatePZ.paker_do["posle"]) == 'отсут':
+    elif 'НН' in CreatePZ.if_None(CreatePZ.dict_pump_SHGN["posle"]).upper() and CreatePZ.paker_do["posle"] == 0:
         lift_select = descent_nn
         lift_key = 'НН'
-    elif 'НН' in CreatePZ.if_None(CreatePZ.dict_pump_SHGN["posle"]).upper() and CreatePZ.if_None(CreatePZ.paker_do["posle"]) != 'отсут':
+    elif 'НН' in CreatePZ.if_None(CreatePZ.dict_pump_SHGN["posle"]).upper() and CreatePZ.paker_do["posle"] != 0:
         lift_select = descent_nn_with_paker
         lift_key = 'НН с пакером'
-    elif CreatePZ.dict_pump_SHGN["posle"] != 'отсут' and CreatePZ.dict_pump_ECN["posle"] != 'отсут':
+    elif CreatePZ.dict_pump_SHGN["posle"] != 0 and CreatePZ.dict_pump_ECN["posle"] != 0:
         lift_select = descentORD
         lift_key = "ОРД"
-    elif 'НН' in  CreatePZ.if_None(CreatePZ.dict_pump_SHGN["posle"]) and CreatePZ.if_None(CreatePZ.paker_do["posle"]) != 'отсут':
+    elif 'НН' in CreatePZ.if_None(CreatePZ.dict_pump_SHGN["posle"]) and CreatePZ.paker_do["posle"] != 0:
         lift_select = descent_nn_with_paker
         lift_key = "НН с пакером"
         print('Подьем НН с пакером ')
 
-    elif  CreatePZ.if_None(CreatePZ.dict_pump_SHGN["posle"]) == 'отсут' and CreatePZ.if_None(CreatePZ.dict_pump_ECN["posle"]) == 'отсут' and CreatePZ.if_None(
-            CreatePZ.paker_do["posle"]) == 'отсут':
+    elif CreatePZ.dict_pump_SHGN["posle"] == 0 and CreatePZ.dict_pump_ECN["posle"] == 0 and \
+            CreatePZ.paker_do["posle"] == 0:
         lift_select = descent_voronka
         lift_key = 'воронка'
         print('Подьем  воронки')
-    elif  CreatePZ.if_None(CreatePZ.dict_pump_SHGN["posle"]) == 'отсут' and CreatePZ.if_None(CreatePZ.dict_pump_ECN["posle"]) == 'отсут' and CreatePZ.if_None(
-            CreatePZ.paker_do["posle"]) != 'отсут':
+    elif CreatePZ.dict_pump_SHGN["posle"] == 0 and CreatePZ.dict_pump_ECN["posle"] == 0 and \
+            CreatePZ.paker_do["posle"] != 0:
         lift_select = paker_descent
         lift_key = 'пакер'
         lift_s = f'пакер ППД  {CreatePZ.paker_do["posle"]}'

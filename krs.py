@@ -15,6 +15,7 @@ def calculationFluidWork(vertical, pressure):
         stockRatio = 0.1 if float(vertical) <= 1200 else 0.05
 
         fluidWork = round(float(str(pressure)) * (1 + stockRatio) / float(vertical) / 0.0981, 2)
+        print(fluidWork < 1.02 , (CreatePZ.region == 'КГМ' or CreatePZ.region == 'АГМ'))
         if fluidWork < 1.02 and (CreatePZ.region == 'КГМ' or CreatePZ.region == 'АГМ'):
             fluidWork = 1.02
         elif fluidWork < 1.02 and (CreatePZ.region == 'ИГМ' or CreatePZ.region == 'ТГМ' or CreatePZ.region == 'ЧГМ'):
@@ -90,11 +91,13 @@ def work_krs(self, work_plan):
             lift_key = 'ОРД'
             print(f'Подьем орд')
 
-        elif CreatePZ.if_None(CreatePZ.dict_pump_ECN["do"]) != 'отсут' and CreatePZ.if_None(CreatePZ.paker_do["do"]) == 'отсут':
+        elif CreatePZ.if_None(CreatePZ.dict_pump_ECN["do"]) != 'отсут' and \
+                CreatePZ.if_None(CreatePZ.paker_do["do"]) == 'отсут':
             lift_key = 'ЭЦН'
 
             print('Подьем ЭЦН')
-        elif CreatePZ.if_None(CreatePZ.dict_pump_ECN["do"]) != 'отсут' and CreatePZ.if_None(CreatePZ.paker_do['do']) != 'отсут':
+        elif CreatePZ.if_None(CreatePZ.dict_pump_ECN["do"]) != 'отсут' and \
+                CreatePZ.if_None(CreatePZ.paker_do['do']) != 'отсут':
             lift_key = 'ЭЦН с пакером'
             print('Подьем ЭЦН с пакером ')
         elif CreatePZ.if_None(CreatePZ.dict_pump_SHGN["do"]) != 'отсут' and CreatePZ.dict_pump_SHGN["do"].upper() != 'НН' \

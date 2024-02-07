@@ -204,9 +204,7 @@ def perf_new(self, roofRir, solePir):
     CreatePZ.perforation_sole = 0
 
     for plast in CreatePZ.plast_all:
-
         for interval in list((CreatePZ.dict_perforation[plast]['интервал'])):
-
             if roofRir <= interval[0] <= solePir:
                 CreatePZ.dict_perforation[plast]['отключение'] = True
             if CreatePZ.dict_perforation[plast]['отключение'] == False:
