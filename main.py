@@ -1463,6 +1463,7 @@ class MyWindow(QMainWindow):
                             schema_pvo_set.add(value[value.index(' №')+1:value.index(' №')+4].replace(' ', ''))
         print(f'схема ПВО {schema_pvo_set}')
 
+
         n = 0
         for schema in list(schema_pvo_set):
             coordinate = f'{get_column_letter(2)}{1 + n}'
@@ -1500,8 +1501,8 @@ class MyWindow(QMainWindow):
                 self.acid_windowPaker = AcidPakerWindow(self.table_widget, CreatePZ.ins_ind, CreatePZ.countAcid)
                 self.acid_windowPaker.setGeometry(100, 400, 100, 400)
                 self.acid_windowPaker.show()
-                # CreatePZ.pause_app(self)
-                # CreatePZ.pause = True
+                CreatePZ.pause_app(self)
+                CreatePZ.pause = True
                 self.acid_windowPaker = None
                 self.reply_acid()
         else:
@@ -1712,7 +1713,7 @@ class MyWindow(QMainWindow):
 
         ws4.cell(row=6, column=1).value = f'НКТ: \n {gno_nkt_opening(CreatePZ.dict_nkt)}'
         ws4.cell(row=7, column=1).value = f'Рпл- {" ".join(list(pressur_set))}атм'
-        ws4.cell(row=8, column=1).value = f'ЖГС = {CreatePZ.fluid_short}г/см3'
+        ws4.cell(row=8, column=1).value = f'ЖГС = {1.02}г/см3'
         ws4.cell(row=9, column=1).value = f'Нст- {CreatePZ.static_level}м / Ндин - {CreatePZ.dinamic_level}м'
         if CreatePZ.curator == 'ОР':
             ws4.cell(row=10, column=1).value = f'Ожидаемые {CreatePZ.expected_Q}м3/сут при Р-{CreatePZ.expected_P}'

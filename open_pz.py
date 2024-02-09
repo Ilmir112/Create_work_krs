@@ -836,9 +836,9 @@ class CreatePZ:
 
             for row in range(CreatePZ.sucker_rod_ind + 1, CreatePZ.pipes_ind):
 
-                key = str(ws.cell(row=row, column=4).value)
+                key = str(ws.cell(row=row, column=4).value).replace(' ','')
                 value = ws.cell(row=row, column=7).value
-                if key != str(None) and key != '-':
+                if key != str(None) and key != '-' and key != '':
                     if CreatePZ.if_None(key) != 'отсут' and row < CreatePZ.b_plan:
 
                         CreatePZ.dict_sucker_rod[key] = CreatePZ.dict_sucker_rod.get(key, 0) + int(
@@ -959,7 +959,8 @@ class CreatePZ:
                     CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('удлинение', set()).add(row[8])
 
                 zhgs  = 1.01
-                if row[9] and row[1]:
+                if str(row[9]).replace(',','').replace('.', '').isdigit() and row[1]:
+                    print(row[9])
                     CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('давление',
                                                                                set()).add(round(float(row[9]), 1))
                     CreatePZ.dict_perforation_short.setdefault(plast, {}).setdefault('давление',

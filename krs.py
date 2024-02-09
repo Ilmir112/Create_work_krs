@@ -1183,16 +1183,18 @@ def volume_vn_nkt(dict_nkt):  # Внутренний объем одного п�
 def volume_rod(dict_sucker_rod):  # Объем штанг
     from open_pz import CreatePZ
     volume_rod = 0
-    # print(dict_sucker_rod)
+    print(dict_sucker_rod)
     for diam_rod, lenght_rod in dict_sucker_rod.items():
-        volume_rod += (3.14 * (lenght_rod * (CreatePZ.without_b(diam_rod) / 1000) / lenght_rod) ** 2) / 4 * lenght_rod
+        if diam_rod:
+            volume_rod += (3.14 * (lenght_rod * (CreatePZ.without_b(diam_rod) / 1000) / lenght_rod) ** 2) / 4 * lenght_rod
     return round(volume_rod, 5)
 
 
 def volume_nkt(dict_nkt):  # Внутренний объем НКТ по фондовым НКТ
     volume_nkt = 0
     for nkt, length_nkt in dict_nkt.items():
-        volume_nkt += volume_vn_nkt(nkt) * length_nkt
+        if nkt:
+            volume_nkt += volume_vn_nkt(nkt) * length_nkt
     return volume_nkt
 
 

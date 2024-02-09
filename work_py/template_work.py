@@ -20,8 +20,12 @@ class TabPage_SO(QWidget):
 
         self.template_first_Label = QLabel("диаметр первого шаблона", self)
         self.template_first_Edit = QLineEdit(self)
+
         self.template_str_Label = QLabel("строчка с шаблонами", self)
         self.template_str_Edit = QLineEdit(self)
+
+        self.skm_teml_str_Label = QLabel("глубины спуска шаблонов", self)
+        self.skm_teml_str_Edit = QLineEdit(self)
 
         self.lenght_template_first_Label = QLabel("длина первого шаблона", self)
         self.lenght_template_first_Edit = QLineEdit(self)
@@ -41,12 +45,12 @@ class TabPage_SO(QWidget):
         self.lenght_template_second_Label = QLabel("длина второго шаблона", self)
         self.lenght_template_second_Edit = QLineEdit(self)
 
-        self.dictance_three_Label = QLabel("третья", self)
-        self.dictance_three_Edit = QLineEdit(self)
+
         grid = QGridLayout(self)
         if CreatePZ.column_additional is False or \
             (CreatePZ.column_additional and CreatePZ.current_bottom < CreatePZ.head_column_additional):
-            self.template_Combo.addItems(['', 'ПСШ ЭК', 'ПСШ открытый ствол', 'ПСШ без хвоста'])
+            self.template_select_list = ['ПСШ ЭК', 'ПСШ открытый ствол', 'ПСШ без хвоста']
+            self.template_Combo.addItems(self.template_select_list)
 
 
 
@@ -66,13 +70,13 @@ class TabPage_SO(QWidget):
             grid.addWidget(self.template_second_Edit, 5, 7)
             grid.addWidget(self.lenght_template_second_Label, 4, 8)
             grid.addWidget(self.lenght_template_second_Edit, 5, 8)
-            grid.addWidget(self.template_str_Label, 8, 1, 8, 8)
-            grid.addWidget(self.template_str_Edit, 9, 1, 9, 8)
-        else:
-            self.template_Combo.addItems(['ПСШ Доп колонна СКМ в основной колонне', 'ПСШ СКМ в доп колонне c хвостом',
-                                          'ПСШ СКМ в доп колонне + открытый ствол', 'ПСШ СКМ в доп колонне без хвоста',
-                                          ])
 
+        else:
+            self.template_select_list = ['ПСШ Доп колонна СКМ в основной колонне', 'ПСШ СКМ в доп колонне c хвостом',
+                                          'ПСШ СКМ в доп колонне + открытый ствол', 'ПСШ СКМ в доп колонне без хвоста']
+            self.template_Combo.addItems(self.template_select_list)
+            self.dictance_three_Label = QLabel("третья", self)
+            self.dictance_three_Edit = QLineEdit(self)
 
 
             grid.addWidget(self.template_labelType, 1, 2, 1, 8)
@@ -95,8 +99,13 @@ class TabPage_SO(QWidget):
             grid.addWidget(self.template_second_Edit, 5, 8)
             grid.addWidget(self.lenght_template_second_Label, 4, 9)
             grid.addWidget(self.lenght_template_second_Edit, 5, 9)
-            grid.addWidget(self.template_str_Label, 11, 1, 11, 8)
-            grid.addWidget(self.template_str_Edit, 12, 1, 21, 8)
+
+        grid.addWidget(self.template_str_Label, 11, 1, 11, 8)
+        grid.addWidget(self.template_str_Edit, 12, 1, 14, 8)
+
+        grid.addWidget(self.skm_teml_str_Label, 15, 1, 15, 8)
+        grid.addWidget(self.skm_teml_str_Edit, 16, 1, 16, 8)
+
 
         template_diam_ek = self.template_diam_ek()
         self.template_first_Edit.setText(str(template_diam_ek[0]))
@@ -114,8 +123,42 @@ class TabPage_SO(QWidget):
         liftEcn = lift_ecn_can[CreatePZ.lift_ecn_can]
         self.lenght_template_second_Edit.setText(str(liftEcn))
 
+    def definition_pssh(self):
+        from open_pz import CreatePZ
 
+        roof_skm = 0
+        if (CreatePZ.column_additional is False and CreatePZ.open_trunk_well is False and all(
+                [CreatePZ.dict_perforation[plast]['отрайбировано'] for plast in CreatePZ.plast_work]) is False) or \
+                (CreatePZ.column_additional is True and float(CreatePZ.current_bottom) <= float(
+                    CreatePZ.head_column_additional) and all(
+                    [CreatePZ.dict_perforation[plast]['отрайбировано'] for plast in CreatePZ.plast_work]) is False):
+            template_key = 'ПСШ ЭК'
 
+        elif CreatePZ.column_additional is False and CreatePZ.open_trunk_well is True and all(
+                [CreatePZ.dict_perforation[plast]['отрайбировано'] for plast in CreatePZ.plast_work]) is False:
+            template_key = 'ПСШ открытый ствол'
+
+        elif CreatePZ.column_additional is False and CreatePZ.open_trunk_well is False and all(
+                [CreatePZ.dict_perforation[plast]['отрайбировано'] for plast in CreatePZ.plast_work]) is True:
+            template_key = 'ПСШ без хвоста'
+
+        # elif CreatePZ.column_additional is True and CreatePZ.head_column_additional > roof_skm:
+        #     template_key = 'ПСШ Доп колонна СКМ в основной колонне'
+
+        elif CreatePZ.column_additional is True and CreatePZ.open_trunk_well is False and all(
+                [CreatePZ.dict_perforation[plast]['отрайбировано'] for plast in CreatePZ.plast_work]) is False:
+            template_key = 'ПСШ СКМ в доп колонне c хвостом'
+
+        elif CreatePZ.column_additional is True and CreatePZ.open_trunk_well is True and all(
+                [CreatePZ.dict_perforation[plast]['отрайбировано'] for plast in CreatePZ.plast_work]) is False:
+            template_key = 'ПСШ СКМ в доп колонне + открытый ствол'
+
+        elif CreatePZ.column_additional is True and all(
+                [CreatePZ.dict_perforation[plast]['отрайбировано'] for plast in
+                 CreatePZ.plast_work]) is True and CreatePZ.open_trunk_well is False:
+            template_key = 'ПСШ СКМ в доп колонне без хвоста'
+
+        self.template_Combo.setCurrentIndex(self.template_select_list.index(template_key))
         # self.sole_rir_Edit.setText()
             # listEnabel = [self.khovstLabel, self.khvostEdit, self.swabTruelabelType, self.swabTrueEditType,
             #               self.plastCombo, self.pakerEdit, self.paker2Edit,
@@ -134,8 +177,6 @@ class TabPage_SO(QWidget):
         self.skm_Edit.setText(str(CreatePZ.column_diametr))
         self.dictance_template_second_Edit.setText(str(10))
 
-
-
         lift_ecn_can = {True: 30, False: 4}
         liftEcn = lift_ecn_can[CreatePZ.lift_ecn_can]
         self.lenght_template_second_Edit.setText(str(liftEcn))
@@ -147,6 +188,7 @@ class TabPage_SO(QWidget):
         nkt_diam = CreatePZ.nkt_diam
         roof_plast, roof_add_column_plast = self.definition_roof_not_raiding()
         dictance_template_first1 = int(CreatePZ.current_bottom - roof_plast + 5)
+        self.dictance_template_first_Edit.setText(str(dictance_template_first1))
         dictance_template_first = self.dictance_template_first_Edit.text()
 
 
@@ -167,36 +209,51 @@ class TabPage_SO(QWidget):
         if self.template_Combo.currentText() == 'ПСШ ЭК':
 
             template_str = f'перо + шаблон-{first_template}мм L-{lenght_template_first}м + НКТ{nkt_diam}мм ' \
-                          f'{dictance_template_first}м + СКМ-{skm} + {dictance_template_second }м ' \
-                           f'НКТ{nkt_diam}мм + шаблон-{template_second}мм L-{lenght_template_second}м '
+                          f'{dictance_template_first}м + СКМ-{skm} +  ' \
+                           f'НКТ{nkt_diam}мм {dictance_template_second }м + шаблон-{template_second}мм ' \
+                           f'L-{lenght_template_second}м '
             print(f'строка шаблона {template_str}')
-            self.template_str_Edit.setText(template_str)
+            CreatePZ.template_depth = int(CreatePZ.current_bottom - int(dictance_template_first1) -
+                                          int(lenght_template_first)) - int(dictance_template_second)
+            skm_teml_str = f'шаблон-{template_second}мм до гл.{CreatePZ.template_depth}м'
+
 
         elif self.template_Combo.currentText() == 'ПСШ без хвоста':
+            # listEnabel = [self.template_first_Edit, self.template_first_Label, self.dictance_template_first_Edit,
+            #               self.lenght_template_first_Edit, self.lenght_template_first_Label,
+            #               self.dictance_template_first_Label]
+            # for enable in listEnabel:
+            #     enable.setEnabled(False)
 
             template_str = f'перо + СКМ-{skm} + {dictance_template_second}м ' \
                            f'НКТ{nkt_diam}мм + шаблон-{template_second}мм L-{liftEcn}м '
-            self.template_str_Edit.setText(template_str)
+            CreatePZ.template_depth = math.ceil(CreatePZ.current_bottom - int(dictance_template_first))
+            dictance_template_second = int(self.dictance_template_second_Edit.text())
+            skm_teml_str = f'шаблон-{template_second}мм до гл.{CreatePZ.template_depth}м'
+
             print(f'строка шаблона {template_str}')
 
         elif self.template_Combo.currentText() == 'ПСШ открытый ствол':
+            # listEnabel = [self.template_first_Edit, self.template_first_Label, self.dictance_template_first_Edit,
+            #               self.dictance_template_first_Label]
+            # for enable in listEnabel:
+            #     enable.setEnabled(False)
 
             self.template_first_Edit.setText('фильтр направление')
 
             self.dictance_template_first_Edit.setText(str(dictance_template_first1))
             self.skm_Edit.setText(str(CreatePZ.column_diametr))
             self.dictance_template_second_Edit.setText(str(10))
-
+            dictance_template_first = int(self.dictance_template_first_Edit.text())
+            dictance_template_second = int(self.dictance_template_second_Edit.text())
             template_str = f'фильтр-направление + НКТ{nkt_diam}мм {dictance_template_first}м ' \
                           f'+ СКМ-{skm} + {dictance_template_second}м НКТ{nkt_diam}мм + ' \
                           f'шаблон-{template_second}мм L-{lenght_template_second}м '
+            CreatePZ.template_depth = int(CreatePZ.current_bottom - dictance_template_first - dictance_template_second)
 
-            self.template_str_Edit.setText(template_str)
+            skm_teml_str = f'шаблон-{template_second}мм до гл.{CreatePZ.template_depth}м'
 
         elif self.template_Combo.currentText() == 'ПСШ Доп колонна СКМ в основной колонне':
-
-
-
             self.lenght_template_first_Edit.setText(str(liftEcn))
             lenght_template_first = int(self.lenght_template_first_Edit.text())
             dictance_template_first1= int(CreatePZ.current_bottom - roof_add_column_plast + 5)
@@ -212,11 +269,20 @@ class TabPage_SO(QWidget):
             self.dictance_three_Edit.setText(str(roof_plast - CreatePZ.head_column_additional + 10))
             dictance_three_first = self.dictance_three_Edit.text()
 
-            template_str = f'обточная муфта  + {dictance_template_first}м ' \
-                             f'НКТ{nkt_pod} + шаблон-{first_template}мм L-{lenght_template_first}м + ' \
+            template_str = f'обточная муфта  + ' \
+                             f'НКТ{nkt_pod}  + {dictance_template_first}м + шаблон-{first_template}мм L-{lenght_template_first}м + ' \
                              f'НКТ{nkt_pod} {dictance_template_second}м + НКТ{nkt_diam} {dictance_three_first}м + ' \
                            f'СКМ-{skm} + шаблон-{template_second}мм L-{liftEcn}м '
-            self.template_str_Edit.setText(template_str)
+
+            CreatePZ.template_depth_addition = int(CreatePZ.current_bottom - dictance_template_first )
+
+            CreatePZ.template_depth = int(CreatePZ.current_bottom -
+                                                   dictance_template_first - lenght_template_first -
+                                                   dictance_template_second - dictance_three_first)
+            # template_str = template_SKM_DP_EK
+            skm_teml_str = f'шаблон-{first_template}мм до гл.{CreatePZ.template_depth_addition}м, ' \
+                                 f'шаблон-{template_second}мм до гл.{CreatePZ.template_depth}м'
+
 
         elif self.template_Combo.currentText() == 'ПСШ СКМ в доп колонне c хвостом':
             self.skm_Edit.setText(str(CreatePZ.column_additional_diametr))
@@ -228,12 +294,19 @@ class TabPage_SO(QWidget):
             dictance_three_first = int(roof_add_column_plast - CreatePZ.head_column_additional - int(
                 self.lenght_template_first_Edit.text()) -9)
             self.dictance_three_Edit.setText(str(dictance_three_first))
-
+            dictance_template_three = self.dictance_three_Edit.text()
             template_str = f'обточная муфта + НКТ{nkt_pod} {dictance_template_first}м ' \
                           f'+ СКМ-{skm} + НКТ{nkt_pod} {dictance_template_second}м + шаблон-{first_template}мм ' \
                           f'L-{lenght_template_first}м + НКТ{nkt_pod} {dictance_three_first}м + ' \
                           f'шаблон-{template_second}мм L-{liftEcn}м '
-            self.template_str_Edit.setText(template_str)
+            CreatePZ.template_depth = math.ceil(CreatePZ.current_bottom - 2 -
+                                  dictance_template_first - dictance_template_second -
+                                  lenght_template_first - dictance_template_three)
+            CreatePZ.template_depth_addition = math.ceil(CreatePZ.current_bottom - 2 -
+                                                         dictance_template_first - dictance_template_second)
+
+            skm_teml_str = f'шаблон-{first_template}мм до гл.{CreatePZ.template_depth_addition}м, ' \
+                           f'шаблон-{template_second}мм до гл.{CreatePZ.template_depth}м))'
 
         elif self.template_Combo.currentText() == 'ПСШ СКМ в доп колонне без хвоста':
             dictance_template_first1 = 0
@@ -256,7 +329,13 @@ class TabPage_SO(QWidget):
             template_str = f'обточная муфта + СКМ-{skm} + НКТ{nkt_pod} {dictance_template_second} + ' \
                            f'шаблон-{first_template}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can_addition]}м + ' \
                            f'НКТ{nkt_pod} {dictance_three_first}м + шаблон-{template_second}мм L-{liftEcn}м '
-            self.template_str_Edit.setText(template_str)
+
+            CreatePZ.template_depth = math.ceil(CreatePZ.current_bottom - dictance_template_second -
+                                                lift_ecn_can[CreatePZ.lift_ecn_can_addition] - dictance_three_first)
+            CreatePZ.template_depth_addition = math.ceil(CreatePZ.current_bottom - dictance_template_second)
+            skm_teml_str = f'шаблон-{first_template}мм до гл.{CreatePZ.template_depth_addition}м, ' \
+                       f'шаблон-{template_second}мм до гл.{CreatePZ.template_depth}м))'
+
 
         elif self.template_Combo.currentText() == 'ПСШ СКМ в доп колонне + открытый ствол':
             self.skm_Edit.setText(str(CreatePZ.column_additional_diametr))
@@ -276,8 +355,20 @@ class TabPage_SO(QWidget):
                                f'+ СКМ-{skm} + НКТ{nkt_pod} {dictance_template_second}м + шаблон-{first_template}мм ' \
                                 f'L-{lenght_template_first}м' \
                                f' + НКТ{nkt_pod} {dictance_template_three}м + шаблон-{template_second}мм L-{liftEcn}м '
+            CreatePZ.template_depth = math.ceil(CreatePZ.current_bottom - 2 -
+                                                         dictance_template_first-dictance_template_second -
+                                                lenght_template_first-dictance_template_three)
+            CreatePZ.template_depth_addition = math.ceil(CreatePZ.current_bottom - 2 -
+                                                         dictance_template_first-dictance_template_second )
 
-            self.template_str_Edit.setText(template_str)
+            skm_teml_str = f'шаблон-{first_template}мм до гл.{CreatePZ.template_depth_addition}м, ' \
+                      f'шаблон-{template_second}мм до гл.{CreatePZ.template_depth}м))'
+
+        self.template_str_Edit.setText(template_str)
+        self.skm_teml_str_Edit.setText(skm_teml_str)
+
+        if 'ПОМ' in str(CreatePZ.paker_do["posle"]).upper() and '122' in str(CreatePZ.paker_do["posle"]):
+            self.template_second_Edit.setText(str(126))
     def definition_roof_not_raiding(self):
         from open_pz import CreatePZ
         dict_perforation = CreatePZ.dict_perforation
@@ -439,7 +530,13 @@ class TemplateKrs(QMainWindow):
 
         template_str = str(self.tabWidget.currentWidget().template_str_Edit.text())
         template = str(self.tabWidget.currentWidget().template_Combo.currentText())
-        work_list = self.template_ek(template_str, template)
+        if CreatePZ.column_additional is False or (
+                CreatePZ.column_additional is True and float(
+            CreatePZ.head_column_additional) >= CreatePZ.current_bottom):
+            template_diametr = int(self.tabWidget.currentWidget().template_second_Edit.text())
+        else:
+            template_diametr = int(self.tabWidget.currentWidget().template_first_Edit.text())
+        work_list = self.template_ek(template_str, template, template_diametr)
         AcidPakerWindow.populate_row(self, CreatePZ.ins_ind, work_list)
 
         CreatePZ.pause = True
@@ -673,52 +770,14 @@ class TemplateKrs(QMainWindow):
     #     return list_template_ek
 
 
-    def template_ek(self, template_str, template):
+    def template_ek(self, template_str, template, temlate_ek):
         from open_pz import CreatePZ
         from work_py.advanted_file import skm_interval, raid
 
-        # roof_plast, roof_add_column_plast = self.definition_roof_not_raiding()
-        #
-        # if CreatePZ.column_additional is True:
-        #     nkt_pod = ['60мм' if CreatePZ.column_additional_diametr < 110 else '73мм со снятыми фасками']
-        #     nkt_pod = ''.join(nkt_pod)
-        #
-        #     # temlate_ek = template_ek()
-        # else:
-        #     nkt_pod = '60'
-        #     template_ek = self.template_diam_ek()
-        #
-        # lift_ecn_can = {True: 30, False: 4}
-        # liftEcn = lift_ecn_can[CreatePZ.lift_ecn_can]
-        #
-        # if CreatePZ.column_additional is False and float(CreatePZ.shoe_column) < float(CreatePZ.current_bottom):
-        #     CreatePZ.open_trunk_well = True
-        #     # print(CreatePZ.column_additional is False and float(CreatePZ.shoe_column), float(CreatePZ.current_bottom),
-        #     #       CreatePZ.column_additional is False and float(CreatePZ.shoe_column) < float(CreatePZ.current_bottom))
-        #
-        # elif CreatePZ.column_additional is True and float(CreatePZ.shoe_column_additional) < float(
-        #         CreatePZ.current_bottom):
-        #     CreatePZ.open_trunk_well = True
 
-        # if CreatePZ.column_additional is False or (
-        #         CreatePZ.column_additional is True and CreatePZ.head_column_additional >= CreatePZ.current_bottom):
-        #     # first_template = self.template_diam_ek()[0]
-        #     # second_template = self.template_diam_ek()[1]
-        #     # print(f'нижний шаблон {first_template}')
-        # else:
-        #     # first_template = self.template_diam_additional_ek()[0]
-        #     # second_template = self.template_diam_additional_ek()[1]
-        if 'ПОМ' in str(CreatePZ.paker_do["posle"]).upper() and '122' in str(CreatePZ.paker_do["posle"]):
-            second_template = 126
 
-        # second_template, ok = QInputDialog.getInt(None, 'Диаметр шаблона',
-        #                                           f'диаметр шаблона для вверхнего колонны',
-        #                                           int(second_template), 70,
-        #                                           200)
-        # first_template, ok = QInputDialog.getInt(None, 'Диаметр шаблона для доп колонны',
-        #                                          f'диаметр шаблона для Нижнего шаблона колонны',
-        #                                          int(first_template), 70,
-        #                                          200)
+
+
         # ckm_teml_SKM_EK, ckm_teml_SKM_EK_open, ckm_teml_SKM_EK_without, ckm_teml_SKM_DP_EK, \
         # ckm_teml_SKM_DP, ckm_teml_SKM_DP_without,\
         # ckm_teml_SKM_DP_open, ckm_teml_SKM_EK_open_True = 0, 0, 0, 0, 0, 0, 0, 0
@@ -728,121 +787,9 @@ class TemplateKrs(QMainWindow):
         # CreatePZ.nkt_diam = ''.join(['73' if CreatePZ.column_diametr > 110 else '60'])
         # length_template_addition = int(''.join(['30' if CreatePZ.lift_ecn_can_addition is True else '2']))
         # # print(f' кровля перфорации {int(CreatePZ.current_bottom),int(CreatePZ.shoe_column), 8}')
-        # template_SKM_EK = f'перо + шаблон-{first_template}мм L-2м + НКТ{CreatePZ.nkt_diam}мм ' \
-        #                   f'{int(CreatePZ.current_bottom - roof_plast + 8)}м ' \
-        #                   f'+ СКМ-{int(CreatePZ.column_diametr)} +10м НКТ{CreatePZ.nkt_diam}мм + ' \
-        #                   f'шаблон-{second_template}мм L-{liftEcn}м '
-        #
-        # template_SKM_EK_open = f'фильтр-направление L-2м + НКТ{CreatePZ.nkt_diam}мм ' \
-        #                        f'{int(CreatePZ.current_bottom) - roof_plast + 8}м' \
-        #                        f'+ СКМ-{int(CreatePZ.column_diametr)} + 10м ' \
-        #                        f'НКТ{CreatePZ.nkt_diam}мм + шаблон-{second_template}мм L-{liftEcn}м '
-        # template_SKM_EK_open_true = f'фильтр-направление L-2м + НКТ{CreatePZ.nkt_diam}мм ' \
-        #                        f'{int(CreatePZ.current_bottom) - int(roof_plast) + 8}м' \
-        #                        f'+ СКМ-{int(CreatePZ.column_diametr)} + 10м ' \
-        #                        f'НКТ{CreatePZ.nkt_diam}мм + шаблон-{second_template}мм L-{liftEcn}м '
-        #
-        # template_SKM_EK_without = f'перо + СКМ-{int(CreatePZ.column_diametr)} + 10м ' \
-        #                           f'НКТ{CreatePZ.nkt_diam}мм + шаблон-{second_template}мм L-{liftEcn}м '
-        #
-        # template_SKM_DP_EK = f'обточная муфта  + {round(CreatePZ.current_bottom - roof_add_column_plast + 10, 0)}м ' \
-        #                      f'НКТ{nkt_pod} + шаблон-{first_template}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can_addition]}м + ' \
-        #                      f'НКТ{nkt_pod} ' \
-        #                      f'{round(float(CreatePZ.current_bottom) - float(CreatePZ.head_column_additional) - lift_ecn_can[CreatePZ.lift_ecn_can_addition] - (float(CreatePZ.current_bottom) - roof_add_column_plast + 10), 0)}м ' \
-        #                      f'+ НКТ{CreatePZ.nkt_diam} {CreatePZ.head_column_additional - roof_plast +10}м + СКМ + шаблон-{second_template}мм L-{liftEcn}м '
-        #
-        # template_SKM_DP = f'обточная муфта + НКТ{nkt_pod} {int(CreatePZ.current_bottom) - math.ceil(roof_add_column_plast) + 10}м ' \
-        #                   f'+ СКМ-{int(CreatePZ.column_additional_diametr)} +10м НКТ{nkt_pod} + шаблон-{first_template}мм ' \
-        #                   f'L-{length_template_addition}м' \
-        #                   f' + НКТ{nkt_pod} {math.ceil(roof_add_column_plast - 10 - length_template_addition - float(CreatePZ.head_column_additional))}м + ' \
-        #                   f'+ НКТ{CreatePZ.nkt_diam} {CreatePZ.head_column_additional - roof_plast}м'+\
-        #                   f'шаблон-{second_template}мм L-{liftEcn}м '
-        #
-        # template_SKM_DP_open = f'фильтр направление L-2м + НКТ{nkt_pod} {math.ceil(CreatePZ.current_bottom - roof_add_column_plast + 10)}м ' \
-        #                        f'+ СКМ-{int(CreatePZ.column_additional_diametr)} +10м НКТ{nkt_pod} + ' \
-        #                        f'шаблон-{first_template}мм L-{length_template_addition}м' \
-        #                        f' + НКТ{nkt_pod} {int(CreatePZ.current_bottom - (int(CreatePZ.current_bottom - roof_add_column_plast + 10)) - 13 - length_template_addition - float(CreatePZ.head_column_additional) + 10)}м' \
-        #                        f'+ НКТ{CreatePZ.nkt_diam} {CreatePZ.head_column_additional - roof_plast +10}м +  шаблон-{second_template}мм L-{liftEcn}м '
-        #
-        #
-        # template_SKM_DP_without = f'обточная муфта + СКМ-{int(CreatePZ.column_additional_diametr)} +10м НКТ{nkt_pod} + ' \
-        #                           f'шаблон-{first_template}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can_addition]}м + НКТ{nkt_pod} ' \
-        #                           f'{round(CreatePZ.current_bottom - float(CreatePZ.head_column_additional) - 10, 0)}м + ' \
-        #                           f'НКТ{CreatePZ.nkt_diam} {CreatePZ.head_column_additional - roof_plast +10}м + шаблон-{second_template}мм L-{liftEcn}м '
-        #
-
-        if (CreatePZ.column_additional is False and CreatePZ.open_trunk_well is False and all(
-                [CreatePZ.dict_perforation[plast]['отрайбировано'] for plast in CreatePZ.plast_work]) is False) or \
-                (CreatePZ.column_additional is True and float(CreatePZ.current_bottom) <= float(
-                    CreatePZ.head_column_additional) and all(
-                    [CreatePZ.dict_perforation[plast]['отрайбировано'] for plast in CreatePZ.plast_work]) is False):
-            # template_str = template_SKM_EK
-
-            # CreatePZ.template_depth = math.ceil(int(roof_plast - 20))
-            # ckm_teml_SKM_EK = f'шаблон-{second_template}мм до гл.{CreatePZ.template_depth}м)'
-            template_key = 'ПСШ ЭК'
-
-        elif CreatePZ.column_additional is False and CreatePZ.open_trunk_well is True and all(
-                [CreatePZ.dict_perforation[plast]['отрайбировано'] for plast in CreatePZ.plast_work]) is False:
-
-            # CreatePZ.template_depth = int(int(roof_plast - 20))
-            # template_str = template_SKM_EK_open
-            # ckm_teml_SKM_EK_open = f'шаблон-{second_template}мм до гл.{CreatePZ.template_depth}м)'
-            template_key = 'ПСШ открытый ствол'
-            print(f'ключ {template_key}')
-        elif CreatePZ.column_additional is False and CreatePZ.open_trunk_well is True and all(
-                [CreatePZ.dict_perforation[plast]['отрайбировано'] is False for plast in CreatePZ.plast_work]) is False:
-
-            # CreatePZ.template_depth = int(CreatePZ.shoe_column) - 20
-            # template_str = template_SKM_EK_open
-            # ckm_teml_SKM_EK_open_True = f'шаблон-{second_template}мм до гл.{CreatePZ.template_depth}м)'
-            template_key = 'ПСШ открытый ствол + ИП отрайбирован'
-            print(f'ключ {template_key}')
-        elif CreatePZ.column_additional is False and CreatePZ.open_trunk_well is False and all(
-                [CreatePZ.dict_perforation[plast]['отрайбировано'] for plast in CreatePZ.plast_work]) is True:
-
-            # CreatePZ.template_depth = math.ceil(CreatePZ.current_bottom - 10)
-            # template_str = template_SKM_EK_without
-            # ckm_teml_SKM_EK_without = f'шаблон-{second_template}мм до гл.{CreatePZ.template_depth}м)'
-            template_key = 'ПСШ без хвоста'
-        elif CreatePZ.column_additional is True and CreatePZ.head_column_additional > roof_skm:
-
-            CreatePZ.template_depth_addition = math.ceil(CreatePZ.current_bottom - 10)
-
-            CreatePZ.template_depth = math.ceil(CreatePZ.head_column_additional - 8)
-            # template_str = template_SKM_DP_EK
-            ckm_teml_SKM_DP_EK = f'шаблон-{second_template}мм до гл.{int(CreatePZ.head_column_additional) - 20}м))'
-            template_key = 'ПСШ Доп колонна СКМ в основной колонне'
-        elif CreatePZ.column_additional is True and CreatePZ.open_trunk_well is False and all(
-                [CreatePZ.dict_perforation[plast]['отрайбировано'] for plast in CreatePZ.plast_work]) is False:
-
-            CreatePZ.template_depth = math.ceil(CreatePZ.head_column_additional - 8)
-            CreatePZ.template_depth_addition = math.ceil(CreatePZ.perforation_roof - 18)
-            # template_str = template_SKM_DP
-
-            # ckm_teml_SKM_DP = f'шаблон-{first_template}мм до гл.{CreatePZ.template_depth_addition}м, ' \
-            #           f'шаблон-{second_template}мм до гл.{CreatePZ.template_depth}м))'
-            template_key = 'ПСШ СКМ в доп колонне c хвостом'
-        elif CreatePZ.column_additional is True and CreatePZ.open_trunk_well is True and all(
-                [CreatePZ.dict_perforation[plast]['отрайбировано'] for plast in CreatePZ.plast_work]) is False:
-            CreatePZ.template_depth = math.ceil(CreatePZ.head_column_additional - 8)
-            CreatePZ.template_depth_addition = math.ceil(CreatePZ.shoe_column_additional - 18)
 
 
-            # template_str = template_SKM_DP_open
-            # ckm_teml_SKM_DP_open = f'шаблон-{first_template}мм до гл.{CreatePZ.template_depth_addition}м, ' \
-            #            f'шаблон-{second_template}мм до гл.{CreatePZ.template_depth}м))'
-            template_key = 'ПСШ СКМ в доп колонне + открытый ствол'
-        elif CreatePZ.column_additional is True and all(
-                [CreatePZ.dict_perforation[plast]['отрайбировано'] for plast in
-                 CreatePZ.plast_work]) is True and CreatePZ.open_trunk_well is False:
-            CreatePZ.template_depth_addition = math.ceil(CreatePZ.current_bottom - 10)
-            CreatePZ.template_depth = math.ceil(CreatePZ.head_column_additional - 8)
 
-            # template_str = template_SKM_DP_without
-            # ckm_teml_SKM_DP_without = f'шаблон-{first_template}мм до гл.{CreatePZ.template_depth_addition}м, ' \
-            #            f'шаблон-{second_template}мм до гл.{CreatePZ.template_depth}м))'
-            template_key = 'ПСШ СКМ в доп колонне без хвоста'
 
         template_sel = ['ПСШ ЭК', 'ПСШ открытый ствол', 'ПСШ без хвоста', 'ПСШ Доп колонна СКМ в основной колонне', 'ПСШ СКМ в доп колонне c хвостом',
                         'ПСШ СКМ в доп колонне + открытый ствол', 'ПСШ СКМ в доп колонне без хвоста', 'ПСШ открытый ствол + ИП отрайбирован']
@@ -930,11 +877,7 @@ class TemplateKrs(QMainWindow):
              None, None, None, None, None, None, None,
              'Мастер КРС', liftingNKT_norm(CreatePZ.current_bottom, 1.2)]
         ]
-        if CreatePZ.column_additional is False or (
-                CreatePZ.column_additional is True and float(CreatePZ.head_column_additional) >= CreatePZ.current_bottom):
-            temlate_ek = 124
-        else:
-            temlate_ek = TemplateKrs.template_diam_additional_ek()[0]
+
 
         notes_list = [[None, None,
                        f'ПРИМЕЧАНИЕ №1: При непрохождении шаблона d={temlate_ek}мм предусмотреть СПО забойного '
