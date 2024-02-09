@@ -176,6 +176,7 @@ class MyWindow(QMainWindow):
         self.acid_windowPaker = None
         self.signatures_window = None
         self.acid_windowPaker2 = None
+        self.rir_window = None
         self.data_window = None
         self.filter_widgets = []
         self.table_class = None
@@ -657,6 +658,15 @@ class MyWindow(QMainWindow):
             full_path = path + '/' + filenames
             # print(f'10 - {ws2.max_row}')
             # print(wb2.path)
+            print(f' кате {CreatePZ.cat_P_1}')
+            if 1 in CreatePZ.cat_P_1 or 1 in CreatePZ.cat_H2S_list or 1 in CreatePZ.cat_gaz_f_pr:
+                ws5 = wb2.create_sheet('Sheet1')
+                ws5.title = "Схемы ПВО"
+                ws5 = wb2["Схемы ПВО"]
+                wb2.move_sheet(ws5, offset=-2)
+                schema_list = self.check_pvo_schema(ws5, ins_ind+2)
+
+
             if wb2:
                 wb2.close()
                 wb2.save(full_path)
@@ -794,7 +804,7 @@ class MyWindow(QMainWindow):
 
     def openContextMenu(self, position):
         from open_pz import CreatePZ
-        from work_py.template_work import template_ek_without_skm, template_ek
+
 
         context_menu = QMenu(self)
 
@@ -939,13 +949,7 @@ class MyWindow(QMainWindow):
         acid_menu.addAction(acid_action2paker)
         acid_action2paker.triggered.connect(self.acid2PakerNewWindow)
 
-        # acid_action_1paker = QAction("на одном пакере", self)
-        # acid_menu.addAction(acid_action_1paker)
-        # acid_action_1paker.triggered.connect(self.acid_action_1paker)
-        #
-        # acid_action_2paker = QAction("на двух пакерах", self)
-        # acid_menu.addAction(acid_action_2paker)
-        # acid_action_2paker.triggered.connect(self.acid_action_2paker)
+
 
         acid_action_gons = QAction("ГОНС", self)
         acid_menu.addAction(acid_action_gons)
@@ -1010,26 +1014,13 @@ class MyWindow(QMainWindow):
         pakerIzvlek_menu.addAction(izvlek_action)
         izvlek_action.triggered.connect(self.izvlek_action)
 
-        rirWithPero_action = QAction('РИР на пере')
-        rir_menu.addAction(rirWithPero_action)
-        rirWithPero_action.triggered.connect(self.rirWithPero)
-
-        rirWithPaker_action = QAction('РИР на пакере')
-        rir_menu.addAction(rirWithPaker_action)
-        rirWithPaker_action.triggered.connect(self.rirWithPaker)
-
-        rirWithRpk_action = QAction('РИР с РПК')
-        rir_menu.addAction(rirWithRpk_action)
-        rirWithRpk_action.triggered.connect(self.rirWithRpk)
-
-        rirWithRpp_action = QAction('РИР с глухим пакером')
-        rir_menu.addAction(rirWithRpp_action)
-        rirWithRpp_action.triggered.connect(self.rirWithRpp)
+        rir_action = QAction('РИР')
+        rir_menu.addAction(rir_action)
+        rir_action.triggered.connect(self.rirAction)
 
         claySolision_action = QAction('Глинистый раствор в ЭК')
         rir_menu.addAction(claySolision_action)
         claySolision_action.triggered.connect(self.claySolision)
-
 
         gno_menu = action_menu.addAction('Спуск фондового оборудования')
         gno_menu.triggered.connect(self.gno_bottom)
@@ -1132,13 +1123,13 @@ class MyWindow(QMainWindow):
         self.populate_row(self.ins_ind, acidGons_work_list)
 
     def izvlek_action(self):
-        from work_py.rir import izvlech_paker
-        izvlech_paker_work_list = izvlech_paker(self)
+        from work_py.rir import RirWindow
+        izvlech_paker_work_list = RirWindow.izvlech_paker(self)
         self.populate_row(self.ins_ind, izvlech_paker_work_list)
 
     def pakerIzvlek_action(self):
-        from work_py.rir import rir_izvelPaker
-        rir_izvelPaker_work_list = rir_izvelPaker(self)
+        from work_py.rir import RirWindow
+        rir_izvelPaker_work_list = RirWindow.rir_izvelPaker(self)
         self.populate_row(self.ins_ind, rir_izvelPaker_work_list)
 
     def pvo_cat1(self):
@@ -1150,30 +1141,25 @@ class MyWindow(QMainWindow):
         from work_py.alone_oreration import fluid_change
         fluid_change_work_list = fluid_change(self)
         self.populate_row(self.ins_ind, fluid_change_work_list)
-
-    def rirWithRpk(self):
-        from work_py.rir import rir_rpk
-        rirRpk_work_list = rir_rpk(self)
-        self.populate_row(self.ins_ind, rirRpk_work_list)
-
-    def rirWithRpp(self):
-        from work_py.rir import rir_rpp
-        rirRpp_work_list = rir_rpp(self)
-        self.populate_row(self.ins_ind, rirRpp_work_list)
-
     def claySolision(self):
         from work_py.claySolution import claySolutionDef
         rirRpp_work_list = claySolutionDef(self)
         self.populate_row(self.ins_ind, rirRpp_work_list)
-    def rirWithPaker(self):
-        from work_py.rir import rir_paker
-        rir_paker_work_list = rir_paker(self)
-        self.populate_row(self.ins_ind, rir_paker_work_list)
+    def rirAction(self):
+        from work_py.rir import RirWindow
 
-    def rirWithPero(self):
-        from work_py.rir import rirWithPero
-        rirWithPero_work_list = rirWithPero(self)
-        self.populate_row(self.ins_ind, rirWithPero_work_list)
+        from open_pz import CreatePZ
+        print(f' окно СКО ')
+        # CreatePZ.pause = False
+        if self.rir_window is None:
+            CreatePZ.countAcid = 0
+            print(f' окно2 СКО ')
+            self.rir_window = RirWindow(self.table_widget, CreatePZ.ins_ind)
+            self.rir_window.setGeometry(200, 400, 300, 400)
+            self.rir_window.show()
+            CreatePZ.pause_app(self)
+            CreatePZ.pause = True
+            self.rir_window = None
 
     def grpWithPaker(self):
         from work_py.grp import grpPaker
@@ -1336,20 +1322,26 @@ class MyWindow(QMainWindow):
         self.populate_row(self.ins_ind, pressure_work1)
 
     def template_pero(self):
-        from work_py.template_work import pero
+        from work_py.template_work import TemplateKrs
 
 
-        template_pero_list = pero(self)
+        template_pero_list = TemplateKrs.pero(self)
         self.populate_row(self.ins_ind, template_pero_list)
 
 
     def template_with_skm(self):
-        from work_py.template_work import template_ek
+        from work_py.template_work import TemplateKrs
         from open_pz import CreatePZ
-        template_ek_list = template_ek(self)
-        print(f'индекс {self.ins_ind, len(template_ek_list)}')
-        self.populate_row(self.ins_ind, template_ek_list)
-        CreatePZ.ins_ind += len(template_ek_list) + 1
+        from open_pz import CreatePZ
+        print(f' окно СКО ')
+
+        if self.acid_windowPaker2 is None:
+            self.acid_windowPaker2 = TemplateKrs(self.table_widget, CreatePZ.ins_ind)
+            self.acid_windowPaker2.setGeometry(200, 400, 300, 400)
+            self.acid_windowPaker2.show()
+            CreatePZ.pause_app(self)
+            CreatePZ.pause = True
+            self.acid_windowPaker2 = None
 
     def template_without_skm(self):
         from work_py.template_work import template_ek_without_skm
@@ -1402,6 +1394,7 @@ class MyWindow(QMainWindow):
         from open_pz import CreatePZ
         print(f' окно СКО ')
 
+
         if self.acid_windowPaker2 is None:
             CreatePZ.countAcid = 0
             print(f' окно2 СКО ')
@@ -1436,6 +1429,7 @@ class MyWindow(QMainWindow):
 
         acid_true_quest = QMessageBox.question(self, 'Необходимость кислоты',
                                                'Нужно ли планировать кислоту на следующий объет?')
+
         if acid_true_quest == QMessageBox.StandardButton.Yes:
             if self.acid_windowPaker2 is None:
                 CreatePZ.countAcid = 1
@@ -1457,7 +1451,42 @@ class MyWindow(QMainWindow):
                 CreatePZ.pause_app(self)
                 CreatePZ.pause = True
                 self.acid_windowPaker2 = None
+    def check_pvo_schema(self, ws5, ind):
+        schema_pvo_set = set()
+        for row in range(self.table_widget.rowCount()):
+            if row > ind:
+                for column in range(self.table_widget.columnCount()):
+                    value = self.table_widget.item(row, column)
+                    if value != None:
+                        value = value.text()
+                        if 'схеме №' in value or 'схемы №' in value:
+                            schema_pvo_set.add(value[value.index(' №')+1:value.index(' №')+4].replace(' ', ''))
+        print(f'схема ПВО {schema_pvo_set}')
 
+        n = 0
+        for schema in list(schema_pvo_set):
+            coordinate = f'{get_column_letter(2)}{1 + n}'
+            schema_path = f'imageFiles/pvo/oil/схема {schema}.jpg'
+            img = openpyxl.drawing.image.Image(schema_path)
+            img.width = 750
+            img.height = 530
+            img.anchor = coordinate
+            ws5.add_image(img, coordinate)
+            n += 29
+        ws5.print_area = f'B1:M{n}'
+        ws5.page_setup.fitToPage = True
+        ws5.page_setup.fitToHeight = False
+        ws5.page_setup.fitToWidth = True
+        ws5.print_options.horizontalCentered = True
+        # зададим размер листа
+        ws5.page_setup.paperSize = ws5.PAPERSIZE_A4
+        # содержимое по ширине страницы
+        ws5.sheet_properties.pageSetUpPr.fitToPage = True
+        ws5.page_setup.fitToHeight = False
+        # Переместите второй лист перед первым
+
+
+        return list(schema_pvo_set)
     def reply_acid(self):
         from open_pz import CreatePZ
         from work_py.acid_paker import AcidPakerWindow
@@ -1471,8 +1500,8 @@ class MyWindow(QMainWindow):
                 self.acid_windowPaker = AcidPakerWindow(self.table_widget, CreatePZ.ins_ind, CreatePZ.countAcid)
                 self.acid_windowPaker.setGeometry(100, 400, 100, 400)
                 self.acid_windowPaker.show()
-                CreatePZ.pause_app(self)
-                CreatePZ.pause = True
+                # CreatePZ.pause_app(self)
+                # CreatePZ.pause = True
                 self.acid_windowPaker = None
                 self.reply_acid()
         else:
@@ -1482,8 +1511,8 @@ class MyWindow(QMainWindow):
                 self.acid_windowPaker = AcidPakerWindow(self.table_widget, CreatePZ.ins_ind, CreatePZ.countAcid)
                 self.acid_windowPaker.setGeometry(100, 400, 100, 400)
                 self.acid_windowPaker.show()
-                CreatePZ.pause_app(self)
-                CreatePZ.pause = True
+                # CreatePZ.pause_app(self)
+                # CreatePZ.pause = True
                 self.acid_windowPaker = None
 
     def GeophysicalNewWindow(self):
@@ -1532,8 +1561,8 @@ class MyWindow(QMainWindow):
 
             self.perforation_correct_window2.show()
 
-            CreatePZ.pause_app(self)
-            CreatePZ.pause = True
+            # CreatePZ.pause_app(self)
+            # CreatePZ.pause = True
             self.perforation_correct_window2 = None
 
     def correctData(self):
@@ -1675,10 +1704,11 @@ class MyWindow(QMainWindow):
             elif CreatePZ.dict_perforation_short[plast]['отключение'] and plast in CreatePZ.dict_perforation_short:
                 for interval in CreatePZ.dict_perforation_short[plast]["интервал"]:
                     plast_str += f'{plast[:4]} :{interval[0]}- {interval[1]} (изол)\n'
+
             filter_list_pressuar = list(filter(lambda x: type(x) in [int, float], list(CreatePZ.dict_perforation_short[plast]["давление"])))
             # print(f'фильтр -{filter_list_pressuar}')
             if filter_list_pressuar:
-                pressur_set.add(f'{plast[:4]} - {filter_list_pressuar[0]}')
+                pressur_set.add(f'{plast[:4]} - {filter_list_pressuar}')
 
         ws4.cell(row=6, column=1).value = f'НКТ: \n {gno_nkt_opening(CreatePZ.dict_nkt)}'
         ws4.cell(row=7, column=1).value = f'Рпл- {" ".join(list(pressur_set))}атм'
@@ -1686,6 +1716,8 @@ class MyWindow(QMainWindow):
         ws4.cell(row=9, column=1).value = f'Нст- {CreatePZ.static_level}м / Ндин - {CreatePZ.dinamic_level}м'
         if CreatePZ.curator == 'ОР':
             ws4.cell(row=10, column=1).value = f'Ожидаемые {CreatePZ.expected_Q}м3/сут при Р-{CreatePZ.expected_P}'
+        else:
+            ws4.cell(row=10, column=1).value = f'Ожидаемые {CreatePZ.Qoil}т при Р-{CreatePZ.Qwater}'
         ws4.cell(row=11, column=1).value = f'макс угол {CreatePZ.max_angle}'
         ws4.cell(row=1, column=2).value = CreatePZ.cdng
         ws4.cell(row=2, column=3).value = f'Рпл - {CreatePZ.cat_P_1[0]}, H2S -{CreatePZ.cat_H2S_list[0]}, газ факт -{CreatePZ.gaz_f_pr[0]}т/м3'

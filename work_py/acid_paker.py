@@ -6,7 +6,7 @@ from PyQt5.Qt import QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, \
     QInputDialog, QTabWidget, QPushButton, Qt, QCheckBox
 from PyQt5.QtCore import QEvent
 from PyQt5.QtGui import QPalette, QFontMetrics, QStandardItem
-from PyQt5.QtWidgets import QVBoxLayout, QStyledItemDelegate, qApp, QMessageBox
+from PyQt5.QtWidgets import QVBoxLayout, QStyledItemDelegate, qApp, QMessageBox, QCompleter
 
 from krs import well_volume
 from main import MyWindow
@@ -42,11 +42,11 @@ class CheckableComboBoxChild(QComboBox):
         self.lineEdit().setPlaceholderText("--выбрать пласты--")
         edit = self.lineEdit()
         self.setLineEdit(edit)
-        #self.completer = QCompleter()
-        #self.completer.setFilterMode(Qt.MatchContains)
-        #self.completer.setCaseSensitivity(Qt.CaseInsensitive)
-        #edit.setCompleter(self.completer)
-        #self.completer.setModel(self.model())
+        self.completer = QCompleter()
+        self.completer.setFilterMode(Qt.MatchContains)
+        self.completer.setCaseSensitivity(Qt.CaseInsensitive)
+        edit.setCompleter(self.completer)
+        self.completer.setModel(self.model())
         edit.returnPressed.connect(self.insertCustomItem)
 
         # Make the lineedit the same color as QPushButton
@@ -98,8 +98,9 @@ class CheckableComboBoxChild(QComboBox):
                 print(self.model().item(i).text())
 
                 CreatePZ.texts.append(self.model().item(i).text())
-                print(CreatePZ.texts)
+                print(f' список пласлов{CreatePZ.texts}')
         text = ", ".join(CreatePZ.texts)
+        print(text)
 
         # Compute elided text (with "...")
         metrics = QFontMetrics(self.lineEdit().font())

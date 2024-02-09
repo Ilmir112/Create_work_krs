@@ -215,21 +215,24 @@ class TabPage_SO(QWidget):
         dict_perforation = CreatePZ.dict_perforation
 
         plasts = CreatePZ.texts
-        print(f'пласты {plasts, len(CreatePZ.texts), len(plasts), CreatePZ.texts}')
+
         roof_plast = CreatePZ.current_bottom
         sole_plast = 0
         for plast in CreatePZ.plast_work:
             for plast_sel in plasts:
                 if plast_sel == plast:
+                    # print(plast, sole_plast)
 
                     if roof_plast >= dict_perforation[plast]['кровля']:
                         roof_plast = dict_perforation[plast]['кровля']
                     if sole_plast <= dict_perforation[plast]['подошва']:
                         sole_plast = dict_perforation[plast]['подошва']
-
+                # print(f' кровля {roof_plast} подошва {sole_plast, dict_perforation[plast]["подошва"]}')
             self.pakerEdit.setText(f"{int(sole_plast + 10)}")
-            self.paker2Edit.setText(f"{int(sole_plast - 10)}")
+
+
             if CreatePZ.countAcid != 2:
+                self.paker2Edit.setText(f"{int(roof_plast - 10)}")
                 self.swab_pakerEdit.setText(f"{int(sole_plast + 10)}")
                 self.swab_pakerEdit.setText(f"{int(sole_plast + 10)}")
 
@@ -237,32 +240,30 @@ class TabPage_SO(QWidget):
         dict_perforation = CreatePZ.dict_perforation
         if CreatePZ.countAcid == 0:
             plasts = CreatePZ.texts
-
+            # print(f' пласты {plasts}')
             roof_plast = CreatePZ.current_bottom
             sole_plast = 0
-            for plast in CreatePZ.plast_work:
-                for plast_sel in plasts:
-                    if plast_sel == plast:
+            # for plast in CreatePZ.plast_work:
+            #     for plast_sel in plasts:
+            #
+            #         if plast_sel == plast:
+            #             #     print(dict_perforation[plast_sel], plast)
+            #             print(plast, sole_plast)
+            #             if roof_plast >= dict_perforation[plast]['кровля']:
+            #                 roof_plast = dict_perforation[plast]['кровля']
+            #             if sole_plast < dict_perforation[plast]['подошва']:
+            #                 sole_plast = dict_perforation[plast]['подошва']
+            # print(f' кровля {roof_plast} подошва {sole_plast,  dict_perforation[plast]["подошва"]}')
 
-                        if roof_plast >= dict_perforation[plast]['кровля']:
-                            roof_plast = dict_perforation[plast]['кровля']
-                        if sole_plast <= dict_perforation[plast]['подошва']:
-                            sole_plast = dict_perforation[plast]['подошва']
 
-            if CreatePZ.perforation_roof < roof_plast:
-                if self.pakerEdit.text():
-                    paker_depth = int(self.pakerEdit.text())
-
-                    # self.khvostEdit.setText(str(int(sole_plast - paker_depth)))
-                    self.swab_pakerEdit.setText(str(int(paker_depth - 30)))
-            else:
-                if self.pakerEdit.text():
-                    paker_depth = int(self.pakerEdit.text())
-                    # self.khvostEdit.setText(str(int(sole_plast - paker_depth)))
-                    self.swab_pakerEdit.setText(str(int(paker_depth - 30)))
+            if self.pakerEdit.text():
+                paker_depth = int(self.pakerEdit.text())
+                # self.khvostEdit.setText(str(int(sole_plast - paker_depth)))
+                self.swab_pakerEdit.setText(str(int(paker_depth - 30)))
         elif CreatePZ.countAcid == 1:
-            paker_depth = int(self.pakerEdit.text())
-            self.paker2Edit.setText(str(paker_depth-CreatePZ.difference_paker))
+            if self.pakerEdit.text():
+                paker_depth = int(self.pakerEdit.text())
+                self.paker2Edit.setText(str(paker_depth-CreatePZ.difference_paker))
 class TabWidget(QTabWidget):
     def __init__(self):
         super().__init__()

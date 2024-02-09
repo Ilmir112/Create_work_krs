@@ -25,6 +25,7 @@ from work_py.gnkt_frez import Work_with_gnkt
 
 
 class CreatePZ:
+    Qoil = 0
     gipsInWell = False
     grpPlan = False
     nktOpressTrue = False
@@ -786,70 +787,7 @@ class CreatePZ:
                     CreatePZ.H2S_mg.append(H2S_pr)
 
 
-        try:
-            for row in range(CreatePZ.data_x_min + 2, CreatePZ.data_x_max + 1):
-                for col in range(1, 12):
-                    if CreatePZ.curator == 'ОР':
-                        if 'прием' in str(ws.cell(row=row, column=col).value).strip().lower() or 'qж' in str(
-                                ws.cell(row=row, column=col).value).strip().lower():
-                            Qpr = ws.cell(row=row, column=col + 1).value
-                            # print(f' приемис {Qpr}')
-                            n = 1
-                            while Qpr is None:
-                                ws.cell(row=row, column=col + n).value
-                                n += 1
-                                Qpr = ws.cell(row=row, column=col + n).value
-                            CreatePZ.expected_Q = Qpr
-                        elif 'зак' in str(ws.cell(row=row, column=col).value).strip().lower() or 'давл' in str(
-                                ws.cell(row=row, column=col).value).strip().lower() or 'P' in str(
-                            ws.cell(row=row, column=col).value).strip().lower():
-                            Pzak = ws.cell(row=row, column=col + 1).value
-                            n = 1
-                            while Pzak is None:
-                                n += 1
-                                Pzak = ws.cell(row=row, column=col + n).value
-                            CreatePZ.expected_P = Pzak
 
-                        CreatePZ.expected_pick_up[Qpr] = Pzak
-                        print(f' ожидаемые показатели {CreatePZ.expected_pick_up}')
-                    else:
-                        if 'qж' in str(ws.cell(row=row, column=col).value).strip().lower():
-                            Qwater = ws.cell(row=row, column=col + 1).value
-                            # print(f' приемис {Qpr}')
-                            n = 1
-                            while Qwater is None or n >12:
-                                n += 1
-                                Qwater = ws.cell(row=row, column=col + n).value
-                            CreatePZ.Qwater = Qwater
-                        elif 'qн' in str(ws.cell(row=row, column=col).value).strip().lower():
-                            Qoil = ws.cell(row=row, column=col + 1).value
-                            # print(f' приемис {Qpr}')
-                            n = 1
-                            while Qoil is None or n >12:
-                                n += 1
-                                Qoil = ws.cell(row=row, column=col + n).value
-                            CreatePZ.Qoil = Qoil
-                        elif 'воды' in str(ws.cell(row=row, column=col).value).strip().lower():
-                            proc_water = ws.cell(row=row, column=col + 1).value
-                            # print(f' приемис {Qpr}')
-                            n = 1
-                            while proc_water is None or n >12:
-                                n += 1
-                                proc_water = ws.cell(row=row, column=col + n).value
-                            CreatePZ.proc_water = proc_water
-        except:
-            print('ошибка при определении плановых показателей')
-            if CreatePZ.curator == 'OP':
-                expected_Q, ok = QInputDialog.getInt(self, 'Ожидаемая приемистость ',
-                                                     f'Ожидаемая приемистость по пласту ',
-                                                     100, 0,
-                                                     1600)
-                expected_P, ok = QInputDialog.getInt(self, f'Ожидаемое Давление закачки',
-                                                     f'Ожидаемое Давление закачки по пласту ',
-                                                     100, 0,
-                                                     250)
-                CreatePZ.expected_pick_up[expected_Q] = expected_P
-                print(f' Ожидаемые {CreatePZ.expected_pick_up}')
         # print(f' индекс нкт {CreatePZ.pipes_ind + 1, CreatePZ.condition_of_wells}')
         a_plan = 0
 
@@ -985,7 +923,7 @@ class CreatePZ:
                                 CreatePZ.dict_perforation_short[plast]['интервал'].add((roof_int, round(interval[1],1)))
 
                             elif interval[0] < roof_int < interval[1] is False and interval[0] < sole_int < interval[1]:
-                                print(f'удаление2 {roof_int, sole_int}, добавление{interval[0], sole_int}')
+                                # print(f'удаление2 {roof_int, sole_int}, добавление{interval[0], sole_int}')
                                 CreatePZ.dict_perforation[plast]['интервал'].discard((roof_int, sole_int))
                                 CreatePZ.dict_perforation[plast]['интервал'].add((round(interval[0], 1), sole_int))
                                 CreatePZ.dict_perforation_short[plast]['интервал'].discard((roof_int, sole_int))
@@ -999,7 +937,7 @@ class CreatePZ:
                                 CreatePZ.dict_perforation_short[plast]['интервал'].add((roof_int, round(interval[1],1)))
 
                             elif interval[0] < roof_int < interval[1] and interval[0] < sole_int < interval[1]:
-                                print(f'удаление {roof_int, sole_int}')
+                                # print(f'удаление {roof_int, sole_int}')
                                 CreatePZ.dict_perforation[plast]['интервал'].discard((roof_int, sole_int))
                                 CreatePZ.dict_perforation_short[plast]['интервал'].discard((roof_int, sole_int))
 
@@ -1021,7 +959,7 @@ class CreatePZ:
                     CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('удлинение', set()).add(row[8])
 
                 zhgs  = 1.01
-                if row[9]:
+                if row[9] and row[1]:
                     CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('давление',
                                                                                set()).add(round(float(row[9]), 1))
                     CreatePZ.dict_perforation_short.setdefault(plast, {}).setdefault('давление',
@@ -1029,7 +967,7 @@ class CreatePZ:
                     zhgs = krs.calculationFluidWork(float(row[1]), float(row[9]))
                 else:
                     CreatePZ.dict_perforation_short.setdefault(plast, {}).setdefault('давление',
-                                                                                     set()).add(0)
+                                                                                     set()).add('0')
                 if zhgs:
                     CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('рабочая жидкость', set()).add(zhgs)
                 if row[10]:
@@ -1093,6 +1031,75 @@ class CreatePZ:
         CreatePZ.curator, ok = QInputDialog.getItem(self, 'Выбор кураторов ремонта', 'Введите сектор кураторов региона',
                                                     curator_list, curator_list.index(curator), False)
         # print(f'куратор {CreatePZ.curator, CreatePZ.if_None(CreatePZ.dict_pump["posle"])}')
+
+        try:
+            if CreatePZ.curator == 'ОР':
+                for row in range(CreatePZ.data_x_min + 2, CreatePZ.data_x_max + 1):
+                    for col in range(1, 12):
+
+                        if 'прием' in str(ws.cell(row=row, column=col).value).lower() or 'qж' in str(
+                                ws.cell(row=row, column=col).value).lower():
+                            Qpr = ws.cell(row=row, column=col + 1).value
+                            # print(f' приемис {Qpr}')
+                            n = 1
+                            while Qpr is None:
+                                ws.cell(row=row, column=col + n).value
+                                n += 1
+                                Qpr = ws.cell(row=row, column=col + n).value
+                            CreatePZ.expected_Q = Qpr
+                        elif 'зак' in str(ws.cell(row=row, column=col).value).lower() or 'давл' in str(
+                                ws.cell(row=row, column=col).value).lower() or 'P' in str(
+                            ws.cell(row=row, column=col).value).lower():
+                            # print('lfdktybt pfrf')
+                            Pzak = ws.cell(row=row, column=col + 1).value
+                            n = 1
+                            while Pzak is None:
+                                n += 1
+                                Pzak = ws.cell(row=row, column=col + n).value
+                            CreatePZ.expected_P = Pzak
+
+                    CreatePZ.expected_pick_up[Qpr] = Pzak
+                    print(f' ожидаемые показатели {CreatePZ.expected_pick_up}')
+            else:
+                for row in range(CreatePZ.data_x_min + 2, CreatePZ.data_x_max + 1):
+                    for col in range(1, 12):
+                        if 'qж' in str(ws.cell(row=row, column=col).value).strip().lower():
+                            Qwater = ws.cell(row=row, column=col + 1).value
+                            # print(f' приемис {Qpr}')
+                            n = 1
+                            while Qwater is None or n > 12:
+                                n += 1
+                                Qwater = ws.cell(row=row, column=col + n).value
+                            CreatePZ.Qwater = Qwater
+                        elif 'qн' in str(ws.cell(row=row, column=col).value).strip().lower():
+                            Qoil = ws.cell(row=row, column=col + 1).value
+                            # print(f' приемис {Qpr}')
+                            n = 1
+                            while Qoil is None or n > 12:
+                                n += 1
+                                Qoil = ws.cell(row=row, column=col + n).value
+                            CreatePZ.Qoil = Qoil
+                        elif 'воды' in str(ws.cell(row=row, column=col).value).strip().lower():
+                            proc_water = ws.cell(row=row, column=col + 1).value
+                            # print(f' приемис {Qpr}')
+                            n = 1
+                            while proc_water is None or n > 12:
+                                n += 1
+                                proc_water = ws.cell(row=row, column=col + n).value
+                            CreatePZ.proc_water = proc_water
+        except:
+            print('ошибка при определении плановых показателей')
+            if CreatePZ.curator == 'OP':
+                expected_Q, ok = QInputDialog.getInt(self, 'Ожидаемая приемистость ',
+                                                     f'Ожидаемая приемистость по пласту ',
+                                                     100, 0,
+                                                     1600)
+                expected_P, ok = QInputDialog.getInt(self, f'Ожидаемое Давление закачки',
+                                                     f'Ожидаемое Давление закачки по пласту ',
+                                                     100, 0,
+                                                     250)
+                CreatePZ.expected_pick_up[expected_Q] = expected_P
+                print(f' Ожидаемые {CreatePZ.expected_pick_up}')
 
         if CreatePZ.column_additional is False and CreatePZ.dict_pump_ECN["posle"] != 0:
             # print(

@@ -9,29 +9,29 @@ def liftingGNO(dict_nkt):
             norm += value/10 * 0.038
         elif '89' in str(key) or '102' in str(key):
             norm += value/10 * 0.048
-    return round(norm,2)
+    return round(norm, 2)
 #Подьем труб
 def liftingNKT_norm(depth, layout):
     norm = 0.14 + 0.14
     if depth > 2000:
         norm += 1000 / 10 * 0.028
-        print(norm)
+        # print(norm)
         norm += 1000 / 10 * 0.031
-        print(norm)
+        # print(norm)
         norm += (depth - 2000) / 10 * 0.036
-        print(norm)
+        # print(norm)
     if 1000 <= depth <= 2000:
         norm += 1000 / 10 * 0.028
-        print(norm)
+        # print(norm)
         norm += (depth-1000)/10 * 0.031
-        print(norm)
+        # print(norm)
 
     if depth < 1000:
         norm += depth / 10 * 0.028
     norm = norm * layout
-    print(norm,layout)
+    # print(norm,layout)
     norm += depth / 400 * 3.2 * 0.053
-    print(norm)
+    # print(norm)
     return round(norm, 2)
 
 #Спуск труб
