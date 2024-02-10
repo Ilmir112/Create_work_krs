@@ -45,6 +45,9 @@ class TabPage_SO(QWidget):
         self.lenght_template_second_Label = QLabel("длина второго шаблона", self)
         self.lenght_template_second_Edit = QLineEdit(self)
 
+        self.dictance_three_Label = QLabel("третья", self)
+        self.dictance_three_Edit = QLineEdit(self)
+
 
         grid = QGridLayout(self)
         if CreatePZ.column_additional is False or \
@@ -70,13 +73,14 @@ class TabPage_SO(QWidget):
             grid.addWidget(self.template_second_Edit, 5, 7)
             grid.addWidget(self.lenght_template_second_Label, 4, 8)
             grid.addWidget(self.lenght_template_second_Edit, 5, 8)
+            grid.addWidget(self.dictance_three_Label, 4, 9)
+            grid.addWidget(self.dictance_three_Edit, 5, 9)
 
         else:
             self.template_select_list = ['ПСШ Доп колонна СКМ в основной колонне', 'ПСШ СКМ в доп колонне c хвостом',
                                           'ПСШ СКМ в доп колонне + открытый ствол', 'ПСШ СКМ в доп колонне без хвоста']
             self.template_Combo.addItems(self.template_select_list)
-            self.dictance_three_Label = QLabel("третья", self)
-            self.dictance_three_Edit = QLineEdit(self)
+
 
 
             grid.addWidget(self.template_labelType, 1, 2, 1, 8)
@@ -181,19 +185,19 @@ class TabPage_SO(QWidget):
         liftEcn = lift_ecn_can[CreatePZ.lift_ecn_can]
         self.lenght_template_second_Edit.setText(str(liftEcn))
 
-        first_template = self.template_first_Edit.text()
-        template_second = self.template_second_Edit.text()
+        first_template = int(self.template_first_Edit.text())
+        template_second = int(self.template_second_Edit.text())
 
-        lenght_template_first = self.lenght_template_first_Edit.text()
+        lenght_template_first = int(self.lenght_template_first_Edit.text())
         nkt_diam = CreatePZ.nkt_diam
         roof_plast, roof_add_column_plast = self.definition_roof_not_raiding()
         dictance_template_first1 = int(CreatePZ.current_bottom - roof_plast + 5)
         self.dictance_template_first_Edit.setText(str(dictance_template_first1))
-        dictance_template_first = self.dictance_template_first_Edit.text()
+        dictance_template_first = int(self.dictance_template_first_Edit.text())
 
 
-        lenght_template_second = self.lenght_template_second_Edit.text()
-        dictance_template_second = self.dictance_template_second_Edit.text()
+        lenght_template_second = int(self.lenght_template_second_Edit.text())
+        dictance_template_second = int(self.dictance_template_second_Edit.text())
         skm = self.skm_Edit.text()
 
         if CreatePZ.column_additional or \
@@ -205,7 +209,9 @@ class TabPage_SO(QWidget):
             self.template_second_Edit.setText(str(self.template_diam_additional_ek()[1]))
             first_template = int(self.template_first_Edit.text())
             template_second = int(self.template_second_Edit.text())
-
+            listEnabel = [self.dictance_three_Edit]
+            for enable in listEnabel:
+                enable.setEnabled(False)
         if self.template_Combo.currentText() == 'ПСШ ЭК':
 
             template_str = f'перо + шаблон-{first_template}мм L-{lenght_template_first}м + НКТ{nkt_diam}мм ' \
@@ -219,15 +225,11 @@ class TabPage_SO(QWidget):
 
 
         elif self.template_Combo.currentText() == 'ПСШ без хвоста':
-            # listEnabel = [self.template_first_Edit, self.template_first_Label, self.dictance_template_first_Edit,
-            #               self.lenght_template_first_Edit, self.lenght_template_first_Label,
-            #               self.dictance_template_first_Label]
-            # for enable in listEnabel:
-            #     enable.setEnabled(False)
+
 
             template_str = f'перо + СКМ-{skm} + {dictance_template_second}м ' \
                            f'НКТ{nkt_diam}мм + шаблон-{template_second}мм L-{liftEcn}м '
-            CreatePZ.template_depth = math.ceil(CreatePZ.current_bottom - int(dictance_template_first))
+            CreatePZ.template_depth = math.ceil(CreatePZ.current_bottom - int(dictance_template_second))
             dictance_template_second = int(self.dictance_template_second_Edit.text())
             skm_teml_str = f'шаблон-{template_second}мм до гл.{CreatePZ.template_depth}м'
 
@@ -260,14 +262,14 @@ class TabPage_SO(QWidget):
             print(f'дистанци {dictance_template_first }')
             self.skm_Edit.setText(str(CreatePZ.column_diametr))
             self.dictance_template_first_Edit.setText(str(dictance_template_first1))
-            dictance_template_first = self.dictance_template_first_Edit.text()
+            dictance_template_first = int(self.dictance_template_first_Edit.text())
             dictance_second1 = int(roof_add_column_plast - lenght_template_first - CreatePZ.head_column_additional - 5)
             self.dictance_template_second_Edit.setText(str(dictance_second1))
-            dictance_template_second = self.dictance_template_second_Edit.text()
+            dictance_template_second = int(self.dictance_template_second_Edit.text())
             self.lenght_template_second_Edit.setText(str(liftEcn))
 
             self.dictance_three_Edit.setText(str(roof_plast - CreatePZ.head_column_additional + 10))
-            dictance_three_first = self.dictance_three_Edit.text()
+            dictance_three_first = int(self.dictance_three_Edit.text())
 
             template_str = f'обточная муфта  + ' \
                              f'НКТ{nkt_pod}  + {dictance_template_first}м + шаблон-{first_template}мм L-{lenght_template_first}м + ' \
@@ -276,8 +278,7 @@ class TabPage_SO(QWidget):
 
             CreatePZ.template_depth_addition = int(CreatePZ.current_bottom - dictance_template_first )
 
-            CreatePZ.template_depth = int(CreatePZ.current_bottom -
-                                                   dictance_template_first - lenght_template_first -
+            CreatePZ.template_depth = int(CreatePZ.current_bottom - dictance_template_first - lenght_template_first -
                                                    dictance_template_second - dictance_three_first)
             # template_str = template_SKM_DP_EK
             skm_teml_str = f'шаблон-{first_template}мм до гл.{CreatePZ.template_depth_addition}м, ' \
@@ -289,12 +290,12 @@ class TabPage_SO(QWidget):
             skm = str(self.skm_Edit.text())
             dictance_template_first1 = int(CreatePZ.current_bottom - roof_add_column_plast + 5)
             self.dictance_template_first_Edit.setText(str(dictance_template_first1))
-            dictance_template_first = self.dictance_template_first_Edit.text()
+            dictance_template_first = int(self.dictance_template_first_Edit.text())
 
             dictance_three_first = int(roof_add_column_plast - CreatePZ.head_column_additional - int(
                 self.lenght_template_first_Edit.text()) -9)
             self.dictance_three_Edit.setText(str(dictance_three_first))
-            dictance_template_three = self.dictance_three_Edit.text()
+            dictance_template_three = int(self.dictance_three_Edit.text())
             template_str = f'обточная муфта + НКТ{nkt_pod} {dictance_template_first}м ' \
                           f'+ СКМ-{skm} + НКТ{nkt_pod} {dictance_template_second}м + шаблон-{first_template}мм ' \
                           f'L-{lenght_template_first}м + НКТ{nkt_pod} {dictance_three_first}м + ' \
@@ -311,7 +312,7 @@ class TabPage_SO(QWidget):
         elif self.template_Combo.currentText() == 'ПСШ СКМ в доп колонне без хвоста':
             dictance_template_first1 = 0
             self.dictance_template_first_Edit.setText(str(dictance_template_first1))
-            dictance_template_first = self.dictance_template_first_Edit.text()
+            dictance_template_first = int(self.dictance_template_first_Edit.text())
 
 
             print(CreatePZ.column_additional_diametr)
@@ -324,7 +325,7 @@ class TabPage_SO(QWidget):
                 CreatePZ.current_bottom - dictance_template_second - CreatePZ.head_column_additional
                 - int(lenght_template_first) - 4)
             self.dictance_three_Edit.setText(str(dictance_three))
-            dictance_three_first = self.dictance_three_Edit.text()
+            dictance_three_first = int(self.dictance_three_Edit.text())
 
             template_str = f'обточная муфта + СКМ-{skm} + НКТ{nkt_pod} {dictance_template_second} + ' \
                            f'шаблон-{first_template}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can_addition]}м + ' \
@@ -342,12 +343,12 @@ class TabPage_SO(QWidget):
             skm = str(self.skm_Edit.text())
             dictance_template_first1 = int(CreatePZ.current_bottom - roof_add_column_plast + 5)
             self.dictance_template_first_Edit.setText(str(dictance_template_first1))
-            dictance_template_first = self.dictance_template_first_Edit.text()
+            dictance_template_first = int(self.dictance_template_first_Edit.text())
 
             dictance_three_first = int(roof_add_column_plast - CreatePZ.head_column_additional - int(
                 self.lenght_template_first_Edit.text()) - 9)
             self.dictance_three_Edit.setText(str(dictance_three_first))
-            dictance_template_three = self.dictance_three_Edit.text()
+            dictance_template_three = int(self.dictance_three_Edit.text())
 
 
 
@@ -671,12 +672,12 @@ class TemplateKrs(QMainWindow):
     #                      f'{CreatePZ.fluid_work} до глубины {CreatePZ.current_bottom}м.', None, None, None, None, None,
     #          None, None,
     #          'Мастер КРС', None],
-    #         [f'Промыть в объеме {round(well_volume() * 1.5, 1)}м3',
+    #         [f'Промыть в объеме {round(TemplateKrs.well_volume(self) * 1.5, 1)}м3',
     #          None,
     #          f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {CreatePZ.fluid_work}  при расходе жидкости 6-8 л/сек '
-    #          f'в присутствии представителя Заказчика в объеме {round(well_volume() * 1.5, 1)}м3. ПРИ ПРОМЫВКЕ НЕ ПРЕВЫШАТЬ ДАВЛЕНИЕ {CreatePZ.max_admissible_pressure}АТМ, ДОПУСТИМАЯ ОСЕВАЯ НАГРУЗКА НА ИНСТРУМЕНТ: 0,5-1,0 ТН',
+    #          f'в присутствии представителя Заказчика в объеме {round(TemplateKrs.well_volume(self) * 1.5, 1)}м3. ПРИ ПРОМЫВКЕ НЕ ПРЕВЫШАТЬ ДАВЛЕНИЕ {CreatePZ.max_admissible_pressure}АТМ, ДОПУСТИМАЯ ОСЕВАЯ НАГРУЗКА НА ИНСТРУМЕНТ: 0,5-1,0 ТН',
     #          None, None, None, None, None, None, None,
-    #          'Мастер КРС, представитель ЦДНГ', well_volume_norm(well_volume() * 1.5)],
+    #          'Мастер КРС, представитель ЦДНГ', well_volume_norm(TemplateKrs.well_volume(self) * 1.5)],
     #         [f'Приподнять до глубины {round(CreatePZ.current_bottom - 20, 1)}м. Тех отстой 2ч. Определение текущего забоя',
     #          None,
     #          f'Приподнять до глубины {round(CreatePZ.current_bottom - 20, 1)}м. Тех отстой 2ч. Определение текущего забоя, при '

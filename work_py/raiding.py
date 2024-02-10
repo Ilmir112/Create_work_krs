@@ -9,7 +9,7 @@ class Raid(CreatePZ):
 
         CreatePZ.raidingColumn()
     def raidingColumn(self):
-        from work_py.template_work import well_volume
+        from work_py.template_work import TemplateKrs
         from work_py.advanted_file import raiding_interval, raid
         # print(f'До отрайбирования {[CreatePZ.dict_perforation[plast]["отрайбировано"] for plast in CreatePZ.plast_work]}')
 
@@ -97,12 +97,12 @@ class Raid(CreatePZ):
              f' ПРЕДУСМОТРЕТЬ КОМПЕНСАЦИЮ РЕАКТИВНОГО МОМЕНТА НА ВЕДУЩЕЙ ТРУБЕ))',
              None, None, None, None, None, None, None,
              'Мастер КРС, УСРСиСТ', None],
-            [f'Промывка уд.весом {CreatePZ.fluid_work[:6]}  в объеме {round(well_volume()*2,1)}м3',
+            [f'Промывка уд.весом {CreatePZ.fluid_work[:6]}  в объеме {round(TemplateKrs.well_volume(self)*2,1)}м3',
              None,
              f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {CreatePZ.fluid_work}  '
-             f'в присутствии представителя заказчика в объеме {round(well_volume()*2,1)}м3. Составить акт.',
+             f'в присутствии представителя заказчика в объеме {round(TemplateKrs.well_volume(self)*2,1)}м3. Составить акт.',
              None, None, None, None, None, None, None,
-             'мастер КРС, предст. заказчика', well_volume_norm(well_volume())],
+             'мастер КРС, предст. заказчика', well_volume_norm(TemplateKrs.well_volume(self))],
             [None, None,
              f'Поднять  {ryber_str} на НКТ{nkt_diam}мм с глубины {CreatePZ.current_bottom}м с доливом скважины в '
              f'объеме {round(CreatePZ.current_bottom*1.12/1000, 1)}м3 тех. жидкостью  уд.весом {CreatePZ.fluid_work}',
