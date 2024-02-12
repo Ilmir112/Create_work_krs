@@ -624,7 +624,11 @@ class CreatePZ:
                                                          'Введите обводненность скважинной продукции',
                                                          100,
                                                          0, 100)
-        CreatePZ.without_damping = main.ExcelWorker.check_well_existence(self, CreatePZ.well_number, CreatePZ.well_area, CreatePZ.region)
+        CreatePZ.region = block_name.region(cdng)
+        thread = main.ExcelWorker()
+        print(f'CreatePZ.region {CreatePZ.region, CreatePZ.well_number, CreatePZ.well_area}')
+        CreatePZ.without_damping = thread.check_well_existence(CreatePZ.well_number, CreatePZ.well_area, CreatePZ.region)
+
 
         if len(CreatePZ.H2S_mg) == 0:
             CreatePZ.H2S_mg = CreatePZ.H2S_mg_m3
@@ -737,7 +741,7 @@ class CreatePZ:
                 except:
                     pass
 
-        CreatePZ.region = block_name.region(cdng)
+
 
         print(CreatePZ.image_list)
         print(f' ГРП - {CreatePZ.grpPlan}')
@@ -1102,21 +1106,7 @@ class CreatePZ:
                 CreatePZ.expected_pick_up[expected_Q] = expected_P
                 print(f' Ожидаемые {CreatePZ.expected_pick_up}')
 
-        if CreatePZ.column_additional is False and CreatePZ.dict_pump_ECN["posle"] != 0:
-            # print(
-            #     f'{CreatePZ.column_additional == False},{("ЭЦН" in str(CreatePZ.dict_pump["posle"]).upper(), "ВНН" in str(CreatePZ.dict_pump["posle"]).upper())}')
 
-            CreatePZ.lift_ecn_can = True
-        elif CreatePZ.column_additional == True:
-            if CreatePZ.dict_pump_ECN["posle"] != 0:
-                if float(CreatePZ.dict_pump_ECN_h["posle"]) < CreatePZ.head_column_additional:
-                    CreatePZ.lift_ecn_can = True
-
-            elif CreatePZ.dict_pump_ECN["posle"] != 0 and \
-                    float(CreatePZ.dict_pump_ECN_h["posle"]) > CreatePZ.head_column_additional:
-
-                CreatePZ.lift_ecn_can_addition = True
-            # print(f' ЭЦН длина" {CreatePZ.lift_ecn_can, CreatePZ.lift_ecn_can_addition, "ЭЦН" in str(CreatePZ.dict_pump["posle"][0]).upper()}')
 
         if self.perforation_correct_window2 is None:
             self.perforation_correct_window2 = PerforationCorrect(self)
