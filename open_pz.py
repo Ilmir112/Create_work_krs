@@ -1160,7 +1160,7 @@ class CreatePZ:
                 # print(f'кровля ПВР раб {CreatePZ.perforation_roof}')
 
 
-        without_damping = krs.without_damping(self)
+        # without_damping = krs.without_damping(self)
         # print(without_damping)
 
 

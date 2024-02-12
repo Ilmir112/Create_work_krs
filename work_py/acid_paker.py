@@ -830,13 +830,17 @@ class AcidPakerWindow(MyWindow):
         from open_pz import CreatePZ
 
         mode = int(mode / 10) * 10
-        if mode > CreatePZ.max_admissible_pressure and (plast != 'D2ps' or plast.lower() != 'дпаш'):
-            mode_str = f'{mode}, {mode - 10}, {mode - 20}'
-        elif (plast == 'D2ps' or plast.lower() == 'дпаш') and CreatePZ.region == 'ИГМ':
+        if ('d2ps' in plast.lower() or 'дпаш' in plast.lower()) and CreatePZ.region == 'ИГМ':
             mode_str = f'{120}, {140}, {160}'
+        elif mode > CreatePZ.max_admissible_pressure:
+            mode_str = f'{mode}, {mode - 10}, {mode - 20}'
         else:
             mode_str = f'{mode - 10}, {mode}, {mode + 10}'
-        return mode_str
+
+        Qpr, _ = QInputDialog.getText(None, 'Режимы определения приемисости', 'Давления при определении приемистости',
+                                   text = mode_str)
+        print(Qpr)
+        return Qpr
 
         # промывка скважины после кислотной обработки в зависимости от интервала перфорации и комповноки и текущего забоя
 
@@ -980,7 +984,7 @@ class AcidPakerWindow(MyWindow):
             # print(f' индекс строк {CreatePZ.ins_ind}')
             CreatePZ.ins_ind += len(work_list)
             # print(f'третья индекс строк {CreatePZ.ins_ind}')
-            self.close()
+
         CreatePZ.pause = False
         self.close()
 

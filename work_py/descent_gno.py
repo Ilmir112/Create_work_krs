@@ -6,8 +6,11 @@ from work_py.rationingKRS import well_volume_norm, descentNKT_norm, descent_suck
 from work_py.calc_fond_nkt import CalcFond
 
 
+
 def gno_down(self):
     from open_pz import CreatePZ
+    from work_py.rgdVcht import rgdWithPaker, rgdWithoutPaker
+
 
     paker_descent = [
         [None, None,
@@ -42,25 +45,7 @@ def gno_down(self):
          f'{testing_pressure(self, CreatePZ.H_F_paker_do["posle"])[0]}',
          None, None, None, None, None, None, None,
          'мастер КРС, предст. заказчика', 0.67],
-        [''.join(['ОВТР 10ч' if CreatePZ.region != 'ЧГМ' else 'ОВТР 4ч']),
-         None, ''.join(['ОВТР 10ч' if CreatePZ.region != 'ЧГМ' else 'ОВТР 4ч']),
-         None, None, None, None, None, None, None,
-         'мастер КРС', ''.join(['10' if CreatePZ.region != 'ЧГМ' else '4'])],
-        [None, None, 'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС "Ойл-сервис". Составить'
-                     ' акт готовности скважины и передать его начальнику партии. При необходимости подготовить площадку'
-                     ' напротив мостков для постановки партии ГИС.',
-         None, None, None, None, None, None, None,
-         'мастер КРС', None],
-        [f'ГИС РГД', None,
-         f'Произвести запись по техкарте 2.3.2: определение профиля приемистости и оценку технического состояния '
-         f'эксплуатационной колонны и НКТ при закачке не менее {PzakPriGis(self)}атм '
-         f'при открытой затрубной задвижке',
-         None, None, None, None, None, None, None,
-         'Мастер КРС, подрядчик по ГИС', 20],
-        [None, None,
-         f'Интерпретация данных ГИС',
-         None, None, None, None, None, None, None,
-         'мастер КРС, подрядчик по ГИС', 8],
+
     ]
     for plast in list(CreatePZ.dict_perforation.keys()):
         for interval in CreatePZ.dict_perforation[plast]['интервал']:
@@ -69,6 +54,10 @@ def gno_down(self):
                 if privyazkaNKT(self)[0] not in paker_descent:
                     paker_descent.insert(2, privyazkaNKT(self)[0])
     calc_fond_nkt_str = calc_fond_nkt(self, sum(list(CreatePZ.dict_nkt_po.values())))
+
+
+
+
     gno_list = [[None, None,
                  f'За 48 часов до спуска запросить КАРТУ спуска на ГНО и заказать оборудование согласно карты спуска.',
                  None, None, None, None, None, None, None,
@@ -604,6 +593,18 @@ def gno_down(self):
     #         CreatePZ.paker_do["posle"]) != 'отсут':
     #     lift_select = lift_orz
     #     print('Подьем ОРЗ')
+    if lift_key == 'пакер':
+        rgd_question = QMessageBox.question(self, 'Проведение РГД', 'Нужно ли проводить РГД?')
+        if rgd_question == QMessageBox.StandardButton.Yes:
+            if CreatePZ.column_additional and CreatePZ.H_F_paker_do['posle'] >= CreatePZ.head_column_additional:
+                # print(rgdWithoutPaker(self))
+                for row in rgdWithoutPaker(self)[::-1]:
+                    paker_descent.insert(0, row)
+            else:
+                for row in rgdWithPaker(self):
+                    paker_descent.append(row)
+
+
 
     lift, ok = QInputDialog.getItem(self, 'Спуcкаемое  оборудование', 'выбор спуcкаемого оборудования',
                                     lift_sel, lift_sel.index(lift_key), False)
@@ -613,6 +614,9 @@ def gno_down(self):
     lift_select = lift_dict[lift]
     for row in lift_select:
         gno_list.append(row)
+
+
+
 
 
 

@@ -20,171 +20,168 @@ from openpyxl.drawing.image import Image
 from H2S import calc_H2S
 from PyQt5.QtCore import QThread, pyqtSignal
 from data_correct_position_people import CorrectSignaturesWindow
-from data_base.work_with_base import export_to_sqlite_without_juming, open_to_sqlite_without_juming, \
-    export_to_sqlite_class_well, open_to_sqlite_class_well
+from data_base.work_with_base import Classifier_well
 
 class ExcelWorker(QThread):
     finished = pyqtSignal()
 
     def __init__(self):
         super().__init__()
-        self.is_running = True
+
 
     def check_well_existence(self, well_number, deposit_area, region):
 
 
-        while self.is_running:
-            # Подключение к базе данных SQLite
-            conn = sqlite3.connect('data_base/database_without_juming.db')
-            cursor = conn.cursor()
-            current_year = datetime.now().year
-            month = datetime.now().month
-            print(f'месяц {month}')
-            if 1 <= month < 4:
-                date_string = datetime(current_year, 1, 1).strftime('%d.%m.%Y')
-                print(f'Корректная таблица перечня без глушения от {date_string}')
-            elif 4 <= month < 7:
-                date_string = datetime(current_year, 4, 1).strftime('%d.%m.%Y')
-                print(f'Корректная таблица перечня без глушения от {date_string}')
-            elif 7 <= month < 10:
-                date_string = datetime(current_year, 7, 1).strftime('%d.%m.%Y')
-                print(f'Корректная таблица перечня без глушения от {date_string}')
-            elif 10 >= month <= 12:
-                date_string = datetime(current_year, 10, 1).strftime('%d.%m.%Y')
-                print(f'Корректная таблица перечня без глушения от {date_string}')
-            print(f' регион {region}')
-
-            if region == 'КГМ':
-                # Проверка наличия записи в базе данных
-                cursor.execute(f"SELECT *  FROM КГМ WHERE today =?", (date_string,))
-                print(f' база данных открыта')
-                result = cursor.fetchone()
-                if result is None:
-                    mes = QMessageBox.warning(self, 'Некорректная дата перечня',
-                                              f'Необходимо обновить перечень скважин без '
-                                              f'глушения на текущий квартал {region}')
-                # Проверка наличия записи в базе данных
-                cursor.execute(f"SELECT * FROM КГМ WHERE well_number=? AND deposit_area=?", (well_number, deposit_area))
-                result = cursor.fetchone()
-                # Закрытие соединения с базой данных
-                conn.close()
-                print(f' база данных закрыта')
-
-                # Если запись найдена, возвращается True, в противном случае возвращается False
-                if result:
-
-                    mes = QMessageBox.information(None, 'перечень без глушения',
-                                                  f'Скважина состоит в перечне скважин без глушения на текущий квартал, '
-                                                  f'в перечне от  {region}')
-                    return True
-                else:
+        # Подключение к базе данных SQLite
+        conn = sqlite3.connect('data_base/database_without_juming.db')
+        cursor = conn.cursor()
+        current_year = datetime.now().year
+        month = datetime.now().month
+        print(f'месяц {month}')
+        if 1 <= month < 4:
+            date_string = datetime(current_year, 1, 1).strftime('%d.%m.%Y')
+            print(f'Корректная таблица перечня без глушения от {date_string}')
+        elif 4 <= month < 7:
+            date_string = datetime(current_year, 4, 1).strftime('%d.%m.%Y')
+            print(f'Корректная таблица перечня без глушения от {date_string}')
+        elif 7 <= month < 10:
+            date_string = datetime(current_year, 7, 1).strftime('%d.%m.%Y')
+            print(f'Корректная таблица перечня без глушения от {date_string}')
+        elif 10 >= month <= 12:
+            date_string = datetime(current_year, 10, 1).strftime('%d.%m.%Y')
+            print(f'Корректная таблица перечня без глушения от {date_string}')
+        print(f' регион {region}')
 
 
-                    return False
-            if region == 'ЧГМ':
-                # Проверка наличия записи в базе данных
-                cursor.execute(f"SELECT *  FROM ЧГМ WHERE today =?", (date_string,))
-                result = cursor.fetchone()
-                if result is None:
-                    mes = QMessageBox.warning(self, 'Некорректная дата перечня',
-                                              f'Необходимо обновить перечень скважин без глушения на текущий квартал {region}')
-                # Проверка наличия записи в базе данных
-                cursor.execute(f"SELECT * FROM ЧГМ WHERE well_number=? AND deposit_area=?", (well_number, deposit_area))
-                result = cursor.fetchone()
-                # Закрытие соединения с базой данных
-                conn.close()
+        if region == 'КГМ':
+            # Проверка наличия записи в базе данных
+            cursor.execute(f"SELECT *  FROM КГМ WHERE today =?", (date_string,))
+            print(f' база данных открыта')
+            result = cursor.fetchone()
+            if result is None:
+                mes = QMessageBox.warning(self, 'Некорректная дата перечня',
+                                          f'Необходимо обновить перечень скважин без '
+                                          f'глушения на текущий квартал {region}')
+            # Проверка наличия записи в базе данных
+            cursor.execute(f"SELECT * FROM КГМ WHERE well_number=? AND deposit_area=?", (well_number, deposit_area))
+            result = cursor.fetchone()
+            # Закрытие соединения с базой данных
+            conn.close()
+            print(f' база данных закрыта')
 
-                # Если запись найдена, возвращается True, в противном случае возвращается False
-                if result:
-                    date_reload = result[2]
-                    mes = QMessageBox.information(self, 'перечень без глушения',
-                                                  f'Скважина состоит в перечне скважин без глушения на текущий квартал, '
-                                                  f'в перечне от {date_reload} {region}')
-                    return True
-                else:
-                    return False
+            # Если запись найдена, возвращается True, в противном случае возвращается False
+            if result:
 
-            if region == 'ТГМ':
-                # Проверка наличия записи в базе данных
-                cursor.execute(f"SELECT *  FROM ТГМ WHERE today =?", (date_string,))
-                result = cursor.fetchone()
-                if result is None:
-                    mes = QMessageBox.warning(self, 'Некорректная дата перечня',
-                                              'Необходимо обновить перечень скважин без глушения на текущий квартал')
+                mes = QMessageBox.information(None, 'перечень без глушения',
+                                              f'Скважина состоит в перечне скважин без глушения на текущий квартал, '
+                                              f'в перечне от  {region}')
 
-                # Проверка наличия записи в базе данных
-                cursor.execute(f"SELECT * FROM ТГМ WHERE well_number=? AND deposit_area=?", (well_number, deposit_area))
-                result = cursor.fetchone()
-
-                # Закрытие соединения с базой данных
-                conn.close()
-                # Если запись найдена, возвращается True, в противном случае возвращается False
-                if result:
-                    date_reload = result[2]
-                    mes = QMessageBox.information(self, 'перечень без глушения',
-                                                  f'Скважина состоит в перечне скважин без глушения на текущий квартал, '
-                                                  f'в перечне от {date_reload} {region}')
-                    return True
-                else:
-                    return False
-
-            if region == 'ИГМ':
-                # Проверка наличия записи в базе данных
-                cursor.execute(f"SELECT *  FROM ИГМ WHERE today =?", (date_string,))
-
-                result = cursor.fetchone()
-                if result is None:
-                    mes = QMessageBox.warning(self, 'Некорректная дата перечня',
-                                              'Необходимо обновить перечень скважин без глушения на текущий квартал')
-                # Проверка наличия записи в базе данных
-                cursor.execute(f"SELECT * FROM ИГМ WHERE well_number=? AND deposit_area=?", (well_number, deposit_area))
-                result = cursor.fetchone()
-                # Закрытие соединения с базой данных
-                conn.close()
-
-                # Если запись найдена, возвращается True, в противном случае возвращается False
-                if result:
-                    date_reload = result[2]
-                    mes = QMessageBox.information(None, 'перечень без глушения',
-                                                  f'Скважина состоит в перечне скважин без глушения на текущий квартал, '
-                                                  f'в перечне от {date_reload} {region}')
-
-                    return True
-                else:
-
-                    return False
-
-            if region == 'АГМ':
-                # Проверка наличия записи в базе данных
-                cursor.execute(f"SELECT *  FROM АГМ WHERE today =?", (date_string,))
-                result = cursor.fetchone()
-                if result is None:
-                    mes = QMessageBox.warning(self, 'Некорректная дата перечня',
-                                              'Необходимо обновить перечень скважин без глушения на текущий квартал')
-                # Проверка наличия записи в базе данных
-                cursor.execute(f"SELECT * FROM АГМ WHERE well_number=? AND deposit_area=?", (well_number, deposit_area))
-                result = cursor.fetchone()
-                # Закрытие соединения с базой данных
-                conn.close()
-
-                # Если запись найдена, возвращается True, в противном случае возвращается False
-                if result:
-                    date_reload = result[2]
-                    mes = QMessageBox.information(None, 'перечень без глушения',
-                                                  f'Скважина состоит в перечне скважин без глушения на текущий квартал, '
-                                                  f'в перечне от {date_reload} {region}')
-
-                    return True
-                else:
-                    return False
+                check_true = True
+            else:
+                check_true = False
 
 
-            self.stop()
+        if region == 'ЧГМ':
+            # Проверка наличия записи в базе данных
+            cursor.execute(f"SELECT *  FROM ЧГМ WHERE today =?", (date_string,))
+            result = cursor.fetchone()
+            if result is None:
+                mes = QMessageBox.warning(self, 'Некорректная дата перечня',
+                                          f'Необходимо обновить перечень скважин без глушения на текущий квартал {region}')
+            # Проверка наличия записи в базе данных
+            cursor.execute(f"SELECT * FROM ЧГМ WHERE well_number=? AND deposit_area=?", (well_number, deposit_area))
+            result = cursor.fetchone()
+            # Закрытие соединения с базой данных
+            conn.close()
+
+            # Если запись найдена, возвращается True, в противном случае возвращается False
+            if result:
+                date_reload = result[2]
+                mes = QMessageBox.information(self, 'перечень без глушения',
+                                              f'Скважина состоит в перечне скважин без глушения на текущий квартал, '
+                                              f'в перечне от {date_reload} {region}')
+                check_true = True
+            else:
+                check_true = False
+
+        if region == 'ТГМ':
+            # Проверка наличия записи в базе данных
+            cursor.execute(f"SELECT *  FROM ТГМ WHERE today =?", (date_string,))
+            result = cursor.fetchone()
+            if result is None:
+                mes = QMessageBox.warning(self, 'Некорректная дата перечня',
+                                          'Необходимо обновить перечень скважин без глушения на текущий квартал')
+
+            # Проверка наличия записи в базе данных
+            cursor.execute(f"SELECT * FROM ТГМ WHERE well_number=? AND deposit_area=?", (well_number, deposit_area))
+            result = cursor.fetchone()
+
+            # Закрытие соединения с базой данных
+            conn.close()
+            # Если запись найдена, возвращается True, в противном случае возвращается False
+            if result:
+                date_reload = result[2]
+                mes = QMessageBox.information(self, 'перечень без глушения',
+                                              f'Скважина состоит в перечне скважин без глушения на текущий квартал, '
+                                              f'в перечне от {date_reload} {region}')
+                check_true = True
+            else:
+                check_true = False
+
+        if region == 'ИГМ':
+            # Проверка наличия записи в базе данных
+            cursor.execute(f"SELECT *  FROM ИГМ WHERE today =?", (date_string,))
+
+            result = cursor.fetchone()
+            if result is None:
+                mes = QMessageBox.warning(self, 'Некорректная дата перечня',
+                                          'Необходимо обновить перечень скважин без глушения на текущий квартал')
+            # Проверка наличия записи в базе данных
+            cursor.execute(f"SELECT * FROM ИГМ WHERE well_number=? AND deposit_area=?", (well_number, deposit_area))
+            result = cursor.fetchone()
+            # Закрытие соединения с базой данных
+            conn.close()
+
+            # Если запись найдена, возвращается True, в противном случае возвращается False
+            if result:
+                date_reload = result[2]
+                mes = QMessageBox.information(None, 'перечень без глушения',
+                                              f'Скважина состоит в перечне скважин без глушения на текущий квартал, '
+                                              f'в перечне от {date_reload} {region}')
+
+                check_true = True
+            else:
+                check_true = False
+
+        if region == 'АГМ':
+            # Проверка наличия записи в базе данных
+            cursor.execute(f"SELECT *  FROM АГМ WHERE today =?", (date_string,))
+            result = cursor.fetchone()
+            if result is None:
+                mes = QMessageBox.warning(self, 'Некорректная дата перечня',
+                                          'Необходимо обновить перечень скважин без глушения на текущий квартал')
+            # Проверка наличия записи в базе данных
+            cursor.execute(f"SELECT * FROM АГМ WHERE well_number=? AND deposit_area=?", (well_number, deposit_area))
+            result = cursor.fetchone()
+            # Закрытие соединения с базой данных
+            conn.close()
+
+            # Если запись найдена, возвращается True, в противном случае возвращается False
+            if result:
+                date_reload = result[2]
+                mes = QMessageBox.information(None, 'перечень без глушения',
+                                              f'Скважина состоит в перечне скважин без глушения на текущий квартал, '
+                                              f'в перечне от {date_reload} {region}')
+
+                check_true = True
+            else:
+                check_true = False
+
+        # Завершение работы потока
+        self.finished.emit()
+        return check_true
 
 
-    def stop(self):
-        self.is_running = False
-        print(f'Поток закрыт')
 class MyWindow(QMainWindow):
 
     def __init__(self, table_widget = None):
@@ -462,20 +459,30 @@ class MyWindow(QMainWindow):
                                                               "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
         if self.fname:
             try:
-                copy = export_to_sqlite_class_well(self, self.fname, costumer, region)
+                copy = Classifier_well.export_to_sqlite_class_well(self, self.fname, costumer, region)
 
             except FileNotFoundError:
                 print('Файл не найден')
 
     def open_without_damping(self, costumer, region):
+
         self.tableDampingWidgetOpen()
 
-        copy = open_to_sqlite_without_juming(self, self.table_juming, costumer, region)
+        copy = Classifier_well.open_to_sqlite_without_juming(self, self.table_juming, costumer, region)
 
     def open_class_well(self, costumer, region):
-        self.tableClassifisierOpen()
-        region = f'{region}_классификатор'
-        copy = open_to_sqlite_class_well(self, self.table_class, costumer, region)
+        if self.new_window is None:
+
+            self.new_window =Classifier_well()
+            self.new_window.setWindowTitle("Классификатор")
+            self.new_window.setGeometry(200, 400, 300, 400)
+            self.new_window.show()
+
+        else:
+            self.new_window.close()  # Close window.
+            self.new_window = None  # Discard reference.
+
+
 
 
     def reload_without_damping(self, costumer, region):
@@ -484,7 +491,7 @@ class MyWindow(QMainWindow):
                                                               "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
         if self.fname:
             try:
-                copy = export_to_sqlite_without_juming(self, self.fname, costumer, region)
+                copy = Classifier_well.export_to_sqlite_without_juming(self, self.fname, costumer, region)
 
             except FileNotFoundError:
                 print('Файл не найден')
@@ -504,44 +511,13 @@ class MyWindow(QMainWindow):
 
     def tableClassifisierOpen(self):
         if self.table_class is None:
-            self.table_class = QTableWidget()
+            self.new_window = Classifier_well()
+            self.new_window.setWindowTitle("Классификатор")
+            self.new_window.setGeometry(200, 400, 300, 400)
+            self.new_window.show()
 
-            self.table_class.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
-            self.table_class.customContextMenuRequested.connect(self.openContextMenu)
-            self.setCentralWidget(self.table_class)
-            self.model = self.table_class.model()
 
-            # Этот сигнал испускается всякий раз, когда ячейка в таблице нажата.
-            # Указанная строка и столбец - это ячейка, которая была нажата.
-            self.table_class.cellPressed[int, int].connect(self.clickedRowColumn)
 
-    def filter(self, filter_text):
-        for i in range(1, self.table_juming.rowCount() + 1):
-            for j in range(0, 1, 2):
-                item = self.table_juming.item(i, j)
-                if item:
-                    match = filter_text.lower() not in item.text().lower()
-                    self.table_juming.setRowHidden(i, match)
-                    if not match:
-                        break
-    def filter_class(self, filter_text):
-        for i in range(1, self.table_class.rowCount() + 1):
-            for j in range(1, 2):
-                item = self.table_class.item(i, j)
-                if item:
-                    match = filter_text.lower() not in item.text().lower()
-                    self.table_class.setRowHidden(i, match)
-                    if not match:
-                        break
-    def filter_class_area(self, filter_text):
-        for i in range(1, self.table_class.rowCount() + 1):
-            for j in range(2):
-                item = self.table_class.item(i, j)
-                if item:
-                    match = filter_text.lower() not in item.text().lower()
-                    self.table_class.setRowHidden(i, match)
-                    if not match:
-                        break
 
 
     def tableWidgetOpen(self):
@@ -843,6 +819,10 @@ class MyWindow(QMainWindow):
         rgd_menu.addAction(rgdWithoutPaker_action)
         rgdWithoutPaker_action.triggered.connect(self.rgdWithoutPaker_action)
 
+        rgdWithPaker_action = QAction("РГД с пакером", self)
+        rgd_menu.addAction(rgdWithPaker_action)
+        rgdWithPaker_action.triggered.connect(self.rgdWithPaker_action)
+
         privyazka_action = QAction("Привязка НКТ", self)
         geophysical.addAction(privyazka_action)
         privyazka_action.triggered.connect(self.privyazkaNKT)
@@ -1100,6 +1080,11 @@ class MyWindow(QMainWindow):
         from work_py.rgdVcht import rgdWithoutPaker
         rgdWithoutPaker_list = rgdWithoutPaker(self)
         self.populate_row(self.ins_ind, rgdWithoutPaker_list)
+
+    def rgdWithPaker_action(self):
+        from work_py.rgdVcht import rgdWithPaker
+        rgdWithPaker_list = rgdWithPaker(self)
+        self.populate_row(self.ins_ind, rgdWithPaker_list)
 
     def definitionBottomGKLM(self):
         from work_py.alone_oreration import definitionBottomGKLM
@@ -1363,10 +1348,10 @@ class MyWindow(QMainWindow):
             self.acid_windowPaker2 = None
 
     def template_without_skm(self):
-        from work_py.template_work import template_ek_without_skm
+        from work_py.template_work import TemplateKrs
         from open_pz import CreatePZ
 
-        template_ek_list = template_ek_without_skm(self)
+        template_ek_list = TemplateKrs.template_ek_without_skm(self)
         # print()
         # print(f'индекс {self.ins_ind, len(template_ek_list)}')
         self.populate_row(self.ins_ind, template_ek_list)
@@ -1531,8 +1516,8 @@ class MyWindow(QMainWindow):
                 self.acid_windowPaker = AcidPakerWindow(self.table_widget, CreatePZ.ins_ind, CreatePZ.countAcid)
                 self.acid_windowPaker.setGeometry(100, 400, 100, 400)
                 self.acid_windowPaker.show()
-                # CreatePZ.pause_app(self)
-                # CreatePZ.pause = True
+                CreatePZ.pause_app(self)
+                CreatePZ.pause = True
                 self.acid_windowPaker = None
 
     def GeophysicalNewWindow(self):

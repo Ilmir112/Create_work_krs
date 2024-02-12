@@ -30,7 +30,7 @@ def calculationFluidWork(vertical, pressure):
 def work_krs(self, work_plan):
     from open_pz import CreatePZ
     from work_py.rationingKRS import lifting_sucker_rod, well_jamming_norm, liftingGNO
-    from krs import well_jamming, without_damping
+    from krs import well_jamming
     from work_py.descent_gno import gno_nkt_opening
     # print(f' пакер {CreatePZ.paker_do}), ЭЦН {CreatePZ.dict_pump_ECN}, ШГН {CreatePZ.dict_pump_SHGN}')
 
@@ -1425,11 +1425,12 @@ def is_number(num):
         return True
     except ValueError or TypeError:
         return False
-def without_damping(self):
-    print('начался второй поток')
-    self.worker_thread = ExcelWorker()
-    self.worker_thread.finished.connect(self.on_finished)
-    self.worker_thread.start()
+# def without_damping(self):
+#
+#     print('начался второй поток')
+#     self.worker_thread = ExcelWorker()
+#     self.worker_thread.finished.connect(self.on_finished)
+#     self.worker_thread.start()
 
 
 def on_finished(self):
