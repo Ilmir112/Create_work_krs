@@ -49,7 +49,7 @@ class TabPage_SO(QWidget):
         self.dictance_three_Edit = QLineEdit(self)
 
 
-        grid = QGridLayout(self)
+        self.grid = QGridLayout(self)
         if CreatePZ.column_additional is False or \
             (CreatePZ.column_additional and CreatePZ.current_bottom < CreatePZ.head_column_additional):
             self.template_select_list = ['ПСШ ЭК', 'ПСШ открытый ствол', 'ПСШ без хвоста']
@@ -57,24 +57,24 @@ class TabPage_SO(QWidget):
 
 
 
-            grid.addWidget(self.template_labelType, 1, 2, 1, 8)
-            grid.addWidget(self.template_Combo, 2, 2, 2, 8)
-            grid.addWidget(self.template_first_Label, 4, 2)
-            grid.addWidget(self.template_first_Edit, 5, 2)
-            grid.addWidget(self.lenght_template_first_Label, 4, 3)
-            grid.addWidget(self.lenght_template_first_Edit, 5, 3)
-            grid.addWidget(self.dictance_template_first_Label, 4, 4)
-            grid.addWidget(self.dictance_template_first_Edit, 5, 4)
-            grid.addWidget(self.skm_Label, 4, 5)
-            grid.addWidget(self.skm_Edit, 5, 5)
-            grid.addWidget(self.dictance_template_second_Label, 4, 6)
-            grid.addWidget(self.dictance_template_second_Edit, 5, 6)
-            grid.addWidget(self.template_second_Label, 4, 7)
-            grid.addWidget(self.template_second_Edit, 5, 7)
-            grid.addWidget(self.lenght_template_second_Label, 4, 8)
-            grid.addWidget(self.lenght_template_second_Edit, 5, 8)
-            grid.addWidget(self.dictance_three_Label, 4, 9)
-            grid.addWidget(self.dictance_three_Edit, 5, 9)
+            self.grid.addWidget(self.template_labelType, 1, 2, 1, 8)
+            self.grid.addWidget(self.template_Combo, 2, 2, 2, 8)
+            self.grid.addWidget(self.template_first_Label, 4, 2)
+            self.grid.addWidget(self.template_first_Edit, 5, 2)
+            self.grid.addWidget(self.lenght_template_first_Label, 4, 3)
+            self.grid.addWidget(self.lenght_template_first_Edit, 5, 3)
+            self.grid.addWidget(self.dictance_template_first_Label, 4, 4)
+            self.grid.addWidget(self.dictance_template_first_Edit, 5, 4)
+            self.grid.addWidget(self.skm_Label, 4, 5)
+            self.grid.addWidget(self.skm_Edit, 5, 5)
+            self.grid.addWidget(self.dictance_template_second_Label, 4, 6)
+            self.grid.addWidget(self.dictance_template_second_Edit, 5, 6)
+            self.grid.addWidget(self.template_second_Label, 4, 7)
+            self.grid.addWidget(self.template_second_Edit, 5, 7)
+            self.grid.addWidget(self.lenght_template_second_Label, 4, 8)
+            self.grid.addWidget(self.lenght_template_second_Edit, 5, 8)
+            self.grid.addWidget(self.dictance_three_Label, 4, 9)
+            self.grid.addWidget(self.dictance_three_Edit, 5, 9)
 
         else:
             self.template_select_list = ['ПСШ Доп колонна СКМ в основной колонне', 'ПСШ СКМ в доп колонне c хвостом',
@@ -83,32 +83,32 @@ class TabPage_SO(QWidget):
 
 
 
-            grid.addWidget(self.template_labelType, 1, 2, 1, 8)
-            grid.addWidget(self.template_Combo, 2, 2, 2, 8)
-            grid.addWidget(self.dictance_template_first_Label, 4, 2)
-            grid.addWidget(self.dictance_template_first_Edit, 5, 2)
+            self.grid.addWidget(self.template_labelType, 1, 2, 1, 8)
+            self.grid.addWidget(self.template_Combo, 2, 2, 2, 8)
+            self.grid.addWidget(self.dictance_template_first_Label, 4, 2)
+            self.grid.addWidget(self.dictance_template_first_Edit, 5, 2)
 
-            grid.addWidget(self.template_first_Label, 4, 3)
-            grid.addWidget(self.template_first_Edit, 5, 3)
+            self.grid.addWidget(self.template_first_Label, 4, 3)
+            self.grid.addWidget(self.template_first_Edit, 5, 3)
 
-            grid.addWidget(self.lenght_template_first_Label, 4, 4)
-            grid.addWidget(self.lenght_template_first_Edit, 5, 4)
-            grid.addWidget(self.dictance_template_second_Label, 4, 5)
-            grid.addWidget(self.dictance_template_second_Edit, 5, 5)
-            grid.addWidget(self.skm_Label, 4, 6)
-            grid.addWidget(self.skm_Edit, 5, 6)
-            grid.addWidget(self.dictance_three_Label, 4, 7)
-            grid.addWidget(self.dictance_three_Edit, 5, 7)
-            grid.addWidget(self.template_second_Label, 4, 8)
-            grid.addWidget(self.template_second_Edit, 5, 8)
-            grid.addWidget(self.lenght_template_second_Label, 4, 9)
-            grid.addWidget(self.lenght_template_second_Edit, 5, 9)
+            self.grid.addWidget(self.lenght_template_first_Label, 4, 4)
+            self.grid.addWidget(self.lenght_template_first_Edit, 5, 4)
+            self.grid.addWidget(self.dictance_template_second_Label, 4, 5)
+            self.grid.addWidget(self.dictance_template_second_Edit, 5, 5)
+            self.grid.addWidget(self.skm_Label, 4, 6)
+            self.grid.addWidget(self.skm_Edit, 5, 6)
+            self.grid.addWidget(self.dictance_three_Label, 4, 7)
+            self.grid.addWidget(self.dictance_three_Edit, 5, 7)
+            self.grid.addWidget(self.template_second_Label, 4, 8)
+            self.grid.addWidget(self.template_second_Edit, 5, 8)
+            self.grid.addWidget(self.lenght_template_second_Label, 4, 9)
+            self.grid.addWidget(self.lenght_template_second_Edit, 5, 9)
 
-        grid.addWidget(self.template_str_Label, 11, 1, 11, 8)
-        grid.addWidget(self.template_str_Edit, 12, 1, 14, 8)
+        self.grid.addWidget(self.template_str_Label, 11, 1, 11, 8)
+        self.grid.addWidget(self.template_str_Edit, 12, 1, 14, 8)
 
-        grid.addWidget(self.skm_teml_str_Label, 15, 1, 15, 8)
-        grid.addWidget(self.skm_teml_str_Edit, 16, 1, 16, 8)
+        self.grid.addWidget(self.skm_teml_str_Label, 15, 1, 15, 8)
+        self.grid.addWidget(self.skm_teml_str_Edit, 16, 1, 16, 8)
 
 
         template_diam_ek = self.template_diam_ek()
@@ -129,6 +129,7 @@ class TabPage_SO(QWidget):
 
     def definition_pssh(self):
         from open_pz import CreatePZ
+
 
         roof_skm = 0
         if (CreatePZ.column_additional is False and CreatePZ.open_trunk_well is False and all(
@@ -173,6 +174,8 @@ class TabPage_SO(QWidget):
     def update_template_edit(self):
         from open_pz import CreatePZ
 
+
+
         template_diam_ek = self.template_diam_ek()
         self.template_first_Edit.setText(str(template_diam_ek[0]))
         self.template_second_Edit.setText(str(template_diam_ek[1]))
@@ -209,9 +212,19 @@ class TabPage_SO(QWidget):
             self.template_second_Edit.setText(str(self.template_diam_additional_ek()[1]))
             first_template = int(self.template_first_Edit.text())
             template_second = int(self.template_second_Edit.text())
-            listEnabel = [self.dictance_three_Edit]
-            for enable in listEnabel:
-                enable.setEnabled(False)
+            # listEnabel = [self.dictance_three_Edit]
+            # for enable in listEnabel:
+            #     enable.setEnabled(False)
+
+        # while self.grid.count() > 0:
+        #     item = self.grid.takeAt(0)
+        #     if item:
+        #         widget = item.widget()
+        #         if widget:
+        #             widget.deleteLater()
+
+
+
         if self.template_Combo.currentText() == 'ПСШ ЭК':
 
             template_str = f'перо + шаблон-{first_template}мм L-{lenght_template_first}м + НКТ{nkt_diam}мм ' \

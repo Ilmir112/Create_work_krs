@@ -10,38 +10,48 @@ from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem, QLineEdit, QHeaderVie
 from openpyxl import load_workbook
 
 class Classifier_well(QMainWindow):
-    def __init__(self, parent=None):
+    def __init__(self,  costumer, region, classifier_well, parent=None):
+        from open_pz import CreatePZ
         super(Classifier_well, self).__init__()
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
         self.table_class = QTableWidget()
+        self.region = region
+        self.costumer = costumer
+        self.number_well = CreatePZ.well_number
 
 
         self.setCentralWidget(self.table_class)
         self.model = self.table_class.model()
-        self.open_to_sqlite_class_well('gg', re)
+        if classifier_well == 'classifier_well':
+            self.open_to_sqlite_class_well(costumer, region)
+        elif classifier_well == 'damping':
+            self.open_to_sqlite_without_juming(costumer, region)
 
 
     def open_to_sqlite_without_juming(self, costumer, region):
         layout = QVBoxLayout()
         self.edit_well_number = QLineEdit()
+
         self.edit_well_number.setPlaceholderText("Ввести номер скважины для фильтрации")
+
         self.edit_well_number.textChanged.connect(self.filter)
+        self.edit_well_number.setText(self.number_well)
         layout.addWidget(self.edit_well_number)
 
-        data = self.get_data_from_db(self, region)
+        data = self.get_data_from_db(region)
 
-        table.setColumnCount(len(data[0]))
-        table.setRowCount(len(data))
-        table.setCellWidget(0, 0, self.edit_well_number)
+        self.table_class.setColumnCount(len(data[0]))
+        self.table_class.setRowCount(len(data))
+        self.table_class.setCellWidget(0, 0, self.edit_well_number)
         for row in range(len(data)):
             for col in range(len(data[row])):
                 item = QTableWidgetItem(str(data[row][col]))
-                table.setItem(row + 1, col, item)
+                self.table_class.setItem(row + 1, col, item)
 
-        table.setHorizontalHeaderLabels(['номер скважины', 'площадь', 'Текущий квартал'])
-        table.horizontalHeader().setStretchLastSection(True)
-        table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.table_class.setHorizontalHeaderLabels(['номер скважины', 'площадь', 'Текущий квартал'])
+        self.table_class.horizontalHeader().setStretchLastSection(True)
+        self.table_class.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         # layout.addWidget(table)
         self.setLayout(layout)
 
@@ -49,14 +59,16 @@ class Classifier_well(QMainWindow):
         layout = QVBoxLayout()
         self.edit_well_number = QLineEdit()
         self.edit_well_number.setPlaceholderText("Ввести номер скважины для фильтрации")
-        self.edit_well_number.textChanged.connect(Classifier_well.filter_class)
+
+        self.edit_well_number.textChanged.connect(self.filter_class)
+        self.edit_well_number.setText(self.number_well)
         layout.addWidget(self.edit_well_number)
 
         self.edit_well_area = QLineEdit()
         self.edit_well_area.setPlaceholderText("Ввести площадь для фильтрации")
-        self.edit_well_area.textChanged.connect(Classifier_well.filter_class_area)
+        self.edit_well_area.textChanged.connect(self.filter_class_area)
         layout.addWidget(self.edit_well_area)
-
+        region =f'{region}_классификатор'
         data = self.get_data_from_class_well_db(region)
         print(data)
 
@@ -84,7 +96,7 @@ class Classifier_well(QMainWindow):
                 #     item = QTableWidgetItem(str(date))
                 else:
                     item = QTableWidgetItem(str(data[row][col]))
-                table.setItem(row + 1, col, item)
+                self.table_class.setItem(row + 1, col, item)
 
         self.table_class.setHorizontalHeaderLabels(['ЦДНГ', 'номер скважины', 'площадь', 'Месторождение', 'Категория \n по Рпл',
                                          'Ргд', 'Рпл', 'Дата замера', 'категория \nH2S', 'H2S-%', "H2S-мг/л",
@@ -126,7 +138,7 @@ class Classifier_well(QMainWindow):
         db = QSqlDatabase.addDatabase("QSQLITE")
         db.setDatabaseName(
             'data_base/database_without_juming.db')  # Замените database.db на имя вашей базы данных SQLite
-        print(db)
+        # print(db)
         print(region)
         print('ТГМ_классификатор')
         if not db.open():
@@ -247,12 +259,12 @@ class Classifier_well(QMainWindow):
         conn.close()
 
     def filter(self, filter_text):
-        for i in range(1, self.table_juming.rowCount() + 1):
+        for i in range(1, self.table_class.rowCount() + 1):
             for j in range(0, 1, 2):
-                item = self.table_juming.item(i, j)
+                item = self.table_class.item(i, j)
                 if item:
                     match = filter_text.lower() not in item.text().lower()
-                    self.table_juming.setRowHidden(i, match)
+                    self.table_class.setRowHidden(i, match)
                     if not match:
                         break
     def filter_class(self, filter_text):
