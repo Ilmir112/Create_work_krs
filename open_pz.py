@@ -230,7 +230,7 @@ class CreatePZ:
                         CreatePZ.well_area = row[col + 1]
                     elif 'месторождение ' == value:  # определение номера скважины
                         CreatePZ.well_oilfield = row[col + 2]
-                        print(f'местрождение {CreatePZ.well_oilfield}')
+                        # print(f'местрождение {CreatePZ.well_oilfield}')
 
                     elif 'Инв. №' == value:
                         CreatePZ.inv_number = row[col + 1]
@@ -270,6 +270,7 @@ class CreatePZ:
 
                     elif 'Направление' in str(value) and 'Шахтное направление' not in str(value) and \
                             ws.cell(row=row_ind + 1, column=col + 4).value not in ['-', '(мм), (мм), -(м)', None]:
+                        CreatePZ.column_direction_True = True
                         # print(row_ind, value, 'Шахтное направление' not in str(value)) and \
                         CreatePZ.column_direction_True = True
 
@@ -296,9 +297,11 @@ class CreatePZ:
                         try:
                             column_conductor_data = (ws.cell(row=row_ind + 1, column=col + 4).value).split('(мм),', )
                             if len(column_conductor_data) == 3:
-                                CreatePZ.column_conductor_diametr = float(column_direction_data[0])
-                                CreatePZ.column_conductor_wall_thickness = float(column_direction_data[1])
-                                CreatePZ.column_conductor_lenght = column_direction_data[2]
+                                print(column_conductor_data)
+                                CreatePZ.column_conductor_diametr = float(column_conductor_data[0])
+                                CreatePZ.column_conductor_wall_thickness = float(column_conductor_data[1])
+                                CreatePZ.column_conductor_lenght = column_conductor_data[2]
+
                         except:
                             CreatePZ.column_conductor_diametr, _ = \
                                 QInputDialog.getInt(self, 'Кондуктор', 'Введите внешний диаметр Кондуктор',
@@ -312,7 +315,9 @@ class CreatePZ:
                     elif any(['Кондуктор' in str(value) for value in row]):
                         for ind, value in enumerate(row):
                             if 'Уровень цемента' in str(value):
+
                                 CreatePZ.level_cement_conductor = row[ind + 2]
+
                     elif any(['Направление' in str(value) for value in row]):
                         for ind, value in enumerate(row):
                             if 'Уровень цемента' in str(value):
@@ -438,7 +443,7 @@ class CreatePZ:
 
 
                     elif '6. Конструкция хвостовика' in str(value):
-                        column_add_index = row_ind + 3
+
                         CreatePZ.data_column_additional = ws.cell(row=row_ind + 3, column=col + 2).value
 
                         if CreatePZ.if_None(CreatePZ.data_column_additional) != 'отсут':
@@ -450,16 +455,12 @@ class CreatePZ:
                             try:
                                 CreatePZ.head_column_additional = float(CreatePZ.data_column_additional.split('-')[0])
                             except:
-                                CreatePZ.head_column_additional, ok = QInputDialog.getInt(self, 'голова доп колонны',
-                                                                                          'введите глубину головы доп колонны',
-                                                                                          600, 0, 3500)
+                                CreatePZ.head_column_additional = ws.cell(row=row_ind + 3, column=col + 2).value
                             try:
                                 CreatePZ.shoe_column_additional = float(CreatePZ.data_column_additional.split('-')[1])
                                 # print(f'доп колонна {CreatePZ.shoe_column_additional}')
                             except:
-                                CreatePZ.shoe_column_additional, ok = QInputDialog.getInt(self, ',башмак доп колонны',
-                                                                                          'введите глубину башмак доп колонны',
-                                                                                          600, 0, 3500)
+                                CreatePZ.shoe_column_additional= ws.cell(row=row_ind + 3, column=col + 3).value
                             try:
                                 if ws.cell(row=row_ind + 3, column=col + 4).value.split('x') == 2:
                                     CreatePZ.column_additional_diametr = CreatePZ.without_b(
@@ -898,7 +899,9 @@ class CreatePZ:
                 # print(f'5 {row}')
 
                 if krs.is_number(str(row[1]).replace(',', '.')) is True:
-                    CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('вертикаль', set()).add(row[1])
+                    CreatePZ.dict_perforation.setdefault(plast,
+                                                         {}).setdefault('вертикаль',
+                                                                        set()).add(float(str(row[1]).replace(',', '.')))
                 if  any(['фильтр' in str(i).lower() for i in row]):
                     CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('отрайбировано', True)
                 else:
