@@ -473,7 +473,7 @@ class MyWindow(QMainWindow):
     def open_class_well(self, costumer, region):
         if self.new_window is None:
 
-            self.new_window =Classifier_well()
+            self.new_window = Classifier_well()
             self.new_window.setWindowTitle("Классификатор")
             self.new_window.setGeometry(200, 400, 300, 400)
             self.new_window.show()
@@ -481,9 +481,6 @@ class MyWindow(QMainWindow):
         else:
             self.new_window.close()  # Close window.
             self.new_window = None  # Discard reference.
-
-
-
 
     def reload_without_damping(self, costumer, region):
 
@@ -496,25 +493,25 @@ class MyWindow(QMainWindow):
             except FileNotFoundError:
                 print('Файл не найден')
 
-    def tableDampingWidgetOpen(self):
-        if self.table_juming is None:
-            self.table_juming = QTableWidget()
+    # def tableDampingWidgetOpen(self):
+    #     if self.table_juming is None:
+    #         self.table_juming = QTableWidget()
+    #
+    #         self.table_juming.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+    #         self.table_juming.customContextMenuRequested.connect(self.openContextMenu)
+    #         self.setCentralWidget(self.table_juming)
+    #         self.model = self.table_juming.model()
+    #
+    #         # Этот сигнал испускается всякий раз, когда ячейка в таблице нажата.
+    #         # Указанная строка и столбец - это ячейка, которая была нажата.
+    #         self.table_juming.cellPressed[int, int].connect(self.clickedRowColumn)
 
-            self.table_juming.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
-            self.table_juming.customContextMenuRequested.connect(self.openContextMenu)
-            self.setCentralWidget(self.table_juming)
-            self.model = self.table_juming.model()
-
-            # Этот сигнал испускается всякий раз, когда ячейка в таблице нажата.
-            # Указанная строка и столбец - это ячейка, которая была нажата.
-            self.table_juming.cellPressed[int, int].connect(self.clickedRowColumn)
-
-    def tableClassifisierOpen(self):
-        if self.table_class is None:
-            self.new_window = Classifier_well()
-            self.new_window.setWindowTitle("Классификатор")
-            self.new_window.setGeometry(200, 400, 300, 400)
-            self.new_window.show()
+    # def tableClassifisierOpen(self):
+    #     if self.table_class is None:
+    #         self.new_window = Classifier_well()
+    #         self.new_window.setWindowTitle("Классификатор")
+    #         self.new_window.setGeometry(200, 400, 300, 400)
+    #         self.new_window.show()
 
 
 
@@ -1345,6 +1342,9 @@ class MyWindow(QMainWindow):
             self.acid_windowPaker2.show()
             CreatePZ.pause_app(self)
             CreatePZ.pause = True
+            self.acid_windowPaker2 = None
+        else:
+            self.acid_windowPaker2.close()  # Close window.
             self.acid_windowPaker2 = None
 
     def template_without_skm(self):

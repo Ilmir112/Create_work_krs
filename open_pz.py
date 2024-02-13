@@ -41,6 +41,7 @@ class CreatePZ:
     template_depth = 0
     nkt_diam = 73
     b_plan = 0
+    column_direction_True = False
     expected_Q = 0
     expected_P = 0
     plast_select = ''
@@ -270,6 +271,7 @@ class CreatePZ:
                     elif 'Направление' in str(value) and 'Шахтное направление' not in str(value) and \
                             ws.cell(row=row_ind + 1, column=col + 4).value not in ['-', '(мм), (мм), -(м)', None]:
                         # print(row_ind, value, 'Шахтное направление' not in str(value)) and \
+                        CreatePZ.column_direction_True = True
 
                         try:
                             column_direction_data = (ws.cell(row=row_ind + 1, column=col + 4).value).split('(мм),', )
@@ -294,7 +296,7 @@ class CreatePZ:
                         try:
                             column_conductor_data = (ws.cell(row=row_ind + 1, column=col + 4).value).split('(мм),', )
                             if len(column_conductor_data) == 3:
-                                CreatePZ.column_conductorn_diametr = float(column_direction_data[0])
+                                CreatePZ.column_conductor_diametr = float(column_direction_data[0])
                                 CreatePZ.column_conductor_wall_thickness = float(column_direction_data[1])
                                 CreatePZ.column_conductor_lenght = column_direction_data[2]
                         except:

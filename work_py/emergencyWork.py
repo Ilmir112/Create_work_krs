@@ -26,7 +26,7 @@ def sbt_select(self):
         sbt_select = ''
 
     elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr < 127:
-        sbt_select = f'СБТ 2 3/8 L- {CreatePZ.current_bottom - CreatePZ.head_column_additional}м '
+        sbt_select = f'СБТ 2 3/8 L- {round(CreatePZ.current_bottom - CreatePZ.head_column_additional,0)}м '
 
     return sbt_select
 

@@ -123,8 +123,8 @@ class RirWindow(QMainWindow):
         self.setCentralWidget(self.centralWidget)
         self.table_widget = table_widget
         self.ins_ind = ins_ind
-        self.rir_paker = None
-        self.paker_select = None
+
+
         self.tabWidget = TabWidget()
 
 
@@ -327,7 +327,12 @@ class RirWindow(QMainWindow):
                     elif interval[1] > CreatePZ.perforation_sole:
                         CreatePZ.perforation_sole = interval[1]
         print(f' Подошва ПВР {CreatePZ.perforation_sole}')
-        CreatePZ.definition_plast_work(self)
+
+        CreatePZ.plast_work = []
+        for plast in CreatePZ.plast_all:
+            if CreatePZ.dict_perforation[plast]['отключение'] == False:
+                CreatePZ.plast_work.append(plast)
+
         if len(CreatePZ.dict_leakiness) != 0:
             for nek in list(CreatePZ.dict_leakiness['НЭК']['интервал'].keys()):
                 print(roofRir, float(nek[0]), solePir)
@@ -704,7 +709,7 @@ class RirWindow(QMainWindow):
             AcidPakerWindow.populate_row(self, CreatePZ.ins_ind, work_list)
 
         elif rir_type_Combo == 'РИР с пакером': # ['РИР на пере', 'РИР с пакером', 'РИР с РПК', 'РИР с РПП']
-
+            print(paker_need_Combo, plastCombo, roof_rir_Edit, sole_rir_Edit)
             work_list = self.rir_paker(paker_need_Combo, plastCombo, roof_rir_Edit, sole_rir_Edit)
             AcidPakerWindow.populate_row(self, CreatePZ.ins_ind, work_list)
         elif rir_type_Combo == 'РИР с РПК': # ['РИР на пере', 'РИР с пакером', 'РИР с РПК', 'РИР с РПП']

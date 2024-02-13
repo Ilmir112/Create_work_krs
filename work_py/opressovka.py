@@ -408,10 +408,13 @@ def testing_pressure(self, depth):
     from open_pz import CreatePZ
 
     interval_list = []
+    print(CreatePZ.plast_all)
 
-    for plast in CreatePZ.plast_work:
-        for interval in CreatePZ.dict_perforation[plast]['интервал']:
-            interval_list.append(interval)
+    print(f'раб пласты {CreatePZ.plast_work}')
+    for plast in CreatePZ.plast_all:
+        if CreatePZ.dict_perforation[plast]['отключение'] is False:
+            for interval in CreatePZ.dict_perforation[plast]['интервал']:
+                interval_list.append(interval)
 
     if CreatePZ.leakiness == True:
 
