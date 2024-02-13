@@ -443,7 +443,6 @@ class CreatePZ:
 
 
                     elif '6. Конструкция хвостовика' in str(value):
-
                         CreatePZ.data_column_additional = ws.cell(row=row_ind + 3, column=col + 2).value
 
                         if CreatePZ.if_None(CreatePZ.data_column_additional) != 'отсут':

@@ -13,20 +13,23 @@ from openpyxl.workbook import Workbook
 
 from krs import volume_vn_nkt, well_volume
 
+from gnkt_data.gnkt_data import dict_saddles
+
 
 class Work_with_gnkt():
 
     def __init__(self):
         from open_pz import CreatePZ
-        super(CreatePZ).__init__()
+        super(CreatePZ, self).__init__()
         self.create_excel_file = None
+        self.dict_perforation = CreatePZ.dict_perforation
+
 
     def create_excel_file(self, ws):
         from open_pz import CreatePZ
         wb4 = Workbook()
         ws2 = wb4.get_sheet_by_name('Sheet')
         ws2.title = "Титульник"
-
         ws3 = wb4.create_sheet(title="Схема")
 
 
@@ -376,8 +379,63 @@ class Work_with_gnkt():
                             end_column=value[2], end_row=value[3])
 
         for index_row, row in enumerate(ws3.iter_rows()):  # Копирование высоты строки
-            ws3.row_dimensions[index_row].height = rowHeights1[index_row]
+            ws3.row_dimensions[index_row].height = rowHeights1[index_row-1]
             if row == 8:
                 for col_ind, col in enumerate(row):
-
                     ws3.column_dimensions[get_column_letter(col_ind + 1)].width = colWidth[col_ind]
+
+        Work_with_gnkt.work_with_port(self, plast_work, CreatePZ.dict_perforation)
+
+
+
+    def work_with_port(self, plast_work:str, dict_perforation: dict):
+        ports_tuple = sorted(list(dict_perforation[plast_work]['интервал']), key = lambda x:x[0], reverse=True)
+        dict_ports = {}
+
+        manufacturer_list = ['НТЦ ЗЭРС', 'Зенит', 'Барбус']
+
+        manufacturer, ok = QInputDialog.getItem(None, 'Выбор подрядчика по хвостовику', 'Введите подрядчика по хвостовику',
+                                                    manufacturer_list, 0, False)
+        if manufacturer == 'НТЦ ЗЭРС':
+            type_column_list = ["ФПЗН.102", "ФПЗН1.114"]
+            type_column, ok = QInputDialog.getItem(None, 'Выбор типа колонны', 'Введите тип колонны',
+                                                    type_column_list, 1, False)
+
+
+        elif manufacturer == 'Зенит':
+            type_column = ["ФПЗН1.114"]
+            type_sanddles_list = ['1.952"', '2,022"', '2,092"', '2,162"', '114/58А', '2,322"',
+                                  '2,402"', '2,487"', '2,577"', '2,667"', '2,757"','2,547"']
+
+
+        elif manufacturer == 'Барбус':
+            type_column = ["гидравлич"]
+
+
+
+        for index, port in enumerate(ports_tuple):
+            if type_column == "ФПЗН.102" and manufacturer == 'НТЦ ЗЭРС':
+                type_sanddles_list = ['102/70', '102/67', '102/64', '102/61', '102/58', '102/55', '102/52', '102/49',
+                                      '102/47','102/45']
+
+            elif type_column == "ФПЗН1.114" and manufacturer == 'НТЦ ЗЭРС':
+                type_sanddles_list = ['114/70А', '114/67А', '114/64А', '114/61А', '114/58А', '114/55А', '114/52А',
+                '114/49А', '114/47А', '114/45А']
+            elif type_column == "ФПЗН1.114" and manufacturer == 'Зенит':
+                type_sanddles_list = ['1.952"', '2,022"', '2,092"', '2,162"', '114/58А', '2,322"',
+                                  '2,402"', '2,487"', '2,577"', '2,667"', '2,757"','2,547"']
+            elif type_column == "ФПЗН1.114" and manufacturer == 'Барбус':
+                type_sanddles_list = ['51,36t20', '54,00t20', '56,65t20', '59,80t20',
+                                      '62,95t20', '66,10t20']
+            type_sanddles, ok = QInputDialog.getItem(None, 'Выбор типа порта ',
+                                                     f'Введите тип порта {manufacturer} №{index + 1}',
+                                                     type_sanddles_list, 0, False)
+            # print(dict_saddles[manufacturer])
+            ball = dict_saddles[manufacturer][type_column][type_sanddles].ball
+            saddle = dict_saddles[manufacturer][type_column][type_sanddles].saddle
+            dict_ports[f'Муфта №{index+1}'] = {'кровля': port[0], 'подошва': port[1], 'шар': ball, 'седло': saddle, 'тип': type_sanddles}
+        print(dict_ports)
+        return dict_ports
+
+
+
