@@ -11,7 +11,7 @@ from openpyxl.styles import Border, Side, PatternFill, Font, GradientFill, Align
 from openpyxl.reader.excel import load_workbook
 from openpyxl.workbook import Workbook
 
-from krs import volume_vn_nkt
+from krs import volume_vn_nkt, well_volume
 
 
 class Work_with_gnkt():
@@ -164,11 +164,12 @@ class Work_with_gnkt():
                     5.140625, 13.0, 13.0, 13.0, 13.0, 13.0, 4.7109375, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0,
                     13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0,
                     13.0, 13.0, 5.42578125, None]
-        plast_work = CreatePZ.plast_work[0]
-        # print(plast_work,  list(CreatePZ.dict_perforation[plast_work]))
+
+        plast_work = CreatePZ.plast_all[0]
+        print(plast_work,  list(CreatePZ.dict_perforation[plast_work]))
         pressuar = list(CreatePZ.dict_perforation[plast_work]['давление'])[0]
         zamer = list(CreatePZ.dict_perforation[plast_work]['замер'])[0]
-        vertikal = min(list(CreatePZ.dict_perforation[plast_work]['вертикаль']))
+        vertikal = min(map(float, list(CreatePZ.dict_perforation[plast_work]['вертикаль'])))
         zhgs = list(CreatePZ.dict_perforation[plast_work]['рабочая жидкость'])[0]
         koef_anomal = round(float(pressuar) * 101325 / (float(vertikal) * 9.81 * 1000), 1)
         nkt = int(list(CreatePZ.dict_nkt.keys())[0])
@@ -176,11 +177,18 @@ class Work_with_gnkt():
 
         bottom_first_port = max(map(lambda x: x[0], [interval for interval in CreatePZ.dict_perforation[plast_work]]))
 
-        arm_grp, ok = QInputDialog.getInT(None, 'Арматура ГРП',
+        arm_grp, ok = QInputDialog.getInt(None, 'Арматура ГРП',
                                                      'ВВедите номер Арматуры ГРП', 16, 0, 500)
 
-        gnkt_lenght =QInputDialog.getInT(None, 'Длина ГНКТ',
+        gnkt_lenght, _ = QInputDialog.getInt(None, 'Длина ГНКТ',
                                                      'ВВедите длину ГНКТ', 1500, 500, 10000)
+
+        well_volume_ek = well_volume(self, CreatePZ.head_column_additional)
+        well_volume_dp = well_volume_ek - well_volume(self, CreatePZ.current_bottom)
+
+        volume_pm_ek = round(3.14 * (CreatePZ.column_diametr - 2 * CreatePZ.column_wall_thickness)** 2 / 4)
+        volume_pm_dp = round(3.14 * (CreatePZ.column_additional_diametr - 2 *
+                                     CreatePZ.column_additional_wall_thickness) ** 2 / 4)
 
 
 
@@ -252,7 +260,7 @@ class Work_with_gnkt():
 
             [None, None, None, None, None, None,
              'Стол ротора', None, None, None, CreatePZ.stol_rotora, None, None, None, None, None,
-             None, None, 'от', None, 'до', None, None, None, None, None, 'п.м./л', None, 'м3', None, None,
+             None, None, 'от', None, 'до', None, None, None, None, None, volume_pm_ek, None, 'м3', None, None,
              'Жидкость глушения', None, None, None, None, None, None, None, zhgs, None, None, 'в объеме', None, None,
              28.9, None],
             [None, None, None, None, None, None, 'Направление', None, None, None, None, None,
@@ -263,8 +271,8 @@ class Work_with_gnkt():
              None, None, None, None, None, None, None, CreatePZ.Qwater, None, None, CreatePZ.Qoil, None, None,
              CreatePZ.proc_water, None],
             [None, None, None, None, None, None, 'Кондуктор', None, None, None, None, None,
-             CreatePZ.column_conductorn_diametr, None, CreatePZ.column_conductor_wall_thickness, None,
-             CreatePZ.column_conductorn_diametr - 2 * CreatePZ.column_conductor_wall_thickness,
+             CreatePZ.column_conductor_diametr, None, CreatePZ.column_conductor_wall_thickness, None,
+             CreatePZ.column_conductor_diametr - 2 * CreatePZ.column_conductor_wall_thickness,
              None, CreatePZ.column_conductor_lenght, None, None, None, CreatePZ.level_cement_conductor,
              None, None, None, None, None, None, None, None,
              'Начало / окончание бурения', None, None, None, None, None, None, None,
@@ -273,7 +281,7 @@ class Work_with_gnkt():
             [None, None, None, None, None, None, 'Экспл. колонна', None, None, None, None, None,
              CreatePZ.column_diametr, None, CreatePZ.column_wall_thickness, None,
              CreatePZ.column_diametr - 2 * CreatePZ.column_wall_thickness, None, CreatePZ.shoe_column, None, None,
-             None, CreatePZ.level_cement_column, None, None, None, 20.550703400000007, None, 22.757643438126006,
+             None, CreatePZ.level_cement_column, None, None, None, "g.м.", None, well_volume_ek,
              None, None, 'Р в межколонном пространстве', None, None, None, None, None, None, None,
              0, None, None, None, CreatePZ.pressuar_mkp, None, None, None],
             [None, None, None, None, None, None, "Хвостовик  ''НТЦ ''ЗЭРС''", None, None, None, None,
@@ -281,8 +289,8 @@ class Work_with_gnkt():
              CreatePZ.column_additional_wall_thickness, None,
              CreatePZ.column_additional_diametr - 2 * CreatePZ.column_additional_wall_thickness, None,
              CreatePZ.head_column_additional, None, CreatePZ.shoe_column_additional, None, 'не цементиров.', None,
-             None, None, 7.4013018499999985,
-             None, 2.6034819387559995, None, None, 'Давление опрессовки МКП', None, None, None, None, None, None, None,
+             None, None, volume_pm_dp,
+             None, well_volume_dp, None, None, 'Давление опрессовки МКП', None, None, None, None, None, None, None,
              None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, f'Подвеска НКТ {nkt}мм', None, None, None, None, None, nkt, None, 6.5,
              None, nkt - 2 * 6.5, None, 0, None, lenght_nkt, None, lenght_nkt, None, None, None,
@@ -306,7 +314,7 @@ class Work_with_gnkt():
              None, None, None, None, CreatePZ.current_bottom, None],
             [None, None, None, None, None, None, 'ГНКТ', None, None, None, None, None, 38.1, None, 3.96, None, 30.18,
              None, gnkt_lenght, None, None, None, None, None, None, None, round(30.2 ** 2 *3.14/4000, 1), None,
-             round(30.2 ** 2 *3.14/4000 *gnkt_lenght/1000, 1), None,
+             round(30.2 ** 2 * 3.14 / 4000 * gnkt_lenght/1000, 1), None,
              None, 'Искусственный забой  (МГРП №1 с актив.шаром 30мм)', None, None, None, None, None, None, None, None,
              None, None, None, None, None, bottom_first_port, None],
             [None, None, None, None, None, None, 'Интервалы установки фрак-портов  (муфт ГРП)', None, None, None, None,
@@ -360,8 +368,8 @@ class Work_with_gnkt():
 
                 cell.value = schema_well_list[row - 1][col - 1]
                 ws3.cell(row=row, column=col).font = Font(name='Arial', size=11, bold=False)
-                ws3.cell(row=row, column=col).alignment = Alignment( horizontal='center',
-                                                                                   vertical='center')
+                ws3.cell(row=row, column=col).alignment = Alignment( horizontal = 'center',
+                                                                                   vertical = 'center')
 
         for key, value in boundaries_dict.items():
             ws3.merge_cells(start_column=value[0], start_row=value[1],

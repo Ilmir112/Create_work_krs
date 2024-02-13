@@ -1183,7 +1183,7 @@ def volume_vn_nkt(dict_nkt):  # Внутренний объем одного п�
 def volume_rod(dict_sucker_rod):  # Объем штанг
     from open_pz import CreatePZ
     volume_rod = 0
-    print(dict_sucker_rod)
+    # print(dict_sucker_rod)
     for diam_rod, lenght_rod in dict_sucker_rod.items():
         if diam_rod:
             volume_rod += (3.14 * (lenght_rod * (CreatePZ.without_b(diam_rod) / 1000) / lenght_rod) ** 2) / 4 * lenght_rod
@@ -1255,7 +1255,7 @@ def well_volume(self, current_bottom):
                               3.14 * (CreatePZ.column_diametr - CreatePZ.column_wall_thickness * 2) ** 2 / 4 / 1000 * (
                          float(CreatePZ.head_column_additional)) / 1000)
     # print(f'Объем скважины {volume_well}')
-    return volume_well
+    return round(volume_well, 1)
 
 
 def volume_pod_NKT():  # Расчет необходимого объема внутри НКТ и между башмаком НКТ и забоем

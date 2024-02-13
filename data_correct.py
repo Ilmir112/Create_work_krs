@@ -545,10 +545,10 @@ class DataWindow(QMainWindow):
         column_direction_diametr =  self.tabWidget.currentWidget().column_direction_diametr_Edit.text()
         column_direction_wall_thickness = self.tabWidget.currentWidget().column_direction_wall_thickness_Edit.text()
         column_direction_lenght = self.tabWidget.currentWidget().column_direction_lenght_Edit.text()
-        level_cement_direction = self.tabWidget.currentWidget().clevel_cement_direction_Edit.text()
+        level_cement_direction = self.tabWidget.currentWidget().level_cement_direction_Edit.text()
         column_conductor_diametr = self.tabWidget.currentWidget().column_conductor_diametr_Edit.text()
         column_conductor_wall_thickness = self.tabWidget.currentWidget().column_conductor_wall_thickness_Edit.text()
-        column_conductor_lenght = self.tabWidget.currentWidget().column_direction_lenght_Edit.text()
+        column_conductor_lenght = self.tabWidget.currentWidget().column_conductor_lenght_Edit.text()
         level_cement_conductor = self.tabWidget.currentWidget().level_cement_conductor_Edit.text()
 
         dict_pump_SHGN_do = str(self.tabWidget.currentWidget().pump_SHGN_do_EditType.text())
@@ -620,7 +620,7 @@ class DataWindow(QMainWindow):
                 CreatePZ.dict_sucker_rod_po[self.tabWidget.currentWidget().labels_sucker_po[1][0].text()] = self.if_None(
                     self.tabWidget.currentWidget().labels_sucker_po[1][1].text())
 
-        voronka_question = True
+        close_file = True
 
         if self.ifNum(columnType) is False \
                 or self.ifNum(column_wall_thickness) is False \
@@ -648,12 +648,12 @@ class DataWindow(QMainWindow):
                 or self.ifNum(H_F_paker2_posle) is False \
                 or self.ifNum(column_direction_diametr) is False\
                 or self.ifNum(column_direction_wall_thickness) is False \
-                or self.ifNum(level_cement_direction) is False \
+                or self.if_string_list(level_cement_direction) is False \
                 or self.ifNum(column_conductor_diametr) is False \
                 or self.ifNum(column_conductor_wall_thickness) is False \
-                or self.ifNum(column_conductor_lenght) is False \
-                or self.ifNum(column_direction_lenght) is False \
-                or self.ifNum(level_cement_conductor) is False\
+                or self.if_string_list(column_conductor_lenght) is False \
+                or self.if_string_list(column_direction_lenght) is False \
+                or self.if_string_list(level_cement_conductor) is False\
                 or any(['НВ' in dict_pump_SHGN_do.upper(), 'ШГН' in dict_pump_SHGN_do.upper(),
                     'НН' in dict_pump_SHGN_do.upper(), dict_pump_SHGN_do == 'отсут',
                         'RHAM' in dict_pump_SHGN_do]) is False\
@@ -687,15 +687,18 @@ class DataWindow(QMainWindow):
                 voronka_question = QMessageBox.question(self, 'Внимание',
                                            'Программа определила что в скважине до ремонта воронка, верно ли')
                 if voronka_question == QMessageBox.StandardButton.No:
-                    voronka_question = False
-                    return
+                    close_file = False
+                else:
+                    close_file = True
             elif all(['отсут' == pump for pump in [dict_pump_ECN_posle, paker2_posle, dict_pump_SHGN_posle, paker_posle]]):
                 voronka_question = QMessageBox.question(self, 'Внимание',
                                            'Программа определила что в скважине После ремонта воронка, верно ли')
                 if voronka_question == QMessageBox.StandardButton.No:
-                    voronka_question = False
-                    return
-            else:
+                    close_file = False
+                else:
+                    close_file = True
+
+            if close_file == True:
                 CreatePZ.column_diametr = self.if_None(columnType)
                 CreatePZ.column_wall_thickness = self.if_None(column_wall_thickness)
                 CreatePZ.shoe_column = self.if_None(shoe_column)
@@ -765,12 +768,26 @@ class DataWindow(QMainWindow):
                 return round(float(value.replace(',','.')), 1)
         else:
             return value
+
+    def if_string_list(self, string):
+        try:
+            if len(string.split('-')) == 2:
+                return True
+            else:
+                return False
+        except:
+            if str(string) == 'отсут':
+                return True
+            else:
+                return False
     def ifNum(self, string):
 
         if str(string) == "['0']":
             return False
         elif str(string) == 'отсут':
             return True
+
+
         elif str(string).replace('.','').replace(',','').isdigit():
             if float(string.replace(',','.')) < 5000:
                 return True
