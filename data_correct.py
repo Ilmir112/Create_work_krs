@@ -38,6 +38,42 @@ class TabPage_SO(QWidget):
         self.labels_sucker = {}
         self.labels_sucker_po = {}
 
+        self.column_direction_diametr_Label = QLabel("диаметр направление", self)
+        self.column_direction_diametr_Edit = FloatLineEdit(self)
+        if CreatePZ.column_direction_True:
+            self.column_direction_diametr_Edit.setText(f'{CreatePZ.column_direction_diametr}')
+
+        self.column_direction_wall_thickness_Label = QLabel("Толщина стенки направление", self)
+        self.column_direction_wall_thickness_Edit = FloatLineEdit(self)
+        if CreatePZ.column_direction_True:
+            self.column_direction_wall_thickness_Edit.setText(f'{CreatePZ.column_direction_wall_thickness}')
+
+        self.column_direction_lenght_Label = QLabel("башмак направления", self)
+        self.column_direction_lenght_Edit = FloatLineEdit(self)
+        if CreatePZ.column_direction_True:
+            self.column_direction_lenght_Edit.setText(f'{CreatePZ.column_direction_lenght}')
+
+        self.level_cement_direction_Label = QLabel("Уровень цемента за направление", self)
+        self.level_cement_direction_Edit = FloatLineEdit(self)
+        if CreatePZ.column_direction_True:
+            self.level_cement_direction_Edit.setText(f'{CreatePZ.level_cement_direction}')
+
+        self.column_conductor_diametr_Label = QLabel("диаметр кондуктора", self)
+        self.column_conductor_diametr_Edit = FloatLineEdit(self)
+        self.column_conductor_diametr_Edit.setText(f'{CreatePZ.column_conductor_diametr}')
+
+        self.column_conductor_wall_thickness_Label = QLabel("Толщина стенки ", self)
+        self.column_conductor_wall_thickness_Edit = FloatLineEdit(self)
+        self.column_conductor_wall_thickness_Edit.setText(f'{CreatePZ.column_conductor_wall_thickness}')
+
+        self.column_conductor_lenght_Label = QLabel("башмак кондуктора", self)
+        self.column_conductor_lenght_Edit = FloatLineEdit(self)
+        self.column_conductor_lenght_Edit.setText(f'{CreatePZ.column_conductor_lenght}')
+
+        self.level_cement_conductor_Label = QLabel("Уровень цемента за кондуктором", self)
+        self.level_cement_conductor_Edit = FloatLineEdit(self)
+        self.level_cement_conductor_Edit.setText(f'{CreatePZ.level_cement_conductor}')
+
         self.columnLabel = QLabel("диаметр ЭК", self)
         self.columnType = FloatLineEdit(self)
         self.columnType.setText(f"{self.ifNone(CreatePZ.column_diametr)}")
@@ -208,82 +244,101 @@ class TabPage_SO(QWidget):
 
 
         grid = QGridLayout(self)
-        grid.addWidget(self.columnLabel, 0, 0)
-        grid.addWidget(self.columnType, 1, 0)
-        grid.addWidget(self.column_wall_thicknessLabel, 0, 1)
-        grid.addWidget(self.column_wall_thicknessEditType2, 1, 1)
-        grid.addWidget(self.shoe_columnLabel, 0, 2)
-        grid.addWidget(self.shoe_columnEditType2, 1, 2)
-        grid.addWidget(self.column_add_trueLabel, 0, 3)
-        grid.addWidget(self.column_add_true_comboBox, 1, 3)
-        grid.addWidget(self.column_addLabel, 0, 4)
-        grid.addWidget(self.column_addEditType, 1, 4)
-        grid.addWidget(self.column_add_wall_thicknessLabel, 0, 5)
-        grid.addWidget(self.column_add_wall_thicknessEditType2, 1, 5)
-        grid.addWidget(self.head_column_addLabel, 0, 6)
-        grid.addWidget(self.head_column_add_EditType2, 1, 6)
-        grid.addWidget(self.shoe_column_addLabel, 0, 7)
-        grid.addWidget(self.shoe_column_add_EditType2, 1, 7)
+        grid.addWidget(self.column_direction_diametr_Label, 0, 0)
+        grid.addWidget(self.column_direction_diametr_Edit, 1, 0)
+        grid.addWidget(self.column_direction_wall_thickness_Label, 0, 1)
+        grid.addWidget(self.column_direction_wall_thickness_Edit, 1, 1)
+        grid.addWidget(self.column_direction_lenght_Label, 0, 2)
+        grid.addWidget(self.column_direction_lenght_Edit, 1, 2)
+        grid.addWidget(self.level_cement_direction_Label, 0, 4)
+        grid.addWidget(self.level_cement_direction_Edit, 1, 4)
+
+        grid.addWidget(self.column_conductor_diametr_Label, 2, 0)
+        grid.addWidget(self.column_conductor_diametr_Edit, 3, 0)
+        grid.addWidget(self.column_conductor_wall_thickness_Label, 2, 1)
+        grid.addWidget(self.column_conductor_wall_thickness_Edit, 3, 1)
+        grid.addWidget(self.column_conductor_lenght_Label, 2, 2)
+        grid.addWidget(self.column_conductor_lenght_Edit, 3, 2)
+        grid.addWidget(self.level_cement_conductor_Label, 2, 4)
+        grid.addWidget(self.level_cement_conductor_Edit, 3, 4)
 
 
-        grid.addWidget(self.bottomhole_drill_Label, 2, 0)
-        grid.addWidget(self.bottomhole_drill_EditType, 3, 0)
-        grid.addWidget(self.bottomhole_artificial_Label, 2, 1)
-        grid.addWidget(self.bottomhole_artificial_EditType, 3, 1)
-        grid.addWidget(self.current_bottom_Label, 2, 2)
-        grid.addWidget(self.current_bottom_EditType, 3, 2)
-        grid.addWidget(self.max_angle_Label, 2, 3)
-        grid.addWidget(self.max_angle_EditType, 3, 3)
-        grid.addWidget(self.max_expected_pressure_Label, 2, 4)
-        grid.addWidget(self.max_expected_pressure_EditType, 3, 4)
-        grid.addWidget(self.max_admissible_pressure_Label, 2, 5)
-        grid.addWidget(self.max_admissible_pressure_EditType, 3, 5)
-        grid.addWidget(self.pump_ECN_do_Label, 4, 0)
-        grid.addWidget(self.pump_ECN_do_EditType, 5, 0)
-        grid.addWidget(self.pump_ECN_depth_do_Label, 4, 1)
-        grid.addWidget(self.pump_ECN_depth_do_EditType, 5, 1)
-        grid.addWidget(self.pump_ECN_posle_Label, 4, 4)
-        grid.addWidget(self.pump_ECN_posle_EditType, 5, 4)
-        grid.addWidget(self.pump_ECN_depth_posle_Label, 4, 5)
-        grid.addWidget(self.pump_ECN_depth_posle_EditType, 5, 5)
+        grid.addWidget(self.columnLabel, 8, 0)
+        grid.addWidget(self.columnType, 9, 0)
+        grid.addWidget(self.column_wall_thicknessLabel, 8, 1)
+        grid.addWidget(self.column_wall_thicknessEditType2, 9, 1)
+        grid.addWidget(self.shoe_columnLabel, 8, 2)
+        grid.addWidget(self.shoe_columnEditType2, 9, 2)
+        grid.addWidget(self.column_add_trueLabel, 8, 3)
+        grid.addWidget(self.column_add_true_comboBox, 9, 3)
+        grid.addWidget(self.column_addLabel, 8, 4)
+        grid.addWidget(self.column_addEditType, 9, 4)
+        grid.addWidget(self.column_add_wall_thicknessLabel, 8, 5)
+        grid.addWidget(self.column_add_wall_thicknessEditType2, 9, 5)
+        grid.addWidget(self.head_column_addLabel, 8, 6)
+        grid.addWidget(self.head_column_add_EditType2, 9, 6)
+        grid.addWidget(self.shoe_column_addLabel, 8, 7)
+        grid.addWidget(self.shoe_column_add_EditType2, 9, 7)
 
-        grid.addWidget(self.pump_SHGN_do_Label, 6, 0)
-        grid.addWidget(self.pump_SHGN_do_EditType, 7, 0)
-        grid.addWidget(self.pump_SHGN_depth_do_Label, 6, 1)
-        grid.addWidget(self.pump_SHGN_depth_do_EditType, 7, 1)
-        grid.addWidget(self.pump_SHGN_posle_Label, 6, 4)
-        grid.addWidget(self.pump_SHGN_posle_EditType, 7, 4)
-        grid.addWidget(self.pump_SHGN_depth_posle_Label, 6, 5)
-        grid.addWidget(self.pump_SHGN_depth_posle_EditType, 7, 5)
 
-        grid.addWidget(self.paker_do_Label, 8, 0)
-        grid.addWidget(self.paker_do_EditType, 9, 0)
-        grid.addWidget(self.paker_depth_do_Label, 8, 1)
-        grid.addWidget(self.paker_depth_do_EditType, 9, 1)
-        grid.addWidget(self.paker_posle_Label, 8, 4)
-        grid.addWidget(self.paker_posle_EditType, 9, 4)
-        grid.addWidget(self.paker_depth_posle_Label, 8, 5)
-        grid.addWidget(self.paker_depth_posle_EditType, 9, 5)
+        grid.addWidget(self.bottomhole_drill_Label, 10, 0)
+        grid.addWidget(self.bottomhole_drill_EditType, 11, 0)
+        grid.addWidget(self.bottomhole_artificial_Label, 10, 1)
+        grid.addWidget(self.bottomhole_artificial_EditType, 11, 1)
+        grid.addWidget(self.current_bottom_Label, 10, 2)
+        grid.addWidget(self.current_bottom_EditType, 11, 2)
+        grid.addWidget(self.max_angle_Label, 10, 3)
+        grid.addWidget(self.max_angle_EditType, 11, 3)
+        grid.addWidget(self.max_expected_pressure_Label, 10, 4)
+        grid.addWidget(self.max_expected_pressure_EditType, 11, 4)
+        grid.addWidget(self.max_admissible_pressure_Label, 10, 5)
+        grid.addWidget(self.max_admissible_pressure_EditType, 11, 5)
+        grid.addWidget(self.pump_ECN_do_Label, 13, 0)
+        grid.addWidget(self.pump_ECN_do_EditType, 14, 0)
+        grid.addWidget(self.pump_ECN_depth_do_Label, 13, 1)
+        grid.addWidget(self.pump_ECN_depth_do_EditType, 14, 1)
+        grid.addWidget(self.pump_ECN_posle_Label, 13, 4)
+        grid.addWidget(self.pump_ECN_posle_EditType, 14, 4)
+        grid.addWidget(self.pump_ECN_depth_posle_Label, 13, 5)
+        grid.addWidget(self.pump_ECN_depth_posle_EditType, 14, 5)
 
-        grid.addWidget(self.paker2_do_Label, 10, 0)
-        grid.addWidget(self.paker2_do_EditType, 11, 0)
-        grid.addWidget(self.paker2_depth_do_Label, 10, 1)
-        grid.addWidget(self.paker2_depth_do_EditType, 11, 1)
-        grid.addWidget(self.paker2_posle_Label, 10, 4)
-        grid.addWidget(self.paker2_posle_EditType, 11, 4)
-        grid.addWidget(self.paker2_depth_posle_Label, 10, 5)
-        grid.addWidget(self.paker2_depth_posle_EditType, 11, 5)
+        grid.addWidget(self.pump_SHGN_do_Label, 15, 0)
+        grid.addWidget(self.pump_SHGN_do_EditType, 16, 0)
+        grid.addWidget(self.pump_SHGN_depth_do_Label, 15, 1)
+        grid.addWidget(self.pump_SHGN_depth_do_EditType, 16, 1)
+        grid.addWidget(self.pump_SHGN_posle_Label, 15, 4)
+        grid.addWidget(self.pump_SHGN_posle_EditType, 16, 4)
+        grid.addWidget(self.pump_SHGN_depth_posle_Label, 15, 5)
+        grid.addWidget(self.pump_SHGN_depth_posle_EditType, 16, 5)
 
-        grid.addWidget(self.static_level_Label, 12, 2)
-        grid.addWidget(self.static_level_EditType, 13, 2)
-        grid.addWidget(self.dinamic_level_Label, 12, 3)
-        grid.addWidget(self.dinamic_level_EditType, 13, 3)
+        grid.addWidget(self.paker_do_Label, 17, 0)
+        grid.addWidget(self.paker_do_EditType, 18, 0)
+        grid.addWidget(self.paker_depth_do_Label, 17, 1)
+        grid.addWidget(self.paker_depth_do_EditType, 18, 1)
+        grid.addWidget(self.paker_posle_Label, 17, 4)
+        grid.addWidget(self.paker_posle_EditType, 18, 4)
+        grid.addWidget(self.paker_depth_posle_Label, 17, 5)
+        grid.addWidget(self.paker_depth_posle_EditType, 18, 5)
 
-        grid.addWidget(self.nkt_do_label, 14, 1)
-        grid.addWidget(self.nkt_posle_label, 14, 5)
+        grid.addWidget(self.paker2_do_Label, 19, 0)
+        grid.addWidget(self.paker2_do_EditType, 20, 0)
+        grid.addWidget(self.paker2_depth_do_Label, 19, 1)
+        grid.addWidget(self.paker2_depth_do_EditType, 20, 1)
+        grid.addWidget(self.paker2_posle_Label, 19, 4)
+        grid.addWidget(self.paker2_posle_EditType, 20, 4)
+        grid.addWidget(self.paker2_depth_posle_Label, 19, 5)
+        grid.addWidget(self.paker2_depth_posle_EditType, 20, 5)
 
-        grid.addWidget(self.sucker_rod_label, 19, 1)
-        grid.addWidget(self.sucker_rod_po_label, 19, 5)
+        grid.addWidget(self.static_level_Label, 21, 2)
+        grid.addWidget(self.static_level_EditType, 22, 2)
+        grid.addWidget(self.dinamic_level_Label, 21, 3)
+        grid.addWidget(self.dinamic_level_EditType, 22, 3)
+
+        grid.addWidget(self.nkt_do_label, 23, 1)
+        grid.addWidget(self.nkt_posle_label, 24, 5)
+
+        grid.addWidget(self.sucker_rod_label, 25, 1)
+        grid.addWidget(self.sucker_rod_po_label, 26, 5)
 
         # добавление строк с НКТ спущенных
         if len(self.dict_nkt) != 0:
@@ -296,8 +351,8 @@ class TabPage_SO(QWidget):
                 lenght_line_edit = QLineEdit(self)
                 lenght_line_edit.setText(str(self.ifNone(lenght)))
 
-                grid.addWidget(nkt_line_edit, 14+n, 1)
-                grid.addWidget(lenght_line_edit, 14+n, 2)
+                grid.addWidget(nkt_line_edit, 22+n, 1)
+                grid.addWidget(lenght_line_edit, 22+n, 2)
 
                 # Переименование атрибута
                 setattr(self, f"{nkt}_{n}_line", nkt_line_edit)
@@ -314,8 +369,8 @@ class TabPage_SO(QWidget):
 
             self.labels_nkt[1] = (nkt_line_edit, lenght_line_edit)
 
-            grid.addWidget(nkt_line_edit, 15, 1)
-            grid.addWidget(lenght_line_edit, 15, 2)
+            grid.addWidget(nkt_line_edit, 23, 1)
+            grid.addWidget(lenght_line_edit, 23, 2)
 
         # добавление строк с штанг спущенных
         if len(self.dict_sucker_rod) != 0:
@@ -328,8 +383,8 @@ class TabPage_SO(QWidget):
                 lenght_sucker_line_edit = QLineEdit(self)
                 lenght_sucker_line_edit.setText(str(self.ifNone(lenght)))
 
-                grid.addWidget(sucker_rod_line_edit, 19 + n, 1)
-                grid.addWidget(lenght_sucker_line_edit, 19 + n, 2)
+                grid.addWidget(sucker_rod_line_edit, 27 + n, 1)
+                grid.addWidget(lenght_sucker_line_edit, 27 + n, 2)
 
                 # Переименование атрибута
                 setattr(self, f"sucker_{n}_line", sucker_rod_line_edit)
@@ -347,8 +402,8 @@ class TabPage_SO(QWidget):
 
             self.labels_sucker[1] = (sucker_rod_line_edit, lenght_sucker_line_edit)
 
-            grid.addWidget(sucker_rod_line_edit, 20, 1)
-            grid.addWidget(lenght_sucker_line_edit, 20, 2)
+            grid.addWidget(sucker_rod_line_edit, 28, 1)
+            grid.addWidget(lenght_sucker_line_edit, 28, 2)
 
         if len(self.dict_nkt_po) != 0:
             # добавление строк с НКТ плановых
@@ -362,8 +417,8 @@ class TabPage_SO(QWidget):
                 lenght_po_line_edit = QLineEdit(self)
                 lenght_po_line_edit.setText(str(self.ifNone(lenght_po)))
 
-                grid.addWidget(nkt_po_line_edit, 14 + n, 5)
-                grid.addWidget(lenght_po_line_edit, 14 + n, 6)
+                grid.addWidget(nkt_po_line_edit, 22 + n, 5)
+                grid.addWidget(lenght_po_line_edit, 22 + n, 6)
 
                 # Переименование атрибута
                 setattr(self, f"nkt_po_{n}_line", nkt_po_line_edit)
@@ -381,8 +436,8 @@ class TabPage_SO(QWidget):
 
             self.labels_nkt_po[1] = (nkt_po_line_edit, lenght_po_line_edit)
 
-            grid.addWidget(nkt_po_line_edit, 15, 1)
-            grid.addWidget(lenght_po_line_edit, 15, 2)
+            grid.addWidget(nkt_po_line_edit, 23, 1)
+            grid.addWidget(lenght_po_line_edit, 23, 2)
         # добавление строк с штангами плановых
 
         if len(self.dict_sucker_rod_po) != 0:
@@ -395,8 +450,8 @@ class TabPage_SO(QWidget):
                 lenght_sucker_po_line_edit = QLineEdit(self)
                 lenght_sucker_po_line_edit.setText(str(self.ifNone(lenght_po)))
 
-                grid.addWidget(sucker_rod_po_line_edit, 19 + n, 5)
-                grid.addWidget(lenght_sucker_po_line_edit, 19 + n, 6)
+                grid.addWidget(sucker_rod_po_line_edit, 27 + n, 5)
+                grid.addWidget(lenght_sucker_po_line_edit, 27 + n, 6)
 
                 # Переименование атрибута
                 setattr(self, f"sucker_{n}_line", sucker_rod_po_line_edit)
@@ -414,8 +469,8 @@ class TabPage_SO(QWidget):
 
             self.labels_sucker_po[1] = (sucker_rod_po_line_edit, lenght_sucker_po_line_edit)
 
-            grid.addWidget(sucker_rod_po_line_edit, 20, 5)
-            grid.addWidget(lenght_sucker_po_line_edit, 20, 6)
+            grid.addWidget(sucker_rod_po_line_edit, 28, 5)
+            grid.addWidget(lenght_sucker_po_line_edit, 28, 6)
 
 
 
@@ -609,7 +664,7 @@ class DataWindow(QMainWindow):
             return
 
         else:
-            print(dict_pump_ECN_do, paker2_do, dict_pump_SHGN_do, paker_do)
+            # print(dict_pump_ECN_do, paker2_do, dict_pump_SHGN_do, paker_do)
             if all(['отсут' == pump for pump in [dict_pump_ECN_do, paker2_do, dict_pump_SHGN_do, paker_do]]):
                 voronka_question = QMessageBox.question(self, 'Внимание',
                                            'Программа определила что в скважине до ремонта воронка, верно ли')

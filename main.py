@@ -465,15 +465,21 @@ class MyWindow(QMainWindow):
                 print('Файл не найден')
 
     def open_without_damping(self, costumer, region):
+        if self.new_window is None:
+            classifier_well = 'damping'
+            self.new_window =Classifier_well(costumer, region, classifier_well)
+            self.new_window.setWindowTitle("Классификатор")
+            self.new_window.setGeometry(200, 400, 300, 400)
+            self.new_window.show()
 
-        self.tableDampingWidgetOpen()
-
-        copy = Classifier_well.open_to_sqlite_without_juming(self, self.table_juming, costumer, region)
+        else:
+            self.new_window.close()  # Close window.
+            self.new_window = None  # Discard reference.
 
     def open_class_well(self, costumer, region):
         if self.new_window is None:
-
-            self.new_window =Classifier_well()
+            classifier_well = 'classifier_well'
+            self.new_window = Classifier_well(costumer, region, classifier_well)
             self.new_window.setWindowTitle("Классификатор")
             self.new_window.setGeometry(200, 400, 300, 400)
             self.new_window.show()

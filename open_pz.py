@@ -41,6 +41,7 @@ class CreatePZ:
     template_depth = 0
     nkt_diam = 73
     b_plan = 0
+    column_direction_True = False
     expected_Q = 0
     expected_P = 0
     plast_select = ''
@@ -229,7 +230,7 @@ class CreatePZ:
                         CreatePZ.well_area = row[col + 1]
                     elif 'месторождение ' == value:  # определение номера скважины
                         CreatePZ.well_oilfield = row[col + 2]
-                        print(f'местрождение {CreatePZ.well_oilfield}')
+                        # print(f'местрождение {CreatePZ.well_oilfield}')
 
                     elif 'Инв. №' == value:
                         CreatePZ.inv_number = row[col + 1]
@@ -269,6 +270,7 @@ class CreatePZ:
 
                     elif 'Направление' in str(value) and 'Шахтное направление' not in str(value) and \
                             ws.cell(row=row_ind + 1, column=col + 4).value not in ['-', '(мм), (мм), -(м)', None]:
+                        CreatePZ.column_direction_True = True
                         # print(row_ind, value, 'Шахтное направление' not in str(value)) and \
 
                         try:
@@ -294,9 +296,10 @@ class CreatePZ:
                         try:
                             column_conductor_data = (ws.cell(row=row_ind + 1, column=col + 4).value).split('(мм),', )
                             if len(column_conductor_data) == 3:
-                                CreatePZ.column_conductorn_diametr = float(column_direction_data[0])
-                                CreatePZ.column_conductor_wall_thickness = float(column_direction_data[1])
-                                CreatePZ.column_conductor_lenght = column_direction_data[2]
+                                print(column_conductor_data)
+                                CreatePZ.column_conductor_diametr = float(column_conductor_data[0])
+                                CreatePZ.column_conductor_wall_thickness = float(column_conductor_data[1])
+                                CreatePZ.column_conductor_lenght = column_conductor_data[2]
                         except:
                             CreatePZ.column_conductor_diametr, _ = \
                                 QInputDialog.getInt(self, 'Кондуктор', 'Введите внешний диаметр Кондуктор',
@@ -310,7 +313,9 @@ class CreatePZ:
                     elif any(['Кондуктор' in str(value) for value in row]):
                         for ind, value in enumerate(row):
                             if 'Уровень цемента' in str(value):
+
                                 CreatePZ.level_cement_conductor = row[ind + 2]
+
                     elif any(['Направление' in str(value) for value in row]):
                         for ind, value in enumerate(row):
                             if 'Уровень цемента' in str(value):
