@@ -583,7 +583,7 @@ class MyWindow(QMainWindow):
                     if work_list[i][0]:
                         plan_short += f'п.{work_list[i][1]} {work_list[i][0]} \n'
 
-            # print(f'88 - {ws2.max_row}')
+            print(f'Нормы времени - {CreatePZ.normOfTime}')
             # print(f'строки {ins_ind}')
             CreatePZ.count_row_height(self.ws, ws2, work_list, merged_cells_dict, ins_ind)
             # print(f'3 - {ws2.max_row}')
@@ -673,6 +673,7 @@ class MyWindow(QMainWindow):
         if not self.table_widget is None:
             self.table_widget.close()
             self.table_widget = None
+            CreatePZ.normOfTime = 0
             CreatePZ.gipsInWell = False
             CreatePZ.grpPlan = False
             CreatePZ.nktOpressTrue = False
@@ -786,11 +787,11 @@ class MyWindow(QMainWindow):
 
     def on_finished(self):
         print("Работа с файлом Excel завершена.")
-    def insert_image(self, ws, file, coordinate):
+    def insert_image(self, ws, file, coordinate, width = 200, height = 180):
         # Загружаем изображение с помощью библиотеки Pillow
         img = openpyxl.drawing.image.Image(file)
-        img.width = 200
-        img.height = 180
+        img.width = width
+        img.height = height
         img.anchor = coordinate
         ws.add_image(img, coordinate)
 

@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QInputDialog
 from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm,well_volume_norm
-from work_py.template_work import well_volume
+from work_py.template_work import TemplateKrs
 
 
 def kompress(self):

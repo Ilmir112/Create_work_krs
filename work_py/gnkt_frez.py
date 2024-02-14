@@ -1,8 +1,9 @@
-import datetime
+from datetime import datetime
 
-from PyQt5.QtWidgets import QInputDialog
+from PyQt5.QtWidgets import QInputDialog, QMainWindow
 from openpyxl.styles import Alignment
 from openpyxl.utils import get_column_letter
+
 
 import block_name
 import plan
@@ -16,11 +17,11 @@ from krs import volume_vn_nkt, well_volume
 from gnkt_data.gnkt_data import dict_saddles
 
 
-class Work_with_gnkt():
+class Work_with_gnkt(QMainWindow):
 
     def __init__(self):
         from open_pz import CreatePZ
-        super(CreatePZ, self).__init__()
+        super(QMainWindow, self).__init__()
         self.create_excel_file = None
         self.dict_perforation = CreatePZ.dict_perforation
 
@@ -58,7 +59,7 @@ class Work_with_gnkt():
              None, None, None, None, None, None, None],
 
             [None, None, None, None, None, None, None, None, None, None, None, None],
-            [None, None, '№ скважины:', f'{CreatePZ.well_number}', 'куст:', 11682, 'Месторождение:', None, None,
+            [None, None, '№ скважины:', f'{CreatePZ.well_number}', 'куст:',  None, 'Месторождение:', None, None,
              CreatePZ.well_oilfield, None, None],
             [None, None, 'инв. №:', CreatePZ.inv_number, None, None, None, None, 'Площадь: ', CreatePZ.well_area, None,
              1],
@@ -106,30 +107,33 @@ class Work_with_gnkt():
 
     def schema_well(self, ws3):
         from open_pz import CreatePZ
+
+
+
         boundaries_dict = {0: (13, 13, 14, 14), 1: (43, 12, 45, 12), 2: (40, 16, 42, 16), 3: (7, 19, 12, 19),
                            4: (17, 21, 18, 21), 5: (19, 21, 20, 21), 6: (13, 10, 30, 10), 7: (15, 15, 16, 15),
                            8: (1, 1, 49, 2), 9: (46, 19, 48, 19), 10: (27, 15, 28, 15), 11: (29, 15, 30, 15),
                            12: (40, 11, 42, 11), 13: (33, 5, 48, 5), 14: (23, 15, 26, 15), 15: (13, 16, 14, 16),
                            16: (15, 16, 16, 16), 17: (9, 34, 48, 34), 18: (19, 19, 20, 19), 19: (27, 16, 28, 16),
-                           20: (29, 19, 30, 19), 21: (13, 18, 14, 18), 22: (40, 13, 42, 13), 23: (11, 25, 13, 25),
-                           24: (45, 26, 47, 26), 25: (27, 18, 28, 18), 26: (13, 17, 14, 17), 27: (15, 17, 16, 17),
+                           20: (29, 19, 30, 19), 21: (13, 18, 14, 18), 22: (40, 13, 42, 13), 23:(23, 16, 26, 16),
+                            25: (27, 18, 28, 18), 26: (13, 17, 14, 17), 27: (15, 17, 16, 17),
                            28: (17, 17, 18, 17), 29: (32, 8, 39, 8), 30: (40, 15, 42, 15), 31: (19, 20, 20, 20),
-                           32: (21, 20, 22, 20), 33: (21, 14, 22, 14), 34: (13, 19, 14, 19), 35: (26, 26, 28, 26),
+                           32: (21, 20, 22, 20), 33: (21, 14, 22, 14), 34: (13, 19, 14, 19),
                            36: (11, 13, 12, 13), 37: (43, 7, 48, 7), 38: (37, 3, 48, 3), 39: (7, 6, 12, 11), 40:
                                (27, 22, 28, 22), 41: (19, 22, 20, 22), 42: (32, 18, 39, 18), 43: (21, 22, 22, 22),
-                           44: (46, 23, 48, 23), 45: (7, 18, 12, 18), 46: (18, 26, 20, 26), 47: (43, 8, 48, 8),
+                           44: (46, 23, 48, 23), 45: (7, 18, 12, 18), 47: (43, 8, 48, 8),
                            48: (13, 7, 30, 7), 49: (46, 15, 48, 15), 50: (43, 14, 45, 14), 51: (40, 18, 42, 18),
-                           52: (17, 23, 18, 23), 53: (43, 10, 48, 10), 54: (29, 14, 30, 14), 55: (34, 26, 36, 26),
+                           52: (17, 23, 18, 23), 53: (43, 10, 48, 10), 54: (29, 14, 30, 14),
                            56: (40, 8, 42, 8), 57: (29, 23, 30, 23), 58: (43, 13, 45, 13), 59: (7, 20, 12, 20),
                            60: (15, 13, 16, 14), 61: (40, 17, 42, 17), 62: (17, 13, 18, 14), 63: (43, 9, 48, 9),
-                           64: (13, 8, 30, 8), 65: (27, 13, 30, 13), 66: (34, 25, 36, 25), 67: (13, 21, 14, 21),
+                           64: (13, 8, 30, 8), 65: (27, 13, 30, 13), 67: (13, 21, 14, 21),
                            68: (15, 21, 16, 21), 69: (40, 10, 42, 10), 70: (17, 15, 18, 15), 71: (43, 15, 45, 15),
                            72: (32, 12, 39, 12), 73: (7, 22, 12, 22), 74: (40, 19, 42, 19), 75: (32, 21, 39, 21),
                            76: (46, 17, 48, 17), 77: (21, 18, 22, 18), 78: (46, 22, 48, 22), 79: (7, 12, 12, 12),
                            80: (40, 9, 42, 9), 81: (7, 21, 12, 21), 82: (10, 5, 30, 5), 83: (32, 7, 39, 7),
-                           84: (23, 16, 26, 16), 85: (7, 23, 12, 23), 86: (13, 9, 30, 9), 87: (46, 12, 48, 12),
+                           85: (7, 23, 12, 23), 86: (13, 9, 30, 9), 87: (46, 12, 48, 12),
                            88: (21, 19, 22, 19), 89: (43, 16, 45, 16), 90: (2, 34, 8, 34), 91: (32, 22, 45, 22),
-                           92: (27, 17, 28, 17), 93: (45, 25, 47, 25), 94: (22, 3, 26, 3), 95: (29, 17, 30, 17),
+                           92: (27, 17, 28, 17),  94: (22, 3, 26, 3), 95: (29, 17, 30, 17),
                            96: (43, 21, 48, 21), 97: (23, 18, 26, 18), 98: (13, 11, 30, 11), 99: (46, 20, 48, 20),
                            100: (15, 19, 16, 19), 101: (10, 38, 11, 38), 102: (46, 14, 48, 14), 103: (43, 18, 45, 18),
                            104: (27, 19, 28, 19), 105: (23, 17, 26, 17), 106: (43, 17, 45, 17), 107: (40, 21, 42, 21),
@@ -140,7 +144,7 @@ class Work_with_gnkt():
                            124: (7, 13, 10, 13), 125: (27, 21, 28, 21), 126: (32, 23, 45, 23), 127: (29, 21, 30, 21),
                            128: (43, 11, 48, 11), 129: (23, 13, 26, 14), 130: (13, 23, 14, 23), 131: (40, 6, 48, 6),
                            132: (19, 13, 22, 13), 133: (15, 23, 16, 23), 134: (46, 18, 48, 18), 135: (27, 23, 28, 23),
-                           136: (11, 26, 13, 26), 137: (23, 21, 26, 21), 138: (18, 25, 20, 25), 139: (32, 13, 39, 13),
+                           137: (23, 21, 26, 21), 138:(19, 16, 22, 16), 139: (32, 13, 39, 13),
                            140: (40, 20, 42, 20), 141: (19, 15, 22, 15), 142: (17, 16, 18, 16), 143: (29, 16, 30, 16),
                            144: (15, 18, 16, 18), 145: (10, 37, 11, 37), 146: (17, 18, 18, 18), 147: (19, 18, 20, 18),
                            148: (29, 18, 30, 18), 149: (7, 15, 12, 15), 150: (40, 12, 42, 12), 151: (13, 6, 30, 6),
@@ -150,7 +154,7 @@ class Work_with_gnkt():
                            164: (29, 20, 30, 20), 165: (19, 17, 22, 17), 166: (17, 22, 18, 22), 167: (32, 20, 39, 20),
                            168: (32, 14, 39, 14), 169: (11, 14, 12, 14), 170: (23, 20, 26, 20), 171: (29, 22, 30, 22),
                            172: (46, 13, 48, 13), 173: (43, 20, 45, 20), 174: (32, 17, 39, 17), 175: (23, 22, 26, 22),
-                           176: (7, 17, 12, 17), 177: (32, 19, 39, 19), 178: (27, 14, 28, 14), 179: (26, 25, 28, 25),
+                           176: (7, 17, 12, 17), 177: (32, 19, 39, 19), 178: (27, 14, 28, 14),
                            180: (7, 14, 10, 14)}
 
         rowHeights1 = [None, None, 27.75, 20.25, 20.25, 20.25, 20.25, 18.0, 22.5, 22.5, 22.5, 18.0, 18.0, 20.25,
@@ -163,35 +167,40 @@ class Work_with_gnkt():
                        None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
                        None, None, 134.25, None, None, None, None, None, None, None]
 
-        colWidth = [2.28515625, 13.0, 4.5703125, 13.0, 13.0, 13.0, 5.7109375, 13.0, 13.0, 13.0, 4.7109375, 13.0,
-                    5.140625, 13.0, 13.0, 13.0, 13.0, 13.0, 4.7109375, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0,
-                    13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0,
-                    13.0, 13.0, 5.42578125, None]
+        colWidth = [2.28515625, 13.0, 4.5703125, 13.0, 13.0, 13.0, 5.7109375, 13.0, 13.0, 13.0, 4.7109375,
+                     13.0, 5.140625, 13.0, 13.0, 13.0, 13.0, 13.0, 4.7109375, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0,
+                     13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0,
+                     13.0, 13.0, 13.0, 5.42578125, 13.0, 4.5703125, 2.28515625, 10.28515625]
+
 
         plast_work = CreatePZ.plast_all[0]
-        print(plast_work,  list(CreatePZ.dict_perforation[plast_work]))
-        pressuar = list(CreatePZ.dict_perforation[plast_work]['давление'])[0]
+        # print(plast_work,  list(CreatePZ.dict_perforation[plast_work]))
+        pressuar = f'{list(CreatePZ.dict_perforation[plast_work]["давление"])[0]}атм'
+        pressuar1 = list(CreatePZ.dict_perforation[plast_work]["давление"])[0]
         zamer = list(CreatePZ.dict_perforation[plast_work]['замер'])[0]
-        vertikal = min(map(float, list(CreatePZ.dict_perforation[plast_work]['вертикаль'])))
-        zhgs = list(CreatePZ.dict_perforation[plast_work]['рабочая жидкость'])[0]
-        koef_anomal = round(float(pressuar) * 101325 / (float(vertikal) * 9.81 * 1000), 1)
+        vertikal = min(map(float, list(CreatePZ.dict_perforation[plast_work]["вертикаль"])))
+        zhgs = f'{list(CreatePZ.dict_perforation[plast_work]["рабочая жидкость"])[0]}г/см3'
+        koef_anomal = round(float(pressuar1) * 101325 / (float(vertikal) * 9.81 * 1000), 1)
         nkt = int(list(CreatePZ.dict_nkt.keys())[0])
         lenght_nkt = sum(list(map(int, CreatePZ.dict_nkt.values())))
 
-        bottom_first_port = max(map(lambda x: x[0], [interval for interval in CreatePZ.dict_perforation[plast_work]]))
+        bottom_first_port = max(sorted([interval for interval in CreatePZ.dict_perforation[plast_work]],
+                                       key = lambda x: x[0]))
 
         arm_grp, ok = QInputDialog.getInt(None, 'Арматура ГРП',
                                                      'ВВедите номер Арматуры ГРП', 16, 0, 500)
 
         gnkt_lenght, _ = QInputDialog.getInt(None, 'Длина ГНКТ',
-                                                     'ВВедите длину ГНКТ', 1500, 500, 10000)
+                                                     'ВВедите длину ГНКТ', 3500, 500, 10000)
+        volume_vn_gnkt = round(30.2 ** 2 * 3.14 / (4*1000), 2)
+        volume_gnkt = round(gnkt_lenght * volume_vn_gnkt/ 1000, 1)
 
         well_volume_ek = well_volume(self, CreatePZ.head_column_additional)
-        well_volume_dp = well_volume_ek - well_volume(self, CreatePZ.current_bottom)
+        well_volume_dp = well_volume(self, CreatePZ.current_bottom) - well_volume_ek
 
-        volume_pm_ek = round(3.14 * (CreatePZ.column_diametr - 2 * CreatePZ.column_wall_thickness)** 2 / 4)
+        volume_pm_ek = round(3.14 * (CreatePZ.column_diametr - 2 * CreatePZ.column_wall_thickness)** 2 / 4 / 1000, 2)
         volume_pm_dp = round(3.14 * (CreatePZ.column_additional_diametr - 2 *
-                                     CreatePZ.column_additional_wall_thickness) ** 2 / 4)
+                                     CreatePZ.column_additional_wall_thickness) ** 2 / 4 / 1000, 2)
 
 
 
@@ -263,7 +272,7 @@ class Work_with_gnkt():
 
             [None, None, None, None, None, None,
              'Стол ротора', None, None, None, CreatePZ.stol_rotora, None, None, None, None, None,
-             None, None, 'от', None, 'до', None, None, None, None, None, volume_pm_ek, None, 'м3', None, None,
+             None, None, 'от', None, 'до', None, None, None, None, None, 'п.м', None, 'м3', None, None,
              'Жидкость глушения', None, None, None, None, None, None, None, zhgs, None, None, 'в объеме', None, None,
              28.9, None],
             [None, None, None, None, None, None, 'Направление', None, None, None, None, None,
@@ -279,12 +288,13 @@ class Work_with_gnkt():
              None, CreatePZ.column_conductor_lenght, None, None, None, CreatePZ.level_cement_conductor,
              None, None, None, None, None, None, None, None,
              'Начало / окончание бурения', None, None, None, None, None, None, None,
-             CreatePZ.date_drilling_run, None, None, CreatePZ.date_drilling_cancel, None, None, None,
+             Work_with_gnkt.date_dmy(self, CreatePZ.date_drilling_run), None, None,
+             Work_with_gnkt.date_dmy(self, CreatePZ.date_drilling_cancel), None, None, None,
              None],
             [None, None, None, None, None, None, 'Экспл. колонна', None, None, None, None, None,
              CreatePZ.column_diametr, None, CreatePZ.column_wall_thickness, None,
              CreatePZ.column_diametr - 2 * CreatePZ.column_wall_thickness, None, CreatePZ.shoe_column, None, None,
-             None, CreatePZ.level_cement_column, None, None, None, "g.м.", None, well_volume_ek,
+             None, CreatePZ.level_cement_column, None, None, None, volume_pm_ek, None, well_volume_ek,
              None, None, 'Р в межколонном пространстве', None, None, None, None, None, None, None,
              0, None, None, None, CreatePZ.pressuar_mkp, None, None, None],
             [None, None, None, None, None, None, "Хвостовик  ''НТЦ ''ЗЭРС''", None, None, None, None,
@@ -296,10 +306,11 @@ class Work_with_gnkt():
              None, well_volume_dp, None, None, 'Давление опрессовки МКП', None, None, None, None, None, None, None,
              None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, f'Подвеска НКТ {nkt}мм', None, None, None, None, None, nkt, None, 6.5,
-             None, nkt - 2 * 6.5, None, 0, None, lenght_nkt, None, lenght_nkt, None, None, None,
+             None, nkt - 2 * 6.5, None, f'{0}-', None, f'{lenght_nkt -0.5- 2.6-3}м', None, f'{lenght_nkt -0.5- 2.6-3}м', None, None, None,
              volume_vn_nkt(CreatePZ.dict_nkt), None, volume_vn_nkt(CreatePZ.dict_nkt) + 0.47, None, None,
              'Давление опрессовки ЭК ', None, None, None, None,
-             None, None, None, CreatePZ.max_expected_pressure, None, None, datetime.datetime(2023, 3, 1, 0, 0),
+             None, None, None, CreatePZ.max_expected_pressure, None, None,
+             None,
              None, None, 'гермет.', None],
             [None, None, None, None, None, None, 'Гидроякорь ', None, None, None, None, None, 122, None, None, None, 71,
              None, lenght_nkt, None, lenght_nkt + 1, None, 0.5, None, None, None, None, None, None, None,
@@ -316,26 +327,213 @@ class Work_with_gnkt():
              None, None, None, None, 'Текущий забой до ГРП ', None, None, None, None, None, None, None, None, None,
              None, None, None, None, CreatePZ.current_bottom, None],
             [None, None, None, None, None, None, 'ГНКТ', None, None, None, None, None, 38.1, None, 3.96, None, 30.18,
-             None, gnkt_lenght, None, None, None, None, None, None, None, round(30.2 ** 2 *3.14/4000, 1), None,
-             round(30.2 ** 2 * 3.14 / 4000 * gnkt_lenght/1000, 1), None,
+             None, gnkt_lenght, None, None, None, None, None, None, None, volume_vn_gnkt, None,
+             volume_gnkt, None,
              None, 'Искусственный забой  (МГРП №1 с актив.шаром 30мм)', None, None, None, None, None, None, None, None,
-             None, None, None, None, None, bottom_first_port, None],
+             None, None, None, None, None, bottom_first_port, None]]
+
+        ports_data = Work_with_gnkt.work_with_port(self, plast_work, CreatePZ.dict_perforation)
+        ports_list, merge_port = Work_with_gnkt.insert_ports_data(self, ports_data)
+        # print(ports_list)
+        for row in ports_list:
+            schema_well_list.append(row)
+
+        border = Border(left=Side(border_style='dashed', color='FF000000'),
+                                 top=Side(border_style='dashed', color='FF000000'),
+                                 right=Side(border_style='dashed', color='FF000000'),
+                                 bottom=Side(border_style='dashed', color='FF000000'),
+                                 )
+        border_left_top = Border(left=Side(border_style='thick', color='FF000000'),
+                                 top=Side(border_style='thick', color='FF000000'),
+                                 right=Side(border_style='dashed', color='FF000000'),
+                                 bottom=Side(border_style='dashed', color='FF000000'),
+                                 )
+        border_left_bottom = Border(left=Side(border_style='thick', color='FF000000'),
+                                 top=Side(border_style='dashed', color='FF000000'),
+                                 right=Side(border_style='dashed', color='FF000000'),
+                                 bottom=Side(border_style='thick', color='FF000000'),
+                                 )
+        border_right_bottom = Border(left=Side(border_style='dashed', color='FF000000'),
+                                    top=Side(border_style='dashed', color='FF000000'),
+                                    right=Side(border_style='thick', color='FF000000'),
+                                    bottom=Side(border_style='thick', color='FF000000'),
+                                    )
+        border_right_top = Border(top=Side(border_style='thick', color='FF000000'),
+                                 right=Side(border_style='thick', color='FF000000'))
+
+        border_right = Border(left=Side(border_style='dashed', color='FF000000'),
+                                  top=Side(border_style='dashed', color='FF000000'),
+                                  right=Side(border_style='thick', color='FF000000'),
+                                  bottom=Side(border_style='dashed', color='FF000000'),
+                                  )
+        border_left = Border(left=Side(border_style='thick', color='FF000000'),
+                              top=Side(border_style='dashed', color='FF000000'),
+                              right=Side(border_style='dashed', color='FF000000'),
+                              bottom=Side(border_style='dashed', color='FF000000'),
+                              )
+        border_top = Border(left=Side(border_style='dashed', color='FF000000'),
+                             top=Side(border_style='thick', color='FF000000'),
+                             right=Side(border_style='dashed', color='FF000000'),
+                             bottom=Side(border_style='dashed', color='FF000000'),
+                             )
+        border_bottom = Border(left=Side(border_style='dashed', color='FF000000'),
+                            top=Side(border_style='dashed', color='FF000000'),
+                            right=Side(border_style='dashed', color='FF000000'),
+                            bottom=Side(border_style='thick', color='FF000000'),
+                            )
+
+
+        for row in range(1, len(schema_well_list) + 1):  # Добавлением работ
+            # print(row, len(schema_well_list[row-1]), schema_well_list[row-1][15])
+            for col in range(1, 48):
+                cell = ws3.cell(row=row, column=col)
+
+                cell.value = schema_well_list[row - 1][col - 1]
+                ws3.cell(row=row, column=col).font = Font(name='Arial', size=11, bold=False)
+                ws3.cell(row=row, column=col).alignment = Alignment(wrap_text=True, horizontal = 'center',
+                                                                                   vertical = 'center')
+                if cell.value != None and row > 24:
+                    cell.border = border
+
+        for row in range(6, 24):
+            for col in range(7, 32):
+                cell = ws3.cell(row=row, column=col)
+
+                cell.border = border
+                if col == 31:
+                    cell.border = Border(left=Side(border_style='thick', color='FF000000'),
+                                         right=Side(border_style='thick', color='FF000000') )
+                if row == 6 and col != 31:
+                    cell.border = border_top
+                elif (row == 22) and col != 31:
+                    cell.border = border_bottom
+                elif (row == 23) and col != 31:
+                    cell.border = border_bottom
+                elif col == 7:
+                    cell.border = border_left
+                elif col == 30:
+                    cell.border = border_right
+
+                elif (row == 13 or row == 14) and col >12 and col != 31:
+                    cell.border = Border(left=Side(border_style='thin', color='FF000000'),
+                            top=Side(border_style='thin', color='FF000000'),
+                            right=Side(border_style='thin', color='FF000000'),
+                            bottom=Side(border_style='thin', color='FF000000'),
+                            )
+
+
+            for col in range(32, 49):
+                cell = ws3.cell(row=row, column=col)
+                cell.border = border
+                if row == 6:
+                    cell.border = border_top
+                elif (row == 22):
+                    cell.border = border_bottom
+                elif (row == 23):
+                    cell.border = border_bottom
+                elif (row == row and col == 32):
+                    cell.border = border_left
+                elif (row == row and col == 48):
+                    cell.border = border_right
+
+
+        ws3.cell(6, 7).border = border_left_top
+        ws3.cell(6, 32).border = border_left_top
+        ws3.cell(22, 7).border = border_left_bottom
+        ws3.cell(23, 7).border = border_left_bottom
+        ws3.cell(22, 32).border = border_left_bottom
+        ws3.cell(23, 32).border = border_left_bottom
+
+        ws3.cell(6, 30).border = border_right_top
+        ws3.cell(6, 48).border = border_right_top
+        ws3.cell(22, 30).border = border_left_bottom
+        ws3.cell(23, 30).border = border_left_bottom
+        ws3.cell(22, 48).border = border_left_bottom
+        ws3.cell(23, 48).border = border_right_bottom
+        ws3.cell(23, 30).border = border_right_bottom
+
+
+        for key, value in merge_port.items():
+            boundaries_dict[key] = value
+            if key % 2 == 0:
+                coordinate = f'{get_column_letter(value[0]-1)}{value[1] + 4}'
+                self.insert_image(ws3, 'imageFiles/schema_well/port.png', coordinate, 200, 200)
+
+
+            for i in range(3):
+                cell = ws3.cell(row=27, column=value[0] + i)
+                cell2 = ws3.cell(row=28, column=value[0] + i)
+                font = Font(bold=True, italic=True)
+                cell.font = font
+                cell2.font = font
+                cell.alignment = Alignment(textRotation=90, horizontal='center', vertical='center')
+                cell2.alignment = Alignment(textRotation=90, horizontal='center', vertical='center')
+
+
+
+
+        # print(boundaries_dict)
+        for key, value in boundaries_dict.items():
+            ws3.merge_cells(start_column=value[0], start_row=value[1],
+                            end_column=value[2], end_row=value[3])
+
+        for index_row, row in enumerate(ws3.iter_rows()):  # Копирование высоты строки
+            ws3.row_dimensions[index_row].height = rowHeights1[index_row-1]
+
+        for col_ind in range(50): #копирование ширины столба
+            ws3.column_dimensions[get_column_letter(col_ind + 1)].width = colWidth[col_ind]/1.9
+
+        coordinate = f'A2'
+
+        self.insert_image(ws3, 'imageFiles/schema_well/gorizont.png', coordinate, 2050, 1000)
+
+        ws3.print_area = f'A1:AW{37}'
+        ws3.page_setup.fitToPage = True
+        ws3.page_setup.fitToHeight = False
+        ws3.page_setup.fitToWidth = True
+        # Измените формат листа на альбомный
+        ws3.page_setup.orientation = ws3.ORIENTATION_LANDSCAPE
+        ws3.print_options.horizontalCentered = True
+        # зададим размер листа
+        ws3.page_setup.paperSize = ws3.PAPERSIZE_A4
+
+
+
+    def date_dmy(self, date_str):
+        date_obj = datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
+        # print(date_obj)
+        # print(date_str)
+
+        if isinstance(date_obj, datetime):
+            return date_obj.strftime('%d.%m.%Y')
+        else:
+            date_obj = datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
+            print(f' даь {date_obj}')
+        return date_obj.strftime('%d.%m.%Y')
+    def insert_ports_data(self, ports_data):
+
+        ports_list = [
             [None, None, None, None, None, None, 'Интервалы установки фрак-портов  (муфт ГРП)', None, None, None, None,
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
-            [None, None, None, None, None, None, None, None, None, None, 5, None, None, None, None, None, None, 4, None,
-             None, None, None, None, None, None, 3, None, None, None, None, None, None, None, 2, None, None, None, None,
-             None, None, None, None, None, None, 1, None, None],
-            [None, None, None, None, None, None, None, None, None, None, '114/58А', None, None, None, None, None, None,
-             '114/52А', None, None, None, None, None, None, None, '114/49А', None, None, None, None, None, None, None,
-             '114/47А', None, None, None, None, None, None, None, None, None, None, 'ФПЗН1.114', None, None],
-            [None, None, None, None, None, None, None, None, None, None, 1216.95, 'Ø  седла', 'Ø  шара', None, None,
-             None, None, 1266.03, 'Ø  седла', 'Ø  шара', None, None, None, None, None, 1326.54, 'Ø  седла', 'Ø  шара',
-             None, None, None, None, None, 1387.13, 'Ø  седла', 'Ø  шара', None, None, None, None, None, None, None,
-             None, 1460.25, 'Ø  седла', 'Ø  шара', None],
-            [None, None, None, None, None, None, None, None, None, None, 1216.05, 55.55, 58.17, None, None, None, None,
-             1265.1299999999999, 49.8, 52.43, None, None, None, None, None, 1325.6399999999999, 47.2, 49.71, None, None,
-             None, None, None, 1386.23, 45.06, 47.07, None, None, None, None, None, None, None, None, 1459.15, 30, 32],
+            [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+             None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+             None, None, None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+             None,
+             None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+             None,
+             None, None, None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+             None,
+             None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+             None,
+             None, None, None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+             None,
+             None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+             None,
+             None, None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None, None, None, None, None, None, None],
@@ -343,6 +541,12 @@ class Work_with_gnkt():
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None, None, None, None, None, None, None],
 
+            [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+             None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+             None, None, None, None, None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+             None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+             None, None, None, None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None, None, None, None, None, None, None],
@@ -363,28 +567,41 @@ class Work_with_gnkt():
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None, None, None, None, None, None, None]
         ]
+        port_len = len(ports_data)
+        col_port = int(36 / port_len)
+        for index_row, row in enumerate(ports_list):
 
-        for row in range(1, len(schema_well_list) + 1):  # Добавлением работ
-            print(row, len(schema_well_list[row-1]), schema_well_list[row-1][15])
-            for col in range(1, 48):
-                cell = ws3.cell(row=row, column=col)
+            # dict_ports[f'Муфта №{index + 1}'] = {'кровля': port[0], 'подошва': port[1], 'шар': ball, 'седло': saddle,
+            #                                      'тип': type_saddles}
+            col = 45
+            n = 3
+            m = 0
+            merge_port = {}
+            for index, port in enumerate(ports_data):
+                if index_row == 1:
+                    ports_list[index_row][col - n - 2] = port
 
-                cell.value = schema_well_list[row - 1][col - 1]
-                ws3.cell(row=row, column=col).font = Font(name='Arial', size=11, bold=False)
-                ws3.cell(row=row, column=col).alignment = Alignment( horizontal = 'center',
-                                                                                   vertical = 'center')
 
-        for key, value in boundaries_dict.items():
-            ws3.merge_cells(start_column=value[0], start_row=value[1],
-                            end_column=value[2], end_row=value[3])
+                elif index_row == 2:
+                    ports_list[index_row][col - n - 2] = ports_data[port]['тип']
+                elif index_row == 3:
+                    ports_list[index_row][col - n - 2] = f'{ports_data[port]["подошва"]}м'
+                    ports_list[index_row][col - n - 1] = 'Ø седла'
+                    ports_list[index_row][col - n] = 'Ø шара'
+                elif index_row == 4:
+                    ports_list[index_row][col - n - 2] = f'{ports_data[port]["кровля"]}-'
+                    ports_list[index_row][col - n - 1] = f'{ports_data[port]["седло"]}'
+                    ports_list[index_row][col - n] = f'{ports_data[port]["шар"]}мм'
+                # print(col - col_port - n)
+                merge_port[182 + m] = (col - n - 1, 25, col - n + 1, 25)
+                merge_port[182 + m + 1] = (col - n - 1, 26, col - n + 1, 26)
+                n += col_port
+                m += 2
 
-        for index_row, row in enumerate(ws3.iter_rows()):  # Копирование высоты строки
-            ws3.row_dimensions[index_row].height = rowHeights1[index_row-1]
-            if row == 8:
-                for col_ind, col in enumerate(row):
-                    ws3.column_dimensions[get_column_letter(col_ind + 1)].width = colWidth[col_ind]
 
-        Work_with_gnkt.work_with_port(self, plast_work, CreatePZ.dict_perforation)
+        print(f'merge {merge_port}')
+        return ports_list, merge_port
+
 
 
 
@@ -404,7 +621,7 @@ class Work_with_gnkt():
 
         elif manufacturer == 'Зенит':
             type_column = ["ФПЗН1.114"]
-            type_sanddles_list = ['1.952"', '2,022"', '2,092"', '2,162"', '114/58А', '2,322"',
+            type_saddles_list = ['1.952"', '2,022"', '2,092"', '2,162"', '114/58А', '2,322"',
                                   '2,402"', '2,487"', '2,577"', '2,667"', '2,757"','2,547"']
 
 
@@ -415,26 +632,26 @@ class Work_with_gnkt():
 
         for index, port in enumerate(ports_tuple):
             if type_column == "ФПЗН.102" and manufacturer == 'НТЦ ЗЭРС':
-                type_sanddles_list = ['102/70', '102/67', '102/64', '102/61', '102/58', '102/55', '102/52', '102/49',
+                type_saddles_list = ['102/70', '102/67', '102/64', '102/61', '102/58', '102/55', '102/52', '102/49',
                                       '102/47','102/45']
 
             elif type_column == "ФПЗН1.114" and manufacturer == 'НТЦ ЗЭРС':
-                type_sanddles_list = ['114/70А', '114/67А', '114/64А', '114/61А', '114/58А', '114/55А', '114/52А',
+                type_saddles_list = ['114/70А', '114/67А', '114/64А', '114/61А', '114/58А', '114/55А', '114/52А',
                 '114/49А', '114/47А', '114/45А']
             elif type_column == "ФПЗН1.114" and manufacturer == 'Зенит':
-                type_sanddles_list = ['1.952"', '2,022"', '2,092"', '2,162"', '114/58А', '2,322"',
+                type_saddles_list = ['1.952"', '2,022"', '2,092"', '2,162"', '114/58А', '2,322"',
                                   '2,402"', '2,487"', '2,577"', '2,667"', '2,757"','2,547"']
             elif type_column == "ФПЗН1.114" and manufacturer == 'Барбус':
-                type_sanddles_list = ['51,36t20', '54,00t20', '56,65t20', '59,80t20',
+                type_saddles_list = ['51,36t20', '54,00t20', '56,65t20', '59,80t20',
                                       '62,95t20', '66,10t20']
-            type_sanddles, ok = QInputDialog.getItem(None, 'Выбор типа порта ',
+            type_saddles, ok = QInputDialog.getItem(None, 'Выбор типа порта ',
                                                      f'Введите тип порта {manufacturer} №{index + 1}',
-                                                     type_sanddles_list, 0, False)
+                                                     type_saddles_list, 0, False)
             # print(dict_saddles[manufacturer])
-            ball = dict_saddles[manufacturer][type_column][type_sanddles].ball
-            saddle = dict_saddles[manufacturer][type_column][type_sanddles].saddle
-            dict_ports[f'Муфта №{index+1}'] = {'кровля': port[0], 'подошва': port[1], 'шар': ball, 'седло': saddle, 'тип': type_sanddles}
-        print(dict_ports)
+            ball = dict_saddles[manufacturer][type_column][type_saddles].ball
+            saddle = dict_saddles[manufacturer][type_column][type_saddles].saddle
+            dict_ports[f'Муфта №{index+1}'] = {'кровля': port[0], 'подошва': port[1], 'шар': ball, 'седло': saddle, 'тип': type_saddles}
+
         return dict_ports
 
 

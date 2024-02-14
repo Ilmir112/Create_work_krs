@@ -826,9 +826,9 @@ def work_krs(self, work_plan):
              None, None, None, None, None,
              'Мастер КРС', round(liftingGNO(CreatePZ.dict_nkt)*1.2,2)],
         ]
-        lift_voronka = [[well_jamming_str[0], None, well_jamming_str[0],
+        lift_voronka = [[well_jamming_str[2], None, well_jamming_str[0],
                          None, None, None, None, None, None, None,
-                         'Мастер КРС, представ заказчика', [str(well_jamming_norm(volume_pod_NKT())) if without_damping_True == False else None][0]],
+                         'Мастер КРС, представ заказчика', [str(well_jamming_norm(volume_pod_NKT())) if without_damping_True is False else None][0]],
                         [None, None,
                          well_jamming_str[1],
                          None, None, None, None, None, None, None,

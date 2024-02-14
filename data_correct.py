@@ -42,21 +42,28 @@ class TabPage_SO(QWidget):
         self.column_direction_diametr_Edit = FloatLineEdit(self)
         if CreatePZ.column_direction_True:
             self.column_direction_diametr_Edit.setText(f'{CreatePZ.column_direction_diametr}')
+        else:
+            self.column_direction_diametr_Edit.setText(f'отсут')
 
         self.column_direction_wall_thickness_Label = QLabel("Толщина стенки направление", self)
         self.column_direction_wall_thickness_Edit = FloatLineEdit(self)
         if CreatePZ.column_direction_True:
             self.column_direction_wall_thickness_Edit.setText(f'{CreatePZ.column_direction_wall_thickness}')
-
+        else:
+            self.column_direction_wall_thickness_Edit.setText(f'отсут')
         self.column_direction_lenght_Label = QLabel("башмак направления", self)
         self.column_direction_lenght_Edit = FloatLineEdit(self)
         if CreatePZ.column_direction_True:
             self.column_direction_lenght_Edit.setText(f'{CreatePZ.column_direction_lenght}')
+        else:
+            self.column_direction_lenght_Edit.setText(f'отсут')
 
         self.level_cement_direction_Label = QLabel("Уровень цемента за направление", self)
         self.level_cement_direction_Edit = FloatLineEdit(self)
         if CreatePZ.column_direction_True:
             self.level_cement_direction_Edit.setText(f'{CreatePZ.level_cement_direction}')
+        else:
+            self.level_cement_direction_Edit.setText(f'отсут')
 
         self.column_conductor_diametr_Label = QLabel("диаметр кондуктора", self)
         self.column_conductor_diametr_Edit = FloatLineEdit(self)
@@ -774,9 +781,12 @@ class DataWindow(QMainWindow):
             if len(string.split('-')) == 2:
                 return True
             else:
-                return False
+                if str(string) == 'отсут' or string == 0:
+                    return True
+                else:
+                    return False
         except:
-            if str(string) == 'отсут':
+            if str(string) == 'отсут' or string == 0:
                 return True
             else:
                 return False

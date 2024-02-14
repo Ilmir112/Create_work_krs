@@ -269,10 +269,9 @@ class CreatePZ:
                         CreatePZ.oilfield = row[col + 2]
 
                     elif 'Направление' in str(value) and 'Шахтное направление' not in str(value) and \
-                            ws.cell(row=row_ind + 1, column=col + 4).value not in ['-', '(мм), (мм), -(м)', None]:
+                            CreatePZ.if_None(ws.cell(row=row_ind + 1, column=col + 4).value)  != 'отсут':
                         CreatePZ.column_direction_True = True
-                        # print(row_ind, value, 'Шахтное направление' not in str(value)) and \
-                        CreatePZ.column_direction_True = True
+                        print(f'направление {ws.cell(row=row_ind + 1, column=col + 4).value,  ws.cell(row=row_ind + 1, column=col + 4).value not in ["-", "(мм), (мм), -(м)", None]}')
 
                         try:
                             column_direction_data = (ws.cell(row=row_ind + 1, column=col + 4).value).split('(мм),', )
@@ -359,9 +358,9 @@ class CreatePZ:
                             n += 1
 
                     elif '10. Расстояние от стола ротора до среза муфты э/колонны ' == value:
-                        CreatePZ.stol_rotora = row[col + 6]
+                        CreatePZ.stol_rotora = row[col + 4]
                         print(f'стол ротора {CreatePZ.stol_rotora}')
-                        n = 6
+                        n = 4
                         while CreatePZ.stol_rotora is None or n > 15:
                             CreatePZ.stol_rotora = row[col + n]
                             n += 1
@@ -1013,7 +1012,9 @@ class CreatePZ:
         CreatePZ.dict_perforation_project = self.dict_perforation_project
         if len(CreatePZ.dict_perforation_project) != 0:
             CreatePZ.plast_project = list(CreatePZ.dict_perforation_project.keys())
-        # print(f'работающие пласты {CreatePZ.plast_work}')
+
+        CreatePZ.definition_plast_work(self)
+        print(f'работающие пласты {CreatePZ.plast_work}')
 
         if float(CreatePZ.column_diametr) < 110:
             CreatePZ.nkt_diam = 60
@@ -1109,7 +1110,6 @@ class CreatePZ:
                                                      250)
                 CreatePZ.expected_pick_up[expected_Q] = expected_P
                 print(f' Ожидаемые {CreatePZ.expected_pick_up}')
-
 
 
         if self.perforation_correct_window2 is None:
@@ -1328,7 +1328,7 @@ class CreatePZ:
     def if_None(value):
         if isinstance(value, datetime):
             return value
-        elif value is None or 'отс' in str(value).lower() or value == '-' or value == 0:
+        elif value is None or 'отс' in str(value).lower() or str(value).replace(' ', '') == '-' or value == 0:
             return 'отсут'
         else:
             return value
