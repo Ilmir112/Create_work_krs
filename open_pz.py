@@ -9,7 +9,7 @@ import krs
 from datetime import datetime, time
 from openpyxl import Workbook, load_workbook
 from PyQt5 import QtCore
-from PyQt5.QtWidgets import QInputDialog, QMessageBox, QDialog
+from PyQt5.QtWidgets import QInputDialog, QMessageBox, QDialog, QMainWindow
 from openpyxl_image_loader import SheetImageLoader
 from openpyxl.drawing.image import Image
 from openpyxl.drawing.spreadsheet_drawing import AbsoluteAnchor
@@ -24,7 +24,7 @@ from cdng import events_gnvp, itog_1, events_gnvp_gnkt
 from work_py.gnkt_frez import Work_with_gnkt
 
 
-class CreatePZ:
+class CreatePZ(QMainWindow):
     Qoil = 0
     gipsInWell = False
     grpPlan = False
@@ -135,6 +135,7 @@ class CreatePZ:
     condition_of_wells = 0
     cat_well_min = 0
     cat_well_max = 0
+    well_volume_in_PZ = []
     bvo = False
     old_version = False
     thin_border = Border(left=Side(style='thin'),
@@ -143,33 +144,25 @@ class CreatePZ:
                          bottom=Side(style='thin'))
     image_list = []
 
-    def __init__(self, dict_perforation_project, work_perforations_dict, ins_ind_border, wb, ws, parent=None):
-        super().__init__(parent)
+    def __init__(self, wb, ws, data_window, perforation_correct_window2,  parent=None):
+        super(QMainWindow, self).__init__()
         # self.lift_ecn_can_addition = lift_ecn_can_addition
-        self.dict_perforation_project = dict_perforation_project
-        self.work_perforations_dict = work_perforations_dict
-        self.ins_ind_border = ins_ind_border
         self.wb = wb
         self.ws = ws
+        self.data_window = data_window
+        self.perforation_correct_window2 = perforation_correct_window2
+        print(ws)
 
-    def open_excel_file(self, fname, work_plan):
 
+
+    def open_excel_file(self, ws, work_plan):
+        old_index = 0
         from data_correct import DataWindow
         from perforation_correct import PerforationCorrect
 
         CreatePZ.work_plan = work_plan
-        global wb, ws
-        wb = load_workbook(fname, data_only=True)
-        name_list = wb.sheetnames
-        CreatePZ.well_volume_in_PZ = []
-        old_index = 1
+        ws = self.ws
 
-
-        ws = wb.active
-
-        for sheet in name_list:
-            if sheet in wb.sheetnames and (sheet != 'наряд-заказ КРС' or sheet != 'План работ'):
-                wb.remove(wb[sheet])
 
         for row_ind, row in enumerate(ws.iter_rows(values_only=True)):
             ws.row_dimensions[row_ind].hidden = False
@@ -1038,7 +1031,7 @@ class CreatePZ:
                       or (CreatePZ.dict_pump_SHGN["posle"] != 0 and CreatePZ.dict_pump_ECN["posle"] != 0)
                    else 'ОР'][0]
 
-        CreatePZ.curator, ok = QInputDialog.getItem(self, 'Выбор кураторов ремонта', 'Введите сектор кураторов региона',
+        CreatePZ.curator, ok = QInputDialog.getItem(None, 'Выбор кураторов ремонта', 'Введите сектор кураторов региона',
                                                     curator_list, curator_list.index(curator), False)
         # print(f'куратор {CreatePZ.curator, CreatePZ.if_None(CreatePZ.dict_pump["posle"])}')
 
@@ -1277,11 +1270,10 @@ class CreatePZ:
                 self.ins_ind_border = CreatePZ.ins_ind
                 # wb.save(f"{CreatePZ.well_number}  1 {CreatePZ.well_area} {CreatePZ.cat_P_1}.xlsx")
 
-            self.ws = ws
-            self.wb = wb
+
 
             # wb.save(f'{CreatePZ.well_number} {CreatePZ.well_area} {work_plan}.xlsx')
-            return self.ws
+            return ws
 
     def addItog(self, ws, ins_ind):
 

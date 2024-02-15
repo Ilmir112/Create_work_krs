@@ -31,12 +31,18 @@ from gnkt_data.gnkt_data import dict_saddles
 
 class Work_with_gnkt(QMainWindow):
 
+    wb_gnkt_frez = Workbook()
 
-    def __init__(self, ws,  tabWidget, table_widget, table_title):
+    def __init__(self, ws, tabWidget, table_title, table_schema,  table_widget):
+
         from open_pz import CreatePZ
         super(QMainWindow, self).__init__()
+        self.table_widget = table_widget
+        self.table_title = table_title
+        self.table_schema = table_schema
 
         self.dict_perforation = CreatePZ.dict_perforation
+        self.ws = ws
         # self.tabWidget = tabWidget
         # self.table_title = table_widget
 
@@ -50,44 +56,149 @@ class Work_with_gnkt(QMainWindow):
         # # Указанная строка и столбец - это ячейка, которая была нажата.
         # self.tabWidget.cellPressed[int, int].connect(self.clickedRowColumn)
 
-        wb4 = Workbook()
-        ws2 = wb4.get_sheet_by_name('Sheet')
-        ws2.title = "Титульник"
-        ws3 = wb4.create_sheet(title="Схема")
+        wb_gnkt_frez = Workbook()
 
-        # head = plan.head_ind(CreatePZ.cat_well_min, CreatePZ.cat_well_max + 1)
-        # plan.copy_true_ws(ws, ws2, head)
+        self.ws_title = Work_with_gnkt.wb_gnkt_frez.create_sheet(title="Титульник")
 
-        create_title = self.create_title_list(ws2)
-        schema_well = self.schema_well(ws3)
+        self.ws_schema = Work_with_gnkt.wb_gnkt_frez.create_sheet(title="Схема")
+        self.ws_work = Work_with_gnkt.wb_gnkt_frez.create_sheet(title="Ход работ")
+
+        head = plan.head_ind(CreatePZ.cat_well_min, CreatePZ.cat_well_max + 1)
+        # print(f'ff  {head}')p
+        # print(self.ws)
+        plan.copy_true_ws(self.ws, self.ws_title, head)
+
+        create_title = self.create_title_list(self.ws_title)
+        schema_well = self.schema_well(self.ws_schema)
+
 
         # wb4.save(f"{CreatePZ.well_number} {CreatePZ.well_area} {CreatePZ.cat_P_1} категории.xlsx")
         # print('файл сохранен')
 
-        main.MyWindow.copy_pz(self, ws2, table_title, 13, 'gnkt_frez', 1)
-        main.MyWindow.copy_pz(self, ws3, table_widget, 46, 'gnkt_frez', 2)
-        #
+        main.MyWindow.copy_pz(self, self.ws_title, table_title, 13, 'gnkt_frez', 1)
+        main.MyWindow.copy_pz(self, self.ws_schema, table_schema, 47, 'gnkt_frez', 2)
+        main.MyWindow.copy_pz(self, self.ws_work, table_widget, 12, 'gnkt_frez', 3)
+        work_well = self.work_gnkt_frez()
+        main.MyWindow.populate_row(self, 0, work_well)
+
+        merged_cells_dict, ins_ind = 0, 0
+        # self.count_row_height(self.ws_work, work_well)#
+
+    def count_row_height(ws2, work_list, merged_cells_dict):
+        from openpyxl.utils.cell import range_boundaries, get_column_letter
+
+        text_width_dict = {35: (0, 100), 50: (101, 200), 70: (201, 300), 90: (301, 400), 110: (401, 500),
+                           130: (501, 600), 150: (601, 700), 170: (701, 800), 190: (801, 900), 210: (901, 1500)}
+
+        for ind, _range in enumerate(ws.merged_cells.ranges):
+            boundaries_dict[ind] = range_boundaries(str(_range))
 
 
+        for i in range(1, len(work_list) + 1):  # Добавлением работ
+            for j in range(1, 13):
+                cell = ws2.cell(row=i, column=j)
+
+                if cell and str(cell) != str(work_list[i - 1][j - 1]):
+                    if str(work_list[i - 1][j - 1]).replace('.','').isdigit() and \
+                            str(work_list[i - 1][j - 1]).count('.') != 2:
+                        cell.value = str(work_list[i - 1][j - 1]).replace('.',',')
+                        # print(f'цифры {cell.value}')
+                    else:
+                        cell.value = work_list[i - 1][j - 1]
+
+                    if j == 11:
+                        cell.font = Font(name='Arial', size=11, bold=False)
+                    # if j == 12:
+                    #     cell.value = work_list[i - 1][j - 1]
+                    else:
+                        cell.font = Font(name='Arial', size=13, bold=False)
+                    ws2.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='center',
+                                                                    vertical='center')
+                    ws2.cell(row=i, column=11).alignment = Alignment(wrap_text=True, horizontal='center',
+                                                                     vertical='center')
+                    ws2.cell(row=i, column=12).alignment = Alignment(wrap_text=True, horizontal='center',
+                                                                     vertical='center')
+                    ws2.cell(row=i, column=3).alignment = Alignment(wrap_text=True, horizontal='left',
+                                                                    vertical='center')
+                    if 'примечание' in str(cell.value).lower() \
+                            or 'заявку оформить за 16 часов' in str(cell.value).lower() \
+                            or 'ЗАДАЧА 2.9.' in str(cell.value).upper() \
+                            or 'ВСЕ ТЕХНОЛОГИЧЕСКИЕ ОПЕРАЦИИ' in str(cell.value).upper() \
+                            or 'за 48 часов до спуска' in str(cell.value).upper():
+                        # print('есть жирный')
+                        ws2.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=True)
+                    elif 'порядок работы' in str(cell.value).lower() or\
+                        'Наименование работ' in str(cell.value):
+                        ws2.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=True)
+                        ws2.cell(row=i, column=j).alignment = Alignment(wrap_text=True, horizontal='center',
+                                                                         vertical='center')
+        # print(merged_cells_dict)
+        for row, col in merged_cells_dict.items():
+            if len(col) != 2:
+                # print(row)
+                ws2.merge_cells(start_row=row+1, start_column=3, end_row=row+1, end_column=10)
 
 
+        for key, value in boundaries_dict.items():
+            # print(value)
+            ws2.merge_cells(start_column=value[0], start_row=value[1],
+                            end_column=value[2], end_row=value[3])
 
-    # def read_data(self, sheet):
-    #     # Получение размеров листа
-    #     rows = sheet.max_row
-    #     cols = sheet.max_column
-    #
-    #     # Создание таблицы
-    #     table = QTableWidget(rows, cols)
-    #
-    #     # Заполнение таблицы данными из Excel
-    #     for r in range(1, rows + 1):
-    #         for c in range(1, cols + 1):
-    #             cell_value = sheet.cell(row=r, column=c).value
-    #             table.setItem(r - 1, c - 1, QTableWidgetItem(str(cell_value)))
-    #
-    #     # Добавление таблицы в виджет TabWidget
-    #     self.tab_widget.addTab(table, sheet.title)
+        return 'Высота изменена'
+
+    def save_to_gnkt(self):
+        from open_pz import CreatePZ
+
+        sheets = ["Титульник", 'Схема', 'Ход работ']
+        tables = [self.table_title, self.table_schema, self.table_widget]
+
+        for i, sheet_name in enumerate(sheets):
+            worksheet = Work_with_gnkt.wb_gnkt_frez[sheet_name]
+            table = tables[i]
+
+            merged_cells_dict = {}
+            # print(f' индекс объ {ins_ind}')
+            for row in merged_cells:
+                merged_cells_dict.setdefault(row[0], []).append(row[1])
+
+            work_list = []
+            for row in range(table.rowCount()):
+                row_lst = []
+                # self.ins_ind_border += 1
+                for column in range(table.columnCount()):
+
+                    item = table.item(row, column)
+                    if not item is None:
+
+                        row_lst.append(item.text())
+                        # print(item.text())
+                    else:
+                        row_lst.append("")
+                work_list.append(row_lst)
+            Work_with_gnkt.count_row_height(worksheet, work_list, merged_cells_dict)
+
+
+        path = 'workiii'
+        filenames = f"{CreatePZ.well_number} {CreatePZ.well_area} кат {CreatePZ.cat_P_1} {self.work_plan}.xlsx"
+        full_path = path + '/' + filenames
+        # print(f'10 - {ws2.max_row}')
+        # print(wb2.path)
+        print(f' кате {CreatePZ.cat_P_1}')
+        if 1 in CreatePZ.cat_P_1 or 1 in CreatePZ.cat_H2S_list or 1 in CreatePZ.cat_gaz_f_pr:
+            ws5 = wb2.create_sheet('Sheet1')
+            ws5.title = "Схемы ПВО"
+            ws5 = wb2["Схемы ПВО"]
+            wb2.move_sheet(ws5, offset=-1)
+            schema_list = self.check_pvo_schema(ws5, ins_ind + 2)
+
+        if wb2:
+            wb2.close()
+            wb2.save(full_path)
+            print(f"Table data saved to Excel {full_path} {CreatePZ.number_dp}")
+        if self.wb:
+            self.wb.close()
+
+
     def create_title_list(self, ws2):
         from open_pz import CreatePZ
 
@@ -122,26 +233,35 @@ class Work_with_gnkt(QMainWindow):
         ws2.cell(row=1, column=2).alignment = Alignment(wrap_text=False, horizontal='left',
                                                         vertical='center')
         ws2.column_dimensions[get_column_letter(1)].width = 15
-        ws2.column_dimensions[get_column_letter(2)].width = 15
+        ws2.column_dimensions[get_column_letter(2)].width = 20
+        ws2.column_dimensions[get_column_letter(3)].width = 20
+        a = None
         for row in range(len(title_list)):  # Добавлением работ
             if row not in range(8, 13):
-                ws2.row_dimensions[row].height = 30
+                ws2.row_dimensions[row].height = 35
             for col in range(1, 12):
-                ws2.column_dimensions[get_column_letter(col)].width = 10
+                # ws2.column_dimensions[get_column_letter(col)].width = 10
                 cell = ws2.cell(row=row + index_insert, column=col)
                 # print(f' Х {title_list[i ][col - 1]}')
                 if title_list[row - 1][col - 1] != None:
-                    cell.value = str(title_list[row - 1][col - 1])
+                    ws2.cell(row=row + index_insert, column=col).value = str(title_list[row - 1][col - 1])
                 ws2.cell(row=row + index_insert, column=col).font = Font(name='Arial', size=11, bold=False)
                 ws2.cell(row=row + index_insert, column=col).alignment = Alignment(wrap_text=False, horizontal='left',
                                                                                    vertical='center')
                 if 'ПЛАН РАБОТ' in str(title_list[row - 1][col - 1]):
+                    a = row
                     ws2.merge_cells(start_row=row + index_insert, start_column=2, end_row=row + index_insert,
                                     end_column=12)
                     ws2.cell(row=row + index_insert, column=col).font = Font(name='Arial', size=13, bold=False)
                     ws2.cell(row=row + index_insert, column=col).alignment = Alignment(wrap_text=False,
                                                                                        horizontal='center',
                                                                                        vertical='center')
+                # if a:
+                #     if a < col and col<37:
+                #         ws2.merge_cells(start_row=row + index_insert, start_column=2, end_row=row + index_insert,
+                #                         end_column=5)
+                #         ws2.merge_cells(start_row=row + index_insert, start_column=8, end_row=row + index_insert,
+                #                         end_column=11)
 
             ws2.print_area = f'B1:L{44}'
             ws2.page_setup.fitToPage = True
@@ -336,15 +456,15 @@ class Work_with_gnkt(QMainWindow):
              None, CreatePZ.column_conductor_lenght, None, None, None, CreatePZ.level_cement_conductor,
              None, None, None, None, None, None, None, None,
              'Начало / окончание бурения', None, None, None, None, None, None, None,
-             Work_with_gnkt.date_dmy(self, CreatePZ.date_drilling_run), None, None,
-             Work_with_gnkt.date_dmy(self, CreatePZ.date_drilling_cancel), None, None, None,
+             self.date_dmy(CreatePZ.date_drilling_run), None, None,
+             self.date_dmy(CreatePZ.date_drilling_cancel), None, None, None,
              None],
             [None, None, None, None, None, None, 'Экспл. колонна', None, None, None, None, None,
              CreatePZ.column_diametr, None, CreatePZ.column_wall_thickness, None,
              CreatePZ.column_diametr - 2 * CreatePZ.column_wall_thickness, None, CreatePZ.shoe_column, None, None,
              None, CreatePZ.level_cement_column, None, None, None, volume_pm_ek, None, well_volume_ek,
              None, None, 'Р в межколонном пространстве', None, None, None, None, None, None, None,
-             f'{0}атм', None, None, None, Work_with_gnkt.date_dmy(self, CreatePZ.date_drilling_cancel), None, None, None],
+             f'{0}атм', None, None, None, self.date_dmy(CreatePZ.date_drilling_cancel), None, None, None],
             [None, None, None, None, None, None, "Хвостовик  ''НТЦ ''ЗЭРС''", None, None, None, None,
              None, CreatePZ.column_additional_diametr, None,
              CreatePZ.column_additional_wall_thickness, None,
@@ -545,6 +665,45 @@ class Work_with_gnkt(QMainWindow):
         ws3.print_options.horizontalCentered = True
         # зададим размер листа
         ws3.page_setup.paperSize = ws3.PAPERSIZE_A4
+
+    def work_gnkt_frez(self):
+
+        krs_begin_gnkt = [
+            [None, None, 'Порядок работы', None, None, None, None, None, None, None, None, None],
+            [None, None, 'Наименование работ', None, None, None, None, None, None, None, 'Ответственный',
+             'Нормы времени \n мин/час.'],
+            [None, 1,
+             f'Начальнику смены ЦТКРС, вызвать телефонограммой представителя Заказчика для оформления АКТа приёма-передачи скважины в ремонт. \n'
+             f'Совместно с представителем Заказчика оформить схему расстановки оборудования при КРС с обязательной подписью представителя Заказчика на схеме.',
+             None, None, None, None, None, None, None,
+             'Мастер КРС, предст-ль Заказчика.', float(0.5)],
+            [None, 2,
+             f'Принять скважину в ремонт у Заказчика с составлением АКТа. Переезд  бригады. Подготовительные работы к КРС. Определить технологические '
+             f'точки откачки жидкости у Заказчика согласно Договора.',
+             None, None, None, None, None, None, None,
+             ' Предст-тель Заказчика, мастер КРС', float(0.5)],
+            [None, 3,
+             f'Перед началом работ по освоению, капитальному и текущему ремонту скважин бригада должна быть ознакомлена с возможными осложнениями и авариями'
+             f'в процессе работ, планом локализации и ликвидации аварии (ПЛА) и планом работ. С работниками должен быть проведен инструктаж по выполнению работ, '
+             f'связанных с применением новых технических устройств и технологий с соответствующим оформлением в журнал инструктажей на рабочем месте ',
+             None, None, None, None, None, None, None,
+             'Мастер КРС', float(0.75)]]
+
+        # for row in range(1, len(krs_begin_gnkt) + 1):  # Добавлением работ
+        #     # print(row, len(schema_well_list[row-1]), schema_well_list[row-1][15])
+        #     for col in range(1, 48):
+        #         cell = ws4.cell(row=row, column=col)
+        #
+        #         cell.value = krs_begin_gnkt[row - 1][col - 1]
+        #         ws4.cell(row=row, column=col).font = Font(name='Arial', size=11, bold=False)
+        #         ws4.cell(row=row, column=col).alignment = Alignment(wrap_text=True, horizontal = 'center',
+        #                                                                            vertical = 'center')
+        #         if cell.value != None and row > 24:
+        #             cell.border = border
+        return krs_begin_gnkt
+
+
+
 
 
 

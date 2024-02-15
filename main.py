@@ -186,7 +186,7 @@ class ExcelWorker(QThread):
 
 class MyWindow(QMainWindow):
 
-    def __init__(self, table_widget = None):
+    def __init__(self):
         super().__init__()
 
         self.initUI()
@@ -206,7 +206,7 @@ class MyWindow(QMainWindow):
         self.ins_ind = None
         self.perforation_list = []
         self.dict_perforation_project = {}
-        self.table_widget = table_widget
+        # self.table_widget = table_widget
         self.ins_ind_border = None
         self.work_plan = 0
 
@@ -319,9 +319,10 @@ class MyWindow(QMainWindow):
                                                                "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
             if self.fname:
                 try:
-
+                    self.read_pz(self.fname)
                     CreatePZ.pause = True
-                    sheet = CreatePZ.open_excel_file(self, self.fname, self.work_plan)
+                    read_pz = CreatePZ(self.wb, self.ws, self.data_window, self.perforation_correct_window2)
+                    sheet = read_pz.open_excel_file(self.ws, self.work_plan)
 
                     self.copy_pz(sheet, self.table_widget)
 
@@ -334,9 +335,10 @@ class MyWindow(QMainWindow):
                                                                "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
             if self.fname:
                 try:
-
+                    self.read_pz(self.fname)
                     CreatePZ.pause = True
-                    sheet = CreatePZ.open_excel_file(self, self.fname, self.work_plan)
+                    read_pz = CreatePZ(self.wb, self.ws, self.data_window, self.perforation_correct_window2)
+                    sheet = read_pz.open_excel_file(self.ws, self.work_plan)
 
                     self.copy_pz(sheet, self.table_widget)
 
@@ -351,8 +353,10 @@ class MyWindow(QMainWindow):
 
             if self.fname:
                 try:
-
-                    sheet = CreatePZ.open_excel_file(self, self.fname, self.work_plan)
+                    self.read_pz(self.fname)
+                    CreatePZ.pause = True
+                    read_pz = CreatePZ(self.wb, self.ws, self.data_window, self.perforation_correct_window2)
+                    sheet = read_pz.open_excel_file(self.ws, self.work_plan)
                     self.copy_pz(sheet, self.table_widget)
 
                 except FileNotFoundError:
@@ -370,9 +374,13 @@ class MyWindow(QMainWindow):
 
             if self.fname:
                 try:
+                    self.read_pz(self.fname)
+                    CreatePZ.pause = True
+                    read_pz = CreatePZ(self.wb, self.ws, self.data_window, self.perforation_correct_window2)
+                    sheet = read_pz.open_excel_file(self.ws, self.work_plan)
 
-                    sheet = CreatePZ.open_excel_file(self, self.fname, self.work_plan)
-                    self.rir_window = Work_with_gnkt(sheet, self.tabWidget, self.table_widget, self.table_title)
+                    self.rir_window = Work_with_gnkt(self.ws, self.tabWidget,
+                                                     self.table_title, self.table_schema, self.table_widget,)
 
                     CreatePZ.pause_app(self)
                     CreatePZ.pause = True
@@ -546,10 +554,15 @@ class MyWindow(QMainWindow):
             # Этот сигнал испускается всякий раз, когда ячейка в таблице нажата.
             # Указанная строка и столбец - это ячейка, которая была нажата.
             self.table_widget.cellPressed[int, int].connect(self.clickedRowColumn)
-            self.tabWidget.addTab(self.table_widget, 'Ход работ')
             if work_plan == 'gnkt_frez':
                 self.table_title = QTableWidget()
-                self.tabWidget.addTab(self.table_title, 'Ход работ')
+                self.tabWidget.addTab(self.table_title, 'Титульник')
+                self.table_schema = QTableWidget()
+                self.tabWidget.addTab(self.table_schema , 'Схема скважины')
+
+            self.tabWidget.addTab(self.table_widget, 'Ход работ')
+
+
     def saveFileDialog(self, wb2):
         from open_pz import CreatePZ
         fileName, _ = QFileDialog.getSaveFileName(self, "Save excel-file", "", "Excel Files (*.xls)")
@@ -560,135 +573,137 @@ class MyWindow(QMainWindow):
         from open_pz import CreatePZ
 
         if self.work_plan != 'gnkt_frez':
-            if not self.table_widget is None:
-                wb2 = Workbook()
-                ws2 = wb2.get_sheet_by_name('Sheet')
-                ws2.title = "План работ"
-                # print(f'открытие wb2')
-
-                ins_ind = self.ins_ind_border
-
-                # print(f'открытие wb2 - {ins_ind}')
-
-                merged_cells = []  # Список индексов объединения ячеек
-
-                work_list = []
-                for row in range(self.table_widget.rowCount()):
-                    row_lst = []
-                    # self.ins_ind_border += 1
-                    for column in range(self.table_widget.columnCount()):
-                        if self.table_widget.rowSpan(row, column) > 1 or self.table_widget.columnSpan(row, column) > 1:
-                            merged_cells.append((row, column))
-                        item = self.table_widget.item(row, column)
-                        if not item is None:
-                            if 'Нормы времени' in item.text():
-                                ins_ind = row
-                            row_lst.append(item.text())
-                            # print(item.text())
-                        else:
-                            row_lst.append("")
-
-                    work_list.append(row_lst)
-
-                merged_cells_dict = {}
-                # print(f' индекс объ {ins_ind}')
-                for row in merged_cells:
-                    if row[0] >= ins_ind-1:
-                        merged_cells_dict.setdefault(row[0], []).append(row[1])
-                plan_short = ''
-
-                for i in range(2, len(work_list)):  # нумерация работ
-                    if i >= ins_ind+2:
-                        work_list[i][1] = i - 1 - ins_ind
-                        if krs.is_number(work_list[i][11]) == True:
-                            CreatePZ.normOfTime += float(str(work_list[i][11]).replace(',', '.'))
-                        if work_list[i][0]:
-                            plan_short += f'п.{work_list[i][1]} {work_list[i][0]} \n'
-
-                print(f'Нормы времени - {CreatePZ.normOfTime}')
-                # print(f'строки {ins_ind}')
-                CreatePZ.count_row_height(self.ws, ws2, work_list, merged_cells_dict, ins_ind)
-                # print(f'3 - {ws2.max_row}')
-                CreatePZ.itog_ind_min = self.ins_ind_border
-                CreatePZ.itog_ind_max = len(work_list)
-                # print(f' длина {len(work_list)}')
-                CreatePZ.addItog(self, ws2, self.table_widget.rowCount() + 1)
-                # print(f'45- {ws2.max_row}')
-                for row_ind, row in enumerate(ws2.iter_rows(values_only=True)):
-
-                    if 15 < row_ind < 100:
-                        if all(cell in [None, ''] for cell in row) \
-                                and ('Интервалы темпа' not in str(ws2.cell(row=row_ind, column=2).value) \
-                                     and 'Замечания к эксплуатационному периоду' not in str(
-                                    ws2.cell(row=row_ind, column=2).value) \
-                                     and 'Замечания к эксплуатационному периоду' not in str(
-                                    ws2.cell(row=row_ind - 2, column=2).value)):
-                            # print(row_ind, ('Интервалы темпа' not in str(ws2.cell(row=row_ind, column=2).value)),
-                            #       str(ws2.cell(row=row_ind, column=2).value))
-                            ws2.row_dimensions[row_ind + 1].hidden = True
-                    for col, value in enumerate(row):
-                        if 'Зуфаров' in str(value):
-                            coordinate = f'{get_column_letter(col - 2)}{row_ind - 2}'
-                            self.insert_image(ws2, 'imageFiles/Зуфаров.png', coordinate)
-                        elif 'М.К.Алиев' in str(value):
-                            coordinate = f'{get_column_letter(col - 1)}{row_ind - 1}'
-                            self.insert_image(ws2, 'imageFiles/Алиев махир.png', coordinate)
-                        elif 'З.К. Алиев' in str(value):
-                            coordinate = f'{get_column_letter(col - 1)}{row_ind - 1}'
-                            self.insert_image(ws2, 'imageFiles/Алиев Заур.png', coordinate)
-                            break
+            self.save_to_krs(self)
+        else:
+            from work_py.gnkt_frez import Work_with_gnkt
+            Work_with_gnkt.save_to_gnkt(self)
 
 
-                self.create_short_plan(wb2, plan_short)
 
-                # print(f'9 - {ws2.max_row}')
-                if self.work_plan != 'dop_plan':
-                    self.insert_image(ws2, 'imageFiles/Хасаншин.png', 'H1')
-                    self.insert_image(ws2, 'imageFiles/Шамигулов.png', 'H4')
+    def save_to_krs(self):
+        if not self.table_widget is None:
+            wb2 = Workbook()
+            ws2 = wb2.get_sheet_by_name('Sheet')
+            ws2.title = "План работ"
+            # print(f'открытие wb2')
 
-                    if 2 in CreatePZ.cat_H2S_list or 1 in CreatePZ.cat_H2S_list and self.work_plan != 'dop_plan':
-                        ws3 = wb2.create_sheet('Sheet1')
-                        ws3.title = "Расчет необходимого количества поглотителя H2S"
-                        ws3 = wb2["Расчет необходимого количества поглотителя H2S"]
-                        calc_H2S(ws3, CreatePZ.H2S_pr, CreatePZ.H2S_mg)
+            ins_ind = self.ins_ind_border
+
+            # print(f'открытие wb2 - {ins_ind}')
+
+            merged_cells = []  # Список индексов объединения ячеек
+
+            work_list = []
+            for row in range(self.table_widget.rowCount()):
+                row_lst = []
+                # self.ins_ind_border += 1
+                for column in range(self.table_widget.columnCount()):
+                    if self.table_widget.rowSpan(row, column) > 1 or self.table_widget.columnSpan(row, column) > 1:
+                        merged_cells.append((row, column))
+                    item = self.table_widget.item(row, column)
+                    if not item is None:
+                        if 'Нормы времени' in item.text():
+                            ins_ind = row
+                        row_lst.append(item.text())
+                        # print(item.text())
                     else:
-                        print(f'{CreatePZ.cat_H2S_list} Расчет поглотителя сероводорода не требуется')
+                        row_lst.append("")
 
+                work_list.append(row_lst)
 
+            merged_cells_dict = {}
+            # print(f' индекс объ {ins_ind}')
+            for row in merged_cells:
+                if row[0] >= ins_ind - 1:
+                    merged_cells_dict.setdefault(row[0], []).append(row[1])
+            plan_short = ''
 
-                ws2.print_area = f'B1:L{self.table_widget.rowCount() + 45}'
-                ws2.page_setup.fitToPage = True
-                ws2.page_setup.fitToHeight = False
-                ws2.page_setup.fitToWidth = True
-                ws2.print_options.horizontalCentered = True
-                # зададим размер листа
-                ws2.page_setup.paperSize = ws2.PAPERSIZE_A4
-                # содержимое по ширине страницы
-                ws2.sheet_properties.pageSetUpPr.fitToPage = True
-                ws2.page_setup.fitToHeight = False
+            for i in range(2, len(work_list)):  # нумерация работ
+                if i >= ins_ind + 2:
+                    work_list[i][1] = i - 1 - ins_ind
+                    if krs.is_number(work_list[i][11]) == True:
+                        CreatePZ.normOfTime += float(str(work_list[i][11]).replace(',', '.'))
+                    if work_list[i][0]:
+                        plan_short += f'п.{work_list[i][1]} {work_list[i][0]} \n'
 
-                path = 'D:\Documents\Desktop\ГТМ'
-                filenames = f"{CreatePZ.well_number} {CreatePZ.well_area} кат {CreatePZ.cat_P_1} {self.work_plan}.xlsx"
-                full_path = path + '/' + filenames
-                # print(f'10 - {ws2.max_row}')
-                # print(wb2.path)
-                print(f' кате {CreatePZ.cat_P_1}')
-                if 1 in CreatePZ.cat_P_1 or 1 in CreatePZ.cat_H2S_list or 1 in CreatePZ.cat_gaz_f_pr:
-                    ws5 = wb2.create_sheet('Sheet1')
-                    ws5.title = "Схемы ПВО"
-                    ws5 = wb2["Схемы ПВО"]
-                    wb2.move_sheet(ws5, offset=-2)
-                    schema_list = self.check_pvo_schema(ws5, ins_ind+2)
+            print(f'Нормы времени - {CreatePZ.normOfTime}')
+            # print(f'строки {ins_ind}')
+            CreatePZ.count_row_height(self.ws, ws2, work_list, merged_cells_dict, ins_ind)
+            # print(f'3 - {ws2.max_row}')
+            CreatePZ.itog_ind_min = self.ins_ind_border
+            CreatePZ.itog_ind_max = len(work_list)
+            # print(f' длина {len(work_list)}')
+            CreatePZ.addItog(self, ws2, self.table_widget.rowCount() + 1)
+            # print(f'45- {ws2.max_row}')
+            for row_ind, row in enumerate(ws2.iter_rows(values_only=True)):
 
+                if 15 < row_ind < 100:
+                    if all(cell in [None, ''] for cell in row) \
+                            and ('Интервалы темпа' not in str(ws2.cell(row=row_ind, column=2).value) \
+                                 and 'Замечания к эксплуатационному периоду' not in str(
+                                ws2.cell(row=row_ind, column=2).value) \
+                                 and 'Замечания к эксплуатационному периоду' not in str(
+                                ws2.cell(row=row_ind - 2, column=2).value)):
+                        # print(row_ind, ('Интервалы темпа' not in str(ws2.cell(row=row_ind, column=2).value)),
+                        #       str(ws2.cell(row=row_ind, column=2).value))
+                        ws2.row_dimensions[row_ind + 1].hidden = True
+                for col, value in enumerate(row):
+                    if 'Зуфаров' in str(value):
+                        coordinate = f'{get_column_letter(col - 2)}{row_ind - 2}'
+                        self.insert_image(ws2, 'imageFiles/Зуфаров.png', coordinate)
+                    elif 'М.К.Алиев' in str(value):
+                        coordinate = f'{get_column_letter(col - 1)}{row_ind - 1}'
+                        self.insert_image(ws2, 'imageFiles/Алиев махир.png', coordinate)
+                    elif 'З.К. Алиев' in str(value):
+                        coordinate = f'{get_column_letter(col - 1)}{row_ind - 1}'
+                        self.insert_image(ws2, 'imageFiles/Алиев Заур.png', coordinate)
+                        break
 
-                if wb2:
-                    wb2.close()
-                    wb2.save(full_path)
-                    print(f"Table data saved to Excel {full_path} {CreatePZ.number_dp}")
-                if self.wb:
-                    self.wb.close()
+            self.create_short_plan(wb2, plan_short)
 
+            # print(f'9 - {ws2.max_row}')
+            if self.work_plan != 'dop_plan':
+                self.insert_image(ws2, 'imageFiles/Хасаншин.png', 'H1')
+                self.insert_image(ws2, 'imageFiles/Шамигулов.png', 'H4')
 
+                if 2 in CreatePZ.cat_H2S_list or 1 in CreatePZ.cat_H2S_list and self.work_plan != 'dop_plan':
+                    ws3 = wb2.create_sheet('Sheet1')
+                    ws3.title = "Расчет необходимого количества поглотителя H2S"
+                    ws3 = wb2["Расчет необходимого количества поглотителя H2S"]
+                    calc_H2S(ws3, CreatePZ.H2S_pr, CreatePZ.H2S_mg)
+                else:
+                    print(f'{CreatePZ.cat_H2S_list} Расчет поглотителя сероводорода не требуется')
+
+            ws2.print_area = f'B1:L{self.table_widget.rowCount() + 45}'
+            ws2.page_setup.fitToPage = True
+            ws2.page_setup.fitToHeight = False
+            ws2.page_setup.fitToWidth = True
+            ws2.print_options.horizontalCentered = True
+            # зададим размер листа
+            ws2.page_setup.paperSize = ws2.PAPERSIZE_A4
+            # содержимое по ширине страницы
+            ws2.sheet_properties.pageSetUpPr.fitToPage = True
+            ws2.page_setup.fitToHeight = False
+
+            path = 'workiii'
+            filenames = f"{CreatePZ.well_number} {CreatePZ.well_area} кат {CreatePZ.cat_P_1} {self.work_plan}.xlsx"
+            full_path = path + '/' + filenames
+            # print(f'10 - {ws2.max_row}')
+            # print(wb2.path)
+            print(f' кате {CreatePZ.cat_P_1}')
+            if 1 in CreatePZ.cat_P_1 or 1 in CreatePZ.cat_H2S_list or 1 in CreatePZ.cat_gaz_f_pr:
+                ws5 = wb2.create_sheet('Sheet1')
+                ws5.title = "Схемы ПВО"
+                ws5 = wb2["Схемы ПВО"]
+                wb2.move_sheet(ws5, offset=-1)
+                schema_list = self.check_pvo_schema(ws5, ins_ind + 2)
+
+            if wb2:
+                wb2.close()
+                wb2.save(full_path)
+                print(f"Table data saved to Excel {full_path} {CreatePZ.number_dp}")
+            if self.wb:
+                self.wb.close()
 
     def close_file(self):
         from open_pz import CreatePZ
@@ -1055,120 +1070,130 @@ class MyWindow(QMainWindow):
     def drilling_SBT_action(self):
         from work_py.drilling import drilling_sbt
         drilling_work_list = drilling_sbt(self)
-        self.populate_row(self.ins_ind, drilling_work_list)
+        self.populate_row(self.ins_ind, drilling_work_list, self.table_widget)
 
     def frezering_port_action(self):
         from work_py.drilling import frezer_ports
         drilling_work_list = frezer_ports(self)
-        self.populate_row(self.ins_ind, drilling_work_list)
+        self.populate_row(self.ins_ind, drilling_work_list, self.table_widget)
     def drilling_action_nkt(self):
         from work_py.drilling import drilling_nkt
         drilling_work_list = drilling_nkt(self)
-        self.populate_row(self.ins_ind, drilling_work_list)
+        self.populate_row(self.ins_ind, drilling_work_list, self.table_widget)
 
     def magnet_action(self):
         from work_py.emergencyWork import magnetWork
         magnet_work_list = magnetWork(self)
-        self.populate_row(self.ins_ind, magnet_work_list)
+        self.populate_row(self.ins_ind, magnet_work_list, self.table_widget)
 
     def emergency_sticking_action(self):
         from work_py.emergencyWork import emergency_sticking
         emergency_sticking_list = emergency_sticking(self)
-        self.populate_row(self.ins_ind, emergency_sticking_list)
+        self.populate_row(self.ins_ind, emergency_sticking_list, self.table_widget)
 
     def hook_action(self):
         from work_py.emergencyWork import emergency_hook
         hook_work_list = emergency_hook(self)
-        self.populate_row(self.ins_ind, hook_work_list)
+        self.populate_row(self.ins_ind, hook_work_list, self.table_widget)
 
     def lapel_tubing_func(self):
         from work_py.emergencyWork import lapel_tubing
         emergency_sbt_list = lapel_tubing(self)
-        self.populate_row(self.ins_ind, emergency_sbt_list)
+        self.populate_row(self.ins_ind, emergency_sbt_list, self.table_widget)
 
 
     def lar_sbt_action(self):
         from work_py.emergencyWork import emergence_sbt
         emergency_sbt_list = emergence_sbt(self)
-        self.populate_row(self.ins_ind, emergency_sbt_list)
+        self.populate_row(self.ins_ind, emergency_sbt_list, self.table_widget)
     def larNKT_action(self):
         from work_py.emergencyWork import emergencyNKT
         emergencyNKT_list = emergencyNKT(self)
-        self.populate_row(self.ins_ind, emergencyNKT_list)
+        self.populate_row(self.ins_ind, emergencyNKT_list, self.table_widget)
 
     def rgdWithoutPaker_action(self):
         from work_py.rgdVcht import rgdWithoutPaker
         rgdWithoutPaker_list = rgdWithoutPaker(self)
-        self.populate_row(self.ins_ind, rgdWithoutPaker_list)
+        self.populate_row(self.ins_ind, rgdWithoutPaker_list, self.table_widget)
 
     def rgdWithPaker_action(self):
         from work_py.rgdVcht import rgdWithPaker
         rgdWithPaker_list = rgdWithPaker(self)
-        self.populate_row(self.ins_ind, rgdWithPaker_list)
+        self.populate_row(self.ins_ind, rgdWithPaker_list, self.table_widget)
 
     def definitionBottomGKLM(self):
         from work_py.alone_oreration import definitionBottomGKLM
         definitionBottomGKLM_list = definitionBottomGKLM(self)
-        self.populate_row(self.ins_ind, definitionBottomGKLM_list)
+        self.populate_row(self.ins_ind, definitionBottomGKLM_list, self.table_widget)
 
     def privyazkaNKT(self):
         from work_py.alone_oreration import privyazkaNKT
         privyazkaNKT_list = privyazkaNKT(self)
-        self.populate_row(self.ins_ind, privyazkaNKT_list)
+        self.populate_row(self.ins_ind, privyazkaNKT_list, self.table_widget)
 
     def definition_Q(self):
         from work_py.alone_oreration import definition_Q
         definition_Q_list = definition_Q(self)
-        self.populate_row(self.ins_ind, definition_Q_list)
+        self.populate_row(self.ins_ind, definition_Q_list, self.table_widget)
 
     def definition_Q_nek(self):
         from work_py.alone_oreration import definition_Q_nek
         definition_Q_list = definition_Q_nek(self)
-        self.populate_row(self.ins_ind, definition_Q_list)
+        self.populate_row(self.ins_ind, definition_Q_list, self.table_widget)
 
     def kot_work(self):
         from work_py.alone_oreration import kot_work
         kot_work_list = kot_work(self)
-        self.populate_row(self.ins_ind, kot_work_list)
+        self.populate_row(self.ins_ind, kot_work_list, self.table_widget)
 
     def konte_action(self):
         from work_py.alone_oreration import konte
         konte_work_list = konte(self)
-        self.populate_row(self.ins_ind, konte_work_list)
+        self.populate_row(self.ins_ind, konte_work_list, self.table_widget)
 
     def mkp_revision(self):
         from work_py.mkp import mkp_revision
         mkp_work_list = mkp_revision(self)
-        self.populate_row(self.ins_ind, mkp_work_list)
+        self.populate_row(self.ins_ind, mkp_work_list, self.table_widget)
 
     def acid_action_gons(self):
         from work_py.acids import acidGons
         acidGons_work_list = acidGons(self)
-        self.populate_row(self.ins_ind, acidGons_work_list)
+        self.populate_row(self.ins_ind, acidGons_work_list, self.table_widget)
 
     def izvlek_action(self):
         from work_py.rir import RirWindow
         izvlech_paker_work_list = RirWindow.izvlech_paker(self)
-        self.populate_row(self.ins_ind, izvlech_paker_work_list)
+        self.populate_row(self.ins_ind, izvlech_paker_work_list, self.table_widget)
 
     def pakerIzvlek_action(self):
         from work_py.rir import RirWindow
         rir_izvelPaker_work_list = RirWindow.rir_izvelPaker(self)
-        self.populate_row(self.ins_ind, rir_izvelPaker_work_list)
+        self.populate_row(self.ins_ind, rir_izvelPaker_work_list, self.table_widget)
+
+    def read_pz(self, fname):
+        self.wb = load_workbook(fname, data_only=True)
+        name_list = self.wb.sheetnames
+        old_index = 1
+        self.ws = self.wb.active
+
+        for sheet in name_list:
+            if sheet in self.wb.sheetnames and (sheet != 'наряд-заказ КРС' or sheet != 'План работ'):
+                self.wb.remove(self.wb[sheet])
 
     def pvo_cat1(self):
         from work_py.alone_oreration import pvo_cat1
         pvo_cat1_work_list = pvo_cat1(self)
-        self.populate_row(self.ins_ind, pvo_cat1_work_list)
+        self.populate_row(self.ins_ind, pvo_cat1_work_list, self.table_widget)
 
     def fluid_change_action(self):
         from work_py.alone_oreration import fluid_change
         fluid_change_work_list = fluid_change(self)
-        self.populate_row(self.ins_ind, fluid_change_work_list)
+        self.populate_row(self.ins_ind, fluid_change_work_list, self.table_widget)
     def claySolision(self):
         from work_py.claySolution import claySolutionDef
         rirRpp_work_list = claySolutionDef(self)
-        self.populate_row(self.ins_ind, rirRpp_work_list)
+        self.populate_row(self.ins_ind, rirRpp_work_list, self.table_widget)
     def rirAction(self):
         from work_py.rir import RirWindow
 
@@ -1193,28 +1218,28 @@ class MyWindow(QMainWindow):
 
         print('Вставился ГРП с пакером')
         grpPaker_work_list = grpPaker(self)
-        self.populate_row(self.ins_ind, grpPaker_work_list)
+        self.populate_row(self.ins_ind, grpPaker_work_list, self.table_widget)
 
     def grpWithGpp(self):
         from work_py.grp import grpGpp
 
         print('Вставился ГРП с ГПП')
         grpGpp_work_list = grpGpp(self)
-        self.populate_row(self.ins_ind, grpGpp_work_list)
+        self.populate_row(self.ins_ind, grpGpp_work_list, self.table_widget)
 
     def filling_sand(self):
         from work_py.sand_filling import sandFilling
 
         print('Вставился отсыпка песком')
         filling_work_list = sandFilling(self)
-        self.populate_row(self.ins_ind, filling_work_list)
+        self.populate_row(self.ins_ind, filling_work_list, self.table_widget)
 
     def washing_sand(self):
         from work_py.sand_filling import sandWashing
 
         print('Вставился отсыпка песком')
         washing_work_list = sandWashing(self)
-        self.populate_row(self.ins_ind, washing_work_list)
+        self.populate_row(self.ins_ind, washing_work_list, self.table_widget)
 
     def deleteString(self):
         selected_ranges = self.table_widget.selectedRanges()
@@ -1237,49 +1262,49 @@ class MyWindow(QMainWindow):
 
     def emptyString(self):
         ryber_work_list = [[None, None, None, None, None, None, None, None, None, None, None, None]]
-        self.populate_row(self.ins_ind, ryber_work_list)
+        self.populate_row(self.ins_ind, ryber_work_list, self.table_widget)
 
     def vp_action(self):
         from work_py.vp_cm import vp
 
         print('Вставился ВП')
         vp_work_list = vp(self)
-        self.populate_row(self.ins_ind, vp_work_list)
+        self.populate_row(self.ins_ind, vp_work_list, self.table_widget)
 
     def czh_action(self):
         from work_py.vp_cm import czh
 
         print('Вставился ВП')
         vp_work_list = czh(self)
-        self.populate_row(self.ins_ind, vp_work_list)
+        self.populate_row(self.ins_ind, vp_work_list, self.table_widget)
 
     def swibbing_with_paker(self):
         from work_py.swabbing import swabbing_with_paker
 
         print('Вставился Сваб с пакером')
         swab_work_list = swabbing_with_paker(self, 10, 1)
-        self.populate_row(self.ins_ind, swab_work_list)
+        self.populate_row(self.ins_ind, swab_work_list, self.table_widget)
 
     def swibbing2_with_paker(self):
         from work_py.swabbing import swabbing_with_2paker
 
         print('Вставился Сваб с пакером')
         swab_work_list = swabbing_with_2paker(self)
-        self.populate_row(self.ins_ind, swab_work_list)
+        self.populate_row(self.ins_ind, swab_work_list, self.table_widget)
 
     def swabbing_opy(self):
         from work_py.swabbing import swabbing_opy
 
         print('Вставился ОПУ')
         swabbing_opy_list = swabbing_opy(self)
-        self.populate_row(self.ins_ind, swabbing_opy_list)
+        self.populate_row(self.ins_ind, swabbing_opy_list, self.table_widget)
 
     def kompress_with_voronka(self):
         from work_py.kompress import kompress
 
         print('Вставился компрессор с воронкой')
         kompress_work_list = kompress(self)
-        self.populate_row(self.ins_ind, kompress_work_list)
+        self.populate_row(self.ins_ind, kompress_work_list, self.table_widget)
 
     def swibbing_with_voronka(self):
 
@@ -1287,33 +1312,33 @@ class MyWindow(QMainWindow):
 
         print('Вставился Сваб с воронкой')
         swab_work_list = swabbing_with_voronka(self)
-        self.populate_row(self.ins_ind, swab_work_list)
+        self.populate_row(self.ins_ind, swab_work_list, self.table_widget)
 
     def ryberAdd(self):
         from work_py.raiding import Raid
 
         print('Вставился райбер')
         ryber_work_list = Raid.raidingColumn(self)
-        self.populate_row(self.ins_ind, ryber_work_list)
+        self.populate_row(self.ins_ind, ryber_work_list, self.table_widget)
 
     def gnkt_after_grp(self):
         from gnkt_after_grp import gnkt_work
         gnkt_work_list = gnkt_work(self)
-        self.populate_row(self.ins_ind, gnkt_work_list)
+        self.populate_row(self.ins_ind, gnkt_work_list, self.table_widget)
 
     def gnkt_opz(self):
         from gnkt_opz import gnkt_work
 
         print('Вставился ГНКТ')
         ryber_work_list = gnkt_work(self)
-        self.populate_row(self.ins_ind, ryber_work_list)
+        self.populate_row(self.ins_ind, ryber_work_list, self.table_widget)
 
     def gno_bottom(self):
         from work_py.descent_gno import gno_down
 
         print('Вставился ГНО')
         gno_work_list = gno_down(self)
-        self.populate_row(self.ins_ind, gno_work_list)
+        self.populate_row(self.ins_ind, gno_work_list, self.table_widget)
 
     def acid_action_1paker(self):
         from work_py.acids_work import acid_work
@@ -1325,7 +1350,7 @@ class MyWindow(QMainWindow):
         print('Вставился кислотная обработка на одном пакере ')
         acid_work_list = acid_work(self)
         if acid_work_list != None:
-            self.populate_row(self.ins_ind, acid_work_list)
+            self.populate_row(self.ins_ind, acid_work_list, self.table_widget)
 
     def acid_action_2paker(self):
         from work_py.acids import acid_work
@@ -1338,7 +1363,7 @@ class MyWindow(QMainWindow):
         print('Вставился кислотная обработка на двух пакере ')
         acid_work_list = acid_work(self)
         if acid_work_list != None:
-            self.populate_row(self.ins_ind, acid_work_list)
+            self.populate_row(self.ins_ind, acid_work_list, self.table_widget)
 
     def pressureTest(self):
         from work_py.opressovka import paker_list
@@ -1346,14 +1371,14 @@ class MyWindow(QMainWindow):
         # print('Вставился опрессовка пакером')
         pressure_work1 = paker_list(self)
         # print(f'индекс {self.ins_ind, len(pressure_work1)}')
-        self.populate_row(self.ins_ind, pressure_work1)
+        self.populate_row(self.ins_ind, pressure_work1, self.table_widget)
 
     def template_pero(self):
         from work_py.template_work import TemplateKrs
 
 
         template_pero_list = TemplateKrs.pero(self)
-        self.populate_row(self.ins_ind, template_pero_list)
+        self.populate_row(self.ins_ind, template_pero_list, self.table_widget)
 
 
     def template_with_skm(self):
@@ -1380,11 +1405,11 @@ class MyWindow(QMainWindow):
         template_ek_list = TemplateKrs.template_ek_without_skm(self)
         # print()
         # print(f'индекс {self.ins_ind, len(template_ek_list)}')
-        self.populate_row(self.ins_ind, template_ek_list)
+        self.populate_row(self.ins_ind, template_ek_list, self.table_widget)
         CreatePZ.ins_ind += len(template_ek_list) + 1
 
     def populate_row(self, ins_ind, work_list):
-
+        # print(type(table_widget))
         text_width_dict = {20: (0, 100), 40: (101, 200), 60: (201, 300), 80: (301, 400), 100: (401, 500),
                            120: (501, 600), 140: (601, 700), 160: (701, 800), 180: (801, 1500)}
 
@@ -1402,7 +1427,7 @@ class MyWindow(QMainWindow):
                 # self.table_widget.setCellWidget(row, column, widget)
 
                 if not data is None:
-                    self.table_widget.setItem(row, column, item)
+                   self.table_widget.setItem(row, column, item)
 
                 else:
                     self.table_widget.setItem(row, column, QtWidgets.QTableWidgetItem(str('')))
@@ -1410,10 +1435,12 @@ class MyWindow(QMainWindow):
                 if column == 2:
                     if not data is None:
                         text = data
+                        print(text)
                         for key, value in text_width_dict.items():
                             if value[0] <= len(text) <= value[1]:
                                 text_width = key
                                 self.table_widget.setRowHeight(row, int(text_width))
+        print(f'закончено')
 
         # self.table_widget.setEditTriggers(QTableWidget.AnyKeyPressed)
         # self.table_widget.resizeColumnsToContents()
@@ -1646,8 +1673,8 @@ class MyWindow(QMainWindow):
         table_widget.setColumnCount(count_col)
         rowHeights_exit = [sheet.row_dimensions[i + 1].height if sheet.row_dimensions[i + 1].height is not None else 18
                            for i in range(sheet.max_row)]
-        print(rowHeights_exit)
-        print(f' Объединенны {merged_cells}')
+        # print(rowHeights_exit)
+        # print(f' Объединенны {merged_cells}')
         for row in range(1, rows + 2):
             if row > 1 and row < rows - 1:
                 table_widget.setRowHeight(row, int(rowHeights_exit[row]))
@@ -1678,7 +1705,7 @@ class MyWindow(QMainWindow):
                                                       merged_cell.max_col - merged_cell.min_col + 1)
 
         if work_plan == 'krs':
-            self.populate_row(table_widget.rowCount(), work_krs(self, self.work_plan))
+            self.populate_row(table_widget.rowCount(), work_krs(self, self.work_plan), self.table_widget)
         
         if work_plan == 'gnkt_frez' and list_page == 2:
             colWidth = [2.28515625, 13.0, 4.5703125, 13.0, 13.0, 13.0, 5.7109375, 13.0, 13.0, 13.0, 4.7109375,
