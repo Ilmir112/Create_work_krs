@@ -962,8 +962,9 @@ class AcidPakerWindow(MyWindow):
                 CreatePZ.swabTypeComboIndex = 2
 
         elif self.countAcid == 2:
+            print(f'ye;yj {CreatePZ.swabTrueEditType}')
 
-            if CreatePZ.swabTrueEditType == 'Нужно освоение':
+            if CreatePZ.swabTrueEditType == 0:
                 work_list = []
                 swabbing_with_paker = self.swabbing_with_paker(CreatePZ.khvostEdit, CreatePZ.swab_paker, CreatePZ.swabType, CreatePZ.swab_volume)
                 for row in swabbing_with_paker:

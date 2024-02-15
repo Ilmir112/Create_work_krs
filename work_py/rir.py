@@ -449,7 +449,7 @@ class RirWindow(QMainWindow):
         ]
 
 
-        if len(CreatePZ.plast_work) == 0 or CreatePZ.perforation_sole < roof_rir_Edit:
+        if len(CreatePZ.plast_work) == 0:
             rir_list = []
             for row in uzmPero_list:
                 rir_list.append(row)

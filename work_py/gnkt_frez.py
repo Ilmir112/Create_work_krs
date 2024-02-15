@@ -1,47 +1,93 @@
 from datetime import datetime
 
-from PyQt5.QtWidgets import QInputDialog, QMainWindow
+from PyQt5.QtWidgets import QInputDialog, QMainWindow, QTabWidget, QWidget, QTableWidget, QApplication
+# from PyQt5.uic.properties import QtWidgets
 from openpyxl.styles import Alignment
 from openpyxl.utils import get_column_letter
+from PyQt5 import QtCore, QtWidgets
 
 
 import block_name
+import main
 import plan
 from block_name import razdel_1
 from openpyxl.styles import Border, Side, PatternFill, Font, GradientFill, Alignment
 from openpyxl.reader.excel import load_workbook
 from openpyxl.workbook import Workbook
 
-from krs import volume_vn_nkt, well_volume
+
 
 from gnkt_data.gnkt_data import dict_saddles
 
+# class TabPage_SO(QWidget):
+#     def __init__(self, parent=None):
+#         super().__init__(parent)
+# class TabWidget(QTabWidget):
+#     def __init__(self):
+#         super().__init__()
+#         self.addTab(TabPage_SO(self), 'Титульный лист')
+#         self.addTab(TabPage_SO(self), 'Схема')
+#         self.addTab(TabPage_SO(self), 'Ход работ')
 
 class Work_with_gnkt(QMainWindow):
 
-    def __init__(self):
+
+    def __init__(self, ws,  tabWidget, table_widget, table_title):
         from open_pz import CreatePZ
         super(QMainWindow, self).__init__()
-        self.create_excel_file = None
+
         self.dict_perforation = CreatePZ.dict_perforation
+        # self.tabWidget = tabWidget
+        # self.table_title = table_widget
 
 
-    def create_excel_file(self, ws):
-        from open_pz import CreatePZ
+        # self.tabWidget.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+        # self.tabWidget.customContextMenuRequested.connect(self.openContextMenu)
+        # self.setCentralWidget(self.table_title)
+        # self.model = self.tabWidget.model()
+        #
+        # # Этот сигнал испускается всякий раз, когда ячейка в таблице нажата.
+        # # Указанная строка и столбец - это ячейка, которая была нажата.
+        # self.tabWidget.cellPressed[int, int].connect(self.clickedRowColumn)
+
         wb4 = Workbook()
         ws2 = wb4.get_sheet_by_name('Sheet')
         ws2.title = "Титульник"
         ws3 = wb4.create_sheet(title="Схема")
 
+        # head = plan.head_ind(CreatePZ.cat_well_min, CreatePZ.cat_well_max + 1)
+        # plan.copy_true_ws(ws, ws2, head)
 
-        head = plan.head_ind(CreatePZ.cat_well_min, CreatePZ.cat_well_max + 1)
-        plan.copy_true_ws(ws, ws2, head)
+        create_title = self.create_title_list(ws2)
+        schema_well = self.schema_well(ws3)
 
-        create_title = Work_with_gnkt.create_title_list(self, ws2)
-        schema_well = Work_with_gnkt.schema_well(self, ws3)
-        wb4.save(f"{CreatePZ.well_number} {CreatePZ.well_area} {CreatePZ.cat_P_1} категории.xlsx")
-        print('файл сохранен')
+        # wb4.save(f"{CreatePZ.well_number} {CreatePZ.well_area} {CreatePZ.cat_P_1} категории.xlsx")
+        # print('файл сохранен')
 
+        main.MyWindow.copy_pz(self, ws2, table_title, 13, 'gnkt_frez', 1)
+        main.MyWindow.copy_pz(self, ws3, table_widget, 46, 'gnkt_frez', 2)
+        #
+
+
+
+
+
+    # def read_data(self, sheet):
+    #     # Получение размеров листа
+    #     rows = sheet.max_row
+    #     cols = sheet.max_column
+    #
+    #     # Создание таблицы
+    #     table = QTableWidget(rows, cols)
+    #
+    #     # Заполнение таблицы данными из Excel
+    #     for r in range(1, rows + 1):
+    #         for c in range(1, cols + 1):
+    #             cell_value = sheet.cell(row=r, column=c).value
+    #             table.setItem(r - 1, c - 1, QTableWidgetItem(str(cell_value)))
+    #
+    #     # Добавление таблицы в виджет TabWidget
+    #     self.tab_widget.addTab(table, sheet.title)
     def create_title_list(self, ws2):
         from open_pz import CreatePZ
 
@@ -107,6 +153,7 @@ class Work_with_gnkt(QMainWindow):
 
     def schema_well(self, ws3):
         from open_pz import CreatePZ
+        from krs import volume_vn_nkt, well_volume
 
 
 
@@ -174,7 +221,7 @@ class Work_with_gnkt(QMainWindow):
 
 
         plast_work = CreatePZ.plast_all[0]
-        # print(plast_work,  list(CreatePZ.dict_perforation[plast_work]))
+        print(plast_work,  list(CreatePZ.dict_perforation[plast_work]))
         pressuar = f'{list(CreatePZ.dict_perforation[plast_work]["давление"])[0]}атм'
         pressuar1 = list(CreatePZ.dict_perforation[plast_work]["давление"])[0]
         zamer = list(CreatePZ.dict_perforation[plast_work]['замер'])[0]
@@ -268,20 +315,21 @@ class Work_with_gnkt(QMainWindow):
              'Диаметр канавки', None, None, None, None, None, 'Наруж.\nдиаметр',
              None, 'Толщина стенки', None, 'Внутр.\nдиаметр', None, 'Глубина', None, None, None, 'ВЦП.\nДлина ПО', None,
              None, None, 'Объем', None, None, None, None, 'Макс. интенс. набора кривизны', None, None, None, None, None,
-             None, None, 6.21, None, None, 'на глубине', None, None, '1310', None],
+             None, None, f'{6.21}/10м', None, None, 'на глубине', None, None, '1310', None],
 
             [None, None, None, None, None, None,
-             'Стол ротора', None, None, None, CreatePZ.stol_rotora, None, None, None, None, None,
+             'Стол ротора', None, None, None, f'{CreatePZ.stol_rotora}м', None, None, None, None, None,
              None, None, 'от', None, 'до', None, None, None, None, None, 'п.м', None, 'м3', None, None,
              'Жидкость глушения', None, None, None, None, None, None, None, zhgs, None, None, 'в объеме', None, None,
-             28.9, None],
+             f'{28.9}м3', None],
             [None, None, None, None, None, None, 'Направление', None, None, None, None, None,
              CreatePZ.column_direction_diametr, None, CreatePZ.column_direction_wall_thickness, None,
              CreatePZ.column_direction_diametr - 2 * CreatePZ.column_direction_wall_thickness, None,
              CreatePZ.column_direction_lenght, None, None, None, CreatePZ.level_cement_direction, None, None,
              None, None, None, None, None, None, 'Ожидаемый дебит',
-             None, None, None, None, None, None, None, CreatePZ.Qwater, None, None, CreatePZ.Qoil, None, None,
-             CreatePZ.proc_water, None],
+             None, None, None, None, None, None, None, f'{CreatePZ.Qwater}м3/сут', None, None,
+             f'{CreatePZ.Qoil}м3', None, None,
+             f'{CreatePZ.proc_water}%', None],
             [None, None, None, None, None, None, 'Кондуктор', None, None, None, None, None,
              CreatePZ.column_conductor_diametr, None, CreatePZ.column_conductor_wall_thickness, None,
              CreatePZ.column_conductor_diametr - 2 * CreatePZ.column_conductor_wall_thickness,
@@ -296,7 +344,7 @@ class Work_with_gnkt(QMainWindow):
              CreatePZ.column_diametr - 2 * CreatePZ.column_wall_thickness, None, CreatePZ.shoe_column, None, None,
              None, CreatePZ.level_cement_column, None, None, None, volume_pm_ek, None, well_volume_ek,
              None, None, 'Р в межколонном пространстве', None, None, None, None, None, None, None,
-             0, None, None, None, CreatePZ.pressuar_mkp, None, None, None],
+             f'{0}атм', None, None, None, Work_with_gnkt.date_dmy(self, CreatePZ.date_drilling_cancel), None, None, None],
             [None, None, None, None, None, None, "Хвостовик  ''НТЦ ''ЗЭРС''", None, None, None, None,
              None, CreatePZ.column_additional_diametr, None,
              CreatePZ.column_additional_wall_thickness, None,
@@ -309,31 +357,31 @@ class Work_with_gnkt(QMainWindow):
              None, nkt - 2 * 6.5, None, f'{0}-', None, f'{lenght_nkt -0.5- 2.6-3}м', None, f'{lenght_nkt -0.5- 2.6-3}м', None, None, None,
              volume_vn_nkt(CreatePZ.dict_nkt), None, volume_vn_nkt(CreatePZ.dict_nkt) + 0.47, None, None,
              'Давление опрессовки ЭК ', None, None, None, None,
-             None, None, None, CreatePZ.max_expected_pressure, None, None,
+             None, None, None, f'{CreatePZ.max_expected_pressure}атм', None, None,
              None,
              None, None, 'гермет.', None],
             [None, None, None, None, None, None, 'Гидроякорь ', None, None, None, None, None, 122, None, None, None, 71,
-             None, lenght_nkt, None, lenght_nkt + 1, None, 0.5, None, None, None, None, None, None, None,
+             None, f'{lenght_nkt}', None, f'{lenght_nkt + 1}м', None, f'{0.5}м3', None, None, None, None, None, None, None,
              None, 'Макс. допустимое Р опр-ки ЭК', None, None, None, None, None, None, None,
              CreatePZ.max_admissible_pressure, None, None, None,
              None, None, None, None],
             [None, None, None, None, None, None, 'Патрубок 1 шт.', None, None, None, None, None, nkt, None, 6.5, None,
-             74.2, None, lenght_nkt - 5.6, None, lenght_nkt - 2.6, None, 3, None, None, None, None,
+             74.2, None, lenght_nkt - 5.6, None, f'{lenght_nkt - 2.6}м', None, f'{3}м', None, None, None, None,
              None, None, None, None, 'Макс. ожидаемое Р на устье скв.', None, None, None, None, None, None, None, 92.8,
              None, None, None, None, None, None, None],
             [None, None, None, None, None, None, f'стингер {CreatePZ.paker_do["do"]}', None, None, None, None, None,
              None, None,
-             None, None, 71, None, lenght_nkt - 2.6, None, lenght_nkt, None, 2.6, None, None, None, None,
+             None, None, 71, None, lenght_nkt - 2.6, None, lenght_nkt, None, f'{2.6}м', None, None, None, None,
              None, None, None, None, 'Текущий забой до ГРП ', None, None, None, None, None, None, None, None, None,
-             None, None, None, None, CreatePZ.current_bottom, None],
+             None, None, None, None, f'{CreatePZ.current_bottom}м', None],
             [None, None, None, None, None, None, 'ГНКТ', None, None, None, None, None, 38.1, None, 3.96, None, 30.18,
              None, gnkt_lenght, None, None, None, None, None, None, None, volume_vn_gnkt, None,
              volume_gnkt, None,
              None, 'Искусственный забой  (МГРП №1 с актив.шаром 30мм)', None, None, None, None, None, None, None, None,
-             None, None, None, None, None, bottom_first_port, None]]
+             None, None, None, None, None, f'{bottom_first_port}м', None]]
 
-        ports_data = Work_with_gnkt.work_with_port(self, plast_work, CreatePZ.dict_perforation)
-        ports_list, merge_port = Work_with_gnkt.insert_ports_data(self, ports_data)
+        ports_data = self.work_with_port(plast_work, CreatePZ.dict_perforation)
+        ports_list, merge_port = self.insert_ports_data(ports_data)
         # print(ports_list)
         for row in ports_list:
             schema_well_list.append(row)
@@ -457,7 +505,8 @@ class Work_with_gnkt(QMainWindow):
             boundaries_dict[key] = value
             if key % 2 == 0:
                 coordinate = f'{get_column_letter(value[0]-1)}{value[1] + 4}'
-                self.insert_image(ws3, 'imageFiles/schema_well/port.png', coordinate, 200, 200)
+                print(f'вставка1 ')
+                # main.MyWindow.insert_image(ws3, 'imageFiles/schema_well/port.png', coordinate, 200, 200)
 
 
             for i in range(3):
@@ -484,8 +533,8 @@ class Work_with_gnkt(QMainWindow):
             ws3.column_dimensions[get_column_letter(col_ind + 1)].width = colWidth[col_ind]/1.9
 
         coordinate = f'A2'
-
-        self.insert_image(ws3, 'imageFiles/schema_well/gorizont.png', coordinate, 2050, 1000)
+        print(f'вставка1 ')
+        # main.MyWindow.insert_image(ws3, 'imageFiles/schema_well/gorizont.png', coordinate, 2050, 1000)
 
         ws3.print_area = f'A1:AW{37}'
         ws3.page_setup.fitToPage = True
@@ -655,4 +704,8 @@ class Work_with_gnkt(QMainWindow):
         return dict_ports
 
 
-
+if __name__ == '__main__':
+    app = QApplication([])
+    window = Work_with_gnkt()
+    window.show()
+    app.exec_()

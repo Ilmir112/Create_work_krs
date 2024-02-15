@@ -480,7 +480,7 @@ def work_krs(self, work_plan):
             [None, None,
              f'{lifting_unit(self)}', None, None, None, None, None, None, None,
              'Мастер КРС представитель Заказчика, пусков. Ком. ', 4.2],
-            [f'Поднять {CreatePZ.dict_pump_SHGN["do"]} с гл. {int(CreatePZ.dict_pump_SHGN_h["do"])}м', None,
+            [f'Поднять {CreatePZ.dict_pump_SHGN["do"]} с гл. {CreatePZ.dict_pump_SHGN_h["do"]}м', None,
              f'Сорвать насос {CreatePZ.dict_pump_SHGN["do"] } (зафиксировать вес при срыве). Обвязать устье скважины '
              f'согласно схемы №3 утвержденной главным '
              f'инженером от 14.10.2021г при СПО штанг (ПМШ 62х21 либо аналог). Опрессовать ПВО на '

@@ -68,12 +68,12 @@ class TabWidget(QTabWidget):
         super().__init__()
         self.addTab(TabPage_SO(self), 'Перфорация')
 
-class PerforationWindow(MyWindow):
+class PerforationWindow(QMainWindow):
 
 
     def __init__(self, table_widget, ins_ind, parent=None):
         from open_pz import CreatePZ
-        super(MyWindow, self).__init__(parent)
+        super(QMainWindow, self).__init__(parent)
 
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)

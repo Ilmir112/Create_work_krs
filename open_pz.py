@@ -1123,8 +1123,9 @@ class CreatePZ:
             self.perforation_correct_window2 = None
             CreatePZ.definition_plast_work(self)
 
-        if CreatePZ.work_plan == 'gnkt_frez':
-            plan_work = Work_with_gnkt.create_excel_file(self, ws)
+
+
+
 
         if len(CreatePZ.plast_work) == 0:
             perf_true_quest = QMessageBox.question(self, 'Программа',
@@ -1178,6 +1179,21 @@ class CreatePZ:
             CreatePZ.bvo = True
         # print(f'БВО {CreatePZ.bvo}')
         # print(CreatePZ.cat_P_1, CreatePZ.cat_H2S_list)
+
+        # if CreatePZ.work_plan == 'gnkt_frez':
+        #     if self.rir_window is None:
+        #         CreatePZ.countAcid = 0
+        #         print(f' окно2 СКО ')
+        #         self.rir_window = Work_with_gnkt(ws)
+        #         self.rir_window.setGeometry(200, 400, 300, 400)
+        #         self.rir_window.show()
+        #         CreatePZ.pause_app(self)
+        #         CreatePZ.pause = True
+        #         self.rir_window = None
+        #     else:
+        #         self.rir_window.close()  # Close window.
+        #         self.rir_window is None
+
         if CreatePZ.work_plan != 'gnkt_frez':
             print(f'план работ {CreatePZ.work_plan}')
             plan.delete_rows_pz(self, ws)

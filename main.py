@@ -7,7 +7,7 @@ from openpyxl.reader.excel import load_workbook
 import krs
 import time
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu, QMenuBar, QAction, QTableWidget, \
-    QLineEdit, QFileDialog, QToolBar, QPushButton, QMessageBox, QInputDialog
+    QLineEdit, QFileDialog, QToolBar, QPushButton, QMessageBox, QInputDialog, QTabWidget
 from PyQt5 import QtCore, QtWidgets
 from datetime import datetime
 from openpyxl.utils import get_column_letter
@@ -21,6 +21,8 @@ from H2S import calc_H2S
 from PyQt5.QtCore import QThread, pyqtSignal
 from data_correct_position_people import CorrectSignaturesWindow
 from data_base.work_with_base import Classifier_well
+from work_py.gnkt_frez import Work_with_gnkt
+
 
 class ExcelWorker(QThread):
     finished = pyqtSignal()
@@ -311,44 +313,47 @@ class MyWindow(QMainWindow):
         from open_pz import CreatePZ
         action = self.sender()
         if action == self.create_KRS:
-            self.tableWidgetOpen()
+            self.work_plan = 'krs'
+            self.tableWidgetOpen(self.work_plan)
             self.fname, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
                                                                "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
             if self.fname:
                 try:
-                    self.work_plan = 'krs'
+
                     CreatePZ.pause = True
                     sheet = CreatePZ.open_excel_file(self, self.fname, self.work_plan)
 
-                    self.copy_pz(sheet)
+                    self.copy_pz(sheet, self.table_widget)
 
                 except FileNotFoundError:
                     print('Файл не найден')
         elif action == self.create_KRS_DP:
-            self.tableWidgetOpen()
+            self.work_plan = 'dop_plan'
+            self.tableWidgetOpen(self.work_plan)
             self.fname, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
                                                                "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
             if self.fname:
                 try:
-                    self.work_plan = 'dop_plan'
+
                     CreatePZ.pause = True
                     sheet = CreatePZ.open_excel_file(self, self.fname, self.work_plan)
 
-                    self.copy_pz(sheet)
+                    self.copy_pz(sheet, self.table_widget)
 
                 except FileNotFoundError:
                     print('Файл не найден')
 
         elif action == self.create_GNKT_OPZ:
-            self.tableWidgetOpen()
+            self.work_plan = 'gnkt_opz'
+            self.tableWidgetOpen(self.work_plan)
 
             self.fname, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',"Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
 
             if self.fname:
                 try:
-                    self.work_plan = 'gnkt_opz'
+
                     sheet = CreatePZ.open_excel_file(self, self.fname, self.work_plan)
-                    self.copy_pz(sheet)
+                    self.copy_pz(sheet, self.table_widget)
 
                 except FileNotFoundError:
                     print('Файл не найден')
@@ -357,15 +362,20 @@ class MyWindow(QMainWindow):
                 #     open_pz.open_excel_file().wb.save("test_unmerge.xlsx")
 
         elif action == self.create_GNKT_frez:
-            self.tableWidgetOpen()
+            self.work_plan = 'gnkt_frez'
+            self.tableWidgetOpen(self.work_plan)
 
             self.fname, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
                                                                   "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
 
             if self.fname:
                 try:
-                    self.work_plan = 'gnkt_frez'
+
                     sheet = CreatePZ.open_excel_file(self, self.fname, self.work_plan)
+                    self.rir_window = Work_with_gnkt(sheet, self.tabWidget, self.table_widget, self.table_title)
+
+                    CreatePZ.pause_app(self)
+                    CreatePZ.pause = True
                     # self.copy_pz(sheet)
 
                 except FileNotFoundError:
@@ -517,19 +527,29 @@ class MyWindow(QMainWindow):
 
 
 
-    def tableWidgetOpen(self):
+    def tableWidgetOpen(self, work_plan = 'krs'):
+
         if self.table_widget is None:
+
+            # Создание объекта TabWidget
+            self.tabWidget = QTabWidget()
+
+
             self.table_widget = QTableWidget()
+
 
             self.table_widget.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
             self.table_widget.customContextMenuRequested.connect(self.openContextMenu)
-            self.setCentralWidget(self.table_widget)
+            self.setCentralWidget(self.tabWidget)
             self.model = self.table_widget.model()
 
             # Этот сигнал испускается всякий раз, когда ячейка в таблице нажата.
             # Указанная строка и столбец - это ячейка, которая была нажата.
             self.table_widget.cellPressed[int, int].connect(self.clickedRowColumn)
-
+            self.tabWidget.addTab(self.table_widget, 'Ход работ')
+            if work_plan == 'gnkt_frez':
+                self.table_title = QTableWidget()
+                self.tabWidget.addTab(self.table_title, 'Ход работ')
     def saveFileDialog(self, wb2):
         from open_pz import CreatePZ
         fileName, _ = QFileDialog.getSaveFileName(self, "Save excel-file", "", "Excel Files (*.xls)")
@@ -538,133 +558,135 @@ class MyWindow(QMainWindow):
 
     def save_to_excel(self):
         from open_pz import CreatePZ
-        if not self.table_widget is None:
-            wb2 = Workbook()
-            ws2 = wb2.get_sheet_by_name('Sheet')
-            ws2.title = "План работ"
-            # print(f'открытие wb2')
 
-            ins_ind = self.ins_ind_border
+        if self.work_plan != 'gnkt_frez':
+            if not self.table_widget is None:
+                wb2 = Workbook()
+                ws2 = wb2.get_sheet_by_name('Sheet')
+                ws2.title = "План работ"
+                # print(f'открытие wb2')
 
-            # print(f'открытие wb2 - {ins_ind}')
+                ins_ind = self.ins_ind_border
 
-            merged_cells = []  # Список индексов объединения ячеек
+                # print(f'открытие wb2 - {ins_ind}')
 
-            work_list = []
-            for row in range(self.table_widget.rowCount()):
-                row_lst = []
-                # self.ins_ind_border += 1
-                for column in range(self.table_widget.columnCount()):
-                    if self.table_widget.rowSpan(row, column) > 1 or self.table_widget.columnSpan(row, column) > 1:
-                        merged_cells.append((row, column))
-                    item = self.table_widget.item(row, column)
-                    if not item is None:
-                        if 'Нормы времени' in item.text():
-                            ins_ind = row
-                        row_lst.append(item.text())
-                        # print(item.text())
+                merged_cells = []  # Список индексов объединения ячеек
+
+                work_list = []
+                for row in range(self.table_widget.rowCount()):
+                    row_lst = []
+                    # self.ins_ind_border += 1
+                    for column in range(self.table_widget.columnCount()):
+                        if self.table_widget.rowSpan(row, column) > 1 or self.table_widget.columnSpan(row, column) > 1:
+                            merged_cells.append((row, column))
+                        item = self.table_widget.item(row, column)
+                        if not item is None:
+                            if 'Нормы времени' in item.text():
+                                ins_ind = row
+                            row_lst.append(item.text())
+                            # print(item.text())
+                        else:
+                            row_lst.append("")
+
+                    work_list.append(row_lst)
+
+                merged_cells_dict = {}
+                # print(f' индекс объ {ins_ind}')
+                for row in merged_cells:
+                    if row[0] >= ins_ind-1:
+                        merged_cells_dict.setdefault(row[0], []).append(row[1])
+                plan_short = ''
+
+                for i in range(2, len(work_list)):  # нумерация работ
+                    if i >= ins_ind+2:
+                        work_list[i][1] = i - 1 - ins_ind
+                        if krs.is_number(work_list[i][11]) == True:
+                            CreatePZ.normOfTime += float(str(work_list[i][11]).replace(',', '.'))
+                        if work_list[i][0]:
+                            plan_short += f'п.{work_list[i][1]} {work_list[i][0]} \n'
+
+                print(f'Нормы времени - {CreatePZ.normOfTime}')
+                # print(f'строки {ins_ind}')
+                CreatePZ.count_row_height(self.ws, ws2, work_list, merged_cells_dict, ins_ind)
+                # print(f'3 - {ws2.max_row}')
+                CreatePZ.itog_ind_min = self.ins_ind_border
+                CreatePZ.itog_ind_max = len(work_list)
+                # print(f' длина {len(work_list)}')
+                CreatePZ.addItog(self, ws2, self.table_widget.rowCount() + 1)
+                # print(f'45- {ws2.max_row}')
+                for row_ind, row in enumerate(ws2.iter_rows(values_only=True)):
+
+                    if 15 < row_ind < 100:
+                        if all(cell in [None, ''] for cell in row) \
+                                and ('Интервалы темпа' not in str(ws2.cell(row=row_ind, column=2).value) \
+                                     and 'Замечания к эксплуатационному периоду' not in str(
+                                    ws2.cell(row=row_ind, column=2).value) \
+                                     and 'Замечания к эксплуатационному периоду' not in str(
+                                    ws2.cell(row=row_ind - 2, column=2).value)):
+                            # print(row_ind, ('Интервалы темпа' not in str(ws2.cell(row=row_ind, column=2).value)),
+                            #       str(ws2.cell(row=row_ind, column=2).value))
+                            ws2.row_dimensions[row_ind + 1].hidden = True
+                    for col, value in enumerate(row):
+                        if 'Зуфаров' in str(value):
+                            coordinate = f'{get_column_letter(col - 2)}{row_ind - 2}'
+                            self.insert_image(ws2, 'imageFiles/Зуфаров.png', coordinate)
+                        elif 'М.К.Алиев' in str(value):
+                            coordinate = f'{get_column_letter(col - 1)}{row_ind - 1}'
+                            self.insert_image(ws2, 'imageFiles/Алиев махир.png', coordinate)
+                        elif 'З.К. Алиев' in str(value):
+                            coordinate = f'{get_column_letter(col - 1)}{row_ind - 1}'
+                            self.insert_image(ws2, 'imageFiles/Алиев Заур.png', coordinate)
+                            break
+
+
+                self.create_short_plan(wb2, plan_short)
+
+                # print(f'9 - {ws2.max_row}')
+                if self.work_plan != 'dop_plan':
+                    self.insert_image(ws2, 'imageFiles/Хасаншин.png', 'H1')
+                    self.insert_image(ws2, 'imageFiles/Шамигулов.png', 'H4')
+
+                    if 2 in CreatePZ.cat_H2S_list or 1 in CreatePZ.cat_H2S_list and self.work_plan != 'dop_plan':
+                        ws3 = wb2.create_sheet('Sheet1')
+                        ws3.title = "Расчет необходимого количества поглотителя H2S"
+                        ws3 = wb2["Расчет необходимого количества поглотителя H2S"]
+                        calc_H2S(ws3, CreatePZ.H2S_pr, CreatePZ.H2S_mg)
                     else:
-                        row_lst.append("")
-
-                work_list.append(row_lst)
-
-            merged_cells_dict = {}
-            # print(f' индекс объ {ins_ind}')
-            for row in merged_cells:
-                if row[0] >= ins_ind-1:
-                    merged_cells_dict.setdefault(row[0], []).append(row[1])
-            plan_short = ''
-
-            for i in range(2, len(work_list)):  # нумерация работ
-                if i >= ins_ind+2:
-                    work_list[i][1] = i - 1 - ins_ind
-                    if krs.is_number(work_list[i][11]) == True:
-                        CreatePZ.normOfTime += float(str(work_list[i][11]).replace(',', '.'))
-                    if work_list[i][0]:
-                        plan_short += f'п.{work_list[i][1]} {work_list[i][0]} \n'
-
-            print(f'Нормы времени - {CreatePZ.normOfTime}')
-            # print(f'строки {ins_ind}')
-            CreatePZ.count_row_height(self.ws, ws2, work_list, merged_cells_dict, ins_ind)
-            # print(f'3 - {ws2.max_row}')
-            CreatePZ.itog_ind_min = self.ins_ind_border
-            CreatePZ.itog_ind_max = len(work_list)
-            # print(f' длина {len(work_list)}')
-            CreatePZ.addItog(self, ws2, self.table_widget.rowCount() + 1)
-            # print(f'45- {ws2.max_row}')
-            for row_ind, row in enumerate(ws2.iter_rows(values_only=True)):
-
-                if 15 < row_ind < 100:
-                    if all(cell in [None, ''] for cell in row) \
-                            and ('Интервалы темпа' not in str(ws2.cell(row=row_ind, column=2).value) \
-                                 and 'Замечания к эксплуатационному периоду' not in str(
-                                ws2.cell(row=row_ind, column=2).value) \
-                                 and 'Замечания к эксплуатационному периоду' not in str(
-                                ws2.cell(row=row_ind - 2, column=2).value)):
-                        # print(row_ind, ('Интервалы темпа' not in str(ws2.cell(row=row_ind, column=2).value)),
-                        #       str(ws2.cell(row=row_ind, column=2).value))
-                        ws2.row_dimensions[row_ind + 1].hidden = True
-                for col, value in enumerate(row):
-                    if 'Зуфаров' in str(value):
-                        coordinate = f'{get_column_letter(col - 2)}{row_ind - 2}'
-                        self.insert_image(ws2, 'imageFiles/Зуфаров.png', coordinate)
-                    elif 'М.К.Алиев' in str(value):
-                        coordinate = f'{get_column_letter(col - 1)}{row_ind - 1}'
-                        self.insert_image(ws2, 'imageFiles/Алиев махир.png', coordinate)
-                    elif 'З.К. Алиев' in str(value):
-                        coordinate = f'{get_column_letter(col - 1)}{row_ind - 1}'
-                        self.insert_image(ws2, 'imageFiles/Алиев Заур.png', coordinate)
-                        break
-
-
-            self.create_short_plan(wb2, plan_short)
-
-            # print(f'9 - {ws2.max_row}')
-            if self.work_plan != 'dop_plan':
-                self.insert_image(ws2, 'imageFiles/Хасаншин.png', 'H1')
-                self.insert_image(ws2, 'imageFiles/Шамигулов.png', 'H4')
-
-                if 2 in CreatePZ.cat_H2S_list or 1 in CreatePZ.cat_H2S_list and self.work_plan != 'dop_plan':
-                    ws3 = wb2.create_sheet('Sheet1')
-                    ws3.title = "Расчет необходимого количества поглотителя H2S"
-                    ws3 = wb2["Расчет необходимого количества поглотителя H2S"]
-                    calc_H2S(ws3, CreatePZ.H2S_pr, CreatePZ.H2S_mg)
-                else:
-                    print(f'{CreatePZ.cat_H2S_list} Расчет поглотителя сероводорода не требуется')
+                        print(f'{CreatePZ.cat_H2S_list} Расчет поглотителя сероводорода не требуется')
 
 
 
-            ws2.print_area = f'B1:L{self.table_widget.rowCount() + 45}'
-            ws2.page_setup.fitToPage = True
-            ws2.page_setup.fitToHeight = False
-            ws2.page_setup.fitToWidth = True
-            ws2.print_options.horizontalCentered = True
-            # зададим размер листа
-            ws2.page_setup.paperSize = ws2.PAPERSIZE_A4
-            # содержимое по ширине страницы
-            ws2.sheet_properties.pageSetUpPr.fitToPage = True
-            ws2.page_setup.fitToHeight = False
+                ws2.print_area = f'B1:L{self.table_widget.rowCount() + 45}'
+                ws2.page_setup.fitToPage = True
+                ws2.page_setup.fitToHeight = False
+                ws2.page_setup.fitToWidth = True
+                ws2.print_options.horizontalCentered = True
+                # зададим размер листа
+                ws2.page_setup.paperSize = ws2.PAPERSIZE_A4
+                # содержимое по ширине страницы
+                ws2.sheet_properties.pageSetUpPr.fitToPage = True
+                ws2.page_setup.fitToHeight = False
 
-            path = 'D:\Documents\Desktop\ГТМ'
-            filenames = f"{CreatePZ.well_number} {CreatePZ.well_area} кат {CreatePZ.cat_P_1} {self.work_plan}.xlsx"
-            full_path = path + '/' + filenames
-            # print(f'10 - {ws2.max_row}')
-            # print(wb2.path)
-            print(f' кате {CreatePZ.cat_P_1}')
-            if 1 in CreatePZ.cat_P_1 or 1 in CreatePZ.cat_H2S_list or 1 in CreatePZ.cat_gaz_f_pr:
-                ws5 = wb2.create_sheet('Sheet1')
-                ws5.title = "Схемы ПВО"
-                ws5 = wb2["Схемы ПВО"]
-                wb2.move_sheet(ws5, offset=-2)
-                schema_list = self.check_pvo_schema(ws5, ins_ind+2)
+                path = 'D:\Documents\Desktop\ГТМ'
+                filenames = f"{CreatePZ.well_number} {CreatePZ.well_area} кат {CreatePZ.cat_P_1} {self.work_plan}.xlsx"
+                full_path = path + '/' + filenames
+                # print(f'10 - {ws2.max_row}')
+                # print(wb2.path)
+                print(f' кате {CreatePZ.cat_P_1}')
+                if 1 in CreatePZ.cat_P_1 or 1 in CreatePZ.cat_H2S_list or 1 in CreatePZ.cat_gaz_f_pr:
+                    ws5 = wb2.create_sheet('Sheet1')
+                    ws5.title = "Схемы ПВО"
+                    ws5 = wb2["Схемы ПВО"]
+                    wb2.move_sheet(ws5, offset=-2)
+                    schema_list = self.check_pvo_schema(ws5, ins_ind+2)
 
 
-            if wb2:
-                wb2.close()
-                wb2.save(full_path)
-                print(f"Table data saved to Excel {full_path} {CreatePZ.number_dp}")
-            if self.wb:
-                self.wb.close()
+                if wb2:
+                    wb2.close()
+                    wb2.save(full_path)
+                    print(f"Table data saved to Excel {full_path} {CreatePZ.number_dp}")
+                if self.wb:
+                    self.wb.close()
 
 
 
@@ -1162,6 +1184,9 @@ class MyWindow(QMainWindow):
             CreatePZ.pause_app(self)
             CreatePZ.pause = True
             self.rir_window = None
+        else:
+            self.rir_window.close()  # Close window.
+            self.rir_window is None
 
     def grpWithPaker(self):
         from work_py.grp import grpPaker
@@ -1611,21 +1636,22 @@ class MyWindow(QMainWindow):
 
         self.populate_row(self.ins_ind, self.perforation_list)
 
-    def copy_pz(self, sheet):
-        from gnkt_opz import gnkt_work
+    def copy_pz(self, sheet, table_widget, count_col = 12, work_plan = 'krs', list_page = 1):
+
         from krs import work_krs
         rows = sheet.max_row
         merged_cells = sheet.merged_cells
 
-        self.table_widget.setRowCount(rows)
-        self.table_widget.setColumnCount(12)
+        table_widget.setRowCount(rows)
+        table_widget.setColumnCount(count_col)
         rowHeights_exit = [sheet.row_dimensions[i + 1].height if sheet.row_dimensions[i + 1].height is not None else 18
                            for i in range(sheet.max_row)]
-        # print(f' Объединенны {merged_cells}')
+        print(rowHeights_exit)
+        print(f' Объединенны {merged_cells}')
         for row in range(1, rows + 2):
             if row > 1 and row < rows - 1:
-                self.table_widget.setRowHeight(row, int(rowHeights_exit[row]))
-            for col in range(1, 12 + 1):
+                table_widget.setRowHeight(row, int(rowHeights_exit[row]))
+            for col in range(1, count_col + 1):
                 if not sheet.cell(row=row, column=col).value is None:
                     if isinstance(sheet.cell(row=row, column=col).value, float) and row > 25:
                         cell_value = str(round(sheet.cell(row=row, column=col).value, 2))
@@ -1633,6 +1659,7 @@ class MyWindow(QMainWindow):
                         cell_value = sheet.cell(row=row, column=col).value.strftime('%d.%m.%Y')
                     else:
                         cell_value = str(sheet.cell(row=row, column=col).value)
+                        # print(cell_value)
                     cell = sheet[f'{get_column_letter(col + 1)}{row + 1}']
                     cell_style = cell._style
 
@@ -1640,18 +1667,27 @@ class MyWindow(QMainWindow):
                     # item.setData(10, cell_style)
                     # item.setData(10, cell_style)
 
-                    self.table_widget.setItem(row - 1, col - 1, item)
+                    table_widget.setItem(row - 1, col - 1, item)
                     # Проверяем, является ли текущая ячейка объединенной
                     for merged_cell in merged_cells:
                         if row in range(merged_cell.min_row, merged_cell.max_row + 1) and \
                                 col in range(merged_cell.min_col, merged_cell.max_col + 1):
                             # Устанавливаем количество объединяемых строк и столбцов для текущей ячейки
-                            self.table_widget.setSpan(row - 1, col - 1,
+                            table_widget.setSpan(row - 1, col - 1,
                                                       merged_cell.max_row - merged_cell.min_row + 1,
                                                       merged_cell.max_col - merged_cell.min_col + 1)
 
-        if self.work_plan != 'gnkt_opz':
-            self.populate_row(self.table_widget.rowCount(), work_krs(self, self.work_plan))
+        if work_plan == 'krs':
+            self.populate_row(table_widget.rowCount(), work_krs(self, self.work_plan))
+        
+        if work_plan == 'gnkt_frez' and list_page == 2:
+            colWidth = [2.28515625, 13.0, 4.5703125, 13.0, 13.0, 13.0, 5.7109375, 13.0, 13.0, 13.0, 4.7109375,
+                        13.0, 5.140625, 13.0, 13.0, 13.0, 13.0, 13.0, 4.7109375, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0,
+                        13.0,
+                        13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0,
+                        13.0, 13.0, 13.0, 5.42578125, 13.0, 4.5703125, 2.28515625, 10.28515625]
+            for column in range(table_widget.columnCount()):
+                table_widget.setColumnWidth(column, int(colWidth[column]))  # Здесь задайте требуемую ширину столбца
 
 
 
@@ -1870,8 +1906,6 @@ class MyWindow(QMainWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-
-
     window = MyWindow()
     window.show()
     sys.exit(app.exec_())
