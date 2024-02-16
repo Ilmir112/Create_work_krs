@@ -4,12 +4,12 @@ from PyQt5.QtGui import QRegExpValidator, QColor, QPalette
 from main import MyWindow
 import re
 
+
 class FloatLineEdit(QLineEdit):
     def __init__(self, parent=None):
         super(FloatLineEdit, self).__init__(parent)
 
         # Устанавливаем валидатор для проверки на float
-
 
         reg = QRegExp("[0-9.отсут]*")
         pValidator = QRegExpValidator(self)
@@ -193,7 +193,6 @@ class TabPage_SO(QWidget):
         else:
             self.pump_ECN_depth_posle_EditType.setText('отсут')
 
-
         self.paker_do_Label = QLabel('Спущенный пакер')
         self.paker_do_EditType = QLineEdit(self)
         self.paker_do_EditType.setText(f'{self.ifNone(CreatePZ.paker_do["do"])}')
@@ -247,9 +246,6 @@ class TabPage_SO(QWidget):
         self.dict_sucker_rod = CreatePZ.dict_sucker_rod
         self.dict_sucker_rod_po = CreatePZ.dict_sucker_rod_po
 
-
-
-
         grid = QGridLayout(self)
         grid.addWidget(self.column_direction_diametr_Label, 0, 0)
         grid.addWidget(self.column_direction_diametr_Edit, 1, 0)
@@ -269,7 +265,6 @@ class TabPage_SO(QWidget):
         grid.addWidget(self.level_cement_conductor_Label, 2, 4)
         grid.addWidget(self.level_cement_conductor_Edit, 3, 4)
 
-
         grid.addWidget(self.columnLabel, 8, 0)
         grid.addWidget(self.columnType, 9, 0)
         grid.addWidget(self.column_wall_thicknessLabel, 8, 1)
@@ -286,7 +281,6 @@ class TabPage_SO(QWidget):
         grid.addWidget(self.head_column_add_EditType2, 9, 6)
         grid.addWidget(self.shoe_column_addLabel, 8, 7)
         grid.addWidget(self.shoe_column_add_EditType2, 9, 7)
-
 
         grid.addWidget(self.bottomhole_drill_Label, 10, 0)
         grid.addWidget(self.bottomhole_drill_EditType, 11, 0)
@@ -358,8 +352,8 @@ class TabPage_SO(QWidget):
                 lenght_line_edit = QLineEdit(self)
                 lenght_line_edit.setText(str(self.ifNone(lenght)))
 
-                grid.addWidget(nkt_line_edit, 22+n, 1)
-                grid.addWidget(lenght_line_edit, 22+n, 2)
+                grid.addWidget(nkt_line_edit, 22 + n, 1)
+                grid.addWidget(lenght_line_edit, 22 + n, 2)
 
                 # Переименование атрибута
                 setattr(self, f"{nkt}_{n}_line", nkt_line_edit)
@@ -383,7 +377,6 @@ class TabPage_SO(QWidget):
         if len(self.dict_sucker_rod) != 0:
             n = 1
             for sucker, lenght in self.dict_sucker_rod.items():
-
                 sucker_rod_line_edit = QLineEdit(self)
                 sucker_rod_line_edit.setText(str(self.ifNone(sucker)))
 
@@ -479,10 +472,6 @@ class TabPage_SO(QWidget):
             grid.addWidget(sucker_rod_po_line_edit, 28, 5)
             grid.addWidget(lenght_sucker_po_line_edit, 28, 6)
 
-
-
-
-
     def ifNone(self, string):
 
         if str(string) in ['0', str(None), '-']:
@@ -490,15 +479,18 @@ class TabPage_SO(QWidget):
         elif str(string).replace('.', '').replace(',', '').isdigit():
 
             # print(str(round(float(string), 1))[-1] == '0', int(string), float(string))
-            return int(float(string)) if str(round(float(str(string).replace(',', '.')), 1))[-1] == "0" else\
+            return int(float(string)) if str(round(float(str(string).replace(',', '.')), 1))[-1] == "0" else \
                 round(float(str(string).replace(',', '.')), 1)
         else:
             return str(string)
+
     def updateLabel(self):
         # self.dinamic_level_Label
         self.columnType.setText()
         self.column_addEditType.setText()
         self.update()
+
+
 class TabWidget(QTabWidget):
     def __init__(self):
         super().__init__()
@@ -512,12 +504,11 @@ class DataWindow(QMainWindow):
 
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
-        self.setWindowModality(QtCore.Qt.ApplicationModal) # Устанавливаем модальность окна
+        self.setWindowModality(QtCore.Qt.ApplicationModal)  # Устанавливаем модальность окна
 
         self.tabWidget = TabWidget()
         # self.tableWidget = QTableWidget(0, 4)
         # self.labels_nkt = labels_nkt
-
 
         self.buttonAdd = QPushButton('сохранить данные')
         self.buttonAdd.clicked.connect(self.addRowTable)
@@ -549,7 +540,7 @@ class DataWindow(QMainWindow):
         max_expected_pressure = self.tabWidget.currentWidget().max_expected_pressure_EditType.text()
         max_admissible_pressure = self.tabWidget.currentWidget().max_admissible_pressure_EditType.text()
 
-        column_direction_diametr =  self.tabWidget.currentWidget().column_direction_diametr_Edit.text()
+        column_direction_diametr = self.tabWidget.currentWidget().column_direction_diametr_Edit.text()
         column_direction_wall_thickness = self.tabWidget.currentWidget().column_direction_wall_thickness_Edit.text()
         column_direction_lenght = self.tabWidget.currentWidget().column_direction_lenght_Edit.text()
         level_cement_direction = self.tabWidget.currentWidget().level_cement_direction_Edit.text()
@@ -591,8 +582,8 @@ class DataWindow(QMainWindow):
         self.dict_nkt_po = CreatePZ.dict_nkt_po
         if self.dict_nkt:
             for key in range(1, len(self.dict_nkt)):
-               CreatePZ.dict_nkt[self.tabWidget.currentWidget().labels_nkt[key][0].text()] = self.if_None(
-                   self.tabWidget.currentWidget().labels_nkt[key][1].text())
+                CreatePZ.dict_nkt[self.tabWidget.currentWidget().labels_nkt[key][0].text()] = self.if_None(
+                    self.tabWidget.currentWidget().labels_nkt[key][1].text())
         else:
             if self.tabWidget.currentWidget().labels_nkt[1][1].text():
                 CreatePZ.dict_nkt[self.tabWidget.currentWidget().labels_nkt[1][0].text()] = self.if_None(
@@ -606,7 +597,7 @@ class DataWindow(QMainWindow):
         else:
             if self.tabWidget.currentWidget().labels_nkt_po[1][1].text():
                 CreatePZ.dict_nkt[self.tabWidget.currentWidget().labels_nkt_po[1][0].text()] = self.if_None(
-                       self.tabWidget.currentWidget().labels_nkt_po[1][1].text())
+                    self.tabWidget.currentWidget().labels_nkt_po[1][1].text())
 
         if self.dict_sucker_rod:
             for key in range(1, len(self.dict_sucker_rod)):
@@ -620,161 +611,174 @@ class DataWindow(QMainWindow):
 
         if self.dict_sucker_rod.items():
             for key in range(1, len(self.dict_sucker_rod.items())):
-                CreatePZ.dict_sucker_rod_po[self.tabWidget.currentWidget().labels_sucker_po[key][0].text()] = self.if_None(
+                CreatePZ.dict_sucker_rod_po[
+                    self.tabWidget.currentWidget().labels_sucker_po[key][0].text()] = self.if_None(
                     self.tabWidget.currentWidget().labels_sucker_po[key][1].text())
         else:
             if self.tabWidget.currentWidget().labels_sucker_po[1][1].text():
-                CreatePZ.dict_sucker_rod_po[self.tabWidget.currentWidget().labels_sucker_po[1][0].text()] = self.if_None(
+                CreatePZ.dict_sucker_rod_po[
+                    self.tabWidget.currentWidget().labels_sucker_po[1][0].text()] = self.if_None(
                     self.tabWidget.currentWidget().labels_sucker_po[1][1].text())
 
         close_file = True
-
-        if self.ifNum(columnType) is False \
-                or self.ifNum(column_wall_thickness) is False \
-                or self.ifNum(shoe_column) is False \
-                or self.ifNum(column_additional_diametr) is False \
-                or self.ifNum(column_additional_wall_thickness) is False \
-                or self.ifNum(shoe_column_additional) is False \
-                or self.ifNum(head_column_additional) is False \
-                or self.ifNum(bottomhole_artificial) is False \
-                or self.ifNum(bottomhole_drill) is False \
-                or self.ifNum(current_bottom) is False \
-                or self.ifNum(max_angle) is False \
-                or self.ifNum(max_admissible_pressure) is False \
-                or self.ifNum(max_expected_pressure) is False \
-                or self.ifNum(dict_pump_ECN_h_do) is False\
-                or self.ifNum(static_level) is False \
-                or self.ifNum(static_level) is False \
-                or self.ifNum(dinamic_level) is False\
-                or self.ifNum(dict_pump_ECN_h_posle) is False \
-                or self.ifNum(dict_pump_SHGN_h_do) is False \
-                or self.ifNum(dict_pump_SHGN_h_posle) is False \
-                or self.ifNum(H_F_paker_do) is False \
-                or self.ifNum(H_F_paker_posle) is False \
-                or self.ifNum(H_F_paker2_do) is False \
-                or self.ifNum(H_F_paker2_posle) is False \
-                or self.ifNum(column_direction_diametr) is False\
-                or self.ifNum(column_direction_wall_thickness) is False \
-                or self.if_string_list(level_cement_direction) is False \
-                or self.ifNum(column_conductor_diametr) is False \
-                or self.ifNum(column_conductor_wall_thickness) is False \
-                or self.if_string_list(column_conductor_lenght) is False \
-                or self.if_string_list(column_direction_lenght) is False \
-                or self.if_string_list(level_cement_conductor) is False\
-                or any(['НВ' in dict_pump_SHGN_do.upper(), 'ШГН' in dict_pump_SHGN_do.upper(),
-                    'НН' in dict_pump_SHGN_do.upper(), dict_pump_SHGN_do == 'отсут',
-                        'RHAM' in dict_pump_SHGN_do]) is False\
-                or any(['НВ' in dict_pump_SHGN_posle.upper(), 'ШГН' in dict_pump_SHGN_posle.upper(),
-                       'НН' in dict_pump_SHGN_posle.upper(), dict_pump_SHGN_posle == 'отсут',
-                        'RHAM' in dict_pump_SHGN_do]) is False \
-                or any(['ЭЦН' in dict_pump_ECN_posle.upper(), 'ВНН' in dict_pump_ECN_posle.upper(),
-                        dict_pump_ECN_posle == 'отсут']) is False \
-                or (dict_pump_ECN_do != 'отсут' and dict_pump_ECN_h_do == 'отсут') \
-                or (dict_pump_ECN_posle != 'отсут' and dict_pump_ECN_h_posle == 'отсут') \
-                or (dict_pump_SHGN_do != 'отсут' and dict_pump_SHGN_h_do == 'отсут') \
-                or (dict_pump_SHGN_posle != 'отсут' and dict_pump_SHGN_h_posle == 'отсут') \
-                or (paker_do != 'отсут' and H_F_paker_do == 'отсут') \
-                or (paker_posle != 'отсут' and H_F_paker_posle == 'отсут') \
-                or (paker2_do != 'отсут' and H_F_paker2_do == 'отсут') \
-                or (paker2_posle != 'отсут' and H_F_paker2_posle == 'отсут') \
-                or any(['ЭЦН' in dict_pump_ECN_do.upper(), 'ВНН' in dict_pump_ECN_do.upper(),
-                        dict_pump_ECN_do == 'отсут']) is False:
+        print(f'голова {[self.ifNum(columnType), self.ifNum(column_wall_thickness), self.ifNum(shoe_column)]}')
+        if any([data_well == 'отсут' for data_well in
+                [columnType, column_wall_thickness, shoe_column]]):
+            msg = QMessageBox.information(self, 'Внимание', 'Не все поля в данных колонне соответствуют значениям')
+            close_file = False
+        elif CreatePZ.column_additional \
+                and any([data_well == 'отсут' for data_well in
+                     [column_additional_diametr,
+                      column_additional_wall_thickness,
+                      shoe_column_additional, head_column_additional]]):
+            msg = QMessageBox.information(self, 'Внимание', 'Не все поля в доп колонне соответствуют значениям')
+            close_file = False
+        elif self.ifNum(bottomhole_artificial) is False \
+           or self.ifNum(bottomhole_drill) is False \
+           or self.ifNum(current_bottom) is False \
+           or self.ifNum(max_angle) is False \
+           or self.ifNum(max_admissible_pressure) is False \
+           or self.ifNum(max_expected_pressure) is False \
+           or self.ifNum(dict_pump_ECN_h_do) is False \
+           or self.ifNum(static_level) is False \
+           or self.ifNum(static_level) is False \
+           or self.ifNum(dinamic_level) is False \
+           or self.ifNum(dict_pump_ECN_h_posle) is False \
+           or self.ifNum(dict_pump_SHGN_h_do) is False \
+           or self.ifNum(dict_pump_SHGN_h_posle) is False \
+           or self.ifNum(H_F_paker_do) is False \
+           or self.ifNum(H_F_paker_posle) is False \
+           or self.ifNum(H_F_paker2_do) is False \
+           or self.ifNum(H_F_paker2_posle) is False \
+           or self.ifNum(column_direction_diametr) is False \
+           or self.ifNum(column_direction_wall_thickness) is False \
+           or self.if_string_list(level_cement_direction) is False \
+           or self.ifNum(column_conductor_diametr) is False \
+           or self.ifNum(column_conductor_wall_thickness) is False:
+           # or self.if_string_list(column_conductor_lenght) is False \
+           # or self.if_string_list(column_direction_lenght) is False \
+           # or self.if_string_list(level_cement_conductor) is False:
 
             msg = QMessageBox.information(self, 'Внимание', 'Не все поля соответствуют значениям')
-            return
+            close_file = False
+
+        elif any(['НВ' in dict_pump_SHGN_do.upper(), 'ШГН' in dict_pump_SHGN_do.upper(),
+                  'НН' in dict_pump_SHGN_do.upper(), dict_pump_SHGN_do == 'отсут',
+                  'RHAM' in dict_pump_SHGN_do]) is False \
+             or any(['НВ' in dict_pump_SHGN_posle.upper(), 'ШГН' in dict_pump_SHGN_posle.upper(),
+                     'НН' in dict_pump_SHGN_posle.upper(), dict_pump_SHGN_posle == 'отсут',
+                     'RHAM' in dict_pump_SHGN_do]) is False \
+             or any(['ЭЦН' in dict_pump_ECN_posle.upper(), 'ВНН' in dict_pump_ECN_posle.upper(),
+                     dict_pump_ECN_posle == 'отсут']) is False \
+             or (dict_pump_ECN_do != 'отсут' and dict_pump_ECN_h_do == 'отсут') \
+             or (dict_pump_ECN_posle != 'отсут' and dict_pump_ECN_h_posle == 'отсут') \
+             or (dict_pump_SHGN_do != 'отсут' and dict_pump_SHGN_h_do == 'отсут') \
+             or (dict_pump_SHGN_posle != 'отсут' and dict_pump_SHGN_h_posle == 'отсут') \
+             or (paker_do != 'отсут' and H_F_paker_do == 'отсут') \
+             or (paker_posle != 'отсут' and H_F_paker_posle == 'отсут') \
+             or (paker2_do != 'отсут' and H_F_paker2_do == 'отсут') \
+             or (paker2_posle != 'отсут' and H_F_paker2_posle == 'отсут') \
+             or any(['ЭЦН' in dict_pump_ECN_do.upper(), 'ВНН' in dict_pump_ECN_do.upper(),
+                     dict_pump_ECN_do == 'отсут']) is False:
+
+            msg = QMessageBox.information(self, 'Внимание', 'Не все поля соответствуют значениям')
+            close_file = False
 
         elif self.if_None(20 if self.ifNum(head_column_additional) else head_column_additional) < 5:
-            # print(self.if_None(head_column_additional))
+        # print(self.if_None(head_column_additional))
             msg = QMessageBox.information(self, 'Внимание', 'В скважине отсутствует доп колонна')
+            close_file = False
+
+        elif all([pump for pump in [self.ifNum(dict_pump_ECN_do), self.ifNum(paker2_do),
+                                               self.ifNum(dict_pump_SHGN_do), self.ifNum(paker_do)]]):
+            voronka_question = QMessageBox.question(self, 'Внимание',
+                                                    'Программа определила что в скважине до ремонта воронка, верно ли')
+            if voronka_question == QMessageBox.StandardButton.No:
+                close_file = False
+            else:
+                close_file = True
+
+        elif all([pump for pump in [self.ifNum(dict_pump_ECN_posle), self.ifNum(paker2_posle),
+                                               self.ifNum(dict_pump_SHGN_posle), self.ifNum(paker_posle)]]):
+
+            voronka_question = QMessageBox.question(self, 'Внимание',
+                                                    'Программа определила что в скважине После ремонта воронка, верно ли')
+            if voronka_question == QMessageBox.StandardButton.No:
+                close_file = False
+            else:
+                close_file = True
+
+        if close_file is False:
             return
+        elif close_file == True:
+            CreatePZ.column_diametr = self.if_None(columnType)
+            CreatePZ.column_wall_thickness = self.if_None(column_wall_thickness)
+            CreatePZ.shoe_column = self.if_None(shoe_column)
+            CreatePZ.column_additional_diametr = self.if_None(column_additional_diametr)
+            CreatePZ.column_additional_wall_thickness = self.if_None(column_additional_wall_thickness)
+            CreatePZ.shoe_column_additional = self.if_None(shoe_column_additional)
+            CreatePZ.head_column_additional = self.if_None(head_column_additional)
 
-        else:
-            # print(dict_pump_ECN_do, paker2_do, dict_pump_SHGN_do, paker_do)
-            if all(['отсут' == pump for pump in [dict_pump_ECN_do, paker2_do, dict_pump_SHGN_do, paker_do]]):
-                voronka_question = QMessageBox.question(self, 'Внимание',
-                                           'Программа определила что в скважине до ремонта воронка, верно ли')
-                if voronka_question == QMessageBox.StandardButton.No:
-                    close_file = False
-                else:
-                    close_file = True
-            elif all(['отсут' == pump for pump in [dict_pump_ECN_posle, paker2_posle, dict_pump_SHGN_posle, paker_posle]]):
-                voronka_question = QMessageBox.question(self, 'Внимание',
-                                           'Программа определила что в скважине После ремонта воронка, верно ли')
-                if voronka_question == QMessageBox.StandardButton.No:
-                    close_file = False
-                else:
-                    close_file = True
+            CreatePZ.bottomhole_drill = self.if_None(bottomhole_drill)
+            CreatePZ.bottomhole_artificial = self.if_None(bottomhole_artificial)
+            CreatePZ.current_bottom = self.if_None(current_bottom)
+            CreatePZ.max_angle = self.if_None(max_angle)
+            CreatePZ.max_expected_pressure = self.if_None(max_expected_pressure)
+            CreatePZ.max_admissible_pressure = self.if_None(max_admissible_pressure)
 
-            if close_file == True:
-                CreatePZ.column_diametr = self.if_None(columnType)
-                CreatePZ.column_wall_thickness = self.if_None(column_wall_thickness)
-                CreatePZ.shoe_column = self.if_None(shoe_column)
-                CreatePZ.column_additional_diametr = self.if_None(column_additional_diametr)
-                CreatePZ.column_additional_wall_thickness = self.if_None(column_additional_wall_thickness)
-                CreatePZ.shoe_column_additional = self.if_None(shoe_column_additional)
-                CreatePZ.head_column_additional = self.if_None(head_column_additional)
+            # print(f'макс {CreatePZ.max_expected_pressure}')
+            CreatePZ.dict_pump_SHGN["do"] = self.if_None(dict_pump_SHGN_do)
+            CreatePZ.dict_pump_SHGN_h["do"] = self.if_None(dict_pump_SHGN_h_do)
+            CreatePZ.dict_pump_SHGN_h["posle"] = self.if_None(dict_pump_SHGN_h_posle)
+            CreatePZ.dict_pump_SHGN["posle"] = self.if_None(dict_pump_SHGN_posle)
 
-                CreatePZ.bottomhole_drill = self.if_None(bottomhole_drill)
-                CreatePZ.bottomhole_artificial =  self.if_None(bottomhole_artificial)
-                CreatePZ.current_bottom =  self.if_None(current_bottom)
-                CreatePZ.max_angle =  self.if_None(max_angle)
-                CreatePZ.max_expected_pressure = self.if_None(max_expected_pressure)
-                CreatePZ.max_admissible_pressure = self.if_None(max_admissible_pressure)
+            CreatePZ.dict_pump_ECN["do"] = self.if_None(dict_pump_ECN_do)
+            CreatePZ.dict_pump_ECN_h["do"] = self.if_None(dict_pump_ECN_h_do)
+            CreatePZ.dict_pump_ECN["posle"] = self.if_None(dict_pump_ECN_posle)
+            CreatePZ.dict_pump_ECN_h["posle"] = self.if_None(dict_pump_ECN_h_posle)
 
-                # print(f'макс {CreatePZ.max_expected_pressure}')
-                CreatePZ.dict_pump_SHGN["do"] = self.if_None(dict_pump_SHGN_do)
-                CreatePZ.dict_pump_SHGN_h["do"] = self.if_None(dict_pump_SHGN_h_do)
-                CreatePZ.dict_pump_SHGN_h["posle"] = self.if_None(dict_pump_SHGN_h_posle)
-                CreatePZ.dict_pump_SHGN["posle"] = self.if_None(dict_pump_SHGN_posle)
+            CreatePZ.paker_do["do"] = self.if_None(paker_do)
+            CreatePZ.H_F_paker_do["do"] = self.if_None(H_F_paker_do)
+            CreatePZ.paker_do["posle"] = self.if_None(paker_posle)
+            CreatePZ.H_F_paker_do["posle"] = self.if_None(H_F_paker_posle)
 
-                CreatePZ.dict_pump_ECN["do"] = self.if_None(dict_pump_ECN_do)
-                CreatePZ.dict_pump_ECN_h["do"] = self.if_None(dict_pump_ECN_h_do)
-                CreatePZ.dict_pump_ECN["posle"] = self.if_None(dict_pump_ECN_posle)
-                CreatePZ.dict_pump_ECN_h["posle"] = self.if_None(dict_pump_ECN_h_posle)
+            CreatePZ.paker2_do["do"] = self.if_None(paker2_do)
+            CreatePZ.H_F_paker2_do["do"] = self.if_None(H_F_paker2_do)
+            CreatePZ.paker2_do["posle"] = self.if_None(paker2_posle)
+            CreatePZ.H_F_paker2_do["posle"] = self.if_None(H_F_paker2_posle)
+            CreatePZ.static_level = self.if_None(static_level)
+            CreatePZ.dinamic_level = self.if_None(dinamic_level)
+            # print(f' после ок {CreatePZ.dict_pump, CreatePZ.paker_do, CreatePZ.H_F_paker_do, CreatePZ.dict_pump_h}')
 
-                CreatePZ.paker_do["do"] = self.if_None(paker_do)
-                CreatePZ.H_F_paker_do["do"] = self.if_None(H_F_paker_do)
-                CreatePZ.paker_do["posle"] = self.if_None(paker_posle)
-                CreatePZ.H_F_paker_do["posle"] = self.if_None(H_F_paker_posle)
+            CreatePZ.column_direction_diametr = self.if_None(column_direction_diametr)
+            CreatePZ.column_direction_wall_thickness = self.if_None(column_direction_wall_thickness)
+            CreatePZ.column_direction_lenght = self.if_None(column_direction_lenght)
+            CreatePZ.level_cement_direction = self.if_None(level_cement_direction)
+            CreatePZ.column_conductor_diametr = self.if_None(column_conductor_diametr)
+            CreatePZ.column_conductor_wall_thickness = self.if_None(column_conductor_wall_thickness)
+            CreatePZ.column_conductor_lenght = self.if_None(column_conductor_lenght)
+            CreatePZ.level_cement_conductor = self.if_None(level_cement_conductor)
 
-                CreatePZ.paker2_do["do"] = self.if_None(paker2_do)
-                CreatePZ.H_F_paker2_do["do"] = self.if_None(H_F_paker2_do)
-                CreatePZ.paker2_do["posle"] = self.if_None(paker2_posle)
-                CreatePZ.H_F_paker2_do["posle"] = self.if_None(H_F_paker2_posle)
-                CreatePZ.static_level = self.if_None(static_level)
-                CreatePZ.dinamic_level = self.if_None(dinamic_level)
-                # print(f' после ок {CreatePZ.dict_pump, CreatePZ.paker_do, CreatePZ.H_F_paker_do, CreatePZ.dict_pump_h}')
-
-                CreatePZ.column_direction_diametr = self.if_None(column_direction_diametr)
-                CreatePZ.column_direction_wall_thickness = self.if_None(column_direction_wall_thickness)
-                CreatePZ.column_direction_lenght = self.if_None(column_direction_lenght)
-                CreatePZ.level_cement_direction = self.if_None(level_cement_direction)
-                CreatePZ.column_conductor_diametr = self.if_None(column_conductor_diametr)
-                CreatePZ.column_conductor_wall_thickness = self.if_None(column_conductor_wall_thickness)
-                CreatePZ.column_conductor_lenght = self.if_None(column_conductor_lenght)
-                CreatePZ.level_cement_conductor = self.if_None(level_cement_conductor)
-
-                CreatePZ.pause = False
-                self.close()
-
+            CreatePZ.pause = False
+            self.close()
 
 
     def if_None(self, value):
-
         if value is None or 'отс' in str(value).lower() or value == '-' or str(value) == 0:
             return 0
         elif isinstance(value, int):
             return int(value)
-        elif str(value).replace('.','').replace(',','').isdigit():
+        elif str(value).replace('.', '').replace(',', '').isdigit():
 
-            if str(round(float(value.replace(',','.')), 1))[-1] == "0":
+            if str(round(float(value.replace(',', '.')), 1))[-1] == "0":
 
-                return int(float(value.replace(',','.')))
+                return int(float(value.replace(',', '.')))
             else:
 
-                return round(float(value.replace(',','.')), 1)
+                return round(float(value.replace(',', '.')), 1)
         else:
             return value
+
 
     def if_string_list(self, string):
         try:
@@ -790,16 +794,17 @@ class DataWindow(QMainWindow):
                 return True
             else:
                 return False
-    def ifNum(self, string):
 
+
+    def ifNum(self, string):
         if str(string) == "['0']":
             return False
         elif str(string) == 'отсут':
             return True
 
 
-        elif str(string).replace('.','').replace(',','').isdigit():
-            if float(string.replace(',','.')) < 5000:
+        elif str(string).replace('.', '').replace(',', '').isdigit():
+            if float(string.replace(',', '.')) < 5000:
                 return True
             else:
                 return False

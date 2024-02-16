@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QInputDialog
 from main import MyWindow
-from work_py.rir import perf_new
+from work_py.rir import RirWindow
 
 
 def vp(self):
@@ -97,7 +97,7 @@ def vp(self):
         ]
 
     CreatePZ.current_bottom = vp_depth - 3
-    perf_new(self, vp_depth, CreatePZ.current_bottom)
+    RirWindow.perf_new(self, vp_depth, CreatePZ.current_bottom)
     return vp_list
 
 

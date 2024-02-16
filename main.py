@@ -484,14 +484,21 @@ class MyWindow(QMainWindow):
 
     def open_without_damping(self, costumer, region):
 
-        self.tableDampingWidgetOpen()
+        if self.new_window is None:
 
-        copy = Classifier_well.open_to_sqlite_without_juming(self, self.table_juming, costumer, region)
+            self.new_window = Classifier_well(costumer, region, 'damping')
+            self.new_window.setWindowTitle("Перечень скважин без глушения")
+            self.new_window.setGeometry(200, 400, 300, 400)
+            self.new_window.show()
+
+        else:
+            self.new_window.close()  # Close window.
+            self.new_window = None  # Discard reference.
 
     def open_class_well(self, costumer, region):
         if self.new_window is None:
 
-            self.new_window = Classifier_well()
+            self.new_window = Classifier_well(costumer, region, 'classifier_well')
             self.new_window.setWindowTitle("Классификатор")
             self.new_window.setGeometry(200, 400, 300, 400)
             self.new_window.show()
@@ -573,7 +580,7 @@ class MyWindow(QMainWindow):
         from open_pz import CreatePZ
 
         if self.work_plan != 'gnkt_frez':
-            self.save_to_krs(self)
+            self.save_to_krs()
         else:
             from work_py.gnkt_frez import Work_with_gnkt
             Work_with_gnkt.save_to_gnkt(self)
@@ -581,6 +588,7 @@ class MyWindow(QMainWindow):
 
 
     def save_to_krs(self):
+        from open_pz import CreatePZ
         if not self.table_widget is None:
             wb2 = Workbook()
             ws2 = wb2.get_sheet_by_name('Sheet')
@@ -685,7 +693,8 @@ class MyWindow(QMainWindow):
             ws2.sheet_properties.pageSetUpPr.fitToPage = True
             ws2.page_setup.fitToHeight = False
 
-            path = 'workiii'
+            # path = 'workiii'
+            path = 'D:\Documents\Desktop\ГТМ'
             filenames = f"{CreatePZ.well_number} {CreatePZ.well_area} кат {CreatePZ.cat_P_1} {self.work_plan}.xlsx"
             full_path = path + '/' + filenames
             # print(f'10 - {ws2.max_row}')
@@ -826,6 +835,7 @@ class MyWindow(QMainWindow):
         print("Работа с файлом Excel завершена.")
     def insert_image(self, ws, file, coordinate, width = 200, height = 180):
         # Загружаем изображение с помощью библиотеки Pillow
+        print(f'vtcnj {file}')
         img = openpyxl.drawing.image.Image(file)
         img.width = width
         img.height = height
@@ -1408,7 +1418,7 @@ class MyWindow(QMainWindow):
         self.populate_row(self.ins_ind, template_ek_list, self.table_widget)
         CreatePZ.ins_ind += len(template_ek_list) + 1
 
-    def populate_row(self, ins_ind, work_list):
+    def populate_row(self, ins_ind, work_list, table_widget):
         # print(type(table_widget))
         text_width_dict = {20: (0, 100), 40: (101, 200), 60: (201, 300), 80: (301, 400), 100: (401, 500),
                            120: (501, 600), 140: (601, 700), 160: (701, 800), 180: (801, 1500)}
@@ -1435,7 +1445,7 @@ class MyWindow(QMainWindow):
                 if column == 2:
                     if not data is None:
                         text = data
-                        print(text)
+                        # print(text)
                         for key, value in text_width_dict.items():
                             if value[0] <= len(text) <= value[1]:
                                 text_width = key
@@ -1608,8 +1618,8 @@ class MyWindow(QMainWindow):
                 elif CreatePZ.perforation_sole >= interval[1] and CreatePZ.dict_perforation[plast][
                     "отключение"] == False:
                     CreatePZ.perforation_sole = interval[1]
-                elif CreatePZ.perforation_roof_all <= interval[0]:
-                    CreatePZ.perforation_roof_all = interval[0]
+                # elif CreatePZ.perforation_roof_all <= interval[0]:
+                #     CreatePZ.perforation_roof_all = interval[0]
                 break
 
         if self.perforation_correct_window2 is None:

@@ -151,7 +151,7 @@ class CreatePZ(QMainWindow):
         self.ws = ws
         self.data_window = data_window
         self.perforation_correct_window2 = perforation_correct_window2
-        print(ws)
+
 
 
 
@@ -277,10 +277,10 @@ class CreatePZ(QMainWindow):
                             CreatePZ.column_direction_diametr, _ = \
                                 QInputDialog.getInt(self, 'Направление', 'Введите внешний диаметр направления',
                                                     324, 0, 500)
-                            column_direction_wall_thickness, _ = \
+                            CreatePZ.column_direction_wall_thickness, _ = \
                                 QInputDialog.getDouble(self, 'Направление', 'Введите толшину стенки направления',
                                                     11, 0, 20)
-                            column_direction_wall_thickness, _ = \
+                            CreatePZ.column_direction_lenght, _ = \
                                 QInputDialog.getInt(self, 'Направление', 'Введите башмак направления',
                                                     0, 0, 700)
                     elif 'Кондуктор' in str(value) and \
@@ -301,7 +301,7 @@ class CreatePZ(QMainWindow):
                             CreatePZ.column_conductor_wall_thickness, _ = \
                                 QInputDialog.getDouble(self, 'Кондуктор', 'Введите толшину стенки Кондуктор',
                                                     9, 0, 20)
-                            CreatePZ.column_conductor_wall_thickness, _ = \
+                            CreatePZ.column_conductor_lenght, _ = \
                                 QInputDialog.getInt(self, 'Кондуктор', 'Введите башмак Кондуктор',
                                                     0, 0, 700)
                     elif any(['Кондуктор' in str(value) for value in row]):
@@ -871,9 +871,9 @@ class CreatePZ(QMainWindow):
                     lst.insert(5, 'отключен')
                 if all([str(i).strip() == 'None' or i is None for i in lst]) == False:
                     perforations_intervals.append(lst)
-        # print(f' интервалы {perforations_intervals}')
-        for ind, row in enumerate(perforations_intervals):
-            # print(row)
+        print(f' интервалы {perforations_intervals}')
+        for ind, row in enumerate(sorted(perforations_intervals, key = lambda x: x[2])):
+            print(row)
             # krovlya_perf = float(row[2])
 
             # print(f'кровля ПВР {krovlya_perf}')
@@ -1023,6 +1023,11 @@ class CreatePZ(QMainWindow):
             CreatePZ.pause_app(self)
             CreatePZ.pause = True
             self.data_window = None
+
+        if CreatePZ.shoe_column < CreatePZ.current_bottom and CreatePZ.column_additional is False:
+            CreatePZ.open_trunk_well = True
+        elif CreatePZ.shoe_column_additional < CreatePZ.current_bottom and CreatePZ.column_additional:
+            CreatePZ.open_trunk_well = True
 
         curator_list = ['ОР', 'ГТМ', 'ГРР', 'ГО', 'ВНС']
         curator = ['ГТМ'

@@ -63,6 +63,7 @@ class TabPage_SO(QWidget):
         if CreatePZ.column_additional is False or \
                 (CreatePZ.column_additional and CreatePZ.current_bottom < CreatePZ.head_column_additional):
             self.template_select_list = ['ПСШ ЭК', 'ПСШ открытый ствол', 'ПСШ без хвоста']
+
             self.template_Combo.addItems(self.template_select_list)
             template_key = self.definition_pssh()
             self.template_Combo.setCurrentIndex(self.template_select_list.index(template_key))
@@ -128,6 +129,7 @@ class TabPage_SO(QWidget):
         self.lenght_template_first_Edit.setText(str(2))
 
         roof_plast, roof_add_column_plast = self.definition_roof_not_raiding()
+        print(f'')
         dictance_template_first = int(CreatePZ.current_bottom - roof_plast + 5)
         self.dictance_template_first_Edit.setText(str(dictance_template_first))
         self.skm_Edit.setText(str(CreatePZ.column_diametr))
@@ -144,13 +146,7 @@ class TabPage_SO(QWidget):
 
     def definition_pssh(self):
         from open_pz import CreatePZ
-
-        roof_skm = 0
-        print((CreatePZ.column_additional is False and CreatePZ.open_trunk_well is False and all(
-            [CreatePZ.dict_perforation[plast]['отрайбировано'] for plast in CreatePZ.plast_work]) is False) or \
-              (CreatePZ.column_additional is True and float(CreatePZ.current_bottom) <= float(
-                  CreatePZ.head_column_additional) and all(
-                  [CreatePZ.dict_perforation[plast]['отрайбировано'] for plast in CreatePZ.plast_work]) is False))
+        print(f'{CreatePZ.column_additional, CreatePZ.open_trunk_well}  открытый ствол')
         if CreatePZ.column_additional is False and CreatePZ.open_trunk_well is False and all(
                 [CreatePZ.dict_perforation[plast]['отрайбировано'] for plast in CreatePZ.plast_work]) is False:
             template_key = 'ПСШ ЭК'
@@ -189,21 +185,21 @@ class TabPage_SO(QWidget):
 
     def update_template(self):
         from open_pz import CreatePZ
-        if self.template_first_Edit.text() != None:
+        if self.template_first_Edit.text() != '':
             first_template = self.template_first_Edit.text()
-        if self.lenght_template_first_Edit.text() != None:
+        if self.lenght_template_first_Edit.text() != '':
             lenght_template_first = self.lenght_template_first_Edit.text()
-        if self.template_second_Edit.text() != None:
+        if self.template_second_Edit.text() != '':
             template_second = self.template_second_Edit.text()
-        if self.lenght_template_second_Edit.text() != None:
+        if self.lenght_template_second_Edit.text() != '':
             lenght_template_second = self.lenght_template_second_Edit.text()
-        if self.skm_Edit.text() != None:
+        if self.skm_Edit.text() != '':
             skm = self.skm_Edit.text()
-        if self.dictance_template_first_Edit.text() != None:
+        if self.dictance_template_first_Edit.text() != '':
             dictance_template_first = self.dictance_template_first_Edit.text()
-        if self.dictance_template_second_Edit.text() != None:
+        if self.dictance_template_second_Edit.text() != '':
             dictance_template_second = int(float(self.dictance_template_second_Edit.text()))
-        if self.dictance_three_Edit.text() != None:
+        if self.dictance_three_Edit.text() != '':
             dictance_three = int(float(self.dictance_three_Edit.text()))
         nkt_diam = CreatePZ.nkt_diam
 
@@ -536,16 +532,17 @@ class TabPage_SO(QWidget):
         from open_pz import CreatePZ
         dict_perforation = CreatePZ.dict_perforation
         plast_all = list(dict_perforation.keys())
-
+        roof_plast = CreatePZ.current_bottom
         if CreatePZ.column_additional is False or (
                 CreatePZ.column_additional and CreatePZ.head_column_additional >= CreatePZ.current_bottom):
             for plast in plast_all:
                 roof = min(list(map(lambda x: x[0], list(dict_perforation[plast]['интервал']))))
 
                 if dict_perforation[plast]['отрайбировано']:
-                    roof_plast = CreatePZ.current_bottom
+
                     roof_add_column_plast = roof_plast
                 else:
+                    print(f'кровля {roof_plast}')
                     roof_plast = min(list(map(lambda x: x[0], list(dict_perforation[plast]['интервал']))))
                     roof_add_column_plast = roof_plast
                     break

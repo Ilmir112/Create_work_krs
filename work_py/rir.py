@@ -134,7 +134,7 @@ class RirWindow(QMainWindow):
         vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
 
-    def rir_rpp(self, paker_need_Combo, plastCombo, roof_rir_Edit, sole_rir_Edit):
+    def rir_rpp(self, paker_need_Combo, plastCombo, roof_rir_Edit):
         from open_pz import CreatePZ
         from work_py.opressovka import paker_list
 
@@ -176,7 +176,7 @@ class RirWindow(QMainWindow):
           None, None, None, None, None, None, None,
           'Мастер КРС, подрядчик РИР, УСРСиСТ', 0.5+0.6],
          [f'установка РПП на {roof_rir_Edit}м', None,
-          f'Произвести установку глухого пакера по технологическому плану подрядчика по РИР силами подрядчика по РИР '
+          f'Произвести установку глухого пакера  для изоляции {plastCombo} по технологическому плану подрядчика по РИР силами подрядчика по РИР '
           f'с установкой пакера  на глубине {roof_rir_Edit}м',
           None, None, None, None, None, None, None,
           'Мастер КРС, подрядчик РИР, УСРСиСТ', 8],
@@ -198,7 +198,7 @@ class RirWindow(QMainWindow):
             rir_list.append(row)
 
         CreatePZ.current_bottom = roof_rir_Edit
-        self.perf_new(roof_rir_Edit, CreatePZ.current_bottom)
+        self.perf_new(roof_rir_Edit, roof_rir_Edit + 1)
         return rir_list
 
 
