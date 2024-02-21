@@ -31,8 +31,9 @@ def gno_down(self):
 
          None,
          f'Спустить подземное оборудование  согласно расчету и карте спуска ЦДНГ '
-         f'НКТ{gno_nkt_opening(CreatePZ.dict_nkt_po)}мм с пакером {CreatePZ.paker_do["posle"]} '
-         f'на глубину {CreatePZ.H_F_paker_do["posle"]}м, воронку на глубину {sum(CreatePZ.dict_nkt_po.values())}м. НКТ '
+         f'НКТ с пакером {CreatePZ.paker_do["posle"]} '
+         f'на глубину {CreatePZ.H_F_paker_do["posle"]}м, воронку на глубину {sum(CreatePZ.dict_nkt_po.values())}м. '
+         f'(Компоновку НКТ{gno_nkt_opening(CreatePZ.dict_nkt_po)}м) '
          f'прошаблонировать для проведения ГИС.',
          None, None, None, None, None, None, None,
          'мастер КРС', descentNKT_norm(sum(CreatePZ.dict_nkt_po.values()),1.2)],

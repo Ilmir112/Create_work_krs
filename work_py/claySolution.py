@@ -28,7 +28,7 @@ def claySolutionDef(self):
     pero_list = [
         [f'СПО {pero_select(self, rirSole)}  на тНКТ{nkt_diam}мм до {rirSole}м', None,
          f'Спустить {pero_select(self, rirSole)}  на тНКТ{nkt_diam}мм до глубины {rirSole}м с замером, шаблонированием '
-         f'шаблоном. \n'
+         f'шаблоном {CreatePZ.nkt_template}мм. \n'
          f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
          None, None, None, None, None, None, None,
          'мастер КРС',descentNKT_norm(rirSole, 1)],

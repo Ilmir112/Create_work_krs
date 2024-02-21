@@ -179,36 +179,36 @@ class AcidPakerWindow(MyWindow):
         if (CreatePZ.column_additional == False and swabTrueEditType == True) or (CreatePZ.column_additional == True \
                                                                                   and pakerEdit < CreatePZ.head_column_additional and swabTrueEditType == True):
             paker_select = f'воронку + НКТ{CreatePZ.nkt_diam}мм {khvostEdit}м + пакер ПРО-ЯМО-{paker_diametr}мм (либо аналог) ' \
-                           f'для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм + НКТ{CreatePZ.nkt_diam} 10м + репер'
-            self.dict_nkt = {73: float(khvostEdit) + float(pakerEdit)}
+                           f'для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм + НКТ{CreatePZ.nkt_diam}мм 10м + репер'
+            self.dict_nkt = {CreatePZ.nkt_diam: float(khvostEdit) + float(pakerEdit)}
 
         elif CreatePZ.column_additional == True and float(CreatePZ.column_additional_diametr) < 110 and \
                 pakerEdit > CreatePZ.head_column_additional and swabTrueEditType == True:
             paker_select = f'воронку + НКТ{60}мм {float(khvostEdit)}м + пакер ПРО-ЯМО-{paker_diametr_select(float(pakerEdit))}мм (либо аналог) ' \
                            f'для ЭК {float(CreatePZ.column_additional_diametr)}мм х {CreatePZ.column_additional_wall_thickness}мм + НКТ60мм 10м + репер'
-            self.dict_nkt = {73: CreatePZ.head_column_additional,
+            self.dict_nkt = {CreatePZ.nkt_diam: CreatePZ.head_column_additional,
                         60: int(float(pakerEdit) + float(khvostEdit) - float(CreatePZ.head_column_additional))}
         elif CreatePZ.column_additional == True and float(CreatePZ.column_additional_diametr) > 110 and pakerEdit > CreatePZ.head_column_additional and swabTrueEditType == True:
             paker_select = f'воронку + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками {float(khvostEdit)}м + пакер ПРО-ЯМО-{paker_diametr}мм (либо аналог) ' \
                            f'для ЭК {float(CreatePZ.column_additional_diametr)}мм х {CreatePZ.column_additional_wall_thickness}мм + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками 10м'
-            self.dict_nkt = {73: float(pakerEdit) + float(khvostEdit)}
+            self.dict_nkt = {CreatePZ.nkt_diam: float(pakerEdit) + float(khvostEdit)}
         elif (CreatePZ.column_additional == False and swabTrueEditType == False) or (
                 CreatePZ.column_additional == True
                 and pakerEdit < float(CreatePZ.head_column_additiona) and swabTrueEditType == False):
-            paker_select = f'Заглушку + щелевой фильтр + НКТ{CreatePZ.nkt_diam}м {float(khvostEdit)}м + пакер ПРО-ЯМО-{paker_diametr}мм (либо аналог) ' \
+            paker_select = f'Заглушку + щелевой фильтр + НКТ{CreatePZ.nkt_diam}мм {float(khvostEdit)}м + пакер ПРО-ЯМО-{paker_diametr}мм (либо аналог) ' \
                            f'для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм + НКТ 10м + сбивной клапан с ввертышем'
-            self.dict_nkt = {73: float(pakerEdit) + float(khvostEdit)}
+            self.dict_nkt = {CreatePZ.nkt_diam: float(pakerEdit) + float(khvostEdit)}
             # print(f' 5 {CreatePZ.column_additional == False, (CreatePZ.column_additional == True and pakerEdit < CreatePZ.head_column_additional), swabTrueEditType == False}')
         elif CreatePZ.column_additional == True or (float(CreatePZ.column_additional_diametr) < 110 and (
                 pakerEdit > CreatePZ.head_column_additional) and swabTrueEditType == False):
             paker_select = f'Заглушку + щелевой фильтр + НКТ{60}мм {float(khvostEdit)}м + пакер ПРО-ЯМО-{paker_diametr}мм (либо аналог) ' \
                            f'для ЭК {float(CreatePZ.column_additional_diametr)}мм х {CreatePZ.column_additional_wall_thickness}мм + НКТ60мм 10м + сбивной клапан с ввертышем'
-            self.dict_nkt = {73: float(CreatePZ.head_column_additional), 60: int(pakerEdit - float(CreatePZ.head_column_additional))}
+            self.dict_nkt = {CreatePZ.nkt_diam: float(CreatePZ.head_column_additional), 60: int(pakerEdit - float(CreatePZ.head_column_additional))}
         elif CreatePZ.column_additional == True and float(CreatePZ.column_additional_diametr) > 110 and pakerEdit > float(CreatePZ.head_column_additional) \
                 and swabTrueEditType == False:
             paker_select = f'Заглушку + щелевой фильтр + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками {khvostEdit}м + пакер ПРО-ЯМО-{paker_diametr}мм (либо аналог) ' \
                            f'для ЭК {float(CreatePZ.column_additional_diametr)}мм х {CreatePZ.column_additional_wall_thickness}мм + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками 10м + сбивной клапан с ввертышем'
-            self.dict_nkt = {73: float(pakerEdit) + float(khvostEdit)}
+            self.dict_nkt = {CreatePZ.nkt_diam: float(pakerEdit) + float(khvostEdit)}
 
         elif CreatePZ.nkt_diam == 60:
             self.dict_nkt = {60: float(pakerEdit) + float(khvostEdit)}
@@ -216,7 +216,7 @@ class AcidPakerWindow(MyWindow):
         paker_list = [
             [None, None,
              f'Спустить {paker_select} на НКТ{CreatePZ.nkt_diam}мм до глубины {pakerEdit}м, воронкой до {pakerEdit + khvostEdit}м'
-             f' с замером, шаблонированием шаблоном. {("Произвести пробную посадку на глубине 50м" if CreatePZ.column_additional == False else "")} '
+             f' с замером, шаблонированием шаблоном {CreatePZ.nkt_template}мм. {("Произвести пробную посадку на глубине 50м" if CreatePZ.column_additional == False else "")} '
                 ,
              None, None, None, None, None, None, None,
              'мастер КРС', descentNKT_norm(pakerEdit, 1.2)],

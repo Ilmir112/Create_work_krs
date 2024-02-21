@@ -59,7 +59,7 @@ class TabPage_SO(QWidget):
 
         index_interval = 1
         for plast in plast_all:
-            for index, (roof, sole) in enumerate(self.dict_perforation[plast]["интервал"]):
+            for index, (roof, sole) in enumerate(list(sorted(self.dict_perforation[plast]["интервал"], key =lambda x:x[0]))):
                 # print(index_interval, (roof, sole))
 
                 plast_edit = QLineEdit(self)
@@ -147,26 +147,49 @@ class PerforationCorrect(QMainWindow):
 
 
         plast_all = list(self.dict_perforation.keys())
+        index = 0
         for plast in plast_all:
-            for index, interval in enumerate(self.dict_perforation[plast]["интервал"]):
-
+            plast_oktl = []
+            plast_templ =[]
+            plast_raid = []
+            for interval in self.dict_perforation[plast]["интервал"]:
                 if self.tabWidget.currentWidget().labels_plast[index + 1][3].currentText() == 'отключен':
-
-                    CreatePZ.dict_perforation[plast]['отключение'] is True
+                    plast_oktl.append(True)
+                    # print(f'отключ {plast, self.tabWidget.currentWidget().labels_plast[index + 1][3].currentText()}')
                 else:
-                    CreatePZ.dict_perforation[plast]['отключение'] is False
+                    plast_oktl.append(False)
+                    print(f'отключ {plast, self.tabWidget.currentWidget().labels_plast[index + 1][3].currentText()}')
+
                 if self.tabWidget.currentWidget().labels_plast[index + 1][4].currentText() == 'Прошаблонировано':
-                    CreatePZ.dict_perforation[plast]['Прошаблонировано'] is True
+                    plast_templ.append(True)
                 else:
-                    CreatePZ.dict_perforation[plast]['Прошаблонировано'] is False
+                    plast_templ.append(False)
+
                 if self.tabWidget.currentWidget().labels_plast[index + 1][5].currentText() == 'отрайбировано':
+                    plast_raid.append(True)
 
-                    CreatePZ.dict_perforation[plast]['отрайбировано'] is True
                 else:
-                    CreatePZ.dict_perforation[plast]['отрайбировано'] is False
+                    plast_raid.append(False)
 
-
-        print(f' интервалы ПВР после корректировки {CreatePZ.dict_perforation}')
+                index += 1
+            # print(f'отклю {plast, plast_oktl}')
+            # print(f'шаблон {plast, plast_templ}')
+            # print(f'райб {plast, plast_templ, all(plast_raid)}')
+            if all(plast_oktl):
+                CreatePZ.dict_perforation_short[plast]['отключение'] = True
+                CreatePZ.dict_perforation[plast]['отключение'] = True
+            else:
+                CreatePZ.dict_perforation_short[plast]['отключение'] = False
+                CreatePZ.dict_perforation[plast]['отключение'] = False
+            if all(plast_templ):
+                CreatePZ.dict_perforation[plast]['Прошаблонировано'] = True
+            else:
+                CreatePZ.dict_perforation[plast]['Прошаблонировано'] = False
+            if all(plast_raid):
+                CreatePZ.dict_perforation[plast]['отрайбировано'] = True
+            else:
+                CreatePZ.dict_perforation[plast]['отрайбировано'] = False
+        # print(f' интервалы ПВР после корректировки {CreatePZ.dict_perforation}')
 
         # self.labels_plast[index] = (plast_edit, roof_edit, sole_edit, plast_status_ComboBox,
         #                             template_status_ComboBox, raiding_status_ComboBox)

@@ -31,7 +31,8 @@ def sandFilling(self):
 
     filling_list = [
         [f'Спустить  {sand_select(self)}  на НКТ{nkt_diam}мм до глубины {round(CreatePZ.current_bottom-100,0)}м', None,
-     f' Спустить  {sand_select(self)}  на НКТ{nkt_diam}мм до глубины {round(CreatePZ.current_bottom-100,0)}м с замером, шаблонированием шаблоном. (При СПО первых десяти НКТ на '
+     f' Спустить  {sand_select(self)}  на НКТ{nkt_diam}мм до глубины {round(CreatePZ.current_bottom-100,0)}м с замером, '
+     f'шаблонированием шаблоном {CreatePZ.nkt_template}мм. (При СПО первых десяти НКТ на '
      f'спайдере дополнительно устанавливать элеватор ЭХЛ)',
      None, None, None, None, None, None, None,
      'Мастер КР', descentNKT_norm(CreatePZ.current_bottom,1)],
@@ -114,7 +115,8 @@ def sandWashing(self):
                                                 CreatePZ.current_bottom, 0, 6000, 1)
     washingOut_list = [
         [f'СПО пера до {round(CreatePZ.current_bottom,0)}м', None,
-     f' Спустить  {sand_select(self)}  на НКТ{nkt_diam}мм до глубины {round(CreatePZ.current_bottom,0)}м с замером, шаблонированием шаблоном. '
+     f' Спустить  {sand_select(self)}  на НКТ{nkt_diam}мм до глубины {round(CreatePZ.current_bottom,0)}м с замером, '
+     f'шаблонированием шаблоном {CreatePZ.nkt_template}мм. '
      f'(При СПО первых десяти НКТ на '
      f'спайдере дополнительно устанавливать элеватор ЭХЛ)',
      None, None, None, None, None, None, None,

@@ -456,7 +456,7 @@ class AcidPakerWindow(MyWindow):
         paker_list = [
             [self.paker_short, None,
              f'Спустить {self.paker_select} на НКТ{CreatePZ.nkt_diam}мм до глубины {pakerEdit}/{paker2Edit}м'
-             f' с замером, шаблонированием шаблоном. {("Произвести пробную посадку на глубине 50м" if CreatePZ.column_additional == False else "")} '
+             f' с замером, шаблонированием шаблоном {CreatePZ.nkt_template}мм. {("Произвести пробную посадку на глубине 50м" if CreatePZ.column_additional == False else "")} '
                 ,
              None, None, None, None, None, None, None,
              'мастер КРС', descentNKT_norm(pakerEdit, 1.2)],

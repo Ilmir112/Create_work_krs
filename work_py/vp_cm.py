@@ -63,6 +63,7 @@ def vp(self):
              f'Определить приемистость НЭК.',
              None, None, None, None, None, None, None,
              'мастер КРС', None]]
+        CreatePZ.current_bottom = vp_depth - 3
 
     else:
         vp_list = [
@@ -96,7 +97,7 @@ def vp(self):
 
         ]
 
-    CreatePZ.current_bottom = vp_depth - 3
+        CreatePZ.current_bottom = vp_depth-3
     RirWindow.perf_new(self, vp_depth, CreatePZ.current_bottom)
     return vp_list
 
@@ -159,5 +160,5 @@ def czh(self):
     if any([float(interval[1]) < float(vp_depth) for interval in interval_list]):
         vp_list = vp_list[:3]
 
-
+    CreatePZ.current_bottom = vp_depth
     return vp_list

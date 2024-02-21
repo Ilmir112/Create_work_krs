@@ -324,7 +324,7 @@ class MyWindow(QMainWindow):
                     read_pz = CreatePZ(self.wb, self.ws, self.data_window, self.perforation_correct_window2)
                     sheet = read_pz.open_excel_file(self.ws, self.work_plan)
 
-                    self.copy_pz(sheet, self.table_widget)
+                    self.copy_pz(sheet, self.table_widget, self.work_plan)
 
                 except FileNotFoundError:
                     print('Файл не найден')
@@ -340,7 +340,7 @@ class MyWindow(QMainWindow):
                     read_pz = CreatePZ(self.wb, self.ws, self.data_window, self.perforation_correct_window2)
                     sheet = read_pz.open_excel_file(self.ws, self.work_plan)
 
-                    self.copy_pz(sheet, self.table_widget)
+                    self.copy_pz(sheet, self.table_widget, self.work_plan)
 
                 except FileNotFoundError:
                     print('Файл не найден')
@@ -356,8 +356,10 @@ class MyWindow(QMainWindow):
                     self.read_pz(self.fname)
                     CreatePZ.pause = True
                     read_pz = CreatePZ(self.wb, self.ws, self.data_window, self.perforation_correct_window2)
+                    print(f' ГНКТ {self.work_plan}')
                     sheet = read_pz.open_excel_file(self.ws, self.work_plan)
-                    self.copy_pz(sheet, self.table_widget)
+                    self.copy_pz(sheet, self.table_widget, self.work_plan)
+
 
                 except FileNotFoundError:
                     print('Файл не найден')
@@ -549,9 +551,7 @@ class MyWindow(QMainWindow):
             # Создание объекта TabWidget
             self.tabWidget = QTabWidget()
 
-
             self.table_widget = QTableWidget()
-
 
             self.table_widget.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
             self.table_widget.customContextMenuRequested.connect(self.openContextMenu)
@@ -567,14 +567,16 @@ class MyWindow(QMainWindow):
                 self.table_schema = QTableWidget()
                 self.tabWidget.addTab(self.table_schema , 'Схема скважины')
 
+
             self.tabWidget.addTab(self.table_widget, 'Ход работ')
 
 
-    def saveFileDialog(self, wb2):
+    def saveFileDialog(self, wb2, full_path):
         from open_pz import CreatePZ
-        fileName, _ = QFileDialog.getSaveFileName(self, "Save excel-file", "", "Excel Files (*.xls)")
+        fileName, _ = QFileDialog.getSaveFileName(self, "Save excel-file",
+                                                  f"{full_path}", "Excel Files (*.xlsx)")
         if fileName:
-            wb2.save(f"{CreatePZ.well_number} {CreatePZ.well_area} {CreatePZ.cat_P_1} категории.xlsx)")
+            wb2.save(full_path)
 
     def save_to_excel(self):
         from open_pz import CreatePZ
@@ -620,7 +622,7 @@ class MyWindow(QMainWindow):
                 work_list.append(row_lst)
 
             merged_cells_dict = {}
-            # print(f' индекс объ {ins_ind}')
+            print(f' индекс объ {ins_ind}')
             for row in merged_cells:
                 if row[0] >= ins_ind - 1:
                     merged_cells_dict.setdefault(row[0], []).append(row[1])
@@ -641,7 +643,7 @@ class MyWindow(QMainWindow):
             CreatePZ.itog_ind_min = self.ins_ind_border
             CreatePZ.itog_ind_max = len(work_list)
             # print(f' длина {len(work_list)}')
-            CreatePZ.addItog(self, ws2, self.table_widget.rowCount() + 1)
+            CreatePZ.addItog(self, ws2, self.table_widget.rowCount() + 1, self.work_plan)
             # print(f'45- {ws2.max_row}')
             for row_ind, row in enumerate(ws2.iter_rows(values_only=True)):
 
@@ -709,7 +711,8 @@ class MyWindow(QMainWindow):
 
             if wb2:
                 wb2.close()
-                wb2.save(full_path)
+                self.saveFileDialog(wb2, full_path)
+                # wb2.save(full_path)
                 print(f"Table data saved to Excel {full_path} {CreatePZ.number_dp}")
             if self.wb:
                 self.wb.close()
@@ -733,7 +736,7 @@ class MyWindow(QMainWindow):
             CreatePZ.column_passability = False
             CreatePZ.column_additional_passability = False
             CreatePZ.template_depth = 0
-            CreatePZ.nkt_diam = 73
+
             CreatePZ.b_plan = 0
             CreatePZ.pipes_ind = 0
             CreatePZ.sucker_rod_ind = 0
@@ -1422,12 +1425,20 @@ class MyWindow(QMainWindow):
         # print(type(table_widget))
         text_width_dict = {20: (0, 100), 40: (101, 200), 60: (201, 300), 80: (301, 400), 100: (401, 500),
                            120: (501, 600), 140: (601, 700), 160: (701, 800), 180: (801, 1500)}
+        index_setSpan = 0
+        if self.work_plan == 'gnkt_frez':
+            index_setSpan = 1
+
+
 
         for i, row_data in enumerate(work_list):
             row = ins_ind + i
             self.table_widget.insertRow(row)
 
-            self.table_widget.setSpan(i + ins_ind, 2, 1, 8)
+            if len(str(row_data[1])) > 3 and self.work_plan == 'gnkt_frez':
+                self.table_widget.setSpan(i + ins_ind, 1, 1, 12)
+            else:
+                self.table_widget.setSpan(i + ins_ind, 2, 1, 8 + index_setSpan)
             for column, data in enumerate(row_data):
                 item = QtWidgets.QTableWidgetItem(str(data))
                 item.setFlags(item.flags() | Qt.ItemIsEditable)
@@ -1472,6 +1483,9 @@ class MyWindow(QMainWindow):
             CreatePZ.pause = True
             self.acid_windowPaker2 = None
             self.reply2_acid()
+        else:
+            self.acid_windowPaker2.close()  # Close window.
+            self.acid_windowPaker2 = None
 
     def acidPakerNewWindow(self):
         from work_py.acid_paker import AcidPakerWindow
@@ -1489,6 +1503,9 @@ class MyWindow(QMainWindow):
             CreatePZ.countAcid = 0
             self.acid_windowPaker = None
             self.reply_acid()
+        else:
+            self.acid_windowPaker.close()  # Close window.
+            self.acid_windowPaker = None
 
     def reply2_acid(self):
         from open_pz import CreatePZ
@@ -1508,8 +1525,11 @@ class MyWindow(QMainWindow):
                 CreatePZ.pause = True
                 self.acid_windowPaker2 = None
                 self.reply2_acid()
+            else:
+                self.acid_windowPaker2.close()  # Close window.
+                self.acid_windowPaker2 = None
         else:
-            if  self.acid_windowPaker2 is None:
+            if self.acid_windowPaker2 is None:
                 CreatePZ.countAcid = 2
                 print(f' окно2 СКО ')
                 self.acid_windowPaker2 = AcidPakerWindow(self.table_widget, CreatePZ.ins_ind, CreatePZ.countAcid)
@@ -1517,6 +1537,9 @@ class MyWindow(QMainWindow):
                 self.acid_windowPaker2.show()
                 CreatePZ.pause_app(self)
                 CreatePZ.pause = True
+                self.acid_windowPaker2 = None
+            else:
+                self.acid_windowPaker2.close()  # Close window.
                 self.acid_windowPaker2 = None
     def check_pvo_schema(self, ws5, ind):
         schema_pvo_set = set()
@@ -1673,13 +1696,14 @@ class MyWindow(QMainWindow):
 
         self.populate_row(self.ins_ind, self.perforation_list)
 
-    def copy_pz(self, sheet, table_widget, count_col = 12, work_plan = 'krs', list_page = 1):
+    def copy_pz(self, sheet, table_widget, work_plan = 'krs', count_col = 12, list_page = 1):
 
         from krs import work_krs
         rows = sheet.max_row
         merged_cells = sheet.merged_cells
 
         table_widget.setRowCount(rows)
+        print(count_col)
         table_widget.setColumnCount(count_col)
         rowHeights_exit = [sheet.row_dimensions[i + 1].height if sheet.row_dimensions[i + 1].height is not None else 18
                            for i in range(sheet.max_row)]
@@ -1790,16 +1814,17 @@ class MyWindow(QMainWindow):
                 pressur_set.add(f'{plast[:4]} - {filter_list_pressuar}')
 
         ws4.cell(row=6, column=1).value = f'НКТ: \n {gno_nkt_opening(CreatePZ.dict_nkt)}'
-        ws4.cell(row=7, column=1).value = f'Рпл- {" ".join(list(pressur_set))}атм'
-        ws4.cell(row=8, column=1).value = f'ЖГС = {1.02}г/см3'
+        ws4.cell(row=7, column=1).value = f'Рпл: \n {" ".join(list(pressur_set))}атм'
+        # ws4.cell(row=8, column=1).value = f'ЖГС = {CreatePZ.fluid_work_short}г/см3'
         ws4.cell(row=9, column=1).value = f'Нст- {CreatePZ.static_level}м / Ндин - {CreatePZ.dinamic_level}м'
         if CreatePZ.curator == 'ОР':
-            ws4.cell(row=10, column=1).value = f'Ожидаемые {CreatePZ.expected_Q}м3/сут при Р-{CreatePZ.expected_P}'
+            ws4.cell(row=10, column=1).value = f'Ожид {CreatePZ.expected_Q}м3/сут при Р-{CreatePZ.expected_P}м3/сут'
         else:
-            ws4.cell(row=10, column=1).value = f'Ожидаемые {CreatePZ.Qoil}т при Р-{CreatePZ.Qwater}'
-        ws4.cell(row=11, column=1).value = f'макс угол {CreatePZ.max_angle}'
+            ws4.cell(row=10, column=1).value = f'Qн {CreatePZ.Qoil}т Qж-{CreatePZ.Qwater}м3/сут'
+        ws4.cell(row=11, column=1).value = f'макс угол {CreatePZ.max_angle} на {CreatePZ.max_angle_H}'
         ws4.cell(row=1, column=2).value = CreatePZ.cdng
-        ws4.cell(row=2, column=3).value = f'Рпл - {CreatePZ.cat_P_1[0]}, H2S -{CreatePZ.cat_H2S_list[0]}, газ факт -{CreatePZ.gaz_f_pr[0]}т/м3'
+        ws4.cell(row=2, column=3).value = f'Рпл - {CreatePZ.cat_P_1[0]}, H2S -{CreatePZ.cat_H2S_list[0]},' \
+                                          f' газ факт -{CreatePZ.gaz_f_pr[0]}т/м3'
         column_well = f'{CreatePZ.column_diametr}х{CreatePZ.column_wall_thickness} в инт 0 - {CreatePZ.shoe_column}м ' \
             if CreatePZ.column_additional is False else f'{CreatePZ.column_diametr} х {CreatePZ.column_wall_thickness} \n' \
                                                f'0 - {CreatePZ.shoe_column}м/\n{CreatePZ.column_additional_diametr}' \
@@ -1837,7 +1862,7 @@ class MyWindow(QMainWindow):
 
 
         for row_ind in range(3, 15):
-            ws4.row_dimensions[row_ind].height = 40
+            ws4.row_dimensions[row_ind].height = 80
             for col in range(3, 10):
                 if row_ind == 3:
                     ws4.column_dimensions[get_column_letter(col)].width = 20

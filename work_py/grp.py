@@ -204,7 +204,7 @@ def normalization(self):
          'Мастер КРС', liftingNKT_norm(current_depth, 1)],
         [None, None,
          f'Спустить {kot_select(self)} на НКТ{CreatePZ.nkt_diam}мм до глубины текущего забоя'
-         f' с замером, шаблонированием шаблоном.',
+         f' с замером, шаблонированием шаблоном {CreatePZ.nkt_template}мм.',
          None, None, None, None, None, None, None,
          'мастер КРС', descentNKT_norm(CreatePZ.current_bottom, 1)],
         [None, None,
@@ -216,7 +216,7 @@ def normalization(self):
          None, None, None, None, None, None, None,
          'мастер КРС, предст. заказчика', None],
         [None, None,
-         f'Поднять {kot_select(self)} на НКТ{CreatePZ.nkt_diam} c глубины {current_depth}м с доливом скважины в '
+         f'Поднять {kot_select(self)} на НКТ{CreatePZ.nkt_diam}мм c глубины {current_depth}м с доливом скважины в '
          f'объеме {round(current_depth * 1.12 / 1000, 1)}м3 удельным весом {CreatePZ.fluid_work}',
          None, None, None, None, None, None, None,
          'мастер КРС', liftingNKT_norm(current_depth, 1)],

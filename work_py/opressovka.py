@@ -94,11 +94,11 @@ def paker_list(self):
     if CreatePZ.column_additional is False or CreatePZ.column_additional is True \
             and paker_depth < CreatePZ.head_column_additional:
 
-        paker_select = f'воронку + НКТ{CreatePZ.nkt_diam}м {paker_khost}м +' \
+        paker_select = f'воронку + НКТ{CreatePZ.nkt_diam}мм {paker_khost}м +' \
                        f' пакер ПРО-ЯМО-{paker_diametr}мм (либо аналог) ' \
                        f'для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм +' \
                        f' {nktOpress(self)[0]}'
-        paker_short = f'в-у + НКТ{CreatePZ.nkt_diam}м {paker_khost}м +' \
+        paker_short = f'в-у + НКТ{CreatePZ.nkt_diam}мм {paker_khost}м +' \
                        f' пакер ПРО-ЯМО-{paker_diametr}мм  +' \
                        f' {nktOpress(self)[0]}'
     elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr < 110 and \
@@ -134,7 +134,7 @@ def paker_list(self):
             [f'СПО {paker_short} до глубины {pakerDepthZumpf}', None,
              f'Спустить {paker_select} на НКТ{CreatePZ.nkt_diam}мм до глубины {pakerDepthZumpf}м,'
              f' воронкой до {pakerDepthZumpf + paker_khost}м'
-             f' с замером, шаблонированием шаблоном. {nktOpress_list[1]} '
+             f' с замером, шаблонированием шаблоном {CreatePZ.nkt_template}мм. {nktOpress_list[1]} '
              f'{("Произвести пробную посадку на глубине 50м" if CreatePZ.column_additional == False else "")} '
              f'ПРИ ОТСУТСТВИИ ЦИРКУЛЯЦИИ ПРЕДУСМОТРЕТЬ НАЛИЧИИ В КОМПОНОВКЕ УРАВНИТЕЛЬНЫХ КЛАПАНОВ ИЛИ СБИВНОГО '
              f'КЛАПАНА С ВВЕРТЫШЕМ НАД ПАКЕРОМ',
@@ -175,7 +175,7 @@ def paker_list(self):
              None, None, None, None, None, None, None,
              'мастер КРС', None],
             [None, None,
-             f'Поднять {paker_select} на НКТ{CreatePZ.nkt_diam} c глубины {paker_depth}м с доливом скважины в '
+             f'Поднять {paker_select} на НКТ{CreatePZ.nkt_diam}мм c глубины {paker_depth}м с доливом скважины в '
              f'объеме {round(paker_depth * 1.12 / 1000, 1)}м3 удельным весом {CreatePZ.fluid_work}',
              None, None, None, None, None, None, None,
              'мастер КРС', liftingNKT_norm(paker_depth, 1.2)]]
@@ -185,7 +185,7 @@ def paker_list(self):
             [f'СПо {paker_short} до глубины {paker_depth}м', None,
              f'Спустить {paker_select} на НКТ{CreatePZ.nkt_diam}мм до глубины {paker_depth}м, '
              f'воронкой до {paker_depth + paker_khost}м'
-             f' с замером, шаблонированием шаблоном. {nktOpress_list[1]} '
+             f' с замером, шаблонированием шаблоном {CreatePZ.nkt_template}мм. {nktOpress_list[1]} '
              f'{("Произвести пробную посадку на глубине 50м" if CreatePZ.column_additional == False else "")} '
              f'ПРИ ОТСУТСТВИИ ЦИРКУЛЯЦИИ ПРЕДУСМОТРЕТЬ НАЛИЧИИ В КОМПОНОВКЕ УРАВНИТЕЛЬНЫХ КЛАПАНОВ ИЛИ СБИВНОГО '
              f'КЛАПАНА С ВВЕРТЫШЕМ НАД ПАКЕРОМ',
@@ -212,7 +212,7 @@ def paker_list(self):
              None, None, None, None, None, None, None,
              'мастер КРС', None],
             [None, None,
-             f'Поднять {paker_select} на НКТ{CreatePZ.nkt_diam} c глубины {paker_depth}м с доливом скважины в '
+             f'Поднять {paker_select} на НКТ{CreatePZ.nkt_diam}мм c глубины {paker_depth}м с доливом скважины в '
              f'объеме {round(paker_depth * 1.12 / 1000, 1)}м3 удельным весом {CreatePZ.fluid_work}',
              None, None, None, None, None, None, None,
              'мастер КРС', liftingNKT_norm(paker_depth, 1.2)]]
@@ -234,7 +234,7 @@ def paker_list(self):
                     [f'СПО {paker_short} до глубины {pakerNEK}', None,
                      f'Спустить {paker_select} на НКТ{CreatePZ.nkt_diam}мм до глубины {pakerNEK}м, воронкой '
                      f'до {pakerNEK + paker_khost}м'
-                     f' с замером, шаблонированием шаблоном. {nktOpress_list[1]}'
+                     f' с замером, шаблонированием шаблоном {CreatePZ.nkt_template}мм. {nktOpress_list[1]}'
                      f' {("Произвести пробную посадку на глубине 50м" if CreatePZ.column_additional == False else "")} '
                      f'ПРИ ОТСУТСТВИИ ЦИРКУЛЯЦИИ ПРЕДУСМОТРЕТЬ НАЛИЧИИ В КОМПОНОВКЕ УРАВНИТЕЛЬНЫХ КЛАПАНОВ ИЛИ СБИВНОГО'
                      f' КЛАПАНА С ВВЕРТЫШЕМ НАД ПАКЕРОМ',

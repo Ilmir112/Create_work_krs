@@ -31,7 +31,7 @@ def swabbing_opy(self):
     paker_list = [
         [None, None,
          f'Спустить {paker_select} на НКТ{nkt_diam}мм  до глубины {CreatePZ.current_bottom}м'
-         f' с замером, шаблонированием шаблоном. ',
+         f' с замером, шаблонированием шаблоном {CreatePZ.nkt_template}мм. ',
          None, None, None, None, None, None, None,
          'мастер КРС', descentNKT_norm(CreatePZ.current_bottom, 1)],
         [None, None,
@@ -224,7 +224,7 @@ def swabbing_with_paker(self, paker_khost, pakerKompo):
         [f'СПО {paker_short} на НКТ{nkt_diam}мм до H- {paker_depth}м, воронкой до {paker_depth + paker_khost}м',
          None,
          f'Спустить {paker_select} на НКТ{nkt_diam}мм до глубины {paker_depth}м, воронкой до {paker_depth + paker_khost}м'
-         f' с замером, шаблонированием шаблоном. {("Произвести пробную посадку на глубине 50м" if CreatePZ.column_additional == False else "")} '
+         f' с замером, шаблонированием шаблоном {CreatePZ.nkt_template}мм. {("Произвести пробную посадку на глубине 50м" if CreatePZ.column_additional == False else "")} '
          f'ПРИ ОТСУТСТВИИ ЦИРКУЛЯЦИИ ПРЕДУСМОТРЕТЬ НАЛИЧИИ В КОМПОНОВКЕ УРАВНИТЕЛЬНЫХ КЛАПАНОВ',
          None, None, None, None, None, None, None,
          'мастер КРС', descentNKT_norm(paker_depth,1.2)],
@@ -394,7 +394,7 @@ def swabbing_with_2paker(self):
     paker_list = [
         [f'Спуск {paker_short} до глубины {paker1_depth}/{paker2_depth}м', None,
          f'Спустить {paker_select} на НКТ{nkt_diam}мм до глубины {paker1_depth}/{paker2_depth}м'
-         f' с замером, шаблонированием шаблоном. {("Произвести пробную посадку на глубине 50м" if CreatePZ.column_additional == False else "")} '
+         f' с замером, шаблонированием шаблоном {CreatePZ.nkt_template}мм. {("Произвести пробную посадку на глубине 50м" if CreatePZ.column_additional == False else "")} '
          f'ПРИ ОТСУТСТВИИ ЦИРКУЛЯЦИИ ПРЕДУСМОТРЕТЬ НАЛИЧИИ В КОМПОНОВКЕ УРАВНИТЕЛЬНЫХ КЛАПАНОВ',
          None, None, None, None, None, None, None,
          'мастер КРС', descentNKT_norm(paker1_depth,1.2)],
@@ -530,7 +530,7 @@ def swabbing_with_voronka(self):
     paker_list = [
         [paker_short, None,
          f'Спустить {paker_select} на НКТ{nkt_diam}мм  воронкой до {paker_depth}м'
-         f' с замером, шаблонированием шаблоном. ',
+         f' с замером, шаблонированием шаблоном {CreatePZ.nkt_template}мм. ',
          None, None, None, None, None, None, None,
          'мастер КРС', round(
             CreatePZ.current_bottom / 9.52 * 1.51 / 60 * 1.2 * 1.2 * 1.04 + 0.18 + 0.008 * paker_depth / 9.52 + 0.003 * CreatePZ.current_bottom / 9.52,

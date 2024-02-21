@@ -15,6 +15,7 @@ from openpyxl.reader.excel import load_workbook
 from openpyxl.workbook import Workbook
 
 from gnkt_data.gnkt_data import dict_saddles
+from work_py.data_informations import dict_data_cdng, calc_pntzh
 
 
 # class TabPage_SO(QWidget):
@@ -26,6 +27,7 @@ from gnkt_data.gnkt_data import dict_saddles
 #         self.addTab(TabPage_SO(self), 'Титульный лист')
 #         self.addTab(TabPage_SO(self), 'Схема')
 #         self.addTab(TabPage_SO(self), 'Ход работ')
+
 
 class Work_with_gnkt(QMainWindow):
     wb_gnkt_frez = Workbook()
@@ -40,6 +42,7 @@ class Work_with_gnkt(QMainWindow):
 
         self.dict_perforation = CreatePZ.dict_perforation
         self.ws = ws
+        self.work_plan = 'gnkt_frez'
         # self.tabWidget = tabWidget
         # self.table_title = table_widget
 
@@ -65,21 +68,26 @@ class Work_with_gnkt(QMainWindow):
         create_title = self.create_title_list(self.ws_title)
         schema_well = self.schema_well(self.ws_schema)
 
-        main.MyWindow.copy_pz(self, self.ws_title, table_title, 13, 'gnkt_frez', 1)
-        main.MyWindow.copy_pz(self, self.ws_schema, table_schema, 47, 'gnkt_frez', 2)
-        main.MyWindow.copy_pz(self, self.ws_work, table_widget, 12, 'gnkt_frez', 3)
-        work_well = self.work_gnkt_frez()
+        main.MyWindow.copy_pz(self, self.ws_title, table_title, 'gnkt_frez', 13, 1)
+        main.MyWindow.copy_pz(self, self.ws_schema, table_schema, 'gnkt_frez', 47, 2)
+        main.MyWindow.copy_pz(self, self.ws_work, table_widget, 'gnkt_frez', 12, 3)
+        work_well = self.work_gnkt_frez(self.ports_data, self.plast_work)
         main.MyWindow.populate_row(self, 0, work_well, table_widget)
 
-        # self.count_row_height(self.ws_work, work_well)#
-        # Work_with_gnkt.wb_gnkt_frez.save(f"{CreatePZ.well_number} {CreatePZ.well_area} {CreatePZ.cat_P_1} категории.xlsx")
+        CreatePZ.addItog(self, self.ws_work, self.table_widget.rowCount() + 1, self.work_plan)
+        # Work_with_gnkt.wb_gnkt_frez.save(f"{CreatePZ.well_number} {CreatePZ.well_area} {CreatePZ.cat_P_1}
+        # категории.xlsx")
         # print('файл сохранен')
 
-    def count_row_height(ws2, work_list, sheet_name):
+    def count_row_height(self, ws2, work_list, sheet_name):
+        from open_pz import CreatePZ
         from openpyxl.utils.cell import range_boundaries, get_column_letter
 
-        text_width_dict = {35: (0, 100), 50: (101, 200), 70: (201, 300), 90: (301, 400), 110: (401, 500),
-                           130: (501, 600), 150: (601, 700), 170: (701, 800), 190: (801, 900), 210: (901, 1500)}
+        colWidth = [2.85546875, 14.42578125, 16.140625, 22.85546875, 17.140625, 14.42578125, 13.0, 13.0, 17.0,
+                     14.42578125, 13.0, 21, 12.140625, None]
+
+        text_width_dict = {35: (0, 100), 50: (101, 200), 70: (201, 300), 110: (301, 400), 120: (401, 500),
+                           130: (501, 600), 150: (601, 700), 170: (701, 800), 190: (801, 900), 230: (901, 1500)}
 
         boundaries_dict = {}
 
@@ -89,8 +97,13 @@ class Work_with_gnkt(QMainWindow):
         for key, value in boundaries_dict.items():
             ws2.unmerge_cells(start_column=value[0], start_row=value[1],
                               end_column=value[2], end_row=value[3])
+        ins_ind = 1
+
 
         for i in range(1, len(work_list) + 1):  # Добавлением работ
+            if str(work_list[i-1][1]).isdigit() and i>39: # Нумерация
+                work_list[i-1][1] = str(ins_ind)
+                ins_ind += 1
             for j in range(1, 13):
                 cell = ws2.cell(row=i, column=j)
 
@@ -101,39 +114,82 @@ class Work_with_gnkt(QMainWindow):
                         # print(f'цифры {cell.value}')
                     else:
                         cell.value = work_list[i - 1][j - 1]
-                    if sheet_name.lower() == 'ход работ':
-                        if j == 11:
-                            cell.font = Font(name='Arial', size=11, bold=False)
-                        # if j == 12:
-                        #     cell.value = work_list[i - 1][j - 1]
-                        else:
-                            cell.font = Font(name='Arial', size=13, bold=False)
-                        ws2.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='center',
-                                                                        vertical='center')
-                        ws2.cell(row=i, column=11).alignment = Alignment(wrap_text=True, horizontal='center',
-                                                                         vertical='center')
-                        ws2.cell(row=i, column=12).alignment = Alignment(wrap_text=True, horizontal='center',
-                                                                         vertical='center')
-                        ws2.cell(row=i, column=3).alignment = Alignment(wrap_text=True, horizontal='left',
-                                                                        vertical='center')
-                        if 'примечание' in str(cell.value).lower() \
-                                or 'заявку оформить за 16 часов' in str(cell.value).lower() \
-                                or 'ЗАДАЧА 2.9.' in str(cell.value).upper() \
-                                or 'ВСЕ ТЕХНОЛОГИЧЕСКИЕ ОПЕРАЦИИ' in str(cell.value).upper() \
-                                or 'за 48 часов до спуска' in str(cell.value).upper():
-                            # print('есть жирный')
-                            ws2.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=True)
-                        elif 'порядок работы' in str(cell.value).lower() or \
-                                'Наименование работ' in str(cell.value):
-                            ws2.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=True)
-                            ws2.cell(row=i, column=j).alignment = Alignment(wrap_text=True, horizontal='center',
-                                                                            vertical='center')
-        # print(merged_cells_dict)
 
-        for key, value in boundaries_dict.items():
-            # print(value)
-            ws2.merge_cells(start_column=value[0], start_row=value[1],
-                            end_column=value[2], end_row=value[3])
+
+
+
+        # print(merged_cells_dict)
+        if sheet_name != 'Ход работ':
+            for key, value in boundaries_dict.items():
+                # print(value)
+                ws2.merge_cells(start_column=value[0], start_row=value[1],
+                                end_column=value[2], end_row=value[3])
+        elif sheet_name == 'Ход работ':
+            for i, row_data in enumerate(work_list):
+                # print(f'gghhg {work_list[i][2]}')
+                for column, data in enumerate(row_data):
+                    if column == 2:
+                        if not data is None:
+                            text = data
+                            for key, value in text_width_dict.items():
+                                if value[0] <= len(text) <= value[1]:
+                                    ws2.row_dimensions[i + 1].height = int(key)
+                    elif column == 1:
+                        if not data is None:
+                            text = data
+                            # print(text)
+                            for key, value in text_width_dict.items():
+                                if value[0] <= len(text) <= value[1]:
+                                    ws2.row_dimensions[i + 1].height = int(key)
+                    if column != 0:
+                        ws2.cell(row=i + 1, column=column + 1).border = CreatePZ.thin_border
+                    if column == 1 or column == 11:
+                        ws2.cell(row=i + 1, column=column + 1).alignment = Alignment(wrap_text=True, horizontal='center',
+                                                                                 vertical='center')
+                        ws2.cell(row=i + 1, column=column + 1).font = Font(name='Arial', size=13, bold=False)
+                    else:
+                        ws2.cell(row=i + 1, column=column + 1).alignment = Alignment(wrap_text=True, horizontal='left',
+                                                                                     vertical='center')
+                        ws2.cell(row=i + 1, column=column + 1).font = Font(name='Arial', size=13, bold=False)
+                        if 'примечание' in str(ws2.cell(row=i + 1, column=column + 1).value).lower() or \
+                            'внимание' in str(ws2.cell(row=i + 1, column=column + 1).value).lower() or \
+                            'мероприятия' in str(ws2.cell(row=i + 1, column=column + 1).value).lower() or \
+                            'порядок работ' in str(ws2.cell(row=i + 1, column=column + 1).value).lower() or \
+                            'По доп.согласованию с Заказчиком' in str(ws2.cell(row=i + 1, column=column + 1).value).lower():
+                            # print('есть жирный')
+                            ws2.cell(row=i + 1, column=column + 1).font = Font(name='Arial', size=13, bold=True)
+
+
+
+                if len(work_list[i][1]) > 5:
+                    ws2.merge_cells(start_column=2, start_row= i + 1, end_column= 12, end_row=i + 1)
+                    ws2.cell(row=i + 1, column=2).alignment = Alignment(wrap_text=True, horizontal='center',
+                                                                        vertical='center')
+                    ws2.cell(row=i + 1, column=2).fill = PatternFill(start_color='C5D9F1', end_color='C5D9F1',
+                                                                      fill_type='solid')
+                    ws2.cell(row=i + 1, column=2).font = Font(name='Arial', size=13, bold=True)
+
+                else:
+                    ws2.merge_cells(start_column=3, start_row=i + 1, end_column=11, end_row=i + 1)
+                    ws2.cell(row=i + 1, column=3).alignment = Alignment(wrap_text=True, horizontal='left',
+                                                                            vertical='center')
+
+
+
+
+            for col in range(13):
+                ws2.column_dimensions[get_column_letter(col + 1)].width = colWidth[col]
+
+            ws2.print_area = f'B1:L{self.table_widget.rowCount() + 45}'
+            ws2.page_setup.fitToPage = True
+            ws2.page_setup.fitToHeight = False
+            ws2.page_setup.fitToWidth = True
+            ws2.print_options.horizontalCentered = True
+            # зададим размер листа
+            ws2.page_setup.paperSize = ws2.PAPERSIZE_A4
+            # содержимое по ширине страницы
+            ws2.sheet_properties.pageSetUpPr.fitToPage = True
+            ws2.page_setup.fitToHeight = False
 
         print(f'{sheet_name} - вставлена')
 
@@ -161,7 +217,12 @@ class Work_with_gnkt(QMainWindow):
                     else:
                         row_lst.append("")
                 work_list.append(row_lst)
-            Work_with_gnkt.count_row_height(worksheet, work_list, sheet_name)
+            Work_with_gnkt.count_row_height(self, worksheet, work_list, sheet_name)
+
+        ws6 = Work_with_gnkt.wb_gnkt_frez.create_sheet(title="СХЕМЫ КНК_44,45")
+        main.MyWindow.insert_image(self, ws6, 'imageFiles/schema_well/СХЕМЫ КНК_44,45.png', 'A1', 550, 900)
+        ws7 = Work_with_gnkt.wb_gnkt_frez.create_sheet(title="СХЕМЫ КНК_38,1")
+        main.MyWindow.insert_image(self, ws7, 'imageFiles/schema_well/СХЕМЫ КНК_38,1.png', 'A1', 550, 900)
 
         # path = 'workiii'
         path = 'D:\Documents\Desktop\ГТМ'
@@ -179,7 +240,9 @@ class Work_with_gnkt(QMainWindow):
 
         if Work_with_gnkt.wb_gnkt_frez:
             Work_with_gnkt.wb_gnkt_frez.remove(Work_with_gnkt.wb_gnkt_frez['Sheet'])
-            Work_with_gnkt.wb_gnkt_frez.save(full_path)
+
+            main.MyWindow.saveFileDialog(self, Work_with_gnkt.wb_gnkt_frez, full_path)
+
             Work_with_gnkt.wb_gnkt_frez.close()
             print(f"Table data saved to Excel {full_path} {CreatePZ.number_dp}")
         if self.wb:
@@ -330,15 +393,23 @@ class Work_with_gnkt(QMainWindow):
                     13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0,
                     13.0, 13.0, 13.0, 5.42578125, 13.0, 4.5703125, 2.28515625, 10.28515625]
 
-        plast_work = CreatePZ.plast_all[0]
-        print(plast_work, list(CreatePZ.dict_perforation[plast_work]))
-        pressuar = f'{list(CreatePZ.dict_perforation[plast_work]["давление"])[0]}атм'
+        self.plast_work = CreatePZ.plast_all[0]
+        plast_work = self.plast_work
+        print(self.plast_work, list(CreatePZ.dict_perforation[plast_work]))
+        self.pressuar = f'{list(CreatePZ.dict_perforation[plast_work]["давление"])[0]}атм'
         pressuar1 = list(CreatePZ.dict_perforation[plast_work]["давление"])[0]
         zamer = list(CreatePZ.dict_perforation[plast_work]['замер'])[0]
         vertikal = min(map(float, list(CreatePZ.dict_perforation[plast_work]["вертикаль"])))
-        zhgs = f'{list(CreatePZ.dict_perforation[plast_work]["рабочая жидкость"])[0]}г/см3'
+        self.fluid = self.calc_fluid()
+        zhgs = f'{self.fluid}г/см3'
         koef_anomal = round(float(pressuar1) * 101325 / (float(vertikal) * 9.81 * 1000), 1)
         nkt = int(list(CreatePZ.dict_nkt.keys())[0])
+        if nkt == 73:
+            nkt_widht = 5.5
+        elif nkt == 89:
+            nkt_widht = 6.5
+        elif nkt == 60:
+            nkt_widht = 5
         lenght_nkt = sum(list(map(int, CreatePZ.dict_nkt.values())))
 
         bottom_first_port = max(sorted([interval for interval in CreatePZ.dict_perforation[plast_work]['интервал']],
@@ -395,7 +466,8 @@ class Work_with_gnkt(QMainWindow):
             [None, None, None, None, None, None, None, None, None, None, None, None,
              'БП 80х70', None, None, None, None,
              None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-             'Пластовое давление', None, None, None, None, None, None, None, pressuar, None, None, zamer, None, None,
+             'Пластовое давление', None, None, None, None, None, None, None, f'{self.pressuar}атм',
+             None, None, zamer, None, None,
              None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None,
              'тройник 80х70-80х70 В60-В60',
@@ -454,7 +526,8 @@ class Work_with_gnkt(QMainWindow):
              None],
             [None, None, None, None, None, None, 'Экспл. колонна', None, None, None, None, None,
              CreatePZ.column_diametr, None, CreatePZ.column_wall_thickness, None,
-             CreatePZ.column_diametr - 2 * CreatePZ.column_wall_thickness, None, CreatePZ.shoe_column, None, None,
+             CreatePZ.column_diametr - 2 * CreatePZ.column_wall_thickness, None, f'0-{CreatePZ.shoe_column}м', None,
+             None,
              None, CreatePZ.level_cement_column, None, None, None, volume_pm_ek, None, well_volume_ek,
              None, None, 'Р в межколонном пространстве', None, None, None, None, None, None, None,
              f'{0}атм', None, None, None, self.date_dmy(CreatePZ.date_drilling_cancel), None, None, None],
@@ -466,8 +539,9 @@ class Work_with_gnkt(QMainWindow):
              None, None, volume_pm_dp,
              None, well_volume_dp, None, None, 'Давление опрессовки МКП', None, None, None, None, None, None, None,
              None, None, None, None, None, None, None, None],
-            [None, None, None, None, None, None, f'Подвеска НКТ {nkt}мм', None, None, None, None, None, nkt, None, 6.5,
-             None, nkt - 2 * 6.5, None, f'{0}-', None, f'{lenght_nkt - 0.5 - 2.6 - 3}м', None,
+            [None, None, None, None, None, None, f'Подвеска НКТ {nkt}мм', None, None, None, None, None, nkt, None,
+             nkt_widht,
+             None, nkt - 2 * nkt_widht, None, f'{0}', None, f'{lenght_nkt - 0.5 - 2.6 - 3}м', None,
              f'{lenght_nkt - 0.5 - 2.6 - 3}м', None, None, None,
              volume_vn_nkt(CreatePZ.dict_nkt), None, volume_vn_nkt(CreatePZ.dict_nkt) + 0.47, None, None,
              'Давление опрессовки ЭК ', None, None, None, None,
@@ -492,13 +566,13 @@ class Work_with_gnkt(QMainWindow):
             [None, None, None, None, None, None, 'ГНКТ', None, None, None, None, None, 38.1, None, 3.96, None, 30.18,
              None, gnkt_lenght, None, None, None, None, None, None, None, volume_vn_gnkt, None,
              volume_gnkt, None,
-             None, 'Искусственный забой  (МГРП №1 с актив.шаром 30мм)', None, None, None, None, None, None, None, None,
+             None, 'Искусственный забой  (МГРП №1)', None, None, None, None, None, None, None, None,
              None, None, None, None, None, f'{bottom_first_port}м', None]]
 
-        ports_data = self.work_with_port(plast_work, CreatePZ.dict_perforation)
-        ports_list, merge_port = self.insert_ports_data(ports_data)
+        self.ports_data = self.work_with_port(self.plast_work, CreatePZ.dict_perforation)
+        self.ports_list, merge_port = self.insert_ports_data(self.ports_data)
         # print(ports_list)
-        for row in ports_list:
+        for row in self.ports_list:
             schema_well_list.append(row)
 
         border = Border(left=Side(border_style='dashed', color='FF000000'),
@@ -582,6 +656,9 @@ class Work_with_gnkt(QMainWindow):
                                          right=Side(border_style='thin', color='FF000000'),
                                          bottom=Side(border_style='thin', color='FF000000'),
                                          )
+            if row < 23:
+                ws3.cell(row=row, column=7).font = Font(name='Arial', size=11, bold=True, color='002060')
+                ws3.cell(row=row, column=32).font = Font(name='Arial', size=11, bold=True, color='002060')
 
             for col in range(32, 49):
                 cell = ws3.cell(row=row, column=col)
@@ -596,6 +673,17 @@ class Work_with_gnkt(QMainWindow):
                     cell.border = border_left
                 elif (row == row and col == 48):
                     cell.border = border_right
+
+        ws3.cell(row=1, column=1).font = Font(name='Arial', size=18, bold=True)
+        ws3.cell(row=3, column=14).font = Font(name='Arial', size=18, bold=True)
+        ws3.cell(row=3, column=30).font = Font(name='Arial', size=18, bold=True)
+        ws3.cell(row=3, column=22).font = Font(name='Arial', size=18, bold=True)
+        ws3.cell(row=3, column=37).font = Font(name='Arial', size=18, bold=True)
+        ws3.cell(row=24, column=7).font = Font(name='Arial', size=14, bold=True, color='002060')
+        ws3.cell(row=34, column=1).font = Font(name='Arial', size=14, bold=True, color='002060')
+        ws3.cell(row=34, column=9).font = Font(name='Arial', size=14, bold=True, color='002060')
+        ws3.cell(row=5, column=10).font = Font(name='Arial', size=14, bold=False, color='002060', underline='single')
+        ws3.cell(row=5, column=33).font = Font(name='Arial', size=14, bold=False, color='002060', underline='single')
 
         ws3.cell(6, 7).border = border_left_top
         ws3.cell(6, 32).border = border_left_top
@@ -658,423 +746,666 @@ class Work_with_gnkt(QMainWindow):
         # зададим размер листа
         ws3.page_setup.paperSize = ws3.PAPERSIZE_A4
 
-    def work_gnkt_frez(self):
+    def work_gnkt_frez(self, ports_data, plast_work):
 
-        krs_begin_gnkt = [
-            [None, None, 'Порядок работы', None, None, None, None, None, None, None, None, None],
-            [None, None, 'Наименование работ', None, None, None, None, None, None, None, 'Ответственный',
-             'Нормы времени \n мин/час.'],
-            [None, 1,
-             f'Начальнику смены ЦТКРС, вызвать телефонограммой представителя Заказчика для оформления АКТа '
-             f'приёма-передачи скважины в ремонт. \n'
-             f'Совместно с представителем Заказчика оформить схему расстановки оборудования при КРС с обязательной '
-             f'подписью представителя Заказчика на схеме.',
-             None, None, None, None, None, None, None,
-             'Мастер КРС, предст-ль Заказчика.', float(0.5)],
-            [None, 2,
-             f'Принять скважину в ремонт у Заказчика с составлением АКТа. Переезд  бригады. Подготовительные работы к '
-             f'КРС. Определить технологические '
-             f'точки откачки жидкости у Заказчика согласно Договора.',
-             None, None, None, None, None, None, None,
-             ' Предст-тель Заказчика, мастер КРС', float(0.5)],
-            [None, 3,
-             f'Перед началом работ по освоению, капитальному и текущему ремонту скважин бригада должна быть '
-             f'ознакомлена с возможными осложнениями и авариями'
-             f'в процессе работ, планом локализации и ликвидации аварии (ПЛА) и планом работ. С работниками '
-             f'должен быть проведен инструктаж по выполнению работ, '
-             f'связанных с применением новых технических устройств и технологий с соответствующим оформлением в '
-             f'журнал инструктажей на рабочем месте ',
-             None, None, None, None, None, None, None,
-             'Мастер КРС', float(0.75)]]
+        from open_pz import CreatePZ
+        from krs import calc_work_fluid
 
-        gnkt_work_list = [
+
+        top_muft = list(ports_data.keys())[-1]
+        bottom_muft = list(ports_data.keys())[0]
+        if sum(list(CreatePZ.dict_nkt.values())) != 0:
+            ntk_true = True
+            nkt_lenght = round(sum(list(CreatePZ.dict_nkt.values())), 0)
+        else:
+            ntk_true = False
+            nkt_lenght = round(top_muft - 20, 1)
+        print(f'пласта {plast_work}')
+        print(f' ПНТЖ - {calc_pntzh(self.fluid, CreatePZ.cdng)}')
+
+        distance, _ = QInputDialog.getInt(None, 'Расстояние НПТЖ', 'Введите Расстояние до ПНТЖ')
+        fluid_work, CreatePZ.fluid_work_short = calc_work_fluid(self)
+
+
+        block_gnvp_list = [
             [None, 'Мероприятия по предотвращению аварий, инцидентов и несчастных случаев:',
              None, None, None, None, None, None, None, None, None, None],
-            [None, 'Все операции при производстве работ выполнять в соответствии с действующими Федеральными нормами и'
-                   ' правилами в области промышленной безопасности "Правила безопасности в нефтяной и газовой промышленности" , РД 153-39-023-97, технологической инструкцией "Требования безопасности при ведении монтажных работ и производстве текущего, капитального ремонта и освоения скважин после бурения" П2-05.01 ТИ-0001 , инструкцией «По предупреждению газонефтеводопроявлений и открытых фонтанов при бурении, освоении, геофизических исследованиях,  эксплуатации скважин, реконструкции, ремонте, техническом  перевооружении, консервации и ликвидации скважин, а также при проведении геофизических  и прострелочно-взрывных работах на скважинах» № П3-05 И-102089 ЮЛ-305, акта (наряд) допуска, мероприятий по сокращению аварийности, протоколов ГТС, молний, писем, доведённых обществом (ООО "Башнефть-Добыча") и других действующих в ООО "Башнефть-Добыча" нормативных документов.',
-             None, None, None, None, None, None, None, None, None, None],
+            [None, None,
+             'Все операции при производстве работ выполнять в соответствии с действующими Федеральными нормами и'
+             ' правилами в области промышленной безопасности "Правила безопасности в нефтяной и газовой '
+             'промышленности" , РД 153-39-023-97, технологической инструкцией "Требования безопасности при '
+             'ведении монтажных работ и производстве текущего, капитального ремонта и освоения скважин после '
+             'бурения" П2-05.01 ТИ-0001 , инструкцией «По предупреждению газонефтеводопроявлений и открытых '
+             'фонтанов при бурении, освоении, геофизических исследованиях,  эксплуатации скважин, реконструкции, '
+             'ремонте, техническом  перевооружении, консервации и ликвидации скважин, а также при проведении '
+             'геофизических  и прострелочно-взрывных работах на скважинах» № П3-05 И-102089 ЮЛ-305, акта (наряд) '
+             'допуска, мероприятий по сокращению аварийности, протоколов ГТС, молний, писем, доведённых обществом '
+             '(ООО "Башнефть-Добыча") и других действующих в ООО "Башнефть-Добыча" нормативных документов.',
+             None, None, None, None, None, None, None, None, None, None, None],
             [None, 'Мероприятия при нахождении рядом с ремонтируемой скважиной работающих скважин', None, None, None,
              None, None, None, None, None, None, None],
             [None, '№', 'Мероприятия', None, None, None, None, None, None, None, None, 'Ответственный'],
             [None, 1, 'Провести устный инструктаж бригаде по проведению ремонта с соседними работающими скважинами.',
              None, None, None, None, None, None, None, None, 'Мастер ГНКТ'],
-            [None, 2,
-                                                                              'В схеме расстановки бригадного хозяйства обозначить опасные зоны работающих скважин (определить с Заказчиком при оформлении наряд-допуска)',
-                                                                              None, None, None, None, None, None, None,
-                                                                              None, 'Мастер ГНКТ'],
+            [None, 2, 'В схеме расстановки бригадного хозяйства обозначить опасные зоны работающих скважин '
+                      '(определить с Заказчиком при оформлении наряд-допуска)',
+             None, None, None, None, None, None, None,
+             None, 'Мастер ГНКТ', None],
             [None, 3,
-                                                                                                     'Оградить работающие скважины по периметру сигнальной лентой (по одной слева, справа) в радиусе 3 метра.',
-                                                                                                     None, None, None,
-                                                                                                     None, None, None,
-                                                                                                     None, None,
-                                                                                                     'Мастер ГНКТ'],
+             'Оградить работающие скважины по периметру сигнальной лентой (по одной слева, справа) в радиусе 3 метра.',
+             None, None, None, None, None, None, None, None, 'Мастер ГНКТ', None],
             [None, 4,
-             'При монтаже или демонтаже подъёмного агрегата для ремонта скважины, соседние с ремонтируемой (по одной слева, справа), эксплуатирующиеся глубинными штанговыми насосами, скважины остановить. Необходимость остановки определить с Заказчиком при приёмке скважины, отразить в наряд-допуске.',
-             None, None, None, None, None, None, None, None, 'Представитель «Заказчика»'], [None, 5,
-                                                                                            'Установить предупреждающие знаки на соседних работающих скважинах (по одной слева¸ справа) «Внимание! Скважина работает!»',
-                                                                                            None, None, None, None,
-                                                                                            None, None, None, None,
-                                                                                            'Мастер ГНКТ'], [None, 6,
-                                                                                                             'Не допускать проведения монтажных, погрузо-разгрузочных работ в радиусе не менее 3 метров от работающих скважин',
-                                                                                                             None, None,
-                                                                                                             None, None,
-                                                                                                             None, None,
-                                                                                                             None, None,
-                                                                                                             'Мастер ГНКТ'],
+             'При монтаже или демонтаже подъёмного агрегата для ремонта скважины, соседние с ремонтируемой '
+             '(по одной слева, справа), эксплуатирующиеся глубинными штанговыми насосами, скважины остановить. '
+             'Необходимость остановки определить с Заказчиком при приёмке скважины, отразить в наряд-допуске.',
+             None, None, None, None, None, None, None, None, 'Представитель «Заказчика»', None],
+            [None, 5,
+             'Установить предупреждающие знаки на соседних работающих скважинах (по одной слева¸ справа)'
+             ' «Внимание! Скважина работает!»', None, None, None, None, None, None, None, None,
+             'Мастер ГНКТ', None],
+            [None, 6,
+             'Не допускать проведения монтажных, погрузо-разгрузочных работ в радиусе не менее 3 '
+             'метров от работающих скважин', None, None, None, None, None, None, None, None,
+             'Мастер ГНКТ', None],
             [None, 7,
-             'При проведении работ по отбору проб, замеру динамических уровней и т.д в обязательном порядке информировать мастера бригады КРС о проведении данных работ.',
-             None, None, None, None, None, None, None, None, 'Представитель «Заказчика»'], [None, 8,
-                                                                                            'Не допускать складирования на запорной арматуре и площадках для исследования ремонтируемой скважины, а также соседних скважин инструмента, оборудования, электрокабелей, труб и т.д. и т.п.',
-                                                                                            None, None, None, None,
-                                                                                            None, None, None, None,
-                                                                                            'Мастер ГНКТ'],
-            [None, 9, 'При расстановке оборудования бригады не загромождать доступ к соседним работающим скважинам.',
-             None, None, None, None, None, None, None, None, 'Мастер ГНКТ'], [None, 10,
-                                                                              'Согласовать схему расстановки оборудования и путей эвукуации с мастером ЦДНГ/ЦППД на схеме коммуникаций-приложение к наряд -допуску.',
-                                                                              None, None, None, None, None, None, None,
-                                                                              None, 'Мастер ГНКТ'], [None, 11,
-                                                                                                     'При обнаружении на соседних скважинах пропусков нефти, газа или воды немедленно закрыть устье ремонтируемой скважины, остановить работы и сообщить о происшествии в ЦДНГ/ЦППД.',
-                                                                                                     None, None, None,
-                                                                                                     None, None, None,
-                                                                                                     None, None,
-                                                                                                     'Мастер ГНКТ'],
+             'При проведении работ по отбору проб, замеру динамических уровней и т.д в обязательном порядке '
+             'информировать мастера бригады КРС о проведении данных работ.',
+             None, None, None, None, None, None, None, None, 'Представитель «Заказчика»', None],
+            [None, 8,
+             'Не допускать складирования на запорной арматуре и площадках для исследования ремонтируемой '
+             'скважины, а также соседних скважин инструмента, оборудования, электрокабелей, труб и т.д. и т.п.',
+             None, None, None, None, None, None, None, None,
+             'Мастер ГНКТ', None],
+            [None, 9,
+             'При расстановке оборудования бригады не загромождать доступ к соседним работающим скважинам.',
+             None, None, None, None, None, None, None, None, 'Мастер ГНКТ', None],
+            [None, 10,
+             'Согласовать схему расстановки оборудования и путей эвукуации с мастером ЦДНГ/ЦППД на схеме '
+             'коммуникаций-приложение к наряд -допуску.',
+             None, None, None, None, None, None, None, None, 'Мастер ГНКТ', None],
+            [None, 11,
+             'При обнаружении на соседних скважинах пропусков нефти, газа или воды немедленно закрыть '
+             'устье ремонтируемой скважины, остановить работы и сообщить о происшествии в ЦДНГ/ЦППД.',
+             None, None, None, None, None, None, None, None, 'Мастер ГНКТ', None],
             [None, 12,
-             'Установка экранирующих устройств на соседних с ремонтируемой скважиной определяется наряд-допуском, выданным Заказчиком.',
+             'Установка экранирующих устройств на соседних с ремонтируемой скважиной определяется наряд-допуском, '
+             'выданным Заказчиком.',
              None, None, None, None, None, None, None, None, 'Мастер ГНКТ'],
             [None, 'Мероприятия по предотвращению аварий (ГНВП и открытых фонтанов)', None, None, None, None, None,
              None, None, None, None, None],
-            [None, '№', 'Мероприятия', None, None, None, None, None, None, None, None, 'Ответственный'], [None, 1,
-                                                                                                          'Перед началом ремонта и перед каждой сменой проводить дополнительный инструктаж по предупреждению газонефтеводопроявлений с Проведением ежесменных учебных тревог «Выброс» с записью в вахтовом журнале.',
-                                                                                                          None, None,
-                                                                                                          None, None,
-                                                                                                          None, None,
-                                                                                                          None, None,
-                                                                                                          'Мастер ГНКТ'],
-            [None, 2,
-             'Ежедневно, перед началом работ проверять комплектность и работоспособность противовыбросового оборудования, с отметкой в журнале ежесменного осмотра оборудования.',
-             None, None, None, None, None, None, None, None, 'Мастер ГНКТ'],
+            [None, '№', 'Мероприятия', None, None, None, None, None, None, None, None, 'Ответственный'],
+            [None, 1,
+             'Перед началом ремонта и перед каждой сменой проводить дополнительный инструктаж по '
+             'предупреждению газонефтеводопроявлений с Проведением ежесменных учебных тревог «Выброс» '
+             'с записью в вахтовом журнале.',
+             None, None, None, None, None, None, None, None, 'Мастер ГНКТ', None],
+            [None, 2, 'Ежедневно, перед началом работ проверять комплектность и работоспособность противовыбросового'
+                      ' оборудования, с отметкой в журнале ежесменного осмотра оборудования.',
+             None, None, None, None, None, None, None, None, 'Мастер ГНКТ', None],
             [None, 3, 'При перерывах в работе запрещается оставлять устье скважины открытым.', None, None, None, None,
-             None, None, None, None, 'Мастер ГНКТ'], [None, 4,
-                                                      'Производить замеры ГВС при спуске, промывках и освоении не реже, чем как через каждый час, с записью в журнале времени и результатов замеров ГВС. В случае возникновения газонефтеводопроявления следует прекратить все работы, загерметизировать устье скважины и сообщить об этом в службу ЦИТС ООО «ВЕТЕРАН» по тел. 8(35342)76292 и «Заказчика»',
-                                                      None, None, None, None, None, None, None, None, 'Мастер ГНКТ'],
-            [None, None, 'Диспетчер АЦДНГ №1 (DISP-ACDNG1@bn.rosneft.ru) +7 (34783) 79722', None, None, None, None,
-             None, None, None, None, None], [None, 5,
-                                             'Перед началом работ по капитальному ремонту скважин иметь в наличии в исправном состоянии средства пожаротушения в соответствии с перечнем.',
-                                             None, None, None, None, None, None, None, None, 'Мастер ГНКТ'],
-            [None, 6, 'Двухкратный запас жидкости глушения уд.веса 1,23г/см3 в объеме 57,8м3 находится на', None, None,
-             None, None, None, None, None, None, 'Заказчик'], [None, None,
-                                                               'ПНТЖ "Крезол" на расстоянии 18км от скважины. ООО "Ветеран" в случае необходимости (аварийного глушения) обязуется обеспечить завоз жидкости глушения на объект работ.',
-                                                               None, None, None, None, None, None, None, None, None],
+             None, None, None, None, 'Мастер ГНКТ', None],
+            [None, 4,
+             f'Производить замеры ГВС при спуске, промывках и освоении не реже, чем как через каждый час, '
+             f'с записью в журнале времени и результатов замеров ГВС. В случае возникновения '
+             f'газонефтеводопроявления следует прекратить все работы, загерметизировать устье скважины и '
+             f'сообщить об этом в службу ЦИТС{CreatePZ.contractor} и «Заказчика» {dict_data_cdng[CreatePZ.cdng]}',
+             None, None, None, None, None, None, None, None,
+             'Мастер ГНКТ', None],
+            [None, 5, 'Перед началом работ по капитальному ремонту скважин иметь в наличии в исправном состоянии '
+                      'средства пожаротушения в соответствии с перечнем.',
+             None, None, None, None, None, None, None, None,
+             'Мастер ГНКТ', None],
+            [None, 6, f'Двухкратный запас жидкости глушения уд.веса {self.fluid}г/см3 в объеме '
+                      f'{round(float(CreatePZ.well_volume_in_PZ[0]) * 2, 1)}м3 находится на '
+                      f'{"".join(calc_pntzh(self.fluid, CreatePZ.cdng))} на расстоянии {distance}км от скважины.'
+                      f' {CreatePZ.contractor} в случае необходимости '
+                      '(аварийного глушения) обязуется обеспечить завоз жидкости глушения на объект работ.', None, None,
+             None, None, None, None, None, None, 'Заказчик', None],
+
             [None, 7,
              'До начала работ, а также на все время выполнения работ, всю технику, принимающую участие в технологических операциях, оборудовать искрогасителями.',
-             None, None, None, None, None, None, None, None, 'Мастер ГНКТ'], [None, 8,
-                                                                              'Опрессовку ПВО скважин 1ой категории производить в присутствии представителя ПФС. \nЗаявку на представителя ПФЧ подавать за 24 часа телефонограммой. \nПо окончании опрессовоки ПВО, получить разрешения от представителя ПФС.',
-                                                                              None, None, None, None, None, None, None,
-                                                                              None, 'Мастер ГНКТ'],
+             None, None, None, None, None, None, None, None, 'Мастер ГНКТ', None],
+            [None, 8,
+             'Опрессовку ПВО скважин 1ой категории производить в присутствии представителя ПФС. '
+             '\nЗаявку на представителя ПФЧ подавать за 24 часа телефонограммой. \nПо окончании опрессовоки '
+             'ПВО, получить разрешения от представителя ПФС.',
+             None, None, None, None, None, None, None, None,
+             'Мастер ГНКТ', None],
             [None, 'Мероприятия по охране окружающей среды:', None, None, None, None, None, None, None, None, None,
-             None], [None, '№', 'Мероприятия', None, None, None, None, None, None, None, None, 'Ответственный'],
+             None, None],
+            [None, '№', 'Мероприятия', None, None, None, None, None, None, None, None, 'Ответственный', None],
             [None, 1,
              'При производстве работ не допускается попадания нефтесодержащей жидкости и солевого раствора на рельеф.',
-             None, None, None, None, None, None, None, None, 'Мастер ГНКТ'],
+             None, None, None, None, None, None, None, None, 'Мастер ГНКТ', None],
             [None, 2, 'Утилизацию технологических отходов производить по договору с Заказчиком.', None, None, None,
-             None, None, None, None, None, 'Мастер ГНКТ'], [None, 3,
-                                                            'ТБО, образующиеся в процессе производства работ складировать в специальные контейнеры, обозначенные надписью «ТБО»',
-                                                            None, None, None, None, None, None, None, None,
-                                                            'Мастер ГНКТ'],
+             None, None, None, None, None, 'Мастер ГНКТ', None],
+            [None, 3, 'ТБО, образующиеся в процессе производства работ складировать в специальные контейнеры, '
+                      'обозначенные надписью «ТБО»',
+             None, None, None, None, None, None, None, None, 'Мастер ГНКТ', None],
             [None, 4, 'Ежесменно проверять состояние запорной арматуры на нефтяных и водяных ёмкостях.', None, None,
-             None, None, None, None, None, None, 'Мастер ГНКТ'], [None, 5,
-                                                                  'При допущенных розливах нефти и задавочной жидкости в кратчайшие сроки необходимо провести мероприятия по устранению розлива, с утилизацией нефтесодержащего материала.',
-                                                                  None, None, None, None, None, None, None, None,
-                                                                  'Мастер ГНКТ'],
-            [None, 'ЦЕЛЬ ПРОГРАММЫ', None, None, None, None, None, None, None, None, None, None], [None,
-                                                                                                   'СПО промывочной КНК-1 с промывкой до МГРП №5. СПО фрезеровочной КНК-2: фрезерование МГРП №5-№2. Тех.отстой , замер Ризб. По доп.согласованию с Заказчиком, СПО промывочной КНК-1 до текущего забоя (МГРП №1).',
-                                                                                                   None, None, None,
-                                                                                                   None, None, None,
-                                                                                                   None, None, None,
-                                                                                                   None], [None,
-                                                                                                           'Внимание: Для проведения технологических операций завоз жидкости производить с ПНТЖ, согласованного с Заказчиком. Перед началом работ согласовать с Заказчиком пункт утилизации жидкости.',
-                                                                                                           None, None,
-                                                                                                           None, None,
-                                                                                                           None, None,
-                                                                                                           None, None,
-                                                                                                           None, None],
-            [None, 'ПОРЯДОК ПРОВЕДЕНИЯ РАБОТ', None, None, None, None, None, None, None, None, None, None],
-            [None, '№', None, None, None, None, None, None, None, None, None, 'Ответственный'], [None, 1,
-                                                                                                 'Ознакомить бригаду с планом работ и режимными параметрами дизайна по промывке и СПО. Провести инструктаж по промышленной безопасности',
-                                                                                                 None, None, None, None,
-                                                                                                 None, None, None, None,
-                                                                                                 'Мастер ГНКТ'],
+             None, None, None, None, None, None, 'Мастер ГНКТ', None],
+            [None, 5, 'При допущенных розливах нефти и задавочной жидкости в кратчайшие сроки необходимо провести '
+                      'мероприятия по устранению розлива, с утилизацией нефтесодержащего материала.',
+             None, None, None, None, None, None, None, None,
+             'Мастер ГНКТ', None]]
+        gnkt_work_firts = [
+            [None, 'ЦЕЛЬ ПРОГРАММЫ', None, None, None, None, None, None, None, None, None, None, None],
+            [None, 1, 'СПО промывочной КНК-1 с промывкой до МГРП №5. СПО фрезеровочной КНК-2: фрезерование МГРП №5-№2. '
+                   'Тех.отстой , замер Ризб. По доп.согласованию с Заказчиком, СПО промывочной КНК-1 до '
+                   'текущего забоя (МГРП №1).', None, None, None, None, None, None, None, None, None, None, None],
+            [None, None,
+             'Внимание: Для проведения технологических операций завоз жидкости производить с ПНТЖ, '
+             'согласованного с Заказчиком. Перед началом работ согласовать с Заказчиком пункт утилизации'
+             ' жидкости.',
+             None, None, None, None, None, None, None, None, None, None, None],
+            [None, 'ПОРЯДОК ПРОВЕДЕНИЯ РАБОТ', None, None, None, None, None, None, None, None, None, None, None],
+            [None, '№', 'Порядок работ', None, None, None, None, None, None, None, None,
+             'Ответственный', None],
+            [None, 1, 'Ознакомить бригаду с планом работ и режимными параметрами дизайна по промывке и СПО. '
+                      'Провести инструктаж по промышленной безопасности',
+             None, None, None, None, None, None, None, None, 'Мастер ГНКТ', None],
             [None, 2, 'Принять скважину у Заказчика по акту (состояние ф/арматуры и кустовой площадки.)', None, None,
-             None, None, None, None, None, None, 'Мастер ГНКТ'], [None, 3,
-                                                                  'Расставить оборудование и технику согласно «Типовой схемы расстановки оборудования и спецтехники при проведении капитального ремонта скважин с использованием установки «Койлтюбинг».',
-                                                                  None, None, None, None, None, None, None, None,
-                                                                  'Мастер ГНКТ'], [None, 4,
-                                                                                   'Произвести завоз технологической жидкости в объеме не менее 10м3 плотностью не более 1,02г/см3. При интенсивном самоизливе скважины в процессе работ или при отрицательной температуре окружающего воздуха, только по доп.согласованию с Заказчиком, перейти на технологическую жидкость с удельным весом до 1,18г/см3.',
-                                                                                   None, None, None, None, None, None,
-                                                                                   None, None, 'Мастер ГНКТ. Заказчик'],
-            [None, 5,
-             'При наличии, согласно плана заказа, Н2S добавить в завезенную промывочную жидкость нейтролизатор сероводорода "Реком-102" в концентрации 0.5л на 10м³',
-             None, None, None, None, None, None, None, None, 'Мастер ГНКТ. Заказчик'], [None, 6,
-                                                                                        'Внимание: при проведении работ по ОПЗ с кислотными составами, весь состав вахты обязан применять СИЗ (Инструкция П1-01.03 И-0128 ЮЛ-305 ООО"Башнефть-Добыча")',
-                                                                                        None, None, None, None, None,
-                                                                                        None, None, None,
-                                                                                        'Мастер ГНКТ'], [None, None,
-                                                                                                         'Примечание: на месте проведения работ по ОПЗ кислотами и их смесями должен быть аварийный запас спецодежды, спецобуви и других средств индивидуальной защиты, запас чистой пресной воды и средств нейтрализации кислоты (мел, известь, хлорамин).',
-                                                                                                         None, None,
-                                                                                                         None, None,
-                                                                                                         None, None,
-                                                                                                         None, None,
-                                                                                                         None],
-            [None, 'Ограничения веса и скоростей при СПО', None, None, None, None, None, None, None, None, None, None],
+             None, None, None, None, None, None, 'Мастер ГНКТ', None],
+            [None, 3,
+             'Расставить оборудование и технику согласно «Типовой схемы расстановки оборудования и '
+             'спецтехники при проведении капитального ремонта скважин с использованием '
+             'установки «Койлтюбинг».',
+             None, None, None, None, None, None, None, None,
+             'Мастер ГНКТ', None],
+            [None, 4,
+             f'Произвести завоз технологической жидкости в объеме не менее 10м3 плотностью не более {fluid_work}'
+             ' При интенсивном самоизливе скважины в процессе работ или при отрицательной температуре '
+             'окружающего воздуха, только по доп.согласованию с Заказчиком, перейти на технологическую '
+             'жидкость с удельным весом до 1,18г/см3.',
+             None, None, None, None, None, None, None, None,
+             'Мастер ГНКТ. Заказчик', None],
+            [None, 6,
+             'Внимание: при проведении работ по ОПЗ с кислотными составами, весь состав вахты обязан '
+             'применять СИЗ (Инструкция П1-01.03 И-0128 ЮЛ-305 ООО"Башнефть-Добыча")',
+             None, None, None, None, None, None, None, None,
+             'Мастер ГНКТ', None],
             [None, 7,
-             'Максимальный расчётный вес ГНКТ при подъёме с забоя – 4,2т; при спуске – 0,4т; в неподвижном состоянии - 2,4т. Максимальный допустимая нагрузка на ГНКТ - 18т.',
-             None, None, None, None, None, None, None, None, None], [None, 8,
-                                                                     'Скорость спуска по интервалам:\nв устьевом оборудовании не более 0.5м/мин;\nв интервале 2- 1081м не более 10-15м/мин - (первичный-последующий спуск);\nв интервале 1081-1127м не более 2 м/мин;\nв интервале 1127-1439м не более 5-10 м/мин (фрез.КНК / промыв.КНК);\nв интервале установки МГРП (± 20м) не более 2 м/мин;\nв интервале 1439-1459м не более 2 м/мин;',
-                                                                     None, None, None, None, None, None, None, None,
-                                                                     'Мастер, бурильщик ГНКТ'], [None, 9,
-                                                                                                 'Скорость подъёма по интервалам:\nв интервале 1459-1127 не более 10 м/мин; \nв интервале установки МГРП (± 20м) не более 2 м/мин;\nв интервале 1127-1081м не более 2 м/мин;\nв  интервале 1081-2м не более 12-15м/мин (первичный-последующий подъем);\nв устьевом оборудовании не более 0.5 м/мин.',
-                                                                                                 None, None, None, None,
-                                                                                                 None, None, None, None,
-                                                                                                 'Мастер, бурильщик ГНКТ'],
+             'Примечание: на месте проведения работ по ОПЗ кислотами и их смесями должен быть '
+             'аварийный запас спецодежды, спецобуви и других средств индивидуальной защиты, запас '
+             'чистой пресной воды и средств нейтрализации кислоты (мел, известь, хлорамин).',
+             None, None, None, None, None, None, None, None, None, None],
+            [None, 'Ограничения веса и скоростей при СПО', None, None, None, None, None, None, None, None, None,
+             None, None],
+            [None, 7,
+             'Максимальный расчётный вес ГНКТ при подъёме с забоя – 4,2т; при спуске – 0,4т; в неподвижном состоянии '
+             '- 2,4т. Максимальный допустимая нагрузка на ГНКТ - 18т.',
+             None, None, None, None, None, None, None, None, None, None],
+            [None, 8,
+             f'Скорость спуска по интервалам:\nв устьевом оборудовании не более 0.5м/мин; \nв интервале 2- '
+             f'{round(nkt_lenght - 20, 0)}м '
+             f'не более 10-15м/мин - (первичный-последующий спуск); \n в интервале '
+             f'{round(nkt_lenght - 20, 0)} - '
+             f'{round(nkt_lenght + 20, 0)}м не более '
+             f'2 м/мин;\n в интервале {round(nkt_lenght + 20, 0)}м - '
+             f'{ports_data[top_muft]["кровля"] - 20}м не более 5-10 м/мин (фрез.КНК / промыв.КНК); в '
+             f'интервале установки МГРП (± 20м) не более 2 м/мин; \nв интервале '
+             f'{ports_data[bottom_muft]["кровля"] - 20}-{ports_data[bottom_muft]["кровля"]}м не более 2 м/мин;',
+             None, None, None, None, None, None, None, None,
+             'Мастер, бурильщик ГНКТ', None],
+            [None, 9,
+             f'Скорость подъёма по интервалам: \nв интервале {ports_data[bottom_muft]["кровля"]}-'
+             f'{round(nkt_lenght + 20, 0)}м не более 10 м/мин; \n в интервале '
+             f'установки МГРП (± 20м) не более 2 м/мин; \nв интервале '
+             f'{round(nkt_lenght + 20, 0)}'
+             f'-{round(nkt_lenght - 20, 0)}м не более 2 м/мин; \n в  '
+             f'интервале {round(nkt_lenght - 20, 0)}-2м не более 12-15м/мин '
+             f'(первичный-последующий подъем);\n в устьевом оборудовании '
+             f'не более 0.5 м/мин.',
+             None, None, None, None, None, None, None, None, 'Мастер, бурильщик ГНКТ', None],
             [None, 10,
-             'При спуске производить приподъёмы для проверки веса на высоту не менее 20м со скоростью не более 5м/мин через каждые 300-500м (первичный-последующий спуск) в НКТ и 50-100м в ЭК.',
-             None, None, None, None, None, None, None, None, 'Мастер, бурильщик ГНКТ'],
+             'При спуске производить приподъёмы для проверки веса на высоту не менее 20м со скоростью не более 5м/мин '
+             'через каждые 300-500м (первичный-последующий спуск) в НКТ и 50-100м в ЭК.',
+             None, None, None, None, None, None, None, None, 'Мастер, бурильщик ГНКТ', None],
             [None, 11, 'Перед каждой промывкой и после проверять веса ГТ (вверх, вниз, собств.)', None, None, None,
-             None, None, None, None, None, 'Мастер, бурильщик ГНКТ'], [None, 12,
-                                                                       'При проведении технологического отстоя - не оставлять ГНКТ без движения - производить расхаживания г/трубы на 20м вверх и на 20м вниз со скоростью СПО не более 3м/мин. При отрицательной температуре окружающей среды, во избежании получения ледяной пробки в г/трубе при проведении тех.отстоя ни в коем случае не прекращать минимальную циркуляцию жидкости по г/трубе.',
-                                                                       None, None, None, None, None, None, None, None,
-                                                                       'Мастер, бурильщик ГНКТ'], [None, 13,
-                                                                                                   'Не допускать увеличение нагрузки на г/трубу в процессе спуска. РАЗГРУЗКА Г/ТРУБЫ НЕ БОЛЕЕ 500 кг от собственного веса на этой глубине.',
-                                                                                                   None, None, None,
-                                                                                                   None, None, None,
-                                                                                                   None, None,
-                                                                                                   'Мастер, бурильщик ГНКТ'],
-            [None, 'Монтаж и опрессовка', None, None, None, None, None, None, None, None, None, None], [None, 14,
-                                                                                                        'Собрать Компоновку Низа Колонны-1 далее КНК-1: коннектор + сдвоенный обратный клапан + насадка-промывочная Ø 38,1мм',
-                                                                                                        None, None,
-                                                                                                        None, None,
-                                                                                                        None, None,
-                                                                                                        None, None,
-                                                                                                        'Мастер ГНКТ'],
+             None, None, None, None, None, 'Мастер, бурильщик ГНКТ', None],
+            [None, 12,
+             'При проведении технологического отстоя - не оставлять ГНКТ без движения - производить '
+             'расхаживания г/трубы на 20м вверх и на 20м вниз со скоростью СПО не более 3м/мин. При '
+             'отрицательной температуре окружающей среды, во избежании получения ледяной пробки в '
+             'г/трубе при проведении тех.отстоя ни в коем случае не прекращать минимальную циркуляцию '
+             'жидкости по г/трубе.',
+             None, None, None, None, None, None, None, None, 'Мастер, бурильщик ГНКТ', None],
+            [None, 13,
+             'Не допускать увеличение нагрузки на г/трубу в процессе спуска. РАЗГРУЗКА Г/ТРУБЫ НЕ '
+             'БОЛЕЕ 500 кг от собственного веса на этой глубине.',
+             None, None, None, None, None, None, None, None,
+             'Мастер, бурильщик ГНКТ', None],
+            [None, 'Монтаж и опрессовка', None, None, None, None, None, None, None, None, None,
+             None, None],
+            [None, 14,
+             'Собрать Компоновку Низа Колонны-1 далее КНК-1: коннектор + сдвоенный обратный клапан + '
+             'насадка-промывочная Ø 38,1мм',
+             None, None, None, None, None, None, None, None,
+             'Мастер ГНКТ', None],
             [None, 15,
-             'Произвести монтаж 4-х секционного превентора БП 80-70.00.00.000 (700атм) и инжектора на устье скважины согласно "Схемы №6 обвязки устья скважин I, II, III категории опасности возникновения ГНВП после проведения гидроразрыва пласта и работы на скважинах ППД с оборудованием койлтюбинговых установок на месторождениях ООО "Башнефть-Добыча" от 02.04.2019г. Произвести обвязку установки ГНКТ, насосно-компрессорного агрегата, желобной циркуляционной системы.',
-             None, None, None, None, None, None, None, None, 'Мастер ГНКТ'], [None, 16,
-                                                                              'Внимание: Все требования ПБ и ОТ должны быть доведены до сведения работников, персонал должен быть проинформирован о начале проведения опрессовок. Все опрессовки производить согласно инструкции опрессовки ПВО и инструкции опрессовки нагнетательной и выкидной линии перед производством работ на скважине с Колтюбинговыми установками.',
-                                                                              None, None, None, None, None, None, None,
-                                                                              None, 'Мастер ГНКТ'], [None, 17,
-                                                                                                     'При отрицательной температуре окружающей среды, нагреть до 50ºC и прокачать по ГНКТ солевой раствор в объеме ГНКТ для предотвращения замерзания раствора внутри г/трубы (получения ледяной пробки).',
-                                                                                                     None, None, None,
-                                                                                                     None, None, None,
-                                                                                                     None, None,
-                                                                                                     'Мастер ГНКТ'],
+             f'Произвести монтаж 4-х секционного превентора БП 80-70.00.00.000 (700атм) и инжектора на устье '
+             f'скважины согласно "Схемы №6 обвязки устья скважин I, II, III категории опасности возникновения ГНВП '
+             f'после проведения гидроразрыва пласта и работы на скважинах ППД с оборудованием койлтюбинговых установок '
+             f'на месторождениях ООО "Башнефть-Добыча" от {CreatePZ.dict_contractor[CreatePZ.contractor]["Дата ПВО"]}. '
+             f'Произвести обвязку установки ГНКТ,'
+             f' насосно-компрессорного агрегата, желобной циркуляционной системы.',
+             None, None, None, None, None, None, None, None,
+             'Мастер ГНКТ', None],
+            [None, 16,
+             'Внимание: Все требования ПБ и ОТ должны быть доведены до сведения работников, персонал должен быть '
+             'проинформирован о начале проведения опрессовок. Все опрессовки производить согласно инструкции '
+             'опрессовки ПВО и инструкции опрессовки нагнетательной и выкидной линии перед производством работ '
+             'на скважине с Колтюбинговыми установками.',
+             None, None, None, None, None, None, None, None,
+             'Мастер ГНКТ', None],
+            [None, 17,
+             'При отрицательной температуре окружающей среды, нагреть до 50ºC и прокачать по ГНКТ солевой раствор '
+             'в объеме ГНКТ для предотвращения замерзания раствора внутри г/трубы (получения ледяной пробки).',
+             None, None, None, None, None, None, None, None,
+             'Мастер ГНКТ', None],
             [None, 18,
-             'При закрытой центральной задвижке фонтанной арматуры опрессовать ГНКТ и все нагнетательные линии на 250атм. Опрессовать ПВО, обратные клапана и выкидную линию от устья скважины до желобной ёмкости (надёжно закрепить, оборудовать дроссельными задвижками) опрессовать на 105атм с выдержкой 30мин. Результат опрессовки ПВО зафиксировать в вахтовом журнале и составить акт опрессовки ПВО. Установить на малом и большом затрубе технологический манометр. Провести УТЗ и инструктаж. Опрессовку проводить в присутствии представителя ПФС, мастера, бурильщика, машиниста подъемника и представителя супервайзерской службы. \nЗаявку на представителя ПФЧ подавать за 24 часа телефонограммой. По окончании опрессовоки ПВО, получить разрешения от представителя ПФС.',
-             None, None, None, None, None, None, None, None, 'Мастер ГНКТ'],
-            [None, 'СПО промывочной КНК-1', None, None, None, None, None, None, None, None, None, None], [None, 19,
-                                                                                                          'Открыв скважину и записав число оборотов задвижки – зафиксировать дату и время. Спустить КНК-1 в скважину с периодическими прокачками рабочей жидкостью (тех.вода 1,02г/см3)  с проверкой веса на подъём через каждые 300м спуска до глубины 1081м.',
-                                                                                                          None, None,
-                                                                                                          None, None,
-                                                                                                          None, None,
-                                                                                                          None, None,
-                                                                                                          'Мастер ГНКТ'],
+             f'При закрытой центральной задвижке фонтанной арматуры опрессовать ГНКТ и все нагнетательные '
+             f'линии на 250атм. Опрессовать ПВО, обратные клапана и выкидную линию от устья скважины '
+             f'до желобной ёмкости (надёжно закрепить, оборудовать дроссельными задвижками) опрессовать '
+             f'на {CreatePZ.max_admissible_pressure}атм с выдержкой 30мин. Результат опрессовки ПВО зафиксировать'
+             f' в вахтовом журнале и '
+             f'составить акт опрессовки ПВО. Установить на малом и большом затрубе технологический манометр. '
+             f'Провести УТЗ и инструктаж. Опрессовку проводить в присутствии представителя ПФС, мастера, '
+             f'бурильщика, машиниста подъемника и представителя супервайзерской службы. \nЗаявку на '
+             f'представителя ПФЧ подавать за 24 часа телефонограммой. По окончании опрессовоки ПВО, '
+             f'получить разрешения от представителя ПФС.',
+             None, None, None, None, None, None, None, None,
+             'Мастер ГНКТ', None],
+            [None, 'СПО промывочной КНК-1', None, None, None, None, None, None, None, None, None,
+             None, None],
+            [None, 19,
+             f'Открыв скважину и записав число оборотов задвижки – зафиксировать дату и время.'
+             f' Спустить КНК-1 в скважину с периодическими прокачками рабочей жидкостью (тех.вода 1,02г/см3)  '
+             f'с проверкой веса на подъём через каждые 300м спуска до глубины '
+             f'{round(nkt_lenght - 20, 0)}м.',
+             None, None, None, None, None, None, None, None,
+             'Мастер ГНКТ', None],
             [None, 20,
-             'ВНИМАНИЕ: при получении посадки в НКТ в процессе спуска и наличии разгрузки на промывочный инструмент более 500кг (уведомить Заказчика – составить АКТ на посадку). Приподнять КНК-1 на 20м выше этой глубины.Произвести вывод НКА на рабочий режим, восстановить устойчивую циркуляцию промывочной жидкости (тех.вода 1,02г/см3) , продолжить спуск до гл.1081м с постоянным контролем промывочной жидкости в обратной ёмкости на наличие мех. примесей. Скорость спуска при промывке НКТ не более 5м/мин. Контрольная проверка веса через каждые 100м промывки.',
-             None, None, None, None, None, None, None, None, 'Мастер ГНКТ'], [None, 21,
-                                                                              'На гл.1081м  произвести вывод НКА на рабочий режим, восстановить устойчивую циркуляцию промывочной жидкости (тех.вода 1,02г/см3), при необходимости произвести запуск и вывод на режим МАК, получить стабильную круговую циркуляцию азотированной смеси. Промывка в течении 60мин с контролем на мех.примеси в обратной ёмкости.',
-                                                                              None, None, None, None, None, None, None,
-                                                                              None, None], [None, None,
-                                                                                            'ВНИМАНИЕ: В процессе промывки скважины - параметры азотированной промывочной смеси могут изменяться (от 80 до 200л/мин по жидкости (тех.вода 1,02г/см3) и от 8 до 20м3/мин по азоту) в зависимости от качества выноса посторонних частиц с забоя - данный процесс находиться под постоянным контролем у мастера по сложным работам ГНКТ.',
-                                                                                            None, None, None, None,
-                                                                                            None, None, None, None,
-                                                                                            None], [None, 22,
-                                                                                                    'Произвести допуск КНК-1 с промывкой до "Муфты ГРП №5" на гл.1216,05-1216,95м.\nСкорость спуска при промывке не более 5м/мин, проверка веса на подъём через каждые 30м.',
-                                                                                                    None, None, None,
-                                                                                                    None, None, None,
-                                                                                                    None, None,
-                                                                                                    'Мастер ГНКТ'],
+             f'ВНИМАНИЕ: при получении посадки в НКТ в процессе спуска и наличии разгрузки на промывочный '
+             f'инструмент более 500кг (уведомить Заказчика – составить АКТ на посадку). Приподнять КНК-1 на 20м '
+             f'выше этой глубины.Произвести вывод НКА на рабочий режим, восстановить устойчивую циркуляцию промывочной'
+             f' жидкости (тех.вода 1,02г/см3) , продолжить спуск до гл.'
+             f'{round(nkt_lenght - 20, 0)}м с постоянным контролем промывочной '
+             f'жидкости в обратной ёмкости на наличие мех. примесей. Скорость спуска при промывке НКТ не более '
+             f'5м/мин. Контрольная проверка веса через каждые 100м промывки.',
+             None, None, None, None, None, None, None, None,
+             'Мастер ГНКТ', None],
+            [None, 21,
+             f'На гл.{round(nkt_lenght + 20, 0)}м '
+             f'произвести вывод НКА на рабочий режим, восстановить устойчивую циркуляцию '
+             f'промывочной жидкости (тех.вода {fluid_work}), при необходимости произвести запуск и'
+             ' вывод на режим МАК, получить стабильную круговую циркуляцию азотированной смеси. '
+             'Промывка в течении 60мин с контролем на мех.примеси в обратной ёмкости.',
+             None, None, None, None, None, None, None, None,
+             None, None],
+            [None, 22,
+             f'ВНИМАНИЕ: В процессе промывки скважины - параметры азотированной промывочной смеси могут изменяться (от '
+             f'80 до 200л/мин по жидкости (тех.вода {fluid_work}) и от 8 до 20м3/мин по азоту) в зависимости от качества '
+             f'выноса посторонних частиц с забоя - данный процесс находиться под постоянным контролем у мастера по'
+             f' сложным работам ГНКТ.',
+             None, None, None, None,
+             None, None, None, None,
+             None, None],
+            [None, 22,
+             f'Произвести допуск КНК-1 с промывкой до МУФТЫ {top_muft} на гл.'
+             f'{ports_data[top_muft]["кровля"]}-{ports_data[top_muft]["подошва"]}м.\nСкорость спуска при '
+             f'промывке не более 5м/мин, проверка веса на подъём через каждые 30м.',
+             None, None, None,
+             None, None, None,
+             None, None,
+             'Мастер ГНКТ', None],
             [None, 23,
-             'При промывке, в случае выноса большого объёма проппанта из пласта (или в случае поглощения промывочной жидкости) поинтервально через каждые 10м (или через каждые 2м) производить прокачку и  сопровождение гелевой пачки объёмом 0,5-3м3 со скоростью 10 м/мин до гл.1081м',
-             None, None, None, None, None, None, None, None, 'Мастер ГНКТ'], [None, 24,
-                                                                              'При слабой циркуляции или аномальном поглощении (более 5м3/ч) промывочной жидкости (тех.вода 1,02г/см3)  в процессе промывки, уведомить Заказчика, приподнять КНК-1 до гл.1081м восстановить стабильную круговой циркуляции жидкости (тех.вода 1,02г/см3). Допустить КНК-1 с циркуляцией (с контролем выхода на мех.примесей в смеси в обратной ёмкости) и продолжить промывку.',
-                                                                              None, None, None, None, None, None, None,
-                                                                              None, 'Мастер ГНКТ'], [None, 25,
-                                                                                                     'ВНИМАНИЕ: в процессе всего периода проведения работ на скважине при отсутствии проходки и получении жёсткой посадки с разгрузкой более 500кг сверх собственного веса на данной глубине, по согласованию с Заказчиком произвести ОБСЛЕДОВАНИЕ ТЕКУЩЕГО ЗАБОЯ спуском торцевой печати на ГНКТ (Dпечати -согласовать с Заказчиком). Получить отпечаток разгрузкой на ГНКТ в 1000кг. Поднять печать из скважины. Дальнейшие работы по результатам обследования печати.',
-                                                                                                     None, None, None,
-                                                                                                     None, None, None,
-                                                                                                     None, None,
-                                                                                                     'Мастер ГНКТ'],
+             f'При промывке, в случае выноса большого объёма проппанта из пласта (или в случае поглощения промывочной '
+             f'жидкости) поинтервально через каждые 10м (или через каждые 2м) производить прокачку и  сопровождение '
+             f'гелевой пачки объёмом 0,5-3м3 со скоростью 10 м/мин до гл.'
+             f'{round(nkt_lenght - 20, 0)}м',
+             None, None, None, None, None, None, None, None, 'Мастер ГНКТ', None],
+            [None, 24,
+             f'При слабой циркуляции или аномальном поглощении (более 5м3/ч) промывочной жидкости '
+             f'(тех.вода {fluid_work}) '
+             f'в процессе промывки, уведомить Заказчика, приподнять КНК-1 до гл.'
+             f'{round(nkt_lenght - 20, 0)}м восстановить стабильную круговой'
+             f' циркуляции жидкости (тех.вода {fluid_work}). Допустить КНК-1 с циркуляцией (с контролем выхода на '
+             'мех.примесей в смеси в обратной ёмкости) и продолжить промывку.',
+             None, None, None, None, None, None, None,
+             None, 'Мастер ГНКТ', None],
+            [None, 25,
+             'ВНИМАНИЕ: в процессе всего периода проведения работ на скважине при отсутствии проходки и получении жёс'
+             'ткой посадки с разгрузкой более 500кг сверх собственного веса на данной глубине, по согласованию с '
+             'Заказчиком произвести ОБСЛЕДОВАНИЕ ТЕКУЩЕГО ЗАБОЯ спуском торцевой печати на ГНКТ (Dпечати -согласовать '
+             'с Заказчиком). Получить отпечаток разгрузкой на ГНКТ в 1000кг. Поднять печать из скважины. Дальнейшие '
+             'работы по результатам обследования печати.',
+             None, None, None, None, None, None, None, None,
+             'Мастер ГНКТ', None],
             [None, 26,
              'При отсутствии проходки и получения жесткой посадки, дальнейшие работы по согласованию с Заказчиком.',
-             None, None, None, None, None, None, None, None, 'Мастер ГНКТ представитель Заказчика'], [None, 27,
-                                                                                                      'При достижении гл.1216,05м произвести промывку в следующем порядке:\n- прокачать гелевую пачку в объеме 2-3м3;\n- промыть скважину в течении 120 минут до выхода чистой, без посторонних примесей, промывочной жидкости (тех.вода 1,02г/см3). Составить акт.',
-                                                                                                      None, None, None,
-                                                                                                      None, None, None,
-                                                                                                      None, None,
-                                                                                                      'Мастер ГНКТ'],
+             None, None, None, None, None, None, None, None, 'Мастер ГНКТ представитель Заказчика', None],
+            [None, 27,
+             f'При достижении гл.{ports_data[top_muft]["кровля"]}м произвести промывку в следующем '
+             f'порядке:\n- прокачать гелевую пачку в объеме '
+             f'2-3м3;\n- промыть скважину в течении 120 минут до выхода чистой, без посторонних примесей, промывочной '
+             f'жидкости (тех.вода {fluid_work}). Составить акт.',
+             None, None, None,
+             None, None, None,
+             None, None,
+             'Мастер ГНКТ', None],
             [None, 28,
-             'Поднять КНК-1 на ГНКТ из скважины, закрыв скважину и записав число оборотов задвижки – зафиксировать дату и время. Демонтировать превентор, лубрикатор, КНК-1.',
-             None, None, None, None, None, None, None, None, 'Мастер ГНКТ представитель Заказчика'],
+             'Поднять КНК-1 на ГНКТ из скважины, закрыв скважину и записав число оборотов задвижки – '
+             'зафиксировать дату и время. Демонтировать превентор, лубрикатор, КНК-1.',
+             None, None, None, None, None, None, None, None, 'Мастер ГНКТ представитель Заказчика', None],
             [None, 'Спуск фрезеровочной КНК-2. Фрезерование муфт ГРП (фрак-портов)', None, None, None, None, None, None,
-             None, None, None, None], [None, 29,
-                                       'Собрать фрезеровочную Компоновку Низа Колонны-2, далее КНК-2: наружный коннектор Ø 54мм + обратный клапан створчатого типа 54мм + гидравлический разъединитель 57мм + ВЗД Ø 54-55мм + торцевой фрез Ø 68мм. Постоянно после сборки компоновки, проверять работоспособность ВЗД перед спуском в скважину на устье. Произвести замеры составных частей КНК с записью в журнале. Произвести монтаж лубрикатора и инжектора на устье скважины. Произвести необходимые опрессовки.',
-                                       None, None, None, None, None, None, None, None, 'Мастер ГНКТ'], [None, 30,
-                                                                                                        'Открыв скважину и записав число оборотов задвижки – зафиксировать дату и время. Спустить КНК-2 в скважину с периодическими прокачками рабочей жидкостью (тех.вода 1,02г/см3)  с проверкой веса на подъём через каждые 300м спуска до глубины 1107м. Убедиться в наличии свободного прохода по лифту НКТ.',
-                                                                                                        None, None,
-                                                                                                        None, None,
-                                                                                                        None, None,
-                                                                                                        None, None,
-                                                                                                        'Мастер ГНКТ'],
-            [None, 31,
-             'При получении посадки в НКТ и отсутствии прохода КНК-2 до гл.1107м, приподнять КНК-2 на 20м выше глубины посадки. Вывести НКА на рабочий режим в соответствии с рабочими параметрами ВЗД. Произвести проработку (проходного сечения НКТ) места посадки до получения свободного прохода в НКТ с составлением АКТа.',
-             None, None, None, None, None, None, None, None, 'Мастер ГНКТ'], [None, 32,
-                                                                              'При свободном и беспрепятственном прохождении КНК-2 на г/трубе в НКТ до гл.1107м, продолжить доспуск КНК-2 с минимальной подачей  ВЗД до "Муфты ГРП №5" до получения посадки на гл.1216,05м. Установить метку на г/трубе.',
-                                                                              None, None, None, None, None, None, None,
-                                                                              None, 'Мастер ГНКТ'], [None, 33,
-                                                                                                     'После соприкосновения с "Муфтой ГРП №5" приподнять КНК-2 на 10м выше. Проверить вес ГНКТ и давление циркуляции - эти значения будут ориентиром во время работы в случае заклинивания ВЗД и закупорки насадки. Вывести НКА на рабочий режим в соответствии с рабочими параметрами ВЗД.',
-                                                                                                     None, None, None,
-                                                                                                     None, None, None,
-                                                                                                     None, None,
-                                                                                                     'Мастер ГНКТ'],
-            [None, 34,
-             'Внимание: рабочее давление на устье в процессе разбуривания не должно превышать 100атм. Если циркуляционное давление выше 250атм, произвести закачку понизителя трения в концентрации 3-5л/1м3.',
-             None, None, None, None, None, None, None, None, 'Мастер ГНКТ'], [None, 35,
-                                                                              'Допустить КНК-2 с циркуляцией, и с гл.1216,05м произвести фрезерование посадочного седла "МГРП №5" до гл.1216,95м до снижения рабочего давления и получения провала. Следить за устьевым давлением и постоянно контролировать выходящую из скважины жидкость на наличие мех.примесей.',
-                                                                              None, None, None, None, None, None, None,
-                                                                              None, 'Мастер ГНКТ'], [None, 36,
-                                                                                                     'ВНИМАНИЕ: при слабой циркуляции или аномальном поглощении (более 5м3/ч) промывочной жидкости (тех.вода 1,02г/см3)  в процессе фрезерования, уведомить Заказчика, приподнять КНК-2 до гл.1081м восстановить стабильную циркуляцию и допустить КНК-2 до МГРП продолжить работы по фрезерованию.',
-                                                                                                     None, None, None,
-                                                                                                     None, None, None,
-                                                                                                     None, None,
-                                                                                                     'Мастер ГНКТ'],
-            [None, 37,
-             'После окончания фрезерования "МГРП №5" (1216,05-1216,95м) и получения прохода КНК-2 ниже глубины 1216,95м и возвращение веса к нормальным значениям (снижения рабочего давления и получения прохода ГНКТ), при необходимости прокачать на циркуляцию по г/трубе вязкую пачку в объеме 1м3. Проработать интервал "МГРП №5" три раза с выходом 5 метров ниже и выше. Минимизировать нахождение фрезы за интервалом разбуривания.',
-             None, None, None, None, None, None, None, None, 'Мастер ГНКТ'], [None, 38,
-                                                                              'После окончания проработки интервала "МГРП №5", произвести допуск КНК-2 на г/трубе с циркуляцией до следующей "Муфты ГРП №4" (на гл.1265,13м); уведомить Заказчика, составить АКТ на посадку. Произвести работы по фрезерованию "МГРП №4-№2" до согласно вышеописанной технологии (п.31-37).',
-                                                                              None, None, None, None, None, None, None,
-                                                                              None, 'Мастер ГНКТ'], [None, 39,
-                                                                                                     'Внимание: при отсутствии проходки вследствии предполагаемого износа фреза, произвести смену вооружения: поднять фрез.КНК, заменить фрез, спустить фрез.КНК, продолжить работы по фрезерованию седел муфт ГРП.',
-                                                                                                     None, None, None,
-                                                                                                     None, None, None,
-                                                                                                     None, None,
-                                                                                                     'Мастер ГНКТ'],
-            [None, 40,
-             'Внимание: при отсутствии свободного и беспрепятственного прохода КНК-2 до следующей "Муфты ГРП №4 (№3.....№2)" по согласованию с Заказчиком, произвести  промежутучную промывку на промывочной КНК-1 до "Муфты ГРП №4 (№3.....№2)", выполнить п.41-43',
-             None, None, None, None, None, None, None, None, 'Мастер ГНКТ'], [None,
-                                                                              'По согласованию с Заказчиком, проведение процедуры промежуточной промывки:\n СПО промывочной КНК-1, промывка до МГРП - выполнение п.41-43',
-                                                                              None, None, None, None, None, None, None,
-                                                                              None, None, None], [None, 41,
-                                                                                                  'Поднять КНК-2 на г/трубе из скважины. Закрыть коренную задвижку. Демонтировать инжектор, лубрикатор, КНК-2 (ВЗД с т/ф). Собрать КНК-1 (насадка промывочная Ø38.1мм + сдвоенный обратный клапан). Произвести монтаж лубрикатора и инжектора на устье скважины.Произвести необходимые опрессовки. Открыть скважину. Спустить КНК-1 в скважину с периодическими прокачками рабочей жидкостью (тех.вода 1,02г/см3) с проверкой веса на подъём через каждые 500м спуска до гл.1081м. Вывести НКА на рабочий режим промывки и получить стабильную круговую циркуляцию промывочной жидкости (тех.вода 1,02г/см3) произвести запуск азотного комплекса, вывести его на рабочий режим.Дождаться выхода пузыря азота. Получить стабильную круговуюциркуляцию азотированной смеси. Доспустить КНК-1 с циркуляцией на азотированной смеси до глубины непрохода КНК-2 и произвести промывку скважины до "Муфты ГРП №4 (№3.....№2)" до получения жесткой посадки.',
-                                                                                                  None, None, None,
-                                                                                                  None, None, None,
-                                                                                                  None, None,
-                                                                                                  'Мастер ГНКТ'],
-            [None, 42,
-             'При достижении "Муфты ГРП №4 (№3.....№2)" произвести промывку:\n- прокачать на циркуляцию по г/трубе вязкую пачку в V=2-3м3;\n- произвести промывку в течении не менее 2 часов, до чистой, без посторонних мех. примесей промывочной жидкости (тех.вода 1,02г/см3).\nСоставить акт на нормализацию в присутствии представителя Заказчика.',
-             None, None, None, None, None, None, None, None, 'Мастер ГНКТ представитель заказчика'], [None, 43,
-                                                                                                      'Поднять КНК-1 на ГНКТ из скважины. Закрыть коренную задвижку. Сменить промывочную КНК-1 на фрезировочную КНК-2. Продолжить работы по фрезерованию МГРП.',
-                                                                                                      None, None, None,
-                                                                                                      None, None, None,
-                                                                                                      None, None,
-                                                                                                      'Мастер ГНКТ'],
-            [None, 'Подъем фрезеровочной КНК-2', None, None, None, None, None, None, None, None, None, None], [None,
-                                                                                                               'ВНИМАНИЕ БУРИЛЬЩИК! П О С Т О Я Н Н О !!! При подъеме ВЗД после фрезерования седел и шаров МГРП, во избежание заклинивания и получения прихвата ГНКТ (от возможного попадания остатков частиц шара или седла после разбуривания ) остановить г/трубу не доходя 50м до воронки и прокачать малый затруб тех.жидкостью (тех.вода 1,02г/см3) в объеме не менее 2х объемов НКТ (9,6м3).',
-                                                                                                               None,
-                                                                                                               None,
-                                                                                                               None,
-                                                                                                               None,
-                                                                                                               None,
-                                                                                                               None,
-                                                                                                               None,
-                                                                                                               None,
-                                                                                                               None,
-                                                                                                               None],
-            [None, 44,
-             'После окончания проработки "МГРП №2 от забоя" поднять КНК-2 до гл.1081м.\nПроизвести тех.отстой в течении 2ух часов для замера Ризб на тех.воде. Пересчитать забойное давление и необходимый удельный вес жидкости глушения. По доп.согласованию с Заказчиком, произвести СПО пром.КНК-1 с целью глушения скважины -  выполнение п.47-57.',
-             None, None, None, None, None, None, None, None, 'Мастер ГНКТ'], [None, 45,
-                                                                              'После тех.отстоя произвести подъем КНК-2 на г/трубе из скважины соблюдая скорости безопасного СПО. Закрыть коренную задвижку.',
-                                                                              None, None, None, None, None, None, None,
-                                                                              None, 'Мастер ГНКТ'], [None, 46,
-                                                                                                     'Демонтировать превентор, лубрикатор, КНК-2 (ВЗД с т/ф). Обрезать 1 метр ГНКТ после СПО фрезеровочной КНК.',
-                                                                                                     None, None, None,
-                                                                                                     None, None, None,
-                                                                                                     None, None,
-                                                                                                     'Мастер ГНКТ'],
-            [None, 'Выполнение п.47-57 по доп. согласованию с Заказчиком.', None, None, None, None, None, None, None,
-             None, None, None],
-            [None, 'Спуск промывочной КНК-1', None, None, None, None, None, None, None, None, None, None], [None, 47,
-                                                                                                            'Собрать промывочную КНК-1: коннектор + сдвоенный обратный клапан + насадка промывочная Ø 38,1мм. Произвести монтаж лубрикатора и инжектора на устье скважины. Произвести необходимые опрессовки.',
-                                                                                                            None, None,
-                                                                                                            None, None,
-                                                                                                            None, None,
-                                                                                                            None, None,
-                                                                                                            'Мастер ГНКТ'],
-            [None, 48,
-             'Открыв скважину и записав число оборотов задвижки – зафиксировать дату и время. Спустить КНК-1 в скважину до гл.1081м с ПЕРИОДИЧЕСКОЙ прокачкой рабочей жидкостью (тех.вода 1,02г/см3) и проверкой веса на подъём. Убедится в наличии свободного прохода КНК-1 по НКТ.',
-             None, None, None, None, None, None, None, None, 'Мастер ГНКТ'], [None, 49,
-                                                                              'Произвести запуск и вывести Азотный комплекс и НКА на рабочий режим. Получить стабильную круговую циркуляцию азотированной смеси, промывка в течении 60мин с контролем на мех.примеси в обратной ёмкости.',
-                                                                              None, None, None, None, None, None, None,
-                                                                              None, 'Мастер ГНКТ'], [None, None,
-                                                                                                     'Расчетные параметры циркуляции: по жидкости (тех.вода 1,02г/см3) 120л/мин; 10м3/мин по азоту.\nВ процессе промывки скважины, параметры азотированной промывочной смеси могут изменяться (от 80 до 200л/мин по жидкости и от 8 до 20м3/мин по азоту) в зависимости от качества выноса посторонних частиц с забоя. данный процесс находится под постоянным контролем у ст.мастера ГНКТ.',
-                                                                                                     None, None, None,
-                                                                                                     None, None, None,
-                                                                                                     None, None,
-                                                                                                     'Мастер ГНКТ'],
-            [None, 50,
-             'Произвести допуск КНК-1 с промывкой на азотированной смеси до текущего забоя на гл.1459м (при отсутствии проходки согласовать достигнутый забой с Заказчиком)',
-             None, None, None, None, None, None, None, None, 'Мастер ГНКТ'], [None, 51,
-                                                                              'При необходимости, при промывке производить сопровождение вымытой пачки со скоростью 2-3м/мин до глубины 1081м. Промывку производить до выхода чистой тех. жидкости (тех.вода 1,02г/см3) и только после этого продолжать промывку.',
-                                                                              None, None, None, None, None, None, None,
-                                                                              None, 'Мастер ГНКТ'], [None, 52,
-                                                                                                     'При достижении глубины 1459м (или согласованного забоя) произвести промывку в следующем порядке:\n- прокачать гелевую пачку в объеме 2-3м3;\n- промыть скважину в течении 2 часов до выхода чистой, без посторонних примесей, промывочной жидкости (тех.вода 1,02г/см3).Составить Акт на промывку в присутствии представителя Заказчика.',
-                                                                                                     None, None, None,
-                                                                                                     None, None, None,
-                                                                                                     None, None,
-                                                                                                     'Мастер ГНКТ'],
-            [None, 'По согласованию с Заказчиком, подтверждение нормализованного забоя', None, None, None, None, None,
-             None, None, None, None, None], [None, 53,
-                                             'Приподнять КНК-1 на ГНКТ не прекращая циркуляции до гл.1081м. Убедиться в отсутствии мех. примесей в промывочной жидкости (тех.вода 1,02г/см3) , остановить подачу жидкости НКА и ПАУ.',
-                                             None, None, None, None, None, None, None, None, 'Мастер ГНКТ'],
-            [None, 54, 'Произвести тех.отстой скважины для оседания твёрдых частиц в течении 2х часов.', None, None,
-             None, None, None, None, None, None, 'Мастер ГНКТ'], [None, 55,
-                                                                  'После технологического отстоя допустить КНК-1 на г/трубе в скважину «без циркуляции» до гл.1459м, забой должен соответствовать ранее нормализованному. Составить АКТ с представителем Заказчика. При отсутствии ранее нормализованного забоя по согл. с Заказчиком, провести работы по нормализации забоя.',
-                                                                  None, None, None, None, None, None, None, None,
-                                                                  'Мастер ГНКТ представитель Заказчика'],
-            [None, 'Подъем промывочной КНК-1', None, None, None, None, None, None, None, None, None, None], [None, 56,
-                                                                                                             'Произвести подъем с замещением скважинной жидкости на раствор глушения, удельного веса по согласованию с Заказчиком, рассчитанного по замеру Ризб после 2-х часов отстоя и удел.веса рабочей жидкости в скважин, но не менее удельного веса расчитанного для пластового давления указанного в настоящем плане работ 1,23г/см3 (при Рпл=95атм).  До завоза раствора, скважину разряжать. Перед замещением КНК установить в интервале нижнего фрак-порта.\nПрокачать на циркуляцию жидкость глушения в объеме не менее 7,4м3 (трубного пространства)  с одновременным подъемом ГНКТ (с протяжкой ГНКТ перевести хвостовик). В процессе перевода соблюдать равенство объемов закаченной и отобранной из скважины жидкости, т.е. не допускать режима фонтанирования (поглощения).',
-                                                                                                             None, None,
-                                                                                                             None, None,
-                                                                                                             None, None,
-                                                                                                             None, None,
-                                                                                                             'Мастер ГНКТ представитель Заказчика'],
-            [None, 57,
-             'Извлечь КНК-1 на ГНКТ из скважины. Закрыть скважину записав и сверив число оборотов задвижки – зафиксировать дату и время.',
-             None, None, None, None, None, None, None, None, 'Мастер ГНКТ представитель Заказчика'],
-            [None, 'ДЕМОНТАЖ И ОСВОБОЖДЕНИЕ ТЕРРИТОРИИ', None, None, None, None, None, None, None, None, None, None],
-            [None, 58, 'После закрытия задвижки - отдуть г/трубу азотом.', None, None, None, None, None, None, None,
-             None, 'Мастер ГНКТ'], [None, 59,
-                                    'Произвести демонтаж превентора и инжектора, установки ГНКТ. Очистить желобные ёмкости от проппанта в мешки – приготовить к вывозу. Составить Акт на количество вымытого проппанта. Произвести демонтаж рабочих линий, рабочей площадки.\nВнимание: произвести вывоз отработанной технологической жидкости и мешки с вымытым проппантом на пункт(ы) утилизации, согласованный с Заказчиком.',
-                                    None, None, None, None, None, None, None, None, 'Мастер ГНКТ'],
-            [None, 60, 'Сдать скважину представителю Заказчика Составить АКТ.', None, None, None, None, None, None,
-             None, None, 'Мастер ГНКТ'],
-            [None, 'Контроль выхода малого затруба', None, None, None, None, None, None, None, None, None, None],
-            [None, 61,
-             'Во время промывки - выход малого затруба постоянно должен находиться под контролем. На желобной ёмкости постоянно осуществляется наблюдение за наличием проппанта и мех. примесей на выходной линии. \nПеред началом промывки – необходимо отрегулировать штуцерный монифольд так, как это необходимо – уровень промывочной жидкости в циркуляционной ёмкости не должен уменьшаться. Уровень жидкости должен находиться под постоянным наблюдением, чтобы избежать потери жидкости в пласт. Во время промывки уровень жидкости должен немного увеличиваться или оставаться неизменным.',
-             None, None, None, None, None, None, None, None, 'Мастер ГНКТ'],
-            [None, 'Действия при приватах ГНКТ.', None, None, None, None, None, None, None, None, None, None],
-            [None, 62,
-             'ВНИМАНИЕ: При наличии посадок КНК - спуск производить с остановками для промежуточных промывок. В случае прихвата ГНКТ в скважине - проинформировсть ответственного представителя Заказчика и руководство ГНКТ ООО "ВЕТЕРАН". Дальнейшие действия производить в присутствии представителя Заказчика с составлением АКТа согласно "Плана-Схемы действий при прихватах ГНКТ" ТЕХНОЛОГИЧЕСКОЙ ИНСТРУКЦИИ ОАО «Башнефть добыча»',
+             None, None, None, None, None],
+            [None, 29,
+             'Собрать фрезеровочную Компоновку Низа Колонны-2, далее КНК-2: наружный коннектор Ø 54мм + '
+             'обратный клапан створчатого типа 54мм + гидравлический разъединитель 57мм + ВЗД Ø 54-55мм +'
+             ' торцевой фрез Ø 68мм. Постоянно после сборки компоновки, проверять работоспособность ВЗД перед спуском '
+             'в скважину на устье. Произвести замеры составных частей КНК с записью в журнале. Произвести монтаж '
+             'лубрикатора и инжектора на устье скважины. Произвести необходимые опрессовки.',
+             None, None, None, None, None, None, None, None, 'Мастер ГНКТ', None],
+            [None, 30,
+             'Открыв скважину и записав число оборотов задвижки – зафиксировать дату и время. Спустить КНК-2 в '
+             f'скважину с периодическими прокачками рабочей жидкостью (тех.вода {fluid_work})  с проверкой веса на '
+             f'подъём через каждые 300м спуска до глубины {ports_data[top_muft]["кровля"] - 20}м. '
+             f'Убедиться в наличии свободного прохода по лифту НКТ.',
              None, None, None, None, None, None, None, None,
-             'Мастер ГНКТ, предст.Заказчика Мастер по сложным работам ГНКТ'],
+             'Мастер ГНКТ', None],
+            [None, 31,
+             f'При получении посадки в НКТ и отсутствии прохода КНК-2 до гл.{ports_data[top_muft]["кровля"] - 20}м,'
+             f' приподнять КНК-2 на 20м выше '
+             f'глубины посадки. Вывести НКА на рабочий режим в соответствии с рабочими параметрами ВЗД. Произвести '
+             'проработку (проходного сечения НКТ) места посадки до получения свободного прохода в НКТ с составлением '
+             'АКТа.',
+             None, None, None, None, None, None, None, None, 'Мастер ГНКТ', None],
+            [None, 32,
+             f'При свободном и беспрепятственном прохождении КНК-2 на г/трубе в НКТ до гл.'
+             f'{ports_data[top_muft]["кровля"] - 20}м, продолжить '
+             f'доспуск КНК-2 с минимальной подачей  ВЗД до {top_muft} до получения посадки на гл.'
+             f'{ports_data[top_muft]["кровля"] - 20}м. '
+             'Установить метку на г/трубе.',
+             None, None, None, None, None, None, None,
+             None, 'Мастер ГНКТ', None]]
+
+        frez_mufts = []
+        count_muft = -2
+        for muft, muft_data in sorted(ports_data.items(), reverse=True)[:-1]:
+
+            frez_muft = [
+                [None,
+                 f'ФРЕЗЕРОВАНИЕ МУФТЫ {muft}',
+                 None, None, None, None, None, None, None, None, None,
+                 'Мастер ГНКТ', None],
+                [None, 33,
+                 f'После соприкосновения с МУФТОЙ {muft} приподнять КНК-2 на 10м выше. Проверить вес ГНКТ и '
+                 'давление циркуляции - эти значения будут ориентиром во время работы в случае заклинивания ВЗД '
+                 'и закупорки насадки. Вывести НКА на рабочий режим в соответствии с рабочими параметрами ВЗД.',
+                 None, None, None,
+                 None, None, None,
+                 None, None,
+                 'Мастер ГНКТ', None],
+                [None, 34,
+                 'Внимание: рабочее давление на устье в процессе разбуривания не должно превышать 100атм. '
+                 'Если циркуляционное давление выше 250атм, произвести закачку понизителя трения в концентрации 3-5л/1м3.',
+                 None, None, None, None, None, None, None, None, 'Мастер ГНКТ', None],
+                [None, 35,
+                 f'Допустить КНК-2 с циркуляцией, и с гл.{muft_data["кровля"]}м произвести фрезерование посадочного седла '
+                 f'МУФТЫ {muft} до  гл.{muft_data["подошва"]} до снижения рабочего давления и получения провала. '
+                 f'Следить за устьевым давлением и '
+                 f'постоянно контролировать выходящую из скважины жидкость на наличие мех.примесей.',
+                 None, None, None, None, None, None, None,
+                 None, 'Мастер ГНКТ', None],
+                [None, 36,
+                 f'ВНИМАНИЕ: при слабой циркуляции или аномальном поглощении (более 5м3/ч) промывочной жидкости (тех.вода '
+                 f'{fluid_work})  в процессе фрезерования, уведомить Заказчика, приподнять КНК-2 до гл.'
+                 f'{round(nkt_lenght - 20, 0)}м восстановить '
+                 f'стабильную циркуляцию и допустить КНК-2 до МГРП продолжить работы по фрезерованию.',
+                 None, None, None,
+                 None, None, None,
+                 None, None,
+                 'Мастер ГНКТ', None],
+                [None, 37,
+                 f'После окончания фрезерования МУФТЫ {muft} ({muft_data["кровля"]}-{muft_data["подошва"]}м) и получения '
+                 f'прохода КНК-2 ниже глубины '
+                 f'{muft_data["подошва"]}м и возвращение веса к нормальным значениям (снижения рабочего давления и '
+                 f'получения прохода ГНКТ),'
+                 f' при необходимости прокачать на циркуляцию по г/трубе вязкую пачку в объеме 1м3. Проработать интервал'
+                 f' МУФТУ {muft} три раза с выходом 5 метров ниже и выше. Минимизировать нахождение фрезы за интервалом '
+                 f'разбуривания.',
+                 None, None, None, None, None, None, None, None, 'Мастер ГНКТ', None],
+                [None, 38,
+                 f'После окончания проработки интервала МУФТЫ {muft}, произвести допуск КНК-2 на г/трубе с циркуляцией до '
+                 f'следующей {list(ports_data.keys())[count_muft]}; уведомить Заказчика, составить АКТ на посадку. ',
+                 None, None, None, None, None, None, None,
+                 None, 'Мастер ГНКТ', None],
+                [None, 39,
+                 'Внимание: при отсутствии проходки вследствии предполагаемого износа фреза, произвести смену '
+                 'вооружения: поднять фрез.КНК, заменить фрез, спустить фрез.КНК, продолжить работы по'
+                 ' фрезерованию седел муфт ГРП.',
+                 None, None, None,
+                 None, None, None,
+                 None, None,
+                 'Мастер ГНКТ', None],
+                [None, 40,
+                 'Внимание: при отсутствии свободного и беспрепятственного прохода КНК-2 до следующей муфты'
+                 ' по согласованию с Заказчиком, произвести  промежутучную промывку на '
+                 'промывочной КНК-1 до следующей муфты',
+                 None, None, None, None, None, None, None, None, 'Мастер ГНКТ', None]]
+            count_muft -= 1
+            frez_mufts.extend(frez_muft)
+
+        flushing_list = [
+            [None,
+             'По согласованию с Заказчиком, проведение процедуры промежуточной промывки:\n СПО '
+             'промывочной КНК-1, промывка до МГРП ',
+             None, None, None, None, None, None, None,
+             None, None, None, None],
+            [None, 41,
+             f'Поднять КНК-2 на г/трубе из скважины. Закрыть коренную задвижку. Демонтировать инжектор,'
+             f' лубрикатор, КНК-2 (ВЗД с т/ф). Собрать КНК-1 (насадка промывочная Ø38.1мм + сдвоенный '
+             f'обратный клапан). Произвести монтаж лубрикатора и инжектора на устье скважины.Произвести необходимые '
+             f'опрессовки. Открыть скважину. Спустить КНК-1 в скважину с периодическими прокачками рабочей жидкостью '
+             f'(тех.вода {fluid_work}) с проверкой веса на подъём через каждые 500м спуска до гл.'
+             f'{round(nkt_lenght - 20, 0)}м. Вывести НКА на'
+             f' рабочий режим промывки и получить стабильную круговую циркуляцию промывочной жидкости (тех.вода'
+             f' {fluid_work}) произвести запуск азотного комплекса, вывести его на рабочий режим.Дождаться выхода пузыря '
+             f'азота. Получить стабильную круговуюциркуляцию азотированной смеси. Доспустить КНК-1 с циркуляцией на '
+             f'азотированной смеси до глубины непрохода КНК-2 и произвести промывку скважины до '
+             f'{top_muft} - {bottom_muft}'
+             f' до получения жесткой посадки.',
+             None, None, None, None, None, None, None, None,
+             'Мастер ГНКТ', None],
+            [None, 42,
+             f'При достижении {top_muft} - {bottom_muft} произвести промывку:\n- прокачать на циркуляцию по '
+             f'г/трубе вязкую пачку в V=2-3м3;\n- произвести промывку в течении не менее 2 часов, до чистой, '
+             f'без посторонних мех. примесей промывочной жидкости (тех.вода {fluid_work}).\nСоставить акт на '
+             'нормализацию в присутствии представителя Заказчика.',
+             None, None, None, None, None, None, None, None, 'Мастер ГНКТ представитель заказчика', None],
+            [None, 43,
+             f'Поднять КНК-1 на ГНКТ из скважины. Закрыть коренную задвижку. Сменить промывочную КНК-1 на '
+             f'фрезеровочную КНК-2. Продолжить работы по фрезерованию МГРП.',
+             None, None, None, None, None, None, None, None,
+             'Мастер ГНКТ', None],
+            [None, 'Подъем фрезеровочной КНК-2', None, None, None, None, None, None, None, None, None, None, None],
+            [None, None,
+             'ВНИМАНИЕ БУРИЛЬЩИК! ПОСТОЯННО!!! При подъеме ВЗД после фрезерования седел и шаров МГРП,'
+             ' во избежание заклинивания и получения прихвата ГНКТ (от возможного попадания остатков частиц шара'
+             ' или седла после разбуривания ) остановить г/трубу не доходя 50м до воронки и прокачать малый затруб '
+             f'тех.жидкостью (тех.вода {fluid_work}) в объеме не менее 2х объемов НКТ.',
+             None, None, None, None, None, None, None, None, None, None, None],
+            [None, 44,
+             f'После окончания проработки {list(ports_data.keys())[-2]} от забоя" поднять КНК-2 до гл.'
+             f'{nkt_lenght - 20}м.\nПроизвести тех.отстой в '
+             'течении 2-х часов для замера Ризб на тех.воде. Пересчитать забойное давление и необходимый удельный '
+             'вес жидкости глушения. По доп.согласованию с Заказчиком, произвести СПО пром.КНК-1 с целью глушения '
+             'скважины -  выполнение ',
+             None, None, None, None, None, None, None, None, 'Мастер ГНКТ', None],
+            [None, 45,
+             'После тех.отстоя произвести подъем КНК-2 на г/трубе из скважины соблюдая скорости безопасного СПО.'
+             ' Закрыть коренную задвижку.',
+             None, None, None, None, None, None, None,
+             None, 'Мастер ГНКТ', None],
+            [None, 46,
+             'Демонтировать превентор, лубрикатор, КНК-2 (ВЗД с т/ф). Обрезать 1 метр ГНКТ после СПО '
+             'фрезеровочной КНК.',
+             None, None, None, None, None, None, None, None,
+             'Мастер ГНКТ', None],
+            [None, 'Промывку произвести по доп. согласованию с Заказчиком.', None, None, None, None, None, None, None,
+             None, None, None, None],
+            [None, 'Спуск промывочной КНК-1', None, None, None, None, None, None, None, None, None, None, None],
+            [None, 47,
+             'Собрать промывочную КНК-1: коннектор + сдвоенный обратный клапан + насадка промывочная Ø 38,1мм. '
+             'Произвести монтаж лубрикатора и инжектора на устье скважины. Произвести необходимые опрессовки.',
+             None, None, None, None, None, None, None, None,
+             'Мастер ГНКТ', None],
+            [None, 48,
+             'Открыв скважину и записав число оборотов задвижки – зафиксировать дату и время. Спустить КНК-1 в '
+             f'скважину до гл.{nkt_lenght - 20}м с ПЕРИОДИЧЕСКОЙ прокачкой рабочей жидкостью (тех.вода '
+             f'{fluid_work}) и проверкой'
+             ' веса на подъём. Убедится в наличии свободного прохода КНК-1 по НКТ.',
+             None, None, None, None, None, None, None, None, 'Мастер ГНКТ', None],
+            [None, 49,
+             'Произвести запуск и вывести Азотный комплекс и НКА на рабочий режим. Получить стабильную круговую '
+             'циркуляцию азотированной смеси, промывка в течении 60мин с контролем на мех.примеси в обратной ёмкости.',
+             None, None, None, None, None, None, None,
+             None, 'Мастер ГНКТ', None],
+            [None, 49,
+             f'Расчетные параметры циркуляции: по жидкости (тех.вода {fluid_work}) 120л/мин; 10м3/мин по азоту.\nВ '
+             'процессе промывки скважины, параметры азотированной промывочной смеси могут изменяться (от 80 до '
+             '200л/мин по жидкости и от 8 до 20м3/мин по азоту) в зависимости от качества выноса посторонних '
+             'частиц с забоя. данный процесс находится под постоянным контролем у мастера ГНКТ.',
+             None, None, None, None, None, None, None, None,
+             'Мастер ГНКТ', None],
+            [None, 50,
+             f'Произвести допуск КНК-1 с промывкой на азотированной смеси до текущего забоя на гл.{bottom_muft}м (при '
+             'отсутствии проходки согласовать достигнутый забой с Заказчиком)',
+             None, None, None, None, None, None, None, None, 'Мастер ГНКТ', None],
+            [None, 51,
+             'При необходимости, при промывке производить сопровождение вымытой пачки со скоростью 2-3м/мин до '
+             f'глубины {nkt_lenght - 20}м. Промывку производить до выхода чистой тех. жидкости (тех.вода '
+             f'{fluid_work}) и только '
+             'после этого продолжать промывку.',
+             None, None, None, None, None, None, None,
+             None, 'Мастер ГНКТ', None],
+            [None, 52,
+             f'При достижении глубины МУФТЫ {bottom_muft} (или согласованного забоя) произвести промывку в следующем '
+             'порядке:\n- прокачать гелевую пачку в объеме 2-3м3;\n- промыть скважину в течении 2 часов до выхода '
+             f'чистой, без посторонних примесей, промывочной жидкости (тех.вода {fluid_work}).Составить Акт на промывку '
+             'в присутствии представителя Заказчика.',
+             None, None, None,
+             None, None, None,
+             None, None,
+             'Мастер ГНКТ', None],
+            [None, 'По согласованию с Заказчиком, подтверждение нормализованного забоя', None, None, None, None, None,
+             None, None, None, None, None, None],
+            [None, 53,
+             f'Приподнять КНК-1 на ГНКТ не прекращая циркуляции до гл.{nkt_lenght - 20}м. Убедиться в отсутствии мех. '
+             f'примесей в '
+             f'промывочной жидкости (тех.вода {fluid_work}) , остановить подачу жидкости НКА и ПАУ.',
+             None, None, None, None, None, None, None, None, 'Мастер ГНКТ', None],
+            [None, 54, 'Произвести тех.отстой скважины для оседания твёрдых частиц в течении 2х часов.', None, None,
+             None, None, None, None, None, None, 'Мастер ГНКТ', None],
+            [None, 55,
+             f'После технологического отстоя допустить КНК-1 на г/трубе в скважину «без циркуляции» до гл.'
+             f'{bottom_muft}м, '
+             'забой должен соответствовать ранее нормализованному. Составить АКТ с представителем Заказчика. При '
+             'отсутствии ранее нормализованного забоя по согл. с Заказчиком, провести работы по нормализации забоя.',
+             None, None, None, None, None, None, None, None,
+             'Мастер ГНКТ представитель Заказчика', None],
+            [None, 'Подъем промывочной КНК-1', None, None, None, None, None, None, None, None, None, None, None],
+            [None, 56,
+             'Произвести подъем с замещением скважинной жидкости на раствор глушения, удельного веса по согласованию '
+             'с Заказчиком, рассчитанного по замеру Ризб после 2-х часов отстоя и удел.веса рабочей жидкости в скважин, '
+             'но не менее удельного веса расчитанного для пластового давления указанного в настоящем плане работ '
+             f'1,23г/см3 (при Рпл={self.pressuar}атм).  До завоза раствора, '
+             f'скважину разряжать. Перед замещением КНК установить '
+             f'в интервале нижнего фрак-порта.\nПрокачать на циркуляцию жидкость глушения в объеме не менее '
+             f'{self.volume_dumping(ntk_true, bottom_muft)}м3 '
+             '(трубного пространства)  с одновременным подъемом ГНКТ (с протяжкой ГНКТ перевести хвостовик). '
+             'В процессе перевода соблюдать равенство объемов закаченной и отобранной из скважины жидкости, '
+             'т.е. не допускать режима фонтанирования (поглощения).',
+             None, None,
+             None, None,
+             None, None,
+             None, None,
+             'Мастер ГНКТ представитель Заказчика', None],
+            [None, 57,
+             'Извлечь КНК-1 на ГНКТ из скважины. Закрыть скважину записав и сверив число оборотов задвижки – '
+             'зафиксировать дату и время.',
+             None, None, None, None, None, None, None, None, 'Мастер ГНКТ представитель Заказчика', None],
+            [None, 'ДЕМОНТАЖ И ОСВОБОЖДЕНИЕ ТЕРРИТОРИИ', None, None, None, None, None, None, None, None, None, None,
+             None],
+            [None, 58, 'После закрытия задвижки - отдуть г/трубу азотом.', None, None, None, None, None, None, None,
+             None, 'Мастер ГНКТ', None],
+            [None, 59,
+             'Произвести демонтаж превентора и инжектора, установки ГНКТ. Очистить желобные ёмкости от проппанта в '
+             'мешки – приготовить к вывозу. Составить Акт на количество вымытого проппанта. Произвести демонтаж '
+             'рабочих линий, рабочей площадки.\nВнимание: произвести вывоз отработанной технологической жидкости'
+             ' и мешки с вымытым проппантом на пункт(ы) утилизации, согласованный с Заказчиком.',
+             None, None, None, None, None, None, None, None, 'Мастер ГНКТ', None],
+            [None, 60, 'Сдать скважину представителю Заказчика Составить АКТ.', None, None, None, None, None, None,
+             None, None, 'Мастер ГНКТ', None],
+            [None, 'Контроль выхода малого затруба', None, None, None, None, None, None, None, None, None, None, None],
+            [None, 61,
+             'Во время промывки - выход малого затруба постоянно должен находиться под контролем. На желобной ёмкости п'
+             'остоянно осуществляется наблюдение за наличием проппанта и мех. примесей на выходной линии. \nПеред'
+             ' началом промывки – необходимо отрегулировать штуцерный монифольд так, как это необходимо – уровень'
+             ' промывочной жидкости в циркуляционной ёмкости не должен уменьшаться. Уровень жидкости должен находиться'
+             ' под постоянным наблюдением, чтобы избежать потери жидкости в пласт. Во время промывки уровень жидкости '
+             'должен немного увеличиваться или оставаться неизменным.',
+             None, None, None, None, None, None, None, None, 'Мастер ГНКТ', None],
+            [None, 'Действия при приватах ГНКТ.', None, None, None, None, None, None, None, None, None, None, None],
+            [None, 62,
+             f'ВНИМАНИЕ: При наличии посадок КНК - спуск производить с остановками для промежуточных промывок. В случае '
+             f'прихвата ГНКТ в скважине - проинформировсть ответственного представителя Заказчика и руководство ГНКТ'
+             f'{CreatePZ.contractor}. Дальнейшие действия производить в присутствии представителя Заказчика с '
+             f'составлением АКТа '
+             f'согласно "Плана-Схемы действий при прихватах ГНКТ" ТЕХНОЛОГИЧЕСКОЙ ИНСТРУКЦИИ {CreatePZ.costumer}',
+             None, None, None, None, None, None, None, None,
+             'Мастер ГНКТ, предст.Заказчика Мастер по сложным работам ГНКТ', None],
             [None, 'Использование хим. реагентов в процессе работ', None, None, None, None, None, None, None, None,
-             None, None], [None, 63,
-                           'а) Во время промывки возможен резкий вынос большого объёма проппанта из пласта, что может привести к потере циркуляции и последующему прихвату ГНКТ, данную ситуацию можно проследить, при этом вес ГНКТ резко понизится, а циркуляционное давление начнёт повышаться, в данном случае необходимо приостановить спуск ГНКТ, произвести промывку с добавлением понизителя трения гидравлического давления (дозировка до 3-5л /1м3 в зависимости от применяемого вида) до стабилизации рабочего давления, после чего продолжить промывку.\nб) В случае поглащения промывочной жидкости (тех.вода 1,02г/см3) в процессе промывки, после взятия каждой пачки проппанта производить прокачку загеленной жидкости (вязких пачек) в объеме 2-4м3 с сопровождением пачек в НКТ до гл.стингера с последующей промывкой до полного выноса проппанта на желобную ёмкость.\nв) При наличии посадок КНК, спуск производить с остановками для промежуточных промывок.\nг) В случае использования мембранной азотной установки, для уменьшения коррозионного влияния кислорода на ГНКТ, приготовить промывочную жидкость с добавлением ингибитора коррозии в расчете 120 л на 25м3 жидкости (тех.вода 1,02г/см3).\nд) При выходе густого высоковязкого геля (во избежании закупорки циркуляционной системы) использовать диструктор - лимонную кислоту в жидком виде.',
-                           None, None, None, None, None, None, None, None, 'Мастер ГНКТ'], [None, 64,
-                                                                                            'После закрытия задвижки, приготовить и прокачать по г/трубе по циркуляции на желобную ёмкость пачку – ингибитора коррозии в объёме 40л, с целью предотвращнения коррозийных отложений в г/трубе.Предположительный расход хим.реагентов на скважину: 1) Понизитель трения Лубритал - 30л (концентрация 1л/м3); 2) Загуститель ВГ-4 - 20л (для загеливания тех.жидкости и прокачки вязких пачек концентрация 5кг/м3)',
-                                                                                            None, None, None, None,
-                                                                                            None, None, None, None,
-                                                                                            'Мастер ГНКТ']]
-        for row in gnkt_work_list:
-            krs_begin_gnkt.append(row)
+             None, None, None, None],
+            [None, 63,
+             'а) Во время промывки возможен резкий вынос большого объёма проппанта из пласта, что может привести к'
+             ' потере циркуляции и последующему прихвату ГНКТ, данную ситуацию можно проследить, при этом вес ГНКТ '
+             'резко понизится, а циркуляционное давление начнёт повышаться, в данном случае необходимо приостановить '
+             'спуск ГНКТ, произвести промывку с добавлением понизителя трения гидравлического давления '
+             '(дозировка до 3-5л /1м3 в зависимости от применяемого вида) до стабилизации рабочего давления, '
+             f'после чего продолжить промывку.\nб) В случае поглащения промывочной жидкости (тех.вода {fluid_work}) '
+             'в процессе промывки, после взятия каждой пачки проппанта производить прокачку загеленной жидкости'
+             ' (вязких пачек) в объеме 2-4м3 с сопровождением пачек в НКТ до гл.стингера с последующей промывкой '
+             'до полного выноса проппанта на желобную ёмкость.\nв) При наличии посадок КНК, спуск производить с '
+             'остановками для промежуточных промывок.\nг) В случае использования мембранной азотной установки, для '
+             'уменьшения коррозионного влияния кислорода на ГНКТ, приготовить промывочную жидкость с добавлением'
+             f' ингибитора коррозии в расчете 120 л на 25м3 жидкости (тех.вода {fluid_work}).\nд) При выходе густого '
+             'высоковязкого геля (во избежании закупорки циркуляционной системы) использовать диструктор - '
+             'лимонную кислоту в жидком виде.',
+             None, None, None, None, None, None, None, None, 'Мастер ГНКТ', None],
+            [None, 64,
+             'После закрытия задвижки, приготовить и прокачать по г/трубе по циркуляции на желобную ёмкость пачку – '
+             'ингибитора коррозии в объёме 40л, с целью предотвращнения коррозийных отложений в г/трубе. '
+             'Предположительный расход хим.реагентов на скважину: 1) Понизитель трения Лубритал - 30л '
+             '(концентрация 1л/м3); 2) Загуститель ВГ-4 - 20л (для загеливания тех.жидкости и прокачки '
+             'вязких пачек концентрация 5кг/м3)',
+             None, None, None, None, None, None, None, None,
+             'Мастер ГНКТ', None]]
+
+        gnkt_work_list = []
+
+        for row in block_gnvp_list:
+            gnkt_work_list.append(row)
+
+        for row in gnkt_work_firts:
+            gnkt_work_list.append(row)
+
+        for row in frez_mufts:
+            gnkt_work_list.append(row)
+
+        for row in flushing_list:
+            gnkt_work_list.append(row)
 
         # for row in range(1, len(krs_begin_gnkt) + 1):  # Добавлением работ
         #     # print(row, len(schema_well_list[row-1]), schema_well_list[row-1][15])
@@ -1087,7 +1418,16 @@ class Work_with_gnkt(QMainWindow):
         #                                                                            vertical = 'center')
         #         if cell.value != None and row > 24:
         #             cell.border = border
-        return krs_begin_gnkt
+        return gnkt_work_list
+
+    def volume_dumping(self, ntk_true, first_muft):
+        from krs import volume_pod_NKT, volume_jamming_well
+
+        if ntk_true == True:
+            volume = volume_pod_NKT(self) * 1.2
+        else:
+            volume = volume_jamming_well(self, first_muft) * 1.1
+        return round(volume, 1)
 
     def date_dmy(self, date_str):
         date_obj = datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
@@ -1174,8 +1514,6 @@ class Work_with_gnkt(QMainWindow):
             for index, port in enumerate(ports_data):
                 if index_row == 1:
                     ports_list[index_row][col - n - 2] = port
-
-
                 elif index_row == 2:
                     ports_list[index_row][col - n - 2] = ports_data[port]['тип']
                 elif index_row == 3:
@@ -1239,10 +1577,30 @@ class Work_with_gnkt(QMainWindow):
             # print(dict_saddles[manufacturer])
             ball = dict_saddles[manufacturer][type_column][type_saddles].ball
             saddle = dict_saddles[manufacturer][type_column][type_saddles].saddle
-            dict_ports[f'Муфта №{index + 1}'] = {'кровля': port[0], 'подошва': port[1], 'шар': ball, 'седло': saddle,
+            dict_ports[f'№{index + 1}'] = {'кровля': port[0], 'подошва': port[1], 'шар': ball, 'седло': saddle,
                                                  'тип': type_saddles}
 
         return dict_ports
+
+    def calc_fluid(self):
+        from open_pz import CreatePZ
+        fluid_list = []
+        try:
+
+            fluid_p = 0.83
+            for plast in CreatePZ.plast_work:
+                if float(list(CreatePZ.dict_perforation[plast]['рабочая жидкость'])[0]) > fluid_p:
+                    fluid_p = list(CreatePZ.dict_perforation[plast]['рабочая жидкость'])[0]
+            fluid_list.append(fluid_p)
+
+            fluid_work_insert, ok = QInputDialog.getDouble(self, 'Рабочая жидкость',
+                                                           'Введите удельный вес рабочей жидкости',
+                                                           max(fluid_list), 0.87, 2, 2)
+        except:
+            fluid_work_insert, ok = QInputDialog.getDouble(self, 'Рабочая жидкость',
+                                                           'Введите удельный вес рабочей жидкости',
+                                                           0, 0.87, 2, 2)
+        return fluid_work_insert
 
 
 if __name__ == '__main__':

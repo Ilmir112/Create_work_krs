@@ -599,15 +599,15 @@ class DataWindow(QMainWindow):
                 CreatePZ.dict_nkt[self.tabWidget.currentWidget().labels_nkt_po[1][0].text()] = self.if_None(
                     self.tabWidget.currentWidget().labels_nkt_po[1][1].text())
 
-        if self.dict_sucker_rod:
-            for key in range(1, len(self.dict_sucker_rod)):
-                # print(self.tabWidget.currentWidget().labels_sucker.keys())
-                CreatePZ.dict_sucker_rod[self.tabWidget.currentWidget().labels_sucker[key][0].text()] = self.if_None(
-                    self.tabWidget.currentWidget().labels_sucker[key][1].text())
-        else:
-            if self.tabWidget.currentWidget().labels_sucker[1][1].text():
-                CreatePZ.dict_sucker_rod[self.tabWidget.currentWidget().labels_sucker[1][0].text()] = self.if_None(
-                    self.tabWidget.currentWidget().labels_sucker[1][1].text())
+        # if self.dict_sucker_rod:
+        #     for key in range(1, len(self.dict_sucker_rod)):
+        #         print(self.tabWidget.currentWidget().labels_sucker)
+        #         CreatePZ.dict_sucker_rod[self.tabWidget.currentWidget().labels_sucker[key][0].text()] = self.if_None(
+        #             self.tabWidget.currentWidget().labels_sucker[key][1].text())
+        # else:
+        #     if self.tabWidget.currentWidget().labels_sucker[1][1].text():
+        #         CreatePZ.dict_sucker_rod[self.tabWidget.currentWidget().labels_sucker[1][0].text()] = self.if_None(
+        #             self.tabWidget.currentWidget().labels_sucker[1][1].text())
 
         if self.dict_sucker_rod.items():
             for key in range(1, len(self.dict_sucker_rod.items())):
@@ -621,7 +621,7 @@ class DataWindow(QMainWindow):
                     self.tabWidget.currentWidget().labels_sucker_po[1][1].text())
 
         close_file = True
-        print(f'голова {[self.ifNum(columnType), self.ifNum(column_wall_thickness), self.ifNum(shoe_column)]}')
+        # print(f'голова {[self.ifNum(columnType), self.ifNum(column_wall_thickness), self.ifNum(shoe_column)]}')
         if any([data_well == 'отсут' for data_well in
                 [columnType, column_wall_thickness, shoe_column]]):
             msg = QMessageBox.information(self, 'Внимание', 'Не все поля в данных колонне соответствуют значениям')
@@ -722,6 +722,7 @@ class DataWindow(QMainWindow):
             CreatePZ.bottomhole_drill = self.if_None(bottomhole_drill)
             CreatePZ.bottomhole_artificial = self.if_None(bottomhole_artificial)
             CreatePZ.current_bottom = self.if_None(current_bottom)
+            CreatePZ.bottom = self.if_None(current_bottom)
             CreatePZ.max_angle = self.if_None(max_angle)
             CreatePZ.max_expected_pressure = self.if_None(max_expected_pressure)
             CreatePZ.max_admissible_pressure = self.if_None(max_admissible_pressure)

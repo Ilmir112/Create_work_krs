@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QInputDialog, QMessageBox
 
-from krs import well_volume
+
 from work_py.acids_work import pressure_mode
 from work_py.rationingKRS import liftingNKT_norm, descentNKT_norm, well_volume_norm
 
@@ -34,7 +34,7 @@ def kot_work(self):
     kot_list = [[f'статической уровень {CreatePZ.static_level}', None,
                  f'При отсутствии циркуляции (статической уровень в ПЗ {CreatePZ.static_level}м):\n'
                  f'Спустить {kot_select(self)} на НКТ{CreatePZ.nkt_diam}мм до глубины {CreatePZ.current_bottom}м'
-                 f' с замером, шаблонированием шаблоном.',
+                 f' с замером, шаблонированием шаблоном {CreatePZ.nkt_template}мм.',
                  None, None, None, None, None, None, None,
                  'мастер КРС', descentNKT_norm(CreatePZ.current_bottom, 1)],
                 [f'{kot_select(self)} до H-{current_bottom} закачкой обратной промывкой', None,
@@ -48,7 +48,7 @@ def kot_work(self):
                  'мастер КРС, предст. заказчика', None],
 
                 [None, None,
-                 f'Поднять {kot_select(self)} на НКТ{CreatePZ.nkt_diam} c глубины {current_bottom}м с доливом '
+                 f'Поднять {kot_select(self)} на НКТ{CreatePZ.nkt_diam}мм c глубины {current_bottom}м с доливом '
                  f'скважины в '
                  f'объеме {round(CreatePZ.current_bottom * 1.12 / 1000, 1)}м3 удельным весом {CreatePZ.fluid_work}',
                  None, None, None, None, None, None, None,
@@ -60,6 +60,7 @@ def kot_work(self):
 
 def fluid_change(self):
     from open_pz import CreatePZ
+    from krs import well_volume
     import H2S
     expected_pressure, ok = QInputDialog.getDouble(self, 'Ожидаемое давление по пласту',
                                                    'Введите Ожидаемое давление по пласту', 0, 0, 300, 1)

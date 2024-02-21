@@ -146,7 +146,7 @@ class TabPage_SO(QWidget):
 
     def definition_pssh(self):
         from open_pz import CreatePZ
-        print(f'{CreatePZ.column_additional, CreatePZ.open_trunk_well}  открытый ствол')
+        print(f'{CreatePZ.column_additional is False, CreatePZ.open_trunk_well is False, all([CreatePZ.dict_perforation[plast]["отрайбировано"] for plast in CreatePZ.plast_work])}  открытый ствол')
         if CreatePZ.column_additional is False and CreatePZ.open_trunk_well is False and all(
                 [CreatePZ.dict_perforation[plast]['отрайбировано'] for plast in CreatePZ.plast_work]) is False:
             template_key = 'ПСШ ЭК'
@@ -721,14 +721,15 @@ class TemplateKrs(QMainWindow):
     def template_ek_without_skm(self):
         from open_pz import CreatePZ
 
-        first_template, second_template = TabPage_SO.template_diam_additional_ek(self)
+        if CreatePZ.column_additional == True:
+            first_template, second_template = TabPage_SO.template_diam_additional_ek(self)
 
-        roof_plast, roof_add_column_plast = self.definition_roof_not_raiding(
+        roof_plast, roof_add_column_plast = TabPage_SO.definition_roof_not_raiding(
             self)  # кровля отрайбированных интервалов перфорции
 
         length_template_addition = int(''.join(['30' if CreatePZ.lift_ecn_can_addition is True else '2']))
-        first_template = self.template_diam_ek()[0]
-        second_template = self.template_diam_ek()[1]
+        first_template =TabPage_SO.template_diam_ek(self)[0]
+        second_template = TabPage_SO.template_diam_ek(self)[1]
         if 'ПОМ' in str(CreatePZ.paker_do["posle"]).upper() and '122' in str(CreatePZ.paker_do["posle"]):
             second_template = 126
         second_template, ok = QInputDialog.getInt(None, 'Диаметр шаблон',
@@ -767,17 +768,20 @@ class TemplateKrs(QMainWindow):
                            f'НКТ{CreatePZ.nkt_diam}мм + шаблон-{second_template}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can]}м '
             ckm_teml = f'шаблон-{second_template}мм до гл.{math.ceil(roof_plast - 8)}м)'
             CreatePZ.template_depth = math.ceil(roof_plast - 8)
-        elif CreatePZ.column_additional is False and CreatePZ.open_trunk_well is False and all(
-                [CreatePZ.dict_perforation[plast]['отрайбировано'] for plast in CreatePZ.plast_work]) is True:
+        elif CreatePZ.column_additional is False \
+                and ((CreatePZ.open_trunk_well is False
+                      and all(
+                [CreatePZ.dict_perforation[plast]['отрайбировано'] for plast in CreatePZ.plast_work]) is True) or
+                                      (CreatePZ.open_trunk_well and CreatePZ.current_bottom < CreatePZ.shoe_column)):
             template_str = f'перо + шаблон-{second_template}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can]}м + ' \
                            f'НКТ{CreatePZ.nkt_diam}мм 10м + репер'
             ckm_teml = f'шаблон-{second_template}мм до гл.{math.ceil(CreatePZ.current_bottom)}м)'
             CreatePZ.template_depth = math.ceil(CreatePZ.current_bottom)
         elif CreatePZ.column_additional is True and CreatePZ.open_trunk_well is False and all(
                 [CreatePZ.dict_perforation[plast]['отрайбировано'] for plast in CreatePZ.plast_work]) is False:
-            template_str = f'обточная муфта + НКТ{nkt_pod}мм ' \
+            template_str = f'обточная муфта + НКТ{nkt_pod} ' \
                            f'{math.ceil(CreatePZ.current_bottom - math.ceil(roof_add_column_plast - 10))}м +' \
-                           f' шаблон-{first_template}мм L-{length_template_addition}м + НКТ{nkt_pod}мм' \
+                           f' шаблон-{first_template}мм L-{length_template_addition}м + НКТ{nkt_pod}' \
                            f' {math.ceil(roof_add_column_plast - float(CreatePZ.head_column_additional) - 20 - length_template_addition)}м ' \
                            f' + НКТ{CreatePZ.nkt_diam} {CreatePZ.head_column_additional - roof_plast}м + шаблон-{second_template}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can]}м '
             ckm_teml = f'(шаблон-{first_template}мм до гл.{math.ceil(roof_add_column_plast - 10)}м, ' \
@@ -789,7 +793,7 @@ class TemplateKrs(QMainWindow):
                 [CreatePZ.dict_perforation[plast]['отрайбировано'] for plast in CreatePZ.plast_work]) is False:
             template_str = f'фильтр направление L-2м + НКТ{nkt_pod} {math.ceil(CreatePZ.current_bottom - math.ceil(roof_add_column_plast) + 8)}м ' \
                            f'шаблон-{first_template}мм L-{length_template_addition} + {math.ceil(roof_add_column_plast) + 8 - float(CreatePZ.head_column_additional) - length_template_addition - 6}' \
-                           f'+ шаблон-{self.template_diam_additional_ek()[1]}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can]}м '
+                           f'+ шаблон-{TabPage_SO.template_diam_additional_ek()[1]}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can]}м '
             ckm_teml = f'(шаблон-{first_template}мм до {math.ceil(roof_add_column_plast) - 10}м, шаблон Ф-{second_template}мм до гл.{CreatePZ.head_column_additional - 10}м)'
             CreatePZ.template_depth_addition = math.ceil(roof_add_column_plast - 8)
             CreatePZ.template_depth = math.ceil(roof_plast - 8)
@@ -892,10 +896,11 @@ class TemplateKrs(QMainWindow):
                          f'уд.весом {CreatePZ.fluid_work}   до глубины {CreatePZ.current_bottom}м',
                          None, None, None, None, None, None, None, 'Мастер КРС', 4, None]
 
-        if CreatePZ.current_bottom - CreatePZ.perforation_sole <= 10 and CreatePZ.open_trunk_well is False:
+        if abs(CreatePZ.current_bottom - CreatePZ.perforation_sole) <= 10 and CreatePZ.open_trunk_well is False:
             privyazka_question = QMessageBox.question(self, 'Привязка оборудования',
-                                                      f'зумпф составляет {int(CreatePZ.current_bottom - CreatePZ.perforation_sole)}м '
-                                                      f'нужно ли привязывать компоновку?'
+                                                  f'зумпф между {CreatePZ.current_bottom} и {CreatePZ.perforation_sole}м '
+                                                  f'составляет {int(CreatePZ.current_bottom - CreatePZ.perforation_sole)}м '
+                                                  f'нужно ли привязывать компоновку?'
                                                       )
             if privyazka_question == QMessageBox.StandardButton.Yes:
                 list_template_ek.insert(-1, privyazka_nkt)
@@ -1132,7 +1137,7 @@ class TemplateKrs(QMainWindow):
         gipsPero_list = [
             [f'Спустить {pero_list}  на тНКТ{CreatePZ.nkt_diam}мм', None,
              f'Спустить {pero_list}  на тНКТ{CreatePZ.nkt_diam}мм до глубины {CreatePZ.current_bottom}м '
-             f'с замером, шаблонированием шаблоном. Опрессовать НКТ на 150атм. Вымыть шар. \n'
+             f'с замером, шаблонированием шаблоном {CreatePZ.nkt_template}мм. Опрессовать НКТ на 150атм. Вымыть шар. \n'
              f'С ГЛУБИНЫ 1100м СНИЗИТЬ СКОРОСТЬ  СПУСКА до 0.25м/с ВОЗМОЖНО ОТЛОЖЕНИЕ ГИПСА'
              f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
              None, None, None, None, None, None, None,

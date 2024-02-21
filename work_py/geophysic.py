@@ -20,7 +20,7 @@ class TabPage_SO(QWidget):
         self.ComboBoxGeophygist = QComboBox(self)
         self.ComboBoxGeophygist.addItems(
             ['Гироскоп', 'АКЦ', 'АКЦ + СГДТ', 'СГДТ', 'ИНГК', 'ЭМДС', 'ПТС', 'РК', 'ГК и ЛМ'])
-        self.ComboBoxGeophygist.setProperty("value", 'ГП')
+        self.ComboBoxGeophygist.currentTextChanged.connect(self.geophygist_data)
 
         self.labelDopInformation = QLabel("Доп информация", self)
         self.lineEditDopInformation = QLineEdit(self)
@@ -36,6 +36,13 @@ class TabPage_SO(QWidget):
         grid.addWidget(self.lineEditType, 1, 1)
         grid.addWidget(self.lineEditType2, 1, 2)
         grid.addWidget(self.lineEditDopInformation, 1, 3)
+
+    def geophygist_data(self):
+        from open_pz import CreatePZ
+        if self.ComboBoxGeophygist.currentText() in ['Гироскоп', 'АКЦ', 'ЭМДС', 'ПТС', 'РК', 'ГК и ЛМ']:
+            self.lineEditType.setText('0')
+            self.lineEditType2.setText(f'{CreatePZ.current_bottom}')
+
 
 
 class TabWidget(QTabWidget):

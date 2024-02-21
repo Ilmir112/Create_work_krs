@@ -28,7 +28,7 @@ def skm_interval(self, template):
                     str_raid.append([int(float(nek[0])) - 90, int(float(nek[1])) + 20])
                 else:
                     str_raid.append([int(float(nek[0])) - 90,
-                                     CreatePZ.CreatePZ.current_bottom - 2])
+                                     CreatePZ.current_bottom - 2])
         print(f'ПВР не отрайбированы {str_raid}')
     elif all(
             [CreatePZ.dict_perforation[plast]['отрайбировано'] is True for plast in CreatePZ.plast_work]):
@@ -193,37 +193,38 @@ def remove_overlapping_intervals(perforating_intervals):
 def raiding_interval(ryber_key):
     from open_pz import CreatePZ
     str_raid = []
-    if len(CreatePZ.dict_perforation) == 1 and CreatePZ.perforation_sole + 30 <= CreatePZ.current_bottom and \
-            CreatePZ.perforation_roof <= CreatePZ.current_bottom:
-        str_raid.append([CreatePZ.perforation_roof - 30, CreatePZ.perforation_sole + 30])
-    elif len(
-            CreatePZ.dict_perforation) == 1 and CreatePZ.perforation_sole + 30 >= CreatePZ.current_bottom and \
-            CreatePZ.perforation_roof <= CreatePZ.current_bottom:
+    # if len(CreatePZ.dict_perforation) == 1 and CreatePZ.perforation_sole + 30 <= CreatePZ.current_bottom and \
+    #         CreatePZ.perforation_roof <= CreatePZ.current_bottom:
+    #     str_raid.append([CreatePZ.perforation_roof - 30, CreatePZ.perforation_sole + 30])
+    #     print(f' кровля {str_raid, CreatePZ.perforation_sole}')
+    # elif len(
+    #         CreatePZ.dict_perforation) == 1 and CreatePZ.perforation_sole + 30 >= CreatePZ.current_bottom and \
+    #         CreatePZ.perforation_roof <= CreatePZ.current_bottom:
+    #
+    #     str_raid.append([CreatePZ.perforation_roof - 30, CreatePZ.current_bottom])
 
-        str_raid.append([CreatePZ.perforation_roof - 30, CreatePZ.current_bottom])
-    # print(str_raid)
-    elif len(CreatePZ.dict_perforation) > 1:
-        for plast in CreatePZ.dict_perforation.keys():
-            if plast in CreatePZ.plast_all:
-                # print(f' отрай {CreatePZ.dict_perforation[plast]["Прошаблонировано"]}')
-                crt = []
-                if CreatePZ.dict_perforation[plast]['отрайбировано'] == False:
-                    for i in CreatePZ.dict_perforation[plast]['интервал']:
-                        if float(i[1]) <= CreatePZ.current_bottom and float(i[0]) <= CreatePZ.current_bottom:
-                            if float(i[1]) + 20 <= CreatePZ.current_bottom:
-                                crt = [float(i[0]) - 20, float(i[1]) + 20]
-                            elif float(i[1]) + 20 >= CreatePZ.shoe_column and CreatePZ.column_additional is False:
-                                crt = [float(i[0]) - 20, CreatePZ.shoe_column]
-                            elif float(i[1]) + 20 >= CreatePZ.shoe_column_additional and CreatePZ.column_additional:
-                                crt = [float(i[0]) - 20, CreatePZ.shoe_column]
-                            elif int(i[0]) == int(CreatePZ.shoe_column) and CreatePZ.column_additional is False:
-                                pass
-                            elif int(i[1]) == int(CreatePZ.shoe_column_additional) and CreatePZ.column_additional:
-                                pass
-                            else:
-                                crt = [float(i[0]) - 20, CreatePZ.current_bottom]
-                            str_raid.append(crt)
-
+    # if len(CreatePZ.dict_perforation) > 1:
+    for plast in CreatePZ.dict_perforation.keys():
+        if plast in CreatePZ.plast_all:
+            # print(f' отрай {CreatePZ.dict_perforation[plast]["Прошаблонировано"]}')
+            crt = []
+            if CreatePZ.dict_perforation[plast]['отрайбировано'] == False:
+                for i in CreatePZ.dict_perforation[plast]['интервал']:
+                    if float(i[1]) <= CreatePZ.current_bottom and float(i[0]) <= CreatePZ.current_bottom:
+                        if float(i[1]) + 20 <= CreatePZ.current_bottom:
+                            crt = [float(i[0]) - 20, float(i[1]) + 20]
+                        elif float(i[1]) + 20 >= CreatePZ.shoe_column and CreatePZ.column_additional is False:
+                            crt = [float(i[0]) - 20, CreatePZ.shoe_column]
+                        elif float(i[1]) + 20 >= CreatePZ.shoe_column_additional and CreatePZ.column_additional:
+                            crt = [float(i[0]) - 20, CreatePZ.shoe_column]
+                        elif int(i[0]) == int(CreatePZ.shoe_column) and CreatePZ.column_additional is False:
+                            pass
+                        elif int(i[1]) == int(CreatePZ.shoe_column_additional) and CreatePZ.column_additional:
+                            pass
+                        else:
+                            crt = [float(i[0]) - 20, CreatePZ.current_bottom]
+                        str_raid.append(crt)
+    print(f'интерва hfq {str_raid}')
     if len(CreatePZ.drilling_interval) != 0:
         # print(CreatePZ.drilling_interval)
         for interval in CreatePZ.drilling_interval:
@@ -255,7 +256,7 @@ def raiding_interval(ryber_key):
         else:
             # print(ryber_key)
             for str in str_raid:
-                print()
+
                 if str[0] < CreatePZ.head_column_additional or str[1] < CreatePZ.head_column_additional:
                     str_raid.remove(str)
     pvlg_rir = QMessageBox.question(None, 'дополнительный интервал',

@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox
 from openpyxl import load_workbook
 
 from main import ExcelWorker
+from work_py.descent_gno import gno_nkt_opening
 from work_py.rationingKRS import liftingNKT_norm
 
 
@@ -21,19 +22,13 @@ def calculationFluidWork(vertical, pressure):
             fluidWork = 1.02
         elif fluidWork < 1.02 and (CreatePZ.region == 'ИГМ' or CreatePZ.region == 'ТГМ' or CreatePZ.region == 'ЧГМ'):
             fluidWork = 1.01
-        # print(f' ЖГС {fluidWork}')
+
         return fluidWork
     else:
         return None
 
-
-def work_krs(self, work_plan):
+def calc_work_fluid(self):
     from open_pz import CreatePZ
-    from work_py.rationingKRS import lifting_sucker_rod, well_jamming_norm, liftingGNO
-    from krs import well_jamming
-    from work_py.descent_gno import gno_nkt_opening
-    # print(f' пакер {CreatePZ.paker_do}), ЭЦН {CreatePZ.dict_pump_ECN}, ШГН {CreatePZ.dict_pump_SHGN}')
-
     fluid_list = []
 
     CreatePZ.current_bottom, ok = QInputDialog.getDouble(self, 'Необходимый забой',
@@ -48,7 +43,6 @@ def work_krs(self, work_plan):
                 fluid_p = list(CreatePZ.dict_perforation[plast]['рабочая жидкость'])[0]
         fluid_list.append(fluid_p)
 
-
         fluid_work_insert, ok = QInputDialog.getDouble(self, 'Рабочая жидкость',
                                                        'Введите удельный вес рабочей жидкости',
                                                        max(fluid_list), 0.87, 2, 2)
@@ -58,10 +52,7 @@ def work_krs(self, work_plan):
                                                        0, 0.87, 2, 2)
 
     CreatePZ.fluid = fluid_work_insert
-
     CreatePZ.fluid_short = fluid_work_insert
-
-    nkt_diam_fond = gno_nkt_opening(CreatePZ.dict_nkt)
 
     if str(CreatePZ.cat_H2S_list[0]) in ['2', '1']:
         fluid_work = f'{fluid_work_insert}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
@@ -81,10 +72,17 @@ def work_krs(self, work_plan):
                              f'расчета {H2S.calv_h2s(self, CreatePZ.cat_H2S_list[1], CreatePZ.H2S_mg[1], CreatePZ.H2S_pr[1])}кг/м3'
                 fluid_work_short = f'{fluid_work_insert}г/см3 c ХИМТЕХНО 101 Марка А - {H2S.calv_h2s(self, CreatePZ.cat_H2S_list[1], CreatePZ.H2S_mg[1], CreatePZ.H2S_pr[1])}кг/м3 '
 
+    return fluid_work, fluid_work_short
 
+def work_krs(self, work_plan):
+    from open_pz import CreatePZ
+    from work_py.rationingKRS import lifting_sucker_rod, well_jamming_norm, liftingGNO
+    from krs import well_jamming
+    from work_py.descent_gno import gno_nkt_opening
+    # print(f' пакер {CreatePZ.paker_do}), ЭЦН {CreatePZ.dict_pump_ECN}, ШГН {CreatePZ.dict_pump_SHGN}')
 
-    CreatePZ.fluid_work = fluid_work
-    CreatePZ.fluid_work_short = fluid_work_short
+    CreatePZ.fluid_work, CreatePZ.fluid_work_short =  calc_work_fluid()
+    nkt_diam_fond = gno_nkt_opening(CreatePZ.dict_nkt)
 
     if work_plan != 'dop_plan':
         if CreatePZ.if_None(CreatePZ.dict_pump_ECN["do"]) != 'отсут' and CreatePZ.if_None(CreatePZ.dict_pump_SHGN["do"]) != 'отсут':
@@ -140,7 +138,7 @@ def work_krs(self, work_plan):
 
         well_jamming_str_in_nkt = " " if without_damping_True is True\
             else f"По результату приемистости произвести глушение скважины в НКТ тех.жидкостью в объеме обеспечивающим " \
-                 f"заполнение трубного пространства и скважины в подпакерной зоне в объеме {volume_pod_NKT()} м3 " \
+                 f"заполнение трубного пространства и скважины в подпакерной зоне в объеме {volume_pod_NKT(self)} м3 " \
                  f"жидкостью уд.веса {fluid_work} при давлении не более {CreatePZ.max_admissible_pressure}атм. " \
                  f"Тех отстой 1-2 часа. Произвести замер избыточного давления в скважине."
 
@@ -167,7 +165,7 @@ def work_krs(self, work_plan):
             [None, 4,
              f'При подъеме труб из скважины производить долив тех. жидкостью Y- {fluid_work}. Долив скважины должен быть равен объему извлекаемого металла.'
              f'По мере расхода жидкости из ёмкости, производить своевременное её заполнение. При всех технологических спусках НКТ 73мм х 5,5мм и 60мм х 5мм производить '
-             f'контрольный замер и отбраковку + шаблонирование шаблоном d=59,6мм и 47,9мм соответственно.',
+             f'контрольный замер и отбраковку + шаблонирование шаблоном {CreatePZ.nkt_template}мм d=59,6мм и 47,9мм соответственно.',
              None, None, None, None, None, None, None,
              ' Мастер КРС.', None],
             [None, None, f'ТЕХНОЛОГИЧЕСКИЕ ОПЕРАЦИИ ПРОИЗВОДИТЬ НА ТЕХ ЖИДКОСТИ УД. ВЕСОМ РАВНОЙ {fluid_work}', None,
@@ -219,7 +217,8 @@ def work_krs(self, work_plan):
                        f'ПРОТИВОФОНТАННЫЙ ЛИФТ ДЛИНОЙ 300м. ', None, None,
                        None, None, None, None, None,
                        'Мастер КРС представитель Заказчика', None]]
-        kvostovik = f' + хвостовиком {round(sum(list(CreatePZ.dict_nkt.values())) - float(CreatePZ.H_F_paker_do["do"]), 1)}м ' if CreatePZ.region == 'ТР' else ''
+        kvostovik = f' + хвостовиком {round(sum(list(CreatePZ.dict_nkt.values())) - float(CreatePZ.H_F_paker_do["do"]), 1)}м '\
+            if CreatePZ.region == 'ТР' else ''
         well_jamming_str = well_jamming(self, without_damping_True, lift_key) # экземпляр функции расчета глушения
         well_jamming_ord = volume_jamming_well(self, float(CreatePZ.H_F_paker_do["do"]))
         lift_ord = [
@@ -257,7 +256,7 @@ def work_krs(self, work_plan):
             [well_jamming_str[2], None,
              well_jamming_str[0],
              None, None, None, None, None, None, None,
-             'Мастер КРС, представ заказчика', [str(well_jamming_norm(volume_pod_NKT())) if without_damping_True == False else None][0]],
+             'Мастер КРС, представ заказчика', [str(well_jamming_norm(volume_pod_NKT(self))) if without_damping_True == False else None][0]],
             [None, None,
              well_jamming_str[1],
              None, None, None, None, None, None, None,
@@ -384,7 +383,7 @@ def work_krs(self, work_plan):
              'Мастер КРС представитель Заказчика, пусков. Ком. ', 4.2],
             [None, None,
              f'Сбить сбивной клапан. '
-             f'{"".join([" " if without_damping_True == True else f"При наличии Избыточного давления не позволяющее сорвать пакера: Произвести глушение в НКТ в объеме {volume_pod_NKT()}м3. {fluid_work}"])}'
+             f'{"".join([" " if without_damping_True == True else f"При наличии Избыточного давления не позволяющее сорвать пакера: Произвести глушение в НКТ в объеме {volume_pod_NKT(self)}м3. {fluid_work}"])}'
 
                 , None, None,
              None, None, None, None, None,
@@ -409,7 +408,7 @@ def work_krs(self, work_plan):
             [well_jamming_str[2], None,
              well_jamming_str[0],
              None, None, None, None, None, None, None,
-             'Мастер КРС, представ заказчика', [str(well_jamming_norm(volume_pod_NKT())) if without_damping_True == False else None][0]],
+             'Мастер КРС, представ заказчика', [str(well_jamming_norm(volume_pod_NKT(self))) if without_damping_True == False else None][0]],
             [None, None,
              well_jamming_str[1],
              None, None, None, None, None, None, None,
@@ -472,11 +471,11 @@ def work_krs(self, work_plan):
             [well_jamming_str[2], None,
              well_jamming_str[0],
              None, None, None, None, None, None, None,
-             'Мастер КРС, представ заказчика', [str(well_jamming_norm(volume_pod_NKT())) if without_damping_True == False else None][0]],
+             'Мастер КРС, представ заказчика', [str(well_jamming_norm(volume_pod_NKT(self))) if without_damping_True == False else None][0]],
             [None, None,
              well_jamming_str[1],
              None, None, None, None, None, None, None,
-             ' Мастер КРС', [str(well_jamming_norm(volume_pod_NKT())) if without_damping_True == False else None][0]],
+             ' Мастер КРС', [str(well_jamming_norm(volume_pod_NKT(self))) if without_damping_True == False else None][0]],
             [None, None,
              f'{lifting_unit(self)}', None, None, None, None, None, None, None,
              'Мастер КРС представитель Заказчика, пусков. Ком. ', 4.2],
@@ -567,7 +566,7 @@ def work_krs(self, work_plan):
              f'согласно схемы №3 утвержденной главным '
              f'инженером от 14.10.2021г при СПО штанг (ПМШ 62х21 либо аналог). '
              f'Опрессовать ПВО на {CreatePZ.max_expected_pressure}атм. '
-             f'{"".join([" " if without_damping_True == True else f"При наличии Избыточного давления не позволяющее сорвать пакера: Приподнять штангу. Произвести глушение в НКТ в объеме{volume_pod_NKT()}м3. Техостой 2ч."])}'
+             f'{"".join([" " if without_damping_True == True else f"При наличии Избыточного давления не позволяющее сорвать пакера: Приподнять штангу. Произвести глушение в НКТ в объеме{volume_pod_NKT(self)}м3. Техостой 2ч."])}'
              f' Поднять на штангах насос с гл. {float(CreatePZ.dict_pump_SHGN_h["do"])}м с '
              f'доливом тех жидкости уд.весом {fluid_work} '
              f'Обеспечить не превышение расчетных нагрузок на штанговые колонны при срыве  '
@@ -600,7 +599,7 @@ def work_krs(self, work_plan):
             [well_jamming_str[2], None,
              well_jamming_str[0],
              None, None, None, None, None, None, None,
-             'Мастер КРС, представ заказчика', [str(well_jamming_norm(volume_pod_NKT())) if without_damping_True == False else None][0]],
+             'Мастер КРС, представ заказчика', [str(well_jamming_norm(volume_pod_NKT(self))) if without_damping_True == False else None][0]],
             [None, None,
              well_jamming_str[1],
              None, None, None, None, None, None, None,
@@ -655,7 +654,7 @@ def work_krs(self, work_plan):
             [well_jamming_str[2], None,
              well_jamming_str[0],
              None, None, None, None, None, None, None,
-             'Мастер КРС, представ заказчика', [str(well_jamming_norm(volume_pod_NKT())) if without_damping_True == False else None][0]],
+             'Мастер КРС, представ заказчика', [str(well_jamming_norm(volume_pod_NKT(self))) if without_damping_True == False else None][0]],
             [None, None,
              well_jamming_str[1],
              None, None, None, None, None, None, None,
@@ -751,7 +750,7 @@ def work_krs(self, work_plan):
             ['Поднять плунжер', None,
              f'Сорвать плунжер насоса (зафиксировать вес при срыве). Обвязать устье скважины согласно схемы №3 утвержденной главным '
              f'инженером от 14.10.2021г при СПО штанг (ПМШ 62х21 либо аналог). Опрессовать ПВО на {CreatePZ.max_expected_pressure}атм. Спуском одной штанги заловить конус. '
-             f'{"".join([" " if without_damping_True == True else f"При наличии Избыточного давления не позволяющее сорвать пакера: Приподнять штангу. Произвести глушение в НКТ в объеме{volume_pod_NKT()}м3. Техостой 2ч."])}'
+             f'{"".join([" " if without_damping_True == True else f"При наличии Избыточного давления не позволяющее сорвать пакера: Приподнять штангу. Произвести глушение в НКТ в объеме{volume_pod_NKT(self)}м3. Техостой 2ч."])}'
     
              f' Поднять на штангах плунжер с гл. {int(CreatePZ.dict_pump_SHGN_h["do"])}м с доливом тех жидкости уд.весом {fluid_work} '
              f'Обеспечить не превышение расчетных нагрузок на штанговые колонны при срыве  насосов (не более 8 тн), без учета веса '
@@ -779,7 +778,7 @@ def work_krs(self, work_plan):
             [well_jamming_str[2], None,
              well_jamming_str[0],
              None, None, None, None, None, None, None,
-             'Мастер КРС, представ заказчика', [str(well_jamming_norm(volume_pod_NKT())) if without_damping_True == False else None][0]],
+             'Мастер КРС, представ заказчика', [str(well_jamming_norm(volume_pod_NKT(self))) if without_damping_True == False else None][0]],
             [None, None,
              well_jamming_str[1],
              None, None, None, None, None, None, None,
@@ -828,7 +827,7 @@ def work_krs(self, work_plan):
         ]
         lift_voronka = [[well_jamming_str[2], None, well_jamming_str[0],
                          None, None, None, None, None, None, None,
-                         'Мастер КРС, представ заказчика', [str(well_jamming_norm(volume_pod_NKT())) if without_damping_True is False else None][0]],
+                         'Мастер КРС, представ заказчика', [str(well_jamming_norm(volume_pod_NKT(self))) if without_damping_True is False else None][0]],
                         [None, None,
                          well_jamming_str[1],
                          None, None, None, None, None, None, None,
@@ -910,7 +909,7 @@ def work_krs(self, work_plan):
                       [None, None,
                        f'{lifting_unit(self)}', None, None, None, None, None, None, None,
                        'Мастер КРС представитель Заказчика, пусков. Ком. ', 4.2],
-                      ['Произвести срыв пакера не более {round(weigth_pipe(CreatePZ.dict_nkt) * 1.2, 1)}т. '
+                      [f'Произвести срыв пакера не более {round(weigth_pipe(CreatePZ.dict_nkt) * 1.2, 1)}т. '
                        f'(вес подвески ({round(weigth_pipe(CreatePZ.dict_nkt), 1)}т) + 20%)', None,
                        f'Разобрать устьевое оборудование. Произвести срыв пакера с поэтапным увеличением нагрузки '
                        f'на 3-4т выше веса НКТ в течении 30мин и с выдержкой '
@@ -931,7 +930,7 @@ def work_krs(self, work_plan):
                        'Мастер КРС представитель Заказчика', 3.2],
                       [well_jamming_str[2], None, well_jamming_str[0], None, None,
                        None, None, None, None, None,
-                       'Мастер КРС представитель Заказчика', [str(well_jamming_norm(volume_pod_NKT())) if without_damping_True == False else None][0]],
+                       'Мастер КРС представитель Заказчика', [str(well_jamming_norm(volume_pod_NKT(self))) if without_damping_True is False else None][0]],
                       ['глушение', None,
                        well_jamming_str[1],
                        None, None, None, None, None, None, None,
@@ -1025,7 +1024,7 @@ def work_krs(self, work_plan):
                  well_jamming_str[0],
                  None, None, None, None, None, None, None,
                  'Мастер КРС, представ заказчика',
-                 [str(well_jamming_norm(volume_pod_NKT())) if without_damping_True is False else None][0]],
+                 [str(well_jamming_norm(volume_pod_NKT(self))) if without_damping_True is False else None][0]],
                 [None, None,
                  well_jamming_str[1],
                  None, None, None, None, None, None, None,
@@ -1034,10 +1033,14 @@ def work_krs(self, work_plan):
                 [None, None,
                  ''.join(["За 24 часа до готовности вызвать пусковую комиссию" if CreatePZ.kat_pvo == 2
                           else "На скважинах первой категории Подрядчик обязан пригласить представителя ПАСФ " \
-                               "для проверки качества м/ж и опрессовки ПВО, документации и выдачи разрешения на производство " \
-                               "работ по ремонту скважин. При обнаружении нарушений, которые могут повлечь за собой опасность для жизни людей"
-                               " и/или возникновению ГНВП и ОФ, дальнейшие работы должны быть прекращены. Представитель ПАСФ приглашается за 24 часа до проведения "
-                               "проверки монтажа ПВО телефонограммой. произвести практическое обучение по команде ВЫБРОС. Пусковой комиссией составить акт готовности "
+                               "для проверки качества м/ж и опрессовки ПВО, документации и выдачи разрешения "
+                               "на производство " \
+                               "работ по ремонту скважин. При обнаружении нарушений, которые могут повлечь "
+                               "за собой опасность для жизни людей"
+                               " и/или возникновению ГНВП и ОФ, дальнейшие работы должны быть прекращены."
+                               " Представитель ПАСФ приглашается за 24 часа до проведения "
+                               "проверки монтажа ПВО телефонограммой. произвести практическое обучение по"
+                               " команде ВЫБРОС. Пусковой комиссией составить акт готовности "
                                "подъёмного агрегата для ремонта скважины."]),
                  None, None, None, None, None, None, None,
                  'Мастер КРС', None],
@@ -1045,7 +1048,8 @@ def work_krs(self, work_plan):
                  pvo_gno(CreatePZ.kat_pvo)[0], None, None,
                  None, None, None, None, None,
                  ''.join([
-                     'Мастер КРС, представ-ли ПАСФ и Заказчика, Пуск. ком' if CreatePZ.kat_pvo == 1 else 'Мастер КРС, представ-ли  Заказчика']),
+                     'Мастер КРС, представ-ли ПАСФ и Заказчика, Пуск. ком'
+                     if CreatePZ.kat_pvo == 1 else 'Мастер КРС, представ-ли  Заказчика']),
                  [4.21 if 'схеме №1' in str(pvo_gno(CreatePZ.kat_pvo)[0]) else 0.23+0.3+0.83+0.67+ 0.14][0]],
                 [None, None,
                  f'Опрессовку ПВО проводить после каждого монтажа. (ОПРЕССОВКУ ПВО ЗАФИКСИРОВАТЬ В ВАХТОВОМ ЖУРНАЛЕ).',
@@ -1111,14 +1115,18 @@ def pvo_gno(kat_pvo):
     pvo_1 = f'Установить ПВО  по  схеме №1 утвержденной главным инженером ООО "Ойл-сервис" от 14.10.2021г ' \
             f'(тип плашечный сдвоенный ПШП-2ФТ-160х21Г Крестовина КР160х21Г, ' \
             f'задвижка ЗМС 65х21 (3шт), Шарового крана 1КШ-73х21, авар. трубы (патрубок НКТ73х7-7-Е, ' \
-            f'блока дросселирования -БД 65х21 (при необходимости произвести монтаж переводника П178х168 или П168 х 146 или ' \
-            f'П178 х 146 в зависимости от типоразмера крестовины и колонной головки). Линия и блок-глушения БГ 65х21 находится на ' \
+            f'блока дросселирования -БД 65х21 (при необходимости произвести монтаж переводника' \
+            f' П178х168 или П168 х 146 или ' \
+            f'П178 х 146 в зависимости от типоразмера крестовины и колонной головки). Линия и' \
+            f' блок-глушения БГ 65х21 находится на ' \
             f'базе БПО, если расстояние от БПО до ремонтируемой скважины составляет менее 150км. Спустить и посадить ' \
             f'пакер на глубину 10м. Опрессовать ПВО (трубные плашки превентора) и линии манифольда до ' \
-            f'концевых задвижек на Р-{CreatePZ.max_expected_pressure}атм  (на максимально ожидаемое давление на устье, ' \
+            f'концевых задвижек на Р-{CreatePZ.max_expected_pressure}атм  (на максимально ожидаемое давление на устье, '\
             f'но не выше максимально допустимого давления опрессовки ' \
-            f'эксплуатационной колонны в течении 30мин), сорвать и извлечь пакер. Опрессовать выкидную линию после концевых задвижек на ' \
-            f'Р - 50 кгс/см2 (5 МПа) - для противовыбросового оборудования, рассчитанного на давление до 210 кгс/см2 ((21 МПа)\n' \
+            f'эксплуатационной колонны в течении 30мин), сорвать и извлечь пакер. Опрессовать ' \
+            f'выкидную линию после концевых задвижек на ' \
+            f'Р - 50 кгс/см2 (5 МПа) - для противовыбросового оборудования, рассчитанного на' \
+            f'давление до 210 кгс/см2 ((21 МПа)\n' \
             f'- Обеспечить о обогрев превентора, станции управления ПВО оборудовать теплоизоляционными ' \
             f'материалом механические задвижки манифольдные линии до блока дросселирования\n' \
             f'- Каркас блока дросселирования должен быть выполнен в корпусе или обтянут бурукрытие' \
@@ -1145,7 +1153,8 @@ def lifting_unit(self):
               f'Составить акт готовности подъемного агрегата. Пусковой комиссией составить акт готовности  подьемного ' \
               f'агрегата и бригады для проведения ремонта скважины. Дальнейшие работы продолжить после проведения пусковой ' \
               f'комиссии заполнения пусковой документации. '
-    upa_60 = f'Установить подъёмный агрегат на устье не менее 60т. Пусковой комиссией составить акт готовности  подьемного агрегата и бригады для проведения ремонта скважины.'
+    upa_60 = f'Установить подъёмный агрегат на устье не менее 60т. Пусковой комиссией составить ' \
+             f'акт готовности  подьемного агрегата и бригады для проведения ремонта скважины.'
 
     return upa_60 if CreatePZ.bottomhole_artificial >= 2300 else aprs_40
 
@@ -1258,7 +1267,7 @@ def well_volume(self, current_bottom):
     return round(volume_well, 1)
 
 
-def volume_pod_NKT():  # Расчет необходимого объема внутри НКТ и между башмаком НКТ и забоем
+def volume_pod_NKT(self):  # Расчет необходимого объема внутри НКТ и между башмаком НКТ и забоем
 
     from open_pz import CreatePZ
     nkt_l = round(sum(list(CreatePZ.dict_nkt.values())), 1)
@@ -1373,7 +1382,7 @@ def well_jamming(self, without_damping, lift_key):
 
 
     if without_damping == True:
-        well_jamming_str = f'Скважина состоит в перечне скважин ООО Башнефть-Добыча, на которых допускается проведение ТКРС без предварительного глушения на текущий квартал',
+        well_jamming_str = f'Скважина состоит в перечне скважин ООО Башнефть-Добыча, на которых допускается проведение ТКРС без предварительного глушения на текущий квартал'
         well_jamming_short = f'Скважина без предварительного глушения'
         well_jamming_list2 = f'В случае наличия избыточного давления необходимость повторного глушения скважины дополнительно согласовать со специалистами ПТО  и ЦДНГ.'
     elif without_damping is False and lift_key in ['НН с пакером', 'НВ с пакером', 'ЭЦН с пакером', 'ОРЗ']:
@@ -1381,12 +1390,12 @@ def well_jamming(self, without_damping, lift_key):
         well_after = f'Произвести закачку на поглощение не более {CreatePZ.max_admissible_pressure}атм тех жидкости в ' \
                              f'объеме {round(volume_well_jaming-well_volume(self, sum(list(CreatePZ.dict_nkt_po.values()))),1)}м3.' if round(volume_well_jaming-well_volume(self, sum(list(CreatePZ.dict_nkt_po.values()))),1) > 0.1 else ''
         well_jamming_str = f'Произвести закачку в трубное пространство тех жидкости уд.весом {CreatePZ.fluid_work} в ' \
-                             f'объеме {round(well_volume(self, sum(list(CreatePZ.dict_nkt.values())))-volume_pod_NKT(),1)}м3 на циркуляцию. ' \
+                             f'объеме {round(well_volume(self, sum(list(CreatePZ.dict_nkt.values())))-volume_pod_NKT(self),1)}м3 на циркуляцию. ' \
                            f'{well_after} Закрыть затрубное пространство. ' \
                              f' Закрыть скважину на  стабилизацию не менее 2 часов. (согласовать ' \
                              f'глушение в коллектор, в случае отсутствия на желобную емкость)'
         well_jamming_short = f'Глушение в НКТ уд.весом {CreatePZ.fluid_work_short} ' \
-                             f'объеме {round(well_volume(self, sum(list(CreatePZ.dict_nkt.values()))) - volume_pod_NKT(), 1)}м3 ' \
+                             f'объеме {round(well_volume(self, sum(list(CreatePZ.dict_nkt.values()))) - volume_pod_NKT(self), 1)}м3 ' \
                              f'на циркуляцию. {well_after} '
     elif without_damping == False and lift_key in ['ОРД']:
         well_jamming_str = f'Произвести закачку в затрубное пространство тех жидкости уд.весом {CreatePZ.fluid_work_short}в ' \

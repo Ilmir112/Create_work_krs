@@ -2,14 +2,15 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox
 
 import main
 from selectPlast import CheckBoxDialog
-from work_py.rationingKRS import liftingNKT_norm, descentNKT_norm,well_volume_norm
-from krs import well_volume
+
+
 def acid_work(self):
     from work_py.opressovka import paker_diametr_select
     from work_py.swabbing import swabbing_with_paker
     from open_pz import CreatePZ
     from work_py.alone_oreration import privyazkaNKT
     from work_py.acid_paker import AcidPakerWindow
+    from work_py.rationingKRS import liftingNKT_norm, descentNKT_norm, well_volume_norm
 
     if len(CreatePZ.plast_work) == 0:
         msc = QMessageBox.information(self, 'Внимание', 'Отсутствуют рабочие интервалы перфорации')
@@ -81,7 +82,7 @@ def acid_work(self):
         paker_list = [
             [None, None,
              f'Спустить {paker_select} на НКТ{nkt_diam}мм до глубины {CreatePZ.paker_depth}м, воронкой до {CreatePZ.paker_depth + CreatePZ.CreatePZ.paker_khost}м'
-             f' с замером, шаблонированием шаблоном. {("Произвести пробную посадку на глубине 50м" if CreatePZ.column_additional == False else "")} '
+             f' с замером, шаблонированием шаблоном {CreatePZ.nkt_template}мм. {("Произвести пробную посадку на глубине 50м" if CreatePZ.column_additional == False else "")} '
              ,
              None, None, None, None, None, None, None,
              'мастер КРС', descentNKT_norm(CreatePZ.paker_depth,1.2)],
@@ -175,6 +176,7 @@ def open_checkbox_dialog():
 def acid_work_list(self, paker_depth, paker_khost, dict_nkt, paker_layout):
     from open_pz import CreatePZ
     from krs import volume_vn_nkt
+    from krs import well_volume
     from work_py.acid_paker import AcidPakerWindow
 
     open_checkbox_dialog()

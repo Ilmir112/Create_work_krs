@@ -57,7 +57,7 @@ def kompress(self):
     paker_list = [
         [f'СПО {paker_short} на НКТ{nkt_diam}мм  воронкой до {voronka_depth}м Пусковые муфты на глубине {mufta1}м, {mufta2}м, {mufta3}м', None,
          f'Спустить {paker_select} на НКТ{nkt_diam}мм  воронкой до {voronka_depth}м'
-         f' с замером, шаблонированием шаблоном. Пусковые муфты на глубине {mufta1}м, {mufta2}м, {mufta3}м,',
+         f' с замером, шаблонированием шаблоном {CreatePZ.nkt_template}мм. Пусковые муфты на глубине {mufta1}м, {mufta2}м, {mufta3}м,',
          None, None, None, None, None, None, None,
          'мастер КРС', round(
             descentNKT_norm(voronka_depth, 1))],

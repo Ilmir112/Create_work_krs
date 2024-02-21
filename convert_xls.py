@@ -21,7 +21,7 @@ for root, dirs, files in os.walk(path):
     for file in files:
         if(file.endswith(format_files, 0, len(file))):
 ##            print(os.path.join(file))## - этот вариант выводит только имя файла
-            print(file)
+            # print(file)
 ##        print(os.path.join(root, file))## - этот вариант выводит полный путь и имя файла
             # -------делаем через COM объект -----------------------------
             excel = win32.gencache.EnsureDispatch('Excel.Application')

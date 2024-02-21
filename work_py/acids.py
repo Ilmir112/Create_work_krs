@@ -34,9 +34,9 @@ def acid_work(self):
                                           paker_khost_top, 0, 4000)
 
     if CreatePZ.column_additional == False or (CreatePZ.column_additional == True and paker_depth_bottom < CreatePZ.head_column_additional):
-        paker_select = f'заглушку + сбивной с ввертышем + НКТ{CreatePZ.nkt_diam}м {paker_khost}м  + пакер ПРО-ЯМО-{paker_diametr_select(paker_depth_bottom)}мм (либо аналог) ' \
+        paker_select = f'заглушку + сбивной с ввертышем + НКТ{CreatePZ.nkt_diam}мм {paker_khost}м  + пакер ПРО-ЯМО-{paker_diametr_select(paker_depth_bottom)}мм (либо аналог) ' \
                        f'для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм + щелевой фильтр НКТ {difference_paker}м ' \
-                       f'+ пакер ПУ - {paker_diametr_select(paker_depth_bottom)} + НКТ{CreatePZ.nkt_diam}мм 20м +реперный патрубок на НКТ{CreatePZ.nkt_diam}'
+                       f'+ пакер ПУ - {paker_diametr_select(paker_depth_bottom)} + НКТ{CreatePZ.nkt_diam}мм 20м +реперный патрубок на НКТ{CreatePZ.nkt_diam}мм'
         dict_nkt = {73: paker_depth_bottom}
     elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr < 110 and paker_depth_bottom > CreatePZ.head_column_additional:
         paker_select = f'заглушку + сбивной с ввертышем + НКТ{60}мм {paker_khost}м  + пакер ПРО-ЯМО-{paker_diametr_select(paker_depth_bottom)}мм (либо аналог) ' \
@@ -57,7 +57,7 @@ def acid_work(self):
     paker_list = [
         [None, None,
          f'Спустить {paker_select} на НКТ{CreatePZ.nkt_diam}мм до глубины нижнего пакера  до {paker_depth_bottom}, вверхнего пакера на {paker_depth_top}'
-         f' с замером, шаблонированием шаблоном. /n {("Произвести пробную посадку на глубине 50м" if CreatePZ.column_additional == False else "")} '
+         f' с замером, шаблонированием шаблоном {CreatePZ.nkt_template}мм. /n {("Произвести пробную посадку на глубине 50м" if CreatePZ.column_additional == False else "")} '
          f'ПРИ ОТСУТСТВИИ ЦИРКУЛЯЦИИ ПРЕДУСМОТРЕТЬ НАЛИЧИИ В КОМПОНОВКЕ УРАВНИТЕЛЬНЫХ КЛАПАНОВ ИЛИ СБИВНОГО '
          f'КЛАПАНА С ВВЕРТЫШЕМ НАД ПАКЕРОМ',
          None, None, None, None, None, None, None,
@@ -111,7 +111,7 @@ def acid_work(self):
     else:
 
         paker_list.append([None, None,
-                                 f'Поднять {paker_select} на НКТ{CreatePZ.nkt_diam} c глубины {paker_depth_bottom}м с доливом скважины в '
+                                 f'Поднять {paker_select} на НКТ{CreatePZ.nkt_diam}мм c глубины {paker_depth_bottom}м с доливом скважины в '
                                  f'объеме {round(paker_depth_bottom * 1.12 / 1000, 1)}м3 удельным весом {CreatePZ.fluid_work}',
                                  None, None, None, None, None, None, None,
                                  'мастер КРС', liftingNKT_norm(paker_depth_bottom, 1.2)])
@@ -158,7 +158,7 @@ def acidGons(self):
     gons_list = [[f'Спуск гидроманиторную насадку до глубины нижней точки до {bottom_point}', None,
      f'Спустить  гидроманиторную насадку {"".join([f" + НКТ60мм {round(CreatePZ.current_bottom -CreatePZ.head_column_additional, 0)}" if CreatePZ.column_additional == True else ""])} '
      f'на НКТ{CreatePZ.nkt_diam}мм до глубины нижней точки до {bottom_point}'
-     f' с замером, шаблонированием шаблоном.',
+     f' с замером, шаблонированием шаблоном {CreatePZ.nkt_template}мм.',
      None, None, None, None, None, None, None,
      'мастер КРС', descentNKT_norm(bottom_point,1)],
      [f' ГОНС пласта {plast} (общий объем {acid_V}м3) в инт. {acid_points}', None,
@@ -174,7 +174,7 @@ def acidGons(self):
       None, None, None, None, None, None, None,
       'мастер КРС', 1.2],
      [None, None,
-      f'Поднять гидроманиторную насадку на НКТ{CreatePZ.nkt_diam} c глубины {CreatePZ.current_bottom}м с доливом скважины в '
+      f'Поднять гидроманиторную насадку на НКТ{CreatePZ.nkt_diam}мм c глубины {CreatePZ.current_bottom}м с доливом скважины в '
       f'объеме {round(CreatePZ.current_bottom * 1.12 / 1000, 1)}м3 удельным весом {CreatePZ.fluid_work}',
       None, None, None, None, None, None, None,
       'мастер КРС',

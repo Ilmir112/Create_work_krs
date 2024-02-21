@@ -158,7 +158,7 @@ class RirWindow(QMainWindow):
         rir_work_list = [[f'СПО РПП до глубины {roof_rir_Edit}м', None,
                        f'Спустить   пакер глухой {self.rpk_nkt(roof_rir_Edit)}  на тНКТ{nkt_diam}мм '
                        f'до глубины {roof_rir_Edit}м '
-                       f'с замером, шаблонированием шаблоном. '
+                       f'с замером, шаблонированием шаблоном {CreatePZ.nkt_template}мм. '
                        f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ) \n'
                        f'Перед спуском технологического пакера произвести визуальный осмотр в присутствии '
                        f'представителя РИР или УСРСиСТ.',
@@ -264,7 +264,7 @@ class RirWindow(QMainWindow):
 
         rir_work_list = [[f'СПО пакера РПК до глубины {roof_rir_Edit}м', None,
                        f'Спустить   пакера РПК {self.rpk_nkt(roof_rir_Edit)}  на тНКТ{nkt_diam}мм до глубины {roof_rir_Edit}м с '
-                       f'замером, шаблонированием шаблоном. '
+                       f'замером, шаблонированием шаблоном {CreatePZ.nkt_template}мм. '
                        f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ) \n'
                        f'Перед спуском технологического пакера произвести визуальный осмотр в присутствии представителя '
                        f'РИР или УСРСиСТ.',
@@ -386,7 +386,7 @@ class RirWindow(QMainWindow):
             [f' СПО пера до глубины {sole_rir_Edit}м Опрессовать НКТ на 200атм', None,
              f'Спустить {self.pero_select(sole_rir_Edit)}  на тНКТ{nkt_diam}мм до глубины {sole_rir_Edit}м с '
              f'замером, шаблонированием '
-             f'шаблоном. Опрессовать НКТ на 200атм. Вымыть шар. \n'
+             f'шаблоном {CreatePZ.nkt_template}мм. Опрессовать НКТ на 200атм. Вымыть шар. \n'
              f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
              None, None, None, None, None, None, None,
              'мастер КРС',descentNKT_norm(sole_rir_Edit, 1)],
@@ -466,7 +466,7 @@ class RirWindow(QMainWindow):
                 [f'СПО пера до глубины {sole_rir_Edit}м. Опрессовать НКТ на 200атм', None,
                  f'Спустить {self.pero_select(sole_rir_Edit)}  на тНКТ{nkt_diam}мм до глубины {sole_rir_Edit}м '
                  f'с замером, шаблонированием '
-                 f'шаблоном. Опрессовать НКТ на 200атм. Вымыть шар. \n'
+                 f'шаблоном {CreatePZ.nkt_template}мм. Опрессовать НКТ на 200атм. Вымыть шар. \n'
                  f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
                  None, None, None, None, None, None, None,
                  'мастер КРС', descentNKT_norm(sole_rir_Edit, 1)],
@@ -735,7 +735,7 @@ class RirWindow(QMainWindow):
         rir_list = [[f'СПО пакера извлекаемый до глубины {pakerIzvPaker}м',
                      None,
            f'Спустить  пакера извлекаемый компании НЕОИНТЕХ +НКТ 20м + реперный патрубок 2м на тНКТ до'
-           f' глубины {pakerIzvPaker}м с замером, шаблонированием шаблоном 59,6мм.'
+           f' глубины {pakerIzvPaker}м с замером, шаблонированием шаблоном {CreatePZ.nkt_template}мм.'
            f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
            None, None, None, None, None, None, None,
            'Мастер КРС, подрядчик РИР, УСРСиСТ', liftingNKT_norm(pakerIzvPaker,1.2)],
@@ -758,7 +758,7 @@ class RirWindow(QMainWindow):
         filling_list = [
             [None, None,
              f' Спустить  {sand_select(self)}  на НКТ{CreatePZ.nkt_diam}мм до глубины {round(pakerIzvPaker - 100, 0)}м '
-             f'с замером, шаблонированием шаблоном. (При СПО первых десяти НКТ на '
+             f'с замером, шаблонированием шаблоном {CreatePZ.nkt_template}мм. (При СПО первых десяти НКТ на '
              f'спайдере дополнительно устанавливать элеватор ЭХЛ)',
              None, None, None, None, None, None, None,
              'Мастер КР', descentNKT_norm(CreatePZ.current_bottom, 1)],
@@ -808,7 +808,7 @@ class RirWindow(QMainWindow):
         rir_list = [[f'СПО {sand_select(self).replace("перо", "перо-110мм")} до '
                      f'глубины {round(CreatePZ.current_bottom,0)}м', None,
          f' Спустить  {sand_select(self).replace("перо", "перо-110мм")}  на НКТ{CreatePZ.nkt_diam}мм до '
-         f'глубины {round(CreatePZ.current_bottom,0)}м с замером, шаблонированием шаблоном. '
+         f'глубины {round(CreatePZ.current_bottom,0)}м с замером, шаблонированием шаблоном {CreatePZ.nkt_template}мм. '
          f'(При СПО первых десяти НКТ на '
          f'спайдере дополнительно устанавливать элеватор ЭХЛ)',
          None, None, None, None, None, None, None,

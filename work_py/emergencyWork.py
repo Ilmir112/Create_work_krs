@@ -6,7 +6,7 @@ def magnet_select(self):
     from open_pz import CreatePZ
     if CreatePZ.column_additional == False or CreatePZ.column_additional == True and\
             CreatePZ.current_bottom <= CreatePZ.head_column_additional:
-        magnet_select = f'НКТ{CreatePZ.nkt_diam} 20м + репер'
+        magnet_select = f'НКТ{CreatePZ.nkt_diam}мм 20м + репер'
 
     elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr < 110 and \
             CreatePZ.current_bottom >= CreatePZ.head_column_additional:
@@ -39,7 +39,7 @@ def magnetWork(self):
          None,
          f'Спустить магнит-ловитель + опрессовочное седло  +{magnet_select(self)} на тНКТ{CreatePZ.nkt_diam}мм до '
          f'глубины {CreatePZ.current_bottom}м с замером, шаблонированием '
-         f'шаблоном. Опрессовать НКТ на 150атм. Вымыть шар. \n'
+         f'шаблоном {CreatePZ.nkt_template}мм. Опрессовать НКТ на 150атм. Вымыть шар. \n'
          f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
          None, None, None, None, None, None, None,
          'мастер КРС', descentNKT_norm(CreatePZ.current_bottom, 1)],
