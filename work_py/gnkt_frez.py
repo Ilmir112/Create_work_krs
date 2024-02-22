@@ -571,6 +571,8 @@ class Work_with_gnkt(QMainWindow):
 
         self.ports_data = self.work_with_port(self.plast_work, CreatePZ.dict_perforation)
         self.ports_list, merge_port = self.insert_ports_data(self.ports_data)
+        self.top_muft = list(self.ports_data.keys())[-1]
+        self.bottom_muft = list(self.ports_data.keys())[0]
         # print(ports_list)
         for row in self.ports_list:
             schema_well_list.append(row)
@@ -752,14 +754,13 @@ class Work_with_gnkt(QMainWindow):
         from krs import calc_work_fluid
 
 
-        top_muft = list(ports_data.keys())[-1]
-        bottom_muft = list(ports_data.keys())[0]
+
         if sum(list(CreatePZ.dict_nkt.values())) != 0:
             ntk_true = True
             nkt_lenght = round(sum(list(CreatePZ.dict_nkt.values())), 0)
         else:
             ntk_true = False
-            nkt_lenght = round(top_muft - 20, 1)
+            nkt_lenght = round(self.top_muft - 20, 1)
         print(f'пласта {plast_work}')
         print(f' ПНТЖ - {calc_pntzh(self.fluid, CreatePZ.cdng)}')
 
@@ -770,7 +771,7 @@ class Work_with_gnkt(QMainWindow):
         block_gnvp_list = [
             [None, 'Мероприятия по предотвращению аварий, инцидентов и несчастных случаев:',
              None, None, None, None, None, None, None, None, None, None],
-            [None, None,
+            [None, 1,
              'Все операции при производстве работ выполнять в соответствии с действующими Федеральными нормами и'
              ' правилами в области промышленной безопасности "Правила безопасности в нефтяной и газовой '
              'промышленности" , РД 153-39-023-97, технологической инструкцией "Требования безопасности при '
@@ -890,10 +891,12 @@ class Work_with_gnkt(QMainWindow):
              'Мастер ГНКТ', None]]
         gnkt_work_firts = [
             [None, 'ЦЕЛЬ ПРОГРАММЫ', None, None, None, None, None, None, None, None, None, None, None],
-            [None, 1, 'СПО промывочной КНК-1 с промывкой до МГРП №5. СПО фрезеровочной КНК-2: фрезерование МГРП №5-№2. '
+            [None, 1,
+             f'СПО промывочной КНК-1 с промывкой до МГРП {self.top_muft}. СПО фрезеровочной КНК-2: фрезерование '
+             f'МГРП {self.top_muft}-{2}. '
                    'Тех.отстой , замер Ризб. По доп.согласованию с Заказчиком, СПО промывочной КНК-1 до '
                    'текущего забоя (МГРП №1).', None, None, None, None, None, None, None, None, None, None, None],
-            [None, None,
+            [None, 2,
              'Внимание: Для проведения технологических операций завоз жидкости производить с ПНТЖ, '
              'согласованного с Заказчиком. Перед началом работ согласовать с Заказчиком пункт утилизации'
              ' жидкости.',
@@ -942,13 +945,13 @@ class Work_with_gnkt(QMainWindow):
              f'{round(nkt_lenght - 20, 0)} - '
              f'{round(nkt_lenght + 20, 0)}м не более '
              f'2 м/мин;\n в интервале {round(nkt_lenght + 20, 0)}м - '
-             f'{ports_data[top_muft]["кровля"] - 20}м не более 5-10 м/мин (фрез.КНК / промыв.КНК); в '
+             f'{ports_data[self.top_muft]["кровля"] - 20}м не более 5-10 м/мин (фрез.КНК / промыв.КНК); в '
              f'интервале установки МГРП (± 20м) не более 2 м/мин; \nв интервале '
-             f'{ports_data[bottom_muft]["кровля"] - 20}-{ports_data[bottom_muft]["кровля"]}м не более 2 м/мин;',
+             f'{ports_data[self.bottom_muft]["кровля"] - 20}-{ports_data[self.bottom_muft]["кровля"]}м не более 2 м/мин;',
              None, None, None, None, None, None, None, None,
              'Мастер, бурильщик ГНКТ', None],
             [None, 9,
-             f'Скорость подъёма по интервалам: \nв интервале {ports_data[bottom_muft]["кровля"]}-'
+             f'Скорость подъёма по интервалам: \nв интервале {ports_data[self.bottom_muft]["кровля"]}-'
              f'{round(nkt_lenght + 20, 0)}м не более 10 м/мин; \n в интервале '
              f'установки МГРП (± 20м) не более 2 м/мин; \nв интервале '
              f'{round(nkt_lenght + 20, 0)}'
@@ -1052,8 +1055,8 @@ class Work_with_gnkt(QMainWindow):
              None, None, None, None,
              None, None],
             [None, 22,
-             f'Произвести допуск КНК-1 с промывкой до МУФТЫ {top_muft} на гл.'
-             f'{ports_data[top_muft]["кровля"]}-{ports_data[top_muft]["подошва"]}м.\nСкорость спуска при '
+             f'Произвести допуск КНК-1 с промывкой до МУФТЫ {self.top_muft} на гл.'
+             f'{ports_data[self.top_muft]["кровля"]}-{ports_data[self.top_muft]["подошва"]}м.\nСкорость спуска при '
              f'промывке не более 5м/мин, проверка веса на подъём через каждые 30м.',
              None, None, None,
              None, None, None,
@@ -1086,7 +1089,7 @@ class Work_with_gnkt(QMainWindow):
              'При отсутствии проходки и получения жесткой посадки, дальнейшие работы по согласованию с Заказчиком.',
              None, None, None, None, None, None, None, None, 'Мастер ГНКТ представитель Заказчика', None],
             [None, 27,
-             f'При достижении гл.{ports_data[top_muft]["кровля"]}м произвести промывку в следующем '
+             f'При достижении гл.{ports_data[self.top_muft]["кровля"]}м произвести промывку в следующем '
              f'порядке:\n- прокачать гелевую пачку в объеме '
              f'2-3м3;\n- промыть скважину в течении 120 минут до выхода чистой, без посторонних примесей, промывочной '
              f'жидкости (тех.вода {fluid_work}). Составить акт.',
@@ -1110,12 +1113,12 @@ class Work_with_gnkt(QMainWindow):
             [None, 30,
              'Открыв скважину и записав число оборотов задвижки – зафиксировать дату и время. Спустить КНК-2 в '
              f'скважину с периодическими прокачками рабочей жидкостью (тех.вода {fluid_work})  с проверкой веса на '
-             f'подъём через каждые 300м спуска до глубины {ports_data[top_muft]["кровля"] - 20}м. '
+             f'подъём через каждые 300м спуска до глубины {ports_data[self.top_muft]["кровля"] - 20}м. '
              f'Убедиться в наличии свободного прохода по лифту НКТ.',
              None, None, None, None, None, None, None, None,
              'Мастер ГНКТ', None],
             [None, 31,
-             f'При получении посадки в НКТ и отсутствии прохода КНК-2 до гл.{ports_data[top_muft]["кровля"] - 20}м,'
+             f'При получении посадки в НКТ и отсутствии прохода КНК-2 до гл.{ports_data[self.top_muft]["кровля"] - 20}м,'
              f' приподнять КНК-2 на 20м выше '
              f'глубины посадки. Вывести НКА на рабочий режим в соответствии с рабочими параметрами ВЗД. Произвести '
              'проработку (проходного сечения НКТ) места посадки до получения свободного прохода в НКТ с составлением '
@@ -1123,9 +1126,9 @@ class Work_with_gnkt(QMainWindow):
              None, None, None, None, None, None, None, None, 'Мастер ГНКТ', None],
             [None, 32,
              f'При свободном и беспрепятственном прохождении КНК-2 на г/трубе в НКТ до гл.'
-             f'{ports_data[top_muft]["кровля"] - 20}м, продолжить '
-             f'доспуск КНК-2 с минимальной подачей  ВЗД до {top_muft} до получения посадки на гл.'
-             f'{ports_data[top_muft]["кровля"] - 20}м. '
+             f'{ports_data[self.top_muft]["кровля"] - 20}м, продолжить '
+             f'доспуск КНК-2 с минимальной подачей  ВЗД до {self.top_muft} до получения посадки на гл.'
+             f'{ports_data[self.top_muft]["кровля"] - 20}м. '
              'Установить метку на г/трубе.',
              None, None, None, None, None, None, None,
              None, 'Мастер ГНКТ', None]]
@@ -1214,12 +1217,12 @@ class Work_with_gnkt(QMainWindow):
              f' {fluid_work}) произвести запуск азотного комплекса, вывести его на рабочий режим.Дождаться выхода пузыря '
              f'азота. Получить стабильную круговуюциркуляцию азотированной смеси. Доспустить КНК-1 с циркуляцией на '
              f'азотированной смеси до глубины непрохода КНК-2 и произвести промывку скважины до '
-             f'{top_muft} - {bottom_muft}'
+             f'{self.top_muft} - {self.bottom_muft}'
              f' до получения жесткой посадки.',
              None, None, None, None, None, None, None, None,
              'Мастер ГНКТ', None],
             [None, 42,
-             f'При достижении {top_muft} - {bottom_muft} произвести промывку:\n- прокачать на циркуляцию по '
+             f'При достижении {self.top_muft} - {self.bottom_muft} произвести промывку:\n- прокачать на циркуляцию по '
              f'г/трубе вязкую пачку в V=2-3м3;\n- произвести промывку в течении не менее 2 часов, до чистой, '
              f'без посторонних мех. примесей промывочной жидкости (тех.вода {fluid_work}).\nСоставить акт на '
              'нормализацию в присутствии представителя Заказчика.',
@@ -1230,7 +1233,7 @@ class Work_with_gnkt(QMainWindow):
              None, None, None, None, None, None, None, None,
              'Мастер ГНКТ', None],
             [None, 'Подъем фрезеровочной КНК-2', None, None, None, None, None, None, None, None, None, None, None],
-            [None, None,
+            [None, 1,
              'ВНИМАНИЕ БУРИЛЬЩИК! ПОСТОЯННО!!! При подъеме ВЗД после фрезерования седел и шаров МГРП,'
              ' во избежание заклинивания и получения прихвата ГНКТ (от возможного попадания остатков частиц шара'
              ' или седла после разбуривания ) остановить г/трубу не доходя 50м до воронки и прокачать малый затруб '
@@ -1280,7 +1283,7 @@ class Work_with_gnkt(QMainWindow):
              None, None, None, None, None, None, None, None,
              'Мастер ГНКТ', None],
             [None, 50,
-             f'Произвести допуск КНК-1 с промывкой на азотированной смеси до текущего забоя на гл.{bottom_muft}м (при '
+             f'Произвести допуск КНК-1 с промывкой на азотированной смеси до текущего забоя на гл.{self.bottom_muft}м (при '
              'отсутствии проходки согласовать достигнутый забой с Заказчиком)',
              None, None, None, None, None, None, None, None, 'Мастер ГНКТ', None],
             [None, 51,
@@ -1291,7 +1294,7 @@ class Work_with_gnkt(QMainWindow):
              None, None, None, None, None, None, None,
              None, 'Мастер ГНКТ', None],
             [None, 52,
-             f'При достижении глубины МУФТЫ {bottom_muft} (или согласованного забоя) произвести промывку в следующем '
+             f'При достижении глубины МУФТЫ {self.bottom_muft} (или согласованного забоя) произвести промывку в следующем '
              'порядке:\n- прокачать гелевую пачку в объеме 2-3м3;\n- промыть скважину в течении 2 часов до выхода '
              f'чистой, без посторонних примесей, промывочной жидкости (тех.вода {fluid_work}).Составить Акт на промывку '
              'в присутствии представителя Заказчика.',
@@ -1310,7 +1313,7 @@ class Work_with_gnkt(QMainWindow):
              None, None, None, None, None, None, 'Мастер ГНКТ', None],
             [None, 55,
              f'После технологического отстоя допустить КНК-1 на г/трубе в скважину «без циркуляции» до гл.'
-             f'{bottom_muft}м, '
+             f'{self.bottom_muft}м, '
              'забой должен соответствовать ранее нормализованному. Составить АКТ с представителем Заказчика. При '
              'отсутствии ранее нормализованного забоя по согл. с Заказчиком, провести работы по нормализации забоя.',
              None, None, None, None, None, None, None, None,
@@ -1320,10 +1323,10 @@ class Work_with_gnkt(QMainWindow):
              'Произвести подъем с замещением скважинной жидкости на раствор глушения, удельного веса по согласованию '
              'с Заказчиком, рассчитанного по замеру Ризб после 2-х часов отстоя и удел.веса рабочей жидкости в скважин, '
              'но не менее удельного веса расчитанного для пластового давления указанного в настоящем плане работ '
-             f'1,23г/см3 (при Рпл={self.pressuar}атм).  До завоза раствора, '
+             f'г/см3 (при Рпл={self.pressuar}атм).  До завоза раствора, '
              f'скважину разряжать. Перед замещением КНК установить '
              f'в интервале нижнего фрак-порта.\nПрокачать на циркуляцию жидкость глушения в объеме не менее '
-             f'{self.volume_dumping(ntk_true, bottom_muft)}м3 '
+             f'{self.volume_dumping(ntk_true, self.bottom_muft)}м3 '
              '(трубного пространства)  с одновременным подъемом ГНКТ (с протяжкой ГНКТ перевести хвостовик). '
              'В процессе перевода соблюдать равенство объемов закаченной и отобранной из скважины жидкости, '
              'т.е. не допускать режима фонтанирования (поглощения).',
@@ -1491,7 +1494,8 @@ class Work_with_gnkt(QMainWindow):
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None, None, None, None, None, None, None],
             [None, 'Цель работ', None, None, None, None, None, None,
-             f'СПО промывочной КНК-1 с промывкой до МГРП №5. СПО фрезеровочной КНК-2: фрезерование МГРП №5-№2.'
+             f'СПО промывочной КНК-1 с промывкой до МГРП №{self.top_muft}. СПО фрезеровочной КНК-2: фрезерование '
+             f'МГРП №{self.top_muft}-№2.'
              f' Тех.отстой , замер Ризб. По доп.согласованию с Заказчиком, СПО промывочной КНК-1 до '
              f'текущего забоя (МГРП №1).',
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
@@ -1504,7 +1508,6 @@ class Work_with_gnkt(QMainWindow):
         port_len = len(ports_data)
         col_port = int(36 / port_len)
         for index_row, row in enumerate(ports_list):
-
             # dict_ports[f'Муфта №{index + 1}'] = {'кровля': port[0], 'подошва': port[1], 'шар': ball, 'седло': saddle,
             #                                      'тип': type_saddles}
             col = 45
@@ -1533,52 +1536,16 @@ class Work_with_gnkt(QMainWindow):
         print(f'merge {merge_port}')
         return ports_list, merge_port
 
-    def work_with_port(self, plast_work: str, dict_perforation: dict):
+    def work_with_port(self, plast_work: str, dict_perforation: dict, manufacturer, type_column):
         ports_tuple = sorted(list(dict_perforation[plast_work]['интервал']), key=lambda x: x[0], reverse=True)
         dict_ports = {}
 
-        manufacturer_list = ['НТЦ ЗЭРС', 'Зенит', 'Барбус']
-
-        manufacturer, ok = QInputDialog.getItem(None, 'Выбор подрядчика по хвостовику',
-                                                'Введите подрядчика по хвостовику',
-                                                manufacturer_list, 0, False)
-        if manufacturer == 'НТЦ ЗЭРС':
-            type_column_list = ["ФПЗН.102", "ФПЗН1.114"]
-            type_column, ok = QInputDialog.getItem(None, 'Выбор типа колонны', 'Введите тип колонны',
-                                                   type_column_list, 1, False)
-
-
-        elif manufacturer == 'Зенит':
-            type_column = ["ФПЗН1.114"]
-            type_saddles_list = ['1.952"', '2,022"', '2,092"', '2,162"', '114/58А', '2,322"',
-                                 '2,402"', '2,487"', '2,577"', '2,667"', '2,757"', '2,547"']
-
-
-        elif manufacturer == 'Барбус':
-            type_column = ["гидравлич"]
-
         for index, port in enumerate(ports_tuple):
-            if type_column == "ФПЗН.102" and manufacturer == 'НТЦ ЗЭРС':
-                type_saddles_list = ['102/70', '102/67', '102/64', '102/61', '102/58', '102/55', '102/52', '102/49',
-                                     '102/47', '102/45']
-
-            elif type_column == "ФПЗН1.114" and manufacturer == 'НТЦ ЗЭРС':
-                type_saddles_list = ['114/70А', '114/67А', '114/64А', '114/61А', '114/58А', '114/55А', '114/52А',
-                                     '114/49А', '114/47А', '114/45А']
-            elif type_column == "ФПЗН1.114" and manufacturer == 'Зенит':
-                type_saddles_list = ['1.952"', '2,022"', '2,092"', '2,162"', '114/58А', '2,322"',
-                                     '2,402"', '2,487"', '2,577"', '2,667"', '2,757"', '2,547"']
-            elif type_column == "ФПЗН1.114" and manufacturer == 'Барбус':
-                type_saddles_list = ['51,36t20', '54,00t20', '56,65t20', '59,80t20',
-                                     '62,95t20', '66,10t20']
-            type_saddles, ok = QInputDialog.getItem(None, 'Выбор типа порта ',
-                                                    f'Введите тип порта {manufacturer} №{index + 1}',
-                                                    type_saddles_list, 0, False)
             # print(dict_saddles[manufacturer])
             ball = dict_saddles[manufacturer][type_column][type_saddles].ball
             saddle = dict_saddles[manufacturer][type_column][type_saddles].saddle
             dict_ports[f'№{index + 1}'] = {'кровля': port[0], 'подошва': port[1], 'шар': ball, 'седло': saddle,
-                                                 'тип': type_saddles}
+                                           'тип': type_saddles}
 
         return dict_ports
 
@@ -1594,7 +1561,8 @@ class Work_with_gnkt(QMainWindow):
             fluid_list.append(fluid_p)
 
             fluid_work_insert, ok = QInputDialog.getDouble(self, 'Рабочая жидкость',
-                                                           'Введите удельный вес рабочей жидкости',
+                                                           'Введите расчетный удельный вес жидкости глушения в '
+                                                           'конце жидкости',
                                                            max(fluid_list), 0.87, 2, 2)
         except:
             fluid_work_insert, ok = QInputDialog.getDouble(self, 'Рабочая жидкость',

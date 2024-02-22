@@ -21,6 +21,7 @@ from openpyxl.utils.cell import get_column_letter
 from openpyxl.styles import Border, Side, PatternFill, Font, GradientFill, Alignment
 
 from cdng import events_gnvp, itog_1, events_gnvp_gnkt
+from perforation_correct_gnkt_frez import PerforationCorrectGnktFrez
 from work_py.gnkt_frez import Work_with_gnkt
 
 
@@ -1027,12 +1028,6 @@ class CreatePZ(QMainWindow):
         if len(CreatePZ.dict_perforation_project) != 0:
             CreatePZ.plast_project = list(CreatePZ.dict_perforation_project.keys())
 
-        CreatePZ.definition_plast_work(self)
-        print(f'работающие пласты {CreatePZ.plast_work}')
-        print(f'кровля , подошва пласты {CreatePZ.perforation_sole}')
-
-
-
 
         # Определение работающих интервалов перфорации и заполнения в словарь
         # вызов окна для проверки корректности данных
@@ -1066,6 +1061,10 @@ class CreatePZ(QMainWindow):
         CreatePZ.curator, ok = QInputDialog.getItem(None, 'Выбор кураторов ремонта', 'Введите сектор кураторов региона',
                                                     curator_list, curator_list.index(curator), False)
         # print(f'куратор {CreatePZ.curator, CreatePZ.if_None(CreatePZ.dict_pump["posle"])}')
+
+        CreatePZ.definition_plast_work(self)
+        print(f'работающие пласты {CreatePZ.plast_work}')
+        print(f'кровля , подошва пласты {CreatePZ.perforation_sole}')
 
         try:
             if CreatePZ.curator == 'ОР':
@@ -1136,20 +1135,34 @@ class CreatePZ(QMainWindow):
                 CreatePZ.expected_pick_up[expected_Q] = expected_P
                 print(f' Ожидаемые {CreatePZ.expected_pick_up}')
 
+        if work_plan != "gnkt_frez":
+            if self.perforation_correct_window2 is None:
+                self.perforation_correct_window2 = PerforationCorrect(self)
+                self.perforation_correct_window2.setWindowTitle("Сверка данных перфорации")
+                self.perforation_correct_window2.setGeometry(200, 400, 100, 400)
 
-        if self.perforation_correct_window2 is None:
-            self.perforation_correct_window2 = PerforationCorrect(self)
-            self.perforation_correct_window2.setWindowTitle("Сверка данных перфорации")
-            self.perforation_correct_window2.setGeometry(200, 400, 100, 400)
-
-            self.perforation_correct_window2.show()
-            CreatePZ.pause_app(self)
-            CreatePZ.pause = True
-            self.perforation_correct_window2 = None
-            CreatePZ.definition_plast_work(self)
+                self.perforation_correct_window2.show()
+                CreatePZ.pause_app(self)
+                CreatePZ.pause = True
+                self.perforation_correct_window2 = None
+                CreatePZ.definition_plast_work(self)
+            else:
+                self.perforation_correct_window2.close()
+                self.perforation_correct_window2 = None
         else:
-            self.perforation_correct_window2.close()
-            self.perforation_correct_window2 = None
+            if self.perforation_correct_window2 is None:
+                self.perforation_correct_window2 = PerforationCorrectGnktFrez(self)
+                self.perforation_correct_window2.setWindowTitle("Сверка данных перфорации")
+                self.perforation_correct_window2.setGeometry(200, 400, 100, 400)
+
+                self.perforation_correct_window2.show()
+                CreatePZ.pause_app(self)
+                CreatePZ.pause = True
+                self.perforation_correct_window2 = None
+                CreatePZ.definition_plast_work(self)
+            else:
+                self.perforation_correct_window2.close()
+                self.perforation_correct_window2 = None
 
 
 

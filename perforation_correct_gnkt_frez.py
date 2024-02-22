@@ -1,0 +1,251 @@
+from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.Qt import *
+from PyQt5.QtGui import QRegExpValidator, QColor, QPalette
+
+from gnkt_data.gnkt_data import dict_saddles
+from main import MyWindow
+import re
+
+class FloatLineEdit(QLineEdit):
+    def __init__(self, parent=None):
+        super(FloatLineEdit, self).__init__(parent)
+
+        # Устанавливаем валидатор для проверки на float
+
+
+        reg = QRegExp("[0-9.]*")
+        pValidator = QRegExpValidator(self)
+        pValidator.setRegExp(reg)
+        self.setValidator(pValidator)
+
+    def focusOutEvent(self, event):
+        # При потере фокуса проверяем, является ли текст float
+        if self.validator().validate(self.text(), 0)[0] != QValidator.Acceptable:
+            # Если текст не является числом, меняем цвет фона на красный
+            palette = self.palette()
+            palette.setColor(QPalette.Base, QColor(Qt.red))
+            self.setPalette(palette)
+        else:
+            # Если текст является числом, возвращаем цвет фона по умолчанию
+            self.setPalette(self.parentWidget().palette())
+
+
+class TabPage_SO(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        from open_pz import CreatePZ
+
+        manufacturer_list = ['НТЦ ЗЭРС', 'Зенит', 'Барбус']
+
+        self.manufacturer, ok = QInputDialog.getItem(None, 'Выбор подрядчика по хвостовику',
+                                                'Введите подрядчика по хвостовику',
+                                                manufacturer_list, 0, False)
+
+
+        self.labels_plast = {}
+        self.dict_perforation = CreatePZ.dict_perforation
+        plast_all = list(self.dict_perforation.keys())[0]
+
+        self.number_port_label = QLabel("номер порта")
+        self.roof_label = QLabel("Кровля")
+        self.sole_label = QLabel("Подошва")
+        self.type_saddles_label = QLabel("Тип хвостовика")
+
+        self.diametr_saddles_label = QLabel("Диаметр седла")
+        self.diametr_ball_label = QLabel("Диаметр шара")
+
+        self.manufacturer_label =QLabel("Подрядчик хвостовика")
+        self.manufacturer_combo = QComboBox(self)
+        self.manufacturer_combo.addItems(manufacturer_list)
+        self.manufacturer_combo.currentIndexChanged.connect(
+                    lambda index: self.check_manufacturer(plast_all))
+
+        self.type_column_label = QLabel('Тип колонны')
+        self.type_column_edit = QLineEdit(self)
+
+
+        self.grid = QGridLayout(self)
+        self.grid.addWidget(self.number_port_label, 0, 0)
+        self.grid.addWidget(self.roof_label, 0, 1)
+        self.grid.addWidget(self.sole_label, 0, 2)
+        self.grid.addWidget(self.type_saddles_label, 0, 3)
+        self.grid.addWidget(self.diametr_saddles_label, 0, 4)
+        self.grid.addWidget(self.diametr_ball_label, 0, 5)
+        self.grid.addWidget(self.manufacturer_label, 8, 3)
+        self.grid.addWidget(self.manufacturer_combo, 9, 3)
+        self.grid.addWidget(self.type_column_label, 10, 3)
+        self.grid.addWidget(self.type_column_edit, 11, 3)
+
+
+
+        # print(self.dict_perforation)
+
+
+        index_interval = 1
+        for index, (roof, sole) in enumerate(
+                list(sorted(self.dict_perforation[plast_all]["интервал"], key=lambda x: x[0], reverse=True))):
+            number_port = QLabel(self)
+            number_port.setText(f'Муфта №{index_interval}')
+
+            roof_edit = QLineEdit(self)
+            roof_edit.setText(str(roof))
+
+            sole_edit = QLineEdit(self)
+            sole_edit.setText(str(sole))
+
+            # self.type_saddles_ComboBox = QComboBox(self)
+            # type_saddles_ComboBox.addItems(self.type_saddles_list)
+            # self.type_saddles_ComboBox.currentIndexChanged.connect(
+            #     lambda i, idx=index: self.on_type_saddles_change(index_interval, idx, self.type_saddles_ComboBox))
+
+            self.grid.addWidget(number_port, index_interval, 0)
+            self.grid.addWidget(roof_edit, index_interval, 1)
+            self.grid.addWidget(sole_edit, index_interval, 2)
+            # self.grid.addWidget(self.type_saddles_ComboBox, index_interval, 3)
+
+
+            setattr(self, f"plast_{index_interval}_edit", number_port)
+            setattr(self, f"roof_{index_interval}_edit", roof_edit)
+            setattr(self, f"sole_{index_interval}_edit", sole_edit)
+
+
+
+            self.labels_plast[index] = (
+            number_port, roof_edit, sole_edit)
+
+            index_interval += 1
+
+    def check_manufacturer(self, plast):
+        from open_pz import CreatePZ
+        if self.manufacturer_combo.currentText() == 'НТЦ ЗЭРС':
+            if CreatePZ.column_additional and CreatePZ.column_additional_diametr <110 \
+                    or CreatePZ.column_additional is False and CreatePZ.column_diametr < 110:
+                self.type_column = "ФПЗН.102"
+
+            else:
+                self.type_column = "ФПЗН1.114"
+
+        elif self.manufacturer_combo.currentText() == 'Зенит':
+            self.type_column = "ФПЗН1.114"
+            self.type_saddles_list = ['1.952"', '2,022"', '2,092"', '2,162"', '114/58А', '2,322"',
+                                 '2,402"', '2,487"', '2,577"', '2,667"', '2,757"', '2,547"']
+
+
+        elif self.manufacturer_combo.currentText() == 'Барбус':
+            self.type_column = "гидравлич"
+
+        self.type_column_edit.setText(self.type_column)
+
+        if self.type_column == "ФПЗН.102" and self.manufacturer == 'НТЦ ЗЭРС':
+            self.type_saddles_list = ['102/70', '102/67', '102/64', '102/61', '102/58', '102/55', '102/52', '102/49',
+                                 '102/47', '102/45']
+
+        elif self.type_column == "ФПЗН1.114" and self.manufacturer == 'НТЦ ЗЭРС':
+            self.type_saddles_list = ['114/70А', '114/67А', '114/64А', '114/61А', '114/58А', '114/55А', '114/52А',
+                                 '114/49А', '114/47А', '114/45А']
+        elif self.type_column == "ФПЗН1.114" and self.manufacturer == 'Зенит':
+            self.type_saddles_list = ['1.952"', '2,022"', '2,092"', '2,162"', '114/58А', '2,322"',
+                                 '2,402"', '2,487"', '2,577"', '2,667"', '2,757"', '2,547"']
+        elif self.type_column == "ФПЗН1.114" and self.manufacturer == 'Барбус':
+            self.type_saddles_list = ['51,36t20', '54,00t20', '56,65t20', '59,80t20',
+                                 '62,95t20', '66,10t20']
+        # self.type_column_edit.textChanged(self.check_type_column)
+
+
+
+        for index in range(len(self.dict_perforation[list(self.dict_perforation.keys())[0]]["интервал"])):
+            self.type_saddles_ComboBox = QComboBox(self)
+            print(self.type_saddles_list)
+            self.type_saddles_ComboBox.currentIndexChanged.connect(
+                    lambda i, idx=index: self.on_type_saddles_change(index, idx, self.type_saddles_ComboBox))
+            self.type_saddles_ComboBox.addItems(self.type_saddles_list)
+            self.grid.addWidget(self.type_saddles_ComboBox, index+1, 3)
+            setattr(self, f"type_status_{index}_edit", self.type_saddles_ComboBox)
+
+
+
+    def on_type_saddles_change(self, index_interval, idx, type_saddles_ComboBox):
+        print('tyo работает')
+
+
+        # Получаем текст из выбранного элемента в type_saddles_ComboBox
+        selected_type = type_saddles_ComboBox.currentText()
+
+        # Получаем данные о шаре и седле для выбранного типа
+
+        diametr_saddles_edit = QLabel(self)
+        diametr_ball_edit = QLabel(self)
+
+        diametr_saddles = dict_saddles[self.manufacturer][self.type_column][selected_type].saddle
+        diametr_saddles_edit.setText(diametr_saddles)
+        diametr_ball = dict_saddles[self.manufacturer][self.type_column][selected_type].ball
+        diametr_ball_edit.setText(diametr_ball)
+
+        self.grid.addWidget(diametr_saddles_edit, idx + 1, 4)
+        self.grid.addWidget(diametr_ball_edit, idx + 1, 5)
+
+        setattr(self, f"diametr_saddles_{idx}_edit", diametr_saddles)
+        setattr(self, f"diametr_ball_{idx}_edit", diametr_ball)
+
+
+
+class TabWidget(QTabWidget):
+    def __init__(self):
+        super().__init__()
+        self.addTab(TabPage_SO(self), 'Проверка корректности данных перфорации')
+
+
+class PerforationCorrectGnktFrez(QMainWindow):
+
+    def __init__(self, parent=None):
+        super(PerforationCorrectGnktFrez, self).__init__()
+
+        self.centralWidget = QWidget()
+        self.setCentralWidget(self.centralWidget)
+        self.setWindowModality(QtCore.Qt.ApplicationModal) # Устанавливаем модальность окна
+
+        self.tabWidget = TabWidget()
+
+        self.buttonAdd = QPushButton('сохранить данные')
+        self.buttonAdd.clicked.connect(self.addRowTable)
+
+        vbox = QGridLayout(self.centralWidget)
+        vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
+        # vbox.addWidget(self.tableWidget, 0, 0, 1, 2)
+        vbox.addWidget(self.buttonAdd, 3, 0)
+
+    def addRowTable(self):
+        from open_pz import CreatePZ
+
+        # Пересохранение данных по интервалам портам
+        self.dict_perforation = CreatePZ.dict_perforation
+        plast_work = list(self.dict_perforation.keys())[0]
+        manufacturer = self.tabWidget.currentWidget().manufacturer_combo.currentText()
+        type_column = self.tabWidget.currentWidget().type_column.text()
+
+        ports_tuple = sorted(list(self.dict_perforation[plast_work]['интервал']), key=lambda x: x[0], reverse=True)
+        dict_ports = {}
+        for index, port in enumerate(ports_tuple):
+            # print(dict_saddles[manufacturer])
+            ball = dict_saddles[manufacturer][type_column][self.tabWidget.currentWidget().labels_plast[index + 1][3].currentText()].ball
+            saddle = dict_saddles[manufacturer][type_column][self.tabWidget.currentWidget().labels_plast[index + 1][3].currentText()].saddle
+            dict_ports[f'№{index + 1}'] = {'кровля': port[0], 'подошва': port[1], 'шар': ball, 'седло': saddle,
+                                           'тип': self.tabWidget.currentWidget().labels_plast[index + 1][3].currentText()}
+        print(dict_ports)
+        CreatePZ.pause = False
+        self.close()
+
+
+
+
+
+
+if __name__ == "__main__":
+    import sys
+
+    app = QtWidgets.QApplication(sys.argv)
+    # app.setStyleSheet()
+    window = PerforationCorrectGnktFrez()
+    QTimer.singleShot(2000, PerforationCorrectGnktFrez.updateLabel)
+    # window.show()
+    app.exec_()
