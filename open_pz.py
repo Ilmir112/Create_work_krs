@@ -21,7 +21,7 @@ from openpyxl.utils.cell import get_column_letter
 from openpyxl.styles import Border, Side, PatternFill, Font, GradientFill, Alignment
 
 from cdng import events_gnvp, itog_1, events_gnvp_gnkt
-from perforation_correct_gnkt_frez import PerforationCorrectGnktFrez
+
 from work_py.gnkt_frez import Work_with_gnkt
 
 
@@ -477,35 +477,15 @@ class CreatePZ(QMainWindow):
                                     CreatePZ.without_b(ws.cell(row=row_ind + 3, column=col + 4).value))
                                 # print(f' диаметр доп колонны {CreatePZ.column_additional_diametr}')
                             except:
-                                CreatePZ.column_additional_diametr, ok = QInputDialog.getDouble(self,
-                                                                                                ',диаметр доп колонны',
-                                                                                                'введите внешний диаметр доп колонны',
-                                                                                                102, 50, 170)
+                                CreatePZ.column_additional_diametr = 'не корректно'
                             try:
                                 CreatePZ.column_additional_wall_thickness = float(
                                     CreatePZ.without_b(ws.cell(row=row_ind + 3, column=col + 6).value))
                                 if CreatePZ.column_additional_wall_thickness == 0:
-                                    CreatePZ.column_additional_wall_thickness, ok = QInputDialog.getDouble(self,
-                                                                                                           ',толщина стенки доп колонны',
-                                                                                                           'введите толщину стенки доп колонны',
-                                                                                                           6.5, 3, 11,
-                                                                                                           1)
-
-                                # print(f'толщина стенки доп колонны {CreatePZ.column_additional_wall_thickness} ')
+                                    CreatePZ.column_additional_wall_thickness = 'не корректно'
                             except:
-                                CreatePZ.column_additional_wall_thickness, ok = QInputDialog.getDouble(self,
-                                                                                                       ',толщина стенки доп колонны',
-                                                                                                       'введите толщину стенки доп колонны',
-                                                                                                       6.5, 3, 11, 1)
-                        if float(CreatePZ.column_additional_diametr) >= 170:
-                            CreatePZ.column_additional_diametr, ok = QInputDialog.getDouble(self,
-                                                                                            ',диаметр доп колонны',
-                                                                                            'введите внешний диаметр доп колонны',
-                                                                                            114, 70, 220, 1)
-                            CreatePZ.column_additional_wall_thickness, ok = QInputDialog.getDouble(self,
-                                                                                                   ',толщина стенки доп колонны',
-                                                                                                   'введите толщину стенки доп колонны',
-                                                                                                   6.4, 4, 12, 1)
+                                CreatePZ.column_additional_wall_thickness = 'не корретно'
+
 
                     elif 'Дата вскрытия/отключения' == value:
                         CreatePZ.old_version = True
@@ -628,6 +608,10 @@ class CreatePZ(QMainWindow):
                         CreatePZ.dinamic_level = row[col + 1]
         try:
             CreatePZ.water_cut = float(CreatePZ.water_cut)  # обводненность
+            if CreatePZ.curator != 'ОР':
+                CreatePZ.water_cut = CreatePZ.proc_water
+            else:
+                CreatePZ.water_cut = 100
         except:
             CreatePZ.water_cut, ok = QInputDialog.getInt(self, 'Обводненность',
                                                          'Введите обводненность скважинной продукции',
@@ -1149,20 +1133,7 @@ class CreatePZ(QMainWindow):
             else:
                 self.perforation_correct_window2.close()
                 self.perforation_correct_window2 = None
-        else:
-            if self.perforation_correct_window2 is None:
-                self.perforation_correct_window2 = PerforationCorrectGnktFrez(self)
-                self.perforation_correct_window2.setWindowTitle("Сверка данных перфорации")
-                self.perforation_correct_window2.setGeometry(200, 400, 100, 400)
 
-                self.perforation_correct_window2.show()
-                CreatePZ.pause_app(self)
-                CreatePZ.pause = True
-                self.perforation_correct_window2 = None
-                CreatePZ.definition_plast_work(self)
-            else:
-                self.perforation_correct_window2.close()
-                self.perforation_correct_window2 = None
 
 
 

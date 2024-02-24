@@ -206,7 +206,8 @@ def razdel_1(self, region):
          None, None, None,
          None]]
 
-    if '1' in CreatePZ.cat_P_1 or '1' in CreatePZ.cat_H2S_list or 1 in CreatePZ.cat_P_1 or 1 in CreatePZ.cat_H2S_list or CreatePZ.curator == 'ВНС':
+    if '1' in CreatePZ.cat_P_1 or '1' in CreatePZ.cat_H2S_list or 1 in CreatePZ.cat_P_1 or 1 in CreatePZ.cat_H2S_list \
+            or CreatePZ.curator == 'ВНС':
 
         for row in range(len(podp_bvo)):
             for col in range(len(podp_bvo[row])):

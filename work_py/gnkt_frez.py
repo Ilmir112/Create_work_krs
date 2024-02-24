@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QInputDialog, QMainWindow, QTabWidget, QWidget, QTab
 from openpyxl.styles import Alignment
 from openpyxl.utils import get_column_letter
 from PyQt5 import QtCore, QtWidgets
+from perforation_correct_gnkt_frez import PerforationCorrectGnktFrez
 
 import block_name
 import main
@@ -43,18 +44,31 @@ class Work_with_gnkt(QMainWindow):
         self.dict_perforation = CreatePZ.dict_perforation
         self.ws = ws
         self.work_plan = 'gnkt_frez'
-        # self.tabWidget = tabWidget
-        # self.table_title = table_widget
+        self.perforation_correct_window2 = None
 
-        # self.tabWidget.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
-        # self.tabWidget.customContextMenuRequested.connect(self.openContextMenu)
-        # self.setCentralWidget(self.table_title)
-        # self.model = self.tabWidget.model()
-        #
-        # # Этот сигнал испускается всякий раз, когда ячейка в таблице нажата.
-        # # Указанная строка и столбец - это ячейка, которая была нажата.
-        # self.tabWidget.cellPressed[int, int].connect(self.clickedRowColumn)
+        if self.perforation_correct_window2 is None:
+            self.perforation_correct_window2 = PerforationCorrectGnktFrez(self)
+            self.perforation_correct_window2.setWindowTitle("Сверка данных по муфтам")
+            self.perforation_correct_window2.setGeometry(200, 400, 100, 400)
+            self.perforation_correct_window2.show()
+            CreatePZ.pause_app(self)
+            CreatePZ.pause = True
+            self.dict_ports = self.perforation_correct_window2.addRowTable()
+            self.perforation_correct_window2 = None
 
+        else:
+            self.perforation_correct_window2.close()
+            self.perforation_correct_window2 = None
+
+        print(f' порты {self.dict_ports}')
+        self.manufacturer = list(self.dict_ports.keys())[0]
+        print(f' порты {self.manufacturer}')
+        self.type_column = list(self.dict_ports[self.manufacturer].keys())[0]
+        print(f' порты {self.type_column}')
+        self.ports_data = self.dict_ports[self.manufacturer][self.type_column]
+        print(f' порты {self.ports_data}')
+        self.top_muft = list(self.ports_data.keys())[-1]
+        self.bottom_muft = list(self.ports_data.keys())[0]
         self.ws_title = Work_with_gnkt.wb_gnkt_frez.create_sheet(title="Титульник")
 
         self.ws_schema = Work_with_gnkt.wb_gnkt_frez.create_sheet(title="Схема")
@@ -118,12 +132,17 @@ class Work_with_gnkt(QMainWindow):
 
 
 
+
         # print(merged_cells_dict)
         if sheet_name != 'Ход работ':
             for key, value in boundaries_dict.items():
                 # print(value)
                 ws2.merge_cells(start_column=value[0], start_row=value[1],
                                 end_column=value[2], end_row=value[3])
+
+
+
+
         elif sheet_name == 'Ход работ':
             for i, row_data in enumerate(work_list):
                 # print(f'gghhg {work_list[i][2]}')
@@ -159,8 +178,6 @@ class Work_with_gnkt(QMainWindow):
                             # print('есть жирный')
                             ws2.cell(row=i + 1, column=column + 1).font = Font(name='Arial', size=13, bold=True)
 
-
-
                 if len(work_list[i][1]) > 5:
                     ws2.merge_cells(start_column=2, start_row= i + 1, end_column= 12, end_row=i + 1)
                     ws2.cell(row=i + 1, column=2).alignment = Alignment(wrap_text=True, horizontal='center',
@@ -191,6 +208,24 @@ class Work_with_gnkt(QMainWindow):
             ws2.sheet_properties.pageSetUpPr.fitToPage = True
             ws2.page_setup.fitToHeight = False
 
+        for row_ind, row in enumerate(ws2.iter_rows(values_only=True)):
+            for col, value in enumerate(row):
+                if 'А.Р. Хасаншин' in str(value):
+                    coordinate = f'{get_column_letter(col + 1)}{row_ind - 1}'
+                    self.insert_image(ws2, 'imageFiles/Хасаншин.png', coordinate)
+                elif 'Д.Д. Шамигулов' in str(value):
+                    coordinate = f'{get_column_letter(col + 1)}{row_ind - 2}'
+                    self.insert_image(ws2, 'imageFiles/Шамигулов.png', coordinate)
+                elif 'Зуфаров' in str(value):
+                    coordinate = f'{get_column_letter(col - 2)}{row_ind}'
+                    self.insert_image(ws2, 'imageFiles/Зуфаров.png', coordinate)
+                elif 'М.К.Алиев' in str(value):
+                    coordinate = f'{get_column_letter(col - 1)}{row_ind - 2}'
+                    self.insert_image(ws2, 'imageFiles/Алиев махир.png', coordinate)
+                elif 'З.К. Алиев' in str(value):
+                    coordinate = f'{get_column_letter(col - 1)}{row_ind - 2}'
+                    self.insert_image(ws2, 'imageFiles/Алиев Заур.png', coordinate)
+                    break
         print(f'{sheet_name} - вставлена')
 
     def save_to_gnkt(self):
@@ -224,8 +259,8 @@ class Work_with_gnkt(QMainWindow):
         ws7 = Work_with_gnkt.wb_gnkt_frez.create_sheet(title="СХЕМЫ КНК_38,1")
         main.MyWindow.insert_image(self, ws7, 'imageFiles/schema_well/СХЕМЫ КНК_38,1.png', 'A1', 550, 900)
 
-        # path = 'workiii'
-        path = 'D:\Documents\Desktop\ГТМ'
+        path = 'workiii'
+        # path = 'D:\Documents\Desktop\ГТМ'
         filenames = f"{CreatePZ.well_number} {CreatePZ.well_area} кат {CreatePZ.cat_P_1} {self.work_plan}.xlsx"
         full_path = path + '/' + filenames
         # print(f'10 - {ws2.max_row}')
@@ -302,7 +337,9 @@ class Work_with_gnkt(QMainWindow):
                                                                                    vertical='center')
                 if 'ПЛАН РАБОТ' in str(title_list[row - 1][col - 1]):
                     ws2.merge_cells(start_row=row + index_insert, start_column=2, end_row=row + index_insert,
-                                    end_column=10)
+                                    end_column=11)
+                    ws2.merge_cells(start_row=row -4 + index_insert, start_column=2, end_row=row -4 + index_insert,
+                                    end_column=4)
                     ws2.cell(row=row + index_insert, column=col).font = Font(name='Arial', size=14, bold=True)
                     ws2.cell(row=row + index_insert, column=col).alignment = Alignment(wrap_text=False,
                                                                                        horizontal='center',
@@ -313,13 +350,13 @@ class Work_with_gnkt(QMainWindow):
             # for row in range(len(title_list)):  # Добавлением работ
             if a:
                 if a > row:
-                    print(f'сссооссоссо {row + index_insert}')
+                    # print(f'сссооссоссо {row + index_insert}')
                     ws2.merge_cells(start_row=row + index_insert, start_column=2, end_row=row + index_insert,
-                                    end_column=5)
+                                    end_column=6)
                     ws2.merge_cells(start_row=row + index_insert, start_column=8, end_row=row + index_insert,
                                     end_column=11)
 
-        ws2.print_area = f'B1:j{44}'
+        ws2.print_area = f'B1:K{44}'
         ws2.page_setup.fitToPage = True
         ws2.page_setup.fitToHeight = False
         ws2.page_setup.fitToWidth = True
@@ -395,14 +432,14 @@ class Work_with_gnkt(QMainWindow):
 
         self.plast_work = CreatePZ.plast_all[0]
         plast_work = self.plast_work
-        print(self.plast_work, list(CreatePZ.dict_perforation[plast_work]))
-        self.pressuar = f'{list(CreatePZ.dict_perforation[plast_work]["давление"])[0]}атм'
-        pressuar1 = list(CreatePZ.dict_perforation[plast_work]["давление"])[0]
+        # print(self.plast_work, list(CreatePZ.dict_perforation[plast_work]))
+        self.pressuar = list(CreatePZ.dict_perforation[plast_work]["давление"])[0]
+
         zamer = list(CreatePZ.dict_perforation[plast_work]['замер'])[0]
         vertikal = min(map(float, list(CreatePZ.dict_perforation[plast_work]["вертикаль"])))
         self.fluid = self.calc_fluid()
         zhgs = f'{self.fluid}г/см3'
-        koef_anomal = round(float(pressuar1) * 101325 / (float(vertikal) * 9.81 * 1000), 1)
+        koef_anomal = round(float(self.pressuar) * 101325 / (float(vertikal) * 9.81 * 1000), 1)
         nkt = int(list(CreatePZ.dict_nkt.keys())[0])
         if nkt == 73:
             nkt_widht = 5.5
@@ -412,8 +449,7 @@ class Work_with_gnkt(QMainWindow):
             nkt_widht = 5
         lenght_nkt = sum(list(map(int, CreatePZ.dict_nkt.values())))
 
-        bottom_first_port = max(sorted([interval for interval in CreatePZ.dict_perforation[plast_work]['интервал']],
-                                       key=lambda x: x[0]))[0]
+        bottom_first_port = self.ports_data['№1']['кровля']
 
         arm_grp, ok = QInputDialog.getInt(None, 'Арматура ГРП',
                                           'ВВедите номер Арматуры ГРП', 16, 0, 500)
@@ -569,10 +605,10 @@ class Work_with_gnkt(QMainWindow):
              None, 'Искусственный забой  (МГРП №1)', None, None, None, None, None, None, None, None,
              None, None, None, None, None, f'{bottom_first_port}м', None]]
 
-        self.ports_data = self.work_with_port(self.plast_work, CreatePZ.dict_perforation)
+        # self.ports_data = self.work_with_port(self.plast_work, CreatePZ.dict_perforation)
         self.ports_list, merge_port = self.insert_ports_data(self.ports_data)
-        self.top_muft = list(self.ports_data.keys())[-1]
-        self.bottom_muft = list(self.ports_data.keys())[0]
+
+
         # print(ports_list)
         for row in self.ports_list:
             schema_well_list.append(row)
@@ -749,6 +785,8 @@ class Work_with_gnkt(QMainWindow):
         ws3.page_setup.paperSize = ws3.PAPERSIZE_A4
 
     def work_gnkt_frez(self, ports_data, plast_work):
+        print(f' portr {ports_data}')
+        print(f'топ {self.top_muft}')
 
         from open_pz import CreatePZ
         from krs import calc_work_fluid
@@ -765,7 +803,7 @@ class Work_with_gnkt(QMainWindow):
         print(f' ПНТЖ - {calc_pntzh(self.fluid, CreatePZ.cdng)}')
 
         distance, _ = QInputDialog.getInt(None, 'Расстояние НПТЖ', 'Введите Расстояние до ПНТЖ')
-        fluid_work, CreatePZ.fluid_work_short = calc_work_fluid(self)
+        fluid_work, CreatePZ.fluid_work_short = calc_work_fluid(self, self.work_plan)
 
 
         block_gnvp_list = [
