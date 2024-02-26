@@ -2,15 +2,16 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.Qt import QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QInputDialog, QTabWidget, QPushButton, Qt
 from PyQt5.QtWidgets import QMessageBox
 
-from krs import well_volume
+
 from main import MyWindow
 from open_pz import CreatePZ
-from work_py.opressovka import testing_pressure
+
 
 from work_py.rationingKRS import descentNKT_norm, well_volume_norm, liftingNKT_norm
 
 from work_py.acid_paker import CheckableComboBox
 class TabPage_SO(QWidget):
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.countAcid = CreatePZ.countAcid
@@ -265,12 +266,14 @@ class TabPage_SO(QWidget):
                 paker_depth = int(self.pakerEdit.text())
                 self.paker2Edit.setText(str(paker_depth-CreatePZ.difference_paker))
 class TabWidget(QTabWidget):
+
     def __init__(self):
         super().__init__()
         self.addTab(TabPage_SO(self), 'Кислотная обработка на двух пакерах')
 
 
 class AcidPakerWindow(MyWindow):
+
 
     def __init__(self, table_widget, ins_ind, countAcid, parent=None):
 
@@ -291,6 +294,8 @@ class AcidPakerWindow(MyWindow):
         vbox.addWidget(self.buttonAdd, 2, 0)
 
     def swabbing_with_paker(self, paker_khost, paker_depth, deferencePaker, swab, swab_volume):
+        from krs import well_volume
+        from work_py.opressovka import OpressovkaEK
         if swab == 'Задача №2.1.13':  # , 'Задача №2.1.16', 'Задача №2.1.11', 'своя задача']'
             swab_select = f'Произвести  геофизические исследования по технологической задаче № 2.1.13 Определение профиля ' \
                           f'и состава притока, дебита, источника обводнения и технического состояния эксплуатационной колонны и НКТ ' \
@@ -321,9 +326,9 @@ class AcidPakerWindow(MyWindow):
                 ,
              None, None, None, None, None, None, None,
              'мастер КРС', 0.3],
-            [f'{testing_pressure(self, paker_depth)[1]}'
+            [f'{OpressovkaEK.testing_pressure(self, paker_depth)[1]}'
                 , None,
-             testing_pressure(self, paker_depth)[0],
+             OpressovkaEK.testing_pressure(self, paker_depth)[0],
              None, None, None, None, None, None, None,
              'мастер КРС, предст. заказчика', 0.67],
 
@@ -386,14 +391,16 @@ class AcidPakerWindow(MyWindow):
         return paker_list
 
     def acidSelect(self, swabTrueEditType, khvostEdit, pakerEdit, paker2Edit, depthGaugeEdit):
-        from work_py.opressovka import paker_diametr_select
+        from work_py.opressovka import OpressovkaEK
+        from krs import well_volume
+
 
         swabTrueEditType = True if swabTrueEditType == 'Нужно освоение' else False
         difference_paker = round(pakerEdit - paker2Edit, 0)
         CreatePZ.difference_paker = difference_paker
         pakerEdit = MyWindow.true_set_Paker(self, pakerEdit)
         paker2Edit = MyWindow.true_set_Paker(self, paker2Edit)
-        paker_diametr = paker_diametr_select(pakerEdit)
+        paker_diametr = OpressovkaEK.paker_diametr_select(pakerEdit)
 
         if depthGaugeEdit == 'Да' and CreatePZ.column_additional == False:
             self.paker_select = f'заглушку + сбивной с ввертышем контейнер с манометром МТГ + НКТ{CreatePZ.nkt_diam}м ' \
@@ -465,8 +472,8 @@ class AcidPakerWindow(MyWindow):
                 ,
              None, None, None, None, None, None, None,
              'мастер КРС', 0.3],
-            [testing_pressure(self, pakerEdit)[1], None,
-             testing_pressure(self, pakerEdit)[0],
+            [OpressovkaEK.testing_pressure(self, pakerEdit)[1], None,
+             OpressovkaEK.testing_pressure(self, pakerEdit)[0],
              None, None, None, None, None, None, None,
              'мастер КРС, предст. заказчика', 0.83 + 0.58],
             [f'срыв 30мин', None,

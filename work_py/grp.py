@@ -5,7 +5,7 @@ import krs
 import main
 from main import MyWindow
 from work_py.alone_oreration import kot_select
-from work_py.opressovka import testing_pressure
+from work_py.opressovka import OpressovkaEK
 from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm,well_volume_norm
 
 def grpGpp(self):

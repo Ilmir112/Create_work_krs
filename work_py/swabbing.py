@@ -5,7 +5,7 @@ import krs
 from krs import well_volume
 from work_py.alone_oreration import privyazkaNKT
 from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm,well_volume_norm
-from work_py.opressovka import testing_pressure
+from work_py.opressovka import OpressovkaEK
 
 
 def swabbing_opy(self):
@@ -185,7 +185,7 @@ def swabbing_with_paker(self, paker_khost, pakerKompo):
                                           int(CreatePZ.perforation_roof - 40), 0,
                                           5000)
 
-    paker_khost1 = int(CreatePZ.perforation_sole - paker_depth)
+
     # print(f'хвостовик {paker_khost1}')
     if pakerKompo == 1:
         paker_khost, ok = QInputDialog.getInt(None, 'хвостовик',
@@ -228,8 +228,8 @@ def swabbing_with_paker(self, paker_khost, pakerKompo):
          f'ПРИ ОТСУТСТВИИ ЦИРКУЛЯЦИИ ПРЕДУСМОТРЕТЬ НАЛИЧИИ В КОМПОНОВКЕ УРАВНИТЕЛЬНЫХ КЛАПАНОВ',
          None, None, None, None, None, None, None,
          'мастер КРС', descentNKT_norm(paker_depth,1.2)],
-        [f'Посадить пакер на глубине {paker_depth}м', None, f'Посадить пакер на глубине {paker_depth}м, воронку на глубине {paker_khost + paker_depth}м'
-            ,
+        [f'Посадить пакер на глубине {paker_depth}м', None, f'Посадить пакер на глубине {paker_depth}м, воронку на '
+                                                            f'глубине {paker_khost + paker_depth}м',
          None, None, None, None, None, None, None,
          'мастер КРС', 0.4],
         [testing_pressure(self, paker_depth)[1],
@@ -307,7 +307,7 @@ def swabbing_with_paker(self, paker_khost, pakerKompo):
             if abs(float(interval[1] - paker_depth)) < 10 or abs(float(interval[0] - paker_depth)) < 10:
                 if privyazkaNKT(self) not in paker_list and CreatePZ.privyazkaSKO == 0:
                     CreatePZ.privyazkaSKO += 1
-                    paker_list.insert(1, privyazkaNKT(self))
+                    paker_list.insert(1, privyazkaNKT(self)[0])
 
     return paker_list
 

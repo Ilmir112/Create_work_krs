@@ -3,9 +3,6 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox
 
 def skm_interval(self, template):
     from open_pz import CreatePZ
-    template_select = ['ПСШ ЭК', 'ПСШ ЭК без хвост', 'ПСШ ЭК открытый ствол', 'ПСШ СКМ в доп колонне c хвостом', 'ПСШ ДП без хвост',
-                       'ПСШ СКМ в доп колонне + открытый ствол', 'СКМ в открытом стволе', 'ПСШ открытый ствол + ИП отрайбирован']
-
 
     str_raid = []
     if CreatePZ.paker_do["posle"] != 0:
@@ -93,15 +90,15 @@ def skm_interval(self, template):
     for interval in merged_segments:
         if template in ['ПСШ ЭК', 'ПСШ без хвоста', 'ПСШ открытый ствол']:
             merged_segments_new = merged_segments
-        elif template in ['ПСШ открытый ствол + ИП отрайбирован']:
-            if interval[0] < float(CreatePZ.shoe_column_additional) and interval[1] < float(
-                    CreatePZ.shoe_column_additional):
+        elif template in ['ПСШ открытый ствол']:
+            if interval[0] < float(CreatePZ.shoe_column) and interval[1] < float(
+                    CreatePZ.shoe_column):
                 merged_segments_new.append(interval)
 
-            elif interval[0] < float(CreatePZ.shoe_column_additional) and interval[1] > float(
-                    CreatePZ.shoe_column_additional):
+            elif interval[0] < float(CreatePZ.shoe_column) and interval[1] > float(
+                    CreatePZ.shoe_column):
 
-                merged_segments_new.append((interval[1], float(CreatePZ.shoe_column_additional) -3))
+                merged_segments_new.append((interval[1], float(CreatePZ.shoe_column) -1))
 
         elif template in ['ПСШ СКМ в доп колонне c хвостом', 'ПСШ СКМ в доп колонне без хвоста',
                           'ПСШ СКМ в доп колонне + открытый ствол']:
@@ -123,6 +120,10 @@ def skm_interval(self, template):
                     CreatePZ.head_column_additional):
                 # merged_segments.remove(interval)
                 merged_segments_new.append((interval[0], CreatePZ.head_column_additional - 2))
+        elif template in ['ПСШ СКМ в доп колонне + открытый ствол']:
+            if interval[0] < float(CreatePZ.shoe_column_additional) and interval[1] < float(
+                    CreatePZ.shoe_column_additional):
+                merged_segments_new.append(interval)
                 # print(f'4 {interval, merged_segments}')
     # print(f'Новые интервалы {merged_segments_new}')
     for skip in merged_segments_new:
@@ -142,25 +143,49 @@ def remove_overlapping_intervals(perforating_intervals):
     # print(f' перфорация_ {perforating_intervals}')
     skipping_intervals = []
     if CreatePZ.paker_do["posle"] != 0:
-        skipping_intervals.append([float(CreatePZ.H_F_paker_do["posle"]) - 20, float(CreatePZ.H_F_paker_do["posle"]) + 20])
-
+        if CreatePZ.skm_depth > CreatePZ.H_F_paker_do["posle"] + 20:
+            skipping_intervals.append(
+                [float(CreatePZ.H_F_paker_do["posle"]) - 20, float(CreatePZ.H_F_paker_do["posle"]) + 20])
+            print(f'1 {skipping_intervals}')
+        else:
+            skipping_intervals.append(
+                [float(CreatePZ.H_F_paker_do["posle"]) - 20, CreatePZ.skm_depth])
+            print(f'2 {skipping_intervals}')
+    if CreatePZ.paker2_do["posle"] != 0:
+        if CreatePZ.skm_depth > CreatePZ.H_F_paker_do["posle"] + 20:
+            skipping_intervals.append(
+                [float(CreatePZ.H_F_paker_do["posle"]) - 20, float(CreatePZ.H_F_paker_do["posle"]) + 20])
+            print(f'3 {skipping_intervals}')
+        else:
+            skipping_intervals.append(
+                [float(CreatePZ.H_F_paker_do["posle"]) - 20, CreatePZ.skm_depth])
+            print(f'4 {skipping_intervals}')
     if CreatePZ.leakiness:
         for nek in list(CreatePZ.dict_leakiness['НЭК']['интервал'].keys()):
-            if int(float(nek[1])) + 20 < CreatePZ.current_bottom:
+            if int(float(nek[1])) + 20 < CreatePZ.skm_depth:
                 skipping_intervals.append([int(float(nek[0])) - 90, int(float(nek[1])) + 20])
             else:
                 skipping_intervals.append([int(float(nek[0])) - 90,
-                                 CreatePZ.current_bottom - 2])
+                                 CreatePZ.skm_depth])
 
     for pvr in sorted(perforating_intervals, key=lambda x: x[0]):
-        if pvr[1] <= CreatePZ.current_bottom - 3:
+        if pvr[1] <= CreatePZ.current_bottom:
             if pvr[1] + 40 < CreatePZ.current_bottom and pvr[0] < CreatePZ.current_bottom:
                 skipping_intervals.append([pvr[0] - 90, pvr[0] - 2])
-                skipping_intervals.append([pvr[1] + 2, pvr[1] + 40])
+                print(f'5 {skipping_intervals}')
+                if CreatePZ.skm_depth >= pvr[1] + 40:
+                    skipping_intervals.append([pvr[1] + 2, pvr[1] + 40])
+                    print(f'6 {skipping_intervals}')
+                else:
+                    skipping_intervals.append([pvr[1] + 2, CreatePZ.skm_depth])
+                    print(f'7 {skipping_intervals}')
 
-            elif pvr[1] + 40 > CreatePZ.current_bottom and pvr[0] < CreatePZ.current_bottom:
+            elif pvr[1] + 40 > CreatePZ.skm_depth and pvr[0] < CreatePZ.skm_depth:
                 skipping_intervals.append([pvr[0] - 90, pvr[0] - 2])
-                skipping_intervals.append([pvr[1] + 2, CreatePZ.current_bottom - 2])
+                print(f'8 {skipping_intervals}')
+                skipping_intervals.append([pvr[1] + 1, CreatePZ.skm_depth])
+                print(f'9 {skipping_intervals}')
+
 
     print(f'СКМ на основе ПВР{sorted(skipping_intervals, key=lambda x: x[0])}')
     skipping_intervals = merge_overlapping_intervals(sorted(skipping_intervals, key=lambda x: x[0]))
@@ -180,7 +205,7 @@ def remove_overlapping_intervals(perforating_intervals):
                     # print(f' range {skm_range}')
 
                     skm_range = skm_range[skm_range.index(int(pvr[1])):]
-                    print(f' range {skm_range}')
+            print(f' range {skm_range}')
             skipping_intervals_new.append((skm_range[0] + 2, pod_skm))
 
     print(f'после разделения {skipping_intervals_new}')
@@ -206,23 +231,34 @@ def raiding_interval(ryber_key):
     # if len(CreatePZ.dict_perforation) > 1:
     for plast in CreatePZ.dict_perforation.keys():
         if plast in CreatePZ.plast_all:
-            # print(f' отрай {CreatePZ.dict_perforation[plast]["Прошаблонировано"]}')
-            crt = []
+
             if CreatePZ.dict_perforation[plast]['отрайбировано'] == False:
-                for i in CreatePZ.dict_perforation[plast]['интервал']:
-                    if float(i[1]) <= CreatePZ.current_bottom and float(i[0]) <= CreatePZ.current_bottom:
-                        if float(i[1]) + 20 <= CreatePZ.current_bottom:
-                            crt = [float(i[0]) - 20, float(i[1]) + 20]
-                        elif float(i[1]) + 20 >= CreatePZ.shoe_column and CreatePZ.column_additional is False:
-                            crt = [float(i[0]) - 20, CreatePZ.shoe_column]
-                        elif float(i[1]) + 20 >= CreatePZ.shoe_column_additional and CreatePZ.column_additional:
-                            crt = [float(i[0]) - 20, CreatePZ.shoe_column]
-                        elif int(i[0]) == int(CreatePZ.shoe_column) and CreatePZ.column_additional is False:
-                            pass
-                        elif int(i[1]) == int(CreatePZ.shoe_column_additional) and CreatePZ.column_additional:
-                            pass
+                for interval in CreatePZ.dict_perforation[plast]['интервал']:
+                    if float(interval[1]) <= CreatePZ.current_bottom and float(interval[0]) <= CreatePZ.current_bottom:
+                        if int(interval[0]) == int(CreatePZ.shoe_column) and CreatePZ.column_additional is False:
+                            crt = [float(interval[0]) - 20, CreatePZ.shoe_column]
+                            print(f'4 {crt}')
+                        elif int(interval[1]) == int(CreatePZ.shoe_column_additional) and CreatePZ.column_additional:
+                            crt = [float(interval[1]) - 20, CreatePZ.shoe_column_additional]
+                            print(f'5 {crt}')
+                        elif float(interval[1]) + 20 <= CreatePZ.current_bottom and \
+                                CreatePZ.shoe_column >= float(interval[1]) + 20:
+                            crt = [float(interval[0]) - 20, float(interval[1]) + 20]
+                            print(f'1 {crt}')
+                        elif float(interval[1]) + 20 >= CreatePZ.shoe_column and CreatePZ.column_additional is False:
+                            crt = [float(interval[1]) - 20, CreatePZ.shoe_column]
+                            print(f'2 {crt}')
+                        elif float(interval[1]) - 20 >= CreatePZ.shoe_column_additional and CreatePZ.column_additional:
+                            crt = [float(interval[0]), CreatePZ.shoe_column]
+                            print(f'3 {crt}')
+                        elif int(interval[0]) == int(CreatePZ.shoe_column) and CreatePZ.column_additional is False:
+                            crt = [float(interval[0]) - 20, CreatePZ.shoe_column]
+                            print(f'4 {crt}')
+                        elif int(interval[1]) == int(CreatePZ.shoe_column_additional) and CreatePZ.column_additional:
+                            crt = [float(interval[1]) - 20, CreatePZ.shoe_column_additional]
+                            print(f'5 {crt}')
                         else:
-                            crt = [float(i[0]) - 20, CreatePZ.current_bottom]
+                            crt = [float(interval[0]) - 20, CreatePZ.current_bottom]
                         str_raid.append(crt)
     print(f'интерва hfq {str_raid}')
     if len(CreatePZ.drilling_interval) != 0:

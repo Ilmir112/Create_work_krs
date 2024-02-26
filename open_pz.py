@@ -110,6 +110,7 @@ class CreatePZ(QMainWindow):
                           'Дата ПВО': '15.10.2021г'
                       }}
     countAcid = 0
+
     swabTypeComboIndex = 1
     swabTrueEditType = 1
     data_x_max = 0
@@ -147,7 +148,7 @@ class CreatePZ(QMainWindow):
     cat_well_max = 0
     well_volume_in_PZ = []
     bvo = False
-    old_version = False
+    old_version = True
     thin_border = Border(left=Side(style='thin'),
                          right=Side(style='thin'),
                          top=Side(style='thin'),
@@ -166,7 +167,7 @@ class CreatePZ(QMainWindow):
 
 
     def open_excel_file(self, ws, work_plan):
-        old_index = 1
+        old_index = 0
         from data_correct import DataWindow
         from perforation_correct import PerforationCorrect
 
@@ -276,56 +277,66 @@ class CreatePZ(QMainWindow):
                     elif 'Направление' in str(value) and 'Шахтное направление' not in str(value) and \
                             CreatePZ.if_None(ws.cell(row=row_ind + 1, column=col + 4).value) != 'отсут':
                         CreatePZ.column_direction_True = True
-                        print(f'направление {ws.cell(row=row_ind + 1, column=col + 4).value,  ws.cell(row=row_ind + 1, column=col + 4).value not in ["-", "(мм), (мм), -(м)", None]}')
+                        print(f'направление32323 {ws.cell(row=row_ind + 1, column=col + 4).value,  ws.cell(row=row_ind + 1, column=col + 4).value not in ["-", "(мм), (мм), -(м)", None]}')
 
                         try:
-                            column_direction_data = (ws.cell(row=row_ind + 1, column=col + 4).value).split('(мм),', )
-                            # print(f'направление {column_direction_data}')
-                            if len(column_direction_data) == 3:
+                            column_direction_data = ws.cell(row=row_ind + 1, column=col + 4).value.split('(мм),')
+                            # print(f'направление32 {column_direction_data, len(column_direction_data)}')
+                            # print(f' dfdf {float(column_direction_data)}')
+                            try:
                                 CreatePZ.column_direction_diametr = float(column_direction_data[0])
+                            except:
+                                CreatePZ.column_direction_diametr = 'не корректно'
+                            # print(f' dfdf {CreatePZ.column_direction_diametr}')
+                            try:
                                 CreatePZ.column_direction_wall_thickness = float(column_direction_data[1])
-                                CreatePZ.column_direction_lenght = column_direction_data[2]
+                            except:
+                                CreatePZ.column_direction_wall_thickness = 'не корректно'
+                            try:
+                                CreatePZ.column_direction_lenght = float(
+                                    column_direction_data[2].split('-')[1].replace('(м)', ''))
+
+                            except:
+                                CreatePZ.column_direction_lenght = 'не корректно'
                         except:
-                            CreatePZ.column_direction_diametr, _ = \
-                                QInputDialog.getInt(self, 'Направление', 'Введите внешний диаметр направления',
-                                                    324, 0, 500)
-                            CreatePZ.column_direction_wall_thickness, _ = \
-                                QInputDialog.getDouble(self, 'Направление', 'Введите толшину стенки направления',
-                                                    11, 0, 20)
-                            CreatePZ.column_direction_lenght, _ = \
-                                QInputDialog.getInt(self, 'Направление', 'Введите башмак направления',
-                                                    0, 0, 700)
+                            CreatePZ.column_direction_diametr = 'не корректно'
+                            CreatePZ.column_direction_wall_thickness = 'не корректно'
+                            CreatePZ.column_direction_lenght = 'не корректно'
                     elif 'Кондуктор' in str(value) and \
                             ws.cell(row=row_ind + 1, column=col + 4).value not in ['-', '(мм), (мм), -(м)', None]:
 
                         try:
                             column_conductor_data = (ws.cell(row=row_ind + 1, column=col + 4).value).split('(мм),', )
-                            if len(column_conductor_data) == 3:
-                                # print(column_conductor_data)
+                            print(f' конж {column_conductor_data}')
+                            try:
                                 CreatePZ.column_conductor_diametr = float(column_conductor_data[0])
+                            except:
+                                CreatePZ.column_conductor_diametr = 'не корректно'
+                            try:
                                 CreatePZ.column_conductor_wall_thickness = float(column_conductor_data[1])
-                                CreatePZ.column_conductor_lenght = column_conductor_data[2]
+                            except:
+                                CreatePZ.column_conductor_wall_thickness = 'не корректно'
+                            try:
+                                print(f'ff{column_conductor_data[2].split("-")}')
+                                CreatePZ.column_conductor_lenght = float(
+                                    column_conductor_data[2].split('-')[1].replace('(м)', ''))
+                            except:
+                                CreatePZ.column_conductor_lenght = 'не корректно'
 
                         except:
-                            CreatePZ.column_conductor_diametr, _ = \
-                                QInputDialog.getInt(self, 'Кондуктор', 'Введите внешний диаметр Кондуктор',
-                                                    245, 0, 500)
-                            CreatePZ.column_conductor_wall_thickness, _ = \
-                                QInputDialog.getDouble(self, 'Кондуктор', 'Введите толшину стенки Кондуктор',
-                                                    9, 0, 20)
-                            CreatePZ.column_conductor_lenght, _ = \
-                                QInputDialog.getInt(self, 'Кондуктор', 'Введите башмак Кондуктор',
-                                                    0, 0, 700)
+                            CreatePZ.column_conductor_diametr = 'не корректно'
+                            CreatePZ.column_conductor_wall_thickness = 'не корректно'
+                            CreatePZ.column_conductor_lenght = 'не корректно'
                     elif any(['Кондуктор' in str(value) for value in row]):
                         for ind, value in enumerate(row):
                             if 'Уровень цемента' in str(value):
 
-                                CreatePZ.level_cement_conductor = row[ind + 2]
+                                CreatePZ.level_cement_conductor = row[ind + 2].split('-')[0].replace(' ', '')
 
                     elif any(['Направление' in str(value) for value in row]):
                         for ind, value in enumerate(row):
                             if 'Уровень цемента' in str(value):
-                                CreatePZ.level_cement_direction = row[ind + 2]
+                                CreatePZ.level_cement_direction = row[ind + 2].split('-')[0].replace(' ', '')
 
                     elif 'колонная головка' in str(value):
                         CreatePZ.column_head_m = row[col + 4]
@@ -487,9 +498,11 @@ class CreatePZ(QMainWindow):
                                 CreatePZ.column_additional_wall_thickness = 'не корретно'
 
 
-                    elif 'Дата вскрытия/отключения' == value:
-                        CreatePZ.old_version = True
-                        old_index = 0
+                    elif any(['вскрытия' == str(value) for value in row]) \
+                            and any(['отключения' == str(value) for value in row]):
+
+                        CreatePZ.old_version = False
+                        old_index = 1
 
                     elif 'Максимально ожидаемое давление на устье' == value:
                         CreatePZ.max_expected_pressure = row[col + 1]
@@ -823,11 +836,12 @@ class CreatePZ(QMainWindow):
 
         # print(f' индекс штанг{CreatePZ.sucker_rod_ind, CreatePZ.pipes_ind}')
         if CreatePZ.sucker_rod_ind == 0:
-            CreatePZ.sucker_rod_ind, ok = QInputDialog.getDouble(self, 'Индекс штанги до ремоант',
-                                                         'Программа не могла определить начала строки с ПЗ штанги - до ремонта')
+            CreatePZ.sucker_rod_ind, ok = QInputDialog.getInt(self, 'Индекс штанги до ремонта',
+                                             'Программа не могла определить начала строки с ПЗ штанги - до ремонта')
 
 
         if CreatePZ.sucker_rod_ind != 0:
+            print(CreatePZ.sucker_rod_ind, CreatePZ.pipes_ind)
             for row in range(CreatePZ.sucker_rod_ind, CreatePZ.pipes_ind):
                 if ws.cell(row=row, column=3).value == 'План' or str(
                         ws.cell(row=row, column=3).value).lower() == 'после ремонта':

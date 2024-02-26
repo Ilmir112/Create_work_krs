@@ -638,28 +638,38 @@ class DataWindow(QMainWindow):
            or self.ifNum(current_bottom) is False \
            or self.ifNum(max_angle) is False \
            or self.ifNum(max_admissible_pressure) is False \
-           or self.ifNum(max_expected_pressure) is False \
-           or self.ifNum(dict_pump_ECN_h_do) is False \
-           or self.ifNum(static_level) is False \
-           or self.ifNum(static_level) is False \
-           or self.ifNum(dinamic_level) is False \
+           or self.ifNum(max_expected_pressure) is False:
+            msg = QMessageBox.information(self, 'Внимание', 'Не все поля в забое соответствуют значениям')
+            close_file = False
+        elif self.ifNum(static_level) is False \
+           or self.ifNum(dinamic_level) is False:
+            msg = QMessageBox.information(self, 'Внимание', 'Не все поля в уровнях соответствуют значениям')
+            close_file = False
+        elif self.ifNum(dict_pump_ECN_h_do) is False \
            or self.ifNum(dict_pump_ECN_h_posle) is False \
            or self.ifNum(dict_pump_SHGN_h_do) is False \
            or self.ifNum(dict_pump_SHGN_h_posle) is False \
            or self.ifNum(H_F_paker_do) is False \
            or self.ifNum(H_F_paker_posle) is False \
            or self.ifNum(H_F_paker2_do) is False \
-           or self.ifNum(H_F_paker2_posle) is False \
-           or self.ifNum(column_direction_diametr) is False \
+           or self.ifNum(H_F_paker2_posle) is False:
+            msg = QMessageBox.information(self, 'Внимание', 'Не все поля в спущенном оборудовании'
+                                                            ' соответствуют значениям')
+            close_file = False
+        elif self.ifNum(column_direction_diametr) is False \
            or self.ifNum(column_direction_wall_thickness) is False \
-           or self.if_string_list(level_cement_direction) is False \
-           or self.ifNum(column_conductor_diametr) is False \
-           or self.ifNum(column_conductor_wall_thickness) is False:
-           # or self.if_string_list(column_conductor_lenght) is False \
-           # or self.if_string_list(column_direction_lenght) is False \
-           # or self.if_string_list(level_cement_conductor) is False:
+            or self.ifNum(column_direction_lenght) is False \
+            or  self.ifNum(level_cement_direction) is False:
 
-            msg = QMessageBox.information(self, 'Внимание', 'Не все поля соответствуют значениям')
+            msg = QMessageBox.information(self, 'Внимание', 'Не все поля в Направлении соответствуют значениям')
+            close_file = False
+        elif self.ifNum(column_conductor_diametr) is False \
+           or self.ifNum(column_conductor_wall_thickness) is False\
+           or self.ifNum(column_conductor_lenght) is False \
+           or self.ifNum(column_direction_lenght) is False \
+           or self.ifNum(level_cement_conductor) is False:
+
+            msg = QMessageBox.information(self, 'Внимание', 'Не все поля в кондукторе соответствуют значениям')
             close_file = False
 
         elif any(['НВ' in dict_pump_SHGN_do.upper(), 'ШГН' in dict_pump_SHGN_do.upper(),

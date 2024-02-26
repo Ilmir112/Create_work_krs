@@ -192,6 +192,7 @@ class MyWindow(QMainWindow):
         self.initUI()
         self.new_window = None
         self.acid_windowPaker = None
+        self.work_window = None
         self.signatures_window = None
         self.acid_windowPaker2 = None
         self.rir_window = None
@@ -1379,12 +1380,21 @@ class MyWindow(QMainWindow):
             self.populate_row(self.ins_ind, acid_work_list, self.table_widget)
 
     def pressureTest(self):
-        from work_py.opressovka import paker_list
+        from work_py.opressovka import OpressovkaEK
+        from open_pz import CreatePZ
 
-        # print('Вставился опрессовка пакером')
-        pressure_work1 = paker_list(self)
-        # print(f'индекс {self.ins_ind, len(pressure_work1)}')
-        self.populate_row(self.ins_ind, pressure_work1, self.table_widget)
+
+        if self.work_window is None:
+            self.work_window = OpressovkaEK(self.table_widget, self.ins_ind)
+            self.work_window.setGeometry(200, 400, 300, 400)
+            self.work_window.show()
+            CreatePZ.pause_app(self)
+            CreatePZ.pause = True
+            self.work_window = None
+        else:
+            self.work_window.close()  # Close window.
+            self.work_window = None
+
 
     def template_pero(self):
         from work_py.template_work import TemplateKrs
@@ -1396,7 +1406,6 @@ class MyWindow(QMainWindow):
 
     def template_with_skm(self):
         from work_py.template_work import TemplateKrs
-        from open_pz import CreatePZ
         from open_pz import CreatePZ
         print(f' окно СКО ')
 
@@ -1434,7 +1443,7 @@ class MyWindow(QMainWindow):
         for i, row_data in enumerate(work_list):
             row = ins_ind + i
             self.table_widget.insertRow(row)
-
+            # print(f'при Х{row_data}')
             if len(str(row_data[1])) > 3 and self.work_plan == 'gnkt_frez':
                 self.table_widget.setSpan(i + ins_ind, 1, 1, 12)
             else:
@@ -1895,7 +1904,7 @@ class MyWindow(QMainWindow):
     def true_set_Paker(self, depth):
         from open_pz import CreatePZ
         from work_py.advanted_file import raid, remove_overlapping_intervals
-        from work_py.opressovka import check_for_template_paker
+        from work_py.opressovka import OpressovkaEK
 
         a = False
 
@@ -1922,7 +1931,7 @@ class MyWindow(QMainWindow):
                                                 int(CreatePZ.current_bottom))
 
 
-        check_for_template = check_for_template_paker(self, depth)
+        check_for_template = OpressovkaEK.check_for_template_paker(self, depth)
         if check_for_template[1]:
             depth = check_for_template[0]
 

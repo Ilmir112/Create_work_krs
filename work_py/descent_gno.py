@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QMessageBox, QInputDialog
 
 from work_py.alone_oreration import privyazkaNKT
-from work_py.opressovka import testing_pressure
+from work_py.opressovka import OpressovkaEK
 from work_py.rationingKRS import well_volume_norm, descentNKT_norm, descent_sucker_pod
 from work_py.calc_fond_nkt import CalcFond
 

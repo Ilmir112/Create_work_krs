@@ -8,10 +8,10 @@ from PyQt5.QtCore import QEvent
 from PyQt5.QtGui import QPalette, QFontMetrics, QStandardItem
 from PyQt5.QtWidgets import QVBoxLayout, QStyledItemDelegate, qApp, QMessageBox, QCompleter
 
-from krs import well_volume
+
 from main import MyWindow
 from open_pz import CreatePZ
-from work_py.opressovka import testing_pressure
+
 
 from work_py.rationingKRS import descentNKT_norm, well_volume_norm, liftingNKT_norm
 
@@ -27,6 +27,7 @@ class CheckableComboBox(QWidget):
 
 class CheckableComboBoxChild(QComboBox):
     # Subclass Delegate to increase item height
+
     class Delegate(QStyledItemDelegate):
         def sizeHint(self, option, index):
             size = super().sizeHint(option, index)
@@ -414,6 +415,8 @@ class AcidPakerWindow(MyWindow):
         vbox.addWidget(self.buttonAdd, 2, 0)
 
     def swabbing_with_paker(self, paker_khost, paker_depth, swab, swab_volume):
+        from work_py.opressovka import OpressovkaEK
+        from krs import well_volume
         if swab == 'Задача №2.1.13':  # , 'Задача №2.1.16', 'Задача №2.1.11', 'своя задача']'
             swab_select = f'Произвести  геофизические исследования по технологической задаче ' \
                           f'№ 2.1.13 Определение профиля и состава притока, дебита, источника ' \
@@ -452,8 +455,8 @@ class AcidPakerWindow(MyWindow):
                 ,
              None, None, None, None, None, None, None,
              'мастер КРС', 0.4],
-            [testing_pressure(self, paker_depth)[1], None,
-             testing_pressure(self, paker_depth)[0],
+            [OpressovkaEK.testing_pressure(self, paker_depth)[1], None,
+             OpressovkaEK.testing_pressure(self, paker_depth)[0],
              None, None, None, None, None, None, None,
              'мастер КРС, предст. заказчика', 0.67],
             [None, None,
@@ -518,9 +521,9 @@ class AcidPakerWindow(MyWindow):
         return paker_list
 
     def acidSelect(self, swabTrueEditType, khvostEdit, pakerEdit, depthGaugeEdit, QplastEdit, plastCombo):
-        from work_py.opressovka import paker_diametr_select
+        from work_py.opressovka import OpressovkaEK
         from work_py.alone_oreration import privyazkaNKT
-        paker_diametr = paker_diametr_select(pakerEdit)
+        paker_diametr = OpressovkaEK.paker_diametr_select(pakerEdit)
         swabTrueEditType = True if swabTrueEditType == 'Нужно освоение' else False
         if depthGaugeEdit == 'Да' and CreatePZ.column_additional == False:
             self.paker_select = f'воронку + контейнер с манометром МТГ + НКТ{CreatePZ.nkt_diam}мм {khvostEdit}м + ' \
@@ -533,7 +536,7 @@ class AcidPakerWindow(MyWindow):
             self.dict_nkt = {CreatePZ.nkt_diam: float(khvostEdit) + float(pakerEdit)}
 
         if (CreatePZ.column_additional == False and swabTrueEditType == True) or (CreatePZ.column_additional == True \
-                                                                                  and pakerEdit < CreatePZ.head_column_additional and swabTrueEditType == True):
+                                                                                  and pakerEdit < CreatePZ.head_column_additional and swabTrueEditType is True):
             self.paker_select = f'воронку + НКТ{CreatePZ.nkt_diam}мм {khvostEdit}м + пакер ПРО-ЯМО-' \
                                 f'{paker_diametr}мм (либо аналог) ' \
                                 f'для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм + ' \
@@ -547,11 +550,11 @@ class AcidPakerWindow(MyWindow):
         elif CreatePZ.column_additional == True and float(CreatePZ.column_additional_diametr) < 110 and \
                 pakerEdit > CreatePZ.head_column_additional and swabTrueEditType == True:
             self.paker_select = f'воронку + НКТ{60}мм {float(khvostEdit)}м + пакер ПРО-ЯМО-' \
-                                f'{paker_diametr_select(float(pakerEdit))}мм (либо аналог) ' \
+                                f'{OpressovkaEK.paker_diametr_select(float(pakerEdit))}мм (либо аналог) ' \
                                 f'для ЭК {float(CreatePZ.column_additional_diametr)}мм х ' \
                                 f'{CreatePZ.column_additional_wall_thickness}мм + НКТ60мм 10м + репер'
             self.paker_short  = f'воронку + НКТ{60}мм {float(khvostEdit)}м + пакер ПРО-ЯМО-' \
-                                f'{paker_diametr_select(float(pakerEdit))}мм  + НКТ60мм 10м + репер'
+                                f'{OpressovkaEK.paker_diametr_select(float(pakerEdit))}мм  + НКТ60мм 10м + репер'
             self.dict_nkt = {CreatePZ.nkt_diam: CreatePZ.head_column_additional,
                              60: int(float(pakerEdit) + float(khvostEdit) - float(CreatePZ.head_column_additional))}
         elif CreatePZ.column_additional == True and float(
@@ -617,8 +620,8 @@ class AcidPakerWindow(MyWindow):
                 ,
              None, None, None, None, None, None, None,
              'мастер КРС', 0.5],
-            [testing_pressure(self, pakerEdit)[1], None,
-             testing_pressure(self, pakerEdit)[0],
+            [OpressovkaEK.testing_pressure(self, pakerEdit)[1], None,
+             OpressovkaEK.testing_pressure(self, pakerEdit)[0],
              None, None, None, None, None, None, None,
              'мастер КРС, предст. заказчика', 0.83 + 0.58],
             [f'срыв 30мин', None,
@@ -666,6 +669,8 @@ class AcidPakerWindow(MyWindow):
     def acid_work(self, swabTrueEditType, acidProcEdit, khvostEdit, pakerEdit, skvAcidEdit, acidEdit, skvVolumeEdit,
                   QplastEdit, skvProcEdit, plastCombo, acidOilProcEdit, acidVolumeEdit, svkTrueEdit, dict_nkt, pressure_Edit):
         from krs import volume_vn_nkt
+        from work_py.opressovka import OpressovkaEK
+        from krs import well_volume
         paker_list = []
         swabTrueEditType = False if swabTrueEditType == 'без СКВ' else False
         skv_list = [[f'Определить приемистость при Р-{CreatePZ.max_admissible_pressure}атм', None,

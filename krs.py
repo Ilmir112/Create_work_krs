@@ -1,5 +1,6 @@
 import H2S
 from PyQt5.QtWidgets import QInputDialog, QMessageBox
+from datetime import datetime
 from openpyxl import load_workbook
 
 from main import ExcelWorker
@@ -34,27 +35,35 @@ def calc_work_fluid(self, work_plan):
         CreatePZ.current_bottom, ok = QInputDialog.getDouble(self, 'Необходимый забой',
                                                              'Введите забой до которого нужно нормализовать',
                                                              float(CreatePZ.current_bottom))
+    # Задаем начальную и конечную даты периода
+    start_date = datetime.strptime('01-12', '%d-%m').date()
+    end_date = datetime.strptime('01-04', '%d-%m').date()
+
+    # Проверяем условие: если текущая дата находится в указанном периоде
+    current_date = datetime.now().date()
 
     try:
 
-        fluid_p = 0.83
         for plast in CreatePZ.plast_work:
             if float(list(CreatePZ.dict_perforation[plast]['рабочая жидкость'])[0]) > fluid_p:
                 fluid_p = list(CreatePZ.dict_perforation[plast]['рабочая жидкость'])[0]
         fluid_list.append(fluid_p)
-        fluid_max = max(fluid_list)
+        if start_date <= current_date <= end_date and max(fluid_list) <= 1.18:
+            fluid_max = 1.18
+        else:
+            fluid_max = max(fluid_list)
         if work_plan == 'gnkt_frez':
-            fluid_max = 1.02
+            fluid_max = 1.18
         fluid_work_insert, ok = QInputDialog.getDouble(self, 'Рабочая жидкость',
                                                        'Введите удельный вес рабочей жидкости',
-                                                       fluid_max, 0.87, 2, 2)
+                                                       fluid_max, fluid_p, 2, 2)
     except:
-        fluid_max = 0.87
+
         if work_plan == 'gnkt_frez':
-            fluid_max = 1.02
+            fluid_max = fluid_p
         fluid_work_insert, ok = QInputDialog.getDouble(self, 'Рабочая жидкость',
                                                        'Введите удельный вес жидкости глушения',
-                                                       fluid_max, 0.87, 2, 2)
+                                                       1.18, 0.87, 2, 2)
 
     CreatePZ.fluid = fluid_work_insert
     CreatePZ.fluid_short = fluid_work_insert
@@ -1412,19 +1421,25 @@ def well_jamming(self, without_damping, lift_key):
                              f'объеме {round(well_volume(self, CreatePZ.current_bottom) - well_volume(self, CreatePZ.H_F_paker_do["do"]), 1)}м3 ' \
 
     elif abs(sum(list(CreatePZ.dict_nkt.values())) - CreatePZ.perforation_roof) > 150:
-        well_jamming_str = f'Произвести глушение скважины обратной промывкой в объеме {volume_well_jaming}м3 тех ' \
+        well_jamming_str = f'Произвести глушение скважины прямой промывкой в объеме {volume_well_jaming}м3 тех ' \
                              f'жидкостью уд.весом {CreatePZ.fluid_work}' \
-                             f' на циркуляцию в следующим алгоритме: \n Произвести закачку в затрубное пространство тех жидкости в ' \
-                             f'объеме {round(well_volume(self, sum(list(CreatePZ.dict_nkt.values()))),1)}м3 на циркуляцию. Закрыть трубное пространство. ' \
-                             f'Произвести закачку на поглощение не более {CreatePZ.max_admissible_pressure}атм тех жидкости в ' \
+                             f' на циркуляцию в следующим алгоритме: \n Произвести закачку в затрубное пространство ' \
+                           f'тех жидкости в ' \
+                             f'объеме {round(well_volume(self, sum(list(CreatePZ.dict_nkt.values()))),1)}м3 на ' \
+                           f'циркуляцию. Закрыть трубное пространство. ' \
+                             f'Произвести закачку на поглощение не более {CreatePZ.max_admissible_pressure}атм ' \
+                           f'тех жидкости в ' \
                              f'объеме {round(volume_well_jaming-well_volume(self, sum(list(CreatePZ.dict_nkt.values()))),1)}м3. Закрыть скважину на ' \
-                             f'стабилизацию не менее 2 часов. (согласовать глушение в коллектор, в случае отсутствия на желобную емкость'
+                             f'стабилизацию не менее 2 часов. (согласовать глушение в коллектор, в случае ' \
+                           f'отсутствия на желобную емкость'
         well_jamming_short = f'Глушение в затруб в объеме {volume_well_jaming}м3 тех ' \
                              f'жидкостью уд.весом {CreatePZ.fluid_work_short}'
     elif abs(sum(list(CreatePZ.dict_nkt.values())) - CreatePZ.perforation_roof) <= 150:
-        well_jamming_str = f'Произвести глушение скважины обратной промывкой в объеме {volume_well_jaming}м3 тех жидкостью уд.весом {CreatePZ.fluid_work}' \
+        well_jamming_str = f'Произвести глушение скважины прямой промывкой в объеме {volume_well_jaming}м3 тех ' \
+                           f'жидкостью уд.весом {CreatePZ.fluid_work}' \
                              f' на циркуляцию. Закрыть скважину на ' \
-                             f'стабилизацию не менее 2 часов. (согласовать глушение в коллектор, в случае отсутствия на желобную емкость)'
+                             f'стабилизацию не менее 2 часов. (согласовать глушение в коллектор, в случае отсутствия ' \
+                           f'на желобную емкость)'
         well_jamming_short = f'Глушение в затруб в объеме {volume_well_jaming}м3 уд.весом {CreatePZ.fluid_work_short}'
 
         # print([well_jamming_str, well_jamming_list2, well_jamming_short])
