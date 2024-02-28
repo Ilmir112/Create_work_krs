@@ -231,7 +231,7 @@ class OpressovkaEK(QMainWindow):
                  None, f'Приподнять и посадить пакер на глубине {paker_depth}м',
                  None, None, None, None, None, None, None,
                  'мастер КРС', 0.4],
-                [self.testing_pressure(paker_depth)[1], None,
+                [OpressovkaEK.testing_pressure(paker_depth)[1], None,
                  self.testing_pressure(paker_depth)[0],
                  None, None, None, None, None, None, None,
                  'мастер КРС, предст. заказчика', 0.67],

@@ -1438,8 +1438,6 @@ class MyWindow(QMainWindow):
         if self.work_plan == 'gnkt_frez':
             index_setSpan = 1
 
-
-
         for i, row_data in enumerate(work_list):
             row = ins_ind + i
             self.table_widget.insertRow(row)
@@ -1470,6 +1468,8 @@ class MyWindow(QMainWindow):
                             if value[0] <= len(text) <= value[1]:
                                 text_width = key
                                 self.table_widget.setRowHeight(row, int(text_width))
+
+
         print(f'закончено')
 
         # self.table_widget.setEditTriggers(QTableWidget.AnyKeyPressed)
@@ -1712,7 +1712,12 @@ class MyWindow(QMainWindow):
         merged_cells = sheet.merged_cells
 
         table_widget.setRowCount(rows)
-        print(count_col)
+
+        border_styles = {}
+        for row in self.ws.iter_rows():
+            for cell in row:
+                border_styles[(cell.row, cell.column)] = cell.border
+
         table_widget.setColumnCount(count_col)
         rowHeights_exit = [sheet.row_dimensions[i + 1].height if sheet.row_dimensions[i + 1].height is not None else 18
                            for i in range(sheet.max_row)]
@@ -1746,6 +1751,17 @@ class MyWindow(QMainWindow):
                             table_widget.setSpan(row - 1, col - 1,
                                                       merged_cell.max_row - merged_cell.min_row + 1,
                                                       merged_cell.max_col - merged_cell.min_col + 1)
+
+
+        # # Чтение стилей границ и применение к QTableWidget
+        # for row in self.ws.iter_rows():
+        #     for cell in row:
+        #         cell_widget = table_widget.itemAt(cell.row - 1, cell.column - 1)
+        #         if cell_widget:
+        #             border = cell.border
+        #             border_style = f"{border.left.style},{border.right.style},{border.top.style},{border.bottom.style}"
+        #             print(border_style)
+        #             cell_widget.horizontalHeader().setStyleSheet(f"border-style: {border_style};")
 
         if work_plan == 'krs':
             self.populate_row(table_widget.rowCount(), work_krs(self, self.work_plan), self.table_widget)

@@ -10,6 +10,7 @@ from work_py.calc_fond_nkt import CalcFond
 def gno_down(self):
     from open_pz import CreatePZ
     from work_py.rgdVcht import rgdWithPaker, rgdWithoutPaker
+    from work_py.opressovka import OpressovkaEK
 
 
     paker_descent = [
@@ -38,12 +39,13 @@ def gno_down(self):
          None, None, None, None, None, None, None,
          'мастер КРС', descentNKT_norm(sum(CreatePZ.dict_nkt_po.values()),1.2)],
         [f'Посадить пакер на глубине {CreatePZ.H_F_paker_do["posle"]}м', None,
-         f'Демонтировать превентор. Посадить пакер на глубине {CreatePZ.H_F_paker_do["posle"]}м. Отревизировать и ориентировать планшайбу для проведения ГИС. '
+         f'Демонтировать превентор. Посадить пакер на глубине {CreatePZ.H_F_paker_do["posle"]}м. '
+         f'Отревизировать и ориентировать планшайбу для проведения ГИС. '
          f'Заменить и установить устьевую арматуру для ППД. Обвязать с нагнетательной линией.',
          None, None, None, None, None, None, None,
          'мастер КРС', 0.25 + 0.5 + 0.5],
-        [f'{testing_pressure(self, CreatePZ.H_F_paker_do["posle"])[1]}', None,
-         f'{testing_pressure(self, CreatePZ.H_F_paker_do["posle"])[0]}',
+        [f'{OpressovkaEK.testing_pressure(self, CreatePZ.H_F_paker_do["posle"])[1]}', None,
+         f'{OpressovkaEK.testing_pressure(self, CreatePZ.H_F_paker_do["posle"])[0]}',
          None, None, None, None, None, None, None,
          'мастер КРС, предст. заказчика', 0.67],
 
@@ -194,8 +196,8 @@ def gno_down(self):
                               f'ПАТРУБКА ЗАПРЕЩЕН. ',
                               None, None, None, None, None, None, None,
                               'Мастер КРС, предст. заказчика', 1.27],
-                             [testing_pressure(self, CreatePZ.H_F_paker_do["posle"])[0], None,
-                              f'{testing_pressure(self, CreatePZ.H_F_paker_do["posle"])[1]}',
+                             [OpressovkaEK.testing_pressure(self, CreatePZ.H_F_paker_do["posle"])[0], None,
+                              f'{OpressovkaEK.testing_pressure(self, CreatePZ.H_F_paker_do["posle"])[1]}',
                               None, None, None, None, None, None, None,
                               'Мастер КРС, предст. заказчика', 0.67],
                              [None, None,
@@ -258,8 +260,8 @@ def gno_down(self):
                               f' оборудование (переводники, муфты, переходные катушки). МОНТАЖ БЕЗ ПОДВЕСНОГО ПАТРУБКА ЗАПРЕЩЕН. ',
                               None, None, None, None, None, None, None,
                               'Мастер КРС, предст. заказчика', 1.77],
-                             [testing_pressure(self, CreatePZ.H_F_paker_do["posle"])[1], None,
-                              f'{testing_pressure(self, CreatePZ.H_F_paker_do["posle"])[0]}',
+                             [OpressovkaEK.testing_pressure(self, CreatePZ.H_F_paker_do["posle"])[1], None,
+                              f'{OpressovkaEK.testing_pressure(self, CreatePZ.H_F_paker_do["posle"])[0]}',
                               None, None, None, None, None, None, None,
                               'Мастер КРС, предст. заказчика', 0.67],
                              [None, None,
@@ -308,11 +310,11 @@ def gno_down(self):
                    f'смазкой резьбовых соединений, замером изоляции каждые 100м.',
                    None, None, None, None, None, None, None,
                    'Мастер КРС, предст. заказчика', descentNKT_norm(sum(list(CreatePZ.dict_nkt_po.values())), 1.2)],
-                  [testing_pressure(self, CreatePZ.H_F_paker_do["posle"])[0], None,
+                  [OpressovkaEK.testing_pressure(self, CreatePZ.H_F_paker_do["posle"])[0], None,
                    f'Демонтировать превентор. Посадить пакер на глубине {CreatePZ.H_F_paker_do["posle"]}м. Монтаж  устьевой арматуры. При монтаже использовать только сертифицированное'
                    f' оборудование (переводники, муфты, переходные катушки). МОНТАЖ БЕЗ ПОДВЕСНОГО ПАТРУБКА ЗАПРЕЩЕН. произвести разделку'
                    f' кабеля под устьевой сальник '
-                   f'произвести герметизацию устья. \n{testing_pressure(self, CreatePZ.H_F_paker_do["posle"])[1]}',
+                   f'произвести герметизацию устья. \n{OpressovkaEK.testing_pressure(self, CreatePZ.H_F_paker_do["posle"])[1]}',
                    None, None, None, None, None, None, None,
                    'Мастер КРС, предст. заказчика', 1.77],
                   [None, None,
@@ -517,8 +519,8 @@ def gno_down(self):
          f'(давление на максимальное возможное давление опрессовки эскплуатационной колонны)',
          None, None, None, None, None, None, None,
          'Мастер КРС, предст. заказчика', 0.7],
-          [testing_pressure(self, CreatePZ.H_F_paker_do["posle"])[1], None,
-           f'{testing_pressure(self, CreatePZ.H_F_paker_do["posle"])[0]} Опрессовать кабельный ввод устьевой арматуры',
+          [OpressovkaEK.testing_pressure(self, CreatePZ.H_F_paker_do["posle"])[1], None,
+           f'{OpressovkaEK.testing_pressure(self, CreatePZ.H_F_paker_do["posle"])[0]} Опрессовать кабельный ввод устьевой арматуры',
            None, None, None, None, None, None, None,
            'Мастер КРС, предст. заказчика', 0.67],
           [None, None,

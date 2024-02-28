@@ -193,7 +193,7 @@ def remove_overlapping_intervals(perforating_intervals):
     for skm in sorted(skipping_intervals, key=lambda x: x[0]):
         kroly_skm = int(skm[0])
         pod_skm = int(skm[1])
-        if CreatePZ.current_bottom > pod_skm:
+        if CreatePZ.current_bottom >= pod_skm:
             skm_range = list(range(kroly_skm, pod_skm + 1))
 
             for pvr in sorted(perforating_intervals, key=lambda x: x[0]):

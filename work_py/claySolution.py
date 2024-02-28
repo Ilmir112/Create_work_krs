@@ -2,12 +2,12 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox
 
 from krs import volume_vn_ek, volume_vn_nkt
 from work_py.rationingKRS import descentNKT_norm
-from work_py.rir import rirWithPero
+from work_py.rir import RirWindow
 
 
 def claySolutionDef(self):
     from open_pz import CreatePZ
-    from work_py.rir import pero_select
+    from work_py.rir import RirWindow
     nkt_diam = ''.join(['73' if CreatePZ.column_diametr > 110 else '60'])
 
 
@@ -26,8 +26,8 @@ def claySolutionDef(self):
     volume_cement = round(volume_vn_ek(self, rirRoof) * (rirSole - rirRoof)/1000, 1)
     dict_nkt = {73: rirRoof}
     pero_list = [
-        [f'СПО {pero_select(self, rirSole)}  на тНКТ{nkt_diam}мм до {rirSole}м', None,
-         f'Спустить {pero_select(self, rirSole)}  на тНКТ{nkt_diam}мм до глубины {rirSole}м с замером, шаблонированием '
+        [f'СПО {RirWindow.pero_select(self, rirSole)}  на тНКТ{nkt_diam}мм до {rirSole}м', None,
+         f'Спустить {RirWindow.pero_select(self, rirSole)}  на тНКТ{nkt_diam}мм до глубины {rirSole}м с замером, шаблонированием '
          f'шаблоном {CreatePZ.nkt_template}мм. \n'
          f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
          None, None, None, None, None, None, None,
@@ -57,7 +57,7 @@ def claySolutionDef(self):
                           None, None, None, None, None, None, None,
                           'мастер КРС', descentNKT_norm(float(rirSole)-float(rirRoof), 1)])
         if (CreatePZ.plast_work) != 0:
-            pero_list.extend(rirWithPero(self)[-9:])
+            pero_list.extend(RirWindow.rirWithPero(self)[-9:])
         else:
-            pero_list.extend(rirWithPero(self)[-10:])
+            pero_list.extend(RirWindow.rirWithPero(self)[-10:])
     return pero_list

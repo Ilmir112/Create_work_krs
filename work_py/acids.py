@@ -5,7 +5,7 @@ from work_py.acids_work import acid_work_list
 from work_py.rationingKRS import liftingNKT_norm, descentNKT_norm
 
 def acid_work(self):
-    from work_py.opressovka import paker_diametr_select
+    from work_py.opressovka import TabPage_SO
     from open_pz import CreatePZ
 
     from work_py.swabbing import swabbing_with_paker
@@ -32,21 +32,21 @@ def acid_work(self):
     paker_khost, ok = QInputDialog.getInt(None, 'хвостовик',
                                           f'Введите длину хвостовика при посадке пакера нижнего пакера на {paker_depth_bottom} и текущем забое {CreatePZ.current_bottom}',
                                           paker_khost_top, 0, 4000)
-
-    if CreatePZ.column_additional == False or (CreatePZ.column_additional == True and paker_depth_bottom < CreatePZ.head_column_additional):
-        paker_select = f'заглушку + сбивной с ввертышем + НКТ{CreatePZ.nkt_diam}мм {paker_khost}м  + пакер ПРО-ЯМО-{paker_diametr_select(paker_depth_bottom)}мм (либо аналог) ' \
+    paker_diametr = TabPage_SO.paker_diametr_select(self, paker_depth_bottom)
+    if CreatePZ.column_additional is False or (CreatePZ.column_additional is True and paker_depth_bottom < CreatePZ.head_column_additional):
+        paker_select = f'заглушку + сбивной с ввертышем + НКТ{CreatePZ.nkt_diam}мм {paker_khost}м  + пакер ПРО-ЯМО-{paker_diametr}мм (либо аналог) ' \
                        f'для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм + щелевой фильтр НКТ {difference_paker}м ' \
-                       f'+ пакер ПУ - {paker_diametr_select(paker_depth_bottom)} + НКТ{CreatePZ.nkt_diam}мм 20м +реперный патрубок на НКТ{CreatePZ.nkt_diam}мм'
+                       f'+ пакер ПУ - {paker_diametr} + НКТ{CreatePZ.nkt_diam}мм 20м +реперный патрубок на НКТ{CreatePZ.nkt_diam}мм'
         dict_nkt = {73: paker_depth_bottom}
     elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr < 110 and paker_depth_bottom > CreatePZ.head_column_additional:
-        paker_select = f'заглушку + сбивной с ввертышем + НКТ{60}мм {paker_khost}м  + пакер ПРО-ЯМО-{paker_diametr_select(paker_depth_bottom)}мм (либо аналог) ' \
+        paker_select = f'заглушку + сбивной с ввертышем + НКТ{60}мм {paker_khost}м  + пакер ПРО-ЯМО-{paker_diametr }мм (либо аналог) ' \
                        f'для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм + щелевой фильтр НКТ{60} {difference_paker}м ' \
-                       f'+ пакер ПУ - {paker_diametr_select(paker_depth_bottom)} + НКТ{60}мм 20м +реперный патрубок на НКТ{60} {CreatePZ.head_column_additional-paker_depth_bottom}'
+                       f'+ пакер ПУ - {paker_diametr } + НКТ{60}мм 20м +реперный патрубок на НКТ{60} {CreatePZ.head_column_additional-paker_depth_bottom}'
         dict_nkt = {73: CreatePZ.head_column_additional-10, 60: int(paker_depth_bottom - CreatePZ.head_column_additional)}
     elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr > 110 and paker_depth_bottom > CreatePZ.head_column_additional:
-        paker_select = f'заглушку + сбивной с ввертышем + НКТ73 со снятыми фасками {paker_khost}м  + пакер ПРО-ЯМО-{paker_diametr_select(paker_depth_bottom)}мм (либо аналог) ' \
+        paker_select = f'заглушку + сбивной с ввертышем + НКТ73 со снятыми фасками {paker_khost}м  + пакер ПРО-ЯМО-{paker_diametr }мм (либо аналог) ' \
                        f'для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм + щелевой фильтр НКТ73 со снятыми фасками {difference_paker}м ' \
-                       f'+ пакер ПУ - {paker_diametr_select(paker_depth_bottom)} + НКТ73 со снятыми фасками 20м +реперный патрубок на НКТ73 со снятыми фасками {CreatePZ.head_column_additional - paker_depth_bottom}'
+                       f'+ пакер ПУ - {paker_diametr } + НКТ73 со снятыми фасками 20м +реперный патрубок на НКТ73 со снятыми фасками {CreatePZ.head_column_additional - paker_depth_bottom}'
 
         dict_nkt = {73: paker_depth_bottom}
     elif CreatePZ.nkt_diam == 60:

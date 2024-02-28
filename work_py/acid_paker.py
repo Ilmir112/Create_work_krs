@@ -521,11 +521,11 @@ class AcidPakerWindow(MyWindow):
         return paker_list
 
     def acidSelect(self, swabTrueEditType, khvostEdit, pakerEdit, depthGaugeEdit, QplastEdit, plastCombo):
-        from work_py.opressovka import OpressovkaEK
+        from work_py.opressovka import OpressovkaEK, TabPage_SO
         from work_py.alone_oreration import privyazkaNKT
-        paker_diametr = OpressovkaEK.paker_diametr_select(pakerEdit)
+        paker_diametr = TabPage_SO.paker_diametr_select(self, pakerEdit)
         swabTrueEditType = True if swabTrueEditType == 'Нужно освоение' else False
-        if depthGaugeEdit == 'Да' and CreatePZ.column_additional == False:
+        if depthGaugeEdit == 'Да' and CreatePZ.column_additional is False:
             self.paker_select = f'воронку + контейнер с манометром МТГ + НКТ{CreatePZ.nkt_diam}мм {khvostEdit}м + ' \
                                 f'пакер ПРО-ЯМО-{paker_diametr}мм (либо аналог) ' \
                                 f'для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм + ' \
@@ -775,8 +775,8 @@ class AcidPakerWindow(MyWindow):
                                                    f'Увеличение давления согласовать с заказчиком']),
                         None, None, None, None, None, None, None,
                         'мастер КРС', 6],
-                       [f'реагирование 2 часа.' if CreatePZ.region != 'ТГМ' and acid_sel != 'HF' else 'без реагирования', None,
-                        f'реагирование 2 часа.' if CreatePZ.region != 'ТГМ' and acid_sel != 'HF' else 'без реагирования',
+                       [f'без реагирования' if (CreatePZ.region == 'ТГМ' and acid_sel == 'HF') else 'реагирование 2 часа.', None,
+                        f'без реагирования' if (CreatePZ.region == 'ТГМ' and acid_sel == 'HF') else 'реагирование 2 часа.',
                         None, None, None, None, None, None, None,
                         'мастер КРС', 2 if CreatePZ.region != 'ТГМ' and acid_sel != 'HF' else ''],
 
@@ -851,6 +851,8 @@ class AcidPakerWindow(MyWindow):
 
     def flushingDownhole(self, paker_depth, paker_khost, paker_layout):
         from open_pz import CreatePZ
+        from work_py.opressovka import OpressovkaEK
+        from krs import well_volume
 
 
         if (CreatePZ.perforation_roof - 5 + paker_khost >= CreatePZ.current_bottom) or \

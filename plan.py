@@ -61,6 +61,8 @@ def copy_row(ws, ws2, head):
                          end_column=value[2], end_row=value[3])
     copy_true_ws(ws, ws2, head)
 
+
+
     # print(f'Вставлены данные по скважине')
     for key, value in boundaries_dict.items():
        ws2.merge_cells(start_column=value[0], start_row=value[1],

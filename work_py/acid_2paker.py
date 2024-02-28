@@ -498,7 +498,7 @@ class AcidPakerWindow(MyWindow):
     def acid_work(self, swabTrueEditType, acidProcEdit, khvostEdit, pakerEdit, paker2Edit, skvAcidEdit, acidEdit,
                   skvVolumeEdit,
                   QplastEdit, skvProcEdit, plastCombo, acidOilProcEdit, acidVolumeEdit, svkTrueEdit, dict_nkt, pressure_Edit):
-        from krs import volume_vn_nkt
+        from krs import volume_vn_nkt, well_volume
         paker_list = []
         swabTrueEditType = [False if swabTrueEditType == 'без СКВ' else False][0]
         skv_list = [[f'Определить приемистость при Р-{CreatePZ.max_admissible_pressure}атм'

@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox, QComboBox
 from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm,well_volume_norm
 def drilling_nkt(self):
     from open_pz import CreatePZ
-    from work_py.opressovka import paker_diametr_select
+    from work_py.opressovka import TabPage_SO
     from krs import well_volume
     bottomType_list = ['ЦМ', 'РПК', 'РПП', 'ВП']
     bottomType, ok = QInputDialog.getItem(self, 'забой', 'Чем представлени забой', bottomType_list, 0, False)
@@ -113,7 +113,7 @@ def drilling_nkt(self):
 
 def drilling_sbt(self):
     from open_pz import CreatePZ
-    from work_py.opressovka import paker_diametr_select
+    from work_py.opressovka import TabPage_SO
     from krs import well_volume
 
 

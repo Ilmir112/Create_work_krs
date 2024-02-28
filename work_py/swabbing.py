@@ -151,7 +151,7 @@ def swabbing_opy(self):
 
 def swabbing_with_paker(self, paker_khost, pakerKompo):
     from open_pz import CreatePZ
-    from work_py.opressovka import paker_diametr_select
+    from work_py.opressovka import OpressovkaEK, TabPage_SO
 
     swab_list = ['Задача №2.1.13', 'Задача №2.1.16', 'Задача №2.1.11', 'своя задача']
     swab, ok = QInputDialog.getItem(self, 'Вид освоения', 'Введите задачу при свабе:', swab_list, 0, False)
@@ -194,7 +194,7 @@ def swabbing_with_paker(self, paker_khost, pakerKompo):
 
     nkt_diam = ''.join(['73' if CreatePZ.column_diametr > 110 or (
                 CreatePZ.column_diametr > 110 and CreatePZ.column_additional == True and CreatePZ.head_column_additional > 800) else '60'])
-    paker_diametr = paker_diametr_select(paker_depth)
+    paker_diametr = TabPage_SO.paker_diametr_select(self, paker_depth)
     if CreatePZ.column_additional == False or (CreatePZ.column_additional == True and \
             paker_depth < CreatePZ.head_column_additional and CreatePZ.head_column_additional > 800) or \
             (CreatePZ.column_additional_diametr < 110 and paker_depth > CreatePZ.head_column_additional):
@@ -232,8 +232,8 @@ def swabbing_with_paker(self, paker_khost, pakerKompo):
                                                             f'глубине {paker_khost + paker_depth}м',
          None, None, None, None, None, None, None,
          'мастер КРС', 0.4],
-        [testing_pressure(self, paker_depth)[1],
-         None,testing_pressure(self, paker_depth)[0],
+        [OpressovkaEK.testing_pressure(self, paker_depth)[1],
+         None,OpressovkaEK.testing_pressure(self, paker_depth)[0],
          None, None, None, None, None, None, None,
          'мастер КРС, предст. заказчика', 0.67],
 
@@ -314,7 +314,7 @@ def swabbing_with_paker(self, paker_khost, pakerKompo):
 
 def swabbing_with_2paker(self):
     from open_pz import CreatePZ
-    from work_py.opressovka import paker_diametr_select
+    from work_py.opressovka import OpressovkaEK
 
     swab_list = ['Задача №2.1.13', 'Задача №2.1.16', 'Задача №2.1.11', 'своя задача']
     swab, ok = QInputDialog.getItem(self, 'Вид освоения', 'Введите задачу при свабе:', swab_list, 0, False)
@@ -359,32 +359,32 @@ def swabbing_with_2paker(self):
 
     nkt_diam = ''.join(['73' if CreatePZ.column_diametr > 110 or (
                 CreatePZ.column_diametr > 110 and CreatePZ.column_additional == True and CreatePZ.head_column_additional > 700) else '60'])
-
-    if CreatePZ.column_additional == False or CreatePZ.column_additional == True and paker1_depth < float(CreatePZ.head_column_additional) and  float(CreatePZ.head_column_additional) > 600:
-        paker_select = f'заглушка + НКТ{nkt_diam}м {paker_khost}м + пакер ПРО-ЯМО-{paker_diametr_select(paker1_depth)}мм (либо аналог) ' \
+    paker_diametr = OpressovkaEK.paker_diametr_select(paker1_depth)
+    if CreatePZ.column_additional is False or CreatePZ.column_additional is True and paker1_depth < float(CreatePZ.head_column_additional) and  float(CreatePZ.head_column_additional) > 600:
+        paker_select = f'заглушка + НКТ{nkt_diam}м {paker_khost}м + пакер ПРО-ЯМО-{paker_diametr}мм (либо аналог) ' \
                        f'для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм + щелевой фильтр + ' \
                        f'НКТ l-{round(paker1_depth-paker2_depth,0)} + пакер ПУ для ЭК ' \
                        f'{CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм + НКТ{nkt_diam} 20мм + репер'
-        paker_short = f'заглушка + НКТ{nkt_diam}м {paker_khost}м + пакер ПРО-ЯМО-{paker_diametr_select(paker1_depth)}мм  + щелевой фильтр + ' \
+        paker_short = f'заглушка + НКТ{nkt_diam}м {paker_khost}м + пакер ПРО-ЯМО-{paker_diametr}мм  + щелевой фильтр + ' \
                        f'НКТ l-{round(paker1_depth-paker2_depth,0)} + пакер ПУ  + НКТ{nkt_diam} 20мм + репер'
         dict_nkt = {73: paker1_depth + paker_khost}
     elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr < 110 and paker1_depth > float(CreatePZ.head_column_additional):
-        paker_select = f'заглушка + НКТ{60}мм {paker_khost}м + пакер ПРО-ЯМО-{paker_diametr_select(paker1_depth)}мм (либо аналог) ' \
+        paker_select = f'заглушка + НКТ{60}мм {paker_khost}м + пакер ПРО-ЯМО-{paker_diametr}мм (либо аналог) ' \
                        f'для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм + щелевой фильтр + ' \
                        f'НКТ l-{round(paker1_depth-paker2_depth,0)} + пакер ПУ НКТ{60} 20мм + репер + НКТ60мм ' \
                        f'{round(float(CreatePZ.head_column_additional) - paker2_depth,0)}м '
-        paker_short = f'заглушка + НКТ{60}мм {paker_khost}м + пакер ПРО-ЯМО-{paker_diametr_select(paker1_depth)}мм ' \
+        paker_short = f'заглушка + НКТ{60}мм {paker_khost}м + пакер ПРО-ЯМО-{paker_diametr}мм ' \
                       f' + щелевой фильтр + НКТ l-{round(paker1_depth - paker2_depth, 0)} + пакер ПУ + НКТ{60} 20мм + репер +' \
                       f' НКТ60мм {round(float(CreatePZ.head_column_additional) - paker2_depth, 0)}м '
         dict_nkt = {73: CreatePZ.head_column_additional, 60: int(paker1_depth - CreatePZ.head_column_additional)}
     elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr > 110 and paker1_depth > CreatePZ.head_column_additional:
         paker_select = f'заглушка + НКТ{73}мм со снятыми фасками {paker_khost}м + пакер ПРО-ЯМО-' \
-                       f'{paker_diametr_select(paker1_depth)}мм (либо аналог) для ЭК {CreatePZ.column_diametr}мм х ' \
+                       f'{paker_diametr}мм (либо аналог) для ЭК {CreatePZ.column_diametr}мм х ' \
                        f'{CreatePZ.column_wall_thickness}мм + щелевой фильтр + ' \
                        f'НКТ l-{round(paker1_depth - paker2_depth, 0)} + пакер ПУ  со снятыми фасками 20мм + репер + ' \
                        f'НКТ{73}мм со снятыми фасками {round(float(CreatePZ.head_column_additional) - paker2_depth, 0)}м '
         paker_short = f'заглушка + НКТ{73}мм со снятыми фасками {paker_khost}м + пакер ПРО-ЯМО-' \
-                       f'{paker_diametr_select(paker1_depth)}мм + щелевой фильтр + ' \
+                       f'{paker_diametr}мм + щелевой фильтр + ' \
                        f'НКТ l-{round(paker1_depth - paker2_depth, 0)} + пакер ПУ  со снятыми фасками 20мм + репер + ' \
                        f'НКТ{73}мм со снятыми фасками {round(float(CreatePZ.head_column_additional) - paker2_depth, 0)}м '
         dict_nkt = {73: paker1_depth + paker_khost}
@@ -402,9 +402,9 @@ def swabbing_with_2paker(self):
             ,
          None, None, None, None, None, None, None,
          'мастер КРС', 0.4],
-        [testing_pressure(self, paker2_depth)[1],
+        [OpressovkaEK.testing_pressure(self, paker2_depth)[1],
          None,
-         testing_pressure(self, paker2_depth)[0],
+         OpressovkaEK.testing_pressure(self, paker2_depth)[0],
          None, None, None, None, None, None, None,
          'мастер КРС, предст. заказчика', 0.67],
 
