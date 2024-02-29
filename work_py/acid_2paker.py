@@ -391,7 +391,7 @@ class AcidPakerWindow(MyWindow):
         return paker_list
 
     def acidSelect(self, swabTrueEditType, khvostEdit, pakerEdit, paker2Edit, depthGaugeEdit):
-        from work_py.opressovka import OpressovkaEK
+        from work_py.opressovka import OpressovkaEK, TabPage_SO
         from krs import well_volume
 
 
@@ -400,7 +400,7 @@ class AcidPakerWindow(MyWindow):
         CreatePZ.difference_paker = difference_paker
         pakerEdit = MyWindow.true_set_Paker(self, pakerEdit)
         paker2Edit = MyWindow.true_set_Paker(self, paker2Edit)
-        paker_diametr = OpressovkaEK.paker_diametr_select(pakerEdit)
+        paker_diametr = TabPage_SO.paker_diametr_select(self, pakerEdit)
 
         if depthGaugeEdit == 'Да' and CreatePZ.column_additional == False:
             self.paker_select = f'заглушку + сбивной с ввертышем контейнер с манометром МТГ + НКТ{CreatePZ.nkt_diam}м ' \
@@ -428,18 +428,18 @@ class AcidPakerWindow(MyWindow):
                                 f' + пакер ПУ - {paker_diametr} + НКТ{CreatePZ.nkt_diam}мм 20м + ' \
                                f'репер на НКТ{CreatePZ.nkt_diam}'
             dict_nkt = {73: pakerEdit}
-        elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr < 110 and pakerEdit > CreatePZ.head_column_additional:
+        elif CreatePZ.column_additional is True and CreatePZ.column_additional_diametr < 110 and pakerEdit > CreatePZ.head_column_additional:
             self.paker_select = f'заглушку + сбивной с ввертышем + НКТ{60}мм {khvostEdit}м  + пакер ПРО-ЯМО-' \
                                 f'{paker_diametr}мм (либо аналог) ' \
                                 f'для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм + ' \
                                 f'щелевой фильтр НКТ{60} {difference_paker}м ' \
                                 f'+ пакер ПУ - {paker_diametr} + НКТ{60}мм 20м +реперный патрубок ' \
-                                f'на НКТ{60} {CreatePZ.head_column_additional - pakerEdit}'
+                                f'на НКТ{60} {round(CreatePZ.head_column_additional - pakerEdit+10,0)}'
             self.paker_short = f'заглушку + сбивной с ввертышем + НКТ{60}мм {khvostEdit}м  + пакер ПРО-ЯМО-' \
                                f'{paker_diametr}мм + щелевой ' \
                                f'фильтр НКТ{60} {difference_paker}м ' \
                                 f'+ пакер ПУ - {paker_diametr} + НКТ{60}мм 20м +репер  на ' \
-                               f'НКТ{60} {CreatePZ.head_column_additional - pakerEdit}'
+                               f'НКТ{60} {round(CreatePZ.head_column_additional - pakerEdit+10,0)}'
             CreatePZ.dict_nkt = {73: CreatePZ.head_column_additional - 10,
                                  60: int(pakerEdit - float(CreatePZ.head_column_additional))}
         elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr > 110 and pakerEdit > CreatePZ.head_column_additional:
@@ -448,13 +448,13 @@ class AcidPakerWindow(MyWindow):
                                 f'для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм + щелевой ' \
                                 f'фильтр НКТ73 со снятыми фасками {difference_paker}м ' \
                                 f'+ пакер ПУ - {paker_diametr} + НКТ73 со снятыми фасками 20м + ' \
-                                f'реперный патрубок на НКТ73 со снятыми фасками {CreatePZ.head_column_additional - pakerEdit}м'
+                                f'реперный патрубок на НКТ73 со снятыми фасками {round(CreatePZ.head_column_additional - pakerEdit+10,0)}м'
 
             self.paker_short = f'заглушку + сбивной с ввертышем + НКТ73 со снятыми фасками {khvostEdit}м  + ' \
                                f'пакер ПРО-ЯМО-{paker_diametr}мм + щелевой фильтр НКТ73 со' \
                                f' снятыми фасками {difference_paker}м ' \
                                 f'+ пакер ПУ - {paker_diametr} + НКТ73 со снятыми фасками 20м +репер' \
-                               f' на НКТ73 со снятыми фасками {CreatePZ.head_column_additional - pakerEdit}м'
+                               f' на НКТ73 со снятыми фасками {round(CreatePZ.head_column_additional - pakerEdit+10,0)}м'
 
             CreatePZ.dict_nkt = {73: pakerEdit}
         elif CreatePZ.nkt_diam == 60:
@@ -687,6 +687,7 @@ class AcidPakerWindow(MyWindow):
 
     def flushingDownhole(self, paker_depth):
         from open_pz import CreatePZ
+        from krs import well_volume
 
         flushingDownhole_list = f'Только при наличии избыточного давления или когда при проведении ОПЗ получен технологический ""СТОП":' \
                                 f'произвести промывку скважину обратной промывкой ' \

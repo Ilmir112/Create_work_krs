@@ -160,12 +160,12 @@ def work_krs(self, work_plan):
             [None, None, 'Порядок работы', None, None, None, None, None, None, None, None, None],
             [None, None, 'Наименование работ', None, None, None, None, None, None, None, 'Ответственный',
              'Нормы времени \n мин/час.'],
-            [None, 1,
+            [None, None,
              f'Начальнику смены ЦТКРС, вызвать телефонограммой представителя Заказчика для оформления АКТа приёма-передачи скважины в ремонт. \n'
              f'Совместно с представителем Заказчика оформить схему расстановки оборудования при КРС с обязательной подписью представителя Заказчика на схеме.',
              None, None, None, None, None, None, None,
              'Мастер КРС, предст-ль Заказчика.', float(0.5)],
-            [None, 2,
+            [None, None,
              f'Принять скважину в ремонт у Заказчика с составлением АКТа. Переезд  бригады. Подготовительные работы к КРС. Определить технологические '
              f'точки откачки жидкости у Заказчика согласно Договора.',
              None, None, None, None, None, None, None,
@@ -175,7 +175,7 @@ def work_krs(self, work_plan):
              f'в процессе работ, планом локализации и ликвидации аварии (ПЛА) и планом работ. С работниками должен быть проведен инструктаж по выполнению работ, '
              f'связанных с применением новых технических устройств и технологий с соответствующим оформлением в журнал инструктажей на рабочем месте ',
              None, None, None, None, None, None, None,
-             'Мастер КРС', float(0.75)],
+             'Мастер КРС', None],
             [None, 4,
              f'При подъеме труб из скважины производить долив тех. жидкостью Y- {CreatePZ.fluid_work}. Долив скважины должен быть равен объему извлекаемого металла.'
              f'По мере расхода жидкости из ёмкости, производить своевременное её заполнение. При всех технологических спусках НКТ 73мм х 5,5мм и 60мм х 5мм производить '
@@ -1203,13 +1203,15 @@ def volume_vn_nkt(dict_nkt):  # Внутренний объем одного п�
     return round(volume_vn_nkt, 1)
 
 
-def volume_rod(dict_sucker_rod):  # Объем штанг
+def volume_rod(self, dict_sucker_rod):  # Объем штанг
     from open_pz import CreatePZ
+    from find import FindIndexPZ
     volume_rod = 0
     # print(dict_sucker_rod)
     for diam_rod, lenght_rod in dict_sucker_rod.items():
         if diam_rod:
-            volume_rod += (3.14 * (lenght_rod * (CreatePZ.without_b(diam_rod) / 1000) / lenght_rod) ** 2) / 4 * lenght_rod
+            volume_rod += (3.14 * (lenght_rod * (
+                    FindIndexPZ.check_str_None(self, diam_rod) / 1000) / lenght_rod) ** 2) / 4 * lenght_rod
     return round(volume_rod, 5)
 
 
@@ -1251,13 +1253,13 @@ def volume_metal_nkt(d_nkt):  # объем металла
 def volume_nkt_metal(dict_nkt):  # Внутренний объем НКТ железа по фондовым
     volume_nkt_metal = 0
     for nkt, length_nkt in dict_nkt.items():
-        if '73' in nkt:
+        if '73' in str(nkt):
             volume_nkt_metal += 1.17 * length_nkt / 1000
-        elif '60' in nkt:
+        elif '60' in str(nkt):
             volume_nkt_metal += 0.87 * length_nkt / 1000
-        elif '89' in nkt:
+        elif '89' in str(nkt):
             volume_nkt_metal += 1.7 * length_nkt / 1000
-        elif '48' in nkt:
+        elif '48' in str(nkt):
             volume_nkt_metal += 0.55 * length_nkt / 1000
     return round(volume_nkt_metal, 1)
 
@@ -1298,14 +1300,14 @@ def volume_pod_NKT(self):  # Расчет необходимого объема 
         v_pod_gno = 3.14 * (
                 CreatePZ.column_additional_diametr - CreatePZ.column_additional_wall_thickness * 2) ** 2 / 4 / 1000 * (
                             CreatePZ.current_bottom - nkt_l) / 1000
-    volume_in_nkt = v_pod_gno + volume_vn_nkt(CreatePZ.dict_nkt) - volume_rod(CreatePZ.dict_sucker_rod)
+    volume_in_nkt = v_pod_gno + volume_vn_nkt(CreatePZ.dict_nkt) - volume_rod(self, CreatePZ.dict_sucker_rod)
     # print(f'Внутренный объем + Зумпф{volume_in_nkt, v_pod_gno, volume_vn_nkt(CreatePZ.dict_nkt)}, ')
     return round(volume_in_nkt, 1)
 
 
 def volume_jamming_well(self, current_bottom): # объем глушения скважины
     from open_pz import CreatePZ
-    volume_jamming_well = round((well_volume(self, current_bottom) - volume_nkt_metal(CreatePZ.dict_nkt) - volume_rod(
+    volume_jamming_well = round((well_volume(self, current_bottom) - volume_nkt_metal(CreatePZ.dict_nkt) - volume_rod(self,
             CreatePZ.dict_sucker_rod)) * 1.1, 1)
     # print(f' объем глушения {well_volume(self, CreatePZ.current_bottom), volume_jamming_well}')
     # print(f' объем {volume_nkt_metal(CreatePZ.dict_nkt)} , {volume_rod(CreatePZ.dict_sucker_rod)}')
@@ -1383,7 +1385,7 @@ def well_jamming(self, without_damping, lift_key):
                          f'ПРОИЗВЕСТИ ЗАМЕР СТАТИЧЕСКОГО УРОВНЯ В ТЕЧЕНИИ ЧАСА С ОТБИВКОЙ УРОВНЯ В СКВАЖИНЕ С ИНТЕРВАЛОМ 15 МИНУТ.' \
                          f'ПО РЕЗУЛЬТАТАМ ЗАМЕРОВ ПРИНИМАЕТСЯ РЕШЕНИЕ ОБ ПРОДОЛЖЕНИИ ОТБИВКИ УРОВНЯ В СКВАЖИНЕ ДО КРИТИЧЕСКОЙ ГЛУБИНЫ ЗА ' \
                          f'ПРОМЕЖУТОК ВРЕМЕНИ.'
-    volume_well_jaming = round((volume_jamming_well(self, CreatePZ.current_bottom) - volume_nkt_metal(CreatePZ.dict_nkt) - volume_rod(CreatePZ.dict_sucker_rod)-0.2) * 1.1, 1)
+    volume_well_jaming = round((volume_jamming_well(self, CreatePZ.current_bottom) - volume_nkt_metal(CreatePZ.dict_nkt) - volume_rod(self, CreatePZ.dict_sucker_rod)-0.2) * 1.1, 1)
     # print(f' Глушение {volume_jamming_well(self, CreatePZ.current_bottom), volume_nkt_metal(CreatePZ.dict_nkt), volume_rod(CreatePZ.dict_sucker_rod)}')
     # print(CreatePZ.well_volume_in_PZ)
     if abs(float(CreatePZ.well_volume_in_PZ[0]) - volume_well_jaming) > 0.5:

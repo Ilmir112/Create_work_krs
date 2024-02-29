@@ -18,7 +18,9 @@ class Classifier_well(QMainWindow):
         self.table_class = QTableWidget()
         self.region = region
         self.costumer = costumer
-        self.number_well = CreatePZ.well_number
+        self.number_well = 0
+        if CreatePZ.well_number:
+            self.number_well = CreatePZ.well_number._value
 
 
         self.setCentralWidget(self.table_class)

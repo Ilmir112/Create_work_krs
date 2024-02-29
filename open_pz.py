@@ -1,5 +1,3 @@
-
-
 from PIL import Image
 import block_name
 import main
@@ -12,17 +10,17 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox, QDialog, QMainWindow
 from openpyxl_image_loader import SheetImageLoader
 from openpyxl.drawing.image import Image
 
-
 from openpyxl.utils.cell import get_column_letter
 from openpyxl.styles import Border, Side, PatternFill, Font, GradientFill, Alignment
 
 from cdng import events_gnvp, itog_1, events_gnvp_gnkt
 
 from work_py.gnkt_frez import Work_with_gnkt
+from find import FindIndexPZ, Well_perforation, Well_Category, Well_data, \
+    WellNkt, WellFond_data, WellCondition, WellHistory_data, WellSucker_rod, Well_expected_pick_up
 
 
 class CreatePZ(QMainWindow):
-
     Qoil = 0
     gipsInWell = False
     grpPlan = False
@@ -103,9 +101,9 @@ class CreatePZ(QMainWindow):
     costumer = 'ОАО "Башнефть"'
     contractor = 'ООО "Ойл-Сервис'
     dict_contractor = {'ООО "Ойл-Сервис':
-                      {
-                          'Дата ПВО': '15.10.2021г'
-                      }
+        {
+            'Дата ПВО': '15.10.2021г'
+        }
     }
     countAcid = 0
 
@@ -149,7 +147,7 @@ class CreatePZ(QMainWindow):
                          bottom=Side(style='thin'))
     image_list = []
 
-    def __init__(self, wb, ws, data_window, perforation_correct_window2,  parent=None):
+    def __init__(self, wb, ws, data_window, perforation_correct_window2, parent=None):
         super(CreatePZ, self).__init__()
         # self.lift_ecn_can_addition = lift_ecn_can_addition
         self.wb = wb
@@ -157,16 +155,13 @@ class CreatePZ(QMainWindow):
         self.data_window = data_window
         self.perforation_correct_window2 = perforation_correct_window2
 
-
     def open_excel_file(self, ws, work_plan):
 
         from data_correct import DataWindow
         from perforation_correct import PerforationCorrect
-        from find import FindIndexPZ, Well_perforation, Well_Category, Well_data,\
-            WellNkt, WellFond_data, WellCondition, WellHistory_data, WellSucker_rod, Well_expected_pick_up
+        from find import FindIndexPZ
 
         CreatePZ.work_plan = work_plan
-
 
         # CreatePZ.cat_well_min = well_PZ.cat_well_min
         well_categ = Well_Category(ws)
@@ -180,89 +175,12 @@ class CreatePZ(QMainWindow):
         well_condition = WellCondition(ws)
         well_expected = Well_expected_pick_up(ws)
 
-
-
-        CreatePZ.expected_Q = well_expected.expected_Q
-        CreatePZ.gaz_f_pr = well_categ.gaz_f_pr
-        CreatePZ.expected_P = well_expected.expected_P
-        CreatePZ.Qwater = well_expected.Qwater
-        CreatePZ.expected_pick_up = well_expected.expected_pick_up
-        CreatePZ.Qoil = well_expected.Qoil
-        CreatePZ.proc_water = well_condition.proc_water
-
-        CreatePZ.static_level = well_condition.static_level
-        CreatePZ.dinamic_level = well_condition.dinamic_level
-        CreatePZ.well_volume_in_PZ = well_condition.well_volume_in_PZ
-
-        CreatePZ.dict_sucker_rod_po = well_sucker.dict_sucker_rod_po
-        CreatePZ.dict_sucker_rod = well_sucker.dict_sucker_rod
-
-        CreatePZ.dict_nkt = well_nkt.dict_nkt
-        CreatePZ.dict_nkt_po = well_nkt.dict_nkt_po
-
-        CreatePZ.paker_do = well_fond.paker_do
-        CreatePZ.paker2_do = well_fond.paker2_do
-        CreatePZ.dict_pump_SHGN = well_fond.dict_pump_SHGN
-        CreatePZ.dict_pump_SHGN_h = well_fond.dict_pump_SHGN_h
-        CreatePZ.dict_pump_ECN = well_fond.dict_pump_ECN
-        CreatePZ.dict_pump_ECN_h = well_fond.dict_pump_ECN_h
-        CreatePZ.H_F_paker_do = well_fond.H_F_paker_do
-        CreatePZ.H_F_paker2_do = well_fond.H_F_paker2_do
-
-        CreatePZ.date_drilling_run = well_history.date_drilling_run
-        CreatePZ.date_drilling_cancel = well_history.date_drilling_cancel
-        CreatePZ.max_expected_pressure = well_history.max_expected_pressure
-        CreatePZ.max_admissible_pressure = well_history.max_admissible_pressure
-
-        CreatePZ.cat_P_1 = well_categ.cat_P_1
-        CreatePZ.cat_H2S_list =well_categ.cat_H2S_list
-        CreatePZ.cat_gaz_f_pr = well_categ.cat_gaz_f_pr
-        CreatePZ.H2S_mg = well_categ.H2S_mg
-        CreatePZ.H2S_pr = well_categ.H2S_pr
-        CreatePZ.well_well_number = well_data.well_number
-        CreatePZ.well_area = well_data.well_area
-        CreatePZ.well_oilfield = well_data.well_oilfield
-        CreatePZ.inv_number = well_data.inv_number
-        CreatePZ.bottomhole_drill = well_data.bottomhole_drill
-        CreatePZ.bottomhole_artificial = well_data.bottomhole_artificial
-        CreatePZ.current_bottom = well_data.current_bottom
-        CreatePZ.bottom = CreatePZ.current_bottom
-        CreatePZ.max_angle = well_data.max_angle
-        CreatePZ.max_angle_H = well_data.max_angle_H
-        CreatePZ.stol_rotora = well_data.stol_rotora
-        CreatePZ.column_direction_True = well_data.column_direction_True
-        CreatePZ.column_direction_diametr = well_data.column_direction_diametr
-        CreatePZ.column_direction_wall_thickness = well_data.column_direction_wall_thickness
-        CreatePZ.column_direction_lenght = well_data.column_direction_lenght
-        CreatePZ.column_conductor_diametr = well_data.column_conductor_diametr
-        CreatePZ.column_conductor_wall_thickness = well_data.column_conductor_wall_thickness
-        CreatePZ.column_conductor_lenght = well_data.column_conductor_lenght
-        CreatePZ.level_cement_direction = well_data.level_cement_direction
-        CreatePZ.level_cement_conductor = well_data.level_cement_conductor
-        CreatePZ.column_diametr = well_data.column_diametr
-        CreatePZ.column_wall_thickness = well_data.column_wall_thickness
-        CreatePZ.shoe_column = well_data.shoe_column
-        CreatePZ.head_column_additional = well_data.head_column_additional
-        CreatePZ.shoe_column_additional = well_data.shoe_column_additional
-        CreatePZ.column_additional_diametr = well_data.column_additional_diametr
-        CreatePZ.column_additional_wall_thickness = well_data.column_additional_wall_thickness
-        CreatePZ.cdng = well_data.cdng
-        CreatePZ.level_cement_column = well_data.level_cement_column
-        CreatePZ.column_additional = well_data.column_additional
-        CreatePZ.grpPlan =well_condition.grpPlan
-
-
-        CreatePZ.dict_perforation = well_perf.dict_perforation
-        CreatePZ.dict_perforation_short = well_perf.dict_perforation_short
-        CreatePZ.dict_perforation_project = well_perf.dict_perforation_project
-
-
         for row_ind, row in enumerate(ws.iter_rows(values_only=True)):
             ws.row_dimensions[row_ind].hidden = False
 
             if any(['ПЛАН РАБОТ' in str(col) for col in row]):
                 CreatePZ.number_dp, ok = QInputDialog.getText(None, 'Номер дополнительного плана работ',
-                                                     'Введите номер дополнительного плана работ')
+                                                              'Введите номер дополнительного плана работ')
                 ws.cell(row=row_ind + 1, column=2).value = f'ДОПОЛНИТЕЛЬНЫЙ ПЛАН РАБОТ № {CreatePZ.number_dp}'
                 print(f'номер доп плана {CreatePZ.number_dp}')
 
@@ -274,29 +192,19 @@ class CreatePZ(QMainWindow):
                     if 'гипс' in str(value).lower() or 'гидратн' in str(value).lower():
                         CreatePZ.gipsInWell = True
 
-        try:
-
-            if CreatePZ.curator != 'ОР':
-                CreatePZ.water_cut = CreatePZ.proc_water
-            else:
-                CreatePZ.water_cut = 100
-        except:
-            CreatePZ.water_cut, ok = QInputDialog.getInt(self, 'Обводненность',
-                                                         'Введите обводненность скважинной продукции',
-                                                         100,
-                                                         0, 100)
-        CreatePZ.region = block_name.region(CreatePZ.cdng)
+        if CreatePZ.curator != 'ОР':
+            CreatePZ.water_cut = CreatePZ.proc_water
+        else:
+            CreatePZ.water_cut = 100
+        CreatePZ.water_cut, ok = QInputDialog.getInt(self, 'Обводненность',
+                                                     'Введите обводненность скважинной продукции',
+                                                     0, 0, 100)
+        print(f'обводнен {CreatePZ.water_cut}')
+        CreatePZ.region = block_name.region(CreatePZ.cdng._value)
         thread = main.ExcelWorker()
-        print(f'CreatePZ.region {CreatePZ.region, CreatePZ.well_number, CreatePZ.well_area}')
-        CreatePZ.without_damping = thread.check_well_existence(CreatePZ.well_number, CreatePZ.well_area, CreatePZ.region)
-
-        #
-        # if len(CreatePZ.H2S_mg) == 0:
-        #     CreatePZ.H2S_mg = CreatePZ.H2S_mg_m3
-        #
-
-        #
-        #
+        print(f'CreatePZ.region {CreatePZ.region, CreatePZ.well_number._value, CreatePZ.well_area._value}')
+        CreatePZ.without_damping = thread.check_well_existence(
+            CreatePZ.well_number._value, CreatePZ.well_area._value, CreatePZ.region)
 
         if CreatePZ.grpPlan:
             grpPlan_quest = QMessageBox.question(self, 'Подготовка к ГРП', 'Программа определела что в скважине'
@@ -305,18 +213,9 @@ class CreatePZ(QMainWindow):
                 CreatePZ.grpPlan = True
             else:
                 CreatePZ.grpPlan = False
-        # if CreatePZ.data_pvr_max == 0:
-        #     CreatePZ.data_pvr_max = QInputDialog.getInt(self,
-        #                                                 'Отсутствует строка',
-        #                                                 'Отсутствует строка "II. История эксплуатации скважины". '
-        #                                                 'необходимо ввести окончания строки с '
-        #                                                 'перфорацией', 0, 10, 300)[0]
-        # print(CreatePZ.dict_pump_ECN, CreatePZ.dict_pump_SHGN, CreatePZ.dict_pump_ECN_h, CreatePZ.H_F_paker_do)
-        # print()
-        # Определение наличия по скважине нарушений
 
-        data_pvr_max = well_PZ.data_pvr_max
-        data_well_max =well_PZ.data_well_max
+        data_pvr_max = CreatePZ.data_pvr_max._value
+        data_well_max = CreatePZ.data_well_max._value
 
         for row in range(data_pvr_max, data_well_max):
             for col in range(1, 13):
@@ -334,7 +233,7 @@ class CreatePZ(QMainWindow):
         if CreatePZ.leakiness == True:
             leakiness_quest = QMessageBox.question(self, 'нарушение колонны',
                                                    'Программа определела что в скважине'
-                                                          f'есть нарушение - {CreatePZ.leakiness_Count}, верно ли?')
+                                                   f'есть нарушение - {CreatePZ.leakiness_Count}, верно ли?')
             if leakiness_quest == QMessageBox.StandardButton.Yes:
                 CreatePZ.leakiness = True
                 krs.get_leakiness(self)
@@ -345,7 +244,7 @@ class CreatePZ(QMainWindow):
         if CreatePZ.emergency_well == True:
             emergency_quest = QMessageBox.question(self, 'Аварийные работы ',
                                                    'Программа определела что в скважине'
-                                                                  f'авария - {CreatePZ.emergency_count}, верно ли?')
+                                                   f'авария - {CreatePZ.emergency_count}, верно ли?')
             if emergency_quest == QMessageBox.StandardButton.Yes:
                 CreatePZ.emergency_well = True
             else:
@@ -361,11 +260,10 @@ class CreatePZ(QMainWindow):
             else:
                 CreatePZ.gipsInWell = False
 
-
         # Копирование изображения
         image_loader = SheetImageLoader(ws)
 
-        for row in range(1, CreatePZ.data_well_max):
+        for row in range(1, CreatePZ.data_well_max._value):
             for col in range(1, 12):
                 try:
                     image = image_loader.get(f'{get_column_letter(col)}{row}')
@@ -380,8 +278,6 @@ class CreatePZ(QMainWindow):
                 except:
                     pass
 
-
-
         print(CreatePZ.image_list)
         print(f' ГРП - {CreatePZ.grpPlan}')
         print(f' глубина насоса ШГН {CreatePZ.dict_pump_SHGN_h}')
@@ -390,27 +286,9 @@ class CreatePZ(QMainWindow):
         print(f'глубина пакер {CreatePZ.H_F_paker_do}')
         print(f' диам колонны {CreatePZ.column_diametr}')
         print(f' гипс в скважине {CreatePZ.gipsInWell}')
-        # print(
-        #     f'{CreatePZ.column_additional == False},{("ЭЦН" in str(CreatePZ.dict_pump["posle"]).upper() or "ВНН" in str(CreatePZ.dict_pump["posle"][0]).upper())}')
-        # print(f'Pdd {str(CreatePZ.dict_pump["posle"]).upper()}')
-
-        # print(f'fh {CreatePZ.cat_well_min, CreatePZ.cat_well_max}')
-
-
-
-
-                # self.dict_sucker_rod = dict_sucker_rod
-                # self.dict_sucker_rod_po = dict_sucker_rod_po
-        # print(f' штанги на спуск {CreatePZ.dict_sucker_rod_po}')
-        # except:
-        #     mes = QMessageBox.warning(self, 'Штанги отсутствуют', 'блок со штангами отсутствует')
-        perforations_intervals = []
-
-        # print(f' индекс ПВР{data_pvr_min+1, data_pvr_max + 1}')
 
         if len(CreatePZ.dict_perforation_project) != 0:
             CreatePZ.plast_project = list(CreatePZ.dict_perforation_project.keys())
-
 
         # Определение работающих интервалов перфорации и заполнения в словарь
         # вызов окна для проверки корректности данных
@@ -423,7 +301,6 @@ class CreatePZ(QMainWindow):
             CreatePZ.pause_app(self)
             CreatePZ.pause = True
             self.data_window = None
-
 
         if CreatePZ.shoe_column < CreatePZ.current_bottom and CreatePZ.column_additional is False:
             CreatePZ.open_trunk_well = True
@@ -449,8 +326,6 @@ class CreatePZ(QMainWindow):
         print(f'работающие пласты {CreatePZ.plast_work}')
         print(f'кровля , подошва пласты {CreatePZ.perforation_sole}')
 
-
-
         if work_plan != "gnkt_frez":
             if self.perforation_correct_window2 is None:
                 self.perforation_correct_window2 = PerforationCorrect(self)
@@ -465,12 +340,6 @@ class CreatePZ(QMainWindow):
             else:
                 self.perforation_correct_window2.close()
                 self.perforation_correct_window2 = None
-
-
-
-
-
-
 
         if len(CreatePZ.plast_work) == 0:
             perf_true_quest = QMessageBox.question(self, 'Программа',
@@ -507,14 +376,7 @@ class CreatePZ(QMainWindow):
                         if CreatePZ.perforation_roof > interval[0]:
                             CreatePZ.perforation_roof = interval[0]
 
-                # print(f'кровля ПВР раб {CreatePZ.perforation_roof}')
-
-
-        # without_damping = krs.without_damping(self)
-        # print(without_damping)
-
-
-        for j in range(CreatePZ.data_x_min, CreatePZ.data_x_max):  # Ожидаемые показатели после ремонта
+        for j in range(CreatePZ.data_x_min._value, CreatePZ.data_x_max._value):  # Ожидаемые показатели после ремонта
             lst = []
             for i in range(0, 12):
                 lst.append(ws.cell(row=j + 1, column=i + 1).value)
@@ -522,22 +384,6 @@ class CreatePZ(QMainWindow):
 
         if '1' in CreatePZ.cat_P_1 or '1' in CreatePZ.cat_H2S_list or 1 in CreatePZ.cat_P_1 or 1 in CreatePZ.cat_H2S_list:
             CreatePZ.bvo = True
-        # print(f'БВО {CreatePZ.bvo}')
-        # print(CreatePZ.cat_P_1, CreatePZ.cat_H2S_list)
-
-        # if CreatePZ.work_plan == 'gnkt_frez':
-        #     if self.rir_window is None:
-        #         CreatePZ.countAcid = 0
-        #         print(f' окно2 СКО ')
-        #         self.rir_window = Work_with_gnkt(ws)
-        #         self.rir_window.setGeometry(200, 400, 300, 400)
-        #         self.rir_window.show()
-        #         CreatePZ.pause_app(self)
-        #         CreatePZ.pause = True
-        #         self.rir_window = None
-        #     else:
-        #         self.rir_window.close()  # Close window.
-        #         self.rir_window is None
 
         if CreatePZ.work_plan != 'gnkt_frez':
             print(f'план работ {CreatePZ.work_plan}')
@@ -553,7 +399,7 @@ class CreatePZ(QMainWindow):
                 ws.merge_cells(start_row=i, start_column=8, end_row=i, end_column=13)
             CreatePZ.ins_ind = 0
 
-            CreatePZ.ins_ind += CreatePZ.data_well_max - CreatePZ.cat_well_min + 19
+            CreatePZ.ins_ind += CreatePZ.data_well_max._value - CreatePZ.cat_well_min._value + 19
             # print(f' индекс вставки ГНВП{CreatePZ.ins_ind}')
             dict_events_gnvp = {}
             dict_events_gnvp['krs'] = events_gnvp()
@@ -564,8 +410,6 @@ class CreatePZ(QMainWindow):
                                90: (501, 600), 110: (601, 700), 120: (701, 800), 130: (801, 900),
                                150: (901, 1500), 270: (1500, 2300)}
 
-
-
             for i in range(CreatePZ.ins_ind, CreatePZ.ins_ind + len(dict_events_gnvp[work_plan]) - 1):
                 ws.merge_cells(start_row=i, start_column=2, end_row=i, end_column=12)
                 data = ws.cell(row=i, column=2)
@@ -575,12 +419,12 @@ class CreatePZ(QMainWindow):
                         'Меры по предупреждению' in str(data.value) or \
                         "о недопустимости нецелевого расхода" in str(data.value):
                     data.alignment = Alignment(wrap_text=True, horizontal='center',
-                                                                   vertical='center')
+                                               vertical='center')
                     data.font = Font(name='Arial', size=13, bold=True)
 
                 else:
                     data.alignment = Alignment(wrap_text=True, horizontal='left',
-                                                                   vertical='top')
+                                               vertical='top')
                     data.font = Font(name='Arial', size=12)
 
                 # print(f'ГНВП -{data.value , len(data.value), len(dict_events_gnvp[work_plan])}')
@@ -596,10 +440,6 @@ class CreatePZ(QMainWindow):
             ws.row_dimensions[2].height = 30
             ws.row_dimensions[6].height = 30
 
-            # data_main_production_string = ws.cell(row=int(ind_data_main_production_string[1:])+1, column=int(ind_data_main_production_string[0])+2).value
-
-
-            # print(CreatePZ.row_expected)
             if len(CreatePZ.row_expected) != 0:
                 for i in range(1, len(CreatePZ.row_expected) + 1):  # Добавление  показатели после ремонта
                     ws.row_dimensions[CreatePZ.ins_ind + i - 1].height = None
@@ -616,13 +456,12 @@ class CreatePZ(QMainWindow):
                                                                                               horizontal='left',
                                                                                               vertical='center')
                             ws.cell(row=i + CreatePZ.ins_ind, column=j).value = CreatePZ.row_expected[i - 1][j - 1]
-                ws.merge_cells(start_column=2, start_row=CreatePZ.ins_ind + 1, end_column=12, end_row=CreatePZ.ins_ind + 1)
+                ws.merge_cells(start_column=2, start_row=CreatePZ.ins_ind + 1, end_column=12,
+                               end_row=CreatePZ.ins_ind + 1)
                 CreatePZ.ins_ind += len(CreatePZ.row_expected)
 
                 self.ins_ind_border = CreatePZ.ins_ind
                 # wb.save(f"{CreatePZ.well_number}  1 {CreatePZ.well_area} {CreatePZ.cat_P_1}.xlsx")
-
-
 
             # wb.save(f'{CreatePZ.well_number} {CreatePZ.well_area} {work_plan}.xlsx')
             return ws
@@ -676,10 +515,6 @@ class CreatePZ(QMainWindow):
                     ws.row_dimensions[i].height = 55
         ins_ind += len(podp_down)
 
-
-
-
-
     def is_valid_date(date):
         try:
             datetime.strptime(date, '%Y-%m-%d')
@@ -695,42 +530,6 @@ class CreatePZ(QMainWindow):
             return 'отсут'
         else:
             return value
-
-    def without_b(a):
-        if isinstance(a, int) is True or isinstance(a, float) is True:
-            return a
-        elif a == '-' or a == 'отсутствует' or a == 'отсутв' or a == 'отсут' or a is None:
-            return '0'
-
-        elif len(a.split('/')) == 2:
-
-            lst = []
-            for i in a.split('/'):
-                b = ''
-                for j in i:
-                    if j in '0123456789.x':
-                        b = str(b) + j
-                    elif j == ',':
-                        b = str(b) + '.'
-
-                lst.append(float(b))
-
-            return lst
-        elif len(a.split('-')) == 2:
-            lst = []
-            for i in a.split('-'):
-                # print(i)
-                lst.append(float(i.replace(',', '.').strip()))
-            return lst[0]
-        else:
-            b = 0
-            for i in a:
-                i.replace(',', '.')
-                if i in '0123456789,.x':
-                    b = str(b) + i
-                print(a, b)
-
-            return float(b)
 
     def definition_plast_work(self):
         # Определение работающих пластов
@@ -778,6 +577,7 @@ class CreatePZ(QMainWindow):
                 CreatePZ.open_trunk_well = True
             else:
                 CreatePZ.open_trunk_well = False
+
     def pause_app(self):
         while CreatePZ.pause == True:
             QtCore.QCoreApplication.instance().processEvents()
@@ -808,9 +608,9 @@ class CreatePZ(QMainWindow):
             for j in range(1, 13):
                 cell = ws2.cell(row=i, column=j)
                 if cell and str(cell) != str(work_list[i - 1][j - 1]):
-                    if str(work_list[i - 1][j - 1]).replace('.','').isdigit() and \
+                    if str(work_list[i - 1][j - 1]).replace('.', '').isdigit() and \
                             str(work_list[i - 1][j - 1]).count('.') != 2:
-                        cell.value = str(work_list[i - 1][j - 1]).replace('.',',')
+                        cell.value = str(work_list[i - 1][j - 1]).replace('.', ',')
                         # print(f'цифры {cell.value}')
                     else:
                         cell.value = work_list[i - 1][j - 1]
@@ -838,16 +638,16 @@ class CreatePZ(QMainWindow):
                                 or 'за 48 часов до спуска' in str(cell.value).upper():
                             # print('есть жирный')
                             ws2.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=True)
-                        elif 'порядок работы' in str(cell.value).lower() or\
-                            'Наименование работ' in str(cell.value):
+                        elif 'порядок работы' in str(cell.value).lower() or \
+                                'Наименование работ' in str(cell.value):
                             ws2.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=True)
                             ws2.cell(row=i, column=j).alignment = Alignment(wrap_text=True, horizontal='center',
-                                                                         vertical='center')
+                                                                            vertical='center')
         # print(merged_cells_dict)
         for row, col in merged_cells_dict.items():
             if len(col) != 2:
                 # print(row)
-                ws2.merge_cells(start_row=row+1, start_column=3, end_row=row+1, end_column=10)
+                ws2.merge_cells(start_row=row + 1, start_column=3, end_row=row + 1, end_column=10)
         for key, value in boundaries_dict.items():
             # print(value)
             ws2.merge_cells(start_column=value[0], start_row=value[1],
@@ -862,9 +662,8 @@ class CreatePZ(QMainWindow):
         if CreatePZ.image_list:
             for img in CreatePZ.image_list:
                 logo = Image(img[0])
-                logo.width, logo.height = img[2][0]*0.48, img[2][1]*0.72
+                logo.width, logo.height = img[2][0] * 0.48, img[2][1] * 0.72
                 ws2.add_image(logo, img[1])
-
 
         # print(f'высота строк работ {ins_ind}')
         # print(f'высота строк работ {len(rowHeights1)}')
@@ -885,11 +684,6 @@ class CreatePZ(QMainWindow):
 
         ws2.column_dimensions[get_column_letter(6)].width = 18
 
-
-
-
         return 'Высота изменена'
-
-
 
 #

@@ -260,7 +260,7 @@ def calv_h2s(self, cat_H2S, H2S_mg, H2S_pr):
 
         vodoiz_sucker = (10 * 3.14 *((25*0.01)**2/4)*sucker_rod_l_25/1000) +(10 * 3.14 *((25*0.01)**2/4)*sucker_rod_l_22/1000) +(10 * 3.14 *((25*0.01)**2/4)*sucker_rod_l_19/1000)
 
-        oil_mass = float(v_pod_gno*(100 - CreatePZ.water_cut) * 0.9/100)
+        oil_mass = float(v_pod_gno*(100 -CreatePZ.water_cut) * 0.9/100)
         # print(f'oil {oil_mass}-{type(oil_mass)} , {CreatePZ.gaz_f_pr[0]}-{type(CreatePZ.gaz_f_pr[0])}')
         volume_h2s = CreatePZ.gaz_f_pr[0] * oil_mass * (float(H2S_pr))/100
 

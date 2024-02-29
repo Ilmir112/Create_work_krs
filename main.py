@@ -32,6 +32,7 @@ class ExcelWorker(QThread):
 
 
     def check_well_existence(self, well_number, deposit_area, region):
+        print(f'jghfjlt {well_number, deposit_area, region}')
 
 
         # Подключение к базе данных SQLite
@@ -698,7 +699,7 @@ class MyWindow(QMainWindow):
 
             # path = 'workiii'
             path = 'D:\Documents\Desktop\ГТМ'
-            filenames = f"{CreatePZ.well_number} {CreatePZ.well_area} кат {CreatePZ.cat_P_1} {self.work_plan}.xlsx"
+            filenames = f"{CreatePZ.well_number._value} {CreatePZ.well_area._value} кат {CreatePZ.cat_P_1} {self.work_plan}.xlsx"
             full_path = path + '/' + filenames
             # print(f'10 - {ws2.max_row}')
             # print(wb2.path)
@@ -1792,10 +1793,10 @@ class MyWindow(QMainWindow):
 
         for row in range(15):
             ws4.insert_rows(ws4.max_row)
-        ws4.cell(row= 1, column=1).value = CreatePZ.well_number
-        ws4.cell(row=2, column=1).value = CreatePZ.well_area
+        ws4.cell(row= 1, column=1).value = CreatePZ.well_number._value
+        ws4.cell(row=2, column=1).value = CreatePZ.well_area._value
 
-        if CreatePZ.dict_pump_SHGN["do"] != 0 and  CreatePZ.dict_pump_ECN["do"] == 0 and\
+        if CreatePZ.dict_pump_SHGN["do"] != 0 and CreatePZ.dict_pump_ECN["do"] == 0 and\
                 CreatePZ.paker_do["do"] == 0:
             ws4.cell(row=3, column=1).value = f'{CreatePZ.dict_pump_SHGN["do"]} -на гл. {CreatePZ.dict_pump_SHGN_h["do"]}м'
         elif CreatePZ.dict_pump_SHGN["do"] == 0 and CreatePZ.dict_pump_ECN["do"] != 0 and\
@@ -1833,7 +1834,8 @@ class MyWindow(QMainWindow):
                 for interval in CreatePZ.dict_perforation_short[plast]["интервал"]:
                     plast_str += f'{plast[:4]} :{interval[0]}- {interval[1]} (изол)\n'
 
-            filter_list_pressuar = list(filter(lambda x: type(x) in [int, float], list(CreatePZ.dict_perforation_short[plast]["давление"])))
+            filter_list_pressuar = list(
+                filter(lambda x: type(x) in [int, float], list(CreatePZ.dict_perforation_short[plast]["давление"])))
             # print(f'фильтр -{filter_list_pressuar}')
             if filter_list_pressuar:
                 pressur_set.add(f'{plast[:4]} - {filter_list_pressuar}')
@@ -1845,9 +1847,9 @@ class MyWindow(QMainWindow):
         if CreatePZ.curator == 'ОР':
             ws4.cell(row=10, column=1).value = f'Ожид {CreatePZ.expected_Q}м3/сут при Р-{CreatePZ.expected_P}м3/сут'
         else:
-            ws4.cell(row=10, column=1).value = f'Qн {CreatePZ.Qoil}т Qж-{CreatePZ.Qwater}м3/сут'
-        ws4.cell(row=11, column=1).value = f'макс угол {CreatePZ.max_angle} на {CreatePZ.max_angle_H}'
-        ws4.cell(row=1, column=2).value = CreatePZ.cdng
+            ws4.cell(row=10, column=1).value = f'Qн {CreatePZ.Qoil}т Qж- {CreatePZ.Qwater}м3/сут'
+        ws4.cell(row=11, column=1).value = f'макс угол {CreatePZ.max_angle} на {CreatePZ.max_angle_H._value}'
+        ws4.cell(row=1, column=2).value = CreatePZ.cdng._value
         ws4.cell(row=2, column=3).value = f'Рпл - {CreatePZ.cat_P_1[0]}, H2S -{CreatePZ.cat_H2S_list[0]},' \
                                           f' газ факт -{CreatePZ.gaz_f_pr[0]}т/м3'
         column_well = f'{CreatePZ.column_diametr}х{CreatePZ.column_wall_thickness} в инт 0 - {CreatePZ.shoe_column}м ' \

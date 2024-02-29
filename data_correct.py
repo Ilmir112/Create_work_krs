@@ -41,60 +41,60 @@ class TabPage_SO(QWidget):
         self.column_direction_diametr_Label = QLabel("диаметр направление", self)
         self.column_direction_diametr_Edit = FloatLineEdit(self)
         if CreatePZ.column_direction_True:
-            self.column_direction_diametr_Edit.setText(f'{CreatePZ.column_direction_diametr}')
+            self.column_direction_diametr_Edit.setText(f'{CreatePZ.column_direction_diametr._value}')
         else:
             self.column_direction_diametr_Edit.setText(f'отсут')
 
         self.column_direction_wall_thickness_Label = QLabel("Толщина стенки направление", self)
         self.column_direction_wall_thickness_Edit = FloatLineEdit(self)
         if CreatePZ.column_direction_True:
-            self.column_direction_wall_thickness_Edit.setText(f'{CreatePZ.column_direction_wall_thickness}')
+            self.column_direction_wall_thickness_Edit.setText(f'{CreatePZ.column_direction_wall_thickness._value}')
         else:
             self.column_direction_wall_thickness_Edit.setText(f'отсут')
         self.column_direction_lenght_Label = QLabel("башмак направления", self)
         self.column_direction_lenght_Edit = FloatLineEdit(self)
         if CreatePZ.column_direction_True:
-            self.column_direction_lenght_Edit.setText(f'{CreatePZ.column_direction_lenght}')
+            self.column_direction_lenght_Edit.setText(f'{CreatePZ.column_direction_lenght._value}')
         else:
             self.column_direction_lenght_Edit.setText(f'отсут')
 
         self.level_cement_direction_Label = QLabel("Уровень цемента за направление", self)
         self.level_cement_direction_Edit = FloatLineEdit(self)
         if CreatePZ.column_direction_True:
-            self.level_cement_direction_Edit.setText(f'{CreatePZ.level_cement_direction}')
+            self.level_cement_direction_Edit.setText(f'{CreatePZ.level_cement_direction._value}')
         else:
             self.level_cement_direction_Edit.setText(f'отсут')
 
         self.column_conductor_diametr_Label = QLabel("диаметр кондуктора", self)
         self.column_conductor_diametr_Edit = FloatLineEdit(self)
-        self.column_conductor_diametr_Edit.setText(f'{CreatePZ.column_conductor_diametr}')
+        self.column_conductor_diametr_Edit.setText(f'{CreatePZ.column_conductor_diametr._value}')
 
         self.column_conductor_wall_thickness_Label = QLabel("Толщина стенки ", self)
         self.column_conductor_wall_thickness_Edit = FloatLineEdit(self)
-        self.column_conductor_wall_thickness_Edit.setText(f'{CreatePZ.column_conductor_wall_thickness}')
+        self.column_conductor_wall_thickness_Edit.setText(f'{CreatePZ.column_conductor_wall_thickness._value}')
 
         self.column_conductor_lenght_Label = QLabel("башмак кондуктора", self)
         self.column_conductor_lenght_Edit = FloatLineEdit(self)
-        self.column_conductor_lenght_Edit.setText(f'{CreatePZ.column_conductor_lenght}')
+        self.column_conductor_lenght_Edit.setText(f'{CreatePZ.column_conductor_lenght._value}')
 
         self.level_cement_conductor_Label = QLabel("Уровень цемента за кондуктором", self)
         self.level_cement_conductor_Edit = FloatLineEdit(self)
-        self.level_cement_conductor_Edit.setText(f'{CreatePZ.level_cement_conductor}')
+        self.level_cement_conductor_Edit.setText(f'{CreatePZ.level_cement_conductor._value}')
 
         self.columnLabel = QLabel("диаметр ЭК", self)
         self.columnType = FloatLineEdit(self)
-        self.columnType.setText(f"{self.ifNone(CreatePZ.column_diametr)}")
+        self.columnType.setText(f"{self.ifNone(CreatePZ.column_diametr._value)}")
 
         # self.columnType.setClearButtonEnabled(True)
 
         self.column_wall_thicknessLabel = QLabel("Толщина стенки ЭК", self)
         self.column_wall_thicknessEditType2 = FloatLineEdit(self)
-        self.column_wall_thicknessEditType2.setText(f"{self.ifNone(CreatePZ.column_wall_thickness)}")
+        self.column_wall_thicknessEditType2.setText(f"{self.ifNone(CreatePZ.column_wall_thickness._value)}")
         # self.column_wall_thicknessEditType2.setClearButtonEnabled(True)
 
         self.shoe_columnLabel = QLabel("башмак ЭК", self)
         self.shoe_columnEditType2 = FloatLineEdit(self)
-        self.shoe_columnEditType2.setText(f"{self.ifNone(CreatePZ.shoe_column)}")
+        self.shoe_columnEditType2.setText(f"{self.ifNone(CreatePZ.shoe_column._value)}")
         # self.shoe_columnEditType2.setClearButtonEnabled(True)
 
         self.column_add_trueLabel = QLabel("наличие Доп. колонны", self)
@@ -108,30 +108,30 @@ class TabPage_SO(QWidget):
 
         self.column_addLabel = QLabel("диаметр доп. колонны", self)
         self.column_addEditType = FloatLineEdit(self)
-        self.column_addEditType.setText(f"{self.ifNone(CreatePZ.column_additional_diametr)}")
+        self.column_addEditType.setText(f"{self.ifNone(CreatePZ.column_additional_diametr._value)}")
         # self.column_addEditType.setClearButtonEnabled(True)
 
         self.column_add_wall_thicknessLabel = QLabel("Толщина стенки доп.колонны", self)
         self.column_add_wall_thicknessEditType2 = FloatLineEdit(self)
-        self.column_add_wall_thicknessEditType2.setText(F'{self.ifNone(CreatePZ.column_additional_wall_thickness)}')
+        self.column_add_wall_thicknessEditType2.setText(F'{self.ifNone(CreatePZ.column_additional_wall_thickness._value)}')
         # self.column_add_wall_thicknessEditType2.setClearButtonEnabled(True)
 
         self.head_column_addLabel = QLabel("Голова доп колонны", self)
         self.head_column_add_EditType2 = FloatLineEdit(self)
-        self.head_column_add_EditType2.setText(f'{self.ifNone(CreatePZ.head_column_additional)}')
+        self.head_column_add_EditType2.setText(f'{self.ifNone(CreatePZ.head_column_additional._value)}')
 
         self.shoe_column_addLabel = QLabel("башмак доп колонны", self)
         self.shoe_column_add_EditType2 = FloatLineEdit(self)
-        self.shoe_column_add_EditType2.setText(f'{self.ifNone(CreatePZ.shoe_column_additional)}')
+        self.shoe_column_add_EditType2.setText(f'{self.ifNone(CreatePZ.shoe_column_additional._value)}')
         # self.shoe_column_add_EditType2.setClearButtonEnabled(True)
 
         self.bottomhole_drill_Label = QLabel('Пробуренный забой')
         self.bottomhole_drill_EditType = FloatLineEdit(self)
-        self.bottomhole_drill_EditType.setText(f'{self.ifNone(CreatePZ.bottomhole_drill)}')
+        self.bottomhole_drill_EditType.setText(f'{self.ifNone(CreatePZ.bottomhole_drill._value)}')
 
         self.bottomhole_artificial_Label = QLabel('Искусственный забой')
         self.bottomhole_artificial_EditType = FloatLineEdit(self)
-        self.bottomhole_artificial_EditType.setText(f'{self.ifNone(CreatePZ.bottomhole_artificial)}')
+        self.bottomhole_artificial_EditType.setText(f'{self.ifNone(CreatePZ.bottomhole_artificial._value)}')
 
         self.current_bottom_Label = QLabel('Текущий забой')
         self.current_bottom_EditType = FloatLineEdit(self)
@@ -139,15 +139,15 @@ class TabPage_SO(QWidget):
 
         self.max_angle_Label = QLabel('Максимальный угол')
         self.max_angle_EditType = FloatLineEdit(self)
-        self.max_angle_EditType.setText(f'{self.ifNone(CreatePZ.max_angle)}')
+        self.max_angle_EditType.setText(f'{self.ifNone(CreatePZ.max_angle._value)}')
 
         self.max_expected_pressure_Label = QLabel('Максимальный ожидаемое давление')
         self.max_expected_pressure_EditType = FloatLineEdit(self)
-        self.max_expected_pressure_EditType.setText(f'{self.ifNone(CreatePZ.max_expected_pressure)}')
+        self.max_expected_pressure_EditType.setText(f'{self.ifNone(CreatePZ.max_expected_pressure._value)}')
 
         self.max_admissible_pressure_Label = QLabel('Максимальный допустимое давление')
         self.max_admissible_pressure_EditType = FloatLineEdit(self)
-        self.max_admissible_pressure_EditType.setText(f'{self.ifNone(CreatePZ.max_admissible_pressure)}')
+        self.max_admissible_pressure_EditType.setText(f'{self.ifNone(CreatePZ.max_admissible_pressure._value)}')
 
         self.pump_SHGN_do_Label = QLabel('Штанговый насос')
         self.pump_SHGN_do_EditType = QLineEdit(self)
@@ -229,11 +229,11 @@ class TabPage_SO(QWidget):
 
         self.static_level_Label = QLabel('Статический уровень в скважине')
         self.static_level_EditType = FloatLineEdit(self)
-        self.static_level_EditType.setText(str(self.ifNone(CreatePZ.static_level)))
+        self.static_level_EditType.setText(str(self.ifNone(CreatePZ.static_level._value)))
 
         self.dinamic_level_Label = QLabel('Динамический уровень в скважине')
         self.dinamic_level_EditType = FloatLineEdit(self)
-        self.dinamic_level_EditType.setText(str(self.ifNone(CreatePZ.dinamic_level)))
+        self.dinamic_level_EditType.setText(str(self.ifNone(CreatePZ.dinamic_level._value)))
 
         self.nkt_do_label = QLabel('НКТ  до ремонта')
         self.nkt_posle_label = QLabel('НКТ плановое согласно расчета')
@@ -243,6 +243,7 @@ class TabPage_SO(QWidget):
 
         self.dict_nkt = CreatePZ.dict_nkt
         self.dict_nkt_po = CreatePZ.dict_nkt_po
+        print(CreatePZ.dict_nkt,  CreatePZ.dict_nkt_po)
         self.dict_sucker_rod = CreatePZ.dict_sucker_rod
         self.dict_sucker_rod_po = CreatePZ.dict_sucker_rod_po
 
@@ -580,6 +581,7 @@ class DataWindow(QMainWindow):
         self.dict_sucker_rod = CreatePZ.dict_sucker_rod_po
         self.dict_nkt = CreatePZ.dict_nkt
         self.dict_nkt_po = CreatePZ.dict_nkt_po
+        print(self.dict_nkt, self.dict_nkt_po)
         if self.dict_nkt:
             for key in range(1, len(self.dict_nkt)):
                 CreatePZ.dict_nkt[self.tabWidget.currentWidget().labels_nkt[key][0].text()] = self.if_None(

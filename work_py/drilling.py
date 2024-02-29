@@ -323,9 +323,9 @@ def frezer_ports(self):
 
     elif CreatePZ.column_additional == True:
         drilling_str = f' пилотный фрезер -{drillingBit_diam} + магнит колонный  2⅜ БТ (П) + СБТ{nkt_pod} ' \
-                       f'{CreatePZ.current_bottom - CreatePZ.head_column_additional}м'
+                       f'{round(current_depth - CreatePZ.head_column_additional, 1)}м'
         drilling_short = f' пилотный фрезер -{drillingBit_diam} + магнит колонный  2⅜ БТ (П) + СБТ{nkt_pod} ' \
-                         f'{CreatePZ.current_bottom - CreatePZ.head_column_additional}м'
+                         f'{round(current_depth - CreatePZ.head_column_additional, 1)}м'
 
     CreatePZ.drilling_interval.append([CreatePZ.current_bottom, current_depth])
     drilling_list = [
