@@ -266,7 +266,8 @@ class Work_with_gnkt(QMainWindow):
         # print(f'10 - {ws2.max_row}')
         # print(wb2.path)
         # print(f' кате {CreatePZ.cat_P_1}')
-        if 1 in CreatePZ.cat_P_1 or 1 in CreatePZ.cat_H2S_list or 1 in CreatePZ.cat_gaz_f_pr:
+
+        if CreatePZ.bvo == True:
             ws5 = Work_with_gnkt.wb_gnkt_frez.create_sheet('Sheet1')
             ws5.title = "Схемы ПВО"
             ws5 = Work_with_gnkt.wb_gnkt_frez["Схемы ПВО"]

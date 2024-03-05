@@ -26,7 +26,7 @@ def sandFilling(self):
                                           int(CreatePZ.perforation_roof - 20), 0, int(CreatePZ.current_bottom))
 
 
-    sand_volume = round(volume_vn_ek(self,filling_depth) * (CreatePZ.current_bottom - filling_depth)/1000, 1)
+    sand_volume = round(volume_vn_ek(self,filling_depth) * (CreatePZ.current_bottom - filling_depth), 1)
 
 
     filling_list = [

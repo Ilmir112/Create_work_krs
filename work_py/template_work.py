@@ -498,6 +498,7 @@ class TabPage_SO(QWidget):
                            f'шаблон-{template_second}мм до гл.{CreatePZ.template_depth}м'
 
 
+
         elif index == 'ПСШ СКМ в доп колонне + открытый ствол':
             self.skm_Edit.setText(str(CreatePZ.column_additional_diametr))
             skm = str(self.skm_Edit.text())
@@ -714,6 +715,11 @@ class TemplateKrs(QMainWindow):
             template_diametr = int(self.tabWidget.currentWidget().template_second_Edit.text())
         else:
             template_diametr = int(self.tabWidget.currentWidget().template_first_Edit.text())
+        if (template_diametr >= CreatePZ.problem_with_ek_diametr - 2
+            and CreatePZ.template_depth > CreatePZ.problem_with_ek_depth):
+            mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже глубины не прохода')
+
+            return
         work_list = self.template_ek(template_str, template, template_diametr)
         AcidPakerWindow.populate_row(self, CreatePZ.ins_ind, work_list)
 
@@ -962,41 +968,11 @@ class TemplateKrs(QMainWindow):
                         'ПСШ СКМ в доп колонне c хвостом',
                         'ПСШ СКМ в доп колонне + открытый ствол', 'ПСШ СКМ в доп колонне без хвоста',
                         'ПСШ открытый ствол + ИП отрайбирован']
-        # template_dict = {
-        #     'ПСШ ЭК': template_SKM_EK,
-        #     'ПСШ открытый ствол': template_SKM_EK_open,
-        #     'ПСШ без хвоста': template_SKM_EK_without,
-        #     'ПСШ Доп колонна СКМ в основной колонне': template_SKM_DP_EK,
-        #     'ПСШ СКМ в доп колонне c хвостом': template_SKM_DP,
-        #     'ПСШ СКМ в доп колонне без хвоста': template_SKM_DP_without,
-        #     'ПСШ СКМ в доп колонне + открытый ствол': template_SKM_DP_open,
-        #     'ПСШ открытый ствол + ИП отрайбирован': template_SKM_EK_open_true
-        # }
-        # SKM_dict = {
-        #     'ПСШ ЭК': ckm_teml_SKM_EK,
-        #     'ПСШ открытый ствол': ckm_teml_SKM_EK_open,
-        #     'ПСШ без хвоста': ckm_teml_SKM_EK_without,
-        #     'ПСШ Доп колонна СКМ в основной колонне': ckm_teml_SKM_DP_EK,
-        #     'ПСШ СКМ в доп колонне c хвостом': ckm_teml_SKM_DP,
-        #     'ПСШ СКМ в доп колонне без хвоста': ckm_teml_SKM_DP_without,
-        #     'ПСШ СКМ в доп колонне + открытый ствол': ckm_teml_SKM_DP_open,
-        #     'ПСШ открытый ствол + ИП отрайбирован': ckm_teml_SKM_EK_open_True
-        # }
-        # print(f'открытй ствол {CreatePZ.open_trunk_well} , башмак НКТ {CreatePZ.shoe_column}, забой P{CreatePZ.current_bottom}')
-        # template, ok = QInputDialog.getItem(self, 'Спуcкаемое  оборудование', 'выбор спуcкаемого оборудования',
-        #                                     template_sel, template_sel.index(template_key), False)
-        #
-        # if ok and template_sel:
-        #     self.le.setText(template)
 
-        # template_str = template_dict[template]
-        # ckm_teml = SKM_dict[template]
-
-        # определение интервала скреперования
 
         skm_interval_tuple = skm_interval(self, template)
 
-        # roof_skm = skm_interval_tuple[0][1]
+
         skm_interval = raid(skm_interval_tuple)
         list_template_ek = [
             [f'СПО  {template_str} на 'f'НКТ{CreatePZ.nkt_diam}мм', None,

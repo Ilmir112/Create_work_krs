@@ -1,5 +1,8 @@
 from PyQt5.QtWidgets import QInputDialog, QMessageBox
 
+from krs import calc_work_fluid
+
+
 def gnkt_work(self):
     from open_pz import CreatePZ
     import H2S
@@ -11,11 +14,7 @@ def gnkt_work(self):
                                                                             'рабочей жидкости', 1.02, 0.87, 2, 2)
 
 
-    if 2 in CreatePZ.cat_H2S_list or '2' in CreatePZ.cat_H2S_list:
-        fluid_work = f'{fluid_work_insert}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из' \
-                     f' расчета {H2S.calv_h2s(self,CreatePZ.cat_H2S_list[0], CreatePZ.H2S_mg[0], CreatePZ.H2S_pr[0])}кг/м3 '
-    else:
-        fluid_work = f'{fluid_work_insert}г/см3 '
+    fluid_work, CreatePZ.fluid_work_short = calc_work_fluid(self, self.work_plan)
 
     gnkt_opz =[
      [None, None, 'Порядок работы', None, None, None, None, None, None, None, None, None],

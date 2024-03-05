@@ -126,14 +126,17 @@ def skm_interval(self, template):
                 merged_segments_new.append(interval)
                 # print(f'4 {interval, merged_segments}')
     # print(f'Новые интервалы {merged_segments_new}')
+    merged_segments = []
     for skip in merged_segments_new:
         skip_question = QMessageBox.question(None, 'Скреперование интервалов посадки',
-                                             f'Нужно ли скреперованить интервал {skip}?')
-        if skip_question == QMessageBox.StandardButton.No:
-            merged_segments_new.pop(merged_segments_new.index(skip))
+                                             f'Нужно ли скреперовать интервал {skip}?')
 
-    CreatePZ.skm_interval.extend(merged_segments_new)
-    return merged_segments_new
+        if skip_question == QMessageBox.StandardButton.Yes:
+            merged_segments.append(skip)
+        print(merged_segments)
+
+
+    return merged_segments
 
 
 # Функция исключения из интервалов скреперования интервалов ПВР

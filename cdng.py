@@ -117,7 +117,7 @@ def events_gnvp_gnkt():
 def events_gnvp():
     from open_pz import CreatePZ
 
-    CreatePZ.kat_pvo = [1 if str(CreatePZ.cat_P_1[0]) == '1' or str(CreatePZ.cat_H2S_list[0]) == '1' else 2][0]
+
     events_gnvp = [
         [None, '1. Все операции при производстве работ выполнять в соответствии с действующими  Федеральными нормами и '
                'правилами в области промышленной безопасности "Правила безопасности в нефтяной и газовой промышленности"'

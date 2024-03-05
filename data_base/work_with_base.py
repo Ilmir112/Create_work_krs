@@ -10,6 +10,7 @@ from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem, QLineEdit, QHeaderVie
 from openpyxl import load_workbook
 
 class Classifier_well(QMainWindow):
+    number_well = None
     def __init__(self,  costumer, region, classifier_well, parent=None):
         from open_pz import CreatePZ
         super(Classifier_well, self).__init__()
@@ -18,7 +19,7 @@ class Classifier_well(QMainWindow):
         self.table_class = QTableWidget()
         self.region = region
         self.costumer = costumer
-        self.number_well = 0
+        self.number_well = None
         if CreatePZ.well_number:
             self.number_well = CreatePZ.well_number._value
 
@@ -176,7 +177,7 @@ class Classifier_well(QMainWindow):
                 # cursor.execute("DROP TABLE my_table")
 
                 # Удаление всех данных из таблицы
-                cursor.execute(f"DELETE FROM {region_name}")
+                # cursor.execute(f"DELETE FROM {region_name}")
 
                 # Создание таблицы в базе данных
                 cursor.execute(f'CREATE TABLE IF NOT EXISTS {region_name}'

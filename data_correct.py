@@ -141,6 +141,10 @@ class TabPage_SO(QWidget):
         self.max_angle_EditType = FloatLineEdit(self)
         self.max_angle_EditType.setText(f'{self.ifNone(CreatePZ.max_angle._value)}')
 
+        self.max_angle_H_Label = QLabel('Глубина максимального угла')
+        self.max_angle_H_EditType = FloatLineEdit(self)
+        self.max_angle_H_EditType.setText(f'{self.ifNone(CreatePZ.max_angle_H._value)}')
+
         self.max_expected_pressure_Label = QLabel('Максимальный ожидаемое давление')
         self.max_expected_pressure_EditType = FloatLineEdit(self)
         self.max_expected_pressure_EditType.setText(f'{self.ifNone(CreatePZ.max_expected_pressure._value)}')
@@ -235,6 +239,11 @@ class TabPage_SO(QWidget):
         self.dinamic_level_EditType = FloatLineEdit(self)
         self.dinamic_level_EditType.setText(str(self.ifNone(CreatePZ.dinamic_level._value)))
 
+        self.curator_Label = QLabel('Куратор ремонта')
+        self.curator_Combo = QComboBox(self)
+
+
+
         self.nkt_do_label = QLabel('НКТ  до ремонта')
         self.nkt_posle_label = QLabel('НКТ плановое согласно расчета')
 
@@ -243,104 +252,113 @@ class TabPage_SO(QWidget):
 
         self.dict_nkt = CreatePZ.dict_nkt
         self.dict_nkt_po = CreatePZ.dict_nkt_po
-        print(CreatePZ.dict_nkt,  CreatePZ.dict_nkt_po)
+        # print(CreatePZ.dict_nkt,  CreatePZ.dict_nkt_po)
         self.dict_sucker_rod = CreatePZ.dict_sucker_rod
         self.dict_sucker_rod_po = CreatePZ.dict_sucker_rod_po
 
-        grid = QGridLayout(self)
-        grid.addWidget(self.column_direction_diametr_Label, 0, 0)
-        grid.addWidget(self.column_direction_diametr_Edit, 1, 0)
-        grid.addWidget(self.column_direction_wall_thickness_Label, 0, 1)
-        grid.addWidget(self.column_direction_wall_thickness_Edit, 1, 1)
-        grid.addWidget(self.column_direction_lenght_Label, 0, 2)
-        grid.addWidget(self.column_direction_lenght_Edit, 1, 2)
-        grid.addWidget(self.level_cement_direction_Label, 0, 4)
-        grid.addWidget(self.level_cement_direction_Edit, 1, 4)
+        self.grid = QGridLayout(self)
+        self.grid.addWidget(self.column_direction_diametr_Label, 0, 0)
+        self.grid.addWidget(self.column_direction_diametr_Edit, 1, 0)
+        self.grid.addWidget(self.column_direction_wall_thickness_Label, 0, 1)
+        self.grid.addWidget(self.column_direction_wall_thickness_Edit, 1, 1)
+        self.grid.addWidget(self.column_direction_lenght_Label, 0, 2)
+        self.grid.addWidget(self.column_direction_lenght_Edit, 1, 2)
+        self.grid.addWidget(self.level_cement_direction_Label, 0, 4)
+        self.grid.addWidget(self.level_cement_direction_Edit, 1, 4)
 
-        grid.addWidget(self.column_conductor_diametr_Label, 2, 0)
-        grid.addWidget(self.column_conductor_diametr_Edit, 3, 0)
-        grid.addWidget(self.column_conductor_wall_thickness_Label, 2, 1)
-        grid.addWidget(self.column_conductor_wall_thickness_Edit, 3, 1)
-        grid.addWidget(self.column_conductor_lenght_Label, 2, 2)
-        grid.addWidget(self.column_conductor_lenght_Edit, 3, 2)
-        grid.addWidget(self.level_cement_conductor_Label, 2, 4)
-        grid.addWidget(self.level_cement_conductor_Edit, 3, 4)
+        self.grid.addWidget(self.column_conductor_diametr_Label, 2, 0)
+        self.grid.addWidget(self.column_conductor_diametr_Edit, 3, 0)
+        self.grid.addWidget(self.column_conductor_wall_thickness_Label, 2, 1)
+        self.grid.addWidget(self.column_conductor_wall_thickness_Edit, 3, 1)
+        self.grid.addWidget(self.column_conductor_lenght_Label, 2, 2)
+        self.grid.addWidget(self.column_conductor_lenght_Edit, 3, 2)
+        self.grid.addWidget(self.level_cement_conductor_Label, 2, 4)
+        self.grid.addWidget(self.level_cement_conductor_Edit, 3, 4)
 
-        grid.addWidget(self.columnLabel, 8, 0)
-        grid.addWidget(self.columnType, 9, 0)
-        grid.addWidget(self.column_wall_thicknessLabel, 8, 1)
-        grid.addWidget(self.column_wall_thicknessEditType2, 9, 1)
-        grid.addWidget(self.shoe_columnLabel, 8, 2)
-        grid.addWidget(self.shoe_columnEditType2, 9, 2)
-        grid.addWidget(self.column_add_trueLabel, 8, 3)
-        grid.addWidget(self.column_add_true_comboBox, 9, 3)
-        grid.addWidget(self.column_addLabel, 8, 4)
-        grid.addWidget(self.column_addEditType, 9, 4)
-        grid.addWidget(self.column_add_wall_thicknessLabel, 8, 5)
-        grid.addWidget(self.column_add_wall_thicknessEditType2, 9, 5)
-        grid.addWidget(self.head_column_addLabel, 8, 6)
-        grid.addWidget(self.head_column_add_EditType2, 9, 6)
-        grid.addWidget(self.shoe_column_addLabel, 8, 7)
-        grid.addWidget(self.shoe_column_add_EditType2, 9, 7)
+        self.grid.addWidget(self.columnLabel, 8, 0)
+        self.grid.addWidget(self.columnType, 9, 0)
+        self.grid.addWidget(self.column_wall_thicknessLabel, 8, 1)
+        self.grid.addWidget(self.column_wall_thicknessEditType2, 9, 1)
+        self.grid.addWidget(self.shoe_columnLabel, 8, 2)
+        self.grid.addWidget(self.shoe_columnEditType2, 9, 2)
+        self.grid.addWidget(self.column_add_trueLabel, 8, 3)
+        self.grid.addWidget(self.column_add_true_comboBox, 9, 3)
+        self.grid.addWidget(self.column_addLabel, 8, 4)
+        self.grid.addWidget(self.column_addEditType, 9, 4)
+        self.grid.addWidget(self.column_add_wall_thicknessLabel, 8, 5)
+        self.grid.addWidget(self.column_add_wall_thicknessEditType2, 9, 5)
+        self.grid.addWidget(self.head_column_addLabel, 8, 6)
+        self.grid.addWidget(self.head_column_add_EditType2, 9, 6)
+        self.grid.addWidget(self.shoe_column_addLabel, 8, 7)
+        self.grid.addWidget(self.shoe_column_add_EditType2, 9, 7)
 
-        grid.addWidget(self.bottomhole_drill_Label, 10, 0)
-        grid.addWidget(self.bottomhole_drill_EditType, 11, 0)
-        grid.addWidget(self.bottomhole_artificial_Label, 10, 1)
-        grid.addWidget(self.bottomhole_artificial_EditType, 11, 1)
-        grid.addWidget(self.current_bottom_Label, 10, 2)
-        grid.addWidget(self.current_bottom_EditType, 11, 2)
-        grid.addWidget(self.max_angle_Label, 10, 3)
-        grid.addWidget(self.max_angle_EditType, 11, 3)
-        grid.addWidget(self.max_expected_pressure_Label, 10, 4)
-        grid.addWidget(self.max_expected_pressure_EditType, 11, 4)
-        grid.addWidget(self.max_admissible_pressure_Label, 10, 5)
-        grid.addWidget(self.max_admissible_pressure_EditType, 11, 5)
-        grid.addWidget(self.pump_ECN_do_Label, 13, 0)
-        grid.addWidget(self.pump_ECN_do_EditType, 14, 0)
-        grid.addWidget(self.pump_ECN_depth_do_Label, 13, 1)
-        grid.addWidget(self.pump_ECN_depth_do_EditType, 14, 1)
-        grid.addWidget(self.pump_ECN_posle_Label, 13, 4)
-        grid.addWidget(self.pump_ECN_posle_EditType, 14, 4)
-        grid.addWidget(self.pump_ECN_depth_posle_Label, 13, 5)
-        grid.addWidget(self.pump_ECN_depth_posle_EditType, 14, 5)
+        self.grid.addWidget(self.bottomhole_drill_Label, 10, 0)
+        self.grid.addWidget(self.bottomhole_drill_EditType, 11, 0)
+        self.grid.addWidget(self.bottomhole_artificial_Label, 10, 1)
+        self.grid.addWidget(self.bottomhole_artificial_EditType, 11, 1)
+        self.grid.addWidget(self.current_bottom_Label, 10, 2)
+        self.grid.addWidget(self.current_bottom_EditType, 11, 2)
+        self.grid.addWidget(self.max_angle_Label, 10, 3)
+        self.grid.addWidget(self.max_angle_EditType, 11, 3)
+        self.grid.addWidget(self.max_angle_H_Label, 10, 4)
+        self.grid.addWidget(self.max_angle_H_EditType, 11, 4)
+        self.grid.addWidget(self.max_expected_pressure_Label, 10, 5)
+        self.grid.addWidget(self.max_expected_pressure_EditType, 11, 5)
+        self.grid.addWidget(self.max_admissible_pressure_Label, 10, 6)
+        self.grid.addWidget(self.max_admissible_pressure_EditType, 11, 6)
+        self.grid.addWidget(self.pump_ECN_do_Label, 13, 0)
+        self.grid.addWidget(self.pump_ECN_do_EditType, 14, 0)
+        self.grid.addWidget(self.pump_ECN_depth_do_Label, 13, 1)
+        self.grid.addWidget(self.pump_ECN_depth_do_EditType, 14, 1)
+        self.grid.addWidget(self.pump_ECN_posle_Label, 13, 4)
+        self.grid.addWidget(self.pump_ECN_posle_EditType, 14, 4)
+        self.grid.addWidget(self.pump_ECN_depth_posle_Label, 13, 5)
+        self.grid.addWidget(self.pump_ECN_depth_posle_EditType, 14, 5)
 
-        grid.addWidget(self.pump_SHGN_do_Label, 15, 0)
-        grid.addWidget(self.pump_SHGN_do_EditType, 16, 0)
-        grid.addWidget(self.pump_SHGN_depth_do_Label, 15, 1)
-        grid.addWidget(self.pump_SHGN_depth_do_EditType, 16, 1)
-        grid.addWidget(self.pump_SHGN_posle_Label, 15, 4)
-        grid.addWidget(self.pump_SHGN_posle_EditType, 16, 4)
-        grid.addWidget(self.pump_SHGN_depth_posle_Label, 15, 5)
-        grid.addWidget(self.pump_SHGN_depth_posle_EditType, 16, 5)
+        self.grid.addWidget(self.pump_SHGN_do_Label, 15, 0)
+        self.grid.addWidget(self.pump_SHGN_do_EditType, 16, 0)
+        self.grid.addWidget(self.pump_SHGN_depth_do_Label, 15, 1)
+        self.grid.addWidget(self.pump_SHGN_depth_do_EditType, 16, 1)
+        self.grid.addWidget(self.pump_SHGN_posle_Label, 15, 4)
+        self.grid.addWidget(self.pump_SHGN_posle_EditType, 16, 4)
+        self.grid.addWidget(self.pump_SHGN_depth_posle_Label, 15, 5)
+        self.grid.addWidget(self.pump_SHGN_depth_posle_EditType, 16, 5)
 
-        grid.addWidget(self.paker_do_Label, 17, 0)
-        grid.addWidget(self.paker_do_EditType, 18, 0)
-        grid.addWidget(self.paker_depth_do_Label, 17, 1)
-        grid.addWidget(self.paker_depth_do_EditType, 18, 1)
-        grid.addWidget(self.paker_posle_Label, 17, 4)
-        grid.addWidget(self.paker_posle_EditType, 18, 4)
-        grid.addWidget(self.paker_depth_posle_Label, 17, 5)
-        grid.addWidget(self.paker_depth_posle_EditType, 18, 5)
+        self.grid.addWidget(self.paker_do_Label, 17, 0)
+        self.grid.addWidget(self.paker_do_EditType, 18, 0)
+        self.grid.addWidget(self.paker_depth_do_Label, 17, 1)
+        self.grid.addWidget(self.paker_depth_do_EditType, 18, 1)
+        self.grid.addWidget(self.paker_posle_Label, 17, 4)
+        self.grid.addWidget(self.paker_posle_EditType, 18, 4)
+        self.grid.addWidget(self.paker_depth_posle_Label, 17, 5)
+        self.grid.addWidget(self.paker_depth_posle_EditType, 18, 5)
 
-        grid.addWidget(self.paker2_do_Label, 19, 0)
-        grid.addWidget(self.paker2_do_EditType, 20, 0)
-        grid.addWidget(self.paker2_depth_do_Label, 19, 1)
-        grid.addWidget(self.paker2_depth_do_EditType, 20, 1)
-        grid.addWidget(self.paker2_posle_Label, 19, 4)
-        grid.addWidget(self.paker2_posle_EditType, 20, 4)
-        grid.addWidget(self.paker2_depth_posle_Label, 19, 5)
-        grid.addWidget(self.paker2_depth_posle_EditType, 20, 5)
+        self.grid.addWidget(self.paker2_do_Label, 19, 0)
+        self.grid.addWidget(self.paker2_do_EditType, 20, 0)
+        self.grid.addWidget(self.paker2_depth_do_Label, 19, 1)
+        self.grid.addWidget(self.paker2_depth_do_EditType, 20, 1)
+        self.grid.addWidget(self.paker2_posle_Label, 19, 4)
+        self.grid.addWidget(self.paker2_posle_EditType, 20, 4)
+        self.grid.addWidget(self.paker2_depth_posle_Label, 19, 5)
+        self.grid.addWidget(self.paker2_depth_posle_EditType, 20, 5)
 
-        grid.addWidget(self.static_level_Label, 21, 2)
-        grid.addWidget(self.static_level_EditType, 22, 2)
-        grid.addWidget(self.dinamic_level_Label, 21, 3)
-        grid.addWidget(self.dinamic_level_EditType, 22, 3)
+        self.grid.addWidget(self.static_level_Label, 21, 2)
+        self.grid.addWidget(self.static_level_EditType, 22, 2)
+        self.grid.addWidget(self.dinamic_level_Label, 21, 3)
+        self.grid.addWidget(self.dinamic_level_EditType, 22, 3)
 
-        grid.addWidget(self.nkt_do_label, 23, 1)
-        grid.addWidget(self.nkt_posle_label, 24, 5)
+        self.grid.addWidget(self.curator_Label, 23, 3)
+        self.grid.addWidget(self.curator_Combo, 24, 3)
 
-        grid.addWidget(self.sucker_rod_label, 25, 1)
-        grid.addWidget(self.sucker_rod_po_label, 26, 5)
+        self.grid.addWidget(self.nkt_do_label, 27, 1)
+        self.grid.addWidget(self.nkt_posle_label, 27, 5)
+
+        self.grid.addWidget(self.sucker_rod_label, 35, 1)
+        self.grid.addWidget(self.sucker_rod_po_label, 35, 5)
+
+
+
+
 
         # добавление строк с НКТ спущенных
         if len(self.dict_nkt) != 0:
@@ -353,8 +371,8 @@ class TabPage_SO(QWidget):
                 lenght_line_edit = QLineEdit(self)
                 lenght_line_edit.setText(str(self.ifNone(lenght)))
 
-                grid.addWidget(nkt_line_edit, 22 + n, 1)
-                grid.addWidget(lenght_line_edit, 22 + n, 2)
+                self.grid.addWidget(nkt_line_edit, 27 + n, 1)
+                self.grid.addWidget(lenght_line_edit, 27 + n, 2)
 
                 # Переименование атрибута
                 setattr(self, f"{nkt}_{n}_line", nkt_line_edit)
@@ -371,8 +389,8 @@ class TabPage_SO(QWidget):
 
             self.labels_nkt[1] = (nkt_line_edit, lenght_line_edit)
 
-            grid.addWidget(nkt_line_edit, 23, 1)
-            grid.addWidget(lenght_line_edit, 23, 2)
+            self.grid.addWidget(nkt_line_edit, 28, 1)
+            self.grid.addWidget(lenght_line_edit, 28, 2)
 
         # добавление строк с штанг спущенных
         if len(self.dict_sucker_rod) != 0:
@@ -384,8 +402,8 @@ class TabPage_SO(QWidget):
                 lenght_sucker_line_edit = QLineEdit(self)
                 lenght_sucker_line_edit.setText(str(self.ifNone(lenght)))
 
-                grid.addWidget(sucker_rod_line_edit, 27 + n, 1)
-                grid.addWidget(lenght_sucker_line_edit, 27 + n, 2)
+                self.grid.addWidget(sucker_rod_line_edit, 37 + n, 1)
+                self.grid.addWidget(lenght_sucker_line_edit, 37 + n, 2)
 
                 # Переименование атрибута
                 setattr(self, f"sucker_{n}_line", sucker_rod_line_edit)
@@ -403,8 +421,8 @@ class TabPage_SO(QWidget):
 
             self.labels_sucker[1] = (sucker_rod_line_edit, lenght_sucker_line_edit)
 
-            grid.addWidget(sucker_rod_line_edit, 28, 1)
-            grid.addWidget(lenght_sucker_line_edit, 28, 2)
+            self.grid.addWidget(sucker_rod_line_edit, 38, 1)
+            self.grid.addWidget(lenght_sucker_line_edit, 38, 2)
 
         if len(self.dict_nkt_po) != 0:
             # добавление строк с НКТ плановых
@@ -418,8 +436,8 @@ class TabPage_SO(QWidget):
                 lenght_po_line_edit = QLineEdit(self)
                 lenght_po_line_edit.setText(str(self.ifNone(lenght_po)))
 
-                grid.addWidget(nkt_po_line_edit, 22 + n, 5)
-                grid.addWidget(lenght_po_line_edit, 22 + n, 6)
+                self.grid.addWidget(nkt_po_line_edit, 27 + n, 5)
+                self.grid.addWidget(lenght_po_line_edit, 27 + n, 6)
 
                 # Переименование атрибута
                 setattr(self, f"nkt_po_{n}_line", nkt_po_line_edit)
@@ -437,8 +455,8 @@ class TabPage_SO(QWidget):
 
             self.labels_nkt_po[1] = (nkt_po_line_edit, lenght_po_line_edit)
 
-            grid.addWidget(nkt_po_line_edit, 23, 1)
-            grid.addWidget(lenght_po_line_edit, 23, 2)
+            self.grid.addWidget(nkt_po_line_edit, 28, 1)
+            self.grid.addWidget(lenght_po_line_edit, 28, 2)
         # добавление строк с штангами плановых
 
         if len(self.dict_sucker_rod_po) != 0:
@@ -451,8 +469,8 @@ class TabPage_SO(QWidget):
                 lenght_sucker_po_line_edit = QLineEdit(self)
                 lenght_sucker_po_line_edit.setText(str(self.ifNone(lenght_po)))
 
-                grid.addWidget(sucker_rod_po_line_edit, 27 + n, 5)
-                grid.addWidget(lenght_sucker_po_line_edit, 27 + n, 6)
+                self.grid.addWidget(sucker_rod_po_line_edit, 37 + n, 5)
+                self.grid.addWidget(lenght_sucker_po_line_edit, 37 + n, 6)
 
                 # Переименование атрибута
                 setattr(self, f"sucker_{n}_line", sucker_rod_po_line_edit)
@@ -470,8 +488,153 @@ class TabPage_SO(QWidget):
 
             self.labels_sucker_po[1] = (sucker_rod_po_line_edit, lenght_sucker_po_line_edit)
 
-            grid.addWidget(sucker_rod_po_line_edit, 28, 5)
-            grid.addWidget(lenght_sucker_po_line_edit, 28, 6)
+            self.grid.addWidget(sucker_rod_po_line_edit, 38, 5)
+            self.grid.addWidget(lenght_sucker_po_line_edit, 38, 6)
+
+        if self.curator_Combo.currentText() == 'ОР':
+
+            self.expected_Q_label = QLabel('Ожидаемая приемистость')
+            self.expected_Q_Edit = FloatLineEdit(self)
+            try:
+                self.expected_Q_Edit.setText(f'{CreatePZ.expected_Q}')
+                # print(f'ожидаемая приемистисть{CreatePZ.expected_Q}')
+            except:
+                pass
+            self.grid.addWidget(self.expected_Q_label, 25, 2)
+            self.grid.addWidget(self.expected_Q_Edit, 26, 2)
+
+            self.expected_P_label = QLabel('Ожидаемое давление закачки')
+            self.expected_P_Edit = FloatLineEdit(self)
+            try:
+                self.expected_P_Edit.setText(f'{CreatePZ.expected_P}')
+            except:
+                pass
+            self.grid.addWidget(self.expected_P_label, 25, 3)
+            self.grid.addWidget(self.expected_P_Edit, 26, 3)
+        else:
+            self.Qwater_Label = QLabel('Дебит по жидкости')
+            self.Qwater_Edit = FloatLineEdit(self)
+            try:
+                self.Qwater_Edit.setText(f'{CreatePZ.Qwater}')
+            except:
+                pass
+            self.grid.addWidget(self.Qwater_Label, 25, 1)
+            self.grid.addWidget(self.Qwater_Edit, 26, 1)
+            self.Qoil_Label = QLabel('Дебит по нефти')
+            self.Qoil_Edit = FloatLineEdit(self)
+            try:
+                self.Qoil_Edit.setText(f'{CreatePZ.Qoil}')
+            except:
+                pass
+            self.grid.addWidget(self.Qoil_Label, 25, 2)
+            self.grid.addWidget(self.Qoil_Edit, 26, 2)
+            self.proc_water_Label = QLabel('Обводненность')
+
+            self.proc_water_Edit = FloatLineEdit(self)
+            try:
+                self.proc_water_Edit.setText(f'{CreatePZ.proc_water}')
+            except:
+                pass
+            self.grid.addWidget(self.proc_water_Label, 25, 3)
+            self.grid.addWidget(self.proc_water_Edit, 26, 3)
+
+        curator_list = ['ГРР', 'ОР', 'ГТМ','ГО', 'ВНС']
+        self.curator_Combo.addItems(curator_list)
+        # print(self.pump_SHGN_posle_EditType.text() != 'отсут', self.pump_ECN_posle_EditType.text() != 'отсут')
+
+        curator = 'ОР' if (self.pump_SHGN_posle_EditType.text() == 'отсут' \
+                          and self.pump_ECN_posle_EditType.text() == 'отсут') else 'ГТМ'
+        self.curator_Combo.currentTextChanged.connect(self.update_curator)
+        # print(f'куратор индекс {curator, curator_list.index(curator)}')
+        self.curator_Combo.setCurrentIndex(curator_list.index(curator))
+    def update_curator(self):
+        from open_pz import CreatePZ
+
+
+        # Очистка и удаление существующих виджетов, если они уже были добавлены ранее
+
+        try:
+            self.expected_P_label.setParent(None)
+        except:
+            pass
+        try:
+            self.expected_P_Edit.setParent(None)
+        except:
+            pass
+        try:
+            self.expected_Q_label.setParent(None)
+        except:
+            pass
+        try:
+            self.expected_Q_Edit.setParent(None)
+        except:
+            pass
+        try:
+            self.Qwater_Label.setParent(None)
+        except:
+            pass
+        try:
+            self.Qwater_Edit.setParent(None)
+        except:
+            pass
+        try:
+            self.Qoil_Label.setParent(None)
+        except:
+            pass
+        try:
+            self.Qoil_Edit.setParent(None)
+        except:
+            pass
+        try:
+            self.proc_water_Label.setParent(None)
+        except:
+            pass
+        try:
+            self.proc_water_Edit.setParent(None)
+        except:
+            pass
+
+        if self.curator_Combo.currentText() == 'ОР':
+            self.expected_Q_label = QLabel('Ожидаемая приемистость')
+            self.expected_Q_Edit = FloatLineEdit(self)
+            try:
+                self.expected_Q_Edit.setText(f'{CreatePZ.expected_Q}')
+            except:
+                pass
+            self.grid.addWidget(self.expected_Q_label, 25, 4)
+            self.grid.addWidget(self.expected_Q_Edit, 26, 4)
+
+            self.expected_P_label = QLabel('Ожидаемое давление закачки')
+            self.expected_P_Edit = FloatLineEdit(self)
+            self.expected_P_Edit.setText(f'{CreatePZ.expected_P}')
+            self.grid.addWidget(self.expected_P_label, 25, 5)
+            self.grid.addWidget(self.expected_P_Edit, 26, 5)
+        else:
+            self.Qwater_Label = QLabel('Дебит по жидкости')
+            self.Qwater_Edit = FloatLineEdit(self)
+            try:
+                self.Qwater_Edit.setText(f'{CreatePZ.Qwater}')
+            except:
+                pass
+            self.grid.addWidget(self.Qwater_Label, 25, 1)
+            self.grid.addWidget(self.Qwater_Edit, 26, 1)
+            self.Qoil_Label = QLabel('Дебит по нефти')
+            self.Qoil_Edit = FloatLineEdit(self)
+            try:
+                self.Qoil_Edit.setText(f'{CreatePZ.Qoil}')
+            except:
+                pass
+            self.grid.addWidget(self.Qoil_Label, 25, 2)
+            self.grid.addWidget(self.Qoil_Edit, 26, 2)
+            self.proc_water_Label = QLabel('Обводненность')
+
+            self.proc_water_Edit = FloatLineEdit(self)
+            try:
+                self.proc_water_Edit.setText(f'{CreatePZ.proc_water}')
+            except:
+                pass
+            self.grid.addWidget(self.proc_water_Label, 25, 3)
+            self.grid.addWidget(self.proc_water_Edit, 26, 3)
 
     def ifNone(self, string):
 
@@ -537,6 +700,7 @@ class DataWindow(QMainWindow):
         bottomhole_drill = self.tabWidget.currentWidget().bottomhole_drill_EditType.text()
         bottomhole_artificial = self.tabWidget.currentWidget().bottomhole_artificial_EditType.text()
         current_bottom = self.tabWidget.currentWidget().current_bottom_EditType.text()
+        max_angle_H = self.tabWidget.currentWidget().max_angle_H_EditType.text()
         max_angle = self.tabWidget.currentWidget().max_angle_EditType.text()
         max_expected_pressure = self.tabWidget.currentWidget().max_expected_pressure_EditType.text()
         max_admissible_pressure = self.tabWidget.currentWidget().max_admissible_pressure_EditType.text()
@@ -575,13 +739,22 @@ class DataWindow(QMainWindow):
 
         static_level = self.tabWidget.currentWidget().static_level_EditType.text()
         dinamic_level = self.tabWidget.currentWidget().dinamic_level_EditType.text()
+        curator = str(self.tabWidget.currentWidget().curator_Combo.currentText())
+
+        if curator == 'ОР':
+            expected_Q_Edit = self.tabWidget.currentWidget().expected_Q_Edit.text()
+            expected_P_Edit = self.tabWidget.currentWidget().expected_P_Edit.text()
+        else:
+            Qwater_Edit = self.tabWidget.currentWidget().Qwater_Edit.text()
+            Qoil_Edit = self.tabWidget.currentWidget().Qoil_Edit.text()
+            proc_water_Edit = self.tabWidget.currentWidget().proc_water_Edit.text()
 
         # Пересохранение данных по НКТ и штангам
         self.dict_sucker_rod = CreatePZ.dict_sucker_rod
         self.dict_sucker_rod = CreatePZ.dict_sucker_rod_po
         self.dict_nkt = CreatePZ.dict_nkt
         self.dict_nkt_po = CreatePZ.dict_nkt_po
-        print(self.dict_nkt, self.dict_nkt_po)
+        # print(self.dict_nkt, self.dict_nkt_po)
         if self.dict_nkt:
             for key in range(1, len(self.dict_nkt)):
                 CreatePZ.dict_nkt[self.tabWidget.currentWidget().labels_nkt[key][0].text()] = self.if_None(
@@ -601,15 +774,6 @@ class DataWindow(QMainWindow):
                 CreatePZ.dict_nkt[self.tabWidget.currentWidget().labels_nkt_po[1][0].text()] = self.if_None(
                     self.tabWidget.currentWidget().labels_nkt_po[1][1].text())
 
-        # if self.dict_sucker_rod:
-        #     for key in range(1, len(self.dict_sucker_rod)):
-        #         print(self.tabWidget.currentWidget().labels_sucker)
-        #         CreatePZ.dict_sucker_rod[self.tabWidget.currentWidget().labels_sucker[key][0].text()] = self.if_None(
-        #             self.tabWidget.currentWidget().labels_sucker[key][1].text())
-        # else:
-        #     if self.tabWidget.currentWidget().labels_sucker[1][1].text():
-        #         CreatePZ.dict_sucker_rod[self.tabWidget.currentWidget().labels_sucker[1][0].text()] = self.if_None(
-        #             self.tabWidget.currentWidget().labels_sucker[1][1].text())
 
         if self.dict_sucker_rod.items():
             for key in range(1, len(self.dict_sucker_rod.items())):
@@ -624,22 +788,22 @@ class DataWindow(QMainWindow):
 
         close_file = True
         # print(f'голова {[self.ifNum(columnType), self.ifNum(column_wall_thickness), self.ifNum(shoe_column)]}')
-        if any([data_well == 'отсут' for data_well in
+        if any([self.ifNum(data_well) is False for data_well in
                 [columnType, column_wall_thickness, shoe_column]]):
             msg = QMessageBox.information(self, 'Внимание', 'Не все поля в данных колонне соответствуют значениям')
             close_file = False
         elif CreatePZ.column_additional \
-                and any([data_well == 'отсут' for data_well in
-                     [column_additional_diametr,
-                      column_additional_wall_thickness,
+                and any([self.ifNum(data_well) is False for data_well in
+                     [column_additional_diametr, column_additional_wall_thickness,
                       shoe_column_additional, head_column_additional]]):
             msg = QMessageBox.information(self, 'Внимание', 'Не все поля в доп колонне соответствуют значениям')
             close_file = False
         elif self.ifNum(bottomhole_artificial) is False \
            or self.ifNum(bottomhole_drill) is False \
            or self.ifNum(current_bottom) is False \
-           or self.ifNum(max_angle) is False \
-           or self.ifNum(max_admissible_pressure) is False \
+           or self.ifNum(max_angle_H) is False \
+            or self.ifNum(max_angle) is False \
+            or self.ifNum(max_admissible_pressure) is False \
            or self.ifNum(max_expected_pressure) is False:
             msg = QMessageBox.information(self, 'Внимание', 'Не все поля в забое соответствуют значениям')
             close_file = False
@@ -673,7 +837,6 @@ class DataWindow(QMainWindow):
 
             msg = QMessageBox.information(self, 'Внимание', 'Не все поля в кондукторе соответствуют значениям')
             close_file = False
-
         elif any(['НВ' in dict_pump_SHGN_do.upper(), 'ШГН' in dict_pump_SHGN_do.upper(),
                   'НН' in dict_pump_SHGN_do.upper(), dict_pump_SHGN_do == 'отсут',
                   'RHAM' in dict_pump_SHGN_do]) is False \
@@ -695,11 +858,15 @@ class DataWindow(QMainWindow):
 
             msg = QMessageBox.information(self, 'Внимание', 'Не все поля соответствуют значениям')
             close_file = False
-
-        elif self.if_None(20 if self.ifNum(head_column_additional) else head_column_additional) < 5:
-        # print(self.if_None(head_column_additional))
-            msg = QMessageBox.information(self, 'Внимание', 'В скважине отсутствует доп колонна')
-            close_file = False
+        elif isinstance(self.ifNum(head_column_additional), str):
+            # print(self.if_None(head_column_additional), isinstance(self.ifNum(head_column_additional), str))
+            if self.if_None(20 if self.ifNum(head_column_additional) else head_column_additional) < 5:
+            # print(self.if_None(head_column_additional))
+                msg = QMessageBox.information(self, 'Внимание', 'В скважине отсутствует доп колонна')
+                close_file = False
+            else:
+                msg = QMessageBox.information(self, 'Внимание', 'В скважине отсутствует доп колонна')
+                close_file = False
 
         elif all([pump for pump in [self.ifNum(dict_pump_ECN_do), self.ifNum(paker2_do),
                                                self.ifNum(dict_pump_SHGN_do), self.ifNum(paker_do)]]):
@@ -719,7 +886,27 @@ class DataWindow(QMainWindow):
                 close_file = False
             else:
                 close_file = True
+        elif (CreatePZ.nkt_mistake == True and len(CreatePZ.dict_nkt) != 0) or \
+                (CreatePZ.nkt_mistake == True and len(CreatePZ.dict_nkt_po) != 0):
+            msg = QMessageBox.information(self, 'Внимание',
+                                          'При вызванной ошибке НКТ до ремонта не может быть пустым')
+            close_file = False
+        elif CreatePZ.nkt_mistake == True and len(CreatePZ.dict_nkt_po) != 0:
+            msg = QMessageBox.information(self, 'Внимание',
+                                          'При вызванной ошибке НКТ до ремонта не может быть пустым')
+            close_file = False
 
+        if curator == 'ОР':
+            if self.ifNum(expected_Q_Edit) is False or self.ifNum(expected_P_Edit) is False:
+                msg = QMessageBox.information(self, 'Внимание',
+                                              'Не все поля в Ожидаемых показателях соответствуют значениям')
+                close_file = False
+        else:
+            if self.ifNum(Qwater_Edit) is False or self.ifNum(Qoil_Edit) is False or\
+                    self.ifNum(proc_water_Edit) is False:
+                msg = QMessageBox.information(self, 'Внимание',
+                                              'Не все поля в Ожидаемых показателях соответствуют значениям')
+                close_file = False
         if close_file is False:
             return
         elif close_file == True:
@@ -771,7 +958,17 @@ class DataWindow(QMainWindow):
             CreatePZ.column_conductor_wall_thickness = self.if_None(column_conductor_wall_thickness)
             CreatePZ.column_conductor_lenght = self.if_None(column_conductor_lenght)
             CreatePZ.level_cement_conductor = self.if_None(level_cement_conductor)
+            if curator == 'ОР':
+                CreatePZ.expected_P = self.if_None(expected_P_Edit)
+                CreatePZ.expected_Q = self.if_None(expected_Q_Edit)
+                CreatePZ.expected_pick_up[CreatePZ.expected_Q] = CreatePZ.expected_P
+                CreatePZ.proc_water = 100
+            else:
+                CreatePZ.Qoil = self.if_None(Qoil_Edit)
+                CreatePZ.Qwater = self.if_None(Qwater_Edit)
+                CreatePZ.proc_water = int(self.if_None(proc_water_Edit))
 
+            CreatePZ.curator = curator
             CreatePZ.pause = False
             self.close()
 

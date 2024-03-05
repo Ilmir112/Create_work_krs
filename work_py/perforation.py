@@ -306,7 +306,7 @@ class PerforationWindow(QMainWindow):
                        [None, None, "Кровля", "-", "Подошва", "Тип заряда", "отв на 1 п.м.", "Кол-во отв",
                       "пласт", "Доп.данные", 'подрядчик по ГИС', None]
                        ]
-        print(f'до {CreatePZ.plast_work}')
+        # print(f'до {CreatePZ.plast_work}')
         for row in range(rows):
             item = self.tableWidget.item(row, 1)
             if item:

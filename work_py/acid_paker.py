@@ -96,12 +96,12 @@ class CheckableComboBoxChild(QComboBox):
         for i in range(self.model().rowCount()):
 
             if self.model().item(i).checkState() == Qt.Checked:
-                print(self.model().item(i).text())
+                # print(self.model().item(i).text())
 
                 CreatePZ.texts.append(self.model().item(i).text())
-                print(f' список пласлов{CreatePZ.texts}')
+                # print(f' список пласлов{CreatePZ.texts}')
         text = ", ".join(CreatePZ.texts)
-        print(text)
+        # print(text)
 
         # Compute elided text (with "...")
         metrics = QFontMetrics(self.lineEdit().font())
@@ -337,7 +337,7 @@ class TabPage_SO(QWidget):
         dict_perforation = CreatePZ.dict_perforation
 
         plasts = CreatePZ.texts
-        print(f'пласты {plasts, len(CreatePZ.texts), len(plasts), CreatePZ.texts}')
+        # print(f'пласты {plasts, len(CreatePZ.texts), len(plasts), CreatePZ.texts}')
         roof_plast = CreatePZ.current_bottom
         sole_plast = 0
         for plast in CreatePZ.plast_work:
@@ -359,12 +359,12 @@ class TabPage_SO(QWidget):
                 self.pakerEdit.setText(f"{paker_depth}")
                 self.khvostEdit.setText(str(int(sole_plast - paker_depth)))
                 self.swab_pakerEdit.setText(str(int(paker_depth - 30)))
-        print(f'кровля {roof_plast}, подошва {sole_plast}')
+        # print(f'кровля {roof_plast}, подошва {sole_plast}')
     def update_paker_edit(self):
         dict_perforation = CreatePZ.dict_perforation
 
         plasts = CreatePZ.texts
-        print(plasts)
+        # print(plasts)
         roof_plast = CreatePZ.current_bottom
         sole_plast = 0
         for plast in CreatePZ.plast_work:
@@ -386,7 +386,7 @@ class TabPage_SO(QWidget):
             if paker_depth:
                 self.khvostEdit.setText(str(int(sole_plast - int(paker_depth))))
                 self.swab_pakerEdit.setText(str(int(paker_depth) - 30))
-        print(f'кровля {roof_plast}, подошва {sole_plast}')
+        # print(f'кровля {roof_plast}, подошва {sole_plast}')
 
 class TabWidget(QTabWidget):
     def __init__(self):
@@ -701,7 +701,7 @@ class AcidPakerWindow(MyWindow):
                                  f'методом дренирования.',
                      None, None, None, None, None, None, None,
                      'мастер КРС, УСРСиСТ', 0.83 + 0.2 + 0.83 + 0.5 + 0.5]]
-        print(f'СКВ {svkTrueEdit}')
+        # print(f'СКВ {svkTrueEdit}')
         if svkTrueEdit == 'Нужно СКВ':
             for row in skv_list:
                 paker_list.append(row)

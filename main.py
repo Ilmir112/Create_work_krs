@@ -1,8 +1,11 @@
 import os
 import sqlite3
 import sys
+import win32com.client
 import openpyxl
 from openpyxl.reader.excel import load_workbook
+
+from collections import namedtuple
 
 import krs
 import time
@@ -21,7 +24,7 @@ from H2S import calc_H2S
 from PyQt5.QtCore import QThread, pyqtSignal
 from data_correct_position_people import CorrectSignaturesWindow
 from data_base.work_with_base import Classifier_well
-from work_py.gnkt_frez import Work_with_gnkt
+
 
 
 class ExcelWorker(QThread):
@@ -32,7 +35,7 @@ class ExcelWorker(QThread):
 
 
     def check_well_existence(self, well_number, deposit_area, region):
-        print(f'jghfjlt {well_number, deposit_area, region}')
+        # print(f'jghfjlt {well_number, deposit_area, region}')
 
 
         # Подключение к базе данных SQLite
@@ -203,6 +206,7 @@ class MyWindow(QMainWindow):
         self.table_juming = None
 
 
+
         self.perforation_correct_window2 = None
         self.ws = None
         self.ins_ind = None
@@ -313,6 +317,7 @@ class MyWindow(QMainWindow):
     @QtCore.pyqtSlot()
     def action_clicked(self):
         from open_pz import CreatePZ
+        from work_py.gnkt_frez import Work_with_gnkt
         action = self.sender()
         if action == self.create_KRS:
             self.work_plan = 'krs'
@@ -579,14 +584,21 @@ class MyWindow(QMainWindow):
                                                   f"{full_path}", "Excel Files (*.xlsx)")
         if fileName:
             wb2.save(full_path)
+        # Создаем объект Excel
+        excel = win32com.client.Dispatch("Excel.Application")
+
+        # Открываем файл
+        workbook = excel.Workbooks.Open(full_path)
+
+        # Отображаем Excel
+        excel.Visible = True
 
     def save_to_excel(self):
-        from open_pz import CreatePZ
+        from work_py.gnkt_frez import Work_with_gnkt
 
         if self.work_plan != 'gnkt_frez':
             self.save_to_krs()
         else:
-            from work_py.gnkt_frez import Work_with_gnkt
             Work_with_gnkt.save_to_gnkt(self)
 
 
@@ -624,7 +636,7 @@ class MyWindow(QMainWindow):
                 work_list.append(row_lst)
 
             merged_cells_dict = {}
-            print(f' индекс объ {ins_ind}')
+            # print(f' индекс объ {ins_ind}')
             for row in merged_cells:
                 if row[0] >= ins_ind - 1:
                     merged_cells_dict.setdefault(row[0], []).append(row[1])
@@ -638,7 +650,7 @@ class MyWindow(QMainWindow):
                     if work_list[i][0]:
                         plan_short += f'п.{work_list[i][1]} {work_list[i][0]} \n'
 
-            print(f'Нормы времени - {CreatePZ.normOfTime}')
+            # print(f'Нормы времени - {CreatePZ.normOfTime}')
             # print(f'строки {ins_ind}')
             CreatePZ.count_row_height(self.ws, ws2, work_list, merged_cells_dict, ins_ind)
             # print(f'3 - {ws2.max_row}')
@@ -678,13 +690,17 @@ class MyWindow(QMainWindow):
                 self.insert_image(ws2, 'imageFiles/Хасаншин.png', 'H1')
                 self.insert_image(ws2, 'imageFiles/Шамигулов.png', 'H4')
 
-                if 2 in CreatePZ.cat_H2S_list or 1 in CreatePZ.cat_H2S_list and self.work_plan != 'dop_plan':
+                cat_H2S_list = CreatePZ.dict_category[CreatePZ.plast_work[0]]['по сероводороду'].category
+                H2S_mg = CreatePZ.dict_category[CreatePZ.plast_work[0]]['по сероводороду'].data_mg_l
+                H2S_pr = CreatePZ.dict_category[CreatePZ.plast_work[0]]['по сероводороду'].data_procent
+
+                if cat_H2S_list  in [1, 2] and self.work_plan != 'dop_plan':
                     ws3 = wb2.create_sheet('Sheet1')
                     ws3.title = "Расчет необходимого количества поглотителя H2S"
                     ws3 = wb2["Расчет необходимого количества поглотителя H2S"]
-                    calc_H2S(ws3, CreatePZ.H2S_pr, CreatePZ.H2S_mg)
+                    calc_H2S(ws3, H2S_pr, H2S_mg)
                 else:
-                    print(f'{CreatePZ.cat_H2S_list} Расчет поглотителя сероводорода не требуется')
+                    print(f'Расчет поглотителя сероводорода не требуется')
 
             ws2.print_area = f'B1:L{self.table_widget.rowCount() + 45}'
             ws2.page_setup.fitToPage = True
@@ -703,8 +719,8 @@ class MyWindow(QMainWindow):
             full_path = path + '/' + filenames
             # print(f'10 - {ws2.max_row}')
             # print(wb2.path)
-            print(f' кате {CreatePZ.cat_P_1}')
-            if 1 in CreatePZ.cat_P_1 or 1 in CreatePZ.cat_H2S_list or 1 in CreatePZ.cat_gaz_f_pr:
+            # print(f' кате {CreatePZ.cat_P_1}')
+            if CreatePZ.bvo:
                 ws5 = wb2.create_sheet('Sheet1')
                 ws5.title = "Схемы ПВО"
                 ws5 = wb2["Схемы ПВО"]
@@ -720,6 +736,7 @@ class MyWindow(QMainWindow):
                 self.wb.close()
 
     def close_file(self):
+        from find import ProtectedIsNonNone
         from open_pz import CreatePZ
         if not self.table_widget is None:
             self.table_widget.close()
@@ -751,7 +768,20 @@ class MyWindow(QMainWindow):
             CreatePZ.kat_pvo = 2
             CreatePZ.gaz_f_pr = []
             CreatePZ.paker_layout = 0
-
+            CreatePZ.cat_P_P = []
+            CreatePZ.column_direction_diametr = ProtectedIsNonNone('отсут')
+            CreatePZ.column_direction_wall_thickness = ProtectedIsNonNone('отсут')
+            CreatePZ.column_direction_lenght = ProtectedIsNonNone('отсут')
+            CreatePZ.column_conductor_diametr = ProtectedIsNonNone('отсут')
+            CreatePZ.column_conductor_wall_thickness = ProtectedIsNonNone('отсут')
+            CreatePZ.column_conductor_lenght = ProtectedIsNonNone('отсут')
+            CreatePZ.column_additional_diametr = ProtectedIsNonNone('отсут')
+            CreatePZ.column_additional_wall_thickness = ProtectedIsNonNone('отсут')
+            CreatePZ.head_column_additional = ProtectedIsNonNone('отсут')
+            CreatePZ.shoe_column_additional = ProtectedIsNonNone('отсут')
+            CreatePZ.column_diametr = ProtectedIsNonNone('отсут')
+            CreatePZ.column_wall_thickness = ProtectedIsNonNone('отсут')
+            CreatePZ.shoe_column = ProtectedIsNonNone('отсут')
             CreatePZ.column_additional_diametr = 0
             CreatePZ.column_additional_wall_thickness = 0
             CreatePZ.shoe_column_additional = 0
@@ -827,6 +857,9 @@ class MyWindow(QMainWindow):
             CreatePZ.bvo = False
             CreatePZ.old_version = False
             CreatePZ.image_list = []
+            CreatePZ.problem_with_ek = False
+            CreatePZ.problem_with_ek_depth = CreatePZ.current_bottom
+            CreatePZ.problem_with_ek_diametr = CreatePZ.column_diametr
             path = "imageFiles/image_work"
             for file in os.listdir(path):
                 file_path = os.path.join(path, file)
@@ -1390,7 +1423,10 @@ class MyWindow(QMainWindow):
             self.work_window.setGeometry(200, 400, 300, 400)
             self.work_window.show()
             CreatePZ.pause_app(self)
+            work_list = OpressovkaEK.addRowTable()
+            # print(work_list)
             CreatePZ.pause = True
+            self.populate_row(self, CreatePZ.ins_ind, work_list)
             self.work_window = None
         else:
             self.work_window.close()  # Close window.
@@ -1561,7 +1597,7 @@ class MyWindow(QMainWindow):
                         value = value.text()
                         if 'схеме №' in value or 'схемы №' in value:
                             schema_pvo_set.add(value[value.index(' №')+1:value.index(' №')+4].replace(' ', ''))
-        print(f'схема ПВО {schema_pvo_set}')
+        # print(f'схема ПВО {schema_pvo_set}')
 
 
         n = 0
@@ -1850,8 +1886,10 @@ class MyWindow(QMainWindow):
             ws4.cell(row=10, column=1).value = f'Qн {CreatePZ.Qoil}т Qж- {CreatePZ.Qwater}м3/сут'
         ws4.cell(row=11, column=1).value = f'макс угол {CreatePZ.max_angle} на {CreatePZ.max_angle_H._value}'
         ws4.cell(row=1, column=2).value = CreatePZ.cdng._value
-        ws4.cell(row=2, column=3).value = f'Рпл - {CreatePZ.cat_P_1[0]}, H2S -{CreatePZ.cat_H2S_list[0]},' \
-                                          f' газ факт -{CreatePZ.gaz_f_pr[0]}т/м3'
+        ws4.cell(row=2, column=3).value = \
+            f'Рпл - {CreatePZ.dict_category[CreatePZ.plast_work[0]]["по давлению"].category},' \
+              f' H2S -{CreatePZ.dict_category[CreatePZ.plast_work[0]]["по сероводороду"].category},' \
+              f' газ факт -{CreatePZ.gaz_f_pr[0]}т/м3'
         column_well = f'{CreatePZ.column_diametr}х{CreatePZ.column_wall_thickness} в инт 0 - {CreatePZ.shoe_column}м ' \
             if CreatePZ.column_additional is False else f'{CreatePZ.column_diametr} х {CreatePZ.column_wall_thickness} \n' \
                                                f'0 - {CreatePZ.shoe_column}м/\n{CreatePZ.column_additional_diametr}' \

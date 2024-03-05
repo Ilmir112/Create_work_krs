@@ -1,10 +1,8 @@
 import H2S
 from PyQt5.QtWidgets import QInputDialog, QMessageBox
 from datetime import datetime
-from openpyxl import load_workbook
+from collections import namedtuple
 
-from main import ExcelWorker
-from work_py.descent_gno import gno_nkt_opening
 from work_py.rationingKRS import liftingNKT_norm
 
 
@@ -36,28 +34,37 @@ def calc_work_fluid(self, work_plan):
                                                              'Введите забой до которого нужно нормализовать',
                                                              float(CreatePZ.current_bottom))
     # Задаем начальную и конечную даты периода
-    start_date = datetime.strptime('01-12', '%d-%m').date()
-    end_date = datetime.strptime('01-04', '%d-%m').date()
+    current_date = datetime.now().date()
+    if current_date.month > 4:
+        start_date = datetime(current_date.year, 12, 1).date()
+        end_date = datetime(current_date.year + 1, 4, 1).date()
+    else:
+        start_date = datetime(current_date.year-1, 12, 1).date()
+        end_date =datetime(current_date.year, 4, 1).date()
 
     # Проверяем условие: если текущая дата находится в указанном периоде
-    current_date = datetime.now().date()
 
     try:
-
+        fluid_p = 1.01
         for plast in CreatePZ.plast_work:
             if float(list(CreatePZ.dict_perforation[plast]['рабочая жидкость'])[0]) > fluid_p:
                 fluid_p = list(CreatePZ.dict_perforation[plast]['рабочая жидкость'])[0]
         fluid_list.append(fluid_p)
-        if start_date <= current_date <= end_date and max(fluid_list) <= 1.18:
-            fluid_max = 1.18
+        if max(fluid_list) <= 1.18:
+
+            if start_date <= current_date <= end_date and max(fluid_list) <= 1.18:
+                fluid_max = 1.18
+            else:
+                fluid_max = max(fluid_list)
         else:
             fluid_max = max(fluid_list)
-        if work_plan == 'gnkt_frez':
+        if work_plan == 'gnkt_frez' or work_plan == 'gnkt_opz':
             fluid_max = 1.18
         fluid_work_insert, ok = QInputDialog.getDouble(self, 'Рабочая жидкость',
                                                        'Введите удельный вес рабочей жидкости',
-                                                       fluid_max, fluid_p, 2, 2)
+                                                       fluid_max, 0.87, 2, 2)
     except:
+        mes = QMessageBox.warning(None,'Ошибка', 'Ошибка в определении удельного веса рабочей жидкости')
 
         if work_plan == 'gnkt_frez':
             fluid_max = fluid_p
@@ -68,23 +75,18 @@ def calc_work_fluid(self, work_plan):
     CreatePZ.fluid = fluid_work_insert
     CreatePZ.fluid_short = fluid_work_insert
 
-    if str(CreatePZ.cat_H2S_list[0]) in ['2', '1']:
+    cat_H2S_list = CreatePZ.dict_category[CreatePZ.plast_work[0]]['по сероводороду'].category
+    H2S_mg = CreatePZ.dict_category[CreatePZ.plast_work[0]]['по сероводороду'].data_mg_l
+    H2S_pr = CreatePZ.dict_category[CreatePZ.plast_work[0]]['по сероводороду'].data_procent
+    if cat_H2S_list in [2, 1]:
         fluid_work = f'{fluid_work_insert}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
-                     f'расчета {H2S.calv_h2s(self, CreatePZ.cat_H2S_list[0], CreatePZ.H2S_mg[0], CreatePZ.H2S_pr[0])}кг/м3 '
-        fluid_work_short = f'{fluid_work_insert}г/см3 c ХИМТЕХНО 101 Марка А - {H2S.calv_h2s(self, CreatePZ.cat_H2S_list[0], CreatePZ.H2S_mg[0], CreatePZ.H2S_pr[0])}кг/м3 '
+                     f'расчета {H2S.calv_h2s(self, cat_H2S_list, H2S_mg, H2S_pr)}кг/м3 '
+        fluid_work_short = f'{fluid_work_insert}г/см3 c ' \
+                           f'ХИМТЕХНО 101 Марка А - {H2S.calv_h2s(self, cat_H2S_list, H2S_mg, H2S_pr)}кг/м3 '
     else:
         fluid_work = f'{fluid_work_insert}г/см3 '
         fluid_work_short = f'{fluid_work_insert}г/см3'
 
-    if len(CreatePZ.cat_H2S_list) > 1:
-        # print(CreatePZ.cat_H2S_list, CreatePZ.H2S_mg, CreatePZ.H2S_pr)
-        if CreatePZ.cat_H2S_list[0] == 3 and CreatePZ.cat_H2S_list[1] == 2:
-            data_h2s_Question = QMessageBox.question(None, "Данные по классификатору", "Является ли данные по H2S "
-                                                                                       "по второму блоку для работающего пласта")
-            if data_h2s_Question == QMessageBox.StandardButton.Yes:
-                fluid_work = f'{fluid_work_insert}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
-                             f'расчета {H2S.calv_h2s(self, CreatePZ.cat_H2S_list[1], CreatePZ.H2S_mg[1], CreatePZ.H2S_pr[1])}кг/м3'
-                fluid_work_short = f'{fluid_work_insert}г/см3 c ХИМТЕХНО 101 Марка А - {H2S.calv_h2s(self, CreatePZ.cat_H2S_list[1], CreatePZ.H2S_mg[1], CreatePZ.H2S_pr[1])}кг/м3 '
 
     return fluid_work, fluid_work_short
 
@@ -1180,6 +1182,7 @@ def volume_vn_ek(self, current):
     else:
         volume = round((CreatePZ.column_additional_diametr - 2 * CreatePZ.column_additional_wall_thickness) ** 2 * 3.14 / 4 / 1000,
             2)
+    print(f'внутренний объем ЭК {volume}')
     return volume
 
 

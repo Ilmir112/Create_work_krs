@@ -205,13 +205,30 @@ def razdel_1(self, region):
         [None, f'"____"_____________________{current_datetime.year}г.', None, None, None, None, None, None,
          None, None, None,
          None]]
+    cat_P_1 = CreatePZ.dict_category[CreatePZ.plast_work[0]]['по давлению'].category
 
-    if '1' in CreatePZ.cat_P_1 or '1' in CreatePZ.cat_H2S_list or 1 in CreatePZ.cat_P_1 or 1 in CreatePZ.cat_H2S_list \
-            or CreatePZ.curator == 'ВНС':
 
+    cat_H2S_list = CreatePZ.dict_category[CreatePZ.plast_work[0]]['по сероводороду'].category
+
+    cat_gaz = CreatePZ.dict_category[CreatePZ.plast_work[0]]['по газовому фактору'].category
+    try:
+        cat_P_1_plan = CreatePZ.dict_category[CreatePZ.plast_project[0]]['по давлению'].category
+        cat_H2S_list_plan = CreatePZ.dict_category[CreatePZ.plast_project[0]]['по сероводороду'].category
+        cat_gaz_plan = CreatePZ.dict_category[CreatePZ.plast_project[0]]['по газовому фактору'].category
+    except:
+        cat_P_1_plan = 3
+        cat_H2S_list_plan = 3
+        cat_gaz_plan = 3
+
+    if 1 in [cat_P_1, cat_P_1_plan, cat_H2S_list, cat_gaz, cat_H2S_list_plan, cat_gaz_plan] or\
+            CreatePZ.curator == 'ВНС':
         for row in range(len(podp_bvo)):
             for col in range(len(podp_bvo[row])):
                 razdel_1[row + 9][col] = podp_bvo[row][col]
+    if 1 in [cat_P_1, cat_H2S_list, cat_gaz] or \
+            CreatePZ.curator == 'ВНС':
+        CreatePZ.kat_pvo = 1
+        CreatePZ.bvo = True
 
     if CreatePZ.grpPlan == True:
         for row in range(len(podp_grp)):

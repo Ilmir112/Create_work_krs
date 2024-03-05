@@ -120,7 +120,7 @@ class TabWidget(QTabWidget):
         super().__init__()
         self.addTab(TabPage_SO(self), 'Выбор компоновки шаблонов')
 class OpressovkaEK(QMainWindow):
-    def __init__(self, table_widget, ins_ind):
+    def __init__(self, table_widget, ins_ind, forRirTrue = False):
         super(OpressovkaEK, self).__init__()
 
         self.centralWidget = QWidget()
@@ -128,6 +128,7 @@ class OpressovkaEK(QMainWindow):
         self.table_widget = table_widget
         self.ins_ind = ins_ind
         self.paker_select = None
+        self.forRirTrue = forRirTrue
         self.tabWidget = TabWidget()
 
         self.buttonAdd = QPushButton('Добавить данные в план работ')
@@ -151,9 +152,12 @@ class OpressovkaEK(QMainWindow):
                                                                    f'ниже текущего забоя')
             return
         work_list = self.paker_list(diametr_paker, paker_khost, paker_depth, pakerDepthZumpf, pressureZUMPF_question)
-        AcidPakerWindow.populate_row(self, CreatePZ.ins_ind, work_list)
+        if self.forRirTrue:
+            CreatePZ.forPaker_list =  work_list
+        else:
+            AcidPakerWindow.populate_row(self, CreatePZ.ins_ind, work_list)
 
-        CreatePZ.pause = True
+            CreatePZ.pause = True
         self.close()
 
 
@@ -231,7 +235,7 @@ class OpressovkaEK(QMainWindow):
                  None, f'Приподнять и посадить пакер на глубине {paker_depth}м',
                  None, None, None, None, None, None, None,
                  'мастер КРС', 0.4],
-                [OpressovkaEK.testing_pressure(paker_depth)[1], None,
+                [self.testing_pressure(paker_depth)[1], None,
                  self.testing_pressure(paker_depth)[0],
                  None, None, None, None, None, None, None,
                  'мастер КРС, предст. заказчика', 0.67],

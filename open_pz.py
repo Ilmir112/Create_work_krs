@@ -1,26 +1,28 @@
-from PIL import Image
+
 import block_name
 import main
 import plan
 import krs
 
+from PIL import Image
 from datetime import datetime
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QInputDialog, QMessageBox, QDialog, QMainWindow
 from openpyxl_image_loader import SheetImageLoader
 from openpyxl.drawing.image import Image
-
 from openpyxl.utils.cell import get_column_letter
 from openpyxl.styles import Border, Side, PatternFill, Font, GradientFill, Alignment
+from collections import namedtuple
 
 from cdng import events_gnvp, itog_1, events_gnvp_gnkt
-
+from find import ProtectedIsDigit, ProtectedIsNonNone
 from work_py.gnkt_frez import Work_with_gnkt
 from find import FindIndexPZ, Well_perforation, Well_Category, Well_data, \
     WellNkt, WellFond_data, WellCondition, WellHistory_data, WellSucker_rod, Well_expected_pick_up
 
 
 class CreatePZ(QMainWindow):
+    column_direction_lenght = ProtectedIsDigit()
     Qoil = 0
     gipsInWell = False
     grpPlan = False
@@ -122,6 +124,7 @@ class CreatePZ(QMainWindow):
     H2S_mg = []
     H2S_mg_m3 = []
     lift_key = 0
+    dict_category = {}
     max_admissible_pressure = 0
     region = ''
     dict_nkt = {}
@@ -134,6 +137,8 @@ class CreatePZ(QMainWindow):
     rowHeights = []
     plast_project = []
     plast_work = []
+
+    cat_P_P = []
     well_oilfield = 0
     template_depth_addition = 0
     condition_of_wells = 0
@@ -146,6 +151,9 @@ class CreatePZ(QMainWindow):
                          top=Side(style='thin'),
                          bottom=Side(style='thin'))
     image_list = []
+    problem_with_ek = False
+    problem_with_ek_depth = current_bottom
+    problem_with_ek_diametr = column_diametr
 
     def __init__(self, wb, ws, data_window, perforation_correct_window2, parent=None):
         super(CreatePZ, self).__init__()
@@ -158,22 +166,49 @@ class CreatePZ(QMainWindow):
     def open_excel_file(self, ws, work_plan):
 
         from data_correct import DataWindow
-        from perforation_correct import PerforationCorrect
         from find import FindIndexPZ
+        from category_correct import CategoryWindow
 
         CreatePZ.work_plan = work_plan
+        CreatePZ.dict_category = CategoryWindow.dict_category
 
-        # CreatePZ.cat_well_min = well_PZ.cat_well_min
-        well_categ = Well_Category(ws)
-        well_data = Well_data(ws)
-        well_perf = Well_perforation(ws)
-        well_history = WellHistory_data(ws)
-        well_fond = WellFond_data(ws)
-        well_nkt = WellNkt(ws)
-
-        well_sucker = WellSucker_rod(ws)
-        well_condition = WellCondition(ws)
-        well_expected = Well_expected_pick_up(ws)
+        # Запуск основного класса и всех дочерних классов в одной строке
+        window = [cls(ws) for cls in FindIndexPZ.__subclasses__()]
+        # CreatePZ.cat_P_1 = list(map(int, [
+        #     CreatePZ.dict_category[plast]['по давлению'].category for plast in CreatePZ.plast_work if
+        #     CreatePZ.dict_category.get(plast) and CreatePZ.dict_category[plast]['отключение'] == 'рабочий'
+        # ]))
+        #
+        # CreatePZ.cat_P_1_plan = list(map(int, [
+        #     CreatePZ.dict_category[plast]['по давлению'].category for plast in CreatePZ.plast_work if
+        #     CreatePZ.dict_category.get(plast) and CreatePZ.dict_category[plast]['отключение'] == 'планируемый'
+        # ]))
+        #
+        # CreatePZ.cat_H2S_list = list(map(int,
+        #                                  [CreatePZ.dict_category[plast]['по сероводороду'].category for plast in
+        #                                   CreatePZ.plast_work if
+        #     CreatePZ.dict_category.get(plast) and CreatePZ.dict_category[plast]['отключение'] == 'рабочий']))
+        #
+        # CreatePZ.cat_H2S_list_plan = list(map(int,
+        #                                  [CreatePZ.dict_category[plast]['по сероводороду'].category for plast in
+        #                                   CreatePZ.plast_work if
+        #                                   CreatePZ.dict_category.get(plast) and
+        #                                   CreatePZ.dict_category[plast]['отключение'] == 'планируемый']))
+        #
+        # CreatePZ.cat_gaz_f_pr = list(map(int,
+        #                                  [CreatePZ.dict_category[plast]['по газовому фактору'].category for plast in
+        #                                   CreatePZ.plast_work if
+        #     CreatePZ.dict_category.get(plast) and CreatePZ.dict_category[plast]['отключение'] == 'рабочий']))
+        #
+        # CreatePZ.H2S_pr = list(map(float,
+        #                                  [CreatePZ.dict_category[plast]['по сероводороду'].data_procent for plast in
+        #                                   CreatePZ.plast_work if
+        #     CreatePZ.dict_category.get(plast) and CreatePZ.dict_category[plast]['отключение'] == 'рабочий']))
+        #
+        # CreatePZ.H2S_mg = list(map(float,
+        #                            [CreatePZ.dict_category[plast]['по сероводороду'].data_mg_l for plast in
+        #                             CreatePZ.plast_work if
+        #     CreatePZ.dict_category.get(plast) and CreatePZ.dict_category[plast]['отключение'] == 'рабочий']))
 
         for row_ind, row in enumerate(ws.iter_rows(values_only=True)):
             ws.row_dimensions[row_ind].hidden = False
@@ -192,43 +227,14 @@ class CreatePZ(QMainWindow):
                     if 'гипс' in str(value).lower() or 'гидратн' in str(value).lower():
                         CreatePZ.gipsInWell = True
 
-        if CreatePZ.curator != 'ОР':
-            CreatePZ.water_cut = CreatePZ.proc_water
-        else:
-            CreatePZ.water_cut = 100
-        CreatePZ.water_cut, ok = QInputDialog.getInt(self, 'Обводненность',
-                                                     'Введите обводненность скважинной продукции',
-                                                     0, 0, 100)
-        print(f'обводнен {CreatePZ.water_cut}')
+
         CreatePZ.region = block_name.region(CreatePZ.cdng._value)
         thread = main.ExcelWorker()
-        print(f'CreatePZ.region {CreatePZ.region, CreatePZ.well_number._value, CreatePZ.well_area._value}')
+
         CreatePZ.without_damping = thread.check_well_existence(
             CreatePZ.well_number._value, CreatePZ.well_area._value, CreatePZ.region)
 
-        if CreatePZ.grpPlan:
-            grpPlan_quest = QMessageBox.question(self, 'Подготовка к ГРП', 'Программа определела что в скважине'
-                                                                           f'планируется ГРП, верно ли?')
-            if grpPlan_quest == QMessageBox.StandardButton.Yes:
-                CreatePZ.grpPlan = True
-            else:
-                CreatePZ.grpPlan = False
 
-        data_pvr_max = CreatePZ.data_pvr_max._value
-        data_well_max = CreatePZ.data_well_max._value
-
-        for row in range(data_pvr_max, data_well_max):
-            for col in range(1, 13):
-                value = str(ws.cell(row=row, column=col).value)
-                if 'нэк' in str(
-                        value).lower() or 'негерм' in value.lower() or 'нарушение э' in value.lower() or 'нарушение г' in value.lower():
-                    CreatePZ.leakiness_Count += 1
-                    CreatePZ.leakiness = True
-                if (
-                        'авар' in value.lower() or 'не проход' in value.lower() or 'расхаж' in value.lower() or 'лар' in value) \
-                        and 'акт о расследовании аварии прилагается' not in value:
-                    CreatePZ.emergency_well = True
-                    CreatePZ.emergency_count += 1
 
         if CreatePZ.leakiness == True:
             leakiness_quest = QMessageBox.question(self, 'нарушение колонны',
@@ -249,6 +255,19 @@ class CreatePZ(QMainWindow):
                 CreatePZ.emergency_well = True
             else:
                 CreatePZ.emergency_well = False
+        if CreatePZ.problem_with_ek == True:
+            problem_with_ek_quest = QMessageBox.question(self, 'ВНИМАНИЕ НЕПРОХОД ',
+                                                   'Программа определела что в скважине '
+                                                   f'ссужение в ЭК -, верно ли?')
+            if problem_with_ek_quest == QMessageBox.StandardButton.Yes:
+                CreatePZ.problem_with_ek = True
+                CreatePZ.problem_with_ek_depth, ok = QInputDialog.getInt(None, 'Глубина сужения',
+                                                        "ВВедите глубину сужения", 0, 0, int(CreatePZ.current_bottom))
+                CreatePZ.problem_with_ek_diametr, ok = QInputDialog.getInt(None, 'диаметр внутренний сужения',
+                                                        "ВВедите внутренний диаметр сужения", 0, 0,
+                                                                int(CreatePZ.current_bottom))
+            else:
+                CreatePZ.problem_with_ek = False
 
         if CreatePZ.gipsInWell == True:
             gips_true_quest = QMessageBox.question(self, 'Гипсовые отложения',
@@ -278,14 +297,7 @@ class CreatePZ(QMainWindow):
                 except:
                     pass
 
-        print(CreatePZ.image_list)
-        print(f' ГРП - {CreatePZ.grpPlan}')
-        print(f' глубина насоса ШГН {CreatePZ.dict_pump_SHGN_h}')
-        print(f' насоса {CreatePZ.dict_pump_SHGN}')
-        print(f'пакер {CreatePZ.paker_do}')
-        print(f'глубина пакер {CreatePZ.H_F_paker_do}')
-        print(f' диам колонны {CreatePZ.column_diametr}')
-        print(f' гипс в скважине {CreatePZ.gipsInWell}')
+
 
         if len(CreatePZ.dict_perforation_project) != 0:
             CreatePZ.plast_project = list(CreatePZ.dict_perforation_project.keys())
@@ -302,44 +314,25 @@ class CreatePZ(QMainWindow):
             CreatePZ.pause = True
             self.data_window = None
 
-        if CreatePZ.shoe_column < CreatePZ.current_bottom and CreatePZ.column_additional is False:
-            CreatePZ.open_trunk_well = True
-        elif CreatePZ.shoe_column_additional < CreatePZ.current_bottom and CreatePZ.column_additional:
-            CreatePZ.open_trunk_well = True
-
         CreatePZ.nkt_diam = 73 if CreatePZ.column_diametr > 110 else 60
         CreatePZ.nkt_template = 59.6 if CreatePZ.column_diametr > 110 else 47.9
-        print(CreatePZ.nkt_template)
 
-        curator_list = ['ОР', 'ГТМ', 'ГРР', 'ГО', 'ВНС']
-        curator = ['ГТМ'
-                   if (CreatePZ.dict_pump_SHGN["posle"] != 0 and CreatePZ.dict_pump_ECN["posle"] == 0)
-                      or (CreatePZ.dict_pump_SHGN["posle"] == 0 and CreatePZ.dict_pump_ECN["posle"] != 0)
-                      or (CreatePZ.dict_pump_SHGN["posle"] != 0 and CreatePZ.dict_pump_ECN["posle"] != 0)
-                   else 'ОР'][0]
-
-        CreatePZ.curator, ok = QInputDialog.getItem(None, 'Выбор кураторов ремонта', 'Введите сектор кураторов региона',
-                                                    curator_list, curator_list.index(curator), False)
-        # print(f'куратор {CreatePZ.curator, CreatePZ.if_None(CreatePZ.dict_pump["posle"])}')
-
-        CreatePZ.definition_plast_work(self)
-        print(f'работающие пласты {CreatePZ.plast_work}')
-        print(f'кровля , подошва пласты {CreatePZ.perforation_sole}')
-
-        if work_plan != "gnkt_frez":
-            if self.perforation_correct_window2 is None:
-                self.perforation_correct_window2 = PerforationCorrect(self)
-                self.perforation_correct_window2.setWindowTitle("Сверка данных перфорации")
-                self.perforation_correct_window2.setGeometry(200, 400, 100, 400)
-
-                self.perforation_correct_window2.show()
-                CreatePZ.pause_app(self)
-                CreatePZ.pause = True
-                self.perforation_correct_window2 = None
-                CreatePZ.definition_plast_work(self)
+        if CreatePZ.column_additional:
+            if CreatePZ.current_bottom > CreatePZ.shoe_column_additional:
+                CreatePZ.open_trunk_well = True
             else:
-                self.perforation_correct_window2.close()
-                self.perforation_correct_window2 = None
+                CreatePZ.open_trunk_well = False
+        else:
+            if CreatePZ.current_bottom > CreatePZ.shoe_column:
+                CreatePZ.open_trunk_well = True
+            else:
+                CreatePZ.open_trunk_well = False
+
+
+
+
+
+
 
         if len(CreatePZ.plast_work) == 0:
             perf_true_quest = QMessageBox.question(self, 'Программа',
@@ -375,6 +368,7 @@ class CreatePZ(QMainWindow):
                         interval = list(interval)
                         if CreatePZ.perforation_roof > interval[0]:
                             CreatePZ.perforation_roof = interval[0]
+        CreatePZ.definition_plast_work(self)
 
         for j in range(CreatePZ.data_x_min._value, CreatePZ.data_x_max._value):  # Ожидаемые показатели после ремонта
             lst = []
@@ -382,13 +376,11 @@ class CreatePZ(QMainWindow):
                 lst.append(ws.cell(row=j + 1, column=i + 1).value)
             CreatePZ.row_expected.append(lst)
 
-        if '1' in CreatePZ.cat_P_1 or '1' in CreatePZ.cat_H2S_list or 1 in CreatePZ.cat_P_1 or 1 in CreatePZ.cat_H2S_list:
-            CreatePZ.bvo = True
+
 
         if CreatePZ.work_plan != 'gnkt_frez':
-            print(f'план работ {CreatePZ.work_plan}')
+            # print(f'план работ {CreatePZ.work_plan}')
             plan.delete_rows_pz(self, ws)
-
             razdel_1 = block_name.razdel_1(self, CreatePZ.region)
 
             for i in range(1, len(razdel_1)):  # Добавлением подписантов на вверху
@@ -497,7 +489,7 @@ class CreatePZ(QMainWindow):
             ins_ind += len(itog_1(self)) + 2
 
         curator_sel = block_name.curator_sel(self, CreatePZ.curator, CreatePZ.region)
-        curator_ved_sel = block_name.curator_sel(self, CreatePZ.curator, CreatePZ.region)
+        print(f'куратор {curator_sel, CreatePZ.curator}')
         podp_down = block_name.pop_down(self, CreatePZ.region, curator_sel)
 
         for i in range(1 + ins_ind, 1 + ins_ind + len(podp_down)):  # Добавлением подписантов внизу
@@ -567,16 +559,7 @@ class CreatePZ(QMainWindow):
         CreatePZ.plast_all = list(CreatePZ.dict_perforation.keys())
         CreatePZ.plast_work = list(plast_work)
 
-        if CreatePZ.column_additional:
-            if CreatePZ.current_bottom > CreatePZ.shoe_column_additional:
-                CreatePZ.open_trunk_well = True
-            else:
-                CreatePZ.open_trunk_well = False
-        else:
-            if CreatePZ.current_bottom > CreatePZ.shoe_column:
-                CreatePZ.open_trunk_well = True
-            else:
-                CreatePZ.open_trunk_well = False
+
 
     def pause_app(self):
         while CreatePZ.pause == True:
