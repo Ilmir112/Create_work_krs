@@ -726,8 +726,10 @@ class AcidPakerWindow(MyWindow):
             acid_sel_short = vt
         elif acidEdit == 'HF':
 
-            acid_sel = f'Произвести кислотную обработку пласта {plastCombo}  в объеме  {acidVolumeEdit}м3  (концентрация в смеси HF 3% / HCl 13%) силами СК Крезол ' \
-                       f'в присутствии представителя заказчика с составлением акта, не превышая давления закачки не более Р={pressure_Edit}атм.'
+            acid_sel = f'Произвести кислотную обработку пласта {plastCombo}  в объеме  {acidVolumeEdit}м3  ' \
+                       f'(концентрация в смеси HF 3% / HCl 13%) силами СК Крезол ' \
+                       f'в присутствии представителя заказчика с составлением акта, не превышая давления ' \
+                       f'закачки не более Р={pressure_Edit}атм.'
             acid_sel_short = f'Произвести ГКО пласта {plastCombo}  в V- {acidVolumeEdit}м3  ' \
                        f'не более Р={pressure_Edit}атм.'
         elif acidEdit == 'Нефтекислотка':
@@ -739,15 +741,17 @@ class AcidPakerWindow(MyWindow):
             acid_sel_short = f'нефтекислотную обработку пласта {plastCombo} в V=2тн товарной нефти +' \
                        f' {acidVolumeEdit}м3  (HCl - {acidProcEdit} %) + {float(acidOilProcEdit) - 2}т товарной нефти'
         elif acidEdit == 'Противогипсовая обработка':
-            acid_sel = f'Произвести противогипсовую обработку пласта{plastCombo} в объеме {acidVolumeEdit}м3 - {20}% раствором каустической соды' \
+            acid_sel = f'Произвести противогипсовую обработку пласта{plastCombo} в объеме {acidVolumeEdit}м3 - {20}% ' \
+                       f'раствором каустической соды' \
                        f'в присутствии представителя заказчика с составлением акта, не превышая давления закачки не ' \
                        f'более Р={CreatePZ.max_admissible_pressure}атм.\n'
-            acid_sel_short = f'Произвести противогипсовую обработку пласта{plastCombo} в объеме {acidVolumeEdit}м3 - {20}% не ' \
+            acid_sel_short = f'Произвести противогипсовую обработку пласта{plastCombo} в объеме {acidVolumeEdit}м3 - ' \
+                             f'{20}% не ' \
                        f'более Р={CreatePZ.max_admissible_pressure}атм.\n'
             # print(f'Ожидаемое показатели {CreatePZ.expected_pick_up.values()}')
         acid_list_1 = [[acid_sel_short, None,
                         f'{acid_sel}'
-                        f'ОБЕСПЕЧИТЬ НАЛИЧИЕ У СОСТАВА ВАХТЫ И СИЗ ПРИ КИСЛОТНОЙ ОБРАБОТКИ',
+                        f'ОБЕСПЕЧИТЬ НАЛИЧИЕ У СОСТАВА ВАХТЫ СИЗ ПРИ КИСЛОТНОЙ ОБРАБОТКИ',
                         None, None, None, None, None, None, None,
                         'мастер КРС, УСРСиСТ', None],
                        [None, None,
@@ -798,11 +802,11 @@ class AcidPakerWindow(MyWindow):
             try:
                 CreatePZ.expected_Q, ok = QInputDialog.getInt(self, 'Ожидаемая приемистость ',
                                                               f'Ожидаемая приемистость по пласту {plastCombo} ',
-                                                              list(CreatePZ.expected_pick_up.keys())[0], 0,
+                                                              list(CreatePZ.expected_Q), 0,
                                                               1600)
                 CreatePZ.expected_P, ok = QInputDialog.getInt(self, 'Ожидаемое Давление закачки',
                                                               f'Ожидаемое Давление закачки по пласту {plastCombo}',
-                                                              list(CreatePZ.expected_pick_up.values())[0], 0,
+                                                              list(CreatePZ.expected_P), 0,
                                                               250)
             except:
                 CreatePZ.expected_Q, ok = QInputDialog.getInt(self, 'Ожидаемая приемистость ',

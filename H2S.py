@@ -214,9 +214,7 @@ def calv_h2s(self, cat_H2S, H2S_mg, H2S_pr):
             v_pod_gno = 3.14 *(CreatePZ.column_additional_diametr-CreatePZ.column_additional_wall_thickness*2)**2/4/1000 * (CreatePZ.bottomhole_artificial-nkt_l)/1000
         # print(f'под ГНО{v_pod_gno}')
         volume_well =  H2S.well_volume(self)
-        # print(volume_well)
-        # print(f'{volume_well} объем скважины')
-        # print(CreatePZ.dict_nkt)
+
         nkt_1 = int(list(CreatePZ.dict_nkt.keys())[0])
 
 
@@ -258,15 +256,16 @@ def calv_h2s(self, cat_H2S, H2S_mg, H2S_pr):
         except:
             sucker_rod_l_19 = 0
 
-        vodoiz_sucker = (10 * 3.14 *((25*0.01)**2/4)*sucker_rod_l_25/1000) +(10 * 3.14 *((25*0.01)**2/4)*sucker_rod_l_22/1000) +(10 * 3.14 *((25*0.01)**2/4)*sucker_rod_l_19/1000)
+        vodoiz_sucker = (10 * 3.14 *((25*0.01)**2/4)*sucker_rod_l_25/1000) + (10 * 3.14 *((25*0.01)**2/4)*sucker_rod_l_22/1000) + (10 * 3.14 *((25*0.01)**2/4)*sucker_rod_l_19/1000)
 
         oil_mass = float(v_pod_gno*(100 - CreatePZ.proc_water) * 0.9/100)
         # print(f'oil {oil_mass}-{type(oil_mass)} , {CreatePZ.gaz_f_pr[0]}-{type(CreatePZ.gaz_f_pr[0])}')
         volume_h2s = CreatePZ.gaz_f_pr[0] * oil_mass * (float(H2S_pr))/100
 
         h2s_mass_in_oil = (34*volume_h2s*1000/22.14)
-        h2s_mass_in_water = (vodoiz_sucker+vodoiz_nkt)*H2S_mg
-        # print(f'h2a{h2s_mass_in_water}')
+        print(type(vodoiz_sucker), type(vodoiz_nkt), H2S_mg, float(H2S_mg))
+        h2s_mass_in_water = float(vodoiz_sucker + vodoiz_nkt) * H2S_mg
+        print(f'h2a{h2s_mass_in_water}')
         mass_oil_pog_gno = (vodoiz_sucker+vodoiz_nkt) * (100-CreatePZ.proc_water)*0.9/100
         h2s_volume_pod_gno = mass_oil_pog_gno* CreatePZ.gaz_f_pr[0]*H2S_pr/100
         mass_h2s_gas = 34*h2s_volume_pod_gno/22.14
@@ -291,3 +290,5 @@ def calv_h2s(self, cat_H2S, H2S_mg, H2S_pr):
         if udel_mas_raskhod <=0.01:
             udel_mas_raskhod = 0.01
         return round(udel_mas_raskhod, 3)
+    else:
+        return 0

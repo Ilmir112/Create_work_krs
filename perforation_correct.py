@@ -150,7 +150,7 @@ class PerforationCorrect(QMainWindow):
         index = 0
         for plast in plast_all:
             plast_oktl = []
-            plast_templ =[]
+            plast_templ = []
             plast_raid = []
             for interval in self.dict_perforation[plast]["интервал"]:
                 if self.tabWidget.currentWidget().labels_plast[index + 1][3].currentText() == 'отключен':
@@ -172,24 +172,24 @@ class PerforationCorrect(QMainWindow):
                     plast_raid.append(False)
 
                 index += 1
-            # print(f'отклю {plast, plast_oktl}')
-            # print(f'шаблон {plast, plast_templ}')
-            # print(f'райб {plast, plast_templ, all(plast_raid)}')
-            if all(plast_oktl):
+            print(f'отклю {plast, plast_oktl}')
+            print(f'шаблон {plast, plast_templ}')
+            print(f'райб {plast, plast_templ, all(plast_raid)}')
+            if all([oktl is True for oktl in plast_oktl]):
                 CreatePZ.dict_perforation_short[plast]['отключение'] = True
                 CreatePZ.dict_perforation[plast]['отключение'] = True
             else:
                 CreatePZ.dict_perforation_short[plast]['отключение'] = False
                 CreatePZ.dict_perforation[plast]['отключение'] = False
-            if all(plast_templ):
+            if all([oktl is True for oktl in plast_templ]):
                 CreatePZ.dict_perforation[plast]['Прошаблонировано'] = True
             else:
                 CreatePZ.dict_perforation[plast]['Прошаблонировано'] = False
-            if all(plast_raid):
+            if  all([oktl is True for oktl in plast_raid]):
                 CreatePZ.dict_perforation[plast]['отрайбировано'] = True
             else:
                 CreatePZ.dict_perforation[plast]['отрайбировано'] = False
-        # print(f' интервалы ПВР после корректировки {CreatePZ.dict_perforation}')
+        print(f' интервалы ПВР после корректировки {CreatePZ.dict_perforation}')
 
         # self.labels_plast[index] = (plast_edit, roof_edit, sole_edit, plast_status_ComboBox,
         #                             template_status_ComboBox, raiding_status_ComboBox)

@@ -1,32 +1,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.Qt import *
 from PyQt5.QtGui import QRegExpValidator, QColor, QPalette
-from main import MyWindow
-import re
-
-
-class FloatLineEdit(QLineEdit):
-    def __init__(self, parent=None):
-        super(FloatLineEdit, self).__init__(parent)
-
-        # Устанавливаем валидатор для проверки на float
-
-        reg = QRegExp("[0-9.отсут]*")
-        pValidator = QRegExpValidator(self)
-        pValidator.setRegExp(reg)
-        self.setValidator(pValidator)
-
-    def focusOutEvent(self, event):
-        # При потере фокуса проверяем, является ли текст float
-        if self.validator().validate(self.text(), 0)[0] != QValidator.Acceptable:
-            # Если текст не является числом, меняем цвет фона на красный
-            palette = self.palette()
-            palette.setColor(QPalette.Base, QColor(Qt.red))
-            self.setPalette(palette)
-        else:
-            # Если текст является числом, возвращаем цвет фона по умолчанию
-            self.setPalette(self.parentWidget().palette())
-
+from perforation_correct import FloatLineEdit
 
 class TabPage_SO(QWidget):
     def __init__(self, parent=None):
@@ -37,6 +12,7 @@ class TabPage_SO(QWidget):
         self.labels_nkt_po = {}
         self.labels_sucker = {}
         self.labels_sucker_po = {}
+
 
         self.column_direction_diametr_Label = QLabel("диаметр направление", self)
         self.column_direction_diametr_Edit = FloatLineEdit(self)
@@ -455,8 +431,8 @@ class TabPage_SO(QWidget):
 
             self.labels_nkt_po[1] = (nkt_po_line_edit, lenght_po_line_edit)
 
-            self.grid.addWidget(nkt_po_line_edit, 28, 1)
-            self.grid.addWidget(lenght_po_line_edit, 28, 2)
+            self.grid.addWidget(nkt_po_line_edit, 28, 5)
+            self.grid.addWidget(lenght_po_line_edit, 28, 6)
         # добавление строк с штангами плановых
 
         if len(self.dict_sucker_rod_po) != 0:
@@ -886,14 +862,13 @@ class DataWindow(QMainWindow):
                 close_file = False
             else:
                 close_file = True
-        elif (CreatePZ.nkt_mistake == True and len(CreatePZ.dict_nkt) != 0) or \
-                (CreatePZ.nkt_mistake == True and len(CreatePZ.dict_nkt_po) != 0):
+        elif (CreatePZ.nkt_mistake is True and len(CreatePZ.dict_nkt) == 0):
             msg = QMessageBox.information(self, 'Внимание',
                                           'При вызванной ошибке НКТ до ремонта не может быть пустым')
             close_file = False
-        elif CreatePZ.nkt_mistake == True and len(CreatePZ.dict_nkt_po) != 0:
+        elif CreatePZ.nkt_mistake is True and len(CreatePZ.dict_nkt_po) == 0:
             msg = QMessageBox.information(self, 'Внимание',
-                                          'При вызванной ошибке НКТ до ремонта не может быть пустым')
+                                          'При вызванной ошибке НКТ после ремонта не может быть пустым')
             close_file = False
 
         if curator == 'ОР':

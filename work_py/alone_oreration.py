@@ -83,6 +83,12 @@ def check_h2s(self):
     cat_H2S_list = list(map(int, [CreatePZ.dict_category[plast]['по сероводороду'].category for plast in
                                   CreatePZ.plast_work if  CreatePZ.dict_category.get(plast) and
                                   CreatePZ.dict_category[plast]['отключение'] == 'рабочий']))
+    H2S_mg = list(map(int, [CreatePZ.dict_category[plast]['по сероводороду'].data_mg_l for plast in
+                                  CreatePZ.plast_work if  CreatePZ.dict_category.get(plast) and
+                                  CreatePZ.dict_category[plast]['отключение'] == 'рабочий']))
+    H2S_pr = list(map(int, [CreatePZ.dict_category[plast]['по сероводороду'].data_procent for plast in
+                                  CreatePZ.plast_work if  CreatePZ.dict_category.get(plast) and
+                                  CreatePZ.dict_category[plast]['отключение'] == 'рабочий']))
 
     if len(CreatePZ.dict_perforation_project) != 0:
         plast, ok = QInputDialog.getItem(self, 'выбор пласта для расчета ЖГС ', 'выбирете пласт для перфорации',
@@ -96,71 +102,56 @@ def check_h2s(self):
         except:
             expected_pressure, ok = QInputDialog.getDouble(self, 'Ожидаемое давление по пласту',
                                                            'Введите Ожидаемое давление по пласту', 0, 0, 300, 1)
-            fluid_new, ok = QInputDialog.getDouble(self, 'Новое значение удельного веса жидкости',
-                                                   'Введите значение удельного веса жидкости', 1.02, 1, 1.72, 2)
     else:
         plast, ok = QInputDialog.getText(self, 'выбор пласта для расчета ЖГС ', 'введите пласт для перфорации')
-        try:
-            expected_pressure, ok = QInputDialog.getDouble(self, 'Ожидаемое давление по пласту',
-                                                           'Введите Ожидаемое давление по пласту',
-                                                           CreatePZ.dict_category[
-                                                               CreatePZ.plast_project][
-                                                               'по давлению'].data_pressuar, 0, 300, 1)
-        except:
-            expected_pressure, ok = QInputDialog.getDouble(self, 'Ожидаемое давление по пласту',
-                                                           'Введите Ожидаемое давление по пласту',
-                                                           0, 0, 300, 1)
-            fluid_new, ok = QInputDialog.getDouble(self, 'Новое значение удельного веса жидкости',
-                                                   'Введите значение удельного веса жидкости', 1.02, 1, 1.72, 2)
+
     try:
         cat_H2S_list_plan = list(map(int,
                                      [CreatePZ.dict_category[plast]['по сероводороду'].category for plast in
-                                      CreatePZ.plast_work if
-                                      CreatePZ.dict_category.get(plast) and
-                                      CreatePZ.dict_category[plast]['отключение'] == 'планируемый']))
+                                      CreatePZ.plast_project]))
+        H2S_mg_plan = list(map(int, [CreatePZ.dict_category[plast]['по сероводороду'].data_mg_l for plast in
+                                     CreatePZ.plast_project]))
+        H2S_pr_plan = list(map(int, [CreatePZ.dict_category[plast]['по сероводороду'].data_procent for plast in
+                                     CreatePZ.plast_project]))
     except:
-        cat_H2S_list_plan = False
+            cat_H2S_list_plan = False
 
-    if len(CreatePZ.plast_work) == 0:
-        if cat_H2S_list_plan:
-            H2S_pr_plan = list(map(int,
-                                   [CreatePZ.dict_category[plast]['по сероводороду'].data_procent for plast in
-                                    CreatePZ.plast_work if
-                                    CreatePZ.dict_category.get(plast) and
-                                    CreatePZ.dict_category[plast]['отключение'] == 'планируемый']))
-            cat_H2S_list_plan = list(map(int,
-                                         [CreatePZ.dict_category[plast]['по сероводороду'].category for plast in
-                                          CreatePZ.plast_work if
-                                          CreatePZ.dict_category.get(plast) and
-                                          CreatePZ.dict_category[plast]['отключение'] == 'планируемый']))
-            H2S_mg_plan = list(map(int,
-                                   [CreatePZ.dict_category[plast]['по сероводороду'].data_mg_l for plast in
-                                    CreatePZ.plast_work if
-                                    CreatePZ.dict_category.get(plast) and
-                                    CreatePZ.dict_category[plast]['отключение'] == 'планируемый']))
+    if len(CreatePZ.plast_work) == 0 and cat_H2S_list_plan is False:
 
-        elif cat_H2S_list_plan is False:
-            CreatePZ.cat_H2S_list_plan = QInputDialog.getInt(self, 'Категория',
-                                                             'Введите категорию скважины по H2S на вскрываемый пласт',
-                                                             2,
-                                                             1, 3)
-            CreatePZ.H2S_pr_plan = QInputDialog.getDouble(self,
-                                                          'Сероводород', 'Введите содержание сероводорода в %', 50, 0,
-                                                          1000, 2)
-            CreatePZ.H2S_mg_plan = QInputDialog.getDouble(self, 'Сероводород',
-                                                          'Введите содержание сероводорода в мг/л', 50, 0, 1000, 2)
+        cat_H2S_list_plan_int, ok = QInputDialog.getInt(self, 'Категория',
+                                                         'Введите категорию скважины по H2S на вскрываемый пласт',
+                                                         2,
+                                                         1, 3)
+        cat_H2S_list_plan = []
+        cat_H2S_list_plan.append(cat_H2S_list_plan_int)
+        H2S_pr_plan_int, ok = QInputDialog.getDouble(self,
+                                                      'Сероводород', 'Введите содержание сероводорода в %', 50, 0,
+                                                      1000, 2)
+        H2S_pr_plan_plan = []
+        H2S_pr_plan_plan.append(H2S_pr_plan_int)
+        H2S_mg_plan_int, ok = QInputDialog.getDouble(self, 'Сероводород',
+                                                      'Введите содержание сероводорода в мг/л', 50, 0, 1000, 2)
+        H2S_mg_plan = []
+        H2S_mg_plan.append(H2S_mg_plan_int)
 
-    if cat_H2S_list_plan in [1, 2]:
+
+
+        fluid_new, ok = QInputDialog.getDouble(self, 'Новое значение удельного веса жидкости',
+                                               'Введите значение удельного веса жидкости', 1.02, 1, 1.72, 2)
+
+    if cat_H2S_list_plan[0] in [1, 2] and len(CreatePZ.plast_work) == 0:
+        expenditure_h2s = round(max([CreatePZ.dict_category[plast[0]]['по сероводороду'].poglot for plast in CreatePZ.plast_project]), 3)
         CreatePZ.fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
-                              f'расчета {calv_h2s(self, cat_H2S_list_plan[0], H2S_mg_plan[0], H2S_pr_plan[0])}кг/м3 '
-    elif ('2' in str(cat_H2S_list_plan[0]) or '1' in str(cat_H2S_list_plan[0])) and (
-            '2' not in str(cat_H2S_list[1]) or '1' not in str(cat_H2S_list[1])):
-        try:
-            CreatePZ.fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
-                                  f'расчета {calv_h2s(self, cat_H2S_list[0], H2S_mg_plan[0], CreatePZ.H2S_pr_plan[0])}кг/м3 '
-        except:
-            CreatePZ.fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
-                                  f'расчета {calv_h2s(self, cat_H2S_list[0], CreatePZ.H2S_mg[0], CreatePZ.H2S_pr[0])}кг/м3 '
+                              f'расчета {expenditure_h2s}кг/м3 '
+    elif ((cat_H2S_list_plan[0] in [1, 2]) or (cat_H2S_list[0] in [1, 2])) and len(CreatePZ.plast_work) != 0:
+        expenditure_h2s_plan = max(
+            [CreatePZ.dict_category[plast[0]]['по сероводороду'].poglot for plast in CreatePZ.plast_project])
+        expenditure_h2s = max(
+            [CreatePZ.dict_category[CreatePZ.plast_work[0]]['по сероводороду'].poglot])
+        expenditure_h2s = round(max([expenditure_h2s, expenditure_h2s_plan]), 1)
+
+        CreatePZ.fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
+                              f'расчета {expenditure_h2s}кг/м3 '
     else:
         CreatePZ.fluid_work = f'{fluid_new}г/см3 '
     return (CreatePZ.fluid_work, CreatePZ.fluid_work_short, plast, expected_pressure)

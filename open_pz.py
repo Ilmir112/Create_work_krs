@@ -152,8 +152,8 @@ class CreatePZ(QMainWindow):
                          bottom=Side(style='thin'))
     image_list = []
     problem_with_ek = False
-    problem_with_ek_depth = current_bottom
-    problem_with_ek_diametr = column_diametr
+    problem_with_ek_depth = 10000
+    problem_with_ek_diametr = 220
 
     def __init__(self, wb, ws, data_window, perforation_correct_window2, parent=None):
         super(CreatePZ, self).__init__()
@@ -297,78 +297,6 @@ class CreatePZ(QMainWindow):
                 except:
                     pass
 
-
-
-        if len(CreatePZ.dict_perforation_project) != 0:
-            CreatePZ.plast_project = list(CreatePZ.dict_perforation_project.keys())
-
-        # Определение работающих интервалов перфорации и заполнения в словарь
-        # вызов окна для проверки корректности данных
-        if self.data_window is None:
-            self.data_window = DataWindow(self)
-            self.data_window.setWindowTitle("Сверка данных")
-            self.data_window.setGeometry(200, 400, 300, 400)
-
-            self.data_window.show()
-            CreatePZ.pause_app(self)
-            CreatePZ.pause = True
-            self.data_window = None
-
-        CreatePZ.nkt_diam = 73 if CreatePZ.column_diametr > 110 else 60
-        CreatePZ.nkt_template = 59.6 if CreatePZ.column_diametr > 110 else 47.9
-
-        if CreatePZ.column_additional:
-            if CreatePZ.current_bottom > CreatePZ.shoe_column_additional:
-                CreatePZ.open_trunk_well = True
-            else:
-                CreatePZ.open_trunk_well = False
-        else:
-            if CreatePZ.current_bottom > CreatePZ.shoe_column:
-                CreatePZ.open_trunk_well = True
-            else:
-                CreatePZ.open_trunk_well = False
-
-
-
-
-
-
-
-        if len(CreatePZ.plast_work) == 0:
-            perf_true_quest = QMessageBox.question(self, 'Программа',
-                                                   'Программа определили,что в скважине интервалов перфорации нет, верно ли?')
-            if perf_true_quest == QMessageBox.StandardButton.Yes:
-                for plast in CreatePZ.plast_all:
-                    CreatePZ.dict_perforation[plast]['отключение'] = True
-                    CreatePZ.dict_perforation[plast]['отрайбировано'] = False
-                    CreatePZ.dict_perforation[plast]['Прошаблонировано'] = False
-                    CreatePZ.dict_perforation_short = {}
-
-            else:
-                plast_work = set()
-                CreatePZ.current_bottom, ok = QInputDialog.getDouble(self, 'Необходимый забой',
-                                                                     'Введите забой до которого нужно нормализовать')
-                for plast, value in CreatePZ.dict_perforation.items():
-
-                    perf_work_quest = QMessageBox.question(self, 'Добавление работающих интервалов перфорации',
-                                                           f'Является ли данный интервал {CreatePZ.dict_perforation[plast]["интервал"]} работающим?')
-                    if perf_work_quest == QMessageBox.StandardButton.No:
-                        CreatePZ.dict_perforation[plast]['отключение'] = True
-                    else:
-                        plast_work.add(plast)
-                        CreatePZ.dict_perforation[plast]['отключение'] = False
-                    CreatePZ.dict_perforation[plast]['отрайбировано'] = False
-                    CreatePZ.dict_perforation[plast]['Прошаблонировано'] = False
-                CreatePZ.plast_work = list(plast_work)
-                # print(f'все интервалы {CreatePZ.plast_all}')
-                # print(f'раб интервалы {CreatePZ.plast_work}')
-                CreatePZ.perforation_roof = CreatePZ.current_bottom
-                for plast in CreatePZ.plast_work:
-                    for interval in CreatePZ.dict_perforation[plast]['интервал']:
-                        interval = list(interval)
-                        if CreatePZ.perforation_roof > interval[0]:
-                            CreatePZ.perforation_roof = interval[0]
-        CreatePZ.definition_plast_work(self)
 
         for j in range(CreatePZ.data_x_min._value, CreatePZ.data_x_max._value):  # Ожидаемые показатели после ремонта
             lst = []

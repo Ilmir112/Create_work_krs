@@ -2,9 +2,6 @@ from PyQt5 import QtWidgets
 from PyQt5.Qt import *
 
 
-from main import MyWindow
-
-
 class TabPage_SO(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -338,8 +335,10 @@ class PerforationWindow(QMainWindow):
             CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('интервал', set()).add(
                 (float(perf_list[2]), float(perf_list[4])))
             CreatePZ.dict_perforation[plast]['отрайбировано'] = False
+            CreatePZ.dict_perforation[plast]['отключение'] = False
             CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('отключение', False)
-
+            CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('отрайбировано', False)
+            print(f' перфорация после добавления {CreatePZ.dict_perforation}')
 
 
             perforation.append(perf_list)

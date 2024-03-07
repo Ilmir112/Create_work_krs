@@ -621,11 +621,11 @@ class AcidPakerWindow(MyWindow):
             try:
                 CreatePZ.expected_Q, ok = QInputDialog.getInt(self, 'Ожидаемая приемистость ',
                                                               f'Ожидаемая приемистость по пласту {plastCombo} ',
-                                                              list(CreatePZ.expected_pick_up.keys())[0], 0,
+                                                              CreatePZ.expected_Q, 0,
                                                               1600)
                 CreatePZ.expected_P, ok = QInputDialog.getInt(self, 'Ожидаемое Давление закачки',
                                                               f'Ожидаемое Давление закачки по пласту {plastCombo}',
-                                                              list(CreatePZ.expected_pick_up.values())[0], 0,
+                                                              CreatePZ.expected_P, 0,
                                                               250)
             except:
                 CreatePZ.expected_Q, ok = QInputDialog.getInt(self, 'Ожидаемая приемистость ',

@@ -2,31 +2,9 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.Qt import *
 from PyQt5.QtGui import QRegExpValidator, QColor, QPalette
 from collections import namedtuple
-import re
 
-
-class FloatLineEdit(QLineEdit):
-    def __init__(self, parent=None):
-        super(FloatLineEdit, self).__init__(parent)
-
-        # Устанавливаем валидатор для проверки на float
-
-        reg = QRegExp("[0-9.отсут]*")
-        pValidator = QRegExpValidator(self)
-        pValidator.setRegExp(reg)
-        self.setValidator(pValidator)
-
-    def focusOutEvent(self, event):
-        # При потере фокуса проверяем, является ли текст float
-        if self.validator().validate(self.text(), 0)[0] != QValidator.Acceptable:
-            # Если текст не является числом, меняем цвет фона на красный
-            palette = self.palette()
-            palette.setColor(QPalette.Base, QColor(Qt.red))
-            self.setPalette(palette)
-        else:
-            # Если текст является числом, возвращаем цвет фона по умолчанию
-            self.setPalette(self.parentWidget().palette())
-
+from H2S import calv_h2s
+from perforation_correct import FloatLineEdit
 
 class TabPage_SO(QWidget):
     def __init__(self, parent=None):
@@ -54,29 +32,49 @@ class TabPage_SO(QWidget):
         self.category_h2s_Label = QLabel('По H2S')
         self.category_h2s2_Label = QLabel('По H2S')
         self.category_gf_Label = QLabel('По газовому фактору')
+        self.calc_h2s_Label = QLabel('расчет поглотителя H2S')
 
         self.grid = QGridLayout(self)
         self.grid.addWidget(self.category_pressuar_Label, 5, 1)
         self.grid.addWidget(self.category_h2s_Label, 6, 1)
         self.grid.addWidget(self.category_h2s2_Label, 7, 1)
         self.grid.addWidget(self.category_gf_Label, 8, 1)
+        self.grid.addWidget(self.calc_h2s_Label, 12, 1)
 
         n = 1
+        work_plast_iter = None
         CreatePZ.number_indez = []
         print(f'строки {list(set(CreatePZ.cat_P_P))}')
 
         for num in range(len(list(set(CreatePZ.cat_P_P)))):
 
             plast_index = QComboBox(self)
+            if len(CreatePZ.plast_work) != 0:
+                work_plast = CreatePZ.plast_work[0]
+                work_plast_index = 0
+            else:
+                work_plast_index = 1
+            try:
+                if work_plast == work_plast_iter:
+                    if len(CreatePZ.dict_perforation_project) != 0 and \
+                            any([plast not in CreatePZ.plast_work for plast in CreatePZ.plast_project]):
+
+                        if abs(self.cat_P_P[num] - list([CreatePZ.dict_perforation_project[
+                                                             plast]['давление'] for plast in CreatePZ.plast_project][0])[0]) < 1:
+                            work_plast = CreatePZ.plast_project[0]
+                            work_plast_index = 1
+                    else:
+                        work_plast, ok = QInputDialog.getText(None, 'индекс пласта', 'Введите индекc пласта вскрываемого')
+                        self.plast_all.append(work_plast)
+                        work_plast_index = 1
+            except:
+                work_plast, ok = QInputDialog.getText(None, 'индекс пласта', 'Введите индекc пласта вскрываемого')
+                self.plast_all.append(work_plast)
+                CreatePZ.plast_all.append(work_plast)
+                work_plast_index = 1
+
+
             plast_index.addItems(self.plast_all)
-            work_plast = CreatePZ.plast_work[0]
-            work_plast_index = 0
-            if CreatePZ.dict_perforation_project:
-                if abs(self.cat_P_P[num] - list([CreatePZ.dict_perforation_project[plast]['давление'] for plast in CreatePZ.plast_project][0])[0]) < 1:
-                    work_plast = CreatePZ.plast_project[0]
-                    work_plast_index = 1
-
-
 
             print(f'пласт {work_plast}')
             plast_index.setCurrentIndex(self.plast_all.index(work_plast))
@@ -109,6 +107,14 @@ class TabPage_SO(QWidget):
             isolated_plast = QComboBox(self)
             isolated_plast.addItems(['рабочий', 'планируемый', 'изолирован'])
             isolated_plast.setCurrentIndex(work_plast_index)
+            if work_plast_iter is None:
+                work_plast_iter = work_plast
+
+            calc_plast_h2s = QLineEdit(self)
+            print(category_h2s_edit.text(),
+                                            H2S_mg_edit.text(), H2S_pr_edit.text())
+            calc_plast_h2s.setText(str(calv_h2s(self, category_h2s_edit.text(),
+                                            float(H2S_mg_edit.text()), float(H2S_pr_edit.text()))))
 
             self.grid.addWidget(plast_index, 4, 1 + n)
             self.grid.addWidget(category_pressuar_line_edit, 5, 1 + n)
@@ -116,6 +122,7 @@ class TabPage_SO(QWidget):
             self.grid.addWidget(category_h2s2_edit, 7, 1 + n)
             self.grid.addWidget(category_gf_edit, 8, 1 + n)
             self.grid.addWidget(isolated_plast, 9, n + 1, 9, n + 1)
+            self.grid.addWidget(calc_plast_h2s, 12, n + 1, 12, n + 1)
             self.grid.addWidget(pressuar_data_edit, 5, 1 + n + 1)
             self.grid.addWidget(H2S_pr_edit, 6, 1 + n + 1)
             self.grid.addWidget(H2S_mg_edit, 7, 1 + n + 1)
@@ -143,7 +150,7 @@ class TabPage_SO(QWidget):
 
             self.labels_category[n] = (plast_index, category_pressuar_line_edit, category_h2s_edit,
                                        category_gf_edit, H2S_pr_edit, H2S_mg_edit, gaz_f_pr_edit,
-                                       pressuar_data_edit, isolated_plast)
+                                       pressuar_data_edit, isolated_plast, calc_plast_h2s)
 
             CreatePZ.number_indez.append(n)
             n += 3
@@ -156,7 +163,7 @@ class TabPage_SO(QWidget):
 
             # print(str(round(float(string), 1))[-1] == '0', int(string), float(string))
             return int(float(string)) if str(round(float(str(string).replace(',', '.')), 1))[-1] == "0" else \
-                round(float(str(string).replace(',', '.')), 1)
+                round(float(str(string).replace(',', '.')), 4)
         else:
             return str(string)
 
@@ -195,7 +202,7 @@ class CategoryWindow(QMainWindow):
 
         plast_index = []
         Pressuar = namedtuple("Pressuar", "category data_pressuar")
-        Data_h2s = namedtuple("Data_h2s", "category data_procent data_mg_l")
+        Data_h2s = namedtuple("Data_h2s", "category data_procent data_mg_l poglot")
         Data_gaz = namedtuple("Data_gaz", "category data")
         if cat_P_1:
             for index in CreatePZ.number_indez:
@@ -206,6 +213,8 @@ class CategoryWindow(QMainWindow):
 
                 plast = self.tabWidget.currentWidget().labels_category[index][0].currentText()
                 plast_index.append(plast)
+                if plast not in CreatePZ.plast_work:
+                    CreatePZ.plast_project.append(plast)
 
                 CategoryWindow.dict_category.setdefault(plast, {}).setdefault(
                     'по давлению',
@@ -216,7 +225,8 @@ class CategoryWindow(QMainWindow):
                     'по сероводороду', Data_h2s(
                         int(self.tabWidget.currentWidget().labels_category[index][2].text()),
                         float(self.tabWidget.currentWidget().labels_category[index][4].text()),
-                        float(self.tabWidget.currentWidget().labels_category[index][5].text())))
+                        float(self.tabWidget.currentWidget().labels_category[index][5].text()),
+                        float(self.tabWidget.currentWidget().labels_category[index][9].text())))
 
                 CategoryWindow.dict_category.setdefault(plast, {}).setdefault(
                     'по газовому фактору', Data_gaz(
@@ -225,6 +235,8 @@ class CategoryWindow(QMainWindow):
 
                 CategoryWindow.dict_category.setdefault(plast, {}).setdefault(
                     'отключение', self.tabWidget.currentWidget().labels_category[index][8].currentText())
+                # CategoryWindow.dict_category.setdefault(plast, {}).setdefault(
+                #     'поглотитель', self.tabWidget.currentWidget().labels_category[index][9].currentText())
 
         CreatePZ.pause = False
         self.close()

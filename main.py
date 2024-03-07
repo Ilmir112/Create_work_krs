@@ -35,8 +35,6 @@ class ExcelWorker(QThread):
 
 
     def check_well_existence(self, well_number, deposit_area, region):
-        # print(f'jghfjlt {well_number, deposit_area, region}')
-
 
         # Подключение к базе данных SQLite
         conn = sqlite3.connect('data_base/database_without_juming.db')
@@ -356,7 +354,8 @@ class MyWindow(QMainWindow):
             self.work_plan = 'gnkt_opz'
             self.tableWidgetOpen(self.work_plan)
 
-            self.fname, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',"Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
+            self.fname, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл',
+                                                                  '.',"Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
 
             if self.fname:
                 try:
@@ -587,11 +586,19 @@ class MyWindow(QMainWindow):
         # Создаем объект Excel
         excel = win32com.client.Dispatch("Excel.Application")
 
-        # Открываем файл
-        workbook = excel.Workbooks.Open(full_path)
+        try:
+            # Открываем файл
+            full_path = "полный_путь_к_файлу.xlsx"
+            workbook = excel.Workbooks.Open(full_path)
 
-        # Отображаем Excel
-        excel.Visible = True
+            # Выбираем активный лист
+            worksheet = workbook.ActiveSheet
+
+            # Назначаем область печати с колонок B до L
+            worksheet.PageSetup.PrintArea = "B:L"
+
+        except Exception as e:
+            print(f"Ошибка при работе с Excel: {e}")
 
     def save_to_excel(self):
         from work_py.gnkt_frez import Work_with_gnkt
@@ -609,11 +616,8 @@ class MyWindow(QMainWindow):
             wb2 = Workbook()
             ws2 = wb2.get_sheet_by_name('Sheet')
             ws2.title = "План работ"
-            # print(f'открытие wb2')
 
             ins_ind = self.ins_ind_border
-
-            # print(f'открытие wb2 - {ins_ind}')
 
             merged_cells = []  # Список индексов объединения ячеек
 
@@ -642,7 +646,7 @@ class MyWindow(QMainWindow):
                     merged_cells_dict.setdefault(row[0], []).append(row[1])
             plan_short = ''
 
-            for i in range(2, len(work_list)):  # нумерация работ
+            for i in range(1, len(work_list)):  # нумерация работ
                 if i >= ins_ind + 2:
                     work_list[i][1] = i - 1 - ins_ind
                     if krs.is_number(work_list[i][11]) == True:
@@ -650,8 +654,7 @@ class MyWindow(QMainWindow):
                     if work_list[i][0]:
                         plan_short += f'п.{work_list[i][1]} {work_list[i][0]} \n'
 
-            # print(f'Нормы времени - {CreatePZ.normOfTime}')
-            # print(f'строки {ins_ind}')
+
             CreatePZ.count_row_height(self.ws, ws2, work_list, merged_cells_dict, ins_ind)
             # print(f'3 - {ws2.max_row}')
             CreatePZ.itog_ind_min = self.ins_ind_border
@@ -690,9 +693,9 @@ class MyWindow(QMainWindow):
                 self.insert_image(ws2, 'imageFiles/Хасаншин.png', 'H1')
                 self.insert_image(ws2, 'imageFiles/Шамигулов.png', 'H4')
 
-                cat_H2S_list = CreatePZ.dict_category[CreatePZ.plast_work[0]]['по сероводороду'].category
-                H2S_mg = CreatePZ.dict_category[CreatePZ.plast_work[0]]['по сероводороду'].data_mg_l
-                H2S_pr = CreatePZ.dict_category[CreatePZ.plast_work[0]]['по сероводороду'].data_procent
+                cat_H2S_list = CreatePZ.dict_category[CreatePZ.plast_work_short[0]]['по сероводороду'].category
+                H2S_mg = CreatePZ.dict_category[CreatePZ.plast_work_short[0]]['по сероводороду'].data_mg_l
+                H2S_pr = CreatePZ.dict_category[CreatePZ.plast_work_short[0]]['по сероводороду'].data_procent
 
                 if cat_H2S_list  in [1, 2] and self.work_plan != 'dop_plan':
                     ws3 = wb2.create_sheet('Sheet1')
@@ -1375,11 +1378,21 @@ class MyWindow(QMainWindow):
         self.populate_row(self.ins_ind, gnkt_work_list, self.table_widget)
 
     def gnkt_opz(self):
-        from gnkt_opz import gnkt_work
+        from gnkt_opz import Gnkt_opz
+        if self.new_window is None:
 
-        print('Вставился ГНКТ')
-        ryber_work_list = gnkt_work(self)
-        self.populate_row(self.ins_ind, ryber_work_list, self.table_widget)
+            self.new_window = Gnkt_opz(self.table_widget, self.ins_ind)
+            self.new_window.setWindowTitle("Перфорация")
+            self.new_window.setGeometry(200, 400, 300, 400)
+            self.new_window.show()
+
+        else:
+            self.new_window.close()  # Close window.
+            self.new_window = None  # Discard reference.
+
+
+        # ryber_work_list = Gnkt_opz.gnkt_work(self)
+        # self.populate_row(self.ins_ind, ryber_work_list, self.table_widget)
 
     def gno_bottom(self):
         from work_py.descent_gno import gno_down
@@ -1887,8 +1900,8 @@ class MyWindow(QMainWindow):
         ws4.cell(row=11, column=1).value = f'макс угол {CreatePZ.max_angle} на {CreatePZ.max_angle_H._value}'
         ws4.cell(row=1, column=2).value = CreatePZ.cdng._value
         ws4.cell(row=2, column=3).value = \
-            f'Рпл - {CreatePZ.dict_category[CreatePZ.plast_work[0]]["по давлению"].category},' \
-              f' H2S -{CreatePZ.dict_category[CreatePZ.plast_work[0]]["по сероводороду"].category},' \
+            f'Рпл - {CreatePZ.dict_category[CreatePZ.plast_work_short[0]]["по давлению"].category},' \
+              f' H2S -{CreatePZ.dict_category[CreatePZ.plast_work_short[0]]["по сероводороду"].category},' \
               f' газ факт -{CreatePZ.gaz_f_pr[0]}т/м3'
         column_well = f'{CreatePZ.column_diametr}х{CreatePZ.column_wall_thickness} в инт 0 - {CreatePZ.shoe_column}м ' \
             if CreatePZ.column_additional is False else f'{CreatePZ.column_diametr} х {CreatePZ.column_wall_thickness} \n' \
@@ -1962,74 +1975,83 @@ class MyWindow(QMainWindow):
         from work_py.advanted_file import raid, remove_overlapping_intervals
         from work_py.opressovka import OpressovkaEK
 
-        a = False
+        check_true = False
 
-        while a is False:
+        while check_true is False:
             for plast in CreatePZ.plast_all:
                 if len(CreatePZ.dict_perforation[plast]['интервал']) >= 1:
                     for interval in CreatePZ.dict_perforation[plast]['интервал']:
                         if interval[0] < depth < interval[1]:
-                            a = False
+                            check_true = False
                         else:
-                            a = True
+                            check_true = True
                 elif len(CreatePZ.dict_perforation[plast]['интервал']) == 0:
-                    a = True
+                    check_true = True
 
 
-            if a is False:
+            if check_true is False:
                 paker_warning = QMessageBox.warning(None, 'Проверка посадки пакера в интервал перфорации',
                                                     f'Проверка посадки показала пакер сажается в интервал перфорации, '
                                                     f'необходимо изменить глубину посадки!!!')
                 # print(f'проверка {a}')
                 depth, ok = QInputDialog.getInt(None, 'опрессовка ЭК',
                                                 'Введите глубину посадки пакера для опрессовки колонны',
-                                                int(CreatePZ.perforation_roof - 20), 0,
+                                                depth, 0,
                                                 int(CreatePZ.current_bottom))
 
 
         check_for_template = OpressovkaEK.check_for_template_paker(self, depth)
-        if check_for_template[1]:
-            depth = check_for_template[0]
+        depth = check_for_template[0]
 
-            if any([interval[0] <= depth <= interval[1] for interval in CreatePZ.skm_interval]):
+        # for interval in CreatePZ.skm_interval:
+        #     print(interval[0] <= depth <= interval[1], interval, depth, all([interval[0] <= depth <= interval[1] for interval in CreatePZ.skm_interval]), any([interval[0] <= depth <= interval[1] for interval in CreatePZ.skm_interval]))
+        if all([interval[0] <= depth <= interval[1] for interval in CreatePZ.skm_interval]):
+            return int(depth)
+        else:
+            false_question = QMessageBox.question(None, 'Проверка посадки пакера в интервал скреперования',
+                                                 f'Проверка посадки показала, что пакер сажается не '
+                                                 f'в интервал скреперования, '
+                                                 f'Проигнорировать ошибку?')
+            if false_question == QMessageBox.StandardButton.Yes:
                 return int(depth)
             else:
-                false_question = QMessageBox.question(None, 'Проверка посадки пакера в интервал скреперования',
-                                                     f'Проверка посадки показала пакер сажается не в интервал скреперования, '
-                                                     f'Посадить ли пакер?')
-                if false_question == QMessageBox.StandardButton.Yes:
+                skm_question = QMessageBox.question(None, 'Скреперование',
+                                                      f'добавить интервал скреперования {depth - 20} - {depth + 20}')
+                if skm_question == QMessageBox.StandardButton.Yes:
+                    skm = (depth - 20, depth + 20)
+                    CreatePZ.skm_interval.append(skm)
+
+                    CreatePZ.skm_interval = sorted(CreatePZ.skm_interval, key = lambda  x: x[0])
+                    perforating_intervals = []
+                    for plast in CreatePZ.plast_all:
+                        for interval in CreatePZ.dict_perforation[plast]['интервал']:
+                            perforating_intervals.append(list(interval))
+
+                    raid_str = raid(remove_overlapping_intervals(perforating_intervals, CreatePZ.skm_interval))
+                    print(raid_str)
+                    for row in range(self.table_widget.rowCount()):
+                        for column in range(self.table_widget.columnCount()):
+                            value = self.table_widget.item(row, column)
+                            if value != None:
+                                value = value.text()
+                                if 'Произвести скреперование' in value:
+                                    ind_value = value.split(' ')
+                                    ind_min = ind_value.index('интервале')+1
+                                    ind_max = ind_value.index('обратной')
+
+                                    new_value = QtWidgets.QTableWidgetItem(f'{" ".join(ind_value[:ind_min])} '
+                                                                           f'{raid_str}м {" ".join(ind_value[ind_max:])}')
+
+                                    self.table_widget.setItem(row, column, new_value)
                     return int(depth)
                 else:
-                    skm_question = QMessageBox.question(None, 'Скреперование',
-                                                          f'добавить интервал скреперования {depth - 20} - {depth + 20}')
-                    if skm_question == QMessageBox.StandardButton.Yes:
+                    depth, ok = QInputDialog.getInt(None, 'опрессовка ЭК',
+                                                    'Введите глубину посадки пакера для опрессовки колонны',
+                                                    depth, 0,
+                                                    int(CreatePZ.current_bottom))
 
-                        CreatePZ.skm_interval.append((depth - 20, depth + 20))
-                        perforating_intervals = []
-                        for plast in CreatePZ.plast_all:
-                            for interval in CreatePZ.dict_perforation[plast]['интервал']:
-                                perforating_intervals.append(list(interval))
-                        # print(f'интервалы ПВР {perforating_intervals, CreatePZ.skm_interval}')
-                        raid_str = raid(remove_overlapping_intervals(perforating_intervals))
-                        for row in range(self.table_widget.rowCount()):
-                            for column in range(self.table_widget.columnCount()):
-                                value = self.table_widget.item(row, column)
-                                if value != None:
-                                    value = value.text()
-                                    if 'Произвести скреперование' in value:
-                                        ind_value = value.split(' ')
-                                        ind_min = ind_value.index('интервале')+1
-                                        ind_max = ind_value.index('обратной')
+                    return int(depth)
 
-                                        new_value = QtWidgets.QTableWidgetItem(f'{" ".join(ind_value[:ind_min])} '
-                                                                               f'{raid_str}м {" ".join(ind_value[ind_max:])}')
-
-                                        self.table_widget.setItem(row, column, new_value)
-                        return int(depth)
-                    else:
-                        return int(depth)
-        else:
-            return int(depth)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

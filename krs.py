@@ -76,13 +76,23 @@ def calc_work_fluid(self, work_plan):
     CreatePZ.fluid_short = fluid_work_insert
 
     cat_H2S_list = CreatePZ.dict_category[CreatePZ.plast_work[0]]['по сероводороду'].category
-    H2S_mg = CreatePZ.dict_category[CreatePZ.plast_work[0]]['по сероводороду'].data_mg_l
-    H2S_pr = CreatePZ.dict_category[CreatePZ.plast_work[0]]['по сероводороду'].data_procent
+
     if cat_H2S_list in [2, 1]:
+        expenditure_h2s_list = []
+        for plast in CreatePZ.plast_work:
+
+            try:
+                print(CreatePZ.dict_category[plast]['по сероводороду'].poglot)
+                expenditure_h2s_list.append([CreatePZ.dict_category[plast]['по сероводороду'].poglot][0])
+                # print(f'поглотои {expenditure_h2s_list}')
+            except:
+                pass
+        print(expenditure_h2s_list)
+        expenditure_h2s = round(max(expenditure_h2s_list), 3)
         fluid_work = f'{fluid_work_insert}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
-                     f'расчета {H2S.calv_h2s(self, cat_H2S_list, H2S_mg, H2S_pr)}кг/м3 '
+                     f'расчета {expenditure_h2s}кг/м3 '
         fluid_work_short = f'{fluid_work_insert}г/см3 c ' \
-                           f'ХИМТЕХНО 101 Марка А - {H2S.calv_h2s(self, cat_H2S_list, H2S_mg, H2S_pr)}кг/м3 '
+                           f'ХИМТЕХНО 101 Марка А - {expenditure_h2s}кг/м3 '
     else:
         fluid_work = f'{fluid_work_insert}г/см3 '
         fluid_work_short = f'{fluid_work_insert}г/см3'
@@ -97,7 +107,7 @@ def work_krs(self, work_plan):
     from work_py.descent_gno import gno_nkt_opening
     # print(f' пакер {CreatePZ.paker_do}), ЭЦН {CreatePZ.dict_pump_ECN}, ШГН {CreatePZ.dict_pump_SHGN}')
 
-    CreatePZ.fluid_work, CreatePZ.fluid_work_short =  calc_work_fluid(self, work_plan)
+    CreatePZ.fluid_work, CreatePZ.fluid_work_short = calc_work_fluid(self, work_plan)
     nkt_diam_fond = gno_nkt_opening(CreatePZ.dict_nkt)
 
     if work_plan != 'dop_plan':
@@ -233,8 +243,8 @@ def work_krs(self, work_plan):
                        f'ПРОТИВОФОНТАННЫЙ ЛИФТ ДЛИНОЙ 300м. ', None, None,
                        None, None, None, None, None,
                        'Мастер КРС представитель Заказчика', None]]
-        kvostovik = f' + хвостовиком {round(sum(list(CreatePZ.dict_nkt.values())) - float(CreatePZ.H_F_paker_do["do"]), 1)}м '\
-            if CreatePZ.region == 'ТР' else ''
+        kvostovik = f' + хвостовиком  {round(sum(list(CreatePZ.dict_nkt.values())) - float(CreatePZ.H_F_paker_do["do"]), 1)}м '\
+            if CreatePZ.region == 'ТГМ' else ''
         well_jamming_str = well_jamming(self, without_damping_True, lift_key) # экземпляр функции расчета глушения
         well_jamming_ord = volume_jamming_well(self, float(CreatePZ.H_F_paker_do["do"]))
         lift_ord = [

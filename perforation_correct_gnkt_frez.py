@@ -1,34 +1,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.Qt import *
-from PyQt5.QtGui import QRegExpValidator, QColor, QPalette
 
 from gnkt_data.gnkt_data import dict_saddles
-
-import re
-
-class FloatLineEdit(QLineEdit):
-    def __init__(self, parent=None):
-        super(FloatLineEdit, self).__init__(parent)
-
-        # Устанавливаем валидатор для проверки на float
-
-
-        reg = QRegExp("[0-9.]*")
-        pValidator = QRegExpValidator(self)
-        pValidator.setRegExp(reg)
-        self.setValidator(pValidator)
-
-    def focusOutEvent(self, event):
-        # При потере фокуса проверяем, является ли текст float
-        if self.validator().validate(self.text(), 0)[0] != QValidator.Acceptable:
-            # Если текст не является числом, меняем цвет фона на красный
-            palette = self.palette()
-            palette.setColor(QPalette.Base, QColor(Qt.red))
-            self.setPalette(palette)
-        else:
-            # Если текст является числом, возвращаем цвет фона по умолчанию
-            self.setPalette(self.parentWidget().palette())
-
 
 class TabPage_SO(QWidget):
     def __init__(self, parent=None):
@@ -67,10 +40,6 @@ class TabPage_SO(QWidget):
         self.grid.addWidget(self.manufacturer_combo, 9, 3)
         self.grid.addWidget(self.type_column_label, 10, 3)
         self.grid.addWidget(self.type_column_edit, 11, 3)
-
-
-
-        # print(self.dict_perforation)
 
 
         index_interval = 1
@@ -255,10 +224,6 @@ class PerforationCorrectGnktFrez(QMainWindow):
         CreatePZ.pause = False
         self.close()
         return dict_ports
-
-
-
-
 
 
 if __name__ == "__main__":
