@@ -36,27 +36,27 @@ class TabPage_SO(QWidget):
                 print(nek1)
                 plast_work.append(f'НЭК {nek1}')
 
-        self.plastLabel = QLabel("Выбор пласта", self)
-        self.plastCombo = CheckableComboBox(self)
-        self.plastCombo.combo_box.addItems(plast_work)
-        self.plastCombo.combo_box.currentTextChanged.connect(self.update_plast_edit)
+        self.plast_label = QLabel("Выбор пласта", self)
+        self.plast_combo = CheckableComboBox(self)
+        self.plast_combo.combo_box.addItems(plast_work)
+        self.plast_combo.combo_box.currentTextChanged.connect(self.update_plast_edit)
 
 
         self.roof_rir_label = QLabel("Плановая кровля РИР", self)
 
-        self.roof_rir_Edit = QLineEdit(self)
-        # self.roof_rir_Edit.setText()
-        self.roof_rir_Edit.setClearButtonEnabled(True)
+        self.roof_rir_edit = QLineEdit(self)
+        # self.roof_rir_edit.setText()
+        self.roof_rir_edit.setClearButtonEnabled(True)
 
         self.sole_rir_LabelType = QLabel("Подошва РИР", self)
 
-        self.sole_rir_Edit = QLineEdit(self)
-        self.sole_rir_Edit.setClearButtonEnabled(True)
-        # self.sole_rir_Edit.setText()
+        self.sole_rir_edit = QLineEdit(self)
+        self.sole_rir_edit.setClearButtonEnabled(True)
+        # self.sole_rir_edit.setText()
             # listEnabel = [self.khovstLabel, self.khvostEdit, self.swabTruelabelType, self.swabTrueEditType,
-            #               self.plastCombo, self.pakerEdit, self.paker2Edit,
-            #               self.svkTrueEdit, self.QplastEdit, self.skvProcEdit, self.acidEdit, self.acidVolumeEdit,
-            #               self.acidProcEdit]
+            #               self.plast_combo, self.pakerEdit, self.paker2Edit,
+            #               self.svk_true_edit, self.QplastEdit, self.skv_proc_edit, self.acid_edit, self.acid_volume_edit,
+            #               self.acid_proc_edit]
             # for enable in listEnabel:
             #     enable.setEnabled(False)
 
@@ -67,12 +67,12 @@ class TabPage_SO(QWidget):
 
         grid.addWidget(self.rir_type_Label, 4, 2)
         grid.addWidget(self.rir_type_Combo,5, 2)
-        grid.addWidget(self.plastLabel, 4, 3)
-        grid.addWidget(self.plastCombo, 5, 3)
+        grid.addWidget(self.plast_label, 4, 3)
+        grid.addWidget(self.plast_combo, 5, 3)
         grid.addWidget(self.roof_rir_label, 4, 4)
-        grid.addWidget(self.roof_rir_Edit, 5, 4)
+        grid.addWidget(self.roof_rir_edit, 5, 4)
         grid.addWidget(self.sole_rir_LabelType, 4, 5)
-        grid.addWidget(self.sole_rir_Edit, 5, 5)
+        grid.addWidget(self.sole_rir_edit, 5, 5)
 
 
     def update_plast_edit(self):
@@ -105,8 +105,8 @@ class TabPage_SO(QWidget):
                         if sole_plast <= nek[1]:
                             sole_plast = nek[1]
                         # print(nek, roof_plast, sole_plast)
-        self.roof_rir_Edit.setText(f"{int(roof_plast - 30)}")
-        self.sole_rir_Edit.setText(f"{CreatePZ.current_bottom}")
+        self.roof_rir_edit.setText(f"{int(roof_plast - 30)}")
+        self.sole_rir_edit.setText(f"{CreatePZ.current_bottom}")
 
 class TabWidget(QTabWidget):
     def __init__(self):
@@ -135,7 +135,7 @@ class RirWindow(QMainWindow):
         vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
 
-    def rir_rpp(self, paker_need_Combo, plastCombo, roof_rir_Edit):
+    def rir_rpp(self, paker_need_Combo, plast_combo, roof_rir_edit):
         from open_pz import CreatePZ
         from work_py.opressovka import OpressovkaEK
 
@@ -147,7 +147,7 @@ class RirWindow(QMainWindow):
         else:
             rir_rpk_plast_true = False
 
-        roof_rir_Edit = MyWindow.true_set_Paker(self, roof_rir_Edit)
+        roof_rir_edit = MyWindow.true_set_Paker(self, roof_rir_edit)
 
         if paker_need_Combo == "Нужно СПО":
             if self.work_window is None:
@@ -162,8 +162,8 @@ class RirWindow(QMainWindow):
 
             rir_list = CreatePZ.forPaker_list
 
-            rir_q_list = [f'насыщение 5м3. Определить Q {plastCombo} при Р=80-100атм. СКВ', None,
-                          f'Произвести насыщение скважины в объеме 5м3. Определить приемистость {plastCombo} при Р=80-100атм '
+            rir_q_list = [f'насыщение 5м3. Определить Q {plast_combo} при Р=80-100атм. СКВ', None,
+                          f'Произвести насыщение скважины в объеме 5м3. Определить приемистость {plast_combo} при Р=80-100атм '
                           f'в присутствии представителя УСРСиСТ или подрядчика по РИР. (Вести контроль за отдачей жидкости '
                           f'после закачки, объем согласовать с подрядчиком по РИР). В случае приёмистости менее  250м3/сут '
                           f'при Р=100атм произвести соляно-кислотную обработку скважины в объеме 1м3 HCl-12% с целью увеличения '
@@ -175,15 +175,15 @@ class RirWindow(QMainWindow):
         else:
             rir_list = []
 
-        rir_work_list = [[f'СПО РПП до глубины {roof_rir_Edit}м', None,
-                       f'Спустить   пакер глухой {self.rpk_nkt(roof_rir_Edit)}  на тНКТ{CreatePZ.nkt_diam}мм '
-                       f'до глубины {roof_rir_Edit}м '
+        rir_work_list = [[f'СПО РПП до глубины {roof_rir_edit}м', None,
+                       f'Спустить   пакер глухой {self.rpk_nkt(roof_rir_edit)}  на тНКТ{CreatePZ.nkt_diam}мм '
+                       f'до глубины {roof_rir_edit}м '
                        f'с замером, шаблонированием шаблоном {CreatePZ.nkt_template}мм. '
                        f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ) \n'
                        f'Перед спуском технологического пакера произвести визуальный осмотр в присутствии '
                        f'представителя РИР или УСРСиСТ.',
             None, None, None, None, None, None, None,
-        'мастер КРС', descentNKT_norm(roof_rir_Edit,1.2)],
+        'мастер КРС', descentNKT_norm(roof_rir_edit,1.2)],
          [f'Привязка по ГК и ЛМ', None,
           f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС "Ойл-сервис". '
           f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером от 14.10.2021г. '
@@ -195,9 +195,9 @@ class RirWindow(QMainWindow):
           f'в присутствии порядчика по РИР. Составить акт. Вымыть шар обратной промывкой ',
           None, None, None, None, None, None, None,
           'Мастер КРС, подрядчик РИР, УСРСиСТ', 0.5+0.6],
-         [f'установка РПП на {roof_rir_Edit}м', None,
-          f'Произвести установку глухого пакера  для изоляции {plastCombo} по технологическому плану подрядчика по РИР силами подрядчика по РИР '
-          f'с установкой пакера  на глубине {roof_rir_Edit}м',
+         [f'установка РПП на {roof_rir_edit}м', None,
+          f'Произвести установку глухого пакера  для изоляции {plast_combo} по технологическому плану подрядчика по РИР силами подрядчика по РИР '
+          f'с установкой пакера  на глубине {roof_rir_edit}м',
           None, None, None, None, None, None, None,
           'Мастер КРС, подрядчик РИР, УСРСиСТ', 8],
 
@@ -208,23 +208,23 @@ class RirWindow(QMainWindow):
           None, None, None, None, None, None, None,
           'Мастер КРС, подрядчик РИР, УСРСиСТ', 0.67],
          [None, None,
-          f'Поднять стыковочное устройство с глубины {roof_rir_Edit}м с доливом скважины в объеме '
+          f'Поднять стыковочное устройство с глубины {roof_rir_edit}м с доливом скважины в объеме '
           f'{round(CreatePZ.current_bottom*1.12/1000, 1)}м3 тех. жидкостью  уд.весом {CreatePZ.fluid_work} ',
           None, None, None, None, None, None, None,
-          'Мастер КРС, подрядчик РИР, УСРСиСТ', liftingNKT_norm(roof_rir_Edit, 1.2)]]
+          'Мастер КРС, подрядчик РИР, УСРСиСТ', liftingNKT_norm(roof_rir_edit, 1.2)]]
 
 
         for row in rir_work_list:
             rir_list.append(row)
 
-        CreatePZ.current_bottom = roof_rir_Edit
-        self.perf_new(roof_rir_Edit, roof_rir_Edit + 1)
+        CreatePZ.current_bottom = roof_rir_edit
+        self.perf_new(roof_rir_edit, roof_rir_edit + 1)
         CreatePZ.forPaker_list = None
         return rir_list
 
 
 
-    def rir_rpk(self, paker_need_Combo, plastCombo, roof_rir_Edit):
+    def rir_rpk(self, paker_need_Combo, plast_combo, roof_rir_edit):
         from open_pz import CreatePZ
         from work_py.opressovka import OpressovkaEK
         rir_list = []
@@ -236,7 +236,7 @@ class RirWindow(QMainWindow):
         else:
             rir_rpk_plast_true = False
 
-        roof_rir_Edit = MyWindow.true_set_Paker(self, roof_rir_Edit)
+        roof_rir_edit = MyWindow.true_set_Paker(self, roof_rir_edit)
 
         if paker_need_Combo == "Нужно СПО":
             if self.work_window is None:
@@ -251,8 +251,8 @@ class RirWindow(QMainWindow):
 
             rir_list = CreatePZ.forPaker_list
 
-            rir_q_list = [f'насыщение 5м3. Определить Q {plastCombo} при Р=80-100атм. СКВ', None,
-                          f'Произвести насыщение скважины в объеме 5м3. Определить приемистость {plastCombo} при Р=80-100атм '
+            rir_q_list = [f'насыщение 5м3. Определить Q {plast_combo} при Р=80-100атм. СКВ', None,
+                          f'Произвести насыщение скважины в объеме 5м3. Определить приемистость {plast_combo} при Р=80-100атм '
                           f'в присутствии представителя УСРСиСТ или подрядчика по РИР. (Вести контроль за отдачей жидкости '
                           f'после закачки, объем согласовать с подрядчиком по РИР). В случае приёмистости менее  250м3/сут '
                           f'при Р=100атм произвести соляно-кислотную обработку скважины в объеме 1м3 HCl-12% с целью увеличения '
@@ -271,14 +271,14 @@ class RirWindow(QMainWindow):
           f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины',
           None, None, None, None, None, None, None,
           'Мастер КРС, подрядчик по ГИС', 4],
-          [f'посадить пакер на глубину {roof_rir_Edit}м'
+          [f'посадить пакер на глубину {roof_rir_edit}м'
               , None,
-                       f'посадить пакер на глубину {roof_rir_Edit}м',
+                       f'посадить пакер на глубину {roof_rir_edit}м',
                         None, None, None, None, None, None, None,
                         'мастер КРС', 1],
-          [f'Насыщение 5м3. Определить приемистость {plastCombo} при Р=80-100атм',
+          [f'Насыщение 5м3. Определить приемистость {plast_combo} при Р=80-100атм',
            None,
-                       f'Произвести насыщение скважины в объеме 5м3. Определить приемистость {plastCombo} при Р=80-100атм '
+                       f'Произвести насыщение скважины в объеме 5м3. Определить приемистость {plast_combo} при Р=80-100атм '
                        f'в присутствии представителя УСРСиСТ или подрядчика по РИР. (Вести контроль за отдачей жидкости '
                        f'после закачки, объем согласовать с подрядчиком по РИР). В случае приёмистости менее  250м3/сут '
                        f'при Р=100атм произвести соляно-кислотную обработку скважины в объеме 1м3 HCl-12% с целью увеличения '
@@ -291,9 +291,9 @@ class RirWindow(QMainWindow):
             rir_rpk_plast_true = False
 
             rir_q_list = [
-                          [f'Насыщение 5м3. Определить Q {plastCombo} при Р=80-100атм',
+                          [f'Насыщение 5м3. Определить Q {plast_combo} при Р=80-100атм',
                            None,
-                           f'Произвести насыщение скважины в объеме 5м3. Определить приемистость {plastCombo} при Р=80-100атм '
+                           f'Произвести насыщение скважины в объеме 5м3. Определить приемистость {plast_combo} при Р=80-100атм '
                            f'в присутствии представителя УСРСиСТ или подрядчика по РИР. (Вести контроль за отдачей жидкости '
                            f'после закачки, объем согласовать с подрядчиком по РИР). В случае приёмистости менее  250м3/сут '
                            f'при Р=100атм произвести соляно-кислотную обработку скважины в объеме 1м3 HCl-12% с целью увеличения '
@@ -303,14 +303,14 @@ class RirWindow(QMainWindow):
             for row in rir_q_list[::-1]:
                 rir_list.insert(-1, row)
 
-        rir_work_list = [[f'СПО пакера РПК до глубины {roof_rir_Edit}м', None,
-                       f'Спустить   пакера РПК {self.rpk_nkt(roof_rir_Edit)}  на тНКТ{CreatePZ.nkt_diam}мм до глубины {roof_rir_Edit}м с '
+        rir_work_list = [[f'СПО пакера РПК до глубины {roof_rir_edit}м', None,
+                       f'Спустить   пакера РПК {self.rpk_nkt(roof_rir_edit)}  на тНКТ{CreatePZ.nkt_diam}мм до глубины {roof_rir_edit}м с '
                        f'замером, шаблонированием шаблоном {CreatePZ.nkt_template}мм. '
                        f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ) \n'
                        f'Перед спуском технологического пакера произвести визуальный осмотр в присутствии представителя '
                        f'РИР или УСРСиСТ.',
             None, None, None, None, None, None, None,
-        'мастер КРС', descentNKT_norm(roof_rir_Edit,1.2)],
+        'мастер КРС', descentNKT_norm(roof_rir_edit,1.2)],
          [f'Привязкапо ГК и ЛМ', None,
           f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС "Ойл-сервис". '
           f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером от 14.10.2021г. '
@@ -322,9 +322,9 @@ class RirWindow(QMainWindow):
           f'в присутствии порядчика по РИР. Составить акт. Вымыть шар обратной промывкой ',
           None, None, None, None, None, None, None,
           'Мастер КРС, подрядчик РИР, УСРСиСТ', 1.2],
-         [f'РИР {plastCombo} с установкой пакера РПК на глубине {roof_rir_Edit}м ', None,
-          f'Произвести РИР {plastCombo} по технологическому плану подрядчика по РИР силами подрядчика по РИР '
-          f'с установкой пакера РПК на глубине {roof_rir_Edit}м',
+         [f'РИР {plast_combo} с установкой пакера РПК на глубине {roof_rir_edit}м ', None,
+          f'Произвести РИР {plast_combo} по технологическому плану подрядчика по РИР силами подрядчика по РИР '
+          f'с установкой пакера РПК на глубине {roof_rir_edit}м',
           None, None, None, None, None, None, None,
           'Мастер КРС, подрядчик РИР, УСРСиСТ', 8],
          [f'ОЗЦ 16-24 часа', None,
@@ -339,14 +339,14 @@ class RirWindow(QMainWindow):
           None, None, None, None, None, None, None,
           'Мастер КРС, подрядчик РИР, УСРСиСТ',0.67],
          [None, None,
-          f'Во время ОЗЦ поднять стыковочное устройство с глубины {roof_rir_Edit}м с доливом скважины в объеме '
+          f'Во время ОЗЦ поднять стыковочное устройство с глубины {roof_rir_edit}м с доливом скважины в объеме '
           f'{round(CreatePZ.current_bottom*1.12/1000, 1)}м3 тех. жидкостью  уд.весом {CreatePZ.fluid_work} ',
           None, None, None, None, None, None, None,
-          'Мастер КРС, подрядчик РИР, УСРСиСТ', liftingNKT_norm(roof_rir_Edit,1)]]
+          'Мастер КРС, подрядчик РИР, УСРСиСТ', liftingNKT_norm(roof_rir_edit,1)]]
         for row in rir_work_list:
             rir_list.append(row)
-        self.perf_new(roof_rir_Edit, CreatePZ.current_bottom)
-        CreatePZ.current_bottom = roof_rir_Edit
+        self.perf_new(roof_rir_edit, CreatePZ.current_bottom)
+        CreatePZ.current_bottom = roof_rir_edit
         CreatePZ.forPaker_list = None
         return rir_list
 
@@ -407,7 +407,7 @@ class RirWindow(QMainWindow):
         return rpk_nkt_select
 
 
-    def rirWithPero(self, paker_need_Combo, plastCombo, roof_rir_Edit, sole_rir_Edit):
+    def rirWithPero(self, paker_need_Combo, plast_combo, roof_rir_edit, sole_rir_edit):
         from open_pz import CreatePZ
         from work_py.opressovka import OpressovkaEK
         from krs import volume_vn_nkt
@@ -416,23 +416,23 @@ class RirWindow(QMainWindow):
 
         
         if CreatePZ.column_additional == True and CreatePZ.column_additional_diametr <110:
-            dict_nkt = {73: CreatePZ.head_column_additional, 60: CreatePZ.head_column_additional-sole_rir_Edit}
+            dict_nkt = {73: CreatePZ.head_column_additional, 60: CreatePZ.head_column_additional-sole_rir_edit}
         else:
-            dict_nkt = {73: sole_rir_Edit}
+            dict_nkt = {73: sole_rir_edit}
 
 
-        volume_cement = round(volume_vn_ek(self,roof_rir_Edit) * (sole_rir_Edit - roof_rir_Edit)/1000, 1)
+        volume_cement = round(volume_vn_ek(self,roof_rir_edit) * (sole_rir_edit - roof_rir_edit)/1000, 1)
 
         uzmPero_list = [
-            [f' СПО пера до глубины {sole_rir_Edit}м Опрессовать НКТ на 200атм', None,
-             f'Спустить {self.pero_select(sole_rir_Edit)}  на тНКТ{nkt_diam}мм до глубины {sole_rir_Edit}м с '
+            [f' СПО пера до глубины {sole_rir_edit}м Опрессовать НКТ на 200атм', None,
+             f'Спустить {self.pero_select(sole_rir_edit)}  на тНКТ{nkt_diam}мм до глубины {sole_rir_edit}м с '
              f'замером, шаблонированием '
              f'шаблоном {CreatePZ.nkt_template}мм. Опрессовать НКТ на 200атм. Вымыть шар. \n'
              f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
              None, None, None, None, None, None, None,
-             'мастер КРС',descentNKT_norm(sole_rir_Edit, 1)],
-            [f'УЦМ в интервале {roof_rir_Edit}-{sole_rir_Edit}м', None,
-             f'Произвести установку  цементного моста в интервале {roof_rir_Edit}-{sole_rir_Edit}м в присутствии '
+             'мастер КРС',descentNKT_norm(sole_rir_edit, 1)],
+            [f'УЦМ в интервале {roof_rir_edit}-{sole_rir_edit}м', None,
+             f'Произвести установку  цементного моста в интервале {roof_rir_edit}-{sole_rir_edit}м в присутствии '
              f'представителя УСРСиСТ',
              None, None, None, None, None, None, None,
              'мастер КРС', 2.5],
@@ -450,7 +450,7 @@ class RirWindow(QMainWindow):
              None, None, None, None, None, None, None,
              'мастер КРС', 0.5],
             [None, None,
-             f'Приподнять перо до гл.{roof_rir_Edit}м. ',
+             f'Приподнять перо до гл.{roof_rir_edit}м. ',
              None, None, None, None, None, None, None,
              'мастер КРС', 0.5],
             [None, None,
@@ -460,7 +460,7 @@ class RirWindow(QMainWindow):
              None, None, None, None, None, None, None,
              'мастер КРС', well_volume_norm(16)],
             [None, None,
-             f'Поднять перо на безопасную зону до гл. {roof_rir_Edit-300}м с доливом скважины в объеме 0,3м3 тех. жидкостью '
+             f'Поднять перо на безопасную зону до гл. {roof_rir_edit-300}м с доливом скважины в объеме 0,3м3 тех. жидкостью '
              f'уд.весом {CreatePZ.fluid_work}.',
              None, None, None, None, None, None, None,
              'мастер КРС', 0.5],
@@ -470,7 +470,7 @@ class RirWindow(QMainWindow):
              None, None, None, None, None, None, None,
              'мастер КРС',24],
             [None, None,
-             f'Допустить компоновку с замером и шаблонированием НКТ до кровли цементного моста (плановый на гл. {roof_rir_Edit}м'
+             f'Допустить компоновку с замером и шаблонированием НКТ до кровли цементного моста (плановый на гл. {roof_rir_edit}м'
              f' с прямой промывкой и разгрузкой на забой 3т. Текущий забой согласовать с Заказчиком письменной телефонограммой.',
              None, None, None, None, None, None, None,
              'мастер КРС', 1.2],
@@ -483,10 +483,10 @@ class RirWindow(QMainWindow):
              None, None, None, None, None, None, None,
              'мастер КРС', 0.67],
             [None, None,
-             f'Поднять перо на тНКТ{nkt_diam}мм с глубины {roof_rir_Edit}м с доливом скважины в объеме 2,2м3 тех. жидкостью '
+             f'Поднять перо на тНКТ{nkt_diam}мм с глубины {roof_rir_edit}м с доливом скважины в объеме 2,2м3 тех. жидкостью '
              f'уд.весом {CreatePZ.fluid_work}',
              None, None, None, None, None, None, None,
-             'мастер КРС', descentNKT_norm(roof_rir_Edit, 1)],
+             'мастер КРС', descentNKT_norm(roof_rir_edit, 1)],
         ]
 
 
@@ -495,8 +495,8 @@ class RirWindow(QMainWindow):
             for row in uzmPero_list:
                 rir_list.append(row)
 
-            self.perf_new(roof_rir_Edit, sole_rir_Edit)
-            CreatePZ.current_bottom = roof_rir_Edit
+            self.perf_new(roof_rir_edit, sole_rir_edit)
+            CreatePZ.current_bottom = roof_rir_edit
 
             if len(CreatePZ.plast_work) != 0:
                 rir_list.pop(-2)
@@ -504,17 +504,17 @@ class RirWindow(QMainWindow):
         else:
             rir_list = []
             rirPero_list = [
-                [f'СПО пера до глубины {sole_rir_Edit}м. Опрессовать НКТ на 200атм', None,
-                 f'Спустить {self.pero_select(sole_rir_Edit)}  на тНКТ{nkt_diam}мм до глубины {sole_rir_Edit}м '
+                [f'СПО пера до глубины {sole_rir_edit}м. Опрессовать НКТ на 200атм', None,
+                 f'Спустить {self.pero_select(sole_rir_edit)}  на тНКТ{nkt_diam}мм до глубины {sole_rir_edit}м '
                  f'с замером, шаблонированием '
                  f'шаблоном {CreatePZ.nkt_template}мм. Опрессовать НКТ на 200атм. Вымыть шар. \n'
                  f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
                  None, None, None, None, None, None, None,
-                 'мастер КРС', descentNKT_norm(sole_rir_Edit, 1)],
-                [f'УЦМ в инт {roof_rir_Edit}-{sole_rir_Edit}м',
+                 'мастер КРС', descentNKT_norm(sole_rir_edit, 1)],
+                [f'УЦМ в инт {roof_rir_edit}-{sole_rir_edit}м',
                  None,
-                 f'Произвести цементную заливку с целью изоляции пласта {plastCombo}  в интервале '
-                 f'{roof_rir_Edit}-{sole_rir_Edit}м в присутствии '
+                 f'Произвести цементную заливку с целью изоляции пласта {plast_combo}  в интервале '
+                 f'{roof_rir_edit}-{sole_rir_edit}м в присутствии '
                  f'представителя УСРС и СТ',
                  None, None, None, None, None, None, None,
                  'мастер КРС', 2.5],
@@ -532,7 +532,7 @@ class RirWindow(QMainWindow):
                  None, None, None, None, None, None, None,
                  'мастер КРС', 0.5],
                 [None, None,
-                 f'Приподнять перо до гл.{roof_rir_Edit}м. Закрыть трубное простанство. '
+                 f'Приподнять перо до гл.{roof_rir_edit}м. Закрыть трубное простанство. '
                  f'Продавить по затрубному пространству '
                  f'тех.жидкостью  при давлении не более {CreatePZ.max_admissible_pressure}атм '
                  f'(до получения технологического СТОП).',
@@ -547,7 +547,7 @@ class RirWindow(QMainWindow):
                  None, None, None, None, None, None, None,
                  'мастер КРС', well_volume_norm(16)],
                 [None, None,
-                 f'Поднять перо на безопасную зону до гл. {roof_rir_Edit - 300}м с доливом скважины в объеме 0,3м3 тех. жидкостью '
+                 f'Поднять перо на безопасную зону до гл. {roof_rir_edit - 300}м с доливом скважины в объеме 0,3м3 тех. жидкостью '
                  f'уд.весом {CreatePZ.fluid_work}.',
                  None, None, None, None, None, None, None,
                  'мастер КРС', 1.2],
@@ -558,7 +558,7 @@ class RirWindow(QMainWindow):
                  'мастер КРС', 24],
                 [None, None,
                  f'Допустить компоновку с замером и шаблонированием НКТ до кровли цементного моста '
-                 f'(плановый на гл. {roof_rir_Edit}м'
+                 f'(плановый на гл. {roof_rir_edit}м'
                  f' с прямой промывкой и разгрузкой на забой 3т. Текущий забой согласовать с Заказчиком письменной '
                  f'телефонограммой.',
                  None, None, None, None, None, None, None,
@@ -573,11 +573,11 @@ class RirWindow(QMainWindow):
                  None, None, None, None, None, None, None,
                  'мастер КРС', 0.67],
                 [None, None,
-                 f'Поднять перо на тНКТ{nkt_diam}мм с глубины {roof_rir_Edit}м с доливом скважины в объеме '
-                 f'{round(roof_rir_Edit * 1.12 / 1000, 1)}м3 тех. жидкостью '
+                 f'Поднять перо на тНКТ{nkt_diam}мм с глубины {roof_rir_edit}м с доливом скважины в объеме '
+                 f'{round(roof_rir_edit * 1.12 / 1000, 1)}м3 тех. жидкостью '
                  f'уд.весом {CreatePZ.fluid_work}',
                  None, None, None, None, None, None, None,
-                 'мастер КРС', liftingNKT_norm(roof_rir_Edit, 1)],
+                 'мастер КРС', liftingNKT_norm(roof_rir_edit, 1)],
             ]
             if paker_need_Combo == "Нужно СПО":
                 if self.work_window is None:
@@ -592,8 +592,8 @@ class RirWindow(QMainWindow):
 
                 rir_list = CreatePZ.forPaker_list
 
-                rir_q_list = [f'насыщение 5м3. Определить Q {plastCombo} при Р=80-100атм. СКВ', None,
-                              f'Произвести насыщение скважины в объеме 5м3. Определить приемистость {plastCombo} при Р=80-100атм '
+                rir_q_list = [f'насыщение 5м3. Определить Q {plast_combo} при Р=80-100атм. СКВ', None,
+                              f'Произвести насыщение скважины в объеме 5м3. Определить приемистость {plast_combo} при Р=80-100атм '
                               f'в присутствии представителя УСРСиСТ или подрядчика по РИР. (Вести контроль за отдачей жидкости '
                               f'после закачки, объем согласовать с подрядчиком по РИР). В случае приёмистости менее  250м3/сут '
                               f'при Р=100атм произвести соляно-кислотную обработку скважины в объеме 1м3 HCl-12% с целью увеличения '
@@ -606,9 +606,9 @@ class RirWindow(QMainWindow):
 
 
                 glin_list = [
-                    [f'насыщение 5м3. Определить Q {plastCombo} при Р=80-100атм ',
+                    [f'насыщение 5м3. Определить Q {plast_combo} при Р=80-100атм ',
                      None,
-                     f'Произвести насыщение скважины в объеме 5м3. Определить приемистость {plastCombo} при Р=80-100атм '
+                     f'Произвести насыщение скважины в объеме 5м3. Определить приемистость {plast_combo} при Р=80-100атм '
                      f'в присутствии представителя УСРСиСТ или подрядчика по РИР. (Вести контроль за отдачей жидкости '
                      f'после закачки, объем согласовать с подрядчиком по РИР). В случае приёмистости менее  250м3/сут '
                      f'при Р={CreatePZ.max_admissible_pressure}атм произвести соляно-кислотную обработку скважины в объеме 1м3 HCl-12% с целью увеличения '
@@ -673,8 +673,8 @@ class RirWindow(QMainWindow):
 
             for row in rirPero_list:
                 rir_list.append(row)
-            self.perf_new(roof_rir_Edit, CreatePZ.current_bottom)
-            CreatePZ.current_bottom = roof_rir_Edit
+            self.perf_new(roof_rir_edit, CreatePZ.current_bottom)
+            CreatePZ.current_bottom = roof_rir_edit
 
             if len(CreatePZ.plast_work) != 0:
                 rir_list.pop(-2)
@@ -687,19 +687,19 @@ class RirWindow(QMainWindow):
         CreatePZ.forPaker_list = None
         return rir_list
 
-    def pero_select(self, sole_rir_Edit):
+    def pero_select(self, sole_rir_edit):
         from open_pz import CreatePZ
-        if CreatePZ.column_additional == False or CreatePZ.column_additional == True and sole_rir_Edit < CreatePZ.head_column_additional:
+        if CreatePZ.column_additional == False or CreatePZ.column_additional == True and sole_rir_edit < CreatePZ.head_column_additional:
             pero_select = f'перо + опрессовочное седло + НКТ{CreatePZ.nkt_diam} 20м + репер'
 
-        elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr < 110 and sole_rir_Edit > CreatePZ.head_column_additional:
-            pero_select = f'перо + опрессовочное седло + НКТ60мм 20м + репер + НКТ60мм L- {round(sole_rir_Edit - CreatePZ.head_column_additional, 1)}м'
-        elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr > 110 and sole_rir_Edit > CreatePZ.head_column_additional:
+        elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr < 110 and sole_rir_edit > CreatePZ.head_column_additional:
+            pero_select = f'перо + опрессовочное седло + НКТ60мм 20м + репер + НКТ60мм L- {round(sole_rir_edit - CreatePZ.head_column_additional, 1)}м'
+        elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr > 110 and sole_rir_edit > CreatePZ.head_column_additional:
             pero_select = f'воронку + опрессовочное седло + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками 20м + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками' \
-                           f' L- {sole_rir_Edit - CreatePZ.head_column_additional}м'
+                           f' L- {sole_rir_edit - CreatePZ.head_column_additional}м'
         return pero_select
 
-    def rir_paker(self, paker_need_Combo, plastCombo, roof_rir_Edit, sole_rir_Edit):
+    def rir_paker(self, paker_need_Combo, plast_combo, roof_rir_edit, sole_rir_edit):
         from open_pz import CreatePZ
         from work_py.opressovka import OpressovkaEK
         if paker_need_Combo == "Нужно СПО":
@@ -718,8 +718,8 @@ class RirWindow(QMainWindow):
 
 
 
-            rir_q_list = [f'насыщение 5м3. Определить Q {plastCombo} при Р=80-100атм. СКВ', None,
-                   f'Произвести насыщение скважины в объеме 5м3. Определить приемистость {plastCombo} при Р=80-100атм '
+            rir_q_list = [f'насыщение 5м3. Определить Q {plast_combo} при Р=80-100атм. СКВ', None,
+                   f'Произвести насыщение скважины в объеме 5м3. Определить приемистость {plast_combo} при Р=80-100атм '
                    f'в присутствии представителя УСРСиСТ или подрядчика по РИР. (Вести контроль за отдачей жидкости '
                    f'после закачки, объем согласовать с подрядчиком по РИР). В случае приёмистости менее  250м3/сут '
                    f'при Р=100атм произвести соляно-кислотную обработку скважины в объеме 1м3 HCl-12% с целью увеличения '
@@ -731,9 +731,9 @@ class RirWindow(QMainWindow):
         else:
             rir_list = []
 
-        rir_paker_list = [[ f'РИР c пакером {plastCombo} c плановой кровлей на глубине {roof_rir_Edit}м',
+        rir_paker_list = [[ f'РИР c пакером {plast_combo} c плановой кровлей на глубине {roof_rir_edit}м',
                             None,
-          f'Произвести РИР {plastCombo} c плановой кровлей на глубине {roof_rir_Edit}м по технологическому плану'
+          f'Произвести РИР {plast_combo} c плановой кровлей на глубине {roof_rir_edit}м по технологическому плану'
           f' подрядчика по РИР силами подрядчика по РИР '
           f'Перед спуском технологического пакера произвести испытание гидроякоря в присутсвии представителя '
           f'РИР или УСРСиСТ.',
@@ -746,7 +746,7 @@ class RirWindow(QMainWindow):
           'Мастер КРС, подрядчик РИР, УСРСиСТ', 24],
           [f'Определение кровли', None,
            f'Допустить компоновку с замером и шаблонированием НКТ до кровли цементного моста (плановый на '
-           f'гл. {roof_rir_Edit}м'
+           f'гл. {roof_rir_edit}м'
            f' с прямой промывкой и разгрузкой на забой 3т',
            None, None, None, None, None, None, None,
            'Мастер КРС, подрядчик РИР, УСРСиСТ', 1.2],
@@ -757,13 +757,13 @@ class RirWindow(QMainWindow):
           None, None, None, None, None, None, None,
           'Мастер КРС, подрядчик РИР, УСРСиСТ', 0.67],
           [None, None,
-           f'Поднять компоновку РИР на тНКТ{CreatePZ.nkt_diam}мм с глубины {roof_rir_Edit}м с доливом скважины в объеме '
-           f'{round(roof_rir_Edit * 1.12 / 1000, 1)}м3 тех. жидкостью  уд.весом {CreatePZ.fluid_work}',
+           f'Поднять компоновку РИР на тНКТ{CreatePZ.nkt_diam}мм с глубины {roof_rir_edit}м с доливом скважины в объеме '
+           f'{round(roof_rir_edit * 1.12 / 1000, 1)}м3 тех. жидкостью  уд.весом {CreatePZ.fluid_work}',
            None, None, None, None, None, None, None,
-           'Мастер КРС, подрядчик РИР, УСРСиСТ', liftingNKT_norm(roof_rir_Edit,1.2)]
+           'Мастер КРС, подрядчик РИР, УСРСиСТ', liftingNKT_norm(roof_rir_edit,1.2)]
             ]
-        self.perf_new(roof_rir_Edit, sole_rir_Edit)
-        CreatePZ.current_bottom = roof_rir_Edit
+        self.perf_new(roof_rir_edit, sole_rir_edit)
+        CreatePZ.current_bottom = roof_rir_edit
 
         if len(CreatePZ.plast_work) != 0:
             rir_paker_list.pop(-2)
@@ -776,28 +776,28 @@ class RirWindow(QMainWindow):
     def addRowTable(self):
         from open_pz import CreatePZ
 
-        plastCombo = str(self.tabWidget.currentWidget().plastCombo.combo_box.currentText())
+        plast_combo = str(self.tabWidget.currentWidget().plast_combo.combo_box.currentText())
         paker_need_Combo = str(self.tabWidget.currentWidget().paker_need_Combo.currentText())
         rir_type_Combo = str(self.tabWidget.currentWidget().rir_type_Combo.currentText())
-        roof_rir_Edit = int(float(self.tabWidget.currentWidget().roof_rir_Edit.text().replace(',', '.')))
-        sole_rir_Edit = int(float(self.tabWidget.currentWidget().sole_rir_Edit.text().replace(',', '.')))
+        roof_rir_edit = int(float(self.tabWidget.currentWidget().roof_rir_edit.text().replace(',', '.')))
+        sole_rir_edit = int(float(self.tabWidget.currentWidget().sole_rir_edit.text().replace(',', '.')))
 
         if rir_type_Combo == 'РИР на пере': # ['РИР на пере', 'РИР с пакером', 'РИР с РПК', 'РИР с РПП']
 
-            work_list = self.rirWithPero(paker_need_Combo, plastCombo, roof_rir_Edit, sole_rir_Edit)
+            work_list = self.rirWithPero(paker_need_Combo, plast_combo, roof_rir_edit, sole_rir_edit)
             AcidPakerWindow.populate_row(self, CreatePZ.ins_ind, work_list)
 
         elif rir_type_Combo == 'РИР с пакером': # ['РИР на пере', 'РИР с пакером', 'РИР с РПК', 'РИР с РПП']
-            print(paker_need_Combo, plastCombo, roof_rir_Edit, sole_rir_Edit)
-            work_list = self.rir_paker(paker_need_Combo, plastCombo, roof_rir_Edit, sole_rir_Edit)
+            print(paker_need_Combo, plast_combo, roof_rir_edit, sole_rir_edit)
+            work_list = self.rir_paker(paker_need_Combo, plast_combo, roof_rir_edit, sole_rir_edit)
             AcidPakerWindow.populate_row(self, CreatePZ.ins_ind, work_list)
         elif rir_type_Combo == 'РИР с РПК': # ['РИР на пере', 'РИР с пакером', 'РИР с РПК', 'РИР с РПП']
 
-            work_list = self.rir_rpk(paker_need_Combo, plastCombo, roof_rir_Edit)
+            work_list = self.rir_rpk(paker_need_Combo, plast_combo, roof_rir_edit)
             AcidPakerWindow.populate_row(self, CreatePZ.ins_ind, work_list)
         elif rir_type_Combo == 'РИР с РПП': # ['РИР на пере', 'РИР с пакером', 'РИР с РПК', 'РИР с РПП']
 
-            work_list = self.rir_rpp(paker_need_Combo, plastCombo, roof_rir_Edit)
+            work_list = self.rir_rpp(paker_need_Combo, plast_combo, roof_rir_edit)
             AcidPakerWindow.populate_row(self, CreatePZ.ins_ind, work_list)
 
         CreatePZ.pause = True

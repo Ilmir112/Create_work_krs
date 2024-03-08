@@ -398,18 +398,18 @@ class WellFond_data(FindIndexPZ):
                     elif value == 'Н посадки, м':
                         try:
                             if CreatePZ.paker_do["do"] != 0:
-                                CreatePZ.H_F_paker_do["do"] = self.check_str_None(row[col_do].value)[0]
-                                CreatePZ.H_F_paker2_do["do"] = self.check_str_None(row[col_do].value)[1]
+                                CreatePZ.depth_fond_paker_do["do"] = self.check_str_None(row[col_do].value)[0]
+                                CreatePZ.depth_fond_paker2_do["do"] = self.check_str_None(row[col_do].value)[1]
                         except:
                             if CreatePZ.paker_do["do"] != 0:
-                                CreatePZ.H_F_paker_do["do"] = row[col_do].value
+                                CreatePZ.depth_fond_paker_do["do"] = row[col_do].value
                         try:
                             if CreatePZ.paker_do["posle"] != 0:
-                                CreatePZ.H_F_paker_do["posle"] = self.check_str_None(row[col_plan].value)[0]
-                                CreatePZ.H_F_paker2_do["posle"] = self.check_str_None(row[col_plan].value)[1]
+                                CreatePZ.depth_fond_paker_do["posle"] = self.check_str_None(row[col_plan].value)[0]
+                                CreatePZ.depth_fond_paker2_do["posle"] = self.check_str_None(row[col_plan].value)[1]
                         except:
                             if CreatePZ.paker_do["posle"] != 0:
-                                CreatePZ.H_F_paker_do["posle"] = row[col_plan].value
+                                CreatePZ.depth_fond_paker_do["posle"] = row[col_plan].value
 
 class WellHistory_data(FindIndexPZ):
 
@@ -559,7 +559,7 @@ class Well_expected_pick_up(FindIndexPZ):
                         CreatePZ.Qoil = self.definition_is_None(CreatePZ.Qoil, row_index, col + 1, 1)
                     if 'воды' in str(value).lower():
                         proc_water = str(row[col + 1].value).replace(' ', '').replace('%', '')
-                        proc_water = int(proc_water) if float(proc_water) > 1 else round(float(proc_water) * 100, 0)
+                        proc_water = int(float(proc_water)) if float(proc_water) > 1 else round(float(proc_water) * 100, 0)
                         CreatePZ.proc_water = self.definition_is_None(proc_water, row_index, col + 1, 1)
 
             try:
@@ -852,7 +852,7 @@ class Well_perforation(FindIndexPZ):
             cancel_index = QInputDialog.getInt(self, 'Индекс начала',
                                                    'ВВедите индекс окончания рабочих интервалов ПВР', 0, 0, 300)[0] - 2
 
-        print(f'основн {osnov_stvol, bokov_stvol}')
+        # print(f'основн {osnov_stvol, bokov_stvol}')
         # print(begin_index, cancel_index)
         perforations_intervals = []
         for row_index, row in enumerate(
@@ -867,8 +867,8 @@ class Well_perforation(FindIndexPZ):
 
             if all([str(i).strip() == 'None' or i is None for i in lst]) is False:
                 perforations_intervals.append(lst)
-        print(perforations_intervals)
-        for ind, row in enumerate(sorted(perforations_intervals, key=lambda x: float(x[2]))):
+        # print(perforations_intervals)
+        for ind, row in enumerate(sorted(perforations_intervals, key=lambda x: float(str(x[2]).replace(',', '.')))):
             plast = row[col_plast_index]
             if plast is None:
                 plast = perforations_intervals[ind - 1][col_plast_index]

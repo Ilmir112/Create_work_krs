@@ -95,14 +95,14 @@ def gnkt_work(self):
                f'подъём до получения посадки с целью определения глубины "головы" проппанта.',
         None, None, None, None, None, None, None,
             'Мастер ГНКТ, ', 4.5],
-    [None, 23, f'ВНИМАНИЕ: При получении посадки до гл. {CreatePZ.H_F_paker_do["do"]}м и наличии разгрузки на промывочный '
+    [None, 23, f'ВНИМАНИЕ: При получении посадки до гл. {CreatePZ.depth_fond_paker_do["do"]}м и наличии разгрузки на промывочный '
                f'инструмент более 500кг  (уведомить Заказчика – '
                f'составить АКТ на посадку). Приподнять КНК-1 на 20м выше глубины посадки. '
                f'Произвести вывод НКА на рабочий режим, восстановить '
                f'устойчивую циркуляцию промывочной жидкости (расход 180-190л/мин), '
-               f'произвести промывку лифта НКТ до гл.{CreatePZ.H_F_paker_do["do"]}м с постоянным контролем промывочной жидкости '
+               f'произвести промывку лифта НКТ до гл.{CreatePZ.depth_fond_paker_do["do"]}м с постоянным контролем промывочной жидкости '
                f'в обратной ёмкости на наличие мех. примесей. Скорость спуска при промывке НКТ от проппанта до '
-               f'гл.{CreatePZ.H_F_paker_do["do"]}м не более 5м/мин. Контрольная проверка веса при вымыве проппанта - '
+               f'гл.{CreatePZ.depth_fond_paker_do["do"]}м не более 5м/мин. Контрольная проверка веса при вымыве проппанта - '
                f'через каждые 100м промывки на высоту не менее 5-10м со скоростью подъёма ГНКТ при проверке веса не '
                f'более 5м/мин. Внимание: после промывки НКТ до гл.2087м приподнять ГТ на 20м выше '
                f'пакера и '
@@ -111,7 +111,7 @@ def gnkt_work(self):
     [None, 24, f'НОРМАЛИЗАЦИЯ ЗАБОЯ СКВАЖИНЫ',
         None, None, None, None, None, None, None,
             'Мастер ГНКТ,', None],
-    [None, 25, f'После отбивки текущего забоя (головы проппанта) произвести подъем КНК -1 до гл.{CreatePZ.H_F_paker_do["do"]-20}м.',
+    [None, 25, f'После отбивки текущего забоя (головы проппанта) произвести подъем КНК -1 до гл.{CreatePZ.depth_fond_paker_do["do"]-20}м.',
         None, None, None, None, None, None, None,
             'Мастер ГНКТ' , 12.5],
     [None, 26, f'Произвести запуск и вывести Азотный комплекс и НКА на рабочий режим. Получить стабильную круговую циркуляцию '
@@ -148,7 +148,7 @@ def gnkt_work(self):
     [None, 29, f'ПОДТВЕРЖДЕНИЕ НОРМАЛИЗОВАННОГО ЗАБОЯ',
      None, None, None, None, None, None, None,
      None, None],
-    [None, 29, f'Приподнять КНК-1 на ГНКТ не прекращая циркуляции до гл.{CreatePZ.H_F_paker_do["do"]-20}м. '
+    [None, 29, f'Приподнять КНК-1 на ГНКТ не прекращая циркуляции до гл.{CreatePZ.depth_fond_paker_do["do"]-20}м. '
                f'Убедиться в отсутствии мех. примесей в промывочной жидкости, остановить подачу '
                f'жидкости НКА и ПАУ.',
      None, None, None, None, None, None, None,
@@ -166,7 +166,7 @@ def gnkt_work(self):
     [None, 29, f'ОСВОЕНИЕ СКВАЖИНЫ',
      None, None, None, None, None, None, None,
      None, None],
-    [None, 29, f'Установить КНК-1 на гл.{CreatePZ.H_F_paker_do["do"]-20}м, произвести вывод на '
+    [None, 29, f'Установить КНК-1 на гл.{CreatePZ.depth_fond_paker_do["do"]-20}м, произвести вывод на '
                f'режим мобильного азотного комплекса. Дождаться выхода пузыря азота. '
                f'В случае отсутствия выхода пузыря азота более 1-1.5 часа - начать постепенный приподъём ГНКТ, не '
                f'прекращая отдувки, до выхода пузыря азота. После получения прорыва азота и выхода пузыря - '
@@ -327,8 +327,8 @@ def gnkt_work(self):
          'Мастер ГНКТ', None],
         [None, 29, f'Скорость спуска по интервалам:\n'
                    f'в устьевом оборудовании не более 0.5м/мин;\n'
-                   f'в интервале 2 -{CreatePZ.H_F_paker_do["do"]-20}м не более 10-15м/мин (первичный-последующий спуск);\n'
-                   f'в интервале {CreatePZ.H_F_paker_do["do"]-20}-{CreatePZ.perforation_roof-10}м не более 2м/мин;\n'
+                   f'в интервале 2 -{CreatePZ.depth_fond_paker_do["do"]-20}м не более 10-15м/мин (первичный-последующий спуск);\n'
+                   f'в интервале {CreatePZ.depth_fond_paker_do["do"]-20}-{CreatePZ.perforation_roof-10}м не более 2м/мин;\n'
                    f'в интервале {CreatePZ.perforation_roof-10}-{CreatePZ.perforation_sole+10}м не более 10 м/мин;\n'
                    f'в интервале {CreatePZ.perforation_sole+10}-{CreatePZ.current_bottom}м не более 2-5 м/мин;',
          None, None, None, None, None, None, None,
@@ -336,7 +336,7 @@ def gnkt_work(self):
         [None, 29, f'Скорость подъёма по интервалам:\n'
                    f'в интервале забой-{CreatePZ.perforation_sole+10}м не более 10 м/мин;\n'
                    f'в интервале {CreatePZ.perforation_sole+10}-{CreatePZ.perforation_roof-10} не более 2 м/мин;\n'
-                   f'в интервале {CreatePZ.H_F_paker_do["do"]-20}-2м не более 15-20 м/мин;\n'
+                   f'в интервале {CreatePZ.depth_fond_paker_do["do"]-20}-2м не более 15-20 м/мин;\n'
                    f'в устьевом оборудовании не более 0.5 м/мин.',
          None, None, None, None, None, None, None,
          'Мастер ГНКТ', None],
@@ -365,7 +365,7 @@ def calc_volume_jumping(self):
     from open_pz import CreatePZ
     from krs import volume_vn_ek, volume_vn_nkt
     volume = round((volume_vn_ek(self,CreatePZ.current_bottom) *
-                    (CreatePZ.current_bottom - CreatePZ.H_F_paker_do["do"])/1000 +
+                    (CreatePZ.current_bottom - CreatePZ.depth_fond_paker_do["do"])/1000 +
                     volume_vn_nkt(CreatePZ.dict_nkt) *
-                                  CreatePZ.H_F_paker_do["do"]/1000)*1.2, 1)
+                                  CreatePZ.depth_fond_paker_do["do"]/1000)*1.2, 1)
     return volume

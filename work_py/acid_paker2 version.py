@@ -33,10 +33,10 @@ class TabPage_SO(QWidget):
 
 
 
-        self.plastLabel = QLabel("Выбор пласта", self)
-        self.plastCombo = QComboBox(self)
-        self.plastCombo.addItems(CreatePZ.plast_work)
-        self.plastCombo.setCurrentIndex(0)
+        self.plast_label = QLabel("Выбор пласта", self)
+        self.plast_combo = QComboBox(self)
+        self.plast_combo.addItems(CreatePZ.plast_work)
+        self.plast_combo.setCurrentIndex(0)
         # self.ComboBoxGeophygist.setProperty("value", 'ГП')
 
         self.privyazkaTrueLabelType = QLabel("необходимость освоения", self)
@@ -45,48 +45,48 @@ class TabPage_SO(QWidget):
         self.privyazkaTrueEdit.setCurrentIndex(1)
         self.privyazkaTrueEdit.setProperty('value', 'без привязки')
 
-        self.skvTrueLabelType = QLabel("необходимость кислотной ванны", self)
-        self.svkTrueEdit = QComboBox(self)
-        self.svkTrueEdit.addItems(['Нужно СКВ', 'без СКВ'])
-        self.svkTrueEdit.setCurrentIndex(1)
-        self.svkTrueEdit.setProperty('value', 'без СКВ')
+        self.skv_true_label_type = QLabel("необходимость кислотной ванны", self)
+        self.svk_true_edit = QComboBox(self)
+        self.svk_true_edit.addItems(['Нужно СКВ', 'без СКВ'])
+        self.svk_true_edit.setCurrentIndex(1)
+        self.svk_true_edit.setProperty('value', 'без СКВ')
 
-        self.skvAcidLabelType = QLabel("Вид кислоты для СКВ", self)
-        self.skvAcidEdit = QComboBox(self)
-        self.skvAcidEdit.addItems(['HCl', 'HF'])
-        self.skvAcidEdit.setCurrentIndex(0)
-        self.skvAcidEdit.setProperty('value', 'HCl')
+        self.skv_acid_label_type = QLabel("Вид кислоты для СКВ", self)
+        self.skv_acid_edit = QComboBox(self)
+        self.skv_acid_edit.addItems(['HCl', 'HF'])
+        self.skv_acid_edit.setCurrentIndex(0)
+        self.skv_acid_edit.setProperty('value', 'HCl')
 
-        self.skvVolumeLabel = QLabel("Объем СКВ", self)
-        self.skvVolumeEdit = QLineEdit(self)
-        self.skvVolumeEdit.setText('1')
-        self.skvVolumeEdit.setClearButtonEnabled(True)
+        self.skv_volume_label = QLabel("Объем СКВ", self)
+        self.skv_volume_edit = QLineEdit(self)
+        self.skv_volume_edit.setText('1')
+        self.skv_volume_edit.setClearButtonEnabled(True)
 
-        self.QplastLabelType = QLabel("Нужно ли определять приемистоть до СКО", self)
+        self.Qplast_labelType = QLabel("Нужно ли определять приемистоть до СКО", self)
         self.QplastEdit = QComboBox(self)
         self.QplastEdit.addItems(['ДА', 'НЕТ'])
         self.QplastEdit.setCurrentIndex(1)
         self.QplastEdit.setProperty('value', 'НЕТ')
 
-        self.skvProcLabel = QLabel("Концентрация СКВ", self)
-        self.skvProcEdit = QLineEdit(self)
-        self.skvProcEdit.setClearButtonEnabled(True)
-        self.skvProcEdit.setText('15')
+        self.skv_proc_label = QLabel("Концентрация СКВ", self)
+        self.skv_proc_edit = QLineEdit(self)
+        self.skv_proc_edit.setClearButtonEnabled(True)
+        self.skv_proc_edit.setText('15')
 
-        self.acidLabelType = QLabel("Вид кислотной обработки", self)
-        self.acidEdit = QComboBox(self)
-        self.acidEdit.addItems(['HCl', 'HF', 'ВТ', 'Нефтекислотка', 'Противогипсовая обработка'])
-        self.acidEdit.setCurrentIndex(0)
+        self.acid_label_type = QLabel("Вид кислотной обработки", self)
+        self.acid_edit = QComboBox(self)
+        self.acid_edit.addItems(['HCl', 'HF', 'ВТ', 'Нефтекислотка', 'Противогипсовая обработка'])
+        self.acid_edit.setCurrentIndex(0)
 
-        self.acidVolumeLabel = QLabel("Объем кислотной обработки", self)
-        self.acidVolumeEdit = QLineEdit(self)
-        self.acidVolumeEdit.setText("10")
-        self.acidVolumeEdit.setClearButtonEnabled(True)
+        self.acid_volume_label = QLabel("Объем кислотной обработки", self)
+        self.acid_volume_edit = QLineEdit(self)
+        self.acid_volume_edit.setText("10")
+        self.acid_volume_edit.setClearButtonEnabled(True)
 
-        self.acidProcLabel = QLabel("Концентрация кислоты", self)
-        self.acidProcEdit = QLineEdit(self)
-        self.acidProcEdit.setText('15')
-        self.acidProcEdit.setClearButtonEnabled(True)
+        self.acid_proc_label = QLabel("Концентрация кислоты", self)
+        self.acid_proc_edit = QLineEdit(self)
+        self.acid_proc_edit.setText('15')
+        self.acid_proc_edit.setClearButtonEnabled(True)
 
         self.acidOilProcLabel = QLabel("объем нефти", self)
 
@@ -96,8 +96,8 @@ class TabPage_SO(QWidget):
         grid = QGridLayout(self)
         grid.addWidget(self.swabTruelabelType, 0, 0)
         grid.addWidget(self.swabTrueEditType, 1, 0)
-        grid.addWidget(self.plastLabel, 0, 1)
-        grid.addWidget(self.plastCombo, 1, 1)
+        grid.addWidget(self.plast_label, 0, 1)
+        grid.addWidget(self.plast_combo, 1, 1)
         grid.addWidget(self.pakerLabel, 0, 2)
         grid.addWidget(self.pakerEdit, 1, 2)
         grid.addWidget(self.khovstLabel, 0, 3)
@@ -105,24 +105,24 @@ class TabPage_SO(QWidget):
         grid.addWidget(self.privyazkaTrueLabelType, 0, 4)
         grid.addWidget(self.privyazkaTrueEdit, 1, 4)
 
-        grid.addWidget(self.skvTrueLabelType, 2, 0)
-        grid.addWidget(self.svkTrueEdit, 3, 0)
-        grid.addWidget(self.skvAcidLabelType, 2, 1)
-        grid.addWidget(self.skvAcidEdit, 3, 1)
-        grid.addWidget(self.skvVolumeLabel, 2, 2)
-        grid.addWidget(self.skvVolumeEdit, 3, 2)
-        grid.addWidget(self.skvProcLabel, 2, 3)
-        grid.addWidget(self.skvProcEdit, 3, 3)
+        grid.addWidget(self.skv_true_label_type, 2, 0)
+        grid.addWidget(self.svk_true_edit, 3, 0)
+        grid.addWidget(self.skv_acid_label_type, 2, 1)
+        grid.addWidget(self.skv_acid_edit, 3, 1)
+        grid.addWidget(self.skv_volume_label, 2, 2)
+        grid.addWidget(self.skv_volume_edit, 3, 2)
+        grid.addWidget(self.skv_proc_label, 2, 3)
+        grid.addWidget(self.skv_proc_edit, 3, 3)
 
-        grid.addWidget(self.acidLabelType, 4, 1)
-        grid.addWidget(self.acidEdit, 5, 1)
-        grid.addWidget(self.acidVolumeLabel, 4, 2)
-        grid.addWidget(self.acidVolumeEdit, 5, 2)
-        grid.addWidget(self.acidProcLabel, 4, 3)
-        grid.addWidget(self.acidProcEdit, 5, 3)
+        grid.addWidget(self.acid_label_type, 4, 1)
+        grid.addWidget(self.acid_edit, 5, 1)
+        grid.addWidget(self.acid_volume_label, 4, 2)
+        grid.addWidget(self.acid_volume_edit, 5, 2)
+        grid.addWidget(self.acid_proc_label, 4, 3)
+        grid.addWidget(self.acid_proc_edit, 5, 3)
         grid.addWidget(self.acidOilProcLabel, 4, 4)
         grid.addWidget(self.acidOilProcEdit, 5, 4)
-        grid.addWidget(self.QplastLabelType, 6, 0)
+        grid.addWidget(self.Qplast_labelType, 6, 0)
         grid.addWidget(self.QplastEdit, 7, 0)
 
 
@@ -167,13 +167,13 @@ class AcidPakerWindow(MyWindow):
 
     def addWork(self):
         pass
-    def acidSelect(self, swabTrueEditType, acidProcEdit, khvostEdit, pakerEdit, skvAcidEdit, acidEdit, skvVolumeEdit,
-                   QplastEdit, skvProcEdit, plastCombo, acidOilProcEdit, acidVolumeEdit, svkTrueEdit):
+    def acidSelect(self, swabTrueEditType, acid_proc_edit, khvostEdit, pakerEdit, skv_acid_edit, acid_edit, skv_volume_edit,
+                   QplastEdit, skv_proc_edit, plast_combo, acidOilProcEdit, acid_volume_edit, svk_true_edit):
         from work_py.opressovka import paker_diametr_select
-        # print(swabTrueEditType, acidProcEdit, khvostEdit, pakerEdit, skvAcidEdit, acidEdit, skvVolumeEdit,
-        #            QplastEdit, skvProcEdit, plastCombo, acidOilProcEdit, acidVolumeEdit, svkTrueEdit)
+        # print(swabTrueEditType, acid_proc_edit, khvostEdit, pakerEdit, skv_acid_edit, acid_edit, skv_volume_edit,
+        #            QplastEdit, skv_proc_edit, plast_combo, acidOilProcEdit, acid_volume_edit, svk_true_edit)
         swabTrueEditType = [True if swabTrueEditType == 'Нужно освоение' else False][0]
-        svkTrueEdit = [False if swabTrueEditType == 'без СКВ' else False][0]
+        svk_true_edit = [False if swabTrueEditType == 'без СКВ' else False][0]
         paker_diametr = paker_diametr_select(pakerEdit)
         print(CreatePZ.column_additional == False, swabTrueEditType == True)
         if (CreatePZ.column_additional == False and swabTrueEditType == True) or (CreatePZ.column_additional == True \
@@ -243,8 +243,8 @@ class AcidPakerWindow(MyWindow):
              None, None, None, None, None, None, None,
              'мастер КРС', None]]
         return paker_list
-    def acid_work(self, swabTrueEditType, acidProcEdit, khvostEdit, pakerEdit, skvAcidEdit, acidEdit, skvVolumeEdit,
-                   QplastEdit, skvProcEdit, plastCombo, acidOilProcEdit, acidVolumeEdit, svkTrueEdit, dict_nkt):
+    def acid_work(self, swabTrueEditType, acid_proc_edit, khvostEdit, pakerEdit, skv_acid_edit, acid_edit, skv_volume_edit,
+                   QplastEdit, skv_proc_edit, plast_combo, acidOilProcEdit, acid_volume_edit, svk_true_edit, dict_nkt):
         paker_list = []
 
         skv_list = [[None, None,
@@ -252,12 +252,12 @@ class AcidPakerWindow(MyWindow):
                      f'при отсутствии приемистости произвести установку СКВ по согласованию с заказчиком',
                      None, None, None, None, None, None, None,
                      'мастер КРС, УСРСиСТ', 1.2],
-                    [None, None, f'Произвести установку СКВ {skvAcidEdit} {skvProcEdit}% концентрации в объеме'
-                                 f' {skvVolumeEdit}м3 (0,7т HCL 24%)(по спец. плану, составляет старший мастер)',
+                    [None, None, f'Произвести установку СКВ {skv_acid_edit} {skv_proc_edit}% концентрации в объеме'
+                                 f' {skv_volume_edit}м3 (0,7т HCL 24%)(по спец. плану, составляет старший мастер)',
                      None, None, None, None, None, None, None,
                      'мастер КРС, УСРСиСТ', 1.2],
                     [None, None,
-                     f'закачать {skvAcidEdit} {skvProcEdit}% в объеме V={skvVolumeEdit}м3; довести кислоту до пласта '
+                     f'закачать {skv_acid_edit} {skv_proc_edit}% в объеме V={skv_volume_edit}м3; довести кислоту до пласта '
                      f'тех.жидкостью в объеме {volume_vn_nkt(dict_nkt)}м3 . ',
                      None, None, None, None, None, None, None,
                      'мастер КРС, УСРСиСТ', 0.6],
@@ -271,32 +271,32 @@ class AcidPakerWindow(MyWindow):
                                  f'методом дренирования.',
                      None, None, None, None, None, None, None,
                      'мастер КРС, УСРСиСТ', 0.83 + 0.2 + 0.83 + 0.5 + 0.5]]
-        print(f' СКВ  {svkTrueEdit}')
-        if svkTrueEdit == True:
+        print(f' СКВ  {svk_true_edit}')
+        if svk_true_edit == True:
             for row in skv_list:
                 paker_list.append(row)
 
-        if acidEdit == 'HCl':
+        if acid_edit == 'HCl':
 
-            acid_sel = f'Произвести  солянокислотную обработку {plastCombo}  в объеме  {acidVolumeEdit}м3  ({acidEdit} - {acidProcEdit} %) ' \
+            acid_sel = f'Произвести  солянокислотную обработку {plast_combo}  в объеме  {acid_volume_edit}м3  ({acid_edit} - {acid_proc_edit} %) ' \
                        f' в присутствии представителя Заказчика с составлением акта, не превышая давления закачки не более Р={CreatePZ.max_admissible_pressure}атм. \n' \
-                       f'(для приготовления соляной кислоты в объеме {acidVolumeEdit}м3 - {acidProcEdit}% необходимо замешать {round(acidVolumeEdit * acidProcEdit / 24 * 1.118, 1)}т HCL 24% и' \
-                       f' пресной воды {round(float(acidVolumeEdit) - float(acidVolumeEdit) * float(acidProcEdit) / 24 * 1.118, 1)}м3) ' \
+                       f'(для приготовления соляной кислоты в объеме {acid_volume_edit}м3 - {acid_proc_edit}% необходимо замешать {round(acid_volume_edit * acid_proc_edit / 24 * 1.118, 1)}т HCL 24% и' \
+                       f' пресной воды {round(float(acid_volume_edit) - float(acid_volume_edit) * float(acid_proc_edit) / 24 * 1.118, 1)}м3) ' \
                        f'Согласовать с Заказчиком проведение кислотной обработки силами ООО Крезол. '
-        elif acidEdit == 'ВТ':
+        elif acid_edit == 'ВТ':
 
             vt, ok = QInputDialog.getText(None, 'Высокотехнологическая кислоты', 'Нужно расписать вид кислоты и объем')
-            acid_sel = f'Произвести кислотную обработку {plastCombo} {vt}  в присутствии представителя ' \
+            acid_sel = f'Произвести кислотную обработку {plast_combo} {vt}  в присутствии представителя ' \
                        f'Заказчика с составлением акта, не превышая давления закачки не более Р={CreatePZ.max_admissible_pressure}атм.'
-        elif acidEdit == 'HF':
+        elif acid_edit == 'HF':
 
-            acid_sel = f'Произвести кислотную обработку пласта {plastCombo}  в объеме  {acidVolumeEdit}м3  ({acidEdit} - {acidProcEdit} %) силами СК Крезол ' \
+            acid_sel = f'Произвести кислотную обработку пласта {plast_combo}  в объеме  {acid_volume_edit}м3  ({acid_edit} - {acid_proc_edit} %) силами СК Крезол ' \
                        f'в присутствии представителя заказчика с составлением акта, не превышая давления закачки не более Р={CreatePZ.max_admissible_pressure}атм.'
-        elif acidEdit == 'Нефтекислотка':
-            acid_sel = f'Произвести нефтекислотную обработку пласта {plastCombo} в V=2тн товарной нефти + {acidVolumeEdit}м3  (HCl - {acidProcEdit} %) + {acidOilProcEdit - 2}т товарной нефти силами СК Крезол ' \
+        elif acid_edit == 'Нефтекислотка':
+            acid_sel = f'Произвести нефтекислотную обработку пласта {plast_combo} в V=2тн товарной нефти + {acid_volume_edit}м3  (HCl - {acid_proc_edit} %) + {acidOilProcEdit - 2}т товарной нефти силами СК Крезол ' \
                        f'в присутствии представителя заказчика с составлением акта, не превышая давления закачки не более Р={CreatePZ.max_admissible_pressure}атм.'
-        elif acidEdit == 'Противогипсовая обработка':
-            acid_sel = f'Произвести противогипсовую обработку пласта{plastCombo} в объеме {acidVolumeEdit}м3 - {20}% раствором каустической соды' \
+        elif acid_edit == 'Противогипсовая обработка':
+            acid_sel = f'Произвести противогипсовую обработку пласта{plast_combo} в объеме {acid_volume_edit}м3 - {20}% раствором каустической соды' \
                        f'в присутствии представителя заказчика с составлением акта, не превышая давления закачки не ' \
                        f'более Р={CreatePZ.max_admissible_pressure}атм.\n'
                     # print(f'Ожидаемое показатели {CreatePZ.expected_pick_up.values()}')
@@ -307,9 +307,9 @@ class AcidPakerWindow(MyWindow):
                         'мастер КРС, УСРСиСТ', 8],
                        [None, None,
                         ''.join([f"Закачать кислоту в объеме V={round(volume_vn_nkt(dict_nkt), 1)}м3 (внутренний "
-                                 f"объем НКТ)" if acidVolumeEdit > volume_vn_nkt(dict_nkt) else f"Закачать кислоту в "
-                                                                                                f"объеме {round(acidVolumeEdit, 1)}м3, "
-                                                                                                f"довести кислоту тех жидкостью в объеме {round(volume_vn_nkt(dict_nkt) - acidVolumeEdit, 1)}м3 "]),
+                                 f"объем НКТ)" if acid_volume_edit > volume_vn_nkt(dict_nkt) else f"Закачать кислоту в "
+                                                                                                f"объеме {round(acid_volume_edit, 1)}м3, "
+                                                                                                f"довести кислоту тех жидкостью в объеме {round(volume_vn_nkt(dict_nkt) - acid_volume_edit, 1)}м3 "]),
                         None, None, None, None, None, None, None,
                         'мастер КРС', None],
                        [None, None,
@@ -321,8 +321,8 @@ class AcidPakerWindow(MyWindow):
                             [
                                 f'продавить кислоту тех жидкостью в объеме {round(volume_vn_nkt(dict_nkt) + 0.5, 1)}м3 при давлении не '
                                 f'более {CreatePZ.max_admissible_pressure}атм. Увеличение давления согласовать'
-                                f' с заказчиком' if acidVolumeEdit < volume_vn_nkt(
-                                    dict_nkt) else f'продавить кислоту оставшейся кислотой в объеме {round(acidVolumeEdit - volume_vn_nkt(dict_nkt), 1)}м3 и тех жидкостью '
+                                f' с заказчиком' if acid_volume_edit < volume_vn_nkt(
+                                    dict_nkt) else f'продавить кислоту оставшейся кислотой в объеме {round(acid_volume_edit - volume_vn_nkt(dict_nkt), 1)}м3 и тех жидкостью '
                                                    f'в объеме {round(volume_vn_nkt(dict_nkt) + 0.5, 1)}м3 при давлении не более {CreatePZ.max_admissible_pressure}атм. '
                                                    f'Увеличение давления согласовать с заказчиком']),
                         None, None, None, None, None, None, None,
@@ -350,25 +350,25 @@ class AcidPakerWindow(MyWindow):
             if QplastEdit == True:
                 try:
                     CreatePZ.expected_Q, ok = QInputDialog.getInt(self, 'Ожидаемая приемистость ',
-                                                                  f'Ожидаемая приемистость по пласту {plastCombo} ',
+                                                                  f'Ожидаемая приемистость по пласту {plast_combo} ',
                                                                   list(CreatePZ.expected_pick_up.keys())[0], 0,
                                                                   1600)
                     CreatePZ.expected_P, ok = QInputDialog.getInt(self, 'Ожидаемое Давление закачки',
-                                                                  f'Ожидаемое Давление закачки по пласту {plastCombo}',
+                                                                  f'Ожидаемое Давление закачки по пласту {plast_combo}',
                                                                   list(CreatePZ.expected_pick_up.values())[0], 0,
                                                                   250)
                 except:
                     CreatePZ.expected_Q, ok = QInputDialog.getInt(self, 'Ожидаемая приемистость ',
-                                                                  f'Ожидаемая приемистость по пласту {plastCombo} ',
+                                                                  f'Ожидаемая приемистость по пласту {plast_combo} ',
                                                                   100, 0,
                                                                   1600)
                     CreatePZ.expected_P, ok = QInputDialog.getInt(self, f'Ожидаемое Давление закачки',
-                                                                  f'Ожидаемое Давление закачки по пласту {plastCombo}',
+                                                                  f'Ожидаемое Давление закачки по пласту {plast_combo}',
                                                                   100, 0,
                                                                   250)
             paker_list.append([None, None,
                                f'Посадить пакер на {pakerEdit}м. Произвести насыщение скважины до стабилизации давления закачки не менее 5м3. Опробовать  '
-                               f'пласт {plastCombo} на приемистость в трех режимах при Р={pressure_mode(CreatePZ.expected_P, plastCombo)}атм в присутствии представителя ЦДНГ. '
+                               f'пласт {plast_combo} на приемистость в трех режимах при Р={pressure_mode(CreatePZ.expected_P, plast_combo)}атм в присутствии представителя ЦДНГ. '
                                f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до '
                                f'начала работ). В СЛУЧАЕ ПРИЕМИСТОСТИ НИЖЕ {CreatePZ.expected_Q}м3/сут при давлении {CreatePZ.expected_P}атм '
                                f'ДАЛЬНЕЙШИЕ РАБОТЫ СОГЛАСОВАТЬ С ЗАКАЗЧИКОМ',
@@ -421,41 +421,41 @@ class AcidPakerWindow(MyWindow):
     #
     def addRowTable(self):
         swabTrueEditType = self.tabWidget.currentWidget().swabTrueEditType.currentText()
-        acidEdit = self.tabWidget.currentWidget().acidEdit.currentText()
+        acid_edit = self.tabWidget.currentWidget().acid_edit.currentText()
         khvostEdit = float(self.tabWidget.currentWidget().khvostEdit.text())
         pakerEdit = float(self.tabWidget.currentWidget().pakerEdit.text())
-        skvVolumeEdit = float(self.tabWidget.currentWidget().skvVolumeEdit.text())
-        skvProcEdit = float(self.tabWidget.currentWidget().skvProcEdit.text())
-        acidVolumeEdit = float(self.tabWidget.currentWidget().acidVolumeEdit.text())
-        acidProcEdit = float(self.tabWidget.currentWidget().acidProcEdit.text())
+        skv_volume_edit = float(self.tabWidget.currentWidget().skv_volume_edit.text())
+        skv_proc_edit = float(self.tabWidget.currentWidget().skv_proc_edit.text())
+        acid_volume_edit = float(self.tabWidget.currentWidget().acid_volume_edit.text())
+        acid_proc_edit = float(self.tabWidget.currentWidget().acid_proc_edit.text())
 
         acidOilProcEdit = self.tabWidget.currentWidget().acidOilProcEdit.text()
 
-        plastCombo = str(self.tabWidget.currentWidget().plastCombo.currentText())
-        svkTrueEdit = str(self.tabWidget.currentWidget().svkTrueEdit.currentText())
-        skvAcidEdit = str(self.tabWidget.currentWidget().skvAcidEdit.currentText())
+        plast_combo = str(self.tabWidget.currentWidget().plast_combo.currentText())
+        svk_true_edit = str(self.tabWidget.currentWidget().svk_true_edit.currentText())
+        skv_acid_edit = str(self.tabWidget.currentWidget().skv_acid_edit.currentText())
         QplastEdit = str(self.tabWidget.currentWidget().QplastEdit.currentText())
         # privyazka = str(self.tabWidget.currentWidget().privyazka.currentText())
 
-        CreatePZ.acid_V = acidVolumeEdit
-        CreatePZ.acid_pr = acidProcEdit
+        CreatePZ.acid_V = acid_volume_edit
+        CreatePZ.acid_pr = acid_proc_edit
         CreatePZ.acid_oil = acidOilProcEdit
-        CreatePZ.acid_true_quest_scv = svkTrueEdit
-        CreatePZ.acid_V_scv = skvVolumeEdit
-        CreatePZ.acid_pr_scv = skvProcEdit
-        CreatePZ.acid = acidEdit
+        CreatePZ.acid_true_quest_scv = svk_true_edit
+        CreatePZ.acid_V_scv = skv_volume_edit
+        CreatePZ.acid_pr_scv = skv_proc_edit
+        CreatePZ.acid = acid_edit
         CreatePZ.pause = False
         CreatePZ.swabbing_true_quest = swabTrueEditType
-        CreatePZ.plast = plastCombo
+        CreatePZ.plast = plast_combo
         CreatePZ.paker_khost1 =  khvostEdit
         CreatePZ.paker_depth = pakerEdit
 
-        # work_list = self.acidSelect(swabTrueEditType, acidProcEdit, khvostEdit, pakerEdit, skvAcidEdit, acidEdit,
-        #                             skvVolumeEdit, QplastEdit, skvProcEdit, plastCombo,
-        #                             acidOilProcEdit, acidVolumeEdit, svkTrueEdit)
+        # work_list = self.acidSelect(swabTrueEditType, acid_proc_edit, khvostEdit, pakerEdit, skv_acid_edit, acid_edit,
+        #                             skv_volume_edit, QplastEdit, skv_proc_edit, plast_combo,
+        #                             acidOilProcEdit, acid_volume_edit, svk_true_edit)
         #
-        # for row in self.acid_work(swabTrueEditType, acidProcEdit, khvostEdit, pakerEdit, skvAcidEdit, acidEdit, skvVolumeEdit,
-        #            QplastEdit, skvProcEdit, plastCombo, acidOilProcEdit, acidVolumeEdit, svkTrueEdit, self.dict_nkt):
+        # for row in self.acid_work(swabTrueEditType, acid_proc_edit, khvostEdit, pakerEdit, skv_acid_edit, acid_edit, skv_volume_edit,
+        #            QplastEdit, skv_proc_edit, plast_combo, acidOilProcEdit, acid_volume_edit, svk_true_edit, self.dict_nkt):
         #     work_list.append(row)
         # self.populate_row(self.ins_ind, work_list)
         # self.ins_ind += len(work_list)

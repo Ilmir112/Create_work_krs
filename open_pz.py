@@ -52,15 +52,15 @@ class CreatePZ(QMainWindow):
     cat_gaz_f_pr = []
     paker_layout = 0
 
-    column_additional_diametr = 0
-    column_additional_wall_thickness = 0
-    shoe_column_additional = 0
+    column_additional_diametr = ProtectedIsDigit(0)
+    column_additional_wall_thickness = ProtectedIsDigit(0)
+    shoe_column_additional = ProtectedIsDigit(0)
     column_diametr = 0
     column_wall_thickness = 0
     shoe_column = 0
     bottomhole_artificial = 0
     max_expected_pressure = 0
-    head_column_additional = 0
+    head_column_additional = ProtectedIsDigit(0)
     leakiness_Count = 0
     expected_pick_up = {}
     current_bottom = 0
@@ -82,9 +82,9 @@ class CreatePZ(QMainWindow):
     well_number = None
     well_area = None
     values = []
-    H_F_paker_do = {"do": 0, "posle": 0}
+    depth_fond_paker_do = {"do": 0, "posle": 0}
     paker2_do = {"do": 0, "posle": 0}
-    H_F_paker2_do = {"do": 0, "posle": 0}
+    depth_fond_paker2_do = {"do": 0, "posle": 0}
     perforation_roof = 50000
     perforation_sole = 0
     dict_pump_SHGN = {"do": '0', "posle": '0'}
@@ -290,12 +290,14 @@ class CreatePZ(QMainWindow):
                     image_size = image.size
                     image_path = f'imageFiles/image_work/image{get_column_letter(col)}{row}.png'
 
-                    coord = f'{get_column_letter(col)}{row + 17 - CreatePZ.cat_well_min}'
+                    coord = f'{get_column_letter(col)}{row + 17 - CreatePZ.cat_well_min._value}'
 
                     CreatePZ.image_list.append((image_path, coord, image_size))
 
                 except:
                     pass
+
+        print(f'схемв {CreatePZ.image_list}')
 
 
         for j in range(CreatePZ.data_x_min._value, CreatePZ.data_x_max._value):  # Ожидаемые показатели после ремонта
@@ -571,6 +573,7 @@ class CreatePZ(QMainWindow):
 
         # вставка сохраненных изображение по координатам ячеек
         if CreatePZ.image_list:
+            print(f' схемы {CreatePZ.image_list}')
             for img in CreatePZ.image_list:
                 logo = Image(img[0])
                 logo.width, logo.height = img[2][0] * 0.48, img[2][1] * 0.72

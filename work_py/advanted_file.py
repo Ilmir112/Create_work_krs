@@ -6,7 +6,7 @@ def skm_interval(self, template):
 
     str_raid = []
     if CreatePZ.paker_do["posle"] != 0:
-        str_raid.append([float(CreatePZ.H_F_paker_do["posle"]) - 20, float(CreatePZ.H_F_paker_do["posle"]) + 20])
+        str_raid.append([float(CreatePZ.depth_fond_paker_do["posle"]) - 20, float(CreatePZ.depth_fond_paker_do["posle"]) + 20])
 
     if CreatePZ.leakiness:
         for nek in list(CreatePZ.dict_leakiness['НЭК']['интервал'].keys()):
@@ -90,7 +90,7 @@ def skm_interval(self, template):
     for interval in merged_segments:
         if template in ['ПСШ ЭК', 'ПСШ без хвоста', 'ПСШ открытый ствол']:
             if CreatePZ.skm_depth >= interval[1]:
-                merged_segments_new.append(merged_segments)
+                merged_segments_new.append(interval)
             elif CreatePZ.skm_depth <= interval[1] and CreatePZ.skm_depth >= interval[0]:
                 merged_segments_new.append([interval[0], CreatePZ.skm_depth])
 
@@ -131,9 +131,9 @@ def skm_interval(self, template):
 
         if skip_question == QMessageBox.StandardButton.Yes:
             merged_segments.append(skip)
-        print(merged_segments)
+        # print(f'kkii {merged_segments}')
 
-    CreatePZ.skm_interval.extend(merged_segments)
+    CreatePZ.skm_interval = merged_segments
     return merged_segments
 
 
@@ -145,23 +145,23 @@ def remove_overlapping_intervals(perforating_intervals, skm_interval = None):
         # print(f' перфорация_ {perforating_intervals}')
         skipping_intervals = []
         if CreatePZ.paker_do["posle"] != 0:
-            if CreatePZ.skm_depth > CreatePZ.H_F_paker_do["posle"] + 20:
+            if CreatePZ.skm_depth > CreatePZ.depth_fond_paker_do["posle"] + 20:
                 skipping_intervals.append(
-                    [float(CreatePZ.H_F_paker_do["posle"]) - 20, float(CreatePZ.H_F_paker_do["posle"]) + 20])
-                print(f'1 {skipping_intervals}')
+                    [float(CreatePZ.depth_fond_paker_do["posle"]) - 20, float(CreatePZ.depth_fond_paker_do["posle"]) + 20])
+                # print(f'1 {skipping_intervals}')
             else:
                 skipping_intervals.append(
-                    [float(CreatePZ.H_F_paker_do["posle"]) - 20, CreatePZ.skm_depth])
-                print(f'2 {skipping_intervals}')
+                    [float(CreatePZ.depth_fond_paker_do["posle"]) - 20, CreatePZ.skm_depth])
+                # print(f'2 {skipping_intervals}')
         if CreatePZ.paker2_do["posle"] != 0:
-            if CreatePZ.skm_depth > CreatePZ.H_F_paker_do["posle"] + 20:
+            if CreatePZ.skm_depth > CreatePZ.depth_fond_paker_do["posle"] + 20:
                 skipping_intervals.append(
-                    [float(CreatePZ.H_F_paker_do["posle"]) - 20, float(CreatePZ.H_F_paker_do["posle"]) + 20])
-                print(f'3 {skipping_intervals}')
+                    [float(CreatePZ.depth_fond_paker_do["posle"]) - 20, float(CreatePZ.depth_fond_paker_do["posle"]) + 20])
+                # print(f'3 {skipping_intervals}')
             else:
                 skipping_intervals.append(
-                    [float(CreatePZ.H_F_paker_do["posle"]) - 20, CreatePZ.skm_depth])
-                print(f'4 {skipping_intervals}')
+                    [float(CreatePZ.depth_fond_paker_do["posle"]) - 20, CreatePZ.skm_depth])
+                # print(f'4 {skipping_intervals}')
         if CreatePZ.leakiness:
             for nek in list(CreatePZ.dict_leakiness['НЭК']['интервал'].keys()):
                 if int(float(nek[1])) + 20 < CreatePZ.skm_depth:
@@ -182,7 +182,7 @@ def remove_overlapping_intervals(perforating_intervals, skm_interval = None):
 
                 elif pvr[1] + 40 > CreatePZ.skm_depth and pvr[0] < CreatePZ.skm_depth:
                     skipping_intervals.append([pvr[0] - 90, pvr[0] - 2])
-                    print(f'8 {skipping_intervals}')
+                    # print(f'8 {skipping_intervals}')
                     skipping_intervals.append([pvr[1] + 1, CreatePZ.skm_depth])
 
 
@@ -193,19 +193,20 @@ def remove_overlapping_intervals(perforating_intervals, skm_interval = None):
         for skm in sorted(skipping_intervals, key=lambda x: x[0]):
             kroly_skm = int(skm[0])
             pod_skm = int(skm[1])
-            if CreatePZ.current_bottom >= pod_skm:
+            if CreatePZ.current_bottom >= pod_skm-1:
                 skm_range = list(range(kroly_skm, pod_skm + 1))
                 for pvr in sorted(perforating_intervals, key=lambda x: x[0]):
                     # print(int(pvr[0]) in skm_range, skm_range[0], int(pvr[0]))
                     if int(pvr[0]) in skm_range and int(pvr[1]) in skm_range and skm_range[0]+1 <= int(pvr[0] - 1):
-                        # print(skm_range)
-                        skipping_intervals_new.append((skm_range[0]+1, int(pvr[0] - 1)))
+                        print(skm_range)
+                        skipping_intervals_new.append((skm_range[0]+1, int(pvr[0] - 2)))
                         # print(skipping_intervals_new, skm_range.index(int(pvr[0]-2)))
-                        print(f' range {skm_range}')
+                        # print(f' range {skm_range}')
 
                         skm_range = skm_range[skm_range.index(int(pvr[1])):]
-                print(f' range {skm_range}')
-                skipping_intervals_new.append((skm_range[0] + 2, pod_skm))
+                # print(f' range {skm_range}')
+                    else:
+                        skipping_intervals_new.append((skm_range[0], pod_skm))
     else:
         skipping_intervals_new = skm_interval
 

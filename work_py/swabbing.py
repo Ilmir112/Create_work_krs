@@ -499,7 +499,7 @@ def swabbing_with_voronka(self):
     nkt_diam = ''.join(['73' if CreatePZ.column_diametr > 110 else '60'])
 
     if CreatePZ.column_additional == False or CreatePZ.column_additional == True and paker_depth < CreatePZ.head_column_additional:
-        paker_select = f'воронку +  НКТ{nkt_diam}м +репер + НКТ 10м'
+        paker_select = f'воронку + свабоограничитель  НКТ{nkt_diam}м +репер + НКТ 10м'
         paker_short = f'в/у + со с/о НКТ{nkt_diam}м +репер + НКТ 10м'
         dict_nkt = {73: paker_depth}
     elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr < 110 and \

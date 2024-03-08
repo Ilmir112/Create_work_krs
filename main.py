@@ -594,8 +594,8 @@ class MyWindow(QMainWindow):
             # Выбираем активный лист
             worksheet = workbook.ActiveSheet
 
-            # Назначаем область печати с колонок B до L
-            worksheet.PageSetup.PrintArea = "B:L"
+            # # Назначаем область печати с колонок B до L
+            # worksheet.PageSetup.PrintArea = "B:L"
 
         except Exception as e:
             print(f"Ошибка при работе с Excel: {e}")
@@ -813,9 +813,9 @@ class MyWindow(QMainWindow):
             CreatePZ.well_number = None
             CreatePZ.well_area = None
             CreatePZ.values = []
-            CreatePZ. H_F_paker_do = {"do": 0, "posle": 0}
+            CreatePZ. depth_fond_paker_do = {"do": 0, "posle": 0}
             CreatePZ.paker2_do = {"do": 0, "posle": 0}
-            CreatePZ.H_F_paker2_do = {"do": 0, "posle": 0}
+            CreatePZ.depth_fond_paker2_do = {"do": 0, "posle": 0}
             CreatePZ.perforation_roof = 50000
             CreatePZ.data_x_min = 0
             CreatePZ.perforation_sole = 0
@@ -1378,10 +1378,10 @@ class MyWindow(QMainWindow):
         self.populate_row(self.ins_ind, gnkt_work_list, self.table_widget)
 
     def gnkt_opz(self):
-        from gnkt_opz import Gnkt_opz
+        from gnkt_opz import GnktOpz
         if self.new_window is None:
 
-            self.new_window = Gnkt_opz(self.table_widget, self.ins_ind)
+            self.new_window = GnktOpz(self.table_widget, self.ins_ind)
             self.new_window.setWindowTitle("Перфорация")
             self.new_window.setGeometry(200, 400, 300, 400)
             self.new_window.show()
@@ -1854,14 +1854,14 @@ class MyWindow(QMainWindow):
         elif CreatePZ.dict_pump_SHGN["do"] == 0 and CreatePZ.dict_pump_ECN["do"] != 0 and\
                 CreatePZ.paker_do["do"] != 0:
             ws4.cell(row=3, column=1).value = f'{CreatePZ.dict_pump_ECN["do"]} -на гл. {CreatePZ.dict_pump_ECN_h["do"]}м \n' \
-                                              f'{CreatePZ.paker_do["do"]} на {CreatePZ.H_F_paker_do["do"]}м'
+                                              f'{CreatePZ.paker_do["do"]} на {CreatePZ.depth_fond_paker_do["do"]}м'
         elif CreatePZ.dict_pump_SHGN["do"] != 0 and  CreatePZ.dict_pump_ECN["do"] == 0 and\
                 CreatePZ.paker_do["do"] != 0:
             ws4.cell(row=3, column=1).value = f'{CreatePZ.dict_pump_SHGN["do"]} -на гл. {CreatePZ.dict_pump_SHGN_h["do"]}м \n' \
-                                              f'{CreatePZ.paker_do["do"]} на {CreatePZ.H_F_paker_do["do"]}м'
+                                              f'{CreatePZ.paker_do["do"]} на {CreatePZ.depth_fond_paker_do["do"]}м'
         elif CreatePZ.dict_pump_SHGN["do"] == 0 and CreatePZ.dict_pump_ECN["do"] == 0 and\
                 CreatePZ.paker_do["do"] != 0:
-            ws4.cell(row=3, column=1).value = f'{CreatePZ.paker_do["do"]} на {CreatePZ.H_F_paker_do["do"]}м'
+            ws4.cell(row=3, column=1).value = f'{CreatePZ.paker_do["do"]} на {CreatePZ.depth_fond_paker_do["do"]}м'
         elif CreatePZ.dict_pump_SHGN["do"] == 0 and CreatePZ.dict_pump_ECN["do"] == 0 and\
                 CreatePZ.paker_do["do"] == 0:
             ws4.cell(row=3, column=1).value = " "
@@ -1869,7 +1869,7 @@ class MyWindow(QMainWindow):
                 CreatePZ.paker_do["do"] != 0:
             ws4.cell(row=3, column=1).value = f'{CreatePZ.dict_pump_SHGN["do"]} -на гл. {CreatePZ.dict_pump_SHGN_h["do"]}м \n' \
                                               f'{CreatePZ.dict_pump_ECN["do"]} -на гл. {CreatePZ.dict_pump_ECN_h["do"]}м \n' \
-                                              f'{CreatePZ.paker_do["do"]} на {CreatePZ.H_F_paker_do["do"]}м ' \
+                                              f'{CreatePZ.paker_do["do"]} на {CreatePZ.depth_fond_paker_do["do"]}м ' \
 
 
         plast_str = ''
@@ -2005,6 +2005,8 @@ class MyWindow(QMainWindow):
 
         # for interval in CreatePZ.skm_interval:
         #     print(interval[0] <= depth <= interval[1], interval, depth, all([interval[0] <= depth <= interval[1] for interval in CreatePZ.skm_interval]), any([interval[0] <= depth <= interval[1] for interval in CreatePZ.skm_interval]))
+        # print(CreatePZ.skm_interval)
+
         if all([interval[0] <= depth <= interval[1] for interval in CreatePZ.skm_interval]):
             return int(depth)
         else:
@@ -2015,20 +2017,44 @@ class MyWindow(QMainWindow):
             if false_question == QMessageBox.StandardButton.Yes:
                 return int(depth)
             else:
+                kroly_skm = depth - 20
+                pod_skm = depth + 20
+                skm = (kroly_skm, pod_skm)
+                perforating_intervals = []
+
+                for plast in CreatePZ.plast_all:
+                    for interval in CreatePZ.dict_perforation[plast]['интервал']:
+                        perforating_intervals.append(list(interval))
+                skipping_intervals_new = 0
+
+                skm_range = list(range(kroly_skm, pod_skm + 1))
+                for pvr in sorted(perforating_intervals, key=lambda x: x[0]):
+                    # print(int(pvr[0]) in skm_range, skm_range[0], int(pvr[0]))
+                    if int(pvr[0]) in skm_range and int(pvr[1]) in skm_range and skm_range[0] + 1 <= int(
+                            pvr[0] - 1):
+                        # print(skm_range)
+                        skipping_intervals_new.append((skm_range[0] + 1, int(pvr[0] - 1)))
+                        # print(skipping_intervals_new, skm_range.index(int(pvr[0]-2)))
+                        # print(f' range {skm_range}')
+
+                        skm_range = skm_range[skm_range.index(int(pvr[1])):]
+                # print(f' range {skm_range}')
+                skipping_intervals_new.append((skm_range[0] + 2, pod_skm))
+
                 skm_question = QMessageBox.question(None, 'Скреперование',
-                                                      f'добавить интервал скреперования {depth - 20} - {depth + 20}')
+                                                      f'добавить интервал скреперования {skipping_intervals_new}')
                 if skm_question == QMessageBox.StandardButton.Yes:
-                    skm = (depth - 20, depth + 20)
-                    CreatePZ.skm_interval.append(skm)
+
+                    CreatePZ.skm_interval.append(skipping_intervals_new)
 
                     CreatePZ.skm_interval = sorted(CreatePZ.skm_interval, key = lambda  x: x[0])
-                    perforating_intervals = []
-                    for plast in CreatePZ.plast_all:
-                        for interval in CreatePZ.dict_perforation[plast]['интервал']:
-                            perforating_intervals.append(list(interval))
-
-                    raid_str = raid(remove_overlapping_intervals(perforating_intervals, CreatePZ.skm_interval))
-                    print(raid_str)
+                    # perforating_intervals = []
+                    # for plast in CreatePZ.plast_all:
+                    #     for interval in CreatePZ.dict_perforation[plast]['интервал']:
+                    #         perforating_intervals.append(list(interval))
+                    #
+                    # raid_str = raid(remove_overlapping_intervals(perforating_intervals, CreatePZ.skm_interval))
+                    print(f'скреперование {CreatePZ.skm_interval}')
                     for row in range(self.table_widget.rowCount()):
                         for column in range(self.table_widget.columnCount()):
                             value = self.table_widget.item(row, column)

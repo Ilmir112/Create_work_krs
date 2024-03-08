@@ -50,26 +50,26 @@ class TabPage_SO(QWidget):
         self.chiefGeologistEditType = QLineEdit(self)
         self.chiefGeologist_nameEditType = QLineEdit(self)
 
-        self.head_of_ORM_EditType = QLineEdit(self)
-        self.head_of_ORM_name_EditType = QLineEdit(self)
+        self.head_of_ORM_editType = QLineEdit(self)
+        self.head_of_ORM_name_editType = QLineEdit(self)
 
-        self.representative_of_ORM_EditType = QLineEdit(self)
-        self.representative_of_ORM_name_EditType = QLineEdit(self)
+        self.representative_of_ORM_editType = QLineEdit(self)
+        self.representative_of_ORM_name_editType = QLineEdit(self)
 
-        self.head_of_GTM_EditType = QLineEdit(self)
-        self.head_of_GTM_name_EditType = QLineEdit(self)
+        self.head_of_GTM_editType = QLineEdit(self)
+        self.head_of_GTM_name_editType = QLineEdit(self)
 
-        self.representative_of_GTM_EditType = QLineEdit(self)
-        self.representative_of_GTM_name_EditType = QLineEdit(self)
+        self.representative_of_GTM_editType = QLineEdit(self)
+        self.representative_of_GTM_name_editType = QLineEdit(self)
 
-        self.representative_of_GO_EditType = QLineEdit(self)
-        self.representative_of_GO_name_EditType = QLineEdit(self)
+        self.representative_of_GO_editType = QLineEdit(self)
+        self.representative_of_GO_name_editType = QLineEdit(self)
 
-        self.head_of_USRSIST_EditType = QLineEdit(self)
-        self.head_of_USRSIST_name_EditType = QLineEdit(self)
+        self.head_of_USRSIST_editType = QLineEdit(self)
+        self.head_of_USRSIST_name_editType = QLineEdit(self)
 
-        self.representative_of_GRR_EditType = QLineEdit(self)
-        self.representative_of_GRR_name_EditType = QLineEdit(self)
+        self.representative_of_GRR_editType = QLineEdit(self)
+        self.representative_of_GRR_name_editType = QLineEdit(self)
 
         grid = QGridLayout(self)
 
@@ -89,32 +89,32 @@ class TabPage_SO(QWidget):
 
         grid.addWidget(self.head_of_ORM_Label, 7, 1)
 
-        grid.addWidget(self.head_of_ORM_EditType, 9, 0)
-        grid.addWidget(self.head_of_ORM_name_EditType, 9, 2)
-        grid.addWidget(self.representative_of_ORM_EditType, 10, 0)
-        grid.addWidget(self.representative_of_ORM_name_EditType, 10, 2)
+        grid.addWidget(self.head_of_ORM_editType, 9, 0)
+        grid.addWidget(self.head_of_ORM_name_editType, 9, 2)
+        grid.addWidget(self.representative_of_ORM_editType, 10, 0)
+        grid.addWidget(self.representative_of_ORM_name_editType, 10, 2)
 
         grid.addWidget(self.head_of_GTM_Label, 11, 1)
 
-        grid.addWidget(self.head_of_GTM_EditType, 13, 0)
-        grid.addWidget(self.head_of_GTM_name_EditType, 13, 2)
-        grid.addWidget(self.representative_of_GTM_EditType, 14, 0)
-        grid.addWidget(self.representative_of_GTM_name_EditType, 14, 2)
+        grid.addWidget(self.head_of_GTM_editType, 13, 0)
+        grid.addWidget(self.head_of_GTM_name_editType, 13, 2)
+        grid.addWidget(self.representative_of_GTM_editType, 14, 0)
+        grid.addWidget(self.representative_of_GTM_name_editType, 14, 2)
 
         grid.addWidget(self.head_of_GO_Label, 15, 1)
 
-        grid.addWidget(self.representative_of_GO_EditType, 17, 0)
-        grid.addWidget(self.representative_of_GO_name_EditType, 17, 2)
+        grid.addWidget(self.representative_of_GO_editType, 17, 0)
+        grid.addWidget(self.representative_of_GO_name_editType, 17, 2)
 
         grid.addWidget(self.head_of_GRR_Label, 18, 1)
 
-        grid.addWidget(self.representative_of_GRR_EditType, 20, 0)
-        grid.addWidget(self.representative_of_GRR_name_EditType, 20, 2)
+        grid.addWidget(self.representative_of_GRR_editType, 20, 0)
+        grid.addWidget(self.representative_of_GRR_name_editType, 20, 2)
 
         grid.addWidget(self.head_of_USRSIST_Label, 21, 1)
 
-        grid.addWidget(self.head_of_USRSIST_EditType, 23, 0)
-        grid.addWidget(self.head_of_USRSIST_name_EditType, 23, 2)
+        grid.addWidget(self.head_of_USRSIST_editType, 23, 0)
+        grid.addWidget(self.head_of_USRSIST_name_editType, 23, 2)
 
     def update_line_edit(self):
         selected_region = self.regioncomboBox.currentText()
@@ -126,26 +126,26 @@ class TabPage_SO(QWidget):
         self.chiefGeologistEditType.setText(self.podpis_dict[selected_region]['gg']['post'])
         self.chiefGeologist_nameEditType.setText(self.podpis_dict[selected_region]['gg']['surname'])
 
-        self.head_of_ORM_EditType.setText(self.podpis_dict[selected_region]["ruk_orm"]['post'])
-        self.head_of_ORM_name_EditType.setText(self.podpis_dict[selected_region]["ruk_orm"]['surname'])
+        self.head_of_ORM_editType.setText(self.podpis_dict[selected_region]["ruk_orm"]['post'])
+        self.head_of_ORM_name_editType.setText(self.podpis_dict[selected_region]["ruk_orm"]['surname'])
 
-        self.representative_of_ORM_EditType.setText(self.podpis_dict[selected_region]["ved_orm"]['post'])
-        self.representative_of_ORM_name_EditType.setText(self.podpis_dict[selected_region]["ved_orm"]['surname'])
+        self.representative_of_ORM_editType.setText(self.podpis_dict[selected_region]["ved_orm"]['post'])
+        self.representative_of_ORM_name_editType.setText(self.podpis_dict[selected_region]["ved_orm"]['surname'])
 
-        self.head_of_GTM_EditType.setText(self.podpis_dict[selected_region]["ruk_gtm"]['post'])
-        self.head_of_GTM_name_EditType.setText(self.podpis_dict[selected_region]["ruk_gtm"]['surname'])
+        self.head_of_GTM_editType.setText(self.podpis_dict[selected_region]["ruk_gtm"]['post'])
+        self.head_of_GTM_name_editType.setText(self.podpis_dict[selected_region]["ruk_gtm"]['surname'])
 
-        self.representative_of_GTM_EditType.setText(self.podpis_dict[selected_region]["ved_gtm"]['post'])
-        self.representative_of_GTM_name_EditType.setText(self.podpis_dict[selected_region]["ved_gtm"]['surname'])
+        self.representative_of_GTM_editType.setText(self.podpis_dict[selected_region]["ved_gtm"]['post'])
+        self.representative_of_GTM_name_editType.setText(self.podpis_dict[selected_region]["ved_gtm"]['surname'])
 
-        self.representative_of_GO_EditType.setText(self.podpis_dict[selected_region]["go"]['post'])
-        self.representative_of_GO_name_EditType.setText(self.podpis_dict[selected_region]["go"]['surname'])
+        self.representative_of_GO_editType.setText(self.podpis_dict[selected_region]["go"]['post'])
+        self.representative_of_GO_name_editType.setText(self.podpis_dict[selected_region]["go"]['surname'])
 
-        self.head_of_USRSIST_EditType.setText(self.podpis_dict[selected_region]["usrs"]['post'])
-        self.head_of_USRSIST_name_EditType.setText(self.podpis_dict[selected_region]["usrs"]['surname'])
+        self.head_of_USRSIST_editType.setText(self.podpis_dict[selected_region]["usrs"]['post'])
+        self.head_of_USRSIST_name_editType.setText(self.podpis_dict[selected_region]["usrs"]['surname'])
 
-        self.representative_of_GRR_EditType.setText(self.podpis_dict[selected_region]["grr"]['post'])
-        self.representative_of_GRR_name_EditType.setText(self.podpis_dict[selected_region]["grr"]['surname'])
+        self.representative_of_GRR_editType.setText(self.podpis_dict[selected_region]["grr"]['post'])
+        self.representative_of_GRR_name_editType.setText(self.podpis_dict[selected_region]["grr"]['surname'])
 
 
 class TabWidget(QTabWidget):
@@ -188,26 +188,26 @@ class CorrectSignaturesWindow(QMainWindow):
         chiefEngineer_nameEditType = self.tabWidget.currentWidget().chiefEngineer_nameEditType.text().title()
         chiefGeologistEditType = self.tabWidget.currentWidget().chiefGeologistEditType.text()
         chiefGeologist_nameEditType = self.tabWidget.currentWidget().chiefGeologist_nameEditType.text().title()
-        head_of_ORM_EditType = self.tabWidget.currentWidget().head_of_ORM_EditType.text()
-        head_of_ORM_name_EditType = self.tabWidget.currentWidget().head_of_ORM_name_EditType.text().title()
-        representative_of_ORM_EditType = self.tabWidget.currentWidget().representative_of_ORM_EditType.text()
-        representative_of_ORM_name_EditType = self.tabWidget.currentWidget().representative_of_ORM_name_EditType.text().title()
-        head_of_GTM_EditType = self.tabWidget.currentWidget().head_of_GTM_EditType.text()
-        head_of_GTM_name_EditType = self.tabWidget.currentWidget().head_of_GTM_name_EditType.text().title()
-        representative_of_GTM_EditType = self.tabWidget.currentWidget().representative_of_GTM_EditType.text()
-        representative_of_GTM_name_EditType = self.tabWidget.currentWidget().representative_of_GTM_name_EditType.text().title()
-        representative_of_GO_EditType = self.tabWidget.currentWidget().representative_of_GO_EditType.text()
-        representative_of_GO_name_EditType = self.tabWidget.currentWidget().representative_of_GO_name_EditType.text().title()
-        head_of_USRSIST_EditType = self.tabWidget.currentWidget().head_of_USRSIST_EditType.text()
-        head_of_USRSIST_name_EditType = self.tabWidget.currentWidget().head_of_USRSIST_name_EditType.text().title()
-        representative_of_GRR_EditType = self.tabWidget.currentWidget().representative_of_GRR_EditType.text()
+        head_of_ORM_editType = self.tabWidget.currentWidget().head_of_ORM_editType.text()
+        head_of_ORM_name_editType = self.tabWidget.currentWidget().head_of_ORM_name_editType.text().title()
+        representative_of_ORM_editType = self.tabWidget.currentWidget().representative_of_ORM_editType.text()
+        representative_of_ORM_name_editType = self.tabWidget.currentWidget().representative_of_ORM_name_editType.text().title()
+        head_of_GTM_editType = self.tabWidget.currentWidget().head_of_GTM_editType.text()
+        head_of_GTM_name_editType = self.tabWidget.currentWidget().head_of_GTM_name_editType.text().title()
+        representative_of_GTM_editType = self.tabWidget.currentWidget().representative_of_GTM_editType.text()
+        representative_of_GTM_name_editType = self.tabWidget.currentWidget().representative_of_GTM_name_editType.text().title()
+        representative_of_GO_editType = self.tabWidget.currentWidget().representative_of_GO_editType.text()
+        representative_of_GO_name_editType = self.tabWidget.currentWidget().representative_of_GO_name_editType.text().title()
+        head_of_USRSIST_editType = self.tabWidget.currentWidget().head_of_USRSIST_editType.text()
+        head_of_USRSIST_name_editType = self.tabWidget.currentWidget().head_of_USRSIST_name_editType.text().title()
+        representative_of_GRR_editType = self.tabWidget.currentWidget().representative_of_GRR_editType.text()
 
-        representative_of_GRR_name_EditType = self.tabWidget.currentWidget().representative_of_GRR_name_EditType.text().title()
+        representative_of_GRR_name_editType = self.tabWidget.currentWidget().representative_of_GRR_name_editType.text().title()
 
         name_list = [chiefEngineer_nameEditType, chiefGeologist_nameEditType,
-                    head_of_USRSIST_name_EditType, head_of_GTM_name_EditType, head_of_ORM_name_EditType,
-                    representative_of_GRR_name_EditType, representative_of_GTM_name_EditType,
-                         representative_of_ORM_name_EditType]
+                    head_of_USRSIST_name_editType, head_of_GTM_name_editType, head_of_ORM_name_editType,
+                    representative_of_GRR_name_editType, representative_of_GTM_name_editType,
+                         representative_of_ORM_name_editType]
         if  TabPage_SO.selected_region == None:
             msg = QMessageBox.information(self, 'Внимание', 'Не все поля соответствуют значениям')
             return
@@ -225,26 +225,26 @@ class CorrectSignaturesWindow(QMainWindow):
             self.podpis_dict[selected_region]['gg']['post'] = chiefGeologistEditType
             self.podpis_dict[selected_region]['gg']['surname'] = chiefGeologist_nameEditType
 
-            self.podpis_dict[selected_region]["ruk_orm"]['post'] = head_of_ORM_EditType
-            self.podpis_dict[selected_region]["ruk_orm"]['surname'] = head_of_ORM_name_EditType
+            self.podpis_dict[selected_region]["ruk_orm"]['post'] = head_of_ORM_editType
+            self.podpis_dict[selected_region]["ruk_orm"]['surname'] = head_of_ORM_name_editType
 
-            self.podpis_dict[selected_region]["ved_orm"]['post'] = representative_of_ORM_EditType
-            self.podpis_dict[selected_region]["ved_orm"]['surname'] = representative_of_ORM_name_EditType
+            self.podpis_dict[selected_region]["ved_orm"]['post'] = representative_of_ORM_editType
+            self.podpis_dict[selected_region]["ved_orm"]['surname'] = representative_of_ORM_name_editType
 
-            self.podpis_dict[selected_region]["ruk_gtm"]['post'] = head_of_GTM_EditType
-            self.podpis_dict[selected_region]["ruk_gtm"]['surname'] = head_of_GTM_name_EditType
+            self.podpis_dict[selected_region]["ruk_gtm"]['post'] = head_of_GTM_editType
+            self.podpis_dict[selected_region]["ruk_gtm"]['surname'] = head_of_GTM_name_editType
 
-            self.podpis_dict[selected_region]["ved_gtm"]['post'] = representative_of_GTM_EditType
-            self.podpis_dict[selected_region]["ved_gtm"]['surname'] = representative_of_GTM_name_EditType
+            self.podpis_dict[selected_region]["ved_gtm"]['post'] = representative_of_GTM_editType
+            self.podpis_dict[selected_region]["ved_gtm"]['surname'] = representative_of_GTM_name_editType
 
-            self.podpis_dict[selected_region]["go"]['post'] = representative_of_GO_EditType
-            self.podpis_dict[selected_region]["go"]['surname'] = representative_of_GO_name_EditType
+            self.podpis_dict[selected_region]["go"]['post'] = representative_of_GO_editType
+            self.podpis_dict[selected_region]["go"]['surname'] = representative_of_GO_name_editType
 
-            self.podpis_dict[selected_region]["usrs"]['post'] = head_of_USRSIST_EditType
-            self.podpis_dict[selected_region]["usrs"]['surname'] = head_of_USRSIST_name_EditType
+            self.podpis_dict[selected_region]["usrs"]['post'] = head_of_USRSIST_editType
+            self.podpis_dict[selected_region]["usrs"]['surname'] = head_of_USRSIST_name_editType
 
-            self.podpis_dict[selected_region]["grr"]['post'] = representative_of_GRR_EditType
-            self.podpis_dict[selected_region]["grr"]['surname'] = representative_of_GRR_name_EditType
+            self.podpis_dict[selected_region]["grr"]['post'] = representative_of_GRR_editType
+            self.podpis_dict[selected_region]["grr"]['surname'] = representative_of_GRR_name_editType
 
 
             with open('podpisant.json', 'w', encoding = 'utf-8') as json_file:

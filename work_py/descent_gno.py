@@ -28,32 +28,32 @@ def gno_down(self):
          None, None, None, None, None, None, None,
          'мастер КРС', 1.2],
         [f'Спуск с пакером {CreatePZ.paker_do["posle"]} '
-         f'на глубину {CreatePZ.H_F_paker_do["posle"]}м, воронку на {sum(CreatePZ.dict_nkt_po.values())}м.',
+         f'на глубину {CreatePZ.depth_fond_paker_do["posle"]}м, воронку на {sum(CreatePZ.dict_nkt_po.values())}м.',
 
          None,
          f'Спустить подземное оборудование  согласно расчету и карте спуска ЦДНГ '
          f'НКТ с пакером {CreatePZ.paker_do["posle"]} '
-         f'на глубину {CreatePZ.H_F_paker_do["posle"]}м, воронку на глубину {sum(CreatePZ.dict_nkt_po.values())}м. '
+         f'на глубину {CreatePZ.depth_fond_paker_do["posle"]}м, воронку на глубину {sum(CreatePZ.dict_nkt_po.values())}м. '
          f'(Компоновку НКТ{gno_nkt_opening(CreatePZ.dict_nkt_po)}м) '
          f'прошаблонировать для проведения ГИС.',
          None, None, None, None, None, None, None,
          'мастер КРС', descentNKT_norm(sum(CreatePZ.dict_nkt_po.values()),1.2)],
-        [f'Посадить пакер на глубине {CreatePZ.H_F_paker_do["posle"]}м', None,
-         f'Демонтировать превентор. Посадить пакер на глубине {CreatePZ.H_F_paker_do["posle"]}м. '
+        [f'Посадить пакер на глубине {CreatePZ.depth_fond_paker_do["posle"]}м', None,
+         f'Демонтировать превентор. Посадить пакер на глубине {CreatePZ.depth_fond_paker_do["posle"]}м. '
          f'Отревизировать и ориентировать планшайбу для проведения ГИС. '
          f'Заменить и установить устьевую арматуру для ППД. Обвязать с нагнетательной линией.',
          None, None, None, None, None, None, None,
          'мастер КРС', 0.25 + 0.5 + 0.5],
-        [f'{OpressovkaEK.testing_pressure(self, CreatePZ.H_F_paker_do["posle"])[1]}', None,
-         f'{OpressovkaEK.testing_pressure(self, CreatePZ.H_F_paker_do["posle"])[0]}',
+        [f'{OpressovkaEK.testing_pressure(self, CreatePZ.depth_fond_paker_do["posle"])[1]}', None,
+         f'{OpressovkaEK.testing_pressure(self, CreatePZ.depth_fond_paker_do["posle"])[0]}',
          None, None, None, None, None, None, None,
          'мастер КРС, предст. заказчика', 0.67],
 
     ]
     for plast in list(CreatePZ.dict_perforation.keys()):
         for interval in CreatePZ.dict_perforation[plast]['интервал']:
-            if abs(float(interval[1] - float(CreatePZ.H_F_paker_do["posle"]))) < 10 or abs(
-                    float(interval[0] - float(CreatePZ.H_F_paker_do["posle"]))) < 10:
+            if abs(float(interval[1] - float(CreatePZ.depth_fond_paker_do["posle"]))) < 10 or abs(
+                    float(interval[0] - float(CreatePZ.depth_fond_paker_do["posle"]))) < 10:
                 if privyazkaNKT(self)[0] not in paker_descent:
                     paker_descent.insert(2, privyazkaNKT(self)[0])
     calc_fond_nkt_str = calc_fond_nkt(self, sum(list(CreatePZ.dict_nkt_po.values())))
@@ -178,26 +178,26 @@ def gno_down(self):
                               'Мастер КРС, предст. заказчика', None],
 
                              [f'СПО з.о. на гл {float(CreatePZ.dict_pump_SHGN_h["posle"])}м. пакер - '
-                              f'{CreatePZ.paker_do["posle"]} на глубину {CreatePZ.H_F_paker_do["posle"]}м ', None,
+                              f'{CreatePZ.paker_do["posle"]} на глубину {CreatePZ.depth_fond_paker_do["posle"]}м ', None,
                               f'Заявить  комплект подгоночных штанг,полированный шток (вывоз согласовать с ТС ЦДНГ). '
                               f'В ЦДНГ заявить сальниковые '
                               f'уплотнения, подвесной патрубок, штанговые переводники, ЯГ-73мм. \n'
                               f'Предварительно, по согласованию с ЦДНГ, спустить замковую опору на гл {float(CreatePZ.dict_pump_SHGN_h["posle"])}м. (в компоновке предусмотреть установку '
                               f'противополетных узлов (з.о. меньшего диаметра или заглушка с щелевым фильтром)) '
-                              f'компоновка НКТ: {gno_nkt_opening(CreatePZ.dict_nkt_po)} пакер - {CreatePZ.paker_do["posle"]} на глубину {CreatePZ.H_F_paker_do["posle"]}м  (завоз с УСО ГНО, ремонтные/новые).\n'
+                              f'компоновка НКТ: {gno_nkt_opening(CreatePZ.dict_nkt_po)} пакер - {CreatePZ.paker_do["posle"]} на глубину {CreatePZ.depth_fond_paker_do["posle"]}м  (завоз с УСО ГНО, ремонтные/новые).\n'
                               f' спуск ФНКТ произвести с шаблонированием  сотбраковкой с калибровкой резьб. ',
                               None, None, None, None, None, None, None,
                               'Мастер КРС, предст. заказчика', descentNKT_norm(sum(list(CreatePZ.dict_nkt_po.values())), 1.2)],
 
                              [None, None,
-                              f'Демонтировать превентор. Посадить пакер на глубине {CreatePZ.H_F_paker_do["posle"]}м. '
+                              f'Демонтировать превентор. Посадить пакер на глубине {CreatePZ.depth_fond_paker_do["posle"]}м. '
                               f'Монтаж устьевой арматуры. При монтаже использовать только сертифицированное'
                               f' оборудование (переводники, муфты, переходные катушки). МОНТАЖ БЕЗ ПОДВЕСНОГО '
                               f'ПАТРУБКА ЗАПРЕЩЕН. ',
                               None, None, None, None, None, None, None,
                               'Мастер КРС, предст. заказчика', 1.27],
-                             [OpressovkaEK.testing_pressure(self, CreatePZ.H_F_paker_do["posle"])[0], None,
-                              f'{OpressovkaEK.testing_pressure(self, CreatePZ.H_F_paker_do["posle"])[1]}',
+                             [OpressovkaEK.testing_pressure(self, CreatePZ.depth_fond_paker_do["posle"])[0], None,
+                              f'{OpressovkaEK.testing_pressure(self, CreatePZ.depth_fond_paker_do["posle"])[1]}',
                               None, None, None, None, None, None, None,
                               'Мастер КРС, предст. заказчика', 0.67],
                              [None, None,
@@ -227,8 +227,8 @@ def gno_down(self):
                              ]
     for plast in list(CreatePZ.dict_perforation.keys()):
         for interval in CreatePZ.dict_perforation[plast]['интервал']:
-            if abs(float(interval[1] - float(CreatePZ.H_F_paker_do["posle"]))) < 10 or abs(
-                    float(interval[0] - float(CreatePZ.H_F_paker_do["posle"]))) < 10:
+            if abs(float(interval[1] - float(CreatePZ.depth_fond_paker_do["posle"]))) < 10 or abs(
+                    float(interval[0] - float(CreatePZ.depth_fond_paker_do["posle"]))) < 10:
                 if privyazkaNKT(self)[0] not in descent_nv_with_paker:
                     descent_nv_with_paker.insert(3, privyazkaNKT(self)[0])
 
@@ -242,12 +242,12 @@ def gno_down(self):
                               'Мастер КРС, предст. заказчика', None],
 
                              [f'СПО {CreatePZ.dict_pump_SHGN["posle"]} на гл {float(CreatePZ.dict_pump_SHGN_h["posle"])}м. пакер - '
-                              f'{CreatePZ.paker_do["posle"]} на глубину {CreatePZ.H_F_paker_do["posle"]}м ', None,
+                              f'{CreatePZ.paker_do["posle"]} на глубину {CreatePZ.depth_fond_paker_do["posle"]}м ', None,
                               f'Заявить  комплект подгоночных штанг,полированный шток (вывоз согласовать с ТС ЦДНГ). В ЦДНГ заявить сальниковые '
                               f'уплотнения, подвесной патрубок, штанговые переводники, ЯГ-73мм. \n'
                               f'Предварительно, по согласованию с ЦДНГ, спустить {CreatePZ.dict_pump_SHGN["posle"]} на '
                               f'гл {float(CreatePZ.dict_pump_SHGN_h["posle"])}м. '
-                              f'пакер - {CreatePZ.paker_do["posle"]} на глубину {CreatePZ.H_F_paker_do["posle"]}м '
+                              f'пакер - {CreatePZ.paker_do["posle"]} на глубину {CreatePZ.depth_fond_paker_do["posle"]}м '
                               f'(в компоновке предусмотреть установку '
                               f'противополетных узлов (з.о. меньшего диаметра или заглушка с щелевым фильтром)) '
                               f'компоновка НКТ: {gno_nkt_opening(CreatePZ.dict_nkt_po)} (завоз с УСО ГНО, ремонтные/новые).\n'
@@ -260,8 +260,8 @@ def gno_down(self):
                               f' оборудование (переводники, муфты, переходные катушки). МОНТАЖ БЕЗ ПОДВЕСНОГО ПАТРУБКА ЗАПРЕЩЕН. ',
                               None, None, None, None, None, None, None,
                               'Мастер КРС, предст. заказчика', 1.77],
-                             [OpressovkaEK.testing_pressure(self, CreatePZ.H_F_paker_do["posle"])[1], None,
-                              f'{OpressovkaEK.testing_pressure(self, CreatePZ.H_F_paker_do["posle"])[0]}',
+                             [OpressovkaEK.testing_pressure(self, CreatePZ.depth_fond_paker_do["posle"])[1], None,
+                              f'{OpressovkaEK.testing_pressure(self, CreatePZ.depth_fond_paker_do["posle"])[0]}',
                               None, None, None, None, None, None, None,
                               'Мастер КРС, предст. заказчика', 0.67],
                              [None, None,
@@ -286,8 +286,8 @@ def gno_down(self):
                              ]
     for plast in list(CreatePZ.dict_perforation.keys()):
         for interval in CreatePZ.dict_perforation[plast]['интервал']:
-            if abs(float(interval[1] - float(CreatePZ.H_F_paker_do["posle"]))) < 10 or abs(
-                    float(interval[0] - float(CreatePZ.H_F_paker_do["posle"]))) < 10:
+            if abs(float(interval[1] - float(CreatePZ.depth_fond_paker_do["posle"]))) < 10 or abs(
+                    float(interval[0] - float(CreatePZ.depth_fond_paker_do["posle"]))) < 10:
                 if privyazkaNKT(self)[0] not in descent_nn_with_paker:
                     descent_nn_with_paker.insert(3, privyazkaNKT(self)[0])
     descentORD = [[None, None,
@@ -305,16 +305,16 @@ def gno_down(self):
                    'Мастер КРС', None],
                   [f'СПО {CreatePZ.dict_pump_ECN["posle"]} на НКТ{gno_nkt_opening(CreatePZ.dict_nkt_po)} c пакером {CreatePZ.paker_do["posle"]}', None,
                    f'Спустить предварительно {CreatePZ.dict_pump_ECN["posle"]} на НКТ{gno_nkt_opening(CreatePZ.dict_nkt_po)} c пакером {CreatePZ.paker_do["posle"]} на'
-                   f' глубину {CreatePZ.H_F_paker_do["posle"]}м'
+                   f' глубину {CreatePZ.depth_fond_paker_do["posle"]}м'
                    f'(завоз с УСО ГНО, ремонтные/новые) на гл. {CreatePZ.dict_pump_ECN_h["posle"]}м. Спуск НКТ производить с шаблонированием и '
                    f'смазкой резьбовых соединений, замером изоляции каждые 100м.',
                    None, None, None, None, None, None, None,
                    'Мастер КРС, предст. заказчика', descentNKT_norm(sum(list(CreatePZ.dict_nkt_po.values())), 1.2)],
-                  [OpressovkaEK.testing_pressure(self, CreatePZ.H_F_paker_do["posle"])[0], None,
-                   f'Демонтировать превентор. Посадить пакер на глубине {CreatePZ.H_F_paker_do["posle"]}м. Монтаж  устьевой арматуры. При монтаже использовать только сертифицированное'
+                  [OpressovkaEK.testing_pressure(self, CreatePZ.depth_fond_paker_do["posle"])[0], None,
+                   f'Демонтировать превентор. Посадить пакер на глубине {CreatePZ.depth_fond_paker_do["posle"]}м. Монтаж  устьевой арматуры. При монтаже использовать только сертифицированное'
                    f' оборудование (переводники, муфты, переходные катушки). МОНТАЖ БЕЗ ПОДВЕСНОГО ПАТРУБКА ЗАПРЕЩЕН. произвести разделку'
                    f' кабеля под устьевой сальник '
-                   f'произвести герметизацию устья. \n{OpressovkaEK.testing_pressure(self, CreatePZ.H_F_paker_do["posle"])[1]}',
+                   f'произвести герметизацию устья. \n{OpressovkaEK.testing_pressure(self, CreatePZ.depth_fond_paker_do["posle"])[1]}',
                    None, None, None, None, None, None, None,
                    'Мастер КРС, предст. заказчика', 1.77],
                   [None, None,
@@ -383,7 +383,7 @@ def gno_down(self):
 
         [f'СПО двух пакерную компоновку ОРЗ на НКТ{gno_nkt_opening(CreatePZ.dict_nkt_po)}', None,
          f'Спустить двух пакерную компоновку ОРЗ на НКТ{gno_nkt_opening(CreatePZ.dict_nkt_po)} (завоз с УСО ГНО, ремонтные/новые) '
-         f'на гл. {CreatePZ.H_F_paker_do["posle"]}/{float(CreatePZ.H_F_paker2_do["posle"])}м. Спуск НКТ производить с шаблонированием и '
+         f'на гл. {CreatePZ.depth_fond_paker_do["posle"]}/{float(CreatePZ.depth_fond_paker2_do["posle"])}м. Спуск НКТ производить с шаблонированием и '
          f'смазкой резьбовых соединений.',
          None, None, None, None, None, None, None,
          'Мастер КРС, предст. заказчика', descentNKT_norm(sum(list(CreatePZ.dict_nkt_po.values())), 1.2)],
@@ -410,9 +410,9 @@ def gno_down(self):
          None, None, None, None, None, None, None,
          'Мастер КРС, предст. заказчика', 0.7],
         [None, None,
-         f'Спустить стыковочное устройство на НКТ48мм до глубины {float(CreatePZ.H_F_paker2_do["posle"])}м с замером и шаблонированием. ',
+         f'Спустить стыковочное устройство на НКТ48мм до глубины {float(CreatePZ.depth_fond_paker2_do["posle"])}м с замером и шаблонированием. ',
          None, None, None, None, None, None, None,
-         'Мастер КРС, предст. заказчика', descentNKT_norm(float(CreatePZ.H_F_paker2_do["posle"]),1)],
+         'Мастер КРС, предст. заказчика', descentNKT_norm(float(CreatePZ.depth_fond_paker2_do["posle"]),1)],
         [None, None,
          f'Произвести стыковку. Смонтировать арматуру ОРЗ. Опрессовать пакер и арматуру ОРЗ в межтрубное пространство'
          f' на Р= {CreatePZ.max_admissible_pressure}атм с открытым трубном пространством '
@@ -496,10 +496,10 @@ def gno_down(self):
            None, None, None, None, None, None, None,
            'Мастер КРС, предст. заказчика', 0.3],
           [f'СПО {CreatePZ.dict_pump_ECN["posle"]} на НКТ{gno_nkt_opening(CreatePZ.dict_nkt_po)}, '
-           f'пакер - {CreatePZ.paker_do["posle"]} на глубину {CreatePZ.H_F_paker_do["posle"]}м',
+           f'пакер - {CreatePZ.paker_do["posle"]} на глубину {CreatePZ.depth_fond_paker_do["posle"]}м',
            None,
            f'Спустить предварительно {CreatePZ.dict_pump_ECN["posle"]} на НКТ{gno_nkt_opening(CreatePZ.dict_nkt_po)}, '
-           f'пакер - {CreatePZ.paker_do["posle"]} на глубину {CreatePZ.H_F_paker_do["posle"]}м. (завоз с УСО ГНО,'
+           f'пакер - {CreatePZ.paker_do["posle"]} на глубину {CreatePZ.depth_fond_paker_do["posle"]}м. (завоз с УСО ГНО,'
            f' ремонтные/новые) '
            f'на гл. {CreatePZ.dict_pump_ECN["posle"]}м. Спуск НКТ производить с шаблонированием и '
            f'смазкой резьбовых соединений, замером изоляции каждые 100м. ',
@@ -519,8 +519,8 @@ def gno_down(self):
          f'(давление на максимальное возможное давление опрессовки эскплуатационной колонны)',
          None, None, None, None, None, None, None,
          'Мастер КРС, предст. заказчика', 0.7],
-          [OpressovkaEK.testing_pressure(self, CreatePZ.H_F_paker_do["posle"])[1], None,
-           f'{OpressovkaEK.testing_pressure(self, CreatePZ.H_F_paker_do["posle"])[0]} Опрессовать кабельный ввод устьевой арматуры',
+          [OpressovkaEK.testing_pressure(self, CreatePZ.depth_fond_paker_do["posle"])[1], None,
+           f'{OpressovkaEK.testing_pressure(self, CreatePZ.depth_fond_paker_do["posle"])[0]} Опрессовать кабельный ввод устьевой арматуры',
            None, None, None, None, None, None, None,
            'Мастер КРС, предст. заказчика', 0.67],
           [None, None,
@@ -599,7 +599,7 @@ def gno_down(self):
     if lift_key == 'пакер':
         rgd_question = QMessageBox.question(self, 'Проведение РГД', 'Нужно ли проводить РГД?')
         if rgd_question == QMessageBox.StandardButton.Yes:
-            if CreatePZ.column_additional and CreatePZ.H_F_paker_do['posle'] >= CreatePZ.head_column_additional:
+            if CreatePZ.column_additional and CreatePZ.depth_fond_paker_do['posle'] >= CreatePZ.head_column_additional:
                 # print(rgdWithoutPaker(self))
                 for row in rgdWithoutPaker(self)[::-1]:
                     paker_descent.insert(0, row)

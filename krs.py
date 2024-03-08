@@ -243,10 +243,10 @@ def work_krs(self, work_plan):
                        f'ПРОТИВОФОНТАННЫЙ ЛИФТ ДЛИНОЙ 300м. ', None, None,
                        None, None, None, None, None,
                        'Мастер КРС представитель Заказчика', None]]
-        kvostovik = f' + хвостовиком  {round(sum(list(CreatePZ.dict_nkt.values())) - float(CreatePZ.H_F_paker_do["do"]), 1)}м '\
+        kvostovik = f' + хвостовиком  {round(sum(list(CreatePZ.dict_nkt.values())) - float(CreatePZ.depth_fond_paker_do["do"]), 1)}м '\
             if CreatePZ.region == 'ТГМ' else ''
         well_jamming_str = well_jamming(self, without_damping_True, lift_key) # экземпляр функции расчета глушения
-        well_jamming_ord = volume_jamming_well(self, float(CreatePZ.H_F_paker_do["do"]))
+        well_jamming_ord = volume_jamming_well(self, float(CreatePZ.depth_fond_paker_do["do"]))
         lift_ord = [
             [ f'Опрессовать ГНО на Р={40}атм', None,
              f'Опрессовать ГНО на Р={40}атм в течении 30мин в присутствии представителя ЦДНГ. '
@@ -991,9 +991,9 @@ def work_krs(self, work_plan):
                        f'Провести практическое обучение вахт по сигналу ВЫБРОС.', None, None,
                        None, None, None, None, None,
                        None, None],
-                      [ f'Поднять  пакер {CreatePZ.paker_do["do"]} с глубины {CreatePZ.H_F_paker_do["do"]}м',
+                      [ f'Поднять  пакер {CreatePZ.paker_do["do"]} с глубины {CreatePZ.depth_fond_paker_do["do"]}м',
                         None,
-                       f'Поднять  пакер {CreatePZ.paker_do["do"]} с глубины {CreatePZ.H_F_paker_do["do"]}м {kvostovik}'
+                       f'Поднять  пакер {CreatePZ.paker_do["do"]} с глубины {CreatePZ.depth_fond_paker_do["do"]}м {kvostovik}'
                        f'на поверхность с замером, накручиванием колпачков с доливом скважины тех.жидкостью уд. весом {CreatePZ.fluid_work}  '
                        f'в объеме 1,7м3 с контролем АСПО на стенках НКТ.', None, None,
                        None, None, None, None, None,
@@ -1098,7 +1098,7 @@ def work_krs(self, work_plan):
                  f'в объеме {round(CreatePZ.dict_nkt["89"] * 1.35 / 1000, 1)}м3 с контролем АСПО на стенках НКТ.',
                  None, None,
                  None, None, None, None, None,
-                 'Мастер КРС', round(liftingNKT_norm(CreatePZ.H_F_paker_do['do'], 1.3), 2)],
+                 'Мастер КРС', round(liftingNKT_norm(CreatePZ.depth_fond_paker_do['do'], 1.3), 2)],
             ]
 
 
@@ -1428,12 +1428,12 @@ def well_jamming(self, without_damping, lift_key):
                              f'на циркуляцию. {well_after} '
     elif without_damping == False and lift_key in ['ОРД']:
         well_jamming_str = f'Произвести закачку в затрубное пространство тех жидкости уд.весом {CreatePZ.fluid_work_short}в ' \
-                             f'объеме {round(well_volume(self, CreatePZ.current_bottom) - well_volume(self, CreatePZ.H_F_paker_do["do"]),1)}м3 ' \
+                             f'объеме {round(well_volume(self, CreatePZ.current_bottom) - well_volume(self, CreatePZ.depth_fond_paker_do["do"]),1)}м3 ' \
                              f'на поглощение при давлении не более {CreatePZ.max_expected_pressure}атм. Закрыть ' \
                              f'затрубное пространство. Закрыть скважину на стабилизацию не менее 2 часов. (согласовать ' \
                              f'глушение в коллектор, в случае отсутствия на желобную емкость)'
         well_jamming_short = f'Глушение в затруб уд.весом {CreatePZ.fluid_work_short} в ' \
-                             f'объеме {round(well_volume(self, CreatePZ.current_bottom) - well_volume(self, CreatePZ.H_F_paker_do["do"]), 1)}м3 ' \
+                             f'объеме {round(well_volume(self, CreatePZ.current_bottom) - well_volume(self, CreatePZ.depth_fond_paker_do["do"]), 1)}м3 ' \
 
     elif abs(sum(list(CreatePZ.dict_nkt.values())) - CreatePZ.perforation_roof) > 150:
         well_jamming_str = f'Произвести глушение скважины прямой промывкой в объеме {volume_well_jaming}м3 тех ' \

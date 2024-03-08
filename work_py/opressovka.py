@@ -16,17 +16,17 @@ class TabPage_SO(QWidget):
         validator = QDoubleValidator(0.0, 80000.0, 2)
 
         self.diametr_paker_labelType = QLabel("Диаметр пакера", self)
-        self.diametr_paker_Edit = QLineEdit(self)
+        self.diametr_paker_edit = QLineEdit(self)
 
         self.paker_khost_Label = QLabel("Длина хвостовика", self)
-        self.paker_khost_Edit = QLineEdit(self)
-        self.paker_khost_Edit.setValidator(validator)
+        self.paker_khost_edit = QLineEdit(self)
+        self.paker_khost_edit.setValidator(validator)
 
         self.paker_depth_Label = QLabel("Глубина посадки", self)
-        self.paker_depth_Edit = QLineEdit(self)
-        self.paker_depth_Edit.setValidator(validator)
-        self.paker_depth_Edit.textChanged.connect(self.update_paker)
-        self.paker_depth_Edit.setText(str(int(CreatePZ.perforation_roof - 20)))
+        self.paker_depth_edit = QLineEdit(self)
+        self.paker_depth_edit.setValidator(validator)
+        self.paker_depth_edit.textChanged.connect(self.update_paker)
+        self.paker_depth_edit.setText(str(int(CreatePZ.perforation_roof - 20)))
 
         self.pressureZUMPF_question_Label = QLabel("Нужно ли опрессовывать ЗУМПФ", self)
         self.pressureZUMPF_question_QCombo = QComboBox(self)
@@ -39,41 +39,41 @@ class TabPage_SO(QWidget):
         self.grid_layout = QGridLayout(self)
 
         self.grid_layout.addWidget(self.diametr_paker_labelType, 3, 1)
-        self.grid_layout.addWidget(self.diametr_paker_Edit, 4, 1)
+        self.grid_layout.addWidget(self.diametr_paker_edit, 4, 1)
 
         self.grid_layout.addWidget(self.paker_khost_Label, 3, 2)
-        self.grid_layout.addWidget(self.paker_khost_Edit, 4, 2)
+        self.grid_layout.addWidget(self.paker_khost_edit, 4, 2)
 
         self.grid_layout.addWidget(self.paker_depth_Label, 3, 3)
-        self.grid_layout.addWidget(self.paker_depth_Edit, 4, 3)
+        self.grid_layout.addWidget(self.paker_depth_edit, 4, 3)
 
         self.grid_layout.addWidget(self.pressureZUMPF_question_Label, 3, 4)
         self.grid_layout.addWidget(self.pressureZUMPF_question_QCombo, 4, 4)
 
 
         self.pakerDepthZumpf_Label = QLabel("Глубина посадки для ЗУМПФа", self)
-        self.pakerDepthZumpf_Edit = QLineEdit(self)
-        self.pakerDepthZumpf_Edit.setValidator(validator)
+        self.pakerDepthZumpf_edit = QLineEdit(self)
+        self.pakerDepthZumpf_edit.setValidator(validator)
         pakerDepthZumpf = CreatePZ.perforation_sole + 10
-        self.pakerDepthZumpf_Edit.setText(f'{pakerDepthZumpf}')
+        self.pakerDepthZumpf_edit.setText(f'{pakerDepthZumpf}')
 
         self.grid_layout.addWidget(self.pakerDepthZumpf_Label, 3, 5)
-        self.grid_layout.addWidget(self.pakerDepthZumpf_Edit, 4, 5)
+        self.grid_layout.addWidget(self.pakerDepthZumpf_edit, 4, 5)
     
     def update_paker(self):
         from open_pz import CreatePZ
         if CreatePZ.open_trunk_well == True:
-            paker_depth = self.paker_depth_Edit.text()
+            paker_depth = self.paker_depth_edit.text()
             if paker_depth != '':
                 paker_khost = CreatePZ.current_bottom - int(paker_depth)
-                self.paker_khost_Edit.setText(f'{paker_khost}')
-                self.diametr_paker_Edit.setText(f'{self.paker_diametr_select(int(paker_depth))}')
+                self.paker_khost_edit.setText(f'{paker_khost}')
+                self.diametr_paker_edit.setText(f'{self.paker_diametr_select(int(paker_depth))}')
         else:
-            paker_depth = self.paker_depth_Edit.text()
+            paker_depth = self.paker_depth_edit.text()
             if paker_depth != '':
                 paker_khost = 10
-                self.paker_khost_Edit.setText(f'{paker_khost}')
-                self.diametr_paker_Edit.setText(f'{self.paker_diametr_select(int(paker_depth))}')
+                self.paker_khost_edit.setText(f'{paker_khost}')
+                self.diametr_paker_edit.setText(f'{self.paker_diametr_select(int(paker_depth))}')
 
 
 
@@ -141,10 +141,10 @@ class OpressovkaEK(QMainWindow):
         from open_pz import CreatePZ
         pressureZUMPF_question = self.tabWidget.currentWidget().pressureZUMPF_question_QCombo.currentText()
 
-        diametr_paker = int(float(self.tabWidget.currentWidget().diametr_paker_Edit.text()))
-        paker_khost = int(float(self.tabWidget.currentWidget().paker_khost_Edit.text()))
-        paker_depth = int(float(self.tabWidget.currentWidget().paker_depth_Edit.text()))
-        pakerDepthZumpf = int(float(self.tabWidget.currentWidget().pakerDepthZumpf_Edit.text()))
+        diametr_paker = int(float(self.tabWidget.currentWidget().diametr_paker_edit.text()))
+        paker_khost = int(float(self.tabWidget.currentWidget().paker_khost_edit.text()))
+        paker_depth = int(float(self.tabWidget.currentWidget().paker_depth_edit.text()))
+        pakerDepthZumpf = int(float(self.tabWidget.currentWidget().pakerDepthZumpf_edit.text()))
 
         if int(paker_khost) + int(paker_depth) > CreatePZ.current_bottom and pressureZUMPF_question == 'Нет' \
             or int(paker_khost) + int(pakerDepthZumpf) > CreatePZ.current_bottom and pressureZUMPF_question == 'Да':
