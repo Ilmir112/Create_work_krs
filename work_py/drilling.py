@@ -13,31 +13,32 @@ def drilling_nkt(self):
 
     current_depth, ok = QInputDialog.getInt(None, 'Нормализация забоя',
                                             'Введите глубину необходимого забоя',
-                                            int(CreatePZ.current_bottom), 0, int(CreatePZ.bottomhole_artificial + 500))
+                                            int(CreatePZ.current_bottom), 0, int(CreatePZ.bottomhole_artificial._value + 500))
     drillingBit_diam = drillingBit_diam_select(current_depth)
 
     if CreatePZ.column_additional == True:
-        nkt_pod = ['60мм' if CreatePZ.column_additional_diametr < 110 else '73мм со снятыми фасками']
+        nkt_pod = ['60мм' if CreatePZ.column_additional_diametr._value < 110 else '73мм со снятыми фасками']
         nkt_pod = ''.join(nkt_pod)
 
-    nkt_diam = ''.join(['73' if CreatePZ.column_diametr > 110 else '60'])
+    nkt_diam = ''.join(['73' if CreatePZ.column_diametr._value > 110 else '60'])
 
-    if CreatePZ.column_additional == False or (CreatePZ.column_additional == True and CreatePZ.head_column_additional >= CreatePZ.current_bottom):
-        drilling_str = f'долото-{drillingBit_diam} для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм +' \
+    if CreatePZ.column_additional == False or (CreatePZ.column_additional == True and CreatePZ.head_column_additional._value >= CreatePZ.current_bottom):
+        drilling_str = f'долото-{drillingBit_diam} для ЭК {CreatePZ.column_diametr._value}мм х {CreatePZ.column_wall_thickness._value}мм +' \
                        f' забойный двигатель +НКТ{nkt_diam}м 20м + репер '
         drilling_short = f'долото-{drillingBit_diam}  +' \
                        f' забойный двигатель  +НКТ{nkt_diam}м 20м + репер '
 
 
     elif CreatePZ.column_additional == True:
-        drilling_str = f'долото-{drillingBit_diam} для ЭК {CreatePZ.column_additional_diametr}мм х ' \
-                       f'{CreatePZ.column_additional_wall_thickness}мм + забойный двигатель Д-76 +НКТ{nkt_pod}мм 20м + репер + ' \
-                       f'НКТ{nkt_pod} {round(CreatePZ.current_bottom - CreatePZ.head_column_additional,0)}м'
+        drilling_str = f'долото-{drillingBit_diam} для ЭК {CreatePZ.column_additional_diametr._value}мм х ' \
+                       f'{CreatePZ.column_additional_wall_thickness._value}мм + забойный двигатель Д-76 +НКТ{nkt_pod}мм 20м + репер + ' \
+                       f'НКТ{nkt_pod} {round(CreatePZ.current_bottom - CreatePZ.head_column_additional._value,0)}м'
         drilling_str = f'долото-{drillingBit_diam}  + забойный двигатель Д-76 +НКТ{nkt_pod}мм 20м + репер + ' \
-                       f'НКТ{nkt_pod} {round(CreatePZ.current_bottom - CreatePZ.head_column_additional, 0)}м'
+                       f'НКТ{nkt_pod} {round(CreatePZ.current_bottom - CreatePZ.head_column_additional._value, 0)}м'
 
 
     CreatePZ.drilling_interval.append([CreatePZ.current_bottom, current_depth])
+
     drilling_list = [
         [f'СПО {drilling_str} до т.з -', None,
          f'Спустить {drilling_str}  на НКТ{nkt_diam}мм до до текущего забоя с замером, '
@@ -53,8 +54,8 @@ def drilling_nkt(self):
          f'буровой рукав, устьевой герметизатор, нагнетательная линия. Застраховать буровой рукав за вертлюг. ',
          None, None, None, None, None, None, None,
          'Мастер КРС, УСРСиСТ', round(0.14+0.17+0.08+0.48,1)],
-        [f'Опрессовать ЭК и ЦМ на Р={CreatePZ.max_admissible_pressure}атм', None,
-         f'Опрессовать ЭК и ЦМ на Р={CreatePZ.max_admissible_pressure}атм в присутствии представителя заказчика. Составить акт. '
+        [f'Опрессовать ЭК и ЦМ на Р={CreatePZ.max_admissible_pressure._value}атм', None,
+         f'Опрессовать ЭК и ЦМ на Р={CreatePZ.max_admissible_pressure._value}атм в присутствии представителя заказчика. Составить акт. '
          f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ) \n'
          f'В случае негерметичности произвести РИР по согласованию с заказчиком',
          None, None, None, None, None, None, None,
@@ -85,8 +86,8 @@ def drilling_nkt(self):
     ]
     drilling_work_list = []
     if len(CreatePZ.plast_work) == 0:
-        drilling_list.append([f'Опрессовать ЭК и ЦМ на Р={CreatePZ.max_admissible_pressure}атм', None,
-                              f'Опрессовать ЭК и ЦМ на Р={CreatePZ.max_admissible_pressure}атм в присутствии представителя заказчика. Составить акт. '
+        drilling_list.append([f'Опрессовать ЭК и ЦМ на Р={CreatePZ.max_admissible_pressure._value}атм', None,
+                              f'Опрессовать ЭК и ЦМ на Р={CreatePZ.max_admissible_pressure._value}атм в присутствии представителя заказчика. Составить акт. '
                               f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ) \n'
                               f'В случае негерметичности произвести РИР по согласованию с заказчиком',
                               None, None, None, None, None, None, None,
@@ -119,24 +120,24 @@ def drilling_sbt(self):
 
     current_depth, ok = QInputDialog.getInt(None, 'Нормализация забоя',
                                             'Введите глубину необходимого забоя',
-                                            int(CreatePZ.current_bottom), 0, int(CreatePZ.bottomhole_artificial + 500))
+                                            int(CreatePZ.current_bottom), 0, int(CreatePZ.bottomhole_artificial._value + 500))
 
     drillingBit_diam = drillingBit_diam_select(current_depth)
 
     nkt_pod = "2' 3/8"
 
-    nkt_diam = ''.join(["2 7/8" if CreatePZ.column_diametr > 110 else "2 3/8"])
+    nkt_diam = ''.join(["2 7/8" if CreatePZ.column_diametr._value > 110 else "2 3/8"])
 
-    if CreatePZ.column_additional is False or (CreatePZ.column_additional is True and CreatePZ.head_column_additional >= CreatePZ.current_bottom):
-        drilling_str = f'долото-{drillingBit_diam} для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм '
-        drilling_short = f'долото-{drillingBit_diam} для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм '
+    if CreatePZ.column_additional is False or (CreatePZ.column_additional is True and CreatePZ.head_column_additional._value >= CreatePZ.current_bottom):
+        drilling_str = f'долото-{drillingBit_diam} для ЭК {CreatePZ.column_diametr._value}мм х {CreatePZ.column_wall_thickness._value}мм '
+        drilling_short = f'долото-{drillingBit_diam} для ЭК {CreatePZ.column_diametr._value}мм х {CreatePZ.column_wall_thickness._value}мм '
 
 
     elif CreatePZ.column_additional == True:
-        drilling_str = f'долото-{drillingBit_diam} для ЭК {CreatePZ.column_additional_diametr}мм х ' \
-                       f'{CreatePZ.column_additional_wall_thickness}мм + СБТ{nkt_pod} ' \
-                       f'{CreatePZ.current_bottom - CreatePZ.head_column_additional}м'
-        drilling_short = f'долото-{drillingBit_diam}  + СБТ{nkt_pod} {CreatePZ.current_bottom - CreatePZ.head_column_additional}м'
+        drilling_str = f'долото-{drillingBit_diam} для ЭК {CreatePZ.column_additional_diametr._value}мм х ' \
+                       f'{CreatePZ.column_additional_wall_thickness._value}мм + СБТ{nkt_pod} ' \
+                       f'{CreatePZ.current_bottom - CreatePZ.head_column_additional._value}м'
+        drilling_short = f'долото-{drillingBit_diam}  + СБТ{nkt_pod} {CreatePZ.current_bottom - CreatePZ.head_column_additional._value}м'
 
     CreatePZ.drilling_interval.append([CreatePZ.current_bottom, current_depth])
     drilling_list = [
@@ -153,8 +154,8 @@ def drilling_sbt(self):
          f'буровой рукав, устьевой герметизатор, нагнетательная линия. Застраховать буровой рукав за вертлюг. ',
          None, None, None, None, None, None, None,
          'Мастер КРС, УСРСиСТ', round(0.14+0.17+0.08+0.48 +1.1,1)],
-        [f'Опрессовать ЭК и ЦМ на Р={CreatePZ.max_admissible_pressure}атм', None,
-         f'Опрессовать ЭК и ЦМ на Р={CreatePZ.max_admissible_pressure}атм в присутствии представителя заказчика. Составить акт. '
+        [f'Опрессовать ЭК и ЦМ на Р={CreatePZ.max_admissible_pressure._value}атм', None,
+         f'Опрессовать ЭК и ЦМ на Р={CreatePZ.max_admissible_pressure._value}атм в присутствии представителя заказчика. Составить акт. '
          f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ) \n'
          f'В случае негерметичности произвести РИР по согласованию с заказчиком',
          None, None, None, None, None, None, None,
@@ -183,8 +184,8 @@ def drilling_sbt(self):
     ]
     drilling_work_list = []
     if len(CreatePZ.plast_work) == 0:
-        drilling_list.append([f'Опрессовать ЭК и ЦМ на Р={CreatePZ.max_admissible_pressure}атм', None,
-                              f'Опрессовать ЭК и ЦМ на Р={CreatePZ.max_admissible_pressure}атм в присутствии представителя заказчика. Составить акт. '
+        drilling_list.append([f'Опрессовать ЭК и ЦМ на Р={CreatePZ.max_admissible_pressure._value}атм', None,
+                              f'Опрессовать ЭК и ЦМ на Р={CreatePZ.max_admissible_pressure._value}атм в присутствии представителя заказчика. Составить акт. '
                               f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ) \n'
                               f'В случае негерметичности произвести РИР по согласованию с заказчиком',
                               None, None, None, None, None, None, None,
@@ -225,8 +226,8 @@ def reply_drilling(self, drilling_str, nkt_diam, drilling_work_list):
                                     ]
         CreatePZ.drilling_interval.append([CreatePZ.current_bottom, current_depth])
         if len(CreatePZ.plast_work) == 0:
-            drilling_true_quest_list.append([f' Опрессовать ЭК и ЦМ на Р={CreatePZ.max_admissible_pressure}атм', None,
-                                             f' Опрессовать ЭК и ЦМ на Р={CreatePZ.max_admissible_pressure}атм в '
+            drilling_true_quest_list.append([f' Опрессовать ЭК и ЦМ на Р={CreatePZ.max_admissible_pressure._value}атм', None,
+                                             f' Опрессовать ЭК и ЦМ на Р={CreatePZ.max_admissible_pressure._value}атм в '
                                              f'присутствии представителя заказчика. Составить акт. '
                                              f'(Вызов представителя осуществлять телефонограммой за 12 часов, с '
                                              f'подтверждением за 2 часа до начала работ) \n'
@@ -289,10 +290,10 @@ def drillingBit_diam_select(depth_landing):
     }
 
     if CreatePZ.column_additional is False or (
-            CreatePZ.column_additional is True and depth_landing <= CreatePZ.head_column_additional):
-        diam_internal_ek = CreatePZ.column_diametr - 2 * CreatePZ.column_wall_thickness
+            CreatePZ.column_additional is True and depth_landing <= CreatePZ.head_column_additional._value):
+        diam_internal_ek = CreatePZ.column_diametr._value - 2 * CreatePZ.column_wall_thickness._value
     else:
-        diam_internal_ek = CreatePZ.column_additional_diametr - 2 * CreatePZ.column_additional_wall_thickness
+        diam_internal_ek = CreatePZ.column_additional_diametr._value - 2 * CreatePZ.column_additional_wall_thickness._value
 
     for diam, diam_internal_bit in drillingBit_dict.items():
         if diam_internal_bit[0] <= diam_internal_ek <= diam_internal_bit[1]:
@@ -307,25 +308,25 @@ def frezer_ports(self):
 
     current_depth, ok = QInputDialog.getInt(None, 'Нормализация забоя',
                                             'Введите глубину необходимого забоя',
-                                            int(CreatePZ.current_bottom), 0, int(CreatePZ.bottomhole_artificial + 500))
+                                            int(CreatePZ.current_bottom), 0, int(CreatePZ.bottomhole_artificial._value + 500))
 
     drillingBit_diam = drillingBit_diam_select(current_depth)
 
     nkt_pod = "2' 3/8"
 
-    nkt_diam = ''.join(["2 7/8" if CreatePZ.column_diametr > 110 else "2 3/8"])
+    nkt_diam = ''.join(["2 7/8" if CreatePZ.column_diametr._value > 110 else "2 3/8"])
 
     if CreatePZ.column_additional is False or (
-            CreatePZ.column_additional is True and CreatePZ.head_column_additional >= CreatePZ.current_bottom):
+            CreatePZ.column_additional is True and CreatePZ.head_column_additional._value >= CreatePZ.current_bottom):
         drilling_str = f' пилотный фрезер -{drillingBit_diam} + магнит колонный  2⅜ БТ (П) '
         drilling_short = f' пилотный фрезер -{drillingBit_diam} + магнит колонный  2⅜ БТ (П) '
 
 
     elif CreatePZ.column_additional == True:
         drilling_str = f' пилотный фрезер -{drillingBit_diam} + магнит колонный  2⅜ БТ (П) + СБТ{nkt_pod} ' \
-                       f'{round(current_depth - CreatePZ.head_column_additional, 1)}м'
+                       f'{round(current_depth - CreatePZ.head_column_additional._value, 1)}м'
         drilling_short = f' пилотный фрезер -{drillingBit_diam} + магнит колонный  2⅜ БТ (П) + СБТ{nkt_pod} ' \
-                         f'{round(current_depth - CreatePZ.head_column_additional, 1)}м'
+                         f'{round(current_depth - CreatePZ.head_column_additional._value, 1)}м'
 
     CreatePZ.drilling_interval.append([CreatePZ.current_bottom, current_depth])
     drilling_list = [

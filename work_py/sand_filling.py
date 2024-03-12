@@ -6,19 +6,19 @@ from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm,well_volume_no
 
 def sand_select(self):
     from open_pz import CreatePZ
-    if CreatePZ.column_additional == False or (CreatePZ.column_additional == True and CreatePZ.current_bottom <= CreatePZ.head_column_additional):
+    if CreatePZ.column_additional == False or (CreatePZ.column_additional == True and CreatePZ.current_bottom <= CreatePZ.head_column_additional._value):
         sand_select = f'перо +  НКТ{CreatePZ.nkt_diam}мм 20м + реперный патрубок'
 
-    elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr < 110 and CreatePZ.current_bottom >= CreatePZ.head_column_additional:
-        sand_select = f'перо + НКТ{60}мм 20м + реперный патрубок + НКТ60мм {round(CreatePZ.current_bottom - CreatePZ.head_column_additional, 0)}м '
-    elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr > 110 and CreatePZ.current_bottom >= CreatePZ.head_column_additional:
-        sand_select = f'перо + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками {20}м + реперный патрубок + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками {round(CreatePZ.current_bottom - CreatePZ.head_column_additional, 0)}м'
+    elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr._value < 110 and CreatePZ.current_bottom >= CreatePZ.head_column_additional._value:
+        sand_select = f'перо + НКТ{60}мм 20м + реперный патрубок + НКТ60мм {round(CreatePZ.current_bottom - CreatePZ.head_column_additional._value, 0)}м '
+    elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr._value > 110 and CreatePZ.current_bottom >= CreatePZ.head_column_additional._value:
+        sand_select = f'перо + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками {20}м + реперный патрубок + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками {round(CreatePZ.current_bottom - CreatePZ.head_column_additional._value, 0)}м'
     return sand_select
 
 def sandFilling(self):
     from open_pz import CreatePZ
     from krs import well_volume, volume_vn_ek
-    nkt_diam = ''.join(['73' if CreatePZ.column_diametr > 110 else '60'])
+    nkt_diam = ''.join(['73' if CreatePZ.column_diametr._value > 110 else '60'])
 
 
     filling_depth, ok = QInputDialog.getInt(None, 'Отсыпка песком',
@@ -73,9 +73,9 @@ def sandFilling(self):
     ]
     if CreatePZ.leakiness == False and CreatePZ.perforation_roof > filling_depth:
         filling_list.insert(-1,
-                            [f'Опрессовать в инт{filling_depth}-0м на Р={CreatePZ.max_admissible_pressure}атм',
+                            [f'Опрессовать в инт{filling_depth}-0м на Р={CreatePZ.max_admissible_pressure._value}атм',
                              None, f'Опрессовать эксплуатационную колонну в интервале {filling_depth}-0м на'
-                                   f'Р={CreatePZ.max_admissible_pressure}атм'
+                                   f'Р={CreatePZ.max_admissible_pressure._value}атм'
                      f' в течение 30 минут в присутствии представителя заказчика, составить акт. '
                      f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа'
                                    f' до начала работ)',
@@ -106,7 +106,7 @@ def sandFilling(self):
 def sandWashing(self):
     from open_pz import CreatePZ
     from krs import volume_vn_nkt
-    nkt_diam = ''.join(['73' if CreatePZ.column_diametr > 110 else '60'])
+    nkt_diam = ''.join(['73' if CreatePZ.column_diametr._value > 110 else '60'])
 
 
 

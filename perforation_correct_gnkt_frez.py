@@ -93,8 +93,8 @@ class TabPage_SO(QWidget):
         from open_pz import CreatePZ
         if self.manufacturer_combo.currentText() == 'НТЦ ЗЭРС':
             self.manufacturer = 'НТЦ ЗЭРС'
-            if CreatePZ.column_additional and CreatePZ.column_additional_diametr <110 \
-                    or CreatePZ.column_additional is False and CreatePZ.column_diametr < 110:
+            if (CreatePZ.column_additional and CreatePZ.column_additional_diametr._value <110) \
+                    or CreatePZ.column_additional is False and CreatePZ.column_diametr._value < 110:
                 self.type_column = "ФПЗН.102"
 
             else:

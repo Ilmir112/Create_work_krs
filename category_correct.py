@@ -45,6 +45,7 @@ class TabPage_SO(QWidget):
         work_plast_iter = None
         CreatePZ.number_indez = []
         print(f'строки {list(set(CreatePZ.cat_P_P))}')
+        print(f'{self.H2S_pr}')
 
         for num in range(len(list(set(CreatePZ.cat_P_P)))):
 
@@ -84,7 +85,7 @@ class TabPage_SO(QWidget):
 
             pressuar_data_edit = QLineEdit(self)
             pressuar_data_edit.setText(str(self.ifNone(self.cat_P_P[num])))
-
+            print(num)
             category_h2s_edit = QLineEdit(self)
             category_h2s_edit.setText(str(self.ifNone(self.cat_H2S_list[num])))
             H2S_pr_edit = QLineEdit(self)

@@ -81,7 +81,7 @@ class TabPage_gnkt(QWidget):
 
         self.pressure_Label = QLabel("Давление закачки", self)
         self.pressure_edit = QLineEdit(self)
-        self.pressure_edit.setText(f'{CreatePZ.max_admissible_pressure}')
+        self.pressure_edit.setText(f'{CreatePZ.max_admissible_pressure._value}')
 
         grid = QGridLayout(self)
         grid.addWidget(self.plast_label, 0, 1)
@@ -207,7 +207,7 @@ class GnktOpz(QMainWindow):
                        f' Крезол НС с протяжкой БДТ вдоль интервалов перфорации {roof_plast}-{sole_plast}м ' \
                        f'(снизу вверх) в ' \
                        f'присутствии представителя Заказчика с составлением акта, не превышая давления' \
-                       f' закачки не более Р={CreatePZ.max_admissible_pressure}атм.\n' \
+                       f' закачки не более Р={CreatePZ.max_admissible_pressure._value}атм.\n' \
                        f' (для приготовления соляной кислоты в объеме {acid_volume_edit}м3 - ' \
                        f'{acid_proc_edit}% необходимо замешать {acid_24}т HCL 24% и пресной воды ' \
                        f'{round(acid_volume_edit - acid_24, 1)}м3)'
@@ -219,7 +219,7 @@ class GnktOpz(QMainWindow):
                        f'НС с протяжкой БДТ вдоль интервалов перфорации {roof_plast}-' \
                        f'{sole_plast}м (снизу вверх) в присутствии представителя ' \
                        f'Заказчика с составлением акта, не превышая давления закачки не более ' \
-                       f'Р = {CreatePZ.max_admissible_pressure}атм.'
+                       f'Р = {CreatePZ.max_admissible_pressure._value}атм.'
             acid_sel_short = f'{vt} пласта {plast_combo}  в объеме ' \
                              f'{acid_volume_edit}м3  ({acid_edit} - {acid_proc_edit} %)'
         elif acid_edit == 'HF':
@@ -229,11 +229,11 @@ class GnktOpz(QMainWindow):
                        f'НС с протяжкой БДТ вдоль интервалов перфорации {roof_plast}-' \
                        f'{sole_plast}м (снизу вверх) в присутствии представителя ' \
                        f'Заказчика с составлением акта, не превышая давления закачки не более ' \
-                       f'Р={CreatePZ.max_admissible_pressure}атм.'
+                       f'Р={CreatePZ.max_admissible_pressure._value}атм.'
             acid_sel_short = f'ГКО пласта {plast_combo}  в объеме  {acid_volume_edit}м3'
 
-        paker_opr = [f'Опрессовать пакер на {CreatePZ.max_admissible_pressure}атм',
-                     5, f'Опрессовать пакер на {CreatePZ.max_admissible_pressure}атм с выдержкой 30 мин с '
+        paker_opr = [f'Опрессовать пакер на {CreatePZ.max_admissible_pressure._value}атм',
+                     5, f'Опрессовать пакер на {CreatePZ.max_admissible_pressure._value}атм с выдержкой 30 мин с '
                         f'оформлением соответствующего акта в присутствии ' \
                         f'представителя представителя ЦДНГ',
                      None, None, None, None, None, None, None,
@@ -322,15 +322,15 @@ class GnktOpz(QMainWindow):
                        f'безопосности.'
                        f' Запустить систему регистрации СОРП. Оповестить всех людей на кустовой площадке о проведении '
                        f'опрессовки.'
-                       f' Опрессовать все нагнетательные линии на {CreatePZ.max_admissible_pressure * 1.5}атм. '
+                       f' Опрессовать все нагнетательные линии на {CreatePZ.max_admissible_pressure._value * 1.5}атм. '
                        f'Опрессовать  выкидную линию '
-                       f'от устья скважины до желобной ёмкости на {round(CreatePZ.max_admissible_pressure * 1.5, 1)}атм '
+                       f'от устья скважины до желобной ёмкости на {round(CreatePZ.max_admissible_pressure._value * 1.5, 1)}атм '
                        f'(надёжно закрепить, оборудовать дроссельными задвижками)',
              None, None, None, None, None, None, None,
              'Мастер ГНКТ, представ.БВО (вызов по телефонограмме при необходимости)', 'факт'],
             [None, 11, f'При закрытой центральной задвижке фондовой арматуры. Опрессовать превентор, глухие и трубные  '
                        f'плашки на '
-                       f'устье скважины на Р={CreatePZ.max_admissible_pressure}атм с выдержкой 30 мин (опрессовку ПВО '
+                       f'устье скважины на Р={CreatePZ.max_admissible_pressure._value}атм с выдержкой 30 мин (опрессовку ПВО '
                        f'зафиксировать'
                        f' в вахтовом журнале). Оформить соответствующий акт в присутствии представителя Башкирского '
                        f'военизированного '
@@ -365,7 +365,7 @@ class GnktOpz(QMainWindow):
                  f' малом затрубном пространстве на циркуляции. Произвести продавку растворителя АСПО до '
                  f'башмака ГНКТ '
                  f'мин.водой уд.вес {fluid_work} в объёме 2,2м3 не превышая давления закачки не более  '
-                 f'Р={CreatePZ.max_admissible_pressure}атм. ',
+                 f'Р={CreatePZ.max_admissible_pressure._value}атм. ',
              None, None, None, None, None, None, None,
              'Мастер ГНКТ, состав бригады, представитель Заказчика', 1.92],
             [None, 15, f'Приподнять БДТ до {int(depth_fond_paker_do) - 20}м. Произвести круговую циркуляцию растворителя в '
@@ -380,11 +380,11 @@ class GnktOpz(QMainWindow):
                        f'ИНТЕНСИВНУЮ ПРОМЫВКУ ОСЛОЖНЕННОГО УЧАСТКА СКВАЖИНЫ ',
              None, None, None, None, None, None, None,
              'Мастер ГНКТ, состав бригады, представитель Заказчика', 0.93],
-            [f'гидросвабирование в инт {CreatePZ.perforation_roof}-'
-             f'{CreatePZ.perforation_sole}м при Рзак={CreatePZ.max_admissible_pressure}атм',
-             23, f'Произвести гидросвабирование пласта в интервале {CreatePZ.perforation_roof}-'
-                 f'{CreatePZ.perforation_sole}м (закрыть затруб, произвести задавку в пласт '
-                 f'жидкости при не более Рзак={CreatePZ.max_admissible_pressure}атм при установленном '
+            [f'гидросвабирование в инт {roof_plast}-'
+             f'{sole_plast}м при Рзак={CreatePZ.max_admissible_pressure._value}атм',
+             23, f'Произвести гидросвабирование пласта в интервале { roof_plast}-'
+                 f'{sole_plast}м (закрыть затруб, произвести задавку в пласт '
+                 f'жидкости при не более Рзак={CreatePZ.max_admissible_pressure._value}атм при установленном '
                  f'герметичном пакере. '
                  f'Операции по задавке и изливу произвести 3-4 раза в зависимости от приёмистости). ',
              None, None, None, None, None, None, None,
@@ -427,7 +427,7 @@ class GnktOpz(QMainWindow):
             ['Допустить БДТ до забоя. Промыть скважину ',
              16, f'Допустить БДТ до забоя. Промыть скважину  мин.водой уд.веса {fluid_work}  с составлением '
                  f'соответствующего акта. При отсутствии циркуляции дальнейшие промывки исключить. Определить '
-                 f'приемистость пласта в трубное пространство при давлении не более {CreatePZ.max_admissible_pressure}атм'
+                 f'приемистость пласта в трубное пространство при давлении не более {CreatePZ.max_admissible_pressure._value}атм'
                  f'  (перед определением приемистости произвести закачку тех.воды не менее 6м3 или при установившемся '
                  f'давлении закачки, но не более 1 часа). Установить БДТ на гл.{CreatePZ.current_bottom}м.',
              None, None, None, None, None, None, None,
@@ -444,7 +444,7 @@ class GnktOpz(QMainWindow):
              None, None, None, None, None, None, None,
              'Мастер ГНКТ, состав бригады', 2.88],
             [None, 19, f'Продавить кислоту в пласт мин.водой уд.веса {fluid_work} в объёме 3м3 при давлении не более '
-                       f'{CreatePZ.max_admissible_pressure}атм. Составить Акт',
+                       f'{CreatePZ.max_admissible_pressure._value}атм. Составить Акт',
              None, None, None, None, None, None, None,
              'Мастер ГНКТ, состав бригады', 1.11],
             [None, 20,

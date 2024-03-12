@@ -226,10 +226,10 @@ class PerforationWindow(QMainWindow):
         charge_diam_dict = {73: (0, 110), 89: (111, 135), 102: (136, 160), 114: (160, 250)}
 
         if CreatePZ.column_additional is False or (
-                CreatePZ.column_additional is True and pvr < CreatePZ.head_column_additional):
-            diam_internal_ek = CreatePZ.column_diametr
+                CreatePZ.column_additional is True and pvr < CreatePZ.head_column_additional._value):
+            diam_internal_ek = CreatePZ.column_diametr._value
         else:
-            diam_internal_ek = CreatePZ.column_additional_diametr
+            diam_internal_ek = CreatePZ.column_additional_diametr._value
 
         for diam, diam_internal_paker in charge_diam_dict.items():
             if diam_internal_paker[0] <= diam_internal_ek <= diam_internal_paker[1]:
@@ -290,7 +290,7 @@ class PerforationWindow(QMainWindow):
                                      f'главным инженером ООО "Ойл-сервис" от 14.10.2021г. Опрессовать  плашки  '
                                     f'ПВО (на давление опрессовки ЭК, но '
                                      f'не ниже максимального ожидаемого давления на устье) '
-                                    f'{CreatePZ.max_expected_pressure}атм, по невозможности на давление поглощения, но '
+                                    f'{CreatePZ.max_expected_pressure._value}атм, по невозможности на давление поглощения, но '
                                      f'не менее 30атм в течении 30мин (ОПРЕССОВКУ ПВО ЗАФИКСИРОВАТЬ В ВАХТОВОМ ЖУРНАЛЕ). '
                                     f'Передать по сводке уровня жидкости до перфорации и после перфорации.'
                                     f'(Произвести фотографию перфоратора в заряженном состоянии, и после проведения '
@@ -298,7 +298,10 @@ class PerforationWindow(QMainWindow):
                                     f' фотографии предоставить в ЦИТС Ойл-сервис',
                          None, None, None, None, None, None, None,
                           'Мастер КРС, подрядчик по ГИС', 1.2, None],
-                       [''.join(["ГИС (Перфорация на кабеле ЗАДАЧА 2.9.1)" if float(CreatePZ.max_angle) <= 50 else "ГИС ( Трубная Перфорация ЗАДАЧА 2.9.2)"]), None, ''.join(["ГИС (Перфорация на кабеле ЗАДАЧА 2.9.1)" if float(CreatePZ.max_angle) <= 50 else "ГИС ( Трубная Перфорация ЗАДАЧА 2.9.2)"]), None, None, None, None,
+                       [''.join(["ГИС (Перфорация на кабеле ЗАДАЧА 2.9.1)" if float(CreatePZ.max_angle._value) <= 50 
+                                 else "ГИС ( Трубная Перфорация ЗАДАЧА 2.9.2)"]), None, 
+                        ''.join(["ГИС (Перфорация на кабеле ЗАДАЧА 2.9.1)" if float(CreatePZ.max_angle._value) <= 50 
+                                 else "ГИС ( Трубная Перфорация ЗАДАЧА 2.9.2)"]), None, None, None, None,
                         None,None, None, 'подрядчик по ГИС', None],
                        [None, None, "Кровля", "-", "Подошва", "Тип заряда", "отв на 1 п.м.", "Кол-во отв",
                       "пласт", "Доп.данные", 'подрядчик по ГИС', None]
@@ -344,7 +347,7 @@ class PerforationWindow(QMainWindow):
             perforation.append(perf_list)
 
         perforation.append([None, None, ''.join(["Произвести контрольную запись ЛМ;ТМ. Составить АКТ на "
-                                                 "перфорацию." if float(CreatePZ.max_angle) <= 50 else ""
+                                                 "перфорацию." if float(CreatePZ.max_angle._value) <= 50 else ""
                                                f"Подъем последних 5-ти НКТ{CreatePZ.nkt_diam}мм и демонтаж перфоратора "
                                                                    f"производить в присутствии ответственного "
                                            f"представителя подрядчика по ГИС» (руководителя взрывных"
@@ -367,7 +370,7 @@ class PerforationWindow(QMainWindow):
             [None, None, 'Произвести ГИС привязку трубного перфоратора по ГК, ЛМ.',
             None, None, None, None, None, None, None,
             'Подрядчик по ГИС', None, None]]
-        if float(CreatePZ.max_angle) >= 50:
+        if float(CreatePZ.max_angle._value) >= 50:
             for i in range(len(pipe_perforation)):
                 perforation.insert(i + 1, pipe_perforation[i])
 
@@ -382,7 +385,7 @@ class PerforationWindow(QMainWindow):
                 row = self.ins_ind + i
                 self.table_widget.insertRow(row)
                 lst = [0, 1, 2, len(perforation)-1]
-                if float(CreatePZ.max_angle) >= 50:
+                if float(CreatePZ.max_angle._value) >= 50:
                     lst.extend([3, 4])
                 if i in lst: # Объединение ячеек по вертикале в столбце "отвественные и норма"
                     self.table_widget.setSpan(i + self.ins_ind, 2, 1, 8)

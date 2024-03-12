@@ -33,20 +33,20 @@ def acid_work(self):
                                           f'Введите длину хвостовика при посадке пакера нижнего пакера на {paker_depth_bottom} и текущем забое {CreatePZ.current_bottom}',
                                           paker_khost_top, 0, 4000)
     paker_diametr = TabPage_SO.paker_diametr_select(self, paker_depth_bottom)
-    if CreatePZ.column_additional is False or (CreatePZ.column_additional is True and paker_depth_bottom < CreatePZ.head_column_additional):
+    if CreatePZ.column_additional is False or (CreatePZ.column_additional is True and paker_depth_bottom < CreatePZ.head_column_additional._value):
         paker_select = f'заглушку + сбивной с ввертышем + НКТ{CreatePZ.nkt_diam}мм {paker_khost}м  + пакер ПРО-ЯМО-{paker_diametr}мм (либо аналог) ' \
-                       f'для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм + щелевой фильтр НКТ {difference_paker}м ' \
+                       f'для ЭК {CreatePZ.column_diametr._value}мм х {CreatePZ.column_wall_thickness._value}мм + щелевой фильтр НКТ {difference_paker}м ' \
                        f'+ пакер ПУ - {paker_diametr} + НКТ{CreatePZ.nkt_diam}мм 20м +реперный патрубок на НКТ{CreatePZ.nkt_diam}мм'
         dict_nkt = {73: paker_depth_bottom}
-    elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr < 110 and paker_depth_bottom > CreatePZ.head_column_additional:
+    elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr._value < 110 and paker_depth_bottom > CreatePZ.head_column_additional._value:
         paker_select = f'заглушку + сбивной с ввертышем + НКТ{60}мм {paker_khost}м  + пакер ПРО-ЯМО-{paker_diametr }мм (либо аналог) ' \
-                       f'для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм + щелевой фильтр НКТ{60} {difference_paker}м ' \
+                       f'для ЭК {CreatePZ.column_diametr._value}мм х {CreatePZ.column_wall_thickness._value}мм + щелевой фильтр НКТ{60} {difference_paker}м ' \
                        f'+ пакер ПУ - {paker_diametr } + НКТ{60}мм 20м +реперный патрубок на НКТ{60} {CreatePZ.head_column_additional-paker_depth_bottom}'
-        dict_nkt = {73: CreatePZ.head_column_additional-10, 60: int(paker_depth_bottom - CreatePZ.head_column_additional)}
-    elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr > 110 and paker_depth_bottom > CreatePZ.head_column_additional:
+        dict_nkt = {73: CreatePZ.head_column_additional-10, 60: int(paker_depth_bottom - CreatePZ.head_column_additional._value)}
+    elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr._value > 110 and paker_depth_bottom > CreatePZ.head_column_additional._value:
         paker_select = f'заглушку + сбивной с ввертышем + НКТ73 со снятыми фасками {paker_khost}м  + пакер ПРО-ЯМО-{paker_diametr }мм (либо аналог) ' \
-                       f'для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм + щелевой фильтр НКТ73 со снятыми фасками {difference_paker}м ' \
-                       f'+ пакер ПУ - {paker_diametr } + НКТ73 со снятыми фасками 20м +реперный патрубок на НКТ73 со снятыми фасками {CreatePZ.head_column_additional - paker_depth_bottom}'
+                       f'для ЭК {CreatePZ.column_diametr._value}мм х {CreatePZ.column_wall_thickness._value}мм + щелевой фильтр НКТ73 со снятыми фасками {difference_paker}м ' \
+                       f'+ пакер ПУ - {paker_diametr } + НКТ73 со снятыми фасками 20м +реперный патрубок на НКТ73 со снятыми фасками {CreatePZ.head_column_additional._value - paker_depth_bottom}'
 
         dict_nkt = {73: paker_depth_bottom}
     elif CreatePZ.nkt_diam == 60:
@@ -75,7 +75,7 @@ def acid_work(self):
          None, None, None, None, None, None, None,
          'мастер КРС', 0.5],
         [None, None,
-         f'Опрессовать эксплуатационную колонну в интервале {paker_depth_top}-0м на Р={CreatePZ.max_admissible_pressure}атм'
+         f'Опрессовать эксплуатационную колонну в интервале {paker_depth_top}-0м на Р={CreatePZ.max_admissible_pressure._value}атм'
          f' в течение 30 минут в присутствии представителя заказчика, составить акт. '
          f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ)',
          None, None, None, None, None, None, None,
@@ -156,7 +156,7 @@ def acidGons(self):
     acid_points, ok = QInputDialog.getText(self, 'точки ГОНС', 'Введите точки ГОНС ')
     bottom_point = max(list(map(int, acid_points.replace('м', '').replace(',', '').split())))
     gons_list = [[f'Спуск гидроманиторную насадку до глубины нижней точки до {bottom_point}', None,
-     f'Спустить  гидроманиторную насадку {"".join([f" + НКТ60мм {round(CreatePZ.current_bottom -CreatePZ.head_column_additional, 0)}" if CreatePZ.column_additional == True else ""])} '
+     f'Спустить  гидроманиторную насадку {"".join([f" + НКТ60мм {round(CreatePZ.current_bottom -CreatePZ.head_column_additional._value, 0)}" if CreatePZ.column_additional == True else ""])} '
      f'на НКТ{CreatePZ.nkt_diam}мм до глубины нижней точки до {bottom_point}'
      f' с замером, шаблонированием шаблоном {CreatePZ.nkt_template}мм.',
      None, None, None, None, None, None, None,

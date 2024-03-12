@@ -193,6 +193,7 @@ class MyWindow(QMainWindow):
 
         self.initUI()
         self.new_window = None
+        self.correct_window = None
         self.acid_windowPaker = None
         self.work_window = None
         self.signatures_window = None
@@ -718,7 +719,8 @@ class MyWindow(QMainWindow):
 
             # path = 'workiii'
             path = 'D:\Documents\Desktop\ГТМ'
-            filenames = f"{CreatePZ.well_number._value} {CreatePZ.well_area._value} кат {CreatePZ.cat_P_1} {self.work_plan}.xlsx"
+            filenames = f"{CreatePZ.well_number._value} {CreatePZ.well_area._value} кат {int(CreatePZ.cat_P_1[0])} " \
+                        f"{self.work_plan}.xlsx"
             full_path = path + '/' + filenames
             # print(f'10 - {ws2.max_row}')
             # print(wb2.path)
@@ -748,7 +750,7 @@ class MyWindow(QMainWindow):
             CreatePZ.gipsInWell = False
             CreatePZ.grpPlan = False
             CreatePZ.nktOpressTrue = False
-            CreatePZ.bottomhole_drill = 0
+            CreatePZ.bottomhole_drill = ProtectedIsNonNone(0)
             CreatePZ.open_trunk_well = False
             CreatePZ.normOfTime = 0
             CreatePZ.lift_ecn_can = False
@@ -772,34 +774,28 @@ class MyWindow(QMainWindow):
             CreatePZ.gaz_f_pr = []
             CreatePZ.paker_layout = 0
             CreatePZ.cat_P_P = []
-            CreatePZ.column_direction_diametr = ProtectedIsNonNone('отсут')
-            CreatePZ.column_direction_wall_thickness = ProtectedIsNonNone('отсут')
-            CreatePZ.column_direction_lenght = ProtectedIsNonNone('отсут')
-            CreatePZ.column_conductor_diametr = ProtectedIsNonNone('отсут')
-            CreatePZ.column_conductor_wall_thickness = ProtectedIsNonNone('отсут')
-            CreatePZ.column_conductor_lenght = ProtectedIsNonNone('отсут')
-            CreatePZ.column_additional_diametr = ProtectedIsNonNone('отсут')
-            CreatePZ.column_additional_wall_thickness = ProtectedIsNonNone('отсут')
-            CreatePZ.head_column_additional = ProtectedIsNonNone('отсут')
-            CreatePZ.shoe_column_additional = ProtectedIsNonNone('отсут')
-            CreatePZ.column_diametr = ProtectedIsNonNone('отсут')
-            CreatePZ.column_wall_thickness = ProtectedIsNonNone('отсут')
-            CreatePZ.shoe_column = ProtectedIsNonNone('отсут')
-            CreatePZ.column_additional_diametr = 0
-            CreatePZ.column_additional_wall_thickness = 0
-            CreatePZ.shoe_column_additional = 0
-            CreatePZ.column_diametr = 0
-            CreatePZ.column_wall_thickness = 0
-            CreatePZ.shoe_column = 0
-            CreatePZ.bottomhole_artificial = 0
-            CreatePZ.max_expected_pressure = 0
-            CreatePZ.head_column_additional = 0
+            CreatePZ.column_direction_diametr = ProtectedIsNonNone('не корректно')
+            CreatePZ.column_direction_wall_thickness = ProtectedIsNonNone('не корректно')
+            CreatePZ.column_direction_lenght = ProtectedIsNonNone('не корректно')
+            CreatePZ.column_conductor_diametr = ProtectedIsNonNone('не корректно')
+            CreatePZ.column_conductor_wall_thickness = ProtectedIsNonNone('не корректно')
+            CreatePZ.column_conductor_lenght = ProtectedIsNonNone('не корректно')
+            CreatePZ.column_additional_diametr = ProtectedIsNonNone('не корректно')
+            CreatePZ.column_additional_wall_thickness = ProtectedIsNonNone('не корректно')
+            CreatePZ.head_column_additional = ProtectedIsNonNone('не корректно')
+            CreatePZ.shoe_column_additional = ProtectedIsNonNone('не корректно')
+            CreatePZ.column_diametr = ProtectedIsNonNone('не корректно')
+            CreatePZ.column_wall_thickness = ProtectedIsNonNone('не корректно')
+            CreatePZ.shoe_column = ProtectedIsNonNone('не корректно')
+            CreatePZ.bottomhole_artificial = ProtectedIsNonNone('не корректно')
+            CreatePZ.max_expected_pressure = ProtectedIsNonNone('не корректно')
+            CreatePZ.head_column_additional = ProtectedIsNonNone('не корректно')
             CreatePZ.leakiness_Count = 0
             CreatePZ.expected_pick_up = {}
             CreatePZ.current_bottom = 0
             CreatePZ.fluid_work = 0
-            CreatePZ.static_level = 0
-            CreatePZ.dinamic_level = 0
+            CreatePZ.static_level = ProtectedIsNonNone('не корректно')
+            CreatePZ.dinamic_level = ProtectedIsNonNone('не корректно')
             CreatePZ.work_perforations_approved = False
             CreatePZ.dict_leakiness = {}
             CreatePZ.leakiness = False
@@ -813,7 +809,7 @@ class MyWindow(QMainWindow):
             CreatePZ.well_number = None
             CreatePZ.well_area = None
             CreatePZ.values = []
-            CreatePZ. depth_fond_paker_do = {"do": 0, "posle": 0}
+            CreatePZ.depth_fond_paker_do = {"do": 0, "posle": 0}
             CreatePZ.paker2_do = {"do": 0, "posle": 0}
             CreatePZ.depth_fond_paker2_do = {"do": 0, "posle": 0}
             CreatePZ.perforation_roof = 50000
@@ -842,7 +838,7 @@ class MyWindow(QMainWindow):
             CreatePZ.cat_H2S_list = []
             CreatePZ.H2S_mg = []
             CreatePZ.lift_key = 0
-            CreatePZ.max_admissible_pressure = 0
+            CreatePZ.max_admissible_pressure = ProtectedIsNonNone(0)
             CreatePZ.region = ''
             CreatePZ.dict_nkt = {}
             CreatePZ.dict_nkt_po = {}
@@ -862,7 +858,7 @@ class MyWindow(QMainWindow):
             CreatePZ.image_list = []
             CreatePZ.problem_with_ek = False
             CreatePZ.problem_with_ek_depth = CreatePZ.current_bottom
-            CreatePZ.problem_with_ek_diametr = CreatePZ.column_diametr
+            CreatePZ.problem_with_ek_diametr = CreatePZ.column_diametr._value
             path = "imageFiles/image_work"
             for file in os.listdir(path):
                 file_path = os.path.join(path, file)
@@ -1262,7 +1258,7 @@ class MyWindow(QMainWindow):
             self.rir_window = None
         else:
             self.rir_window.close()  # Close window.
-            self.rir_window is None
+            self.rir_window = None
 
     def grpWithPaker(self):
         from work_py.grp import grpPaker
@@ -1719,17 +1715,19 @@ class MyWindow(QMainWindow):
         from data_correct import DataWindow
         from open_pz import CreatePZ
 
-        if self.new_window is None:
+        if self.correct_window is None:
 
-            self.new_window = DataWindow()
-            self.new_window.setWindowTitle("Окно корректировки")
-            self.new_window.setGeometry(100, 400, 300, 400)
-            self.new_window.show()
+            self.correct_window = DataWindow()
+            self.correct_window.setWindowTitle("Окно корректировки")
+            self.correct_window.setGeometry(100, 400, 300, 400)
+            self.correct_window.show()
+            CreatePZ.pause_app(self)
             CreatePZ.pause = True
+            self.correct_window = None
 
         else:
-            self.new_window.close()  # Close window.
-            self.new_window = None  # Discard reference.
+            self.correct_window.close()  # Close window.
+            self.correct_window = None  # Discard reference.
 
     def perforationNewWindow(self):
         from work_py.perforation import PerforationWindow
@@ -1892,30 +1890,30 @@ class MyWindow(QMainWindow):
         ws4.cell(row=6, column=1).value = f'НКТ: \n {gno_nkt_opening(CreatePZ.dict_nkt)}'
         ws4.cell(row=7, column=1).value = f'Рпл: \n {" ".join(list(pressur_set))}атм'
         # ws4.cell(row=8, column=1).value = f'ЖГС = {CreatePZ.fluid_work_short}г/см3'
-        ws4.cell(row=9, column=1).value = f'Нст- {CreatePZ.static_level}м / Ндин - {CreatePZ.dinamic_level}м'
+        ws4.cell(row=9, column=1).value = f'Нст- {CreatePZ.static_level._value}м / Ндин - {CreatePZ.dinamic_level._value}м'
         if CreatePZ.curator == 'ОР':
             ws4.cell(row=10, column=1).value = f'Ожид {CreatePZ.expected_Q}м3/сут при Р-{CreatePZ.expected_P}м3/сут'
         else:
             ws4.cell(row=10, column=1).value = f'Qн {CreatePZ.Qoil}т Qж- {CreatePZ.Qwater}м3/сут'
-        ws4.cell(row=11, column=1).value = f'макс угол {CreatePZ.max_angle} на {CreatePZ.max_angle_H._value}'
+        ws4.cell(row=11, column=1).value = f'макс угол {CreatePZ.max_angle._value} на {CreatePZ.max_angle_H._value}'
         ws4.cell(row=1, column=2).value = CreatePZ.cdng._value
         ws4.cell(row=2, column=3).value = \
             f'Рпл - {CreatePZ.dict_category[CreatePZ.plast_work_short[0]]["по давлению"].category},' \
               f' H2S -{CreatePZ.dict_category[CreatePZ.plast_work_short[0]]["по сероводороду"].category},' \
               f' газ факт -{CreatePZ.gaz_f_pr[0]}т/м3'
-        column_well = f'{CreatePZ.column_diametr}х{CreatePZ.column_wall_thickness} в инт 0 - {CreatePZ.shoe_column}м ' \
-            if CreatePZ.column_additional is False else f'{CreatePZ.column_diametr} х {CreatePZ.column_wall_thickness} \n' \
-                                               f'0 - {CreatePZ.shoe_column}м/\n{CreatePZ.column_additional_diametr}' \
-                                               f' х {CreatePZ.column_additional_wall_thickness} в инт ' \
-                                                f'{CreatePZ.head_column_additional}-{CreatePZ.shoe_column_additional}м'
+        column_well = f'{CreatePZ.column_diametr._value}х{CreatePZ.column_wall_thickness._value} в инт 0 - {CreatePZ.shoe_column._value}м ' \
+            if CreatePZ.column_additional is False else f'{CreatePZ.column_diametr._value} х {CreatePZ.column_wall_thickness._value} \n' \
+                                               f'0 - {CreatePZ.shoe_column._value}м/\n{CreatePZ.column_additional_diametr._value}' \
+                                               f' х {CreatePZ.column_additional_wall_thickness._value} в инт ' \
+                                                f'{CreatePZ.head_column_additional._value}-{CreatePZ.head_column_additional._value}м'
         ws4.cell(row=1, column=7).value = column_well
-        ws4.cell(row=4, column=7).value = f'Пробур забой {CreatePZ.bottomhole_drill}м'
-        ws4.cell(row=5, column=7).value = f'Исскус забой {CreatePZ.bottomhole_artificial}м'
+        ws4.cell(row=4, column=7).value = f'Пробур забой {CreatePZ.bottomhole_drill._value}м'
+        ws4.cell(row=5, column=7).value = f'Исскус забой {CreatePZ.bottomhole_artificial._value}м'
         ws4.cell(row=6, column=7).value = f'Тек забой {CreatePZ.bottom}м'
 
 
         ws4.cell(row=7, column=7).value = plast_str
-        ws4.cell(row=11, column=7).value = f'Рмакс {CreatePZ.max_admissible_pressure}атм'
+        ws4.cell(row=11, column=7).value = f'Рмакс {CreatePZ.max_admissible_pressure._value}атм'
         ws4.cell(row=3, column=2).value = plan_short
         nek_str = 'НЭК '
         if len(CreatePZ.leakiness_interval) != 0:
@@ -2003,11 +2001,13 @@ class MyWindow(QMainWindow):
         check_for_template = OpressovkaEK.check_for_template_paker(self, depth)
         depth = check_for_template[0]
 
-        # for interval in CreatePZ.skm_interval:
-        #     print(interval[0] <= depth <= interval[1], interval, depth, all([interval[0] <= depth <= interval[1] for interval in CreatePZ.skm_interval]), any([interval[0] <= depth <= interval[1] for interval in CreatePZ.skm_interval]))
-        # print(CreatePZ.skm_interval)
 
-        if all([interval[0] <= depth <= interval[1] for interval in CreatePZ.skm_interval]):
+        print(interval[0] <= depth <= interval[1],
+              all([interval[0] <= depth <= interval[1] for interval in CreatePZ.skm_interval]),
+              any([interval[0] <= depth <= interval[1] for interval in CreatePZ.skm_interval]))
+        print(CreatePZ.skm_interval)
+
+        if any([interval[0] <= depth <= interval[1] for interval in CreatePZ.skm_interval]):
             return int(depth)
         else:
             false_question = QMessageBox.question(None, 'Проверка посадки пакера в интервал скреперования',
@@ -2025,7 +2025,7 @@ class MyWindow(QMainWindow):
                 for plast in CreatePZ.plast_all:
                     for interval in CreatePZ.dict_perforation[plast]['интервал']:
                         perforating_intervals.append(list(interval))
-                skipping_intervals_new = 0
+                skipping_intervals_new = []
 
                 skm_range = list(range(kroly_skm, pod_skm + 1))
                 for pvr in sorted(perforating_intervals, key=lambda x: x[0]):
@@ -2039,13 +2039,15 @@ class MyWindow(QMainWindow):
 
                         skm_range = skm_range[skm_range.index(int(pvr[1])):]
                 # print(f' range {skm_range}')
-                skipping_intervals_new.append((skm_range[0] + 2, pod_skm))
+                skipping_intervals_new.append((skm_range[0], pod_skm))
 
                 skm_question = QMessageBox.question(None, 'Скреперование',
                                                       f'добавить интервал скреперования {skipping_intervals_new}')
                 if skm_question == QMessageBox.StandardButton.Yes:
+                    print(CreatePZ.skm_interval)
 
-                    CreatePZ.skm_interval.append(skipping_intervals_new)
+                    CreatePZ.skm_interval.append(skipping_intervals_new[0])
+                    print(CreatePZ.skm_interval)
 
                     CreatePZ.skm_interval = sorted(CreatePZ.skm_interval, key = lambda  x: x[0])
                     # perforating_intervals = []
@@ -2053,7 +2055,7 @@ class MyWindow(QMainWindow):
                     #     for interval in CreatePZ.dict_perforation[plast]['интервал']:
                     #         perforating_intervals.append(list(interval))
                     #
-                    # raid_str = raid(remove_overlapping_intervals(perforating_intervals, CreatePZ.skm_interval))
+                    raid_str = raid(remove_overlapping_intervals(perforating_intervals, CreatePZ.skm_interval))
                     print(f'скреперование {CreatePZ.skm_interval}')
                     for row in range(self.table_widget.rowCount()):
                         for column in range(self.table_widget.columnCount()):

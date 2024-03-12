@@ -5,28 +5,28 @@ from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm
 def magnet_select(self):
     from open_pz import CreatePZ
     if CreatePZ.column_additional == False or CreatePZ.column_additional == True and\
-            CreatePZ.current_bottom <= CreatePZ.head_column_additional:
+            CreatePZ.current_bottom <= CreatePZ.head_column_additional._value:
         magnet_select = f'НКТ{CreatePZ.nkt_diam}мм 20м + репер'
 
-    elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr < 110 and \
-            CreatePZ.current_bottom >= CreatePZ.head_column_additional:
-        magnet_select = f'НКТ60мм 20м + репер + НКТ60мм L- {round(CreatePZ.current_bottom - CreatePZ.head_column_additional, 1)}м'
-    elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr > 110 and\
-            CreatePZ.current_bottom >= CreatePZ.head_column_additional:
+    elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr._value < 110 and \
+            CreatePZ.current_bottom >= CreatePZ.head_column_additional._value:
+        magnet_select = f'НКТ60мм 20м + репер + НКТ60мм L- {round(CreatePZ.current_bottom - CreatePZ.head_column_additional._value, 1)}м'
+    elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr._value > 110 and\
+            CreatePZ.current_bottom >= CreatePZ.head_column_additional._value:
         magnet_select = f'НКТ{CreatePZ.nkt_diam}мм со снятыми фасками 20м +' \
                         f' НКТ{CreatePZ.nkt_diam}мм со снятыми фасками' \
-                        f' L- {round(CreatePZ.current_bottom - CreatePZ.head_column_additional, 1)}м'
+                        f' L- {round(CreatePZ.current_bottom - CreatePZ.head_column_additional._value, 1)}м'
     return magnet_select
 
 
 def sbt_select(self):
     from open_pz import CreatePZ
     if CreatePZ.column_additional == False or CreatePZ.column_additional == True and \
-            CreatePZ.current_bottom <= CreatePZ.head_column_additional:
+            CreatePZ.current_bottom <= CreatePZ.head_column_additional._value:
         sbt_select = ''
 
-    elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr < 127:
-        sbt_select = f'СБТ 2 3/8 L- {round(CreatePZ.current_bottom - CreatePZ.head_column_additional,0)}м '
+    elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr._value < 127:
+        sbt_select = f'СБТ 2 3/8 L- {round(CreatePZ.current_bottom - CreatePZ.head_column_additional._value,0)}м '
 
     return sbt_select
 
@@ -101,7 +101,7 @@ def emergencyNKT(self):
     from open_pz import CreatePZ
     emergenceBottom, ok = QInputDialog.getDouble(self, 'Аварийный забой',
                                                  'Введите глубину аварийного забоя:', int(CreatePZ.current_bottom), 2,
-                                                 int(CreatePZ.bottomhole_drill), 1)
+                                                 int(CreatePZ.bottomhole_drill._value), 1)
     emergencyNKT_list = [[f'СПо печати до Н={emergenceBottom}м', None,
                           f'Спустить с замером торцевую печать {magnet_select(self)} до Н={emergenceBottom}м '
                           f'(Аварийная голова) с замером.'
@@ -137,8 +137,8 @@ def emergencyNKT(self):
                           'мастер КРС', liftingNKT_norm(emergenceBottom, 1.2)]]
     CreatePZ.current_bottom, ok = QInputDialog.getDouble(self, 'Текущий забой',
                                                          'Введите Текущий забой после ЛАР',
-                                                         CreatePZ.bottomhole_artificial, 1,
-                                                         CreatePZ.bottomhole_drill, 1)
+                                                         CreatePZ.bottomhole_artificial._value, 1,
+                                                         CreatePZ.bottomhole_drill._value, 1)
     return emergencyNKT_list
 
 
@@ -316,8 +316,8 @@ def emergency_sticking(self):
 
     CreatePZ.current_bottom, ok = QInputDialog.getDouble(self, 'Текущий забой',
                                                          'Введите Текущий забой после ЛАР',
-                                                         CreatePZ.bottomhole_artificial, 1,
-                                                         CreatePZ.bottomhole_drill, 1)
+                                                         CreatePZ.bottomhole_artificial._value, 1,
+                                                         CreatePZ.bottomhole_drill._value, 1)
     return emergency_list
 
 

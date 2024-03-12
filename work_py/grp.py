@@ -12,11 +12,11 @@ from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm,well_volume_no
 def grpGpp(self):
     from open_pz import CreatePZ
 
-    nkt_diam = ''.join(['89' if CreatePZ.column_diametr > 110 else '60'])
+    nkt_diam = ''.join(['89' if CreatePZ.column_diametr._value > 110 else '60'])
 
     gpp_depth, ok = QInputDialog.getInt(None, 'глубина ',
                                         'Введите глубину установки',
-                                        int(CreatePZ.perforation_roof - 50), 0, int(CreatePZ.bottomhole_drill))
+                                        int(CreatePZ.perforation_roof - 50), 0, int(CreatePZ.bottomhole_drill._value))
     gPP_300 = MyWindow.true_set_Paker(self, 300)
 
     main.MyWindow.check_gpp_upa(self)
@@ -60,7 +60,7 @@ def grpGpp(self):
         [None, None,
          f'Обвязать устье скважины согасно схемы ПВО №7 утвержденной главным инженером ООО "Ойл-сервис" '
          f'от 14.10.2021г для проведения ГРП на месторождениях ООО "БашнефтьДобыча". Посадить планшайбу. Произвести демонтаж'
-         f' оборудования. Опрессовать установленную арматуру для ГРП на Р={CreatePZ.max_admissible_pressure}атм, '
+         f' оборудования. Опрессовать установленную арматуру для ГРП на Р={CreatePZ.max_admissible_pressure._value}атм, '
          f'составить акт в присутствии следующих представителей: УСРСиСТ (супервайзер), подрядчика по ГРП. '
          f'В случае негерметичности арматуры, составить акт и устранить негерметичность под руководством следующих '
          f'представителей:  УСРСиСТ (супервайзер), подрядчика по ГРП .',
@@ -173,11 +173,11 @@ def check_gpp_upa(self):
 def normalization(self):
     from open_pz import CreatePZ
     from work_py.opressovka import TabPage_SO
-    nkt_diam = ''.join(['73' if CreatePZ.column_diametr > 110 else '60'])
+    nkt_diam = ''.join(['73' if CreatePZ.column_diametr._value > 110 else '60'])
 
     current_depth, ok = QInputDialog.getInt(None, 'Нормализация забоя',
                                             'Введите глубину необходмого забоя',
-                                            int(CreatePZ.current_bottom), 0, int(CreatePZ.bottomhole_artificial + 500))
+                                            int(CreatePZ.current_bottom), 0, int(CreatePZ.bottomhole_artificial._value + 500))
     normalization_list = [
         [f'Согласовать Алгоритм нормализации до H- {current_depth}м', None, f'Алгоритм работ согласовать с Заказчиком: \n'
                      f'В случае освоения скважины ГНКТ и дохождение до гл. не ниже {CreatePZ.current_bottom}м перейти к отбивки забоя '
@@ -258,27 +258,27 @@ def normalization(self):
 def gpp_select(paker_depth):
     from open_pz import CreatePZ
     from work_py.opressovka import TabPage_SO
-    if CreatePZ.column_diametr > 120:
+    if CreatePZ.column_diametr._value > 120:
         nkt_diam = '89'
     else:
         nkt_diam = '60'
-    if CreatePZ.column_additional == True and CreatePZ.column_additional_diametr <= 120:
+    if CreatePZ.column_additional == True and CreatePZ.column_additional_diametr._value <= 120:
         nkt_diam_add = '60'
 
     if CreatePZ.column_additional == False or (
-            CreatePZ.column_additional == True and paker_depth < CreatePZ.head_column_additional):
-        paker_select = f'гидропескоструйный перфоратор под ЭК {CreatePZ.column_diametr}мм-{CreatePZ.column_wall_thickness}мм+' \
+            CreatePZ.column_additional == True and paker_depth < CreatePZ.head_column_additional._value):
+        paker_select = f'гидропескоструйный перфоратор под ЭК {CreatePZ.column_diametr._value}мм-{CreatePZ.column_wall_thickness._value}мм+' \
                        f'опрессовочный узел +НКТ{nkt_diam}мм - 10м, реперный патрубок НКТ{nkt_diam}мм - 2м,'
-        paker_short = f'ГПП под ЭК {CreatePZ.column_diametr}мм-{CreatePZ.column_wall_thickness}мм+' \
+        paker_short = f'ГПП под ЭК {CreatePZ.column_diametr._value}мм-{CreatePZ.column_wall_thickness._value}мм+' \
                        f'опрессовочный узел +НКТ{nkt_diam}мм - 10м, репер НКТ{nkt_diam}мм - 2м,'
     else:
 
-        paker_select = f'гидропескоструйный перфоратор под ЭК {CreatePZ.column_additional_diametr}мм-{CreatePZ.column_additional_wall_thickness}мм +' \
+        paker_select = f'гидропескоструйный перфоратор под ЭК {CreatePZ.column_additional_diametr._value}мм-{CreatePZ.column_additional_wall_thickness._value}мм +' \
                        f'опрессовочный узел +НКТ{nkt_diam_add}мм - 10м, реперный патрубок НКТ{nkt_diam_add}мм - 2м, + НКТ{nkt_diam_add} L-' \
-                       f'{round(paker_depth - CreatePZ.head_column_additional, 0)}м'
-        paker_short = f'ГПП под ЭК {CreatePZ.column_additional_diametr}мм-{CreatePZ.column_additional_wall_thickness}мм +' \
+                       f'{round(paker_depth - CreatePZ.head_column_additional._value, 0)}м'
+        paker_short = f'ГПП под ЭК {CreatePZ.column_additional_diametr._value}мм-{CreatePZ.column_additional_wall_thickness._value}мм +' \
                        f'опрессовочный узел +НКТ{nkt_diam_add}мм - 10м, репер НКТ{nkt_diam_add}мм - 2м, + НКТ{nkt_diam_add} L-' \
-                       f'{round(paker_depth - CreatePZ.head_column_additional, 0)}м'
+                       f'{round(paker_depth - CreatePZ.head_column_additional._value, 0)}м'
 
     return paker_select, paker_short
 
@@ -286,35 +286,35 @@ def gpp_select(paker_depth):
 def paker_select(paker_depth):
     from open_pz import CreatePZ
     from work_py.opressovka import TabPage_SO
-    if CreatePZ.column_diametr > 120:
+    if CreatePZ.column_diametr._value > 120:
         nkt_diam = '89'
-    elif 110 < CreatePZ.column_diametr < 120:
+    elif 110 < CreatePZ.column_diametr._value < 120:
         nkt_diam = '73'
     else:
         nkt_diam = '60'
     paker_select = ''
     
     
-    if CreatePZ.column_additional == False or (CreatePZ.column_additional == True and paker_depth < CreatePZ.head_column_additional):
-        paker_select = f'воронка, НКТ{nkt_diam}мм - 1,5м, пакер ГРП для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм +' \
+    if CreatePZ.column_additional == False or (CreatePZ.column_additional == True and paker_depth < CreatePZ.head_column_additional._value):
+        paker_select = f'воронка, НКТ{nkt_diam}мм - 1,5м, пакер ГРП для ЭК {CreatePZ.column_diametr._value}мм х {CreatePZ.column_wall_thickness._value}мм +' \
                        f'опрессовочный узел +НКТ{nkt_diam}мм - 10м, реперный патрубок НКТ{nkt_diam}мм - 2м'
-        paker_short = f'воронка, НКТ{nkt_diam}мм - 1,5м, пакер ГРП для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм +' \
+        paker_short = f'воронка, НКТ{nkt_diam}мм - 1,5м, пакер ГРП для ЭК {CreatePZ.column_diametr._value}мм х {CreatePZ.column_wall_thickness._value}мм +' \
                        f'опрессовочный узел +НКТ{nkt_diam}мм - 10м, реперный патрубок НКТ{nkt_diam}мм - 2м'
 
     else:
-        paker_select = f'воронка, НКТ{nkt_diam}мм - 1,5м, пакер ГРП для ЭК {CreatePZ.column_additional_diametr}мм х {CreatePZ.column_additional_wall_thickness}мм+' \
+        paker_select = f'воронка, НКТ{nkt_diam}мм - 1,5м, пакер ГРП для ЭК {CreatePZ.column_additional_diametr._value}мм х {CreatePZ.column_additional_wall_thickness._value}мм+' \
                        f'опрессовочный узел +НКТ{nkt_diam}мм - 10м, реперный патрубок НКТ{nkt_diam}мм - 2м, + НКТ{nkt_diam} ' \
-                       f' L-{round(paker_depth - CreatePZ.head_column_additional, 0)}м'
-        paker_short = f'воронка, НКТ{nkt_diam}мм - 1,5м, пакер ГРП для ЭК {CreatePZ.column_additional_diametr}мм х {CreatePZ.column_additional_wall_thickness}мм+' \
+                       f' L-{round(paker_depth - CreatePZ.head_column_additional._value, 0)}м'
+        paker_short = f'воронка, НКТ{nkt_diam}мм - 1,5м, пакер ГРП для ЭК {CreatePZ.column_additional_diametr._value}мм х {CreatePZ.column_additional_wall_thickness._value}мм+' \
                        f'опрессовочный узел +НКТ{nkt_diam}мм - 10м, реперный патрубок НКТ{nkt_diam}мм - 2м, + НКТ{nkt_diam} ' \
-                       f' L-{round(paker_depth - CreatePZ.head_column_additional, 0)}м'
+                       f' L-{round(paker_depth - CreatePZ.head_column_additional._value, 0)}м'
     return paker_select, paker_short
 
 
 def grpPaker(self):
     from open_pz import CreatePZ
 
-    nkt_diam = ''.join(['89' if CreatePZ.column_diametr > 110 else '60'])
+    nkt_diam = ''.join(['89' if CreatePZ.column_diametr._value > 110 else '60'])
 
     paker_depth, ok = QInputDialog.getInt(None, 'опрессовка ЭК',
                                           'Введите глубину посадки пакера ГРП',
@@ -366,7 +366,7 @@ def grpPaker(self):
         [None, None,
          f'Демонтировать ПВО. Обвязать устье скважины согасно схемы ПВО №7а утвержденной главным инженером ООО "Ойл-сервис" '
          f'от 14.10.2021г для проведения ГРП на месторождениях ООО "БашнефтьДобыча". Посадить планшайбу. Произвести демонтаж'
-         f' оборудования. Опрессовать установленную арматуру для ГРП на Р={CreatePZ.max_admissible_pressure}атм, '
+         f' оборудования. Опрессовать установленную арматуру для ГРП на Р={CreatePZ.max_admissible_pressure._value}атм, '
          f'составить акт в присутствии следующих представителей: УСРСиСТ (супервайзер), подрядчика по ГРП. '
          f'В случае негерметичности арматуры, составить акт и устранить негерметичность под руководством следующих '
          f'представителей:  УСРСиСТ (супервайзер), подрядчика по ГРП .',
@@ -439,7 +439,7 @@ def grpPaker(self):
          None, None, None, None, None, None, None,
          'Мастер КРС, представ. заказчика', liftingNKT_norm(paker_depth,1.2)],
         [None, None,
-         f'Опрессовать глухие плашки превентора на максимально ожидаемое давление {CreatePZ.max_expected_pressure}атм, но не выше '
+         f'Опрессовать глухие плашки превентора на максимально ожидаемое давление {CreatePZ.max_expected_pressure._value}атм, но не выше '
          f'максимально допустимого давления опрессовки эксплуатационной колонны с выдержкой в течении 30 минут,в случае невозможности '
          f'опрессовки по результатам определения приемистости и по согласованию с заказчиком  опрессовать глухие плашки ПВО на давление поглощения, '
          f'но не менее 30атм и  с составлением акта на опрессовку ПВО с представителем Заказчика. ', None,
@@ -477,25 +477,25 @@ def grpPaker(self):
 def paker_select(self, paker_depth):
     from open_pz import CreatePZ
     from work_py.opressovka import TabPage_SO
-    if CreatePZ.column_diametr > 120:
+    if CreatePZ.column_diametr._value > 120:
         nkt_diam = '89'
-    elif 110 < CreatePZ.column_diametr < 120:
+    elif 110 < CreatePZ.column_diametr._value < 120:
         nkt_diam = '73'
     else:
         nkt_diam = '60'
     paker_diametr = TabPage_SO.paker_diametr_select(self, paker_depth)
-    if CreatePZ.column_additional == False or CreatePZ.column_additional == True and paker_depth < CreatePZ.head_column_additional:
+    if CreatePZ.column_additional == False or CreatePZ.column_additional == True and paker_depth < CreatePZ.head_column_additional._value:
         paker_select = f'воронка, НКТ{nkt_diam}мм - 1,5м, пакер ПРО-ЯМО-{paker_diametr} (либо аналог) +' \
                        f'опрессовочный узел +НКТ{nkt_diam}мм - 10м, реперный патрубок НКТ{nkt_diam}мм - 2м,'
         paker_short = f'в-ка, НКТ{nkt_diam}мм - 1,5м, пакер {paker_diametr}  +' \
                        f'опрессовочный узел +НКТ{nkt_diam}мм - 10м, репер НКТ{nkt_diam}мм - 2м,'
-    elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr < 110 and paker_depth > CreatePZ.head_column_additional:
+    elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr._value < 110 and paker_depth > CreatePZ.head_column_additional._value:
         paker_select = f'воронка, НКТ{nkt_diam}мм - 1,5м, пакер ПРО-ЯМО-{paker_diametr} (либо аналог) +' \
                        f'опрессовочный узел +НКТ{nkt_diam}мм - 10м, реперный патрубок НКТ{nkt_diam}мм - 2м, + НКТ{nkt_diam} L-' \
-                       f'{round(paker_depth - CreatePZ.head_column_additional, 0)}м'
+                       f'{round(paker_depth - CreatePZ.head_column_additional._value, 0)}м'
         paker_short = f'в-ка, НКТ{nkt_diam}мм - 1,5м, пакер ПРО-ЯМО-{paker_diametr}' \
                       f'опрессовочный узел +НКТ{nkt_diam}мм - 10м, репер НКТ{nkt_diam}мм - 2м,' \
-                      f'{round(paker_depth - CreatePZ.head_column_additional, 0)}м'
+                      f'{round(paker_depth - CreatePZ.head_column_additional._value, 0)}м'
 
 
     return paker_select, paker_short
@@ -505,9 +505,9 @@ def nktGrp(self):
     from open_pz import CreatePZ
 
     if CreatePZ.column_additional is False or (
-            CreatePZ.column_additional is True and CreatePZ.current_bottom >= CreatePZ.head_column_additional):
+            CreatePZ.column_additional is True and CreatePZ.current_bottom >= CreatePZ.head_column_additional._value):
         return f'НКТ{CreatePZ.nkt_diam}мм'
-    elif CreatePZ.column_additional is True and CreatePZ.column_additional_diametr < 110:
-        return f'НКТ60мм L- {round(CreatePZ.current_bottom - CreatePZ.head_column_additional + 20, 0)}'
-    elif CreatePZ.column_additional is True and CreatePZ.column_additional_diametr > 110:
-        return f'НКТ{CreatePZ.nkt_diam}мм со снятыми фасками L- {round(CreatePZ.current_bottom - CreatePZ.head_column_additional + 20, 0)}'
+    elif CreatePZ.column_additional is True and CreatePZ.column_additional_diametr._value < 110:
+        return f'НКТ60мм L- {round(CreatePZ.current_bottom - CreatePZ.head_column_additional._value + 20, 0)}'
+    elif CreatePZ.column_additional is True and CreatePZ.column_additional_diametr._value > 110:
+        return f'НКТ{CreatePZ.nkt_diam}мм со снятыми фасками L- {round(CreatePZ.current_bottom - CreatePZ.head_column_additional._value + 20, 0)}'

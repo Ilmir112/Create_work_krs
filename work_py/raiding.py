@@ -22,21 +22,21 @@ class Raid(CreatePZ):
                                                   200)
         nkt_pod = 0
         if CreatePZ.column_additional == True:
-            nkt_pod = ['60мм' if CreatePZ.column_additional_diametr <110 else '73мм со снятыми фасками']
+            nkt_pod = ['60мм' if CreatePZ.column_additional_diametr._value <110 else '73мм со снятыми фасками']
             nkt_pod = ''.join(nkt_pod)
 
         nkt_diam = CreatePZ.nkt_diam
         nkt_template = CreatePZ.nkt_template
 
 
-        ryber_str_EK = f'райбер-{ryber_diam} для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм +'\
+        ryber_str_EK = f'райбер-{ryber_diam} для ЭК {CreatePZ.column_diametr._value}мм х {CreatePZ.column_wall_thickness._value}мм +'\
                        f' забойный двигатель  +НКТ{nkt_diam}м 20м + репер '
-        ryber_str_DP = f'райбер-{ryber_diam} для ЭК {CreatePZ.column_additional_diametr}мм х ' \
-                f'{CreatePZ.column_additional_wall_thickness}мм + забойный двигатель +НКТ{nkt_pod}мм 20м + репер + ' \
-                f'НКТ{nkt_pod} {round(CreatePZ.current_bottom - float(CreatePZ.head_column_additional))}м'
+        ryber_str_DP = f'райбер-{ryber_diam} для ЭК {CreatePZ.column_additional_diametr._value}мм х ' \
+                f'{CreatePZ.column_additional_wall_thickness._value}мм + забойный двигатель +НКТ{nkt_pod}мм 20м + репер + ' \
+                f'НКТ{nkt_pod} {round(CreatePZ.current_bottom - float(CreatePZ.head_column_additional._value))}м'
 
         if CreatePZ.column_additional == False or \
-                (CreatePZ.column_additional == True and CreatePZ.head_column_additional >= CreatePZ.current_bottom):
+                (CreatePZ.column_additional == True and CreatePZ.head_column_additional._value >= CreatePZ.current_bottom):
             ryber_key = 'райбер в ЭК'
             ryber_str = ryber_str_EK
         elif CreatePZ.column_additional == True:
@@ -117,7 +117,7 @@ class Raid(CreatePZ):
                                                    'Нужно ли изменять удельный вес?')
             if acid_true_quest == QMessageBox.StandardButton.Yes:
                 for row in fluid_change(self):
-                    ryber_list.insert(-2, row)
+                    ryber_list.insert(-1, row)
         return ryber_list
 
 
@@ -144,10 +144,10 @@ def raiding_Bit_diam_select(depth_landing):
     }
 
     if CreatePZ.column_additional is False or (
-            CreatePZ.column_additional is True and depth_landing <= CreatePZ.head_column_additional):
-        diam_internal_ek = CreatePZ.column_diametr - 2 * CreatePZ.column_wall_thickness
+            CreatePZ.column_additional is True and depth_landing <= CreatePZ.head_column_additional._value):
+        diam_internal_ek = CreatePZ.column_diametr._value - 2 * CreatePZ.column_wall_thickness._value
     else:
-        diam_internal_ek = CreatePZ.column_additional_diametr - 2 * CreatePZ.column_additional_wall_thickness
+        diam_internal_ek = CreatePZ.column_additional_diametr._value - 2 * CreatePZ.column_additional_wall_thickness._value
 
     for diam, diam_internal_bit in raiding_Bit_dict.items():
         if diam_internal_bit[0] <= diam_internal_ek <= diam_internal_bit[1]:

@@ -8,17 +8,17 @@ from work_py.rir import RirWindow
 def claySolutionDef(self):
     from open_pz import CreatePZ
     from work_py.rir import RirWindow
-    nkt_diam = ''.join(['73' if CreatePZ.column_diametr > 110 else '60'])
+    nkt_diam = ''.join(['73' if CreatePZ.column_diametr._value > 110 else '60'])
 
 
     rirSole, ok = QInputDialog.getInt(None, 'Подошва глинистого раствора',
                                       'Введите глубину глинистого раствора ',
-                                      int(CreatePZ.current_bottom), 0, int(CreatePZ.bottomhole_drill))
+                                      int(CreatePZ.current_bottom), 0, int(CreatePZ.bottomhole_drill._value))
     rirRoof, ok = QInputDialog.getInt(None, 'Кровля глинистого раствора',
                                       'Введите глубину глинистого раствора',
-                                      int(CreatePZ.perforation_sole +20), 0, int(CreatePZ.bottomhole_drill))
-    if CreatePZ.column_additional == True and CreatePZ.column_additional_diametr <110:
-        dict_nkt = {73: CreatePZ.head_column_additional, 60: CreatePZ.head_column_additional-rirSole}
+                                      int(CreatePZ.perforation_sole +20), 0, int(CreatePZ.bottomhole_drill._value))
+    if CreatePZ.column_additional == True and CreatePZ.column_additional_diametr._value <110:
+        dict_nkt = {73: CreatePZ.head_column_additional._value, 60: CreatePZ.head_column_additional-rirSole}
     else:
         dict_nkt = {73: rirSole}
 

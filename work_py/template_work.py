@@ -22,91 +22,127 @@ class TabPage_SO(QWidget):
         self.template_Combo.currentTextChanged.connect(self.update_template_edit)
 
         self.template_str_Label = QLabel("строчка с шаблонами", self)
-        self.template_str_edit = QLineEdit(self)
+        self.template_str_Edit = QLineEdit(self)
 
         self.skm_teml_str_Label = QLabel("глубины спуска шаблонов", self)
-        self.skm_teml_str_edit = QLineEdit(self)
+        self.skm_teml_str_Edit = QLineEdit(self)
 
         self.template_first_Label = QLabel("диаметр первого шаблона", self)
-        self.template_first_edit = QLineEdit(self)
-        self.template_first_edit.setValidator(validator)
+        self.template_first_Edit = QLineEdit(self)
+        self.template_first_Edit.setValidator(validator)
 
         self.lenght_template_first_Label = QLabel("длина первого шаблона", self)
-        self.lenght_template_first_edit = QLineEdit(self)
-        self.lenght_template_first_edit.setValidator(validator)
+        self.lenght_template_first_Edit = QLineEdit(self)
+        self.lenght_template_first_Edit.setValidator(validator)
 
         self.dictance_template_first_Label = QLabel("расстояние", self)
-        self.dictance_template_first_edit = QLineEdit(self)
-        self.dictance_template_first_edit.setValidator(validator)
+        self.dictance_template_first_Edit = QLineEdit(self)
+        self.dictance_template_first_Edit.setValidator(validator)
 
         self.skm_Label = QLabel("диаметр СКМ", self)
-        self.skm_edit = QLineEdit(self)
-        self.skm_edit.setValidator(validator)
+        self.skm_Edit = QLineEdit(self)
+        self.skm_Edit.setValidator(validator)
 
         self.dictance_template_second_Label = QLabel("расстояние", self)
-        self.dictance_template_second_edit = QLineEdit(self)
-        self.dictance_template_second_edit.setValidator(validator)
+        self.dictance_template_second_Edit = QLineEdit(self)
+        self.dictance_template_second_Edit.setValidator(validator)
 
         self.template_second_Label = QLabel("диаметр второго шаблона", self)
-        self.template_second_edit = QLineEdit(self)
-        self.template_second_edit.setValidator(validator)
+        self.template_second_Edit = QLineEdit(self)
+        self.template_second_Edit.setValidator(validator)
 
         self.lenght_template_second_Label = QLabel("длина второго шаблона", self)
-        self.lenght_template_second_edit = QLineEdit(self)
-        self.lenght_template_second_edit.setValidator(validator)
+        self.lenght_template_second_Edit = QLineEdit(self)
+        self.lenght_template_second_Edit.setValidator(validator)
 
         self.dictance_three_Label = QLabel("третья", self)
-        self.dictance_three_edit = QLineEdit(self)
-        # self.dictance_three_edit.setValidator()
+        self.dictance_three_Edit = QLineEdit(self)
+        # self.dictance_three_Edit.setValidator()
 
-        self.template_select_list = ['ПСШ ЭК', 'ПСШ открытый ствол', 'ПСШ без хвоста',
-                                     'ПСШ Доп колонна СКМ в основной колонне', 'ПСШ СКМ в доп колонне c хвостом',
-                                     'ПСШ СКМ в доп колонне + открытый ствол', 'ПСШ СКМ в доп колонне без хвоста']
-        self.template_Combo.addItems(self.template_select_list)
-        template_key = self.definition_pssh()
-        self.template_Combo.setCurrentIndex(self.template_select_list.index(template_key))
         self.grid = QGridLayout(self)
-        # if CreatePZ.column_additional is False or \
-        #         (CreatePZ.column_additional and CreatePZ.current_bottom < CreatePZ.head_column_additional):
-        #     self.template_select_list = ['ПСШ ЭК', 'ПСШ открытый ствол', 'ПСШ без хвоста',
-        #                                  'ПСШ Доп колонна СКМ в основной колонне', 'ПСШ СКМ в доп колонне c хвостом',
-        #                                  'ПСШ СКМ в доп колонне + открытый ствол', 'ПСШ СКМ в доп колонне без хвоста' ]
-        #
-        #     self.template_Combo.addItems(self.template_select_list)
-        #     template_key = self.definition_pssh()
-        #     self.template_Combo.setCurrentIndex(self.template_select_list.index(template_key))
-        #
-        # else:
-        #     self.template_select_list = ['ПСШ Доп колонна СКМ в основной колонне', 'ПСШ СКМ в доп колонне c хвостом',
-        #                                  'ПСШ СКМ в доп колонне + открытый ствол', 'ПСШ СКМ в доп колонне без хвоста'с]
-        #     self.template_Combo.addItems(self.template_select_list)
-        #
-        #     template_key = self.definition_pssh()
-        #     # print(template_key)
-        #     self.template_Combo.setCurrentIndex(self.template_select_list.index(template_key))
+        if CreatePZ.column_additional is False or \
+                (CreatePZ.column_additional and CreatePZ.current_bottom < CreatePZ.head_column_additional._value):
+            self.template_select_list = ['ПСШ ЭК', 'ПСШ открытый ствол', 'ПСШ без хвоста']
 
+            self.template_Combo.addItems(self.template_select_list)
+            template_key = self.definition_pssh()
+            self.template_Combo.setCurrentIndex(self.template_select_list.index(template_key))
+
+            self.grid.addWidget(self.template_labelType, 1, 2, 1, 8)
+            self.grid.addWidget(self.template_Combo, 2, 2, 2, 8)
+            self.grid.addWidget(self.template_first_Label, 4, 2)
+            self.grid.addWidget(self.template_first_Edit, 5, 2)
+            self.grid.addWidget(self.lenght_template_first_Label, 4, 3)
+            self.grid.addWidget(self.lenght_template_first_Edit, 5, 3)
+            self.grid.addWidget(self.dictance_template_first_Label, 4, 4)
+            self.grid.addWidget(self.dictance_template_first_Edit, 5, 4)
+            self.grid.addWidget(self.skm_Label, 4, 5)
+            self.grid.addWidget(self.skm_Edit, 5, 5)
+            self.grid.addWidget(self.dictance_template_second_Label, 4, 6)
+            self.grid.addWidget(self.dictance_template_second_Edit, 5, 6)
+            self.grid.addWidget(self.template_second_Label, 4, 7)
+            self.grid.addWidget(self.template_second_Edit, 5, 7)
+            self.grid.addWidget(self.lenght_template_second_Label, 4, 8)
+            self.grid.addWidget(self.lenght_template_second_Edit, 5, 8)
+            self.grid.addWidget(self.dictance_three_Label, 4, 9)
+            self.grid.addWidget(self.dictance_three_Edit, 5, 9)
+
+        else:
+            self.template_select_list = ['ПСШ Доп колонна СКМ в основной колонне', 'ПСШ СКМ в доп колонне c хвостом',
+                                         'ПСШ СКМ в доп колонне + открытый ствол', 'ПСШ СКМ в доп колонне без хвоста']
+            self.template_Combo.addItems(self.template_select_list)
+            template_key = self.definition_pssh()
+            # print(template_key)
+            self.template_Combo.setCurrentIndex(self.template_select_list.index(template_key))
+
+            self.grid.addWidget(self.template_labelType, 1, 2, 1, 8)
+            self.grid.addWidget(self.template_Combo, 2, 2, 2, 8)
+            self.grid.addWidget(self.dictance_template_first_Label, 4, 2)
+            self.grid.addWidget(self.dictance_template_first_Edit, 5, 2)
+
+            self.grid.addWidget(self.template_first_Label, 4, 3)
+            self.grid.addWidget(self.template_first_Edit, 5, 3)
+
+            self.grid.addWidget(self.lenght_template_first_Label, 4, 4)
+            self.grid.addWidget(self.lenght_template_first_Edit, 5, 4)
+            self.grid.addWidget(self.dictance_template_second_Label, 4, 5)
+            self.grid.addWidget(self.dictance_template_second_Edit, 5, 5)
+            self.grid.addWidget(self.skm_Label, 4, 6)
+            self.grid.addWidget(self.skm_Edit, 5, 6)
+            self.grid.addWidget(self.dictance_three_Label, 4, 7)
+            self.grid.addWidget(self.dictance_three_Edit, 5, 7)
+            self.grid.addWidget(self.template_second_Label, 4, 8)
+            self.grid.addWidget(self.template_second_Edit, 5, 8)
+            self.grid.addWidget(self.lenght_template_second_Label, 4, 9)
+            self.grid.addWidget(self.lenght_template_second_Edit, 5, 9)
+
+        self.grid.addWidget(self.template_str_Label, 11, 1, 11, 8)
+        self.grid.addWidget(self.template_str_Edit, 12, 1, 14, 8)
+
+        self.grid.addWidget(self.skm_teml_str_Label, 15, 1, 15, 8)
+        self.grid.addWidget(self.skm_teml_str_Edit, 16, 1, 16, 8)
 
         template_diam_ek = self.template_diam_ek()
-        self.template_first_edit.setText(str(template_diam_ek[0]))
-        self.template_second_edit.setText(str(template_diam_ek[1]))
+        self.template_first_Edit.setText(str(template_diam_ek[0]))
+        self.template_second_Edit.setText(str(template_diam_ek[1]))
 
-        self.lenght_template_first_edit.setText(str(2))
+        self.lenght_template_first_Edit.setText(str(2))
 
         roof_plast, roof_add_column_plast = self.definition_roof_not_raiding()
 
         dictance_template_first = int(CreatePZ.current_bottom - roof_plast + 5)
-        self.dictance_template_first_edit.setText(str(dictance_template_first))
-        self.skm_edit.setText(str(CreatePZ.column_diametr))
-        self.dictance_template_second_edit.setText(str(10))
+        self.dictance_template_first_Edit.setText(str(dictance_template_first))
+        self.skm_Edit.setText(str(CreatePZ.column_diametr._value))
+        self.dictance_template_second_Edit.setText(str(10))
 
-        self.template_first_edit.textChanged.connect(self.update_template)
-
-        self.lenght_template_second_edit.textChanged.connect(self.update_template)
-        self.template_second_edit.textChanged.connect(self.update_template)
-        self.dictance_template_second_edit.textChanged.connect(self.update_template)
-        self.dictance_template_first_edit.textChanged.connect(self.update_template)
-        self.lenght_template_first_edit.textChanged.connect(self.update_template)
-        self.skm_edit.textChanged.connect(self.update_template)
+        self.template_first_Edit.textChanged.connect(self.update_template)
+        self.dictance_three_Edit.textChanged.connect(self.update_template)
+        self.lenght_template_second_Edit.textChanged.connect(self.update_template)
+        self.template_second_Edit.textChanged.connect(self.update_template)
+        self.dictance_template_second_Edit.textChanged.connect(self.update_template)
+        self.dictance_template_first_Edit.textChanged.connect(self.update_template)
+        self.lenght_template_first_Edit.textChanged.connect(self.update_template)
+        self.skm_Edit.textChanged.connect(self.update_template)
 
     def definition_pssh(self):
         from open_pz import CreatePZ
@@ -115,7 +151,6 @@ class TabPage_SO(QWidget):
                 [CreatePZ.dict_perforation[plast]['отрайбировано'] for plast in CreatePZ.plast_work]) is False:
             template_key = 'ПСШ ЭК'
 
-
         elif CreatePZ.column_additional is False and CreatePZ.open_trunk_well is True:
             template_key = 'ПСШ открытый ствол'
 
@@ -123,7 +158,7 @@ class TabPage_SO(QWidget):
                 [CreatePZ.dict_perforation[plast]['отрайбировано'] for plast in CreatePZ.plast_work]) is True:
             template_key = 'ПСШ без хвоста'
 
-        # elif CreatePZ.column_additional is True and CreatePZ.head_column_additional > roof_skm:
+        # elif CreatePZ.column_additional is True and CreatePZ.head_column_additional._value > roof_skm:
         #     template_key = 'ПСШ Доп колонна СКМ в основной колонне'
 
         elif CreatePZ.column_additional is True and CreatePZ.open_trunk_well is False and all(
@@ -139,43 +174,43 @@ class TabPage_SO(QWidget):
             template_key = 'ПСШ СКМ в доп колонне без хвоста'
         return template_key
 
-        # self.sole_rir_edit.setText()
+        # self.sole_rir_Edit.setText()
         # listEnabel = [self.khovstLabel, self.khvostEdit, self.swabTruelabelType, self.swabTrueEditType,
-        #               self.plast_combo, self.pakerEdit, self.paker2Edit,
-        #               self.svk_true_edit, self.QplastEdit, self.skv_proc_edit, self.acid_edit, self.acid_volume_edit,
-        #               self.acid_proc_edit]
+        #               self.plastCombo, self.pakerEdit, self.paker2Edit,
+        #               self.svkTrueEdit, self.QplastEdit, self.skvProcEdit, self.acidEdit, self.acidVolumeEdit,
+        #               self.acidProcEdit]
         # for enable in listEnabel:
         #     enable.setEnabled(False)
 
     def update_template(self):
         from open_pz import CreatePZ
-        if self.template_first_edit.text() != '':
-            first_template = self.template_first_edit.text()
-        if self.lenght_template_first_edit.text() != '':
-            lenght_template_first = self.lenght_template_first_edit.text()
-        if self.template_second_edit.text() != '':
-            template_second = self.template_second_edit.text()
-        if self.lenght_template_second_edit.text() != '':
-            lenght_template_second = self.lenght_template_second_edit.text()
-        if self.skm_edit.text() != '':
-            skm = self.skm_edit.text()
-        if self.dictance_template_first_edit.text() != '':
-            dictance_template_first = int(float(self.dictance_template_first_edit.text()))
+        if self.template_first_Edit.text() != '':
+            first_template = self.template_first_Edit.text()
+        if self.lenght_template_first_Edit.text() != '':
+            lenght_template_first = self.lenght_template_first_Edit.text()
+        if self.template_second_Edit.text() != '':
+            template_second = self.template_second_Edit.text()
+        if self.lenght_template_second_Edit.text() != '':
+            lenght_template_second = self.lenght_template_second_Edit.text()
+        if self.skm_Edit.text() != '':
+            skm = self.skm_Edit.text()
+        if self.dictance_template_first_Edit.text() != '':
+            dictance_template_first = int(float(self.dictance_template_first_Edit.text()))
         else:
             dictance_template_first = ''
-        if self.dictance_template_second_edit.text() != '':
-            dictance_template_second = int(float(self.dictance_template_second_edit.text()))
+        if self.dictance_template_second_Edit.text() != '':
+            dictance_template_second = int(float(self.dictance_template_second_Edit.text()))
         else:
             dictance_template_second = ''
-        if self.dictance_three_edit.text() != '':
-            dictance_three = int(float(self.dictance_three_edit.text()))
+        if self.dictance_three_Edit.text() != '':
+            dictance_three = int(float(self.dictance_three_Edit.text()))
         else:
-            dictance_three = 0
+            dictance_three = ''
         nkt_diam = CreatePZ.nkt_diam
 
         if CreatePZ.column_additional or \
-                (CreatePZ.head_column_additional >= CreatePZ.current_bottom and CreatePZ.column_additional is False):
-            nkt_pod = ['60мм' if CreatePZ.column_additional_diametr < 110 else '73мм со снятыми фасками']
+                (CreatePZ.head_column_additional._value >= CreatePZ.current_bottom and CreatePZ.column_additional is False):
+            nkt_pod = ['60мм' if CreatePZ.column_additional_diametr._value < 110 else '73мм со снятыми фасками']
             nkt_pod = ''.join(nkt_pod)
 
         if first_template != '' and lenght_template_first != '' and \
@@ -185,7 +220,7 @@ class TabPage_SO(QWidget):
 
             if self.template_Combo.currentText() == 'ПСШ ЭК':
                 if dictance_template_second != '':
-                    print(f'ff{dictance_template_second}')
+
                     template_str = f'перо + шаблон-{int(first_template)}мм L-{int(lenght_template_first)}м + НКТ{nkt_diam}мм ' \
                                    f'{int(dictance_template_first)}м + СКМ-{skm} +  ' \
                                    f'НКТ{nkt_diam}мм {int(dictance_template_second)}м + шаблон-{template_second}мм ' \
@@ -207,7 +242,7 @@ class TabPage_SO(QWidget):
 
             elif self.template_Combo.currentText() == 'ПСШ открытый ствол':
                 if dictance_template_second != None:
-                    self.template_first_edit.setText('фильтр направление')
+                    self.template_first_Edit.setText('фильтр направление')
                     template_str = f'фильтр-направление + НКТ{nkt_diam}мм {dictance_template_first}м ' \
                                    f'+ СКМ-{skm} + {dictance_template_second}м НКТ{nkt_diam}мм + ' \
                                    f'шаблон-{template_second}мм L-{lenght_template_second}м '
@@ -286,64 +321,65 @@ class TabPage_SO(QWidget):
                     skm_teml_str = f'шаблон-{first_template}мм до гл.{CreatePZ.template_depth_addition}м, ' \
                                    f'шаблон-{template_second}мм до гл.{CreatePZ.template_depth}м'
             if dictance_template_second != "":
-                self.template_str_edit.setText(template_str)
-                self.skm_teml_str_edit.setText(skm_teml_str)
+                self.template_str_Edit.setText(template_str)
+                self.skm_teml_str_Edit.setText(skm_teml_str)
 
     def update_template_edit(self, index):
         from open_pz import CreatePZ
 
-        self.grid = QGridLayout(self)
-        self.template_str_edit.setParent(None)
-        self.skm_teml_str_edit.setParent(None)
-        self.template_first_edit.setParent(None)
-        self.lenght_template_first_edit.setParent(None)
-
-        self.dictance_template_first_edit.setParent(None)
-        self.skm_edit.setParent(None)
-        self.dictance_template_second_edit.setParent(None)
-        self.template_second_edit.setParent(None)
-        self.lenght_template_second_edit.setParent(None)
-        try:
-            self.dictance_three_edit.setParent(None)
-        except:
-            pass
-
         nkt_diam = CreatePZ.nkt_diam
-        first_template, template_second = self.template_diam_ek()
-        self.template_first_edit.setText(str(first_template))
-        self.template_second_edit.setText(str(template_second))
-        self.skm_edit.setText(str(CreatePZ.column_diametr))
-        self.dictance_template_second_edit.setText(str(10))
+        if CreatePZ.column_additional and CreatePZ.head_column_additional._value > CreatePZ.current_bottom:
+            first_template, template_second = self.template_diam_additional_ek()
+        else:
+            first_template, template_second = self.template_diam_ek()
+
+        self.template_first_Edit.setText(str(first_template))
+        self.template_second_Edit.setText(str(template_second))
+        self.skm_Edit.setText(str(CreatePZ.column_diametr._value))
+        self.dictance_template_second_Edit.setText(str(10))
 
         roof_plast, roof_add_column_plast = self.definition_roof_not_raiding()
         dictance_template_first1 = int(CreatePZ.current_bottom - roof_plast + 5)
-        self.dictance_template_first_edit.setText(str(dictance_template_first1))
+        self.dictance_template_first_Edit.setText(str(dictance_template_first1))
 
         lenght_template_first, lenght_template_second = self.definition_ECN_true(CreatePZ.dict_pump_ECN_h["posle"])
-        self.lenght_template_first_edit.setText(lenght_template_first)
-        self.lenght_template_second_edit.setText(str(lenght_template_second))
+        self.lenght_template_first_Edit.setText(lenght_template_first)
+        self.lenght_template_second_Edit.setText(str(lenght_template_second))
 
-        first_template = self.template_first_edit.text()
-        template_second = int(self.template_second_edit.text())
-        lenght_template_first = int(self.lenght_template_first_edit.text())
+        first_template = self.template_first_Edit.text()
+        template_second = int(self.template_second_Edit.text())
+        lenght_template_first = int(self.lenght_template_first_Edit.text())
 
-        dictance_template_first = int(self.dictance_template_first_edit.text())
+        dictance_template_first = int(self.dictance_template_first_Edit.text())
 
-        lenght_template_second = int(self.lenght_template_second_edit.text())
-        dictance_template_second = int(self.dictance_template_second_edit.text())
-        skm = self.skm_edit.text()
+        lenght_template_second = int(self.lenght_template_second_Edit.text())
+        dictance_template_second = int(self.dictance_template_second_Edit.text())
+        skm = self.skm_Edit.text()
+
+        self.template_first_Label.setParent(None)
+        self.template_first_Edit.setParent(None)
+        self.lenght_template_first_Label.setParent(None)
+        self.lenght_template_first_Edit.setParent(None)
+        self.dictance_three_Edit.setParent(None)
+        self.dictance_three_Edit.setParent(None)
+        self.dictance_template_first_Label.setParent(None)
+        self.dictance_template_first_Edit.setParent(None)
+        self.dictance_three_Label.setParent(None)
+        self.dictance_three_Edit.setParent(None)
 
         if CreatePZ.column_additional or \
-                (CreatePZ.head_column_additional >= CreatePZ.current_bottom and CreatePZ.column_additional is False):
-            nkt_pod = ['60мм' if CreatePZ.column_additional_diametr < 110 else '73мм со снятыми фасками']
-            nkt_pod = ''.join(nkt_pod)
-
-            self.template_first_edit.setText(str(self.template_diam_additional_ek()[0]))
-            self.template_second_edit.setText(str(self.template_diam_additional_ek()[1]))
-            first_template = int(self.template_first_edit.text())
-            template_second = int(self.template_second_edit.text())
+                (CreatePZ.head_column_additional._value >= CreatePZ.current_bottom and CreatePZ.column_additional is False):
+            nkt_pod = '60мм' if CreatePZ.column_additional_diametr._value < 110 else '73мм со снятыми фасками'
 
         if index == 'ПСШ ЭК':
+            self.grid.addWidget(self.template_first_Label, 4, 2)
+            self.grid.addWidget(self.template_first_Edit, 5, 2)
+            self.grid.addWidget(self.lenght_template_first_Label, 4, 3)
+            self.grid.addWidget(self.lenght_template_first_Edit, 5, 3)
+            self.grid.addWidget(self.dictance_template_first_Label, 4, 4)
+            self.grid.addWidget(self.dictance_template_first_Edit, 5, 4)
+            self.grid.addWidget(self.lenght_template_second_Label, 4, 9)
+            self.grid.addWidget(self.lenght_template_second_Edit, 5, 9)
 
             template_str = f'перо + шаблон-{first_template}мм L-{lenght_template_first}м + НКТ{nkt_diam}мм ' \
                            f'{dictance_template_first}м + СКМ-{skm} +  ' \
@@ -355,81 +391,31 @@ class TabPage_SO(QWidget):
             CreatePZ.skm_depth = CreatePZ.template_depth + dictance_template_second
             skm_teml_str = f'шаблон-{template_second}мм до гл.{CreatePZ.template_depth}м'
 
-            self.template_Combo.addItems(self.template_select_list)
-            template_key = self.definition_pssh()
-            self.template_Combo.setCurrentIndex(self.template_select_list.index(template_key))
-
-
-            self.grid.addWidget(self.template_labelType, 1, 2, 1, 8)
-            self.grid.addWidget(self.template_Combo, 2, 2, 2, 8)
-            self.grid.addWidget(self.template_first_Label, 4, 2)
-            self.grid.addWidget(self.template_first_edit, 5, 2)
-            self.grid.addWidget(self.lenght_template_first_Label, 4, 3)
-            self.grid.addWidget(self.lenght_template_first_edit, 5, 3)
-            self.grid.addWidget(self.dictance_template_first_Label, 4, 4)
-            self.grid.addWidget(self.dictance_template_first_edit, 5, 4)
-            self.grid.addWidget(self.skm_Label, 4, 5)
-            self.grid.addWidget(self.skm_edit, 5, 5)
-            self.grid.addWidget(self.dictance_template_second_Label, 4, 6)
-            self.grid.addWidget(self.dictance_template_second_edit, 5, 6)
-            self.grid.addWidget(self.template_second_Label, 4, 7)
-            self.grid.addWidget(self.template_second_edit, 5, 7)
-            self.grid.addWidget(self.lenght_template_second_Label, 4, 8)
-            self.grid.addWidget(self.lenght_template_second_edit, 5, 8)
-            # self.grid.addWidget(self.dictance_three_Label, 4, 9)
-            # self.grid.addWidget(self.dictance_three_edit, 5, 9)
-            self.grid.addWidget(self.template_str_Label, 11, 1, 11, 8)
-            self.grid.addWidget(self.template_str_edit, 12, 1, 14, 8)
-
-            self.grid.addWidget(self.skm_teml_str_Label, 15, 1, 15, 8)
-            self.grid.addWidget(self.skm_teml_str_edit, 16, 1, 16, 8)
-
 
 
         elif index == 'ПСШ без хвоста':
-
             template_str = f'перо + СКМ-{skm} + {dictance_template_second}м ' \
                            f'НКТ{nkt_diam}мм + шаблон-{template_second}мм L-{lenght_template_second}м '
             CreatePZ.template_depth = math.ceil(CreatePZ.current_bottom - int(dictance_template_second))
             CreatePZ.skm_depth = CreatePZ.current_bottom
-
             skm_teml_str = f'шаблон-{template_second}мм до гл.{CreatePZ.template_depth}м'
 
-            self.grid.addWidget(self.template_labelType, 1, 2, 1, 8)
-            self.grid.addWidget(self.template_Combo, 2, 2, 2, 8)
-            # self.grid.addWidget(self.template_first_Label, 4, 2)
-            # self.grid.addWidget(self.template_first_edit, 5, 2)
-            # self.grid.addWidget(self.lenght_template_first_Label, 4, 3)
-            # self.grid.addWidget(self.lenght_template_first_edit, 5, 3)
-            # self.grid.addWidget(self.dictance_template_first_Label, 4, 4)
-            # self.grid.addWidget(self.dictance_template_first_edit, 5, 4)
-            self.grid.addWidget(self.skm_Label, 4, 5)
-            self.grid.addWidget(self.skm_edit, 5, 5)
-            self.grid.addWidget(self.dictance_template_second_Label, 4, 6)
-            self.grid.addWidget(self.dictance_template_second_edit, 5, 6)
-            self.grid.addWidget(self.template_second_Label, 4, 7)
-            self.grid.addWidget(self.template_second_edit, 5, 7)
-            self.grid.addWidget(self.lenght_template_second_Label, 4, 8)
-            self.grid.addWidget(self.lenght_template_second_edit, 5, 8)
-            # self.grid.addWidget(self.dictance_three_Label, 4, 9)
-            # self.grid.addWidget(self.dictance_three_edit, 5, 9)
-            self.grid.addWidget(self.template_str_Label, 11, 1, 11, 8)
-            self.grid.addWidget(self.template_str_edit, 12, 1, 14, 8)
-
-            self.grid.addWidget(self.skm_teml_str_Label, 15, 1, 15, 8)
-            self.grid.addWidget(self.skm_teml_str_edit, 16, 1, 16, 8)
-
         elif index == 'ПСШ открытый ствол':
-            # listEnabel = [self.template_first_edit, self.template_first_Label, self.dictance_template_first_edit,
-            #               self.dictance_template_first_Label]
-            # for enable in listEnabel:
-            #     enable.setEnabled(False)
 
-            self.template_first_edit.setText('фильтр направление')
-            self.dictance_template_first_edit.setText(str(dictance_template_first1))
-            self.dictance_template_second_edit.setText(str(10))
-            dictance_template_first = int(self.dictance_template_first_edit.text())
-            dictance_template_second = int(self.dictance_template_second_edit.text())
+            # self.grid.addWidget(self.template_first_Label, 4, 2)
+            # self.grid.addWidget(self.template_first_Edit, 5, 2)
+            self.grid.addWidget(self.lenght_template_first_Label, 4, 3)
+            self.grid.addWidget(self.lenght_template_first_Edit, 5, 3)
+            self.grid.addWidget(self.dictance_template_first_Label, 4, 4)
+            self.grid.addWidget(self.dictance_template_first_Edit, 5, 4)
+            self.grid.addWidget(self.lenght_template_second_Label, 4, 9)
+            self.grid.addWidget(self.lenght_template_second_Edit, 5, 9)
+
+            self.template_first_Edit.setText('фильтр направление')
+            self.dictance_template_first_Edit.setText(str(dictance_template_first1))
+            self.dictance_template_second_Edit.setText(str(10))
+            dictance_template_first = int(self.dictance_template_first_Edit.text())
+            dictance_template_second = int(self.dictance_template_second_Edit.text())
 
             template_str = f'фильтр-направление + НКТ{nkt_diam}мм {dictance_template_first}м ' \
                            f'+ СКМ-{skm} + {dictance_template_second}м НКТ{nkt_diam}мм + ' \
@@ -438,51 +424,35 @@ class TabPage_SO(QWidget):
             CreatePZ.skm_depth = CreatePZ.template_depth + dictance_template_second
 
             skm_teml_str = f'шаблон-{template_second}мм до гл.{CreatePZ.template_depth}м'
-            self.grid.addWidget(self.template_labelType, 1, 2, 1, 8)
-            self.grid.addWidget(self.template_Combo, 2, 2, 2, 8)
-            self.grid.addWidget(self.template_first_Label, 4, 2)
-            self.grid.addWidget(self.template_first_edit, 5, 2)
-            self.grid.addWidget(self.lenght_template_first_Label, 4, 3)
-            self.grid.addWidget(self.lenght_template_first_edit, 5, 3)
-            self.grid.addWidget(self.dictance_template_first_Label, 4, 4)
-            self.grid.addWidget(self.dictance_template_first_edit, 5, 4)
-            self.grid.addWidget(self.skm_Label, 4, 5)
-            self.grid.addWidget(self.skm_edit, 5, 5)
-            self.grid.addWidget(self.dictance_template_second_Label, 4, 6)
-            self.grid.addWidget(self.dictance_template_second_edit, 5, 6)
-            self.grid.addWidget(self.template_second_Label, 4, 7)
-            self.grid.addWidget(self.template_second_edit, 5, 7)
-            self.grid.addWidget(self.lenght_template_second_Label, 4, 8)
-            self.grid.addWidget(self.lenght_template_second_edit, 5, 8)
-            # self.grid.addWidget(self.dictance_three_Label, 4, 9)
-            # self.grid.addWidget(self.dictance_three_edit, 5, 9)
-            self.grid.addWidget(self.template_str_Label, 11, 1, 11, 8)
-            self.grid.addWidget(self.template_str_edit, 12, 1, 14, 8)
-
-            self.grid.addWidget(self.skm_teml_str_Label, 15, 1, 15, 8)
-            self.grid.addWidget(self.skm_teml_str_edit, 16, 1, 16, 8)
 
         elif index == 'ПСШ Доп колонна СКМ в основной колонне':
 
-            self.dictance_three_Label = QLabel("третья", self)
-            self.dictance_three_edit = QLineEdit(self)
+            self.grid.addWidget(self.dictance_template_first_Label, 4, 2)
+            self.grid.addWidget(self.dictance_template_first_Edit, 5, 2)
+            self.grid.addWidget(self.template_first_Label, 4, 3)
+            self.grid.addWidget(self.template_first_Edit, 5, 3)
+            self.grid.addWidget(self.lenght_template_first_Label, 4, 4)
+            self.grid.addWidget(self.lenght_template_first_Edit, 5, 4)
+            self.grid.addWidget(self.lenght_template_second_Label, 4, 9)
+            self.grid.addWidget(self.lenght_template_second_Edit, 5, 9)
+            self.grid.addWidget(self.dictance_three_Label, 4, 7)
+            self.grid.addWidget(self.dictance_three_Edit, 5, 7)
 
-            self.lenght_template_first_edit.setText(str(lenght_template_first))
-            lenght_template_first = int(self.lenght_template_first_edit.text())
+            self.lenght_template_first_Edit.setText(str(lenght_template_first))
+            lenght_template_first = int(self.lenght_template_first_Edit.text())
             dictance_template_first1 = int(CreatePZ.current_bottom - roof_add_column_plast + 5)
 
             # print(f'дистанци {dictance_template_first }')
-            self.skm_edit.setText(str(CreatePZ.column_diametr))
-            self.dictance_template_first_edit.setText(str(dictance_template_first1))
-            dictance_template_first = int(self.dictance_template_first_edit.text())
-            dictance_second1 = int(roof_add_column_plast - lenght_template_first - CreatePZ.head_column_additional - 5)
-            self.dictance_template_second_edit.setText(str(dictance_second1))
-            dictance_template_second = int(self.dictance_template_second_edit.text())
-            self.lenght_template_second_edit.setText(str(lenght_template_second))
+            self.skm_Edit.setText(str(CreatePZ.column_diametr._value))
+            self.dictance_template_first_Edit.setText(str(dictance_template_first1))
+            dictance_template_first = int(self.dictance_template_first_Edit.text())
+            dictance_second1 = int(roof_add_column_plast - lenght_template_first - CreatePZ.head_column_additional._value - 5)
+            self.dictance_template_second_Edit.setText(str(dictance_second1))
+            dictance_template_second = int(self.dictance_template_second_Edit.text())
+            self.lenght_template_second_Edit.setText(str(lenght_template_second))
 
-
-            self.dictance_three_edit.setText(str(roof_plast - CreatePZ.head_column_additional + 10))
-            dictance_three_first = int(float(self.dictance_three_edit.text()))
+            self.dictance_three_Edit.setText(str(roof_plast - CreatePZ.head_column_additional._value + 10))
+            dictance_three_first = int(float(self.dictance_three_Edit.text()))
 
             template_str = f'обточная муфта  + ' \
                            f'НКТ{nkt_pod}  + {dictance_template_first}м + шаблон-{first_template}мм L-{lenght_template_first}м + ' \
@@ -497,46 +467,30 @@ class TabPage_SO(QWidget):
             skm_teml_str = f'шаблон-{first_template}мм до гл.{CreatePZ.template_depth_addition}м, ' \
                            f'шаблон-{template_second}мм до гл.{CreatePZ.template_depth}м'
 
-            self.grid.addWidget(self.template_labelType, 1, 2, 1, 8)
-            self.grid.addWidget(self.template_Combo, 2, 2, 2, 8)
-            self.grid.addWidget(self.dictance_template_first_Label, 4, 2)
-            self.grid.addWidget(self.dictance_template_first_edit, 5, 2)
-
-            self.grid.addWidget(self.template_first_Label, 4, 3)
-            self.grid.addWidget(self.template_first_edit, 5, 3)
-
-            self.grid.addWidget(self.lenght_template_first_Label, 4, 4)
-            self.grid.addWidget(self.lenght_template_first_edit, 5, 4)
-            self.grid.addWidget(self.dictance_template_second_Label, 4, 5)
-            self.grid.addWidget(self.dictance_template_second_edit, 5, 5)
-            self.grid.addWidget(self.skm_Label, 4, 6)
-            self.grid.addWidget(self.skm_edit, 5, 6)
-            self.grid.addWidget(self.dictance_three_Label, 4, 7)
-            self.grid.addWidget(self.dictance_three_edit, 5, 7)
-            self.grid.addWidget(self.template_second_Label, 4, 8)
-            self.grid.addWidget(self.template_second_edit, 5, 8)
-            self.grid.addWidget(self.lenght_template_second_Label, 4, 9)
-            self.grid.addWidget(self.lenght_template_second_edit, 5, 9)
-
-            self.grid.addWidget(self.template_str_Label, 11, 1, 11, 8)
-            self.grid.addWidget(self.template_str_edit, 12, 1, 14, 8)
-
-            self.grid.addWidget(self.skm_teml_str_Label, 15, 1, 15, 8)
-            self.grid.addWidget(self.skm_teml_str_edit, 16, 1, 16, 8)
-
-            self.dictance_three_edit.textChanged.connect(self.update_template)
 
         elif index == 'ПСШ СКМ в доп колонне c хвостом':
-            self.skm_edit.setText(str(CreatePZ.column_additional_diametr))
-            skm = str(self.skm_edit.text())
-            dictance_template_first1 = int(CreatePZ.current_bottom - roof_add_column_plast + 5)
-            self.dictance_template_first_edit.setText(str(dictance_template_first1))
-            dictance_template_first = int(self.dictance_template_first_edit.text())
 
-            dictance_three_first = int(roof_add_column_plast - CreatePZ.head_column_additional - int(
-                self.lenght_template_first_edit.text()) - 9)
-            self.dictance_three_edit.setText(str(dictance_three_first))
-            dictance_template_three = int(self.dictance_three_edit.text())
+            self.grid.addWidget(self.dictance_template_first_Label, 4, 2)
+            self.grid.addWidget(self.dictance_template_first_Edit, 5, 2)
+            self.grid.addWidget(self.template_first_Label, 4, 3)
+            self.grid.addWidget(self.template_first_Edit, 5, 3)
+            self.grid.addWidget(self.lenght_template_first_Label, 4, 4)
+            self.grid.addWidget(self.lenght_template_first_Edit, 5, 4)
+            self.grid.addWidget(self.lenght_template_second_Label, 4, 9)
+            self.grid.addWidget(self.lenght_template_second_Edit, 5, 9)
+            self.grid.addWidget(self.dictance_three_Label, 4, 7)
+            self.grid.addWidget(self.dictance_three_Edit, 5, 7)
+
+            self.skm_Edit.setText(str(CreatePZ.column_additional_diametr._value))
+            skm = str(self.skm_Edit.text())
+            dictance_template_first1 = int(CreatePZ.current_bottom - roof_add_column_plast + 5)
+            self.dictance_template_first_Edit.setText(str(dictance_template_first1))
+            dictance_template_first = int(self.dictance_template_first_Edit.text())
+
+            dictance_three_first = int(roof_add_column_plast - CreatePZ.head_column_additional._value - int(
+                self.lenght_template_first_Edit.text()) - 9)
+            self.dictance_three_Edit.setText(str(dictance_three_first))
+            dictance_template_three = int(self.dictance_three_Edit.text())
             template_str = f'обточная муфта + НКТ{nkt_pod} {dictance_template_first}м ' \
                            f'+ СКМ-{skm} + НКТ{nkt_pod} {dictance_template_second}м + шаблон-{first_template}мм ' \
                            f'L-{lenght_template_first}м + НКТ{nkt_pod} {dictance_three_first}м + ' \
@@ -551,48 +505,24 @@ class TabPage_SO(QWidget):
             skm_teml_str = f'шаблон-{first_template}мм до гл.{CreatePZ.template_depth_addition}м, ' \
                            f'шаблон-{template_second}мм до гл.{CreatePZ.template_depth}м'
 
-            self.grid.addWidget(self.template_labelType, 1, 2, 1, 8)
-            self.grid.addWidget(self.template_Combo, 2, 2, 2, 8)
-            self.grid.addWidget(self.dictance_template_first_Label, 4, 2)
-            self.grid.addWidget(self.dictance_template_first_edit, 5, 2)
-
-            self.grid.addWidget(self.template_first_Label, 4, 3)
-            self.grid.addWidget(self.template_first_edit, 5, 3)
-
-            self.grid.addWidget(self.lenght_template_first_Label, 4, 4)
-            self.grid.addWidget(self.lenght_template_first_edit, 5, 4)
-            self.grid.addWidget(self.dictance_template_second_Label, 4, 5)
-            self.grid.addWidget(self.dictance_template_second_edit, 5, 5)
-            self.grid.addWidget(self.skm_Label, 4, 6)
-            self.grid.addWidget(self.skm_edit, 5, 6)
-            self.grid.addWidget(self.dictance_three_Label, 4, 7)
-            self.grid.addWidget(self.dictance_three_edit, 5, 7)
-            self.grid.addWidget(self.template_second_Label, 4, 8)
-            self.grid.addWidget(self.template_second_edit, 5, 8)
-            self.grid.addWidget(self.lenght_template_second_Label, 4, 9)
-            self.grid.addWidget(self.lenght_template_second_edit, 5, 9)
-
-            self.grid.addWidget(self.template_str_Label, 11, 1, 11, 8)
-            self.grid.addWidget(self.template_str_edit, 12, 1, 14, 8)
-
-            self.grid.addWidget(self.skm_teml_str_Label, 15, 1, 15, 8)
-            self.grid.addWidget(self.skm_teml_str_edit, 16, 1, 16, 8)
-
-            self.dictance_three_edit.textChanged.connect(self.update_template)
         elif index == 'ПСШ СКМ в доп колонне без хвоста':
-            dictance_template_first1 = 0
-            self.dictance_template_first_edit.setText(str(dictance_template_first1))
 
-            self.skm_edit.setText(str(CreatePZ.column_additional_diametr))
-            skm = str(self.skm_edit.text())
-            self.dictance_template_second_edit.setText(str(10))
-            dictance_template_second = int(self.dictance_template_second_edit.text())
+            self.grid.addWidget(self.dictance_three_Label, 4, 7)
+            self.grid.addWidget(self.dictance_three_Edit, 5, 7)
+
+            dictance_template_first1 = 0
+            self.dictance_template_first_Edit.setText(str(dictance_template_first1))
+
+            self.skm_Edit.setText(str(CreatePZ.column_additional_diametr._value))
+            skm = str(self.skm_Edit.text())
+            self.dictance_template_second_Edit.setText(str(10))
+            dictance_template_second = int(self.dictance_template_second_Edit.text())
 
             dictance_three = int(
                 CreatePZ.current_bottom - int(dictance_template_second) - CreatePZ.head_column_additional
                 - int(lenght_template_first) + 4)
-            self.dictance_three_edit.setText(str(dictance_three))
-            dictance_three_first = int(self.dictance_three_edit.text())
+            self.dictance_three_Edit.setText(str(dictance_three))
+            dictance_three_first = int(self.dictance_three_Edit.text())
 
             template_str = f'обточная муфта + СКМ-{skm} + НКТ{nkt_pod} {dictance_template_second} + ' \
                            f'шаблон-{first_template}мм L-{lenght_template_first}м + ' \
@@ -606,46 +536,31 @@ class TabPage_SO(QWidget):
             skm_teml_str = f'шаблон-{first_template}мм до гл.{CreatePZ.template_depth_addition}м, ' \
                            f'шаблон-{template_second}мм до гл.{CreatePZ.template_depth}м'
 
-            self.grid.addWidget(self.template_labelType, 1, 2, 1, 8)
-            self.grid.addWidget(self.template_Combo, 2, 2, 2, 8)
-            # self.grid.addWidget(self.dictance_template_first_Label, 4, 2)
-            # self.grid.addWidget(self.dictance_template_first_edit, 5, 2)
 
-            # self.grid.addWidget(self.template_first_Label, 4, 3)
-            # self.grid.addWidget(self.template_first_edit, 5, 3)
-
-            # self.grid.addWidget(self.lenght_template_first_Label, 4, 4)
-            # self.grid.addWidget(self.lenght_template_first_edit, 5, 4)
-            self.grid.addWidget(self.dictance_template_second_Label, 4, 5)
-            self.grid.addWidget(self.dictance_template_second_edit, 5, 5)
-            self.grid.addWidget(self.skm_Label, 4, 6)
-            self.grid.addWidget(self.skm_edit, 5, 6)
-            self.grid.addWidget(self.dictance_three_Label, 4, 7)
-            self.grid.addWidget(self.dictance_three_edit, 5, 7)
-            self.grid.addWidget(self.template_second_Label, 4, 8)
-            self.grid.addWidget(self.template_second_edit, 5, 8)
-            self.grid.addWidget(self.lenght_template_second_Label, 4, 9)
-            self.grid.addWidget(self.lenght_template_second_edit, 5, 9)
-
-            self.grid.addWidget(self.template_str_Label, 11, 1, 11, 8)
-            self.grid.addWidget(self.template_str_edit, 12, 1, 14, 8)
-
-            self.grid.addWidget(self.skm_teml_str_Label, 15, 1, 15, 8)
-            self.grid.addWidget(self.skm_teml_str_edit, 16, 1, 16, 8)
-
-            self.dictance_three_edit.textChanged.connect(self.update_template)
 
         elif index == 'ПСШ СКМ в доп колонне + открытый ствол':
-            self.skm_edit.setText(str(CreatePZ.column_additional_diametr))
-            skm = str(self.skm_edit.text())
-            dictance_template_first1 = int(CreatePZ.current_bottom - roof_add_column_plast + 5)
-            self.dictance_template_first_edit.setText(str(dictance_template_first1))
-            dictance_template_first = int(self.dictance_template_first_edit.text())
 
-            dictance_three_first = int(roof_add_column_plast - CreatePZ.head_column_additional - int(
-                self.lenght_template_first_edit.text()) - 9)
-            self.dictance_three_edit.setText(str(dictance_three_first))
-            dictance_template_three = int(self.dictance_three_edit.text())
+            self.grid.addWidget(self.dictance_template_first_Label, 4, 2)
+            self.grid.addWidget(self.dictance_template_first_Edit, 5, 2)
+            self.grid.addWidget(self.template_first_Label, 4, 3)
+            self.grid.addWidget(self.template_first_Edit, 5, 3)
+            self.grid.addWidget(self.lenght_template_first_Label, 4, 4)
+            self.grid.addWidget(self.lenght_template_first_Edit, 5, 4)
+            self.grid.addWidget(self.lenght_template_second_Label, 4, 9)
+            self.grid.addWidget(self.lenght_template_second_Edit, 5, 9)
+            self.grid.addWidget(self.dictance_three_Label, 4, 7)
+            self.grid.addWidget(self.dictance_three_Edit, 5, 7)
+
+            self.skm_Edit.setText(str(CreatePZ.column_additional_diametr._value))
+            skm = str(self.skm_Edit.text())
+            dictance_template_first1 = int(CreatePZ.current_bottom - roof_add_column_plast + 5)
+            self.dictance_template_first_Edit.setText(str(dictance_template_first1))
+            dictance_template_first = int(self.dictance_template_first_Edit.text())
+
+            dictance_three_first = int(roof_add_column_plast - CreatePZ.head_column_additional._value - int(
+                self.lenght_template_first_Edit.text()) - 9)
+            self.dictance_three_Edit.setText(str(dictance_three_first))
+            dictance_template_three = int(self.dictance_three_Edit.text())
 
             template_str = f'фильтр направление L-2м + НКТ{nkt_pod} {dictance_template_first}м ' \
                            f'+ СКМ-{skm} + НКТ{nkt_pod} {dictance_template_second}м + шаблон-{first_template}мм ' \
@@ -662,49 +577,21 @@ class TabPage_SO(QWidget):
             skm_teml_str = f'шаблон-{first_template}мм до гл.{CreatePZ.template_depth_addition}м, ' \
                            f'шаблон-{template_second}мм до гл.{CreatePZ.template_depth}м'
 
-            self.grid.addWidget(self.template_labelType, 1, 2, 1, 8)
-            self.grid.addWidget(self.template_Combo, 2, 2, 2, 8)
-            self.grid.addWidget(self.dictance_template_first_Label, 4, 2)
-            self.grid.addWidget(self.dictance_template_first_edit, 5, 2)
-
-            self.grid.addWidget(self.template_first_Label, 4, 3)
-            self.grid.addWidget(self.template_first_edit, 5, 3)
-
-            self.grid.addWidget(self.lenght_template_first_Label, 4, 4)
-            self.grid.addWidget(self.lenght_template_first_edit, 5, 4)
-            self.grid.addWidget(self.dictance_template_second_Label, 4, 5)
-            self.grid.addWidget(self.dictance_template_second_edit, 5, 5)
-            self.grid.addWidget(self.skm_Label, 4, 6)
-            self.grid.addWidget(self.skm_edit, 5, 6)
-            self.grid.addWidget(self.dictance_three_Label, 4, 7)
-            self.grid.addWidget(self.dictance_three_edit, 5, 7)
-            self.grid.addWidget(self.template_second_Label, 4, 8)
-            self.grid.addWidget(self.template_second_edit, 5, 8)
-            self.grid.addWidget(self.lenght_template_second_Label, 4, 9)
-            self.grid.addWidget(self.lenght_template_second_edit, 5, 9)
-
-            self.grid.addWidget(self.template_str_Label, 11, 1, 11, 8)
-            self.grid.addWidget(self.template_str_edit, 12, 1, 14, 8)
-
-            self.grid.addWidget(self.skm_teml_str_Label, 15, 1, 15, 8)
-            self.grid.addWidget(self.skm_teml_str_edit, 16, 1, 16, 8)
-            self.dictance_three_edit.textChanged.connect(self.update_template)
-
-        self.template_str_edit.setText(template_str)
-        self.skm_teml_str_edit.setText(skm_teml_str)
+        self.template_str_Edit.setText(template_str)
+        self.skm_teml_str_Edit.setText(skm_teml_str)
 
         if 'ПОМ' in str(CreatePZ.paker_do["posle"]).upper() and '122' in str(CreatePZ.paker_do["posle"]):
-            self.template_second_edit.setText(str(126))
+            self.template_second_Edit.setText(str(126))
 
     def definition_ECN_true(self, depth_ecn):
         from open_pz import CreatePZ
         if CreatePZ.column_additional is False and CreatePZ.dict_pump_ECN["posle"] != 0:
             return "2", "30"
         elif CreatePZ.column_additional is True and CreatePZ.dict_pump_ECN["posle"] != 0:
-            if CreatePZ.dict_pump_ECN["posle"] != 0 and float(depth_ecn) < CreatePZ.head_column_additional:
+            if CreatePZ.dict_pump_ECN["posle"] != 0 and float(depth_ecn) < CreatePZ.head_column_additional._value:
                 return "2", "30"
 
-            elif CreatePZ.dict_pump_ECN["posle"] != 0 and float(depth_ecn) >= CreatePZ.head_column_additional:
+            elif CreatePZ.dict_pump_ECN["posle"] != 0 and float(depth_ecn) >= CreatePZ.head_column_additional._value:
 
                 return "30", "4"
         else:
@@ -718,14 +605,14 @@ class TabPage_SO(QWidget):
         plast_all = list(dict_perforation.keys())
         roof_plast = CreatePZ.current_bottom
         if CreatePZ.column_additional is False or (
-                CreatePZ.column_additional and CreatePZ.head_column_additional >= CreatePZ.current_bottom):
+                CreatePZ.column_additional and CreatePZ.head_column_additional._value >= CreatePZ.current_bottom):
             for plast in plast_all:
                 roof = min(list(map(lambda x: x[0], list(dict_perforation[plast]['интервал']))))
 
                 if dict_perforation[plast]['отрайбировано'] and  CreatePZ.open_trunk_well is False:
                     roof_add_column_plast = roof_plast
                 elif CreatePZ.open_trunk_well is True and dict_perforation[plast]['отрайбировано']:
-                    roof_plast = CreatePZ.shoe_column
+                    roof_plast = CreatePZ.shoe_column._value
                     roof_add_column_plast = CreatePZ.current_bottom
                     break
                 else:
@@ -736,26 +623,26 @@ class TabPage_SO(QWidget):
             for plast in plast_all:
                 roof = min(list(map(lambda x: x[0], list(dict_perforation[plast]['интервал']))))
 
-                if CreatePZ.head_column_additional <= roof:
+                if CreatePZ.head_column_additional._value <= roof:
                     if dict_perforation[plast]['отрайбировано'] and CreatePZ.open_trunk_well is False:
                         roof_add_column_plast = CreatePZ.current_bottom
                         roof_plast = CreatePZ.head_column_additional
                     elif CreatePZ.open_trunk_well is True and dict_perforation[plast]['отрайбировано']:
-                        roof_plast = CreatePZ.shoe_column
+                        roof_plast = CreatePZ.shoe_column._value
                         roof_add_column_plast =CreatePZ.current_bottom
                         break
                     else:
                         roof_add_column_plast = roof
-                        roof_plast = CreatePZ.head_column_additional
+                        roof_plast = CreatePZ.head_column_additional._value
                         break
 
                 else:
                     if dict_perforation[plast]['отрайбировано']:
 
                         roof_add_column_plast = CreatePZ.current_bottom
-                        roof_plast = CreatePZ.head_column_additional
+                        roof_plast = CreatePZ.head_column_additional._value
                     elif CreatePZ.open_trunk_well is True and dict_perforation[plast]['отрайбировано']:
-                        roof_add_column_plast = CreatePZ.shoe_column_additional
+                        roof_add_column_plast = CreatePZ.shoe_column_additional._value
                         roof_plast = roof
                         break
                     else:
@@ -771,7 +658,7 @@ class TabPage_SO(QWidget):
     def template_diam_ek(self):
         from open_pz import CreatePZ
 
-        diam_internal_ek = CreatePZ.column_diametr - 2 * CreatePZ.column_wall_thickness
+        diam_internal_ek = CreatePZ.column_diametr._value - 2 * CreatePZ.column_wall_thickness._value
 
         template_first_diam_dict = {
             80: (88, 97),
@@ -810,9 +697,9 @@ class TabPage_SO(QWidget):
 
     def template_diam_additional_ek(self):  # Выбор диаметра шаблонов при наличии в скважине дополнительной колонны
         from open_pz import CreatePZ
-        diam_internal_ek = CreatePZ.column_diametr - 2 * CreatePZ.column_wall_thickness
-        diam_internal_ek_addition = float(CreatePZ.column_additional_diametr) - 2 * float(
-            CreatePZ.column_additional_wall_thickness)
+        diam_internal_ek = CreatePZ.column_diametr._value - 2 * CreatePZ.column_wall_thickness
+        diam_internal_ek_addition = float(CreatePZ.column_additional_diametr._value) - 2 * float(
+            CreatePZ.column_additional_wall_thickness._value)
 
         template_second_diam_dict = {
             84: (88, 92),
@@ -861,7 +748,6 @@ class TemplateKrs(QMainWindow):
         self.rir_paker = None
         self.paker_select = None
         self.tabWidget = TabWidget()
-        self.le = QLineEdit()
 
         self.buttonAdd = QPushButton('Добавить данные в план работ')
         self.buttonAdd.clicked.connect(self.addRowTable)
@@ -872,16 +758,16 @@ class TemplateKrs(QMainWindow):
     def addRowTable(self):
         from open_pz import CreatePZ
 
-        template_str = str(self.tabWidget.currentWidget().template_str_edit.text())
+        template_str = str(self.tabWidget.currentWidget().template_str_Edit.text())
         template = str(self.tabWidget.currentWidget().template_Combo.currentText())
         if CreatePZ.column_additional is False or (
                 CreatePZ.column_additional is True and float(
-            CreatePZ.head_column_additional) >= CreatePZ.current_bottom):
-            template_diametr = int(self.tabWidget.currentWidget().template_second_edit.text())
+            CreatePZ.head_column_additional._value) >= CreatePZ.current_bottom):
+            template_diametr = int(self.tabWidget.currentWidget().template_second_Edit.text())
         else:
-            template_diametr = int(self.tabWidget.currentWidget().template_first_edit.text())
-        if (template_diametr >= CreatePZ.problem_with_ek_diametr - 2
-            and CreatePZ.template_depth > CreatePZ.problem_with_ek_depth):
+            template_diametr = int(self.tabWidget.currentWidget().template_first_Edit.text())
+        if (template_diametr >= int(CreatePZ.problem_with_ek_diametr) - 2
+            and CreatePZ.template_depth > int(CreatePZ.problem_with_ek_depth)):
             mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже глубины не прохода')
 
             return
@@ -896,16 +782,16 @@ class TemplateKrs(QMainWindow):
         # print(CreatePZ.column_additional)
         if not CreatePZ.column_additional:
 
-            volume_well = 3.14 * (CreatePZ.column_diametr - CreatePZ.column_wall_thickness * 2) ** 2 / 4 / 1000000 * (
+            volume_well = 3.14 * (CreatePZ.column_diametr._value - CreatePZ.column_wall_thickness._value * 2) ** 2 / 4 / 1000000 * (
                 CreatePZ.current_bottom)
             return volume_well
         else:
             volume_well = (3.14 * (
-                    CreatePZ.column_additional_diametr - CreatePZ.column_wall_thickness * 2) ** 2 / 4 / 1000 * (
-                                   CreatePZ.current_bottom - float(CreatePZ.head_column_additional)) / 1000) + (
+                    CreatePZ.column_additional_diametr._value - CreatePZ.column_wall_thickness._value * 2) ** 2 / 4 / 1000 * (
+                                   CreatePZ.current_bottom - float(CreatePZ.head_column_additional._value)) / 1000) + (
                                   3.14 * (
-                                      CreatePZ.column_diametr - CreatePZ.column_wall_thickness * 2) ** 2 / 4 / 1000 * (
-                                      CreatePZ.head_column_additional) / 1000)
+                                      CreatePZ.column_diametr._value - CreatePZ.column_wall_thickness._value * 2) ** 2 / 4 / 1000 * (
+                                      CreatePZ.head_column_additional._value) / 1000)
             return volume_well
 
     def template_ek_without_skm(self):
@@ -926,22 +812,22 @@ class TemplateKrs(QMainWindow):
                                                   f'диаметр шаблона',
                                                   int(second_template), 70,
                                                   200)
-        if CreatePZ.column_additional is False and float(CreatePZ.shoe_column) < float(CreatePZ.current_bottom):
+        if CreatePZ.column_additional is False and float(CreatePZ.shoe_column._value) < float(CreatePZ.current_bottom):
             CreatePZ.open_trunk_well = True
 
 
-        elif CreatePZ.column_additional is True and float(CreatePZ.shoe_column_additional) < float(
+        elif CreatePZ.column_additional is True and float(CreatePZ.shoe_column_additional._value) < float(
                 CreatePZ.current_bottom):
             CreatePZ.open_trunk_well = True
 
         if CreatePZ.column_additional is True:
-            nkt_pod = ['60мм' if CreatePZ.column_additional_diametr < 110 else '73мм со снятыми фасками']
+            nkt_pod = ['60мм' if CreatePZ.column_additional_diametr._value < 110 else '73мм со снятыми фасками']
             nkt_pod = ''.join(nkt_pod)
 
         lift_ecn_can = {True: 30, False: 4}
         # print(f' кровля ПВР {CreatePZ.perforation_roof}')
         # print(CreatePZ.dict_perforation)
-        CreatePZ.nkt_diam = ''.join(['73' if CreatePZ.column_diametr > 110 else '60'])
+        CreatePZ.nkt_diam = ''.join(['73' if CreatePZ.column_diametr._value > 110 else '60'])
         if CreatePZ.column_additional is False and CreatePZ.open_trunk_well is False and all(
                 [CreatePZ.dict_perforation[plast]['отрайбировано'] for plast in CreatePZ.plast_work]) is False:
 
@@ -962,7 +848,7 @@ class TemplateKrs(QMainWindow):
                 and ((CreatePZ.open_trunk_well is False
                       and all(
                 [CreatePZ.dict_perforation[plast]['отрайбировано'] for plast in CreatePZ.plast_work]) is True) or
-                                      (CreatePZ.open_trunk_well and CreatePZ.current_bottom < CreatePZ.shoe_column)):
+                                      (CreatePZ.open_trunk_well and CreatePZ.current_bottom < CreatePZ.shoe_column._value)):
             template_str = f'перо + шаблон-{second_template}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can]}м + ' \
                            f'НКТ{CreatePZ.nkt_diam}мм 10м + репер'
             ckm_teml = f'шаблон-{second_template}мм до гл.{math.ceil(CreatePZ.current_bottom)}м)'
@@ -972,19 +858,19 @@ class TemplateKrs(QMainWindow):
             template_str = f'обточная муфта + НКТ{nkt_pod} ' \
                            f'{math.ceil(CreatePZ.current_bottom - math.ceil(roof_add_column_plast - 10))}м +' \
                            f' шаблон-{first_template}мм L-{length_template_addition}м + НКТ{nkt_pod}' \
-                           f' {math.ceil(roof_add_column_plast - float(CreatePZ.head_column_additional) - 20 - length_template_addition)}м ' \
-                           f' + НКТ{CreatePZ.nkt_diam} {CreatePZ.head_column_additional - roof_plast}м + шаблон-{second_template}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can]}м '
+                           f' {math.ceil(roof_add_column_plast - float(CreatePZ.head_column_additional._value) - 20 - length_template_addition)}м ' \
+                           f' + НКТ{CreatePZ.nkt_diam} {CreatePZ.head_column_additional._value - roof_plast}м + шаблон-{second_template}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can]}м '
             ckm_teml = f'(шаблон-{first_template}мм до гл.{math.ceil(roof_add_column_plast - 10)}м, ' \
-                       f'шаблон-{first_template}мм до гл.{CreatePZ.head_column_additional - 10}м)'
+                       f'шаблон-{first_template}мм до гл.{CreatePZ.head_column_additional._value - 10}м)'
             CreatePZ.template_depth = math.ceil(roof_plast)
             CreatePZ.template_depth_addition = math.ceil(roof_add_column_plast - 8)
 
         elif CreatePZ.column_additional is True and CreatePZ.open_trunk_well is True and all(
                 [CreatePZ.dict_perforation[plast]['отрайбировано'] for plast in CreatePZ.plast_work]) is False:
             template_str = f'фильтр направление L-2м + НКТ{nkt_pod} {math.ceil(CreatePZ.current_bottom - math.ceil(roof_add_column_plast) + 8)}м ' \
-                           f'шаблон-{first_template}мм L-{length_template_addition} + {math.ceil(roof_add_column_plast) + 8 - float(CreatePZ.head_column_additional) - length_template_addition - 6}' \
+                           f'шаблон-{first_template}мм L-{length_template_addition} + {math.ceil(roof_add_column_plast) + 8 - float(CreatePZ.head_column_additional._value) - length_template_addition - 6}' \
                            f'+ шаблон-{TabPage_SO.template_diam_additional_ek()[1]}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can]}м '
-            ckm_teml = f'(шаблон-{first_template}мм до {math.ceil(roof_add_column_plast) - 10}м, шаблон Ф-{second_template}мм до гл.{CreatePZ.head_column_additional - 10}м)'
+            ckm_teml = f'(шаблон-{first_template}мм до {math.ceil(roof_add_column_plast) - 10}м, шаблон Ф-{second_template}мм до гл.{CreatePZ.head_column_additional._value - 10}м)'
             CreatePZ.template_depth_addition = math.ceil(roof_add_column_plast - 8)
             CreatePZ.template_depth = math.ceil(roof_plast - 8)
         elif CreatePZ.column_additional is True and all(
@@ -992,15 +878,15 @@ class TemplateKrs(QMainWindow):
             template_str = f'обточная муфта + шаблон-{first_template}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can_addition]}м + НКТ{nkt_pod} ' \
                            f'{round(CreatePZ.current_bottom - roof_plast, 0)}м + шаблон-{second_template}мм L-{lift_ecn_can[CreatePZ.lift_ecn_can]}м '
             ckm_teml = f'(шаблон-{first_template}мм до гл.{math.ceil(CreatePZ.current_bottom)}м, шаблон-{second_template}мм' \
-                       f' до глубины {round(CreatePZ.current_bottom - lift_ecn_can[CreatePZ.lift_ecn_can_addition] - (CreatePZ.current_bottom - CreatePZ.head_column_additional), 0)}м'
+                       f' до глубины {round(CreatePZ.current_bottom - lift_ecn_can[CreatePZ.lift_ecn_can_addition] - (CreatePZ.current_bottom - CreatePZ.head_column_additional._value), 0)}м'
             # print(f' шаблонирование {math.ceil(CreatePZ.current_bottom - 10)}')
             CreatePZ.template_depth_addition = math.ceil(CreatePZ.current_bottom - 10)
 
-            CreatePZ.template_depth = math.ceil(CreatePZ.head_column_additional - 8)
+            CreatePZ.template_depth = math.ceil(CreatePZ.head_column_additional._value - 8)
 
         list_template_ek = [
-            [None, None,
-             f'Спустить  {template_str}на 'f'НКТ{CreatePZ.nkt_diam}мм {ckm_teml} с замером, шаблонированием НКТ. \n'
+            [f'Cпустить  {template_str} на НКТ{CreatePZ.nkt_diam}мм', None,
+             f'Спустить  {template_str} на 'f'НКТ{CreatePZ.nkt_diam}мм {ckm_teml} с замером, шаблонированием НКТ. \n'
              f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
              None, None, None, None, None, None, None,
              'мастер КРС', descentNKT_norm(CreatePZ.current_bottom, 1.2)],
@@ -1021,7 +907,7 @@ class TemplateKrs(QMainWindow):
             [f'Промыть в объеме {round(TemplateKrs.well_volume(self) * 1.5, 1)}м3',
              None,
              f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {CreatePZ.fluid_work}  при расходе жидкости 6-8 л/сек '
-             f'в присутствии представителя Заказчика в объеме {round(TemplateKrs.well_volume(self) * 1.5, 1)}м3. ПРИ ПРОМЫВКЕ НЕ ПРЕВЫШАТЬ ДАВЛЕНИЕ {CreatePZ.max_admissible_pressure}АТМ, ДОПУСТИМАЯ ОСЕВАЯ НАГРУЗКА НА ИНСТРУМЕНТ: 0,5-1,0 ТН',
+             f'в присутствии представителя Заказчика в объеме {round(TemplateKrs.well_volume(self) * 1.5, 1)}м3. ПРИ ПРОМЫВКЕ НЕ ПРЕВЫШАТЬ ДАВЛЕНИЕ {CreatePZ.max_admissible_pressure._value}АТМ, ДОПУСТИМАЯ ОСЕВАЯ НАГРУЗКА НА ИНСТРУМЕНТ: 0,5-1,0 ТН',
              None, None, None, None, None, None, None,
              'Мастер КРС, представитель ЦДНГ', well_volume_norm(TemplateKrs.well_volume(self) * 1.5)],
             [
@@ -1095,7 +981,7 @@ class TemplateKrs(QMainWindow):
             if privyazka_question == QMessageBox.StandardButton.Yes:
                 list_template_ek.insert(-1, privyazka_nkt)
 
-        if float(CreatePZ.static_level) > 700:
+        if float(CreatePZ.static_level._value) > 700:
             kot_question = QMessageBox.question(self, 'Низкий Статический уровень', 'Нужно ли произвести СПО '
                                                                                     'обратных клапанов перед ПСШ?')
             if kot_question == QMessageBox.StandardButton.Yes:
@@ -1119,7 +1005,15 @@ class TemplateKrs(QMainWindow):
         from open_pz import CreatePZ
         from work_py.advanted_file import skm_interval, raid
 
-
+        # ckm_teml_SKM_EK, ckm_teml_SKM_EK_open, ckm_teml_SKM_EK_without, ckm_teml_SKM_DP_EK, \
+        # ckm_teml_SKM_DP, ckm_teml_SKM_DP_without,\
+        # ckm_teml_SKM_DP_open, ckm_teml_SKM_EK_open_True = 0, 0, 0, 0, 0, 0, 0, 0
+        #
+        roof_skm = 0
+        # # print(f'отрайбировани {[CreatePZ.dict_perforation[plast]["отрайбировано"] for plast in CreatePZ.plast_work]}')
+        # CreatePZ.nkt_diam = ''.join(['73' if CreatePZ.column_diametr._value > 110 else '60'])
+        # length_template_addition = int(''.join(['30' if CreatePZ.lift_ecn_can_addition is True else '2']))
+        # # print(f' кровля перфорации {int(CreatePZ.current_bottom),int(CreatePZ.shoe_column._value), 8}')
 
         template_sel = ['ПСШ ЭК', 'ПСШ открытый ствол', 'ПСШ без хвоста', 'ПСШ Доп колонна СКМ в основной колонне',
                         'ПСШ СКМ в доп колонне c хвостом',
@@ -1129,17 +1023,17 @@ class TemplateKrs(QMainWindow):
 
         skm_interval_tuple = skm_interval(self, template)
 
-        print(skm_interval_tuple)
-        skm_interval_str = raid(skm_interval_tuple)
+
+        skm_interval = raid(skm_interval_tuple)
         list_template_ek = [
             [f'СПО  {template_str} на 'f'НКТ{CreatePZ.nkt_diam}мм', None,
              f'Спустить  {template_str} на 'f'НКТ{CreatePZ.nkt_diam}мм  с замером, шаблонированием НКТ. \n'
              f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
              None, None, None, None, None, None, None,
              'мастер КРС', descentNKT_norm(CreatePZ.current_bottom, 1.2)],
-            [f'скреперование э/к в интервале {skm_interval_str}м Допустить низ НКТ до гл. {CreatePZ.current_bottom}м',
+            [f'Произвести скреперование э/к в интервале {skm_interval}м Допустить низ НКТ до гл. {CreatePZ.current_bottom}м',
              None,
-             f'Произвести скреперование э/к в интервале {skm_interval_str}м обратной промывкой и проработкой 5 раз каждого '
+             f'Произвести скреперование э/к в интервале {skm_interval}м обратной промывкой и проработкой 5 раз каждого '
              'наращивания. Работы производить согласно сборника технологических регламентов и инструкций в присутствии '
              f'представителя Заказчика. Допустить низ НКТ до гл. {CreatePZ.current_bottom}м, шаблон '
              f'до глубины {CreatePZ.template_depth}м. Составить акт. \n'
@@ -1160,7 +1054,7 @@ class TemplateKrs(QMainWindow):
                 f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {CreatePZ.fluid_work}  при расходе '
                 f'жидкости 6-8 л/сек '
                 f'в присутствии представителя Заказчика в объеме {round(TemplateKrs.well_volume(self) * 1.5, 1)}м3 ПРИ ПРОМЫВКЕ НЕ '
-                f'ПРЕВЫШАТЬ ДАВЛЕНИЕ {CreatePZ.max_admissible_pressure}АТМ, '
+                f'ПРЕВЫШАТЬ ДАВЛЕНИЕ {CreatePZ.max_admissible_pressure._value}АТМ, '
                 f'ДОПУСТИМАЯ ОСЕВАЯ НАГРУЗКА НА ИНСТРУМЕНТ: 0,5-1,0 ТН',
                 None, None, None, None, None, None, None,
                 'Мастер КРС, представитель ЦДНГ', well_volume_norm(TemplateKrs.well_volume(self) * 1.5)],
@@ -1246,7 +1140,7 @@ class TemplateKrs(QMainWindow):
             if privyazka_question == QMessageBox.StandardButton.Yes:
                 list_template_ek.insert(-1, privyazka_nkt)
 
-        if float(CreatePZ.static_level) > 700:
+        if float(CreatePZ.static_level._value) > 700:
             kot_question = QMessageBox.question(self, 'Низкий Статический уровень', 'Нужно ли произвести СПО '
                                                                                     'обратных клапанов перед ПСШ?')
             if kot_question == QMessageBox.StandardButton.Yes:
@@ -1272,10 +1166,10 @@ class TemplateKrs(QMainWindow):
         from open_pz import CreatePZ
 
         if CreatePZ.column_additional is False or (
-                CreatePZ.column_additional is True and depth_landing < CreatePZ.head_column_additional):
-            diam_internal_ek = CreatePZ.column_diametr - 2 * CreatePZ.column_wall_thickness
+                CreatePZ.column_additional is True and depth_landing < CreatePZ.head_column_additional._value):
+            diam_internal_ek = CreatePZ.column_diametr._value - 2 * CreatePZ.column_wall_thickness
         else:
-            diam_internal_ek = CreatePZ.column_additional_diametr - 2 * CreatePZ.column_additional_wall_thickness
+            diam_internal_ek = CreatePZ.column_additional_diametr._value - 2 * CreatePZ.column_additional_wall_thickness
 
         for diam, diam_internal_paker in CreatePZ.paker_diam_dict.items():
             if diam_internal_paker[0] <= diam_internal_ek << diam_internal_paker[1]:
@@ -1299,7 +1193,7 @@ class TemplateKrs(QMainWindow):
                 None,
                 f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {CreatePZ.fluid_work} при расходе жидкости '
                 f'6-8 л/сек в присутствии представителя Заказчика в объеме {round(TemplateKrs.well_volume(self) * 1.5, 1)}м3. ПРИ ПРОМЫВКЕ НЕ '
-                f'ПРЕВЫШАТЬ ДАВЛЕНИЕ {CreatePZ.max_admissible_pressure}АТМ, ДОПУСТИМАЯ ОСЕВАЯ '
+                f'ПРЕВЫШАТЬ ДАВЛЕНИЕ {CreatePZ.max_admissible_pressure._value}АТМ, ДОПУСТИМАЯ ОСЕВАЯ '
                 f'НАГРУЗКА НА ИНСТРУМЕНТ: 0,5-1,0 ТН',
                 None, None, None, None, None, None, None,
                 'Мастер КРС, представитель ЦДНГ', 1.5],

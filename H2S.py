@@ -26,12 +26,12 @@ def calc_H2S(ws3, H2S_pr, H2S_mg):
         # print(nkt_l)
         if CreatePZ.column_additional == True:
 
-            gno_well = 3.14*(CreatePZ.column_diametr-CreatePZ.column_wall_thickness*2)**2/4/1000*(CreatePZ.bottom-float(CreatePZ.head_column_additional))/1000/10
+            gno_well = 3.14*(CreatePZ.column_diametr-CreatePZ.column_wall_thickness._value *2)**2/4/1000*(CreatePZ.bottom-float(CreatePZ.head_column_additional._value))/1000/10
         else:
-            if nkt_l < CreatePZ.shoe_column:
-                gno_well = (3.14*(CreatePZ.column_diametr-CreatePZ.column_wall_thickness*2)**2/4/1000*(CreatePZ.bottom- float(CreatePZ.head_column_additional))/1000)+(3.14*(CreatePZ.column_diametr-CreatePZ.column_wall_thickness*2)**2/4/1000*(CreatePZ.shoe_column-nkt_l)/1000)
+            if nkt_l < CreatePZ.shoe_column._value:
+                gno_well = (3.14*(CreatePZ.column_diametr-CreatePZ.column_wall_thickness._value *2)**2/4/1000*(CreatePZ.bottom- float(CreatePZ.head_column_additional._value))/1000)+(3.14*(CreatePZ.column_diametr-CreatePZ.column_wall_thickness._value *2)**2/4/1000*(CreatePZ.shoe_column-nkt_l)/1000)
             else:
-                gno_well = 3.14*(CreatePZ.column_additional_diametr-CreatePZ.column_additional_wall_thickness*2)**2/4/1000*(CreatePZ.bottom-nkt_1_l)/10000
+                gno_well = 3.14*(CreatePZ.column_additional_diametr._value -CreatePZ.column_additional_wall_thickness._value *2)**2/4/1000*(CreatePZ.bottom-nkt_1_l)/10000
 
         return gno_well
 
@@ -61,19 +61,19 @@ def calc_H2S(ws3, H2S_pr, H2S_mg):
         [None, None, None, None, None, None],
         [None, '№', 'Параметр', None, 'Результат расчета', None],
         [None, 1, 'Параметры скважины', None, f'{CreatePZ.well_number} {CreatePZ.well_area}', None],
-        [None, 1.1, 'Забой скважины', 'м', round(float(CreatePZ.bottomhole_artificial), 1), 'формула'],
+        [None, 1.1, 'Забой скважины', 'м', round(float(CreatePZ.bottomhole_artificial._value), 1), 'формула'],
         [None, 1.2, 'текущий забой', 'м', round(float(CreatePZ.bottom),1), 'ввод'],
-        [None, 1.3, 'Диаметр ЭК (ступень 1 верхняя)', 'мм', int(CreatePZ.column_diametr), 'ввод'],
-            [None, '1.3.1.', 'Толщина стенки ЭК (ступень 1 верхняя)', 'мм', round(float(CreatePZ.column_wall_thickness), 1), 'ввод'],
-        [None, '1.3.2.', 'Длина подвески ЭК (ступень 1 верхняя)', 'м', int(CreatePZ.shoe_column), 'ввод'],
-        [None, '1.3.3.', 'Диаметр ЭК (ступень 2 хвостовик)', 'мм', int(CreatePZ.column_additional_diametr), 'ввод'],
-        [None, '1.3.4.', 'Толщина стенки ЭК (ступень 2 хвостовик)', 'м', float(CreatePZ.column_additional_wall_thickness),
+        [None, 1.3, 'Диаметр ЭК (ступень 1 верхняя)', 'мм', int(CreatePZ.column_diametr._value), 'ввод'],
+            [None, '1.3.1.', 'Толщина стенки ЭК (ступень 1 верхняя)', 'мм', round(float(CreatePZ.column_wall_thickness._value), 1), 'ввод'],
+        [None, '1.3.2.', 'Длина подвески ЭК (ступень 1 верхняя)', 'м', int(CreatePZ.shoe_column._value), 'ввод'],
+        [None, '1.3.3.', 'Диаметр ЭК (ступень 2 хвостовик)', 'мм', int(CreatePZ.column_additional_diametr._value), 'ввод'],
+        [None, '1.3.4.', 'Толщина стенки ЭК (ступень 2 хвостовик)', 'м', float(CreatePZ.column_additional_wall_thickness._value),
          'ввод'],
         [None, '1.3.5.', 'Длина подвески ЭК (ступень 2 хвостовик)', 'м',
-         abs(int(CreatePZ.head_column_additional) - int(CreatePZ.shoe_column_additional)), 'ввод'],
-        [None, '1.3.6.', 'Глубина "головы" (ступень 2 хвостовик)', 'м', int(CreatePZ.head_column_additional), 'ввод',
+         abs(int(CreatePZ.head_column_additional._value) - int(CreatePZ.shoe_column_additional._value)), 'ввод'],
+        [None, '1.3.6.', 'Глубина "головы" (ступень 2 хвостовик)', 'м', int(CreatePZ.head_column_additional._value), 'ввод',
          ],
-        [None, '1.3.7.', 'Глубина "башмака" (ступень 2 хвостовик)', 'м', int(CreatePZ.shoe_column_additional),
+        [None, '1.3.7.', 'Глубина "башмака" (ступень 2 хвостовик)', 'м', int(CreatePZ.shoe_column_additional._value),
          'формула'],
         [None, None, None, None, None, None],
         [None, 2, 'Параметры ГНО', None, None, None, None],
@@ -184,15 +184,15 @@ def well_volume(self):
     # print(CreatePZ.column_additional)
     if CreatePZ.column_additional == False:
 
-        volume_well = 3.14 * (CreatePZ.column_diametr - CreatePZ.column_wall_thickness * 2) ** 2 / 4 / 1000000 * (
-            CreatePZ.bottomhole_artificial)
+        volume_well = 3.14 * (CreatePZ.column_diametr._value - CreatePZ.column_wall_thickness._value * 2) ** 2 / 4 / 1000000 * (
+            CreatePZ.bottomhole_artificial._value)
         return volume_well
     else:
 
-        volume_well = (3.14 * (CreatePZ.column_additional_diametr - CreatePZ.column_wall_thickness * 2) ** 2 / 4 / 1000 * (
-                CreatePZ.bottomhole_artificial - float(CreatePZ.head_column_additional)) / 1000) + (
-                                  3.14 * (CreatePZ.column_diametr - CreatePZ.column_wall_thickness * 2) ** 2 / 4 / 1000 * (
-                              float(CreatePZ.head_column_additional)) / 1000)
+        volume_well = (3.14 * (CreatePZ.column_additional_diametr._value - CreatePZ.column_wall_thickness._value * 2) ** 2 / 4 / 1000 * (
+                CreatePZ.bottomhole_artificial._value - float(CreatePZ.head_column_additional._value)) / 1000) + (
+                                  3.14 * (CreatePZ.column_diametr._value - CreatePZ.column_wall_thickness._value * 2) ** 2 / 4 / 1000 * (
+                              float(CreatePZ.head_column_additional._value)) / 1000)
         return volume_well
 def calv_h2s(self, cat_H2S, H2S_mg, H2S_pr):
 
@@ -200,18 +200,18 @@ def calv_h2s(self, cat_H2S, H2S_mg, H2S_pr):
     if '2' == str(cat_H2S) or '1' in str(cat_H2S):
         nkt_l = sum(list(CreatePZ.dict_nkt.values()))
 
-        udel_vnutr_v = 10 *3.14 *((CreatePZ.column_diametr - CreatePZ.column_wall_thickness*2)*0.01)**2/4
+        udel_vnutr_v = 10 *3.14 *((CreatePZ.column_diametr._value - CreatePZ.column_wall_thickness._value *2)*0.01)**2/4
         if CreatePZ.column_additional == True:
-            udel_vn__khv = 10 *3.14 *((CreatePZ.column_additional_diametr - CreatePZ.column_additional_wall_thickness*2)*0.01)**2/4
+            udel_vn__khv = 10 *3.14 *((CreatePZ.column_additional_diametr._value - CreatePZ.column_additional_wall_thickness._value *2)*0.01)**2/4
         # print(f'ff{udel_vn__khv}')
-        # print(f' НКТ{CreatePZ.column_diametr}2 {nkt_l, CreatePZ.head_column_additional}88{CreatePZ.column_diametr, CreatePZ.column_wall_thickness}0{CreatePZ.head_column_additional, CreatePZ.bottomhole_artificial}')
+        # print(f' НКТ{CreatePZ.column_diametr._value}2 {nkt_l, CreatePZ.head_column_additional._value}88{CreatePZ.column_diametr, CreatePZ.column_wall_thickness._value}0{CreatePZ.head_column_additional._value, CreatePZ.bottomhole_artificial._value}')
         if CreatePZ.column_additional == False:
 
-            v_pod_gno = 3.14 * (int(CreatePZ.column_diametr) - int(CreatePZ.column_wall_thickness)*2)**2/4/1000*(CreatePZ.bottomhole_artificial-int(nkt_l))/1000
-        elif nkt_l > float(CreatePZ.head_column_additional):
-            v_pod_gno = 3.14 * (CreatePZ.column_diametr - CreatePZ.column_wall_thickness*2)**2/4/1000 * (float(CreatePZ.head_column_additional)-nkt_l)/1000+ 3.14*(CreatePZ.column_additional_diametr - CreatePZ.column_additional_wall_thickness*2)**2/4/1000*(CreatePZ.bottomhole_artificial-float(CreatePZ.head_column_additional))/1000
-        elif nkt_l < float(CreatePZ.head_column_additional):
-            v_pod_gno = 3.14 *(CreatePZ.column_additional_diametr-CreatePZ.column_additional_wall_thickness*2)**2/4/1000 * (CreatePZ.bottomhole_artificial-nkt_l)/1000
+            v_pod_gno = 3.14 * (int(CreatePZ.column_diametr._value) - int(CreatePZ.column_wall_thickness._value)*2)**2/4/1000*(CreatePZ.bottomhole_artificial._value -int(nkt_l))/1000
+        elif nkt_l > float(CreatePZ.head_column_additional._value):
+            v_pod_gno = 3.14 * (CreatePZ.column_diametr._value - CreatePZ.column_wall_thickness._value *2)**2/4/1000 * (float(CreatePZ.head_column_additional._value)-nkt_l)/1000+ 3.14*(CreatePZ.column_additional_diametr._value - CreatePZ.column_additional_wall_thickness._value *2)**2/4/1000*(CreatePZ.bottomhole_artificial._value -float(CreatePZ.head_column_additional._value))/1000
+        elif nkt_l < float(CreatePZ.head_column_additional._value):
+            v_pod_gno = 3.14 *(CreatePZ.column_additional_diametr._value -CreatePZ.column_additional_wall_thickness._value *2)**2/4/1000 * (CreatePZ.bottomhole_artificial._value -nkt_l)/1000
         # print(f'под ГНО{v_pod_gno}')
         volume_well =  H2S.well_volume(self)
 

@@ -11,7 +11,7 @@ def vp(self):
     if ok and vp:
         self.le.setText(vp)
     vp_depth, ok = QInputDialog.getInt(self, 'Глубина посадки ВП', 'Введите глубину посадки ВП',
-                                       int(CreatePZ.perforation_roof - 10), 2, int(CreatePZ.bottomhole_drill))
+                                       int(CreatePZ.perforation_roof - 10), 2, int(CreatePZ.bottomhole_drill._value))
 
     vp_depth = MyWindow.true_set_Paker(self, vp_depth)
 
@@ -26,8 +26,8 @@ def vp(self):
              f'Произвести установку {vp} (ЗАДАЧА 2.9.4.) на глубине  {vp_depth}м',
              None, None, None, None, None, None, None,
              'Мастер КРС, подрядчик по ГИС', 10],
-            [f'Опрессовать эксплуатационную колонну на Р={CreatePZ.max_admissible_pressure}атм', None,
-             f'Опрессовать эксплуатационную колонну на Р={CreatePZ.max_admissible_pressure}атм в присутствии представителя заказчика '
+            [f'Опрессовать эксплуатационную колонну на Р={CreatePZ.max_admissible_pressure._value}атм', None,
+             f'Опрессовать эксплуатационную колонну на Р={CreatePZ.max_admissible_pressure._value}атм в присутствии представителя заказчика '
              f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ) ',
              None, None, None, None, None, None, None,
              'Мастер КРС, подрядчик РИР, УСРСиСТ', 1.2],
@@ -51,8 +51,8 @@ def vp(self):
              f'взрывные желонки).',
              None, None, None, None, None, None, None,
              'Мастер КРС, подрядчик по ГИС', None],
-            [f'Опрессовать эксплуатационную колонну на Р={CreatePZ.max_admissible_pressure}атм', None,
-             f'Опрессовать эксплуатационную колонну на Р={CreatePZ.max_admissible_pressure}атм в присутствии представителя заказчика '
+            [f'Опрессовать эксплуатационную колонну на Р={CreatePZ.max_admissible_pressure._value}атм', None,
+             f'Опрессовать эксплуатационную колонну на Р={CreatePZ.max_admissible_pressure._value}атм в присутствии представителя заказчика '
              f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ) ',
              None, None, None, None, None, None, None,
              'Мастер КРС, подрядчик РИР, УСРСиСТ', 1.2],
@@ -106,7 +106,7 @@ def czh(self):
     from open_pz import CreatePZ
 
     vp_depth, ok = QInputDialog.getInt(self, 'Глубина докрепления', 'Введите глубину до крепления цем желонки ',
-                                       int(CreatePZ.perforation_roof - 10), 2, int(CreatePZ.bottomhole_drill))
+                                       int(CreatePZ.perforation_roof - 10), 2, int(CreatePZ.bottomhole_drill._value))
 
     vp_list = [
         [None, None, f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС "Ойл-сервис". '
@@ -133,9 +133,9 @@ def czh(self):
          f'взрывные желонки).',
          None, None, None, None, None, None, None,
          'Мастер КРС, подрядчик по ГИС', None],
-        [f'Опрессовать ЭК на Р={CreatePZ.max_admissible_pressure}атм',
+        [f'Опрессовать ЭК на Р={CreatePZ.max_admissible_pressure._value}атм',
          None,
-         f'Опрессовать эксплуатационную колонну на Р={CreatePZ.max_admissible_pressure}атм в присутствии '
+         f'Опрессовать эксплуатационную колонну на Р={CreatePZ.max_admissible_pressure._value}атм в присутствии '
          f'представителя заказчика Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, '
          f'с подтверждением за 2 часа до начала работ) ',
          None, None, None, None, None, None, None,
@@ -154,10 +154,13 @@ def czh(self):
             interval_list.append(interval)
 
     if CreatePZ.leakiness:
+        print(CreatePZ.dict_leakiness)
         for nek in CreatePZ.dict_leakiness['НЭК']['интервал']:
-            if nek['отключение'] == False:
-                interval_list.append(nek.split('-'))
-    if any([float(interval[1]) < float(vp_depth) for interval in interval_list]):
+            print(nek)
+            if CreatePZ.dict_leakiness['НЭК']['интервал'][nek]['отключение'] == False:
+                interval_list.append(nek)
+    print(interval_list)
+    if any([float(interval[0]) < float(vp_depth) for interval in interval_list]):
         vp_list = vp_list[:3]
 
     CreatePZ.current_bottom = vp_depth

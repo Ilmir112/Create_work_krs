@@ -27,7 +27,7 @@ def events_gnvp_gnkt():
         [None, ' 4. Движение транспортных средств осуществлять согласно схемы маршрута передвижения специальной '
                'техники по площадке скважины в присутствии ответственного лица', None, None,
          None, None, None, None, None, None, None],
-        [None, f'5. Производить опрессовку плашек ПВО {CreatePZ.max_expected_pressure}атм на максимально'
+        [None, f'5. Производить опрессовку плашек ПВО {CreatePZ.max_expected_pressure._value}атм на максимально'
                f' ожидаемое давление на устье + 10 % (для освоения), но не выше максимально допустимого '
                f'давления опрессовки эксплуатационной колонны с выдержкой в течении 30мин и составлением '
                f'акта на опрессовку ПВО (согласно плана мероприятий по результатам  расследования и анализа '
@@ -152,7 +152,7 @@ def events_gnvp():
                'техники по площадке скважины в присутствии ответственного лица', None, None,
          None, None, None, None, None, None, None],
         [None,
-         f'5. Производить опрессовку трубных  плашек ПВО с СПО тех.пакера на гл.10м на давление {CreatePZ.max_expected_pressure}атм на максимально'
+         f'5. Производить опрессовку трубных  плашек ПВО с СПО тех.пакера на гл.10м на давление {CreatePZ.max_expected_pressure._value}атм на максимально'
          f' ожидаемое давление на устье + 10 % (для освоения), но не выше максимально допустимого '
          f'давления опрессовки эксплуатационной колонны с выдержкой в течении 30мин и составлением '
          f'акта на опрессовку ПВО (согласно плана мероприятий по результатам  расследования и анализа '
@@ -417,10 +417,11 @@ def itog_1(self):
         [None, 'ПЗР в начале и конце смены с заполнением вахтового журнала', None, None, None, None, None,
          None, None, None, None, round(CreatePZ.normOfTime / 11.5 * 0.3, 1)],
         [None, 'Непредвиденные  работы  : ', None, None, None, None, None, None, None, None, None,
-         round(CreatePZ.normOfTime * float(CreatePZ.bottomhole_artificial) / 100 * 0.0004, 1)],
+         round(CreatePZ.normOfTime * float(CreatePZ.bottomhole_artificial._value) / 100 * 0.0004, 1)],
         [None, 'ВСЕГО  :', None, None, None, None, None, None, None, None, None, \
          round(
-             CreatePZ.normOfTime + CreatePZ.normOfTime / 11.5 * 11 / 60 + CreatePZ.normOfTime / 11.5 * 0.3 + CreatePZ.normOfTime * CreatePZ.bottomhole_artificial / 100 * 0.0004,
+             CreatePZ.normOfTime + CreatePZ.normOfTime / 11.5 * 11 / 60 + CreatePZ.normOfTime / 11.5 * 0.3 +
+             CreatePZ.normOfTime * CreatePZ.bottomhole_artificial._value / 100 * 0.0004,
              1)],
         [None,
          'Примечания: В соответствии с регламентом на производство КРС – заблаговременно подавать заявки на '
@@ -445,7 +446,7 @@ def itog_1(self):
     #     [None, 'ПЗР в начале и конце смены с заполнением вахтового журнала', None, None, None, None, None,
     #      None, None, None, None, f'=ROUND(SUM(L{CreatePZ.itog_ind_min}:L{CreatePZ.itog_ind_max - 1})/11.5*0.3,1)'],
     #     [None, 'Непредвиденные  работы  : ', None, None, None, None, None, None, None, None, None,
-    #      f'=ROUND(SUM(L{CreatePZ.itog_ind_min}:L{CreatePZ.itog_ind_max+2})*{CreatePZ.bottomhole_artificial}/100*0.0004 ,1)'],
+    #      f'=ROUND(SUM(L{CreatePZ.itog_ind_min}:L{CreatePZ.itog_ind_max+2})*{CreatePZ.bottomhole_artificial._value}/100*0.0004 ,1)'],
     #     [None, 'ВСЕГО  :', None, None, None, None, None, None, None, None, None, \
     #      f'=ROUND(l{CreatePZ.itog_ind_max + 1} + l{CreatePZ.itog_ind_max + 2} + l{CreatePZ.itog_ind_max + 3} + l{CreatePZ.itog_ind_max + 4} +l{CreatePZ.itog_ind_max + 5}, 1)'],
     #     [None,

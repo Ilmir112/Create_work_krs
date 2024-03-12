@@ -101,7 +101,7 @@ class TabPage_SO(QWidget):
         self.pressure_Label = QLabel("Давление закачки", self)
         self.pressure_edit = QLineEdit(self)
         self.pressure_edit.setClearButtonEnabled(True)
-        self.pressure_edit.setText(str(CreatePZ.max_admissible_pressure))
+        self.pressure_edit.setText(str(CreatePZ.max_admissible_pressure._value))
 
         self.swabTypeLabel = QLabel("задача при освоении", self)
         self.swabTypeCombo = QComboBox(self)
@@ -343,7 +343,7 @@ class AcidPakerWindow(MyWindow):
              'мастер КРС', None],
             [None, None,
              f'Произвести  монтаж СВАБа согласно схемы  №8 при свабированиии утвержденной главным инженером от 14.10.2021г. '
-             f'Обвязать устье скважины с ЕДК на жесткую линию. Опрессовать ПВО на максимально ожидаемое давление на устье {CreatePZ.max_expected_pressure}атм,'
+             f'Обвязать устье скважины с ЕДК на жесткую линию. Опрессовать ПВО на максимально ожидаемое давление на устье {CreatePZ.max_expected_pressure._value}атм,'
              f' по невозможности на давление поглощения, но не менее 30атм в течении 30мин Провести практическое обучение вахт по '
              f'сигналу "выброс" с записью в журнале проведения учебных тревог',
              None, None, None, None, None, None, None,
@@ -405,7 +405,7 @@ class AcidPakerWindow(MyWindow):
         if depthGaugeEdit == 'Да' and CreatePZ.column_additional == False:
             self.paker_select = f'заглушку + сбивной с ввертышем контейнер с манометром МТГ + НКТ{CreatePZ.nkt_diam}м ' \
                                 f'{khvostEdit}м  + пакер ПРО-ЯМО-{paker_diametr}мм (либо аналог) ' \
-                                f'для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм + щелевой ' \
+                                f'для ЭК {CreatePZ.column_diametr._value}мм х {CreatePZ.column_wall_thickness._value}мм + щелевой ' \
                                 f'фильтр НКТ {difference_paker}м + контейнер с манометром МТГ' \
                                 f'+ пакер ПУ - {paker_diametr} + НКТ{CreatePZ.nkt_diam}мм 20м +' \
                                 f'реперный патрубок + сбивной с ввертышем контейнер с манометром МТГ на НКТ{CreatePZ.nkt_diam}'
@@ -416,10 +416,10 @@ class AcidPakerWindow(MyWindow):
                                 f'реперный патрубок + МТГ на НКТ{CreatePZ.nkt_diam}'
             dict_nkt = {73: pakerEdit}
         elif CreatePZ.column_additional == False or (
-                CreatePZ.column_additional == True and pakerEdit < CreatePZ.head_column_additional):
+                CreatePZ.column_additional == True and pakerEdit < CreatePZ.head_column_additional._value):
             self.paker_select = f'заглушку + сбивной с ввертышем + НКТ{CreatePZ.nkt_diam}м {khvostEdit}м  + ' \
                                 f'пакер ПРО-ЯМО-{paker_diametr}мм (либо аналог) ' \
-                                f'для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм + ' \
+                                f'для ЭК {CreatePZ.column_diametr._value}мм х {CreatePZ.column_wall_thickness._value}мм + ' \
                                 f'щелевой фильтр НКТ {difference_paker}м ' \
                                 f'+ пакер ПУ - {paker_diametr} + НКТ{CreatePZ.nkt_diam}мм 20м + ' \
                                 f'реперный патрубок на НКТ{CreatePZ.nkt_diam}'
@@ -428,33 +428,33 @@ class AcidPakerWindow(MyWindow):
                                 f' + пакер ПУ - {paker_diametr} + НКТ{CreatePZ.nkt_diam}мм 20м + ' \
                                f'репер на НКТ{CreatePZ.nkt_diam}'
             dict_nkt = {73: pakerEdit}
-        elif CreatePZ.column_additional is True and CreatePZ.column_additional_diametr < 110 and pakerEdit > CreatePZ.head_column_additional:
+        elif CreatePZ.column_additional is True and CreatePZ.column_additional_diametr._value < 110 and pakerEdit > CreatePZ.head_column_additional._value:
             self.paker_select = f'заглушку + сбивной с ввертышем + НКТ{60}мм {khvostEdit}м  + пакер ПРО-ЯМО-' \
                                 f'{paker_diametr}мм (либо аналог) ' \
-                                f'для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм + ' \
+                                f'для ЭК {CreatePZ.column_diametr._value}мм х {CreatePZ.column_wall_thickness._value}мм + ' \
                                 f'щелевой фильтр НКТ{60} {difference_paker}м ' \
                                 f'+ пакер ПУ - {paker_diametr} + НКТ{60}мм 20м +реперный патрубок ' \
-                                f'на НКТ{60} {round(CreatePZ.head_column_additional - pakerEdit+10,0)}'
+                                f'на НКТ{60} {round(CreatePZ.head_column_additional._value - pakerEdit+10,0)}'
             self.paker_short = f'заглушку + сбивной с ввертышем + НКТ{60}мм {khvostEdit}м  + пакер ПРО-ЯМО-' \
                                f'{paker_diametr}мм + щелевой ' \
                                f'фильтр НКТ{60} {difference_paker}м ' \
                                 f'+ пакер ПУ - {paker_diametr} + НКТ{60}мм 20м +репер  на ' \
-                               f'НКТ{60} {round(CreatePZ.head_column_additional - pakerEdit+10,0)}'
-            CreatePZ.dict_nkt = {73: CreatePZ.head_column_additional - 10,
-                                 60: int(pakerEdit - float(CreatePZ.head_column_additional))}
-        elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr > 110 and pakerEdit > CreatePZ.head_column_additional:
+                               f'НКТ{60} {round(CreatePZ.head_column_additional._value - pakerEdit+10,0)}'
+            CreatePZ.dict_nkt = {73: CreatePZ.head_column_additional._value - 10,
+                                 60: int(pakerEdit - float(CreatePZ.head_column_additional._value))}
+        elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr._value > 110 and pakerEdit > CreatePZ.head_column_additional._value:
             self.paker_select = f'заглушку + сбивной с ввертышем + НКТ73 со снятыми фасками {khvostEdit}м  + пакер ' \
                                 f'ПРО-ЯМО-{paker_diametr}мм (либо аналог) ' \
-                                f'для ЭК {CreatePZ.column_diametr}мм х {CreatePZ.column_wall_thickness}мм + щелевой ' \
+                                f'для ЭК {CreatePZ.column_diametr._value}мм х {CreatePZ.column_wall_thickness._value}мм + щелевой ' \
                                 f'фильтр НКТ73 со снятыми фасками {difference_paker}м ' \
                                 f'+ пакер ПУ - {paker_diametr} + НКТ73 со снятыми фасками 20м + ' \
-                                f'реперный патрубок на НКТ73 со снятыми фасками {round(CreatePZ.head_column_additional - pakerEdit+10,0)}м'
+                                f'реперный патрубок на НКТ73 со снятыми фасками {round(CreatePZ.head_column_additional._value - pakerEdit+10,0)}м'
 
             self.paker_short = f'заглушку + сбивной с ввертышем + НКТ73 со снятыми фасками {khvostEdit}м  + ' \
                                f'пакер ПРО-ЯМО-{paker_diametr}мм + щелевой фильтр НКТ73 со' \
                                f' снятыми фасками {difference_paker}м ' \
                                 f'+ пакер ПУ - {paker_diametr} + НКТ73 со снятыми фасками 20м +репер' \
-                               f' на НКТ73 со снятыми фасками {round(CreatePZ.head_column_additional - pakerEdit+10,0)}м'
+                               f' на НКТ73 со снятыми фасками {round(CreatePZ.head_column_additional._value - pakerEdit+10,0)}м'
 
             CreatePZ.dict_nkt = {73: pakerEdit}
         elif CreatePZ.nkt_diam == 60:
@@ -501,9 +501,9 @@ class AcidPakerWindow(MyWindow):
         from krs import volume_vn_nkt, well_volume
         paker_list = []
         swabTrueEditType = [False if swabTrueEditType == 'без СКВ' else False][0]
-        skv_list = [[f'Определить приемистость при Р-{CreatePZ.max_admissible_pressure}атм'
+        skv_list = [[f'Определить приемистость при Р-{CreatePZ.max_admissible_pressure._value}атм'
                         , None,
-                     f'Определить приемистость при Р-{CreatePZ.max_admissible_pressure}атм в присутствии представителя заказчика.'
+                     f'Определить приемистость при Р-{CreatePZ.max_admissible_pressure._value}атм в присутствии представителя заказчика.'
                      f'при отсутствии приемистости произвести установку СКВ по согласованию с заказчиком',
                      None, None, None, None, None, None, None,
                      'мастер КРС, УСРСиСТ', 1.2],
@@ -535,7 +535,7 @@ class AcidPakerWindow(MyWindow):
         if acid_edit == 'HCl':
 
             acid_sel = f'Произвести  солянокислотную обработку {plast_combo}  в объеме  {acid_volume_edit}м3  ({acid_edit} - {acid_proc_edit} %) ' \
-                       f' в присутствии представителя Заказчика с составлением акта, не превышая давления закачки не более Р={CreatePZ.max_admissible_pressure}атм. \n' \
+                       f' в присутствии представителя Заказчика с составлением акта, не превышая давления закачки не более Р={CreatePZ.max_admissible_pressure._value}атм. \n' \
                        f'(для приготовления соляной кислоты в объеме {acid_volume_edit}м3 - {acid_proc_edit}% необходимо замешать {round(acid_volume_edit * acid_proc_edit / 24 * 1.118, 1)}т HCL 24% и' \
                        f' пресной воды {round(float(acid_volume_edit) - float(acid_volume_edit) * float(acid_proc_edit) / 24 * 1.118, 1)}м3) ' \
                        f'Согласовать с Заказчиком проведение кислотной обработки силами ООО Крезол. '
@@ -546,21 +546,21 @@ class AcidPakerWindow(MyWindow):
             vt, ok = QInputDialog.getText(None, 'Высокотехнологическая кислоты', 'Нужно расписать вид кислоты и объем')
             acid_sel = f'Произвести кислотную обработку {plast_combo} {vt}  в присутствии представителя ' \
                        f'Заказчика с составлением акта, не превышая давления закачки не более Р=' \
-                       f'{CreatePZ.max_admissible_pressure}атм.'
+                       f'{CreatePZ.max_admissible_pressure._value}атм.'
             acid_sel_short = vt
         elif acid_edit == 'HF':
 
             acid_sel = f'Произвести глинокислотную обработку пласта {plast_combo}  в объеме  {acid_volume_edit}м3  ' \
                        f'(концентрация в смеси HF 3% / HCl 13%) силами СК Крезол ' \
                        f'в присутствии представителя заказчика с составлением акта, не превышая давления закачки не' \
-                       f' более Р={CreatePZ.max_admissible_pressure}атм.'
+                       f' более Р={CreatePZ.max_admissible_pressure._value}атм.'
             acid_sel_short = f'ГКО пласта {plast_combo}  в V {acid_volume_edit}м3 '
         elif acid_edit == 'Нефтекислотка':
             acid_sel = f'Произвести нефтекислотную обработку пласта {plast_combo} в V=2тн товарной нефти + ' \
                        f'{acid_volume_edit}м3  (HCl - {acid_proc_edit} %) + {float(acidOilProcEdit) - 2}т товарной ' \
                        f'нефти силами СК Крезол ' \
                        f'в присутствии представителя заказчика с составлением акта, не превышая давления закачки ' \
-                       f'не более Р={CreatePZ.max_admissible_pressure}атм.'
+                       f'не более Р={CreatePZ.max_admissible_pressure._value}атм.'
             acid_sel_short = f'НКО пласта {plast_combo} в V=2тн товарной нефти + ' \
                        f'{acid_volume_edit}м3  (HCl - {acid_proc_edit} %) + {float(acidOilProcEdit) - 2}т товарной ' \
                        f'нефти'
@@ -568,7 +568,7 @@ class AcidPakerWindow(MyWindow):
             acid_sel = f'Произвести противогипсовую обработку пласта{plast_combo} в объеме {acid_volume_edit}м3 - ' \
                        f'{20}% раствором каустической соды' \
                        f'в присутствии представителя заказчика с составлением акта, не превышая давления закачки не ' \
-                       f'более Р={CreatePZ.max_admissible_pressure}атм.\n'
+                       f'более Р={CreatePZ.max_admissible_pressure._value}атм.\n'
             acid_sel_short = f' ПГО обработку пласта{plast_combo} в объеме {acid_volume_edit}м3'
             # print(f'Ожидаемое показатели {CreatePZ.expected_pick_up.values()}')
         acid_list_1 = [[acid_sel_short, None,
@@ -591,17 +591,19 @@ class AcidPakerWindow(MyWindow):
                         ''.join(
                             [
                                 f'продавить кислоту тех жидкостью в объеме {round(volume_vn_nkt(dict_nkt) + 0.5, 1)}м3 при давлении не '
-                                f'более {CreatePZ.max_admissible_pressure}атм. Увеличение давления согласовать'
+                                f'более {CreatePZ.max_admissible_pressure._value}атм. Увеличение давления согласовать'
                                 f' с заказчиком' if acid_volume_edit < volume_vn_nkt(
                                     dict_nkt) else f'продавить кислоту оставшейся кислотой в объеме {round(acid_volume_edit - volume_vn_nkt(dict_nkt), 1)}м3 и тех жидкостью '
                                                    f'в объеме {round(volume_vn_nkt(dict_nkt) + 0.5, 1)}м3 при давлении не более {pressure_edit}атм. '
                                                    f'Увеличение давления согласовать с заказчиком']),
                         None, None, None, None, None, None, None,
                         'мастер КРС', 6],
-                       [f'реагирование 2 часа', None,
-                        f'реагирование 2 часа.',
+                       [f'без реагирования' if (
+                                   CreatePZ.region == 'ТГМ' and acid_sel == 'HF') else 'реагирование 2 часа.', None,
+                        f'без реагирования' if (
+                                    CreatePZ.region == 'ТГМ' and acid_sel == 'HF') else 'реагирование 2 часа.',
                         None, None, None, None, None, None, None,
-                        'мастер КРС', 2],
+                        'мастер КРС', '' if (CreatePZ.region == 'ТГМ' and acid_sel == 'HF') else 2],
 
                        [f'срыв 30мин', None,
                         f'Произвести срыв пакера с поэтапным увеличением нагрузки на 3-4т выше веса НКТ в течении 30мин и с '
@@ -675,7 +677,7 @@ class AcidPakerWindow(MyWindow):
         from open_pz import CreatePZ
 
         mode = int(mode / 10) * 10
-        if mode > CreatePZ.max_admissible_pressure and (plast != 'D2ps' or plast.lower() != 'дпаш'):
+        if mode > CreatePZ.max_admissible_pressure._value and (plast != 'D2ps' or plast.lower() != 'дпаш'):
             mode_str = f'{mode}, {mode - 10}, {mode - 20}'
         elif (plast == 'D2ps' or plast.lower() == 'дпаш') and CreatePZ.region == 'ИГМ':
             mode_str = f'{120}, {140}, {160}'

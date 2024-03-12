@@ -18,7 +18,9 @@ class ProtectedIsDigit():
         return instance.__dict__[self._name]
 
     def __set__(self, instance, value):
-        if isinstance(value, str):
+        if 'уст' in str(value).lower():
+            self._value = 0
+        elif isinstance(value, str):
             try:
                 float_value = float(value.replace(",", "").replace(".", ""))  # Пробуем преобразовать строку в число
                 self._value = float_value
@@ -217,6 +219,7 @@ class FindIndexPZ(QMainWindow):
                 # print(i)
                 lst.append(float(i.replace(',', '.').strip()))
             return lst
+
         else:
             b = 0
             for i in str(string):
@@ -227,14 +230,18 @@ class FindIndexPZ(QMainWindow):
 
     def definition_is_None(self, data, row, col, step, m=12):
         try:
-            # print(data._value, row, col, step, m)
-            while data._value is None or step == m:
-                data = ProtectedIsDigit(self.ws.cell(row=row, column=col + step).value)
+            print(data._value, data._value is None, row, col, step, m)
+            data = data._value
+            while data is None or step == m:
+                data = self.ws.cell(row=row, column=col + step).value
+                print(f'в цикле {data}')
                 step += 1
-            return data
+                print(f'цикл {data, row, col, step, m}')
+
+            return ProtectedIsNonNone(data)
         except:
-            # print(f'не защище {data, row, col}, {step, m}')
-            while data is None:
+            print(f'не защище {data, row, col}, {step, m}')
+            while str(data) is str(None):
 
                 data = self.ws.cell(row=row, column=col + step).value
                 # print(f'{data} - col')
@@ -422,6 +429,8 @@ class WellHistory_data(FindIndexPZ):
 
     def read_well(self, ws, begin_index, cancel_index):
         from open_pz import CreatePZ
+        CreatePZ.max_expected_pressure = ProtectedIsNonNone('не корректно')
+        CreatePZ.max_admissible_pressure = ProtectedIsNonNone('не корректно')
 
         # print(begin_index, cancel_index)
         for row_index, row in enumerate(ws.iter_rows(min_row=begin_index, max_row=cancel_index)):
@@ -476,6 +485,9 @@ class WellCondition(FindIndexPZ):
 
     def read_well(self, ws, begin_index, cancel_index):
         from open_pz import CreatePZ
+
+        CreatePZ.static_level = ProtectedIsNonNone('не корректно')
+        CreatePZ.dinamic_level = ProtectedIsNonNone('не корректно')
 
         CreatePZ.dinamic_level = ProtectedIsDigit(0)
         for row_index, row in enumerate(ws.iter_rows(min_row=begin_index, max_row=cancel_index)):
@@ -579,6 +591,32 @@ class Well_data(FindIndexPZ):
     def read_well(self, ws, begin_index, cancel_index):
         from open_pz import CreatePZ
 
+        CreatePZ.well_area = ProtectedIsNonNone('не корректно')
+        CreatePZ.well_number = ProtectedIsNonNone('не корректно')
+        CreatePZ.inv_number = ProtectedIsNonNone('не корректно')
+        CreatePZ.cdng = ProtectedIsNonNone('не корректно')
+        CreatePZ.bottomhole_drill = ProtectedIsNonNone('не корректно')
+        CreatePZ.bottomhole_artificial = ProtectedIsNonNone('не корректно')
+        CreatePZ.max_angle = ProtectedIsNonNone('не корректно')
+        CreatePZ.max_angle_H = ProtectedIsNonNone('не корректно')
+        CreatePZ.stol_rotora = ProtectedIsNonNone('не корректно')
+        CreatePZ.level_cement_direction = ProtectedIsNonNone('не корректно')
+        CreatePZ.column_direction_diametr =ProtectedIsNonNone('отсут')
+        CreatePZ.column_direction_wall_thickness = ProtectedIsNonNone('отсут')
+        CreatePZ.column_direction_lenght = ProtectedIsNonNone('отсут')
+        CreatePZ.level_cement_conductor = ProtectedIsNonNone('отсут')
+        CreatePZ.column_conductor_wall_thickness = ProtectedIsNonNone('отсут')
+        CreatePZ.column_conductor_lenght = ProtectedIsNonNone('отсут')
+        CreatePZ.column_diametr = ProtectedIsNonNone('не корректно')
+        CreatePZ.column_wall_thickness = ProtectedIsNonNone('не корректно')
+        CreatePZ.shoe_column = ProtectedIsNonNone('не корректно')
+        CreatePZ.level_cement_column = ProtectedIsNonNone('не корректно')
+        CreatePZ.pressuar_mkp = ProtectedIsNonNone('не корректно')
+        CreatePZ.column_additional_diametr = ProtectedIsNonNone('не корректно')
+        CreatePZ.column_additional_wall_thickness = ProtectedIsNonNone('не корректно')
+        CreatePZ.head_column_additional = ProtectedIsNonNone('не корректно')
+        CreatePZ.shoe_column_additional = ProtectedIsNonNone('не корректно')
+
         for row_index, row in enumerate(ws.iter_rows(min_row=begin_index, max_row=cancel_index)):
             row_index += begin_index
 
@@ -600,9 +638,11 @@ class Well_data(FindIndexPZ):
                         CreatePZ.bottomhole_drill = FindIndexPZ.definition_is_None(self, CreatePZ.bottomhole_drill,
                                                                                    row_index, col, 2)
 
-                        CreatePZ.bottomhole_artificial = ProtectedIsDigit(row[col + 2].value)
+                        CreatePZ.bottomhole_artificial = ProtectedIsDigit(row[col + 4].value)
+                        print(f'пробуренный забой {CreatePZ.bottomhole_artificial}')
                         CreatePZ.bottomhole_artificial = \
-                            FindIndexPZ.definition_is_None(self, CreatePZ.bottomhole_drill, row_index, col, 5)
+                            FindIndexPZ.definition_is_None(self, CreatePZ.bottomhole_artificial, row_index, col, 5)
+                        print(f'пробуренный забой {CreatePZ.bottomhole_artificial}')
 
                     elif 'зенитный угол' in str(value).lower():
                         CreatePZ.max_angle = ProtectedIsDigit(row[col + 4].value)
@@ -623,11 +663,13 @@ class Well_data(FindIndexPZ):
                             ws.cell(row=row_index + 1, column=col + 1).value != None and \
                             self.check_str_None(row[col + 3].value) != '0':
                         CreatePZ.column_direction_True = True
-
-                        for col1, cell in enumerate(row):
-                            if 'Уровень цемента' in str(cell.value):
-                                CreatePZ.level_cement_direction = ProtectedIsDigit(
-                                    str(row[col1 + 2].value.split('-')[0]).replace(" ", ""))
+                        if CreatePZ.column_direction_True:
+                            for col1, cell in enumerate(row):
+                                if 'Уровень цемента' in str(cell.value):
+                                    CreatePZ.level_cement_direction = ProtectedIsDigit(
+                                        str(row[col1 + 2].value.split('-')[0]).replace(" ", ""))
+                        else:
+                            CreatePZ.level_cement_direction = ProtectedIsNonNone('отсут')
                         try:
                             column_direction_data = row[col + 3].value.split('(мм),')
                             try:
@@ -680,7 +722,7 @@ class Well_data(FindIndexPZ):
                             try:
                                 try:
                                     CreatePZ.column_conductor_lenght = ProtectedIsDigit(
-                                        column_conductor_data[2].split('-')[1].replace('(м)', ''))
+                                        column_conductor_data[2].split('-')[1].replace('(м)', '').strip())
                                 except:
                                     CreatePZ.column_conductor_lenght = ProtectedIsDigit(
                                         str(column_conductor_data[2].replace('(м)', '')).strip())
@@ -723,7 +765,7 @@ class Well_data(FindIndexPZ):
                             CreatePZ.shoe_column = ProtectedIsNonNone('не корректно')
 
                     elif 'Уровень цемента за колонной' in str(value):
-                        CreatePZ.level_cement_column = ProtectedIsDigit(row[col + 1])
+                        CreatePZ.level_cement_column = ProtectedIsDigit(row[col + 3].value)
                         CreatePZ.level_cement_column = self.definition_is_None(CreatePZ.level_cement_column, row_index,
                                                                                col, 1)
                     elif 'Рмкп ( э/к и' in str(cell):
@@ -750,14 +792,22 @@ class Well_data(FindIndexPZ):
                                         ws.cell(row=row_index + 2, column=col + 4).value)
                                     # print(f' доп колонна {data_add_column}')
                                     CreatePZ.column_additional_diametr = ProtectedIsDigit(data_add_column[0])
-                                    CreatePZ.column_additional_wall_thickness = ProtectedIsDigit(data_add_column[1])
+
                                 except:
                                     CreatePZ.column_additional_diametr = ProtectedIsDigit(
                                         self.check_str_None(ws.cell(row=row_index + 2, column=col + 4).value))
+
+                                try:
+                                    data_add_column = self.check_str_None(
+                                        ws.cell(row=row_index + 2, column=col + 4).value)
+                                    CreatePZ.column_additional_wall_thickness = ProtectedIsDigit(data_add_column[1])
+                                except:
+
                                     CreatePZ.column_additional_wall_thickness = ProtectedIsDigit(
                                         self.check_str_None(ws.cell(row=row_index + 2, column=col + 6).value))
 
                             except:
+                                CreatePZ.column_additional_wall_thickness = ProtectedIsNonNone('не корректно')
                                 CreatePZ.column_additional_diametr = ProtectedIsNonNone('не корректно')
                         else:
                             CreatePZ.column_additional_diametr = ProtectedIsNonNone('отсут')
@@ -775,16 +825,16 @@ class Well_data(FindIndexPZ):
             CreatePZ.pause = True
             self.data_window = None
 
-        CreatePZ.nkt_diam = 73 if CreatePZ.column_diametr > 110 else 60
-        CreatePZ.nkt_template = 59.6 if CreatePZ.column_diametr > 110 else 47.9
+        CreatePZ.nkt_diam = 73 if CreatePZ.column_diametr._value > 110 else 60
+        CreatePZ.nkt_template = 59.6 if CreatePZ.column_diametr._value > 110 else 47.9
 
         if CreatePZ.column_additional:
-            if CreatePZ.current_bottom > CreatePZ.shoe_column_additional:
+            if CreatePZ.current_bottom > CreatePZ.shoe_column_additional._value:
                 CreatePZ.open_trunk_well = True
             else:
                 CreatePZ.open_trunk_well = False
         else:
-            if CreatePZ.current_bottom > CreatePZ.shoe_column:
+            if CreatePZ.current_bottom > CreatePZ.shoe_column._value:
                 CreatePZ.open_trunk_well = True
             else:
                 CreatePZ.open_trunk_well = False
@@ -1058,7 +1108,7 @@ class Well_Category(FindIndexPZ):
 
     def read_well(self, ws, begin_index, cancel_index):
         from open_pz import CreatePZ
-
+        print(f'индекс катего {begin_index, cancel_index}')
         for row in range(begin_index, cancel_index):
             for col in range(1, 13):
                 cell = ws.cell(row=row, column=col).value
@@ -1099,8 +1149,8 @@ class Well_Category(FindIndexPZ):
                             CreatePZ.gaz_f_pr.append(round(float(self.check_str_None(cell2)), 1))
                     elif '%' in str(cell):
                         cell2 = ws.cell(row=row, column=col - 1).value
-                        if cell2:
-                            CreatePZ.H2S_pr.append(float(str(self.check_str_None(cell2)).replace(',', '.')))
+                        print(f'проц {cell2}')
+                        CreatePZ.H2S_pr.append(float(str(self.check_str_None(cell2)).replace(',', '.')))
 
                     elif str(cell) in 'мг/м3':
                         cell2 = ws.cell(row=row, column=col - 1).value

@@ -178,7 +178,7 @@ class GeophysicWindow(MyWindow):
             [' ', None,
              f'Долить скважину до устья тех жидкостью уд.весом {CreatePZ.fluid_work} .Установить ПВО по схеме №8а утвержденной '
              f'главным инженером ООО "Ойл-сервис" от 14.10.2021г. Опрессовать  плашки  ПВО (на давление опрессовки ЭК, но '
-             f'не ниже максимального ожидаемого давления на устье) {CreatePZ.max_expected_pressure}атм, по невозможности на давление поглощения, но '
+             f'не ниже максимального ожидаемого давления на устье) {CreatePZ.max_expected_pressure._value}атм, по невозможности на давление поглощения, но '
              f'не менее 30атм в течении 30мин (ОПРЕССОВКУ ПВО ЗАФИКСИРОВАТЬ В ВАХТОВОМ ЖУРНАЛЕ). ',
              None, None, None, None, None, None, None,
              'Мастер КРС, подрядчик по ГИС', 1.2]
@@ -218,7 +218,7 @@ class GeophysicWindow(MyWindow):
             row = self.ins_ind + i
             self.table_widget.insertRow(row)
             # lst = [1, 0, 2, len(geophysicalResearch)-1]
-            # if float(CreatePZ.max_angle) >= 50:
+            # if float(CreatePZ.max_angle._value) >= 50:
             #     lst.extend([3, 4])
             # Объединение ячеек по горизонтали в столбце "отвественные и норма"
             self.table_widget.setSpan(i + self.ins_ind, 2, 1, 8)

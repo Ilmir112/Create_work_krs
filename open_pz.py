@@ -27,7 +27,7 @@ class CreatePZ(QMainWindow):
     gipsInWell = False
     grpPlan = False
     nktOpressTrue = False
-    bottomhole_drill = 0
+    bottomhole_drill = ProtectedIsNonNone('не корректно')
     open_trunk_well = False
     normOfTime = 0
     lift_ecn_can = False
@@ -51,16 +51,20 @@ class CreatePZ(QMainWindow):
     paker_diametr = 0
     cat_gaz_f_pr = []
     paker_layout = 0
+    column_direction_diametr = ProtectedIsNonNone('не корректно')
+    column_direction_wall_thickness = ProtectedIsNonNone('не корректно')
+    column_direction_lenght = ProtectedIsNonNone('не корректно')
+    level_cement_direction = ProtectedIsNonNone('не корректно')
 
-    column_additional_diametr = ProtectedIsDigit(0)
-    column_additional_wall_thickness = ProtectedIsDigit(0)
-    shoe_column_additional = ProtectedIsDigit(0)
+    column_additional_diametr = ProtectedIsNonNone('не корректно')
+    column_additional_wall_thickness = ProtectedIsNonNone('не корректно')
+    shoe_column_additional = ProtectedIsNonNone('не корректно')
     column_diametr = 0
     column_wall_thickness = 0
     shoe_column = 0
     bottomhole_artificial = 0
     max_expected_pressure = 0
-    head_column_additional = ProtectedIsDigit(0)
+    head_column_additional = ProtectedIsNonNone('не корректно')
     leakiness_Count = 0
     expected_pick_up = {}
     current_bottom = 0
@@ -279,8 +283,11 @@ class CreatePZ(QMainWindow):
             else:
                 CreatePZ.gipsInWell = False
 
-        # Копирование изображения
-        image_loader = SheetImageLoader(ws)
+        try:
+            # Копирование изображения
+            image_loader = SheetImageLoader(ws)
+        except:
+            mes = QMessageBox.warning(None,'Ошибка', 'Ошибка в копировании изображений')
 
         for row in range(1, CreatePZ.data_well_max._value):
             for col in range(1, 12):

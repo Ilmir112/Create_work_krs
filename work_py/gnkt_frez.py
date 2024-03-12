@@ -460,12 +460,12 @@ class Work_with_gnkt(QMainWindow):
         volume_vn_gnkt = round(30.2 ** 2 * 3.14 / (4 * 1000), 2)
         volume_gnkt = round(gnkt_lenght * volume_vn_gnkt / 1000, 1)
 
-        well_volume_ek = well_volume(self, CreatePZ.head_column_additional)
+        well_volume_ek = well_volume(self, CreatePZ.head_column_additional._value)
         well_volume_dp = well_volume(self, CreatePZ.current_bottom) - well_volume_ek
 
-        volume_pm_ek = round(3.14 * (CreatePZ.column_diametr - 2 * CreatePZ.column_wall_thickness) ** 2 / 4 / 1000, 2)
-        volume_pm_dp = round(3.14 * (CreatePZ.column_additional_diametr - 2 *
-                                     CreatePZ.column_additional_wall_thickness) ** 2 / 4 / 1000, 2)
+        volume_pm_ek = round(3.14 * (CreatePZ.column_diametr._value - 2 * CreatePZ.column_wall_thickness._value) ** 2 / 4 / 1000, 2)
+        volume_pm_dp = round(3.14 * (CreatePZ.column_additional_diametr._value - 2 *
+                                     CreatePZ.column_additional_wall_thickness._value) ** 2 / 4 / 1000, 2)
 
         schema_well_list = [
             ['СХЕМА СКВАЖИНЫ', None, None, None, None, None, None, None, None, None, None, None, None,
@@ -545,34 +545,34 @@ class Work_with_gnkt(QMainWindow):
              'Жидкость глушения', None, None, None, None, None, None, None, zhgs, None, None, 'в объеме', None, None,
              f'{28.9}м3', None],
             [None, None, None, None, None, None, 'Направление', None, None, None, None, None,
-             CreatePZ.column_direction_diametr, None, CreatePZ.column_direction_wall_thickness, None,
-             CreatePZ.column_direction_diametr - 2 * CreatePZ.column_direction_wall_thickness, None,
-             CreatePZ.column_direction_lenght, None, None, None, CreatePZ.level_cement_direction, None, None,
+             CreatePZ.column_direction_diametr._value, None, CreatePZ.column_direction_wall_thickness._value, None,
+             CreatePZ.column_direction_diametr - 2 * CreatePZ.column_direction_wall_thickness._value, None,
+             CreatePZ.column_direction_lenght, None, None, None, CreatePZ.level_cement_direction._value, None, None,
              None, None, None, None, None, None, 'Ожидаемый дебит',
              None, None, None, None, None, None, None, f'{CreatePZ.Qwater}м3/сут', None, None,
              f'{CreatePZ.Qoil}м3', None, None,
              f'{CreatePZ.proc_water}%', None],
             [None, None, None, None, None, None, 'Кондуктор', None, None, None, None, None,
-             CreatePZ.column_conductor_diametr, None, CreatePZ.column_conductor_wall_thickness, None,
-             CreatePZ.column_conductor_diametr - 2 * CreatePZ.column_conductor_wall_thickness,
-             None, CreatePZ.column_conductor_lenght, None, None, None, CreatePZ.level_cement_conductor,
+             CreatePZ.column_conductor_diametr._value, None, CreatePZ.column_conductor_wall_thickness._value, None,
+             CreatePZ.column_conductor_diametr._value - 2 * CreatePZ.column_conductor_wall_thickness._value,
+             None, CreatePZ.column_conductor_lenght._value, None, None, None, CreatePZ.level_cement_conductor._value,
              None, None, None, None, None, None, None, None,
              'Начало / окончание бурения', None, None, None, None, None, None, None,
              self.date_dmy(CreatePZ.date_drilling_run), None, None,
              self.date_dmy(CreatePZ.date_drilling_cancel), None, None, None,
              None],
             [None, None, None, None, None, None, 'Экспл. колонна', None, None, None, None, None,
-             CreatePZ.column_diametr, None, CreatePZ.column_wall_thickness, None,
-             CreatePZ.column_diametr - 2 * CreatePZ.column_wall_thickness, None, f'0-{CreatePZ.shoe_column}м', None,
+             CreatePZ.column_diametr._value, None, CreatePZ.column_wall_thickness._value, None,
+             CreatePZ.column_diametr._value - 2 * CreatePZ.column_wall_thickness._value, None, f'0-{CreatePZ.shoe_column._value}м', None,
              None,
-             None, CreatePZ.level_cement_column, None, None, None, volume_pm_ek, None, well_volume_ek,
+             None, CreatePZ.level_cement_column._value, None, None, None, volume_pm_ek, None, well_volume_ek,
              None, None, 'Р в межколонном пространстве', None, None, None, None, None, None, None,
              f'{0}атм', None, None, None, self.date_dmy(CreatePZ.date_drilling_cancel), None, None, None],
             [None, None, None, None, None, None, "Хвостовик  ''НТЦ ''ЗЭРС''", None, None, None, None,
-             None, CreatePZ.column_additional_diametr, None,
-             CreatePZ.column_additional_wall_thickness, None,
-             CreatePZ.column_additional_diametr - 2 * CreatePZ.column_additional_wall_thickness, None,
-             CreatePZ.head_column_additional, None, CreatePZ.shoe_column_additional, None, 'не цементиров.', None,
+             None, CreatePZ.column_additional_diametr._value, None,
+             CreatePZ.column_additional_wall_thickness._value, None,
+             CreatePZ.column_additional_diametr._value - 2 * CreatePZ.column_additional_wall_thickness._value, None,
+             CreatePZ.head_column_additional._value, None, CreatePZ.shoe_column_additional._value, None, 'не цементиров.', None,
              None, None, volume_pm_dp,
              None, well_volume_dp, None, None, 'Давление опрессовки МКП', None, None, None, None, None, None, None,
              None, None, None, None, None, None, None, None],
@@ -582,14 +582,14 @@ class Work_with_gnkt(QMainWindow):
              f'{lenght_nkt - 0.5 - 2.6 - 3}м', None, None, None,
              volume_vn_nkt(CreatePZ.dict_nkt), None, volume_vn_nkt(CreatePZ.dict_nkt) + 0.47, None, None,
              'Давление опрессовки ЭК ', None, None, None, None,
-             None, None, None, f'{CreatePZ.max_expected_pressure}атм', None, None,
+             None, None, None, f'{CreatePZ.max_expected_pressure._value}атм', None, None,
              None,
              None, None, 'гермет.', None],
             [None, None, None, None, None, None, 'Гидроякорь ', None, None, None, None, None, 122, None, None, None, 71,
              None, f'{lenght_nkt}', None, f'{lenght_nkt + 1}м', None, f'{0.5}м3', None, None, None, None, None, None,
              None,
              None, 'Макс. допустимое Р опр-ки ЭК', None, None, None, None, None, None, None,
-             CreatePZ.max_admissible_pressure, None, None, None,
+             CreatePZ.max_admissible_pressure._value, None, None, None,
              None, None, None, None],
             [None, None, None, None, None, None, 'Патрубок 1 шт.', None, None, None, None, None, nkt, None, 6.5, None,
              74.2, None, lenght_nkt - 5.6, None, f'{lenght_nkt - 2.6}м', None, f'{3}м', None, None, None, None,
@@ -1049,7 +1049,7 @@ class Work_with_gnkt(QMainWindow):
              f'При закрытой центральной задвижке фонтанной арматуры опрессовать ГНКТ и все нагнетательные '
              f'линии на 250атм. Опрессовать ПВО, обратные клапана и выкидную линию от устья скважины '
              f'до желобной ёмкости (надёжно закрепить, оборудовать дроссельными задвижками) опрессовать '
-             f'на {CreatePZ.max_admissible_pressure}атм с выдержкой 30мин. Результат опрессовки ПВО зафиксировать'
+             f'на {CreatePZ.max_admissible_pressure._value}атм с выдержкой 30мин. Результат опрессовки ПВО зафиксировать'
              f' в вахтовом журнале и '
              f'составить акт опрессовки ПВО. Установить на малом и большом затрубе технологический манометр. '
              f'Провести УТЗ и инструктаж. Опрессовку проводить в присутствии представителя ПФС, мастера, '

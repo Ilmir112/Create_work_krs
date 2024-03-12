@@ -3,6 +3,7 @@ from PyQt5.Qt import *
 from PyQt5.QtGui import QRegExpValidator, QColor, QPalette
 from perforation_correct import FloatLineEdit
 
+
 class TabPage_SO(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -660,6 +661,7 @@ class DataWindow(QMainWindow):
 
     def addRowTable(self):
         from open_pz import CreatePZ
+        from find import ProtectedIsNonNone, ProtectedIsDigit
 
         columnType = self.tabWidget.currentWidget().columnType.text()
         column_wall_thickness = self.tabWidget.currentWidget().column_wall_thicknessEditType2.text()
@@ -885,23 +887,23 @@ class DataWindow(QMainWindow):
         if close_file is False:
             return
         elif close_file == True:
-            CreatePZ.column_diametr = self.if_None(columnType)
-            CreatePZ.column_wall_thickness = self.if_None(column_wall_thickness)
-            CreatePZ.shoe_column = self.if_None(shoe_column)
-            CreatePZ.column_additional_diametr = self.if_None(column_additional_diametr)
-            CreatePZ.column_additional_wall_thickness = self.if_None(column_additional_wall_thickness)
-            CreatePZ.shoe_column_additional = self.if_None(shoe_column_additional)
-            CreatePZ.head_column_additional = self.if_None(head_column_additional)
+            CreatePZ.column_diametr = ProtectedIsDigit(self.if_None(columnType))
+            CreatePZ.column_wall_thickness = ProtectedIsDigit(self.if_None(column_wall_thickness))
+            CreatePZ.shoe_column = ProtectedIsDigit(self.if_None(shoe_column))
+            CreatePZ.column_additional_diametr = ProtectedIsDigit(self.if_None(column_additional_diametr))
+            CreatePZ.column_additional_wall_thickness = ProtectedIsDigit(self.if_None(column_additional_wall_thickness))
+            CreatePZ.shoe_column_additional = ProtectedIsDigit(self.if_None(shoe_column_additional))
+            CreatePZ.head_column_additional = ProtectedIsDigit(self.if_None(head_column_additional))
 
-            CreatePZ.bottomhole_drill = self.if_None(bottomhole_drill)
-            CreatePZ.bottomhole_artificial = self.if_None(bottomhole_artificial)
+            CreatePZ.bottomhole_drill = ProtectedIsDigit(self.if_None(bottomhole_drill))
+            CreatePZ.bottomhole_artificial = ProtectedIsDigit(self.if_None(bottomhole_artificial))
             CreatePZ.current_bottom = self.if_None(current_bottom)
             CreatePZ.bottom = self.if_None(current_bottom)
-            CreatePZ.max_angle = self.if_None(max_angle)
-            CreatePZ.max_expected_pressure = self.if_None(max_expected_pressure)
-            CreatePZ.max_admissible_pressure = self.if_None(max_admissible_pressure)
+            CreatePZ.max_angle = ProtectedIsDigit(self.if_None(max_angle))
+            CreatePZ.max_expected_pressure = ProtectedIsDigit(self.if_None(max_expected_pressure))
+            CreatePZ.max_admissible_pressure = ProtectedIsDigit(self.if_None(max_admissible_pressure))
 
-            # print(f'макс {CreatePZ.max_expected_pressure}')
+            # print(f'макс {CreatePZ.max_expected_pressure._value}')
             CreatePZ.dict_pump_SHGN["do"] = self.if_None(dict_pump_SHGN_do)
             CreatePZ.dict_pump_SHGN_h["do"] = self.if_None(dict_pump_SHGN_h_do)
             CreatePZ.dict_pump_SHGN_h["posle"] = self.if_None(dict_pump_SHGN_h_posle)
@@ -921,18 +923,18 @@ class DataWindow(QMainWindow):
             CreatePZ.depth_fond_paker2_do["do"] = self.if_None(depth_fond_paker2_do)
             CreatePZ.paker2_do["posle"] = self.if_None(paker2_posle)
             CreatePZ.depth_fond_paker2_do["posle"] = self.if_None(depth_fond_paker2_posle)
-            CreatePZ.static_level = self.if_None(static_level)
-            CreatePZ.dinamic_level = self.if_None(dinamic_level)
+            CreatePZ.static_level = ProtectedIsDigit(self.if_None(static_level))
+            CreatePZ.dinamic_level = ProtectedIsDigit(self.if_None(dinamic_level))
             # print(f' после ок {CreatePZ.dict_pump, CreatePZ.paker_do, CreatePZ.depth_fond_paker_do, CreatePZ.dict_pump_h}')
 
-            CreatePZ.column_direction_diametr = self.if_None(column_direction_diametr)
-            CreatePZ.column_direction_wall_thickness = self.if_None(column_direction_wall_thickness)
-            CreatePZ.column_direction_lenght = self.if_None(column_direction_lenght)
-            CreatePZ.level_cement_direction = self.if_None(level_cement_direction)
-            CreatePZ.column_conductor_diametr = self.if_None(column_conductor_diametr)
-            CreatePZ.column_conductor_wall_thickness = self.if_None(column_conductor_wall_thickness)
-            CreatePZ.column_conductor_lenght = self.if_None(column_conductor_lenght)
-            CreatePZ.level_cement_conductor = self.if_None(level_cement_conductor)
+            CreatePZ.column_direction_diametr = ProtectedIsDigit(self.if_None(column_direction_diametr))
+            CreatePZ.column_direction_wall_thickness = ProtectedIsDigit(self.if_None(column_direction_wall_thickness))
+            CreatePZ.column_direction_lenght = ProtectedIsDigit(self.if_None(column_direction_lenght))
+            CreatePZ.level_cement_direction = ProtectedIsDigit(self.if_None(level_cement_direction))
+            CreatePZ.column_conductor_diametr = ProtectedIsDigit(self.if_None(column_conductor_diametr))
+            CreatePZ.column_conductor_wall_thickness = ProtectedIsDigit(self.if_None(column_conductor_wall_thickness))
+            CreatePZ.column_conductor_lenght = ProtectedIsDigit(self.if_None(column_conductor_lenght))
+            CreatePZ.level_cement_conductor = ProtectedIsDigit(self.if_None(level_cement_conductor))
             if curator == 'ОР':
                 CreatePZ.expected_P = self.if_None(expected_P_edit)
                 CreatePZ.expected_Q = self.if_None(expected_Q_edit)

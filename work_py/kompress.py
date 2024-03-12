@@ -41,18 +41,18 @@ def kompress(self):
 
     nkt_diam = CreatePZ.nkt_diam
 
-    if CreatePZ.column_additional == False or CreatePZ.column_additional == True and voronka_depth < CreatePZ.head_column_additional:
+    if CreatePZ.column_additional == False or CreatePZ.column_additional == True and voronka_depth < CreatePZ.head_column_additional._value:
         paker_select = f'воронку + НКТ{nkt_diam} {round(voronka_depth-mufta1)}м + ПМ с отв 3мм + НКТ{nkt_diam} {round(mufta1-mufta2)}м ' \
                        f'+ ПМ с отв 2мм НКТ{nkt_diam} {round(mufta2-mufta3)}м + ПМ с отв 2мм '
         paker_short = f'в-ку + НКТ{nkt_diam} {round(voronka_depth - mufta1)}м + ПМ с отв 3мм + НКТ{nkt_diam} {round(mufta1 - mufta2)}м ' \
                        f'+ ПМ с отв 2мм НКТ{nkt_diam} {round(mufta2 - mufta3)}м + ПМ с отв 2мм '
         dict_nkt = {73: voronka_depth}
-    elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr < 110 and voronka_depth > CreatePZ.head_column_additional:
+    elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr._value < 110 and voronka_depth > CreatePZ.head_column_additional._value:
         paker_select = f'в-ку + НКТ{60} {round(voronka_depth - mufta1)}м + ПМ с отв 3мм + НКТ{nkt_diam} {round(mufta1 - mufta2)}м ' \
                        f'+ ПМ с отв 2мм НКТ{60} {round(mufta2 - mufta3)}м + ПМ с отв 2мм '
         paker_short = f'в-ку + НКТ{60} {round(voronka_depth - mufta1)}м + ПМ с отв 3мм + НКТ{nkt_diam} {round(mufta1 - mufta2)}м ' \
                        f'+ ПМ с отв 2мм НКТ{60} {round(mufta2 - mufta3)}м + ПМ с отв 2мм '
-        dict_nkt = {73: CreatePZ.head_column_additional, 60: int(voronka_depth - CreatePZ.head_column_additional)}
+        dict_nkt = {73: CreatePZ.head_column_additional._value, 60: int(voronka_depth - CreatePZ.head_column_additional._value)}
 
     paker_list = [
         [f'СПО {paker_short} на НКТ{nkt_diam}мм  воронкой до {voronka_depth}м Пусковые муфты на глубине {mufta1}м, {mufta2}м, {mufta3}м', None,
@@ -70,7 +70,7 @@ def kompress(self):
         [None, None,
          f'Произвести  монтаж ГИС согласно схемы  №8 при свабированиии утвержденной главным инженером от 14.10.2021г. '
          f'Обвязать устье скважины с ЕДК на жесткую линию. Опрессовать ПВО на максимально ожидаемое давление на устье '
-         f'{CreatePZ.max_expected_pressure}атм,'
+         f'{CreatePZ.max_expected_pressure._value}атм,'
          f' по невозможности на давление поглощения, но не менее 30атм в течении 30мин Провести практическое обучение вахт по '
          f'сигналу "выброс" с записью в журнале проведения учебных тревог',
          None, None, None, None, None, None, None,
