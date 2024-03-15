@@ -26,8 +26,8 @@ def claySolutionDef(self):
     volume_cement = round(volume_vn_ek(self, rirRoof) * (rirSole - rirRoof)/1000, 1)
     dict_nkt = {73: rirRoof}
     pero_list = [
-        [f'СПО {RirWindow.pero_select(self, rirSole)}  на тНКТ{nkt_diam}мм до {rirSole}м', None,
-         f'Спустить {RirWindow.pero_select(self, rirSole)}  на тНКТ{nkt_diam}мм до глубины {rirSole}м с замером, шаблонированием '
+        [f'СПО {RirWindow.pero_select(self, rirSole)}  на тНКТ{nkt_diam}м до {rirSole}м', None,
+         f'Спустить {RirWindow.pero_select(self, rirSole)}  на тНКТ{nkt_diam}м до глубины {rirSole}м с замером, шаблонированием '
          f'шаблоном {CreatePZ.nkt_template}мм. \n'
          f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
          None, None, None, None, None, None, None,
@@ -46,13 +46,13 @@ def claySolutionDef(self):
     rirPlan_quest = QMessageBox.question(self, 'Планировать ли РИР', 'Нужно ставить "висящий" мост в колонне')
     if rirPlan_quest  == QMessageBox.StandardButton.No:
         pero_list.append([None, None,
-         f'Поднять перо на тНКТ{nkt_diam}мм с глубины {rirSole}м с доливом скважины в объеме 1.1м3 тех. жидкостью '
+         f'Поднять перо на тНКТ{nkt_diam}м с глубины {rirSole}м с доливом скважины в объеме 1.1м3 тех. жидкостью '
          f'уд.весом {CreatePZ.fluid_work}',
          None, None, None, None, None, None, None,
          'мастер КРС', descentNKT_norm(rirRoof, 1)])
     else:
         pero_list.append([None, None,
-                          f'Поднять перо на тНКТ{nkt_diam}мм до глубины {rirRoof}м с доливом скважины в объеме 0.3м3 тех. жидкостью '
+                          f'Поднять перо на тНКТ{nkt_diam}м до глубины {rirRoof}м с доливом скважины в объеме 0.3м3 тех. жидкостью '
                           f'уд.весом {CreatePZ.fluid_work}',
                           None, None, None, None, None, None, None,
                           'мастер КРС', descentNKT_norm(float(rirSole)-float(rirRoof), 1)])

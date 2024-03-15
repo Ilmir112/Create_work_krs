@@ -343,7 +343,7 @@ class AcidPakerWindow(MyWindow):
              'мастер КРС', None],
             [None, None,
              f'Произвести  монтаж СВАБа согласно схемы  №8 при свабированиии утвержденной главным инженером от 14.10.2021г. '
-             f'Обвязать устье скважины с ЕДК на жесткую линию. Опрессовать ПВО на максимально ожидаемое давление на устье {CreatePZ.max_expected_pressure._value}атм,'
+             f'Обвязать устье скважины с ЕДК на жесткую линию. Опрессовать ПВО на максимально возможное давление на устье {CreatePZ.max_admissible_pressure._value}атм,'
              f' по невозможности на давление поглощения, но не менее 30атм в течении 30мин Провести практическое обучение вахт по '
              f'сигналу "выброс" с записью в журнале проведения учебных тревог',
              None, None, None, None, None, None, None,
@@ -590,11 +590,11 @@ class AcidPakerWindow(MyWindow):
                        [None, None,
                         ''.join(
                             [
-                                f'продавить кислоту тех жидкостью в объеме {round(volume_vn_nkt(dict_nkt) + 0.5, 1)}м3 при давлении не '
+                                f'продавить кислоту тех жидкостью в объеме {round(volume_vn_nkt(dict_nkt) * 1.5, 1)}м3 при давлении не '
                                 f'более {CreatePZ.max_admissible_pressure._value}атм. Увеличение давления согласовать'
                                 f' с заказчиком' if acid_volume_edit < volume_vn_nkt(
                                     dict_nkt) else f'продавить кислоту оставшейся кислотой в объеме {round(acid_volume_edit - volume_vn_nkt(dict_nkt), 1)}м3 и тех жидкостью '
-                                                   f'в объеме {round(volume_vn_nkt(dict_nkt) + 0.5, 1)}м3 при давлении не более {pressure_edit}атм. '
+                                                   f'в объеме {round(volume_vn_nkt(dict_nkt) * 1.5, 1)}м3 при давлении не более {pressure_edit}атм. '
                                                    f'Увеличение давления согласовать с заказчиком']),
                         None, None, None, None, None, None, None,
                         'мастер КРС', 6],

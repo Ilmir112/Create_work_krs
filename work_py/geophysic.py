@@ -54,7 +54,6 @@ class TabWidget(QTabWidget):
 class GeophysicWindow(MyWindow):
 
     def __init__(self, table_widget, ins_ind, parent=None):
-
         super(MyWindow, self).__init__(parent)
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
@@ -178,7 +177,7 @@ class GeophysicWindow(MyWindow):
             [' ', None,
              f'Долить скважину до устья тех жидкостью уд.весом {CreatePZ.fluid_work} .Установить ПВО по схеме №8а утвержденной '
              f'главным инженером ООО "Ойл-сервис" от 14.10.2021г. Опрессовать  плашки  ПВО (на давление опрессовки ЭК, но '
-             f'не ниже максимального ожидаемого давления на устье) {CreatePZ.max_expected_pressure._value}атм, по невозможности на давление поглощения, но '
+             f'не ниже максимального ожидаемого давления на устье) {CreatePZ.max_admissible_pressure._value}атм, по невозможности на давление поглощения, но '
              f'не менее 30атм в течении 30мин (ОПРЕССОВКУ ПВО ЗАФИКСИРОВАТЬ В ВАХТОВОМ ЖУРНАЛЕ). ',
              None, None, None, None, None, None, None,
              'Мастер КРС, подрядчик по ГИС', 1.2]

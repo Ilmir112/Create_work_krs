@@ -2,7 +2,7 @@
 import block_name
 import main
 import plan
-import krs
+
 
 from PIL import Image
 from datetime import datetime
@@ -13,12 +13,10 @@ from openpyxl.drawing.image import Image
 from openpyxl.utils.cell import get_column_letter
 from openpyxl.styles import Border, Side, PatternFill, Font, GradientFill, Alignment
 from collections import namedtuple
-
+from work_py.leakage_column import LeakageWindow
 from cdng import events_gnvp, itog_1, events_gnvp_gnkt
 from find import ProtectedIsDigit, ProtectedIsNonNone
-from work_py.gnkt_frez import Work_with_gnkt
-from find import FindIndexPZ, Well_perforation, Well_Category, Well_data, \
-    WellNkt, WellFond_data, WellCondition, WellHistory_data, WellSucker_rod, Well_expected_pick_up
+
 
 
 class CreatePZ(QMainWindow):
@@ -141,6 +139,7 @@ class CreatePZ(QMainWindow):
     rowHeights = []
     plast_project = []
     plast_work = []
+    leakage_window = None
 
     cat_P_P = []
     well_oilfield = 0
@@ -166,6 +165,7 @@ class CreatePZ(QMainWindow):
         self.ws = ws
         self.data_window = data_window
         self.perforation_correct_window2 = perforation_correct_window2
+
 
     def open_excel_file(self, ws, work_plan):
 
@@ -238,18 +238,6 @@ class CreatePZ(QMainWindow):
         CreatePZ.without_damping = thread.check_well_existence(
             CreatePZ.well_number._value, CreatePZ.well_area._value, CreatePZ.region)
 
-
-
-        if CreatePZ.leakiness == True:
-            leakiness_quest = QMessageBox.question(self, 'нарушение колонны',
-                                                   'Программа определела что в скважине'
-                                                   f'есть нарушение - {CreatePZ.leakiness_Count}, верно ли?')
-            if leakiness_quest == QMessageBox.StandardButton.Yes:
-                CreatePZ.leakiness = True
-                krs.get_leakiness(self)
-
-            else:
-                CreatePZ.leakiness = False
 
         if CreatePZ.emergency_well == True:
             emergency_quest = QMessageBox.question(self, 'Аварийные работы ',
@@ -367,7 +355,7 @@ class CreatePZ(QMainWindow):
             CreatePZ.ins_ind += len(dict_events_gnvp[work_plan]) - 1
 
             ws.row_dimensions[2].height = 30
-            ws.row_dimensions[6].height = 30
+            # ws.row_dimensions[6].height = 30
 
             if len(CreatePZ.row_expected) != 0:
                 for i in range(1, len(CreatePZ.row_expected) + 1):  # Добавление  показатели после ремонта
@@ -524,16 +512,25 @@ class CreatePZ(QMainWindow):
                             if value[0] <= len(text) <= value[1]:
                                 ws2.row_dimensions[i + 1].height = int(key)
 
+        head = plan.head_ind(0, ind_ins)
+        # print(f'head - {head}')
+
+        plan.copy_true_ws(ws, ws2, head)
+
         for i in range(1, len(work_list) + 1):  # Добавлением работ
             for j in range(1, 13):
                 cell = ws2.cell(row=i, column=j)
+
                 if cell and str(cell) != str(work_list[i - 1][j - 1]):
+
                     if str(work_list[i - 1][j - 1]).replace('.', '').isdigit() and \
                             str(work_list[i - 1][j - 1]).count('.') != 2:
+
                         cell.value = str(work_list[i - 1][j - 1]).replace('.', ',')
                         # print(f'цифры {cell.value}')
                     else:
                         cell.value = work_list[i - 1][j - 1]
+
                     if i >= ind_ins:
                         if j != 1:
                             cell.border = CreatePZ.thin_border
@@ -573,10 +570,7 @@ class CreatePZ(QMainWindow):
             ws2.merge_cells(start_column=value[0], start_row=value[1],
                             end_column=value[2], end_row=value[3])
 
-        head = plan.head_ind(0, ind_ins)
-        # print(f'head - {head}')
 
-        plan.copy_true_ws(ws, ws2, head)
 
         # вставка сохраненных изображение по координатам ячеек
         if CreatePZ.image_list:

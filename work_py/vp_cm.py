@@ -154,7 +154,7 @@ def czh(self):
             interval_list.append(interval)
 
     if CreatePZ.leakiness:
-        print(CreatePZ.dict_leakiness)
+      # print(CreatePZ.dict_leakiness)
         for nek in CreatePZ.dict_leakiness['НЭК']['интервал']:
             print(nek)
             if CreatePZ.dict_leakiness['НЭК']['интервал'][nek]['отключение'] == False:

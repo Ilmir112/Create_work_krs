@@ -55,7 +55,7 @@ class TabPage_SO(QWidget):
 
         plast_all = list(self.dict_perforation.keys())
 
-        print(self.dict_perforation)
+
 
         index_interval = 1
         for plast in plast_all:
@@ -146,6 +146,7 @@ class PerforationCorrect(QMainWindow):
         self.dict_perforation = CreatePZ.dict_perforation
 
 
+
         plast_all = list(self.dict_perforation.keys())
         index = 0
         for plast in plast_all:
@@ -158,7 +159,7 @@ class PerforationCorrect(QMainWindow):
                     # print(f'отключ {plast, self.tabWidget.currentWidget().labels_plast[index + 1][3].currentText()}')
                 else:
                     plast_oktl.append(False)
-                    print(f'отключ {plast, self.tabWidget.currentWidget().labels_plast[index + 1][3].currentText()}')
+                    # print(f'отключ {plast, self.tabWidget.currentWidget().labels_plast[index + 1][3].currentText()}')
 
                 if self.tabWidget.currentWidget().labels_plast[index + 1][4].currentText() == 'Прошаблонировано':
                     plast_templ.append(True)
@@ -172,9 +173,7 @@ class PerforationCorrect(QMainWindow):
                     plast_raid.append(False)
 
                 index += 1
-            print(f'отклю {plast, plast_oktl}')
-            print(f'шаблон {plast, plast_templ}')
-            print(f'райб {plast, plast_templ, all(plast_raid)}')
+
             if all([oktl is True for oktl in plast_oktl]):
                 CreatePZ.dict_perforation_short[plast]['отключение'] = True
                 CreatePZ.dict_perforation[plast]['отключение'] = True
@@ -189,11 +188,24 @@ class PerforationCorrect(QMainWindow):
                 CreatePZ.dict_perforation[plast]['отрайбировано'] = True
             else:
                 CreatePZ.dict_perforation[plast]['отрайбировано'] = False
-        print(f' интервалы ПВР после корректировки {CreatePZ.dict_perforation}')
+
 
         # self.labels_plast[index] = (plast_edit, roof_edit, sole_edit, plast_status_ComboBox,
         #                             template_status_ComboBox, raiding_status_ComboBox)
         CreatePZ.definition_plast_work(self)
+        CreatePZ.plast_work_short = CreatePZ.plast_work
+
+        if len(CreatePZ.plast_work) == 0:
+            perf_true_quest = QMessageBox.question(self, 'Программа',
+                                                   'Программа определили,что в скважине интервалов перфорации нет, верно ли?')
+            if perf_true_quest == QMessageBox.StandardButton.Yes:
+
+                CreatePZ.pause = False
+                self.close()
+                return
+            else:
+                CreatePZ.current_bottom, ok = QInputDialog.getDouble(self, 'Необходимый забой',
+                                                                     'Введите забой до которого нужно нормализовать')
         CreatePZ.pause = False
         self.close()
 

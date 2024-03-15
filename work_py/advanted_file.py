@@ -212,17 +212,7 @@ def remove_overlapping_intervals(perforating_intervals, skm_interval = None):
 def raiding_interval(ryber_key):
     from open_pz import CreatePZ
     str_raid = []
-    # if len(CreatePZ.dict_perforation) == 1 and CreatePZ.perforation_sole + 30 <= CreatePZ.current_bottom and \
-    #         CreatePZ.perforation_roof <= CreatePZ.current_bottom:
-    #     str_raid.append([CreatePZ.perforation_roof - 30, CreatePZ.perforation_sole + 30])
-    #     print(f' кровля {str_raid, CreatePZ.perforation_sole}')
-    # elif len(
-    #         CreatePZ.dict_perforation) == 1 and CreatePZ.perforation_sole + 30 >= CreatePZ.current_bottom and \
-    #         CreatePZ.perforation_roof <= CreatePZ.current_bottom:
-    #
-    #     str_raid.append([CreatePZ.perforation_roof - 30, CreatePZ.current_bottom])
 
-    # if len(CreatePZ.dict_perforation) > 1:
     for plast in CreatePZ.dict_perforation.keys():
         if plast in CreatePZ.plast_all:
 
@@ -254,7 +244,7 @@ def raiding_interval(ryber_key):
                         else:
                             crt = [float(interval[0]) - 20, CreatePZ.current_bottom]
                         str_raid.append(crt)
-    print(f'интерва hfq {str_raid}')
+
     if len(CreatePZ.drilling_interval) != 0:
         # print(CreatePZ.drilling_interval)
         for interval in CreatePZ.drilling_interval:
@@ -263,10 +253,8 @@ def raiding_interval(ryber_key):
                 str_raid.append((float(interval[0]) - 20, float(interval[1]) + 20))
             else:
                 str_raid.append((float(interval[0]) - 20, CreatePZ.current_bottom))
-
-    if CreatePZ.leakiness == True:
-        roof_leakiness = float(list(CreatePZ.dict_leakiness['НЭК']['интервал'].keys())[0][0])
-
+  # print(CreatePZ.leakiness)
+    if len(CreatePZ.dict_leakiness) != 0:
 
         for nek in list(CreatePZ.dict_leakiness['НЭК']['интервал'].keys()):
             if CreatePZ.dict_leakiness['НЭК']['интервал'][nek]['отрайбировано'] is False:
@@ -277,7 +265,7 @@ def raiding_interval(ryber_key):
                     crt = (float(nek[0]) - 30, CreatePZ.current_bottom)
                 str_raid.append(crt)
     # print(f' интервал райбире {str_raid}')
-    if CreatePZ.column_additional == True and CreatePZ.current_bottom > CreatePZ.head_column_additional._value:
+    if CreatePZ.column_additional is True and CreatePZ.current_bottom > CreatePZ.head_column_additional._value:
         if ryber_key == 'райбер в ЭК':
             # print(ryber_key)
             for str in str_raid:
@@ -289,30 +277,13 @@ def raiding_interval(ryber_key):
 
                 if str[0] < CreatePZ.head_column_additional._value or str[1] < CreatePZ.head_column_additional._value:
                     str_raid.remove(str)
-    pvlg_rir = QMessageBox.question(None, 'дополнительный интервал',
-                                    'Нужно ли дополнительно интервал прорабатывать?')
-
-    if pvlg_rir == QMessageBox.StandardButton.Yes:
-
-        skm_column, ok = QInputDialog.getText(None, 'Райбирование',
-                                              'Введите интервал райбирования через тире')
-
-        while '-' not in skm_column:
-            mes = QMessageBox.warning(None, 'Введены не корректные данные', 'Введены не корректные данные')
-            skm_column, ok = QInputDialog.getText(None, 'Райбирование',
-                                                  'Введите интервал райбирования через тире')
-            while skm_column.split('-')[0] >= skm_column.split('-')[1]:
-                mes = QMessageBox.warning(None, 'Введенны не корректные данные')
-                skm_column, ok = QInputDialog.getText(None, 'Райбирование',
-                                                      'Введите интервал райбирования через тире')
-        str_raid.append((int(skm_column.split('-')[0]), int(skm_column.split('-')[1])))
 
     merged_segments = merge_overlapping_intervals(str_raid)
 
     if CreatePZ.dict_leakiness:
         for nek in list(CreatePZ.dict_leakiness['НЭК']['интервал'].keys()):
             for str in str_raid:
-                print(str[0], list(nek)[0], str[1])
+                # print(str[0], list(nek)[0], str[1])
                 if str[0] <= list(nek)[0] <= str[1]:
                     CreatePZ.dict_leakiness['НЭК']['интервал'][nek]['отрайбировано'] = True
     if CreatePZ.plast_all:

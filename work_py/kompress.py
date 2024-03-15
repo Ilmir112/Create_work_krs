@@ -55,8 +55,8 @@ def kompress(self):
         dict_nkt = {73: CreatePZ.head_column_additional._value, 60: int(voronka_depth - CreatePZ.head_column_additional._value)}
 
     paker_list = [
-        [f'СПО {paker_short} на НКТ{nkt_diam}мм  воронкой до {voronka_depth}м Пусковые муфты на глубине {mufta1}м, {mufta2}м, {mufta3}м', None,
-         f'Спустить {paker_select} на НКТ{nkt_diam}мм  воронкой до {voronka_depth}м'
+        [f'СПО {paker_short} на НКТ{nkt_diam}м  воронкой до {voronka_depth}м Пусковые муфты на глубине {mufta1}м, {mufta2}м, {mufta3}м', None,
+         f'Спустить {paker_select} на НКТ{nkt_diam}м  воронкой до {voronka_depth}м'
          f' с замером, шаблонированием шаблоном {CreatePZ.nkt_template}мм. Пусковые муфты на глубине {mufta1}м, {mufta2}м, {mufta3}м,',
          None, None, None, None, None, None, None,
          'мастер КРС', round(
@@ -69,8 +69,8 @@ def kompress(self):
          'мастер КРС', None],
         [None, None,
          f'Произвести  монтаж ГИС согласно схемы  №8 при свабированиии утвержденной главным инженером от 14.10.2021г. '
-         f'Обвязать устье скважины с ЕДК на жесткую линию. Опрессовать ПВО на максимально ожидаемое давление на устье '
-         f'{CreatePZ.max_expected_pressure._value}атм,'
+         f'Обвязать устье скважины с ЕДК на жесткую линию. Опрессовать ПВО максимально допустимое давление опрессовки э/колонны на устье '
+         f'{CreatePZ.max_admissible_pressure._value}атм,'
          f' по невозможности на давление поглощения, но не менее 30атм в течении 30мин Провести практическое обучение вахт по '
          f'сигналу "выброс" с записью в журнале проведения учебных тревог',
          None, None, None, None, None, None, None,

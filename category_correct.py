@@ -112,8 +112,7 @@ class TabPage_SO(QWidget):
                 work_plast_iter = work_plast
 
             calc_plast_h2s = QLineEdit(self)
-            print(category_h2s_edit.text(),
-                                            H2S_mg_edit.text(), H2S_pr_edit.text())
+          # print(Category_h2s_edit.text(), H2S_mg_edit.text(), H2S_pr_edit.text())
             calc_plast_h2s.setText(str(calv_h2s(self, category_h2s_edit.text(),
                                             float(H2S_mg_edit.text()), float(H2S_pr_edit.text()))))
 

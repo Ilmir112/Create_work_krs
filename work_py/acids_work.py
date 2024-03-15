@@ -1,11 +1,13 @@
 from PyQt5.QtWidgets import QInputDialog, QMessageBox
 
 import main
+from krs import well_volume
 from selectPlast import CheckBoxDialog
+from work_py.rationingKRS import well_volume_norm
 
 
 def acid_work(self):
-    from work_py.opressovka import paker_diametr_select
+    from work_py.opressovka import OpressovkaEK
     from work_py.swabbing import swabbing_with_paker
     from open_pz import CreatePZ
     from work_py.alone_oreration import privyazkaNKT
@@ -45,10 +47,10 @@ def acid_work(self):
 
         nkt_diam = ''.join(['73' if CreatePZ.column_diametr._value > 110 else '60'])
         # print(f' 5 {CreatePZ.column_additional == False, (CreatePZ.column_additional == True and paker_depth < CreatePZ.head_column_additional._value), swabbing_true_quest == False}')
-        paker_diametr = paker_diametr_select(CreatePZ.paker_depth)
+        paker_diametr = OpressovkaEK.paker_diametr_select(CreatePZ.paker_depth)
         if (CreatePZ.column_additional == False and CreatePZ.swabbing_true_quest == True) or (CreatePZ.column_additional == True \
                 and CreatePZ.paker_depth < CreatePZ.head_column_additional._value and CreatePZ.swabbing_true_quest == True):
-            paker_select = f'воронку + НКТ{nkt_diam}мм {CreatePZ.paker_khost}м + пакер ПРО-ЯМО-{paker_diametr}мм (либо аналог) ' \
+            paker_select = f'воронку + НКТ{nkt_diam}м {CreatePZ.paker_khost}м + пакер ПРО-ЯМО-{paker_diametr}мм (либо аналог) ' \
                            f'для ЭК {CreatePZ.column_diametr._value}мм х {CreatePZ.column_wall_thickness._value}мм + НКТ 10м'
             dict_nkt = {73: CreatePZ.paker_depth + CreatePZ.paker_khost}
 
@@ -81,7 +83,7 @@ def acid_work(self):
 
         paker_list = [
             [None, None,
-             f'Спустить {paker_select} на НКТ{nkt_diam}мм до глубины {CreatePZ.paker_depth}м, воронкой до {CreatePZ.paker_depth + CreatePZ.CreatePZ.paker_khost}м'
+             f'Спустить {paker_select} на НКТ{nkt_diam}м до глубины {CreatePZ.paker_depth}м, воронкой до {CreatePZ.paker_depth + CreatePZ.CreatePZ.paker_khost}м'
              f' с замером, шаблонированием шаблоном {CreatePZ.nkt_template}мм. {("Произвести пробную посадку на глубине 50м" if CreatePZ.column_additional == False else "")} '
              ,
              None, None, None, None, None, None, None,
@@ -278,11 +280,11 @@ def acid_work_list(self, paker_depth, paker_khost, dict_nkt, paker_layout):
      'мастер КРС', None],
     [None, None,
      ''.join(
-         [f'продавить  кислоту тех жидкостью в объеме {round(volume_vn_nkt(dict_nkt) + 0.5, 1)}м3 при давлении не '
+         [f'продавить  кислоту тех жидкостью в объеме {round(volume_vn_nkt(dict_nkt) * 1.5, 1)}м3 при давлении не '
           f'более {CreatePZ.max_admissible_pressure._value}атм. Увеличение давления согласовать'
           f' с заказчиком' if CreatePZ.acid_V < volume_vn_nkt(
              dict_nkt) else f'продавить кислоту оставшейся кислотой в объеме {round(CreatePZ.acid_V - volume_vn_nkt(dict_nkt), 1)}м3 и тех жидкостью '
-                            f'в объеме {round(volume_vn_nkt(dict_nkt) + 0.5, 1)}м3 при давлении не более {CreatePZ.max_admissible_pressure._value}атм. '
+                            f'в объеме {round(volume_vn_nkt(dict_nkt) * 1.5, 1)}м3 при давлении не более {CreatePZ.max_admissible_pressure._value}атм. '
                             f'Увеличение давления согласовать с заказчиком']),
      None, None, None, None, None, None, None,
      'мастер КРС', None],

@@ -16,7 +16,7 @@ def swabbing_opy(self):
             CreatePZ.column_diametr._value > 110 and CreatePZ.column_additional == True and CreatePZ.head_column_additional._value < depth_opy == True) else '60'])
 
     if CreatePZ.column_additional == False or CreatePZ.column_additional == True and CreatePZ.current_bottom < CreatePZ.head_column_additional._value and CreatePZ.head_column_additional._value > 600:
-        paker_select = f'воронку со свабоограничителем + НКТ{nkt_diam}м  + НКТ 10м + репер'
+        paker_select = f'воронку со свабоограничителем + НКТ{nkt_diam}  + НКТ 10м + репер'
         dict_nkt = {73: depth_opy}
     elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr._value < 110 and CreatePZ.current_bottom >= CreatePZ.head_column_additional._value:
         paker_select = f'воронку со свабоограничителем + НКТ60мм 10м + репер +НКТ60мм {round(CreatePZ.current_bottom - CreatePZ.head_column_additional._value + 10, 0)}м'
@@ -30,7 +30,7 @@ def swabbing_opy(self):
 
     paker_list = [
         [None, None,
-         f'Спустить {paker_select} на НКТ{nkt_diam}мм  до глубины {CreatePZ.current_bottom}м'
+         f'Спустить {paker_select} на НКТ{nkt_diam}м  до глубины {CreatePZ.current_bottom}м'
          f' с замером, шаблонированием шаблоном {CreatePZ.nkt_template}мм. ',
          None, None, None, None, None, None, None,
          'мастер КРС', descentNKT_norm(CreatePZ.current_bottom, 1)],
@@ -53,7 +53,7 @@ def swabbing_opy(self):
          'мастер КРС', None],
         [None, None,
          f'Произвести  монтаж СВАБа согласно схемы  №8 при свабированиии утвержденной главным инженером от 14.10.2021г. '
-         f'Обвязать устье скважины с ЕДК на жесткую линию. Опрессовать ПВО на максимально ожидаемое давление на устье {CreatePZ.max_admissible_pressure._value}атм,'
+         f'Обвязать устье скважины с ЕДК на жесткую линию. Опрессовать ПВО максимально допустимое давление опрессовки э/колонны на устье {CreatePZ.max_admissible_pressure._value}атм,'
          f' по невозможности на давление поглощения, но не менее 30атм в течении 30мин Провести практическое обучение вахт по '
          f'сигналу "выброс" с записью в журнале проведения учебных тревог',
          None, None, None, None, None, None, None,
@@ -167,10 +167,10 @@ def swabbing_with_paker(self, paker_khost, pakerKompo):
     if CreatePZ.column_additional == False or (CreatePZ.column_additional == True and \
             paker_depth < CreatePZ.head_column_additional._value and CreatePZ.head_column_additional._value > 800) or \
             (CreatePZ.column_additional_diametr._value < 110 and paker_depth > CreatePZ.head_column_additional._value):
-        paker_select = f'воронку со свабоограничителем + НКТ{nkt_diam}м {paker_khost}м + пакер ' \
+        paker_select = f'воронку со свабоограничителем + НКТ{nkt_diam} {paker_khost}м + пакер ' \
                        f'ПРО-ЯМО-{paker_diametr}мм (либо аналог) ' \
                        f'для ЭК {CreatePZ.column_diametr._value}мм х {CreatePZ.column_wall_thickness._value}мм + НКТ 10м'
-        paker_short = f'в/ку со с/о + НКТ{nkt_diam}м {paker_khost}м + пакер ПРО-ЯМО-{paker_diametr}мм + НКТ 10м + репер'
+        paker_short = f'в/ку со с/о + НКТ{nkt_diam} {paker_khost}м + пакер ПРО-ЯМО-{paker_diametr}мм + НКТ 10м + репер'
 
         dict_nkt = {int(nkt_diam): paker_depth + paker_khost}
     elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr._value < 110 and paker_depth > CreatePZ.head_column_additional._value:
@@ -191,9 +191,9 @@ def swabbing_with_paker(self, paker_khost, pakerKompo):
         dict_nkt = {60: paker_depth + paker_khost}
 
     paker_list = [
-        [f'СПО {paker_short} на НКТ{nkt_diam}мм до H- {paker_depth}м, воронкой до {paker_depth + paker_khost}м',
+        [f'СПО {paker_short} на НКТ{nkt_diam}м до H- {paker_depth}м, воронкой до {paker_depth + paker_khost}м',
          None,
-         f'Спустить {paker_select} на НКТ{nkt_diam}мм до глубины {paker_depth}м, воронкой до {paker_depth + paker_khost}м'
+         f'Спустить {paker_select} на НКТ{nkt_diam}м до глубины {paker_depth}м, воронкой до {paker_depth + paker_khost}м'
          f' с замером, шаблонированием шаблоном {CreatePZ.nkt_template}мм.'
          f' {("Произвести пробную посадку на глубине 50м" if CreatePZ.column_additional == False else "")} '
          f'ПРИ ОТСУТСТВИИ ЦИРКУЛЯЦИИ ПРЕДУСМОТРЕТЬ НАЛИЧИИ В КОМПОНОВКЕ УРАВНИТЕЛЬНЫХ КЛАПАНОВ',
@@ -221,9 +221,9 @@ def swabbing_with_paker(self, paker_khost, pakerKompo):
          None, None, None, None, None, None, None,
          'мастер КРС', None],
         [None, None,
-         f'Произвести  монтаж СВАБа согласно схемы  №8 при свабированиии утвержденной главным инженером от 14.10.2021г. '
-         f'Обвязать устье скважины с ЕДК на жесткую линию. Опрессовать ПВО на максимально ожидаемое '
-         f'давление на устье {CreatePZ.max_expected_pressure._value}атм,'
+         f'Произвести  монтаж СВАБа согласно схемы  №8 при свабированиии утвержденной главным инженером от 14.10.2021г.'
+         f'Обвязать устье скважины с ЕДК на жесткую линию. Опрессовать ПВО на максимально допустимое '
+         f'давление на устье {CreatePZ.max_admissible_pressure._value}атм,'
          f' по невозможности на давление поглощения, но не менее 30атм в течении 30мин Провести '
          f'практическое обучение вахт по '
          f'сигналу "выброс" с записью в журнале проведения учебных тревог',
@@ -343,11 +343,11 @@ def swabbing_with_2paker(self):
                 CreatePZ.column_diametr._value > 110 and CreatePZ.column_additional == True and CreatePZ.head_column_additional._value > 700) else '60'])
     paker_diametr = TabPage_SO.paker_diametr_select(self, paker1_depth)
     if CreatePZ.column_additional is False or CreatePZ.column_additional is True and paker1_depth < float(CreatePZ.head_column_additional._value) and  float(CreatePZ.head_column_additional._value) > 600:
-        paker_select = f'заглушка + НКТ{nkt_diam}м {paker_khost}м + пакер ПРО-ЯМО-{paker_diametr}мм (либо аналог) ' \
+        paker_select = f'заглушка + НКТ{nkt_diam} {paker_khost}м + пакер ПРО-ЯМО-{paker_diametr}мм (либо аналог) ' \
                        f'для ЭК {CreatePZ.column_diametr._value}мм х {CreatePZ.column_wall_thickness._value}мм + щелевой фильтр + ' \
                        f'НКТ l-{round(paker1_depth-paker2_depth,0)} + пакер ПУ для ЭК ' \
                        f'{CreatePZ.column_diametr._value}мм х {CreatePZ.column_wall_thickness._value}мм + НКТ{nkt_diam} 20мм + репер'
-        paker_short = f'заглушка + НКТ{nkt_diam}м {paker_khost}м + пакер ПРО-ЯМО-{paker_diametr}мм  + щелевой фильтр + ' \
+        paker_short = f'заглушка + НКТ{nkt_diam} {paker_khost}м + пакер ПРО-ЯМО-{paker_diametr}мм  + щелевой фильтр + ' \
                        f'НКТ l-{round(paker1_depth-paker2_depth,0)} + пакер ПУ  + НКТ{nkt_diam} 20мм + репер'
         dict_nkt = {73: paker1_depth + paker_khost}
     elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr._value < 110 and paker1_depth > float(CreatePZ.head_column_additional._value):
@@ -375,7 +375,7 @@ def swabbing_with_2paker(self):
 
     paker_list = [
         [f'Спуск {paker_short} до глубины {paker1_depth}/{paker2_depth}м', None,
-         f'Спустить {paker_select} на НКТ{nkt_diam}мм до глубины {paker1_depth}/{paker2_depth}м'
+         f'Спустить {paker_select} на НКТ{nkt_diam}м до глубины {paker1_depth}/{paker2_depth}м'
          f' с замером, шаблонированием шаблоном {CreatePZ.nkt_template}мм. {("Произвести пробную посадку на глубине 50м" if CreatePZ.column_additional == False else "")} '
          f'ПРИ ОТСУТСТВИИ ЦИРКУЛЯЦИИ ПРЕДУСМОТРЕТЬ НАЛИЧИИ В КОМПОНОВКЕ УРАВНИТЕЛЬНЫХ КЛАПАНОВ',
          None, None, None, None, None, None, None,
@@ -404,7 +404,7 @@ def swabbing_with_2paker(self):
          'мастер КРС', None],
         [None, None,
          f'Произвести  монтаж СВАБа согласно схемы  №8 при свабированиии утвержденной главным инженером от 14.10.2021г. '
-         f'Обвязать устье скважины с ЕДК на жесткую линию. Опрессовать ПВО на максимально ожидаемое давление на устье {CreatePZ.max_expected_pressure._value}атм,'
+         f'Обвязать устье скважины с ЕДК на жесткую линию. Опрессовать ПВО на максимально допустимое давление на устье {CreatePZ.max_admissible_pressure._value}атм,'
          f' по невозможности на давление поглощения, но не менее 30атм в течении 30мин Провести практическое обучение вахт по '
          f'сигналу "выброс" с записью в журнале проведения учебных тревог',
          None, None, None, None, None, None, None,
@@ -499,8 +499,8 @@ def swabbing_with_voronka(self):
     nkt_diam = ''.join(['73' if CreatePZ.column_diametr._value > 110 else '60'])
 
     if CreatePZ.column_additional == False or CreatePZ.column_additional == True and paker_depth < CreatePZ.head_column_additional._value:
-        paker_select = f'воронку + свабоограничитель  НКТ{nkt_diam}м +репер + НКТ 10м'
-        paker_short = f'в/у + со с/о НКТ{nkt_diam}м +репер + НКТ 10м'
+        paker_select = f'воронку + свабоограничитель  НКТ{nkt_diam} +репер + НКТ 10м'
+        paker_short = f'в/у + со с/о НКТ{nkt_diam} +репер + НКТ 10м'
         dict_nkt = {73: paker_depth}
     elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr._value < 110 and \
             paker_depth > CreatePZ.head_column_additional._value:
@@ -511,7 +511,7 @@ def swabbing_with_voronka(self):
 
     paker_list = [
         [paker_short, None,
-         f'Спустить {paker_select} на НКТ{nkt_diam}мм  воронкой до {paker_depth}м'
+         f'Спустить {paker_select} на НКТ{nkt_diam}м  воронкой до {paker_depth}м'
          f' с замером, шаблонированием шаблоном {CreatePZ.nkt_template}мм. ',
          None, None, None, None, None, None, None,
          'мастер КРС', round(
@@ -525,8 +525,8 @@ def swabbing_with_voronka(self):
          'мастер КРС', None],
         [None, None,
          f'Произвести  монтаж СВАБа согласно схемы  №8 при свабированиии утвержденной главным инженером от 14.10.2021г. '
-         f'Обвязать устье скважины с ЕДК на жесткую линию. Опрессовать ПВО на максимально ожидаемое давление на устье '
-         f'{CreatePZ.max_expected_pressure._value}атм,'
+         f'Обвязать устье скважины с ЕДК на жесткую линию. Опрессовать ПВО на максимально допустимое давление на устье '
+         f'{CreatePZ.max_admissible_pressure._value}атм,'
          f' по невозможности на давление поглощения, но не менее 30атм в течении 30мин Провести практическое обучение вахт по '
          f'сигналу "выброс" с записью в журнале проведения учебных тревог',
          None, None, None, None, None, None, None,

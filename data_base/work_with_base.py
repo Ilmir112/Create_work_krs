@@ -353,7 +353,7 @@ class Classifier_well(QMainWindow):
                     if index_row > 18:
                         break
                 print(region_name, version_year)
-                print(check_param)
+              # print(Check_param)
                 if check_param in region_name:
                     mes = QMessageBox.warning(self, 'ВНИМАНИЕ ОШИБКА',
                                               f'регион выбрано корректно  {region_name}')

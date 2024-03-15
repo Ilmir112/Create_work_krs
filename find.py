@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QInputDialog, QMainWindow, QMessageBox
 from category_correct import CategoryWindow
 from data_correct import DataWindow
 from perforation_correct import PerforationCorrect
+from work_py.leakage_column import LeakageWindow
 
 
 class ProtectedIsDigit():
@@ -57,6 +58,7 @@ class FindIndexPZ(QMainWindow):
         self.readPZ(ws)
         self.data_window = None
         self.perforation_correct_window2 = None
+
     def readPZ(self, ws):
         from open_pz import CreatePZ
 
@@ -230,24 +232,22 @@ class FindIndexPZ(QMainWindow):
 
     def definition_is_None(self, data, row, col, step, m=12):
         try:
-            print(data._value, data._value is None, row, col, step, m)
+
             data = data._value
             while data is None or step == m:
                 data = self.ws.cell(row=row, column=col + step).value
-                print(f'в цикле {data}')
+
                 step += 1
-                print(f'цикл {data, row, col, step, m}')
 
             return ProtectedIsNonNone(data)
         except:
-            print(f'не защище {data, row, col}, {step, m}')
-            while str(data) is str(None):
 
+            while data is None:
                 data = self.ws.cell(row=row, column=col + step).value
-                # print(f'{data} - col')
-                step += 1
+
                 if step == m:
                     break
+                step += 1
 
             return data
 
@@ -333,6 +333,7 @@ class WellSucker_rod(FindIndexPZ):
             CreatePZ.sucker_mistake = True
             mes = QMessageBox.warning(self, 'Ошибка', 'Программа не смогла определить диаметры и длину штанг')
 
+
 class WellFond_data(FindIndexPZ):
 
     def __init__(self, ws):
@@ -344,17 +345,14 @@ class WellFond_data(FindIndexPZ):
     def read_well(self, ws, begin_index, cancel_index):
         from open_pz import CreatePZ
 
-        # print(begin_index, cancel_index)
         CreatePZ.old_index = 1
         for row_index, row in enumerate(ws.iter_rows(min_row=begin_index, max_row=cancel_index)):
             row_index += begin_index
             for col, cell in enumerate(row):
-
                 value = cell.value
                 if value:
                     if 'карта спуска' in str(value).lower():
                         col_plan = col
-
                     if 'до ремонта' in str(value).lower() and row_index < 6 + begin_index:
                         col_do = col
 
@@ -372,7 +370,6 @@ class WellFond_data(FindIndexPZ):
                             CreatePZ.paker_do["posle"] = row[col_plan].value
 
                     elif value == 'Насос' and row[col + 2].value == 'типоразмер':
-                        # print([ind.value for ind in row])
                         if row[col_do].value:
                             if ('НВ' in str(row[col_do].value).upper() or 'ШГН' in str(row[col_do].value).upper() \
                                 or 'НН' in str(row[col_do].value).upper()) or 'RHAM' in str(row[col_do].value).upper():
@@ -418,12 +415,14 @@ class WellFond_data(FindIndexPZ):
                             if CreatePZ.paker_do["posle"] != 0:
                                 CreatePZ.depth_fond_paker_do["posle"] = row[col_plan].value
 
+
 class WellHistory_data(FindIndexPZ):
 
     def __init__(self, ws):
         from open_pz import CreatePZ
 
         super().__init__(ws)
+        self.leakage_window = None
         self.ws = ws
         self.read_well(self.ws, CreatePZ.data_pvr_max._value, CreatePZ.data_fond_min._value)
 
@@ -440,13 +439,13 @@ class WellHistory_data(FindIndexPZ):
 
                     if 'нэк' in str(value).lower() or 'негерм' in str(
                             value).lower() or 'нарушение э' in str(
-                            value).lower() or \
+                        value).lower() or \
                             'нарушение г' in str(value).lower():
                         CreatePZ.leakiness_Count += 1
                         CreatePZ.leakiness = True
                     if ('авар' in str(
                             value).lower() or 'расхаж' in str(
-                            value).lower() or 'лар' in str(value).lower()) \
+                        value).lower() or 'лар' in str(value).lower()) \
                             and 'акт о расследовании аварии прилагается' not in str(value).lower():
                         CreatePZ.emergency_well = True
                         CreatePZ.emergency_count += 1
@@ -467,11 +466,38 @@ class WellHistory_data(FindIndexPZ):
                         CreatePZ.max_expected_pressure = self.definition_is_None(
                             CreatePZ.max_expected_pressure, row_index + begin_index, col + 1, 1)
 
-                    elif 'Максимально допустимое давление опрессовки э/колонны' == value \
-                            or 'Максимально допустимое давление на э/колонну' == value:
+                    elif 'Максимально допустимое давление'.lower() in str(value).lower():
                         CreatePZ.max_admissible_pressure = ProtectedIsDigit(row[col + 1].value)
                         CreatePZ.max_admissible_pressure = self.definition_is_None(
                             CreatePZ.max_admissible_pressure, row_index + begin_index, col + 1, 1)
+
+        if CreatePZ.leakiness == True:
+            leakiness_quest = QMessageBox.question(self, 'нарушение колонны',
+                                                   'Программа определела что в скважине'
+                                                   f'есть нарушение - {CreatePZ.leakiness_Count}, верно ли?')
+            if leakiness_quest == QMessageBox.StandardButton.Yes:
+                CreatePZ.leakiness = True
+                if self.leakage_window is None:
+                    self.leakage_window = LeakageWindow()
+                    self.leakage_window.setWindowTitle("Геофизические исследования")
+                    self.leakage_window.setGeometry(200, 400, 300, 400)
+                    self.leakage_window.show()
+
+                    CreatePZ.pause_app(self)
+                    CreatePZ.dict_leakiness = self.leakage_window.addWork()
+                    # print(f'словарь нарушений {CreatePZ.dict_leakiness}')
+                    CreatePZ.pause = True
+                    self.leakage_window = None  # Discard reference.
+
+
+                else:
+                    self.leakage_window.close()  # Close window.
+                    self.leakage_window = None  # Discard reference.
+
+
+            else:
+                CreatePZ.leakiness = False
+
 
 class WellCondition(FindIndexPZ):
 
@@ -496,7 +522,8 @@ class WellCondition(FindIndexPZ):
                 value = cell.value
 
                 if 'нэк' in str(
-                        value).lower() or 'негерм' in str(value).lower() or 'нарушение э' in str(value).lower() or 'нарушение г' in str( value).lower():
+                        value).lower() or 'негерм' in str(value).lower() or 'нарушение э' in str(
+                    value).lower() or 'нарушение г' in str(value).lower():
                     CreatePZ.leakiness_Count += 1
                     CreatePZ.leakiness = True
                 if ('авар' in str(value).lower() or 'расхаж' in str(value).lower() or 'лар' in str(value)) \
@@ -505,7 +532,10 @@ class WellCondition(FindIndexPZ):
                     CreatePZ.emergency_count += 1
                 if value:
                     if "Hст " in str(value):
-                        CreatePZ.static_level = ProtectedIsDigit(row[col + 1].value)
+                        if '/' in str(row[col + 1].value):
+                            CreatePZ.static_level = ProtectedIsDigit(row[col + 1].value.split('/')[0])
+                        else:
+                            CreatePZ.static_level = ProtectedIsDigit(row[col + 1].value)
                     if "грп" in str(value).lower():
                         CreatePZ.grpPlan = True
 
@@ -534,6 +564,7 @@ class WellCondition(FindIndexPZ):
             else:
                 CreatePZ.grpPlan = False
 
+
 class Well_expected_pick_up(FindIndexPZ):
 
     def __init__(self, ws):
@@ -556,8 +587,9 @@ class Well_expected_pick_up(FindIndexPZ):
 
                     if 'прием' in str(value).lower() or 'qж' in str(value).lower():
                         CreatePZ.expected_Q = row[col + 1].value
-                        # print(row_index, col +1)
+                      # print(CreatePZ.expected_Q)
                         CreatePZ.expected_Q = self.definition_is_None(CreatePZ.expected_Q, row_index, col + 1, 1)
+                        print(f'после {CreatePZ.expected_Q}')
                     if 'зак' in str(value).lower() or 'давл' in str(value).lower() or 'p' in str(value).lower():
                         CreatePZ.expected_P = row[col + 1].value
                         CreatePZ.expected_P = self.definition_is_None(CreatePZ.expected_P, row_index, col + 1, 1)
@@ -571,13 +603,15 @@ class Well_expected_pick_up(FindIndexPZ):
                         CreatePZ.Qoil = self.definition_is_None(CreatePZ.Qoil, row_index, col + 1, 1)
                     if 'воды' in str(value).lower():
                         proc_water = str(row[col + 1].value).replace(' ', '').replace('%', '')
-                        proc_water = int(float(proc_water)) if float(proc_water) > 1 else round(float(proc_water) * 100, 0)
+                        proc_water = int(float(proc_water)) if float(proc_water) > 1 else round(float(proc_water) * 100,
+                                                                                                0)
                         CreatePZ.proc_water = self.definition_is_None(proc_water, row_index, col + 1, 1)
 
             try:
                 CreatePZ.expected_pick_up[CreatePZ.expected_Q] = CreatePZ.expected_P
             except:
                 print('Ошибка в определении ожидаемых показателей')
+
 
 class Well_data(FindIndexPZ):
 
@@ -601,7 +635,7 @@ class Well_data(FindIndexPZ):
         CreatePZ.max_angle_H = ProtectedIsNonNone('не корректно')
         CreatePZ.stol_rotora = ProtectedIsNonNone('не корректно')
         CreatePZ.level_cement_direction = ProtectedIsNonNone('не корректно')
-        CreatePZ.column_direction_diametr =ProtectedIsNonNone('отсут')
+        CreatePZ.column_direction_diametr = ProtectedIsNonNone('отсут')
         CreatePZ.column_direction_wall_thickness = ProtectedIsNonNone('отсут')
         CreatePZ.column_direction_lenght = ProtectedIsNonNone('отсут')
         CreatePZ.level_cement_conductor = ProtectedIsNonNone('отсут')
@@ -666,20 +700,23 @@ class Well_data(FindIndexPZ):
                         if CreatePZ.column_direction_True:
                             for col1, cell in enumerate(row):
                                 if 'Уровень цемента' in str(cell.value):
-                                    CreatePZ.level_cement_direction = ProtectedIsDigit(
-                                        str(row[col1 + 2].value.split('-')[0]).replace(" ", ""))
+                                    if 'уст' in str(row[col1 + 2].value).lower():
+                                        CreatePZ.level_cement_direction = ProtectedIsDigit(0)
+                                    else:
+                                        CreatePZ.level_cement_direction = ProtectedIsDigit(
+                                            str(row[col1 + 2].value.split('-')[0]).replace(" ", ""))
                         else:
                             CreatePZ.level_cement_direction = ProtectedIsNonNone('отсут')
                         try:
                             column_direction_data = row[col + 3].value.split('(мм),')
                             try:
                                 CreatePZ.column_direction_diametr = ProtectedIsDigit(column_direction_data[0])
-
                             except:
                                 CreatePZ.column_direction_diametr = ProtectedIsNonNone('не корректно')
 
                             try:
-                                CreatePZ.column_direction_wall_thickness = ProtectedIsDigit(column_direction_data[0])
+                                CreatePZ.column_direction_wall_thickness = ProtectedIsDigit(
+                                    column_direction_data[1].replace(' ', ''))
                             except:
                                 CreatePZ.column_direction_wall_thickness = ProtectedIsNonNone('не корректно')
                             try:
@@ -702,9 +739,13 @@ class Well_data(FindIndexPZ):
 
                         for col1, cell in enumerate(row):
                             if 'Уровень цемента' in str(cell.value):
+
                                 try:
-                                    CreatePZ.level_cement_conductor = ProtectedIsDigit(
-                                        str(row[col1 + 2].value.split('-')[0]).replace(' ', ''))
+                                    if 'уст' in str(row[col1 + 2].value).lower():
+                                        CreatePZ.level_cement_conductor = ProtectedIsDigit(0)
+                                    else:
+                                        CreatePZ.level_cement_conductor = ProtectedIsDigit(
+                                            str(row[col1 + 2].value.split('-')[0]).replace(' ', ''))
                                 except:
                                     CreatePZ.level_cement_conductor = ProtectedIsNonNone('не корректно')
                         try:
@@ -853,18 +894,18 @@ class Well_perforation(FindIndexPZ):
         from krs import is_number, calculationFluidWork
 
         CreatePZ.old_version = True
-        print(begin_index, cancel_index)
+        col_old_open_index = 0
         bokov_stvol = False
         osnov_stvol = False
-        for row in ws.iter_rows(min_row=begin_index + 1, max_row=cancel_index+2, values_only=True):
+        for row in ws.iter_rows(min_row=begin_index + 1, max_row=cancel_index + 2, values_only=True):
             # print(row)
             for col_index, column in enumerate(row):
-                if 'оризонт'.lower() in str(column).lower() or 'пласт/'.lower() in str(column).lower() :
+                if 'оризонт'.lower() in str(column).lower() or 'пласт/'.lower() in str(column).lower():
                     col_plast_index = col_index - 1
-                    # print(f'пласт {col_plast_index}')
+                    print(f'пласт {col_plast_index}')
                 if 'по вертикали'.lower() in str(column).lower():
                     col_vert_index = col_index - 1
-                    # print(f'вер {col_index}')
+                    print(f'вер {col_index}')
                 if 'кровля'.lower() in str(column).lower():
                     col_roof_index = col_index - 1
                     # print(f'кров {col_index}')
@@ -897,31 +938,36 @@ class Well_perforation(FindIndexPZ):
         if osnov_stvol is True and bokov_stvol is True:
             mes = QMessageBox.warning(self, 'ОШИБКА', 'Ошибка в определении рабочий интервалов перфорации')
             begin_index = QInputDialog.getInt(self, 'Индекс начала', 'ВВедите индекс начала рабочих интервалов ПВР',
-                                                  0, 0, 300)[0] - 3
+                                              0, 0, 300)[0] - 3
 
             cancel_index = QInputDialog.getInt(self, 'Индекс начала',
-                                                   'ВВедите индекс окончания рабочих интервалов ПВР', 0, 0, 300)[0] - 2
+                                               'ВВедите индекс окончания рабочих интервалов ПВР', 0, 0, 300)[0] - 2
 
-        # print(f'основн {osnov_stvol, bokov_stvol}')
-        # print(begin_index, cancel_index)
         perforations_intervals = []
         for row_index, row in enumerate(
-                ws.iter_rows(min_row=begin_index + 3, max_row=cancel_index + 2)):  # Сортировка интервала перфорации
+                ws.iter_rows(min_row=begin_index + 3, max_row=cancel_index + 2)):
             lst = []
-            # print(row[col_roof_index].value)
-            if str(row[col_roof_index+1].value).replace('.', '').replace(',', '').isdigit():
-                for col in row[1:13]:
-                    cell = col.value
-                    lst.append(cell)
 
+            if str(row[col_roof_index + 1].value).replace('.', '').replace(',', '').isdigit():
+                if row[1].value != None:
+                    plast = row[1].value
+                    lst.append(plast)
+                else:
+                    lst.append(plast)
+
+                for col in row[2:13]:
+
+                    lst.append(col.value)
 
             if all([str(i).strip() == 'None' or i is None for i in lst]) is False:
                 perforations_intervals.append(lst)
-        # print(perforations_intervals)
-        for ind, row in enumerate(sorted(perforations_intervals, key=lambda x: float(str(x[2]).replace(',', '.')))):
+        print(perforations_intervals)
+        for ind, row in enumerate(perforations_intervals):
             plast = row[col_plast_index]
+            print(f'пласт {plast}')
             if plast is None:
                 plast = perforations_intervals[ind - 1][col_plast_index]
+            print(f'пластs {plast}')
 
             if any(['проект' in str((i)).lower() or 'не пер' in str((i)).lower() for i in row]) is False and all(
                     [str(i).strip() is None for i in row]) is False and is_number(row[col_roof_index]) is True \
@@ -945,6 +991,7 @@ class Well_perforation(FindIndexPZ):
                     (roof_int, sole_int))
                 # for interval in list(CreatePZ.dict_perforation[plast]["интервал"]):
                 # print(interval)
+
                 # print(f' эни {(interval[0],(roof_int, sole_int), interval[1])}, {interval[0] < roof_int < interval[1] or interval[0] < sole_int < interval[1]}')
                 if any([interval[0] < roof_int < interval[1] or interval[0] < sole_int < interval[1] for interval in
                         list(CreatePZ.dict_perforation[plast]['интервал'])]):
@@ -986,14 +1033,15 @@ class Well_perforation(FindIndexPZ):
                                 CreatePZ.dict_perforation_short[plast]['интервал'].discard((roof_int, sole_int))
 
                 CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('вскрытие', set()).add(row[col_open_index])
-                try:
+
+                if col_old_open_index != col_open_index:
                     if row[col_close_index] is None or row[col_close_index] == '-':
                         CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('отключение', False)
                         CreatePZ.dict_perforation_short.setdefault(plast, {}).setdefault('отключение', False)
                     else:
                         CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('отключение', True)
                         CreatePZ.dict_perforation_short.setdefault(plast, {}).setdefault('отключение', True)
-                except:
+                else:
                     if isinstance(row[col_old_open_index], datetime):
                         CreatePZ.dict_perforation.setdefault(plast, {}).setdefault('отключение', False)
                         CreatePZ.dict_perforation_short.setdefault(plast, {}).setdefault('отключение', False)
@@ -1022,7 +1070,7 @@ class Well_perforation(FindIndexPZ):
                     [str(i).strip() is None for i in row]) == False and is_number(row[col_roof_index]) is True \
                     and is_number(
                 float(
-                    str(row[col_roof_index]).replace(',', '.'))) is True:  # Определение проектных интервалов перфорации
+                    str(row[col_roof_index]).replace(',', '.'))) is True: # Определение проектных интервалов перфорации
                 roof_int = round(float(str(row[col_roof_index]).replace(',', '.')), 1)
                 sole_int = round(float(str(row[col_sole_index]).replace(',', '.')), 1)
                 print(roof_int, sole_int)
@@ -1042,7 +1090,6 @@ class Well_perforation(FindIndexPZ):
         if len(CreatePZ.dict_perforation_project) != 0:
             CreatePZ.plast_project = list(CreatePZ.dict_perforation_project.keys())
 
-
         if self.perforation_correct_window2 is None:
             self.perforation_correct_window2 = PerforationCorrect(self)
             self.perforation_correct_window2.setWindowTitle("Сверка данных перфорации")
@@ -1060,42 +1107,6 @@ class Well_perforation(FindIndexPZ):
         if len(CreatePZ.dict_perforation_project) != 0:
             CreatePZ.plast_project = list(CreatePZ.dict_perforation_project.keys())
 
-        if len(CreatePZ.plast_work) == 0:
-            perf_true_quest = QMessageBox.question(self, 'Программа',
-                                                   'Программа определили,что в скважине интервалов перфорации нет, верно ли?')
-            if perf_true_quest == QMessageBox.StandardButton.Yes:
-                for plast in CreatePZ.plast_all:
-                    CreatePZ.dict_perforation[plast]['отключение'] = True
-                    CreatePZ.dict_perforation[plast]['отрайбировано'] = False
-                    CreatePZ.dict_perforation[plast]['Прошаблонировано'] = False
-                    CreatePZ.dict_perforation_short = {}
-
-            else:
-                plast_work = set()
-                CreatePZ.current_bottom, ok = QInputDialog.getDouble(self, 'Необходимый забой',
-                                                                     'Введите забой до которого нужно нормализовать')
-                for plast, value in CreatePZ.dict_perforation.items():
-
-                    perf_work_quest = QMessageBox.question(self, 'Добавление работающих интервалов перфорации',
-                                                           f'Является ли данный интервал {CreatePZ.dict_perforation[plast]["интервал"]} работающим?')
-                    if perf_work_quest == QMessageBox.StandardButton.No:
-                        CreatePZ.dict_perforation[plast]['отключение'] = True
-                    else:
-                        plast_work.add(plast)
-                        CreatePZ.dict_perforation[plast]['отключение'] = False
-                    CreatePZ.dict_perforation[plast]['отрайбировано'] = False
-                    CreatePZ.dict_perforation[plast]['Прошаблонировано'] = False
-                CreatePZ.plast_work = list(plast_work)
-                # print(f'все интервалы {CreatePZ.plast_all}')
-                # print(f'раб интервалы {CreatePZ.plast_work}')
-                CreatePZ.perforation_roof = CreatePZ.current_bottom
-                for plast in CreatePZ.plast_work:
-                    for interval in CreatePZ.dict_perforation[plast]['интервал']:
-                        interval = list(interval)
-                        if CreatePZ.perforation_roof > interval[0]:
-                            CreatePZ.perforation_roof = interval[0]
-        CreatePZ.definition_plast_work(self)
-        CreatePZ.plast_work_short = CreatePZ.plast_work
 
 class Well_Category(FindIndexPZ):
 
@@ -1104,7 +1115,6 @@ class Well_Category(FindIndexPZ):
 
         super(Well_Category, self).__init__(ws)
         self.read_well(ws, CreatePZ.cat_well_min._value, CreatePZ.data_well_min._value)
-
 
     def read_well(self, ws, begin_index, cancel_index):
         from open_pz import CreatePZ
@@ -1118,10 +1128,10 @@ class Well_Category(FindIndexPZ):
                         for column in range(1, 13):
                             col = ws.cell(row=row, column=column).value
                             # print(col)
-                            if str(col) in ['атм'] and ws.cell(row=row, column=column-2).value:
-                                CreatePZ.cat_P_1.append(ws.cell(row=row, column=column-2).value)
-                                print(CreatePZ.cat_P_P)
-                                CreatePZ.cat_P_P.append(ws.cell(row=row, column=column-1).value)
+                            if str(col) in ['атм'] and ws.cell(row=row, column=column - 2).value:
+                                CreatePZ.cat_P_1.append(ws.cell(row=row, column=column - 2).value)
+                              # print(CreatePZ.cat_P_P)
+                                CreatePZ.cat_P_P.append(ws.cell(row=row, column=column - 1).value)
 
                     elif 'по H2S' in str(cell) and 'по H2S' not in str(
                             ws.cell(row=row - 1, column=2).value):
@@ -1168,8 +1178,13 @@ class Well_Category(FindIndexPZ):
             self.data_window.close()
             self.data_window = None
 
+        if len(CreatePZ.H2S_pr) == 0:
+            mes = QMessageBox.warning(self, 'Ошибка', 'Программа не смогла найти данные по содержания '
+                                                      'сероводорода в процентах')
+            H2S_pr, _ = QInputDialog.getDouble(self, 'сероводород в процентах',
+                                               'Введите значение серовородода в процентах', 0, 0, 100, 5)
 
-
+            CreatePZ.H2S_pr.append(H2S_pr)
 
 # wb = load_workbook('Копия 358 ПНЛГ  (Толбазинское 358) ПНЛГ на Дпаш.xlsx', data_only=True)
 # name_list = wb.sheetnames

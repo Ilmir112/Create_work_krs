@@ -263,9 +263,9 @@ def calv_h2s(self, cat_H2S, H2S_mg, H2S_pr):
         volume_h2s = CreatePZ.gaz_f_pr[0] * oil_mass * (float(H2S_pr))/100
 
         h2s_mass_in_oil = (34*volume_h2s*1000/22.14)
-        print(type(vodoiz_sucker), type(vodoiz_nkt), H2S_mg, float(H2S_mg))
+        # print(type(vodoiz_sucker), type(vodoiz_nkt), H2S_mg, float(H2S_mg))
         h2s_mass_in_water = float(vodoiz_sucker + vodoiz_nkt) * H2S_mg
-        print(f'h2a{h2s_mass_in_water}')
+        # print(f'h2a{h2s_mass_in_water}')
         mass_oil_pog_gno = (vodoiz_sucker+vodoiz_nkt) * (100-CreatePZ.proc_water)*0.9/100
         h2s_volume_pod_gno = mass_oil_pog_gno* CreatePZ.gaz_f_pr[0]*H2S_pr/100
         mass_h2s_gas = 34*h2s_volume_pod_gno/22.14

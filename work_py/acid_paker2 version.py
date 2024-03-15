@@ -175,7 +175,7 @@ class AcidPakerWindow(MyWindow):
         swabTrueEditType = [True if swabTrueEditType == 'Нужно освоение' else False][0]
         svk_true_edit = [False if swabTrueEditType == 'без СКВ' else False][0]
         paker_diametr = paker_diametr_select(pakerEdit)
-        print(CreatePZ.column_additional == False, swabTrueEditType == True)
+      # print(CreatePZ.column_additional == False, swabTrueEditType == True)
         if (CreatePZ.column_additional == False and swabTrueEditType == True) or (CreatePZ.column_additional == True \
                                                                                   and pakerEdit < CreatePZ.head_column_additional._value and swabTrueEditType == True):
             paker_select = f'воронку + НКТ{CreatePZ.nkt_diam}мм {khvostEdit}м + пакер ПРО-ЯМО-{paker_diametr}мм (либо аналог) ' \
@@ -319,11 +319,11 @@ class AcidPakerWindow(MyWindow):
                        [None, None,
                         ''.join(
                             [
-                                f'продавить кислоту тех жидкостью в объеме {round(volume_vn_nkt(dict_nkt) + 0.5, 1)}м3 при давлении не '
+                                f'продавить кислоту тех жидкостью в объеме {round(volume_vn_nkt(dict_nkt) * 1.5, 1)}м3 при давлении не '
                                 f'более {CreatePZ.max_admissible_pressure._value}атм. Увеличение давления согласовать'
                                 f' с заказчиком' if acid_volume_edit < volume_vn_nkt(
                                     dict_nkt) else f'продавить кислоту оставшейся кислотой в объеме {round(acid_volume_edit - volume_vn_nkt(dict_nkt), 1)}м3 и тех жидкостью '
-                                                   f'в объеме {round(volume_vn_nkt(dict_nkt) + 0.5, 1)}м3 при давлении не более {CreatePZ.max_admissible_pressure._value}атм. '
+                                                   f'в объеме {round(volume_vn_nkt(dict_nkt) * 1.5, 1)}м3 при давлении не более {CreatePZ.max_admissible_pressure._value}атм. '
                                                    f'Увеличение давления согласовать с заказчиком']),
                         None, None, None, None, None, None, None,
                         'мастер КРС', None],

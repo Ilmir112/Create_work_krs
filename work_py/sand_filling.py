@@ -30,8 +30,8 @@ def sandFilling(self):
 
 
     filling_list = [
-        [f'Спустить  {sand_select(self)}  на НКТ{nkt_diam}мм до глубины {round(CreatePZ.current_bottom-100,0)}м', None,
-     f' Спустить  {sand_select(self)}  на НКТ{nkt_diam}мм до глубины {round(CreatePZ.current_bottom-100,0)}м с замером, '
+        [f'Спустить  {sand_select(self)}  на НКТ{nkt_diam}м до глубины {round(CreatePZ.current_bottom-100,0)}м', None,
+     f' Спустить  {sand_select(self)}  на НКТ{nkt_diam}м до глубины {round(CreatePZ.current_bottom-100,0)}м с замером, '
      f'шаблонированием шаблоном {CreatePZ.nkt_template}мм. (При СПО первых десяти НКТ на '
      f'спайдере дополнительно устанавливать элеватор ЭХЛ)',
      None, None, None, None, None, None, None,
@@ -67,7 +67,7 @@ def sandFilling(self):
          None, None, None, None, None, None, None,
          'мастер КРС', None],
         [None, None,
-         f'Поднять {sand_select(self)} НКТ{nkt_diam}мм с глубины {filling_depth}м с доливом скважины в объеме {round(filling_depth * 1.12/1000,1)}м3 тех. жидкостью  уд.весом {CreatePZ.fluid_work}',
+         f'Поднять {sand_select(self)} НКТ{nkt_diam}м с глубины {filling_depth}м с доливом скважины в объеме {round(filling_depth * 1.12/1000,1)}м3 тех. жидкостью  уд.весом {CreatePZ.fluid_work}',
          None, None, None, None, None, None, None,
          'мастер КРС', liftingNKT_norm(filling_depth,1)]
     ]
@@ -115,7 +115,7 @@ def sandWashing(self):
                                                 CreatePZ.current_bottom, 0, 6000, 1)
     washingOut_list = [
         [f'СПО пера до {round(CreatePZ.current_bottom,0)}м', None,
-     f' Спустить  {sand_select(self)}  на НКТ{nkt_diam}мм до глубины {round(CreatePZ.current_bottom,0)}м с замером, '
+     f' Спустить  {sand_select(self)}  на НКТ{nkt_diam}м до глубины {round(CreatePZ.current_bottom,0)}м с замером, '
      f'шаблонированием шаблоном {CreatePZ.nkt_template}мм. '
      f'(При СПО первых десяти НКТ на '
      f'спайдере дополнительно устанавливать элеватор ЭХЛ)',
@@ -128,7 +128,7 @@ def sandWashing(self):
          None, None, None, None, None, None, None,
          'мастер КРС', 3.5],
         [None, None,
-         f'Поднять {sand_select(self)} НКТ{nkt_diam}мм с глубины {washingDepth}м с доливом скважины в объеме {round(washingDepth * 1.12 / 1000, 1)}м3 тех. '
+         f'Поднять {sand_select(self)} НКТ{nkt_diam}м с глубины {washingDepth}м с доливом скважины в объеме {round(washingDepth * 1.12 / 1000, 1)}м3 тех. '
          f'жидкостью  уд.весом {CreatePZ.fluid_work}',
          None, None, None, None, None, None, None,
          'мастер КРС', liftingNKT_norm(washingDepth, 1.2)]]

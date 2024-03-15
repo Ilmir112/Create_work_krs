@@ -5,12 +5,10 @@ from krs import volume_vn_ek, volume_vn_nkt, well_volume
 
 from main import MyWindow
 from work_py.alone_oreration import fluid_change
-from work_py.drilling import drilling_nkt
-from work_py.raiding import Raid
+
 from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm,well_volume_norm
 from work_py.sand_filling import sandFilling, sand_select, sandWashing
 from work_py.acid_paker import CheckableComboBox, AcidPakerWindow
-
 
 
 
@@ -381,7 +379,7 @@ class RirWindow(QMainWindow):
                     CreatePZ.dict_leakiness['НЭК']['интервал'][nek]['отключение'] = True
             print(f"при {CreatePZ.dict_leakiness['НЭК']['интервал'][nek]['отключение']}")
 
-        print(CreatePZ.dict_leakiness)
+      # print(CreatePZ.dict_leakiness)
 
         print(f' пласта рабоче {CreatePZ.plast_work}')
         # CreatePZ.definition_plast_work(self)
@@ -425,7 +423,7 @@ class RirWindow(QMainWindow):
 
         uzmPero_list = [
             [f' СПО пера до глубины {sole_rir_edit}м Опрессовать НКТ на 200атм', None,
-             f'Спустить {self.pero_select(sole_rir_edit)}  на тНКТ{nkt_diam}мм до глубины {sole_rir_edit}м с '
+             f'Спустить {self.pero_select(sole_rir_edit)}  на тНКТ{nkt_diam}м до глубины {sole_rir_edit}м с '
              f'замером, шаблонированием '
              f'шаблоном {CreatePZ.nkt_template}мм. Опрессовать НКТ на 200атм. Вымыть шар. \n'
              f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
@@ -483,7 +481,7 @@ class RirWindow(QMainWindow):
              None, None, None, None, None, None, None,
              'мастер КРС', 0.67],
             [None, None,
-             f'Поднять перо на тНКТ{nkt_diam}мм с глубины {roof_rir_edit}м с доливом скважины в объеме 2,2м3 тех. жидкостью '
+             f'Поднять перо на тНКТ{nkt_diam}м с глубины {roof_rir_edit}м с доливом скважины в объеме 2,2м3 тех. жидкостью '
              f'уд.весом {CreatePZ.fluid_work}',
              None, None, None, None, None, None, None,
              'мастер КРС', descentNKT_norm(roof_rir_edit, 1)],
@@ -505,7 +503,7 @@ class RirWindow(QMainWindow):
             rir_list = []
             rirPero_list = [
                 [f'СПО пера до глубины {sole_rir_edit}м. Опрессовать НКТ на 200атм', None,
-                 f'Спустить {self.pero_select(sole_rir_edit)}  на тНКТ{nkt_diam}мм до глубины {sole_rir_edit}м '
+                 f'Спустить {self.pero_select(sole_rir_edit)}  на тНКТ{nkt_diam}м до глубины {sole_rir_edit}м '
                  f'с замером, шаблонированием '
                  f'шаблоном {CreatePZ.nkt_template}мм. Опрессовать НКТ на 200атм. Вымыть шар. \n'
                  f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
@@ -573,7 +571,7 @@ class RirWindow(QMainWindow):
                  None, None, None, None, None, None, None,
                  'мастер КРС', 0.67],
                 [None, None,
-                 f'Поднять перо на тНКТ{nkt_diam}мм с глубины {roof_rir_edit}м с доливом скважины в объеме '
+                 f'Поднять перо на тНКТ{nkt_diam}м с глубины {roof_rir_edit}м с доливом скважины в объеме '
                  f'{round(roof_rir_edit * 1.12 / 1000, 1)}м3 тех. жидкостью '
                  f'уд.весом {CreatePZ.fluid_work}',
                  None, None, None, None, None, None, None,

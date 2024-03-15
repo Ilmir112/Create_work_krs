@@ -193,6 +193,8 @@ class MyWindow(QMainWindow):
 
         self.initUI()
         self.new_window = None
+        self.raid_window = None
+        self.leakage_window = None
         self.correct_window = None
         self.acid_windowPaker = None
         self.work_window = None
@@ -589,14 +591,14 @@ class MyWindow(QMainWindow):
 
         try:
             # Открываем файл
-            full_path = "полный_путь_к_файлу.xlsx"
+
             workbook = excel.Workbooks.Open(full_path)
 
             # Выбираем активный лист
             worksheet = workbook.ActiveSheet
 
-            # # Назначаем область печати с колонок B до L
-            # worksheet.PageSetup.PrintArea = "B:L"
+            # Назначаем область печати с колонок B до L
+            worksheet.PageSetup.PrintArea = "B:L"
 
         except Exception as e:
             print(f"Ошибка при работе с Excel: {e}")
@@ -648,8 +650,9 @@ class MyWindow(QMainWindow):
             plan_short = ''
 
             for i in range(1, len(work_list)):  # нумерация работ
-                if i >= ins_ind + 2:
-                    work_list[i][1] = i - 1 - ins_ind
+
+                if i >= ins_ind + 1:
+                    work_list[i][1] = i - ins_ind
                     if krs.is_number(work_list[i][11]) == True:
                         CreatePZ.normOfTime += float(str(work_list[i][11]).replace(',', '.'))
                     if work_list[i][0]:
@@ -858,7 +861,7 @@ class MyWindow(QMainWindow):
             CreatePZ.image_list = []
             CreatePZ.problem_with_ek = False
             CreatePZ.problem_with_ek_depth = CreatePZ.current_bottom
-            CreatePZ.problem_with_ek_diametr = CreatePZ.column_diametr._value
+            CreatePZ.problem_with_ek_diametr = CreatePZ.column_diametr
             path = "imageFiles/image_work"
             for file in os.listdir(path):
                 file_path = os.path.join(path, file)
@@ -1124,9 +1127,20 @@ class MyWindow(QMainWindow):
         drilling_work_list = frezer_ports(self)
         self.populate_row(self.ins_ind, drilling_work_list, self.table_widget)
     def drilling_action_nkt(self):
-        from work_py.drilling import drilling_nkt
-        drilling_work_list = drilling_nkt(self)
-        self.populate_row(self.ins_ind, drilling_work_list, self.table_widget)
+        from open_pz import CreatePZ
+        from work_py.drilling import Drill_window
+        if self.raid_window is None:
+            self.raid_window = Drill_window(self.table_widget, self.ins_ind)
+            self.raid_window.setGeometry(200, 400, 300, 400)
+            self.raid_window.show()
+            CreatePZ.pause_app(self)
+            ryber_work_list = self.raid_window.addWork()
+            CreatePZ.pause = True
+            self.populate_row(CreatePZ.ins_ind, ryber_work_list, self.table_widget)
+            self.raid_window = None
+        else:
+            self.raid_window.close()  # Close window.
+            self.raid_window = None
 
     def magnet_action(self):
         from work_py.emergencyWork import magnetWork
@@ -1363,10 +1377,21 @@ class MyWindow(QMainWindow):
 
     def ryberAdd(self):
         from work_py.raiding import Raid
+        from open_pz import CreatePZ
 
-        print('Вставился райбер')
-        ryber_work_list = Raid.raidingColumn(self)
-        self.populate_row(self.ins_ind, ryber_work_list, self.table_widget)
+        if self.raid_window is None:
+            self.raid_window = Raid(self.table_widget, self.ins_ind)
+            self.raid_window.setGeometry(200, 400, 300, 400)
+            self.raid_window.show()
+            CreatePZ.pause_app(self)
+            ryber_work_list = self.raid_window.addWork()
+            CreatePZ.pause = True
+            self.populate_row(CreatePZ.ins_ind, ryber_work_list, self.table_widget)
+            self.raid_window = None
+        else:
+            self.raid_window.close()  # Close window.
+            self.raid_window = None
+
 
     def gnkt_after_grp(self):
         from gnkt_after_grp import gnkt_work
@@ -1663,12 +1688,17 @@ class MyWindow(QMainWindow):
 
     def GeophysicalNewWindow(self):
         from work_py.geophysic import GeophysicWindow
+        from open_pz import CreatePZ
 
         if self.new_window is None:
             self.new_window = GeophysicWindow(self.table_widget, self.ins_ind)
             self.new_window.setWindowTitle("Геофизические исследования")
             self.new_window.setGeometry(200, 400, 300, 400)
             self.new_window.show()
+            CreatePZ.pause_app(self)
+            CreatePZ.pause = True
+            self.new_window = None  # Discard reference.
+
 
         else:
             self.new_window.close()  # Close window.
@@ -1677,38 +1707,21 @@ class MyWindow(QMainWindow):
     def correctPVR(self):
         from perforation_correct import PerforationCorrect
         from open_pz import CreatePZ
-        plast_work = set()
+
         CreatePZ.current_bottom, ok = QInputDialog.getDouble(self, 'Необходимый забой',
                                                              'Введите забой до которого нужно нормализовать')
-        for plast, value in CreatePZ.dict_perforation.items():
-            for interval in value['интервал']:
-                if CreatePZ.current_bottom >= interval[0]:
-                    perf_work_quest = QMessageBox.question(self, 'Добавление работающих интервалов перфорации',
-                                                           f'Является ли данный интервал {CreatePZ.dict_perforation[plast]["интервал"]} работающим?')
-                    if perf_work_quest == QMessageBox.StandardButton.No:
-                        CreatePZ.dict_perforation[plast]['отключение'] = True
-                    else:
-                        plast_work.add(plast)
-                        CreatePZ.dict_perforation[plast]['отключение'] = False
-                elif CreatePZ.perforation_roof <= interval[0] and CreatePZ.dict_perforation[plast][
-                    "отключение"] == False:
-                    CreatePZ.perforation_roof = interval[0]
-                elif CreatePZ.perforation_sole >= interval[1] and CreatePZ.dict_perforation[plast][
-                    "отключение"] == False:
-                    CreatePZ.perforation_sole = interval[1]
-                # elif CreatePZ.perforation_roof_all <= interval[0]:
-                #     CreatePZ.perforation_roof_all = interval[0]
-                break
-
         if self.perforation_correct_window2 is None:
             self.perforation_correct_window2 = PerforationCorrect(self)
             self.perforation_correct_window2.setWindowTitle("Сверка данных перфорации")
             self.perforation_correct_window2.setGeometry(200, 400, 100, 400)
 
             self.perforation_correct_window2.show()
-
-            # CreatePZ.pause_app(self)
-            # CreatePZ.pause = True
+            CreatePZ.pause_app(self)
+            CreatePZ.pause = True
+            self.perforation_correct_window2 = None
+            CreatePZ.definition_plast_work(self)
+        else:
+            self.perforation_correct_window2.close()
             self.perforation_correct_window2 = None
 
     def correctData(self):
@@ -2005,7 +2018,7 @@ class MyWindow(QMainWindow):
         print(interval[0] <= depth <= interval[1],
               all([interval[0] <= depth <= interval[1] for interval in CreatePZ.skm_interval]),
               any([interval[0] <= depth <= interval[1] for interval in CreatePZ.skm_interval]))
-        print(CreatePZ.skm_interval)
+      # print(CreatePZ.skm_interval)
 
         if any([interval[0] <= depth <= interval[1] for interval in CreatePZ.skm_interval]):
             return int(depth)
@@ -2044,10 +2057,10 @@ class MyWindow(QMainWindow):
                 skm_question = QMessageBox.question(None, 'Скреперование',
                                                       f'добавить интервал скреперования {skipping_intervals_new}')
                 if skm_question == QMessageBox.StandardButton.Yes:
-                    print(CreatePZ.skm_interval)
+                  # print(CreatePZ.skm_interval)
 
                     CreatePZ.skm_interval.append(skipping_intervals_new[0])
-                    print(CreatePZ.skm_interval)
+                  # print(CreatePZ.skm_interval)
 
                     CreatePZ.skm_interval = sorted(CreatePZ.skm_interval, key = lambda  x: x[0])
                     # perforating_intervals = []

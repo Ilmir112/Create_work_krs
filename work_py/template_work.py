@@ -122,9 +122,15 @@ class TabPage_SO(QWidget):
         self.grid.addWidget(self.skm_teml_str_Label, 15, 1, 15, 8)
         self.grid.addWidget(self.skm_teml_str_Edit, 16, 1, 16, 8)
 
-        template_diam_ek = self.template_diam_ek()
-        self.template_first_Edit.setText(str(template_diam_ek[0]))
-        self.template_second_Edit.setText(str(template_diam_ek[1]))
+        if CreatePZ.column_additional is False or (CreatePZ.column_additional and
+                                                   CreatePZ.head_column_additional._value >= CreatePZ.current_bottom):
+            first_template, template_second = self.template_diam_ek()
+        else:
+            first_template, template_second = self.template_diam_additional_ek()
+
+
+        self.template_first_Edit.setText(str(first_template))
+        self.template_second_Edit.setText(str(template_second))
 
         self.lenght_template_first_Edit.setText(str(2))
 
@@ -210,8 +216,8 @@ class TabPage_SO(QWidget):
 
         if CreatePZ.column_additional or \
                 (CreatePZ.head_column_additional._value >= CreatePZ.current_bottom and CreatePZ.column_additional is False):
-            nkt_pod = ['60мм' if CreatePZ.column_additional_diametr._value < 110 else '73мм со снятыми фасками']
-            nkt_pod = ''.join(nkt_pod)
+            nkt_pod = '60мм' if CreatePZ.column_additional_diametr._value < 110 else '73мм со снятыми фасками'
+
 
         if first_template != '' and lenght_template_first != '' and \
                 template_second != '' and lenght_template_second != '' and \
@@ -221,9 +227,9 @@ class TabPage_SO(QWidget):
             if self.template_Combo.currentText() == 'ПСШ ЭК':
                 if dictance_template_second != '':
 
-                    template_str = f'перо + шаблон-{int(first_template)}мм L-{int(lenght_template_first)}м + НКТ{nkt_diam}мм ' \
+                    template_str = f'перо + шаблон-{int(first_template)}мм L-{int(lenght_template_first)}м + НКТ{nkt_diam}м ' \
                                    f'{int(dictance_template_first)}м + СКМ-{skm} +  ' \
-                                   f'НКТ{nkt_diam}мм {int(dictance_template_second)}м + шаблон-{template_second}мм ' \
+                                   f'НКТ{nkt_diam}м {int(dictance_template_second)}м + шаблон-{template_second}мм ' \
                                    f'L-{lenght_template_second}м '
 
                     CreatePZ.template_depth = int(CreatePZ.current_bottom - int(dictance_template_first) -
@@ -235,7 +241,7 @@ class TabPage_SO(QWidget):
             elif self.template_Combo.currentText() == 'ПСШ без хвоста':
                 if dictance_template_second != None:
                     template_str = f'перо + СКМ-{skm} + {dictance_template_second}м ' \
-                                   f'НКТ{nkt_diam}мм + шаблон-{template_second}мм L-{lenght_template_second}м '
+                                   f'НКТ{nkt_diam}м + шаблон-{template_second}мм L-{lenght_template_second}м '
                     CreatePZ.template_depth = math.ceil(CreatePZ.current_bottom - int(dictance_template_second))
                     CreatePZ.skm_depth = CreatePZ.template_depth + dictance_template_second
                     skm_teml_str = f'шаблон-{template_second}мм до гл.{CreatePZ.template_depth}м'
@@ -243,8 +249,8 @@ class TabPage_SO(QWidget):
             elif self.template_Combo.currentText() == 'ПСШ открытый ствол':
                 if dictance_template_second != None:
                     self.template_first_Edit.setText('фильтр направление')
-                    template_str = f'фильтр-направление + НКТ{nkt_diam}мм {dictance_template_first}м ' \
-                                   f'+ СКМ-{skm} + {dictance_template_second}м НКТ{nkt_diam}мм + ' \
+                    template_str = f'фильтр-направление + НКТ{nkt_diam}м {dictance_template_first}м ' \
+                                   f'+ СКМ-{skm} + {dictance_template_second}м НКТ{nkt_diam}м + ' \
                                    f'шаблон-{template_second}мм L-{lenght_template_second}м '
                     CreatePZ.template_depth = int(CreatePZ.current_bottom - int(dictance_template_first) -
                                                   int(dictance_template_second))
@@ -328,10 +334,14 @@ class TabPage_SO(QWidget):
         from open_pz import CreatePZ
 
         nkt_diam = CreatePZ.nkt_diam
-        if CreatePZ.column_additional and CreatePZ.head_column_additional._value > CreatePZ.current_bottom:
-            first_template, template_second = self.template_diam_additional_ek()
-        else:
+        if CreatePZ.column_additional is False or (CreatePZ.column_additional and
+                                                   CreatePZ.head_column_additional._value >= CreatePZ.current_bottom):
+
             first_template, template_second = self.template_diam_ek()
+            print(f'диаметры шаблонов {first_template, template_second}')
+        else:
+            first_template, template_second = self.template_diam_additional_ek()
+            print(f'диаметры шаблонов {first_template, template_second}')
 
         self.template_first_Edit.setText(str(first_template))
         self.template_second_Edit.setText(str(template_second))
@@ -381,10 +391,11 @@ class TabPage_SO(QWidget):
             self.grid.addWidget(self.lenght_template_second_Label, 4, 9)
             self.grid.addWidget(self.lenght_template_second_Edit, 5, 9)
 
-            template_str = f'перо + шаблон-{first_template}мм L-{lenght_template_first}м + НКТ{nkt_diam}мм ' \
+            template_str = f'перо + шаблон-{first_template}мм L-{lenght_template_first}м + НКТ{nkt_diam}м ' \
                            f'{dictance_template_first}м + СКМ-{skm} +  ' \
-                           f'НКТ{nkt_diam}мм {dictance_template_second}м + шаблон-{template_second}мм ' \
+                           f'НКТ{nkt_diam}м {dictance_template_second}м + шаблон-{template_second}мм ' \
                            f'L-{lenght_template_second}м '
+
             # print(f'строка шаблона {template_str}')
             CreatePZ.template_depth = int(CreatePZ.current_bottom - int(dictance_template_first1) -
                                           int(lenght_template_first)) - int(dictance_template_second)
@@ -395,7 +406,7 @@ class TabPage_SO(QWidget):
 
         elif index == 'ПСШ без хвоста':
             template_str = f'перо + СКМ-{skm} + {dictance_template_second}м ' \
-                           f'НКТ{nkt_diam}мм + шаблон-{template_second}мм L-{lenght_template_second}м '
+                           f'НКТ{nkt_diam}м + шаблон-{template_second}мм L-{lenght_template_second}м '
             CreatePZ.template_depth = math.ceil(CreatePZ.current_bottom - int(dictance_template_second))
             CreatePZ.skm_depth = CreatePZ.current_bottom
             skm_teml_str = f'шаблон-{template_second}мм до гл.{CreatePZ.template_depth}м'
@@ -417,8 +428,8 @@ class TabPage_SO(QWidget):
             dictance_template_first = int(self.dictance_template_first_Edit.text())
             dictance_template_second = int(self.dictance_template_second_Edit.text())
 
-            template_str = f'фильтр-направление + НКТ{nkt_diam}мм {dictance_template_first}м ' \
-                           f'+ СКМ-{skm} + {dictance_template_second}м НКТ{nkt_diam}мм + ' \
+            template_str = f'фильтр-направление + НКТ{nkt_diam}м {dictance_template_first}м ' \
+                           f'+ СКМ-{skm} + {dictance_template_second}м НКТ{nkt_diam}м + ' \
                            f'шаблон-{template_second}мм L-{lenght_template_second}м '
             CreatePZ.template_depth = int(CreatePZ.current_bottom - dictance_template_first - dictance_template_second)
             CreatePZ.skm_depth = CreatePZ.template_depth + dictance_template_second
@@ -519,7 +530,7 @@ class TabPage_SO(QWidget):
             dictance_template_second = int(self.dictance_template_second_Edit.text())
 
             dictance_three = int(
-                CreatePZ.current_bottom - int(dictance_template_second) - CreatePZ.head_column_additional
+                CreatePZ.current_bottom - int(dictance_template_second) - CreatePZ.head_column_additional._value
                 - int(lenght_template_first) + 4)
             self.dictance_three_Edit.setText(str(dictance_three))
             dictance_three_first = int(self.dictance_three_Edit.text())
@@ -697,7 +708,7 @@ class TabPage_SO(QWidget):
 
     def template_diam_additional_ek(self):  # Выбор диаметра шаблонов при наличии в скважине дополнительной колонны
         from open_pz import CreatePZ
-        diam_internal_ek = CreatePZ.column_diametr._value - 2 * CreatePZ.column_wall_thickness
+        diam_internal_ek = CreatePZ.column_diametr._value - 2 * CreatePZ.column_wall_thickness._value
         diam_internal_ek_addition = float(CreatePZ.column_additional_diametr._value) - 2 * float(
             CreatePZ.column_additional_wall_thickness._value)
 
@@ -766,6 +777,7 @@ class TemplateKrs(QMainWindow):
             template_diametr = int(self.tabWidget.currentWidget().template_second_Edit.text())
         else:
             template_diametr = int(self.tabWidget.currentWidget().template_first_Edit.text())
+        print(f'проблема ЭК {CreatePZ.problem_with_ek_diametr}')
         if (template_diametr >= int(CreatePZ.problem_with_ek_diametr) - 2
             and CreatePZ.template_depth > int(CreatePZ.problem_with_ek_depth)):
             mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже глубины не прохода')
@@ -1178,7 +1190,8 @@ class TemplateKrs(QMainWindow):
     def pero(self):
         from work_py.rir import RirWindow
         from open_pz import CreatePZ
-        from work_py.drilling import drilling_nkt
+        from work_py.drilling import Drill_window
+
         pero_list = RirWindow.pero_select(self, CreatePZ.current_bottom)
         gipsPero_list = [
             [f'Спустить {pero_list}  на тНКТ{CreatePZ.nkt_diam}мм', None,
@@ -1217,37 +1230,40 @@ class TemplateKrs(QMainWindow):
              None]
         ]
         if CreatePZ.gipsInWell is True:
+
             if CreatePZ.dict_pump_SHGN["do"] != 0:
 
                 gipsPero_list = [gipsPero_list[-1]]
-                drilling_list = drilling_nkt(self)
-                drilling_list[2] = [f'нормализацию забоя до Н= {CreatePZ.current_bottom}м', None,
-                                    f'Произвести нормализацию забоя до Н= {CreatePZ.current_bottom}м с наращиванием, '
-                                    f'промывкой тех жидкостью уд.весом {CreatePZ.fluid_work}.'
-                                    'При отсутствии проходки более 4ч, согласовать с УСРСиСТ подьем компоновки на ревизию. '
-                                    'При наработке долото более 80ч, произвести подьем и заменить долото и (Вызов представителя '
-                                    'осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа '
-                                    f'до начала работ). Работы производить согласно сборника технологических регламентов и '
-                                    f'инструкций в присутствии'
-                                    f' представителя заказчика.',
-                                    None, None, None, None, None, None, None,
-                                    'Мастер КРС, УСРСиСТ', 16, ]
+                from work_py.drilling import Drill_window
+                if self.raid_window is None:
+                    self.raid_window = Drill_window(self.table_widget, self.ins_ind)
+                    self.raid_window.setGeometry(200, 400, 300, 400)
+                    self.raid_window.show()
+                    CreatePZ.pause_app(self)
+                    drill_work_list = self.raid_window.addWork()
+                    CreatePZ.pause = True
 
-                for row in drilling_list:
+                    self.raid_window = None
+                else:
+                    self.raid_window.close()  # Close window.
+                    self.raid_window = None
+
+                for row in drill_work_list:
                     gipsPero_list.append(row)
             else:
-                drilling_list = drilling_nkt(self)
-                drilling_list[2] = [f'Произвести нормализацию забоя до Н= {CreatePZ.current_bottom}м', None,
-                                    f'Произвести нормализацию забоя до Н= {CreatePZ.current_bottom}м с наращиванием, промывкой '
-                                    f'тех жидкостью уд.весом {CreatePZ.fluid_work}.'
-                                    'При отсутствии проходки более 4ч, согласовать с УСРСиСТ подьем компоновки на ревизию. '
-                                    'При наработке долото более 80ч, произвести подьем и заменить долото и (Вызов представителя '
-                                    'осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа '
-                                    f'до начала работ). Работы производить согласно сборника технологических регламентов и '
-                                    f'инструкций в присутствии представителя заказчика.',
-                                    None, None, None, None, None, None, None,
-                                    'Мастер КРС, УСРСиСТ', 16, ]
-                for row in drilling_list:
+                if self.raid_window is None:
+                    self.raid_window = Drill_window(self.table_widget, self.ins_ind)
+                    self.raid_window.setGeometry(200, 400, 300, 400)
+                    self.raid_window.show()
+                    CreatePZ.pause_app(self)
+                    drill_work_list = self.raid_window.addWork()
+                    CreatePZ.pause = True
+
+                    self.raid_window = None
+                else:
+                    self.raid_window.close()  # Close window.
+                    self.raid_window = None
+                for row in drill_work_list:
                     gipsPero_list.append(row)
 
         return gipsPero_list

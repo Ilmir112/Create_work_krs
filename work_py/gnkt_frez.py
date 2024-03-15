@@ -582,7 +582,7 @@ class Work_with_gnkt(QMainWindow):
              f'{lenght_nkt - 0.5 - 2.6 - 3}м', None, None, None,
              volume_vn_nkt(CreatePZ.dict_nkt), None, volume_vn_nkt(CreatePZ.dict_nkt) + 0.47, None, None,
              'Давление опрессовки ЭК ', None, None, None, None,
-             None, None, None, f'{CreatePZ.max_expected_pressure._value}атм', None, None,
+             None, None, None, f'{CreatePZ.max_admissible_pressure._value}атм', None, None,
              None,
              None, None, 'гермет.', None],
             [None, None, None, None, None, None, 'Гидроякорь ', None, None, None, None, None, 122, None, None, None, 71,
@@ -772,7 +772,7 @@ class Work_with_gnkt(QMainWindow):
         coordinate = f'B3'
         print(f'вставка2 ')
         main.MyWindow.insert_image(self, ws3, 'imageFiles/schema_well/gorizont_1.png', coordinate, 237, 1023)
-        print(column_img)
+      # print(Column_img)
         main.MyWindow.insert_image(self, ws3, 'imageFiles/schema_well/gorizont_12.png', column_img, 1800, 120)
 
         ws3.print_area = f'A1:AW{37}'
