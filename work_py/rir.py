@@ -218,6 +218,7 @@ class RirWindow(QMainWindow):
         CreatePZ.current_bottom = roof_rir_edit
         self.perf_new(roof_rir_edit, roof_rir_edit + 1)
         CreatePZ.forPaker_list = None
+        print(f'текущий забой {CreatePZ.current_bottom}')
         return rir_list
 
 
@@ -377,7 +378,15 @@ class RirWindow(QMainWindow):
                 # print(roofRir, float(nek[0]), solePir)
                 if roofRir <= float(nek[0]) <= solePir:
                     CreatePZ.dict_leakiness['НЭК']['интервал'][nek]['отключение'] = True
-            print(f"при {CreatePZ.dict_leakiness['НЭК']['интервал'][nek]['отключение']}")
+            # print(f"при {CreatePZ.dict_leakiness['НЭК']['интервал'][nek]['отключение']}")
+        if CreatePZ.column_additional:
+            if CreatePZ.current_bottom <= CreatePZ.shoe_column_additional._value:
+                CreatePZ.open_trunk_well = False
+        else:
+            if CreatePZ.current_bottom <= CreatePZ.shoe_column._value:
+                CreatePZ.open_trunk_well = False
+
+
 
       # print(CreatePZ.dict_leakiness)
 

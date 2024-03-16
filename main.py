@@ -1123,8 +1123,8 @@ class MyWindow(QMainWindow):
         self.populate_row(self.ins_ind, drilling_work_list, self.table_widget)
 
     def frezering_port_action(self):
-        from work_py.drilling import frezer_ports
-        drilling_work_list = frezer_ports(self)
+        from work_py.drilling import Drill_window
+        drilling_work_list = Drill_window.frezer_ports(self)
         self.populate_row(self.ins_ind, drilling_work_list, self.table_widget)
     def drilling_action_nkt(self):
         from open_pz import CreatePZ
@@ -1134,9 +1134,9 @@ class MyWindow(QMainWindow):
             self.raid_window.setGeometry(200, 400, 300, 400)
             self.raid_window.show()
             CreatePZ.pause_app(self)
-            ryber_work_list = self.raid_window.addWork()
+            drill_work_list = self.raid_window.addWork()
             CreatePZ.pause = True
-            self.populate_row(CreatePZ.ins_ind, ryber_work_list, self.table_widget)
+            self.populate_row(CreatePZ.ins_ind, drill_work_list, self.table_widget)
             self.raid_window = None
         else:
             self.raid_window.close()  # Close window.
@@ -1480,26 +1480,38 @@ class MyWindow(QMainWindow):
         from open_pz import CreatePZ
         print(f' окно СКО ')
 
-        if self.acid_windowPaker2 is None:
-            self.acid_windowPaker2 = TemplateKrs(self.table_widget, CreatePZ.ins_ind)
-            self.acid_windowPaker2.setGeometry(200, 400, 300, 400)
-            self.acid_windowPaker2.show()
+        if self.work_window is None:
+            self.work_window = TemplateKrs(self.table_widget, CreatePZ.ins_ind)
+            self.work_window.setGeometry(200, 400, 500, 500)
+            self.work_window.show()
             CreatePZ.pause_app(self)
+            template_work_list = self.work_window.addWork()
+
             CreatePZ.pause = True
-            self.acid_windowPaker2 = None
+            self.populate_row(CreatePZ.ins_ind, template_work_list, self.table_widget)
+            self.work_window = None
         else:
-            self.acid_windowPaker2.close()  # Close window.
-            self.acid_windowPaker2 = None
+            self.work_window.close()  # Close window.
+            self.work_window = None
 
     def template_without_skm(self):
-        from work_py.template_work import TemplateKrs
+        from work_py.template_without_skm import Template_without_skm
         from open_pz import CreatePZ
+        print(f' окно СКО ')
 
-        template_ek_list = TemplateKrs.template_ek_without_skm(self)
-        # print()
-        # print(f'индекс {self.ins_ind, len(template_ek_list)}')
-        self.populate_row(self.ins_ind, template_ek_list, self.table_widget)
-        CreatePZ.ins_ind += len(template_ek_list) + 1
+        if self.work_window is None:
+            self.work_window = Template_without_skm(self.table_widget, CreatePZ.ins_ind)
+            self.work_window.setGeometry(200, 400, 500, 500)
+            self.work_window.show()
+            CreatePZ.pause_app(self)
+            template_work_list = self.work_window.addRowTable()
+
+            CreatePZ.pause = True
+            self.populate_row(CreatePZ.ins_ind, template_work_list, self.table_widget)
+            self.work_window = None
+        else:
+            self.work_window.close()  # Close window.
+            self.work_window = None
 
     def populate_row(self, ins_ind, work_list, table_widget):
         # print(type(table_widget))

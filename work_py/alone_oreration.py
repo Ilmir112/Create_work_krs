@@ -155,7 +155,7 @@ def check_h2s(self):
 
         elif ((cat_H2S_list_plan[0] in [1, 2]) or (cat_H2S_list[0] in [1, 2])) and len(CreatePZ.plast_work) != 0:
             expenditure_h2s_plan = max(
-                [CreatePZ.dict_category[plast[0]]['по сероводороду'].poglot for plast in CreatePZ.plast_project])
+                [CreatePZ.dict_category[CreatePZ.plast_work[0]]['по сероводороду'].poglot for plast in CreatePZ.plast_project])
             expenditure_h2s = max(
                 [CreatePZ.dict_category[CreatePZ.plast_work[0]]['по сероводороду'].poglot])
             expenditure_h2s = round(max([expenditure_h2s, expenditure_h2s_plan]), 1)

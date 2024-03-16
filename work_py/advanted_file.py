@@ -48,38 +48,8 @@ def skm_interval(self, template):
         else:
             str_raid.append([CreatePZ.dict_perforation_project[plast]['интервал'][1] + 10,
                              CreatePZ.current_bottom - 2])
-    else:
-        pvlg_rir = QMessageBox.question(None, 'переход - приобщение',
-                                        'Планируются ли достреливать новые интервалы перфорации')
-
-        if pvlg_rir == QMessageBox.StandardButton.Yes:
-
-            skm_column, ok = QInputDialog.getText(None, 'Скреперование',
-                                                      'Введите интервал скреперования через тире')
 
 
-            while '-' not in skm_column:
-                mes = QMessageBox.warning(None, 'Введены не корректные данные')
-                skm_column, ok = QInputDialog.getText(None, 'Скреперование',
-                                                      'Введите интервал скреперования через тире')
-                while skm_column.split('-')[0] >= skm_column.split('-')[1]:
-                    mes = QMessageBox.warning(None, 'Введенны не корректные данные')
-                    skm_column, ok = QInputDialog.getText(None, 'Скреперование',
-                                                          'Введите интервал скреперования через тире')
-
-
-
-            if ',' not in skm_column:
-                a = []
-                for i in skm_column.split('-'):
-                    a.append(int(float(i)))
-                str_raid.append(a)
-            else:
-                for skm in skm_column.split(','):
-                    a = []
-                    for i in skm.split('-'):
-                        a.append(int(float(i)))
-                    str_raid.append(a)
 
     # print(f'скреперо {str_raid}')
     merged_segments = merge_overlapping_intervals(str_raid)
@@ -122,19 +92,8 @@ def skm_interval(self, template):
                 # merged_segments.remove(interval)
                 merged_segments_new.append((interval[0], CreatePZ.skm_depth))
 
-
-    # print(f'Новые интервалы {merged_segments_new}')
-    merged_segments = []
-    for skip in merged_segments_new:
-        skip_question = QMessageBox.question(None, 'Скреперование интервалов посадки',
-                                             f'Нужно ли скреперовать интервал {skip}?')
-
-        if skip_question == QMessageBox.StandardButton.Yes:
-            merged_segments.append(skip)
-        # print(f'kkii {merged_segments}')
-
-    CreatePZ.skm_interval = merged_segments
-    return merged_segments
+    CreatePZ.skm_interval = merged_segments_new
+    return merged_segments_new
 
 
 # Функция исключения из интервалов скреперования интервалов ПВР

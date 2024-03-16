@@ -1081,7 +1081,7 @@ class Well_perforation(FindIndexPZ):
                     plast, {}).setdefault('интервал', set()).add((roof_int, sole_int))
 
                 if row[col_pressuar_index] != None:
-                    # print(f'давление {row[col_pressuar_index]}')
+                    print(f'давление {row[col_pressuar_index]}')
                     CreatePZ.dict_perforation_project.setdefault(plast, {}).setdefault('давление', set()).add(
                         round(float(row[col_pressuar_index]), 1))
                 CreatePZ.dict_perforation_project.setdefault(plast, {}).setdefault('рабочая жидкость', set()).add(
@@ -1137,10 +1137,12 @@ class Well_Category(FindIndexPZ):
                             ws.cell(row=row - 1, column=2).value):
                         for column in range(1, 13):
                             col = ws.cell(row=row, column=column).value
-                            # print(col)
+                            print(f'ячейка {col}')
                             if str(col) in ['%', 'мг/л', 'мг/дм3', 'мг/м3'] and \
                                     ws.cell(row=row, column=column - 2).value:
+                                print(f'ячейка- 3 3 {col}')
                                 CreatePZ.cat_H2S_list.append(ws.cell(row=row, column=column - 2).value)
+
 
                     elif 'газовому фактору' in str(cell):
                         for column in range(1, 13):
@@ -1159,14 +1161,14 @@ class Well_Category(FindIndexPZ):
                             CreatePZ.gaz_f_pr.append(round(float(self.check_str_None(cell2)), 1))
                     elif '%' in str(cell):
                         cell2 = ws.cell(row=row, column=col - 1).value
-                        print(f'проц {cell2}')
+                        # print(f'проц {cell2}')
                         CreatePZ.H2S_pr.append(float(str(self.check_str_None(cell2)).replace(',', '.')))
 
                     elif str(cell) in 'мг/м3':
                         cell2 = ws.cell(row=row, column=col - 1).value
                         if cell2:
                             CreatePZ.H2S_mg_m3.append(float(str(self.check_str_None(cell2)).replace(',', '.')) / 1000)
-
+        print(f'kbcnf {CreatePZ.H2S_pr} кат {CreatePZ.cat_H2S_list}')
         if self.data_window is None:
             self.data_window = CategoryWindow(self)
             self.data_window.setWindowTitle("Сверка данных")

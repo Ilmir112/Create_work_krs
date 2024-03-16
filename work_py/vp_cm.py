@@ -106,7 +106,7 @@ def czh(self):
     from open_pz import CreatePZ
 
     vp_depth, ok = QInputDialog.getInt(self, 'Глубина докрепления', 'Введите глубину до крепления цем желонки ',
-                                       int(CreatePZ.perforation_roof - 10), 2, int(CreatePZ.bottomhole_drill._value))
+                                       int(CreatePZ.current_bottom - 2), 2, int(CreatePZ.bottomhole_drill._value))
 
     vp_list = [
         [None, None, f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС "Ойл-сервис". '
@@ -159,7 +159,7 @@ def czh(self):
             print(nek)
             if CreatePZ.dict_leakiness['НЭК']['интервал'][nek]['отключение'] == False:
                 interval_list.append(nek)
-    print(interval_list)
+
     if any([float(interval[0]) < float(vp_depth) for interval in interval_list]):
         vp_list = vp_list[:3]
 
