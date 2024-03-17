@@ -56,6 +56,7 @@ class TabPage_SO(QWidget):
         self.grid = QGridLayout(self)
         if CreatePZ.column_additional is False or \
                 (CreatePZ.column_additional and CreatePZ.current_bottom < CreatePZ.head_column_additional._value):
+            first_template, template_second = TabPage_SO_with.template_diam_ek(self)
             self.template_select_list = ['шаблон ЭК с хвостом', 'шаблон открытый ствол', 'шаблон без хвоста']
 
             self.template_Combo.addItems(self.template_select_list)
@@ -70,17 +71,17 @@ class TabPage_SO(QWidget):
             self.grid.addWidget(self.lenght_template_first_Edit, 5, 3)
             self.grid.addWidget(self.dictance_template_first_Label, 4, 4)
             self.grid.addWidget(self.dictance_template_first_Edit, 5, 4)
-            # self.grid.addWidget(self.skm_Label, 4, 5)
-            # self.grid.addWidget(self.skm_Edit, 5, 5)
-            self.grid.addWidget(self.dictance_template_second_Label, 4, 6)
-            self.grid.addWidget(self.dictance_template_second_Edit, 5, 6)
+
+
             self.grid.addWidget(self.template_second_Label, 4, 7)
             self.grid.addWidget(self.template_second_Edit, 5, 7)
             self.grid.addWidget(self.lenght_template_second_Label, 4, 8)
             self.grid.addWidget(self.lenght_template_second_Edit, 5, 8)
-
+            self.dictance_template_second_Edit.setParent(None)
+            self.dictance_template_second_Label.setParent(None)
 
         else:
+            first_template, template_second = TabPage_SO_with.template_diam_additional_ek(self)
             self.template_select_list = ['шаблон ДП с хвостом', 'шаблон ДП открытый ствол', 'шаблон ДП без хвоста']
             self.template_Combo.addItems(self.template_select_list)
             template_key = self.definition_pssh()
@@ -89,23 +90,22 @@ class TabPage_SO(QWidget):
 
             self.grid.addWidget(self.template_labelType, 1, 2, 1, 8)
             self.grid.addWidget(self.template_Combo, 2, 2, 2, 8)
-            # self.grid.addWidget(self.dictance_template_first_Label, 4, 2)
-            # self.grid.addWidget(self.dictance_template_first_Edit, 5, 2)
+            self.grid.addWidget(self.dictance_template_first_Label, 4, 2)
+            self.grid.addWidget(self.dictance_template_first_Edit, 5, 2)
 
-            # self.grid.addWidget(self.template_first_Label, 4, 3)
-            # self.grid.addWidget(self.template_first_Edit, 5, 3)
-            #
-            # self.grid.addWidget(self.lenght_template_first_Label, 4, 4)
-            # self.grid.addWidget(self.lenght_template_first_Edit, 5, 4)
-            # self.grid.addWidget(self.dictance_template_second_Label, 4, 5)
-            # self.grid.addWidget(self.dictance_template_second_Edit, 5, 5)
-            # self.grid.addWidget(self.skm_Label, 4, 6)
-            # self.grid.addWidget(self.skm_Edit, 5, 6)
+            self.grid.addWidget(self.template_first_Label, 4, 3)
+            self.grid.addWidget(self.template_first_Edit, 5, 3)
 
-            self.grid.addWidget(self.template_second_Label, 4, 8)
-            self.grid.addWidget(self.template_second_Edit, 5, 8)
-            self.grid.addWidget(self.lenght_template_second_Label, 4, 9)
-            self.grid.addWidget(self.lenght_template_second_Edit, 5, 9)
+            self.grid.addWidget(self.lenght_template_first_Label, 4, 4)
+            self.grid.addWidget(self.lenght_template_first_Edit, 5, 4)
+
+
+            self.grid.addWidget(self.template_second_Label, 4, 5)
+            self.grid.addWidget(self.template_second_Edit, 5, 5)
+            self.grid.addWidget(self.lenght_template_second_Label, 4, 6)
+            self.grid.addWidget(self.lenght_template_second_Edit, 5, 6)
+            self.grid.addWidget(self.dictance_template_second_Label, 4, 7)
+            self.grid.addWidget(self.dictance_template_second_Edit, 5, 7)
 
         self.grid.addWidget(self.template_str_Label, 11, 1, 11, 8)
         self.grid.addWidget(self.template_str_Edit, 12, 1, 14, 8)
@@ -113,11 +113,6 @@ class TabPage_SO(QWidget):
         self.grid.addWidget(self.skm_teml_str_Label, 15, 1, 15, 8)
         self.grid.addWidget(self.skm_teml_str_Edit, 16, 1, 16, 8)
 
-        if CreatePZ.column_additional is False or (CreatePZ.column_additional and
-                                                   CreatePZ.head_column_additional._value >= CreatePZ.current_bottom):
-            first_template, template_second = TabPage_SO_with.template_diam_ek(self)
-        else:
-            first_template, template_second = TabPage_SO_with.template_diam_additional_ek(self)
 
 
         self.template_first_Edit.setText(str(first_template))
@@ -125,12 +120,13 @@ class TabPage_SO(QWidget):
 
         self.lenght_template_first_Edit.setText(str(2))
 
-        roof_plast, roof_add_column_plast = self.definition_roof_not_raiding()
+        roof_plast, roof_add_column_plast = TabPage_SO_with.definition_roof_not_raiding(self)
 
-        dictance_template_first = int(CreatePZ.current_bottom - roof_plast + 5)
-        self.dictance_template_first_Edit.setText(str(dictance_template_first))
+        dictance_template_first = int(CreatePZ.current_bottom - roof_plast-100)
+        # self.dictance_template_first_Edit.setText(str(dictance_template_first))
 
-        self.dictance_template_second_Edit.setText(str(10))
+        self.dictance_template_second_Edit.setText(str(dictance_template_first -
+                                                       int(CreatePZ.head_column_additional._value)))
 
         self.template_first_Edit.textChanged.connect(self.update_template)
 
@@ -218,10 +214,10 @@ class TabPage_SO(QWidget):
                 if dictance_template_second != '':
 
                     template_str = f'перо + шаблон-{int(first_template)}мм L-{int(lenght_template_first)}м + НКТ{nkt_diam}м ' \
-                                   f'{int(dictance_template_first)}м  + шаблон-{template_second}мм '
+                                   f'{int(dictance_template_first)}м  + шаблон-{template_second}мм L-{lenght_template_second}'
 
                     CreatePZ.template_depth = int(CreatePZ.current_bottom - int(dictance_template_first) -
-                                                  int(lenght_template_first)) - int(dictance_template_second)
+                                                  int(lenght_template_first))
 
                     skm_teml_str = f'шаблон-{template_second}мм до гл.{CreatePZ.template_depth}м'
 
@@ -245,11 +241,11 @@ class TabPage_SO(QWidget):
                 if dictance_template_second != None:
                     template_str = f'обточная муфта + НКТ{nkt_pod} {dictance_template_first}м ' \
                                    f'+ шаблон-{first_template}мм ' \
-                                   f'L-{lenght_template_first}м + НКТ{nkt_pod} {dictance_three}м + ' \
+                                   f'L-{lenght_template_first}м + НКТ{nkt_pod} {dictance_template_second}м + ' \
                                    f'шаблон-{template_second}мм L-{lenght_template_second}м '
                     CreatePZ.template_depth = math.ceil(CreatePZ.current_bottom - 2 -
                                                         int(dictance_template_first) - int(dictance_template_second) -
-                                                        int(lenght_template_first) - int(dictance_three))
+                                                        int(lenght_template_first))
                     CreatePZ.template_depth_addition = math.ceil(CreatePZ.current_bottom - 2 -
                                                                  int(dictance_template_first) - int(
                         dictance_template_second))
@@ -262,11 +258,11 @@ class TabPage_SO(QWidget):
 
                 template_str = f'обточная муфта + ' \
                                f'шаблон-{first_template}мм L-{lenght_template_first}м + ' \
-                               f'НКТ{nkt_pod} {dictance_three}м + шаблон-{template_second}мм ' \
+                               f'НКТ{nkt_pod} {dictance_template_second}м + шаблон-{template_second}мм ' \
                                f'L-{lenght_template_second}м '
 
                 CreatePZ.template_depth = math.ceil(CreatePZ.current_bottom - int(dictance_template_second) -
-                                                    int(lenght_template_first) - int(dictance_three))
+                                                    int(lenght_template_first))
                 CreatePZ.template_depth_addition = math.ceil(
                     CreatePZ.current_bottom - int(dictance_template_second))
 
@@ -283,7 +279,7 @@ class TabPage_SO(QWidget):
                                    f'L-{lenght_template_second}м '
                     CreatePZ.template_depth = math.ceil(CreatePZ.current_bottom - 2 -
                                                         int(dictance_template_first) - int(dictance_template_second) -
-                                                        int(lenght_template_first) - int(dictance_three))
+                                                        int(lenght_template_first))
                     CreatePZ.template_depth_addition = math.ceil(CreatePZ.current_bottom - 2 -
                                                                  int(dictance_template_first) - int(
                         dictance_template_second))
@@ -296,7 +292,8 @@ class TabPage_SO(QWidget):
 
     def update_template_edit(self, index):
         from open_pz import CreatePZ
-
+        template_str = ''
+        skm_teml_str = ''
         nkt_diam = CreatePZ.nkt_diam
         if CreatePZ.column_additional is False or (CreatePZ.column_additional and
                                                    CreatePZ.head_column_additional._value >= CreatePZ.current_bottom):
@@ -313,8 +310,8 @@ class TabPage_SO(QWidget):
         self.dictance_template_second_Edit.setText(str(10))
 
         roof_plast, roof_add_column_plast = TabPage_SO_with.definition_roof_not_raiding(self)
-        dictance_template_first1 = int(CreatePZ.current_bottom - roof_plast + 5)
-        self.dictance_template_first_Edit.setText(str(dictance_template_first1))
+        dictance_template_first = int(CreatePZ.current_bottom - roof_plast)
+        self.dictance_template_first_Edit.setText(str(dictance_template_first))
 
         lenght_template_first, lenght_template_second = TabPage_SO_with.definition_ECN_true(self, CreatePZ.dict_pump_ECN_h["posle"])
         self.lenght_template_first_Edit.setText(lenght_template_first)
@@ -337,13 +334,15 @@ class TabPage_SO(QWidget):
 
         self.dictance_template_first_Label.setParent(None)
         self.dictance_template_first_Edit.setParent(None)
+        self.dictance_template_second_Edit.setParent(None)
+
 
 
         if CreatePZ.column_additional or \
                 (CreatePZ.head_column_additional._value >= CreatePZ.current_bottom and CreatePZ.column_additional is False):
             nkt_pod = '60мм' if CreatePZ.column_additional_diametr._value < 110 else '73мм со снятыми фасками'
 
-        if index == 'шаблон ЭК':
+        if index == 'шаблон ЭК с хвостом':
             self.grid.addWidget(self.template_first_Label, 4, 2)
             self.grid.addWidget(self.template_first_Edit, 5, 2)
             self.grid.addWidget(self.lenght_template_first_Label, 4, 3)
@@ -355,8 +354,8 @@ class TabPage_SO(QWidget):
 
             template_str = f'перо + шаблон-{first_template}мм L-2м + НКТ{CreatePZ.nkt_diam}мм ' \
                            f'{int(CreatePZ.current_bottom - math.ceil(roof_plast))}м ' \
-                           f'+  НКТ{CreatePZ.nkt_diam}мм + шаблон-{second_template}мм' \
-                           f' L-{lift_ecn_can[CreatePZ.lift_ecn_can]}м '
+                           f'+  НКТ{CreatePZ.nkt_diam}мм + шаблон-{template_second}мм' \
+                           f' L-{lenght_template_second}м '
 
             # print(f'строка шаблона {template_str}')
             CreatePZ.template_depth = int(CreatePZ.current_bottom - int(dictance_template_first1) -
@@ -367,6 +366,7 @@ class TabPage_SO(QWidget):
 
 
         elif index == 'шаблон без хвоста':
+
             template_str = f'перо + шаблон-{template_second}мм L-{lenght_template_second}м '
             CreatePZ.template_depth = math.ceil(CreatePZ.current_bottom - int(dictance_template_second))
             CreatePZ.skm_depth = CreatePZ.current_bottom
@@ -404,28 +404,27 @@ class TabPage_SO(QWidget):
             self.grid.addWidget(self.template_first_Edit, 5, 3)
             self.grid.addWidget(self.lenght_template_first_Label, 4, 4)
             self.grid.addWidget(self.lenght_template_first_Edit, 5, 4)
+            self.grid.addWidget(self.dictance_template_second_Label, 4, 5)
+            self.grid.addWidget(self.dictance_template_second_Edit, 5, 5)
             self.grid.addWidget(self.lenght_template_second_Label, 4, 9)
             self.grid.addWidget(self.lenght_template_second_Edit, 5, 9)
-            self.grid.addWidget(self.dictance_three_Label, 4, 7)
-            self.grid.addWidget(self.dictance_three_Edit, 5, 7)
 
-            self.skm_Edit.setText(str(CreatePZ.column_additional_diametr._value))
-            skm = str(self.skm_Edit.text())
-            dictance_template_first1 = int(CreatePZ.current_bottom - roof_add_column_plast + 5)
-            self.dictance_template_first_Edit.setText(str(dictance_template_first1))
-            dictance_template_first = int(self.dictance_template_first_Edit.text())
 
-            dictance_three_first = int(roof_add_column_plast - CreatePZ.head_column_additional._value - int(
+            dictance_template_first = int(CreatePZ.current_bottom - roof_add_column_plast + 5)
+            self.dictance_template_first_Edit.setText(str(dictance_template_first))
+            dictance_template_second = int(roof_add_column_plast - CreatePZ.head_column_additional._value - int(
                 self.lenght_template_first_Edit.text()) - 9)
-            self.dictance_three_Edit.setText(str(dictance_three_first))
-            dictance_template_three = int(self.dictance_three_Edit.text())
+            self.dictance_template_second_Edit.setText(str(dictance_template_second))
+
+
+
             template_str = f'обточная муфта + НКТ{nkt_pod} {dictance_template_first}м ' \
                            f' + шаблон-{first_template}мм ' \
-                           f'L-{lenght_template_first}м + НКТ{nkt_pod} {dictance_three_first}м + ' \
+                           f'L-{lenght_template_first}м + НКТ{nkt_pod} {dictance_template_second}м + ' \
                            f'шаблон-{template_second}мм L-{lenght_template_second}м '
             CreatePZ.template_depth = math.ceil(CreatePZ.current_bottom - 2 -
                                                 dictance_template_first - dictance_template_second -
-                                                lenght_template_first - dictance_template_three)
+                                                lenght_template_first)
             CreatePZ.template_depth_addition = math.ceil(CreatePZ.current_bottom - 2 -
                                                          dictance_template_first - dictance_template_second)
 
@@ -434,32 +433,27 @@ class TabPage_SO(QWidget):
                            f'шаблон-{template_second}мм до гл.{CreatePZ.template_depth}м'
 
         elif index == 'шаблон ДП без хвоста':
+            self.grid.addWidget(self.template_first_Label, 4, 2)
+            self.grid.addWidget(self.template_first_Edit, 5, 2)
+            self.grid.addWidget(self.lenght_template_first_Label, 4, 3)
+            self.grid.addWidget(self.lenght_template_first_Edit, 5, 3)
+            self.grid.addWidget(self.dictance_template_second_Label, 4, 7)
+            self.grid.addWidget(self.dictance_template_second_Edit, 5, 7)
 
-            self.grid.addWidget(self.dictance_three_Label, 4, 7)
-            self.grid.addWidget(self.dictance_three_Edit, 5, 7)
-
-            dictance_template_first1 = 0
-            self.dictance_template_first_Edit.setText(str(dictance_template_first1))
-
-            self.skm_Edit.setText(str(CreatePZ.column_additional_diametr._value))
-            skm = str(self.skm_Edit.text())
-            self.dictance_template_second_Edit.setText(str(10))
-            dictance_template_second = int(self.dictance_template_second_Edit.text())
-
-            dictance_three = int(
+            dictance_template_second =  int(
                 CreatePZ.current_bottom - int(dictance_template_second) - CreatePZ.head_column_additional._value
                 - int(lenght_template_first) + 4)
-            self.dictance_three_Edit.setText(str(dictance_three))
-            dictance_three_first = int(self.dictance_three_Edit.text())
+            self.dictance_template_second_Edit.setText(str(dictance_template_second))
+            dictance_template_second = int(self.dictance_template_second_Edit.text())
 
             template_str = f'обточная муфта + шаблон-{first_template}мм L-{lenght_template_first}м + ' \
-                           f'НКТ{nkt_pod} {dictance_three_first}м + шаблон-{template_second}мм ' \
+                           f'НКТ{nkt_pod} {dictance_template_second}м + шаблон-{template_second}мм ' \
                            f'L-{lenght_template_second}м '
 
             CreatePZ.template_depth = math.ceil(CreatePZ.current_bottom - dictance_template_second -
-                                                lenght_template_first - dictance_three_first)
+                                                lenght_template_first)
             CreatePZ.template_depth_addition = math.ceil(CreatePZ.current_bottom - dictance_template_second)
-            CreatePZ.skm_depth = CreatePZ.template_depth_addition + dictance_template_second
+
             skm_teml_str = f'шаблон-{first_template}мм до гл.{CreatePZ.template_depth_addition}м, ' \
                            f'шаблон-{template_second}мм до гл.{CreatePZ.template_depth}м'
 
@@ -475,27 +469,27 @@ class TabPage_SO(QWidget):
             self.grid.addWidget(self.lenght_template_first_Edit, 5, 4)
             self.grid.addWidget(self.lenght_template_second_Label, 4, 9)
             self.grid.addWidget(self.lenght_template_second_Edit, 5, 9)
-            self.grid.addWidget(self.dictance_three_Label, 4, 7)
-            self.grid.addWidget(self.dictance_three_Edit, 5, 7)
+            self.grid.addWidget(self.dictance_template_second_Label, 4, 7)
+            self.grid.addWidget(self.dictance_template_second_Edit, 5, 7)
 
-            self.skm_Edit.setText(str(CreatePZ.column_additional_diametr._value))
-            skm = str(self.skm_Edit.text())
+
+
             dictance_template_first1 = int(CreatePZ.current_bottom - roof_add_column_plast + 5)
             self.dictance_template_first_Edit.setText(str(dictance_template_first1))
             dictance_template_first = int(self.dictance_template_first_Edit.text())
 
-            dictance_three_first = int(roof_add_column_plast - CreatePZ.head_column_additional._value - int(
+            dictance_template_second = int(roof_add_column_plast - CreatePZ.head_column_additional._value - int(
                 self.lenght_template_first_Edit.text()) - 9)
-            self.dictance_three_Edit.setText(str(dictance_three_first))
-            dictance_template_three = int(self.dictance_three_Edit.text())
+            self.dictance_template_second_Edit.setText(str(dictance_template_second))
+
 
             template_str = f'фильтр направление L-2м + НКТ{nkt_pod} {dictance_template_first}м ' \
                            f' + шаблон-{first_template}мм L-{lenght_template_first}м' \
-                           f' + НКТ{nkt_pod} {dictance_template_three}м + шаблон-{template_second}мм ' \
+                           f' + НКТ{nkt_pod} {dictance_template_second}м + шаблон-{template_second}мм ' \
                            f'L-{lenght_template_second}м '
             CreatePZ.template_depth = math.ceil(CreatePZ.current_bottom - 2 -
                                                 dictance_template_first - dictance_template_second -
-                                                lenght_template_first - dictance_template_three)
+                                                lenght_template_first)
             CreatePZ.template_depth_addition = math.ceil(CreatePZ.current_bottom - 2 -
                                                          dictance_template_first - dictance_template_second)
 
