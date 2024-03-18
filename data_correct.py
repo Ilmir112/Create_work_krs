@@ -219,8 +219,6 @@ class TabPage_SO(QWidget):
         self.curator_Label = QLabel('Куратор ремонта')
         self.curator_Combo = QComboBox(self)
 
-
-
         self.nkt_do_label = QLabel('НКТ  до ремонта')
         self.nkt_posle_label = QLabel('НКТ плановое согласно расчета')
 
@@ -765,7 +763,7 @@ class DataWindow(QMainWindow):
                     self.tabWidget.currentWidget().labels_sucker_po[1][1].text())
 
         close_file = True
-        # print(f'голова {[self.ifNum(columnType), self.ifNum(column_wall_thickness), self.ifNum(shoe_column)]}')
+        print(f'голова {[columnType, column_additional_diametr]}')
         if any([self.ifNum(data_well) is False for data_well in
                 [columnType, column_wall_thickness, shoe_column]]):
             msg = QMessageBox.information(self, 'Внимание', 'Не все поля в данных колонне соответствуют значениям')
@@ -814,6 +812,9 @@ class DataWindow(QMainWindow):
            or self.ifNum(level_cement_conductor) is False:
 
             msg = QMessageBox.information(self, 'Внимание', 'Не все поля в кондукторе соответствуют значениям')
+            close_file = False
+        elif int(column_additional_diametr) >= int(columnType):
+            msg = QMessageBox.information(self, 'Внимание', 'Ошибка в диаметре доп колонны')
             close_file = False
         elif any(['НВ' in dict_pump_SHGN_do.upper(), 'ШГН' in dict_pump_SHGN_do.upper(),
                   'НН' in dict_pump_SHGN_do.upper(), dict_pump_SHGN_do == 'отсут',

@@ -151,12 +151,12 @@ class TabPage_SO_with(QWidget):
 
         self.lenght_template_first_Edit.setText(str(2))
 
-        roof_plast, roof_add_column_plast = self.definition_roof_not_raiding()
 
-        dictance_template_first = int(CreatePZ.current_bottom - roof_plast + 5)
-        self.dictance_template_first_Edit.setText(str(dictance_template_first))
-        self.skm_Edit.setText(str(CreatePZ.column_diametr._value))
-        self.dictance_template_second_Edit.setText(str(10))
+        #
+        # dictance_template_first = int(CreatePZ.current_bottom - roof_plast + 5)
+        # self.dictance_template_first_Edit.setText(str(dictance_template_first))
+        # self.skm_Edit.setText(str(CreatePZ.column_diametr._value))
+        # self.dictance_template_second_Edit.setText(str(10))
 
         self.template_first_Edit.textChanged.connect(self.update_template)
         self.dictance_three_Edit.textChanged.connect(self.update_template)
@@ -231,6 +231,8 @@ class TabPage_SO_with(QWidget):
             dictance_three = ''
         nkt_diam = CreatePZ.nkt_diam
 
+        roof_plast, roof_add_column_plast = self.definition_roof_not_raiding()
+
         if CreatePZ.column_additional or \
                 (CreatePZ.head_column_additional._value >= CreatePZ.current_bottom and CreatePZ.column_additional is False):
             nkt_pod = '60мм' if CreatePZ.column_additional_diametr._value < 110 else '73мм со снятыми фасками'
@@ -243,6 +245,8 @@ class TabPage_SO_with(QWidget):
 
             if self.template_Combo.currentText() == 'ПСШ ЭК':
                 if dictance_template_second != '':
+                    self.dictance_three_Edit.setParent(None)
+                    self.dictance_three_Label.setParent(None)
 
                     template_str = f'перо + шаблон-{int(first_template)}мм L-{int(lenght_template_first)}м + НКТ{nkt_diam}м ' \
                                    f'{int(dictance_template_first)}м + СКМ-{skm} +  ' \
@@ -266,11 +270,11 @@ class TabPage_SO_with(QWidget):
             elif self.template_Combo.currentText() == 'ПСШ открытый ствол':
                 if dictance_template_second != None:
                     self.template_first_Edit.setText('фильтр направление')
-                    template_str = f'фильтр-направление + НКТ{nkt_diam}м {dictance_template_first}м ' \
+                    template_str = f'фильтр-направление L {lenght_template_first}м + НКТ{nkt_diam}м {dictance_template_first}м ' \
                                    f'+ СКМ-{skm} + {dictance_template_second}м НКТ{nkt_diam}м + ' \
                                    f'шаблон-{template_second}мм L-{lenght_template_second}м '
                     CreatePZ.template_depth = int(CreatePZ.current_bottom - int(dictance_template_first) -
-                                                  int(dictance_template_second))
+                                                  int(dictance_template_second) - int(lenght_template_first))
                     CreatePZ.skm_depth = CreatePZ.template_depth + dictance_template_second
                     skm_teml_str = f'шаблон-{template_second}мм до гл.{CreatePZ.template_depth}м'
 
@@ -282,11 +286,9 @@ class TabPage_SO_with(QWidget):
                                    f'НКТ{nkt_pod} {dictance_template_second}м + НКТ{nkt_diam} {dictance_three}м + ' \
                                    f'СКМ-{skm} + шаблон-{template_second}мм L-{lenght_template_second}м '
 
-                    CreatePZ.template_depth_addition = int(CreatePZ.current_bottom - int(dictance_template_first))
+                    CreatePZ.template_depth_addition = int(roof_add_column_plast - 5)
 
-                    CreatePZ.template_depth = int(
-                        CreatePZ.current_bottom - int(dictance_template_first) - int(lenght_template_first) -
-                        int(dictance_template_second) - int(dictance_three))
+                    CreatePZ.template_depth = int(roof_add_column_plast - 5 -dictance_template_second - dictance_three)
                     CreatePZ.skm_depth = CreatePZ.template_depth + dictance_three
                 # template_str = template_SKM_DP_EK
                 skm_teml_str = f'шаблон-{first_template}мм до гл.{CreatePZ.template_depth_addition}м, ' \
@@ -302,9 +304,8 @@ class TabPage_SO_with(QWidget):
                     CreatePZ.template_depth = math.ceil(CreatePZ.current_bottom - 2 -
                                                         int(dictance_template_first) - int(dictance_template_second) -
                                                         int(lenght_template_first) - int(dictance_three))
-                    CreatePZ.template_depth_addition = math.ceil(CreatePZ.current_bottom - 2 -
-                                                                 int(dictance_template_first) - int(
-                        dictance_template_second))
+                    CreatePZ.template_depth_addition = math.ceil(roof_add_column_plast -
+                                                                 5 - dictance_template_second)
                     CreatePZ.skm_depth = CreatePZ.template_depth_addition + dictance_template_second
 
                     skm_teml_str = f'шаблон-{first_template}мм до гл.{CreatePZ.template_depth_addition}м, ' \
@@ -317,8 +318,7 @@ class TabPage_SO_with(QWidget):
                                    f'НКТ{nkt_pod} {dictance_three}м + шаблон-{template_second}мм ' \
                                    f'L-{lenght_template_second}м '
 
-                    CreatePZ.template_depth = math.ceil(CreatePZ.current_bottom - int(dictance_template_second) -
-                                                        int(lenght_template_first) - int(dictance_three))
+                    CreatePZ.template_depth = math.ceil(roof_add_column_plast - 5 - dictance_template_second - dictance_three)
                     CreatePZ.template_depth_addition = math.ceil(
                         CreatePZ.current_bottom - int(dictance_template_second))
                     CreatePZ.skm_depth = CreatePZ.template_depth_addition + dictance_template_second
@@ -333,12 +333,9 @@ class TabPage_SO_with(QWidget):
                                    f'L-{lenght_template_first}м' \
                                    f' + НКТ{nkt_pod} {dictance_three}м + шаблон-{template_second}мм ' \
                                    f'L-{lenght_template_second}м '
-                    CreatePZ.template_depth = math.ceil(CreatePZ.current_bottom - 2 -
-                                                        int(dictance_template_first) - int(dictance_template_second) -
-                                                        int(lenght_template_first) - int(dictance_three))
-                    CreatePZ.template_depth_addition = math.ceil(CreatePZ.current_bottom - 2 -
-                                                                 int(dictance_template_first) - int(
-                        dictance_template_second))
+                    CreatePZ.template_depth_addition = math.ceil(roof_add_column_plast -
+                                                                 5 - dictance_template_second)
+
                     CreatePZ.skm_depth = CreatePZ.template_depth_addition + dictance_template_second
 
                     skm_teml_str = f'шаблон-{first_template}мм до гл.{CreatePZ.template_depth_addition}м, ' \
