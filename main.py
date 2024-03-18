@@ -1,7 +1,7 @@
 import os
 import sqlite3
 import sys
-# import win32com.client
+import win32com.client
 import openpyxl
 from openpyxl.reader.excel import load_workbook
 
@@ -924,21 +924,9 @@ class MyWindow(QMainWindow):
         geophysical.addAction(czh_action)
         czh_action.triggered.connect(self.czh_action)
 
-        swibbing_action = QAction("Свабирование со пакером", self)
+        swibbing_action = QAction("Свабирование", self)
         geophysical.addAction(swibbing_action)
         swibbing_action.triggered.connect(self.swibbing_with_paker)
-
-        swibbing2_action = QAction("Свабирование с двумя пакерами", self)
-        geophysical.addAction(swibbing2_action)
-        swibbing2_action.triggered.connect(self.swibbing2_with_paker)
-
-        swabbing_opy_action = QAction("ГИС ОПУ", self)
-        geophysical.addAction(swabbing_opy_action)
-        swabbing_opy_action.triggered.connect(self.swabbing_opy)
-
-        swibbingVoronka_action = QAction("Свабирование со воронкой", self)
-        geophysical.addAction(swibbingVoronka_action)
-        swibbingVoronka_action.triggered.connect(self.swibbing_with_voronka)
 
         kompressVoronka_action = QAction("Освоение компрессором с воронкой", self)
         geophysical.addAction(kompressVoronka_action)
@@ -1118,8 +1106,8 @@ class MyWindow(QMainWindow):
         # print(f' выбранная строка {self.ins_ind}')
 
     def drilling_SBT_action(self):
-        from work_py.drilling import drilling_sbt
-        drilling_work_list = drilling_sbt(self)
+        from work_py.drilling import Drill_window
+        drilling_work_list = Drill_window.drilling_sbt(self)
         self.populate_row(self.ins_ind, drilling_work_list, self.table_widget)
 
     def frezering_port_action(self):
@@ -1275,18 +1263,40 @@ class MyWindow(QMainWindow):
             self.rir_window = None
 
     def grpWithPaker(self):
-        from work_py.grp import grpPaker
+        from work_py.grp import Grp_window
+        from open_pz import CreatePZ
 
-        print('Вставился ГРП с пакером')
-        grpPaker_work_list = grpPaker(self)
-        self.populate_row(self.ins_ind, grpPaker_work_list, self.table_widget)
+        if self.work_window is None:
+            self.work_window = Grp_window(self.table_widget, CreatePZ.ins_ind)
+            self.work_window.setGeometry(200, 400, 500, 500)
+            self.work_window.show()
+            CreatePZ.pause_app(self)
+            grp_work_list = self.work_window.addWork()
+            print(f'окно {grp_work_list}')
+            CreatePZ.pause = True
+            self.populate_row(CreatePZ.ins_ind, grp_work_list, self.table_widget)
+            self.work_window = None
+        else:
+            self.work_window.close()  # Close window.
+            self.work_window = None
 
     def grpWithGpp(self):
-        from work_py.grp import grpGpp
+        from work_py.gpp import Gpp_window
+        from open_pz import CreatePZ
 
-        print('Вставился ГРП с ГПП')
-        grpGpp_work_list = grpGpp(self)
-        self.populate_row(self.ins_ind, grpGpp_work_list, self.table_widget)
+        if self.work_window is None:
+            self.work_window = Gpp_window(self.table_widget, CreatePZ.ins_ind)
+            self.work_window.setGeometry(200, 400, 500, 500)
+            self.work_window.show()
+            CreatePZ.pause_app(self)
+            gpp_work_list = self.work_window.addWork()
+
+            CreatePZ.pause = True
+            self.populate_row(CreatePZ.ins_ind, gpp_work_list, self.table_widget)
+            self.work_window = None
+        else:
+            self.work_window.close()  # Close window.
+            self.work_window = None
 
     def filling_sand(self):
         from work_py.sand_filling import sandFilling
@@ -1340,25 +1350,23 @@ class MyWindow(QMainWindow):
         self.populate_row(self.ins_ind, vp_work_list, self.table_widget)
 
     def swibbing_with_paker(self):
-        from work_py.swabbing import swabbing_with_paker
+        from work_py.swabbing import Swab_Window
 
-        print('Вставился Сваб с пакером')
-        swab_work_list = swabbing_with_paker(self, 10, 1)
-        self.populate_row(self.ins_ind, swab_work_list, self.table_widget)
+        from open_pz import CreatePZ
 
-    def swibbing2_with_paker(self):
-        from work_py.swabbing import swabbing_with_2paker
+        if self.work_window is None:
+            self.work_window = Swab_Window()
+            self.work_window.setGeometry(200, 400, 500, 500)
+            self.work_window.show()
+            CreatePZ.pause_app(self)
+            swab_work_list = self.work_window.addWork()
 
-        print('Вставился Сваб с пакером')
-        swab_work_list = swabbing_with_2paker(self)
-        self.populate_row(self.ins_ind, swab_work_list, self.table_widget)
-
-    def swabbing_opy(self):
-        from work_py.swabbing import swabbing_opy
-
-        print('Вставился ОПУ')
-        swabbing_opy_list = swabbing_opy(self)
-        self.populate_row(self.ins_ind, swabbing_opy_list, self.table_widget)
+            CreatePZ.pause = True
+            self.populate_row(CreatePZ.ins_ind, swab_work_list, self.table_widget)
+            self.work_window = None
+        else:
+            self.work_window.close()  # Close window.
+            self.work_window = None
 
     def kompress_with_voronka(self):
         from work_py.kompress import kompress
@@ -1367,20 +1375,14 @@ class MyWindow(QMainWindow):
         kompress_work_list = kompress(self)
         self.populate_row(self.ins_ind, kompress_work_list, self.table_widget)
 
-    def swibbing_with_voronka(self):
 
-        from work_py.swabbing import swabbing_with_voronka
-
-        print('Вставился Сваб с воронкой')
-        swab_work_list = swabbing_with_voronka(self)
-        self.populate_row(self.ins_ind, swab_work_list, self.table_widget)
 
     def ryberAdd(self):
         from work_py.raiding import Raid
         from open_pz import CreatePZ
 
         if self.raid_window is None:
-            self.raid_window = Raid(self.table_widget, self.ins_ind)
+            self.raid_window = Raid()
             self.raid_window.setGeometry(200, 400, 300, 400)
             self.raid_window.show()
             CreatePZ.pause_app(self)

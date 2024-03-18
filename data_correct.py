@@ -813,9 +813,7 @@ class DataWindow(QMainWindow):
 
             msg = QMessageBox.information(self, 'Внимание', 'Не все поля в кондукторе соответствуют значениям')
             close_file = False
-        elif int(column_additional_diametr) >= int(columnType):
-            msg = QMessageBox.information(self, 'Внимание', 'Ошибка в диаметре доп колонны')
-            close_file = False
+
         elif any(['НВ' in dict_pump_SHGN_do.upper(), 'ШГН' in dict_pump_SHGN_do.upper(),
                   'НН' in dict_pump_SHGN_do.upper(), dict_pump_SHGN_do == 'отсут',
                   'RHAM' in dict_pump_SHGN_do]) is False \
@@ -873,6 +871,11 @@ class DataWindow(QMainWindow):
             msg = QMessageBox.information(self, 'Внимание',
                                           'При вызванной ошибке НКТ после ремонта не может быть пустым')
             close_file = False
+
+        elif CreatePZ.column_additional:
+            if int(column_additional_diametr) >= int(columnType):
+                msg = QMessageBox.information(self, 'Внимание', 'Ошибка в диаметре доп колонны')
+                close_file = False
 
         if curator == 'ОР':
             if self.ifNum(expected_Q_edit) is False or self.ifNum(expected_P_edit) is False:

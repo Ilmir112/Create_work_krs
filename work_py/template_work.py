@@ -633,7 +633,7 @@ class TabPage_SO_with(QWidget):
                 CreatePZ.column_additional and CreatePZ.head_column_additional._value >= CreatePZ.current_bottom):
             for plast in plast_all:
                 roof = min(list(map(lambda x: x[0], list(dict_perforation[plast]['интервал']))))
-                print(roof_plast < roof, roof_plast, roof)
+                # print(roof_plast < roof, roof_plast, roof)
                 if roof_plast > roof:
                     if dict_perforation[plast]['отрайбировано'] and CreatePZ.open_trunk_well is False:
                         roof_add_column_plast = roof_plast

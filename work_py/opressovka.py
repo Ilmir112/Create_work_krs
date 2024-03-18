@@ -58,6 +58,7 @@ class TabPage_SO(QWidget):
         self.grid_layout.addWidget(self.pakerDepthZumpf_edit, 4, 5)
 
     def update_paker(self):
+
         from open_pz import CreatePZ
         if CreatePZ.open_trunk_well == True:
             paker_depth = self.paker_depth_edit.text()
@@ -73,6 +74,7 @@ class TabPage_SO(QWidget):
                 self.diametr_paker_edit.setText(f'{self.paker_diametr_select(int(paker_depth))}')
 
     def paker_diametr_select(self, depth_landing):
+
         from open_pz import CreatePZ
 
         paker_diam_dict = {
@@ -111,7 +113,7 @@ class TabPage_SO(QWidget):
 class TabWidget(QTabWidget):
     def __init__(self):
         super().__init__()
-        self.addTab(TabPage_SO(self), 'Выбор компоновки шаблонов')
+        self.addTab(TabPage_SO(self), 'Опрессовка')
 
 
 class OpressovkaEK(QMainWindow):

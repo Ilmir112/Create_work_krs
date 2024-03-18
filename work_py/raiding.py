@@ -136,12 +136,11 @@ class TabWidget(QTabWidget):
         super().__init__()
         self.addTab(TabPage_SO_raid(self), 'Райбер')
 class Raid(MyWindow):
-    def __init__(self, table_widget, ins_ind, parent=None):
+    def __init__(self, parent=None):
         super(MyWindow, self).__init__(parent)
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
-        self.table_widget = table_widget
-        self.ins_ind = ins_ind
+
         self.tabWidget = TabWidget()
         self.tableWidget = QTableWidget(0, 3)
         self.tableWidget.setHorizontalHeaderLabels(
