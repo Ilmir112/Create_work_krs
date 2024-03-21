@@ -1,7 +1,7 @@
 import os
 import sqlite3
 import sys
-import win32com.client
+# import win32com.client
 import openpyxl
 from openpyxl.reader.excel import load_workbook
 

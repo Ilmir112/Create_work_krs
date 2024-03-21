@@ -361,13 +361,13 @@ class WellFond_data(FindIndexPZ):
                         col_do = col
 
                     if 'Пакер' in str(value) and 'типоразмер' in str(row[col + 2].value):
-                        if '/' in row[col_do].value:
+                        if '/' in str(row[col_do].value):
                             CreatePZ.paker_do["do"] = str(row[col_do].value).split('/')[0]
                             CreatePZ.paker2_do["do"] = str(row[col_do].value).split('/')[1]
                         else:
                             CreatePZ.paker_do["do"] = row[col_do].value
 
-                        if '/' in row[col_plan].value:
+                        if '/' in str(row[col_plan].value):
                             CreatePZ.paker_do["posle"] = str(row[col_plan].value).split('/')[0]
                             CreatePZ.paker2_do["posle"] = str(row[col_plan].value).split('/')[1]
                         else:
