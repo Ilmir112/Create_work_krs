@@ -1,3 +1,4 @@
+from PyQt5.QtGui import QDoubleValidator
 from PyQt5.QtWidgets import QMessageBox, QInputDialog, QLabel, QComboBox, QLineEdit, QGridLayout, QWidget, QPushButton, \
     QMainWindow, QTabWidget
 
@@ -12,7 +13,7 @@ from work_py.acid_paker import CheckableComboBox, AcidPakerWindow
 
 
 
-class TabPage_SO(QWidget):
+class TabPage_SO_rir(QWidget):
     def __init__(self, parent=None):
         from open_pz import CreatePZ
         super().__init__(parent)
@@ -27,6 +28,7 @@ class TabPage_SO(QWidget):
         self.rir_type_Combo.addItems(['РИР на пере', 'РИР с пакером', 'РИР с РПК', 'РИР с РПП'])
 
         plast_work = CreatePZ.plast_work
+        print(f'наруш { CreatePZ.leakiness}')
         if CreatePZ.leakiness:
             for nek in list(CreatePZ.dict_leakiness['НЭК']['интервал'].keys()):
                 print(list(nek))
@@ -58,19 +60,133 @@ class TabPage_SO(QWidget):
             # for enable in listEnabel:
             #     enable.setEnabled(False)
 
-        grid = QGridLayout(self)
+        self.validator = QDoubleValidator(0.0, 80000.0, 2)
 
-        grid.addWidget(self.paker_need_labelType, 4, 1)
-        grid.addWidget(self.paker_need_Combo, 5, 1)
+        self.diametr_paker_labelType = QLabel("Диаметр пакера", self)
+        self.diametr_paker_edit = QLineEdit(self)
 
-        grid.addWidget(self.rir_type_Label, 4, 2)
-        grid.addWidget(self.rir_type_Combo,5, 2)
-        grid.addWidget(self.plast_label, 4, 3)
-        grid.addWidget(self.plast_combo, 5, 3)
-        grid.addWidget(self.roof_rir_label, 4, 4)
-        grid.addWidget(self.roof_rir_edit, 5, 4)
-        grid.addWidget(self.sole_rir_LabelType, 4, 5)
-        grid.addWidget(self.sole_rir_edit, 5, 5)
+        self.paker_khost_Label = QLabel("Длина хвостовика", self)
+        self.paker_khost_edit = QLineEdit(self)
+        self.paker_khost_edit.setValidator(self.validator)
+
+        self.paker_depth_Label = QLabel("Глубина посадки", self)
+        self.paker_depth_edit = QLineEdit(self)
+        self.paker_depth_edit.setValidator(self.validator)
+
+
+        if len(CreatePZ.plast_work) != 0:
+            pakerDepth = CreatePZ.perforation_sole - 20
+        else:
+            if CreatePZ.leakiness:
+                pakerDepth = min([CreatePZ.dict_perforation['НЭК']['интервал'][nek][0] - 10
+                                  for nek in CreatePZ.dict_perforation['НЭК']['интервал'].keys()])
+
+        self.paker_depth_edit.setText(str(int(pakerDepth)))
+
+        self.pakerDepthZumpf_Label = QLabel("Глубина посадки для ЗУМПФа", self)
+        self.pakerDepthZumpf_edit = QLineEdit(self)
+        self.pakerDepthZumpf_edit.setValidator(self.validator)
+
+        self.pressureZUMPF_question_Label = QLabel("Нужно ли опрессовывать ЗУМПФ", self)
+        self.pressureZUMPF_question_QCombo = QComboBox(self)
+        self.paker_need_Combo.currentTextChanged.connect(self.update_paker)
+        self.pressureZUMPF_question_QCombo.currentTextChanged.connect(self.update_pakerZUMPF)
+
+
+        self.pressureZUMPF_question_QCombo.addItems(['Нет', 'Да'])
+
+
+        self.grid = QGridLayout(self)
+
+        self.grid.addWidget(self.paker_need_labelType, 4, 1)
+        self.grid.addWidget(self.paker_need_Combo, 5, 1)
+
+        self.grid.addWidget(self.rir_type_Label, 4, 2)
+        self.grid.addWidget(self.rir_type_Combo, 5, 2)
+        self.grid.addWidget(self.plast_label, 4, 3)
+        self.grid.addWidget(self.plast_combo, 5, 3)
+        self.grid.addWidget(self.roof_rir_label, 4, 4)
+        self.grid.addWidget(self.roof_rir_edit, 5, 4)
+        self.grid.addWidget(self.sole_rir_LabelType, 4, 5)
+        self.grid.addWidget(self.sole_rir_edit, 5, 5)
+
+        self.grid.addWidget(self.diametr_paker_labelType, 1, 1)
+        self.grid.addWidget(self.diametr_paker_edit, 2, 1)
+
+        self.grid.addWidget(self.paker_khost_Label, 1, 2)
+        self.grid.addWidget(self.paker_khost_edit, 2, 2)
+
+        self.grid.addWidget(self.paker_depth_Label, 1, 3)
+        self.grid.addWidget(self.paker_depth_edit, 2, 3)
+
+        self.grid.addWidget(self.pressureZUMPF_question_Label, 1, 4)
+        self.grid.addWidget(self.pressureZUMPF_question_QCombo, 2, 4)
+
+    def update_pakerZUMPF(self, index):
+        from open_pz import CreatePZ
+        from work_py.opressovka import OpressovkaEK, TabPage_SO
+
+        if index == 'Да':
+            if len(CreatePZ.plast_work) != 0:
+                pakerDepthZumpf = CreatePZ.perforation_sole + 10
+            else:
+                if CreatePZ.leakiness:
+                    pakerDepthZumpf = max([CreatePZ.dict_perforation['НЭК']['интервал'][nek][0]+10
+                                           for nek in CreatePZ.dict_perforation['НЭК']['интервал'].keys()])
+            self.pakerDepthZumpf_edit.setText(f'{pakerDepthZumpf}')
+
+            self.grid.addWidget(self.pakerDepthZumpf_Label, 1, 5)
+            self.grid.addWidget(self.pakerDepthZumpf_edit, 2, 5)
+        elif index == 'Нет':
+            self.pakerDepthZumpf_Label.setParent(None)
+            self.pakerDepthZumpf_edit.setParent(None)
+
+        if CreatePZ.open_trunk_well == True:
+            paker_depth = self.paker_depth_edit.text()
+            if paker_depth != '':
+                paker_khost = CreatePZ.current_bottom - int(paker_depth)
+                self.paker_khost_edit.setText(f'{paker_khost}')
+                self.diametr_paker_edit.setText(f'{TabPage_SO.paker_diametr_select(self, int(paker_depth))}')
+        else:
+            paker_depth = self.paker_depth_edit.text()
+            if paker_depth != '':
+                paker_khost = 10
+                self.paker_khost_edit.setText(f'{paker_khost}')
+                self.diametr_paker_edit.setText(f'{TabPage_SO.paker_diametr_select(self, int(paker_depth))}')
+    def update_paker(self, index):
+
+        if index == 'Нужно СПО':
+            self.grid.addWidget(self.diametr_paker_labelType, 1, 1)
+            self.grid.addWidget(self.diametr_paker_edit, 2, 1)
+
+            self.grid.addWidget(self.paker_khost_Label, 1, 2)
+            self.grid.addWidget(self.paker_khost_edit, 2, 2)
+
+            self.grid.addWidget(self.paker_depth_Label, 1, 3)
+            self.grid.addWidget(self.paker_depth_edit, 2, 3)
+
+            self.grid.addWidget(self.pressureZUMPF_question_Label, 1, 4)
+            self.grid.addWidget(self.pressureZUMPF_question_QCombo, 2, 4)
+
+        else:
+            self.diametr_paker_labelType.setParent(None)
+            self.diametr_paker_edit.setParent(None)
+
+            self.paker_khost_Label.setParent(None)
+            self.paker_khost_edit.setParent(None)
+
+            self.paker_depth_Label.setParent(None)
+            self.paker_depth_edit.setParent(None)
+            try:
+                self.pressureZUMPF_question_Label.setParent(None)
+                self.pressureZUMPF_question_QCombo.setParent(None)
+
+
+                self.pakerDepthZumpf_Label.setParent(None)
+                self.pakerDepthZumpf_edit.setParent(None)
+            except:
+                pass
+
 
 
     def update_plast_edit(self):
@@ -109,23 +225,19 @@ class TabPage_SO(QWidget):
 class TabWidget(QTabWidget):
     def __init__(self):
         super().__init__()
-        self.addTab(TabPage_SO(self), 'Ремонтно-Изоляционные работы')
+        self.addTab(TabPage_SO_rir(self), 'Ремонтно-Изоляционные работы')
 
 
 class RirWindow(QMainWindow):
     work_rir_window = None
 
-    def __init__(self, table_widget, ins_ind, parent=None):
+    def __init__(self,  parent=None):
 
         super(QMainWindow, self).__init__(parent)
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
-        self.table_widget = table_widget
-        self.ins_ind = ins_ind
-
 
         self.tabWidget = TabWidget()
-
 
         self.buttonAdd = QPushButton('Добавить данные в план работ')
         self.buttonAdd.clicked.connect(self.addRowTable)
@@ -147,31 +259,7 @@ class RirWindow(QMainWindow):
 
         roof_rir_edit = MyWindow.true_set_Paker(self, roof_rir_edit)
 
-        if paker_need_Combo == "Нужно СПО":
-            if self.work_rir_window is None:
-                self.work_rir_window = OpressovkaEK(self.table_widget, self.ins_ind, True)
-                self.work_rir_window.setGeometry(200, 400, 300, 400)
-                self.work_rir_window.show()
-                CreatePZ.pause_app(self)
-                CreatePZ.pause = True
-            else:
-                self.work_rir_window.close()  # Close window.
-                self.work_rir_window = None
-
-            rir_list = CreatePZ.forPaker_list
-
-            rir_q_list = [f'насыщение 5м3. Определить Q {plast_combo} при Р=80-100атм. СКВ', None,
-                          f'Произвести насыщение скважины в объеме 5м3. Определить приемистость {plast_combo} при Р=80-100атм '
-                          f'в присутствии представителя УСРСиСТ или подрядчика по РИР. (Вести контроль за отдачей жидкости '
-                          f'после закачки, объем согласовать с подрядчиком по РИР). В случае приёмистости менее  250м3/сут '
-                          f'при Р=100атм произвести соляно-кислотную обработку скважины в объеме 1м3 HCl-12% с целью увеличения '
-                          f'приемистости по технологическому плану',
-                          None, None, None, None, None, None, None,
-                          'мастер КРС', 1.77]
-            rir_list.insert(-3, rir_q_list)
-
-        else:
-            rir_list = []
+        rir_list = self.need_paker(paker_need_Combo, plast_combo)
 
         rir_work_list = [[f'СПО РПП до глубины {roof_rir_edit}м', None,
                        f'Спустить   пакер глухой {self.rpk_nkt(roof_rir_edit)}  на тНКТ{CreatePZ.nkt_diam}мм '
@@ -237,31 +325,7 @@ class RirWindow(QMainWindow):
 
         roof_rir_edit = MyWindow.true_set_Paker(self, roof_rir_edit)
 
-        if paker_need_Combo == "Нужно СПО":
-            if self.work_rir_window is None:
-                self.work_rir_window = OpressovkaEK(self.table_widget, self.ins_ind, True)
-                self.work_rir_window.setGeometry(200, 400, 300, 400)
-                self.work_rir_window.show()
-                CreatePZ.pause_app(self)
-                CreatePZ.pause = True
-            else:
-                self.work_rir_window.close()  # Close window.
-                self.work_rir_window = None
-
-            rir_list = CreatePZ.forPaker_list
-
-            rir_q_list = [f'насыщение 5м3. Определить Q {plast_combo} при Р=80-100атм. СКВ', None,
-                          f'Произвести насыщение скважины в объеме 5м3. Определить приемистость {plast_combo} при Р=80-100атм '
-                          f'в присутствии представителя УСРСиСТ или подрядчика по РИР. (Вести контроль за отдачей жидкости '
-                          f'после закачки, объем согласовать с подрядчиком по РИР). В случае приёмистости менее  250м3/сут '
-                          f'при Р=100атм произвести соляно-кислотную обработку скважины в объеме 1м3 HCl-12% с целью увеличения '
-                          f'приемистости по технологическому плану',
-                          None, None, None, None, None, None, None,
-                          'мастер КРС', 1.77]
-            rir_list.insert(-3, rir_q_list)
-
-        else:
-            rir_list = []
+        rir_list = self.need_paker(paker_need_Combo, plast_combo)
 
         if rir_rpk_plast_true:
             rir_q_list = [[f'Привязка по ГК и ЛМ', None,
@@ -353,7 +417,7 @@ class RirWindow(QMainWindow):
 
         from open_pz import CreatePZ
 
-        print(f' пласта до изоляции {CreatePZ.plast_work}')
+        # print(f' пласта до изоляции {CreatePZ.plast_work}')
         CreatePZ.perforation_roof = 5000
         CreatePZ.perforation_sole = 0
 
@@ -366,11 +430,12 @@ class RirWindow(QMainWindow):
                         CreatePZ.perforation_roof = interval[0]
                     elif interval[1] > CreatePZ.perforation_sole:
                         CreatePZ.perforation_sole = interval[1]
-        print(f' Подошва ПВР {CreatePZ.perforation_sole}')
+
 
         CreatePZ.plast_work = []
         for plast in CreatePZ.plast_all:
-            if CreatePZ.dict_perforation[plast]['отключение'] == False:
+            if CreatePZ.dict_perforation[plast]['отключение'] == False and \
+                CreatePZ.dict_perforation[plast]['кровля'] < CreatePZ.current_bottom:
                 CreatePZ.plast_work.append(plast)
 
         if len(CreatePZ.dict_leakiness) != 0:
@@ -449,10 +514,10 @@ class RirWindow(QMainWindow):
              None, None, None, None, None, None, None,
              'мастер КРС', 0.5],
             [None, None,
-             f'Вызвать циркуляцию. Закачать в НКТ тех. воду у=1,00г/см3 в объеме 0,5м3, цементный '
+             f'Вызвать циркуляцию. Закачать в НКТ тех. воду у=1,00г/см3 в объеме 1,5м3, цементный '
              f'раствор в объеме {volume_cement}м3, '
-             f'довести тех.жидкостью у=1,00г/см3 в объёме 1,5м3, тех. жидкостью  в '
-             f'объёме {round(volume_vn_nkt(dict_nkt)-1.5,1)}м3. '
+             f'довести тех.жидкостью у=1,00г/см3 в объёме 0,5м3, тех. жидкостью  в '
+             f'объёме {round(volume_vn_nkt(dict_nkt)-0.5,1)}м3. '
              f'Уравновешивание цементного раствора',
              None, None, None, None, None, None, None,
              'мастер КРС', 0.5],
@@ -497,7 +562,7 @@ class RirWindow(QMainWindow):
         ]
 
 
-        if len(CreatePZ.plast_work) == 0:
+        if len(CreatePZ.plast_work) == 0 or roof_rir_edit > CreatePZ.perforation_sole:
             rir_list = []
             for row in uzmPero_list:
                 rir_list.append(row)
@@ -505,11 +570,11 @@ class RirWindow(QMainWindow):
             self.perf_new(roof_rir_edit, sole_rir_edit)
             CreatePZ.current_bottom = roof_rir_edit
 
-            if len(CreatePZ.plast_work) != 0:
+            if OpressovkaEK.testing_pressure(self, roof_rir_edit)[2]:
                 rir_list.pop(-2)
 
         else:
-            rir_list = []
+
             rirPero_list = [
                 [f'СПО пера до глубины {sole_rir_edit}м. Опрессовать НКТ на 200атм', None,
                  f'Спустить {self.pero_select(sole_rir_edit)}  на тНКТ{nkt_diam}м до глубины {sole_rir_edit}м '
@@ -531,10 +596,10 @@ class RirWindow(QMainWindow):
                  None, None, None, None, None, None, None,
                  'мастер КРС', 0.5],
                 [None, None,
-                 f'Вызвать циркуляцию. Закачать в НКТ тех. воду у=1,00г/см3 в объеме 0,5м3, цементный раствор в '
+                 f'Вызвать циркуляцию. Закачать в НКТ тех. воду у=1,00г/см3 в объеме 1,5м3, цементный раствор в '
                  f'объеме {volume_cement}м3, '
-                 f'довести тех.жидкостью у=1,00г/см3 в объёме 1,5м3, тех. жидкостью  в объёме '
-                 f'{round(volume_vn_nkt(dict_nkt) - 1.5, 1)}м3. '
+                 f'довести тех.жидкостью у=1,00г/см3 в объёме 0,5м3, тех. жидкостью  в объёме '
+                 f'{round(volume_vn_nkt(dict_nkt) - 0.5, 1)}м3. '
                  f'Уравновешивание цементного раствора',
                  None, None, None, None, None, None, None,
                  'мастер КРС', 0.5],
@@ -586,33 +651,9 @@ class RirWindow(QMainWindow):
                  None, None, None, None, None, None, None,
                  'мастер КРС', liftingNKT_norm(roof_rir_edit, 1)],
             ]
+            rir_list = self.need_paker(paker_need_Combo, plast_combo)
+
             if paker_need_Combo == "Нужно СПО":
-                if self.work_rir_window is None:
-                    self.work_rir_window = OpressovkaEK(self.table_widget, self.ins_ind, True)
-                    self.work_rir_window.setGeometry(200, 400, 300, 400)
-                    self.work_rir_window.show()
-                    CreatePZ.pause_app(self)
-                    CreatePZ.pause = True
-                else:
-                    self.work_rir_window.close()  # Close window.
-                    self.work_rir_window = None
-
-                rir_list = CreatePZ.forPaker_list
-
-                rir_q_list = [f'насыщение 5м3. Определить Q {plast_combo} при Р=80-100атм. СКВ', None,
-                              f'Произвести насыщение скважины в объеме 5м3. Определить приемистость {plast_combo} при Р=80-100атм '
-                              f'в присутствии представителя УСРСиСТ или подрядчика по РИР. (Вести контроль за отдачей жидкости '
-                              f'после закачки, объем согласовать с подрядчиком по РИР). В случае приёмистости менее  250м3/сут '
-                              f'при Р=100атм произвести соляно-кислотную обработку скважины в объеме 1м3 HCl-12% с целью увеличения '
-                              f'приемистости по технологическому плану',
-                              None, None, None, None, None, None, None,
-                              'мастер КРС', 1.77]
-
-                rir_list.insert(-3, rir_q_list)
-
-
-
-
                 glin_list = [
                     [f'насыщение 5м3. Определить Q {plast_combo} при Р=80-100атм ',
                      None,
@@ -684,7 +725,7 @@ class RirWindow(QMainWindow):
             self.perf_new(roof_rir_edit, CreatePZ.current_bottom)
             CreatePZ.current_bottom = roof_rir_edit
 
-            if len(CreatePZ.plast_work) != 0:
+            if OpressovkaEK.testing_pressure(self, roof_rir_edit)[2]:
                 rir_list.pop(-2)
             else:
                 acid_true_quest = QMessageBox.question(self, 'Необходимость смены объема',
@@ -707,37 +748,41 @@ class RirWindow(QMainWindow):
                            f' L- {sole_rir_edit - CreatePZ.head_column_additional._value}м'
         return pero_select
 
-    def rir_paker(self, paker_need_Combo, plast_combo, roof_rir_edit, sole_rir_edit):
-        from open_pz import CreatePZ
+    def need_paker(self, paker_need_Combo, plast_combo):
+
         from work_py.opressovka import OpressovkaEK
-        if paker_need_Combo == "Нужно СПО":
-            if self.work_rir_window is None:
-                self.work_rir_window = OpressovkaEK(self.table_widget, self.ins_ind, True)
-                self.work_rir_window.setGeometry(200, 400, 300, 400)
-                self.work_rir_window.show()
-                CreatePZ.pause_app(self)
-                CreatePZ.pause = True
-            else:
-                self.work_rir_window.close()  # Close window.
-                self.work_rir_window = None
 
+        pressureZUMPF_question = self.tabWidget.currentWidget().pressureZUMPF_question_QCombo.currentText()
 
-            rir_list = CreatePZ.forPaker_list
+        diametr_paker = int(float(self.tabWidget.currentWidget().diametr_paker_edit.text()))
+        paker_khost = int(float(self.tabWidget.currentWidget().paker_khost_edit.text()))
+        paker_depth = int(float(self.tabWidget.currentWidget().paker_depth_edit.text()))
+        try:
+            pakerDepthZumpf = int(float(self.tabWidget.currentWidget().pakerDepthZumpf_edit.text()))
+        except:
+            pakerDepthZumpf = 0
+        if paker_need_Combo == 'Нужно СПО':
 
-
+            rir_list = OpressovkaEK.paker_list(self, diametr_paker, paker_khost, paker_depth, pakerDepthZumpf, pressureZUMPF_question)
 
             rir_q_list = [f'насыщение 5м3. Определить Q {plast_combo} при Р=80-100атм. СКВ', None,
-                   f'Произвести насыщение скважины в объеме 5м3. Определить приемистость {plast_combo} при Р=80-100атм '
-                   f'в присутствии представителя УСРСиСТ или подрядчика по РИР. (Вести контроль за отдачей жидкости '
-                   f'после закачки, объем согласовать с подрядчиком по РИР). В случае приёмистости менее  250м3/сут '
-                   f'при Р=100атм произвести соляно-кислотную обработку скважины в объеме 1м3 HCl-12% с целью увеличения '
-                   f'приемистости по технологическому плану',
-                   None, None, None, None, None, None, None,
-                   'мастер КРС', 1.77]
+                          f'Произвести насыщение скважины в объеме 5м3. Определить приемистость {plast_combo} при Р=80-100атм '
+                          f'в присутствии представителя УСРСиСТ или подрядчика по РИР. (Вести контроль за отдачей жидкости '
+                          f'после закачки, объем согласовать с подрядчиком по РИР). В случае приёмистости менее  250м3/сут '
+                          f'при Р=100атм произвести соляно-кислотную обработку скважины в объеме 1м3 HCl-12% с целью увеличения '
+                          f'приемистости по технологическому плану',
+                          None, None, None, None, None, None, None,
+                          'мастер КРС', 1.77]
             rir_list.insert(-3, rir_q_list)
-
         else:
             rir_list = []
+
+
+        return rir_list
+    def rir_paker(self, paker_need_Combo, plast_combo, roof_rir_edit, sole_rir_edit):
+        from open_pz import CreatePZ
+
+        rir_list = self.need_paker(paker_need_Combo, plast_combo)
 
         rir_paker_list = [[ f'РИР c пакером {plast_combo} c плановой кровлей на глубине {roof_rir_edit}м',
                             None,
@@ -793,23 +838,24 @@ class RirWindow(QMainWindow):
         if rir_type_Combo == 'РИР на пере': # ['РИР на пере', 'РИР с пакером', 'РИР с РПК', 'РИР с РПП']
 
             work_list = self.rirWithPero(paker_need_Combo, plast_combo, roof_rir_edit, sole_rir_edit)
-            AcidPakerWindow.populate_row(self, CreatePZ.ins_ind, work_list)
+
 
         elif rir_type_Combo == 'РИР с пакером': # ['РИР на пере', 'РИР с пакером', 'РИР с РПК', 'РИР с РПП']
-            print(paker_need_Combo, plast_combo, roof_rir_edit, sole_rir_edit)
+            # print(paker_need_Combo, plast_combo, roof_rir_edit, sole_rir_edit)
             work_list = self.rir_paker(paker_need_Combo, plast_combo, roof_rir_edit, sole_rir_edit)
-            AcidPakerWindow.populate_row(self, CreatePZ.ins_ind, work_list)
+
         elif rir_type_Combo == 'РИР с РПК': # ['РИР на пере', 'РИР с пакером', 'РИР с РПК', 'РИР с РПП']
 
             work_list = self.rir_rpk(paker_need_Combo, plast_combo, roof_rir_edit)
-            AcidPakerWindow.populate_row(self, CreatePZ.ins_ind, work_list)
+
         elif rir_type_Combo == 'РИР с РПП': # ['РИР на пере', 'РИР с пакером', 'РИР с РПК', 'РИР с РПП']
 
             work_list = self.rir_rpp(paker_need_Combo, plast_combo, roof_rir_edit)
-            AcidPakerWindow.populate_row(self, CreatePZ.ins_ind, work_list)
 
-        CreatePZ.pause = True
+
+        CreatePZ.pause = False
         self.close()
+        return work_list
     def rir_izvelPaker(self):
         from open_pz import CreatePZ
         pakerIzvPaker, ok = QInputDialog.getInt(None, 'Глубина извлекаемого пакера',

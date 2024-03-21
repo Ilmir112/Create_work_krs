@@ -61,12 +61,13 @@ class FindIndexPZ(QMainWindow):
 
     def readPZ(self, ws):
         from open_pz import CreatePZ
-
+        cat_well_min = []
         for row_ind, row in enumerate(ws.iter_rows(values_only=True)):
             ws.row_dimensions[row_ind].hidden = False
 
             if 'Категория скважины' in row:
-                CreatePZ.cat_well_min = ProtectedIsDigit(row_ind + 1)  # индекс начала категории
+                cat_well_min.append(row_ind + 1)
+                CreatePZ.cat_well_min = ProtectedIsDigit(min(cat_well_min))  # индекс начала категории
 
             elif 'План-заказ' in row:
 
@@ -196,9 +197,12 @@ class FindIndexPZ(QMainWindow):
                                     0, 0, 800)[0])
 
     def check_str_None(self, string):
-        # print(str(string).replace(' ', '') == '-')
+
         if isinstance(string, int) is True or isinstance(string, float) is True:
-            return string
+            if str(round(float(str(string).replace(',', '.')), 1))[-1] == "0":
+                return int(float(string))
+            else:
+                return round(float(str(string).replace(',', '.')), 4)
         elif str(string).replace(' ', '') == '-' or 'отсут' in str(string) or \
                 str(string).strip() == '' or string is None:
             return '0'
@@ -357,16 +361,16 @@ class WellFond_data(FindIndexPZ):
                         col_do = col
 
                     if 'Пакер' in str(value) and 'типоразмер' in str(row[col + 2].value):
-                        try:
-                            CreatePZ.paker_do["do"] = self.check_str_None(row[col_plan].value)[0]
-                            CreatePZ.paker2_do["do"] = self.check_str_None(row[col_plan].value)[1]
-                        except:
+                        if '/' in row[col_do].value:
+                            CreatePZ.paker_do["do"] = str(row[col_do].value).split('/')[0]
+                            CreatePZ.paker2_do["do"] = str(row[col_do].value).split('/')[1]
+                        else:
                             CreatePZ.paker_do["do"] = row[col_do].value
 
-                        try:
-                            CreatePZ.paker_do["posle"] = self.check_str_None(row[col_plan].value)[0]
-                            CreatePZ.paker2_do["posle"] = self.check_str_None(row[col_plan].value)[1]
-                        except:
+                        if '/' in row[col_plan].value:
+                            CreatePZ.paker_do["posle"] = str(row[col_plan].value).split('/')[0]
+                            CreatePZ.paker2_do["posle"] = str(row[col_plan].value).split('/')[1]
+                        else:
                             CreatePZ.paker_do["posle"] = row[col_plan].value
 
                     elif value == 'Насос' and row[col + 2].value == 'типоразмер':
@@ -471,33 +475,6 @@ class WellHistory_data(FindIndexPZ):
                         CreatePZ.max_admissible_pressure = self.definition_is_None(
                             CreatePZ.max_admissible_pressure, row_index + begin_index, col + 1, 1)
 
-        if CreatePZ.leakiness == True:
-            leakiness_quest = QMessageBox.question(self, 'нарушение колонны',
-                                                   'Программа определела что в скважине'
-                                                   f'есть нарушение - {CreatePZ.leakiness_Count}, верно ли?')
-            if leakiness_quest == QMessageBox.StandardButton.Yes:
-                CreatePZ.leakiness = True
-                if self.leakage_window is None:
-                    self.leakage_window = LeakageWindow()
-                    self.leakage_window.setWindowTitle("Геофизические исследования")
-                    self.leakage_window.setGeometry(200, 400, 300, 400)
-                    self.leakage_window.show()
-
-                    CreatePZ.pause_app(self)
-                    CreatePZ.dict_leakiness = self.leakage_window.addWork()
-                    # print(f'словарь нарушений {CreatePZ.dict_leakiness}')
-                    CreatePZ.pause = True
-                    self.leakage_window = None  # Discard reference.
-
-
-                else:
-                    self.leakage_window.close()  # Close window.
-                    self.leakage_window = None  # Discard reference.
-
-
-            else:
-                CreatePZ.leakiness = False
-
 
 class WellCondition(FindIndexPZ):
 
@@ -505,9 +482,11 @@ class WellCondition(FindIndexPZ):
         from open_pz import CreatePZ
 
         super().__init__(ws)
+        self.leakage_window = None
         self.ws = ws
 
         self.read_well(ws, CreatePZ.condition_of_wells._value, CreatePZ.data_well_max._value)
+
 
     def read_well(self, ws, begin_index, cancel_index):
         from open_pz import CreatePZ
@@ -564,6 +543,33 @@ class WellCondition(FindIndexPZ):
             else:
                 CreatePZ.grpPlan = False
 
+        if CreatePZ.leakiness == True:
+            leakiness_quest = QMessageBox.question(self, 'нарушение колонны',
+                                                   'Программа определела что в скважине'
+                                                   f'есть нарушение - {CreatePZ.leakiness_Count}, верно ли?')
+            if leakiness_quest == QMessageBox.StandardButton.Yes:
+                CreatePZ.leakiness = True
+                if self.leakage_window is None:
+                    self.leakage_window = LeakageWindow()
+                    self.leakage_window.setWindowTitle("Геофизические исследования")
+                    self.leakage_window.setGeometry(200, 400, 300, 400)
+                    self.leakage_window.show()
+
+                    CreatePZ.pause_app(self)
+                    CreatePZ.dict_leakiness = self.leakage_window.addWork()
+                    # print(f'словарь нарушений {CreatePZ.dict_leakiness}')
+                    CreatePZ.pause = True
+                    self.leakage_window = None  # Discard reference.
+
+
+                else:
+                    self.leakage_window.close()  # Close window.
+                    self.leakage_window = None  # Discard reference.
+
+
+            else:
+                CreatePZ.leakiness = False
+
 
 class Well_expected_pick_up(FindIndexPZ):
 
@@ -585,6 +591,7 @@ class Well_expected_pick_up(FindIndexPZ):
                 value = cell.value
                 if value:
 
+
                     if 'прием' in str(value).lower() or 'qж' in str(value).lower():
                         CreatePZ.expected_Q = row[col + 1].value
                       # print(CreatePZ.expected_Q)
@@ -601,11 +608,15 @@ class Well_expected_pick_up(FindIndexPZ):
                     if 'qн' in str(value).lower():
                         CreatePZ.Qoil = str(row[col + 1].value).replace(' ', '').replace('т/сут', '')
                         CreatePZ.Qoil = self.definition_is_None(CreatePZ.Qoil, row_index, col + 1, 1)
-                    if 'воды' in str(value).lower():
-                        proc_water = str(row[col + 1].value).replace(' ', '').replace('%', '')
-                        proc_water = int(float(proc_water)) if float(proc_water) > 1 else round(float(proc_water) * 100,
+                    if 'воды' in str(value).lower() and "%" in str(value).lower():
+                        try:
+                            proc_water = str(row[col + 1].value).replace(' ', '').replace('%', '')
+
+                            proc_water = self.definition_is_None(proc_water, row_index, col + 1, 1)
+                            CreatePZ.proc_water = int(float(proc_water)) if float(proc_water) > 1 else round(float(proc_water) * 100,
                                                                                                 0)
-                        CreatePZ.proc_water = self.definition_is_None(proc_water, row_index, col + 1, 1)
+                        except:
+                            print(f'ошибка в определение')
 
             try:
                 CreatePZ.expected_pick_up[CreatePZ.expected_Q] = CreatePZ.expected_P
@@ -961,13 +972,13 @@ class Well_perforation(FindIndexPZ):
 
             if all([str(i).strip() == 'None' or i is None for i in lst]) is False:
                 perforations_intervals.append(lst)
-        print(perforations_intervals)
+        # print(perforations_intervals)
         for ind, row in enumerate(perforations_intervals):
             plast = row[col_plast_index]
-            print(f'пласт {plast}')
+            # print(f'пласт {plast}')
             if plast is None:
                 plast = perforations_intervals[ind - 1][col_plast_index]
-            print(f'пластs {plast}')
+            # print(f'пластs {plast}')
 
             if any(['проект' in str((i)).lower() or 'не пер' in str((i)).lower() for i in row]) is False and all(
                     [str(i).strip() is None for i in row]) is False and is_number(row[col_roof_index]) is True \
@@ -1118,7 +1129,7 @@ class Well_Category(FindIndexPZ):
 
     def read_well(self, ws, begin_index, cancel_index):
         from open_pz import CreatePZ
-        print(f'индекс катего {begin_index, cancel_index}')
+        # print(f'индекс катего {begin_index, cancel_index}')
         for row in range(begin_index, cancel_index):
             for col in range(1, 13):
                 cell = ws.cell(row=row, column=col).value
@@ -1137,10 +1148,10 @@ class Well_Category(FindIndexPZ):
                             ws.cell(row=row - 1, column=2).value):
                         for column in range(1, 13):
                             col = ws.cell(row=row, column=column).value
-                            print(f'ячейка {col}')
+                            # print(f'ячейка {col}')
                             if str(col) in ['%', 'мг/л', 'мг/дм3', 'мг/м3'] and \
                                     ws.cell(row=row, column=column - 2).value:
-                                print(f'ячейка- 3 3 {col}')
+                                # print(f'ячейка- 3 3 {col}')
                                 CreatePZ.cat_H2S_list.append(ws.cell(row=row, column=column - 2).value)
 
 
@@ -1161,14 +1172,27 @@ class Well_Category(FindIndexPZ):
                             CreatePZ.gaz_f_pr.append(round(float(self.check_str_None(cell2)), 1))
                     elif '%' in str(cell):
                         cell2 = ws.cell(row=row, column=col - 1).value
-                        # print(f'проц {cell2}')
-                        CreatePZ.H2S_pr.append(float(str(self.check_str_None(cell2)).replace(',', '.')))
+                        print(f'проц {cell2}')
+                        if type(cell2) in [float, int]:
+                            if str(round(float(str(cell2).replace(',', '.')), 3))[-1] == "0":
+                                H2S_pr = int(float(cell2))
+                            else:
+                                H2S_pr = round(float(str(cell2).replace(',', '.')), 4)
+                            CreatePZ.H2S_pr.append(float(str(H2S_pr).replace(',', '.')))
+                        else:
+                            H2S_pr = cell2
+                            CreatePZ.H2S_pr.append(self.check_str_None(cell2))
+
 
                     elif str(cell) in 'мг/м3':
                         cell2 = ws.cell(row=row, column=col - 1).value
                         if cell2:
                             CreatePZ.H2S_mg_m3.append(float(str(self.check_str_None(cell2)).replace(',', '.')) / 1000)
-        print(f'kbcnf {CreatePZ.H2S_pr} кат {CreatePZ.cat_H2S_list}')
+        if len(CreatePZ.H2S_mg) == 0 and len(CreatePZ.H2S_mg_m3) != 0:
+            for mg in CreatePZ.H2S_mg_m3:
+                print(f'значени{mg}')
+                CreatePZ.H2S_mg.append(mg)
+
         if self.data_window is None:
             self.data_window = CategoryWindow(self)
             self.data_window.setWindowTitle("Сверка данных")

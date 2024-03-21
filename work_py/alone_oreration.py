@@ -25,14 +25,14 @@ def kot_select(self):
     return kot_select
 
 
-def kot_work(self):
+def kot_work(self, current_bottom):
     from open_pz import CreatePZ
     current_bottom, ok = QInputDialog.getDouble(self, 'Необходимый забой',
                                                          'Введите забой до которого нужно нормализовать',
-                                                         float(CreatePZ.current_bottom))
+                                                         float(current_bottom))
 
     kot_list = [[f'статической уровень {CreatePZ.static_level._value}', None,
-                 f'При отсутствии циркуляции (статической уровень в ПЗ {CreatePZ.static_level._value}м):\n'
+                 f'При отсутствии циркуляции:\n'
                  f'Спустить {kot_select(self)} на НКТ{CreatePZ.nkt_diam}мм до глубины {CreatePZ.current_bottom}м'
                  f' с замером, шаблонированием шаблоном {CreatePZ.nkt_template}мм.',
                  None, None, None, None, None, None, None,
@@ -79,7 +79,7 @@ def fluid_change(self):
 
 def check_h2s(self):
     from open_pz import CreatePZ
-    from H2S import calv_h2s
+
     cat_H2S_list = list(map(int, [CreatePZ.dict_category[plast]['по сероводороду'].category for plast in
                                   CreatePZ.plast_work if CreatePZ.dict_category.get(plast) and
                                   CreatePZ.dict_category[plast]['отключение'] == 'рабочий']))
@@ -102,13 +102,11 @@ def check_h2s(self):
                                                    'Введите значение удельного веса жидкости', 1.02, 1, 1.72, 2)
         try:
             expected_pressure = list(CreatePZ.dict_perforation_project[plast]['давление'])[0]
-            print(f'ожидаемое давление {expected_pressure}')
+
             expected_pressure, ok = QInputDialog.getDouble(None, 'Ожидаемое давление по пласту',
                                                            'Введите Ожидаемое давление по пласту',
                                                            expected_pressure, 0, 300, 1)
-            well_volume_in_PZ, _ = QInputDialog.getDouble(None, 'Объем глушения',
-                                                          'ВВедите объем глушения согласно ПЗ', 50, 1,
-                                                          70)
+
         except:
             mes = QMessageBox.warning(self, 'Ошибка', 'ошибка в определении планового пластового давления')
             expected_pressure, ok = QInputDialog.getDouble(self, 'Ожидаемое давление по пласту',
@@ -117,17 +115,12 @@ def check_h2s(self):
         plast, ok = QInputDialog.getText(self, 'выбор пласта для расчета ЖГС ', 'введите пласт для перфорации')
 
     try:
-        cat_H2S_list_plan = list(map(int,
+        print()
+        print(CreatePZ.dict_category)
+        cat_H2S_list_plan = list(map(float,
                                      [CreatePZ.dict_category[plast]['по сероводороду'].category for plast in
                                       CreatePZ.plast_project]))
-        # H2S_mg_plan = list(map(int, [CreatePZ.dict_category[plast]['по сероводороду'].data_mg_l for plast in
-        #                              CreatePZ.plast_project]))
-        # H2S_pr_plan = list(map(int, [CreatePZ.dict_category[plast]['по сероводороду'].data_procent for plast in
-        #                              CreatePZ.plast_project]))
     except:
-            cat_H2S_list_plan = False
-
-    if len(CreatePZ.plast_work) == 0 and cat_H2S_list_plan is False:
 
         cat_H2S_list_plan_int, ok = QInputDialog.getInt(self, 'Категория',
                                                          'Введите категорию скважины по H2S на вскрываемый пласт',
@@ -147,6 +140,10 @@ def check_h2s(self):
 
 
     if len(cat_H2S_list) != 0:
+        fluid_new, ok = QInputDialog.getDouble(self, 'Новое значение удельного веса жидкости',
+                                               'Введите значение удельного веса жидкости', 1.02, 1, 1.72, 2)
+        expected_pressure, ok = QInputDialog.getDouble(self, 'Ожидаемое давление по пласту',
+                                                       'Введите Ожидаемое давление по пласту', 0, 0, 300, 1)
         if cat_H2S_list_plan[0] in [1, 2] and len(CreatePZ.plast_work) == 0:
             expenditure_h2s = round(max([CreatePZ.dict_category[plast]['по сероводороду'].poglot for plast in CreatePZ.plast_project]), 3)
             CreatePZ.fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
@@ -163,22 +160,29 @@ def check_h2s(self):
             CreatePZ.fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
                                   f'расчета {expenditure_h2s}кг/м3 '
         else:
-            CreatePZ.fluid_work = f'{fluid_new}г/см3 '
+            try:
+                CreatePZ.fluid_work = f'{fluid_new}г/см3 '
+            except:
+
+                expected_pressure, ok = QInputDialog.getDouble(self, 'Ожидаемое давление по пласту',
+                                                               'Введите Ожидаемое давление по пласту', 0, 0, 300, 1)
+
     else:
+        fluid_new, ok = QInputDialog.getDouble(self, 'Новое значение удельного веса жидкости',
+                                               'Введите значение удельного веса жидкости', 1.02, 1, 1.72, 2)
+        expected_pressure, ok = QInputDialog.getDouble(self, 'Ожидаемое давление по пласту',
+                                                       'Введите Ожидаемое давление по пласту', 0, 0, 300, 1)
         if cat_H2S_list_plan[0] in [1, 2]:
 
-            fluid_new, ok = QInputDialog.getDouble(self, 'Новое значение удельного веса жидкости',
-                                                       'Введите значение удельного веса жидкости', 1.02, 1, 1.72, 2)
+
             expenditure_h2s = round(
                 max([CreatePZ.dict_category[plast]['по сероводороду'].poglot for plast in CreatePZ.plast_project]), 3)
             CreatePZ.fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
                     f'расчета {expenditure_h2s}кг/м3 '
-            expected_pressure, ok = QInputDialog.getDouble(self, 'Ожидаемое давление по пласту',
-                                                           'Введите Ожидаемое давление по пласту', 0, 0, 300, 1)
+
         else:
             CreatePZ.fluid_work = f'{fluid_new}г/см3 '
-            expected_pressure, ok = QInputDialog.getDouble(self, 'Ожидаемое давление по пласту',
-                                                           'Введите Ожидаемое давление по пласту', 0, 0, 300, 1)
+
     return (CreatePZ.fluid_work, CreatePZ.fluid_work_short, plast, expected_pressure)
 
 def konte(self):

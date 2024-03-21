@@ -16,11 +16,10 @@ def skm_interval(self, template):
                 str_raid.append([int(float(nek[0])) - 90,
                                  CreatePZ.current_bottom - 2])
     if all([CreatePZ.dict_perforation[plast]['отрайбировано'] is False for plast in CreatePZ.plast_work]):
-        str_raid.append([CreatePZ.perforation_roof - 90, CreatePZ.perforation_roof - 10])
-
+        str_raid.append([CreatePZ.perforation_roof - 90, CreatePZ.skm_depth])
         if CreatePZ.leakiness:
             for nek in list(CreatePZ.dict_leakiness['НЭК']['интервал'].keys()):
-                print(f' наруш {nek}')
+                # print(f' наруш {nek}')
                 if float(nek[1]) + 20 < CreatePZ.current_bottom:
                     str_raid.append([int(float(nek[0])) - 90, int(float(nek[1])) + 20])
                 else:
@@ -59,36 +58,37 @@ def skm_interval(self, template):
 
     for interval in merged_segments:
         if template in ['ПСШ ЭК', 'ПСШ без хвоста', 'ПСШ открытый ствол']:
-            if CreatePZ.skm_depth >= interval[1]:
+            if CreatePZ.skm_depth >= interval[1] and interval[1] > interval[0]:
                 merged_segments_new.append(interval)
-            elif CreatePZ.skm_depth <= interval[1] and CreatePZ.skm_depth >= interval[0]:
+            elif CreatePZ.skm_depth <= interval[1] and CreatePZ.skm_depth >= interval[0] and interval[1] > interval[0]:
                 merged_segments_new.append([interval[0], CreatePZ.skm_depth])
 
 
         elif template in ['ПСШ СКМ в доп колонне c хвостом', 'ПСШ СКМ в доп колонне без хвоста',
                           'ПСШ СКМ в доп колонне + открытый ствол'] and CreatePZ.skm_depth > interval[1]:
             if interval[0] > float(CreatePZ.head_column_additional._value) and interval[1] > float(
-                    CreatePZ.head_column_additional._value) and CreatePZ.skm_depth >= interval[1]:
+                    CreatePZ.head_column_additional._value) and CreatePZ.skm_depth >= interval[1] \
+                    and interval[1] > interval[0]:
                 merged_segments_new.append(interval)
 
             elif interval[0] < float(CreatePZ.head_column_additional._value) and interval[1] > float(
                     CreatePZ.head_column_additional._value) and CreatePZ.skm_depth <= interval[1] \
-                    and CreatePZ.skm_depth >= interval[0] :
+                    and CreatePZ.skm_depth >= interval[0] and interval[1] > interval[0]:
 
                 merged_segments_new.append((CreatePZ.head_column_additional._value + 2, CreatePZ.skm_depth))
             elif interval[0] < float(CreatePZ.head_column_additional._value) and interval[1] > float(
-                CreatePZ.head_column_additional._value) and CreatePZ.skm_depth >= interval[1]:
+                CreatePZ.head_column_additional._value) and CreatePZ.skm_depth >= interval[1] and interval[1] > interval[0]:
 
                 merged_segments_new.append((CreatePZ.head_column_additional._value + 2, interval[1]))
                 # print(f'2 {interval, merged_segments}')
         elif template in ['ПСШ Доп колонна СКМ в основной колонне']:
             if interval[0] < float(CreatePZ.head_column_additional._value) and interval[1] < float(
-                    CreatePZ.head_column_additional._value) and CreatePZ.skm_depth >= interval[1]:
+                    CreatePZ.head_column_additional._value) and CreatePZ.skm_depth >= interval[1] and interval[1] > interval[0]:
                 merged_segments_new.append(interval)
 
             elif interval[0] < float(CreatePZ.head_column_additional._value) and interval[1] > float(
                     CreatePZ.head_column_additional._value) and CreatePZ.skm_depth <= interval[1] \
-                    and CreatePZ.skm_depth >= interval[0]:
+                    and CreatePZ.skm_depth >= interval[0] and interval[1] > interval[0]:
                 # merged_segments.remove(interval)
                 merged_segments_new.append((interval[0], CreatePZ.skm_depth))
 

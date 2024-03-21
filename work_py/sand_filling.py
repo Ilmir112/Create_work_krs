@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import QInputDialog, QMessageBox
-from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm,well_volume_norm
 
+from work_py.opressovka import OpressovkaEK
+from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm,well_volume_norm
 
 
 
@@ -18,6 +19,7 @@ def sand_select(self):
 def sandFilling(self):
     from open_pz import CreatePZ
     from krs import well_volume, volume_vn_ek
+    from work_py.rir import RirWindow
     nkt_diam = ''.join(['73' if CreatePZ.column_diametr._value > 110 else '60'])
 
 
@@ -65,13 +67,9 @@ def sandFilling(self):
          f'В случае пеcчаного моста ниже гл.{filling_depth}м работы повторить с корректировкой обьема и технологических глубин.'
          f' В случае песчаного моста выше гл.{filling_depth}м вымыть песок до гл.{filling_depth}м',
          None, None, None, None, None, None, None,
-         'мастер КРС', None],
-        [None, None,
-         f'Поднять {sand_select(self)} НКТ{nkt_diam}м с глубины {filling_depth}м с доливом скважины в объеме {round(filling_depth * 1.12/1000,1)}м3 тех. жидкостью  уд.весом {CreatePZ.fluid_work}',
-         None, None, None, None, None, None, None,
-         'мастер КРС', liftingNKT_norm(filling_depth,1)]
+         'мастер КРС', None]
     ]
-    if CreatePZ.leakiness == False and CreatePZ.perforation_roof > filling_depth:
+    if OpressovkaEK.testing_pressure(self, filling_depth):
         filling_list.insert(-1,
                             [f'Опрессовать в инт{filling_depth}-0м на Р={CreatePZ.max_admissible_pressure._value}атм',
                              None, f'Опрессовать эксплуатационную колонну в интервале {filling_depth}-0м на'
@@ -100,6 +98,28 @@ def sandFilling(self):
 
 
     CreatePZ.current_bottom = filling_depth
+    rir_true_quest = QMessageBox.question(self, 'РИР на пере',
+                                          'Нужно производить заливку на данной компоновке?')
+    if rir_true_quest == QMessageBox.StandardButton.Yes:
+        if self.rir_window is None:
+
+            self.rir_window = RirWindow()
+            self.rir_window.setGeometry(200, 400, 300, 400)
+            self.rir_window.show()
+            CreatePZ.pause_app(self)
+            CreatePZ.pause = True
+            rir_work_list = self.rir_window.addRowTable()
+            self.rir_window = None
+        else:
+            self.rir_window.close()  # Close window.
+            self.rir_window = None
+        filling_list.extend(rir_work_list[-9:])
+    else:
+        filling_list.append([None, None,
+         f'Поднять {sand_select(self)} НКТ{nkt_diam}м с глубины {filling_depth}м с доливом скважины в '
+         f'объеме {round(filling_depth * 1.12 / 1000, 1)}м3 тех. жидкостью  уд.весом {CreatePZ.fluid_work}',
+         None, None, None, None, None, None, None,
+         'мастер КРС', liftingNKT_norm(filling_depth, 1)])
 
     return filling_list
 

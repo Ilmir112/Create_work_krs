@@ -19,13 +19,15 @@ class TabPage_SO(QWidget):
         for plast in CreatePZ.plast_project:
             self.plast_all.append(plast)
 
-        print(f'пласты {self.plast_all}')
+
         self.cat_P_1 = CreatePZ.cat_P_1
         self.cat_H2S_list = CreatePZ.cat_H2S_list
         self.cat_gaz_f_pr = CreatePZ.cat_gaz_f_pr
         self.gaz_f_pr = CreatePZ.gaz_f_pr
         self.H2S_mg = CreatePZ.H2S_mg
+        print(f'мг {self.H2S_mg}')
         self.H2S_pr = CreatePZ.H2S_pr
+        print(f'мг % {self.H2S_pr}')
         self.cat_P_P = CreatePZ.cat_P_P
 
         self.category_pressuar_Label = QLabel('По Рпл')
@@ -44,8 +46,8 @@ class TabPage_SO(QWidget):
         n = 1
         work_plast_iter = None
         CreatePZ.number_indez = []
-        print(f'строки {list(set(CreatePZ.cat_P_P))}')
-        print(f'{self.H2S_pr}')
+        # print(f'строки {list(set(CreatePZ.cat_P_P))}')
+        # print(f'{self.H2S_pr}')
 
         for num in range(len(list(set(CreatePZ.cat_P_P)))):
 
@@ -69,15 +71,19 @@ class TabPage_SO(QWidget):
                         self.plast_all.append(work_plast)
                         work_plast_index = 1
             except:
+
                 work_plast, ok = QInputDialog.getText(None, 'индекс пласта', 'Введите индекc пласта вскрываемого')
+                while work_plast not in  CreatePZ.plast_all:
+                    mes = QMessageBox.warning(self, 'Ошибка', 'Пласт есть в списке')
+                    work_plast, ok = QInputDialog.getText(None, 'индекс пласта', 'Введите индекc пласта вскрываемого')
                 self.plast_all.append(work_plast)
                 CreatePZ.plast_all.append(work_plast)
                 work_plast_index = 1
 
 
             plast_index.addItems(self.plast_all)
-
-            print(f'пласт {work_plast}')
+            #
+            # print(f'пласт {work_plast}')
             plast_index.setCurrentIndex(self.plast_all.index(work_plast))
 
             category_pressuar_line_edit = QLineEdit(self)
@@ -85,15 +91,21 @@ class TabPage_SO(QWidget):
 
             pressuar_data_edit = QLineEdit(self)
             pressuar_data_edit.setText(str(self.ifNone(self.cat_P_P[num])))
-            print(num)
+            # print(num)
             category_h2s_edit = QLineEdit(self)
             category_h2s_edit.setText(str(self.ifNone(self.cat_H2S_list[num])))
             H2S_pr_edit = QLineEdit(self)
-            H2S_pr_edit.setText(str(self.ifNone(self.H2S_pr[num])))
+            if str(round(float(str(self.H2S_pr[num]).replace(',', '.')), 3))[-1] == "0":
+                H2S_pr =  int(float(self.H2S_pr[num]))
+            else:
+                H2S_pr = round(float(str(self.H2S_pr[num]).replace(',', '.')), 4)
+
+            H2S_pr_edit.setText(str(H2S_pr))
 
             category_h2s2_edit = QLineEdit(self)
             category_h2s2_edit.setText(str(self.ifNone(self.cat_H2S_list[num])))
             H2S_mg_edit = QLineEdit(self)
+
             H2S_mg_edit.setText(str(self.ifNone(self.H2S_mg[num])))
 
             category_gf_edit = QLineEdit(self)
@@ -160,10 +172,10 @@ class TabPage_SO(QWidget):
         if str(string) in ['0', str(None), '-']:
             return 'отсут'
         elif str(string).replace('.', '').replace(',', '').isdigit():
-
-            # print(str(round(float(string), 1))[-1] == '0', int(string), float(string))
-            return int(float(string)) if str(round(float(str(string).replace(',', '.')), 1))[-1] == "0" else \
-                round(float(str(string).replace(',', '.')), 4)
+            if str(round(float(str(string).replace(',', '.')), 1))[-1] == "0":
+                return int(float(string))
+            else:
+                return round(float(str(string).replace(',', '.')), 4)
         else:
             return str(string)
 
@@ -198,6 +210,7 @@ class CategoryWindow(QMainWindow):
         from open_pz import CreatePZ
         # Пересохранение по сереводорода
 
+
         cat_P_1 = CreatePZ.cat_P_1
 
         plast_index = []
@@ -212,6 +225,7 @@ class CategoryWindow(QMainWindow):
                         return
 
                 plast = self.tabWidget.currentWidget().labels_category[index][0].currentText()
+
                 plast_index.append(plast)
                 if plast not in CreatePZ.plast_work:
                     CreatePZ.plast_project.append(plast)
@@ -237,7 +251,7 @@ class CategoryWindow(QMainWindow):
                     'отключение', self.tabWidget.currentWidget().labels_category[index][8].currentText())
                 # CategoryWindow.dict_category.setdefault(plast, {}).setdefault(
                 #     'поглотитель', self.tabWidget.currentWidget().labels_category[index][9].currentText())
-
+        print(f'кат {CategoryWindow.dict_category}')
         CreatePZ.pause = False
         self.close()
 

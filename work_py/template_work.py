@@ -1,6 +1,6 @@
 import math
 from PyQt5.QtWidgets import QInputDialog, QMessageBox, QTabWidget, QWidget, QLabel, QComboBox, QMainWindow, QLineEdit, \
-    QGridLayout, QPushButton, QBoxLayout, QTableWidget, QHeaderView, QTableWidgetItem
+    QGridLayout, QPushButton, QBoxLayout, QTableWidget, QHeaderView, QTableWidgetItem, QApplication
 
 from open_pz import CreatePZ
 from work_py.acid_paker import AcidPakerWindow
@@ -658,7 +658,7 @@ class TabPage_SO_with(QWidget):
                 if CreatePZ.head_column_additional._value <= roof:
                     if dict_perforation[plast]['отрайбировано'] and CreatePZ.open_trunk_well is False:
                         roof_add_column_plast = CreatePZ.current_bottom
-                        roof_plast = CreatePZ.head_column_additional
+                        roof_plast = CreatePZ.head_column_additional._value
                     elif CreatePZ.open_trunk_well is True and dict_perforation[plast]['отрайбировано']:
                         roof_plast = CreatePZ.shoe_column._value
                         roof_add_column_plast =CreatePZ.current_bottom
@@ -767,16 +767,13 @@ class TabWidget(QTabWidget):
 
 class TemplateKrs(QMainWindow):
 
-    def __init__(self, table_widget, ins_ind):
-
-        super(QMainWindow, self).__init__()
+    def __init__(self, parent=None):
+        super().__init__()
+        print(f'дочерний класс TemplateKRS')
 
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
-        self.table_widget = table_widget
-        self.ins_ind = ins_ind
-        self.rir_paker = None
-        self.paker_select = None
+
         self.tabWidget = TabWidget()
         self.tableWidget = QTableWidget(0, 3)
         self.tableWidget.setHorizontalHeaderLabels(
@@ -810,7 +807,6 @@ class TemplateKrs(QMainWindow):
 
         roof_skm = self.tabWidget.currentWidget().roof_skm_line.text().replace(',', '.')
         sole_skm = self.tabWidget.currentWidget().sole_skm_line.text().replace(',', '.')
-
         if not roof_skm or not sole_skm:
             msg = QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
             return
@@ -834,6 +830,11 @@ class TemplateKrs(QMainWindow):
         template = self.tabWidget.currentWidget().template_Combo.currentText()
 
         skm_interval = skm_interval(self, template)
+        if len(skm_interval) == 0:
+            mes = QMessageBox.warning(self, 'Ошибка',
+                                      'Интервалы перфорации не отрайбированы,'
+                                      'данная компоновка не позволяет скреперовать посадку пакера')
+            return
         rows = self.tableWidget.rowCount()
 
         for roof, sole in skm_interval:
@@ -866,6 +867,9 @@ class TemplateKrs(QMainWindow):
 
         skm_tuple = []
         rows = self.tableWidget.rowCount()
+        if rows == 0:
+            mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'Нужно добавить интервалы скреперования')
+            return
         for row in range(rows):
             roof_skm = self.tableWidget.item(row, 0)
             sole_skm = self.tableWidget.item(row, 1)
@@ -880,7 +884,7 @@ class TemplateKrs(QMainWindow):
 
         CreatePZ.pause = False
         self.close()
-
+        # print(f'в {work_template_list}')
         return work_template_list
 
     def del_row_table(self):
@@ -1038,7 +1042,7 @@ class TemplateKrs(QMainWindow):
                                                                                     'обратных клапанов перед ПСШ?')
             if kot_question == QMessageBox.StandardButton.Yes:
                 # print(f'Нужно вставить коты')
-                for row in kot_work(self)[::-1]:
+                for row in kot_work(self, CreatePZ.current_bottom)[::-1]:
                     list_template_ek.insert(0, row)
 
         if CreatePZ.gipsInWell is True:  # Добавление работ при наличии Гипсово-солевых отложений
@@ -1061,6 +1065,7 @@ class TemplateKrs(QMainWindow):
         from work_py.drilling import Drill_window
 
         pero_list = RirWindow.pero_select(self, CreatePZ.current_bottom)
+
         gipsPero_list = [
             [f'Спустить {pero_list}  на тНКТ{CreatePZ.nkt_diam}мм', None,
              f'Спустить {pero_list}  на тНКТ{CreatePZ.nkt_diam}мм до глубины {CreatePZ.current_bottom}м '
@@ -1129,3 +1134,13 @@ class TemplateKrs(QMainWindow):
                     gipsPero_list.append(row)
 
         return gipsPero_list
+
+
+if __name__ == "__main__":
+    import sys
+
+    app = QApplication(sys.argv)
+    # app.setStyleSheet()
+    window = TemplateKrs()
+    window.show()
+    app.exec_()

@@ -14,25 +14,40 @@ class TabPage_SO(QWidget):
         from open_pz import CreatePZ
         super().__init__(parent)
 
-        validator = QDoubleValidator(0.0, 80000.0, 2)
+        self.validator = QDoubleValidator(0.0, 80000.0, 2)
 
         self.diametr_paker_labelType = QLabel("Диаметр пакера", self)
         self.diametr_paker_edit = QLineEdit(self)
 
         self.paker_khost_Label = QLabel("Длина хвостовика", self)
         self.paker_khost_edit = QLineEdit(self)
-        self.paker_khost_edit.setValidator(validator)
+        self.paker_khost_edit.setValidator(self.validator)
 
         self.paker_depth_Label = QLabel("Глубина посадки", self)
         self.paker_depth_edit = QLineEdit(self)
-        self.paker_depth_edit.setValidator(validator)
+        self.paker_depth_edit.setValidator(self.validator)
         self.paker_depth_edit.textChanged.connect(self.update_paker)
-        self.paker_depth_edit.setText(str(int(CreatePZ.perforation_roof - 20)))
+
+        if len(CreatePZ.plast_work) != 0:
+            pakerDepth = CreatePZ.perforation_sole -20
+        else:
+            if CreatePZ.leakiness:
+                pakerDepth = min([CreatePZ.dict_perforation['НЭК']['интервал'][nek][0] - 10
+                                       for nek in CreatePZ.dict_perforation['НЭК']['интервал'].keys()])
+
+        self.paker_depth_edit.setText(str(int(pakerDepth)))
+
+        self.pakerDepthZumpf_Label = QLabel("Глубина посадки для ЗУМПФа", self)
+        self.pakerDepthZumpf_edit = QLineEdit(self)
+        self.pakerDepthZumpf_edit.setValidator(self.validator)
 
         self.pressureZUMPF_question_Label = QLabel("Нужно ли опрессовывать ЗУМПФ", self)
         self.pressureZUMPF_question_QCombo = QComboBox(self)
         self.pressureZUMPF_question_QCombo.currentTextChanged.connect(self.update_paker)
+
         self.pressureZUMPF_question_QCombo.addItems(['Нет', 'Да'])
+
+
 
         self.grid_layout = QGridLayout(self)
 
@@ -48,18 +63,30 @@ class TabPage_SO(QWidget):
         self.grid_layout.addWidget(self.pressureZUMPF_question_Label, 3, 4)
         self.grid_layout.addWidget(self.pressureZUMPF_question_QCombo, 4, 4)
 
-        self.pakerDepthZumpf_Label = QLabel("Глубина посадки для ЗУМПФа", self)
-        self.pakerDepthZumpf_edit = QLineEdit(self)
-        self.pakerDepthZumpf_edit.setValidator(validator)
-        pakerDepthZumpf = CreatePZ.perforation_sole + 10
-        self.pakerDepthZumpf_edit.setText(f'{pakerDepthZumpf}')
+        # self.grid_layout.addWidget(self.pakerDepthZumpf_Label, 3, 5)
+        # self.grid_layout.addWidget(self.pakerDepthZumpf_edit, 4, 5)
 
-        self.grid_layout.addWidget(self.pakerDepthZumpf_Label, 3, 5)
-        self.grid_layout.addWidget(self.pakerDepthZumpf_edit, 4, 5)
 
-    def update_paker(self):
 
+
+    def update_paker(self, index):
         from open_pz import CreatePZ
+
+        if index == 'Да':
+            if len(CreatePZ.plast_work) != 0:
+                pakerDepthZumpf = CreatePZ.perforation_sole + 10
+            else:
+                if CreatePZ.leakiness:
+                    pakerDepthZumpf = max([CreatePZ.dict_perforation['НЭК']['интервал'][nek][0]+10
+                                           for nek in CreatePZ.dict_perforation['НЭК']['интервал'].keys()])
+            self.pakerDepthZumpf_edit.setText(f'{pakerDepthZumpf}')
+
+            self.grid_layout.addWidget(self.pakerDepthZumpf_Label, 3, 5)
+            self.grid_layout.addWidget(self.pakerDepthZumpf_edit, 4, 5)
+        elif index == 'Нет':
+            self.pakerDepthZumpf_Label.setParent(None)
+            self.pakerDepthZumpf_edit.setParent(None)
+
         if CreatePZ.open_trunk_well == True:
             paker_depth = self.paker_depth_edit.text()
             if paker_depth != '':
@@ -117,45 +144,45 @@ class TabWidget(QTabWidget):
 
 
 class OpressovkaEK(QMainWindow):
-    def __init__(self, table_widget, ins_ind, forRirTrue=False):
-        super(OpressovkaEK, self).__init__()
+    def __init__(self, forRirTrue=False, parent=None):
+        super().__init__(parent)
 
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
-        self.table_widget = table_widget
-        self.ins_ind = ins_ind
-        self.paker_select = None
+        # self.table_widget = table_widget
+        # self.ins_ind = ins_ind
+        # self.paker_select = None
         self.forRirTrue = forRirTrue
         self.tabWidget = TabWidget()
 
         self.buttonAdd = QPushButton('Добавить данные в план работ')
-        self.buttonAdd.clicked.connect(self.addRowTable)
+        self.buttonAdd.clicked.connect(self.add_work)
         vbox = QGridLayout(self.centralWidget)
         vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
 
-    def addRowTable(self):
+    def add_work(self):
         from open_pz import CreatePZ
         pressureZUMPF_question = self.tabWidget.currentWidget().pressureZUMPF_question_QCombo.currentText()
 
         diametr_paker = int(float(self.tabWidget.currentWidget().diametr_paker_edit.text()))
         paker_khost = int(float(self.tabWidget.currentWidget().paker_khost_edit.text()))
         paker_depth = int(float(self.tabWidget.currentWidget().paker_depth_edit.text()))
-        pakerDepthZumpf = int(float(self.tabWidget.currentWidget().pakerDepthZumpf_edit.text()))
+        try:
+            pakerDepthZumpf = int(float(self.tabWidget.currentWidget().pakerDepthZumpf_edit.text()))
+        except:
+            pakerDepthZumpf = 0
 
         if int(paker_khost) + int(paker_depth) > CreatePZ.current_bottom and pressureZUMPF_question == 'Нет' \
                 or int(paker_khost) + int(pakerDepthZumpf) > CreatePZ.current_bottom and pressureZUMPF_question == 'Да':
             mes = QMessageBox.warning(self, 'Некорректные данные', f'Компоновка НКТ c хвостовик + пакер '
                                                                    f'ниже текущего забоя')
             return
-        work_list = self.paker_list(diametr_paker, paker_khost, paker_depth, pakerDepthZumpf, pressureZUMPF_question)
-        if self.forRirTrue:
-            CreatePZ.forPaker_list = work_list
-        else:
-            AcidPakerWindow.populate_row(self, CreatePZ.ins_ind, work_list)
 
-            CreatePZ.pause = True
-        self.close()
+        work_list = OpressovkaEK.paker_list(self, diametr_paker, paker_khost, paker_depth, pakerDepthZumpf, pressureZUMPF_question)
+        CreatePZ.pause = False
+
+        return work_list
 
     # Добавление строк с опрессовкой ЭК
     def paker_list(self, paker_diametr, paker_khost, paker_depth, pakerDepthZumpf, pressureZUMPF_question):
@@ -169,36 +196,36 @@ class OpressovkaEK(QMainWindow):
             paker_select = f'воронку + НКТ{CreatePZ.nkt_diam}мм {paker_khost}м +' \
                            f' пакер ПРО-ЯМО-{paker_diametr}мм (либо аналог) ' \
                            f'для ЭК {CreatePZ.column_diametr._value}мм х {CreatePZ.column_wall_thickness._value}мм +' \
-                           f' {self.nktOpress()[0]}'
+                           f' {OpressovkaEK.nktOpress(self)[0]}'
             paker_short = f'в-у + НКТ{CreatePZ.nkt_diam}мм {paker_khost}м +' \
                           f' пакер ПРО-ЯМО-{paker_diametr}мм  +' \
-                          f' {self.nktOpress()[0]}'
+                          f' {OpressovkaEK.nktOpress(self)[0]}'
         elif CreatePZ.column_additional is True and CreatePZ.column_additional_diametr._value < 110 and \
                 paker_depth > CreatePZ.head_column_additional._value:
             paker_select = f'воронку + НКТ{60}мм {paker_khost}м + пакер ПРО-ЯМО-' \
                            f'{paker_diametr}мм ' \
                            f'(либо аналог)  ' \
                            f'для ЭК {CreatePZ.column_additional_diametr._value}мм х ' \
-                           f'{CreatePZ.column_additional_wall_thickness._value}мм  + {self.nktOpress()[0]} ' \
+                           f'{CreatePZ.column_additional_wall_thickness._value}мм  + {OpressovkaEK.nktOpress(self)[0]} ' \
                            f'+ НКТ60мм L- {round(paker_depth - CreatePZ.head_column_additional._value, 0)}м'
             paker_short = f'в-у + НКТ{60}мм {paker_khost}м + пакер ПРО-ЯМО-' \
                           f'{paker_diametr}мм ' \
-                          f' + {self.nktOpress()[0]} ' \
+                          f' + {OpressovkaEK.nktOpress(self)[0]} ' \
                           f'+ НКТ60мм L- {round(paker_depth - CreatePZ.head_column_additional._value, 0)}м'
         elif CreatePZ.column_additional is True and CreatePZ.column_additional_diametr._value > 110 and \
                 paker_depth > CreatePZ.head_column_additional._value:
             paker_select = f'воронку + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками {paker_khost}м + ' \
                            f'пакер ПРО-ЯМО-{paker_diametr}мм (либо аналог) ' \
                            f'для ЭК {CreatePZ.column_additional_diametr._value}мм х ' \
-                           f'{CreatePZ.column_additional_wall_thickness._value}мм  + {self.nktOpress()[0]}' \
+                           f'{CreatePZ.column_additional_wall_thickness._value}мм  + {OpressovkaEK.nktOpress(self)[0]}' \
                            f'+ НКТ{CreatePZ.nkt_diam}мм со снятыми фасками L- ' \
                            f'{round(paker_depth - CreatePZ.head_column_additional._value, 0)}м'
             paker_short = f'в-у + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками {paker_khost}м + ' \
-                          f'пакер ПРО-ЯМО-{paker_diametr}мм + {self.nktOpress()[0]}' \
+                          f'пакер ПРО-ЯМО-{paker_diametr}мм + {OpressovkaEK.nktOpress(self)[0]}' \
                           f'+ НКТ{CreatePZ.nkt_diam}мм со снятыми фасками L- ' \
                           f'{round(paker_depth - CreatePZ.head_column_additional._value, 0)}м'
 
-        nktOpress_list = self.nktOpress()
+        nktOpress_list = OpressovkaEK.nktOpress(self)
 
         if pressureZUMPF_question == 'Да':
             paker_list = [
@@ -228,8 +255,8 @@ class OpressovkaEK(QMainWindow):
                  None, f'Приподнять и посадить пакер на глубине {paker_depth}м',
                  None, None, None, None, None, None, None,
                  'мастер КРС', 0.4],
-                [self.testing_pressure(paker_depth)[1], None,
-                 self.testing_pressure(paker_depth)[0],
+                [OpressovkaEK.testing_pressure(self, paker_depth)[1], None,
+                 OpressovkaEK.testing_pressure(self, paker_depth)[0],
                  None, None, None, None, None, None, None,
                  'мастер КРС, предст. заказчика', 0.67],
                 [f'срыв пакера 30мин + 1ч', None,
@@ -265,8 +292,8 @@ class OpressovkaEK(QMainWindow):
                 [None, None, f'Посадить пакер на глубине {paker_depth}м',
                  None, None, None, None, None, None, None,
                  'мастер КРС', 0.4],
-                [self.testing_pressure(paker_depth)[1],
-                 None, self.testing_pressure(paker_depth)[0],
+                [OpressovkaEK.testing_pressure(self, paker_depth)[1],
+                 None, OpressovkaEK.testing_pressure(self, paker_depth)[0],
                  None, None, None, None, None, None, None,
                  'мастер КРС, предст. заказчика', 0.67],
                 [f'cрыв пакера 30мин +1ч', None,
@@ -495,13 +522,12 @@ class OpressovkaEK(QMainWindow):
                     interval_list.append(interval)
 
         if CreatePZ.leakiness == True:
-
             for nek in CreatePZ.dict_leakiness['НЭК']['интервал']:
-                # print(CreatePZ.dict_leakiness)
-                if CreatePZ.dict_leakiness['НЭК']['интервал'][nek]['отключение'] == False:
+                if CreatePZ.dict_leakiness['НЭК']['интервал'][nek]['отключение'] is False and nek[0] < depth:
                     interval_list.append(nek)
-
+        check_true = False
         if any([float(interval[1]) < float(depth) for interval in interval_list]):
+            check_true = True
             testing_pressure_str = f'Закачкой тех жидкости в затрубное пространство при Р=' \
                                    f'{CreatePZ.max_admissible_pressure._value}атм' \
                                    f' удостоверить в отсутствии выхода тех жидкости и герметичности пакера, составить акт. ' \
@@ -510,9 +536,8 @@ class OpressovkaEK(QMainWindow):
             testing_pressure_short = f'Закачкой в затруб при Р=' \
                                      f'{CreatePZ.max_admissible_pressure._value}атм' \
                                      f' удостоверить в герметичности пакера'
-
         else:
-
+            check_true = False
             testing_pressure_str = f'Опрессовать эксплуатационную колонну в интервале {depth}-0м на ' \
                                    f'Р={CreatePZ.max_admissible_pressure._value}атм' \
                                    f' в течение 30 минут в присутствии представителя заказчика, составить акт. ' \
@@ -520,7 +545,7 @@ class OpressovkaEK(QMainWindow):
                                    f'до начала работ)'
             testing_pressure_short = f'Опрессовать в {depth}-0м на Р={CreatePZ.max_admissible_pressure._value}атм'
 
-        return testing_pressure_str, testing_pressure_short
+        return testing_pressure_str, testing_pressure_short, check_true
 
 
 

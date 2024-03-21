@@ -133,13 +133,12 @@ class TabWidget(QTabWidget):
 
 
 class GnktOpz(QMainWindow):
-    def __init__(self, table_widget, ins_ind, parent=None):
+    def __init__(self, parent=None):
 
         super(GnktOpz, self).__init__(parent=None)
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
-        self.table_widget = table_widget
-        self.ins_ind = ins_ind
+
         self.work_plan = 'gnkt_opz'
         self.paker_select = None
         self.tabWidget = TabWidget()
@@ -174,12 +173,9 @@ class GnktOpz(QMainWindow):
                                    plast_combo, svk_true_edit, skv_acid_edit)
 
 
-        CreatePZ.ins_ind += len(work_list)
-
-        AcidPakerWindow.populate_row(self, CreatePZ.ins_ind, work_list)
-
-        CreatePZ.pause = True
+        CreatePZ.pause = False
         self.close()
+        return work_list
 
     def gnkt_work(self, roof_plast, sole_plast, need_rast_combo, volume_rast_edit, acid_true_edit,
                   acid_edit, skv_volume_edit, skv_proc_edit, acid_volume_edit, acid_proc_edit, pressure_edit,

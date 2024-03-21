@@ -57,7 +57,33 @@ def claySolutionDef(self):
                           None, None, None, None, None, None, None,
                           'мастер КРС', descentNKT_norm(float(rirSole)-float(rirRoof), 1)])
         if (CreatePZ.plast_work) != 0:
-            pero_list.extend(RirWindow.rirWithPero(self)[-9:])
+            if self.rir_window is None:
+
+                self.rir_window = RirWindow()
+                self.rir_window.setGeometry(200, 400, 300, 400)
+                self.rir_window.show()
+                CreatePZ.pause_app(self)
+                CreatePZ.pause = True
+                rir_work_list = self.rir_window.addRowTable()
+                self.rir_window = None
+            else:
+                self.rir_window.close()  # Close window.
+                self.rir_window = None
+            pero_list.extend(rir_work_list[-9:])
         else:
-            pero_list.extend(RirWindow.rirWithPero(self)[-10:])
+            if self.rir_window is None:
+                CreatePZ.countAcid = 0
+                print(f' окно2 СКО ')
+                self.rir_window = RirWindow()
+                self.rir_window.setGeometry(200, 400, 300, 400)
+                self.rir_window.show()
+                CreatePZ.pause_app(self)
+                CreatePZ.pause = True
+                rir_work_list = self.rir_window.addRowTable()
+
+                self.rir_window = None
+            else:
+                self.rir_window.close()  # Close window.
+                self.rir_window = None
+            pero_list.extend(rir_work_list[-10:])
     return pero_list

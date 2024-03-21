@@ -76,19 +76,22 @@ def calc_work_fluid(self, work_plan):
     CreatePZ.fluid = fluid_work_insert
     CreatePZ.fluid_short = fluid_work_insert
 
-    cat_H2S_list = CreatePZ.dict_category[CreatePZ.plast_work[0]]['по сероводороду'].category
-
-    if cat_H2S_list in [2, 1]:
+    cat_H2S_list = [CreatePZ.dict_category[plast]['по сероводороду'
+                    ].category for plast in list(CreatePZ.dict_category.keys()) if CreatePZ.dict_category[plast]['отключение'] == 'рабочий']
+    print(f'категор {cat_H2S_list}')
+    if 2 in cat_H2S_list or 1 in cat_H2S_list:
         expenditure_h2s_list = []
         for plast in CreatePZ.plast_work:
 
             try:
-                # print(CreatePZ.dict_category[plast]['по сероводороду'].poglot)
-                expenditure_h2s_list.append([CreatePZ.dict_category[plast]['по сероводороду'].poglot][0])
-                # print(f'поглотои {expenditure_h2s_list}')
+                poglot = [CreatePZ.dict_category[plast]['по сероводороду'
+                    ].poglot for plast in list(CreatePZ.dict_category.keys())
+                          if CreatePZ.dict_category[plast]['по сероводороду'].category in [1, 2]][0]
+                expenditure_h2s_list.append(poglot)
+                print(f'поглотои {expenditure_h2s_list}')
             except:
                 pass
-        # print(expenditure_h2s_list)
+        print(f'список {expenditure_h2s_list}')
         expenditure_h2s = round(max(expenditure_h2s_list), 3)
         fluid_work = f'{fluid_work_insert}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
                      f'расчета {expenditure_h2s}кг/м3 '

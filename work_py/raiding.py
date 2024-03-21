@@ -18,8 +18,7 @@ class TabPage_SO_raid(QWidget):
         self.raid_select_label = QLabel("компоновка НКТ", self)
         self.raid_select_combo = QComboBox(self)
 
-        self.raid_select_combo.addItems(
-            ['райбер в ЭК', 'райбер в ДП'])
+        self.raid_select_combo.addItems( ['райбер в ЭК', 'райбер в ДП'])
         self.raid_select_combo.currentTextChanged.connect(self.update_raid_edit)
 
         self.downhole_motor_label = QLabel("Забойный двигатель", self)
@@ -54,29 +53,45 @@ class TabPage_SO_raid(QWidget):
         self.raid_True_combo.addItems(
             ['нужно', 'не нужно'])
 
-        grid = QGridLayout(self)
-        grid.setColumnMinimumWidth(1, 150)
-
-        grid.addWidget(self.raid_select_label, 2, 1)
-        grid.addWidget(self.raid_select_combo, 3, 1)
-
-        grid.addWidget(self.raid_diametr_label, 2, 2)
-        grid.addWidget(self.raid_diametr_line, 3, 2)
-
-        grid.addWidget(self.downhole_motor_label, 2, 3)
-        grid.addWidget(self.downhole_motor_line, 3, 3)
-
-        grid.addWidget(self.raid_label, 4, 1, 2, 2)
+        self.nkt_str_label = QLabel("НКТ или СБТ", self)
+        self.nkt_str_combo = QComboBox(self)
+        self.nkt_str_combo.addItems(
+            ['НКТ', 'СБТ'])
+        self.raid_select_combo.currentTextChanged.connect(self.update_nkt)
 
 
-        grid.addWidget(self.roof_raid_label, 7, 0)
-        grid.addWidget(self.sole_raid_label, 7, 1)
-        grid.addWidget(self.raid_True_label, 7, 2)
+        self.grid = QGridLayout(self)
+        self.grid.setColumnMinimumWidth(1, 150)
 
-        grid.addWidget(self.roof_raid_line, 8, 0)
-        grid.addWidget(self.sole_raid_line, 8, 1)
-        grid.addWidget(self.raid_True_combo, 8, 2, 2, 1)
+        self.grid.addWidget(self.raid_select_label, 2, 1)
+        self.grid.addWidget(self.raid_select_combo, 3, 1)
 
+        self.grid.addWidget(self.nkt_str_label, 2, 2)
+        self.grid.addWidget(self.nkt_str_combo, 3, 2)
+
+        self.grid.addWidget(self.raid_diametr_label, 2, 3)
+        self.grid.addWidget(self.raid_diametr_line, 3, 3)
+
+        self.grid.addWidget(self.downhole_motor_label, 2, 4)
+        self.grid.addWidget(self.downhole_motor_line, 3, 4)
+
+        self.grid.addWidget(self.raid_label, 4, 1, 2, 2)
+
+        self.grid.addWidget(self.roof_raid_label, 7, 0)
+        self.grid.addWidget(self.sole_raid_label, 7, 1)
+        self.grid.addWidget(self.raid_True_label, 7, 2)
+
+        self.grid.addWidget(self.roof_raid_line, 8, 0)
+        self.grid.addWidget(self.sole_raid_line, 8, 1)
+        self.grid.addWidget(self.raid_True_combo, 8, 2, 2, 1)
+
+    def update_nkt(self, index):
+        if index == 'СБТ':
+            self.downhole_motor_label.setParent(None)
+            self.downhole_motor_line.setParent(None)
+        else:
+            self.grid.addWidget(self.downhole_motor_label, 2, 4)
+            self.grid.addWidget(self.downhole_motor_line, 3, 4)
     def update_raid_edit(self, index):
 
         if index == 'райбер в ЭК':
@@ -85,12 +100,18 @@ class TabPage_SO_raid(QWidget):
                 self.downhole_motor_line.setText('Д-106')
             else:
                 self.downhole_motor_line.setText('Д-76')
-        else:
+            if CreatePZ.column_additional:
+
+                self.raid_diametr_line.setText(str(self.raiding_Bit_diam_select(CreatePZ.head_column_additional._value -20)))
+            else:
+                self.raid_diametr_line.setText(str(self.raiding_Bit_diam_select(CreatePZ.current_bottom)))
+        if index == 'райбер в ДП':
             self.raid_diametr_line.setText(str(self.raiding_Bit_diam_select(CreatePZ.head_column_additional._value-1)))
-            if CreatePZ.column_additional_diametr._value < 127:
+            if CreatePZ.column_additional_diametr._value > 127:
                 self.downhole_motor_line.setText('Д-106')
             else:
                 self.downhole_motor_line.setText('Д-76')
+            self.raid_diametr_line.setText(str(self.raiding_Bit_diam_select(CreatePZ.current_bottom)))
 
 
     def raiding_Bit_diam_select(self, depth):
@@ -201,44 +222,37 @@ class Raid(MyWindow):
         ryber_key = self.tabWidget.currentWidget().raid_select_combo.currentText()
         self.downhole_motor = self.tabWidget.currentWidget().downhole_motor_line.text()
         raiding_interval = raiding_interval(ryber_key)
-
+        if len(raiding_interval) == 0:
+            mes = QMessageBox.warning(self, 'Ошибка',
+                                      'Не выбраны интервалы райбирования')
+            return
         rows = self.tableWidget.rowCount()
+
         for roof, sole in raiding_interval:
-
-            raid_combo = QComboBox(self)
-            raid_combo.addItems(['нужно', 'не нужно'])
-
             self.tableWidget.insertRow(rows)
             self.tableWidget.setItem(rows, 0, QTableWidgetItem(str(int(roof))))
             self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(int(sole))))
-            self.tableWidget.setCellWidget(rows, 2, raid_combo)
-            self.tableWidget.setSortingEnabled(True)
+            self.tableWidget.setSortingEnabled(False)
 
-        # except:
-        #     mes = QMessageBox.warning(self, 'Ошибка', 'Данные введены не корректно')
-        #     self.addString()
+
 
 
     def addWork(self):
-
+        nkt_str_combo = self.tabWidget.currentWidget().nkt_str_combo.currentText()
         rows = self.tableWidget.rowCount()
         raid_tuple = []
         for row in range(rows):
-
             roof_raid = self.tableWidget.item(row, 0)
             sole_raid =self.tableWidget.item(row, 1)
-            raid_True_combo = self.tableWidget.cellWidget(row, 2)
 
             if roof_raid and sole_raid:
                 roof = int(roof_raid.text())
                 sole = int(sole_raid.text())
-                raid_True = raid_True_combo.currentText()
-
-                if raid_True == 'нужно':
-                    raid_tuple.append((roof, sole))
-
-
-        raid_list = self.raidingColumn(raid_tuple, self.downhole_motor)
+                raid_tuple.append((roof, sole))
+        if nkt_str_combo == 'НКТ':
+            raid_list = self.raidingColumn(raid_tuple[::-1])
+        else:
+            raid_list = self.raiding_sbt(raid_tuple[::-1])
 
         CreatePZ.pause = False
         self.close()
@@ -249,14 +263,14 @@ class Raid(MyWindow):
             msg = QMessageBox.information(self, 'Внимание', 'Выберите строку для удаления')
             return
         self.tableWidget.removeRow(row)
-    def raidingColumn(self, raiding_interval_tuple, downhole_motor):
+    def raidingColumn(self, raiding_interval_tuple):
         from work_py.template_work import TemplateKrs
         from work_py.advanted_file import raiding_interval, raid
         from open_pz import CreatePZ
 
         ryber_diam = self.tabWidget.currentWidget().raid_diametr_line.text()
         ryber_key = self.tabWidget.currentWidget().raid_select_combo.currentText()
-
+        downhole_motor = self.tabWidget.currentWidget().downhole_motor_line.text()
         nkt_pod = 0
         if CreatePZ.column_additional:
             nkt_pod = '60мм' if CreatePZ.column_additional_diametr._value < 110 else '73мм со снятыми фасками'
@@ -334,6 +348,84 @@ class Raid(MyWindow):
                     ryber_list.insert(-1, row)
         return ryber_list
 
+    def raiding_sbt(self, raiding_interval_tuple):
+        from work_py.template_work import TemplateKrs
+        from work_py.advanted_file import raid
+        from open_pz import CreatePZ
+
+        ryber_diam = self.tabWidget.currentWidget().raid_diametr_line.text()
+        ryber_key = self.tabWidget.currentWidget().raid_select_combo.currentText()
+
+        nkt_pod = "2'3/8"
+        nkt_diam = "2'7/8" if CreatePZ.column_diametr._value > 110 else "2'3/8"
+
+        ryber_str_EK = f'райбер ФКК-{ryber_diam} для ЭК {CreatePZ.column_diametr._value}мм х {CreatePZ.column_wall_thickness._value}мм '
+        ryber_str_short_ek = f'райбер ФКК-{ryber_diam} для ЭК {CreatePZ.column_diametr._value}мм х {CreatePZ.column_wall_thickness._value}мм '
+
+        ryber_str_DP = f'райбер ФКК-{ryber_diam} для ЭК {CreatePZ.column_additional_diametr._value}мм х ' \
+                       f'{CreatePZ.column_additional_wall_thickness._value}мм + СБТ {nkt_pod} ' \
+                       f'{int(CreatePZ.current_bottom - CreatePZ.head_column_additional._value)}м'
+        ryber_str_short_dp = f'райбер ФКК-{ryber_diam}  + СБТ {nkt_pod} {int(CreatePZ.current_bottom - CreatePZ.head_column_additional._value)}м'
+
+        rayber_dict = {'райбер в ЭК': (ryber_str_EK,ryber_str_short_ek) , 'райбер в ДП': (ryber_str_DP, ryber_str_short_dp)}
+
+        ryber_str, ryber_str_short = rayber_dict[ryber_key]
+
+        if len(raiding_interval_tuple) != 0:
+            krovly_raiding = int(raiding_interval_tuple[0][0])
+        else:
+            krovly_raiding = CreatePZ.perforation_roof
+
+        raiding_interval = raid(raiding_interval_tuple)
+        ryber_list = [
+            [f'СПО {ryber_str_short} на СБТ {nkt_diam} до Н= { krovly_raiding - 30}', None,
+             f'Спустить {ryber_str}  на СБТ {nkt_diam} до Н= { krovly_raiding - 30}м с замером, '
+             f' (При СПО первых десяти СБТ на спайдере дополнительно устанавливать элеватор ЭХЛ). '
+             f'В случае разгрузки инструмента  при спуске, проработать место посадки с промывкой скв., '
+             f'составить акт. СКОРОСТЬ СПУСКА НЕ БОЛЕЕ 1 М/С (НЕ ДОХОДЯ 40 - 50 М ДО ПЛАНОВОГО ИНТЕРВАЛА СКОРОСТЬ '
+             f'СПУСКА СНИЗИТЬ ДО 0,25 М/С). '
+             f'ЗА 20 М ДО ЗАБОЯ СПУСК ПРОИЗВОДИТЬ С ПРОМЫВКОЙ',
+             None, None, None, None, None, None, None,
+             'мастер КРС', descentNKT_norm(CreatePZ.current_bottom, 1.1)],
+            [f'монтаж мех.ротора', None,
+             f'Произвести монтаж мех.ротора. Собрать промывочное оборудование: вертлюг, ведущая труба (установить '
+             f'вставной фильтр под ведущей трубой), '
+             f'буровой рукав, устьевой герметизатор, нагнетательная линия. Застраховать буровой рукав за вертлюг. ',
+             None, None, None, None, None, None, None,
+             'Мастер КРС, УСРСиСТ', round(0.14 + 0.17 + 0.08 + 0.48 + 1.1, 1)],
+            [f'райбирование ЭК в инт. {raiding_interval}', None,
+             f'Произвести райбирование ЭК в инт. {raiding_interval}м с наращиванием, с промывкой и проработкой 5 раз каждого наращивания. '
+             f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа '
+             f'до начала работ) Работы производить согласно сборника технологических регламентов и инструкций в присутствии'
+             f' представителя заказчика. Допустить до текущего забоя {CreatePZ.current_bottom}м.',
+             None, None, None, None, None, None, None,
+             'Мастер КРС, УСРСиСТ', 8],
+            [None, None,
+             f'ПРИМЕЧАНИЕ: РАСХОД РАБОЧЕЙ ЖИДКОСТИ 8-10 Л/С;'
+             f' ОСЕВАЯ НАГРУЗКА НЕ БОЛЕЕ 75% ОТ ДОПУСТИМОЙ НАГРУЗКИ (УТОЧНИТЬ ПО ПАСПОРТУ );'
+             f' ПРЕДУСМОТРЕТЬ КОМПЕНСАЦИЮ РЕАКТИВНОГО МОМЕНТА НА ВЕДУЩЕЙ ТРУБЕ))',
+             None, None, None, None, None, None, None,
+             'Мастер КРС, УСРСиСТ', None],
+            [f'Промывка уд.весом {CreatePZ.fluid_work[:6]}  в объеме {round(TemplateKrs.well_volume(self)*2,1)}м3',
+             None,
+             f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {CreatePZ.fluid_work}  '
+             f'в присутствии представителя заказчика в объеме {round(TemplateKrs.well_volume(self)*2,1)}м3. Составить акт.',
+             None, None, None, None, None, None, None,
+             'мастер КРС, предст. заказчика', well_volume_norm(TemplateKrs.well_volume(self))],
+            [None, None,
+             f'Поднять  {ryber_str} на СБТ{nkt_diam}м с глубины {CreatePZ.current_bottom}м с доливом скважины в '
+             f'объеме {round(CreatePZ.current_bottom*1.12/1000, 1)}м3 тех. жидкостью  уд.весом {CreatePZ.fluid_work}',
+             None, None, None, None, None, None, None,
+             'мастер КРС', liftingNKT_norm(CreatePZ.current_bottom,1.2)]]
+
+        # print(f' после отрайбирования {[CreatePZ.dict_perforation[plast]["отрайбировано"] for plast in CreatePZ.plast_work]}')
+        if len(CreatePZ.plast_work) == 0:
+            acid_true_quest = QMessageBox.question(self, 'Необходимость смены объема',
+                                                   'Нужно ли изменять удельный вес?')
+            if acid_true_quest == QMessageBox.StandardButton.Yes:
+                for row in fluid_change(self):
+                    ryber_list.insert(-1, row)
+        return ryber_list
 
 
 if __name__ == "__main__":

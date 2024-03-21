@@ -377,7 +377,7 @@ class CreatePZ(QMainWindow):
                                end_row=CreatePZ.ins_ind + 1)
                 CreatePZ.ins_ind += len(CreatePZ.row_expected)
 
-                self.ins_ind_border = CreatePZ.ins_ind
+            self.ins_ind_border = CreatePZ.ins_ind
                 # wb.save(f"{CreatePZ.well_number}  1 {CreatePZ.well_area} {CreatePZ.cat_P_1}.xlsx")
 
             # wb.save(f'{CreatePZ.well_number} {CreatePZ.well_area} {work_plan}.xlsx')

@@ -200,7 +200,7 @@ class TabPage_SO(QWidget):
 
         self.paker2_posle_Label = QLabel('пакер на спуск')
         self.paker2_posle_editType = QLineEdit(self)
-        # print(self.ifNone(CreatePZ.paker2_do["posle"]))
+        print(CreatePZ.paker2_do[self.ifNone("posle")])
         self.paker2_posle_editType.setText(self.ifNone(CreatePZ.paker2_do["posle"]))
 
         self.paker2_depth_posle_Label = QLabel('Глубина спуска пакера')
@@ -615,6 +615,8 @@ class TabPage_SO(QWidget):
 
         if str(string) in ['0', str(None), '-']:
             return 'отсут'
+        if '/' in str(string):
+            return string.split('/')[0]
         elif str(string).replace('.', '').replace(',', '').isdigit():
 
             # print(str(round(float(string), 1))[-1] == '0', int(string), float(string))
@@ -898,6 +900,11 @@ class DataWindow(QMainWindow):
             CreatePZ.column_additional_wall_thickness = ProtectedIsDigit(self.if_None(column_additional_wall_thickness))
             CreatePZ.shoe_column_additional = ProtectedIsDigit(self.if_None(shoe_column_additional))
             CreatePZ.head_column_additional = ProtectedIsDigit(self.if_None(head_column_additional))
+            if CreatePZ.column_additional is False:
+                CreatePZ.column_additional_diametr = ProtectedIsDigit(0)
+                CreatePZ.column_additional_wall_thickness = ProtectedIsDigit(0)
+                CreatePZ.shoe_column_additional = ProtectedIsDigit(0)
+                CreatePZ.head_column_additional = ProtectedIsDigit(0)
 
             CreatePZ.bottomhole_drill = ProtectedIsDigit(self.if_None(bottomhole_drill))
             CreatePZ.bottomhole_artificial = ProtectedIsDigit(self.if_None(bottomhole_artificial))

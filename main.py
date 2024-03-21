@@ -32,8 +32,6 @@ class ExcelWorker(QThread):
 
     def __init__(self):
         super().__init__()
-
-
     def check_well_existence(self, well_number, deposit_area, region):
 
         # Подключение к базе данных SQLite
@@ -41,7 +39,7 @@ class ExcelWorker(QThread):
         cursor = conn.cursor()
         current_year = datetime.now().year
         month = datetime.now().month
-        print(f'месяц {month}')
+        # print(f'месяц {month}')
         if 1 <= month < 4:
             date_string = datetime(current_year, 1, 1).strftime('%d.%m.%Y')
             print(f'Корректная таблица перечня без глушения от {date_string}')
@@ -206,14 +204,12 @@ class MyWindow(QMainWindow):
         self.table_class = None
         self.table_juming = None
 
-
-
         self.perforation_correct_window2 = None
         self.ws = None
         self.ins_ind = None
         self.perforation_list = []
         self.dict_perforation_project = {}
-        # self.table_widget = table_widget
+
         self.ins_ind_border = None
         self.work_plan = 0
 
@@ -365,7 +361,7 @@ class MyWindow(QMainWindow):
                     self.read_pz(self.fname)
                     CreatePZ.pause = True
                     read_pz = CreatePZ(self.wb, self.ws, self.data_window, self.perforation_correct_window2)
-                    print(f' ГНКТ {self.work_plan}')
+                    # print(f' ГНКТ {self.work_plan}')
                     sheet = read_pz.open_excel_file(self.ws, self.work_plan)
                     self.copy_pz(sheet, self.table_widget, self.work_plan)
 
@@ -376,8 +372,8 @@ class MyWindow(QMainWindow):
                 # if action == self.save_file:
                 #     open_pz.open_excel_file().wb.save("test_unmerge.xlsx")
 
-        elif action == self.create_GNKT_frez:
-            self.work_plan = 'gnkt_frez'
+        elif action == self.create_GNKT_GRP:
+            self.work_plan = 'gnkt_after_grp'
             self.tableWidgetOpen(self.work_plan)
 
             self.fname, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
@@ -400,6 +396,30 @@ class MyWindow(QMainWindow):
                 except FileNotFoundError:
                     print('Файл не найден')
 
+        elif action == self.create_GNKT_frez:
+            self.work_plan = 'gnkt_frez'
+            self.tableWidgetOpen(self.work_plan)
+
+            self.fname, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
+                                                                  "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
+
+            if self.fname:
+                try:
+                    self.read_pz(self.fname)
+                    CreatePZ.pause = True
+                    read_pz = CreatePZ(self.wb, self.ws, self.data_window, self.perforation_correct_window2)
+                    sheet = read_pz.open_excel_file(self.ws, self.work_plan)
+
+                    self.rir_window = Work_with_gnkt(self.ws, self.tabWidget,
+                                                     self.table_title, self.table_schema, self.table_widget, )
+
+                    CreatePZ.pause_app(self)
+                    CreatePZ.pause = True
+                    # self.copy_pz(sheet)
+
+                except FileNotFoundError:
+                    print('Файл не найден')
+
                 # if action == self.save_file:
                 #     open_pz.open_excel_file().wb.save("test_unmerge.xlsx")
 
@@ -411,7 +431,6 @@ class MyWindow(QMainWindow):
 
         elif action == self.signatories_Bnd:
             if self.signatures_window is None:
-                print('Подписанты')
                 self.signatures_window = CorrectSignaturesWindow()
                 self.signatures_window.setWindowTitle("Подписанты")
                 self.signatures_window.setGeometry(200, 400, 300, 400)
@@ -861,7 +880,7 @@ class MyWindow(QMainWindow):
             CreatePZ.image_list = []
             CreatePZ.problem_with_ek = False
             CreatePZ.problem_with_ek_depth = CreatePZ.current_bottom
-            CreatePZ.problem_with_ek_diametr = CreatePZ.column_diametr
+            CreatePZ.problem_with_ek_diametr = CreatePZ.column_diametr._value
             path = "imageFiles/image_work"
             for file in os.listdir(path):
                 file_path = os.path.join(path, file)
@@ -875,7 +894,7 @@ class MyWindow(QMainWindow):
         print("Работа с файлом Excel завершена.")
     def insert_image(self, ws, file, coordinate, width = 200, height = 180):
         # Загружаем изображение с помощью библиотеки Pillow
-        print(f'vtcnj {file}')
+
         img = openpyxl.drawing.image.Image(file)
         img.width = width
         img.height = height
@@ -883,8 +902,6 @@ class MyWindow(QMainWindow):
         ws.add_image(img, coordinate)
 
     def openContextMenu(self, position):
-        from open_pz import CreatePZ
-
 
         context_menu = QMenu(self)
 
@@ -1016,12 +1033,6 @@ class MyWindow(QMainWindow):
         acid_action1paker = QAction("окно на одном пакере", self)
         acid_menu.addAction(acid_action1paker)
         acid_action1paker.triggered.connect(self.acidPakerNewWindow)
-
-        acid_action2paker = QAction("окно на двух пакерах", self)
-        acid_menu.addAction(acid_action2paker)
-        acid_action2paker.triggered.connect(self.acid2PakerNewWindow)
-
-
 
         acid_action_gons = QAction("ГОНС", self)
         acid_menu.addAction(acid_action_gons)
@@ -1252,11 +1263,15 @@ class MyWindow(QMainWindow):
         if self.rir_window is None:
             CreatePZ.countAcid = 0
             print(f' окно2 СКО ')
-            self.rir_window = RirWindow(self.table_widget, CreatePZ.ins_ind)
+            self.rir_window = RirWindow()
             self.rir_window.setGeometry(200, 400, 300, 400)
             self.rir_window.show()
             CreatePZ.pause_app(self)
             CreatePZ.pause = True
+            rir_work_list = self.rir_window.addRowTable()
+
+            CreatePZ.pause = True
+            self.populate_row(CreatePZ.ins_ind, rir_work_list, self.table_widget)
             self.rir_window = None
         else:
             self.rir_window.close()  # Close window.
@@ -1402,17 +1417,20 @@ class MyWindow(QMainWindow):
 
     def gnkt_opz(self):
         from gnkt_opz import GnktOpz
-        if self.new_window is None:
+        from open_pz import CreatePZ
+        if self.work_window is None:
+            self.work_window = GnktOpz()
+            self.work_window.setGeometry(200, 400, 500, 500)
+            self.work_window.show()
+            CreatePZ.pause_app(self)
+            template_work_list = self.work_window.addRowTable()
 
-            self.new_window = GnktOpz(self.table_widget, self.ins_ind)
-            self.new_window.setWindowTitle("Перфорация")
-            self.new_window.setGeometry(200, 400, 300, 400)
-            self.new_window.show()
-
+            CreatePZ.pause = True
+            self.populate_row(CreatePZ.ins_ind, template_work_list, self.table_widget)
+            self.work_window = None
         else:
-            self.new_window.close()  # Close window.
-            self.new_window = None  # Discard reference.
-
+            self.work_window.close()  # Close window.
+            self.work_window = None
 
         # ryber_work_list = Gnkt_opz.gnkt_work(self)
         # self.populate_row(self.ins_ind, ryber_work_list, self.table_widget)
@@ -1455,14 +1473,14 @@ class MyWindow(QMainWindow):
 
 
         if self.work_window is None:
-            self.work_window = OpressovkaEK(self.table_widget, self.ins_ind)
+            self.work_window = OpressovkaEK()
             self.work_window.setGeometry(200, 400, 300, 400)
             self.work_window.show()
             CreatePZ.pause_app(self)
-            work_list = OpressovkaEK.addRowTable()
+            work_list = self.work_window.add_work()
             # print(work_list)
             CreatePZ.pause = True
-            self.populate_row(self, CreatePZ.ins_ind, work_list)
+            self.populate_row(CreatePZ.ins_ind, work_list, self.table_widget)
             self.work_window = None
         else:
             self.work_window.close()  # Close window.
@@ -1471,7 +1489,6 @@ class MyWindow(QMainWindow):
 
     def template_pero(self):
         from work_py.template_work import TemplateKrs
-
 
         template_pero_list = TemplateKrs.pero(self)
         self.populate_row(self.ins_ind, template_pero_list, self.table_widget)
@@ -1483,7 +1500,7 @@ class MyWindow(QMainWindow):
         print(f' окно СКО ')
 
         if self.work_window is None:
-            self.work_window = TemplateKrs(self.table_widget, CreatePZ.ins_ind)
+            self.work_window = TemplateKrs()
             self.work_window.setGeometry(200, 400, 500, 500)
             self.work_window.show()
             CreatePZ.pause_app(self)
@@ -1502,7 +1519,7 @@ class MyWindow(QMainWindow):
         print(f' окно СКО ')
 
         if self.work_window is None:
-            self.work_window = Template_without_skm(self.table_widget, CreatePZ.ins_ind)
+            self.work_window = Template_without_skm()
             self.work_window.setGeometry(200, 400, 500, 500)
             self.work_window.show()
             CreatePZ.pause_app(self)
@@ -1557,29 +1574,6 @@ class MyWindow(QMainWindow):
 
         print(f'закончено')
 
-        # self.table_widget.setEditTriggers(QTableWidget.AnyKeyPressed)
-        # self.table_widget.resizeColumnsToContents()
-        # self.table_widget.resizeRowsToContents()
-
-    def acid2PakerNewWindow(self):
-        from work_py.acid_2paker import AcidPakerWindow
-        from open_pz import CreatePZ
-        print(f' окно СКО ')
-
-
-        if self.acid_windowPaker2 is None:
-            CreatePZ.countAcid = 0
-            print(f' окно2 СКО ')
-            self.acid_windowPaker2 = AcidPakerWindow(self.table_widget, CreatePZ.ins_ind, 0)
-            self.acid_windowPaker2.setGeometry(200, 400, 300, 400)
-            self.acid_windowPaker2.show()
-            CreatePZ.pause_app(self)
-            CreatePZ.pause = True
-            self.acid_windowPaker2 = None
-            self.reply2_acid()
-        else:
-            self.acid_windowPaker2.close()  # Close window.
-            self.acid_windowPaker2 = None
 
     def acidPakerNewWindow(self):
         from work_py.acid_paker import AcidPakerWindow
@@ -1587,54 +1581,23 @@ class MyWindow(QMainWindow):
         print(f' окно СКО ')
 
         if self.acid_windowPaker is None:
-            CreatePZ.countAcid = 0
+
             print(f' окно2 СКО ')
-            self.acid_windowPaker = AcidPakerWindow(self.table_widget, CreatePZ.ins_ind, 0)
+            self.acid_windowPaker = AcidPakerWindow()
             self.acid_windowPaker.setGeometry(200, 400, 300, 400)
             self.acid_windowPaker.show()
             CreatePZ.pause_app(self)
+            work_list = self.acid_windowPaker.addWork()
+
             CreatePZ.pause = True
-            CreatePZ.countAcid = 0
-            self.acid_windowPaker = None
-            self.reply_acid()
+            if work_list:
+                self.populate_row(CreatePZ.ins_ind, work_list, self.table_widget)
+
         else:
             self.acid_windowPaker.close()  # Close window.
             self.acid_windowPaker = None
 
-    def reply2_acid(self):
-        from open_pz import CreatePZ
-        from work_py.acid_2paker import AcidPakerWindow
 
-        acid_true_quest = QMessageBox.question(self, 'Необходимость кислоты',
-                                               'Нужно ли планировать кислоту на следующий объет?')
-
-        if acid_true_quest == QMessageBox.StandardButton.Yes:
-            if self.acid_windowPaker2 is None:
-                CreatePZ.countAcid = 1
-                print(f' окно2 СКО ')
-                self.acid_windowPaker2 = AcidPakerWindow(self.table_widget, CreatePZ.ins_ind, CreatePZ.countAcid)
-                self.acid_windowPaker2.setGeometry(100, 400, 100, 400)
-                self.acid_windowPaker2.show()
-                CreatePZ.pause_app(self)
-                CreatePZ.pause = True
-                self.acid_windowPaker2 = None
-                self.reply2_acid()
-            else:
-                self.acid_windowPaker2.close()  # Close window.
-                self.acid_windowPaker2 = None
-        else:
-            if self.acid_windowPaker2 is None:
-                CreatePZ.countAcid = 2
-                print(f' окно2 СКО ')
-                self.acid_windowPaker2 = AcidPakerWindow(self.table_widget, CreatePZ.ins_ind, CreatePZ.countAcid)
-                self.acid_windowPaker2.setGeometry(100, 400, 100, 400)
-                self.acid_windowPaker2.show()
-                CreatePZ.pause_app(self)
-                CreatePZ.pause = True
-                self.acid_windowPaker2 = None
-            else:
-                self.acid_windowPaker2.close()  # Close window.
-                self.acid_windowPaker2 = None
     def check_pvo_schema(self, ws5, ind):
         schema_pvo_set = set()
         for row in range(self.table_widget.rowCount()):
@@ -1672,33 +1635,7 @@ class MyWindow(QMainWindow):
 
 
         return list(schema_pvo_set)
-    def reply_acid(self):
-        from open_pz import CreatePZ
-        from work_py.acid_paker import AcidPakerWindow
 
-        acid_true_quest = QMessageBox.question(self, 'Необходимость кислоты',
-                                               'Нужно ли планировать кислоту на следующий объет?')
-        if acid_true_quest == QMessageBox.StandardButton.Yes:
-            if self.acid_windowPaker is None:
-                CreatePZ.countAcid = 1
-                print(f' окно2 СКО ')
-                self.acid_windowPaker = AcidPakerWindow(self.table_widget, CreatePZ.ins_ind, CreatePZ.countAcid)
-                self.acid_windowPaker.setGeometry(100, 400, 100, 400)
-                self.acid_windowPaker.show()
-                CreatePZ.pause_app(self)
-                CreatePZ.pause = True
-                self.acid_windowPaker = None
-                self.reply_acid()
-        else:
-            if self.acid_windowPaker is None:
-                CreatePZ.countAcid = 2
-                print(f' окно2 СКО ')
-                self.acid_windowPaker = AcidPakerWindow(self.table_widget, CreatePZ.ins_ind, CreatePZ.countAcid)
-                self.acid_windowPaker.setGeometry(100, 400, 100, 400)
-                self.acid_windowPaker.show()
-                CreatePZ.pause_app(self)
-                CreatePZ.pause = True
-                self.acid_windowPaker = None
 
     def GeophysicalNewWindow(self):
         from work_py.geophysic import GeophysicWindow
@@ -2029,9 +1966,7 @@ class MyWindow(QMainWindow):
         depth = check_for_template[0]
 
 
-        print(interval[0] <= depth <= interval[1],
-              all([interval[0] <= depth <= interval[1] for interval in CreatePZ.skm_interval]),
-              any([interval[0] <= depth <= interval[1] for interval in CreatePZ.skm_interval]))
+
       # print(CreatePZ.skm_interval)
 
         if any([interval[0] <= depth <= interval[1] for interval in CreatePZ.skm_interval]):
@@ -2083,7 +2018,7 @@ class MyWindow(QMainWindow):
                     #         perforating_intervals.append(list(interval))
                     #
                     raid_str = raid(remove_overlapping_intervals(perforating_intervals, CreatePZ.skm_interval))
-                    print(f'скреперование {CreatePZ.skm_interval}')
+                    # print(f'скреперование {CreatePZ.skm_interval}')
                     for row in range(self.table_widget.rowCount()):
                         for column in range(self.table_widget.columnCount()):
                             value = self.table_widget.item(row, column)

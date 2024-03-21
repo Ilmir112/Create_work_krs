@@ -519,14 +519,13 @@ class TabWidget(QTabWidget):
 
 
 class Template_without_skm(QMainWindow):
-    def __init__(self, table_widget, ins_ind):
+    def __init__(self):
 
         super(QMainWindow, self).__init__()
 
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
-        self.table_widget = table_widget
-        self.ins_ind = ins_ind
+
         self.rir_paker = None
         self.paker_select = None
         self.tabWidget = TabWidget()
@@ -555,10 +554,10 @@ class Template_without_skm(QMainWindow):
 
             return
         work_list = self.template_ek(template_str, template, template_diametr)
-        AcidPakerWindow.populate_row(self, CreatePZ.ins_ind, work_list)
 
-        CreatePZ.pause = True
+        CreatePZ.pause = False
         self.close()
+        return work_list
 
     def well_volume(self):
         from open_pz import CreatePZ
@@ -582,7 +581,7 @@ class Template_without_skm(QMainWindow):
 
         list_template_ek = [
             [f'Cпустить  {template_str} на НКТ{CreatePZ.nkt_diam}мм', None,
-             f'Спустить  {template_str} на 'f'НКТ{CreatePZ.nkt_diam}мм {template_str} с замером, шаблонированием НКТ. \n'
+             f'Спустить  {template_str} на 'f'НКТ{CreatePZ.nkt_diam}мм  с замером, шаблонированием НКТ. \n'
              f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
              None, None, None, None, None, None, None,
              'мастер КРС', descentNKT_norm(CreatePZ.current_bottom, 1.2)],

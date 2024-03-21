@@ -246,7 +246,9 @@ class Drill_window(QMainWindow):
                 roof = int(current_depth)
 
     def addWork(self):
-
+        self.nkt_str = self.tabWidget.currentWidget().nkt_str_combo.currentText()
+        self.drillingBit_diam = self.tabWidget.currentWidget().drill_diametr_line.text()
+        self.downhole_motor = self.tabWidget.currentWidget().downhole_motor_line.text()
         rows = self.tableWidget.rowCount()
         drill_tuple = []
         for row in range(rows):
@@ -256,11 +258,12 @@ class Drill_window(QMainWindow):
             drill_type_combo = self.tableWidget.cellWidget(row, 2)
 
             if roof_drill and sole_drill:
-                roof = int(roof_drill.text())
-                sole = int(sole_drill.text())
+                roof = int(float(roof_drill.text()))
+                sole = int(float(sole_drill.text()))
                 drill_True = drill_type_combo.currentText()
 
                 drill_tuple.append((sole, drill_True))
+                roof = sole
 
         drill_tuple = sorted(drill_tuple, key=lambda x: x[0])
         if self.nkt_str == 'НКТ':
@@ -340,12 +343,19 @@ class Drill_window(QMainWindow):
               f'В случае негерметичности произвести РИР по согласованию с заказчиком',
               None, None, None, None, None, None, None,
               'Мастер КРС, УСРСиСТ', 0.67])
-
-        for drill_sole, bottomType2 in drill_tuple:
-            # print(drill_sole, self.check_pressure(drill_sole))
-            if self.check_pressure(drill_sole) is True:
+        if len(drill_tuple) == 1:
+            for drill_sole, bottomType2 in drill_tuple:
                 for row in self.reply_drilling(drill_sole, bottomType2, drilling_str, nkt_diam):
                     drilling_list.append(row)
+
+        else:
+            for drill_sole, bottomType2 in drill_tuple:
+                # print(drill_sole, self.check_pressure(drill_sole))
+                if self.check_pressure(drill_sole) is True:
+                    for row in self.reply_drilling(drill_sole, bottomType2, drilling_str, nkt_diam):
+                        drilling_list.append(row)
+
+
 
         drilling_list_end = [
             [None, None,
@@ -355,14 +365,6 @@ class Drill_window(QMainWindow):
              f' ПРЕДУСМОТРЕТЬ КОМПЕНСАЦИЮ РЕАКТИВНОГО МОМЕНТА НА ВЕДУЩЕЙ ТРУБЕ))',
              None, None, None, None, None, None, None,
              'Мастер КРС, УСРСиСТ', None],
-            [
-                f'Промывка в объеме {round(well_volume(self, CreatePZ.current_bottom) * 2, 1)}м3 {CreatePZ.fluid_work_short}',
-                None,
-                f'Промыть скважину круговой циркуляцией тех жидкостью уд.весом {CreatePZ.fluid_work} '
-                f'в присутствии представителя заказчика в объеме '
-                f'{round(well_volume(self, CreatePZ.current_bottom) * 2, 1)}м3. Составить акт.',
-                None, None, None, None, None, None, None,
-                'мастер КРС, предст. заказчика', well_volume_norm(well_volume(self, CreatePZ.current_bottom))],
             [None, None,
              f'Поднять  {drilling_str} на НКТ{nkt_diam} с глубины {CreatePZ.current_bottom}м с доливом скважины в '
              f'объеме {round(CreatePZ.current_bottom * 1.4 / 1000, 1)}м3 тех. жидкостью  уд.весом {CreatePZ.fluid_work}',
@@ -535,27 +537,42 @@ class Drill_window(QMainWindow):
         from krs import well_volume
         from work_py.alone_oreration import kot_work
 
+        max_port = max([CreatePZ.dict_perforation[plast]['подошва'] for plast in CreatePZ.plast_work])
+        min_port = max([CreatePZ.dict_perforation[plast]['кровля'] for plast in CreatePZ.plast_work])
+
         current_depth, ok = QInputDialog.getInt(None, 'Нормализация забоя',
-                                                'Введите глубину необходимого забоя',
-                                                int(CreatePZ.current_bottom), 0,
+                                                'Введите глубину необходимого забоя при нормализации',
+                                                int(max_port-2), 0,
                                                 int(CreatePZ.bottomhole_artificial._value + 500))
 
-        drillingBit_diam = TabPage_SO_drill.drillingBit_diam_select(current_depth)
+        kot_question = QMessageBox.question(self, 'КОТ', 'Нужно ли произвести СПО '
+                                                         'обратных клапанов перед фрезом?')
 
+        if kot_question == QMessageBox.StandardButton.Yes:
+            kot_list = kot_work(self, min_port)[::-1]
+
+
+
+        drillingBit_diam = TabPage_SO_drill.drillingBit_diam_select(self, current_depth)
+
+        drillingBit_diam, ok = QInputDialog.getDouble(None, 'Диаметр фреза',
+                                                'Введите диаметр фреза', drillingBit_diam, 50, 210, 1)
         nkt_pod = "2' 3/8"
 
         nkt_diam = ''.join(["2 7/8" if CreatePZ.column_diametr._value > 110 else "2 3/8"])
 
         if CreatePZ.column_additional is False or (
                 CreatePZ.column_additional is True and CreatePZ.head_column_additional._value >= CreatePZ.current_bottom):
-            drilling_str = f' пилотный фрезер -{drillingBit_diam} + магнит колонный  2⅜ БТ (П) '
-            drilling_short = f' пилотный фрезер -{drillingBit_diam} + магнит колонный  2⅜ БТ (П) '
+            drilling_str = f'торцевой фрезер -{drillingBit_diam} + СБТ + магнит колонный  2⅜ БТ (П) '
+            drilling_short = f'торцевой фрезер -{drillingBit_diam} + СБТ + магнит колонный  2⅜ БТ (П) '
 
 
         elif CreatePZ.column_additional == True:
-            drilling_str = f' пилотный фрезер -{drillingBit_diam} + магнит колонный  2⅜ БТ (П) + СБТ{nkt_pod} ' \
+            drilling_str = f'торцевой фрезер -{drillingBit_diam} + СБТ + магнит колонный  2⅜ БТ (П) + ' \
+                           f'СБТ{nkt_pod} ' \
                            f'{round(current_depth - CreatePZ.head_column_additional._value, 1)}м'
-            drilling_short = f' пилотный фрезер -{drillingBit_diam} + магнит колонный  2⅜ БТ (П) + СБТ{nkt_pod} ' \
+            drilling_short = f'торцевой фрезер -{drillingBit_diam} + СБТ + магнит колонный  2⅜ БТ (П) + ' \
+                             f'СБТ{nkt_pod} ' \
                              f'{round(current_depth - CreatePZ.head_column_additional._value, 1)}м'
 
         CreatePZ.drilling_interval.append([CreatePZ.current_bottom, current_depth])
@@ -618,6 +635,10 @@ class Drill_window(QMainWindow):
              None, None, None, None, None, None, None,
              'мастер КРС', liftingNKT_norm(CreatePZ.current_bottom, 1.3)]
         ]
-        for row in kot_work(self):
+        for row in kot_list:
+            drilling_list.insert(0, row)
+
+        for row in kot_work(self, current_depth):
             drilling_list.append(row)
+
         return drilling_list

@@ -3,23 +3,28 @@ from PyQt5.QtWidgets import QMessageBox, QWidget, QLabel, QComboBox, \
     QMainWindow, QPushButton, QApplication
 
 from krs import well_volume
-from work_py.acid_paker import CheckableComboBox
+
 from work_py.alone_oreration import privyazkaNKT, check_h2s
 from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
-from work_py.opressovka import OpressovkaEK, TabPage_SO
+
 from open_pz import CreatePZ
 
 
 class TabPage_SO_swab(QWidget):
-    def __init__(self, parent=None):
-        super().__init__(parent)
+    def __init__(self, paker_layout_combo, parent=None):
+        from work_py.acid_paker import CheckableComboBox
+        from work_py.opressovka import OpressovkaEK, TabPage_SO
+        super().__init__()
 
         self.swabTruelabelType = QLabel("компоновка", self)
         self.swabTrueEditType = QComboBox(self)
-        self.swabTrueEditType.addItems(['двухпакерная компоновка', 'однопакерная компоновка',
+        paker_layout_list = ['двухпакерная', 'однопакерная',
                                         'воронка', 'пакер с заглушкой', 'Опрессовка снижением уровня на шаблоне',
-                                        'Опрессовка снижением уровня на пакере с заглушкой'])
-        self.swabTrueEditType.currentTextChanged.connect(self.swabTrueEdit_select)
+                                        'Опрессовка снижением уровня на пакере с заглушкой']
+        self.swabTrueEditType.addItems(paker_layout_list)
+        self.paker_layout_combo = paker_layout_combo
+
+        self.swabTrueEditType.setCurrentIndex(paker_layout_list.index(self.paker_layout_combo))
 
         self.depthGaugeLabel = QLabel("глубинные манометры", self)
         self.depthGaugeCombo = QComboBox(self)
@@ -60,6 +65,8 @@ class TabPage_SO_swab(QWidget):
         self.swab_volumeEdit = QLineEdit(self)
         self.swab_volumeEdit.setText('20')
 
+        self.swabTrueEditType.currentTextChanged.connect(self.swabTrueEdit_select)
+
         self.grid = QGridLayout(self)
         self.grid.addWidget(self.swabTruelabelType, 0, 0)
         self.grid.addWidget(self.swabTrueEditType, 1, 0)
@@ -83,7 +90,7 @@ class TabPage_SO_swab(QWidget):
         self.grid.addWidget(self.depthGaugeCombo, 7, 4)
 
     def swabTrueEdit_select(self):
-        if self.swabTrueEditType.currentText() == 'однопакерная компоновка':
+        if self.swabTrueEditType.currentText() == 'однопакерная':
             self.pakerLabel.setText('Глубина пакера')
             self.grid.addWidget(self.khovstLabel, 0, 3)
             self.grid.addWidget(self.khvostEdit, 1, 3)
@@ -94,7 +101,7 @@ class TabPage_SO_swab(QWidget):
             self.grid.addWidget(self.diametr_paker_labelType, 0, 2)
             self.grid.addWidget(self.diametr_paker_edit, 1, 2)
 
-        elif self.swabTrueEditType.currentText() == 'двухпакерная компоновка':
+        elif self.swabTrueEditType.currentText() == 'двухпакерная':
             self.pakerLabel.setText('Глубина нижнего пакера')
             self.grid.addWidget(self.khovstLabel, 0, 3)
             self.grid.addWidget(self.khvostEdit, 1, 3)
@@ -117,7 +124,23 @@ class TabPage_SO_swab(QWidget):
 
 
         elif self.swabTrueEditType.currentText() == 'пакер с заглушкой':
+            self.swabTypeLabel.setParent(None)
+            self.swabTypeCombo.setParent(None)
+            self.swab_volumeEdit.setParent(None)
+            self.plast_label.setParent(None)
+            self.plast_combo.setParent(None)
+            self.khovstLabel.setParent(None)
+            self.khvostEdit.setParent(None)
+            self.pakerLabel.setParent(None)
+            self.pakerEdit.setParent(None)
+            self.diametr_paker_labelType.setParent(None)
+            self.diametr_paker_edit.setParent(None)
             self.pakerLabel.setText('Глубина пакера')
+            self.paker2Label.setText('Глубина понижения')
+            self.paker2Edit.setText(f'{CreatePZ.current_bottom - 250}')
+            self.grid.addWidget(self.paker2Label, 0, 5)
+            self.grid.addWidget(self.paker2Edit, 1, 5)
+
             self.grid.addWidget(self.khovstLabel, 0, 3)
             self.grid.addWidget(self.khvostEdit, 1, 3)
             self.grid.addWidget(self.pakerLabel, 0, 4)
@@ -127,14 +150,24 @@ class TabPage_SO_swab(QWidget):
             self.paker2Label.setParent(None)
             self.paker2Edit.setParent(None)
         elif self.swabTrueEditType.currentText() == 'Опрессовка снижением уровня на шаблоне':
-            self.paker2Label.setText('Глубина Понижения провня')
-            self.paker2Edit.setText(f'{CreatePZ.current_bottom - 250}')
+            self.depthGaugeLabel.setParent(None)
+            self.depthGaugeCombo.setParent(None)
+            self.swab_volumeEditLabel.setParent(None)
+            self.swabTypeLabel.setParent(None)
+            self.swabTypeCombo.setParent(None)
+            self.swab_volumeEdit.setParent(None)
+            self.plast_label.setParent(None)
+            self.plast_combo.setParent(None)
             self.khovstLabel.setParent(None)
             self.khvostEdit.setParent(None)
             self.pakerLabel.setParent(None)
             self.pakerEdit.setParent(None)
             self.diametr_paker_labelType.setParent(None)
             self.diametr_paker_edit.setParent(None)
+            self.paker2Label.setText('Глубина Понижения уровня')
+            self.paker2Edit.setText(f'{CreatePZ.current_bottom - 250}')
+            self.grid.addWidget(self.paker2Label, 0, 3)
+            self.grid.addWidget(self.paker2Edit, 1, 3)
         elif self.swabTrueEditType.currentText() == 'Опрессовка снижением уровня на пакере с заглушкой':
             self.paker2Label.setText('Глубина Понижения провня')
             self.paker2Edit.setText(f'{CreatePZ.current_bottom - 250}')
@@ -174,20 +207,21 @@ class TabPage_SO_swab(QWidget):
 
 
 class TabWidget(QTabWidget):
-    def __init__(self):
+    def __init__(self, paker_layout_combo):
         super().__init__()
-        self.addTab(TabPage_SO_swab(self), 'Кислотная обработка на одном пакере')
+        self.addTab(TabPage_SO_swab(paker_layout_combo), 'Свабирование')
 
 
 class Swab_Window(QMainWindow):
-    def __init__(self, parent=None):
-        super(Swab_Window, self).__init__(parent)
+    def __init__(self, paker_layout_combo = 'двухпакерная', parent=None):
+        super(QMainWindow, self).__init__(parent)
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
         # self.table_widget = table_widget
         # self.ins_ind = ins_ind
+        self.paker_layout_combo = paker_layout_combo
 
-        self.tabWidget = TabWidget()
+        self.tabWidget = TabWidget(self.paker_layout_combo)
         self.dict_nkt = {}
 
         self.buttonAdd = QPushButton('Добавить данные в план работ')
@@ -209,15 +243,16 @@ class Swab_Window(QMainWindow):
         depthGaugeCombo = str(self.tabWidget.currentWidget().depthGaugeCombo.currentText())
         paker2_depth = int(float(self.tabWidget.currentWidget().paker2Edit.text()))
 
+
         # if int(paker_khost) + int(paker_depth) > CreatePZ.current_bottom:
         #     mes = QMessageBox.warning(self, 'Некорректные данные', f'Компоновка НКТ c хвостовик + пакер '
         #                                                            f'ниже текущего забоя')
         #     return
 
-        if swabTrueEditType == 'однопакерная компоновка':
+        if swabTrueEditType == 'однопакерная':
             work_list = self.swabbing_with_paker(diametr_paker, paker_depth, paker_khost, plast_combo,
                                                  swabTypeCombo, swab_volumeEdit, depthGaugeCombo)
-        elif swabTrueEditType == '2 пакер':
+        elif swabTrueEditType == 'двухпакерная':
             work_list = self.swabbing_with_2paker(diametr_paker, paker_depth, paker2_depth, paker_khost, plast_combo,
                                                   swabTypeCombo, swab_volumeEdit, depthGaugeCombo)
         elif swabTrueEditType == 'воронка':
@@ -230,7 +265,7 @@ class Swab_Window(QMainWindow):
             work_list = self.swabbing_opy(paker2_depth)
         elif swabTrueEditType == 'Опрессовка снижением уровня на пакере с заглушкой':
             work_list = self.swabbing_opy_with_paker(diametr_paker, paker_khost, paker_depth, paker2_depth)
-
+        print(work_list)
         CreatePZ.pause = False
         self.close()
         return work_list
@@ -353,11 +388,12 @@ class Swab_Window(QMainWindow):
 
     def swabbing_opy(self, depth_opy):
         from open_pz import CreatePZ
+        from work_py.template_work import TabPage_SO_with
         if CreatePZ.column_additional is False or (CreatePZ.column_additional and
                                                    CreatePZ.head_column_additional._value >= CreatePZ.current_bottom):
-            first_template, template_second = self.template_diam_ek()
+            first_template, template_second = TabPage_SO_with.template_diam_ek(self)
         else:
-            first_template, template_second = self.template_diam_additional_ek()
+            first_template, template_second = TabPage_SO_with.template_diam_additional_ek(self)
 
         nkt_diam = ''.join(['73' if CreatePZ.column_diametr._value > 110 or (
                 CreatePZ.column_diametr._value > 110 and CreatePZ.column_additional is True \
@@ -512,8 +548,9 @@ class Swab_Window(QMainWindow):
     def swabbing_with_paker_stub(self, diametr_paker, paker_depth, paker_khost, plast_combo, swabTypeCombo,
                                  swab_volumeEdit, depthGaugeCombo):
         from open_pz import CreatePZ
+        from work_py.opressovka import OpressovkaEK, TabPage_SO
 
-        swab_short, swab_select = self.swab_select(swabTypeCombo, plast_combo, swab_volumeEdit)
+        swab_short, swab_select = Swab_Window.swab_select(self, swabTypeCombo, plast_combo, swab_volumeEdit)
 
         if depthGaugeCombo == 'Да':
             depthGauge = 'контейнер с манометром МТГ-25 + '
@@ -655,8 +692,9 @@ class Swab_Window(QMainWindow):
     def swabbing_with_paker(self, diametr_paker, paker_depth, paker_khost, plast_combo, swabTypeCombo, swab_volumeEdit,
                             depthGaugeCombo):
         from open_pz import CreatePZ
+        from work_py.opressovka import OpressovkaEK
 
-        swab_short, swab_select = self.swab_select(swabTypeCombo, plast_combo, swab_volumeEdit)
+        swab_short, swab_select = Swab_Window.swab_select(self, swabTypeCombo, plast_combo, swab_volumeEdit)
 
         if depthGaugeCombo == 'Да':
             depthGauge = 'контейнер с манометром МТГ-25 + '
@@ -796,8 +834,9 @@ class Swab_Window(QMainWindow):
     def swabbing_with_2paker(self, diametr_paker, paker1_depth, paker2_depth, paker_khost, plast_combo, swabTypeCombo,
                              swab_volumeEdit, depthGaugeCombo):
         from open_pz import CreatePZ
+        from work_py.opressovka import OpressovkaEK
 
-        swab_short, swab_select = self.swab_select(swabTypeCombo, plast_combo, swab_volumeEdit)
+        swab_short, swab_select = Swab_Window.swab_select(self, swabTypeCombo, plast_combo, swab_volumeEdit)
 
         nkt_diam = '73' if CreatePZ.column_diametr._value > 110 or (
                 CreatePZ.column_diametr._value > 110 and CreatePZ.column_additional is True and \
@@ -927,7 +966,7 @@ class Swab_Window(QMainWindow):
 
     def swabbing_with_voronka(self, paker_depth, plast_combo, swabTypeCombo, swab_volumeEdit, depthGaugeCombo):
         from open_pz import CreatePZ
-        swab_short, swab_select = self.swab_select(swabTypeCombo, plast_combo, swab_volumeEdit)
+        swab_short, swab_select = Swab_Window.swab_select(self, swabTypeCombo, plast_combo, swab_volumeEdit)
         nkt_diam = '73' if CreatePZ.column_diametr._value > 110 or (
                 CreatePZ.column_diametr._value > 110 and CreatePZ.column_additional is True and \
                 CreatePZ.head_column_additional._value > 700) else '60'
