@@ -2,6 +2,12 @@ from collections import namedtuple
 
 Saddles = namedtuple('Saddles', ['saddle', 'ball'])
 
+Gnkt_data = namedtuple("Gnkt_data", ["gnkt_length", "diametr_length", "pvo"])
+
+
+gnkt_2 = Gnkt_data(2200, 38, 115)
+gnkt_1 = Gnkt_data(3200, 38, 166)
+
 dict_saddles = {
     'НТЦ ЗЭРС': {"ФПЗН1.114": {
                 '114/70А': Saddles('67.90', '70.92'),

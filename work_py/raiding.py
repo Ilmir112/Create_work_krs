@@ -15,11 +15,16 @@ class TabPage_SO_raid(QWidget):
         self.raid_diametr_line.setText(str(self.raiding_Bit_diam_select(CreatePZ.current_bottom)))
         self.raid_diametr_line.setClearButtonEnabled(True)
 
+        self.raid_type_label = QLabel("Тип райбера", self)
+        self.raid_type_combo = QComboBox(self)
+        raid_type_list = ['ФКК', 'арбузный ФА']
+        self.raid_type_combo.addItems(raid_type_list)
+
         self.raid_select_label = QLabel("компоновка НКТ", self)
         self.raid_select_combo = QComboBox(self)
 
         self.raid_select_combo.addItems( ['райбер в ЭК', 'райбер в ДП'])
-        self.raid_select_combo.currentTextChanged.connect(self.update_raid_edit)
+
 
         self.downhole_motor_label = QLabel("Забойный двигатель", self)
         self.downhole_motor_line = QLineEdit(self)
@@ -63,8 +68,11 @@ class TabPage_SO_raid(QWidget):
         self.grid = QGridLayout(self)
         self.grid.setColumnMinimumWidth(1, 150)
 
-        self.grid.addWidget(self.raid_select_label, 2, 1)
-        self.grid.addWidget(self.raid_select_combo, 3, 1)
+        self.grid.addWidget(self.raid_select_label, 2, 0)
+        self.grid.addWidget(self.raid_select_combo, 3, 0)
+
+        self.grid.addWidget(self.raid_type_label, 2, 1)
+        self.grid.addWidget(self.raid_type_combo, 3, 1)
 
         self.grid.addWidget(self.nkt_str_label, 2, 2)
         self.grid.addWidget(self.nkt_str_combo, 3, 2)
@@ -84,6 +92,8 @@ class TabPage_SO_raid(QWidget):
         self.grid.addWidget(self.roof_raid_line, 8, 0)
         self.grid.addWidget(self.sole_raid_line, 8, 1)
         self.grid.addWidget(self.raid_True_combo, 8, 2, 2, 1)
+
+        self.raid_select_combo.currentTextChanged.connect(self.update_raid_edit)
 
     def update_nkt(self, index):
         if index == 'СБТ':
@@ -239,11 +249,12 @@ class Raid(MyWindow):
 
     def addWork(self):
         nkt_str_combo = self.tabWidget.currentWidget().nkt_str_combo.currentText()
+
         rows = self.tableWidget.rowCount()
         raid_tuple = []
         for row in range(rows):
             roof_raid = self.tableWidget.item(row, 0)
-            sole_raid =self.tableWidget.item(row, 1)
+            sole_raid = self.tableWidget.item(row, 1)
 
             if roof_raid and sole_raid:
                 roof = int(roof_raid.text())
@@ -271,6 +282,7 @@ class Raid(MyWindow):
         ryber_diam = self.tabWidget.currentWidget().raid_diametr_line.text()
         ryber_key = self.tabWidget.currentWidget().raid_select_combo.currentText()
         downhole_motor = self.tabWidget.currentWidget().downhole_motor_line.text()
+        raid_type_combo = self.tabWidget.currentWidget().raid_type_combo.currentText()
         nkt_pod = 0
         if CreatePZ.column_additional:
             nkt_pod = '60мм' if CreatePZ.column_additional_diametr._value < 110 else '73мм со снятыми фасками'
@@ -279,10 +291,11 @@ class Raid(MyWindow):
         nkt_template = CreatePZ.nkt_template
 
 
-        ryber_str_EK = f'райбер-{ryber_diam} для ЭК {CreatePZ.column_diametr._value}мм х {CreatePZ.column_wall_thickness._value}мм +'\
+        ryber_str_EK = f'райбер {raid_type_combo}-{ryber_diam} для ЭК {CreatePZ.column_diametr._value}мм х ' \
+                       f'{CreatePZ.column_wall_thickness._value}мм +'\
                        f' забойный двигатель {downhole_motor} + НКТ{CreatePZ.nkt_diam} 20м + репер '
 
-        ryber_str_DP = f'райбер-{ryber_diam} для ЭК {CreatePZ.column_additional_diametr._value}мм х ' \
+        ryber_str_DP = f'райбер {raid_type_combo}-{ryber_diam} для ЭК {CreatePZ.column_additional_diametr._value}мм х ' \
                 f'{CreatePZ.column_additional_wall_thickness._value}мм + забойный двигатель ' \
                        f'{downhole_motor} + НКТ{nkt_pod} 20м + репер + ' \
                 f'НКТ{nkt_pod} {round(CreatePZ.current_bottom - float(CreatePZ.head_column_additional._value))}м'
@@ -355,14 +368,15 @@ class Raid(MyWindow):
 
         ryber_diam = self.tabWidget.currentWidget().raid_diametr_line.text()
         ryber_key = self.tabWidget.currentWidget().raid_select_combo.currentText()
+        raid_type_combo = self.tabWidget.currentWidget().raid_type_combo.currentText()
 
         nkt_pod = "2'3/8"
         nkt_diam = "2'7/8" if CreatePZ.column_diametr._value > 110 else "2'3/8"
 
-        ryber_str_EK = f'райбер ФКК-{ryber_diam} для ЭК {CreatePZ.column_diametr._value}мм х {CreatePZ.column_wall_thickness._value}мм '
+        ryber_str_EK = f'райбер {raid_type_combo}-{ryber_diam} для ЭК {CreatePZ.column_diametr._value}мм х {CreatePZ.column_wall_thickness._value}мм '
         ryber_str_short_ek = f'райбер ФКК-{ryber_diam} для ЭК {CreatePZ.column_diametr._value}мм х {CreatePZ.column_wall_thickness._value}мм '
 
-        ryber_str_DP = f'райбер ФКК-{ryber_diam} для ЭК {CreatePZ.column_additional_diametr._value}мм х ' \
+        ryber_str_DP = f'райбер {raid_type_combo}-{ryber_diam} для ЭК {CreatePZ.column_additional_diametr._value}мм х ' \
                        f'{CreatePZ.column_additional_wall_thickness._value}мм + СБТ {nkt_pod} ' \
                        f'{int(CreatePZ.current_bottom - CreatePZ.head_column_additional._value)}м'
         ryber_str_short_dp = f'райбер ФКК-{ryber_diam}  + СБТ {nkt_pod} {int(CreatePZ.current_bottom - CreatePZ.head_column_additional._value)}м'

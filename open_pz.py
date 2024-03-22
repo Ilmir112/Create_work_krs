@@ -20,6 +20,7 @@ from find import ProtectedIsDigit, ProtectedIsNonNone
 
 
 class CreatePZ(QMainWindow):
+    konte_true = False
     column_direction_lenght = ProtectedIsDigit()
     Qoil = 0
     gipsInWell = False
@@ -156,7 +157,7 @@ class CreatePZ(QMainWindow):
     image_list = []
     problem_with_ek = False
     problem_with_ek_depth = 10000
-    problem_with_ek_diametr = 220
+    problem_with_ek_diametr = ProtectedIsNonNone(220)
 
     def __init__(self, wb, ws, data_window, perforation_correct_window2, parent=None):
         super(CreatePZ, self).__init__()
@@ -255,11 +256,11 @@ class CreatePZ(QMainWindow):
                 CreatePZ.problem_with_ek = True
                 CreatePZ.problem_with_ek_depth, ok = QInputDialog.getInt(None, 'Глубина сужения',
                                                         "ВВедите глубину сужения", 0, 0, int(CreatePZ.current_bottom))
-                CreatePZ.problem_with_ek_diametr, ok = QInputDialog.getInt(None, 'диаметр внутренний сужения',
+                CreatePZ.problem_with_ek_diametr = ProtectedIsDigit(QInputDialog.getInt(None, 'диаметр внутренний сужения',
                                                         "ВВедите внутренний диаметр сужения", 0, 0,
-                                                                int(CreatePZ.current_bottom))
+                                                                int(CreatePZ.current_bottom))[0])
             else:
-                CreatePZ.problem_with_ek = False
+                CreatePZ.problem_with_ek = ProtectedIsNonNone(False)
 
         if CreatePZ.gipsInWell == True:
             gips_true_quest = QMessageBox.question(self, 'Гипсовые отложения',

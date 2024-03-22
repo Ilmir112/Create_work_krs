@@ -1,7 +1,7 @@
 import os
 import sqlite3
 import sys
-# import win32com.client
+import win32com.client
 import openpyxl
 from openpyxl.reader.excel import load_workbook
 
@@ -212,13 +212,14 @@ class MyWindow(QMainWindow):
 
         self.ins_ind_border = None
         self.work_plan = 0
+        self.table_widget = None
 
     def initUI(self):
 
         self.setWindowTitle("Main Window")
         self.setGeometry(200, 100, 800, 800)
 
-        self.table_widget = None
+
 
         self.createMenuBar()
         self.le = QLineEdit()
@@ -743,7 +744,7 @@ class MyWindow(QMainWindow):
             path = 'D:\Documents\Desktop\ГТМ'
             filenames = f"{CreatePZ.well_number._value} {CreatePZ.well_area._value} кат {int(CreatePZ.cat_P_1[0])} " \
                         f"{self.work_plan}.xlsx"
-            full_path = path + '/' + filenames
+            full_path = path + "/" + filenames
             # print(f'10 - {ws2.max_row}')
             # print(wb2.path)
             # print(f' кате {CreatePZ.cat_P_1}')
@@ -880,7 +881,7 @@ class MyWindow(QMainWindow):
             CreatePZ.image_list = []
             CreatePZ.problem_with_ek = False
             CreatePZ.problem_with_ek_depth = CreatePZ.current_bottom
-            CreatePZ.problem_with_ek_diametr = CreatePZ.column_diametr._value
+            CreatePZ.problem_with_ek_diametr = CreatePZ.column_diametr
             path = "imageFiles/image_work"
             for file in os.listdir(path):
                 file_path = os.path.join(path, file)
@@ -1203,7 +1204,8 @@ class MyWindow(QMainWindow):
 
     def kot_work(self):
         from work_py.alone_oreration import kot_work
-        kot_work_list = kot_work(self)
+        from open_pz import CreatePZ
+        kot_work_list = kot_work(self, CreatePZ.current_bottom)
         self.populate_row(self.ins_ind, kot_work_list, self.table_widget)
 
     def konte_action(self):
@@ -1282,7 +1284,7 @@ class MyWindow(QMainWindow):
         from open_pz import CreatePZ
 
         if self.work_window is None:
-            self.work_window = Grp_window(self.table_widget, CreatePZ.ins_ind)
+            self.work_window = Grp_window(self.table_widget)
             self.work_window.setGeometry(200, 400, 500, 500)
             self.work_window.show()
             CreatePZ.pause_app(self)
@@ -1473,7 +1475,7 @@ class MyWindow(QMainWindow):
 
 
         if self.work_window is None:
-            self.work_window = OpressovkaEK()
+            self.work_window = OpressovkaEK(self.table_widget)
             self.work_window.setGeometry(200, 400, 300, 400)
             self.work_window.show()
             CreatePZ.pause_app(self)
@@ -1606,9 +1608,13 @@ class MyWindow(QMainWindow):
                     value = self.table_widget.item(row, column)
                     if value != None:
                         value = value.text()
+
                         if 'схеме №' in value or 'схемы №' in value:
-                            schema_pvo_set.add(value[value.index(' №')+1:value.index(' №')+4].replace(' ', ''))
-        # print(f'схема ПВО {schema_pvo_set}')
+                            number_schema = value[value.index(' №')+1:value.index(' №')+4].replace(' ', '')
+                            if '1' in number_schema:
+                                number_schema = "2"
+                            schema_pvo_set.add(number_schema)
+        print(f'схема ПВО {schema_pvo_set}')
 
 
         n = 0

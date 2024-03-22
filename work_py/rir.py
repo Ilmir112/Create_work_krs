@@ -220,6 +220,7 @@ class TabPage_SO_rir(QWidget):
                             sole_plast = nek[1]
                         # print(nek, roof_plast, sole_plast)
         self.roof_rir_edit.setText(f"{int(roof_plast - 30)}")
+        self.paker_depth_edit.setText(f"{int(roof_plast - 20)}")
         self.sole_rir_edit.setText(f"{CreatePZ.current_bottom}")
 
 class TabWidget(QTabWidget):
@@ -247,9 +248,9 @@ class RirWindow(QMainWindow):
 
     def rir_rpp(self, paker_need_Combo, plast_combo, roof_rir_edit):
         from open_pz import CreatePZ
-        from work_py.opressovka import OpressovkaEK
 
-        rir_list = []
+
+        rir_list = self.need_paker(paker_need_Combo, plast_combo)
 
         rir_rpk_question = QMessageBox.question(self, 'посадку между пластами?', 'посадку между пластами?')
         if rir_rpk_question == QMessageBox.StandardButton.Yes:
@@ -259,7 +260,7 @@ class RirWindow(QMainWindow):
 
         roof_rir_edit = MyWindow.true_set_Paker(self, roof_rir_edit)
 
-        rir_list = self.need_paker(paker_need_Combo, plast_combo)
+
 
         rir_work_list = [[f'СПО РПП до глубины {roof_rir_edit}м', None,
                        f'Спустить   пакер глухой {self.rpk_nkt(roof_rir_edit)}  на тНКТ{CreatePZ.nkt_diam}мм '
@@ -314,7 +315,7 @@ class RirWindow(QMainWindow):
     def rir_rpk(self, paker_need_Combo, plast_combo, roof_rir_edit):
         from open_pz import CreatePZ
         from work_py.opressovka import OpressovkaEK
-        rir_list = []
+        rir_list = self.need_paker(paker_need_Combo, plast_combo)
 
         rir_rpk_question = QMessageBox.question(self, 'посадку между пластами?', 'посадку между пластами?')
 
@@ -325,7 +326,7 @@ class RirWindow(QMainWindow):
 
         roof_rir_edit = MyWindow.true_set_Paker(self, roof_rir_edit)
 
-        rir_list = self.need_paker(paker_need_Combo, plast_combo)
+
 
         if rir_rpk_plast_true:
             rir_q_list = [[f'Привязка по ГК и ЛМ', None,
@@ -488,10 +489,78 @@ class RirWindow(QMainWindow):
 
         
         if CreatePZ.column_additional == True and CreatePZ.column_additional_diametr._value <110:
-            dict_nkt = {73: CreatePZ.head_column_additional._value, 60: CreatePZ.head_column_additional-sole_rir_edit}
+            dict_nkt = {73: CreatePZ.head_column_additional._value,
+                        60: CreatePZ.head_column_additional._value-sole_rir_edit}
         else:
             dict_nkt = {73: sole_rir_edit}
+        rir_list = self.need_paker(paker_need_Combo, plast_combo)
 
+        if paker_need_Combo == "Нужно СПО":
+            glin_list = [
+                [f'насыщение 5м3. Определить Q {plast_combo} при Р=80-100атм ',
+                 None,
+                 f'Произвести насыщение скважины в объеме 5м3. Определить приемистость {plast_combo} при Р=80-100атм '
+                 f'в присутствии представителя УСРСиСТ или подрядчика по РИР. (Вести контроль за отдачей жидкости '
+                 f'после закачки, объем согласовать с подрядчиком по РИР). В случае приёмистости менее  250м3/сут '
+                 f'при Р={CreatePZ.max_admissible_pressure._value}атм произвести соляно-кислотную обработку скважины в объеме 1м3 HCl-12% с целью увеличения '
+                 f'приемистости по технологическому плану',
+                 None, None, None, None, None, None, None,
+                 'мастер КРС', 1.77],
+                [None, None,
+                 f'По результатам определения приёмистости выполнить следующие работы: \n'
+                 f'В случае приёмистости свыше 480 м3/сут при Р=100атм выполнить работы по закачке гдинистого раствора '
+                 f'(по согласованию с ГС и ПТО ООО Ойл-сервис и заказчика). \n'
+                 f'В случае приёмистости менее 480 м3/сут при Р=100атм и более 120м3/сут при Р=100атм приступить к выполнению РИР',
+                 None, None, None, None, None, None, None,
+                 'мастер КРС, заказчик', None],
+                [None, None,
+                 f'Объём глинистого р-ра скорректировать на устье на основании тех.возможности. \n'
+                 f'Приготовить глинистый раствор в объёме 5м3 (расчет на 1 м3 - сухой глинопорошок массой 0,3т + '
+                 f'вода у=1,00г/см3 в объёме 0,9м3) плотностью у=1,24г/см3',
+                 None, None, None, None, None, None, None,
+                 'мастер КРС', 3.5],
+                [f'Закачка глины для сбития приемистости', None,
+                 f'Закачать в НКТ при открытом затрубном пространстве глинистый раствор в объеме 5м3 + тех. воду '
+                 f'в объёме {round(volume_vn_nkt(dict_nkt) - 5, 1)}м3. Закрыть затруб. '
+                 f'Продавить в НКТ тех. воду  в объёме {volume_vn_nkt(dict_nkt)}м3 при давлении не более '
+                 f'{CreatePZ.max_admissible_pressure._value}атм.',
+                 None, None, None, None, None, None, None,
+                 'мастер КРС', 0.5],
+                [f'Коагуляция 4 часа', None,
+                 f'Коагуляция 4 часа (на основании конечного давления при продавке. '
+                 f'В случае конечного давления менее 50атм, согласовать объем глинистого раствора с '
+                 f'Заказчиком и продолжить приготовление следующего объема глинистого объема).',
+                 None, None, None, None, None, None, None,
+                 'мастер КРС', 4],
+                [None, None,
+                 f'Определить приёмистость по НКТ при Р=100атм.',
+                 None, None, None, None, None, None, None,
+                 'мастер КРС', 0.35],
+                [None, None,
+                 f'В случае необходимости выполнить работы по закачке глнистого раствора, с корректировкой '
+                 f'по объёму раствора.',
+                 None, None, None, None, None, None, None,
+                 'мастер КРС', None],
+                [None, None,
+                 f'Промыть скважину обратной промывкой по круговой циркуляции  жидкостью '
+                 f'в объеме не менее {well_volume(self, volume_vn_nkt(dict_nkt))}м3 с расходом жидкости не менее 8 л/с.',
+                 None, None, None, None, None, None, None,
+                 'мастер КРС', well_volume_norm(24)]
+            ]
+            if volume_vn_nkt(dict_nkt) <= 5:
+                glin_list[3] = [None, None,
+                                f'Закачать в НКТ при открытом затрубном пространстве глинистый раствор в '
+                                f'объеме {volume_vn_nkt(dict_nkt)}м3. Закрыть затруб. '
+                                f'Продавить в НКТ остаток глинистого раствора в объеме '
+                                f'{round(5 - volume_vn_nkt(dict_nkt), 1)} и тех. воду  в объёме '
+                                f'{volume_vn_nkt(dict_nkt)}м3 при давлении не более {CreatePZ.max_admissible_pressure._value}атм.',
+                                None, None, None, None, None, None, None,
+                                'мастер КРС', 0.5]
+
+            for row in glin_list:
+                rir_list.insert(-3, row)
+        else:
+            rir_list = []
 
         volume_cement = round(volume_vn_ek(self,roof_rir_edit) * (sole_rir_edit - roof_rir_edit)/1000, 1)
 
@@ -651,74 +720,7 @@ class RirWindow(QMainWindow):
                  None, None, None, None, None, None, None,
                  'мастер КРС', liftingNKT_norm(roof_rir_edit, 1)],
             ]
-            rir_list = self.need_paker(paker_need_Combo, plast_combo)
 
-            if paker_need_Combo == "Нужно СПО":
-                glin_list = [
-                    [f'насыщение 5м3. Определить Q {plast_combo} при Р=80-100атм ',
-                     None,
-                     f'Произвести насыщение скважины в объеме 5м3. Определить приемистость {plast_combo} при Р=80-100атм '
-                     f'в присутствии представителя УСРСиСТ или подрядчика по РИР. (Вести контроль за отдачей жидкости '
-                     f'после закачки, объем согласовать с подрядчиком по РИР). В случае приёмистости менее  250м3/сут '
-                     f'при Р={CreatePZ.max_admissible_pressure._value}атм произвести соляно-кислотную обработку скважины в объеме 1м3 HCl-12% с целью увеличения '
-                     f'приемистости по технологическому плану',
-                     None, None, None, None, None, None, None,
-                     'мастер КРС', 1.77],
-                    [None, None,
-                     f'По результатам определения приёмистости выполнить следующие работы: \n'
-                     f'В случае приёмистости свыше 480 м3/сут при Р=100атм выполнить работы по закачке гдинистого раствора '
-                     f'(по согласованию с ГС и ПТО ООО Ойл-сервис и заказчика). \n'
-                     f'В случае приёмистости менее 480 м3/сут при Р=100атм и более 120м3/сут при Р=100атм приступить к выполнению РИР',
-                     None, None, None, None, None, None, None,
-                     'мастер КРС, заказчик', None],
-                    [None, None,
-                     f'Объём глинистого р-ра скорректировать на устье на основании тех.возможности. \n'
-                     f'Приготовить глинистый раствор в объёме 5м3 (расчет на 1 м3 - сухой глинопорошок массой 0,3т + '
-                     f'вода у=1,00г/см3 в объёме 0,9м3) плотностью у=1,24г/см3',
-                     None, None, None, None, None, None, None,
-                     'мастер КРС', 3.5],
-                    [f'Закачка глины для сбития приемистости', None,
-                     f'Закачать в НКТ при открытом затрубном пространстве глинистый раствор в объеме 5м3 + тех. воду '
-                     f'в объёме {round(volume_vn_nkt(dict_nkt) - 5,1)}м3. Закрыть затруб. '
-                     f'Продавить в НКТ тех. воду  в объёме {volume_vn_nkt(dict_nkt)}м3 при давлении не более '
-                     f'{CreatePZ.max_admissible_pressure._value}атм.',
-                     None, None, None, None, None, None, None,
-                     'мастер КРС', 0.5],
-                    [f'Коагуляция 4 часа', None,
-                     f'Коагуляция 4 часа (на основании конечного давления при продавке. '
-                     f'В случае конечного давления менее 50атм, согласовать объем глинистого раствора с '
-                     f'Заказчиком и продолжить приготовление следующего объема глинистого объема).',
-                     None, None, None, None, None, None, None,
-                     'мастер КРС', 4],
-                    [None, None,
-                     f'Определить приёмистость по НКТ при Р=100атм.',
-                     None, None, None, None, None, None, None,
-                     'мастер КРС', 0.35],
-                    [None, None,
-                     f'В случае необходимости выполнить работы по закачке глнистого раствора, с корректировкой '
-                     f'по объёму раствора.',
-                     None, None, None, None, None, None, None,
-                     'мастер КРС', None ],
-                    [None, None,
-                     f'Промыть скважину обратной промывкой по круговой циркуляции  жидкостью '
-                     f'в объеме не менее {well_volume(self, volume_vn_nkt(dict_nkt))}м3 с расходом жидкости не менее 8 л/с.',
-                     None, None, None, None, None, None, None,
-                     'мастер КРС', well_volume_norm(24)]
-                ]
-                if volume_vn_nkt(dict_nkt) <= 5:
-                    glin_list[3] = [None, None,
-                                    f'Закачать в НКТ при открытом затрубном пространстве глинистый раствор в '
-                                    f'объеме {volume_vn_nkt(dict_nkt)}м3. Закрыть затруб. '
-                                    f'Продавить в НКТ остаток глинистого раствора в объеме '
-                                    f'{round(5 - volume_vn_nkt(dict_nkt), 1)} и тех. воду  в объёме '
-                                    f'{volume_vn_nkt(dict_nkt)}м3 при давлении не более {CreatePZ.max_admissible_pressure._value}атм.',
-                                    None, None, None, None, None, None, None,
-                                    'мастер КРС', 0.5]
-
-                for row in glin_list:
-                    rir_list.insert(-3, row)
-            else:
-                rir_list = []
 
             for row in rirPero_list:
                 rir_list.append(row)
@@ -738,13 +740,18 @@ class RirWindow(QMainWindow):
 
     def pero_select(self, sole_rir_edit):
         from open_pz import CreatePZ
-        if CreatePZ.column_additional == False or CreatePZ.column_additional == True and sole_rir_edit < CreatePZ.head_column_additional._value:
+        if CreatePZ.column_additional is False or CreatePZ.column_additional is True \
+                and sole_rir_edit < CreatePZ.head_column_additional._value:
             pero_select = f'перо + опрессовочное седло + НКТ{CreatePZ.nkt_diam} 20м + репер'
 
-        elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr._value < 110 and sole_rir_edit > CreatePZ.head_column_additional._value:
-            pero_select = f'перо + опрессовочное седло + НКТ60мм 20м + репер + НКТ60мм L- {round(sole_rir_edit - CreatePZ.head_column_additional._value, 1)}м'
-        elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr._value > 110 and sole_rir_edit > CreatePZ.head_column_additional._value:
-            pero_select = f'воронку + опрессовочное седло + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками 20м + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками' \
+        elif CreatePZ.column_additional is True and CreatePZ.column_additional_diametr._value < 110 \
+                and sole_rir_edit > CreatePZ.head_column_additional._value:
+            pero_select = f'перо + опрессовочное седло + НКТ60мм 20м + репер + НКТ60мм L- ' \
+                          f'{round(sole_rir_edit - CreatePZ.head_column_additional._value, 1)}м'
+        elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr._value > 110 \
+                and sole_rir_edit > CreatePZ.head_column_additional._value:
+            pero_select = f'воронку + опрессовочное седло + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками 20м + ' \
+                          f'НКТ{CreatePZ.nkt_diam}мм со снятыми фасками' \
                            f' L- {sole_rir_edit - CreatePZ.head_column_additional._value}м'
         return pero_select
 
@@ -766,13 +773,13 @@ class RirWindow(QMainWindow):
             rir_list = OpressovkaEK.paker_list(self, diametr_paker, paker_khost, paker_depth, pakerDepthZumpf, pressureZUMPF_question)
 
             rir_q_list = [f'насыщение 5м3. Определить Q {plast_combo} при Р=80-100атм. СКВ', None,
-                          f'Произвести насыщение скважины в объеме 5м3. Определить приемистость {plast_combo} при Р=80-100атм '
-                          f'в присутствии представителя УСРСиСТ или подрядчика по РИР. (Вести контроль за отдачей жидкости '
-                          f'после закачки, объем согласовать с подрядчиком по РИР). В случае приёмистости менее  250м3/сут '
-                          f'при Р=100атм произвести соляно-кислотную обработку скважины в объеме 1м3 HCl-12% с целью увеличения '
-                          f'приемистости по технологическому плану',
-                          None, None, None, None, None, None, None,
-                          'мастер КРС', 1.77]
+              f'Произвести насыщение скважины в объеме 5м3. Определить приемистость {plast_combo} при Р=80-100атм '
+              f'в присутствии представителя УСРСиСТ или подрядчика по РИР. (Вести контроль за отдачей жидкости '
+              f'после закачки, объем согласовать с подрядчиком по РИР). В случае приёмистости менее  250м3/сут '
+              f'при Р=100атм произвести соляно-кислотную обработку скважины в объеме 1м3 HCl-12% с целью увеличения '
+              f'приемистости по технологическому плану',
+              None, None, None, None, None, None, None,
+              'мастер КРС', 1.77]
             rir_list.insert(-3, rir_q_list)
         else:
             rir_list = []
@@ -804,13 +811,16 @@ class RirWindow(QMainWindow):
            None, None, None, None, None, None, None,
            'Мастер КРС, подрядчик РИР, УСРСиСТ', 1.2],
          [f'Опрессовать на Р={CreatePZ.max_admissible_pressure._value}атм', None,
-          f'Опрессовать цементный мост на Р={CreatePZ.max_admissible_pressure._value}атм в присутствии представителя заказчика '
-          f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала '
+          f'Опрессовать цементный мост на Р={CreatePZ.max_admissible_pressure._value}атм в присутствии '
+          f'представителя заказчика '
+          f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, '
+          f'с подтверждением за 2 часа до начала '
           f'работ) В случае негерметичности цементного моста дальнейшие работы согласовать с Заказчиком.',
           None, None, None, None, None, None, None,
           'Мастер КРС, подрядчик РИР, УСРСиСТ', 0.67],
           [None, None,
-           f'Поднять компоновку РИР на тНКТ{CreatePZ.nkt_diam}мм с глубины {roof_rir_edit}м с доливом скважины в объеме '
+           f'Поднять компоновку РИР на тНКТ{CreatePZ.nkt_diam}мм с глубины {roof_rir_edit}м '
+           f'с доливом скважины в объеме '
            f'{round(roof_rir_edit * 1.12 / 1000, 1)}м3 тех. жидкостью  уд.весом {CreatePZ.fluid_work}',
            None, None, None, None, None, None, None,
            'Мастер КРС, подрядчик РИР, УСРСиСТ', liftingNKT_norm(roof_rir_edit,1.2)]
@@ -973,7 +983,7 @@ class RirWindow(QMainWindow):
                       None, None, None, None, None, None, None,
                       'мастер КРС', liftingNKT_norm(CreatePZ.pakerIzvPaker, 1)],
                      [None, None,
-                      f'Рассхадить и поднять компоновку НКТ{CreatePZ.nkt_diam}мм с глубины {CreatePZ.pakerIzvPaker}м с '
+                      f'Расходить и поднять компоновку НКТ{CreatePZ.nkt_diam}мм с глубины {CreatePZ.pakerIzvPaker}м с '
                       f'доливом скважины в объеме {round(CreatePZ.pakerIzvPaker * 1.12 / 1000, 1)}м3 тех. жидкостью '
                       f'уд.весом {CreatePZ.fluid_work}',
                       None, None, None, None, None, None, None,

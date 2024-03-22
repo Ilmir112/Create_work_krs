@@ -144,12 +144,12 @@ class TabWidget(QTabWidget):
 
 
 class OpressovkaEK(QMainWindow):
-    def __init__(self, forRirTrue=False, parent=None):
+    def __init__(self, table_widget, forRirTrue=False, parent=None):
         super().__init__(parent)
 
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
-        # self.table_widget = table_widget
+        self.table_widget = table_widget
         # self.ins_ind = ins_ind
         # self.paker_select = None
         self.forRirTrue = forRirTrue
@@ -357,7 +357,7 @@ class OpressovkaEK(QMainWindow):
                          f'Определить приемистость НЭК.',
                          None, None, None, None, None, None, None,
                          'мастер КРС', None],
-                        [f'Опрессовать  в инт 0-{pakerNEK + 20}м на '
+                        [f'Опрессовать  в инт 0-{int(dict_leakinest_keys[0][1]) + 10}м на '
                          f'Р={CreatePZ.max_admissible_pressure._value}атм.', None,
                          f'Допустить пакер до глубины {pakerNEK + 20}м. '
                          f'Опрессовать эксплуатационную колонну в интервале {pakerNEK + 20}-0м на '
@@ -525,7 +525,7 @@ class OpressovkaEK(QMainWindow):
             for nek in CreatePZ.dict_leakiness['НЭК']['интервал']:
                 if CreatePZ.dict_leakiness['НЭК']['интервал'][nek]['отключение'] is False and nek[0] < depth:
                     interval_list.append(nek)
-        check_true = False
+                    check_true = False
         if any([float(interval[1]) < float(depth) for interval in interval_list]):
             check_true = True
             testing_pressure_str = f'Закачкой тех жидкости в затрубное пространство при Р=' \

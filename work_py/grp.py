@@ -91,13 +91,13 @@ class TabWidget(QTabWidget):
         self.addTab(TabPage_SO_grp(self), 'пакер ГРП')
 
 class Grp_window(QMainWindow):
-    def __init__(self, table_widget, ins_ind):
+    def __init__(self, table_widget):
         super(Grp_window, self).__init__()
 
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
         self.table_widget = table_widget
-        self.ins_ind = ins_ind
+
         self.tabWidget = TabWidget()
 
         self.buttonAdd = QPushButton('Добавить данные в план работ')

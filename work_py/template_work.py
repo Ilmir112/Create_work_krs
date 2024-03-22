@@ -611,16 +611,17 @@ class TabPage_SO_with(QWidget):
     def definition_ECN_true(self, depth_ecn):
         from open_pz import CreatePZ
         if CreatePZ.column_additional is False and CreatePZ.dict_pump_ECN["posle"] != 0:
-            return "2", "30"
-        elif CreatePZ.column_additional is True and CreatePZ.dict_pump_ECN["posle"] != 0:
+            return "4", "30"
+        elif CreatePZ.column_additional is True and CreatePZ.dict_pump_ECN["posle"] != 0 \
+                and CreatePZ.column_additional_diametr._value < 170:
             if CreatePZ.dict_pump_ECN["posle"] != 0 and float(depth_ecn) < CreatePZ.head_column_additional._value:
-                return "2", "30"
+                return "4", "30"
 
             elif CreatePZ.dict_pump_ECN["posle"] != 0 and float(depth_ecn) >= CreatePZ.head_column_additional._value:
 
                 return "30", "4"
         else:
-            return "2", "4"
+            return "4", "4"
 
             # print(f' ЭЦН длина" {CreatePZ.lift_ecn_can, CreatePZ.lift_ecn_can_addition, "ЭЦН" in str(CreatePZ.dict_pump["posle"][0]).upper()}')
 
@@ -756,6 +757,8 @@ class TabPage_SO_with(QWidget):
             if diam_internal[0] <= diam_internal_ek_addition <= diam_internal[1]:
                 # print(diam_internal[0] <= diam_internal_ek_addition <= diam_internal[1], diam_internal[0],diam_internal_ek_addition,diam_internal[1])
                 template_first_diam = diam
+        if 'ПОМ' in str(CreatePZ.paker_do["posle"]).upper() and '122' in str(CreatePZ.paker_do["posle"]):
+            template_second_diam = 126
         return (template_first_diam, template_second_diam)
 
 
@@ -859,7 +862,7 @@ class TemplateKrs(QMainWindow):
         else:
             template_diametr = int(self.tabWidget.currentWidget().template_first_Edit.text())
         # print(f'проблема ЭК {CreatePZ.problem_with_ek_diametr}')
-        if (template_diametr >= int(CreatePZ.problem_with_ek_diametr) - 2
+        if (template_diametr >= int(CreatePZ.problem_with_ek_diametr._value) - 2
             and CreatePZ.template_depth > int(CreatePZ.problem_with_ek_depth)):
             mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже глубины не прохода')
 
@@ -1108,15 +1111,8 @@ class TemplateKrs(QMainWindow):
 
                 gipsPero_list = [gipsPero_list[-1]]
                 from work_py.drilling import Drill_window
-                if self.raid_window is None:
-                    self.raid_window = Drill_window(self.table_widget, self.ins_ind)
-                    self.raid_window.setGeometry(200, 400, 300, 400)
-                    self.raid_window.show()
-                    drill_work_list = self.raid_window.addWork()
-                    self.raid_window = None
-                else:
-                    self.raid_window.close()  # Close window.
-                    self.raid_window = None
+                drill_work_list = Drill_window.addWork()
+
 
                 for row in drill_work_list:
                     gipsPero_list.append(row)

@@ -12,17 +12,23 @@ class TabPage_SO_drill(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
 
+        self.drill_select_label = QLabel("компоновка НКТ", self)
+        self.drill_select_combo = QComboBox(self)
+
+        self.drill_type_label = QLabel("Тип разрушающегося инструмента", self)
+        self.drill_type_combo = QComboBox(self)
+
+        drill_type_list =['Трехшарошечное', 'битовское', "фрез торцевой", "фрез кольцевой", "фрез пилотный"]
+        self.drill_type_combo.addItems(drill_type_list)
+
         self.drill_diametr_label = QLabel("Диаметр долото", self)
         self.drill_diametr_line = QLineEdit(self)
         self.drill_diametr_line.setText(str(self.drillingBit_diam_select(CreatePZ.current_bottom)))
         self.drill_diametr_line.setClearButtonEnabled(True)
 
-        self.drill_select_label = QLabel("компоновка НКТ", self)
-        self.drill_select_combo = QComboBox(self)
-
         self.drill_select_combo.addItems(
             ['долото в ЭК', 'долото в ДП'])
-        self.drill_select_combo.currentTextChanged.connect(self.update_drill_edit)
+
 
         self.downhole_motor_label = QLabel("Забойный двигатель", self)
         self.downhole_motor_line = QLineEdit(self)
@@ -65,8 +71,11 @@ class TabPage_SO_drill(QWidget):
         grid = QGridLayout(self)
         grid.setColumnMinimumWidth(1, 150)
 
-        grid.addWidget(self.drill_select_label, 2, 1)
-        grid.addWidget(self.drill_select_combo, 3, 1)
+        grid.addWidget(self.drill_select_label, 2, 0)
+        grid.addWidget(self.drill_select_combo, 3, 0)
+
+        grid.addWidget(self.drill_type_label, 2, 1)
+        grid.addWidget(self.drill_type_combo, 3, 1)
 
         grid.addWidget(self.drill_diametr_label, 2, 2)
         grid.addWidget(self.drill_diametr_line, 3, 2)
@@ -86,6 +95,9 @@ class TabPage_SO_drill(QWidget):
         grid.addWidget(self.roof_drill_line, 8, 0)
         grid.addWidget(self.sole_drill_line, 8, 1)
         grid.addWidget(self.drill_type_combo, 8, 2, 2, 1)
+
+
+        self.drill_select_combo.currentTextChanged.connect(self.update_drill_edit)
 
     def update_drill_edit(self, index):
 
@@ -249,6 +261,8 @@ class Drill_window(QMainWindow):
         self.nkt_str = self.tabWidget.currentWidget().nkt_str_combo.currentText()
         self.drillingBit_diam = self.tabWidget.currentWidget().drill_diametr_line.text()
         self.downhole_motor = self.tabWidget.currentWidget().downhole_motor_line.text()
+        self.drill_type_combo = self.tabWidget.currentWidget().drill_type_combo.currentText()
+
         rows = self.tableWidget.rowCount()
         drill_tuple = []
         for row in range(rows):
@@ -267,9 +281,9 @@ class Drill_window(QMainWindow):
 
         drill_tuple = sorted(drill_tuple, key=lambda x: x[0])
         if self.nkt_str == 'НКТ':
-            drill_list = self.drilling_nkt(drill_tuple, self.drillingBit_diam, self.downhole_motor)
-        else:
-            drill_list = self.drilling_sbt(drill_tuple, self.drillingBit_diam, self.downhole_motor)
+            drill_list = self.drilling_nkt(drill_tuple, self.drill_type_combo, self.drillingBit_diam, self.downhole_motor)
+        elif self.nkt_str == 'СБТ':
+            drill_list = self.drilling_sbt(drill_tuple, self.drill_type_combo, self.drillingBit_diam, self.downhole_motor)
 
         CreatePZ.pause = False
         self.close()
@@ -282,8 +296,7 @@ class Drill_window(QMainWindow):
             return
         self.tableWidget.removeRow(row)
 
-    def drilling_nkt(self, drill_tuple, drillingBit_diam, downhole_motor):
-        from krs import well_volume
+    def drilling_nkt(self, drill_tuple, drill_type_combo, drillingBit_diam, downhole_motor):
 
         currentBottom = CreatePZ.current_bottom
 
@@ -298,19 +311,19 @@ class Drill_window(QMainWindow):
         if CreatePZ.column_additional is False \
                 or (CreatePZ.column_additional is True
                     and CreatePZ.head_column_additional._value >= CreatePZ.current_bottom):
-            drilling_str = f'долото-{drillingBit_diam} для ' \
+            drilling_str = f'{drill_type_combo}-{drillingBit_diam} для ' \
                            f'ЭК {CreatePZ.column_diametr._value}мм х {CreatePZ.column_wall_thickness._value}мм +' \
                            f' забойный двигатель {downhole_motor} + НКТ{nkt_diam} 20м + репер '
-            drilling_short = f'долото-{drillingBit_diam} + ' \
+            drilling_short = f'{drill_type_combo}-{drillingBit_diam} + ' \
                              f'забойный двигатель {downhole_motor}  + НКТ{nkt_diam} 20м + репер '
 
 
         elif CreatePZ.column_additional == True:
-            drilling_str = f'долото-{drillingBit_diam} для ЭК {CreatePZ.column_additional_diametr._value}мм х ' \
+            drilling_str = f'{drill_type_combo}-{drillingBit_diam} для ЭК {CreatePZ.column_additional_diametr._value}мм х ' \
                            f'{CreatePZ.column_additional_wall_thickness._value}мм + забойный двигатель ' \
                            f'{downhole_motor} +НКТ{nkt_pod} 20м + репер + ' \
                            f'НКТ{nkt_pod} {round(CreatePZ.current_bottom - CreatePZ.head_column_additional._value, 0)}м'
-            drilling_short = f'долото-{drillingBit_diam}  + забойный двигатель  {downhole_motor} +НКТ{nkt_pod} 20м + ' \
+            drilling_short = f'{drill_type_combo}-{drillingBit_diam}  + забойный двигатель  {downhole_motor} +НКТ{nkt_pod} 20м + ' \
                              f'репер + ' \
                              f'НКТ{nkt_pod} {round(CreatePZ.current_bottom - CreatePZ.head_column_additional._value, 0)}м'
 
@@ -421,10 +434,10 @@ class Drill_window(QMainWindow):
                  None, None, None, None, None, None, None,
                  'Мастер КРС, УСРСиСТ', 0.67]
             )
-
+        CreatePZ.current_bottom = current_depth
         return drilling_true_quest_list
 
-    def drilling_sbt(self, drill_tuple, drillingBit_diam, downhole_motor):
+    def drilling_sbt(self, drill_tuple, drill_type_combo, drillingBit_diam, downhole_motor):
         from open_pz import CreatePZ
 
         currentBottom = CreatePZ.current_bottom
@@ -436,15 +449,19 @@ class Drill_window(QMainWindow):
 
         if CreatePZ.column_additional is False or (
                 CreatePZ.column_additional is True and CreatePZ.head_column_additional._value >= current_depth):
-            drilling_str = f'долото-{drillingBit_diam} для ЭК {CreatePZ.column_diametr._value}мм х {CreatePZ.column_wall_thickness._value}мм '
-            drilling_short = f'долото-{drillingBit_diam} для ЭК {CreatePZ.column_diametr._value}мм х {CreatePZ.column_wall_thickness._value}мм '
+            drilling_str = f'{drill_type_combo}-{drillingBit_diam} для ЭК {CreatePZ.column_diametr._value}мм х ' \
+                           f'{CreatePZ.column_wall_thickness._value}мм '
+            drilling_short = f'{drill_type_combo}-{drillingBit_diam} для ЭК {CreatePZ.column_diametr._value}мм х ' \
+                             f'{CreatePZ.column_wall_thickness._value}мм '
             sbt_lenght = f'СБТ {nkt_diam} - {int(current_depth + 100)}м'
 
         elif CreatePZ.column_additional == True:
-            drilling_str = f'долото-{drillingBit_diam} для ЭК {CreatePZ.column_additional_diametr._value}мм х ' \
+            drilling_str = f'{drill_type_combo}-{drillingBit_diam} для ЭК ' \
+                           f'{CreatePZ.column_additional_diametr._value}мм х ' \
                            f'{CreatePZ.column_additional_wall_thickness._value}мм + СБТ{nkt_pod} ' \
                            f'{CreatePZ.current_bottom - CreatePZ.head_column_additional._value}м'
-            drilling_short = f'долото-{drillingBit_diam}  + СБТ{nkt_pod} {CreatePZ.current_bottom - CreatePZ.head_column_additional._value}м'
+            drilling_short = f'{drill_type_combo}-{drillingBit_diam}  + СБТ{nkt_pod} ' \
+                             f'{CreatePZ.current_bottom - CreatePZ.head_column_additional._value}м'
             sbt_lenght = f'СБТ {nkt_diam} - {CreatePZ.head_column_additional._value}м и СБТ {nkt_pod}' \
                          f' {int(current_depth + 100)-CreatePZ.head_column_additional._value}м'
 

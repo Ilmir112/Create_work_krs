@@ -548,7 +548,7 @@ class Template_without_skm(QMainWindow):
         else:
             template_diametr = int(self.tabWidget.currentWidget().template_first_Edit.text())
         # print(f'проблема ЭК {CreatePZ.problem_with_ek_diametr}')
-        if (template_diametr >= int(CreatePZ.problem_with_ek_diametr) - 2
+        if (template_diametr >= int(CreatePZ.problem_with_ek_diametr._value) - 2
             and CreatePZ.template_depth > int(CreatePZ.problem_with_ek_depth)):
             mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже глубины не прохода')
 

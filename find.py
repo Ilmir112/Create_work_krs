@@ -196,6 +196,8 @@ class FindIndexPZ(QMainWindow):
                                     'Программа не смогла найти строку с таблицей фондового оборудования',
                                     0, 0, 800)[0])
 
+
+
     def check_str_None(self, string):
 
         if isinstance(string, int) is True or isinstance(string, float) is True:
@@ -645,6 +647,9 @@ class Well_data(FindIndexPZ):
         CreatePZ.max_angle = ProtectedIsNonNone('не корректно')
         CreatePZ.max_angle_H = ProtectedIsNonNone('не корректно')
         CreatePZ.stol_rotora = ProtectedIsNonNone('не корректно')
+        CreatePZ.column_conductor_diametr = ProtectedIsNonNone('не корректно')
+        CreatePZ.column_conductor_wall_thickness = ProtectedIsNonNone('не корректно')
+        CreatePZ.column_conductor_lenght = ProtectedIsNonNone('не корректно')
         CreatePZ.level_cement_direction = ProtectedIsNonNone('не корректно')
         CreatePZ.column_direction_diametr = ProtectedIsNonNone('отсут')
         CreatePZ.column_direction_wall_thickness = ProtectedIsNonNone('отсут')
@@ -870,7 +875,7 @@ class Well_data(FindIndexPZ):
         if self.data_window is None:
             self.data_window = DataWindow(self)
             self.data_window.setWindowTitle("Сверка данных")
-            self.data_window.setGeometry(200, 400, 300, 400)
+            self.data_window.setGeometry(100, 100, 300, 400)
 
             self.data_window.show()
             CreatePZ.pause_app(self)
@@ -890,7 +895,11 @@ class Well_data(FindIndexPZ):
                 CreatePZ.open_trunk_well = True
             else:
                 CreatePZ.open_trunk_well = False
-
+        if str(CreatePZ.well_number._value) in ['358', '878', "285", '120', '124', '549',
+                                                '144', '168', "306АБШ", "650", "2290", "3287", "687", "2286",
+                                                "1105", "3374", '4063', "3334", "4693"]:
+            QMessageBox.warning(self, 'Канатные технологии', f'Скважина согласована на канатные технологии')
+            CreatePZ.konte_true = True
 
 class Well_perforation(FindIndexPZ):
     def __init__(self, ws):

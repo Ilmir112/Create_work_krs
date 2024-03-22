@@ -3,12 +3,18 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox, QMainWindow, QTabWidget, 
 from PyQt5 import QtWidgets
 from krs import calc_work_fluid
 from work_py.acid_paker import CheckableComboBox, AcidPakerWindow
+from gnkt_data import gnkt_data
+from collections import namedtuple
 
 
 class TabPage_gnkt(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         from open_pz import CreatePZ
+
+        self.gnkt_number_label = QLabel('Номер ГНКТ')
+        self.gnkt_number_combo = QComboBox(self)
+        self.gnkt_number_combo.addItems(['ГНКТ №2', 'ГНКТ №1'])
 
         self.roof_label = QLabel("кровля пласта", self)
         self.roof_edit = QLineEdit(self)
@@ -53,7 +59,7 @@ class TabPage_gnkt(QWidget):
         if self.svk_true_edit.setCurrentIndex(1) == 'без СКВ':
             self.skv_volume_edit.setEnabled(False)
             self.skv_acid_edit.setEnabled(False)
-            self.skv_proc_edit.setEnabled(False)
+            # self.skv_proc_edit.setEnabled(False)
 
         self.skv_proc_label = QLabel("Концентрация СКВ", self)
         self.skv_proc_edit = QLineEdit(self)
@@ -84,6 +90,8 @@ class TabPage_gnkt(QWidget):
         self.pressure_edit.setText(f'{CreatePZ.max_admissible_pressure._value}')
 
         grid = QGridLayout(self)
+        grid.addWidget(self.gnkt_number_label, 0, 0)
+        grid.addWidget(self.gnkt_number_combo, 1, 0)
         grid.addWidget(self.plast_label, 0, 1)
         grid.addWidget(self.plast_combo, 1, 1)
         grid.addWidget(self.roof_label, 0, 2)
@@ -182,9 +190,16 @@ class GnktOpz(QMainWindow):
                   plast_combo, svk_true_edit, skv_acid_edit):
         from open_pz import CreatePZ
 
-        gnkt_lenth, ok = QInputDialog.getInt(self, 'Введите длину ГНКТ', 'Введите длину ГНКТ', 2000, 0, 9000)
+        gnkt_number_combo = str(self.tabWidget.currentWidget().gnkt_number_combo.currentText())
 
-        V_gntk = round(gnkt_lenth * 0.74 / 1000, 1)
+
+
+        if gnkt_number_combo == 'ГНКТ №2':
+            gnkt_number = gnkt_data.gnkt_2
+        elif gnkt_number_combo == 'ГНКТ №1':
+            gnkt_number = gnkt_data.gnkt_1,
+
+        V_gntk = round(gnkt_number.gnkt_length * 0.74 / 1000, 1)
 
         if acid_true_edit == "нужно":
             acid_true_quest = True
@@ -198,7 +213,7 @@ class GnktOpz(QMainWindow):
 
         if acid_edit == 'HCl':
             acid_24 = round(acid_volume_edit * acid_proc_edit / 24 * 1.118, 1)
-            acid_sel = f'Произвести  солянокислотную обработку {plast_combo}  в объеме  {acid_volume_edit}м3 ' \
+            acid_sel = f'Произвести  солянокислотную обработку {plast_combo} в объеме {acid_volume_edit}м3 ' \
                        f' ({acid_edit} - {acid_proc_edit} %) силами/' \
                        f' Крезол НС с протяжкой БДТ вдоль интервалов перфорации {roof_plast}-{sole_plast}м ' \
                        f'(снизу вверх) в ' \
@@ -244,6 +259,8 @@ class GnktOpz(QMainWindow):
                                                           0, CreatePZ.current_bottom)
         else:
             depth_fond_paker_do = CreatePZ.depth_fond_paker_do["do"]
+
+
         gnkt_opz = [
             [None, None, 'Порядок работы', None, None, None, None, None, None, None, None, None],
             [None, 'п/п', 'Наименование работ', None, None, None, None, None, None, None,
@@ -284,28 +301,26 @@ class GnktOpz(QMainWindow):
              None, None, None, None, None, None, None,
              'Мастер ГНКТ, состав бригады', None],
 
-            [None, 6, 'Провести работы по монтажу колтюбинговой установки'
-                      ' в соответствии с технологической инструкцией, федеральных норм и правила в области промышленной '
-                      'безопасности'
-                      ' «Правила безопасности в нефтяной и газовой\
-                 промышленности»  РОСТЕХНАДЗОР Приказ №1 от 15.12.2020г и РД 153-39-023-97.',
+            [None, 6,
+             'Провести работы по монтажу колтюбинговой установки'
+              ' в соответствии с технологической инструкцией, федеральных норм и правила в области промышленной '
+              'безопасности «Правила безопасности в нефтяной и газовой промышленности»  РОСТЕХНАДЗОР '
+              'Приказ №1 от 15.12.2020г и РД 153-39-023-97.',
              None, None, None, None, None, None, None,
              'Мастер ГНКТ, состав бригады', None],
-            [None, 7, 'Все операции при производстве выполнять в соответствии с технологической инструкцией, '
-                      'федеральных норм и правила в'
-                      'области промышленной безопасности "Правила безопасности в нефтяной и газовой промышленности"  '
-                      'от 15.12.2020г '
-                      'и РД 153-39-023-97.',
+            [None, 7,
+             'Все операции при производстве выполнять в соответствии с технологической инструкцией, '
+              'федеральных норм и правила в области промышленной безопасности "Правила безопасности в '
+              'нефтяной и газовой промышленности" '
+              'от 15.12.2020г и РД 153-39-023-97.',
              None, None, None, None, None, None, None,
              'Мастер ГНКТ, состав бригады', None],
             [None, 8,
-             'Произвести монтаж колтюбингового оборудования ПП4- 80х70 (при изменении тип и марку ПВО указывает '
-             'мастер) '
-             '______________________  (ПВО согласно утверждённой схемы № 5 от 14.10.2021г ("Обвязки устья '
-             'при глушении '
-             'скважин, после проведения гидроразрыва пласта и работы на скважинах ППД с оборудованием'
-             ' койлтюбинговых '
-             'установок на месторождениях ООО "Башнефть-Добыча")',
+             f'Произвести монтаж колтюбингового оборудования согласно утверждённой схемы № 5 от 14.10.2021г '
+             f'("Обвязки устья '
+             f'при глушении скважин, после проведения гидроразрыва пласта и работы на скважинах ППД с оборудованием'
+             f' койлтюбинговых установок на месторождениях ООО "Башнефть-Добыча") перевентором ППК 80х35 '
+             f'(4-х секционный превентор БП 80-70.00.00.000 (700атм)) № {gnkt_number.pvo} и инжектором ',
              None, None, None, None, None, None, None,
              'Мастер ГНКТ, бур-к КРС, машинист подъёмника, пред. УСРСиСТ', 3.5],
             [None, 9, 'Пусковой комиссии в составе мастера и членов бригады согласно положения от 2015г.'
