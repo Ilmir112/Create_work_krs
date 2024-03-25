@@ -1,26 +1,27 @@
 from PyQt5.QtWidgets import QMessageBox
 
+import well_data
 from work_py.descent_gno import PzakPriGis
 
 
 def rgdWithoutPaker(self):
 
-    from open_pz import CreatePZ
+   
 
     rgd_list = [
-        [f'СП НКТ 300м', None, f'Спустить с замером воронку на НКТ до  глубины 300м с замером, шаблонированием шаблоном {CreatePZ.nkt_template}мм . '
+        [f'СП НКТ 300м', None, f'Спустить с замером воронку на НКТ до  глубины 300м с замером, шаблонированием шаблоном {well_data.nkt_template}мм . '
                      f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
          None, None, None, None, None, None, None,
          'мастер КРС', 1.3  ],
         [None, None, f'Произвести  монтаж ГИС согласно схемы  №8 при работе ГИС с утвержденной главным инженером оТ 14.10.2021г '
                      f'Обвязать устье скважины с ЕДК на жесткую линию. Опрессовать ПВО максимально допустимое давление опрессовки э/колонны на '
-                     f'устье {CreatePZ.max_admissible_pressure._value}атм, по невозможности на давление поглощения, но не менее 30атм '
+                     f'устье {well_data.max_admissible_pressure._value}атм, по невозможности на давление поглощения, но не менее 30атм '
                      f'в течении 30мин Провести практическое обучение вахт по сигналу "выброс" с записью в журнале проведения учебных тревог',
          None, None, None, None, None, None, None,
          'мастер КРС', 0.75],
-        [''.join(['ОВТР 10ч' if CreatePZ.region != 'ЧГМ' else 'ОВТР 4ч']), None, ''.join(['ОВТР 10ч' if CreatePZ.region != 'ЧГМ' else 'ОВТР 4ч']),
+        [''.join(['ОВТР 10ч' if well_data.region != 'ЧГМ' else 'ОВТР 4ч']), None, ''.join(['ОВТР 10ч' if well_data.region != 'ЧГМ' else 'ОВТР 4ч']),
              None, None, None, None, None, None, None,
-             'мастер КРС', ''.join(['10' if CreatePZ.region != 'ЧГМ' else '4'])],
+             'мастер КРС', ''.join(['10' if well_data.region != 'ЧГМ' else '4'])],
         [None, None, 'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС "Ойл-сервис". Составить'
                          ' акт готовности скважины и передать его начальнику партии. При необходимости подготовить площадку'
                          ' напротив мостков для постановки партии ГИС.',
@@ -41,23 +42,23 @@ def rgdWithoutPaker(self):
                                     None, None, None, None, None, None, None,
                                     'Мастер КРС, подрядчик по ГИС', 8])
         rgd_list.append([None, None,
-                         f'Поднять компоновку с доливом скважины в объеме 0.3м3 тех. жидкостью  уд.весом {CreatePZ.fluid_work}',
+                         f'Поднять компоновку с доливом скважины в объеме 0.3м3 тех. жидкостью  уд.весом {well_data.fluid_work}',
                          None, None, None, None, None, None, None,
                          'Мастер КРС', 1.3])
     else:
         rgd_list.append([None, None,
-                  f'Поднять компоновку с доливом скважины в объеме 0.3м3 тех. жидкостью  уд.весом {CreatePZ.fluid_work}',
+                  f'Поднять компоновку с доливом скважины в объеме 0.3м3 тех. жидкостью  уд.весом {well_data.fluid_work}',
                   None, None, None, None, None, None, None,
                   'Мастер КРС', 1.3])
     return rgd_list
 
 def rgdWithPaker(self):
-    from open_pz import CreatePZ
+   
 
-    vcht_rgd = [[''.join(['ОВТР 10ч' if CreatePZ.region != 'ЧГМ' else 'ОВТР 4ч']),
-                 None, ''.join(['ОВТР 10ч' if CreatePZ.region != 'ЧГМ' else 'ОВТР 4ч']),
+    vcht_rgd = [[''.join(['ОВТР 10ч' if well_data.region != 'ЧГМ' else 'ОВТР 4ч']),
+                 None, ''.join(['ОВТР 10ч' if well_data.region != 'ЧГМ' else 'ОВТР 4ч']),
                  None, None, None, None, None, None, None,
-                 'мастер КРС', ''.join(['10' if CreatePZ.region != 'ЧГМ' else '4'])],
+                 'мастер КРС', ''.join(['10' if well_data.region != 'ЧГМ' else '4'])],
                 [None, None,
                  'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС "Ойл-сервис". Составить'
                  ' акт готовности скважины и передать его начальнику партии. При необходимости подготовить площадку'

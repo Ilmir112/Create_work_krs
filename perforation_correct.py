@@ -1,8 +1,14 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.Qt import *
 from PyQt5.QtGui import QRegExpValidator, QColor, QPalette
+
+import well_data
+
 from main import MyWindow
 import re
+
+from work_py.advanted_file import definition_plast_work
+
 
 class FloatLineEdit(QLineEdit):
     def __init__(self, parent=None):
@@ -31,10 +37,10 @@ class FloatLineEdit(QLineEdit):
 class TabPage_SO(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
-        from open_pz import CreatePZ
+       
 
         self.labels_plast = {}
-        self.dict_perforation = CreatePZ.dict_perforation
+        self.dict_perforation = well_data.dict_perforation
 
         self.plast_label = QLabel("пласта")
         self.roof_label = QLabel("Кровля")
@@ -143,7 +149,7 @@ class PerforationCorrect(QMainWindow):
         from open_pz import CreatePZ
 
         # Пересохранение данных по интервалам перфорации
-        self.dict_perforation = CreatePZ.dict_perforation
+        self.dict_perforation = well_data.dict_perforation
 
 
 
@@ -175,38 +181,38 @@ class PerforationCorrect(QMainWindow):
                 index += 1
 
             if all([oktl is True for oktl in plast_oktl]):
-                CreatePZ.dict_perforation_short[plast]['отключение'] = True
-                CreatePZ.dict_perforation[plast]['отключение'] = True
+                well_data.dict_perforation_short[plast]['отключение'] = True
+                well_data.dict_perforation[plast]['отключение'] = True
             else:
-                CreatePZ.dict_perforation_short[plast]['отключение'] = False
-                CreatePZ.dict_perforation[plast]['отключение'] = False
+                well_data.dict_perforation_short[plast]['отключение'] = False
+                well_data.dict_perforation[plast]['отключение'] = False
             if all([oktl is True for oktl in plast_templ]):
-                CreatePZ.dict_perforation[plast]['Прошаблонировано'] = True
+                well_data.dict_perforation[plast]['Прошаблонировано'] = True
             else:
-                CreatePZ.dict_perforation[plast]['Прошаблонировано'] = False
+                well_data.dict_perforation[plast]['Прошаблонировано'] = False
             if  all([oktl is True for oktl in plast_raid]):
-                CreatePZ.dict_perforation[plast]['отрайбировано'] = True
+                well_data.dict_perforation[plast]['отрайбировано'] = True
             else:
-                CreatePZ.dict_perforation[plast]['отрайбировано'] = False
+                well_data.dict_perforation[plast]['отрайбировано'] = False
 
 
         # self.labels_plast[index] = (plast_edit, roof_edit, sole_edit, plast_status_ComboBox,
         #                             template_status_ComboBox, raiding_status_ComboBox)
-        CreatePZ.definition_plast_work(self)
-        CreatePZ.plast_work_short = CreatePZ.plast_work
+        definition_plast_work(self)
+        well_data.plast_work_short = well_data.plast_work
 
-        if len(CreatePZ.plast_work) == 0:
+        if len(well_data.plast_work) == 0:
             perf_true_quest = QMessageBox.question(self, 'Программа',
                                                    'Программа определили,что в скважине интервалов перфорации нет, верно ли?')
             if perf_true_quest == QMessageBox.StandardButton.Yes:
 
-                CreatePZ.pause = False
+                well_data.pause = False
                 self.close()
                 return
             else:
-                CreatePZ.current_bottom, ok = QInputDialog.getDouble(self, 'Необходимый забой',
+                well_data.current_bottom, ok = QInputDialog.getDouble(self, 'Необходимый забой',
                                                                      'Введите забой до которого нужно нормализовать')
-        CreatePZ.pause = False
+        well_data.pause = False
         self.close()
 
 

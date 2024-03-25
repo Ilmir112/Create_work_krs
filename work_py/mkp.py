@@ -1,5 +1,8 @@
+import well_data
+
+
 def mkp_revision(self):
-    from open_pz import CreatePZ
+
 
     mkp_list = [
         [f'земляные работ', None,
@@ -7,7 +10,7 @@ def mkp_revision(self):
          None, None, None, None, None, None, None,
          'мастер КРС', 8],
         [None, None,
-         f'При отсутствии дыхательного патрубка спустить НКТ{CreatePZ.nkt_diam}мм с пакером на глубину 50м + хв.200м. '
+         f'При отсутствии дыхательного патрубка спустить НКТ{well_data.nkt_diam}мм с пакером на глубину 50м + хв.200м. '
          f'Посадить пакер на Н=50м. Долить скважину тех.жидкостью до устья. Демонтировать ПВО, '
          f'подъемный агрегат и освободить прискважинную территорию вокруг устья скважины.',
          None, None, None, None, None, None, None,
@@ -33,7 +36,7 @@ def mkp_revision(self):
     return mkp_list
 
 def mkp_revision_1_kateg(self):
-    from open_pz import CreatePZ
+
 
     mkp_list = [
         [f'земляные работ', None,

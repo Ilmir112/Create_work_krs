@@ -1,52 +1,56 @@
 from PyQt5.QtWidgets import QInputDialog, QMessageBox
 
-
+import plan
+import well_data
+from openpyxl.drawing.image import Image
+from openpyxl.styles import Border, Side, PatternFill, Font, GradientFill, Alignment
+from PyQt5 import QtCore
 def skm_interval(self, template):
-    from open_pz import CreatePZ
+   
 
     str_raid = []
-    if CreatePZ.paker_do["posle"] != 0:
-        str_raid.append([float(CreatePZ.depth_fond_paker_do["posle"]) - 20, float(CreatePZ.depth_fond_paker_do["posle"]) + 20])
+    if well_data.paker_do["posle"] != 0:
+        str_raid.append([float(well_data.depth_fond_paker_do["posle"]) - 20, float(well_data.depth_fond_paker_do["posle"]) + 20])
 
-    if CreatePZ.leakiness:
-        for nek in list(CreatePZ.dict_leakiness['НЭК']['интервал'].keys()):
-            if int(float(nek[1])) + 20 < CreatePZ.current_bottom:
+    if well_data.leakiness:
+        for nek in list(well_data.dict_leakiness['НЭК']['интервал'].keys()):
+            if int(float(nek[1])) + 20 < well_data.current_bottom:
                 str_raid.append([int(float(nek[0])) - 90, int(float(nek[1])) + 20])
             else:
                 str_raid.append([int(float(nek[0])) - 90,
-                                 CreatePZ.current_bottom - 2])
-    if all([CreatePZ.dict_perforation[plast]['отрайбировано'] is False for plast in CreatePZ.plast_work]):
-        str_raid.append([CreatePZ.perforation_roof - 90, CreatePZ.skm_depth])
-        if CreatePZ.leakiness:
-            for nek in list(CreatePZ.dict_leakiness['НЭК']['интервал'].keys()):
+                                 well_data.current_bottom - 2])
+    if all([well_data.dict_perforation[plast]['отрайбировано'] is False for plast in well_data.plast_work]):
+        str_raid.append([well_data.perforation_roof - 90, well_data.skm_depth])
+        if well_data.leakiness:
+            for nek in list(well_data.dict_leakiness['НЭК']['интервал'].keys()):
                 # print(f' наруш {nek}')
-                if float(nek[1]) + 20 < CreatePZ.current_bottom:
+                if float(nek[1]) + 20 < well_data.current_bottom:
                     str_raid.append([int(float(nek[0])) - 90, int(float(nek[1])) + 20])
                 else:
                     str_raid.append([int(float(nek[0])) - 90,
-                                     CreatePZ.current_bottom - 2])
+                                     well_data.current_bottom - 2])
         print(f'ПВР не отрайбированы {str_raid}')
     elif all(
-            [CreatePZ.dict_perforation[plast]['отрайбировано'] is True for plast in CreatePZ.plast_work]):
+            [well_data.dict_perforation[plast]['отрайбировано'] is True for plast in well_data.plast_work]):
         str_raid = []
 
         perforating_intervals = []
 
-        for plast in CreatePZ.plast_all:
-            for interval in CreatePZ.dict_perforation[plast]['интервал']:
+        for plast in well_data.plast_all:
+            for interval in well_data.dict_perforation[plast]['интервал']:
                 perforating_intervals.append(list(interval))
 
 
         str_raid.extend(remove_overlapping_intervals(perforating_intervals))
 
-    if CreatePZ.dict_perforation_project is None and any(
-            [plast in CreatePZ.plast_all for plast in list(CreatePZ.dict_perforation_project.keys())]) == False:
-        if CreatePZ.dict_perforation_project[plast]['интервал'][1] < CreatePZ.current_bottom:
-            str_raid.append([CreatePZ.dict_perforation_project[plast]['интервал'][1] + 10,
-                             CreatePZ.dict_perforation_project[plast]['интервал'][1] + 50])
+    if well_data.dict_perforation_project is None and any(
+            [plast in well_data.plast_all for plast in list(well_data.dict_perforation_project.keys())]) == False:
+        if well_data.dict_perforation_project[plast]['интервал'][1] < well_data.current_bottom:
+            str_raid.append([well_data.dict_perforation_project[plast]['интервал'][1] + 10,
+                             well_data.dict_perforation_project[plast]['интервал'][1] + 50])
         else:
-            str_raid.append([CreatePZ.dict_perforation_project[plast]['интервал'][1] + 10,
-                             CreatePZ.current_bottom - 2])
+            str_raid.append([well_data.dict_perforation_project[plast]['интервал'][1] + 10,
+                             well_data.current_bottom - 2])
 
 
 
@@ -58,86 +62,86 @@ def skm_interval(self, template):
 
     for interval in merged_segments:
         if template in ['ПСШ ЭК', 'ПСШ без хвоста', 'ПСШ открытый ствол']:
-            if CreatePZ.skm_depth >= interval[1] and interval[1] > interval[0]:
+            if well_data.skm_depth >= interval[1] and interval[1] > interval[0]:
                 merged_segments_new.append(interval)
-            elif CreatePZ.skm_depth <= interval[1] and CreatePZ.skm_depth >= interval[0] and interval[1] > interval[0]:
-                merged_segments_new.append([interval[0], CreatePZ.skm_depth])
+            elif well_data.skm_depth <= interval[1] and well_data.skm_depth >= interval[0] and interval[1] > interval[0]:
+                merged_segments_new.append([interval[0], well_data.skm_depth])
 
 
         elif template in ['ПСШ СКМ в доп колонне c хвостом', 'ПСШ СКМ в доп колонне без хвоста',
-                          'ПСШ СКМ в доп колонне + открытый ствол'] and CreatePZ.skm_depth > interval[1]:
-            if interval[0] > float(CreatePZ.head_column_additional._value) and interval[1] > float(
-                    CreatePZ.head_column_additional._value) and CreatePZ.skm_depth >= interval[1] \
+                          'ПСШ СКМ в доп колонне + открытый ствол'] and well_data.skm_depth > interval[1]:
+            if interval[0] > float(well_data.head_column_additional._value) and interval[1] > float(
+                    well_data.head_column_additional._value) and well_data.skm_depth >= interval[1] \
                     and interval[1] > interval[0]:
                 merged_segments_new.append(interval)
 
-            elif interval[0] < float(CreatePZ.head_column_additional._value) and interval[1] > float(
-                    CreatePZ.head_column_additional._value) and CreatePZ.skm_depth <= interval[1] \
-                    and CreatePZ.skm_depth >= interval[0] and interval[1] > interval[0]:
+            elif interval[0] < float(well_data.head_column_additional._value) and interval[1] > float(
+                    well_data.head_column_additional._value) and well_data.skm_depth <= interval[1] \
+                    and well_data.skm_depth >= interval[0] and interval[1] > interval[0]:
 
-                merged_segments_new.append((CreatePZ.head_column_additional._value + 2, CreatePZ.skm_depth))
-            elif interval[0] < float(CreatePZ.head_column_additional._value) and interval[1] > float(
-                CreatePZ.head_column_additional._value) and CreatePZ.skm_depth >= interval[1] and interval[1] > interval[0]:
+                merged_segments_new.append((well_data.head_column_additional._value + 2, well_data.skm_depth))
+            elif interval[0] < float(well_data.head_column_additional._value) and interval[1] > float(
+                well_data.head_column_additional._value) and well_data.skm_depth >= interval[1] and interval[1] > interval[0]:
 
-                merged_segments_new.append((CreatePZ.head_column_additional._value + 2, interval[1]))
+                merged_segments_new.append((well_data.head_column_additional._value + 2, interval[1]))
                 # print(f'2 {interval, merged_segments}')
         elif template in ['ПСШ Доп колонна СКМ в основной колонне']:
-            if interval[0] < float(CreatePZ.head_column_additional._value) and interval[1] < float(
-                    CreatePZ.head_column_additional._value) and CreatePZ.skm_depth >= interval[1] and interval[1] > interval[0]:
+            if interval[0] < float(well_data.head_column_additional._value) and interval[1] < float(
+                    well_data.head_column_additional._value) and well_data.skm_depth >= interval[1] and interval[1] > interval[0]:
                 merged_segments_new.append(interval)
 
-            elif interval[0] < float(CreatePZ.head_column_additional._value) and interval[1] > float(
-                    CreatePZ.head_column_additional._value) and CreatePZ.skm_depth <= interval[1] \
-                    and CreatePZ.skm_depth >= interval[0] and interval[1] > interval[0]:
+            elif interval[0] < float(well_data.head_column_additional._value) and interval[1] > float(
+                    well_data.head_column_additional._value) and well_data.skm_depth <= interval[1] \
+                    and well_data.skm_depth >= interval[0] and interval[1] > interval[0]:
                 # merged_segments.remove(interval)
-                merged_segments_new.append((interval[0], CreatePZ.skm_depth))
+                merged_segments_new.append((interval[0], well_data.skm_depth))
 
-    CreatePZ.skm_interval = merged_segments_new
+    well_data.skm_interval = merged_segments_new
     return merged_segments_new
 
 
 # Функция исключения из интервалов скреперования интервалов ПВР
 def remove_overlapping_intervals(perforating_intervals, skm_interval = None):
-    from open_pz import CreatePZ
+   
 
     if skm_interval is None:
         # print(f' перфорация_ {perforating_intervals}')
         skipping_intervals = []
-        if CreatePZ.paker_do["posle"] != 0:
-            if CreatePZ.skm_depth > CreatePZ.depth_fond_paker_do["posle"] + 20:
+        if well_data.paker_do["posle"] != 0:
+            if well_data.skm_depth > well_data.depth_fond_paker_do["posle"] + 20:
                 skipping_intervals.append(
-                    [float(CreatePZ.depth_fond_paker_do["posle"]) - 20, float(CreatePZ.depth_fond_paker_do["posle"]) + 20])
+                    [float(well_data.depth_fond_paker_do["posle"]) - 20, float(well_data.depth_fond_paker_do["posle"]) + 20])
                 # print(f'1 {skipping_intervals}')
-            elif CreatePZ.skm_depth > CreatePZ.depth_fond_paker_do["posle"]:
+            elif well_data.skm_depth > well_data.depth_fond_paker_do["posle"]:
                 skipping_intervals.append(
-                    [float(CreatePZ.depth_fond_paker_do["posle"]) - 20, CreatePZ.skm_depth])
+                    [float(well_data.depth_fond_paker_do["posle"]) - 20, well_data.skm_depth])
                 # print(f'2 {skipping_intervals}')
 
-        if CreatePZ.leakiness:
-            for nek in list(CreatePZ.dict_leakiness['НЭК']['интервал'].keys()):
-                if int(float(nek[1])) + 20 < CreatePZ.skm_depth:
+        if well_data.leakiness:
+            for nek in list(well_data.dict_leakiness['НЭК']['интервал'].keys()):
+                if int(float(nek[1])) + 20 < well_data.skm_depth:
                     skipping_intervals.append([int(float(nek[0])) - 90, int(float(nek[1])) + 20])
                 else:
                     skipping_intervals.append([int(float(nek[0])) - 90,
-                                     CreatePZ.skm_depth])
-        print(f'глубина СКМ {CreatePZ.skm_depth, skipping_intervals}')
+                                     well_data.skm_depth])
+        print(f'глубина СКМ {well_data.skm_depth, skipping_intervals}')
         print(perforating_intervals)
         for pvr in sorted(perforating_intervals, key=lambda x: x[0]):
-            if pvr[1] <= CreatePZ.skm_depth:
-                print(pvr, CreatePZ.skm_depth)
-                if pvr[1] + 40 < CreatePZ.skm_depth and pvr[0] < CreatePZ.skm_depth:
+            if pvr[1] <= well_data.skm_depth:
+                print(pvr, well_data.skm_depth)
+                if pvr[1] + 40 < well_data.skm_depth and pvr[0] < well_data.skm_depth:
                     skipping_intervals.append([pvr[0] - 90, pvr[0] - 2])
-                    if CreatePZ.skm_depth >= pvr[1] + 40:
+                    if well_data.skm_depth >= pvr[1] + 40:
                         if [pvr[1] + 2, pvr[1] + 40] not in skipping_intervals:
                             skipping_intervals.append([pvr[1] + 2, pvr[1] + 40])
                     else:
-                        if [pvr[1] + 2, CreatePZ.skm_depth] not in skipping_intervals:
-                            skipping_intervals.append([pvr[1] + 2, CreatePZ.skm_depth])
-                elif pvr[1] + 40 > CreatePZ.skm_depth and pvr[0] < CreatePZ.skm_depth:
+                        if [pvr[1] + 2, well_data.skm_depth] not in skipping_intervals:
+                            skipping_intervals.append([pvr[1] + 2, well_data.skm_depth])
+                elif pvr[1] + 40 > well_data.skm_depth and pvr[0] < well_data.skm_depth:
                     if [pvr[0] - 90, pvr[0] - 2] not in skipping_intervals:
                         skipping_intervals.append([pvr[0] - 90, pvr[0] - 2])
-                    if [pvr[1] + 1, CreatePZ.skm_depth] not in skipping_intervals:
-                        skipping_intervals.append([pvr[1] + 1, CreatePZ.skm_depth])
+                    if [pvr[1] + 1, well_data.skm_depth] not in skipping_intervals:
+                        skipping_intervals.append([pvr[1] + 1, well_data.skm_depth])
 
         print(f'СКМ на основе ПВР{sorted(skipping_intervals, key=lambda x: x[0])}')
 
@@ -169,88 +173,88 @@ def remove_overlapping_intervals(perforating_intervals, skm_interval = None):
 
 
 def raiding_interval(ryber_key):
-    from open_pz import CreatePZ
+   
     str_raid = []
 
-    for plast in CreatePZ.dict_perforation.keys():
-        if plast in CreatePZ.plast_all:
+    for plast in well_data.dict_perforation.keys():
+        if plast in well_data.plast_all:
 
-            if CreatePZ.dict_perforation[plast]['отрайбировано'] == False:
-                for interval in CreatePZ.dict_perforation[plast]['интервал']:
-                    if float(interval[1]) <= CreatePZ.current_bottom and float(interval[0]) <= CreatePZ.current_bottom:
-                        if int(interval[0]) == int(CreatePZ.shoe_column._value) and CreatePZ.column_additional is False:
-                            crt = [float(interval[0]) - 20, CreatePZ.shoe_column._value]
+            if well_data.dict_perforation[plast]['отрайбировано'] == False:
+                for interval in well_data.dict_perforation[plast]['интервал']:
+                    if float(interval[1]) <= well_data.current_bottom and float(interval[0]) <= well_data.current_bottom:
+                        if int(interval[0]) == int(well_data.shoe_column._value) and well_data.column_additional is False:
+                            crt = [float(interval[0]) - 20, well_data.shoe_column._value]
                             print(f'4 {crt}')
-                        elif int(interval[1]) == int(CreatePZ.shoe_column_additional._value) and CreatePZ.column_additional:
-                            crt = [float(interval[1]) - 20, CreatePZ.shoe_column_additional._value]
+                        elif int(interval[1]) == int(well_data.shoe_column_additional._value) and well_data.column_additional:
+                            crt = [float(interval[1]) - 20, well_data.shoe_column_additional._value]
                             print(f'5 {crt}')
-                        elif float(interval[1]) + 20 <= CreatePZ.current_bottom and \
-                                CreatePZ.shoe_column._value >= float(interval[1]) + 20:
+                        elif float(interval[1]) + 20 <= well_data.current_bottom and \
+                                well_data.shoe_column._value >= float(interval[1]) + 20:
                             crt = [float(interval[0]) - 20, float(interval[1]) + 20]
                             print(f'1 {crt}')
-                        elif float(interval[1]) + 20 >= CreatePZ.shoe_column._value and CreatePZ.column_additional is False:
-                            crt = [float(interval[1]) - 20, CreatePZ.shoe_column._value]
+                        elif float(interval[1]) + 20 >= well_data.shoe_column._value and well_data.column_additional is False:
+                            crt = [float(interval[1]) - 20, well_data.shoe_column._value]
                             print(f'2 {crt}')
-                        elif float(interval[1]) - 20 >= CreatePZ.shoe_column_additional._value and CreatePZ.column_additional:
-                            crt = [float(interval[0]), CreatePZ.shoe_column._value]
+                        elif float(interval[1]) - 20 >= well_data.shoe_column_additional._value and well_data.column_additional:
+                            crt = [float(interval[0]), well_data.shoe_column._value]
                             print(f'3 {crt}')
-                        elif int(interval[0]) == int(CreatePZ.shoe_column._value) and CreatePZ.column_additional is False:
-                            crt = [float(interval[0]) - 20, CreatePZ.shoe_column._value]
+                        elif int(interval[0]) == int(well_data.shoe_column._value) and well_data.column_additional is False:
+                            crt = [float(interval[0]) - 20, well_data.shoe_column._value]
                             print(f'4 {crt}')
-                        elif int(interval[1]) == int(CreatePZ.shoe_column_additional._value) and CreatePZ.column_additional:
-                            crt = [float(interval[1]) - 20, CreatePZ.shoe_column_additional._value]
+                        elif int(interval[1]) == int(well_data.shoe_column_additional._value) and well_data.column_additional:
+                            crt = [float(interval[1]) - 20, well_data.shoe_column_additional._value]
                             print(f'5 {crt}')
                         else:
-                            crt = [float(interval[0]) - 20, CreatePZ.current_bottom]
+                            crt = [float(interval[0]) - 20, well_data.current_bottom]
                         str_raid.append(crt)
 
-    if len(CreatePZ.drilling_interval) != 0:
-        # print(CreatePZ.drilling_interval)
-        for interval in CreatePZ.drilling_interval:
+    if len(well_data.drilling_interval) != 0:
+        # print(well_data.drilling_interval)
+        for interval in well_data.drilling_interval:
             # print(interval)
-            if float(interval[1]) + 20 <= CreatePZ.current_bottom:
+            if float(interval[1]) + 20 <= well_data.current_bottom:
                 str_raid.append((float(interval[0]) - 20, float(interval[1]) + 20))
             else:
-                str_raid.append((float(interval[0]) - 20, CreatePZ.current_bottom))
-  # print(CreatePZ.leakiness)
-    if len(CreatePZ.dict_leakiness) != 0:
+                str_raid.append((float(interval[0]) - 20, well_data.current_bottom))
+  # print(well_data.leakiness)
+    if len(well_data.dict_leakiness) != 0:
 
-        for nek in list(CreatePZ.dict_leakiness['НЭК']['интервал'].keys()):
-            if CreatePZ.dict_leakiness['НЭК']['интервал'][nek]['отрайбировано'] is False:
+        for nek in list(well_data.dict_leakiness['НЭК']['интервал'].keys()):
+            if well_data.dict_leakiness['НЭК']['интервал'][nek]['отрайбировано'] is False:
 
-                if float(nek[1]) + 30 <= CreatePZ.current_bottom and float(nek[0]) + 30 <= CreatePZ.current_bottom:
+                if float(nek[1]) + 30 <= well_data.current_bottom and float(nek[0]) + 30 <= well_data.current_bottom:
                     crt = (float(nek[0]) - 30, float(nek[1]) + 30)
                 else:
-                    crt = (float(nek[0]) - 30, CreatePZ.current_bottom)
+                    crt = (float(nek[0]) - 30, well_data.current_bottom)
                 str_raid.append(crt)
     # print(f' интервал райбире {str_raid}')
-    if CreatePZ.column_additional is True and CreatePZ.current_bottom > CreatePZ.head_column_additional._value:
+    if well_data.column_additional is True and well_data.current_bottom > well_data.head_column_additional._value:
         if ryber_key == 'райбер в ЭК':
             # print(ryber_key)
             for str in str_raid:
-                if str[0] > CreatePZ.head_column_additional._value or str[1] > CreatePZ.head_column_additional._value:
+                if str[0] > well_data.head_column_additional._value or str[1] > well_data.head_column_additional._value:
                     str_raid.remove(str)
         else:
             # print(ryber_key)
             for str in str_raid:
 
-                if str[0] < CreatePZ.head_column_additional._value or str[1] < CreatePZ.head_column_additional._value:
+                if str[0] < well_data.head_column_additional._value or str[1] < well_data.head_column_additional._value:
                     str_raid.remove(str)
 
     merged_segments = merge_overlapping_intervals(str_raid)
 
-    if CreatePZ.dict_leakiness:
-        for nek in list(CreatePZ.dict_leakiness['НЭК']['интервал'].keys()):
+    if well_data.dict_leakiness:
+        for nek in list(well_data.dict_leakiness['НЭК']['интервал'].keys()):
             for str in str_raid:
                 # print(str[0], list(nek)[0], str[1])
                 if str[0] <= list(nek)[0] <= str[1]:
-                    CreatePZ.dict_leakiness['НЭК']['интервал'][nek]['отрайбировано'] = True
-    if CreatePZ.plast_all:
-        for plast in CreatePZ.plast_all:
-            for interval in list((CreatePZ.dict_perforation[plast]['интервал'])):
+                    well_data.dict_leakiness['НЭК']['интервал'][nek]['отрайбировано'] = True
+    if well_data.plast_all:
+        for plast in well_data.plast_all:
+            for interval in list((well_data.dict_perforation[plast]['интервал'])):
                 for str in str_raid:
                     if str[0] <= list(interval)[0] <= str[1]:
-                        CreatePZ.dict_perforation[plast]['отрайбировано'] = True
+                        well_data.dict_perforation[plast]['отрайбировано'] = True
 
 
     return merged_segments
@@ -273,17 +277,17 @@ def merge_overlapping_intervals(intervals):
 
 
 def raid(a):
-    from open_pz import CreatePZ
+   
 
 
     if len(a) == 1:
         return f'{int(float(a[0][0]))} - {int(float(a[0][1]))}'
     if len(a) == 0:
         return 'разбуренного цем моста'
-    elif len(a) > 1 and CreatePZ.column_additional == True:
+    elif len(a) > 1 and well_data.column_additional == True:
         d = ''
         for i in list(a):
-            if CreatePZ.head_column_additional._value <= i[0]:
+            if well_data.head_column_additional._value <= i[0]:
                 d += f'{int(float(i[0]))} - {int(float(i[1]))}, '
     else:
         d = ''
@@ -295,3 +299,152 @@ def raid(a):
 
 
     return d[:-2]
+
+
+
+def definition_plast_work(self):
+    # Определение работающих пластов
+    plast_work = set()
+    perforation_roof = well_data.current_bottom
+    perforation_sole = 0
+
+    for plast, value in well_data.dict_perforation.items():
+        for interval in value['интервал']:
+            # print(f' интервалы ПВР {plast, interval[0], dict_perforation[plast]["отключение"]}')
+            # print(perforation_roof >= interval[0])
+            if well_data.current_bottom >= interval[0] and well_data.dict_perforation[plast]["отключение"] is False:
+                plast_work.add(plast)
+
+            if well_data.dict_perforation[plast]["отключение"] is False:
+                roof = min(list(map(lambda x: x[0], list(well_data.dict_perforation[plast]['интервал']))))
+                sole = max(list(map(lambda x: x[1], list(well_data.dict_perforation[plast]['интервал']))))
+                well_data.dict_perforation[plast]["кровля"] = roof
+                well_data.dict_perforation[plast]["подошва"] = sole
+                if perforation_roof >= roof:
+                    perforation_roof = roof
+                if perforation_sole < sole:
+                    perforation_sole = sole
+
+            else:
+
+                well_data.dict_perforation[plast]["кровля"] = \
+                    min(list(map(lambda x: x[0], list(well_data.dict_perforation[plast]['интервал']))))
+                well_data.dict_perforation[plast]["подошва"] = \
+                    max(list(map(lambda x: x[1], list(well_data.dict_perforation[plast]['интервал']))))
+
+    well_data.perforation_roof = perforation_roof
+    well_data.perforation_sole = perforation_sole
+    # print(dict_perforation)
+    well_data.plast_all = list(well_data.dict_perforation.keys())
+    well_data.plast_work = list(plast_work)
+
+
+
+def count_row_height(ws, ws2, work_list, merged_cells_dict, ind_ins):
+    from openpyxl.utils.cell import range_boundaries, get_column_letter
+
+    boundaries_dict = {}
+
+    text_width_dict = {35: (0, 100), 50: (101, 200), 70: (201, 300), 95: (301, 400), 110: (401, 500),
+                       130: (501, 600), 150: (601, 700), 170: (701, 800), 190: (801, 900), 210: (901, 1500)}
+    for ind, _range in enumerate(ws.merged_cells.ranges):
+        boundaries_dict[ind] = range_boundaries(str(_range))
+
+    rowHeights1 = [ws.row_dimensions[i].height for i in range(ws.max_row)]
+    colWidth = [ws.column_dimensions[get_column_letter(i + 1)].width for i in range(0, 13)] + [None]
+    # print(colWidth)
+    for i, row_data in enumerate(work_list):
+        for column, data in enumerate(row_data):
+            if column == 2:
+                if not data is None:
+                    text = data
+                    for key, value in text_width_dict.items():
+                        if value[0] <= len(text) <= value[1]:
+                            ws2.row_dimensions[i + 1].height = int(key)
+
+    head = plan.head_ind(0, ind_ins)
+    # print(f'head - {head}')
+
+    plan.copy_true_ws(ws, ws2, head)
+
+    for i in range(1, len(work_list) + 1):  # Добавлением работ
+        for j in range(1, 13):
+            cell = ws2.cell(row=i, column=j)
+
+            if cell and str(cell) != str(work_list[i - 1][j - 1]):
+
+                if str(work_list[i - 1][j - 1]).replace('.', '').isdigit() and \
+                        str(work_list[i - 1][j - 1]).count('.') != 2:
+
+                    cell.value = str(work_list[i - 1][j - 1]).replace('.', ',')
+                    # print(f'цифры {cell.value}')
+                else:
+                    cell.value = work_list[i - 1][j - 1]
+
+                if i >= ind_ins:
+                    if j != 1:
+                        cell.border = well_data.thin_border
+                    if j == 11:
+                        cell.font = Font(name='Arial', size=11, bold=False)
+                    # if j == 12:
+                    #     cell.value = work_list[i - 1][j - 1]
+                    else:
+                        cell.font = Font(name='Arial', size=13, bold=False)
+                    ws2.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='center',
+                                                                    vertical='center')
+                    ws2.cell(row=i, column=11).alignment = Alignment(wrap_text=True, horizontal='center',
+                                                                     vertical='center')
+                    ws2.cell(row=i, column=12).alignment = Alignment(wrap_text=True, horizontal='center',
+                                                                     vertical='center')
+                    ws2.cell(row=i, column=3).alignment = Alignment(wrap_text=True, horizontal='left',
+                                                                    vertical='center')
+                    if 'примечание' in str(cell.value).lower() \
+                            or 'заявку оформить за 16 часов' in str(cell.value).lower() \
+                            or 'ЗАДАЧА 2.9.' in str(cell.value).upper() \
+                            or 'ВСЕ ТЕХНОЛОГИЧЕСКИЕ ОПЕРАЦИИ' in str(cell.value).upper() \
+                            or 'за 48 часов до спуска' in str(cell.value).upper():
+                        # print('есть жирный')
+                        ws2.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=True)
+                    elif 'порядок работы' in str(cell.value).lower() or \
+                            'Наименование работ' in str(cell.value):
+                        ws2.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=True)
+                        ws2.cell(row=i, column=j).alignment = Alignment(wrap_text=True, horizontal='center',
+                                                                        vertical='center')
+    # print(merged_cells_dict)
+    for row, col in merged_cells_dict.items():
+        if len(col) != 2:
+            # print(row)
+            ws2.merge_cells(start_row=row + 1, start_column=3, end_row=row + 1, end_column=10)
+    for key, value in boundaries_dict.items():
+        # print(value)
+        ws2.merge_cells(start_column=value[0], start_row=value[1],
+                        end_column=value[2], end_row=value[3])
+
+    # вставка сохраненных изображение по координатам ячеек
+    if well_data.image_list:
+        print(f' схемы {well_data.image_list}')
+        for img in well_data.image_list:
+            logo = Image(img[0])
+            logo.width, logo.height = img[2][0] * 0.48, img[2][1] * 0.72
+            ws2.add_image(logo, img[1])
+
+    # print(f'высота строк работ {ins_ind}')
+    # print(f'высота строк работ {len(rowHeights1)}')
+    for index_row, row in enumerate(ws2.iter_rows()):  # Копирование высоты строки
+        if all([col is None for col in row]):
+            ws2.row_dimensions[index_row].hidden = True
+        try:
+            if index_row < ind_ins:
+                ws2.row_dimensions[index_row].height = rowHeights1[index_row]
+        except:
+            pass
+        if index_row == 2:
+            for col_ind, col in enumerate(row):
+                if col_ind <= 12:
+                    ws2.column_dimensions[get_column_letter(col_ind + 1)].width = colWidth[col_ind]
+    ws2.column_dimensions[get_column_letter(11)].width = 20
+    ws2.column_dimensions[get_column_letter(12)].width = 20
+
+    ws2.column_dimensions[get_column_letter(6)].width = 18
+
+    return 'Высота изменена'

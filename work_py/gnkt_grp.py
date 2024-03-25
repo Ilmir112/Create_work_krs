@@ -5,6 +5,8 @@ from PyQt5.QtWidgets import QInputDialog, QMainWindow, QTabWidget, QWidget, QTab
 from openpyxl.styles import Alignment
 from openpyxl.utils import get_column_letter
 from PyQt5 import QtCore, QtWidgets
+
+import well_data
 from perforation_correct import PerforationCorrect
 
 import block_name
@@ -36,13 +38,13 @@ class Work_with_gnkt(QMainWindow):
 
     def __init__(self, ws, tabWidget, table_title, table_schema, table_widget):
 
-        from open_pz import CreatePZ
+       
         super(QMainWindow, self).__init__()
         self.table_widget = table_widget
         self.table_title = table_title
         self.table_schema = table_schema
 
-        self.dict_perforation = CreatePZ.dict_perforation
+        self.dict_perforation = well_data.dict_perforation
         self.ws = ws
         self.work_plan = 'gnkt_after_grp'
         self.perforation_correct_window2 = None
@@ -51,7 +53,7 @@ class Work_with_gnkt(QMainWindow):
         self.ws_schema = Work_with_gnkt.wb_gnkt_frez.create_sheet(title="Схема")
         self.ws_work = Work_with_gnkt.wb_gnkt_frez.create_sheet(title="Ход работ")
 
-        head = plan.head_ind(CreatePZ.cat_well_min, CreatePZ.cat_well_max + 1)
+        head = plan.head_ind(well_data.cat_well_min, well_data.cat_well_max + 1)
         # print(f'ff  {head}')p
         # print(self.ws)
         plan.copy_true_ws(self.ws, self.ws_title, head)
@@ -66,12 +68,12 @@ class Work_with_gnkt(QMainWindow):
         main.MyWindow.populate_row(self, 0, work_well, table_widget)
 
         CreatePZ.addItog(self, self.ws_work, self.table_widget.rowCount() + 1, self.work_plan)
-        # Work_with_gnkt.wb_gnkt_frez.save(f"{CreatePZ.well_number} {CreatePZ.well_area} {CreatePZ.cat_P_1}
+        # Work_with_gnkt.wb_gnkt_frez.save(f"{well_data.well_number} {well_data.well_area} {well_data.cat_P_1}
         # категории.xlsx")
         # print('файл сохранен')
 
     def count_row_height(self, ws2, work_list, sheet_name):
-        from open_pz import CreatePZ
+       
         from openpyxl.utils.cell import range_boundaries, get_column_letter
 
         colWidth = [2.85546875, 14.42578125, 16.140625, 22.85546875, 17.140625, 14.42578125, 13.0, 13.0, 17.0,
@@ -138,7 +140,7 @@ class Work_with_gnkt(QMainWindow):
                                 if value[0] <= len(text) <= value[1]:
                                     ws2.row_dimensions[i + 1].height = int(key)
                     if column != 0:
-                        ws2.cell(row=i + 1, column=column + 1).border = CreatePZ.thin_border
+                        ws2.cell(row=i + 1, column=column + 1).border = well_data.thin_border
                     if column == 1 or column == 11:
                         ws2.cell(row=i + 1, column=column + 1).alignment = Alignment(wrap_text=True, horizontal='center',
                                                                                  vertical='center')
@@ -206,7 +208,7 @@ class Work_with_gnkt(QMainWindow):
         print(f'{sheet_name} - вставлена')
 
     def save_to_gnkt(self):
-        from open_pz import CreatePZ
+       
 
         sheets = ["Титульник", 'Схема', 'Ход работ']
         tables = [self.table_title, self.table_schema, self.table_widget]
@@ -238,13 +240,13 @@ class Work_with_gnkt(QMainWindow):
 
         # path = 'workiii'
         path = 'D:\Documents\Desktop\ГТМ'
-        filenames = f"{CreatePZ.well_number} {CreatePZ.well_area} кат {CreatePZ.cat_P_1} {self.work_plan}.xlsx"
+        filenames = f"{well_data.well_number} {well_data.well_area} кат {well_data.cat_P_1} {self.work_plan}.xlsx"
         full_path = path + '/' + filenames
         # print(f'10 - {ws2.max_row}')
         # print(wb2.path)
-        # print(f' кате {CreatePZ.cat_P_1}')
+        # print(f' кате {well_data.cat_P_1}')
 
-        if CreatePZ.bvo == True:
+        if well_data.bvo == True:
             ws5 = Work_with_gnkt.wb_gnkt_frez.create_sheet('Sheet1')
             ws5.title = "Схемы ПВО"
             ws5 = Work_with_gnkt.wb_gnkt_frez["Схемы ПВО"]
@@ -257,30 +259,30 @@ class Work_with_gnkt(QMainWindow):
             main.MyWindow.saveFileDialog(self, Work_with_gnkt.wb_gnkt_frez, full_path)
 
             Work_with_gnkt.wb_gnkt_frez.close()
-            print(f"Table data saved to Excel {full_path} {CreatePZ.number_dp}")
+            print(f"Table data saved to Excel {full_path} {well_data.number_dp}")
         if self.wb:
             self.wb.close()
 
     def create_title_list(self, ws2):
-        from open_pz import CreatePZ
+       
 
-        CreatePZ.region = block_name.region(CreatePZ.cdng)
-        self.region = CreatePZ.region
+        well_data.region = block_name.region(well_data.cdng)
+        self.region = well_data.region
 
         title_list = [
             [None, None, None, None, None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None],
             [None, 'ООО «Башнефть-Добыча»', None, None, None, None, None, None, None, None, None, None],
-            [None, None, None, f'{CreatePZ.cdng}', None, None, None, None, None, None, None, None],
+            [None, None, None, f'{well_data.cdng}', None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None],
             [None, 'ПЛАН РАБОТ НА СКВАЖИНЕ С ПОМОЩЬЮ УСТАНОВКИ С ГИБКОЙ ТРУБОЙ', None, None, None,
              None, None, None, None, None, None, None],
 
             [None, None, None, None, None, None, None, None, None, None, None, None],
-            [None, None, '№ скважины:', f'{CreatePZ.well_number}', 'куст:', None, 'Месторождение:', None, None,
-             CreatePZ.well_oilfield, None, None],
-            [None, None, 'инв. №:', CreatePZ.inv_number, None, None, None, None, 'Площадь: ', CreatePZ.well_area, None,
+            [None, None, '№ скважины:', f'{well_data.well_number}', 'куст:', None, 'Месторождение:', None, None,
+             well_data.well_oilfield, None, None],
+            [None, None, 'инв. №:', well_data.inv_number, None, None, None, None, 'Площадь: ', well_data.well_area, None,
              1],
             [None, None, None, None, None, None, None, None, None, None, None, None]]
 
@@ -351,24 +353,24 @@ class Work_with_gnkt(QMainWindow):
 
         colWidth = []
 
-        self.plast_work = CreatePZ.plast_all[0]
+        self.plast_work = well_data.plast_all[0]
         plast_work = self.plast_work
-        # print(self.plast_work, list(CreatePZ.dict_perforation[plast_work]))
-        self.pressuar = list(CreatePZ.dict_perforation[plast_work]["давление"])[0]
+        # print(self.plast_work, list(well_data.dict_perforation[plast_work]))
+        self.pressuar = list(well_data.dict_perforation[plast_work]["давление"])[0]
 
-        zamer = list(CreatePZ.dict_perforation[plast_work]['замер'])[0]
-        vertikal = min(map(float, list(CreatePZ.dict_perforation[plast_work]["вертикаль"])))
+        zamer = list(well_data.dict_perforation[plast_work]['замер'])[0]
+        vertikal = min(map(float, list(well_data.dict_perforation[plast_work]["вертикаль"])))
         self.fluid = self.calc_fluid()
         zhgs = f'{self.fluid}г/см3'
         koef_anomal = round(float(self.pressuar) * 101325 / (float(vertikal) * 9.81 * 1000), 1)
-        nkt = int(list(CreatePZ.dict_nkt.keys())[0])
+        nkt = int(list(well_data.dict_nkt.keys())[0])
         if nkt == 73:
             nkt_widht = 5.5
         elif nkt == 89:
             nkt_widht = 6.5
         elif nkt == 60:
             nkt_widht = 5
-        lenght_nkt = sum(list(map(int, CreatePZ.dict_nkt.values())))
+        lenght_nkt = sum(list(map(int, well_data.dict_nkt.values())))
 
 
 
@@ -380,12 +382,12 @@ class Work_with_gnkt(QMainWindow):
         volume_vn_gnkt = round(30.2 ** 2 * 3.14 / (4 * 1000), 2)
         volume_gnkt = round(gnkt_lenght * volume_vn_gnkt / 1000, 1)
 
-        well_volume_ek = well_volume(self, CreatePZ.head_column_additional._value)
-        well_volume_dp = well_volume(self, CreatePZ.current_bottom) - well_volume_ek
+        well_volume_ek = well_volume(self, well_data.head_column_additional._value)
+        well_volume_dp = well_volume(self, well_data.current_bottom) - well_volume_ek
 
-        volume_pm_ek = round(3.14 * (CreatePZ.column_diametr._value - 2 * CreatePZ.column_wall_thickness._value) ** 2 / 4 / 1000, 2)
-        volume_pm_dp = round(3.14 * (CreatePZ.column_additional_diametr._value - 2 *
-                                     CreatePZ.column_additional_wall_thickness._value) ** 2 / 4 / 1000, 2)
+        volume_pm_ek = round(3.14 * (well_data.column_diametr._value - 2 * well_data.column_wall_thickness._value) ** 2 / 4 / 1000, 2)
+        volume_pm_dp = round(3.14 * (well_data.column_additional_diametr._value - 2 *
+                                     well_data.column_additional_wall_thickness._value) ** 2 / 4 / 1000, 2)
         schema_well_list = [
             [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None, None, None],
@@ -404,38 +406,38 @@ class Work_with_gnkt(QMainWindow):
              'Тип ФА', None, None, 'АУШГН-146 / АУГРП 146*14', None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None,
              'Тип КГ', None, None, None, None, None, None, None, None, None, None],
-            [None, None, None, None, None, None, None, None, None, CreatePZ.column_diametr._value, None, None,
-             'Стол ротора', None, CreatePZ.stol_rotora, 'Øнаруж мм', 'толщ, мм', 'Øвнут, мм', 'Интервал спуска, м',
+            [None, None, None, None, None, None, None, None, None, well_data.column_diametr._value, None, None,
+             'Стол ротора', None, well_data.stol_rotora, 'Øнаруж мм', 'толщ, мм', 'Øвнут, мм', 'Интервал спуска, м',
              None, 'ВПЦ.\nДлина', 'Объем', None],
-            [None, None, None, None, None, None, None, None, None, CreatePZ.shoe_column._value, None, None,
+            [None, None, None, None, None, None, None, None, None, well_data.shoe_column._value, None, None,
              'Ø канавки', None, 211, None, None, None, None, None, None, 'л/п.м.', 'м3'],
             [None, None, None, None, None, None, None, None, None, None, None, None,
              'Шахтное направление', None, None, f'-', None, None, f'-', f'-', f'-', None, None],
             [None, None, None, None, None, None, None, None, None,
              'НКТ 89мм', None, None, 'Направление', None, None,
-             CreatePZ.column_direction_diametr._value, CreatePZ.column_direction_wall_thickness._value,
-             round(CreatePZ.column_direction_diametr._value - 2 *CreatePZ.column_direction_wall_thickness._value,1),
-             0, CreatePZ.column_direction_lenght, CreatePZ.level_cement_direction._value, None, None],
+             well_data.column_direction_diametr._value, well_data.column_direction_wall_thickness._value,
+             round(well_data.column_direction_diametr._value - 2 *well_data.column_direction_wall_thickness._value,1),
+             0, well_data.column_direction_lenght, well_data.level_cement_direction._value, None, None],
             [None, None, None, None, None, None, None, None, None, 2448, None, None,
              'Кондуктор', None, None,
-             CreatePZ.column_conductor_diametr._value, CreatePZ.column_conductor_wall_thickness._value,
-             round(CreatePZ.column_conductor_diametr._value - 2 * CreatePZ.column_conductor_wall_thickness._value, 1),
-             0, CreatePZ.column_conductor_lenght._value, CreatePZ.level_cement_conductor._value, None, None],
+             well_data.column_conductor_diametr._value, well_data.column_conductor_wall_thickness._value,
+             round(well_data.column_conductor_diametr._value - 2 * well_data.column_conductor_wall_thickness._value, 1),
+             0, well_data.column_conductor_lenght._value, well_data.level_cement_conductor._value, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None,
              'Экспл. колонна', None, None,
-             CreatePZ.column_diametr._value, CreatePZ.column_wall_thickness._value,
-             round(CreatePZ.column_diametr._value - 2* CreatePZ.column_wall_thickness._value, 1),
-             0, CreatePZ.shoe_column,CreatePZ.level_cement_direction, volume_pm_ek, well_volume_ek],
+             well_data.column_diametr._value, well_data.column_wall_thickness._value,
+             round(well_data.column_diametr._value - 2* well_data.column_wall_thickness._value, 1),
+             0, well_data.shoe_column,well_data.level_cement_direction, volume_pm_ek, well_volume_ek],
             [None, None, None, None, None, None, None, None, None, None, None, None,
              'доп.колонна', None, None,
-             CreatePZ.column_additional_diametr._value, CreatePZ.column_additional_wall_thickness._value,
-             round(CreatePZ.column_additional_diametr._value - 2* CreatePZ.column_additional_wall_thickness._value, 1),
+             well_data.column_additional_diametr._value, well_data.column_additional_wall_thickness._value,
+             round(well_data.column_additional_diametr._value - 2* well_data.column_additional_wall_thickness._value, 1),
              None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None,
              'колонна НКТ', None, None, nkt, nkt_widht, nkt -2 * nkt_widht, 0, lenght_nkt, None, 4.335917984, 10.605655388864],
             [None, None, None, None, None, None, None, None, None, None, None, None,
-             f'{CreatePZ.paker_do["do"]}', None, None, None, None, 50,
-             CreatePZ.depth_fond_paker_do["do"], CreatePZ.depth_fond_paker_do["do"] + 2, None,  None,  None],
+             f'{well_data.paker_do["do"]}', None, None, None, None, 50,
+             well_data.depth_fond_paker_do["do"], well_data.depth_fond_paker_do["do"] + 2, None,  None,  None],
             [None, None, None, None, None, None, None, None, None, None, None, None,
              'воронка', None, None, nkt, nkt_widht , nkt -2 * nkt_widht, 0, lenght_nkt, None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None,
@@ -446,11 +448,11 @@ class Work_with_gnkt(QMainWindow):
             [None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None,
-             'Тек. забой перед ГРП', None, None, None, None, None, None, None, None, CreatePZ.current_bottom, None],
+             'Тек. забой перед ГРП', None, None, None, None, None, None, None, None, well_data.current_bottom, None],
             [None, None, None, None, None, None, None, None, None, None, None, None,
-             'Текущий забой', None, None, None, None, None, None, None, None, CreatePZ.current_bottom, None],
+             'Текущий забой', None, None, None, None, None, None, None, None, well_data.current_bottom, None],
             [None, None, None, None, None, None, None, None, None, None, None, None,
-             'Искусственный забой  ', None, None, None, None, None, None, None, None, CreatePZ.bottomhole_artificial._value, None],
+             'Искусственный забой  ', None, None, None, None, None, None, None, None, well_data.bottomhole_artificial._value, None],
             [None, None, None, None, None, None, None, None, None, None, None, None,
              'Дополнительная информация', None, None, None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, None, None,
@@ -731,14 +733,14 @@ class Work_with_gnkt(QMainWindow):
 
 
     def calc_fluid(self):
-        from open_pz import CreatePZ
+       
         fluid_list = []
         try:
 
             fluid_p = 0.83
-            for plast in CreatePZ.plast_work:
-                if float(list(CreatePZ.dict_perforation[plast]['рабочая жидкость'])[0]) > fluid_p:
-                    fluid_p = list(CreatePZ.dict_perforation[plast]['рабочая жидкость'])[0]
+            for plast in well_data.plast_work:
+                if float(list(well_data.dict_perforation[plast]['рабочая жидкость'])[0]) > fluid_p:
+                    fluid_p = list(well_data.dict_perforation[plast]['рабочая жидкость'])[0]
             fluid_list.append(fluid_p)
 
             fluid_work_insert, ok = QInputDialog.getDouble(self, 'Рабочая жидкость',

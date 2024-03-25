@@ -1,17 +1,17 @@
+import math
+import well_data
+
 from PyQt5.QtWidgets import QInputDialog, QMessageBox, QTabWidget, QWidget, QLabel, QComboBox, QMainWindow, QLineEdit, \
     QGridLayout, QPushButton, QBoxLayout
-
-import math
-
-from work_py.acid_paker import AcidPakerWindow
 from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
 from work_py.alone_oreration import kot_work
 from PyQt5.QtGui import QDoubleValidator
 from work_py.template_work import TemplateKrs, TabPage_SO_with
+from main import MyWindow
 
 class TabPage_SO(QWidget):
     def __init__(self, parent=None):
-        from open_pz import CreatePZ
+       
         super().__init__(parent)
 
         validator = QDoubleValidator(0.0, 80000.0, 2)
@@ -54,8 +54,8 @@ class TabPage_SO(QWidget):
 
 
         self.grid = QGridLayout(self)
-        if CreatePZ.column_additional is False or \
-                (CreatePZ.column_additional and CreatePZ.current_bottom < CreatePZ.head_column_additional._value):
+        if well_data.column_additional is False or \
+                (well_data.column_additional and well_data.current_bottom < well_data.head_column_additional._value):
             first_template, template_second = TabPage_SO_with.template_diam_ek(self)
             self.template_select_list = ['шаблон ЭК с хвостом', 'шаблон открытый ствол', 'шаблон без хвоста']
 
@@ -127,33 +127,33 @@ class TabPage_SO(QWidget):
 
 
     def definition_pssh(self):
-        from open_pz import CreatePZ
+       
 
 
-        if CreatePZ.column_additional is False and CreatePZ.open_trunk_well is False and all(
-                [CreatePZ.dict_perforation[plast]['отрайбировано'] for plast in CreatePZ.plast_work]) is False:
+        if well_data.column_additional is False and well_data.open_trunk_well is False and all(
+                [well_data.dict_perforation[plast]['отрайбировано'] for plast in well_data.plast_work]) is False:
             template_key = 'шаблон ЭК с хвостом'
 
-        elif CreatePZ.column_additional is False and CreatePZ.open_trunk_well is True:
+        elif well_data.column_additional is False and well_data.open_trunk_well is True:
             template_key = 'шаблон открытый ствол'
 
-        elif CreatePZ.column_additional is False and CreatePZ.open_trunk_well is False and all(
-                [CreatePZ.dict_perforation[plast]['отрайбировано'] for plast in CreatePZ.plast_work]) is True:
+        elif well_data.column_additional is False and well_data.open_trunk_well is False and all(
+                [well_data.dict_perforation[plast]['отрайбировано'] for plast in well_data.plast_work]) is True:
             template_key = 'шаблон без хвоста'
 
-        # elif CreatePZ.column_additional is True and CreatePZ.head_column_additional._value > roof_skm:
+        # elif well_data.column_additional is True and well_data.head_column_additional._value > roof_skm:
         #     template_key = 'ПСШ Доп колонна СКМ в основной колонне'
 
-        elif CreatePZ.column_additional is True and CreatePZ.open_trunk_well is False and all(
-                [CreatePZ.dict_perforation[plast]['отрайбировано'] for plast in CreatePZ.plast_work]) is False:
+        elif well_data.column_additional is True and well_data.open_trunk_well is False and all(
+                [well_data.dict_perforation[plast]['отрайбировано'] for plast in well_data.plast_work]) is False:
             template_key = 'шаблон ДП с хвостом'
 
-        elif CreatePZ.column_additional is True and CreatePZ.open_trunk_well is True:
+        elif well_data.column_additional is True and well_data.open_trunk_well is True:
             template_key = 'шаблон ДП открытый ствол'
 
-        elif CreatePZ.column_additional is True and all(
-                [CreatePZ.dict_perforation[plast]['отрайбировано'] for plast in
-                 CreatePZ.plast_work]) is True and CreatePZ.open_trunk_well is False:
+        elif well_data.column_additional is True and all(
+                [well_data.dict_perforation[plast]['отрайбировано'] for plast in
+                 well_data.plast_work]) is True and well_data.open_trunk_well is False:
             template_key = 'шаблон ДП с хвоста'
         return template_key
 
@@ -166,7 +166,7 @@ class TabPage_SO(QWidget):
         #     enable.setEnabled(False)
 
     def update_template(self):
-        from open_pz import CreatePZ
+       
         if self.template_first_Edit.text() != '':
             first_template = self.template_first_Edit.text()
         if self.lenght_template_first_Edit.text() != '':
@@ -186,11 +186,11 @@ class TabPage_SO(QWidget):
             dictance_template_second = ''
 
 
-        nkt_diam = CreatePZ.nkt_diam
+        nkt_diam = well_data.nkt_diam
 
-        if CreatePZ.column_additional or \
-                (CreatePZ.head_column_additional._value >= CreatePZ.current_bottom and CreatePZ.column_additional is False):
-            nkt_pod = '60мм' if CreatePZ.column_additional_diametr._value < 110 else '73мм со снятыми фасками'
+        if well_data.column_additional or \
+                (well_data.head_column_additional._value >= well_data.current_bottom and well_data.column_additional is False):
+            nkt_pod = '60мм' if well_data.column_additional_diametr._value < 110 else '73мм со снятыми фасками'
 
 
         if first_template != '' and lenght_template_first != '' and \
@@ -205,26 +205,26 @@ class TabPage_SO(QWidget):
                     template_str = f'перо + шаблон-{int(first_template)}мм L-{int(lenght_template_first)}м + НКТ{nkt_diam}м ' \
                                    f'{int(dictance_template_first)}м  + шаблон-{template_second}мм L-{lenght_template_second}'
 
-                    CreatePZ.template_depth = int(CreatePZ.current_bottom - int(dictance_template_first) -
+                    well_data.template_depth = int(well_data.current_bottom - int(dictance_template_first) -
                                                   int(lenght_template_first))
 
-                    skm_teml_str = f'шаблон-{template_second}мм до гл.{CreatePZ.template_depth}м'
+                    skm_teml_str = f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
 
 
             elif self.template_Combo.currentText() == 'шаблон без хвоста':
                 if dictance_template_second != None:
                     template_str = f'перо + шаблон-{template_second}мм L-{lenght_template_second}м '
-                    CreatePZ.template_depth = CreatePZ.current_bottom
-                    skm_teml_str = f'шаблон-{template_second}мм до гл.{CreatePZ.template_depth}м'
+                    well_data.template_depth = well_data.current_bottom
+                    skm_teml_str = f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
 
             elif self.template_Combo.currentText() == 'шаблон открытый ствол':
                 if dictance_template_second != None:
                     self.template_first_Edit.setText('фильтр направление')
                     template_str = f'фильтр-направление + НКТ{nkt_diam}м {dictance_template_first}м ' \
                                    f'шаблон-{template_second}мм L-{lenght_template_second}м '
-                    CreatePZ.template_depth = int(CreatePZ.current_bottom - int(dictance_template_first))
+                    well_data.template_depth = int(well_data.current_bottom - int(dictance_template_first))
 
-                    skm_teml_str = f'шаблон-{template_second}мм до гл.{CreatePZ.template_depth}м'
+                    skm_teml_str = f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
 
             elif self.template_Combo.currentText() == 'шаблон ДП с хвостом':
                 if dictance_template_second != None:
@@ -232,16 +232,16 @@ class TabPage_SO(QWidget):
                                    f'+ шаблон-{first_template}мм ' \
                                    f'L-{lenght_template_first}м + НКТ{nkt_pod} {dictance_template_second}м + ' \
                                    f'шаблон-{template_second}мм L-{lenght_template_second}м '
-                    CreatePZ.template_depth = math.ceil(CreatePZ.current_bottom - 2 -
+                    well_data.template_depth = math.ceil(well_data.current_bottom - 2 -
                                                         int(dictance_template_first) - int(dictance_template_second) -
                                                         int(lenght_template_first))
-                    CreatePZ.template_depth_addition = math.ceil(CreatePZ.current_bottom - 2 -
+                    well_data.template_depth_addition = math.ceil(well_data.current_bottom - 2 -
                                                                  int(dictance_template_first) - int(
                         dictance_template_second))
 
 
-                    skm_teml_str = f'шаблон-{first_template}мм до гл.{CreatePZ.template_depth_addition}м, ' \
-                                   f'шаблон-{template_second}мм до гл.{CreatePZ.template_depth}м'
+                    skm_teml_str = f'шаблон-{first_template}мм до гл.{well_data.template_depth_addition}м, ' \
+                                   f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
 
             elif self.template_Combo.currentText() == 'шаблон ДП без хвоста':
 
@@ -250,13 +250,13 @@ class TabPage_SO(QWidget):
                                f'НКТ{nkt_pod} {dictance_template_second}м + шаблон-{template_second}мм ' \
                                f'L-{lenght_template_second}м '
 
-                CreatePZ.template_depth = math.ceil(CreatePZ.current_bottom - int(dictance_template_second) -
+                well_data.template_depth = math.ceil(well_data.current_bottom - int(dictance_template_second) -
                                                     int(lenght_template_first))
-                CreatePZ.template_depth_addition = math.ceil(
-                    CreatePZ.current_bottom - int(dictance_template_second))
+                well_data.template_depth_addition = math.ceil(
+                    well_data.current_bottom - int(dictance_template_second))
 
-                skm_teml_str = f'шаблон-{first_template}мм до гл.{CreatePZ.template_depth_addition}м, ' \
-                               f'шаблон-{template_second}мм до гл.{CreatePZ.template_depth}м'
+                skm_teml_str = f'шаблон-{first_template}мм до гл.{well_data.template_depth_addition}м, ' \
+                               f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
 
 
             elif self.template_Combo.currentText() == 'шаблон ДП открытый ствол':
@@ -266,26 +266,26 @@ class TabPage_SO(QWidget):
                                    f'L-{lenght_template_first}м' \
                                    f' + НКТ{nkt_pod} + шаблон-{template_second}мм ' \
                                    f'L-{lenght_template_second}м '
-                    CreatePZ.template_depth = math.ceil(CreatePZ.current_bottom - 2 -
+                    well_data.template_depth = math.ceil(well_data.current_bottom - 2 -
                                                         int(dictance_template_first) - int(dictance_template_second) -
                                                         int(lenght_template_first))
-                    CreatePZ.template_depth_addition = math.ceil(CreatePZ.current_bottom - 2 -
+                    well_data.template_depth_addition = math.ceil(well_data.current_bottom - 2 -
                                                                  int(dictance_template_first) - int(
                         dictance_template_second))
 
-                    skm_teml_str = f'шаблон-{first_template}мм до гл.{CreatePZ.template_depth_addition}м, ' \
-                                   f'шаблон-{template_second}мм до гл.{CreatePZ.template_depth}м'
+                    skm_teml_str = f'шаблон-{first_template}мм до гл.{well_data.template_depth_addition}м, ' \
+                                   f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
             if dictance_template_second != "":
                 self.template_str_Edit.setText(template_str)
                 self.skm_teml_str_Edit.setText(skm_teml_str)
 
     def update_template_edit(self, index):
-        from open_pz import CreatePZ
+       
         template_str = ''
         skm_teml_str = ''
-        nkt_diam = CreatePZ.nkt_diam
-        if CreatePZ.column_additional is False or (CreatePZ.column_additional and
-                                                   CreatePZ.head_column_additional._value >= CreatePZ.current_bottom):
+        nkt_diam = well_data.nkt_diam
+        if well_data.column_additional is False or (well_data.column_additional and
+                                                   well_data.head_column_additional._value >= well_data.current_bottom):
 
             first_template, template_second = TabPage_SO_with.template_diam_ek(self)
             # print(f'диаметры шаблонов {first_template, template_second}')
@@ -295,14 +295,14 @@ class TabPage_SO(QWidget):
 
         self.template_first_Edit.setText(str(first_template))
         self.template_second_Edit.setText(str(template_second))
-        # self.skm_Edit.setText(str(CreatePZ.column_diametr._value))
+        # self.skm_Edit.setText(str(well_data.column_diametr._value))
         self.dictance_template_second_Edit.setText(str(10))
 
         roof_plast, roof_add_column_plast = TabPage_SO_with.definition_roof_not_raiding(self)
-        dictance_template_first = int(CreatePZ.current_bottom - roof_plast + 5)
+        dictance_template_first = int(well_data.current_bottom - roof_plast + 5)
         self.dictance_template_first_Edit.setText(str(dictance_template_first))
 
-        lenght_template_first, lenght_template_second = TabPage_SO_with.definition_ECN_true(self, CreatePZ.dict_pump_ECN_h["posle"])
+        lenght_template_first, lenght_template_second = TabPage_SO_with.definition_ECN_true(self, well_data.dict_pump_ECN_h["posle"])
         self.lenght_template_first_Edit.setText(lenght_template_first)
         self.lenght_template_second_Edit.setText(str(lenght_template_second))
 
@@ -327,9 +327,9 @@ class TabPage_SO(QWidget):
 
 
 
-        if CreatePZ.column_additional or \
-                (CreatePZ.head_column_additional._value >= CreatePZ.current_bottom and CreatePZ.column_additional is False):
-            nkt_pod = '60мм' if CreatePZ.column_additional_diametr._value < 110 else '73мм со снятыми фасками'
+        if well_data.column_additional or \
+                (well_data.head_column_additional._value >= well_data.current_bottom and well_data.column_additional is False):
+            nkt_pod = '60мм' if well_data.column_additional_diametr._value < 110 else '73мм со снятыми фасками'
 
         if index == 'шаблон ЭК с хвостом':
             self.dictance_template_second_Edit.setParent(None)
@@ -347,8 +347,8 @@ class TabPage_SO(QWidget):
                            f' L-{lenght_template_second}м '
 
             # print(f'строка шаблона {template_str}')
-            CreatePZ.template_depth = int(roof_plast - 5)
-            skm_teml_str = f'шаблон-{template_second}мм до гл.{CreatePZ.template_depth}м'
+            well_data.template_depth = int(roof_plast - 5)
+            skm_teml_str = f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
 
 
 
@@ -359,8 +359,8 @@ class TabPage_SO(QWidget):
             self.dictance_template_first_Label.setParent(None)
 
             template_str = f'перо + шаблон-{template_second}мм L-{lenght_template_second}м '
-            CreatePZ.template_depth = CreatePZ.current_bottom
-            skm_teml_str = f'шаблон-{template_second}мм до гл.{CreatePZ.template_depth}м'
+            well_data.template_depth = well_data.current_bottom
+            skm_teml_str = f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
 
         elif index == 'шаблон открытый ствол':
 
@@ -381,9 +381,9 @@ class TabPage_SO(QWidget):
 
             template_str = f'фильтр-направление L-2 + НКТ{nkt_diam}м {dictance_template_first}м +' \
                            f'шаблон-{template_second}мм L-{lenght_template_second}м '
-            CreatePZ.template_depth = int(roof_plast - 5)
+            well_data.template_depth = int(roof_plast - 5)
 
-            skm_teml_str = f'шаблон-{template_second}мм до гл.{CreatePZ.template_depth}м'
+            skm_teml_str = f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
 
         elif index == 'шаблон ДП с хвостом':
 
@@ -399,9 +399,9 @@ class TabPage_SO(QWidget):
             self.grid.addWidget(self.lenght_template_second_Edit, 5, 8)
 
 
-            dictance_template_first = int(CreatePZ.current_bottom - roof_add_column_plast + 5)
+            dictance_template_first = int(well_data.current_bottom - roof_add_column_plast + 5)
             self.dictance_template_first_Edit.setText(str(dictance_template_first))
-            dictance_template_second = int(roof_add_column_plast - CreatePZ.head_column_additional._value - int(
+            dictance_template_second = int(roof_add_column_plast - well_data.head_column_additional._value - int(
                 self.lenght_template_first_Edit.text())+5)
             self.dictance_template_second_Edit.setText(str(dictance_template_second))
 
@@ -411,12 +411,12 @@ class TabPage_SO(QWidget):
                            f' + шаблон-{first_template}мм ' \
                            f'L-{lenght_template_first}м + НКТ{nkt_pod} {dictance_template_second}м + ' \
                            f'шаблон-{template_second}мм L-{lenght_template_second}м '
-            CreatePZ.template_depth = math.ceil(roof_add_column_plast - 5 - lenght_template_first - dictance_template_second)
-            CreatePZ.template_depth_addition = math.ceil(roof_add_column_plast - 5)
+            well_data.template_depth = math.ceil(roof_add_column_plast - 5 - lenght_template_first - dictance_template_second)
+            well_data.template_depth_addition = math.ceil(roof_add_column_plast - 5)
 
 
-            skm_teml_str = f'шаблон-{first_template}мм до гл.{CreatePZ.template_depth_addition}м, ' \
-                           f'шаблон-{template_second}мм до гл.{CreatePZ.template_depth}м'
+            skm_teml_str = f'шаблон-{first_template}мм до гл.{well_data.template_depth_addition}м, ' \
+                           f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
 
         elif index == 'шаблон ДП без хвоста':
             self.dictance_template_first_Edit.setParent(None)
@@ -433,7 +433,7 @@ class TabPage_SO(QWidget):
             self.grid.addWidget(self.lenght_template_second_Edit, 5, 8)
 
 
-            dictance_template_second = int(CreatePZ.current_bottom - CreatePZ.head_column_additional._value
+            dictance_template_second = int(well_data.current_bottom - well_data.head_column_additional._value
                 - int(lenght_template_first) + 5)
             self.dictance_template_second_Edit.setText(str(dictance_template_second))
             dictance_template_second = int(self.dictance_template_second_Edit.text())
@@ -442,12 +442,12 @@ class TabPage_SO(QWidget):
                            f'НКТ{nkt_pod} {dictance_template_second}м + шаблон-{template_second}мм ' \
                            f'L-{lenght_template_second}м '
 
-            CreatePZ.template_depth = math.ceil(CreatePZ.current_bottom - dictance_template_second -
+            well_data.template_depth = math.ceil(well_data.current_bottom - dictance_template_second -
                                                 lenght_template_first)
-            CreatePZ.template_depth_addition = math.ceil(CreatePZ.current_bottom)
+            well_data.template_depth_addition = math.ceil(well_data.current_bottom)
 
-            skm_teml_str = f'шаблон-{first_template}мм до гл.{CreatePZ.template_depth_addition}м, ' \
-                           f'шаблон-{template_second}мм до гл.{CreatePZ.template_depth}м'
+            skm_teml_str = f'шаблон-{first_template}мм до гл.{well_data.template_depth_addition}м, ' \
+                           f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
 
 
 
@@ -466,11 +466,11 @@ class TabPage_SO(QWidget):
 
 
 
-            dictance_template_first = int(CreatePZ.current_bottom - roof_add_column_plast + 5)
+            dictance_template_first = int(well_data.current_bottom - roof_add_column_plast + 5)
             self.dictance_template_first_Edit.setText(str(dictance_template_first))
             dictance_template_first = int(self.dictance_template_first_Edit.text())
 
-            dictance_template_second = int(roof_add_column_plast - CreatePZ.head_column_additional._value - int(
+            dictance_template_second = int(roof_add_column_plast - well_data.head_column_additional._value - int(
                 self.lenght_template_first_Edit.text()) + 5)
             self.dictance_template_second_Edit.setText(str(dictance_template_second))
 
@@ -479,35 +479,35 @@ class TabPage_SO(QWidget):
                            f' + шаблон-{first_template}мм L-{lenght_template_first}м' \
                            f' + НКТ{nkt_pod} {dictance_template_second}м + шаблон-{template_second}мм ' \
                            f'L-{lenght_template_second}м '
-            CreatePZ.template_depth = math.ceil(
+            well_data.template_depth = math.ceil(
                 roof_add_column_plast - 5 - lenght_template_first - dictance_template_second)
-            CreatePZ.template_depth_addition = math.ceil(roof_add_column_plast - 5)
+            well_data.template_depth_addition = math.ceil(roof_add_column_plast - 5)
 
 
-            skm_teml_str = f'шаблон-{first_template}мм до гл.{CreatePZ.template_depth_addition}м, ' \
-                           f'шаблон-{template_second}мм до гл.{CreatePZ.template_depth}м'
+            skm_teml_str = f'шаблон-{first_template}мм до гл.{well_data.template_depth_addition}м, ' \
+                           f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
 
         self.template_str_Edit.setText(template_str)
         self.skm_teml_str_Edit.setText(skm_teml_str)
 
-        if 'ПОМ' in str(CreatePZ.paker_do["posle"]).upper() and '122' in str(CreatePZ.paker_do["posle"]):
+        if 'ПОМ' in str(well_data.paker_do["posle"]).upper() and '122' in str(well_data.paker_do["posle"]):
             self.template_second_Edit.setText(str(126))
 
     def definition_ECN_true(self, depth_ecn):
-        from open_pz import CreatePZ
-        if CreatePZ.column_additional is False and CreatePZ.dict_pump_ECN["posle"] != 0:
+       
+        if well_data.column_additional is False and well_data.dict_pump_ECN["posle"] != 0:
             return "2", "30"
-        elif CreatePZ.column_additional is True and CreatePZ.dict_pump_ECN["posle"] != 0:
-            if CreatePZ.dict_pump_ECN["posle"] != 0 and float(depth_ecn) < CreatePZ.head_column_additional._value:
+        elif well_data.column_additional is True and well_data.dict_pump_ECN["posle"] != 0:
+            if well_data.dict_pump_ECN["posle"] != 0 and float(depth_ecn) < well_data.head_column_additional._value:
                 return "2", "30"
 
-            elif CreatePZ.dict_pump_ECN["posle"] != 0 and float(depth_ecn) >= CreatePZ.head_column_additional._value:
+            elif well_data.dict_pump_ECN["posle"] != 0 and float(depth_ecn) >= well_data.head_column_additional._value:
 
                 return "30", "4"
         else:
             return "2", "4"
 
-            # print(f' ЭЦН длина" {CreatePZ.lift_ecn_can, CreatePZ.lift_ecn_can_addition, "ЭЦН" in str(CreatePZ.dict_pump["posle"][0]).upper()}')
+            # print(f' ЭЦН длина" {well_data.lift_ecn_can, well_data.lift_ecn_can_addition, "ЭЦН" in str(well_data.dict_pump["posle"][0]).upper()}')
 
 
 
@@ -531,92 +531,90 @@ class Template_without_skm(QMainWindow):
         self.tabWidget = TabWidget()
 
         self.buttonAdd = QPushButton('Добавить данные в план работ')
-        self.buttonAdd.clicked.connect(self.addRowTable)
+        self.buttonAdd.clicked.connect(self.addWork)
         vbox = QGridLayout(self.centralWidget)
         vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
 
-    def addRowTable(self):
-        from open_pz import CreatePZ
-
+    def addWork(self):
         template_str = str(self.tabWidget.currentWidget().template_str_Edit.text())
         template = str(self.tabWidget.currentWidget().template_Combo.currentText())
-        if CreatePZ.column_additional is False or (
-                CreatePZ.column_additional is True and float(
-            CreatePZ.head_column_additional._value) >= CreatePZ.current_bottom):
+        if well_data.column_additional is False or (
+                well_data.column_additional is True and float(
+            well_data.head_column_additional._value) >= well_data.current_bottom):
             template_diametr = int(self.tabWidget.currentWidget().template_second_Edit.text())
         else:
             template_diametr = int(self.tabWidget.currentWidget().template_first_Edit.text())
-        # print(f'проблема ЭК {CreatePZ.problem_with_ek_diametr}')
-        if (template_diametr >= int(CreatePZ.problem_with_ek_diametr._value) - 2
-            and CreatePZ.template_depth > int(CreatePZ.problem_with_ek_depth)):
+        # print(f'проблема ЭК {well_data.problemWithEk_diametr}')
+        if (template_diametr >= int(well_data.problemWithEk_diametr._value) - 2
+            and well_data.template_depth > int(well_data.problemWithEk_depth)):
             mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже глубины не прохода')
 
             return
         work_list = self.template_ek(template_str, template, template_diametr)
 
-        CreatePZ.pause = False
+        well_data.pause = False
         self.close()
         return work_list
 
     def well_volume(self):
-        from open_pz import CreatePZ
-        # print(CreatePZ.column_additional)
-        if not CreatePZ.column_additional:
+       
+        # print(well_data.column_additional)
+        if not well_data.column_additional:
 
-            volume_well = 3.14 * (CreatePZ.column_diametr._value - CreatePZ.column_wall_thickness._value * 2) ** 2 / 4 / 1000000 * (
-                CreatePZ.current_bottom)
+            volume_well = 3.14 * (well_data.column_diametr._value - well_data.column_wall_thickness._value * 2) ** 2 / 4 / 1000000 * (
+                well_data.current_bottom)
             return volume_well
         else:
             volume_well = (3.14 * (
-                    CreatePZ.column_additional_diametr._value - CreatePZ.column_wall_thickness._value * 2) ** 2 / 4 / 1000 * (
-                                   CreatePZ.current_bottom - float(CreatePZ.head_column_additional._value)) / 1000) + (
+                    well_data.column_additional_diametr._value - well_data.column_wall_thickness._value * 2) ** 2 / 4 / 1000 * (
+                                   well_data.current_bottom - float(well_data.head_column_additional._value)) / 1000) + (
                                   3.14 * (
-                                      CreatePZ.column_diametr._value - CreatePZ.column_wall_thickness._value * 2) ** 2 / 4 / 1000 * (
-                                      CreatePZ.head_column_additional._value) / 1000)
+                                      well_data.column_diametr._value - well_data.column_wall_thickness._value * 2) ** 2 / 4 / 1000 * (
+                                      well_data.head_column_additional._value) / 1000)
             return volume_well
 
     def template_ek(self, template_str, template, temlate_ek):
-        from open_pz import CreatePZ
+       
 
         list_template_ek = [
-            [f'Cпустить  {template_str} на НКТ{CreatePZ.nkt_diam}мм', None,
-             f'Спустить  {template_str} на 'f'НКТ{CreatePZ.nkt_diam}мм  с замером, шаблонированием НКТ. \n'
+            [f'Cпустить  {template_str} на НКТ{well_data.nkt_diam}мм', None,
+             f'Спустить  {template_str} на 'f'НКТ{well_data.nkt_diam}мм  с замером, шаблонированием НКТ. \n'
              f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
              None, None, None, None, None, None, None,
-             'мастер КРС', descentNKT_norm(CreatePZ.current_bottom, 1.2)],
+             'мастер КРС', descentNKT_norm(well_data.current_bottom, 1.2)],
 
             [None, None,
              f'По результатам ревизии ГНО, в случае наличия отложений АСПО:\n'
              f'Очистить колонну от АСПО растворителем - 2м3. При открытом затрубном пространстве закачать в '
              f'трубное пространство растворитель в объеме 2м3, продавить в трубное пространство тех.жидкостью '
-             f'в объеме {round(3 * CreatePZ.current_bottom / 1000, 1)}м3. Приподнять. Закрыть трубное и затрубное '
+             f'в объеме {round(3 * well_data.current_bottom / 1000, 1)}м3. Приподнять. Закрыть трубное и затрубное '
              f'пространство. Реагирование 2 часа.',
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика', 4],
-            [f'Нормализовать до глубины {CreatePZ.current_bottom}м.',
+            [f'Нормализовать до глубины {well_data.current_bottom}м.',
              None, f'При необходимости нормализовать забой обратной промывкой тех жидкостью уд.весом '
-                   f'{CreatePZ.fluid_work} до глубины {CreatePZ.current_bottom}м.', None, None, None, None, None,
+                   f'{well_data.fluid_work} до глубины {well_data.current_bottom}м.', None, None, None, None, None,
              None, None,
              'Мастер КРС', None],
             [f'Промыть в объеме {round(TemplateKrs.well_volume(self) * 1.5, 1)}м3',
              None,
-             f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {CreatePZ.fluid_work}  при расходе жидкости 6-8 л/сек '
-             f'в присутствии представителя Заказчика в объеме {round(TemplateKrs.well_volume(self) * 1.5, 1)}м3. ПРИ ПРОМЫВКЕ НЕ ПРЕВЫШАТЬ ДАВЛЕНИЕ {CreatePZ.max_admissible_pressure._value}АТМ, ДОПУСТИМАЯ ОСЕВАЯ НАГРУЗКА НА ИНСТРУМЕНТ: 0,5-1,0 ТН',
+             f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {well_data.fluid_work}  при расходе жидкости 6-8 л/сек '
+             f'в присутствии представителя Заказчика в объеме {round(TemplateKrs.well_volume(self) * 1.5, 1)}м3. ПРИ ПРОМЫВКЕ НЕ ПРЕВЫШАТЬ ДАВЛЕНИЕ {well_data.max_admissible_pressure._value}АТМ, ДОПУСТИМАЯ ОСЕВАЯ НАГРУЗКА НА ИНСТРУМЕНТ: 0,5-1,0 ТН',
              None, None, None, None, None, None, None,
              'Мастер КРС, представитель ЦДНГ', well_volume_norm(TemplateKrs.well_volume(self) * 1.5)],
             [
-                f'Приподнять до глубины {round(CreatePZ.current_bottom - 20, 1)}м. Тех отстой 2ч. Определение текущего забоя',
+                f'Приподнять до глубины {round(well_data.current_bottom - 20, 1)}м. Тех отстой 2ч. Определение текущего забоя',
                 None,
-                f'Приподнять до глубины {round(CreatePZ.current_bottom - 20, 1)}м. Тех отстой 2ч. Определение текущего забоя, при '
+                f'Приподнять до глубины {round(well_data.current_bottom - 20, 1)}м. Тех отстой 2ч. Определение текущего забоя, при '
                 f'необходимости повторная промывка.',
                 None, None, None, None, None, None, None,
                 'Мастер КРС, представитель ЦДНГ', 2.49],
             [None, None,
-             f'Поднять {template_str} на НКТ{CreatePZ.nkt_diam}мм с глубины {CreatePZ.current_bottom}м с доливом скважины в '
-             f'объеме {round(CreatePZ.current_bottom * 1.12 / 1000, 1)}м3 тех. жидкостью  уд.весом {CreatePZ.fluid_work}',
+             f'Поднять {template_str} на НКТ{well_data.nkt_diam}мм с глубины {well_data.current_bottom}м с доливом скважины в '
+             f'объеме {round(well_data.current_bottom * 1.12 / 1000, 1)}м3 тех. жидкостью  уд.весом {well_data.fluid_work}',
              None, None, None, None, None, None, None,
-             'Мастер КРС', liftingNKT_norm(CreatePZ.current_bottom, 1.2)]
+             'Мастер КРС', liftingNKT_norm(well_data.current_bottom, 1.2)]
         ]
 
         notes_list = [
@@ -624,11 +622,11 @@ class Template_without_skm(QMainWindow):
                f'ПРИМЕЧАНИЕ №1: При непрохождении шаблона d={temlate_ek}мм предусмотреть СПО забойного '
                f'двигателя с райбером d={temlate_ek + 1}мм, {temlate_ek - 1}мм, {temlate_ek - 3}мм, '
                f'{temlate_ek - 5}мм на ТНКТ под проработку в интервале посадки инструмента с допуском до '
-               f'гл.{CreatePZ.current_bottom}м с последующим СПО шаблона {temlate_ek}мм на ТНКТ под промывку '
+               f'гл.{well_data.current_bottom}м с последующим СПО шаблона {temlate_ek}мм на ТНКТ под промывку '
                f'скважины (по согласованию Заказчиком). Подъем райбера (шаблона {temlate_ek}мм) '
-               f'на ТНКТ с гл. {CreatePZ.current_bottom}м вести с доливом скважины до устья т/ж '
-               f'удел.весом {CreatePZ.fluid_work} в '
-               f'объеме {round(CreatePZ.current_bottom * 1.12 / 1000, 1)}м3 ',
+               f'на ТНКТ с гл. {well_data.current_bottom}м вести с доливом скважины до устья т/ж '
+               f'удел.весом {well_data.fluid_work} в '
+               f'объеме {round(well_data.current_bottom * 1.12 / 1000, 1)}м3 ',
                None, None, None, None, None, None, None, 'Мастер КРС', None, None],
             [None, None,
                f'ПРИМЕЧАНИЕ №2: При отсутствия планового текущего забоя произвести СПО забойного двигателя с '
@@ -639,18 +637,18 @@ class Template_without_skm(QMainWindow):
                f'проходимости ствола  '
                f'и забоя скважины с применением мех.ротора, до текущего забоя с последующей нормализацией до '
                f'планового '
-               f'текущего забоя. Подъем долота с забойным двигателем на  ТНКТ с гл.{CreatePZ.current_bottom}м '
+               f'текущего забоя. Подъем долота с забойным двигателем на  ТНКТ с гл.{well_data.current_bottom}м '
                f'вести с доливом '
-               f'скважины до устья т/ж удел.весом {CreatePZ.fluid_work} в объеме {round(CreatePZ.current_bottom * 1.12 / 1000, 1)}м3',
+               f'скважины до устья т/ж удел.весом {well_data.fluid_work} в объеме {round(well_data.current_bottom * 1.12 / 1000, 1)}м3',
                None, None, None, None, None, None, None, 'Мастер КРС',
                None],
             [None, None,
                f'ПРИМЕЧАНИЕ №3: В случае отсутствия проходки более 4 часов при нормализации забоя по примечанию '
                f'№2 произвести '
                f'СПО МЛ с последующим СПО торцевой печати. Подъем компоновки на ТНКТ с гл.'
-               f'{CreatePZ.current_bottom}м вести с '
+               f'{well_data.current_bottom}м вести с '
                f'доливом скважины до устья т/ж удел.весом с доливом c'
-               f'скважины до устья т/ж удел.весом {CreatePZ.fluid_work} в объеме {round(CreatePZ.current_bottom * 1.12 / 1000, 1)}м3',
+               f'скважины до устья т/ж удел.весом {well_data.fluid_work} в объеме {round(well_data.current_bottom * 1.12 / 1000, 1)}м3',
                None, None, None, None, None, None, None, 'Мастер КРС', None],
 
             [None, None,
@@ -658,17 +656,17 @@ class Template_without_skm(QMainWindow):
                f'до планового '
                f'текущего забоя. СПО КОТ-50 повторить до полной нормализации. При жесткой посадке  '
                f'КОТ-50 или КОС произвести взрыхление с СПО забойного двигателя с долотом . Подъем компоновки '
-               f'на ТНКТ с гл.{CreatePZ.current_bottom}м'
-               f' вести с доливом скважины до устья т/ж удел.весом {CreatePZ.fluid_work} в '
-               f'объеме {round(CreatePZ.current_bottom * 1.12 / 1000, 1)}м3',
+               f'на ТНКТ с гл.{well_data.current_bottom}м'
+               f' вести с доливом скважины до устья т/ж удел.весом {well_data.fluid_work} в '
+               f'объеме {round(well_data.current_bottom * 1.12 / 1000, 1)}м3',
                None, None, None, None, None, None, None, 'Мастер КРС', None, ''],
             [None, None,
                f'Примечание №5: В случае необходимости по результатам восстановления проходимости '
                f'экплуатационной колонны '
                f'по согласованию с УСРСиСТ произвести СПО пера под промывку скважины до планового текущего забоя на '
-               f'проходимость. Подъем компоновки на ТНКТ с гл.{CreatePZ.current_bottom}м'
-               f' вести с доливом скважины до устья т/ж удел.весом {CreatePZ.fluid_work} в объеме '
-               f'{round(CreatePZ.current_bottom * 1.12 / 1000, 1)}м3',
+               f'проходимость. Подъем компоновки на ТНКТ с гл.{well_data.current_bottom}м'
+               f' вести с доливом скважины до устья т/ж удел.весом {well_data.fluid_work} в объеме '
+               f'{round(well_data.current_bottom * 1.12 / 1000, 1)}м3',
                None, None, None, None, None, None, None, 'Мастер КРС', None, None]]
 
         privyazka_nkt = [f'Привязка по ГК и ЛМ По привязому НКТ удостовериться в наличии текущего забоя', None,
@@ -676,17 +674,17 @@ class Template_without_skm(QMainWindow):
                          f' ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины.'
                          f' По привязому НКТ удостовериться в наличии'
                          f'текущего забоя с плановым, при необходимости нормализовать забой обратной промывкой тех жидкостью '
-                         f'уд.весом {CreatePZ.fluid_work}   до глубины {CreatePZ.current_bottom}м',
+                         f'уд.весом {well_data.fluid_work}   до глубины {well_data.current_bottom}м',
                          None, None, None, None, None, None, None, 'Мастер КРС', None, None]
-        if CreatePZ.current_bottom - CreatePZ.perforation_sole <= 10 and CreatePZ.open_trunk_well is False:
+        if well_data.current_bottom - well_data.perforation_sole <= 10 and well_data.open_trunk_well is False:
             privyazka_question = QMessageBox.question(self, 'Привязка оборудования',
-                                                      f'зумпф составляет {int(CreatePZ.current_bottom - CreatePZ.perforation_sole)}м '
+                                                      f'зумпф составляет {int(well_data.current_bottom - well_data.perforation_sole)}м '
                                                       f'нужно ли привязывать компоновку?'
                                                       )
             if privyazka_question == QMessageBox.StandardButton.Yes:
                 list_template_ek.insert(-1, privyazka_nkt)
 
-        if float(CreatePZ.static_level._value) > 700:
+        if float(well_data.static_level._value) > 700:
             kot_question = QMessageBox.question(self, 'Низкий Статический уровень', 'Нужно ли произвести СПО '
                                                                                     'обратных клапанов перед ПСШ?')
             if kot_question == QMessageBox.StandardButton.Yes:
@@ -694,14 +692,14 @@ class Template_without_skm(QMainWindow):
                 for row in kot_work(self)[::-1]:
                     list_template_ek.insert(0, row)
 
-        if CreatePZ.gipsInWell is True:  # Добавление работ при наличии Гипсово-солевх отложений
+        if well_data.gipsInWell is True:  # Добавление работ при наличии Гипсово-солевх отложений
             gips = TemplateKrs.pero(self)
             for row in gips[::-1]:
                 list_template_ek.insert(0, row)
 
-        if CreatePZ.count_template == 0:
+        if well_data.count_template == 0:
             list_template_ek = list_template_ek + notes_list
-            CreatePZ.count_template += 1
+            well_data.count_template += 1
         else:
             list_template_ek = list_template_ek
             list_template_ek.pop(2)
@@ -710,39 +708,39 @@ class Template_without_skm(QMainWindow):
 
     def pero(self):
         from work_py.rir import RirWindow
-        from open_pz import CreatePZ
+       
         from work_py.drilling import Drill_window
 
-        pero_list = RirWindow.pero_select(self, CreatePZ.current_bottom)
+        pero_list = RirWindow.pero_select(self, well_data.current_bottom)
         gipsPero_list = [
-            [f'Спустить {pero_list}  на тНКТ{CreatePZ.nkt_diam}мм', None,
-             f'Спустить {pero_list}  на тНКТ{CreatePZ.nkt_diam}мм до глубины {CreatePZ.current_bottom}м '
-             f'с замером, шаблонированием шаблоном {CreatePZ.nkt_template}мм. Опрессовать НКТ на 150атм. Вымыть шар. \n'
+            [f'Спустить {pero_list}  на тНКТ{well_data.nkt_diam}мм', None,
+             f'Спустить {pero_list}  на тНКТ{well_data.nkt_diam}мм до глубины {well_data.current_bottom}м '
+             f'с замером, шаблонированием шаблоном {well_data.nkt_template}мм. Опрессовать НКТ на 150атм. Вымыть шар. \n'
              f'С ГЛУБИНЫ 1100м СНИЗИТЬ СКОРОСТЬ  СПУСКА до 0.25м/с ВОЗМОЖНО ОТЛОЖЕНИЕ ГИПСА'
              f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
              None, None, None, None, None, None, None,
              'мастер КРС', 2.5],
             [
-                f'Промывка уд.весом {CreatePZ.fluid_work_short} в объеме {round(TemplateKrs.well_volume(self) * 1.5, 1)}м3 ',
+                f'Промывка уд.весом {well_data.fluid_work_short} в объеме {round(TemplateKrs.well_volume(self) * 1.5, 1)}м3 ',
                 None,
-                f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {CreatePZ.fluid_work} при расходе жидкости '
+                f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {well_data.fluid_work} при расходе жидкости '
                 f'6-8 л/сек в присутствии представителя Заказчика в объеме {round(TemplateKrs.well_volume(self) * 1.5, 1)}м3. ПРИ ПРОМЫВКЕ НЕ '
-                f'ПРЕВЫШАТЬ ДАВЛЕНИЕ {CreatePZ.max_admissible_pressure._value}АТМ, ДОПУСТИМАЯ ОСЕВАЯ '
+                f'ПРЕВЫШАТЬ ДАВЛЕНИЕ {well_data.max_admissible_pressure._value}АТМ, ДОПУСТИМАЯ ОСЕВАЯ '
                 f'НАГРУЗКА НА ИНСТРУМЕНТ: 0,5-1,0 ТН',
                 None, None, None, None, None, None, None,
                 'Мастер КРС, представитель ЦДНГ', 1.5],
             [None, None,
-             f'Приподнять до глубины {round(CreatePZ.current_bottom - 20, 1)}м. Тех отстой 2ч. Определение текущего забоя, '
+             f'Приподнять до глубины {round(well_data.current_bottom - 20, 1)}м. Тех отстой 2ч. Определение текущего забоя, '
              f'при необходимости повторная промывка.',
              None, None, None, None, None, None, None,
              'Мастер КРС, представитель ЦДНГ', 2.49],
             [None, None,
-             f'Поднять {pero_list} на НКТ{CreatePZ.nkt_diam}мм с глубины {CreatePZ.current_bottom}м с доливом скважины в '
-             f'объеме {round(CreatePZ.current_bottom * 1.12 / 1000, 1)}м3 тех. жидкостью  уд.весом {CreatePZ.fluid_work}',
+             f'Поднять {pero_list} на НКТ{well_data.nkt_diam}мм с глубины {well_data.current_bottom}м с доливом скважины в '
+             f'объеме {round(well_data.current_bottom * 1.12 / 1000, 1)}м3 тех. жидкостью  уд.весом {well_data.fluid_work}',
              None, None, None, None, None, None, None,
              'Мастер КРС',
              round(
-                 CreatePZ.current_bottom / 9.5 * 0.028 * 1.2 * 1.04 + 0.005 * CreatePZ.current_bottom / 9.5 + 0.17 + 0.5,
+                 well_data.current_bottom / 9.5 * 0.028 * 1.2 * 1.04 + 0.005 * well_data.current_bottom / 9.5 + 0.17 + 0.5,
                  2)],
             [None, None,
              f'В случае недохождения пера до текущего забоя работы продолжить:',
@@ -750,9 +748,9 @@ class Template_without_skm(QMainWindow):
              'Мастер КРС',
              None]
         ]
-        if CreatePZ.gipsInWell is True:
+        if well_data.gipsInWell is True:
 
-            if CreatePZ.dict_pump_SHGN["do"] != 0:
+            if well_data.dict_pump_SHGN["do"] != 0:
 
                 gipsPero_list = [gipsPero_list[-1]]
                 from work_py.drilling import Drill_window
@@ -760,9 +758,9 @@ class Template_without_skm(QMainWindow):
                     self.raid_window = Drill_window(self.table_widget, self.ins_ind)
                     self.raid_window.setGeometry(200, 400, 300, 400)
                     self.raid_window.show()
-                    CreatePZ.pause_app(self)
+                    MyWindow.pause_app()
                     drill_work_list = self.raid_window.addWork()
-                    CreatePZ.pause = True
+                    well_data.pause = True
 
                     self.raid_window = None
                 else:
@@ -776,9 +774,9 @@ class Template_without_skm(QMainWindow):
                     self.raid_window = Drill_window(self.table_widget, self.ins_ind)
                     self.raid_window.setGeometry(200, 400, 300, 400)
                     self.raid_window.show()
-                    CreatePZ.pause_app(self)
+                    MyWindow.pause_app()
                     drill_work_list = self.raid_window.addWork()
-                    CreatePZ.pause = True
+                    well_data.pause = True
 
                     self.raid_window = None
                 else:

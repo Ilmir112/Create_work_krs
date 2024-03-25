@@ -1,15 +1,12 @@
-import datetime
-
-import openpyxl
 from copy import copy
 
-
-from openpyxl.workbook import Workbook
 from openpyxl.utils.cell import range_boundaries, get_column_letter
-from openpyxl.styles import  PatternFill, Border, Side
+
+import well_data
+
 
 def delete_rows_pz(self, ws):
-    from open_pz import CreatePZ
+
 
     boundaries_dict = {}
 
@@ -17,31 +14,31 @@ def delete_rows_pz(self, ws):
         boundaries_dict[ind] = range_boundaries(str(_range))
 
     # rowHeights_top = [None, 18.0, 18, 18,None, 18.0, 18, 18,None, 18.0, 18, 18, 18.0, 18, 18, 18.0, 18, 18, 18.0, 18, 18]
-    rowHeights1 = [ws.row_dimensions[i + 1].height for i in range(CreatePZ.cat_well_min._value, ws.max_row)]
+    rowHeights1 = [ws.row_dimensions[i + 1].height for i in range(well_data.cat_well_min._value, ws.max_row)]
     for key, value in boundaries_dict.items():
         ws.unmerge_cells(start_column=value[0], start_row=value[1],
                          end_column=value[2], end_row=value[3])
-    # print(f'индекс удаления {1, CreatePZ.cat_well_min - 1} , {CreatePZ.data_well_max + 2, ws.max_row - CreatePZ.data_well_max}')
+    # print(f'индекс удаления {1, well_data.cat_well_min - 1} , {well_data.data_well_max + 2, ws.max_row - well_data.data_well_max}')
 
-    ws.delete_rows(CreatePZ.data_x_max._value, ws.max_row - CreatePZ.data_x_max._value)
+    ws.delete_rows(well_data.data_x_max._value, ws.max_row - well_data.data_x_max._value)
 
-    ws.delete_rows(1, CreatePZ.cat_well_min._value - 1)
+    ws.delete_rows(1, well_data.cat_well_min._value - 1)
 
     # print(sorted(boundaries_dict))
-    CreatePZ.rowHeights = rowHeights1
-    # print(rowHeights1[CreatePZ.cat_well_min:])
-    # print(len(CreatePZ.rowHeights))
+    well_data.rowHeights = rowHeights1
+    # print(rowHeights1[well_data.cat_well_min:])
+    # print(len(well_data.rowHeights))
     # print(f'251po {16}')
     for _ in range(16):
         ws.insert_rows(1, 1)
     for key, value in boundaries_dict.items():
-        if value[1] <= CreatePZ.data_well_max._value + 1 and value[1] >= CreatePZ.cat_well_min._value:
-            ws.merge_cells(start_column=value[0], start_row=value[1] + 16 - CreatePZ.cat_well_min._value + 1,
-                           end_column=value[2], end_row=value[3] + 16 - CreatePZ.cat_well_min._value + 1)
+        if value[1] <= well_data.data_well_max._value + 1 and value[1] >= well_data.cat_well_min._value:
+            ws.merge_cells(start_column=value[0], start_row=value[1] + 16 - well_data.cat_well_min._value + 1,
+                           end_column=value[2], end_row=value[3] + 16 - well_data.cat_well_min._value + 1)
 
-    # print(f'{ws.max_row, len(CreatePZ.rowHeights)}dd')
+    # print(f'{ws.max_row, len(well_data.rowHeights)}dd')
     for index_row, row in enumerate(ws.iter_rows()):  # Копирование высоты строки
-        ws.row_dimensions[index_row + 17].height = CreatePZ.rowHeights[index_row - 1]
+        ws.row_dimensions[index_row + 17].height = well_data.rowHeights[index_row - 1]
 
 
 def head_ind(start, finish):

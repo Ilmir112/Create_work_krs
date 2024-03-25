@@ -1,6 +1,8 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.Qt import *
 
+import well_data
+
 
 class TabPage_SO_leakage(QWidget):
     def __init__(self, parent=None):
@@ -82,7 +84,7 @@ class LeakageWindow(QMainWindow):
         if not roof_leakage or not sole_leakage_line:
             msg = QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
             return
-        # if CreatePZ.bottomhole_artificial < float(sole_leakage_line):
+        # if well_data.bottomhole_artificial < float(sole_leakage_line):
         #     msg = QMessageBox.information(self, 'Внимание', 'глубина НЭК ниже искусственного забоя')
         #     return
 
@@ -97,7 +99,7 @@ class LeakageWindow(QMainWindow):
         self.tableWidget.setSortingEnabled(True)
 
     def addString(self):
-        from open_pz import CreatePZ
+       
         try:
             leakiness_column, ok = QInputDialog.getText(self, 'Нарушение колонны',
                                                         'Введите нарушение колонны через тире')
@@ -129,7 +131,7 @@ class LeakageWindow(QMainWindow):
 
 
     def addWork(self):
-        from open_pz import CreatePZ
+       
         rows = self.tableWidget.rowCount()
         dict_leakiness = {}
         for row in range(rows):
@@ -154,7 +156,7 @@ class LeakageWindow(QMainWindow):
                     'НЭК', {}).setdefault('интервал', {}).setdefault((roof, sole), {}).setdefault(
                     'отрайбировано', False)
 
-        CreatePZ.pause = False
+        well_data.pause = False
         self.close()
         return dict_leakiness
 

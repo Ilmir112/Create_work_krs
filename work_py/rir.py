@@ -2,6 +2,7 @@ from PyQt5.QtGui import QDoubleValidator
 from PyQt5.QtWidgets import QMessageBox, QInputDialog, QLabel, QComboBox, QLineEdit, QGridLayout, QWidget, QPushButton, \
     QMainWindow, QTabWidget
 
+import well_data
 from krs import volume_vn_ek, volume_vn_nkt, well_volume
 
 from main import MyWindow
@@ -15,7 +16,7 @@ from work_py.acid_paker import CheckableComboBox, AcidPakerWindow
 
 class TabPage_SO_rir(QWidget):
     def __init__(self, parent=None):
-        from open_pz import CreatePZ
+       
         super().__init__(parent)
 
 
@@ -27,10 +28,10 @@ class TabPage_SO_rir(QWidget):
         self.rir_type_Combo = QComboBox(self)
         self.rir_type_Combo.addItems(['РИР на пере', 'РИР с пакером', 'РИР с РПК', 'РИР с РПП'])
 
-        plast_work = CreatePZ.plast_work
-        print(f'наруш { CreatePZ.leakiness}')
-        if CreatePZ.leakiness:
-            for nek in list(CreatePZ.dict_leakiness['НЭК']['интервал'].keys()):
+        plast_work = well_data.plast_work
+        print(f'наруш { well_data.leakiness}')
+        if well_data.leakiness:
+            for nek in list(well_data.dict_leakiness['НЭК']['интервал'].keys()):
                 print(list(nek))
                 nek1 = "-".join(map(str, list(map(int, list(nek)))))
                 print(nek1)
@@ -74,12 +75,12 @@ class TabPage_SO_rir(QWidget):
         self.paker_depth_edit.setValidator(self.validator)
 
 
-        if len(CreatePZ.plast_work) != 0:
-            pakerDepth = CreatePZ.perforation_sole - 20
+        if len(well_data.plast_work) != 0:
+            pakerDepth = well_data.perforation_sole - 20
         else:
-            if CreatePZ.leakiness:
-                pakerDepth = min([CreatePZ.dict_perforation['НЭК']['интервал'][nek][0] - 10
-                                  for nek in CreatePZ.dict_perforation['НЭК']['интервал'].keys()])
+            if well_data.leakiness:
+                pakerDepth = min([well_data.dict_perforation['НЭК']['интервал'][nek][0] - 10
+                                  for nek in well_data.dict_perforation['НЭК']['интервал'].keys()])
 
         self.paker_depth_edit.setText(str(int(pakerDepth)))
 
@@ -123,16 +124,16 @@ class TabPage_SO_rir(QWidget):
         self.grid.addWidget(self.pressureZUMPF_question_QCombo, 2, 4)
 
     def update_pakerZUMPF(self, index):
-        from open_pz import CreatePZ
+       
         from work_py.opressovka import OpressovkaEK, TabPage_SO
 
         if index == 'Да':
-            if len(CreatePZ.plast_work) != 0:
-                pakerDepthZumpf = CreatePZ.perforation_sole + 10
+            if len(well_data.plast_work) != 0:
+                pakerDepthZumpf = well_data.perforation_sole + 10
             else:
-                if CreatePZ.leakiness:
-                    pakerDepthZumpf = max([CreatePZ.dict_perforation['НЭК']['интервал'][nek][0]+10
-                                           for nek in CreatePZ.dict_perforation['НЭК']['интервал'].keys()])
+                if well_data.leakiness:
+                    pakerDepthZumpf = max([well_data.dict_perforation['НЭК']['интервал'][nek][0]+10
+                                           for nek in well_data.dict_perforation['НЭК']['интервал'].keys()])
             self.pakerDepthZumpf_edit.setText(f'{pakerDepthZumpf}')
 
             self.grid.addWidget(self.pakerDepthZumpf_Label, 1, 5)
@@ -141,10 +142,10 @@ class TabPage_SO_rir(QWidget):
             self.pakerDepthZumpf_Label.setParent(None)
             self.pakerDepthZumpf_edit.setParent(None)
 
-        if CreatePZ.open_trunk_well == True:
+        if well_data.open_trunk_well == True:
             paker_depth = self.paker_depth_edit.text()
             if paker_depth != '':
-                paker_khost = CreatePZ.current_bottom - int(paker_depth)
+                paker_khost = well_data.current_bottom - int(paker_depth)
                 self.paker_khost_edit.setText(f'{paker_khost}')
                 self.diametr_paker_edit.setText(f'{TabPage_SO.paker_diametr_select(self, int(paker_depth))}')
         else:
@@ -190,15 +191,15 @@ class TabPage_SO_rir(QWidget):
 
 
     def update_plast_edit(self):
-        from open_pz import CreatePZ
-        dict_perforation = CreatePZ.dict_perforation
+       
+        dict_perforation = well_data.dict_perforation
 
-        plasts = CreatePZ.texts
-        # print(f'пласты {plasts, len(CreatePZ.texts), len(plasts), CreatePZ.texts}')
-        roof_plast = CreatePZ.current_bottom
+        plasts = well_data.texts
+        # print(f'пласты {plasts, len(well_data.texts), len(plasts), well_data.texts}')
+        roof_plast = well_data.current_bottom
         sole_plast = 0
         for plast_sel in plasts:
-            for plast in CreatePZ.plast_work:
+            for plast in well_data.plast_work:
                 if plast_sel == plast:
                     try:
                         if roof_plast >= dict_perforation[plast]['кровля']:
@@ -207,9 +208,9 @@ class TabPage_SO_rir(QWidget):
                             sole_plast = dict_perforation[plast]['подошва']
                     except:
                         pass
-            # print(f' пл {plast_sel, roof_plast, sole_plast, CreatePZ.leakiness}')
-            if CreatePZ.leakiness:
-                for nek in list(CreatePZ.dict_leakiness['НЭК']['интервал'].keys()):
+            # print(f' пл {plast_sel, roof_plast, sole_plast, well_data.leakiness}')
+            if well_data.leakiness:
+                for nek in list(well_data.dict_leakiness['НЭК']['интервал'].keys()):
                     # print(str(int(nek[0])), plast_sel, str(int(nek[0])) in plast_sel)
                     if str(int(nek[0])) in plast_sel:
                         if roof_plast >= nek[0]:
@@ -221,7 +222,7 @@ class TabPage_SO_rir(QWidget):
                         # print(nek, roof_plast, sole_plast)
         self.roof_rir_edit.setText(f"{int(roof_plast - 30)}")
         self.paker_depth_edit.setText(f"{int(roof_plast - 20)}")
-        self.sole_rir_edit.setText(f"{CreatePZ.current_bottom}")
+        self.sole_rir_edit.setText(f"{well_data.current_bottom}")
 
 class TabWidget(QTabWidget):
     def __init__(self):
@@ -241,13 +242,13 @@ class RirWindow(QMainWindow):
         self.tabWidget = TabWidget()
 
         self.buttonAdd = QPushButton('Добавить данные в план работ')
-        self.buttonAdd.clicked.connect(self.addRowTable)
+        self.buttonAdd.clicked.connect(self.addWork)
         vbox = QGridLayout(self.centralWidget)
         vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
 
     def rir_rpp(self, paker_need_Combo, plast_combo, roof_rir_edit):
-        from open_pz import CreatePZ
+       
 
 
         rir_list = self.need_paker(paker_need_Combo, plast_combo)
@@ -263,9 +264,9 @@ class RirWindow(QMainWindow):
 
 
         rir_work_list = [[f'СПО РПП до глубины {roof_rir_edit}м', None,
-                       f'Спустить   пакер глухой {self.rpk_nkt(roof_rir_edit)}  на тНКТ{CreatePZ.nkt_diam}мм '
+                       f'Спустить   пакер глухой {self.rpk_nkt(roof_rir_edit)}  на тНКТ{well_data.nkt_diam}мм '
                        f'до глубины {roof_rir_edit}м '
-                       f'с замером, шаблонированием шаблоном {CreatePZ.nkt_template}мм. '
+                       f'с замером, шаблонированием шаблоном {well_data.nkt_template}мм. '
                        f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ) \n'
                        f'Перед спуском технологического пакера произвести визуальный осмотр в присутствии '
                        f'представителя РИР или УСРСиСТ.',
@@ -288,15 +289,15 @@ class RirWindow(QMainWindow):
           None, None, None, None, None, None, None,
           'Мастер КРС, подрядчик РИР, УСРСиСТ', 8],
 
-         [f'{"".join([f"Опрессовать на Р={CreatePZ.max_admissible_pressure._value}атм" if  rir_rpk_plast_true == False else ""])}',
+         [f'{"".join([f"Опрессовать на Р={well_data.max_admissible_pressure._value}атм" if  rir_rpk_plast_true == False else ""])}',
           None,
-          f'{"".join([f"Опрессовать эксплуатационную колонну на Р={CreatePZ.max_admissible_pressure._value}атм в присутствии представителя заказчика" if  rir_rpk_plast_true == False else ""])} '
+          f'{"".join([f"Опрессовать эксплуатационную колонну на Р={well_data.max_admissible_pressure._value}атм в присутствии представителя заказчика" if  rir_rpk_plast_true == False else ""])} '
           f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ) ',
           None, None, None, None, None, None, None,
           'Мастер КРС, подрядчик РИР, УСРСиСТ', 0.67],
          [None, None,
           f'Поднять стыковочное устройство с глубины {roof_rir_edit}м с доливом скважины в объеме '
-          f'{round(CreatePZ.current_bottom*1.12/1000, 1)}м3 тех. жидкостью  уд.весом {CreatePZ.fluid_work} ',
+          f'{round(well_data.current_bottom*1.12/1000, 1)}м3 тех. жидкостью  уд.весом {well_data.fluid_work} ',
           None, None, None, None, None, None, None,
           'Мастер КРС, подрядчик РИР, УСРСиСТ', liftingNKT_norm(roof_rir_edit, 1.2)]]
 
@@ -304,16 +305,16 @@ class RirWindow(QMainWindow):
         for row in rir_work_list:
             rir_list.append(row)
 
-        CreatePZ.current_bottom = roof_rir_edit
+        well_data.current_bottom = roof_rir_edit
         self.perf_new(roof_rir_edit, roof_rir_edit + 1)
-        CreatePZ.forPaker_list = None
-        print(f'текущий забой {CreatePZ.current_bottom}')
+        well_data.forPaker_list = None
+        print(f'текущий забой {well_data.current_bottom}')
         return rir_list
 
 
 
     def rir_rpk(self, paker_need_Combo, plast_combo, roof_rir_edit):
-        from open_pz import CreatePZ
+       
         from work_py.opressovka import OpressovkaEK
         rir_list = self.need_paker(paker_need_Combo, plast_combo)
 
@@ -368,8 +369,8 @@ class RirWindow(QMainWindow):
                 rir_list.insert(-1, row)
 
         rir_work_list = [[f'СПО пакера РПК до глубины {roof_rir_edit}м', None,
-                       f'Спустить   пакера РПК {self.rpk_nkt(roof_rir_edit)}  на тНКТ{CreatePZ.nkt_diam}мм до глубины {roof_rir_edit}м с '
-                       f'замером, шаблонированием шаблоном {CreatePZ.nkt_template}мм. '
+                       f'Спустить   пакера РПК {self.rpk_nkt(roof_rir_edit)}  на тНКТ{well_data.nkt_diam}мм до глубины {roof_rir_edit}м с '
+                       f'замером, шаблонированием шаблоном {well_data.nkt_template}мм. '
                        f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ) \n'
                        f'Перед спуском технологического пакера произвести визуальный осмотр в присутствии представителя '
                        f'РИР или УСРСиСТ.',
@@ -396,101 +397,101 @@ class RirWindow(QMainWindow):
           f'технологического "СТОП" ОЗЦ без давления.',
           None, None, None, None, None, None, None,
           'Мастер КРС, подрядчик РИР, УСРСиСТ', 16],
-         [f'{"".join([f"Опрессовать на Р={CreatePZ.max_admissible_pressure._value}атм" if rir_rpk_plast_true == False else ""])}',
+         [f'{"".join([f"Опрессовать на Р={well_data.max_admissible_pressure._value}атм" if rir_rpk_plast_true == False else ""])}',
           None,
-          f'{"".join([f"Опрессовать цементный мост на Р={CreatePZ.max_admissible_pressure._value}атм в присутствии представителя заказчика" if rir_rpk_plast_true == False else ""])} '
+          f'{"".join([f"Опрессовать цементный мост на Р={well_data.max_admissible_pressure._value}атм в присутствии представителя заказчика" if rir_rpk_plast_true == False else ""])} '
           f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ) ',
           None, None, None, None, None, None, None,
           'Мастер КРС, подрядчик РИР, УСРСиСТ',0.67],
          [None, None,
           f'Во время ОЗЦ поднять стыковочное устройство с глубины {roof_rir_edit}м с доливом скважины в объеме '
-          f'{round(CreatePZ.current_bottom*1.12/1000, 1)}м3 тех. жидкостью  уд.весом {CreatePZ.fluid_work} ',
+          f'{round(well_data.current_bottom*1.12/1000, 1)}м3 тех. жидкостью  уд.весом {well_data.fluid_work} ',
           None, None, None, None, None, None, None,
           'Мастер КРС, подрядчик РИР, УСРСиСТ', liftingNKT_norm(roof_rir_edit,1)]]
         for row in rir_work_list:
             rir_list.append(row)
-        self.perf_new(roof_rir_edit, CreatePZ.current_bottom)
-        CreatePZ.current_bottom = roof_rir_edit
-        CreatePZ.forPaker_list = None
+        self.perf_new(roof_rir_edit, well_data.current_bottom)
+        well_data.current_bottom = roof_rir_edit
+        well_data.forPaker_list = None
         return rir_list
 
     def perf_new(self, roofRir, solePir):
 
-        from open_pz import CreatePZ
+       
 
-        # print(f' пласта до изоляции {CreatePZ.plast_work}')
-        CreatePZ.perforation_roof = 5000
-        CreatePZ.perforation_sole = 0
+        # print(f' пласта до изоляции {well_data.plast_work}')
+        well_data.perforation_roof = 5000
+        well_data.perforation_sole = 0
 
-        for plast in CreatePZ.plast_all:
-            for interval in list((CreatePZ.dict_perforation[plast]['интервал'])):
+        for plast in well_data.plast_all:
+            for interval in list((well_data.dict_perforation[plast]['интервал'])):
                 if roofRir <= interval[0] <= solePir:
-                    CreatePZ.dict_perforation[plast]['отключение'] = True
-                if CreatePZ.dict_perforation[plast]['отключение'] == False:
-                    if interval[0] < CreatePZ.perforation_roof:
-                        CreatePZ.perforation_roof = interval[0]
-                    elif interval[1] > CreatePZ.perforation_sole:
-                        CreatePZ.perforation_sole = interval[1]
+                    well_data.dict_perforation[plast]['отключение'] = True
+                if well_data.dict_perforation[plast]['отключение'] == False:
+                    if interval[0] < well_data.perforation_roof:
+                        well_data.perforation_roof = interval[0]
+                    elif interval[1] > well_data.perforation_sole:
+                        well_data.perforation_sole = interval[1]
 
 
-        CreatePZ.plast_work = []
-        for plast in CreatePZ.plast_all:
-            if CreatePZ.dict_perforation[plast]['отключение'] == False and \
-                CreatePZ.dict_perforation[plast]['кровля'] < CreatePZ.current_bottom:
-                CreatePZ.plast_work.append(plast)
+        well_data.plast_work = []
+        for plast in well_data.plast_all:
+            if well_data.dict_perforation[plast]['отключение'] == False and \
+                well_data.dict_perforation[plast]['кровля'] < well_data.current_bottom:
+                well_data.plast_work.append(plast)
 
-        if len(CreatePZ.dict_leakiness) != 0:
-            for nek in list(CreatePZ.dict_leakiness['НЭК']['интервал'].keys()):
+        if len(well_data.dict_leakiness) != 0:
+            for nek in list(well_data.dict_leakiness['НЭК']['интервал'].keys()):
                 # print(roofRir, float(nek[0]), solePir)
                 if roofRir <= float(nek[0]) <= solePir:
-                    CreatePZ.dict_leakiness['НЭК']['интервал'][nek]['отключение'] = True
-            # print(f"при {CreatePZ.dict_leakiness['НЭК']['интервал'][nek]['отключение']}")
-        if CreatePZ.column_additional:
-            if CreatePZ.current_bottom <= CreatePZ.shoe_column_additional._value:
-                CreatePZ.open_trunk_well = False
+                    well_data.dict_leakiness['НЭК']['интервал'][nek]['отключение'] = True
+            # print(f"при {well_data.dict_leakiness['НЭК']['интервал'][nek]['отключение']}")
+        if well_data.column_additional:
+            if well_data.current_bottom <= well_data.shoe_column_additional._value:
+                well_data.open_trunk_well = False
         else:
-            if CreatePZ.current_bottom <= CreatePZ.shoe_column._value:
-                CreatePZ.open_trunk_well = False
+            if well_data.current_bottom <= well_data.shoe_column._value:
+                well_data.open_trunk_well = False
 
 
 
-      # print(CreatePZ.dict_leakiness)
+      # print(well_data.dict_leakiness)
 
-        print(f' пласта рабоче {CreatePZ.plast_work}')
-        # CreatePZ.definition_plast_work(self)
+        print(f' пласта рабоче {well_data.plast_work}')
+        # well_data.definition_plast_work(self)
 
 
 
     def rpk_nkt(self, paker_depth):
-        from open_pz import CreatePZ
+       
         from work_py.opressovka import OpressovkaEK
-        CreatePZ.nktOpressTrue = False
+        well_data.nktOpressTrue = False
 
 
-        if CreatePZ.column_additional == False or CreatePZ.column_additional == True and paker_depth< CreatePZ.head_column_additional._value:
-            rpk_nkt_select = f' для ЭК {CreatePZ.column_diametr._value}мм х {CreatePZ.column_wall_thickness._value}мм ' \
+        if well_data.column_additional == False or well_data.column_additional == True and paker_depth< well_data.head_column_additional._value:
+            rpk_nkt_select = f' для ЭК {well_data.column_diametr._value}мм х {well_data.column_wall_thickness._value}мм ' \
                            f'+ {OpressovkaEK.nktOpress(self)[0]} + НКТ + репер'
-        elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr._value < 110 and paker_depth> CreatePZ.head_column_additional._value:
-            rpk_nkt_select = f' для ЭК {CreatePZ.column_additional_diametr._value}мм х {CreatePZ.column_additional_wall_thickness._value}мм  + {OpressovkaEK.nktOpress(self)[0]} ' \
-                           f'+ НКТ60мм + репер + НКТ60мм L- {round(paker_depth-CreatePZ.head_column_additional._value, 0)}м '
-        elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr._value > 110 and paker_depth> CreatePZ.head_column_additional._value:
-            rpk_nkt_select = f' для ЭК {CreatePZ.column_additional_diametr._value}мм х {CreatePZ.column_additional_wall_thickness._value}мм  + {OpressovkaEK.nktOpress(self)[0]}' \
-                           f'+ НКТ + репер + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками L- {round(paker_depth-CreatePZ.head_column_additional._value, 0)}м '
+        elif well_data.column_additional == True and well_data.column_additional_diametr._value < 110 and paker_depth> well_data.head_column_additional._value:
+            rpk_nkt_select = f' для ЭК {well_data.column_additional_diametr._value}мм х {well_data.column_additional_wall_thickness._value}мм  + {OpressovkaEK.nktOpress(self)[0]} ' \
+                           f'+ НКТ60мм + репер + НКТ60мм L- {round(paker_depth-well_data.head_column_additional._value, 0)}м '
+        elif well_data.column_additional == True and well_data.column_additional_diametr._value > 110 and paker_depth> well_data.head_column_additional._value:
+            rpk_nkt_select = f' для ЭК {well_data.column_additional_diametr._value}мм х {well_data.column_additional_wall_thickness._value}мм  + {OpressovkaEK.nktOpress(self)[0]}' \
+                           f'+ НКТ + репер + НКТ{well_data.nkt_diam}мм со снятыми фасками L- {round(paker_depth-well_data.head_column_additional._value, 0)}м '
 
         return rpk_nkt_select
 
 
     def rirWithPero(self, paker_need_Combo, plast_combo, roof_rir_edit, sole_rir_edit):
-        from open_pz import CreatePZ
+       
         from work_py.opressovka import OpressovkaEK
         from krs import volume_vn_nkt
 
-        nkt_diam = ''.join(['73' if CreatePZ.column_diametr._value > 110 else '60'])
+        nkt_diam = ''.join(['73' if well_data.column_diametr._value > 110 else '60'])
 
         
-        if CreatePZ.column_additional == True and CreatePZ.column_additional_diametr._value <110:
-            dict_nkt = {73: CreatePZ.head_column_additional._value,
-                        60: CreatePZ.head_column_additional._value-sole_rir_edit}
+        if well_data.column_additional == True and well_data.column_additional_diametr._value <110:
+            dict_nkt = {73: well_data.head_column_additional._value,
+                        60: well_data.head_column_additional._value-sole_rir_edit}
         else:
             dict_nkt = {73: sole_rir_edit}
         rir_list = self.need_paker(paker_need_Combo, plast_combo)
@@ -502,7 +503,7 @@ class RirWindow(QMainWindow):
                  f'Произвести насыщение скважины в объеме 5м3. Определить приемистость {plast_combo} при Р=80-100атм '
                  f'в присутствии представителя УСРСиСТ или подрядчика по РИР. (Вести контроль за отдачей жидкости '
                  f'после закачки, объем согласовать с подрядчиком по РИР). В случае приёмистости менее  250м3/сут '
-                 f'при Р={CreatePZ.max_admissible_pressure._value}атм произвести соляно-кислотную обработку скважины в объеме 1м3 HCl-12% с целью увеличения '
+                 f'при Р={well_data.max_admissible_pressure._value}атм произвести соляно-кислотную обработку скважины в объеме 1м3 HCl-12% с целью увеличения '
                  f'приемистости по технологическому плану',
                  None, None, None, None, None, None, None,
                  'мастер КРС', 1.77],
@@ -523,7 +524,7 @@ class RirWindow(QMainWindow):
                  f'Закачать в НКТ при открытом затрубном пространстве глинистый раствор в объеме 5м3 + тех. воду '
                  f'в объёме {round(volume_vn_nkt(dict_nkt) - 5, 1)}м3. Закрыть затруб. '
                  f'Продавить в НКТ тех. воду  в объёме {volume_vn_nkt(dict_nkt)}м3 при давлении не более '
-                 f'{CreatePZ.max_admissible_pressure._value}атм.',
+                 f'{well_data.max_admissible_pressure._value}атм.',
                  None, None, None, None, None, None, None,
                  'мастер КРС', 0.5],
                 [f'Коагуляция 4 часа', None,
@@ -553,7 +554,7 @@ class RirWindow(QMainWindow):
                                 f'объеме {volume_vn_nkt(dict_nkt)}м3. Закрыть затруб. '
                                 f'Продавить в НКТ остаток глинистого раствора в объеме '
                                 f'{round(5 - volume_vn_nkt(dict_nkt), 1)} и тех. воду  в объёме '
-                                f'{volume_vn_nkt(dict_nkt)}м3 при давлении не более {CreatePZ.max_admissible_pressure._value}атм.',
+                                f'{volume_vn_nkt(dict_nkt)}м3 при давлении не более {well_data.max_admissible_pressure._value}атм.',
                                 None, None, None, None, None, None, None,
                                 'мастер КРС', 0.5]
 
@@ -568,7 +569,7 @@ class RirWindow(QMainWindow):
             [f' СПО пера до глубины {sole_rir_edit}м Опрессовать НКТ на 200атм', None,
              f'Спустить {self.pero_select(sole_rir_edit)}  на тНКТ{nkt_diam}м до глубины {sole_rir_edit}м с '
              f'замером, шаблонированием '
-             f'шаблоном {CreatePZ.nkt_template}мм. Опрессовать НКТ на 200атм. Вымыть шар. \n'
+             f'шаблоном {well_data.nkt_template}мм. Опрессовать НКТ на 200атм. Вымыть шар. \n'
              f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
              None, None, None, None, None, None, None,
              'мастер КРС',descentNKT_norm(sole_rir_edit, 1)],
@@ -596,13 +597,13 @@ class RirWindow(QMainWindow):
              'мастер КРС', 0.5],
             [None, None,
              f'Открыть трубное пространство. Промыть скважину обратной промывкой (срезка) по круговой циркуляции '
-             f'тех.жидкостью  в объеме не менее {round(volume_vn_nkt(dict_nkt) * 1.5, 1)}м3 уд.весом {CreatePZ.fluid_work} (Полуторакратный объем НКТ) '
+             f'тех.жидкостью  в объеме не менее {round(volume_vn_nkt(dict_nkt) * 1.5, 1)}м3 уд.весом {well_data.fluid_work} (Полуторакратный объем НКТ) '
              f'с расходом жидкости 8л/с (срезка) до чистой воды.',
              None, None, None, None, None, None, None,
              'мастер КРС', well_volume_norm(16)],
             [None, None,
              f'Поднять перо на безопасную зону до гл. {roof_rir_edit-300}м с доливом скважины в объеме 0,3м3 тех. жидкостью '
-             f'уд.весом {CreatePZ.fluid_work}.',
+             f'уд.весом {well_data.fluid_work}.',
              None, None, None, None, None, None, None,
              'мастер КРС', 0.5],
             [f'ОЗЦ - 23 час', None,
@@ -615,9 +616,9 @@ class RirWindow(QMainWindow):
              f' с прямой промывкой и разгрузкой на забой 3т. Текущий забой согласовать с Заказчиком письменной телефонограммой.',
              None, None, None, None, None, None, None,
              'мастер КРС', 1.2],
-            [f'Опрессовать на Р={CreatePZ.max_admissible_pressure._value}атм',
+            [f'Опрессовать на Р={well_data.max_admissible_pressure._value}атм',
              None,
-             f'Опрессовать цементный мост на Р={CreatePZ.max_admissible_pressure._value}атм в присутствии представителя '
+             f'Опрессовать цементный мост на Р={well_data.max_admissible_pressure._value}атм в присутствии представителя '
              f'УСРСиСТ Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до '
              f'начала работ) В случае негерметичности цементного моста дальнейшие работы согласовать с Заказчиком '
              f'В случае головы ЦМ ниже планового РИР повторить  с учетом корректировки мощности моста ',
@@ -625,19 +626,19 @@ class RirWindow(QMainWindow):
              'мастер КРС', 0.67],
             [None, None,
              f'Поднять перо на тНКТ{nkt_diam}м с глубины {roof_rir_edit}м с доливом скважины в объеме 2,2м3 тех. жидкостью '
-             f'уд.весом {CreatePZ.fluid_work}',
+             f'уд.весом {well_data.fluid_work}',
              None, None, None, None, None, None, None,
              'мастер КРС', descentNKT_norm(roof_rir_edit, 1)],
         ]
 
 
-        if len(CreatePZ.plast_work) == 0 or roof_rir_edit > CreatePZ.perforation_sole:
+        if len(well_data.plast_work) == 0 or roof_rir_edit > well_data.perforation_sole:
             rir_list = []
             for row in uzmPero_list:
                 rir_list.append(row)
 
             self.perf_new(roof_rir_edit, sole_rir_edit)
-            CreatePZ.current_bottom = roof_rir_edit
+            well_data.current_bottom = roof_rir_edit
 
             if OpressovkaEK.testing_pressure(self, roof_rir_edit)[2]:
                 rir_list.pop(-2)
@@ -648,7 +649,7 @@ class RirWindow(QMainWindow):
                 [f'СПО пера до глубины {sole_rir_edit}м. Опрессовать НКТ на 200атм', None,
                  f'Спустить {self.pero_select(sole_rir_edit)}  на тНКТ{nkt_diam}м до глубины {sole_rir_edit}м '
                  f'с замером, шаблонированием '
-                 f'шаблоном {CreatePZ.nkt_template}мм. Опрессовать НКТ на 200атм. Вымыть шар. \n'
+                 f'шаблоном {well_data.nkt_template}мм. Опрессовать НКТ на 200атм. Вымыть шар. \n'
                  f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
                  None, None, None, None, None, None, None,
                  'мастер КРС', descentNKT_norm(sole_rir_edit, 1)],
@@ -675,21 +676,21 @@ class RirWindow(QMainWindow):
                 [None, None,
                  f'Приподнять перо до гл.{roof_rir_edit}м. Закрыть трубное простанство. '
                  f'Продавить по затрубному пространству '
-                 f'тех.жидкостью  при давлении не более {CreatePZ.max_admissible_pressure._value}атм '
+                 f'тех.жидкостью  при давлении не более {well_data.max_admissible_pressure._value}атм '
                  f'(до получения технологического СТОП).',
                  None, None, None, None, None, None, None,
                  'мастер КРС', 0.5],
                 [None, None,
                  f'Открыть трубное пространство. Промыть скважину обратной промывкой (срезка) по круговой циркуляции '
                  f'тех.жидкостью  в объеме не менее {round(volume_vn_nkt(dict_nkt) * 1.5, 1)}м3 уд.весом '
-                 f'{CreatePZ.fluid_work} '
+                 f'{well_data.fluid_work} '
                  f'(Полуторакратный объем НКТ) '
                  f'с расходом жидкости 8л/с (срезка) до чистой воды.',
                  None, None, None, None, None, None, None,
                  'мастер КРС', well_volume_norm(16)],
                 [None, None,
                  f'Поднять перо на безопасную зону до гл. {roof_rir_edit - 300}м с доливом скважины в объеме 0,3м3 тех. жидкостью '
-                 f'уд.весом {CreatePZ.fluid_work}.',
+                 f'уд.весом {well_data.fluid_work}.',
                  None, None, None, None, None, None, None,
                  'мастер КРС', 1.2],
                 [None, None,
@@ -704,9 +705,9 @@ class RirWindow(QMainWindow):
                  f'телефонограммой.',
                  None, None, None, None, None, None, None,
                  'мастер КРС', 1.2],
-                [f'Опрессовать цементный мост на Р={CreatePZ.max_admissible_pressure._value}атм',
+                [f'Опрессовать цементный мост на Р={well_data.max_admissible_pressure._value}атм',
                  None,
-                 f'Опрессовать цементный мост на Р={CreatePZ.max_admissible_pressure._value}атм в присутствии представителя '
+                 f'Опрессовать цементный мост на Р={well_data.max_admissible_pressure._value}атм в присутствии представителя '
                  f'УСРСиСТ Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, '
                  f'с подтверждением за 2 часа до '
                  f'начала работ) В случае негерметичности цементного моста дальнейшие работы согласовать с Заказчиком '
@@ -716,7 +717,7 @@ class RirWindow(QMainWindow):
                 [None, None,
                  f'Поднять перо на тНКТ{nkt_diam}м с глубины {roof_rir_edit}м с доливом скважины в объеме '
                  f'{round(roof_rir_edit * 1.12 / 1000, 1)}м3 тех. жидкостью '
-                 f'уд.весом {CreatePZ.fluid_work}',
+                 f'уд.весом {well_data.fluid_work}',
                  None, None, None, None, None, None, None,
                  'мастер КРС', liftingNKT_norm(roof_rir_edit, 1)],
             ]
@@ -724,8 +725,8 @@ class RirWindow(QMainWindow):
 
             for row in rirPero_list:
                 rir_list.append(row)
-            self.perf_new(roof_rir_edit, CreatePZ.current_bottom)
-            CreatePZ.current_bottom = roof_rir_edit
+            self.perf_new(roof_rir_edit, well_data.current_bottom)
+            well_data.current_bottom = roof_rir_edit
 
             if OpressovkaEK.testing_pressure(self, roof_rir_edit)[2]:
                 rir_list.pop(-2)
@@ -735,24 +736,24 @@ class RirWindow(QMainWindow):
                 if acid_true_quest == QMessageBox.StandardButton.Yes:
                     for row in fluid_change(self):
                         rir_list.insert(-1, row)
-        CreatePZ.forPaker_list = None
+        well_data.forPaker_list = None
         return rir_list
 
     def pero_select(self, sole_rir_edit):
-        from open_pz import CreatePZ
-        if CreatePZ.column_additional is False or CreatePZ.column_additional is True \
-                and sole_rir_edit < CreatePZ.head_column_additional._value:
-            pero_select = f'перо + опрессовочное седло + НКТ{CreatePZ.nkt_diam} 20м + репер'
+       
+        if well_data.column_additional is False or well_data.column_additional is True \
+                and sole_rir_edit < well_data.head_column_additional._value:
+            pero_select = f'перо + опрессовочное седло + НКТ{well_data.nkt_diam} 20м + репер'
 
-        elif CreatePZ.column_additional is True and CreatePZ.column_additional_diametr._value < 110 \
-                and sole_rir_edit > CreatePZ.head_column_additional._value:
+        elif well_data.column_additional is True and well_data.column_additional_diametr._value < 110 \
+                and sole_rir_edit > well_data.head_column_additional._value:
             pero_select = f'перо + опрессовочное седло + НКТ60мм 20м + репер + НКТ60мм L- ' \
-                          f'{round(sole_rir_edit - CreatePZ.head_column_additional._value, 1)}м'
-        elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr._value > 110 \
-                and sole_rir_edit > CreatePZ.head_column_additional._value:
-            pero_select = f'воронку + опрессовочное седло + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками 20м + ' \
-                          f'НКТ{CreatePZ.nkt_diam}мм со снятыми фасками' \
-                           f' L- {sole_rir_edit - CreatePZ.head_column_additional._value}м'
+                          f'{round(sole_rir_edit - well_data.head_column_additional._value, 1)}м'
+        elif well_data.column_additional == True and well_data.column_additional_diametr._value > 110 \
+                and sole_rir_edit > well_data.head_column_additional._value:
+            pero_select = f'воронку + опрессовочное седло + НКТ{well_data.nkt_diam}мм со снятыми фасками 20м + ' \
+                          f'НКТ{well_data.nkt_diam}мм со снятыми фасками' \
+                           f' L- {sole_rir_edit - well_data.head_column_additional._value}м'
         return pero_select
 
     def need_paker(self, paker_need_Combo, plast_combo):
@@ -787,7 +788,7 @@ class RirWindow(QMainWindow):
 
         return rir_list
     def rir_paker(self, paker_need_Combo, plast_combo, roof_rir_edit, sole_rir_edit):
-        from open_pz import CreatePZ
+       
 
         rir_list = self.need_paker(paker_need_Combo, plast_combo)
 
@@ -810,8 +811,8 @@ class RirWindow(QMainWindow):
            f' с прямой промывкой и разгрузкой на забой 3т',
            None, None, None, None, None, None, None,
            'Мастер КРС, подрядчик РИР, УСРСиСТ', 1.2],
-         [f'Опрессовать на Р={CreatePZ.max_admissible_pressure._value}атм', None,
-          f'Опрессовать цементный мост на Р={CreatePZ.max_admissible_pressure._value}атм в присутствии '
+         [f'Опрессовать на Р={well_data.max_admissible_pressure._value}атм', None,
+          f'Опрессовать цементный мост на Р={well_data.max_admissible_pressure._value}атм в присутствии '
           f'представителя заказчика '
           f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, '
           f'с подтверждением за 2 часа до начала '
@@ -819,25 +820,24 @@ class RirWindow(QMainWindow):
           None, None, None, None, None, None, None,
           'Мастер КРС, подрядчик РИР, УСРСиСТ', 0.67],
           [None, None,
-           f'Поднять компоновку РИР на тНКТ{CreatePZ.nkt_diam}мм с глубины {roof_rir_edit}м '
+           f'Поднять компоновку РИР на тНКТ{well_data.nkt_diam}мм с глубины {roof_rir_edit}м '
            f'с доливом скважины в объеме '
-           f'{round(roof_rir_edit * 1.12 / 1000, 1)}м3 тех. жидкостью  уд.весом {CreatePZ.fluid_work}',
+           f'{round(roof_rir_edit * 1.12 / 1000, 1)}м3 тех. жидкостью  уд.весом {well_data.fluid_work}',
            None, None, None, None, None, None, None,
            'Мастер КРС, подрядчик РИР, УСРСиСТ', liftingNKT_norm(roof_rir_edit,1.2)]
             ]
         self.perf_new(roof_rir_edit, sole_rir_edit)
-        CreatePZ.current_bottom = roof_rir_edit
+        well_data.current_bottom = roof_rir_edit
 
-        if len(CreatePZ.plast_work) != 0:
+        if len(well_data.plast_work) != 0:
             rir_paker_list.pop(-2)
         for row in rir_paker_list:
             rir_list.append(row)
 
-        CreatePZ.forPaker_list = None
+        well_data.forPaker_list = None
         return rir_list
 
-    def addRowTable(self):
-        from open_pz import CreatePZ
+    def addWork(self):
 
         plast_combo = str(self.tabWidget.currentWidget().plast_combo.combo_box.currentText())
         paker_need_Combo = str(self.tabWidget.currentWidget().paker_need_Combo.currentText())
@@ -863,22 +863,22 @@ class RirWindow(QMainWindow):
             work_list = self.rir_rpp(paker_need_Combo, plast_combo, roof_rir_edit)
 
 
-        CreatePZ.pause = False
+        well_data.pause = False
         self.close()
         return work_list
     def rir_izvelPaker(self):
-        from open_pz import CreatePZ
+       
         pakerIzvPaker, ok = QInputDialog.getInt(None, 'Глубина извлекаемого пакера',
                                           'Введите глубину установки извлекаемого пакера ',
-                                          int(CreatePZ.perforation_roof-50), 0, int(CreatePZ.bottomhole_drill._value))
+                                          int(well_data.perforation_roof-50), 0, int(well_data.bottomhole_drill._value))
 
         pakerIzvPaker = MyWindow.true_set_Paker(self, pakerIzvPaker)
 
-        CreatePZ.pakerIzvPaker = pakerIzvPaker
+        well_data.pakerIzvPaker = pakerIzvPaker
         rir_list = [[f'СПО пакера извлекаемый до глубины {pakerIzvPaker}м',
                      None,
            f'Спустить  пакера извлекаемый компании НЕОИНТЕХ +НКТ 20м + реперный патрубок 2м на тНКТ до'
-           f' глубины {pakerIzvPaker}м с замером, шаблонированием шаблоном {CreatePZ.nkt_template}мм.'
+           f' глубины {pakerIzvPaker}м с замером, шаблонированием шаблоном {well_data.nkt_template}мм.'
            f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
            None, None, None, None, None, None, None,
            'Мастер КРС, подрядчик РИР, УСРСиСТ', liftingNKT_norm(pakerIzvPaker,1.2)],
@@ -900,14 +900,14 @@ class RirWindow(QMainWindow):
             filling_list = [
             [None, None,
              f'Поднять ИУГ до глубины {pakerIzvPaker - 120}м с доливом тех жидкости в '
-             f'объеме  {round(120 * 1.12 / 1000, 1)}м3 уд.весом {CreatePZ.fluid_work}',
+             f'объеме  {round(120 * 1.12 / 1000, 1)}м3 уд.весом {well_data.fluid_work}',
              None, None, None, None, None, None, None,
              'Мастер КРС, подрядчик по ГИС', 4],
             [f'отсыпка в инт. {pakerIzvPaker - 20} - {pakerIzvPaker}  в объеме'
              f' {round(well_volume(self, pakerIzvPaker) / pakerIzvPaker * 1000 * (20), 0)}л',
              None, f'Произвести отсыпку кварцевым песком в инт. {pakerIzvPaker - 20} - {pakerIzvPaker} '
                    f' в объеме {round(well_volume(self, pakerIzvPaker) / pakerIzvPaker * 1000 * (20), 0)}л '
-                   f'Закачать в НКТ кварцевый песок  с доводкой тех.жидкостью {CreatePZ.fluid_work}',
+                   f'Закачать в НКТ кварцевый песок  с доводкой тех.жидкостью {well_data.fluid_work}',
              None, None, None, None, None, None, None,
              'мастер КРС', 3.5],
             [f'Ожидание 4 часа.', None, f'Ожидание оседания песка 4 часа.',
@@ -927,70 +927,70 @@ class RirWindow(QMainWindow):
              'мастер КРС', None],
             [None, None,
              f'Поднять ИУГ с глубины {pakerIzvPaker - 20}м с доливом тех '
-             f'жидкости в объеме  {round(pakerIzvPaker * 1.12 / 1000, 1)}м3 уд.весом {CreatePZ.fluid_work}',
+             f'жидкости в объеме  {round(pakerIzvPaker * 1.12 / 1000, 1)}м3 уд.весом {well_data.fluid_work}',
              None, None, None, None, None, None, None,
              'Мастер КРС, подрядчик по ГИС', 4]]
 
             for row in filling_list:
                 rir_list.append(row)
-            CreatePZ.current_bottom2 = pakerIzvPaker
-            CreatePZ.current_bottom = pakerIzvPaker-20
+            well_data.current_bottom2 = pakerIzvPaker
+            well_data.current_bottom = pakerIzvPaker-20
         else:
             rir_list.append([None, None,
              f'Поднять ИУГ до глубины {pakerIzvPaker - 120}м с доливом тех жидкости в объеме '
-             f'{round(pakerIzvPaker * 1.12 / 1000, 1)}м3 уд.весом {CreatePZ.fluid_work}',
+             f'{round(pakerIzvPaker * 1.12 / 1000, 1)}м3 уд.весом {well_data.fluid_work}',
              None, None, None, None, None, None, None,
              'Мастер КРС, подрядчик по ГИС', 4])
-            CreatePZ.current_bottom2 = CreatePZ.current_bottom
-            CreatePZ.current_bottom = pakerIzvPaker
-        CreatePZ.forPaker_list = None
+            well_data.current_bottom2 = well_data.current_bottom
+            well_data.current_bottom = pakerIzvPaker
+        well_data.forPaker_list = None
         return rir_list
 
     def izvlech_paker(self):
-        from open_pz import CreatePZ
+       
         rir_list = [[f'СПО {sand_select(self).replace("перо", "перо-110мм")} до '
-                     f'глубины {round(CreatePZ.current_bottom,0)}м', None,
-         f' Спустить  {sand_select(self).replace("перо", "перо-110мм")}  на НКТ{CreatePZ.nkt_diam}мм до '
-         f'глубины {round(CreatePZ.current_bottom,0)}м с замером, шаблонированием шаблоном {CreatePZ.nkt_template}мм. '
+                     f'глубины {round(well_data.current_bottom,0)}м', None,
+         f' Спустить  {sand_select(self).replace("перо", "перо-110мм")}  на НКТ{well_data.nkt_diam}мм до '
+         f'глубины {round(well_data.current_bottom,0)}м с замером, шаблонированием шаблоном {well_data.nkt_template}мм. '
          f'(При СПО первых десяти НКТ на '
          f'спайдере дополнительно устанавливать элеватор ЭХЛ)',
          None, None, None, None, None, None, None,
-         'Мастер КР', descentNKT_norm(CreatePZ.current_bottom, 1)],
-            [f'Вымыв песка до гл.{CreatePZ.pakerIzvPaker-10}',
+         'Мастер КР', descentNKT_norm(well_data.current_bottom, 1)],
+            [f'Вымыв песка до гл.{well_data.pakerIzvPaker-10}',
              None, f'Произвести нормализацию забоя (вымыв кварцевого песка) с наращиванием, комбинированной промывкой '
                    f'по круговой циркуляции '
-                 f'жидкостью  с расходом жидкости не менее 8 л/с до гл.{CreatePZ.pakerIzvPaker-10}м. \n'
+                 f'жидкостью  с расходом жидкости не менее 8 л/с до гл.{well_data.pakerIzvPaker-10}м. \n'
                  f'Тех отстой 2ч. Повторное определение текущего забоя, при необходимости повторно вымыть.',
              None, None, None, None, None, None, None,
              'мастер КРС', 3.5],
             [None, None,
-             f'Поднять {sand_select(self)} НКТ{CreatePZ.nkt_diam}мм с глубины {CreatePZ.pakerIzvPaker-10}м с доливом '
+             f'Поднять {sand_select(self)} НКТ{well_data.nkt_diam}мм с глубины {well_data.pakerIzvPaker-10}м с доливом '
              f'скважины'
-             f' в объеме {round((CreatePZ.pakerIzvPaker-10) * 1.12 / 1000, 1)}м3 тех. '
-             f'жидкостью  уд.весом {CreatePZ.fluid_work}',
+             f' в объеме {round((well_data.pakerIzvPaker-10) * 1.12 / 1000, 1)}м3 тех. '
+             f'жидкостью  уд.весом {well_data.fluid_work}',
              None, None, None, None, None, None, None,
-             'мастер КРС', liftingNKT_norm(CreatePZ.pakerIzvPaker-10, 1)]]
+             'мастер КРС', liftingNKT_norm(well_data.pakerIzvPaker-10, 1)]]
 
-        emer_list = [[f'СПО лов. инст до до Н= {CreatePZ.current_bottom}', None,
-             f'Спустить с замером ловильный инструмент на НКТ до Н= {CreatePZ.current_bottom}м с замером. ',
+        emer_list = [[f'СПО лов. инст до до Н= {well_data.current_bottom}', None,
+             f'Спустить с замером ловильный инструмент на НКТ до Н= {well_data.current_bottom}м с замером. ',
              None, None, None, None, None, None, None,
-             'мастер КРС', liftingNKT_norm(CreatePZ.current_bottom, 1)],
-                     [f'Вымыв песка до {CreatePZ.pakerIzvPaker}м. Извлечение пакера', None,
+             'мастер КРС', liftingNKT_norm(well_data.current_bottom, 1)],
+                     [f'Вымыв песка до {well_data.pakerIzvPaker}м. Извлечение пакера', None,
                       f'Произвести нормализацию (вымыв кварцевого песка) на ловильном инструменте до глубины '
-                      f'{CreatePZ.pakerIzvPaker}м обратной '
-                      f'промывкой уд.весом {CreatePZ.fluid_work} \n'
-                      f'Произвести  ловильный работы при представителе заказчика на глубине {CreatePZ.pakerIzvPaker}м.',
+                      f'{well_data.pakerIzvPaker}м обратной '
+                      f'промывкой уд.весом {well_data.fluid_work} \n'
+                      f'Произвести  ловильный работы при представителе заказчика на глубине {well_data.pakerIzvPaker}м.',
                       None, None, None, None, None, None, None,
-                      'мастер КРС', liftingNKT_norm(CreatePZ.pakerIzvPaker, 1)],
+                      'мастер КРС', liftingNKT_norm(well_data.pakerIzvPaker, 1)],
                      [None, None,
-                      f'Расходить и поднять компоновку НКТ{CreatePZ.nkt_diam}мм с глубины {CreatePZ.pakerIzvPaker}м с '
-                      f'доливом скважины в объеме {round(CreatePZ.pakerIzvPaker * 1.12 / 1000, 1)}м3 тех. жидкостью '
-                      f'уд.весом {CreatePZ.fluid_work}',
+                      f'Расходить и поднять компоновку НКТ{well_data.nkt_diam}мм с глубины {well_data.pakerIzvPaker}м с '
+                      f'доливом скважины в объеме {round(well_data.pakerIzvPaker * 1.12 / 1000, 1)}м3 тех. жидкостью '
+                      f'уд.весом {well_data.fluid_work}',
                       None, None, None, None, None, None, None,
-                      'мастер КРС', liftingNKT_norm(CreatePZ.pakerIzvPaker, 1)]]
+                      'мастер КРС', liftingNKT_norm(well_data.pakerIzvPaker, 1)]]
         for row in emer_list:
             rir_list.append(row)
 
-        CreatePZ.current_bottom = CreatePZ.bottomhole_artificial._value
-        CreatePZ.forPaker_list = None
+        well_data.current_bottom = well_data.bottomhole_artificial._value
+        well_data.forPaker_list = None
         return rir_list

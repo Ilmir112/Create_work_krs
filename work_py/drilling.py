@@ -1,11 +1,11 @@
 from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QLineEdit, QComboBox, QGridLayout, QTabWidget, \
     QTableWidget, QHeaderView, QPushButton, QTableWidgetItem, QApplication, QMainWindow
 
-from krs import well_volume
-from main import MyWindow
-from work_py.alone_oreration import fluid_change
+import well_data
+
+
 from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
-from open_pz import CreatePZ
+
 
 
 class TabPage_SO_drill(QWidget):
@@ -18,13 +18,11 @@ class TabPage_SO_drill(QWidget):
         self.drill_type_label = QLabel("Тип разрушающегося инструмента", self)
         self.drill_type_combo = QComboBox(self)
 
-        drill_type_list =['Трехшарошечное', 'битовское', "фрез торцевой", "фрез кольцевой", "фрез пилотный"]
+        drill_type_list = ['долото', 'долото ВС', "фрез торцевой", "фрез кольцевой", "фрез пилотный"]
         self.drill_type_combo.addItems(drill_type_list)
 
         self.drill_diametr_label = QLabel("Диаметр долото", self)
         self.drill_diametr_line = QLineEdit(self)
-        self.drill_diametr_line.setText(str(self.drillingBit_diam_select(CreatePZ.current_bottom)))
-        self.drill_diametr_line.setClearButtonEnabled(True)
 
         self.drill_select_combo.addItems(
             ['долото в ЭК', 'долото в ДП'])
@@ -39,23 +37,28 @@ class TabPage_SO_drill(QWidget):
         self.nkt_str_combo.addItems(
             ['НКТ', 'СБТ'])
 
-        if CreatePZ.column_additional is False or (CreatePZ.column_additional and
-                                                   CreatePZ.head_column_additional._value < CreatePZ.current_bottom):
+        if well_data.column_additional is False or (well_data.column_additional and
+                                                   well_data.head_column_additional._value >= well_data.current_bottom):
             self.drill_select_combo.setCurrentIndex(0)
-            if CreatePZ.column_diametr._value > 127:
+            if well_data.column_diametr._value > 127:
                 self.downhole_motor_line.setText('Д-106')
             else:
                 self.downhole_motor_line.setText('Д-76')
+
+            self.drill_diametr_line.setText(str(self.drillingBit_diam_select(well_data.current_bottom)))
+
+
         else:
-            if CreatePZ.column_additional_diametr._value > 127:
+            if well_data.column_additional_diametr._value > 127:
                 self.downhole_motor_line.setText('Д-106')
             else:
                 self.downhole_motor_line.setText('Д-76')
             self.drill_select_combo.setCurrentIndex(1)
+            self.drill_diametr_line.setText(str(self.drillingBit_diam_select(well_data.current_bottom)))
 
         self.roof_drill_label = QLabel("Кровля", self)
         self.roof_drill_line = QLineEdit(self)
-        self.roof_drill_line.setText(f'{CreatePZ.current_bottom}')
+        self.roof_drill_line.setText(f'{well_data.current_bottom}')
         self.roof_drill_line.setClearButtonEnabled(True)
 
         self.sole_drill_label = QLabel("Подошва", self)
@@ -64,9 +67,9 @@ class TabPage_SO_drill(QWidget):
 
         self.drill_True_label = QLabel("вид разбуриваемого материала", self)
         self.drill_label = QLabel("добавление поинтервального бурения", self)
-        self.drill_type_combo = QComboBox(self)
+        self.drill_cm_combo = QComboBox(self)
         self.bottomType_list = ['ЦМ', 'РПК', 'РПП', 'ВП']
-        self.drill_type_combo.addItems(self.bottomType_list)
+        self.drill_cm_combo.addItems(self.bottomType_list)
 
         grid = QGridLayout(self)
         grid.setColumnMinimumWidth(1, 150)
@@ -75,7 +78,7 @@ class TabPage_SO_drill(QWidget):
         grid.addWidget(self.drill_select_combo, 3, 0)
 
         grid.addWidget(self.drill_type_label, 2, 1)
-        grid.addWidget(self.drill_type_combo, 3, 1)
+        grid.addWidget(self.drill_cm_combo, 3, 1)
 
         grid.addWidget(self.drill_diametr_label, 2, 2)
         grid.addWidget(self.drill_diametr_line, 3, 2)
@@ -102,22 +105,22 @@ class TabPage_SO_drill(QWidget):
     def update_drill_edit(self, index):
 
         if index == 'долото в ЭК':
-            self.drill_diametr_line.setText(str(self.drillingBit_diam_select(CreatePZ.current_bottom)))
-            if CreatePZ.column_diametr._value > 127:
+            self.drill_diametr_line.setText(str(self.drillingBit_diam_select(well_data.current_bottom)))
+            if well_data.column_diametr._value > 127:
                 self.downhole_motor_line.setText('Д-106')
             else:
                 self.downhole_motor_line.setText('Д-76')
         else:
             self.drill_diametr_line.setText(
-                str(self.drillingBit_diam_select(CreatePZ.head_column_additional._value - 1)))
-            if CreatePZ.column_additional_diametr._value < 127:
+                str(self.drillingBit_diam_select(well_data.head_column_additional._value - 1)))
+            if well_data.column_additional_diametr._value < 127:
                 self.downhole_motor_line.setText('Д-106')
             else:
                 self.downhole_motor_line.setText('Д-76')
 
     def drillingBit_diam_select(self, depth_landing):
 
-        from open_pz import CreatePZ
+
 
         drillingBit_dict = {
             84: (88, 92),
@@ -138,11 +141,11 @@ class TabPage_SO_drill(QWidget):
             204: (215, 221)
         }
 
-        if CreatePZ.column_additional is False or (
-                CreatePZ.column_additional is True and depth_landing <= CreatePZ.head_column_additional._value):
-            diam_internal_ek = CreatePZ.column_diametr._value - 2 * CreatePZ.column_wall_thickness._value
+        if well_data.column_additional is False or (
+                well_data.column_additional is True and depth_landing <= well_data.head_column_additional._value):
+            diam_internal_ek = well_data.column_diametr._value - 2 * well_data.column_wall_thickness._value
         else:
-            diam_internal_ek = CreatePZ.column_additional_diametr._value - 2 * CreatePZ.column_additional_wall_thickness._value
+            diam_internal_ek = well_data.column_additional_diametr._value - 2 * well_data.column_additional_wall_thickness._value
 
         for diam, diam_internal_bit in drillingBit_dict.items():
             if diam_internal_bit[0] <= diam_internal_ek <= diam_internal_bit[1]:
@@ -158,12 +161,10 @@ class TabWidget(QTabWidget):
 
 
 class Drill_window(QMainWindow):
-    def __init__(self, table_widget, ins_ind, parent=None):
+    def __init__(self, parent=None):
         super(Drill_window, self).__init__(parent)
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
-        self.table_widget = table_widget
-        self.ins_ind = ins_ind
         self.tabWidget = TabWidget()
         self.tableWidget = QTableWidget(0, 3)
         self.tableWidget.setHorizontalHeaderLabels(
@@ -203,7 +204,7 @@ class Drill_window(QMainWindow):
         if not roof_drill or not sole_drill:
             msg = QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
             return
-        # if CreatePZ.current_bottom < float(sole_drill):
+        # if well_data.current_bottom < float(sole_drill):
         #     msg = QMessageBox.information(self, 'Внимание', 'глубина НЭК ниже искусственного забоя')
         #     return
 
@@ -228,16 +229,16 @@ class Drill_window(QMainWindow):
             msg = QMessageBox.information(self, 'Внимание', 'Не заполнен необходимый забой')
             return
 
-        drilling_interval = [CreatePZ.dict_perforation[plast]["подошва"] for plast in CreatePZ.plast_all]
-        if len(CreatePZ.dict_leakiness) != 0:
+        drilling_interval = [well_data.dict_perforation[plast]["подошва"] for plast in well_data.plast_all]
+        if len(well_data.dict_leakiness) != 0:
             leakness_list = [
-                CreatePZ.dict_leakiness['нэк']['интервал'][
-                    nek][1] for nek in list(CreatePZ.dict_leakiness['нэк']['интервал'].keys())]
+                well_data.dict_leakiness['нэк']['интервал'][
+                    nek][1] for nek in list(well_data.dict_leakiness['нэк']['интервал'].keys())]
             drilling_interval.extend([leakness_list])
-        # drilling_interval = list(filter(key = lambda x: x[0] > CreatePZ.current_bottom, drilling_interval))
+        # drilling_interval = list(filter(key = lambda x: x[0] > well_data.current_bottom, drilling_interval))
         print(drilling_interval)
         rows = self.tableWidget.rowCount()
-        roof = CreatePZ.current_bottom
+        roof = well_data.current_bottom
         for sole in sorted(drilling_interval):
             drill_combo = QComboBox(self)
             bottomType_list = ['ЦМ', 'РПК', 'РПП', 'ВП']
@@ -261,6 +262,7 @@ class Drill_window(QMainWindow):
         self.nkt_str = self.tabWidget.currentWidget().nkt_str_combo.currentText()
         self.drillingBit_diam = self.tabWidget.currentWidget().drill_diametr_line.text()
         self.downhole_motor = self.tabWidget.currentWidget().downhole_motor_line.text()
+        self.drill_cm_combo = self.tabWidget.currentWidget().drill_cm_combo.currentText()
         self.drill_type_combo = self.tabWidget.currentWidget().drill_type_combo.currentText()
 
         rows = self.tableWidget.rowCount()
@@ -285,7 +287,7 @@ class Drill_window(QMainWindow):
         elif self.nkt_str == 'СБТ':
             drill_list = self.drilling_sbt(drill_tuple, self.drill_type_combo, self.drillingBit_diam, self.downhole_motor)
 
-        CreatePZ.pause = False
+        well_data.pause = False
         self.close()
         return drill_list
 
@@ -298,47 +300,47 @@ class Drill_window(QMainWindow):
 
     def drilling_nkt(self, drill_tuple, drill_type_combo, drillingBit_diam, downhole_motor):
 
-        currentBottom = CreatePZ.current_bottom
+        currentBottom = well_data.current_bottom
 
         current_depth = drill_tuple[-1][0]
         bottomType = drill_tuple[-1][1]
 
-        if CreatePZ.column_additional == True:
-            nkt_pod = '60мм' if CreatePZ.column_additional_diametr._value < 110 else '73мм со снятыми фасками'
+        if well_data.column_additional == True:
+            nkt_pod = '60мм' if well_data.column_additional_diametr._value < 110 else '73мм со снятыми фасками'
 
-        nkt_diam = CreatePZ.nkt_diam
+        nkt_diam = well_data.nkt_diam
 
-        if CreatePZ.column_additional is False \
-                or (CreatePZ.column_additional is True
-                    and CreatePZ.head_column_additional._value >= CreatePZ.current_bottom):
+        if well_data.column_additional is False \
+                or (well_data.column_additional is True
+                    and well_data.head_column_additional._value >= well_data.current_bottom):
             drilling_str = f'{drill_type_combo}-{drillingBit_diam} для ' \
-                           f'ЭК {CreatePZ.column_diametr._value}мм х {CreatePZ.column_wall_thickness._value}мм +' \
+                           f'ЭК {well_data.column_diametr._value}мм х {well_data.column_wall_thickness._value}мм +' \
                            f' забойный двигатель {downhole_motor} + НКТ{nkt_diam} 20м + репер '
             drilling_short = f'{drill_type_combo}-{drillingBit_diam} + ' \
                              f'забойный двигатель {downhole_motor}  + НКТ{nkt_diam} 20м + репер '
 
 
-        elif CreatePZ.column_additional == True:
-            drilling_str = f'{drill_type_combo}-{drillingBit_diam} для ЭК {CreatePZ.column_additional_diametr._value}мм х ' \
-                           f'{CreatePZ.column_additional_wall_thickness._value}мм + забойный двигатель ' \
+        elif well_data.column_additional == True:
+            drilling_str = f'{drill_type_combo}-{drillingBit_diam} для ЭК {well_data.column_additional_diametr._value}мм х ' \
+                           f'{well_data.column_additional_wall_thickness._value}мм + забойный двигатель ' \
                            f'{downhole_motor} +НКТ{nkt_pod} 20м + репер + ' \
-                           f'НКТ{nkt_pod} {round(CreatePZ.current_bottom - CreatePZ.head_column_additional._value, 0)}м'
+                           f'НКТ{nkt_pod} {round(well_data.current_bottom - well_data.head_column_additional._value, 0)}м'
             drilling_short = f'{drill_type_combo}-{drillingBit_diam}  + забойный двигатель  {downhole_motor} +НКТ{nkt_pod} 20м + ' \
                              f'репер + ' \
-                             f'НКТ{nkt_pod} {round(CreatePZ.current_bottom - CreatePZ.head_column_additional._value, 0)}м'
+                             f'НКТ{nkt_pod} {round(well_data.current_bottom - well_data.head_column_additional._value, 0)}м'
 
-        CreatePZ.drilling_interval.append([CreatePZ.current_bottom, current_depth])
+        well_data.drilling_interval.append([well_data.current_bottom, current_depth])
 
         drilling_list = [
             [f'СПО {drilling_short} до т.з -', None,
-             f'Спустить {drilling_str}  на НКТ{nkt_diam}м до до текущего забоя с замером, '
-             f'шаблонированием шаблоном {CreatePZ.nkt_template}мм\n'
+             f'Спустить {drilling_str} на НКТ{nkt_diam}м до до текущего забоя с замером, '
+             f'шаблонированием шаблоном {well_data.nkt_template}мм\n'
              f' (При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ). '
              f'В случае разгрузки инструмента  при спуске, проработать место посадки с промывкой скв., составить акт.'
              f'СКОРОСТЬ СПУСКА НЕ БОЛЕЕ 1 М/С (НЕ ДОХОДЯ 40 - 50 М ДО ПЛАНОВОГО ИНТЕРВАЛА СКОРОСТЬ СПУСКА СНИЗИТЬ ДО 0,25 М/С). '
              f'ЗА 20 М ДО ЗАБОЯ СПУСК ПРОИЗВОДИТЬ С ПРОМЫВКОЙ',
              None, None, None, None, None, None, None,
-             'мастер КРС', descentNKT_norm(CreatePZ.current_bottom, 1.2)],
+             'мастер КРС', descentNKT_norm(well_data.current_bottom, 1.2)],
             [None, None,
              f'Собрать промывочное оборудование: вертлюг, ведущая труба (установить вставной фильтр под ведущей трубой), '
              f'буровой рукав, устьевой герметизатор, нагнетательная линия. Застраховать буровой рукав за вертлюг. ',
@@ -348,8 +350,8 @@ class Drill_window(QMainWindow):
 
         if self.check_pressure(current_depth):
             drilling_list.append(
-                [f'Опрессовать ЭК и ЦМ на Р={CreatePZ.max_admissible_pressure._value}атм', None,
-              f'Опрессовать ЭК и ЦМ на Р={CreatePZ.max_admissible_pressure._value}атм в присутствии '
+                [f'Опрессовать ЭК и ЦМ на Р={well_data.max_admissible_pressure._value}атм', None,
+              f'Опрессовать ЭК и ЦМ на Р={well_data.max_admissible_pressure._value}атм в присутствии '
               f'представителя заказчика. Составить акт. '
               f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до '
               f'начала работ) \n'
@@ -379,54 +381,54 @@ class Drill_window(QMainWindow):
              None, None, None, None, None, None, None,
              'Мастер КРС, УСРСиСТ', None],
             [None, None,
-             f'Поднять  {drilling_str} на НКТ{nkt_diam} с глубины {CreatePZ.current_bottom}м с доливом скважины в '
-             f'объеме {round(CreatePZ.current_bottom * 1.4 / 1000, 1)}м3 тех. жидкостью  уд.весом {CreatePZ.fluid_work}',
+             f'Поднять  {drilling_str} на НКТ{nkt_diam} с глубины {well_data.current_bottom}м с доливом скважины в '
+             f'объеме {round(well_data.current_bottom * 1.4 / 1000, 1)}м3 тех. жидкостью  уд.весом {well_data.fluid_work}',
              None, None, None, None, None, None, None,
-             'мастер КРС', liftingNKT_norm(CreatePZ.current_bottom, 1.3)]
+             'мастер КРС', liftingNKT_norm(well_data.current_bottom, 1.3)]
         ]
 
         drilling_list.extend(drilling_list_end)
 
-        CreatePZ.current_bottom = current_depth
+        well_data.current_bottom = current_depth
 
         if bottomType == "РПК" or bottomType == "РПП":
-            CreatePZ.current_bottom = currentBottom
+            well_data.current_bottom = currentBottom
             drilling_list.append([f'Завоз СБТ', None,
                                   f'В случае возможности завоза тяжелого оборудования и установки УПА-60 (АПР60/80), '
                                   f'по согласованию с Заказчиком нормализацию выполнить по следующему пункту',
                                   None, None, None, None, None, None, None,
                                   'Мастер КРС, УСРСиСТ', None])
 
-            for row in self.drilling_sbt(self):
+            for row in self.drilling_sbt(self, drill_tuple, drill_type_combo, drillingBit_diam, downhole_motor):
                 drilling_list.append(row)
 
         return drilling_list
 
     def reply_drilling(self, current_depth, bottomtype, drilling_str, nkt_diam):
-        from open_pz import CreatePZ
+
         from krs import well_volume
 
         drilling_true_quest_list = [
             [f'Произвести нормализацию {bottomtype} до Н -{current_depth}м', None,
              f'Произвести нормализацию {bottomtype} до глубины {current_depth}м с наращиванием, промывкой '
-             f'тех жидкостью уд.весом {CreatePZ.fluid_work}. '
+             f'тех жидкостью уд.весом {well_data.fluid_work}. '
              f'Работы производить согласно сборника технологических регламентов и инструкций в присутствии'
              f' представителя заказчика.',
              None, None, None, None, None, None, None,
              'Мастер КРС, УСРСиСТ', 8, ],
-            [f'Промыть  {CreatePZ.fluid_work} в объеме '
-             f'{round(well_volume(self, CreatePZ.current_bottom) * 2, 1)}м3', None,
-             f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {CreatePZ.fluid_work}  '
+            [f'Промыть  {well_data.fluid_work} в объеме '
+             f'{round(well_volume(self, well_data.current_bottom) * 2, 1)}м3', None,
+             f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {well_data.fluid_work}  '
              f'в присутствии представителя заказчика в объеме '
-             f'{round(well_volume(self, CreatePZ.current_bottom) * 2, 1)}м3. Составить акт.',
+             f'{round(well_volume(self, well_data.current_bottom) * 2, 1)}м3. Составить акт.',
              None, None, None, None, None, None, None,
              'мастер КРС, предст. заказчика', 1.5],
         ]
 
         if self.check_pressure(current_depth):
             drilling_true_quest_list.append(
-                [f'Опрессовать ЭК и ЦМ на Р={CreatePZ.max_admissible_pressure._value}атм', None,
-                 f'Опрессовать ЭК и ЦМ на Р={CreatePZ.max_admissible_pressure._value}атм в '
+                [f'Опрессовать ЭК и ЦМ на Р={well_data.max_admissible_pressure._value}атм', None,
+                 f'Опрессовать ЭК и ЦМ на Р={well_data.max_admissible_pressure._value}атм в '
                  f'присутствии представителя заказчика. Составить акт. '
                  f'(Вызов представителя осуществлять телефонограммой за 12 часов, с '
                  f'подтверждением за 2 часа до начала работ) \n'
@@ -434,53 +436,53 @@ class Drill_window(QMainWindow):
                  None, None, None, None, None, None, None,
                  'Мастер КРС, УСРСиСТ', 0.67]
             )
-        CreatePZ.current_bottom = current_depth
+        well_data.current_bottom = current_depth
         return drilling_true_quest_list
 
     def drilling_sbt(self, drill_tuple, drill_type_combo, drillingBit_diam, downhole_motor):
-        from open_pz import CreatePZ
 
-        currentBottom = CreatePZ.current_bottom
+
+        currentBottom = well_data.current_bottom
 
         current_depth = drill_tuple[-1][0]
 
         nkt_pod = "2'3/8"
-        nkt_diam = "2'7/8" if CreatePZ.column_diametr._value > 110 else "2'3/8"
+        nkt_diam = "2'7/8" if well_data.column_diametr._value > 110 else "2'3/8"
 
-        if CreatePZ.column_additional is False or (
-                CreatePZ.column_additional is True and CreatePZ.head_column_additional._value >= current_depth):
-            drilling_str = f'{drill_type_combo}-{drillingBit_diam} для ЭК {CreatePZ.column_diametr._value}мм х ' \
-                           f'{CreatePZ.column_wall_thickness._value}мм '
-            drilling_short = f'{drill_type_combo}-{drillingBit_diam} для ЭК {CreatePZ.column_diametr._value}мм х ' \
-                             f'{CreatePZ.column_wall_thickness._value}мм '
+        if well_data.column_additional is False or (
+                well_data.column_additional is True and well_data.head_column_additional._value >= current_depth):
+            drilling_str = f'{drill_type_combo}-{drillingBit_diam} для ЭК {well_data.column_diametr._value}мм х ' \
+                           f'{well_data.column_wall_thickness._value}мм '
+            drilling_short = f'{drill_type_combo}-{drillingBit_diam} для ЭК {well_data.column_diametr._value}мм х ' \
+                             f'{well_data.column_wall_thickness._value}мм '
             sbt_lenght = f'СБТ {nkt_diam} - {int(current_depth + 100)}м'
 
-        elif CreatePZ.column_additional == True:
+        elif well_data.column_additional == True:
             drilling_str = f'{drill_type_combo}-{drillingBit_diam} для ЭК ' \
-                           f'{CreatePZ.column_additional_diametr._value}мм х ' \
-                           f'{CreatePZ.column_additional_wall_thickness._value}мм + СБТ{nkt_pod} ' \
-                           f'{CreatePZ.current_bottom - CreatePZ.head_column_additional._value}м'
+                           f'{well_data.column_additional_diametr._value}мм х ' \
+                           f'{well_data.column_additional_wall_thickness._value}мм + СБТ{nkt_pod} ' \
+                           f'{well_data.current_bottom - well_data.head_column_additional._value}м'
             drilling_short = f'{drill_type_combo}-{drillingBit_diam}  + СБТ{nkt_pod} ' \
-                             f'{CreatePZ.current_bottom - CreatePZ.head_column_additional._value}м'
-            sbt_lenght = f'СБТ {nkt_diam} - {CreatePZ.head_column_additional._value}м и СБТ {nkt_pod}' \
-                         f' {int(current_depth + 100)-CreatePZ.head_column_additional._value}м'
+                             f'{well_data.current_bottom - well_data.head_column_additional._value}м'
+            sbt_lenght = f'СБТ {nkt_diam} - {well_data.head_column_additional._value}м и СБТ {nkt_pod}' \
+                         f' {int(current_depth + 100)-well_data.head_column_additional._value}м'
 
-        CreatePZ.drilling_interval.append([CreatePZ.current_bottom, current_depth])
+        well_data.drilling_interval.append([well_data.current_bottom, current_depth])
 
         drilling_list = [
             [f'Завезти на скважину {sbt_lenght}', None,
                  f'Завезти на скважину СБТ {sbt_lenght} – Укладка труб на стеллажи.',
                  None, None, None, None, None, None, None,
                  'Мастер', None],
-            [f'СПО {drilling_short} на СБТ {nkt_diam} до Н= {CreatePZ.current_bottom - 30}', None,
-                 f'Спустить {drilling_str}  на СБТ {nkt_diam} до Н= {CreatePZ.current_bottom - 30}м с замером, '
+            [f'СПО {drilling_short} на СБТ {nkt_diam} до Н= {well_data.current_bottom - 30}', None,
+                 f'Спустить {drilling_str}  на СБТ {nkt_diam} до Н= {well_data.current_bottom - 30}м с замером, '
                  f' (При СПО первых десяти СБТ на спайдере дополнительно устанавливать элеватор ЭХЛ). '
                  f'В случае разгрузки инструмента  при спуске, проработать место посадки с промывкой скв., '
                  f'составить акт. СКОРОСТЬ СПУСКА НЕ БОЛЕЕ 1 М/С (НЕ ДОХОДЯ 40 - 50 М ДО ПЛАНОВОГО ИНТЕРВАЛА СКОРОСТЬ '
                  f'СПУСКА СНИЗИТЬ ДО 0,25 М/С). '
                  f'ЗА 20 М ДО ЗАБОЯ СПУСК ПРОИЗВОДИТЬ С ПРОМЫВКОЙ',
                  None, None, None, None, None, None, None,
-                 'мастер КРС', descentNKT_norm(CreatePZ.current_bottom, 1.1)],
+                 'мастер КРС', descentNKT_norm(well_data.current_bottom, 1.1)],
             [f'монтаж мех.ротора', None,
                  f'Произвести монтаж мех.ротора. Собрать промывочное оборудование: вертлюг, ведущая труба (установить '
                  f'вставной фильтр под ведущей трубой), '
@@ -492,8 +494,8 @@ class Drill_window(QMainWindow):
 
         if self.check_pressure(current_depth) == 0:
             drilling_list.append(
-                [f'Опрессовать ЭК и ЦМ на Р={CreatePZ.max_admissible_pressure._value}атм', None,
-                 f'Опрессовать ЭК и ЦМ на Р={CreatePZ.max_admissible_pressure._value}атм в присутствии представителя '
+                [f'Опрессовать ЭК и ЦМ на Р={well_data.max_admissible_pressure._value}атм', None,
+                 f'Опрессовать ЭК и ЦМ на Р={well_data.max_admissible_pressure._value}атм в присутствии представителя '
                  f'заказчика. Составить акт. '
                  f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до '
                  f'начала работ) \n'
@@ -501,7 +503,7 @@ class Drill_window(QMainWindow):
                  None, None, None, None, None, None, None,
                  'Мастер КРС, УСРСиСТ', 0.67])
 
-        CreatePZ.current_bottom = current_depth
+        well_data.current_bottom = current_depth
 
         for drill_sole, bottomType2 in drill_tuple:
             # print(drill_sole, self.check_pressure(drill_sole))
@@ -521,46 +523,46 @@ class Drill_window(QMainWindow):
                 None, None, None, None, None, None, None,
                 'мастер КРС, предст. заказчика', 0.77],
             [None, None,
-             f'Поднять  {drilling_str} на СБТ с глубины {CreatePZ.current_bottom}м с доливом скважины в '
-             f'объеме {round(CreatePZ.current_bottom * 1.4 / 1000, 1)}м3 тех. жидкостью  уд.весом {CreatePZ.fluid_work}',
+             f'Поднять  {drilling_str} на СБТ с глубины {well_data.current_bottom}м с доливом скважины в '
+             f'объеме {round(well_data.current_bottom * 1.4 / 1000, 1)}м3 тех. жидкостью  уд.весом {well_data.fluid_work}',
              None, None, None, None, None, None, None,
-             'мастер КРС', liftingNKT_norm(CreatePZ.current_bottom, 1.3)]
+             'мастер КРС', liftingNKT_norm(well_data.current_bottom, 1.3)]
         ]
         drilling_list.extend(drilling_list_end)
         return drilling_list
 
     def check_pressure(self, depth):
-        from open_pz import CreatePZ
+
 
         check_True = True
 
-        for plast in CreatePZ.plast_all:
-            if CreatePZ.dict_perforation[plast]['отключение'] is False:
-                for interval in CreatePZ.dict_perforation[plast]['интервал']:
+        for plast in well_data.plast_all:
+            if well_data.dict_perforation[plast]['отключение'] is False:
+                for interval in well_data.dict_perforation[plast]['интервал']:
                     if depth > interval[0]:
                         check_True = False
 
-        if CreatePZ.leakiness == True:
+        if well_data.leakiness == True:
 
-            for nek in CreatePZ.dict_leakiness['НЭК']['интервал']:
-                # print(CreatePZ.dict_leakiness)
-                if CreatePZ.dict_leakiness['НЭК']['интервал'][nek]['отключение'] == False:
+            for nek in well_data.dict_leakiness['НЭК']['интервал']:
+                # print(well_data.dict_leakiness)
+                if well_data.dict_leakiness['НЭК']['интервал'][nek]['отключение'] == False:
                     if depth > nek[0]:
                         check_True = False
         return check_True
 
     def frezer_ports(self):
-        from open_pz import CreatePZ
+
         from krs import well_volume
         from work_py.alone_oreration import kot_work
 
-        max_port = max([CreatePZ.dict_perforation[plast]['подошва'] for plast in CreatePZ.plast_work])
-        min_port = max([CreatePZ.dict_perforation[plast]['кровля'] for plast in CreatePZ.plast_work])
+        max_port = max([well_data.dict_perforation[plast]['подошва'] for plast in well_data.plast_work])
+        min_port = max([well_data.dict_perforation[plast]['кровля'] for plast in well_data.plast_work])
 
         current_depth, ok = QInputDialog.getInt(None, 'Нормализация забоя',
                                                 'Введите глубину необходимого забоя при нормализации',
                                                 int(max_port-2), 0,
-                                                int(CreatePZ.bottomhole_artificial._value + 500))
+                                                int(well_data.bottomhole_artificial._value + 500))
 
         kot_question = QMessageBox.question(self, 'КОТ', 'Нужно ли произвести СПО '
                                                          'обратных клапанов перед фрезом?')
@@ -576,35 +578,35 @@ class Drill_window(QMainWindow):
                                                 'Введите диаметр фреза', drillingBit_diam, 50, 210, 1)
         nkt_pod = "2' 3/8"
 
-        nkt_diam = ''.join(["2 7/8" if CreatePZ.column_diametr._value > 110 else "2 3/8"])
+        nkt_diam = ''.join(["2 7/8" if well_data.column_diametr._value > 110 else "2 3/8"])
 
-        if CreatePZ.column_additional is False or (
-                CreatePZ.column_additional is True and CreatePZ.head_column_additional._value >= CreatePZ.current_bottom):
+        if well_data.column_additional is False or (
+                well_data.column_additional is True and well_data.head_column_additional._value >= well_data.current_bottom):
             drilling_str = f'торцевой фрезер -{drillingBit_diam} + СБТ + магнит колонный  2⅜ БТ (П) '
             drilling_short = f'торцевой фрезер -{drillingBit_diam} + СБТ + магнит колонный  2⅜ БТ (П) '
 
 
-        elif CreatePZ.column_additional == True:
+        elif well_data.column_additional == True:
             drilling_str = f'торцевой фрезер -{drillingBit_diam} + СБТ + магнит колонный  2⅜ БТ (П) + ' \
                            f'СБТ{nkt_pod} ' \
-                           f'{round(current_depth - CreatePZ.head_column_additional._value, 1)}м'
+                           f'{round(current_depth - well_data.head_column_additional._value, 1)}м'
             drilling_short = f'торцевой фрезер -{drillingBit_diam} + СБТ + магнит колонный  2⅜ БТ (П) + ' \
                              f'СБТ{nkt_pod} ' \
-                             f'{round(current_depth - CreatePZ.head_column_additional._value, 1)}м'
+                             f'{round(current_depth - well_data.head_column_additional._value, 1)}м'
 
-        CreatePZ.drilling_interval.append([CreatePZ.current_bottom, current_depth])
+        well_data.drilling_interval.append([well_data.current_bottom, current_depth])
         drilling_list = [[f'Завоз на скважину СБТ', None,
          f'Завоз на скважину СБТ – Укладка труб на стеллажи.',
          None, None, None, None, None, None, None,
          'Мастер', None],
-            [f'СПО {drilling_short} на СБТ{nkt_diam} до Н= {CreatePZ.perforation_roof - 30}', None,
-             f'Спустить {drilling_str}  на СБТ{nkt_diam} до Н= {CreatePZ.perforation_roof - 30}м с замером, '
+            [f'СПО {drilling_short} на СБТ{nkt_diam} до Н= {well_data.perforation_roof - 30}', None,
+             f'Спустить {drilling_str}  на СБТ{nkt_diam} до Н= {well_data.perforation_roof - 30}м с замером, '
              f' (При СПО первых десяти СБТ на спайдере дополнительно устанавливать элеватор ЭХЛ). '
              f'В случае разгрузки инструмента  при спуске, проработать место посадки с промывкой скв., составить акт.'
              f'СКОРОСТЬ СПУСКА НЕ БОЛЕЕ 1 М/С (НЕ ДОХОДЯ 40 - 50 М ДО ПЛАНОВОГО ИНТЕРВАЛА СКОРОСТЬ СПУСКА СНИЗИТЬ ДО 0,25 М/С). '
              f'ЗА 20 М ДО ЗАБОЯ СПУСК ПРОИЗВОДИТЬ С ПРОМЫВКОЙ',
              None, None, None, None, None, None, None,
-             'мастер КРС', descentNKT_norm(CreatePZ.current_bottom, 1.1)],
+             'мастер КРС', descentNKT_norm(well_data.current_bottom, 1.1)],
             [f'монтаж мех.ротора', None,
              f'Произвести монтаж мех.ротора. Собрать промывочное оборудование: вертлюг, ведущая труба (установить '
              f'вставной фильтр под ведущей трубой), '
@@ -612,9 +614,9 @@ class Drill_window(QMainWindow):
              None, None, None, None, None, None, None,
              'Мастер КРС, УСРСиСТ', round(0.14 + 0.17 + 0.08 + 0.48 + 1.1, 1)],
             [f'нормализацию до Н= {current_depth}м', None,
-             f'Произвести фрезерование муфт ГРП  с гл.{CreatePZ.perforation_roof}м до '
-             f'гл.{CreatePZ.perforation_sole}м  до первого порта с периодической обратной промывкой, с проработкой э/к в'
-             f' интервале {CreatePZ.perforation_roof}-{CreatePZ.perforation_sole}м (режим работы 60-80 об/мин, расход '
+             f'Произвести фрезерование муфт ГРП  с гл.{well_data.perforation_roof}м до '
+             f'гл.{well_data.perforation_sole}м  до первого порта с периодической обратной промывкой, с проработкой э/к в'
+             f' интервале {well_data.perforation_roof}-{well_data.perforation_sole}м (режим работы 60-80 об/мин, расход '
              f'6-10 литров, нагрузка на фрезерующий инструмент до 3-х тонн. Приподнимаем инструмент после 15-20 минут '
              f'работы).',
              None, None, None, None, None, None, None,
@@ -630,27 +632,27 @@ class Drill_window(QMainWindow):
              f'ПРИПОДНИМАЕМ ИНСТРУМЕНТ ПОСЛЕ 15-20 МИНУТ РАБОТЫ',
              None, None, None, None, None, None, None,
              'Мастер КРС, УСРСиСТ', None],
-            [f'Промыть  {CreatePZ.fluid_work}  '
-             f'в объеме {round(well_volume(self, CreatePZ.current_bottom) * 2, 1)}м3', None,
-             f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {CreatePZ.fluid_work}  '
-             f'в присутствии представителя заказчика в объеме {round(well_volume(self, CreatePZ.current_bottom) * 2, 1)}м3. Составить акт.',
+            [f'Промыть  {well_data.fluid_work}  '
+             f'в объеме {round(well_volume(self, well_data.current_bottom) * 2, 1)}м3', None,
+             f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {well_data.fluid_work}  '
+             f'в присутствии представителя заказчика в объеме {round(well_volume(self, well_data.current_bottom) * 2, 1)}м3. Составить акт.',
              None, None, None, None, None, None, None,
-             'мастер КРС, предст. заказчика', well_volume_norm(well_volume(self, CreatePZ.current_bottom))],
+             'мастер КРС, предст. заказчика', well_volume_norm(well_volume(self, well_data.current_bottom))],
             [None, None,
-             f'Поднять  {drilling_str} на СБТ {nkt_diam} с глубины {CreatePZ.current_bottom}м с доливом скважины в '
-             f'объеме {round(CreatePZ.current_bottom * 1.4 / 1000, 1)}м3 тех. жидкостью  уд.весом {CreatePZ.fluid_work}',
+             f'Поднять  {drilling_str} на СБТ {nkt_diam} с глубины {well_data.current_bottom}м с доливом скважины в '
+             f'объеме {round(well_data.current_bottom * 1.4 / 1000, 1)}м3 тех. жидкостью  уд.весом {well_data.fluid_work}',
              None, None, None, None, None, None, None,
-             'мастер КРС', liftingNKT_norm(CreatePZ.current_bottom, 1.3)],
+             'мастер КРС', liftingNKT_norm(well_data.current_bottom, 1.3)],
             [None, None,
              f'В случае превышении норм времени на фрезерование портов увеличение продолжительности дополнительно '
              f'согласовать с супервайзерской службой с составление акта на фактически затраченное время. Или согласовать '
              f'смену вооружения и повторить работы',
              None, None, None, None, None, None, None,
-             'мастер КРС', liftingNKT_norm(CreatePZ.current_bottom, 1.3)],
+             'мастер КРС', liftingNKT_norm(well_data.current_bottom, 1.3)],
             [None, None,
              f'При посадке фреза на глубине выше планируемого порта по согласованию с УСРСиСТ произвести следующие работы:',
              None, None, None, None, None, None, None,
-             'мастер КРС', liftingNKT_norm(CreatePZ.current_bottom, 1.3)]
+             'мастер КРС', liftingNKT_norm(well_data.current_bottom, 1.3)]
         ]
         for row in kot_list:
             drilling_list.insert(0, row)

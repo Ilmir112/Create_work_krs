@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QLineEdit, QComboBox, QGridLayout, QTabWidget, \
     QTableWidget, QHeaderView, QPushButton, QTableWidgetItem, QApplication,QMainWindow
 
+import well_data
 from main import MyWindow
 from work_py.alone_oreration import fluid_change
 from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
@@ -12,8 +13,6 @@ class TabPage_SO_raid(QWidget):
 
         self.raid_diametr_label = QLabel("Диаметр райбера", self)
         self.raid_diametr_line = QLineEdit(self)
-        self.raid_diametr_line.setText(str(self.raiding_Bit_diam_select(CreatePZ.current_bottom)))
-        self.raid_diametr_line.setClearButtonEnabled(True)
 
         self.raid_type_label = QLabel("Тип райбера", self)
         self.raid_type_combo = QComboBox(self)
@@ -22,23 +21,21 @@ class TabPage_SO_raid(QWidget):
 
         self.raid_select_label = QLabel("компоновка НКТ", self)
         self.raid_select_combo = QComboBox(self)
-
-        self.raid_select_combo.addItems( ['райбер в ЭК', 'райбер в ДП'])
-
+        self.raid_select_combo.addItems(['райбер в ЭК', 'райбер в ДП'])
 
         self.downhole_motor_label = QLabel("Забойный двигатель", self)
         self.downhole_motor_line = QLineEdit(self)
         self.downhole_motor_line.setClearButtonEnabled(True)
 
-        if CreatePZ.column_additional is False or (CreatePZ.column_additional and
-                                                   CreatePZ.head_column_additional._value < CreatePZ.current_bottom):
+        if well_data.column_additional is False or (well_data.column_additional and
+                                                   well_data.head_column_additional._value < well_data.current_bottom):
             self.raid_select_combo.setCurrentIndex(0)
-            if CreatePZ.column_diametr._value > 127:
+            if well_data.column_diametr._value > 127:
                 self.downhole_motor_line.setText('Д-106')
             else:
                 self.downhole_motor_line.setText('Д-76')
         else:
-            if CreatePZ.column_additional_diametr._value > 127:
+            if well_data.column_additional_diametr._value > 127:
                 self.downhole_motor_line.setText('Д-106')
             else:
                 self.downhole_motor_line.setText('Д-76')
@@ -93,7 +90,16 @@ class TabPage_SO_raid(QWidget):
         self.grid.addWidget(self.sole_raid_line, 8, 1)
         self.grid.addWidget(self.raid_True_combo, 8, 2, 2, 1)
 
+
         self.raid_select_combo.currentTextChanged.connect(self.update_raid_edit)
+        self.raid_select_combo.setCurrentIndex(1)
+
+        if well_data.column_additional is False or \
+            (well_data.column_additional and well_data.current_bottom > well_data.head_column_additional._value):
+            self.raid_select_combo.setCurrentIndex(0)
+        else:
+            print(f'строка райбера')
+            self.raid_select_combo.setCurrentIndex(1)
 
     def update_nkt(self, index):
         if index == 'СБТ':
@@ -105,27 +111,31 @@ class TabPage_SO_raid(QWidget):
     def update_raid_edit(self, index):
 
         if index == 'райбер в ЭК':
-            self.raid_diametr_line.setText(str(self.raiding_Bit_diam_select(CreatePZ.current_bottom)))
-            if CreatePZ.column_diametr._value > 127:
-                self.downhole_motor_line.setText('Д-106')
+            if well_data.column_additional is False or \
+                    (well_data.column_additional and well_data.current_bottom < well_data.head_column_additional._value):
+                self.raid_diametr_line.setText(str(self.raiding_Bit_diam_select(well_data.current_bottom)))
+                if well_data.column_diametr._value > 127:
+                    self.downhole_motor_line.setText('Д-106')
+                else:
+                    self.downhole_motor_line.setText('Д-76')
             else:
-                self.downhole_motor_line.setText('Д-76')
-            if CreatePZ.column_additional:
+                self.raid_diametr_line.setText(str(self.raiding_Bit_diam_select(well_data.head_column_additional._value - 10)))
+                if well_data.column_additional_diametr._value > 127:
+                    self.downhole_motor_line.setText('Д-106')
+                else:
+                    self.downhole_motor_line.setText('Д-76')
 
-                self.raid_diametr_line.setText(str(self.raiding_Bit_diam_select(CreatePZ.head_column_additional._value -20)))
-            else:
-                self.raid_diametr_line.setText(str(self.raiding_Bit_diam_select(CreatePZ.current_bottom)))
         if index == 'райбер в ДП':
-            self.raid_diametr_line.setText(str(self.raiding_Bit_diam_select(CreatePZ.head_column_additional._value-1)))
-            if CreatePZ.column_additional_diametr._value > 127:
+            self.raid_diametr_line.setText(str(self.raiding_Bit_diam_select(well_data.current_bottom)))
+            if well_data.column_additional_diametr._value > 127:
                 self.downhole_motor_line.setText('Д-106')
             else:
                 self.downhole_motor_line.setText('Д-76')
-            self.raid_diametr_line.setText(str(self.raiding_Bit_diam_select(CreatePZ.current_bottom)))
+
 
 
     def raiding_Bit_diam_select(self, depth):
-        from open_pz import CreatePZ
+       
 
         raiding_Bit_dict = {
             85: (88, 92),
@@ -146,17 +156,17 @@ class TabPage_SO_raid(QWidget):
             204: (215, 221)
         }
 
-        if CreatePZ.column_additional is False or (
-                CreatePZ.column_additional is True and depth <= CreatePZ.head_column_additional._value):
-            diam_internal_ek = CreatePZ.column_diametr._value - 2 * CreatePZ.column_wall_thickness._value
+        if well_data.column_additional is False or (
+                well_data.column_additional is True and depth <= well_data.head_column_additional._value):
+            diam_internal_ek = well_data.column_diametr._value - 2 * well_data.column_wall_thickness._value
         else:
-            diam_internal_ek = CreatePZ.column_additional_diametr._value - 2 * CreatePZ.column_additional_wall_thickness._value
+            diam_internal_ek = well_data.column_additional_diametr._value - 2 * well_data.column_additional_wall_thickness._value
 
         for diam, diam_internal_bit in raiding_Bit_dict.items():
             if diam_internal_bit[0] <= diam_internal_ek <= diam_internal_bit[1]:
                 bit_diametr = diam
 
-        if 'ПОМ' in str(CreatePZ.paker_do["posle"]).upper() and '122' in str(CreatePZ.paker_do["posle"]):
+        if 'ПОМ' in str(well_data.paker_do["posle"]).upper() and '122' in str(well_data.paker_do["posle"]):
             bit_diametr = 126
 
         return bit_diametr
@@ -212,7 +222,7 @@ class Raid(MyWindow):
         if not roof_raid or not sole_raid:
             msg = QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
             return
-        if CreatePZ.current_bottom < float(sole_raid):
+        if well_data.current_bottom < float(sole_raid):
             msg = QMessageBox.information(self, 'Внимание', 'глубина НЭК ниже искусственного забоя')
             return
 
@@ -265,7 +275,7 @@ class Raid(MyWindow):
         else:
             raid_list = self.raiding_sbt(raid_tuple[::-1])
 
-        CreatePZ.pause = False
+        well_data.pause = False
         self.close()
         return raid_list
     def del_row_table(self):
@@ -277,28 +287,28 @@ class Raid(MyWindow):
     def raidingColumn(self, raiding_interval_tuple):
         from work_py.template_work import TemplateKrs
         from work_py.advanted_file import raiding_interval, raid
-        from open_pz import CreatePZ
+       
 
         ryber_diam = self.tabWidget.currentWidget().raid_diametr_line.text()
         ryber_key = self.tabWidget.currentWidget().raid_select_combo.currentText()
         downhole_motor = self.tabWidget.currentWidget().downhole_motor_line.text()
         raid_type_combo = self.tabWidget.currentWidget().raid_type_combo.currentText()
         nkt_pod = 0
-        if CreatePZ.column_additional:
-            nkt_pod = '60мм' if CreatePZ.column_additional_diametr._value < 110 else '73мм со снятыми фасками'
+        if well_data.column_additional:
+            nkt_pod = '60мм' if well_data.column_additional_diametr._value < 110 else '73мм со снятыми фасками'
 
-        nkt_diam = CreatePZ.nkt_diam
-        nkt_template = CreatePZ.nkt_template
+        nkt_diam = well_data.nkt_diam
+        nkt_template = well_data.nkt_template
 
 
-        ryber_str_EK = f'райбер {raid_type_combo}-{ryber_diam} для ЭК {CreatePZ.column_diametr._value}мм х ' \
-                       f'{CreatePZ.column_wall_thickness._value}мм +'\
-                       f' забойный двигатель {downhole_motor} + НКТ{CreatePZ.nkt_diam} 20м + репер '
+        ryber_str_EK = f'райбер {raid_type_combo}-{ryber_diam} для ЭК {well_data.column_diametr._value}мм х ' \
+                       f'{well_data.column_wall_thickness._value}мм +'\
+                       f' забойный двигатель {downhole_motor} + НКТ{well_data.nkt_diam} 20м + репер '
 
-        ryber_str_DP = f'райбер {raid_type_combo}-{ryber_diam} для ЭК {CreatePZ.column_additional_diametr._value}мм х ' \
-                f'{CreatePZ.column_additional_wall_thickness._value}мм + забойный двигатель ' \
+        ryber_str_DP = f'райбер {raid_type_combo}-{ryber_diam} для ЭК {well_data.column_additional_diametr._value}мм х ' \
+                f'{well_data.column_additional_wall_thickness._value}мм + забойный двигатель ' \
                        f'{downhole_motor} + НКТ{nkt_pod} 20м + репер + ' \
-                f'НКТ{nkt_pod} {round(CreatePZ.current_bottom - float(CreatePZ.head_column_additional._value))}м'
+                f'НКТ{nkt_pod} {round(well_data.current_bottom - float(well_data.head_column_additional._value))}м'
 
         rayber_dict = {'райбер в ЭК': ryber_str_EK, 'райбер в ДП': ryber_str_DP}
 
@@ -308,7 +318,7 @@ class Raid(MyWindow):
         if len(raiding_interval_tuple) != 0:
             krovly_raiding = int(raiding_interval_tuple[0][0])
         else:
-            krovly_raiding = CreatePZ.perforation_roof
+            krovly_raiding = well_data.perforation_roof
 
         raiding_interval = raid(raiding_interval_tuple)
         ryber_list = [
@@ -330,7 +340,7 @@ class Raid(MyWindow):
              f'Произвести райбирование ЭК в инт. {raiding_interval}м с наращиванием, с промывкой и проработкой 5 раз каждого наращивания. '
              f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа '
              f'до начала работ) Работы производить согласно сборника технологических регламентов и инструкций в присутствии'
-             f' представителя заказчика. Допустить до текущего забоя {CreatePZ.current_bottom}м.',
+             f' представителя заказчика. Допустить до текущего забоя {well_data.current_bottom}м.',
              None, None, None, None, None, None, None,
              'Мастер КРС, УСРСиСТ', 8],
             [None, None,
@@ -340,20 +350,20 @@ class Raid(MyWindow):
              f' ПРЕДУСМОТРЕТЬ КОМПЕНСАЦИЮ РЕАКТИВНОГО МОМЕНТА НА ВЕДУЩЕЙ ТРУБЕ))',
              None, None, None, None, None, None, None,
              'Мастер КРС, УСРСиСТ', None],
-            [f'Промывка уд.весом {CreatePZ.fluid_work[:6]}  в объеме {round(TemplateKrs.well_volume(self)*2,1)}м3',
+            [f'Промывка уд.весом {well_data.fluid_work[:6]}  в объеме {round(TemplateKrs.well_volume(self)*2,1)}м3',
              None,
-             f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {CreatePZ.fluid_work}  '
+             f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {well_data.fluid_work}  '
              f'в присутствии представителя заказчика в объеме {round(TemplateKrs.well_volume(self)*2,1)}м3. Составить акт.',
              None, None, None, None, None, None, None,
              'мастер КРС, предст. заказчика', well_volume_norm(TemplateKrs.well_volume(self))],
             [None, None,
-             f'Поднять  {ryber_str} на НКТ{nkt_diam}м с глубины {CreatePZ.current_bottom}м с доливом скважины в '
-             f'объеме {round(CreatePZ.current_bottom*1.12/1000, 1)}м3 тех. жидкостью  уд.весом {CreatePZ.fluid_work}',
+             f'Поднять  {ryber_str} на НКТ{nkt_diam}м с глубины {well_data.current_bottom}м с доливом скважины в '
+             f'объеме {round(well_data.current_bottom*1.12/1000, 1)}м3 тех. жидкостью  уд.весом {well_data.fluid_work}',
              None, None, None, None, None, None, None,
-             'мастер КРС', liftingNKT_norm(CreatePZ.current_bottom,1.2)]]
+             'мастер КРС', liftingNKT_norm(well_data.current_bottom,1.2)]]
 
-        # print(f' после отрайбирования {[CreatePZ.dict_perforation[plast]["отрайбировано"] for plast in CreatePZ.plast_work]}')
-        if len(CreatePZ.plast_work) == 0:
+        # print(f' после отрайбирования {[well_data.dict_perforation[plast]["отрайбировано"] for plast in well_data.plast_work]}')
+        if len(well_data.plast_work) == 0:
             acid_true_quest = QMessageBox.question(self, 'Необходимость смены объема',
                                                    'Нужно ли изменять удельный вес?')
             if acid_true_quest == QMessageBox.StandardButton.Yes:
@@ -364,22 +374,22 @@ class Raid(MyWindow):
     def raiding_sbt(self, raiding_interval_tuple):
         from work_py.template_work import TemplateKrs
         from work_py.advanted_file import raid
-        from open_pz import CreatePZ
+       
 
         ryber_diam = self.tabWidget.currentWidget().raid_diametr_line.text()
         ryber_key = self.tabWidget.currentWidget().raid_select_combo.currentText()
         raid_type_combo = self.tabWidget.currentWidget().raid_type_combo.currentText()
 
         nkt_pod = "2'3/8"
-        nkt_diam = "2'7/8" if CreatePZ.column_diametr._value > 110 else "2'3/8"
+        nkt_diam = "2'7/8" if well_data.column_diametr._value > 110 else "2'3/8"
 
-        ryber_str_EK = f'райбер {raid_type_combo}-{ryber_diam} для ЭК {CreatePZ.column_diametr._value}мм х {CreatePZ.column_wall_thickness._value}мм '
-        ryber_str_short_ek = f'райбер ФКК-{ryber_diam} для ЭК {CreatePZ.column_diametr._value}мм х {CreatePZ.column_wall_thickness._value}мм '
+        ryber_str_EK = f'райбер {raid_type_combo}-{ryber_diam} для ЭК {well_data.column_diametr._value}мм х {well_data.column_wall_thickness._value}мм '
+        ryber_str_short_ek = f'райбер ФКК-{ryber_diam} для ЭК {well_data.column_diametr._value}мм х {well_data.column_wall_thickness._value}мм '
 
-        ryber_str_DP = f'райбер {raid_type_combo}-{ryber_diam} для ЭК {CreatePZ.column_additional_diametr._value}мм х ' \
-                       f'{CreatePZ.column_additional_wall_thickness._value}мм + СБТ {nkt_pod} ' \
-                       f'{int(CreatePZ.current_bottom - CreatePZ.head_column_additional._value)}м'
-        ryber_str_short_dp = f'райбер ФКК-{ryber_diam}  + СБТ {nkt_pod} {int(CreatePZ.current_bottom - CreatePZ.head_column_additional._value)}м'
+        ryber_str_DP = f'райбер {raid_type_combo}-{ryber_diam} для ЭК {well_data.column_additional_diametr._value}мм х ' \
+                       f'{well_data.column_additional_wall_thickness._value}мм + СБТ {nkt_pod} ' \
+                       f'{int(well_data.current_bottom - well_data.head_column_additional._value)}м'
+        ryber_str_short_dp = f'райбер ФКК-{ryber_diam}  + СБТ {nkt_pod} {int(well_data.current_bottom - well_data.head_column_additional._value)}м'
 
         rayber_dict = {'райбер в ЭК': (ryber_str_EK,ryber_str_short_ek) , 'райбер в ДП': (ryber_str_DP, ryber_str_short_dp)}
 
@@ -388,7 +398,7 @@ class Raid(MyWindow):
         if len(raiding_interval_tuple) != 0:
             krovly_raiding = int(raiding_interval_tuple[0][0])
         else:
-            krovly_raiding = CreatePZ.perforation_roof
+            krovly_raiding = well_data.perforation_roof
 
         raiding_interval = raid(raiding_interval_tuple)
         ryber_list = [
@@ -400,7 +410,7 @@ class Raid(MyWindow):
              f'СПУСКА СНИЗИТЬ ДО 0,25 М/С). '
              f'ЗА 20 М ДО ЗАБОЯ СПУСК ПРОИЗВОДИТЬ С ПРОМЫВКОЙ',
              None, None, None, None, None, None, None,
-             'мастер КРС', descentNKT_norm(CreatePZ.current_bottom, 1.1)],
+             'мастер КРС', descentNKT_norm(well_data.current_bottom, 1.1)],
             [f'монтаж мех.ротора', None,
              f'Произвести монтаж мех.ротора. Собрать промывочное оборудование: вертлюг, ведущая труба (установить '
              f'вставной фильтр под ведущей трубой), '
@@ -411,7 +421,7 @@ class Raid(MyWindow):
              f'Произвести райбирование ЭК в инт. {raiding_interval}м с наращиванием, с промывкой и проработкой 5 раз каждого наращивания. '
              f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа '
              f'до начала работ) Работы производить согласно сборника технологических регламентов и инструкций в присутствии'
-             f' представителя заказчика. Допустить до текущего забоя {CreatePZ.current_bottom}м.',
+             f' представителя заказчика. Допустить до текущего забоя {well_data.current_bottom}м.',
              None, None, None, None, None, None, None,
              'Мастер КРС, УСРСиСТ', 8],
             [None, None,
@@ -420,20 +430,20 @@ class Raid(MyWindow):
              f' ПРЕДУСМОТРЕТЬ КОМПЕНСАЦИЮ РЕАКТИВНОГО МОМЕНТА НА ВЕДУЩЕЙ ТРУБЕ))',
              None, None, None, None, None, None, None,
              'Мастер КРС, УСРСиСТ', None],
-            [f'Промывка уд.весом {CreatePZ.fluid_work[:6]}  в объеме {round(TemplateKrs.well_volume(self)*2,1)}м3',
+            [f'Промывка уд.весом {well_data.fluid_work[:6]}  в объеме {round(TemplateKrs.well_volume(self)*2,1)}м3',
              None,
-             f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {CreatePZ.fluid_work}  '
+             f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {well_data.fluid_work}  '
              f'в присутствии представителя заказчика в объеме {round(TemplateKrs.well_volume(self)*2,1)}м3. Составить акт.',
              None, None, None, None, None, None, None,
              'мастер КРС, предст. заказчика', well_volume_norm(TemplateKrs.well_volume(self))],
             [None, None,
-             f'Поднять  {ryber_str} на СБТ{nkt_diam}м с глубины {CreatePZ.current_bottom}м с доливом скважины в '
-             f'объеме {round(CreatePZ.current_bottom*1.12/1000, 1)}м3 тех. жидкостью  уд.весом {CreatePZ.fluid_work}',
+             f'Поднять  {ryber_str} на СБТ{nkt_diam}м с глубины {well_data.current_bottom}м с доливом скважины в '
+             f'объеме {round(well_data.current_bottom*1.12/1000, 1)}м3 тех. жидкостью  уд.весом {well_data.fluid_work}',
              None, None, None, None, None, None, None,
-             'мастер КРС', liftingNKT_norm(CreatePZ.current_bottom,1.2)]]
+             'мастер КРС', liftingNKT_norm(well_data.current_bottom,1.2)]]
 
-        # print(f' после отрайбирования {[CreatePZ.dict_perforation[plast]["отрайбировано"] for plast in CreatePZ.plast_work]}')
-        if len(CreatePZ.plast_work) == 0:
+        # print(f' после отрайбирования {[well_data.dict_perforation[plast]["отрайбировано"] for plast in well_data.plast_work]}')
+        if len(well_data.plast_work) == 0:
             acid_true_quest = QMessageBox.question(self, 'Необходимость смены объема',
                                                    'Нужно ли изменять удельный вес?')
             if acid_true_quest == QMessageBox.StandardButton.Yes:

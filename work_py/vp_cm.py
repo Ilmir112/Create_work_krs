@@ -1,21 +1,23 @@
 from PyQt5.QtWidgets import QInputDialog
+
+import well_data
 from main import MyWindow
 from work_py.rir import RirWindow
 
 
 def vp(self):
-    from open_pz import CreatePZ
+   
     vp_1 = ['ВП', 'ГПШ', 'ВПШ']
     vp, ok = QInputDialog.getItem(self, 'Вид геофизического прибора',
                                   'Введите вид геофизического прибора:', vp_1, 0, False)
     if ok and vp:
         self.le.setText(vp)
     vp_depth, ok = QInputDialog.getInt(self, 'Глубина посадки ВП', 'Введите глубину посадки ВП',
-                                       int(CreatePZ.perforation_roof - 10), 2, int(CreatePZ.bottomhole_drill._value))
+                                       int(well_data.perforation_roof - 10), 2, int(well_data.bottomhole_drill._value))
 
     vp_depth = MyWindow.true_set_Paker(self, vp_depth)
 
-    if CreatePZ.perforation_roof > vp_depth:
+    if well_data.perforation_roof > vp_depth:
         vp_list = [
             [None, None, f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС "Ойл-сервис". '
                          f'При необходимости  подготовить место для установки партии ГИС напротив мостков. '
@@ -26,8 +28,8 @@ def vp(self):
              f'Произвести установку {vp} (ЗАДАЧА 2.9.4.) на глубине  {vp_depth}м',
              None, None, None, None, None, None, None,
              'Мастер КРС, подрядчик по ГИС', 10],
-            [f'Опрессовать эксплуатационную колонну на Р={CreatePZ.max_admissible_pressure._value}атм', None,
-             f'Опрессовать эксплуатационную колонну на Р={CreatePZ.max_admissible_pressure._value}атм в присутствии представителя заказчика '
+            [f'Опрессовать эксплуатационную колонну на Р={well_data.max_admissible_pressure._value}атм', None,
+             f'Опрессовать эксплуатационную колонну на Р={well_data.max_admissible_pressure._value}атм в присутствии представителя заказчика '
              f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ) ',
              None, None, None, None, None, None, None,
              'Мастер КРС, подрядчик РИР, УСРСиСТ', 1.2],
@@ -51,8 +53,8 @@ def vp(self):
              f'взрывные желонки).',
              None, None, None, None, None, None, None,
              'Мастер КРС, подрядчик по ГИС', None],
-            [f'Опрессовать эксплуатационную колонну на Р={CreatePZ.max_admissible_pressure._value}атм', None,
-             f'Опрессовать эксплуатационную колонну на Р={CreatePZ.max_admissible_pressure._value}атм в присутствии представителя заказчика '
+            [f'Опрессовать эксплуатационную колонну на Р={well_data.max_admissible_pressure._value}атм', None,
+             f'Опрессовать эксплуатационную колонну на Р={well_data.max_admissible_pressure._value}атм в присутствии представителя заказчика '
              f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ) ',
              None, None, None, None, None, None, None,
              'Мастер КРС, подрядчик РИР, УСРСиСТ', 1.2],
@@ -63,7 +65,7 @@ def vp(self):
              f'Определить приемистость НЭК.',
              None, None, None, None, None, None, None,
              'мастер КРС', None]]
-        CreatePZ.current_bottom = vp_depth - 3
+        well_data.current_bottom = vp_depth - 3
 
     else:
         vp_list = [
@@ -97,16 +99,16 @@ def vp(self):
 
         ]
 
-        CreatePZ.current_bottom = vp_depth-3
-    RirWindow.perf_new(self, vp_depth, CreatePZ.current_bottom)
+        well_data.current_bottom = vp_depth-3
+    RirWindow.perf_new(self, vp_depth, well_data.current_bottom)
     return vp_list
 
 
 def czh(self):
-    from open_pz import CreatePZ
+    
 
     vp_depth, ok = QInputDialog.getInt(self, 'Глубина докрепления', 'Введите глубину до крепления цем желонки ',
-                                       int(CreatePZ.current_bottom - 2), 2, int(CreatePZ.bottomhole_drill._value))
+                                       int(well_data.current_bottom - 2), 2, int(well_data.bottomhole_drill._value))
 
     vp_list = [
         [None, None, f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС "Ойл-сервис". '
@@ -133,9 +135,9 @@ def czh(self):
          f'взрывные желонки).',
          None, None, None, None, None, None, None,
          'Мастер КРС, подрядчик по ГИС', None],
-        [f'Опрессовать ЭК на Р={CreatePZ.max_admissible_pressure._value}атм',
+        [f'Опрессовать ЭК на Р={well_data.max_admissible_pressure._value}атм',
          None,
-         f'Опрессовать эксплуатационную колонну на Р={CreatePZ.max_admissible_pressure._value}атм в присутствии '
+         f'Опрессовать эксплуатационную колонну на Р={well_data.max_admissible_pressure._value}атм в присутствии '
          f'представителя заказчика Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, '
          f'с подтверждением за 2 часа до начала работ) ',
          None, None, None, None, None, None, None,
@@ -149,19 +151,19 @@ def czh(self):
          'мастер КРС', None],
     ]
     interval_list = []
-    for plast in CreatePZ.plast_work:
-        for interval in CreatePZ.dict_perforation[plast]['интервал']:
+    for plast in well_data.plast_work:
+        for interval in well_data.dict_perforation[plast]['интервал']:
             interval_list.append(interval)
 
-    if CreatePZ.leakiness:
-      # print(CreatePZ.dict_leakiness)
-        for nek in CreatePZ.dict_leakiness['НЭК']['интервал']:
+    if well_data.leakiness:
+      # print(well_data.dict_leakiness)
+        for nek in well_data.dict_leakiness['НЭК']['интервал']:
             print(nek)
-            if CreatePZ.dict_leakiness['НЭК']['интервал'][nek]['отключение'] == False:
+            if well_data.dict_leakiness['НЭК']['интервал'][nek]['отключение'] == False:
                 interval_list.append(nek)
 
     if any([float(interval[0]) < float(vp_depth) for interval in interval_list]):
         vp_list = vp_list[:3]
 
-    CreatePZ.current_bottom = vp_depth
+    well_data.current_bottom = vp_depth
     return vp_list

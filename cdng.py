@@ -1,5 +1,8 @@
+import well_data
+
+
 def events_gnvp_gnkt():
-    from open_pz import CreatePZ
+
 
     events_gnvp_gnkt = [
         [None, '1. Все операции при производстве работ выполнять в соответствии с действующими  Федеральными нормами и '
@@ -27,7 +30,7 @@ def events_gnvp_gnkt():
         [None, ' 4. Движение транспортных средств осуществлять согласно схемы маршрута передвижения специальной '
                'техники по площадке скважины в присутствии ответственного лица', None, None,
          None, None, None, None, None, None, None],
-        [None, f'5. Производить опрессовку плашек ПВО {CreatePZ.max_admissible_pressure._value}атм на максимально'
+        [None, f'5. Производить опрессовку плашек ПВО {well_data.max_admissible_pressure._value}атм на максимально'
                f' ожидаемое давление на устье + 10 % (для освоения), но не выше максимально допустимого '
                f'давления опрессовки эксплуатационной колонны с выдержкой в течении 30мин и составлением '
                f'акта на опрессовку ПВО (согласно плана мероприятий по результатам  расследования и анализа '
@@ -115,7 +118,7 @@ def events_gnvp_gnkt():
 
 
 def events_gnvp():
-    from open_pz import CreatePZ
+
 
 
     events_gnvp = [
@@ -153,7 +156,7 @@ def events_gnvp():
          None, None, None, None, None, None, None],
         [None,
          f'5. Производить опрессовку трубных  плашек ПВО с СПО тех.пакера на гл.10м на давление '
-         f'{CreatePZ.max_admissible_pressure._value}атм на максимально'
+         f'{well_data.max_admissible_pressure._value}атм на максимально'
          f' ожидаемое давление на устье + 10 % (для освоения), но не выше максимально допустимого '
          f'давления опрессовки эксплуатационной колонны с выдержкой в течении 30мин и составлением '
          f'акта на опрессовку ПВО (согласно плана мероприятий по результатам  расследования и анализа '
@@ -235,7 +238,7 @@ def events_gnvp():
                ', БКФ или ДОТ и БРИЗ) согласно ПЛА. Результаты замеров заносить в журнал КВС.',
          None, None, None, None, None, None, None, None, None],
         [None,
-         f'5. Оборудовать устье скважины согласно по схеме № {CreatePZ.kat_pvo}, утвержденной главным инженером ООО "Ойл-сервис от'
+         f'5. Оборудовать устье скважины согласно по схеме № {well_data.kat_pvo}, утвержденной главным инженером ООО "Ойл-сервис от'
          f' 14.10.2021г, согласно схемы обвязки устья скважин  на месторождениях ООО Башнефть-Добыча превенторной'
          f' установкой при капитальном, текущем ремонте, освоении для скважин, соответствующей категории по '
          f'степени опасности возникновения'
@@ -408,21 +411,21 @@ region_dict = {
 
 
 def itog_1(self):
-    from open_pz import CreatePZ
+
     itog_1 = [
-        [None, 'ИТОГО:', None, None, None, None, None, None, None, None, None, CreatePZ.normOfTime],
+        [None, 'ИТОГО:', None, None, None, None, None, None, None, None, None, well_data.normOfTime],
         [None, 'Герметизация , разгерметизация  устья  скважины', None, None, None, None, None, None, None,
-         None, None, round(CreatePZ.normOfTime / 11.5 * 11 / 60, 1)],
+         None, None, round(well_data.normOfTime / 11.5 * 11 / 60, 1)],
         [None, 'Заправка ДВС', None, None, None, None, None, None, None, None, None,
-         round(CreatePZ.normOfTime / 23 * 0.13, 1)],
+         round(well_data.normOfTime / 23 * 0.13, 1)],
         [None, 'ПЗР в начале и конце смены с заполнением вахтового журнала', None, None, None, None, None,
-         None, None, None, None, round(CreatePZ.normOfTime / 11.5 * 0.3, 1)],
+         None, None, None, None, round(well_data.normOfTime / 11.5 * 0.3, 1)],
         [None, 'Непредвиденные  работы  : ', None, None, None, None, None, None, None, None, None,
-         round(CreatePZ.normOfTime * float(CreatePZ.bottomhole_artificial._value) / 100 * 0.0004, 1)],
+         round(well_data.normOfTime * float(well_data.bottomhole_artificial._value) / 100 * 0.0004, 1)],
         [None, 'ВСЕГО  :', None, None, None, None, None, None, None, None, None, \
          round(
-             CreatePZ.normOfTime + CreatePZ.normOfTime / 11.5 * 11 / 60 + CreatePZ.normOfTime / 11.5 * 0.3 +
-             CreatePZ.normOfTime * CreatePZ.bottomhole_artificial._value / 100 * 0.0004,
+             well_data.normOfTime + well_data.normOfTime / 11.5 * 11 / 60 + well_data.normOfTime / 11.5 * 0.3 +
+             well_data.normOfTime * well_data.bottomhole_artificial._value / 100 * 0.0004,
              1)],
         [None,
          'Примечания: В соответствии с регламентом на производство КРС – заблаговременно подавать заявки на '
@@ -439,17 +442,17 @@ def itog_1(self):
          None, None, None, None, None, None, None, None]]
     # itog_1 = [
     #     [None, 'ИТОГО:', None, None, None, None, None, None, None, None, None,
-    #      f'=ROUND(SUM(L{CreatePZ.itog_ind_min + 2}:L{CreatePZ.itog_ind_max}),1)'],
+    #      f'=ROUND(SUM(L{well_data.itog_ind_min + 2}:L{well_data.itog_ind_max}),1)'],
     #     [None, 'Герметизация , разгерметизация  устья  скважины', None, None, None, None, None, None, None,
-    #      None, None, f'=ROUND(SUM(L{CreatePZ.itog_ind_min + 2}:L{CreatePZ.itog_ind_max - 1})/11.5*11/60 ,1)'],
+    #      None, None, f'=ROUND(SUM(L{well_data.itog_ind_min + 2}:L{well_data.itog_ind_max - 1})/11.5*11/60 ,1)'],
     #     [None, 'Заправка ДВС', None, None, None, None, None, None, None, None, None,
-    #      f'=ROUND(SUM(L{CreatePZ.itog_ind_min}:L{CreatePZ.itog_ind_max - 1})/11.5*0.3    ,1)'],
+    #      f'=ROUND(SUM(L{well_data.itog_ind_min}:L{well_data.itog_ind_max - 1})/11.5*0.3    ,1)'],
     #     [None, 'ПЗР в начале и конце смены с заполнением вахтового журнала', None, None, None, None, None,
-    #      None, None, None, None, f'=ROUND(SUM(L{CreatePZ.itog_ind_min}:L{CreatePZ.itog_ind_max - 1})/11.5*0.3,1)'],
+    #      None, None, None, None, f'=ROUND(SUM(L{well_data.itog_ind_min}:L{well_data.itog_ind_max - 1})/11.5*0.3,1)'],
     #     [None, 'Непредвиденные  работы  : ', None, None, None, None, None, None, None, None, None,
-    #      f'=ROUND(SUM(L{CreatePZ.itog_ind_min}:L{CreatePZ.itog_ind_max+2})*{CreatePZ.bottomhole_artificial._value}/100*0.0004 ,1)'],
+    #      f'=ROUND(SUM(L{well_data.itog_ind_min}:L{well_data.itog_ind_max+2})*{well_data.bottomhole_artificial._value}/100*0.0004 ,1)'],
     #     [None, 'ВСЕГО  :', None, None, None, None, None, None, None, None, None, \
-    #      f'=ROUND(l{CreatePZ.itog_ind_max + 1} + l{CreatePZ.itog_ind_max + 2} + l{CreatePZ.itog_ind_max + 3} + l{CreatePZ.itog_ind_max + 4} +l{CreatePZ.itog_ind_max + 5}, 1)'],
+    #      f'=ROUND(l{well_data.itog_ind_max + 1} + l{well_data.itog_ind_max + 2} + l{well_data.itog_ind_max + 3} + l{well_data.itog_ind_max + 4} +l{well_data.itog_ind_max + 5}, 1)'],
     #     [None,
     #      'Примечания: В соответствии с регламентом на производство КРС – заблаговременно подавать заявки на '
     #      'необходимое оборудование, а так же вызывать представителя Заказчика на геофизические работы, ПВР, '

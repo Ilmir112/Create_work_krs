@@ -1,7 +1,8 @@
-import openpyxl as op
+
 from datetime import datetime
 
-from cdng import region_dict, region_p, events_gnvp
+import well_data
+from cdng import region_dict
 import json
 
 
@@ -31,7 +32,7 @@ current_datetime = datetime.today()
 
 # Выбор подписантов в зависимости от региона
 def pop_down(self, region, curator_sel):
-    from open_pz import CreatePZ
+
     nach_tkrs_list = [' ', 'З.К. Алиев', 'М.К.Алиев']
     if region == 'ЧГМ' or region == 'ТГМ':
         nach_tkrs = nach_tkrs_list[0]
@@ -118,39 +119,39 @@ def pop_down(self, region, curator_sel):
 
     ved_orm_list = [None, podpis_dict[region]['ved_orm']['post'], None, None, None, None, '_______________', None, None,
                     podpis_dict[region]['ved_orm']['surname'], None, None]
-    if (region == 'ЧГМ') and CreatePZ.curator == 'ОР':
+    if (region == 'ЧГМ') and well_data.curator == 'ОР':
         podp_down.insert(13, ved_orm_list)
         podp_down.insert(14,
                          [None, None, None, None, None, None, '"___"___________', None, None, '     дата подписания',
                           None,
                           None])
-    elif (region == 'КГМ') and CreatePZ.curator == 'ОР' and CreatePZ.work_plan == 'gnkt_opz':
+    elif (region == 'КГМ') and well_data.curator == 'ОР' and well_data.work_plan == 'gnkt_opz':
 
         podp_down.insert(13, ved_orm_list)
         podp_down.insert(14,
                          [None, None, None, None, None, None, '"___"___________', None, None, '     дата подписания',
                           None,
                           None])
-    elif (region == 'КГМ') and CreatePZ.curator == 'ОР':
+    elif (region == 'КГМ') and well_data.curator == 'ОР':
 
         podp_down.insert(13, ved_gtm_list)
         podp_down.insert(14,
                          [None, None, None, None, None, None, '"___"___________', None, None, '     дата подписания',
                           None,
                           None])
-    elif region == 'КГМ' or region == 'ЧГМ' and CreatePZ.curator == 'ГТМ':
+    elif region == 'КГМ' or region == 'ЧГМ' and well_data.curator == 'ГТМ':
         podp_down.insert(13, ved_gtm_list)
         podp_down.insert(14,
                          [None, None, None, None, None, None, '"___"___________', None, None, '     дата подписания',
                           None,
                           None])
-    elif region == 'КГМ' or region == 'ЧГМ' and CreatePZ.curator == 'ГТМ':
+    elif region == 'КГМ' or region == 'ЧГМ' and well_data.curator == 'ГТМ':
         podp_down.insert(13, ved_gtm_list)
         podp_down.insert(14,
                          [None, None, None, None, None, None, '"___"___________', None, None, '     дата подписания',
                           None,
                           None])
-    if CreatePZ.curator == "ВНС":
+    if well_data.curator == "ВНС":
         podp_down.insert(6, [None, 'Менеджер ТКРС БНД', None, None, None, None, '___________________', None, None,
          'А.М. Кузьмин', None, ' '])
         podp_down.insert(7,
@@ -162,7 +163,7 @@ def pop_down(self, region, curator_sel):
 
 
 def razdel_1(self, region):
-    from open_pz import CreatePZ
+
 
     with open('podpisant.json', 'r', encoding='utf-8') as file:
         podpis_dict = json.load(file)
@@ -205,32 +206,32 @@ def razdel_1(self, region):
         [None, f'"____"_____________________{current_datetime.year}г.', None, None, None, None, None, None,
          None, None, None,
          None]]
-    cat_P_1 = CreatePZ.dict_category[CreatePZ.plast_work[0]]['по давлению'].category
+    cat_P_1 = well_data.dict_category[well_data.plast_work[0]]['по давлению'].category
 
 
-    cat_H2S_list = CreatePZ.dict_category[CreatePZ.plast_work[0]]['по сероводороду'].category
+    cat_H2S_list = well_data.dict_category[well_data.plast_work[0]]['по сероводороду'].category
 
-    cat_gaz = CreatePZ.dict_category[CreatePZ.plast_work[0]]['по газовому фактору'].category
+    cat_gaz = well_data.dict_category[well_data.plast_work[0]]['по газовому фактору'].category
     try:
-        cat_P_1_plan = CreatePZ.dict_category[CreatePZ.plast_project[0]]['по давлению'].category
-        cat_H2S_list_plan = CreatePZ.dict_category[CreatePZ.plast_project[0]]['по сероводороду'].category
-        cat_gaz_plan = CreatePZ.dict_category[CreatePZ.plast_project[0]]['по газовому фактору'].category
+        cat_P_1_plan = well_data.dict_category[well_data.plast_project[0]]['по давлению'].category
+        cat_H2S_list_plan = well_data.dict_category[well_data.plast_project[0]]['по сероводороду'].category
+        cat_gaz_plan = well_data.dict_category[well_data.plast_project[0]]['по газовому фактору'].category
     except:
         cat_P_1_plan = 3
         cat_H2S_list_plan = 3
         cat_gaz_plan = 3
 
     if 1 in [cat_P_1, cat_P_1_plan, cat_H2S_list, cat_gaz, cat_H2S_list_plan, cat_gaz_plan] or\
-            CreatePZ.curator == 'ВНС':
+            well_data.curator == 'ВНС':
         for row in range(len(podp_bvo)):
             for col in range(len(podp_bvo[row])):
                 razdel_1[row + 9][col] = podp_bvo[row][col]
     if 1 in [cat_P_1, cat_H2S_list, cat_gaz] or \
-            CreatePZ.curator == 'ВНС':
-        CreatePZ.kat_pvo = 1
-        CreatePZ.bvo = True
+            well_data.curator == 'ВНС':
+        well_data.kat_pvo = 1
+        well_data.bvo = True
 
-    if CreatePZ.grpPlan == True:
+    if well_data.grp_plan == True:
         for row in range(len(podp_grp)):
             for col in range(len(podp_grp[row])):
                 razdel_1[row + 12][col] = podp_grp[row][col]

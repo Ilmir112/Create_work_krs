@@ -1,24 +1,27 @@
 from PyQt5.QtWidgets import QInputDialog, QMessageBox
 
+import well_data
 from krs import volume_vn_ek, volume_vn_nkt
+
 from work_py.rationingKRS import descentNKT_norm
+from main import MyWindow
 from work_py.rir import RirWindow
 
 
 def claySolutionDef(self):
-    from open_pz import CreatePZ
+
     from work_py.rir import RirWindow
-    nkt_diam = ''.join(['73' if CreatePZ.column_diametr._value > 110 else '60'])
+    nkt_diam = ''.join(['73' if well_data.column_diametr._value > 110 else '60'])
 
 
     rirSole, ok = QInputDialog.getInt(None, 'Подошва глинистого раствора',
                                       'Введите глубину глинистого раствора ',
-                                      int(CreatePZ.current_bottom), 0, int(CreatePZ.bottomhole_drill._value))
+                                      int(well_data.current_bottom), 0, int(well_data.bottomhole_drill._value))
     rirRoof, ok = QInputDialog.getInt(None, 'Кровля глинистого раствора',
                                       'Введите глубину глинистого раствора',
-                                      int(CreatePZ.perforation_sole +20), 0, int(CreatePZ.bottomhole_drill._value))
-    if CreatePZ.column_additional == True and CreatePZ.column_additional_diametr._value <110:
-        dict_nkt = {73: CreatePZ.head_column_additional._value, 60: CreatePZ.head_column_additional-rirSole}
+                                      int(well_data.perforation_sole +20), 0, int(well_data.bottomhole_drill._value))
+    if well_data.column_additional == True and well_data.column_additional_diametr._value <110:
+        dict_nkt = {73: well_data.head_column_additional._value, 60: well_data.head_column_additional-rirSole}
     else:
         dict_nkt = {73: rirSole}
 
@@ -28,7 +31,7 @@ def claySolutionDef(self):
     pero_list = [
         [f'СПО {RirWindow.pero_select(self, rirSole)}  на тНКТ{nkt_diam}м до {rirSole}м', None,
          f'Спустить {RirWindow.pero_select(self, rirSole)}  на тНКТ{nkt_diam}м до глубины {rirSole}м с замером, шаблонированием '
-         f'шаблоном {CreatePZ.nkt_template}мм. \n'
+         f'шаблоном {well_data.nkt_template}мм. \n'
          f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
          None, None, None, None, None, None, None,
          'мастер КРС',descentNKT_norm(rirSole, 1)],
@@ -42,29 +45,29 @@ def claySolutionDef(self):
          f'-Продавить тех жидкостью  в объеме {volume_vn_nkt(dict_nkt)}м3.',
          None, None, None, None, None, None, None,
          'мастер КРС', 2.5]]
-    CreatePZ.current_bottom = rirRoof
+    well_data.current_bottom = rirRoof
     rirPlan_quest = QMessageBox.question(self, 'Планировать ли РИР', 'Нужно ставить "висящий" мост в колонне')
     if rirPlan_quest  == QMessageBox.StandardButton.No:
         pero_list.append([None, None,
          f'Поднять перо на тНКТ{nkt_diam}м с глубины {rirSole}м с доливом скважины в объеме 1.1м3 тех. жидкостью '
-         f'уд.весом {CreatePZ.fluid_work}',
+         f'уд.весом {well_data.fluid_work}',
          None, None, None, None, None, None, None,
          'мастер КРС', descentNKT_norm(rirRoof, 1)])
     else:
         pero_list.append([None, None,
                           f'Поднять перо на тНКТ{nkt_diam}м до глубины {rirRoof}м с доливом скважины в объеме 0.3м3 тех. жидкостью '
-                          f'уд.весом {CreatePZ.fluid_work}',
+                          f'уд.весом {well_data.fluid_work}',
                           None, None, None, None, None, None, None,
                           'мастер КРС', descentNKT_norm(float(rirSole)-float(rirRoof), 1)])
-        if (CreatePZ.plast_work) != 0:
+        if (well_data.plast_work) != 0:
             if self.rir_window is None:
 
                 self.rir_window = RirWindow()
                 self.rir_window.setGeometry(200, 400, 300, 400)
                 self.rir_window.show()
-                CreatePZ.pause_app(self)
-                CreatePZ.pause = True
-                rir_work_list = self.rir_window.addRowTable()
+                MyWindow.pause_app()
+                well_data.pause = True
+                rir_work_list = self.rir_window.addWork()
                 self.rir_window = None
             else:
                 self.rir_window.close()  # Close window.
@@ -72,13 +75,13 @@ def claySolutionDef(self):
             pero_list.extend(rir_work_list[-9:])
         else:
             if self.rir_window is None:
-                CreatePZ.countAcid = 0
+                well_data.countAcid = 0
                 print(f' окно2 СКО ')
                 self.rir_window = RirWindow()
                 self.rir_window.setGeometry(200, 400, 300, 400)
                 self.rir_window.show()
-                CreatePZ.pause_app(self)
-                CreatePZ.pause = True
+                MyWindow.pause_app()
+                well_data.pause = True
                 rir_work_list = self.rir_window.addRowTable()
 
                 self.rir_window = None

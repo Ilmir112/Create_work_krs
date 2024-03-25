@@ -1,47 +1,50 @@
 from PyQt5.QtWidgets import QInputDialog, QMessageBox
 
+import well_data
+from main import MyWindow
+
 from work_py.opressovka import OpressovkaEK
 from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm,well_volume_norm
 
 
 
 def sand_select(self):
-    from open_pz import CreatePZ
-    if CreatePZ.column_additional == False or (CreatePZ.column_additional == True and CreatePZ.current_bottom <= CreatePZ.head_column_additional._value):
-        sand_select = f'перо +  НКТ{CreatePZ.nkt_diam}мм 20м + реперный патрубок'
+   
+    if well_data.column_additional == False or (well_data.column_additional == True and well_data.current_bottom <= well_data.head_column_additional._value):
+        sand_select = f'перо +  НКТ{well_data.nkt_diam}мм 20м + реперный патрубок'
 
-    elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr._value < 110 and CreatePZ.current_bottom >= CreatePZ.head_column_additional._value:
-        sand_select = f'перо + НКТ{60}мм 20м + реперный патрубок + НКТ60мм {round(CreatePZ.current_bottom - CreatePZ.head_column_additional._value, 0)}м '
-    elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr._value > 110 and CreatePZ.current_bottom >= CreatePZ.head_column_additional._value:
-        sand_select = f'перо + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками {20}м + реперный патрубок + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками {round(CreatePZ.current_bottom - CreatePZ.head_column_additional._value, 0)}м'
+    elif well_data.column_additional == True and well_data.column_additional_diametr._value < 110 and well_data.current_bottom >= well_data.head_column_additional._value:
+        sand_select = f'перо + НКТ{60}мм 20м + реперный патрубок + НКТ60мм {round(well_data.current_bottom - well_data.head_column_additional._value, 0)}м '
+    elif well_data.column_additional == True and well_data.column_additional_diametr._value > 110 and well_data.current_bottom >= well_data.head_column_additional._value:
+        sand_select = f'перо + НКТ{well_data.nkt_diam}мм со снятыми фасками {20}м + реперный патрубок + НКТ{well_data.nkt_diam}мм со снятыми фасками {round(well_data.current_bottom - well_data.head_column_additional._value, 0)}м'
     return sand_select
 
 def sandFilling(self):
-    from open_pz import CreatePZ
+   
     from krs import well_volume, volume_vn_ek
     from work_py.rir import RirWindow
-    nkt_diam = ''.join(['73' if CreatePZ.column_diametr._value > 110 else '60'])
+    nkt_diam = ''.join(['73' if well_data.column_diametr._value > 110 else '60'])
 
 
     filling_depth, ok = QInputDialog.getInt(None, 'Отсыпка песком',
                                           'Введите кровлю необходимого песчанного моста',
-                                          int(CreatePZ.perforation_roof - 20), 0, int(CreatePZ.current_bottom))
+                                          int(well_data.perforation_roof - 20), 0, int(well_data.current_bottom))
 
 
-    sand_volume = round(volume_vn_ek(self,filling_depth) * (CreatePZ.current_bottom - filling_depth), 1)
+    sand_volume = round(volume_vn_ek(self,filling_depth) * (well_data.current_bottom - filling_depth), 1)
 
 
     filling_list = [
-        [f'Спустить  {sand_select(self)}  на НКТ{nkt_diam}м до глубины {round(CreatePZ.current_bottom-100,0)}м', None,
-     f' Спустить  {sand_select(self)}  на НКТ{nkt_diam}м до глубины {round(CreatePZ.current_bottom-100,0)}м с замером, '
-     f'шаблонированием шаблоном {CreatePZ.nkt_template}мм. (При СПО первых десяти НКТ на '
+        [f'Спустить  {sand_select(self)}  на НКТ{nkt_diam}м до глубины {round(well_data.current_bottom-100,0)}м', None,
+     f' Спустить  {sand_select(self)}  на НКТ{nkt_diam}м до глубины {round(well_data.current_bottom-100,0)}м с замером, '
+     f'шаблонированием шаблоном {well_data.nkt_template}мм. (При СПО первых десяти НКТ на '
      f'спайдере дополнительно устанавливать элеватор ЭХЛ)',
      None, None, None, None, None, None, None,
-     'Мастер КР', descentNKT_norm(CreatePZ.current_bottom,1)],
-        [f'отсыпка кварцевым песком в инт. {filling_depth} - {CreatePZ.current_bottom} в объеме {sand_volume}л',
-         None, f'Произвести отсыпку кварцевым песком в инт. {filling_depth} - {CreatePZ.current_bottom} '
+     'Мастер КР', descentNKT_norm(well_data.current_bottom,1)],
+        [f'отсыпка кварцевым песком в инт. {filling_depth} - {well_data.current_bottom} в объеме {sand_volume}л',
+         None, f'Произвести отсыпку кварцевым песком в инт. {filling_depth} - {well_data.current_bottom} '
                      f' в объеме {sand_volume}л '
-                     f'Закачать в НКТ кварцевый песок  с доводкой тех.жидкостью {CreatePZ.fluid_work}',
+                     f'Закачать в НКТ кварцевый песок  с доводкой тех.жидкостью {well_data.fluid_work}',
          None, None, None, None, None, None, None,
          'мастер КРС', 3.5],
         [f'Ожидание оседания песка 4 часа.',
@@ -71,9 +74,9 @@ def sandFilling(self):
     ]
     if OpressovkaEK.testing_pressure(self, filling_depth):
         filling_list.insert(-1,
-                            [f'Опрессовать в инт{filling_depth}-0м на Р={CreatePZ.max_admissible_pressure._value}атм',
+                            [f'Опрессовать в инт{filling_depth}-0м на Р={well_data.max_admissible_pressure._value}атм',
                              None, f'Опрессовать эксплуатационную колонну в интервале {filling_depth}-0м на'
-                                   f'Р={CreatePZ.max_admissible_pressure._value}атм'
+                                   f'Р={well_data.max_admissible_pressure._value}атм'
                      f' в течение 30 минут в присутствии представителя заказчика, составить акт. '
                      f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа'
                                    f' до начала работ)',
@@ -97,7 +100,7 @@ def sandFilling(self):
         filling_list.pop(4)
 
 
-    CreatePZ.current_bottom = filling_depth
+    well_data.current_bottom = filling_depth
     rir_true_quest = QMessageBox.question(self, 'РИР на пере',
                                           'Нужно производить заливку на данной компоновке?')
     if rir_true_quest == QMessageBox.StandardButton.Yes:
@@ -106,8 +109,8 @@ def sandFilling(self):
             self.rir_window = RirWindow()
             self.rir_window.setGeometry(200, 400, 300, 400)
             self.rir_window.show()
-            CreatePZ.pause_app(self)
-            CreatePZ.pause = True
+            MyWindow.pause_app()
+            well_data.pause = True
             rir_work_list = self.rir_window.addRowTable()
             self.rir_window = None
         else:
@@ -117,30 +120,30 @@ def sandFilling(self):
     else:
         filling_list.append([None, None,
          f'Поднять {sand_select(self)} НКТ{nkt_diam}м с глубины {filling_depth}м с доливом скважины в '
-         f'объеме {round(filling_depth * 1.12 / 1000, 1)}м3 тех. жидкостью  уд.весом {CreatePZ.fluid_work}',
+         f'объеме {round(filling_depth * 1.12 / 1000, 1)}м3 тех. жидкостью  уд.весом {well_data.fluid_work}',
          None, None, None, None, None, None, None,
          'мастер КРС', liftingNKT_norm(filling_depth, 1)])
 
     return filling_list
 
 def sandWashing(self):
-    from open_pz import CreatePZ
+   
     from krs import volume_vn_nkt
-    nkt_diam = ''.join(['73' if CreatePZ.column_diametr._value > 110 else '60'])
+    nkt_diam = ''.join(['73' if well_data.column_diametr._value > 110 else '60'])
 
 
 
     washingDepth, ok = QInputDialog.getDouble(None, 'вымыв песка',
                                                 'Введите глубину вымыва песчанного моста',
-                                                CreatePZ.current_bottom, 0, 6000, 1)
+                                                well_data.current_bottom, 0, 6000, 1)
     washingOut_list = [
-        [f'СПО пера до {round(CreatePZ.current_bottom,0)}м', None,
-     f' Спустить  {sand_select(self)}  на НКТ{nkt_diam}м до глубины {round(CreatePZ.current_bottom,0)}м с замером, '
-     f'шаблонированием шаблоном {CreatePZ.nkt_template}мм. '
+        [f'СПО пера до {round(well_data.current_bottom,0)}м', None,
+     f' Спустить  {sand_select(self)}  на НКТ{nkt_diam}м до глубины {round(well_data.current_bottom,0)}м с замером, '
+     f'шаблонированием шаблоном {well_data.nkt_template}мм. '
      f'(При СПО первых десяти НКТ на '
      f'спайдере дополнительно устанавливать элеватор ЭХЛ)',
      None, None, None, None, None, None, None,
-     'Мастер КР', descentNKT_norm(CreatePZ.current_bottom, 1)],
+     'Мастер КР', descentNKT_norm(well_data.current_bottom, 1)],
         [f'вымыв песка до {washingDepth}м',
          None, f'Произвести нормализацию забоя (вымыв кварцевого песка) с наращиванием, комбинированной  промывкой по круговой циркуляции '
                      f'жидкостью  с расходом жидкости не менее 8 л/с до гл.{washingDepth}м. \n'
@@ -149,9 +152,9 @@ def sandWashing(self):
          'мастер КРС', 3.5],
         [None, None,
          f'Поднять {sand_select(self)} НКТ{nkt_diam}м с глубины {washingDepth}м с доливом скважины в объеме {round(washingDepth * 1.12 / 1000, 1)}м3 тех. '
-         f'жидкостью  уд.весом {CreatePZ.fluid_work}',
+         f'жидкостью  уд.весом {well_data.fluid_work}',
          None, None, None, None, None, None, None,
          'мастер КРС', liftingNKT_norm(washingDepth, 1.2)]]
-    CreatePZ.current_bottom = washingDepth
+    well_data.current_bottom = washingDepth
 
     return washingOut_list

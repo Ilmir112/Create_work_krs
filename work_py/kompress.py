@@ -1,11 +1,13 @@
 from PyQt5.QtWidgets import QInputDialog
+
+import well_data
 from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm,well_volume_norm
 from work_py.template_work import TemplateKrs
 
 
 def kompress(self):
 
-    from open_pz import CreatePZ
+
 
     swab_list = ['Задача №2.1.15', 'своя задача']
     swab, ok = QInputDialog.getItem(self, 'Вид освоения', 'Введите задачу при компрессор:', swab_list, 0, False)
@@ -23,41 +25,41 @@ def kompress(self):
 
     voronka_depth, ok = QInputDialog.getInt(None, 'глубина воронки',
                                           f'Введите глубину воронки при освоении  ',
-                                          int(CreatePZ.perforation_roof - 10), 0,
-                                          int(CreatePZ.current_bottom))
+                                          int(well_data.perforation_roof - 10), 0,
+                                          int(well_data.current_bottom))
     mufta1, ok = QInputDialog.getInt(None, 'глубина муфты',
                                           f'Введите глубину первой муфты',
                                           int(voronka_depth-200), 0,
-                                          int(CreatePZ.current_bottom))
+                                          int(well_data.current_bottom))
     mufta2, ok = QInputDialog.getInt(None, 'глубина муфты',
                                  f'Введите глубину второй муфты',
                                  int(mufta1 - 200), 0,
-                                 int(CreatePZ.current_bottom))
+                                 int(well_data.current_bottom))
     mufta3, ok = QInputDialog.getInt(None, 'глубина муфты',
                                  f'Введите глубину второй муфты',
                                  int(mufta2 - 200), 0,
-                                 int(CreatePZ.current_bottom))
+                                 int(well_data.current_bottom))
 
 
-    nkt_diam = CreatePZ.nkt_diam
+    nkt_diam = well_data.nkt_diam
 
-    if CreatePZ.column_additional == False or CreatePZ.column_additional == True and voronka_depth < CreatePZ.head_column_additional._value:
+    if well_data.column_additional == False or well_data.column_additional == True and voronka_depth < well_data.head_column_additional._value:
         paker_select = f'воронку + НКТ{nkt_diam} {round(voronka_depth-mufta1)}м + ПМ с отв 3мм + НКТ{nkt_diam} {round(mufta1-mufta2)}м ' \
                        f'+ ПМ с отв 2мм НКТ{nkt_diam} {round(mufta2-mufta3)}м + ПМ с отв 2мм '
         paker_short = f'в-ку + НКТ{nkt_diam} {round(voronka_depth - mufta1)}м + ПМ с отв 3мм + НКТ{nkt_diam} {round(mufta1 - mufta2)}м ' \
                        f'+ ПМ с отв 2мм НКТ{nkt_diam} {round(mufta2 - mufta3)}м + ПМ с отв 2мм '
         dict_nkt = {73: voronka_depth}
-    elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr._value < 110 and voronka_depth > CreatePZ.head_column_additional._value:
+    elif well_data.column_additional == True and well_data.column_additional_diametr._value < 110 and voronka_depth > well_data.head_column_additional._value:
         paker_select = f'в-ку + НКТ{60} {round(voronka_depth - mufta1)}м + ПМ с отв 3мм + НКТ{nkt_diam} {round(mufta1 - mufta2)}м ' \
                        f'+ ПМ с отв 2мм НКТ{60} {round(mufta2 - mufta3)}м + ПМ с отв 2мм '
         paker_short = f'в-ку + НКТ{60} {round(voronka_depth - mufta1)}м + ПМ с отв 3мм + НКТ{nkt_diam} {round(mufta1 - mufta2)}м ' \
                        f'+ ПМ с отв 2мм НКТ{60} {round(mufta2 - mufta3)}м + ПМ с отв 2мм '
-        dict_nkt = {73: CreatePZ.head_column_additional._value, 60: int(voronka_depth - CreatePZ.head_column_additional._value)}
+        dict_nkt = {73: well_data.head_column_additional._value, 60: int(voronka_depth - well_data.head_column_additional._value)}
 
     paker_list = [
         [f'СПО {paker_short} на НКТ{nkt_diam}м  воронкой до {voronka_depth}м Пусковые муфты на глубине {mufta1}м, {mufta2}м, {mufta3}м', None,
          f'Спустить {paker_select} на НКТ{nkt_diam}м  воронкой до {voronka_depth}м'
-         f' с замером, шаблонированием шаблоном {CreatePZ.nkt_template}мм. Пусковые муфты на глубине {mufta1}м, {mufta2}м, {mufta3}м,',
+         f' с замером, шаблонированием шаблоном {well_data.nkt_template}мм. Пусковые муфты на глубине {mufta1}м, {mufta2}м, {mufta3}м,',
          None, None, None, None, None, None, None,
          'мастер КРС', round(
             descentNKT_norm(voronka_depth, 1))],
@@ -70,7 +72,7 @@ def kompress(self):
         [None, None,
          f'Произвести  монтаж ГИС согласно схемы  №8 при свабированиии утвержденной главным инженером от 14.10.2021г. '
          f'Обвязать устье скважины с ЕДК на жесткую линию. Опрессовать ПВО максимально допустимое давление опрессовки э/колонны на устье '
-         f'{CreatePZ.max_admissible_pressure._value}атм,'
+         f'{well_data.max_admissible_pressure._value}атм,'
          f' по невозможности на давление поглощения, но не менее 30атм в течении 30мин Провести практическое обучение вахт по '
          f'сигналу "выброс" с записью в журнале проведения учебных тревог',
          None, None, None, None, None, None, None,
@@ -88,7 +90,7 @@ def kompress(self):
         [f'Промывка скважины  не менее {round(TemplateKrs.well_volume(self) * 1.5, 1)}м3', None,
          f' При наличии избыточного давления: '
          f'произвести промывку скважину обратной промывкой ' \
-         f'по круговой циркуляции  жидкостью уд.весом {CreatePZ.fluid_work} при расходе жидкости не ' \
+         f'по круговой циркуляции  жидкостью уд.весом {well_data.fluid_work} при расходе жидкости не ' \
          f'менее 6-8 л/сек в объеме не менее {round(TemplateKrs.well_volume(self) * 1.5, 1)}м3 ' \
          f'в присутствии представителя заказчика ДО ЧИСТОЙ ВОДЫ.Составить акт.',
          None, None, None, None, None, None, None,
@@ -103,7 +105,7 @@ def kompress(self):
          'Мастер КРС', 0.5],
         [None, None,
          f'Поднять {paker_select} на НКТ{nkt_diam} c глубины {voronka_depth}м с доливом скважины в '
-         f'объеме {round(voronka_depth * 1.12 / 1000, 1)}м3 удельным весом {CreatePZ.fluid_work}',
+         f'объеме {round(voronka_depth * 1.12 / 1000, 1)}м3 удельным весом {well_data.fluid_work}',
          None, None, None, None, None, None, None,
          'мастер КРС',
          liftingNKT_norm(voronka_depth,1)]

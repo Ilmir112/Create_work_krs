@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QMessageBox, QWidget, QLabel, QComboBox, \
     QLineEdit, QGridLayout, QTabWidget, \
     QMainWindow, QPushButton, QApplication
 
+import well_data
 from krs import well_volume
 
 from work_py.alone_oreration import privyazkaNKT, check_h2s
@@ -32,15 +33,19 @@ class TabPage_SO_swab(QWidget):
 
         self.pakerLabel = QLabel("глубина пакера", self)
         self.pakerEdit = QLineEdit(self)
-        self.pakerEdit.setText(f"{int(CreatePZ.perforation_sole - 40)}")
+        self.pakerEdit.setText(f"{int(well_data.perforation_sole - 40)}")
 
         self.paker2Label = QLabel("глубина вверхнего пакера", self)
         self.paker2Edit = QLineEdit(self)
-        self.paker2Edit.setText(f"{int(CreatePZ.perforation_sole - 40)}")
+        self.paker2Edit.setText(f"{int(well_data.perforation_sole - 40)}")
 
         self.diametr_paker_labelType = QLabel("Диаметр пакера", self)
         self.diametr_paker_edit = QLineEdit(self)
-        paker_diametr = TabPage_SO.paker_diametr_select(self, self.pakerEdit.text())
+        paker_depth = self.pakerEdit.text()
+        print(paker_depth)
+        if paker_depth:
+            paker_diametr = TabPage_SO.paker_diametr_select(self, paker_depth)
+            print(paker_diametr)
         self.diametr_paker_edit.setText(str(paker_diametr))
 
         self.khovstLabel = QLabel("Длина хвостовики", self)
@@ -48,7 +53,7 @@ class TabPage_SO_swab(QWidget):
         self.khvostEdit.setText(str(10))
         self.khvostEdit.setClearButtonEnabled(True)
 
-        plast_work = CreatePZ.plast_work
+        plast_work = well_data.plast_work
         self.plast_label = QLabel("Выбор пласта", self)
         self.plast_combo = CheckableComboBox(self)
         self.plast_combo.combo_box.addItems(plast_work)
@@ -58,7 +63,7 @@ class TabPage_SO_swab(QWidget):
         self.swabTypeCombo = QComboBox(self)
         self.swabTypeCombo.addItems(['Задача №2.1.13', 'Задача №2.1.16', 'Задача №2.1.11',
                                      'своя задача'])
-        self.swabTypeCombo.setCurrentIndex(CreatePZ.swabTypeComboIndex)
+        self.swabTypeCombo.setCurrentIndex(well_data.swabTypeComboIndex)
         self.swabTypeCombo.setProperty('value', 'Задача №2.1.16')
 
         self.swab_volumeEditLabel = QLabel("объем освоения", self)
@@ -137,7 +142,7 @@ class TabPage_SO_swab(QWidget):
             self.diametr_paker_edit.setParent(None)
             self.pakerLabel.setText('Глубина пакера')
             self.paker2Label.setText('Глубина понижения')
-            self.paker2Edit.setText(f'{CreatePZ.current_bottom - 250}')
+            self.paker2Edit.setText(f'{well_data.current_bottom - 250}')
             self.grid.addWidget(self.paker2Label, 0, 5)
             self.grid.addWidget(self.paker2Edit, 1, 5)
 
@@ -165,12 +170,12 @@ class TabPage_SO_swab(QWidget):
             self.diametr_paker_labelType.setParent(None)
             self.diametr_paker_edit.setParent(None)
             self.paker2Label.setText('Глубина Понижения уровня')
-            self.paker2Edit.setText(f'{CreatePZ.current_bottom - 250}')
+            self.paker2Edit.setText(f'{well_data.current_bottom - 250}')
             self.grid.addWidget(self.paker2Label, 0, 3)
             self.grid.addWidget(self.paker2Edit, 1, 3)
         elif self.swabTrueEditType.currentText() == 'Опрессовка снижением уровня на пакере с заглушкой':
             self.paker2Label.setText('Глубина Понижения провня')
-            self.paker2Edit.setText(f'{CreatePZ.current_bottom - 250}')
+            self.paker2Edit.setText(f'{well_data.current_bottom - 250}')
             self.grid.addWidget(self.khovstLabel, 0, 3)
             self.grid.addWidget(self.khvostEdit, 1, 3)
             self.grid.addWidget(self.pakerLabel, 0, 4)
@@ -180,12 +185,12 @@ class TabPage_SO_swab(QWidget):
 
     def update_plast_edit(self):
 
-        dict_perforation = CreatePZ.dict_perforation
-        plasts = CreatePZ.texts
-        # print(f'пласты {plasts, len(CreatePZ.texts), len(plasts), CreatePZ.texts}')
-        roof_plast = CreatePZ.current_bottom
+        dict_perforation = well_data.dict_perforation
+        plasts = well_data.texts
+        # print(f'пласты {plasts, len(well_data.texts), len(plasts), well_data.texts}')
+        roof_plast = well_data.current_bottom
         sole_plast = 0
-        for plast in CreatePZ.plast_work:
+        for plast in well_data.plast_work:
             for plast_sel in plasts:
                 if plast_sel == plast:
 
@@ -231,7 +236,7 @@ class Swab_Window(QMainWindow):
         vbox.addWidget(self.buttonAdd, 2, 0)
 
     def addWork(self):
-        from open_pz import CreatePZ
+       
 
         diametr_paker = int(float(self.tabWidget.currentWidget().diametr_paker_edit.text()))
         paker_khost = int(float(self.tabWidget.currentWidget().khvostEdit.text()))
@@ -244,7 +249,7 @@ class Swab_Window(QMainWindow):
         paker2_depth = int(float(self.tabWidget.currentWidget().paker2Edit.text()))
 
 
-        # if int(paker_khost) + int(paker_depth) > CreatePZ.current_bottom:
+        # if int(paker_khost) + int(paker_depth) > well_data.current_bottom:
         #     mes = QMessageBox.warning(self, 'Некорректные данные', f'Компоновка НКТ c хвостовик + пакер '
         #                                                            f'ниже текущего забоя')
         #     return
@@ -266,61 +271,61 @@ class Swab_Window(QMainWindow):
         elif swabTrueEditType == 'Опрессовка снижением уровня на пакере с заглушкой':
             work_list = self.swabbing_opy_with_paker(diametr_paker, paker_khost, paker_depth, paker2_depth)
         print(work_list)
-        CreatePZ.pause = False
+        well_data.pause = False
         self.close()
         return work_list
 
     def swabbing_opy_with_paker(self, diametr_paker, paker_khost, paker_depth, depth_opy):
-        from open_pz import CreatePZ
+       
 
-        nkt_diam = ''.join(['73' if CreatePZ.column_diametr._value > 110 or (
-                CreatePZ.column_diametr._value > 110 and CreatePZ.column_additional is True \
-                and CreatePZ.head_column_additional._value < depth_opy == True) else '60'])
+        nkt_diam = ''.join(['73' if well_data.column_diametr._value > 110 or (
+                well_data.column_diametr._value > 110 and well_data.column_additional is True \
+                and well_data.head_column_additional._value < depth_opy == True) else '60'])
 
-        if CreatePZ.column_additional is False or (CreatePZ.column_additional is True and \
-                                                   paker_depth < CreatePZ.head_column_additional._value and
-                                                   CreatePZ.head_column_additional._value > 800) or \
-                (CreatePZ.column_additional_diametr._value < 110 and
-                 paker_depth > CreatePZ.head_column_additional._value):
+        if well_data.column_additional is False or (well_data.column_additional is True and \
+                                                   paker_depth < well_data.head_column_additional._value and
+                                                   well_data.head_column_additional._value > 800) or \
+                (well_data.column_additional_diametr._value < 110 and
+                 paker_depth > well_data.head_column_additional._value):
             paker_select = f'заглушка +  НКТ{nkt_diam} {paker_khost}м + пакер ' \
                            f'ПРО-ЯМО-{diametr_paker}мм (либо аналог) ' \
-                           f'для ЭК {CreatePZ.column_diametr._value}мм х {CreatePZ.column_wall_thickness._value}мм +' \
+                           f'для ЭК {well_data.column_diametr._value}мм х {well_data.column_wall_thickness._value}мм +' \
                            f' щелевой фильтр НКТ 10м'
             paker_short = f'заглушка  + НКТ{nkt_diam} {paker_khost}м + пакер ПРО-ЯМО-{diametr_paker}мм + ' \
                           f'щелевой фильтр НКТ 10м + репер'
 
             dict_nkt = {int(nkt_diam): paker_depth + paker_khost}
-        elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr._value < 110 and \
-                paker_depth > CreatePZ.head_column_additional._value:
+        elif well_data.column_additional == True and well_data.column_additional_diametr._value < 110 and \
+                paker_depth > well_data.head_column_additional._value:
             paker_select = f'заглушка + НКТ{60}мм {paker_khost}м + пакер ПРО-ЯМО-' \
                            f'{diametr_paker}мм (либо аналог) ' \
-                           f'для ЭК {CreatePZ.column_additional_diametr._value}мм х' \
-                           f' {CreatePZ.column_additional_wall_thickness._value}мм + щелевой фильтр + НКТ60мм 10м '
+                           f'для ЭК {well_data.column_additional_diametr._value}мм х' \
+                           f' {well_data.column_additional_wall_thickness._value}мм + щелевой фильтр + НКТ60мм 10м '
             paker_short = f'заглушка+ НКТ{60}мм {paker_khost}м + пакер ПРО-ЯМО-{diametr_paker}мм  + щелевой фильтр + ' \
                           f'НКТ60мм 10м '
-            dict_nkt = {int(nkt_diam): CreatePZ.head_column_additional._value, 60:
-                int(paker_depth - CreatePZ.head_column_additional._value)}
-        elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr._value > 110 \
-                and paker_depth > CreatePZ.head_column_additional._value:
-            paker_select = f'заглушка + НКТ{CreatePZ.nkt_diam}мм со' \
+            dict_nkt = {int(nkt_diam): well_data.head_column_additional._value, 60:
+                int(paker_depth - well_data.head_column_additional._value)}
+        elif well_data.column_additional == True and well_data.column_additional_diametr._value > 110 \
+                and paker_depth > well_data.head_column_additional._value:
+            paker_select = f'заглушка + НКТ{well_data.nkt_diam}мм со' \
                            f' снятыми фасками {paker_khost}м + ' \
                            f'пакер ПРО-ЯМО-{diametr_paker}мм (либо аналог) ' \
-                           f'для ЭК {CreatePZ.column_additional_diametr._value}мм х ' \
-                           f'{CreatePZ.column_additional_wall_thickness._value}мм' \
-                           f' + щелевой фильтр + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками 10м'
-            paker_short = f'заглушка + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками {paker_khost}м + ' \
-                          f'пакер ПРО-ЯМО-{diametr_paker}мм + щелевой фильтр + НКТ{CreatePZ.nkt_diam}мм ' \
+                           f'для ЭК {well_data.column_additional_diametr._value}мм х ' \
+                           f'{well_data.column_additional_wall_thickness._value}мм' \
+                           f' + щелевой фильтр + НКТ{well_data.nkt_diam}мм со снятыми фасками 10м'
+            paker_short = f'заглушка + НКТ{well_data.nkt_diam}мм со снятыми фасками {paker_khost}м + ' \
+                          f'пакер ПРО-ЯМО-{diametr_paker}мм + щелевой фильтр + НКТ{well_data.nkt_diam}мм ' \
                           f'со снятыми фасками 10м'
             dict_nkt = {int(nkt_diam): paker_depth + paker_khost}
         elif nkt_diam == 60:
             dict_nkt = {60: paker_depth + paker_khost}
 
         paker_list = [
-            [f'СПО {paker_short} на НКТ{nkt_diam}м  до глубины {CreatePZ.current_bottom}м', None,
-             f'Спустить {paker_select} на НКТ{nkt_diam}м  до глубины {CreatePZ.current_bottom}м'
-             f' с замером, шаблонированием шаблоном {CreatePZ.nkt_template}мм. ',
+            [f'СПО {paker_short} на НКТ{nkt_diam}м  до глубины {well_data.current_bottom}м', None,
+             f'Спустить {paker_select} на НКТ{nkt_diam}м  до глубины {well_data.current_bottom}м'
+             f' с замером, шаблонированием шаблоном {well_data.nkt_template}мм. ',
              None, None, None, None, None, None, None,
-             'мастер КРС', descentNKT_norm(CreatePZ.current_bottom, 1)],
+             'мастер КРС', descentNKT_norm(well_data.current_bottom, 1)],
             [f'Посадить пакер на глубину {paker_depth}м', None,
              f'Посадить пакер на глубину {paker_depth}м',
              None, None, None, None, None, None, None,
@@ -332,7 +337,7 @@ class Swab_Window(QMainWindow):
              'мастер КРС', None],
             [None, None,
              f'Произвести  монтаж СВАБа согласно схемы  №8 при свабированиии утвержденной главным инженером от 14.10.2021г. '
-             f'Обвязать устье скважины с ЕДК на жесткую линию. Опрессовать ПВО максимально допустимое давление опрессовки э/колонны на устье {CreatePZ.max_admissible_pressure._value}атм,'
+             f'Обвязать устье скважины с ЕДК на жесткую линию. Опрессовать ПВО максимально допустимое давление опрессовки э/колонны на устье {well_data.max_admissible_pressure._value}атм,'
              f' по невозможности на давление поглощения, но не менее 30атм в течении 30мин Провести практическое обучение вахт по '
              f'сигналу "выброс" с записью в журнале проведения учебных тревог',
              None, None, None, None, None, None, None,
@@ -352,27 +357,27 @@ class Swab_Window(QMainWindow):
         fluid_change_quest = QMessageBox.question(self, 'Смена объема',
                                                   'Нужна ли смена удельного веса рабочей жидкости?')
         if fluid_change_quest == QMessageBox.StandardButton.Yes:
-            CreatePZ.fluid_work, CreatePZ.fluid_work_short, plast, expected_pressure = check_h2s(self)
+            well_data.fluid_work, well_data.fluid_work_short, plast, expected_pressure = check_h2s(self)
 
             fluid_change_list = [
                 [None, None,
-                 f'Допустить до {CreatePZ.current_bottom}м. Произвести смену объема обратной '
-                 f'промывкой по круговой циркуляции  жидкостью  {CreatePZ.fluid_work} '
+                 f'Допустить до {well_data.current_bottom}м. Произвести смену объема обратной '
+                 f'промывкой по круговой циркуляции  жидкостью  {well_data.fluid_work} '
                  f'(по расчету по вскрываемому пласта {plast} Рожид- {expected_pressure}атм) в объеме не '
-                 f'менее {round(well_volume(self, CreatePZ.current_bottom), 1)}м3  в присутствии '
+                 f'менее {round(well_volume(self, well_data.current_bottom), 1)}м3  в присутствии '
                  f'представителя заказчика, Составить акт. '
                  f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 '
                  f'часа до начала работ)',
                  None, None, None, None, None, None, None,
-                 'мастер КРС', round(well_volume_norm(well_volume(self, CreatePZ.current_bottom))
-                                     + descentNKT_norm(CreatePZ.current_bottom - depth_opy - 200, 1), 1)],
+                 'мастер КРС', round(well_volume_norm(well_volume(self, well_data.current_bottom))
+                                     + descentNKT_norm(well_data.current_bottom - depth_opy - 200, 1), 1)],
                 [None, None,
-                 f'Поднять {paker_select} на НКТ{nkt_diam} c глубины {CreatePZ.current_bottom}м с '
+                 f'Поднять {paker_select} на НКТ{nkt_diam} c глубины {well_data.current_bottom}м с '
                  f'доливом скважины в '
-                 f'объеме {round((CreatePZ.current_bottom) * 1.12 / 1000, 1)}м3 удельным весом {CreatePZ.fluid_work}',
+                 f'объеме {round((well_data.current_bottom) * 1.12 / 1000, 1)}м3 удельным весом {well_data.fluid_work}',
                  None, None, None, None, None, None, None,
                  'мастер КРС',
-                 liftingNKT_norm(CreatePZ.current_bottom, 1)]
+                 liftingNKT_norm(well_data.current_bottom, 1)]
             ]
 
             for row in fluid_change_list:
@@ -380,75 +385,75 @@ class Swab_Window(QMainWindow):
         else:
             paker_list.append([None, None,
                                f'Поднять {paker_select} на НКТ{nkt_diam} c глубины {depth_opy + 200}м с доливом скважины в '
-                               f'объеме {round((depth_opy + 200) * 1.12 / 1000, 1)}м3 удельным весом {CreatePZ.fluid_work}',
+                               f'объеме {round((depth_opy + 200) * 1.12 / 1000, 1)}м3 удельным весом {well_data.fluid_work}',
                                None, None, None, None, None, None, None,
                                'мастер КРС',
                                liftingNKT_norm(depth_opy + 200, 1)])
         return paker_list
 
     def swabbing_opy(self, depth_opy):
-        from open_pz import CreatePZ
+       
         from work_py.template_work import TabPage_SO_with
-        if CreatePZ.column_additional is False or (CreatePZ.column_additional and
-                                                   CreatePZ.head_column_additional._value >= CreatePZ.current_bottom):
+        if well_data.column_additional is False or (well_data.column_additional and
+                                                   well_data.head_column_additional._value >= well_data.current_bottom):
             first_template, template_second = TabPage_SO_with.template_diam_ek(self)
         else:
             first_template, template_second = TabPage_SO_with.template_diam_additional_ek(self)
 
-        nkt_diam = ''.join(['73' if CreatePZ.column_diametr._value > 110 or (
-                CreatePZ.column_diametr._value > 110 and CreatePZ.column_additional is True \
-                and CreatePZ.head_column_additional._value < depth_opy == True) else '60'])
+        nkt_diam = ''.join(['73' if well_data.column_diametr._value > 110 or (
+                well_data.column_diametr._value > 110 and well_data.column_additional is True \
+                and well_data.head_column_additional._value < depth_opy == True) else '60'])
 
-        if CreatePZ.column_additional == False or CreatePZ.column_additional == True and \
-                CreatePZ.current_bottom < CreatePZ.head_column_additional._value and \
-                CreatePZ.head_column_additional._value > 600:
+        if well_data.column_additional == False or well_data.column_additional == True and \
+                well_data.current_bottom < well_data.head_column_additional._value and \
+                well_data.head_column_additional._value > 600:
             paker_select = f'воронку со свабоограничителем + шаблон {first_template} L-2 + НКТ{nkt_diam}  + НКТ 10м + репер'
             paker_short = f'воронку со с/о + шаблон {first_template} L-2 + НКТ{nkt_diam}  + НКТ 10м + репер'
             dict_nkt = {73: depth_opy}
-        elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr._value < 110 and \
-                CreatePZ.current_bottom >= CreatePZ.head_column_additional._value:
+        elif well_data.column_additional == True and well_data.column_additional_diametr._value < 110 and \
+                well_data.current_bottom >= well_data.head_column_additional._value:
             paker_select = f'воронку со свабоограничителем + шаблон {first_template} L-2 + НКТ60мм 10м + репер +НКТ60мм ' \
-                           f'{round(CreatePZ.current_bottom - CreatePZ.head_column_additional._value + 10, 0)}м'
+                           f'{round(well_data.current_bottom - well_data.head_column_additional._value + 10, 0)}м'
             paker_short = f'воронку со с/о + шаблон {first_template} L-2 + НКТ60мм 10м + репер +НКТ60мм'
-            dict_nkt = {73: CreatePZ.head_column_additional._value,
-                        60: int(CreatePZ.current_bottom - CreatePZ.head_column_additional._value)}
-        elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr._value > 110 and \
-                CreatePZ.current_bottom >= CreatePZ.head_column_additional._value:
-            paker_select = f'воронку со свабоограничителем + шаблон {first_template} L-2 + НКТ{CreatePZ.nkt_diam}мм ' \
+            dict_nkt = {73: well_data.head_column_additional._value,
+                        60: int(well_data.current_bottom - well_data.head_column_additional._value)}
+        elif well_data.column_additional == True and well_data.column_additional_diametr._value > 110 and \
+                well_data.current_bottom >= well_data.head_column_additional._value:
+            paker_select = f'воронку со свабоограничителем + шаблон {first_template} L-2 + НКТ{well_data.nkt_diam}мм ' \
                            f'со снятыми фасками + ' \
-                           f'НКТ{CreatePZ.nkt_diam}мм со снятыми фасками 10м ' \
-                           f'{round(CreatePZ.current_bottom - CreatePZ.head_column_additional._value + 10, 0)}м'
-            paker_short = f'в/у со c/о + шаблон {first_template} L-2 + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками + ' \
-                          f'НКТ{CreatePZ.nkt_diam}мм со снятыми фасками 10м'
+                           f'НКТ{well_data.nkt_diam}мм со снятыми фасками 10м ' \
+                           f'{round(well_data.current_bottom - well_data.head_column_additional._value + 10, 0)}м'
+            paker_short = f'в/у со c/о + шаблон {first_template} L-2 + НКТ{well_data.nkt_diam}мм со снятыми фасками + ' \
+                          f'НКТ{well_data.nkt_diam}мм со снятыми фасками 10м'
             dict_nkt = {73: depth_opy}
         elif nkt_diam == 60:
             dict_nkt = {60: depth_opy}
 
         paker_list = [
-            [f'СПО {paker_short}до глубины {CreatePZ.current_bottom}м', None,
-             f'Спустить {paker_select} на НКТ{nkt_diam}м  до глубины {CreatePZ.current_bottom}м'
-             f' с замером, шаблонированием шаблоном {CreatePZ.nkt_template}мм. ',
+            [f'СПО {paker_short}до глубины {well_data.current_bottom}м', None,
+             f'Спустить {paker_select} на НКТ{nkt_diam}м  до глубины {well_data.current_bottom}м'
+             f' с замером, шаблонированием шаблоном {well_data.nkt_template}мм. ',
              None, None, None, None, None, None, None,
-             'мастер КРС', descentNKT_norm(CreatePZ.current_bottom, 1)],
-            [f'Промыть уд.весом {CreatePZ.fluid_work} в объеме '
-             f'{round(well_volume(self, CreatePZ.current_bottom) * 1.5, 1)}м3', None,
-             f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {CreatePZ.fluid_work}  при '
+             'мастер КРС', descentNKT_norm(well_data.current_bottom, 1)],
+            [f'Промыть уд.весом {well_data.fluid_work} в объеме '
+             f'{round(well_volume(self, well_data.current_bottom) * 1.5, 1)}м3', None,
+             f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {well_data.fluid_work}  при '
              f'расходе жидкости 6-8 л/сек '
              f'в присутствии представителя Заказчика в объеме '
-             f'{round(well_volume(self, CreatePZ.current_bottom) * 1.5, 1)}м3 ПРИ ПРОМЫВКЕ НЕ ПРЕВЫШАТЬ '
-             f'ДАВЛЕНИЕ {CreatePZ.max_admissible_pressure._value}АТМ, ДОПУСТИМАЯ ОСЕВАЯ НАГРУЗКА НА ИНСТРУМЕНТ: '
+             f'{round(well_volume(self, well_data.current_bottom) * 1.5, 1)}м3 ПРИ ПРОМЫВКЕ НЕ ПРЕВЫШАТЬ '
+             f'ДАВЛЕНИЕ {well_data.max_admissible_pressure._value}АТМ, ДОПУСТИМАЯ ОСЕВАЯ НАГРУЗКА НА ИНСТРУМЕНТ: '
              f'0,5-1,0 ТН',
              None, None, None, None, None, None, None,
              'Мастер КРС, представитель ЦДНГ', 1.5],
             [None, None,
              f'При необходимости нормализовать забой обратной промывкой тех жидкостью уд.весом '
-             f'{CreatePZ.fluid_work} до глубины {CreatePZ.current_bottom}м.', None, None, None, None, None,
+             f'{well_data.fluid_work} до глубины {well_data.current_bottom}м.', None, None, None, None, None,
              None, None,
              'Мастер КРС', None],
             [f'Приподнять  воронку до глубины {depth_opy + 200}м', None,
              f'Приподнять  воронку до глубины {depth_opy + 200}м',
              None, None, None, None, None, None, None,
-             'мастер КРС', liftingNKT_norm(float(CreatePZ.current_bottom) - (depth_opy + 200), 1)],
+             'мастер КРС', liftingNKT_norm(float(well_data.current_bottom) - (depth_opy + 200), 1)],
             [None, None,
              f'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС "Ойл-сервис". '
              f' Составить акт готовности скважины и передать его начальнику партии',
@@ -457,7 +462,7 @@ class Swab_Window(QMainWindow):
             [None, None,
              f'Произвести  монтаж СВАБа согласно схемы  №8 при свабированиии утвержденной главным инженером от 14.10.2021г. '
              f'Обвязать устье скважины с ЕДК на жесткую линию. Опрессовать ПВО максимально допустимое'
-             f' давление опрессовки э/колонны на устье {CreatePZ.max_admissible_pressure._value}атм,'
+             f' давление опрессовки э/колонны на устье {well_data.max_admissible_pressure._value}атм,'
              f' по невозможности на давление поглощения, но не менее 30атм в течении 30мин Провести практическое '
              f'обучение вахт по '
              f'сигналу "выброс" с записью в журнале проведения учебных тревог',
@@ -479,27 +484,27 @@ class Swab_Window(QMainWindow):
         fluid_change_quest = QMessageBox.question(self, 'Смена объема',
                                                   'Нужна ли смена удельного веса рабочей жидкости?')
         if fluid_change_quest == QMessageBox.StandardButton.Yes:
-            CreatePZ.fluid_work, CreatePZ.fluid_work_short, plast, expected_pressure = check_h2s(self)
+            well_data.fluid_work, well_data.fluid_work_short, plast, expected_pressure = check_h2s(self)
             fluid_change_list = [
-                [f'Допустить до {CreatePZ.current_bottom}м. Произвести смену объема  {CreatePZ.fluid_work}г/см3 '
-                 f'не менее {round(well_volume(self, CreatePZ.current_bottom), 1)}м3', None,
-                 f'Допустить до {CreatePZ.current_bottom}м. Произвести смену объема обратной '
-                 f'промывкой по круговой циркуляции  жидкостью  {CreatePZ.fluid_work} '
+                [f'Допустить до {well_data.current_bottom}м. Произвести смену объема  {well_data.fluid_work}г/см3 '
+                 f'не менее {round(well_volume(self, well_data.current_bottom), 1)}м3', None,
+                 f'Допустить до {well_data.current_bottom}м. Произвести смену объема обратной '
+                 f'промывкой по круговой циркуляции  жидкостью  {well_data.fluid_work} '
                  f'(по расчету по вскрываемому пласта {plast} Рожид- {expected_pressure}атм) в объеме не '
-                 f'менее {round(well_volume(self, CreatePZ.current_bottom), 1)}м3  в присутствии '
+                 f'менее {round(well_volume(self, well_data.current_bottom), 1)}м3  в присутствии '
                  f'представителя заказчика, Составить акт. '
                  f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 '
                  f'часа до начала работ)',
                  None, None, None, None, None, None, None,
-                 'мастер КРС', round(well_volume_norm(well_volume(self, CreatePZ.current_bottom))
-                                     + descentNKT_norm(CreatePZ.current_bottom - depth_opy - 200, 1), 1)],
+                 'мастер КРС', round(well_volume_norm(well_volume(self, well_data.current_bottom))
+                                     + descentNKT_norm(well_data.current_bottom - depth_opy - 200, 1), 1)],
                 [None, None,
-                 f'Поднять {paker_select} на НКТ{nkt_diam} c глубины {CreatePZ.current_bottom}м с '
+                 f'Поднять {paker_select} на НКТ{nkt_diam} c глубины {well_data.current_bottom}м с '
                  f'доливом скважины в '
-                 f'объеме {round((CreatePZ.current_bottom) * 1.12 / 1000, 1)}м3 удельным весом {CreatePZ.fluid_work}',
+                 f'объеме {round((well_data.current_bottom) * 1.12 / 1000, 1)}м3 удельным весом {well_data.fluid_work}',
                  None, None, None, None, None, None, None,
                  'мастер КРС',
-                 liftingNKT_norm(CreatePZ.current_bottom, 1)]
+                 liftingNKT_norm(well_data.current_bottom, 1)]
             ]
 
             for row in fluid_change_list:
@@ -507,7 +512,7 @@ class Swab_Window(QMainWindow):
         else:
             paker_list.append([None, None,
                                f'Поднять {paker_select} на НКТ{nkt_diam} c глубины {depth_opy + 200}м с доливом скважины в '
-                               f'объеме {round((depth_opy + 200) * 1.12 / 1000, 1)}м3 удельным весом {CreatePZ.fluid_work}',
+                               f'объеме {round((depth_opy + 200) * 1.12 / 1000, 1)}м3 удельным весом {well_data.fluid_work}',
                                None, None, None, None, None, None, None,
                                'мастер КРС',
                                liftingNKT_norm(depth_opy + 200, 1)])
@@ -547,7 +552,7 @@ class Swab_Window(QMainWindow):
 
     def swabbing_with_paker_stub(self, diametr_paker, paker_depth, paker_khost, plast_combo, swabTypeCombo,
                                  swab_volumeEdit, depthGaugeCombo):
-        from open_pz import CreatePZ
+       
         from work_py.opressovka import OpressovkaEK, TabPage_SO
 
         swab_short, swab_select = Swab_Window.swab_select(self, swabTypeCombo, plast_combo, swab_volumeEdit)
@@ -557,42 +562,42 @@ class Swab_Window(QMainWindow):
         else:
             depthGauge = ''
 
-        nkt_diam = ''.join(['73' if CreatePZ.column_diametr._value > 110 or (
-                CreatePZ.column_diametr._value > 110 and CreatePZ.column_additional is True and
-                CreatePZ.head_column_additional._value > 800) else '60'])
+        nkt_diam = ''.join(['73' if well_data.column_diametr._value > 110 or (
+                well_data.column_diametr._value > 110 and well_data.column_additional is True and
+                well_data.head_column_additional._value > 800) else '60'])
 
-        if CreatePZ.column_additional is False or (CreatePZ.column_additional is True and \
-                                                   paker_depth < CreatePZ.head_column_additional._value and CreatePZ.head_column_additional._value > 800) or \
+        if well_data.column_additional is False or (well_data.column_additional is True and \
+                                                   paker_depth < well_data.head_column_additional._value and well_data.head_column_additional._value > 800) or \
                 (
-                        CreatePZ.column_additional_diametr._value < 110 and paker_depth > CreatePZ.head_column_additional._value):
+                        well_data.column_additional_diametr._value < 110 and paker_depth > well_data.head_column_additional._value):
             paker_select = f'заглушка + {depthGauge} НКТ{nkt_diam} {paker_khost}м + пакер ' \
                            f'ПРО-ЯМО-{diametr_paker}мм (либо аналог) ' \
-                           f'для ЭК {CreatePZ.column_diametr._value}мм х {CreatePZ.column_wall_thickness._value}мм + ' \
+                           f'для ЭК {well_data.column_diametr._value}мм х {well_data.column_wall_thickness._value}мм + ' \
                            f'щелевой фильтр + {depthGauge} НКТ 10м'
             paker_short = f'заглушка {depthGauge} + НКТ{nkt_diam} {paker_khost}м + пакер ПРО-ЯМО-{diametr_paker}мм +' \
                           f' {depthGauge} щелевой фильтр  +НКТ 10м + репер'
 
             dict_nkt = {int(nkt_diam): paker_depth + paker_khost}
-        elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr._value < 110 and \
-                paker_depth > CreatePZ.head_column_additional._value:
+        elif well_data.column_additional == True and well_data.column_additional_diametr._value < 110 and \
+                paker_depth > well_data.head_column_additional._value:
             paker_select = f'заглушка + НКТ{60}мм {paker_khost}м + пакер ПРО-ЯМО-' \
                            f'{diametr_paker}мм (либо аналог) ' \
-                           f'для ЭК {CreatePZ.column_additional_diametr._value}мм х' \
-                           f' {CreatePZ.column_additional_wall_thickness._value}мм + НКТ60мм 10м '
+                           f'для ЭК {well_data.column_additional_diametr._value}мм х' \
+                           f' {well_data.column_additional_wall_thickness._value}мм + НКТ60мм 10м '
             paker_short = f'заглушка + НКТ{60}мм {paker_khost}м + пакер ПРО-ЯМО-{diametr_paker}мм  + ' \
                           f'НКТ60мм 10м '
-            dict_nkt = {int(nkt_diam): CreatePZ.head_column_additional._value, 60:
-                int(paker_depth - CreatePZ.head_column_additional._value)}
-        elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr._value > 110 \
-                and paker_depth > CreatePZ.head_column_additional._value:
-            paker_select = f'заглушка +  НКТ{CreatePZ.nkt_diam}мм со' \
+            dict_nkt = {int(nkt_diam): well_data.head_column_additional._value, 60:
+                int(paker_depth - well_data.head_column_additional._value)}
+        elif well_data.column_additional == True and well_data.column_additional_diametr._value > 110 \
+                and paker_depth > well_data.head_column_additional._value:
+            paker_select = f'заглушка +  НКТ{well_data.nkt_diam}мм со' \
                            f' снятыми фасками {paker_khost}м + ' \
                            f'пакер ПРО-ЯМО-{diametr_paker}мм (либо аналог) ' \
-                           f'для ЭК {CreatePZ.column_additional_diametr._value}мм х ' \
-                           f'{CreatePZ.column_additional_wall_thickness._value}мм' \
-                           f' + щелевой фильтр + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками 10м'
-            paker_short = f'заглушка + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками {paker_khost}м + ' \
-                          f'пакер ПРО-ЯМО-{diametr_paker}мм + щелевой фильтр + НКТ{CreatePZ.nkt_diam}мм ' \
+                           f'для ЭК {well_data.column_additional_diametr._value}мм х ' \
+                           f'{well_data.column_additional_wall_thickness._value}мм' \
+                           f' + щелевой фильтр + НКТ{well_data.nkt_diam}мм со снятыми фасками 10м'
+            paker_short = f'заглушка + НКТ{well_data.nkt_diam}мм со снятыми фасками {paker_khost}м + ' \
+                          f'пакер ПРО-ЯМО-{diametr_paker}мм + щелевой фильтр + НКТ{well_data.nkt_diam}мм ' \
                           f'со снятыми фасками 10м'
             dict_nkt = {int(nkt_diam): paker_depth + paker_khost}
         elif nkt_diam == 60:
@@ -603,8 +608,8 @@ class Swab_Window(QMainWindow):
              None,
              f'Спустить {paker_select} на НКТ{nkt_diam}м до глубины {paker_depth}м, воронкой до'
              f' {paker_depth + paker_khost}м'
-             f' с замером, шаблонированием шаблоном {CreatePZ.nkt_template}мм.'
-             f' {("Произвести пробную посадку на глубине 50м" if CreatePZ.column_additional is False else "")} '
+             f' с замером, шаблонированием шаблоном {well_data.nkt_template}мм.'
+             f' {("Произвести пробную посадку на глубине 50м" if well_data.column_additional is False else "")} '
              f'ПРИ ОТСУТСТВИИ ЦИРКУЛЯЦИИ ПРЕДУСМОТРЕТЬ НАЛИЧИИ В КОМПОНОВКЕ УРАВНИТЕЛЬНЫХ КЛАПАНОВ',
              None, None, None, None, None, None, None,
              'мастер КРС', descentNKT_norm(paker_depth, 1.2)],
@@ -632,7 +637,7 @@ class Swab_Window(QMainWindow):
             [None, None,
              f'Произвести  монтаж СВАБа согласно схемы  №8 при свабированиии утвержденной главным инженером от 14.10.2021г.'
              f'Обвязать устье скважины с ЕДК на жесткую линию. Опрессовать ПВО на максимально допустимое '
-             f'давление на устье {CreatePZ.max_admissible_pressure._value}атм,'
+             f'давление на устье {well_data.max_admissible_pressure._value}атм,'
              f' по невозможности на давление поглощения, но не менее 30атм в течении 30мин Провести '
              f'практическое обучение вахт по '
              f'сигналу "выброс" с записью в журнале проведения учебных тревог',
@@ -652,7 +657,7 @@ class Swab_Window(QMainWindow):
              f'Произвести срыв пакера с поэтапным увеличением нагрузки на 3-4т выше веса НКТ в течении 30мин и '
              f'с выдержкой 1ч  для возврата резиновых элементов в исходное положение. При наличии избыточного давления: '
              f'произвести промывку скважину обратной промывкой ' \
-             f'по круговой циркуляции  жидкостью уд.весом {CreatePZ.fluid_work} при расходе жидкости не ' \
+             f'по круговой циркуляции  жидкостью уд.весом {well_data.fluid_work} при расходе жидкости не ' \
              f'менее 6-8 л/сек в объеме не менее {round(well_volume(self, paker_depth) * 1.5, 1)}м3 ' \
              f'в присутствии представителя заказчика ДО ЧИСТОЙ ВОДЫ.Составить акт.',
              None, None, None, None, None, None, None,
@@ -667,31 +672,31 @@ class Swab_Window(QMainWindow):
              'Мастер КРС', 0.5],
             [None, None,
              f'Поднять {paker_select} на НКТ{nkt_diam} c глубины {paker_depth}м с доливом скважины в '
-             f'объеме {round(paker_depth * 1.12 / 1000, 1)}м3 удельным весом {CreatePZ.fluid_work}',
+             f'объеме {round(paker_depth * 1.12 / 1000, 1)}м3 удельным весом {well_data.fluid_work}',
              None, None, None, None, None, None, None,
              'мастер КРС',
              liftingNKT_norm(paker_depth, 1.2)]
         ]
-        ovtr = 'ОВТР 4ч' if CreatePZ.region == 'ЧГМ' else 'ОВТР 10ч'
-        ovtr4 = 4 if CreatePZ.region == 'ЧГМ' else 10
-        if swabTypeCombo == 'Задача №2.1.13' and CreatePZ.region not in ['ИГМ', 'ТГМ']:
+        ovtr = 'ОВТР 4ч' if well_data.region == 'ЧГМ' else 'ОВТР 10ч'
+        ovtr4 = 4 if well_data.region == 'ЧГМ' else 10
+        if swabTypeCombo == 'Задача №2.1.13' and well_data.region not in ['ИГМ', 'ТГМ']:
             paker_list.insert(3, [ovtr, None, ovtr,
                                   None, None, None, None, None, None, None,
                                   'мастер КРС', ovtr4])
 
         # Добавление привязки компоновки при посадке пакера близко к интервалу перфорации
-        for plast in list(CreatePZ.dict_perforation.keys()):
-            for interval in CreatePZ.dict_perforation[plast]['интервал']:
+        for plast in list(well_data.dict_perforation.keys()):
+            for interval in well_data.dict_perforation[plast]['интервал']:
                 if abs(float(interval[1] - paker_depth)) < 10 or abs(float(interval[0] - paker_depth)) < 10:
-                    if privyazkaNKT(self) not in paker_list and CreatePZ.privyazkaSKO == 0:
-                        CreatePZ.privyazkaSKO += 1
+                    if privyazkaNKT(self) not in paker_list and well_data.privyazkaSKO == 0:
+                        well_data.privyazkaSKO += 1
                         paker_list.insert(1, privyazkaNKT(self)[0])
 
         return paker_list
 
     def swabbing_with_paker(self, diametr_paker, paker_depth, paker_khost, plast_combo, swabTypeCombo, swab_volumeEdit,
                             depthGaugeCombo):
-        from open_pz import CreatePZ
+       
         from work_py.opressovka import OpressovkaEK
 
         swab_short, swab_select = Swab_Window.swab_select(self, swabTypeCombo, plast_combo, swab_volumeEdit)
@@ -701,40 +706,40 @@ class Swab_Window(QMainWindow):
         else:
             depthGauge = ''
 
-        nkt_diam = ''.join(['73' if CreatePZ.column_diametr._value > 110 or (
-                CreatePZ.column_diametr._value > 110 and CreatePZ.column_additional is True and
-                CreatePZ.head_column_additional._value > 800) else '60'])
+        nkt_diam = ''.join(['73' if well_data.column_diametr._value > 110 or (
+                well_data.column_diametr._value > 110 and well_data.column_additional is True and
+                well_data.head_column_additional._value > 800) else '60'])
 
-        if CreatePZ.column_additional is False or (CreatePZ.column_additional is True and \
-                                                   paker_depth < CreatePZ.head_column_additional._value and CreatePZ.head_column_additional._value > 800) or \
+        if well_data.column_additional is False or (well_data.column_additional is True and \
+                                                   paker_depth < well_data.head_column_additional._value and well_data.head_column_additional._value > 800) or \
                 (
-                        CreatePZ.column_additional_diametr._value < 110 and paker_depth > CreatePZ.head_column_additional._value):
+                        well_data.column_additional_diametr._value < 110 and paker_depth > well_data.head_column_additional._value):
             paker_select = f'воронку со свабоограничителем + {depthGauge} НКТ{nkt_diam} {paker_khost}м + пакер ' \
                            f'ПРО-ЯМО-{diametr_paker}мм (либо аналог) ' \
-                           f'для ЭК {CreatePZ.column_diametr._value}мм х {CreatePZ.column_wall_thickness._value}мм + {depthGauge} НКТ 10м'
+                           f'для ЭК {well_data.column_diametr._value}мм х {well_data.column_wall_thickness._value}мм + {depthGauge} НКТ 10м'
             paker_short = f'в/ку со с/о {depthGauge} + НКТ{nkt_diam} {paker_khost}м + пакер ПРО-ЯМО-{diametr_paker}мм + {depthGauge}НКТ 10м + репер'
 
             dict_nkt = {int(nkt_diam): paker_depth + paker_khost}
-        elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr._value < 110 and \
-                paker_depth > CreatePZ.head_column_additional._value:
+        elif well_data.column_additional == True and well_data.column_additional_diametr._value < 110 and \
+                paker_depth > well_data.head_column_additional._value:
             paker_select = f'воронку со свабоограничителем+ НКТ{60}мм {paker_khost}м + пакер ПРО-ЯМО-' \
                            f'{diametr_paker}мм (либо аналог) ' \
-                           f'для ЭК {CreatePZ.column_additional_diametr._value}мм х' \
-                           f' {CreatePZ.column_additional_wall_thickness._value}мм + НКТ60мм 10м '
+                           f'для ЭК {well_data.column_additional_diametr._value}мм х' \
+                           f' {well_data.column_additional_wall_thickness._value}мм + НКТ60мм 10м '
             paker_short = f'в-ку со свабоогр.+ НКТ{60}мм {paker_khost}м + пакер ПРО-ЯМО-{diametr_paker}мм  + ' \
                           f'НКТ60мм 10м '
-            dict_nkt = {int(nkt_diam): CreatePZ.head_column_additional._value, 60:
-                int(paker_depth - CreatePZ.head_column_additional._value)}
-        elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr._value > 110 \
-                and paker_depth > CreatePZ.head_column_additional._value:
-            paker_select = f'воронку со свабоограничителем+ НКТ{CreatePZ.nkt_diam}мм со' \
+            dict_nkt = {int(nkt_diam): well_data.head_column_additional._value, 60:
+                int(paker_depth - well_data.head_column_additional._value)}
+        elif well_data.column_additional == True and well_data.column_additional_diametr._value > 110 \
+                and paker_depth > well_data.head_column_additional._value:
+            paker_select = f'воронку со свабоограничителем+ НКТ{well_data.nkt_diam}мм со' \
                            f' снятыми фасками {paker_khost}м + ' \
                            f'пакер ПРО-ЯМО-{diametr_paker}мм (либо аналог) ' \
-                           f'для ЭК {CreatePZ.column_additional_diametr._value}мм х ' \
-                           f'{CreatePZ.column_additional_wall_thickness._value}мм' \
-                           f' + НКТ{CreatePZ.nkt_diam}мм со снятыми фасками 10м'
-            paker_short = f'в-ку со свабоогр.+ НКТ{CreatePZ.nkt_diam}мм со снятыми фасками {paker_khost}м + ' \
-                          f'пакер ПРО-ЯМО-{diametr_paker}мм + НКТ{CreatePZ.nkt_diam}мм ' \
+                           f'для ЭК {well_data.column_additional_diametr._value}мм х ' \
+                           f'{well_data.column_additional_wall_thickness._value}мм' \
+                           f' + НКТ{well_data.nkt_diam}мм со снятыми фасками 10м'
+            paker_short = f'в-ку со свабоогр.+ НКТ{well_data.nkt_diam}мм со снятыми фасками {paker_khost}м + ' \
+                          f'пакер ПРО-ЯМО-{diametr_paker}мм + НКТ{well_data.nkt_diam}мм ' \
                           f'со снятыми фасками 10м'
             dict_nkt = {int(nkt_diam): paker_depth + paker_khost}
         elif nkt_diam == 60:
@@ -745,8 +750,8 @@ class Swab_Window(QMainWindow):
              None,
              f'Спустить {paker_select} на НКТ{nkt_diam}м до глубины {paker_depth}м, воронкой до'
              f' {paker_depth + paker_khost}м'
-             f' с замером, шаблонированием шаблоном {CreatePZ.nkt_template}мм.'
-             f' {("Произвести пробную посадку на глубине 50м" if CreatePZ.column_additional is False else "")} '
+             f' с замером, шаблонированием шаблоном {well_data.nkt_template}мм.'
+             f' {("Произвести пробную посадку на глубине 50м" if well_data.column_additional is False else "")} '
              f'ПРИ ОТСУТСТВИИ ЦИРКУЛЯЦИИ ПРЕДУСМОТРЕТЬ НАЛИЧИИ В КОМПОНОВКЕ УРАВНИТЕЛЬНЫХ КЛАПАНОВ',
              None, None, None, None, None, None, None,
              'мастер КРС', descentNKT_norm(paker_depth, 1.2)],
@@ -774,7 +779,7 @@ class Swab_Window(QMainWindow):
             [None, None,
              f'Произвести  монтаж СВАБа согласно схемы  №8 при свабированиии утвержденной главным инженером от 14.10.2021г.'
              f'Обвязать устье скважины с ЕДК на жесткую линию. Опрессовать ПВО на максимально допустимое '
-             f'давление на устье {CreatePZ.max_admissible_pressure._value}атм,'
+             f'давление на устье {well_data.max_admissible_pressure._value}атм,'
              f' по невозможности на давление поглощения, но не менее 30атм в течении 30мин Провести '
              f'практическое обучение вахт по '
              f'сигналу "выброс" с записью в журнале проведения учебных тревог',
@@ -794,7 +799,7 @@ class Swab_Window(QMainWindow):
              f'Произвести срыв пакера с поэтапным увеличением нагрузки на 3-4т выше веса НКТ в течении 30мин и '
              f'с выдержкой 1ч  для возврата резиновых элементов в исходное положение. При наличии избыточного давления: '
              f'произвести промывку скважину обратной промывкой ' \
-             f'по круговой циркуляции  жидкостью уд.весом {CreatePZ.fluid_work} при расходе жидкости не ' \
+             f'по круговой циркуляции  жидкостью уд.весом {well_data.fluid_work} при расходе жидкости не ' \
              f'менее 6-8 л/сек в объеме не менее {round(well_volume(self, paker_depth) * 1.5, 1)}м3 ' \
              f'в присутствии представителя заказчика ДО ЧИСТОЙ ВОДЫ.Составить акт.',
              None, None, None, None, None, None, None,
@@ -809,75 +814,75 @@ class Swab_Window(QMainWindow):
              'Мастер КРС', 0.5],
             [None, None,
              f'Поднять {paker_select} на НКТ{nkt_diam} c глубины {paker_depth}м с доливом скважины в '
-             f'объеме {round(paker_depth * 1.12 / 1000, 1)}м3 удельным весом {CreatePZ.fluid_work}',
+             f'объеме {round(paker_depth * 1.12 / 1000, 1)}м3 удельным весом {well_data.fluid_work}',
              None, None, None, None, None, None, None,
              'мастер КРС',
              liftingNKT_norm(paker_depth, 1.2)]
         ]
-        ovtr = 'ОВТР 4ч' if CreatePZ.region == 'ЧГМ' else 'ОВТР 10ч'
-        ovtr4 = 4 if CreatePZ.region == 'ЧГМ' else 10
-        if swabTypeCombo == 'Задача №2.1.13' and CreatePZ.region not in ['ИГМ', 'ТГМ']:
+        ovtr = 'ОВТР 4ч' if well_data.region == 'ЧГМ' else 'ОВТР 10ч'
+        ovtr4 = 4 if well_data.region == 'ЧГМ' else 10
+        if swabTypeCombo == 'Задача №2.1.13' and well_data.region not in ['ИГМ', 'ТГМ']:
             paker_list.insert(3, [ovtr, None, ovtr,
                                   None, None, None, None, None, None, None,
                                   'мастер КРС', ovtr4])
 
         # Добавление привязки компоновки при посадке пакера близко к интервалу перфорации
-        for plast in list(CreatePZ.dict_perforation.keys()):
-            for interval in CreatePZ.dict_perforation[plast]['интервал']:
+        for plast in list(well_data.dict_perforation.keys()):
+            for interval in well_data.dict_perforation[plast]['интервал']:
                 if abs(float(interval[1] - paker_depth)) < 10 or abs(float(interval[0] - paker_depth)) < 10:
-                    if privyazkaNKT(self) not in paker_list and CreatePZ.privyazkaSKO == 0:
-                        CreatePZ.privyazkaSKO += 1
+                    if privyazkaNKT(self) not in paker_list and well_data.privyazkaSKO == 0:
+                        well_data.privyazkaSKO += 1
                         paker_list.insert(1, privyazkaNKT(self)[0])
 
         return paker_list
 
     def swabbing_with_2paker(self, diametr_paker, paker1_depth, paker2_depth, paker_khost, plast_combo, swabTypeCombo,
                              swab_volumeEdit, depthGaugeCombo):
-        from open_pz import CreatePZ
+       
         from work_py.opressovka import OpressovkaEK
 
         swab_short, swab_select = Swab_Window.swab_select(self, swabTypeCombo, plast_combo, swab_volumeEdit)
 
-        nkt_diam = '73' if CreatePZ.column_diametr._value > 110 or (
-                CreatePZ.column_diametr._value > 110 and CreatePZ.column_additional is True and \
-                CreatePZ.head_column_additional._value > 700) else '60'
+        nkt_diam = '73' if well_data.column_diametr._value > 110 or (
+                well_data.column_diametr._value > 110 and well_data.column_additional is True and \
+                well_data.head_column_additional._value > 700) else '60'
         if depthGaugeCombo == 'Да':
             depthGauge = 'контейнер с манометром МТГ-25 + '
         else:
             depthGauge = ''
 
-        if CreatePZ.column_additional is False or CreatePZ.column_additional is True and \
-                paker1_depth < float(CreatePZ.head_column_additional._value) and \
-                float(CreatePZ.head_column_additional._value) > 600:
+        if well_data.column_additional is False or well_data.column_additional is True and \
+                paker1_depth < float(well_data.head_column_additional._value) and \
+                float(well_data.head_column_additional._value) > 600:
 
             paker_select = f'заглушка + {depthGauge} НКТ{nkt_diam} {paker_khost}м + пакер ПРО-ЯМО-{diametr_paker}мм (либо аналог) ' \
-                           f'для ЭК {CreatePZ.column_diametr._value}мм х {CreatePZ.column_wall_thickness._value}мм + щелевой фильтр + ' \
+                           f'для ЭК {well_data.column_diametr._value}мм х {well_data.column_wall_thickness._value}мм + щелевой фильтр + ' \
                            f'{depthGauge} НКТ l-{round(paker1_depth - paker2_depth, 0)} + пакер ПУ для ЭК ' \
-                           f'{CreatePZ.column_diametr._value}мм х {CreatePZ.column_wall_thickness._value}мм + {depthGauge} НКТ{nkt_diam} 20мм + репер'
+                           f'{well_data.column_diametr._value}мм х {well_data.column_wall_thickness._value}мм + {depthGauge} НКТ{nkt_diam} 20мм + репер'
             paker_short = f'заглушка + {depthGauge}НКТ{nkt_diam} {paker_khost}м + пакер ПРО-ЯМО-{diametr_paker}мм  + щелевой фильтр + {depthGauge}' \
                           f'НКТ l-{round(paker1_depth - paker2_depth, 0)} + пакер ПУ {depthGauge}  + НКТ{nkt_diam} 20мм + репер'
             dict_nkt = {73: paker1_depth + paker_khost}
-        elif CreatePZ.column_additional is True and CreatePZ.column_additional_diametr._value < 110 and paker1_depth > float(
-                CreatePZ.head_column_additional._value):
+        elif well_data.column_additional is True and well_data.column_additional_diametr._value < 110 and paker1_depth > float(
+                well_data.head_column_additional._value):
             paker_select = f'заглушка +  НКТ{60}мм {paker_khost}м + пакер ПРО-ЯМО-{diametr_paker}мм (либо аналог) ' \
-                           f'для ЭК {CreatePZ.column_diametr._value}мм х {CreatePZ.column_wall_thickness._value}мм + щелевой фильтр + ' \
+                           f'для ЭК {well_data.column_diametr._value}мм х {well_data.column_wall_thickness._value}мм + щелевой фильтр + ' \
                            f'НКТ l-{round(paker1_depth - paker2_depth, 0)} + пакер ПУ НКТ{60} 20мм + репер + НКТ60мм ' \
-                           f'{round(float(CreatePZ.head_column_additional._value) - paker2_depth, 0)}м '
+                           f'{round(float(well_data.head_column_additional._value) - paker2_depth, 0)}м '
             paker_short = f'заглушка + НКТ{60}мм {paker_khost}м + пакер ПРО-ЯМО-{diametr_paker}мм ' \
                           f' + щелевой фильтр + НКТ l-{round(paker1_depth - paker2_depth, 0)} + пакер ПУ + НКТ{60} 20мм + репер +' \
-                          f' НКТ60мм {round(float(CreatePZ.head_column_additional._value) - paker2_depth, 0)}м '
-            dict_nkt = {73: CreatePZ.head_column_additional._value,
-                        60: int(paker1_depth - CreatePZ.head_column_additional._value)}
-        elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr._value > 110 and paker1_depth > CreatePZ.head_column_additional._value:
+                          f' НКТ60мм {round(float(well_data.head_column_additional._value) - paker2_depth, 0)}м '
+            dict_nkt = {73: well_data.head_column_additional._value,
+                        60: int(paker1_depth - well_data.head_column_additional._value)}
+        elif well_data.column_additional == True and well_data.column_additional_diametr._value > 110 and paker1_depth > well_data.head_column_additional._value:
             paker_select = f'заглушка + {depthGauge}НКТ{73}мм со снятыми фасками {paker_khost}м + пакер ПРО-ЯМО-' \
-                           f'{diametr_paker}мм (либо аналог) для ЭК {CreatePZ.column_diametr._value}мм х ' \
-                           f'{CreatePZ.column_wall_thickness._value}мм + щелевой фильтр + {depthGauge}' \
+                           f'{diametr_paker}мм (либо аналог) для ЭК {well_data.column_diametr._value}мм х ' \
+                           f'{well_data.column_wall_thickness._value}мм + щелевой фильтр + {depthGauge}' \
                            f'НКТ l-{round(paker1_depth - paker2_depth, 0)} {depthGauge} + пакер ПУ  со снятыми фасками 20мм + репер + ' \
-                           f'НКТ{73}мм со снятыми фасками {round(float(CreatePZ.head_column_additional._value) - paker2_depth, 0)}м '
+                           f'НКТ{73}мм со снятыми фасками {round(float(well_data.head_column_additional._value) - paker2_depth, 0)}м '
             paker_short = f'заглушка +{depthGauge}  НКТ{73}мм со снятыми фасками {paker_khost}м + пакер ПРО-ЯМО-' \
                           f'{diametr_paker}мм + щелевой фильтр + {depthGauge}' \
                           f'НКТ l-{round(paker1_depth - paker2_depth, 0)} + пакер ПУ  со снятыми фасками 20мм + {depthGauge} + репер + ' \
-                          f'НКТ{73}мм со снятыми фасками {round(float(CreatePZ.head_column_additional._value) - paker2_depth, 0)}м '
+                          f'НКТ{73}мм со снятыми фасками {round(float(well_data.head_column_additional._value) - paker2_depth, 0)}м '
             dict_nkt = {73: paker1_depth + paker_khost}
         elif nkt_diam == 60:
             dict_nkt = {60: paker1_depth + paker_khost}
@@ -885,8 +890,8 @@ class Swab_Window(QMainWindow):
         paker_list = [
             [f'Спуск {paker_short} до глубины {paker1_depth}/{paker2_depth}м', None,
              f'Спустить {paker_select} на НКТ{nkt_diam}м до глубины {paker1_depth}/{paker2_depth}м'
-             f' с замером, шаблонированием шаблоном {CreatePZ.nkt_template}мм. '
-             f'{("Произвести пробную посадку на глубине 50м" if CreatePZ.column_additional == False else "")} '
+             f' с замером, шаблонированием шаблоном {well_data.nkt_template}мм. '
+             f'{("Произвести пробную посадку на глубине 50м" if well_data.column_additional == False else "")} '
              f'ПРИ ОТСУТСТВИИ ЦИРКУЛЯЦИИ ПРЕДУСМОТРЕТЬ НАЛИЧИИ В КОМПОНОВКЕ УРАВНИТЕЛЬНЫХ КЛАПАНОВ',
              None, None, None, None, None, None, None,
              'мастер КРС', descentNKT_norm(paker1_depth, 1.2)],
@@ -914,7 +919,7 @@ class Swab_Window(QMainWindow):
              'мастер КРС', None],
             [None, None,
              f'Произвести  монтаж СВАБа согласно схемы  №8 при свабированиии утвержденной главным инженером от 14.10.2021г. '
-             f'Обвязать устье скважины с ЕДК на жесткую линию. Опрессовать ПВО на максимально допустимое давление на устье {CreatePZ.max_admissible_pressure._value}атм,'
+             f'Обвязать устье скважины с ЕДК на жесткую линию. Опрессовать ПВО на максимально допустимое давление на устье {well_data.max_admissible_pressure._value}атм,'
              f' по невозможности на давление поглощения, но не менее 30атм в течении 30мин Провести практическое обучение вахт по '
              f'сигналу "выброс" с записью в журнале проведения учебных тревог',
              None, None, None, None, None, None, None,
@@ -934,7 +939,7 @@ class Swab_Window(QMainWindow):
              f'Произвести срыв пакера с поэтапным увеличением нагрузки на 3-4т выше веса НКТ в течении 30мин и '
              f'с выдержкой 1ч  для возврата резиновых элементов в исходное положение. При наличии избыточного давления: '
              f'произвести промывку скважину обратной промывкой ' \
-             f'по круговой циркуляции  жидкостью уд.весом {CreatePZ.fluid_work} при расходе жидкости не ' \
+             f'по круговой циркуляции  жидкостью уд.весом {well_data.fluid_work} при расходе жидкости не ' \
              f'менее 6-8 л/сек в объеме не менее {round(well_volume(self, paker1_depth) * 1.5, 1)}м3 ' \
              f'в присутствии представителя заказчика ДО ЧИСТОЙ ВОДЫ.Составить акт.',
              None, None, None, None, None, None, None,
@@ -948,51 +953,51 @@ class Swab_Window(QMainWindow):
              'Мастер КРС', 0.5],
             [None, None,
              f'Поднять {paker_select} на НКТ{nkt_diam} c глубины {paker1_depth}м с доливом скважины в '
-             f'объеме {round(paker1_depth * 1.12 / 1000, 1)}м3 удельным весом {CreatePZ.fluid_work}',
+             f'объеме {round(paker1_depth * 1.12 / 1000, 1)}м3 удельным весом {well_data.fluid_work}',
              None, None, None, None, None, None, None,
              'мастер КРС',
              liftingNKT_norm(paker1_depth, 1.2)]
         ]
 
         # Добавление привязки компоновки при посадке пакера близко к интервалу перфорации
-        for plast in list(CreatePZ.dict_perforation.keys()):
-            for interval in CreatePZ.dict_perforation[plast]['интервал']:
+        for plast in list(well_data.dict_perforation.keys()):
+            for interval in well_data.dict_perforation[plast]['интервал']:
                 if abs(float(interval[1] - paker1_depth)) < 10 or abs(float(interval[0] - paker1_depth)) < 10:
-                    if privyazkaNKT(self) not in paker_list and CreatePZ.privyazkaSKO == 0:
-                        CreatePZ.privyazkaSKO += 1
+                    if privyazkaNKT(self) not in paker_list and well_data.privyazkaSKO == 0:
+                        well_data.privyazkaSKO += 1
                         paker_list.insert(1, *privyazkaNKT(self))
 
         return paker_list
 
     def swabbing_with_voronka(self, paker_depth, plast_combo, swabTypeCombo, swab_volumeEdit, depthGaugeCombo):
-        from open_pz import CreatePZ
+       
         swab_short, swab_select = Swab_Window.swab_select(self, swabTypeCombo, plast_combo, swab_volumeEdit)
-        nkt_diam = '73' if CreatePZ.column_diametr._value > 110 or (
-                CreatePZ.column_diametr._value > 110 and CreatePZ.column_additional is True and \
-                CreatePZ.head_column_additional._value > 700) else '60'
+        nkt_diam = '73' if well_data.column_diametr._value > 110 or (
+                well_data.column_diametr._value > 110 and well_data.column_additional is True and \
+                well_data.head_column_additional._value > 700) else '60'
 
         if depthGaugeCombo == 'Да':
             depthGauge = 'контейнер с манометром МТГ-25 + '
         else:
             depthGauge = ''
 
-        if CreatePZ.column_additional is False or CreatePZ.column_additional is True and paker_depth < CreatePZ.head_column_additional._value:
+        if well_data.column_additional is False or well_data.column_additional is True and paker_depth < well_data.head_column_additional._value:
             paker_select = f'воронку + {depthGauge} свабоограничитель  НКТ{nkt_diam} +репер + НКТ 10м'
             paker_short = f'в/у + {depthGauge} со с/о НКТ{nkt_diam} +репер + НКТ 10м'
             dict_nkt = {73: paker_depth}
-        elif CreatePZ.column_additional == True and CreatePZ.column_additional_diametr._value < 110 and \
-                paker_depth > CreatePZ.head_column_additional._value:
+        elif well_data.column_additional == True and well_data.column_additional_diametr._value < 110 and \
+                paker_depth > well_data.head_column_additional._value:
             paker_select = f'воронку со свабоограничителем  + НКТ{60}мм  + НКТ60мм 10м '
-            paker_short = f'в/у + НКТ{60}мм  + НКТ60мм 10м + {round(paker_depth - CreatePZ.head_column_additional._value, 1)}м {depthGauge}'
+            paker_short = f'в/у + НКТ{60}мм  + НКТ60мм 10м + {round(paker_depth - well_data.head_column_additional._value, 1)}м {depthGauge}'
             dict_nkt = {60: paker_depth}
 
         paker_list = [
             [paker_short, None,
              f'Спустить {paker_select} на НКТ{nkt_diam}м  воронкой до {paker_depth}м'
-             f' с замером, шаблонированием шаблоном {CreatePZ.nkt_template}мм. ',
+             f' с замером, шаблонированием шаблоном {well_data.nkt_template}мм. ',
              None, None, None, None, None, None, None,
              'мастер КРС', round(
-                CreatePZ.current_bottom / 9.52 * 1.51 / 60 * 1.2 * 1.2 * 1.04 + 0.18 + 0.008 * paker_depth / 9.52 + 0.003 * CreatePZ.current_bottom / 9.52,
+                well_data.current_bottom / 9.52 * 1.51 / 60 * 1.2 * 1.2 * 1.04 + 0.18 + 0.008 * paker_depth / 9.52 + 0.003 * well_data.current_bottom / 9.52,
                 2)],
             [None, None,
              f'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС "Ойл-сервис". '
@@ -1002,7 +1007,7 @@ class Swab_Window(QMainWindow):
             [None, None,
              f'Произвести  монтаж СВАБа согласно схемы  №8 при свабированиии утвержденной главным инженером от 14.10.2021г. '
              f'Обвязать устье скважины с ЕДК на жесткую линию. Опрессовать ПВО на максимально допустимое давление на устье '
-             f'{CreatePZ.max_admissible_pressure._value}атм,'
+             f'{well_data.max_admissible_pressure._value}атм,'
              f' по невозможности на давление поглощения, но не менее 30атм в течении 30мин Провести практическое обучение вахт по '
              f'сигналу "выброс" с записью в журнале проведения учебных тревог',
              None, None, None, None, None, None, None,
@@ -1020,7 +1025,7 @@ class Swab_Window(QMainWindow):
             [f'промывка в объеме не менее {round(well_volume(self, paker_depth) * 1.5, 1)}м3', None,
              f' При наличии избыточного давления: '
              f'произвести промывку скважину обратной промывкой ' \
-             f'по круговой циркуляции  жидкостью уд.весом {CreatePZ.fluid_work} при расходе жидкости не ' \
+             f'по круговой циркуляции  жидкостью уд.весом {well_data.fluid_work} при расходе жидкости не ' \
              f'менее 6-8 л/сек в объеме не менее {round(well_volume(self, paker_depth) * 1.5, 1)}м3 ' \
              f'в присутствии представителя заказчика ДО ЧИСТОЙ ВОДЫ.Составить акт.',
              None, None, None, None, None, None, None,
@@ -1034,14 +1039,14 @@ class Swab_Window(QMainWindow):
              'Мастер КРС', 0.5],
             [None, None,
              f'Поднять {paker_select} на НКТ{nkt_diam} c глубины {paker_depth}м с доливом скважины в '
-             f'объеме {round(paker_depth * 1.12 / 1000, 1)}м3 удельным весом {CreatePZ.fluid_work}',
+             f'объеме {round(paker_depth * 1.12 / 1000, 1)}м3 удельным весом {well_data.fluid_work}',
              None, None, None, None, None, None, None,
              'мастер КРС',
              liftingNKT_norm(paker_depth, 1)]
         ]
-        ovtr = 'ОВТР 4ч' if CreatePZ.region == 'ЧГМ' else 'ОВТР 10ч'
-        ovtr4 = 4 if CreatePZ.region == 'ЧГМ' else 10
-        if swabTypeCombo == 'Задача №2.1.13' and CreatePZ.region not in ['ИГМ']:
+        ovtr = 'ОВТР 4ч' if well_data.region == 'ЧГМ' else 'ОВТР 10ч'
+        ovtr4 = 4 if well_data.region == 'ЧГМ' else 10
+        if swabTypeCombo == 'Задача №2.1.13' and well_data.region not in ['ИГМ']:
             paker_list.insert(1, [ovtr, None, ovtr,
                                   None, None, None, None, None, None, None,
                                   'мастер КРС', ovtr4])

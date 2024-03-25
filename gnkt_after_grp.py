@@ -1,12 +1,10 @@
 from PyQt5.QtWidgets import QInputDialog, QMessageBox
 
+import well_data
 from krs import calc_work_fluid
 
 
 def gnkt_work(self):
-    from open_pz import CreatePZ
-    import H2S
-
 
     V_gntk = round(2327 * 0.74 / 1000, 1)
 
@@ -14,7 +12,7 @@ def gnkt_work(self):
                                                                             'рабочей жидкости', 1.02, 0.87, 2, 2)
 
 
-    fluid_work, CreatePZ.fluid_work_short = calc_work_fluid(self, self.work_plan)
+    fluid_work, well_data.fluid_work_short = calc_work_fluid(self, self.work_plan)
 
     gnkt_opz =[
      [None, None, 'Порядок работы', None, None, None, None, None, None, None, None, None],
@@ -77,10 +75,10 @@ def gnkt_work(self):
         None, None, None, None, None, None, None,
             'Мастер ГНКТ', 2],
     [None, 13, f'При закрытой центральной задвижке фондовой арматуры опрессовать ГНКТ и все '
-               f'нагнетательные линии на {round(CreatePZ.max_admissible_pressure*1.5,1)}атм. '
+               f'нагнетательные линии на {round(well_data.max_admissible_pressure*1.5,1)}атм. '
                f'Опрессовать ПВО, обратные клапана и выкидную линию от '
                f'устья скважины до желобной ёмкости (надёжно закрепить, оборудовать дроссельными задвижками) '
-               f'опрессовать на {CreatePZ.max_admissible_pressure._value}атм с выдержкой 30мин. '
+               f'опрессовать на {well_data.max_admissible_pressure._value}атм с выдержкой 30мин. '
                f'Опрессовку ПВО зафиксировать в вахтовом журнале. Установить на малом и большом затрубе '
                f'технологический манометр. Провести УТЗ и инструктаж. Опрессовку проводить в присутствии мастера, '
                f'бурильщика, машиниста подъемника и представителя супервайзерской службы. Получить разрешение на '
@@ -99,14 +97,14 @@ def gnkt_work(self):
                f'подъём до получения посадки с целью определения глубины "головы" проппанта.',
         None, None, None, None, None, None, None,
             'Мастер ГНКТ, ', 4.5],
-    [None, 23, f'ВНИМАНИЕ: При получении посадки до гл. {CreatePZ.depth_fond_paker_do["do"]}м и наличии разгрузки на промывочный '
+    [None, 23, f'ВНИМАНИЕ: При получении посадки до гл. {well_data.depth_fond_paker_do["do"]}м и наличии разгрузки на промывочный '
                f'инструмент более 500кг  (уведомить Заказчика – '
                f'составить АКТ на посадку). Приподнять КНК-1 на 20м выше глубины посадки. '
                f'Произвести вывод НКА на рабочий режим, восстановить '
                f'устойчивую циркуляцию промывочной жидкости (расход 180-190л/мин), '
-               f'произвести промывку лифта НКТ до гл.{CreatePZ.depth_fond_paker_do["do"]}м с постоянным контролем промывочной жидкости '
+               f'произвести промывку лифта НКТ до гл.{well_data.depth_fond_paker_do["do"]}м с постоянным контролем промывочной жидкости '
                f'в обратной ёмкости на наличие мех. примесей. Скорость спуска при промывке НКТ от проппанта до '
-               f'гл.{CreatePZ.depth_fond_paker_do["do"]}м не более 5м/мин. Контрольная проверка веса при вымыве проппанта - '
+               f'гл.{well_data.depth_fond_paker_do["do"]}м не более 5м/мин. Контрольная проверка веса при вымыве проппанта - '
                f'через каждые 100м промывки на высоту не менее 5-10м со скоростью подъёма ГНКТ при проверке веса не '
                f'более 5м/мин. Внимание: после промывки НКТ до гл.2087м приподнять ГТ на 20м выше '
                f'пакера и '
@@ -115,7 +113,7 @@ def gnkt_work(self):
     [None, 24, f'НОРМАЛИЗАЦИЯ ЗАБОЯ СКВАЖИНЫ',
         None, None, None, None, None, None, None,
             'Мастер ГНКТ,', None],
-    [None, 25, f'После отбивки текущего забоя (головы проппанта) произвести подъем КНК -1 до гл.{CreatePZ.depth_fond_paker_do["do"]-20}м.',
+    [None, 25, f'После отбивки текущего забоя (головы проппанта) произвести подъем КНК -1 до гл.{well_data.depth_fond_paker_do["do"]-20}м.',
         None, None, None, None, None, None, None,
             'Мастер ГНКТ' , 12.5],
     [None, 26, f'Произвести запуск и вывести Азотный комплекс и НКА на рабочий режим. Получить стабильную круговую циркуляцию '
@@ -140,11 +138,11 @@ def gnkt_work(self):
         'Мастер ГНКТ', None],
     [None, 28, 'Произвести допуск компоновки с промывкой со скоростью 2 м/мин, с проверкой веса '
                f'на подъём со скоростью не более 3 м/мин через каждые 10-20м интервала промывки '
-               f'до глубины {CreatePZ.current_bottom}м. В случае отсутствия проходки, '
+               f'до глубины {well_data.current_bottom}м. В случае отсутствия проходки, '
                f'согласовать максимально достигнутый забой с Заказчиком.',
      None, None, None, None, None, None, None,
      'Мастер ГНКТ, состав бригады', 0.7],
-    [None, 29, f'При достижении глубины {CreatePZ.current_bottom}м произвести прокачку гелевой пачки в V=2-3м3, '
+    [None, 29, f'При достижении глубины {well_data.current_bottom}м произвести прокачку гелевой пачки в V=2-3м3, '
                f'промыть скважину в течении 120мин до выхода чистой, без посторонних примесей, '
                f'промывочной жидкости.',
      None, None, None, None, None, None, None,
@@ -152,7 +150,7 @@ def gnkt_work(self):
     [None, 29, f'ПОДТВЕРЖДЕНИЕ НОРМАЛИЗОВАННОГО ЗАБОЯ',
      None, None, None, None, None, None, None,
      None, None],
-    [None, 29, f'Приподнять КНК-1 на ГНКТ не прекращая циркуляции до гл.{CreatePZ.depth_fond_paker_do["do"]-20}м. '
+    [None, 29, f'Приподнять КНК-1 на ГНКТ не прекращая циркуляции до гл.{well_data.depth_fond_paker_do["do"]-20}м. '
                f'Убедиться в отсутствии мех. примесей в промывочной жидкости, остановить подачу '
                f'жидкости НКА и ПАУ.',
      None, None, None, None, None, None, None,
@@ -161,20 +159,20 @@ def gnkt_work(self):
      None, None, None, None, None, None, None,
      'Мастер ГНКТ', 2],
     [None, 29, f'По истечении 2х часов, произвести допуск КНК-1 на г/трубе в скважину '
-               f'«без циркуляции» до гл. {CreatePZ.current_bottom}м. '
+               f'«без циркуляции» до гл. {well_data.current_bottom}м. '
                f'Забой должен соответствовать ранее нормализованному. Составить АКТ на забой совмесно '
-               f'с представителем Заказчика. При отсутствии нормализованного забоя на гл.{CreatePZ.current_bottom}м, '
+               f'с представителем Заказчика. При отсутствии нормализованного забоя на гл.{well_data.current_bottom}м, '
                f'по согласованию с Заказчиком, провести работы по нормализации забоя.',
      None, None, None, None, None, None, None,
      'Мастер ГНКТ', 0.5],
     [None, 29, f'ОСВОЕНИЕ СКВАЖИНЫ',
      None, None, None, None, None, None, None,
      None, None],
-    [None, 29, f'Установить КНК-1 на гл.{CreatePZ.depth_fond_paker_do["do"]-20}м, произвести вывод на '
+    [None, 29, f'Установить КНК-1 на гл.{well_data.depth_fond_paker_do["do"]-20}м, произвести вывод на '
                f'режим мобильного азотного комплекса. Дождаться выхода пузыря азота. '
                f'В случае отсутствия выхода пузыря азота более 1-1.5 часа - начать постепенный приподъём ГНКТ, не '
                f'прекращая отдувки, до выхода пузыря азота. После получения прорыва азота и выхода пузыря - '
-               f'произвести допуск ГНКТ с одновременной отдувкой азотом до гл. {CreatePZ.current_bottom}м',
+               f'произвести допуск ГНКТ с одновременной отдувкой азотом до гл. {well_data.current_bottom}м',
      None, None, None, None, None, None, None,
      'Мастер ГНКТ', 1],
     [None, 29, f'Произвести освоение скважины один цикл в течении 4х часов с расходом по азоту в процессе освоения: \n'
@@ -204,21 +202,21 @@ def gnkt_work(self):
          None, None, None, None, None, None, None,
          'Мастер ГНКТ', 2],
         [None, 29, f'По истечении 2х часов, произвести допуск КНК-1 на г/трубе в скважину '
-                   f'«без циркуляции» до гл. {CreatePZ.current_bottom}м.'
-                   f' Забой должен соответствовать – {CreatePZ.current_bottom}м. '
+                   f'«без циркуляции» до гл. {well_data.current_bottom}м.'
+                   f' Забой должен соответствовать – {well_data.current_bottom}м. '
                    f'Составить АКТ на забой совмесно с представителем Заказчика. '
-                   f'При отсутствии нормализованного забоя на гл. {CreatePZ.current_bottom}м '
+                   f'При отсутствии нормализованного забоя на гл. {well_data.current_bottom}м '
                    f'(по согласованию с Заказчиком) - провести работы по нормализации забоя.',
          None, None, None, None, None, None, None,
          'Мастер ГНКТ', 0.5],
-        [None, 29, f'При наличии забоя на гл.{CreatePZ.current_bottom}м, '
+        [None, 29, f'При наличии забоя на гл.{well_data.current_bottom}м, '
                    f'по согласованию с Заказчиком: ',
          None, None, None, None, None, None, None,
          'Мастер ГНКТ', None],
         [None, 29, f'Произвести замер избыточного давления в течении 2ч при условии заполнения '
                    f'ствола ствола жидкостью уд.весом {fluid_work}г/см3. Произвести перерасчет '
                    f'забойного давления, Согласовать с заказчиком глушение скважин и необходимый '
-                   f'удельный вес жидкости глушения, допустить КНК до {CreatePZ.current_bottom}м ',
+                   f'удельный вес жидкости глушения, допустить КНК до {well_data.current_bottom}м ',
          None, None, None, None, None, None, None,
          'Мастер ГНКТ', 2.5],
         [None, 29, f'ГЛУШЕНИЕ СКВАЖИНЫ',
@@ -325,22 +323,22 @@ def gnkt_work(self):
         [None, 29, f'Ограничения веса и скоростей при СПО:',
          None, None, None, None, None, None, None,
          'Мастер ГНКТ', None],
-        [None, 29, f'Максимальный расчётный вес ГНКТ при подъёме с забоя – {round(CreatePZ.current_bottom*2.2*1.1,0)}кг; '
-                   f'при спуске – {round(CreatePZ.current_bottom*2.2*0.9,0)}кг.; в неподвижном состоянии - {round(CreatePZ.current_bottom*2.2,0)}кг.',
+        [None, 29, f'Максимальный расчётный вес ГНКТ при подъёме с забоя – {round(well_data.current_bottom*2.2*1.1,0)}кг; '
+                   f'при спуске – {round(well_data.current_bottom*2.2*0.9,0)}кг.; в неподвижном состоянии - {round(well_data.current_bottom*2.2,0)}кг.',
          None, None, None, None, None, None, None,
          'Мастер ГНКТ', None],
         [None, 29, f'Скорость спуска по интервалам:\n'
                    f'в устьевом оборудовании не более 0.5м/мин;\n'
-                   f'в интервале 2 -{CreatePZ.depth_fond_paker_do["do"]-20}м не более 10-15м/мин (первичный-последующий спуск);\n'
-                   f'в интервале {CreatePZ.depth_fond_paker_do["do"]-20}-{CreatePZ.perforation_roof-10}м не более 2м/мин;\n'
-                   f'в интервале {CreatePZ.perforation_roof-10}-{CreatePZ.perforation_sole+10}м не более 10 м/мин;\n'
-                   f'в интервале {CreatePZ.perforation_sole+10}-{CreatePZ.current_bottom}м не более 2-5 м/мин;',
+                   f'в интервале 2 -{well_data.depth_fond_paker_do["do"]-20}м не более 10-15м/мин (первичный-последующий спуск);\n'
+                   f'в интервале {well_data.depth_fond_paker_do["do"]-20}-{well_data.perforation_roof-10}м не более 2м/мин;\n'
+                   f'в интервале {well_data.perforation_roof-10}-{well_data.perforation_sole+10}м не более 10 м/мин;\n'
+                   f'в интервале {well_data.perforation_sole+10}-{well_data.current_bottom}м не более 2-5 м/мин;',
          None, None, None, None, None, None, None,
          'Мастер ГНКТ', None],
         [None, 29, f'Скорость подъёма по интервалам:\n'
-                   f'в интервале забой-{CreatePZ.perforation_sole+10}м не более 10 м/мин;\n'
-                   f'в интервале {CreatePZ.perforation_sole+10}-{CreatePZ.perforation_roof-10} не более 2 м/мин;\n'
-                   f'в интервале {CreatePZ.depth_fond_paker_do["do"]-20}-2м не более 15-20 м/мин;\n'
+                   f'в интервале забой-{well_data.perforation_sole+10}м не более 10 м/мин;\n'
+                   f'в интервале {well_data.perforation_sole+10}-{well_data.perforation_roof-10} не более 2 м/мин;\n'
+                   f'в интервале {well_data.depth_fond_paker_do["do"]-20}-2м не более 15-20 м/мин;\n'
                    f'в устьевом оборудовании не более 0.5 м/мин.',
          None, None, None, None, None, None, None,
          'Мастер ГНКТ', None],
@@ -366,10 +364,10 @@ def gnkt_work(self):
     return gnkt_opz
 
 def calc_volume_jumping(self):
-    from open_pz import CreatePZ
+
     from krs import volume_vn_ek, volume_vn_nkt
-    volume = round((volume_vn_ek(self,CreatePZ.current_bottom) *
-                    (CreatePZ.current_bottom - CreatePZ.depth_fond_paker_do["do"])/1000 +
-                    volume_vn_nkt(CreatePZ.dict_nkt) *
-                                  CreatePZ.depth_fond_paker_do["do"]/1000)*1.2, 1)
+    volume = round((volume_vn_ek(self,well_data.current_bottom) *
+                    (well_data.current_bottom - well_data.depth_fond_paker_do["do"])/1000 +
+                    volume_vn_nkt(well_data.dict_nkt) *
+                                  well_data.depth_fond_paker_do["do"]/1000)*1.2, 1)
     return volume

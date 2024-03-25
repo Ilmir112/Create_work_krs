@@ -1,19 +1,22 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QCheckBox, QPushButton, QDialog
 
+import well_data
+
+
 class CheckBoxDialog(QDialog):
 
     def __init__(self):
         super().__init__()
-        from open_pz import CreatePZ
+
 
         layout = QVBoxLayout()
         n = 1
-        for plast in CreatePZ.plast_work:
+        for plast in well_data.plast_work:
             self.plast = QCheckBox(plast)
             layout.addWidget(self.plast)
-        if CreatePZ.leakiness:
-            for nek in list(CreatePZ.dict_leakiness['НЭК']['интервал'].keys()):
+        if well_data.leakiness:
+            for nek in list(well_data.dict_leakiness['НЭК']['интервал'].keys()):
                 self.plast = QCheckBox(f'НЭК {nek}')
                 layout.addWidget(self.plast)
 
@@ -25,16 +28,16 @@ class CheckBoxDialog(QDialog):
         self.setLayout(layout)
 
     def handle_button_click(self):
-        from open_pz import CreatePZ
-        CreatePZ.plast_select = ''
+
+        well_data.plast_select = ''
         selected_options = []
-        print(f' рабочие пласты {CreatePZ.plast_work}')
-        for plast in CreatePZ.plast_work:
+        print(f' рабочие пласты {well_data.plast_work}')
+        for plast in well_data.plast_work:
             if self.plast.isChecked():
                 if self.plast.text() not in selected_options:
                     selected_options.append(self.plast.text())
 
-        for plast in CreatePZ.plast_project:
+        for plast in well_data.plast_project:
             if self.plast.isChecked():
                 if self.plast.text() not in selected_options:
                     selected_options.append(self.plast.text())
@@ -42,7 +45,7 @@ class CheckBoxDialog(QDialog):
         print("Selected options:", selected_options)
         plast_select = ', '.join(selected_options)
         self.close()
-        return CreatePZ.plast_select
+        return well_data.plast_select
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

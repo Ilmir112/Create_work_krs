@@ -12,7 +12,7 @@ from openpyxl import load_workbook
 class Classifier_well(QMainWindow):
     number_well = None
     def __init__(self,  costumer, region, classifier_well, parent=None):
-        from open_pz import CreatePZ
+       
         super(Classifier_well, self).__init__()
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
@@ -20,8 +20,8 @@ class Classifier_well(QMainWindow):
         self.region = region
         self.costumer = costumer
         self.number_well = None
-        if CreatePZ.well_number:
-            self.number_well = CreatePZ.well_number._value
+        if well_data.well_number:
+            self.number_well = well_data.well_number._value
 
 
         self.setCentralWidget(self.table_class)

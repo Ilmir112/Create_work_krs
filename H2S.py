@@ -3,18 +3,19 @@ from openpyxl.styles import Border, Side, PatternFill, Font, GradientFill, Align
 from openpyxl.utils.cell import get_column_letter
 
 import H2S
+import well_data
 
 
 def calc_H2S(ws3, H2S_pr, H2S_mg):
-    from open_pz import CreatePZ
 
-    # print(CreatePZ.dict_nkt)
-    nkt_1 = list(CreatePZ.dict_nkt.keys())[0]
-    nkt_1_l = CreatePZ.dict_nkt[nkt_1]
+
+    # print(well_data.dict_nkt)
+    nkt_1 = list(well_data.dict_nkt.keys())[0]
+    nkt_1_l = well_data.dict_nkt[nkt_1]
 
     try:
-        nkt_2 = list(CreatePZ.dict_nkt.keys())[1]
-        nkt_2_l = CreatePZ.dict_nkt[nkt_2]
+        nkt_2 = list(well_data.dict_nkt.keys())[1]
+        nkt_2_l = well_data.dict_nkt[nkt_2]
     except:
         nkt_2 = 0
         nkt_2_l = 0
@@ -22,34 +23,34 @@ def calc_H2S(ws3, H2S_pr, H2S_mg):
 
 
     def gno_volume():
-        nkt_l = sum(list(CreatePZ.dict_nkt.values()))
+        nkt_l = sum(list(well_data.dict_nkt.values()))
         # print(nkt_l)
-        if CreatePZ.column_additional == True:
+        if well_data.column_additional == True:
 
-            gno_well = 3.14*(CreatePZ.column_diametr-CreatePZ.column_wall_thickness._value *2)**2/4/1000*(CreatePZ.bottom-float(CreatePZ.head_column_additional._value))/1000/10
+            gno_well = 3.14*(well_data.column_diametr-well_data.column_wall_thickness._value *2)**2/4/1000*(well_data.bottom-float(well_data.head_column_additional._value))/1000/10
         else:
-            if nkt_l < CreatePZ.shoe_column._value:
-                gno_well = (3.14*(CreatePZ.column_diametr-CreatePZ.column_wall_thickness._value *2)**2/4/1000*(CreatePZ.bottom- float(CreatePZ.head_column_additional._value))/1000)+(3.14*(CreatePZ.column_diametr-CreatePZ.column_wall_thickness._value *2)**2/4/1000*(CreatePZ.shoe_column-nkt_l)/1000)
+            if nkt_l < well_data.shoe_column._value:
+                gno_well = (3.14*(well_data.column_diametr-well_data.column_wall_thickness._value *2)**2/4/1000*(well_data.bottom- float(well_data.head_column_additional._value))/1000)+(3.14*(well_data.column_diametr-well_data.column_wall_thickness._value *2)**2/4/1000*(well_data.shoe_column-nkt_l)/1000)
             else:
-                gno_well = 3.14*(CreatePZ.column_additional_diametr._value -CreatePZ.column_additional_wall_thickness._value *2)**2/4/1000*(CreatePZ.bottom-nkt_1_l)/10000
+                gno_well = 3.14*(well_data.column_additional_diametr._value -well_data.column_additional_wall_thickness._value *2)**2/4/1000*(well_data.bottom-nkt_1_l)/10000
 
         return gno_well
 
 
     try:
-        nkt_3 = list(CreatePZ.dict_nkt.keys())[2]
+        nkt_3 = list(well_data.dict_nkt.keys())[2]
     except:
         nkt_3 = 0
     try:
-        sucker_rod_l_25 = CreatePZ.dict_sucker_rod['25']
+        sucker_rod_l_25 = well_data.dict_sucker_rod['25']
     except:
         sucker_rod_l_25 = 0
     try:
-        sucker_rod_l_22 = CreatePZ.dict_sucker_rod['22']
+        sucker_rod_l_22 = well_data.dict_sucker_rod['22']
     except:
         sucker_rod_l_22 = 0
     try:
-        sucker_rod_l_19 = CreatePZ.dict_sucker_rod['19']
+        sucker_rod_l_19 = well_data.dict_sucker_rod['19']
     except:
         sucker_rod_l_19 = 0
 
@@ -60,20 +61,20 @@ def calc_H2S(ws3, H2S_pr, H2S_mg):
         [None, 'Объем раствора глушения - по объему скважины от устья до забоя', None, None, None, None],
         [None, None, None, None, None, None],
         [None, '№', 'Параметр', None, 'Результат расчета', None],
-        [None, 1, 'Параметры скважины', None, f'{CreatePZ.well_number} {CreatePZ.well_area}', None],
-        [None, 1.1, 'Забой скважины', 'м', round(float(CreatePZ.bottomhole_artificial._value), 1), 'формула'],
-        [None, 1.2, 'текущий забой', 'м', round(float(CreatePZ.bottom),1), 'ввод'],
-        [None, 1.3, 'Диаметр ЭК (ступень 1 верхняя)', 'мм', int(CreatePZ.column_diametr._value), 'ввод'],
-            [None, '1.3.1.', 'Толщина стенки ЭК (ступень 1 верхняя)', 'мм', round(float(CreatePZ.column_wall_thickness._value), 1), 'ввод'],
-        [None, '1.3.2.', 'Длина подвески ЭК (ступень 1 верхняя)', 'м', int(CreatePZ.shoe_column._value), 'ввод'],
-        [None, '1.3.3.', 'Диаметр ЭК (ступень 2 хвостовик)', 'мм', int(CreatePZ.column_additional_diametr._value), 'ввод'],
-        [None, '1.3.4.', 'Толщина стенки ЭК (ступень 2 хвостовик)', 'м', float(CreatePZ.column_additional_wall_thickness._value),
+        [None, 1, 'Параметры скважины', None, f'{well_data.well_number} {well_data.well_area}', None],
+        [None, 1.1, 'Забой скважины', 'м', round(float(well_data.bottomhole_artificial._value), 1), 'формула'],
+        [None, 1.2, 'текущий забой', 'м', round(float(well_data.bottom),1), 'ввод'],
+        [None, 1.3, 'Диаметр ЭК (ступень 1 верхняя)', 'мм', int(well_data.column_diametr._value), 'ввод'],
+            [None, '1.3.1.', 'Толщина стенки ЭК (ступень 1 верхняя)', 'мм', round(float(well_data.column_wall_thickness._value), 1), 'ввод'],
+        [None, '1.3.2.', 'Длина подвески ЭК (ступень 1 верхняя)', 'м', int(well_data.shoe_column._value), 'ввод'],
+        [None, '1.3.3.', 'Диаметр ЭК (ступень 2 хвостовик)', 'мм', int(well_data.column_additional_diametr._value), 'ввод'],
+        [None, '1.3.4.', 'Толщина стенки ЭК (ступень 2 хвостовик)', 'м', float(well_data.column_additional_wall_thickness._value),
          'ввод'],
         [None, '1.3.5.', 'Длина подвески ЭК (ступень 2 хвостовик)', 'м',
-         abs(int(CreatePZ.head_column_additional._value) - int(CreatePZ.shoe_column_additional._value)), 'ввод'],
-        [None, '1.3.6.', 'Глубина "головы" (ступень 2 хвостовик)', 'м', int(CreatePZ.head_column_additional._value), 'ввод',
+         abs(int(well_data.head_column_additional._value) - int(well_data.shoe_column_additional._value)), 'ввод'],
+        [None, '1.3.6.', 'Глубина "головы" (ступень 2 хвостовик)', 'м', int(well_data.head_column_additional._value), 'ввод',
          ],
-        [None, '1.3.7.', 'Глубина "башмака" (ступень 2 хвостовик)', 'м', int(CreatePZ.shoe_column_additional._value),
+        [None, '1.3.7.', 'Глубина "башмака" (ступень 2 хвостовик)', 'м', int(well_data.shoe_column_additional._value),
          'формула'],
         [None, None, None, None, None, None],
         [None, 2, 'Параметры ГНО', None, None, None, None],
@@ -105,10 +106,10 @@ def calc_H2S(ws3, H2S_pr, H2S_mg):
          'формула'],
         [None, None, None, None, None, None],
         [None, 4, 'Параметры добываемой жидкости и газа', None, None, None, None],
-        [None, 4.1, 'Газосодержание нефти', 'м3/тонну', CreatePZ.gaz_f_pr[0], 'ввод'],
-        [None, 4.2, 'Содержание сероводорода в газе (по данным проекта разработки)', '% (об)', CreatePZ.H2S_pr[0], 'ввод'],
-        [None, 4.3, 'Обводенность продукции', '% (масс.)',CreatePZ.proc_water, 'ввод'],
-        [None, 4.4, 'Содержание сероводорода в пластовом флюиде (устьевая проба, вода+нефть)', 'мг/дм3', CreatePZ.H2S_mg[0], 'ввод'],
+        [None, 4.1, 'Газосодержание нефти', 'м3/тонну', well_data.gaz_f_pr[0], 'ввод'],
+        [None, 4.2, 'Содержание сероводорода в газе (по данным проекта разработки)', '% (об)', well_data.H2S_pr[0], 'ввод'],
+        [None, 4.3, 'Обводенность продукции', '% (масс.)',well_data.proc_water, 'ввод'],
+        [None, 4.4, 'Содержание сероводорода в пластовом флюиде (устьевая проба, вода+нефть)', 'мг/дм3', well_data.H2S_mg[0], 'ввод'],
         [None, 4.5, 'Плотность воды', 'г/см3', 1.17, 'ввод'],
         [None, 4.6, 'Плотность нефти', 'г/см3', 0.9, 'ввод'],
         [None, None, None, None, None, None],
@@ -180,49 +181,49 @@ def calc_H2S(ws3, H2S_pr, H2S_mg):
     ws3.page_setup.fitToWidth = True
     ws3.print_area = 'A1:F77'
 def well_volume(self):
-    from open_pz import CreatePZ
-    # print(CreatePZ.column_additional)
-    if CreatePZ.column_additional == False:
 
-        volume_well = 3.14 * (CreatePZ.column_diametr._value - CreatePZ.column_wall_thickness._value * 2) ** 2 / 4 / 1000000 * (
-            CreatePZ.bottomhole_artificial._value)
+    # print(well_data.column_additional)
+    if well_data.column_additional == False:
+
+        volume_well = 3.14 * (well_data.column_diametr._value - well_data.column_wall_thickness._value * 2) ** 2 / 4 / 1000000 * (
+            well_data.bottomhole_artificial._value)
         return volume_well
     else:
 
-        volume_well = (3.14 * (CreatePZ.column_additional_diametr._value - CreatePZ.column_wall_thickness._value * 2) ** 2 / 4 / 1000 * (
-                CreatePZ.bottomhole_artificial._value - float(CreatePZ.head_column_additional._value)) / 1000) + (
-                                  3.14 * (CreatePZ.column_diametr._value - CreatePZ.column_wall_thickness._value * 2) ** 2 / 4 / 1000 * (
-                              float(CreatePZ.head_column_additional._value)) / 1000)
+        volume_well = (3.14 * (well_data.column_additional_diametr._value - well_data.column_wall_thickness._value * 2) ** 2 / 4 / 1000 * (
+                well_data.bottomhole_artificial._value - float(well_data.head_column_additional._value)) / 1000) + (
+                                  3.14 * (well_data.column_diametr._value - well_data.column_wall_thickness._value * 2) ** 2 / 4 / 1000 * (
+                              float(well_data.head_column_additional._value)) / 1000)
         return volume_well
 def calv_h2s(self, cat_H2S, H2S_mg, H2S_pr):
 
-    from open_pz import CreatePZ
+
     if '2' == str(cat_H2S) or '1' in str(cat_H2S):
-        nkt_l = sum(list(CreatePZ.dict_nkt.values()))
+        nkt_l = sum(list(well_data.dict_nkt.values()))
 
-        udel_vnutr_v = 10 *3.14 *((CreatePZ.column_diametr._value - CreatePZ.column_wall_thickness._value *2)*0.01)**2/4
-        if CreatePZ.column_additional == True:
-            udel_vn__khv = 10 *3.14 *((CreatePZ.column_additional_diametr._value - CreatePZ.column_additional_wall_thickness._value *2)*0.01)**2/4
+        udel_vnutr_v = 10 *3.14 *((well_data.column_diametr._value - well_data.column_wall_thickness._value *2)*0.01)**2/4
+        if well_data.column_additional == True:
+            udel_vn__khv = 10 *3.14 *((well_data.column_additional_diametr._value - well_data.column_additional_wall_thickness._value *2)*0.01)**2/4
         # print(f'ff{udel_vn__khv}')
-        # print(f' НКТ{CreatePZ.column_diametr._value}2 {nkt_l, CreatePZ.head_column_additional._value}88{CreatePZ.column_diametr, CreatePZ.column_wall_thickness._value}0{CreatePZ.head_column_additional._value, CreatePZ.bottomhole_artificial._value}')
-        if CreatePZ.column_additional == False:
+        # print(f' НКТ{well_data.column_diametr._value}2 {nkt_l, well_data.head_column_additional._value}88{well_data.column_diametr, well_data.column_wall_thickness._value}0{well_data.head_column_additional._value, well_data.bottomhole_artificial._value}')
+        if well_data.column_additional == False:
 
-            v_pod_gno = 3.14 * (int(CreatePZ.column_diametr._value) - int(CreatePZ.column_wall_thickness._value)*2)**2/4/1000*(CreatePZ.bottomhole_artificial._value -int(nkt_l))/1000
-        elif nkt_l > float(CreatePZ.head_column_additional._value):
-            v_pod_gno = 3.14 * (CreatePZ.column_diametr._value - CreatePZ.column_wall_thickness._value *2)**2/4/1000 * (float(CreatePZ.head_column_additional._value)-nkt_l)/1000+ 3.14*(CreatePZ.column_additional_diametr._value - CreatePZ.column_additional_wall_thickness._value *2)**2/4/1000*(CreatePZ.bottomhole_artificial._value -float(CreatePZ.head_column_additional._value))/1000
-        elif nkt_l < float(CreatePZ.head_column_additional._value):
-            v_pod_gno = 3.14 *(CreatePZ.column_additional_diametr._value -CreatePZ.column_additional_wall_thickness._value *2)**2/4/1000 * (CreatePZ.bottomhole_artificial._value -nkt_l)/1000
+            v_pod_gno = 3.14 * (int(well_data.column_diametr._value) - int(well_data.column_wall_thickness._value)*2)**2/4/1000*(well_data.bottomhole_artificial._value -int(nkt_l))/1000
+        elif nkt_l > float(well_data.head_column_additional._value):
+            v_pod_gno = 3.14 * (well_data.column_diametr._value - well_data.column_wall_thickness._value *2)**2/4/1000 * (float(well_data.head_column_additional._value)-nkt_l)/1000+ 3.14*(well_data.column_additional_diametr._value - well_data.column_additional_wall_thickness._value *2)**2/4/1000*(well_data.bottomhole_artificial._value -float(well_data.head_column_additional._value))/1000
+        elif nkt_l < float(well_data.head_column_additional._value):
+            v_pod_gno = 3.14 *(well_data.column_additional_diametr._value -well_data.column_additional_wall_thickness._value *2)**2/4/1000 * (well_data.bottomhole_artificial._value -nkt_l)/1000
         # print(f'под ГНО{v_pod_gno}')
         volume_well =  H2S.well_volume(self)
 
-        nkt_1 = int(list(CreatePZ.dict_nkt.keys())[0])
+        nkt_1 = int(list(well_data.dict_nkt.keys())[0])
 
 
 
         try:
-            # print(list(CreatePZ.dict_nkt.keys()))
-            nkt_2 = int(list(CreatePZ.dict_nkt.keys())[1])
-            nkt_2_l = CreatePZ.dict_nkt[nkt_2]
+            # print(list(well_data.dict_nkt.keys()))
+            nkt_2 = int(list(well_data.dict_nkt.keys())[1])
+            nkt_2_l = well_data.dict_nkt[nkt_2]
         except:
             nkt_2 = 0
             nkt_2_l = 0
@@ -237,37 +238,37 @@ def calv_h2s(self, cat_H2S, H2S_mg, H2S_pr):
         except:
             udel_vodoiz_nkt= udel_vodoiz_nkt
             # print(f'dnjhfzНКТ {udel_vodoiz_nkt}')
-        nkt_1_l = CreatePZ.dict_nkt[str(nkt_1)]
+        nkt_1_l = well_data.dict_nkt[str(nkt_1)]
         vodoiz_nkt = nkt_1_l *udel_vodoiz_nkt/1000
         try:
             vodoiz_nkt += nkt_2_l*udel_vodoiz_nkt_2/1000
         except:
             vodoiz_nkt = vodoiz_nkt
         try:
-            sucker_rod_l_25 = CreatePZ.dict_sucker_rod['25']
+            sucker_rod_l_25 = well_data.dict_sucker_rod['25']
         except:
             sucker_rod_l_25 = 0
         try:
-            sucker_rod_l_22 = CreatePZ.dict_sucker_rod['22']
+            sucker_rod_l_22 = well_data.dict_sucker_rod['22']
         except:
             sucker_rod_l_22 = 0
         try:
-            sucker_rod_l_19 = CreatePZ.dict_sucker_rod["19"]
+            sucker_rod_l_19 = well_data.dict_sucker_rod["19"]
         except:
             sucker_rod_l_19 = 0
 
         vodoiz_sucker = (10 * 3.14 *((25*0.01)**2/4)*sucker_rod_l_25/1000) + (10 * 3.14 *((25*0.01)**2/4)*sucker_rod_l_22/1000) + (10 * 3.14 *((25*0.01)**2/4)*sucker_rod_l_19/1000)
 
-        oil_mass = float(v_pod_gno*(100 - CreatePZ.proc_water) * 0.9/100)
-        # print(f'oil {oil_mass}-{type(oil_mass)} , {CreatePZ.gaz_f_pr[0]}-{type(CreatePZ.gaz_f_pr[0])}')
-        volume_h2s = CreatePZ.gaz_f_pr[0] * oil_mass * (float(H2S_pr))/100
+        oil_mass = float(v_pod_gno*(100 - well_data.proc_water) * 0.9/100)
+        # print(f'oil {oil_mass}-{type(oil_mass)} , {well_data.gaz_f_pr[0]}-{type(well_data.gaz_f_pr[0])}')
+        volume_h2s = well_data.gaz_f_pr[0] * oil_mass * (float(H2S_pr))/100
 
         h2s_mass_in_oil = (34*volume_h2s*1000/22.14)
         # print(type(vodoiz_sucker), type(vodoiz_nkt), H2S_mg, float(H2S_mg))
         h2s_mass_in_water = float(vodoiz_sucker + vodoiz_nkt) * H2S_mg
         # print(f'h2a{h2s_mass_in_water}')
-        mass_oil_pog_gno = (vodoiz_sucker+vodoiz_nkt) * (100-CreatePZ.proc_water)*0.9/100
-        h2s_volume_pod_gno = mass_oil_pog_gno* CreatePZ.gaz_f_pr[0]*H2S_pr/100
+        mass_oil_pog_gno = (vodoiz_sucker+vodoiz_nkt) * (100-well_data.proc_water)*0.9/100
+        h2s_volume_pod_gno = mass_oil_pog_gno* well_data.gaz_f_pr[0]*H2S_pr/100
         mass_h2s_gas = 34*h2s_volume_pod_gno/22.14
         mass_h2s_water = v_pod_gno*H2S_mg
         # print(f'mass{mass_h2s_water}')
