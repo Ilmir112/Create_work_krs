@@ -145,13 +145,13 @@ class TabWidget(QTabWidget):
 
 
 class OpressovkaEK(QMainWindow):
-    def __init__(self, table_widget, forRirTrue=False, parent=None):
+    def __init__(self, ins_ind, table_widget, forRirTrue=False, parent=None):
         super().__init__(parent)
 
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
         self.table_widget = table_widget
-        # self.ins_ind = ins_ind
+        self.ins_ind = ins_ind
         # self.paker_select = None
         self.forRirTrue = forRirTrue
         self.tabWidget = TabWidget()
@@ -181,9 +181,9 @@ class OpressovkaEK(QMainWindow):
             return
 
         work_list = OpressovkaEK.paker_list(self, diametr_paker, paker_khost, paker_depth, pakerDepthZumpf, pressureZUMPF_question)
+        MyWindow.populate_row(self.ins_ind, work_list, self.table_widget)
         well_data.pause = False
-
-        return work_list
+        self.close()
 
     # Добавление строк с опрессовкой ЭК
     def paker_list(self, paker_diametr, paker_khost, paker_depth, pakerDepthZumpf, pressureZUMPF_question):

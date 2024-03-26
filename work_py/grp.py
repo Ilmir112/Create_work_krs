@@ -92,11 +92,12 @@ class TabWidget(QTabWidget):
         self.addTab(TabPage_SO_grp(self), 'пакер ГРП')
 
 class Grp_window(QMainWindow):
-    def __init__(self, table_widget):
+    def __init__(self, ins_ind, table_widget):
         super(Grp_window, self).__init__()
 
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
+        self.ins_ind = ins_ind
         self.table_widget = table_widget
 
         self.tabWidget = TabWidget()
@@ -124,9 +125,9 @@ class Grp_window(QMainWindow):
         work_list = self.grpPaker(diametr_paker, paker_depth, paker_khost, gisOTZ_true_quest,
                                   normalization_true_quest, current_depth)
 
+        MyWindow.populate_row(self.ins_ind, work_list, self.table_widget)
         well_data.pause = False
         self.close()
-        return work_list
 
     def normalization(self, current_depth, diametr_paker):
 

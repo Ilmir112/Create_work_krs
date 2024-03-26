@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QLineEdi
     QTableWidget, QHeaderView, QPushButton, QTableWidgetItem, QApplication, QMainWindow
 
 import well_data
+from PyQt5.QtCore import Qt
 
 
 from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
@@ -161,10 +162,12 @@ class TabWidget(QTabWidget):
 
 
 class Drill_window(QMainWindow):
-    def __init__(self, parent=None):
+    def __init__(self, ins_ind, table_widget, parent=None):
         super(Drill_window, self).__init__(parent)
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
+        self.ins_ind = ins_ind
+        self.table_widget = table_widget
         self.tabWidget = TabWidget()
         self.tableWidget = QTableWidget(0, 3)
         self.tableWidget.setHorizontalHeaderLabels(
@@ -180,7 +183,7 @@ class Drill_window(QMainWindow):
         self.buttonDel = QPushButton('Удалить записи из таблице')
         self.buttonDel.clicked.connect(self.del_row_table)
         self.buttonAddWork = QPushButton('Добавить в план работ')
-        self.buttonAddWork.clicked.connect(self.addWork)
+        self.buttonAddWork.clicked.connect(self.addWork, Qt.QueuedConnection)
         self.buttonAddString = QPushButton('Добавить интервалы бурения')
         self.buttonAddString.clicked.connect(self.addString)
         vbox = QGridLayout(self.centralWidget)
@@ -259,6 +262,7 @@ class Drill_window(QMainWindow):
                 roof = int(current_depth)
 
     def addWork(self):
+        from main import MyWindow
         self.nkt_str = self.tabWidget.currentWidget().nkt_str_combo.currentText()
         self.drillingBit_diam = self.tabWidget.currentWidget().drill_diametr_line.text()
         self.downhole_motor = self.tabWidget.currentWidget().downhole_motor_line.text()
@@ -287,9 +291,9 @@ class Drill_window(QMainWindow):
         elif self.nkt_str == 'СБТ':
             drill_list = self.drilling_sbt(drill_tuple, self.drill_type_combo, self.drillingBit_diam, self.downhole_motor)
 
+        MyWindow.populate_row(self.ins_ind, drill_list, self.table_widget)
         well_data.pause = False
         self.close()
-        return drill_list
 
     def del_row_table(self):
         row = self.tableWidget.currentRow()

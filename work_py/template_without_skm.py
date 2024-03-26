@@ -519,7 +519,7 @@ class TabWidget(QTabWidget):
 
 
 class Template_without_skm(QMainWindow):
-    def __init__(self):
+    def __init__(self,  ins_ind, table_widget):
 
         super(QMainWindow, self).__init__()
 
@@ -528,6 +528,8 @@ class Template_without_skm(QMainWindow):
 
         self.rir_paker = None
         self.paker_select = None
+        self.ins_ind = ins_ind
+        self.table_widget = table_widget
         self.tabWidget = TabWidget()
 
         self.buttonAdd = QPushButton('Добавить данные в план работ')
@@ -549,13 +551,13 @@ class Template_without_skm(QMainWindow):
         if (template_diametr >= int(well_data.problemWithEk_diametr._value) - 2
             and well_data.template_depth > int(well_data.problemWithEk_depth)):
             mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже глубины не прохода')
-
             return
-        work_list = self.template_ek(template_str, template, template_diametr)
 
+        work_list = self.template_ek(template_str, template, template_diametr)
+        MyWindow.populate_row(self.ins_ind, work_list, self.table_widget)
         well_data.pause = False
         self.close()
-        return work_list
+
 
     def well_volume(self):
        

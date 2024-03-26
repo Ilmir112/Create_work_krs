@@ -97,7 +97,7 @@ class PerforationWindow(QMainWindow):
         self.buttonDel = QPushButton('Удалить интервалы перфорации в таблице')
         self.buttonDel.clicked.connect(self.del_row_table)
         self.buttonAddWork = QPushButton('Добавить в план работ')
-        self.buttonAddWork.clicked.connect(self.addWork)
+        self.buttonAddWork.clicked.connect(self.addWork, Qt.QueuedConnection)
         self.buttonAddProject = QPushButton('Добавить проектные интервалы перфорации')
         self.buttonAddProject.clicked.connect(self.addPerfProject)
 
@@ -240,7 +240,6 @@ class PerforationWindow(QMainWindow):
                 return f'{diam} ПП{zar}ГП', f'{diam} ПП{zar}БО'
 
     def addRowTable(self):
-       
 
         editType = self.tabWidget.currentWidget().lineEditType.text().replace(',', '.')
         editType2 = self.tabWidget.currentWidget().lineEditType2.text().replace(',', '.')
@@ -273,32 +272,32 @@ class PerforationWindow(QMainWindow):
         # print(editType, spinYearOfIssue, editSerialNumber, editSpecifications)
 
     def addWork(self):
-
        
         rows = self.tableWidget.rowCount()
         if len(well_data.cat_P_1) > 1:
             kateg2 = [1 if str(well_data.cat_P_1[1]) == '1' or str(well_data.cat_H2S_list[1]) == '1' else 2][0]
-
             if well_data.kat_pvo <  kateg2:
                 well_data.kat_pvo = kateg2
 
-        perforation = [[None, None, f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через '
-                                    f'ЦИТС "Ойл-сервис". '
-                                     f'При необходимости  подготовить место для установки партии ГИС напротив мостков. '
-                                     f'Произвести  монтаж ГИС согласно схемы  №8а утвержденной главным инженером от 14.10.2021г',
+        perforation = [[None, None,
+                        f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через '
+                        f'ЦИТС "Ойл-сервис". '
+                         f'При необходимости  подготовить место для установки партии ГИС напротив мостков. '
+                         f'Произвести  монтаж ГИС согласно схемы  №8а утвержденной главным инженером от 14.10.2021г',
                          None, None, None, None, None, None, None,
                           'Мастер КРС', None, None, None],
-                       [None, None, f'Долить скважину до устья тех жидкостью уд.весом {well_data.fluid_work}. '
-                                    f'Установить ПВО по схеме №8а утвержденной '
-                                     f'главным инженером ООО "Ойл-сервис" от 14.10.2021г. Опрессовать  плашки  '
-                                    f'ПВО (на давление опрессовки ЭК, но '
-                                     f'не ниже максимального ожидаемого давления на устье) '
-                                    f'{well_data.max_admissible_pressure._value}атм, по невозможности на давление поглощения, но '
-                                     f'не менее 30атм в течении 30мин (ОПРЕССОВКУ ПВО ЗАФИКСИРОВАТЬ В ВАХТОВОМ ЖУРНАЛЕ). '
-                                    f'Передать по сводке уровня жидкости до перфорации и после перфорации.'
-                                    f'(Произвести фотографию перфоратора в заряженном состоянии, и после проведения '
-                                    f'перфорации,'
-                                    f' фотографии предоставить в ЦИТС Ойл-сервис',
+                       [None, None,
+                        f'Долить скважину до устья тех жидкостью уд.весом {well_data.fluid_work}. '
+                        f'Установить ПВО по схеме №8а утвержденной '
+                         f'главным инженером ООО "Ойл-сервис" от 14.10.2021г. Опрессовать  плашки  '
+                        f'ПВО (на давление опрессовки ЭК, но '
+                         f'не ниже максимального ожидаемого давления на устье) '
+                        f'{well_data.max_admissible_pressure._value}атм, по невозможности на давление поглощения, но '
+                         f'не менее 30атм в течении 30мин (ОПРЕССОВКУ ПВО ЗАФИКСИРОВАТЬ В ВАХТОВОМ ЖУРНАЛЕ). '
+                        f'Передать по сводке уровня жидкости до перфорации и после перфорации.'
+                        f'(Произвести фотографию перфоратора в заряженном состоянии, и после проведения '
+                        f'перфорации,'
+                        f' фотографии предоставить в ЦИТС Ойл-сервис',
                          None, None, None, None, None, None, None,
                           'Мастер КРС, подрядчик по ГИС', 1.2, None],
                        [''.join(["ГИС (Перфорация на кабеле ЗАДАЧА 2.9.1)" if float(well_data.max_angle._value) <= 50
@@ -309,7 +308,7 @@ class PerforationWindow(QMainWindow):
                        [None, None, "Кровля", "-", "Подошва", "Тип заряда", "отв на 1 п.м.", "Кол-во отв",
                       "пласт", "Доп.данные", 'подрядчик по ГИС', None]
                        ]
-        # print(f'до {well_data.plast_work}')
+
         for row in range(rows):
             item = self.tableWidget.item(row, 1)
             if item:
@@ -334,9 +333,6 @@ class PerforationWindow(QMainWindow):
 
             perf_list.extend([pvr_str, None, roof, '-', sool, type_charge, count_otv, count_charge, plast, dop_information,
                               'подрядчик по ГИС', round(float(sool)-float(roof)) * 1.5, 1])
-            # print(perf_list)
-
-            # print(f' раб ПВР {well_data.plast_work, plast}')
 
             well_data.dict_perforation.setdefault(plast, {}).setdefault('интервал', set()).add(
                 (float(perf_list[2]), float(perf_list[4])))
@@ -359,15 +355,16 @@ class PerforationWindow(QMainWindow):
                           'Подрядчик по ГИС', 2])
         # print([well_data.dict_perforation[plast] for plast in well_data.plast_work])
         pipe_perforation = [
-           [f'монтаж трубного перфоратора', None, f'Произвести монтаж трубного перфоратора + 2шт/20м НКТ + реперный '
-                                                  f'патрубок L=2м до намеченного интервала перфорации '
-                        f'(с шаблонировкой НКТ{well_data.nkt_diam}мм шаблоном {well_data.nkt_template}мм. Спуск компоновки производить  со '
-                                                  f'скоростью не более 0,30 м/с, не допуская резких ударов и вращения.'
-                        f'(Произвести фотографию перфоратора в заряженном состоянии, и после проведения перфорации, '
-                                              f'фотографии предоставить в ЦИТС Ойл-сервис, передать по сводке уровня '
-                        f'жидкости до перфорации и после перфорации) '
-                        f'(При СПО первых десяти НКТ на спайдере дополнительно '
-                        f'устанавливать элеватор ЭХЛ).' ,
+           [f'монтаж трубного перфоратора', None,
+            f'Произвести монтаж трубного перфоратора + 2шт/20м НКТ + реперный '
+            f'патрубок L=2м до намеченного интервала перфорации '
+            f'(с шаблонировкой НКТ{well_data.nkt_diam}мм шаблоном {well_data.nkt_template}мм. '
+            f'Спуск компоновки производить  со скоростью не более 0,30 м/с, не допуская резких ударов и вращения.'
+            f'(Произвести фотографию перфоратора в заряженном состоянии, и после проведения перфорации, '
+            f'фотографии предоставить в ЦИТС Ойл-сервис, передать по сводке уровня '
+            f'жидкости до перфорации и после перфорации) '
+            f'(При СПО первых десяти НКТ на спайдере дополнительно '
+            f'устанавливать элеватор ЭХЛ).' ,
                  None, None, None, None, None, None, None,
                   'Подрядчик по ГИС, мастер КРС', None, None],
             [None, None, 'Произвести ГИС привязку трубного перфоратора по ГК, ЛМ.',
@@ -394,19 +391,10 @@ class PerforationWindow(QMainWindow):
                     self.table_widget.setSpan(i + self.ins_ind, 2, 1, 8)
                 for column, data in enumerate(row_data):
 
-                    # widget = QtWidgets.QLabel(str())
-                    # if column != 25:
-                    #     widget.setStyleSheet("""QLabel {
-                    #                                         border: 1px solid black;
-                    #                                         font-size: 12px;
-                    #                                         font-family: Arial;
-                    #                                     }
-                    #                                     """)
-                    #     self.table_widget.setCellWidget(row, column, widget)
+
                     self.table_widget.setItem(row, column, QtWidgets.QTableWidgetItem(str(data)))
 
-                    # if column == 2 or column == 10 or column == 11:
-                    if not data  is  None:
+                    if not data is None:
                         text = data
                         for key, value in text_width_dict.items():
                             if value[0] <= len(str(text)) <= value[1]:
@@ -414,10 +402,7 @@ class PerforationWindow(QMainWindow):
                                 self.table_widget.setRowHeight(row, int(float(text_width)))
                     else:
                         self.table_widget.setItem(row, column, QtWidgets.QTableWidgetItem(str('')))
-            # self.table_widget.setSpan(1 + self.ins_ind, 10, len(perforation) - 2, 1)
-            # self.table_widget.setSpan(1 + self.ins_ind, 11, len(perforation) - 2, 1)
 
-            # print(f'мин {well_data.perforation_roof}, мак {well_data.perforation_sole}')
 
             self.table_widget.setRowHeight(self.ins_ind, 60)
             self.table_widget.setRowHeight(self.ins_ind + 1, 60)

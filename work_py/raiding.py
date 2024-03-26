@@ -1,11 +1,13 @@
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QLineEdit, QComboBox, QGridLayout, QTabWidget, \
-    QTableWidget, QHeaderView, QPushButton, QTableWidgetItem, QApplication,QMainWindow
+    QTableWidget, QHeaderView, QPushButton, QTableWidgetItem, QApplication, QMainWindow
 
 import well_data
 from main import MyWindow
 from work_py.alone_oreration import fluid_change
 from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
-from open_pz import CreatePZ
+
+
 
 class TabPage_SO_raid(QWidget):
     def __init__(self, parent=None):
@@ -28,7 +30,7 @@ class TabPage_SO_raid(QWidget):
         self.downhole_motor_line.setClearButtonEnabled(True)
 
         if well_data.column_additional is False or (well_data.column_additional and
-                                                   well_data.head_column_additional._value < well_data.current_bottom):
+                                                    well_data.head_column_additional._value < well_data.current_bottom):
             self.raid_select_combo.setCurrentIndex(0)
             if well_data.column_diametr._value > 127:
                 self.downhole_motor_line.setText('Д-106')
@@ -61,7 +63,6 @@ class TabPage_SO_raid(QWidget):
             ['НКТ', 'СБТ'])
         self.raid_select_combo.currentTextChanged.connect(self.update_nkt)
 
-
         self.grid = QGridLayout(self)
         self.grid.setColumnMinimumWidth(1, 150)
 
@@ -90,12 +91,11 @@ class TabPage_SO_raid(QWidget):
         self.grid.addWidget(self.sole_raid_line, 8, 1)
         self.grid.addWidget(self.raid_True_combo, 8, 2, 2, 1)
 
-
         self.raid_select_combo.currentTextChanged.connect(self.update_raid_edit)
         self.raid_select_combo.setCurrentIndex(1)
 
         if well_data.column_additional is False or \
-            (well_data.column_additional and well_data.current_bottom > well_data.head_column_additional._value):
+                (well_data.column_additional and well_data.current_bottom > well_data.head_column_additional._value):
             self.raid_select_combo.setCurrentIndex(0)
         else:
             print(f'строка райбера')
@@ -108,18 +108,21 @@ class TabPage_SO_raid(QWidget):
         else:
             self.grid.addWidget(self.downhole_motor_label, 2, 4)
             self.grid.addWidget(self.downhole_motor_line, 3, 4)
+
     def update_raid_edit(self, index):
 
         if index == 'райбер в ЭК':
             if well_data.column_additional is False or \
-                    (well_data.column_additional and well_data.current_bottom < well_data.head_column_additional._value):
+                    (
+                            well_data.column_additional and well_data.current_bottom < well_data.head_column_additional._value):
                 self.raid_diametr_line.setText(str(self.raiding_Bit_diam_select(well_data.current_bottom)))
                 if well_data.column_diametr._value > 127:
                     self.downhole_motor_line.setText('Д-106')
                 else:
                     self.downhole_motor_line.setText('Д-76')
             else:
-                self.raid_diametr_line.setText(str(self.raiding_Bit_diam_select(well_data.head_column_additional._value - 10)))
+                self.raid_diametr_line.setText(
+                    str(self.raiding_Bit_diam_select(well_data.head_column_additional._value - 10)))
                 if well_data.column_additional_diametr._value > 127:
                     self.downhole_motor_line.setText('Д-106')
                 else:
@@ -132,10 +135,7 @@ class TabPage_SO_raid(QWidget):
             else:
                 self.downhole_motor_line.setText('Д-76')
 
-
-
     def raiding_Bit_diam_select(self, depth):
-       
 
         raiding_Bit_dict = {
             85: (88, 92),
@@ -175,13 +175,17 @@ class TabPage_SO_raid(QWidget):
 class TabWidget(QTabWidget):
     def __init__(self):
         super().__init__()
-        self.addTab(TabPage_SO_raid(self), 'Райбер')
+        self.addTab(TabPage_SO_raid(), 'Райбер')
+
+
 class Raid(MyWindow):
-    def __init__(self, parent=None):
+    def __init__(self, ins_ind, table_widget, parent=None):
         super(MyWindow, self).__init__(parent)
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
 
+        self.ins_ind = ins_ind
+        self.table_widget = table_widget
         self.tabWidget = TabWidget()
         self.tableWidget = QTableWidget(0, 3)
         self.tableWidget.setHorizontalHeaderLabels(
@@ -197,7 +201,7 @@ class Raid(MyWindow):
         self.buttonDel = QPushButton('Удалить записи из таблице')
         self.buttonDel.clicked.connect(self.del_row_table)
         self.buttonAddWork = QPushButton('Добавить в план работ')
-        self.buttonAddWork.clicked.connect(self.addWork)
+        self.buttonAddWork.clicked.connect(self.addWork, Qt.QueuedConnection)
         self.buttonAddString = QPushButton('Добавить интервалы райбирования')
         self.buttonAddString.clicked.connect(self.addString)
         vbox = QGridLayout(self.centralWidget)
@@ -254,9 +258,6 @@ class Raid(MyWindow):
             self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(int(sole))))
             self.tableWidget.setSortingEnabled(False)
 
-
-
-
     def addWork(self):
         nkt_str_combo = self.tabWidget.currentWidget().nkt_str_combo.currentText()
 
@@ -275,19 +276,20 @@ class Raid(MyWindow):
         else:
             raid_list = self.raiding_sbt(raid_tuple[::-1])
 
+        MyWindow.populate_row(self.ins_ind, raid_list, self.table_widget)
         well_data.pause = False
         self.close()
-        return raid_list
+
     def del_row_table(self):
         row = self.tableWidget.currentRow()
         if row == -1:
             msg = QMessageBox.information(self, 'Внимание', 'Выберите строку для удаления')
             return
         self.tableWidget.removeRow(row)
+
     def raidingColumn(self, raiding_interval_tuple):
         from work_py.template_work import TemplateKrs
         from work_py.advanted_file import raiding_interval, raid
-       
 
         ryber_diam = self.tabWidget.currentWidget().raid_diametr_line.text()
         ryber_key = self.tabWidget.currentWidget().raid_select_combo.currentText()
@@ -300,18 +302,16 @@ class Raid(MyWindow):
         nkt_diam = well_data.nkt_diam
         nkt_template = well_data.nkt_template
 
-
         ryber_str_EK = f'райбер {raid_type_combo}-{ryber_diam} для ЭК {well_data.column_diametr._value}мм х ' \
-                       f'{well_data.column_wall_thickness._value}мм +'\
+                       f'{well_data.column_wall_thickness._value}мм +' \
                        f' забойный двигатель {downhole_motor} + НКТ{well_data.nkt_diam} 20м + репер '
 
         ryber_str_DP = f'райбер {raid_type_combo}-{ryber_diam} для ЭК {well_data.column_additional_diametr._value}мм х ' \
-                f'{well_data.column_additional_wall_thickness._value}мм + забойный двигатель ' \
+                       f'{well_data.column_additional_wall_thickness._value}мм + забойный двигатель ' \
                        f'{downhole_motor} + НКТ{nkt_pod} 20м + репер + ' \
-                f'НКТ{nkt_pod} {round(well_data.current_bottom - float(well_data.head_column_additional._value))}м'
+                       f'НКТ{nkt_pod} {round(well_data.current_bottom - float(well_data.head_column_additional._value))}м'
 
         rayber_dict = {'райбер в ЭК': ryber_str_EK, 'райбер в ДП': ryber_str_DP}
-
 
         ryber_str = rayber_dict[ryber_key]
 
@@ -332,8 +332,9 @@ class Raid(MyWindow):
              f'ЗА 20 М ДО ЗАБОЯ СПУСК ПРОИЗВОДИТЬ С ПРОМЫВКОЙ',
              None, None, None, None, None, None, None,
              'мастер КРС', descentNKT_norm(krovly_raiding, 1.2)],
-            [None, None, f'Собрать промывочное оборудование: вертлюг, ведущая труба (установить вставной фильтр под ведущей трубой), '
-                         f'буровой рукав, устьевой герметизатор, нагнетательная линия. Застраховать буровой рукав за вертлюг. ',
+            [None, None,
+             f'Собрать промывочное оборудование: вертлюг, ведущая труба (установить вставной фильтр под ведущей трубой), '
+             f'буровой рукав, устьевой герметизатор, нагнетательная линия. Застраховать буровой рукав за вертлюг. ',
              None, None, None, None, None, None, None,
              'Мастер КРС, УСРСиСТ', 0.6],
             [f'райбирование ЭК в инт. {raiding_interval}', None,
@@ -350,17 +351,17 @@ class Raid(MyWindow):
              f' ПРЕДУСМОТРЕТЬ КОМПЕНСАЦИЮ РЕАКТИВНОГО МОМЕНТА НА ВЕДУЩЕЙ ТРУБЕ))',
              None, None, None, None, None, None, None,
              'Мастер КРС, УСРСиСТ', None],
-            [f'Промывка уд.весом {well_data.fluid_work[:6]}  в объеме {round(TemplateKrs.well_volume(self)*2,1)}м3',
+            [f'Промывка уд.весом {well_data.fluid_work[:6]}  в объеме {round(TemplateKrs.well_volume(self) * 2, 1)}м3',
              None,
              f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {well_data.fluid_work}  '
-             f'в присутствии представителя заказчика в объеме {round(TemplateKrs.well_volume(self)*2,1)}м3. Составить акт.',
+             f'в присутствии представителя заказчика в объеме {round(TemplateKrs.well_volume(self) * 2, 1)}м3. Составить акт.',
              None, None, None, None, None, None, None,
              'мастер КРС, предст. заказчика', well_volume_norm(TemplateKrs.well_volume(self))],
             [None, None,
              f'Поднять  {ryber_str} на НКТ{nkt_diam}м с глубины {well_data.current_bottom}м с доливом скважины в '
-             f'объеме {round(well_data.current_bottom*1.12/1000, 1)}м3 тех. жидкостью  уд.весом {well_data.fluid_work}',
+             f'объеме {round(well_data.current_bottom * 1.12 / 1000, 1)}м3 тех. жидкостью  уд.весом {well_data.fluid_work}',
              None, None, None, None, None, None, None,
-             'мастер КРС', liftingNKT_norm(well_data.current_bottom,1.2)]]
+             'мастер КРС', liftingNKT_norm(well_data.current_bottom, 1.2)]]
 
         # print(f' после отрайбирования {[well_data.dict_perforation[plast]["отрайбировано"] for plast in well_data.plast_work]}')
         if len(well_data.plast_work) == 0:
@@ -374,7 +375,6 @@ class Raid(MyWindow):
     def raiding_sbt(self, raiding_interval_tuple):
         from work_py.template_work import TemplateKrs
         from work_py.advanted_file import raid
-       
 
         ryber_diam = self.tabWidget.currentWidget().raid_diametr_line.text()
         ryber_key = self.tabWidget.currentWidget().raid_select_combo.currentText()
@@ -391,7 +391,8 @@ class Raid(MyWindow):
                        f'{int(well_data.current_bottom - well_data.head_column_additional._value)}м'
         ryber_str_short_dp = f'райбер ФКК-{ryber_diam}  + СБТ {nkt_pod} {int(well_data.current_bottom - well_data.head_column_additional._value)}м'
 
-        rayber_dict = {'райбер в ЭК': (ryber_str_EK,ryber_str_short_ek) , 'райбер в ДП': (ryber_str_DP, ryber_str_short_dp)}
+        rayber_dict = {'райбер в ЭК': (ryber_str_EK, ryber_str_short_ek),
+                       'райбер в ДП': (ryber_str_DP, ryber_str_short_dp)}
 
         ryber_str, ryber_str_short = rayber_dict[ryber_key]
 
@@ -402,8 +403,8 @@ class Raid(MyWindow):
 
         raiding_interval = raid(raiding_interval_tuple)
         ryber_list = [
-            [f'СПО {ryber_str_short} на СБТ {nkt_diam} до Н= { krovly_raiding - 30}', None,
-             f'Спустить {ryber_str}  на СБТ {nkt_diam} до Н= { krovly_raiding - 30}м с замером, '
+            [f'СПО {ryber_str_short} на СБТ {nkt_diam} до Н= {krovly_raiding - 30}', None,
+             f'Спустить {ryber_str}  на СБТ {nkt_diam} до Н= {krovly_raiding - 30}м с замером, '
              f' (При СПО первых десяти СБТ на спайдере дополнительно устанавливать элеватор ЭХЛ). '
              f'В случае разгрузки инструмента  при спуске, проработать место посадки с промывкой скв., '
              f'составить акт. СКОРОСТЬ СПУСКА НЕ БОЛЕЕ 1 М/С (НЕ ДОХОДЯ 40 - 50 М ДО ПЛАНОВОГО ИНТЕРВАЛА СКОРОСТЬ '
@@ -430,17 +431,17 @@ class Raid(MyWindow):
              f' ПРЕДУСМОТРЕТЬ КОМПЕНСАЦИЮ РЕАКТИВНОГО МОМЕНТА НА ВЕДУЩЕЙ ТРУБЕ))',
              None, None, None, None, None, None, None,
              'Мастер КРС, УСРСиСТ', None],
-            [f'Промывка уд.весом {well_data.fluid_work[:6]}  в объеме {round(TemplateKrs.well_volume(self)*2,1)}м3',
+            [f'Промывка уд.весом {well_data.fluid_work[:6]}  в объеме {round(TemplateKrs.well_volume(self) * 2, 1)}м3',
              None,
              f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {well_data.fluid_work}  '
-             f'в присутствии представителя заказчика в объеме {round(TemplateKrs.well_volume(self)*2,1)}м3. Составить акт.',
+             f'в присутствии представителя заказчика в объеме {round(TemplateKrs.well_volume(self) * 2, 1)}м3. Составить акт.',
              None, None, None, None, None, None, None,
              'мастер КРС, предст. заказчика', well_volume_norm(TemplateKrs.well_volume(self))],
             [None, None,
              f'Поднять  {ryber_str} на СБТ{nkt_diam}м с глубины {well_data.current_bottom}м с доливом скважины в '
-             f'объеме {round(well_data.current_bottom*1.12/1000, 1)}м3 тех. жидкостью  уд.весом {well_data.fluid_work}',
+             f'объеме {round(well_data.current_bottom * 1.12 / 1000, 1)}м3 тех. жидкостью  уд.весом {well_data.fluid_work}',
              None, None, None, None, None, None, None,
-             'мастер КРС', liftingNKT_norm(well_data.current_bottom,1.2)]]
+             'мастер КРС', liftingNKT_norm(well_data.current_bottom, 1.2)]]
 
         # print(f' после отрайбирования {[well_data.dict_perforation[plast]["отрайбировано"] for plast in well_data.plast_work]}')
         if len(well_data.plast_work) == 0:
@@ -452,13 +453,11 @@ class Raid(MyWindow):
         return ryber_list
 
 
-if __name__ == "__main__":
-    import sys
-
-    app = QApplication(sys.argv)
-    # app.setStyleSheet()
-    window = Raid()
-    # window.show()
-    sys.exit(app.exec_())
-
-
+# if __name__ == "__main__":
+#     import sys
+#
+#     app = QApplication(sys.argv)
+#     # app.setStyleSheet()
+#     window = Raid()
+#     # window.show()
+#     sys.exit(app.exec_())

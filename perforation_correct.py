@@ -4,7 +4,7 @@ from PyQt5.QtGui import QRegExpValidator, QColor, QPalette
 
 import well_data
 
-from main import MyWindow
+
 import re
 
 from work_py.advanted_file import definition_plast_work
@@ -182,7 +182,7 @@ class PerforationCorrect(QMainWindow):
 
             if all([oktl is True for oktl in plast_oktl]):
                 well_data.dict_perforation_short[plast]['отключение'] = True
-                well_data.dict_perforation[plast]['отключение'] = True
+                well_data.dict_perforation[plast]["отключение"] = True
             else:
                 well_data.dict_perforation_short[plast]['отключение'] = False
                 well_data.dict_perforation[plast]['отключение'] = False

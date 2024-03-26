@@ -1,9 +1,9 @@
-from datetime import datetime
 
 from PyQt5 import QtWidgets
+
 from PyQt5.Qt import QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, \
     QInputDialog, QTabWidget, QPushButton, Qt, QCheckBox
-from PyQt5.QtCore import QEvent
+from PyQt5.QtCore import QEvent, Qt
 from PyQt5.QtGui import QPalette, QFontMetrics, QStandardItem
 from PyQt5.QtWidgets import QVBoxLayout, QStyledItemDelegate, qApp, QMessageBox, QCompleter, QTableWidget, QHeaderView, \
     QTableWidgetItem, QMainWindow
@@ -507,15 +507,19 @@ class TabWidget(QTabWidget):
 
 class AcidPakerWindow(QMainWindow):
 
-    def __init__(self, parent=None):
+    def __init__(self, ins_ind, table_widget, parent=None):
 
         super().__init__(parent)
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
 
+
         self.paker_select = None
         self.dict_nkt = {}
         self.work_window = None
+
+        self.ins_ind = ins_ind
+        self.table_widget = table_widget
         self.tableWidget = QTableWidget(0, 8)
         self.tabWidget = TabWidget(self.tableWidget)
 
@@ -530,7 +534,7 @@ class AcidPakerWindow(QMainWindow):
         self.buttonDel = QPushButton('Удалить записи из таблице')
         self.buttonDel.clicked.connect(self.del_row_table)
         self.buttonAddWork = QPushButton('Добавить в план работ')
-        self.buttonAddWork.clicked.connect(self.addWork)
+        self.buttonAddWork.clicked.connect(self.addWork, Qt.QueuedConnection)
         self.buttonAddString = QPushButton('Добавить обработку')
         self.buttonAddString.clicked.connect(self.addString)
 
@@ -766,10 +770,9 @@ class AcidPakerWindow(QMainWindow):
                                        'мастер КРС',
                                        liftingNKT_norm(well_data.current_bottom, 1)])
 
+        MyWindow.populate_row(self.ins_ind, work_template_list, self.table_widget)
         well_data.pause = False
         self.close()
-        # print(f'в {work_template_list}')
-        return work_template_list
 
     def del_row_table(self):
         row = self.tableWidget.currentRow()

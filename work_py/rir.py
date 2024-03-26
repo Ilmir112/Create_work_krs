@@ -233,12 +233,15 @@ class TabWidget(QTabWidget):
 class RirWindow(QMainWindow):
     work_rir_window = None
 
-    def __init__(self,  parent=None):
+    def __init__(self, ins_ind, table_widget, parent=None):
 
         super(QMainWindow, self).__init__(parent)
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
 
+
+        self.ins_ind = ins_ind
+        self.table_widget = table_widget
         self.tabWidget = TabWidget()
 
         self.buttonAdd = QPushButton('Добавить данные в план работ')
@@ -862,10 +865,9 @@ class RirWindow(QMainWindow):
 
             work_list = self.rir_rpp(paker_need_Combo, plast_combo, roof_rir_edit)
 
-
+        MyWindow.populate_row(self.ins_ind, work_list, self.table_widget)
         well_data.pause = False
         self.close()
-        return work_list
     def rir_izvelPaker(self):
        
         pakerIzvPaker, ok = QInputDialog.getInt(None, 'Глубина извлекаемого пакера',

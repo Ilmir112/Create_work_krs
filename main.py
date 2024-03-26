@@ -1109,19 +1109,15 @@ class MyWindow(QMainWindow):
         self.populate_row(self.ins_ind, drilling_work_list, self.table_widget)
 
 
-    def adding_in_work_list(self, work_window, table_widget, ins_ind):
-        work_window.show()
-        self.pause_app()
-        work_list = work_window.addWork()
 
-        self.populate_row(ins_ind, work_list, table_widget)
-        well_data.pause = True
+
 
     def drilling_action_nkt(self):
         if self.raid_window is None:
-            self.raid_window = Drill_window()
+            self.raid_window = Drill_window(well_data.ins_ind, self.table_widget)
             self.raid_window.setGeometry(200, 400, 300, 400)
-            self.adding_in_work_list(self.raid_window, self.table_widget, well_data.ins_ind)
+            self.pause_app()
+            well_data.pause = True
             self.raid_window = None
         else:
             self.raid_window.close()  # Close window.
@@ -1243,7 +1239,7 @@ class MyWindow(QMainWindow):
         self.populate_row(self.ins_ind, rirRpp_work_list, self.table_widget)
     def rirAction(self):
         from work_py.rir import RirWindow
-        from open_pz import CreatePZ
+
 
 
         print(f' окно СКО ')
@@ -1251,9 +1247,10 @@ class MyWindow(QMainWindow):
         if self.rir_window is None:
             well_data.countAcid = 0
 
-            self.rir_window = RirWindow()
+            self.rir_window = RirWindow(well_data.ins_ind, self.table_widget)
             self.rir_window.setGeometry(200, 400, 300, 400)
-            self.adding_in_work_list(self.rir_window, self.table_widget, well_data.ins_ind)
+            self.pause_app()
+            well_data.pause = True
             self.rir_window = None
         else:
             self.rir_window.close()  # Close window.
@@ -1265,9 +1262,11 @@ class MyWindow(QMainWindow):
 
 
         if self.work_window is None:
-            self.work_window = Grp_window(self.table_widget)
+            self.work_window = Grp_window(well_data.ins_ind, self.table_widget)
             self.work_window.setGeometry(200, 400, 500, 500)
-            self.adding_in_work_list(self.work_window, self.table_widget, well_data.ins_ind)
+            self.work_window.show()
+            self.pause_app()
+            well_data.pause = True
             self.work_window = None
         else:
             self.work_window.close()  # Close window.
@@ -1279,9 +1278,11 @@ class MyWindow(QMainWindow):
 
 
         if self.work_window is None:
-            self.work_window = Gpp_window(self.table_widget, well_data.ins_ind)
+            self.work_window = Gpp_window(well_data.ins_ind, self.table_widget)
             self.work_window.setGeometry(200, 400, 500, 500)
-            self.adding_in_work_list(self.work_window, self.table_widget, well_data.ins_ind)
+            self.work_window.show()
+            self.pause_app()
+            well_data.pause = True
             self.work_window = None
         else:
             self.work_window.close()  # Close window.
@@ -1345,9 +1346,11 @@ class MyWindow(QMainWindow):
 
 
         if self.work_window is None:
-            self.work_window = Swab_Window()
+            self.work_window = Swab_Window(well_data.ins_ind, self.table_widget)
             self.work_window.setGeometry(200, 400, 500, 500)
-            self.adding_in_work_list(self.work_window, self.table_widget, well_data.ins_ind)
+            self.work_window.show()
+            self.pause_app()
+            well_data.pause = True
             self.work_window = None
         else:
             self.work_window.close()  # Close window.
@@ -1364,12 +1367,14 @@ class MyWindow(QMainWindow):
 
     def ryberAdd(self):
         from work_py.raiding import Raid
-        from open_pz import CreatePZ
 
         if self.work_window is None:
-            self.work_window = Raid()
+            self.work_window = Raid(well_data.ins_ind, self.table_widget)
             self.work_window.setGeometry(200, 400, 300, 400)
-            self.adding_in_work_list(self.work_window, self.table_widget, well_data.ins_ind)
+            self.work_window.show()
+            self.pause_app()
+            well_data.pause = True
+
             self.work_window = None
         else:
             self.work_window.close()  # Close window.
@@ -1383,11 +1388,11 @@ class MyWindow(QMainWindow):
 
     def gnkt_opz(self):
         from gnkt_opz import GnktOpz
-        from open_pz import CreatePZ
 
         if self.work_window is None:
             self.work_window = GnktOpz()
-            self.adding_in_work_list(self.work_window, self.table_widget, well_data.ins_ind)
+            self.pause_app()
+            well_data.pause = True
             self.work_window = None
         else:
             self.work_window.close()  # Close window.
@@ -1410,9 +1415,11 @@ class MyWindow(QMainWindow):
 
 
         if self.work_window is None:
-            self.work_window = OpressovkaEK(self.table_widget)
+            self.work_window = OpressovkaEK(well_data.ins_ind, self.table_widget)
             self.work_window.setGeometry(200, 400, 300, 400)
-            self.adding_in_work_list(self.work_window, self.table_widget, well_data.ins_ind)
+            self.work_window.show()
+            self.pause_app()
+            well_data.pause = True
             self.work_window = None
         else:
             self.work_window.close()  # Close window.
@@ -1430,9 +1437,11 @@ class MyWindow(QMainWindow):
         from work_py.template_work import TemplateKrs
 
         if self.work_window is None:
-            self.work_window = TemplateKrs()
+            self.work_window = TemplateKrs(well_data.ins_ind, self.table_widget)
             self.work_window.setGeometry(200, 400, 500, 500)
-            self.adding_in_work_list(self.work_window, self.table_widget, well_data.ins_ind)
+            self.work_window.show()
+            self.pause_app()
+            well_data.pause = True
             self.work_window = None
         else:
             self.work_window.close()  # Close window.
@@ -1442,9 +1451,11 @@ class MyWindow(QMainWindow):
         from work_py.template_without_skm import Template_without_skm
 
         if self.work_window is None:
-            self.work_window = Template_without_skm()
+            self.work_window = Template_without_skm(well_data.ins_ind, self.table_widget)
             self.work_window.setGeometry(200, 400, 500, 500)
-            self.adding_in_work_list(self.work_window, self.table_widget, well_data.ins_ind)
+            self.work_window.show()
+            self.pause_app()
+            well_data.pause = True
             self.work_window = None
         else:
             self.work_window.close()  # Close window.
@@ -1490,9 +1501,10 @@ class MyWindow(QMainWindow):
 
         if self.acid_windowPaker is None:
             print(f' окно2 СКО ')
-            self.acid_windowPaker = AcidPakerWindow()
+            self.acid_windowPaker = AcidPakerWindow(self.ins_ind, self.table_widget)
             self.acid_windowPaker.setGeometry(200, 400, 300, 400)
-            self.adding_in_work_list(self.acid_windowPaker, self.table_widget, well_data.ins_ind)
+            self.pause_app()
+            well_data.pause = True
 
         else:
             self.acid_windowPaker.close()  # Close window.
@@ -1582,7 +1594,6 @@ class MyWindow(QMainWindow):
 
     def correctData(self):
         from data_correct import DataWindow
-        from open_pz import CreatePZ
 
         if self.correct_window is None:
 
@@ -1613,6 +1624,8 @@ class MyWindow(QMainWindow):
             self.new_window.setWindowTitle("Перфорация")
             self.new_window.setGeometry(200, 400, 300, 400)
             self.new_window.show()
+            self.pause_app()
+            well_data.pause = True
 
         else:
             self.new_window.close()  # Close window.

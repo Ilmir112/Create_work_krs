@@ -3,11 +3,12 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox, QTabWidget, QWidget, QLab
     QGridLayout, QPushButton, QBoxLayout, QTableWidget, QHeaderView, QTableWidgetItem, QApplication
 
 import well_data
-from open_pz import CreatePZ
+from PyQt5.QtCore import Qt
 from work_py.acid_paker import AcidPakerWindow
 from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
 from work_py.alone_oreration import kot_work
 from PyQt5.QtGui import QDoubleValidator
+from main import MyWindow
 
 
 class TabPage_SO_with(QWidget):
@@ -771,12 +772,14 @@ class TabWidget(QTabWidget):
 
 class TemplateKrs(QMainWindow):
 
-    def __init__(self, parent=None):
+    def __init__(self, ins_ind, table_widget, parent=None):
         super().__init__()
         print(f'дочерний класс TemplateKRS')
 
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
+        self.ins_ind = ins_ind
+        self.table_widget = table_widget
 
         self.tabWidget = TabWidget()
         self.tableWidget = QTableWidget(0, 3)
@@ -793,7 +796,7 @@ class TemplateKrs(QMainWindow):
         self.buttonDel = QPushButton('Удалить записи из таблице')
         self.buttonDel.clicked.connect(self.del_row_table)
         self.buttonAddWork = QPushButton('Добавить в план работ')
-        self.buttonAddWork.clicked.connect(self.addWork)
+        self.buttonAddWork.clicked.connect(self.addWork, Qt.QueuedConnection)
         self.buttonAddString = QPushButton('Добавить интервалы скреперования')
         self.buttonAddString.clicked.connect(self.addString)
 
@@ -862,7 +865,7 @@ class TemplateKrs(QMainWindow):
             template_diametr = int(self.tabWidget.currentWidget().template_second_Edit.text())
         else:
             template_diametr = int(self.tabWidget.currentWidget().template_first_Edit.text())
-        print(f'проблема ЭК {well_data.problemWithEk_diametr}')
+
         if (template_diametr >= int(well_data.problemWithEk_diametr._value) - 2
             and well_data.template_depth > int(well_data.problemWithEk_depth)):
             mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже глубины не прохода')
@@ -886,9 +889,10 @@ class TemplateKrs(QMainWindow):
         skm_list = sorted(skm_tuple, key = lambda x: x[0])
         work_template_list = self.template_ek(template_str, template_key, template_diametr, skm_list)
 
+        MyWindow.populate_row(self.ins_ind, work_template_list, self.table_widget)
         well_data.pause = False
         self.close()
-        return work_template_list
+
 
     def del_row_table(self):
         row = self.tableWidget.currentRow()
@@ -1055,10 +1059,10 @@ class TemplateKrs(QMainWindow):
         print(f'счет использования шаблн {well_data.count_template}')
         if well_data.count_template == 0:
             list_template_ek = list_template_ek + notes_list
-        #     well_data.count_template += 1
-        # else:
-        #     list_template_ek = list_template_ek
-        #     list_template_ek.pop(2)
+            well_data.count_template += 1
+        else:
+            list_template_ek = list_template_ek
+            list_template_ek.pop(2)
 
         return list_template_ek
 

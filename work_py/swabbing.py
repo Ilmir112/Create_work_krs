@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QMessageBox, QWidget, QLabel, QComboBox, \
 
 import well_data
 from krs import well_volume
+from main import MyWindow
 
 from work_py.alone_oreration import privyazkaNKT, check_h2s
 from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
@@ -218,12 +219,12 @@ class TabWidget(QTabWidget):
 
 
 class Swab_Window(QMainWindow):
-    def __init__(self, paker_layout_combo = 'двухпакерная', parent=None):
+    def __init__(self, ins_ind, table_widget, paker_layout_combo = 'двухпакерная', parent=None):
         super(QMainWindow, self).__init__(parent)
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
-        # self.table_widget = table_widget
-        # self.ins_ind = ins_ind
+        self.table_widget = table_widget
+        self.ins_ind = ins_ind
         self.paker_layout_combo = paker_layout_combo
 
         self.tabWidget = TabWidget(self.paker_layout_combo)
@@ -270,10 +271,9 @@ class Swab_Window(QMainWindow):
             work_list = self.swabbing_opy(paker2_depth)
         elif swabTrueEditType == 'Опрессовка снижением уровня на пакере с заглушкой':
             work_list = self.swabbing_opy_with_paker(diametr_paker, paker_khost, paker_depth, paker2_depth)
-        print(work_list)
+        MyWindow.populate_row(self.ins_ind, work_list, self.table_widget)
         well_data.pause = False
         self.close()
-        return work_list
 
     def swabbing_opy_with_paker(self, diametr_paker, paker_khost, paker_depth, depth_opy):
        

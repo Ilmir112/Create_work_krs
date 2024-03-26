@@ -158,7 +158,7 @@ class AcidPakerWindow(MyWindow):
         self.buttonDel = QPushButton('Удалить строку из таблице')
         self.buttonDel.clicked.connect(self.del_row_table)
         self.buttonAddWork = QPushButton('Добавить в план работ')
-        self.buttonAddWork.clicked.connect(self.addWork)
+        self.buttonAddWork.clicked.connect(self.addWork, Qt.QueuedConnection)
         vbox = QGridLayout(self.centralWidget)
         vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
         # vbox.addWidget(self.tableWidget, 1, 0, 1, 2)
