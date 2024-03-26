@@ -1,7 +1,7 @@
 import os
 import sqlite3
 import sys
-import win32com.client
+# import win32com.client
 import openpyxl
 from openpyxl.reader.excel import load_workbook
 import krs
@@ -26,12 +26,12 @@ from data_base.work_with_base import Classifier_well
 from work_py.drilling import Drill_window
 
 
-
 class ExcelWorker(QThread):
     finished = pyqtSignal()
 
     def __init__(self):
         super().__init__()
+
     def check_well_existence(self, well_number, deposit_area, region):
 
         # Подключение к базе данных SQLite
@@ -53,7 +53,6 @@ class ExcelWorker(QThread):
             date_string = datetime(current_year, 10, 1).strftime('%d.%m.%Y')
             print(f'Корректная таблица перечня без глушения от {date_string}')
         print(f' регион {region}')
-
 
         if region == 'КГМ':
             # Проверка наличия записи в базе данных
@@ -81,7 +80,6 @@ class ExcelWorker(QThread):
                 check_true = True
             else:
                 check_true = False
-
 
         if region == 'ЧГМ':
             # Проверка наличия записи в базе данных
@@ -219,8 +217,6 @@ class MyWindow(QMainWindow):
         self.setWindowTitle("Main Window")
         self.setGeometry(200, 100, 800, 800)
 
-
-
         self.createMenuBar()
         self.le = QLineEdit()
 
@@ -311,7 +307,6 @@ class MyWindow(QMainWindow):
 
         self.signatories_Bnd = self.signatories.addAction('&БашНефть-Добыча', self.action_clicked)
 
-
     @QtCore.pyqtSlot()
     def action_clicked(self):
         from open_pz import CreatePZ
@@ -321,7 +316,7 @@ class MyWindow(QMainWindow):
             self.work_plan = 'krs'
             self.tableWidgetOpen(self.work_plan)
             self.fname, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
-                                                               "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
+                                                                  "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
             if self.fname:
                 try:
                     self.read_pz(self.fname)
@@ -337,7 +332,7 @@ class MyWindow(QMainWindow):
             self.work_plan = 'dop_plan'
             self.tableWidgetOpen(self.work_plan)
             self.fname, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
-                                                               "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
+                                                                  "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
             if self.fname:
                 try:
                     self.read_pz(self.fname)
@@ -355,7 +350,7 @@ class MyWindow(QMainWindow):
             self.tableWidgetOpen(self.work_plan)
 
             self.fname, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл',
-                                                                  '.',"Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
+                                                                  '.', "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
 
             if self.fname:
                 try:
@@ -388,7 +383,7 @@ class MyWindow(QMainWindow):
                     sheet = read_pz.open_excel_file(self.ws, self.work_plan)
 
                     self.rir_window = Work_with_gnkt(self.ws, self.tabWidget,
-                                                     self.table_title, self.table_schema, self.table_widget,)
+                                                     self.table_title, self.table_schema, self.table_widget, )
 
                     self.pause_app()
                     well_data.pause = True
@@ -549,7 +544,7 @@ class MyWindow(QMainWindow):
             except FileNotFoundError:
                 print('Файл не найден')
 
-    def tableWidgetOpen(self, work_plan = 'krs'):
+    def tableWidgetOpen(self, work_plan='krs'):
 
         if self.table_widget is None:
 
@@ -570,11 +565,9 @@ class MyWindow(QMainWindow):
                 self.table_title = QTableWidget()
                 self.tabWidget.addTab(self.table_title, 'Титульник')
                 self.table_schema = QTableWidget()
-                self.tabWidget.addTab(self.table_schema , 'Схема скважины')
-
+                self.tabWidget.addTab(self.table_schema, 'Схема скважины')
 
             self.tabWidget.addTab(self.table_widget, 'Ход работ')
-
 
     def saveFileDialog(self, wb2, full_path):
 
@@ -606,8 +599,6 @@ class MyWindow(QMainWindow):
             self.save_to_krs()
         else:
             Work_with_gnkt.save_to_gnkt(self)
-
-
 
     def save_to_krs(self):
         from open_pz import CreatePZ
@@ -655,7 +646,6 @@ class MyWindow(QMainWindow):
                     if work_list[i][0]:
                         plan_short += f'п.{work_list[i][1]} {work_list[i][0]} \n'
 
-
             count_row_height(self.ws, ws2, work_list, merged_cells_dict, ins_ind)
             # print(f'3 - {ws2.max_row}')
             well_data.itog_ind_min = self.ins_ind_border
@@ -698,7 +688,7 @@ class MyWindow(QMainWindow):
                 H2S_mg = well_data.dict_category[well_data.plast_work_short[0]]['по сероводороду'].data_mg_l
                 H2S_pr = well_data.dict_category[well_data.plast_work_short[0]]['по сероводороду'].data_procent
 
-                if cat_H2S_list  in [1, 2] and self.work_plan != 'dop_plan':
+                if cat_H2S_list in [1, 2] and self.work_plan != 'dop_plan':
                     ws3 = wb2.create_sheet('Sheet1')
                     ws3.title = "Расчет необходимого количества поглотителя H2S"
                     ws3 = wb2["Расчет необходимого количества поглотителя H2S"]
@@ -865,12 +855,12 @@ class MyWindow(QMainWindow):
                 if os.path.isfile(file_path):
                     os.remove(file_path)
 
-
         print("Closing current file")
 
     def on_finished(self):
         print("Работа с файлом Excel завершена.")
-    def insert_image(self, ws, file, coordinate, width = 200, height = 180):
+
+    def insert_image(self, ws, file, coordinate, width=200, height=180):
         # Загружаем изображение с помощью библиотеки Pillow
 
         img = openpyxl.drawing.image.Image(file)
@@ -1103,11 +1093,11 @@ class MyWindow(QMainWindow):
     def pause_app():
         while well_data.pause == True:
             QtCore.QCoreApplication.instance().processEvents()
+
     def frezering_port_action(self):
         from work_py.drilling import Drill_window
         drilling_work_list = Drill_window.frezer_ports(self)
         self.populate_row(self.ins_ind, drilling_work_list, self.table_widget)
-
 
     def drilling_action_nkt(self):
         if self.raid_window is None:
@@ -1141,11 +1131,11 @@ class MyWindow(QMainWindow):
         emergency_sbt_list = lapel_tubing(self)
         self.populate_row(self.ins_ind, emergency_sbt_list, self.table_widget)
 
-
     def lar_sbt_action(self):
         from work_py.emergencyWork import emergence_sbt
         emergency_sbt_list = emergence_sbt(self)
         self.populate_row(self.ins_ind, emergency_sbt_list, self.table_widget)
+
     def larNKT_action(self):
         from work_py.emergencyWork import emergencyNKT
         emergencyNKT_list = emergencyNKT(self)
@@ -1231,23 +1221,31 @@ class MyWindow(QMainWindow):
         from work_py.alone_oreration import fluid_change
         fluid_change_work_list = fluid_change(self)
         self.populate_row(self.ins_ind, fluid_change_work_list, self.table_widget)
+
     def claySolision(self):
-        from work_py.claySolution import claySolutionDef
-        rirRpp_work_list = claySolutionDef(self)
-        self.populate_row(self.ins_ind, rirRpp_work_list, self.table_widget)
+        from work_py.claySolution import ClayWindow
+        if self.rir_window is None:
+            well_data.countAcid = 0
+            self.rir_window = ClayWindow(well_data.ins_ind, self.table_widget)
+            self.rir_window.setGeometry(200, 400, 300, 400)
+            self.rir_window.show()
+            self.pause_app()
+            well_data.pause = True
+            self.rir_window = None
+        else:
+            self.rir_window.close()  # Close window.
+            self.rir_window = None
+
     def rirAction(self):
         from work_py.rir import RirWindow
-
-
 
         print(f' окно СКО ')
         # well_data.pause = False
         if self.rir_window is None:
             well_data.countAcid = 0
-
             self.rir_window = RirWindow(well_data.ins_ind, self.table_widget)
             self.rir_window.setGeometry(200, 400, 300, 400)
-            self.work_window.show()
+            self.rir_window.show()
             self.pause_app()
             well_data.pause = True
             self.rir_window = None
@@ -1258,7 +1256,6 @@ class MyWindow(QMainWindow):
     def grpWithPaker(self):
         from work_py.grp import Grp_window
         from open_pz import CreatePZ
-
 
         if self.work_window is None:
             self.work_window = Grp_window(well_data.ins_ind, self.table_widget)
@@ -1274,7 +1271,6 @@ class MyWindow(QMainWindow):
     def grpWithGpp(self):
         from work_py.gpp import Gpp_window
         from open_pz import CreatePZ
-
 
         if self.work_window is None:
             self.work_window = Gpp_window(well_data.ins_ind, self.table_widget)
@@ -1349,8 +1345,6 @@ class MyWindow(QMainWindow):
         from work_py.swabbing import Swab_Window
         from open_pz import CreatePZ
 
-
-
         if self.work_window is None:
             self.work_window = Swab_Window(well_data.ins_ind, self.table_widget)
             self.work_window.setGeometry(200, 400, 500, 500)
@@ -1369,8 +1363,6 @@ class MyWindow(QMainWindow):
         kompress_work_list = kompress(self)
         self.populate_row(self.ins_ind, kompress_work_list, self.table_widget)
 
-
-
     def ryberAdd(self):
         from work_py.raiding import Raid
 
@@ -1385,7 +1377,6 @@ class MyWindow(QMainWindow):
         else:
             self.work_window.close()  # Close window.
             self.work_window = None
-
 
     def gnkt_after_grp(self):
         from gnkt_after_grp import gnkt_work
@@ -1405,8 +1396,6 @@ class MyWindow(QMainWindow):
             self.work_window.close()  # Close window.
             self.work_window = None
 
-
-
     def gno_bottom(self):
         from work_py.descent_gno import gno_down
 
@@ -1414,11 +1403,8 @@ class MyWindow(QMainWindow):
         gno_work_list = gno_down(self)
         self.populate_row(self.ins_ind, gno_work_list, self.table_widget)
 
-
-
     def pressureTest(self):
         from work_py.opressovka import OpressovkaEK
-
 
         if self.work_window is None:
             self.work_window = OpressovkaEK(well_data.ins_ind, self.table_widget)
@@ -1431,13 +1417,11 @@ class MyWindow(QMainWindow):
             self.work_window.close()  # Close window.
             self.work_window = None
 
-
     def template_pero(self):
         from work_py.template_work import TemplateKrs
 
         template_pero_list = TemplateKrs.pero(self)
         self.populate_row(self.ins_ind, template_pero_list, self.table_widget)
-
 
     def template_with_skm(self):
         from work_py.template_work import TemplateKrs
@@ -1468,7 +1452,7 @@ class MyWindow(QMainWindow):
             self.work_window = None
 
     @staticmethod
-    def populate_row(ins_ind, work_list, table_widget, work_plan = 'krs'):
+    def populate_row(ins_ind, work_list, table_widget, work_plan='krs'):
         text_width_dict = {20: (0, 100), 40: (101, 200), 60: (201, 300), 80: (301, 400), 100: (401, 500),
                            120: (501, 600), 140: (601, 700), 160: (701, 800), 180: (801, 1500)}
         index_setSpan = 0
@@ -1488,7 +1472,7 @@ class MyWindow(QMainWindow):
                 item.setFlags(item.flags() | Qt.ItemIsEditable)
 
                 if not data is None:
-                   table_widget.setItem(row, column, item)
+                    table_widget.setItem(row, column, item)
 
                 else:
                     table_widget.setItem(row, column, QtWidgets.QTableWidgetItem(str('')))
@@ -1500,7 +1484,6 @@ class MyWindow(QMainWindow):
                             if value[0] <= len(text) <= value[1]:
                                 text_width = key
                                 table_widget.setRowHeight(row, int(text_width))
-
 
     def acidPakerNewWindow(self):
         from work_py.acid_paker import AcidPakerWindow
@@ -1518,7 +1501,6 @@ class MyWindow(QMainWindow):
             self.acid_windowPaker.close()  # Close window.
             self.acid_windowPaker = None
 
-
     def check_pvo_schema(self, ws5, ind):
         schema_pvo_set = set()
         for row in range(self.table_widget.rowCount()):
@@ -1529,12 +1511,11 @@ class MyWindow(QMainWindow):
                         value = value.text()
 
                         if 'схеме №' in value or 'схемы №' in value:
-                            number_schema = value[value.index(' №')+1:value.index(' №')+4].replace(' ', '')
+                            number_schema = value[value.index(' №') + 1:value.index(' №') + 4].replace(' ', '')
                             if '1' in number_schema:
                                 number_schema = "2"
                             schema_pvo_set.add(number_schema)
         print(f'схема ПВО {schema_pvo_set}')
-
 
         n = 0
         for schema in list(schema_pvo_set):
@@ -1558,14 +1539,11 @@ class MyWindow(QMainWindow):
         ws5.page_setup.fitToHeight = False
         # Переместите второй лист перед первым
 
-
         return list(schema_pvo_set)
-
 
     def GeophysicalNewWindow(self):
         from work_py.geophysic import GeophysicWindow
         from open_pz import CreatePZ
-
 
         if self.new_window is None:
             self.new_window = GeophysicWindow(self.table_widget, self.ins_ind)
@@ -1585,7 +1563,7 @@ class MyWindow(QMainWindow):
         from perforation_correct import PerforationCorrect
 
         well_data.current_bottom, ok = QInputDialog.getDouble(self, 'Необходимый забой',
-                                                             'Введите забой до которого нужно нормализовать')
+                                                              'Введите забой до которого нужно нормализовать')
         if self.perforation_correct_window2 is None:
             self.perforation_correct_window2 = PerforationCorrect(self)
             self.perforation_correct_window2.setWindowTitle("Сверка данных перфорации")
@@ -1620,7 +1598,6 @@ class MyWindow(QMainWindow):
     def perforationNewWindow(self):
         from work_py.perforation import PerforationWindow
 
-
         if len(well_data.cat_P_1) > 1:
             if well_data.cat_P_1[1] == 1 and well_data.kat_pvo != 1:
                 msc = QMessageBox.information(self, 'Внимание', 'Не произведен монтаж первой категории')
@@ -1643,7 +1620,7 @@ class MyWindow(QMainWindow):
 
         self.populate_row(self.ins_ind, self.perforation_list)
 
-    def copy_pz(self, sheet, table_widget, work_plan = 'krs', count_col = 12, list_page = 1):
+    def copy_pz(self, sheet, table_widget, work_plan='krs', count_col=12, list_page=1):
 
         from krs import work_krs
         rows = sheet.max_row
@@ -1687,9 +1664,8 @@ class MyWindow(QMainWindow):
                                 col in range(merged_cell.min_col, merged_cell.max_col + 1):
                             # Устанавливаем количество объединяемых строк и столбцов для текущей ячейки
                             table_widget.setSpan(row - 1, col - 1,
-                                                      merged_cell.max_row - merged_cell.min_row + 1,
-                                                      merged_cell.max_col - merged_cell.min_col + 1)
-
+                                                 merged_cell.max_row - merged_cell.min_row + 1,
+                                                 merged_cell.max_col - merged_cell.min_col + 1)
 
         # # Чтение стилей границ и применение к QTableWidget
         # for row in self.ws.iter_rows():
@@ -1703,7 +1679,7 @@ class MyWindow(QMainWindow):
 
         if work_plan == 'krs':
             self.populate_row(table_widget.rowCount(), work_krs(self, self.work_plan), self.table_widget)
-        
+
         if work_plan == 'gnkt_frez' and list_page == 2:
             colWidth = [2.28515625, 13.0, 4.5703125, 13.0, 13.0, 13.0, 5.7109375, 13.0, 13.0, 13.0, 4.7109375,
                         13.0, 5.140625, 13.0, 13.0, 13.0, 13.0, 13.0, 4.7109375, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0,
@@ -1713,13 +1689,10 @@ class MyWindow(QMainWindow):
             for column in range(table_widget.columnCount()):
                 table_widget.setColumnWidth(column, int(colWidth[column]))  # Здесь задайте требуемую ширину столбца
 
-
-
         # elif self.work_plan == 'gnkt-opz':
         #
         #     # print(well_data.gnkt_work1)
         #     # self.populate_row(self.table_widget.rowCount(), well_data.gnkt_work1)
-
 
     def create_short_plan(self, wb2, plan_short):
 
@@ -1730,41 +1703,45 @@ class MyWindow(QMainWindow):
 
         for row in range(15):
             ws4.insert_rows(ws4.max_row)
-        ws4.cell(row= 1, column=1).value = well_data.well_number._value
+        ws4.cell(row=1, column=1).value = well_data.well_number._value
         ws4.cell(row=2, column=1).value = well_data.well_area._value
 
-        if well_data.dict_pump_SHGN["do"] != 0 and well_data.dict_pump_ECN["do"] == 0 and\
+        if well_data.dict_pump_SHGN["do"] != 0 and well_data.dict_pump_ECN["do"] == 0 and \
                 well_data.paker_do["do"] == 0:
-            ws4.cell(row=3, column=1).value = f'{well_data.dict_pump_SHGN["do"]} -на гл. {well_data.dict_pump_SHGN_h["do"]}м'
-        elif well_data.dict_pump_SHGN["do"] == 0 and well_data.dict_pump_ECN["do"] != 0 and\
+            ws4.cell(row=3,
+                     column=1).value = f'{well_data.dict_pump_SHGN["do"]} -на гл. {well_data.dict_pump_SHGN_h["do"]}м'
+        elif well_data.dict_pump_SHGN["do"] == 0 and well_data.dict_pump_ECN["do"] != 0 and \
                 well_data.paker_do["do"] == 0:
-            ws4.cell(row=3, column=1).value = f'{well_data.dict_pump_ECN["do"]} -на гл. {well_data.dict_pump_ECN_h["do"]}м'
-        elif well_data.dict_pump_SHGN["do"] == 0 and well_data.dict_pump_ECN["do"] != 0 and\
+            ws4.cell(row=3,
+                     column=1).value = f'{well_data.dict_pump_ECN["do"]} -на гл. {well_data.dict_pump_ECN_h["do"]}м'
+        elif well_data.dict_pump_SHGN["do"] == 0 and well_data.dict_pump_ECN["do"] != 0 and \
                 well_data.paker_do["do"] != 0:
-            ws4.cell(row=3, column=1).value = f'{well_data.dict_pump_ECN["do"]} -на гл. {well_data.dict_pump_ECN_h["do"]}м \n' \
-                                              f'{well_data.paker_do["do"]} на {well_data.depth_fond_paker_do["do"]}м'
-        elif well_data.dict_pump_SHGN["do"] != 0 and  well_data.dict_pump_ECN["do"] == 0 and\
+            ws4.cell(row=3,
+                     column=1).value = f'{well_data.dict_pump_ECN["do"]} -на гл. {well_data.dict_pump_ECN_h["do"]}м \n' \
+                                       f'{well_data.paker_do["do"]} на {well_data.depth_fond_paker_do["do"]}м'
+        elif well_data.dict_pump_SHGN["do"] != 0 and well_data.dict_pump_ECN["do"] == 0 and \
                 well_data.paker_do["do"] != 0:
-            ws4.cell(row=3, column=1).value = f'{well_data.dict_pump_SHGN["do"]} -на гл. {well_data.dict_pump_SHGN_h["do"]}м \n' \
-                                              f'{well_data.paker_do["do"]} на {well_data.depth_fond_paker_do["do"]}м'
-        elif well_data.dict_pump_SHGN["do"] == 0 and well_data.dict_pump_ECN["do"] == 0 and\
+            ws4.cell(row=3,
+                     column=1).value = f'{well_data.dict_pump_SHGN["do"]} -на гл. {well_data.dict_pump_SHGN_h["do"]}м \n' \
+                                       f'{well_data.paker_do["do"]} на {well_data.depth_fond_paker_do["do"]}м'
+        elif well_data.dict_pump_SHGN["do"] == 0 and well_data.dict_pump_ECN["do"] == 0 and \
                 well_data.paker_do["do"] != 0:
             ws4.cell(row=3, column=1).value = f'{well_data.paker_do["do"]} на {well_data.depth_fond_paker_do["do"]}м'
-        elif well_data.dict_pump_SHGN["do"] == 0 and well_data.dict_pump_ECN["do"] == 0 and\
+        elif well_data.dict_pump_SHGN["do"] == 0 and well_data.dict_pump_ECN["do"] == 0 and \
                 well_data.paker_do["do"] == 0:
             ws4.cell(row=3, column=1).value = " "
-        elif well_data.dict_pump_SHGN["do"] != 0 and well_data.dict_pump_ECN["do"] != 0 and\
+        elif well_data.dict_pump_SHGN["do"] != 0 and well_data.dict_pump_ECN["do"] != 0 and \
                 well_data.paker_do["do"] != 0:
-            ws4.cell(row=3, column=1).value = f'{well_data.dict_pump_SHGN["do"]} -на гл. {well_data.dict_pump_SHGN_h["do"]}м \n' \
-                                              f'{well_data.dict_pump_ECN["do"]} -на гл. {well_data.dict_pump_ECN_h["do"]}м \n' \
-                                              f'{well_data.paker_do["do"]} на {well_data.depth_fond_paker_do["do"]}м ' \
-
-
+            ws4.cell(row=3,
+                     column=1).value = f'{well_data.dict_pump_SHGN["do"]} -на гл. {well_data.dict_pump_SHGN_h["do"]}м \n' \
+                                       f'{well_data.dict_pump_ECN["do"]} -на гл. {well_data.dict_pump_ECN_h["do"]}м \n' \
+                                       f'{well_data.paker_do["do"]} на {well_data.depth_fond_paker_do["do"]}м '
         plast_str = ''
         pressur_set = set()
         # print(f'После {well_data.dict_perforation_short}')
         for plast in list(well_data.dict_perforation_short.keys()):
-            if well_data.dict_perforation_short[plast]['отключение'] is False and plast in well_data.dict_perforation_short:
+            if well_data.dict_perforation_short[plast][
+                'отключение'] is False and plast in well_data.dict_perforation_short:
                 for interval in well_data.dict_perforation_short[plast]["интервал"]:
                     plast_str += f'{plast[:4]}: {interval[0]}- {interval[1]} \n'
             elif well_data.dict_perforation_short[plast]['отключение'] and plast in well_data.dict_perforation_short:
@@ -1780,7 +1757,8 @@ class MyWindow(QMainWindow):
         ws4.cell(row=6, column=1).value = f'НКТ: \n {gno_nkt_opening(well_data.dict_nkt)}'
         ws4.cell(row=7, column=1).value = f'Рпл: \n {" ".join(list(pressur_set))}атм'
         # ws4.cell(row=8, column=1).value = f'ЖГС = {well_data.fluid_work_short}г/см3'
-        ws4.cell(row=9, column=1).value = f'Нст- {well_data.static_level._value}м / Ндин - {well_data.dinamic_level._value}м'
+        ws4.cell(row=9,
+                 column=1).value = f'Нст- {well_data.static_level._value}м / Ндин - {well_data.dinamic_level._value}м'
         if well_data.curator == 'ОР':
             ws4.cell(row=10, column=1).value = f'Ожид {well_data.expected_Q}м3/сут при Р-{well_data.expected_P}м3/сут'
         else:
@@ -1789,18 +1767,17 @@ class MyWindow(QMainWindow):
         ws4.cell(row=1, column=2).value = well_data.cdng._value
         ws4.cell(row=2, column=3).value = \
             f'Рпл - {well_data.dict_category[well_data.plast_work_short[0]]["по давлению"].category},' \
-              f' H2S -{well_data.dict_category[well_data.plast_work_short[0]]["по сероводороду"].category},' \
-              f' газ факт -{well_data.gaz_f_pr[0]}т/м3'
+            f' H2S -{well_data.dict_category[well_data.plast_work_short[0]]["по сероводороду"].category},' \
+            f' газ факт -{well_data.gaz_f_pr[0]}т/м3'
         column_well = f'{well_data.column_diametr._value}х{well_data.column_wall_thickness._value} в инт 0 - {well_data.shoe_column._value}м ' \
             if well_data.column_additional is False else f'{well_data.column_diametr._value} х {well_data.column_wall_thickness._value} \n' \
-                                               f'0 - {well_data.shoe_column._value}м/\n{well_data.column_additional_diametr._value}' \
-                                               f' х {well_data.column_additional_wall_thickness._value} в инт ' \
-                                                f'{well_data.head_column_additional._value}-{well_data.head_column_additional._value}м'
+                                                         f'0 - {well_data.shoe_column._value}м/\n{well_data.column_additional_diametr._value}' \
+                                                         f' х {well_data.column_additional_wall_thickness._value} в инт ' \
+                                                         f'{well_data.head_column_additional._value}-{well_data.head_column_additional._value}м'
         ws4.cell(row=1, column=7).value = column_well
         ws4.cell(row=4, column=7).value = f'Пробур забой {well_data.bottomhole_drill._value}м'
         ws4.cell(row=5, column=7).value = f'Исскус забой {well_data.bottomhole_artificial._value}м'
         ws4.cell(row=6, column=7).value = f'Тек забой {well_data.bottom}м'
-
 
         ws4.cell(row=7, column=7).value = plast_str
         ws4.cell(row=11, column=7).value = f'Рмакс {well_data.max_admissible_pressure._value}атм'
@@ -1818,14 +1795,13 @@ class MyWindow(QMainWindow):
         ws4.cell(row=2, column=3).value = 'Краткое содержание плана работ'
         ws4.cell(row=2, column=3).font = Font(name='Arial', size=16, bold=True)
 
-        #объединение ячеек
-        ws4.merge_cells(start_row=2, start_column=3, end_row=2, end_column=9) # Объединение оглавления
-        ws4.merge_cells(start_row=5, start_column=3, end_row=7, end_column=3) # Объединение строк ГНО
-        ws4.merge_cells(start_row=4, start_column=5, end_row=4, end_column=6) # объединение по класси
-        ws4.merge_cells(start_row=3, start_column=9, end_row=4, end_column=9) # Объединение строк данных по колонну
+        # объединение ячеек
+        ws4.merge_cells(start_row=2, start_column=3, end_row=2, end_column=9)  # Объединение оглавления
+        ws4.merge_cells(start_row=5, start_column=3, end_row=7, end_column=3)  # Объединение строк ГНО
+        ws4.merge_cells(start_row=4, start_column=5, end_row=4, end_column=6)  # объединение по класси
+        ws4.merge_cells(start_row=3, start_column=9, end_row=4, end_column=9)  # Объединение строк данных по колонну
         ws4.merge_cells(start_row=9, start_column=9, end_row=12, end_column=9)
         ws4.merge_cells(start_row=5, start_column=4, end_row=13, end_column=8)
-
 
         for row_ind in range(3, 15):
             ws4.row_dimensions[row_ind].height = 80
@@ -1836,7 +1812,7 @@ class MyWindow(QMainWindow):
                 ws4.cell(row=row_ind, column=col).border = well_data.thin_border
                 ws4.cell(row=row_ind, column=col).font = Font(name='Arial', size=13, bold=False)
                 ws4.cell(row=row_ind, column=col).alignment = Alignment(wrap_text=True, horizontal='left',
-                                                               vertical='center')
+                                                                        vertical='center')
         ws4.cell(row=5, column=4).font = Font(name='Arial', size=11, bold=False)
         ws4.hide = True
         ws4.page_setup.fitToPage = True
@@ -1876,7 +1852,6 @@ class MyWindow(QMainWindow):
                 elif len(well_data.dict_perforation[plast]['интервал']) == 0:
                     check_true = True
 
-
             if check_true is False:
                 paker_warning = QMessageBox.warning(None, 'Проверка посадки пакера в интервал перфорации',
                                                     f'Проверка посадки показала пакер сажается в интервал перфорации, '
@@ -1887,21 +1862,18 @@ class MyWindow(QMainWindow):
                                                 depth, 0,
                                                 int(well_data.current_bottom))
 
-
         check_for_template = OpressovkaEK.check_for_template_paker(self, depth)
         depth = check_for_template[0]
 
-
-
-      # print(well_data.skm_interval)
+        # print(well_data.skm_interval)
 
         if any([interval[0] <= depth <= interval[1] for interval in well_data.skm_interval]):
             return int(depth)
         else:
             false_question = QMessageBox.question(None, 'Проверка посадки пакера в интервал скреперования',
-                                                 f'Проверка посадки показала, что пакер сажается не '
-                                                 f'в интервал скреперования, '
-                                                 f'Проигнорировать ошибку?')
+                                                  f'Проверка посадки показала, что пакер сажается не '
+                                                  f'в интервал скреперования, '
+                                                  f'Проигнорировать ошибку?')
             if false_question == QMessageBox.StandardButton.Yes:
                 return int(depth)
             else:
@@ -1930,14 +1902,14 @@ class MyWindow(QMainWindow):
                 skipping_intervals_new.append((skm_range[0], pod_skm))
 
                 skm_question = QMessageBox.question(None, 'Скреперование',
-                                                      f'добавить интервал скреперования {skipping_intervals_new}')
+                                                    f'добавить интервал скреперования {skipping_intervals_new}')
                 if skm_question == QMessageBox.StandardButton.Yes:
-                  # print(well_data.skm_interval)
+                    # print(well_data.skm_interval)
 
                     well_data.skm_interval.append(skipping_intervals_new[0])
-                  # print(well_data.skm_interval)
+                    # print(well_data.skm_interval)
 
-                    well_data.skm_interval = sorted(well_data.skm_interval, key = lambda  x: x[0])
+                    well_data.skm_interval = sorted(well_data.skm_interval, key=lambda x: x[0])
                     # perforating_intervals = []
                     # for plast in well_data.plast_all:
                     #     for interval in well_data.dict_perforation[plast]['интервал']:
@@ -1952,7 +1924,7 @@ class MyWindow(QMainWindow):
                                 value = value.text()
                                 if 'Произвести скреперование' in value:
                                     ind_value = value.split(' ')
-                                    ind_min = ind_value.index('интервале')+1
+                                    ind_min = ind_value.index('интервале') + 1
                                     ind_max = ind_value.index('обратной')
 
                                     new_value = QtWidgets.QTableWidgetItem(f'{" ".join(ind_value[:ind_min])} '
