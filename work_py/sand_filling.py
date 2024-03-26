@@ -1,160 +1,282 @@
-from PyQt5.QtWidgets import QInputDialog, QMessageBox
+from PyQt5.QtGui import QDoubleValidator,QIntValidator
+from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QTabWidget, \
+    QMainWindow, QPushButton
 
 import well_data
 from main import MyWindow
+from work_py.rir import RirWindow
 
 from work_py.opressovka import OpressovkaEK
-from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm,well_volume_norm
+from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
+
+
+class TabPage_SO_sand(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+        self.validator = QIntValidator(0, 80000)
+
+        self.roof_sand_label = QLabel("кровля ПМ", self)
+        self.roof_sand_edit = QLineEdit(self)
+        self.roof_sand_edit.setValidator( self.validator)
+
+        self.roof_sand_edit.setText(f'{well_data.perforation_roof -20}')
+        self.roof_sand_edit.setClearButtonEnabled(True)
+
+        self.sole_sand_LabelType = QLabel("Подошва ПМ", self)
+        self.sole_sand_edit = QLineEdit(self)
+        self.sole_sand_edit.setText(f'{well_data.current_bottom}')
+        self.sole_sand_edit.setValidator(self.validator)
+
+
+        self.privyazka_question_Label = QLabel("Нужно ли привязывать компоновку", self)
+        self.privyazka_question_QCombo = QComboBox(self)
+        self.privyazka_question_QCombo.addItems(['Нет', 'Да'])
+
+        self.rir_question_Label = QLabel("Нужно ли производить на данной компоновке", self)
+        self.rir_question_QCombo = QComboBox(self)
+        self.rir_question_QCombo.addItems(['Нет', 'Да'])
+
+        self.roof_rir_label = QLabel("Плановая кровля РИР", self)
+        self.roof_rir_edit = QLineEdit(self)
+        self.roof_rir_edit.setText(f'{well_data.current_bottom - 50}')
+        self.roof_rir_edit.setClearButtonEnabled(True)
+
+        self.sole_rir_LabelType = QLabel("Подошва РИР", self)
+        self.sole_rir_edit = QLineEdit(self)
+        self.sole_rir_edit.setText(f'{well_data.current_bottom}')
+        self.sole_rir_edit.setClearButtonEnabled(True)
 
 
 
-def sand_select(self):
-   
-    if well_data.column_additional == False or (well_data.column_additional == True and well_data.current_bottom <= well_data.head_column_additional._value):
-        sand_select = f'перо +  НКТ{well_data.nkt_diam}мм 20м + реперный патрубок'
+        self.grid = QGridLayout(self)
 
-    elif well_data.column_additional == True and well_data.column_additional_diametr._value < 110 and well_data.current_bottom >= well_data.head_column_additional._value:
-        sand_select = f'перо + НКТ{60}мм 20м + реперный патрубок + НКТ60мм {round(well_data.current_bottom - well_data.head_column_additional._value, 0)}м '
-    elif well_data.column_additional == True and well_data.column_additional_diametr._value > 110 and well_data.current_bottom >= well_data.head_column_additional._value:
-        sand_select = f'перо + НКТ{well_data.nkt_diam}мм со снятыми фасками {20}м + реперный патрубок + НКТ{well_data.nkt_diam}мм со снятыми фасками {round(well_data.current_bottom - well_data.head_column_additional._value, 0)}м'
-    return sand_select
+        self.grid.addWidget(self.privyazka_question_Label, 4, 3)
+        self.grid.addWidget(self.privyazka_question_QCombo, 5, 3)
 
-def sandFilling(self):
-   
-    from krs import well_volume, volume_vn_ek
-    from work_py.rir import RirWindow
-    nkt_diam = ''.join(['73' if well_data.column_diametr._value > 110 else '60'])
+        self.grid.addWidget(self.roof_sand_label, 4, 4)
+        self.grid.addWidget(self.roof_sand_edit, 5, 4)
+        self.grid.addWidget(self.sole_sand_LabelType, 4, 5)
+        self.grid.addWidget(self.sole_sand_edit, 5, 5)
 
+        self.grid.addWidget(self.rir_question_Label, 6, 3)
+        self.grid.addWidget(self.rir_question_QCombo, 7, 3)
 
-    filling_depth, ok = QInputDialog.getInt(None, 'Отсыпка песком',
-                                          'Введите кровлю необходимого песчанного моста',
-                                          int(well_data.perforation_roof - 20), 0, int(well_data.current_bottom))
+        self.grid.addWidget(self.roof_rir_label, 6, 4)
+        self.grid.addWidget(self.roof_rir_edit, 7, 4)
+        self.grid.addWidget(self.sole_rir_LabelType, 6, 5)
+        self.grid.addWidget(self.sole_rir_edit, 7, 5)
 
+        self.roof_sand_edit.textChanged.connect(self.update_roof)
+        self.rir_question_QCombo.currentTextChanged.connect(self.update_rir)
+        self.rir_question_QCombo.setCurrentIndex(1)
+        self.rir_question_QCombo.setCurrentIndex(0)
 
-    sand_volume = round(volume_vn_ek(self,filling_depth) * (well_data.current_bottom - filling_depth), 1)
-
-
-    filling_list = [
-        [f'Спустить  {sand_select(self)}  на НКТ{nkt_diam}м до глубины {round(well_data.current_bottom-100,0)}м', None,
-     f' Спустить  {sand_select(self)}  на НКТ{nkt_diam}м до глубины {round(well_data.current_bottom-100,0)}м с замером, '
-     f'шаблонированием шаблоном {well_data.nkt_template}мм. (При СПО первых десяти НКТ на '
-     f'спайдере дополнительно устанавливать элеватор ЭХЛ)',
-     None, None, None, None, None, None, None,
-     'Мастер КР', descentNKT_norm(well_data.current_bottom,1)],
-        [f'отсыпка кварцевым песком в инт. {filling_depth} - {well_data.current_bottom} в объеме {sand_volume}л',
-         None, f'Произвести отсыпку кварцевым песком в инт. {filling_depth} - {well_data.current_bottom} '
-                     f' в объеме {sand_volume}л '
-                     f'Закачать в НКТ кварцевый песок  с доводкой тех.жидкостью {well_data.fluid_work}',
-         None, None, None, None, None, None, None,
-         'мастер КРС', 3.5],
-        [f'Ожидание оседания песка 4 часа.',
-         None, f'Ожидание оседания песка 4 часа.',
-         None, None, None, None, None, None, None,
-         'мастер КРС', 4],
-        [None, None, f'Допустить компоновку с замером и шаблонированием НКТ до кровли песчаного моста (плановый забой - {filling_depth}м).'
-                     f' Определить текущий забой скважины (перо от песчаного моста не поднимать, упереться в песчаный мост).',
-         None, None, None, None, None, None, None,
-         'мастер КРС', 1.2],
-        [None, None,
-         f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС "Ойл-сервис". При необходимости '
-         f'подготовить место для установки партии ГИС напротив мостков. Произвести  монтаж ГИС согласно схемы  №8 при '
-         f'привязке утвержденной главным инженером оТ 14.10.2021г.',
-         None, None, None, None, None, None, None,
-         'мастер КРС', None],
-        [f'Привязка ', None,
-         f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины',
-         None, None, None, None, None, None, None,
-         'Мастер КРС, подрядчик по ГИС', 4],
-        [f'Определение кровли', None,
-         f'В случае если кровля песчаного моста на гл.{filling_depth}м дальнейшие работы продолжить дальше по плану'
-         f'В случае пеcчаного моста ниже гл.{filling_depth}м работы повторить с корректировкой обьема и технологических глубин.'
-         f' В случае песчаного моста выше гл.{filling_depth}м вымыть песок до гл.{filling_depth}м',
-         None, None, None, None, None, None, None,
-         'мастер КРС', None]
-    ]
-    if OpressovkaEK.testing_pressure(self, filling_depth):
-        filling_list.insert(-1,
-                            [f'Опрессовать в инт{filling_depth}-0м на Р={well_data.max_admissible_pressure._value}атм',
-                             None, f'Опрессовать эксплуатационную колонну в интервале {filling_depth}-0м на'
-                                   f'Р={well_data.max_admissible_pressure._value}атм'
-                     f' в течение 30 минут в присутствии представителя заказчика, составить акт. '
-                     f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа'
-                                   f' до начала работ)',
-         None, None, None, None, None, None, None,
-         'мастер КРС, предст. заказчика', 0.67])
-        filling_list.insert(-1,
-                            [None, None,
-                     f'В случае негерметичности э/к, по согласованию с заказчиком произвести ОТСЭК для определения интервала '
-                     f'негерметичности эксплуатационной колонны с точностью до одного НКТ или запись РГД, ВЧТ с '
-                     f'целью определения места нарушения в присутствии представителя заказчика, составить акт. '
-                     f'Определить приемистость НЭК.',
-                     None, None, None, None, None, None, None,
-                     'мастер КРС', None] )
-    gis_true_quest = QMessageBox.question(self, 'привязка компоновки',
-                                          'Нужно ли привязывать компоновку?')
-
-    if gis_true_quest == QMessageBox.StandardButton.Yes:
-        pass
-    else:
-        filling_list.pop(5)
-        filling_list.pop(4)
+    def update_roof(self):
+        roof_sand_edit = int(float(self.tabWidget.currentWidget().roof_sand_edit.text()))
+        rir_question_QCombo = str(self.tabWidget.currentWidget().rir_question_QCombo.currentText())
+        if roof_sand_edit:
+            if int(roof_sand_edit) + 10 > well_data.perforation_roof:
+                self.privyazka_question_QCombo.setCurrentIndex(1)
+            else:
+                self.privyazka_question_QCombo.setCurrentIndex(0)
+            if rir_question_QCombo == 'Да':
 
 
-    well_data.current_bottom = filling_depth
-    rir_true_quest = QMessageBox.question(self, 'РИР на пере',
-                                          'Нужно производить заливку на данной компоновке?')
-    if rir_true_quest == QMessageBox.StandardButton.Yes:
-        if self.rir_window is None:
+                self.sole_rir_edit.setText(f'{roof_sand_edit}')
+                self.roof_rir_edit.setText(f'{roof_sand_edit-50}')
 
-            self.rir_window = RirWindow()
-            self.rir_window.setGeometry(200, 400, 300, 400)
-            self.rir_window.show()
-            MyWindow.pause_app()
-            well_data.pause = True
-            rir_work_list = self.rir_window.addRowTable()
-            self.rir_window = None
+    def update_rir(self, index):
+
+        if index == "Да":
+            self.grid.addWidget(self.roof_rir_label, 6, 4)
+            self.grid.addWidget(self.roof_rir_edit, 7, 4)
+            self.grid.addWidget(self.sole_rir_LabelType, 6, 5)
+            self.grid.addWidget(self.sole_rir_edit, 7, 5)
         else:
-            self.rir_window.close()  # Close window.
-            self.rir_window = None
-        filling_list.extend(rir_work_list[-9:])
-    else:
+            self.roof_rir_label.setParent(None)
+            self.roof_rir_edit.setParent(None)
+            self.sole_rir_LabelType.setParent(None)
+            self.sole_rir_edit.setParent(None)
+
+
+class TabWidget(QTabWidget):
+    def __init__(self):
+        super().__init__()
+        self.addTab(TabPage_SO_sand(self), 'отсыпка')
+
+
+class SandWindow(QMainWindow):
+    work_sand_window = None
+    def __init__(self, ins_ind, table_widget, parent=None):
+        super(QMainWindow, self).__init__(parent)
+        self.centralWidget = QWidget()
+        self.setCentralWidget(self.centralWidget)
+
+        self.ins_ind = ins_ind
+        self.table_widget = table_widget
+        self.tabWidget = TabWidget()
+
+        self.buttonAdd = QPushButton('Добавить данные в план работ')
+        self.buttonAdd.clicked.connect(self.addWork)
+        vbox = QGridLayout(self.centralWidget)
+        vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
+        vbox.addWidget(self.buttonAdd, 2, 0)
+
+    def addWork(self):
+
+        privyazka_question_QCombo = str(self.tabWidget.currentWidget().privyazka_question_QCombo.currentText())
+        roof_sand_edit = int(float(self.tabWidget.currentWidget().roof_sand_edit.text()))
+        sole_sand_edit = int(float(self.tabWidget.currentWidget().sole_sand_edit.text()))
+        rir_question_QCombo = str(self.tabWidget.currentWidget().rir_question_QCombo.currentText())
+
+        work_list = self.sandFilling(roof_sand_edit, sole_sand_edit, privyazka_question_QCombo)
+        if rir_question_QCombo == "Да":
+            work_list = work_list[:-1]
+            roof_rir_edit = int(float(self.tabWidget.currentWidget().roof_rir_edit.text()))
+            sole_rir_edit = int(float(self.tabWidget.currentWidget().sole_rir_edit.text()))
+            rir_list = RirWindow.rirWithPero("Не нужно", '', roof_rir_edit, sole_rir_edit)
+            work_list.extend(rir_list[1:])
+
+        MyWindow.populate_row(self.ins_ind, work_list, self.table_widget)
+        well_data.pause = False
+        self.close()
+    def sand_select(self):
+
+        if well_data.column_additional is False or (well_data.column_additional is True and \
+                                                    well_data.current_bottom <= well_data.head_column_additional._value):
+            sand_select = f'перо +  НКТ{well_data.nkt_diam}мм 20м + реперный патрубок'
+
+        elif well_data.column_additional is True and \
+                well_data.column_additional_diametr._value < 110 and \
+                well_data.current_bottom >= well_data.head_column_additional._value:
+            sand_select = f'перо + НКТ{60}мм 20м + реперный патрубок + НКТ60мм ' \
+                          f'{round(well_data.current_bottom - well_data.head_column_additional._value, 0)}м '
+        elif well_data.column_additional is True and \
+                well_data.column_additional_diametr._value > 110 and \
+                well_data.current_bottom >= well_data.head_column_additional._value:
+            sand_select = f'перо + НКТ{well_data.nkt_diam}мм со снятыми фасками {20}м + реперный патрубок + ' \
+                          f'НКТ{well_data.nkt_diam}мм со снятыми фасками ' \
+                          f'{round(well_data.current_bottom - well_data.head_column_additional._value, 0)}м'
+        return sand_select
+
+    def sandFilling(self, filling_depth, sole_sand_edit, privyazka_question_QCombo):
+
+        from krs import well_volume, volume_vn_ek
+        from work_py.rir import RirWindow
+        nkt_diam = ''.join(['73' if well_data.column_diametr._value > 110 else '60'])
+
+        sand_volume = round(volume_vn_ek(self, filling_depth) * (sole_sand_edit - filling_depth), 1)
+
+
+        filling_list = [
+            [f'Спустить  {self.sand_select()}  на НКТ{nkt_diam}м до глубины {round(sole_sand_edit-100,0)}м', None,
+         f' Спустить  {self.sand_select()}  на НКТ{nkt_diam}м до глубины {round(sole_sand_edit-100,0)}м с замером, '
+         f'шаблонированием шаблоном {well_data.nkt_template}мм. (При СПО первых десяти НКТ на '
+         f'спайдере дополнительно устанавливать элеватор ЭХЛ)',
+         None, None, None, None, None, None, None,
+         'Мастер КР', descentNKT_norm(sole_sand_edit,1)],
+            [f'отсыпка кварцевым песком в инт. {filling_depth} - {sole_sand_edit} в объеме {sand_volume}л',
+             None, f'Произвести отсыпку кварцевым песком в инт. {filling_depth} - {sole_sand_edit} '
+                         f' в объеме {sand_volume}л '
+                         f'Закачать в НКТ кварцевый песок  с доводкой тех.жидкостью {well_data.fluid_work}',
+             None, None, None, None, None, None, None,
+             'мастер КРС', 3.5],
+            [f'Ожидание оседания песка 4 часа.',
+             None, f'Ожидание оседания песка 4 часа.',
+             None, None, None, None, None, None, None,
+             'мастер КРС', 4],
+            [None, None,
+             f'Допустить компоновку с замером и шаблонированием НКТ до кровли песчаного моста '
+             f'(плановый забой -{filling_depth}м).'
+            f' Определить текущий забой скважины (перо от песчаного моста не поднимать, упереться в песчаный мост).',
+             None, None, None, None, None, None, None,
+             'мастер КРС', 1.2],
+            [None, None,
+             f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС "Ойл-сервис". При необходимости '
+             f'подготовить место для установки партии ГИС напротив мостков. Произвести  монтаж ГИС согласно схемы  №8 при '
+             f'привязке утвержденной главным инженером оТ 14.10.2021г.',
+             None, None, None, None, None, None, None,
+             'мастер КРС', None],
+            [f'Привязка ', None,
+             f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины',
+             None, None, None, None, None, None, None,
+             'Мастер КРС, подрядчик по ГИС', 4],
+            [f'Определение кровли', None,
+             f'В случае если кровля песчаного моста на гл.{filling_depth}м дальнейшие работы продолжить дальше по плану'
+             f'В случае пеcчаного моста ниже гл.{filling_depth}м работы повторить с корректировкой обьема и '
+             f'технологических глубин.'
+             f' В случае песчаного моста выше гл.{filling_depth}м вымыть песок до гл.{filling_depth}м',
+             None, None, None, None, None, None, None,
+             'мастер КРС', None]
+        ]
+        if OpressovkaEK.testing_pressure(self, filling_depth):
+            filling_list.insert(-1,
+                        [f'Опрессовать в инт{filling_depth}-0м на Р={well_data.max_admissible_pressure._value}атм',
+                         None, f'Опрессовать эксплуатационную колонну в интервале {filling_depth}-0м на'
+                               f'Р={well_data.max_admissible_pressure._value}атм'
+                         f' в течение 30 минут в присутствии представителя заказчика, составить акт. '
+                         f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа'
+                                       f' до начала работ)',
+             None, None, None, None, None, None, None,
+             'мастер КРС, предст. заказчика', 0.67])
+            filling_list.insert(-1,
+                                [None, None,
+                         f'В случае негерметичности э/к, по согласованию с заказчиком произвести ОТСЭК для '
+                         f'определения интервала '
+                         f'негерметичности эксплуатационной колонны с точностью до одного НКТ или запись РГД, ВЧТ с '
+                         f'целью определения места нарушения в присутствии представителя заказчика, составить акт. '
+                         f'Определить приемистость НЭК.',
+                         None, None, None, None, None, None, None,
+                         'мастер КРС', None] )
+
+        if privyazka_question_QCombo == "Да":
+            pass
+        else:
+            filling_list.pop(5)
+            filling_list.pop(4)
+
+
         filling_list.append([None, None,
-         f'Поднять {sand_select(self)} НКТ{nkt_diam}м с глубины {filling_depth}м с доливом скважины в '
-         f'объеме {round(filling_depth * 1.12 / 1000, 1)}м3 тех. жидкостью  уд.весом {well_data.fluid_work}',
+                             f'Поднять {self.sand_select()} НКТ{nkt_diam}м с глубины {filling_depth}м с доливом '
+                             f'скважины в объеме {round(filling_depth * 1.12 / 1000, 1)}м3 тех. жидкостью '
+                             f'уд.весом {well_data.fluid_work}',
+             None, None, None, None, None, None, None,
+             'мастер КРС', liftingNKT_norm(filling_depth, 1)])
+
+        return filling_list
+
+    def sandWashing(self):
+
+        from krs import volume_vn_nkt
+        nkt_diam = ''.join(['73' if well_data.column_diametr._value > 110 else '60'])
+
+
+        washingDepth, ok = QInputDialog.getDouble(None, 'вымыв песка',
+                                                    'Введите глубину вымыва песчанного моста',
+                                                    well_data.current_bottom, 0, 6000, 1)
+        washingOut_list = [
+            [f'СПО пера до {round(well_data.current_bottom,0)}м', None,
+         f' Спустить  {SandWindow.sand_select(self)}  на НКТ{nkt_diam}м до глубины {round(well_data.current_bottom,0)}м с '
+         f'замером,'
+         f' шаблонированием шаблоном {well_data.nkt_template}мм. '
+         f'(При СПО первых десяти НКТ на '
+         f'спайдере дополнительно устанавливать элеватор ЭХЛ)',
          None, None, None, None, None, None, None,
-         'мастер КРС', liftingNKT_norm(filling_depth, 1)])
+         'Мастер КР', descentNKT_norm(well_data.current_bottom, 1)],
+            [f'вымыв песка до {washingDepth}м',
+             None, f'Произвести нормализацию забоя (вымыв кварцевого песка) с наращиванием, комбинированной '
+                   f'промывкой по круговой циркуляции '
+                   f'жидкостью  с расходом жидкости не менее 8 л/с до гл.{washingDepth}м. \n'
+                   f'Тех отстой 2ч. Повторное определение текущего забоя, при необходимости повторно вымыть.',
+             None, None, None, None, None, None, None,
+             'мастер КРС', 3.5],
+            [None, None,
+             f'Поднять {SandWindow.sand_select(self)} НКТ{nkt_diam}м с глубины {washingDepth}м с доливом скважины в объеме '
+             f'{round(washingDepth * 1.12 / 1000, 1)}м3 тех. '
+             f'жидкостью  уд.весом {well_data.fluid_work}',
+             None, None, None, None, None, None, None,
+             'мастер КРС', liftingNKT_norm(washingDepth, 1.2)]]
+        well_data.current_bottom = washingDepth
 
-    return filling_list
-
-def sandWashing(self):
-   
-    from krs import volume_vn_nkt
-    nkt_diam = ''.join(['73' if well_data.column_diametr._value > 110 else '60'])
-
-
-
-    washingDepth, ok = QInputDialog.getDouble(None, 'вымыв песка',
-                                                'Введите глубину вымыва песчанного моста',
-                                                well_data.current_bottom, 0, 6000, 1)
-    washingOut_list = [
-        [f'СПО пера до {round(well_data.current_bottom,0)}м', None,
-     f' Спустить  {sand_select(self)}  на НКТ{nkt_diam}м до глубины {round(well_data.current_bottom,0)}м с замером, '
-     f'шаблонированием шаблоном {well_data.nkt_template}мм. '
-     f'(При СПО первых десяти НКТ на '
-     f'спайдере дополнительно устанавливать элеватор ЭХЛ)',
-     None, None, None, None, None, None, None,
-     'Мастер КР', descentNKT_norm(well_data.current_bottom, 1)],
-        [f'вымыв песка до {washingDepth}м',
-         None, f'Произвести нормализацию забоя (вымыв кварцевого песка) с наращиванием, комбинированной  промывкой по круговой циркуляции '
-                     f'жидкостью  с расходом жидкости не менее 8 л/с до гл.{washingDepth}м. \n'
-                     f'Тех отстой 2ч. Повторное определение текущего забоя, при необходимости повторно вымыть.',
-         None, None, None, None, None, None, None,
-         'мастер КРС', 3.5],
-        [None, None,
-         f'Поднять {sand_select(self)} НКТ{nkt_diam}м с глубины {washingDepth}м с доливом скважины в объеме {round(washingDepth * 1.12 / 1000, 1)}м3 тех. '
-         f'жидкостью  уд.весом {well_data.fluid_work}',
-         None, None, None, None, None, None, None,
-         'мастер КРС', liftingNKT_norm(washingDepth, 1.2)]]
-    well_data.current_bottom = washingDepth
-
-    return washingOut_list
+        return washingOut_list

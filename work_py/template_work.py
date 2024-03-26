@@ -13,7 +13,7 @@ from main import MyWindow
 
 class TabPage_SO_with(QWidget):
     def __init__(self, parent=None):
-       
+
         super().__init__(parent)
 
         validator = QDoubleValidator(0.0, 80000.0, 2)
@@ -40,6 +40,7 @@ class TabPage_SO_with(QWidget):
         self.dictance_template_first_Label = QLabel("расстояние", self)
         self.dictance_template_first_Edit = QLineEdit(self)
         self.dictance_template_first_Edit.setValidator(validator)
+
 
         self.skm_Label = QLabel("диаметр СКМ", self)
         self.skm_Edit = QLineEdit(self)
@@ -70,8 +71,6 @@ class TabPage_SO_with(QWidget):
         self.sole_skm_line = QLineEdit(self)
         self.sole_skm_line.setClearButtonEnabled(True)
         self.sole_skm_line.setValidator(validator)
-
-
 
         self.grid = QGridLayout(self)
         if well_data.column_additional is False or \
@@ -137,7 +136,7 @@ class TabPage_SO_with(QWidget):
         self.grid.addWidget(self.skm_teml_str_Edit, 14, 1, 1, 8)
 
         if well_data.column_additional is False or (well_data.column_additional and
-                                                   well_data.head_column_additional._value >= well_data.current_bottom):
+                                                    well_data.head_column_additional._value >= well_data.current_bottom):
             first_template, template_second = self.template_diam_ek()
         else:
             first_template, template_second = self.template_diam_additional_ek()
@@ -153,24 +152,17 @@ class TabPage_SO_with(QWidget):
 
         self.lenght_template_first_Edit.setText(str(2))
 
-
-        #
-        # dictance_template_first = int(well_data.current_bottom - roof_plast + 5)
-        # self.dictance_template_first_Edit.setText(str(dictance_template_first))
-        # self.skm_Edit.setText(str(well_data.column_diametr._value))
-        # self.dictance_template_second_Edit.setText(str(10))
-
+        self.dictance_template_second_Edit.textChanged.connect(self.update_template)
+        self.dictance_template_first_Edit.textChanged.connect(self.update_template)
         self.template_first_Edit.textChanged.connect(self.update_template)
         self.dictance_three_Edit.textChanged.connect(self.update_template)
         self.lenght_template_second_Edit.textChanged.connect(self.update_template)
         self.template_second_Edit.textChanged.connect(self.update_template)
-        self.dictance_template_second_Edit.textChanged.connect(self.update_template)
-        self.dictance_template_first_Edit.textChanged.connect(self.update_template)
+
         self.lenght_template_first_Edit.textChanged.connect(self.update_template)
         self.skm_Edit.textChanged.connect(self.update_template)
 
     def definition_pssh(self):
-       
 
         if well_data.column_additional is False and well_data.open_trunk_well is False and all(
                 [well_data.dict_perforation[plast]['отрайбировано'] for plast in well_data.plast_work]) is False:
@@ -182,9 +174,6 @@ class TabPage_SO_with(QWidget):
         elif well_data.column_additional is False and well_data.open_trunk_well is False and all(
                 [well_data.dict_perforation[plast]['отрайбировано'] for plast in well_data.plast_work]) is True:
             template_key = 'ПСШ без хвоста'
-
-        # elif well_data.column_additional is True and well_data.head_column_additional._value > roof_skm:
-        #     template_key = 'ПСШ Доп колонна СКМ в основной колонне'
 
         elif well_data.column_additional is True and well_data.open_trunk_well is False and all(
                 [well_data.dict_perforation[plast]['отрайбировано'] for plast in well_data.plast_work]) is False:
@@ -199,16 +188,8 @@ class TabPage_SO_with(QWidget):
             template_key = 'ПСШ СКМ в доп колонне без хвоста'
         return template_key
 
-        # self.sole_rir_Edit.setText()
-        # listEnabel = [self.khovstLabel, self.khvostEdit, self.swabTruelabelType, self.swabTrueEditType,
-        #               self.plastCombo, self.pakerEdit, self.paker2Edit,
-        #               self.svkTrueEdit, self.QplastEdit, self.skvProcEdit, self.acidEdit, self.acidVolumeEdit,
-        #               self.acidProcEdit]
-        # for enable in listEnabel:
-        #     enable.setEnabled(False)
-
     def update_template(self):
-       
+
         if self.template_first_Edit.text() != '':
             first_template = self.template_first_Edit.text()
         if self.lenght_template_first_Edit.text() != '':
@@ -236,9 +217,9 @@ class TabPage_SO_with(QWidget):
         roof_plast, roof_add_column_plast = self.definition_roof_not_raiding()
 
         if well_data.column_additional or \
-                (well_data.head_column_additional._value >= well_data.current_bottom and well_data.column_additional is False):
+                (
+                        well_data.head_column_additional._value >= well_data.current_bottom and well_data.column_additional is False):
             nkt_pod = '60мм' if well_data.column_additional_diametr._value < 110 else '73мм со снятыми фасками'
-
 
         if first_template != '' and lenght_template_first != '' and \
                 template_second != '' and lenght_template_second != '' and \
@@ -256,7 +237,7 @@ class TabPage_SO_with(QWidget):
                                    f'L-{lenght_template_second}м '
 
                     well_data.template_depth = int(well_data.current_bottom - int(dictance_template_first) -
-                                                  int(lenght_template_first)) - int(dictance_template_second)
+                                                   int(lenght_template_first)) - int(dictance_template_second)
                     well_data.skm_depth = well_data.template_depth + dictance_template_second
                     skm_teml_str = f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
 
@@ -276,7 +257,7 @@ class TabPage_SO_with(QWidget):
                                    f'+ СКМ-{skm} + {dictance_template_second}м НКТ{nkt_diam}м + ' \
                                    f'шаблон-{template_second}мм L-{lenght_template_second}м '
                     well_data.template_depth = int(well_data.current_bottom - int(dictance_template_first) -
-                                                  int(dictance_template_second) - int(lenght_template_first))
+                                                   int(dictance_template_second) - int(lenght_template_first))
                     well_data.skm_depth = well_data.template_depth + dictance_template_second
                     skm_teml_str = f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
 
@@ -290,7 +271,8 @@ class TabPage_SO_with(QWidget):
 
                     well_data.template_depth_addition = int(roof_add_column_plast - 5)
 
-                    well_data.template_depth = int(roof_add_column_plast - 5 -dictance_template_second - dictance_three)
+                    well_data.template_depth = int(
+                        roof_add_column_plast - 5 - dictance_template_second - dictance_three)
                     well_data.skm_depth = well_data.template_depth + dictance_three
                 # template_str = template_SKM_DP_EK
                 skm_teml_str = f'шаблон-{first_template}мм до гл.{well_data.template_depth_addition}м, ' \
@@ -304,11 +286,11 @@ class TabPage_SO_with(QWidget):
                                    f'L-{lenght_template_first}м + НКТ{nkt_pod} {dictance_three}м + ' \
                                    f'шаблон-{template_second}мм L-{lenght_template_second}м '
                     well_data.template_depth = math.ceil(well_data.current_bottom - 2 -
-                                                        int(dictance_template_first) - int(dictance_template_second) -
-                                                        int(lenght_template_first) - int(dictance_three))
-                    well_data.template_depth_addition = math.ceil(roof_add_column_plast -
-                                                                 5 - dictance_template_second)
-                    well_data.skm_depth = well_data.template_depth_addition + dictance_template_second
+                                                         int(dictance_template_first) - int(dictance_template_second) -
+                                                         int(lenght_template_first) - int(dictance_three))
+                    well_data.template_depth_addition = math.ceil(
+                        well_data.current_bottom - int(dictance_template_first) - int(dictance_template_second))
+                    well_data.skm_depth =  well_data.current_bottom - int(dictance_template_first)
 
                     skm_teml_str = f'шаблон-{first_template}мм до гл.{well_data.template_depth_addition}м, ' \
                                    f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
@@ -320,7 +302,8 @@ class TabPage_SO_with(QWidget):
                                    f'НКТ{nkt_pod} {dictance_three}м + шаблон-{template_second}мм ' \
                                    f'L-{lenght_template_second}м '
 
-                    well_data.template_depth = math.ceil(roof_add_column_plast - 5 - dictance_template_second - dictance_three)
+                    well_data.template_depth = math.ceil(
+                        roof_add_column_plast - 5 - dictance_template_second - dictance_three)
                     well_data.template_depth_addition = math.ceil(
                         well_data.current_bottom - int(dictance_template_second))
                     well_data.skm_depth = well_data.template_depth_addition + dictance_template_second
@@ -336,7 +319,7 @@ class TabPage_SO_with(QWidget):
                                    f' + НКТ{nkt_pod} {dictance_three}м + шаблон-{template_second}мм ' \
                                    f'L-{lenght_template_second}м '
                     well_data.template_depth_addition = math.ceil(roof_add_column_plast -
-                                                                 5 - dictance_template_second)
+                                                                  5 - dictance_template_second)
 
                     well_data.skm_depth = well_data.template_depth_addition + dictance_template_second
 
@@ -347,12 +330,10 @@ class TabPage_SO_with(QWidget):
                 self.skm_teml_str_Edit.setText(skm_teml_str)
 
     def update_template_edit(self, index):
-       
 
         nkt_diam = well_data.nkt_diam
         if well_data.column_additional is False or (well_data.column_additional and
-                                                   well_data.head_column_additional._value >= well_data.current_bottom):
-
+                                                    well_data.head_column_additional._value >= well_data.current_bottom):
             first_template, template_second = self.template_diam_ek()
             # print(f'диаметры шаблонов {first_template, template_second}')
         else:
@@ -394,7 +375,8 @@ class TabPage_SO_with(QWidget):
         self.dictance_three_Edit.setParent(None)
 
         if well_data.column_additional or \
-                (well_data.head_column_additional._value >= well_data.current_bottom and well_data.column_additional is False):
+                (well_data.head_column_additional._value >= well_data.current_bottom and \
+                 well_data.column_additional is False):
             nkt_pod = '60мм' if well_data.column_additional_diametr._value < 110 else '73мм со снятыми фасками'
 
         if index == 'ПСШ ЭК':
@@ -414,7 +396,7 @@ class TabPage_SO_with(QWidget):
 
             # print(f'строка шаблона {template_str}')
             well_data.template_depth = int(well_data.current_bottom - int(dictance_template_first1) -
-                                          int(lenght_template_first)) - int(dictance_template_second)
+                                           int(lenght_template_first)) - int(dictance_template_second)
             well_data.skm_depth = well_data.template_depth + dictance_template_second
             skm_teml_str = f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
 
@@ -447,7 +429,8 @@ class TabPage_SO_with(QWidget):
             template_str = f'фильтр-направление + НКТ{nkt_diam}м {dictance_template_first}м ' \
                            f'+ СКМ-{skm} + {dictance_template_second}м НКТ{nkt_diam}м + ' \
                            f'шаблон-{template_second}мм L-{lenght_template_second}м '
-            well_data.template_depth = int(well_data.current_bottom - dictance_template_first - dictance_template_second)
+            well_data.template_depth = int(
+                well_data.current_bottom - dictance_template_first - dictance_template_second)
             well_data.skm_depth = well_data.template_depth + dictance_template_second
 
             skm_teml_str = f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
@@ -473,7 +456,8 @@ class TabPage_SO_with(QWidget):
             self.skm_Edit.setText(str(well_data.column_diametr._value))
             self.dictance_template_first_Edit.setText(str(dictance_template_first1))
             dictance_template_first = int(self.dictance_template_first_Edit.text())
-            dictance_second1 = int(roof_add_column_plast - lenght_template_first - well_data.head_column_additional._value - 5)
+            dictance_second1 = int(
+                roof_add_column_plast - lenght_template_first - well_data.head_column_additional._value - 5)
             self.dictance_template_second_Edit.setText(str(dictance_second1))
             dictance_template_second = int(self.dictance_template_second_Edit.text())
             self.lenght_template_second_Edit.setText(str(lenght_template_second))
@@ -483,12 +467,12 @@ class TabPage_SO_with(QWidget):
 
             template_str = f'обточная муфта  + ' \
                            f'НКТ{nkt_pod}  + {dictance_template_first}м + шаблон-{first_template}мм L-{lenght_template_first}м + ' \
-                           f'НКТ{nkt_pod} {dictance_template_second}м +'\
+                           f'НКТ{nkt_pod} {dictance_template_second}м +' \
                            f'СКМ-{skm} + НКТ{nkt_diam} {dictance_three_first}м + шаблон-{template_second}мм L-{lenght_template_second}м '
 
             well_data.template_depth_addition = int(well_data.current_bottom - dictance_template_first)
             well_data.template_depth = int(well_data.current_bottom - dictance_template_first - lenght_template_first -
-                                          dictance_template_second - dictance_three_first)
+                                           dictance_template_second - dictance_three_first)
             well_data.skm_depth = well_data.template_depth + dictance_three_first
             # template_str = template_SKM_DP_EK
             skm_teml_str = f'шаблон-{first_template}мм до гл.{well_data.template_depth_addition}м, ' \
@@ -523,10 +507,10 @@ class TabPage_SO_with(QWidget):
                            f'L-{lenght_template_first}м + НКТ{nkt_pod} {dictance_three_first}м + ' \
                            f'шаблон-{template_second}мм L-{lenght_template_second}м '
             well_data.template_depth = math.ceil(well_data.current_bottom - 2 -
-                                                dictance_template_first - dictance_template_second -
-                                                lenght_template_first - dictance_template_three)
+                                                 dictance_template_first - dictance_template_second -
+                                                 lenght_template_first - dictance_template_three)
             well_data.template_depth_addition = math.ceil(well_data.current_bottom - 2 -
-                                                         dictance_template_first - dictance_template_second)
+                                                          dictance_template_first - dictance_template_second)
             well_data.skm_depth = well_data.template_depth_addition + dictance_template_second
 
             skm_teml_str = f'шаблон-{first_template}мм до гл.{well_data.template_depth_addition}м, ' \
@@ -557,7 +541,7 @@ class TabPage_SO_with(QWidget):
                            f'L-{lenght_template_second}м '
 
             well_data.template_depth = math.ceil(well_data.current_bottom - dictance_template_second -
-                                                lenght_template_first - dictance_three_first)
+                                                 lenght_template_first - dictance_three_first)
             well_data.template_depth_addition = math.ceil(well_data.current_bottom - dictance_template_second)
             well_data.skm_depth = well_data.template_depth_addition + dictance_template_second
             skm_teml_str = f'шаблон-{first_template}мм до гл.{well_data.template_depth_addition}м, ' \
@@ -595,10 +579,10 @@ class TabPage_SO_with(QWidget):
                            f' + НКТ{nkt_pod} {dictance_template_three}м + шаблон-{template_second}мм ' \
                            f'L-{lenght_template_second}м '
             well_data.template_depth = math.ceil(well_data.current_bottom - 2 -
-                                                dictance_template_first - dictance_template_second -
-                                                lenght_template_first - dictance_template_three)
+                                                 dictance_template_first - dictance_template_second -
+                                                 lenght_template_first - dictance_template_three)
             well_data.template_depth_addition = math.ceil(well_data.current_bottom - 2 -
-                                                         dictance_template_first - dictance_template_second)
+                                                          dictance_template_first - dictance_template_second)
             well_data.skm_depth = well_data.template_depth_addition + dictance_template_second
 
             skm_teml_str = f'шаблон-{first_template}мм до гл.{well_data.template_depth_addition}м, ' \
@@ -611,7 +595,7 @@ class TabPage_SO_with(QWidget):
             self.template_second_Edit.setText(str(126))
 
     def definition_ECN_true(self, depth_ecn):
-       
+
         if well_data.column_additional is False and well_data.dict_pump_ECN["posle"] != 0:
             return "4", "30"
         elif well_data.column_additional is True and well_data.dict_pump_ECN["posle"] != 0 \
@@ -628,7 +612,7 @@ class TabPage_SO_with(QWidget):
             # print(f' ЭЦН длина" {well_data.lift_ecn_can, well_data.lift_ecn_can_addition, "ЭЦН" in str(well_data.dict_pump["posle"][0]).upper()}')
 
     def definition_roof_not_raiding(self):
-       
+
         dict_perforation = well_data.dict_perforation
         plast_all = list(dict_perforation.keys())
         roof_plast = well_data.current_bottom
@@ -664,7 +648,7 @@ class TabPage_SO_with(QWidget):
                         roof_plast = well_data.head_column_additional._value
                     elif well_data.open_trunk_well is True and dict_perforation[plast]['отрайбировано']:
                         roof_plast = well_data.shoe_column._value
-                        roof_add_column_plast =well_data.current_bottom
+                        roof_add_column_plast = well_data.current_bottom
                         break
                     else:
                         roof_add_column_plast = roof
@@ -688,7 +672,6 @@ class TabPage_SO_with(QWidget):
         return roof_plast, roof_add_column_plast
 
     def template_diam_ek(self):
-       
 
         diam_internal_ek = well_data.column_diametr._value - 2 * well_data.column_wall_thickness._value
 
@@ -728,7 +711,7 @@ class TabPage_SO_with(QWidget):
         return (template_first_diam, template_second_diam)
 
     def template_diam_additional_ek(self):  # Выбор диаметра шаблонов при наличии в скважине дополнительной колонны
-       
+
         diam_internal_ek = well_data.column_diametr._value - 2 * well_data.column_wall_thickness._value
         diam_internal_ek_addition = float(well_data.column_additional_diametr._value) - 2 * float(
             well_data.column_additional_wall_thickness._value)
@@ -832,11 +815,10 @@ class TemplateKrs(QMainWindow):
         self.tableWidget.setSortingEnabled(False)
 
     def addString(self):
-
         from work_py.advanted_file import skm_interval
-        template = self.tabWidget.currentWidget().template_Combo.currentText()
 
-        skm_interval = skm_interval(self, template)
+        template_key = str(self.tabWidget.currentWidget().template_Combo.currentText())
+        skm_interval = skm_interval(self, template_key)
         if len(skm_interval) == 0:
             mes = QMessageBox.warning(self, 'Ошибка',
                                       'Интервалы перфорации не отрайбированы,'
@@ -849,16 +831,12 @@ class TemplateKrs(QMainWindow):
             self.tableWidget.setItem(rows, 0, QTableWidgetItem(str(int(roof))))
             self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(int(sole))))
             self.tableWidget.setSortingEnabled(False)
-
-        # except:
-        #     mes = QMessageBox.warning(self, 'Ошибка', 'Данные введены не корректно')
-        #     self.addString()
-
     def addWork(self):
 
         template_str = str(self.tabWidget.currentWidget().template_str_Edit.text())
         template_key = str(self.tabWidget.currentWidget().template_Combo.currentText())
-
+        distance_second = int(self.tabWidget.currentWidget().dictance_template_second_Edit.text())
+        distance_first = int(self.tabWidget.currentWidget().dictance_template_first_Edit.text())
         if well_data.column_additional is False or (
                 well_data.column_additional is True and float(
             well_data.head_column_additional._value) >= well_data.current_bottom):
@@ -867,11 +845,32 @@ class TemplateKrs(QMainWindow):
             template_diametr = int(self.tabWidget.currentWidget().template_first_Edit.text())
 
         if (template_diametr >= int(well_data.problemWithEk_diametr._value) - 2
+                and well_data.template_depth > int(well_data.problemWithEk_depth)):
+            mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже глубины не прохода')
+            return
+        if (template_diametr >= int(well_data.problemWithEk_diametr._value) - 2
             and well_data.template_depth > int(well_data.problemWithEk_depth)):
             mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже глубины не прохода')
-
             return
-
+        if well_data.column_additional is False or \
+                well_data.column_additional and well_data.current_bottom <= well_data.head_column_additional._value:
+            if well_data.template_depth >= well_data.current_bottom:
+                mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже текущего забоя')
+                return
+        else:
+            if well_data.template_depth_addition >= well_data.current_bottom:
+                mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже текущего забоя')
+                return
+            if well_data.template_depth >= well_data.head_column_additional._value:
+                mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже головы хвостовика')
+                return
+            if template_key == 'ПСШ Доп колонна СКМ в основной колонне' and\
+                    well_data.skm_depth >= well_data.head_column_additional._value:
+                mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'СКМ спускается ниже головы хвостовика')
+                return
+        if distance_second < 0 or distance_first < 0:
+            mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'Расстояние между шаблонами не корректно')
+            return
         skm_tuple = []
         rows = self.tableWidget.rowCount()
         if rows == 0:
@@ -886,13 +885,12 @@ class TemplateKrs(QMainWindow):
                 skm_tuple.append((roof, sole))
 
         # skm_list = self.SkmColumn(skm_tuple)
-        skm_list = sorted(skm_tuple, key = lambda x: x[0])
+        skm_list = sorted(skm_tuple, key=lambda x: x[0])
         work_template_list = self.template_ek(template_str, template_key, template_diametr, skm_list)
 
         MyWindow.populate_row(self.ins_ind, work_template_list, self.table_widget)
         well_data.pause = False
         self.close()
-
 
     def del_row_table(self):
         row = self.tableWidget.currentRow()
@@ -901,28 +899,26 @@ class TemplateKrs(QMainWindow):
             return
         self.tableWidget.removeRow(row)
 
-
     def well_volume(self):
-       
 
         if not well_data.column_additional:
 
-            volume_well = 3.14 * (well_data.column_diametr._value - well_data.column_wall_thickness._value * 2) ** 2 / 4 / 1000000 * (
-                well_data.current_bottom)
+            volume_well = 3.14 * (
+                        well_data.column_diametr._value - well_data.column_wall_thickness._value * 2) ** 2 / 4 / 1000000 * (
+                              well_data.current_bottom)
             return volume_well
         else:
             volume_well = (3.14 * (
                     well_data.column_additional_diametr._value - well_data.column_wall_thickness._value * 2) ** 2 / 4 / 1000 * (
-                                   well_data.current_bottom - float(well_data.head_column_additional._value)) / 1000) + (
+                                   well_data.current_bottom - float(
+                               well_data.head_column_additional._value)) / 1000) + (
                                   3.14 * (
-                                      well_data.column_diametr._value - well_data.column_wall_thickness._value * 2) ** 2 / 4 / 1000 * (
+                                  well_data.column_diametr._value - well_data.column_wall_thickness._value * 2) ** 2 / 4 / 1000 * (
                                       well_data.head_column_additional._value) / 1000)
             return volume_well
 
-
-
     def template_ek(self, template_str, template_key, template_diametr, skm_list):
-       
+
         from work_py.advanted_file import raid
 
         skm_interval = raid(skm_list)
@@ -933,15 +929,16 @@ class TemplateKrs(QMainWindow):
              f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
              None, None, None, None, None, None, None,
              'мастер КРС', descentNKT_norm(well_data.current_bottom, 1.2)],
-            [f'Произвести скреперование э/к в интервале {skm_interval}м Допустить низ НКТ до гл. {well_data.current_bottom}м',
-             None,
-             f'Произвести скреперование э/к в интервале {skm_interval}м обратной промывкой и проработкой 5 раз каждого '
-             'наращивания. Работы производить согласно сборника технологических регламентов и инструкций в присутствии '
-             f'представителя Заказчика. Допустить низ НКТ до гл. {well_data.current_bottom}м, шаблон '
-             f'до глубины {well_data.template_depth}м. Составить акт. \n'
-             '(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ). ',
-             None, None, None, None, None, None, None,
-             'Мастер КРС, представитель УСРСиСТ', round(0.012 * 90 * 1.04 + 1.02 + 0.77, 2)],
+            [
+                f'Произвести скреперование э/к в интервале {skm_interval}м Допустить низ НКТ до гл. {well_data.current_bottom}м',
+                None,
+                f'Произвести скреперование э/к в интервале {skm_interval}м обратной промывкой и проработкой 5 раз каждого '
+                'наращивания. Работы производить согласно сборника технологических регламентов и инструкций в присутствии '
+                f'представителя Заказчика. Допустить низ НКТ до гл. {well_data.current_bottom}м, шаблон '
+                f'до глубины {well_data.template_depth}м. Составить акт. \n'
+                '(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ). ',
+                None, None, None, None, None, None, None,
+                'Мастер КРС, представитель УСРСиСТ', round(0.012 * 90 * 1.04 + 1.02 + 0.77, 2)],
             [f'Очистить колонну от АСПО растворителем - 2м3', None,
              f'По результатам ревизии ГНО, в случае наличия отложений АСПО:\n'
              f'Очистить колонну от АСПО растворителем - 2м3. При открытом затрубном пространстве закачать в '
@@ -950,7 +947,8 @@ class TemplateKrs(QMainWindow):
              f'пространство. Реагирование 2 часа.',
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика', 4],
-            [f'Промывка скважину уд.весом {well_data.fluid_work_short} в объеме {round(TemplateKrs.well_volume(self) * 1.5, 1)}м3 ',
+            [
+                f'Промывка скважину уд.весом {well_data.fluid_work_short} в объеме {round(TemplateKrs.well_volume(self) * 1.5, 1)}м3 ',
                 None,
                 f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {well_data.fluid_work}  при расходе '
                 f'жидкости 6-8 л/сек '
@@ -960,7 +958,8 @@ class TemplateKrs(QMainWindow):
                 None, None, None, None, None, None, None,
                 'Мастер КРС, представитель ЦДНГ', well_volume_norm(TemplateKrs.well_volume(self) * 1.5)],
             [None, None, f'При необходимости нормализовать забой обратной промывкой тех жидкостью уд.весом '
-                         f'{well_data.fluid_work} до глубины {well_data.current_bottom}м.', None, None, None, None, None,
+                         f'{well_data.fluid_work} до глубины {well_data.current_bottom}м.', None, None, None, None,
+             None,
              None, None,
              'Мастер КРС', None],
             [f'Приподнять до глубины {round(well_data.current_bottom - 20, 1)}м. Тех отстой 2ч', None,
@@ -977,56 +976,56 @@ class TemplateKrs(QMainWindow):
 
         notes_list = [
             [None, None,
-           f'ПРИМЕЧАНИЕ №1: При непрохождении шаблона d={template_diametr}мм предусмотреть СПО забойного '
-           f'двигателя с райбером d={template_diametr + 1}мм, {template_diametr - 1}мм, {template_diametr - 3}мм, '
-           f'{template_diametr - 5}мм на ТНКТ под проработку в интервале посадки инструмента с допуском до '
-           f'гл.{well_data.current_bottom}м с последующим СПО шаблона {template_diametr}мм на ТНКТ под промывку '
-           f'скважины (по согласованию Заказчиком). Подъем райбера (шаблона {template_diametr}мм) '
-           f'на ТНКТ с гл. {well_data.current_bottom}м вести с доливом скважины до устья т/ж '
-           f'удел.весом {well_data.fluid_work} в '
-           f'объеме {round(well_data.current_bottom * 1.12 / 1000, 1)}м3 ',
-           None, None, None, None, None, None, None, 'Мастер КРС', None, None],
-          [None, None,
-           f'ПРИМЕЧАНИЕ №2: При отсутствия планового текущего забоя произвести СПО забойного двигателя с '
-           f'долотом {template_diametr};'
-           f' {template_diametr - 2}; {template_diametr - 4}мм  фрезера-{template_diametr}мм, '
-           f'райбера-{template_diametr + 1}мм и другого оборудования и '
-           f'инструмента, (при необходимости  ловильного), при необходимости на СБТ для восстановления '
-           f'проходимости ствола  '
-           f'и забоя скважины с применением мех.ротора, до текущего забоя с последующей нормализацией до '
-           f'планового '
-           f'текущего забоя. Подъем долота с забойным двигателем на  ТНКТ с гл.{well_data.current_bottom}м '
-           f'вести с доливом '
-           f'скважины до устья т/ж удел.весом {well_data.fluid_work} в объеме '
-           f'{round(well_data.current_bottom * 1.12 / 1000, 1)}м3',
-           None, None, None, None, None, None, None, 'Мастер КРС',
-           None],
-          [None, None,
-           f'ПРИМЕЧАНИЕ №3: В случае отсутствия проходки более 4 часов при нормализации забоя по примечанию '
-           f'№2 произвести '
-           f'СПО МЛ с последующим СПО торцевой печати. Подъем компоновки на ТНКТ с гл.'
-           f'{well_data.current_bottom}м вести с '
-           f'доливом скважины до устья т/ж удел.весом с доливом c'
-           f'скважины до устья т/ж удел.весом {well_data.fluid_work} в объеме '
-           f'{round(well_data.current_bottom * 1.12 / 1000, 1)}м3',
-           None, None, None, None, None, None, None, 'Мастер КРС', None],
-          [None, None,
-           f'Примечание №4: В случае отсутствия циркуляции при нормализации забоя произвести СПО КОТ-50 '
-           f'до планового '
-           f'текущего забоя обратной циркуляцией. СПО КОТ-50 повторить до полной нормализации. При жесткой посадке '
-           f'КОТ-50 произвести взрыхление с СПО забойного двигателя с долотом . Подъем компоновки '
-           f'на ТНКТ с гл.{well_data.current_bottom}м'
-           f' вести с доливом скважины до устья т/ж удел.весом {well_data.fluid_work} в '
-           f'объеме {round(well_data.current_bottom * 1.12 / 1000, 1)}м3',
-           None, None, None, None, None, None, None, 'Мастер КРС', None, ''],
-          [None, None,
-           f'Примечание №5: В случае необходимости по результатам восстановления проходимости '
-           f'экплуатационной колонны '
-           f'по согласованию с УСРСиСТ произвести СПО пера под промывку скважины до планового текущего забоя на '
-           f'проходимость. Подъем компоновки на ТНКТ с гл.{well_data.current_bottom}м'
-           f' вести с доливом скважины до устья т/ж удел.весом {well_data.fluid_work} в объеме '
-           f'{round(well_data.current_bottom * 1.12 / 1000, 1)}м3',
-           None, None, None, None, None, None, None, 'Мастер КРС', None, None]]
+             f'ПРИМЕЧАНИЕ №1: При непрохождении шаблона d={template_diametr}мм предусмотреть СПО забойного '
+             f'двигателя с райбером d={template_diametr + 1}мм, {template_diametr - 1}мм, {template_diametr - 3}мм, '
+             f'{template_diametr - 5}мм на ТНКТ под проработку в интервале посадки инструмента с допуском до '
+             f'гл.{well_data.current_bottom}м с последующим СПО шаблона {template_diametr}мм на ТНКТ под промывку '
+             f'скважины (по согласованию Заказчиком). Подъем райбера (шаблона {template_diametr}мм) '
+             f'на ТНКТ с гл. {well_data.current_bottom}м вести с доливом скважины до устья т/ж '
+             f'удел.весом {well_data.fluid_work} в '
+             f'объеме {round(well_data.current_bottom * 1.12 / 1000, 1)}м3 ',
+             None, None, None, None, None, None, None, 'Мастер КРС', None, None],
+            [None, None,
+             f'ПРИМЕЧАНИЕ №2: При отсутствия планового текущего забоя произвести СПО забойного двигателя с '
+             f'долотом {template_diametr};'
+             f' {template_diametr - 2}; {template_diametr - 4}мм  фрезера-{template_diametr}мм, '
+             f'райбера-{template_diametr + 1}мм и другого оборудования и '
+             f'инструмента, (при необходимости  ловильного), при необходимости на СБТ для восстановления '
+             f'проходимости ствола  '
+             f'и забоя скважины с применением мех.ротора, до текущего забоя с последующей нормализацией до '
+             f'планового '
+             f'текущего забоя. Подъем долота с забойным двигателем на  ТНКТ с гл.{well_data.current_bottom}м '
+             f'вести с доливом '
+             f'скважины до устья т/ж удел.весом {well_data.fluid_work} в объеме '
+             f'{round(well_data.current_bottom * 1.12 / 1000, 1)}м3',
+             None, None, None, None, None, None, None, 'Мастер КРС',
+             None],
+            [None, None,
+             f'ПРИМЕЧАНИЕ №3: В случае отсутствия проходки более 4 часов при нормализации забоя по примечанию '
+             f'№2 произвести '
+             f'СПО МЛ с последующим СПО торцевой печати. Подъем компоновки на ТНКТ с гл.'
+             f'{well_data.current_bottom}м вести с '
+             f'доливом скважины до устья т/ж удел.весом с доливом c'
+             f'скважины до устья т/ж удел.весом {well_data.fluid_work} в объеме '
+             f'{round(well_data.current_bottom * 1.12 / 1000, 1)}м3',
+             None, None, None, None, None, None, None, 'Мастер КРС', None],
+            [None, None,
+             f'Примечание №4: В случае отсутствия циркуляции при нормализации забоя произвести СПО КОТ-50 '
+             f'до планового '
+             f'текущего забоя обратной циркуляцией. СПО КОТ-50 повторить до полной нормализации. При жесткой посадке '
+             f'КОТ-50 произвести взрыхление с СПО забойного двигателя с долотом . Подъем компоновки '
+             f'на ТНКТ с гл.{well_data.current_bottom}м'
+             f' вести с доливом скважины до устья т/ж удел.весом {well_data.fluid_work} в '
+             f'объеме {round(well_data.current_bottom * 1.12 / 1000, 1)}м3',
+             None, None, None, None, None, None, None, 'Мастер КРС', None, ''],
+            [None, None,
+             f'Примечание №5: В случае необходимости по результатам восстановления проходимости '
+             f'экплуатационной колонны '
+             f'по согласованию с УСРСиСТ произвести СПО пера под промывку скважины до планового текущего забоя на '
+             f'проходимость. Подъем компоновки на ТНКТ с гл.{well_data.current_bottom}м'
+             f' вести с доливом скважины до устья т/ж удел.весом {well_data.fluid_work} в объеме '
+             f'{round(well_data.current_bottom * 1.12 / 1000, 1)}м3',
+             None, None, None, None, None, None, None, 'Мастер КРС', None, None]]
 
         privyazka_nkt = [f'Привязка по ГК и ЛМ По привязому НКТ удостовериться в наличии текущего забоя', None,
                          f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС "Ойл-сервис".'
@@ -1068,7 +1067,7 @@ class TemplateKrs(QMainWindow):
 
     def pero(self):
         from work_py.rir import RirWindow
-       
+
         from work_py.drilling import Drill_window
 
         pero_list = RirWindow.pero_select(self, well_data.current_bottom)
@@ -1116,7 +1115,6 @@ class TemplateKrs(QMainWindow):
                 gipsPero_list = [gipsPero_list[-1]]
                 from work_py.drilling import Drill_window
                 drill_work_list = Drill_window.addWork()
-
 
                 for row in drill_work_list:
                     gipsPero_list.append(row)

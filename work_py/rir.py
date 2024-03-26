@@ -1,4 +1,4 @@
-from PyQt5.QtGui import QDoubleValidator
+from PyQt5.QtGui import QDoubleValidator, QIntValidator
 from PyQt5.QtWidgets import QMessageBox, QInputDialog, QLabel, QComboBox, QLineEdit, QGridLayout, QWidget, QPushButton, \
     QMainWindow, QTabWidget
 
@@ -9,7 +9,6 @@ from main import MyWindow
 from work_py.alone_oreration import fluid_change
 
 from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm,well_volume_norm
-from work_py.sand_filling import sandFilling, sand_select, sandWashing
 from work_py.acid_paker import CheckableComboBox, AcidPakerWindow
 
 
@@ -53,15 +52,8 @@ class TabPage_SO_rir(QWidget):
 
         self.sole_rir_edit = QLineEdit(self)
         self.sole_rir_edit.setClearButtonEnabled(True)
-        # self.sole_rir_edit.setText()
-            # listEnabel = [self.khovstLabel, self.khvostEdit, self.swabTruelabelType, self.swabTrueEditType,
-            #               self.plast_combo, self.pakerEdit, self.paker2Edit,
-            #               self.svk_true_edit, self.QplastEdit, self.skv_proc_edit, self.acid_edit, self.acid_volume_edit,
-            #               self.acid_proc_edit]
-            # for enable in listEnabel:
-            #     enable.setEnabled(False)
 
-        self.validator = QDoubleValidator(0.0, 80000.0, 2)
+        self.validator = QIntValidator(0, 8000)
 
         self.diametr_paker_labelType = QLabel("Диаметр пакера", self)
         self.diametr_paker_edit = QLineEdit(self)

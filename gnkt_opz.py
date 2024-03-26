@@ -4,6 +4,7 @@ from PyQt5 import QtWidgets
 
 import well_data
 from krs import calc_work_fluid
+from main import MyWindow
 from work_py.acid_paker import CheckableComboBox, AcidPakerWindow
 from gnkt_data import gnkt_data
 from collections import namedtuple
@@ -143,7 +144,7 @@ class TabWidget(QTabWidget):
 
 
 class GnktOpz(QMainWindow):
-    def __init__(self, parent=None):
+    def __init__(self, ins_ind, table_widget, parent=None):
 
         super(GnktOpz, self).__init__(parent=None)
         self.centralWidget = QWidget()
@@ -151,6 +152,8 @@ class GnktOpz(QMainWindow):
 
         self.work_plan = 'gnkt_opz'
         self.paker_select = None
+        self.ins_ind = ins_ind
+        self.table_widget = table_widget
         self.tabWidget = TabWidget()
         self.dict_nkt = {}
 
@@ -181,7 +184,7 @@ class GnktOpz(QMainWindow):
                                    acid_edit, skv_volume_edit, skv_proc_edit, acid_volume_edit, acid_proc_edit, pressure_edit,
                                    plast_combo, svk_true_edit, skv_acid_edit)
 
-
+        MyWindow.populate_row(self.ins_ind, work_list, self.table_widget)
         well_data.pause = False
         self.close()
         return work_list
@@ -198,7 +201,7 @@ class GnktOpz(QMainWindow):
         if gnkt_number_combo == 'ГНКТ №2':
             gnkt_number = gnkt_data.gnkt_2
         elif gnkt_number_combo == 'ГНКТ №1':
-            gnkt_number = gnkt_data.gnkt_1,
+            gnkt_number = gnkt_data.gnkt_1
 
         V_gntk = round(gnkt_number.gnkt_length * 0.74 / 1000, 1)
 

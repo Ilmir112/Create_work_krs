@@ -1109,13 +1109,11 @@ class MyWindow(QMainWindow):
         self.populate_row(self.ins_ind, drilling_work_list, self.table_widget)
 
 
-
-
-
     def drilling_action_nkt(self):
         if self.raid_window is None:
             self.raid_window = Drill_window(well_data.ins_ind, self.table_widget)
             self.raid_window.setGeometry(200, 400, 300, 400)
+            self.raid_window.show()
             self.pause_app()
             well_data.pause = True
             self.raid_window = None
@@ -1249,6 +1247,7 @@ class MyWindow(QMainWindow):
 
             self.rir_window = RirWindow(well_data.ins_ind, self.table_widget)
             self.rir_window.setGeometry(200, 400, 300, 400)
+            self.work_window.show()
             self.pause_app()
             well_data.pause = True
             self.rir_window = None
@@ -1289,17 +1288,24 @@ class MyWindow(QMainWindow):
             self.work_window = None
 
     def filling_sand(self):
-        from work_py.sand_filling import sandFilling
+        from work_py.sand_filling import SandWindow
 
-        print('Вставился отсыпка песком')
-        filling_work_list = sandFilling(self)
-        self.populate_row(self.ins_ind, filling_work_list, self.table_widget)
+        if self.work_window is None:
+            self.work_window = SandWindow(well_data.ins_ind, self.table_widget)
+            self.work_window.setGeometry(200, 400, 500, 500)
+            self.work_window.show()
+            self.pause_app()
+            well_data.pause = True
+            self.work_window = None
+        else:
+            self.work_window.close()  # Close window.
+            self.work_window = None
 
     def washing_sand(self):
-        from work_py.sand_filling import sandWashing
+        from work_py.sand_filling import SandWindow
 
         print('Вставился отсыпка песком')
-        washing_work_list = sandWashing(self)
+        washing_work_list = SandWindow.sandWashing(self)
         self.populate_row(self.ins_ind, washing_work_list, self.table_widget)
 
     def deleteString(self):
@@ -1390,7 +1396,8 @@ class MyWindow(QMainWindow):
         from gnkt_opz import GnktOpz
 
         if self.work_window is None:
-            self.work_window = GnktOpz()
+            self.work_window = GnktOpz(well_data.ins_ind, self.table_widget)
+            self.work_window.show()
             self.pause_app()
             well_data.pause = True
             self.work_window = None
@@ -1398,8 +1405,7 @@ class MyWindow(QMainWindow):
             self.work_window.close()  # Close window.
             self.work_window = None
 
-        # ryber_work_list = Gnkt_opz.gnkt_work(self)
-        # self.populate_row(self.ins_ind, ryber_work_list, self.table_widget)
+
 
     def gno_bottom(self):
         from work_py.descent_gno import gno_down
@@ -1502,7 +1508,9 @@ class MyWindow(QMainWindow):
         if self.acid_windowPaker is None:
             print(f' окно2 СКО ')
             self.acid_windowPaker = AcidPakerWindow(self.ins_ind, self.table_widget)
+
             self.acid_windowPaker.setGeometry(200, 400, 300, 400)
+            self.acid_windowPaker.show()
             self.pause_app()
             well_data.pause = True
 

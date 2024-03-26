@@ -6,6 +6,7 @@ import well_data
 from main import MyWindow
 from work_py.alone_oreration import fluid_change
 from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
+from work_py.advanted_file import change_True_raid
 
 
 
@@ -95,10 +96,10 @@ class TabPage_SO_raid(QWidget):
         self.raid_select_combo.setCurrentIndex(1)
 
         if well_data.column_additional is False or \
-                (well_data.column_additional and well_data.current_bottom > well_data.head_column_additional._value):
+                (well_data.column_additional and well_data.current_bottom < well_data.head_column_additional._value):
             self.raid_select_combo.setCurrentIndex(0)
         else:
-            print(f'строка райбера')
+
             self.raid_select_combo.setCurrentIndex(1)
 
     def update_nkt(self, index):
@@ -113,16 +114,15 @@ class TabPage_SO_raid(QWidget):
 
         if index == 'райбер в ЭК':
             if well_data.column_additional is False or \
-                    (
-                            well_data.column_additional and well_data.current_bottom < well_data.head_column_additional._value):
-                self.raid_diametr_line.setText(str(self.raiding_Bit_diam_select(well_data.current_bottom)))
+                    (well_data.column_additional and well_data.current_bottom > well_data.head_column_additional._value):
+                self.raid_diametr_line.setText(str(self.raiding_Bit_diam_select(well_data.head_column_additional._value - 10)))
                 if well_data.column_diametr._value > 127:
                     self.downhole_motor_line.setText('Д-106')
                 else:
                     self.downhole_motor_line.setText('Д-76')
             else:
                 self.raid_diametr_line.setText(
-                    str(self.raiding_Bit_diam_select(well_data.head_column_additional._value - 10)))
+                    str(self.raiding_Bit_diam_select(well_data.current_bottom)))
                 if well_data.column_additional_diametr._value > 127:
                     self.downhole_motor_line.setText('Д-106')
                 else:
@@ -217,6 +217,8 @@ class Raid(MyWindow):
 
         roof_raid = self.tabWidget.currentWidget().roof_raid_line.text().replace(',', '.')
         sole_raid = self.tabWidget.currentWidget().sole_raid_line.text().replace(',', '.')
+        ryber_key = self.tabWidget.currentWidget().raid_select_combo.currentText()
+
         raid_True_combo = QComboBox(self)
         raid_True_combo.addItems(
             ['нужно', 'не нужно'])
@@ -226,6 +228,15 @@ class Raid(MyWindow):
         if not roof_raid or not sole_raid:
             msg = QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
             return
+        if well_data.column_additional and int(roof_raid) > well_data.head_column_additional._value and \
+                ryber_key == 'райбер в ЭК':
+            msg = QMessageBox.information(self, 'Внимание', 'Компоновка подобрана не корректно')
+            return
+        if well_data.column_additional and int(sole_raid) < well_data.head_column_additional._value \
+                and ryber_key == 'райбер в ДП':
+            msg = QMessageBox.information(self, 'Внимание', 'Компоновка подобрана не корректно')
+            return
+
         if well_data.current_bottom < float(sole_raid):
             msg = QMessageBox.information(self, 'Внимание', 'глубина НЭК ниже искусственного забоя')
             return
@@ -246,6 +257,18 @@ class Raid(MyWindow):
         ryber_key = self.tabWidget.currentWidget().raid_select_combo.currentText()
         self.downhole_motor = self.tabWidget.currentWidget().downhole_motor_line.text()
         raiding_interval = raiding_interval(ryber_key)
+        # 'райбер в ЭК': ryber_str_EK, 'райбер в ДП'
+        if raiding_interval:
+            if ryber_key == 'райбер в ЭК' and well_data.column_additional and \
+                    raiding_interval[0][1] > well_data.head_column_additional._value:
+                mes = QMessageBox.warning(self, 'Ошибка',
+                                          'Не корректно выбрана компоновка')
+                return
+            elif ryber_key == 'райбер в ДП' and well_data.column_additional and \
+                    raiding_interval[0][0] < well_data.head_column_additional._value:
+                mes = QMessageBox.warning(self, 'Ошибка',
+                                          'Не корректно выбрана компоновка')
+                return
         if len(raiding_interval) == 0:
             mes = QMessageBox.warning(self, 'Ошибка',
                                       'Не выбраны интервалы райбирования')
@@ -271,6 +294,8 @@ class Raid(MyWindow):
                 roof = int(roof_raid.text())
                 sole = int(sole_raid.text())
                 raid_tuple.append((roof, sole))
+
+
         if nkt_str_combo == 'НКТ':
             raid_list = self.raidingColumn(raid_tuple[::-1])
         else:
@@ -321,6 +346,7 @@ class Raid(MyWindow):
             krovly_raiding = well_data.perforation_roof
 
         raiding_interval = raid(raiding_interval_tuple)
+        change_True_raid(self, raiding_interval_tuple)
         ryber_list = [
             [f'СПО {ryber_str}  на НКТ{nkt_diam} до Н={krovly_raiding}м', None,
              f'Спустить {ryber_str}  на НКТ{nkt_diam} до Н={krovly_raiding}м с замером, '

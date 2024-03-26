@@ -539,6 +539,8 @@ class Template_without_skm(QMainWindow):
         vbox.addWidget(self.buttonAdd, 2, 0)
 
     def addWork(self):
+
+
         template_str = str(self.tabWidget.currentWidget().template_str_Edit.text())
         template = str(self.tabWidget.currentWidget().template_Combo.currentText())
         if well_data.column_additional is False or (
@@ -552,6 +554,27 @@ class Template_without_skm(QMainWindow):
             and well_data.template_depth > int(well_data.problemWithEk_depth)):
             mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже глубины не прохода')
             return
+        if well_data.column_additional is False or \
+                well_data.column_additional and well_data.current_bottom <= well_data.head_column_additional._value:
+            if well_data.template_depth >= well_data.current_bottom:
+                mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже текущего забоя')
+                return
+        else:
+            if well_data.template_depth_addition >= well_data.current_bottom:
+                mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже текущего забоя')
+                return
+            if well_data.template_depth >= well_data.head_column_additional._value:
+                mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже головы хвостовика')
+                return
+            if self.template_Combo.currentText() == 'ПСШ Доп колонна СКМ в основной колонне' and\
+                    well_data.skm_depth >= well_data.head_column_additional._value:
+                mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'СКМ спускается ниже головы хвостовика')
+                return
+        if distance_second < 0 or distance_first < 0:
+            mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'Расстояние между шаблонами не корректно')
+            return
+
+
 
         work_list = self.template_ek(template_str, template, template_diametr)
         MyWindow.populate_row(self.ins_ind, work_list, self.table_widget)
