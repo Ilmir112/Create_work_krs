@@ -87,7 +87,7 @@ class TabPage_SO(QWidget):
             self.pakerDepthZumpf_Label.setParent(None)
             self.pakerDepthZumpf_edit.setParent(None)
 
-        if well_data.open_trunk_well == True:
+        if well_data.open_trunk_well is True:
             paker_depth = self.paker_depth_edit.text()
             if paker_depth != '':
                 paker_khost = well_data.current_bottom - int(paker_depth)
@@ -156,12 +156,12 @@ class OpressovkaEK(QMainWindow):
         self.tabWidget = TabWidget()
 
         self.buttonAdd = QPushButton('Добавить данные в план работ')
-        self.buttonAdd.clicked.connect(self.addWork)
+        self.buttonAdd.clicked.connect(self.add_work)
         vbox = QGridLayout(self.centralWidget)
         vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
 
-    def addWork(self):
+    def add_work(self):
 
         pressureZUMPF_question = self.tabWidget.currentWidget().pressureZUMPF_question_QCombo.currentText()
 
@@ -233,7 +233,7 @@ class OpressovkaEK(QMainWindow):
                  f'Спустить {paker_select} на НКТ{well_data.nkt_diam}мм до глубины {pakerDepthZumpf}м,'
                  f' воронкой до {pakerDepthZumpf + paker_khost}м'
                  f' с замером, шаблонированием шаблоном {well_data.nkt_template}мм. {nktOpress_list[1]} '
-                 f'{("Произвести пробную посадку на глубине 50м" if well_data.column_additional == False else "")} '
+                 f'{("Произвести пробную посадку на глубине 50м" if well_data.column_additional is False else "")} '
                  f'ПРИ ОТСУТСТВИИ ЦИРКУЛЯЦИИ ПРЕДУСМОТРЕТЬ НАЛИЧИИ В КОМПОНОВКЕ УРАВНИТЕЛЬНЫХ КЛАПАНОВ ИЛИ СБИВНОГО '
                  f'КЛАПАНА С ВВЕРТЫШЕМ НАД ПАКЕРОМ',
                  None, None, None, None, None, None, None,
@@ -284,7 +284,7 @@ class OpressovkaEK(QMainWindow):
                  f'Спустить {paker_select} на НКТ{well_data.nkt_diam}мм до глубины {paker_depth}м, '
                  f'воронкой до {paker_depth + paker_khost}м'
                  f' с замером, шаблонированием шаблоном {well_data.nkt_template}мм. {nktOpress_list[1]} '
-                 f'{("Произвести пробную посадку на глубине 50м" if well_data.column_additional == False else "")} '
+                 f'{("Произвести пробную посадку на глубине 50м" if well_data.column_additional is False else "")} '
                  f'ПРИ ОТСУТСТВИИ ЦИРКУЛЯЦИИ ПРЕДУСМОТРЕТЬ НАЛИЧИИ В КОМПОНОВКЕ УРАВНИТЕЛЬНЫХ КЛАПАНОВ ИЛИ СБИВНОГО '
                  f'КЛАПАНА С ВВЕРТЫШЕМ НАД ПАКЕРОМ',
                  None, None, None, None, None, None, None,
@@ -333,7 +333,7 @@ class OpressovkaEK(QMainWindow):
                          f'Спустить {paker_select} на НКТ{well_data.nkt_diam}мм до глубины {pakerNEK}м, воронкой '
                          f'до {pakerNEK + paker_khost}м'
                          f' с замером, шаблонированием шаблоном {well_data.nkt_template}мм. {nktOpress_list[1]}'
-                         f' {("Произвести пробную посадку на глубине 50м" if well_data.column_additional == False else "")} '
+                         f' {("Произвести пробную посадку на глубине 50м" if well_data.column_additional is False else "")} '
                          f'ПРИ ОТСУТСТВИИ ЦИРКУЛЯЦИИ ПРЕДУСМОТРЕТЬ НАЛИЧИИ В КОМПОНОВКЕ УРАВНИТЕЛЬНЫХ КЛАПАНОВ ИЛИ СБИВНОГО'
                          f' КЛАПАНА С ВВЕРТЫШЕМ НАД ПАКЕРОМ',
                          None, None, None, None, None, None, None,
@@ -474,8 +474,8 @@ class OpressovkaEK(QMainWindow):
 
     def nktOpress(self):
 
-        if well_data.nktOpressTrue == False:
-            well_data.nktOpressTrue == True
+        if well_data.nktOpressTrue is False:
+            well_data.nktOpressTrue is True
             return 'НКТ + опрессовочное седло', 'Опрессовать НКТ на 200атм. Вымыть шар'
         else:
             return 'НКТ', ''
@@ -486,7 +486,7 @@ class OpressovkaEK(QMainWindow):
 
         check_true = False
         print(f' глубина шаблона {well_data.template_depth}, посадка пакера {depth}')
-        while check_true == False:
+        while check_true is False:
             if depth < float(
                     well_data.head_column_additional._value) and depth <= well_data.template_depth and well_data.column_additional:
                 check_true = True
@@ -496,7 +496,7 @@ class OpressovkaEK(QMainWindow):
             elif depth <= well_data.template_depth and well_data.column_additional is False:
                 check_true = True
 
-            if check_true == False:
+            if check_true is False:
 
                 false_template = QMessageBox.question(None, 'Проверка глубины пакера',
                                                       f'Проверка показала пакер опускается ниже глубины шаблонирования ЭК'
@@ -521,7 +521,7 @@ class OpressovkaEK(QMainWindow):
                 for interval in well_data.dict_perforation[plast]['интервал']:
                     interval_list.append(interval)
 
-        if well_data.leakiness == True:
+        if well_data.leakiness is True:
             for nek in well_data.dict_leakiness['НЭК']['интервал']:
                 if well_data.dict_leakiness['НЭК']['интервал'][nek]['отключение'] is False and nek[0] < depth:
                     interval_list.append(nek)

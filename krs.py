@@ -1,19 +1,16 @@
-import H2S
 from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QTabWidget, \
     QMainWindow, QPushButton
 from datetime import datetime
-from collections import namedtuple
 
 import well_data
 from work_py.alone_oreration import lifting_unit, weigth_pipe, volume_pod_NKT, pvo_gno, volume_jamming_well
-from .mkp import mkp_revision_1_kateg
-from .rationingKRS import liftingNKT_norm
+from work_py.mkp import mkp_revision_1_kateg
+from work_py.rationingKRS import liftingNKT_norm
 
 
-
-class TabPage_gno(QWidget):
+class TabPageGno(QWidget):
     def __init__(self, work_plan, parent=None):
-        super().__init__()
+        super().__init__(parent)
         self.work_plan = work_plan
 
         self.current_bottom_label = QLabel('Забой текущий')
@@ -28,19 +25,17 @@ class TabPage_gno(QWidget):
         self.volume_jumping_edit = QLineEdit(self)
         self.volume_jumping_edit.setText(f'{self.volume()}')
 
-        
-
         self.gno_label = QLabel("вид поднимаемого ГНО", self)
         self.gno_combo = QComboBox(self)
         gno_list = ['пакер', 'ОРЗ', 'ОРД', 'воронка', 'НН с пакером', 'НВ с пакером',
-                        'ЭЦН с пакером', 'ЭЦН', 'НВ', 'НН']
+                    'ЭЦН с пакером', 'ЭЦН', 'НВ', 'НН']
         self.gno_combo.addItems(gno_list)
         lift_key = self.select_gno()
         print(f' гно {gno_list.index(lift_key)}')
         self.gno_combo.setCurrentIndex(gno_list.index(lift_key))
 
         grid = QGridLayout(self)
-        
+
         grid.addWidget(self.gno_label, 4, 3)
         grid.addWidget(self.gno_combo, 5, 3)
         grid.addWidget(self.current_bottom_label, 4, 4)
@@ -49,8 +44,9 @@ class TabPage_gno(QWidget):
         grid.addWidget(self.fluid_edit, 5, 5)
         grid.addWidget(self.volume_jumping_label, 4, 6)
         grid.addWidget(self.volume_jumping_edit, 5, 6)
-    
-    def select_gno(self):
+
+    @staticmethod
+    def select_gno():
         if well_data.if_None(well_data.dict_pump_ECN["do"]) != 'отсут' and \
                 well_data.if_None(well_data.dict_pump_SHGN["do"]) != 'отсут':
             lift_key = 'ОРД'
@@ -86,10 +82,10 @@ class TabPage_gno(QWidget):
                 well_data.if_None(
                     well_data.paker_do['do']) != 'отсут':
             lift_key = 'ОРЗ'
-        return lift_key 
+        return lift_key
 
     def volume(self):
-        from work_py.alone_oreration import volume_jamming_well, volume_rod,volume_nkt_metal
+        from work_py.alone_oreration import volume_jamming_well, volume_rod, volume_nkt_metal
 
         volume_well_jaming = round((volume_jamming_well(self, well_data.current_bottom) - volume_nkt_metal(
             well_data.dict_nkt) - volume_rod(self, well_data.dict_sucker_rod) - 0.2) * 1.1, 1)
@@ -101,8 +97,9 @@ class TabPage_gno(QWidget):
                                                            "корректный объем",
                                                            'Введите корректный объем', volume_well_jaming, 1, 80, 1)
         return volume_well_jaming
-    
-    def calc_fluid(self, work_plan, current_bottom):
+
+    @staticmethod
+    def calc_fluid(work_plan, current_bottom):
         fluid_list = []
         if work_plan != 'gnkt_frez':
             well_data.current_bottom = current_bottom
@@ -136,33 +133,32 @@ class TabPage_gno(QWidget):
 
 
 class TabWidget(QTabWidget):
-    def __init__(self,  work_plan):
+    def __init__(self, work_plan):
         super().__init__()
-        self.addTab(TabPage_gno(self,  work_plan), 'Подьем ГНО')
+        self.addTab(TabPageGno(self, work_plan), 'Подьем ГНО')
 
 
-class Gno_window(QMainWindow):
+class GnoWindow(QMainWindow):
     def __init__(self, ins_ind, table_widget, work_plan, parent=None):
-    
-        super(Gno_window, self).__init__(parent=None)
+
+        super(GnoWindow, self).__init__(parent)
         self.centralWidget = QWidget()
-        self.setCentralWidget(self.centralWidget)        
+        self.setCentralWidget(self.centralWidget)
         self.ins_ind = ins_ind
         self.table_widget = table_widget
         self.work_plan = work_plan
         self.tabWidget = TabWidget(self.work_plan)
-        
 
         self.buttonAdd = QPushButton('Добавить данные в план работ')
-        self.buttonAdd.clicked.connect(self.addWork)
+        self.buttonAdd.clicked.connect(self.add_work)
         vbox = QGridLayout(self.centralWidget)
         vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
 
-    def addWork(self):  
+    def add_work(self):
         from main import MyWindow
         lift_key = str(self.tabWidget.currentWidget().gno_combo.currentText())
-        current_bottom = round(float(self.tabWidget.currentWidget().current_bottom_edit.text()), 1)        
+        current_bottom = round(float(self.tabWidget.currentWidget().current_bottom_edit.text()), 1)
         fluid = self.tabWidget.currentWidget().fluid_edit.text()
         volume_well_jaming = round(float(self.tabWidget.currentWidget().volume_jumping_edit.text()), 1)
         well_data.current_bottom = current_bottom
@@ -172,34 +168,33 @@ class Gno_window(QMainWindow):
         MyWindow.populate_row(self.ins_ind, work_list, self.table_widget)
         well_data.pause = False
         self.close()
-        
 
-    
     def work_krs(self, work_plan, lift_key, volume_well_jaming, fluid):
-        from .rationingKRS import lifting_sucker_rod, well_jamming_norm, liftingGNO
+        from work_py.rationingKRS import lifting_sucker_rod, well_jamming_norm, liftingGNO
         from work_py.alone_oreration import well_jamming
-        from .descent_gno import gno_nkt_opening
-        
-        
-    
+        from work_py.descent_gno import gno_nkt_opening
+
         well_data.fluid_work, well_data.fluid_work_short = self.calc_work_fluid(fluid)
         nkt_diam_fond = gno_nkt_opening(well_data.dict_nkt)
-    
-        if work_plan != 'dop_plan':            
-    
+
+        if work_plan != 'dop_plan':
+
             without_damping_True = well_data.without_damping
-    
+
             if any([cater == 1 for cater in well_data.cat_P_1]):
-                well_data.kat_pvo, _ = QInputDialog.getInt(None, 'Категория скважины',
+                well_data.kat_pvo, _ = QInputDialog.getInt(self, 'Категория скважины',
                                                            f'Категория скважины № {well_data.kat_pvo}, корректно?',
                                                            well_data.kat_pvo, 1, 2)
-    
+
             well_jamming_str_in_nkt = " " if without_damping_True is True \
-                else f"По результату приемистости произвести глушение скважины в НКТ тех.жидкостью в объеме обеспечивающим " \
-                     f"заполнение трубного пространства и скважины в подпакерной зоне в объеме {volume_pod_NKT(self)} м3 " \
-                     f"жидкостью уд.веса {well_data.fluid_work} при давлении не более {well_data.max_admissible_pressure._value}атм. " \
+                else f"По результату приемистости произвести глушение скважины в НКТ тех.жидкостью в объеме " \
+                     f"обеспечивающим " \
+                     f"заполнение трубного пространства и скважины в подпакерной зоне в объеме " \
+                     f"{volume_pod_NKT(self)} м3 " \
+                     f"жидкостью уд.веса {well_data.fluid_work} при давлении не более " \
+                     f"{well_data.max_admissible_pressure._value}атм. " \
                      f"Тех отстой 1-2 часа. Произвести замер избыточного давления в скважине."
-    
+
             krs_begin = [
                 [None, None, 'Порядок работы', None, None, None, None, None, None, None, None, None],
                 [None, None, 'Наименование работ', None, None, None, None, None, None, None, 'Ответственный',
@@ -212,13 +207,15 @@ class Gno_window(QMainWindow):
                  None, None, None, None, None, None, None,
                  'Мастер КРС, предст-ль Заказчика.', float(0.5)],
                 [None, None,
-                 f'Принять скважину в ремонт у Заказчика с составлением АКТа. Переезд  бригады. Подготовительные работы '
+                 f'Принять скважину в ремонт у Заказчика с составлением АКТа. Переезд  бригады. '
+                 f'Подготовительные работы '
                  f'к КРС. Определить технологические '
                  f'точки откачки жидкости у Заказчика согласно Договора.',
                  None, None, None, None, None, None, None,
                  ' Предст-тель Заказчика, мастер КРС', float(0.5)],
                 [None, 3,
-                 f'Перед началом работ по освоению, капитальному и текущему ремонту скважин бригада должна быть ознакомлена '
+                 f'Перед началом работ по освоению, капитальному и текущему ремонту скважин бригада должна быть '
+                 f'ознакомлена '
                  f'с возможными осложнениями и авариями'
                  f'в процессе работ, планом локализации и ликвидации аварии (ПЛА) и планом работ. С работниками должен '
                  f'быть проведен инструктаж по выполнению работ, '
@@ -227,11 +224,14 @@ class Gno_window(QMainWindow):
                  None, None, None, None, None, None, None,
                  'Мастер КРС', None],
                 [None, 4,
-                 f'При подъеме труб из скважины производить долив тех. жидкостью Y- {well_data.fluid_work}. Долив скважины '
+                 f'При подъеме труб из скважины производить долив тех. жидкостью Y- {well_data.fluid_work}. '
+                 f'Долив скважины '
                  f'должен быть равен объему извлекаемого металла.'
-                 f'По мере расхода жидкости из ёмкости, производить своевременное её заполнение. При всех технологических '
+                 f'По мере расхода жидкости из ёмкости, производить своевременное её заполнение. При всех '
+                 f'технологических '
                  f'спусках НКТ 73мм х 5,5мм и 60мм х 5мм производить '
-                 f'контрольный замер и отбраковку + шаблонирование шаблоном {well_data.nkt_template}мм d=59,6мм и 47,9мм '
+                 f'контрольный замер и отбраковку + шаблонирование шаблоном {well_data.nkt_template}мм d=59,6мм и 47,'
+                 f'9мм '
                  f'соответственно.',
                  None, None, None, None, None, None, None,
                  ' Мастер КРС.', None],
@@ -240,7 +240,8 @@ class Gno_window(QMainWindow):
                  None, None, None, None, None, None, None,
                  None],
                 [None, None, f'Замерить Ризб. При наличии избыточного давления произвести замер Ризб и уд.вес '
-                             f'жидкости излива, по результату замеру произвести перерасчет и корректировку удельного веса тех.жидкости',
+                             f'жидкости излива, по результату замеру произвести перерасчет и корректировку удельного '
+                             f'веса тех.жидкости',
                  None, None, None, None, None, None, None,
                  ' Мастер КРС.', 0.5],
                 [None, None,
@@ -248,8 +249,8 @@ class Gno_window(QMainWindow):
                  f'избыточного давления и '
                  f'наличии риска поглощения жидкости глушения. произвести замер статического уровня силами ЦДНГ перед '
                  f'началом работ и в '
-                 f'процессе ремонта (с периодичностью определяемой ответственным руководителем работ, по согласованию с '
-                 f'представителем Заказчика '
+                 f'процессе ремонта (с периодичностью определяемой ответственным руководителем работ, по согласованию с'
+                 f' представителем Заказчика '
                  f'Результаты замеров статического уровня фиксировать в вахтовом журнале и передавать в сводке '
                  f'При изменении '
                  f'уровня в скважине от первоначально замеренного на 100м и более метров в сторону уменьшения или '
@@ -265,15 +266,17 @@ class Gno_window(QMainWindow):
             if well_data.bvo is True:
                 for row in mkp_revision_1_kateg(self):
                     krs_begin.insert(-3, row)
-    
+
             posle_lift = [[None, None,
                            f'По результатам подъема провести ревизию НКТ в присутствии представителя ЦДНГ. В случае '
                            f'обнаружения дефекта НКТ, вызвать '
                            f'представителя ЦДНГ, составить акт. На Отказные НКТ закрепить бирку " на расследование", '
                            f'сдать в ООО "РН-Ремонт НПО" '
-                           f'отдельно, с пометкой в БНД-25 "на расследование". Произвести Фотофиксацию отказных элементов, '
+                           f'отдельно, с пометкой в БНД-25 "на расследование". Произвести Фотофиксацию отказных '
+                           f'элементов, '
                            f'БНД-25. Фото предоставить в '
-                           f'технологический отдел В течение 24 часов после подъема согласовать с ЦДНГ необходимость замены,'
+                           f'технологический отдел В течение 24 часов после подъема согласовать с ЦДНГ '
+                           f'необходимость замены,'
                            f' пропарки, промывки ГНО, '
                            f'технологию опрессовки НКТ согласовать с ПТО', None, None,
                            None, None, None, None, None,
@@ -281,11 +284,14 @@ class Gno_window(QMainWindow):
                           [None, None,
                            f'Опрессовать глухие плашки превентора на  '
                            f'{well_data.max_admissible_pressure._value}атм на '
-                           f'максимально допустимое давление опрессовки эксплуатационной колонны с выдержкой в течении 30 '
+                           f'максимально допустимое давление опрессовки эксплуатационной колонны с'
+                           f' выдержкой в течении 30 '
                            f'минут,в случае невозможности '
-                           f'опрессовки по результатам определения приемистости и по согласованию с заказчиком  опрессовать '
+                           f'опрессовки по результатам определения приемистости и по согласованию с '
+                           f'заказчиком  опрессовать '
                            f'глухие плашки ПВО на давление поглощения, '
-                           f'но не менее 30атм и  с составлением акта на опрессовку ПВО с представителем Заказчика. ', None,
+                           f'но не менее 30атм и  с составлением акта на опрессовку ПВО с представителем Заказчика. ',
+                           None,
                            None,
                            None, None, None, None, None,
                            'Мастер КРС', 0.67],
@@ -296,19 +302,23 @@ class Gno_window(QMainWindow):
                            f'пуска (подъёма) не должна превышать '
                            f'0,1 м/с в интервалах искривления. Произвести визуальный осмотр колонной муфты и ниппеля '
                            f'колонного патрубка, отревизировать переводники. '
-                           f'При отбраковке дать заявку в цех Заказчика на замену. Составить акт (при изменении альтитуды '
+                           f'При отбраковке дать заявку в цех Заказчика на замену. Составить акт (при '
+                           f'изменении альтитуды '
                            f'муфты э/колонны указать в акте).',
                            None, None,
                            None, None, None, None, None,
                            'Мастер КРС', None],
                           [None, None,
-                           f'В СЛУЧАЕ ВЫНУЖДЕННОГО ПРОДОЛЖИТЕЛЬНОГО ПРОСТОЯ ПО ЗАВОЗУ ТЕХНОЛОГИЧЕСКОГО ИЛИ ФОНДОВОГО ОБОРУДОВАНИЯ В СКВАЖИНУ НЕОБХОДИМО СПУСКАТЬ '
+                           f'В СЛУЧАЕ ВЫНУЖДЕННОГО ПРОДОЛЖИТЕЛЬНОГО ПРОСТОЯ ПО ЗАВОЗУ ТЕХНОЛОГИЧЕСКОГО '
+                           f'ИЛИ ФОНДОВОГО ОБОРУДОВАНИЯ В СКВАЖИНУ НЕОБХОДИМО СПУСКАТЬ '
                            f'ПРОТИВОФОНТАННЫЙ ЛИФТ ДЛИНОЙ 300м. ', None, None,
                            None, None, None, None, None,
                            'Мастер КРС представитель Заказчика', None]]
-            kvostovik = f' + хвостовиком  {round(sum(list(well_data.dict_nkt.values())) - float(well_data.depth_fond_paker_do["do"]), 1)}м ' \
+            kvostovik = f' + хвостовиком ' \
+                        f'{round(sum(list(well_data.dict_nkt.values())) - float(well_data.depth_fond_paker_do["do"]), 1)}м ' \
                 if well_data.region == 'ТГМ' else ''
-            well_jamming_str = well_jamming(self, without_damping_True, lift_key, volume_well_jaming)  # экземпляр функции расчета глушения
+            well_jamming_str = well_jamming(self, without_damping_True, lift_key,
+                                            volume_well_jaming)  # экземпляр функции расчета глушения
             well_jamming_ord = volume_jamming_well(self, float(well_data.depth_fond_paker_do["do"]))
             lift_ord = [
                 [f'Опрессовать ГНО на Р={40}атм', None,
@@ -321,24 +331,37 @@ class Gno_window(QMainWindow):
                  f'{lifting_unit(self)}', None, None, None, None, None, None, None,
                  'Мастер КРС представитель Заказчика, пусков. Ком. ', 4.2],
                 [f'подьем {well_data.dict_pump_SHGN["do"]}', None,
-                 f'Сорвать насос штанговый насос {well_data.dict_pump_SHGN["do"]}(зафиксировать вес при срыве). Обвязать устье скважины согласно схемы №3 утвержденной главным '
-                 f'инженером от 14.10.2021г при СПО штанг (ПМШ 62х21 либо аналог). Опрессовать ПВО на {well_data.max_admissible_pressure._value}атм. '
-                 f'{"".join([" " if without_damping_True == True else f"Приподнять штангу. Произвести глушение в затрубное пространство в объеме{well_jamming_ord}м3 (объем колонны от пакера до устья уд.весом {well_data.fluid_work}. Техостой 2ч."])}'
-                 f'Поднять на штангах насос с гл. {well_data.dict_pump_SHGN_h["do"]}м с доливом тех жидкости уд.весом {well_data.fluid_work} '
-                 f'Обеспечить не превышение расчетных нагрузок на штанговые колонны при срыве  насосов (не более 8 тн), без учета веса '
-                 f'штанг в  0,9т. При отрицательном результате согласов технологической службой ЦДНГ или ПТО региона  постепенное увеличение нагрузки до 15тн ( по 1т - 1 час), либо искусственный  отворот НШ с последующим комбинированным подъемом ГНО НВ. В случае невозможности отворота колонны НШ с подтверждением супервайзера, распиловку НШ согласовать с ПТО по направлению сектора учета НКТ и НШ.',
+                 f'Сорвать насос штанговый насос {well_data.dict_pump_SHGN["do"]}(зафиксировать вес при срыве).'
+                 f' Обвязать устье скважины согласно схемы №3 утвержденной главным '
+                 f'инженером от 14.10.2021г при СПО штанг (ПМШ 62х21 либо аналог). Опрессовать ПВО на '
+                 f'{well_data.max_admissible_pressure._value}атм. '
+                 f'{"".join([" " if without_damping_True is True else f"Приподнять штангу. Произвести глушение в затрубное пространство в объеме{well_jamming_ord}м3 (объем колонны от пакера до устья уд.весом {well_data.fluid_work}. Техостой 2ч."])}'
+                 f'Поднять на штангах насос с гл. {well_data.dict_pump_SHGN_h["do"]}м с доливом тех жидкости '
+                 f'уд.весом {well_data.fluid_work} '
+                 f'Обеспечить не превышение расчетных нагрузок на штанговые колонны при срыве '
+                 f'насосов (не более 8 тн), без учета веса '
+                 f'штанг в  0,9т. При отрицательном результате согласов технологической службой ЦДНГ или ПТО '
+                 f'региона  постепенное увеличение нагрузки до 15тн ( по 1т - 1 час), либо искусственный отворот НШ с '
+                 f'последующим комбинированным подъемом ГНО НВ. В случае невозможности отворота колонны НШ с '
+                 f'подтверждением супервайзера, распиловку НШ согласовать с ПТО по направлению сектора учета НКТ и НШ.',
                  None, None, None, None, None, None, None,
                  'Мастер КРС представитель Заказчика, пусков. Ком. ',
                  lifting_sucker_rod(well_data.dict_sucker_rod)],
                 [f'Сорвать планшайбу и пакер  не более {round(weigth_pipe(well_data.dict_nkt) * 1.2, 1)}т. '
                  f'(вес подвески ({round(weigth_pipe(well_data.dict_nkt), 1)}т) + 20%)', None,
-                 f'Разобрать устьевое оборудование. Сорвать планшайбу и пакер с поэтапным увеличением нагрузки с выдержкой 30мин для возврата резиновых элементов в исходное положение'
+                 f'Разобрать устьевое оборудование. Сорвать планшайбу и пакер с поэтапным увеличением нагрузки с '
+                 f'выдержкой 30мин для возврата резиновых элементов в исходное положение '
                  f'в присутствии представителя ЦДНГ, с '
-                 f'составлением акта. При срыве нагрузка не должна превышать предельно допустимую нагрузку на НКТ не более {round(weigth_pipe(well_data.dict_nkt) * 1.2, 1)}т. '
-                 f'(вес подвески ({round(weigth_pipe(well_data.dict_nkt), 1)}т) + 20%). ПРИМЕЧАНИЕ: При отрицательном результате согласовать с УСРСиСТ ступенчатое увеличение '
-                 f'нагрузки до 28т ( страг нагрузка НКТ по паспорту), по 3 т – 0,5 час , при необходимости  с противодавлением в НКТ '
-                 f'(время на прибытие СТП ЦА 320 + АЦ не более 4 часов). Общие время на расхаживание - не более 6 часов, через 5 часов'
-                 f' с момента расхаживания пакера - выйти с согласование на УСРСиСТ, ПТО Региона -  для составления алгоритма'
+                 f'составлением акта. При срыве нагрузка не должна превышать предельно допустимую нагрузку на НКТ не '
+                 f'более {round(weigth_pipe(well_data.dict_nkt) * 1.2, 1)}т. '
+                 f'(вес подвески ({round(weigth_pipe(well_data.dict_nkt), 1)}т) + 20%). ПРИМЕЧАНИЕ: При отрицательном '
+                 f'результате согласовать с УСРСиСТ ступенчатое увеличение '
+                 f'нагрузки до 28т ( страг нагрузка НКТ по паспорту), по 3 т – 0,5 час , при необходимости  с '
+                 f'противодавлением в НКТ '
+                 f'(время на прибытие СТП ЦА 320 + АЦ не более 4 часов). Общие время на расхаживание - не более 6 '
+                 f'часов, через 5 часов '
+                 f' с момента расхаживания пакера - выйти с согласование на УСРСиСТ, ПТО Региона -  для составления '
+                 f'алгоритма '
                  f' последующих работ. ', None, None,
                  None, None, None, None, None,
                  'Мастер КРС представитель Заказчика', 0.67 + 1 + 0.07 + 0.32 + 0.45 + 0.3 + 0.23 + 0.83],
@@ -346,18 +369,22 @@ class Gno_window(QMainWindow):
                  well_jamming_str[0],
                  None, None, None, None, None, None, None,
                  'Мастер КРС, представ заказчика',
-                 [str(well_jamming_norm(volume_pod_NKT(self))) if without_damping_True == False else None][0]],
+                 [str(well_jamming_norm(volume_pod_NKT(self))) if without_damping_True is False else None][0]],
                 [None, None,
                  well_jamming_str[1],
                  None, None, None, None, None, None, None,
                  ' Мастер КРС', None],
                 [None, None,
                  ''.join(["За 24 часа до готовности вызвать пусковую комиссию" if well_data.kat_pvo == 2
-                          else "На скважинах первой категории Подрядчик обязан пригласить представителя ПАСФ " \
-                               "для проверки качества м/ж и опрессовки ПВО, документации и выдачи разрешения на производство " \
-                               "работ по ремонту скважин. При обнаружении нарушений, которые могут повлечь за собой опасность для жизни людей"
-                               " и/или возникновению ГНВП и ОФ, дальнейшие работы должны быть прекращены. Представитель ПАСФ приглашается за 24 часа до проведения "
-                               "проверки монтажа ПВО телефонограммой. произвести практическое обучение по команде ВЫБРОС. Пусковой комиссией составить акт готовности "
+                          else "На скважинах первой категории Подрядчик обязан пригласить представителя ПАСФ "
+                               "для проверки качества м/ж и опрессовки ПВО, документации и выдачи разрешения на "
+                               "производство "
+                               "работ по ремонту скважин. При обнаружении нарушений, которые могут повлечь за собой "
+                               "опасность для жизни людей "
+                               "и/или возникновению ГНВП и ОФ, дальнейшие работы должны быть прекращены. "
+                               "Представитель ПАСФ приглашается за 24 часа до проведения "
+                               "проверки монтажа ПВО телефонограммой. произвести практическое обучение по команде "
+                               "ВЫБРОС. Пусковой комиссией составить акт готовности "
                                "подъёмного агрегата для ремонта скважины."]),
                  None, None, None, None, None, None, None,
                  'Мастер КРС', 2.8],
@@ -373,7 +400,8 @@ class Gno_window(QMainWindow):
                  None, None, None, None, None,
                  None, None],
                 [None, None,
-                 f'Мастеру бригады КРС осуществлять входной контроль за плотностью ввозимой жидкости глушения и промывки с записью удельного веса в вахтовом журнале. ',
+                 f'Мастеру бригады КРС осуществлять входной контроль за плотностью ввозимой жидкости глушения и '
+                 f'промывки с записью удельного веса в вахтовом журнале. ',
                  None, None,
                  None, None, None, None, None,
                  None, None],
@@ -384,9 +412,12 @@ class Gno_window(QMainWindow):
                 [f'Поднять  {well_data.dict_pump_ECN["do"]} с пакером {well_data.paker_do["do"]}',
                  None,
                  f'Поднять  {well_data.dict_pump_ECN["do"]} с пакером {well_data.paker_do["do"]} с '
-                 f'глубины {round(sum(list(well_data.dict_nkt.values())), 1)}м (компоновка НКТ {nkt_diam_fond} на поверхность '
-                 f'с замером, накручиванием колпачков с доливом скважины тех.жидкостью уд. весом {well_data.fluid_work}  '
-                 f'в объеме {round(round(sum(list(well_data.dict_nkt.values())), 1) * 1.12 / 1000, 1)}м3 с контролем АСПО '
+                 f'глубины {round(sum(list(well_data.dict_nkt.values())), 1)}м (компоновка НКТ {nkt_diam_fond} '
+                 f'на поверхность '
+                 f'с замером, накручиванием колпачков с доливом скважины тех.жидкостью уд.'
+                 f' весом {well_data.fluid_work} '
+                 f'в объеме {round(round(sum(list(well_data.dict_nkt.values())), 1) * 1.12 / 1000, 1)}м3 с '
+                 f'контролем АСПО '
                  f'на стенках НКТ.',
                  None, None,
                  None, None, None, None, None,
@@ -394,8 +425,10 @@ class Gno_window(QMainWindow):
             ]
             lift_ecn = [
                 [f'Опрессовать ГНО на Р=50атм', None,
-                 'Опрессовать ГНО на Р=50атм в течении 30мин в присутствии представителя ЦДНГ. Составить акт. (Вызов представителя осуществлять '
-                 'телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ) ПРИ НЕГЕРМЕТИЧНОСТИ НКТ ПОДЪЕМ ВЕСТИ С КАЛИБРОВКОЙ',
+                 'Опрессовать ГНО на Р=50атм в течении 30мин в присутствии представителя ЦДНГ. Составить акт. (Вызов '
+                 'представителя осуществлять '
+                 'телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ) ПРИ НЕГЕРМЕТИЧНОСТИ НКТ'
+                 ' ПОДЪЕМ ВЕСТИ С КАЛИБРОВКОЙ',
                  None, None, None, None, None, None, None,
                  'Мастер КРС представитель Заказчика ', 0.7],
                 [f'Сбить сбивной клапан. {well_jamming_str[2]}', None,
@@ -411,30 +444,41 @@ class Gno_window(QMainWindow):
                 [f'Сорвать планшайбу не более {round(weigth_pipe(well_data.dict_nkt) * 1.2, 1)}т. '
                  f'(вес подвески ({round(weigth_pipe(well_data.dict_nkt), 1)}т) + 20%)', None,
                  f'Разобрать устьевое оборудование. Сорвать планшайбу в присутствии представителя ЦДНГ, с '
-                 f'составлением акта. При срыве нагрузка не должна превышать предельно допустимую нагрузку на НКТ не более {round(weigth_pipe(well_data.dict_nkt) * 1.2, 1)}т. '
-                 f'(вес подвески ({round(weigth_pipe(well_data.dict_nkt), 1)}т) + 20%). ПРИМЕЧАНИЕ: При отрицательном результате согласовать с УСРСиСТ ступенчатое увеличение '
-                 f'нагрузки до 28т ( страг нагрузка НКТ по паспорту), по 3 т – 0,5 час , при необходимости  с противодавлением в НКТ '
-                 f'(время на прибытие СТП ЦА 320 +  АЦ не более 4 часов). Общие время на расхаживание - не более 6 часов, через 5 часов'
-                 f' с момента расхаживания пакера - выйти с согласование на УСРСиСТ, ПТО Региона - для составления алгоритма'
+                 f'составлением акта. При срыве нагрузка не должна превышать предельно допустимую нагрузку на НКТ '
+                 f'не более {round(weigth_pipe(well_data.dict_nkt) * 1.2, 1)}т. '
+                 f'(вес подвески ({round(weigth_pipe(well_data.dict_nkt), 1)}т) + 20%). ПРИМЕЧАНИЕ: При отрицательном'
+                 f' результате согласовать с УСРСиСТ ступенчатое увеличение '
+                 f'нагрузки до 28т ( страг нагрузка НКТ по паспорту), по 3 т – 0,5 час , при необходимости  '
+                 f'с противодавлением в НКТ '
+                 f'(время на прибытие СТП ЦА 320 +  АЦ не более 4 часов). Общие время на расхаживание - не более 6 '
+                 f'часов, через 5 часов'
+                 f' с момента расхаживания пакера - выйти с согласование на УСРСиСТ, ПТО Региона - для составления '
+                 f'алгоритма'
                  f' последующих работ. ', None, None,
                  None, None, None, None, None,
                  'Мастер КРС представитель Заказчика', 1.5],
                 [None, None,
                  ''.join(["За 24 часа до готовности вызвать пусковую комиссию" if well_data.kat_pvo == 2
-                          else "На скважинах первой категории Подрядчик обязан пригласить представителя ПАСФ " \
-                               "для проверки качества м/ж и опрессовки ПВО, документации и выдачи разрешения на производство " \
-                               "работ по ремонту скважин. При обнаружении нарушений, которые могут повлечь за собой опасность для жизни людей"
-                               " и/или возникновению ГНВП и ОФ, дальнейшие работы должны быть прекращены. Представитель ПАСФ приглашается за 24 часа до проведения "
-                               "проверки монтажа ПВО телефонограммой. произвести практическое обучение по команде ВЫБРОС. Пусковой комиссией составить акт готовности "
+                          else "На скважинах первой категории Подрядчик обязан пригласить представителя ПАСФ "
+                               "для проверки качества м/ж и опрессовки ПВО, документации и выдачи разрешения на "
+                               "производство "
+                               "работ по ремонту скважин. При обнаружении нарушений, которые могут повлечь за собой "
+                               "опасность для жизни людей"
+                               " и/или возникновению ГНВП и ОФ, дальнейшие работы должны быть прекращены. Представитель "
+                               "ПАСФ приглашается за 24 часа до проведения "
+                               "проверки монтажа ПВО телефонограммой. произвести практическое обучение по команде "
+                               "ВЫБРОС. Пусковой комиссией составить акт готовности "
                                "подъёмного агрегата для ремонта скважины."]),
                  None, None, None, None, None, None, None,
                  'Мастер КРС', None],
                 [pvo_gno(well_data.kat_pvo)[1], None,
-                 'Заглубить оставшийся  кабель в скважину на 1-3 технологических НКТ' + pvo_gno(well_data.kat_pvo)[0], None,
+                 'Заглубить оставшийся  кабель в скважину на 1-3 технологических НКТ' + pvo_gno(well_data.kat_pvo)[0],
+                 None,
                  None,
                  None, None, None, None, None,
                  ''.join([
-                     'Мастер КРС, представ-ли ПАСФ и Заказчика, Пуск. ком' if well_data.kat_pvo == 1 else 'Мастер КРС, представ-ли  Заказчика']),
+                     'Мастер КРС, представ-ли ПАСФ и Заказчика, Пуск. ком'
+                     if well_data.kat_pvo == 1 else 'Мастер КРС, представ-ли  Заказчика']),
                  [4.21 if 'схеме №1' in str(pvo_gno(well_data.kat_pvo)[0]) else 0.23 + 0.3 + 0.83 + 0.67 + 0.14][0]],
                 [None, None,
                  f'Опрессовку ПВО проводить после каждого монтажа. (ОПРЕССОВКУ ПВО ЗАФИКСИРОВАТЬ В ВАХТОВОМ ЖУРНАЛЕ).',
@@ -442,7 +486,8 @@ class Gno_window(QMainWindow):
                  None, None, None, None, None,
                  None, None],
                 [None, None,
-                 f'Мастеру бригады КРС осуществлять входной контроль за плотностью ввозимой жидкости глушения и промывки с записью удельного веса в вахтовом журнале. ',
+                 f'Мастеру бригады КРС осуществлять входной контроль за плотностью ввозимой жидкости глушения и '
+                 f'промывки с записью удельного веса в вахтовом журнале. ',
                  None, None,
                  None, None, None, None, None,
                  None, None],
@@ -450,18 +495,22 @@ class Gno_window(QMainWindow):
                  f'Провести практическое обучение вахт по сигналу ВЫБРОС.', None, None,
                  None, None, None, None, None,
                  None, 1.2],
-                [f'Поднять  {well_data.dict_pump_ECN["do"]} с глубины {round(sum(list(well_data.dict_nkt.values())), 1)}м',
-                 None,
-                 f'Поднять  {well_data.dict_pump_ECN["do"]} с глубины {round(sum(list(well_data.dict_nkt.values())), 1)}м '
-                 f'(компоновка НКТ{nkt_diam_fond}) на поверхность с замером, накручиванием колпачков с доливом скважины '
-                 f'тех.жидкостью уд. весом {well_data.fluid_work}  '
-                 f'в объеме {round(round(sum(list(well_data.dict_nkt.values())), 1) * 1.12 / 1000, 1)}м3 с контролем АСПО'
-                 f' на стенках НКТ.',
-                 None, None,
-                 None, None, None, None, None,
-                 'Мастер КРС', round(liftingGNO(well_data.dict_nkt) * 1.2, 2)],
+                [
+                    f'Поднять  {well_data.dict_pump_ECN["do"]} с глубины {round(sum(list(well_data.dict_nkt.values())), 1)}м',
+                    None,
+                    f'Поднять  {well_data.dict_pump_ECN["do"]} с глубины '
+                    f'{round(sum(list(well_data.dict_nkt.values())), 1)}м '
+                    f'(компоновка НКТ{nkt_diam_fond}) на поверхность с замером, '
+                    f'накручиванием колпачков с доливом скважины '
+                    f'тех.жидкостью уд. весом {well_data.fluid_work}  '
+                    f'в объеме {round(round(sum(list(well_data.dict_nkt.values())), 1) * 1.12 / 1000, 1)}м3 с '
+                    f'контролем АСПО'
+                    f' на стенках НКТ.',
+                    None, None,
+                    None, None, None, None, None,
+                    'Мастер КРС', round(liftingGNO(well_data.dict_nkt) * 1.2, 2)],
             ]
-    
+
             lift_ecn_with_paker = [
                 ['Опрессовать ГНО на Р=50атм', None,
                  'Опрессовать ГНО на Р=50атм в течении 30мин в присутствии представителя ЦДНГ. Составить акт. '
@@ -475,22 +524,24 @@ class Gno_window(QMainWindow):
                  'Мастер КРС представитель Заказчика, пусков. Ком. ', 4.2],
                 [None, None,
                  f'Сбить сбивной клапан. '
-                 f'{"".join([" " if without_damping_True == True else f"При наличии Избыточного давления не позволяющее сорвать пакера: Произвести глушение в НКТ в объеме {volume_pod_NKT(self)}м3. {well_data.fluid_work}"])}'
-    
+                 f'{"".join([" " if without_damping_True is True else f"При наличии Избыточного давления не позволяющее сорвать пакера: Произвести глушение в НКТ в объеме {volume_pod_NKT(self)}м3. {well_data.fluid_work}"])}'
+
                     , None, None,
                  None, None, None, None, None,
                  'Мастер КРС представитель Заказчика, пусков. Ком. ', 4.2],
                 [f'срыв пакера не более {round(weigth_pipe(well_data.dict_nkt) * 1.2, 1)}т. '
                  f'(вес подвески ({round(weigth_pipe(well_data.dict_nkt), 1)}т) + 20%)', None,
                  f'Разобрать устьевое оборудование. Сорвать планшайбу и пакер с поэтапным увеличением нагрузки '
-                 f'с выдержкой 30мин для возврата резиновых элементов в исходное положение в присутствии представителя ЦДНГ, с '
+                 f'с выдержкой 30мин для возврата резиновых элементов в исходное положение в присутствии представителя '
+                 f'ЦДНГ, с '
                  f'составлением акта. При срыве нагрузка не должна превышать предельно допустимую нагрузку на НКТ не '
                  f'более {round(weigth_pipe(well_data.dict_nkt) * 1.2, 1)}т. '
                  f'(вес подвески ({round(weigth_pipe(well_data.dict_nkt), 1)}т) + 20%). ПРИМЕЧАНИЕ: '
                  f'При отрицательном результате согласовать с УСРСиСТ ступенчатое увеличение '
                  f'нагрузки до 28т ( страг нагрузка НКТ по паспорту), по 3 т – 0,5 час , при необходимости  с '
                  f'противодавлением в НКТ '
-                 f'(время на прибытие СТП ЦА 320 +  АЦ не более 4 часов). Общие время на расхаживание - не более 6 часов, '
+                 f'(время на прибытие СТП ЦА 320 +  АЦ не более 4 часов). Общие время на расхаживание - '
+                 f'не более 6 часов, '
                  f'через 5 часов'
                  f' с момента расхаживания пакера - выйти с согласование на УСРСиСТ, ПТО Региона -  для составления '
                  f'алгоритма'
@@ -501,21 +552,22 @@ class Gno_window(QMainWindow):
                  well_jamming_str[0],
                  None, None, None, None, None, None, None,
                  'Мастер КРС, представ заказчика',
-                 [str(well_jamming_norm(volume_pod_NKT(self))) if without_damping_True == False else None][0]],
+                 [str(well_jamming_norm(volume_pod_NKT(self))) if without_damping_True is False else None][0]],
                 [None, None,
                  well_jamming_str[1],
                  None, None, None, None, None, None, None,
                  ' Мастер КРС', None],
                 [None, None,
                  ''.join(["За 24 часа до готовности вызвать пусковую комиссию" if well_data.kat_pvo == 2
-                          else "На скважинах первой категории Подрядчик обязан пригласить представителя ПАСФ " \
+                          else "На скважинах первой категории Подрядчик обязан пригласить представителя ПАСФ "
                                "для проверки качества м/ж и опрессовки ПВО, документации и выдачи разрешения на "
-                               "производство " \
+                               "производство "
                                "работ по ремонту скважин. При обнаружении нарушений, которые могут повлечь за собой "
                                "опасность для жизни людей"
                                " и/или возникновению ГНВП и ОФ, дальнейшие работы должны быть прекращены. Представитель "
                                "ПАСФ приглашается за 24 часа до проведения "
-                               "проверки монтажа ПВО телефонограммой. произвести практическое обучение по команде ВЫБРОС. "
+                               "проверки монтажа ПВО телефонограммой. произвести практическое обучение по команде"
+                               " ВЫБРОС. "
                                "Пусковой комиссией составить акт готовности "
                                "подъёмного агрегата для ремонта скважины."]),
                  None, None, None, None, None, None, None,
@@ -524,8 +576,8 @@ class Gno_window(QMainWindow):
                  pvo_gno(well_data.kat_pvo)[0], None, None,
                  None, None, None, None, None,
                  ''.join([
-                     'Мастер КРС, представ-ли ПАСФ и Заказчика, Пуск. ком' if well_data.kat_pvo == 1 else 'Мастер КРС, '
-                                                                                                          'представ-ли  Заказчика']),
+                     'Мастер КРС, представ-ли ПАСФ и Заказчика, Пуск. ком'
+                     if well_data.kat_pvo == 1 else 'Мастер КРС, представ-ли  Заказчика']),
                  [4.21 if 'схеме №1' in str(pvo_gno(well_data.kat_pvo)[0]) else 0.23 + 0.3 + 0.83 + 0.67 + 0.14][0]],
                 [None, None,
                  f'Опрессовку ПВО проводить после каждого монтажа. (ОПРЕССОВКУ ПВО ЗАФИКСИРОВАТЬ В ВАХТОВОМ ЖУРНАЛЕ).',
@@ -565,12 +617,12 @@ class Gno_window(QMainWindow):
                  well_jamming_str[0],
                  None, None, None, None, None, None, None,
                  'Мастер КРС, представ заказчика',
-                 [str(well_jamming_norm(volume_pod_NKT(self))) if without_damping_True == False else None][0]],
+                 [str(well_jamming_norm(volume_pod_NKT(self))) if without_damping_True is False else None][0]],
                 [None, None,
                  well_jamming_str[1],
                  None, None, None, None, None, None, None,
                  ' Мастер КРС',
-                 [str(well_jamming_norm(volume_pod_NKT(self))) if without_damping_True == False else None][0]],
+                 [str(well_jamming_norm(volume_pod_NKT(self))) if without_damping_True is False else None][0]],
                 [None, None,
                  f'{lifting_unit(self)}', None, None, None, None, None, None, None,
                  'Мастер КРС представитель Заказчика, пусков. Ком. ', 4.2],
@@ -583,7 +635,9 @@ class Gno_window(QMainWindow):
                  f'Обеспечить не превышение расчетных нагрузок на штанговые колонны при срыве  насосов (не более 8 тн), '
                  f'без учета веса '
                  f'штанг в  0,9т. При отрицательном результате согласов технологической службой ЦДНГ или ПТО региона  '
-                 f'постепенное увеличение нагрузки до 15тн ( по 1т - 1 час), либо искусственный  отворот НШ с последующим комбинированным подъемом ГНО НВ. В случае невозможности отворота колонны НШ с подтверждением супервайзера, распиловку НШ согласовать с ПТО по направлению сектора учета НКТ и НШ.',
+                 f'постепенное увеличение нагрузки до 15тн ( по 1т - 1 час), либо искусственный  отворот НШ '
+                 f'с последующим комбинированным подъемом ГНО НВ. В случае невозможности отворота колонны НШ с'
+                 f' подтверждением супервайзера, распиловку НШ согласовать с ПТО по направлению сектора учета НКТ и НШ.',
                  None, None, None, None, None, None, None,
                  'Мастер КРС представитель Заказчика, пусков. Ком. ',
                  lifting_sucker_rod(well_data.dict_sucker_rod)],
@@ -596,7 +650,8 @@ class Gno_window(QMainWindow):
                  f'результате согласовать с УСРСиСТ ступенчатое увеличение '
                  f'нагрузки до 28т ( страг нагрузка НКТ по паспорту), по 3 т – 0,5 час , при необходимости  с '
                  f'противодавлением в НКТ '
-                 f'(время на прибытие СТП ЦА 320 +  АЦ не более 4 часов). Общие время на расхаживание - не более 6 часов, '
+                 f'(время на прибытие СТП ЦА 320 +  АЦ не более 4 часов). Общие время на расхаживание - '
+                 f'не более 6 часов, '
                  f'через 5 часов'
                  f' с момента расхаживания пакера - выйти с согласование на УСРСиСТ, ПТО Региона - '
                  f'для составления алгоритма'
@@ -605,8 +660,9 @@ class Gno_window(QMainWindow):
                  'Мастер КРС представитель Заказчика', 1.5],
                 [None, None,
                  ''.join(["За 24 часа до готовности вызвать пусковую комиссию" if well_data.kat_pvo == 2
-                          else "На скважинах первой категории Подрядчик обязан пригласить представителя ПАСФ " \
-                               "для проверки качества м/ж и опрессовки ПВО, документации и выдачи разрешения на производство " \
+                          else "На скважинах первой категории Подрядчик обязан пригласить представителя ПАСФ "
+                               "для проверки качества м/ж и опрессовки ПВО, документации и выдачи разрешения на"
+                               " производство "
                                "работ по ремонту скважин. При обнаружении нарушений, которые могут повлечь за собой "
                                "опасность для жизни людей"
                                " и/или возникновению ГНВП и ОФ, дальнейшие работы должны быть прекращены. Представитель "
@@ -620,7 +676,8 @@ class Gno_window(QMainWindow):
                  pvo_gno(well_data.kat_pvo)[0], None, None,
                  None, None, None, None, None,
                  ''.join([
-                     'Мастер КРС, представ-ли ПАСФ и Заказчика, Пуск. ком' if well_data.kat_pvo == 1 else 'Мастер КРС, представ-ли  Заказчика']),
+                     'Мастер КРС, представ-ли ПАСФ и Заказчика, Пуск. ком' if well_data.kat_pvo == 1 else
+                     'Мастер КРС, представ-ли  Заказчика']),
                  [4.21 if 'схеме №1' in str(pvo_gno(well_data.kat_pvo)[0]) else 0.23 + 0.3 + 0.83 + 0.67 + 0.14][0]],
                 [None, None,
                  f'Опрессовку ПВО проводить после каждого монтажа. (ОПРЕССОВКУ ПВО ЗАФИКСИРОВАТЬ В ВАХТОВОМ ЖУРНАЛЕ).',
@@ -638,10 +695,11 @@ class Gno_window(QMainWindow):
                  None, None, None, None, None,
                  None, 1.2],
                 [
-                    f'{"".join(["Допустить фНКТ для определения текущего забоя. " if well_data.gipsInWell == True else ""])}Поднять  замковую опору с глубины {round(sum(list(well_data.dict_nkt.values())), 1)}м',
+                    f'{"".join(["Допустить фНКТ для определения текущего забоя. " if well_data.gipsInWell is True else ""])}Поднять  замковую опору с глубины {round(sum(list(well_data.dict_nkt.values())), 1)}м',
                     None,
-                    f'{"".join(["Допустить фНКТ для определения текущего забоя. " if well_data.gipsInWell == True else ""])}Поднять  замковую опору  на НКТ с глубины {round(sum(list(well_data.dict_nkt.values())), 1)}м (компоновка НКТ{nkt_diam_fond}) на поверхность с замером, накручиванием колпачков с доливом скважины тех.жидкостью уд. весом {well_data.fluid_work}  '
-                    f'в объеме {round(round(sum(list(well_data.dict_nkt.values())), 1) * 1.12 / 1000, 1)}м3 с контролем АСПО на стенках НКТ.',
+                    f'{"".join(["Допустить фНКТ для определения текущего забоя. " if well_data.gipsInWell is True else ""])}Поднять  замковую опору  на НКТ с глубины {round(sum(list(well_data.dict_nkt.values())), 1)}м (компоновка НКТ{nkt_diam_fond}) на поверхность с замером, накручиванием колпачков с доливом скважины тех.жидкостью уд. весом {well_data.fluid_work}  '
+                    f'в объеме {round(round(sum(list(well_data.dict_nkt.values())), 1) * 1.12 / 1000, 1)}м3 '
+                    f'с контролем АСПО на стенках НКТ.',
                     None, None,
                     None, None, None, None, None,
                     'Мастер КРС', liftingGNO(well_data.dict_nkt)],
@@ -662,7 +720,7 @@ class Gno_window(QMainWindow):
                  f'согласно схемы №3 утвержденной главным '
                  f'инженером от 14.10.2021г при СПО штанг (ПМШ 62х21 либо аналог). '
                  f'Опрессовать ПВО на {well_data.max_admissible_pressure._value}атм. '
-                 f'{"".join([" " if without_damping_True == True else f"При наличии Избыточного давления не позволяющее сорвать пакера: Приподнять штангу. Произвести глушение в НКТ в объеме{volume_pod_NKT(self)}м3. Техостой 2ч."])}'
+                 f'{"".join([" " if without_damping_True is True else f"При наличии Избыточного давления не позволяющее сорвать пакера: Приподнять штангу. Произвести глушение в НКТ в объеме{volume_pod_NKT(self)}м3. Техостой 2ч."])}'
                  f' Поднять на штангах насос с гл. {float(well_data.dict_pump_SHGN_h["do"])}м с '
                  f'доливом тех жидкости уд.весом {well_data.fluid_work} '
                  f'Обеспечить не превышение расчетных нагрузок на штанговые колонны при срыве  '
@@ -696,18 +754,22 @@ class Gno_window(QMainWindow):
                  well_jamming_str[0],
                  None, None, None, None, None, None, None,
                  'Мастер КРС, представ заказчика',
-                 [str(well_jamming_norm(volume_pod_NKT(self))) if without_damping_True == False else None][0]],
+                 [str(well_jamming_norm(volume_pod_NKT(self))) if without_damping_True is False else None][0]],
                 [None, None,
                  well_jamming_str[1],
                  None, None, None, None, None, None, None,
                  ' Мастер КРС', None],
                 [None, None,
                  ''.join(["За 24 часа до готовности вызвать пусковую комиссию" if well_data.kat_pvo == 2
-                          else "На скважинах первой категории Подрядчик обязан пригласить представителя ПАСФ " \
-                               "для проверки качества м/ж и опрессовки ПВО, документации и выдачи разрешения на производство " \
-                               "работ по ремонту скважин. При обнаружении нарушений, которые могут повлечь за собой опасность для жизни людей"
-                               " и/или возникновению ГНВП и ОФ, дальнейшие работы должны быть прекращены. Представитель ПАСФ приглашается за 24 часа до проведения "
-                               "проверки монтажа ПВО телефонограммой. произвести практическое обучение по команде ВЫБРОС. Пусковой комиссией составить акт готовности "
+                          else "На скважинах первой категории Подрядчик обязан пригласить представителя ПАСФ "
+                               "для проверки качества м/ж и опрессовки ПВО, документации и выдачи разрешения на"
+                               " производство "
+                               "работ по ремонту скважин. При обнаружении нарушений, которые могут повлечь за "
+                               "собой опасность для жизни людей"
+                               " и/или возникновению ГНВП и ОФ, дальнейшие работы должны быть прекращены. "
+                               "Представитель ПАСФ приглашается за 24 часа до проведения "
+                               "проверки монтажа ПВО телефонограммой. произвести практическое обучение по "
+                               "команде ВЫБРОС. Пусковой комиссией составить акт готовности "
                                "подъёмного агрегата для ремонта скважины."]),
                  None, None, None, None, None, None, None,
                  'Мастер КРС', None],
@@ -723,7 +785,8 @@ class Gno_window(QMainWindow):
                  None, None, None, None, None,
                  None, None],
                 [None, None,
-                 f'Мастеру бригады КРС осуществлять входной контроль за плотностью ввозимой жидкости глушения и промывки с записью удельного веса в вахтовом журнале. ',
+                 f'Мастеру бригады КРС осуществлять входной контроль за плотностью ввозимой жидкости глушения и '
+                 f'промывки с записью удельного веса в вахтовом журнале. ',
                  None, None,
                  None, None, None, None, None,
                  None, None],
@@ -735,7 +798,8 @@ class Gno_window(QMainWindow):
                  f'Поднять  замковую опору с пакером {well_data.paker_do["do"]} с глубины'
                  f' {round(sum(list(well_data.dict_nkt.values())), 1)}м  (компоновка НКТ{nkt_diam_fond}) на '
                  f'поверхность с замером, накручиванием колпачков с доливом скважины тех.жидкостью уд. весом {well_data.fluid_work}  '
-                 f'в объеме {round(round(sum(list(well_data.dict_nkt.values())), 1) * 1.12 / 1000, 1)}м3 с контролем АСПО на стенках НКТ.',
+                 f'в объеме {round(round(sum(list(well_data.dict_nkt.values())), 1) * 1.12 / 1000, 1)}м3 с '
+                 f'контролем АСПО на стенках НКТ.',
                  None, None,
                  None, None, None, None, None,
                  'Мастер КРС', round(liftingGNO(well_data.dict_nkt) * 1.2, 2)],
@@ -752,7 +816,7 @@ class Gno_window(QMainWindow):
                  well_jamming_str[0],
                  None, None, None, None, None, None, None,
                  'Мастер КРС, представ заказчика',
-                 [str(well_jamming_norm(volume_pod_NKT(self))) if without_damping_True == False else None][0]],
+                 [str(well_jamming_norm(volume_pod_NKT(self))) if without_damping_True is False else None][0]],
                 [None, None,
                  well_jamming_str[1],
                  None, None, None, None, None, None, None,
@@ -761,14 +825,17 @@ class Gno_window(QMainWindow):
                  f'{lifting_unit(self)}', None, None, None, None, None, None, None,
                  'Мастер КРС представитель Заказчика, пусков. Ком. ', 4.2],
                 [f'поднять плунжен', None,
-                 f'Сорвать  плунжер. (зафиксировать вес при срыве). Обвязать устье скважины согласно схемы №3 утвержденной главным '
+                 f'Сорвать  плунжер. (зафиксировать вес при срыве). Обвязать устье скважины согласно схемы №3 '
+                 f'утвержденной главным '
                  f'инженером от 14.10.2021г при СПО штанг (ПМШ 62х21 либо аналог). Опрессовать ПВО на '
                  f'{well_data.max_admissible_pressure._value}атм. Заловить конус спуском одной '
                  f'штанги. Поднять на штангах плунжер с гл. {float(well_data.dict_pump_SHGN_h["do"])}м с доливом тех '
                  f'жидкости уд.весом {well_data.fluid_work} '
-                 f'Обеспечить не превышение расчетных нагрузок на штанговые колонны при срыве  насосов (не более 8 тн), без учета веса '
+                 f'Обеспечить не превышение расчетных нагрузок на штанговые колонны при срыве  насосов '
+                 f'(не более 8 тн), без учета веса '
                  f'штанг в  0,9т. При отрицательном результате согласов технологической службой ЦДНГ или ПТО региона  '
-                 f'постепенное увеличение нагрузки до 15тн ( по 1т - 1 час), либо искусственный  отворот НШ с последующим '
+                 f'постепенное увеличение нагрузки до 15тн ( по 1т - 1 час), либо искусственный  отворот НШ с '
+                 f'последующим '
                  f'комбинированным подъемом ГНО НВ. В случае невозможности отворота колонны НШ с подтверждением '
                  f'супервайзера, распиловку НШ согласовать с ПТО по направлению сектора учета НКТ и НШ.',
                  None, None, None, None, None, None, None,
@@ -783,7 +850,8 @@ class Gno_window(QMainWindow):
                  f'результате согласовать с УСРСиСТ ступенчатое увеличение '
                  f'нагрузки до 28т ( страг нагрузка НКТ по паспорту), по 3 т – 0,5 час , при необходимости  с'
                  f' противодавлением в НКТ '
-                 f'(время на прибытие СТП ЦА 320 +  АЦ не более 4 часов). Общие время на расхаживание - не более 6 часов, '
+                 f'(время на прибытие СТП ЦА 320 +  АЦ не более 4 часов). Общие время на расхаживание - '
+                 f'не более 6 часов, '
                  f'через 5 часов'
                  f' с момента расхаживания пакера - выйти с согласование на УСРСиСТ, ПТО Региона - для составления '
                  f'алгоритма'
@@ -792,8 +860,9 @@ class Gno_window(QMainWindow):
                  'Мастер КРС представитель Заказчика', 1.5],
                 [None, None,
                  ''.join(["За 24 часа до готовности вызвать пусковую комиссию" if well_data.kat_pvo == 2
-                          else "На скважинах первой категории Подрядчик обязан пригласить представителя ПАСФ " \
-                               "для проверки качества м/ж и опрессовки ПВО, документации и выдачи разрешения на производство " \
+                          else "На скважинах первой категории Подрядчик обязан пригласить представителя ПАСФ "
+                               "для проверки качества м/ж и опрессовки ПВО, документации и выдачи разрешения "
+                               "на производство "
                                "работ по ремонту скважин. При обнаружении нарушений, которые могут повлечь за "
                                "собой опасность для жизни людей"
                                " и/или возникновению ГНВП и ОФ, дальнейшие работы должны быть прекращены. "
@@ -846,13 +915,21 @@ class Gno_window(QMainWindow):
                  f'{lifting_unit(self)}', None, None, None, None, None, None, None,
                  'Мастер КРС представитель Заказчика, пусков. Ком. ', 4.2],
                 ['Поднять плунжер', None,
-                 f'Сорвать плунжер насоса (зафиксировать вес при срыве). Обвязать устье скважины согласно схемы №3 утвержденной главным '
-                 f'инженером от 14.10.2021г при СПО штанг (ПМШ 62х21 либо аналог). Опрессовать ПВО на {well_data.max_admissible_pressure._value}атм. Спуском одной штанги заловить конус. '
-                 f'{"".join([" " if without_damping_True == True else f"При наличии Избыточного давления не позволяющее сорвать пакера: Приподнять штангу. Произвести глушение в НКТ в объеме{volume_pod_NKT(self)}м3. Техостой 2ч."])}'
-    
-                 f' Поднять на штангах плунжер с гл. {int(well_data.dict_pump_SHGN_h["do"])}м с доливом тех жидкости уд.весом {well_data.fluid_work} '
-                 f'Обеспечить не превышение расчетных нагрузок на штанговые колонны при срыве  насосов (не более 8 тн), без учета веса '
-                 f'штанг в  0,9т. При отрицательном результате согласов технологической службой ЦДНГ или ПТО региона  постепенное увеличение нагрузки до 15тн ( по 1т - 1 час), либо искусственный  отворот НШ с последующим комбинированным подъемом ГНО НВ. В случае невозможности отворота колонны НШ с подтверждением супервайзера, распиловку НШ согласовать с ПТО по направлению сектора учета НКТ и НШ.',
+                 f'Сорвать плунжер насоса (зафиксировать вес при срыве). Обвязать устье скважины согласно '
+                 f'схемы №3 утвержденной главным '
+                 f'инженером от 14.10.2021г при СПО штанг (ПМШ 62х21 либо аналог). Опрессовать ПВО на '
+                 f'{well_data.max_admissible_pressure._value}атм. Спуском одной штанги заловить конус. '
+                 f'{"".join([" " if without_damping_True is True else f"При наличии Избыточного давления не позволяющее сорвать пакера: Приподнять штангу. Произвести глушение в НКТ в объеме{volume_pod_NKT(self)}м3. Техостой 2ч."])}'
+
+                 f' Поднять на штангах плунжер с гл. {int(well_data.dict_pump_SHGN_h["do"])}м с доливом тех '
+                 f'жидкости уд.весом {well_data.fluid_work} '
+                 f'Обеспечить не превышение расчетных нагрузок на штанговые колонны при срыве '
+                 f'насосов (не более 8 тн), без учета веса '
+                 f'штанг в  0,9т. При отрицательном результате согласов технологической службой ЦДНГ или ПТО региона '
+                 f'постепенное увеличение нагрузки до 15тн ( по 1т - 1 час), либо искусственный  отворот НШ с '
+                 f'последующим комбинированным подъемом ГНО НВ. В случае невозможности отворота колонны НШ с'
+                 f' подтверждением супервайзера, распиловку НШ согласовать с ПТО по направлению сектора '
+                 f'учета НКТ и НШ.',
                  None, None, None, None, None, None, None,
                  'Мастер КРС представитель Заказчика, пусков. Ком. ',
                  lifting_sucker_rod(well_data.dict_sucker_rod)],
@@ -861,7 +938,8 @@ class Gno_window(QMainWindow):
                  f'(вес подвески ({round(weigth_pipe(well_data.dict_nkt), 1)}т) + 20%)',
                  None,
                  f'Разобрать устьевое оборудование. Сорвать планшайбу и пакер с поэтапным увеличением нагрузки с '
-                 f'выдержкой 30мин для возврата резиновых элементов в исходное положение в присутствии представителя ЦДНГ, с '
+                 f'выдержкой 30мин для возврата резиновых элементов в исходное положение в присутствии представителя'
+                 f' ЦДНГ, с '
                  f'составлением акта. При срыве нагрузка не должна превышать предельно допустимую нагрузку на НКТ не '
                  f'более {round(weigth_pipe(well_data.dict_nkt) * 1.2, 1)}т. '
                  f'(вес подвески ({round(weigth_pipe(well_data.dict_nkt), 1)}т) + 20%). ПРИМЕЧАНИЕ: При отрицательном '
@@ -869,7 +947,8 @@ class Gno_window(QMainWindow):
                  f'нагрузки до 28т ( страг нагрузка НКТ по паспорту), по 3 т – 0,5 час , при необходимости  '
                  f'с противодавлением в НКТ (время на прибытие СТП ЦА 320 +  АЦ не более 4 часов). Общие время на '
                  f'расхаживание - не более 6 часов, через 5 часов'
-                 f' с момента расхаживания пакера - выйти с согласование на УСРСиСТ, ПТО Региона - для составления алгоритма'
+                 f' с момента расхаживания пакера - выйти с согласование на УСРСиСТ, ПТО Региона - для составления'
+                 f' алгоритма'
                  f' последующих работ. ', None, None,
                  None, None, None, None, None,
                  'Мастер КРС представитель Заказчика', 1.5],
@@ -877,18 +956,22 @@ class Gno_window(QMainWindow):
                  well_jamming_str[0],
                  None, None, None, None, None, None, None,
                  'Мастер КРС, представ заказчика',
-                 [str(well_jamming_norm(volume_pod_NKT(self))) if without_damping_True == False else None][0]],
+                 [str(well_jamming_norm(volume_pod_NKT(self))) if without_damping_True is False else None][0]],
                 [None, None,
                  well_jamming_str[1],
                  None, None, None, None, None, None, None,
                  ' Мастер КРС', None],
                 [None, None,
                  ''.join(["За 24 часа до готовности вызвать пусковую комиссию" if well_data.kat_pvo == 2
-                          else "На скважинах первой категории Подрядчик обязан пригласить представителя ПАСФ " \
-                               "для проверки качества м/ж и опрессовки ПВО, документации и выдачи разрешения на производство " \
-                               "работ по ремонту скважин. При обнаружении нарушений, которые могут повлечь за собой опасность для жизни людей"
-                               " и/или возникновению ГНВП и ОФ, дальнейшие работы должны быть прекращены. Представитель ПАСФ приглашается за 24 часа до проведения "
-                               "проверки монтажа ПВО телефонограммой. произвести практическое обучение по команде ВЫБРОС. Пусковой комиссией составить акт готовности "
+                          else "На скважинах первой категории Подрядчик обязан пригласить представителя ПАСФ "
+                               "для проверки качества м/ж и опрессовки ПВО, документации и выдачи разрешения "
+                               "на производство "
+                               "работ по ремонту скважин. При обнаружении нарушений, которые могут повлечь за "
+                               "собой опасность для жизни людей"
+                               " и/или возникновению ГНВП и ОФ, дальнейшие работы должны быть прекращены. "
+                               "Представитель ПАСФ приглашается за 24 часа до проведения "
+                               "проверки монтажа ПВО телефонограммой. произвести практическое обучение по "
+                               "команде ВЫБРОС. Пусковой комиссией составить акт готовности "
                                "подъёмного агрегата для ремонта скважины."]),
                  None, None, None, None, None, None, None,
                  'Мастер КРС', None],
@@ -916,9 +999,11 @@ class Gno_window(QMainWindow):
                 [f'Поднять  насос {well_data.dict_pump_SHGN["do"]} с пакером {well_data.paker_do["do"]}',
                  None,
                  f'Поднять  насос {well_data.dict_pump_SHGN["do"]} с пакером {well_data.paker_do["do"]} с глубины '
-                 f'{round(sum(list(well_data.dict_nkt.values())), 1)}м (компоновка НКТ{nkt_diam_fond}) на поверхность с '
+                 f'{round(sum(list(well_data.dict_nkt.values())), 1)}м (компоновка НКТ{nkt_diam_fond}) на '
+                 f'поверхность с '
                  f'замером, накручиванием колпачков с доливом скважины тех.жидкостью уд. весом {well_data.fluid_work}  '
-                 f'в объеме {round(round(sum(list(well_data.dict_nkt.values())), 1) * 1.12 / 1000, 1)}м3 с контролем АСПО '
+                 f'в объеме {round(round(sum(list(well_data.dict_nkt.values())), 1) * 1.12 / 1000, 1)}м3 с контролем '
+                 f'АСПО '
                  f'на стенках НКТ.',
                  None, None,
                  None, None, None, None, None,
@@ -927,7 +1012,8 @@ class Gno_window(QMainWindow):
             lift_voronka = [[well_jamming_str[2], None, well_jamming_str[0],
                              None, None, None, None, None, None, None,
                              'Мастер КРС, представ заказчика',
-                             [str(well_jamming_norm(volume_pod_NKT(self))) if without_damping_True is False else None][0]],
+                             [str(well_jamming_norm(volume_pod_NKT(self))) if without_damping_True is False else None][
+                                 0]],
                             [None, None,
                              well_jamming_str[1],
                              None, None, None, None, None, None, None,
@@ -939,21 +1025,31 @@ class Gno_window(QMainWindow):
                              f'(вес подвески ({round(weigth_pipe(well_data.dict_nkt), 1)}т) + 20%)',
                              None,
                              f'Разобрать устьевое оборудование. Сорвать планшайбу в присутствии представителя ЦДНГ, с '
-                             f'составлением акта. При срыве нагрузка не должна превышать предельно допустимую нагрузку на НКТ не более {round(weigth_pipe(well_data.dict_nkt) * 1.2, 1)}т. '
-                             f'(вес подвески ({round(weigth_pipe(well_data.dict_nkt), 1)}т) + 20%). ПРИМЕЧАНИЕ: При отрицательном результате согласовать с УСРСиСТ ступенчатое увеличение '
-                             f'нагрузки до 28т ( страг нагрузка НКТ по паспорту), по 3 т – 0,5 час , при необходимости  с противодавлением в НКТ '
-                             f'(время на прибытие СТП ЦА 320 +  АЦ не более 4 часов). Общие время на расхаживание - не более 6 часов, через 5 часов'
-                             f' с момента расхаживания пакера - выйти с согласование на УСРСиСТ, ПТО Региона - для составления алгоритма'
+                             f'составлением акта. При срыве нагрузка не должна превышать предельно допустимую '
+                             f'нагрузку на НКТ не более {round(weigth_pipe(well_data.dict_nkt) * 1.2, 1)}т. '
+                             f'(вес подвески ({round(weigth_pipe(well_data.dict_nkt), 1)}т) + 20%). ПРИМЕЧАНИЕ: '
+                             f'При отрицательном результате согласовать с УСРСиСТ ступенчатое увеличение '
+                             f'нагрузки до 28т ( страг нагрузка НКТ по паспорту), по 3 т – 0,5 час , при '
+                             f'необходимости  с противодавлением в НКТ '
+                             f'(время на прибытие СТП ЦА 320 +  АЦ не более 4 часов). Общие время на '
+                             f'расхаживание - не более 6 часов, через 5 часов'
+                             f' с момента расхаживания пакера - выйти с согласование на УСРСиСТ, ПТО '
+                             f'Региона - для составления алгоритма'
                              f' последующих работ. ', None, None,
                              None, None, None, None, None,
                              'Мастер КРС представитель Заказчика', 1.5],
                             [None, None,
                              ''.join(["За 24 часа до готовности вызвать пусковую комиссию" if well_data.kat_pvo == 2
-                                      else "На скважинах первой категории Подрядчик обязан пригласить представителя ПАСФ " \
-                                           "для проверки качества м/ж и опрессовки ПВО, документации и выдачи разрешения на производство " \
-                                           "работ по ремонту скважин. При обнаружении нарушений, которые могут повлечь за собой опасность для жизни людей"
-                                           " и/или возникновению ГНВП и ОФ, дальнейшие работы должны быть прекращены. Представитель ПАСФ приглашается за 24 часа до проведения "
-                                           "проверки монтажа ПВО телефонограммой. произвести практическое обучение по команде ВЫБРОС. Пусковой комиссией составить акт готовности "
+                                      else "На скважинах первой категории Подрядчик обязан пригласить "
+                                           "представителя ПАСФ "
+                                           "для проверки качества м/ж и опрессовки ПВО, документации и "
+                                           "выдачи разрешения на производство "
+                                           "работ по ремонту скважин. При обнаружении нарушений, которые могут "
+                                           "повлечь за собой опасность для жизни людей"
+                                           " и/или возникновению ГНВП и ОФ, дальнейшие работы должны быть прекращены. "
+                                           "Представитель ПАСФ приглашается за 24 часа до проведения "
+                                           "проверки монтажа ПВО телефонограммой. произвести практическое обучение "
+                                           "по команде ВЫБРОС. Пусковой комиссией составить акт готовности "
                                            "подъёмного агрегата для ремонта скважины."]),
                              None, None, None, None, None, None, None,
                              'Мастер КРС', None],
@@ -965,12 +1061,14 @@ class Gno_window(QMainWindow):
                              [4.21 if 'схеме №1' in str(
                                  pvo_gno(well_data.kat_pvo)[0]) else 0.23 + 0.3 + 0.83 + 0.67 + 0.14][0]],
                             [None, None,
-                             f'Опрессовку ПВО проводить после каждого монтажа. (ОПРЕССОВКУ ПВО ЗАФИКСИРОВАТЬ В ВАХТОВОМ ЖУРНАЛЕ).',
+                             f'Опрессовку ПВО проводить после каждого монтажа. (ОПРЕССОВКУ ПВО ЗАФИКСИРОВАТЬ '
+                             f'В ВАХТОВОМ ЖУРНАЛЕ).',
                              None, None,
                              None, None, None, None, None,
                              None, None],
                             [None, None,
-                             f'Мастеру бригады КРС осуществлять входной контроль за плотностью ввозимой жидкости глушения и промывки с записью удельного веса в вахтовом журнале. ',
+                             f'Мастеру бригады КРС осуществлять входной контроль за плотностью ввозимой жидкости '
+                             f'глушения и промывки с записью удельного веса в вахтовом журнале. ',
                              None, None,
                              None, None, None, None, None,
                              None, None],
@@ -989,7 +1087,7 @@ class Gno_window(QMainWindow):
                              None, None, None, None, None,
                              'Мастер КРС', liftingGNO(well_data.dict_nkt)],
                             ]
-    
+
             lift_paker = [
                 [f'Опрессовать эксплуатационную колонну и пакер на Р={well_data.max_admissible_pressure._value}атм',
                  None,
@@ -1002,7 +1100,8 @@ class Gno_window(QMainWindow):
                 [f'При наличии Избыточного давления не позволяющее сорвать пакера:\n'
                  f'Произвести определение приемистости скважины', None,
                  f'При наличии Избыточного давления не позволяющее сорвать пакера:\n '
-                 f'Произвести определение приемистости скважины при давлении не более {well_data.max_admissible_pressure._value}атм. '
+                 f'Произвести определение приемистости скважины при давлении не более '
+                 f'{well_data.max_admissible_pressure._value}атм. '
                  f'{well_jamming_str_in_nkt}',
                  None, None,
                  None, None, None, None, None,
@@ -1039,9 +1138,9 @@ class Gno_window(QMainWindow):
                  'Мастер КРС', None],
                 [None, None,
                  ''.join(["За 24 часа до готовности вызвать пусковую комиссию" if well_data.kat_pvo == 2
-                          else "На скважинах первой категории Подрядчик обязан пригласить представителя ПАСФ " \
+                          else "На скважинах первой категории Подрядчик обязан пригласить представителя ПАСФ "
                                "для проверки качества м/ж и опрессовки ПВО, документации и выдачи разрешения на"
-                               " производство " \
+                               " производство "
                                "работ по ремонту скважин. При обнаружении нарушений, которые могут повлечь за "
                                "собой опасность для жизни людей"
                                " и/или возникновению ГНВП и ОФ, дальнейшие работы должны быть прекращены. "
@@ -1055,7 +1154,8 @@ class Gno_window(QMainWindow):
                  pvo_gno(well_data.kat_pvo)[0], None, None,
                  None, None, None, None, None,
                  ''.join([
-                     'Мастер КРС, представ-ли ПАСФ и Заказчика, Пуск. ком' if well_data.kat_pvo == 1 else 'Мастер КРС, представ-ли  Заказчика']),
+                     'Мастер КРС, представ-ли ПАСФ и Заказчика, Пуск. ком'
+                     if well_data.kat_pvo == 1 else 'Мастер КРС, представ-ли  Заказчика']),
                  [4.21 if 'схеме №1' in str(pvo_gno(well_data.kat_pvo)[0]) else 0.23 + 0.3 + 0.83 + 0.67 + 0.14][0]],
                 [None, None,
                  f'Мастеру бригады КРС осуществлять входной контроль за плотностью ввозимой жидкости глушения и'
@@ -1067,25 +1167,24 @@ class Gno_window(QMainWindow):
                  f'Провести практическое обучение вахт по сигналу ВЫБРОС.', None, None,
                  None, None, None, None, None,
                  None, None],
-                [f'Поднять  пакер {well_data.paker_do["do"]} с глубины {well_data.depth_fond_paker_do["do"]}м',
-                 None,
-                 f'Поднять  пакер {well_data.paker_do["do"]} с глубины {well_data.depth_fond_paker_do["do"]}м {kvostovik}'
-                 f'на поверхность с замером, накручиванием колпачков с доливом скважины тех.жидкостью уд. весом {well_data.fluid_work}  '
+                [f'Поднять  пакер {well_data.paker_do["do"]} с глубины {well_data.depth_fond_paker_do["do"]}м', None,
+                 f'Поднять  пакер {well_data.paker_do["do"]} с глубины {well_data.depth_fond_paker_do["do"]}м '
+                 f'{kvostovik}'
+                 f'на поверхность с замером, накручиванием колпачков с доливом скважины тех.жидкостью уд.'
+                 f' весом {well_data.fluid_work}  '
                  f'в объеме 1,7м3 с контролем АСПО на стенках НКТ.', None, None,
                  None, None, None, None, None,
                  'Мастер КРС', round(liftingGNO(well_data.dict_nkt) * 1.2, 2)]
-                ]
+            ]
             # print(f'ключ НКТ {list(map(int, well_data.dict_nkt.keys())), well_data.dict_nkt}')
             lift_orz = [[]]
             if 89 in list(map(int, well_data.dict_nkt.keys())) and 48 in list(map(int, well_data.dict_nkt.keys())):
-                lift_orz = []
-                # try:
                 lift_key = 'ОРЗ'
                 lift_orz = [
                     [f'глушение скважины в НКТ48мм в объеме {round(1.3 * well_data.dict_nkt["48"] / 1000, 1)}м3, '
                      f'Произвести глушение скважины в '
-                     f'НКТ89мм тех.жидкостью на поглощение в объеме {round(1.3 * well_data.dict_nkt["89"] * 1.1 / 1000, 1)}м3',
-                     None,
+                     f'НКТ89мм тех.жидкостью на поглощение в объеме '
+                     f'{round(1.3 * well_data.dict_nkt["89"] * 1.1 / 1000, 1)}м3', None,
                      f'Произвести глушение скважины в НКТ48мм тех.жидкостью в объеме обеспечивающим заполнение трубного '
                      f'пространства в объеме {round(1.3 * well_data.dict_nkt["48"] / 1000, 1)}м3 жидкостью уд.веса '
                      f'{well_data.fluid_work}на давление поглощения до {well_data.max_admissible_pressure._value}атм. '
@@ -1135,9 +1234,9 @@ class Gno_window(QMainWindow):
                      None],
                     [None, None,
                      ''.join(["За 24 часа до готовности вызвать пусковую комиссию" if well_data.kat_pvo == 2
-                              else "На скважинах первой категории Подрядчик обязан пригласить представителя ПАСФ " \
+                              else "На скважинах первой категории Подрядчик обязан пригласить представителя ПАСФ "
                                    "для проверки качества м/ж и опрессовки ПВО, документации и выдачи разрешения "
-                                   "на производство " \
+                                   "на производство "
                                    "работ по ремонту скважин. При обнаружении нарушений, которые могут повлечь "
                                    "за собой опасность для жизни людей"
                                    " и/или возникновению ГНВП и ОФ, дальнейшие работы должны быть прекращены."
@@ -1153,9 +1252,11 @@ class Gno_window(QMainWindow):
                      ''.join([
                          'Мастер КРС, представ-ли ПАСФ и Заказчика, Пуск. ком'
                          if well_data.kat_pvo == 1 else 'Мастер КРС, представ-ли  Заказчика']),
-                     [4.21 if 'схеме №1' in str(pvo_gno(well_data.kat_pvo)[0]) else 0.23 + 0.3 + 0.83 + 0.67 + 0.14][0]],
+                     [4.21 if 'схеме №1' in str(pvo_gno(well_data.kat_pvo)[0]) else 0.23 + 0.3 + 0.83 + 0.67 + 0.14][
+                         0]],
                     [None, None,
-                     f'Опрессовку ПВО проводить после каждого монтажа. (ОПРЕССОВКУ ПВО ЗАФИКСИРОВАТЬ В ВАХТОВОМ ЖУРНАЛЕ).',
+                     f'Опрессовку ПВО проводить после каждого монтажа. (ОПРЕССОВКУ ПВО ЗАФИКСИРОВАТЬ В ВАХТОВОМ'
+                     f' ЖУРНАЛЕ).',
                      None, None,
                      None, None, None, None, None,
                      None, None],
@@ -1170,14 +1271,15 @@ class Gno_window(QMainWindow):
                      None, None, None, None, None,
                      None, None],
                     [f'Поднять компоновку ОРЗ с глубины {well_data.dict_nkt["89"]}м', None,
-                     f'Поднять компоновку ОРЗ на НКТ89мм с глубины {well_data.dict_nkt["89"]}м на поверхность с замером, '
+                     f'Поднять компоновку ОРЗ на НКТ89мм с глубины {well_data.dict_nkt["89"]}м на поверхность '
+                     f'с замером, '
                      f'накручиванием колпачков с доливом скважины тех.жидкостью уд. весом {well_data.fluid_work}  '
                      f'в объеме {round(well_data.dict_nkt["89"] * 1.35 / 1000, 1)}м3 с контролем АСПО на стенках НКТ.',
                      None, None,
                      None, None, None, None, None,
                      'Мастер КРС', round(liftingNKT_norm(well_data.depth_fond_paker_do['do'], 1.3), 2)],
                 ]
-    
+
             lift_dict = {'пакер': lift_paker, 'ОРЗ': lift_orz, 'ОРД': lift_ord, 'воронка': lift_voronka,
                          'НН с пакером': lift_pump_nn_with_paker, 'НВ с пакером': lift_pump_nv_with_paker,
                          'ЭЦН с пакером': lift_ecn_with_paker, 'ЭЦН': lift_ecn, 'НВ': lift_pump_nv, 'НН': lift_pump_nn}
@@ -1194,8 +1296,6 @@ class Gno_window(QMainWindow):
                  None, None, None, None, None, None, None,
                  None, None]]
             return krs_begin[:2]
-
-    
 
     def calc_work_fluid(self, fluid_work_insert):
         well_data.fluid = fluid_work_insert
@@ -1215,7 +1315,7 @@ class Gno_window(QMainWindow):
                               if well_data.dict_category[plast]['по сероводороду'].category in [1, 2]][0]
                     expenditure_h2s_list.append(poglot)
 
-                except:
+                except ValueError:
                     pass
 
             expenditure_h2s = round(max(expenditure_h2s_list), 3)
@@ -1228,6 +1328,3 @@ class Gno_window(QMainWindow):
             fluid_work_short = f'{fluid_work_insert}г/см3'
 
         return fluid_work, fluid_work_short
-
-
-

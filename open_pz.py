@@ -1,34 +1,28 @@
-import block_name
-import main
-import plan
-
-
-from datetime import datetime
-
-from PyQt5.QtWidgets import QInputDialog, QMessageBox, QDialog, QMainWindow
-from openpyxl_image_loader import SheetImageLoader
-from openpyxl.drawing.image import Image
-from openpyxl.utils.cell import get_column_letter
-from openpyxl.styles import Border, Side, PatternFill, Font, GradientFill, Alignment
-
 import well_data
+from datetime import datetime
+from PyQt5.QtWidgets import QInputDialog, QMessageBox, QMainWindow
+from openpyxl_image_loader import SheetImageLoader
+from openpyxl.utils.cell import get_column_letter
+from openpyxl.styles import Font, Alignment
+from main import ExcelWorker
 
 from cdng import events_gnvp, itog_1, events_gnvp_gnkt
 from find import ProtectedIsDigit, ProtectedIsNonNone
+from plan import delete_rows_pz
+from block_name import region, razdel_1, curator_sel, pop_down
 
 
 class CreatePZ(QMainWindow):
 
     def __init__(self, wb, ws, data_window, perforation_correct_window2, parent=None):
-        super(CreatePZ, self).__init__()
-        # self.lift_ecn_can_addition = lift_ecn_can_addition
+        super(CreatePZ, self).__init__(parent)
+
         self.wb = wb
         self.ws = ws
         self.data_window = data_window
         self.perforation_correct_window2 = perforation_correct_window2
 
     def open_excel_file(self, ws, work_plan):
-
         from find import FindIndexPZ
         from category_correct import CategoryWindow
 
@@ -42,7 +36,7 @@ class CreatePZ(QMainWindow):
             ws.row_dimensions[row_ind].hidden = False
 
             if any(['ПЛАН РАБОТ' in str(col) for col in row]):
-                well_data.number_dp, ok = QInputDialog.getText(None, 'Номер дополнительного плана работ',
+                well_data.number_dp, ok = QInputDialog.getText(self, 'Номер дополнительного плана работ',
                                                                'Введите номер дополнительного плана работ')
                 ws.cell(row=row_ind + 1, column=2).value = f'ДОПОЛНИТЕЛЬНЫЙ ПЛАН РАБОТ № {well_data.number_dp}'
                 print(f'номер доп плана {well_data.number_dp}')
@@ -55,13 +49,13 @@ class CreatePZ(QMainWindow):
                     if 'гипс' in str(value).lower() or 'гидратн' in str(value).lower():
                         well_data.gipsInWell = True
 
-        well_data.region = block_name.region(well_data.cdng._value)
-        thread = main.ExcelWorker()
+        well_data.region = region(well_data.cdng._value)
+        thread = ExcelWorker()
 
         well_data.without_damping = thread.check_well_existence(
             well_data.well_number._value, well_data.well_area._value, well_data.region)
 
-        if well_data.emergency_well == True:
+        if well_data.emergency_well is True:
             emergency_quest = QMessageBox.question(self, 'Аварийные работы ',
                                                    'Программа определела что в скважине'
                                                    f'авария - {well_data.emergency_count}, верно ли?')
@@ -69,22 +63,22 @@ class CreatePZ(QMainWindow):
                 well_data.emergency_well = True
             else:
                 well_data.emergency_well = False
-        if well_data.problemWithEk == True:
+        if well_data.problemWithEk is True:
             problemWithEk_quest = QMessageBox.question(self, 'ВНИМАНИЕ НЕПРОХОД ',
-                                                         'Программа определела что в скважине '
-                                                         f'ссужение в ЭК -, верно ли?')
+                                                       f'Программа определела что в скважине '
+                                                       f'ссужение в ЭК -, верно ли?')
             if problemWithEk_quest == QMessageBox.StandardButton.Yes:
                 well_data.problemWithEk = True
-                well_data.problemWithEk_depth, ok = QInputDialog.getInt(None, 'Глубина сужения',
-                                                                          "ВВедите глубину сужения", 0, 0,
-                                                                          int(well_data.current_bottom))
-                well_data.problemWithEk_diametr = QInputDialog.getInt(None, 'диаметр внутренний сужения',
-                                        "ВВедите внутренний диаметр сужения", 0, 0,
-                                        int(well_data.current_bottom))[0]
+                well_data.problemWithEk_depth, ok = QInputDialog.getInt(self, 'Глубина сужения',
+                                                                        "ВВедите глубину cсужения", 0, 0,
+                                                                        int(well_data.current_bottom))
+                well_data.problemWithEk_diametr = QInputDialog.getInt(self, 'диаметр внутренний cсужения',
+                                                                      "ВВедите внутренний диаметр cсужения", 0, 0,
+                                                                      int(well_data.current_bottom))[0]
             else:
                 well_data.problemWithEk = ProtectedIsNonNone(False)
 
-        if well_data.gipsInWell == True:
+        if well_data.gipsInWell is True:
             gips_true_quest = QMessageBox.question(self, 'Гипсовые отложения',
                                                    'Программа определела что скважина осложнена гипсовыми отложениями '
                                                    'и требуется предварительно определить забой на НКТ, верно ли это?')
@@ -123,12 +117,12 @@ class CreatePZ(QMainWindow):
 
         if well_data.work_plan != 'gnkt_frez':
             # print(f'план работ {well_data.work_plan}')
-            plan.delete_rows_pz(self, ws)
-            razdel_1 = block_name.razdel_1(self, well_data.region)
+            delete_rows_pz(self, ws)
+            razdel = razdel_1(self, well_data.region)
 
             for i in range(1, len(razdel_1)):  # Добавлением подписантов на вверху
                 for j in range(1, 13):
-                    ws.cell(row=i, column=j).value = razdel_1[i - 1][j - 1]
+                    ws.cell(row=i, column=j).value = razdel[i - 1][j - 1]
                     ws.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=False)
                 ws.merge_cells(start_row=i, start_column=2, end_row=i, end_column=7)
                 ws.merge_cells(start_row=i, start_column=8, end_row=i, end_column=13)
@@ -162,18 +156,15 @@ class CreatePZ(QMainWindow):
                                                vertical='top')
                     data.font = Font(name='Arial', size=12)
 
-                # print(f'ГНВП -{data.value , len(data.value), len(dict_events_gnvp[work_plan])}')
                 if not data.value is None:
                     text = data.value
                     for key, value in text_width_dict.items():
                         if value[0] <= len(text) <= value[1]:
                             ws.row_dimensions[i].height = int(key)
 
-            ins_gnvp = well_data.ins_ind
             well_data.ins_ind += len(dict_events_gnvp[work_plan]) - 1
 
             ws.row_dimensions[2].height = 30
-            # ws.row_dimensions[6].height = 30
 
             if len(well_data.row_expected) != 0:
                 for i in range(1, len(well_data.row_expected) + 1):  # Добавление  показатели после ремонта
@@ -196,12 +187,10 @@ class CreatePZ(QMainWindow):
                 well_data.ins_ind += len(well_data.row_expected)
 
             self.ins_ind_border = well_data.ins_ind
-            # wb.save(f"{well_data.well_number}  1 {well_data.well_area} {well_data.cat_P_1}.xlsx")
 
-            # wb.save(f'{well_data.well_number} {well_data.well_area} {work_plan}.xlsx')
             return ws
 
-    def addItog(self, ws, ins_ind, work_plan):
+    def add_itog(self, ws, ins_ind, work_plan):
 
         ws.delete_rows(ins_ind, self.table_widget.rowCount() - ins_ind + 1)
         if work_plan != 'gnkt_frez':
@@ -231,9 +220,9 @@ class CreatePZ(QMainWindow):
 
             ins_ind += len(itog_1(self)) + 2
 
-        curator_sel = block_name.curator_sel(self, well_data.curator, well_data.region)
+        curator_s = curator_sel(self, well_data.curator, well_data.region)
         print(f'куратор {curator_sel, well_data.curator}')
-        podp_down = block_name.pop_down(self, well_data.region, curator_sel)
+        podp_down = pop_down(self, well_data.region, curator_s)
 
         for i in range(1 + ins_ind, 1 + ins_ind + len(podp_down)):  # Добавлением подписантов внизу
             for j in range(1, 13):
@@ -256,7 +245,5 @@ class CreatePZ(QMainWindow):
             return True
         except ValueError:
             return False
-
-    
 
 #

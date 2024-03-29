@@ -44,7 +44,7 @@ def skm_interval(self, template):
         str_raid.extend(remove_overlapping_intervals(perforating_intervals))
 
     if well_data.dict_perforation_project is None and any(
-            [plast in well_data.plast_all for plast in list(well_data.dict_perforation_project.keys())]) == False:
+            [plast in well_data.plast_all for plast in list(well_data.dict_perforation_project.keys())]) is False:
         if well_data.dict_perforation_project[plast]['интервал'][1] < well_data.current_bottom:
             str_raid.append([well_data.dict_perforation_project[plast]['интервал'][1] + 10,
                              well_data.dict_perforation_project[plast]['интервал'][1] + 50])
@@ -283,7 +283,7 @@ def raid(a):
         return f'{int(float(a[0][0]))} - {int(float(a[0][1]))}'
     if len(a) == 0:
         return 'разбуренного цем моста'
-    elif len(a) > 1 and well_data.column_additional == True:
+    elif len(a) > 1 and well_data.column_additional is True:
         d = ''
         for i in list(a):
             if well_data.head_column_additional._value <= i[0]:

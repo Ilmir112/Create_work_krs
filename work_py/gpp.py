@@ -51,7 +51,7 @@ class TabPage_SO_grp(QWidget):
 
     def update_paker(self):
        
-        if well_data.open_trunk_well == True:
+        if well_data.open_trunk_well is True:
             paker_depth = self.paker_depth_edit.text()
             if paker_depth != '':
                 self.diametr_paker_edit.setText(f'{TabPage_SO.paker_diametr_select(self, int(paker_depth))}')
@@ -77,12 +77,12 @@ class Gpp_window(QMainWindow):
         self.tabWidget = TabWidget()
 
         self.buttonAdd = QPushButton('Добавить данные в план работ')
-        self.buttonAdd.clicked.connect(self.addWork)
+        self.buttonAdd.clicked.connect(self.add_work)
         vbox = QGridLayout(self.centralWidget)
         vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
 
-    def addWork(self):
+    def add_work(self):
        
 
 

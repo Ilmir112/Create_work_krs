@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QInputDialog, QMainWindow, QTabWidget, QWidget, QTab
 # from PyQt5.uic.properties import QtWidgets
 from openpyxl.styles import Alignment
 from openpyxl.utils import get_column_letter
-from PyQt5 import QtCore, QtWidgets
+
 
 import well_data
 from perforation_correct import PerforationCorrect
@@ -13,24 +13,10 @@ import block_name
 import main
 import plan
 from block_name import razdel_1
-from openpyxl.styles import Border, Side, PatternFill, Font, GradientFill, Alignment
+from openpyxl.styles import Border, Side, PatternFill, Font, Alignment
 from openpyxl.reader.excel import load_workbook
 from openpyxl.workbook import Workbook
 from open_pz import CreatePZ
-
-from gnkt_data.gnkt_data import dict_saddles
-from .data_informations import dict_data_cdng, calc_pntzh
-
-
-# class TabPage_SO(QWidget):
-#     def __init__(self, parent=None):
-#         super().__init__(parent)
-# class TabWidget(QTabWidget):
-#     def __init__(self):
-#         super().__init__()
-#         self.addTab(TabPage_SO(self), 'Титульный лист')
-#         self.addTab(TabPage_SO(self), 'Схема')
-#         self.addTab(TabPage_SO(self), 'Ход работ')
 
 
 class Work_with_gnkt(QMainWindow):
@@ -67,7 +53,7 @@ class Work_with_gnkt(QMainWindow):
         work_well = self.work_gnkt_frez(self.ports_data, self.plast_work)
         main.MyWindow.populate_row(self, 0, work_well, table_widget)
 
-        CreatePZ.addItog(self, self.ws_work, self.table_widget.rowCount() + 1, self.work_plan)
+        CreatePZ.add_itog(self, self.ws_work, self.table_widget.rowCount() + 1, self.work_plan)
         # Work_with_gnkt.wb_gnkt_frez.save(f"{well_data.well_number} {well_data.well_area} {well_data.cat_P_1}
         # категории.xlsx")
         # print('файл сохранен')
@@ -246,7 +232,7 @@ class Work_with_gnkt(QMainWindow):
         # print(wb2.path)
         # print(f' кате {well_data.cat_P_1}')
 
-        if well_data.bvo == True:
+        if well_data.bvo is True:
             ws5 = Work_with_gnkt.wb_gnkt_frez.create_sheet('Sheet1')
             ws5.title = "Схемы ПВО"
             ws5 = Work_with_gnkt.wb_gnkt_frez["Схемы ПВО"]
@@ -710,7 +696,7 @@ class Work_with_gnkt(QMainWindow):
     def volume_dumping(self, ntk_true, first_muft):
         from work_py.alone_oreration import volume_pod_NKT, volume_jamming_well
 
-        if ntk_true == True:
+        if ntk_true is True:
             volume = volume_pod_NKT(self) * 1.2
         else:
             volume = volume_jamming_well(self, first_muft) * 1.1

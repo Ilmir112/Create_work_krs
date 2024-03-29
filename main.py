@@ -643,7 +643,7 @@ class MyWindow(QMainWindow):
 
                 if i >= ins_ind + 1:
                     work_list[i][1] = i - ins_ind
-                    if is_number(work_list[i][11]) == True:
+                    if is_number(work_list[i][11]) is True:
                         well_data.normOfTime += float(str(work_list[i][11]).replace(',', '.'))
                     if work_list[i][0]:
                         plan_short += f'п.{work_list[i][1]} {work_list[i][0]} \n'
@@ -653,7 +653,7 @@ class MyWindow(QMainWindow):
             well_data.itog_ind_min = self.ins_ind_border
             well_data.itog_ind_max = len(work_list)
             # print(f' длина {len(work_list)}')
-            CreatePZ.addItog(self, ws2, self.table_widget.rowCount() + 1, self.work_plan)
+            CreatePZ.add_itog(self, ws2, self.table_widget.rowCount() + 1, self.work_plan)
             # print(f'45- {ws2.max_row}')
             for row_ind, row in enumerate(ws2.iter_rows(values_only=True)):
 
@@ -820,7 +820,7 @@ class MyWindow(QMainWindow):
             well_data.cat_P_1 = []
             well_data.countAcid = 0
             well_data.swabTypeComboIndex = 1
-            well_data.swabTrueEditType = 1
+            well_data.swab_true_edit_type = 1
             well_data.data_x_max = 0
             well_data.drilling_interval = []
             well_data.max_angle = 0
@@ -1082,11 +1082,9 @@ class MyWindow(QMainWindow):
         well_data.ins_ind = r + 1
         # print(f' выбранная строка {self.ins_ind}')
 
-
-
     @staticmethod
     def pause_app():
-        while well_data.pause == True:
+        while well_data.pause is True:
             QtCore.QCoreApplication.instance().processEvents()
 
     def frezering_port_action(self):
@@ -1243,8 +1241,6 @@ class MyWindow(QMainWindow):
     def rirAction(self):
         from work_py.rir import RirWindow
 
-        print(f' окно СКО ')
-        # well_data.pause = False
         if self.rir_window is None:
             well_data.countAcid = 0
             self.rir_window = RirWindow(well_data.ins_ind, self.table_widget)
@@ -1628,7 +1624,7 @@ class MyWindow(QMainWindow):
 
     def copy_pz(self, sheet, table_widget, work_plan='krs', count_col=12, list_page=1):
 
-        from krs import Gno_window
+        from krs import GnoWindow
         rows = sheet.max_row
         merged_cells = sheet.merged_cells
 
@@ -1675,7 +1671,7 @@ class MyWindow(QMainWindow):
 
         if work_plan == 'krs':
             if self.work_window is None:
-                self.work_window = Gno_window(table_widget.rowCount(), self.table_widget, self.work_plan)
+                self.work_window = GnoWindow(table_widget.rowCount(), self.table_widget, self.work_plan)
                 self.work_window.setGeometry(100, 400, 200, 500)
                 self.work_window.show()
                 self.pause_app()
@@ -1685,7 +1681,7 @@ class MyWindow(QMainWindow):
                 self.work_window.close()  # Close window.
                 self.work_window = None
 
-            # self.populate_row(table_widget.rowCount(), Gno_window.work_krs(self, self.work_plan), self.table_widget)
+            # self.populate_row(table_widget.rowCount(), GnoWindow.work_krs(self, self.work_plan), self.table_widget)
 
         if work_plan == 'gnkt_frez' and list_page == 2:
             colWidth = [2.28515625, 13.0, 4.5703125, 13.0, 13.0, 13.0, 5.7109375, 13.0, 13.0, 13.0, 4.7109375,

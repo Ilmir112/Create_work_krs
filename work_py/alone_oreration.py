@@ -2,22 +2,23 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox
 
 import H2S
 import well_data
-from .acids_work import pressure_mode
+from selectPlast import CheckBoxDialog
+
 from .rationingKRS import liftingNKT_norm, descentNKT_norm, well_volume_norm
 
 
 def kot_select(self):
 
 
-    if well_data.column_additional == False \
-            or (well_data.column_additional == True and well_data.current_bottom <= well_data.head_column_additional._value):
+    if well_data.column_additional is False \
+            or (well_data.column_additional is True and well_data.current_bottom <= well_data.head_column_additional._value):
         kot_select = f'КОТ-50 (клапан обратный тарельчатый) +НКТ{well_data.nkt_diam}мм 10м + репер '
 
-    elif well_data.column_additional == True and well_data.column_additional_diametr._value < 110 and\
+    elif well_data.column_additional is True and well_data.column_additional_diametr._value < 110 and\
             well_data.current_bottom >= well_data.head_column_additional._value:
         kot_select = f'КОТ-50 (клапан обратный тарельчатый) +НКТ{60}мм 10м + репер + ' \
                      f'НКТ60мм L- {round(well_data.current_bottom - well_data.head_column_additional._value, 0)}м'
-    elif well_data.column_additional == True and well_data.column_additional_diametr._value > 110 and\
+    elif well_data.column_additional is True and well_data.column_additional_diametr._value > 110 and\
             well_data.current_bottom >= well_data.head_column_additional._value:
         kot_select = f'КОТ-50 (клапан обратный тарельчатый) +НКТ{73}мм со снятыми фасками 10м + репер + ' \
                      f'НКТ{well_data.nkt_diam}мм со снятыми фасками' \
@@ -188,9 +189,6 @@ def definition_Q(self):
     return definition_Q_list
 
 def definition_Q_nek(self):
-
-    from .acids_work import open_checkbox_dialog
-
     open_checkbox_dialog()
     plast = well_data.plast_select
     definition_Q_list = [[f'Насыщение 5м3 Q-{plast} при {well_data.max_admissible_pressure._value}', None,
@@ -333,7 +331,7 @@ def lifting_unit(self):
 
 
 def volume_vn_ek(self, current):
-    if well_data.column_additional == False or well_data.column_additional == True and current < well_data.head_column_additional._value:
+    if well_data.column_additional is False or well_data.column_additional is True and current < well_data.head_column_additional._value:
         volume = round(
             (well_data.column_diametr._value - 2 * well_data.column_wall_thickness._value) ** 2 * 3.14 / 4 / 1000, 2)
     else:
@@ -427,7 +425,7 @@ def volume_nkt_metal(dict_nkt):  # Внутренний объем НКТ жел
 
 def well_volume(self, current_bottom):
     # print(well_data.column_additional)
-    if well_data.column_additional == False:
+    if well_data.column_additional is False:
         # print(well_data.column_diametr, well_data.column_wall_thickness, current_bottom)
         volume_well = 3.14 * (
                 well_data.column_diametr._value - well_data.column_wall_thickness._value * 2) ** 2 / 4 / 1000000 * (
@@ -448,7 +446,7 @@ def well_volume(self, current_bottom):
 def volume_pod_NKT(self):  # Расчет необходимого объема внутри НКТ и между башмаком НКТ и забоем
 
     nkt_l = round(sum(list(well_data.dict_nkt.values())), 1)
-    if well_data.column_additional == False:
+    if well_data.column_additional is False:
         v_pod_gno = 3.14 * (int(well_data.column_diametr._value) - int(
             well_data.column_wall_thickness._value) * 2) ** 2 / 4 / 1000 * (
                             float(well_data.current_bottom) - int(nkt_l)) / 1000
@@ -553,7 +551,7 @@ def well_jamming(self, without_damping, lift_key, volume_well_jaming):
     # print(well_data.well_volume_in_PZ)
 
 
-    if without_damping == True:
+    if without_damping is True:
         well_jamming_str = f'Скважина состоит в перечне скважин ООО Башнефть-Добыча, на которых допускается проведение ТКРС без предварительного глушения на текущий квартал'
         well_jamming_short = f'Скважина без предварительного глушения'
         well_jamming_list2 = f'В случае наличия избыточного давления необходимость повторного глушения скважины дополнительно согласовать со специалистами ПТО  и ЦДНГ.'
@@ -570,7 +568,7 @@ def well_jamming(self, without_damping, lift_key, volume_well_jaming):
         well_jamming_short = f'Глушение в НКТ уд.весом {well_data.fluid_work_short} ' \
                              f'объеме {round(well_volume(self, sum(list(well_data.dict_nkt.values()))) - volume_pod_NKT(self), 1)}м3 ' \
                              f'на циркуляцию. {well_after} '
-    elif without_damping == False and lift_key in ['ОРД']:
+    elif without_damping is False and lift_key in ['ОРД']:
         well_jamming_str = f'Произвести закачку в затрубное пространство тех жидкости уд.весом {well_data.fluid_work_short}в ' \
                            f'объеме {round(well_volume(self, well_data.current_bottom) - well_volume(self, well_data.depth_fond_paker_do["do"]), 1)}м3 ' \
                            f'на поглощение при давлении не более {well_data.max_admissible_pressure._value}атм. Закрыть ' \
@@ -613,4 +611,24 @@ def is_number(num):
         return False
 
 
+
+def open_checkbox_dialog():
+    dialog = CheckBoxDialog()
+    dialog.exec_()
+
+
+
+
+# Определение трех режимов давлений при определении приемистости
+def pressure_mode(mode, plast):
+
+
+    mode = float(mode) / 10 * 10
+    if mode > well_data.max_admissible_pressure._value and (plast != 'D2ps' or plast.lower() != 'дпаш'):
+        mode_str = f'{float(mode)}, {float(mode)-10}, {float(mode)-20}'
+    elif (plast == 'D2ps' or plast.lower() == 'дпаш') and well_data.region == 'ИГМ':
+        mode_str = f'{120}, {140}, {160}'
+    else:
+        mode_str = f'{float(mode)-10}, {float(mode)}, {float(mode) + 10}'
+    return mode_str
 

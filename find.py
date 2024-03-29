@@ -7,20 +7,19 @@ from category_correct import CategoryWindow
 from data_correct import DataWindow
 from perforation_correct import PerforationCorrect
 
-from .leakage_column import LeakageWindow
+from work_py.leakage_column import LeakageWindow
 from well_data import ProtectedIsDigit, ProtectedIsNonNone
-from .advanted_file import definition_plast_work
-
+from work_py.advanted_file import definition_plast_work
 
 
 class FindIndexPZ(QMainWindow):
     def __init__(self, ws):
         super().__init__()
-        self.readPZ(ws)
+        self.read_pz(ws)
         self.data_window = None
         self.perforation_correct_window2 = None
 
-    def readPZ(self, ws):
+    def read_pz(self, ws):
 
         cat_well_min = []
         for row_ind, row in enumerate(ws.iter_rows(values_only=True)):
@@ -457,7 +456,7 @@ class WellCondition(FindIndexPZ):
                             # well_volume_in_PZ = self.definition_is_None(well_volume_in_PZ, row_index, col + 1, 1)
                             well_data.well_volume_in_PZ.append(round(float(well_volume_in_PZ), 1))
                         except:
-                            well_volume_in_PZ, _ = QInputDialog.getDouble(None, 'Объем глушения',
+                            well_volume_in_PZ, _ = QInputDialog.getDouble(self, 'Объем глушения',
                                                                           'ВВедите объем глушения согласно ПЗ', 50, 1,
                                                                           70)
                             well_data.well_volume_in_PZ.append(well_volume_in_PZ)
@@ -470,7 +469,7 @@ class WellCondition(FindIndexPZ):
             else:
                 well_data.grp_plan = False
 
-        if well_data.leakiness == True:
+        if well_data.leakiness is True:
             leakiness_quest = QMessageBox.question(self, 'нарушение колонны',
                                                    'Программа определела что в скважине'
                                                    f'есть нарушение - {well_data.leakiness_Count}, верно ли?')
@@ -483,7 +482,7 @@ class WellCondition(FindIndexPZ):
                     self.leakage_window.show()
 
                     MyWindow.pause_app()
-                    well_data.dict_leakiness = self.leakage_window.addWork()
+                    well_data.dict_leakiness = self.leakage_window.add_work()
                     # print(f'словарь нарушений {well_data.dict_leakiness}')
                     well_data.pause = True
                     self.leakage_window = None  # Discard reference.
@@ -969,7 +968,7 @@ class Well_perforation(FindIndexPZ):
                         plast, {}).setdefault('замер', set()).add(row[col_date_pressuar_index])
 
             elif any([str((i)).lower() == 'проект' for i in row]) is True and all(
-                    [str(i).strip() is None for i in row]) == False and is_number(row[col_roof_index]) is True \
+                    [str(i).strip() is None for i in row]) is False and is_number(row[col_roof_index]) is True \
                     and is_number(
                 float(
                     str(row[col_roof_index]).replace(',', '.'))) is True:  # Определение проектных интервалов перфорации
@@ -991,7 +990,6 @@ class Well_perforation(FindIndexPZ):
 
         if len(well_data.dict_perforation_project) != 0:
             well_data.plast_project = list(well_data.dict_perforation_project.keys())
-
 
         # объединение интервалов перфорации если они пересекаются
         for plast, value in well_data.dict_perforation.items():
@@ -1023,6 +1021,8 @@ class Well_perforation(FindIndexPZ):
             well_data.plast_project = list(well_data.dict_perforation_project.keys())
 
         print(well_data.dict_perforation)
+
+
 class Well_Category(FindIndexPZ):
 
     def __init__(self, ws):
@@ -1118,4 +1118,3 @@ class Well_Category(FindIndexPZ):
                                                'Введите значение серовородода в процентах', 0, 0, 100, 5)
 
             well_data.H2S_pr.append(H2S_pr)
-

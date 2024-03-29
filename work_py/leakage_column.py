@@ -59,8 +59,8 @@ class LeakageWindow(QMainWindow):
         self.buttonAdd.clicked.connect(self.addRowTable)
         self.buttonDel = QPushButton('Удалить записи из таблице')
         self.buttonDel.clicked.connect(self.del_row_table)
-        self.buttonAddWork = QPushButton('Добавить в план работ')
-        self.buttonAddWork.clicked.connect(self.addWork, Qt.QueuedConnection)
+        self.buttonadd_work = QPushButton('Добавить в план работ')
+        self.buttonadd_work.clicked.connect(self.add_work, Qt.QueuedConnection)
         self.buttonAddString = QPushButton('Добавить строкой')
         self.buttonAddString.clicked.connect(self.addString)
         vbox = QGridLayout(self.centralWidget)
@@ -68,7 +68,7 @@ class LeakageWindow(QMainWindow):
         vbox.addWidget(self.tableWidget, 1, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
         vbox.addWidget(self.buttonDel, 2, 1)
-        vbox.addWidget(self.buttonAddWork, 3, 0)
+        vbox.addWidget(self.buttonadd_work, 3, 0)
         vbox.addWidget(self.buttonAddString, 3, 1)
 
     def addRowTable(self):
@@ -130,7 +130,7 @@ class LeakageWindow(QMainWindow):
             self.tableWidget.setSortingEnabled(True)
 
 
-    def addWork(self):
+    def add_work(self):
        
         rows = self.tableWidget.rowCount()
         dict_leakiness = {}

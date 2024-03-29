@@ -158,7 +158,7 @@ class TabPage_SO(QWidget):
         return template_key
 
         # self.sole_rir_Edit.setText()
-        # listEnabel = [self.khovstLabel, self.khvostEdit, self.swabTruelabelType, self.swabTrueEditType,
+        # listEnabel = [self.khovst_label, self.khvostEdit, self.swab_true_label_type, self.swab_true_edit_type,
         #               self.plastCombo, self.pakerEdit, self.paker2Edit,
         #               self.svkTrueEdit, self.QplastEdit, self.skvProcEdit, self.acidEdit, self.acidVolumeEdit,
         #               self.acidProcEdit]
@@ -533,12 +533,12 @@ class Template_without_skm(QMainWindow):
         self.tabWidget = TabWidget()
 
         self.buttonAdd = QPushButton('Добавить данные в план работ')
-        self.buttonAdd.clicked.connect(self.addWork)
+        self.buttonAdd.clicked.connect(self.add_work)
         vbox = QGridLayout(self.centralWidget)
         vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
 
-    def addWork(self):
+    def add_work(self):
 
         distance_second = int(self.tabWidget.currentWidget().dictance_template_second_Edit.text())
         distance_first = int(self.tabWidget.currentWidget().dictance_template_first_Edit.text())
@@ -785,7 +785,7 @@ class Template_without_skm(QMainWindow):
                     self.raid_window.setGeometry(200, 400, 300, 400)
                     self.raid_window.show()
                     MyWindow.pause_app()
-                    drill_work_list = self.raid_window.addWork()
+                    drill_work_list = self.raid_window.add_work()
                     well_data.pause = True
 
                     self.raid_window = None
@@ -801,7 +801,7 @@ class Template_without_skm(QMainWindow):
                     self.raid_window.setGeometry(200, 400, 300, 400)
                     self.raid_window.show()
                     MyWindow.pause_app()
-                    drill_work_list = self.raid_window.addWork()
+                    drill_work_list = self.raid_window.add_work()
                     well_data.pause = True
 
                     self.raid_window = None

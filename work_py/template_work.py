@@ -784,8 +784,8 @@ class TemplateKrs(QMainWindow):
         self.buttonAdd.clicked.connect(self.addRowTable)
         self.buttonDel = QPushButton('Удалить записи из таблице')
         self.buttonDel.clicked.connect(self.del_row_table)
-        self.buttonAddWork = QPushButton('Добавить в план работ')
-        self.buttonAddWork.clicked.connect(self.addWork, Qt.QueuedConnection)
+        self.buttonadd_work = QPushButton('Добавить в план работ')
+        self.buttonadd_work.clicked.connect(self.add_work, Qt.QueuedConnection)
         self.buttonAddString = QPushButton('Добавить интервалы скреперования')
         self.buttonAddString.clicked.connect(self.addString)
 
@@ -796,7 +796,7 @@ class TemplateKrs(QMainWindow):
         vbox.addWidget(self.tableWidget, 1, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
         vbox.addWidget(self.buttonDel, 2, 1)
-        vbox.addWidget(self.buttonAddWork, 3, 0)
+        vbox.addWidget(self.buttonadd_work, 3, 0)
         vbox.addWidget(self.buttonAddString, 3, 1)
 
     def addRowTable(self):
@@ -837,7 +837,7 @@ class TemplateKrs(QMainWindow):
             self.tableWidget.setItem(rows, 0, QTableWidgetItem(str(int(roof))))
             self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(int(sole))))
             self.tableWidget.setSortingEnabled(False)
-    def addWork(self):
+    def add_work(self):
 
         template_str = str(self.tabWidget.currentWidget().template_str_Edit.text())
         template_key = str(self.tabWidget.currentWidget().template_Combo.currentText())
@@ -1122,7 +1122,7 @@ class TemplateKrs(QMainWindow):
 
                 gipsPero_list = [gipsPero_list[-1]]
                 from .drilling import Drill_window
-                drill_work_list = Drill_window.addWork()
+                drill_work_list = Drill_window.add_work()
 
                 for row in drill_work_list:
                     gipsPero_list.append(row)
@@ -1131,7 +1131,7 @@ class TemplateKrs(QMainWindow):
                     self.raid_window = Drill_window(self.table_widget, self.ins_ind)
                     self.raid_window.setGeometry(200, 400, 300, 400)
                     self.raid_window.show()
-                    drill_work_list = self.raid_window.addWork()
+                    drill_work_list = self.raid_window.add_work()
                     self.raid_window = None
                 else:
                     self.raid_window.close()  # Close window.

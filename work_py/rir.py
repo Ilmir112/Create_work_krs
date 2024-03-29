@@ -134,7 +134,7 @@ class TabPage_SO_rir(QWidget):
             self.pakerDepthZumpf_Label.setParent(None)
             self.pakerDepthZumpf_edit.setParent(None)
 
-        if well_data.open_trunk_well == True:
+        if well_data.open_trunk_well is True:
             paker_depth = self.paker_depth_edit.text()
             if paker_depth != '':
                 paker_khost = well_data.current_bottom - int(paker_depth)
@@ -237,7 +237,7 @@ class RirWindow(QMainWindow):
         self.tabWidget = TabWidget()
 
         self.buttonAdd = QPushButton('Добавить данные в план работ')
-        self.buttonAdd.clicked.connect(self.addWork)
+        self.buttonAdd.clicked.connect(self.add_work)
         vbox = QGridLayout(self.centralWidget)
         vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
@@ -286,9 +286,9 @@ class RirWindow(QMainWindow):
           None, None, None, None, None, None, None,
           'Мастер КРС, подрядчик РИР, УСРСиСТ', 8],
 
-         [f'{"".join([f"Опрессовать на Р={well_data.max_admissible_pressure._value}атм" if  rir_rpk_plast_true == False else ""])}',
+         [f'{"".join([f"Опрессовать на Р={well_data.max_admissible_pressure._value}атм" if  rir_rpk_plast_true is False else ""])}',
           None,
-          f'{"".join([f"Опрессовать эксплуатационную колонну на Р={well_data.max_admissible_pressure._value}атм в присутствии представителя заказчика" if  rir_rpk_plast_true == False else ""])} '
+          f'{"".join([f"Опрессовать эксплуатационную колонну на Р={well_data.max_admissible_pressure._value}атм в присутствии представителя заказчика" if  rir_rpk_plast_true is False else ""])} '
           f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ) ',
           None, None, None, None, None, None, None,
           'Мастер КРС, подрядчик РИР, УСРСиСТ', 0.67],
@@ -397,9 +397,9 @@ class RirWindow(QMainWindow):
           f'технологического "СТОП" ОЗЦ без давления.',
           None, None, None, None, None, None, None,
           'Мастер КРС, подрядчик РИР, УСРСиСТ', 16],
-         [f'{"".join([f"Опрессовать на Р={well_data.max_admissible_pressure._value}атм" if rir_rpk_plast_true == False else ""])}',
+         [f'{"".join([f"Опрессовать на Р={well_data.max_admissible_pressure._value}атм" if rir_rpk_plast_true is False else ""])}',
           None,
-          f'{"".join([f"Опрессовать цементный мост на Р={well_data.max_admissible_pressure._value}атм в присутствии представителя заказчика" if rir_rpk_plast_true == False else ""])} '
+          f'{"".join([f"Опрессовать цементный мост на Р={well_data.max_admissible_pressure._value}атм в присутствии представителя заказчика" if rir_rpk_plast_true is False else ""])} '
           f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ) ',
           None, None, None, None, None, None, None,
           'Мастер КРС, подрядчик РИР, УСРСиСТ',0.67],
@@ -427,7 +427,7 @@ class RirWindow(QMainWindow):
             for interval in list((well_data.dict_perforation[plast]['интервал'])):
                 if roofRir <= interval[0] <= solePir:
                     well_data.dict_perforation[plast]['отключение'] = True
-                if well_data.dict_perforation[plast]['отключение'] == False:
+                if well_data.dict_perforation[plast]['отключение'] is False:
                     if interval[0] < well_data.perforation_roof:
                         well_data.perforation_roof = interval[0]
                     elif interval[1] > well_data.perforation_sole:
@@ -436,7 +436,7 @@ class RirWindow(QMainWindow):
 
         well_data.plast_work = []
         for plast in well_data.plast_all:
-            if well_data.dict_perforation[plast]['отключение'] == False and \
+            if well_data.dict_perforation[plast]['отключение'] is False and \
                 well_data.dict_perforation[plast]['кровля'] < well_data.current_bottom:
                 well_data.plast_work.append(plast)
 
@@ -468,13 +468,13 @@ class RirWindow(QMainWindow):
         well_data.nktOpressTrue = False
 
 
-        if well_data.column_additional == False or well_data.column_additional == True and paker_depth< well_data.head_column_additional._value:
+        if well_data.column_additional is False or well_data.column_additional is True and paker_depth< well_data.head_column_additional._value:
             rpk_nkt_select = f' для ЭК {well_data.column_diametr._value}мм х {well_data.column_wall_thickness._value}мм ' \
                            f'+ {OpressovkaEK.nktOpress(self)[0]} + НКТ + репер'
-        elif well_data.column_additional == True and well_data.column_additional_diametr._value < 110 and paker_depth> well_data.head_column_additional._value:
+        elif well_data.column_additional is True and well_data.column_additional_diametr._value < 110 and paker_depth> well_data.head_column_additional._value:
             rpk_nkt_select = f' для ЭК {well_data.column_additional_diametr._value}мм х {well_data.column_additional_wall_thickness._value}мм  + {OpressovkaEK.nktOpress(self)[0]} ' \
                            f'+ НКТ60мм + репер + НКТ60мм L- {round(paker_depth-well_data.head_column_additional._value, 0)}м '
-        elif well_data.column_additional == True and well_data.column_additional_diametr._value > 110 and paker_depth> well_data.head_column_additional._value:
+        elif well_data.column_additional is True and well_data.column_additional_diametr._value > 110 and paker_depth> well_data.head_column_additional._value:
             rpk_nkt_select = f' для ЭК {well_data.column_additional_diametr._value}мм х {well_data.column_additional_wall_thickness._value}мм  + {OpressovkaEK.nktOpress(self)[0]}' \
                            f'+ НКТ + репер + НКТ{well_data.nkt_diam}мм со снятыми фасками L- {round(paker_depth-well_data.head_column_additional._value, 0)}м '
 
@@ -491,7 +491,7 @@ class RirWindow(QMainWindow):
         nkt_diam = ''.join(['73' if well_data.column_diametr._value > 110 else '60'])
 
         
-        if well_data.column_additional == True and well_data.column_additional_diametr._value <110:
+        if well_data.column_additional is True and well_data.column_additional_diametr._value <110:
             dict_nkt = {73: well_data.head_column_additional._value,
                         60: well_data.head_column_additional._value-sole_rir_edit}
         else:
@@ -635,7 +635,7 @@ class RirWindow(QMainWindow):
         ]
 
 
-        if len(well_data.plast_work) == 0 or (roof_rir_edit < well_data.perforation_roof < sole_rir_edit) == False:
+        if len(well_data.plast_work) == 0 or (roof_rir_edit < well_data.perforation_roof < sole_rir_edit) is False:
             rir_list = []
             for row in uzmPero_list:
                 rir_list.append(row)
@@ -752,7 +752,7 @@ class RirWindow(QMainWindow):
                 and sole_rir_edit > well_data.head_column_additional._value:
             pero_select = f'перо + опрессовочное седло + НКТ60мм 20м + репер + НКТ60мм L- ' \
                           f'{round(sole_rir_edit - well_data.head_column_additional._value, 1)}м'
-        elif well_data.column_additional == True and well_data.column_additional_diametr._value > 110 \
+        elif well_data.column_additional is True and well_data.column_additional_diametr._value > 110 \
                 and sole_rir_edit > well_data.head_column_additional._value:
             pero_select = f'воронку + опрессовочное седло + НКТ{well_data.nkt_diam}мм со снятыми фасками 20м + ' \
                           f'НКТ{well_data.nkt_diam}мм со снятыми фасками' \
@@ -840,7 +840,7 @@ class RirWindow(QMainWindow):
         well_data.forPaker_list = None
         return rir_list
 
-    def addWork(self):
+    def add_work(self):
 
         plast_combo = str(self.tabWidget.currentWidget().plast_combo.combo_box.currentText())
         paker_need_Combo = str(self.tabWidget.currentWidget().paker_need_Combo.currentText())

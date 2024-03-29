@@ -46,6 +46,7 @@ class ProtectedIsNonNone:
             print(f'Ошибка: {value} - не корректное строковое значение')
             raise ValueError("Значение должно быть строкой")
 
+
 well_area = ProtectedIsNonNone('не корректно')
 well_number = ProtectedIsNonNone('не корректно')
 inv_number = ProtectedIsNonNone('не корректно')
@@ -187,7 +188,7 @@ dict_contractor = {'ООО "Ойл-Сервис':
 }
 countAcid = 0
 swabTypeComboIndex = 1
-swabTrueEditType = 1
+swab_true_edit_type = 1
 
 drilling_interval = []
 max_angle = 0
@@ -215,6 +216,7 @@ leakage_window = None
 cat_P_P = []
 well_oilfield = 0
 template_depth_addition = 0
+nkt_template = 59
 
 well_volume_in_PZ = []
 image_list = []
@@ -224,6 +226,7 @@ thin_border = Border(left=Side(style='thin'),
                      top=Side(style='thin'),
                      bottom=Side(style='thin'))
 
+
 def if_None(value):
     if isinstance(value, datetime):
         return value
@@ -232,8 +235,3 @@ def if_None(value):
         return 'отсут'
     else:
         return value
-
-
-
-
-

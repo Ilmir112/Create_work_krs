@@ -73,7 +73,7 @@ class TabPage_SO_grp(QWidget):
 
     def update_paker(self):
 
-        if well_data.open_trunk_well == True:
+        if well_data.open_trunk_well is True:
             paker_depth = self.paker_depth_edit.text()
             if paker_depth != '':
                 paker_khost = 1.5
@@ -103,12 +103,12 @@ class Grp_window(QMainWindow):
         self.tabWidget = TabWidget()
 
         self.buttonAdd = QPushButton('Добавить данные в план работ')
-        self.buttonAdd.clicked.connect(self.addWork)
+        self.buttonAdd.clicked.connect(self.add_work)
         vbox = QGridLayout(self.centralWidget)
         vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
 
-    def addWork(self):
+    def add_work(self):
 
 
         diametr_paker = int(float(self.tabWidget.currentWidget().diametr_paker_edit.text()))
@@ -273,7 +273,7 @@ class Grp_window(QMainWindow):
             [f'СПО: {self.paker_select(paker_depth, paker_khost)[1]} на НКТ{nkt_diam}м на Н {paker_depth}м', None,
              f'Спустить компоновку с замером и шаблонированием НКТ: {self.paker_select(paker_depth, paker_khost)[0]} на '
              f'НКТ{nkt_diam}м на глубину {paker_depth}м, с замером, шаблонированием НКТ. '
-             f'{"".join(["(Произвести пробную посадку на глубине 50м)" if well_data.column_additional == False else " "])}',
+             f'{"".join(["(Произвести пробную посадку на глубине 50м)" if well_data.column_additional is False else " "])}',
              None, None, None, None, None, None, None,
              'мастер КРС', descentNKT_norm(paker_depth,1.2)],
             [None, None, f'При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ) '

@@ -79,7 +79,7 @@ class TabPage_SO(QWidget):
         self.column_add_trueLabel = QLabel("наличие Доп. колонны", self)
         self.column_add_true_comboBox = QComboBox(self)
         self.column_add_true_comboBox.addItems(['в наличии', 'отсутствует'])
-        if well_data.column_additional == True:
+        if well_data.column_additional is True:
             column_add = 0
         else:
             column_add = 1
@@ -892,7 +892,7 @@ class DataWindow(QMainWindow):
                 close_file = False
         if close_file is False:
             return
-        elif close_file == True:
+        elif close_file is True:
             well_data.column_diametr = ProtectedIsDigit(self.if_None(columnType))
             well_data.column_wall_thickness = ProtectedIsDigit(self.if_None(column_wall_thickness))
             well_data.shoe_column = ProtectedIsDigit(self.if_None(shoe_column))

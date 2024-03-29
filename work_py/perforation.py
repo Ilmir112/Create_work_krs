@@ -96,8 +96,8 @@ class PerforationWindow(QMainWindow):
         self.buttonAdd.clicked.connect(self.addRowTable)
         self.buttonDel = QPushButton('Удалить интервалы перфорации в таблице')
         self.buttonDel.clicked.connect(self.del_row_table)
-        self.buttonAddWork = QPushButton('Добавить в план работ')
-        self.buttonAddWork.clicked.connect(self.addWork, Qt.QueuedConnection)
+        self.buttonadd_work = QPushButton('Добавить в план работ')
+        self.buttonadd_work.clicked.connect(self.add_work, Qt.QueuedConnection)
         self.buttonAddProject = QPushButton('Добавить проектные интервалы перфорации')
         self.buttonAddProject.clicked.connect(self.addPerfProject)
 
@@ -106,7 +106,7 @@ class PerforationWindow(QMainWindow):
         vbox.addWidget(self.tableWidget, 1, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
         vbox.addWidget(self.buttonDel, 2, 1)
-        vbox.addWidget(self.buttonAddWork, 3, 0)
+        vbox.addWidget(self.buttonadd_work, 3, 0)
         vbox.addWidget(self.buttonAddProject, 3, 1)
 
 
@@ -271,7 +271,7 @@ class PerforationWindow(QMainWindow):
         self.tableWidget.setSortingEnabled(True)
         # print(editType, spinYearOfIssue, editSerialNumber, editSpecifications)
 
-    def addWork(self):
+    def add_work(self):
        
         rows = self.tableWidget.rowCount()
         if len(well_data.cat_P_1) > 1:

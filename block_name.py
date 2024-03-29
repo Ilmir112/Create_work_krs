@@ -231,7 +231,7 @@ def razdel_1(self, region):
         well_data.kat_pvo = 1
         well_data.bvo = True
 
-    if well_data.grp_plan == True:
+    if well_data.grp_plan is True:
         for row in range(len(podp_grp)):
             for col in range(len(podp_grp[row])):
                 razdel_1[row + 12][col] = podp_grp[row][col]

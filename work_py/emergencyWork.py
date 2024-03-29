@@ -6,14 +6,14 @@ from .rationingKRS import descentNKT_norm, liftingNKT_norm
 
 def magnet_select(self):
 
-    if well_data.column_additional == False or well_data.column_additional == True and\
+    if well_data.column_additional is False or well_data.column_additional is True and\
             well_data.current_bottom <= well_data.head_column_additional._value:
         magnet_select = f'НКТ{well_data.nkt_diam}мм 20м + репер'
 
-    elif well_data.column_additional == True and well_data.column_additional_diametr._value < 110 and \
+    elif well_data.column_additional is True and well_data.column_additional_diametr._value < 110 and \
             well_data.current_bottom >= well_data.head_column_additional._value:
         magnet_select = f'НКТ60мм 20м + репер + НКТ60мм L- {round(well_data.current_bottom - well_data.head_column_additional._value, 1)}м'
-    elif well_data.column_additional == True and well_data.column_additional_diametr._value > 110 and\
+    elif well_data.column_additional is True and well_data.column_additional_diametr._value > 110 and\
             well_data.current_bottom >= well_data.head_column_additional._value:
         magnet_select = f'НКТ{well_data.nkt_diam}мм со снятыми фасками 20м +' \
                         f' НКТ{well_data.nkt_diam}мм со снятыми фасками' \
@@ -23,11 +23,11 @@ def magnet_select(self):
 
 def sbt_select(self):
 
-    if well_data.column_additional == False or well_data.column_additional == True and \
+    if well_data.column_additional is False or well_data.column_additional is True and \
             well_data.current_bottom <= well_data.head_column_additional._value:
         sbt_select = ''
 
-    elif well_data.column_additional == True and well_data.column_additional_diametr._value < 127:
+    elif well_data.column_additional is True and well_data.column_additional_diametr._value < 127:
         sbt_select = f'СБТ 2 3/8 L- {round(well_data.current_bottom - well_data.head_column_additional._value,0)}м '
 
     return sbt_select

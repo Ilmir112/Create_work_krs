@@ -122,12 +122,12 @@ class SandWindow(QMainWindow):
         self.tabWidget = TabWidget()
 
         self.buttonAdd = QPushButton('Добавить данные в план работ')
-        self.buttonAdd.clicked.connect(self.addWork)
+        self.buttonAdd.clicked.connect(self.add_work)
         vbox = QGridLayout(self.centralWidget)
         vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
 
-    def addWork(self):
+    def add_work(self):
 
         privyazka_question_QCombo = str(self.tabWidget.currentWidget().privyazka_question_QCombo.currentText())
         roof_sand_edit = int(float(self.tabWidget.currentWidget().roof_sand_edit.text()))

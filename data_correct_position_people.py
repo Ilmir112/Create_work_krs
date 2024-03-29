@@ -212,7 +212,7 @@ class CorrectSignaturesWindow(QMainWindow):
             msg = QMessageBox.information(self, 'Внимание', 'Не все поля соответствуют значениям')
             return
 
-        elif all([string.count('.') == 2 for string in name_list]) == False:
+        elif all([string.count('.') == 2 for string in name_list]) is False:
             print([string.count('.') == 2 for string in name_list])
             msg = QMessageBox.information(self, 'Внимание', 'Не корректны сокращения в фамилиях')
             return

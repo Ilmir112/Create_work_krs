@@ -7,8 +7,6 @@ from .rationingKRS import well_volume_norm
 
 class TabPage_SO_swab(QWidget):
     def __init__(self, parent=None):
-        from .acid_paker import CheckableComboBox
-
         super().__init__()
 
         self.need_change_zgs_label = QLabel('Необходимо ли менять ЖГС', self)
@@ -86,12 +84,12 @@ class Change_fluid_Window(QMainWindow):
         self.dict_nkt = {}
 
         self.buttonAdd = QPushButton('Добавить данные в план работ')
-        self.buttonAdd.clicked.connect(self.addWork)
+        self.buttonAdd.clicked.connect(self.add_work)
         vbox = QGridLayout(self.centralWidget)
         vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
 
-    def addWork(self):
+    def add_work(self):
         from main import MyWindow
         plast_new = str(self.tabWidget.currentWidget().plast_new_combo.currentText())
         fluid_new = round(float(float(self.tabWidget.currentWidget().fluid_new_edit.text())), 2)

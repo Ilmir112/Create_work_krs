@@ -3,9 +3,9 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox, QMainWindow, QTabWidget, 
 from PyQt5 import QtWidgets
 
 import well_data
-from work_py.alone_oreration import calc_work_fluid
+from krs import GnoWindow
 from main import MyWindow
-from .acid_paker import CheckableComboBox, AcidPakerWindow
+from work_py.acid_paker import CheckableComboBox, AcidPakerWindow
 from gnkt_data import gnkt_data
 from collections import namedtuple
 
@@ -13,7 +13,6 @@ from collections import namedtuple
 class TabPage_gnkt(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
-
 
         self.gnkt_number_label = QLabel('Номер ГНКТ')
         self.gnkt_number_combo = QComboBox(self)
@@ -158,12 +157,12 @@ class GnktOpz(QMainWindow):
         self.dict_nkt = {}
 
         self.buttonAdd = QPushButton('Добавить данные в план работ')
-        self.buttonAdd.clicked.connect(self.addWork)
+        self.buttonAdd.clicked.connect(self.add_work)
         vbox = QGridLayout(self.centralWidget)
         vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
 
-    def addWork(self):
+    def add_work(self):
 
         roof_plast = float(self.tabWidget.currentWidget().roof_edit.text())
         sole_plast = float(self.tabWidget.currentWidget().sole_edit.text())
@@ -181,22 +180,19 @@ class GnktOpz(QMainWindow):
         skv_acid_edit = str(self.tabWidget.currentWidget().skv_acid_edit.currentText())
 
         work_list = self.gnkt_work(roof_plast, sole_plast, need_rast_combo, volume_rast_edit, acid_true_edit,
-                                   acid_edit, skv_volume_edit, skv_proc_edit, acid_volume_edit, acid_proc_edit, pressure_edit,
+                                   acid_edit, skv_volume_edit, skv_proc_edit, acid_volume_edit, acid_proc_edit,
+                                   pressure_edit,
                                    plast_combo, svk_true_edit, skv_acid_edit)
 
         MyWindow.populate_row(self.ins_ind, work_list, self.table_widget)
         well_data.pause = False
         self.close()
-        
 
     def gnkt_work(self, roof_plast, sole_plast, need_rast_combo, volume_rast_edit, acid_true_edit,
                   acid_edit, skv_volume_edit, skv_proc_edit, acid_volume_edit, acid_proc_edit, pressure_edit,
                   plast_combo, svk_true_edit, skv_acid_edit):
 
-
         gnkt_number_combo = str(self.tabWidget.currentWidget().gnkt_number_combo.currentText())
-
-
 
         if gnkt_number_combo == 'ГНКТ №2':
             gnkt_number = gnkt_data.gnkt_2
@@ -210,7 +206,7 @@ class GnktOpz(QMainWindow):
         else:
             acid_true_quest = False
 
-        fluid_work, well_data.fluid_work_short = calc_work_fluid(self, self.work_plan)
+        fluid_work, well_data.fluid_work_short = GnoWindow.calc_work_fluid(self, self.work_plan)
 
         if need_rast_combo == 'нужно':
             volume_rast_edit = volume_rast_edit
@@ -259,30 +255,29 @@ class GnktOpz(QMainWindow):
             # print(depth_fond_paker_do)
             if depth_fond_paker_do >= well_data.current_bottom:
                 depth_fond_paker_do, ok = QInputDialog.getDouble(self, 'глубина НКТ',
-                                                          'Введите Глубины башмака НКТ', 500,
-                                                          0, well_data.current_bottom)
+                                                                 'Введите Глубины башмака НКТ', 500,
+                                                                 0, well_data.current_bottom)
         else:
             depth_fond_paker_do = well_data.depth_fond_paker_do["do"]
-
 
         gnkt_opz = [
             [None, None, 'Порядок работы', None, None, None, None, None, None, None, None, None],
             [None, 'п/п', 'Наименование работ', None, None, None, None, None, None, None,
              'Ответственный', 'Нормы времени'],
             [None, None, 'ВНИМАНИЕ: Перед спуском и вовремя проведения СПО бурильщикам и мастеру производить осмотр '
-                   'ГНКТ на наличие '
-                   '"меток" на г/трубы, установленных запрещённым способом.\nПри обнаружении - доложить руководству'
-                   ' ООО "Ойл-Сервис" '
-                   'по согласованию произвести отрезание ГНКТ выше "метки" с составлением АКТа и указанием метража '
-                   'отрезанного участка ГНКТ. '
-                   'Установку меток на г/трубе производить ТОЛЬКО безопасным способом - (краской, лентой фум, '
-                   'шкемарём, и тд.) '
-                   'КАТЕГОРИЧЕСКИ ЗАПРЕЩАЕТСЯ устанавливать "метки" опасным способом - вальцевателем (труборезом) или '
-                   'другим инструментом - '
-                   'который причиняет механические повреждения на теле г/трубы и может привести к снижению прочностных '
-                   'характеристик ГНКТ. '
-                   'Запросить у Заказчика внутренние диаметры спущенной компоновки для исключения заклинивания низа'
-                   ' компоновки',
+                         'ГНКТ на наличие '
+                         '"меток" на г/трубы, установленных запрещённым способом.\nПри обнаружении - доложить руководству'
+                         ' ООО "Ойл-Сервис" '
+                         'по согласованию произвести отрезание ГНКТ выше "метки" с составлением АКТа и указанием метража '
+                         'отрезанного участка ГНКТ. '
+                         'Установку меток на г/трубе производить ТОЛЬКО безопасным способом - (краской, лентой фум, '
+                         'шкемарём, и тд.) '
+                         'КАТЕГОРИЧЕСКИ ЗАПРЕЩАЕТСЯ устанавливать "метки" опасным способом - вальцевателем (труборезом) или '
+                         'другим инструментом - '
+                         'который причиняет механические повреждения на теле г/трубы и может привести к снижению прочностных '
+                         'характеристик ГНКТ. '
+                         'Запросить у Заказчика внутренние диаметры спущенной компоновки для исключения заклинивания низа'
+                         ' компоновки',
              None, None, None, None, None, None, None,
              'Мастер КРС,бурильщик', None],
             [None, None, 'Провести приемку скважины в ремонт у Заказчика с составлением акта. Переезд бригады КРС '
@@ -307,16 +302,16 @@ class GnktOpz(QMainWindow):
 
             [None, 6,
              'Провести работы по монтажу колтюбинговой установки'
-              ' в соответствии с технологической инструкцией, федеральных норм и правила в области промышленной '
-              'безопасности «Правила безопасности в нефтяной и газовой промышленности»  РОСТЕХНАДЗОР '
-              'Приказ №1 от 15.12.2020г и РД 153-39-023-97.',
+             ' в соответствии с технологической инструкцией, федеральных норм и правила в области промышленной '
+             'безопасности «Правила безопасности в нефтяной и газовой промышленности»  РОСТЕХНАДЗОР '
+             'Приказ №1 от 15.12.2020г и РД 153-39-023-97.',
              None, None, None, None, None, None, None,
              'Мастер ГНКТ, состав бригады', None],
             [None, 7,
              'Все операции при производстве выполнять в соответствии с технологической инструкцией, '
-              'федеральных норм и правила в области промышленной безопасности "Правила безопасности в '
-              'нефтяной и газовой промышленности" '
-              'от 15.12.2020г и РД 153-39-023-97.',
+             'федеральных норм и правила в области промышленной безопасности "Правила безопасности в '
+             'нефтяной и газовой промышленности" '
+             'от 15.12.2020г и РД 153-39-023-97.',
              None, None, None, None, None, None, None,
              'Мастер ГНКТ, состав бригады', None],
             [None, 8,
@@ -333,26 +328,26 @@ class GnktOpz(QMainWindow):
              None, None, None, None, None, None, None,
              'Мастер ГНКТ, бур-к КРС, машинист подъёмника, пред. УСРСиСТ', 0.5],
             [None, 10, f'Перед началом опрессовки принять все требуемые меры безопасности. Подготовиться к опрессовке.'
-               f' Удостовериться в том, рабочая зона вокруг линий высокого давления обозначена знаками '
-               f'безопосности.'
-               f' Запустить систему регистрации СОРП. Оповестить всех людей на кустовой площадке о проведении '
-               f'опрессовки.'
-               f' Опрессовать все нагнетательные линии на {min(225, well_data.max_admissible_pressure._value * 1.5)}атм. '
-               f'Опрессовать  выкидную линию '
-               f'от устья скважины до желобной ёмкости на '
+                       f' Удостовериться в том, рабочая зона вокруг линий высокого давления обозначена знаками '
+                       f'безопосности.'
+                       f' Запустить систему регистрации СОРП. Оповестить всех людей на кустовой площадке о проведении '
+                       f'опрессовки.'
+                       f' Опрессовать все нагнетательные линии на {min(225, well_data.max_admissible_pressure._value * 1.5)}атм. '
+                       f'Опрессовать  выкидную линию '
+                       f'от устья скважины до желобной ёмкости на '
                        f'{min(225, round(well_data.max_admissible_pressure._value * 1.5, 1))}атм c выдержкой 30мин'
-               f'(надёжно закрепить, оборудовать дроссельными задвижками)',
+                       f'(надёжно закрепить, оборудовать дроссельными задвижками)',
              None, None, None, None, None, None, None,
              'Мастер ГНКТ, представ.БВО (вызов по телефонограмме при необходимости)', 'факт'],
             [None, 11, f'При закрытой центральной задвижке фондовой арматуры. Опрессовать превентор, глухие и трубные  '
-               f'плашки на '
-               f'устье скважины на Р={well_data.max_admissible_pressure._value}атм с выдержкой 30 мин (опрессовку ПВО '
-               f'зафиксировать'
-               f' в вахтовом журнале). Оформить соответствующий акт в присутствии представителя Башкирского '
-               f'военизированного '
-               f'отряда с выдачей разрешения на дальнейшее проведение работ (вызов представителя БВО по '
-               f'телефонограмме за 24 '
-               f'часа). Провести учебно-тренировочное занятие по сигналу "Выброс" с записью в журнале.',
+                       f'плашки на '
+                       f'устье скважины на Р={well_data.max_admissible_pressure._value}атм с выдержкой 30 мин (опрессовку ПВО '
+                       f'зафиксировать'
+                       f' в вахтовом журнале). Оформить соответствующий акт в присутствии представителя Башкирского '
+                       f'военизированного '
+                       f'отряда с выдачей разрешения на дальнейшее проведение работ (вызов представителя БВО по '
+                       f'телефонограмме за 24 '
+                       f'часа). Провести учебно-тренировочное занятие по сигналу "Выброс" с записью в журнале.',
              None, None, None, None, None, None, None,
              'Мастер ГНКТ, представ.БВО (вызов по телефонограмме при необходимости)', 0.47],
             [None, 12,
@@ -384,8 +379,9 @@ class GnktOpz(QMainWindow):
                  f'Р={well_data.max_admissible_pressure._value}атм. ',
              None, None, None, None, None, None, None,
              'Мастер ГНКТ, состав бригады, представитель Заказчика', 1.92],
-            [None, 15, f'Приподнять БДТ до {int(depth_fond_paker_do) - 20}м. Произвести круговую циркуляцию растворителя в '
-                       f'течении 2часов. Составить Акт',
+            [None, 15,
+             f'Приподнять БДТ до {int(depth_fond_paker_do) - 20}м. Произвести круговую циркуляцию растворителя в '
+             f'течении 2часов. Составить Акт',
              None, None, None, None, None, None, None,
              'Мастер ГНКТ, состав бригады', 2.06],
 
@@ -398,7 +394,7 @@ class GnktOpz(QMainWindow):
              'Мастер ГНКТ, состав бригады, представитель Заказчика', 0.93],
             [f'гидросвабирование в инт {roof_plast}-'
              f'{sole_plast}м при Рзак={well_data.max_admissible_pressure._value}атм',
-             23, f'Произвести гидросвабирование пласта в интервале { roof_plast}-'
+             23, f'Произвести гидросвабирование пласта в интервале {roof_plast}-'
                  f'{sole_plast}м (закрыть затруб, произвести задавку в пласт '
                  f'жидкости при не более Рзак={well_data.max_admissible_pressure._value}атм при установленном '
                  f'герметичном пакере. '

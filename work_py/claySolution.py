@@ -112,12 +112,12 @@ class ClayWindow(QMainWindow):
         self.tabWidget = TabWidget()
 
         self.buttonAdd = QPushButton('Добавить данные в план работ')
-        self.buttonAdd.clicked.connect(self.addWork)
+        self.buttonAdd.clicked.connect(self.add_work)
         vbox = QGridLayout(self.centralWidget)
         vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
 
-    def addWork(self):
+    def add_work(self):
 
         
         roof_clay_edit = int(float(self.tabWidget.currentWidget().roof_clay_edit.text()))
@@ -142,7 +142,7 @@ class ClayWindow(QMainWindow):
        
         nkt_diam = ''.join(['73' if well_data.column_diametr._value > 110 else '60'])
 
-        if well_data.column_additional == True and well_data.column_additional_diametr._value <110:
+        if well_data.column_additional is True and well_data.column_additional_diametr._value <110:
             dict_nkt = {73: well_data.head_column_additional._value,
                         60: well_data.head_column_additional._value-rirSole}
         else:

@@ -21,7 +21,7 @@ def acidGons(self):
     bottom_point = max(list(map(int, acid_points.replace('м', '').replace(',', '').split())))
     gons_list = [[f'Спуск гидроманиторную насадку до глубины нижней точки до {bottom_point}', None,
      f'Спустить  гидроманиторную насадку '
-     f'{"".join([f" + НКТ60мм {round(well_data.current_bottom -well_data.head_column_additional._value, 0)}" if well_data.column_additional == True else ""])} '
+     f'{"".join([f" + НКТ60мм {round(well_data.current_bottom -well_data.head_column_additional._value, 0)}" if well_data.column_additional is True else ""])} '
      f'на НКТ{well_data.nkt_diam}мм до глубины нижней точки до {bottom_point}'
      f' с замером, шаблонированием шаблоном {well_data.nkt_template}мм.',
      None, None, None, None, None, None, None,

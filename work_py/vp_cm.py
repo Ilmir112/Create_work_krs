@@ -159,7 +159,7 @@ def czh(self):
       # print(well_data.dict_leakiness)
         for nek in well_data.dict_leakiness['НЭК']['интервал']:
             print(nek)
-            if well_data.dict_leakiness['НЭК']['интервал'][nek]['отключение'] == False:
+            if well_data.dict_leakiness['НЭК']['интервал'][nek]['отключение'] is False:
                 interval_list.append(nek)
 
     if any([float(interval[0]) < float(vp_depth) for interval in interval_list]):

@@ -1,10 +1,9 @@
 from datetime import datetime
 
-from PyQt5.QtWidgets import QInputDialog, QMainWindow, QTabWidget, QWidget, QTableWidget, QApplication
-# from PyQt5.uic.properties import QtWidgets
-from openpyxl.styles import Alignment
+from PyQt5.QtWidgets import QInputDialog, QMainWindow, QApplication
+
 from openpyxl.utils import get_column_letter
-from PyQt5 import QtCore, QtWidgets
+
 
 import well_data
 from perforation_correct_gnkt_frez import PerforationCorrectGnktFrez
@@ -36,7 +35,7 @@ class Work_with_gnkt(QMainWindow):
     wb_gnkt_frez = Workbook()
 
     def __init__(self, ws, tabWidget, table_title, table_schema, table_widget):
-
+        from open_pz import CreatePZ
        
         super(QMainWindow, self).__init__()
         self.table_widget = table_widget
@@ -90,7 +89,7 @@ class Work_with_gnkt(QMainWindow):
         work_well = self.work_gnkt_frez(self.ports_data, self.plast_work)
         main.MyWindow.populate_row(self, 0, work_well, table_widget)
 
-        CreatePZ.addItog(self, self.ws_work, self.table_widget.rowCount() + 1, self.work_plan)
+        CreatePZ.add_itog(self, self.ws_work, self.table_widget.rowCount() + 1, self.work_plan)
         # Work_with_gnkt.wb_gnkt_frez.save(f"{well_data.well_number} {well_data.well_area} {well_data.cat_P_1}
         # категории.xlsx")
         # print('файл сохранен')
@@ -269,7 +268,7 @@ class Work_with_gnkt(QMainWindow):
         # print(wb2.path)
         # print(f' кате {well_data.cat_P_1}')
 
-        if well_data.bvo == True:
+        if well_data.bvo is True:
             ws5 = Work_with_gnkt.wb_gnkt_frez.create_sheet('Sheet1')
             ws5.title = "Схемы ПВО"
             ws5 = Work_with_gnkt.wb_gnkt_frez["Схемы ПВО"]
@@ -788,13 +787,7 @@ class Work_with_gnkt(QMainWindow):
         ws3.page_setup.paperSize = ws3.PAPERSIZE_A4
 
     def work_gnkt_frez(self, ports_data, plast_work):
-        print(f' portr {ports_data}')
-        print(f'топ {self.top_muft}')
-
-       
-        from work_py.alone_oreration import calc_work_fluid
-
-
+        from krs import GnoWindow
 
         if sum(list(well_data.dict_nkt.values())) != 0:
             ntk_true = True
@@ -806,7 +799,7 @@ class Work_with_gnkt(QMainWindow):
         print(f' ПНТЖ - {calc_pntzh(self.fluid, well_data.cdng)}')
 
         distance, _ = QInputDialog.getInt(None, 'Расстояние НПТЖ', 'Введите Расстояние до ПНТЖ')
-        fluid_work, well_data.fluid_work_short = calc_work_fluid(self, self.work_plan)
+        fluid_work, well_data.fluid_work_short = GnoWindow.calc_work_fluid(self, self.work_plan)
 
 
         block_gnvp_list = [
@@ -1467,7 +1460,7 @@ class Work_with_gnkt(QMainWindow):
     def volume_dumping(self, ntk_true, first_muft):
         from work_py.alone_oreration import volume_pod_NKT, volume_jamming_well
 
-        if ntk_true == True:
+        if ntk_true is True:
             volume = volume_pod_NKT(self) * 1.2
         else:
             volume = volume_jamming_well(self, first_muft) * 1.1

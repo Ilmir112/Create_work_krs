@@ -182,8 +182,8 @@ class Drill_window(QMainWindow):
         self.buttonAdd.clicked.connect(self.addRowTable)
         self.buttonDel = QPushButton('Удалить записи из таблице')
         self.buttonDel.clicked.connect(self.del_row_table)
-        self.buttonAddWork = QPushButton('Добавить в план работ')
-        self.buttonAddWork.clicked.connect(self.addWork, Qt.QueuedConnection)
+        self.buttonadd_work = QPushButton('Добавить в план работ')
+        self.buttonadd_work.clicked.connect(self.add_work, Qt.QueuedConnection)
         self.buttonAddString = QPushButton('Добавить интервалы бурения')
         self.buttonAddString.clicked.connect(self.addString)
         vbox = QGridLayout(self.centralWidget)
@@ -192,7 +192,7 @@ class Drill_window(QMainWindow):
         vbox.addWidget(self.tableWidget, 1, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
         vbox.addWidget(self.buttonDel, 2, 1)
-        vbox.addWidget(self.buttonAddWork, 3, 0)
+        vbox.addWidget(self.buttonadd_work, 3, 0)
         vbox.addWidget(self.buttonAddString, 3, 1)
 
     def addRowTable(self):
@@ -262,7 +262,7 @@ class Drill_window(QMainWindow):
 
                 roof = int(current_depth)
 
-    def addWork(self):
+    def add_work(self):
         from main import MyWindow
         self.nkt_str = self.tabWidget.currentWidget().nkt_str_combo.currentText()
         self.drillingBit_diam = self.tabWidget.currentWidget().drill_diametr_line.text()
@@ -310,7 +310,7 @@ class Drill_window(QMainWindow):
         current_depth = drill_tuple[-1][0]
         bottomType = drill_tuple[-1][1]
 
-        if well_data.column_additional == True:
+        if well_data.column_additional is True:
             nkt_pod = '60мм' if well_data.column_additional_diametr._value < 110 else '73мм со снятыми фасками'
 
         nkt_diam = well_data.nkt_diam
@@ -325,7 +325,7 @@ class Drill_window(QMainWindow):
                              f'забойный двигатель {downhole_motor}  + НКТ{nkt_diam} 20м + репер '
 
 
-        elif well_data.column_additional == True:
+        elif well_data.column_additional is True:
             drilling_str = f'{drill_type_combo}-{drillingBit_diam} для ЭК {well_data.column_additional_diametr._value}мм х ' \
                            f'{well_data.column_additional_wall_thickness._value}мм + забойный двигатель ' \
                            f'{downhole_motor} +НКТ{nkt_pod} 20м + репер + ' \
@@ -462,7 +462,7 @@ class Drill_window(QMainWindow):
                              f'{well_data.column_wall_thickness._value}мм '
             sbt_lenght = f'СБТ {nkt_diam} - {int(current_depth + 100)}м'
 
-        elif well_data.column_additional == True:
+        elif well_data.column_additional is True:
             drilling_str = f'{drill_type_combo}-{drillingBit_diam} для ЭК ' \
                            f'{well_data.column_additional_diametr._value}мм х ' \
                            f'{well_data.column_additional_wall_thickness._value}мм + СБТ{nkt_pod} ' \
@@ -547,11 +547,11 @@ class Drill_window(QMainWindow):
                     if depth > interval[0]:
                         check_True = False
 
-        if well_data.leakiness == True:
+        if well_data.leakiness is True:
 
             for nek in well_data.dict_leakiness['НЭК']['интервал']:
                 # print(well_data.dict_leakiness)
-                if well_data.dict_leakiness['НЭК']['интервал'][nek]['отключение'] == False:
+                if well_data.dict_leakiness['НЭК']['интервал'][nek]['отключение'] is False:
                     if depth > nek[0]:
                         check_True = False
         return check_True
@@ -591,7 +591,7 @@ class Drill_window(QMainWindow):
             drilling_short = f'торцевой фрезер -{drillingBit_diam} + СБТ + магнит колонный  2⅜ БТ (П) '
 
 
-        elif well_data.column_additional == True:
+        elif well_data.column_additional is True:
             drilling_str = f'торцевой фрезер -{drillingBit_diam} + СБТ + магнит колонный  2⅜ БТ (П) + ' \
                            f'СБТ{nkt_pod} ' \
                            f'{round(current_depth - well_data.head_column_additional._value, 1)}м'
