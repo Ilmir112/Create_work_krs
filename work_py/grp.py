@@ -9,9 +9,9 @@ import main
 import well_data
 from main import MyWindow
 from work_py.alone_oreration import kot_select
-from work_py.opressovka import OpressovkaEK
-from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm,well_volume_norm
-from work_py.opressovka import OpressovkaEK, TabPage_SO
+from .opressovka import OpressovkaEK
+from .rationingKRS import descentNKT_norm, liftingNKT_norm,well_volume_norm
+from .opressovka import OpressovkaEK, TabPage_SO
 
 
 class TabPage_SO_grp(QWidget):
@@ -131,7 +131,7 @@ class Grp_window(QMainWindow):
 
     def normalization(self, current_depth, diametr_paker):
 
-        from work_py.opressovka import TabPage_SO
+        from .opressovka import TabPage_SO
         nkt_diam = ''.join(['73' if well_data.column_diametr._value > 110 else '60'])
 
 
@@ -424,7 +424,7 @@ class Grp_window(QMainWindow):
 
     def paker_select(self, paker_depth, paker_khost):
 
-        from work_py.opressovka import TabPage_SO
+        from .opressovka import TabPage_SO
         if well_data.column_diametr._value > 120:
             nkt_diam = '89'
         elif 110 < well_data.column_diametr._value < 120:

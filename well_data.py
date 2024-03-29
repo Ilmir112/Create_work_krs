@@ -75,11 +75,13 @@ column_direction_lenght = ProtectedIsDigit('не корректно')
 column_direction_diametr = ProtectedIsNonNone('не корректно')
 column_direction_wall_thickness = ProtectedIsNonNone('не корректно')
 
-problemWithEk_diametr = ProtectedIsNonNone(220)
+problemWithEk_diametr = 220
 cdng = ProtectedIsNonNone('не корректно')
 data_fond_min = ProtectedIsDigit(0)
 cat_well_min = ProtectedIsDigit(0)
 cat_well_max = ProtectedIsDigit(0)
+data_well_max = ProtectedIsDigit(0)
+data_pvr_max = ProtectedIsDigit(0)
 q_water = ProtectedIsDigit(0)
 proc_water = ProtectedIsDigit(100)
 data_well_min = ProtectedIsDigit(0)
@@ -89,6 +91,8 @@ condition_of_wells = ProtectedIsDigit(0)
 static_level = ProtectedIsNonNone('не корректно')
 dinamic_level = ProtectedIsNonNone('не корректно')
 sucker_rod_ind = ProtectedIsDigit(0)
+data_x_max = ProtectedIsDigit(0)
+data_x_min = ProtectedIsDigit(0)
 
 problemWithEk = False
 plast_all = {}
@@ -184,10 +188,10 @@ dict_contractor = {'ООО "Ойл-Сервис':
 countAcid = 0
 swabTypeComboIndex = 1
 swabTrueEditType = 1
-data_x_max = 0
+
 drilling_interval = []
 max_angle = 0
-data_x_min = 0
+
 privyazkaSKO = 0
 nkt_mistake = False
 H2S_pr = []
@@ -200,8 +204,7 @@ max_admissible_pressure = 0
 region = ''
 dict_nkt = {}
 dict_nkt_po = {}
-data_well_max = 0
-data_pvr_max = 0
+
 dict_sucker_rod = {}
 dict_sucker_rod_po = {}
 row_expected = []

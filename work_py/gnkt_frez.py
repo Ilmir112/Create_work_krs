@@ -18,7 +18,7 @@ from openpyxl.reader.excel import load_workbook
 from openpyxl.workbook import Workbook
 
 from gnkt_data.gnkt_data import dict_saddles
-from work_py.data_informations import dict_data_cdng, calc_pntzh
+from .data_informations import dict_data_cdng, calc_pntzh
 
 
 # class TabPage_SO(QWidget):
@@ -369,7 +369,7 @@ class Work_with_gnkt(QMainWindow):
 
     def schema_well(self, ws3):
        
-        from krs import volume_vn_nkt, well_volume
+        from work_py.alone_oreration import volume_vn_nkt, well_volume
 
         boundaries_dict = {0: (13, 13, 14, 14), 1: (43, 12, 45, 12), 2: (40, 16, 42, 16), 3: (7, 19, 12, 19),
                            4: (17, 21, 18, 21), 5: (19, 21, 20, 21), 6: (13, 10, 30, 10), 7: (15, 15, 16, 15),
@@ -792,7 +792,7 @@ class Work_with_gnkt(QMainWindow):
         print(f'топ {self.top_muft}')
 
        
-        from krs import calc_work_fluid
+        from work_py.alone_oreration import calc_work_fluid
 
 
 
@@ -1465,7 +1465,7 @@ class Work_with_gnkt(QMainWindow):
         return gnkt_work_list
 
     def volume_dumping(self, ntk_true, first_muft):
-        from krs import volume_pod_NKT, volume_jamming_well
+        from work_py.alone_oreration import volume_pod_NKT, volume_jamming_well
 
         if ntk_true == True:
             volume = volume_pod_NKT(self) * 1.2

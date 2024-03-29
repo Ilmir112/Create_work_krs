@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QMessageBox
 
 import well_data
-from work_py.descent_gno import PzakPriGis
+from .descent_gno import PzakPriGis
 
 
 def rgdWithoutPaker(self):

@@ -4,10 +4,10 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QComboBo
 
 import well_data
 from main import MyWindow
-from work_py.rir import RirWindow
+from .rir import RirWindow
 
-from work_py.opressovka import OpressovkaEK
-from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
+from .opressovka import OpressovkaEK
+from .rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
 
 
 class TabPage_SO_sand(QWidget):
@@ -18,7 +18,7 @@ class TabPage_SO_sand(QWidget):
 
         self.roof_sand_label = QLabel("кровля ПМ", self)
         self.roof_sand_edit = QLineEdit(self)
-        self.roof_sand_edit.setValidator( self.validator)
+        self.roof_sand_edit.setValidator(self.validator)
 
         self.roof_sand_edit.setText(f'{well_data.perforation_roof -20}')
         self.roof_sand_edit.setClearButtonEnabled(True)
@@ -39,13 +39,11 @@ class TabPage_SO_sand(QWidget):
 
         self.roof_rir_label = QLabel("Плановая кровля РИР", self)
         self.roof_rir_edit = QLineEdit(self)
-        self.roof_rir_edit.setText(f'{well_data.current_bottom - 50}')
-        self.roof_rir_edit.setClearButtonEnabled(True)
+
 
         self.sole_rir_LabelType = QLabel("Подошва РИР", self)
         self.sole_rir_edit = QLineEdit(self)
-        self.sole_rir_edit.setText(f'{well_data.current_bottom}')
-        self.sole_rir_edit.setClearButtonEnabled(True)
+
 
 
 
@@ -73,8 +71,10 @@ class TabPage_SO_sand(QWidget):
         self.rir_question_QCombo.setCurrentIndex(0)
 
     def update_roof(self):
-        roof_sand_edit = int(float(self.tabWidget.currentWidget().roof_sand_edit.text()))
-        rir_question_QCombo = str(self.tabWidget.currentWidget().rir_question_QCombo.currentText())
+        roof_sand_edit = self.roof_sand_edit.text()
+        if roof_sand_edit != '':
+            roof_sand_edit = int(float(self.roof_sand_edit.text()))
+        rir_question_QCombo = self.rir_question_QCombo.currentText()
         if roof_sand_edit:
             if int(roof_sand_edit) + 10 > well_data.perforation_roof:
                 self.privyazka_question_QCombo.setCurrentIndex(1)
@@ -87,12 +87,16 @@ class TabPage_SO_sand(QWidget):
                 self.roof_rir_edit.setText(f'{roof_sand_edit-50}')
 
     def update_rir(self, index):
-
+        roof_sand_edit = self.roof_sand_edit.text()
+        if roof_sand_edit != '':
+            roof_sand_edit = int(float(self.roof_sand_edit.text()))
         if index == "Да":
             self.grid.addWidget(self.roof_rir_label, 6, 4)
             self.grid.addWidget(self.roof_rir_edit, 7, 4)
             self.grid.addWidget(self.sole_rir_LabelType, 6, 5)
             self.grid.addWidget(self.sole_rir_edit, 7, 5)
+            self.sole_rir_edit.setText(f'{roof_sand_edit}')
+            self.roof_rir_edit.setText(f'{roof_sand_edit - 50}')
         else:
             self.roof_rir_label.setParent(None)
             self.roof_rir_edit.setParent(None)
@@ -135,7 +139,7 @@ class SandWindow(QMainWindow):
             work_list = work_list[:-1]
             roof_rir_edit = int(float(self.tabWidget.currentWidget().roof_rir_edit.text()))
             sole_rir_edit = int(float(self.tabWidget.currentWidget().sole_rir_edit.text()))
-            rir_list = RirWindow.rirWithPero("Не нужно", '', roof_rir_edit, sole_rir_edit)
+            rir_list = RirWindow.rirWithPero(self, "Не нужно", '', roof_rir_edit, sole_rir_edit)
             work_list.extend(rir_list[1:])
 
         MyWindow.populate_row(self.ins_ind, work_list, self.table_widget)
@@ -162,8 +166,8 @@ class SandWindow(QMainWindow):
 
     def sandFilling(self, filling_depth, sole_sand_edit, privyazka_question_QCombo):
 
-        from krs import well_volume, volume_vn_ek
-        from work_py.rir import RirWindow
+        from work_py.alone_oreration import well_volume, volume_vn_ek
+
         nkt_diam = ''.join(['73' if well_data.column_diametr._value > 110 else '60'])
 
         sand_volume = round(volume_vn_ek(self, filling_depth) * (sole_sand_edit - filling_depth), 1)
@@ -243,12 +247,13 @@ class SandWindow(QMainWindow):
                              f'уд.весом {well_data.fluid_work}',
              None, None, None, None, None, None, None,
              'мастер КРС', liftingNKT_norm(filling_depth, 1)])
+        well_data.current_bottom = filling_depth
 
         return filling_list
 
     def sandWashing(self):
 
-        from krs import volume_vn_nkt
+
         nkt_diam = ''.join(['73' if well_data.column_diametr._value > 110 else '60'])
 
 

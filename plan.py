@@ -75,7 +75,10 @@ def copy_row(ws, ws2, head):
 def copy_true_ws(ws, ws2, head):
     for row_number, row in enumerate(ws[head]):
         for col_number, cell in enumerate(row):
-            ws2.cell(row_number + 1, col_number + 1, cell.value)
+            if type(cell.value) == float:
+                ws2.cell(row_number + 1, col_number + 1, round(cell.value,4))
+            else:
+                ws2.cell(row_number + 1, col_number + 1, cell.value)
             # print(cell.value, row_number)
             if cell.has_style:
                 ws2.cell(row_number + 1, col_number + 1).font = copy(cell.font)

@@ -5,8 +5,8 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QLineEdi
 import well_data
 from main import MyWindow
 from work_py.alone_oreration import fluid_change
-from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
-from work_py.advanted_file import change_True_raid
+from .rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
+from .advanted_file import change_True_raid
 
 
 
@@ -114,7 +114,7 @@ class TabPage_SO_raid(QWidget):
 
         if index == 'райбер в ЭК':
             if well_data.column_additional is False or \
-                    (well_data.column_additional and well_data.current_bottom > well_data.head_column_additional._value):
+                    (well_data.column_additional and well_data.current_bottom < well_data.head_column_additional._value):
                 self.raid_diametr_line.setText(str(self.raiding_Bit_diam_select(well_data.head_column_additional._value - 10)))
                 if well_data.column_diametr._value > 127:
                     self.downhole_motor_line.setText('Д-106')
@@ -253,7 +253,7 @@ class Raid(MyWindow):
 
     def addString(self):
 
-        from work_py.advanted_file import raiding_interval
+        from .advanted_file import raiding_interval
         ryber_key = self.tabWidget.currentWidget().raid_select_combo.currentText()
         self.downhole_motor = self.tabWidget.currentWidget().downhole_motor_line.text()
         raiding_interval = raiding_interval(ryber_key)
@@ -273,6 +273,7 @@ class Raid(MyWindow):
             mes = QMessageBox.warning(self, 'Ошибка',
                                       'Не выбраны интервалы райбирования')
             return
+
         rows = self.tableWidget.rowCount()
 
         for roof, sole in raiding_interval:
@@ -283,7 +284,7 @@ class Raid(MyWindow):
 
     def addWork(self):
         nkt_str_combo = self.tabWidget.currentWidget().nkt_str_combo.currentText()
-
+        ryber_key = self.tabWidget.currentWidget().raid_select_combo.currentText()
         rows = self.tableWidget.rowCount()
         raid_tuple = []
         for row in range(rows):
@@ -297,9 +298,9 @@ class Raid(MyWindow):
 
 
         if nkt_str_combo == 'НКТ':
-            raid_list = self.raidingColumn(raid_tuple[::-1])
+            raid_list = self.raidingColumn(raid_tuple[::-1], ryber_key)
         else:
-            raid_list = self.raiding_sbt(raid_tuple[::-1])
+            raid_list = self.raiding_sbt(raid_tuple[::-1], ryber_key)
 
         MyWindow.populate_row(self.ins_ind, raid_list, self.table_widget)
         well_data.pause = False
@@ -312,16 +313,20 @@ class Raid(MyWindow):
             return
         self.tableWidget.removeRow(row)
 
-    def raidingColumn(self, raiding_interval_tuple):
-        from work_py.template_work import TemplateKrs
-        from work_py.advanted_file import raiding_interval, raid
+    def raidingColumn(self, raiding_interval_tuple, ryber_key):
+        from .template_work import TemplateKrs
+        from .advanted_file import raiding_interval, raid
 
         ryber_diam = self.tabWidget.currentWidget().raid_diametr_line.text()
         ryber_key = self.tabWidget.currentWidget().raid_select_combo.currentText()
         downhole_motor = self.tabWidget.currentWidget().downhole_motor_line.text()
         raid_type_combo = self.tabWidget.currentWidget().raid_type_combo.currentText()
         nkt_pod = 0
+        current_str = well_data.current_bottom
         if well_data.column_additional:
+            if ryber_key == 'райбер в ЭК':
+                current_str = well_data.head_column_additional._value
+
             nkt_pod = '60мм' if well_data.column_additional_diametr._value < 110 else '73мм со снятыми фасками'
 
         nkt_diam = well_data.nkt_diam
@@ -339,6 +344,7 @@ class Raid(MyWindow):
         rayber_dict = {'райбер в ЭК': ryber_str_EK, 'райбер в ДП': ryber_str_DP}
 
         ryber_str = rayber_dict[ryber_key]
+
 
         if len(raiding_interval_tuple) != 0:
             krovly_raiding = int(raiding_interval_tuple[0][0])
@@ -367,7 +373,7 @@ class Raid(MyWindow):
              f'Произвести райбирование ЭК в инт. {raiding_interval}м с наращиванием, с промывкой и проработкой 5 раз каждого наращивания. '
              f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа '
              f'до начала работ) Работы производить согласно сборника технологических регламентов и инструкций в присутствии'
-             f' представителя заказчика. Допустить до текущего забоя {well_data.current_bottom}м.',
+             f' представителя заказчика. Допустить до глубины {current_str}м.',
              None, None, None, None, None, None, None,
              'Мастер КРС, УСРСиСТ', 8],
             [None, None,
@@ -384,10 +390,10 @@ class Raid(MyWindow):
              None, None, None, None, None, None, None,
              'мастер КРС, предст. заказчика', well_volume_norm(TemplateKrs.well_volume(self))],
             [None, None,
-             f'Поднять  {ryber_str} на НКТ{nkt_diam}м с глубины {well_data.current_bottom}м с доливом скважины в '
+             f'Поднять  {ryber_str} на НКТ{nkt_diam}м с глубины {current_str}м с доливом скважины в '
              f'объеме {round(well_data.current_bottom * 1.12 / 1000, 1)}м3 тех. жидкостью  уд.весом {well_data.fluid_work}',
              None, None, None, None, None, None, None,
-             'мастер КРС', liftingNKT_norm(well_data.current_bottom, 1.2)]]
+             'мастер КРС', liftingNKT_norm(current_str, 1.2)]]
 
         # print(f' после отрайбирования {[well_data.dict_perforation[plast]["отрайбировано"] for plast in well_data.plast_work]}')
         if len(well_data.plast_work) == 0:
@@ -398,13 +404,18 @@ class Raid(MyWindow):
                     ryber_list.insert(-1, row)
         return ryber_list
 
-    def raiding_sbt(self, raiding_interval_tuple):
-        from work_py.template_work import TemplateKrs
-        from work_py.advanted_file import raid
+    def raiding_sbt(self, raiding_interval_tuple, ryber_key):
+        from .template_work import TemplateKrs
+        from .advanted_file import raid
 
         ryber_diam = self.tabWidget.currentWidget().raid_diametr_line.text()
         ryber_key = self.tabWidget.currentWidget().raid_select_combo.currentText()
         raid_type_combo = self.tabWidget.currentWidget().raid_type_combo.currentText()
+
+        current_str = well_data.current_bottom
+        if well_data.column_additional:
+            if ryber_key == 'райбер в ЭК':
+                current_str = well_data.head_column_additional._value
 
         nkt_pod = "2'3/8"
         nkt_diam = "2'7/8" if well_data.column_diametr._value > 110 else "2'3/8"
@@ -448,7 +459,7 @@ class Raid(MyWindow):
              f'Произвести райбирование ЭК в инт. {raiding_interval}м с наращиванием, с промывкой и проработкой 5 раз каждого наращивания. '
              f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа '
              f'до начала работ) Работы производить согласно сборника технологических регламентов и инструкций в присутствии'
-             f' представителя заказчика. Допустить до текущего забоя {well_data.current_bottom}м.',
+             f' представителя заказчика. Допустить до {current_str}м.',
              None, None, None, None, None, None, None,
              'Мастер КРС, УСРСиСТ', 8],
             [None, None,
@@ -464,10 +475,10 @@ class Raid(MyWindow):
              None, None, None, None, None, None, None,
              'мастер КРС, предст. заказчика', well_volume_norm(TemplateKrs.well_volume(self))],
             [None, None,
-             f'Поднять  {ryber_str} на СБТ{nkt_diam}м с глубины {well_data.current_bottom}м с доливом скважины в '
+             f'Поднять  {ryber_str} на СБТ{nkt_diam}м с глубины {current_str}м с доливом скважины в '
              f'объеме {round(well_data.current_bottom * 1.12 / 1000, 1)}м3 тех. жидкостью  уд.весом {well_data.fluid_work}',
              None, None, None, None, None, None, None,
-             'мастер КРС', liftingNKT_norm(well_data.current_bottom, 1.2)]]
+             'мастер КРС', liftingNKT_norm(current_str, 1.2)]]
 
         # print(f' после отрайбирования {[well_data.dict_perforation[plast]["отрайбировано"] for plast in well_data.plast_work]}')
         if len(well_data.plast_work) == 0:

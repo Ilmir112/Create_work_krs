@@ -765,7 +765,7 @@ class DataWindow(QMainWindow):
                     self.tabWidget.currentWidget().labels_sucker_po[1][1].text())
 
         close_file = True
-        print(f'голова {[columnType, column_additional_diametr]}')
+
         if any([self.ifNum(data_well) is False for data_well in
                 [columnType, column_wall_thickness, shoe_column]]):
             msg = QMessageBox.information(self, 'Внимание', 'Не все поля в данных колонне соответствуют значениям')

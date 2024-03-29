@@ -74,9 +74,10 @@ class TabPage_SO(QWidget):
             except:
 
                 work_plast, ok = QInputDialog.getText(None, 'индекс пласта', 'Введите индекc пласта вскрываемого')
-                while work_plast not in  well_data.plast_all:
+                while work_plast not in well_data.plast_all:
                     mes = QMessageBox.warning(self, 'Ошибка', 'Пласт есть в списке')
                     work_plast, ok = QInputDialog.getText(None, 'индекс пласта', 'Введите индекc пласта вскрываемого')
+                    print(well_data.plast_all)
                 self.plast_all.append(work_plast)
                 well_data.plast_all.append(work_plast)
                 work_plast_index = 1

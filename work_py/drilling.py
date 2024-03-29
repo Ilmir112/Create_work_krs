@@ -5,7 +5,7 @@ import well_data
 from PyQt5.QtCore import Qt
 
 
-from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
+from .rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
 
 
 
@@ -233,6 +233,7 @@ class Drill_window(QMainWindow):
             return
 
         drilling_interval = [well_data.dict_perforation[plast]["подошва"] for plast in well_data.plast_all]
+        drilling_interval.append(int(current_depth))
         if len(well_data.dict_leakiness) != 0:
             leakness_list = [
                 well_data.dict_leakiness['нэк']['интервал'][
@@ -403,14 +404,14 @@ class Drill_window(QMainWindow):
                                   None, None, None, None, None, None, None,
                                   'Мастер КРС, УСРСиСТ', None])
 
-            for row in self.drilling_sbt(self, drill_tuple, drill_type_combo, drillingBit_diam, downhole_motor):
+            for row in self.drilling_sbt(self, drill_tuple, drill_type_combo, drillingBit_diam):
                 drilling_list.append(row)
 
         return drilling_list
 
     def reply_drilling(self, current_depth, bottomtype, drilling_str, nkt_diam):
 
-        from krs import well_volume
+        from work_py.alone_oreration import well_volume
 
         drilling_true_quest_list = [
             [f'Произвести нормализацию {bottomtype} до Н -{current_depth}м', None,
@@ -557,7 +558,7 @@ class Drill_window(QMainWindow):
 
     def frezer_ports(self):
 
-        from krs import well_volume
+        from work_py.alone_oreration import well_volume
         from work_py.alone_oreration import kot_work
 
         max_port = max([well_data.dict_perforation[plast]['подошва'] for plast in well_data.plast_work])

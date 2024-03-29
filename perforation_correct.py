@@ -7,7 +7,7 @@ import well_data
 
 import re
 
-from work_py.advanted_file import definition_plast_work
+from .advanted_file import definition_plast_work
 
 
 class FloatLineEdit(QLineEdit):

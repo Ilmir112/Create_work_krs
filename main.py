@@ -1,7 +1,7 @@
 import os
 import sqlite3
 import sys
-# import win32com.client
+import win32com.client
 import openpyxl
 from openpyxl.reader.excel import load_workbook
 import krs
@@ -23,6 +23,7 @@ from H2S import calc_H2S
 from PyQt5.QtCore import QThread, pyqtSignal
 from data_correct_position_people import CorrectSignaturesWindow
 from data_base.work_with_base import Classifier_well
+
 from work_py.drilling import Drill_window
 
 
@@ -121,9 +122,9 @@ class ExcelWorker(QThread):
             # Если запись найдена, возвращается True, в противном случае возвращается False
             if result:
                 date_reload = result[2]
-                mes = QMessageBox.information(self, 'перечень без глушения',
-                                              f'Скважина состоит в перечне скважин без глушения на текущий квартал, '
-                                              f'в перечне от {date_reload} {region}')
+                # mes = QMessageBox.information(self, 'перечень без глушения',
+                #                               f'Скважина состоит в перечне скважин без глушения на текущий квартал, '
+                #                               f'в перечне от {date_reload} {region}')
                 check_true = True
             else:
                 check_true = False
@@ -602,6 +603,7 @@ class MyWindow(QMainWindow):
 
     def save_to_krs(self):
         from open_pz import CreatePZ
+        from work_py.alone_oreration import is_number
 
         if not self.table_widget is None:
             wb2 = Workbook()
@@ -641,7 +643,7 @@ class MyWindow(QMainWindow):
 
                 if i >= ins_ind + 1:
                     work_list[i][1] = i - ins_ind
-                    if krs.is_number(work_list[i][11]) == True:
+                    if is_number(work_list[i][11]) == True:
                         well_data.normOfTime += float(str(work_list[i][11]).replace(',', '.'))
                     if work_list[i][0]:
                         plan_short += f'п.{work_list[i][1]} {work_list[i][0]} \n'
@@ -848,7 +850,7 @@ class MyWindow(QMainWindow):
             well_data.image_list = []
             well_data.problemWithEk = False
             well_data.problemWithEk_depth = well_data.current_bottom
-            well_data.problemWithEk_diametr = well_data.column_diametr
+            well_data.problemWithEk_diametr = well_data.column_diametr._value
             path = "imageFiles/image_work"
             for file in os.listdir(path):
                 file_path = os.path.join(path, file)
@@ -951,7 +953,7 @@ class MyWindow(QMainWindow):
 
         ryber_action = QAction("Райбирование", self)
         action_menu.addAction(ryber_action)
-        ryber_action.triggered.connect(self.ryberAdd)
+        ryber_action.triggered.connect(self.ryber_add)
 
         drilling_menu = action_menu.addMenu('Бурение')
 
@@ -962,10 +964,6 @@ class MyWindow(QMainWindow):
         frezering_port_action = QAction("Фрезерование портов", self)
         drilling_menu.addAction(frezering_port_action)
         frezering_port_action.triggered.connect(self.frezering_port_action)
-
-        drilling_SBT_action = QAction("бурение на СБТ", self)
-        drilling_menu.addAction(drilling_SBT_action)
-        drilling_SBT_action.triggered.connect(self.drilling_SBT_action)
 
         template_without_skm = QAction("шаблон без СКМ", self)
         template_menu.addAction(template_without_skm)
@@ -998,7 +996,7 @@ class MyWindow(QMainWindow):
         lapel_tubing_action.triggered.connect(self.lapel_tubing_func)
 
         acid_menu = action_menu.addMenu('Кислотная обработка')
-        acid_action1paker = QAction("окно на одном пакере", self)
+        acid_action1paker = QAction("Кислотная обработка", self)
         acid_menu.addAction(acid_action1paker)
         acid_action1paker.triggered.connect(self.acidPakerNewWindow)
 
@@ -1084,10 +1082,7 @@ class MyWindow(QMainWindow):
         well_data.ins_ind = r + 1
         # print(f' выбранная строка {self.ins_ind}')
 
-    def drilling_SBT_action(self):
-        from work_py.drilling import Drill_window
-        drilling_work_list = Drill_window.drilling_sbt(self)
-        self.populate_row(self.ins_ind, drilling_work_list, self.table_widget)
+
 
     @staticmethod
     def pause_app():
@@ -1218,16 +1213,25 @@ class MyWindow(QMainWindow):
         self.populate_row(self.ins_ind, pvo_cat1_work_list, self.table_widget)
 
     def fluid_change_action(self):
-        from work_py.alone_oreration import fluid_change
-        fluid_change_work_list = fluid_change(self)
-        self.populate_row(self.ins_ind, fluid_change_work_list, self.table_widget)
+        from work_py.change_fluid import Change_fluid_Window
+
+        if self.rir_window is None:
+            self.rir_window = Change_fluid_Window(well_data.ins_ind, self.table_widget)
+            self.rir_window.setGeometry(200, 400, 100, 200)
+            self.rir_window.show()
+            self.pause_app()
+            well_data.pause = True
+            self.rir_window = None
+        else:
+            self.rir_window.close()  # Close window.
+            self.rir_window = None
 
     def claySolision(self):
         from work_py.claySolution import ClayWindow
         if self.rir_window is None:
             well_data.countAcid = 0
             self.rir_window = ClayWindow(well_data.ins_ind, self.table_widget)
-            self.rir_window.setGeometry(200, 400, 300, 400)
+            self.rir_window.setGeometry(200, 400, 100, 200)
             self.rir_window.show()
             self.pause_app()
             well_data.pause = True
@@ -1255,7 +1259,6 @@ class MyWindow(QMainWindow):
 
     def grpWithPaker(self):
         from work_py.grp import Grp_window
-        from open_pz import CreatePZ
 
         if self.work_window is None:
             self.work_window = Grp_window(well_data.ins_ind, self.table_widget)
@@ -1270,7 +1273,6 @@ class MyWindow(QMainWindow):
 
     def grpWithGpp(self):
         from work_py.gpp import Gpp_window
-        from open_pz import CreatePZ
 
         if self.work_window is None:
             self.work_window = Gpp_window(well_data.ins_ind, self.table_widget)
@@ -1343,7 +1345,6 @@ class MyWindow(QMainWindow):
 
     def swibbing_with_paker(self):
         from work_py.swabbing import Swab_Window
-        from open_pz import CreatePZ
 
         if self.work_window is None:
             self.work_window = Swab_Window(well_data.ins_ind, self.table_widget)
@@ -1357,13 +1358,20 @@ class MyWindow(QMainWindow):
             self.work_window = None
 
     def kompress_with_voronka(self):
-        from work_py.kompress import kompress
+        from work_py.kompress import Kompress_Window
 
-        print('Вставился компрессор с воронкой')
-        kompress_work_list = kompress(self)
-        self.populate_row(self.ins_ind, kompress_work_list, self.table_widget)
+        if self.work_window is None:
+            self.work_window = Kompress_Window(well_data.ins_ind, self.table_widget)
+            self.work_window.setGeometry(200, 400, 300, 400)
+            self.work_window.show()
+            self.pause_app()
+            well_data.pause = True
+            self.work_window = None
+        else:
+            self.work_window.close()  # Close window.
+            self.work_window = None
 
-    def ryberAdd(self):
+    def ryber_add(self):
         from work_py.raiding import Raid
 
         if self.work_window is None:
@@ -1372,7 +1380,6 @@ class MyWindow(QMainWindow):
             self.work_window.show()
             self.pause_app()
             well_data.pause = True
-
             self.work_window = None
         else:
             self.work_window.close()  # Close window.
@@ -1543,7 +1550,6 @@ class MyWindow(QMainWindow):
 
     def GeophysicalNewWindow(self):
         from work_py.geophysic import GeophysicWindow
-        from open_pz import CreatePZ
 
         if self.new_window is None:
             self.new_window = GeophysicWindow(self.table_widget, self.ins_ind)
@@ -1622,7 +1628,7 @@ class MyWindow(QMainWindow):
 
     def copy_pz(self, sheet, table_widget, work_plan='krs', count_col=12, list_page=1):
 
-        from krs import work_krs
+        from krs import Gno_window
         rows = sheet.max_row
         merged_cells = sheet.merged_cells
 
@@ -1667,18 +1673,19 @@ class MyWindow(QMainWindow):
                                                  merged_cell.max_row - merged_cell.min_row + 1,
                                                  merged_cell.max_col - merged_cell.min_col + 1)
 
-        # # Чтение стилей границ и применение к QTableWidget
-        # for row in self.ws.iter_rows():
-        #     for cell in row:
-        #         cell_widget = table_widget.itemAt(cell.row - 1, cell.column - 1)
-        #         if cell_widget:
-        #             border = cell.border
-        #             border_style = f"{border.left.style},{border.right.style},{border.top.style},{border.bottom.style}"
-        #             print(border_style)
-        #             cell_widget.horizontalHeader().setStyleSheet(f"border-style: {border_style};")
-
         if work_plan == 'krs':
-            self.populate_row(table_widget.rowCount(), work_krs(self, self.work_plan), self.table_widget)
+            if self.work_window is None:
+                self.work_window = Gno_window(table_widget.rowCount(), self.table_widget, self.work_plan)
+                self.work_window.setGeometry(100, 400, 200, 500)
+                self.work_window.show()
+                self.pause_app()
+                well_data.pause = True
+                self.work_window = None
+            else:
+                self.work_window.close()  # Close window.
+                self.work_window = None
+
+            # self.populate_row(table_widget.rowCount(), Gno_window.work_krs(self, self.work_plan), self.table_widget)
 
         if work_plan == 'gnkt_frez' and list_page == 2:
             colWidth = [2.28515625, 13.0, 4.5703125, 13.0, 13.0, 13.0, 5.7109375, 13.0, 13.0, 13.0, 4.7109375,
@@ -1695,8 +1702,8 @@ class MyWindow(QMainWindow):
         #     # self.populate_row(self.table_widget.rowCount(), well_data.gnkt_work1)
 
     def create_short_plan(self, wb2, plan_short):
-
         from work_py.descent_gno import gno_nkt_opening
+
         ws4 = wb2.create_sheet('Sheet1')
         ws4.title = "Краткое содержание плана работ"
         ws4 = wb2["Краткое содержание плана работ"]
@@ -1835,7 +1842,6 @@ class MyWindow(QMainWindow):
                         self.table_widget.setItem(row, column, new_value)
 
     def true_set_Paker(self, depth):
-
         from work_py.advanted_file import raid, remove_overlapping_intervals
         from work_py.opressovka import OpressovkaEK
 

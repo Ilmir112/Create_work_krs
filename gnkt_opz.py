@@ -3,9 +3,9 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox, QMainWindow, QTabWidget, 
 from PyQt5 import QtWidgets
 
 import well_data
-from krs import calc_work_fluid
+from work_py.alone_oreration import calc_work_fluid
 from main import MyWindow
-from work_py.acid_paker import CheckableComboBox, AcidPakerWindow
+from .acid_paker import CheckableComboBox, AcidPakerWindow
 from gnkt_data import gnkt_data
 from collections import namedtuple
 
@@ -69,7 +69,7 @@ class TabPage_gnkt(QWidget):
         self.skv_proc_edit.setClearButtonEnabled(True)
         self.skv_proc_edit.setText('15')
 
-        self.acid_label_type = QLabel("необходимость кислотной обработки", self)
+        self.acid_label = QLabel("необходимость кислотной обработки", self)
         self.acid_true_edit = QComboBox(self)
         self.acid_true_edit.addItems(['нужно', 'не нужно'])
 
@@ -116,7 +116,7 @@ class TabPage_gnkt(QWidget):
         grid.addWidget(self.skv_proc_label, 4, 3)
         grid.addWidget(self.skv_proc_edit, 5, 3)
 
-        grid.addWidget(self.acid_label_type, 6, 0)
+        grid.addWidget(self.acid_label, 6, 0)
         grid.addWidget(self.acid_true_edit, 7, 0)
 
         grid.addWidget(self.acid_label_type, 6, 1)
@@ -187,7 +187,7 @@ class GnktOpz(QMainWindow):
         MyWindow.populate_row(self.ins_ind, work_list, self.table_widget)
         well_data.pause = False
         self.close()
-        return work_list
+        
 
     def gnkt_work(self, roof_plast, sole_plast, need_rast_combo, volume_rast_edit, acid_true_edit,
                   acid_edit, skv_volume_edit, skv_proc_edit, acid_volume_edit, acid_proc_edit, pressure_edit,

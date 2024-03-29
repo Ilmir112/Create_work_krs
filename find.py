@@ -2,16 +2,14 @@ from datetime import datetime
 
 from PyQt5.QtWidgets import QInputDialog, QMainWindow, QMessageBox
 
-
 import well_data
 from category_correct import CategoryWindow
 from data_correct import DataWindow
 from perforation_correct import PerforationCorrect
 
-from work_py.leakage_column import LeakageWindow
+from .leakage_column import LeakageWindow
 from well_data import ProtectedIsDigit, ProtectedIsNonNone
-from work_py.advanted_file import definition_plast_work
-from main import MyWindow
+from .advanted_file import definition_plast_work
 
 
 
@@ -23,7 +21,7 @@ class FindIndexPZ(QMainWindow):
         self.perforation_correct_window2 = None
 
     def readPZ(self, ws):
-       
+
         cat_well_min = []
         for row_ind, row in enumerate(ws.iter_rows(values_only=True)):
             ws.row_dimensions[row_ind].hidden = False
@@ -71,95 +69,66 @@ class FindIndexPZ(QMainWindow):
 
             elif 'III. Состояние скважины к началу ремонта ' in row:
                 well_data.condition_of_wells = ProtectedIsDigit(row_ind)
-        try:
-            check = well_data.cat_well_min._value
-        except:
+        if well_data.cat_well_min._value == 0:
             well_data.cat_well_min = ProtectedIsDigit(QInputDialog.getInt(
                 self, 'индекс начала копирования', 'Программа не смогла определить строку начала копирования',
                 0, 0, 800)[0])
-        try:
-            check = well_data.cat_well_max._value
-
-        except:
-            well_data.cat_well_max = ProtectedIsDigit(QInputDialog.getInt(self, 'индекс начала копирования',
-                                                                         'Программа не смогла определить строку начала копирования',
-                                                                         0, 0, 800)[0])
-        try:
-            check = well_data.sucker_rod_ind._value
-
-        except:
-            well_data.sucker_rod_ind = ProtectedIsDigit(QInputDialog.getInt(self, 'индекс начала строки со штангами',
-                                                                           'Программа не смогла найти строку со штангами',
-                                                                           0, 0, 800)[0])
-        try:
-            check = well_data.data_well_max._value
-
-        except:
-            well_data.data_well_max = ProtectedIsDigit(QInputDialog.getInt(self, 'индекс окончания копирования',
-                                                                          'Программа не смогла определить строку окончания копирования',
-                                                                          0, 0, 800)[0])
-        try:
-            check = well_data.data_x_max._value
-        except:
+        if well_data.cat_well_max._value == 0:
+            well_data.cat_well_max = ProtectedIsDigit(
+                QInputDialog.getInt(self, 'индекс начала копирования',
+                                    'Программа не смогла определить строку начала копирования',
+                                    0, 0, 800)[0])
+        if well_data.sucker_rod_ind._value == 0:
+            well_data.sucker_rod_ind = ProtectedIsDigit(
+                QInputDialog.getInt(self, 'индекс начала строки со штангами',
+                                    'Программа не смогла найти строку со штангами',
+                                    0, 0, 800)[0])
+        if well_data.data_well_max._value == 0:
+            well_data.data_well_max = ProtectedIsDigit(
+                QInputDialog.getInt(self, 'индекс окончания копирования',
+                                    'Программа не смогла определить строку окончания копирования',
+                                    0, 0, 800)[0])
+        if well_data.data_x_max._value == 0:
             well_data.data_x_max, _ = ProtectedIsDigit(
                 QInputDialog.getInt(self, 'индекс окончания копирования ожидаемых показателей',
                                     'Программа не смогла определить строку окончания копирования'
                                     ' ожидаемых показателей',
                                     0, 0, 800)[0])
-        try:
-            check = well_data.condition_of_wells._value
-        except:
-            well_data.condition_of_wells = ProtectedIsDigit(
-                QInputDialog.getInt(self, 'индекс копирования',
-                                    'Программа не смогла определить строку n\ III. '
-                                    'Состояние скважины к началу ремонта ',
-                                    0, 0, 800)[0])
-        try:
-            check = well_data.data_x_min._value
-        except:
+        if well_data.condition_of_wells._value == 0:
+            well_data.condition_of_wells = ProtectedIsDigit(QInputDialog.getInt(self, 'индекс копирования',
+                                                                                'Программа не смогла определить строку n\ III. '
+                                                                                'Состояние скважины к началу ремонта ',
+                                                                                0, 0, 800)[0])
+        if well_data.data_x_min._value == 0:
             well_data.data_x_min = ProtectedIsDigit(
                 QInputDialog.getInt(self, 'индекс начала копирования ожидаемых показателей',
                                     'Программа не смогла определить строку начала копирования'
                                     ' ожидаемых показателей',
                                     0, 0, 800)[0])
-        try:
-            check = well_data.data_well_min._value
-        except:
+        if well_data.data_well_min._value == 0:
             well_data.data_well_min = ProtectedIsDigit(
                 QInputDialog.getInt(self, 'индекс начала строки после план заказ',
                                     'Программа не смогла найти начала строки после план заказ',
                                     0, 0, 800)[0])
-        try:
-            check = well_data.data_pvr_max._value
-
-        except:
+        if well_data.data_pvr_max._value == 0:
             well_data.data_pvr_max = ProtectedIsDigit(
                 QInputDialog.getInt(self, 'индекс начала строки после план заказ',
                                     'Программа не смогла найти "II. История эксплуатации скважины"',
                                     0, 0, 800)[0])
 
-        try:
-            check = well_data.pipes_ind._value
-
-        except:
+        if well_data.pipes_ind._value == 0:
             well_data.pipes_ind = ProtectedIsDigit(QInputDialog.getInt(self, 'индекс начала строки с НКТ',
-                                                                      'Программа не смогла найти строку с НКТ',
-                                                                      0, 0, 800)[0])
-        try:
-            check = well_data.data_pvr_min._value
-        except:
+                                                                       'Программа не смогла найти строку с НКТ',
+                                                                       0, 0, 800)[0])
+        if well_data.data_pvr_min._value == 0:
             well_data.data_pvr_min = ProtectedIsDigit(QInputDialog.getInt(self, 'индекс начала начала ПВР',
-                                                                         'Программа не смогла найти индекс начала ПВР',
-                                                                         0, 0, 800)[0])
-        try:
-            check = well_data.data_fond_min._value
-        except:
+                                                                          'Программа не смогла найти индекс начала ПВР',
+                                                                          0, 0, 800)[0])
+        if well_data.data_fond_min._value == 0:
             well_data.data_fond_min = ProtectedIsDigit(
                 QInputDialog.getInt(self, 'индекс начала строки с таблицей фондовыго оборудования',
                                     'Программа не смогла найти строку с таблицей фондового оборудования',
                                     0, 0, 800)[0])
-
-
 
     def check_str_None(self, string):
 
@@ -224,14 +193,12 @@ class FindIndexPZ(QMainWindow):
 class WellNkt(FindIndexPZ):
 
     def __init__(self, ws):
-       
 
         super().__init__(ws)
 
         self.read_well(ws, well_data.pipes_ind._value, well_data.condition_of_wells._value)
 
     def read_well(self, ws, begin_index, cancel_index):
-       
 
         try:
             a_plan = 0
@@ -243,7 +210,7 @@ class WellNkt(FindIndexPZ):
                     a_plan = row
             if a_plan == 0:
                 a_plan = QInputDialog.getDouble(self, 'Индекс планового НКТ',
-                                                'Программа не могла определить начала строку с ПЗ НКТ - план')
+                                                'Программа не могла определить начала строку с ПЗ НКТ - план')[0]
             # print(f'индекс a_plan {a_plan}')
             for row in range(begin_index, cancel_index + 1):
                 # print(str(ws.cell(row=row, column=4).value))
@@ -265,13 +232,13 @@ class WellNkt(FindIndexPZ):
 class WellSucker_rod(FindIndexPZ):
 
     def __init__(self, ws):
-       
+
         super().__init__(ws)
 
         self.read_well(ws, well_data.sucker_rod_ind._value, well_data.pipes_ind._value)
 
     def read_well(self, ws, begin_index, cancel_index):
-       
+
         try:
             well_data.sucker_mistake = False
             b_plan = 0
@@ -306,13 +273,11 @@ class WellSucker_rod(FindIndexPZ):
 class WellFond_data(FindIndexPZ):
 
     def __init__(self, ws):
-       
 
         super().__init__(ws)
         self.read_well(ws, well_data.data_fond_min._value, well_data.condition_of_wells._value)
 
     def read_well(self, ws, begin_index, cancel_index):
-       
 
         well_data.old_index = 1
         for row_index, row in enumerate(ws.iter_rows(min_row=begin_index, max_row=cancel_index)):
@@ -363,10 +328,10 @@ class WellFond_data(FindIndexPZ):
                             well_data.dict_pump_SHGN_h["do"] = ws.cell(row=row_index + 4, column=col_do + 1).value
                         if well_data.dict_pump_ECN["posle"] != 0:
                             well_data.dict_pump_ECN_h["posle"] = ws.cell(row=row_index + 4,
-                                                                        column=col_plan + 1).value
+                                                                         column=col_plan + 1).value
                         if well_data.dict_pump_SHGN["posle"] != 0:
                             well_data.dict_pump_SHGN_h["posle"] = ws.cell(row=row_index + 4,
-                                                                         column=col_plan + 1).value
+                                                                          column=col_plan + 1).value
 
                     elif value == 'Н посадки, м':
                         try:
@@ -388,7 +353,6 @@ class WellFond_data(FindIndexPZ):
 class WellHistory_data(FindIndexPZ):
 
     def __init__(self, ws):
-       
 
         super().__init__(ws)
         self.leakage_window = None
@@ -396,7 +360,7 @@ class WellHistory_data(FindIndexPZ):
         self.read_well(self.ws, well_data.data_pvr_max._value, well_data.data_fond_min._value)
 
     def read_well(self, ws, begin_index, cancel_index):
-       
+
         well_data.max_expected_pressure = ProtectedIsNonNone('не корректно')
         well_data.max_admissible_pressure = ProtectedIsNonNone('не корректно')
 
@@ -444,7 +408,6 @@ class WellHistory_data(FindIndexPZ):
 class WellCondition(FindIndexPZ):
 
     def __init__(self, ws):
-       
 
         super().__init__(ws)
         self.leakage_window = None
@@ -452,9 +415,8 @@ class WellCondition(FindIndexPZ):
 
         self.read_well(ws, well_data.condition_of_wells._value, well_data.data_well_max._value)
 
-
     def read_well(self, ws, begin_index, cancel_index):
-       
+        from main import MyWindow
 
         well_data.static_level = ProtectedIsNonNone('не корректно')
         well_data.dinamic_level = ProtectedIsNonNone('не корректно')
@@ -502,7 +464,7 @@ class WellCondition(FindIndexPZ):
 
         if well_data.grp_plan:
             grp_plan_quest = QMessageBox.question(self, 'Подготовка к ГРП', 'Программа определела что в скважине'
-                                                                           f'планируется ГРП, верно ли?')
+                                                                            f'планируется ГРП, верно ли?')
             if grp_plan_quest == QMessageBox.StandardButton.Yes:
                 well_data.grp_plan = True
             else:
@@ -539,14 +501,12 @@ class WellCondition(FindIndexPZ):
 class Well_expected_pick_up(FindIndexPZ):
 
     def __init__(self, ws):
-       
 
         super().__init__(ws)
         self.ws = ws
         self.read_well(ws, well_data.data_x_min._value, well_data.data_x_max._value)
 
     def read_well(self, ws, begin_index, cancel_index):
-       
 
         for row_index, row in enumerate(ws.iter_rows(min_row=begin_index, max_row=cancel_index)):
             row_index += begin_index
@@ -556,10 +516,9 @@ class Well_expected_pick_up(FindIndexPZ):
                 value = cell.value
                 if value:
 
-
                     if 'прием' in str(value).lower() or 'qж' in str(value).lower():
                         well_data.expected_Q = row[col + 1].value
-                      # print(well_data.expected_Q)
+                        # print(well_data.expected_Q)
                         well_data.expected_Q = self.definition_is_None(well_data.expected_Q, row_index, col + 1, 1)
                         print(f'после {well_data.expected_Q}')
                     if 'зак' in str(value).lower() or 'давл' in str(value).lower() or 'p' in str(value).lower():
@@ -578,8 +537,9 @@ class Well_expected_pick_up(FindIndexPZ):
                             proc_water = str(row[col + 1].value).replace(' ', '').replace('%', '')
 
                             proc_water = self.definition_is_None(proc_water, row_index, col + 1, 1)
-                            well_data.proc_water = int(float(proc_water)) if float(proc_water) > 1 else round(float(proc_water) * 100,
-                                                                                                0)
+                            well_data.proc_water = int(float(proc_water)) if float(proc_water) > 1 else round(
+                                float(proc_water) * 100,
+                                0)
                         except:
                             print(f'ошибка в определение')
 
@@ -592,14 +552,13 @@ class Well_expected_pick_up(FindIndexPZ):
 class Well_data(FindIndexPZ):
 
     def __init__(self, ws):
-       
 
         super().__init__(ws)
         self.ws = ws
         self.read_well(self.ws, well_data.cat_well_max._value, well_data.data_pvr_min._value)
 
     def read_well(self, ws, begin_index, cancel_index):
-        from open_pz import CreatePZ
+        from main import MyWindow
 
         well_data.well_area = ProtectedIsNonNone('не корректно')
         well_data.well_number = ProtectedIsNonNone('не корректно')
@@ -649,7 +608,7 @@ class Well_data(FindIndexPZ):
                     elif 'пробуренный забой' in str(value).lower():
                         well_data.bottomhole_drill = ProtectedIsDigit(row[col + 2].value)
                         well_data.bottomhole_drill = FindIndexPZ.definition_is_None(self, well_data.bottomhole_drill,
-                                                                                   row_index, col, 2)
+                                                                                    row_index, col, 2)
 
                         well_data.bottomhole_artificial = ProtectedIsDigit(row[col + 4].value)
                         print(f'пробуренный забой {well_data.bottomhole_artificial}')
@@ -786,8 +745,9 @@ class Well_data(FindIndexPZ):
 
                     elif 'Уровень цемента за колонной' in str(value):
                         well_data.level_cement_column = ProtectedIsDigit(row[col + 3].value)
-                        well_data.level_cement_column = self.definition_is_None(well_data.level_cement_column, row_index,
-                                                                               col, 1)
+                        well_data.level_cement_column = self.definition_is_None(well_data.level_cement_column,
+                                                                                row_index,
+                                                                                col, 1)
                     elif 'Рмкп ( э/к и' in str(cell):
                         well_data.pressuar_mkp = ProtectedIsNonNone(row[col + 2].value)
                     elif 'онструкция хвостовика' in str(value):
@@ -859,22 +819,22 @@ class Well_data(FindIndexPZ):
             else:
                 well_data.open_trunk_well = False
         if str(well_data.well_number._value) in ['358', '878', "285", '120', '124', '549',
-                                                '144', '168', "306АБШ", "650", "2290", "3287", "687", "2286",
-                                                "1105", "3374", '4063', "3334", "4693"]:
+                                                 '144', '168', "306АБШ", "650", "2290", "3287", "687", "2286",
+                                                 "1105", "3374", '4063', "3334", "4693"]:
             QMessageBox.warning(self, 'Канатные технологии', f'Скважина согласована на канатные технологии')
             well_data.konte_true = True
 
+
 class Well_perforation(FindIndexPZ):
     def __init__(self, ws):
-       
 
         super().__init__(ws)
         self.ws = ws
         self.read_well(self.ws, well_data.data_pvr_min._value, well_data.data_pvr_max._value + 1)
 
     def read_well(self, ws, begin_index, cancel_index):
-       
-        from krs import is_number, calculationFluidWork
+        from work_py.alone_oreration import is_number, calculationFluidWork
+        from main import MyWindow
 
         well_data.old_version = True
         col_old_open_index = 0
@@ -939,12 +899,11 @@ class Well_perforation(FindIndexPZ):
                     lst.append(plast)
 
                 for col in row[2:13]:
-
                     lst.append(col.value)
 
             if all([str(i).strip() == 'None' or i is None for i in lst]) is False:
                 perforations_intervals.append(lst)
-        # print(perforations_intervals)
+
         for ind, row in enumerate(perforations_intervals):
             plast = row[col_plast_index]
             # print(f'пласт {plast}')
@@ -959,8 +918,8 @@ class Well_perforation(FindIndexPZ):
 
                 if is_number(str(row[col_vert_index]).replace(',', '.')) is True:
                     well_data.dict_perforation.setdefault(plast,
-                                                         {}).setdefault('вертикаль',
-                                                                        set()).add(float(
+                                                          {}).setdefault('вертикаль',
+                                                                         set()).add(float(
                         str(row[col_vert_index]).replace(',', '.')))
                 if any(['фильтр' in str(i).lower() for i in row]):
                     well_data.dict_perforation.setdefault(plast, {}).setdefault('отрайбировано', True)
@@ -974,46 +933,6 @@ class Well_perforation(FindIndexPZ):
                     (roof_int, sole_int))
                 # for interval in list(well_data.dict_perforation[plast]["интервал"]):
                 # print(interval)
-
-                # print(f' эни {(interval[0],(roof_int, sole_int), interval[1])}, {interval[0] < roof_int < interval[1] or interval[0] < sole_int < interval[1]}')
-                if any([interval[0] < roof_int < interval[1] or interval[0] < sole_int < interval[1] for interval in
-                        list(well_data.dict_perforation[plast]['интервал'])]):
-                    # print(f'интервалы {well_data.dict_perforation[plast]["интервал"]}')
-                    for perf_int in [
-                        sorted(list(well_data.dict_perforation[plast]['интервал']), key=lambda x: x[0], reverse=False),
-                        sorted(list(well_data.dict_perforation[plast]['интервал']), key=lambda x: x[0], reverse=True)]:
-                        for interval in sorted(perf_int):
-                            # print(f'{interval[0], interval[1]},проверяемый {roof_int, sole_int}')
-                            # print(interval[0] < roof_int < interval[1], interval[0] < sole_int < interval[1] )
-                            if interval[0] < roof_int < interval[1] is False and interval[0] < sole_int < interval[
-                                1] is False:
-                                # print(f'удаление1 {roof_int, sole_int}, добавление{interval[0], sole_int}')
-                                well_data.dict_perforation[plast]['интервал'].discard((roof_int, sole_int))
-                                well_data.dict_perforation[plast]['интервал'].add((roof_int, round(interval[1])))
-                                well_data.dict_perforation_short[plast]['интервал'].discard((roof_int, sole_int))
-                                well_data.dict_perforation_short[plast]['интервал'].add(
-                                    (roof_int, round(interval[1], 1)))
-
-                            elif interval[0] < roof_int < interval[1] is False and interval[0] < sole_int < interval[1]:
-                                # print(f'удаление2 {roof_int, sole_int}, добавление{interval[0], sole_int}')
-                                well_data.dict_perforation[plast]['интервал'].discard((roof_int, sole_int))
-                                well_data.dict_perforation[plast]['интервал'].add((round(interval[0], 1), sole_int))
-                                well_data.dict_perforation_short[plast]['интервал'].discard((roof_int, sole_int))
-                                well_data.dict_perforation_short[plast]['интервал'].add(
-                                    (round(interval[0], 1), sole_int))
-
-                            elif interval[0] < roof_int < interval[1] and interval[0] < sole_int < interval[1] is False:
-                                # print(f'удаление3 {roof_int, sole_int}, добавление{roof_int, round(interval[1],1)}')
-                                well_data.dict_perforation[plast]['интервал'].discard((roof_int, sole_int))
-                                well_data.dict_perforation[plast]['интервал'].add((roof_int, round(interval[1], 1)))
-                                well_data.dict_perforation_short[plast]['интервал'].discard((roof_int, sole_int))
-                                well_data.dict_perforation_short[plast]['интервал'].add(
-                                    (roof_int, round(interval[1], 1)))
-
-                            elif interval[0] < roof_int < interval[1] and interval[0] < sole_int < interval[1]:
-                                # print(f'удаление {roof_int, sole_int}')
-                                well_data.dict_perforation[plast]['интервал'].discard((roof_int, sole_int))
-                                well_data.dict_perforation_short[plast]['интервал'].discard((roof_int, sole_int))
 
                 well_data.dict_perforation.setdefault(plast, {}).setdefault('вскрытие', set()).add(row[col_open_index])
 
@@ -1036,13 +955,13 @@ class Well_perforation(FindIndexPZ):
                 if str(row[col_pressuar_index]).replace(',', '').replace('.', '').isdigit() and row[col_vert_index]:
                     data_p = float(str(row[col_pressuar_index]).replace(',', '.'))
                     well_data.dict_perforation.setdefault(plast, {}).setdefault('давление',
-                                                                               set()).add(round(data_p, 1))
+                                                                                set()).add(round(data_p, 1))
                     well_data.dict_perforation_short.setdefault(plast, {}).setdefault('давление',
-                                                                                     set()).add(round(data_p, 1))
+                                                                                      set()).add(round(data_p, 1))
                     zhgs = calculationFluidWork(float(row[col_vert_index]), float(data_p))
                 else:
                     well_data.dict_perforation_short.setdefault(plast, {}).setdefault('давление',
-                                                                                     set()).add('0')
+                                                                                      set()).add('0')
                 if zhgs:
                     well_data.dict_perforation.setdefault(plast, {}).setdefault('рабочая жидкость', set()).add(zhgs)
                 if row[col_date_pressuar_index]:
@@ -1053,7 +972,7 @@ class Well_perforation(FindIndexPZ):
                     [str(i).strip() is None for i in row]) == False and is_number(row[col_roof_index]) is True \
                     and is_number(
                 float(
-                    str(row[col_roof_index]).replace(',', '.'))) is True: # Определение проектных интервалов перфорации
+                    str(row[col_roof_index]).replace(',', '.'))) is True:  # Определение проектных интервалов перфорации
                 roof_int = round(float(str(row[col_roof_index]).replace(',', '.')), 1)
                 sole_int = round(float(str(row[col_sole_index]).replace(',', '.')), 1)
                 print(roof_int, sole_int)
@@ -1073,6 +992,19 @@ class Well_perforation(FindIndexPZ):
         if len(well_data.dict_perforation_project) != 0:
             well_data.plast_project = list(well_data.dict_perforation_project.keys())
 
+
+        # объединение интервалов перфорации если они пересекаются
+        for plast, value in well_data.dict_perforation.items():
+            intervals = value['интервал']
+            merged_segments = []
+            for roof_int, sole_int in sorted(list(intervals), key=lambda x: x[0]):
+
+                if not merged_segments or roof_int > merged_segments[-1][1]:
+                    merged_segments.append((roof_int, sole_int))
+                else:
+                    merged_segments[-1] = [merged_segments[-1][0], max(sole_int, merged_segments[-1][1])]
+            well_data.dict_perforation[plast]['интервал'] = merged_segments
+
         if self.perforation_correct_window2 is None:
             self.perforation_correct_window2 = PerforationCorrect(self)
             self.perforation_correct_window2.setWindowTitle("Сверка данных перфорации")
@@ -1090,30 +1022,29 @@ class Well_perforation(FindIndexPZ):
         if len(well_data.dict_perforation_project) != 0:
             well_data.plast_project = list(well_data.dict_perforation_project.keys())
 
-
+        print(well_data.dict_perforation)
 class Well_Category(FindIndexPZ):
 
     def __init__(self, ws):
-       
 
         super(Well_Category, self).__init__(ws)
         self.read_well(ws, well_data.cat_well_min._value, well_data.data_well_min._value)
 
     def read_well(self, ws, begin_index, cancel_index):
-       
+        from main import MyWindow
+
         # print(f'индекс катего {begin_index, cancel_index}')
         for row in range(begin_index, cancel_index):
             for col in range(1, 13):
                 cell = ws.cell(row=row, column=col).value
                 if cell:
-
                     if 'по Pпл' in str(cell):
                         for column in range(1, 13):
                             col = ws.cell(row=row, column=column).value
                             # print(col)
                             if str(col) in ['атм'] and ws.cell(row=row, column=column - 2).value:
                                 well_data.cat_P_1.append(ws.cell(row=row, column=column - 2).value)
-                              # print(well_data.cat_P_P)
+                                # print(well_data.cat_P_P)
                                 well_data.cat_P_P.append(ws.cell(row=row, column=column - 1).value)
 
                     elif 'по H2S' in str(cell) and 'по H2S' not in str(
@@ -1166,7 +1097,7 @@ class Well_Category(FindIndexPZ):
                 well_data.H2S_mg.append(mg)
         if len(well_data.H2S_mg) == 0:
             H2S_mg, _ = QInputDialog.getDouble(self, 'сероводород в процентах',
-                                               'Введите значение серовородода в процентах', 0, 0, 100, 5)
+                                               'Введите значение серовородода в мг/л', 0, 0, 100, 1)
             well_data.H2S_mg.append(H2S_mg)
 
         if self.data_window is None:
@@ -1188,31 +1119,3 @@ class Well_Category(FindIndexPZ):
 
             well_data.H2S_pr.append(H2S_pr)
 
-# wb = load_workbook('Копия 358 ПНЛГ  (Толбазинское 358) ПНЛГ на Дпаш.xlsx', data_only=True)
-# name_list = wb.sheetnames
-# old_index = 1
-# ws = wb.active
-#
-# # Создаем экземпляр класса FindIndexPZ
-# find_index = FindIndexPZ(ws)
-# find_index.readPZ(ws)
-# # Получаем значение атрибута cat_well_min
-# cat_well_min = find_index.cat_well_min
-# cat_well_max = find_index.cat_well_max
-#
-# d = Well_Category(ws)
-# d.read_well(cat_well_min, cat_well_max)
-# data_pvr_min = find_index.data_pvr_min
-# data_pvr_max = find_index.data_pvr_max
-# data_fond_min = find_index.data_fond_min
-# sucker_rod_ind = find_index.sucker_rod_ind
-# pipes_ind = find_index.pipes_ind
-# condition_of_wells = find_index.condition_of_wells
-# data_well_max = find_index.data_well_max
-# data_x_max = find_index.data_x_max
-# a = Well_expected_pick_up()
-#
-# a.read_well(data_well_max, data_x_max)
-# # Используем значение атрибута cat_well_min
-#
-# print(a.proc_water, a.Qwater, a.Qoil)

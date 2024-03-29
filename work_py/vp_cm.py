@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import QInputDialog
 
 import well_data
 from main import MyWindow
-from work_py.rir import RirWindow
+from .rir import RirWindow
 
 
 def vp(self):

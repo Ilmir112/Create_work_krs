@@ -2,7 +2,7 @@ from PyQt5 import QtWidgets
 from PyQt5.Qt import *
 
 import well_data
-from work_py.advanted_file import definition_plast_work
+from .advanted_file import definition_plast_work
 
 
 class TabPage_SO(QWidget):

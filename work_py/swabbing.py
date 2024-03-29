@@ -3,19 +3,17 @@ from PyQt5.QtWidgets import QMessageBox, QWidget, QLabel, QComboBox, \
     QMainWindow, QPushButton, QApplication
 
 import well_data
-from krs import well_volume
+from work_py.alone_oreration import well_volume
 from main import MyWindow
 
-from work_py.alone_oreration import privyazkaNKT, check_h2s
-from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
-
-from open_pz import CreatePZ
+from work_py.alone_oreration import privyazkaNKT, check_h2s, need_h2s
+from .rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
 
 
 class TabPage_SO_swab(QWidget):
     def __init__(self, paker_layout_combo, parent=None):
-        from work_py.acid_paker import CheckableComboBox
-        from work_py.opressovka import OpressovkaEK, TabPage_SO
+        from .acid_paker import CheckableComboBox
+
         super().__init__()
 
         self.swabTruelabelType = QLabel("компоновка", self)
@@ -32,22 +30,18 @@ class TabPage_SO_swab(QWidget):
         self.depthGaugeCombo = QComboBox(self)
         self.depthGaugeCombo.addItems(['Нет', 'Да'])
 
+        self.diametr_paker_labelType = QLabel("Диаметр пакера", self)
+        self.diametr_paker_edit = QLineEdit(self)
+
         self.pakerLabel = QLabel("глубина пакера", self)
         self.pakerEdit = QLineEdit(self)
+        self.pakerEdit.textChanged.connect(self.update_paker_depth)
         self.pakerEdit.setText(f"{int(well_data.perforation_sole - 40)}")
+
 
         self.paker2Label = QLabel("глубина вверхнего пакера", self)
         self.paker2Edit = QLineEdit(self)
         self.paker2Edit.setText(f"{int(well_data.perforation_sole - 40)}")
-
-        self.diametr_paker_labelType = QLabel("Диаметр пакера", self)
-        self.diametr_paker_edit = QLineEdit(self)
-        paker_depth = self.pakerEdit.text()
-        print(paker_depth)
-        if paker_depth:
-            paker_diametr = TabPage_SO.paker_diametr_select(self, paker_depth)
-            print(paker_diametr)
-        self.diametr_paker_edit.setText(str(paker_diametr))
 
         self.khovstLabel = QLabel("Длина хвостовики", self)
         self.khvostEdit = QLineEdit(self)
@@ -70,6 +64,20 @@ class TabPage_SO_swab(QWidget):
         self.swab_volumeEditLabel = QLabel("объем освоения", self)
         self.swab_volumeEdit = QLineEdit(self)
         self.swab_volumeEdit.setText('20')
+
+        self.need_change_zgs_label = QLabel('Необходимо ли менять ЖГС', self)
+        self.need_change_zgs_combo = QComboBox(self)
+        self.need_change_zgs_combo.addItems(['Нет', 'Да'])
+
+        self.plast_new_label = QLabel('индекс нового пласта', self)
+        self.plast_new_combo = QComboBox(self)
+        self.plast_new_combo.addItems(well_data.plast_project)
+
+        self.fluid_new_label = QLabel('удельный вес ЖГС', self)
+        self.fluid_new_edit = QLineEdit(self)
+
+        self.pressuar_new_label = QLabel('Ожидаемое давление', self)
+        self.pressuar_new_edit = QLineEdit(self)
 
         self.swabTrueEditType.currentTextChanged.connect(self.swabTrueEdit_select)
 
@@ -95,6 +103,49 @@ class TabPage_SO_swab(QWidget):
         self.grid.addWidget(self.depthGaugeLabel, 6, 4)
         self.grid.addWidget(self.depthGaugeCombo, 7, 4)
 
+        self.grid.addWidget(self.need_change_zgs_label, 9, 2)
+        self.grid.addWidget(self.need_change_zgs_combo, 10, 2)
+
+        self.grid.addWidget(self.plast_new_label, 9, 3)
+        self.grid.addWidget(self.plast_new_combo, 10, 3)
+
+        self.grid.addWidget(self.fluid_new_label, 9, 4)
+        self.grid.addWidget( self.fluid_new_edit, 10, 4)
+
+        self.grid.addWidget(self.pressuar_new_label, 9, 5)
+        self.grid.addWidget(self.pressuar_new_edit, 10, 5)
+
+    def update_need_fluid(self, index):
+        if index == 'Да':
+            self.grid.addWidget(self.plast_new_label, 9, 3)
+            self.grid.addWidget(self.plast_new_combo, 10, 3)
+
+            self.grid.addWidget(self.fluid_new_label, 9, 4)
+            self.grid.addWidget(self.fluid_new_edit, 10, 4)
+
+            self.grid.addWidget(self.pressuar_new_label, 9, 5)
+            self.grid.addWidget(self.pressuar_new_edit, 10, 5)
+            fluid_new, plast, expected_pressure = check_h2s(self)
+            print(fluid_new, plast, expected_pressure)
+
+            self.plast_new_combo.setCurrentIndex(well_data.plast_project.index(plast))
+            self.fluid_new_edit.setText(str(fluid_new))
+            self.pressuar_new_edit.setText(str(expected_pressure))
+
+        else:
+            self.plast_new_label.setParent(None)
+            self.plast_new_combo.setParent(None)
+            self.fluid_new_label.setParent(None)
+            self.fluid_new_edit.setParent(None)
+            self.pressuar_new_label.setParent(None)
+            self.pressuar_new_edit.setParent(None)
+
+    def update_paker_depth(self):
+        from .opressovka import OpressovkaEK, TabPage_SO
+        paker_depth = self.pakerEdit.text()
+        if paker_depth:
+            paker_diametr = int(TabPage_SO.paker_diametr_select(self, paker_depth))
+            self.diametr_paker_edit.setText(str(int(paker_diametr)))
     def swabTrueEdit_select(self):
         if self.swabTrueEditType.currentText() == 'однопакерная':
             self.pakerLabel.setText('Глубина пакера')
@@ -106,6 +157,12 @@ class TabPage_SO_swab(QWidget):
             self.grid.addWidget(self.pakerEdit, 1, 4)
             self.grid.addWidget(self.diametr_paker_labelType, 0, 2)
             self.grid.addWidget(self.diametr_paker_edit, 1, 2)
+            self.plast_new_label.setParent(None)
+            self.plast_new_combo.setParent(None)
+            self.fluid_new_label.setParent(None)
+            self.fluid_new_edit.setParent(None)
+            self.pressuar_new_label.setParent(None)
+            self.pressuar_new_edit.setParent(None)
 
         elif self.swabTrueEditType.currentText() == 'двухпакерная':
             self.pakerLabel.setText('Глубина нижнего пакера')
@@ -117,6 +174,12 @@ class TabPage_SO_swab(QWidget):
             self.grid.addWidget(self.paker2Edit, 1, 5)
             self.grid.addWidget(self.diametr_paker_labelType, 0, 2)
             self.grid.addWidget(self.diametr_paker_edit, 1, 2)
+            self.plast_new_label.setParent(None)
+            self.plast_new_combo.setParent(None)
+            self.fluid_new_label.setParent(None)
+            self.fluid_new_edit.setParent(None)
+            self.pressuar_new_label.setParent(None)
+            self.pressuar_new_edit.setParent(None)
 
         elif self.swabTrueEditType.currentText() == 'воронка':
             self.pakerLabel.setText('Глубина воронки')
@@ -127,6 +190,12 @@ class TabPage_SO_swab(QWidget):
             self.paker2Edit.setParent(None)
             self.diametr_paker_labelType.setParent(None)
             self.diametr_paker_edit.setParent(None)
+            self.plast_new_label.setParent(None)
+            self.plast_new_combo.setParent(None)
+            self.fluid_new_label.setParent(None)
+            self.fluid_new_edit.setParent(None)
+            self.pressuar_new_label.setParent(None)
+            self.pressuar_new_edit.setParent(None)
 
 
         elif self.swabTrueEditType.currentText() == 'пакер с заглушкой':
@@ -139,6 +208,12 @@ class TabPage_SO_swab(QWidget):
             self.khvostEdit.setParent(None)
             self.pakerLabel.setParent(None)
             self.pakerEdit.setParent(None)
+            self.plast_new_label.setParent(None)
+            self.plast_new_combo.setParent(None)
+            self.fluid_new_label.setParent(None)
+            self.fluid_new_edit.setParent(None)
+            self.pressuar_new_label.setParent(None)
+            self.pressuar_new_edit.setParent(None)
             self.diametr_paker_labelType.setParent(None)
             self.diametr_paker_edit.setParent(None)
             self.pakerLabel.setText('Глубина пакера')
@@ -156,6 +231,10 @@ class TabPage_SO_swab(QWidget):
             self.paker2Label.setParent(None)
             self.paker2Edit.setParent(None)
         elif self.swabTrueEditType.currentText() == 'Опрессовка снижением уровня на шаблоне':
+            self.need_change_zgs_combo.currentTextChanged.connect(self.update_need_fluid)
+            if len(well_data.plast_work) == 0:
+                self.need_change_zgs_combo.setCurrentIndex(1)
+
             self.depthGaugeLabel.setParent(None)
             self.depthGaugeCombo.setParent(None)
             self.swab_volumeEditLabel.setParent(None)
@@ -174,6 +253,22 @@ class TabPage_SO_swab(QWidget):
             self.paker2Edit.setText(f'{well_data.current_bottom - 250}')
             self.grid.addWidget(self.paker2Label, 0, 3)
             self.grid.addWidget(self.paker2Edit, 1, 3)
+
+            self.need_change_zgs_label = QLabel('Необходимо ли менять ЖГС', self)
+            self.need_change_zgs_combo = QComboBox(self)
+            self.need_change_zgs_combo.addItems(['Да', 'Нет'])
+
+            self.plast_new_label = QLabel('индекс нового пласта', self)
+            self.plast_new_combo = QComboBox(self)
+            self.plast_new_combo.addItems(well_data.plast_project)
+
+            self.fluid_new_label = QLabel('удельный вес ЖГС', self)
+            self.fluid_new_edit = QLineEdit(self)
+
+            self.pressuar_new_label = QLabel('Ожидаемое давление', self)
+            self.pressuar_new_edit = QLineEdit(self)
+
+
         elif self.swabTrueEditType.currentText() == 'Опрессовка снижением уровня на пакере с заглушкой':
             self.paker2Label.setText('Глубина Понижения провня')
             self.paker2Edit.setText(f'{well_data.current_bottom - 250}')
@@ -276,7 +371,11 @@ class Swab_Window(QMainWindow):
         self.close()
 
     def swabbing_opy_with_paker(self, diametr_paker, paker_khost, paker_depth, depth_opy):
-       
+        need_change_zgs_combo = str(self.tabWidget.currentWidget().need_change_zgs_combo.currentText())
+        if need_change_zgs_combo == 'Да':
+            plast_new_combo = str(self.tabWidget.currentWidget().plast_new_combo.currentText())
+            fluid_new_edit = int(float(self.tabWidget.currentWidget().fluid_new_edit.text()))
+            pressuar_new_edit = float(self.tabWidget.currentWidget().pressuar_new_edit.text())
 
         nkt_diam = ''.join(['73' if well_data.column_diametr._value > 110 or (
                 well_data.column_diametr._value > 110 and well_data.column_additional is True \
@@ -357,7 +456,7 @@ class Swab_Window(QMainWindow):
         fluid_change_quest = QMessageBox.question(self, 'Смена объема',
                                                   'Нужна ли смена удельного веса рабочей жидкости?')
         if fluid_change_quest == QMessageBox.StandardButton.Yes:
-            well_data.fluid_work, well_data.fluid_work_short, plast, expected_pressure = check_h2s(self)
+            well_data.fluid_work, well_data.fluid_work_short, plast, expected_pressure = need_h2s(self)
 
             fluid_change_list = [
                 [None, None,
@@ -383,17 +482,21 @@ class Swab_Window(QMainWindow):
             for row in fluid_change_list:
                 paker_list.append(row)
         else:
-            paker_list.append([None, None,
-                               f'Поднять {paker_select} на НКТ{nkt_diam} c глубины {depth_opy + 200}м с доливом скважины в '
-                               f'объеме {round((depth_opy + 200) * 1.12 / 1000, 1)}м3 удельным весом {well_data.fluid_work}',
-                               None, None, None, None, None, None, None,
-                               'мастер КРС',
-                               liftingNKT_norm(depth_opy + 200, 1)])
+            paker_list.append(
+                [None, None,
+                   f'Поднять {paker_select} на НКТ{nkt_diam} c глубины {depth_opy + 200}м с доливом скважины в '
+                   f'объеме {round((depth_opy + 200) * 1.12 / 1000, 1)}м3 удельным весом {well_data.fluid_work}',
+                   None, None, None, None, None, None, None,
+                   'мастер КРС',
+                   liftingNKT_norm(depth_opy + 200, 1)])
         return paker_list
 
     def swabbing_opy(self, depth_opy):
        
-        from work_py.template_work import TabPage_SO_with
+        from .template_work import TabPage_SO_with
+
+        need_change_zgs_combo = str(self.tabWidget.currentWidget().need_change_zgs_combo.currentText())
+
         if well_data.column_additional is False or (well_data.column_additional and
                                                    well_data.head_column_additional._value >= well_data.current_bottom):
             first_template, template_second = TabPage_SO_with.template_diam_ek(self)
@@ -407,7 +510,7 @@ class Swab_Window(QMainWindow):
         if well_data.column_additional == False or well_data.column_additional == True and \
                 well_data.current_bottom < well_data.head_column_additional._value and \
                 well_data.head_column_additional._value > 600:
-            paker_select = f'воронку со свабоограничителем + шаблон {first_template} L-2 + НКТ{nkt_diam}  + НКТ 10м + репер'
+            paker_select = f'воронку со свабоограничителем + шаблон {first_template}мм L-2 + НКТ{nkt_diam} + НКТ 10м + репер'
             paker_short = f'воронку со с/о + шаблон {first_template} L-2 + НКТ{nkt_diam}  + НКТ 10м + репер'
             dict_nkt = {73: depth_opy}
         elif well_data.column_additional == True and well_data.column_additional_diametr._value < 110 and \
@@ -419,7 +522,7 @@ class Swab_Window(QMainWindow):
                         60: int(well_data.current_bottom - well_data.head_column_additional._value)}
         elif well_data.column_additional == True and well_data.column_additional_diametr._value > 110 and \
                 well_data.current_bottom >= well_data.head_column_additional._value:
-            paker_select = f'воронку со свабоограничителем + шаблон {first_template} L-2 + НКТ{well_data.nkt_diam}мм ' \
+            paker_select = f'воронку со свабоограничителем + шаблон {first_template}мм L-2 + НКТ{well_data.nkt_diam}мм ' \
                            f'со снятыми фасками + ' \
                            f'НКТ{well_data.nkt_diam}мм со снятыми фасками 10м ' \
                            f'{round(well_data.current_bottom - well_data.head_column_additional._value + 10, 0)}м'
@@ -480,13 +583,18 @@ class Swab_Window(QMainWindow):
              f' с целью недопущения попадания кислоты в систему сбора. (Протокол №095-ПП от 19.10.2015г).',
              None, None, None, None, None, None, None,
              'Мастер КРС, подрядчик по ГИС', None]]
+        print(f'перевод {need_change_zgs_combo}')
 
-        fluid_change_quest = QMessageBox.question(self, 'Смена объема',
-                                                  'Нужна ли смена удельного веса рабочей жидкости?')
-        if fluid_change_quest == QMessageBox.StandardButton.Yes:
-            well_data.fluid_work, well_data.fluid_work_short, plast, expected_pressure = check_h2s(self)
+        if need_change_zgs_combo == 'Да':
+            plast_new = str(self.tabWidget.currentWidget().plast_new_combo.currentText())
+            fluid_new = round(float(float(self.tabWidget.currentWidget().fluid_new_edit.text())),2)
+            pressuar_new = float(self.tabWidget.currentWidget().pressuar_new_edit.text())
+
+            well_data.fluid_work, well_data.fluid_work_short, plast, expected_pressure = need_h2s(
+                fluid_new, plast_new, pressuar_new)
+
             fluid_change_list = [
-                [f'Допустить до {well_data.current_bottom}м. Произвести смену объема  {well_data.fluid_work}г/см3 '
+                [f'Допустить до {well_data.current_bottom}м. Произвести смену объема  {well_data.fluid_work_short} '
                  f'не менее {round(well_volume(self, well_data.current_bottom), 1)}м3', None,
                  f'Допустить до {well_data.current_bottom}м. Произвести смену объема обратной '
                  f'промывкой по круговой циркуляции  жидкостью  {well_data.fluid_work} '
@@ -507,8 +615,7 @@ class Swab_Window(QMainWindow):
                  liftingNKT_norm(well_data.current_bottom, 1)]
             ]
 
-            for row in fluid_change_list:
-                paker_list.append(row)
+            paker_list.extend(fluid_change_list)
         else:
             paker_list.append([None, None,
                                f'Поднять {paker_select} на НКТ{nkt_diam} c глубины {depth_opy + 200}м с доливом скважины в '
@@ -553,7 +660,7 @@ class Swab_Window(QMainWindow):
     def swabbing_with_paker_stub(self, diametr_paker, paker_depth, paker_khost, plast_combo, swabTypeCombo,
                                  swab_volumeEdit, depthGaugeCombo):
        
-        from work_py.opressovka import OpressovkaEK, TabPage_SO
+        from .opressovka import OpressovkaEK, TabPage_SO
 
         swab_short, swab_select = Swab_Window.swab_select(self, swabTypeCombo, plast_combo, swab_volumeEdit)
 
@@ -697,7 +804,7 @@ class Swab_Window(QMainWindow):
     def swabbing_with_paker(self, diametr_paker, paker_depth, paker_khost, plast_combo, swabTypeCombo, swab_volumeEdit,
                             depthGaugeCombo):
        
-        from work_py.opressovka import OpressovkaEK
+        from .opressovka import OpressovkaEK
 
         swab_short, swab_select = Swab_Window.swab_select(self, swabTypeCombo, plast_combo, swab_volumeEdit)
 
@@ -839,7 +946,7 @@ class Swab_Window(QMainWindow):
     def swabbing_with_2paker(self, diametr_paker, paker1_depth, paker2_depth, paker_khost, plast_combo, swabTypeCombo,
                              swab_volumeEdit, depthGaugeCombo):
        
-        from work_py.opressovka import OpressovkaEK
+        from .opressovka import OpressovkaEK
 
         swab_short, swab_select = Swab_Window.swab_select(self, swabTypeCombo, plast_combo, swab_volumeEdit)
 

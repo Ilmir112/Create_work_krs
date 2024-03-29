@@ -26,9 +26,11 @@ class CalcFond:
         calc_pressuar_dict = {}
         for nkt_l in calc_nkt_list:
             if nkt_l <= float(self.static_level):
-                p = round(self.fluid * 9.81 * nkt_l / 100, 0)
+                print(f'ЖГС {self.fluid}')
+                p = round(float(self.fluid) * 9.81 * nkt_l / 100, 0)
             else:
-                p = round(self.fluid * 9.81 * nkt_l / 100-((nkt_l - float(self.static_level)) * 9.81 * self.fluid) / 100, 0)
+                p = round(float(self.fluid) * 9.81 * nkt_l / 100-
+                          ((nkt_l - float(self.static_level)) * 9.81 * float(self.fluid)) / 100, 0)
 
             if p >= 150:
                 p = 150
@@ -36,5 +38,3 @@ class CalcFond:
             calc_pressuar_dict[nkt_l] = 149 - p if pressuar_nkt < 149 - p else pressuar_nkt
         return calc_pressuar_dict
 
-calc = CalcFond(1000, 1450, 1.13, 40, 300)
-print(calc.calc_pressuar_list())

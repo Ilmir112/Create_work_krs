@@ -9,10 +9,10 @@ import main
 import well_data
 from main import MyWindow
 from work_py.alone_oreration import kot_select
-from work_py.opressovka import OpressovkaEK
-from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm,well_volume_norm
-from work_py.opressovka import OpressovkaEK, TabPage_SO
-from work_py.grp import Grp_window
+from .opressovka import OpressovkaEK
+from .rationingKRS import descentNKT_norm, liftingNKT_norm,well_volume_norm
+from .opressovka import OpressovkaEK, TabPage_SO
+from .grp import Grp_window
 
 
 class TabPage_SO_grp(QWidget):
@@ -256,7 +256,7 @@ class Gpp_window(QMainWindow):
 
     def gpp_select(self, paker_depth):
        
-        from work_py.opressovka import TabPage_SO
+        from .opressovka import TabPage_SO
         if well_data.column_diametr._value > 120:
             nkt_diam = '89'
         else:

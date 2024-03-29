@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QInputDialog
 
 import well_data
-from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm
+from .rationingKRS import descentNKT_norm, liftingNKT_norm
 
 
 def magnet_select(self):

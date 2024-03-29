@@ -78,10 +78,9 @@ class CreatePZ(QMainWindow):
                 well_data.problemWithEk_depth, ok = QInputDialog.getInt(None, 'Глубина сужения',
                                                                           "ВВедите глубину сужения", 0, 0,
                                                                           int(well_data.current_bottom))
-                well_data.problemWithEk_diametr = ProtectedIsDigit(
-                    QInputDialog.getInt(None, 'диаметр внутренний сужения',
+                well_data.problemWithEk_diametr = QInputDialog.getInt(None, 'диаметр внутренний сужения',
                                         "ВВедите внутренний диаметр сужения", 0, 0,
-                                        int(well_data.current_bottom))[0])
+                                        int(well_data.current_bottom))[0]
             else:
                 well_data.problemWithEk = ProtectedIsNonNone(False)
 

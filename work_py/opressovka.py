@@ -5,9 +5,8 @@ from main import MyWindow
 from PyQt5.QtWidgets import QMessageBox, QInputDialog, QMainWindow, QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, \
     QTabWidget, QPushButton
 
-from work_py.acid_2paker import AcidPakerWindow
 from work_py.alone_oreration import privyazkaNKT
-from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm
+from .rationingKRS import descentNKT_norm, liftingNKT_norm
 
 
 class TabPage_SO(QWidget):

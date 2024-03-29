@@ -2,19 +2,20 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox
 
 
 import well_data
-from krs import well_volume
+
 from selectPlast import CheckBoxDialog
-from work_py.rationingKRS import well_volume_norm
+from .rationingKRS import well_volume_norm
 from main import MyWindow
 
 
 
 def acid_work(self):
-    from work_py.swabbing import Swab_Window
-    from work_py.opressovka import OpressovkaEK
-    from work_py.alone_oreration import privyazkaNKT
-    from work_py.acid_paker import AcidPakerWindow
-    from work_py.rationingKRS import liftingNKT_norm, descentNKT_norm, well_volume_norm
+    from .swabbing import Swab_Window
+    from .opressovka import OpressovkaEK
+    from work_py.alone_oreration import privyazkaNKT, well_volume
+    from .acid_paker import AcidPakerWindow
+
+    from .rationingKRS import liftingNKT_norm, descentNKT_norm, well_volume_norm
 
     if len(well_data.plast_work) == 0:
         msc = QMessageBox.information(self, 'Внимание', 'Отсутствуют рабочие интервалы перфорации')
@@ -179,9 +180,9 @@ def open_checkbox_dialog():
     dialog.exec_()
 def acid_work_list(self, paker_depth, paker_khost, dict_nkt, paker_layout):
 
-    from krs import volume_vn_nkt
-    from krs import well_volume
-    from work_py.acid_paker import AcidPakerWindow
+    from work_py.alone_oreration import volume_vn_nkt
+
+    from work_py.alone_oreration import well_volume
 
     open_checkbox_dialog()
     
@@ -323,7 +324,7 @@ def acid_work_list(self, paker_depth, paker_khost, dict_nkt, paker_layout):
 acid_true_quest_list = []
 def reply_acid(self, paker_khost):
 
-    from work_py.acid_paker import AcidPakerWindow
+    from .acid_paker import AcidPakerWindow
     acid_true_quest = QMessageBox.question(self, 'Необходимость кислоты',
                                            'Нужно ли планировать кислоту на следующий объет?')
 
@@ -371,13 +372,16 @@ def pressure_mode(mode, plast):
 
 # промывка скважины после кислотной обработки в зависимости от интервала перфорации и комповноки и текущего забоя
 def flushingDownhole(self, paker_depth, paker_khost, paker_layout):
+    from work_py.alone_oreration import well_volume
 
 
 
     if paker_layout == 2:
-        flushingDownhole_list = f'Только при наличии избыточного давления или когда при проведении ОПЗ получен технологический ""СТОП":' \
+        flushingDownhole_list = f'Только при наличии избыточного давления или когда при проведении ОПЗ получен ' \
+                                f'технологический ""СТОП":' \
                                 f'произвести промывку скважину обратной промывкой ' \
-                                f'по круговой циркуляции  жидкостью уд.весом {well_data.fluid_work} при расходе жидкости не ' \
+                                f'по круговой циркуляции  жидкостью уд.весом {well_data.fluid_work} при расходе' \
+                                f' жидкости не ' \
                                 f'менее 6-8 л/сек в объеме не менее {round(well_volume(self, paker_depth) * 1.5, 1)}м3 ' \
                                 f'в присутствии представителя заказчика ДО ЧИСТОЙ ВОДЫ.'
     elif paker_depth + paker_khost >= well_data.current_bottom or (paker_depth + paker_khost < well_data.current_bottom):

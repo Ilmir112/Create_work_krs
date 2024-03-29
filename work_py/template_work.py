@@ -4,8 +4,8 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox, QTabWidget, QWidget, QLab
 
 import well_data
 from PyQt5.QtCore import Qt
-from work_py.acid_paker import AcidPakerWindow
-from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
+from .acid_paker import AcidPakerWindow
+from .rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
 from work_py.alone_oreration import kot_work
 from PyQt5.QtGui import QDoubleValidator
 from main import MyWindow
@@ -60,7 +60,7 @@ class TabPage_SO_with(QWidget):
 
         self.dictance_three_Label = QLabel("третья", self)
         self.dictance_three_Edit = QLineEdit(self)
-        # self.dictance_three_Edit.setValidator()
+        self.dictance_three_Edit.setValidator(validator)
 
         self.roof_skm_label = QLabel("Кровля скреперования", self)
         self.roof_skm_line = QLineEdit(self)
@@ -214,11 +214,8 @@ class TabPage_SO_with(QWidget):
             dictance_three = ''
         nkt_diam = well_data.nkt_diam
 
-        roof_plast, roof_add_column_plast = self.definition_roof_not_raiding()
-
         if well_data.column_additional or \
-                (
-                        well_data.head_column_additional._value >= well_data.current_bottom and well_data.column_additional is False):
+                (well_data.head_column_additional._value >= well_data.current_bottom and well_data.column_additional is False):
             nkt_pod = '60мм' if well_data.column_additional_diametr._value < 110 else '73мм со снятыми фасками'
 
         if first_template != '' and lenght_template_first != '' and \
@@ -262,17 +259,17 @@ class TabPage_SO_with(QWidget):
                     skm_teml_str = f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
 
             elif self.template_Combo.currentText() == 'ПСШ Доп колонна СКМ в основной колонне':
-                if dictance_template_second != None:
+                if dictance_template_second != None and  dictance_template_first and dictance_three:
                     template_str = f'обточная муфта  + ' \
                                    f'НКТ{nkt_pod}  + {dictance_template_first}м + шаблон-{first_template}мм ' \
                                    f'L-{lenght_template_first}м + ' \
                                    f'НКТ{nkt_pod} {dictance_template_second}м + НКТ{nkt_diam} {dictance_three}м + ' \
                                    f'СКМ-{skm} + шаблон-{template_second}мм L-{lenght_template_second}м '
 
-                    well_data.template_depth_addition = int(roof_add_column_plast - 5)
+                    well_data.template_depth_addition = well_data.current_bottom - int(dictance_template_first)
 
-                    well_data.template_depth = int(
-                        roof_add_column_plast - 5 - dictance_template_second - dictance_three)
+                    well_data.template_depth = well_data.current_bottom - int(dictance_template_first) - \
+                                               int(dictance_template_second) - int(dictance_three)
                     well_data.skm_depth = well_data.template_depth + dictance_three
                 # template_str = template_SKM_DP_EK
                 skm_teml_str = f'шаблон-{first_template}мм до гл.{well_data.template_depth_addition}м, ' \
@@ -280,17 +277,20 @@ class TabPage_SO_with(QWidget):
 
 
             elif self.template_Combo.currentText() == 'ПСШ СКМ в доп колонне c хвостом':
-                if dictance_template_second != None:
+                if dictance_three and dictance_template_second and dictance_template_first and lenght_template_first:
                     template_str = f'обточная муфта + НКТ{nkt_pod} {dictance_template_first}м ' \
                                    f'+ СКМ-{skm} + НКТ{nkt_pod} {dictance_template_second}м + шаблон-{first_template}мм ' \
                                    f'L-{lenght_template_first}м + НКТ{nkt_pod} {dictance_three}м + ' \
                                    f'шаблон-{template_second}мм L-{lenght_template_second}м '
-                    well_data.template_depth = math.ceil(well_data.current_bottom - 2 -
-                                                         int(dictance_template_first) - int(dictance_template_second) -
-                                                         int(lenght_template_first) - int(dictance_three))
-                    well_data.template_depth_addition = math.ceil(
-                        well_data.current_bottom - int(dictance_template_first) - int(dictance_template_second))
-                    well_data.skm_depth =  well_data.current_bottom - int(dictance_template_first)
+
+
+
+                    well_data.template_depth = well_data.current_bottom - int(dictance_template_first) - \
+                                               int(dictance_template_second) - int(dictance_three) - \
+                                               int(lenght_template_first)
+                    well_data.template_depth_addition = well_data.current_bottom - int(dictance_template_first) - \
+                                                        int(dictance_template_second)
+                    well_data.skm_depth = well_data.template_depth_addition + int(dictance_template_second)
 
                     skm_teml_str = f'шаблон-{first_template}мм до гл.{well_data.template_depth_addition}м, ' \
                                    f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
@@ -301,14 +301,15 @@ class TabPage_SO_with(QWidget):
                                    f'шаблон-{first_template}мм L-{lenght_template_first}м + ' \
                                    f'НКТ{nkt_pod} {dictance_three}м + шаблон-{template_second}мм ' \
                                    f'L-{lenght_template_second}м '
+                    if dictance_three and dictance_template_second and lenght_template_first:
+                        well_data.template_depth_addition = well_data.current_bottom - int(dictance_template_second)
 
-                    well_data.template_depth = math.ceil(
-                        roof_add_column_plast - 5 - dictance_template_second - dictance_three)
-                    well_data.template_depth_addition = math.ceil(
-                        well_data.current_bottom - int(dictance_template_second))
-                    well_data.skm_depth = well_data.template_depth_addition + dictance_template_second
-                    skm_teml_str = f'шаблон-{first_template}мм до гл.{well_data.template_depth_addition}м, ' \
-                                   f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
+                        well_data.template_depth = well_data.current_bottom - int(dictance_template_second) - \
+                                                   int(dictance_three) - int(lenght_template_first)
+                        well_data.skm_depth = well_data.template_depth + int(dictance_three)
+
+                        skm_teml_str = f'шаблон-{first_template}мм до гл.{well_data.template_depth_addition}м, ' \
+                                       f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
 
 
             elif self.template_Combo.currentText() == 'ПСШ СКМ в доп колонне + открытый ствол':
@@ -318,14 +319,18 @@ class TabPage_SO_with(QWidget):
                                    f'L-{lenght_template_first}м' \
                                    f' + НКТ{nkt_pod} {dictance_three}м + шаблон-{template_second}мм ' \
                                    f'L-{lenght_template_second}м '
-                    well_data.template_depth_addition = math.ceil(roof_add_column_plast -
-                                                                  5 - dictance_template_second)
+                    if dictance_three and dictance_template_second and dictance_template_first and lenght_template_first:
+                        well_data.template_depth_addition = well_data.current_bottom - int(dictance_template_first) - \
+                                                            int(dictance_template_second)
 
-                    well_data.skm_depth = well_data.template_depth_addition + dictance_template_second
+                        well_data.template_depth = well_data.current_bottom - int(dictance_template_first) - \
+                                                   int(dictance_template_second) - int(dictance_three) - \
+                                                   int(lenght_template_first)
+                        well_data.skm_depth = well_data.template_depth_addition + int(dictance_template_second)
 
-                    skm_teml_str = f'шаблон-{first_template}мм до гл.{well_data.template_depth_addition}м, ' \
-                                   f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
-            if dictance_template_second != "":
+                        skm_teml_str = f'шаблон-{first_template}мм до гл.{well_data.template_depth_addition}м, ' \
+                                       f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
+            if dictance_three and dictance_template_second and dictance_template_first and lenght_template_first:
                 self.template_str_Edit.setText(template_str)
                 self.skm_teml_str_Edit.setText(skm_teml_str)
 
@@ -346,8 +351,10 @@ class TabPage_SO_with(QWidget):
         self.dictance_template_second_Edit.setText(str(10))
 
         roof_plast, roof_add_column_plast = self.definition_roof_not_raiding()
-        dictance_template_first1 = int(well_data.current_bottom - roof_plast + 5)
-        self.dictance_template_first_Edit.setText(str(dictance_template_first1))
+
+        print(f'кровля отрайби интерва {roof_plast, roof_add_column_plast}')
+        dictance_template_first = int(well_data.current_bottom - roof_plast + 5)
+        self.dictance_template_first_Edit.setText(str(dictance_template_first))
 
         lenght_template_first, lenght_template_second = self.definition_ECN_true(well_data.dict_pump_ECN_h["posle"])
         self.lenght_template_first_Edit.setText(lenght_template_first)
@@ -356,8 +363,6 @@ class TabPage_SO_with(QWidget):
         first_template = self.template_first_Edit.text()
         template_second = int(self.template_second_Edit.text())
         lenght_template_first = int(self.lenght_template_first_Edit.text())
-
-        dictance_template_first = int(self.dictance_template_first_Edit.text())
 
         lenght_template_second = int(self.lenght_template_second_Edit.text())
         dictance_template_second = int(self.dictance_template_second_Edit.text())
@@ -395,7 +400,7 @@ class TabPage_SO_with(QWidget):
                            f'L-{lenght_template_second}м '
 
             # print(f'строка шаблона {template_str}')
-            well_data.template_depth = int(well_data.current_bottom - int(dictance_template_first1) -
+            well_data.template_depth = int(well_data.current_bottom - int(dictance_template_first) -
                                            int(lenght_template_first)) - int(dictance_template_second)
             well_data.skm_depth = well_data.template_depth + dictance_template_second
             skm_teml_str = f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
@@ -421,7 +426,7 @@ class TabPage_SO_with(QWidget):
             self.grid.addWidget(self.lenght_template_second_Edit, 5, 9)
 
             self.template_first_Edit.setText('фильтр направление')
-            self.dictance_template_first_Edit.setText(str(dictance_template_first1))
+            self.dictance_template_first_Edit.setText(str(dictance_template_first))
             self.dictance_template_second_Edit.setText(str(10))
             dictance_template_first = int(self.dictance_template_first_Edit.text())
             dictance_template_second = int(self.dictance_template_second_Edit.text())
@@ -456,24 +461,26 @@ class TabPage_SO_with(QWidget):
             self.skm_Edit.setText(str(well_data.column_diametr._value))
             self.dictance_template_first_Edit.setText(str(dictance_template_first1))
             dictance_template_first = int(self.dictance_template_first_Edit.text())
-            dictance_second1 = int(
-                roof_add_column_plast - lenght_template_first - well_data.head_column_additional._value - 5)
-            self.dictance_template_second_Edit.setText(str(dictance_second1))
-            dictance_template_second = int(self.dictance_template_second_Edit.text())
+            dictance_template_second = well_data.current_bottom - dictance_template_first1 - \
+                               lenght_template_first - well_data.head_column_additional._value +5
+            self.dictance_template_second_Edit.setText(str(dictance_template_second))
+
             self.lenght_template_second_Edit.setText(str(lenght_template_second))
 
-            self.dictance_three_Edit.setText(str(roof_plast - well_data.head_column_additional._value + 10))
-            dictance_three_first = int(float(self.dictance_three_Edit.text()))
+            dictance_template_three = (well_data.current_bottom - dictance_template_first - \
+                                       int(dictance_template_second) - lenght_template_first) - roof_plast + 10
+            self.dictance_three_Edit.setText(str(dictance_template_three))
+
 
             template_str = f'обточная муфта  + ' \
                            f'НКТ{nkt_pod}  + {dictance_template_first}м + шаблон-{first_template}мм L-{lenght_template_first}м + ' \
                            f'НКТ{nkt_pod} {dictance_template_second}м +' \
-                           f'СКМ-{skm} + НКТ{nkt_diam} {dictance_three_first}м + шаблон-{template_second}мм L-{lenght_template_second}м '
+                           f'СКМ-{skm} + НКТ{nkt_diam} {dictance_template_three}м + шаблон-{template_second}мм L-{lenght_template_second}м '
 
             well_data.template_depth_addition = int(well_data.current_bottom - dictance_template_first)
             well_data.template_depth = int(well_data.current_bottom - dictance_template_first - lenght_template_first -
-                                           dictance_template_second - dictance_three_first)
-            well_data.skm_depth = well_data.template_depth + dictance_three_first
+                                           dictance_template_second - dictance_template_three)
+            well_data.skm_depth = well_data.template_depth + dictance_template_three
             # template_str = template_SKM_DP_EK
             skm_teml_str = f'шаблон-{first_template}мм до гл.{well_data.template_depth_addition}м, ' \
                            f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
@@ -492,25 +499,29 @@ class TabPage_SO_with(QWidget):
             self.grid.addWidget(self.dictance_three_Label, 4, 7)
             self.grid.addWidget(self.dictance_three_Edit, 5, 7)
 
-            self.skm_Edit.setText(str(well_data.column_additional_diametr._value))
-            skm = str(self.skm_Edit.text())
-            dictance_template_first1 = int(well_data.current_bottom - roof_add_column_plast + 5)
-            self.dictance_template_first_Edit.setText(str(dictance_template_first1))
-            dictance_template_first = int(self.dictance_template_first_Edit.text())
+            skm = str(well_data.column_additional_diametr._value)
+            self.skm_Edit.setText(skm)
 
-            dictance_three_first = int(roof_add_column_plast - well_data.head_column_additional._value - int(
-                self.lenght_template_first_Edit.text()) - 9)
-            self.dictance_three_Edit.setText(str(dictance_three_first))
-            dictance_template_three = int(self.dictance_three_Edit.text())
+            dictance_template_first = int(well_data.current_bottom - roof_add_column_plast + 5)
+            self.dictance_template_first_Edit.setText(str(dictance_template_first))
+
+            dictance_template_three = (well_data.current_bottom - dictance_template_first - \
+                                      int(dictance_template_second) - lenght_template_first) - roof_plast + 10
+
+            self.dictance_three_Edit.setText(str(dictance_template_three))
+
             template_str = f'обточная муфта + НКТ{nkt_pod} {dictance_template_first}м ' \
                            f'+ СКМ-{skm} + НКТ{nkt_pod} {dictance_template_second}м + шаблон-{first_template}мм ' \
-                           f'L-{lenght_template_first}м + НКТ{nkt_pod} {dictance_three_first}м + ' \
+                           f'L-{lenght_template_first}м + НКТ{nkt_pod} {dictance_template_three}м + ' \
                            f'шаблон-{template_second}мм L-{lenght_template_second}м '
-            well_data.template_depth = math.ceil(well_data.current_bottom - 2 -
+
+            well_data.template_depth = math.ceil(well_data.current_bottom -
                                                  dictance_template_first - dictance_template_second -
                                                  lenght_template_first - dictance_template_three)
-            well_data.template_depth_addition = math.ceil(well_data.current_bottom - 2 -
-                                                          dictance_template_first - dictance_template_second)
+
+            well_data.template_depth_addition = math.ceil(well_data.current_bottom - dictance_template_first -
+                                                          dictance_template_second)
+
             well_data.skm_depth = well_data.template_depth_addition + dictance_template_second
 
             skm_teml_str = f'шаблон-{first_template}мм до гл.{well_data.template_depth_addition}м, ' \
@@ -521,27 +532,27 @@ class TabPage_SO_with(QWidget):
             self.grid.addWidget(self.dictance_three_Label, 4, 7)
             self.grid.addWidget(self.dictance_three_Edit, 5, 7)
 
-            dictance_template_first1 = 0
-            self.dictance_template_first_Edit.setText(str(dictance_template_first1))
+            dictance_template_first = 0
+            self.dictance_template_first_Edit.setText(str(dictance_template_first))
 
-            self.skm_Edit.setText(str(well_data.column_additional_diametr._value))
-            skm = str(self.skm_Edit.text())
-            self.dictance_template_second_Edit.setText(str(10))
-            dictance_template_second = int(self.dictance_template_second_Edit.text())
+            skm = str(well_data.column_additional_diametr._value)
+            self.skm_Edit.setText(skm)
+            dictance_template_second = 10
+            self.dictance_template_second_Edit.setText(str(dictance_template_second))
 
-            dictance_three = int(
-                well_data.current_bottom - int(dictance_template_second) - well_data.head_column_additional._value
-                - int(lenght_template_first) + 4)
-            self.dictance_three_Edit.setText(str(dictance_three))
-            dictance_three_first = int(self.dictance_three_Edit.text())
+            dictance_template_three = (well_data.current_bottom - dictance_template_first - \
+                                       int(dictance_template_second) - lenght_template_first) - roof_plast + 10
+
+            self.dictance_three_Edit.setText(str(dictance_template_three))
+
 
             template_str = f'обточная муфта + СКМ-{skm} + НКТ{nkt_pod} {dictance_template_second} + ' \
                            f'шаблон-{first_template}мм L-{lenght_template_first}м + ' \
-                           f'НКТ{nkt_pod} {dictance_three_first}м + шаблон-{template_second}мм ' \
+                           f'НКТ{nkt_pod} {dictance_template_three}м + шаблон-{template_second}мм ' \
                            f'L-{lenght_template_second}м '
 
             well_data.template_depth = math.ceil(well_data.current_bottom - dictance_template_second -
-                                                 lenght_template_first - dictance_three_first)
+                                                 lenght_template_first - dictance_template_three)
             well_data.template_depth_addition = math.ceil(well_data.current_bottom - dictance_template_second)
             well_data.skm_depth = well_data.template_depth_addition + dictance_template_second
             skm_teml_str = f'шаблон-{first_template}мм до гл.{well_data.template_depth_addition}м, ' \
@@ -562,26 +573,27 @@ class TabPage_SO_with(QWidget):
             self.grid.addWidget(self.dictance_three_Label, 4, 7)
             self.grid.addWidget(self.dictance_three_Edit, 5, 7)
 
-            self.skm_Edit.setText(str(well_data.column_additional_diametr._value))
-            skm = str(self.skm_Edit.text())
-            dictance_template_first1 = int(well_data.current_bottom - roof_add_column_plast + 5)
-            self.dictance_template_first_Edit.setText(str(dictance_template_first1))
-            dictance_template_first = int(self.dictance_template_first_Edit.text())
+            skm = str(well_data.column_additional_diametr._value)
+            self.skm_Edit.setText(skm)
 
-            dictance_three_first = int(roof_add_column_plast - well_data.head_column_additional._value - int(
-                self.lenght_template_first_Edit.text()) - 9)
-            self.dictance_three_Edit.setText(str(dictance_three_first))
-            dictance_template_three = int(self.dictance_three_Edit.text())
+            dictance_template_first = int(well_data.current_bottom - roof_add_column_plast + 5)
+            self.dictance_template_first_Edit.setText(str(dictance_template_first))
+
+            dictance_template_three = (well_data.current_bottom - dictance_template_first - \
+                                       int(dictance_template_second) - lenght_template_first) - roof_plast + 10
+            self.dictance_three_Edit.setText(str(dictance_template_three))
+
 
             template_str = f'фильтр направление L-2м + НКТ{nkt_pod} {dictance_template_first}м ' \
                            f'+ СКМ-{skm} + НКТ{nkt_pod} {dictance_template_second}м + шаблон-{first_template}мм ' \
                            f'L-{lenght_template_first}м' \
                            f' + НКТ{nkt_pod} {dictance_template_three}м + шаблон-{template_second}мм ' \
                            f'L-{lenght_template_second}м '
-            well_data.template_depth = math.ceil(well_data.current_bottom - 2 -
+
+            well_data.template_depth = math.ceil(well_data.current_bottom -
                                                  dictance_template_first - dictance_template_second -
                                                  lenght_template_first - dictance_template_three)
-            well_data.template_depth_addition = math.ceil(well_data.current_bottom - 2 -
+            well_data.template_depth_addition = math.ceil(well_data.current_bottom -
                                                           dictance_template_first - dictance_template_second)
             well_data.skm_depth = well_data.template_depth_addition + dictance_template_second
 
@@ -640,34 +652,28 @@ class TabPage_SO_with(QWidget):
 
         elif well_data.column_additional:
             for plast in plast_all:
-                roof = min(list(map(lambda x: x[0], list(dict_perforation[plast]['интервал']))))
+                roof_plast_in = dict_perforation[plast]['кровля']
 
-                if well_data.head_column_additional._value <= roof:
+                if well_data.head_column_additional._value <= roof_plast_in:
                     if dict_perforation[plast]['отрайбировано'] and well_data.open_trunk_well is False:
                         roof_add_column_plast = well_data.current_bottom
+                    elif well_data.open_trunk_well is True and dict_perforation[plast]['отрайбировано']:
+                        roof_add_column_plast = well_data.current_bottom
+                    else:
+                        roof_add_column_plast = roof_plast_in
+                        break
+            for plast in plast_all:
+                roof_plast_in = dict_perforation[plast]['кровля']
+                if well_data.head_column_additional._value > roof_plast_in:
+                    if dict_perforation[plast]['отрайбировано'] and well_data.open_trunk_well is False:
                         roof_plast = well_data.head_column_additional._value
                     elif well_data.open_trunk_well is True and dict_perforation[plast]['отрайбировано']:
                         roof_plast = well_data.shoe_column._value
-                        roof_add_column_plast = well_data.current_bottom
-                        break
                     else:
-                        roof_add_column_plast = roof
-                        roof_plast = well_data.head_column_additional._value
+                        roof_plast = roof_plast_in
                         break
 
-                else:
-                    if dict_perforation[plast]['отрайбировано']:
 
-                        roof_add_column_plast = well_data.current_bottom
-                        roof_plast = well_data.head_column_additional._value
-                    elif well_data.open_trunk_well is True and dict_perforation[plast]['отрайбировано']:
-                        roof_add_column_plast = well_data.shoe_column_additional._value
-                        roof_plast = roof
-                        break
-                    else:
-                        roof_add_column_plast = well_data.current_bottom
-                        roof_plast = roof
-                        break
 
         return roof_plast, roof_add_column_plast
 
@@ -815,7 +821,7 @@ class TemplateKrs(QMainWindow):
         self.tableWidget.setSortingEnabled(False)
 
     def addString(self):
-        from work_py.advanted_file import skm_interval
+        from .advanted_file import skm_interval
 
         template_key = str(self.tabWidget.currentWidget().template_Combo.currentText())
         skm_interval = skm_interval(self, template_key)
@@ -835,7 +841,7 @@ class TemplateKrs(QMainWindow):
 
         template_str = str(self.tabWidget.currentWidget().template_str_Edit.text())
         template_key = str(self.tabWidget.currentWidget().template_Combo.currentText())
-        distance_second = int(self.tabWidget.currentWidget().dictance_template_second_Edit.text())
+        distance_second = int(float(self.tabWidget.currentWidget().dictance_template_second_Edit.text()))
         distance_first = int(self.tabWidget.currentWidget().dictance_template_first_Edit.text())
         if well_data.column_additional is False or (
                 well_data.column_additional is True and float(
@@ -844,11 +850,11 @@ class TemplateKrs(QMainWindow):
         else:
             template_diametr = int(self.tabWidget.currentWidget().template_first_Edit.text())
 
-        if (template_diametr >= int(well_data.problemWithEk_diametr._value) - 2
+        if (template_diametr >= int(well_data.problemWithEk_diametr) - 2
                 and well_data.template_depth > int(well_data.problemWithEk_depth)):
             mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже глубины не прохода')
             return
-        if (template_diametr >= int(well_data.problemWithEk_diametr._value) - 2
+        if (template_diametr >= int(well_data.problemWithEk_diametr) - 2
             and well_data.template_depth > int(well_data.problemWithEk_depth)):
             mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже глубины не прохода')
             return
@@ -871,6 +877,7 @@ class TemplateKrs(QMainWindow):
         if distance_second < 0 or distance_first < 0:
             mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'Расстояние между шаблонами не корректно')
             return
+
         skm_tuple = []
         rows = self.tableWidget.rowCount()
         if rows == 0:
@@ -884,7 +891,8 @@ class TemplateKrs(QMainWindow):
                 sole = int(sole_skm.text())
                 skm_tuple.append((roof, sole))
 
-        # skm_list = self.SkmColumn(skm_tuple)
+        well_data.skm_interval.extend(skm_tuple)
+        print(f'интервалы СКМ {well_data.skm_interval}')
         skm_list = sorted(skm_tuple, key=lambda x: x[0])
         work_template_list = self.template_ek(template_str, template_key, template_diametr, skm_list)
 
@@ -919,7 +927,7 @@ class TemplateKrs(QMainWindow):
 
     def template_ek(self, template_str, template_key, template_diametr, skm_list):
 
-        from work_py.advanted_file import raid
+        from .advanted_file import raid
 
         skm_interval = raid(skm_list)
 
@@ -1066,9 +1074,9 @@ class TemplateKrs(QMainWindow):
         return list_template_ek
 
     def pero(self):
-        from work_py.rir import RirWindow
+        from .rir import RirWindow
 
-        from work_py.drilling import Drill_window
+        from .drilling import Drill_window
 
         pero_list = RirWindow.pero_select(self, well_data.current_bottom)
 
@@ -1113,7 +1121,7 @@ class TemplateKrs(QMainWindow):
             if well_data.dict_pump_SHGN["do"] != 0:
 
                 gipsPero_list = [gipsPero_list[-1]]
-                from work_py.drilling import Drill_window
+                from .drilling import Drill_window
                 drill_work_list = Drill_window.addWork()
 
                 for row in drill_work_list:

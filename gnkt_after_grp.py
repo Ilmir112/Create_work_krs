@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QInputDialog, QMessageBox
 
 import well_data
-from krs import calc_work_fluid
+from work_py.alone_oreration import calc_work_fluid
 
 
 def gnkt_work(self):
@@ -365,7 +365,7 @@ def gnkt_work(self):
 
 def calc_volume_jumping(self):
 
-    from krs import volume_vn_ek, volume_vn_nkt
+    from work_py.alone_oreration import volume_vn_ek, volume_vn_nkt
     volume = round((volume_vn_ek(self,well_data.current_bottom) *
                     (well_data.current_bottom - well_data.depth_fond_paker_do["do"])/1000 +
                     volume_vn_nkt(well_data.dict_nkt) *

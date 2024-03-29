@@ -3,10 +3,10 @@ import well_data
 
 from PyQt5.QtWidgets import QInputDialog, QMessageBox, QTabWidget, QWidget, QLabel, QComboBox, QMainWindow, QLineEdit, \
     QGridLayout, QPushButton, QBoxLayout
-from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
+from .rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
 from work_py.alone_oreration import kot_work
 from PyQt5.QtGui import QDoubleValidator
-from work_py.template_work import TemplateKrs, TabPage_SO_with
+from .template_work import TemplateKrs, TabPage_SO_with
 from main import MyWindow
 
 class TabPage_SO(QWidget):
@@ -540,7 +540,8 @@ class Template_without_skm(QMainWindow):
 
     def addWork(self):
 
-
+        distance_second = int(self.tabWidget.currentWidget().dictance_template_second_Edit.text())
+        distance_first = int(self.tabWidget.currentWidget().dictance_template_first_Edit.text())
         template_str = str(self.tabWidget.currentWidget().template_str_Edit.text())
         template = str(self.tabWidget.currentWidget().template_Combo.currentText())
         if well_data.column_additional is False or (
@@ -550,17 +551,17 @@ class Template_without_skm(QMainWindow):
         else:
             template_diametr = int(self.tabWidget.currentWidget().template_first_Edit.text())
         # print(f'проблема ЭК {well_data.problemWithEk_diametr}')
-        if (template_diametr >= int(well_data.problemWithEk_diametr._value) - 2
+        if (template_diametr >= int(well_data.problemWithEk_diametr) - 2
             and well_data.template_depth > int(well_data.problemWithEk_depth)):
             mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже глубины не прохода')
             return
         if well_data.column_additional is False or \
-                well_data.column_additional and well_data.current_bottom <= well_data.head_column_additional._value:
-            if well_data.template_depth >= well_data.current_bottom:
+                well_data.column_additional and well_data.current_bottom < well_data.head_column_additional._value:
+            if well_data.template_depth > well_data.current_bottom:
                 mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже текущего забоя')
                 return
         else:
-            if well_data.template_depth_addition >= well_data.current_bottom:
+            if well_data.template_depth_addition > well_data.current_bottom:
                 mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже текущего забоя')
                 return
             if well_data.template_depth >= well_data.head_column_additional._value:
@@ -732,9 +733,9 @@ class Template_without_skm(QMainWindow):
         return list_template_ek
 
     def pero(self):
-        from work_py.rir import RirWindow
+        from .rir import RirWindow
        
-        from work_py.drilling import Drill_window
+        from .drilling import Drill_window
 
         pero_list = RirWindow.pero_select(self, well_data.current_bottom)
         gipsPero_list = [
@@ -778,7 +779,7 @@ class Template_without_skm(QMainWindow):
             if well_data.dict_pump_SHGN["do"] != 0:
 
                 gipsPero_list = [gipsPero_list[-1]]
-                from work_py.drilling import Drill_window
+                from .drilling import Drill_window
                 if self.raid_window is None:
                     self.raid_window = Drill_window(self.table_widget, self.ins_ind)
                     self.raid_window.setGeometry(200, 400, 300, 400)

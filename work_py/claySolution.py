@@ -1,11 +1,11 @@
 from PyQt5.QtWidgets import QInputDialog, QMessageBox
 
 import well_data
-from krs import volume_vn_ek, volume_vn_nkt
+from work_py.alone_oreration import volume_vn_ek, volume_vn_nkt
 
-from work_py.rationingKRS import descentNKT_norm
+from .rationingKRS import descentNKT_norm
 from main import MyWindow
-from work_py.rir import RirWindow
+from .rir import RirWindow
 
 from PyQt5.QtGui import QDoubleValidator,QIntValidator
 from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QTabWidget, \
@@ -13,10 +13,10 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QComboBo
 
 import well_data
 from main import MyWindow
-from work_py.rir import RirWindow
+from .rir import RirWindow
 
-from work_py.opressovka import OpressovkaEK
-from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
+from .opressovka import OpressovkaEK
+from .rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
 
 
 class TabPage_SO_clay(QWidget):
@@ -74,18 +74,11 @@ class TabPage_SO_clay(QWidget):
         self.rir_question_QCombo.setCurrentIndex(0)
 
     def update_roof(self):
-        roof_clay_edit = int(float(self.tabWidget.currentWidget().roof_clay_edit.text()))
-        rir_question_QCombo = str(self.tabWidget.currentWidget().rir_question_QCombo.currentText())
-        if roof_clay_edit:
-            if int(roof_clay_edit) + 10 > well_data.perforation_roof:
-                self.privyazka_question_QCombo.setCurrentIndex(1)
-            else:
-                self.privyazka_question_QCombo.setCurrentIndex(0)
-            if rir_question_QCombo == 'Да':
+        roof_clay_edit = self.roof_clay_edit.text()
 
-
-                self.sole_rir_edit.setText(f'{roof_clay_edit}')
-                self.roof_rir_edit.setText(f'{roof_clay_edit-50}')
+        if roof_clay_edit != '':
+            self.sole_rir_edit.setText(f'{float(roof_clay_edit)}')
+            self.roof_rir_edit.setText(f'{float(roof_clay_edit)-50}')
 
     def update_rir(self, index):
 
@@ -125,27 +118,33 @@ class ClayWindow(QMainWindow):
         vbox.addWidget(self.buttonAdd, 2, 0)
 
     def addWork(self):
+
         
         roof_clay_edit = int(float(self.tabWidget.currentWidget().roof_clay_edit.text()))
         sole_clay_edit = int(float(self.tabWidget.currentWidget().sole_clay_edit.text()))
         rir_question_QCombo = str(self.tabWidget.currentWidget().rir_question_QCombo.currentText())
         roof_rir_edit = int(float(self.tabWidget.currentWidget().roof_rir_edit.text()))
         sole_rir_edit = int(float(self.tabWidget.currentWidget().sole_rir_edit.text()))
-        rir_list = RirWindow.rirWithPero(self, "Не нужно", '', roof_rir_edit, sole_rir_edit)
+        if roof_clay_edit > sole_clay_edit:
+            mes = QMessageBox.warning(self, 'Ошибка', 'Не корректные интервалы ')
+            return
+
         work_list = self.claySolutionDef(roof_clay_edit, sole_clay_edit, rir_question_QCombo,
                                          roof_rir_edit, sole_rir_edit)
+
 
         MyWindow.populate_row(self.ins_ind, work_list, self.table_widget)
         well_data.pause = False
         self.close()
 
-    def claySolutionDef(self, roof_clay_edit, sole_clay_edit, rir_question_QCombo,
+    def claySolutionDef(self, rirRoof, rirSole, rir_question_QCombo,
                                          roof_rir_edit, sole_rir_edit):
        
         nkt_diam = ''.join(['73' if well_data.column_diametr._value > 110 else '60'])
 
         if well_data.column_additional == True and well_data.column_additional_diametr._value <110:
-            dict_nkt = {73: well_data.head_column_additional._value, 60: well_data.head_column_additional-rirSole}
+            dict_nkt = {73: well_data.head_column_additional._value,
+                        60: well_data.head_column_additional._value-rirSole}
         else:
             dict_nkt = {73: rirSole}
     
@@ -172,7 +171,7 @@ class ClayWindow(QMainWindow):
              None, None, None, None, None, None, None,
              'мастер КРС', 2.5]]
         well_data.current_bottom = rirRoof
-        rirPlan_quest = QMessageBox.question(self, 'Планировать ли РИР', 'Нужно ставить "висящий" мост в колонне')
+
         if rir_question_QCombo  == 'Нет':
             pero_list.append([None, None,
              f'Поднять перо на тНКТ{nkt_diam}м с глубины {rirSole}м с доливом скважины в объеме '
@@ -188,9 +187,9 @@ class ClayWindow(QMainWindow):
                               None, None, None, None, None, None, None,
                               'мастер КРС', descentNKT_norm(float(rirSole)-float(rirRoof), 1)])
             if (well_data.plast_work) != 0 or rirSole > well_data.perforation_sole:
-                rir_work_list = RirWindow.rirWithPero('Не нужно', '', roof_rir_edit, sole_rir_edit)
+                rir_work_list = RirWindow.rirWithPero(self, 'Не нужно', '', roof_rir_edit, sole_rir_edit)
                 pero_list.extend(rir_work_list[-9:])
             else:
-                rir_work_list = RirWindow.rirWithPero('Не нужно', '', roof_rir_edit, sole_rir_edit)
+                rir_work_list = RirWindow.rirWithPero(self,'Не нужно', '', roof_rir_edit, sole_rir_edit)
                 pero_list.extend(rir_work_list[-10:])
         return pero_list

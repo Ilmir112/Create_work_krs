@@ -19,7 +19,7 @@ from openpyxl.workbook import Workbook
 from open_pz import CreatePZ
 
 from gnkt_data.gnkt_data import dict_saddles
-from work_py.data_informations import dict_data_cdng, calc_pntzh
+from .data_informations import dict_data_cdng, calc_pntzh
 
 
 # class TabPage_SO(QWidget):
@@ -345,7 +345,7 @@ class Work_with_gnkt(QMainWindow):
         ws2.page_setup.paperSize = ws2.PAPERSIZE_A4
 
     def schema_well(self, ws3):
-        from krs import volume_vn_nkt, well_volume
+        from work_py.alone_oreration import volume_vn_nkt, well_volume
 
         boundaries_dict = {}
 
@@ -708,7 +708,7 @@ class Work_with_gnkt(QMainWindow):
         pass
 
     def volume_dumping(self, ntk_true, first_muft):
-        from krs import volume_pod_NKT, volume_jamming_well
+        from work_py.alone_oreration import volume_pod_NKT, volume_jamming_well
 
         if ntk_true == True:
             volume = volume_pod_NKT(self) * 1.2
