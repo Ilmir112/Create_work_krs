@@ -274,7 +274,7 @@ def emergency_sticking(self):
          f'Поднять аварийные НКТ до устья. \nПри выявлении отложений солей и гипса, отобрать шлам. '
          f'Сдать в лабораторию для проведения хим. анализа.',
          None, None, None, None, None, None, None,
-         'Мастер КРС', liftingNKT_norm(well_data.dict_nkt, 1.2)],
+         'Мастер КРС', liftingNKT_norm(well_data.current_bottom, 1.2)],
         [f'Завоз на скважину СБТ', None,
          f'Завоз на скважину СБТ – Укладка труб на стеллажи.',
          None, None, None, None, None, None, None,

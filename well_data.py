@@ -195,10 +195,10 @@ max_angle = 0
 
 privyazkaSKO = 0
 nkt_mistake = False
-H2S_pr = []
-cat_H2S_list = []
-H2S_mg = []
-H2S_mg_m3 = []
+h2s_pr = []
+cat_h2s_list = []
+h2s_mg = []
+h2s_mg_m3 = []
 lift_key = 0
 dict_category = {}
 max_admissible_pressure = 0

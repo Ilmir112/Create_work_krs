@@ -11,7 +11,7 @@ from .rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
 
 
 class TabPage_SO_swab(QWidget):
-    def __init__(self, paker_layout_combo, parent=None):
+    def __init__(self, paker_layout_combo):
         from .acid_paker import CheckableComboBox
 
         super().__init__()
@@ -141,7 +141,7 @@ class TabPage_SO_swab(QWidget):
             self.pressuar_new_edit.setParent(None)
 
     def update_paker_depth(self):
-        from .opressovka import OpressovkaEK, TabPage_SO
+        from .opressovka import TabPage_SO
         paker_depth = self.pakerEdit.text()
         if paker_depth:
             paker_diametr = int(TabPage_SO.paker_diametr_select(self, paker_depth))

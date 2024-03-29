@@ -9,8 +9,8 @@ from work_py.rationingKRS import liftingNKT_norm
 
 
 class TabPageGno(QWidget):
-    def __init__(self, work_plan, parent=None):
-        super().__init__(parent)
+    def __init__(self, work_plan):
+        super().__init__()
         self.work_plan = work_plan
 
         self.current_bottom_label = QLabel('Забой текущий')
@@ -135,7 +135,7 @@ class TabPageGno(QWidget):
 class TabWidget(QTabWidget):
     def __init__(self, work_plan):
         super().__init__()
-        self.addTab(TabPageGno(self, work_plan), 'Подьем ГНО')
+        self.addTab(TabPageGno(work_plan), 'Подьем ГНО')
 
 
 class GnoWindow(QMainWindow):
@@ -1301,11 +1301,11 @@ class GnoWindow(QMainWindow):
         well_data.fluid = fluid_work_insert
         well_data.fluid_short = fluid_work_insert
 
-        cat_H2S_list = [well_data.dict_category[plast]['по сероводороду'
+        cat_h2s_list = [well_data.dict_category[plast]['по сероводороду'
                         ].category for plast in list(well_data.dict_category.keys()) if
                         well_data.dict_category[plast]['отключение'] == 'рабочий']
 
-        if 2 in cat_H2S_list or 1 in cat_H2S_list:
+        if 2 in cat_h2s_list or 1 in cat_h2s_list:
             expenditure_h2s_list = []
             for plast in well_data.plast_work:
 

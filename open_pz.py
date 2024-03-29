@@ -7,7 +7,7 @@ from openpyxl.styles import Font, Alignment
 from main import ExcelWorker
 
 from cdng import events_gnvp, itog_1, events_gnvp_gnkt
-from find import ProtectedIsDigit, ProtectedIsNonNone
+from find import ProtectedIsNonNone
 from plan import delete_rows_pz
 from block_name import region, razdel_1, curator_sel, pop_down
 
@@ -120,7 +120,7 @@ class CreatePZ(QMainWindow):
             delete_rows_pz(self, ws)
             razdel = razdel_1(self, well_data.region)
 
-            for i in range(1, len(razdel_1)):  # Добавлением подписантов на вверху
+            for i in range(1, len(razdel)):  # Добавлением подписантов на вверху
                 for j in range(1, 13):
                     ws.cell(row=i, column=j).value = razdel[i - 1][j - 1]
                     ws.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=False)

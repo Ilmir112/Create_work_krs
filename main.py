@@ -19,7 +19,7 @@ from work_py.advanted_file import count_row_height, definition_plast_work
 from openpyxl.drawing.image import Image
 
 import well_data
-from H2S import calc_H2S
+from H2S import calc_h2s
 from PyQt5.QtCore import QThread, pyqtSignal
 from data_correct_position_people import CorrectSignaturesWindow
 from data_base.work_with_base import Classifier_well
@@ -686,15 +686,15 @@ class MyWindow(QMainWindow):
                 self.insert_image(ws2, 'imageFiles/Хасаншин.png', 'H1')
                 self.insert_image(ws2, 'imageFiles/Шамигулов.png', 'H4')
 
-                cat_H2S_list = well_data.dict_category[well_data.plast_work_short[0]]['по сероводороду'].category
-                H2S_mg = well_data.dict_category[well_data.plast_work_short[0]]['по сероводороду'].data_mg_l
-                H2S_pr = well_data.dict_category[well_data.plast_work_short[0]]['по сероводороду'].data_procent
+                cat_h2s_list = well_data.dict_category[well_data.plast_work_short[0]]['по сероводороду'].category
+                h2s_mg = well_data.dict_category[well_data.plast_work_short[0]]['по сероводороду'].data_mg_l
+                h2s_pr = well_data.dict_category[well_data.plast_work_short[0]]['по сероводороду'].data_procent
 
-                if cat_H2S_list in [1, 2] and self.work_plan != 'dop_plan':
+                if cat_h2s_list in [1, 2] and self.work_plan != 'dop_plan':
                     ws3 = wb2.create_sheet('Sheet1')
                     ws3.title = "Расчет необходимого количества поглотителя H2S"
                     ws3 = wb2["Расчет необходимого количества поглотителя H2S"]
-                    calc_H2S(ws3, H2S_pr, H2S_mg)
+                    calc_h2s(ws3, h2s_pr, h2s_mg)
                 else:
                     print(f'Расчет поглотителя сероводорода не требуется')
 
@@ -826,9 +826,9 @@ class MyWindow(QMainWindow):
             well_data.max_angle = 0
             well_data.pakerTwoSKO = False
             well_data.privyazkaSKO = 0
-            well_data.H2S_pr = []
-            well_data.cat_H2S_list = []
-            well_data.H2S_mg = []
+            well_data.h2s_pr = []
+            well_data.cat_h2s_list = []
+            well_data.h2s_mg = []
             well_data.lift_key = 0
             well_data.max_admissible_pressure = ProtectedIsNonNone(0)
             well_data.region = ''

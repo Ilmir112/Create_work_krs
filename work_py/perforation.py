@@ -275,7 +275,7 @@ class PerforationWindow(QMainWindow):
        
         rows = self.tableWidget.rowCount()
         if len(well_data.cat_P_1) > 1:
-            kateg2 = [1 if str(well_data.cat_P_1[1]) == '1' or str(well_data.cat_H2S_list[1]) == '1' else 2][0]
+            kateg2 = [1 if str(well_data.cat_P_1[1]) == '1' or str(well_data.cat_h2s_list[1]) == '1' else 2][0]
             if well_data.kat_pvo <  kateg2:
                 well_data.kat_pvo = kateg2
 

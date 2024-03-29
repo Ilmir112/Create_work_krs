@@ -9,6 +9,9 @@ from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem, QLineEdit, QHeaderVie
 
 from openpyxl import load_workbook
 
+import well_data
+
+
 class Classifier_well(QMainWindow):
     number_well = None
     def __init__(self,  costumer, region, classifier_well, parent=None):

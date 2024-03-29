@@ -1,11 +1,8 @@
-from openpyxl.styles import Border, Side, PatternFill, Font, GradientFill, Alignment
-from openpyxl.utils.cell import get_column_letter
-
-import H2S
 import well_data
+from openpyxl.styles import Border, Side, Font,  Alignment
 
-
-def calc_H2S(ws3, H2S_pr, H2S_mg):
+def calc_h2s(ws3, h2s_pr, h2s_mg):
+    from H2S import well_volume
     # print(well_data.dict_nkt)
     nkt_1 = list(well_data.dict_nkt.keys())[0]
     nkt_1_l = well_data.dict_nkt[nkt_1]
@@ -64,9 +61,9 @@ def calc_H2S(ws3, H2S_pr, H2S_mg):
         [None, 'Объем раствора глушения - по объему скважины от устья до забоя', None, None, None, None],
         [None, None, None, None, None, None],
         [None, '№', 'Параметр', None, 'Результат расчета', None],
-        [None, 1, 'Параметры скважины', None, f'{well_data.well_number} {well_data.well_area}', None],
+        [None, 1, 'Параметры скважины', None, f'{well_data.well_number._value} {well_data.well_area._value}', None],
         [None, 1.1, 'Забой скважины', 'м', round(float(well_data.bottomhole_artificial._value), 1), 'формула'],
-        [None, 1.2, 'текущий забой', 'м', round(float(well_data.bottom), 1), 'ввод'],
+        [None, 1.2, 'текущий забой', 'м', round(float(well_data.bottom._value), 1), 'ввод'],
         [None, 1.3, 'Диаметр ЭК (ступень 1 верхняя)', 'мм', int(well_data.column_diametr._value), 'ввод'],
         [None, '1.3.1.', 'Толщина стенки ЭК (ступень 1 верхняя)', 'мм',
          round(float(well_data.column_wall_thickness._value), 1), 'ввод'],
@@ -119,11 +116,11 @@ def calc_H2S(ws3, H2S_pr, H2S_mg):
         [None, None, None, None, None, None],
         [None, 4, 'Параметры добываемой жидкости и газа', None, None, None, None],
         [None, 4.1, 'Газосодержание нефти', 'м3/тонну', well_data.gaz_f_pr[0], 'ввод'],
-        [None, 4.2, 'Содержание сероводорода в газе (по данным проекта разработки)', '% (об)', well_data.H2S_pr[0],
+        [None, 4.2, 'Содержание сероводорода в газе (по данным проекта разработки)', '% (об)', well_data.h2s_pr[0],
          'ввод'],
         [None, 4.3, 'Обводенность продукции', '% (масс.)', well_data.proc_water, 'ввод'],
         [None, 4.4, 'Содержание сероводорода в пластовом флюиде (устьевая проба, вода+нефть)', 'мг/дм3',
-         well_data.H2S_mg[0], 'ввод'],
+         well_data.h2s_mg[0], 'ввод'],
         [None, 4.5, 'Плотность воды', 'г/см3', 1.17, 'ввод'],
         [None, 4.6, 'Плотность нефти', 'г/см3', 0.9, 'ввод'],
         [None, None, None, None, None, None],
@@ -219,7 +216,7 @@ def well_volume(self):
         return volume_well
 
 
-def calv_h2s(self, cat_H2S, H2S_mg, H2S_pr):
+def calv_h2s(self, cat_H2S, h2s_mg, h2s_pr):
     if '2' == str(cat_H2S) or '1' in str(cat_H2S):
         nkt_l = sum(list(well_data.dict_nkt.values()))
 
@@ -247,7 +244,7 @@ def calv_h2s(self, cat_H2S, H2S_mg, H2S_pr):
                         well_data.column_additional_diametr._value - well_data.column_additional_wall_thickness._value * 2) ** 2 / 4 / 1000 * (
                                     well_data.bottomhole_artificial._value - nkt_l) / 1000
         # print(f'под ГНО{v_pod_gno}')
-        volume_well = H2S.well_volume(self)
+        volume_well = well_volume(self)
 
         nkt_1 = int(list(well_data.dict_nkt.keys())[0])
 
@@ -294,16 +291,16 @@ def calv_h2s(self, cat_H2S, H2S_mg, H2S_pr):
 
         oil_mass = float(v_pod_gno * (100 - well_data.proc_water) * 0.9 / 100)
         # print(f'oil {oil_mass}-{type(oil_mass)} , {well_data.gaz_f_pr[0]}-{type(well_data.gaz_f_pr[0])}')
-        volume_h2s = well_data.gaz_f_pr[0] * oil_mass * (float(H2S_pr)) / 100
+        volume_h2s = well_data.gaz_f_pr[0] * oil_mass * (float(h2s_pr)) / 100
 
         h2s_mass_in_oil = (34 * volume_h2s * 1000 / 22.14)
-        # print(type(vodoiz_sucker), type(vodoiz_nkt), H2S_mg, float(H2S_mg))
-        h2s_mass_in_water = float(vodoiz_sucker + vodoiz_nkt) * H2S_mg
+        # print(type(vodoiz_sucker), type(vodoiz_nkt), h2s_mg, float(h2s_mg))
+        h2s_mass_in_water = float(vodoiz_sucker + vodoiz_nkt) * h2s_mg
         # print(f'h2a{h2s_mass_in_water}')
         mass_oil_pog_gno = (vodoiz_sucker + vodoiz_nkt) * (100 - well_data.proc_water) * 0.9 / 100
-        h2s_volume_pod_gno = mass_oil_pog_gno * well_data.gaz_f_pr[0] * H2S_pr / 100
+        h2s_volume_pod_gno = mass_oil_pog_gno * well_data.gaz_f_pr[0] * h2s_pr / 100
         mass_h2s_gas = 34 * h2s_volume_pod_gno / 22.14
-        mass_h2s_water = v_pod_gno * H2S_mg
+        mass_h2s_water = v_pod_gno * h2s_mg
         # print(f'mass{mass_h2s_water}')
         mass_h2s_all = h2s_mass_in_water + h2s_mass_in_oil + mass_h2s_gas + mass_h2s_water
         # print(f'mass_h2 {mass_h2s_all}')

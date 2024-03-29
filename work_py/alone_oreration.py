@@ -108,28 +108,28 @@ def check_h2s(self, plast= 0, fluid_new = 0, expected_pressure = 0):
     return fluid_new, plast, expected_pressure
 
 def need_h2s(fluid_new, plast, expected_pressure):
-    сat_H2S_list = list(map(int, [well_data.dict_category[plast]['по сероводороду'].category for plast in
+    сat_h2s_list = list(map(int, [well_data.dict_category[plast]['по сероводороду'].category for plast in
                                   well_data.plast_work if well_data.dict_category.get(plast) and
                                   well_data.dict_category[plast]['отключение'] == 'рабочий']))
 
-    H2S_mg = list(map(int, [well_data.dict_category[plast]['по сероводороду'].data_mg_l for plast in
+    h2s_mg = list(map(int, [well_data.dict_category[plast]['по сероводороду'].data_mg_l for plast in
                             well_data.plast_work if well_data.dict_category.get(plast) and
                             well_data.dict_category[plast]['отключение'] == 'рабочий']))
-    H2S_pr = list(map(int, [well_data.dict_category[plast]['по сероводороду'].data_procent for plast in
+    h2s_pr = list(map(int, [well_data.dict_category[plast]['по сероводороду'].data_procent for plast in
                             well_data.plast_work if well_data.dict_category.get(plast) and
                             well_data.dict_category[plast]['отключение'] == 'рабочий']))
-    cat_H2S_list_plan = list(map(int, [well_data.dict_category[plast]['по сероводороду'].category for plast in
+    cat_h2s_list_plan = list(map(int, [well_data.dict_category[plast]['по сероводороду'].category for plast in
                                   well_data.plast_project if well_data.dict_category.get(plast) and
                                   well_data.dict_category[plast]['отключение'] == 'планируемый']))
 
-    if len(cat_H2S_list_plan) != 0:
-        if cat_H2S_list_plan[0] in [1, 2] and len(well_data.plast_work) == 0:
+    if len(cat_h2s_list_plan) != 0:
+        if cat_h2s_list_plan[0] in [1, 2] and len(well_data.plast_work) == 0:
             expenditure_h2s = round(max([well_data.dict_category[plast]['по сероводороду'].poglot for plast in well_data.plast_project]), 3)
             well_data.fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
                                   f'расчета {expenditure_h2s}кг/м3 '
 
 
-        elif ((cat_H2S_list_plan[0] in [1, 2]) or (сat_H2S_list[0] in [1, 2])) and len(well_data.plast_work) != 0:
+        elif ((cat_h2s_list_plan[0] in [1, 2]) or (сat_h2s_list[0] in [1, 2])) and len(well_data.plast_work) != 0:
             expenditure_h2s_plan = max(
                 [well_data.dict_category[well_data.plast_work[0]]['по сероводороду'].poglot for plast in well_data.plast_project])
 
@@ -145,7 +145,7 @@ def need_h2s(fluid_new, plast, expected_pressure):
             well_data.fluid_work_short = f'{fluid_new}г/см3 '
     else:
 
-        if cat_H2S_list_plan[0] in [1, 2]:
+        if cat_h2s_list_plan[0] in [1, 2]:
 
             expenditure_h2s = round(
                 max([well_data.dict_category[plast]['по сероводороду'].poglot for plast in well_data.plast_project]), 2)

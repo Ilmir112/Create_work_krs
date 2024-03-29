@@ -22,13 +22,13 @@ class TabPage_SO(QWidget):
 
 
         self.cat_P_1 = well_data.cat_P_1
-        self.cat_H2S_list = well_data.cat_H2S_list
+        self.cat_h2s_list = well_data.cat_h2s_list
         self.cat_gaz_f_pr = well_data.cat_gaz_f_pr
         self.gaz_f_pr = well_data.gaz_f_pr
-        self.H2S_mg = well_data.H2S_mg
-        print(f'мг {self.H2S_mg}')
-        self.H2S_pr = well_data.H2S_pr
-        print(f'мг % {self.H2S_pr}')
+        self.h2s_mg = well_data.h2s_mg
+        print(f'мг {self.h2s_mg}')
+        self.h2s_pr = well_data.h2s_pr
+        print(f'мг % {self.h2s_pr}')
         self.cat_P_P = well_data.cat_P_P
 
         self.category_pressuar_Label = QLabel('По Рпл')
@@ -48,7 +48,7 @@ class TabPage_SO(QWidget):
         work_plast_iter = None
         well_data.number_indez = []
         # print(f'строки {list(set(well_data.cat_P_P))}')
-        # print(f'{self.H2S_pr}')
+        # print(f'{self.h2s_pr}')
 
         for num in range(len(list(set(well_data.cat_P_P)))):
 
@@ -95,20 +95,20 @@ class TabPage_SO(QWidget):
             pressuar_data_edit.setText(str(self.ifNone(self.cat_P_P[num])))
             # print(num)
             category_h2s_edit = QLineEdit(self)
-            category_h2s_edit.setText(str(self.ifNone(self.cat_H2S_list[num])))
-            H2S_pr_edit = QLineEdit(self)
-            if str(round(float(str(self.H2S_pr[num]).replace(',', '.')), 3))[-1] == "0":
-                H2S_pr =  int(float(self.H2S_pr[num]))
+            category_h2s_edit.setText(str(self.ifNone(self.cat_h2s_list[num])))
+            h2s_pr_edit = QLineEdit(self)
+            if str(round(float(str(self.h2s_pr[num]).replace(',', '.')), 3))[-1] == "0":
+                h2s_pr =  int(float(self.h2s_pr[num]))
             else:
-                H2S_pr = round(float(str(self.H2S_pr[num]).replace(',', '.')), 4)
+                h2s_pr = round(float(str(self.h2s_pr[num]).replace(',', '.')), 4)
 
-            H2S_pr_edit.setText(str(H2S_pr))
+            h2s_pr_edit.setText(str(h2s_pr))
 
             category_h2s2_edit = QLineEdit(self)
-            category_h2s2_edit.setText(str(self.ifNone(self.cat_H2S_list[num])))
-            H2S_mg_edit = QLineEdit(self)
+            category_h2s2_edit.setText(str(self.ifNone(self.cat_h2s_list[num])))
+            h2s_mg_edit = QLineEdit(self)
 
-            H2S_mg_edit.setText(str(self.ifNone(self.H2S_mg[num])))
+            h2s_mg_edit.setText(str(self.ifNone(self.h2s_mg[num])))
 
             category_gf_edit = QLineEdit(self)
             category_gf_edit.setText(str(self.ifNone(self.cat_gaz_f_pr[num])))
@@ -126,9 +126,9 @@ class TabPage_SO(QWidget):
                 work_plast_iter = work_plast
 
             calc_plast_h2s = QLineEdit(self)
-          # print(Category_h2s_edit.text(), H2S_mg_edit.text(), H2S_pr_edit.text())
+          # print(Category_h2s_edit.text(), h2s_mg_edit.text(), h2s_pr_edit.text())
             calc_plast_h2s.setText(str(calv_h2s(self, category_h2s_edit.text(),
-                                            float(H2S_mg_edit.text()), float(H2S_pr_edit.text()))))
+                                            float(h2s_mg_edit.text()), float(h2s_pr_edit.text()))))
 
             self.grid.addWidget(plast_index, 4, 1 + n)
             self.grid.addWidget(category_pressuar_line_edit, 5, 1 + n)
@@ -138,8 +138,8 @@ class TabPage_SO(QWidget):
             self.grid.addWidget(isolated_plast, 9, n + 1, 9, n + 1)
             self.grid.addWidget(calc_plast_h2s, 12, n + 1, 12, n + 1)
             self.grid.addWidget(pressuar_data_edit, 5, 1 + n + 1)
-            self.grid.addWidget(H2S_pr_edit, 6, 1 + n + 1)
-            self.grid.addWidget(H2S_mg_edit, 7, 1 + n + 1)
+            self.grid.addWidget(h2s_pr_edit, 6, 1 + n + 1)
+            self.grid.addWidget(h2s_mg_edit, 7, 1 + n + 1)
             self.grid.addWidget(gaz_f_pr_edit, 8, 1 + n + 1)
             self.grid.addWidget(units_pressuar, 5, 1 + n + 2)
 
@@ -153,8 +153,8 @@ class TabPage_SO(QWidget):
             setattr(self, f"{pressuar_data_edit}_{n}_line", pressuar_data_edit)
             setattr(self, f"{category_h2s_edit}_{n}_line", category_h2s_edit)
             setattr(self, f"{category_gf_edit}_{n}_line", category_gf_edit)
-            setattr(self, f"{H2S_pr_edit}_{n}_line", H2S_pr_edit)
-            setattr(self, f"{H2S_mg_edit}_{n}_line", H2S_mg_edit)
+            setattr(self, f"{h2s_pr_edit}_{n}_line", h2s_pr_edit)
+            setattr(self, f"{h2s_mg_edit}_{n}_line", h2s_mg_edit)
             setattr(self, f"{gaz_f_pr_edit}_{n}_line", gaz_f_pr_edit)
             setattr(self, f"{units_pressuar}_{n}_line", units_pressuar)
             setattr(self, f"{units_h2s_pr}_{n}_line", units_h2s_pr)
@@ -163,7 +163,7 @@ class TabPage_SO(QWidget):
             setattr(self, f"{isolated_plast}_{n}_line", isolated_plast)
 
             self.labels_category[n] = (plast_index, category_pressuar_line_edit, category_h2s_edit,
-                                       category_gf_edit, H2S_pr_edit, H2S_mg_edit, gaz_f_pr_edit,
+                                       category_gf_edit, h2s_pr_edit, h2s_mg_edit, gaz_f_pr_edit,
                                        pressuar_data_edit, isolated_plast, calc_plast_h2s)
 
             well_data.number_indez.append(n)

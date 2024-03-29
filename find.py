@@ -1055,7 +1055,7 @@ class Well_Category(FindIndexPZ):
                             if str(col) in ['%', 'мг/л', 'мг/дм3', 'мг/м3'] and \
                                     ws.cell(row=row, column=column - 2).value:
                                 # print(f'ячейка- 3 3 {col}')
-                                well_data.cat_H2S_list.append(ws.cell(row=row, column=column - 2).value)
+                                well_data.cat_h2s_list.append(ws.cell(row=row, column=column - 2).value)
 
 
                     elif 'газовому фактору' in str(cell):
@@ -1068,7 +1068,7 @@ class Well_Category(FindIndexPZ):
                     elif 'мг/л' in str(cell) or 'мг/дм3' in str(cell):
                         cell2 = ws.cell(row=row, column=col - 1).value
                         if cell2:
-                            well_data.H2S_mg.append(float(self.check_str_None(cell2)))
+                            well_data.h2s_mg.append(float(self.check_str_None(cell2)))
                     elif 'м3/т' in str(cell):
                         cell2 = ws.cell(row=row, column=col - 1).value
                         if cell2:
@@ -1078,27 +1078,27 @@ class Well_Category(FindIndexPZ):
                         print(f'проц {cell2}')
                         if type(cell2) in [float, int]:
                             if str(round(float(str(cell2).replace(',', '.')), 3))[-1] == "0":
-                                H2S_pr = int(float(cell2))
+                                h2s_pr = int(float(cell2))
                             else:
-                                H2S_pr = round(float(str(cell2).replace(',', '.')), 4)
-                            well_data.H2S_pr.append(float(str(H2S_pr).replace(',', '.')))
+                                h2s_pr = round(float(str(cell2).replace(',', '.')), 4)
+                            well_data.h2s_pr.append(float(str(h2s_pr).replace(',', '.')))
                         else:
-                            H2S_pr = cell2
-                            well_data.H2S_pr.append(self.check_str_None(cell2))
+                            h2s_pr = cell2
+                            well_data.h2s_pr.append(self.check_str_None(cell2))
 
 
                     elif str(cell) in 'мг/м3':
                         cell2 = ws.cell(row=row, column=col - 1).value
                         if cell2:
-                            well_data.H2S_mg_m3.append(float(str(self.check_str_None(cell2)).replace(',', '.')) / 1000)
-        if len(well_data.H2S_mg) == 0 and len(well_data.H2S_mg_m3) != 0:
-            for mg in well_data.H2S_mg_m3:
+                            well_data.h2s_mg_m3.append(float(str(self.check_str_None(cell2)).replace(',', '.')) / 1000)
+        if len(well_data.h2s_mg) == 0 and len(well_data.h2s_mg_m3) != 0:
+            for mg in well_data.h2s_mg_m3:
                 print(f'значени{mg}')
-                well_data.H2S_mg.append(mg)
-        if len(well_data.H2S_mg) == 0:
-            H2S_mg, _ = QInputDialog.getDouble(self, 'сероводород в процентах',
+                well_data.h2s_mg.append(mg)
+        if len(well_data.h2s_mg) == 0:
+            h2s_mg, _ = QInputDialog.getDouble(self, 'сероводород в процентах',
                                                'Введите значение серовородода в мг/л', 0, 0, 100, 1)
-            well_data.H2S_mg.append(H2S_mg)
+            well_data.h2s_mg.append(h2s_mg)
 
         if self.data_window is None:
             self.data_window = CategoryWindow(self)
@@ -1111,10 +1111,10 @@ class Well_Category(FindIndexPZ):
             self.data_window.close()
             self.data_window = None
 
-        if len(well_data.H2S_pr) == 0:
+        if len(well_data.h2s_pr) == 0:
             mes = QMessageBox.warning(self, 'Ошибка', 'Программа не смогла найти данные по содержания '
                                                       'сероводорода в процентах')
-            H2S_pr, _ = QInputDialog.getDouble(self, 'сероводород в процентах',
+            h2s_pr, _ = QInputDialog.getDouble(self, 'сероводород в процентах',
                                                'Введите значение серовородода в процентах', 0, 0, 100, 5)
 
-            well_data.H2S_pr.append(H2S_pr)
+            well_data.h2s_pr.append(h2s_pr)

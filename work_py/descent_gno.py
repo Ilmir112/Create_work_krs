@@ -116,8 +116,10 @@ def gno_down(self):
                 for row in rgdWithPaker(self):
                     paker_descent.append(row)
 
-    if lift_key in ['ЭЦН', 'НВ', 'НН', 'НН с пакером', 'ЭЦН с пакером', 'НВ с пакером', 'ОРД']:
+    if lift_key not in ['ЭЦН', 'НВ', 'НН', 'НН с пакером', 'ЭЦН с пакером', 'НВ с пакером', 'ОРД']:
         calc_fond_nkt_str = calc_fond_nkt(self, sum(list(well_data.dict_nkt_po.values())))
+    else:
+        calc_fond_nkt_str = None
 
     gno_list = [[None, None,
                  f'За 48 часов до спуска запросить КАРТУ спуска на ГНО и заказать оборудование согласно карты спуска.',

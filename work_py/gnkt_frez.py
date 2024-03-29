@@ -12,8 +12,8 @@ import block_name
 import main
 import plan
 from block_name import razdel_1
-from openpyxl.styles import Border, Side, PatternFill, Font, GradientFill, Alignment
-from openpyxl.reader.excel import load_workbook
+from openpyxl.styles import Border, Side, PatternFill, Font, Alignment
+
 from openpyxl.workbook import Workbook
 
 from gnkt_data.gnkt_data import dict_saddles
@@ -510,7 +510,7 @@ class Work_with_gnkt(QMainWindow):
             [None, None, None, None, None, None, None, None, None, None, None, None,
              'тройник 80х70-80х70 В60-В60',
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-             'Содержание H2S', None, None, None, None, None, None, None, round(well_data.H2S_mg[0], 5), None, None, None,
+             'Содержание H2S', None, None, None, None, None, None, None, round(well_data.h2s_mg[0], 5), None, None, None,
              None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None,
              f'ФА  ГРП ГУ 180х35-89 К1ХЛ № {arm_grp}',
