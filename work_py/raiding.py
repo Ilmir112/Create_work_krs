@@ -324,7 +324,7 @@ class Raid(MyWindow):
         nkt_pod = 0
         current_str = well_data.current_bottom
         if well_data.column_additional:
-            if ryber_key == 'райбер в ЭК':
+            if ryber_key == 'райбер в ЭК' and well_data.head_column_additional._value < well_data.current_bottom:
                 current_str = well_data.head_column_additional._value
 
             nkt_pod = '60мм' if well_data.column_additional_diametr._value < 110 else '73мм со снятыми фасками'

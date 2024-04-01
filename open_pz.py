@@ -25,12 +25,26 @@ class CreatePZ(QMainWindow):
     def open_excel_file(self, ws, work_plan):
         from find import FindIndexPZ
         from category_correct import CategoryWindow
+        from find import WellNkt, Well_perforation, WellCondition, WellHistory_data, Well_data, Well_Category, \
+            WellFond_data, WellSucker_rod, Well_expected_pick_up
 
         well_data.work_plan = work_plan
         well_data.dict_category = CategoryWindow.dict_category
 
         # Запуск основного класса и всех дочерних классов в одной строке
-        window = [cls(ws) for cls in FindIndexPZ.__subclasses__()]
+        well_pz = FindIndexPZ(ws)
+        # well_pz.read_pz(ws)
+        WellNkt.read_well(self, ws, well_data.pipes_ind._value, well_data.condition_of_wells._value)
+        WellSucker_rod.read_well(self,ws, well_data.sucker_rod_ind._value, well_data.pipes_ind._value)
+        WellFond_data.read_well(self,ws, well_data.data_fond_min._value, well_data.condition_of_wells._value)
+        WellHistory_data.read_well(self,ws, well_data.data_pvr_max._value, well_data.data_fond_min._value)
+        WellCondition.read_well(self,ws, well_data.condition_of_wells._value, well_data.data_well_max._value)
+        Well_expected_pick_up.read_well(self,ws, well_data.data_x_min._value, well_data.data_x_max._value)
+        Well_data.read_well(self,ws, well_data.cat_well_max._value, well_data.data_pvr_min._value)
+        Well_perforation.read_well(self,ws, well_data.data_pvr_min._value, well_data.data_pvr_max._value + 1)
+        Well_Category.read_well(self,ws, well_data.cat_well_min._value, well_data.data_well_min._value)
+
+
 
         for row_ind, row in enumerate(ws.iter_rows(values_only=True)):
             ws.row_dimensions[row_ind].hidden = False

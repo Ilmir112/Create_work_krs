@@ -63,7 +63,7 @@ class FindIndexPZ(QMainWindow):
                 well_data.data_x_max = ProtectedIsDigit(row_ind)
 
 
-            elif 'II. История эксплуатации скважины' in row:
+            elif any(['II. История эксплуатации скважины' in str(col) for col in row]):
                 well_data.data_pvr_max = ProtectedIsDigit(row_ind)
 
             elif 'III. Состояние скважины к началу ремонта ' in row:
@@ -77,11 +77,12 @@ class FindIndexPZ(QMainWindow):
                 QInputDialog.getInt(self, 'индекс начала копирования',
                                     'Программа не смогла определить строку начала копирования',
                                     0, 0, 800)[0])
-        if well_data.sucker_rod_ind._value == 0:
-            well_data.sucker_rod_ind = ProtectedIsDigit(
-                QInputDialog.getInt(self, 'индекс начала строки со штангами',
-                                    'Программа не смогла найти строку со штангами',
-                                    0, 0, 800)[0])
+        if well_data.sucker_rod_none:
+            if well_data.sucker_rod_ind._value == 0:
+                well_data.sucker_rod_ind = ProtectedIsDigit(
+                    QInputDialog.getInt(self, 'индекс начала строки со штангами',
+                                        'Программа не смогла найти строку со штангами',
+                                        0, 0, 800)[0])
         if well_data.data_well_max._value == 0:
             well_data.data_well_max = ProtectedIsDigit(
                 QInputDialog.getInt(self, 'индекс окончания копирования',
@@ -192,10 +193,8 @@ class FindIndexPZ(QMainWindow):
 class WellNkt(FindIndexPZ):
 
     def __init__(self, ws):
-
         super().__init__(ws)
-
-        self.read_well(ws, well_data.pipes_ind._value, well_data.condition_of_wells._value)
+        # self.read_well(ws, well_data.pipes_ind._value, well_data.condition_of_wells._value)
 
     def read_well(self, ws, begin_index, cancel_index):
 
@@ -234,7 +233,7 @@ class WellSucker_rod(FindIndexPZ):
 
         super().__init__(ws)
 
-        self.read_well(ws, well_data.sucker_rod_ind._value, well_data.pipes_ind._value)
+        # self.read_well(ws, well_data.sucker_rod_ind._value, well_data.pipes_ind._value)
 
     def read_well(self, ws, begin_index, cancel_index):
 
@@ -249,8 +248,18 @@ class WellSucker_rod(FindIndexPZ):
                         ws.cell(row=row, column=3).value).lower() == 'до ремонта':
                         b_plan = row
 
-                if b_plan == 0:
-                    b_plan = QInputDialog.getDouble(self, 'Индекс планового НКТ',
+                if b_plan == 0 and well_data.sucker_rod_none is True:
+                    sucker_rod_question = QMessageBox.question(self,
+                                                                         'отсутствие штанг',
+                                                                         'Программа определило что штанг в '
+                                                                         'скважине нет, корректно?')
+                    if sucker_rod_question == QMessageBox.StandardButton.Yes:
+                        well_data.sucker_rod_none = False
+                    else:
+                        well_data.sucker_rod_none = True
+
+                    if well_data.sucker_rod_none == True:
+                        b_plan = QInputDialog.getDouble(self, 'Индекс планового НКТ',
                                                     'Программа не могла определить начала строку с ПЗ штанги - план')
                 # print(f'б {b_plan}')
 
@@ -274,7 +283,7 @@ class WellFond_data(FindIndexPZ):
     def __init__(self, ws):
 
         super().__init__(ws)
-        self.read_well(ws, well_data.data_fond_min._value, well_data.condition_of_wells._value)
+        # self.read_well(ws, well_data.data_fond_min._value, well_data.condition_of_wells._value)
 
     def read_well(self, ws, begin_index, cancel_index):
 
@@ -335,15 +344,15 @@ class WellFond_data(FindIndexPZ):
                     elif value == 'Н посадки, м':
                         try:
                             if well_data.paker_do["do"] != 0:
-                                well_data.depth_fond_paker_do["do"] = self.check_str_None(row[col_do].value)[0]
-                                well_data.depth_fond_paker2_do["do"] = self.check_str_None(row[col_do].value)[1]
+                                well_data.depth_fond_paker_do["do"] = FindIndexPZ.check_str_None(self,row[col_do].value)[0]
+                                well_data.depth_fond_paker2_do["do"] = FindIndexPZ.check_str_None(self,row[col_do].value)[1]
                         except:
                             if well_data.paker_do["do"] != 0:
                                 well_data.depth_fond_paker_do["do"] = row[col_do].value
                         try:
                             if well_data.paker_do["posle"] != 0:
-                                well_data.depth_fond_paker_do["posle"] = self.check_str_None(row[col_plan].value)[0]
-                                well_data.depth_fond_paker2_do["posle"] = self.check_str_None(row[col_plan].value)[1]
+                                well_data.depth_fond_paker_do["posle"] = FindIndexPZ.check_str_None(self,row[col_plan].value)[0]
+                                well_data.depth_fond_paker2_do["posle"] = FindIndexPZ.check_str_None(self,row[col_plan].value)[1]
                         except:
                             if well_data.paker_do["posle"] != 0:
                                 well_data.depth_fond_paker_do["posle"] = row[col_plan].value
@@ -356,7 +365,7 @@ class WellHistory_data(FindIndexPZ):
         super().__init__(ws)
         self.leakage_window = None
         self.ws = ws
-        self.read_well(self.ws, well_data.data_pvr_max._value, well_data.data_fond_min._value)
+        # self.read_well(self.ws, well_data.data_pvr_max._value, well_data.data_fond_min._value)
 
     def read_well(self, ws, begin_index, cancel_index):
 
@@ -390,17 +399,17 @@ class WellHistory_data(FindIndexPZ):
                     elif 'Конец бурения' == value:
                         well_data.date_drilling_cancel = row[col + 2].value
 
-                        well_data.date_drilling_cancel = self.definition_is_None(
+                        well_data.date_drilling_cancel = FindIndexPZ.definition_is_None(self, 
                             well_data.date_drilling_cancel, row_index + begin_index, col + 1, 1)
 
                     elif 'Максимально ожидаемое давление на устье' == value:
                         well_data.max_expected_pressure = ProtectedIsDigit(row[col + 1].value)
-                        well_data.max_expected_pressure = self.definition_is_None(
+                        well_data.max_expected_pressure = FindIndexPZ.definition_is_None(self,
                             well_data.max_expected_pressure, row_index + begin_index, col + 1, 1)
 
                     elif 'Максимально допустимое давление'.lower() in str(value).lower():
                         well_data.max_admissible_pressure = ProtectedIsDigit(row[col + 1].value)
-                        well_data.max_admissible_pressure = self.definition_is_None(
+                        well_data.max_admissible_pressure = FindIndexPZ.definition_is_None(self,
                             well_data.max_admissible_pressure, row_index + begin_index, col + 1, 1)
 
 
@@ -412,7 +421,7 @@ class WellCondition(FindIndexPZ):
         self.leakage_window = None
         self.ws = ws
 
-        self.read_well(ws, well_data.condition_of_wells._value, well_data.data_well_max._value)
+        # self.read_well(ws, well_data.condition_of_wells._value, well_data.data_well_max._value)
 
     def read_well(self, ws, begin_index, cancel_index):
         from main import MyWindow
@@ -448,12 +457,12 @@ class WellCondition(FindIndexPZ):
                         well_data.dinamic_level = ProtectedIsDigit(row[col + 1].value)
                     if "% воды " in str(value):
                         well_data.proc_water = str(row[col + 1].value).strip().replace('%', '')
-                        well_data.proc_water = self.definition_is_None(well_data.proc_water, row_index, col + 1, 1)
+                        well_data.proc_water = FindIndexPZ.definition_is_None(self,well_data.proc_water, row_index, col + 1, 1)
                     if 'Vжг' in str(value):
                         try:
                             well_volume_in_PZ = str(row[col + 1].value).replace(',', '.')
                             # print(f'строка {well_volume_in_PZ}')
-                            # well_volume_in_PZ = self.definition_is_None(well_volume_in_PZ, row_index, col + 1, 1)
+                            # well_volume_in_PZ = FindIndexPZ.definition_is_None(self,well_volume_in_PZ, row_index, col + 1, 1)
                             well_data.well_volume_in_PZ.append(round(float(well_volume_in_PZ), 1))
                         except:
                             well_volume_in_PZ, _ = QInputDialog.getDouble(self, 'Объем глушения',
@@ -503,7 +512,7 @@ class Well_expected_pick_up(FindIndexPZ):
 
         super().__init__(ws)
         self.ws = ws
-        self.read_well(ws, well_data.data_x_min._value, well_data.data_x_max._value)
+        # self.read_well(ws, well_data.data_x_min._value, well_data.data_x_max._value)
 
     def read_well(self, ws, begin_index, cancel_index):
 
@@ -518,24 +527,24 @@ class Well_expected_pick_up(FindIndexPZ):
                     if 'прием' in str(value).lower() or 'qж' in str(value).lower():
                         well_data.expected_Q = row[col + 1].value
                         # print(well_data.expected_Q)
-                        well_data.expected_Q = self.definition_is_None(well_data.expected_Q, row_index, col + 1, 1)
+                        well_data.expected_Q = FindIndexPZ.definition_is_None(self,well_data.expected_Q, row_index, col + 1, 1)
                         print(f'после {well_data.expected_Q}')
                     if 'зак' in str(value).lower() or 'давл' in str(value).lower() or 'p' in str(value).lower():
                         well_data.expected_P = row[col + 1].value
-                        well_data.expected_P = self.definition_is_None(well_data.expected_P, row_index, col + 1, 1)
+                        well_data.expected_P = FindIndexPZ.definition_is_None(self,well_data.expected_P, row_index, col + 1, 1)
 
                     if 'qж' in str(value).lower():
                         well_data.Qwater = str(row[col + 1].value).strip().replace(' ', '').replace('м3/сут', '')
-                        well_data.Qwater = self.definition_is_None(well_data.Qwater, row_index, col + 1, 1)
+                        well_data.Qwater = FindIndexPZ.definition_is_None(self,well_data.Qwater, row_index, col + 1, 1)
 
                     if 'qн' in str(value).lower():
                         well_data.Qoil = str(row[col + 1].value).replace(' ', '').replace('т/сут', '')
-                        well_data.Qoil = self.definition_is_None(well_data.Qoil, row_index, col + 1, 1)
+                        well_data.Qoil = FindIndexPZ.definition_is_None(self,well_data.Qoil, row_index, col + 1, 1)
                     if 'воды' in str(value).lower() and "%" in str(value).lower():
                         try:
                             proc_water = str(row[col + 1].value).replace(' ', '').replace('%', '')
 
-                            proc_water = self.definition_is_None(proc_water, row_index, col + 1, 1)
+                            proc_water = FindIndexPZ.definition_is_None(self,proc_water, row_index, col + 1, 1)
                             well_data.proc_water = int(float(proc_water)) if float(proc_water) > 1 else round(
                                 float(proc_water) * 100,
                                 0)
@@ -554,7 +563,7 @@ class Well_data(FindIndexPZ):
 
         super().__init__(ws)
         self.ws = ws
-        self.read_well(self.ws, well_data.cat_well_max._value, well_data.data_pvr_min._value)
+        # self.read_well(self.ws, well_data.cat_well_max._value, well_data.data_pvr_min._value)
 
     def read_well(self, ws, begin_index, cancel_index):
         from main import MyWindow
@@ -632,7 +641,7 @@ class Well_data(FindIndexPZ):
 
                     elif 'Направление' in str(value) and 'Шахтное направление' not in str(value) and \
                             ws.cell(row=row_index + 1, column=col + 1).value != None and \
-                            self.check_str_None(row[col + 3].value) != '0':
+                            FindIndexPZ.check_str_None(self,row[col + 3].value) != '0':
                         well_data.column_direction_True = True
                         if well_data.column_direction_True:
                             for col1, cell in enumerate(row):
@@ -672,7 +681,7 @@ class Well_data(FindIndexPZ):
                             well_data.column_direction_lenght = ProtectedIsNonNone('не корректно')
 
                     elif 'Кондуктор' in str(value) and \
-                            self.check_str_None(row[col + 3].value) != '0':
+                            FindIndexPZ.check_str_None(self,row[col + 3].value) != '0':
 
                         for col1, cell in enumerate(row):
                             if 'Уровень цемента' in str(cell.value):
@@ -731,10 +740,10 @@ class Well_data(FindIndexPZ):
                                 if len(data_main_production_string[-1].split('-')) == 2:
 
                                     well_data.shoe_column = ProtectedIsDigit(
-                                        self.check_str_None(data_main_production_string[-1].split('-')[-1]))
+                                        FindIndexPZ.check_str_None(self,data_main_production_string[-1].split('-')[-1]))
                                 else:
                                     well_data.shoe_column = ProtectedIsDigit(
-                                        self.check_str_None(data_main_production_string[-1]))
+                                        FindIndexPZ.check_str_None(self,data_main_production_string[-1]))
                             except:
                                 well_data.shoe_column = ProtectedIsNonNone('не корректно')
                         except ValueError:
@@ -744,15 +753,15 @@ class Well_data(FindIndexPZ):
 
                     elif 'Уровень цемента за колонной' in str(value):
                         well_data.level_cement_column = ProtectedIsDigit(row[col + 3].value)
-                        well_data.level_cement_column = self.definition_is_None(well_data.level_cement_column,
+                        well_data.level_cement_column = FindIndexPZ.definition_is_None(self,well_data.level_cement_column,
                                                                                 row_index,
                                                                                 col, 1)
                     elif 'Рмкп ( э/к и' in str(cell):
                         well_data.pressuar_mkp = ProtectedIsNonNone(row[col + 2].value)
                     elif 'онструкция хвостовика' in str(value):
 
-                        data_column_additional = self.check_str_None(ws.cell(row=row_index + 2, column=col + 2).value)
-                        # print(f'доп колона {data_column_additional.strip(), self.check_str_None(data_column_additional.strip())}')
+                        data_column_additional = FindIndexPZ.check_str_None(self,ws.cell(row=row_index + 2, column=col + 2).value)
+                        # print(f'доп колона {data_column_additional.strip(), FindIndexPZ.check_str_None(self,data_column_additional.strip())}')
                         if data_column_additional != '0':
                             well_data.column_additional = True
                         if well_data.column_additional is True:
@@ -767,23 +776,23 @@ class Well_data(FindIndexPZ):
 
                             try:
                                 try:
-                                    data_add_column = self.check_str_None(
+                                    data_add_column = FindIndexPZ.check_str_None(self,
                                         ws.cell(row=row_index + 2, column=col + 4).value)
                                     # print(f' доп колонна {data_add_column}')
                                     well_data.column_additional_diametr = ProtectedIsDigit(data_add_column[0])
 
                                 except:
                                     well_data.column_additional_diametr = ProtectedIsDigit(
-                                        self.check_str_None(ws.cell(row=row_index + 2, column=col + 4).value))
+                                        FindIndexPZ.check_str_None(self,ws.cell(row=row_index + 2, column=col + 4).value))
 
                                 try:
-                                    data_add_column = self.check_str_None(
+                                    data_add_column = FindIndexPZ.check_str_None(self,
                                         ws.cell(row=row_index + 2, column=col + 4).value)
                                     well_data.column_additional_wall_thickness = ProtectedIsDigit(data_add_column[1])
                                 except:
 
                                     well_data.column_additional_wall_thickness = ProtectedIsDigit(
-                                        self.check_str_None(ws.cell(row=row_index + 2, column=col + 6).value))
+                                        FindIndexPZ.check_str_None(self,ws.cell(row=row_index + 2, column=col + 6).value))
 
                             except:
                                 well_data.column_additional_wall_thickness = ProtectedIsNonNone('не корректно')
@@ -829,7 +838,7 @@ class Well_perforation(FindIndexPZ):
 
         super().__init__(ws)
         self.ws = ws
-        self.read_well(self.ws, well_data.data_pvr_min._value, well_data.data_pvr_max._value + 1)
+        # self.read_well(self.ws, well_data.data_pvr_min._value, well_data.data_pvr_max._value + 1)
 
     def read_well(self, ws, begin_index, cancel_index):
         from work_py.alone_oreration import is_number, calculationFluidWork
@@ -1028,7 +1037,7 @@ class Well_Category(FindIndexPZ):
     def __init__(self, ws):
 
         super(Well_Category, self).__init__(ws)
-        self.read_well(ws, well_data.cat_well_min._value, well_data.data_well_min._value)
+        # self.read_well(ws, well_data.cat_well_min._value, well_data.data_well_min._value)
 
     def read_well(self, ws, begin_index, cancel_index):
         from main import MyWindow
@@ -1068,11 +1077,11 @@ class Well_Category(FindIndexPZ):
                     elif 'мг/л' in str(cell) or 'мг/дм3' in str(cell):
                         cell2 = ws.cell(row=row, column=col - 1).value
                         if cell2:
-                            well_data.h2s_mg.append(float(self.check_str_None(cell2)))
+                            well_data.h2s_mg.append(float(FindIndexPZ.check_str_None(self,cell2)))
                     elif 'м3/т' in str(cell):
                         cell2 = ws.cell(row=row, column=col - 1).value
                         if cell2:
-                            well_data.gaz_f_pr.append(round(float(self.check_str_None(cell2)), 1))
+                            well_data.gaz_f_pr.append(round(float(FindIndexPZ.check_str_None(self,cell2)), 1))
                     elif '%' in str(cell):
                         cell2 = ws.cell(row=row, column=col - 1).value
                         print(f'проц {cell2}')
@@ -1084,13 +1093,13 @@ class Well_Category(FindIndexPZ):
                             well_data.h2s_pr.append(float(str(h2s_pr).replace(',', '.')))
                         else:
                             h2s_pr = cell2
-                            well_data.h2s_pr.append(self.check_str_None(cell2))
+                            well_data.h2s_pr.append(FindIndexPZ.check_str_None(self,cell2))
 
 
                     elif str(cell) in 'мг/м3':
                         cell2 = ws.cell(row=row, column=col - 1).value
                         if cell2:
-                            well_data.h2s_mg_m3.append(float(str(self.check_str_None(cell2)).replace(',', '.')) / 1000)
+                            well_data.h2s_mg_m3.append(float(str(FindIndexPZ.check_str_None(self,cell2)).replace(',', '.')) / 1000)
         if len(well_data.h2s_mg) == 0 and len(well_data.h2s_mg_m3) != 0:
             for mg in well_data.h2s_mg_m3:
                 print(f'значени{mg}')

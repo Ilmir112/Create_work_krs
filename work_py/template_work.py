@@ -78,8 +78,11 @@ class TabPage_SO_with(QWidget):
             self.template_select_list = ['ПСШ ЭК', 'ПСШ открытый ствол', 'ПСШ без хвоста']
 
             self.template_Combo.addItems(self.template_select_list)
+
             template_key = self.definition_pssh()
+            print(self.template_select_list, template_key)
             self.template_Combo.setCurrentIndex(self.template_select_list.index(template_key))
+
 
             self.grid.addWidget(self.template_labelType, 1, 2, 1, 8)
             self.grid.addWidget(self.template_Combo, 2, 2, 2, 8)
@@ -165,14 +168,22 @@ class TabPage_SO_with(QWidget):
     def definition_pssh(self):
 
         if well_data.column_additional is False and well_data.open_trunk_well is False and all(
-                [well_data.dict_perforation[plast]['отрайбировано'] for plast in well_data.plast_work]) is False:
+                [well_data.dict_perforation[plast]['отрайбировано'] for plast in well_data.plast_work]) is False or \
+                (well_data.column_additional is True and well_data.open_trunk_well is False and all(
+            [well_data.dict_perforation[plast]['отрайбировано'] for plast in well_data.plast_work]) is False and \
+                 well_data.current_bottom <= well_data.head_column_additional._value):
             template_key = 'ПСШ ЭК'
 
-        elif well_data.column_additional is False and well_data.open_trunk_well is True:
+        elif well_data.column_additional is False and well_data.open_trunk_well is True or \
+                ( well_data.column_additional is True and well_data.open_trunk_well is True and \
+                  well_data.current_bottom <= well_data.head_column_additional._value and well_data.open_trunk_well):
             template_key = 'ПСШ открытый ствол'
 
         elif well_data.column_additional is False and well_data.open_trunk_well is False and all(
-                [well_data.dict_perforation[plast]['отрайбировано'] for plast in well_data.plast_work]) is True:
+                [well_data.dict_perforation[plast]['отрайбировано'] for plast in well_data.plast_work]) is True or \
+                (well_data.column_additional is True and well_data.open_trunk_well is False and all(
+                [well_data.dict_perforation[plast]['отрайбировано'] for plast in well_data.plast_work]) is True and \
+                 well_data.current_bottom <= well_data.head_column_additional._value):
             template_key = 'ПСШ без хвоста'
 
         elif well_data.column_additional is True and well_data.open_trunk_well is False and all(
@@ -894,7 +905,7 @@ class TemplateKrs(QMainWindow):
         well_data.skm_interval.extend(skm_tuple)
         print(f'интервалы СКМ {well_data.skm_interval}')
         skm_list = sorted(skm_tuple, key=lambda x: x[0])
-        work_template_list = self.template_ek(template_str, template_key, template_diametr, skm_list)
+        work_template_list = self.template_ek(template_str, template_diametr, skm_list)
 
         MyWindow.populate_row(self.ins_ind, work_template_list, self.table_widget)
         well_data.pause = False
@@ -925,10 +936,10 @@ class TemplateKrs(QMainWindow):
                                       well_data.head_column_additional._value) / 1000)
             return volume_well
 
-    def template_ek(self, template_str, template_key, template_diametr, skm_list):
+    def template_ek(self, template_str, template_diametr, skm_list):
 
         from .advanted_file import raid
-
+        print(f'внут {skm_list}')
         skm_interval = raid(skm_list)
 
         list_template_ek = [

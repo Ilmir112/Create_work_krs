@@ -19,8 +19,8 @@ def acidGons(self):
     acid_countOfpoint, ok = QInputDialog.getInt(self, 'концентрация кислоты', 'Введите объем кислоты на точку', 5, 1, 24)
     acid_points, ok = QInputDialog.getText(self, 'точки ГОНС', 'Введите точки ГОНС ')
     bottom_point = max(list(map(int, acid_points.replace('м', '').replace(',', '').split())))
-    gons_list = [[f'Спуск гидроманиторную насадку до глубины нижней точки до {bottom_point}', None,
-     f'Спустить  гидроманиторную насадку '
+    gons_list = [[f'Спуск гидромониторную насадку до глубины нижней точки до {bottom_point}', None,
+     f'Спустить  гидромониторную насадку '
      f'{"".join([f" + НКТ60мм {round(well_data.current_bottom -well_data.head_column_additional._value, 0)}" if well_data.column_additional is True else ""])} '
      f'на НКТ{well_data.nkt_diam}мм до глубины нижней точки до {bottom_point}'
      f' с замером, шаблонированием шаблоном {well_data.nkt_template}мм.',
@@ -39,7 +39,7 @@ def acidGons(self):
       None, None, None, None, None, None, None,
       'мастер КРС', 1.2],
      [None, None,
-      f'Поднять гидроманиторную насадку на НКТ{well_data.nkt_diam}мм c глубины {well_data.current_bottom}м с доливом скважины в '
+      f'Поднять гидромониторную насадку на НКТ{well_data.nkt_diam}мм c глубины {well_data.current_bottom}м с доливом скважины в '
       f'объеме {round(well_data.current_bottom * 1.12 / 1000, 1)}м3 удельным весом {well_data.fluid_work}',
       None, None, None, None, None, None, None,
       'мастер КРС',

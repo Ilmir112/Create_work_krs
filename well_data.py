@@ -103,6 +103,7 @@ grp_plan = False
 nktOpressTrue = False
 open_trunk_well = False
 lift_ecn_can = False
+sucker_rod_none = True
 pause = True
 curator = '0'
 lift_ecn_can_addition = False

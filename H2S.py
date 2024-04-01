@@ -63,7 +63,7 @@ def calc_h2s(ws3, h2s_pr, h2s_mg):
         [None, '№', 'Параметр', None, 'Результат расчета', None],
         [None, 1, 'Параметры скважины', None, f'{well_data.well_number._value} {well_data.well_area._value}', None],
         [None, 1.1, 'Забой скважины', 'м', round(float(well_data.bottomhole_artificial._value), 1), 'формула'],
-        [None, 1.2, 'текущий забой', 'м', round(float(well_data.bottom._value), 1), 'ввод'],
+        [None, 1.2, 'текущий забой', 'м', round(float(well_data.bottom), 1), 'ввод'],
         [None, 1.3, 'Диаметр ЭК (ступень 1 верхняя)', 'мм', int(well_data.column_diametr._value), 'ввод'],
         [None, '1.3.1.', 'Толщина стенки ЭК (ступень 1 верхняя)', 'мм',
          round(float(well_data.column_wall_thickness._value), 1), 'ввод'],

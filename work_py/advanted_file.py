@@ -275,26 +275,15 @@ def merge_overlapping_intervals(intervals):
     return merged
 
 
-def raid(a):
-   
-
-
-    if len(a) == 1:
-        return f'{int(float(a[0][0]))} - {int(float(a[0][1]))}'
-    if len(a) == 0:
+def raid(string):
+    if len(string) == 1:
+        return f'{int(float(string[0][0]))} - {int(float(string[0][1]))}'
+    if len(string) == 0:
         return 'разбуренного цем моста'
-    elif len(a) > 1 and well_data.column_additional is True:
+    elif len(string) > 1:
         d = ''
-        for i in list(a):
-            if well_data.head_column_additional._value <= i[0]:
-                d += f'{int(float(i[0]))} - {int(float(i[1]))}, '
-    else:
-        d = ''
-        print(a)
-        for i in list(a):
-            print(i)
+        for i in list(string):
             d += f'{int(float(i[0]))} - {int(float(i[1]))}, '
-
 
 
     return d[:-2]

@@ -171,7 +171,7 @@ class GnoWindow(QMainWindow):
 
     def work_krs(self, work_plan, lift_key, volume_well_jaming, fluid):
         from work_py.rationingKRS import lifting_sucker_rod, well_jamming_norm, liftingGNO
-        from work_py.alone_oreration import well_jamming
+        from work_py.alone_oreration import well_jamming, konte
         from work_py.descent_gno import gno_nkt_opening
 
         well_data.fluid_work, well_data.fluid_work_short = self.calc_work_fluid(fluid)
@@ -314,9 +314,12 @@ class GnoWindow(QMainWindow):
                            f'ПРОТИВОФОНТАННЫЙ ЛИФТ ДЛИНОЙ 300м. ', None, None,
                            None, None, None, None, None,
                            'Мастер КРС представитель Заказчика', None]]
-            kvostovik = f' + хвостовиком ' \
-                        f'{round(sum(list(well_data.dict_nkt.values())) - float(well_data.depth_fond_paker_do["do"]), 1)}м ' \
-                if well_data.region == 'ТГМ' else ''
+
+            kvostovika_lenght = round(sum(list(well_data.dict_nkt.values())) - float(well_data.depth_fond_paker_do["do"]), 1)
+
+            kvostovik = f' + хвостовиком {kvostovika_lenght}м ' if well_data.region == 'ТГМ' and \
+                                                                  kvostovika_lenght > 0.001 else ''
+
             well_jamming_str = well_jamming(self, without_damping_True, lift_key,
                                             volume_well_jaming)  # экземпляр функции расчета глушения
             well_jamming_ord = volume_jamming_well(self, float(well_data.depth_fond_paker_do["do"]))
@@ -324,7 +327,8 @@ class GnoWindow(QMainWindow):
                 [f'Опрессовать ГНО на Р={40}атм', None,
                  f'Опрессовать ГНО на Р={40}атм в течении 30мин в присутствии представителя ЦДНГ. '
                  f'Составить акт. (Вызов представителя осуществлять '
-                 f'телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ) ПРИ НЕГЕРМЕТИЧНОСТИ НКТ ПОДЪЕМ ВЕСТИ С КАЛИБРОВКОЙ',
+                 f'телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ) ПРИ НЕГЕРМЕТИЧНОСТИ '
+                 f'НКТ ПОДЪЕМ ВЕСТИ С КАЛИБРОВКОЙ',
                  None, None, None, None, None, None, None,
                  'Мастер КРС представитель Заказчика ', 0.67],
                 [None, None,
@@ -392,7 +396,8 @@ class GnoWindow(QMainWindow):
                  pvo_gno(well_data.kat_pvo)[0], None, None,
                  None, None, None, None, None,
                  ''.join([
-                     'Мастер КРС, представ-ли ПАСФ и Заказчика, Пуск. ком' if well_data.kat_pvo == 1 else 'Мастер КРС, представ-ли  Заказчика']),
+                     'Мастер КРС, представ-ли ПАСФ и '
+                     'Заказчика, Пуск. ком' if well_data.kat_pvo == 1 else 'Мастер КРС, представ-ли  Заказчика']),
                  [4.21 if 'схеме №1' in str(pvo_gno(well_data.kat_pvo)[0]) else 0.23 + 0.3 + 0.83 + 0.67 + 0.14][0]],
                 [None, None,
                  f'Опрессовку ПВО проводить после каждого монтажа. (ОПРЕССОВКУ ПВО ЗАФИКСИРОВАТЬ В ВАХТОВОМ ЖУРНАЛЕ).',
@@ -1285,7 +1290,11 @@ class GnoWindow(QMainWindow):
                          'ЭЦН с пакером': lift_ecn_with_paker, 'ЭЦН': lift_ecn, 'НВ': lift_pump_nv, 'НН': lift_pump_nn}
 
             lift_select = lift_dict[lift_key]
-            return krs_begin + lift_select + posle_lift
+            if well_data.konte_true:
+                konte_list = konte(self)
+            else:
+                konte_list = []
+            return krs_begin + lift_select + posle_lift + konte_list
         else:
             krs_begin = [
                 [None, None, 'Порядок работы', None, None, None, None, None, None, None, None, None],

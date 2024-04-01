@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import QVBoxLayout, QStyledItemDelegate, qApp, QMessageBox,
     QTableWidgetItem, QMainWindow
 
 import well_data
+import work_py.alone_oreration
 from work_py.alone_oreration import volume_vn_nkt
 from main import MyWindow
 
@@ -771,7 +772,8 @@ class AcidPakerWindow(QMainWindow):
                                        None, None, None, None, None, None, None,
                                        'мастер КРС',
                                        liftingNKT_norm(well_data.current_bottom, 1)])
-
+        if well_data.region == 'ТГМ' and well_data.curator == 'ОР':
+            work_template_list.extend(work_py.alone_oreration.kot_work(self, well_data.current_bottom))
         MyWindow.populate_row(self.ins_ind, work_template_list, self.table_widget)
         well_data.pause = False
         self.close()
@@ -1294,8 +1296,8 @@ class AcidPakerWindow(QMainWindow):
     def flushing_downhole(self, paker_depth, paker_khost, paker_layout):
         from work_py.alone_oreration import well_volume
 
-        if 'однопакерная' == paker_layout:
-
+        print(paker_layout)
+        if 'одно' in paker_layout:
             if (well_data.perforation_roof - 5 + paker_khost >= well_data.current_bottom) or \
                     (all([well_data.dict_perforation[plast]['отрайбировано'] for plast in well_data.plast_work])):
                 flushing_downhole_list = f'Допустить компоновку до глубины {well_data.current_bottom}м.' \
@@ -1323,7 +1325,7 @@ class AcidPakerWindow(QMainWindow):
                                           f' {well_data.perforation_roof - 5 + paker_khost}м) ' \
                                           f'Промыть уд.весом {well_data.fluid_work} не менее ' \
                                           f'{round(well_volume(self, paker_depth + paker_khost) * 1.5, 1)}м3 '
-        if 'воронка' == paker_layout:
+        elif 'ворон' in paker_layout:
             flushing_downhole_list = f'Допустить компоновку до глубины {well_data.current_bottom}м.' \
                                      f' Промыть скважину обратной промывкой ' \
                                      f'по круговой циркуляции  жидкостью уд.весом {well_data.fluid_work} п' \

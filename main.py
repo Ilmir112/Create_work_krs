@@ -25,6 +25,7 @@ from data_correct_position_people import CorrectSignaturesWindow
 from data_base.work_with_base import Classifier_well
 
 from work_py.drilling import Drill_window
+from find import ProtectedIsDigit
 
 
 class ExcelWorker(QThread):
@@ -747,6 +748,7 @@ class MyWindow(QMainWindow):
             well_data.normOfTime = 0
             well_data.lift_ecn_can = False
             well_data.pause = True
+            well_data.sucker_rod_none = True
             well_data.curator = '0'
             well_data.lift_ecn_can_addition = False
             well_data.column_passability = False
@@ -754,8 +756,8 @@ class MyWindow(QMainWindow):
             well_data.template_depth = 0
 
             well_data.b_plan = 0
-            well_data.pipes_ind = 0
-            well_data.sucker_rod_ind = 0
+            well_data.pipes_ind = ProtectedIsDigit(0)
+            well_data.sucker_rod_ind = ProtectedIsDigit(0)
             well_data.expected_Q = 0
             well_data.expected_P = 0
             well_data.plast_select = ''
