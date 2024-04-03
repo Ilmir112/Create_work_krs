@@ -97,7 +97,7 @@ class Gpp_window(QMainWindow):
             return
         work_list = self.grpGpp(paker_depth, current_depth, diametr_paker)
 
-        MyWindow.populate_row(self.ins_ind, work_list, self.table_widget)
+        MyWindow.populate_row(self, self.ins_ind, work_list, self.table_widget)
         well_data.pause = False
         self.close()
     def grpGpp(self, gpp_depth, current_depth, diametr_paker):

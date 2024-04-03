@@ -860,9 +860,9 @@ class TemplateKrs(QMainWindow):
             template_diametr = int(self.tabWidget.currentWidget().template_second_Edit.text())
         else:
             template_diametr = int(self.tabWidget.currentWidget().template_first_Edit.text())
-
+        print(well_data.problemWithEk_depth)
         if (template_diametr >= int(well_data.problemWithEk_diametr) - 2
-                and well_data.template_depth > int(well_data.problemWithEk_depth)):
+                and well_data.template_depth > float(well_data.problemWithEk_depth)):
             mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже глубины не прохода')
             return
         if (template_diametr >= int(well_data.problemWithEk_diametr) - 2
@@ -907,7 +907,7 @@ class TemplateKrs(QMainWindow):
         skm_list = sorted(skm_tuple, key=lambda x: x[0])
         work_template_list = self.template_ek(template_str, template_diametr, skm_list)
 
-        MyWindow.populate_row(self.ins_ind, work_template_list, self.table_widget)
+        MyWindow.populate_row(self, self.ins_ind, work_template_list, self.table_widget)
         well_data.pause = False
         self.close()
 
@@ -1140,7 +1140,7 @@ class TemplateKrs(QMainWindow):
             else:
                 if self.raid_window is None:
                     self.raid_window = Drill_window(self.table_widget, self.ins_ind)
-                    self.raid_window.setGeometry(200, 400, 300, 400)
+                    # self.raid_window.setGeometry(200, 400, 300, 400)
                     self.raid_window.show()
                     drill_work_list = self.raid_window.add_work()
                     self.raid_window = None

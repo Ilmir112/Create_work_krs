@@ -16,47 +16,30 @@ def gno_down(self):
         lift_key = 'ЭЦН'
     elif '89' in well_data.dict_nkt_po.keys() and '48' in well_data.dict_nkt_po.keys() and well_data.paker_do[
         "posle"] != 0:
-
         lift_key = 'ОРЗ'
-
     elif well_data.dict_pump_ECN["posle"] != 0 and well_data.paker_do["posle"] == 0:
-
         lift_key = 'ЭЦН с пакером'
-        print('Подьем ЭЦН с пакером ')
-
     elif ('НВ' in well_data.if_None(well_data.dict_pump_SHGN["posle"]).upper() or 'ШГН' in well_data.if_None(
             well_data.dict_pump_SHGN[
                 "posle"]).upper()) and well_data.paker_do["posle"] == 0:
-
         lift_key = 'НВ'
     elif ('НВ' in well_data.if_None(well_data.dict_pump_SHGN["posle"]).upper() or 'ШГН' in well_data.if_None(
             well_data.dict_pump_SHGN[
                 "posle"]).upper()) and well_data.paker_do["posle"] != 0:
-
         lift_key = 'НВ с пакером'
-
     elif 'НН' in well_data.if_None(well_data.dict_pump_SHGN["posle"]).upper() and well_data.paker_do["posle"] == 0:
-
         lift_key = 'НН'
     elif 'НН' in well_data.if_None(well_data.dict_pump_SHGN["posle"]).upper() and well_data.paker_do["posle"] != 0:
-
         lift_key = 'НН с пакером'
     elif well_data.dict_pump_SHGN["posle"] != 0 and well_data.dict_pump_ECN["posle"] != 0:
-
         lift_key = "ОРД"
     elif 'НН' in well_data.if_None(well_data.dict_pump_SHGN["posle"]) and well_data.paker_do["posle"] != 0:
-
         lift_key = "НН с пакером"
-
-
     elif well_data.dict_pump_SHGN["posle"] == 0 and well_data.dict_pump_ECN["posle"] == 0 and \
             well_data.paker_do["posle"] == 0:
-
         lift_key = 'воронка'
-
     elif well_data.dict_pump_SHGN["posle"] == 0 and well_data.dict_pump_ECN["posle"] == 0 and \
             well_data.paker_do["posle"] != 0:
-
         lift_key = 'пакер'
 
     paker_descent = [
@@ -115,8 +98,8 @@ def gno_down(self):
             else:
                 for row in rgdWithPaker(self):
                     paker_descent.append(row)
-
-    if lift_key not in ['ЭЦН', 'НВ', 'НН', 'НН с пакером', 'ЭЦН с пакером', 'НВ с пакером', 'ОРД']:
+    print(f'ключ {lift_key}')
+    if lift_key in ['ЭЦН', 'НВ', 'НН', 'НН с пакером', 'ЭЦН с пакером', 'НВ с пакером', 'ОРД']:
         calc_fond_nkt_str = calc_fond_nkt(self, sum(list(well_data.dict_nkt_po.values())))
     else:
         calc_fond_nkt_str = None
@@ -665,10 +648,10 @@ def gno_down(self):
                                     f'ПРИ НАЛИЧИИ ЦИРКУЛЯЦИИ ДОПУСТИТЬ КОМПОНОВКУ НА ТНКТ ДО ТЕКУЩЕГО ЗАБОЯ 1350м. '
                                     f'ПРОИЗВЕСТИ ВЫМЫВ ПРОДУКТОВ '
                                     f'РЕАКЦИИ С ТЕКУЩЕГО ЗАБОЯ ОБРАТНОЙ ПРОМЫВКОЙ УД.ВЕСОМ {well_data.fluid_work}. '
-                                    f'ПОДНЯТЬ тНКТ ДО ПЛАНОВОЙ ГЛУБИНЫ {well_data.dict_pump_SHGN_h}м',
+                                    f'ПОДНЯТЬ тНКТ ДО ПЛАНОВОЙ ГЛУБИНЫ {well_data.dict_pump_SHGN_h["posle"]}м',
                                     None, None, None, None, None, None, None,
                                     'мастер КРС', float(8.5)]
-                gno_list.append(jumping_sko_list)
+                gno_list.insert(-4, jumping_sko_list)
         else:
             if jumping_sko_question == QMessageBox.StandardButton.Yes:
                 gips = TemplateKrs.pero(self)

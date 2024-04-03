@@ -152,7 +152,7 @@ class Kompress_Window(QMainWindow):
         else:
             pass
 
-        MyWindow.populate_row(self.ins_ind, work_list, self.table_widget)
+        MyWindow.populate_row(self, self.ins_ind, work_list, self.table_widget)
         well_data.pause = False
         self.close()
 

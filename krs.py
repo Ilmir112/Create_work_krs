@@ -113,8 +113,10 @@ class TabPageGno(QWidget):
             end_date = datetime(current_date.year, 4, 1).date()
 
         # Проверяем условие: если текущая дата находится в указанном периоде    
-
-        fluid_p = 1.01
+        if well_data.region in ['КГМ', 'АГМ']:
+            fluid_p = 1.02
+        else:
+            fluid_p = 1.01
         for plast in well_data.plast_work:
             if float(list(well_data.dict_perforation[plast]['рабочая жидкость'])[0]) > fluid_p:
                 fluid_p = list(well_data.dict_perforation[plast]['рабочая жидкость'])[0]
@@ -165,7 +167,7 @@ class GnoWindow(QMainWindow):
         well_data.fluid_work, well_data.fluid_work_short = self.calc_work_fluid(fluid)
         work_list = self.work_krs(self.work_plan, lift_key, volume_well_jaming, fluid)
 
-        MyWindow.populate_row(self.ins_ind, work_list, self.table_widget)
+        MyWindow.populate_row(self, self.ins_ind, work_list, self.table_widget)
         well_data.pause = False
         self.close()
 
@@ -196,9 +198,6 @@ class GnoWindow(QMainWindow):
                      f"Тех отстой 1-2 часа. Произвести замер избыточного давления в скважине."
 
             krs_begin = [
-                [None, None, 'Порядок работы', None, None, None, None, None, None, None, None, None],
-                [None, None, 'Наименование работ', None, None, None, None, None, None, None, 'Ответственный',
-                 'Нормы времени \n мин/час.'],
                 [None, None,
                  f'Начальнику смены ЦТКРС, вызвать телефонограммой представителя Заказчика для оформления АКТа '
                  f'приёма-передачи скважины в ремонт. \n'

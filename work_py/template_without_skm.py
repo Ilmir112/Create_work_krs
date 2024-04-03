@@ -578,7 +578,7 @@ class Template_without_skm(QMainWindow):
 
 
         work_list = self.template_ek(template_str, template, template_diametr)
-        MyWindow.populate_row(self.ins_ind, work_list, self.table_widget)
+        MyWindow.populate_row(self, self.ins_ind, work_list, self.table_widget)
         well_data.pause = False
         self.close()
 
@@ -782,7 +782,7 @@ class Template_without_skm(QMainWindow):
                 from .drilling import Drill_window
                 if self.raid_window is None:
                     self.raid_window = Drill_window(self.table_widget, self.ins_ind)
-                    self.raid_window.setGeometry(200, 400, 300, 400)
+                    # self.raid_window.setGeometry(200, 400, 300, 400)
                     self.raid_window.show()
                     MyWindow.pause_app()
                     drill_work_list = self.raid_window.add_work()
@@ -798,7 +798,7 @@ class Template_without_skm(QMainWindow):
             else:
                 if self.raid_window is None:
                     self.raid_window = Drill_window(self.table_widget, self.ins_ind)
-                    self.raid_window.setGeometry(200, 400, 300, 400)
+                    # self.raid_window.setGeometry(200, 400, 300, 400)
                     self.raid_window.show()
                     MyWindow.pause_app()
                     drill_work_list = self.raid_window.add_work()

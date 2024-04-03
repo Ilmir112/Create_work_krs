@@ -29,7 +29,7 @@ class TabPage_SO(QWidget):
         self.paker_depth_edit.textChanged.connect(self.update_paker)
 
         if len(well_data.plast_work) != 0:
-            pakerDepth = well_data.perforation_sole -20
+            pakerDepth = well_data.perforation_roof - 20
         else:
             if well_data.leakiness:
                 pakerDepth = min([well_data.dict_perforation['НЭК']['интервал'][nek][0] - 10
@@ -74,11 +74,11 @@ class TabPage_SO(QWidget):
 
         if index == 'Да':
             if len(well_data.plast_work) != 0:
-                pakerDepthZumpf = well_data.perforation_sole + 10
+                pakerDepthZumpf = int(well_data.perforation_sole + 10)
             else:
                 if well_data.leakiness:
-                    pakerDepthZumpf = max([well_data.dict_perforation['НЭК']['интервал'][nek][0]+10
-                                           for nek in well_data.dict_perforation['НЭК']['интервал'].keys()])
+                    pakerDepthZumpf = int(max([well_data.dict_perforation['НЭК']['интервал'][nek][0]+10
+                                           for nek in well_data.dict_perforation['НЭК']['интервал'].keys()]))
             self.pakerDepthZumpf_edit.setText(f'{pakerDepthZumpf}')
 
             self.grid_layout.addWidget(self.pakerDepthZumpf_Label, 3, 5)
@@ -180,7 +180,7 @@ class OpressovkaEK(QMainWindow):
             return
 
         work_list = OpressovkaEK.paker_list(self, diametr_paker, paker_khost, paker_depth, pakerDepthZumpf, pressureZUMPF_question)
-        MyWindow.populate_row(self.ins_ind, work_list, self.table_widget)
+        MyWindow.populate_row(self, self.ins_ind, work_list, self.table_widget)
         well_data.pause = False
         self.close()
 

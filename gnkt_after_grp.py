@@ -7,7 +7,12 @@ from krs import GnoWindow
 def gnkt_work(self):
     V_gntk = round(2327 * 0.74 / 1000, 1)
 
-    fluid_work, well_data.fluid_work_short = GnoWindow.calc_work_fluid(self, self.work_plan)
+    fluid_work_insert, ok = QInputDialog.getDouble(self,
+                                                   'удельный вес',
+                                                   'ВВедите удельный вес рабочей жидкости',
+                                                   1.18, 0, 1.6, 2)
+
+    fluid_work, well_data.fluid_work_short = GnoWindow.calc_work_fluid(self, fluid_work_insert)
 
     gnkt_opz = [
         [None, None, 'Порядок работы', None, None, None, None, None, None, None, None, None],

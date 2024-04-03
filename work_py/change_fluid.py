@@ -96,7 +96,7 @@ class Change_fluid_Window(QMainWindow):
         pressuar_new = float(self.tabWidget.currentWidget().pressuar_new_edit.text())
 
         work_list = self.fluid_change(plast_new, fluid_new, pressuar_new)
-        MyWindow.populate_row(self.ins_ind, work_list, self.table_widget)
+        MyWindow.populate_row(self, self.ins_ind, work_list, self.table_widget)
         well_data.pause = False
         self.close()
 

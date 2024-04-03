@@ -142,7 +142,7 @@ class SandWindow(QMainWindow):
             rir_list = RirWindow.rirWithPero(self, "Не нужно", '', roof_rir_edit, sole_rir_edit)
             work_list.extend(rir_list[1:])
 
-        MyWindow.populate_row(self.ins_ind, work_list, self.table_widget)
+        MyWindow.populate_row(self, self.ins_ind, work_list, self.table_widget)
         well_data.pause = False
         self.close()
     def sand_select(self):

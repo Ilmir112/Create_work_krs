@@ -184,7 +184,7 @@ class GnktOpz(QMainWindow):
                                    pressure_edit,
                                    plast_combo, svk_true_edit, skv_acid_edit)
 
-        MyWindow.populate_row(self.ins_ind, work_list, self.table_widget)
+        MyWindow.populate_row(self, self.ins_ind, work_list, self.table_widget)
         well_data.pause = False
         self.close()
 
@@ -206,7 +206,11 @@ class GnktOpz(QMainWindow):
         else:
             acid_true_quest = False
 
-        fluid_work, well_data.fluid_work_short = GnoWindow.calc_work_fluid(self, self.work_plan)
+        fluid_work_insert, ok = QInputDialog.getDouble(self,
+                                                   'удельный вес',
+                                                   'ВВедите удельный вес рабочей жидкости',
+                                                   1.18, 0, 1.6, 2)
+        fluid_work, well_data.fluid_work_short = GnoWindow.calc_work_fluid(self, fluid_work_insert)
 
         if need_rast_combo == 'нужно':
             volume_rast_edit = volume_rast_edit
@@ -261,9 +265,6 @@ class GnktOpz(QMainWindow):
             depth_fond_paker_do = well_data.depth_fond_paker_do["do"]
 
         gnkt_opz = [
-            [None, None, 'Порядок работы', None, None, None, None, None, None, None, None, None],
-            [None, 'п/п', 'Наименование работ', None, None, None, None, None, None, None,
-             'Ответственный', 'Нормы времени'],
             [None, None, 'ВНИМАНИЕ: Перед спуском и вовремя проведения СПО бурильщикам и мастеру производить осмотр '
                          'ГНКТ на наличие '
                          '"меток" на г/трубы, установленных запрещённым способом.\nПри обнаружении - доложить руководству'

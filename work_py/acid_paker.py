@@ -774,7 +774,7 @@ class AcidPakerWindow(QMainWindow):
                                        liftingNKT_norm(well_data.current_bottom, 1)])
         if well_data.region == 'ТГМ' and well_data.curator == 'ОР':
             work_template_list.extend(work_py.alone_oreration.kot_work(self, well_data.current_bottom))
-        MyWindow.populate_row(self.ins_ind, work_template_list, self.table_widget)
+        MyWindow.populate_row(self, self.ins_ind, work_template_list, self.table_widget)
         well_data.pause = False
         self.close()
 
@@ -1204,16 +1204,20 @@ class AcidPakerWindow(QMainWindow):
              'мастер КРС', 0.3],
             [None, None,
              ''.join(
-                 [f'продавить кислоту тех жидкостью в объеме {round(volume_vn_nkt(self.dict_nkt) * 1.5, 1)}м3 '
+                 [f'продавить кислоту тех жидкостью в объеме {round(volume_vn_nkt(self.dict_nkt) +0,5 , 1)}м3 '                  
                   f'при давлении не '
                   f'более {well_data.max_admissible_pressure._value}атм. Увеличение давления согласовать'
                   f' с заказчиком' if acid_volume_edit < volume_vn_nkt(
                      self.dict_nkt) else f'продавить кислоту оставшейся кислотой в объеме '
                                          f'{round(acid_volume_edit - volume_vn_nkt(self.dict_nkt), 1)}м3 и тех '
                                          f'жидкостью '
-                                         f'в объеме {round(volume_vn_nkt(self.dict_nkt) * 1.5, 1)}м3 при давлении '
+                                         f'в объеме {round(volume_vn_nkt(self.dict_nkt) + 0.5, 1)}м3 '                                     
+                                         f'при давлении '
                                          f'не более {well_data.max_admissible_pressure._value}атм. '
-                                         f'Увеличение давления согласовать с заказчиком']),
+                                         f'Увеличение давления согласовать с заказчиком\n'
+                                         f'(в случае поглощения произвести продавку в '
+                                         f'V-{round(volume_vn_nkt(self.dict_nkt)*1.5 , 1)}м3 '
+                                            f'(1.5-ом объеме НКТ)) ']),
              None, None, None, None, None, None, None,
              'мастер КРС', 6],
             [f'без реагирования' if (
@@ -1300,45 +1304,63 @@ class AcidPakerWindow(QMainWindow):
         if 'одно' in paker_layout:
             if (well_data.perforation_roof - 5 + paker_khost >= well_data.current_bottom) or \
                     (all([well_data.dict_perforation[plast]['отрайбировано'] for plast in well_data.plast_work])):
-                flushing_downhole_list = f'Допустить компоновку до глубины {well_data.current_bottom}м.' \
+                flushing_downhole_list = f'При наличии ЦИРКУЛЯЦИИ: Допустить компоновку до глубины {well_data.current_bottom}м.' \
                                          f' Промыть скважину обратной промывкой ' \
                                          f'по круговой циркуляции  жидкостью уд.весом {well_data.fluid_work} п' \
                                          f'ри расходе жидкости не ' \
                                          f'менее 6-8 л/сек в объеме не менее ' \
                                          f'{round(well_volume(self, paker_depth + paker_khost) * 1.5, 1)}м3 ' \
-                                         f'в присутствии представителя заказчика ДО ЧИСТОЙ ВОДЫ.'
-                flushing_downhole_short = f'Допустить до Н- {well_data.current_bottom}м. Промыть уд.весом ' \
+                                         f'в присутствии представителя заказчика ДО ЧИСТОЙ ВОДЫ. \n' \
+                                         f'МЕРОПРИЯТИЯ ПОСЛЕ ОПЗ: \n' \
+                                     f'-При отсутствии циркуляции произвести замещения продуктов реакции тех ' \
+                                     f'жидкостью большей плотностью с последующей промывкой' \
+
+                flushing_downhole_short = f'При наличии ЦИРКУЛЯЦИИ: Допустить до Н- {well_data.current_bottom}м. Промыть уд.весом ' \
                                           f'{well_data.fluid_work_short}' \
                                           f'не менее {round(well_volume(self, paker_depth + paker_khost) * 1.5, 1)}м3 '
 
             elif well_data.perforation_roof - 5 + paker_khost < well_data.current_bottom:
-                flushing_downhole_list = f'Допустить пакер до глубины {int(well_data.perforation_roof - 5)}м. ' \
+                flushing_downhole_list = f'При наличии ЦИРКУЛЯЦИИ: Допустить пакер до глубины {int(well_data.perforation_roof - 5)}м. ' \
                                          f'(на 5м выше кровли интервала перфорации), низ НКТ до глубины' \
                                          f' {well_data.perforation_roof - 5 + paker_khost}м) ' \
                                          f'Промыть скважину обратной промывкой по круговой циркуляции ' \
                                          f'жидкостью уд.весом {well_data.fluid_work} при расходе жидкости не ' \
                                          f'менее 6-8 л/сек в объеме не менее ' \
                                          f'{round(well_volume(self, paker_depth + paker_khost) * 1.5, 1)}м3 ' \
-                                         f'в присутствии представителя заказчика ДО ЧИСТОЙ ВОДЫ.'
-                flushing_downhole_short = f'Допустить пакер до H- {int(well_data.perforation_roof - 5)}м. ' \
+                                         f'в присутствии представителя заказчика ДО ЧИСТОЙ ВОДЫ. \n'\
+                                         f'МЕРОПРИЯТИЯ ПОСЛЕ ОПЗ: \n' \
+                                     f'-При отсутствии циркуляции произвести замещения продуктов реакции тех ' \
+                                     f'жидкостью большей плотностью с последующей промывкой' \
+
+                flushing_downhole_short = f'При наличии ЦИРКУЛЯЦИИ: Допустить пакер до H- ' \
+                                          f'{int(well_data.perforation_roof - 5)}м. ' \
                                           f' низ НКТ до H' \
                                           f' {well_data.perforation_roof - 5 + paker_khost}м) ' \
                                           f'Промыть уд.весом {well_data.fluid_work} не менее ' \
-                                          f'{round(well_volume(self, paker_depth + paker_khost) * 1.5, 1)}м3 '
+                                          f'{round(well_volume(self, paker_depth + paker_khost) * 1.5, 1)}м3 '\
+                                          f'МЕРОПРИЯТИЯ ПОСЛЕ ОПЗ: \n' \
+                                     f'-При отсутствии циркуляции произвести замещения продуктов реакции тех ' \
+                                     f'жидкостью большей плотностью с последующей промывкой' \
+
         elif 'ворон' in paker_layout:
-            flushing_downhole_list = f'Допустить компоновку до глубины {well_data.current_bottom}м.' \
+            flushing_downhole_list = f'При наличии ЦИРКУЛЯЦИИ: Допустить компоновку до глубины ' \
+                                     f'{well_data.current_bottom}м.' \
                                      f' Промыть скважину обратной промывкой ' \
                                      f'по круговой циркуляции  жидкостью уд.весом {well_data.fluid_work} п' \
                                      f'ри расходе жидкости не ' \
                                      f'менее 6-8 л/сек в объеме не менее ' \
                                      f'{round(well_volume(self, paker_depth + paker_khost) * 1.5, 1)}м3 ' \
-                                     f'в присутствии представителя заказчика ДО ЧИСТОЙ ВОДЫ.'
-            flushing_downhole_short = f'Допустить до Н- {well_data.current_bottom}м. Промыть уд.весом ' \
+                                     f'в присутствии представителя заказчика ДО ЧИСТОЙ ВОДЫ.'\
+                                     f'МЕРОПРИЯТИЯ ПОСЛЕ ОПЗ: \n' \
+                                     f'При отсутствии циркуляции произвести замещения продуктов реакции тех ' \
+                                     f'жидкостью большей плотностью с последующей промывкой' \
+
+            flushing_downhole_short = f'При наличии ЦИРКУЛЯЦИИ: Допустить до Н- {well_data.current_bottom}м. Промыть уд.весом ' \
                                       f'{well_data.fluid_work_short}' \
                                       f'не менее {round(well_volume(self, paker_depth + paker_khost) * 1.5, 1)}м3 '
         else:
-            flushing_downhole_list = f'При наличии избыточного давления:' \
-                                     f' Промыть скважину обратной промывкой ' \
+            flushing_downhole_list = f'При наличии ЦИРКУЛЯЦИИ: При наличии избыточного давления:' \
+                                     f'Промыть скважину обратной промывкой ' \
                                      f'по круговой циркуляции  жидкостью уд.весом {well_data.fluid_work} п' \
                                      f'ри расходе жидкости не ' \
                                      f'менее 6-8 л/сек в объеме не менее ' \

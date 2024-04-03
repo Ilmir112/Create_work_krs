@@ -366,7 +366,7 @@ class Swab_Window(QMainWindow):
             work_list = self.swabbing_opy(paker2_depth)
         elif swab_true_edit_type == 'Опрессовка снижением уровня на пакере с заглушкой':
             work_list = self.swabbing_opy_with_paker(diametr_paker, paker_khost, paker_depth, paker2_depth)
-        MyWindow.populate_row(self.ins_ind, work_list, self.table_widget)
+        MyWindow.populate_row(self, self.ins_ind, work_list, self.table_widget)
         well_data.pause = False
         self.close()
 

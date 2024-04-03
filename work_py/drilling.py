@@ -232,7 +232,7 @@ class Drill_window(QMainWindow):
             msg = QMessageBox.information(self, 'Внимание', 'Не заполнен необходимый забой')
             return
 
-        drilling_interval = [well_data.dict_perforation[plast]["подошва"] for plast in well_data.plast_all]
+        drilling_interval = list(set([well_data.dict_perforation[plast]["подошва"] for plast in well_data.plast_all]))
         drilling_interval.append(int(current_depth))
         if len(well_data.dict_leakiness) != 0:
             leakness_list = [
@@ -240,7 +240,7 @@ class Drill_window(QMainWindow):
                     nek][1] for nek in list(well_data.dict_leakiness['нэк']['интервал'].keys())]
             drilling_interval.extend([leakness_list])
         # drilling_interval = list(filter(key = lambda x: x[0] > well_data.current_bottom, drilling_interval))
-        print(drilling_interval)
+
         rows = self.tableWidget.rowCount()
         roof = well_data.current_bottom
         for sole in sorted(drilling_interval):
@@ -292,7 +292,7 @@ class Drill_window(QMainWindow):
         elif self.nkt_str == 'СБТ':
             drill_list = self.drilling_sbt(drill_tuple, self.drill_type_combo, self.drillingBit_diam, self.downhole_motor)
 
-        MyWindow.populate_row(self.ins_ind, drill_list, self.table_widget)
+        MyWindow.populate_row(self, self.ins_ind, drill_list, self.table_widget)
         well_data.pause = False
         self.close()
 

@@ -25,6 +25,7 @@ class CreatePZ(QMainWindow):
     def open_excel_file(self, ws, work_plan):
         from find import FindIndexPZ
         from category_correct import CategoryWindow
+        from main import MyWindow
         from find import WellNkt, Well_perforation, WellCondition, WellHistory_data, Well_data, Well_Category, \
             WellFond_data, WellSucker_rod, Well_expected_pick_up
 
@@ -129,6 +130,7 @@ class CreatePZ(QMainWindow):
                 lst.append(ws.cell(row=j + 1, column=i + 1).value)
             well_data.row_expected.append(lst)
 
+
         if well_data.work_plan != 'gnkt_frez':
             # print(f'план работ {well_data.work_plan}')
             delete_rows_pz(self, ws)
@@ -201,7 +203,7 @@ class CreatePZ(QMainWindow):
                 well_data.ins_ind += len(well_data.row_expected)
 
             self.ins_ind_border = well_data.ins_ind
-
+            MyWindow.create_database_well(self, work_plan)
             return ws
 
     def add_itog(self, ws, ins_ind, work_plan):
@@ -235,7 +237,7 @@ class CreatePZ(QMainWindow):
             ins_ind += len(itog_1(self)) + 2
 
         curator_s = curator_sel(self, well_data.curator, well_data.region)
-        print(f'куратор {curator_sel, well_data.curator}')
+        # print(f'куратор {curator_sel, well_data.curator}')
         podp_down = pop_down(self, well_data.region, curator_s)
 
         for i in range(1 + ins_ind, 1 + ins_ind + len(podp_down)):  # Добавлением подписантов внизу

@@ -1,3 +1,4 @@
+import json
 import re
 import sqlite3
 
@@ -10,6 +11,7 @@ from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem, QLineEdit, QHeaderVie
 from openpyxl import load_workbook
 
 import well_data
+from main import MyWindow
 
 
 class Classifier_well(QMainWindow):
@@ -145,8 +147,8 @@ class Classifier_well(QMainWindow):
         db.setDatabaseName(
             'data_base/database_without_juming.db')  # Замените database.db на имя вашей базы данных SQLite
         # print(db)
-        print(region)
-        print('ТГМ_классификатор')
+        # print(region)
+        # print('ТГМ_классификатор')
         if not db.open():
             print("Не удалось установить соединение с базой данных.")
             return []
@@ -425,6 +427,80 @@ class Classifier_well(QMainWindow):
 
         # Закрытие соединения с базой данных
         conn.close()
+
+
+def create_database_well_db():
+    # print(row, well_data.count_row_well)
+    conn = sqlite3.connect('data_base/data_base_well/databaseWell.db')
+    cursor = conn.cursor()
+
+    # Создаем таблицу для хранения данных
+    number = json.dumps(well_data.well_number._value + well_data.well_area._value, ensure_ascii=False)
+
+    # Попытка удалить таблицу, если она существует
+    cursor.execute(f'DROP TABLE IF EXISTS {number}')
+
+    cursor.execute(f'CREATE TABLE IF NOT EXISTS {number}'
+                   f'(id INTEGER PRIMARY KEY AUTOINCREMENT,'
+                   f'index_row INTEGER,'
+                   f'current_bottom FLOAT,'
+                   f'perforation TEXT, '
+                   f'plast_all TEXT, '
+                   f'plast_work TEXT, '
+                   f'leakage TEXT,'
+                   f'column_additional TEXT,'
+                   f'fluid TEXT,'
+                   f'category_pressuar TEXT,'
+                   f'category_h2s TEXT,'
+                   f'category_gf TEXT,'
+                   f'template_depth FLOAT,'
+                   f'skm_list TEXT,'
+                   f'problemWithEk_depth FLOAT,'
+                   f'problemWithEk_diametr FLOAT)')
+
+    print(well_data.data_list[0])
+    for index, data in enumerate(well_data.data_list):
+
+
+        current_bottom = data[1]
+        dict_perforation_json = data[2]
+        plast_all = data[3]
+        plast_work = data[4]
+        dict_leakiness = data[5]
+        column_additional = data[6]
+        fluid_work = data[7]
+        template_depth = int(data[11])
+        skm_interval = data[12]
+        problemWithEk_depth = data[13]
+        problemWithEk_diametr = data[14]
+
+
+        number = json.dumps(well_data.well_number._value + well_data.well_area._value, ensure_ascii=False)
+
+        # Подготовленные данные для вставки (пример)
+        data_values = (index, current_bottom, dict_perforation_json, plast_all, plast_work,
+                       dict_leakiness, column_additional, fluid_work, well_data.category_pressuar,
+                       well_data.category_h2s, well_data.category_gf, template_depth, skm_interval,
+                       problemWithEk_depth, problemWithEk_diametr)
+
+
+        # Подготовленный запрос для вставки данных с параметрами
+        query = f"INSERT INTO {number} " \
+                f"(index_row, current_bottom, perforation, plast_all, plast_work, leakage, column_additional, fluid, " \
+                f"category_pressuar, category_h2s, category_gf, template_depth, skm_list, " \
+                f"problemWithEk_depth, problemWithEk_diametr) " \
+                f"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+
+
+        # Выполнение запроса с использованием параметров
+        cursor.execute(query, data_values)
+
+
+
+    # Сохранить изменения и закрыть соединение
+    conn.commit()
+    conn.close()
+
 
 if __name__ == "__main__":
     import sys

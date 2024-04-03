@@ -217,6 +217,8 @@ class GeophysicWindow(MyWindow):
         for i, row_data in enumerate(geophysicalResearch):
             row = self.ins_ind + i
             self.table_widget.insertRow(row)
+            row_max = self.table_widget.rowCount()
+            MyWindow.insert_data_in_database(self, row, row_max)
             # lst = [1, 0, 2, len(geophysicalResearch)-1]
             # if float(well_data.max_angle._value) >= 50:
             #     lst.extend([3, 4])

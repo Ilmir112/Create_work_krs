@@ -75,7 +75,7 @@ column_direction_lenght = ProtectedIsDigit('не корректно')
 
 column_direction_diametr = ProtectedIsNonNone('не корректно')
 column_direction_wall_thickness = ProtectedIsNonNone('не корректно')
-
+data_list = []
 problemWithEk_diametr = 220
 cdng = ProtectedIsNonNone('не корректно')
 data_fond_min = ProtectedIsDigit(0)
@@ -96,7 +96,7 @@ data_x_max = ProtectedIsDigit(0)
 data_x_min = ProtectedIsDigit(0)
 
 problemWithEk = False
-plast_all = {}
+plast_all = []
 konte_true = False
 gipsInWell = False
 grp_plan = False
@@ -161,6 +161,9 @@ dict_perforation_short = {}
 
 emergency_count = 0
 skm_interval = []
+category_pressuar = 3
+category_h2s = 3
+category_gf = 3
 work_perforations = []
 work_perforations_dict = {}
 paker_do = {"do": 0, "posle": 0}

@@ -2,6 +2,7 @@ from PyQt5 import QtWidgets
 from PyQt5.Qt import *
 
 import well_data
+from main import MyWindow
 from .advanted_file import definition_plast_work
 
 
@@ -334,14 +335,15 @@ class PerforationWindow(QMainWindow):
             perf_list.extend([pvr_str, None, roof, '-', sool, type_charge, count_otv, count_charge, plast, dop_information,
                               'подрядчик по ГИС', round(float(sool)-float(roof)) * 1.5, 1])
 
-            well_data.dict_perforation.setdefault(plast, {}).setdefault('интервал', set()).add(
-                (float(perf_list[2]), float(perf_list[4])))
+            well_data.dict_perforation.setdefault(plast, {}).setdefault('интервал', []).append(
+                    (float(perf_list[2]), float(perf_list[4])))
             well_data.dict_perforation[plast]['отрайбировано'] = False
             well_data.dict_perforation[plast]['отключение'] = False
             well_data.dict_perforation.setdefault(plast, {}).setdefault('отключение', False)
             well_data.dict_perforation.setdefault(plast, {}).setdefault('отрайбировано', False)
             print(f' перфорация после добавления {well_data.dict_perforation}')
-
+            well_data.dict_perforation[plast]['интервал'] = list(
+                set(map(tuple, well_data.dict_perforation[plast]['интервал'])))
 
             perforation.append(perf_list)
 
@@ -381,10 +383,14 @@ class PerforationWindow(QMainWindow):
         if len(perforation) < 6:
             msg = QMessageBox.information(self, 'Внимание', 'Не добавлены интервалы перфорации!!!')
         else:
+
             for i, row_data in enumerate(perforation):
                 row = self.ins_ind + i
                 self.table_widget.insertRow(row)
                 lst = [0, 1, 2, len(perforation)-1]
+                row_max = self.table_widget.rowCount()
+                definition_plast_work(self)
+                MyWindow.insert_data_in_database(self, row, row_max)
                 if float(well_data.max_angle._value) >= 50:
                     lst.extend([3, 4])
                 if i in lst: # Объединение ячеек по вертикале в столбце "отвественные и норма"
@@ -407,7 +413,7 @@ class PerforationWindow(QMainWindow):
             self.table_widget.setRowHeight(self.ins_ind, 60)
             self.table_widget.setRowHeight(self.ins_ind + 1, 60)
 
-            definition_plast_work(self)
+
 
             self.close()
 

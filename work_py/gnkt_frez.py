@@ -50,7 +50,7 @@ class Work_with_gnkt(QMainWindow):
         if self.perforation_correct_window2 is None:
             self.perforation_correct_window2 = PerforationCorrectGnktFrez(self)
             self.perforation_correct_window2.setWindowTitle("Сверка данных по муфтам")
-            self.perforation_correct_window2.setGeometry(200, 400, 100, 400)
+            # self.perforation_correct_window2.setGeometry(200, 400, 100, 400)
             self.perforation_correct_window2.show()
             main.MyWindow.pause_app()
             well_data.pause = True
@@ -799,7 +799,13 @@ class Work_with_gnkt(QMainWindow):
         print(f' ПНТЖ - {calc_pntzh(self.fluid, well_data.cdng)}')
 
         distance, _ = QInputDialog.getInt(None, 'Расстояние НПТЖ', 'Введите Расстояние до ПНТЖ')
-        fluid_work, well_data.fluid_work_short = GnoWindow.calc_work_fluid(self, self.work_plan)
+
+        fluid_work_insert, ok = QInputDialog.getDouble(self,
+                                                   'удельный вес',
+                                                   'ВВедите удельный вес рабочей жидкости',
+                                                   1.18, 0, 1.6, 2)
+
+        fluid_work, well_data.fluid_work_short = GnoWindow.calc_work_fluid(self, fluid_work_insert)
 
 
         block_gnvp_list = [

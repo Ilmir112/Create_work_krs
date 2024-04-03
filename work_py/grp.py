@@ -125,7 +125,7 @@ class Grp_window(QMainWindow):
         work_list = self.grpPaker(diametr_paker, paker_depth, paker_khost, gisOTZ_true_quest,
                                   normalization_true_quest, current_depth)
 
-        MyWindow.populate_row(self.ins_ind, work_list, self.table_widget)
+        MyWindow.populate_row(self, self.ins_ind, work_list, self.table_widget)
         well_data.pause = False
         self.close()
 

@@ -179,6 +179,7 @@ def remove_overlapping_intervals(perforating_intervals, skm_interval = None):
 
 
 def raiding_interval(ryber_key):
+    print(well_data.dict_perforation)
 
     str_raid = []
     crt = 0
@@ -186,10 +187,13 @@ def raiding_interval(ryber_key):
 
         if well_data.dict_perforation[plast]['отрайбировано'] is False and \
                 well_data.dict_perforation[plast]['кровля'] <= well_data.current_bottom:
+            print(well_data.dict_perforation[plast]['интервал'])
             for interval in well_data.dict_perforation[plast]['интервал']:
+
                 if well_data.column_additional is False or \
                         (well_data.column_additional and \
                          well_data.head_column_additional._value > well_data.current_bottom):
+                    print(interval)
                     if float(interval[1]) + 20 <= well_data.current_bottom and \
                             well_data.shoe_column._value >= float(interval[1]) + 20:
                         crt = [float(interval[0]) - 20, float(interval[1]) + 20]
@@ -325,7 +329,6 @@ def definition_plast_work(self):
     # print(dict_perforation)
     well_data.plast_all = list(well_data.dict_perforation.keys())
     well_data.plast_work = list(plast_work)
-
 
 
 def count_row_height(ws, ws2, work_list, merged_cells_dict, ind_ins):

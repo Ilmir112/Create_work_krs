@@ -883,7 +883,7 @@ class RirWindow(QMainWindow):
                                          roof_rir_edit, sole_rir_edit, pressureZUMPF_question,
                                          diametr_paker, paker_khost, paker_depth)
 
-        MyWindow.populate_row(self.ins_ind, work_list, self.table_widget)
+        MyWindow.populate_row(self, self.ins_ind, work_list, self.table_widget)
         well_data.pause = False
         self.close()
     def rir_izvelPaker(self):
@@ -1012,6 +1012,8 @@ class RirWindow(QMainWindow):
         for row in emer_list:
             rir_list.append(row)
 
-        well_data.current_bottom = well_data.bottomhole_artificial._value
+        well_data.current_bottom, ok = QInputDialog.getInt(None, 'Глубина забоя',
+                                          'Введите глубину текущего забоя после извлечения',
+                                          int(well_data.current_bottom), 0, int(well_data.bottomhole_drill._value))
         well_data.forPaker_list = None
         return rir_list
