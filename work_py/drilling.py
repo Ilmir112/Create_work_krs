@@ -261,6 +261,7 @@ class Drill_window(QMainWindow):
                 self.tableWidget.setCellWidget(rows, 2, drill_combo)
 
                 roof = int(current_depth)
+                break
 
     def add_work(self):
         from main import MyWindow

@@ -458,7 +458,7 @@ def create_database_well_db():
                    f'problemWithEk_depth FLOAT,'
                    f'problemWithEk_diametr FLOAT)')
 
-    print(well_data.data_list[0])
+
     for index, data in enumerate(well_data.data_list):
 
 

@@ -836,7 +836,7 @@ class Well_data(FindIndexPZ):
         if self.data_window is None:
             self.data_window = DataWindow(self)
             self.data_window.setWindowTitle("Сверка данных")
-            # self.data_window.setGeometry(100, 100, 300, 400)
+            self.data_window.setGeometry(100, 100, 300, 400)
 
             self.data_window.show()
             MyWindow.pause_app()

@@ -98,7 +98,7 @@ class TabPage_SO(QWidget):
             category_h2s_edit.setText(str(self.ifNone(self.cat_h2s_list[num])))
             h2s_pr_edit = QLineEdit(self)
             if str(round(float(str(self.h2s_pr[num]).replace(',', '.')), 3))[-1] == "0":
-                h2s_pr =  int(float(self.h2s_pr[num]))
+                h2s_pr = int(float(self.h2s_pr[num]))
             else:
                 h2s_pr = round(float(str(self.h2s_pr[num]).replace(',', '.')), 4)
 

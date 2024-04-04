@@ -27,6 +27,7 @@ from data_correct_position_people import CorrectSignaturesWindow
 
 from work_py.drilling import Drill_window
 from find import ProtectedIsDigit
+from users.login_users import LoginWindow
 
 
 class ExcelWorker(QThread):
@@ -192,6 +193,7 @@ class MyWindow(QMainWindow):
         super().__init__()
 
         self.initUI()
+        self.login_window = None
         self.new_window = None
         self.raid_window = None
         self.leakage_window = None
@@ -215,6 +217,15 @@ class MyWindow(QMainWindow):
         self.ins_ind_border = None
         self.work_plan = 0
         self.table_widget = None
+
+        if self.login_window == None:
+            self.login_window = LoginWindow()
+            self.login_window.show()
+            self.pause_app()
+            well_data.pause = False
+
+
+
 
     def initUI(self):
 
@@ -1095,14 +1106,14 @@ class MyWindow(QMainWindow):
     def read_clicked_mouse_data(self, row):
 
         row = row - well_data.count_row_well
-        print(row)
+
         for index, data in enumerate(well_data.data_list):
             if index == row:
 
                 well_data.current_bottom = data[1]
                 well_data.dict_perforation = json.loads(data[2])
                 # print(f' строка {well_data.dict_perforation}')
-                print(f' забой { well_data.current_bottom}')
+
                 well_data.plast_all = json.loads(data[3])
                 well_data.plast_work = json.loads(data[4])
                 well_data.dict_leakiness = json.loads(data[5])
@@ -1112,8 +1123,7 @@ class MyWindow(QMainWindow):
                 well_data.skm_interval = json.loads(data[12])
                 well_data.problemWithEk_depth = data[13]
                 well_data.problemWithEk_diametr = data[14]
-                print(well_data.plast_all)
-                print(well_data.plast_work)
+
 
 
 

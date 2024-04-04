@@ -112,12 +112,6 @@ def need_h2s(fluid_new, plast, expected_pressure):
                                   well_data.plast_work if well_data.dict_category.get(plast) and
                                   well_data.dict_category[plast]['отключение'] == 'рабочий']))
 
-    h2s_mg = list(map(int, [well_data.dict_category[plast]['по сероводороду'].data_mg_l for plast in
-                            well_data.plast_work if well_data.dict_category.get(plast) and
-                            well_data.dict_category[plast]['отключение'] == 'рабочий']))
-    h2s_pr = list(map(int, [well_data.dict_category[plast]['по сероводороду'].data_procent for plast in
-                            well_data.plast_work if well_data.dict_category.get(plast) and
-                            well_data.dict_category[plast]['отключение'] == 'рабочий']))
     cat_h2s_list_plan = list(map(int, [well_data.dict_category[plast]['по сероводороду'].category for plast in
                                   well_data.plast_project if well_data.dict_category.get(plast) and
                                   well_data.dict_category[plast]['отключение'] == 'планируемый']))

@@ -312,9 +312,9 @@ def definition_plast_work(self):
                 sole = max(list(map(lambda x: x[1], list(well_data.dict_perforation[plast]['интервал']))))
                 well_data.dict_perforation[plast]["кровля"] = roof
                 well_data.dict_perforation[plast]["подошва"] = sole
-                if perforation_roof >= roof:
+                if perforation_roof >= roof and well_data.current_bottom > roof:
                     perforation_roof = roof
-                if perforation_sole < sole:
+                if perforation_sole < sole and well_data.current_bottom > sole:
                     perforation_sole = sole
 
             else:

@@ -895,11 +895,11 @@ class DataWindow(QMainWindow):
         elif close_file is True:
             well_data.column_diametr = ProtectedIsDigit(self.if_None(columnType))
             well_data.column_wall_thickness = ProtectedIsDigit(self.if_None(column_wall_thickness))
-            well_data.shoe_column = ProtectedIsDigit(self.if_None(shoe_column))
+            well_data.shoe_column = ProtectedIsDigit(int(float(self.if_None(shoe_column))))
             well_data.column_additional_diametr = ProtectedIsDigit(self.if_None(column_additional_diametr))
             well_data.column_additional_wall_thickness = ProtectedIsDigit(self.if_None(column_additional_wall_thickness))
-            well_data.shoe_column_additional = ProtectedIsDigit(self.if_None(shoe_column_additional))
-            well_data.head_column_additional = ProtectedIsDigit(self.if_None(head_column_additional))
+            well_data.shoe_column_additional = ProtectedIsDigit(int(float(self.if_None(shoe_column_additional))))
+            well_data.head_column_additional = ProtectedIsDigit(int(float(self.if_None(head_column_additional))))
             if well_data.column_additional is False:
                 well_data.column_additional_diametr = ProtectedIsDigit(0)
                 well_data.column_additional_wall_thickness = ProtectedIsDigit(0)

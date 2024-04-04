@@ -45,9 +45,9 @@ def pop_down(self, region, curator_sel):
         podpis_dict = json.load(file)
 
     podp_down = [
-        [None, 'План работ составил Ведущий геолог Ойл-сервис', None, None, None, None, '___________________', None,
+        [None, f'План работ составил {well_data.user[0]}', None, None, None, None, '___________________', None,
          None,
-         '/И.М. Зуфаров/', None, None],
+         f'{well_data.user[1]}', None, None],
         [None, None, None, None, None, None, None, None, 'дата составления', None, datetime.now().strftime('%d.%m.%Y'),
          None],
         [None, None, 'Начальник ЦТКРС ООО  " Ойл-Сервис"', None, None, None, None, None, None,
