@@ -10,6 +10,7 @@ from cdng import events_gnvp, itog_1, events_gnvp_gnkt
 from find import ProtectedIsNonNone
 from plan import delete_rows_pz
 from block_name import region, razdel_1, curator_sel, pop_down
+from work_py.dop_plan_py import DopPlanWindow
 
 
 class CreatePZ(QMainWindow):
@@ -50,13 +51,16 @@ class CreatePZ(QMainWindow):
         for row_ind, row in enumerate(ws.iter_rows(values_only=True)):
             ws.row_dimensions[row_ind].hidden = False
 
-            if any(['ПЛАН РАБОТ' in str(col) for col in row]):
+            if any(['ПЛАН РАБОТ' in row]) \
+                    and work_plan == 'dop_plan':
                 well_data.number_dp, ok = QInputDialog.getText(self, 'Номер дополнительного плана работ',
                                                                'Введите номер дополнительного плана работ')
                 ws.cell(row=row_ind + 1, column=2).value = f'ДОПОЛНИТЕЛЬНЫЙ ПЛАН РАБОТ № {well_data.number_dp}'
                 print(f'номер доп плана {well_data.number_dp}')
 
             if 'План-заказ' in row:
+                # print(row)
+
                 ws.cell(row=row_ind + 1, column=2).value = 'ПЛАН РАБОТ'
 
             for col, value in enumerate(row):
@@ -204,6 +208,7 @@ class CreatePZ(QMainWindow):
 
             self.ins_ind_border = well_data.ins_ind
             MyWindow.create_database_well(self, work_plan)
+
             return ws
 
     def add_itog(self, ws, ins_ind, work_plan):
@@ -261,5 +266,6 @@ class CreatePZ(QMainWindow):
             return True
         except ValueError:
             return False
+
 
 #

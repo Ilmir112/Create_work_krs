@@ -578,11 +578,19 @@ class AcidPakerWindow(QMainWindow):
             paker_khost = self.if_None((self.tabWidget.currentWidget().paker_khost.text()))
             paker_depth = self.if_None(self.tabWidget.currentWidget().paker_depth.text())
 
-            if well_data.current_bottom < float(paker_khost + paker_depth):
+            if well_data.current_bottom < float(paker_khost + paker_depth) or \
+                    0 < paker_khost + paker_depth < well_data.current_bottom is False:
                 msg = QMessageBox.information(self, 'Внимание',
                                               f'Компоновка ниже {paker_khost + paker_depth}м текущего забоя '
                                               f'{well_data.current_bottom}м')
                 return
+            if MyWindow.check_true_depth_template(self, paker_depth) is False:
+                return
+            if MyWindow.true_set_Paker(self, paker_depth) is False:
+                return
+            if MyWindow.check_depth_in_skm_interval(self, paker_depth) is False:
+                return
+
             self.tableWidget.insertRow(rows)
             self.tableWidget.setItem(rows, 0, QTableWidgetItem(plast_combo))
             self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(paker_khost)))
@@ -596,9 +604,22 @@ class AcidPakerWindow(QMainWindow):
             self.tableWidget.setSortingEnabled(False)
         elif paker_layout_combo in ['двухпакерная', 'двухпакерная, упорные']:
             paker_khost = self.if_None((self.tabWidget.currentWidget().paker_khost.text()))
-            paker_depth = self.if_None(self.tabWidget.currentWidget().paker_depth.text())
-            paker2_depth = self.if_None(self.tabWidget.currentWidget().paker2_depth.text())
-            if well_data.current_bottom < float(paker_khost + paker_depth):
+            paker_depth = int(self.if_None(self.tabWidget.currentWidget().paker_depth.text()))
+            paker2_depth = int(self.if_None(self.tabWidget.currentWidget().paker2_depth.text()))
+            if MyWindow.check_true_depth_template(self, paker_depth) is False:
+                return
+            if MyWindow.true_set_Paker(self, paker_depth) is False:
+                return
+            if MyWindow.check_depth_in_skm_interval(self, paker_depth) is False:
+                return
+            if MyWindow.check_true_depth_template(self, paker2_depth) is False:
+                return
+            if MyWindow.true_set_Paker(self, paker2_depth) is False:
+                return
+            if MyWindow.check_depth_in_skm_interval(self, paker2_depth) is False:
+                return
+
+            if well_data.current_bottom < float(paker_khost + paker2_depth):
                 msg = QMessageBox.information(self, 'Внимание',
                                               f'Компоновка ниже {paker_khost + paker_depth}м текущего забоя '
                                               f'{well_data.current_bottom}м')
@@ -747,13 +768,39 @@ class AcidPakerWindow(QMainWindow):
         if swab_true_edit_type == "Нужно освоение":
             swabTypeCombo = str(self.tabWidget.currentWidget().swabTypeCombo.currentText())
             swab_volumeEdit = int(float(self.tabWidget.currentWidget().swab_volumeEdit.text()))
+            paker_depth_swab = int(self.tabWidget.currentWidget().swab_paker_depth.text())
+            paker_khost = (paker_depth - paker_khost) - paker_depth_swab
 
             if self.paker_layout_combo == 'однопакерная':
-                swab_work_list = Swab_Window.swabbing_with_paker(self, diametr_paker, paker_depth, paker_khost,
+                if MyWindow.true_set_Paker(self, paker_depth_swab) is False:
+                    return
+                if MyWindow.check_depth_in_skm_interval(self, paker_depth_swab) is False:
+                    return
+                if MyWindow.check_true_depth_template(self, paker_depth_swab) is False:
+                    return
+
+                swab_work_list = Swab_Window.swabbing_with_paker(self, diametr_paker, paker_depth_swab, paker_khost,
                                                                  plast_combo, swabTypeCombo, swab_volumeEdit,
                                                                  depth_gauge_combo)
             elif self.paker_layout_combo == 'двухпакерная':
-                swab_work_list = Swab_Window.swabbing_with_2paker(self, diametr_paker, paker_depth, paker2_depth,
+                paker_depth_swab = int(self.tabWidget.currentWidget().swab_paker_depth.text())
+                if MyWindow.check_true_depth_template(self, paker_depth_swab) is False:
+                    return
+                if MyWindow.true_set_Paker(self, paker_depth_swab) is False:
+                    return
+                if MyWindow.check_depth_in_skm_interval(self, paker_depth_swab) is False:
+                    return
+
+                paker_depth2_swab = paker_depth_swab -(paker_depth - paker2_depth)
+                if MyWindow.check_true_depth_template(self, paker_depth2_swab) is False:
+                    return
+                if MyWindow.true_set_Paker(self, paker_depth2_swab) is False:
+                    return
+                if MyWindow.check_depth_in_skm_interval(self, paker_depth2_swab) is False:
+                    return
+
+
+                swab_work_list = Swab_Window.swabbing_with_2paker(self, diametr_paker, paker_depth_swab, paker_depth2_swab,
                                                                   paker_khost, plast_combo, swabTypeCombo,
                                                                   swab_volumeEdit, depth_gauge_combo)
             elif self.paker_layout_combo == 'воронка':

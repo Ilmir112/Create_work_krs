@@ -29,9 +29,10 @@ class FindIndexPZ(QMainWindow):
                 cat_well_min.append(row_ind + 1)
                 well_data.cat_well_min = ProtectedIsDigit(min(cat_well_min))  # индекс начала категории
 
-            elif 'План-заказ' in row:
+            elif any(['план-заказ' in str(col).lower() or 'план работ' in str(col).lower() for col in row]) \
+                    and row_ind < 50:
 
-                well_data.cat_well_max = ProtectedIsDigit(row_ind - 1)
+                well_data.cat_well_max = ProtectedIsDigit(row_ind)
                 well_data.data_well_min = ProtectedIsDigit(row_ind + 1)
 
 
@@ -48,9 +49,10 @@ class FindIndexPZ(QMainWindow):
                     any(['IX. Мероприятия по предотвращению аварий, инцидентов и осложнений::' in str(col) for col in
                          row]):
                 well_data.data_well_max = ProtectedIsDigit(row_ind)
-
+                well_data.cat_well_min, well_data.cat_well_max, well_data.data_well_min, well_data.data_well_max
             elif 'НКТ' == str(row[1]).upper():
                 well_data.pipes_ind = ProtectedIsDigit(row_ind + 1)
+                well_data.cat_well_min, well_data.cat_well_max, well_data.data_well_min, well_data.data_well_max, well_data.pipes_ind, well_data.sucker_rod_ind
 
 
             elif 'ШТАНГИ' == str(row[1]).upper():
@@ -80,25 +82,26 @@ class FindIndexPZ(QMainWindow):
         if well_data.data_well_max._value == 0:
             well_data.data_well_max = ProtectedIsDigit(
                 QInputDialog.getInt(self, 'индекс окончания копирования',
-                                    'Программа не смогла определить строку окончания копирования',
+                                    'Программа не смогла определить строку с IX. Мероприятия по предотвращению аварий ',
                                     0, 0, 800)[0])
             while well_data.data_well_max._value < 150:
                 mes = QMessageBox.warning(self, 'Ошибка', 'Не корректное значение')
                 well_data.data_well_max = ProtectedIsDigit(
                     QInputDialog.getInt(self, 'индекс окончания копирования',
-                                        'Программа не смогла определить строку окончания копирования',
+                                        'Программа не смогла определить строку IX. Мероприятия по предотвращению аварий',
                                         0, 0, 800)[0])
         if well_data.data_well_min._value == 0:
             well_data.data_well_min = ProtectedIsDigit(
                 QInputDialog.getInt(self, 'индекс начала строки после план заказ',
                                     'Программа не смогла найти начала строки после план заказ',
                                     0, 0, 800)[0])
-            while well_data.data_well_min._value < well_data.cat_well_min_value or \
+            while well_data.data_well_min._value < well_data.cat_well_min._value or \
                     well_data.data_well_min._value > well_data.data_well_max._value:
+
                 mes = QMessageBox.warning(self, 'Ошибка', 'Не корректное значение')
                 well_data.data_well_min = ProtectedIsDigit(
-                    QInputDialog.getInt(self, 'индекс окончания копирования',
-                                        'Программа не смогла определить строку окончания копирования',
+                    QInputDialog.getInt(self, 'индекс начала строки после план заказ',
+                                        'Программа не смогла найти начала строки после план заказ',
                                         0, 0, 800)[0])
 
         if well_data.cat_well_max._value == 0:
@@ -158,7 +161,10 @@ class FindIndexPZ(QMainWindow):
                 QInputDialog.getInt(self, 'индекс начала строки с таблицей фондовыго оборудования',
                                     'Программа не смогла найти строку с таблицей фондового оборудования',
                                     0, 0, 800)[0])
-
+        # print(well_data.cat_well_min._value, well_data.cat_well_max._value, well_data.data_well_min._value,
+        #       well_data.data_pvr_max._value, well_data.condition_of_wells._value, well_data.data_well_max._value,
+        #       well_data.pipes_ind._value, well_data.sucker_rod_ind._value
+# )
     def check_str_None(self, string):
 
         if isinstance(string, int) is True or isinstance(string, float) is True:
@@ -227,33 +233,33 @@ class WellNkt(FindIndexPZ):
 
     def read_well(self, ws, begin_index, cancel_index):
 
-        try:
-            a_plan = 0
-            well_data.nkt_mistake = False
-            for row in range(begin_index, cancel_index):  # словарь  количества НКТ и метраж
 
-                if ws.cell(row=row, column=3).value == 'План' or str(
-                        ws.cell(row=row, column=3).value).lower() == 'после ремонта':
-                    a_plan = row
-            if a_plan == 0:
-                a_plan = QInputDialog.getDouble(self, 'Индекс планового НКТ',
-                                                'Программа не могла определить начала строку с ПЗ НКТ - план')[0]
-            # print(f'индекс a_plan {a_plan}')
-            for row in range(begin_index, cancel_index + 1):
-                # print(str(ws.cell(row=row, column=4).value))
-                key = str(ws.cell(row=row, column=4).value)
-                if key != str(None) and key != '-' and "Диам" not in key:
-                    value = ws.cell(row=row, column=7).value
-                    if value:
-                        if not key is None and row < a_plan:
-                            well_data.dict_nkt[key] = well_data.dict_nkt.get(key, 0) + round(float(value), 1)
-                        elif not key is None and row >= a_plan:
-                            well_data.dict_nkt_po[key] = well_data.dict_nkt_po.get(key, 0) + round(float(value), 1)
-                    # print(f'индекс a_plan {well_data.dict_nkt}')
-                # well_data.shoe_nkt = float(sum(well_data.dict_nkt.values()))
-        except:
-            well_data.nkt_mistake = True
-            mes = QMessageBox.warning(self, 'Ошибка', 'Программа не смогла определить диаметры и длину НКТ')
+        a_plan = 0
+        well_data.nkt_mistake = False
+        for row in range(begin_index, cancel_index):  # словарь  количества НКТ и метраж
+
+            if ws.cell(row=row, column=3).value == 'План' or str(
+                    ws.cell(row=row, column=3).value).lower() == 'после ремонта':
+                a_plan = row
+        if a_plan == 0:
+            a_plan = QInputDialog.getDouble(self, 'Индекс планового НКТ',
+                                            'Программа не могла определить начала строку с ПЗ НКТ - план')[0]
+        # print(f'индекс a_plan {a_plan}')
+        for row in range(begin_index, cancel_index + 1):
+            # print(str(ws.cell(row=row, column=4).value))
+            key = str(ws.cell(row=row, column=4).value)
+            if key != str(None) and key != '-' and "Диам" not in key:
+                value = ws.cell(row=row, column=7).value
+                if value:
+                    if not key is None and row < a_plan:
+                        well_data.dict_nkt[key] = well_data.dict_nkt.get(key, 0) + round(float(str(value).replace(',', '.')), 1)
+                    elif not key is None and row >= a_plan:
+                        well_data.dict_nkt_po[key] = well_data.dict_nkt_po.get(key, 0) + round(float(str(value).replace(',', '.')), 1)
+                # print(f'индекс a_plan {well_data.dict_nkt}')
+            # well_data.shoe_nkt = float(sum(well_data.dict_nkt.values()))
+        # except:
+        #     well_data.nkt_mistake = True
+        #     mes = QMessageBox.warning(self, 'Ошибка', 'Программа не смогла определить диаметры и длину НКТ')
 
 
 class WellSucker_rod(FindIndexPZ):
@@ -266,45 +272,45 @@ class WellSucker_rod(FindIndexPZ):
 
     def read_well(self, ws, begin_index, cancel_index):
 
-        try:
-            well_data.sucker_mistake = False
-            b_plan = 0
-            if well_data.sucker_rod_ind._value != 0:
-                for row in range(begin_index, cancel_index):  # словарь  количества штанг и метраж
-                    if ws.cell(row=row, column=3).value == 'План' or str(
-                            ws.cell(row=row, column=3).value).lower() == 'после ремонта' \
-                            or str(
-                        ws.cell(row=row, column=3).value).lower() == 'до ремонта':
-                        b_plan = row
+        # try:
+        well_data.sucker_mistake = False
+        b_plan = 0
+        if well_data.sucker_rod_ind._value != 0:
+            for row in range(begin_index, cancel_index):  # словарь  количества штанг и метраж
+                if ws.cell(row=row, column=3).value == 'План' or str(
+                        ws.cell(row=row, column=3).value).lower() == 'после ремонта' \
+                        or str(
+                    ws.cell(row=row, column=3).value).lower() == 'до ремонта':
+                    b_plan = row
 
-                if b_plan == 0 and well_data.sucker_rod_none is True:
-                    sucker_rod_question = QMessageBox.question(self,
-                                                                         'отсутствие штанг',
-                                                                         'Программа определило что штанг в '
-                                                                         'скважине нет, корректно?')
-                    if sucker_rod_question == QMessageBox.StandardButton.Yes:
-                        well_data.sucker_rod_none = False
-                    else:
-                        well_data.sucker_rod_none = True
+            if b_plan == 0 and well_data.sucker_rod_none is True:
+                sucker_rod_question = QMessageBox.question(self,
+                                                                     'отсутствие штанг',
+                                                                     'Программа определило что штанг в '
+                                                                     'скважине нет, корректно?')
+                if sucker_rod_question == QMessageBox.StandardButton.Yes:
+                    well_data.sucker_rod_none = False
+                else:
+                    well_data.sucker_rod_none = True
 
-                    if well_data.sucker_rod_none == True:
-                        b_plan = QInputDialog.getDouble(self, 'Индекс планового НКТ',
-                                                    'Программа не могла определить начала строку с ПЗ штанги - план')
-                # print(f'б {b_plan}')
+                if well_data.sucker_rod_none == True:
+                    b_plan = QInputDialog.getDouble(self, 'Индекс планового НКТ',
+                                                'Программа не могла определить начала строку с ПЗ штанги - план')
+            # print(f'б {b_plan}')
 
-                for row in range(begin_index, cancel_index - 1):
+            for row in range(begin_index, cancel_index - 1):
 
-                    key = str(ws.cell(row=row, column=4).value).replace(' ', '')
-                    value = ws.cell(row=row, column=7).value
-                    if key != str(None) and key != '-' and key != '':
-                        # print(key, value)
-                        if key != None and row < b_plan:
-                            well_data.dict_sucker_rod[key] = well_data.dict_sucker_rod.get(key, 0) + int(value + 1)
-                        if key != None and row >= b_plan:
-                            well_data.dict_sucker_rod_po[key] = well_data.dict_sucker_rod_po.get(key, 0) + int(value)
-        except:
-            well_data.sucker_mistake = True
-            mes = QMessageBox.warning(self, 'Ошибка', 'Программа не смогла определить диаметры и длину штанг')
+                key = str(ws.cell(row=row, column=4).value).replace(' ', '')
+                value = ws.cell(row=row, column=7).value
+                if key != str(None) and key != '-' and key != '':
+                    # print(key, value)
+                    if key != None and row < b_plan:
+                        well_data.dict_sucker_rod[key] = well_data.dict_sucker_rod.get(key, 0) + int(float(str(value).replace(',', '.'))) + 1
+                    if key != None and row >= b_plan:
+                        well_data.dict_sucker_rod_po[key] = well_data.dict_sucker_rod_po.get(key, 0) + int(float(str(value).replace(',', '.')))
+        # except:
+        #     well_data.sucker_mistake = True
+        #     mes = QMessageBox.warning(self, 'Ошибка', 'Программа не смогла определить диаметры и длину штанг')
 
 
 class WellFond_data(FindIndexPZ):
@@ -345,36 +351,63 @@ class WellFond_data(FindIndexPZ):
                             if ('НВ' in str(row[col_do].value).upper() or 'ШГН' in str(row[col_do].value).upper() \
                                 or 'НН' in str(row[col_do].value).upper()) or 'RHAM' in str(row[col_do].value).upper():
                                 well_data.dict_pump_SHGN["do"] = row[col_do].value
+                                if '/' in str(row[col_do].value):
+                                    well_data.dict_pump_SHGN["do"] = [ecn for ecn in row[col_do].value.split('/')
+                                                                      if 'НВ' in ecn or 'НН' in ecn or
+                                                                      'ШГН' in ecn or 'RHAM' in ecn][0]
+
                             if ('ЭЦН' in str(row[col_do].value).upper() or 'ВНН' in str(row[col_do].value).upper()):
                                 well_data.dict_pump_ECN["do"] = row[col_do].value
-
+                                if '/' in str(row[col_do].value):
+                                    well_data.dict_pump_ECN["do"] = [ecn for ecn in row[col_do].value.split('/')
+                                                                     if 'ЭЦН' in ecn or 'ВНН' in ecn][0]
+                                # print(well_data.dict_pump_ECN["do"])
                         if row[col_plan].value:
                             if ('НВ' in str(row[col_plan].value).upper() or 'ШГН' in str(
-                                    row[col_plan].value).upper() \
+                                    row[col_plan].value).upper()\
                                 or 'НН' in str(row[col_plan].value).upper()) \
                                     or 'RHAM' in str(row[col_plan].value).upper():
                                 well_data.dict_pump_SHGN["posle"] = row[col_plan].value
+                                if '/' in str(row[col_plan].value):
+                                    well_data.dict_pump_SHGN["posle"] = [ecn for ecn in row[col_plan].value.split('/')
+                                                                      if 'НВ' in ecn or 'НН' in ecn or
+                                                                      'ШГН' in ecn or 'RHAM' in ecn][0]
 
                             if ('ЭЦН' in str(row[col_plan].value).upper() or 'ВНН' in str(
                                     row[col_plan].value).upper()):
                                 well_data.dict_pump_ECN["posle"] = row[col_plan].value
+                                if '/' in str(row[col_plan].value):
+                                    well_data.dict_pump_ECN["posle"] = [ecn for ecn in row[col_plan].value.split('/')
+                                                                     if 'ЭЦН' in ecn or 'ВНН' in ecn][0]
 
                         if well_data.dict_pump_ECN["do"] != 0:
-                            well_data.dict_pump_ECN_h["do"] = ws.cell(row=row_index + 4, column=col_do + 1).value
+                            well_data.dict_pump_ECN_h["do"] = FindIndexPZ.check_str_None(self,
+                                ws.cell(row=row_index + 4, column=col_do + 1).value)
+                            if '/' in str(ws.cell(row=row_index + 4, column=col_do + 1).value):
+                                well_data.dict_pump_ECN_h["do"] = max(FindIndexPZ.check_str_None(self, ws.cell(row=row_index + 4, column=col_do + 1).value))
                         if well_data.dict_pump_SHGN["do"] != 0:
-                            well_data.dict_pump_SHGN_h["do"] = ws.cell(row=row_index + 4, column=col_do + 1).value
+
+                            well_data.dict_pump_SHGN_h["do"] = FindIndexPZ.check_str_None(self, ws.cell(row=row_index + 4, column=col_do + 1).value)
+                            if '/' in str(ws.cell(row=row_index + 4, column=col_do + 1).value):
+                                well_data.dict_pump_SHGN_h["do"] = min(FindIndexPZ.check_str_None(self, ws.cell(row=row_index + 4, column=col_do + 1).value))
                         if well_data.dict_pump_ECN["posle"] != 0:
-                            well_data.dict_pump_ECN_h["posle"] = ws.cell(row=row_index + 4,
-                                                                         column=col_plan + 1).value
+                            well_data.dict_pump_ECN_h["posle"] = FindIndexPZ.check_str_None(self, ws.cell( row=row_index + 4,
+                                                                         column=col_plan + 1).value)
+                            if '/' in str(ws.cell(row=row_index + 4,column=col_plan + 1).value):
+                                well_data.dict_pump_ECN_h["posle"] = max(FindIndexPZ.check_str_None(self, ws.cell(row=row_index + 4,
+                                                                         column=col_plan + 1).value))
                         if well_data.dict_pump_SHGN["posle"] != 0:
-                            well_data.dict_pump_SHGN_h["posle"] = ws.cell(row=row_index + 4,
-                                                                          column=col_plan + 1).value
+                            well_data.dict_pump_SHGN_h["posle"] = FindIndexPZ.check_str_None(self, ws.cell(row=row_index + 4,
+                                                                          column=col_plan + 1).value)
+                            if '/' in str(ws.cell(row=row_index + 4, column=col_plan + 1).value):
+                                well_data.dict_pump_SHGN_h["posle"] = min(FindIndexPZ.check_str_None(self, ws.cell(row=row_index + 4,
+                                                                                                  column=col_plan + 1).value))
 
                     elif value == 'Н посадки, м':
                         try:
                             if well_data.paker_do["do"] != 0:
-                                well_data.depth_fond_paker_do["do"] = FindIndexPZ.check_str_None(self,row[col_do].value)[0]
-                                well_data.depth_fond_paker2_do["do"] = FindIndexPZ.check_str_None(self,row[col_do].value)[1]
+                                well_data.depth_fond_paker_do["do"] = FindIndexPZ.check_str_None(self, row[col_do].value)[0]
+                                well_data.depth_fond_paker2_do["do"] = FindIndexPZ.check_str_None(self, row[col_do].value)[1]
                         except:
                             if well_data.paker_do["do"] != 0:
                                 well_data.depth_fond_paker_do["do"] = row[col_do].value
@@ -558,7 +591,7 @@ class Well_expected_pick_up(FindIndexPZ):
                         well_data.expected_Q = row[col + 1].value
                         # print(well_data.expected_Q)
                         well_data.expected_Q = FindIndexPZ.definition_is_None(self,well_data.expected_Q, row_index, col + 1, 1)
-                        print(f'после {well_data.expected_Q}')
+                        # print(f'после {well_data.expected_Q}')
                     if 'зак' in str(value).lower() or 'давл' in str(value).lower() or 'p' in str(value).lower():
                         well_data.expected_P = row[col + 1].value
                         well_data.expected_P = FindIndexPZ.definition_is_None(self,well_data.expected_P, row_index, col + 1, 1)
@@ -649,10 +682,10 @@ class Well_data(FindIndexPZ):
                                                                                     row_index, col, 2)
 
                         well_data.bottomhole_artificial = ProtectedIsDigit(row[col + 4].value)
-                        print(f'пробуренный забой {well_data.bottomhole_artificial}')
+                        # print(f'пробуренный забой {well_data.bottomhole_artificial}')
                         well_data.bottomhole_artificial = \
                             FindIndexPZ.definition_is_None(self, well_data.bottomhole_artificial, row_index, col, 5)
-                        print(f'пробуренный забой {well_data.bottomhole_artificial}')
+                        # print(f'пробуренный забой {well_data.bottomhole_artificial}')
 
                     elif 'зенитный угол' in str(value).lower():
                         well_data.max_angle = ProtectedIsDigit(row[col + 4].value)
@@ -883,10 +916,10 @@ class Well_perforation(FindIndexPZ):
             for col_index, column in enumerate(row):
                 if 'оризонт'.lower() in str(column).lower() or 'пласт/'.lower() in str(column).lower():
                     col_plast_index = col_index - 1
-                    print(f'пласт {col_plast_index}')
+                    # print(f'пласт {col_plast_index}')
                 if 'по вертикали'.lower() in str(column).lower():
                     col_vert_index = col_index - 1
-                    print(f'вер {col_index}')
+                    # print(f'вер {col_index}')
                 if 'кровля'.lower() in str(column).lower():
                     col_roof_index = col_index - 1
                     # print(f'кров {col_index}')
@@ -996,7 +1029,7 @@ class Well_perforation(FindIndexPZ):
                                                                                 []).append(round(data_p, 1))
                     well_data.dict_perforation_short.setdefault(plast, {}).setdefault('давление',
                                                                                       []).append(round(data_p, 1))
-                    zhgs = calculationFluidWork(float(row[col_vert_index]), float(data_p))
+                    zhgs = calculationFluidWork(float(str(row[col_vert_index]).replace(',','.')), float(data_p))
                 else:
                     well_data.dict_perforation_short.setdefault(plast, {}).setdefault('давление',
                                                                                       []).append('0')
@@ -1013,7 +1046,7 @@ class Well_perforation(FindIndexPZ):
                     str(row[col_roof_index]).replace(',', '.'))) is True:  # Определение проектных интервалов перфорации
                 roof_int = round(float(str(row[col_roof_index]).replace(',', '.')), 1)
                 sole_int = round(float(str(row[col_sole_index]).replace(',', '.')), 1)
-                print(roof_int, sole_int)
+
                 if row[col_vert_index] != None:
                     well_data.dict_perforation_project.setdefault(
                         plast, {}).setdefault('вертикаль', []).append(round(float(row[col_vert_index]), 1))
@@ -1021,7 +1054,7 @@ class Well_perforation(FindIndexPZ):
                     plast, {}).setdefault('интервал', []).append((roof_int, sole_int))
 
                 if row[col_pressuar_index] != None:
-                    print(f'давление {row[col_pressuar_index]}')
+
                     well_data.dict_perforation_project.setdefault(plast, {}).setdefault('давление', []).append(
                         round(float(row[col_pressuar_index]), 1))
                 well_data.dict_perforation_project.setdefault(plast, {}).setdefault('рабочая жидкость', []).append(
@@ -1066,7 +1099,7 @@ class Well_perforation(FindIndexPZ):
         if len(well_data.dict_perforation_project) != 0:
             well_data.plast_project = list(well_data.dict_perforation_project.keys())
 
-        print(well_data.dict_perforation)
+
 
 
 class Well_Category(FindIndexPZ):
@@ -1114,32 +1147,33 @@ class Well_Category(FindIndexPZ):
                     elif 'мг/л' in str(cell) or 'мг/дм3' in str(cell):
                         cell2 = ws.cell(row=row, column=col - 1).value
                         if cell2:
-                            well_data.h2s_mg.append(float(FindIndexPZ.check_str_None(self,cell2)))
+                            well_data.h2s_mg.append(float(FindIndexPZ.check_str_None(self, str(cell2).replace(',', '.'))))
                     elif 'м3/т' in str(cell):
                         cell2 = ws.cell(row=row, column=col - 1).value
                         if cell2:
-                            well_data.gaz_f_pr.append(round(float(FindIndexPZ.check_str_None(self,cell2)), 1))
+                            well_data.gaz_f_pr.append(round(float(FindIndexPZ.check_str_None(self, str(cell2).replace(',', '.'))), 1))
                     elif '%' in str(cell):
                         cell2 = ws.cell(row=row, column=col - 1).value
-                        print(f'проц {cell2}')
+                        # print(f'проц {cell2}')
                         if type(cell2) in [float, int]:
                             if str(round(float(str(cell2).replace(',', '.')), 3))[-1] == "0":
-                                h2s_pr = int(float(cell2))
+                                h2s_pr = int(float(str(cell2).replace(',', '.')))
                             else:
                                 h2s_pr = round(float(str(cell2).replace(',', '.')), 4)
                             well_data.h2s_pr.append(float(str(h2s_pr).replace(',', '.')))
                         else:
                             h2s_pr = cell2
-                            well_data.h2s_pr.append(FindIndexPZ.check_str_None(self,cell2))
+                            well_data.h2s_pr.append(FindIndexPZ.check_str_None(self, str(cell2).replace(',', '.')))
 
 
                     elif str(cell) in 'мг/м3':
                         cell2 = ws.cell(row=row, column=col - 1).value
                         if cell2:
-                            well_data.h2s_mg_m3.append(float(str(FindIndexPZ.check_str_None(self,cell2)).replace(',', '.')) / 1000)
+                            well_data.h2s_mg_m3.append(float(str(
+                                FindIndexPZ.check_str_None(self, str(cell2).replace(',', '.')))) / 1000)
         if len(well_data.h2s_mg) == 0 and len(well_data.h2s_mg_m3) != 0:
             for mg in well_data.h2s_mg_m3:
-                print(f'значени{mg}')
+                # print(f'значени{mg}')
                 well_data.h2s_mg.append(mg)
         if len(well_data.h2s_mg) == 0:
             h2s_mg, _ = QInputDialog.getDouble(self, 'сероводород в процентах',

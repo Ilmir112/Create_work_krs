@@ -170,6 +170,14 @@ class OpressovkaEK(QMainWindow):
         paker_depth = int(float(self.tabWidget.currentWidget().paker_depth_edit.text()))
         try:
             pakerDepthZumpf = int(float(self.tabWidget.currentWidget().pakerDepthZumpf_edit.text()))
+            if MyWindow.check_true_depth_template(self, paker_depth) is False:
+                return
+            if MyWindow.true_set_Paker(self, paker_depth) is False:
+                return
+            if MyWindow.check_depth_in_skm_interval(self, paker_depth) is False:
+                return
+
+
         except:
             pakerDepthZumpf = 0
 
@@ -178,8 +186,16 @@ class OpressovkaEK(QMainWindow):
             mes = QMessageBox.warning(self, 'Некорректные данные', f'Компоновка НКТ c хвостовик + пакер '
                                                                    f'ниже текущего забоя')
             return
+        if MyWindow.check_true_depth_template(self, paker_depth) is False:
+            return
+        if MyWindow.true_set_Paker(self, paker_depth) is False:
+            return
+        if MyWindow.check_depth_in_skm_interval(self, paker_depth) is False:
+            return
 
-        work_list = OpressovkaEK.paker_list(self, diametr_paker, paker_khost, paker_depth, pakerDepthZumpf, pressureZUMPF_question)
+
+        work_list = OpressovkaEK.paker_list(self, diametr_paker, paker_khost, paker_depth, pakerDepthZumpf,
+                                            pressureZUMPF_question)
         MyWindow.populate_row(self, self.ins_ind, work_list, self.table_widget)
         well_data.pause = False
         self.close()
@@ -188,7 +204,7 @@ class OpressovkaEK(QMainWindow):
     def paker_list(self, paker_diametr, paker_khost, paker_depth, pakerDepthZumpf, pressureZUMPF_question):
 
 
-        paker_depth = MyWindow.true_set_Paker(self, paker_depth)
+
 
         if well_data.column_additional is False or well_data.column_additional is True \
                 and paker_depth < well_data.head_column_additional._value:
@@ -483,7 +499,6 @@ class OpressovkaEK(QMainWindow):
     # функция проверки спуска пакера выше прошаблонированной колонны
     def check_for_template_paker(self, depth):
 
-
         check_true = False
         print(f' глубина шаблона {well_data.template_depth}, посадка пакера {depth}')
         while check_true is False:
@@ -499,17 +514,12 @@ class OpressovkaEK(QMainWindow):
             if check_true is False:
 
                 false_template = QMessageBox.question(None, 'Проверка глубины пакера',
-                                                      f'Проверка показала пакер опускается ниже глубины шаблонирования ЭК'
+                                                      f'Проверка показала посадка пакера {depth}м '
+                                                      f'опускается ниже глубины шаблонирования ЭК '
+                                                      f'{well_data.template_depth}м'
                                                       f'изменить глубину ?')
-                if false_template is QMessageBox.StandardButton.Yes:
-                    depth, ok = QInputDialog.getInt(None, 'опрессовка ЭК',
-                                                    'Введите глубину посадки пакера для опрессовки колонны',
-                                                    int(well_data.perforation_roof - 20), 0,
-                                                    int(well_data.current_bottom))
-                else:
-                    check_true = True
 
-        return int(depth), check_true
+        return check_true
 
     def testing_pressure(self, depth):
 

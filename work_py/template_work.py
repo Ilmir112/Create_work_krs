@@ -870,7 +870,7 @@ class TemplateKrs(QMainWindow):
             template_diametr = int(self.tabWidget.currentWidget().template_second_Edit.text())
         else:
             template_diametr = int(self.tabWidget.currentWidget().template_first_Edit.text())
-        print(well_data.problemWithEk_depth)
+        print(well_data.problemWithEk_diametr)
         if (template_diametr >= int(well_data.problemWithEk_diametr) - 2
                 and well_data.template_depth > float(well_data.problemWithEk_depth)):
             mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже глубины не прохода')

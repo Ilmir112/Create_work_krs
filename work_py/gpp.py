@@ -106,7 +106,7 @@ class Gpp_window(QMainWindow):
         nkt_diam = ''.join(['89' if well_data.column_diametr._value > 110 else '60'])
 
 
-        gPP_300 = MyWindow.true_set_Paker(self, 300)
+        gPP_300 = MyWindow.check_depth_in_skm_interval(self, depth)
 
         main.MyWindow.check_gpp_upa(self)
 

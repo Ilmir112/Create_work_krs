@@ -117,6 +117,13 @@ class Grp_window(QMainWindow):
         gisOTZ_true_quest = self.tabWidget.currentWidget().otz_question_QCombo.currentText()
         normalization_true_quest = self.tabWidget.currentWidget().normalization_QCombo.currentText()
         current_depth = int(float(self.tabWidget.currentWidget().current_depth_edit.text()))
+        if MyWindow.check_true_depth_template(self, paker_depth) is False:
+            return
+        if MyWindow.true_set_Paker(self, paker_depth) is False:
+            return
+        if MyWindow.check_depth_in_skm_interval(self, paker_depth) is False:
+            return
+
 
         if int(paker_khost) + int(paker_depth) > well_data.current_bottom:
             mes = QMessageBox.warning(self, 'Некорректные данные', f'Компоновка НКТ c хвостовик + пакер '
@@ -258,7 +265,7 @@ class Grp_window(QMainWindow):
 
         nkt_diam = ''.join(['89' if well_data.column_diametr._value > 110 else '60'])
 
-        paker_depth = MyWindow.true_set_Paker(self, paker_depth)
+
         paker_list = [
             [f'За 48 часов оформить заявку на завоз оборудования ГРП.', None,
              f'За 48 часов оформить заявку на завоз оборудования ГРП. Уложить НКТ на дополнительные стеллажи',

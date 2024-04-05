@@ -1299,10 +1299,7 @@ class GnoWindow(QMainWindow):
                 [None, None, 'Порядок работы', None, None, None, None, None, None, None, None, None],
                 [None, None, 'Наименование работ', None, None, None, None, None, None, None, 'Ответственный',
                  'Нормы времени \n мин/час.'],
-                [None, 1,
-                 'Ранее проведенные работ:',
-                 None, None, None, None, None, None, None,
-                 None, None]]
+                ]
             return krs_begin[:2]
 
     def calc_work_fluid(self, fluid_work_insert):

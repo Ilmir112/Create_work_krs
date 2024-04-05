@@ -23,6 +23,8 @@ def gno_down(self):
             well_data.dict_pump_SHGN[
                 "posle"]).upper()) and well_data.paker_do["posle"] == 0:
         lift_key = 'НВ'
+    elif well_data.dict_pump_SHGN["posle"] != 0 and well_data.dict_pump_ECN["posle"] != 0:
+        lift_key = "ОРД"
     elif ('НВ' in well_data.if_None(well_data.dict_pump_SHGN["posle"]).upper() or 'ШГН' in well_data.if_None(
             well_data.dict_pump_SHGN[
                 "posle"]).upper()) and well_data.paker_do["posle"] != 0:

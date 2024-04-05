@@ -400,15 +400,39 @@ class Swab_Window(QMainWindow):
         #     return
 
         if swab_true_edit_type == 'однопакерная':
+            if MyWindow.check_true_depth_template(self, paker_depth) is False:
+                return
+            if MyWindow.true_set_Paker(self, paker_depth) is False:
+                return
+            if MyWindow.check_depth_in_skm_interval(self, paker_depth) is False:
+                return
             work_list = self.swabbing_with_paker(diametr_paker, paker_depth, paker_khost, plast_combo,
                                                  swabTypeCombo, swab_volumeEdit, depthGaugeCombo)
         elif swab_true_edit_type == 'двухпакерная':
+            if MyWindow.check_true_depth_template(self, paker_depth) is False:
+                return
+            if MyWindow.true_set_Paker(self, paker_depth) is False:
+                return
+            if MyWindow.check_depth_in_skm_interval(self, paker_depth) is False:
+                return
+            if MyWindow.check_true_depth_template(self, paker2_depth) is False:
+                return
+            if MyWindow.true_set_Paker(self, paker2_depth) is False:
+                return
+            if MyWindow.check_depth_in_skm_interval(self, paker2_depth) is False:
+                return
             work_list = self.swabbing_with_2paker(diametr_paker, paker_depth, paker2_depth, paker_khost, plast_combo,
                                                   swabTypeCombo, swab_volumeEdit, depthGaugeCombo)
         elif swab_true_edit_type == 'воронка':
             work_list = self.swabbing_with_voronka(paker_depth, plast_combo, swabTypeCombo,
                                                    swab_volumeEdit, depthGaugeCombo)
         elif swab_true_edit_type == 'пакер с заглушкой':
+            if MyWindow.check_true_depth_template(self, paker_depth) is False:
+                return
+            if MyWindow.true_set_Paker(self, paker_depth) is False:
+                return
+            if MyWindow.check_depth_in_skm_interval(self, paker_depth) is False:
+                return
             work_list = self.swabbing_with_paker(diametr_paker, paker_depth, paker_khost, plast_combo,
                                                  swabTypeCombo, swab_volumeEdit, depthGaugeCombo)
         elif swab_true_edit_type == 'Опрессовка снижением уровня на шаблоне':
@@ -447,16 +471,28 @@ class Swab_Window(QMainWindow):
                 return
             work_list = self.swabbing_opy(paker2_depth, fluid_new, need_change_zgs_combo, plast_new, pressuar_new)
         elif swab_true_edit_type == 'Опрессовка снижением уровня на пакере с заглушкой':
+            if MyWindow.check_true_depth_template(self, paker_depth) is False:
+                return
+            if MyWindow.true_set_Paker(self, paker_depth) is False:
+                return
+            if MyWindow.check_depth_in_skm_interval(self, paker_depth) is False:
+                return
             work_list = self.swabbing_opy_with_paker(diametr_paker, paker_khost, paker_depth, paker2_depth)
         MyWindow.populate_row(self, self.ins_ind, work_list, self.table_widget)
         well_data.pause = False
         self.close()
 
     def swabbing_opy_with_paker(self, diametr_paker, paker_khost, paker_depth, depth_opy):
+        if MyWindow.check_true_depth_template(self, paker_depth) is False:
+            return
+        if MyWindow.true_set_Paker(self, paker_depth) is False:
+            return
+        if MyWindow.check_depth_in_skm_interval(self, paker_depth) is False:
+            return
         need_change_zgs_combo = str(self.tabWidget.currentWidget().need_change_zgs_combo.currentText())
         if need_change_zgs_combo == 'Да':
             if len(well_data.plast_project) != 0:
-                print('проект отсутствует')
+
                 plast_new_combo = self.tabWidget.currentWidget().plast_new_combo.currentText()
             else:
                 plast_new_combo = self.tabWidget.currentWidget().plast_new_combo.text()

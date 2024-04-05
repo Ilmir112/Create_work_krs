@@ -256,8 +256,6 @@ class RirWindow(QMainWindow):
         else:
             rir_rpk_plast_true = False
 
-        roof_rir_edit = MyWindow.true_set_Paker(self, roof_rir_edit)
-
 
 
         rir_work_list = [[f'СПО РПП до глубины {roof_rir_edit}м', None,
@@ -324,9 +322,6 @@ class RirWindow(QMainWindow):
             rir_rpk_plast_true = True
         else:
             rir_rpk_plast_true = False
-
-        roof_rir_edit = MyWindow.true_set_Paker(self, roof_rir_edit)
-
 
 
         if rir_rpk_plast_true:
@@ -853,6 +848,14 @@ class RirWindow(QMainWindow):
             diametr_paker = int(float(self.tabWidget.currentWidget().diametr_paker_edit.text()))
             paker_khost = int(float(self.tabWidget.currentWidget().paker_khost_edit.text()))
             paker_depth = int(float(self.tabWidget.currentWidget().paker_depth_edit.text()))
+            if MyWindow.check_true_depth_template(self, paker_depth) is False:
+                return
+            if MyWindow.true_set_Paker(self, paker_depth) is False:
+                return
+            if MyWindow.check_depth_in_skm_interval(self, paker_depth) is False:
+                return
+
+
         else:
             diametr_paker = 122
             paker_khost = 10
@@ -892,7 +895,7 @@ class RirWindow(QMainWindow):
                                           'Введите глубину установки извлекаемого пакера ',
                                           int(well_data.perforation_roof-50), 0, int(well_data.bottomhole_drill._value))
 
-        pakerIzvPaker = MyWindow.true_set_Paker(self, pakerIzvPaker)
+
 
         well_data.pakerIzvPaker = pakerIzvPaker
         rir_list = [[f'СПО пакера извлекаемый до глубины {pakerIzvPaker}м',
