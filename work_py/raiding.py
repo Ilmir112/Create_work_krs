@@ -294,6 +294,10 @@ class Raid(MyWindow):
             if roof_raid and sole_raid:
                 roof = int(roof_raid.text())
                 sole = int(sole_raid.text())
+                if roof > sole:
+                    mes = QMessageBox.warning(self, 'Ошибка',
+                                              'кровля больше подошвы райбирования')
+                    return
                 raid_tuple.append((roof, sole))
 
 

@@ -1,12 +1,10 @@
 from PyQt5.QtWidgets import QMessageBox
 
 import well_data
-from .descent_gno import PzakPriGis
+from .descent_gno import GnoDescentWindow
 
 
 def rgdWithoutPaker(self):
-
-   
 
     rgd_list = [
         [f'СП НКТ 300м', None, f'Спустить с замером воронку на НКТ до  глубины 300м с замером, шаблонированием шаблоном {well_data.nkt_template}мм . '
@@ -27,11 +25,12 @@ def rgdWithoutPaker(self):
                          ' напротив мостков для постановки партии ГИС.',
              None, None, None, None, None, None, None,
              'мастер КРС', None],
-            [f'РГД по колонне при закачке не менее {PzakPriGis(self)}атм',
+            [f'РГД по колонне при закачке не менее {GnoDescentWindow.PzakPriGis(self)}атм',
              None,
              f'Произвести запись по техкарте 2.3.1: Определение профиля приемистости скважины и оценка технического состояния '
              f'эксплуатационной колонны при закачке (скважинная аппаратура на кабеле, НКТ подняты). '
-             f'Давление закачки должно быть согласно ожидаемой закачки ППД. при закачке не менее {PzakPriGis(self)}атм '
+             f'Давление закачки должно быть согласно ожидаемой закачки ППД. при закачке не менее '
+             f'{GnoDescentWindow.PzakPriGis(self)}атм '
              f'при открытой затрубной задвижке',
              None, None, None, None, None, None, None,
              'Мастер КРС, подрядчик по ГИС', 20]]
@@ -67,7 +66,7 @@ def rgdWithPaker(self):
                  'мастер КРС', None],
                 [f'ГИС РГД', None,
                  f'Произвести запись по техкарте 2.3.2: определение профиля приемистости и оценку технического состояния '
-                 f'эксплуатационной колонны и НКТ при закачке не менее {PzakPriGis(self)}атм '
+                 f'эксплуатационной колонны и НКТ при закачке не менее {GnoDescentWindow.PzakPriGis(self)}атм '
                  f'при открытой затрубной задвижке',
                  None, None, None, None, None, None, None,
                  'Мастер КРС, подрядчик по ГИС', 20],

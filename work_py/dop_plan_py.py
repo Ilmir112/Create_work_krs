@@ -1,3 +1,6 @@
+import json
+import sqlite3
+
 from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QTabWidget, \
     QMainWindow, QPushButton
 from datetime import datetime
@@ -68,13 +71,14 @@ class DopPlanWindow(QMainWindow):
         work_earlier = self.tabWidget.currentWidget().work_edit.text()
         well_data.current_bottom = current_bottom
 
-        if current_bottom != '' or fluid != '' or work_earlier != '':
+        if current_bottom == '' or fluid == '' or work_earlier == '':
+            print(current_bottom, fluid, work_earlier)
             mes = QMessageBox.critical(self, 'Забой', 'не все значения введены')
             return
-        if current_bottom >well_data.bottomhole_drill:
+        if current_bottom > well_data.bottomhole_drill._value:
             mes = QMessageBox.critical(self, 'Забой', 'Текущий забой больше пробуренного забоя')
             return
-        if 0.87 <= fluid <= 1.64 is False:
+        if (0.87 <= fluid <= 1.64) == False:
             mes = QMessageBox.critical(self, 'рабочая жидкость',
                                        'уд. вес рабочей жидкости не может быть меньше 0,87 и больше 1,64')
             return
@@ -82,6 +86,69 @@ class DopPlanWindow(QMainWindow):
         work_list = self.work_list(work_earlier)
         MyWindow.populate_row(self, self.ins_ind+2, work_list, self.table_widget)
         well_data.pause = False
+
+
+        # Устанавливаем соединение с базой данных
+        conn1 = sqlite3.connect('data_base/data_base_well/databaseWell.db')
+        cursor1 = conn1.cursor()
+
+        # Проверяем наличие таблицы с определенным именем
+        print(f'номер {well_data.number_dp, type(well_data.number_dp)}')
+        number_dp = int(well_data.number_dp) - 1
+        for i in [number_dp, '']:
+            if i == '':
+                work_plan = 'krs'
+            else:
+                work_plan = f'dop_plan{i}'
+            try:
+                table_name = f'{well_data.well_number._value}{well_data.well_area._value}{work_plan}{i}'
+                cursor1.execute(f"SELECT * FROM sqlite_master WHERE name='{table_name}'")
+                result_table = cursor1.fetchall()
+            except:
+                pass
+            if len(result_table) > 0:
+                break
+        # Закрываем соединение с базой данных
+        conn1.close()
+        if len(result_table) > 0:
+            conn1 = sqlite3.connect('data_base/data_base_well/databaseWell.db')
+            cursor2 = conn1.cursor()
+            print(result_table)
+            print(f"Таблица '{table_name}' существует в базе данных.")
+            cursor2.execute(f"SELECT * FROM table_name")
+            result = cursor2.fetchall()
+            well_data.paragraph_row, ok = QInputDialog.getInt(self, 'пункт плана работ',
+                                                              'Введите пункт плана работ после которого идет изменение')
+            while len(result) < well_data.paragraph_row:
+                mes = QMessageBox.warning(self, 'ОШИБКА', f'нет пункта {well_data.paragraph_row} в базе данных ')
+                well_data.paragraph_row, ok = QInputDialog.getInt(self, 'пункт плана работ',
+                                                                  'Введите пункт плана работ после которого идет изменение')
+
+
+
+            current_bottom = result[well_data.paragraph_row][2]
+            perforation = json.loads(result[well_data.paragraph_row][3])
+            plast_all = json.loads(result[well_data.paragraph_row][4])
+            plast_work =  json.loads(result[well_data.paragraph_row][5])
+            leakage = json.loads(result[well_data.paragraph_row][6])
+            column_additional = result[well_data.paragraph_row][7]
+            fluid = result[well_data.paragraph_row][8]
+            category_pressuar = result[well_data.paragraph_row][9]
+            category_h2s = result[well_data.paragraph_row][0]
+            category_gf =  result[well_data.paragraph_row][11]
+            template_depth = result[well_data.paragraph_row][12]
+            skm_list = json.loads(result[well_data.paragraph_row][13])
+
+            problemWithEk_depth = result[well_data.paragraph_row][14]
+            problemWithEk_diametr = result[well_data.paragraph_row][15]
+
+            print(current_bottom, perforation, plast_work, skm_list)
+        else:
+            mes = QMessageBox.warning(self, 'Проверка наличия таблицы в базе данных',
+                                      f"Таблицы '{table_name}' нет в базе данных.")
+
+        conn1.close()
+
         self.close()
 
     def work_list(self, work_earlier):

@@ -179,7 +179,6 @@ def remove_overlapping_intervals(perforating_intervals, skm_interval = None):
 
 
 def raiding_interval(ryber_key):
-    print(well_data.dict_perforation)
 
     str_raid = []
     crt = 0
@@ -187,31 +186,31 @@ def raiding_interval(ryber_key):
 
         if well_data.dict_perforation[plast]['отрайбировано'] is False and \
                 well_data.dict_perforation[plast]['кровля'] <= well_data.current_bottom:
-            print(well_data.dict_perforation[plast]['интервал'])
+
             for interval in well_data.dict_perforation[plast]['интервал']:
+                if interval[1] < well_data.current_bottom:
+                    if well_data.column_additional is False or \
+                            (well_data.column_additional and \
+                             well_data.head_column_additional._value > well_data.current_bottom):
 
-                if well_data.column_additional is False or \
-                        (well_data.column_additional and \
-                         well_data.head_column_additional._value > well_data.current_bottom):
-                    print(interval)
-                    if float(interval[1]) + 20 <= well_data.current_bottom and \
-                            well_data.shoe_column._value >= float(interval[1]) + 20:
-                        crt = [float(interval[0]) - 20, float(interval[1]) + 20]
+                        if float(interval[1]) + 20 <= well_data.current_bottom and \
+                                well_data.shoe_column._value >= float(interval[1]) + 20:
+                            crt = [float(interval[0]) - 20, float(interval[1]) + 20]
 
-                    elif float(interval[1]) + 20 >= well_data.shoe_column._value:
-                        crt = [float(interval[0]) - 20, well_data.shoe_column._value]
+                        elif float(interval[1]) + 20 >= well_data.shoe_column._value:
+                            crt = [float(interval[0]) - 20, well_data.shoe_column._value]
 
-                    elif float(interval[1]) + 20 < well_data.shoe_column._value and \
-                            float(interval[1] + 20) > well_data.current_bottom:
-                        crt = [float(interval[0]) - 20, well_data.current_bottom]
-                else:
-                    if float(interval[1]) + 20 <= well_data.current_bottom and well_data.shoe_column_additional._value >= float(interval[1]) + 20:
-                        crt = [float(interval[0]) - 20, float(interval[1]) + 20]
-                    elif float(interval[1]) + 20 >= well_data.shoe_column_additional._value:
-                        crt = [float(interval[0]) - 20, well_data.shoe_column._value]
-                    elif float(interval[1]) + 20 < well_data.shoe_column_additional._value and \
-                            float(interval[1] + 20) > well_data.current_bottom:
-                        crt = [float(interval[0]) - 20, well_data.current_bottom]
+                        elif float(interval[1]) + 20 < well_data.shoe_column._value and \
+                                float(interval[1] + 20) > well_data.current_bottom:
+                            crt = [float(interval[0]) - 20, well_data.current_bottom]
+                    else:
+                        if float(interval[1]) + 20 <= well_data.current_bottom and well_data.shoe_column_additional._value >= float(interval[1]) + 20:
+                            crt = [float(interval[0]) - 20, float(interval[1]) + 20]
+                        elif float(interval[1]) + 20 >= well_data.shoe_column_additional._value:
+                            crt = [float(interval[0]) - 20, well_data.shoe_column._value]
+                        elif float(interval[1]) + 20 < well_data.shoe_column_additional._value and \
+                                float(interval[1] + 20) > well_data.current_bottom:
+                            crt = [float(interval[0]) - 20, well_data.current_bottom]
                 if crt != 0 and crt not in str_raid:
                     str_raid.append(crt)
 
@@ -240,15 +239,19 @@ def raiding_interval(ryber_key):
     merged_segments_new = []
     if ryber_key == 'райбер в ЭК' and well_data.column_additional:
         for str in merged_segments:
-            if str[0] < well_data.head_column_additional._value:
+            if str[0] < well_data.head_column_additional._value and str[0] < str[1]:
                 merged_segments_new.append(str)
 
-    elif ryber_key == 'райбер в ДП' and well_data.column_additional:
+    elif ryber_key == 'райбер в ДП' and well_data.column_additional and str[0] < str[1]:
         for str in merged_segments:
             if str[1] > well_data.head_column_additional._value:
                 merged_segments_new.append(str)
     else:
-        merged_segments_new = merged_segments
+        for str in merged_segments:
+            print(str[0], str[1])
+            if str[0] < str[1]:
+                print(str[0] < str[1], str[0], str[1])
+                merged_segments_new = merged_segments
     return merged_segments_new
 
 def change_True_raid(self, str_raid):
@@ -322,7 +325,8 @@ def definition_plast_work(self):
                 well_data.dict_perforation[plast]["кровля"] = \
                     min(list(map(lambda x: x[0], list(well_data.dict_perforation[plast]['интервал']))))
                 well_data.dict_perforation[plast]["подошва"] = \
-                    max(list(map(lambda x: x[1], list(well_data.dict_perforation[plast]['интервал']))))
+                    max(list(map(lambda x: x[1] if x[1] < well_data.current_bottom else 0,
+                                 list(well_data.dict_perforation[plast]['интервал']))))
 
     well_data.perforation_roof = perforation_roof
     well_data.perforation_sole = perforation_sole

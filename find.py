@@ -1211,22 +1211,26 @@ class Well_Category(FindIndexPZ):
         well_data.without_damping = thread.check_well_existence(
             well_data.well_number._value, well_data.well_area._value, well_data.region)
 
-        categoty_pressure_well, categoty_h2s_well, categoty_gf, data = thread.check_category(
-            well_data.well_number, well_data.well_area, well_data.region)
+        try:
+            categoty_pressure_well, categoty_h2s_well, categoty_gf, data = thread.check_category(
+                well_data.well_number, well_data.well_area, well_data.region)
 
+            if categoty_pressure_well:
+                if str(categoty_pressure_well) != str(well_data.category_pressuar):
+                    mes = QMessageBox.warning(None, 'Некорректная категория давления',
+                                              f'согласно классификатора от {data} категория скважина '
+                                              f'по давлению {categoty_pressure_well}')
+            if categoty_h2s_well:
+                if str(well_data.cat_h2s_list[0]) != str(well_data.category_h2s):
+                    print(str(well_data.cat_h2s_list[0]), well_data.category_h2s)
 
-        if categoty_pressure_well:
-            if str(categoty_pressure_well) != str(well_data.category_pressuar):
-                mes = QMessageBox.warning(None, 'Некорректная категория давления',
-                                          f'согласно классификатора от {data} категория скважина '
-                                          f'по давлению {categoty_pressure_well}')
-        if categoty_h2s_well:
-            if str(well_data.cat_h2s_list[0]) != well_data.category_h2s:
-                mes = QMessageBox.warning(None, 'Некорректная категория давления',
-                                          f'согласно классификатора от {data} категория скважина '
-                                          f'по сероводороду {categoty_h2s_well}')
-        if categoty_gf:
-            if categoty_gf != well_data.category_gf:
-                mes = QMessageBox.warning(None, 'Некорректная категория давления',
-                                          f'согласно классификатора от {data} категория скважина '
-                                          f'по газовому фактору {categoty_gf}')
+                    mes = QMessageBox.warning(None, 'Некорректная категория давления',
+                                              f'согласно классификатора от {data} категория скважина '
+                                              f'по сероводороду {categoty_h2s_well}')
+            if categoty_gf:
+                if categoty_gf != well_data.category_gf:
+                    mes = QMessageBox.warning(None, 'Некорректная категория давления',
+                                              f'согласно классификатора от {data} категория скважина '
+                                              f'по газовому фактору {categoty_gf}')
+        except:
+            mes = QMessageBox.warning(self, 'Ошибка', 'Скважина не найдена в классификаторе')

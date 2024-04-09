@@ -203,7 +203,8 @@ class PerforationCorrect(QMainWindow):
 
         if len(well_data.plast_work) == 0:
             perf_true_quest = QMessageBox.question(self, 'Программа',
-                                                   'Программа определили,что в скважине интервалов перфорации нет, верно ли?')
+                                                   'Программа определили,что в скважине интервалов '
+                                                   'перфорации нет, верно ли?')
             if perf_true_quest == QMessageBox.StandardButton.Yes:
 
                 well_data.pause = False
@@ -212,6 +213,7 @@ class PerforationCorrect(QMainWindow):
             else:
                 well_data.current_bottom, ok = QInputDialog.getDouble(self, 'Необходимый забой',
                                                                      'Введите забой до которого нужно нормализовать')
+                return
         well_data.pause = False
         self.close()
 

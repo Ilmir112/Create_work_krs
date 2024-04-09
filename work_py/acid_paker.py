@@ -343,11 +343,11 @@ class TabPage_SO_acid(QWidget):
         self.svk_true_combo.setCurrentIndex(0)
         self.svk_true_combo.setCurrentIndex(1)
         self.plast_combo.combo_box.currentTextChanged.connect(self.update_plast_edit)
-        self.iron_volume_edit.setText(f'{round(float(self.acid_volume_edit.text()), 1)}')
+        self.iron_volume_edit.setText(f'{round(float(self.acid_volume_edit.text()), 1)*10}')
         self.acid_volume_edit.textChanged.connect(self.change_volume_acid)
 
     def change_volume_acid(self):
-        self.iron_volume_edit.setText(f'{round(float(self.acid_volume_edit.text()), 1)}')
+        self.iron_volume_edit.setText(f'{round(float(self.acid_volume_edit.text()), 1)*10}')
     def update_paker_depth(self):
         from .opressovka import TabPage_SO
 
@@ -691,9 +691,13 @@ class AcidPakerWindow(QMainWindow):
                 plast_combo = self.tableWidget.item(row, 0).text()
                 if row == 0:
                     paker_khost = int(float(self.tableWidget.item(row, 1).text()))
+                    if paker_khost < 0:
+                        mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'Не корректная компоновка')
+                        return
                     well_data.paker_khost = paker_khost
                 else:
                     paker_khost = well_data.paker_khost
+
                 paker_depth = int(float(self.tableWidget.item(row, 2).text()))
                 paker2_depth = int(float(self.tableWidget.item(row, 3).text()))
                 svk_true_combo = self.tableWidget.cellWidget(row, 4).currentText()

@@ -30,7 +30,12 @@ class CreatePZ(QMainWindow):
         from find import WellNkt, Well_perforation, WellCondition, WellHistory_data, Well_data, Well_Category, \
             WellFond_data, WellSucker_rod, Well_expected_pick_up
 
+        if work_plan == 'dop_plan':
+            well_data.number_dp, ok = QInputDialog.getText(self, 'Номер дополнительного плана работ',
+                                                           'Введите номер дополнительного плана работ')
+
         well_data.work_plan = work_plan
+
         well_data.dict_category = CategoryWindow.dict_category
 
         # Запуск основного класса и всех дочерних классов в одной строке
@@ -53,8 +58,6 @@ class CreatePZ(QMainWindow):
 
             if any(['ПЛАН РАБОТ' in row]) \
                     and work_plan == 'dop_plan':
-                well_data.number_dp, ok = QInputDialog.getText(self, 'Номер дополнительного плана работ',
-                                                               'Введите номер дополнительного плана работ')
                 ws.cell(row=row_ind + 1, column=2).value = f'ДОПОЛНИТЕЛЬНЫЙ ПЛАН РАБОТ № {well_data.number_dp}'
                 print(f'номер доп плана {well_data.number_dp}')
 

@@ -429,13 +429,14 @@ class Classifier_well(QMainWindow):
         conn.close()
 
 
-def create_database_well_db():
+def create_database_well_db(work_plan, number_dp):
     # print(row, well_data.count_row_well)
     conn = sqlite3.connect('data_base/data_base_well/databaseWell.db')
     cursor = conn.cursor()
 
     # Создаем таблицу для хранения данных
-    number = json.dumps(well_data.well_number._value + well_data.well_area._value, ensure_ascii=False)
+    number = json.dumps(well_data.well_number._value + well_data.well_area._value + work_plan + number_dp,
+                        ensure_ascii=False)
 
     # Попытка удалить таблицу, если она существует
     cursor.execute(f'DROP TABLE IF EXISTS {number}')
@@ -458,9 +459,8 @@ def create_database_well_db():
                    f'problemWithEk_depth FLOAT,'
                    f'problemWithEk_diametr FLOAT)')
 
-
+    print(len(well_data.data_list))
     for index, data in enumerate(well_data.data_list):
-
 
         current_bottom = data[1]
         dict_perforation_json = data[2]
@@ -474,15 +474,11 @@ def create_database_well_db():
         problemWithEk_depth = data[13]
         problemWithEk_diametr = data[14]
 
-
-        number = json.dumps(well_data.well_number._value + well_data.well_area._value, ensure_ascii=False)
-
         # Подготовленные данные для вставки (пример)
         data_values = (index, current_bottom, dict_perforation_json, plast_all, plast_work,
                        dict_leakiness, column_additional, fluid_work, well_data.category_pressuar,
                        well_data.category_h2s, well_data.category_gf, template_depth, skm_interval,
                        problemWithEk_depth, problemWithEk_diametr)
-
 
         # Подготовленный запрос для вставки данных с параметрами
         query = f"INSERT INTO {number} " \
@@ -491,11 +487,8 @@ def create_database_well_db():
                 f"problemWithEk_depth, problemWithEk_diametr) " \
                 f"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 
-
         # Выполнение запроса с использованием параметров
         cursor.execute(query, data_values)
-
-
 
     # Сохранить изменения и закрыть соединение
     conn.commit()

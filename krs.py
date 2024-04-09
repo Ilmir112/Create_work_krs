@@ -174,10 +174,10 @@ class GnoWindow(QMainWindow):
     def work_krs(self, work_plan, lift_key, volume_well_jaming, fluid):
         from work_py.rationingKRS import lifting_sucker_rod, well_jamming_norm, liftingGNO
         from work_py.alone_oreration import well_jamming, konte
-        from work_py.descent_gno import gno_nkt_opening
+        from work_py.descent_gno import TabPage_Gno
 
         well_data.fluid_work, well_data.fluid_work_short = self.calc_work_fluid(fluid)
-        nkt_diam_fond = gno_nkt_opening(well_data.dict_nkt)
+        nkt_diam_fond = TabPage_Gno.gno_nkt_opening(well_data.dict_nkt)
 
         if work_plan != 'dop_plan':
 

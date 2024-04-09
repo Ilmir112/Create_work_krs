@@ -693,7 +693,7 @@ class MyWindow(QMainWindow):
                         row_lst.append("")
 
                 work_list.append(row_lst)
-            create_database_well_db()
+            create_database_well_db(self.work_plan, well_data.number_dp)
             merged_cells_dict = {}
             # print(f' индекс объ {ins_ind}')
             for row in merged_cells:
@@ -1497,11 +1497,17 @@ class MyWindow(QMainWindow):
             self.work_window = None
 
     def gno_bottom(self):
-        from work_py.descent_gno import gno_down
+        from work_py.descent_gno import GnoDescentWindow
 
-        print('Вставился ГНО')
-        gno_work_list = gno_down(self)
-        self.populate_row(self.ins_ind, gno_work_list, self.table_widget)
+        if self.work_window is None:
+            self.work_window = GnoDescentWindow(well_data.ins_ind, self.table_widget)
+            self.work_window.show()
+            self.pause_app()
+            well_data.pause = True
+            self.work_window = None
+        else:
+            self.work_window.close()  # Close window.
+            self.work_window = None
 
     def pressureTest(self):
         from work_py.opressovka import OpressovkaEK
@@ -1563,7 +1569,6 @@ class MyWindow(QMainWindow):
         for i, row_data in enumerate(work_list):
 
             row = ins_ind + i
-
             MyWindow.insert_data_in_database(self, row, row_max + i)
 
             table_widget.insertRow(row)
@@ -1593,14 +1598,9 @@ class MyWindow(QMainWindow):
 
         well_data.number_dict = []
 
-
-
-
-
     def insert_data_in_database(self, row_number, row_max):
 
         dict_perforation_json = json.dumps(well_data.dict_perforation, default=str, ensure_ascii=False, indent=4)
-
         leakage_json = json.dumps(well_data.dict_leakiness, default=str, ensure_ascii=False, indent=4)
         plast_all_json = json.dumps(well_data.plast_all)
         plast_work_json = json.dumps(well_data.plast_work)
@@ -1845,7 +1845,7 @@ class MyWindow(QMainWindow):
 
 
     def create_short_plan(self, wb2, plan_short):
-        from work_py.descent_gno import gno_nkt_opening
+        from work_py.descent_gno import TabPage_Gno
 
         ws4 = wb2.create_sheet('Sheet1')
         ws4.title = "Краткое содержание плана работ"
@@ -1904,7 +1904,7 @@ class MyWindow(QMainWindow):
             if filter_list_pressuar:
                 pressur_set.add(f'{plast[:4]} - {filter_list_pressuar}')
 
-        ws4.cell(row=6, column=1).value = f'НКТ: \n {gno_nkt_opening(well_data.dict_nkt)}'
+        ws4.cell(row=6, column=1).value = f'НКТ: \n {TabPage_Gno.gno_nkt_opening(well_data.dict_nkt)}'
         ws4.cell(row=7, column=1).value = f'Рпл: \n {" ".join(list(pressur_set))}атм'
         # ws4.cell(row=8, column=1).value = f'ЖГС = {well_data.fluid_work_short}г/см3'
         ws4.cell(row=9,
