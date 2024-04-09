@@ -736,21 +736,21 @@ class DataWindow(QMainWindow):
         if self.dict_nkt:
             for key in range(1, len(self.dict_nkt)):
                 well_data.dict_nkt[self.tabWidget.currentWidget().labels_nkt[key][0].text()] = self.if_None(
-                    self.tabWidget.currentWidget().labels_nkt[key][1].text())
+                    int(float(self.tabWidget.currentWidget().labels_nkt[key][1].text())))
         else:
             if self.tabWidget.currentWidget().labels_nkt[1][1].text():
                 well_data.dict_nkt[self.tabWidget.currentWidget().labels_nkt[1][0].text()] = self.if_None(
-                    self.tabWidget.currentWidget().labels_nkt[1][1].text())
+                    int(float(self.tabWidget.currentWidget().labels_nkt[1][1].text())))
         if self.dict_nkt_po:
             for key in range(1, len(self.dict_nkt_po)):
                 dict_nkt_correct = self.tabWidget.currentWidget().labels_nkt_po[key][1].text()
 
                 well_data.dict_nkt_po[self.tabWidget.currentWidget().labels_nkt_po[key][0].text()] = self.if_None(
-                    dict_nkt_correct)
+                    int(float(dict_nkt_correct)))
         else:
             if self.tabWidget.currentWidget().labels_nkt_po[1][1].text():
                 well_data.dict_nkt[self.tabWidget.currentWidget().labels_nkt_po[1][0].text()] = self.if_None(
-                    self.tabWidget.currentWidget().labels_nkt_po[1][1].text())
+                    int(float( self.tabWidget.currentWidget().labels_nkt_po[1][1].text())))
 
 
         if self.dict_sucker_rod.items():
@@ -936,7 +936,7 @@ class DataWindow(QMainWindow):
             well_data.depth_fond_paker2_do["posle"] = self.if_None(depth_fond_paker2_posle)
             well_data.static_level = ProtectedIsDigit(self.if_None(static_level))
             well_data.dinamic_level = ProtectedIsDigit(self.if_None(dinamic_level))
-            # print(f' после ок {well_data.dict_pump, well_data.paker_do, well_data.depth_fond_paker_do, well_data.dict_pump_h}')
+
 
             well_data.column_direction_diametr = ProtectedIsDigit(self.if_None(column_direction_diametr))
             well_data.column_direction_wall_thickness = ProtectedIsDigit(self.if_None(column_direction_wall_thickness))

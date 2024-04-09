@@ -1,0 +1,41 @@
+name: Build PyQt5 Application
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install -- upgrade pip
+        pip install -r requirements.txt
+        # Дополнительные команды по установке зависимостей
+
+    - name: Build Application
+      run: |
+        python build_script.py  # Здесь должен быть ваш скрипт для компиляции приложения
+        # Другие команды для сборки приложения
+
+    - name: Run Tests
+      run: |
+        python test_script.py  # Здесь должен быть ваш скрипт для тестирования приложения
+        # Другие команды для тестирования
+
+    - name: Deploy Application
+      run: |
+        python deploy_script.py  # Здесь должен быть ваш скрипт для развертывания приложения
+        # Другие команды для развертывания

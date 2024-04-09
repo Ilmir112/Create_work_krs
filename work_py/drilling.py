@@ -405,7 +405,7 @@ class Drill_window(QMainWindow):
                                   None, None, None, None, None, None, None,
                                   'Мастер КРС, УСРСиСТ', None])
 
-            for row in self.drilling_sbt(self, drill_tuple, drill_type_combo, drillingBit_diam):
+            for row in self.drilling_sbt(drill_tuple, drill_type_combo, drillingBit_diam, downhole_motor):
                 drilling_list.append(row)
 
         return drilling_list

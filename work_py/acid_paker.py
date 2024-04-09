@@ -186,7 +186,6 @@ class TabPage_SO_acid(QWidget):
         self.paker2Label = QLabel("глубина верхнего пакера", self)
         self.paker2_depth = QLineEdit(self)
         self.paker2_depth.setText(f"{int(well_data.perforation_sole - 20)}")
-        # self.paker2_depth.textChanged.connect(self.update_paker_edit)
 
         self.diametr_paker_labelType = QLabel("Диаметр пакера", self)
         self.diametr_paker_edit = QLineEdit(self)
@@ -207,6 +206,8 @@ class TabPage_SO_acid(QWidget):
         self.skv_true_label_type = QLabel("необходимость кислотной ванны", self)
         self.svk_true_combo = QComboBox(self)
         self.svk_true_combo.addItems(['Нужно СКВ', 'без СКВ'])
+
+
         self.svk_true_combo.setCurrentIndex(1)
         self.skv_acid_label_type = QLabel("Вид кислоты для СКВ", self)
         self.skv_acid_edit = QComboBox(self)
@@ -228,6 +229,8 @@ class TabPage_SO_acid(QWidget):
         self.QplastEdit.setCurrentIndex(1)
         self.QplastEdit.setProperty('value', 'НЕТ')
 
+
+
         self.acid_label_type = QLabel("Вид кислотной обработки", self)
         self.acid_edit = QComboBox(self)
         self.acid_edit.addItems(['HCl', 'HF', 'ВТ', 'Нефтекислотка', 'Противогипсовая обработка'])
@@ -235,6 +238,7 @@ class TabPage_SO_acid(QWidget):
 
         self.acid_volume_label = QLabel("Объем кислотной обработки", self)
         self.acid_volume_edit = QLineEdit(self)
+
         self.acid_volume_edit.setText("10")
         self.acid_volume_edit.setClearButtonEnabled(True)
 
@@ -260,6 +264,13 @@ class TabPage_SO_acid(QWidget):
         self.swab_volumeLabel = QLabel("объем освоения", self)
         self.swab_volumeEdit = QLineEdit(self)
         self.swab_volumeEdit.setText('20')
+
+        self.iron_label_type = QLabel("необходимость стабилизатора железа", self)
+        self.iron_true_combo = QComboBox(self)
+        self.iron_true_combo.addItems(['Нет', 'Да'])
+        self.iron_volume_label = QLabel("Объем стабилизатора", self)
+        self.iron_volume_edit = QLineEdit(self)
+
 
         self.pressure_edit = QLineEdit(self)
         self.pressure_edit.setClearButtonEnabled(True)
@@ -293,6 +304,10 @@ class TabPage_SO_acid(QWidget):
         self.grid.addWidget(self.skv_volume_edit, 5, 2)
         self.grid.addWidget(self.skv_proc_label, 4, 3)
         self.grid.addWidget(self.skv_proc_edit, 5, 3)
+        self.grid.addWidget(self.iron_label_type, 4, 4)
+        self.grid.addWidget(self.iron_true_combo, 5, 4)
+        self.grid.addWidget(self.iron_volume_label, 4, 5)
+        self.grid.addWidget(self.iron_volume_edit, 5, 5)
 
         self.grid.addWidget(self.acid_label_type, 6, 1)
         self.grid.addWidget(self.acid_edit, 7, 1)
@@ -328,7 +343,11 @@ class TabPage_SO_acid(QWidget):
         self.svk_true_combo.setCurrentIndex(0)
         self.svk_true_combo.setCurrentIndex(1)
         self.plast_combo.combo_box.currentTextChanged.connect(self.update_plast_edit)
+        self.iron_volume_edit.setText(f'{round(float(self.acid_volume_edit.text()), 1)}')
+        self.acid_volume_edit.textChanged.connect(self.change_volume_acid)
 
+    def change_volume_acid(self):
+        self.iron_volume_edit.setText(f'{round(float(self.acid_volume_edit.text()), 1)}')
     def update_paker_depth(self):
         from .opressovka import TabPage_SO
 
@@ -658,6 +677,9 @@ class AcidPakerWindow(QMainWindow):
         QplastEdit = str(self.tabWidget.currentWidget().QplastEdit.currentText())
         acidOilProcEdit = self.tabWidget.currentWidget().acidOilProcEdit.text()
 
+        iron_true_combo = self.tabWidget.currentWidget().iron_true_combo.currentText()
+        iron_volume_edit = self.tabWidget.currentWidget().acidOilProcEdit.text()
+
         rows = self.tableWidget.rowCount()
 
         if rows == 0:
@@ -683,10 +705,11 @@ class AcidPakerWindow(QMainWindow):
                     acidOilProc = round(float(self.tableWidget.item(row, 8).text()))
                 except:
                     acidOilProc = 0
-                print(acid_edit, acid_volume_edit, acid_proc_edit)
+
                 if row == 0:
                     work_template_list = self.paker_layout_two(swab_true_edit_type, diametr_paker, paker_khost,
-                                                               paker_depth, paker2_depth, depth_gauge_combo)
+                                                               paker_depth, paker2_depth, depth_gauge_combo,
+                                                               iron_true_combo, iron_volume_edit)
                 else:
                     work_template_list.append(
                         [None, None, f'установить пакера на глубине {paker_depth}/{paker2_depth}м', None, None,
@@ -745,25 +768,29 @@ class AcidPakerWindow(QMainWindow):
                 if row == 0 and well_data.curator != 'ОР' and rows != 1:
                     work_template_list.extend(self.acid_work(QplastEdit, plast_combo, paker_khost, acid_edit,
                                                              acid_volume_edit, acid_proc_edit, pressure_edit,
-                                                             acidOilProcEdit, paker_depth, paker2_depth)[:-1])
+                                                             acidOilProcEdit,  iron_true_combo, iron_volume_edit,
+                                                             paker_depth, paker2_depth)[:-1])
                 else:
                     work_template_list.extend(self.acid_work(QplastEdit, plast_combo, paker_khost, acid_edit,
                                                              acid_volume_edit, acid_proc_edit, pressure_edit,
-                                                             acidOilProcEdit, paker_depth, paker2_depth))
+                                                             acidOilProcEdit, iron_true_combo, iron_volume_edit,
+                                                             paker_depth, paker2_depth))
             elif "одно" in self.paker_layout_combo:
                 if row == 0 and well_data.curator != 'ОР' and rows != 1:
 
                     work_template_list.extend(self.acid_work(QplastEdit, plast_combo, paker_khost, acid_edit,
                                                              acid_volume_edit, acid_proc_edit, pressure_edit,
-                                                             acidOilProcEdit, paker_depth)[:-1])
+                                                             acidOilProcEdit,  iron_true_combo, iron_volume_edit,
+                                                             paker_depth)[:-1])
                 else:
                     work_template_list.extend(self.acid_work(QplastEdit, plast_combo, paker_khost, acid_edit,
                                                              acid_volume_edit, acid_proc_edit, pressure_edit,
-                                                             acidOilProcEdit, paker_depth))
+                                                             acidOilProcEdit,  iron_true_combo, iron_volume_edit,
+                                                             paker_depth))
             elif "воронка" in self.paker_layout_combo:
                 work_template_list.extend(self.acid_work(QplastEdit, plast_combo, paker_khost, acid_edit,
                                                          acid_volume_edit, acid_proc_edit, pressure_edit,
-                                                         acidOilProcEdit))
+                                                         acidOilProcEdit, iron_true_combo, iron_volume_edit))
 
         if swab_true_edit_type == "Нужно освоение":
             swabTypeCombo = str(self.tabWidget.currentWidget().swabTypeCombo.currentText())
@@ -802,7 +829,7 @@ class AcidPakerWindow(QMainWindow):
 
                 swab_work_list = Swab_Window.swabbing_with_2paker(self, diametr_paker, paker_depth_swab, paker_depth2_swab,
                                                                   paker_khost, plast_combo, swabTypeCombo,
-                                                                  swab_volumeEdit, depth_gauge_combo)
+                                                                  swab_volumeEdit, depth_gauge_combo, )
             elif self.paker_layout_combo == 'воронка':
                 swab_work_list = Swab_Window.swabbing_with_voronka(self, paker_depth, plast_combo, swabTypeCombo,
                                                                    swab_volumeEdit, depth_gauge_combo)
@@ -1154,7 +1181,8 @@ class AcidPakerWindow(QMainWindow):
         return skv_list
 
     def acid_work(self, QplastEdit, plast_combo, paker_khost, acid_edit,
-                  acid_volume_edit, acid_proc_edit, pressure_edit, acidOilProcEdit, paker_depth=1000,
+                  acid_volume_edit, acid_proc_edit, pressure_edit, acidOilProcEdit,
+                  iron_true_combo, iron_volume_edit, paker_depth=1000,
                   paker2_depth=1000):
         global acid_sel
         from work_py.alone_oreration import volume_vn_nkt, well_volume
@@ -1178,10 +1206,15 @@ class AcidPakerWindow(QMainWindow):
                  None, None, None, None, None, None, None,
                  'мастер КРС', 0.17 + 0.52 + 0.2 + 0.2 + 0.2])
 
+        if iron_true_combo == 'Да':
+            iron_str = f' с добавлением стабилизатор железа (Hi-Iron)  из расчета 10кг на 1тн ({iron_volume_edit}кг)'
+        else:
+            iron_str = ""
+
         if acid_edit == 'HCl':
 
             acid_sel = f'Произвести солянокислотную обработку {plast_combo} в объеме {acid_volume_edit}м3 ' \
-                       f'({acid_edit} - {acid_proc_edit} %) ' \
+                       f'({acid_edit} - {acid_proc_edit} %) {iron_str}' \
                        f' в присутствии представителя Заказчика с составлением акта, не превышая давления закачки не ' \
                        f'более Р={well_data.max_admissible_pressure._value}атм. \n' \
                        f'(для приготовления соляной кислоты в объеме {acid_volume_edit}м3 - {acid_proc_edit}% ' \
@@ -1200,8 +1233,8 @@ class AcidPakerWindow(QMainWindow):
             acid_sel_short = vt
         elif acid_edit == 'HF':
 
-            acid_sel = f'Произвести кислотную обработку пласта {plast_combo}  в объеме  {acid_volume_edit}м3  ' \
-                       f'(концентрация в смеси HF 3% / HCl 13%) силами СК Крезол ' \
+            acid_sel = f'Произвести кислотную обработку пласта {plast_combo} в объеме  {acid_volume_edit}м3 ' \
+                       f'(концентрация в смеси HF 3% / HCl 13%){iron_str} силами СК Крезол ' \
                        f'в присутствии представителя заказчика с составлением акта, не превышая давления ' \
                        f'закачки не более Р={pressure_edit}атм.'
             acid_sel_short = f'Произвести ГКО пласта {plast_combo}  в V- {acid_volume_edit}м3  ' \
@@ -1209,7 +1242,7 @@ class AcidPakerWindow(QMainWindow):
         elif acid_edit == 'Нефтекислотка':
             acid_sel = f'Произвести нефтекислотную обработку пласта {plast_combo} в V=2тн товарной нефти +' \
                        f' {acid_volume_edit}м3  (HCl - {acid_proc_edit} %) + {float(acidOilProcEdit) - 2}т товарной ' \
-                       f'нефти силами СК Крезол ' \
+                       f'нефти  {iron_str} силами СК Крезол ' \
                        f'в присутствии представителя заказчика с составлением акта, не превышая давления закачки не ' \
                        f'более Р={well_data.max_admissible_pressure._value}атм.'
             acid_sel_short = f'нефтекислотную обработку пласта {plast_combo} в V=2тн товарной нефти +' \

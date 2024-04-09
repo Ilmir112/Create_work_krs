@@ -4,6 +4,7 @@ import sqlite3
 import sys
 import win32com.client
 import openpyxl
+import re
 from openpyxl.reader.excel import load_workbook
 
 
@@ -26,7 +27,7 @@ from data_correct_position_people import CorrectSignaturesWindow
 from work_py.dop_plan_py import DopPlanWindow
 
 from work_py.drilling import Drill_window
-from find import ProtectedIsDigit
+
 from users.login_users import LoginWindow
 
 
@@ -139,7 +140,7 @@ class ExcelWorker(QThread):
 
             result = cursor.fetchone()
             if result is None:
-                mes = QMessageBox.warning(self, 'Некорректная дата перечня',
+                mes = QMessageBox.warning(None, 'Некорректная дата перечня',
                                           'Необходимо обновить перечень скважин без глушения на текущий квартал')
             # Проверка наличия записи в базе данных
             cursor.execute(f"SELECT * FROM ИГМ WHERE well_number=? AND deposit_area=?", (well_number, deposit_area))
@@ -186,6 +187,46 @@ class ExcelWorker(QThread):
         self.finished.emit()
         return check_true
 
+    def check_category(self, well_number, deposit_area, region):
+        # Подключение к базе данных SQLite
+        conn = sqlite3.connect('data_base/database_without_juming.db')
+        cursor = conn.cursor()
+        print(well_number._value, deposit_area._value, region)
+        # Подключение к базе данных SQLite)
+
+        if region == 'КГМ':
+            # Проверка наличия записи в базе данных
+            cursor.execute(f"SELECT categoty_pressure, categoty_h2s, categoty_gf, today FROM КГМ_классификатор "
+                           f"WHERE well_number = ? and deposit_area = ?", (well_number._value, deposit_area._value))
+
+        elif region == 'АГМ':
+            # Проверка наличия записи в базе данных
+            cursor.execute(f"SELECT categoty_pressure, categoty_h2s, categoty_gf, today FROM АГМ_классификатор "
+                           f"WHERE well_number = ? and deposit_area = ?", (well_number._value, deposit_area._value))
+
+        elif region == 'ИГМ':
+            print(f'ркатг')
+            # Проверка наличия записи в базе данных
+            cursor.execute(f"SELECT categoty_pressure, categoty_h2s, categoty_gf, today FROM ИГМ_классификатор "
+                           f"WHERE well_number = ? and deposit_area = ?", (well_number._value, deposit_area._value))
+
+        elif region == 'ТГМ':
+            # Проверка наличия записи в базе данных
+            cursor.execute(f"SELECT categoty_pressure, categoty_h2s, categoty_gf, today FROM ТГМ_классификатор "
+                           f"WHERE well_number = ? and deposit_area = ?", (well_number._value, deposit_area._value))
+
+        elif region == 'ЧГМ':
+            # Проверка наличия записи в базе данных
+            cursor.execute(f"SELECT categoty_pressure, categoty_h2s, categoty_gf, today FROM ЧГМ_классификатор "
+                           f"WHERE well_number = ? and deposit_area = ?", (well_number._value, deposit_area._value))
+
+        result = cursor.fetchone()
+        print(result)
+        # Закрытие соединения с базой данных
+        conn.close()
+        # # Завершение работы потока
+        # ExcelWorker.finished.emit()
+        return result
 
 class MyWindow(QMainWindow):
 
@@ -643,8 +684,11 @@ class MyWindow(QMainWindow):
                     if not item is None:
                         if 'Нормы времени' in item.text():
                             ins_ind = row
-                        row_lst.append(item.text())
-                        # print(item.text())
+                        if self.check_str_isdigit(item.text()):
+                            row_lst.append(item.text().replace(',', '.'))
+                        else:
+                            row_lst.append(item.text())
+
                     else:
                         row_lst.append("")
 
@@ -759,6 +803,7 @@ class MyWindow(QMainWindow):
 
     def close_file(self):
         from find import ProtectedIsNonNone
+        from find import ProtectedIsDigit
 
         if not self.table_widget is None:
             self.table_widget.close()
@@ -934,9 +979,6 @@ class MyWindow(QMainWindow):
         geophysical.addAction(vp_action)
         vp_action.triggered.connect(self.vp_action)
 
-        czh_action = QAction("Установка цементными желонками", self)
-        geophysical.addAction(czh_action)
-        czh_action.triggered.connect(self.czh_action)
 
         swibbing_action = QAction("Свабирование", self)
         geophysical.addAction(swibbing_action)
@@ -1945,7 +1987,7 @@ class MyWindow(QMainWindow):
     def check_true_depth_template(self, depth):
         check = True
         if well_data.column_additional:
-            print(f'глубина {well_data.template_depth_addition, depth}')
+
             if well_data.template_depth_addition < depth and depth > well_data.head_column_additional._value:
                 check = False
                 check_question = QMessageBox.question(self, 'Проверка глубины пакера',
@@ -1992,6 +2034,16 @@ class MyWindow(QMainWindow):
                                                     f'необходимо изменить глубину посадки!!!')
         return check_true
 
+    def check_str_isdigit(self, string):
+
+        # Паттерн для проверки: допустимы только цифры, точка и запятая
+        pattern = r'^[\d.,]+$'
+
+        # Проверка строки на соответствие паттерну
+        if re.match(pattern, string):
+            return True
+        else:
+            return False
 
     def check_depth_in_skm_interval(self, depth):
         check_true = False

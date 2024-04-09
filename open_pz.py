@@ -68,11 +68,7 @@ class CreatePZ(QMainWindow):
                     if 'гипс' in str(value).lower() or 'гидратн' in str(value).lower():
                         well_data.gipsInWell = True
 
-        well_data.region = region(well_data.cdng._value)
-        thread = ExcelWorker()
 
-        well_data.without_damping = thread.check_well_existence(
-            well_data.well_number._value, well_data.well_area._value, well_data.region)
 
         if well_data.emergency_well is True:
             emergency_quest = QMessageBox.question(self, 'Аварийные работы ',

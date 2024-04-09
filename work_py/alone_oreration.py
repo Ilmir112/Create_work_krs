@@ -60,9 +60,10 @@ def kot_work(self, current_bottom):
     return kot_list
 
 
-def fluid_change(self):
-    fluid_new, plast, expected_pressure = check_h2s(self)
-    well_data.fluid_work, well_data.fluid_work_short, plast, expected_pressure = need_h2s(fluid_new, plast, expected_pressure)
+def fluid_change(self, fluid_new, plast, expected_pressure):
+    fluid_new, plast, expected_pressure = check_h2s(self, fluid_new, plast, expected_pressure)
+    well_data.fluid_work, well_data.fluid_work_short, plast, expected_pressure = need_h2s(fluid_new, plast,
+                                                                                          expected_pressure)
 
     fluid_change_list = [
         [f'Cмена объема {well_data.fluid}г/см3- {round(well_volume(self, well_data.current_bottom), 1)}м3' ,
@@ -124,8 +125,13 @@ def need_h2s(fluid_new, plast, expected_pressure):
 
 
         elif ((cat_h2s_list_plan[0] in [1, 2]) or (сat_h2s_list[0] in [1, 2])) and len(well_data.plast_work) != 0:
-            expenditure_h2s_plan = max(
-                [well_data.dict_category[well_data.plast_work[0]]['по сероводороду'].poglot for plast in well_data.plast_project])
+            try:
+                expenditure_h2s_plan = max(
+                    [well_data.dict_category[well_data.plast_project[0]]['по сероводороду'].poglot
+                     for plast in well_data.plast_project])
+            except:
+                expenditure_h2s_plan = QInputDialog.getDouble(None, 'нет данных',
+                                                              'ВВедите расход поглотетеля сероводорода', 0.25, 0, 3)
 
             expenditure_h2s = max(
                 [well_data.dict_category[well_data.plast_work[0]]['по сероводороду'].poglot])

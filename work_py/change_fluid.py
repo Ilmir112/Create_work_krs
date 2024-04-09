@@ -92,7 +92,7 @@ class Change_fluid_Window(QMainWindow):
     def add_work(self):
         from main import MyWindow
         plast_new = str(self.tabWidget.currentWidget().plast_new_combo.currentText())
-        fluid_new = round(float(float(self.tabWidget.currentWidget().fluid_new_edit.text())), 2)
+        fluid_new = round(float(float(self.tabWidget.currentWidget().fluid_new_edit.text().replace(',', '.'))), 2)
         pressuar_new = float(self.tabWidget.currentWidget().pressuar_new_edit.text())
 
         work_list = self.fluid_change(plast_new, fluid_new, pressuar_new)

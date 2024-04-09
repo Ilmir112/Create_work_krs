@@ -5,10 +5,12 @@ from PyQt5.QtWidgets import QInputDialog, QMainWindow, QMessageBox
 import well_data
 from category_correct import CategoryWindow
 from data_correct import DataWindow
+from main import ExcelWorker
 from perforation_correct import PerforationCorrect
 
 from work_py.leakage_column import LeakageWindow
 from well_data import ProtectedIsDigit, ProtectedIsNonNone
+from block_name import region
 from work_py.advanted_file import definition_plast_work
 
 
@@ -1198,3 +1200,33 @@ class Well_Category(FindIndexPZ):
                                                'Введите значение серовородода в процентах', 0, 0, 100, 5)
 
             well_data.h2s_pr.append(h2s_pr)
+
+        well_data.category_pressuar = well_data.cat_P_1[0]
+        well_data.category_h2s = well_data.cat_h2s_list[0]
+        well_data.category_gf = well_data.cat_gaz_f_pr[0]
+
+        well_data.region = region(well_data.cdng._value)
+        thread = ExcelWorker()
+
+        well_data.without_damping = thread.check_well_existence(
+            well_data.well_number._value, well_data.well_area._value, well_data.region)
+
+        categoty_pressure_well, categoty_h2s_well, categoty_gf, data = thread.check_category(
+            well_data.well_number, well_data.well_area, well_data.region)
+
+
+        if categoty_pressure_well:
+            if str(categoty_pressure_well) != str(well_data.category_pressuar):
+                mes = QMessageBox.warning(None, 'Некорректная категория давления',
+                                          f'согласно классификатора от {data} категория скважина '
+                                          f'по давлению {categoty_pressure_well}')
+        if categoty_h2s_well:
+            if str(well_data.cat_h2s_list[0]) != well_data.category_h2s:
+                mes = QMessageBox.warning(None, 'Некорректная категория давления',
+                                          f'согласно классификатора от {data} категория скважина '
+                                          f'по сероводороду {categoty_h2s_well}')
+        if categoty_gf:
+            if categoty_gf != well_data.category_gf:
+                mes = QMessageBox.warning(None, 'Некорректная категория давления',
+                                          f'согласно классификатора от {data} категория скважина '
+                                          f'по газовому фактору {categoty_gf}')

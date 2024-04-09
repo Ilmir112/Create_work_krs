@@ -276,9 +276,15 @@ class PerforationWindow(QMainWindow):
        
         rows = self.tableWidget.rowCount()
         if len(well_data.cat_P_1) > 1:
+            well_data.category_pressuar = well_data.cat_P_1[1]
+            well_data.category_h2s = well_data.cat_h2s_list[1]
+            well_data.category_gf = well_data.cat_gaz_f_pr[1]
             kateg2 = [1 if str(well_data.cat_P_1[1]) == '1' or str(well_data.cat_h2s_list[1]) == '1' else 2][0]
-            if well_data.kat_pvo <  kateg2:
+
+            if well_data.kat_pvo < kateg2:
                 well_data.kat_pvo = kateg2
+
+
 
         perforation = [[None, None,
                         f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через '

@@ -26,16 +26,14 @@ class TabPage_Vp(QWidget):
         self.vp_depth_label = QLabel("Глубина установки пакера", self)
         self.vp_depth_edit = QLineEdit(self)
         self.vp_depth_edit.setValidator(self.validator)
-        self.vp_depth_edit.setText(f'{well_data.perforation_roof -20}')
+        self.vp_depth_edit.setText(f'{int(float(well_data.perforation_roof -20))}')
 
         self.cement_vp_Label = QLabel("Глубина докрепления цементом", self)
         self.cement_vp_edit = QLineEdit(self)
         self.cement_vp_edit.setValidator(self.validator)
         vp_depth = self.vp_depth_edit.text()
         if vp_depth != '':
-            self.cement_vp_edit.setText(vp_depth)
-
-
+            self.cement_vp_edit.setText(f'{int(float(vp_depth)-3)}')
 
 
         self.grid = QGridLayout(self)
@@ -60,7 +58,7 @@ class TabPage_Vp(QWidget):
     def update_vp_depth(self):
         vp_depth = self.vp_depth_edit.text()
         if vp_depth != '':
-            self.cement_vp_edit.setText(int(vp_depth) -3)
+            self.cement_vp_edit.setText(int(float(vp_depth)) -3)
 
 
 
