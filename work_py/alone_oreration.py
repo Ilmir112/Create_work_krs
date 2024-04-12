@@ -1,3 +1,5 @@
+from collections import namedtuple
+
 from PyQt5.QtWidgets import QInputDialog, QMessageBox
 
 import H2S
@@ -60,24 +62,7 @@ def kot_work(self, current_bottom):
     return kot_list
 
 
-def fluid_change(self, fluid_new, plast, expected_pressure):
-    fluid_new, plast, expected_pressure = check_h2s(self, fluid_new, plast, expected_pressure)
-    well_data.fluid_work, well_data.fluid_work_short, plast, expected_pressure = need_h2s(fluid_new, plast,
-                                                                                          expected_pressure)
 
-    fluid_change_list = [
-        [f'Cмена объема {well_data.fluid}г/см3- {round(well_volume(self, well_data.current_bottom), 1)}м3' ,
-          None,
-          f'Произвести смену объема обратной промывкой по круговой циркуляции  жидкостью  {well_data.fluid_work} '
-          f'(по расчету по вскрываемому пласта Рожид- {expected_pressure}атм) в объеме не '
-          f'менее {round(well_volume(self, well_data.current_bottom), 1)}м3  в присутствии '
-          f'представителя заказчика, Составить акт. '
-          f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за '
-          f'2 часа до начала работ)',
-          None, None, None, None, None, None, None,
-          'мастер КРС', well_volume_norm(well_volume(self, well_data.current_bottom))]]
-
-    return fluid_change_list
 
 def check_h2s(self, plast= 0, fluid_new = 0, expected_pressure = 0):
 
@@ -144,6 +129,21 @@ def need_h2s(fluid_new, plast, expected_pressure):
             well_data.fluid_work = f'{fluid_new}г/см3 '
             well_data.fluid_work_short = f'{fluid_new}г/см3 '
     else:
+        cat_list = ['1', '2', '3']
+        cat_H2S, ok = QInputDialog.getItem(None, 'Категория скважины', 'Выберете категорию скважины',
+                                           cat_list, 0, False)
+        cat_h2s_list_plan.append(cat_H2S)
+        h2s_mg, _ = QInputDialog.getDouble(None, 'сероводород в мг/л',
+                                           'Введите значение серовородода в мг/л', 0, 0, 100, 5)
+        well_data.h2s_mg.append(h2s_mg)
+        h2s_pr, _ = QInputDialog.getDouble(None, 'сероводород в процентах',
+                                           'Введите значение серовородода в процентах', 0, 0, 100, 1)
+        poglot = H2S.calv_h2s(None, cat_H2S, h2s_mg, h2s_pr)
+        Data_h2s = namedtuple("Data_h2s", "category data_procent data_mg_l poglot")
+        well_data.dict_category.setdefault(plast, {}).setdefault(
+            'по сероводороду', Data_h2s(int(cat_H2S), h2s_pr, h2s_mg, poglot))
+        well_data.dict_category.setdefault(plast, {}).setdefault(
+            'отключение', 'планируемый')
 
         if cat_h2s_list_plan[0] in [1, 2]:
 
@@ -152,7 +152,6 @@ def need_h2s(fluid_new, plast, expected_pressure):
             well_data.fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
                     f'расчета {expenditure_h2s}кг/м3 '
             well_data.fluid_work_short = f'{fluid_new}г/см3 ХИМТЕХНО 101 {expenditure_h2s}кг/м3 '
-
         else:
             well_data.fluid_work = f'{fluid_new}г/см3 '
 
@@ -328,31 +327,31 @@ def lifting_unit(self):
     return upa_60 if well_data.bottomhole_artificial._value >= 2300 else aprs_40
 
 
-def volume_vn_ek(self, current):
+def volume_vn_ek(current):
     if well_data.column_additional is False or well_data.column_additional is True and current < well_data.head_column_additional._value:
         volume = round(
             (well_data.column_diametr._value - 2 * well_data.column_wall_thickness._value) ** 2 * 3.14 / 4 / 1000, 2)
     else:
-        volume = round((
-                               well_data.column_additional_diametr._value - 2 * well_data.column_additional_wall_thickness._value) ** 2 * 3.14 / 4 / 1000,
-                       2)
-    print(f'внутренний объем ЭК {volume}')
-    return volume
+        volume = round((well_data.column_additional_diametr._value - 2 * well_data.column_additional_wall_thickness._value
+                        ) ** 2 * 3.14 / 4 / 1000, 2)
+
+    return round(volume, 1)
 
 
 def volume_vn_nkt(dict_nkt):  # Внутренний объем одного погонного местра НКТ
     # print(dict_nkt)
     for nkt, lenght_nkt in dict_nkt.items():
         volume_vn_nkt = 0
-        if ''.join(filter(str.isdecimal, str(nkt))) == '73':
+        if ''.join(filter(str.isdecimal, str(nkt))) == '60':
+            t_nkt = 5
+            volume_vn_nkt += round(3.14 * (int(nkt) - 2 * t_nkt) ** 2 / 4000000 * lenght_nkt, 5)
+        elif ''.join(filter(str.isdecimal, str(nkt))) == '73':
             t_nkt = 5.5
             volume_vn_nkt += round(3.14 * (int(nkt) - 2 * t_nkt) ** 2 / 4000000 * lenght_nkt, 5)
         elif ''.join(filter(str.isdecimal, str(nkt))) == '89':
             t_nkt = 6
             volume_vn_nkt += round(3.14 * (int(nkt) - 2 * t_nkt) ** 2 / 4000000 * lenght_nkt, 5)
-        elif ''.join(filter(str.isdecimal, str(nkt))) == '60':
-            t_nkt = 5
-            volume_vn_nkt += round(3.14 * (int(nkt) - 2 * t_nkt) ** 2 / 4000000 * lenght_nkt, 5)
+
         elif ''.join(filter(str.isdecimal, str(nkt))) == '48':
             t_nkt = 4.5
             volume_vn_nkt += round(3.14 * (int(nkt) - 2 * t_nkt) ** 2 / 4000000 * lenght_nkt * 1.1, 5)

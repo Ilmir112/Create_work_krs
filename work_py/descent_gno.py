@@ -142,6 +142,8 @@ class GnoDescentWindow(QMainWindow):
         sucker_edit = self.tabWidget.currentWidget().sucker_edit.text()
         if well_data.region == 'КГМ':
             need_juming_after_sko_combo = self.tabWidget.currentWidget().need_juming_after_sko_combo.currentText()
+        else:
+            need_juming_after_sko_combo = 'Нет'
         if lift_key == 'пакер':
             if well_data.depth_fond_paker_do["posle"] > well_data.template_depth and \
                     (well_data.column_additional is False or \
@@ -294,7 +296,7 @@ class GnoDescentWindow(QMainWindow):
         ]
         return descent_voronka
 
-    def gno_down(self, lift_key, nkt_edit, sucker_edit, need_juming_after_sko_combo):
+    def gno_down(self, lift_key, nkt_edit, sucker_edit, need_juming_after_sko_combo = 'Нет'):
 
         from .opressovka import OpressovkaEK
 

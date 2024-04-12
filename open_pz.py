@@ -30,9 +30,7 @@ class CreatePZ(QMainWindow):
         from find import WellNkt, Well_perforation, WellCondition, WellHistory_data, Well_data, Well_Category, \
             WellFond_data, WellSucker_rod, Well_expected_pick_up
 
-        if work_plan == 'dop_plan':
-            well_data.number_dp, ok = QInputDialog.getText(self, 'Номер дополнительного плана работ',
-                                                           'Введите номер дополнительного плана работ')
+
 
         well_data.work_plan = work_plan
 
@@ -41,15 +39,30 @@ class CreatePZ(QMainWindow):
         # Запуск основного класса и всех дочерних классов в одной строке
         well_pz = FindIndexPZ(ws)
         # well_pz.read_pz(ws)
+
         WellNkt.read_well(self, ws, well_data.pipes_ind._value, well_data.condition_of_wells._value)
-        WellSucker_rod.read_well(self,ws, well_data.sucker_rod_ind._value, well_data.pipes_ind._value)
-        WellFond_data.read_well(self,ws, well_data.data_fond_min._value, well_data.condition_of_wells._value)
-        WellHistory_data.read_well(self,ws, well_data.data_pvr_max._value, well_data.data_fond_min._value)
-        WellCondition.read_well(self,ws, well_data.condition_of_wells._value, well_data.data_well_max._value)
-        Well_expected_pick_up.read_well(self,ws, well_data.data_x_min._value, well_data.data_x_max._value)
-        Well_data.read_well(self,ws, well_data.cat_well_max._value, well_data.data_pvr_min._value)
-        Well_perforation.read_well(self,ws, well_data.data_pvr_min._value, well_data.data_pvr_max._value + 1)
-        Well_Category.read_well(self,ws, well_data.cat_well_min._value, well_data.data_well_min._value)
+        WellSucker_rod.read_well(self, ws, well_data.sucker_rod_ind._value, well_data.pipes_ind._value)
+        WellFond_data.read_well(self, ws, well_data.data_fond_min._value, well_data.condition_of_wells._value)
+        WellHistory_data.read_well(self, ws, well_data.data_pvr_max._value, well_data.data_fond_min._value)
+        WellCondition.read_well(self, ws, well_data.condition_of_wells._value, well_data.data_well_max._value)
+        Well_expected_pick_up.read_well(self, ws, well_data.data_x_min._value, well_data.data_x_max._value)
+        Well_data.read_well(self, ws, well_data.cat_well_max._value, well_data.data_pvr_min._value)
+
+        well_data.region = region(well_data.cdng._value)
+        if well_data.work_plan == 'dop_plan':
+            well_data.number_dp, ok = QInputDialog.getText(self, 'Номер дополнительного плана работ',
+                                                           'Введите номер дополнительного плана работ')
+            DopPlanWindow.extraction_data(self)
+        print(f'ПВР после вставки {well_data.dict_perforation}')
+        # if well_data.work_plan != 'dop_plan' and well_data.data_in_base is False:
+        Well_perforation.read_well(self, ws, well_data.data_pvr_min._value, well_data.data_pvr_max._value + 1)
+        Well_Category.read_well(self, ws, well_data.cat_well_min._value, well_data.data_well_min._value)
+
+
+
+
+
+
 
 
 

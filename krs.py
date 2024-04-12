@@ -117,6 +117,7 @@ class TabPageGno(QWidget):
             fluid_p = 1.02
         else:
             fluid_p = 1.01
+
         for plast in well_data.plast_work:
             if float(list(well_data.dict_perforation[plast]['рабочая жидкость'])[0]) > fluid_p:
                 fluid_p = list(well_data.dict_perforation[plast]['рабочая жидкость'])[0]

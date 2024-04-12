@@ -1,13 +1,17 @@
-from PyQt5.QtWidgets import QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QTabWidget, QMainWindow, QPushButton
+from PyQt5.QtGui import QIntValidator, QDoubleValidator
+from PyQt5.QtWidgets import QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QTabWidget, QMainWindow, QPushButton, \
+    QMessageBox
 
 import well_data
-from work_py.alone_oreration import check_h2s, need_h2s
+from work_py.alone_oreration import  need_h2s
 from .rationingKRS import well_volume_norm
 
 
 class TabPage_SO_swab(QWidget):
     def __init__(self, parent=None):
         super().__init__()
+        self.validator_int = QIntValidator(0, 600)
+        self.validator_float = QDoubleValidator(0.87, 1.65, 2)
 
         self.need_change_zgs_label = QLabel('Необходимо ли менять ЖГС', self)
         self.need_change_zgs_combo = QComboBox(self)
@@ -19,11 +23,13 @@ class TabPage_SO_swab(QWidget):
 
         self.fluid_new_label = QLabel('удельный вес ЖГС', self)
         self.fluid_new_edit = QLineEdit(self)
+        self.fluid_new_edit.setValidator(self.validator_float)
 
         self.pressuar_new_label = QLabel('Ожидаемое давление', self)
         self.pressuar_new_edit = QLineEdit(self)
+        self.pressuar_new_edit.setValidator(self.validator_int)
 
-
+        self.need_change_zgs_combo.currentTextChanged.connect(self.update_change_fluid)
 
         self.grid = QGridLayout(self)
 
@@ -38,9 +44,24 @@ class TabPage_SO_swab(QWidget):
 
         self.grid.addWidget(self.pressuar_new_label, 9, 5)
         self.grid.addWidget(self.pressuar_new_edit, 10, 5)
-
-    def update_need_fluid(self, index):
+    def update_change_fluid(self, index):
         if index == 'Да':
+            if len(well_data.plast_project) != 0:
+                plast = well_data.plast_project[0]
+                try:
+                    fluid_new = list(well_data.dict_perforation_project[plast]['рабочая жидкость'])[0]
+                    self.fluid_new_edit.setText(fluid_new)
+                except:
+                    pass
+
+
+            cat_h2s_list_plan = list(map(int, [well_data.dict_category[plast]['по сероводороду'].category for plast in
+                                               well_data.plast_project if well_data.dict_category.get(plast) and
+                                               well_data.dict_category[plast]['отключение'] == 'планируемый']))
+
+            if len(cat_h2s_list_plan) != 0:
+                self.pressuar_new_edit.setText(f'{well_data.dict_category[plast]["по давлению"].data_pressuar}')
+
             self.grid.addWidget(self.plast_new_label, 9, 3)
             self.grid.addWidget(self.plast_new_combo, 10, 3)
 
@@ -49,12 +70,6 @@ class TabPage_SO_swab(QWidget):
 
             self.grid.addWidget(self.pressuar_new_label, 9, 5)
             self.grid.addWidget(self.pressuar_new_edit, 10, 5)
-            fluid_new, plast, expected_pressure = check_h2s(self)
-
-
-            self.plast_new_combo.setCurrentIndex(well_data.plast_project.index(plast))
-            self.fluid_new_edit.setText(str(fluid_new))
-            self.pressuar_new_edit.setText(str(expected_pressure))
         else:
             self.plast_new_label.setParent(None)
             self.plast_new_combo.setParent(None)
@@ -62,8 +77,6 @@ class TabPage_SO_swab(QWidget):
             self.fluid_new_edit.setParent(None)
             self.pressuar_new_label.setParent(None)
             self.pressuar_new_edit.setParent(None)
-
-
 
 
 class TabWidget(QTabWidget):
@@ -91,11 +104,20 @@ class Change_fluid_Window(QMainWindow):
 
     def add_work(self):
         from main import MyWindow
-        plast_new = str(self.tabWidget.currentWidget().plast_new_combo.currentText())
-        fluid_new = round(float(float(self.tabWidget.currentWidget().fluid_new_edit.text().replace(',', '.'))), 2)
-        pressuar_new = float(self.tabWidget.currentWidget().pressuar_new_edit.text())
+        plast_new_combo = str(self.tabWidget.currentWidget().plast_new_combo.currentText())
+        fluid_new_edit = round(float(float(self.tabWidget.currentWidget().fluid_new_edit.text().replace(',', '.'))), 2)
+        pressuar_new_edit = float(self.tabWidget.currentWidget().pressuar_new_edit.text())
 
-        work_list = self.fluid_change(plast_new, fluid_new, pressuar_new)
+        if (plast_new_combo == '' or fluid_new_edit == '' or pressuar_new_edit == ''):
+            mes = QMessageBox.critical(self, 'Ошибка', 'Введены не все параметры')
+            return
+        if 0.87 <= fluid_new_edit < 1.65 is False:
+            mes = QMessageBox.critical(self, 'Ошибка', 'Жидкость не может быть данным удельным весом')
+            return
+        if pressuar_new_edit < 10 is False:
+            mes = QMessageBox.critical(self, 'Ошибка', 'Ожидаемое давление слишком низкое')
+            return
+        work_list = self.fluid_change(plast_new_combo, fluid_new_edit, pressuar_new_edit)
         MyWindow.populate_row(self, self.ins_ind, work_list, self.table_widget)
         well_data.pause = False
         self.close()

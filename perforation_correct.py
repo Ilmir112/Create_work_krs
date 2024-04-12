@@ -114,6 +114,7 @@ class TabPage_SO(QWidget):
         return 0 if self.dict_perforation[plast]['отключение'] else 1
 
     def check_template_status(self, plast):
+        print(self.dict_perforation[plast].keys())
         return 0 if self.dict_perforation[plast]['Прошаблонировано'] else 1
 
     def check_raiding_status(self, plast):
@@ -179,21 +180,23 @@ class PerforationCorrect(QMainWindow):
                     plast_raid.append(False)
 
                 index += 1
+            if well_data.data_in_base is False:
+                print(well_data.data_in_base)
 
-            if all([oktl is True for oktl in plast_oktl]):
-                well_data.dict_perforation_short[plast]['отключение'] = True
-                well_data.dict_perforation[plast]["отключение"] = True
-            else:
-                well_data.dict_perforation_short[plast]['отключение'] = False
-                well_data.dict_perforation[plast]['отключение'] = False
-            if all([oktl is True for oktl in plast_templ]):
-                well_data.dict_perforation[plast]['Прошаблонировано'] = True
-            else:
-                well_data.dict_perforation[plast]['Прошаблонировано'] = False
-            if  all([oktl is True for oktl in plast_raid]):
-                well_data.dict_perforation[plast]['отрайбировано'] = True
-            else:
-                well_data.dict_perforation[plast]['отрайбировано'] = False
+                if all([oktl is True for oktl in plast_oktl]):
+                    well_data.dict_perforation_short[plast]['отключение'] = True
+                    well_data.dict_perforation[plast]["отключение"] = True
+                else:
+                    well_data.dict_perforation_short[plast]['отключение'] = False
+                    well_data.dict_perforation[plast]['отключение'] = False
+                if all([oktl is True for oktl in plast_templ]):
+                    well_data.dict_perforation[plast]['Прошаблонировано'] = True
+                else:
+                    well_data.dict_perforation[plast]['Прошаблонировано'] = False
+                if  all([oktl is True for oktl in plast_raid]):
+                    well_data.dict_perforation[plast]['отрайбировано'] = True
+                else:
+                    well_data.dict_perforation[plast]['отрайбировано'] = False
 
 
         # self.labels_plast[index] = (plast_edit, roof_edit, sole_edit, plast_status_ComboBox,

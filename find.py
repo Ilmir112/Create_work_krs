@@ -168,8 +168,9 @@ class FindIndexPZ(QMainWindow):
         #       well_data.pipes_ind._value, well_data.sucker_rod_ind._value
 # )
     def check_str_None(self, string):
+        from main import MyWindow
 
-        if isinstance(string, int) is True or isinstance(string, float) is True:
+        if MyWindow.check_str_isdigit(self, str(string)) is True:
             if str(round(float(str(string).replace(',', '.')), 1))[-1] == "0":
                 return int(float(string))
             else:
@@ -420,6 +421,8 @@ class WellFond_data(FindIndexPZ):
                         except:
                             if well_data.paker_do["posle"] != 0:
                                 well_data.depth_fond_paker_do["posle"] = row[col_plan].value
+
+
 
 
 class WellHistory_data(FindIndexPZ):
@@ -908,181 +911,183 @@ class Well_perforation(FindIndexPZ):
     def read_well(self, ws, begin_index, cancel_index):
         from work_py.alone_oreration import is_number, calculationFluidWork
         from main import MyWindow
-
+        print(f'перфорация доп {well_data.dict_perforation}')
         well_data.old_version = True
         col_old_open_index = 0
         bokov_stvol = False
         osnov_stvol = False
-        for row in ws.iter_rows(min_row=begin_index + 1, max_row=cancel_index + 2, values_only=True):
-            # print(row)
-            for col_index, column in enumerate(row):
-                if 'оризонт'.lower() in str(column).lower() or 'пласт/'.lower() in str(column).lower():
-                    col_plast_index = col_index - 1
-                    # print(f'пласт {col_plast_index}')
-                if 'по вертикали'.lower() in str(column).lower():
-                    col_vert_index = col_index - 1
-                    # print(f'вер {col_index}')
-                if 'кровля'.lower() in str(column).lower():
-                    col_roof_index = col_index - 1
-                    # print(f'кров {col_index}')
-                if 'подошва'.lower() in str(column).lower():
-                    # print(f'подо {col_index}')
-                    col_sole_index = col_index - 1
-                if 'вскрытия'.lower() in str(column).lower():
-                    # print(f'вскр {col_index}')
-                    col_open_index = col_index - 1
-                if 'отключ'.lower() in str(column).lower():
-                    # print(f'октл {col_index}')
-                    col_close_index = col_index - 1
-                if 'удлине'.lower() in str(column).lower():
-                    # print(f'удл {col_index}')
-                    col_udlin_index = col_index - 1
-                if 'Рпл'.lower() in str(column).lower():
-                    # print(f'Рпл {col_index}')
-                    col_pressuar_index = col_index - 1
-                if 'замера' in str(column).lower():
-                    # print(f'заме {col_index}')
-                    col_date_pressuar_index = col_index - 1
-                if 'вскрыт'.lower() in str(column).lower() and 'откл'.lower() in str(column).lower():
-                    well_data.old_version = True
-                    col_old_open_index = col_index - 1
-                if "сновной" in str(column).lower():
-                    osnov_stvol = True
-                if "боков" in str(column).lower():
-                    bokov_stvol = True
 
-        if osnov_stvol is True and bokov_stvol is True:
-            mes = QMessageBox.warning(self, 'ОШИБКА', 'Ошибка в определении рабочий интервалов перфорации')
-            begin_index = QInputDialog.getInt(self, 'Индекс начала', 'ВВедите индекс начала рабочих интервалов ПВР',
-                                              0, 0, 300)[0] - 3
+        if len(well_data.dict_perforation) == 0:
+            for row in ws.iter_rows(min_row=begin_index + 1, max_row=cancel_index + 2, values_only=True):
+                # print(row)
+                for col_index, column in enumerate(row):
+                    if 'оризонт'.lower() in str(column).lower() or 'пласт/'.lower() in str(column).lower():
+                        col_plast_index = col_index - 1
+                        # print(f'пласт {col_plast_index}')
+                    if 'по вертикали'.lower() in str(column).lower():
+                        col_vert_index = col_index - 1
+                        # print(f'вер {col_index}')
+                    if 'кровля'.lower() in str(column).lower():
+                        col_roof_index = col_index - 1
+                        # print(f'кров {col_index}')
+                    if 'подошва'.lower() in str(column).lower():
+                        # print(f'подо {col_index}')
+                        col_sole_index = col_index - 1
+                    if 'вскрытия'.lower() in str(column).lower():
+                        # print(f'вскр {col_index}')
+                        col_open_index = col_index - 1
+                    if 'отключ'.lower() in str(column).lower():
+                        # print(f'октл {col_index}')
+                        col_close_index = col_index - 1
+                    if 'удлине'.lower() in str(column).lower():
+                        # print(f'удл {col_index}')
+                        col_udlin_index = col_index - 1
+                    if 'Рпл'.lower() in str(column).lower():
+                        # print(f'Рпл {col_index}')
+                        col_pressuar_index = col_index - 1
+                    if 'замера' in str(column).lower():
+                        # print(f'заме {col_index}')
+                        col_date_pressuar_index = col_index - 1
+                    if 'вскрыт'.lower() in str(column).lower() and 'откл'.lower() in str(column).lower():
+                        well_data.old_version = True
+                        col_old_open_index = col_index - 1
+                    if "сновной" in str(column).lower():
+                        osnov_stvol = True
+                    if "боков" in str(column).lower():
+                        bokov_stvol = True
 
-            cancel_index = QInputDialog.getInt(self, 'Индекс начала',
-                                               'ВВедите индекс окончания рабочих интервалов ПВР', 0, 0, 300)[0] - 2
+            if osnov_stvol is True and bokov_stvol is True:
+                mes = QMessageBox.warning(self, 'ОШИБКА', 'Ошибка в определении рабочий интервалов перфорации')
+                begin_index = QInputDialog.getInt(self, 'Индекс начала', 'ВВедите индекс начала рабочих интервалов ПВР',
+                                                  0, 0, 300)[0] - 3
 
-        perforations_intervals = []
-        for row_index, row in enumerate(
-                ws.iter_rows(min_row=begin_index + 3, max_row=cancel_index + 2)):
-            lst = []
+                cancel_index = QInputDialog.getInt(self, 'Индекс начала',
+                                                   'ВВедите индекс окончания рабочих интервалов ПВР', 0, 0, 300)[0] - 2
 
-            if str(row[col_roof_index + 1].value).replace('.', '').replace(',', '').isdigit():
-                if row[1].value != None:
-                    plast = row[1].value
-                    lst.append(plast)
-                else:
-                    lst.append(plast)
+            perforations_intervals = []
+            for row_index, row in enumerate(
+                    ws.iter_rows(min_row=begin_index + 3, max_row=cancel_index + 2)):
+                lst = []
 
-                for col in row[2:13]:
-                    lst.append(col.value)
-
-            if all([str(i).strip() == 'None' or i is None for i in lst]) is False:
-                perforations_intervals.append(lst)
-
-        for ind, row in enumerate(perforations_intervals):
-            plast = row[col_plast_index]
-            # print(f'пласт {plast}')
-            if plast is None:
-                plast = perforations_intervals[ind - 1][col_plast_index]
-            # print(f'пластs {plast}')
-
-            if any(['проект' in str((i)).lower() or 'не пер' in str((i)).lower() for i in row]) is False and all(
-                    [str(i).strip() is None for i in row]) is False and is_number(row[col_roof_index]) is True \
-                    and is_number(row[col_sole_index]) is True:
-                # print(f'5 {row}')
-
-                if is_number(str(row[col_vert_index]).replace(',', '.')) is True:
-                    well_data.dict_perforation.setdefault(plast,
-                                                          {}).setdefault('вертикаль',
-                                                                         []).append(float(
-                        str(row[col_vert_index]).replace(',', '.')))
-                if any(['фильтр' in str(i).lower() for i in row]):
-                    well_data.dict_perforation.setdefault(plast, {}).setdefault('отрайбировано', True)
-                else:
-                    well_data.dict_perforation.setdefault(plast, {}).setdefault('отрайбировано', False)
-                well_data.dict_perforation.setdefault(plast, {}).setdefault('Прошаблонировано', False)
-                roof_int = round(float(str(row[col_roof_index]).replace(',', '.')), 1)
-                sole_int = round(float(str(row[col_sole_index]).replace(',', '.')), 1)
-                well_data.dict_perforation.setdefault(plast, {}).setdefault('интервал', []).append((roof_int, sole_int))
-                well_data.dict_perforation_short.setdefault(plast, {}).setdefault('интервал', []).append(
-                    (roof_int, sole_int))
-                # for interval in list(well_data.dict_perforation[plast]["интервал"]):
-                # print(interval)
-
-                well_data.dict_perforation.setdefault(plast, {}).setdefault('вскрытие', []).append(row[col_open_index])
-
-                if col_old_open_index != col_open_index:
-                    if row[col_close_index] is None or row[col_close_index] == '-':
-                        well_data.dict_perforation.setdefault(plast, {}).setdefault('отключение', False)
-                        well_data.dict_perforation_short.setdefault(plast, {}).setdefault('отключение', False)
+                if str(row[col_roof_index + 1].value).replace('.', '').replace(',', '').isdigit():
+                    if row[1].value != None:
+                        plast = row[1].value
+                        lst.append(plast)
                     else:
-                        well_data.dict_perforation.setdefault(plast, {}).setdefault('отключение', True)
-                        well_data.dict_perforation_short.setdefault(plast, {}).setdefault('отключение', True)
-                else:
-                    if isinstance(row[col_old_open_index], datetime):
-                        well_data.dict_perforation.setdefault(plast, {}).setdefault('отключение', False)
-                        well_data.dict_perforation_short.setdefault(plast, {}).setdefault('отключение', False)
+                        lst.append(plast)
+
+                    for col in row[2:13]:
+                        lst.append(col.value)
+
+                if all([str(i).strip() == 'None' or i is None for i in lst]) is False:
+                    perforations_intervals.append(lst)
+
+            for ind, row in enumerate(perforations_intervals):
+                plast = row[col_plast_index]
+                # print(f'пласт {plast}')
+                if plast is None:
+                    plast = perforations_intervals[ind - 1][col_plast_index]
+                # print(f'пластs {plast}')
+
+                if any(['проект' in str((i)).lower() or 'не пер' in str((i)).lower() for i in row]) is False and all(
+                        [str(i).strip() is None for i in row]) is False and is_number(row[col_roof_index]) is True \
+                        and is_number(row[col_sole_index]) is True:
+                    # print(f'5 {row}')
+
+                    if is_number(str(row[col_vert_index]).replace(',', '.')) is True:
+                        well_data.dict_perforation.setdefault(plast,
+                                                              {}).setdefault('вертикаль',
+                                                                             []).append(float(
+                            str(row[col_vert_index]).replace(',', '.')))
+                    if any(['фильтр' in str(i).lower() for i in row]):
+                        well_data.dict_perforation.setdefault(plast, {}).setdefault('отрайбировано', True)
                     else:
-                        well_data.dict_perforation.setdefault(plast, {}).setdefault('отключение', True)
-                        well_data.dict_perforation_short.setdefault(plast, {}).setdefault('отключение', True)
+                        well_data.dict_perforation.setdefault(plast, {}).setdefault('отрайбировано', False)
+                    well_data.dict_perforation.setdefault(plast, {}).setdefault('Прошаблонировано', False)
+                    roof_int = round(float(str(row[col_roof_index]).replace(',', '.')), 1)
+                    sole_int = round(float(str(row[col_sole_index]).replace(',', '.')), 1)
+                    well_data.dict_perforation.setdefault(plast, {}).setdefault('интервал', []).append((roof_int, sole_int))
+                    well_data.dict_perforation_short.setdefault(plast, {}).setdefault('интервал', []).append(
+                        (roof_int, sole_int))
+                    # for interval in list(well_data.dict_perforation[plast]["интервал"]):
+                    # print(interval)
 
-                zhgs = 1.01
-                if str(row[col_pressuar_index]).replace(',', '').replace('.', '').isdigit() and row[col_vert_index]:
-                    data_p = float(str(row[col_pressuar_index]).replace(',', '.'))
-                    well_data.dict_perforation.setdefault(plast, {}).setdefault('давление',
-                                                                                []).append(round(data_p, 1))
-                    well_data.dict_perforation_short.setdefault(plast, {}).setdefault('давление',
-                                                                                      []).append(round(data_p, 1))
-                    zhgs = calculationFluidWork(float(str(row[col_vert_index]).replace(',','.')), float(data_p))
-                else:
-                    well_data.dict_perforation_short.setdefault(plast, {}).setdefault('давление',
-                                                                                      []).append('0')
-                if zhgs:
-                    well_data.dict_perforation.setdefault(plast, {}).setdefault('рабочая жидкость', []).append(zhgs)
-                if row[col_date_pressuar_index]:
-                    well_data.dict_perforation.setdefault(
-                        plast, {}).setdefault('замер', []).append(row[col_date_pressuar_index])
+                    well_data.dict_perforation.setdefault(plast, {}).setdefault('вскрытие', []).append(row[col_open_index])
 
-            elif any([str((i)).lower() == 'проект' for i in row]) is True and all(
-                    [str(i).strip() is None for i in row]) is False and is_number(row[col_roof_index]) is True \
-                    and is_number(
-                float(
-                    str(row[col_roof_index]).replace(',', '.'))) is True:  # Определение проектных интервалов перфорации
-                roof_int = round(float(str(row[col_roof_index]).replace(',', '.')), 1)
-                sole_int = round(float(str(row[col_sole_index]).replace(',', '.')), 1)
+                    if col_old_open_index != col_open_index:
+                        if row[col_close_index] is None or row[col_close_index] == '-':
+                            well_data.dict_perforation.setdefault(plast, {}).setdefault('отключение', False)
+                            well_data.dict_perforation_short.setdefault(plast, {}).setdefault('отключение', False)
+                        else:
+                            well_data.dict_perforation.setdefault(plast, {}).setdefault('отключение', True)
+                            well_data.dict_perforation_short.setdefault(plast, {}).setdefault('отключение', True)
+                    else:
+                        if isinstance(row[col_old_open_index], datetime):
+                            well_data.dict_perforation.setdefault(plast, {}).setdefault('отключение', False)
+                            well_data.dict_perforation_short.setdefault(plast, {}).setdefault('отключение', False)
+                        else:
+                            well_data.dict_perforation.setdefault(plast, {}).setdefault('отключение', True)
+                            well_data.dict_perforation_short.setdefault(plast, {}).setdefault('отключение', True)
 
-                if row[col_vert_index] != None:
+                    zhgs = 1.01
+                    if str(row[col_pressuar_index]).replace(',', '').replace('.', '').isdigit() and row[col_vert_index]:
+                        data_p = float(str(row[col_pressuar_index]).replace(',', '.'))
+                        well_data.dict_perforation.setdefault(plast, {}).setdefault('давление',
+                                                                                    []).append(round(data_p, 1))
+                        well_data.dict_perforation_short.setdefault(plast, {}).setdefault('давление',
+                                                                                          []).append(round(data_p, 1))
+                        zhgs = calculationFluidWork(float(str(row[col_vert_index]).replace(',','.')), float(data_p))
+                    else:
+                        well_data.dict_perforation_short.setdefault(plast, {}).setdefault('давление',
+                                                                                          []).append('0')
+                    if zhgs:
+                        well_data.dict_perforation.setdefault(plast, {}).setdefault('рабочая жидкость', []).append(zhgs)
+                    if row[col_date_pressuar_index]:
+                        well_data.dict_perforation.setdefault(
+                            plast, {}).setdefault('замер', []).append(row[col_date_pressuar_index])
+
+                elif any([str((i)).lower() == 'проект' for i in row]) is True and all(
+                        [str(i).strip() is None for i in row]) is False and is_number(row[col_roof_index]) is True \
+                        and is_number(
+                    float(
+                        str(row[col_roof_index]).replace(',', '.'))) is True:  # Определение проектных интервалов перфорации
+                    roof_int = round(float(str(row[col_roof_index]).replace(',', '.')), 1)
+                    sole_int = round(float(str(row[col_sole_index]).replace(',', '.')), 1)
+
+                    if row[col_vert_index] != None:
+                        well_data.dict_perforation_project.setdefault(
+                            plast, {}).setdefault('вертикаль', []).append(round(float(row[col_vert_index]), 1))
                     well_data.dict_perforation_project.setdefault(
-                        plast, {}).setdefault('вертикаль', []).append(round(float(row[col_vert_index]), 1))
-                well_data.dict_perforation_project.setdefault(
-                    plast, {}).setdefault('интервал', []).append((roof_int, sole_int))
+                        plast, {}).setdefault('интервал', []).append((roof_int, sole_int))
 
-                if row[col_pressuar_index] != None:
+                    if row[col_pressuar_index] != None:
 
-                    well_data.dict_perforation_project.setdefault(plast, {}).setdefault('давление', []).append(
-                        round(float(row[col_pressuar_index]), 1))
-                well_data.dict_perforation_project.setdefault(plast, {}).setdefault('рабочая жидкость', []).append(
-                    calculationFluidWork(row[col_vert_index], row[col_pressuar_index]))
+                        well_data.dict_perforation_project.setdefault(plast, {}).setdefault('давление', []).append(
+                            round(float(row[col_pressuar_index]), 1))
+                    well_data.dict_perforation_project.setdefault(plast, {}).setdefault('рабочая жидкость', []).append(
+                        calculationFluidWork(row[col_vert_index], row[col_pressuar_index]))
 
-        if len(well_data.dict_perforation_project) != 0:
-            well_data.plast_project = list(well_data.dict_perforation_project.keys())
+            if len(well_data.dict_perforation_project) != 0:
+                well_data.plast_project = list(well_data.dict_perforation_project.keys())
 
-        # объединение интервалов перфорации если они пересекаются
-        for plast, value in well_data.dict_perforation.items():
-            intervals = value['интервал']
-            merged_segments = list()
-            for roof_int, sole_int in sorted(list(intervals), key=lambda x: x[0]):
+            # объединение интервалов перфорации если они пересекаются
+            for plast, value in well_data.dict_perforation.items():
+                intervals = value['интервал']
+                merged_segments = list()
+                for roof_int, sole_int in sorted(list(intervals), key=lambda x: x[0]):
 
-                if not merged_segments or roof_int > merged_segments[-1][1]:
-                    merged_segments.append((roof_int, sole_int))
-                else:
-                    merged_segments[-1] = [merged_segments[-1][0], max(sole_int, merged_segments[-1][1])]
+                    if not merged_segments or roof_int > merged_segments[-1][1]:
+                        merged_segments.append((roof_int, sole_int))
+                    else:
+                        merged_segments[-1] = [merged_segments[-1][0], max(sole_int, merged_segments[-1][1])]
 
-            # merged_segments = set(map(tuple, merged_segments))
-            # print(merged_segments)
-            # merged_segments = set(merged_segments)
-            well_data.dict_perforation[plast]['интервал'] = merged_segments
-            if type(well_data.dict_perforation[plast]['вертикаль'][0]) in [float, int]:
-                well_data.dict_perforation[plast]['вертикаль'] = min(well_data.dict_perforation[plast]['вертикаль'])
-
+                # merged_segments = set(map(tuple, merged_segments))
+                # print(merged_segments)
+                # merged_segments = set(merged_segments)
+                well_data.dict_perforation[plast]['интервал'] = merged_segments
+                if type(well_data.dict_perforation[plast]['вертикаль'][0]) in [float, int]:
+                    well_data.dict_perforation[plast]['вертикаль'] = min(well_data.dict_perforation[plast]['вертикаль'])
+        print(well_data.dict_perforation)
 
         if self.perforation_correct_window2 is None:
             self.perforation_correct_window2 = PerforationCorrect(self)
@@ -1113,124 +1118,124 @@ class Well_Category(FindIndexPZ):
 
     def read_well(self, ws, begin_index, cancel_index):
         from main import MyWindow
+        if well_data.data_in_base is False:
+            # print(f'индекс катего {begin_index, cancel_index}')
+            for row in range(begin_index, cancel_index):
+                for col in range(1, 13):
+                    cell = ws.cell(row=row, column=col).value
+                    if cell:
+                        if 'по Pпл' in str(cell):
+                            for column in range(1, 13):
+                                col = ws.cell(row=row, column=column).value
+                                # print(col)
+                                if str(col) in ['атм'] and ws.cell(row=row, column=column - 2).value:
+                                    well_data.cat_P_1.append(ws.cell(row=row, column=column - 2).value)
+                                    # print(well_data.cat_P_P)
+                                    well_data.cat_P_P.append(ws.cell(row=row, column=column - 1).value)
 
-        # print(f'индекс катего {begin_index, cancel_index}')
-        for row in range(begin_index, cancel_index):
-            for col in range(1, 13):
-                cell = ws.cell(row=row, column=col).value
-                if cell:
-                    if 'по Pпл' in str(cell):
-                        for column in range(1, 13):
-                            col = ws.cell(row=row, column=column).value
-                            # print(col)
-                            if str(col) in ['атм'] and ws.cell(row=row, column=column - 2).value:
-                                well_data.cat_P_1.append(ws.cell(row=row, column=column - 2).value)
-                                # print(well_data.cat_P_P)
-                                well_data.cat_P_P.append(ws.cell(row=row, column=column - 1).value)
-
-                    elif 'по H2S' in str(cell) and 'по H2S' not in str(
-                            ws.cell(row=row - 1, column=2).value):
-                        for column in range(1, 13):
-                            col = ws.cell(row=row, column=column).value
-                            # print(f'ячейка {col}')
-                            if str(col) in ['%', 'мг/л', 'мг/дм3', 'мг/м3'] and \
-                                    ws.cell(row=row, column=column - 2).value:
-                                # print(f'ячейка- 3 3 {col}')
-                                well_data.cat_h2s_list.append(ws.cell(row=row, column=column - 2).value)
-
-
-                    elif 'газовому фактору' in str(cell):
-                        for column in range(1, 13):
-                            col = ws.cell(row=row, column=column).value
-                            if str(col) in ['м3/т']:
-                                well_data.cat_gaz_f_pr.append(ws.cell(row=row, column=column - 2).value)
+                        elif 'по H2S' in str(cell) and 'по H2S' not in str(
+                                ws.cell(row=row - 1, column=2).value):
+                            for column in range(1, 13):
+                                col = ws.cell(row=row, column=column).value
+                                # print(f'ячейка {col}')
+                                if str(col) in ['%', 'мг/л', 'мг/дм3', 'мг/м3'] and \
+                                        ws.cell(row=row, column=column - 2).value:
+                                    # print(f'ячейка- 3 3 {col}')
+                                    well_data.cat_h2s_list.append(ws.cell(row=row, column=column - 2).value)
 
 
-                    elif 'мг/л' in str(cell) or 'мг/дм3' in str(cell):
-                        cell2 = ws.cell(row=row, column=col - 1).value
-                        if cell2:
-                            well_data.h2s_mg.append(float(FindIndexPZ.check_str_None(self, str(cell2).replace(',', '.'))))
-                    elif 'м3/т' in str(cell):
-                        cell2 = ws.cell(row=row, column=col - 1).value
-                        if cell2:
-                            well_data.gaz_f_pr.append(round(float(FindIndexPZ.check_str_None(self, str(cell2).replace(',', '.'))), 1))
-                    elif '%' in str(cell):
-                        cell2 = ws.cell(row=row, column=col - 1).value
-                        # print(f'проц {cell2}')
-                        if type(cell2) in [float, int]:
-                            if str(round(float(str(cell2).replace(',', '.')), 3))[-1] == "0":
-                                h2s_pr = int(float(str(cell2).replace(',', '.')))
+                        elif 'газовому фактору' in str(cell):
+                            for column in range(1, 13):
+                                col = ws.cell(row=row, column=column).value
+                                if str(col) in ['м3/т']:
+                                    well_data.cat_gaz_f_pr.append(ws.cell(row=row, column=column - 2).value)
+
+
+                        elif 'мг/л' in str(cell) or 'мг/дм3' in str(cell):
+                            cell2 = ws.cell(row=row, column=col - 1).value
+                            if cell2:
+                                well_data.h2s_mg.append(float(FindIndexPZ.check_str_None(self, str(cell2).replace(',', '.'))))
+                        elif 'м3/т' in str(cell):
+                            cell2 = ws.cell(row=row, column=col - 1).value
+                            if cell2:
+                                well_data.gaz_f_pr.append(round(float(FindIndexPZ.check_str_None(self, str(cell2).replace(',', '.'))), 1))
+                        elif '%' in str(cell):
+                            cell2 = ws.cell(row=row, column=col - 1).value
+                            # print(f'проц {cell2}')
+                            if type(cell2) in [float, int]:
+                                if str(round(float(str(cell2).replace(',', '.')), 3))[-1] == "0":
+                                    h2s_pr = int(float(str(cell2).replace(',', '.')))
+                                else:
+                                    h2s_pr = round(float(str(cell2).replace(',', '.')), 4)
+                                well_data.h2s_pr.append(float(str(h2s_pr).replace(',', '.')))
                             else:
-                                h2s_pr = round(float(str(cell2).replace(',', '.')), 4)
-                            well_data.h2s_pr.append(float(str(h2s_pr).replace(',', '.')))
-                        else:
-                            h2s_pr = cell2
-                            well_data.h2s_pr.append(FindIndexPZ.check_str_None(self, str(cell2).replace(',', '.')))
+                                h2s_pr = cell2
+                                well_data.h2s_pr.append(FindIndexPZ.check_str_None(self, str(cell2).replace(',', '.')))
 
 
-                    elif str(cell) in 'мг/м3':
-                        cell2 = ws.cell(row=row, column=col - 1).value
-                        if cell2:
-                            well_data.h2s_mg_m3.append(float(str(
-                                FindIndexPZ.check_str_None(self, str(cell2).replace(',', '.')))) / 1000)
-        if len(well_data.h2s_mg) == 0 and len(well_data.h2s_mg_m3) != 0:
-            for mg in well_data.h2s_mg_m3:
-                # print(f'значени{mg}')
-                well_data.h2s_mg.append(mg)
-        if len(well_data.h2s_mg) == 0:
-            h2s_mg, _ = QInputDialog.getDouble(self, 'сероводород в процентах',
-                                               'Введите значение серовородода в мг/л', 0, 0, 100, 1)
-            well_data.h2s_mg.append(h2s_mg)
+                        elif str(cell) in 'мг/м3':
+                            cell2 = ws.cell(row=row, column=col - 1).value
+                            if cell2:
+                                well_data.h2s_mg_m3.append(float(str(
+                                    FindIndexPZ.check_str_None(self, str(cell2).replace(',', '.')))) / 1000)
+            if len(well_data.h2s_mg) == 0 and len(well_data.h2s_mg_m3) != 0:
+                for mg in well_data.h2s_mg_m3:
+                    # print(f'значени{mg}')
+                    well_data.h2s_mg.append(mg)
+            if len(well_data.h2s_mg) == 0:
+                h2s_mg, _ = QInputDialog.getDouble(self, 'сероводород в процентах',
+                                                   'Введите значение серовородода в мг/л', 0, 0, 100, 1)
+                well_data.h2s_mg.append(h2s_mg)
 
-        if self.data_window is None:
-            self.data_window = CategoryWindow(self)
-            self.data_window.setWindowTitle("Сверка данных")
-            # self.data_window.setGeometry(200, 200, 200, 200)
-            self.data_window.show()
-            MyWindow.pause_app()
-            well_data.pause = True
-        else:
-            self.data_window.close()
-            self.data_window = None
+            if self.data_window is None:
+                self.data_window = CategoryWindow(self)
+                self.data_window.setWindowTitle("Сверка данных")
+                # self.data_window.setGeometry(200, 200, 200, 200)
+                self.data_window.show()
+                MyWindow.pause_app()
+                well_data.pause = True
+            else:
+                self.data_window.close()
+                self.data_window = None
 
-        if len(well_data.h2s_pr) == 0:
-            mes = QMessageBox.warning(self, 'Ошибка', 'Программа не смогла найти данные по содержания '
-                                                      'сероводорода в процентах')
-            h2s_pr, _ = QInputDialog.getDouble(self, 'сероводород в процентах',
-                                               'Введите значение серовородода в процентах', 0, 0, 100, 5)
+            if len(well_data.h2s_pr) == 0:
+                mes = QMessageBox.warning(self, 'Ошибка', 'Программа не смогла найти данные по содержания '
+                                                          'сероводорода в процентах')
+                h2s_pr, _ = QInputDialog.getDouble(self, 'сероводород в процентах',
+                                                   'Введите значение серовородода в процентах', 0, 0, 100, 5)
 
-            well_data.h2s_pr.append(h2s_pr)
+                well_data.h2s_pr.append(h2s_pr)
 
-        well_data.category_pressuar = well_data.cat_P_1[0]
-        well_data.category_h2s = well_data.cat_h2s_list[0]
-        well_data.category_gf = well_data.cat_gaz_f_pr[0]
+            well_data.category_pressuar = well_data.cat_P_1[0]
+            well_data.category_h2s = well_data.cat_h2s_list[0]
+            well_data.category_gf = well_data.cat_gaz_f_pr[0]
 
-        well_data.region = region(well_data.cdng._value)
-        thread = ExcelWorker()
 
-        well_data.without_damping = thread.check_well_existence(
-            well_data.well_number._value, well_data.well_area._value, well_data.region)
+            thread = ExcelWorker()
 
-        try:
-            categoty_pressure_well, categoty_h2s_well, categoty_gf, data = thread.check_category(
-                well_data.well_number, well_data.well_area, well_data.region)
+            well_data.without_damping = thread.check_well_existence(
+                well_data.well_number._value, well_data.well_area._value, well_data.region)
 
-            if categoty_pressure_well:
-                if str(categoty_pressure_well) != str(well_data.category_pressuar):
-                    mes = QMessageBox.warning(None, 'Некорректная категория давления',
-                                              f'согласно классификатора от {data} категория скважина '
-                                              f'по давлению {categoty_pressure_well}')
-            if categoty_h2s_well:
-                if str(well_data.cat_h2s_list[0]) != str(well_data.category_h2s):
-                    print(str(well_data.cat_h2s_list[0]), well_data.category_h2s)
+            try:
+                categoty_pressure_well, categoty_h2s_well, categoty_gf, data = thread.check_category(
+                    well_data.well_number, well_data.well_area, well_data.region)
 
-                    mes = QMessageBox.warning(None, 'Некорректная категория давления',
-                                              f'согласно классификатора от {data} категория скважина '
-                                              f'по сероводороду {categoty_h2s_well}')
-            if categoty_gf:
-                if categoty_gf != well_data.category_gf:
-                    mes = QMessageBox.warning(None, 'Некорректная категория давления',
-                                              f'согласно классификатора от {data} категория скважина '
-                                              f'по газовому фактору {categoty_gf}')
-        except:
-            mes = QMessageBox.warning(self, 'Ошибка', 'Скважина не найдена в классификаторе')
+                if categoty_pressure_well:
+                    if str(categoty_pressure_well) != str(well_data.category_pressuar):
+                        mes = QMessageBox.warning(None, 'Некорректная категория давления',
+                                                  f'согласно классификатора от {data} категория скважина '
+                                                  f'по давлению {categoty_pressure_well}')
+                if categoty_h2s_well:
+                    if str(well_data.cat_h2s_list[0]) != str(well_data.category_h2s):
+                        print(str(well_data.cat_h2s_list[0]), well_data.category_h2s)
+
+                        mes = QMessageBox.warning(None, 'Некорректная категория давления',
+                                                  f'согласно классификатора от {data} категория скважина '
+                                                  f'по сероводороду {categoty_h2s_well}')
+                if categoty_gf:
+                    if categoty_gf != well_data.category_gf:
+                        mes = QMessageBox.warning(None, 'Некорректная категория давления',
+                                                  f'согласно классификатора от {data} категория скважина '
+                                                  f'по газовому фактору {categoty_gf}')
+            except:
+                mes = QMessageBox.warning(self, 'Ошибка', 'Скважина не найдена в классификаторе')

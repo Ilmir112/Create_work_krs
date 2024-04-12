@@ -434,8 +434,9 @@ def create_database_well_db(work_plan, number_dp):
     conn = sqlite3.connect('data_base/data_base_well/databaseWell.db')
     cursor = conn.cursor()
 
+
     # Создаем таблицу для хранения данных
-    number = json.dumps(well_data.well_number._value + well_data.well_area._value + work_plan + number_dp,
+    number = json.dumps(well_data.well_number._value + well_data.well_area._value + work_plan + str(number_dp),
                         ensure_ascii=False)
 
     # Попытка удалить таблицу, если она существует
@@ -459,7 +460,7 @@ def create_database_well_db(work_plan, number_dp):
                    f'problemWithEk_depth FLOAT,'
                    f'problemWithEk_diametr FLOAT)')
 
-    print(len(well_data.data_list))
+
     for index, data in enumerate(well_data.data_list):
 
         current_bottom = data[1]

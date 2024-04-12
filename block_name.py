@@ -206,35 +206,37 @@ def razdel_1(self, region):
         [None, f'"____"_____________________{current_datetime.year}г.', None, None, None, None, None, None,
          None, None, None,
          None]]
-    if len(well_data.plast_work) != 0:
-        cat_P_1 = well_data.dict_category[well_data.plast_work[0]]['по давлению'].category
+    if well_data.data_in_base is False:
+        if len(well_data.plast_work) != 0:
+            print(well_data.plast_work, well_data.dict_category)
+            cat_P_1 = well_data.dict_category[well_data.plast_work[0]]['по давлению'].category
 
 
-        cat_h2s_list = well_data.dict_category[well_data.plast_work[0]]['по сероводороду'].category
+            cat_h2s_list = well_data.dict_category[well_data.plast_work[0]]['по сероводороду'].category
 
-        cat_gaz = well_data.dict_category[well_data.plast_work[0]]['по газовому фактору'].category
-    try:
-        cat_P_1_plan = well_data.dict_category[well_data.plast_project[0]]['по давлению'].category
-        cat_h2s_list_plan = well_data.dict_category[well_data.plast_project[0]]['по сероводороду'].category
-        cat_gaz_plan = well_data.dict_category[well_data.plast_project[0]]['по газовому фактору'].category
-    except:
-        cat_P_1_plan = 3
-        cat_h2s_list_plan = 3
-        cat_gaz_plan = 3
+            cat_gaz = well_data.dict_category[well_data.plast_work[0]]['по газовому фактору'].category
+        try:
+            cat_P_1_plan = well_data.dict_category[well_data.plast_project[0]]['по давлению'].category
+            cat_h2s_list_plan = well_data.dict_category[well_data.plast_project[0]]['по сероводороду'].category
+            cat_gaz_plan = well_data.dict_category[well_data.plast_project[0]]['по газовому фактору'].category
+        except:
+            cat_P_1_plan = 3
+            cat_h2s_list_plan = 3
+            cat_gaz_plan = 3
 
-    if 1 in [cat_P_1, cat_P_1_plan, cat_h2s_list, cat_gaz, cat_h2s_list_plan, cat_gaz_plan] or\
-            well_data.curator == 'ВНС':
-        for row in range(len(podp_bvo)):
-            for col in range(len(podp_bvo[row])):
-                razdel_1[row + 9][col] = podp_bvo[row][col]
-    if 1 in [cat_P_1, cat_h2s_list, cat_gaz] or \
-            well_data.curator == 'ВНС':
-        well_data.kat_pvo = 1
-        well_data.bvo = True
+        if 1 in [cat_P_1, cat_P_1_plan, cat_h2s_list, cat_gaz, cat_h2s_list_plan, cat_gaz_plan] or\
+                well_data.curator == 'ВНС':
+            for row in range(len(podp_bvo)):
+                for col in range(len(podp_bvo[row])):
+                    razdel_1[row + 9][col] = podp_bvo[row][col]
+        if 1 in [cat_P_1, cat_h2s_list, cat_gaz] or \
+                well_data.curator == 'ВНС':
+            well_data.kat_pvo = 1
+            well_data.bvo = True
 
-    if well_data.grp_plan is True:
-        for row in range(len(podp_grp)):
-            for col in range(len(podp_grp[row])):
-                razdel_1[row + 12][col] = podp_grp[row][col]
+        if well_data.grp_plan is True:
+            for row in range(len(podp_grp)):
+                for col in range(len(podp_grp[row])):
+                    razdel_1[row + 12][col] = podp_grp[row][col]
 
     return razdel_1

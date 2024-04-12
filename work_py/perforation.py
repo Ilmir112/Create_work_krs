@@ -335,6 +335,7 @@ class PerforationWindow(QMainWindow):
                 (float(perf_list[2]), float(perf_list[4])))
             well_data.dict_perforation[plast]['отрайбировано'] = False
             well_data.dict_perforation[plast]['отключение'] = False
+            well_data.dict_perforation[plast]['Прошаблонировано'] = False
             well_data.dict_perforation.setdefault(plast, {}).setdefault('отключение', False)
             well_data.dict_perforation.setdefault(plast, {}).setdefault('отрайбировано', False)
             # print(f' перфорация после добавления {well_data.dict_perforation}')

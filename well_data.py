@@ -207,6 +207,7 @@ lift_key = 0
 dict_category = {}
 max_admissible_pressure = 0
 region = ''
+data_in_base = False
 dict_nkt = {}
 dict_nkt_po = {}
 

@@ -165,6 +165,10 @@ class TabPage_SO_with(QWidget):
         self.lenght_template_second_Edit.textChanged.connect(self.update_template)
 
     def definition_pssh(self):
+        print(well_data.plast_work)
+
+        print(list(well_data.dict_perforation.keys()))
+        print(well_data.dict_perforation[plast]['отрайбировано'] for plast in well_data.plast_work)
 
         if well_data.column_additional is False and well_data.open_trunk_well is False and all(
                 [well_data.dict_perforation[plast]['отрайбировано'] for plast in well_data.plast_work]) is False or \
@@ -357,6 +361,7 @@ class TabPage_SO_with(QWidget):
     def update_template_edit(self, index):
 
         nkt_diam = well_data.nkt_diam
+        print(well_data.column_additional, well_data.head_column_additional._value, well_data.current_bottom)
         if well_data.column_additional is False or (well_data.column_additional and
                                                     well_data.head_column_additional._value >= well_data.current_bottom):
             first_template, template_second = self.template_diam_ek()

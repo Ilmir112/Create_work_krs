@@ -66,7 +66,7 @@ class TabWidget(QTabWidget):
         self.addTab(TabPage_SO_grp(self), 'ГПП')
 
 class Gpp_window(QMainWindow):
-    def __init__(self, table_widget, ins_ind):
+    def __init__(self,  ins_ind, table_widget):
         super(Gpp_window, self).__init__()
 
         self.centralWidget = QWidget()
@@ -106,9 +106,10 @@ class Gpp_window(QMainWindow):
         nkt_diam = ''.join(['89' if well_data.column_diametr._value > 110 else '60'])
 
 
-        gPP_300 = MyWindow.check_depth_in_skm_interval(self, depth)
+        gPP_300 = MyWindow.check_depth_in_skm_interval(self, gpp_depth)
+        print(self.table_widget)
 
-        main.MyWindow.check_gpp_upa(self)
+        main.MyWindow.check_gpp_upa(self, self.table_widget)
 
         gpp_list = [
             ['За 48 часов оформить заявку на завоз оборудования ГРП.',

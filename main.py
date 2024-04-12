@@ -854,6 +854,7 @@ class MyWindow(QMainWindow):
             well_data.max_expected_pressure = ProtectedIsNonNone('не корректно')
             well_data.head_column_additional = ProtectedIsNonNone('не корректно')
             well_data.leakiness_Count = 0
+            well_data.data_in_base = False
             well_data.well_volume_in_PZ = []
             well_data.expected_pick_up = {}
             well_data.current_bottom = 0
@@ -1971,9 +1972,9 @@ class MyWindow(QMainWindow):
         ws4.page_setup.fitToWidth = True
         ws4.print_area = 'C2:I14'
 
-    def check_gpp_upa(self):
-        for row in range(self.table_widget.rowCount()):
-            for column in range(self.table_widget.columnCount()):
+    def check_gpp_upa(self, table_widget):
+        for row in range(table_widget.rowCount()):
+            for column in range(table_widget.columnCount()):
                 value = self.table_widget.item(row, column)
                 if value != None:
                     value = value.text()
@@ -1982,7 +1983,7 @@ class MyWindow(QMainWindow):
                                                                f'Пусковой комиссией составить акт готовности подьемного '
                                                                f'агрегата и бригады для проведения ремонта скважины.')
 
-                        self.table_widget.setItem(row, column, new_value)
+                        table_widget.setItem(row, column, new_value)
 
     def check_true_depth_template(self, depth):
         check = True
@@ -2111,8 +2112,6 @@ class MyWindow(QMainWindow):
                                     self.table_widget.setItem(row, column, new_value)
                     return True
                 else:
-
-
                     return False
 
 
