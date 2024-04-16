@@ -255,6 +255,24 @@ def pvo_cat1(self):
     well_data.kat_pvo = 1
     return pvo_list
 
+def fluid_change(self):
+    from open_pz import CreatePZ
+
+
+    CreatePZ.fluid_work, CreatePZ.fluid_work_short, plast, expected_pressure = check_h2s(self)
+
+    fluid_change_list = [[f'Cмена объема {CreatePZ.fluid}г/см3- {round(well_volume(self, CreatePZ.current_bottom), 1)}м3' ,
+                          None,
+                          f'Произвести смену объема обратной промывкой по круговой циркуляции  жидкостью  {CreatePZ.fluid_work} '
+                          f'(по расчету по вскрываемому пласта Рожид- {expected_pressure}атм) в объеме не '
+                          f'менее {round(well_volume(self, CreatePZ.current_bottom), 1)}м3  в присутствии '
+                          f'представителя заказчика, Составить акт. '
+                          f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за '
+                          f'2 часа до начала работ)',
+                          None, None, None, None, None, None, None,
+                          'мастер КРС', well_volume_norm(well_volume(self, CreatePZ.current_bottom))]]
+
+    return fluid_change_list
 
 def calculationFluidWork(vertical, pressure):
     if (isinstance(vertical, float) or isinstance(vertical, int)) and (

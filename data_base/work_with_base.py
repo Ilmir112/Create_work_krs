@@ -28,7 +28,6 @@ class Classifier_well(QMainWindow):
         if well_data.well_number:
             self.number_well = well_data.well_number._value
 
-
         self.setCentralWidget(self.table_class)
         self.model = self.table_class.model()
         if classifier_well == 'classifier_well':
@@ -76,7 +75,8 @@ class Classifier_well(QMainWindow):
         self.edit_well_area.setPlaceholderText("Ввести площадь для фильтрации")
         self.edit_well_area.textChanged.connect(self.filter_class_area)
         layout.addWidget(self.edit_well_area)
-        region =f'{region}_классификатор'
+        region = f'{region}_классификатор'
+        print(region)
         data = self.get_data_from_class_well_db(region)
         print(data)
 
@@ -146,9 +146,9 @@ class Classifier_well(QMainWindow):
         db = QSqlDatabase.addDatabase("QSQLITE")
         db.setDatabaseName(
             'data_base/database_without_juming.db')  # Замените database.db на имя вашей базы данных SQLite
-        # print(db)
-        # print(region)
-        # print('ТГМ_классификатор')
+        print(db)
+        print(region)
+        print('ТГМ_классификатор')
         if not db.open():
             print("Не удалось установить соединение с базой данных.")
             return []
@@ -307,7 +307,7 @@ class Classifier_well(QMainWindow):
 
                 # Удаление всех данных из таблицы
                 cursor.execute(f"DELETE FROM {region_name}")
-                print(region_name)
+
                 # Создание таблицы в базе данных
                 cursor.execute(f'CREATE TABLE IF NOT EXISTS {region_name}'
                                f'(id INTEGER PRIMARY KEY AUTOINCREMENT,'
@@ -362,61 +362,60 @@ class Classifier_well(QMainWindow):
                 if check_param in region_name:
                     mes = QMessageBox.warning(self, 'ВНИМАНИЕ ОШИБКА',
                                               f'регион выбрано корректно  {region_name}')
-                    try:
-                        # Получение данных из Excel и запись их в базу данных
-                        for index_row, row in enumerate(ws.iter_rows(min_row=2, values_only=True)):
-                            if 'Классификация' in row:
-                                check_file = True
-                                print(f' класс {check_file}')
-                            if 'Скважина' in row:
-                                area_row = index_row + 2
-                                for col, value in enumerate(row):
-                                    if not value is None and col <= 20:
-                                        if 'Скважина' == value:
-                                            well_column = col
-                                        elif 'Цех' == value:
-                                            cdng = col
-                                        elif 'Площадь' == value:
-                                            area_column = col
-                                        elif 'Месторождение' == value:
-                                            oilfield = col
-                                        elif 'Пластовое давление' == value:
-                                            categoty_pressure = col
-                                            pressure_Gst = col + 1
-                                            date_measurement = col + 2
-                                            pressure_Ppl = col + 3
-                                        elif 'Содержание сероводорода в продукции пробы' == value:
-                                            categoty_h2s = col
-                                            h2s_pr = col + 1
-                                            h2s_mg_l = col + 2
-                                            h2s_mg_m = col + 3
+                    # try:
+                    # Получение данных из Excel и запись их в базу данных
+                    for index_row, row in enumerate(ws.iter_rows(min_row=2, values_only=True)):
+                        if 'Классификация' in row:
+                            check_file = True
+                            print(f' класс {check_file}')
+                        if 'Скважина' in row:
+                            area_row = index_row + 2
+                            for col, value in enumerate(row):
+                                if not value is None and col <= 20:
+                                    if 'Скважина' == value:
+                                        well_column = col
+                                    elif 'Цех' == value:
+                                        cdng = col
+                                    elif 'Площадь' == value:
+                                        area_column = col
+                                    elif 'Месторождение' == value:
+                                        oilfield = col
+                                    elif 'Пластовое давление' == value:
+                                        categoty_pressure = col
+                                        pressure_Gst = col + 1
+                                        date_measurement = col + 2
+                                        pressure_Ppl = col + 3
+                                    elif 'содержание сероводорода' in str(value).lower():
+                                        categoty_h2s = col
+                                        h2s_pr = col + 1
+                                        h2s_mg_l = col + 2
+                                        h2s_mg_m = col + 3
 
-                                        elif 'Газовый фактор' == value:
-                                            categoty_gf = col
-                                            gas_factor = col + 1
+                                    elif 'Газовый фактор' == value:
+                                        categoty_gf = col
+                                        gas_factor = col + 1
 
-                        for index_row, row in enumerate(ws.iter_rows(min_row=2, values_only=True)):
-                            if index_row > area_row:
+                    for index_row, row in enumerate(ws.iter_rows(min_row=2, values_only=True)):
+                        if index_row > area_row:
 
-                                well_number = row[well_column]
-                                area_well = row[area_column]
-                                oilfield_str = row[oilfield]
+                            well_number = row[well_column]
+                            area_well = row[area_column]
+                            oilfield_str = row[oilfield]
 
-                                if well_number:
-                                    cursor.execute(
-                                        f"INSERT INTO {region_name} (cdng, well_number, deposit_area, oilfield, "
-                                        f"categoty_pressure, pressure_Ppl, pressure_Gst, date_measurement,categoty_h2s, "
-                                        f"h2s_pr, h2s_mg_l, h2s_mg_m, categoty_gf, gas_factor, today, region) "
-                                        f"VALUES (?,?,?,?,?,?,?,?,?,?,?,?, ?, ?, ?, ?)",
-                                        (row[cdng], well_number, area_well, oilfield_str, row[categoty_pressure],
-                                         row[pressure_Ppl],
-                                         row[pressure_Gst], row[date_measurement], row[categoty_h2s], row[h2s_pr],
-                                         row[h2s_mg_l],
-                                         row[h2s_mg_m], row[categoty_gf], row[gas_factor], version_year, region))
+                            if well_number:
+                                cursor.execute(
+                                    f"INSERT INTO {region_name} (cdng, well_number, deposit_area, oilfield, "
+                                    f"categoty_pressure, pressure_Ppl, pressure_Gst, date_measurement,categoty_h2s, "
+                                    f"h2s_pr, h2s_mg_l, h2s_mg_m, categoty_gf, gas_factor, today, region) "
+                                    f"VALUES (?,?,?,?,?,?,?,?,?,?,?,?, ?, ?, ?, ?)",
+                                    (row[cdng], well_number, area_well, oilfield_str, row[categoty_pressure],
+                                     row[pressure_Ppl], row[pressure_Gst], row[date_measurement], row[categoty_h2s],
+                                     row[h2s_pr], row[h2s_mg_l], row[h2s_mg_m], row[categoty_gf], row[gas_factor],
+                                     version_year, region))
 
-                        mes = QMessageBox.information(self, 'данные обновлены', 'Данные обновлены')
-                    except:
-                        mes = QMessageBox.warning(self, 'ОШИБКА', 'Выбран файл с не корректными данными')
+                    mes = QMessageBox.information(self, 'данные обновлены', 'Данные обновлены')
+                    # except:
+                    #     mes = QMessageBox.warning(self, 'ОШИБКА', 'Выбран файл с не корректными данными')
 
                 else:
                     mes = QMessageBox.warning(self, 'ВНИМАНИЕ ОШИБКА',

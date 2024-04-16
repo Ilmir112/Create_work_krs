@@ -16,6 +16,8 @@ class TabPage_SO_sand(QWidget):
 
         self.validator = QIntValidator(0, 80000)
 
+        self.validator_float = QDoubleValidator(0.0, 1.65, 2)
+
         self.roof_sand_label = QLabel("кровля ПМ", self)
         self.roof_sand_edit = QLineEdit(self)
         self.roof_sand_edit.setValidator(self.validator)
@@ -40,12 +42,30 @@ class TabPage_SO_sand(QWidget):
         self.roof_rir_label = QLabel("Плановая кровля РИР", self)
         self.roof_rir_edit = QLineEdit(self)
 
-
         self.sole_rir_LabelType = QLabel("Подошва РИР", self)
         self.sole_rir_edit = QLineEdit(self)
 
+        self.need_change_zgs_label = QLabel('Необходимо ли менять ЖГС', self)
+        self.need_change_zgs_combo = QComboBox(self)
+        self.need_change_zgs_combo.addItems(['Нет', 'Да'])
+        if len(well_data.plast_work) == 0:
+            self.need_change_zgs_combo.setCurrentIndex(1)
 
+        self.fluid_new_label = QLabel('удельный вес ЖГС', self)
+        self.fluid_new_edit = QLineEdit(self)
+        self.fluid_new_edit.setValidator(self.validator_float)
 
+        self.pressuar_new_label = QLabel('Ожидаемое давление', self)
+        self.pressuar_new_edit = QLineEdit(self)
+        self.pressuar_new_edit.setValidator(self.validator)
+
+        if len(well_data.plast_project) != 0:
+            self.plast_new_label = QLabel('индекс нового пласта', self)
+            self.plast_new_combo = QComboBox(self)
+            self.plast_new_combo.addItems(well_data.plast_project)
+        else:
+            self.plast_new_label = QLabel('индекс нового пласта', self)
+            self.plast_new_combo = QLineEdit(self)
 
         self.grid = QGridLayout(self)
 
@@ -64,6 +84,20 @@ class TabPage_SO_sand(QWidget):
         self.grid.addWidget(self.roof_rir_edit, 7, 4)
         self.grid.addWidget(self.sole_rir_LabelType, 6, 5)
         self.grid.addWidget(self.sole_rir_edit, 7, 5)
+        self.grid.addWidget(self.need_change_zgs_label, 9, 2)
+        self.grid.addWidget(self.need_change_zgs_combo, 10, 2)
+
+        self.grid.addWidget(self.plast_new_label, 9, 3)
+        self.grid.addWidget(self.plast_new_combo, 10, 3)
+
+        self.grid.addWidget(self.fluid_new_label, 9, 4)
+        self.grid.addWidget(self.fluid_new_edit, 10, 4)
+
+        self.grid.addWidget(self.pressuar_new_label, 9, 5)
+        self.grid.addWidget(self.pressuar_new_edit, 10, 5)
+
+        self.need_change_zgs_combo.currentTextChanged.connect(self.update_change_fluid)
+        self.need_change_zgs_combo.setCurrentIndex(1)
 
         self.roof_sand_edit.textChanged.connect(self.update_roof)
         self.rir_question_QCombo.currentTextChanged.connect(self.update_rir)
@@ -81,8 +115,6 @@ class TabPage_SO_sand(QWidget):
             else:
                 self.privyazka_question_QCombo.setCurrentIndex(0)
             if rir_question_QCombo == 'Да':
-
-
                 self.sole_rir_edit.setText(f'{roof_sand_edit}')
                 self.roof_rir_edit.setText(f'{roof_sand_edit-50}')
 
@@ -103,12 +135,43 @@ class TabPage_SO_sand(QWidget):
             self.sole_rir_LabelType.setParent(None)
             self.sole_rir_edit.setParent(None)
 
+    def update_change_fluid(self, index):
+        if index == 'Да':
+            # if len(well_data.plast_project) != 0:
+            #     self.plast_new_combo = QComboBox(self)
+            #     self.plast_new_combo.addItems(well_data.plast_project)
+            #     plast = self.plast_new_combo.currentText()
+            # else:
+            #     self.plast_new_combo = QLineEdit(self)
+            #     plast = self.plast_new_combo.text()
+
+            cat_h2s_list_plan = list(map(int, [well_data.dict_category[plast]['по сероводороду'].category for plast in
+                                               well_data.plast_project if well_data.dict_category.get(plast) and
+                                               well_data.dict_category[plast]['отключение'] == 'планируемый']))
+
+            if len(cat_h2s_list_plan) != 0:
+                plast = well_data.plast_project[0]
+                self.pressuar_new_edit.setText(f'{well_data.dict_category[plast]["по давлению"].data_pressuar}')
+            self.grid.addWidget(self.plast_new_label, 9, 3)
+            self.grid.addWidget(self.plast_new_combo, 10, 3)
+
+            self.grid.addWidget(self.fluid_new_label, 9, 4)
+            self.grid.addWidget(self.fluid_new_edit, 10, 4)
+
+            self.grid.addWidget(self.pressuar_new_label, 9, 5)
+            self.grid.addWidget(self.pressuar_new_edit, 10, 5)
+        else:
+            self.plast_new_label.setParent(None)
+            self.plast_new_combo.setParent(None)
+            self.fluid_new_label.setParent(None)
+            self.fluid_new_edit.setParent(None)
+            self.pressuar_new_label.setParent(None)
+            self.pressuar_new_edit.setParent(None)
 
 class TabWidget(QTabWidget):
     def __init__(self):
         super().__init__()
         self.addTab(TabPage_SO_sand(self), 'отсыпка')
-
 
 class SandWindow(QMainWindow):
     work_sand_window = None
@@ -149,7 +212,7 @@ class SandWindow(QMainWindow):
 
         if well_data.column_additional is False or (well_data.column_additional is True and \
                                                     well_data.current_bottom <= well_data.head_column_additional._value):
-            sand_select = f'перо +  НКТ{well_data.nkt_diam}мм 20м + реперный патрубок'
+            sand_select = f'перо + НКТ{well_data.nkt_diam}мм 20м + реперный патрубок'
 
         elif well_data.column_additional is True and \
                 well_data.column_additional_diametr._value < 110 and \
@@ -170,7 +233,7 @@ class SandWindow(QMainWindow):
 
         nkt_diam = ''.join(['73' if well_data.column_diametr._value > 110 else '60'])
 
-        sand_volume = round(volume_vn_ek(self, filling_depth) * (sole_sand_edit - filling_depth), 1)
+        sand_volume = round(volume_vn_ek(filling_depth) * (sole_sand_edit - filling_depth), 1)
 
 
         filling_list = [

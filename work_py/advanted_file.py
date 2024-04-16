@@ -204,7 +204,11 @@ def raiding_interval(ryber_key):
                                 float(interval[1] + 20) > well_data.current_bottom:
                             crt = [float(interval[0]) - 20, well_data.current_bottom]
                     else:
-                        if float(interval[1]) + 20 <= well_data.current_bottom and well_data.shoe_column_additional._value >= float(interval[1]) + 20:
+                        if float(interval[1]) + 20 <= well_data.current_bottom and \
+                                well_data.shoe_column_additional._value > float(interval[0]) - 20:
+                            crt = [well_data.shoe_column_additional._value, float(interval[1]) + 20]
+                        elif float(interval[1]) + 20 <= well_data.current_bottom and \
+                                well_data.shoe_column_additional._value >= float(interval[1]) + 20:
                             crt = [float(interval[0]) - 20, float(interval[1]) + 20]
                         elif float(interval[1]) + 20 >= well_data.shoe_column_additional._value:
                             crt = [float(interval[0]) - 20, well_data.shoe_column._value]
@@ -242,15 +246,13 @@ def raiding_interval(ryber_key):
             if str[0] < well_data.head_column_additional._value and str[0] < str[1]:
                 merged_segments_new.append(str)
 
-    elif ryber_key == 'райбер в ДП' and well_data.column_additional and str[0] < str[1]:
+    elif ryber_key == 'райбер в ДП' and well_data.column_additional:
         for str in merged_segments:
-            if str[1] > well_data.head_column_additional._value:
+            if str[1] > well_data.head_column_additional._value and str[0] < str[1]:
                 merged_segments_new.append(str)
     else:
         for str in merged_segments:
-            print(str[0], str[1])
             if str[0] < str[1]:
-                print(str[0] < str[1], str[0], str[1])
                 merged_segments_new = merged_segments
     return merged_segments_new
 

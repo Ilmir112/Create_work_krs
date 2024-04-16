@@ -486,14 +486,14 @@ class TabPage_SO_with(QWidget):
             self.skm_Edit.setText(str(well_data.column_diametr._value))
             self.dictance_template_first_Edit.setText(str(dictance_template_first1))
             dictance_template_first = int(self.dictance_template_first_Edit.text())
-            dictance_template_second = well_data.current_bottom - dictance_template_first1 - \
-                               lenght_template_first - well_data.head_column_additional._value +5
+            dictance_template_second = int(well_data.current_bottom - dictance_template_first1 - \
+                               lenght_template_first - well_data.head_column_additional._value +5)
             self.dictance_template_second_Edit.setText(str(dictance_template_second))
 
             self.lenght_template_second_Edit.setText(str(lenght_template_second))
 
-            dictance_template_three = (well_data.current_bottom - dictance_template_first - \
-                                       int(dictance_template_second) - lenght_template_first) - roof_plast + 10
+            dictance_template_three = round(well_data.current_bottom - dictance_template_first - \
+                                       int(dictance_template_second) - lenght_template_first - roof_plast + 10, 0)
             self.dictance_three_Edit.setText(str(dictance_template_three))
 
 
@@ -530,8 +530,8 @@ class TabPage_SO_with(QWidget):
             dictance_template_first = int(well_data.current_bottom - roof_add_column_plast + 5)
             self.dictance_template_first_Edit.setText(str(dictance_template_first))
 
-            dictance_template_three = (well_data.current_bottom - dictance_template_first - \
-                                      int(dictance_template_second) - lenght_template_first) - roof_plast + 10
+            dictance_template_three = round((well_data.current_bottom - dictance_template_first - \
+                                      int(dictance_template_second) - lenght_template_first) - roof_plast + 10, 0)
 
             self.dictance_three_Edit.setText(str(dictance_template_three))
 
@@ -565,8 +565,8 @@ class TabPage_SO_with(QWidget):
             dictance_template_second = 10
             self.dictance_template_second_Edit.setText(str(dictance_template_second))
 
-            dictance_template_three = (well_data.current_bottom - dictance_template_first - \
-                                       int(dictance_template_second) - lenght_template_first) - roof_plast + 10
+            dictance_template_three = round((well_data.current_bottom - dictance_template_first - \
+                                       int(dictance_template_second) - lenght_template_first) - roof_plast + 10, 0)
 
             self.dictance_three_Edit.setText(str(dictance_template_three))
 
@@ -604,8 +604,8 @@ class TabPage_SO_with(QWidget):
             dictance_template_first = int(well_data.current_bottom - roof_add_column_plast + 5)
             self.dictance_template_first_Edit.setText(str(dictance_template_first))
 
-            dictance_template_three = (well_data.current_bottom - dictance_template_first - \
-                                       int(dictance_template_second) - lenght_template_first) - roof_plast + 10
+            dictance_template_three = round((well_data.current_bottom - dictance_template_first - \
+                                       int(dictance_template_second) - lenght_template_first) - roof_plast + 10, 0)
             self.dictance_three_Edit.setText(str(dictance_template_three))
 
 
@@ -633,11 +633,18 @@ class TabPage_SO_with(QWidget):
 
     def definition_ECN_true(self, depth_ecn):
 
-        if well_data.column_additional is False and well_data.dict_pump_ECN["posle"] != 0:
+        if well_data.column_additional is False and well_data.dict_pump_ECN["posle"] != 0 and \
+                well_data.column_diametr._value > 168:
+            return "4", "4"
+
+        elif well_data.column_additional is False and well_data.dict_pump_ECN["posle"] != 0:
             return "4", "30"
         elif well_data.column_additional is True and well_data.dict_pump_ECN["posle"] != 0 \
                 and well_data.column_additional_diametr._value < 170:
-            if well_data.dict_pump_ECN["posle"] != 0 and float(depth_ecn) < well_data.head_column_additional._value:
+            if well_data.dict_pump_ECN["posle"] != 0 and float(depth_ecn) < well_data.head_column_additional._value and \
+                    well_data.column_diametr._value > 168:
+                return "4", "4"
+            elif well_data.dict_pump_ECN["posle"] != 0 and float(depth_ecn) < well_data.head_column_additional._value:
                 return "4", "30"
 
             elif well_data.dict_pump_ECN["posle"] != 0 and float(depth_ecn) >= well_data.head_column_additional._value:

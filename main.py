@@ -5,8 +5,9 @@ import sys
 import win32com.client
 import openpyxl
 import re
-from openpyxl.reader.excel import load_workbook
 
+from PyQt5.QtGui import QColor
+from openpyxl.reader.excel import load_workbook
 
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu, QMenuBar, QAction, QTableWidget, \
     QLineEdit, QFileDialog, QToolBar, QPushButton, QMessageBox, QInputDialog, QTabWidget, QTableWidgetItem
@@ -16,6 +17,8 @@ from openpyxl.utils import get_column_letter
 from PyQt5.QtCore import Qt
 from openpyxl.workbook import Workbook
 from openpyxl.styles import Border, Side, Alignment, Font
+
+
 from work_py.advanted_file import count_row_height, definition_plast_work, raid, remove_overlapping_intervals
 
 from openpyxl.drawing.image import Image
@@ -25,9 +28,7 @@ from H2S import calc_h2s
 from PyQt5.QtCore import QThread, pyqtSignal
 from data_correct_position_people import CorrectSignaturesWindow
 from work_py.dop_plan_py import DopPlanWindow
-
 from work_py.drilling import Drill_window
-
 from users.login_users import LoginWindow
 
 
@@ -258,6 +259,7 @@ class MyWindow(QMainWindow):
         self.ins_ind_border = None
         self.work_plan = 0
         self.table_widget = None
+        self.table_pvr = None
 
         if self.login_window == None:
             self.login_window = LoginWindow()
@@ -299,11 +301,16 @@ class MyWindow(QMainWindow):
         self.menuBar = QMenuBar(self)
         self.setMenuBar(self.menuBar)
         self.fileMenu = QMenu('&Файл', self)
+        self.application_geophysical = QMenu('&Заявка на ГИС', self)
         self.classifierMenu = QMenu('&Классификатор', self)
         self.signatories = QMenu('&Подписанты ', self)
         self.menuBar.addMenu(self.fileMenu)
+        self.menuBar.addMenu(self.application_geophysical)
         self.menuBar.addMenu(self.classifierMenu)
         self.menuBar.addMenu(self.signatories)
+
+        self.application_pvr = self.application_geophysical.addAction('Заявка на ПВР', self.action_clicked)
+        self.application_gis = self.application_geophysical.addAction('Заявка на ГИС', self.action_clicked)
 
         self.create_file = self.fileMenu.addMenu('&Создать')
         self.create_KRS = self.create_file.addAction('План КРС', self.action_clicked)
@@ -367,6 +374,7 @@ class MyWindow(QMainWindow):
     def action_clicked(self):
         from open_pz import CreatePZ
         from work_py.gnkt_frez import Work_with_gnkt
+        from application_pvr import PvrApplication
         action = self.sender()
         if action == self.create_KRS:
             self.work_plan = 'krs'
@@ -381,7 +389,6 @@ class MyWindow(QMainWindow):
                     sheet = read_pz.open_excel_file(self.ws, self.work_plan)
 
                     self.copy_pz(sheet, self.table_widget, self.work_plan)
-
 
                 except FileNotFoundError:
                     print('Файл не найден')
@@ -554,6 +561,24 @@ class MyWindow(QMainWindow):
         elif action == self.class_well_AGM_open:
             costumer = 'ООО Башнефть-добыча'
             self.open_class_well(costumer, 'АГМ')
+        elif action == self.application_pvr:
+            self.work_plan = 'application_pvr'
+            # self.tableWidgetOpenPvr()
+            self.fname, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
+                                                                  "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
+            if self.fname:
+                self.open_pvr_application(self.fname)
+        elif action == self.application_gis:
+            self.work_plan = 'application_gis'
+            # self.tableWidgetOpenPvr()
+            self.fname, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
+                                                                  "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
+            if self.fname:
+                self.open_pvr_application(self.fname)
+
+
+        elif action == self.application_geophysical:
+            pass
 
     def reload_class_well(self, costumer, region):
         from data_base.work_with_base import Classifier_well
@@ -580,6 +605,23 @@ class MyWindow(QMainWindow):
             self.new_window.close()  # Close window.
             self.new_window = None  # Discard reference.
 
+    def open_pvr_application(self, fname):
+        from open_pz import CreatePZ
+        from application_gis import GisApplication
+        if fname:
+            # try:
+            self.read_pz(fname)
+            well_data.pause = True
+            read_pz = CreatePZ(self.wb, self.ws, self.data_window, self.perforation_correct_window2)
+            sheet = read_pz.open_excel_file(self.ws, self.work_plan)
+            self.rir_window = GisApplication(self.table_pvr)
+            self.rir_window.show()
+
+            self.pause_app()
+            well_data.pause = False
+            # except:
+            #     pass
+
     def open_class_well(self, costumer, region):
         from data_base.work_with_base import Classifier_well
         if self.new_window is None:
@@ -604,14 +646,34 @@ class MyWindow(QMainWindow):
             except FileNotFoundError:
                 print('Файл не найден')
 
+    def tableWidgetOpenPvr(self):
+
+        if self.table_pvr is None:
+            # Создание объекта TabWidget
+            self.tabWidget = QTabWidget()
+            self.table_pvr = QTableWidget()
+
+            self.table_pvr.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+            self.table_pvr.customContextMenuRequested.connect(self.openContextMenu)
+            self.setCentralWidget(self.tabWidget)
+            self.model = self.table_pvr.model()
+
+            # Этот сигнал испускается всякий раз, когда ячейка в таблице нажата.
+            # Указанная строка и столбец - это ячейка, которая была нажата.
+            self.table_pvr.cellPressed[int, int].connect(self.clickedRowColumn)
+
+            if self.work_plan == 'application_pvr':
+                self.tabWidget.addTab(self.table_pvr, 'заявка на ПВР')
+
+
     def tableWidgetOpen(self, work_plan='krs'):
 
         if self.table_widget is None:
 
             # Создание объекта TabWidget
             self.tabWidget = QTabWidget()
-
             self.table_widget = QTableWidget()
+            self.table_pvr = QTableWidget()
 
             self.table_widget.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
             self.table_widget.customContextMenuRequested.connect(self.openContextMenu)
@@ -627,7 +689,10 @@ class MyWindow(QMainWindow):
                 self.table_schema = QTableWidget()
                 self.tabWidget.addTab(self.table_schema, 'Схема скважины')
 
-            self.tabWidget.addTab(self.table_widget, 'Ход работ')
+            else:
+                self.tabWidget.addTab(self.table_widget, 'Ход работ')
+
+
 
     def saveFileDialog(self, wb2, full_path):
         try:
@@ -1567,15 +1632,18 @@ class MyWindow(QMainWindow):
             index_setSpan = 1
         row_max = table_widget.rowCount()
         print(f'макс {row_max}')
+
         for i, row_data in enumerate(work_list):
 
             row = ins_ind + i
-            MyWindow.insert_data_in_database(self, row, row_max + i)
+            if work_plan not in ['application_pvr', 'gnkt_frez']:
+                MyWindow.insert_data_in_database(self, row, row_max + i)
 
             table_widget.insertRow(row)
 
-            if len(str(row_data[1])) > 3 and work_plan == 'gnkt_frez':
+            if len(str(row_data[1])) > 3 and work_plan in 'gnkt_frez':
                 table_widget.setSpan(i + ins_ind, 1, 1, 12)
+
             else:
                 table_widget.setSpan(i + ins_ind, 2, 1, 8 + index_setSpan)
             for column, data in enumerate(row_data):
@@ -1757,33 +1825,30 @@ class MyWindow(QMainWindow):
     def copy_pz(self, sheet, table_widget, work_plan='krs', count_col=12, list_page=1):
         from krs import GnoWindow
 
-
         rows = sheet.max_row
         merged_cells = sheet.merged_cells
-
         table_widget.setRowCount(rows)
-
         well_data.count_row_well = table_widget.rowCount()
 
-
         border_styles = {}
-        for row in self.ws.iter_rows():
+        for row in sheet.iter_rows():
             for cell in row:
                 border_styles[(cell.row, cell.column)] = cell.border
 
         table_widget.setColumnCount(count_col)
         rowHeights_exit = [sheet.row_dimensions[i + 1].height if sheet.row_dimensions[i + 1].height is not None else 18
                            for i in range(sheet.max_row)]
-
-        self.populate_row(table_widget.rowCount(), [
-            [None, None, 'Порядок работы', None, None, None, None, None, None, None, None, None],
-            [None, None, 'Наименование работ', None, None, None, None, None, None, None, 'Ответственный',
-             'Нормы времени \n мин/час.']], self.table_widget, self.work_plan)
+        if work_plan not in ['application_pvr', 'gnkt_frez']:
+            self.populate_row(table_widget.rowCount(), [
+                [None, None, 'Порядок работы', None, None, None, None, None, None, None, None, None],
+                [None, None, 'Наименование работ', None, None, None, None, None, None, None, 'Ответственный',
+                 'Нормы времени \n мин/час.']], self.table_widget, self.work_plan)
 
         for row in range(1, rows + 2):
             if row > 1 and row < rows - 1:
                 table_widget.setRowHeight(row, int(rowHeights_exit[row]))
             for col in range(1, count_col + 1):
+
                 if not sheet.cell(row=row, column=col).value is None:
                     if isinstance(sheet.cell(row=row, column=col).value, float) and row > 25:
                         cell_value = str(round(sheet.cell(row=row, column=col).value, 2))
@@ -1792,12 +1857,14 @@ class MyWindow(QMainWindow):
                     else:
                         cell_value = str(sheet.cell(row=row, column=col).value)
                         # print(cell_value)
-                    cell = sheet[f'{get_column_letter(col + 1)}{row + 1}']
-                    cell_style = cell._style
+
+                    # cell = sheet[f'{get_column_letter(col + 1)}{row + 1}']
+                    # cell_style = cell._style
 
                     item = QtWidgets.QTableWidgetItem(str(cell_value))
                     # item.setData(10, cell_style)
                     # item.setData(10, cell_style)
+
 
                     table_widget.setItem(row - 1, col - 1, item)
                     # Проверяем, является ли текущая ячейка объединенной
@@ -1808,7 +1875,42 @@ class MyWindow(QMainWindow):
                             table_widget.setSpan(row - 1, col - 1,
                                                  merged_cell.max_row - merged_cell.min_row + 1,
                                                  merged_cell.max_col - merged_cell.min_col + 1)
+                else:
+                    item = QTableWidgetItem("")
+                border = sheet.cell(row=row, column=col).border
+                if border.top.style is not None:
+                    item.setFlags(item.flags() ^ 0x00100000)  # Убираем рамку из ячейки
+                table_widget.setItem(row - 1, col - 1, item)
 
+
+
+                # # Установка стилей и границ ячеек, используя openpyxl
+                # cell = sheet.cell(row=row + 1, column=col + 1)
+                # if cell.border:
+                #     top_border = cell.border.top.style
+                #     bottom_border = cell.border.bottom.style
+                #     left_border = cell.border.left.style
+                #     right_border = cell.border.right.style
+                #
+                # # if right_border:
+                #
+                #     # Установка стилей для правых границ ячеек
+                #     if table_widget.item(row, col):
+                #         border_style = cell.data(Qt.UserRole)
+                #         if border_style:
+                #             cell.setStyleSheet("border-right: 1px solid black;")
+
+                # if not left_border is None:
+                #     # Установка стилей для правых границ ячеек
+                #     item.setData(Qt.UserRole, "border-left: 1px solid black;")
+                # if not bottom_border is  None:
+                #     # Установка стилей для правых границ ячеек
+                #     item.setData(Qt.UserRole, "border-bottom: 1px solid black;")
+                # if not top_border is  None:
+                #     # Установка стилей для правых границ ячеек
+                #     item.setData(Qt.UserRole, "border-top: 1px solid black;")
+
+                # table_widget.setStyleSheet(f"QTableWidget::item {top_border}: 1px ; padding: 2px; ")
         if work_plan == 'krs':
             if self.work_window is None:
                 self.work_window = GnoWindow(table_widget.rowCount(), self.table_widget, self.work_plan)
@@ -1842,6 +1944,12 @@ class MyWindow(QMainWindow):
                         13.0, 13.0, 13.0, 5.42578125, 13.0, 4.5703125, 2.28515625, 10.28515625]
             for column in range(table_widget.columnCount()):
                 table_widget.setColumnWidth(column, int(colWidth[column]))  # Здесь задайте требуемую ширину столбца
+
+        if work_plan == 'application_pvr':
+            from property_excel import property_excel_pvr
+            for column in range(table_widget.columnCount()):
+                table_widget.setColumnWidth(column, int(property_excel_pvr.colWidth[column]))  # Здесь задайте требуемую ширину столбца
+
 
 
 

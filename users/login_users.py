@@ -55,9 +55,6 @@ class LoginWindow(QWidget):
             mes = QMessageBox.critical(self, 'Пароль', 'логин и пароль не совпадает')
             self.close()
 
-
-
-
     def get_list_users(self):
         # Создаем подключение к базе данных
         conn = sqlite3.connect('data_base/users_database/users.db')

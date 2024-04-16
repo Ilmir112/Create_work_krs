@@ -155,6 +155,7 @@ class TabPage_SO_rir(QWidget):
         self.need_change_zgs_combo.setCurrentIndex(1)
         self.rir_type_Combo.currentTextChanged.connect(self.update_rir_type)
         self.rir_type_Combo.setCurrentIndex(1)
+        self.paker_depth_edit.textChanged.connect(self.update_depth_paker)
 
     def update_change_fluid(self, index):
         if index == 'Да':
@@ -171,6 +172,7 @@ class TabPage_SO_rir(QWidget):
                                                well_data.dict_category[plast]['отключение'] == 'планируемый']))
 
             if len(cat_h2s_list_plan) != 0:
+                plast = well_data.plast_project[0]
                 self.pressuar_new_edit.setText(f'{well_data.dict_category[plast]["по давлению"].data_pressuar}')
             self.grid.addWidget(self.plast_new_label, 9, 3)
             self.grid.addWidget(self.plast_new_combo, 10, 3)
@@ -218,6 +220,11 @@ class TabPage_SO_rir(QWidget):
                 paker_khost = 10
                 self.paker_khost_edit.setText(f'{paker_khost}')
                 self.diametr_paker_edit.setText(f'{TabPage_SO.paker_diametr_select(self, int(paker_depth))}')
+    def update_depth_paker(self):
+        from work_py.opressovka import TabPage_SO
+        paker_depth = self.paker_depth_edit.text()
+        if paker_depth != '':
+            self.diametr_paker_edit.setText(f'{TabPage_SO.paker_diametr_select(self, int(paker_depth))}')
     def update_rir_type(self, index):
         if index in 'РИР с пакером':
             self.need_change_zgs_label.setParent(None)
@@ -414,8 +421,9 @@ class RirWindow(QMainWindow):
     def rir_rpk(self, paker_need_Combo, plast_combo,
                                          roof_rir_edit, sole_rir_edit, pressureZUMPF_question = 'Не нужно',
                                          diametr_paker = 122, paker_khost= 0, paker_depth= 0):
-       
         from .opressovka import OpressovkaEK
+        print(paker_need_Combo, plast_combo, diametr_paker, paker_khost,
+                   paker_depth, pressureZUMPF_question)
         rir_list = self.need_paker(paker_need_Combo, plast_combo, diametr_paker, paker_khost,
                    paker_depth, pressureZUMPF_question)
 
@@ -582,7 +590,8 @@ class RirWindow(QMainWindow):
     def rirWithPero(self, paker_need_Combo, plast_combo,
                                          roof_rir_edit, sole_rir_edit, pressureZUMPF_question = 'Не нужно',
                                          diametr_paker = 122, paker_khost= 0, paker_depth= 0):
-        need_change_zgs_combo = self.tabWidget.currentWidget().need_change_zgs_combo.currentText()
+        if len(well_data.plast_work) != 0:
+            need_change_zgs_combo = self.tabWidget.currentWidget().need_change_zgs_combo.currentText()
         if need_change_zgs_combo == 'Да':
             if len(well_data.plast_project) != 0:
                 plast_new_combo = self.tabWidget.currentWidget().plast_new_combo.currentText()
@@ -622,7 +631,8 @@ class RirWindow(QMainWindow):
             dict_nkt = {73: sole_rir_edit}
         rir_list = RirWindow.need_paker(self, paker_need_Combo, plast_combo, diametr_paker, paker_khost,
                    paker_depth, pressureZUMPF_question)
-        volume_in_nkt, volume_in_ek = self.calc_buffer(roof_rir_edit, sole_rir_edit, dict_nkt)
+
+        volume_in_nkt, volume_in_ek = RirWindow.calc_buffer(self, roof_rir_edit, sole_rir_edit, dict_nkt)
 
         if paker_need_Combo == "Нужно СПО":
             glin_list = [
@@ -965,8 +975,9 @@ class RirWindow(QMainWindow):
         roof_rir_edit = int(float(self.tabWidget.currentWidget().roof_rir_edit.text().replace(',', '.')))
         sole_rir_edit = int(float(self.tabWidget.currentWidget().sole_rir_edit.text().replace(',', '.')))
 
+        paker_need_Combo = self.tabWidget.currentWidget().paker_need_Combo.currentText()
         pressureZUMPF_question = self.tabWidget.currentWidget().pressureZUMPF_question_QCombo.currentText()
-        if pressureZUMPF_question == 'Нужно СПО':
+        if paker_need_Combo == 'Нужно СПО':
             diametr_paker = int(float(self.tabWidget.currentWidget().diametr_paker_edit.text()))
             paker_khost = int(float(self.tabWidget.currentWidget().paker_khost_edit.text()))
             paker_depth = int(float(self.tabWidget.currentWidget().paker_depth_edit.text()))

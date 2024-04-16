@@ -114,18 +114,16 @@ class GeophysicWindow(MyWindow):
     def geophysic_sel(self, geophysic, editType, editType2):
 
         if geophysic == 'АКЦ':
-            research = f'ЗАДАЧА 2.7.1 Определение состояния цементного камня (АКЦ, АК-сканирование) в интервале {editType}-{editType2}м. '
+            research = f'ЗАДАЧА 2.7.1 Определение состояния цементного камня (АКЦ, АК сканирование) в интервале {editType}-{editType2}м. '
             research_short = f'АКЦ в интервале {editType}-{editType2}м.'
         elif geophysic == 'СГДТ':
             research = f'ЗАДАЧА 2.7.2 Определение плотности, дефектов цементного камня, эксцентриситета колонны (СГДТ) в интервале {editType}-{editType2}м.'
             research_short = f'СГДТ в интервале {editType}-{editType2}м.'
         elif geophysic == 'АКЦ + СГДТ':
-            research = f'ЗАДАЧА 2.7.3  Определение состояния цементного камня (АКЦ, АК-сканирование). в интервале {editType}-{editType2}м,' \
+            research = f'ЗАДАЧА 2.7.3  Определение состояния цементного камня (АКЦ, АК сканирование). в интервале {editType}-{editType2}м,' \
                        f'Определение плотности, дефектов цементного камня, эксцентриситета колонны (СГДТ) в интервале 0 - {well_data.perforation_roof - 20} '
             research_short = f'АКЦ в интервале {editType}-{editType2}м.' \
                              f'СГДТ в интервале 0 - {well_data.perforation_roof - 20}'
-
-
 
         elif geophysic == 'ИНГК':
             research = f'ЗАДАЧА 2.4.3 Определение текущей нефтенасыщенности по данным интегрального импульсного нейтронного' \

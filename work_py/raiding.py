@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QLineEdi
 
 import well_data
 from main import MyWindow
-from work_py.alone_oreration import fluid_change
+
 from .rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
 from .advanted_file import change_True_raid
 
@@ -320,6 +320,7 @@ class Raid(MyWindow):
     def raidingColumn(self, raiding_interval_tuple, ryber_key):
         from .template_work import TemplateKrs
         from .advanted_file import raiding_interval, raid
+        from work_py.alone_oreration import fluid_change
 
         ryber_diam = self.tabWidget.currentWidget().raid_diametr_line.text()
         ryber_key = self.tabWidget.currentWidget().raid_select_combo.currentText()
@@ -411,6 +412,7 @@ class Raid(MyWindow):
     def raiding_sbt(self, raiding_interval_tuple, ryber_key):
         from .template_work import TemplateKrs
         from .advanted_file import raid
+        from .alone_oreration import fluid_change
 
         ryber_diam = self.tabWidget.currentWidget().raid_diametr_line.text()
         ryber_key = self.tabWidget.currentWidget().raid_select_combo.currentText()

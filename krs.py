@@ -104,7 +104,7 @@ class TabPageGno(QWidget):
         if work_plan != 'gnkt_frez':
             well_data.current_bottom = current_bottom
         # Задаем начальную и конечную даты периода
-        current_date = datetime.now().date()
+        current_date = well_data.current_date
         if current_date.month > 4:
             start_date = datetime(current_date.year, 12, 1).date()
             end_date = datetime(current_date.year + 1, 4, 1).date()

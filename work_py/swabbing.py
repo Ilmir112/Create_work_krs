@@ -315,6 +315,7 @@ class TabPage_SO_swab(QWidget):
         # print(f'пласты {plasts, len(well_data.texts), len(plasts), well_data.texts}')
         roof_plast = well_data.current_bottom
         sole_plast = 0
+
         for plast in well_data.plast_work:
             for plast_sel in plasts:
                 if plast_sel == plast:
@@ -324,15 +325,17 @@ class TabPage_SO_swab(QWidget):
                     if sole_plast <= dict_perforation[plast]['подошва']:
                         sole_plast = dict_perforation[plast]['подошва']
 
-            if dict_perforation[plast]['отрайбировано']:
-                paker_depth = int(roof_plast - 8)
-                self.pakerEdit.setText(f"{paker_depth}")
-                self.paker2Edit.setText(str(int(paker_depth - 30)))
+        if self.swab_true_edit_type.currentText() in ['однопакерная', 'воронка',
+                                                      'Опрессовка снижением уровня на шаблоне']:
+            paker_depth = int(roof_plast - 40)
+            self.pakerEdit.setText(f"{paker_depth}")
+            self.paker2Edit.setText(str(int(paker_depth - 30)))
 
-            else:
-                paker_depth = int(roof_plast - 40)
-                self.pakerEdit.setText(f"{paker_depth}")
-                self.paker2Edit.setText(str(int(paker_depth - 30)))
+        else:
+            paker_depth = int(sole_plast + 10)
+            self.pakerEdit.setText(f"{paker_depth}")
+            self.paker2Edit.setText(str(int(roof_plast - 10)))
+
         # print(f'кровля {roof_plast}, подошва {sole_plast}')
 
 

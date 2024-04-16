@@ -567,10 +567,10 @@ class Template_without_skm(QMainWindow):
             if well_data.template_depth >= well_data.head_column_additional._value:
                 mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже головы хвостовика')
                 return
-            if self.template_Combo.currentText() == 'ПСШ Доп колонна СКМ в основной колонне' and\
-                    well_data.skm_depth >= well_data.head_column_additional._value:
-                mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'СКМ спускается ниже головы хвостовика')
-                return
+            # if self.template_Combo.currentText() == 'ПСШ Доп колонна СКМ в основной колонне' and\
+            #         well_data.skm_depth >= well_data.head_column_additional._value:
+            #     mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'СКМ спускается ниже головы хвостовика')
+            #     return
         if distance_second < 0 or distance_first < 0:
             mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'Расстояние между шаблонами не корректно')
             return

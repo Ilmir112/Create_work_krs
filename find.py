@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from PyQt5.QtWidgets import QInputDialog, QMainWindow, QMessageBox
+from openpyxl.workbook import Workbook
 
 import well_data
 from category_correct import CategoryWindow
@@ -14,12 +15,15 @@ from block_name import region
 from work_py.advanted_file import definition_plast_work
 
 
+
 class FindIndexPZ(QMainWindow):
+    wb_pvr = Workbook()
     def __init__(self, ws):
         super().__init__()
         self.read_pz(ws)
         self.data_window = None
         self.perforation_correct_window2 = None
+
 
     def read_pz(self, ws):
 
@@ -33,7 +37,6 @@ class FindIndexPZ(QMainWindow):
 
             elif any(['план-заказ' in str(col).lower() or 'план работ' in str(col).lower() for col in row]) \
                     and row_ind < 50:
-
                 well_data.cat_well_max = ProtectedIsDigit(row_ind)
                 well_data.data_well_min = ProtectedIsDigit(row_ind + 1)
 
@@ -119,11 +122,12 @@ class FindIndexPZ(QMainWindow):
                                         0, 0, 800)[0])
 
         if well_data.data_x_max._value == 0:
-            well_data.data_x_max, _ = ProtectedIsDigit(
+            well_data.data_x_max = ProtectedIsDigit(
                 QInputDialog.getInt(self, 'индекс окончания копирования ожидаемых показателей',
                                     'Программа не смогла определить строку окончания копирования'
                                     ' ожидаемых показателей',
                                     0, 0, 800)[0])
+
         if well_data.condition_of_wells._value == 0:
             well_data.condition_of_wells = ProtectedIsDigit(QInputDialog.getInt(
                 self, 'индекс копирования',
@@ -255,9 +259,11 @@ class WellNkt(FindIndexPZ):
                 value = ws.cell(row=row, column=7).value
                 if value:
                     if not key is None and row < a_plan:
-                        well_data.dict_nkt[key] = well_data.dict_nkt.get(key, 0) + round(float(str(value).replace(',', '.')), 1)
+                        well_data.dict_nkt[key] = well_data.dict_nkt.get(
+                            key, 0) + round(FindIndexPZ.check_str_None(self, value), 1)
                     elif not key is None and row >= a_plan:
-                        well_data.dict_nkt_po[key] = well_data.dict_nkt_po.get(key, 0) + round(float(str(value).replace(',', '.')), 1)
+                        well_data.dict_nkt_po[key] = well_data.dict_nkt_po.get(
+                            key, 0) + round(FindIndexPZ.check_str_None(self, value), 1)
                 # print(f'индекс a_plan {well_data.dict_nkt}')
             # well_data.shoe_nkt = float(sum(well_data.dict_nkt.values()))
         # except:
@@ -466,7 +472,7 @@ class WellHistory_data(FindIndexPZ):
                     elif 'Конец бурения' == value:
                         well_data.date_drilling_cancel = row[col + 2].value
 
-                        well_data.date_drilling_cancel = FindIndexPZ.definition_is_None(self, 
+                        well_data.date_drilling_cancel = FindIndexPZ.definition_is_None(self,
                             well_data.date_drilling_cancel, row_index + begin_index, col + 1, 1)
 
                     elif 'Максимально ожидаемое давление на устье' == value:
@@ -906,6 +912,7 @@ class Well_perforation(FindIndexPZ):
 
         super().__init__(ws)
         self.ws = ws
+
         # self.read_well(self.ws, well_data.data_pvr_min._value, well_data.data_pvr_max._value + 1)
 
     def read_well(self, ws, begin_index, cancel_index):
@@ -1056,14 +1063,15 @@ class Well_perforation(FindIndexPZ):
 
                     if row[col_vert_index] != None:
                         well_data.dict_perforation_project.setdefault(
-                            plast, {}).setdefault('вертикаль', []).append(round(float(row[col_vert_index]), 1))
+                            plast, {}).setdefault('вертикаль', []).append(round(float(str(
+                            row[col_vert_index]).replace(',', '.')), 1))
                     well_data.dict_perforation_project.setdefault(
                         plast, {}).setdefault('интервал', []).append((roof_int, sole_int))
 
                     if row[col_pressuar_index] != None:
 
                         well_data.dict_perforation_project.setdefault(plast, {}).setdefault('давление', []).append(
-                            round(float(row[col_pressuar_index]), 1))
+                            round(FindIndexPZ.check_str_None(self, row[col_pressuar_index]), 1))
                     well_data.dict_perforation_project.setdefault(plast, {}).setdefault('рабочая жидкость', []).append(
                         calculationFluidWork(row[col_vert_index], row[col_pressuar_index]))
 
@@ -1085,9 +1093,9 @@ class Well_perforation(FindIndexPZ):
                 # print(merged_segments)
                 # merged_segments = set(merged_segments)
                 well_data.dict_perforation[plast]['интервал'] = merged_segments
-                if type(well_data.dict_perforation[plast]['вертикаль'][0]) in [float, int]:
-                    well_data.dict_perforation[plast]['вертикаль'] = min(well_data.dict_perforation[plast]['вертикаль'])
-        print(well_data.dict_perforation)
+                # if type(well_data.dict_perforation[plast]['вертикаль'][0]) in [float, int]:
+                #     well_data.dict_perforation[plast]['вертикаль'] = min(well_data.dict_perforation[plast]['вертикаль'])
+
 
         if self.perforation_correct_window2 is None:
             self.perforation_correct_window2 = PerforationCorrect(self)

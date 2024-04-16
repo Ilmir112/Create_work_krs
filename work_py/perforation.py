@@ -263,6 +263,8 @@ class PerforationWindow(QMainWindow):
         self.tableWidget.setSortingEnabled(True)
         # print(editType, spinYearOfIssue, editSerialNumber, editSpecifications)
 
+    def geophysicalSelect(self, geophysic):
+        return geophysic
     def add_work(self):
 
         rows = self.tableWidget.rowCount()
