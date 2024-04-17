@@ -1,12 +1,15 @@
 from datetime import datetime
 
-from PyQt5.QtWidgets import QInputDialog, QMainWindow, QTabWidget, QWidget, QTableWidget, QApplication
+from PyQt5.QtWidgets import QInputDialog, QMainWindow, QTabWidget, QWidget, QTableWidget, QApplication, QLabel, \
+    QLineEdit, QGridLayout, QComboBox, QPushButton
 # from PyQt5.uic.properties import QtWidgets
 from openpyxl.styles import Alignment
 from openpyxl.utils import get_column_letter
-
+from collections import namedtuple
 
 import well_data
+from gnkt_data.gnkt_data import gnkt_1, gnkt_2, gnkt_dict
+from krs import TabPageGno, GnoWindow
 from perforation_correct import PerforationCorrect
 
 import block_name
@@ -17,192 +20,556 @@ from openpyxl.styles import Border, Side, PatternFill, Font, Alignment
 from openpyxl.reader.excel import load_workbook
 from openpyxl.workbook import Workbook
 from open_pz import CreatePZ
+from work_py.alone_oreration import well_volume
+from work_py.gnkt_frez import Work_with_gnkt
+from work_py.gnkt_grp_work import GnktOsvWindow2
 
 
-class Work_with_gnkt(QMainWindow):
-    wb_gnkt_frez = Workbook()
+class TabPageDp(QWidget):
+    def __init__(self, work_plan):
+        super().__init__()
+        self.work_plan = work_plan
 
-    def __init__(self, ws, tabWidget, table_title, table_schema, table_widget):
+        self.gnkt_number_label = QLabel('Номер флота ГНКТ')
+        self.gnkt_number_combo = QComboBox(self)
+        self.gnkt_number_combo.addItems(gnkt_dict["Ойл-сервис"])
+        if self.gnkt_number_combo.currentText() == 'ГНКТ №1':
+            self.gnkt = gnkt_1
+        elif self.gnkt_number_combo.currentText() == 'ГНКТ №2':
+            self.gnkt = gnkt_2
 
-       
+        self.lenght_gnkt_label = QLabel('длина ГНКТ')
+        self.lenght_gnkt_edit = QLineEdit(self)
+        self.lenght_gnkt_edit.setText(f'{self.gnkt.gnkt_length}')
+
+        self.iznos_gnkt_label = QLabel('Износ трубы')
+        self.iznos_gnkt_edit = QLineEdit(self)
+        self.iznos_gnkt_edit.setText(f'{self.gnkt.iznos}')
+
+        self.pvo_number_label = QLabel('Номер ПВО')
+        self.pvo_number_edit = QLineEdit(self)
+        self.pvo_number_edit.setText(f'{self.gnkt.pvo}')
+
+        self.current_bottom_label = QLabel('необходимый текущий забой')
+        self.current_bottom_edit = QLineEdit(self)
+        self.current_bottom_edit.setText(f'{well_data.current_bottom}')
+
+        self.fluid_label = QLabel("уд.вес жидкости глушения", self)
+        self.fluid_edit = QLineEdit(self)
+        if well_data.fluid_work == '':
+            self.fluid_edit.setText(f'{TabPageGno.calc_fluid(self.work_plan, well_data.current_bottom)}')
+        else:
+            self.fluid_edit.setText(f'{well_data.fluid_work}')
+
+        self.osvoenie_label = QLabel('Необходимость освоения')
+        self.osvoenie_combo = QComboBox(self)
+        self.osvoenie_combo.addItems('Да', 'Нет')
+
+        self.grid = QGridLayout(self)
+        self.grid.addWidget(self.gnkt_number_label, 2, 2, 3, 1)
+        self.grid.addWidget(self.gnkt_number_combo, 3, 2, 3, 1)
+        self.grid.addWidget(self.lenght_gnkt_label, 2, 3)
+        self.grid.addWidget(self.lenght_gnkt_edit, 3, 3)
+        self.grid.addWidget(self.iznos_gnkt_label, 2, 4)
+        self.grid.addWidget(self.iznos_gnkt_edit, 3, 4)
+        self.grid.addWidget(self.pvo_number_label, 2, 5)
+        self.grid.addWidget(self.pvo_number_edit, 3, 5)
+
+        self.grid.addWidget(self.current_bottom_label, 4, 2)
+        self.grid.addWidget(self.current_bottom_edit, 5, 2)
+        self.grid.addWidget(self.fluid_label, 4, 3)
+        self.grid.addWidget(self.fluid_edit, 5, 3)
+        self.grid.addWidget(self.osvoenie_label, 4, 4)
+        self.grid.addWidget(self.osvoenie_combo, 5, 4)
+
+
+class TabWidget(QTabWidget):
+    def __init__(self, work_plan):
+        super().__init__()
+        self.addTab(TabPageDp(work_plan), 'ГНКТ освоение после ГРП')
+
+
+class GnktOsvWindow(QMainWindow):
+    wb = None
+
+    def __init__(self, sheet, table_title, table_schema, table_widget):
         super(QMainWindow, self).__init__()
+        from work_py.gnkt_frez import Work_with_gnkt
+
+        self.centralWidget = QWidget()
+        self.setCentralWidget(self.centralWidget)
+        # self.tabWidget = tabWidget
         self.table_widget = table_widget
         self.table_title = table_title
         self.table_schema = table_schema
 
         self.dict_perforation = well_data.dict_perforation
-        self.ws = ws
+        self.wb = load_workbook('property_excel/tepmpale_gnkt_osv_grp.xlsx')
+        GnktOsvWindow.wb = self.wb
+        self.ws_schema = self.wb.active
         self.work_plan = 'gnkt_after_grp'
         self.perforation_correct_window2 = None
+        self.wb.sheetnames.insert(0, "Титульник")
+        self.ws_title = self.wb.create_sheet("Титульник", 0)
+        self.ws_work = self.wb.create_sheet(title="Ход работ")
 
-        self.ws_title = Work_with_gnkt.wb_gnkt_frez.create_sheet(title="Титульник")
-        self.ws_schema = Work_with_gnkt.wb_gnkt_frez.create_sheet(title="Схема")
-        self.ws_work = Work_with_gnkt.wb_gnkt_frez.create_sheet(title="Ход работ")
+        create_title = Work_with_gnkt.create_title_list(self, self.ws_title)
+        head = plan.head_ind(well_data.cat_well_min._value, well_data.cat_well_max._value)
+        plan.copy_true_ws(sheet, self.ws_title, head)
 
-        head = plan.head_ind(well_data.cat_well_min, well_data.cat_well_max + 1)
-        # print(f'ff  {head}')p
-        # print(self.ws)
-        plan.copy_true_ws(self.ws, self.ws_title, head)
+        if self.perforation_correct_window2 is None:
+            self.perforation_correct_window2 = GnktOsvWindow2(self)
+            self.perforation_correct_window2.setWindowTitle("Данные по ГНКТ")
+            self.perforation_correct_window2.setGeometry(200, 400, 100, 400)
+            self.perforation_correct_window2.show()
+            main.MyWindow.pause_app()
+            well_data.pause = True
 
-        create_title = self.create_title_list(self.ws_title)
-        schema_well = self.schema_well(self.ws_schema)
+            self.work_schema = self.perforation_correct_window2.add_work()
+
+            # print(self.work_schema)
+            self.perforation_correct_window2 = None
+
+        else:
+            self.perforation_correct_window2.close()
+            self.perforation_correct_window2 = None
+        # schema_well = self.schema_well(self.ws_schema, )
+        self.copy_pvr(self.ws_schema, self.work_schema)
+        # self.wb.save(f"{well_data.well_number._value} {well_data.well_area._value} ГНКТ освоение.xlsx")
+        # print('файл сохранен')
 
         main.MyWindow.copy_pz(self, self.ws_title, table_title, self.work_plan, 13, 1)
-        main.MyWindow.copy_pz(self, self.ws_schema, table_schema, self.work_plan, 47, 2)
+        main.MyWindow.copy_pz(self, self.ws_schema, table_schema, self.work_plan, 23, 2)
         main.MyWindow.copy_pz(self, self.ws_work, table_widget, self.work_plan, 12, 3)
-        work_well = self.work_gnkt_frez(self.ports_data, self.plast_work)
+        work_well = self.gnkt_work(
+            GnktOsvWindow2.fluid_edit, GnktOsvWindow2.pvo_number, GnktOsvWindow2.current_bottom_edit,
+         GnktOsvWindow2.osvoenie_combo_need)
         main.MyWindow.populate_row(self, 0, work_well, table_widget)
-
         CreatePZ.add_itog(self, self.ws_work, self.table_widget.rowCount() + 1, self.work_plan)
+
+        # CreatePZ.add_itog(self, self.ws_work, self.table_widget.rowCount() + 1, self.work_plan)
         # Work_with_gnkt.wb_gnkt_frez.save(f"{well_data.well_number} {well_data.well_area} {well_data.cat_P_1}
         # категории.xlsx")
         # print('файл сохранен')
 
-    def count_row_height(self, ws2, work_list, sheet_name):
-       
-        from openpyxl.utils.cell import range_boundaries, get_column_letter
+        # self.buttonAdd = QPushButton('Добавить данные в план работ')
+        # self.buttonAdd.clicked.connect(self.add_work)
+        # vbox = QGridLayout(self.centralWidget)
+        # vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
+        # vbox.addWidget(self.buttonAdd, 2, 0)
 
-        colWidth = [2.85546875, 14.42578125, 16.140625, 22.85546875, 17.140625, 14.42578125, 13.0, 13.0, 17.0,
-                     14.42578125, 13.0, 21, 12.140625, None]
+    def gnkt_work(self, fluid_work_insert, pvo_number_edit, current_bottom_edit, osvoenie_combo_need):
+        from cdng import events_gnvp_frez
 
-        text_width_dict = {35: (0, 100), 50: (101, 200), 70: (201, 300), 110: (301, 400), 120: (401, 500),
-                           130: (501, 600), 150: (601, 700), 170: (701, 800), 190: (801, 900), 230: (901, 1500)}
+        fluid_work, well_data.fluid_work_short = GnoWindow.calc_work_fluid(self, fluid_work_insert)
 
-        boundaries_dict = {}
+        distance, _ = QInputDialog.getInt(None, 'Расстояние НПТЖ', 'Введите Расстояние до ПНТЖ')
 
-        for ind, _range in enumerate(ws2.merged_cells.ranges):
-            boundaries_dict[ind] = range_boundaries(str(_range))
+        block_gnvp_list = events_gnvp_frez(self, distance, float(fluid_work_insert))
+        gnkt_opz = [
+            [None, 'Порядок работы', None,  None, None, None, None, None, None, None, None, None],
+            [None,  None, 'Наименование работ',  None, None, None, None, None, None, None,
+             'Ответственный', 'Нормы'],
+            [None,
+             None, 'Ознакомить бригаду с планом работ и режимными параметрами '
+                   'дизайна по промывке и СПО. Провести инструктаж по промышленной безопасности',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ', None],
+            [None, None, 'Принять скважину у Заказчика по акту '
+                         '(состояние ф/арматуры и кустовой площадки.).',
+             None, None, None, None, None, None, None, 'Мастер ГНКТ'],
+            [None, None, 'Расставить оборудование и технику согласно '
+                         '«Типовой схемы расстановки оборудования и спецтехники при '
+                         'проведении капитального ремонта скважин с использованием установки «Койлтюбинг».',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ, состав бригады', None],
+            [None, 3, 'Произвести завоз технологической жидкости в V не менее 10м3 '
+                      f'плотностью {fluid_work}. Солевой раствор солевой раствор в объеме ГНКТ',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ, состав бригады', None],
+            [None, 4, 'При наличии, согласно плана заказа Н2S, добавить в завезенную промывочную '
+                      'жидкость нейтрализатора сероводорода "Реком-102" в концентрации 0,5л на 10м³',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ, состав бригады', None],
 
-        for key, value in boundaries_dict.items():
-            ws2.unmerge_cells(start_column=value[0], start_row=value[1],
-                              end_column=value[2], end_row=value[3])
-        ins_ind = 1
+            [None, 6, 'Внимание: при проведении работ по ОПЗ с кислотными составами, весь состав вахты '
+                      'обязан применять СИЗ (Инструкция П1-01.03 И-0128 ЮЛ-305 ООО"Башнефть-Добыча")',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ, состав бригады ГНКТ', None],
+            [None, 7, 'Примечание: на месте проведения работ по ОПЗ кислотами и их смесями должен быть '
+                      'аварийный запас спецодежды, спецобуви и других средств индивидуальной защиты, запас '
+                      'чистой пресной воды и средств нейтрализации кислоты (мел, известь, хлорамин).',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ, состав бригады', None],
+            [None, 'МОНТАЖ И ОПРЕССОВКА', None,
+             None, None, None, None, None, None, None,
+             None, None, ],
+            [None, 9, 'Собрать Компоновку Низа Колонны-1 далее КНК-1: '
+                      '(насадка-промывочная D-38мм + сдвоенный обратный клапан.)',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ, бур-к КРС, машинист подъёмника, пред. УСРСиСТ', 0.5],
+            [None, 10, f'Произвести монтаж 4-х секционного превентора БП 80-70.00.00.000 (700атм) {pvo_number_edit} '
+                       f'и инжектора н'
+                       f'а устье скважины согласно «Схемы обвязки № 5 устья противовыбросовым оборудованием при '
+                       f'производстве работ по промывке скважины с установкой «ГНКТ» утвержденная главным '
+                       f'инженером от 14.10.2021г. Произвести обвязку установки ГНКТ, насосно-компрессорного '
+                       f'агрегата, желобной циркуляционной системы.',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ, представ.БВО (вызов по телефонограмме при необходимости)', 2],
+            [None, 11, f'Внимание: Все требования ПБ и ОТ должны быть доведены до сведения работников, '
+                       f'персонал должен быть проинформирован о начале проведения опрессовок. Все опрессовки '
+                       f'производить согласно инструкции опрессовки ПВО и инструкции опрессовки нагнетательной '
+                       f'и выкидной линии перед производством работ на скважине с Колтюбинговыми установками.',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ', None],
+            [None, 12, f'При отрицательной температуре окружающей среды, нагреть до t - 50C и прокачать '
+                       f'по ГНКТ солевой раствор в объеме ГНКТ для предотвращения замерзания раствора внутри '
+                       f'г/трубы (получения ледяной пробки).',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ', 2],
+            [None, 13, f'При закрытой центральной задвижке фондовой арматуры опрессовать ГНКТ и все '
+                       f'нагнетательные линии на {round(well_data.max_admissible_pressure._value * 1.5, 1)}атм. '
+                       f'Опрессовать ПВО, обратные клапана и выкидную линию от '
+                       f'устья скважины до желобной ёмкости (надёжно закрепить, оборудовать дроссельными задвижками) '
+                       f'опрессовать на {well_data.max_admissible_pressure._value}атм с выдержкой 30мин. '
+                       f'Опрессовку ПВО зафиксировать в вахтовом журнале. Установить на малом и большом затрубе '
+                       f'технологический манометр. Провести УТЗ и инструктаж. Опрессовку проводить в присутствии мастера, '
+                       f'бурильщика, машиниста подъемника и представителя супервайзерской службы. Получить разрешение на '
+                       f'проведение работ.',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ, состав бригады, представит. Заказчика', 2],
+            [None, 14, f'Ограничения веса и скоростей при СПО',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ, состав бригады, представитель Заказчика', None, ],
+            [None, f'СПУСК ГНКТ В СКВАЖИНУ', None,
+             None, None, None, None, None, None, None,
+             None, None],
 
+            [None, 22, f'Открыв скважину и записав число оборотов задвижки – зафиксировать дату и время. '
+                       f'Спустить КНК-1 в скважину с ПЕРИОДИЧЕСКОЙ прокачкой рабочей жидкостью и проверкой веса на '
+                       f'подъём до получения посадки с целью определения глубины "головы" проппанта.',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ, ', 4.5],
+            [None, 23,
+             f'ВНИМАНИЕ: При получении посадки до гл. {well_data.depth_fond_paker_do["do"]}м и наличии разгрузки на промывочный '
+             f'инструмент более 500кг  (уведомить Заказчика – '
+             f'составить АКТ на посадку). Приподнять КНК-1 на 20м выше глубины посадки. '
+             f'Произвести вывод НКА на рабочий режим, восстановить '
+             f'устойчивую циркуляцию промывочной жидкости (расход 180-190л/мин), '
+             f'произвести промывку лифта НКТ до гл.{well_data.depth_fond_paker_do["do"]}м с постоянным контролем промывочной жидкости '
+             f'в обратной ёмкости на наличие мех. примесей. Скорость спуска при промывке НКТ от проппанта до '
+             f'гл.{well_data.depth_fond_paker_do["do"]}м не более 5м/мин. Контрольная проверка веса при вымыве проппанта - '
+             f'через каждые 100м промывки на высоту не менее 5-10м со скоростью подъёма ГНКТ при проверке веса не '
+             f'более 5м/мин. Внимание: после промывки НКТ до гл.2087м приподнять ГТ на 20м выше '
+             f'пакера и '
+             f'промыться до выхода чистой тех. жидкости (без мех.примесей) и '
+             f'только после этого продолжить промывку ниже пакера', 2.5],
+            [None,  f'НОРМАЛИЗАЦИЯ ЗАБОЯ СКВАЖИНЫ', None,
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ,', None],
+            [None, 25,
+             f'После отбивки текущего забоя (головы проппанта) произвести подъем КНК -1 до гл.{well_data.depth_fond_paker_do["do"] - 20}м.',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ', 12.5],
+            [None, 26,
+             f'Произвести запуск и вывести Азотный комплекс и НКА на рабочий режим. Получить стабильную круговую циркуляцию '
+             f'азотированной смеси, - циркуляция по жидкости не менее 120л/мин; 10м3/мин по азоту в течении 30мин '
+             f'с контролем на мех примеси в обратной ёмкости.',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ, состав бригады', 1],
+            [None, 27,
+             'ВНИМАНИЕ. В процессе промывки скважины, параметры азотированной промывочной смеси могут изменяться '
+             '(от 80 до 200л/мин по жидкости и от 8 до 20м3/мин по азоту) в зависимости от '
+             'качества выноса посторонних частиц с забоя, данный процесс находится под постоянным контролем у ст.мастера ГНКТ.',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ', 0.5],
+            [None, 28, 'Произвести доспуск КНК-1 с циркуляцией на азотированной смеси со скоростью 2 м/мин, '
+                       'с проверкой веса на подъём со скоростью не более 3 м/мин через каждые 30м интервала до гл. '
+                       'посадки. Добиться устойчивой циркуляции азотированной смеси.',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ, состав бригады', None],
+            [None, 29, 'ВНИМАНИЕ: При промывке, во избежании риска прихвата ГНКТ, производить сопровождение '
+                       'вымытой пачки со скоростью 2-3м/мин. Производить промывку до выхода чистой тех. '
+                       'жидкости и только после этого продолжать промывку.',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ', None],
+            [None, 28, 'Произвести допуск компоновки с промывкой со скоростью 2 м/мин, с проверкой веса '
+                       f'на подъём со скоростью не более 3 м/мин через каждые 10-20м интервала промывки '
+                       f'до глубины {current_bottom_edit}м. В случае отсутствия проходки, '
+                       f'согласовать максимально достигнутый забой с Заказчиком.',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ, состав бригады', 0.7],
+            [None, 29,
+             f'При достижении глубины {current_bottom_edit}м произвести прокачку гелевой пачки в V=2-3м3, '
+             f'промыть скважину в течении 120мин до выхода чистой, без посторонних примесей, '
+             f'промывочной жидкости.',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ', 2.5],
+            [None, 29, f'ПОДТВЕРЖДЕНИЕ НОРМАЛИЗОВАННОГО ЗАБОЯ',
+             None, None, None, None, None, None, None,
+             None, None],
+            [None, 29,
+             f'Приподнять КНК-1 на ГНКТ не прекращая циркуляции до гл.{well_data.depth_fond_paker_do["do"] - 20}м. '
+             f'Убедиться в отсутствии мех. примесей в промывочной жидкости, остановить подачу '
+             f'жидкости НКА и ПАУ.',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ', 0.5],
+            [None, 29, f'Произвести тех.отстой скважины для оседания твёрдых частиц в течении 2х часов.',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ', 2],
+            [None, 29, f'По истечении 2х часов, произвести допуск КНК-1 на г/трубе в скважину '
+                       f'«без циркуляции» до гл. {current_bottom_edit}м. '
+                       f'Забой должен соответствовать ранее нормализованному. Составить АКТ на забой совмесно '
+                       f'с представителем Заказчика. При отсутствии нормализованного забоя на гл.{current_bottom_edit}м, '
+                       f'по согласованию с Заказчиком, провести работы по нормализации забоя.',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ', 0.5],
 
-        for i in range(1, len(work_list) + 1):  # Добавлением работ
-            if str(work_list[i-1][1]).isdigit() and i>39: # Нумерация
-                work_list[i-1][1] = str(ins_ind)
-                ins_ind += 1
-            for j in range(1, 13):
-                cell = ws2.cell(row=i, column=j)
+            [None, 29, f'При наличии забоя на гл.{current_bottom_edit}м, '
+                       f'по согласованию с Заказчиком: ',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ', None],
+            [None, 29, f'Произвести замер избыточного давления в течении 2ч при условии заполнения '
+                       f'ствола ствола жидкостью уд.весом {fluid_work}г/см3. Произвести перерасчет '
+                       f'забойного давления, Согласовать с заказчиком глушение скважин и необходимый '
+                       f'удельный вес жидкости глушения, допустить КНК до {current_bottom_edit}м ',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ', 2.5],
+            [None, f'ГЛУШЕНИЕ СКВАЖИНЫ', None,
+             None, None, None, None, None, None, None,
+             None, None],
+            [None, 29, f'Произвести перевод на тех жидкость расчетного удельного веса '
+                       f'в объеме {self.calc_volume_jumping()}м3 (объем хвостовика + объем НКТ + 20 % запаса) '
+                       f'с ПРОТЯЖКОЙ ГНКТ СНИЗУ ВВЕРХ с выходом по малому затрубу. Т'
+                       f'ех отстой 2ч. В случае отрицательного результата по глушению скважины '
+                       f'произвести перерасчет ЖГС и повторить операцию.'
+                       f'ПРИ ПРОВЕДЕНИИ ВЕСТИ ГЛУШЕНИЯ КОНТРОЛЬ ЗА БАЛАНСОМ МЕЖДУ ОБЪЕМОМ'
+                       f' ЗАКАЧИВАЕМОЙ И ВЫХОДЯЩЕЙ ЖИДКОСТЬЮ',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ', 4.5],
+            [None, 29, f'Закрыв скважину и записав число оборотов задвижки – зафиксировать дату и время.',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ', None],
+            [None,  f'ОТБИВКА ЗАБОЯ ПО ГК и ЛМ', None,
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ', None],
+            [None, 29, f'По согласованию с Заказчиком, проведение ГИС - отбивка забоя по ГК, МЛМ.'
+                       f'Заявку на промыслово-геофизические исследования для подтверждения забоя подавать за 24 часа',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ', 4],
+            [None,  f'ДЕМОНТАЖ И ОСВОБОЖДЕНИЕ ТЕРРИТОРИИ', None,
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ', None],
+            [None, 29, f'После закрытия задвижки - отдуть г/трубу азотом.',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ', None],
+            [None, 29, f'Произвести демонтаж превентора и инжектора, установки ГНКТ. '
+                       f'Очистить желобные ёмкости от проппанта в мешки – приготовить к вывозу. Составить '
+                       f'Акт на количество вымытого проппанта. Произвести демонтаж рабочих линий, рабочей площадки.'
+                       f'Внимание: произвести вывоз мешков с вымытым проппантом и отработанной '
+                       f'технологической жидкости на пункты утилизации, соглаованный с Заказчиком.',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ', 2.5],
+            [None, 29, f'Сдать скважину представителю Заказчика Составить АКТ.',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ', None],
+            [None, 29, f'Контроль выхода малого затруба',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ', None],
+            [None, 29, f'Во время промывки - выход малого затруба постоянно должен находиться под '
+                       f'контролем. На желобной ёмкости постоянно осуществляется наблюдение за '
+                       f'наличием проппанта и мех. примесей на выходной линии. Перед началом '
+                       f'промывки – необходимо отрегулировать штуцерный монифольд так, как это '
+                       f'необходимо – уровень промывочной жидкости в циркуляционной ёмкости не должен уменьшаться. '
+                       f'Уровень жидкости должен находиться под постоянным наблюдением, '
+                       f'чтобы избежать потери жидкости в пласт. Во время промывки уровень жидкости должен немного '
+                       f'увеличиваться или оставаться неизменным. Промывку от проппанта производить со '
+                       f'скоростью не более 2м/мин, с проверкой веса на подъём через каждые 30м промывки, '
+                       f'не превышая скорость подъёма г/трубы 3м/мин.',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ', None],
+            [None, 29, f'Действия при приватах ГНКТ.',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ', None],
+            [None, 29,
+             f'ВНИМАНИЕ: При наличии посадок КНК - спуск производить с остановками для промежуточных промывок. '
+             f'В случае прихвата ГНКТ в скважине - проинформировсть ответственного представителя Заказчика и '
+             f'руководство ГНКТ ООО "Ойл-сервис". Дальнейшие действия производить в присутствии представителя '
+             f'Заказчика с составлением АКТа согласно "Плана-Схемы действий при прихватах ГНКТ" '
+             f'ТЕХНОЛОГИЧЕСКОЙ ИНСТРУКЦИИ ОАО «Башнефть добыча»',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ', None],
+            [None, 29, f'Использование хим. реагентов в процессе работ',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ', None],
+            [None, 29,
+             f'При отрицательных температурах окружающего воздуха перед открытием задвижки прокачать по '
+                   f'ГНКТ (горячий солевой раствор в объеме ГНКТ) для предотвращения замерзания раствора внутри ГНКТ '
+                   f'(получения ледяной пробки). ВНИМАНИЕ: Во время промывки возможен резкий вынос большого '
+                   f'объёма проппанта из пласта, что может привести к потере циркуляции и последующему прихвату ГНКТ. '
+                   f'Данную ситуацию можно проследить; при этом вес ГНКТ резко понизиться, а циркуляционное давление начнёт повышаться. '
+                   f'а) Необходимо спуск г/трубы приостановить – произвести промывку с добавлением понизителя трения (0.4-1 л/м3) '
+                   f'до стабилизации рабочего давления, но не менее 4 пачек по 4 м3 каждая. '
+                   f'Продолжить промывку. б) В случае поглощения промывочной жидкости в процессе промывки интервала перфорации - '
+                   f'производить прокачку по г/трубе (вязких пачек V-от 2 м3 до 4 м3), а на забое '
+                   f'(пачку V- 4 м)3 и сопровождение вязкой пачки в пакер через каждые 2м промывки интервала '
+                   f'до полного выноса проппанта на желобную ёмкость.',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ', None],
+            [None, 29,
+             f'После закрытия задвижки - приготовить и прокачать по г/трубе по циркуляции на желобную ёмкость '
+             f'пачку – (ингибитора коррозии в объёме 40л.) - для недопустимости коррозийных отложений в г/трубе. '
+             f'Предположительный расход хим.реагентов на скважину: \n'
+             f'1) Понизитель трения Лубритал - 30л (концентрация 1л/м3) \n'
+             f'2) Загуститель ВГ-4 - 20л (для загеливания тех жидкости и прокачки вязких пачек концентрация 5кг/м3)\n'
+             f'3) Лимонная кислота - 300кг (для разложения геля 1 кг/м3, для кислотных ванн 100кг/м3) \n'
+             f'4) Ингибитор коррозии - 40л (концентрация 1л/м3)',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ', None],
+            [None, 29, f'При наличии корки проппанта',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ', None],
+            [None, 29, f'При отсутствии проходки в процессе промывки и наличии корки спёкшегося проппанта, '
+                       f'по согласованию с Заказчиком, произвести подъём КНК-1 на ГНКТ из скважины, заменить '
+                       f'перо на насадку для резки проппанта. Спустить насадку на г/трубе до глубины посадки '
+                       f'промывочного пера и произвести резку корки проппанта насадкой, но не более 10м от '
+                       f'места посадки. После чего, поднять насадку на г/трубе из скважины, произвести замену '
+                       f'насадки на КНК-1. Произвести спуск промывочного пера на г/трубе до текущего забоя. '
+                       f'Продолжить промывку далее.- В случае неполного выноса проппанта при промывке произвести '
+                       f'подъём компоновки 20м выше пакера и произвести промывку до полного выноса проппанта.',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ', None],
+            [None, 29, f'Ограничения веса и скоростей при СПО:',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ', None],
+            [None, 29,
+             f'Максимальный расчётный вес ГНКТ при подъёме с забоя – {round(current_bottom_edit * 2.2 * 1.1, 0)}кг; '
+             f'при спуске – {round(current_bottom_edit * 2.2 * 0.9, 0)}кг.; в неподвижном состоянии - '
+             f'{round(current_bottom_edit * 2.2, 0)}кг.',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ', None],
+            [None, 29, f'Скорость спуска по интервалам:\n'
+                       f'в устьевом оборудовании не более 0.5м/мин;\n'
+                       f'в интервале 2 -{well_data.depth_fond_paker_do["do"] - 20}м не более 10-15м/мин '
+                       f'(первичный-последующий спуск);\n'
+                       f'в интервале {well_data.depth_fond_paker_do["do"] - 20}-{well_data.perforation_roof - 10}м не '
+                       f'более 2м/мин;\n'
+                       f'в интервале {well_data.perforation_roof - 10}-{well_data.perforation_sole + 10}м не более 10 м/мин;\n'
+                       f'в интервале {well_data.perforation_sole + 10}-{current_bottom_edit}м не более 2-5 м/мин;',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ', None],
+            [None, 29, f'Скорость подъёма по интервалам:\n'
+                       f'в интервале забой-{well_data.perforation_sole + 10}м не более 10 м/мин;\n'
+                       f'в интервале {well_data.perforation_sole + 10}-{well_data.perforation_roof - 10} не более 2 м/мин;\n'
+                       f'в интервале {well_data.depth_fond_paker_do["do"] - 20}-2м не более 15-20 м/мин;\n'
+                       f'в устьевом оборудовании не более 0.5 м/мин.',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ', None],
+            [None, 29, f'В процессе спуска производить приподъёмы для проверки веса на высоту не '
+                       f'менее 20м со скоростью не более 5м/мин через каждые 300-500м спуска (первичный-последующий спуск).',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ', None],
+            [None, 29, f'Перед каждой промывкой и после проверять веса ГТ (вверх, вниз, собств.)',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ', None],
 
-                if cell and str(cell) != str(work_list[i - 1][j - 1]):
-                    if str(work_list[i - 1][j - 1]).replace('.', '').isdigit() and \
-                            str(work_list[i - 1][j - 1]).count('.') != 2:
-                        cell.value = str(work_list[i - 1][j - 1]).replace('.', ',')
-                        # print(f'цифры {cell.value}')
-                    else:
-                        cell.value = work_list[i - 1][j - 1]
+            [None, 29,
+             f'Не допускать увеличение нагрузки на г/трубу в процессе спуска. РАЗГРУЗКА Г/ТРУБЫ НЕ БОЛЕЕ 500 кг от '
+             f'собственного веса на этой глубине.',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ', None],
+            [None, 29,
+             f'При проведении технологического отстоя - не оставлять ГНКТ без движения: производить расхаживания'
+             f' г/трубы на 20м '
+             f'вверх и на 20м вниз со скоростью СПО не более 3м/мин. При отрицательной температуре окружающей среды, '
+             f'во избежании получения ледяной '
+             f'пробки в г/трубе при проведении тех.отстоя ни в коем случае не прекращать минимальную циркуляцию '
+             f'жидкости по г/трубе.',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ', None]
+        ]
+        osvoenie_list = [[None,  f'ОСВОЕНИЕ СКВАЖИНЫ', None,
+             None, None, None, None, None, None, None,
+             None, None],
+            [None, 29, f'Установить КНК-1 на гл.{well_data.depth_fond_paker_do["do"] - 20}м, произвести вывод на '
+                       f'режим мобильного азотного комплекса. Дождаться выхода пузыря азота. '
+                       f'В случае отсутствия выхода пузыря азота более 1-1.5 часа - начать постепенный приподъём ГНКТ, не '
+                       f'прекращая отдувки, до выхода пузыря азота. После получения прорыва азота и выхода пузыря - '
+                       f'произвести допуск ГНКТ с одновременной отдувкой азотом до гл. {current_bottom_edit}м',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ', 1],
+            [None, 29,
+             f'Произвести освоение скважины один цикл в течении 4х часов с расходом по азоту в процессе освоения: \n'
+             f'Первый час освоения - расход азота не менее 14м3/мин; \n'
+             f'Второй час освоения - расход азота не менее 16м3/мин; ',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ', 4],
+            [None, 29, f'Последующие 2 часа освоения производить на выбранном оптимальном режиме освоения '
+                       f'(по согласованию с Заказчиком) позволяющим производить оптимальный отбор флюида из пласта. '
+                       f'В ПРОЦЕССЕ ОСВОЕНИЯ (не оставлять г/трубу без движения) ПРОИЗВОДИТЬ ПРИПОДЪЁМЫ '
+                       f'ГНКТ ЧЕРЕЗ 15-20 МИНУТ ВВЕРХ-ВНИЗ НА 20м. '
+                       f'В процессе освоения проводить замеры притока каждый час и общее количество '
+                       f'отобранной из пласта жидкости. В сводке отразить: процентное содержание нефти '
+                       f'в возвратной жидкости, средний приток пластового флюида, количество отобранной из '
+                       f'пласта жидкости. Отбор проб производить каждый  час. Пробы отбирать через пробоотборник, '
+                       f'расположенный согласно схеме обвязки устья. По отдельному запросу геологической службы, '
+                       f'пробы предоставлять оператору ЦДНГ для определения КВЧ и процентного содержания воды, '
+                       f'с составлением акта передачи проб.',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ', None],
+            [None, f'ПОДТВЕРЖДЕНИЕ НОРМАЛИЗОВАННОГО ЗАБОЯ', None,
+             None, None, None, None, None, None, None,
+             None, None],
+            [None, 29, f'По окончании освоения, остановить закачку азота, '
+                       f'дождаться полного выхода азота из скважины и произвести тех.отстой '
+                       f'скважины для оседания твёрдых частиц – в течении 2 часов',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ', 2],
+            [None, 29, f'По истечении 2х часов, произвести допуск КНК-1 на г/трубе в скважину '
+                       f'«без циркуляции» до гл. {current_bottom_edit}м.'
+                       f' Забой должен соответствовать – {current_bottom_edit}м. '
+                       f'Составить АКТ на забой совмесно с представителем Заказчика. '
+                       f'При отсутствии нормализованного забоя на гл. {current_bottom_edit}м '
+                       f'(по согласованию с Заказчиком) - провести работы по нормализации забоя.',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ', 0.5],
+        ]
+        if osvoenie_combo_need == 'Да':
+            for index, row in enumerate(osvoenie_list):
+                gnkt_opz.insert(index + 32, row)
 
+        for row in block_gnvp_list[::-1]:
+            gnkt_opz.insert(0, row)
+        return gnkt_opz
 
+    def calc_volume_jumping(self):
+        from work_py.alone_oreration import volume_vn_ek, volume_vn_nkt
+        volume = round((volume_vn_ek(well_data.current_bottom) *
+                        (well_data.current_bottom - well_data.depth_fond_paker_do["do"]) / 1000 +
+                        volume_vn_nkt(well_data.dict_nkt) *
+                        well_data.depth_fond_paker_do["do"] / 1000) * 1.2, 1)
+        return volume
 
-
-
-        # print(merged_cells_dict)
-        if sheet_name != 'Ход работ':
-            for key, value in boundaries_dict.items():
-                # print(value)
-                ws2.merge_cells(start_column=value[0], start_row=value[1],
-                                end_column=value[2], end_row=value[3])
-
-
-
-
-        elif sheet_name == 'Ход работ':
-            for i, row_data in enumerate(work_list):
-                # print(f'gghhg {work_list[i][2]}')
-                for column, data in enumerate(row_data):
-                    if column == 2:
-                        if not data is None:
-                            text = data
-                            for key, value in text_width_dict.items():
-                                if value[0] <= len(text) <= value[1]:
-                                    ws2.row_dimensions[i + 1].height = int(key)
-                    elif column == 1:
-                        if not data is None:
-                            text = data
-                            # print(text)
-                            for key, value in text_width_dict.items():
-                                if value[0] <= len(text) <= value[1]:
-                                    ws2.row_dimensions[i + 1].height = int(key)
-                    if column != 0:
-                        ws2.cell(row=i + 1, column=column + 1).border = well_data.thin_border
-                    if column == 1 or column == 11:
-                        ws2.cell(row=i + 1, column=column + 1).alignment = Alignment(wrap_text=True, horizontal='center',
-                                                                                 vertical='center')
-                        ws2.cell(row=i + 1, column=column + 1).font = Font(name='Arial', size=13, bold=False)
-                    else:
-                        ws2.cell(row=i + 1, column=column + 1).alignment = Alignment(wrap_text=True, horizontal='left',
-                                                                                     vertical='center')
-                        ws2.cell(row=i + 1, column=column + 1).font = Font(name='Arial', size=13, bold=False)
-                        if 'примечание' in str(ws2.cell(row=i + 1, column=column + 1).value).lower() or \
-                            'внимание' in str(ws2.cell(row=i + 1, column=column + 1).value).lower() or \
-                            'мероприятия' in str(ws2.cell(row=i + 1, column=column + 1).value).lower() or \
-                            'порядок работ' in str(ws2.cell(row=i + 1, column=column + 1).value).lower() or \
-                            'По доп.согласованию с Заказчиком' in str(ws2.cell(row=i + 1, column=column + 1).value).lower():
-                            # print('есть жирный')
-                            ws2.cell(row=i + 1, column=column + 1).font = Font(name='Arial', size=13, bold=True)
-
-                if len(work_list[i][1]) > 5:
-                    ws2.merge_cells(start_column=2, start_row= i + 1, end_column= 12, end_row=i + 1)
-                    ws2.cell(row=i + 1, column=2).alignment = Alignment(wrap_text=True, horizontal='center',
-                                                                        vertical='center')
-                    ws2.cell(row=i + 1, column=2).fill = PatternFill(start_color='C5D9F1', end_color='C5D9F1',
-                                                                      fill_type='solid')
-                    ws2.cell(row=i + 1, column=2).font = Font(name='Arial', size=13, bold=True)
-
-                else:
-                    ws2.merge_cells(start_column=3, start_row=i + 1, end_column=11, end_row=i + 1)
-                    ws2.cell(row=i + 1, column=3).alignment = Alignment(wrap_text=True, horizontal='left',
-                                                                            vertical='center')
-
-
-
-
-            for col in range(13):
-                ws2.column_dimensions[get_column_letter(col + 1)].width = colWidth[col]
-
-            ws2.print_area = f'B1:L{self.table_widget.rowCount() + 45}'
-            ws2.page_setup.fitToPage = True
-            ws2.page_setup.fitToHeight = False
-            ws2.page_setup.fitToWidth = True
-            ws2.print_options.horizontalCentered = True
-            # зададим размер листа
-            ws2.page_setup.paperSize = ws2.PAPERSIZE_A4
-            # содержимое по ширине страницы
-            ws2.sheet_properties.pageSetUpPr.fitToPage = True
-            ws2.page_setup.fitToHeight = False
-
-        for row_ind, row in enumerate(ws2.iter_rows(values_only=True)):
-            for col, value in enumerate(row):
-                if 'А.Р. Хасаншин' in str(value):
-                    coordinate = f'{get_column_letter(col + 1)}{row_ind - 1}'
-                    self.insert_image(ws2, 'imageFiles/Хасаншин.png', coordinate)
-                elif 'Д.Д. Шамигулов' in str(value):
-                    coordinate = f'{get_column_letter(col + 1)}{row_ind - 2}'
-                    self.insert_image(ws2, 'imageFiles/Шамигулов.png', coordinate)
-                elif 'Зуфаров' in str(value):
-                    coordinate = f'{get_column_letter(col - 2)}{row_ind}'
-                    self.insert_image(ws2, 'imageFiles/Зуфаров.png', coordinate)
-                elif 'М.К.Алиев' in str(value):
-                    coordinate = f'{get_column_letter(col - 1)}{row_ind - 2}'
-                    self.insert_image(ws2, 'imageFiles/Алиев махир.png', coordinate)
-                elif 'З.К. Алиев' in str(value):
-                    coordinate = f'{get_column_letter(col - 1)}{row_ind - 2}'
-                    self.insert_image(ws2, 'imageFiles/Алиев Заур.png', coordinate)
-                    break
-        print(f'{sheet_name} - вставлена')
+    def copy_pvr(self, ws, work_list):
+        for row in range(len(work_list)):
+            for col in range(23):
+                if work_list[row][col]:
+                    ws.cell(row=row + 1, column=col + 1).value = work_list[row][col]
+        # Перебираем строки и скрываем те, у которых все значения равны None
+        for row_ind, row in enumerate(ws.iter_rows(values_only=True)):
+            if all(value is None for value in row[:42]):
+                ws.row_dimensions[row_ind + 1].hidden = True
+        coordinate = f'E2'
+        main.MyWindow.insert_image(self, ws, 'imageFiles/schema_well/column.png', coordinate, 170, 1280)
 
     def save_to_gnkt(self):
-       
 
-        sheets = ["Титульник", 'Схема', 'Ход работ']
+        sheets = ["Титульник", 'СХЕМА', 'Ход работ']
         tables = [self.table_title, self.table_schema, self.table_widget]
 
         for i, sheet_name in enumerate(sheets):
-            worksheet = Work_with_gnkt.wb_gnkt_frez[sheet_name]
+            worksheet = GnktOsvWindow.wb[sheet_name]
             table = tables[i]
-
             work_list = []
             for row in range(table.rowCount()):
                 row_lst = []
@@ -219,488 +586,29 @@ class Work_with_gnkt(QMainWindow):
                 work_list.append(row_lst)
             Work_with_gnkt.count_row_height(self, worksheet, work_list, sheet_name)
 
-        ws6 = Work_with_gnkt.wb_gnkt_frez.create_sheet(title="СХЕМЫ КНК_44,45")
-        main.MyWindow.insert_image(self, ws6, 'imageFiles/schema_well/СХЕМЫ КНК_44,45.png', 'A1', 550, 900)
-        ws7 = Work_with_gnkt.wb_gnkt_frez.create_sheet(title="СХЕМЫ КНК_38,1")
+        # ws6 = GnktOsvWindow.wb.create_sheet(title="СХЕМЫ КНК_44,45")
+        # main.MyWindow.insert_image(self, ws6, 'imageFiles/schema_well/СХЕМЫ КНК_44,45.png', 'A1', 550, 900)
+        ws7 = GnktOsvWindow.wb.create_sheet(title="СХЕМЫ КНК_38,1")
         main.MyWindow.insert_image(self, ws7, 'imageFiles/schema_well/СХЕМЫ КНК_38,1.png', 'A1', 550, 900)
 
         # path = 'workiii'
         path = 'D:\Documents\Desktop\ГТМ'
-        filenames = f"{well_data.well_number} {well_data.well_area} кат {well_data.cat_P_1} {self.work_plan}.xlsx"
+        filenames = f"{well_data.well_number._value} {well_data.well_area._value} кат {well_data.cat_P_1[0]} {self.work_plan}.xlsx"
         full_path = path + '/' + filenames
-        # print(f'10 - {ws2.max_row}')
-        # print(wb2.path)
-        # print(f' кате {well_data.cat_P_1}')
 
         if well_data.bvo is True:
-            ws5 = Work_with_gnkt.wb_gnkt_frez.create_sheet('Sheet1')
+            ws5 = GnktOsvWindow.wb.create_sheet('Sheet1')
             ws5.title = "Схемы ПВО"
-            ws5 = Work_with_gnkt.wb_gnkt_frez["Схемы ПВО"]
-            Work_with_gnkt.wb_gnkt_frez.move_sheet(ws5, offset=-1)
+            ws5 = GnktOsvWindow.wb["Схемы ПВО"]
+            GnktOsvWindow.wb.move_sheet(ws5, offset=-1)
             # schema_list = self.check_pvo_schema(ws5, ins_ind + 2)
 
-        if Work_with_gnkt.wb_gnkt_frez:
-            Work_with_gnkt.wb_gnkt_frez.remove(Work_with_gnkt.wb_gnkt_frez['Sheet'])
-
-            main.MyWindow.saveFileDialog(self, Work_with_gnkt.wb_gnkt_frez, full_path)
-
+        if GnktOsvWindow.wb:
+            main.MyWindow.saveFileDialog(self, GnktOsvWindow.wb, full_path)
             Work_with_gnkt.wb_gnkt_frez.close()
             print(f"Table data saved to Excel {full_path} {well_data.number_dp}")
         if self.wb:
             self.wb.close()
-
-    def create_title_list(self, ws2):
-       
-
-        well_data.region = block_name.region(well_data.cdng)
-        self.region = well_data.region
-
-        title_list = [
-            [None, None, None, None, None, None, None, None, None, None, None, None],
-            [None, None, None, None, None, None, None, None, None, None, None, None],
-            [None, 'ООО «Башнефть-Добыча»', None, None, None, None, None, None, None, None, None, None],
-            [None, None, None, f'{well_data.cdng}', None, None, None, None, None, None, None, None],
-            [None, None, None, None, None, None, None, None, None, None, None, None],
-            [None, None, None, None, None, None, None, None, None, None, None, None],
-            [None, 'ПЛАН РАБОТ НА СКВАЖИНЕ С ПОМОЩЬЮ УСТАНОВКИ С ГИБКОЙ ТРУБОЙ', None, None, None,
-             None, None, None, None, None, None, None],
-
-            [None, None, None, None, None, None, None, None, None, None, None, None],
-            [None, None, '№ скважины:', f'{well_data.well_number}', 'куст:', None, 'Месторождение:', None, None,
-             well_data.well_oilfield, None, None],
-            [None, None, 'инв. №:', well_data.inv_number, None, None, None, None, 'Площадь: ', well_data.well_area, None,
-             1],
-            [None, None, None, None, None, None, None, None, None, None, None, None]]
-
-        razdel = razdel_1(self, self.region)
-        for row in razdel:  # Добавлением работ
-            title_list.append(row)
-
-        for row in [
-            [None, None, None, None, None, "дата", datetime.now().strftime('%d.%m.%Y'), None, None, None, None]]:
-            title_list.insert(-1, row)
-        # print(title_list)
-        index_insert = 11
-        ws2.cell(row=1, column=2).alignment = Alignment(wrap_text=False, horizontal='left',
-                                                        vertical='center')
-        ws2.cell(row=1, column=4).alignment = Alignment(wrap_text=False, horizontal='left',
-                                                        vertical='center')
-        # ws2.column_dimensions[get_column_letter(1)].width = 15
-        # ws2.column_dimensions[get_column_letter(2)].width = 20
-        # ws2.column_dimensions[get_column_letter(3)].width = 20
-        a = None
-        for row in range(len(title_list)):  # Добавлением работ
-            if row not in range(8, 13):
-                ws2.row_dimensions[row].height = 35
-            for col in range(1, 12):
-                ws2.column_dimensions[get_column_letter(col)].width = 15
-                cell = ws2.cell(row=row + index_insert, column=col)
-                # print(f' Х {title_list[i ][col - 1]}')
-                if title_list[row - 1][col - 1] != None:
-                    ws2.cell(row=row + index_insert, column=col).value = str(title_list[row - 1][col - 1])
-                ws2.cell(row=row + index_insert, column=col).font = Font(name='Arial', size=11, bold=False)
-                ws2.cell(row=row + index_insert, column=col).alignment = Alignment(wrap_text=False, horizontal='left',
-                                                                                   vertical='center')
-                if 'ПЛАН РАБОТ' in str(title_list[row - 1][col - 1]):
-                    ws2.merge_cells(start_row=row + index_insert, start_column=2, end_row=row + index_insert,
-                                    end_column=11)
-                    ws2.merge_cells(start_row=row -4 + index_insert, start_column=2, end_row=row -4 + index_insert,
-                                    end_column=4)
-                    ws2.cell(row=row + index_insert, column=col).font = Font(name='Arial', size=14, bold=True)
-                    ws2.cell(row=row + index_insert, column=col).alignment = Alignment(wrap_text=False,
-                                                                                       horizontal='center',
-                                                                                       vertical='center')
-                if 'СОГЛАСОВАНО:' in str(title_list[row - 1][col - 1]):
-                    a = row + index_insert
-
-            # for row in range(len(title_list)):  # Добавлением работ
-            if a:
-                if a > row:
-                    # print(f'сссооссоссо {row + index_insert}')
-                    ws2.merge_cells(start_row=row + index_insert, start_column=2, end_row=row + index_insert,
-                                    end_column=6)
-                    ws2.merge_cells(start_row=row + index_insert, start_column=8, end_row=row + index_insert,
-                                    end_column=11)
-
-        ws2.print_area = f'B1:K{44}'
-        ws2.page_setup.fitToPage = True
-        ws2.page_setup.fitToHeight = False
-        ws2.page_setup.fitToWidth = True
-        ws2.print_options.horizontalCentered = True
-        # зададим размер листа
-        ws2.page_setup.paperSize = ws2.PAPERSIZE_A4
-
-    def schema_well(self, ws3):
-        from work_py.alone_oreration import volume_vn_nkt, well_volume
-
-        boundaries_dict = {}
-
-        rowHeights1 = []
-
-        colWidth = []
-
-        self.plast_work = well_data.plast_all[0]
-        plast_work = self.plast_work
-        # print(self.plast_work, list(well_data.dict_perforation[plast_work]))
-        self.pressuar = list(well_data.dict_perforation[plast_work]["давление"])[0]
-
-        zamer = list(well_data.dict_perforation[plast_work]['замер'])[0]
-        vertikal = min(map(float, list(well_data.dict_perforation[plast_work]["вертикаль"])))
-        self.fluid = self.calc_fluid()
-        zhgs = f'{self.fluid}г/см3'
-        koef_anomal = round(float(self.pressuar) * 101325 / (float(vertikal) * 9.81 * 1000), 1)
-        nkt = int(list(well_data.dict_nkt.keys())[0])
-        if nkt == 73:
-            nkt_widht = 5.5
-        elif nkt == 89:
-            nkt_widht = 6.5
-        elif nkt == 60:
-            nkt_widht = 5
-        lenght_nkt = sum(list(map(int, well_data.dict_nkt.values())))
-
-
-
-        arm_grp, ok = QInputDialog.getInt(None, 'Арматура ГРП',
-                                          'ВВедите номер Арматуры ГРП', 16, 0, 500)
-
-        gnkt_lenght, _ = QInputDialog.getInt(None, 'Длина ГНКТ',
-                                             'ВВедите длину ГНКТ', 3500, 500, 10000)
-        volume_vn_gnkt = round(30.2 ** 2 * 3.14 / (4 * 1000), 2)
-        volume_gnkt = round(gnkt_lenght * volume_vn_gnkt / 1000, 1)
-
-        well_volume_ek = well_volume(self, well_data.head_column_additional._value)
-        well_volume_dp = well_volume(self, well_data.current_bottom) - well_volume_ek
-
-        volume_pm_ek = round(3.14 * (well_data.column_diametr._value - 2 * well_data.column_wall_thickness._value) ** 2 / 4 / 1000, 2)
-        volume_pm_dp = round(3.14 * (well_data.column_additional_diametr._value - 2 *
-                                     well_data.column_additional_wall_thickness._value) ** 2 / 4 / 1000, 2)
-        schema_well_list = [
-            [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-             None, None, None, None, None, None, None],
-            [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-             None, None, None, None, None, None, None],
-            [None, 'СХЕМА СКВАЖИНЫ', None, None, None, None, None, None, None,
-             None, None, None, None, None, None, None, None, None, None, None, None, None, None],
-            [None, None, None, None, None, None, None, None, None, None, None, None, 'Данные о размерности труб',
-             None, None, None, None, None, None, None, None, None, None],
-            [None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-             None, None, None, None, None, None, None, None, None],
-            [None, None, None, None, None, None, None, None, None, None, None, None,
-             'Тип ПВО', None, None, '4-х секционный превентор БП 80-70.00.00.000 (700атм) К2', None, None, None, None,
-             None, None, None],
-            [None, None, None, None, None, None, None, None, None, None, None, None,
-             'Тип ФА', None, None, 'АУШГН-146 / АУГРП 146*14', None, None, None, None, None, None, None],
-            [None, None, None, None, None, None, None, None, None, None, None, None,
-             'Тип КГ', None, None, None, None, None, None, None, None, None, None],
-            [None, None, None, None, None, None, None, None, None, well_data.column_diametr._value, None, None,
-             'Стол ротора', None, well_data.stol_rotora, 'Øнаруж мм', 'толщ, мм', 'Øвнут, мм', 'Интервал спуска, м',
-             None, 'ВПЦ.\nДлина', 'Объем', None],
-            [None, None, None, None, None, None, None, None, None, well_data.shoe_column._value, None, None,
-             'Ø канавки', None, 211, None, None, None, None, None, None, 'л/п.м.', 'м3'],
-            [None, None, None, None, None, None, None, None, None, None, None, None,
-             'Шахтное направление', None, None, f'-', None, None, f'-', f'-', f'-', None, None],
-            [None, None, None, None, None, None, None, None, None,
-             'НКТ 89мм', None, None, 'Направление', None, None,
-             well_data.column_direction_diametr._value, well_data.column_direction_wall_thickness._value,
-             round(well_data.column_direction_diametr._value - 2 *well_data.column_direction_wall_thickness._value,1),
-             0, well_data.column_direction_lenght, well_data.level_cement_direction._value, None, None],
-            [None, None, None, None, None, None, None, None, None, 2448, None, None,
-             'Кондуктор', None, None,
-             well_data.column_conductor_diametr._value, well_data.column_conductor_wall_thickness._value,
-             round(well_data.column_conductor_diametr._value - 2 * well_data.column_conductor_wall_thickness._value, 1),
-             0, well_data.column_conductor_lenght._value, well_data.level_cement_conductor._value, None, None],
-            [None, None, None, None, None, None, None, None, None, None, None, None,
-             'Экспл. колонна', None, None,
-             well_data.column_diametr._value, well_data.column_wall_thickness._value,
-             round(well_data.column_diametr._value - 2* well_data.column_wall_thickness._value, 1),
-             0, well_data.shoe_column,well_data.level_cement_direction, volume_pm_ek, well_volume_ek],
-            [None, None, None, None, None, None, None, None, None, None, None, None,
-             'доп.колонна', None, None,
-             well_data.column_additional_diametr._value, well_data.column_additional_wall_thickness._value,
-             round(well_data.column_additional_diametr._value - 2* well_data.column_additional_wall_thickness._value, 1),
-             None, None, None, None, None],
-            [None, None, None, None, None, None, None, None, None, None, None, None,
-             'колонна НКТ', None, None, nkt, nkt_widht, nkt -2 * nkt_widht, 0, lenght_nkt, None, 4.335917984, 10.605655388864],
-            [None, None, None, None, None, None, None, None, None, None, None, None,
-             f'{well_data.paker_do["do"]}', None, None, None, None, 50,
-             well_data.depth_fond_paker_do["do"], well_data.depth_fond_paker_do["do"] + 2, None,  None,  None],
-            [None, None, None, None, None, None, None, None, None, None, None, None,
-             'воронка', None, None, nkt, nkt_widht , nkt -2 * nkt_widht, 0, lenght_nkt, None, None, None, None, None],
-            [None, None, None, None, None, None, None, None, None, None, None, None,
-             'ГНКТ', None, None, 38.1, 3.68, 30.74, gnkt_lenght, None, None, volume_vn_gnkt, volume_gnkt],
-
-            [None, None, None, None, None, None, None, None, None, None, None, None, None,
-             'Данные о забое', None, None, None, None, None, None, None, None, None, None],
-            [None, None, None, None, None, None, None, None, None, None, None, None, None,
-             None, None, None, None, None, None, None, None, None, None],
-            [None, None, None, None, None, None, None, None, None, None, None, None,
-             'Тек. забой перед ГРП', None, None, None, None, None, None, None, None, well_data.current_bottom, None],
-            [None, None, None, None, None, None, None, None, None, None, None, None,
-             'Текущий забой', None, None, None, None, None, None, None, None, well_data.current_bottom, None],
-            [None, None, None, None, None, None, None, None, None, None, None, None,
-             'Искусственный забой  ', None, None, None, None, None, None, None, None, well_data.bottomhole_artificial._value, None],
-            [None, None, None, None, None, None, None, None, None, None, None, None,
-             'Дополнительная информация', None, None, None, None, None, None, None, None, None, None],
-            [None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-             None, None, None, None, None, None, None, None, None],
-            [None, None, None, None, None, None, None, None, None, None, None, None,
-             'Категория скважины', None, None, None, None, 2, None, None, None, None, None],
-            [None, None, None, None, None, None, None, None, None, None, None, None, 'Содержание H2S',
-             None, None, None, None, 28.37, None, None, None, None, None],
-            [None, None, None, None, None, None, None, 2468, None, None, None, None,
-             'Газовый фактор', None, None, None, None, 52.6, None, None, None, None, None],
-            [None, None, None, None, None, None, None, None, None, None, None, None,
-             'Коэффициент аномальности', None, None, None, None, 0.7534098067523365, None, None, None, None, None],
-            [None, None, None, None, None, None, None, None, None, None, None, None,
-             'Плотность жидкость глушения', None, None, None, None, 1.02, None, 'в объеме', None, 30.28, None],
-            [None, None, None, None, None, None, None, None, None, None, None, None,
-             'Текущий дебит скважины', None, None, None, None, 0.4, None, 0.3, None, 0.02, None],
-            [None, None, None, None, None, None, None, 2474, None, None, None, None,
-             'Ожидаемый дебит скважины', None, None, None, None, 16.7, None, 7.3, None, 0.51, None],
-            [None, None, None, None, None, None, None, None, None, None, None, None,
-             'Максимальный угол наклона', None, None, None, None, 1.75, None, 'на глубине', None, 1480, None],
-            [None, None, None, None, None, None, None, None, None, None, None, None,
-             'Макс. набор кривизны более', None, None, None, None, 'вертикальная', None, 'на глубине', None, None, None],
-            [None, None, None, None, None, None, None, None, None, None, None, None,
-             'Дата начало / окончания бурения', None, None, None, None, datetime.datetime(1995, 8, 27, 0, 0),
-             None, datetime.datetime(1996, 1, 21, 0, 0), None, None, None],
-            [None, None, None, None, None, None, None, None, None, None, None, None,
-             'Дата ввода в эксплуатацию', None, None, None, None, datetime.datetime(1998, 1, 6, 0, 0),
-             None, None, None, None, None],
-            [None, None, None, None, None, None, None, None, None, None, None, None,
-             'Р в межколонном пространстве', None, None, None, None, 0, None, ' ', None, None, None],
-            [None, None, None, None, None, None, None, None, None, None, None, None,
-             'Первоначальное Р опр-ки ЭК', None, None, None, None, 150, None, None, None, None, None],
-            [None, None, None, None, None, None, None, None, None, None, None, None,
-             'Результат предыдущей опрес-и ЭК', None, None, None, None, 80, None,
-             datetime.datetime(2018, 2, 6, 0, 0), None, 'гермет.', None],
-            [None, None, None, None, None, None, None, None, 'Тек.забой', None, None, None,
-             'Макс.допустимое Р опр-ки ЭК', None, None, None, None, 80, None, None, None, None, None],
-            [None, None, None, None, None, None, None, None, 2488.8, None, None, None,
-             'Макс. ожидаемое Р на устье ', None, None, None, None, 70, None, None, None, None, None],
-            [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-             None, None, None, None, None, None, None, None],
-            [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-             None, None, None, None, None, None, None, None],
-            [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-             None, None, None, None, None, None, None, None],
-            [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-             None, None, None, None, None, None, None, None],
-            [None, None, None, None, None, None, None, None, None, None, None, None, None,
-             None, None,  None, None, None, None, None, None, None, None],
-            [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-             None, None, None, None, None, None, None, None],
-            [None, None, None, None, None, None, None, None, None, None, None, None,
-             None, None, None, None, None, None, None, None, None, None, None],
-           [None, None, None, None, None, None, None, None, None, None, None, None,
-            'Данные о перфорации', None, None, None, None, None, None, None, None, None, None],
-           [None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-            None, None, None, None, None, None, None, None, None],
-           [None, None, None, None, None, None, None, None, None,
-            'пакер', None, None, 'Пласт\nгоризонт', None, 'Глубина пласта по вертикали', None,
-            'Интервал перфорации',
-            None, None, None, 'Дата вскрытия/\nотключения', 'Р пл. атм \nДата замера', None],
-           [None, None, None, None, None, None, None, None, None, 2446, None, None, None, None, None,
-            None, 'от', None, 'до', None, None, None, None],
-           [None, None, None, None, None, None, None, None, None, None, None, None,
-            'Dпаш', None, 2467.68, None, 2468, None, 2474, None, datetime.datetime(1996, 2, 1, 0, 0),
-            180, None],
-           [None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-            None, None, None, None, None, None, datetime.datetime(2018, 2, 3, 0, 0), None, None],
-           [None, None, None, None, None, None, None, None, None, 'воронка', None, None, None,
-            None, None, None, None, None, None, None, datetime.datetime(2019, 10, 5, 0, 0),
-            datetime.datetime(2023, 4, 1, 0, 0), None],
-           [None, None, None, None, None, None, None, None, None, 2448, None, None, None,
-            None, None, None, None, None, None, None, 'июнь 2023г.', None, None]]
-
-
-
-        # print(ports_list)
-        for row in self.ports_list:
-            schema_well_list.append(row)
-
-        border = Border(left=Side(border_style='dashed', color='FF000000'),
-                        top=Side(border_style='dashed', color='FF000000'),
-                        right=Side(border_style='dashed', color='FF000000'),
-                        bottom=Side(border_style='dashed', color='FF000000'),
-                        )
-        border_left_top = Border(left=Side(border_style='thick', color='FF000000'),
-                                 top=Side(border_style='thick', color='FF000000'),
-                                 right=Side(border_style='dashed', color='FF000000'),
-                                 bottom=Side(border_style='dashed', color='FF000000'),
-                                 )
-        border_left_bottom = Border(left=Side(border_style='thick', color='FF000000'),
-                                    top=Side(border_style='dashed', color='FF000000'),
-                                    right=Side(border_style='dashed', color='FF000000'),
-                                    bottom=Side(border_style='thick', color='FF000000'),
-                                    )
-        border_right_bottom = Border(left=Side(border_style='dashed', color='FF000000'),
-                                     top=Side(border_style='dashed', color='FF000000'),
-                                     right=Side(border_style='thick', color='FF000000'),
-                                     bottom=Side(border_style='thick', color='FF000000'),
-                                     )
-        border_right_top = Border(top=Side(border_style='thick', color='FF000000'),
-                                  right=Side(border_style='thick', color='FF000000'))
-
-        border_right = Border(left=Side(border_style='dashed', color='FF000000'),
-                              top=Side(border_style='dashed', color='FF000000'),
-                              right=Side(border_style='thick', color='FF000000'),
-                              bottom=Side(border_style='dashed', color='FF000000'),
-                              )
-        border_left = Border(left=Side(border_style='thick', color='FF000000'),
-                             top=Side(border_style='dashed', color='FF000000'),
-                             right=Side(border_style='dashed', color='FF000000'),
-                             bottom=Side(border_style='dashed', color='FF000000'),
-                             )
-        border_top = Border(left=Side(border_style='dashed', color='FF000000'),
-                            top=Side(border_style='thick', color='FF000000'),
-                            right=Side(border_style='dashed', color='FF000000'),
-                            bottom=Side(border_style='dashed', color='FF000000'),
-                            )
-        border_bottom = Border(left=Side(border_style='dashed', color='FF000000'),
-                               top=Side(border_style='dashed', color='FF000000'),
-                               right=Side(border_style='dashed', color='FF000000'),
-                               bottom=Side(border_style='thick', color='FF000000'),
-                               )
-
-        for row in range(1, len(schema_well_list) + 1):  # Добавлением работ
-            # print(row, len(schema_well_list[row-1]), schema_well_list[row-1][15])
-            for col in range(1, 48):
-                cell = ws3.cell(row=row, column=col)
-
-                cell.value = schema_well_list[row - 1][col - 1]
-                ws3.cell(row=row, column=col).font = Font(name='Arial', size=11, bold=False)
-                ws3.cell(row=row, column=col).alignment = Alignment(wrap_text=True, horizontal='center',
-                                                                    vertical='center')
-                if cell.value != None and row > 24:
-                    cell.border = border
-
-        for row in range(6, 24):
-            for col in range(7, 32):
-                cell = ws3.cell(row=row, column=col)
-
-                cell.border = border
-                if col == 31:
-                    cell.border = Border(left=Side(border_style='thick', color='FF000000'),
-                                         right=Side(border_style='thick', color='FF000000'))
-                if row == 6 and col != 31:
-                    cell.border = border_top
-                elif (row == 22) and col != 31:
-                    cell.border = border_bottom
-                elif (row == 23) and col != 31:
-                    cell.border = border_bottom
-                elif col == 7:
-                    cell.border = border_left
-                elif col == 30:
-                    cell.border = border_right
-
-                elif (row == 13 or row == 14) and col > 12 and col != 31:
-                    cell.border = Border(left=Side(border_style='thin', color='FF000000'),
-                                         top=Side(border_style='thin', color='FF000000'),
-                                         right=Side(border_style='thin', color='FF000000'),
-                                         bottom=Side(border_style='thin', color='FF000000'),
-                                         )
-            if row < 23:
-                ws3.cell(row=row, column=7).font = Font(name='Arial', size=11, bold=True, color='002060')
-                ws3.cell(row=row, column=32).font = Font(name='Arial', size=11, bold=True, color='002060')
-
-            for col in range(32, 49):
-                cell = ws3.cell(row=row, column=col)
-                cell.border = border
-                if row == 6:
-                    cell.border = border_top
-                elif (row == 22):
-                    cell.border = border_bottom
-                elif (row == 23):
-                    cell.border = border_bottom
-                elif (row == row and col == 32):
-                    cell.border = border_left
-                elif (row == row and col == 48):
-                    cell.border = border_right
-
-        ws3.cell(row=1, column=1).font = Font(name='Arial', size=18, bold=True)
-        ws3.cell(row=3, column=14).font = Font(name='Arial', size=18, bold=True)
-        ws3.cell(row=3, column=30).font = Font(name='Arial', size=18, bold=True)
-        ws3.cell(row=3, column=22).font = Font(name='Arial', size=18, bold=True)
-        ws3.cell(row=3, column=37).font = Font(name='Arial', size=18, bold=True)
-        ws3.cell(row=24, column=7).font = Font(name='Arial', size=14, bold=True, color='002060')
-        ws3.cell(row=34, column=1).font = Font(name='Arial', size=14, bold=True, color='002060')
-        ws3.cell(row=34, column=9).font = Font(name='Arial', size=14, bold=True, color='002060')
-        ws3.cell(row=5, column=10).font = Font(name='Arial', size=14, bold=False, color='002060', underline='single')
-        ws3.cell(row=5, column=33).font = Font(name='Arial', size=14, bold=False, color='002060', underline='single')
-
-        ws3.cell(6, 7).border = border_left_top
-        ws3.cell(6, 32).border = border_left_top
-        ws3.cell(22, 7).border = border_left_bottom
-        ws3.cell(23, 7).border = border_left_bottom
-        ws3.cell(22, 32).border = border_left_bottom
-        ws3.cell(23, 32).border = border_left_bottom
-
-        ws3.cell(6, 30).border = border_right_top
-        ws3.cell(6, 48).border = border_right_top
-        ws3.cell(22, 30).border = border_left_bottom
-        ws3.cell(23, 30).border = border_left_bottom
-        ws3.cell(22, 48).border = border_left_bottom
-        ws3.cell(23, 48).border = border_right_bottom
-        ws3.cell(23, 30).border = border_right_bottom
-
-        for key, value in merge_port.items():
-            boundaries_dict[key] = value
-
-            if key % 2 == 0:
-                coordinate = f'{get_column_letter(value[0] - 1)}{value[1] + 4}'
-                print(f'вставка1 ')
-                column_img = f'H{value[1] + 6}'
-
-                main.MyWindow.insert_image(self, ws3, 'imageFiles/schema_well/port.png', coordinate, 200, 200)
-
-            for i in range(3):
-                cell = ws3.cell(row=27, column=value[0] + i)
-                cell2 = ws3.cell(row=28, column=value[0] + i)
-                font = Font(bold=True, italic=True)
-                cell.font = font
-                cell2.font = font
-                cell.alignment = Alignment(textRotation=90, horizontal='center', vertical='center')
-                cell2.alignment = Alignment(textRotation=90, horizontal='center', vertical='center')
-
-        # print(boundaries_dict)
-        for key, value in boundaries_dict.items():
-            ws3.merge_cells(start_column=value[0], start_row=value[1],
-                            end_column=value[2], end_row=value[3])
-
-        for index_row, row in enumerate(ws3.iter_rows()):  # Копирование высоты строки
-            ws3.row_dimensions[index_row].height = rowHeights1[index_row - 1]
-
-        for col_ind in range(50):  # копирование ширины столба
-            ws3.column_dimensions[get_column_letter(col_ind + 1)].width = colWidth[col_ind] / 1.9
-
-        coordinate = f'B3'
-        print(f'вставка2 ')
-        main.MyWindow.insert_image(self, ws3, 'imageFiles/schema_well/gorizont_1.png', coordinate, 237, 1023)
-      # print(Column_img)
-        main.MyWindow.insert_image(self, ws3, 'imageFiles/schema_well/gorizont_12.png', column_img, 1800, 120)
-
-        ws3.print_area = f'A1:AW{37}'
-        ws3.page_setup.fitToPage = True
-        ws3.page_setup.fitToHeight = False
-        ws3.page_setup.fitToWidth = True
-        # Измените формат листа на альбомный
-        ws3.page_setup.orientation = ws3.ORIENTATION_LANDSCAPE
-        ws3.print_options.horizontalCentered = True
-        # зададим размер листа
-        ws3.page_setup.paperSize = ws3.PAPERSIZE_A4
-
-    def work_gnkt_frez(self, ports_data, plast_work):
-        pass
-
-    def volume_dumping(self, ntk_true, first_muft):
-        from work_py.alone_oreration import volume_pod_NKT, volume_jamming_well
-
-        if ntk_true is True:
-            volume = volume_pod_NKT(self) * 1.2
-        else:
-            volume = volume_jamming_well(self, first_muft) * 1.1
-        return round(volume, 1)
 
     def date_dmy(self, date_str):
         date_obj = datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
@@ -711,15 +619,11 @@ class Work_with_gnkt(QMainWindow):
             return date_obj.strftime('%d.%m.%Y')
         else:
             date_obj = datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
-            print(f' даь {date_obj}')
+            # print(f' даь {date_obj}')
         return date_obj.strftime('%d.%m.%Y')
 
-
-
-
-
     def calc_fluid(self):
-       
+
         fluid_list = []
         try:
 
@@ -742,6 +646,6 @@ class Work_with_gnkt(QMainWindow):
 
 if __name__ == '__main__':
     app = QApplication([])
-    window = Work_with_gnkt()
+    window = GnktOsvWindow()
     window.show()
     app.exec_()

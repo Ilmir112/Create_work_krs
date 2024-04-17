@@ -957,6 +957,12 @@ class DataWindow(QMainWindow):
                 well_data.proc_water = int(self.if_None(proc_water_edit))
 
             well_data.curator = curator
+            if curator in ['ВНС']:
+                well_data.bvo = True
+            elif curator in ['ГРР'] and well_data.work_plan in ['gnkt_after_grp']:
+                well_data.bvo = True
+            elif well_data.work_plan in ['gnkt_frez']:
+                well_data.bvo = True
             well_data.pause = False
             self.close()
 

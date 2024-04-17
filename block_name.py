@@ -168,7 +168,8 @@ def razdel_1(self, region):
     with open('podpisant.json', 'r', encoding='utf-8') as file:
         podpis_dict = json.load(file)
 
-    razdel_1 = [[None, 'СОГЛАСОВАНО:', None, None, None, None, None, 'УТВЕРЖДАЕМ:', None, None, None, None],
+    razdel_1 = [
+        [None, 'СОГЛАСОВАНО:', None, None, None, None, None, 'УТВЕРЖДАЕМ:', None, None, None, None],
                 [None, podpis_dict[region]['gi']['post'], None, None, None, None, None,
                  'Главный Инженер ООО "Ойл-Сервис"', None, None, None, None],
                 [None, f'____________{podpis_dict[region]["gi"]["surname"]}', None, None, None, None, None,

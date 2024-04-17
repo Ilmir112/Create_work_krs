@@ -341,7 +341,10 @@ class WellFond_data(FindIndexPZ):
                         col_plan = col
                     if 'до ремонта' in str(value).lower() and row_index < 6 + begin_index:
                         col_do = col
-
+                    if 'колонная головка' in str(value) and 'типоразмер' in str(row[col + 2].value):
+                        well_data.column_head_m = row[col_do].value
+                    if 'Арматура устьевая' in str(value) and 'типоразмер' in str(row[col + 2].value):
+                        well_data.wellhead_fittings = row[col_do].value
                     if 'Пакер' in str(value) and 'типоразмер' in str(row[col + 2].value):
                         if '/' in str(row[col_do].value):
                             well_data.paker_do["do"] = str(row[col_do].value).split('/')[0]
@@ -711,7 +714,8 @@ class Well_data(FindIndexPZ):
 
                         well_data.bottom = well_data.current_bottom
                     elif '10. Расстояние от стола ротора до среза муфты э/колонны ' in str(value):
-                        well_data.stol_rotora = ProtectedIsDigit(row[col + 4].value)
+                        well_data.stol_rotora = FindIndexPZ.definition_is_None(
+                            self, ProtectedIsDigit(row[col + 5].value), row_index, col, 1)
 
                     elif 'Направление' in str(value) and 'Шахтное направление' not in str(value) and \
                             ws.cell(row=row_index + 1, column=col + 1).value != None and \

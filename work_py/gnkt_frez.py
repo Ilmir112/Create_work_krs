@@ -4,7 +4,6 @@ from PyQt5.QtWidgets import QInputDialog, QMainWindow, QApplication
 
 from openpyxl.utils import get_column_letter
 
-
 import well_data
 from perforation_correct_gnkt_frez import PerforationCorrectGnktFrez
 
@@ -13,30 +12,17 @@ import main
 import plan
 from block_name import razdel_1
 from openpyxl.styles import Border, Side, PatternFill, Font, Alignment
-
 from openpyxl.workbook import Workbook
-
 from gnkt_data.gnkt_data import dict_saddles
+from work_py.gnkt_grp_work import GnktOsvWindow2
 from .data_informations import dict_data_cdng, calc_pntzh
-
-
-# class TabPage_SO(QWidget):
-#     def __init__(self, parent=None):
-#         super().__init__(parent)
-# class TabWidget(QTabWidget):
-#     def __init__(self):
-#         super().__init__()
-#         self.addTab(TabPage_SO(self), 'Титульный лист')
-#         self.addTab(TabPage_SO(self), 'Схема')
-#         self.addTab(TabPage_SO(self), 'Ход работ')
-
 
 class Work_with_gnkt(QMainWindow):
     wb_gnkt_frez = Workbook()
 
-    def __init__(self, ws, tabWidget, table_title, table_schema, table_widget):
+    def __init__(self, ws, table_title, table_schema, table_widget):
         from open_pz import CreatePZ
-       
+
         super(QMainWindow, self).__init__()
         self.table_widget = table_widget
         self.table_title = table_title
@@ -46,6 +32,7 @@ class Work_with_gnkt(QMainWindow):
         self.ws = ws
         self.work_plan = 'gnkt_frez'
         self.perforation_correct_window2 = None
+        self.perforation_correct_window = None
 
         if self.perforation_correct_window2 is None:
             self.perforation_correct_window2 = PerforationCorrectGnktFrez(self)
@@ -61,13 +48,26 @@ class Work_with_gnkt(QMainWindow):
             self.perforation_correct_window2.close()
             self.perforation_correct_window2 = None
 
-        print(f' порты {self.dict_ports}')
+        if self.perforation_correct_window is None:
+            self.perforation_correct_window = GnktOsvWindow2(self)
+            self.perforation_correct_window.setWindowTitle("Данные по ГНКТ")
+            self.perforation_correct_window.setGeometry(200, 400, 100, 400)
+            self.perforation_correct_window.show()
+            well_data.pause = True
+            main.MyWindow.pause_app()
+            self.perforation_correct_window = None
+
+        else:
+            self.perforation_correct_window.close()
+            self.perforation_correct_window = None
+
+        # print(f' порты {self.dict_ports}')
         self.manufacturer = list(self.dict_ports.keys())[0]
-        print(f' порты {self.manufacturer}')
+        # print(f' порты {self.manufacturer}')
         self.type_column = list(self.dict_ports[self.manufacturer].keys())[0]
-        print(f' порты {self.type_column}')
+        # print(f' порты {self.type_column}')
         self.ports_data = self.dict_ports[self.manufacturer][self.type_column]
-        print(f' порты {self.ports_data}')
+        # print(f' порты {self.ports_data}')
         self.top_muft = list(self.ports_data.keys())[-1]
         self.bottom_muft = list(self.ports_data.keys())[0]
         self.ws_title = Work_with_gnkt.wb_gnkt_frez.create_sheet(title="Титульник")
@@ -75,9 +75,8 @@ class Work_with_gnkt(QMainWindow):
         self.ws_schema = Work_with_gnkt.wb_gnkt_frez.create_sheet(title="Схема")
         self.ws_work = Work_with_gnkt.wb_gnkt_frez.create_sheet(title="Ход работ")
 
-        head = plan.head_ind(well_data.cat_well_min, well_data.cat_well_max + 1)
-        # print(f'ff  {head}')p
-        # print(self.ws)
+        head = plan.head_ind(well_data.cat_well_min._value, well_data.cat_well_max._value)
+
         plan.copy_true_ws(self.ws, self.ws_title, head)
 
         create_title = self.create_title_list(self.ws_title)
@@ -90,16 +89,13 @@ class Work_with_gnkt(QMainWindow):
         main.MyWindow.populate_row(self, 0, work_well, table_widget)
 
         CreatePZ.add_itog(self, self.ws_work, self.table_widget.rowCount() + 1, self.work_plan)
-        # Work_with_gnkt.wb_gnkt_frez.save(f"{well_data.well_number} {well_data.well_area} {well_data.cat_P_1}
-        # категории.xlsx")
-        # print('файл сохранен')
 
     def count_row_height(self, ws2, work_list, sheet_name):
-       
+
         from openpyxl.utils.cell import range_boundaries, get_column_letter
 
         colWidth = [2.85546875, 14.42578125, 16.140625, 22.85546875, 17.140625, 14.42578125, 13.0, 13.0, 17.0,
-                     14.42578125, 13.0, 21, 12.140625, None]
+                    14.42578125, 13.0, 21, 12.140625, None]
 
         text_width_dict = {35: (0, 100), 50: (101, 200), 70: (201, 300), 110: (301, 400), 120: (401, 500),
                            130: (501, 600), 150: (601, 700), 170: (701, 800), 190: (801, 900), 230: (901, 1500)}
@@ -114,10 +110,9 @@ class Work_with_gnkt(QMainWindow):
                               end_column=value[2], end_row=value[3])
         ins_ind = 1
 
-
         for i in range(1, len(work_list) + 1):  # Добавлением работ
-            if str(work_list[i-1][1]).isdigit() and i>39: # Нумерация
-                work_list[i-1][1] = str(ins_ind)
+            if str(work_list[i - 1][1]).isdigit() and i > 39:  # Нумерация
+                work_list[i - 1][1] = str(ins_ind)
                 ins_ind += 1
             for j in range(1, 13):
                 cell = ws2.cell(row=i, column=j)
@@ -130,19 +125,12 @@ class Work_with_gnkt(QMainWindow):
                     else:
                         cell.value = work_list[i - 1][j - 1]
 
-
-
-
-
         # print(merged_cells_dict)
         if sheet_name != 'Ход работ':
             for key, value in boundaries_dict.items():
                 # print(value)
                 ws2.merge_cells(start_column=value[0], start_row=value[1],
                                 end_column=value[2], end_row=value[3])
-
-
-
 
         elif sheet_name == 'Ход работ':
             for i, row_data in enumerate(work_list):
@@ -164,36 +152,35 @@ class Work_with_gnkt(QMainWindow):
                     if column != 0:
                         ws2.cell(row=i + 1, column=column + 1).border = well_data.thin_border
                     if column == 1 or column == 11:
-                        ws2.cell(row=i + 1, column=column + 1).alignment = Alignment(wrap_text=True, horizontal='center',
-                                                                                 vertical='center')
+                        ws2.cell(row=i + 1, column=column + 1).alignment = Alignment(wrap_text=True,
+                                                                                     horizontal='center',
+                                                                                     vertical='center')
                         ws2.cell(row=i + 1, column=column + 1).font = Font(name='Arial', size=13, bold=False)
                     else:
                         ws2.cell(row=i + 1, column=column + 1).alignment = Alignment(wrap_text=True, horizontal='left',
                                                                                      vertical='center')
                         ws2.cell(row=i + 1, column=column + 1).font = Font(name='Arial', size=13, bold=False)
                         if 'примечание' in str(ws2.cell(row=i + 1, column=column + 1).value).lower() or \
-                            'внимание' in str(ws2.cell(row=i + 1, column=column + 1).value).lower() or \
-                            'мероприятия' in str(ws2.cell(row=i + 1, column=column + 1).value).lower() or \
-                            'порядок работ' in str(ws2.cell(row=i + 1, column=column + 1).value).lower() or \
-                            'По доп.согласованию с Заказчиком' in str(ws2.cell(row=i + 1, column=column + 1).value).lower():
+                                'внимание' in str(ws2.cell(row=i + 1, column=column + 1).value).lower() or \
+                                'мероприятия' in str(ws2.cell(row=i + 1, column=column + 1).value).lower() or \
+                                'порядок работ' in str(ws2.cell(row=i + 1, column=column + 1).value).lower() or \
+                                'По доп.согласованию с Заказчиком' in str(
+                            ws2.cell(row=i + 1, column=column + 1).value).lower():
                             # print('есть жирный')
                             ws2.cell(row=i + 1, column=column + 1).font = Font(name='Arial', size=13, bold=True)
 
                 if len(work_list[i][1]) > 5:
-                    ws2.merge_cells(start_column=2, start_row= i + 1, end_column= 12, end_row=i + 1)
+                    ws2.merge_cells(start_column=2, start_row=i + 1, end_column=12, end_row=i + 1)
                     ws2.cell(row=i + 1, column=2).alignment = Alignment(wrap_text=True, horizontal='center',
                                                                         vertical='center')
                     ws2.cell(row=i + 1, column=2).fill = PatternFill(start_color='C5D9F1', end_color='C5D9F1',
-                                                                      fill_type='solid')
+                                                                     fill_type='solid')
                     ws2.cell(row=i + 1, column=2).font = Font(name='Arial', size=13, bold=True)
 
                 else:
                     ws2.merge_cells(start_column=3, start_row=i + 1, end_column=11, end_row=i + 1)
                     ws2.cell(row=i + 1, column=3).alignment = Alignment(wrap_text=True, horizontal='left',
-                                                                            vertical='center')
-
-
-
+                                                                        vertical='center')
 
             for col in range(13):
                 ws2.column_dimensions[get_column_letter(col + 1)].width = colWidth[col]
@@ -230,7 +217,6 @@ class Work_with_gnkt(QMainWindow):
         print(f'{sheet_name} - вставлена')
 
     def save_to_gnkt(self):
-       
 
         sheets = ["Титульник", 'Схема', 'Ход работ']
         tables = [self.table_title, self.table_schema, self.table_widget]
@@ -260,9 +246,10 @@ class Work_with_gnkt(QMainWindow):
         ws7 = Work_with_gnkt.wb_gnkt_frez.create_sheet(title="СХЕМЫ КНК_38,1")
         main.MyWindow.insert_image(self, ws7, 'imageFiles/schema_well/СХЕМЫ КНК_38,1.png', 'A1', 550, 900)
 
-        path = 'workiii'
-        # path = 'D:\Documents\Desktop\ГТМ'
-        filenames = f"{well_data.well_number} {well_data.well_area} кат {well_data.cat_P_1} {self.work_plan}.xlsx"
+        # path = 'workiii'
+        path = 'D:\Documents\Desktop\ГТМ'
+        filenames = f"{well_data.well_number._value} {well_data.well_area._value} кат " \
+                    f"{well_data.cat_P_1} {self.work_plan}.xlsx"
         full_path = path + '/' + filenames
         # print(f'10 - {ws2.max_row}')
         # print(wb2.path)
@@ -286,29 +273,29 @@ class Work_with_gnkt(QMainWindow):
             self.wb.close()
 
     def create_title_list(self, ws2):
-       
 
-        well_data.region = block_name.region(well_data.cdng)
+        well_data.region = block_name.region(well_data.cdng._value)
         self.region = well_data.region
 
         title_list = [
             [None, None, None, None, None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None],
             [None, 'ООО «Башнефть-Добыча»', None, None, None, None, None, None, None, None, None, None],
-            [None, None, None, f'{well_data.cdng}', None, None, None, None, None, None, None, None],
+            [None, None, None, f'{well_data.cdng._value}', None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None],
             [None, 'ПЛАН РАБОТ НА СКВАЖИНЕ С ПОМОЩЬЮ УСТАНОВКИ С ГИБКОЙ ТРУБОЙ', None, None, None,
              None, None, None, None, None, None, None],
 
             [None, None, None, None, None, None, None, None, None, None, None, None],
-            [None, None, '№ скважины:', f'{well_data.well_number}', 'куст:', None, 'Месторождение:', None, None,
-             well_data.well_oilfield, None, None],
-            [None, None, 'инв. №:', well_data.inv_number, None, None, None, None, 'Площадь: ', well_data.well_area, None,
+            [None, None, '№ скважины:', f'{well_data.well_number._value}', 'куст:', None, 'Месторождение:', None, None,
+             well_data.well_oilfield._value, None, None],
+            [None, None, 'инв. №:', well_data.inv_number._value, None, None, None, None, 'Площадь: ',
+             well_data.well_area._value, None,
              1],
             [None, None, None, None, None, None, None, None, None, None, None, None]]
 
-        razdel = razdel_1(self, self.region)
+        razdel = razdel_1(self, well_data.region)
         for row in razdel:  # Добавлением работ
             title_list.append(row)
 
@@ -340,7 +327,7 @@ class Work_with_gnkt(QMainWindow):
                 if 'ПЛАН РАБОТ' in str(title_list[row - 1][col - 1]):
                     ws2.merge_cells(start_row=row + index_insert, start_column=2, end_row=row + index_insert,
                                     end_column=11)
-                    ws2.merge_cells(start_row=row -4 + index_insert, start_column=2, end_row=row -4 + index_insert,
+                    ws2.merge_cells(start_row=row - 4 + index_insert, start_column=2, end_row=row - 4 + index_insert,
                                     end_column=4)
                     ws2.cell(row=row + index_insert, column=col).font = Font(name='Arial', size=14, bold=True)
                     ws2.cell(row=row + index_insert, column=col).alignment = Alignment(wrap_text=False,
@@ -367,7 +354,7 @@ class Work_with_gnkt(QMainWindow):
         ws2.page_setup.paperSize = ws2.PAPERSIZE_A4
 
     def schema_well(self, ws3):
-       
+
         from work_py.alone_oreration import volume_vn_nkt, well_volume
 
         boundaries_dict = {0: (13, 13, 14, 14), 1: (43, 12, 45, 12), 2: (40, 16, 42, 16), 3: (7, 19, 12, 19),
@@ -453,18 +440,17 @@ class Work_with_gnkt(QMainWindow):
 
         bottom_first_port = self.ports_data['№1']['кровля']
 
-        arm_grp, ok = QInputDialog.getInt(None, 'Арматура ГРП',
-                                          'ВВедите номер Арматуры ГРП', 16, 0, 500)
-
-        gnkt_lenght, _ = QInputDialog.getInt(None, 'Длина ГНКТ',
-                                             'ВВедите длину ГНКТ', 3500, 500, 10000)
+        gnkt_lenght = int(GnktOsvWindow2.lenght_gnkt_edit)
+        gnkt_lenght_str = f'длина ГНКТ - {GnktOsvWindow2.lenght_gnkt_edit}м; износ -{GnktOsvWindow2.iznos_gnkt_edit}%; ' \
+                      f'пробег '
         volume_vn_gnkt = round(30.2 ** 2 * 3.14 / (4 * 1000), 2)
         volume_gnkt = round(gnkt_lenght * volume_vn_gnkt / 1000, 1)
 
         well_volume_ek = well_volume(self, well_data.head_column_additional._value)
         well_volume_dp = well_volume(self, well_data.current_bottom) - well_volume_ek
 
-        volume_pm_ek = round(3.14 * (well_data.column_diametr._value - 2 * well_data.column_wall_thickness._value) ** 2 / 4 / 1000, 2)
+        volume_pm_ek = round(
+            3.14 * (well_data.column_diametr._value - 2 * well_data.column_wall_thickness._value) ** 2 / 4 / 1000, 2)
         volume_pm_dp = round(3.14 * (well_data.column_additional_diametr._value - 2 *
                                      well_data.column_additional_wall_thickness._value) ** 2 / 4 / 1000, 2)
 
@@ -479,9 +465,10 @@ class Work_with_gnkt(QMainWindow):
              None, None, None, None, None, None, None, None, None, None, None, None, None],
 
             [None, None, None, None, None, None, None, None, None, None, None, None, None,
-             '№ скважины:', None, None, None, None, None, None, None, well_data.well_number, None, None, None, None,
+             '№ скважины:', None, None, None, None, None, None, None, well_data.well_number._value, None, None, None, None,
              None, None,
-             None, 'Месторождение:', None, None, None, None, None, None, well_data.well_oilfield, None, None, None, None,
+             None, 'Месторождение:', None, None, None, None, None, None, well_data.well_oilfield._value, None, None, None,
+             None,
              None, None, None, None, None, None],
 
             [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
@@ -510,10 +497,11 @@ class Work_with_gnkt(QMainWindow):
             [None, None, None, None, None, None, None, None, None, None, None, None,
              'тройник 80х70-80х70 В60-В60',
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-             'Содержание H2S', None, None, None, None, None, None, None, round(well_data.h2s_mg[0], 5), None, None, None,
+             'Содержание H2S', None, None, None, None, None, None, None, round(well_data.h2s_mg[0], 5), None, None,
+             None,
              None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None,
-             f'ФА  ГРП ГУ 180х35-89 К1ХЛ № {arm_grp}',
+             f'ФА  ГРП ГУ 180х35-89 К1ХЛ № ',
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              'Газовый фактор', None, None, None, None, None, None, None, well_data.gaz_f_pr[0], None, None, None, None,
              None, None, None],
@@ -531,8 +519,8 @@ class Work_with_gnkt(QMainWindow):
             [' ', None, None, None, None, None, 'Тип КГ', None, None, None, None, None,
              well_data.column_head_m, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None, None, None, None,
-             'Макс.угол в горизонт. участке', None, None, None, None, None, None, None, well_data.max_angle, None, None,
-             'на глубине', None, None, well_data.max_angle_H, None],
+             'Макс.угол в горизонт. участке', None, None, None, None, None, None, None, well_data.max_angle._value, None, None,
+             'на глубине', None, None, well_data.max_angle_H._value, None],
 
             [None, None, None, None, None, None,
              'Диаметр канавки', None, None, None, None, None, 'Наруж.\nдиаметр',
@@ -541,14 +529,14 @@ class Work_with_gnkt(QMainWindow):
              None, None, f'{6.21}/10м', None, None, 'на глубине', None, None, '1310', None],
 
             [None, None, None, None, None, None,
-             'Стол ротора', None, None, None, f'{well_data.stol_rotora}м', None, None, None, None, None,
+             'Стол ротора', None, None, None, f'{well_data.stol_rotora._value}м', None, None, None, None, None,
              None, None, 'от', None, 'до', None, None, None, None, None, 'п.м', None, 'м3', None, None,
              'Жидкость глушения', None, None, None, None, None, None, None, zhgs, None, None, 'в объеме', None, None,
              f'{28.9}м3', None],
             [None, None, None, None, None, None, 'Направление', None, None, None, None, None,
              well_data.column_direction_diametr._value, None, well_data.column_direction_wall_thickness._value, None,
-             well_data.column_direction_diametr - 2 * well_data.column_direction_wall_thickness._value, None,
-             well_data.column_direction_lenght, None, None, None, well_data.level_cement_direction._value, None, None,
+             well_data.column_direction_diametr._value - 2 * well_data.column_direction_wall_thickness._value, None,
+             well_data.column_direction_lenght._value, None, None, None, well_data.level_cement_direction._value, None, None,
              None, None, None, None, None, None, 'Ожидаемый дебит',
              None, None, None, None, None, None, None, f'{well_data.Qwater}м3/сут', None, None,
              f'{well_data.Qoil}м3', None, None,
@@ -564,7 +552,8 @@ class Work_with_gnkt(QMainWindow):
              None],
             [None, None, None, None, None, None, 'Экспл. колонна', None, None, None, None, None,
              well_data.column_diametr._value, None, well_data.column_wall_thickness._value, None,
-             well_data.column_diametr._value - 2 * well_data.column_wall_thickness._value, None, f'0-{well_data.shoe_column._value}м', None,
+             well_data.column_diametr._value - 2 * well_data.column_wall_thickness._value, None,
+             f'0-{well_data.shoe_column._value}м', None,
              None,
              None, well_data.level_cement_column._value, None, None, None, volume_pm_ek, None, well_volume_ek,
              None, None, 'Р в межколонном пространстве', None, None, None, None, None, None, None,
@@ -573,7 +562,8 @@ class Work_with_gnkt(QMainWindow):
              None, well_data.column_additional_diametr._value, None,
              well_data.column_additional_wall_thickness._value, None,
              well_data.column_additional_diametr._value - 2 * well_data.column_additional_wall_thickness._value, None,
-             well_data.head_column_additional._value, None, well_data.shoe_column_additional._value, None, 'не цементиров.', None,
+             well_data.head_column_additional._value, None, well_data.shoe_column_additional._value, None,
+             'не цементиров.', None,
              None, None, volume_pm_dp,
              None, well_volume_dp, None, None, 'Давление опрессовки МКП', None, None, None, None, None, None, None,
              None, None, None, None, None, None, None, None],
@@ -602,14 +592,13 @@ class Work_with_gnkt(QMainWindow):
              None, None, None, None, 'Текущий забой до ГРП ', None, None, None, None, None, None, None, None, None,
              None, None, None, None, f'{well_data.current_bottom}м', None],
             [None, None, None, None, None, None, 'ГНКТ', None, None, None, None, None, 38.1, None, 3.96, None, 30.18,
-             None, gnkt_lenght, None, None, None, None, None, None, None, volume_vn_gnkt, None,
+             None, gnkt_lenght_str, None, None, None, None, None, None, None, volume_vn_gnkt, None,
              volume_gnkt, None,
              None, 'Искусственный забой  (МГРП №1)', None, None, None, None, None, None, None, None,
              None, None, None, None, None, f'{bottom_first_port}м', None]]
 
         # self.ports_data = self.work_with_port(self.plast_work, well_data.dict_perforation)
         self.ports_list, merge_port = self.insert_ports_data(self.ports_data)
-
 
         # print(ports_list)
         for row in self.ports_list:
@@ -663,7 +652,7 @@ class Work_with_gnkt(QMainWindow):
             # print(row, len(schema_well_list[row-1]), schema_well_list[row-1][15])
             for col in range(1, 48):
                 cell = ws3.cell(row=row, column=col)
-
+                print(row, col)
                 cell.value = schema_well_list[row - 1][col - 1]
                 ws3.cell(row=row, column=col).font = Font(name='Arial', size=11, bold=False)
                 ws3.cell(row=row, column=col).alignment = Alignment(wrap_text=True, horizontal='center',
@@ -745,7 +734,7 @@ class Work_with_gnkt(QMainWindow):
 
             if key % 2 == 0:
                 coordinate = f'{get_column_letter(value[0] - 1)}{value[1] + 4}'
-                print(f'вставка1 ')
+                # print(f'вставка1 ')
                 column_img = f'H{value[1] + 6}'
 
                 main.MyWindow.insert_image(self, ws3, 'imageFiles/schema_well/port.png', coordinate, 200, 200)
@@ -771,9 +760,9 @@ class Work_with_gnkt(QMainWindow):
             ws3.column_dimensions[get_column_letter(col_ind + 1)].width = colWidth[col_ind] / 1.9
 
         coordinate = f'B3'
-        print(f'вставка2 ')
+
         main.MyWindow.insert_image(self, ws3, 'imageFiles/schema_well/gorizont_1.png', coordinate, 237, 1023)
-      # print(Column_img)
+        # print(Column_img)
         main.MyWindow.insert_image(self, ws3, 'imageFiles/schema_well/gorizont_12.png', column_img, 1800, 120)
 
         ws3.print_area = f'A1:AW{37}'
@@ -788,6 +777,7 @@ class Work_with_gnkt(QMainWindow):
 
     def work_gnkt_frez(self, ports_data, plast_work):
         from krs import GnoWindow
+        from cdng import events_gnvp_frez
 
         if sum(list(well_data.dict_nkt.values())) != 0:
             ntk_true = True
@@ -795,147 +785,21 @@ class Work_with_gnkt(QMainWindow):
         else:
             ntk_true = False
             nkt_lenght = round(self.top_muft - 20, 1)
-        print(f'пласта {plast_work}')
-        print(f' ПНТЖ - {calc_pntzh(self.fluid, well_data.cdng)}')
 
         distance, _ = QInputDialog.getInt(None, 'Расстояние НПТЖ', 'Введите Расстояние до ПНТЖ')
 
-        fluid_work_insert, ok = QInputDialog.getDouble(self,
-                                                   'удельный вес',
-                                                   'ВВедите удельный вес рабочей жидкости',
-                                                   1.18, 0, 1.6, 2)
+        fluid_work_insert = GnktOsvWindow2.fluid_edit
 
         fluid_work, well_data.fluid_work_short = GnoWindow.calc_work_fluid(self, fluid_work_insert)
 
-
-        block_gnvp_list = [
-            [None, 'Мероприятия по предотвращению аварий, инцидентов и несчастных случаев:',
-             None, None, None, None, None, None, None, None, None, None],
-            [None, 1,
-             'Все операции при производстве работ выполнять в соответствии с действующими Федеральными нормами и'
-             ' правилами в области промышленной безопасности "Правила безопасности в нефтяной и газовой '
-             'промышленности" , РД 153-39-023-97, технологической инструкцией "Требования безопасности при '
-             'ведении монтажных работ и производстве текущего, капитального ремонта и освоения скважин после '
-             'бурения" П2-05.01 ТИ-0001 , инструкцией «По предупреждению газонефтеводопроявлений и открытых '
-             'фонтанов при бурении, освоении, геофизических исследованиях,  эксплуатации скважин, реконструкции, '
-             'ремонте, техническом  перевооружении, консервации и ликвидации скважин, а также при проведении '
-             'геофизических  и прострелочно-взрывных работах на скважинах» № П3-05 И-102089 ЮЛ-305, акта (наряд) '
-             'допуска, мероприятий по сокращению аварийности, протоколов ГТС, молний, писем, доведённых обществом '
-             '(ООО "Башнефть-Добыча") и других действующих в ООО "Башнефть-Добыча" нормативных документов.',
-             None, None, None, None, None, None, None, None, None, None, None],
-            [None, 'Мероприятия при нахождении рядом с ремонтируемой скважиной работающих скважин', None, None, None,
-             None, None, None, None, None, None, None],
-            [None, '№', 'Мероприятия', None, None, None, None, None, None, None, None, 'Ответственный'],
-            [None, 1, 'Провести устный инструктаж бригаде по проведению ремонта с соседними работающими скважинами.',
-             None, None, None, None, None, None, None, None, 'Мастер ГНКТ'],
-            [None, 2, 'В схеме расстановки бригадного хозяйства обозначить опасные зоны работающих скважин '
-                      '(определить с Заказчиком при оформлении наряд-допуска)',
-             None, None, None, None, None, None, None,
-             None, 'Мастер ГНКТ', None],
-            [None, 3,
-             'Оградить работающие скважины по периметру сигнальной лентой (по одной слева, справа) в радиусе 3 метра.',
-             None, None, None, None, None, None, None, None, 'Мастер ГНКТ', None],
-            [None, 4,
-             'При монтаже или демонтаже подъёмного агрегата для ремонта скважины, соседние с ремонтируемой '
-             '(по одной слева, справа), эксплуатирующиеся глубинными штанговыми насосами, скважины остановить. '
-             'Необходимость остановки определить с Заказчиком при приёмке скважины, отразить в наряд-допуске.',
-             None, None, None, None, None, None, None, None, 'Представитель «Заказчика»', None],
-            [None, 5,
-             'Установить предупреждающие знаки на соседних работающих скважинах (по одной слева¸ справа)'
-             ' «Внимание! Скважина работает!»', None, None, None, None, None, None, None, None,
-             'Мастер ГНКТ', None],
-            [None, 6,
-             'Не допускать проведения монтажных, погрузо-разгрузочных работ в радиусе не менее 3 '
-             'метров от работающих скважин', None, None, None, None, None, None, None, None,
-             'Мастер ГНКТ', None],
-            [None, 7,
-             'При проведении работ по отбору проб, замеру динамических уровней и т.д в обязательном порядке '
-             'информировать мастера бригады КРС о проведении данных работ.',
-             None, None, None, None, None, None, None, None, 'Представитель «Заказчика»', None],
-            [None, 8,
-             'Не допускать складирования на запорной арматуре и площадках для исследования ремонтируемой '
-             'скважины, а также соседних скважин инструмента, оборудования, электрокабелей, труб и т.д. и т.п.',
-             None, None, None, None, None, None, None, None,
-             'Мастер ГНКТ', None],
-            [None, 9,
-             'При расстановке оборудования бригады не загромождать доступ к соседним работающим скважинам.',
-             None, None, None, None, None, None, None, None, 'Мастер ГНКТ', None],
-            [None, 10,
-             'Согласовать схему расстановки оборудования и путей эвукуации с мастером ЦДНГ/ЦППД на схеме '
-             'коммуникаций-приложение к наряд -допуску.',
-             None, None, None, None, None, None, None, None, 'Мастер ГНКТ', None],
-            [None, 11,
-             'При обнаружении на соседних скважинах пропусков нефти, газа или воды немедленно закрыть '
-             'устье ремонтируемой скважины, остановить работы и сообщить о происшествии в ЦДНГ/ЦППД.',
-             None, None, None, None, None, None, None, None, 'Мастер ГНКТ', None],
-            [None, 12,
-             'Установка экранирующих устройств на соседних с ремонтируемой скважиной определяется наряд-допуском, '
-             'выданным Заказчиком.',
-             None, None, None, None, None, None, None, None, 'Мастер ГНКТ'],
-            [None, 'Мероприятия по предотвращению аварий (ГНВП и открытых фонтанов)', None, None, None, None, None,
-             None, None, None, None, None],
-            [None, '№', 'Мероприятия', None, None, None, None, None, None, None, None, 'Ответственный'],
-            [None, 1,
-             'Перед началом ремонта и перед каждой сменой проводить дополнительный инструктаж по '
-             'предупреждению газонефтеводопроявлений с Проведением ежесменных учебных тревог «Выброс» '
-             'с записью в вахтовом журнале.',
-             None, None, None, None, None, None, None, None, 'Мастер ГНКТ', None],
-            [None, 2, 'Ежедневно, перед началом работ проверять комплектность и работоспособность противовыбросового'
-                      ' оборудования, с отметкой в журнале ежесменного осмотра оборудования.',
-             None, None, None, None, None, None, None, None, 'Мастер ГНКТ', None],
-            [None, 3, 'При перерывах в работе запрещается оставлять устье скважины открытым.', None, None, None, None,
-             None, None, None, None, 'Мастер ГНКТ', None],
-            [None, 4,
-             f'Производить замеры ГВС при спуске, промывках и освоении не реже, чем как через каждый час, '
-             f'с записью в журнале времени и результатов замеров ГВС. В случае возникновения '
-             f'газонефтеводопроявления следует прекратить все работы, загерметизировать устье скважины и '
-             f'сообщить об этом в службу ЦИТС{well_data.contractor} и «Заказчика» {dict_data_cdng[well_data.cdng]}',
-             None, None, None, None, None, None, None, None,
-             'Мастер ГНКТ', None],
-            [None, 5, 'Перед началом работ по капитальному ремонту скважин иметь в наличии в исправном состоянии '
-                      'средства пожаротушения в соответствии с перечнем.',
-             None, None, None, None, None, None, None, None,
-             'Мастер ГНКТ', None],
-            [None, 6, f'Двухкратный запас жидкости глушения уд.веса {self.fluid}г/см3 в объеме '
-                      f'{round(float(well_data.well_volume_in_PZ[0]) * 2, 1)}м3 находится на '
-                      f'{"".join(calc_pntzh(self.fluid, well_data.cdng))} на расстоянии {distance}км от скважины.'
-                      f' {well_data.contractor} в случае необходимости '
-                      '(аварийного глушения) обязуется обеспечить завоз жидкости глушения на объект работ.', None, None,
-             None, None, None, None, None, None, 'Заказчик', None],
-
-            [None, 7,
-             'До начала работ, а также на все время выполнения работ, всю технику, принимающую участие в технологических операциях, оборудовать искрогасителями.',
-             None, None, None, None, None, None, None, None, 'Мастер ГНКТ', None],
-            [None, 8,
-             'Опрессовку ПВО скважин 1ой категории производить в присутствии представителя ПФС. '
-             '\nЗаявку на представителя ПФЧ подавать за 24 часа телефонограммой. \nПо окончании опрессовоки '
-             'ПВО, получить разрешения от представителя ПФС.',
-             None, None, None, None, None, None, None, None,
-             'Мастер ГНКТ', None],
-            [None, 'Мероприятия по охране окружающей среды:', None, None, None, None, None, None, None, None, None,
-             None, None],
-            [None, '№', 'Мероприятия', None, None, None, None, None, None, None, None, 'Ответственный', None],
-            [None, 1,
-             'При производстве работ не допускается попадания нефтесодержащей жидкости и солевого раствора на рельеф.',
-             None, None, None, None, None, None, None, None, 'Мастер ГНКТ', None],
-            [None, 2, 'Утилизацию технологических отходов производить по договору с Заказчиком.', None, None, None,
-             None, None, None, None, None, 'Мастер ГНКТ', None],
-            [None, 3, 'ТБО, образующиеся в процессе производства работ складировать в специальные контейнеры, '
-                      'обозначенные надписью «ТБО»',
-             None, None, None, None, None, None, None, None, 'Мастер ГНКТ', None],
-            [None, 4, 'Ежесменно проверять состояние запорной арматуры на нефтяных и водяных ёмкостях.', None, None,
-             None, None, None, None, None, None, 'Мастер ГНКТ', None],
-            [None, 5, 'При допущенных розливах нефти и задавочной жидкости в кратчайшие сроки необходимо провести '
-                      'мероприятия по устранению розлива, с утилизацией нефтесодержащего материала.',
-             None, None, None, None, None, None, None, None,
-             'Мастер ГНКТ', None]]
+        block_gnvp_list = events_gnvp_frez(self, distance, fluid_work_insert)
         gnkt_work_firts = [
             [None, 'ЦЕЛЬ ПРОГРАММЫ', None, None, None, None, None, None, None, None, None, None, None],
             [None, 1,
              f'СПО промывочной КНК-1 с промывкой до МГРП {self.top_muft}. СПО фрезеровочной КНК-2: фрезерование '
              f'МГРП {self.top_muft}-{2}. '
-                   'Тех.отстой , замер Ризб. По доп.согласованию с Заказчиком, СПО промывочной КНК-1 до '
-                   'текущего забоя (МГРП №1).', None, None, None, None, None, None, None, None, None, None, None],
+             'Тех.отстой , замер Ризб. По доп.согласованию с Заказчиком, СПО промывочной КНК-1 до '
+             'текущего забоя (МГРП №1).', None, None, None, None, None, None, None, None, None, None, None],
             [None, 2,
              'Внимание: Для проведения технологических операций завоз жидкости производить с ПНТЖ, '
              'согласованного с Заказчиком. Перед началом работ согласовать с Заказчиком пункт утилизации'
@@ -1176,7 +1040,6 @@ class Work_with_gnkt(QMainWindow):
         frez_mufts = []
         count_muft = -2
         for muft, muft_data in sorted(ports_data.items(), reverse=True)[:-1]:
-
             frez_muft = [
                 [None,
                  f'ФРЕЗЕРОВАНИЕ МУФТЫ {muft}',
@@ -1473,7 +1336,7 @@ class Work_with_gnkt(QMainWindow):
         return round(volume, 1)
 
     def date_dmy(self, date_str):
-        date_obj = datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
+        date_obj = date_str
         # print(date_obj)
         # print(date_str)
 
@@ -1576,21 +1439,21 @@ class Work_with_gnkt(QMainWindow):
         print(f'merge {merge_port}')
         return ports_list, merge_port
 
-    def work_with_port(self, plast_work: str, dict_perforation: dict, manufacturer, type_column):
-        ports_tuple = sorted(list(dict_perforation[plast_work]['интервал']), key=lambda x: x[0], reverse=True)
-        dict_ports = {}
-
-        for index, port in enumerate(ports_tuple):
-            # print(dict_saddles[manufacturer])
-            ball = dict_saddles[manufacturer][type_column][type_saddles].ball
-            saddle = dict_saddles[manufacturer][type_column][type_saddles].saddle
-            dict_ports[f'№{index + 1}'] = {'кровля': port[0], 'подошва': port[1], 'шар': ball, 'седло': saddle,
-                                           'тип': type_saddles}
-
-        return dict_ports
+    # def work_with_port(self, plast_work: str, dict_perforation: dict, manufacturer, type_column):
+    #     ports_tuple = sorted(list(dict_perforation[plast_work]['интервал']), key=lambda x: x[0], reverse=True)
+    #     dict_ports = {}
+    #
+    #     for index, port in enumerate(ports_tuple):
+    #         # print(dict_saddles[manufacturer])
+    #         ball = dict_saddles[manufacturer][type_column][type_saddles].ball
+    #         saddle = dict_saddles[manufacturer][type_column][type_saddles].saddle
+    #         dict_ports[f'№{index + 1}'] = {'кровля': port[0], 'подошва': port[1], 'шар': ball, 'седло': saddle,
+    #                                        'тип': type_saddles}
+    #
+    #     return dict_ports
 
     def calc_fluid(self):
-       
+
         fluid_list = []
         try:
 

@@ -18,7 +18,7 @@ from PyQt5.QtCore import Qt
 from openpyxl.workbook import Workbook
 from openpyxl.styles import Border, Side, Alignment, Font
 
-
+import property_excel.property_excel_pvr
 from work_py.advanted_file import count_row_height, definition_plast_work, raid, remove_overlapping_intervals
 
 from openpyxl.drawing.image import Image
@@ -30,6 +30,7 @@ from data_correct_position_people import CorrectSignaturesWindow
 from work_py.dop_plan_py import DopPlanWindow
 from work_py.drilling import Drill_window
 from users.login_users import LoginWindow
+
 
 
 class ExcelWorker(QThread):
@@ -374,6 +375,7 @@ class MyWindow(QMainWindow):
     def action_clicked(self):
         from open_pz import CreatePZ
         from work_py.gnkt_frez import Work_with_gnkt
+        from work_py.gnkt_grp import GnktOsvWindow
         from application_pvr import PvrApplication
         action = self.sender()
         if action == self.create_KRS:
@@ -446,8 +448,9 @@ class MyWindow(QMainWindow):
                     read_pz = CreatePZ(self.wb, self.ws, self.data_window, self.perforation_correct_window2)
                     sheet = read_pz.open_excel_file(self.ws, self.work_plan)
 
-                    self.rir_window = Work_with_gnkt(self.ws, self.tabWidget,
-                                                     self.table_title, self.table_schema, self.table_widget, )
+                    self.rir_window = GnktOsvWindow(self.ws,
+                                                     self.table_title, self.table_schema, self.table_widget)
+
 
                     self.pause_app()
                     well_data.pause = True
@@ -470,8 +473,7 @@ class MyWindow(QMainWindow):
                     read_pz = CreatePZ(self.wb, self.ws, self.data_window, self.perforation_correct_window2)
                     sheet = read_pz.open_excel_file(self.ws, self.work_plan)
 
-                    self.rir_window = Work_with_gnkt(self.ws, self.tabWidget,
-                                                     self.table_title, self.table_schema, self.table_widget, )
+                    self.rir_window = Work_with_gnkt(self.ws, self.table_title, self.table_schema, self.table_widget)
 
                     self.pause_app()
                     well_data.pause = True
@@ -482,6 +484,7 @@ class MyWindow(QMainWindow):
 
                 # if action == self.save_file:
                 #     open_pz.open_excel_file().wb.save("test_unmerge.xlsx")
+
 
         elif action == self.save_file:
             self.save_to_excel
@@ -683,17 +686,15 @@ class MyWindow(QMainWindow):
             # Этот сигнал испускается всякий раз, когда ячейка в таблице нажата.
             # Указанная строка и столбец - это ячейка, которая была нажата.
             self.table_widget.cellPressed[int, int].connect(self.clickedRowColumn)
-            if work_plan == 'gnkt_frez':
+            if work_plan in ['gnkt_frez', 'gnkt_after_grp']:
                 self.table_title = QTableWidget()
                 self.tabWidget.addTab(self.table_title, 'Титульник')
                 self.table_schema = QTableWidget()
                 self.tabWidget.addTab(self.table_schema, 'Схема скважины')
+                self.tabWidget.addTab(self.table_widget, 'Ход работ')
 
             else:
                 self.tabWidget.addTab(self.table_widget, 'Ход работ')
-
-
-
     def saveFileDialog(self, wb2, full_path):
         try:
             fileName, _ = QFileDialog.getSaveFileName(self, "Save excel-file",
@@ -718,11 +719,14 @@ class MyWindow(QMainWindow):
 
     def save_to_excel(self):
         from work_py.gnkt_frez import Work_with_gnkt
+        from work_py.gnkt_grp import GnktOsvWindow
 
-        if self.work_plan != 'gnkt_frez':
-            self.save_to_krs()
-        else:
+        if self.work_plan in ['gnkt_frez']:
             Work_with_gnkt.save_to_gnkt(self)
+        elif self.work_plan in ['gnkt_after_grp']:
+            GnktOsvWindow.save_to_gnkt(self)
+        else:
+            self.save_to_krs()
 
     def save_to_krs(self):
         from open_pz import CreatePZ
@@ -1838,7 +1842,7 @@ class MyWindow(QMainWindow):
         table_widget.setColumnCount(count_col)
         rowHeights_exit = [sheet.row_dimensions[i + 1].height if sheet.row_dimensions[i + 1].height is not None else 18
                            for i in range(sheet.max_row)]
-        if work_plan not in ['application_pvr', 'gnkt_frez']:
+        if work_plan not in ['application_pvr', 'gnkt_frez', 'gnkt_after_grp']:
             self.populate_row(table_widget.rowCount(), [
                 [None, None, 'Порядок работы', None, None, None, None, None, None, None, None, None],
                 [None, None, 'Наименование работ', None, None, None, None, None, None, None, 'Ответственный',
@@ -1877,10 +1881,10 @@ class MyWindow(QMainWindow):
                                                  merged_cell.max_col - merged_cell.min_col + 1)
                 else:
                     item = QTableWidgetItem("")
-                border = sheet.cell(row=row, column=col).border
-                if border.top.style is not None:
-                    item.setFlags(item.flags() ^ 0x00100000)  # Убираем рамку из ячейки
-                table_widget.setItem(row - 1, col - 1, item)
+                # border = sheet.cell(row=row, column=col).border
+                # if border.top.style is not None:
+                #     item.setFlags(item.flags() ^ 0x00100000)  # Убираем рамку из ячейки
+                # table_widget.setItem(row - 1, col - 1, item)
 
 
 
@@ -1936,7 +1940,7 @@ class MyWindow(QMainWindow):
 
 
 
-        if work_plan == 'gnkt_frez' and list_page == 2:
+        if work_plan in ['gnkt_frez'] and list_page == 2:
             colWidth = [2.28515625, 13.0, 4.5703125, 13.0, 13.0, 13.0, 5.7109375, 13.0, 13.0, 13.0, 4.7109375,
                         13.0, 5.140625, 13.0, 13.0, 13.0, 13.0, 13.0, 4.7109375, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0,
                         13.0,
@@ -1944,8 +1948,14 @@ class MyWindow(QMainWindow):
                         13.0, 13.0, 13.0, 5.42578125, 13.0, 4.5703125, 2.28515625, 10.28515625]
             for column in range(table_widget.columnCount()):
                 table_widget.setColumnWidth(column, int(colWidth[column]))  # Здесь задайте требуемую ширину столбца
+        elif work_plan in ['gnkt_after_grp'] and list_page == 2:
 
-        if work_plan == 'application_pvr':
+            colWidth = property_excel.property_excel_pvr.colWidth_gnkt_osv
+            for column in range(table_widget.columnCount()):
+
+                table_widget.setColumnWidth(column, int(colWidth[column]*9))  # Здесь задайте требуемую ширину столбца
+
+        elif  work_plan == 'application_pvr':
             from property_excel import property_excel_pvr
             for column in range(table_widget.columnCount()):
                 table_widget.setColumnWidth(column, int(property_excel_pvr.colWidth[column]))  # Здесь задайте требуемую ширину столбца

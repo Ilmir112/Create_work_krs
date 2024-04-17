@@ -7,17 +7,7 @@ from PyQt5.QtGui import QIntValidator, QDoubleValidator
 from PyQt5.QtWidgets import QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QTabWidget, QMainWindow, QPushButton, \
     QMessageBox, QApplication, QTableWidget, QTableWidgetItem, QVBoxLayout, QHeaderView
 
-from openpyxl.utils.cell import range_boundaries, get_column_letter
-from openpyxl.workbook import Workbook
 
-from block_name import region
-from property_excel.property_excel_pvr import boundaries, rowHeights1, colWidth
-
-from main import MyWindow
-from plan import copy_true_ws
-
-
-from work_py.perforation import PerforationWindow
 
 
 class TabPage_SO_pvr(QWidget):

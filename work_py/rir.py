@@ -970,11 +970,9 @@ class RirWindow(QMainWindow):
     def add_work(self):
 
         plast_combo = str(self.tabWidget.currentWidget().plast_combo.combo_box.currentText())
-        paker_need_Combo = str(self.tabWidget.currentWidget().paker_need_Combo.currentText())
         rir_type_Combo = str(self.tabWidget.currentWidget().rir_type_Combo.currentText())
         roof_rir_edit = int(float(self.tabWidget.currentWidget().roof_rir_edit.text().replace(',', '.')))
         sole_rir_edit = int(float(self.tabWidget.currentWidget().sole_rir_edit.text().replace(',', '.')))
-
         paker_need_Combo = self.tabWidget.currentWidget().paker_need_Combo.currentText()
         pressureZUMPF_question = self.tabWidget.currentWidget().pressureZUMPF_question_QCombo.currentText()
         if paker_need_Combo == 'Нужно СПО':

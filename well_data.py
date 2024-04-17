@@ -46,7 +46,10 @@ class ProtectedIsNonNone:
             print(f'Ошибка: {value} - не корректное строковое значение')
             raise ValueError("Значение должно быть строкой")
 
-
+column_head_m = ''
+date_drilling_cancel = ''
+date_drilling_run = ''
+wellhead_fittings = ''
 well_area = ProtectedIsNonNone('не корректно')
 well_number = ProtectedIsNonNone('не корректно')
 inv_number = ProtectedIsNonNone('не корректно')

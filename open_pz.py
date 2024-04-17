@@ -38,6 +38,7 @@ class CreatePZ(QMainWindow):
         well_pz = FindIndexPZ(ws)
         # well_pz.read_pz(ws)
 
+        well_data.region = region(well_data.cdng._value)
         WellNkt.read_well(self, ws, well_data.pipes_ind._value, well_data.condition_of_wells._value)
         if well_data.work_plan not in ['application_pvr', 'application_gis']:
             WellSucker_rod.read_well(self, ws, well_data.sucker_rod_ind._value, well_data.pipes_ind._value)
@@ -140,7 +141,7 @@ class CreatePZ(QMainWindow):
                 well_data.row_expected.append(lst)
 
 
-            if well_data.work_plan not in ['gnkt_frez', 'application_pvr', 'application_gis']:
+            if well_data.work_plan not in ['gnkt_frez', 'application_pvr', 'application_gis', 'gnkt_after_grp']:
                 # print(f'план работ {well_data.work_plan}')
                 delete_rows_pz(self, ws)
                 razdel = razdel_1(self, well_data.region)
@@ -261,7 +262,7 @@ class CreatePZ(QMainWindow):
     def add_itog(self, ws, ins_ind, work_plan):
 
         ws.delete_rows(ins_ind, self.table_widget.rowCount() - ins_ind + 1)
-        if work_plan not in ['gnkt_frez', 'application_pvr']:
+        if work_plan not in ['gnkt_frez', 'application_pvr', 'gnkt_after_grp']:
             for i in range(ins_ind, len(itog_1(self)) + ins_ind):  # Добавлением итогов
                 if i < ins_ind + 6:
                     for j in range(1, 13):

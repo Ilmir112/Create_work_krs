@@ -2,14 +2,18 @@ from collections import namedtuple
 
 Saddles = namedtuple('Saddles', ['saddle', 'ball'])
 
-Gnkt_data = namedtuple("Gnkt_data", ["gnkt_length", "diametr_length", "pvo"])
+Gnkt_data = namedtuple("Gnkt_data", ["gnkt_length", "diametr_length", "iznos", "pvo"])
 
 
-gnkt_2 = Gnkt_data(2200, 38, 115)
-gnkt_1 = Gnkt_data(3200, 38, 166)
+
+gnkt_2 = Gnkt_data(2200, 38, 20, 115)
+gnkt_1 = Gnkt_data(3200, 38, 20, 166)
+gnkt_dict = {}
+gnkt_dict["Ойл-сервис"] = ['ГНКТ №1', 'ГНКТ №2']
 
 dict_saddles = {
-    'НТЦ ЗЭРС': {"ФПЗН1.114": {
+    'НТЦ ЗЭРС': {
+        "ФПЗН1.114": {
                 '114/70А': Saddles('67.90', '70.92'),
                 '114/67А': Saddles('64.65', '67.57'),
                 '114/64А': Saddles('61.5', '64.32'),

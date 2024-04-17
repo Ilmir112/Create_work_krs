@@ -472,7 +472,7 @@ def volume_pod_NKT(self):  # Расчет необходимого объема 
                             float(well_data.head_column_additional._value) - nkt_l) / 1000 + 3.14 * (
                             well_data.column_additional_diametr._value - well_data.column_additional_wall_thickness._value * 2) ** 2 / 4 / 1000 * (
                             well_data.current_bottom - float(well_data.head_column_additional._value)) / 1000
-    elif nkt_l < float(well_data.head_column_additional._value):
+    elif nkt_l <= float(well_data.head_column_additional._value):
         v_pod_gno = 3.14 * (
                 well_data.column_additional_diametr._value - well_data.column_additional_wall_thickness._value * 2) ** 2 / 4 / 1000 * (
                             well_data.current_bottom - nkt_l) / 1000
