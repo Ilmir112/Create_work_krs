@@ -262,7 +262,7 @@ class CreatePZ(QMainWindow):
     def add_itog(self, ws, ins_ind, work_plan):
 
         ws.delete_rows(ins_ind, self.table_widget.rowCount() - ins_ind + 1)
-        if work_plan not in ['gnkt_frez', 'application_pvr', 'gnkt_after_grp']:
+        if work_plan not in ['gnkt_frez', 'application_pvr', 'gnkt_after_grp', 'gnkt_opz']:
             for i in range(ins_ind, len(itog_1(self)) + ins_ind):  # Добавлением итогов
                 if i < ins_ind + 6:
                     for j in range(1, 13):

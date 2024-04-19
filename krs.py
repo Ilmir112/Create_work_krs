@@ -163,7 +163,7 @@ class GnoWindow(QMainWindow):
         lift_key = str(self.tabWidget.currentWidget().gno_combo.currentText())
         current_bottom = round(float(self.tabWidget.currentWidget().current_bottom_edit.text()), 1)
         fluid = self.tabWidget.currentWidget().fluid_edit.text()
-        volume_well_jaming = round(float(self.tabWidget.currentWidget().volume_jumping_edit.text()), 1)
+        volume_well_jaming = round(float(self.tabWidget.currentWidget().volume_jumping_edit.text().replace(',', '.')), 1)
         well_data.current_bottom = current_bottom
         well_data.fluid_work, well_data.fluid_work_short = self.calc_work_fluid(fluid)
         work_list = self.work_krs(self.work_plan, lift_key, volume_well_jaming, fluid)

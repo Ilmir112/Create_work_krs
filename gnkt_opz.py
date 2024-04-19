@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox, QMainWindow, QTabWidget, 
 from PyQt5 import QtWidgets
 
 import well_data
+from cdng import events_gnvp_frez
 from krs import GnoWindow
 from main import MyWindow
 from work_py.acid_paker import CheckableComboBox, AcidPakerWindow
@@ -14,9 +15,9 @@ class TabPage_gnkt(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        self.gnkt_number_label = QLabel('Номер ГНКТ')
-        self.gnkt_number_combo = QComboBox(self)
-        self.gnkt_number_combo.addItems(['ГНКТ №2', 'ГНКТ №1'])
+        # self.gnkt_number_label = QLabel('Номер ГНКТ')
+        # self.gnkt_number_combo = QComboBox(self)
+        # self.gnkt_number_combo.addItems(['ГНКТ №2', 'ГНКТ №1'])
 
         self.roof_label = QLabel("кровля пласта", self)
         self.roof_edit = QLineEdit(self)
@@ -92,8 +93,8 @@ class TabPage_gnkt(QWidget):
         self.pressure_edit.setText(f'{well_data.max_admissible_pressure._value}')
 
         grid = QGridLayout(self)
-        grid.addWidget(self.gnkt_number_label, 0, 0)
-        grid.addWidget(self.gnkt_number_combo, 1, 0)
+        # grid.addWidget(self.gnkt_number_label, 0, 0)
+        # grid.addWidget(self.gnkt_number_combo, 1, 0)
         grid.addWidget(self.plast_label, 0, 1)
         grid.addWidget(self.plast_combo, 1, 1)
         grid.addWidget(self.roof_label, 0, 2)
@@ -143,7 +144,7 @@ class TabWidget(QTabWidget):
 
 
 class GnktOpz(QMainWindow):
-    def __init__(self, ins_ind, table_widget, parent=None):
+    def __init__(self,  table_widget, gnkt_number_combo, fluid_edit, parent=None):
 
         super(GnktOpz, self).__init__(parent=None)
         self.centralWidget = QWidget()
@@ -151,7 +152,9 @@ class GnktOpz(QMainWindow):
 
         self.work_plan = 'gnkt_opz'
         self.paker_select = None
-        self.ins_ind = ins_ind
+        self.gnkt_number_combo = gnkt_number_combo
+        self.fluid_edit = fluid_edit
+
         self.table_widget = table_widget
         self.tabWidget = TabWidget()
         self.dict_nkt = {}
@@ -182,17 +185,21 @@ class GnktOpz(QMainWindow):
         work_list = self.gnkt_work(roof_plast, sole_plast, need_rast_combo, volume_rast_edit, acid_true_edit,
                                    acid_edit, skv_volume_edit, skv_proc_edit, acid_volume_edit, acid_proc_edit,
                                    pressure_edit,
-                                   plast_combo, svk_true_edit, skv_acid_edit)
+                                   plast_combo, svk_true_edit, skv_acid_edit, self.gnkt_number_combo, self.fluid_edit)
 
-        MyWindow.populate_row(self, self.ins_ind, work_list, self.table_widget)
+
         well_data.pause = False
         self.close()
+        return work_list
 
     def gnkt_work(self, roof_plast, sole_plast, need_rast_combo, volume_rast_edit, acid_true_edit,
                   acid_edit, skv_volume_edit, skv_proc_edit, acid_volume_edit, acid_proc_edit, pressure_edit,
-                  plast_combo, svk_true_edit, skv_acid_edit):
+                  plast_combo, svk_true_edit, skv_acid_edit, gnkt_number_combo, fluid_work_insert):
 
-        gnkt_number_combo = str(self.tabWidget.currentWidget().gnkt_number_combo.currentText())
+        distance, _ = QInputDialog.getInt(None, 'Расстояние НПТЖ', 'Введите Расстояние до ПНТЖ')
+
+        block_gnvp_list = events_gnvp_frez(self, distance, float(fluid_work_insert))
+
 
         if gnkt_number_combo == 'ГНКТ №2':
             gnkt_number = gnkt_data.gnkt_2
@@ -206,10 +213,7 @@ class GnktOpz(QMainWindow):
         else:
             acid_true_quest = False
 
-        fluid_work_insert, ok = QInputDialog.getDouble(self,
-                                                   'удельный вес',
-                                                   'ВВедите удельный вес рабочей жидкости',
-                                                   1.18, 0, 1.6, 2)
+
         fluid_work, well_data.fluid_work_short = GnoWindow.calc_work_fluid(self, fluid_work_insert)
 
         if need_rast_combo == 'нужно':
@@ -487,7 +491,8 @@ class GnktOpz(QMainWindow):
                 n += 1
         else:
             pass
-
+        for row in block_gnvp_list[::-1]:
+            gnkt_opz.insert(0, row)
         for i in range(3, len(gnkt_opz)):  # нумерация работ
             gnkt_opz[i][1] = i - 2
 

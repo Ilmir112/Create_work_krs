@@ -110,6 +110,7 @@ class GnktOsvWindow2(QMainWindow):
     def add_work(self):
         gnkt_number_combo = self.tabWidget.currentWidget().gnkt_number_combo.currentText()
         GnktOsvWindow2.gnkt_number_combo = gnkt_number_combo
+        GnktOsvWindow2.gnkt_number_combo = gnkt_number_combo
         lenght_gnkt_edit = self.tabWidget.currentWidget().lenght_gnkt_edit.text()
         GnktOsvWindow2.lenght_gnkt_edit = lenght_gnkt_edit
         iznos_gnkt_edit = self.tabWidget.currentWidget().iznos_gnkt_edit.text()

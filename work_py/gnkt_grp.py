@@ -2,13 +2,11 @@ from datetime import datetime
 
 from PyQt5.QtWidgets import QInputDialog, QMainWindow, QTabWidget, QWidget, QTableWidget, QApplication, QLabel, \
     QLineEdit, QGridLayout, QComboBox, QPushButton
-# from PyQt5.uic.properties import QtWidgets
-from openpyxl.styles import Alignment
-from openpyxl.utils import get_column_letter
-from collections import namedtuple
+from main import MyWindow
 
 import well_data
 from gnkt_data.gnkt_data import gnkt_1, gnkt_2, gnkt_dict
+from gnkt_opz import GnktOpz
 from krs import TabPageGno, GnoWindow
 from perforation_correct import PerforationCorrect
 
@@ -92,7 +90,7 @@ class TabWidget(QTabWidget):
 class GnktOsvWindow(QMainWindow):
     wb = None
 
-    def __init__(self, sheet, table_title, table_schema, table_widget):
+    def __init__(self, sheet, table_title, table_schema, table_widget, work_plan):
         super(QMainWindow, self).__init__()
         from work_py.gnkt_frez import Work_with_gnkt
 
@@ -108,32 +106,38 @@ class GnktOsvWindow(QMainWindow):
         GnktOsvWindow.wb = self.wb
         self.ws_schema = self.wb.active
 
-        self.work_plan = 'gnkt_after_grp'
-        self.perforation_correct_window2 = None
+        self.work_plan = work_plan
+
+        self.work_window = None
         self.wb.sheetnames.insert(0, "Титульник")
         self.ws_title = self.wb.create_sheet("Титульник", 0)
         self.ws_work = self.wb.create_sheet(title="Ход работ")
 
         create_title = Work_with_gnkt.create_title_list(self, self.ws_title)
-        head = plan.head_ind(well_data.cat_well_min._value, well_data.cat_well_max._value)
+        if self.work_plan == 'gnkt_opz':
+            b = 4
+        else:
+            b = 0
+        head = plan.head_ind(well_data.cat_well_min._value+b, well_data.cat_well_max._value+b)
+        print(f'классификатор {head}')
         plan.copy_true_ws(sheet, self.ws_title, head)
 
-        if self.perforation_correct_window2 is None:
-            self.perforation_correct_window2 = GnktOsvWindow2(self)
-            self.perforation_correct_window2.setWindowTitle("Данные по ГНКТ")
-            self.perforation_correct_window2.setGeometry(200, 400, 100, 400)
-            self.perforation_correct_window2.show()
+        if self.work_window is None:
+            self.work_window = GnktOsvWindow2(self)
+            self.work_window.setWindowTitle("Данные по ГНКТ")
+            self.work_window.setGeometry(200, 400, 100, 400)
+            self.work_window.show()
             main.MyWindow.pause_app()
             well_data.pause = True
 
-            self.work_schema = self.perforation_correct_window2.add_work()
+            self.work_schema = self.work_window.add_work()
 
             # print(self.work_schema)
-            self.perforation_correct_window2 = None
+            self.work_window = None
 
         else:
-            self.perforation_correct_window2.close()
-            self.perforation_correct_window2 = None
+            self.work_window.close()
+            self.work_window = None
         # schema_well = self.schema_well(self.ws_schema, )
         self.copy_pvr(self.ws_schema, self.work_schema)
         # self.wb.save(f"{well_data.well_number._value} {well_data.well_area._value} ГНКТ освоение.xlsx")
@@ -143,11 +147,27 @@ class GnktOsvWindow(QMainWindow):
         main.MyWindow.copy_pz(self, self.ws_schema, table_schema, self.work_plan, 23, 2)
 
         main.MyWindow.copy_pz(self, self.ws_work, table_widget, self.work_plan, 12, 3)
-        work_well = self.gnkt_work(
-            GnktOsvWindow2.fluid_edit, GnktOsvWindow2.pvo_number, GnktOsvWindow2.current_bottom_edit,
-         GnktOsvWindow2.osvoenie_combo_need)
-        main.MyWindow.populate_row(self, 0, work_well, table_widget)
-        CreatePZ.add_itog(self, self.ws_work, self.table_widget.rowCount() + 1, self.work_plan)
+        if self.work_plan == 'gnkt_opz':
+            if self.work_window is None:
+                self.work_window = GnktOpz(table_widget, GnktOsvWindow2.gnkt_number_combo, GnktOsvWindow2.fluid_edit)
+                self.work_window.show()
+                well_data.pause = True
+                MyWindow.pause_app()
+
+                work_well = self.work_window.add_work()
+                well_data.pause = True
+                self.work_window = None
+            else:
+                self.work_window.close()  # Close window.
+                self.work_window = None
+
+        elif self.work_plan == 'gnkt_after_grp':
+            work_well = self.gnkt_work(
+                GnktOsvWindow2.fluid_edit, GnktOsvWindow2.pvo_number, GnktOsvWindow2.current_bottom_edit,
+             GnktOsvWindow2.osvoenie_combo_need)
+        if work_well:
+            main.MyWindow.populate_row(self, 0, work_well, table_widget)
+            CreatePZ.add_itog(self, self.ws_work, self.table_widget.rowCount() + 1, self.work_plan)
 
 
 
@@ -556,7 +576,8 @@ class GnktOsvWindow(QMainWindow):
         coordinate_nkt_with_paker = 'F6'
         main.MyWindow.insert_image(self, ws, 'imageFiles/schema_well/НКТ с пакером.png', coordinate_nkt_with_paker, 100, 470)
         coordinate_propant = 'F43'
-        main.MyWindow.insert_image(self, ws, 'imageFiles/schema_well/пропант.png', coordinate_propant, 90, 500)
+        if self.work_plan == 'gnkt_after_grp':
+            main.MyWindow.insert_image(self, ws, 'imageFiles/schema_well/пропант.png', coordinate_propant, 90, 500)
 
 
         n = 0
@@ -564,12 +585,12 @@ class GnktOsvWindow(QMainWindow):
         for plast in well_data.plast_all:
             count_interval = well_data.dict_perforation[plast]['счет_объединение']
 
-            self.ws_schema.merge_cells(start_column=23, start_row=27 + m,
+            self.ws_schema.merge_cells(start_column=23, start_row=26 + m,
                                 end_column=23, end_row= 27 + count_interval + m -1)
-            self.ws_schema.merge_cells(start_column=22, start_row=27 + m,
+            self.ws_schema.merge_cells(start_column=22, start_row=26 + m,
                                        end_column=22, end_row=27 + count_interval + m - 1)
-            self.ws_schema.merge_cells(start_column=21, start_row=27 + m,
-                                       end_column=21, end_row=27 + count_interval + m - 1)
+            self.ws_schema.merge_cells(start_column=21, start_row=26 + m,
+                                       end_column=21, end_row=26 + count_interval + m - 1)
             m += count_interval
             roof_plast = well_data.dict_perforation[plast]['кровля']
             sole_plast = well_data.dict_perforation[plast]['подошва']
@@ -583,8 +604,8 @@ class GnktOsvWindow(QMainWindow):
                 ws.cell(row=48+n, column=10).font = Font(name='Arial', size=12, bold=True)
                 ws.cell(row=48+n, column=10).alignment = Alignment(wrap_text=True, horizontal='left',
                                        vertical='center')
-                n += 3
-                main.MyWindow.insert_image(self, ws, 'imageFiles/schema_well/ПВР.png', coordinate_pvr, 100, 100)
+                n += 2
+                main.MyWindow.insert_image(self, ws, 'imageFiles/schema_well/ПВР.png', coordinate_pvr, 90, 100)
 
         coordinate_voln = f'E18'
         main.MyWindow.insert_image(self, ws, 'imageFiles/schema_well/переход.png', coordinate_voln, 150, 60)

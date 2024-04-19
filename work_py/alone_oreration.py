@@ -173,10 +173,10 @@ def konte(self):
     return konte_list
 def definition_Q(self):
 
-    definition_Q_list = [[f'Насыщение 5м3 определение Q при {pressure_mode(well_data.expected_P, "пласт")}', None,
+    definition_Q_list = [[f'Насыщение 5м3 определение Q при 80-120атм', None,
                            f'Произвести насыщение скважины до стабилизации давления закачки не менее 5м3. Опробовать  '
-                           f' на приемистость в трех режимах при Р={pressure_mode(well_data.expected_P, "пласт")}атм в '
-                           f'присутствии представителя ЦДНГ. '
+                           f' на приемистость в трех режимах при Р=80-120атм в '
+                           f'присутствии представителя супервайзерской службы или подрядчика по РИР. '
                            f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, '
                            f'с подтверждением за 2 часа до '
                            f'начала работ). ',
@@ -354,7 +354,7 @@ def volume_vn_ek(current):
 
 
 def volume_vn_nkt(dict_nkt):  # Внутренний объем одного погонного местра НКТ
-    # print(dict_nkt)
+    print(dict_nkt)
     for nkt, lenght_nkt in dict_nkt.items():
         volume_vn_nkt = 0
         if ''.join(filter(str.isdecimal, str(nkt))) == '60':
@@ -388,9 +388,11 @@ def volume_rod(self, dict_sucker_rod):  # Объем штанг
 
 def volume_nkt(dict_nkt):  # Внутренний объем НКТ по фондовым НКТ
     volume_nkt = 0
+
     for nkt, length_nkt in dict_nkt.items():
         if nkt:
-            volume_nkt += volume_vn_nkt(nkt) * length_nkt
+            volume_nkt += (float(nkt) - 2 * 7.6)**2 * 3.14 /4/1000000 * length_nkt
+    print(f'объем НКТ {volume_nkt}')
     return volume_nkt
 
 
@@ -406,19 +408,6 @@ def weigth_pipe(dict_nkt):
         elif '48' in str(nkt):
             weigth_pipe += lenght_nkt * 4.3 / 1000
     return weigth_pipe
-
-
-def volume_metal_nkt(d_nkt):  # объем металла
-    if ''.join(filter(str.isdecimal, str(d_nkt))) == '73':
-        t_nkt = 5.5
-    elif ''.join(filter(str.isdecimal, str(d_nkt))) == '89':
-        t_nkt = 6
-    elif ''.join(filter(str.isdecimal, str(d_nkt))) == '60':
-        t_nkt = 5
-    elif ''.join(filter(str.isdecimal, str(d_nkt))) == '48':
-        t_nkt = 4.5
-    # print(f'объем между ЭК и НКТ{well_volume()-3.14 * (d_nkt) ** 2 / 4000000 * 1141}' )
-    return round(3.14 * (d_nkt) ** 2 / 4000000 - 3.14 * (d_nkt - 2 * t_nkt) ** 2 / 4000000, 6)
 
 
 def volume_nkt_metal(dict_nkt):  # Внутренний объем НКТ железа по фондовым
@@ -438,20 +427,20 @@ def volume_nkt_metal(dict_nkt):  # Внутренний объем НКТ жел
 def well_volume(self, current_bottom):
     # print(well_data.column_additional)
     if well_data.column_additional is False:
-        print(well_data.column_diametr._value, well_data.column_wall_thickness._value, current_bottom)
+        # print(well_data.column_diametr._value, well_data.column_wall_thickness._value, current_bottom)
         volume_well = 3.14 * (
                 well_data.column_diametr._value - well_data.column_wall_thickness._value * 2) ** 2 / 4 / 1000000 * (
                           current_bottom)
 
     else:
-        print(f' ghb [{well_data.column_additional_diametr._value, well_data.column_additional_wall_thickness._value}]')
+        # print(f' ghb [{well_data.column_additional_diametr._value, well_data.column_additional_wall_thickness._value}]')
         volume_well = (3.14 * (
                 well_data.column_additional_diametr._value - well_data.column_additional_wall_thickness._value * 2) ** 2 / 4 / 1000 * (
                                current_bottom - float(well_data.head_column_additional._value)) / 1000) + (
                               3.14 * (
                               well_data.column_diametr._value - well_data.column_wall_thickness._value * 2) ** 2 / 4 / 1000 * (
                                   float(well_data.head_column_additional._value)) / 1000)
-    print(f'Объем скважины {volume_well}')
+    # print(f'Объем скважины {volume_well}')
     return round(volume_well, 1)
 
 

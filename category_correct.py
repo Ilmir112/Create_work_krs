@@ -86,7 +86,7 @@ class TabPage_SO(QWidget):
 
             plast_index.addItems(self.plast_all)
             #
-            # print(f'пласт {work_plast}')
+            print(f'пласт {work_plast}')
             plast_index.setCurrentIndex(self.plast_all.index(work_plast))
 
             category_pressuar_line_edit = QLineEdit(self)
@@ -242,7 +242,7 @@ class CategoryWindow(QMainWindow):
                         int(self.tabWidget.currentWidget().labels_category[index][2].text()),
                         float(self.tabWidget.currentWidget().labels_category[index][4].text()),
                         float(self.tabWidget.currentWidget().labels_category[index][5].text()),
-                        float(self.tabWidget.currentWidget().labels_category[index][9].text())))
+                        float(self.tabWidget.currentWidget().labels_category[index][9].text().replace(',','.'))))
 
                 CategoryWindow.dict_category.setdefault(plast, {}).setdefault(
                     'по газовому фактору', Data_gaz(

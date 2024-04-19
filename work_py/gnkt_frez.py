@@ -14,6 +14,7 @@ from block_name import razdel_1
 from openpyxl.styles import Border, Side, PatternFill, Font, Alignment
 from openpyxl.workbook import Workbook
 from gnkt_data.gnkt_data import dict_saddles
+from work_py.alone_oreration import volume_jamming_well, well_volume, volume_nkt_metal, volume_nkt
 from work_py.gnkt_grp_work import GnktOsvWindow2
 from .data_informations import dict_data_cdng, calc_pntzh
 
@@ -778,13 +779,38 @@ class Work_with_gnkt(QMainWindow):
     def work_gnkt_frez(self, ports_data, plast_work):
         from krs import GnoWindow
         from cdng import events_gnvp_frez
+        if well_data.column_additional:
+            if sum(list(well_data.dict_nkt.values())) != 0 and \
+                    abs(well_data.depth_fond_paker_do['do'] - well_data.head_column_additional._value) > 30:
+                ntk_true = True
+                paker_true = False
+                nkt_lenght = round(sum(list(well_data.dict_nkt.values())), 0)
+            elif sum(list(well_data.dict_nkt.values())) != 0 and \
+                        abs(well_data.depth_fond_paker_do['do'] - well_data.head_column_additional._value) < 30:
+                ntk_true = True
+                paker_true = True
+                nkt_lenght = round(sum(list(well_data.dict_nkt.values())), 0)
 
-        if sum(list(well_data.dict_nkt.values())) != 0:
-            ntk_true = True
-            nkt_lenght = round(sum(list(well_data.dict_nkt.values())), 0)
+            else:
+                ntk_true = False
+                paker_true = False
+                nkt_lenght = 0
         else:
-            ntk_true = False
-            nkt_lenght = round(self.top_muft - 20, 1)
+            if sum(list(well_data.dict_nkt.values())) != 0 and \
+                    well_data.depth_fond_paker_do['do'] != 0:
+                ntk_true = True
+                paker_true = True
+                nkt_lenght = round(sum(list(well_data.dict_nkt.values())), 0)
+            elif sum(list(well_data.dict_nkt.values())) == 0:
+                ntk_true = False
+                paker_true = False
+                nkt_lenght = round(sum(list(well_data.dict_nkt.values())), 0)
+            else:
+                ntk_true = True
+                paker_true = False
+                nkt_lenght = 0
+
+
 
         distance, _ = QInputDialog.getInt(None, 'Расстояние НПТЖ', 'Введите Расстояние до ПНТЖ')
 
@@ -891,11 +917,10 @@ class Work_with_gnkt(QMainWindow):
              'Мастер ГНКТ', None],
             [None, 15,
              f'Произвести монтаж 4-х секционного превентора БП 80-70.00.00.000 (700атм) и инжектора на устье '
-             f'скважины согласно "Схемы №6 обвязки устья скважин I, II, III категории опасности возникновения ГНВП '
-             f'после проведения гидроразрыва пласта и работы на скважинах ППД с оборудованием койлтюбинговых установок '
-             f'на месторождениях ООО "Башнефть-Добыча" от {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}. '
-             f'Произвести обвязку установки ГНКТ,'
-             f' насосно-компрессорного агрегата, желобной циркуляционной системы.',
+             f'скважины согласно «Схемы обвязки №5 устья противовыбросовым оборудованием при производстве работ по '
+             f'промывке скважины с установкой «ГНКТ» утвержденная главным инженером от '
+             f'{well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г. Произвести обвязку установки ГНКТ, '
+             f'насосно-компрессорного агрегата, желобной циркуляционной системы.',
              None, None, None, None, None, None, None, None,
              'Мастер ГНКТ', None],
             [None, 16,
@@ -1224,16 +1249,7 @@ class Work_with_gnkt(QMainWindow):
              'Мастер ГНКТ представитель Заказчика', None],
             [None, 'Подъем промывочной КНК-1', None, None, None, None, None, None, None, None, None, None, None],
             [None, 56,
-             'Произвести подъем с замещением скважинной жидкости на раствор глушения, удельного веса по согласованию '
-             'с Заказчиком, рассчитанного по замеру Ризб после 2-х часов отстоя и удел.веса рабочей жидкости в скважин, '
-             'но не менее удельного веса расчитанного для пластового давления указанного в настоящем плане работ '
-             f'{self.zhgs} (при Рпл={self.pressuar}атм).  До завоза раствора, '
-             f'скважину разряжать. Перед замещением КНК установить '
-             f'в интервале нижнего фрак-порта.\nПрокачать на циркуляцию жидкость глушения в объеме не менее '
-             f'{self.volume_dumping(ntk_true, self.bottom_muft)}м3 '
-             '(трубного пространства)  с одновременным подъемом ГНКТ (с протяжкой ГНКТ перевести хвостовик). '
-             'В процессе перевода соблюдать равенство объемов закаченной и отобранной из скважины жидкости, '
-             'т.е. не допускать режима фонтанирования (поглощения).',
+             self.jamming_well_str(ntk_true, paker_true),
              None, None,
              None, None,
              None, None,
@@ -1326,7 +1342,46 @@ class Work_with_gnkt(QMainWindow):
         #         if cell.value != None and row > 24:
         #             cell.border = border
         return gnkt_work_list
+    def jamming_well_str(self, ntk_true, paker_true):
+        if ntk_true is True and paker_true is True:
 
+            jamming_well = f'Произвести подъем с замещением скважинной жидкости на раствор глушения, удельного веса по согласованию ' \
+                             f'с Заказчиком, рассчитанного по замеру Ризб после 2-х часов отстоя и удел.веса рабочей жидкости в скважин, '\
+                 f'но не менее удельного веса расчитанного для пластового давления указанного в настоящем плане работ '\
+                 f'{self.zhgs} (при Рпл={self.pressuar}атм).  До завоза раствора, '\
+                 f'скважину разряжать. Перед замещением КНК установить '\
+                 f'в интервале нижнего фрак-порта.\nПрокачать на циркуляцию жидкость глушения в объеме не менее '\
+                 f'{self.volume_dumping(ntk_true, paker_true, self.bottom_muft)}м3 '\
+                 f'(трубного пространства) с одновременным подъемом ГНКТ (с протяжкой ГНКТ перевести хвостовик). '\
+                 f'В процессе перевода соблюдать равенство объемов закаченной и отобранной из скважины жидкости, '\
+                 f'т.е. не допускать режима фонтанирования (поглощения).'
+        elif ntk_true is True and paker_true is False:
+            print(f'объем скважины {well_volume(self, well_data.perforation_sole)}')
+            print(f'объем металла {volume_nkt_metal(well_data.dict_nkt)}')
+            print(f'объем внутренний НКТ {volume_nkt(well_data.dict_nkt)}')
+            volume_first = round((well_volume(self, well_data.perforation_sole) -volume_nkt_metal(well_data.dict_nkt) -volume_nkt(well_data.dict_nkt)) *1.2, 1)
+            print(volume_first)
+
+            jamming_well = f'Произвести замер избыточного давления в течении 2ч при условии заполнения ствола ствола ' \
+                         f'жидкостью уд.весом 1.01г/см3. Произвести перерасчет забойного давления, Согласовать с ' \
+                         f'заказчиком глушение скважин и необходимый удельный вес жидкости глушения,  но не менее ' \
+                           f'удельного веса расчитанного для пластового ' \
+                         f'давления указанного в настоящем плане работ {self.zhgs} (при Рпл={self.pressuar}атм). ' \
+                           f'Допустить КНК до нижнего фрак-порта.' \
+                         f'До завоза раствора, скважину разряжать. При достаточной вязкости раствора  предусмотреть ' \
+                           f'работу без обратного клапана'\
+                           f'Произвести перевод на тех жидкость расчетного удельного ' \
+                         f'веса в объеме {volume_first}м3 (объем подпакерного пространства + затруб + 20% запас), ' \
+                         f'вывести циркуляцию с большого затруба  с ПРОТЯЖКОЙ ГНКТ СНИЗУ ВВЕРХ  с выходом ' \
+                         f'циркуляции по большому затрубу до башмака НКТ до гл. {well_data.depth_fond_paker_do["do"]}м ' \
+                         f'В башмаке НКТ промыть до выхода жидкости глушения по малому затрубу в объеме ' \
+                         f'{round(volume_nkt(well_data.dict_nkt),1)}м3 с одновременным подъемом ГНКТ. Тех отстой 2ч.' \
+                         f' В случае отрицательного результата по глушению скважины произвести перерасчет ЖГС и ' \
+                         f'повторить операцию. В процессе перевода соблюдать равенство объемов закаченной и ' \
+                           f'отобранной из скважины жидкости, '\
+                        f'т.е. не допускать режима фонтанирования (поглощения).'
+
+        return jamming_well
     def volume_dumping(self, ntk_true, first_muft):
         from work_py.alone_oreration import volume_pod_NKT, volume_jamming_well
 
