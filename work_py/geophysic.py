@@ -114,19 +114,24 @@ class GeophysicWindow(MyWindow):
     def geophysic_sel(self, geophysic, editType, editType2):
 
         if geophysic == 'АКЦ':
-            research = f'ЗАДАЧА 2.7.1 Определение состояния цементного камня (АКЦ, АК сканирование) в интервале {editType}-{editType2}м. '
+            research = f'ЗАДАЧА 2.7.1 Определение состояния цементного камня (АКЦ, АК сканирование) в ' \
+                       f'интервале {editType}-{editType2}м. '
             research_short = f'АКЦ в интервале {editType}-{editType2}м.'
         elif geophysic == 'СГДТ':
-            research = f'ЗАДАЧА 2.7.2 Определение плотности, дефектов цементного камня, эксцентриситета колонны (СГДТ) в интервале {editType}-{editType2}м.'
+            research = f'ЗАДАЧА 2.7.2 Определение плотности, дефектов цементного камня, эксцентриситета колонны ' \
+                       f'(СГДТ) в интервале {editType}-{editType2}м.'
             research_short = f'СГДТ в интервале {editType}-{editType2}м.'
         elif geophysic == 'АКЦ + СГДТ':
-            research = f'ЗАДАЧА 2.7.3  Определение состояния цементного камня (АКЦ, АК сканирование). в интервале {editType}-{editType2}м,' \
-                       f'Определение плотности, дефектов цементного камня, эксцентриситета колонны (СГДТ) в интервале 0 - {well_data.perforation_roof - 20} '
+            research = f'ЗАДАЧА 2.7.3  Определение состояния цементного камня (АКЦ, АК сканирование). в интервале ' \
+                       f'{editType}-{editType2}м,' \
+                       f'Определение плотности, дефектов цементного камня, эксцентриситета колонны (СГДТ) в ' \
+                       f'интервале 0 - {well_data.perforation_roof - 20} '
             research_short = f'АКЦ в интервале {editType}-{editType2}м.' \
                              f'СГДТ в интервале 0 - {well_data.perforation_roof - 20}'
 
         elif geophysic == 'ИНГК':
-            research = f'ЗАДАЧА 2.4.3 Определение текущей нефтенасыщенности по данным интегрального импульсного нейтронного' \
+            research = f'ЗАДАЧА 2.4.3 Определение текущей нефтенасыщенности по данным интегрального импульсного ' \
+                       f'нейтронного' \
                        f'каротажа пласта  в интервале {editType}-{editType2}м. '
             research_short = f'ИНГК в интервале {editType}-{editType2}м.'
 
@@ -164,8 +169,6 @@ class GeophysicWindow(MyWindow):
             return 0
     def add_work(self):
 
-
-
         rows = self.tableWidget.rowCount()
         geophysicalResearch = [
             [" ", None, f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС "Ойл-сервис". '
@@ -194,11 +197,14 @@ class GeophysicWindow(MyWindow):
                 edit2_1 = edit2.text()
                 geo_sel = self.geophysic_sel(value, edit1_1, edit2_1)
                 # print(f'геофои {geo_sel}')
-                researchGis_list.extend([geo_sel[1], None, geo_sel[0], None, None, None, None, None, None, None, 'подряд по ГИС', 4])
+                researchGis_list.extend([geo_sel[1], None, geo_sel[0], None, None, None, None, None, None, None,
+                                         'подряд по ГИС', 4])
 
+        if len(researchGis_list) == 0:
+            mes = QMessageBox.critical(self, 'Ошибка', 'Исследования не добавлены')
+            return
 
-
-            geophysicalResearch.append(researchGis_list)
+        geophysicalResearch.append(researchGis_list)
         # print(geophysicalResearch)
 
         ori = QMessageBox.question(self, 'ОРИ', 'Нужна ли интерпретация?')

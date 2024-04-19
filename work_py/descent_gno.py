@@ -171,21 +171,23 @@ class GnoDescentWindow(QMainWindow):
             work_list = voronka_down(self, lift_key, nkt_edit)
         else:
             if lift_key in ['ОРД', 'ЭЦН с пакером', 'ЭЦН']:
+                print(f'ЭЦН, Шаблон {well_data.dict_pump_ECN_h["posle"], well_data.template_depth}')
                 if well_data.dict_pump_ECN_h["posle"] > well_data.template_depth and \
                         (well_data.column_additional is False or \
                          (well_data.column_additional and \
                           well_data.current_bottom > well_data.head_column_additional._value and \
                           well_data.dict_pump_ECN_h["posle"] < well_data.head_column_additional._value)):
-                    mes = QMessageBox.critical(self, 'Ошибка', f'Нельзя спускать пакер {well_data.paker_do["posle"]}м'
+                    mes = QMessageBox.critical(self, 'Ошибка', f'Нельзя спускать ЭЦН {well_data.paker_do["posle"]}м'
                                                                f'ниже глубины шаблонирования ЭК {well_data.template_depth}м')
+                    return
                 elif well_data.dict_pump_ECN_h["posle"] < well_data.head_column_additional._value and \
-                        well_data.dict_pump_ECN_h["posle"] > well_data.template_depth:
-                    mes = QMessageBox.critical(self, 'Ошибка', f'Нельзя спускать пакер {well_data.paker_do["posle"]}м'
+                        well_data.dict_pump_ECN_h["posle"] > well_data.template_depth and well_data.column_additional:
+                    mes = QMessageBox.critical(self, 'Ошибка', f'Нельзя спускать ЭЦН {well_data.paker_do["posle"]}м'
                                                                f'ниже глубины шаблонирования ЭК {well_data.template_depth}м')
                     return
                 elif well_data.dict_pump_ECN_h["posle"] > well_data.head_column_additional._value and \
-                        well_data.dict_pump_ECN_h["posle"] > well_data.template_depth_addition:
-                    mes = QMessageBox.critical(self, 'Ошибка', f'Нельзя спускать пакер {well_data.paker_do["posle"]}м'
+                        well_data.dict_pump_ECN_h["posle"] > well_data.template_depth_addition and well_data.column_additional:
+                    mes = QMessageBox.critical(self, 'Ошибка', f'Нельзя спускать ЭЦН {well_data.paker_do["posle"]}м'
                                                                f'ниже глубины шаблонирования ЭК '
                                                                f'{well_data.template_depth_addition}м')
                     return
@@ -821,9 +823,14 @@ class GnoDescentWindow(QMainWindow):
                     gno_list.insert(-4, jumping_sko_list)
             else:
                 if need_juming_after_sko_combo == 'Да':
-                    gips = TemplateKrs.pero(self)
-                    for row in gips[::-1]:
-                        gno_list.insert(0, row)
+                    pero_list = [[None, None,
+                                        'С целью вымыва продуктов реакции:',
+                                        None, None, None, None, None, None, None,
+                                        'мастер КРС', '']]
+                    for row in TemplateKrs.pero(self):
+                        pero_list.append(row)
+
+                    gno_list.extend(pero_list)
 
         return gno_list
 

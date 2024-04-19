@@ -121,12 +121,10 @@ class TabPage_SO_drill(QWidget):
 
     def drillingBit_diam_select(self, depth_landing):
 
-
-
         drillingBit_dict = {
             84: (88, 92),
-            90: (92.1, 97),
-            94: (97.1, 102),
+            90: (92.1, 96.5),
+            95: (96.5, 102),
             102: (102.1, 109),
             105: (109, 115),
             114: (118, 120),
@@ -562,21 +560,21 @@ class Drill_window(QMainWindow):
         from work_py.alone_oreration import well_volume
         from work_py.alone_oreration import kot_work
 
-        max_port = max([well_data.dict_perforation[plast]['подошва'] for plast in well_data.plast_work])
+        max_port = max([well_data.dict_perforation[plast]['подошва'] for plast in well_data.plast_work]) - 2
         min_port = max([well_data.dict_perforation[plast]['кровля'] for plast in well_data.plast_work])
 
         current_depth, ok = QInputDialog.getInt(None, 'Нормализация забоя',
                                                 'Введите глубину необходимого забоя при нормализации',
-                                                int(max_port-2), 0,
+                                                int(max_port), 0,
                                                 int(well_data.bottomhole_artificial._value + 500))
 
         kot_question = QMessageBox.question(self, 'КОТ', 'Нужно ли произвести СПО '
                                                          'обратных клапанов перед фрезом?')
 
         if kot_question == QMessageBox.StandardButton.Yes:
-            kot_list = kot_work(self, min_port)[::-1]
-
-
+            kot_list = kot_work(self, min_port)
+        else:
+            kot_list = []
 
         drillingBit_diam = TabPage_SO_drill.drillingBit_diam_select(self, current_depth)
 
@@ -605,14 +603,14 @@ class Drill_window(QMainWindow):
          f'Завоз на скважину СБТ – Укладка труб на стеллажи.',
          None, None, None, None, None, None, None,
          'Мастер', None],
-            [f'СПО {drilling_short} на СБТ{nkt_diam} до Н= {well_data.perforation_roof - 30}', None,
-             f'Спустить {drilling_str}  на СБТ{nkt_diam} до Н= {well_data.perforation_roof - 30}м с замером, '
+            [f'СПО {drilling_short} на СБТ{nkt_diam} до Н= {min_port - 30}', None,
+             f'Спустить {drilling_str}  на СБТ{nkt_diam} до Н= {min_port - 30}м с замером, '
              f' (При СПО первых десяти СБТ на спайдере дополнительно устанавливать элеватор ЭХЛ). '
              f'В случае разгрузки инструмента  при спуске, проработать место посадки с промывкой скв., составить акт.'
              f'СКОРОСТЬ СПУСКА НЕ БОЛЕЕ 1 М/С (НЕ ДОХОДЯ 40 - 50 М ДО ПЛАНОВОГО ИНТЕРВАЛА СКОРОСТЬ СПУСКА СНИЗИТЬ ДО 0,25 М/С). '
              f'ЗА 20 М ДО ЗАБОЯ СПУСК ПРОИЗВОДИТЬ С ПРОМЫВКОЙ',
              None, None, None, None, None, None, None,
-             'мастер КРС', descentNKT_norm(well_data.current_bottom, 1.1)],
+             'мастер КРС', descentNKT_norm(min_port, 1.1)],
             [f'монтаж мех.ротора', None,
              f'Произвести монтаж мех.ротора. Собрать промывочное оборудование: вертлюг, ведущая труба (установить '
              f'вставной фильтр под ведущей трубой), '
@@ -620,9 +618,9 @@ class Drill_window(QMainWindow):
              None, None, None, None, None, None, None,
              'Мастер КРС, УСРСиСТ', round(0.14 + 0.17 + 0.08 + 0.48 + 1.1, 1)],
             [f'нормализацию до Н= {current_depth}м', None,
-             f'Произвести фрезерование муфт ГРП  с гл.{well_data.perforation_roof}м до '
-             f'гл.{well_data.perforation_sole}м  до первого порта с периодической обратной промывкой, с проработкой э/к в'
-             f' интервале {well_data.perforation_roof}-{well_data.perforation_sole}м (режим работы 60-80 об/мин, расход '
+             f'Произвести фрезерование муфт ГРП  с гл.{min_port}м до '
+             f'гл.{current_depth}м  до первого порта с периодической обратной промывкой, с проработкой э/к в'
+             f' интервале {min_port-20}-{current_depth}м (режим работы 60-80 об/мин, расход '
              f'6-10 литров, нагрузка на фрезерующий инструмент до 3-х тонн. Приподнимаем инструмент после 15-20 минут '
              f'работы).',
              None, None, None, None, None, None, None,
@@ -639,13 +637,14 @@ class Drill_window(QMainWindow):
              None, None, None, None, None, None, None,
              'Мастер КРС, УСРСиСТ', None],
             [f'Промыть  {well_data.fluid_work}  '
-             f'в объеме {round(well_volume(self, well_data.current_bottom) * 2, 1)}м3', None,
+             f'в объеме {round(well_volume(self, current_depth) * 2, 1)}м3', None,
              f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {well_data.fluid_work}  '
-             f'в присутствии представителя заказчика в объеме {round(well_volume(self, well_data.current_bottom) * 2, 1)}м3. Составить акт.',
+             f'в присутствии представителя заказчика в объеме '
+             f'{round(well_volume(self, current_depth) * 2, 1)}м3. Составить акт.',
              None, None, None, None, None, None, None,
-             'мастер КРС, предст. заказчика', well_volume_norm(well_volume(self, well_data.current_bottom))],
+             'мастер КРС, предст. заказчика', well_volume_norm(well_volume(self, current_depth))],
             [None, None,
-             f'Поднять  {drilling_str} на СБТ {nkt_diam} с глубины {well_data.current_bottom}м с доливом скважины в '
+             f'Поднять  {drilling_str} на СБТ {nkt_diam} с глубины {current_depth}м с доливом скважины в '
              f'объеме {round(well_data.current_bottom * 1.4 / 1000, 1)}м3 тех. жидкостью  уд.весом {well_data.fluid_work}',
              None, None, None, None, None, None, None,
              'мастер КРС', liftingNKT_norm(well_data.current_bottom, 1.3)],
@@ -660,10 +659,10 @@ class Drill_window(QMainWindow):
              None, None, None, None, None, None, None,
              'мастер КРС', liftingNKT_norm(well_data.current_bottom, 1.3)]
         ]
-        for row in kot_list:
-            drilling_list.insert(0, row)
+        for row in drilling_list:
+            kot_list.append(row)
 
-        for row in kot_work(self, current_depth):
-            drilling_list.append(row)
+        well_data.current_bottom = current_depth
+        print(f'забой {well_data.current_bottom }')
 
-        return drilling_list
+        return kot_list

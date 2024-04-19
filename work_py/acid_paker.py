@@ -8,8 +8,8 @@ from PyQt5.QtWidgets import QVBoxLayout, QStyledItemDelegate, qApp, QMessageBox,
     QTableWidgetItem, QMainWindow
 
 import well_data
-import work_py.alone_oreration
-from work_py.alone_oreration import volume_vn_nkt
+
+from work_py.alone_oreration import volume_vn_nkt, well_volume, kot_work
 from main import MyWindow
 
 from .rationingKRS import descentNKT_norm, well_volume_norm, liftingNKT_norm
@@ -190,12 +190,11 @@ class TabPage_SO_acid(QWidget):
         self.diametr_paker_labelType = QLabel("Диаметр пакера", self)
         self.diametr_paker_edit = QLineEdit(self)
 
-        self.paker_depth.setClearButtonEnabled(True)
+
 
         self.khovst_label = QLabel("Длина хвостовики", self)
         self.paker_khost = QLineEdit(self)
 
-        self.paker_khost.setClearButtonEnabled(True)
 
         plast_work = well_data.plast_work
 
@@ -206,7 +205,6 @@ class TabPage_SO_acid(QWidget):
         self.skv_true_label_type = QLabel("необходимость кислотной ванны", self)
         self.svk_true_combo = QComboBox(self)
         self.svk_true_combo.addItems(['Нужно СКВ', 'без СКВ'])
-
 
         self.svk_true_combo.setCurrentIndex(1)
         self.skv_acid_label_type = QLabel("Вид кислоты для СКВ", self)
@@ -228,8 +226,6 @@ class TabPage_SO_acid(QWidget):
         self.QplastEdit.addItems(['ДА', 'НЕТ'])
         self.QplastEdit.setCurrentIndex(1)
         self.QplastEdit.setProperty('value', 'НЕТ')
-
-
 
         self.acid_label_type = QLabel("Вид кислотной обработки", self)
         self.acid_edit = QComboBox(self)
@@ -270,7 +266,6 @@ class TabPage_SO_acid(QWidget):
         self.iron_true_combo.addItems(['Нет', 'Да'])
         self.iron_volume_label = QLabel("Объем стабилизатора", self)
         self.iron_volume_edit = QLineEdit(self)
-
 
         self.pressure_edit = QLineEdit(self)
         self.pressure_edit.setClearButtonEnabled(True)
@@ -338,16 +333,20 @@ class TabPage_SO_acid(QWidget):
 
         self.paker_depth.textChanged.connect(self.update_paker_depth)
         self.paker_depth.textChanged.connect(self.update_paker_edit)
+        self.paker2_depth.textChanged.connect(self.update_paker_edit)
 
         self.svk_true_combo.currentTextChanged.connect(self.update_skv_edit)
         self.svk_true_combo.setCurrentIndex(0)
         self.svk_true_combo.setCurrentIndex(1)
         self.plast_combo.combo_box.currentTextChanged.connect(self.update_plast_edit)
-        self.iron_volume_edit.setText(f'{round(float(self.acid_volume_edit.text()), 1)*10}')
+        self.plast_combo.combo_box.currentTextChanged.connect(self.update_paker_edit)
+        self.iron_volume_edit.setText(f'{round(float(self.acid_volume_edit.text()), 1) * 10}')
         self.acid_volume_edit.textChanged.connect(self.change_volume_acid)
 
     def change_volume_acid(self):
-        self.iron_volume_edit.setText(f'{round(float(self.acid_volume_edit.text()), 1)*10}')
+        if self.acid_volume_edit.text() != '':
+            self.iron_volume_edit.setText(f'{round(float(self.acid_volume_edit.text().replace(",", ".")), 1) * 10}')
+
     def update_paker_depth(self):
         from .opressovka import TabPage_SO
 
@@ -391,9 +390,6 @@ class TabPage_SO_acid(QWidget):
         elif index in ['ГОНС']:
             paker_layout_list_tab = ["Пласт", "точки", "пом.",
                                      "вид кислоты", "процент", "объем"]
-
-        # for i in range(len(paker_layout_list_tab)):
-        #     self.tableWidget.horizontalHeader().setSectionResizeMode(i, QHeaderView.Stretch)
         self.tableWidget.setHorizontalHeaderLabels(paker_layout_list_tab)
 
         self.tableWidget.setSortingEnabled(True)
@@ -415,7 +411,7 @@ class TabPage_SO_acid(QWidget):
             self.skv_proc_label.setParent(None)
             self.skv_proc_edit.setParent(None)
 
-    def update_plast_edit(self, index):
+    def update_plast_edit(self):
 
         dict_perforation = well_data.dict_perforation
         plasts = well_data.texts
@@ -467,7 +463,7 @@ class TabPage_SO_acid(QWidget):
 
     def update_paker_edit(self):
         dict_perforation = well_data.dict_perforation
-
+        rows = self.tableWidget.rowCount()
         plasts = well_data.texts
         # print(plasts)
         roof_plast = well_data.current_bottom
@@ -475,7 +471,6 @@ class TabPage_SO_acid(QWidget):
         for plast in well_data.plast_work:
             for plast_sel in plasts:
                 if plast_sel == plast:
-
                     if roof_plast >= dict_perforation[plast]['кровля']:
                         roof_plast = dict_perforation[plast]['кровля']
                     if sole_plast <= dict_perforation[plast]['подошва']:
@@ -489,12 +484,31 @@ class TabPage_SO_acid(QWidget):
                 if self.paker_layout_combo.currentText() == 'однопакерная, упорный':
                     self.paker_khost.setText(str(int(well_data.current_bottom - int(paker_depth))))
                     self.swab_paker_depth.setText(f'{paker_depth}')
+            if rows == 0:
+                if paker_depth != '' and self.paker_khost.text() != '':
+                    self.distance_between_packers_voronka = int(self.paker_khost.text()) - int(self.paker_depth.text())
+            else:
+                if self.paker_khost != '':
+                    self.paker_khost.setText(f'{int(self.paker_depth.text()) - self.distance_between_packers_voronka}')
+                self.paker_khost.setEnabled(False)
         elif self.paker_layout_combo.currentText() in ['двухпакерная', 'двухпакерная, упорные']:
             if paker_depth != '':
                 self.paker_khost.setText(f'{10}')
                 self.swab_paker_depth.setText(f'{paker_depth}')
                 if self.paker_layout_combo.currentText() == 'двухпакерная, упорные':
                     self.paker_khost.setText(str(int(well_data.current_bottom - int(paker_depth))))
+
+            if rows == 0:
+                if self.paker_depth.text() != '' and self.paker2_depth.text() != '':
+                    self.distance_between_packers = abs(int(self.paker_depth.text()) - int(self.paker2_depth.text()))
+                    print(f' расстояние между пакерами {self.distance_between_packers}')
+            else:
+                self.paker2_depth.setText(f'{int(self.paker_depth.text()) - self.distance_between_packers}')
+                self.paker2_depth.setEnabled(False)
+
+
+
+
         elif self.paker_layout_combo.currentText() in ['воронка']:
             self.paker_khost.setText(f'{sole_plast}')
             self.swab_paker_depth.setText(f'{roof_plast - 30}')
@@ -716,7 +730,7 @@ class AcidPakerWindow(QMainWindow):
                                                                iron_true_combo, iron_volume_edit)
                 else:
                     work_template_list.append(
-                        [None, None, f'установить пакера на глубине {paker_depth}/{paker2_depth}м', None, None,
+                        [f'установить пакера на глубине {paker_depth}/{paker2_depth}м', None, f'установить пакера на глубине {paker_depth}/{paker2_depth}м', None, None,
                          None, None, None, None, None,
                          'мастер КРС', 1.2])
             if self.paker_layout_combo in ['однопакерная', 'однопакерная, упорный']:
@@ -742,8 +756,10 @@ class AcidPakerWindow(QMainWindow):
                                                                paker_depth, depth_gauge_combo)
                 else:
                     work_template_list.append(
-                        [None, None, f'установить пакер на глубине {paker_depth}, '
-                                     f'хвост на глубине {paker_depth + paker_khost}м', None, None,
+                        [f'установить пакер на глубине {paker_depth}, '
+                         f'хвост на глубине {paker_depth + paker_khost}м', None,
+                         f'установить пакер на глубине {paker_depth}, '
+                         f'хвост на глубине {paker_depth + paker_khost}м', None, None,
                          None, None, None, None, None,
                          'мастер КРС', 1.2])
             if self.paker_layout_combo in ['воронка']:
@@ -772,7 +788,7 @@ class AcidPakerWindow(QMainWindow):
                 if row == 0 and well_data.curator != 'ОР' and rows != 1:
                     work_template_list.extend(self.acid_work(QplastEdit, plast_combo, paker_khost, acid_edit,
                                                              acid_volume_edit, acid_proc_edit, pressure_edit,
-                                                             acidOilProcEdit,  iron_true_combo, iron_volume_edit,
+                                                             acidOilProcEdit, iron_true_combo, iron_volume_edit,
                                                              paker_depth, paker2_depth)[:-1])
                 else:
                     work_template_list.extend(self.acid_work(QplastEdit, plast_combo, paker_khost, acid_edit,
@@ -784,12 +800,12 @@ class AcidPakerWindow(QMainWindow):
 
                     work_template_list.extend(self.acid_work(QplastEdit, plast_combo, paker_khost, acid_edit,
                                                              acid_volume_edit, acid_proc_edit, pressure_edit,
-                                                             acidOilProcEdit,  iron_true_combo, iron_volume_edit,
+                                                             acidOilProcEdit, iron_true_combo, iron_volume_edit,
                                                              paker_depth)[:-1])
                 else:
                     work_template_list.extend(self.acid_work(QplastEdit, plast_combo, paker_khost, acid_edit,
                                                              acid_volume_edit, acid_proc_edit, pressure_edit,
-                                                             acidOilProcEdit,  iron_true_combo, iron_volume_edit,
+                                                             acidOilProcEdit, iron_true_combo, iron_volume_edit,
                                                              paker_depth))
             elif "воронка" in self.paker_layout_combo:
                 work_template_list.extend(self.acid_work(QplastEdit, plast_combo, paker_khost, acid_edit,
@@ -822,7 +838,7 @@ class AcidPakerWindow(QMainWindow):
                 if MyWindow.check_depth_in_skm_interval(self, paker_depth_swab) is False:
                     return
 
-                paker_depth2_swab = paker_depth_swab -(paker_depth - paker2_depth)
+                paker_depth2_swab = paker_depth_swab - (paker_depth - paker2_depth)
                 if MyWindow.check_true_depth_template(self, paker_depth2_swab) is False:
                     return
                 if MyWindow.true_set_Paker(self, paker_depth2_swab) is False:
@@ -830,8 +846,8 @@ class AcidPakerWindow(QMainWindow):
                 if MyWindow.check_depth_in_skm_interval(self, paker_depth2_swab) is False:
                     return
 
-
-                swab_work_list = Swab_Window.swabbing_with_2paker(self, diametr_paker, paker_depth_swab, paker_depth2_swab,
+                swab_work_list = Swab_Window.swabbing_with_2paker(self, diametr_paker, paker_depth_swab,
+                                                                  paker_depth2_swab,
                                                                   paker_khost, plast_combo, swabTypeCombo,
                                                                   swab_volumeEdit, depth_gauge_combo, )
             elif self.paker_layout_combo == 'воронка':
@@ -851,7 +867,7 @@ class AcidPakerWindow(QMainWindow):
                                        'мастер КРС',
                                        liftingNKT_norm(well_data.current_bottom, 1)])
         if well_data.region == 'ТГМ' and well_data.curator == 'ОР':
-            work_template_list.extend(work_py.alone_oreration.kot_work(self, well_data.current_bottom))
+            work_template_list.extend(kot_work(self, well_data.current_bottom))
         MyWindow.populate_row(self, self.ins_ind, work_template_list, self.table_widget)
         well_data.pause = False
         self.close()
@@ -864,7 +880,7 @@ class AcidPakerWindow(QMainWindow):
         self.tableWidget.removeRow(row)
 
     def paker_layout_two(self, swab_true_edit_type, paker_diametr, paker_khost, paker_depth, paker2_depth,
-                         depth_gauge_combo):
+                         depth_gauge_combo, iron_true_combo, iron_volume_edit):
         from work_py.alone_oreration import privyazkaNKT
         from .opressovka import OpressovkaEK, TabPage_SO
 
@@ -876,9 +892,8 @@ class AcidPakerWindow(QMainWindow):
             paker_type = 'ПРО-ЯМО'
 
         gidroyakor_str = ''
-
         if depth_gauge_combo == 'Да':
-            mtg_str = 'контейнер с манометром МТГ'
+            mtg_str = 'контейнер с манометром МТГ +'
         else:
             mtg_str = ''
 
@@ -886,18 +901,18 @@ class AcidPakerWindow(QMainWindow):
                 paker_depth > well_data.head_column_additional._value:
             nkt_int = 60
             nkt_pod = '60мм'
-        elif well_data.column_additional is True and float(well_data.column_additional_diametr._value) < 110 and \
+        elif well_data.column_additional is True and float(well_data.column_additional_diametr._value) > 110 and \
                 paker_depth > well_data.head_column_additional._value:
             nkt_int = 73
             nkt_pod = '73мм со снятыми фасками'
 
         if (well_data.column_additional is False) or \
                 (well_data.column_additional is True and paker_depth < well_data.head_column_additional._value):
-            self.paker_select = f'заглушку + сбивной с ввертышем + {mtg_str} НКТ{well_data.nkt_diam}м {paker_khost}м  ' \
+            self.paker_select = f'заглушку + сбивной с ввертышем + {mtg_str} НКТ{well_data.nkt_diam}м {paker_khost}м '\
                                 f'+ пакер {paker_type}-{paker_diametr}мм (либо аналог) ' \
                                 f'для ЭК {well_data.column_diametr._value}мм х ' \
                                 f'{well_data.column_wall_thickness._value}мм + ' \
-                                f' {mtg_str} + щелевой фильтр НКТ{well_data.nkt_diam} {difference_paker}м ' \
+                                f' {mtg_str}  щелевой фильтр НКТ{well_data.nkt_diam} {difference_paker}м ' \
                                 f'+ пакер ПУ - {paker_diametr} + {mtg_str} НКТ{well_data.nkt_diam}мм 20м + ' \
                                 f'реперный патрубок'
             self.paker_short = f'заглушку + сбивной с ввертышем + НКТ{well_data.nkt_diam}м {paker_khost}м  + ' \
@@ -905,8 +920,7 @@ class AcidPakerWindow(QMainWindow):
                                f' + пакер ПУ - {paker_diametr} + НКТ{well_data.nkt_diam}мм 20м + репер'
             self.dict_nkt = {well_data.nkt_diam: float(paker_khost) + float(paker_depth)}
 
-        elif well_data.column_additional is True and float(well_data.column_additional_diametr._value) < 110 and \
-                paker_depth > well_data.head_column_additional._value:
+        else:
             gidroyakor_str = 'гидроякорь'
             self.paker_select = f'заглушку + сбивной с ввертышем + НКТ{nkt_pod}мм {paker_khost}м  + ' \
                                 f'пакер {paker_type}-' \
@@ -915,18 +929,18 @@ class AcidPakerWindow(QMainWindow):
                                 f'{well_data.column_additional_wall_thickness._value}мм + ' \
                                 f'щелевой фильтр НКТ{nkt_pod} {difference_paker}м ' \
                                 f'+ пакер ПУ - {paker_diametr} + НКТ{nkt_pod}мм 20м + репер + НКТ{nkt_pod}' \
-                                f'{round(well_data.head_column_additional.value - well_data.current_bottom, 1)}м ' \
+                                f'{round(well_data.head_column_additional._value - well_data.current_bottom, 1)}м ' \
                                 f'{gidroyakor_str} {mtg_str}'
             self.paker_short = f'заглушку + сбивной с ввертышем + НКТ{nkt_pod}мм {paker_khost}м  + ' \
                                f'пакер {paker_type}-' \
                                f'{paker_diametr}мм + щелевой фильтр НКТ{nkt_pod} {difference_paker}м ' \
                                f'+ пакер ПУ - {paker_diametr} + НКТ{nkt_pod}мм 20м + репер + НКТ{nkt_pod}' \
-                               f'{round(well_data.head_column_additional.value - well_data.current_bottom, 1)}м ' \
+                               f'{round(well_data.head_column_additional._value - well_data.current_bottom, 1)}м ' \
                                f'{gidroyakor_str} {mtg_str}'
             self.dict_nkt = {
-                well_data.nkt_diam: round(well_data.head_column_additional.value - well_data.current_bottom, 0),
+                well_data.nkt_diam: round(well_data.head_column_additional._value - well_data.current_bottom, 0),
                 nkt_int: int(float(paker_depth) + float(paker_khost) - round(
-                    well_data.head_column_additional.value - well_data.current_bottom, 0))}
+                    well_data.head_column_additional._value - well_data.current_bottom, 0))}
 
         paker_list = [
             [self.paker_short, None,
@@ -968,7 +982,6 @@ class AcidPakerWindow(QMainWindow):
                 mtg_count = 2
             elif self.paker_layout_combo in ['воронка']:
                 mtg_count = 1
-
             else:
                 mtg_count = 3
             paker_list.insert(0, [f'Заявить {mtg_count} глубинных манометра подрядчику по ГИС', None,
@@ -1021,7 +1034,7 @@ class AcidPakerWindow(QMainWindow):
                                f'НКТ{well_data.nkt_diam}мм 10м {swab_layout2} {mtg_str} + репер'
             self.dict_nkt = {well_data.nkt_diam: float(paker_khost) + float(paker_depth)}
 
-        elif well_data.column_additional is True:
+        elif well_data.column_additional is True and paker_depth > well_data.head_column_additional._value:
             gidroyakor_str = 'гидроякорь'
             self.paker_select = f'{swab_layout} 2" + НКТ{nkt_pod} {float(paker_khost)}м + пакер {paker_type}-' \
                                 f'{paker_diametr}мм (либо аналог) ' \
@@ -1288,20 +1301,20 @@ class AcidPakerWindow(QMainWindow):
              'мастер КРС', 0.3],
             [None, None,
              ''.join(
-                 [f'продавить кислоту тех жидкостью в объеме {round(volume_vn_nkt(self.dict_nkt) +0,5 , 1)}м3 '                  
+                 [f'продавить кислоту тех жидкостью в объеме {round(volume_vn_nkt(self.dict_nkt) + 0.5, 1)}м3 '
                   f'при давлении не '
                   f'более {well_data.max_admissible_pressure._value}атм. Увеличение давления согласовать'
                   f' с заказчиком' if acid_volume_edit < volume_vn_nkt(
                      self.dict_nkt) else f'продавить кислоту оставшейся кислотой в объеме '
                                          f'{round(acid_volume_edit - volume_vn_nkt(self.dict_nkt), 1)}м3 и тех '
                                          f'жидкостью '
-                                         f'в объеме {round(volume_vn_nkt(self.dict_nkt) + 0.5, 1)}м3 '                                     
+                                         f'в объеме {round(volume_vn_nkt(self.dict_nkt) + 0.5, 1)}м3 '
                                          f'при давлении '
                                          f'не более {well_data.max_admissible_pressure._value}атм. '
                                          f'Увеличение давления согласовать с заказчиком\n'
                                          f'(в случае поглощения произвести продавку в '
-                                         f'V-{round(volume_vn_nkt(self.dict_nkt)*1.5 , 1)}м3 '
-                                            f'(1.5-ом объеме НКТ)) ']),
+                                         f'V-{round(volume_vn_nkt(self.dict_nkt) * 1.5, 1)}м3 '
+                                         f'(1.5-ом объеме НКТ)) ']),
              None, None, None, None, None, None, None,
              'мастер КРС', 6],
             [f'без реагирования' if (
@@ -1381,9 +1394,8 @@ class AcidPakerWindow(QMainWindow):
         # забоя
 
     def flushing_downhole(self, paker_depth, paker_khost, paker_layout):
-        from work_py.alone_oreration import well_volume
 
-        print(paker_layout)
+
         if 'одно' in paker_layout:
             if (well_data.perforation_roof - 5 + paker_khost >= well_data.current_bottom) or \
                     (all([well_data.dict_perforation[plast]['отрайбировано'] for plast in well_data.plast_work])):
@@ -1395,8 +1407,8 @@ class AcidPakerWindow(QMainWindow):
                                          f'{round(well_volume(self, paker_depth + paker_khost) * 1.5, 1)}м3 ' \
                                          f'в присутствии представителя заказчика ДО ЧИСТОЙ ВОДЫ. \n' \
                                          f'МЕРОПРИЯТИЯ ПОСЛЕ ОПЗ: \n' \
-                                        f'При отсутствии циркуляции на скважине промывку исключить, ' \
-                                         f'увеличить объем продавки кислотного состава в 1,5 кратном объеме НКТ' \
+                                         f'При отсутствии циркуляции на скважине промывку исключить, ' \
+                                         f'увеличить объем продавки кислотного состава в 1,5 кратном объеме НКТ'
 
                 flushing_downhole_short = f'При наличии ЦИРКУЛЯЦИИ: Допустить до Н- {well_data.current_bottom}м. Промыть уд.весом ' \
                                           f'{well_data.fluid_work_short}' \
@@ -1410,21 +1422,20 @@ class AcidPakerWindow(QMainWindow):
                                          f'жидкостью уд.весом {well_data.fluid_work} при расходе жидкости не ' \
                                          f'менее 6-8 л/сек в объеме не менее ' \
                                          f'{round(well_volume(self, paker_depth + paker_khost) * 1.5, 1)}м3 ' \
-                                         f'в присутствии представителя заказчика ДО ЧИСТОЙ ВОДЫ. \n'\
+                                         f'в присутствии представителя заказчика ДО ЧИСТОЙ ВОДЫ. \n' \
                                          f'МЕРОПРИЯТИЯ ПОСЛЕ ОПЗ: \n' \
-                                        f'При отсутствии циркуляции на скважине промывку исключить, ' \
-                                         f'увеличить объем продавки кислотного состава в 1,5 кратном объеме НКТ' \
+                                         f'При отсутствии циркуляции на скважине промывку исключить, ' \
+                                         f'увеличить объем продавки кислотного состава в 1,5 кратном объеме НКТ'
 
                 flushing_downhole_short = f'При наличии ЦИРКУЛЯЦИИ: Допустить пакер до H- ' \
                                           f'{int(well_data.perforation_roof - 5)}м. ' \
                                           f' низ НКТ до H' \
                                           f' {well_data.perforation_roof - 5 + paker_khost}м) ' \
                                           f'Промыть уд.весом {well_data.fluid_work} не менее ' \
-                                          f'{round(well_volume(self, paker_depth + paker_khost) * 1.5, 1)}м3 '\
+                                          f'{round(well_volume(self, paker_depth + paker_khost) * 1.5, 1)}м3 ' \
                                           f'МЕРОПРИЯТИЯ ПОСЛЕ ОПЗ: \n' \
                                           f'При отсутствии циркуляции на скважине промывку исключить, ' \
-                                          f'увеличить объем продавки кислотного состава в 1,5 кратном объеме НКТ' \
-
+                                          f'увеличить объем продавки кислотного состава в 1,5 кратном объеме НКТ'
         elif 'ворон' in paker_layout:
             flushing_downhole_list = f'При наличии ЦИРКУЛЯЦИИ: Допустить компоновку до глубины ' \
                                      f'{well_data.current_bottom}м.' \
@@ -1433,10 +1444,10 @@ class AcidPakerWindow(QMainWindow):
                                      f'ри расходе жидкости не ' \
                                      f'менее 6-8 л/сек в объеме не менее ' \
                                      f'{round(well_volume(self, paker_depth + paker_khost) * 1.5, 1)}м3 ' \
-                                     f'в присутствии представителя заказчика ДО ЧИСТОЙ ВОДЫ.'\
+                                     f'в присутствии представителя заказчика ДО ЧИСТОЙ ВОДЫ.' \
                                      f'МЕРОПРИЯТИЯ ПОСЛЕ ОПЗ: \n' \
                                      f'При отсутствии циркуляции произвести замещения продуктов реакции тех ' \
-                                     f'жидкостью большей плотностью с последующей промывкой' \
+                                     f'жидкостью большей плотностью с последующей промывкой'
 
             flushing_downhole_short = f'При наличии ЦИРКУЛЯЦИИ: Допустить до Н- {well_data.current_bottom}м. Промыть уд.весом ' \
                                       f'{well_data.fluid_work_short}' \
@@ -1451,7 +1462,7 @@ class AcidPakerWindow(QMainWindow):
                                      f'в присутствии представителя заказчика ДО ЧИСТОЙ ВОДЫ.' \
                                      f'МЕРОПРИЯТИЯ ПОСЛЕ ОПЗ: \n' \
                                      f'При отсутствии циркуляции произвести замещения продуктов реакции тех ' \
-                                     f'жидкостью большей плотностью с последующей промывкой' 
+                                     f'жидкостью большей плотностью с последующей промывкой'
             flushing_downhole_short = f'При наличии избыточного давления: Промыть уд.весом ' \
                                       f'{well_data.fluid_work_short}' \
                                       f'не менее {round(well_volume(self, paker_depth + paker_khost) * 1.5, 1)}м3 '

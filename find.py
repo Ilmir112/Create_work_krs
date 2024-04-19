@@ -1219,6 +1219,7 @@ class Well_Category(FindIndexPZ):
                 well_data.h2s_pr.append(h2s_pr)
 
             well_data.category_pressuar = well_data.cat_P_1[0]
+            print(f'категория по давлению {well_data.category_pressuar}')
             well_data.category_h2s = well_data.cat_h2s_list[0]
             well_data.category_gf = well_data.cat_gaz_f_pr[0]
 

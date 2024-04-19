@@ -32,7 +32,6 @@ from work_py.drilling import Drill_window
 from users.login_users import LoginWindow
 
 
-
 class ExcelWorker(QThread):
     finished = pyqtSignal()
 
@@ -118,7 +117,6 @@ class ExcelWorker(QThread):
             if result is None:
                 mes = QMessageBox.warning(self, 'Некорректная дата перечня',
                                           'Необходимо обновить перечень скважин без глушения на текущий квартал')
-
 
             # Проверка наличия записи в базе данных
             cursor.execute(f"SELECT * FROM ТГМ WHERE well_number=? AND deposit_area=?", (well_number, deposit_area))
@@ -230,6 +228,7 @@ class ExcelWorker(QThread):
         # ExcelWorker.finished.emit()
         return result
 
+
 class MyWindow(QMainWindow):
 
     def __init__(self):
@@ -267,9 +266,6 @@ class MyWindow(QMainWindow):
             self.login_window.show()
             self.pause_app()
             well_data.pause = False
-
-
-
 
     def initUI(self):
 
@@ -449,8 +445,7 @@ class MyWindow(QMainWindow):
                     sheet = read_pz.open_excel_file(self.ws, self.work_plan)
 
                     self.rir_window = GnktOsvWindow(self.ws,
-                                                     self.table_title, self.table_schema, self.table_widget)
-
+                                                    self.table_title, self.table_schema, self.table_widget)
 
                     self.pause_app()
                     well_data.pause = True
@@ -668,7 +663,6 @@ class MyWindow(QMainWindow):
             if self.work_plan == 'application_pvr':
                 self.tabWidget.addTab(self.table_pvr, 'заявка на ПВР')
 
-
     def tableWidgetOpen(self, work_plan='krs'):
 
         if self.table_widget is None:
@@ -695,6 +689,7 @@ class MyWindow(QMainWindow):
 
             else:
                 self.tabWidget.addTab(self.table_widget, 'Ход работ')
+
     def saveFileDialog(self, wb2, full_path):
         try:
             fileName, _ = QFileDialog.getSaveFileName(self, "Save excel-file",
@@ -843,7 +838,7 @@ class MyWindow(QMainWindow):
             # path = 'workiii'
             path = 'D:\Documents\Desktop\ГТМ'
             if self.work_plan == 'dop_plan':
-                string_work =f' № {well_data.number_dp}'
+                string_work = f' № {well_data.number_dp}'
             elif self.work_plan == 'krs':
                 string_work = 'ПР'
             else:
@@ -875,6 +870,12 @@ class MyWindow(QMainWindow):
         from find import ProtectedIsDigit
 
         if not self.table_widget is None:
+            column_head_m = ''
+            date_drilling_cancel = ''
+            date_drilling_run = ''
+            wellhead_fittings = ''
+            well_data.dict_perforation_short = {}
+            well_data.plast_work_short = []
             self.table_widget.close()
             self.table_widget = None
             well_data.normOfTime = 0
@@ -1048,7 +1049,6 @@ class MyWindow(QMainWindow):
         vp_action = QAction("Установка ВП", self)
         geophysical.addAction(vp_action)
         vp_action.triggered.connect(self.vp_action)
-
 
         swibbing_action = QAction("Свабирование", self)
         geophysical.addAction(swibbing_action)
@@ -1228,7 +1228,6 @@ class MyWindow(QMainWindow):
 
         for index, data in enumerate(well_data.data_list):
             if index == row:
-
                 well_data.current_bottom = data[1]
                 well_data.dict_perforation = json.loads(data[2])
                 # print(f' строка {well_data.dict_perforation}')
@@ -1242,9 +1241,6 @@ class MyWindow(QMainWindow):
                 well_data.skm_interval = json.loads(data[12])
                 well_data.problemWithEk_depth = data[13]
                 well_data.problemWithEk_diametr = data[14]
-
-
-
 
     @staticmethod
     def pause_app():
@@ -1485,8 +1481,7 @@ class MyWindow(QMainWindow):
             for row in selected_rows:
                 # print(row-well_data.count_row_well)
                 self.table_widget.removeRow(row)
-                well_data.data_list.pop(row-well_data.count_row_well)
-
+                well_data.data_list.pop(row - well_data.count_row_well)
 
     def emptyString(self):
         if self.ins_ind > well_data.count_row_well:
@@ -1503,8 +1498,6 @@ class MyWindow(QMainWindow):
             self.pause_app()
             well_data.pause = True
             self.work_window = None
-
-
 
     def swibbing_with_paker(self):
         from work_py.swabbing import Swab_Window
@@ -1627,7 +1620,6 @@ class MyWindow(QMainWindow):
             self.work_window.close()  # Close window.
             self.work_window = None
 
-
     def populate_row(self, ins_ind, work_list, table_widget, work_plan='krs'):
         text_width_dict = {20: (0, 100), 40: (101, 200), 60: (201, 300), 80: (301, 400), 100: (401, 500),
                            120: (501, 600), 140: (601, 700), 160: (701, 800), 180: (801, 1500)}
@@ -1667,6 +1659,7 @@ class MyWindow(QMainWindow):
                             if value[0] <= len(text) <= value[1]:
                                 text_width = key
                                 table_widget.setRowHeight(row, int(text_width))
+
     def create_database_well(self, work_plan):
 
         well_data.number_dict = []
@@ -1869,7 +1862,6 @@ class MyWindow(QMainWindow):
                     # item.setData(10, cell_style)
                     # item.setData(10, cell_style)
 
-
                     table_widget.setItem(row - 1, col - 1, item)
                     # Проверяем, является ли текущая ячейка объединенной
                     for merged_cell in merged_cells:
@@ -1885,8 +1877,6 @@ class MyWindow(QMainWindow):
                 # if border.top.style is not None:
                 #     item.setFlags(item.flags() ^ 0x00100000)  # Убираем рамку из ячейки
                 # table_widget.setItem(row - 1, col - 1, item)
-
-
 
                 # # Установка стилей и границ ячеек, используя openpyxl
                 # cell = sheet.cell(row=row + 1, column=col + 1)
@@ -1938,8 +1928,6 @@ class MyWindow(QMainWindow):
             well_data.pause = True
             self.rir_window = None
 
-
-
         if work_plan in ['gnkt_frez'] and list_page == 2:
             colWidth = [2.28515625, 13.0, 4.5703125, 13.0, 13.0, 13.0, 5.7109375, 13.0, 13.0, 13.0, 4.7109375,
                         13.0, 5.140625, 13.0, 13.0, 13.0, 13.0, 13.0, 4.7109375, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0,
@@ -1952,16 +1940,13 @@ class MyWindow(QMainWindow):
 
             colWidth = property_excel.property_excel_pvr.colWidth_gnkt_osv
             for column in range(table_widget.columnCount()):
+                table_widget.setColumnWidth(column, int(colWidth[column] * 9))  # Здесь задайте требуемую ширину столбца
 
-                table_widget.setColumnWidth(column, int(colWidth[column]*9))  # Здесь задайте требуемую ширину столбца
-
-        elif  work_plan == 'application_pvr':
+        elif work_plan == 'application_pvr':
             from property_excel import property_excel_pvr
             for column in range(table_widget.columnCount()):
-                table_widget.setColumnWidth(column, int(property_excel_pvr.colWidth[column]))  # Здесь задайте требуемую ширину столбца
-
-
-
+                table_widget.setColumnWidth(column, int(
+                    property_excel_pvr.colWidth[column]))  # Здесь задайте требуемую ширину столбца
 
     def create_short_plan(self, wb2, plan_short):
         from work_py.descent_gno import TabPage_Gno
@@ -2100,7 +2085,6 @@ class MyWindow(QMainWindow):
                         new_value = QtWidgets.QTableWidgetItem(f'Установить подъёмный агрегат на устье не менее 60т. '
                                                                f'Пусковой комиссией составить акт готовности подьемного '
                                                                f'агрегата и бригады для проведения ремонта скважины.')
-
                         table_widget.setItem(row, column, new_value)
 
     def check_true_depth_template(self, depth):
@@ -2110,28 +2094,29 @@ class MyWindow(QMainWindow):
             if well_data.template_depth_addition < depth and depth > well_data.head_column_additional._value:
                 check = False
                 check_question = QMessageBox.question(self, 'Проверка глубины пакера',
-                                           f'Проверка показало что пакер с глубиной {depth}м спускается ниже '
-                                           f'глубины  {well_data.template_depth_addition}')
-                if check_question  == QMessageBox.StandardButton.Yes:
+                                                      f'Проверка показало что пакер с глубиной {depth}м спускается ниже '
+                                                      f'глубины  {well_data.template_depth_addition}')
+                if check_question == QMessageBox.StandardButton.Yes:
                     check = True
             if well_data.template_depth < depth and depth < well_data.head_column_additional._value:
                 check = False
                 check_question = QMessageBox.question(self, 'Проверка глубины пакера',
-                                           f'Проверка показало что пакер с глубиной {depth}м спускается ниже '
-                                           f'глубины  {well_data.template_depth}')
-                if check_question  == QMessageBox.StandardButton.Yes:
+                                                      f'Проверка показало что пакер с глубиной {depth}м спускается ниже '
+                                                      f'глубины  {well_data.template_depth}')
+                if check_question == QMessageBox.StandardButton.Yes:
                     check = True
         else:
             print(f'глубина {well_data.template_depth, depth}')
             if well_data.template_depth < depth:
                 check = False
                 check_question = QMessageBox.question(self, 'Проверка глубины пакера',
-                                           f'Проверка показало что пакер с глубиной {depth}м спускается ниже '
-                                           f'глубины  {well_data.template_depth}')
+                                                      f'Проверка показало что пакер с глубиной {depth}м спускается ниже '
+                                                      f'глубины  {well_data.template_depth}')
                 if check_question == QMessageBox.StandardButton.Yes:
                     check = True
 
         return check
+
     def true_set_Paker(self, depth):
 
         check_true = False

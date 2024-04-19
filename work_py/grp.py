@@ -171,7 +171,7 @@ class Grp_window(QMainWindow):
              None, None, None, None, None, None, None,
              'Мастер КРС', liftingNKT_norm(current_depth, 1)],
             [None, None,
-             f'Спустить {kot_select(self)} на НКТ{well_data.nkt_diam}мм до глубины текущего забоя'
+             f'Спустить {kot_select(self, current_depth)} на НКТ{well_data.nkt_diam}мм до глубины текущего забоя'
              f' с замером, шаблонированием шаблоном {well_data.nkt_template}мм.',
              None, None, None, None, None, None, None,
              'мастер КРС', descentNKT_norm(well_data.current_bottom, 1)],
@@ -185,7 +185,7 @@ class Grp_window(QMainWindow):
              None, None, None, None, None, None, None,
              'мастер КРС, предст. заказчика', None],
             [None, None,
-             f'Поднять {kot_select(self)} на НКТ{well_data.nkt_diam}мм c глубины {current_depth}м с доливом скважины в '
+             f'Поднять {kot_select(self, current_depth)} на НКТ{well_data.nkt_diam}мм c глубины {current_depth}м с доливом скважины в '
              f'объеме {round(current_depth * 1.12 / 1000, 1)}м3 удельным весом {well_data.fluid_work}',
              None, None, None, None, None, None, None,
              'мастер КРС', liftingNKT_norm(current_depth, 1)],

@@ -107,11 +107,11 @@ class TabPage_SO(QWidget):
             self.grid.addWidget(self.lenght_template_second_Edit, 5, 7)
 
 
-        self.grid.addWidget(self.template_str_Label, 11, 1, 11, 8)
-        self.grid.addWidget(self.template_str_Edit, 12, 1, 14, 8)
+        self.grid.addWidget(self.template_str_Label, 13, 1, 1, 8)
+        self.grid.addWidget(self.template_str_Edit, 14, 1, 1, 8)
 
-        self.grid.addWidget(self.skm_teml_str_Label, 15, 1, 15, 8)
-        self.grid.addWidget(self.skm_teml_str_Edit, 16, 1, 16, 8)
+        self.grid.addWidget(self.skm_teml_str_Label, 15, 1, 1, 8)
+        self.grid.addWidget(self.skm_teml_str_Edit, 16, 1, 1, 8)
 
         self.template_first_Edit.setText(str(first_template))
         self.template_second_Edit.setText(str(template_second))
@@ -300,6 +300,7 @@ class TabPage_SO(QWidget):
 
         roof_plast, roof_add_column_plast = TabPage_SO_with.definition_roof_not_raiding(self)
         dictance_template_first = int(well_data.current_bottom - roof_plast + 5)
+        print(f'дистанция первая {dictance_template_first}')
         self.dictance_template_first_Edit.setText(str(dictance_template_first))
 
         lenght_template_first, lenght_template_second = TabPage_SO_with.definition_ECN_true(self, well_data.dict_pump_ECN_h["posle"])

@@ -225,7 +225,10 @@ def razdel_1(self, region):
             cat_h2s_list_plan = 3
             cat_gaz_plan = 3
 
-        if 1 in [cat_P_1, cat_P_1_plan, cat_h2s_list, cat_gaz, cat_h2s_list_plan, cat_gaz_plan] or\
+        if 1 in [cat_P_1, cat_P_1_plan, cat_h2s_list, cat_gaz, cat_h2s_list_plan, cat_gaz_plan,
+                 well_data.category_pressuar] or '1' in [cat_P_1, cat_P_1_plan, cat_h2s_list, cat_gaz,
+                                                       cat_h2s_list_plan, cat_gaz_plan,
+                                                         well_data.category_pressuar] or \
                 well_data.curator == 'ВНС':
             for row in range(len(podp_bvo)):
                 for col in range(len(podp_bvo[row])):

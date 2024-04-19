@@ -427,7 +427,7 @@ class Work_with_gnkt(QMainWindow):
         zamer = list(well_data.dict_perforation[plast_work]['замер'])[0]
         vertikal = min(map(float, list(well_data.dict_perforation[plast_work]["вертикаль"])))
         self.fluid = self.calc_fluid()
-        zhgs = f'{self.fluid}г/см3'
+        self.zhgs = f'{self.fluid}г/см3'
         koef_anomal = round(float(self.pressuar) * 101325 / (float(vertikal) * 9.81 * 1000), 1)
         nkt = int(list(well_data.dict_nkt.keys())[0])
         if nkt == 73:
@@ -531,7 +531,7 @@ class Work_with_gnkt(QMainWindow):
             [None, None, None, None, None, None,
              'Стол ротора', None, None, None, f'{well_data.stol_rotora._value}м', None, None, None, None, None,
              None, None, 'от', None, 'до', None, None, None, None, None, 'п.м', None, 'м3', None, None,
-             'Жидкость глушения', None, None, None, None, None, None, None, zhgs, None, None, 'в объеме', None, None,
+             'Жидкость глушения', None, None, None, None, None, None, None, self.zhgs, None, None, 'в объеме', None, None,
              f'{28.9}м3', None],
             [None, None, None, None, None, None, 'Направление', None, None, None, None, None,
              well_data.column_direction_diametr._value, None, well_data.column_direction_wall_thickness._value, None,
@@ -652,7 +652,7 @@ class Work_with_gnkt(QMainWindow):
             # print(row, len(schema_well_list[row-1]), schema_well_list[row-1][15])
             for col in range(1, 48):
                 cell = ws3.cell(row=row, column=col)
-                print(row, col)
+                # print(row, col)
                 cell.value = schema_well_list[row - 1][col - 1]
                 ws3.cell(row=row, column=col).font = Font(name='Arial', size=11, bold=False)
                 ws3.cell(row=row, column=col).alignment = Alignment(wrap_text=True, horizontal='center',
@@ -1186,7 +1186,8 @@ class Work_with_gnkt(QMainWindow):
              None, None, None, None, None, None, None, None,
              'Мастер ГНКТ', None],
             [None, 50,
-             f'Произвести допуск КНК-1 с промывкой на азотированной смеси до текущего забоя на гл.{self.bottom_muft}м (при '
+             f'Произвести допуск КНК-1 с промывкой на азотированной смеси до текущего забоя на гл. муфты №'
+             f'{self.bottom_muft} (при '
              'отсутствии проходки согласовать достигнутый забой с Заказчиком)',
              None, None, None, None, None, None, None, None, 'Мастер ГНКТ', None],
             [None, 51,
@@ -1226,7 +1227,7 @@ class Work_with_gnkt(QMainWindow):
              'Произвести подъем с замещением скважинной жидкости на раствор глушения, удельного веса по согласованию '
              'с Заказчиком, рассчитанного по замеру Ризб после 2-х часов отстоя и удел.веса рабочей жидкости в скважин, '
              'но не менее удельного веса расчитанного для пластового давления указанного в настоящем плане работ '
-             f'г/см3 (при Рпл={self.pressuar}атм).  До завоза раствора, '
+             f'{self.zhgs} (при Рпл={self.pressuar}атм).  До завоза раствора, '
              f'скважину разряжать. Перед замещением КНК установить '
              f'в интервале нижнего фрак-порта.\nПрокачать на циркуляцию жидкость глушения в объеме не менее '
              f'{self.volume_dumping(ntk_true, self.bottom_muft)}м3 '
@@ -1344,7 +1345,7 @@ class Work_with_gnkt(QMainWindow):
             return date_obj.strftime('%d.%m.%Y')
         else:
             date_obj = datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
-            print(f' даь {date_obj}')
+            # print(f' даь {date_obj}')
         return date_obj.strftime('%d.%m.%Y')
 
     def insert_ports_data(self, ports_data):
@@ -1413,10 +1414,12 @@ class Work_with_gnkt(QMainWindow):
         for index_row, row in enumerate(ports_list):
             # dict_ports[f'Муфта №{index + 1}'] = {'кровля': port[0], 'подошва': port[1], 'шар': ball, 'седло': saddle,
             #                                      'тип': type_saddles}
+            print(f'порты {ports_data}')
             col = 45
             n = 3
             m = 0
             merge_port = {}
+
             for index, port in enumerate(ports_data):
                 if index_row == 1:
                     ports_list[index_row][col - n - 2] = port
@@ -1436,7 +1439,7 @@ class Work_with_gnkt(QMainWindow):
                 n += col_port
                 m += 2
 
-        print(f'merge {merge_port}')
+
         return ports_list, merge_port
 
     # def work_with_port(self, plast_work: str, dict_perforation: dict, manufacturer, type_column):
@@ -1465,7 +1468,7 @@ class Work_with_gnkt(QMainWindow):
 
             fluid_work_insert, ok = QInputDialog.getDouble(self, 'Рабочая жидкость',
                                                            'Введите расчетный удельный вес жидкости глушения в '
-                                                           'конце жидкости',
+                                                           'конце ремонта',
                                                            max(fluid_list), 0.87, 2, 2)
         except:
             fluid_work_insert, ok = QInputDialog.getDouble(self, 'Рабочая жидкость',

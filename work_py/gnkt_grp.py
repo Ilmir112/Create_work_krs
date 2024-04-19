@@ -107,6 +107,7 @@ class GnktOsvWindow(QMainWindow):
         self.wb = load_workbook('property_excel/tepmpale_gnkt_osv_grp.xlsx')
         GnktOsvWindow.wb = self.wb
         self.ws_schema = self.wb.active
+
         self.work_plan = 'gnkt_after_grp'
         self.perforation_correct_window2 = None
         self.wb.sheetnames.insert(0, "Титульник")
@@ -140,6 +141,7 @@ class GnktOsvWindow(QMainWindow):
 
         main.MyWindow.copy_pz(self, self.ws_title, table_title, self.work_plan, 13, 1)
         main.MyWindow.copy_pz(self, self.ws_schema, table_schema, self.work_plan, 23, 2)
+
         main.MyWindow.copy_pz(self, self.ws_work, table_widget, self.work_plan, 12, 3)
         work_well = self.gnkt_work(
             GnktOsvWindow2.fluid_edit, GnktOsvWindow2.pvo_number, GnktOsvWindow2.current_bottom_edit,
@@ -147,16 +149,7 @@ class GnktOsvWindow(QMainWindow):
         main.MyWindow.populate_row(self, 0, work_well, table_widget)
         CreatePZ.add_itog(self, self.ws_work, self.table_widget.rowCount() + 1, self.work_plan)
 
-        # CreatePZ.add_itog(self, self.ws_work, self.table_widget.rowCount() + 1, self.work_plan)
-        # Work_with_gnkt.wb_gnkt_frez.save(f"{well_data.well_number} {well_data.well_area} {well_data.cat_P_1}
-        # категории.xlsx")
-        # print('файл сохранен')
 
-        # self.buttonAdd = QPushButton('Добавить данные в план работ')
-        # self.buttonAdd.clicked.connect(self.add_work)
-        # vbox = QGridLayout(self.centralWidget)
-        # vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
-        # vbox.addWidget(self.buttonAdd, 2, 0)
 
     def gnkt_work(self, fluid_work_insert, pvo_number_edit, current_bottom_edit, osvoenie_combo_need):
         from cdng import events_gnvp_frez
@@ -559,9 +552,48 @@ class GnktOsvWindow(QMainWindow):
         for row_ind, row in enumerate(ws.iter_rows(values_only=True)):
             if all(value is None for value in row[:42]):
                 ws.row_dimensions[row_ind + 1].hidden = True
-        coordinate = f'E2'
-        main.MyWindow.insert_image(self, ws, 'imageFiles/schema_well/column.png', coordinate, 170, 1280)
 
+        coordinate_nkt_with_paker = 'F6'
+        main.MyWindow.insert_image(self, ws, 'imageFiles/schema_well/НКТ с пакером.png', coordinate_nkt_with_paker, 100, 470)
+        coordinate_propant = 'F43'
+        main.MyWindow.insert_image(self, ws, 'imageFiles/schema_well/пропант.png', coordinate_propant, 90, 500)
+
+
+        n = 0
+        m = 0
+        for plast in well_data.plast_all:
+            count_interval = well_data.dict_perforation[plast]['счет_объединение']
+
+            self.ws_schema.merge_cells(start_column=23, start_row=27 + m,
+                                end_column=23, end_row= 27 + count_interval + m -1)
+            self.ws_schema.merge_cells(start_column=22, start_row=27 + m,
+                                       end_column=22, end_row=27 + count_interval + m - 1)
+            self.ws_schema.merge_cells(start_column=21, start_row=27 + m,
+                                       end_column=21, end_row=27 + count_interval + m - 1)
+            m += count_interval
+            roof_plast = well_data.dict_perforation[plast]['кровля']
+            sole_plast = well_data.dict_perforation[plast]['подошва']
+            if roof_plast > well_data.depth_fond_paker_do["do"]:
+                interval_str = f'{plast} {roof_plast}-{sole_plast}'
+                coordinate_pvr = f'F{48+n}'
+
+                ws.cell(row=48+n, column=10).value = interval_str
+                ws.merge_cells(start_column=10, start_row=48+n,
+                                end_column=12, end_row= 48+n+2)
+                ws.cell(row=48+n, column=10).font = Font(name='Arial', size=12, bold=True)
+                ws.cell(row=48+n, column=10).alignment = Alignment(wrap_text=True, horizontal='left',
+                                       vertical='center')
+                n += 3
+                main.MyWindow.insert_image(self, ws, 'imageFiles/schema_well/ПВР.png', coordinate_pvr, 100, 100)
+
+        coordinate_voln = f'E18'
+        main.MyWindow.insert_image(self, ws, 'imageFiles/schema_well/переход.png', coordinate_voln, 150, 60)
+
+        ws.print_area = f'B3:AP{70}'
+        # ws.page_setup.fitToPage = True
+        # ws.page_setup.fitToHeight = False
+        # ws.page_setup.fitToWidth = True
+        # ws.print_options.horizontalCentered = True
     def save_to_gnkt(self):
 
         sheets = ["Титульник", 'СХЕМА', 'Ход работ']

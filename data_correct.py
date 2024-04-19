@@ -770,6 +770,10 @@ class DataWindow(QMainWindow):
                 [columnType, column_wall_thickness, shoe_column]]):
             msg = QMessageBox.information(self, 'Внимание', 'Не все поля в данных колонне соответствуют значениям')
             close_file = False
+        elif well_data.column_additional:
+            if int(float(head_column_additional.replace(',', '.'))) < 10:
+                msg = QMessageBox.information(self, 'Внимание', 'доп колонна не может быть близко 0')
+                close_file = False
         elif well_data.column_additional \
                 and any([self.ifNum(data_well) is False for data_well in
                      [column_additional_diametr, column_additional_wall_thickness,

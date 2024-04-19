@@ -26,9 +26,9 @@ class TabPage_SO(QWidget):
         self.cat_gaz_f_pr = well_data.cat_gaz_f_pr
         self.gaz_f_pr = well_data.gaz_f_pr
         self.h2s_mg = well_data.h2s_mg
-        print(f'мг {self.h2s_mg}')
+
         self.h2s_pr = well_data.h2s_pr
-        print(f'мг % {self.h2s_pr}')
+
         self.cat_P_P = well_data.cat_P_P
 
         self.category_pressuar_Label = QLabel('По Рпл')
@@ -70,7 +70,7 @@ class TabPage_SO(QWidget):
                             work_plast_index = 1
                     else:
                         work_plast, ok = QInputDialog.getText(None, 'индекс пласта', 'Введите индекc пласта вскрываемого')
-                        self.plast_all.append(work_plast)
+                        # self.plast_all.append(work_plast)
                         work_plast_index = 1
             except:
 
@@ -79,8 +79,8 @@ class TabPage_SO(QWidget):
                     mes = QMessageBox.warning(self, 'Ошибка', 'Пласт есть в списке')
                     work_plast, ok = QInputDialog.getText(None, 'индекс пласта', 'Введите индекc пласта вскрываемого')
 
-                self.plast_all.append(work_plast)
-                well_data.plast_all.append(work_plast)
+                # self.plast_all.append(work_plast)
+                # well_data.plast_all.append(work_plast)
                 work_plast_index = 1
 
 
@@ -212,7 +212,6 @@ class CategoryWindow(QMainWindow):
     def addRowTable(self):
        
         # Пересохранение по сереводорода
-
 
         cat_P_1 = well_data.cat_P_1
 

@@ -205,9 +205,6 @@ def raiding_interval(ryber_key):
                             crt = [float(interval[0]) - 20, well_data.current_bottom]
                     else:
                         if float(interval[1]) + 20 <= well_data.current_bottom and \
-                                well_data.shoe_column_additional._value > float(interval[0]) - 20:
-                            crt = [well_data.shoe_column_additional._value, float(interval[1]) + 20]
-                        elif float(interval[1]) + 20 <= well_data.current_bottom and \
                                 well_data.shoe_column_additional._value >= float(interval[1]) + 20:
                             crt = [float(interval[0]) - 20, float(interval[1]) + 20]
                         elif float(interval[1]) + 20 >= well_data.shoe_column_additional._value:

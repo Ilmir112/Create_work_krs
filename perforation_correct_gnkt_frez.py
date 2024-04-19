@@ -76,8 +76,9 @@ class TabPage_SO(QWidget):
             setattr(self, f"diametr_saddles_{index_interval}_edit", self.diametr_saddles_edit)
             setattr(self, f"diametr_ball_{index_interval}_edit", self.diametr_ball_edit)
 
-            self.labels_plast[index] = (self.number_port, self.roof_edit, self.sole_edit,
-                                        self.type_saddles_ComboBox, self.diametr_saddles_edit, self.diametr_ball_edit)
+            self.labels_plast[index] = [self.number_port.text(), self.roof_edit.text(), self.sole_edit.text(),
+                                        self.type_saddles_ComboBox, self.diametr_saddles_edit, self.diametr_ball_edit]
+            self.labels_plast_read = {}
 
             index_interval += 1
 
@@ -135,7 +136,7 @@ class TabPage_SO(QWidget):
         # print(f'индекс {idx}')
         # Получаем текст из выбранного элемента в type_saddles_ComboBox
         type_items = [type_saddles_ComboBox.itemText(i) for i in range(type_saddles_ComboBox.count())]
-        # print(f'tyo работает {idx, index_interval, type_items}')
+        print(f'tyo работает {idx, index_interval, type_items[idx]}')
         # Получаем данные о шаре и седле для выбранного типа
 
         self.diametr_saddles_edit = QLineEdit(self)
@@ -151,9 +152,11 @@ class TabPage_SO(QWidget):
 
         setattr(self, f"diametr_saddles_{index_interval}_edit", diametr_saddles)
         setattr(self, f"diametr_ball_{index_interval}_edit", diametr_ball)
-        self.labels_plast[index_interval] = (
-            self.number_port, self.roof_edit, self.sole_edit, self.type_saddles_ComboBox,
-            self.diametr_saddles_edit, self.diametr_ball_edit)
+
+        print(f'тип порта {self.type_saddles_ComboBox.currentText()}')
+        self.labels_plast[index_interval][3] = type_items[idx]
+        self.labels_plast[index_interval][4] = self.diametr_saddles_edit.text()
+        self.labels_plast[index_interval][5] = self.diametr_ball_edit.text()
 
 
 class TabWidget(QTabWidget):
@@ -192,12 +195,13 @@ class PerforationCorrectGnktFrez(QMainWindow):
 
         ports_tuple = sorted(list(self.dict_perforation[plast_work]['интервал']), key=lambda x: x[0], reverse=True)
         dict_ports = {}
+        print(f'порты собрать {ports_tuple}')
         for index, port in enumerate(ports_tuple):
-            roof = self.tabWidget.currentWidget().labels_plast[index][1].text()
-            sole = self.tabWidget.currentWidget().labels_plast[index][2].text()
-            type_sanddles = self.tabWidget.currentWidget().labels_plast[index][3].currentText()
-            ball = self.tabWidget.currentWidget().labels_plast[index][4].text()
-            saddle = self.tabWidget.currentWidget().labels_plast[index][5].text()
+            roof = self.tabWidget.currentWidget().labels_plast[index][1]
+            sole = self.tabWidget.currentWidget().labels_plast[index][2]
+            type_sanddles = self.tabWidget.currentWidget().labels_plast[index][3]
+            ball = self.tabWidget.currentWidget().labels_plast[index][4]
+            saddle = self.tabWidget.currentWidget().labels_plast[index][5]
 
             dict_ports.setdefault(manufacturer, {}).setdefault(type_column, {}).setdefault(f'№{index + 1}',
                                                                                            {}).setdefault(

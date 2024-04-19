@@ -101,7 +101,7 @@ class DopPlanWindow(QMainWindow):
         cursor1 = conn1.cursor()
 
         # Проверяем наличие таблицы с определенным именем
-
+        result_table = 0
         number_dp = int(well_data.number_dp) - 1
         if number_dp == 0:
             work_plan = 'krs'

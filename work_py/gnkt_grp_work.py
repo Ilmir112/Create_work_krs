@@ -514,7 +514,7 @@ class GnktOsvWindow2(QMainWindow):
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Экспл. колонна', None, None,
              f'{well_data.column_diametr._value}', f'{well_data.column_wall_thickness._value}',
              f'{round(float(well_data.column_diametr._value - 2 * well_data.column_wall_thickness._value), 1)}',
-             0, well_data.shoe_column._value, well_data.level_cement_column._value, volume_pm_ek, well_volume_ek],
+             f'0-', well_data.shoe_column._value, well_data.level_cement_column._value, volume_pm_ek, well_volume_ek],
             [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, "", ""],
             [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
@@ -532,7 +532,8 @@ class GnktOsvWindow2(QMainWindow):
              50, well_data.depth_fond_paker_do["do"], well_data.depth_fond_paker_do["do"] + 2, 2, None, None],
             [None, None, None, None, None, None, None, None, None, 'пакер', None, None, 'без патрубка', None, None,
              None, 0, 0, well_data.depth_fond_paker_do["do"], well_data.depth_fond_paker_do["do"], 0, 0, 0],
-            [None, None, None, None, None, None, None, None, None, well_data.depth_fond_paker_do["do"], None, None,
+            [None, None, None, None, None, None, None, None, None, f'на гл {well_data.depth_fond_paker_do["do"]}м',
+             None, None,
              'воронка', None, None, nkt, None,
              None, well_data.depth_fond_paker_do["do"], None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Данные о перфорации', None, None,
@@ -591,7 +592,7 @@ class GnktOsvWindow2(QMainWindow):
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Содержание H2S, мг/л', None, None,
              None,
              None, well_data.h2s_mg[0], None, None, None, None, None],
-            [None, None, None, None, None, None, None, f'{well_data.perforation_roof}-{well_data.perforation_sole}',
+            [None, None, None, None, None, None, None, None,
              None, None, None, None, 'Газовый фактор', None, None, None,
              None, well_data.gaz_f_pr[0], None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Коэффициент аномальности', None,
@@ -646,13 +647,18 @@ class GnktOsvWindow2(QMainWindow):
              None, None, None, None, None],
         ]
         pvr_list = []
-        for plast in well_data.plast_all:
-
+        for plast in sorted(well_data.plast_all, key = lambda x: self.get_start_depth(
+                well_data.dict_perforation[x]['интервал'][0])):
+            count_interval = 0
             for interval in well_data.dict_perforation[plast]['интервал']:
+                count_interval += 1
                 if well_data.dict_perforation[plast]['отключение']:
                     izol = 'Изолирован'
                 else:
                     izol = 'рабочий'
+                if well_data.paker_do['do'] != 0:
+                    if well_data.dict_perforation[plast]['кровля'] < well_data.depth_fond_paker_do['do']:
+                        izol = 'над пакером'
                 try:
                     pressuar = well_data.dict_perforation[plast]['давление'][0]
                     zamer = well_data.dict_perforation[plast]['замер'][0]
@@ -664,9 +670,11 @@ class GnktOsvWindow2(QMainWindow):
                      None, interval[0],
                      None, interval[1], None, izol, pressuar,
                      zamer, None], )
+            well_data.dict_perforation[plast]['счет_объединение'] = count_interval
+
 
         for index, pvr in enumerate(pvr_list):
-            schema_well_list[27 + index] = pvr
+            schema_well_list[26 + index] = pvr
 
         return schema_well_list
 
@@ -687,6 +695,9 @@ class GnktOsvWindow2(QMainWindow):
             print(f' даь {date_obj}')
         return date_obj.strftime('%d.%m.%Y')
 
+    # Функция для получения глубины начала интервала
+    def get_start_depth(self, interval):
+        return interval[0]
     def calc_fluid(self):
 
         fluid_list = []

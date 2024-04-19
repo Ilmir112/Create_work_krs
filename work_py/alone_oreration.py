@@ -9,7 +9,7 @@ from selectPlast import CheckBoxDialog
 from .rationingKRS import liftingNKT_norm, descentNKT_norm, well_volume_norm
 
 
-def kot_select(self):
+def kot_select(self, current_bottom):
 
 
     if well_data.column_additional is False \
@@ -17,31 +17,28 @@ def kot_select(self):
         kot_select = f'КОТ-50 (клапан обратный тарельчатый) +НКТ{well_data.nkt_diam}мм 10м + репер '
 
     elif well_data.column_additional is True and well_data.column_additional_diametr._value < 110 and\
-            well_data.current_bottom >= well_data.head_column_additional._value:
+            current_bottom >= well_data.head_column_additional._value:
         kot_select = f'КОТ-50 (клапан обратный тарельчатый) +НКТ{60}мм 10м + репер + ' \
-                     f'НКТ60мм L- {round(well_data.current_bottom - well_data.head_column_additional._value, 0)}м'
+                     f'НКТ60мм L- {round(current_bottom - well_data.head_column_additional._value, 0)}м'
     elif well_data.column_additional is True and well_data.column_additional_diametr._value > 110 and\
-            well_data.current_bottom >= well_data.head_column_additional._value:
+            current_bottom >= well_data.head_column_additional._value:
         kot_select = f'КОТ-50 (клапан обратный тарельчатый) +НКТ{73}мм со снятыми фасками 10м + репер + ' \
                      f'НКТ{well_data.nkt_diam}мм со снятыми фасками' \
-                     f' L- {round(well_data.current_bottom - well_data.head_column_additional._value, 0)}м'
+                     f' L- {round(current_bottom - well_data.head_column_additional._value, 0)}м'
 
     return kot_select
 
 
 def kot_work(self, current_bottom):
 
-    current_bottom, ok = QInputDialog.getDouble(self, 'Необходимый забой',
-                                                         'Введите забой до которого нужно нормализовать',
-                                                         float(current_bottom))
 
     kot_list = [[f'статической уровень {well_data.static_level._value}', None,
                  f'При отсутствии циркуляции:\n'
-                 f'Спустить {kot_select(self)} на НКТ{well_data.nkt_diam}мм до глубины {well_data.current_bottom}м'
+                 f'Спустить {kot_select(self, current_bottom)} на НКТ{well_data.nkt_diam}мм до глубины {current_bottom}м'
                  f' с замером, шаблонированием шаблоном {well_data.nkt_template}мм.',
                  None, None, None, None, None, None, None,
-                 'мастер КРС', descentNKT_norm(well_data.current_bottom, 1)],
-                [f'{kot_select(self)} до H-{current_bottom} закачкой обратной промывкой', None,
+                 'мастер КРС', descentNKT_norm(current_bottom, 1)],
+                [f'{kot_select(self, current_bottom)} до H-{current_bottom} закачкой обратной промывкой', None,
                  f'Произвести очистку забоя скважины до гл.{current_bottom}м закачкой обратной промывкой тех '
                  f'жидкости уд.весом {well_data.fluid_work}, по согласованию с Заказчиком',
                  None, None, None, None, None, None, None,
@@ -52,13 +49,13 @@ def kot_work(self, current_bottom):
                  'мастер КРС, предст. заказчика', None],
 
                 [None, None,
-                 f'Поднять {kot_select(self)} на НКТ{well_data.nkt_diam}мм c глубины {current_bottom}м с доливом '
+                 f'Поднять {kot_select(self, current_bottom)} на НКТ{well_data.nkt_diam}мм c глубины {current_bottom}м с доливом '
                  f'скважины в '
-                 f'объеме {round(well_data.current_bottom * 1.12 / 1000, 1)}м3 удельным весом {well_data.fluid_work}',
+                 f'объеме {round(current_bottom * 1.12 / 1000, 1)}м3 удельным весом {well_data.fluid_work}',
                  None, None, None, None, None, None, None,
-                 'мастер КРС', liftingNKT_norm(well_data.current_bottom, 1)]
+                 'мастер КРС', liftingNKT_norm(current_bottom, 1)]
                 ]
-    well_data.current_bottom = current_bottom
+
     return kot_list
 
 
@@ -441,20 +438,20 @@ def volume_nkt_metal(dict_nkt):  # Внутренний объем НКТ жел
 def well_volume(self, current_bottom):
     # print(well_data.column_additional)
     if well_data.column_additional is False:
-        # print(well_data.column_diametr, well_data.column_wall_thickness, current_bottom)
+        print(well_data.column_diametr._value, well_data.column_wall_thickness._value, current_bottom)
         volume_well = 3.14 * (
                 well_data.column_diametr._value - well_data.column_wall_thickness._value * 2) ** 2 / 4 / 1000000 * (
                           current_bottom)
 
     else:
-        # print(f' ghb [{well_data.column_additional_diametr, well_data.column_additional_wall_thickness._value}]')
+        print(f' ghb [{well_data.column_additional_diametr._value, well_data.column_additional_wall_thickness._value}]')
         volume_well = (3.14 * (
                 well_data.column_additional_diametr._value - well_data.column_additional_wall_thickness._value * 2) ** 2 / 4 / 1000 * (
                                current_bottom - float(well_data.head_column_additional._value)) / 1000) + (
                               3.14 * (
                               well_data.column_diametr._value - well_data.column_wall_thickness._value * 2) ** 2 / 4 / 1000 * (
                                   float(well_data.head_column_additional._value)) / 1000)
-    # print(f'Объем скважины {volume_well}')
+    print(f'Объем скважины {volume_well}')
     return round(volume_well, 1)
 
 
@@ -487,8 +484,8 @@ def volume_jamming_well(self, current_bottom):  # объем глушения с
         (well_volume(self, current_bottom) - volume_nkt_metal(well_data.dict_nkt) - volume_rod(self,
                                                                                                well_data.dict_sucker_rod)) * 1.1,
         1)
-    # print(f' объем глушения {well_volume(self, well_data.current_bottom), volume_jamming_well}')
-    # print(f' объем {volume_nkt_metal(well_data.dict_nkt)} , {volume_rod(well_data.dict_sucker_rod)}')
+    print(f' объем глушения {well_volume(self, well_data.current_bottom), volume_jamming_well}')
+    print(f' объем {volume_nkt_metal(well_data.dict_nkt)} , {volume_rod(self, well_data.dict_sucker_rod)}')
     return volume_jamming_well
 
 

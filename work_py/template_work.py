@@ -204,8 +204,6 @@ class TabPage_SO_with(QWidget):
 
     def update_template(self):
 
-
-
         if self.template_first_Edit.text() != '':
                 first_template = self.template_first_Edit.text()
         if self.lenght_template_first_Edit.text() != '':
@@ -352,9 +350,10 @@ class TabPage_SO_with(QWidget):
 
                     skm_teml_str = f'шаблон-{first_template}мм до гл.{well_data.template_depth_addition}м, ' \
                                    f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
-            if dictance_three != '' and dictance_template_second != '' and dictance_template_first != '' and \
+            if dictance_template_second != '' and dictance_template_first != '' and \
                     lenght_template_first != '' and first_template != '' and template_second != '' \
                     and lenght_template_second != '':
+
                 self.template_str_Edit.setText(template_str)
                 self.skm_teml_str_Edit.setText(skm_teml_str)
 
@@ -660,12 +659,13 @@ class TabPage_SO_with(QWidget):
         dict_perforation = well_data.dict_perforation
         plast_all = list(dict_perforation.keys())
         roof_plast = well_data.current_bottom
+        roof_add_column_plast = well_data.head_column_additional._value
         if well_data.column_additional is False or (
                 well_data.column_additional and well_data.head_column_additional._value >= well_data.current_bottom):
             for plast in plast_all:
                 roof = min(list(map(lambda x: x[0], list(dict_perforation[plast]['интервал']))))
-                # print(roof_plast < roof, roof_plast, roof)
-                if roof_plast > roof and roof_plast < well_data.current_bottom:
+
+                if roof_plast > roof and roof < well_data.current_bottom:
                     if dict_perforation[plast]['отрайбировано'] and well_data.open_trunk_well is False:
                         roof_add_column_plast = roof_plast
                     elif well_data.open_trunk_well is True and dict_perforation[plast]['отрайбировано']:
@@ -674,10 +674,9 @@ class TabPage_SO_with(QWidget):
                         break
                     else:
                         roof_plast = min(list(map(lambda x: x[0], list(dict_perforation[plast]['интервал']))))
-                        roof_add_column_plast = roof_plast
+                        roof_add_column_plast = roof
                         break
-                    if roof_plast > well_data.current_bottom:
-                        roof_plast = well_data.current_bottom
+
                 else:
                     roof_add_column_plast = roof_plast
 
@@ -706,7 +705,7 @@ class TabPage_SO_with(QWidget):
                         roof_plast = roof_plast_in
                         break
 
-
+        print(f'кровля райбированного ПВР {roof_plast, roof_add_column_plast}')
 
         return roof_plast, roof_add_column_plast
 
@@ -1156,7 +1155,7 @@ class TemplateKrs(QMainWindow):
 
                 gipsPero_list = [gipsPero_list[-1]]
                 from .drilling import Drill_window
-                drill_work_list = Drill_window.add_work()
+                drill_work_list = Drill_window.add_work(self)
 
                 for row in drill_work_list:
                     gipsPero_list.append(row)
