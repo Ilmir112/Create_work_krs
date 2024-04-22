@@ -16,8 +16,9 @@ jobs:
 #        run: pip install -r requirements.txt
       - name: Build executable
         run:
-          pyinstaller --noconfirm --onefile --windowed          
-          
+          pyinstaller --noconfirm --onefile --windowed
+          --add-data application_gis.py:application_gis.py
+          --add-data application_pvr.py:application_pvr.py
           --add-data data_base:data_base
           --add-data gnkt_data:gnkt_data
           --add-data imageFiles:imageFiles
@@ -44,8 +45,7 @@ jobs:
           --add-data selectPlast.py:selectPlast.py 
           --add-data well_data.py:well_data.py 
           --add-data work_json.py:work_json.py 
-          --add-data application_gis.py:application_gis.py 
-          --add-data application_pvr.py:application_pvr.py          
+                   
           main.py
 
       - name: Upload artifact
