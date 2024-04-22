@@ -45,9 +45,8 @@ jobs:
           --add-data "D:/python/Create_work_krs/property_excel;property_excel/" 
           --add-data "D:/python/Create_work_krs/imageFiles;imageFiles/" 
           --add-data "D:/python/Create_work_krs/gnkt_data;gnkt_data/" 
-          --add-data "D:/python/Create_work_krs/data_base;data_base/" 
-          --add-data "D:/python/Create_work_krs/main.py;."  
-          "D:/python/Create_work_krs/main.py"
+          --add-data "D:/python/Create_work_krs/data_base;data_base/"          
+          main.py
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
