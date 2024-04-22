@@ -16,36 +16,37 @@ jobs:
 #        run: pip install -r requirements.txt
       - name: Build executable
         run:
-          pyinstaller --noconfirm --onefile --windowed 
-          --add-data work_json.py:work_json.py
-          --add-data well_data.py:well_data.py 
-          --add-data selectPlast.py:selectPlast.py 
-          --add-data proverka.py:proverka.py 
-          --add-data prov.py:prov.py 
-          --add-data podpisant.json:podpisant.json 
-          --add-data plan.py:plan.py 
-          --add-data perforation_correct_gnkt_frez.py:perforation_correct_gnkt_frez.py. 
-          --add-data perforation_correct.py:perforation_correct.py
-          --add-data open_pz.py:open_pz.py
-          --add-data krs.py:krs.py 
+          pyinstaller --noconfirm --onefile --windowed
+          --hidden-import openpyxl
+          --hidden-import PyQt5
+          --add-data база_данных:база_данных
+          --add-data gnkt_data:gnkt_data
+          --add-data imageFiles:imageFiles
+          --add-data property_excel:property_excel
+          --add-data пользователи:пользователи
+          --add-data work_py:work_py
+          --add-data имя_блока.py:имя_блока.py
+          --add-data Category_correct.py:category_correct.py
+          --add-data cdng.py:cdng.py
+          --add-data data_correct.py:data_correct.py
+          --add-data data_correct_position_people.py:data_correct_position_people.py
+          --add-data find.py:find.py
+          --add-data gnkt_after_grp.py:gnkt_after_grp.py
+          --add-data gnkt_opz.py:gnkt_opz.py
           --add-data H2S.py:H2S.py
-          --add-data gnkt_opz.py:gnkt_opz.py 
-          --add-data gnkt_after_grp.py:gnkt_after_grp.py 
-          --add-data find.py:find.py 
-          --add-data data_correct_position_people.py:data_correct_position_people.py 
-          --add-data data_correct.py:data_correct.py 
-          --add-data convert_xls.py:convert_xls.py 
-          --add-data cdng.py:cdng.py 
-          --add-data category_correct.py:category_correct 
-          --add-data block_name.py:block_name.py 
-          --add-data application_pvr.py:application_pvr.py 
-          --add-data application_gis.py:application_gis.py 
-          --add-data work_py:work_py/ 
-          --add-data users:users/ 
-          --add-data property_excel:property_excel/ 
-          --add-data imageFiles:imageFiles/ 
-          --add-data gnkt_data:gnkt_data/ 
-          --add-data data_base:data_base/     
+          --add-data krs.py:krs.py
+          --add-data open_pz.py:open_pz.py
+          --add-data perforation_correct.py:perforation_correct.py
+          --add-data perforation_correct_gnkt_frez.py:perforation_correct_gnkt_frez.py
+          --add-data plan.py:plan.py
+          --add-data plan23.py:plan23.py
+          --add-data podpisant.json:podpisant.json
+          --add-data proverka.py:proverka.py
+          --add-data selectPlast.py:selectPlast.py
+          --add-data well_data.py:well_data.py
+          --add-data work_json.py:work_json.py
+          --add-data application_gis.py:application_gis.py
+          --add-data application_pvr.py:application_pvr.py
           main.py
 
       - name: Upload artifact
