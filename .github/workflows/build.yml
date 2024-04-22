@@ -16,7 +16,7 @@ jobs:
 #        run: pip install -r requirements.txt
       - name: Build executable
         run:
-          pyinstaller --noconfirm --onedir --windowed
+          pyinstaller --noconfirm --onefile --windowed
           --hidden-import openpyxl
           --hidden-import PyQt5
           --add-data application_gis.py:application_gis.py
