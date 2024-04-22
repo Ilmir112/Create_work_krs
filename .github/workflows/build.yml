@@ -4,9 +4,9 @@ jobs:
   build:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
       - name: Set up Python
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
         with:
           python-version: '3.8' # Замените на нужную версию Pyth on
 
@@ -16,7 +16,7 @@ jobs:
 #        run: pip install -r requirements.txt
       - name: Build executable
         run:
-          pyinstaller 
+          pyinstaller --onefile
           --add-data data_base:data_base
           --add-data gnkt_data:gnkt_data
           --add-data imageFiles:imageFiles
@@ -37,14 +37,14 @@ jobs:
           --add-data perforation_correct.py:perforation_correct.py 
           --add-data perforation_correct_gnkt_frez.py:perforation_correct_gnkt_frez.py 
           --add-data plan.py:plan.py 
-          --add-data plan23.py:plan23.py 
+          --add-data plan23.py:plan23.py          
           --add-data podpisant.json:podpisant.json 
           --add-data proverka.py:proverka.py 
           --add-data selectPlast.py:selectPlast.py 
           --add-data well_data.py:well_data.py 
           --add-data work_json.py:work_json.py 
           --add-data application_gis.py:application_gis.py 
-          --add-data application_pvr.py:application_pvr.py 
+          --add-data application_pvr.py:application_pvr.py          
           main.py
 
 

@@ -594,7 +594,7 @@ class GnktOsvWindow(QMainWindow):
             m += count_interval
             roof_plast = well_data.dict_perforation[plast]['кровля']
             sole_plast = well_data.dict_perforation[plast]['подошва']
-            if roof_plast > well_data.depth_fond_paker_do["do"]:
+            if roof_plast > well_data.depth_fond_paker_do["do"] and roof_plast < well_data.current_bottom:
                 interval_str = f'{plast} {roof_plast}-{sole_plast}'
                 coordinate_pvr = f'F{48+n}'
 
