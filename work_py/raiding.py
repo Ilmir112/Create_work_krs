@@ -113,20 +113,12 @@ class TabPage_SO_raid(QWidget):
     def update_raid_edit(self, index):
 
         if index == 'райбер в ЭК':
-            if well_data.column_additional is False or \
-                    (well_data.column_additional and well_data.current_bottom < well_data.head_column_additional._value):
-                self.raid_diametr_line.setText(str(self.raiding_Bit_diam_select(well_data.head_column_additional._value - 10)))
-                if well_data.column_diametr._value > 127:
-                    self.downhole_motor_line.setText('Д-106')
-                else:
-                    self.downhole_motor_line.setText('Д-76')
+            self.raid_diametr_line.setText(str(self.raiding_Bit_diam_select(well_data.head_column_additional._value - 10)))
+            if well_data.column_diametr._value > 127:
+                self.downhole_motor_line.setText('Д-106')
             else:
-                self.raid_diametr_line.setText(
-                    str(self.raiding_Bit_diam_select(well_data.current_bottom)))
-                if well_data.column_additional_diametr._value > 127:
-                    self.downhole_motor_line.setText('Д-106')
-                else:
-                    self.downhole_motor_line.setText('Д-76')
+                self.downhole_motor_line.setText('Д-76')
+
 
         if index == 'райбер в ДП':
             self.raid_diametr_line.setText(str(self.raiding_Bit_diam_select(well_data.current_bottom)))

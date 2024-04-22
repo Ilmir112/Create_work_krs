@@ -323,7 +323,7 @@ class GnktOsvWindow2(QMainWindow):
 
     def create_title_list(self, ws2):
 
-        print(f'цднг {well_data.cdng._value}')
+        # print(f'цднг {well_data.cdng._value}')
         well_data.region = block_name.region(well_data.cdng._value)
         self.region = well_data.region
 
@@ -427,7 +427,7 @@ class GnktOsvWindow2(QMainWindow):
         lenght_nkt = sum(list(map(int, well_data.dict_nkt.values())))
 
         volume_vn_gnkt = round(30.2 ** 2 * 3.14 / (4 * 1000), 2)
-        print(gnkt_lenght, volume_vn_gnkt)
+        # print(gnkt_lenght, volume_vn_gnkt)
         volume_gnkt = round(float(gnkt_lenght) * volume_vn_gnkt / 1000, 1)
         if well_data.column_additional:
             well_volume_ek = well_volume(self, well_data.head_column_additional._value)

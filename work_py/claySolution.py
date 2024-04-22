@@ -148,7 +148,7 @@ class ClayWindow(QMainWindow):
         else:
             dict_nkt = {73: rirSole}
     
-        volume_cement = round(volume_vn_ek(self, rirRoof) * (rirSole - rirRoof)/1000, 1)
+        volume_cement = round(volume_vn_ek(rirRoof) * (rirSole - rirRoof)/1000, 1)
         dict_nkt = {73: rirRoof}
         pero_list = [
             [f'СПО {RirWindow.pero_select(self, rirSole)}  на тНКТ{nkt_diam}м до {rirSole}м', None,
@@ -172,7 +172,7 @@ class ClayWindow(QMainWindow):
              'мастер КРС', 2.5]]
         well_data.current_bottom = rirRoof
 
-        if rir_question_QCombo  == 'Нет':
+        if rir_question_QCombo == 'Нет':
             pero_list.append([None, None,
              f'Поднять перо на тНКТ{nkt_diam}м с глубины {rirSole}м с доливом скважины в объеме '
              f'{round(rirSole*1.3/1000, 1)}м3 тех. жидкостью '

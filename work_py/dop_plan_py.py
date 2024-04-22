@@ -74,7 +74,7 @@ class DopPlanWindow(QMainWindow):
         work_earlier = self.tabWidget.currentWidget().work_edit.text()
         well_data.current_bottom = current_bottom
         if current_bottom == '' or fluid == '' or work_earlier == '':
-            print(current_bottom, fluid, work_earlier)
+            # print(current_bottom, fluid, work_earlier)
             mes = QMessageBox.critical(self, 'Забой', 'не все значения введены')
             return
         if current_bottom > well_data.bottomhole_drill._value:
@@ -127,7 +127,7 @@ class DopPlanWindow(QMainWindow):
             well_data.data_in_base = True
             cursor2 = conn1.cursor()
             # print(result_table)
-            print(f"Таблица {table_name}' существует в базе данных.")
+            # print(f"Таблица {table_name}' существует в базе данных.")
             cursor2.execute(f"SELECT * FROM {table_name}")
             result = cursor2.fetchall()
             well_data.paragraph_row, ok = QInputDialog.getInt(self, 'пункт плана работ',

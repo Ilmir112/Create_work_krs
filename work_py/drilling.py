@@ -663,6 +663,6 @@ class Drill_window(QMainWindow):
             kot_list.append(row)
 
         well_data.current_bottom = current_depth
-        print(f'забой {well_data.current_bottom }')
+        # print(f'забой {well_data.current_bottom }')
 
         return kot_list

@@ -235,7 +235,7 @@ class CreatePZ(QMainWindow):
                         row_list.append(str(ws.cell(row=row+1, column=col+1).value))
                     well_data.pvr_row.append(row_list)
 
-            print(f'Индексы ПВР {well_data.pvr_row}')
+            # print(f'Индексы ПВР {well_data.pvr_row}')
 
         elif work_plan in ['application_gis']:
             for row_ind, row in enumerate(ws.iter_rows(values_only=True)):

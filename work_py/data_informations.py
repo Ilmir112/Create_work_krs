@@ -92,7 +92,7 @@ dict_data_cdng = {
 
 
 def calc_pntzh(fluid, cdng):
-    print(f'ррррр {fluid,cdng}')
+    # print(f'ррррр {fluid,cdng}')
 
     if cdng in ["ТЦДНГ 04", "ТЦДНГ 03", "ТЦДНГ 02", "ТЦДНГ 01", "ОЦДНГ 02", "ОЦДНГ 01", "ОЦДНГ 03"]:
         if fluid > 1.18:

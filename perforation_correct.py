@@ -114,7 +114,7 @@ class TabPage_SO(QWidget):
         return 0 if self.dict_perforation[plast]['отключение'] else 1
 
     def check_template_status(self, plast):
-        print(self.dict_perforation[plast].keys())
+        # print(self.dict_perforation[plast].keys())
         return 0 if self.dict_perforation[plast]['Прошаблонировано'] else 1
 
     def check_raiding_status(self, plast):

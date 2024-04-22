@@ -31,7 +31,7 @@ class CheckBoxDialog(QDialog):
 
         well_data.plast_select = ''
         selected_options = []
-        print(f' рабочие пласты {well_data.plast_work}')
+        # print(f' рабочие пласты {well_data.plast_work}')
         for plast in well_data.plast_work:
             if self.plast.isChecked():
                 if self.plast.text() not in selected_options:

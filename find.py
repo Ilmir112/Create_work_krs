@@ -904,9 +904,9 @@ class Well_data(FindIndexPZ):
                 well_data.open_trunk_well = True
             else:
                 well_data.open_trunk_well = False
-        if str(well_data.well_number._value) in ['358', '878', "285", '120', '124', '549',
-                                                 '144', '168', "306АБШ", "650", "2290", "3287", "687", "2286",
-                                                 "1105", "3374", '4063', "3334", "4693"]:
+        if str(well_data.well_number._value) in ['882', '667', "3375", '2064', '1160', '1034',
+                                                 '1685', '1686', "1571", "3374", "2360", "3354",
+                                                 '878', '124', '549', '168']:
             QMessageBox.warning(self, 'Канатные технологии', f'Скважина согласована на канатные технологии')
             well_data.konte_true = True
 
@@ -922,7 +922,7 @@ class Well_perforation(FindIndexPZ):
     def read_well(self, ws, begin_index, cancel_index):
         from work_py.alone_oreration import is_number, calculationFluidWork
         from main import MyWindow
-        print(f'перфорация доп {well_data.dict_perforation}')
+        # print(f'перфорация доп {well_data.dict_perforation}')
         well_data.old_version = True
         col_old_open_index = 0
         bokov_stvol = False
@@ -1241,7 +1241,7 @@ class Well_Category(FindIndexPZ):
                 if categoty_h2s_well:
                     if str(well_data.cat_h2s_list[0]) != str(well_data.category_h2s):
                         print(str(well_data.cat_h2s_list[0]), well_data.category_h2s)
-
+                        #
                         mes = QMessageBox.warning(None, 'Некорректная категория давления',
                                                   f'согласно классификатора от {data} категория скважина '
                                                   f'по сероводороду {categoty_h2s_well}')

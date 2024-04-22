@@ -191,7 +191,7 @@ class ExcelWorker(QThread):
         # Подключение к базе данных SQLite
         conn = sqlite3.connect('data_base/database_without_juming.db')
         cursor = conn.cursor()
-        print(well_number._value, deposit_area._value, region)
+        # print(well_number._value, deposit_area._value, region)
         # Подключение к базе данных SQLite)
 
         if region == 'КГМ':
@@ -221,7 +221,7 @@ class ExcelWorker(QThread):
                            f"WHERE well_number = ? and deposit_area = ?", (well_number._value, deposit_area._value))
 
         result = cursor.fetchone()
-        print(result)
+        # print(result)
         # Закрытие соединения с базой данных
         conn.close()
         # # Завершение работы потока
@@ -1629,7 +1629,7 @@ class MyWindow(QMainWindow):
         if work_plan == 'gnkt_frez':
             index_setSpan = 1
         row_max = table_widget.rowCount()
-        print(f'макс {row_max}')
+        # print(f'макс {row_max}')
 
         for i, row_data in enumerate(work_list):
 
@@ -1718,7 +1718,7 @@ class MyWindow(QMainWindow):
                             if '1' in number_schema:
                                 number_schema = "2"
                             schema_pvo_set.add(number_schema)
-        print(f'схема ПВО {schema_pvo_set}')
+        # print(f'схема ПВО {schema_pvo_set}')
 
         n = 0
         for schema in list(schema_pvo_set):
@@ -2108,7 +2108,7 @@ class MyWindow(QMainWindow):
                 if check_question == QMessageBox.StandardButton.Yes:
                     check = True
         else:
-            print(f'глубина {well_data.template_depth, depth}')
+            # print(f'глубина {well_data.template_depth, depth}')
             if well_data.template_depth < depth:
                 check = False
                 check_question = QMessageBox.question(self, 'Проверка глубины пакера',
@@ -2123,21 +2123,22 @@ class MyWindow(QMainWindow):
 
         check_true = False
 
-        while check_true is False:
-            for plast in well_data.plast_all:
-                if len(well_data.dict_perforation[plast]['интервал']) >= 1:
-                    for interval in well_data.dict_perforation[plast]['интервал']:
-                        if interval[0] < depth < interval[1]:
-                            check_true = False
-                        else:
-                            check_true = True
-                elif len(well_data.dict_perforation[plast]['интервал']) == 0:
-                    check_true = True
 
-            if check_true is False:
-                paker_warning = QMessageBox.warning(None, 'Проверка посадки пакера в интервал перфорации',
-                                                    f'Проверка посадки показала пакер сажается в интервал перфорации, '
-                                                    f'необходимо изменить глубину посадки!!!')
+        for plast in well_data.plast_all:
+            if len(well_data.dict_perforation[plast]['интервал']) >= 1:
+                for interval in well_data.dict_perforation[plast]['интервал']:
+                    if interval[0] < depth < interval[1]:
+                        check_true = False
+                    else:
+                        check_true = True
+            elif len(well_data.dict_perforation[plast]['интервал']) == 0:
+                check_true = True
+
+        if check_true is False:
+            paker_warning = QMessageBox.warning(None, 'Проверка посадки пакера в интервал перфорации',
+                                                f'Проверка посадки показала пакер сажается в интервал перфорации, '
+                                                f'необходимо изменить глубину посадки!!!')
+
         return check_true
 
     def check_str_isdigit(self, string):

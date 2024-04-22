@@ -130,11 +130,11 @@ def remove_overlapping_intervals(perforating_intervals, skm_interval = None):
                 else:
                     skipping_intervals.append([int(float(nek[0])) - 90,
                                      well_data.skm_depth])
-        print(f'глубина СКМ {well_data.skm_depth, skipping_intervals}')
-        print(perforating_intervals)
+        # print(f'глубина СКМ {well_data.skm_depth, skipping_intervals}')
+        # print(perforating_intervals)
         for pvr in sorted(perforating_intervals, key=lambda x: x[0]):
             if pvr[1] <= well_data.skm_depth:
-                print(pvr, well_data.skm_depth)
+                # print(pvr, well_data.skm_depth)
                 if pvr[1] + 40 < well_data.skm_depth and pvr[0] < well_data.skm_depth:
                     skipping_intervals.append([pvr[0] - 90, pvr[0] - 2])
                     if well_data.skm_depth >= pvr[1] + 40:
@@ -149,7 +149,7 @@ def remove_overlapping_intervals(perforating_intervals, skm_interval = None):
                     if [pvr[1] + 1, well_data.skm_depth] not in skipping_intervals:
                         skipping_intervals.append([pvr[1] + 1, well_data.skm_depth])
 
-        print(f'СКМ на основе ПВР{sorted(skipping_intervals, key=lambda x: x[0])}')
+        # print(f'СКМ на основе ПВР{sorted(skipping_intervals, key=lambda x: x[0])}')
 
         skipping_intervals = merge_overlapping_intervals(sorted(skipping_intervals, key=lambda x: x[0]))
         skipping_intervals_new = []
@@ -171,7 +171,7 @@ def remove_overlapping_intervals(perforating_intervals, skm_interval = None):
     else:
         skipping_intervals_new = skm_interval
 
-    print(f'после разделения {skipping_intervals_new}')
+    # print(f'после разделения {skipping_intervals_new}')
 
 
 
@@ -416,7 +416,7 @@ def count_row_height(ws, ws2, work_list, merged_cells_dict, ind_ins):
 
     # вставка сохраненных изображение по координатам ячеек
     if well_data.image_list:
-        print(f' схемы {well_data.image_list}')
+        # print(f' схемы {well_data.image_list}')
         for img in well_data.image_list:
             logo = Image(img[0])
             logo.width, logo.height = img[2][0] * 0.48, img[2][1] * 0.72

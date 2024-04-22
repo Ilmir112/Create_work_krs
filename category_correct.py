@@ -51,7 +51,6 @@ class TabPage_SO(QWidget):
         # print(f'{self.h2s_pr}')
 
         for num in range(len(list(set(well_data.cat_P_P)))):
-
             plast_index = QComboBox(self)
             if len(well_data.plast_work) != 0:
                 work_plast = well_data.plast_work[0]
@@ -70,7 +69,7 @@ class TabPage_SO(QWidget):
                             work_plast_index = 1
                     else:
                         work_plast, ok = QInputDialog.getText(None, 'индекс пласта', 'Введите индекc пласта вскрываемого')
-                        # self.plast_all.append(work_plast)
+                        self.plast_all.append(work_plast)
                         work_plast_index = 1
             except:
 
@@ -79,7 +78,7 @@ class TabPage_SO(QWidget):
                     mes = QMessageBox.warning(self, 'Ошибка', 'Пласт есть в списке')
                     work_plast, ok = QInputDialog.getText(None, 'индекс пласта', 'Введите индекc пласта вскрываемого')
 
-                # self.plast_all.append(work_plast)
+                self.plast_all.append(work_plast)
                 # well_data.plast_all.append(work_plast)
                 work_plast_index = 1
 

@@ -1356,11 +1356,11 @@ class Work_with_gnkt(QMainWindow):
                  f'В процессе перевода соблюдать равенство объемов закаченной и отобранной из скважины жидкости, '\
                  f'т.е. не допускать режима фонтанирования (поглощения).'
         elif ntk_true is True and paker_true is False:
-            print(f'объем скважины {well_volume(self, well_data.perforation_sole)}')
-            print(f'объем металла {volume_nkt_metal(well_data.dict_nkt)}')
-            print(f'объем внутренний НКТ {volume_nkt(well_data.dict_nkt)}')
+            # print(f'объем скважины {well_volume(self, well_data.perforation_sole)}')
+            # print(f'объем металла {volume_nkt_metal(well_data.dict_nkt)}')
+            # print(f'объем внутренний НКТ {volume_nkt(well_data.dict_nkt)}')
             volume_first = round((well_volume(self, well_data.perforation_sole) -volume_nkt_metal(well_data.dict_nkt) -volume_nkt(well_data.dict_nkt)) *1.2, 1)
-            print(volume_first)
+            # print(volume_first)
 
             jamming_well = f'Произвести замер избыточного давления в течении 2ч при условии заполнения ствола ствола ' \
                          f'жидкостью уд.весом 1.01г/см3. Произвести перерасчет забойного давления, Согласовать с ' \
@@ -1469,7 +1469,7 @@ class Work_with_gnkt(QMainWindow):
         for index_row, row in enumerate(ports_list):
             # dict_ports[f'Муфта №{index + 1}'] = {'кровля': port[0], 'подошва': port[1], 'шар': ball, 'седло': saddle,
             #                                      'тип': type_saddles}
-            print(f'порты {ports_data}')
+            # print(f'порты {ports_data}')
             col = 45
             n = 3
             m = 0

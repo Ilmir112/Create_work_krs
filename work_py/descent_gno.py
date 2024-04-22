@@ -171,7 +171,7 @@ class GnoDescentWindow(QMainWindow):
             work_list = voronka_down(self, lift_key, nkt_edit)
         else:
             if lift_key in ['ОРД', 'ЭЦН с пакером', 'ЭЦН']:
-                print(f'ЭЦН, Шаблон {well_data.dict_pump_ECN_h["posle"], well_data.template_depth}')
+                # print(f'ЭЦН, Шаблон {well_data.dict_pump_ECN_h["posle"], well_data.template_depth}')
                 if well_data.dict_pump_ECN_h["posle"] > well_data.template_depth and \
                         (well_data.column_additional is False or \
                          (well_data.column_additional and \

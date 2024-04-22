@@ -994,7 +994,7 @@ class AcidPakerWindow(QMainWindow):
     def paker_layout_one(self, swab_true_edit_type, paker_diametr, paker_khost, paker_depth, depth_gauge_combo):
         from work_py.alone_oreration import privyazkaNKT
         from .opressovka import OpressovkaEK, TabPage_SO
-        print(swab_true_edit_type, paker_diametr, paker_khost, paker_depth, depth_gauge_combo)
+        # print(swab_true_edit_type, paker_diametr, paker_khost, paker_depth, depth_gauge_combo)
         if 'упорны' in self.paker_layout_combo:
             paker_type = 'ПУ'
         else:

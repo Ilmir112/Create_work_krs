@@ -31,7 +31,7 @@ class TabPageGno(QWidget):
                     'ЭЦН с пакером', 'ЭЦН', 'НВ', 'НН']
         self.gno_combo.addItems(gno_list)
         lift_key = self.select_gno()
-        print(f' гно {gno_list.index(lift_key)}')
+        # print(f' гно {gno_list.index(lift_key)}')
         self.gno_combo.setCurrentIndex(gno_list.index(lift_key))
 
         grid = QGridLayout(self)

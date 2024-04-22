@@ -80,7 +80,7 @@ class TabPage_SO_with(QWidget):
             self.template_Combo.addItems(self.template_select_list)
 
             template_key = self.definition_pssh()
-            print(self.template_select_list, template_key)
+            # print(self.template_select_list, template_key)
             self.template_Combo.setCurrentIndex(self.template_select_list.index(template_key))
 
 
@@ -165,10 +165,10 @@ class TabPage_SO_with(QWidget):
         self.lenght_template_second_Edit.textChanged.connect(self.update_template)
 
     def definition_pssh(self):
-        print(well_data.plast_work)
-
-        print(list(well_data.dict_perforation.keys()))
-        print(well_data.dict_perforation[plast]['отрайбировано'] for plast in well_data.plast_work)
+        # print(well_data.plast_work)
+        #
+        # print(list(well_data.dict_perforation.keys()))
+        # print(well_data.dict_perforation[plast]['отрайбировано'] for plast in well_data.plast_work)
 
         if well_data.column_additional is False and well_data.open_trunk_well is False and all(
                 [well_data.dict_perforation[plast]['отрайбировано'] for plast in well_data.plast_work]) is False or \
@@ -360,7 +360,7 @@ class TabPage_SO_with(QWidget):
     def update_template_edit(self, index):
 
         nkt_diam = well_data.nkt_diam
-        print(well_data.column_additional, well_data.head_column_additional._value, well_data.current_bottom)
+        # print(well_data.column_additional, well_data.head_column_additional._value, well_data.current_bottom)
         if well_data.column_additional is False or (well_data.column_additional and
                                                     well_data.head_column_additional._value >= well_data.current_bottom):
             first_template, template_second = self.template_diam_ek()
@@ -376,7 +376,7 @@ class TabPage_SO_with(QWidget):
 
         roof_plast, roof_add_column_plast = self.definition_roof_not_raiding()
 
-        print(f'кровля отрайби интерва {roof_plast, roof_add_column_plast}')
+        # print(f'кровля отрайби интерва {roof_plast, roof_add_column_plast}')
         dictance_template_first = int(well_data.current_bottom - roof_plast + 5)
         self.dictance_template_first_Edit.setText(str(dictance_template_first))
 
@@ -881,7 +881,7 @@ class TemplateKrs(QMainWindow):
             template_diametr = int(self.tabWidget.currentWidget().template_second_Edit.text())
         else:
             template_diametr = int(self.tabWidget.currentWidget().template_first_Edit.text())
-        print(well_data.problemWithEk_diametr)
+        # print(well_data.problemWithEk_diametr)
         if (template_diametr >= int(well_data.problemWithEk_diametr) - 2
                 and well_data.template_depth > float(well_data.problemWithEk_depth)):
             mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже глубины не прохода')
@@ -960,7 +960,7 @@ class TemplateKrs(QMainWindow):
     def template_ek(self, template_str, template_diametr, skm_list):
 
         from .advanted_file import raid
-        print(f'внут {skm_list}')
+        # print(f'внут {skm_list}')
         skm_interval = raid(skm_list)
 
         list_template_ek = [

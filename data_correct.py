@@ -202,7 +202,7 @@ class TabPage_SO(QWidget):
 
         self.paker2_posle_Label = QLabel('пакер на спуск')
         self.paker2_posle_editType = QLineEdit(self)
-        print(well_data.paker2_do[self.ifNone("posle")])
+        # print(well_data.paker2_do[self.ifNone("posle")])
         self.paker2_posle_editType.setText(self.ifNone(well_data.paker2_do["posle"]))
 
         self.paker2_depth_posle_Label = QLabel('Глубина спуска пакера')

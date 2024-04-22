@@ -354,7 +354,7 @@ def volume_vn_ek(current):
 
 
 def volume_vn_nkt(dict_nkt):  # Внутренний объем одного погонного местра НКТ
-    print(dict_nkt)
+    # print(dict_nkt)
     for nkt, lenght_nkt in dict_nkt.items():
         volume_vn_nkt = 0
         if ''.join(filter(str.isdecimal, str(nkt))) == '60':
@@ -392,7 +392,7 @@ def volume_nkt(dict_nkt):  # Внутренний объем НКТ по фон�
     for nkt, length_nkt in dict_nkt.items():
         if nkt:
             volume_nkt += (float(nkt) - 2 * 7.6)**2 * 3.14 /4/1000000 * length_nkt
-    print(f'объем НКТ {volume_nkt}')
+    # print(f'объем НКТ {volume_nkt}')
     return volume_nkt
 
 
@@ -473,8 +473,8 @@ def volume_jamming_well(self, current_bottom):  # объем глушения с
         (well_volume(self, current_bottom) - volume_nkt_metal(well_data.dict_nkt) - volume_rod(self,
                                                                                                well_data.dict_sucker_rod)) * 1.1,
         1)
-    print(f' объем глушения {well_volume(self, well_data.current_bottom), volume_jamming_well}')
-    print(f' объем {volume_nkt_metal(well_data.dict_nkt)} , {volume_rod(self, well_data.dict_sucker_rod)}')
+    # print(f' объем глушения {well_volume(self, well_data.current_bottom), volume_jamming_well}')
+    # print(f' объем {volume_nkt_metal(well_data.dict_nkt)} , {volume_rod(self, well_data.dict_sucker_rod)}')
     return volume_jamming_well
 
 

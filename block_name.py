@@ -209,7 +209,7 @@ def razdel_1(self, region):
          None]]
     if well_data.data_in_base is False:
         if len(well_data.plast_work) != 0:
-            print(well_data.plast_work, well_data.dict_category)
+            # print(well_data.plast_work, well_data.dict_category)
             cat_P_1 = well_data.dict_category[well_data.plast_work[0]]['по давлению'].category
 
 

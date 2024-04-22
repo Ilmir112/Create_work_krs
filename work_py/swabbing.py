@@ -776,7 +776,7 @@ class Swab_Window(QMainWindow):
              f' с целью недопущения попадания кислоты в систему сбора. (Протокол №095-ПП от 19.10.2015г).',
              None, None, None, None, None, None, None,
              'Мастер КРС, подрядчик по ГИС', None]]
-        print(f'перевод {need_change_zgs_combo}')
+        # print(f'перевод {need_change_zgs_combo}')
 
         if need_change_zgs_combo == 'Да':
             if plast_new not in well_data.plast_project:
@@ -1130,7 +1130,7 @@ class Swab_Window(QMainWindow):
                         paker_list.insert(1, privyazkaNKT(self)[0])
 
         if need_change_zgs_combo == 'Да':
-            print(plast_new, fluid_new, pressuar_new)
+            # print(plast_new, fluid_new, pressuar_new)
             paker_list.extend(Change_fluid_Window.fluid_change(self, plast_new, fluid_new, pressuar_new))
             paker_list.append([None, None,
                                f'Поднять {paker_select} на НКТ{nkt_diam} c глубины {paker_depth}м с доливом скважины в '
