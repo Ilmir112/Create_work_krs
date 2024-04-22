@@ -16,8 +16,8 @@ jobs:
 #        run: pip install -r requirements.txt
       - name: Install dependencies
         run: pip install -r requirements.txt
-          - name: Build executable
-              run: pyinstaller --onefile --hidden-import data_base.data_base_well.database_well main.py
+#          - name: Build executable
+#              run: pyinstaller --onefile --hidden-import data_base.data_base_well.database_well main.py
       - name: Build executable
         run:
 #          pyinstaller --noconfirm --onedir --windowed
