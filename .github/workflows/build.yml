@@ -23,8 +23,8 @@ jobs:
           --add-data property_excel:property_excel
           --add-data users:users
           --add-data work_py:work_py
-          --add-data :block_name.py 
-          --add-data :category_correct.py 
+          --add-data block_name.py:block_name.py 
+          --add-data category_correct.py:category_correct.py 
           --add-data cdng.py:cdng.py
           --add-data data_correct.py:data_correct.py 
           --add-data data_correct_position_people.py:data_correct_position_people.py 
