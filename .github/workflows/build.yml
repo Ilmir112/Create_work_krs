@@ -127,8 +127,9 @@ jobs:
           --add-data "work_py/swabbing.py;." 
           --add-data "work_py/template_without_skm.py;." 
           --add-data "work_py/template_work.py;." 
-          --add-data "work_py/vp_cm.py;."
-#          main.py
+          --add-data "work_py/vp_cm.py;."  
+          "main.py"
+
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
