@@ -1,14 +1,7 @@
-import subprocess
+import os
 
-# Указываем путь к вашему файлу приложения PyQt
-entry_point = 'main.py'
-
-# Указываем дополнительные параметры PyInstaller
-additional_options = ['--onefile', '--windowed']  # Пример: скрыть консоль
-
-
-# Указываем все зависимости явно для включения в сборку
-additional_files = [
+# Список папок и файлов для добавления
+data_to_add = [
     ('data_base/data_base_well/database_well.py', '.'),  # Пример включения другой зависимости
     ('data_base/data_base_well/databaseWell.db', '.'),
     ('data_base/work_with_base.py', '.'),
@@ -23,7 +16,6 @@ additional_files = [
     ('work_py/calc_fond_nkt.py', '.'),
     ('work_py/change_fluid.py', '.'),
     ('work_py/claySolution.py', '.'),
-
     ('work_py/data_informations.py', '.'),
     ('work_py/descent_gno.py', '.'),
     ('work_py/dop_plan_py.py', '.'),
@@ -69,10 +61,20 @@ additional_files = [
     ('selectPlast.py', '.'),
     ('well_data.py', '.'),
     ('work_json.py', '.'),
-
-
-
+    ('application_gis.py', '.'),
+    ('application_pvr.py', '.'),
 ]
 
-# Вызываем PyInstaller для сборки
-subprocess.call(['pyinstaller'] + additional_options + ['--add-data', ','.join([f"{path}{dest}" for path, sep, dest in additional_files]), entry_point])
+# Создаем команду PyInstaller
+command = ["pyinstaller --onefile"]
+
+# Добавляем опции --add-data для каждого элемента в списке
+for data in data_to_add:
+    command.extend([f"--add-data {data[0]}:{data[0]}"])
+
+
+# Добавляем основной скрипт Python
+command.append("main.py")
+print('\n'.join(command))
+# # Выполняем команду PyInstaller
+# os.system(" ".join(command))
