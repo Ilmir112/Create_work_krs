@@ -128,7 +128,7 @@ jobs:
           --add-data "/work_py/template_without_skm.py;." 
           --add-data "/work_py/template_work.py;." 
           --add-data "/work_py/vp_cm.py;."  
-          "/main.py"
+          "main.py"
 
 
       - name: Upload artifact
