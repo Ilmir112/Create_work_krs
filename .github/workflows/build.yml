@@ -17,35 +17,35 @@ jobs:
       - name: Build executable
         run:
           pyinstaller --noconfirm --onefile --windowed 
-          --add-data D:/python/Create_work_krs/work_json.py:work_json.py
-          --add-data D:/python/Create_work_krs/well_data.py:well_data.py 
-          --add-data D:/python/Create_work_krs/selectPlast.py:selectPlast.py 
-          --add-data D:/python/Create_work_krs/proverka.py:proverka.py 
-          --add-data D:/python/Create_work_krs/prov.py:prov.py 
-          --add-data D:/python/Create_work_krs/podpisant.json:podpisant.json 
-          --add-data D:/python/Create_work_krs/plan.py:plan.py 
-          --add-data D:/python/Create_work_krs/perforation_correct_gnkt_frez.py:perforation_correct_gnkt_frez.py. 
-          --add-data D:/python/Create_work_krs/perforation_correct.py:perforation_correct.py
-          --add-data D:/python/Create_work_krs/open_pz.py:open_pz.py
-          --add-data D:/python/Create_work_krs/krs.py:krs.py 
-          --add-data D:/python/Create_work_krs/H2S.py:H2S.py
-          --add-data D:/python/Create_work_krs/gnkt_opz.py:gnkt_opz.py 
-          --add-data D:/python/Create_work_krs/gnkt_after_grp.py:gnkt_after_grp.py 
-          --add-data D:/python/Create_work_krs/find.py:find.py 
-          --add-data D:/python/Create_work_krs/data_correct_position_people.py:data_correct_position_people.py 
-          --add-data D:/python/Create_work_krs/data_correct.py:data_correct.py 
-          --add-data D:/python/Create_work_krs/convert_xls.py:convert_xls.py 
-          --add-data D:/python/Create_work_krs/cdng.py:cdng.py 
-          --add-data D:/python/Create_work_krs/category_correct.py:category_correct 
-          --add-data D:/python/Create_work_krs/block_name.py:block_name.py 
-          --add-data D:/python/Create_work_krs/application_pvr.py:application_pvr.py 
-          --add-data D:/python/Create_work_krs/application_gis.py:application_gis.py 
-          --add-data D:/python/Create_work_krs/work_py:work_py/ 
-          --add-data D:/python/Create_work_krs/users:users/ 
-          --add-data D:/python/Create_work_krs/property_excel:property_excel/ 
-          --add-data D:/python/Create_work_krs/imageFiles:imageFiles/ 
-          --add-data D:/python/Create_work_krs/gnkt_data:gnkt_data/ 
-          --add-data D:/python/Create_work_krs/data_base:data_base/     
+          --add-data work_json.py:work_json.py
+          --add-data well_data.py:well_data.py 
+          --add-data selectPlast.py:selectPlast.py 
+          --add-data proverka.py:proverka.py 
+          --add-data prov.py:prov.py 
+          --add-data podpisant.json:podpisant.json 
+          --add-data plan.py:plan.py 
+          --add-data perforation_correct_gnkt_frez.py:perforation_correct_gnkt_frez.py. 
+          --add-data perforation_correct.py:perforation_correct.py
+          --add-data open_pz.py:open_pz.py
+          --add-data krs.py:krs.py 
+          --add-data H2S.py:H2S.py
+          --add-data gnkt_opz.py:gnkt_opz.py 
+          --add-data gnkt_after_grp.py:gnkt_after_grp.py 
+          --add-data find.py:find.py 
+          --add-data data_correct_position_people.py:data_correct_position_people.py 
+          --add-data data_correct.py:data_correct.py 
+          --add-data convert_xls.py:convert_xls.py 
+          --add-data cdng.py:cdng.py 
+          --add-data category_correct.py:category_correct 
+          --add-data block_name.py:block_name.py 
+          --add-data application_pvr.py:application_pvr.py 
+          --add-data application_gis.py:application_gis.py 
+          --add-data work_py:work_py/ 
+          --add-data users:users/ 
+          --add-data property_excel:property_excel/ 
+          --add-data imageFiles:imageFiles/ 
+          --add-data gnkt_data:gnkt_data/ 
+          --add-data data_base:data_base/     
           main.py
 
       - name: Upload artifact
