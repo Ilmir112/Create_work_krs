@@ -16,8 +16,38 @@ jobs:
 #        run: pip install -r requirements.txt
       - name: Build executable
         run:
-          pyinstaller --noconfirm --onefile --windowed --add-data "D:/python/Create_work_krs/work_json.py;." --add-data "D:/python/Create_work_krs/well_data.py;." --add-data "D:/python/Create_work_krs/selectPlast.py;." --add-data "D:/python/Create_work_krs/proverka.py;." --add-data "D:/python/Create_work_krs/prov.py;." --add-data "D:/python/Create_work_krs/podpisant.json;." --add-data "D:/python/Create_work_krs/plan.py;." --add-data "D:/python/Create_work_krs/perforation_correct_gnkt_frez.py;." --add-data "D:/python/Create_work_krs/perforation_correct.py;." --add-data "D:/python/Create_work_krs/open_pz.py;." --add-data "D:/python/Create_work_krs/krs.py;." --add-data "D:/python/Create_work_krs/H2S.py;." --add-data "D:/python/Create_work_krs/gnkt_opz.py;." --add-data "D:/python/Create_work_krs/gnkt_after_grp.py;." --add-data "D:/python/Create_work_krs/find.py;." --add-data "D:/python/Create_work_krs/data_correct_position_people.py;." --add-data "D:/python/Create_work_krs/data_correct.py;." --add-data "D:/python/Create_work_krs/convert_xls.py;." --add-data "D:/python/Create_work_krs/cdng.py;." --add-data "D:/python/Create_work_krs/category_correct.py;." --add-data "D:/python/Create_work_krs/block_name.py;." --add-data "D:/python/Create_work_krs/application_pvr.py;." --add-data "D:/python/Create_work_krs/application_gis.py;." --add-data "D:/python/Create_work_krs/work_py;work_py/" --add-data "D:/python/Create_work_krs/users;users/" --add-data "D:/python/Create_work_krs/property_excel;property_excel/" --add-data "D:/python/Create_work_krs/imageFiles;imageFiles/" --add-data "D:/python/Create_work_krs/gnkt_data;gnkt_data/" --add-data "D:/python/Create_work_krs/data_base;data_base/"  "D:/python/Create_work_krs/main.py"
-
+          pyinstaller --noconfirm --onefile --windowed 
+          --add-data "D:/python/Create_work_krs/work_json.py;." 
+          --add-data "D:/python/Create_work_krs/well_data.py;." 
+          --add-data "D:/python/Create_work_krs/selectPlast.py;." 
+          --add-data "D:/python/Create_work_krs/proverka.py;." 
+          --add-data "D:/python/Create_work_krs/prov.py;." 
+          --add-data "D:/python/Create_work_krs/podpisant.json;." 
+          --add-data "D:/python/Create_work_krs/plan.py;." 
+          --add-data "D:/python/Create_work_krs/perforation_correct_gnkt_frez.py;." 
+          --add-data "D:/python/Create_work_krs/perforation_correct.py;." 
+          --add-data "D:/python/Create_work_krs/open_pz.py;." 
+          --add-data "D:/python/Create_work_krs/krs.py;." 
+          --add-data "D:/python/Create_work_krs/H2S.py;." 
+          --add-data "D:/python/Create_work_krs/gnkt_opz.py;." 
+          --add-data "D:/python/Create_work_krs/gnkt_after_grp.py;." 
+          --add-data "D:/python/Create_work_krs/find.py;." 
+          --add-data "D:/python/Create_work_krs/data_correct_position_people.py;." 
+          --add-data "D:/python/Create_work_krs/data_correct.py;." 
+          --add-data "D:/python/Create_work_krs/convert_xls.py;." 
+          --add-data "D:/python/Create_work_krs/cdng.py;." 
+          --add-data "D:/python/Create_work_krs/category_correct.py;." 
+          --add-data "D:/python/Create_work_krs/block_name.py;." 
+          --add-data "D:/python/Create_work_krs/application_pvr.py;." 
+          --add-data "D:/python/Create_work_krs/application_gis.py;." 
+          --add-data "D:/python/Create_work_krs/work_py;work_py/" 
+          --add-data "D:/python/Create_work_krs/users;users/" 
+          --add-data "D:/python/Create_work_krs/property_excel;property_excel/" 
+          --add-data "D:/python/Create_work_krs/imageFiles;imageFiles/" 
+          --add-data "D:/python/Create_work_krs/gnkt_data;gnkt_data/" 
+          --add-data "D:/python/Create_work_krs/data_base;data_base/" 
+          --add-data "D:/python/Create_work_krs/main.py;."  
+          "D:/python/Create_work_krs/main.py"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
