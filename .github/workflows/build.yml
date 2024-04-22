@@ -17,4 +17,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: zima
-          path: dist/zima.exe
+          path: dist/main.exe
