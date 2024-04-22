@@ -20,7 +20,7 @@ jobs:
 #              run: pyinstaller --onefile --hidden-import data_base.data_base_well.database_well main.py
       - name: Build executable
         run:
-         pyinstaller --noconfirm --onefile --windowed
+         pyinstaller --noconfirm --onedir --windowed
          --hidden-import openpyxl
          --hidden-import PyQt5
          --add-data application_gis.py:application_gis.py
