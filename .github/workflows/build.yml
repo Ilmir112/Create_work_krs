@@ -22,7 +22,7 @@ jobs:
           --add-data D:/python/Create_work_krs/selectPlast.py:. 
           --add-data D:/python/Create_work_krs/proverka.py:. 
           --add-data D:/python/Create_work_krs/prov.py:. 
-          --add-data D:/python/Create_work_krs/podpisant.json;. 
+          --add-data D:/python/Create_work_krs/podpisant.json:. 
           --add-data D:/python/Create_work_krs/plan.py:. 
           --add-data D:/python/Create_work_krs/perforation_correct_gnkt_frez.py:. 
           --add-data D:/python/Create_work_krs/perforation_correct.py:. 
@@ -41,11 +41,11 @@ jobs:
           --add-data D:/python/Create_work_krs/application_pvr.py:. 
           --add-data D:/python/Create_work_krs/application_gis.py:. 
           --add-data D:/python/Create_work_krs/work_py:work_py/ 
-          --add-data D:/python/Create_work_krs/users;users/ 
-          --add-data D:/python/Create_work_krs/property_excel;property_excel/ 
-          --add-data D:/python/Create_work_krs/imageFiles;imageFiles/ 
-          --add-data D:/python/Create_work_krs/gnkt_data;gnkt_data/ 
-          --add-data D:/python/Create_work_krs/data_base;data_base/     
+          --add-data D:/python/Create_work_krs/users:users/ 
+          --add-data D:/python/Create_work_krs/property_excel:property_excel/ 
+          --add-data D:/python/Create_work_krs/imageFiles:imageFiles/ 
+          --add-data D:/python/Create_work_krs/gnkt_data:gnkt_data/ 
+          --add-data D:/python/Create_work_krs/data_base:data_base/     
           main.py
 
       - name: Upload artifact
