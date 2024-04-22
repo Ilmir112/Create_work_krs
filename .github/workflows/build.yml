@@ -44,8 +44,7 @@ jobs:
           --add-data proverka.py:proverka.py 
           --add-data selectPlast.py:selectPlast.py 
           --add-data well_data.py:well_data.py 
-          --add-data work_json.py:work_json.py 
-                   
+          --add-data work_json.py:work_json.py                   
           main.py
 
       - name: Upload artifact
