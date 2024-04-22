@@ -2,7 +2,7 @@ import json
 import os
 import sqlite3
 import sys
-import win32com.client
+# import win32com.client
 import openpyxl
 import re
 
@@ -699,7 +699,7 @@ class MyWindow(QMainWindow):
             if fileName:
                 wb2.save(full_path)
             # Создаем объект Excel
-            excel = win32com.client.Dispatch("Excel.Application")
+            # excel = win32com.client.Dispatch("Excel.Application")
         except:
             mes = QMessageBox.critical(self, 'Ошибка', 'файл под таким именем открыт, закройте его')
         try:
