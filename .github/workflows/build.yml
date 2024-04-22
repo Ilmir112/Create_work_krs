@@ -4,9 +4,10 @@ on:
   push:
     branches:
       - main
-    tags:
-      - v[0-9]+.[0-9]+.[0-9]+*
-
+  pull_request:
+      - main
+  tags:
+    - v[0-9]+.[0-9]+.[0-9]+*
 
 jobs:
   build:
@@ -24,5 +25,5 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          name: your_app
-          path: dist/your_app.exe
+          name: zima
+          path: dist/zima.exe
