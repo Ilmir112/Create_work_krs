@@ -14,121 +14,125 @@ jobs:
         run: pip install pyinstaller
 #      - name: Install requirements
 #        run: pip install -r requirements.txt
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+          - name: Build executable
+              run: pyinstaller --onefile --hidden-import data_base.data_base_well.database_well main.py
       - name: Build executable
         run:
 #          pyinstaller --noconfirm --onedir --windowed
-          pyinstaller --noconfirm --onedir --windowed 
-          --add-data "/work_py;work_py/" 
-          --add-data "/users;users/" 
-          --add-data "/property_excel;property_excel/" 
-          --add-data "/imageFiles;imageFiles/" 
-          --add-data "/gnkt_data;gnkt_data/" 
-          --add-data "/data_base;data_base/" 
-          --add-data "/work_json.py;." 
-          --add-data "/well_data.py;." 
-          --add-data "/selectPlast.py;." 
-          --add-data "/proverka.py;." 
-          --add-data "/prov.py;prov.py" 
-          --add-data "/plan23.py;." 
-          --add-data "/plan.py;." 
-          --add-data "/perforation_correct_gnkt_frez.py;." 
-          --add-data "/perforation_correct.py;." 
-          --add-data "/open_pz.py;." 
-          --add-data "/main.py;." 
-          --add-data "/krs.py;." 
-          --add-data "/H2S.py;." 
-          --add-data "/gnkt_opz.py;." 
-          --add-data "/gnkt_after_grp.py;." 
-          --add-data "/find.py;." 
-          --add-data "/data_correct_position_people.py;." 
-          --add-data "/data_correct.py;."
-          --add-data "/convert_xls.py;." 
-          --add-data "/cdng.py;." 
-          --add-data "/category_correct.py;." 
-          --add-data "/build_script.py;."
-          --add-data "/block_name.py;." 
-          --add-data "/application_pvr.py;." 
-          --add-data "/application_gis.py;."
-          --add-data "/data_base/database_without_juming.db;." 
-          --add-data "/data_base/work_with_base.py;." 
-          --add-data "/data_base/users_database/databaseWell.db;." 
-          --add-data "/data_base/users_database/users.db;." 
-          --add-data "/data_base/data_base_well/database_well.py;." 
-          --add-data "/data_base/data_base_well/databaseWell.db;." 
-          --add-data "/data_base/users_database/databaseWell.db;." 
-          --add-data "/data_base/users_database/users.db;." 
-          --add-data "/gnkt_data/gnkt_data.py;." 
-          --add-data "/imageFiles/Алиев Заур.png;." 
-          --add-data "/imageFiles/Алиев махир.png;."
-          --add-data "/imageFiles/Зуфаров.png;." 
-          --add-data "/imageFiles/Хасаншин.png;." 
-          --add-data "/imageFiles/Шамигулов.png;." 
-          --add-data "/imageFiles/schema_well/column.png;." 
-          --add-data "/imageFiles/schema_well/gorizont_1.png;." 
-          --add-data "/imageFiles/schema_well/gorizont_12.png;."
-          --add-data "/imageFiles/schema_well/port.png;." 
-          --add-data "/imageFiles/schema_well/кабель.png;." 
-          --add-data "/imageFiles/schema_well/нарушение.png;." 
-          --add-data "/imageFiles/schema_well/НКТ с воронкой.jpg;." 
-          --add-data "/imageFiles/schema_well/НКТ с воронкой.png;." 
-          --add-data "/imageFiles/schema_well/НКТ с пакером.png;."
-          --add-data "/imageFiles/schema_well/открытый ствол.png;." 
-          --add-data "/imageFiles/schema_well/пакер.png;." 
-          --add-data "/imageFiles/schema_well/ПВР.png;." 
-          --add-data "/imageFiles/schema_well/переход.png;." 
-          --add-data "/imageFiles/schema_well/пропант.png;." 
-          --add-data "/imageFiles/schema_well/СХЕМЫ КНК_38,1.png;." 
-          --add-data "/imageFiles/schema_well/СХЕМЫ КНК_44,45.png;." 
-          --add-data "/imageFiles/pvo/oil/схема №1.jpg;." 
-          --add-data "/imageFiles/pvo/oil/схема №2.jpg;." 
-          --add-data "/imageFiles/pvo/oil/схема №3.jpg;." 
-          --add-data "/imageFiles/pvo/oil/схема №4.jpg;." 
-          --add-data "/imageFiles/pvo/oil/схема №5.jpg;." 
-          --add-data "/imageFiles/pvo/oil/схема №6.jpg;." 
-          --add-data "/imageFiles/pvo/oil/схема №7.jpg;." 
-          --add-data "/imageFiles/pvo/oil/схема №7а.jpg;."
-          --add-data "/imageFiles/pvo/oil/схема №8.jpg;." 
-          --add-data "/imageFiles/pvo/oil/схема №8а.jpg;." 
-          --add-data "/imageFiles/pvo/oil/схема №8б.jpg;."
-          --add-data "/property_excel/property_excel_pvr.py;." 
-          --add-data "/property_excel/template_gis.xlsx;." 
-          --add-data "/property_excel/template_pvr.xlsx;." 
-          --add-data "/property_excel/tepmpale_gnkt_osv_grp.xlsx;." 
-          --add-data "/users/login_users.py;."
-          --add-data "/work_py/acid_paker.py;." 
-          --add-data "/work_py/acids.py;." 
-          --add-data "/work_py/advanted_file.py;." 
-          --add-data "/work_py/alone_oreration.py;." 
-          --add-data "/work_py/calc_fond_nkt.py;." 
-          --add-data "/work_py/change_fluid.py;." 
-          --add-data "/work_py/claySolution.py;." 
-          --add-data "/work_py/data_informations.py;." 
-          --add-data "/work_py/descent_gno.py;." 
-          --add-data "/work_py/dop_plan_py.py;." 
-          --add-data "/work_py/drilling.py;." 
-          --add-data "/work_py/emergencyWork.py;."
-          --add-data "/work_py/geophysic.py;."
-          --add-data "/work_py/gnkt_frez.py;."
-          --add-data "/work_py/gnkt_grp.py;." 
-          --add-data "/work_py/gnkt_grp_work.py;." 
-          --add-data "/work_py/gpp.py;." 
-          --add-data "/work_py/grp.py;." 
-          --add-data "/work_py/kompress.py;." 
-          --add-data "/work_py/leakage_column.py;." 
-          --add-data "/work_py/mkp.py;." 
-          --add-data "/work_py/mouse.py;." 
-          --add-data "/work_py/opressovka.py;."
-          --add-data "/work_py/perforation.py;." 
-          --add-data "/work_py/raiding.py;." 
-          --add-data "/work_py/rationingKRS.py;." 
-          --add-data "/work_py/rgdVcht.py;." 
-          --add-data "/work_py/rir.py;."
-          --add-data "/work_py/sand_filling.py;." 
-          --add-data "/work_py/swabbing.py;." 
-          --add-data "/work_py/template_without_skm.py;." 
-          --add-data "/work_py/template_work.py;." 
-          --add-data "/work_py/vp_cm.py;."  
-          "main.py"
+          pyinstaller --onedir 
+         --hidden-import work_py;work_py/ 
+         --hidden-import users;users/ 
+         --hidden-import property_excel;property_excel/ 
+         --hidden-import imageFiles;imageFiles/ 
+         --hidden-import gnkt_data;gnkt_data/ 
+         --hidden-import data_base;data_base/ 
+         --hidden-import work_json.py;. 
+         --hidden-import well_data.py;. 
+         --hidden-import selectPlast.py;. 
+         --hidden-import proverka.py;. 
+         --hidden-import prov.py;prov.py 
+         --hidden-import plan23.py;. 
+         --hidden-import plan.py;. 
+         --hidden-import perforation_correct_gnkt_frez.py;. 
+         --hidden-import perforation_correct.py;. 
+         --hidden-import open_pz.py;. 
+         --hidden-import main.py;. 
+         --hidden-import krs.py;. 
+         --hidden-import H2S.py;. 
+         --hidden-import gnkt_opz.py;. 
+         --hidden-import gnkt_after_grp.py;. 
+         --hidden-import find.py;. 
+         --hidden-import data_correct_position_people.py;. 
+         --hidden-import data_correct.py;.
+         --hidden-import convert_xls.py;. 
+         --hidden-import cdng.py;. 
+         --hidden-import category_correct.py;. 
+         --hidden-import build_script.py;.
+         --hidden-import block_name.py;. 
+         --hidden-import application_pvr.py;. 
+         --hidden-import application_gis.py;.
+         --hidden-import data_base/database_without_juming.db;. 
+         --hidden-import data_base/work_with_base.py;. 
+         --hidden-import data_base/users_database/databaseWell.db;. 
+         --hidden-import data_base/users_database/users.db;. 
+         --hidden-import data_base/data_base_well/database_well.py;. 
+         --hidden-import data_base/data_base_well/databaseWell.db;. 
+         --hidden-import data_base/users_database/databaseWell.db;. 
+         --hidden-import data_base/users_database/users.db;. 
+         --hidden-import gnkt_data/gnkt_data.py;. 
+         --hidden-import imageFiles/Алиев Заур.png;. 
+         --hidden-import imageFiles/Алиев махир.png;.
+         --hidden-import imageFiles/Зуфаров.png;. 
+         --hidden-import imageFiles/Хасаншин.png;. 
+         --hidden-import imageFiles/Шамигулов.png;. 
+         --hidden-import imageFiles/schema_well/column.png;. 
+         --hidden-import imageFiles/schema_well/gorizont_1.png;. 
+         --hidden-import imageFiles/schema_well/gorizont_12.png;.
+         --hidden-import imageFiles/schema_well/port.png;. 
+         --hidden-import imageFiles/schema_well/кабель.png;. 
+         --hidden-import imageFiles/schema_well/нарушение.png;. 
+         --hidden-import imageFiles/schema_well/НКТ с воронкой.jpg;. 
+         --hidden-import imageFiles/schema_well/НКТ с воронкой.png;. 
+         --hidden-import imageFiles/schema_well/НКТ с пакером.png;.
+         --hidden-import imageFiles/schema_well/открытый ствол.png;. 
+         --hidden-import imageFiles/schema_well/пакер.png;. 
+         --hidden-import imageFiles/schema_well/ПВР.png;. 
+         --hidden-import imageFiles/schema_well/переход.png;. 
+         --hidden-import imageFiles/schema_well/пропант.png;. 
+         --hidden-import imageFiles/schema_well/СХЕМЫ КНК_38,1.png;. 
+         --hidden-import imageFiles/schema_well/СХЕМЫ КНК_44,45.png;. 
+         --hidden-import imageFiles/pvo/oil/схема №1.jpg;. 
+         --hidden-import imageFiles/pvo/oil/схема №2.jpg;. 
+         --hidden-import imageFiles/pvo/oil/схема №3.jpg;. 
+         --hidden-import imageFiles/pvo/oil/схема №4.jpg;. 
+         --hidden-import imageFiles/pvo/oil/схема №5.jpg;. 
+         --hidden-import imageFiles/pvo/oil/схема №6.jpg;. 
+         --hidden-import imageFiles/pvo/oil/схема №7.jpg;. 
+         --hidden-import imageFiles/pvo/oil/схема №7а.jpg;.
+         --hidden-import imageFiles/pvo/oil/схема №8.jpg;. 
+         --hidden-import imageFiles/pvo/oil/схема №8а.jpg;. 
+         --hidden-import imageFiles/pvo/oil/схема №8б.jpg;.
+         --hidden-import property_excel/property_excel_pvr.py;. 
+         --hidden-import property_excel/template_gis.xlsx;. 
+         --hidden-import property_excel/template_pvr.xlsx;. 
+         --hidden-import property_excel/tepmpale_gnkt_osv_grp.xlsx;. 
+         --hidden-import users/login_users.py;.
+         --hidden-import work_py/acid_paker.py;. 
+         --hidden-import work_py/acids.py;. 
+         --hidden-import work_py/advanted_file.py;. 
+         --hidden-import work_py/alone_oreration.py;. 
+         --hidden-import work_py/calc_fond_nkt.py;. 
+         --hidden-import work_py/change_fluid.py;. 
+         --hidden-import work_py/claySolution.py;. 
+         --hidden-import work_py/data_informations.py;. 
+         --hidden-import work_py/descent_gno.py;. 
+         --hidden-import work_py/dop_plan_py.py;. 
+         --hidden-import work_py/drilling.py;. 
+         --hidden-import work_py/emergencyWork.py;.
+         --hidden-import work_py/geophysic.py;.
+         --hidden-import work_py/gnkt_frez.py;.
+         --hidden-import work_py/gnkt_grp.py;. 
+         --hidden-import work_py/gnkt_grp_work.py;. 
+         --hidden-import work_py/gpp.py;. 
+         --hidden-import work_py/grp.py;. 
+         --hidden-import work_py/kompress.py;. 
+         --hidden-import work_py/leakage_column.py;. 
+         --hidden-import work_py/mkp.py;. 
+         --hidden-import work_py/mouse.py;. 
+         --hidden-import work_py/opressovka.py;.
+         --hidden-import work_py/perforation.py;. 
+         --hidden-import work_py/raiding.py;. 
+         --hidden-import work_py/rationingKRS.py;. 
+         --hidden-import work_py/rgdVcht.py;. 
+         --hidden-import work_py/rir.py;.
+         --hidden-import work_py/sand_filling.py;. 
+         --hidden-import work_py/swabbing.py;. 
+         --hidden-import work_py/template_without_skm.py;. 
+         --hidden-import work_py/template_work.py;. 
+         --hidden-import work_py/vp_cm.py;.  
+          main.py
 
 
       - name: Upload artifact
