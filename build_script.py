@@ -75,6 +75,6 @@ for data in data_to_add:
 
 # Добавляем основной скрипт Python
 command.append("main.py")
-print('\n'.join(command))
+print(' '.join(command))
 # # Выполняем команду PyInstaller
 # os.system(" ".join(command))
