@@ -1,19 +1,26 @@
 name: Build PyInstaller
 on:  ['push', 'pull_request']
-
 jobs:
   build:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
         with:
-          python-version: '3.8' # Замените на нужную версию Python
+          python-version: '3.8' # Замените на нужную версию Pyth on
+
       - name: Install PyInstaller
         run: pip install pyinstaller
+#      - name: Install requirements
+#        run: pip install -r requirements.txt
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+#          - name: Build executable
+#              run: pyinstaller --onefile --hidden-import data_base.data_base_well.database_well main.py
       - name: Build executable
-        run: pyinstaller --onedir \
+        run:
+          pyinstaller --noconfirm --onedir --windowed \
           --add-data work_py:work_py \
           --add-data users:users \
           --add-data property_excel:property_excel \
