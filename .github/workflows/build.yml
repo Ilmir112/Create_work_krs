@@ -14,6 +14,8 @@ jobs:
         run: pip install pyinstaller
 #      - name: Install requirements
 #        run: pip install -r requirements.txt
+      - name: Run PyInstaller
+        run: pyinstaller --clean --distpath 'D:\\a\\Create_work_krs\\Create_work_krs\\dist\\custom_output_directory' main.py
       - name: Install dependencies
         run: pip install -r requirements.txt
 #          - name: Build executable
