@@ -84,6 +84,7 @@ jobs:
           --add-data imageFiles/pvo/oil/схема №5.jpg:. \
           main.py
 
+
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
