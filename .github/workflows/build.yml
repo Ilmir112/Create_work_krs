@@ -12,76 +12,73 @@ jobs:
           python-version: '3.8' # Замените на нужную версию Python
       - name: Install PyInstaller
         run: pip install pyinstaller
-      - name: Install requirements
-        run: pip install -r requirements.txt
       - name: Build executable
-        run:
-          pyinstaller --onedir \
+        run: pyinstaller --onedir \
           --add-data work_py:work_py \
           --add-data users:users \
           --add-data property_excel:property_excel \
           --add-data imageFiles:imageFiles \
           --add-data gnkt_data:gnkt_data \
           --add-data data_base:data_base \
-          --add-data work_json.py:work_json.py \
-          --add-data well_data.py:well_data.py \
-          --add-data selectPlast.py:selectPlast.py \
-          --add-data proverka.py:proverka.py \
+          --add-data work_json.py:. \
+          --add-data well_data.py:. \
+          --add-data selectPlast.py:. \
+          --add-data proverka.py:. \
           --add-data prov.py:prov.py \
-          --add-data plan23.py:plan23.py \
-          --add-data plan.py:plan.py \
-          --add-data perforation_correct_gnkt_frez.py:perforation_correct_gnkt_frez.py \
-          --add-data perforation_correct.py:perforation_correct.py \
-          --add-data open_pz.py:open_pz.py \
-          --add-data krs.py:krs.py \
-          --add-data H2S.py:H2S.py \
-          --add-data gnkt_opz.py:gnkt_opz.py \
-          --add-data gnkt_after_grp.py:gnkt_after_grp.py \
-          --add-data find.py:find.py \
-          --add-data data_correct_position_people.py:data_correct_position_people.py \
-          --add-data data_correct.py:data_correct.py \
-          --add-data convert_xls.py:convert_xls.py \
-          --add-data cdng.py:cdng.py \
-          --add-data category_correct.py:category_correct.py \
-          --add-data build_script.py:build_script.py \
-          --add-data block_name.py:block_name.py \
-          --add-data application_pvr.py:application_pvr.py \
-          --add-data application_gis.py:application_gis.py \
-          --add-data data_base/database_without_juming.db:data_base/database_without_juming.db \
-          --add-data data_base/work_with_base.py:data_base/work_with_base.py \
-          --add-data data_base/users_database/databaseWell.db:data_base/users_database/databaseWell.db \
-          --add-data data_base/users_database/users.db:data_base/users_database/users.db \
-          --add-data data_base/data_base_well/database_well.py:data_base/data_base_well/database_well.py \
-          --add-data data_base/data_base_well/databaseWell.db:data_base/data_base_well/databaseWell.db \
-          --add-data data_base/users_database/databaseWell.db:data_base/users_database/databaseWell.db \
-          --add-data data_base/users_database/users.db:data_base/users_database/users.db \
-          --add-data gnkt_data/gnkt_data.py:gnkt_data/gnkt_data.py \
-          --add-data imageFiles/Алиев Заур.png:imageFiles/Алиев Заур.png \
-          --add-data imageFiles/Алиев махир.png:imageFiles/Алиев махир.png \
-          --add-data imageFiles/Зуфаров.png:imageFiles/Зуфаров.png \
-          --add-data imageFiles/Хасаншин.png:imageFiles/Хасаншин.png \
-          --add-data imageFiles/Шамигулов.png:imageFiles/Шамигулов.png \
-          --add-data imageFiles/schema_well/column.png:imageFiles/schema_well/column.png \
-          --add-data imageFiles/schema_well/gorizont_1.png:imageFiles/schema_well/gorizont_1.png \
-          --add-data imageFiles/schema_well/gorizont_12.png:imageFiles/schema_well/gorizont_12.png \
-          --add-data imageFiles/schema_well/port.png:imageFiles/schema_well/port.png \
-          --add-data imageFiles/schema_well/кабель.png:imageFiles/schema_well/кабель.png \
-          --add-data imageFiles/schema_well/нарушение.png:imageFiles/schema_well/нарушение.png \
-          --add-data imageFiles/schema_well/НКТ с воронкой.jpg:imageFiles/schema_well/НКТ с воронкой.jpg \
-          --add-data imageFiles/schema_well/НКТ с воронкой.png:imageFiles/schema_well/НКТ с воронкой.png \
-          --add-data imageFiles/schema_well/НКТ с пакером.png:imageFiles/schema_well/НКТ с пакером.png \
-          --add-data imageFiles/schema_well/открытый ствол.png:imageFiles/schema_well/открытый ствол.png \
-          --add-data imageFiles/schema_well/пакер.png:imageFiles/schema_well/пакер.png \
-          --add-data imageFiles/schema_well/ПВР.png:imageFiles/schema_well/ПВР.png \
-          --add-data imageFiles/schema_well/переход.png:imageFiles/schema_well/переход.png \
-          --add-data imageFiles/schema_well/пропант.png:imageFiles/schema_well/пропант.png \
-          --add-data imageFiles/schema_well/СХЕМЫ КНК_38,1.png:imageFiles/schema_well/СХЕМЫ КНК_38,1.png \
-          --add-data imageFiles/schema_well/СХЕМЫ КНК_44,45.png:imageFiles/schema_well/СХЕМЫ КНК_44,45.png \
-          --add-data imageFiles/pvo/oil/схема №1.jpg:imageFiles/pvo/oil/схема №1.jpg \
-          --add-data imageFiles/pvo/oil/схема №2.jpg:imageFiles/pvo/oil/схема №2.jpg \
-          --add-data imageFiles/pvo/oil/схема №3.jpg:imageFiles/pvo/oil/схема №3.jpg \
-          --add-data imageFiles/pvo/oil/схема №4.jpg:imageFiles/pvo/oil/схема №4.jpg \
-          --add-data imageFiles/pvo/oil/схема №5.jpg:imageFiles/pvo/oil/схема №5.jpg \
+          --add-data plan23.py:. \
+          --add-data plan.py:. \
+          --add-data perforation_correct_gnkt_frez.py:. \
+          --add-data perforation_correct.py:. \
+          --add-data open_pz.py:. \
+          --add-data krs.py:. \
+          --add-data H2S.py:. \
+          --add-data gnkt_opz.py:. \
+          --add-data gnkt_after_grp.py:. \
+          --add-data find.py:. \
+          --add-data data_correct_position_people.py:. \
+          --add-data data_correct.py:. \
+          --add-data convert_xls.py:. \
+          --add-data cdng.py:. \
+          --add-data category_correct.py:. \
+          --add-data build_script.py:. \
+          --add-data block_name.py:. \
+          --add-data application_pvr.py:. \
+          --add-data application_gis.py:. \
+          --add-data data_base/database_without_juming.db:. \
+          --add-data data_base/work_with_base.py:. \
+          --add-data data_base/users_database/databaseWell.db:. \
+          --add-data data_base/users_database/users.db:. \
+          --add-data data_base/data_base_well/database_well.py:. \
+          --add-data data_base/data_base_well/databaseWell.db:. \
+          --add-data data_base/users_database/databaseWell.db:. \
+          --add-data data_base/users_database/users.db:. \
+          --add-data gnkt_data/gnkt_data.py:. \
+          --add-data imageFiles/Алиев Заур.png:. \
+          --add-data imageFiles/Алиев махир.png:. \
+          --add-data imageFiles/Зуфаров.png:. \
+          --add-data imageFiles/Хасаншин.png:. \
+          --add-data imageFiles/Шамигулов.png:. \
+          --add-data imageFiles/schema_well/column.png:. \
+          --add-data imageFiles/schema_well/gorizont_1.png:. \
+          --add-data imageFiles/schema_well/gorizont_12.png:. \
+          --add-data imageFiles/schema_well/port.png:. \
+          --add-data imageFiles/schema_well/кабель.png:. \
+          --add-data imageFiles/schema_well/нарушение.png:. \
+          --add-data imageFiles/schema_well/НКТ с воронкой.jpg:. \
+          --add-data imageFiles/schema_well/НКТ с воронкой.png:. \
+          --add-data imageFiles/schema_well/НКТ с пакером.png:. \
+          --add-data imageFiles/schema_well/открытый ствол.png:. \
+          --add-data imageFiles/schema_well/пакер.png:. \
+          --add-data imageFiles/schema_well/ПВР.png:. \
+          --add-data imageFiles/schema_well/переход.png:. \
+          --add-data imageFiles/schema_well/пропант.png:. \
+          --add-data imageFiles/schema_well/СХЕМЫ КНК_38,1.png:. \
+          --add-data imageFiles/schema_well/СХЕМЫ КНК_44,45.png:. \
+          --add-data imageFiles/pvo/oil/схема №1.jpg:. \
+          --add-data imageFiles/pvo/oil/схема №2.jpg:. \
+          --add-data imageFiles/pvo/oil/схема №3.jpg:. \
+          --add-data imageFiles/pvo/oil/схема №4.jpg:. \
+          --add-data imageFiles/pvo/oil/схема №5.jpg:. \
           main.py
 
 
