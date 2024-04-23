@@ -78,7 +78,7 @@ class LeakageWindow(QMainWindow):
         insulation_combo1 = QComboBox(self)
         insulation_combo1.addItems(['не изолирован', 'изолирован'])
         index_insulation = self.tabWidget.currentWidget().insulation_combo.currentIndex()
-        print(index_insulation)
+        # print(index_insulation)
         insulation_combo1.setCurrentIndex(index_insulation)
 
         if not roof_leakage or not sole_leakage_line:
@@ -116,14 +116,15 @@ class LeakageWindow(QMainWindow):
     def get_leakiness(self, leakiness_column):
 
         leakiness_column.replace('м', '').strip()
-        rows = self.tableWidget.rowCount()
-        for leakiness in leakiness_column.replace('м', '').replace(' ', '').split(','):
 
+        for leakiness in leakiness_column.replace('м', '').replace(' ', '').split(','):
+            rows = self.tableWidget.rowCount()
+            self.tableWidget.insertRow(rows)
             roof_leakage = str(min(map(float, leakiness.split('-'))))
             sole_leakage = str(max(map(float, leakiness.split('-'))))
             insulation_combo = QComboBox(self)
             insulation_combo.addItems(['не изолирован', 'изолирован'])
-            self.tableWidget.insertRow(rows)
+
             self.tableWidget.setItem(rows, 0, QTableWidgetItem(roof_leakage))
             self.tableWidget.setItem(rows, 1, QTableWidgetItem(sole_leakage))
             self.tableWidget.setCellWidget(rows, 2, insulation_combo)

@@ -26,7 +26,7 @@ class CalcFond:
         calc_pressuar_dict = {}
         for nkt_l in calc_nkt_list:
             if nkt_l <= float(self.static_level):
-                print(f'ЖГС {self.fluid}')
+                # print(f'ЖГС {self.fluid}')
                 p = round(float(self.fluid) * 9.81 * nkt_l / 100, 0)
             else:
                 p = round(float(self.fluid) * 9.81 * nkt_l / 100-

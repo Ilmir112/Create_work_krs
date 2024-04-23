@@ -233,6 +233,7 @@ class Drill_window(QMainWindow):
         drilling_interval = list(set([well_data.dict_perforation[plast]["подошва"] for plast in well_data.plast_all]))
         drilling_interval.append(int(current_depth))
         if len(well_data.dict_leakiness) != 0:
+
             leakness_list = [
                 well_data.dict_leakiness['нэк']['интервал'][
                     nek][1] for nek in list(well_data.dict_leakiness['нэк']['интервал'].keys())]

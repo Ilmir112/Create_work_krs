@@ -806,8 +806,8 @@ class MyWindow(QMainWindow):
                         coordinate = f'{get_column_letter(col - 1)}{row_ind - 1}'
                         self.insert_image(ws2, 'imageFiles/Алиев Заур.png', coordinate)
                         break
-
-            self.create_short_plan(wb2, plan_short)
+            if self.work_plan != 'dop_plan':
+                self.create_short_plan(wb2, plan_short)
 
             # print(f'9 - {ws2.max_row}')
             if self.work_plan != 'dop_plan':
@@ -1481,7 +1481,7 @@ class MyWindow(QMainWindow):
             selected_rows.sort(reverse=True)
             # print(selected_rows)
             for row in selected_rows:
-                # print(row-well_data.count_row_well)
+                print(row - well_data.count_row_well, well_data.data_list)
                 self.table_widget.removeRow(row)
                 well_data.data_list.pop(row - well_data.count_row_well)
 
@@ -1629,13 +1629,16 @@ class MyWindow(QMainWindow):
         if work_plan == 'gnkt_frez':
             index_setSpan = 1
         row_max = table_widget.rowCount()
-        # print(f'макс {row_max}')
+        print(f'ДОП {work_plan}')
 
         for i, row_data in enumerate(work_list):
 
             row = ins_ind + i
-            if work_plan not in ['application_pvr', 'gnkt_frez']:
-                MyWindow.insert_data_in_database(self, row, row_max + i)
+            try:
+                if work_plan not in ['application_pvr', 'gnkt_frez', 'dop_plan', 'gnkt_opz', 'application_gis']:
+                    MyWindow.insert_data_in_database(self, row, row_max + i)
+            except:
+                pass
 
             table_widget.insertRow(row)
 
@@ -2171,35 +2174,11 @@ class MyWindow(QMainWindow):
                 skm = (kroly_skm, pod_skm)
                 perforating_intervals = []
 
-                for plast in well_data.plast_all:
-                    for interval in well_data.dict_perforation[plast]['интервал']:
-                        perforating_intervals.append(list(interval))
-                skipping_intervals_new = []
-
-                skm_range = list(range(kroly_skm, pod_skm + 1))
-                for pvr in sorted(perforating_intervals, key=lambda x: x[0]):
-                    # print(int(pvr[0]) in skm_range, skm_range[0], int(pvr[0]))
-                    if int(pvr[0]) in skm_range and int(pvr[1]) in skm_range and skm_range[0] + 1 <= int(
-                            pvr[0] - 1):
-                        skipping_intervals_new.append((skm_range[0] + 1, int(pvr[0] - 1)))
-                        skm_range = skm_range[skm_range.index(int(pvr[1])):]
-
-                skipping_intervals_new.append((skm_range[0], pod_skm))
-
                 skm_question = QMessageBox.question(None, 'Скреперование',
-                                                    f'добавить интервал скреперования {skipping_intervals_new}')
+                                                    f'добавить интервал скреперования {skm}')
                 if skm_question == QMessageBox.StandardButton.Yes:
-                    # print(well_data.skm_interval)
-
-                    well_data.skm_interval.append(skipping_intervals_new[0])
-                    # print(well_data.skm_interval)
-
+                    well_data.skm_interval.append(skm)
                     well_data.skm_interval = sorted(well_data.skm_interval, key=lambda x: x[0])
-                    # perforating_intervals = []
-                    # for plast in well_data.plast_all:
-                    #     for interval in well_data.dict_perforation[plast]['интервал']:
-                    #         perforating_intervals.append(list(interval))
-                    #
                     raid_str = raid(remove_overlapping_intervals(perforating_intervals, well_data.skm_interval))
                     # print(f'скреперование {well_data.skm_interval}')
                     for row in range(self.table_widget.rowCount()):
@@ -2211,7 +2190,6 @@ class MyWindow(QMainWindow):
                                     ind_value = value.split(' ')
                                     ind_min = ind_value.index('интервале') + 1
                                     ind_max = ind_value.index('обратной')
-
                                     new_value = QtWidgets.QTableWidgetItem(f'{" ".join(ind_value[:ind_min])} '
                                                                            f'{raid_str}м {" ".join(ind_value[ind_max:])}')
 

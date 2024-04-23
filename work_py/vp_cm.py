@@ -58,9 +58,8 @@ class TabPage_Vp(QWidget):
     def update_vp_depth(self):
         vp_depth = self.vp_depth_edit.text()
         if vp_depth != '':
-            self.cement_vp_edit.setText(int(float(vp_depth)) -3)
-
-
+            # print(f'ВП {vp_depth}')
+            self.cement_vp_edit.setText(f'{int(float(vp_depth))-3}')
 
     def update_vp(self, index):
 
@@ -292,7 +291,7 @@ class VpWindow(QMainWindow):
         if well_data.leakiness:
           # print(well_data.dict_leakiness)
             for nek in well_data.dict_leakiness['НЭК']['интервал']:
-                print(nek)
+                # print(nek)
                 if well_data.dict_leakiness['НЭК']['интервал'][nek]['отключение'] is False:
                     interval_list.append(nek)
 

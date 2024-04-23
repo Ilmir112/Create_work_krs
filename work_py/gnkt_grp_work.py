@@ -693,7 +693,7 @@ class GnktOsvWindow2(QMainWindow):
             return date_obj.strftime('%d.%m.%Y')
         else:
             date_obj = datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
-            print(f' даь {date_obj}')
+            # print(f' даь {date_obj}')
         return date_obj.strftime('%d.%m.%Y')
 
     # Функция для получения глубины начала интервала

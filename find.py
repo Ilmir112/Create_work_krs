@@ -56,6 +56,7 @@ class FindIndexPZ(QMainWindow):
                 well_data.data_well_max = ProtectedIsDigit(row_ind)
                 well_data.cat_well_min, well_data.cat_well_max, well_data.data_well_min, well_data.data_well_max
             elif 'НКТ' == str(row[1]).upper():
+
                 well_data.pipes_ind = ProtectedIsDigit(row_ind + 1)
                 well_data.cat_well_min, well_data.cat_well_max, well_data.data_well_min, well_data.data_well_max, well_data.pipes_ind, well_data.sucker_rod_ind
 
@@ -1219,7 +1220,7 @@ class Well_Category(FindIndexPZ):
                 well_data.h2s_pr.append(h2s_pr)
 
             well_data.category_pressuar = well_data.cat_P_1[0]
-            print(f'категория по давлению {well_data.category_pressuar}')
+            # print(f'категория по давлению {well_data.category_pressuar}')
             well_data.category_h2s = well_data.cat_h2s_list[0]
             well_data.category_gf = well_data.cat_gaz_f_pr[0]
 
@@ -1240,7 +1241,7 @@ class Well_Category(FindIndexPZ):
                                                   f'по давлению {categoty_pressure_well}')
                 if categoty_h2s_well:
                     if str(well_data.cat_h2s_list[0]) != str(well_data.category_h2s):
-                        print(str(well_data.cat_h2s_list[0]), well_data.category_h2s)
+                        # print(str(well_data.cat_h2s_list[0]), well_data.category_h2s)
                         #
                         mes = QMessageBox.warning(None, 'Некорректная категория давления',
                                                   f'согласно классификатора от {data} категория скважина '

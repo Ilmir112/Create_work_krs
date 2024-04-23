@@ -136,7 +136,7 @@ class TabPage_SO(QWidget):
         # print(f'индекс {idx}')
         # Получаем текст из выбранного элемента в type_saddles_ComboBox
         type_items = [type_saddles_ComboBox.itemText(i) for i in range(type_saddles_ComboBox.count())]
-        print(f'tyo работает {idx, index_interval, type_items[idx]}')
+        # print(f'tyo работает {idx, index_interval, type_items[idx]}')
         # Получаем данные о шаре и седле для выбранного типа
 
         self.diametr_saddles_edit = QLineEdit(self)
@@ -153,7 +153,6 @@ class TabPage_SO(QWidget):
         setattr(self, f"diametr_saddles_{index_interval}_edit", diametr_saddles)
         setattr(self, f"diametr_ball_{index_interval}_edit", diametr_ball)
 
-        print(f'тип порта {self.type_saddles_ComboBox.currentText()}')
         self.labels_plast[index_interval][3] = type_items[idx]
         self.labels_plast[index_interval][4] = self.diametr_saddles_edit.text()
         self.labels_plast[index_interval][5] = self.diametr_ball_edit.text()
@@ -195,7 +194,7 @@ class PerforationCorrectGnktFrez(QMainWindow):
 
         ports_tuple = sorted(list(self.dict_perforation[plast_work]['интервал']), key=lambda x: x[0], reverse=True)
         dict_ports = {}
-        print(f'порты собрать {ports_tuple}')
+        # print(f'порты собрать {ports_tuple}')
         for index, port in enumerate(ports_tuple):
             roof = self.tabWidget.currentWidget().labels_plast[index][1]
             sole = self.tabWidget.currentWidget().labels_plast[index][2]

@@ -76,9 +76,9 @@ class Classifier_well(QMainWindow):
         self.edit_well_area.textChanged.connect(self.filter_class_area)
         layout.addWidget(self.edit_well_area)
         region = f'{region}_классификатор'
-        print(region)
+        # print(region)
         data = self.get_data_from_class_well_db(region)
-        print(data)
+        # print(data)
 
         self.table_class.setColumnCount(len(data[0]))
         self.table_class.setRowCount(len(data))
@@ -146,8 +146,8 @@ class Classifier_well(QMainWindow):
         db = QSqlDatabase.addDatabase("QSQLITE")
         db.setDatabaseName(
             'data_base/database_without_juming.db')  # Замените database.db на имя вашей базы данных SQLite
-        print(db)
-        print(region)
+        # print(db)
+        # print(region)
         print('ТГМ_классификатор')
         if not db.open():
             print("Не удалось установить соединение с базой данных.")
@@ -201,7 +201,7 @@ class Classifier_well(QMainWindow):
                 for index_row, row in enumerate(ws.iter_rows(min_row=2, values_only=True)):
                     for col, value in enumerate(row):
                         if not value is None and col <= 18:
-                            print(value)
+                            # print(value)
                             if 'туймазин' in str(value).lower():
                                 check_param = 'ТГМ'
                             if 'ишимбай' in str(value).lower():
@@ -357,7 +357,7 @@ class Classifier_well(QMainWindow):
                                     version_year = version_year[:-1]
                     if index_row > 18:
                         break
-                print(region_name, version_year)
+                # print(region_name, version_year)
               # print(Check_param)
                 if check_param in region_name:
                     mes = QMessageBox.warning(self, 'ВНИМАНИЕ ОШИБКА',
@@ -367,7 +367,7 @@ class Classifier_well(QMainWindow):
                     for index_row, row in enumerate(ws.iter_rows(min_row=2, values_only=True)):
                         if 'Классификация' in row:
                             check_file = True
-                            print(f' класс {check_file}')
+                            # print(f' класс {check_file}')
                         if 'Скважина' in row:
                             area_row = index_row + 2
                             for col, value in enumerate(row):

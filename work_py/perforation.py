@@ -131,7 +131,7 @@ class PerforationWindow(QMainWindow):
         if len(well_data.dict_perforation_project) != 0:
             for plast, data in well_data.dict_perforation_project.items():
                 for i in data['интервал']:
-                    print(i[1], well_data.current_bottom)
+                    # print(i[1], well_data.current_bottom)
 
                     if well_data.grp_plan:
                         count_charge = int((max(i) - min(i)) * chargePM_GP)

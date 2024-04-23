@@ -413,7 +413,7 @@ class RirWindow(QMainWindow):
         well_data.current_bottom = roof_rir_edit
         self.perf_new(roof_rir_edit, roof_rir_edit + 1)
         well_data.forPaker_list = None
-        print(f'текущий забой {well_data.current_bottom}')
+        # print(f'текущий забой {well_data.current_bottom}')
         return rir_list
 
 
@@ -422,8 +422,8 @@ class RirWindow(QMainWindow):
                                          roof_rir_edit, sole_rir_edit, pressureZUMPF_question = 'Не нужно',
                                          diametr_paker = 122, paker_khost= 0, paker_depth= 0):
 
-        print(paker_need_Combo, plast_combo, diametr_paker, paker_khost,
-                   paker_depth, pressureZUMPF_question)
+        # print(paker_need_Combo, plast_combo, diametr_paker, paker_khost,
+        #            paker_depth, pressureZUMPF_question)
         rir_list = self.need_paker(paker_need_Combo, plast_combo, diametr_paker, paker_khost,
                    paker_depth, pressureZUMPF_question)
 

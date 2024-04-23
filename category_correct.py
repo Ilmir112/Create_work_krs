@@ -85,7 +85,7 @@ class TabPage_SO(QWidget):
 
             plast_index.addItems(self.plast_all)
             #
-            print(f'пласт {work_plast}')
+            # print(f'пласт {work_plast}')
             plast_index.setCurrentIndex(self.plast_all.index(work_plast))
 
             category_pressuar_line_edit = QLineEdit(self)

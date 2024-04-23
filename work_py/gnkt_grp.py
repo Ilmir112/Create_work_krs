@@ -119,7 +119,7 @@ class GnktOsvWindow(QMainWindow):
         else:
             b = 0
         head = plan.head_ind(well_data.cat_well_min._value+b, well_data.cat_well_max._value+b)
-        print(f'классификатор {head}')
+
         plan.copy_true_ws(sheet, self.ws_title, head)
 
         if self.work_window is None:

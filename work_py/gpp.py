@@ -107,7 +107,7 @@ class Gpp_window(QMainWindow):
 
 
         gPP_300 = MyWindow.check_depth_in_skm_interval(self, gpp_depth)
-        print(self.table_widget)
+        # print(self.table_widget)
 
         main.MyWindow.check_gpp_upa(self, self.table_widget)
 

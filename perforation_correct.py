@@ -181,7 +181,7 @@ class PerforationCorrect(QMainWindow):
 
                 index += 1
             if well_data.data_in_base is False:
-                print(well_data.data_in_base)
+                # print(well_data.data_in_base)
 
                 if all([oktl is True for oktl in plast_oktl]):
                     well_data.dict_perforation_short[plast]['отключение'] = True

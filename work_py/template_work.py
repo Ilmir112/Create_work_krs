@@ -80,7 +80,7 @@ class TabPage_SO_with(QWidget):
             self.template_Combo.addItems(self.template_select_list)
 
             template_key = self.definition_pssh()
-            # print(self.template_select_list, template_key)
+            print(self.template_select_list, template_key)
             self.template_Combo.setCurrentIndex(self.template_select_list.index(template_key))
 
 
@@ -1096,7 +1096,7 @@ class TemplateKrs(QMainWindow):
             gips = TemplateKrs.pero(self)
             for row in gips[::-1]:
                 list_template_ek.insert(0, row)
-        print(f'счет использования шаблн {well_data.count_template}')
+        # print(f'счет использования шаблн {well_data.count_template}')
         if well_data.count_template == 0:
             list_template_ek = list_template_ek + notes_list
             well_data.count_template += 1

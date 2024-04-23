@@ -1477,7 +1477,7 @@ class AcidPakerWindow(QMainWindow):
 
         elif str(value).replace('.', '').replace(',', '').isdigit():
             if str(round(float(value.replace(',', '.')), 1))[-1] == 0:
-                print(str(round(float(value.replace(',', '.')), 1)))
+                # print(str(round(float(value.replace(',', '.')), 1)))
                 return int(float(value.replace(',', '.')))
             else:
                 return float(value.replace(',', '.'))

@@ -85,7 +85,7 @@ class DopPlanWindow(QMainWindow):
                                        'уд. вес рабочей жидкости не может быть меньше 0,87 и больше 1,64')
             return
         work_list = self.work_list(work_earlier)
-        MyWindow.populate_row(self, self.ins_ind + 2, work_list, self.table_widget)
+        MyWindow.populate_row(self, self.ins_ind + 2, work_list, self.table_widget, self.work_plan)
         well_data.pause = False
 
         if str(fluid) not in str(well_data.fluid_work):
@@ -110,6 +110,8 @@ class DopPlanWindow(QMainWindow):
             cursor1.execute(f"SELECT * FROM sqlite_master WHERE name = {table_name} AND type = 'table'")
             result_table = cursor1.fetchall()
         else:
+            work_plan = f'dop_plan'
+            table_name = json.dumps(well_data.well_number._value + well_data.well_area._value + work_plan + str(number_dp))
             for i in range(1, number_dp + 1, -1):
                 try:
                     work_plan = f'dop_plan{i}'
@@ -123,7 +125,7 @@ class DopPlanWindow(QMainWindow):
                 if len(result_table) > 0:
                     break
 
-        if len(result_table) > 0:
+        if result_table != 0:
             well_data.data_in_base = True
             cursor2 = conn1.cursor()
             # print(result_table)
@@ -158,7 +160,7 @@ class DopPlanWindow(QMainWindow):
             well_data.problemWithEk_depth = result[well_data.paragraph_row][14]
             well_data.problemWithEk_diametr = result[well_data.paragraph_row][15]
             well_data.dict_perforation_short = json.loads(result[well_data.paragraph_row][3])
-            print()
+
 
 
         else:

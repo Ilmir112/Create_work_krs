@@ -31,9 +31,10 @@ class TabPage_SO(QWidget):
         if len(well_data.plast_work) != 0:
             pakerDepth = well_data.perforation_roof - 20
         else:
+            # print(well_data.dict_perforation)
             if well_data.leakiness:
-                pakerDepth = min([well_data.dict_perforation['НЭК']['интервал'][nek][0] - 10
-                                       for nek in well_data.dict_perforation['НЭК']['интервал'].keys()])
+                pakerDepth = min([well_data.dict_leakiness['НЭК']['интервал'][nek][0] - 10
+                                       for nek in well_data.dict_leakiness['НЭК']['интервал'].keys()])
 
         self.paker_depth_edit.setText(str(int(pakerDepth)))
 
@@ -500,7 +501,7 @@ class OpressovkaEK(QMainWindow):
     def check_for_template_paker(self, depth):
 
         check_true = False
-        print(f' глубина шаблона {well_data.template_depth}, посадка пакера {depth}')
+        # print(f' глубина шаблона {well_data.template_depth}, посадка пакера {depth}')
         while check_true is False:
             if depth < float(
                     well_data.head_column_additional._value) and depth <= well_data.template_depth and well_data.column_additional:
