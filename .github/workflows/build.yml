@@ -60,8 +60,6 @@ jobs:
           --add-data data_base/users_database/databaseWell.db:data_base/users_database/databaseWell.db
           --add-data data_base/users_database/users.db:data_base/users_database/users.db          
           --add-data data_base/data_base_well/database_well.py:data_base/data_base_well/database_well.py
-          --add-data data_base/data_base_well/databaseWell.db:data_base/data_base_well/databaseWell.db
-          --add-data data_base/users_database/databaseWell.db:data_base/users_database/databaseWell.db
           --add-data data_base/users_database/users.db:data_base/users_database/users.db
           --add-data gnkt_data:gnkt_data
           --add-data gnkt_data/gnkt_data.py:gnkt_data/gnkt_data.py
