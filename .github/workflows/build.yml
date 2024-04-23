@@ -20,7 +20,7 @@ jobs:
 #              run: pyinstaller --onefile --hidden-import data_base.data_base_well.database_well main.py
       - name: Build executable
         run:
-          pyinstaller --noconfirm --onedir --windowed
+          pyinstaller --noconfirm --onefile --windowed
           --add-data data_base:data_base
           --add-data data_base/data_base_well:data_base/data_base_well
           --add-data work_py:work_py 
