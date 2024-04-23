@@ -100,7 +100,6 @@ jobs:
       #          --add-data imageFiles/pvo/oil/схема №8б.jpg:.
 
       - name: Upload artifact
-        run: ./dist/main
         uses: actions/upload-artifact@v3
         with:
           name: main
