@@ -31,7 +31,6 @@ jobs:
           --add-data well_data.py:well_data.py 
           --add-data selectPlast.py:selectPlast 
           --add-data proverka.py:proverka.py 
-          --add-data prov.py:prov.py 
           --add-data plan23.py:. 
           --add-data plan.py:. 
           --add-data perforation_correct_gnkt_frez.py:erforation_correct_gnkt_frez.py 
