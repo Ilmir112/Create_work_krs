@@ -503,8 +503,9 @@ class TabPage_SO_acid(QWidget):
                     self.distance_between_packers = abs(int(self.paker_depth.text()) - int(self.paker2_depth.text()))
                     print(f' расстояние между пакерами {self.distance_between_packers}')
             else:
-                self.paker2_depth.setText(f'{int(self.paker_depth.text()) - self.distance_between_packers}')
-                self.paker2_depth.setEnabled(False)
+                if self.paker_depth.text() != '':
+                    self.paker2_depth.setText(f'{int(self.paker_depth.text()) - self.distance_between_packers}')
+                    self.paker2_depth.setEnabled(False)
 
 
 
