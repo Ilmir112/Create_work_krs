@@ -50,8 +50,47 @@ jobs:
           --add-data block_name.py:block_name.py 
           --add-data application_pvr.py:application_pvr.py 
           --add-data application_gis.py:application_gis.py 
+          --add-data data_base/database_without_juming.db:data_base/database_without_juming.db
+          --add-data data_base/work_with_base.py:data_base/work_with_base.py
+          --add-data data_base/users_database/databaseWell.db:data_base/users_database/databaseWell.db
+          --add-data data_base/users_database/users.db:data_base/users_database/users.db
+          --add-data data_base/data_base_well/database_well.py:data_base/data_base_well/database_well.py
+          --add-data data_base/data_base_well/databaseWell.db:data_base/data_base_well/databaseWell.db
+          --add-data data_base/users_database/databaseWell.db:data_base/users_database/databaseWell.db
+          --add-data data_base/users_database/users.db:data_base/users_database/users.db
+          --add-data gnkt_data/gnkt_data.py:gnkt_data/gnkt_data.py
           main.py
-
+      #          --add-data imageFiles/Алиев Заур.png:.
+      #          --add-data imageFiles/Алиев махир.png:.
+      #          --add-data imageFiles/Зуфаров.png:.
+      #          --add-data imageFiles/Хасаншин.png:.
+      #          --add-data imageFiles/Шамигулов.png:.
+      #          --add-data imageFiles/schema_well/column.png:.
+      #          --add-data imageFiles/schema_well/gorizont_1.png:.
+      #          --add-data imageFiles/schema_well/gorizont_12.png:.
+      #          --add-data imageFiles/schema_well/port.png:.
+      #          --add-data imageFiles/schema_well/кабель.png:.
+      #          --add-data imageFiles/schema_well/нарушение.png:.
+      #          --add-data imageFiles/schema_well/НКТ с воронкой.jpg:.
+      #          --add-data imageFiles/schema_well/НКТ с воронкой.png:.
+      #          --add-data imageFiles/schema_well/НКТ с пакером.png:.
+      #          --add-data imageFiles/schema_well/открытый ствол.png:.
+      #          --add-data imageFiles/schema_well/пакер.png:.
+      #          --add-data imageFiles/schema_well/ПВР.png:.
+      #          --add-data imageFiles/schema_well/переход.png:.
+      #          --add-data imageFiles/schema_well/пропант.png:.
+      #          --add-data imageFiles/schema_well/СХЕМЫ КНК_38,1.png:.
+      #          --add-data imageFiles/schema_well/СХЕМЫ КНК_44,45.png:.
+      #          --add-data imageFiles/pvo/oil/схема №1.jpg:.
+      #          --add-data imageFiles/pvo/oil/схема №2.jpg:.
+      #          --add-data imageFiles/pvo/oil/схема №3.jpg:.
+      #          --add-data imageFiles/pvo/oil/схема №4.jpg:.
+      #          --add-data imageFiles/pvo/oil/схема №5.jpg:.
+      #          --add-data imageFiles/pvo/oil/схема №6.jpg:.
+      #          --add-data imageFiles/pvo/oil/схема №7.jpg:.
+      #          --add-data imageFiles/pvo/oil/схема №7а.jpg:.
+      #          --add-data imageFiles/pvo/oil/схема №8.jpg:.
+      #          --add-data imageFiles/pvo/oil/схема №8б.jpg:.
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
