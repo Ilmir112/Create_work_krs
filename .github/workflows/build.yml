@@ -20,7 +20,9 @@ jobs:
 #              run: pyinstaller --onefile --hidden-import data_base.data_base_well.database_well main.py
       - name: Build executable
         run:
-          pyinstaller --noconfirm --onedir --windowed 
+          pyinstaller --noconfirm --onedir --windowed
+          --add-data data_base:data_base
+          --add-data data_base/data_base_well:data_base/data_base_well
           --add-data work_py:work_py 
           --add-data users:users 
           --add-data property_excel:property_excel 
@@ -49,14 +51,12 @@ jobs:
           --add-data build_script.py:build_script.py 
           --add-data block_name.py:block_name.py 
           --add-data application_pvr.py:application_pvr.py 
-          --add-data application_gis.py:application_gis.py
-          --add-data data_base:data_base
+          --add-data application_gis.py:application_gis.py          
           --add-data data_base/database_without_juming.db:data_base/database_without_juming.db
           --add-data data_base/work_with_base.py:data_base/work_with_base.py
           --add-data data_base/users_database:data_base/users_database
           --add-data data_base/users_database/databaseWell.db:data_base/users_database/databaseWell.db
-          --add-data data_base/users_database/users.db:data_base/users_database/users.db
-          --add-data data_base/data_base_well:data_base/data_base_well
+          --add-data data_base/users_database/users.db:data_base/users_database/users.db          
           --add-data data_base/data_base_well/database_well.py:data_base/data_base_well/database_well.py
           --add-data data_base/data_base_well/databaseWell.db:data_base/data_base_well/databaseWell.db
           --add-data data_base/users_database/databaseWell.db:data_base/users_database/databaseWell.db
