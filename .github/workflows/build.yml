@@ -65,8 +65,7 @@ jobs:
           --add-data gnkt_data/gnkt_data.py:gnkt_data/gnkt_data.py
           --add-data imageFiles:imageFiles
           --add-data imageFiles/schema_well:imageFiles/schema_well
-          --add-data imageFiles/pvo/oil:imageFiles/pvo/oil
-          
+          --add-data imageFiles/pvo/oil:imageFiles/pvo/oil          
           main.py
       #          --add-data imageFiles/Алиев Заур.png:.
       #          --add-data imageFiles/Алиев махир.png:.
