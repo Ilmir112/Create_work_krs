@@ -16,7 +16,7 @@ jobs:
         run: pip install -r requirements.txt
       - name: Build executable
         run:
-          pyinstaller --onedic \
+          pyinstaller --onefile \
           --add-data work_py:work_py \
           --add-data users:users \
           --add-data property_excel:property_excel \
