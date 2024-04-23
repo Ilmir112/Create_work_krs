@@ -10,7 +10,7 @@ class LoginWindow(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle('окно входа')
-        self.setGeometry(100, 100, 300, 200)
+        self.setGeometry(100, 100, 400, 300)
 
         self.label_username = QLabel("Пользователь:", self)
         self.label_username.move(50, 30)
@@ -39,21 +39,24 @@ class LoginWindow(QWidget):
     def login(self):
         username = self.username.currentText()
         password = self.password.text()
-
+        last_name, first_name, second_name, _ = username.split(' ')
         conn = sqlite3.connect('data_base/users_database/users.db')
         cursor = conn.cursor()
-        cursor.execute("SELECT last_name, first_name, second_name, password, position_in, organization FROM users")
+        cursor.execute("SELECT last_name, first_name, second_name, password, position_in, organization FROM users "
+                       "WHERE last_name=? AND first_name=? AND second_name=?",
+                       (last_name, first_name, second_name))
         password_base = cursor.fetchone()
-        password_base_short = password_base[0] + " " + password_base[1][0] + '.' + password_base[2][0] + '.'
-        if password.lower() == password_base[3].lower() and password_base_short == username:
+
+        password_base_short = f'{password_base[0]} {password_base[1]} {password_base[2]} '
+        if password_base_short == username and password_base[3] == str(password):
             # mes = QMessageBox.information(self, 'Пароль', 'вход произведен')
             self.close()
             well_data.user = (password_base[4] + ' ' + password_base[5], password_base_short)
 
             well_data.pause = False
         else:
-            mes = QMessageBox.critical(self, 'Пароль', 'логин и пароль не совпадает')
-            self.close()
+             mes = QMessageBox.critical(self, 'Пароль', 'логин и пароль не совпадает')
+
 
     def get_list_users(self):
         # Создаем подключение к базе данных
@@ -65,12 +68,12 @@ class LoginWindow(QWidget):
 
         for user in users:
             position = user[3] + " " + user[4]
-            user_name = user[0] + " " + user[1][0] + '.' + user[2][0] + '.'
+            user_name = user[0] + " " + user[1] + ' ' + user[2] + ' '
             users_list.append((position, user_name))
         conn.close()
 
         return users_list
-        # Здесь обычно происходит проверка данных в базе данных
+
 
     def show_register_window(self):
         self.register_window = RegisterWindow()
@@ -85,25 +88,25 @@ class RegisterWindow(QWidget):
         self.label_last_name = QLabel("Фамилия:", self)
         self.label_last_name.move(50, 30)
         self.last_name = QLineEdit(self)
-        self.last_name.setText('Зуфаров')
+        # self.last_name.setText('Зуфаров')
         self.last_name.move(150, 30)
 
         self.label_first_name = QLabel("Имя:", self)
         self.label_first_name.move(50, 80)
         self.first_name = QLineEdit(self)
-        self.first_name.setText('Ильмир')
+        # self.first_name.setText('Ильмир')
         self.first_name.move(150, 80)
 
         self.label_second_name = QLabel("Отчество:", self)
         self.label_second_name.move(50, 130)
         self.second_name = QLineEdit(self)
-        self.second_name.setText('Мияссарович')
+        # self.second_name.setText('Мияссарович')
         self.second_name.move(150, 130)
 
         self.label_position = QLabel("Должность:", self)
         self.label_position.move(50, 180)
         self.position = QLineEdit(self)
-        self.position.setText('Зам. главного геолога')
+        # self.position.setText('Зам. главного геолога')
         self.position.move(150, 180)
 
         self.label_organization = QLabel("Организация:", self)
@@ -126,6 +129,7 @@ class RegisterWindow(QWidget):
 
         self.button_register_user = QPushButton("Регистрация", self)
         self.button_register_user.move(150, 380)
+        self.password.setEchoMode(QLineEdit.Password)  # Устанавливаем режим скрытия пароля
         self.button_register_user.clicked.connect(self.register_user)
 
     def register_user(self):
@@ -141,15 +145,16 @@ class RegisterWindow(QWidget):
         cursor = conn.cursor()
 
         # Проверяем, существует ли пользователь с таким именем
-        cursor.execute("SELECT last_name, first_name, second_name  FROM users WHERE username=?",
-                       (last_name, first_name,second_name))
+        cursor.execute("SELECT last_name, first_name, second_name  FROM users "
+                       "WHERE last_name=? AND first_name=? AND second_name=?",
+                       (last_name, first_name, second_name))
         existing_user = cursor.fetchone()
 
         if existing_user:  # Если пользователь уже существует
             QMessageBox.critical(self, 'Данный пользовать существует', 'Данный пользовать существует')
         else:  # Если пользователя с таким именем еще нет
-            if password == password2:
 
+            if password == password2:
                 cursor.execute(
                     "INSERT INTO users ("
                     "last_name, first_name, second_name, position_in, organization, password) VALUES (?, ?, ?, ?, ?, ?)",

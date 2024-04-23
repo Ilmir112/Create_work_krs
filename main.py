@@ -2,7 +2,7 @@ import json
 import os
 import sqlite3
 import sys
-# import win32com.client
+import win32com.client
 import openpyxl
 import re
 
@@ -698,21 +698,21 @@ class MyWindow(QMainWindow):
                                                       f"{full_path}", "Excel Files (*.xlsx)")
             if fileName:
                 wb2.save(full_path)
-            # # Создаем объект Excel
-            # excel = win32com.client.Dispatch("Excel.Application")
+            # Создаем объект Excel
+            excel = win32com.client.Dispatch("Excel.Application")
         except:
             mes = QMessageBox.critical(self, 'Ошибка', 'файл под таким именем открыт, закройте его')
-        # try:
-        #     # Открываем файл
-        #     workbook = excel.Workbooks.Open(full_path)
-        #     # Выбираем активный лист
-        #     worksheet = workbook.ActiveSheet
-        #
-        #     # Назначаем область печати с колонок B до L
-        #     worksheet.PageSetup.PrintArea = "B:L"
-        #
-        # except Exception as e:
-        #     print(f"Ошибка при работе с Excel: {e}")
+        try:
+            # Открываем файл
+            workbook = excel.Workbooks.Open(full_path)
+            # Выбираем активный лист
+            worksheet = workbook.ActiveSheet
+
+            # Назначаем область печати с колонок B до L
+            worksheet.PageSetup.PrintArea = "B:L"
+
+        except Exception as e:
+            print(f"Ошибка при работе с Excel: {e}")
 
     def save_to_excel(self):
         from work_py.gnkt_frez import Work_with_gnkt
