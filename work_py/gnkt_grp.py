@@ -567,6 +567,7 @@ class GnktOsvWindow(QMainWindow):
         for row in range(len(work_list)):
             for col in range(23):
                 if work_list[row][col]:
+                    # print(row, col)
                     ws.cell(row=row + 1, column=col + 1).value = work_list[row][col]
         # Перебираем строки и скрываем те, у которых все значения равны None
         for row_ind, row in enumerate(ws.iter_rows(values_only=True)):
@@ -585,12 +586,12 @@ class GnktOsvWindow(QMainWindow):
         for plast in well_data.plast_all:
             count_interval = well_data.dict_perforation[plast]['счет_объединение']
 
-            self.ws_schema.merge_cells(start_column=23, start_row=26 + m,
+            self.ws_schema.merge_cells(start_column=23, start_row=27 + m,
                                 end_column=23, end_row= 27 + count_interval + m -1)
-            self.ws_schema.merge_cells(start_column=22, start_row=26 + m,
+            self.ws_schema.merge_cells(start_column=22, start_row=27 + m,
                                        end_column=22, end_row=27 + count_interval + m - 1)
-            self.ws_schema.merge_cells(start_column=21, start_row=26 + m,
-                                       end_column=21, end_row=26 + count_interval + m - 1)
+            self.ws_schema.merge_cells(start_column=21, start_row=27 + m,
+                                       end_column=21, end_row=27 + count_interval + m - 1)
             m += count_interval
             roof_plast = well_data.dict_perforation[plast]['кровля']
             sole_plast = well_data.dict_perforation[plast]['подошва']

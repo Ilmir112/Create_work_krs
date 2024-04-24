@@ -300,7 +300,7 @@ class TabPage_SO(QWidget):
 
         roof_plast, roof_add_column_plast = TabPage_SO_with.definition_roof_not_raiding(self)
         dictance_template_first = int(well_data.current_bottom - roof_plast + 5)
-        print(f'дистанция первая {dictance_template_first}')
+        # print(f'дистанция первая {dictance_template_first}')
         self.dictance_template_first_Edit.setText(str(dictance_template_first))
 
         lenght_template_first, lenght_template_second = TabPage_SO_with.definition_ECN_true(self, well_data.dict_pump_ECN_h["posle"])

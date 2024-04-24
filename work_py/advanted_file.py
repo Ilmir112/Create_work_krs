@@ -56,7 +56,7 @@ def skm_interval(self, template):
 
     # print(f'скреперо {str_raid}')
     merged_segments = merge_overlapping_intervals(str_raid)
-    print(f'скреперо после {merged_segments}')
+    # print(f'скреперо после {merged_segments}')
     merged_segments_new = []
 
 
@@ -171,10 +171,7 @@ def remove_overlapping_intervals(perforating_intervals, skm_interval = None):
     else:
         skipping_intervals_new = skm_interval
 
-    # print(f'после разделения {skipping_intervals_new}')
-
-
-
+    print(f'после разделения {skipping_intervals_new}')
     return skipping_intervals_new
 
 
@@ -276,11 +273,9 @@ def merge_overlapping_intervals(intervals):
         else:
             if interval[0] < interval[1]:
                 merged[-1] = (merged[-1][0], max(merged[-1][1], interval[1]))
-    print(f'интервалы СКМ {merged}')
+    # print(f'интервалы СКМ {merged}')
 
     return merged
-
-
 def raid(string):
     if len(string) == 1:
         return f'{int(float(string[0][0]))} - {int(float(string[0][1]))}'
@@ -290,7 +285,6 @@ def raid(string):
         d = ''
         for i in list(string):
             d += f'{int(float(i[0]))} - {int(float(i[1]))}, '
-
 
     return d[:-2]
 
@@ -329,8 +323,6 @@ def definition_plast_work(self):
     # print(dict_perforation)
     well_data.plast_all = list(well_data.dict_perforation.keys())
     well_data.plast_work = list(plast_work)
-
-
 def count_row_height(ws, ws2, work_list, merged_cells_dict, ind_ins):
     from openpyxl.utils.cell import range_boundaries, get_column_letter
 

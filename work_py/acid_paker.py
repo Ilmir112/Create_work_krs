@@ -501,7 +501,7 @@ class TabPage_SO_acid(QWidget):
             if rows == 0:
                 if self.paker_depth.text() != '' and self.paker2_depth.text() != '':
                     self.distance_between_packers = abs(int(self.paker_depth.text()) - int(self.paker2_depth.text()))
-                    print(f' расстояние между пакерами {self.distance_between_packers}')
+                    # print(f' расстояние между пакерами {self.distance_between_packers}')
             else:
                 if self.paker_depth.text() != '':
                     self.paker2_depth.setText(f'{int(self.paker_depth.text()) - self.distance_between_packers}')
@@ -816,7 +816,7 @@ class AcidPakerWindow(QMainWindow):
         if swab_true_edit_type == "Нужно освоение":
             swabTypeCombo = str(self.tabWidget.currentWidget().swabTypeCombo.currentText())
             swab_volumeEdit = int(float(self.tabWidget.currentWidget().swab_volumeEdit.text()))
-            paker_depth_swab = int(self.tabWidget.currentWidget().swab_paker_depth.text())
+            paker_depth_swab = int(float(self.tabWidget.currentWidget().swab_paker_depth.text()))
             paker_khost = (paker_depth - paker_khost) - paker_depth_swab
 
             if self.paker_layout_combo == 'однопакерная':

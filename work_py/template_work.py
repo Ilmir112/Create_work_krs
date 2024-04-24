@@ -80,7 +80,7 @@ class TabPage_SO_with(QWidget):
             self.template_Combo.addItems(self.template_select_list)
 
             template_key = self.definition_pssh()
-            print(self.template_select_list, template_key)
+            # print(self.template_select_list, template_key)
             self.template_Combo.setCurrentIndex(self.template_select_list.index(template_key))
 
 
@@ -795,7 +795,7 @@ class TemplateKrs(QMainWindow):
 
     def __init__(self, ins_ind, table_widget, parent=None):
         super().__init__()
-        print(f'дочерний класс TemplateKRS')
+        # print(f'дочерний класс TemplateKRS')
 
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
@@ -924,7 +924,7 @@ class TemplateKrs(QMainWindow):
                 skm_tuple.append((roof, sole))
 
         well_data.skm_interval.extend(skm_tuple)
-        print(f'интервалы СКМ {well_data.skm_interval}')
+        # print(f'интервалы СКМ {well_data.skm_interval}')
         skm_list = sorted(skm_tuple, key=lambda x: x[0])
         work_template_list = self.template_ek(template_str, template_diametr, skm_list)
 
@@ -970,7 +970,7 @@ class TemplateKrs(QMainWindow):
              None, None, None, None, None, None, None,
              'мастер КРС', descentNKT_norm(well_data.current_bottom, 1.2)],
             [
-                f'Произвести скреперование э/к в интервале {skm_interval}м Допустить низ НКТ до гл. {well_data.current_bottom}м',
+                f'Произвести скреперование в интервале {skm_interval}м Допустить низ НКТ до гл. {well_data.current_bottom}м',
                 None,
                 f'Произвести скреперование э/к в интервале {skm_interval}м обратной промывкой и проработкой 5 раз каждого '
                 'наращивания. Работы производить согласно сборника технологических регламентов и инструкций в присутствии '

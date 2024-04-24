@@ -233,11 +233,11 @@ class Drill_window(QMainWindow):
         drilling_interval = list(set([well_data.dict_perforation[plast]["подошва"] for plast in well_data.plast_all]))
         drilling_interval.append(int(current_depth))
         if len(well_data.dict_leakiness) != 0:
-            print(well_data.dict_leakiness)
+            # print(well_data.dict_leakiness)
             leakness_list = []
             for nek in list(well_data.dict_leakiness['НЭК']['интервал'].keys()):
                 nek_bur = float(nek.split('-')[1]) +10
-                print(nek_bur)
+                # print(nek_bur)
                 leakness_list.append(nek_bur)
 
 
@@ -246,7 +246,7 @@ class Drill_window(QMainWindow):
 
         rows = self.tableWidget.rowCount()
         roof = well_data.current_bottom
-        print(drilling_interval)
+        # print(drilling_interval)
         for sole in sorted(drilling_interval):
 
             drill_combo = QComboBox(self)

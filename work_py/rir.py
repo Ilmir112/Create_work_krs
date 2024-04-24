@@ -735,7 +735,7 @@ class RirWindow(QMainWindow):
              'мастер КРС', descentNKT_norm(roof_rir_edit, 1)],
         ]
 
-        print(plast_combo)
+        # print(plast_combo)
         if plast_combo == '':
             rir_list = []
             for row in uzmPero_list:

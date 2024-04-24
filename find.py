@@ -436,7 +436,11 @@ class WellFond_data(FindIndexPZ):
                         except:
                             if well_data.paker_do["posle"] != 0:
                                 well_data.depth_fond_paker_do["posle"] = row[col_plan].value
-
+        if well_data.wellhead_fittings in [None, '']:
+            well_data.wellhead_fitting, _ = QInputDialog.getText(self, 'Ошибка',
+                                                              'ПРограмма не могла найти устьевую арматуру, '
+                                                              'Введите вид фонтанной арматуры')
+            print(f'арматура {well_data.wellhead_fitting}')
 
 
 

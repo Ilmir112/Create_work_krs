@@ -179,9 +179,6 @@ class GnktOsvWindow2(QMainWindow):
                 ws2.merge_cells(start_column=value[0], start_row=value[1],
                                 end_column=value[2], end_row=value[3])
 
-
-
-
         elif sheet_name == 'Ход работ':
             for i, row_data in enumerate(work_list):
                 # print(f'gghhg {work_list[i][2]}')
@@ -445,16 +442,16 @@ class GnktOsvWindow2(QMainWindow):
         if well_data.column_additional:
             column_data_add_diam = well_data.column_additional_diametr._value
             column_data_add_wall_thickness = well_data.column_additional_wall_thickness._value
-            column_data_add_shoe = well_data.shoe_column_additional._value
+
             column_data_add_vn_volume = round(
                 well_data.column_additional_diametr._value - 2 * well_data.column_additional_wall_thickness._value, 1)
-            column_add_head = well_data.head_column_additional
-            column_add_shoe = well_data.shoe_column_additional
+            column_add_head = well_data.head_column_additional._value
+            column_add_shoe = well_data.shoe_column_additional._value
 
         else:
             column_data_add_diam = ''
             column_data_add_wall_thickness = ''
-            column_data_add_shoe = ''
+
             column_data_add_vn_volume = ''
             column_add_head = ''
             column_add_shoe = ''
@@ -468,7 +465,7 @@ class GnktOsvWindow2(QMainWindow):
             Qoil = f'{well_data.Qoil}т/сут'
             Qwater = f'{well_data.Qwater}м3/сут'
             proc_water = f'{well_data.proc_water}%'
-        if 'грп' in well_data.wellhead_fittings.lower():
+        if 'грп' in str(well_data.wellhead_fittings).lower():
             wellhead_fittings = well_data.wellhead_fittings
         else:
             wellhead_fittings = f'АУШГН-{well_data.column_diametr._value}/ АУГРП {well_data.column_diametr._value}*14'
@@ -599,8 +596,8 @@ class GnktOsvWindow2(QMainWindow):
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Коэффициент аномальности', None,
              None, None, None, koef_anomal, None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Плотность жидкость глушения',
-             None, None, None, None, fluid_edit, None, None, None, None, None],
-            [None, None, None, None, None, None, None, None, None, None, None, None, 'Ожидаемый дебит скважины', None,
+             None, None, None, None, fluid_edit, None, 'в объеме', None, well_volume_ek, None],
+            [None, None, None, None, None, None, None, None, None, None, None, None, expected_title, None,
              None, None, None, Qoil, None, Qwater, None, proc_water, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Максимальный угол наклона', None,
              None, None, None, well_data.max_angle._value, None, 'на глубине', None, well_data.max_angle_H._value,

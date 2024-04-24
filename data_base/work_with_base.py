@@ -429,7 +429,7 @@ class Classifier_well(QMainWindow):
 
 
 def create_database_well_db(work_plan, number_dp):
-    print(row, well_data.count_row_well)
+    # print(row, well_data.count_row_well)
     conn = sqlite3.connect('data_base/data_base_well/databaseWell.db')
     cursor = conn.cursor()
 

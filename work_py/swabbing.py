@@ -994,8 +994,7 @@ class Swab_Window(QMainWindow):
         return paker_list
 
     def swabbing_with_paker(self, diametr_paker, paker_depth, paker_khost, plast_combo, swabTypeCombo, swab_volumeEdit,
-                            depthGaugeCombo, need_change_zgs_combo,
-                                             plast_new, fluid_new, pressuar_new):
+                            depthGaugeCombo, need_change_zgs_combo='нет', plast_new = '', fluid_new = '', pressuar_new = ''):
         from .opressovka import OpressovkaEK
 
         swab_short, swab_select = Swab_Window.swab_select(self, swabTypeCombo, plast_combo, swab_volumeEdit)

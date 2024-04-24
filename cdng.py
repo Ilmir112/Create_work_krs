@@ -184,7 +184,6 @@ def events_gnvp_frez(self, distance, fluid):
          None, None, None, None, None, None, None, None, 'Мастер ГНКТ'],
         [None, 'Мероприятия по предотвращению аварий (ГНВП и открытых фонтанов)', None, None, None, None, None,
          None, None, None, None, None],
-        [None, '№', 'Мероприятия', None, None, None, None, None, None, None, None, 'Ответственный'],
         [None, 1,
          'Перед началом ремонта и перед каждой сменой проводить дополнительный инструктаж по '
          'предупреждению газонефтеводопроявлений с Проведением ежесменных учебных тревог «Выброс» '
@@ -223,7 +222,6 @@ def events_gnvp_frez(self, distance, fluid):
          'Мастер ГНКТ', None],
         [None, 'Мероприятия по охране окружающей среды:', None, None, None, None, None, None, None, None, None,
          None, None],
-        [None, '№', 'Мероприятия', None, None, None, None, None, None, None, None, 'Ответственный', None],
         [None, 1,
          'При производстве работ не допускается попадания нефтесодержащей жидкости и солевого раствора на рельеф.',
          None, None, None, None, None, None, None, None, 'Мастер ГНКТ', None],

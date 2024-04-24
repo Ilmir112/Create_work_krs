@@ -250,7 +250,7 @@ class CategoryWindow(QMainWindow):
                     'отключение', self.tabWidget.currentWidget().labels_category[index][8].currentText())
                 # CategoryWindow.dict_category.setdefault(plast, {}).setdefault(
                 #     'поглотитель', self.tabWidget.currentWidget().labels_category[index][9].currentText())
-        print(f'кат {CategoryWindow.dict_category}')
+        # print(f'кат {CategoryWindow.dict_category}')
         well_data.pause = False
         self.close()
 

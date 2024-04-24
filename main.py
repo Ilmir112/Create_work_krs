@@ -205,7 +205,7 @@ class ExcelWorker(QThread):
                            f"WHERE well_number = ? and deposit_area = ?", (well_number._value, deposit_area._value))
 
         elif region == 'ИГМ':
-            print(f'ркатг')
+
             # Проверка наличия записи в базе данных
             cursor.execute(f"SELECT categoty_pressure, categoty_h2s, categoty_gf, today FROM ИГМ_классификатор "
                            f"WHERE well_number = ? and deposit_area = ?", (well_number._value, deposit_area._value))
@@ -1088,9 +1088,12 @@ class MyWindow(QMainWindow):
         template_with_skm.triggered.connect(self.template_with_skm)
 
         template_pero = QAction("проходимость по перу", self)
-
         template_menu.addAction(template_pero)
         template_pero.triggered.connect(self.template_pero)
+
+        paker_aspo = QAction("очистка колонны от АСПО с пакером и заглушкой", self)
+        template_menu.addAction(paker_aspo)
+        paker_aspo.triggered.connect(self.paker_clear_aspo)
 
         ryber_action = QAction("Райбирование", self)
         action_menu.addAction(ryber_action)
@@ -1481,7 +1484,7 @@ class MyWindow(QMainWindow):
             selected_rows.sort(reverse=True)
             # print(selected_rows)
             for row in selected_rows:
-                print(row - well_data.count_row_well, well_data.data_list)
+
                 self.table_widget.removeRow(row)
                 well_data.data_list.pop(row - well_data.count_row_well)
 
@@ -1607,6 +1610,19 @@ class MyWindow(QMainWindow):
         else:
             self.work_window.close()  # Close window.
             self.work_window = None
+    def paker_clear_aspo(self):
+        from work_py.opressovka_aspo import PakerAspo
+
+        if self.work_window is None:
+            self.work_window = PakerAspo(well_data.ins_ind, self.table_widget)
+            # self.work_window.setGeometry(200, 400, 500, 500)
+            self.work_window.show()
+            self.pause_app()
+            well_data.pause = True
+            self.work_window = None
+        else:
+            self.work_window.close()  # Close window.
+            self.work_window = None
 
     def template_without_skm(self):
         from work_py.template_without_skm import Template_without_skm
@@ -1629,7 +1645,7 @@ class MyWindow(QMainWindow):
         if work_plan == 'gnkt_frez':
             index_setSpan = 1
         row_max = table_widget.rowCount()
-        print(f'ДОП {work_plan}')
+        # print(f'ДОП {work_plan}')
 
         for i, row_data in enumerate(work_list):
 
@@ -1669,7 +1685,7 @@ class MyWindow(QMainWindow):
     def insert_data_in_database(self, row_number, row_max):
 
         dict_perforation_json = json.dumps(well_data.dict_perforation, default=str, ensure_ascii=False, indent=4)
-        print(well_data.dict_leakiness)
+        # print(well_data.dict_leakiness)
         leakage_json = json.dumps(well_data.dict_leakiness, default=str, ensure_ascii=False, indent=4)
         plast_all_json = json.dumps(well_data.plast_all)
         plast_work_json = json.dumps(well_data.plast_work)
@@ -2178,20 +2194,22 @@ class MyWindow(QMainWindow):
                     well_data.skm_interval.append(skm)
                     well_data.skm_interval = sorted(well_data.skm_interval, key=lambda x: x[0])
                     raid_str = raid(remove_overlapping_intervals(perforating_intervals, well_data.skm_interval))
-                    # print(f'скреперование {well_data.skm_interval}')
+                    print(f'скреперование {well_data.skm_interval}')
                     for row in range(self.table_widget.rowCount()):
                         for column in range(self.table_widget.columnCount()):
-                            value = self.table_widget.item(row, column)
-                            if value != None:
-                                value = value.text()
-                                if 'Произвести скреперование' in value:
-                                    ind_value = value.split(' ')
-                                    ind_min = ind_value.index('интервале') + 1
-                                    ind_max = ind_value.index('обратной')
-                                    new_value = QtWidgets.QTableWidgetItem(f'{" ".join(ind_value[:ind_min])} '
-                                                                           f'{raid_str}м {" ".join(ind_value[ind_max:])}')
+                            if column != 0:
+                                value = self.table_widget.item(row, column)
+                                if value != None:
+                                    value = value.text()
+                                    if 'Произвести скреперование э/к' in value:
+                                        print(value)
+                                        ind_value = value.split(' ')
+                                        ind_min = ind_value.index('интервале') + 1
+                                        ind_max = ind_value.index('обратной')
+                                        new_value = QtWidgets.QTableWidgetItem(f'{" ".join(ind_value[:ind_min])} '
+                                                                               f'{raid_str}м {" ".join(ind_value[ind_max:])}')
 
-                                    self.table_widget.setItem(row, column, new_value)
+                                        self.table_widget.setItem(row, column, new_value)
                     return True
                 else:
                     return False
