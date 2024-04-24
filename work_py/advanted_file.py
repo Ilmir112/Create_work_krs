@@ -14,20 +14,20 @@ def skm_interval(self, template):
 
     if well_data.leakiness:
         for nek in list(well_data.dict_leakiness['НЭК']['интервал'].keys()):
-            if int(float(nek[1])) + 20 < well_data.current_bottom:
-                str_raid.append([int(float(nek[0])) - 90, int(float(nek[1])) + 20])
+            if int(float(nek.split('-')[1])) + 20 < well_data.current_bottom:
+                str_raid.append([int(float(nek.split('-')[0])) - 90, int(float(nek.split('-')[1])) + 20])
             else:
-                str_raid.append([int(float(nek[0])) - 90,
+                str_raid.append([int(float(nek.split('-')[0])) - 90,
                                  well_data.current_bottom - 2])
     if all([well_data.dict_perforation[plast]['отрайбировано'] is False for plast in well_data.plast_work]):
         str_raid.append([well_data.perforation_roof - 90, well_data.skm_depth])
         if well_data.leakiness:
             for nek in list(well_data.dict_leakiness['НЭК']['интервал'].keys()):
                 # print(f' наруш {nek}')
-                if float(nek[1]) + 20 < well_data.current_bottom:
-                    str_raid.append([int(float(nek[0])) - 90, int(float(nek[1])) + 20])
+                if float(nek.split('-')[1]) + 20 < well_data.current_bottom:
+                    str_raid.append([int(float(nek.split('-')[0])) - 90, int(float(nek.split('-')[1])) + 20])
                 else:
-                    str_raid.append([int(float(nek[0])) - 90,
+                    str_raid.append([int(float(nek.split('-')[0])) - 90,
                                      well_data.current_bottom - 2])
 
     elif all(
@@ -125,10 +125,10 @@ def remove_overlapping_intervals(perforating_intervals, skm_interval = None):
 
         if well_data.leakiness:
             for nek in list(well_data.dict_leakiness['НЭК']['интервал'].keys()):
-                if int(float(nek[1])) + 20 < well_data.skm_depth:
-                    skipping_intervals.append([int(float(nek[0])) - 90, int(float(nek[1])) + 20])
+                if int(float(nek.split('-')[1])) + 20 < well_data.skm_depth:
+                    skipping_intervals.append([int(float(nek.split('-')[0])) - 90, int(float(nek.split('-')[1])) + 20])
                 else:
-                    skipping_intervals.append([int(float(nek[0])) - 90,
+                    skipping_intervals.append([int(float(nek.split('-')[0])) - 90,
                                      well_data.skm_depth])
         # print(f'глубина СКМ {well_data.skm_depth, skipping_intervals}')
         # print(perforating_intervals)
@@ -229,10 +229,10 @@ def raiding_interval(ryber_key):
         for nek in list(well_data.dict_leakiness['НЭК']['интервал'].keys()):
             if well_data.dict_leakiness['НЭК']['интервал'][nek]['отрайбировано'] is False:
 
-                if float(nek[1]) + 30 <= well_data.current_bottom and float(nek[0]) + 30 <= well_data.current_bottom:
-                    crt = (float(nek[0]) - 30, float(nek[1]) + 30)
+                if float(nek.split('-')[1]) + 30 <= well_data.current_bottom and float(nek.split('-')[0]) + 30 <= well_data.current_bottom:
+                    crt = (float(nek.split('-')[0]) - 30, float(nek.split('-')[1]) + 30)
                 else:
-                    crt = (float(nek[0]) - 30, well_data.current_bottom)
+                    crt = (float(nek.split('-')[0]) - 30, well_data.current_bottom)
                 str_raid.append(crt)
 
 
@@ -258,7 +258,7 @@ def change_True_raid(self, str_raid):
         for nek in list(well_data.dict_leakiness['НЭК']['интервал'].keys()):
             for str in str_raid:
                 # print(str[0], list(nek)[0], str[1])
-                if str[0] <= list(nek)[0] <= str[1]:
+                if str[0] <= float(nek.split('-')[0]) <= str[1]:
                     well_data.dict_leakiness['НЭК']['интервал'][nek]['отрайбировано'] = True
     if well_data.plast_all:
         for plast in well_data.plast_all:
@@ -304,9 +304,8 @@ def definition_plast_work(self):
 
     for plast, value in well_data.dict_perforation.items():
         for interval in value['интервал']:
-            # print(f' интервалы ПВР {plast, interval[0], dict_perforation[plast]["отключение"]}')
-            # print(perforation_roof >= interval[0])
-            if well_data.current_bottom >= interval[0] and well_data.dict_perforation[plast]["отключение"] is False:
+
+            if well_data.dict_perforation[plast]["отключение"] is False:
                 plast_work.add(plast)
 
             if well_data.dict_perforation[plast]["отключение"] is False:
@@ -318,9 +317,7 @@ def definition_plast_work(self):
                     perforation_roof = roof
                 if perforation_sole < sole and well_data.current_bottom > sole:
                     perforation_sole = sole
-
             else:
-
                 well_data.dict_perforation[plast]["кровля"] = \
                     min(list(map(lambda x: x[0], list(well_data.dict_perforation[plast]['интервал']))))
                 well_data.dict_perforation[plast]["подошва"] = \

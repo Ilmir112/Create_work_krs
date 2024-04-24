@@ -116,9 +116,10 @@ class LeakageWindow(QMainWindow):
     def get_leakiness(self, leakiness_column):
 
         leakiness_column.replace('м', '').strip()
-
+        # print(leakiness_column)
+        rows = self.tableWidget.rowCount()
         for leakiness in leakiness_column.replace('м', '').replace(' ', '').split(','):
-            rows = self.tableWidget.rowCount()
+
             self.tableWidget.insertRow(rows)
             roof_leakage = str(min(map(float, leakiness.split('-'))))
             sole_leakage = str(max(map(float, leakiness.split('-'))))
@@ -128,7 +129,7 @@ class LeakageWindow(QMainWindow):
             self.tableWidget.setItem(rows, 0, QTableWidgetItem(roof_leakage))
             self.tableWidget.setItem(rows, 1, QTableWidgetItem(sole_leakage))
             self.tableWidget.setCellWidget(rows, 2, insulation_combo)
-            self.tableWidget.setSortingEnabled(True)
+            self.tableWidget.setSortingEnabled(False)
 
 
     def add_work(self):
@@ -139,22 +140,20 @@ class LeakageWindow(QMainWindow):
             roof_leakage = self.tableWidget.item(row, 0)
             sole_leakage = self.tableWidget.item(row, 1)
             insulation_leakage = self.tableWidget.cellWidget(row, 2)
-
-
             if roof_leakage and sole_leakage:
                 roof = round(float(roof_leakage.text()), 1)
                 sole = round(float(sole_leakage.text()), 1)
                 insulation = insulation_leakage.currentText()
 
                 dict_leakiness.setdefault(
-                    'НЭК', {}).setdefault('интервал', {}).setdefault((roof, sole), {}).setdefault('отключение', False)
+                    'НЭК', {}).setdefault('интервал', {}).setdefault((f"{roof}-{sole}"), {}).setdefault('отключение', False)
                 if insulation == 'изолирован':
-                   dict_leakiness['НЭК']['интервал'][(roof, sole)]['отключение'] = True
+                   dict_leakiness['НЭК']['интервал'][f"{roof}-{sole}"]['отключение'] = True
                 dict_leakiness.setdefault(
-                    'НЭК', {}).setdefault('интервал', {}).setdefault((roof, sole), {}).setdefault(
+                    'НЭК', {}).setdefault('интервал', {}).setdefault((f"{roof}-{sole}"), {}).setdefault(
                     'Прошаблонировано', False)
                 dict_leakiness.setdefault(
-                    'НЭК', {}).setdefault('интервал', {}).setdefault((roof, sole), {}).setdefault(
+                    'НЭК', {}).setdefault('интервал', {}).setdefault((f"{roof}-{sole}"), {}).setdefault(
                     'отрайбировано', False)
 
         well_data.pause = False

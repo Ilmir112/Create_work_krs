@@ -63,7 +63,7 @@ class CreatePZ(QMainWindow):
             for row_ind, row in enumerate(ws.iter_rows(values_only=True)):
                 ws.row_dimensions[row_ind].hidden = False
 
-                if any(['ПЛАН РАБОТ' in row]) \
+                if any(['ПЛАН РАБОТ' in str(col).upper() for col in row]) \
                         and work_plan == 'dop_plan':
                     ws.cell(row=row_ind + 1, column=2).value = f'ДОПОЛНИТЕЛЬНЫЙ ПЛАН РАБОТ № {well_data.number_dp}'
                     print(f'номер доп плана {well_data.number_dp}')

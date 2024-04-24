@@ -233,16 +233,22 @@ class Drill_window(QMainWindow):
         drilling_interval = list(set([well_data.dict_perforation[plast]["подошва"] for plast in well_data.plast_all]))
         drilling_interval.append(int(current_depth))
         if len(well_data.dict_leakiness) != 0:
+            print(well_data.dict_leakiness)
+            leakness_list = []
+            for nek in list(well_data.dict_leakiness['НЭК']['интервал'].keys()):
+                nek_bur = float(nek.split('-')[1]) +10
+                print(nek_bur)
+                leakness_list.append(nek_bur)
 
-            leakness_list = [
-                well_data.dict_leakiness['нэк']['интервал'][
-                    nek][1] for nek in list(well_data.dict_leakiness['нэк']['интервал'].keys())]
-            drilling_interval.extend([leakness_list])
+
+            drilling_interval.extend(leakness_list)
         # drilling_interval = list(filter(key = lambda x: x[0] > well_data.current_bottom, drilling_interval))
 
         rows = self.tableWidget.rowCount()
         roof = well_data.current_bottom
+        print(drilling_interval)
         for sole in sorted(drilling_interval):
+
             drill_combo = QComboBox(self)
             bottomType_list = ['ЦМ', 'РПК', 'РПП', 'ВП']
             drill_combo.addItems(bottomType_list)
@@ -552,7 +558,7 @@ class Drill_window(QMainWindow):
             for nek in well_data.dict_leakiness['НЭК']['интервал']:
                 # print(well_data.dict_leakiness)
                 if well_data.dict_leakiness['НЭК']['интервал'][nek]['отключение'] is False:
-                    if depth > nek[0]:
+                    if depth > float(nek.split('-')[0]):
                         check_True = False
         return check_True
 

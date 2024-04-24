@@ -47,8 +47,6 @@ class TabPage_SO(QWidget):
         n = 1
         work_plast_iter = None
         well_data.number_indez = []
-        # print(f'строки {list(set(well_data.cat_P_P))}')
-        # print(f'{self.h2s_pr}')
 
         for num in range(len(list(set(well_data.cat_P_P)))):
             plast_index = QComboBox(self)
@@ -59,7 +57,7 @@ class TabPage_SO(QWidget):
                 work_plast_index = 1
             try:
                 if work_plast == work_plast_iter and well_data.work_plan not in \
-                        ['application_pvr',  'application_gis', 'gnkt_after_grp', 'gnkt_frez']:
+                        ['application_pvr',  'application_gis', 'gnkt_after_grp', 'gnkt_frez', 'gntk_opz']:
                     if len(well_data.dict_perforation_project) != 0 and \
                             any([plast not in well_data.plast_work for plast in well_data.plast_project]):
 

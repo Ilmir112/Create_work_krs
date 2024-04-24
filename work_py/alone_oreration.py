@@ -477,65 +477,6 @@ def volume_jamming_well(self, current_bottom):  # объем глушения с
     # print(f' объем {volume_nkt_metal(well_data.dict_nkt)} , {volume_rod(self, well_data.dict_sucker_rod)}')
     return volume_jamming_well
 
-
-def get_leakiness(self):
-    leakiness_column, ok = QInputDialog.getText(self, 'Нарушение колонны',
-                                                'Введите нарушение колонны через тире')
-    try:
-        leakiness_column_min = min(map(float, leakiness_column.split('-')))
-        leakiness_column_max = max(map(float, leakiness_column.split('-')))
-
-        leakiness_column_len = len(leakiness_column.split('-'))
-        leakiness_column = leakiness_column_min, leakiness_column_max
-
-    except:
-        leakiness_column_len = 0
-    # print(leakiness_column_len)
-    while leakiness_column_len != 2:
-        mes = QMessageBox.warning(None, 'Некорректные данные', "Введены не корректные данные")
-        leakiness_column, ok = QInputDialog.getText(self, 'Нарушение колонны',
-                                                    'Введите нарушение колонны через тире')
-        try:
-            leakiness_column_min = min(map(float, leakiness_column.split('-')))
-            leakiness_column_max = max(map(float, leakiness_column.split('-')))
-            # print(leakiness_column_min, leakiness_column_max)
-            leakiness_column_len = len(leakiness_column.split('-'))
-            leakiness_column = leakiness_column_min, leakiness_column_max
-        except:
-            leakiness_column_len = 0
-
-    well_data.leakiness_interval.append(leakiness_column)
-    # print(f'Наруше {well_data.leakiness_interval}')
-
-    leakiness_rir = QMessageBox.question(self, 'изолированы ли',
-                                         'изолировано ли нарушение')
-    leakiness_True = {}
-    well_data.dict_leakiness.setdefault('НЭК', {}).setdefault('интервал', {}).setdefault(leakiness_column,
-                                                                                         {}).setdefault('отрайбировано',
-                                                                                                        False)
-    well_data.dict_leakiness.setdefault('НЭК', {}).setdefault('интервал', {}).setdefault(leakiness_column,
-                                                                                         {}).setdefault(
-        'Прошаблонировано', False)
-    if leakiness_rir == QMessageBox.StandardButton.Yes:
-        well_data.dict_leakiness.setdefault('НЭК', {}).setdefault('интервал', {}).setdefault(leakiness_column,
-                                                                                             {}).setdefault(
-            'отключение',
-            True)
-    else:
-        well_data.dict_leakiness.setdefault('НЭК', {}).setdefault('интервал', {}).setdefault(leakiness_column,
-                                                                                             {}).setdefault(
-            'отключение',
-            False)
-
-    leakiness_quest = QMessageBox.question(self, 'Нарушение колонны',
-                                           'Есть ли еще нарушения?')
-    if leakiness_quest == QMessageBox.StandardButton.Yes:
-        get_leakiness(self)
-    else:
-        # print(well_data.dict_leakiness)
-        pass
-
-
 def well_jamming(self, without_damping, lift_key, volume_well_jaming):
     # print(f' выбранный {lift_key}')
 

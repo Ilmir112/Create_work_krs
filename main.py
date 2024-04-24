@@ -852,7 +852,7 @@ class MyWindow(QMainWindow):
             # print(f'10 - {ws2.max_row}')
             # print(wb2.path)
             # print(f' кате {well_data.cat_P_1}')
-            if well_data.bvo:
+            if well_data.bvo and self.work_plan != 'dop_plan':
                 ws5 = wb2.create_sheet('Sheet1')
                 ws5.title = "Схемы ПВО"
                 ws5 = wb2["Схемы ПВО"]
@@ -1634,11 +1634,8 @@ class MyWindow(QMainWindow):
         for i, row_data in enumerate(work_list):
 
             row = ins_ind + i
-            try:
-                if work_plan not in ['application_pvr', 'gnkt_frez', 'dop_plan', 'gnkt_opz', 'application_gis']:
-                    MyWindow.insert_data_in_database(self, row, row_max + i)
-            except:
-                pass
+            if work_plan not in ['application_pvr', 'gnkt_frez', 'gnkt_opz', 'gnkt_after_grp', 'application_gis']:
+                MyWindow.insert_data_in_database(self, row, row_max + i)
 
             table_widget.insertRow(row)
 
@@ -1672,6 +1669,7 @@ class MyWindow(QMainWindow):
     def insert_data_in_database(self, row_number, row_max):
 
         dict_perforation_json = json.dumps(well_data.dict_perforation, default=str, ensure_ascii=False, indent=4)
+        print(well_data.dict_leakiness)
         leakage_json = json.dumps(well_data.dict_leakiness, default=str, ensure_ascii=False, indent=4)
         plast_all_json = json.dumps(well_data.plast_all)
         plast_work_json = json.dumps(well_data.plast_work)
@@ -1778,7 +1776,7 @@ class MyWindow(QMainWindow):
             self.pause_app()
             well_data.pause = True
             self.perforation_correct_window2 = None
-            definition_plast_work(self)
+
         else:
             self.perforation_correct_window2.close()
             self.perforation_correct_window2 = None
@@ -2045,7 +2043,7 @@ class MyWindow(QMainWindow):
         if len(well_data.leakiness_interval) != 0:
 
             for nek in well_data.leakiness_interval:
-                nek_str += f'{nek[0]}-{nek[1]} \n'
+                nek_str += f'{nek.split("-")[0]}-{nek.split("-")[1]} \n'
 
         ws4.cell(row=3, column=7).value = nek_str
 

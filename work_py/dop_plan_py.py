@@ -111,7 +111,8 @@ class DopPlanWindow(QMainWindow):
             result_table = cursor1.fetchall()
         else:
             work_plan = f'dop_plan'
-            table_name = json.dumps(well_data.well_number._value + well_data.well_area._value + work_plan + str(number_dp))
+            table_name = json.dumps(well_data.well_number._value + well_data.well_area._value +
+                                    work_plan + str(number_dp), ensure_ascii=False)
             for i in range(1, number_dp + 1, -1):
                 try:
                     work_plan = f'dop_plan{i}'
@@ -160,8 +161,6 @@ class DopPlanWindow(QMainWindow):
             well_data.problemWithEk_depth = result[well_data.paragraph_row][14]
             well_data.problemWithEk_diametr = result[well_data.paragraph_row][15]
             well_data.dict_perforation_short = json.loads(result[well_data.paragraph_row][3])
-
-
 
         else:
             mes = QMessageBox.warning(self, 'Проверка наличия таблицы в базе данных',

@@ -78,7 +78,7 @@ class TabPage_SO(QWidget):
                 pakerDepthZumpf = int(well_data.perforation_sole + 10)
             else:
                 if well_data.leakiness:
-                    pakerDepthZumpf = int(max([well_data.dict_perforation['НЭК']['интервал'][nek][0]+10
+                    pakerDepthZumpf = int(max([float(nek.split('-')[0])+10
                                            for nek in well_data.dict_perforation['НЭК']['интервал'].keys()]))
             self.pakerDepthZumpf_edit.setText(f'{pakerDepthZumpf}')
 
@@ -534,7 +534,7 @@ class OpressovkaEK(QMainWindow):
 
         if well_data.leakiness is True:
             for nek in well_data.dict_leakiness['НЭК']['интервал']:
-                if well_data.dict_leakiness['НЭК']['интервал'][nek]['отключение'] is False and nek[0] < depth:
+                if well_data.dict_leakiness['НЭК']['интервал'][nek]['отключение'] is False and float(nek.split('-')[0]) < depth:
                     interval_list.append(nek)
                     check_true = False
         if any([float(interval[1]) < float(depth) for interval in interval_list]):

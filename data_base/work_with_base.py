@@ -429,10 +429,9 @@ class Classifier_well(QMainWindow):
 
 
 def create_database_well_db(work_plan, number_dp):
-    # print(row, well_data.count_row_well)
+    print(row, well_data.count_row_well)
     conn = sqlite3.connect('data_base/data_base_well/databaseWell.db')
     cursor = conn.cursor()
-
 
     # Создаем таблицу для хранения данных
     number = json.dumps(well_data.well_number._value + well_data.well_area._value + work_plan + str(number_dp),
@@ -461,7 +460,6 @@ def create_database_well_db(work_plan, number_dp):
 
 
     for index, data in enumerate(well_data.data_list):
-
         current_bottom = data[1]
         dict_perforation_json = data[2]
         plast_all = data[3]

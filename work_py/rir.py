@@ -30,10 +30,7 @@ class TabPage_SO_rir(QWidget):
 
         if well_data.leakiness:
             for nek in list(well_data.dict_leakiness['НЭК']['интервал'].keys()):
-                # print(list(nek))
-                nek1 = "-".join(map(str, list(map(int, list(nek)))))
-                # print(nek1)
-                plast_work.append(f'НЭК {nek1}')
+                plast_work.append(f'НЭК {nek}')
 
         self.plast_label = QLabel("Выбор пласта", self)
         self.plast_combo = CheckableComboBox(self)
@@ -72,7 +69,7 @@ class TabPage_SO_rir(QWidget):
             pakerDepth = well_data.perforation_sole - 20
         else:
             if well_data.leakiness:
-                pakerDepth = min([well_data.dict_perforation['НЭК']['интервал'][nek][0] - 10
+                pakerDepth = min([float(nek.split('-')[0]) - 10
                                   for nek in well_data.dict_perforation['НЭК']['интервал'].keys()])
 
         self.paker_depth_edit.setText(str(int(pakerDepth)))
@@ -198,8 +195,8 @@ class TabPage_SO_rir(QWidget):
                 pakerDepthZumpf = well_data.perforation_sole + 10
             else:
                 if well_data.leakiness:
-                    pakerDepthZumpf = max([well_data.dict_perforation['НЭК']['интервал'][nek][0]+10
-                                           for nek in well_data.dict_perforation['НЭК']['интервал'].keys()])
+                    pakerDepthZumpf = max([float(nek.split('-')[0])+10
+                                           for nek in well_data.dict_leakiness['НЭК']['интервал'].keys()])
             self.pakerDepthZumpf_edit.setText(f'{pakerDepthZumpf}')
 
             self.grid.addWidget(self.pakerDepthZumpf_Label, 1, 5)
@@ -314,17 +311,19 @@ class TabPage_SO_rir(QWidget):
             if well_data.leakiness:
                 for nek in list(well_data.dict_leakiness['НЭК']['интервал'].keys()):
 
-                    if str(int(nek[0])) in plast_sel:
-                        if roof_plast >= nek[0]:
+                    if nek in plast_sel:
+                        if roof_plast >= float(nek.split('-')[0]):
 
-                            roof_plast = nek[0]
+                            roof_plast = float(nek.split('-')[0])
                             # print(f' кровля {roof_plast}')
-                        if sole_plast <= nek[1]:
-                            sole_plast = nek[1]
+                        if sole_plast <= float(nek.split('-')[1]):
+                            sole_plast = float(nek.split('-')[1])
                         # print(nek, roof_plast, sole_plast)
         self.roof_rir_edit.setText(f"{int(roof_plast - 30)}")
         self.paker_depth_edit.setText(f"{int(roof_plast - 20)}")
-        self.sole_rir_edit.setText(f"{well_data.current_bottom}")
+        self.sole_rir_edit.setText(f"{sole_plast + 20}")
+        if self.pressureZUMPF_question_QCombo.currentText() == 'Да':
+            self.pakerDepthZumpf_edit.setText(f'{sole_plast + 20}')
 
 class TabWidget(QTabWidget):
     def __init__(self):
@@ -548,8 +547,8 @@ class RirWindow(QMainWindow):
 
         if len(well_data.dict_leakiness) != 0:
             for nek in list(well_data.dict_leakiness['НЭК']['интервал'].keys()):
-                # print(roofRir, float(nek[0]), solePir)
-                if roofRir <= float(nek[0]) <= solePir:
+                # print(roofRir, float(nek.split('-')[0]), solePir)
+                if roofRir <= float(nek.split('-')[0]) <= solePir:
                     well_data.dict_leakiness['НЭК']['интервал'][nek]['отключение'] = True
             # print(f"при {well_data.dict_leakiness['НЭК']['интервал'][nek]['отключение']}")
         if well_data.column_additional:
@@ -592,16 +591,7 @@ class RirWindow(QMainWindow):
                     fluid_new_edit = '', pressuar_new_edit = '', pressureZUMPF_question = 'Не нужно',
                                          diametr_paker = 122, paker_khost= 0, paker_depth= 0):
 
-        if (plast_new_combo == '' or fluid_new_edit == '' or pressuar_new_edit == '') and \
-                need_change_zgs_combo == 'Да':
-            mes = QMessageBox.critical(self, 'Ошибка', 'Введены не все параметры')
-            return
-        if MyWindow.check_true_depth_template(self, paker_depth) is False:
-            return
-        if MyWindow.true_set_Paker(self, paker_depth) is False:
-            return
-        if MyWindow.check_depth_in_skm_interval(self, paker_depth) is False:
-            return
+
 
 
         nkt_diam = ''.join(['73' if well_data.column_diametr._value > 110 else '60'])
@@ -745,8 +735,8 @@ class RirWindow(QMainWindow):
              'мастер КРС', descentNKT_norm(roof_rir_edit, 1)],
         ]
 
-
-        if len(well_data.plast_work) == 0 or (roof_rir_edit < well_data.perforation_roof < sole_rir_edit) is False:
+        print(plast_combo)
+        if plast_combo == '':
             rir_list = []
             for row in uzmPero_list:
                 rir_list.append(row)
@@ -983,7 +973,16 @@ class RirWindow(QMainWindow):
             paker_depth = 1000
 
         if rir_type_Combo == 'РИР на пере': # ['РИР на пере', 'РИР с пакером', 'РИР с РПК', 'РИР с РПП']
-
+            if (plast_new_combo == '' or fluid_new_edit == '' or pressuar_new_edit == '') and \
+                    need_change_zgs_combo == 'Да':
+                mes = QMessageBox.critical(self, 'Ошибка', 'Введены не все параметры')
+                return
+            if MyWindow.check_true_depth_template(self, paker_depth) is False:
+                return
+            if MyWindow.true_set_Paker(self, paker_depth) is False:
+                return
+            if MyWindow.check_depth_in_skm_interval(self, paker_depth) is False:
+                return
             work_list = self.rirWithPero(paker_need_Combo, plast_combo,
                                          roof_rir_edit, sole_rir_edit, need_change_zgs_combo, plast_new_combo,
                     fluid_new_edit, pressuar_new_edit, pressureZUMPF_question,

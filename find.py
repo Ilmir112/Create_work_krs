@@ -117,8 +117,13 @@ class FindIndexPZ(QMainWindow):
                                     0, 0, 800)[0])
         if well_data.sucker_rod_none:
             if well_data.sucker_rod_ind._value == 0:
-                well_data.sucker_rod_ind = ProtectedIsDigit(
-                    QInputDialog.getInt(self, 'индекс начала строки со штангами',
+                sucker_mes = QMessageBox.question(self, 'ШТАНГИ', 'Программа определелила, что в скважине '
+                                                                  'отсутствуют штанги, корректно ли это?')
+                if sucker_mes == QMessageBox.StandardButton.Yes:
+                    well_data.sucker_rod_ind = ProtectedIsDigit(0)
+                else:
+                    well_data.sucker_rod_ind = ProtectedIsDigit(
+                        QInputDialog.getInt(self, 'индекс начала строки со штангами',
                                         'Программа не смогла найти строку со штангами',
                                         0, 0, 800)[0])
 
@@ -489,7 +494,6 @@ class WellHistory_data(FindIndexPZ):
                         well_data.max_admissible_pressure = FindIndexPZ.definition_is_None(self,
                             well_data.max_admissible_pressure, row_index + begin_index, col + 1, 1)
 
-
 class WellCondition(FindIndexPZ):
     leakage_window = None
 
@@ -582,8 +586,6 @@ class WellCondition(FindIndexPZ):
 
             else:
                 well_data.leakiness = False
-
-
 class Well_expected_pick_up(FindIndexPZ):
 
     def __init__(self, ws):
@@ -633,8 +635,6 @@ class Well_expected_pick_up(FindIndexPZ):
                 well_data.expected_pick_up[well_data.expected_Q] = well_data.expected_P
             except:
                 print('Ошибка в определении ожидаемых показателей')
-
-
 class Well_data(FindIndexPZ):
 
     def __init__(self, ws):
@@ -910,8 +910,6 @@ class Well_data(FindIndexPZ):
                                                  '878', '124', '549', '168']:
             QMessageBox.warning(self, 'Канатные технологии', f'Скважина согласована на канатные технологии')
             well_data.konte_true = True
-
-
 class Well_perforation(FindIndexPZ):
     def __init__(self, ws):
 
@@ -1118,9 +1116,6 @@ class Well_perforation(FindIndexPZ):
 
         if len(well_data.dict_perforation_project) != 0:
             well_data.plast_project = list(well_data.dict_perforation_project.keys())
-
-
-
 
 class Well_Category(FindIndexPZ):
 

@@ -1097,7 +1097,7 @@ class TemplateKrs(QMainWindow):
             for row in gips[::-1]:
                 list_template_ek.insert(0, row)
         # print(f'счет использования шаблн {well_data.count_template}')
-        if well_data.count_template == 0:
+        if well_data.count_template == 0 and well_data.work_plan != 'dop_plan':
             list_template_ek = list_template_ek + notes_list
             well_data.count_template += 1
         else:

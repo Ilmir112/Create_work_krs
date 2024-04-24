@@ -198,9 +198,6 @@ class PerforationCorrect(QMainWindow):
                 else:
                     well_data.dict_perforation[plast]['отрайбировано'] = False
 
-
-        # self.labels_plast[index] = (plast_edit, roof_edit, sole_edit, plast_status_ComboBox,
-        #                             template_status_ComboBox, raiding_status_ComboBox)
         definition_plast_work(self)
         well_data.plast_work_short = well_data.plast_work
 
