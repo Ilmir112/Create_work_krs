@@ -44,6 +44,10 @@ class TabPageDp(QWidget):
         self.iznos_gnkt_edit = QLineEdit(self)
         self.iznos_gnkt_edit.setText(f'{self.gnkt.iznos}')
 
+        self.pipe_mileage_label = QLabel('Пробег трубы')
+        self.pipe_mileage_edit = QLineEdit(self)
+        self.pipe_mileage_edit.setText(f'{self.gnkt.pipe_mileage}')
+
         self.pvo_number_label = QLabel('Номер ПВО')
         self.pvo_number_edit = QLineEdit(self)
         self.pvo_number_edit.setText(f'{self.gnkt.pvo}')

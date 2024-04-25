@@ -357,17 +357,18 @@ def volume_vn_nkt(dict_nkt):  # Внутренний объем одного п�
     # print(dict_nkt)
     for nkt, lenght_nkt in dict_nkt.items():
         volume_vn_nkt = 0
-        if ''.join(filter(str.isdecimal, str(nkt))) == '60':
+        nkt = ''.join(c for c in str(nkt) if c.isdigit())
+        if '60' in str(nkt):
             t_nkt = 5
             volume_vn_nkt += round(3.14 * (int(nkt) - 2 * t_nkt) ** 2 / 4000000 * lenght_nkt, 5)
-        elif ''.join(filter(str.isdecimal, str(nkt))) == '73':
+        elif '73' in str(nkt):
             t_nkt = 5.5
             volume_vn_nkt += round(3.14 * (int(nkt) - 2 * t_nkt) ** 2 / 4000000 * lenght_nkt, 5)
-        elif ''.join(filter(str.isdecimal, str(nkt))) == '89':
+        elif '89' in str(nkt):
             t_nkt = 6
             volume_vn_nkt += round(3.14 * (int(nkt) - 2 * t_nkt) ** 2 / 4000000 * lenght_nkt, 5)
 
-        elif ''.join(filter(str.isdecimal, str(nkt))) == '48':
+        elif '48' in str(nkt):
             t_nkt = 4.5
             volume_vn_nkt += round(3.14 * (int(nkt) - 2 * t_nkt) ** 2 / 4000000 * lenght_nkt * 1.1, 5)
 
