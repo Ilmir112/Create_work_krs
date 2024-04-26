@@ -110,7 +110,17 @@ class PerforationWindow(QMainWindow):
 
     def addPerfProject(self):
 
-
+        if well_data.grp_plan:
+            chargePM_GP = QInputDialog.getInt(self, 'кол-во отверстий на 1 п.м.',
+                                              'кол-во отверстий на 1 п.м. зарядов ГП', 20, 5,
+                                              50)[0]
+            chargePM_BO = QInputDialog.getInt(self, 'кол-во отверстий на 1 п.м.',
+                                              'кол-во отверстий на 1 п.м. зарядов БО', 20, 5,
+                                              50)[0]
+        else:
+            chargePM = QInputDialog.getInt(self, 'кол-во отверстий на 1 п.м.',
+                                           'кол-во отверстий на 1 п.м.', 20, 5,
+                                           50)[0]
 
         self.tableWidget.setSortingEnabled(False)
         # print(f' проект {self.dict_perforation_project}')
@@ -122,13 +132,6 @@ class PerforationWindow(QMainWindow):
             for plast, data in well_data.dict_perforation_project.items():
                 for i in data['интервал']:
                     if well_data.grp_plan:
-                        chargePM_GP = QInputDialog.getInt(self, 'кол-во отверстий на 1 п.м.',
-                                                          'кол-во отверстий на 1 п.м. зарядов ГП', 20, 5,
-                                                          50)[0]
-                        chargePM_BO = QInputDialog.getInt(self, 'кол-во отверстий на 1 п.м.',
-                                                          'кол-во отверстий на 1 п.м. зарядов БО', 20, 5,
-                                                          50)[0]
-
                         count_charge = int((max(i) - min(i)) * chargePM_GP)
                         # Вставка интервалов зарядов ГП
                         self.tableWidget.insertRow(rows)
@@ -154,13 +157,6 @@ class PerforationWindow(QMainWindow):
                         self.tableWidget.setItem(rows, 6, QTableWidgetItem(' '))
 
                     else:
-
-                        chargePM = QInputDialog.getInt(self, 'кол-во отверстий на 1 п.м.',
-                                                       'кол-во отверстий на 1 п.м.', 20, 5,
-                                                       50)[0]
-                        # print(i[1], well_data.current_bottom)
-
-
                         # Вставка интервалов зарядов ГП без ГРП
                         count_charge = int((max(i) - min(i)) * chargePM)
 
