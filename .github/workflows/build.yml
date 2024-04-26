@@ -11,7 +11,7 @@ jobs:
           python-version: '3.8'
 
       - name: Install PyInstaller
-        run: pip install pyinstaller
+        run: pip install pyinstaller pywin32
 #      - name: Install requirements
 #        run: pip install -r requirements.txt
       - name: Install dependencies
@@ -20,7 +20,7 @@ jobs:
 #              run: pyinstaller --onefile --hidden-import data_base.data_base_well.database_well main.py
       - name: Build executable
         run:
-          pyinstaller --noconfirm --onedir --icon=imageFiles/icon/zima_ico.ico --console
+          pyinstaller --noconfirm --onedir --icon=imageFiles/icon/zima_ico.ico --console --name "ZIMA"
           --add-data data_base:data_base
           --add-data data_base/data_base_well:data_base/data_base_well
           --add-data work_py:work_py 
@@ -63,5 +63,5 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          name: main
-          path: dist/_internal/*
+          name: ZIMA
+          path: dist/main.py

@@ -6,6 +6,7 @@ import win32com.client
 import openpyxl
 import re
 
+import win32con
 from PyQt5.QtGui import QColor
 from openpyxl.reader.excel import load_workbook
 
@@ -30,6 +31,9 @@ from data_correct_position_people import CorrectSignaturesWindow
 from work_py.dop_plan_py import DopPlanWindow
 from work_py.drilling import Drill_window
 from users.login_users import LoginWindow
+import threading
+import time
+import win32gui
 
 
 class ExcelWorker(QThread):
@@ -260,6 +264,7 @@ class MyWindow(QMainWindow):
         self.work_plan = 0
         self.table_widget = None
         self.table_pvr = None
+        threading.Timer(2.0, self.close_splash).start()
 
         if self.login_window == None:
             self.login_window = LoginWindow()
@@ -591,6 +596,10 @@ class MyWindow(QMainWindow):
             except FileNotFoundError:
                 print('Файл не найден')
 
+    def close_splash(self):
+        splash_hwnd = win32gui.FindWindow(None, "Splash Screen")  # При необходимости измените название окна
+        if splash_hwnd:
+            win32gui.PostMessage(splash_hwnd, win32con.WM_CLOSE, 0, 0)
     def open_without_damping(self, costumer, region):
         from data_base.work_with_base import Classifier_well
 
