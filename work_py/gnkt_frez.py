@@ -107,8 +107,6 @@ class Work_with_gnkt(QMainWindow):
         for ind, _range in enumerate(ws2.merged_cells.ranges):
             boundaries_dict[ind] = range_boundaries(str(_range))
 
-        print(boundaries_dict)
-
         for key, value in boundaries_dict.items():
             ws2.unmerge_cells(start_column=value[0], start_row=value[1],
                               end_column=value[2], end_row=value[3])

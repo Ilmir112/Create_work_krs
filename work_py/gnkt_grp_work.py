@@ -107,7 +107,7 @@ class TabPageDp(QWidget):
         self.lenght_gnkt_edit.setText(f'{result_gnkt[3]}')
         self.iznos_gnkt_edit.setText(f'{result_gnkt[5]}')
         self.pipe_mileage_edit.setText(f'{result_gnkt[6]}')
-        self.pvo_number_edit.setText(f'{result_gnkt[8]}')
+        self.pvo_number_edit.setText(f'{result_gnkt[10]}')
 
 
 

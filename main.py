@@ -698,11 +698,12 @@ class MyWindow(QMainWindow):
                                                       f"{full_path}", "Excel Files (*.xlsx)")
             if fileName:
                 wb2.save(full_path)
-            # Создаем объект Excel
-            excel = win32com.client.Dispatch("Excel.Application")
+
         except:
             mes = QMessageBox.critical(self, 'Ошибка', 'файл под таким именем открыт, закройте его')
         try:
+            # Создаем объект Excel
+            excel = win32com.client.Dispatch("Excel.Application")
             # Открываем файл
             workbook = excel.Workbooks.Open(full_path)
             # Выбираем активный лист
