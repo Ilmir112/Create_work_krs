@@ -468,7 +468,7 @@ def create_data_base(contractor, gnkt_number):
     gnkt_2 = Gnkt_data(2200, 38, 20, 35025, '25', 115)
     gnkt_1 = Gnkt_data(3200, 38, 20, 42006, '25', 166)
     for ind, gnkt in enumerate([gnkt_1, gnkt_2]):
-        if ind == 1:
+        if ind == 0:
             gnkt_number = 'ГНКТ №1'
         else:
             gnkt_number = 'ГНКТ №2'
