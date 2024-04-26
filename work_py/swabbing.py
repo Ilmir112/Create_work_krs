@@ -42,13 +42,18 @@ class TabPage_SO_swab(QWidget):
         self.pakerEdit = QLineEdit(self)
         self.pakerEdit.setValidator(self.validator_int)
         self.pakerEdit.textChanged.connect(self.update_paker_depth)
-        self.pakerEdit.setText(f"{int(well_data.perforation_sole - 40)}")
-
+        if (well_data.perforation_sole - 40) < well_data.current_bottom:
+            self.pakerEdit.setText(f"{int(well_data.perforation_sole - 40)}")
+        else:
+            self.pakerEdit.setText(f"{int(well_data.current_bottom - 40)}")
 
         self.paker2Label = QLabel("глубина вверхнего пакера", self)
         self.paker2Edit = QLineEdit(self)
         self.paker2Edit.setValidator(self.validator_int)
-        self.paker2Edit.setText(f"{int(well_data.perforation_sole - 40)}")
+        if (well_data.perforation_sole - 40) < well_data.current_bottom:
+            self.paker2Edit.setText(f"{int(well_data.perforation_sole - 40)}")
+        else:
+            self.pakerEdit.setText(f"{int(well_data.current_bottom - 40)}")
 
         self.khovst_label = QLabel("Длина хвостовики", self)
         self.khvostEdit = QLineEdit(self)
@@ -471,9 +476,11 @@ class Swab_Window(QMainWindow):
                     need_change_zgs_combo == 'Да':
                 mes = QMessageBox.critical(self, 'Ошибка', 'Введены не все параметры')
                 return
+
             work_list = self.swabbing_with_voronka(paker_depth, plast_combo, swabTypeCombo,
                                                    swab_volumeEdit, depthGaugeCombo, need_change_zgs_combo,
                                              plast_new_combo, fluid_new_edit, pressuar_new_edit)
+
         elif swab_true_edit_type == 'пакер с заглушкой':
             if need_change_zgs_combo == 'Нет':
                 if len(well_data.plast_project) != 0:
@@ -515,14 +522,14 @@ class Swab_Window(QMainWindow):
             fluid_new = self.tabWidget.currentWidget().fluid_new_edit.text()
             if fluid_new != '':
                 fluid_new = round(float(fluid_new.replace(',', '')), 2)
-            pressuar_new = self.tabWidget.currentWidget().pressuar_new_edit.text()
-            if pressuar_new != '':
-                pressuar_new = int(pressuar_new)
-            if not pressuar_new or not fluid_new or not plast_new:
+            expected_pressure = self.tabWidget.currentWidget().pressuar_new_edit.text()
+            if expected_pressure != '':
+                expected_pressure = float(expected_pressure.replace(',', '.'))
+            if not expected_pressure or not fluid_new or not plast_new:
                 msg = QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
                 return
-            fluid_new, plast, expected_pressure = need_h2s(fluid_new, plast_new, pressuar_new)
-            work_list = self.swabbing_opy(paker2_depth, fluid_new, need_change_zgs_combo, plast, expected_pressure)
+
+            work_list = self.swabbing_opy(paker2_depth, fluid_new, need_change_zgs_combo, plast_new, expected_pressure)
         elif swab_true_edit_type == 'Опрессовка снижением уровня на пакере с заглушкой':
             if MyWindow.check_true_depth_template(self, paker_depth) is False:
                 return
@@ -687,8 +694,8 @@ class Swab_Window(QMainWindow):
         return paker_list
 
     def swabbing_opy(self, depth_opy, fluid_new, need_change_zgs_combo, plast_new, pressuar_new):
-       
         from .template_work import TabPage_SO_with
+
         if well_data.column_additional is False or (well_data.column_additional and
                                                    well_data.head_column_additional._value >= well_data.current_bottom):
             first_template, template_second = TabPage_SO_with.template_diam_ek(self)
@@ -1359,12 +1366,6 @@ class Swab_Window(QMainWindow):
              f'или вычислить его расчетным методом.',
              None, None, None, None, None, None, None,
              'Мастер КРС', 0.5],
-            [None, None,
-             f'Поднять {paker_select} на НКТ{nkt_diam} c глубины {paker_depth}м с доливом скважины в '
-             f'объеме {round(paker_depth * 1.12 / 1000, 1)}м3 удельным весом {well_data.fluid_work}',
-             None, None, None, None, None, None, None,
-             'мастер КРС',
-             liftingNKT_norm(paker_depth, 1)]
         ]
         ovtr = 'ОВТР 4ч' if well_data.region == 'ЧГМ' else 'ОВТР 10ч'
         ovtr4 = 4 if well_data.region == 'ЧГМ' else 10

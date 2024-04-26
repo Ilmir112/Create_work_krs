@@ -1503,6 +1503,10 @@ class MyWindow(QMainWindow):
             self.pause_app()
             well_data.pause = True
             self.work_window = None
+        else:
+            self.work_window.close()  # Close window.
+            self.work_window = None
+
 
     def swibbing_with_paker(self):
         from work_py.swabbing import Swab_Window

@@ -102,8 +102,9 @@ def need_h2s(fluid_new, plast, expected_pressure):
     if len(cat_h2s_list_plan) != 0:
         if cat_h2s_list_plan[0] in [1, 2] and len(well_data.plast_work) == 0:
             expenditure_h2s = round(max([well_data.dict_category[plast]['по сероводороду'].poglot for plast in well_data.plast_project]), 3)
-            well_data.fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
+            fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
                                   f'расчета {expenditure_h2s}кг/м3 '
+            fluid_work_short = f'{fluid_new}г/см3 ХИМТЕХНО 101 {expenditure_h2s}кг/м3 '
 
 
         elif ((cat_h2s_list_plan[0] in [1, 2]) or (сat_h2s_list[0] in [1, 2])) and len(well_data.plast_work) != 0:
@@ -119,12 +120,12 @@ def need_h2s(fluid_new, plast, expected_pressure):
                 [well_data.dict_category[well_data.plast_work[0]]['по сероводороду'].poglot])
             expenditure_h2s = round(max([expenditure_h2s, expenditure_h2s_plan]), 2)
 
-            well_data.fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
+            fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
                                   f'расчета {expenditure_h2s}кг/м3 '
-            well_data.fluid_work_short = f'{fluid_new}г/см3 ХИМТЕХНО 101 {expenditure_h2s}кг/м3 '
+            fluid_work_short = f'{fluid_new}г/см3 ХИМТЕХНО 101 {expenditure_h2s}кг/м3 '
         else:
-            well_data.fluid_work = f'{fluid_new}г/см3 '
-            well_data.fluid_work_short = f'{fluid_new}г/см3 '
+            fluid_work = f'{fluid_new}г/см3 '
+            fluid_work_short = f'{fluid_new}г/см3 '
     else:
         cat_list = ['1', '2', '3']
         cat_H2S, ok = QInputDialog.getItem(None, 'Категория скважины', 'Выберете категорию скважины',
@@ -146,13 +147,13 @@ def need_h2s(fluid_new, plast, expected_pressure):
 
             expenditure_h2s = round(
                 max([well_data.dict_category[plast]['по сероводороду'].poglot for plast in well_data.plast_project]), 2)
-            well_data.fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
+            fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
                     f'расчета {expenditure_h2s}кг/м3 '
-            well_data.fluid_work_short = f'{fluid_new}г/см3 ХИМТЕХНО 101 {expenditure_h2s}кг/м3 '
+            fluid_work_short = f'{fluid_new}г/см3 ХИМТЕХНО 101 {expenditure_h2s}кг/м3 '
         else:
-            well_data.fluid_work = f'{fluid_new}г/см3 '
+            fluid_work = f'{fluid_new}г/см3 '
 
-    return (well_data.fluid_work, well_data.fluid_work_short, plast, expected_pressure)
+    return (fluid_work, fluid_work_short, plast, expected_pressure)
 
 def konte(self):
 

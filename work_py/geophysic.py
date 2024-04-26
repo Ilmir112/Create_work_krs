@@ -187,7 +187,6 @@ class GeophysicWindow(MyWindow):
 
         for row in range(rows):
             researchGis_list = []
-
             item = self.tableWidget.item(row, 0)
             edit1 = self.tableWidget.item(row, 1)
             edit2 = self.tableWidget.item(row, 2)
@@ -200,12 +199,12 @@ class GeophysicWindow(MyWindow):
                 researchGis_list.extend([geo_sel[1], None, geo_sel[0], None, None, None, None, None, None, None,
                                          'подряд по ГИС', 4])
 
-        if len(researchGis_list) == 0:
-            mes = QMessageBox.critical(self, 'Ошибка', 'Исследования не добавлены')
-            return
+            if len(researchGis_list) == 0:
+                mes = QMessageBox.critical(self, 'Ошибка', 'Исследования не добавлены')
+                return
 
-        geophysicalResearch.append(researchGis_list)
-        # print(geophysicalResearch)
+            geophysicalResearch.append(researchGis_list)
+            # print(geophysicalResearch)
 
         ori = QMessageBox.question(self, 'ОРИ', 'Нужна ли интерпретация?')
         if ori == QMessageBox.StandardButton.Yes:
@@ -213,7 +212,6 @@ class GeophysicWindow(MyWindow):
                                         f'Интерпретация данных ГИС, согласовать с ПТО и Ведущим инженером ЦДНГ опрессовку фНКТ ',
                                         None, None, None, None, None, None, None,
                                         'Мастер КРС, подрядчик по ГИС', 8])
-
 
         text_width_dict = {20: (0, 100), 40: (101, 200), 60: (201, 300), 80: (301, 400), 100: (401, 500),
                            120: (501, 600), 140: (601, 700)}

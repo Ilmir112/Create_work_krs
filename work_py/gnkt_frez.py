@@ -15,6 +15,7 @@ from openpyxl.styles import Border, Side, PatternFill, Font, Alignment
 from openpyxl.workbook import Workbook
 from gnkt_data.gnkt_data import dict_saddles
 from work_py.alone_oreration import volume_jamming_well, well_volume, volume_nkt_metal, volume_nkt
+from work_py.gnkt_grp import GnktOsvWindow
 from work_py.gnkt_grp_work import GnktOsvWindow2
 from .data_informations import dict_data_cdng, calc_pntzh
 
@@ -106,9 +107,12 @@ class Work_with_gnkt(QMainWindow):
         for ind, _range in enumerate(ws2.merged_cells.ranges):
             boundaries_dict[ind] = range_boundaries(str(_range))
 
+        print(boundaries_dict)
+
         for key, value in boundaries_dict.items():
             ws2.unmerge_cells(start_column=value[0], start_row=value[1],
                               end_column=value[2], end_row=value[3])
+
         ins_ind = 1
 
         for i in range(1, len(work_list) + 1):  # Добавлением работ
@@ -132,6 +136,15 @@ class Work_with_gnkt(QMainWindow):
                 # print(value)
                 ws2.merge_cells(start_column=value[0], start_row=value[1],
                                 end_column=value[2], end_row=value[3])
+            if sheet_name == 'СХЕМА':
+
+                GnktOsvWindow.insert_image_schema(self, ws2)
+                ws2.print_area = f'B3:AP{70}'
+                # print(ws2, type(ws2))
+                # ws2.page_setup.fitToPage = True
+                # ws2.page_setup.fitToHeight = False
+                # ws2.page_setup.fitToWidth = True
+                # ws2.print_options.horizontalCentered = True
 
         elif sheet_name == 'Ход работ':
             for i, row_data in enumerate(work_list):

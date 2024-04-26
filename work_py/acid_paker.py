@@ -909,7 +909,7 @@ class AcidPakerWindow(QMainWindow):
                                 f'+ пакер {paker_type}-{paker_diametr}мм (либо аналог) ' \
                                 f'для ЭК {well_data.column_diametr._value}мм х ' \
                                 f'{well_data.column_wall_thickness._value}мм + ' \
-                                f' {mtg_str}  щелевой фильтр НКТ{nkt_diam} {difference_paker}м ' \
+                                f' {mtg_str}  щелевой фильтр НКТ{nkt_diam} L-{difference_paker}м ' \
                                 f'+ пакер ПУ - {paker_diametr} + {mtg_str} НКТ{nkt_diam}мм 20м + ' \
                                 f'реперный патрубок'
             self.paker_short = f'заглушку + сбивной с ввертышем + НКТ{nkt_diam}м {paker_khost}м  + ' \
@@ -1008,10 +1008,14 @@ class AcidPakerWindow(QMainWindow):
             nkt_pod = '60мм'
             template_nkt_diam = '59.6мм, 47.9мм'
 
-        elif well_data.column_additional is False and well_data.column_diametr < 110:
+        elif well_data.column_additional is False and well_data.column_diametr._value < 110:
             nkt_diam = 60
             nkt_pod = '60мм'
             template_nkt_diam = '47.9мм'
+        else:
+            nkt_diam = 73
+            nkt_pod = '73мм'
+            template_nkt_diam = '59.6мм'
                 
         return nkt_diam, nkt_pod, template_nkt_diam
 

@@ -1,4 +1,5 @@
 import sqlite3
+from datetime import datetime
 from collections import namedtuple
 
 Saddles = namedtuple('Saddles', ['saddle', 'ball'])
@@ -11,7 +12,7 @@ gnkt_2 = Gnkt_data(2200, 38, 20, 35025, 25, 115)
 gnkt_1 = Gnkt_data(3200, 38, 20, 42006, 25, 166)
 gnkt_dict = {}
 
-gnkt_dict["Ойл-сервис"] = ['ГНКТ №1', 'ГНКТ №2']
+gnkt_dict["Ойл-сервис"] = ['', 'ГНКТ №1', 'ГНКТ №2']
 
 dict_saddles = {
     'НТЦ ЗЭРС': {
@@ -70,25 +71,51 @@ dict_saddles = {
          }
 }
 
-def create_data_base(contractor, gnkt_number):
+def read_database_gnkt(contractor, gnkt_number):
     # Подключение к базе данных SQLite
-    conn = sqlite3.connect('D:\python\Create_work_krs\data_base\data_base_gnkt\gnkt_oilservice.dp')
+    conn = sqlite3.connect('data_base\data_base_gnkt\gnkt_base.dp')
     cursor = conn.cursor()
+
     if 'ойл-сервис' in contractor.lower():
         contractor = 'oil_service'
 
-    print(contractor)
-    # Создание таблицы в базе данных
-    cursor.execute(f'CREATE TABLE IF NOT EXISTS gnkt_{contractor}'
-                   f'(id INTEGER PRIMARY KEY AUTOINCREMENT,'
-                   f'gnkt_number INT NOT NULL,'
-                   f'well_number TEXT,'
-                   f'length DECIMAL(10,2) NOT NULL, '
-                   f'diameter DECIMAL(10,2) NOT NULL,'
-                   f'wear DECIMAL(5,2) NOT NULL,'
-                   f'mileage DECIMAL(10,2) NOT NULL,'
-                   f'pvo_number INT NOT NULL)'
-                   )
+    cursor.execute(f"SELECT * FROM gnkt_{contractor} WHERE gnkt_number =?", (gnkt_number,))
+
+    result = cursor.fetchall()
+
+    well_previus_list = [(well[10], well[9]) for well in result]
+    well_previus_list = sorted(well_previus_list, key=lambda x:  datetime.strptime(x[1], "%d.%m.%Y"))
+    well_previus_list = list(filter(lambda x: x[0], well_previus_list))
+    print(f'список ремонтов {result}')
+    # Закрытие соединения с базой данных
+    conn.close()
+
+    return well_previus_list
+
+
+def insert_data_base_gnkt(contractor, gnkt_number, gnkt_length, diametr_length,
+                     iznos, pipe_mileage, pipe_fatigue, pvo, previous_well):
+    # Подключение к базе данных SQLite
+
+    conn = sqlite3.connect('data_base\data_base_gnkt\gnkt_oilservice.dp')
+    cursor = conn.cursor()
+
+    if 'ойл-сервис' in contractor.lower():
+        contractor = 'oilservice'
+
+    current_datetime = datetime.today().strftime('%d.%m.%Y')
+
+    data_values = (gnkt_number, '1963', gnkt_length, diametr_length, iznos,
+                   pipe_mileage, pipe_fatigue, pvo, current_datetime, previous_well)
+
+    # Подготовленный запрос для вставки данных с параметрами
+    query = f"INSERT INTO gnkt_{contractor} " \
+            f"(gnkt_number, well_number, length_gnkt, diameter_gnkt, wear_gnkt, mileage_gnkt, tubing_fatigue, " \
+            f"pvo_number, today, previous_well) " \
+            f"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+
+    # Выполнение запроса с использованием параметров
+    cursor.execute(query, data_values)
 
     # Сохранение изменений
     conn.commit()
@@ -97,5 +124,5 @@ def create_data_base(contractor, gnkt_number):
     conn.close()
 
 contractor = 'ООО "Ойл-Сервис'
-
-# print(create_data_base(contractor))
+print()
+read_database_gnkt(contractor, 'ГНКТ №1')

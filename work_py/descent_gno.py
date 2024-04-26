@@ -168,7 +168,7 @@ class GnoDescentWindow(QMainWindow):
             rgd_question_combo = self.tabWidget.currentWidget().rgd_question_combo.currentText()
             work_list = self.paker_down(nkt_edit, rgd_question_combo)
         elif lift_key == 'воронка':
-            work_list = voronka_down(self, lift_key, nkt_edit)
+            work_list = self.voronka_down(lift_key, nkt_edit)
         else:
             if lift_key in ['ОРД', 'ЭЦН с пакером', 'ЭЦН']:
                 # print(f'ЭЦН, Шаблон {well_data.dict_pump_ECN_h["posle"], well_data.template_depth}')
@@ -260,7 +260,7 @@ class GnoDescentWindow(QMainWindow):
                     paker_descent.append(row)
         return paker_descent
 
-    def voronka_down(self, lift_key, nkt_edit, sucker_edit, need_juming_after_sko_combo):
+    def voronka_down(self, lift_key, nkt_edit):
 
         descent_voronka = [
             [None, None,

@@ -1,11 +1,12 @@
+import sqlite3
 from datetime import datetime
 
 from PyQt5.QtWidgets import QInputDialog, QMainWindow, QTabWidget, QWidget, QTableWidget, QApplication, QLabel, \
-    QLineEdit, QGridLayout, QComboBox, QPushButton
+    QLineEdit, QGridLayout, QComboBox, QPushButton,QMessageBox
 from main import MyWindow
 
 import well_data
-from gnkt_data.gnkt_data import gnkt_1, gnkt_2, gnkt_dict
+from gnkt_data.gnkt_data import gnkt_1, gnkt_2, gnkt_dict, read_database_gnkt
 from gnkt_opz import GnktOpz
 from krs import TabPageGno, GnoWindow
 from perforation_correct import PerforationCorrect
@@ -19,7 +20,7 @@ from openpyxl.reader.excel import load_workbook
 from openpyxl.workbook import Workbook
 from open_pz import CreatePZ
 from work_py.alone_oreration import well_volume
-from work_py.gnkt_frez import Work_with_gnkt
+
 from work_py.gnkt_grp_work import GnktOsvWindow2
 
 
@@ -31,26 +32,25 @@ class TabPageDp(QWidget):
         self.gnkt_number_label = QLabel('Номер флота ГНКТ')
         self.gnkt_number_combo = QComboBox(self)
         self.gnkt_number_combo.addItems(gnkt_dict["Ойл-сервис"])
-        if self.gnkt_number_combo.currentText() == 'ГНКТ №1':
-            self.gnkt = gnkt_1
-        elif self.gnkt_number_combo.currentText() == 'ГНКТ №2':
-            self.gnkt = gnkt_2
 
         self.lenght_gnkt_label = QLabel('длина ГНКТ')
         self.lenght_gnkt_edit = QLineEdit(self)
-        self.lenght_gnkt_edit.setText(f'{self.gnkt.gnkt_length}')
+
 
         self.iznos_gnkt_label = QLabel('Износ трубы')
         self.iznos_gnkt_edit = QLineEdit(self)
-        self.iznos_gnkt_edit.setText(f'{self.gnkt.iznos}')
 
         self.pipe_mileage_label = QLabel('Пробег трубы')
         self.pipe_mileage_edit = QLineEdit(self)
-        self.pipe_mileage_edit.setText(f'{self.gnkt.pipe_mileage}')
+
 
         self.pvo_number_label = QLabel('Номер ПВО')
         self.pvo_number_edit = QLineEdit(self)
-        self.pvo_number_edit.setText(f'{self.gnkt.pvo}')
+
+        self.previous_well_label = QLabel('Предыдущая скважина')
+        self.previous_well_combo = QComboBox(self)
+        well_previus_list = read_database_gnkt(well_data.contractor, self.gnkt_number_combo.currentText())
+        self.previous_well_combo.addItems(well_previus_list)
 
         self.current_bottom_label = QLabel('необходимый текущий забой')
         self.current_bottom_edit = QLineEdit(self)
@@ -76,6 +76,8 @@ class TabPageDp(QWidget):
         self.grid.addWidget(self.iznos_gnkt_edit, 3, 4)
         self.grid.addWidget(self.pvo_number_label, 2, 5)
         self.grid.addWidget(self.pvo_number_edit, 3, 5)
+        self.grid.addWidget(self.previous_well_label, 2, 6)
+        self.grid.addWidget(self.previous_well_combo, 3, 6)
 
         self.grid.addWidget(self.current_bottom_label, 4, 2)
         self.grid.addWidget(self.current_bottom_edit, 5, 2)
@@ -83,6 +85,20 @@ class TabPageDp(QWidget):
         self.grid.addWidget(self.fluid_edit, 5, 3)
         self.grid.addWidget(self.osvoenie_label, 4, 4)
         self.grid.addWidget(self.osvoenie_combo, 5, 4)
+        self.gnkt_number_combo.textChanged.connect(self.update_number_gnkt)
+
+    def update_number_gnkt(self, number_gnkt):
+
+        conn = sqlite3.connect('data_base/data_base_well/databaseWell.db')
+        cursor = conn.cursor()
+        cursor.execute(f"SELECT * FROM КГМ WHERE today =?, ?", (number_gnkt, self.previous_well_edit.text()))
+
+        result_gnkt = cursor.fetchone()
+        print(result_gnkt)
+        self.lenght_gnkt_edit.setText(f'{result_gnkt[3]}')
+        self.iznos_gnkt_edit.setText(f'{result_gnkt[5]}')
+        self.pipe_mileage_edit.setText(f'{result_gnkt[6]}')
+        self.pvo_number_edit.setText(f'{result_gnkt[8]}')
 
 
 class TabWidget(QTabWidget):
@@ -122,6 +138,7 @@ class GnktOsvWindow(QMainWindow):
             b = 4
         else:
             b = 0
+
         head = plan.head_ind(well_data.cat_well_min._value+b, well_data.cat_well_max._value+b)
 
         plan.copy_true_ws(sheet, self.ws_title, head)
@@ -578,49 +595,10 @@ class GnktOsvWindow(QMainWindow):
             if all(value is None for value in row[:42]):
                 ws.row_dimensions[row_ind + 1].hidden = True
 
-        coordinate_nkt_with_paker = 'F6'
-        main.MyWindow.insert_image(self, ws, 'imageFiles/schema_well/НКТ с пакером.png', coordinate_nkt_with_paker, 100, 470)
-        coordinate_propant = 'F43'
-        if self.work_plan == 'gnkt_after_grp':
-            main.MyWindow.insert_image(self, ws, 'imageFiles/schema_well/пропант.png', coordinate_propant, 90, 500)
 
 
-        n = 0
-        m = 0
-        for plast in well_data.plast_all:
-            count_interval = well_data.dict_perforation[plast]['счет_объединение']
-
-            self.ws_schema.merge_cells(start_column=23, start_row=27 + m,
-                                end_column=23, end_row= 27 + count_interval + m -1)
-            self.ws_schema.merge_cells(start_column=22, start_row=27 + m,
-                                       end_column=22, end_row=27 + count_interval + m - 1)
-            self.ws_schema.merge_cells(start_column=21, start_row=27 + m,
-                                       end_column=21, end_row=27 + count_interval + m - 1)
-            m += count_interval
-            roof_plast = well_data.dict_perforation[plast]['кровля']
-            sole_plast = well_data.dict_perforation[plast]['подошва']
-            if roof_plast > well_data.depth_fond_paker_do["do"] and roof_plast < well_data.current_bottom:
-                interval_str = f'{plast} {roof_plast}-{sole_plast}'
-                coordinate_pvr = f'F{48+n}'
-
-                ws.cell(row=48+n, column=10).value = interval_str
-                ws.merge_cells(start_column=10, start_row=48+n,
-                                end_column=12, end_row= 48+n+2)
-                ws.cell(row=48+n, column=10).font = Font(name='Arial', size=12, bold=True)
-                ws.cell(row=48+n, column=10).alignment = Alignment(wrap_text=True, horizontal='left',
-                                       vertical='center')
-                n += 2
-                main.MyWindow.insert_image(self, ws, 'imageFiles/schema_well/ПВР.png', coordinate_pvr, 90, 100)
-
-        coordinate_voln = f'E18'
-        main.MyWindow.insert_image(self, ws, 'imageFiles/schema_well/переход.png', coordinate_voln, 150, 60)
-
-        ws.print_area = f'B3:AP{70}'
-        # ws.page_setup.fitToPage = True
-        # ws.page_setup.fitToHeight = False
-        # ws.page_setup.fitToWidth = True
-        # ws.print_options.horizontalCentered = True
     def save_to_gnkt(self):
+        from work_py.gnkt_frez import Work_with_gnkt
 
         sheets = ["Титульник", 'СХЕМА', 'Ход работ']
         tables = [self.table_title, self.table_schema, self.table_widget]
@@ -629,16 +607,14 @@ class GnktOsvWindow(QMainWindow):
             worksheet = GnktOsvWindow.wb[sheet_name]
             table = tables[i]
             work_list = []
+
             for row in range(table.rowCount()):
                 row_lst = []
-                # self.ins_ind_border += 1
-                for column in range(table.columnCount()):
 
+                for column in range(table.columnCount()):
                     item = table.item(row, column)
                     if not item is None:
-
                         row_lst.append(item.text())
-                        # print(item.text())
                     else:
                         row_lst.append("")
                 work_list.append(row_lst)
@@ -667,6 +643,56 @@ class GnktOsvWindow(QMainWindow):
             print(f"Table data saved to Excel {full_path} {well_data.number_dp}")
         if self.wb:
             self.wb.close()
+
+    def insert_image_schema(self, ws):
+        print(f'пакер наличие {well_data.paker_do["do"]}')
+        if well_data.paker_do["do"] != 0:
+            coordinate_nkt_with_paker = 'F6'
+            main.MyWindow.insert_image(self, ws, 'imageFiles/schema_well/НКТ с пакером.png',
+                                       coordinate_nkt_with_paker, 100, 470)
+        else:
+            coordinate_nkt_with_voronka = 'F6'
+            main.MyWindow.insert_image(self, ws, 'imageFiles/schema_well/НКТ с воронкой.png',
+                                       coordinate_nkt_with_voronka, 70, 470)
+
+        coordinate_propant = 'F43'
+        if self.work_plan == 'gnkt_after_grp':
+            main.MyWindow.insert_image(self, ws, 'imageFiles/schema_well/пропант.png', coordinate_propant, 90, 500)
+
+        n = 0
+        m = 0
+        for plast in well_data.plast_all:
+            count_interval = well_data.dict_perforation[plast]['счет_объединение']
+
+            ws.merge_cells(start_column=23, start_row=27 + m,
+                                       end_column=23, end_row=27 + count_interval + m - 1)
+            ws.merge_cells(start_column=22, start_row=27 + m,
+                                       end_column=22, end_row=27 + count_interval + m - 1)
+            ws.merge_cells(start_column=21, start_row=27 + m,
+                                       end_column=21, end_row=27 + count_interval + m - 1)
+            m += count_interval
+            roof_plast = well_data.dict_perforation[plast]['кровля']
+            sole_plast = well_data.dict_perforation[plast]['подошва']
+            try:
+                if roof_plast > well_data.depth_fond_paker_do["do"] and roof_plast < well_data.current_bottom:
+                    interval_str = f'{plast} {roof_plast}-{sole_plast}'
+                    coordinate_pvr = f'F{48 + n}'
+
+                    ws.cell(row=48 + n, column=10).value = interval_str
+                    ws.merge_cells(start_column=10, start_row=48 + n,
+                                   end_column=12, end_row=48 + n + 2)
+                    ws.cell(row=48 + n, column=10).font = Font(name='Arial', size=12, bold=True)
+                    ws.cell(row=48 + n, column=10).alignment = Alignment(wrap_text=True, horizontal='left',
+                                                                         vertical='center')
+                    n += 3
+                    main.MyWindow.insert_image(self, ws, 'imageFiles/schema_well/ПВР.png', coordinate_pvr, 85, 70)
+            except:
+                mes = QMessageBox.critical(self, 'Ошибка', f'программа не смогла вставить интервал перфорации в схему'
+                                                           f'{roof_plast}-{sole_plast}')
+
+        coordinate_voln = f'E18'
+        main.MyWindow.insert_image(self, ws, 'imageFiles/schema_well/переход.png', coordinate_voln, 150, 60)
+
 
     def date_dmy(self, date_str):
         date_obj = datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")

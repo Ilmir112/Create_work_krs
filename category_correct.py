@@ -93,6 +93,7 @@ class TabPage_SO(QWidget):
             pressuar_data_edit.setText(str(self.ifNone(self.cat_P_P[num])))
             # print(num)
             category_h2s_edit = QLineEdit(self)
+            print(self.cat_h2s_list)
             category_h2s_edit.setText(str(self.ifNone(self.cat_h2s_list[num])))
             h2s_pr_edit = QLineEdit(self)
             if str(round(float(str(self.h2s_pr[num]).replace(',', '.')), 3))[-1] == "0":
@@ -105,7 +106,7 @@ class TabPage_SO(QWidget):
             category_h2s2_edit = QLineEdit(self)
             category_h2s2_edit.setText(str(self.ifNone(self.cat_h2s_list[num])))
             h2s_mg_edit = QLineEdit(self)
-
+            print(self.h2s_mg)
             h2s_mg_edit.setText(str(self.ifNone(self.h2s_mg[num])))
 
             category_gf_edit = QLineEdit(self)

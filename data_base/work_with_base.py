@@ -1,6 +1,7 @@
 import json
 import re
 import sqlite3
+from collections import namedtuple
 
 from datetime import datetime
 
@@ -427,50 +428,56 @@ class Classifier_well(QMainWindow):
         # Закрытие соединения с базой данных
         conn.close()
 
-def create_data_base(contractor):
+def read_database_gnkt(contractor, gnkt_number):
     # Подключение к базе данных SQLite
     conn = sqlite3.connect('data_base\data_base_gnkt\gnkt_oilservice.dp')
     cursor = conn.cursor()
     if 'ойл-сервис' in contractor.lower():
         contractor = 'oil_service'
+    cursor = conn.cursor()
+    cursor.execute(f"SELECT * FROM КГМ WHERE today =?", (gnkt_number, '1963'))
+    print(f' база данных открыта')
+    result = cursor.fetchone()
+    print(result)
+
+def create_data_base(contractor, gnkt_number):
+    # Подключение к базе данных SQLite
+    conn = sqlite3.connect('data_base\data_base_gnkt\gnkt_base.dp')
+    cursor = conn.cursor()
+    if 'ойл-сервис' in contractor.lower():
+        contractor = 'oil_service'
+
+        # Удаление всех данных из таблицы
+        cursor.execute(f"DROP TABLE gnkt_{contractor}")
 
     # Создание таблицы в базе данных
     cursor.execute(f'CREATE TABLE IF NOT EXISTS gnkt_{contractor}'
                    f'(id INTEGER PRIMARY KEY AUTOINCREMENT,'
                    f'gnkt_number INT NOT NULL,'
                    f'well_number TEXT,'
-                   f'length DECIMAL(10,2) NOT NULL, '
-                   f'diameter DECIMAL(10,2) NOT NULL,'
-                   f'wear DECIMAL(5,2) NOT NULL,'
-                   f'mileage DECIMAL(10,2) NOT NULL,'
+                   f'length_gnkt INT NOT NULL, '
+                   f'diameter_gnkt DECIMAL(10,2) NOT NULL,'
+                   f'wear_gnkt DECIMAL(5,2) NOT NULL,'
+                   f'mileage_gnkt DECIMAL(10,2) NOT NULL,'
+                   f'tubing_fatigue TEXT NOT NULL,'
                    f'pvo_number INT NOT NULL)'
                    )
-
-    for index, data in enumerate(well_data.data_list):
-        current_bottom = data[1]
-        dict_perforation_json = data[2]
-        plast_all = data[3]
-        plast_work = data[4]
-        dict_leakiness = data[5]
-        column_additional = data[6]
-        fluid_work = data[7]
-        template_depth = int(data[11])
-        skm_interval = data[12]
-        problemWithEk_depth = data[13]
-        problemWithEk_diametr = data[14]
-
-        # Подготовленные данные для вставки (пример)
-        data_values = (index, current_bottom, dict_perforation_json, plast_all, plast_work,
-                       dict_leakiness, column_additional, fluid_work, well_data.category_pressuar,
-                       well_data.category_h2s, well_data.category_gf, template_depth, skm_interval,
-                       problemWithEk_depth, problemWithEk_diametr)
-
+    Gnkt_data = namedtuple("Gnkt_data",
+                           ["gnkt_length", "diametr_length", "iznos", "pipe_mileage", 'pipe_fatigue',
+                            "pvo"])
+    gnkt_2 = Gnkt_data(2200, 38, 20, 35025, '25', 115)
+    gnkt_1 = Gnkt_data(3200, 38, 20, 42006, '25', 166)
+    for ind, gnkt in enumerate([gnkt_1, gnkt_2]):
+        if ind == 1:
+            gnkt_number = 'ГНКТ №1'
+        else:
+            gnkt_number = 'ГНКТ №2'
+        data_values = (gnkt_number, '1963', gnkt.gnkt_length, gnkt.diametr_length, gnkt.iznos,
+                       gnkt.pipe_mileage, gnkt.pipe_fatigue, gnkt.pvo)
         # Подготовленный запрос для вставки данных с параметрами
-        query = f"INSERT INTO {number} " \
-                f"(index_row, current_bottom, perforation, plast_all, plast_work, leakage, column_additional, fluid, " \
-                f"category_pressuar, category_h2s, category_gf, template_depth, skm_list, " \
-                f"problemWithEk_depth, problemWithEk_diametr) " \
-                f"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        query = f"INSERT INTO gnkt_{contractor} " \
+                f"(gnkt_number, well_number, length_gnkt, diameter_gnkt, wear_gnkt, mileage_gnkt, tubing_fatigue, pvo_number) " \
+                f"VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
 
         # Выполнение запроса с использованием параметров
         cursor.execute(query, data_values)
@@ -480,6 +487,8 @@ def create_data_base(contractor):
 
     # Закрытие соединения с базой данных
     conn.close()
+
+
 
 def create_database_well_db(work_plan, number_dp):
     # print(row, well_data.count_row_well)
