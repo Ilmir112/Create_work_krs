@@ -21,42 +21,42 @@ jobs:
       - name: Build executable
         run:
           pyinstaller --noconfirm --onedir --icon=imageFiles/icon/zima_ico.ico --console --name "ZIMA"
-          --add-data data_base:data_base
-          --add-data data_base/data_base_well:data_base/data_base_well
-          --add-data work_py:work_py 
-          --add-data users:users 
-          --add-data property_excel:property_excel 
-          --add-data imageFiles:imageFiles 
-          --add-data gnkt_data:gnkt_data 
-          --add-data data_base:data_base 
-          --add-data work_json.py:.
-          --add-data well_data.py:. 
-          --add-data selectPlast.py:.t 
-          --add-data proverka.py:. 
-          --add-data plan23.py:. 
-          --add-data plan.py:. 
-          --add-data perforation_correct_gnkt_frez.py:.
-          --add-data perforation_correct.py:.
-          --add-data open_pz.py:.
-          --add-data krs.py:.
-          --add-data H2S.py:.
-          --add-data gnkt_opz.py:.
-          --add-data gnkt_after_grp.py:.
-          --add-data find.py:.
-          --add-data data_correct_position_people.py:.
-          --add-data data_correct.py:.
-          --add-data convert_xls.py:.
-          --add-data cdng.py:.
-          --add-data category_correct.py:.
-          --add-data build_script.py:.
-          --add-data block_name.py:.
-          --add-data application_pvr.py:.
-          --add-data application_gis.py:.
-          --add-data data_base/users_database:data_base/users_database
-          --add-data gnkt_data:gnkt_data
-          --add-data imageFiles:imageFiles
-          --add-data imageFiles/schema_well:imageFiles/schema_well
-          --add-data imageFiles/pvo/oil:imageFiles/pvo/oil          
+          --add-data data_base:ZIMA/data_base
+          
+          --add-data work_py:ZIMA/work_py
+          --add-data users:ZIMA/users
+          --add-data property_excel:ZIMA/property_excel 
+          --add-data imageFiles:ZIMA/imageFiles
+          --add-data gnkt_data:ZIMA/
+          --add-data data_base:ZIMA/ 
+          --add-data work_json.py:ZIMA/.
+          --add-data well_data.py:ZIMA/. 
+          --add-data selectPlast.py:ZIMA/.
+          --add-data proverka.py:ZIMA/ 
+          --add-data plan23.py:ZIMA/ 
+          --add-data plan.py:ZIMA/ 
+          --add-data perforation_correct_gnkt_frez.py:ZIMA/
+          --add-data perforation_correct.py:ZIMA/
+          --add-data open_pz.py:ZIMA/
+          --add-data krs.py:ZIMA/
+          --add-data H2S.py:ZIMA/
+          --add-data gnkt_opz.py:ZIMA/
+          --add-data gnkt_after_grp.py:ZIMA/
+          --add-data find.py:ZIMA/
+          --add-data data_correct_position_people.py:ZIMA/
+          --add-data data_correct.py:ZIMA/
+          --add-data convert_xls.py:ZIMA/
+          --add-data cdng.py:ZIMA/
+          --add-data category_correct.py:ZIMA/
+          --add-data build_script.py:ZIMA/
+          --add-data block_name.py:ZIMA/
+          --add-data application_pvr.py:ZIMA/
+          --add-data application_gis.py:ZIMA/
+          --add-data data_base/users_database:ZIMA/
+          --add-data gnkt_data:ZIMA/
+          --add-data imageFiles:ZIMA/
+          --add-data imageFiles/schema_well:ZIMA/
+          --add-data imageFiles/pvo/oil:ZIMA/        
           main.py
 
 
