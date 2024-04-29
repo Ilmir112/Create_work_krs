@@ -87,27 +87,48 @@ class TabPageDp(QWidget):
         self.grid.addWidget(self.osvoenie_label, 4, 4)
         self.grid.addWidget(self.osvoenie_combo, 5, 4)
         self.gnkt_number_combo.currentTextChanged.connect(self.update_number_gnkt)
+        self.previous_well_combo.currentTextChanged.connect(self.update_data_gnkt)
 
+    def update_data_gnkt(self):
+
+        previus_well = self.previous_well_combo.currentText()
+
+        if previus_well:
+            conn = sqlite3.connect('data_base\data_base_gnkt\gnkt_base.dp')
+            cursor = conn.cursor()
+            if 'ойл-сервис' in well_data.contractor.lower():
+                contractor = 'oil_service'
+            print(previus_well)
+            cursor.execute(f"SELECT * FROM gnkt_{contractor} WHERE well_number =?", (previus_well,))
+
+            result_gnkt = cursor.fetchone()
+            print(result_gnkt)
+
+            self.lenght_gnkt_edit.setText(f'{result_gnkt[3]}')
+            self.iznos_gnkt_edit.setText(f'{result_gnkt[5]}')
+            self.pipe_mileage_edit.setText(f'{result_gnkt[6]}')
+            self.pvo_number_edit.setText(f'{result_gnkt[10]}')
 
 
     def update_number_gnkt(self, gnkt_number):
+        if gnkt_number != '':
 
-        well_previus_list = read_database_gnkt(well_data.contractor, gnkt_number)
-        self.previous_well_combo.addItems(list(map(str, well_previus_list)))
+            well_previus_list = read_database_gnkt(well_data.contractor, gnkt_number)
+            self.previous_well_combo.addItems(list(map(str, well_previus_list)))
 
-        conn = sqlite3.connect('data_base\data_base_gnkt\gnkt_base.dp')
-        cursor = conn.cursor()
-        if 'ойл-сервис' in well_data.contractor.lower():
-            contractor = 'oil_service'
-
-        cursor.execute(f"SELECT * FROM gnkt_{contractor} WHERE gnkt_number =?", (gnkt_number,))
-
-        result_gnkt = cursor.fetchone()
-
-        self.lenght_gnkt_edit.setText(f'{result_gnkt[3]}')
-        self.iznos_gnkt_edit.setText(f'{result_gnkt[5]}')
-        self.pipe_mileage_edit.setText(f'{result_gnkt[6]}')
-        self.pvo_number_edit.setText(f'{result_gnkt[10]}')
+            # conn = sqlite3.connect('data_base\data_base_gnkt\gnkt_base.dp')
+            # cursor = conn.cursor()
+            # if 'ойл-сервис' in well_data.contractor.lower():
+            #     contractor = 'oil_service'
+            #
+            # cursor.execute(f"SELECT * FROM gnkt_{contractor} WHERE gnkt_number =?", (gnkt_number,))
+            #
+            # result_gnkt = cursor.fetchone()
+            #
+            # self.lenght_gnkt_edit.setText(f'{result_gnkt[3]}')
+            # self.iznos_gnkt_edit.setText(f'{result_gnkt[5]}')
+            # self.pipe_mileage_edit.setText(f'{result_gnkt[6]}')
+            # self.pvo_number_edit.setText(f'{result_gnkt[10]}')
 
 
 
@@ -135,12 +156,18 @@ class GnktOsvWindow2(QMainWindow):
 
     def add_work(self):
         gnkt_number_combo = self.tabWidget.currentWidget().gnkt_number_combo.currentText()
-        GnktOsvWindow2.gnkt_number_combo = gnkt_number_combo
+        well_data.gnkt_number = gnkt_number_combo
 
         lenght_gnkt_edit = self.tabWidget.currentWidget().lenght_gnkt_edit.text()
-        GnktOsvWindow2.lenght_gnkt_edit = lenght_gnkt_edit
-        iznos_gnkt_edit = self.tabWidget.currentWidget().iznos_gnkt_edit.text()
-        GnktOsvWindow2.iznos_gnkt_edit = iznos_gnkt_edit
+
+        well_data.pipe_fatigue = 0
+
+
+        well_data.gnkt_length = lenght_gnkt_edit
+        iznos_gnkt_edit = self.tabWidget.currentWidget().iznos_gnkt_edit.text().replace(',', '.')
+        pipe_mileage_edit = self.tabWidget.currentWidget().pipe_mileage_edit.text()
+        well_data.pipe_mileage = pipe_mileage_edit
+        well_data.iznos = iznos_gnkt_edit
         current_bottom_edit = self.tabWidget.currentWidget().current_bottom_edit.text()
         GnktOsvWindow2.current_bottom_edit = int(float(current_bottom_edit))
         fluid_edit = self.tabWidget.currentWidget().fluid_edit.text()
@@ -148,19 +175,21 @@ class GnktOsvWindow2(QMainWindow):
         osvoenie_combo_need = self.tabWidget.currentWidget().osvoenie_combo.currentText()
         GnktOsvWindow2.osvoenie_combo_need = osvoenie_combo_need
         pvo_number = self.tabWidget.currentWidget().pvo_number_edit.text()
-        GnktOsvWindow2.pvo_number = pvo_number
+        well_data.pvo = pvo_number
+        previous_well_combo = self.tabWidget.currentWidget().previous_well_combo.currentText()
+        well_data.previous_well = previous_well_combo
+
+        print(f'lllddd {well_data.previous_well}')
         diametr_length = 38
-        GnktOsvWindow2.diametr_length = 38
+        well_data.diametr_length = 38
 
         if '' in [gnkt_number_combo, lenght_gnkt_edit, iznos_gnkt_edit, fluid_edit, pvo_number]:
             mes = QMessageBox.warning(self, 'Некорректные данные', f'Не все данные заполнены')
             return
 
         work_list = self.schema_well(osvoenie_combo_need, current_bottom_edit, fluid_edit, gnkt_number_combo,
-                                     lenght_gnkt_edit, iznos_gnkt_edit, pvo_number, diametr_length)
-        # self.copy_pvr(self.ws_pvr, work_list)
+                                     lenght_gnkt_edit, iznos_gnkt_edit, pvo_number, diametr_length, pipe_mileage_edit)
 
-        # main.MyWindow.populate_row(self, 1, work_list, self.table_schema)
         well_data.pause = False
         self.close()
         return work_list
@@ -322,7 +351,10 @@ class GnktOsvWindow2(QMainWindow):
         main.MyWindow.insert_image(self, ws7, 'imageFiles/schema_well/СХЕМЫ КНК_38,1.png', 'A1', 550, 900)
 
         # path = 'workiii'
-        path = 'D:\Documents\Desktop\ГТМ'
+        if 'Зуфаров' in well_data.user:
+            path = 'D:\Documents\Desktop\ГТМ'
+        else:
+            path = ""
         filenames = f"{well_data.well_number} {well_data.well_area} кат {well_data.cat_P_1} {self.work_plan}.xlsx"
         full_path = path + '/' + filenames
         # print(f'10 - {ws2.max_row}')
@@ -430,17 +462,21 @@ class GnktOsvWindow2(QMainWindow):
         ws2.page_setup.paperSize = ws2.PAPERSIZE_A4
 
     def schema_well(self, osvoenie_combo_need, current_bottom_edit, fluid_edit, gnkt_number_combo,
-                    gnkt_lenght, iznos_gnkt_edit, pvo_number, diametr_length):
+                    gnkt_lenght, iznos_gnkt_edit, pvo_number, diametr_length, pipe_mileage_edit):
         self.gnkt = self.tabWidget.currentWidget()
-        self.plast_work = well_data.plast_all[0]
-        plast_work = self.plast_work
-        # print(self.plast_work, list(well_data.dict_perforation[plast_work]))
-        self.pressuar = list(well_data.dict_perforation[plast_work]["давление"])[0]
+        for plast_ind in well_data.plast_work:
+            try:
+                self.plast_work = plast_ind
+                plast_work = self.plast_work
 
-        zamer = list(well_data.dict_perforation[plast_work]['замер'])[0]
-        vertikal = min(map(float, list(well_data.dict_perforation[plast_work]["вертикаль"])))
-        # self.fluid = self.calc_fluid()
-        # zhgs = f'{self.fluid}г/см3'
+                self.pressuar = list(well_data.dict_perforation[plast_work]["давление"])[0]
+
+                zamer = list(well_data.dict_perforation[plast_work]['замер'])[0]
+                vertikal = min(map(float, list(well_data.dict_perforation[plast_work]["вертикаль"])))
+                break
+            except:
+                pass
+
         koef_anomal = round(float(self.pressuar) * 101325 / (float(vertikal) * 9.81 * 1000), 1)
         nkt = int(list(well_data.dict_nkt.keys())[0])
         if nkt == 73:
@@ -451,10 +487,9 @@ class GnktOsvWindow2(QMainWindow):
             nkt_widht = 5
 
         lenght_nkt = sum(list(map(int, well_data.dict_nkt.values())))
-        print(f'длина НКТ {nkt, nkt_widht, lenght_nkt}')
 
         volume_vn_gnkt = round(30.2 ** 2 * 3.14 / (4 * 1000), 2)
-        # print(gnkt_lenght, volume_vn_gnkt)
+
         volume_gnkt = round(float(gnkt_lenght) * volume_vn_gnkt / 1000, 1)
         if well_data.column_additional:
             well_volume_ek = well_volume(self, well_data.head_column_additional._value)
@@ -467,8 +502,7 @@ class GnktOsvWindow2(QMainWindow):
         volume_pm_dp = round(3.14 * (well_data.column_additional_diametr._value - 2 *
                                      well_data.column_additional_wall_thickness._value) ** 2 / 4 / 1000, 2)
 
-        column_data = f'{well_data.column_diametr._value}мм x {well_data.column_wall_thickness._value} в инт ' \
-                      f'0-{well_data.shoe_column._value}м'
+
         if well_data.column_additional:
             column_data_add_diam = well_data.column_additional_diametr._value
             column_data_add_wall_thickness = well_data.column_additional_wall_thickness._value
@@ -495,10 +529,14 @@ class GnktOsvWindow2(QMainWindow):
             Qoil = f'{well_data.Qoil}т/сут'
             Qwater = f'{well_data.Qwater}м3/сут'
             proc_water = f'{well_data.proc_water}%'
-        if 'грп' in str(well_data.wellhead_fittings).lower():
-            wellhead_fittings = well_data.wellhead_fittings
-        else:
-            wellhead_fittings = f'АУШГН-{well_data.column_diametr._value}/ АУГРП {well_data.column_diametr._value}*14'
+
+        wellhead_fittings = well_data.wellhead_fittings
+        if well_data.work_plan == 'gnkt_after_grp':
+            if 'грп' in str(well_data.wellhead_fittings).lower():
+                wellhead_fittings = well_data.wellhead_fittings
+            else:
+                wellhead_fittings = f'АУШГН-{well_data.column_diametr._value}/' \
+                                    f'АУГРП {well_data.column_diametr._value}*14'
 
         schema_well_list = [
             [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
@@ -606,7 +644,7 @@ class GnktOsvWindow2(QMainWindow):
             [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Тек. забой по ПЗ ', None, None,
-             None, None, None, None, None, None, well_data.current_bottom, None],
+             None, None, None, None, None, None, well_data.bottom, None],
             [None, None, None, None, None, None, None, None, None, None, None, None,
              'необходимый текущий забой ', None, None, None, None, None, None, None, None, well_data.current_bottom, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Искусственный забой  ', None,
@@ -662,7 +700,8 @@ class GnktOsvWindow2(QMainWindow):
              'м3', None, '%', None, 'м', None, None],
             [None, None, None, None, None, None, None, None, None, None, None, gnkt_lenght,
              diametr_length, 3.68, '=M67-2*N67',
-             '=ROUND(O67*O67*3.14/4/1000,2)', None, '=ROUND(L67*P67/1000, 1)', None, iznos_gnkt_edit, None, None, None],
+             '=ROUND(O67*O67*3.14/4/1000,2)', None, '=ROUND(L67*P67/1000, 1)', None, iznos_gnkt_edit, None,
+             pipe_mileage_edit, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, 'объем наземной линии, м3', None,

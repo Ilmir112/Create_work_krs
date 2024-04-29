@@ -90,7 +90,7 @@ def check_h2s(self, plast= 0, fluid_new = 0, expected_pressure = 0):
 
     return fluid_new, plast, expected_pressure
 
-def need_h2s(fluid_new, plast, expected_pressure):
+def need_h2s(fluid_new, plast_edit, expected_pressure):
     сat_h2s_list = list(map(int, [well_data.dict_category[plast]['по сероводороду'].category for plast in
                                   well_data.plast_work if well_data.dict_category.get(plast) and
                                   well_data.dict_category[plast]['отключение'] == 'рабочий']))
@@ -100,12 +100,15 @@ def need_h2s(fluid_new, plast, expected_pressure):
                                   well_data.dict_category[plast]['отключение'] == 'планируемый']))
 
     if len(cat_h2s_list_plan) != 0:
-        if cat_h2s_list_plan[0] in [1, 2] and len(well_data.plast_work) == 0:
+        print(f'ДО {сat_h2s_list} после {cat_h2s_list_plan, well_data.plast_work }')
+        if cat_h2s_list_plan[0] in [1, 2, '1', '2'] and len(well_data.plast_work) == 0:
             expenditure_h2s = round(max([well_data.dict_category[plast]['по сероводороду'].poglot for plast in well_data.plast_project]), 3)
             fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
                                   f'расчета {expenditure_h2s}кг/м3 '
             fluid_work_short = f'{fluid_new}г/см3 ХИМТЕХНО 101 {expenditure_h2s}кг/м3 '
-
+        elif cat_h2s_list_plan[0] in [3, '3'] and len(well_data.plast_work) == 0:
+            fluid_work = f'{fluid_new}г/см3 '
+            fluid_work_short = f'{fluid_new}г/см3 '
 
         elif ((cat_h2s_list_plan[0] in [1, 2]) or (сat_h2s_list[0] in [1, 2])) and len(well_data.plast_work) != 0:
             try:
@@ -127,9 +130,18 @@ def need_h2s(fluid_new, plast, expected_pressure):
             fluid_work = f'{fluid_new}г/см3 '
             fluid_work_short = f'{fluid_new}г/см3 '
     else:
+
         cat_list = ['1', '2', '3']
-        cat_H2S, ok = QInputDialog.getItem(None, 'Категория скважины', 'Выберете категорию скважины',
+        cat_pressuar, ok = QInputDialog.getItem(None, 'Категория скважины по давлению вскрываемого пласта',
+                                           'Выберете категорию скважины',
                                            cat_list, 0, False)
+        pressuar, ok = QInputDialog.getDouble(None, 'Категория скважины по давлению вскрываемого пласта',
+                                           'Выберете категорию скважины', 0, 0, 600, 1)
+
+        cat_H2S, ok = QInputDialog.getItem(None, 'Категория скважины по сероводороду вскрываемого пласта',
+                                           'Выберете категорию скважины',
+                                           cat_list, 0, False)
+
         cat_h2s_list_plan.append(cat_H2S)
         h2s_mg, _ = QInputDialog.getDouble(None, 'сероводород в мг/л',
                                            'Введите значение серовородода в мг/л', 0, 0, 100, 5)
@@ -138,9 +150,12 @@ def need_h2s(fluid_new, plast, expected_pressure):
                                            'Введите значение серовородода в процентах', 0, 0, 100, 1)
         poglot = H2S.calv_h2s(None, cat_H2S, h2s_mg, h2s_pr)
         Data_h2s = namedtuple("Data_h2s", "category data_procent data_mg_l poglot")
-        well_data.dict_category.setdefault(plast, {}).setdefault(
-            'по сероводороду', Data_h2s(int(cat_H2S), h2s_pr, h2s_mg, poglot))
-        well_data.dict_category.setdefault(plast, {}).setdefault(
+        Pressuar = namedtuple("Pressuar", "category data_pressuar")
+        well_data.dict_category.setdefault(plast_edit, {}).setdefault(
+            'по давлению', Pressuar(int(cat_H2S), pressuar))
+        well_data.dict_category.setdefault(plast_edit, {}).setdefault(
+            'по сероводороду', Data_h2s(int(cat_pressuar), h2s_pr, h2s_mg, poglot))
+        well_data.dict_category.setdefault(plast_edit, {}).setdefault(
             'отключение', 'планируемый')
 
         if cat_h2s_list_plan[0] in [1, 2]:
@@ -152,8 +167,9 @@ def need_h2s(fluid_new, plast, expected_pressure):
             fluid_work_short = f'{fluid_new}г/см3 ХИМТЕХНО 101 {expenditure_h2s}кг/м3 '
         else:
             fluid_work = f'{fluid_new}г/см3 '
-
-    return (fluid_work, fluid_work_short, plast, expected_pressure)
+            fluid_work_short = f'{fluid_new}г/см3 '
+    print(f'')
+    return (fluid_work, fluid_work_short, plast_edit, expected_pressure)
 
 def konte(self):
 

@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QInputDialog, QMainWindow, QTabWidget, QWidget, QTab
 from main import MyWindow
 
 import well_data
-from gnkt_data.gnkt_data import gnkt_1, gnkt_2, gnkt_dict, read_database_gnkt
+from gnkt_data.gnkt_data import gnkt_1, gnkt_2, gnkt_dict, read_database_gnkt, insert_data_base_gnkt
 from gnkt_opz import GnktOpz
 from krs import TabPageGno, GnoWindow
 from perforation_correct import PerforationCorrect
@@ -133,9 +133,9 @@ class GnktOsvWindow(QMainWindow):
         self.ws_title = self.wb.create_sheet("Титульник", 0)
         self.ws_work = self.wb.create_sheet(title="Ход работ")
 
-        create_title = Work_with_gnkt.create_title_list(self, self.ws_title)
+        Work_with_gnkt.create_title_list(self, self.ws_title)
         if self.work_plan == 'gnkt_opz':
-            b = 4
+            b = 5
         else:
             b = 0
 
@@ -170,7 +170,7 @@ class GnktOsvWindow(QMainWindow):
         main.MyWindow.copy_pz(self, self.ws_work, table_widget, self.work_plan, 12, 3)
         if self.work_plan == 'gnkt_opz':
             if self.work_window is None:
-                self.work_window = GnktOpz(table_widget, GnktOsvWindow2.gnkt_number_combo, GnktOsvWindow2.fluid_edit)
+                self.work_window = GnktOpz(table_widget, well_data.gnkt_number, GnktOsvWindow2.fluid_edit)
                 self.work_window.show()
                 well_data.pause = True
                 MyWindow.pause_app()
@@ -184,7 +184,7 @@ class GnktOsvWindow(QMainWindow):
 
         elif self.work_plan == 'gnkt_after_grp':
             work_well = self.gnkt_work(
-                GnktOsvWindow2.fluid_edit, GnktOsvWindow2.pvo_number, GnktOsvWindow2.current_bottom_edit,
+                GnktOsvWindow2.fluid_edit, well_data.pvo, GnktOsvWindow2.current_bottom_edit,
              GnktOsvWindow2.osvoenie_combo_need)
         if work_well:
             main.MyWindow.populate_row(self, 0, work_well, table_widget)
@@ -626,9 +626,16 @@ class GnktOsvWindow(QMainWindow):
         main.MyWindow.insert_image(self, ws7, 'imageFiles/schema_well/СХЕМЫ КНК_38,1.png', 'A1', 550, 900)
 
         # path = 'workiii'
-        path = 'D:\Documents\Desktop\ГТМ'
+        if 'Зуфаров' in well_data.user:
+            path = 'D:\Documents\Desktop\ГТМ'
+        else:
+            path = ''
         filenames = f"{well_data.well_number._value} {well_data.well_area._value} кат {well_data.cat_P_1[0]} {self.work_plan}.xlsx"
         full_path = path + '/' + filenames
+
+        insert_data_base_gnkt(well_data.contractor, filenames, well_data.gnkt_number, int(well_data.gnkt_length), float(well_data.diametr_length),
+                              float(well_data.iznos)*1.014, int(well_data.pipe_mileage) + int(well_data.current_bottom * 1.1),
+                              well_data.pipe_fatigue, int(well_data.pvo), well_data.previous_well)
 
         if well_data.bvo is True:
             ws5 = GnktOsvWindow.wb.create_sheet('Sheet1')

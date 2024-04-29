@@ -61,7 +61,9 @@ class TabPage_SO_swab(QWidget):
         self.khvostEdit.setText(str(10))
         self.khvostEdit.setClearButtonEnabled(True)
 
-        plast_work = well_data.plast_work
+        plast_work = ['']
+        plast_work.extend(well_data.plast_work)
+
         self.plast_label = QLabel("Выбор пласта", self)
         self.plast_combo = CheckableComboBox(self)
         self.plast_combo.combo_box.addItems(plast_work)
@@ -528,7 +530,7 @@ class Swab_Window(QMainWindow):
             if not expected_pressure or not fluid_new or not plast_new:
                 msg = QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
                 return
-
+            print(f'до {fluid_new}')
             work_list = self.swabbing_opy(paker2_depth, fluid_new, need_change_zgs_combo, plast_new, expected_pressure)
         elif swab_true_edit_type == 'Опрессовка снижением уровня на пакере с заглушкой':
             if MyWindow.check_true_depth_template(self, paker_depth) is False:
@@ -788,7 +790,7 @@ class Swab_Window(QMainWindow):
         if need_change_zgs_combo == 'Да':
             if plast_new not in well_data.plast_project:
                 well_data.plast_project.append(plast_new)
-
+            print(f'после 1 {fluid_new}')
             well_data.fluid_work, well_data.fluid_work_short, plast, expected_pressure = need_h2s(
                 fluid_new, plast_new, pressuar_new)
 

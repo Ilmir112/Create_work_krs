@@ -54,11 +54,11 @@ class FindIndexPZ(QMainWindow):
                     any(['IX. Мероприятия по предотвращению аварий, инцидентов и осложнений::' in str(col) for col in
                          row]):
                 well_data.data_well_max = ProtectedIsDigit(row_ind)
-                well_data.cat_well_min, well_data.cat_well_max, well_data.data_well_min, well_data.data_well_max
+
             elif 'НКТ' == str(row[1]).upper():
 
                 well_data.pipes_ind = ProtectedIsDigit(row_ind + 1)
-                well_data.cat_well_min, well_data.cat_well_max, well_data.data_well_min, well_data.data_well_max, well_data.pipes_ind, well_data.sucker_rod_ind
+
 
 
             elif 'ШТАНГИ' == str(row[1]).upper():
@@ -350,7 +350,9 @@ class WellFond_data(FindIndexPZ):
                     if 'колонная головка' in str(value) and 'типоразмер' in str(row[col + 2].value):
                         well_data.column_head_m = row[col_do].value
                     if 'Арматура устьевая' in str(value) and 'типоразмер' in str(row[col + 2].value):
+                        print(f'арматура {row_index, col_do}')
                         well_data.wellhead_fittings = row[col_do].value
+                        print(f'арматура {row[col_do].value}')
                     if 'Пакер' in str(value) and 'типоразмер' in str(row[col + 2].value):
                         if '/' in str(row[col_do].value):
                             well_data.paker_do["do"] = str(row[col_do].value).split('/')[0]
@@ -1052,6 +1054,8 @@ class Well_perforation(FindIndexPZ):
                                                                                           []).append(round(data_p, 1))
                         zhgs = calculationFluidWork(float(str(row[col_vert_index]).replace(',','.')), float(data_p))
                     else:
+                        well_data.dict_perforation.setdefault(plast, {}).setdefault('давление',
+                                                                                          []).append('0')
                         well_data.dict_perforation_short.setdefault(plast, {}).setdefault('давление',
                                                                                           []).append('0')
                     if zhgs:

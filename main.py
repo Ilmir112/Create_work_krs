@@ -379,7 +379,7 @@ class MyWindow(QMainWindow):
         from work_py.gnkt_grp import GnktOsvWindow
         from application_pvr import PvrApplication
         action = self.sender()
-        if action == self.create_KRS:
+        if action == self.create_KRS and self.table_widget == None:
             self.work_plan = 'krs'
             self.tableWidgetOpen(self.work_plan)
             self.fname, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
@@ -395,7 +395,7 @@ class MyWindow(QMainWindow):
 
                 except FileNotFoundError:
                     print('Файл не найден')
-        elif action == self.create_KRS_DP:
+        elif action == self.create_KRS_DP and self.table_widget == None:
             self.work_plan = 'dop_plan'
             self.tableWidgetOpen(self.work_plan)
             self.fname, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
@@ -412,7 +412,7 @@ class MyWindow(QMainWindow):
                 except FileNotFoundError:
                     print('Файл не найден')
 
-        elif action == self.create_GNKT_OPZ:
+        elif action == self.create_GNKT_OPZ and self.table_widget == None:
             self.work_plan = 'gnkt_opz'
 
             self.tableWidgetOpen(self.work_plan)
@@ -437,7 +437,7 @@ class MyWindow(QMainWindow):
                 except FileNotFoundError:
                     print('Файл не найден')
 
-        elif action == self.create_GNKT_GRP:
+        elif action == self.create_GNKT_GRP and self.table_widget == None:
             self.work_plan = 'gnkt_after_grp'
             self.tableWidgetOpen(self.work_plan)
 
@@ -461,7 +461,7 @@ class MyWindow(QMainWindow):
                 except FileNotFoundError:
                     print('Файл не найден')
 
-        elif action == self.create_GNKT_frez:
+        elif action == self.create_GNKT_frez and self.table_widget == None:
             self.work_plan = 'gnkt_frez'
             self.tableWidgetOpen(self.work_plan)
 
@@ -500,6 +500,10 @@ class MyWindow(QMainWindow):
                 self.signatures_window.setWindowTitle("Подписанты")
                 self.signatures_window.setGeometry(200, 400, 300, 400)
                 self.signatures_window.show()
+            else:
+                self.signatures_window.close()
+                self.signatures_window = None
+
 
         elif action == self.without_jamming_TGM_reload:
             costumer = 'ООО Башнефть-добыча'
@@ -703,10 +707,11 @@ class MyWindow(QMainWindow):
 
     def saveFileDialog(self, wb2, full_path):
         try:
+
             fileName, _ = QFileDialog.getSaveFileName(self, "Save excel-file",
                                                       f"{full_path}", "Excel Files (*.xlsx)")
             if fileName:
-                wb2.save(full_path)
+                wb2.save(fileName)
 
         except:
             mes = QMessageBox.critical(self, 'Ошибка', 'файл под таким именем открыт, закройте его')
@@ -714,7 +719,7 @@ class MyWindow(QMainWindow):
             # Создаем объект Excel
             excel = win32com.client.Dispatch("Excel.Application")
             # Открываем файл
-            workbook = excel.Workbooks.Open(full_path)
+            workbook = excel.Workbooks.Open(fileName)
             # Выбираем активный лист
             worksheet = workbook.ActiveSheet
 
@@ -848,7 +853,10 @@ class MyWindow(QMainWindow):
             ws2.page_setup.fitToHeight = False
 
             # path = 'workiii'
-            path = 'D:\Documents\Desktop\ГТМ'
+            if 'Зуфаров' in well_data.user:
+                path = 'D:\Documents\Desktop\ГТМ'
+            else:
+                path = ""
             if self.work_plan == 'dop_plan':
                 string_work = f' № {well_data.number_dp}'
             elif self.work_plan == 'krs':
@@ -882,17 +890,19 @@ class MyWindow(QMainWindow):
         from find import ProtectedIsDigit
 
         if not self.table_widget is None:
-            column_head_m = ''
-            date_drilling_cancel = ''
-            date_drilling_run = ''
-            wellhead_fittings = ''
+            self.table_widget = None
+            self.tabWidget = None
+            well_data.column_head_m = ''
+            well_data.date_drilling_cancel = ''
+            well_data.date_drilling_run = ''
+            well_data.wellhead_fittings = ''
             well_data.dict_perforation_short = {}
             well_data.plast_work_short = []
-            self.table_widget.close()
             self.table_widget = None
             well_data.normOfTime = 0
             well_data.gipsInWell = False
             well_data.grp_plan = False
+            well_data.bottom = 0
             well_data.nktOpressTrue = False
             well_data.bottomhole_drill = ProtectedIsNonNone(0)
             well_data.open_trunk_well = False
@@ -905,7 +915,14 @@ class MyWindow(QMainWindow):
             well_data.column_passability = False
             well_data.column_additional_passability = False
             well_data.template_depth = 0
-
+            well_data.gnkt_number = 0
+            well_data.gnkt_length = 0
+            well_data.diametr_length = 0
+            well_data.iznos = 0
+            well_data.pipe_mileage = 0
+            well_data.pipe_fatigue = 0
+            well_data.pvo  = 0
+            well_data.previous_well = 0
             well_data.b_plan = 0
             well_data.pipes_ind = ProtectedIsDigit(0)
             well_data.sucker_rod_ind = ProtectedIsDigit(0)
@@ -989,8 +1006,8 @@ class MyWindow(QMainWindow):
             well_data.region = ''
             well_data.dict_nkt = {}
             well_data.dict_nkt_po = {}
-            well_data.data_well_max = 0
-            well_data.data_pvr_max = 0
+            well_data.data_well_max = ProtectedIsNonNone(0)
+            well_data.data_pvr_max = ProtectedIsNonNone(0)
             well_data.dict_sucker_rod = {}
             well_data.dict_sucker_rod_po = {}
             well_data.row_expected = []
@@ -998,8 +1015,8 @@ class MyWindow(QMainWindow):
             well_data.plast_project = []
             well_data.plast_work = []
             well_data.plast_all = []
-            well_data.condition_of_wells = 0
-            well_data.cat_well_min = 0
+            well_data.condition_of_wells = ProtectedIsNonNone(0)
+            well_data.cat_well_min = ProtectedIsNonNone(0)
             well_data.bvo = False
             well_data.old_version = False
             well_data.image_list = []

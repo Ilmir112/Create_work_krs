@@ -69,7 +69,7 @@ class TabPage_SO_drill(QWidget):
         self.drill_True_label = QLabel("вид разбуриваемого материала", self)
         self.drill_label = QLabel("добавление поинтервального бурения", self)
         self.drill_cm_combo = QComboBox(self)
-        self.bottomType_list = ['ЦМ', 'РПК', 'РПП', 'ВП']
+        self.bottomType_list = ['ЦМ', 'РПК', 'РПП', 'ВП', 'Гипсовые отложения']
         self.drill_cm_combo.addItems(self.bottomType_list)
 
         grid = QGridLayout(self)
@@ -198,7 +198,7 @@ class Drill_window(QMainWindow):
         roof_drill = self.tabWidget.currentWidget().roof_drill_line.text().replace(',', '.')
         sole_drill = self.tabWidget.currentWidget().sole_drill_line.text().replace(',', '.')
         drill_type_combo = QComboBox(self)
-        drill_type_combo.addItems(['ЦМ', 'РПК', 'РПП', 'ВП'])
+        drill_type_combo.addItems(['ЦМ', 'РПК', 'РПП', 'ВП', 'Гипсовых отложений'])
         index_drill_True = self.tabWidget.currentWidget().drill_type_combo.currentIndex()
         drill_type_combo.setCurrentIndex(index_drill_True)
 
@@ -277,6 +277,9 @@ class Drill_window(QMainWindow):
         self.drill_type_combo = self.tabWidget.currentWidget().drill_type_combo.currentText()
 
         rows = self.tableWidget.rowCount()
+        if rows == 0:
+            mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'Нужно добавить интервалы ,бурения')
+            return
         drill_tuple = []
         for row in range(rows):
 
@@ -297,10 +300,17 @@ class Drill_window(QMainWindow):
             drill_list = self.drilling_nkt(drill_tuple, self.drill_type_combo, self.drillingBit_diam, self.downhole_motor)
         elif self.nkt_str == 'СБТ':
             drill_list = self.drilling_sbt(drill_tuple, self.drill_type_combo, self.drillingBit_diam, self.downhole_motor)
+        try:
+            MyWindow.populate_row(self, self.ins_ind, drill_list, self.table_widget)
+            well_data.pause = False
+            self.close()
+        except:
+            print('ошибка ожидаемая')
+            well_data.pause = False
+            self.close()
+            return drill_list
 
-        MyWindow.populate_row(self, self.ins_ind, drill_list, self.table_widget)
-        well_data.pause = False
-        self.close()
+
 
     def del_row_table(self):
         row = self.tableWidget.currentRow()

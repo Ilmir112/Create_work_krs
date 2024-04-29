@@ -25,8 +25,9 @@ class TabPage_SO_rir(QWidget):
         self.rir_type_Label = QLabel("Вид РИР", self)
         self.rir_type_Combo = QComboBox(self)
         self.rir_type_Combo.addItems(['РИР на пере', 'РИР с пакером', 'РИР с РПК', 'РИР с РПП'])
+        plast_work = ['']
+        plast_work.extend(well_data.plast_work)
 
-        plast_work = well_data.plast_work
 
         if well_data.leakiness:
             for nek in list(well_data.dict_leakiness['НЭК']['интервал'].keys()):
@@ -221,7 +222,7 @@ class TabPage_SO_rir(QWidget):
         from work_py.opressovka import TabPage_SO
         paker_depth = self.paker_depth_edit.text()
         if paker_depth != '':
-            self.diametr_paker_edit.setText(f'{TabPage_SO.paker_diametr_select(self, int(paker_depth))}')
+            self.diametr_paker_edit.setText(f'{TabPage_SO.paker_diametr_select(self, int(float(paker_depth)))}')
     def update_rir_type(self, index):
         if index in 'РИР с пакером':
             self.need_change_zgs_label.setParent(None)
@@ -232,6 +233,9 @@ class TabPage_SO_rir(QWidget):
             self.fluid_new_edit.setParent(None)
             self.pressuar_new_label.setParent(None)
             self.pressuar_new_edit.setParent(None)
+            self.paker_depth_edit.setText(f'{well_data.perforation_roof - 30}')
+            self.roof_rir_edit.setText(f'{well_data.perforation_roof - 30}')
+            self.sole_rir_edit.setText(f'{well_data.current_bottom}')
         elif index == 'РИР с РПК' or index == 'РИР с РПП': # ['РИР на пере', 'РИР с пакером', 'РИР с РПК', 'РИР с РПП']
             self.need_change_zgs_label.setParent(None)
             self.need_change_zgs_combo.setParent(None)
@@ -241,6 +245,14 @@ class TabPage_SO_rir(QWidget):
             self.fluid_new_edit.setParent(None)
             self.pressuar_new_label.setParent(None)
             self.pressuar_new_edit.setParent(None)
+            self.paker_depth_edit.setText(f'{well_data.perforation_roof - 30}')
+            self.roof_rir_edit.setText(f'{well_data.perforation_roof - 10}')
+            if index == 'РИР с РПП':
+                self.sole_rir_edit.setText(f'{well_data.current_bottom}')
+                self.paker_depth_edit.setText(f'{well_data.perforation_roof - 30}')
+            elif index == 'РИР с РПК':
+                self.sole_rir_edit.setText(f'{well_data.perforation_roof - 10}')
+                self.paker_depth_edit.setText(f'{well_data.perforation_roof - 10}')
         elif index == 'РИР на пере': # ['РИР на пере', 'РИР с пакером', 'РИР с РПК', 'РИР с РПП']
 
             self.grid.addWidget(self.need_change_zgs_label, 9, 2)
@@ -254,6 +266,9 @@ class TabPage_SO_rir(QWidget):
 
             self.grid.addWidget(self.pressuar_new_label, 9, 5)
             self.grid.addWidget(self.pressuar_new_edit, 10, 5)
+            self.roof_rir_edit.setText(f'{well_data.perforation_roof-50}')
+            self.sole_rir_edit.setText(f'{well_data.current_bottom}')
+            self.paker_depth_edit.setText(f'{well_data.perforation_roof-30}')
 
     def update_paker(self, index):
 

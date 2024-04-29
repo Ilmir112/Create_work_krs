@@ -1,3 +1,4 @@
+from PyQt5.QtGui import QIntValidator, QDoubleValidator
 from PyQt5.QtWidgets import QInputDialog, QMessageBox, QMainWindow, QTabWidget, QLabel, QLineEdit, QComboBox, \
     QGridLayout, QWidget, QPushButton
 from PyQt5 import QtWidgets
@@ -15,6 +16,8 @@ class TabPage_gnkt(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
 
+        self.validator_int = QIntValidator(0, 8000)
+        self.validator_float = QDoubleValidator(0, 8000, 1)
         # self.gnkt_number_label = QLabel('Номер ГНКТ')
         # self.gnkt_number_combo = QComboBox(self)
         # self.gnkt_number_combo.addItems(['ГНКТ №2', 'ГНКТ №1'])
@@ -22,17 +25,19 @@ class TabPage_gnkt(QWidget):
         self.roof_label = QLabel("кровля пласта", self)
         self.roof_edit = QLineEdit(self)
         self.roof_edit.setText(f'{well_data.perforation_roof}')
+        self.roof_edit.setValidator(self.validator_float)
 
         self.sole_label = QLabel("подошва пласта", self)
         self.sole_edit = QLineEdit(self)
         self.sole_edit.setText(f'{well_data.perforation_sole}')
-
-        plast_work = well_data.plast_work
+        self.sole_edit.setValidator(self.validator_float)
+        plast_work = ['']
+        plast_work.extend(well_data.plast_work)
 
         self.plast_label = QLabel("Выбор пласта", self)
         self.plast_combo = CheckableComboBox(self)
         self.plast_combo.combo_box.addItems(plast_work)
-        self.plast_combo.combo_box.currentTextChanged.connect(self.update_plast_edit)
+        # self.plast_combo.combo_box.currentTextChanged.connect(self.update_plast_edit)
 
         self.need_rast_label = QLabel("необходимость растворителя", self)
         self.need_rast_combo = QComboBox(self)
@@ -41,12 +46,14 @@ class TabPage_gnkt(QWidget):
         self.volume_rast_label = QLabel("Объем растворителя", self)
         self.volume_rast_edit = QLineEdit(self)
         self.volume_rast_edit.setText('2')
+        self.volume_rast_edit.setValidator(self.validator_int)
 
         self.skv_true_label_type = QLabel("необходимость кислотной ванны", self)
-        self.svk_true_edit = QComboBox(self)
-        self.svk_true_edit.addItems(['Нужно СКВ', 'без СКВ'])
-        self.svk_true_edit.setCurrentIndex(1)
-        self.svk_true_edit.setProperty('value', 'без СКВ')
+        self.svk_true_combo = QComboBox(self)
+        self.svk_true_combo.addItems(['Нужно СКВ', 'без СКВ'])
+        self.svk_true_combo.setCurrentIndex(1)
+        self.svk_true_combo.setProperty('value', 'без СКВ')
+
 
         self.skv_acid_label_type = QLabel("Вид кислоты для СКВ", self)
         self.skv_acid_edit = QComboBox(self)
@@ -56,18 +63,15 @@ class TabPage_gnkt(QWidget):
 
         self.skv_volume_label = QLabel("Объем СКВ", self)
         self.skv_volume_edit = QLineEdit(self)
+        self.skv_volume_edit.setValidator(self.validator_float)
         self.skv_volume_edit.setText('1')
         self.skv_volume_edit.setClearButtonEnabled(True)
-
-        if self.svk_true_edit.setCurrentIndex(1) == 'без СКВ':
-            self.skv_volume_edit.setEnabled(False)
-            self.skv_acid_edit.setEnabled(False)
-            # self.skv_proc_edit.setEnabled(False)
 
         self.skv_proc_label = QLabel("Концентрация СКВ", self)
         self.skv_proc_edit = QLineEdit(self)
         self.skv_proc_edit.setClearButtonEnabled(True)
         self.skv_proc_edit.setText('15')
+        self.skv_proc_edit.setValidator(self.validator_int)
 
         self.acid_label = QLabel("необходимость кислотной обработки", self)
         self.acid_true_edit = QComboBox(self)
@@ -80,62 +84,117 @@ class TabPage_gnkt(QWidget):
 
         self.acid_volume_label = QLabel("Объем кислотной обработки", self)
         self.acid_volume_edit = QLineEdit(self)
+        self.acid_volume_edit.setValidator(self.validator_float)
         self.acid_volume_edit.setText("10")
         self.acid_volume_edit.setClearButtonEnabled(True)
+
 
         self.acid_proc_label = QLabel("Концентрация кислоты", self)
         self.acid_proc_edit = QLineEdit(self)
         self.acid_proc_edit.setText('15')
         self.acid_proc_edit.setClearButtonEnabled(True)
+        self.acid_proc_edit.setValidator(self.validator_int)
 
         self.pressure_Label = QLabel("Давление закачки", self)
         self.pressure_edit = QLineEdit(self)
         self.pressure_edit.setText(f'{well_data.max_admissible_pressure._value}')
+        self.pressure_edit.setValidator(self.validator_int)
 
-        grid = QGridLayout(self)
+        self.distance_pntzh_label = QLabel('Расстояние  до ПНТЖ', self)
+        self.distance_pntzh_edit = QLineEdit(self)
+        self.distance_pntzh_edit.setValidator(self.validator_int)
+
+
+        self.grid = QGridLayout(self)
         # grid.addWidget(self.gnkt_number_label, 0, 0)
         # grid.addWidget(self.gnkt_number_combo, 1, 0)
-        grid.addWidget(self.plast_label, 0, 1)
-        grid.addWidget(self.plast_combo, 1, 1)
-        grid.addWidget(self.roof_label, 0, 2)
-        grid.addWidget(self.roof_edit, 1, 2)
-        grid.addWidget(self.sole_label, 0, 3)
-        grid.addWidget(self.sole_edit, 1, 3)
+        self.grid.addWidget(self.plast_label, 0, 1)
+        self.grid.addWidget(self.plast_combo, 1, 1)
+        self.grid.addWidget(self.roof_label, 0, 2)
+        self.grid.addWidget(self.roof_edit, 1, 2)
+        self.grid.addWidget(self.sole_label, 0, 3)
+        self.grid.addWidget(self.sole_edit, 1, 3)
 
-        grid.addWidget(self.need_rast_label, 2, 0)
-        grid.addWidget(self.need_rast_combo, 3, 0)
-        grid.addWidget(self.volume_rast_label, 2, 1)
-        grid.addWidget(self.volume_rast_edit, 3, 1)
+        self.grid.addWidget(self.need_rast_label, 2, 0)
+        self.grid.addWidget(self.need_rast_combo, 3, 0)
+        self.grid.addWidget(self.volume_rast_label, 2, 1)
+        self.grid.addWidget(self.volume_rast_edit, 3, 1)
 
-        grid.addWidget(self.skv_true_label_type, 4, 0)
-        grid.addWidget(self.svk_true_edit, 5, 0)
-        grid.addWidget(self.skv_acid_label_type, 4, 1)
-        grid.addWidget(self.skv_acid_edit, 5, 1)
-        grid.addWidget(self.skv_volume_label, 4, 2)
-        grid.addWidget(self.skv_volume_edit, 5, 2)
-        grid.addWidget(self.skv_proc_label, 4, 3)
-        grid.addWidget(self.skv_proc_edit, 5, 3)
+        self.grid.addWidget(self.skv_true_label_type, 4, 0)
+        self.grid.addWidget(self.svk_true_combo, 5, 0)
+        self.grid.addWidget(self.skv_acid_label_type, 4, 1)
+        self.grid.addWidget(self.skv_acid_edit, 5, 1)
+        self.grid.addWidget(self.skv_volume_label, 4, 2)
+        self.grid.addWidget(self.skv_volume_edit, 5, 2)
+        self.grid.addWidget(self.skv_proc_label, 4, 3)
+        self.grid.addWidget(self.skv_proc_edit, 5, 3)
 
-        grid.addWidget(self.acid_label, 6, 0)
-        grid.addWidget(self.acid_true_edit, 7, 0)
+        self.grid.addWidget(self.acid_label, 6, 0)
+        self.grid.addWidget(self.acid_true_edit, 7, 0)
 
-        grid.addWidget(self.acid_label_type, 6, 1)
-        grid.addWidget(self.acid_edit, 7, 1)
-        grid.addWidget(self.acid_volume_label, 6, 2)
-        grid.addWidget(self.acid_volume_edit, 7, 2)
-        grid.addWidget(self.acid_proc_label, 6, 3)
-        grid.addWidget(self.acid_proc_edit, 7, 3)
+        self.grid.addWidget(self.acid_label_type, 6, 1)
+        self.grid.addWidget(self.acid_edit, 7, 1)
+        self.grid.addWidget(self.acid_volume_label, 6, 2)
+        self.grid.addWidget(self.acid_volume_edit, 7, 2)
+        self.grid.addWidget(self.acid_proc_label, 6, 3)
+        self.grid.addWidget(self.acid_proc_edit, 7, 3)
         # grid.addWidget(self.acidOilProcLabel, 4, 4)
         # grid.addWidget(self.acidOilProcEdit, 5, 4)
-        grid.addWidget(self.pressure_Label, 6, 5)
-        grid.addWidget(self.pressure_edit, 7, 5)
+        self.grid.addWidget(self.pressure_Label, 6, 5)
+        self.grid.addWidget(self.pressure_edit, 7, 5)
 
-        grid.addWidget(self.pressure_Label, 6, 5)
-        grid.addWidget(self.pressure_edit, 7, 5)
+        self.grid.addWidget(self.pressure_Label, 6, 5)
+        self.grid.addWidget(self.pressure_edit, 7, 5)
+
+        self.grid.addWidget(self.distance_pntzh_label, 8, 1, 1, 3)
+        self.grid.addWidget(self.distance_pntzh_edit, 9, 1, 1, 3)
+
+        self.svk_true_combo.currentTextChanged.connect(self.update_skv_edit)
+        self.svk_true_combo.setCurrentIndex(0)
+        self.svk_true_combo.setCurrentIndex(1)
+        self.acid_edit.currentTextChanged.connect(self.update_sko_type)
+        self.plast_combo.combo_box.currentTextChanged.connect(self.update_plast_edit)
+    def update_skv_edit(self, index):
+        if index == 'Нужно СКВ':
+            self.grid.addWidget(self.skv_acid_label_type, 4, 1)
+            self.grid.addWidget(self.skv_acid_edit, 5, 1)
+            self.grid.addWidget(self.skv_volume_label, 4, 2)
+            self.grid.addWidget(self.skv_volume_edit, 5, 2)
+            self.grid.addWidget(self.skv_proc_label, 4, 3)
+            self.grid.addWidget(self.skv_proc_edit, 5, 3)
+        else:
+            self.skv_acid_label_type.setParent(None)
+            self.skv_acid_edit.setParent(None)
+            self.skv_volume_label.setParent(None)
+            self.skv_volume_edit.setParent(None)
+            self.skv_proc_label.setParent(None)
+            self.skv_proc_edit.setParent(None)
 
     def update_plast_edit(self):
-        pass
 
+        dict_perforation = well_data.dict_perforation
+        plasts = well_data.texts
+        # print(f'пласты {plasts, len(well_data.texts), len(plasts), well_data.texts}')
+        roof_plast = well_data.current_bottom
+        sole_plast = 0
+        for plast in well_data.plast_work:
+            for plast_sel in plasts:
+                if plast_sel == plast:
+                    if roof_plast >= dict_perforation[plast]['кровля']:
+                        roof_plast = dict_perforation[plast]['кровля']
+                    if sole_plast <= dict_perforation[plast]['подошва']:
+                        sole_plast = dict_perforation[plast]['подошва']
+        self.roof_edit.setText(f'{roof_plast}')
+        self.sole_edit.setText(f'{sole_plast}')
+    def update_sko_type(self, type_sko):
+        self.sko_vt_label = QLabel('Высокотехнологическое СКО', self)
+        self.sko_vt_edit = QLineEdit(self)
+        if type_sko == 'ВТ':
+            self.grid.addWidget(self.sko_vt_label, 6, 6)
+            self.grid.addWidget(self.sko_vt_edit, 7, 6)
+        else:
+            self.sko_vt_label.setParent(None)
+            self.sko_vt_edit.setParent(None)
 
 class TabWidget(QTabWidget):
     def __init__(self):
@@ -179,13 +238,22 @@ class GnktOpz(QMainWindow):
         acid_proc_edit = int(self.tabWidget.currentWidget().acid_proc_edit.text().replace(',', '.'))
         pressure_edit = int(self.tabWidget.currentWidget().pressure_edit.text())
         plast_combo = str(self.tabWidget.currentWidget().plast_combo.combo_box.currentText())
-        svk_true_edit = str(self.tabWidget.currentWidget().svk_true_edit.currentText())
+        svk_true_combo = str(self.tabWidget.currentWidget().svk_true_combo.currentText())
         skv_acid_edit = str(self.tabWidget.currentWidget().skv_acid_edit.currentText())
+        self.distance = self.tabWidget.currentWidget().distance_pntzh_edit.text()
+        if self.distance == '':
+            mes = QMessageBox.critical(self, "Ошибка", "Нужно указать расстояние до ПНТЖ")
+            return
+        if acid_edit == 'ВТ':
+            self.vt = self.tabWidget.currentWidget().sko_vt_edit.currentText()
+            if self.vt == '':
+                mes = QMessageBox.critical(self, "Ошибка", "Нужно расписать объемы и вид кислоты")
+                return
 
         work_list = self.gnkt_work(roof_plast, sole_plast, need_rast_combo, volume_rast_edit, acid_true_edit,
                                    acid_edit, skv_volume_edit, skv_proc_edit, acid_volume_edit, acid_proc_edit,
                                    pressure_edit,
-                                   plast_combo, svk_true_edit, skv_acid_edit, self.gnkt_number_combo, self.fluid_edit)
+                                   plast_combo, svk_true_combo, skv_acid_edit, self.gnkt_number_combo, self.fluid_edit)
 
 
         well_data.pause = False
@@ -194,11 +262,12 @@ class GnktOpz(QMainWindow):
 
     def gnkt_work(self, roof_plast, sole_plast, need_rast_combo, volume_rast_edit, acid_true_edit,
                   acid_edit, skv_volume_edit, skv_proc_edit, acid_volume_edit, acid_proc_edit, pressure_edit,
-                  plast_combo, svk_true_edit, skv_acid_edit, gnkt_number_combo, fluid_work_insert):
+                  plast_combo, svk_true_combo, skv_acid_edit, gnkt_number_combo, fluid_work_insert):
 
-        distance, _ = QInputDialog.getInt(None, 'Расстояние НПТЖ', 'Введите Расстояние до ПНТЖ')
 
-        block_gnvp_list = events_gnvp_frez(self, distance, float(fluid_work_insert))
+
+
+        block_gnvp_list = events_gnvp_frez(self, self.distance, float(fluid_work_insert))
 
 
         if gnkt_number_combo == 'ГНКТ №2':
@@ -233,8 +302,8 @@ class GnktOpz(QMainWindow):
             acid_sel_short = f'СКО пласта {plast_combo}  в объеме  {acid_volume_edit}м3  ' \
                              f'({acid_edit} - {acid_proc_edit} %)'
         elif acid_edit == 'ВТ':
-            vt, ok = QInputDialog.getText(None, 'Высокотехнологическая кислоты', 'Нужно расписать вид кислоты и объем')
-            acid_sel = f'Произвести кислотную обработку пласта {plast_combo} {vt}  силами Крезол ' \
+
+            acid_sel = f'Произвести кислотную обработку пласта {plast_combo} {self.vt}  силами Крезол ' \
                        f'НС с протяжкой БДТ вдоль интервалов перфорации {roof_plast}-' \
                        f'{sole_plast}м (снизу вверх) в присутствии представителя ' \
                        f'Заказчика с составлением акта, не превышая давления закачки не более ' \
@@ -258,7 +327,6 @@ class GnktOpz(QMainWindow):
                      None, None, None, None, None, None, None,
                      'Мастер ГНКТ, предст. Заказчика', 1]
         if well_data.depth_fond_paker_do["do"] == 0:
-            # print(25)
             depth_fond_paker_do = sum(list(well_data.dict_nkt.values()))
             # print(depth_fond_paker_do)
             if depth_fond_paker_do >= well_data.current_bottom:
@@ -272,7 +340,7 @@ class GnktOpz(QMainWindow):
             [None, 'Порядок работы', None,  None, None, None, None, None, None, None, None, None],
             [None,  None, 'Наименование работ',  None, None, None, None, None, None, None,
              'Ответственный', 'Нормы'],
-            [None,1, 'ВНИМАНИЕ: Перед спуском и вовремя проведения СПО бурильщикам и мастеру производить осмотр '
+            [None, 1, 'ВНИМАНИЕ: Перед спуском и вовремя проведения СПО бурильщикам и мастеру производить осмотр '
                          'ГНКТ на наличие '
                          '"меток" на г/трубы, установленных запрещённым способом.\nПри обнаружении - доложить руководству'
                          ' ООО "Ойл-Сервис" '
@@ -307,7 +375,6 @@ class GnktOpz(QMainWindow):
             [None, 4, 'Проводить замеры газовоздушной среды согласно утвержденного графика',
              None, None, None, None, None, None, None,
              'Мастер ГНКТ, состав бригады', None],
-
             [None, 6,
              'Провести работы по монтажу колтюбинговой установки'
              ' в соответствии с технологической инструкцией, федеральных норм и правила в области промышленной '
@@ -323,7 +390,7 @@ class GnktOpz(QMainWindow):
              None, None, None, None, None, None, None,
              'Мастер ГНКТ, состав бригады', None],
             [None, 8,
-             f'Произвести монтаж колтюбингового оборудования согласно утверждённой схемы № 5 от 14.10.2021г '
+             f'Произвести монтаж колтюбингового оборудования согласно утверждённой схемы №5 от 14.10.2021г '
              f'("Обвязки устья '
              f'при глушении скважин, после проведения гидроразрыва пласта и работы на скважинах ППД с оборудованием'
              f' койлтюбинговых установок на месторождениях ООО "Башнефть-Добыча") перевентором ППК 80х35 '
@@ -492,10 +559,10 @@ class GnktOpz(QMainWindow):
             for i in opz:
                 gnkt_opz.insert(n, i)
                 n += 1
-        else:
-            pass
+
         for row in block_gnvp_list[::-1]:
             gnkt_opz.insert(0, row)
+
         number_punkt = 1
         for i in range(3, len(gnkt_opz)):  # нумерация работ
             if len(str(gnkt_opz[i][1])) <= 3 and gnkt_opz[i][1] != '№':

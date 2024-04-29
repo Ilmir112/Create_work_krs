@@ -85,7 +85,7 @@ class TabPage_SO(QWidget):
             self.template_select_list = ['шаблон ДП с хвостом', 'шаблон ДП открытый ствол', 'шаблон ДП без хвоста']
             self.template_Combo.addItems(self.template_select_list)
             template_key = self.definition_pssh()
-            # print(template_key)
+            print(template_key)
             self.template_Combo.setCurrentIndex(self.template_select_list.index(template_key))
 
             self.grid.addWidget(self.template_labelType, 1, 2, 1, 8)

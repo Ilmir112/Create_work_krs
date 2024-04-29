@@ -1108,7 +1108,6 @@ class TemplateKrs(QMainWindow):
 
     def pero(self):
         from .rir import RirWindow
-
         from .drilling import Drill_window
 
         pero_list = RirWindow.pero_select(self, well_data.current_bottom)
@@ -1150,25 +1149,30 @@ class TemplateKrs(QMainWindow):
              None]
         ]
         if well_data.gipsInWell is True:
-
             if well_data.dict_pump_SHGN["do"] != 0:
 
                 gipsPero_list = [gipsPero_list[-1]]
-                from .drilling import Drill_window
-                drill_work_list = Drill_window.add_work(self)
+
+                self.raid_window = Drill_window(self.table_widget, self.ins_ind,)
+                self.raid_window.setGeometry(200, 400, 300, 400)
+                self.raid_window.show()
+                MyWindow.pause_app()
+                well_data.pause = False
+                drill_work_list = self.raid_window.add_work()
+                self.raid_window = None
 
                 for row in drill_work_list:
                     gipsPero_list.append(row)
             else:
-                if self.raid_window is None:
-                    self.raid_window = Drill_window(self.table_widget, self.ins_ind)
-                    # self.raid_window.setGeometry(200, 400, 300, 400)
-                    self.raid_window.show()
-                    drill_work_list = self.raid_window.add_work()
-                    self.raid_window = None
-                else:
-                    self.raid_window.close()  # Close window.
-                    self.raid_window = None
+
+                self.raid_window = Drill_window(self.ins_ind, self.table_widget)
+                self.raid_window.setGeometry(200, 400, 300, 400)
+                self.raid_window.show()
+                MyWindow.pause_app()
+                well_data.pause = False
+                drill_work_list = self.raid_window.add_work()
+                self.raid_window = None
+
                 for row in drill_work_list:
                     gipsPero_list.append(row)
 

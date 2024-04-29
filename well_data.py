@@ -54,7 +54,14 @@ well_area = ProtectedIsNonNone('не корректно')
 well_number = ProtectedIsNonNone('не корректно')
 inv_number = ProtectedIsNonNone('не корректно')
 cdng = ProtectedIsNonNone('не корректно')
-
+gnkt_number = 0
+gnkt_length = 0
+diametr_length = 0
+iznos = 0
+pipe_mileage = 0
+pipe_fatigue = 0
+pvo = 0
+previous_well = 0
 bottomhole_drill = ProtectedIsNonNone('не корректно')
 bottomhole_artificial = ProtectedIsNonNone('не корректно')
 max_angle = ProtectedIsNonNone('не корректно')

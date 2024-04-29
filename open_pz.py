@@ -59,7 +59,7 @@ class CreatePZ(QMainWindow):
         Well_perforation.read_well(self, ws, well_data.data_pvr_min._value, well_data.data_pvr_max._value + 1)
         Well_Category.read_well(self, ws, well_data.cat_well_min._value, well_data.data_well_min._value)
 
-        if work_plan not in ['application_pvr',  'application_gis']:
+        if work_plan not in ['application_pvr', 'application_gis']:
             for row_ind, row in enumerate(ws.iter_rows(values_only=True)):
                 ws.row_dimensions[row_ind].hidden = False
 
@@ -77,8 +77,6 @@ class CreatePZ(QMainWindow):
                     if not value is None and col <= 12:
                         if 'гипс' in str(value).lower() or 'гидратн' in str(value).lower():
                             well_data.gipsInWell = True
-
-
 
             if well_data.emergency_well is True:
                 emergency_quest = QMessageBox.question(self, 'Аварийные работы ',
@@ -134,12 +132,12 @@ class CreatePZ(QMainWindow):
                     except:
                         pass
 
-            for j in range(well_data.data_x_min._value, well_data.data_x_max._value):  # Ожидаемые показатели после ремонта
+            for j in range(well_data.data_x_min._value,
+                           well_data.data_x_max._value):  # Ожидаемые показатели после ремонта
                 lst = []
                 for i in range(0, 12):
                     lst.append(ws.cell(row=j + 1, column=i + 1).value)
                 well_data.row_expected.append(lst)
-
 
             if well_data.work_plan not in ['gnkt_frez', 'application_pvr', 'application_gis', 'gnkt_after_grp']:
                 # print(f'план работ {well_data.work_plan}')
@@ -197,17 +195,21 @@ class CreatePZ(QMainWindow):
                         ws.row_dimensions[well_data.ins_ind + i - 1].height = None
                         for j in range(1, 12):
                             if i == 1:
-                                ws.cell(row=i + well_data.ins_ind, column=j).font = Font(name='Arial', size=13, bold=True)
+                                ws.cell(row=i + well_data.ins_ind, column=j).font = Font(name='Arial', size=13,
+                                                                                         bold=True)
                                 ws.cell(row=i + well_data.ins_ind, column=j).alignment = Alignment(wrap_text=False,
                                                                                                    horizontal='center',
                                                                                                    vertical='center')
-                                ws.cell(row=i + well_data.ins_ind, column=j).value = well_data.row_expected[i - 1][j - 1]
+                                ws.cell(row=i + well_data.ins_ind, column=j).value = well_data.row_expected[i - 1][
+                                    j - 1]
                             else:
-                                ws.cell(row=i + well_data.ins_ind, column=j).font = Font(name='Arial', size=13, bold=True)
+                                ws.cell(row=i + well_data.ins_ind, column=j).font = Font(name='Arial', size=13,
+                                                                                         bold=True)
                                 ws.cell(row=i + well_data.ins_ind, column=j).alignment = Alignment(wrap_text=False,
                                                                                                    horizontal='left',
                                                                                                    vertical='center')
-                                ws.cell(row=i + well_data.ins_ind, column=j).value = well_data.row_expected[i - 1][j - 1]
+                                ws.cell(row=i + well_data.ins_ind, column=j).value = well_data.row_expected[i - 1][
+                                    j - 1]
                     ws.merge_cells(start_column=2, start_row=well_data.ins_ind + 1, end_column=12,
                                    end_row=well_data.ins_ind + 1)
                     well_data.ins_ind += len(well_data.row_expected)
@@ -222,17 +224,18 @@ class CreatePZ(QMainWindow):
                     if col_ind in [3, 2]:
                         if 'кровля' in str(col).lower():
                             type_pvr = ws.cell(row=row_ind, column=3).value
-                            index_row_pvr_begin = row_ind+1
+                            index_row_pvr_begin = row_ind + 1
                         if 'произвести контрольную' in str(col).lower():
                             index_row_pvr_cancel = row_ind
                             if index_row_pvr_begin < index_row_pvr_cancel:
-                                well_data.index_row_pvr_list.append((index_row_pvr_begin, index_row_pvr_cancel, type_pvr))
+                                well_data.index_row_pvr_list.append(
+                                    (index_row_pvr_begin, index_row_pvr_cancel, type_pvr))
                                 index_row_pvr_begin, index_row_pvr_cancel = 0, 0
             for pvr in well_data.index_row_pvr_list:
                 for row in range(pvr[0], pvr[1]):
                     row_list = []
                     for col in range(2, 9):
-                        row_list.append(str(ws.cell(row=row+1, column=col+1).value))
+                        row_list.append(str(ws.cell(row=row + 1, column=col + 1).value))
                     well_data.pvr_row.append(row_list)
 
             # print(f'Индексы ПВР {well_data.pvr_row}')
@@ -245,19 +248,8 @@ class CreatePZ(QMainWindow):
                             'задаче №' in str(col).lower()) and \
                                 'перфорация' not in str(col).lower() and 'привязка' not in str(col).lower() and \
                                 'отбивка' not in str(col).lower():
-                            type_pvr = ws.cell(row=row_ind+1, column=3).value
+                            type_pvr = ws.cell(row=row_ind + 1, column=3).value
                             well_data.gis_list.append(type_pvr)
-
-
-
-
-
-
-
-
-
-
-
 
     def add_itog(self, ws, ins_ind, work_plan):
 
@@ -314,6 +306,5 @@ class CreatePZ(QMainWindow):
             return True
         except ValueError:
             return False
-
 
 #

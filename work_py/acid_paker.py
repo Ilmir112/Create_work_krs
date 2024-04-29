@@ -190,13 +190,11 @@ class TabPage_SO_acid(QWidget):
         self.diametr_paker_labelType = QLabel("Диаметр пакера", self)
         self.diametr_paker_edit = QLineEdit(self)
 
-
-
         self.khovst_label = QLabel("Длина хвостовики", self)
         self.paker_khost = QLineEdit(self)
 
-
-        plast_work = well_data.plast_work
+        plast_work = ['']
+        plast_work.extend(well_data.plast_work)
 
         self.plast_label = QLabel("Выбор пласта", self)
         self.plast_combo = CheckableComboBox(self)
@@ -342,7 +340,19 @@ class TabPage_SO_acid(QWidget):
         self.plast_combo.combo_box.currentTextChanged.connect(self.update_paker_edit)
         self.iron_volume_edit.setText(f'{round(float(self.acid_volume_edit.text()), 1) * 10}')
         self.acid_volume_edit.textChanged.connect(self.change_volume_acid)
+        self.acid_edit.currentTextChanged.connect(self.update_sko_type)
+    def update_sko_type(self, type_sko):
 
+        if type_sko == 'ВТ':
+            self.sko_vt_label = QLabel('Высокотехнологическое СКО', self)
+            self.sko_vt_edit = QLineEdit(self)
+            self.grid.addWidget(self.sko_vt_label, 6, 6)
+            self.grid.addWidget(self.sko_vt_edit, 7, 6)
+        else:
+            self.sko_vt_label = QLabel('Высокотехнологическое СКО', self)
+            self.sko_vt_edit = QLineEdit(self)
+            self.sko_vt_label.setParent(None)
+            self.sko_vt_edit.setParent(None)
     def change_volume_acid(self):
         if self.acid_volume_edit.text() != '':
             self.iron_volume_edit.setText(f'{round(float(self.acid_volume_edit.text().replace(",", ".")), 1) * 10}')
@@ -941,7 +951,7 @@ class AcidPakerWindow(QMainWindow):
 
         paker_list = [
             [self.paker_short, None,
-             f'Спустить {self.paker_select} {gidroyakor_str} на НКТ{nkt_diam}мм до '
+             f'Спустить {self.paker_select} на НКТ{nkt_diam}мм до '
              f'глубины {paker_depth}/{paker2_depth}м'
              f' с замером, шаблонированием шаблоном {nkt_template}мм. '
              f'{("Произвести пробную посадку на глубине 50м" if well_data.column_additional is False else "")} ',
@@ -986,27 +996,26 @@ class AcidPakerWindow(QMainWindow):
                                   f'Заявить {mtg_count} глубинных манометра подрядчику по ГИС',
                                   None, None, None, None, None, None, None,
                                   'мастер КРС', None])
-
         return paker_list
     
     def select_diametr_nkt(self, paker_depth, swab_true_edit_type):
         if well_data.column_additional is True and float(well_data.column_additional_diametr._value) < 110 and \
                 paker_depth > well_data.head_column_additional._value and well_data.head_column_additional._value > 1000:
             nkt_diam = 73
-            nkt_pod = '60мм'
-            template_nkt_diam = '59.6мм, 47.9мм'
+            nkt_pod = '60'
+            template_nkt_diam = '59.6мм, 47.9'
         elif well_data.column_additional is True and float(well_data.column_additional_diametr._value) > 110 and \
                 paker_depth > well_data.head_column_additional._value:
             nkt_diam = 73
             nkt_pod = '73мм со снятыми фасками'
-            template_nkt_diam = '59.6мм'
+            template_nkt_diam = '59.6'
         elif well_data.column_additional and well_data.head_column_additional._value <= 1000 and \
                 swab_true_edit_type == 'Нужно освоение':
             nkt_list = ["60", "73"]
             nkt_diam, ok = QInputDialog.getItem(self, 'выбор диаметра НКТ', 'динамический уровень в скважине ниже головы хвостовика,'
                                                                           'Выберете диаметр НКТ', nkt_list, 0, False)
             nkt_pod = '60мм'
-            template_nkt_diam = '59.6мм, 47.9мм'
+            template_nkt_diam = '59.6мм, 47.9'
 
         elif well_data.column_additional is False and well_data.column_diametr._value < 110:
             nkt_diam = 60
@@ -1258,7 +1267,7 @@ class AcidPakerWindow(QMainWindow):
                              f' {acid_proc_edit} %) '
         elif acid_edit == 'ВТ':
 
-            vt, ok = QInputDialog.getText(None, 'Высокотехнологическая кислоты', 'Нужно расписать вид кислоты и объем')
+            vt = self.tabWidget.currentWidget().sko_vt_edit.currentText()
             acid_sel = f'Произвести кислотную обработку {plast_combo} {vt}  в присутствии представителя ' \
                        f'Заказчика с составлением акта, не превышая давления закачки не более' \
                        f' Р={well_data.max_admissible_pressure._value}атм.'

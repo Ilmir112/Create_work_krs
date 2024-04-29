@@ -26,6 +26,8 @@ dict_data_cdng = {
         'Диспетчер КЦДНГ 06 (disp6kudng@bn.rosneft.ru) +7 (34760) 71507',
     'КЦДНГ 07':
         'Диспетчер КЦДНГ 07 (changakul@bn.rosneft.ru) +7 (34760) 71120',
+    'КЦДНГ 08':
+        'Диспетчер КЦДНГ 08 (changakul@bn.rosneft.ru) +7 (34760) 71120',
     'ЮЦДНГ 01':
         'Диспетчер ЮЦДНГ 01 (DISP-UCDNG1@bn.rosneft.ru) +7 (34783) 76314',
     'ЮЦДНГ 02':
@@ -131,6 +133,15 @@ def calc_pntzh(fluid, cdng):
         else:
             return 'ПНТЖ "УПС-Биаваш"  соленая 1,18', 'ПНТЖ "Четырманово"  пресная 1'
     elif cdng in ['КЦДНГ 07']:
+        if fluid > 1.18:
+            return 'ПНТЖ Крезол',
+        elif fluid == 1.18:
+            return 'ПНТЖ "УПС-7" Байсар соленая 1,18',
+        elif fluid == 1.01:
+            return 'ПНТЖ "Четырманово"  пресная 1',
+        else:
+            return 'ПНТЖ "УПС-7" Байсар соленая 1,18', 'ПНТЖ "Четырманово"  пресная 1'
+    elif cdng in ['КЦДНГ 08']:
         if fluid > 1.18:
             return 'ПНТЖ Крезол',
         elif fluid == 1.18:

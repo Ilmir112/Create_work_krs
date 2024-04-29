@@ -2,6 +2,8 @@ import sqlite3
 from datetime import datetime
 from collections import namedtuple
 
+import well_data
+
 Saddles = namedtuple('Saddles', ['saddle', 'ball'])
 
 Gnkt_data = namedtuple("Gnkt_data", ["gnkt_length", "diametr_length", "iznos", "pipe_mileage", 'pipe_fatigue', "pvo"])
@@ -80,12 +82,13 @@ def read_database_gnkt(contractor, gnkt_number):
         contractor = 'oil_service'
 
     cursor.execute(f"SELECT * FROM gnkt_{contractor} WHERE gnkt_number =?", (gnkt_number,))
-
+    well_previus_list = []
     result = cursor.fetchall()
-    print(result)
-    well_previus_list = [(well[8], well[9]) for well in result]
-    well_previus_list = sorted(well_previus_list, key=lambda x:  datetime.strptime(x[1], "%d.%m.%Y"))
-    well_previus_list = list(filter(lambda x: x[0], well_previus_list))
+
+    well_previus_list = [(well[2], well[9]) for well in result]
+    well_previus_list = sorted(well_previus_list, key=lambda x:  datetime.strptime(x[1], "%d.%m.%Y"), reverse=True)
+    well_previus_list = list(map(lambda x:x[0], list(filter(lambda x: x[0], well_previus_list))))
+    print(f' списа{well_previus_list}')
     print(f'список ремонтов {result}')
     # Закрытие соединения с базой данных
     conn.close()
@@ -93,84 +96,94 @@ def read_database_gnkt(contractor, gnkt_number):
     return well_previus_list
 
 
-def insert_data_base_gnkt(contractor, gnkt_number, gnkt_length, diametr_length,
+def insert_data_base_gnkt(contractor, well_name, gnkt_number, gnkt_length, diametr_length,
                      iznos, pipe_mileage, pipe_fatigue, pvo, previous_well):
+    print(previous_well)
 
     # Подключение к базе данных SQLite
     conn = sqlite3.connect('data_base\data_base_gnkt\gnkt_base.dp')
     cursor = conn.cursor()
 
     if 'ойл-сервис' in contractor.lower():
-        contractor = 'oilservice'
-
-    current_datetime = datetime.today().strftime('%d.%m.%Y')
-
-    data_values = (gnkt_number, '1963', gnkt_length, diametr_length, iznos,
-                   pipe_mileage, pipe_fatigue, pvo, current_datetime, previous_well)
-
-    # Подготовленный запрос для вставки данных с параметрами
-    query = f"INSERT INTO gnkt_{contractor} " \
-            f"(gnkt_number, well_number, length_gnkt, diameter_gnkt, wear_gnkt, mileage_gnkt, tubing_fatigue, " \
-            f"pvo_number, today, previous_well) " \
-            f"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-
-    # Выполнение запроса с использованием параметров
-    cursor.execute(query, data_values)
-
-    # Сохранение изменений
-    conn.commit()
-
-    # Закрытие соединения с базой данных
-    conn.close()
-def create_data_base(contractor, gnkt_number):
-    # Подключение к базе данных SQLite
-    conn = sqlite3.connect('D:\python\Create_work_krs\data_base\data_base_gnkt\gnkt_base.dp')
-    cursor = conn.cursor()
-    if 'ойл-сервис' in contractor.lower():
         contractor = 'oil_service'
 
-        # Удаление всех данных из таблицы
-        cursor.execute(f"DROP TABLE gnkt_{contractor}")
+    filenames = f"{well_data.well_number._value} {well_data.well_area._value} кат " \
+                f"{well_data.cat_P_1} {well_data.work_plan}.xlsx"
+    cursor.execute(f"SELECT * FROM gnkt_{contractor} WHERE well_number =?", (filenames,))
 
-    # Создание таблицы в базе данных
-    cursor.execute(f'CREATE TABLE IF NOT EXISTS gnkt_{contractor}'
-                   f'(id INTEGER PRIMARY KEY AUTOINCREMENT,'
-                   f'gnkt_number INT NOT NULL,'
-                   f'well_number TEXT,'
-                   f'length_gnkt INT NOT NULL, '
-                   f'diameter_gnkt DECIMAL(10,2) NOT NULL,'
-                   f'wear_gnkt DECIMAL(5,2) NOT NULL,'
-                   f'mileage_gnkt DECIMAL(10,2) NOT NULL,'
-                   f'tubing_fatigue TEXT NOT NULL,'
-                   f'previus_well TEXT NOT NULL,'
-                   f'today TEXT NOT NULL,'
-                   f'pvo_number INT NOT NULL)'
-                   )
-    Gnkt_data = namedtuple("Gnkt_data",
-                           ["gnkt_length", "diametr_length", "iznos", "pipe_mileage", 'pipe_fatigue',
-                            "pvo"])
-    gnkt_2 = Gnkt_data(2200, 38, 20, 35025, '25', 115)
-    gnkt_1 = Gnkt_data(3200, 38, 20, 42006, '25', 166)
-    for ind, gnkt in enumerate([gnkt_1, gnkt_2]):
-        if ind == 0:
-            gnkt_number = 'ГНКТ №1'
-        else:
-            gnkt_number = 'ГНКТ №2'
-        data_values = (gnkt_number, '1963', gnkt.gnkt_length, gnkt.diametr_length, gnkt.iznos,
-                       gnkt.pipe_mileage, gnkt.pipe_fatigue, '1923', '26.04.2024', gnkt.pvo)
+    result = cursor.fetchall()
+
+    if result is None:
+        current_datetime = datetime.today().strftime('%d.%m.%Y')
+
+        data_values = (gnkt_number, well_name, gnkt_length, diametr_length, iznos,
+                       pipe_mileage, pipe_fatigue, previous_well, current_datetime, pvo)
+        print(data_values)
+
+
         # Подготовленный запрос для вставки данных с параметрами
         query = f"INSERT INTO gnkt_{contractor} " \
-                f"(gnkt_number, well_number, length_gnkt, diameter_gnkt, wear_gnkt, mileage_gnkt, tubing_fatigue, previus_well, today, pvo_number) " \
+                f"(gnkt_number, well_number, length_gnkt, diameter_gnkt, wear_gnkt, mileage_gnkt, " \
+                f"tubing_fatigue, previous_well, today, pvo_number) " \
                 f"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 
         # Выполнение запроса с использованием параметров
         cursor.execute(query, data_values)
-
-    # Сохранение изменений
+    else:
+        print(f'скважина есть в базе данных')    # Сохранение изменений
     conn.commit()
 
     # Закрытие соединения с базой данных
     conn.close()
-contractor = 'ООО "Ойл-Сервис'
-print()
-create_data_base(contractor, 'ГНКТ №1')
+# def create_data_base(contractor, gnkt_number):
+#     # Подключение к базе данных SQLite
+#     conn = sqlite3.connect('D:\python\Create_work_krs\data_base\data_base_gnkt\gnkt_base.dp')
+#     cursor = conn.cursor()
+#     if 'ойл-сервис' in contractor.lower():
+#         contractor = 'oil_service'
+#
+#         # Удаление всех данных из таблицы
+#         cursor.execute(f"DROP TABLE gnkt_{contractor}")
+#
+#     # Создание таблицы в базе данных
+#     cursor.execute(f'CREATE TABLE IF NOT EXISTS gnkt_{contractor}'
+#                    f'(id INTEGER PRIMARY KEY AUTOINCREMENT,'
+#                    f'gnkt_number TEXT,'
+#                    f'well_number TEXT,'
+#                    f'length_gnkt INT NOT NULL, '
+#                    f'diameter_gnkt DECIMAL(10,2) NOT NULL,'
+#                    f'wear_gnkt DECIMAL(5,2) NOT NULL,'
+#                    f'mileage_gnkt INT NOT NULL,'
+#                    f'tubing_fatigue TEXT NOT NULL,'
+#                    f'previous_well TEXT NOT NULL,'
+#                    f'today TEXT NOT NULL,'
+#                    f'pvo_number TEXT)'
+#                    )
+#     Gnkt_data = namedtuple("Gnkt_data",
+#                            ["gnkt_length", "diametr_length", "iznos", "pipe_mileage", 'pipe_fatigue',
+#                             "pvo"])
+#     gnkt_2 = Gnkt_data(2200, 38, 20, 35025, '25', 115)
+#     gnkt_1 = Gnkt_data(3200, 38, 20, 42006, '25', 166)
+#     for ind, gnkt in enumerate([gnkt_1, gnkt_2]):
+#         if ind == 0:
+#             gnkt_number = 'ГНКТ №1'
+#         else:
+#             gnkt_number = 'ГНКТ №2'
+#         data_values = (gnkt_number, '1963', gnkt.gnkt_length, gnkt.diametr_length, gnkt.iznos,
+#                        gnkt.pipe_mileage, gnkt.pipe_fatigue, '12 Сухоязская кат 3 gnkt_opz.xlsx', '26.04.2024', gnkt.pvo)
+#         # Подготовленный запрос для вставки данных с параметрами
+#         query = f"INSERT INTO gnkt_{contractor} " \
+#                 f"(gnkt_number, well_number, length_gnkt, diameter_gnkt, wear_gnkt, mileage_gnkt, tubing_fatigue, previous_well, today, pvo_number) " \
+#                 f"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+#
+#         # Выполнение запроса с использованием параметров
+#         cursor.execute(query, data_values)
+#
+#     # Сохранение изменений
+#     conn.commit()
+#
+#     # Закрытие соединения с базой данных
+#     conn.close()
+# contractor = 'ООО "Ойл-Сервис'
+# print()
+# create_data_base(contractor, 'ГНКТ №1')

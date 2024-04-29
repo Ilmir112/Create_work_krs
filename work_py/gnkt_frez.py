@@ -114,9 +114,12 @@ class Work_with_gnkt(QMainWindow):
         ins_ind = 1
 
         for i in range(1, len(work_list) + 1):  # Добавлением работ
-            if str(work_list[i - 1][1]).isdigit() and i > 39:  # Нумерация
-                work_list[i - 1][1] = str(ins_ind)
-                ins_ind += 1
+            if sheet_name == 'Ход работ':
+                if len(str(work_list[i - 1][1])) <= 3 and str(work_list[i - 1][1]) != '№':  # Нумерация
+                    work_list[i - 1][1] = str(ins_ind)
+                    ins_ind += 1
+                else:
+                    ins_ind = 1
             for j in range(1, 13):
                 cell = ws2.cell(row=i, column=j)
 
@@ -259,13 +262,15 @@ class Work_with_gnkt(QMainWindow):
         main.MyWindow.insert_image(self, ws7, 'imageFiles/schema_well/СХЕМЫ КНК_38,1.png', 'A1', 550, 900)
 
         # path = 'workiii'
-        path = 'D:\Documents\Desktop\ГТМ'
+        if 'Зуфаров' in well_data.user:
+            path = 'D:\Documents\Desktop\ГТМ'
+        else:
+            path = ""
+
         filenames = f"{well_data.well_number._value} {well_data.well_area._value} кат " \
                     f"{well_data.cat_P_1} {self.work_plan}.xlsx"
         full_path = path + '/' + filenames
-        # print(f'10 - {ws2.max_row}')
-        # print(wb2.path)
-        # print(f' кате {well_data.cat_P_1}')
+
 
         if well_data.bvo is True:
             ws5 = Work_with_gnkt.wb_gnkt_frez.create_sheet('Sheet1')
@@ -280,7 +285,7 @@ class Work_with_gnkt(QMainWindow):
             main.MyWindow.saveFileDialog(self, Work_with_gnkt.wb_gnkt_frez, full_path)
 
             Work_with_gnkt.wb_gnkt_frez.close()
-            print(f"Table data saved to Excel {full_path} {well_data.number_dp}")
+
         if self.wb:
             self.wb.close()
 
@@ -452,8 +457,8 @@ class Work_with_gnkt(QMainWindow):
 
         bottom_first_port = self.ports_data['№1']['кровля']
 
-        gnkt_lenght = int(GnktOsvWindow2.lenght_gnkt_edit)
-        gnkt_lenght_str = f'длина ГНКТ - {GnktOsvWindow2.lenght_gnkt_edit}м; износ -{GnktOsvWindow2.iznos_gnkt_edit}%; ' \
+        gnkt_lenght = int(well_data.gnkt_length)
+        gnkt_lenght_str = f'длина ГНКТ - {well_data.gnkt_length}м; износ -{well_data.iznos}%; ' \
                       f'пробег '
         volume_vn_gnkt = round(30.2 ** 2 * 3.14 / (4 * 1000), 2)
         volume_gnkt = round(gnkt_lenght * volume_vn_gnkt / 1000, 1)
@@ -1507,19 +1512,6 @@ class Work_with_gnkt(QMainWindow):
 
 
         return ports_list, merge_port
-
-    # def work_with_port(self, plast_work: str, dict_perforation: dict, manufacturer, type_column):
-    #     ports_tuple = sorted(list(dict_perforation[plast_work]['интервал']), key=lambda x: x[0], reverse=True)
-    #     dict_ports = {}
-    #
-    #     for index, port in enumerate(ports_tuple):
-    #         # print(dict_saddles[manufacturer])
-    #         ball = dict_saddles[manufacturer][type_column][type_saddles].ball
-    #         saddle = dict_saddles[manufacturer][type_column][type_saddles].saddle
-    #         dict_ports[f'№{index + 1}'] = {'кровля': port[0], 'подошва': port[1], 'шар': ball, 'седло': saddle,
-    #                                        'тип': type_saddles}
-    #
-    #     return dict_ports
 
     def calc_fluid(self):
 
