@@ -139,7 +139,8 @@ class CreatePZ(QMainWindow):
                     lst.append(ws.cell(row=j + 1, column=i + 1).value)
                 well_data.row_expected.append(lst)
 
-            if well_data.work_plan not in ['gnkt_frez', 'application_pvr', 'application_gis', 'gnkt_after_grp']:
+            if well_data.work_plan not in ['gnkt_frez', 'application_pvr',
+                                           'application_gis', 'gnkt_after_grp', 'gnkt_opz']:
                 # print(f'план работ {well_data.work_plan}')
                 delete_rows_pz(self, ws)
                 razdel = razdel_1(self, well_data.region)

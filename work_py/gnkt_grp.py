@@ -134,12 +134,8 @@ class GnktOsvWindow(QMainWindow):
         self.ws_work = self.wb.create_sheet(title="Ход работ")
 
         Work_with_gnkt.create_title_list(self, self.ws_title)
-        if self.work_plan == 'gnkt_opz':
-            b = 5
-        else:
-            b = 0
 
-        head = plan.head_ind(well_data.cat_well_min._value+b, well_data.cat_well_max._value+b)
+        head = plan.head_ind(well_data.cat_well_min._value, well_data.cat_well_max._value)
 
         plan.copy_true_ws(sheet, self.ws_title, head)
 

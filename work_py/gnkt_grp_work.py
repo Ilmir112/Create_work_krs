@@ -57,11 +57,14 @@ class TabPageDp(QWidget):
 
         self.fluid_label = QLabel("уд.вес жидкости глушения", self)
         self.fluid_edit = QLineEdit(self)
-        self.fluid_edit.setText('1.01')
+        if well_data.work_plan == 'gnkt_opz':
+            self.fluid_edit.setText('1.18')
+        else:
+            self.fluid_edit.setText('1.01')
 
-        self.osvoenie_label = QLabel('Необходимость освоения')
-        self.osvoenie_combo = QComboBox(self)
-        self.osvoenie_combo.addItems(['Да', 'Нет'])
+        # self.osvoenie_label = QLabel('Необходимость освоения')
+        # self.osvoenie_combo = QComboBox(self)
+        # self.osvoenie_combo.addItems(['Да', 'Нет'])
 
         self.grid = QGridLayout(self)
         self.grid.addWidget(self.gnkt_number_label, 0, 2, 1, 5)
@@ -84,8 +87,8 @@ class TabPageDp(QWidget):
         self.grid.addWidget(self.current_bottom_edit, 5, 2)
         self.grid.addWidget(self.fluid_label, 4, 3)
         self.grid.addWidget(self.fluid_edit, 5, 3)
-        self.grid.addWidget(self.osvoenie_label, 4, 4)
-        self.grid.addWidget(self.osvoenie_combo, 5, 4)
+        # self.grid.addWidget(self.osvoenie_label, 4, 4)
+        # self.grid.addWidget(self.osvoenie_combo, 5, 4)
         self.gnkt_number_combo.currentTextChanged.connect(self.update_number_gnkt)
         self.previous_well_combo.currentTextChanged.connect(self.update_data_gnkt)
 
@@ -136,7 +139,7 @@ class TabPageDp(QWidget):
 class TabWidget(QTabWidget):
     def __init__(self):
         super().__init__()
-        self.addTab(TabPageDp(), 'ГНКТ освоение после ГРП')
+        self.addTab(TabPageDp(), 'Данные по ГНКТ')
 
 
 class GnktOsvWindow2(QMainWindow):
@@ -179,7 +182,6 @@ class GnktOsvWindow2(QMainWindow):
         previous_well_combo = self.tabWidget.currentWidget().previous_well_combo.currentText()
         well_data.previous_well = previous_well_combo
 
-        print(f'lllddd {well_data.previous_well}')
         diametr_length = 38
         well_data.diametr_length = 38
 

@@ -54,7 +54,6 @@ class TabPage_gnkt(QWidget):
         self.svk_true_combo.setCurrentIndex(1)
         self.svk_true_combo.setProperty('value', 'без СКВ')
 
-
         self.skv_acid_label_type = QLabel("Вид кислоты для СКВ", self)
         self.skv_acid_edit = QComboBox(self)
         self.skv_acid_edit.addItems(['HCl', 'HF'])
@@ -88,7 +87,6 @@ class TabPage_gnkt(QWidget):
         self.acid_volume_edit.setText("10")
         self.acid_volume_edit.setClearButtonEnabled(True)
 
-
         self.acid_proc_label = QLabel("Концентрация кислоты", self)
         self.acid_proc_edit = QLineEdit(self)
         self.acid_proc_edit.setText('15')
@@ -103,7 +101,6 @@ class TabPage_gnkt(QWidget):
         self.distance_pntzh_label = QLabel('Расстояние  до ПНТЖ', self)
         self.distance_pntzh_edit = QLineEdit(self)
         self.distance_pntzh_edit.setValidator(self.validator_int)
-
 
         self.grid = QGridLayout(self)
         # grid.addWidget(self.gnkt_number_label, 0, 0)
@@ -154,6 +151,7 @@ class TabPage_gnkt(QWidget):
         self.svk_true_combo.setCurrentIndex(1)
         self.acid_edit.currentTextChanged.connect(self.update_sko_type)
         self.plast_combo.combo_box.currentTextChanged.connect(self.update_plast_edit)
+
     def update_skv_edit(self, index):
         if index == 'Нужно СКВ':
             self.grid.addWidget(self.skv_acid_label_type, 4, 1)
@@ -186,6 +184,7 @@ class TabPage_gnkt(QWidget):
                         sole_plast = dict_perforation[plast]['подошва']
         self.roof_edit.setText(f'{roof_plast}')
         self.sole_edit.setText(f'{sole_plast}')
+
     def update_sko_type(self, type_sko):
         self.sko_vt_label = QLabel('Высокотехнологическое СКО', self)
         self.sko_vt_edit = QLineEdit(self)
@@ -196,6 +195,7 @@ class TabPage_gnkt(QWidget):
             self.sko_vt_label.setParent(None)
             self.sko_vt_edit.setParent(None)
 
+
 class TabWidget(QTabWidget):
     def __init__(self):
         super().__init__()
@@ -203,7 +203,7 @@ class TabWidget(QTabWidget):
 
 
 class GnktOpz(QMainWindow):
-    def __init__(self,  table_widget, gnkt_number_combo, fluid_edit, parent=None):
+    def __init__(self, table_widget, gnkt_number_combo, fluid_edit, parent=None):
 
         super(GnktOpz, self).__init__(parent=None)
         self.centralWidget = QWidget()
@@ -255,7 +255,6 @@ class GnktOpz(QMainWindow):
                                    pressure_edit,
                                    plast_combo, svk_true_combo, skv_acid_edit, self.gnkt_number_combo, self.fluid_edit)
 
-
         well_data.pause = False
         self.close()
         return work_list
@@ -264,11 +263,7 @@ class GnktOpz(QMainWindow):
                   acid_edit, skv_volume_edit, skv_proc_edit, acid_volume_edit, acid_proc_edit, pressure_edit,
                   plast_combo, svk_true_combo, skv_acid_edit, gnkt_number_combo, fluid_work_insert):
 
-
-
-
         block_gnvp_list = events_gnvp_frez(self, self.distance, float(fluid_work_insert))
-
 
         if gnkt_number_combo == 'ГНКТ №2':
             gnkt_number = gnkt_data.gnkt_2
@@ -281,7 +276,6 @@ class GnktOpz(QMainWindow):
             acid_true_quest = True
         else:
             acid_true_quest = False
-
 
         fluid_work, well_data.fluid_work_short = GnoWindow.calc_work_fluid(self, fluid_work_insert)
 
@@ -308,7 +302,7 @@ class GnktOpz(QMainWindow):
                        f'{sole_plast}м (снизу вверх) в присутствии представителя ' \
                        f'Заказчика с составлением акта, не превышая давления закачки не более ' \
                        f'Р = {well_data.max_admissible_pressure._value}атм.'
-            acid_sel_short = f'{vt} пласта {plast_combo}  в объеме ' \
+            acid_sel_short = f'{self.vt} пласта {plast_combo}  в объеме ' \
                              f'{acid_volume_edit}м3  ({acid_edit} - {acid_proc_edit} %)'
         elif acid_edit == 'HF':
             acid_sel = f'Произвести глинокислотную обработку пласта {plast_combo} в объеме ' \
@@ -337,34 +331,34 @@ class GnktOpz(QMainWindow):
             depth_fond_paker_do = well_data.depth_fond_paker_do["do"]
 
         gnkt_opz = [
-            [None, 'Порядок работы', None,  None, None, None, None, None, None, None, None, None],
-            [None,  None, 'Наименование работ',  None, None, None, None, None, None, None,
+            [None, 'Порядок работы', None, None, None, None, None, None, None, None, None, None],
+            [None, None, 'Наименование работ', None, None, None, None, None, None, None,
              'Ответственный', 'Нормы'],
             [None, 1, 'ВНИМАНИЕ: Перед спуском и вовремя проведения СПО бурильщикам и мастеру производить осмотр '
-                         'ГНКТ на наличие '
-                         '"меток" на г/трубы, установленных запрещённым способом.\nПри обнаружении - доложить руководству'
-                         ' ООО "Ойл-Сервис" '
-                         'по согласованию произвести отрезание ГНКТ выше "метки" с составлением АКТа и указанием метража '
-                         'отрезанного участка ГНКТ. '
-                         'Установку меток на г/трубе производить ТОЛЬКО безопасным способом - (краской, лентой фум, '
-                         'шкемарём, и тд.) '
-                         'КАТЕГОРИЧЕСКИ ЗАПРЕЩАЕТСЯ устанавливать "метки" опасным способом - вальцевателем (труборезом) или '
-                         'другим инструментом - '
-                         'который причиняет механические повреждения на теле г/трубы и может привести к снижению прочностных '
-                         'характеристик ГНКТ. '
-                         'Запросить у Заказчика внутренние диаметры спущенной компоновки для исключения заклинивания низа'
-                         ' компоновки',
+                      'ГНКТ на наличие '
+                      '"меток" на г/трубы, установленных запрещённым способом.\nПри обнаружении - доложить руководству'
+                      ' ООО "Ойл-Сервис" '
+                      'по согласованию произвести отрезание ГНКТ выше "метки" с составлением АКТа и указанием метража '
+                      'отрезанного участка ГНКТ. '
+                      'Установку меток на г/трубе производить ТОЛЬКО безопасным способом - (краской, лентой фум, '
+                      'шкемарём, и тд.) '
+                      'КАТЕГОРИЧЕСКИ ЗАПРЕЩАЕТСЯ устанавливать "метки" опасным способом - вальцевателем (труборезом) или '
+                      'другим инструментом - '
+                      'который причиняет механические повреждения на теле г/трубы и может привести к снижению прочностных '
+                      'характеристик ГНКТ. '
+                      'Запросить у Заказчика внутренние диаметры спущенной компоновки для исключения заклинивания низа'
+                      ' компоновки',
              None, None, None, None, None, None, None,
              'Мастер КРС,бурильщик', None],
             [None, 1, 'Провести приемку скважины в ремонт у Заказчика с составлением акта. Переезд бригады КРС '
-                         'на скважину. '
-                         'Подготовительные работы к КРС. Расставить технику и оборудование.Составить Акт .',
+                      'на скважину. '
+                      'Подготовительные работы к КРС. Расставить технику и оборудование.Составить Акт .',
              None, None, None, None, None, None, None, 'Мастер КРС, представитель Заказчика', 'расчет нормы на '
                                                                                               'переезд '],
             [None, 1, 'Провести инструктаж по предупреждению ГНВП и ОФ при КРС, а также по плану ликвидации '
-                         'аварий при '
-                         'производстве работ с записью в журнале (инструктаж, в обязательном порядке, проводить '
-                         'с обеими вахтами бригады).',
+                      'аварий при '
+                      'производстве работ с записью в журнале (инструктаж, в обязательном порядке, проводить '
+                      'с обеими вахтами бригады).',
              None, None, None, None, None, None, None,
              'Мастер ГНКТ, состав бригады', None],
             [None, 3,

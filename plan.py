@@ -1,5 +1,6 @@
 from copy import copy
 
+from openpyxl.styles import Alignment
 from openpyxl.utils.cell import range_boundaries, get_column_letter
 
 import well_data
@@ -77,8 +78,8 @@ def copy_true_ws(ws, ws2, head):
         for col_number, cell in enumerate(row):
             # print(cell.value)
             if 'катег' in str(cell.value).lower():
-                ws2.merge_cells(start_column=col_number, start_row=row_number,
-                                end_column=col_number+2, end_row=row_number)
+                ws2.cell(row=row_number+1, column=col_number+1).alignment = Alignment(wrap_text=True, horizontal='left',
+                                                                        vertical='center')
             if type(cell.value) == float:
                 ws2.cell(row_number + 1, col_number + 1, round(cell.value, 4))
             else:
