@@ -106,7 +106,7 @@ class TabPage_SO_drill(QWidget):
     def update_drill_edit(self, index):
 
         if index == 'долото в ЭК':
-            self.drill_diametr_line.setText(str(self.drillingBit_diam_select(well_data.current_bottom)))
+            TabPage_SO_drill.drill_diametr_line.setText(str(self.drillingBit_diam_select(well_data.current_bottom)))
             if well_data.column_diametr._value > 127:
                 self.downhole_motor_line.setText('Д-106')
             else:
@@ -270,6 +270,7 @@ class Drill_window(QMainWindow):
 
     def add_work(self):
         from main import MyWindow
+
         self.nkt_str = self.tabWidget.currentWidget().nkt_str_combo.currentText()
         self.drillingBit_diam = self.tabWidget.currentWidget().drill_diametr_line.text()
         self.downhole_motor = self.tabWidget.currentWidget().downhole_motor_line.text()
@@ -300,12 +301,15 @@ class Drill_window(QMainWindow):
             drill_list = self.drilling_nkt(drill_tuple, self.drill_type_combo, self.drillingBit_diam, self.downhole_motor)
         elif self.nkt_str == 'СБТ':
             drill_list = self.drilling_sbt(drill_tuple, self.drill_type_combo, self.drillingBit_diam, self.downhole_motor)
+
         try:
             MyWindow.populate_row(self, self.ins_ind, drill_list, self.table_widget)
             well_data.pause = False
+            print(f'dfkjkrf')
             self.close()
         except:
             print('ошибка ожидаемая')
+            print(drill_list)
             well_data.pause = False
             self.close()
             return drill_list
@@ -320,7 +324,7 @@ class Drill_window(QMainWindow):
         self.tableWidget.removeRow(row)
 
     def drilling_nkt(self, drill_tuple, drill_type_combo, drillingBit_diam, downhole_motor):
-
+        print(drill_tuple, drill_type_combo, drillingBit_diam)
         currentBottom = well_data.current_bottom
 
         current_depth = drill_tuple[-1][0]
@@ -369,7 +373,7 @@ class Drill_window(QMainWindow):
              'Мастер КРС, УСРСиСТ', round(0.14 + 0.17 + 0.08 + 0.48, 1)],
         ]
 
-        if self.check_pressure(current_depth):
+        if Drill_window.check_pressure(self, current_depth):
             drilling_list.append(
                 [f'Опрессовать ЭК и ЦМ на Р={well_data.max_admissible_pressure._value}атм', None,
               f'Опрессовать ЭК и ЦМ на Р={well_data.max_admissible_pressure._value}атм в присутствии '
@@ -381,7 +385,7 @@ class Drill_window(QMainWindow):
               'Мастер КРС, УСРСиСТ', 0.67])
         if len(drill_tuple) == 1:
             for drill_sole, bottomType2 in drill_tuple:
-                for row in self.reply_drilling(drill_sole, bottomType2, drilling_str, nkt_diam):
+                for row in Drill_window.reply_drilling(self, drill_sole, bottomType2, drilling_str, nkt_diam):
                     drilling_list.append(row)
 
         else:
@@ -446,7 +450,7 @@ class Drill_window(QMainWindow):
              'мастер КРС, предст. заказчика', 1.5],
         ]
 
-        if self.check_pressure(current_depth):
+        if Drill_window.check_pressure(self, current_depth):
             drilling_true_quest_list.append(
                 [f'Опрессовать ЭК и ЦМ на Р={well_data.max_admissible_pressure._value}атм', None,
                  f'Опрессовать ЭК и ЦМ на Р={well_data.max_admissible_pressure._value}атм в '
@@ -554,7 +558,7 @@ class Drill_window(QMainWindow):
 
     def check_pressure(self, depth):
 
-
+        print(depth)
         check_True = True
 
         for plast in well_data.plast_all:

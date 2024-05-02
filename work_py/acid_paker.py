@@ -168,7 +168,7 @@ class TabPage_SO_acid(QWidget):
         self.paker_layout_label = QLabel("Компоновка пакеров", self)
         self.paker_layout_combo = QComboBox(self)
         paker_layout_list = ['воронка', 'однопакерная', 'двухпакерная',
-                             'однопакерная, упорный', 'двухпакерная, упорные', 'ГОНС']
+                             'однопакерная, упорный', 'двухпакерная, упорные']
         self.paker_layout_combo.addItems(paker_layout_list)
 
         self.swab_true_label_type = QLabel("необходимость освоения", self)
@@ -245,7 +245,7 @@ class TabPage_SO_acid(QWidget):
         self.acidOilProcEdit = QLineEdit(self)
         self.acidOilProcEdit.setText('0')
 
-        self.pressure_Label = QLabel("Давление закачки", self)
+
         self.swabTypeLabel = QLabel("задача при освоении", self)
         self.swabTypeCombo = QComboBox(self)
         self.swabTypeCombo.addItems(['Задача №2.1.13', 'Задача №2.1.16', 'Задача №2.1.11', 'своя задача'])
@@ -265,6 +265,7 @@ class TabPage_SO_acid(QWidget):
         self.iron_volume_label = QLabel("Объем стабилизатора", self)
         self.iron_volume_edit = QLineEdit(self)
 
+        self.pressure_Label = QLabel("Давление закачки", self)
         self.pressure_edit = QLineEdit(self)
         self.pressure_edit.setClearButtonEnabled(True)
         self.pressure_edit.setText(str(well_data.max_admissible_pressure._value))
@@ -742,7 +743,8 @@ class AcidPakerWindow(QMainWindow):
                                                                iron_true_combo, iron_volume_edit)
                 else:
                     work_template_list.append(
-                        [f'установить пакера на глубине {paker_depth}/{paker2_depth}м', None, f'установить пакера на глубине {paker_depth}/{paker2_depth}м', None, None,
+                        [f'установить пакера на глубине {paker_depth}/{paker2_depth}м',
+                         None, f'установить пакера на глубине {paker_depth}/{paker2_depth}м', None, None,
                          None, None, None, None, None,
                          'мастер КРС', 1.2])
             if self.paker_layout_combo in ['однопакерная', 'однопакерная, упорный']:

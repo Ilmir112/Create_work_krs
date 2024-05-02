@@ -1373,9 +1373,18 @@ class MyWindow(QMainWindow):
         self.populate_row(self.ins_ind, mkp_work_list, self.table_widget)
 
     def acid_action_gons(self):
-        from work_py.acids import acidGons
-        acidGons_work_list = acidGons(self)
-        self.populate_row(self.ins_ind, acidGons_work_list, self.table_widget)
+        from work_py.acids import GonsWindow
+
+        if self.raid_window is None:
+            self.raid_window = GonsWindow(well_data.ins_ind, self.table_widget)
+            self.raid_window.setGeometry(200, 400, 300, 400)
+            self.raid_window.show()
+            self.pause_app()
+            well_data.pause = True
+            self.raid_window = None
+        else:
+            self.raid_window.close()  # Close window.
+            self.raid_window = None
 
     def izvlek_action(self):
         from work_py.rir import RirWindow
@@ -1721,7 +1730,7 @@ class MyWindow(QMainWindow):
         plast_all_json = json.dumps(well_data.plast_all)
         plast_work_json = json.dumps(well_data.plast_work)
         skm_list_json = json.dumps(well_data.skm_interval)
-        number = json.dumps(well_data.well_number._value + well_data.well_area._value, ensure_ascii=False, indent=4)
+        number = json.dumps(str(well_data.well_number._value) + well_data.well_area._value, ensure_ascii=False, indent=4)
 
         # Подготовленные данные для вставки (пример)
         data_values = (row_max, well_data.current_bottom, dict_perforation_json, plast_all_json, plast_work_json,

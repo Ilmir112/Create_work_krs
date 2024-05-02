@@ -1108,7 +1108,7 @@ class TemplateKrs(QMainWindow):
 
     def pero(self):
         from .rir import RirWindow
-        from .drilling import Drill_window
+        from .drilling import Drill_window, TabPage_SO_drill
 
         pero_list = RirWindow.pero_select(self, well_data.current_bottom)
 
@@ -1149,31 +1149,25 @@ class TemplateKrs(QMainWindow):
              None]
         ]
         if well_data.gipsInWell is True:
-            if well_data.dict_pump_SHGN["do"] != 0:
+            template_diametr = TabPage_SO_drill.drillingBit_diam_select(self, well_data.current_bottom)
 
+            if well_data.column_diametr._value > 127 or (well_data.column_additional and \
+                    well_data.column_additional_diametr > 127):
+                downhole_motor = 'Д-106'
+            else:
+                downhole_motor = 'Д-76'
+
+            if well_data.dict_pump_SHGN["do"] != 0 and well_data.paker_do["do"] == 0:
                 gipsPero_list = [gipsPero_list[-1]]
-
-                self.raid_window = Drill_window(self.table_widget, self.ins_ind,)
-                self.raid_window.setGeometry(200, 400, 300, 400)
-                self.raid_window.show()
-                MyWindow.pause_app()
-                well_data.pause = False
-                drill_work_list = self.raid_window.add_work()
-                self.raid_window = None
-
-                for row in drill_work_list:
+                drill_list = Drill_window.drilling_nkt(self, [(well_data.current_bottom, 'гипсовых отложениий')],
+                                                       'долото', template_diametr, downhole_motor )
+                for row in drill_list:
                     gipsPero_list.append(row)
             else:
+                drill_list = Drill_window.drilling_nkt(self, [(well_data.current_bottom, 'гипсовых отложениий')],
+                                                       'долото', template_diametr, downhole_motor )
 
-                self.raid_window = Drill_window(self.ins_ind, self.table_widget)
-                self.raid_window.setGeometry(200, 400, 300, 400)
-                self.raid_window.show()
-                MyWindow.pause_app()
-                well_data.pause = False
-                drill_work_list = self.raid_window.add_work()
-                self.raid_window = None
-
-                for row in drill_work_list:
+                for row in drill_list:
                     gipsPero_list.append(row)
 
         return gipsPero_list

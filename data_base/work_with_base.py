@@ -7,7 +7,8 @@ from datetime import datetime
 
 from PyQt5 import QtWidgets
 from PyQt5.QtSql import QSqlDatabase, QSqlQuery
-from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem, QLineEdit, QHeaderView, QVBoxLayout, QMainWindow, QWidget, QTableWidget
+from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem, QLineEdit, QHeaderView, QVBoxLayout, QMainWindow, QWidget, \
+    QTableWidget
 
 from openpyxl import load_workbook
 
@@ -17,8 +18,9 @@ from main import MyWindow
 
 class Classifier_well(QMainWindow):
     number_well = None
-    def __init__(self,  costumer, region, classifier_well, parent=None):
-       
+
+    def __init__(self, costumer, region, classifier_well, parent=None):
+
         super(Classifier_well, self).__init__()
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
@@ -35,7 +37,6 @@ class Classifier_well(QMainWindow):
             self.open_to_sqlite_class_well(costumer, region)
         elif classifier_well == 'damping':
             self.open_to_sqlite_without_juming(costumer, region)
-
 
     def open_to_sqlite_without_juming(self, costumer, region):
         layout = QVBoxLayout()
@@ -107,9 +108,10 @@ class Classifier_well(QMainWindow):
                     item = QTableWidgetItem(str(data[row][col]))
                 self.table_class.setItem(row + 1, col, item)
 
-        self.table_class.setHorizontalHeaderLabels(['ЦДНГ', 'номер скважины', 'площадь', 'Месторождение', 'Категория \n по Рпл',
-                                         'Ргд', 'Рпл', 'Дата замера', 'категория \nH2S', 'H2S-%', "H2S-мг/л",
-                                         "H2S-мг/м3", 'Категория по газу', "Газовый фактор", "версия от"])
+        self.table_class.setHorizontalHeaderLabels(
+            ['ЦДНГ', 'номер скважины', 'площадь', 'Месторождение', 'Категория \n по Рпл',
+             'Ргд', 'Рпл', 'Дата замера', 'категория \nH2S', 'H2S-%', "H2S-мг/л",
+             "H2S-мг/м3", 'Категория по газу', "Газовый фактор", "версия от"])
         self.table_class.horizontalHeader().setStretchLastSection(True)
         self.table_class.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         # layout.addWidget(table)
@@ -276,6 +278,7 @@ class Classifier_well(QMainWindow):
                     self.table_class.setRowHidden(i, match)
                     if not match:
                         break
+
     def filter_class(self, filter_text):
         for i in range(1, self.table_class.rowCount() + 1):
             for j in range(1, 2):
@@ -285,6 +288,7 @@ class Classifier_well(QMainWindow):
                     self.table_class.setRowHidden(i, match)
                     if not match:
                         break
+
     def filter_class_area(self, filter_text):
         for i in range(1, self.table_class.rowCount() + 1):
             for j in range(2):
@@ -294,6 +298,7 @@ class Classifier_well(QMainWindow):
                     self.table_class.setRowHidden(i, match)
                     if not match:
                         break
+
     def export_to_sqlite_class_well(self, fname, costumer, region):
         # Подключение к базе данных SQLite
         conn = sqlite3.connect('data_base/database_without_juming.db')
@@ -359,7 +364,7 @@ class Classifier_well(QMainWindow):
                     if index_row > 18:
                         break
                 # print(region_name, version_year)
-              # print(Check_param)
+                # print(Check_param)
                 if check_param in region_name:
                     mes = QMessageBox.warning(self, 'ВНИМАНИЕ ОШИБКА',
                                               f'регион выбрано корректно  {region_name}')
@@ -428,6 +433,7 @@ class Classifier_well(QMainWindow):
         # Закрытие соединения с базой данных
         conn.close()
 
+
 def read_database_gnkt(contractor, gnkt_number):
     # Подключение к базе данных SQLite
     conn = sqlite3.connect('data_base\data_base_gnkt\gnkt_oilservice.dp')
@@ -441,16 +447,13 @@ def read_database_gnkt(contractor, gnkt_number):
     print(result)
 
 
-
-
-
 def create_database_well_db(work_plan, number_dp):
     # print(row, well_data.count_row_well)
     conn = sqlite3.connect('data_base/data_base_well/databaseWell.db')
     cursor = conn.cursor()
 
     # Создаем таблицу для хранения данных
-    number = json.dumps(well_data.well_number._value + well_data.well_area._value + work_plan + str(number_dp),
+    number = json.dumps(str(well_data.well_number._value) + well_data.well_area._value + work_plan + str(number_dp),
                         ensure_ascii=False)
 
     # Попытка удалить таблицу, если она существует
@@ -473,7 +476,6 @@ def create_database_well_db(work_plan, number_dp):
                    f'skm_list TEXT,'
                    f'problemWithEk_depth FLOAT,'
                    f'problemWithEk_diametr FLOAT)')
-
 
     for index, data in enumerate(well_data.data_list):
         current_bottom = data[1]

@@ -46,6 +46,7 @@ class ProtectedIsNonNone:
             print(f'Ошибка: {value} - не корректное строковое значение')
             raise ValueError("Значение должно быть строкой")
 
+
 column_head_m = ''
 date_drilling_cancel = ''
 date_drilling_run = ''
@@ -364,6 +365,7 @@ dict_telephon = {'Бригада № 1': 9228432791,
                  'Бригада ТРС № 3': 9228928016,
                  'Бригада ГНКТ №1': 9174003142,
                  'Бригада ГНКТ №2': 9174001690}
+
 
 def if_None(value):
     if isinstance(value, datetime):
