@@ -350,9 +350,9 @@ class WellFond_data(FindIndexPZ):
                     if 'колонная головка' in str(value) and 'типоразмер' in str(row[col + 2].value):
                         well_data.column_head_m = row[col_do].value
                     if 'Арматура устьевая' in str(value) and 'типоразмер' in str(row[col + 2].value):
-                        print(f'арматура {row_index, col_do}')
+
                         well_data.wellhead_fittings = row[col_do].value
-                        print(f'арматура {row[col_do].value}')
+
                     if 'Пакер' in str(value) and 'типоразмер' in str(row[col + 2].value):
                         if '/' in str(row[col_do].value):
                             well_data.paker_do["do"] = str(row[col_do].value).split('/')[0]
@@ -952,7 +952,7 @@ class Well_perforation(FindIndexPZ):
                     if 'вскрытия'.lower() in str(column).lower():
                         # print(f'вскр {col_index}')
                         col_open_index = col_index - 1
-                    if 'отключ'.lower() in str(column).lower():
+                    if 'отключ'.lower() in str(column).lower() and col_index < 8:
                         # print(f'октл {col_index}')
                         col_close_index = col_index - 1
                     if 'удлине'.lower() in str(column).lower():
@@ -1032,9 +1032,12 @@ class Well_perforation(FindIndexPZ):
 
                     if col_old_open_index != col_open_index:
                         if row[col_close_index] is None or row[col_close_index] == '-':
+                            print(f'вскрыт {plast} {row[col_close_index], col_close_index}')
+
                             well_data.dict_perforation.setdefault(plast, {}).setdefault('отключение', False)
                             well_data.dict_perforation_short.setdefault(plast, {}).setdefault('отключение', False)
                         else:
+                            print(f'отключ {plast} {row[col_close_index], col_close_index}')
                             well_data.dict_perforation.setdefault(plast, {}).setdefault('отключение', True)
                             well_data.dict_perforation_short.setdefault(plast, {}).setdefault('отключение', True)
                     else:
@@ -1100,12 +1103,8 @@ class Well_perforation(FindIndexPZ):
                     else:
                         merged_segments[-1] = [merged_segments[-1][0], max(sole_int, merged_segments[-1][1])]
 
-                # merged_segments = set(map(tuple, merged_segments))
-                # print(merged_segments)
-                # merged_segments = set(merged_segments)
                 well_data.dict_perforation[plast]['интервал'] = merged_segments
-                # if type(well_data.dict_perforation[plast]['вертикаль'][0]) in [float, int]:
-                #     well_data.dict_perforation[plast]['вертикаль'] = min(well_data.dict_perforation[plast]['вертикаль'])
+
 
 
         if self.perforation_correct_window2 is None:
