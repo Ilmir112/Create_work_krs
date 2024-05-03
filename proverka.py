@@ -1,26 +1,50 @@
-import json
+import sqlite3
+import psycopg2
 
-import openpyxl
+# Параметры подключения к SQLite
+sqlite_db_path = 'data_base/data_base_well/databaseWell.db'
 
-# Открываем Excel файл
-from openpyxl.utils import range_boundaries, get_column_letter
+# Параметры подключения к PostgreSQL
+postgres_db_config = {
+    'host': 'localhost',
+    'database': 'databaseWell.db',
+    'user': 'postgres',
+    'password': '1953'
+}
 
-wb = openpyxl.load_workbook('property_excel/tepmpale_gnkt_osv_grp.xlsx')
+# Подключение к базам данных
+sqlite_conn = sqlite3.connect(sqlite_db_path)
+postgres_conn = psycopg2.connect(*postgres_db_config)
+sqlite_cursor = sqlite_conn.cursor()
+postgres_cursor = postgres_conn.cursor()
 
-# Выбираем активный лист
-ws = wb.active
-boundaries_dict = {}
-values_list = []
-for row_ind, row in enumerate(ws.iter_rows(values_only=True)):
-    row_list = []
-    if row_ind < 90:
-        for index_col, col in enumerate(row[:23]):
-            row_list.append(col)
-    values_list.append(row_list)
-# for row in values_list:
-#     print(f'{row},')
+# Получение списка таблиц из SQLite
+sqlite_cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
+tables = sqlite_cursor.fetchall()
 
-colWidth = [ws.column_dimensions[get_column_letter(i + 1)].width for i in range(0, 25)] + [None]
-print(colWidth)
+# Перенос данных для каждой таблицы
+for table_name, in tables:
+    # Получение схемы таблицы
+    sqlite_cursor.execute(f"PRAGMA table_info({table_name})")
+    table_info = sqlite_cursor.fetchall()
 
+    # Создание таблицы в PostgreSQL
+    create_table_sql = f"CREATE TABLE {table_name} ("
+    for column_info in table_info:
+        column_name, data_type, _, _, _, _ = column_info
+        create_table_sql += f"{column_name} {data_type},"
+    create_table_sql = create_table_sql[:-1] + ")"
+    postgres_cursor.execute(create_table_sql)
 
+    # Получение данных из SQLite
+    sqlite_cursor.execute(f"SELECT * FROM {table_name}")
+    data = sqlite_cursor.fetchall()
+
+    # Вставка данных в PostgreSQL
+    insert_sql = f"INSERT INTO {table_name} VALUES ({','.join(['%s' for _ in range(len(table_info))])})"
+    postgres_cursor.executemany(insert_sql, data)
+
+# Сохранение изменений и закрытие соединений
+postgres_conn.commit()
+sqlite_conn.close()
+postgres_conn.close()

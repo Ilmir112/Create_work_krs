@@ -830,7 +830,7 @@ class AcidPakerWindow(QMainWindow):
             swabTypeCombo = str(self.tabWidget.currentWidget().swabTypeCombo.currentText())
             swab_volumeEdit = int(float(self.tabWidget.currentWidget().swab_volumeEdit.text()))
             paker_depth_swab = int(float(self.tabWidget.currentWidget().swab_paker_depth.text()))
-            paker_khost = (paker_depth - paker_khost) - paker_depth_swab
+
 
             if self.paker_layout_combo == 'однопакерная':
                 if MyWindow.true_set_Paker(self, paker_depth_swab) is False:
@@ -882,7 +882,7 @@ class AcidPakerWindow(QMainWindow):
                                        None, None, None, None, None, None, None,
                                        'мастер КРС',
                                        liftingNKT_norm(well_data.current_bottom, 1)])
-        if well_data.region == 'ТГМ' and well_data.curator == 'ОР':
+        if well_data.region == 'ТГМ' and well_data.curator == 'ОР' and well_data.dict_pump_ECN == 0:
             work_template_list.extend(kot_work(self, well_data.current_bottom))
         MyWindow.populate_row(self, self.ins_ind, work_template_list, self.table_widget)
         well_data.pause = False
@@ -1363,7 +1363,7 @@ class AcidPakerWindow(QMainWindow):
         for row in acid_list_1:
             paker_list.append(row)
 
-        if well_data.curator == 'ОР':
+        if well_data.curator == 'ОР' and well_data.dict_pump_ECN == 0:
             try:
                 well_data.expected_Q, ok = QInputDialog.getInt(self, 'Ожидаемая приемистость ',
                                                                f'Ожидаемая приемистость по пласту {plast_combo} ',
