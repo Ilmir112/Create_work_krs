@@ -821,6 +821,10 @@ class MyWindow(QMainWindow):
                         coordinate = f'{get_column_letter(col - 1)}{row_ind - 1}'
                         self.insert_image(ws2, 'imageFiles/Алиев Заур.png', coordinate)
                         break
+                    elif 'Расчет жидкости глушения производится согласно МУ' in str(value):
+                        coordinate = f'{get_column_letter(6)}{row_ind+1}'
+                        self.insert_image(ws2, 'imageFiles/schema_well/формула.png', coordinate, 330,130)
+                        break
             if self.work_plan != 'dop_plan':
                 self.create_short_plan(wb2, plan_short)
 
