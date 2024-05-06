@@ -100,7 +100,7 @@ def need_h2s(fluid_new, plast_edit, expected_pressure):
                                   well_data.dict_category[plast]['отключение'] == 'планируемый']))
 
     if len(cat_h2s_list_plan) != 0:
-        print(f'ДО {сat_h2s_list} после {cat_h2s_list_plan, well_data.plast_work }')
+
         if cat_h2s_list_plan[0] in [1, 2, '1', '2'] and len(well_data.plast_work) == 0:
             expenditure_h2s = round(max([well_data.dict_category[plast]['по сероводороду'].poglot for plast in well_data.plast_project]), 3)
             fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
@@ -135,11 +135,11 @@ def need_h2s(fluid_new, plast_edit, expected_pressure):
         cat_pressuar, ok = QInputDialog.getItem(None, 'Категория скважины по давлению вскрываемого пласта',
                                            'Выберете категорию скважины',
                                            cat_list, 0, False)
-        pressuar, ok = QInputDialog.getDouble(None, 'Категория скважины по давлению вскрываемого пласта',
-                                           'Выберете категорию скважины', 0, 0, 600, 1)
+        pressuar, ok = QInputDialog.getDouble(None, 'Значение по давлению вскрываемого пласта',
+                                           'ВВедите давление вскрываемого пласта', 0, 0, 600, 1)
 
         cat_H2S, ok = QInputDialog.getItem(None, 'Категория скважины по сероводороду вскрываемого пласта',
-                                           'Выберете категорию скважины',
+                                           'Выберете категорию скважины по сероводороду вскрываемого пласта',
                                            cat_list, 0, False)
 
         cat_h2s_list_plan.append(cat_H2S)

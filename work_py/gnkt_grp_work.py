@@ -117,6 +117,8 @@ class TabPageDp(QWidget):
         if gnkt_number != '':
 
             well_previus_list = read_database_gnkt(well_data.contractor, gnkt_number)
+
+            self.previous_well_combo.clear()
             self.previous_well_combo.addItems(list(map(str, well_previus_list)))
 
             # conn = sqlite3.connect('data_base\data_base_gnkt\gnkt_base.dp')
@@ -175,8 +177,8 @@ class GnktOsvWindow2(QMainWindow):
         GnktOsvWindow2.current_bottom_edit = int(float(current_bottom_edit))
         fluid_edit = self.tabWidget.currentWidget().fluid_edit.text()
         GnktOsvWindow2.fluid_edit = round(float(fluid_edit), 2)
-        osvoenie_combo_need = self.tabWidget.currentWidget().osvoenie_combo.currentText()
-        GnktOsvWindow2.osvoenie_combo_need = osvoenie_combo_need
+        # osvoenie_combo_need = self.tabWidget.currentWidget().osvoenie_combo.currentText()
+        # GnktOsvWindow2.osvoenie_combo_need = osvoenie_combo_need
         pvo_number = self.tabWidget.currentWidget().pvo_number_edit.text()
         well_data.pvo = pvo_number
         previous_well_combo = self.tabWidget.currentWidget().previous_well_combo.currentText()
@@ -189,7 +191,7 @@ class GnktOsvWindow2(QMainWindow):
             mes = QMessageBox.warning(self, 'Некорректные данные', f'Не все данные заполнены')
             return
 
-        work_list = self.schema_well(osvoenie_combo_need, current_bottom_edit, fluid_edit, gnkt_number_combo,
+        work_list = self.schema_well(current_bottom_edit, fluid_edit, gnkt_number_combo,
                                      lenght_gnkt_edit, iznos_gnkt_edit, pvo_number, diametr_length, pipe_mileage_edit)
 
         well_data.pause = False
@@ -463,7 +465,7 @@ class GnktOsvWindow2(QMainWindow):
         # зададим размер листа
         ws2.page_setup.paperSize = ws2.PAPERSIZE_A4
 
-    def schema_well(self, osvoenie_combo_need, current_bottom_edit, fluid_edit, gnkt_number_combo,
+    def schema_well(self, current_bottom_edit, fluid_edit, gnkt_number_combo,
                     gnkt_lenght, iznos_gnkt_edit, pvo_number, diametr_length, pipe_mileage_edit):
         self.gnkt = self.tabWidget.currentWidget()
         for plast_ind in well_data.plast_work:

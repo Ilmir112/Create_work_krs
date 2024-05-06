@@ -317,7 +317,7 @@ class WellSucker_rod(FindIndexPZ):
 
                 key = str(ws.cell(row=row, column=4).value).replace(' ', '')
                 value = ws.cell(row=row, column=7).value
-                if key != str(None) and key != '-' and key != '':
+                if key != str(None) and key != '-' and key != '' and 'отсут' not in str(key).lower():
                     # print(key, value)
                     if key != None and row < b_plan:
                         well_data.dict_sucker_rod[key] = well_data.dict_sucker_rod.get(key, 0) + int(float(str(value).replace(',', '.'))) + 1

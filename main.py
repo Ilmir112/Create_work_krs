@@ -781,9 +781,9 @@ class MyWindow(QMainWindow):
                 if row[0] >= ins_ind - 1:
                     merged_cells_dict.setdefault(row[0], []).append(row[1])
             plan_short = ''
+            well_data.normOfTime = 0
 
             for i in range(1, len(work_list)):  # нумерация работ
-
                 if i >= ins_ind + 1:
                     work_list[i][1] = i - ins_ind
                     if is_number(work_list[i][11]) is True:

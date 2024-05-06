@@ -1,7 +1,7 @@
 import sqlite3
 from datetime import datetime
 from collections import namedtuple
-
+from PyQt5.QtWidgets import  QMessageBox
 import well_data
 
 Saddles = namedtuple('Saddles', ['saddle', 'ball'])
@@ -82,14 +82,14 @@ def read_database_gnkt(contractor, gnkt_number):
         contractor = 'oil_service'
 
     cursor.execute(f"SELECT * FROM gnkt_{contractor} WHERE gnkt_number =?", (gnkt_number,))
-    well_previus_list = []
+
     result = cursor.fetchall()
 
     well_previus_list = [(well[2], well[9]) for well in result]
     well_previus_list = sorted(well_previus_list, key=lambda x:  datetime.strptime(x[1], "%d.%m.%Y"), reverse=True)
-    well_previus_list = list(map(lambda x:x[0], list(filter(lambda x: x[0], well_previus_list))))
-    print(f' списа{well_previus_list}')
-    print(f'список ремонтов {result}')
+    well_previus_list = list(map(lambda x: x[0], list(filter(lambda x: x[0], well_previus_list))))
+    # print(f' списа{well_previus_list}')
+    # print(f'список ремонтов {result}')
     # Закрытие соединения с базой данных
     conn.close()
 
@@ -113,13 +113,12 @@ def insert_data_base_gnkt(contractor, well_name, gnkt_number, gnkt_length, diame
 
     result = cursor.fetchall()
 
-    if result is None:
+
+    if len(result) == 0:
         current_datetime = datetime.today().strftime('%d.%m.%Y')
 
         data_values = (gnkt_number, well_name, gnkt_length, diametr_length, iznos,
                        pipe_mileage, pipe_fatigue, previous_well, current_datetime, pvo)
-        print(data_values)
-
 
         # Подготовленный запрос для вставки данных с параметрами
         query = f"INSERT INTO gnkt_{contractor} " \
@@ -129,8 +128,34 @@ def insert_data_base_gnkt(contractor, well_name, gnkt_number, gnkt_length, diame
 
         # Выполнение запроса с использованием параметров
         cursor.execute(query, data_values)
+        mes = QMessageBox.information(None, 'база данных', f'Скважина добавлена в базу данных')
+
     else:
-        print(f'скважина есть в базе данных')    # Сохранение изменений
+        mes = QMessageBox.question(None, 'база данных', f'Скважина уже есть в базе данных, обновить?')
+        if mes == QMessageBox.StandardButton.Yes:
+            # Подготовленный запрос для удаления
+            query = f"DELETE FROM gnkt_{contractor} WHERE well_number = ?"
+
+            # Выполнение запроса
+            cursor.execute(query, (filenames,))
+
+            current_datetime = datetime.today().strftime('%d.%m.%Y')
+
+            data_values = (gnkt_number, well_name, gnkt_length, diametr_length, iznos,
+                           pipe_mileage, pipe_fatigue, previous_well, current_datetime, pvo)
+
+            # Подготовленный запрос для вставки данных с параметрами
+            query = f"INSERT INTO gnkt_{contractor} " \
+                    f"(gnkt_number, well_number, length_gnkt, diameter_gnkt, wear_gnkt, mileage_gnkt, " \
+                    f"tubing_fatigue, previous_well, today, pvo_number) " \
+                    f"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+
+            # Выполнение запроса с использованием параметров
+            cursor.execute(query, data_values)
+            mes = QMessageBox.information(None, 'база данных', f'Скважина добавлена в базу данных')
+
+
+
     conn.commit()
 
     # Закрытие соединения с базой данных

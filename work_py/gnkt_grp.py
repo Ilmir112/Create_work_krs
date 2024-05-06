@@ -595,6 +595,7 @@ class GnktOsvWindow(QMainWindow):
 
     def save_to_gnkt(self):
         from work_py.gnkt_frez import Work_with_gnkt
+        from main import MyWindow
 
         sheets = ["Титульник", 'СХЕМА', 'Ход работ']
         tables = [self.table_title, self.table_schema, self.table_widget]
@@ -621,16 +622,20 @@ class GnktOsvWindow(QMainWindow):
         ws7 = GnktOsvWindow.wb.create_sheet(title="СХЕМЫ КНК_38,1")
         main.MyWindow.insert_image(self, ws7, 'imageFiles/schema_well/СХЕМЫ КНК_38,1.png', 'A1', 550, 900)
 
-        # path = 'workiii'
+
         if 'Зуфаров' in well_data.user:
             path = 'D:\Documents\Desktop\ГТМ'
         else:
             path = ''
-        filenames = f"{well_data.well_number._value} {well_data.well_area._value} кат {well_data.cat_P_1[0]} {self.work_plan}.xlsx"
+
+        filenames = f"{well_data.well_number._value} {well_data.well_area._value} кат {well_data.cat_P_1[0]} " \
+                    f"{self.work_plan}.xlsx"
         full_path = path + '/' + filenames
 
-        insert_data_base_gnkt(well_data.contractor, filenames, well_data.gnkt_number, int(well_data.gnkt_length), float(well_data.diametr_length),
-                              float(well_data.iznos)*1.014, int(well_data.pipe_mileage) + int(well_data.current_bottom * 1.1),
+        insert_data_base_gnkt(well_data.contractor, filenames, well_data.gnkt_number, int(well_data.gnkt_length),
+                              float(well_data.diametr_length),
+                              float(well_data.iznos)*1.014,
+                              int(well_data.pipe_mileage) + int(well_data.current_bottom * 1.1),
                               well_data.pipe_fatigue, int(well_data.pvo), well_data.previous_well)
 
         if well_data.bvo is True:
@@ -638,7 +643,7 @@ class GnktOsvWindow(QMainWindow):
             ws5.title = "Схемы ПВО"
             ws5 = GnktOsvWindow.wb["Схемы ПВО"]
             GnktOsvWindow.wb.move_sheet(ws5, offset=-1)
-            # schema_list = self.check_pvo_schema(ws5, ins_ind + 2)
+            schema_list = MyWindow.check_pvo_schema(self, ws5, 1)
 
         if GnktOsvWindow.wb:
             main.MyWindow.saveFileDialog(self, GnktOsvWindow.wb, full_path)
@@ -648,7 +653,7 @@ class GnktOsvWindow(QMainWindow):
             self.wb.close()
 
     def insert_image_schema(self, ws):
-        print(f'пакер наличие {well_data.paker_do["do"]}')
+
         if well_data.paker_do["do"] != 0:
             coordinate_nkt_with_paker = 'F6'
             main.MyWindow.insert_image(self, ws, 'imageFiles/schema_well/НКТ с пакером.png',

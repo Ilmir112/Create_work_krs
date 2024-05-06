@@ -44,10 +44,11 @@ def pop_down(self, region, curator_sel):
     with open('podpisant.json', 'r', encoding='utf-8') as file:
         podpis_dict = json.load(file)
 
+    user = f'{well_data.user[1].split(" ")[0]} {well_data.user[1].split(" ")[1][0]}. {well_data.user[1].split(" ")[2][0]}.'
     podp_down = [
         [None, f'План работ составил {well_data.user[0]}', None, None, None, None, '___________________', None,
          None,
-         f'{well_data.user[1]}', None, None],
+         f'{user}', None, None],
         [None, None, None, None, None, None, None, None, 'дата составления', None, datetime.now().strftime('%d.%m.%Y'),
          None],
         [None, None, 'Начальник ЦТКРС ООО  " Ойл-Сервис"', None, None, None, None, None, None,

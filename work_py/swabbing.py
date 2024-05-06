@@ -71,7 +71,7 @@ class TabPage_SO_swab(QWidget):
 
         self.swabTypeLabel = QLabel("задача при освоении", self)
         self.swabTypeCombo = QComboBox(self)
-        self.swabTypeCombo.addItems(['Задача №2.1.13', 'Задача №2.1.16', 'Задача №2.1.11',
+        self.swabTypeCombo.addItems(['Задача №2.1.13', 'Задача №2.1.16', 'Задача №2.1.11', 'ГРР'
                                      'своя задача'])
         self.swabTypeCombo.setCurrentIndex(well_data.swabTypeComboIndex)
         self.swabTypeCombo.setProperty('value', 'Задача №2.1.16')
@@ -515,7 +515,6 @@ class Swab_Window(QMainWindow):
         elif swab_true_edit_type == 'Опрессовка снижением уровня на шаблоне':
             need_change_zgs_combo = self.tabWidget.currentWidget().need_change_zgs_combo.currentText()
 
-
             if len(well_data.plast_project) != 0:
                 plast_new = str(self.tabWidget.currentWidget().plast_new_combo.currentText())
             else:
@@ -858,6 +857,15 @@ class Swab_Window(QMainWindow):
                           f'(объем не менее 10литров).' \
                           f'Обязательная сдача в этот день в ЦДНГ'
             swab_short = f'сваб не менее {swab_volumeEdit}м3'
+        elif swabTypeCombo == 'ГРР':
+            swab_select = f'Провести освоение объекта {plast_combo} свабированием (объем согласовать с ОГРР) не менее ' \
+                          f'{swab_volumeEdit}м3 с отбором поверхностных ' \
+                          f'проб через каждые 5м3 сваб и передачей представителю ЦДНГ, выполнить прослеживание уровней ' \
+                          f'и ВНР с регистрацией КВУ глубинными манометрами, записать профиль притока, в случае ' \
+                          f'получения притока нефти отобрать глубинные пробы (при выполнении условий отбора), ' \
+                          f'провести ГДИС (КВДз).'
+            swab_short = f'сваб профиль не менее ' \
+                          f'{swab_volumeEdit}'
 
         return swab_short, swab_select
 

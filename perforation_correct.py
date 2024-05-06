@@ -147,12 +147,9 @@ class PerforationCorrect(QMainWindow):
         vbox.addWidget(self.buttonAdd, 3, 0)
 
     def addRowTable(self):
-        from open_pz import CreatePZ
 
         # Пересохранение данных по интервалам перфорации
         self.dict_perforation = well_data.dict_perforation
-
-
 
         plast_all = list(self.dict_perforation.keys())
         index = 0
