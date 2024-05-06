@@ -96,7 +96,7 @@ class TabPageDp(QWidget):
         result_gnkt = cursor.fetchone()
         print(result_gnkt)
         self.lenght_gnkt_edit.setText(f'{result_gnkt[3]}')
-        self.iznos_gnkt_edit.setText(f'{result_gnkt[5]}')
+        self.iznos_gnkt_edit.setText(f'{round(result_gnkt[5], 1)}')
         self.pipe_mileage_edit.setText(f'{result_gnkt[6]}')
         self.pvo_number_edit.setText(f'{result_gnkt[8]}')
 

@@ -98,7 +98,7 @@ def read_database_gnkt(contractor, gnkt_number):
 
 def insert_data_base_gnkt(contractor, well_name, gnkt_number, gnkt_length, diametr_length,
                      iznos, pipe_mileage, pipe_fatigue, pvo, previous_well):
-    print(previous_well)
+
 
     # Подключение к базе данных SQLite
     conn = sqlite3.connect('data_base\data_base_gnkt\gnkt_base.dp')
@@ -107,11 +107,19 @@ def insert_data_base_gnkt(contractor, well_name, gnkt_number, gnkt_length, diame
     if 'ойл-сервис' in contractor.lower():
         contractor = 'oil_service'
 
-    filenames = f"{well_data.well_number._value} {well_data.well_area._value} кат " \
-                f"{well_data.cat_P_1} {well_data.work_plan}.xlsx"
-    cursor.execute(f"SELECT * FROM gnkt_{contractor} WHERE well_number =?", (filenames,))
+
+    filenames = f"{well_data.well_number._value} {well_data.well_area._value} "
+
+    query = f"SELECT * FROM gnkt_{contractor} WHERE well_number LIKE ?"
+
+    # Выполнение запроса
+    cursor.execute(query, ('%' + filenames + '%',))
 
     result = cursor.fetchall()
+
+    # Вывод результатов
+    for row in result:
+        print(row)
 
 
     if len(result) == 0:
@@ -134,10 +142,10 @@ def insert_data_base_gnkt(contractor, well_name, gnkt_number, gnkt_length, diame
         mes = QMessageBox.question(None, 'база данных', f'Скважина уже есть в базе данных, обновить?')
         if mes == QMessageBox.StandardButton.Yes:
             # Подготовленный запрос для удаления
-            query = f"DELETE FROM gnkt_{contractor} WHERE well_number = ?"
+            query1 = f"DELETE FROM gnkt_{contractor} WHERE well_number LIKE ?"
 
             # Выполнение запроса
-            cursor.execute(query, (filenames,))
+            cursor.execute(query1, ('%' + filenames + '%',))
 
             current_datetime = datetime.today().strftime('%d.%m.%Y')
 
