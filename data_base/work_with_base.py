@@ -1,6 +1,7 @@
 import json
 import re
 import sqlite3
+import psycopg2
 from PyQt5.QtWidgets import QInputDialog
 from collections import namedtuple
 
@@ -90,12 +91,12 @@ class Classifier_well(QMainWindow):
         for row in range(len(data)):
             for col in range(len(data[row])):
                 if col in [5, 6, 10, 11, 13]:
-                    if data[row][col].replace('.', '').isdigit() and data[row][col].count('.') < 2:
+                    if str(data[row][col]).replace('.', '').isdigit() and str(data[row][col]).count('.') < 2:
                         item = QTableWidgetItem(str(round(float(data[row][col]), 1)))
                     else:
                         item = QTableWidgetItem(str(data[row][col]))
                 elif col in [9]:
-                    if data[row][col].replace('.', '').isdigit() and data[row][col].count('.') < 2:
+                    if str(data[row][col]).replace('.', '').isdigit() and str(data[row][col]).count('.') < 2:
                         item = QTableWidgetItem(str(round(float(data[row][col]), 7)))
                     else:
                         item = QTableWidgetItem(str(data[row][col]))
@@ -119,64 +120,69 @@ class Classifier_well(QMainWindow):
         self.setLayout(layout)
 
     def get_data_from_db(self, region):
-        # Создание подключения к базе данных SQLite
-        db = QSqlDatabase.addDatabase("QSQLITE")
-        db.setDatabaseName(
-            'data_base/database_without_juming.db')  # Замените database.db на имя вашей базы данных SQLite
 
-        if not db.open():
-            print("Не удалось установить соединение с базой данных.")
+        # Параметры подключения к PostgreSQL
+        postgres_params = {
+            'database': 'databasewell',
+            'user': 'postgres',
+            'password': '1953'
+        }
+
+        try:
+            # Создание подключения к базе данных PostgreSQL
+            conn = psycopg2.connect(**postgres_params)
+
+            # Выполнение SQL-запроса для получения данных
+            with conn.cursor() as cur:
+                cur.execute(f"""
+                    SELECT well_number, deposit_area, today
+                    FROM {region};
+                """)
+                data = cur.fetchall()
+
+        except psycopg2.Error as e:
+            print(f"Ошибка при подключении к базе данных или выполнении запроса: {e}")
             return []
-
-        # Выполнение SQL-запроса для получения данных
-        query = QSqlQuery()
-        query.prepare(
-            f"SELECT well_number, deposit_area, today FROM {region}")  # Замените table_name на имя вашей таблицы SQLite
-        if not query.exec():
-            print("Не удалось выполнить запрос.")
-            return []
-
-        data = []
-        while query.next():
-            row = [query.value(i) for i in range(query.record().count())]
-            data.append(row)
-
-        db.close()
+        finally:
+            if conn:
+                conn.close()
 
         return data
 
     def get_data_from_class_well_db(self, region):
-        # Создание подключения к базе данных SQLite
-        db = QSqlDatabase.addDatabase("QSQLITE")
-        db.setDatabaseName(
-            'data_base/database_without_juming.db')  # Замените database.db на имя вашей базы данных SQLite
-        # print(db)
-        # print(region)
-        print('ТГМ_классификатор')
-        if not db.open():
-            print("Не удалось установить соединение с базой данных.")
+        # Параметры подключения к PostgreSQL
+        postgres_params = {
+            'database': 'databasewell',
+            'user': 'postgres',
+            'password': '1953',
+        }
+
+        try:
+            # Создание подключения к базе данных PostgreSQL
+            conn = psycopg2.connect(**postgres_params)
+
+            # Выполнение SQL-запроса для получения данных
+            with conn.cursor() as cur:
+                cur.execute(f"""
+                    SELECT cdng, well_number, deposit_area, oilfield, categoty_pressure,
+                           pressure_Ppl, pressure_Gst, date_measurement, categoty_h2s,
+                           h2s_pr, h2s_mg_l, h2s_mg_m, categoty_gf, gas_factor, today
+                    FROM {region};
+                """)
+                data = cur.fetchall()
+
+        except psycopg2.Error as e:
+            print(f"Ошибка при подключении к базе данных или выполнении запроса: {e}")
             return []
-
-        # Выполнение SQL-запроса для получения данных
-        query = QSqlQuery()
-        query.prepare(
-            f"SELECT cdng, well_number, deposit_area, oilfield, categoty_pressure,pressure_Ppl, pressure_Gst, date_measurement, categoty_h2s, h2s_pr, h2s_mg_l, h2s_mg_m, categoty_gf, gas_factor, today FROM {region}")  # Замените table_name на имя вашей таблицы SQLite
-        if not query.exec():
-            print("Не удалось выполнить запрос.")
-            return []
-
-        data = []
-        while query.next():
-            row = [query.value(i) for i in range(query.record().count())]
-            data.append(row)
-
-        db.close()
+        finally:
+            if conn:
+                conn.close()
 
         return data
 
     def export_to_sqlite_without_juming(self, fname, costumer, region):
-        # Подключение к базе данных SQLite
-        conn = sqlite3.connect('data_base/database_without_juming.db')
+        # Подключение к базе данных
+        conn = psycopg2.connect(dbname='databasewell', user='postgres', password='1953')
         cursor = conn.cursor()
         region_list = ['ЧГМ', 'АГМ', 'ТГМ', 'ИГМ', 'КГМ', ]
 
@@ -190,8 +196,7 @@ class Classifier_well(QMainWindow):
 
                 # Создание таблицы в базе данных
                 cursor.execute(f'CREATE TABLE IF NOT EXISTS {region_name}'
-                               f'(id INTEGER PRIMARY KEY AUTOINCREMENT,'
-                               f'well_number TEXT,'
+                               f'(well_number TEXT,'
                                f'deposit_area TEXT, '
                                f'today TEXT,'
                                f'region TEXT,'
@@ -253,7 +258,7 @@ class Classifier_well(QMainWindow):
                                 if well_number:
                                     cursor.execute(
                                         f"INSERT INTO {region_name} (well_number, deposit_area, today, region, costumer) "
-                                        f"VALUES (?,?,?,?,?)",
+                                        f"VALUES (%s, %s, %s, %s,%s)",
                                         (well_number, area_well, version_year, region_name, costumer))
 
                         mes = QMessageBox.information(self, 'данные обновлены', 'Данные обновлены')
@@ -300,81 +305,70 @@ class Classifier_well(QMainWindow):
                     if not match:
                         break
 
+
+
     def export_to_sqlite_class_well(self, fname, costumer, region):
-        # Подключение к базе данных SQLite
-        conn = sqlite3.connect('data_base/database_without_juming.db')
-        cursor = conn.cursor()
+        # Параметры подключения к PostgreSQL
+        postgres_params = {
+            'database': 'databasewell',
+            'user': 'postgres',
+            'password': '1953',
+            'host': 'localhost',  # Укажите ваш хост, если отличается
+            'port': '5432'
+        }
+
         region_list = ['ЧГМ_классификатор', 'АГМ_классификатор', 'ТГМ_классификатор', 'ИГМ_классификатор',
-                       'КГМ_классификатор', ]
+                       'КГМ_классификатор']
 
-        for region_name in region_list:
-            if region in region_name:
-                # # Удаление всех данных из таблицы
-                # cursor.execute("DROP TABLE my_table")
+        try:
+            # Создание подключения к базе данных PostgreSQL
+            conn = psycopg2.connect(**postgres_params)
+            cursor = conn.cursor()
 
-                # Удаление всех данных из таблицы
-                cursor.execute(f"DELETE FROM {region_name}")
+            for region_name in region_list:
+                if region in region_name:
+                    # Удаление всех данных из таблицы (опционально)
+                    cursor.execute(f"DROP TABLE IF EXISTS {region_name};")
 
-                # Создание таблицы в базе данных
-                cursor.execute(f'CREATE TABLE IF NOT EXISTS {region_name}'
-                               f'(id INTEGER PRIMARY KEY AUTOINCREMENT,'
-                               f'cdng TEXT,'
-                               f'well_number TEXT,'
-                               f'deposit_area TEXT,'
-                               f'oilfield TEXT,'
-                               f'categoty_pressure TEXT,'
-                               f'pressure_Ppl TEXT,'
-                               f'pressure_Gst TEXT,'
-                               f'date_measurement TEXT,'
-                               f'categoty_h2s TEXT,'
-                               f'h2s_pr TEXT,'
-                               f'h2s_mg_l TEXT,'
-                               f'h2s_mg_m TEXT,'
-                               f'categoty_gf TEXT,'
-                               f'gas_factor TEXT,'
-                               f'today TEXT,'
-                               f'region TEXT,'
-                               f'costumer TEXT)')
 
-                # Загрузка файла Excel
-                wb = load_workbook(fname)
-                ws = wb.active
+                    # Создание таблицы, если она не существует
+                    cursor.execute(f"""
+                        CREATE TABLE IF NOT EXISTS {region_name} (
+                            ID SERIAL PRIMARY KEY NOT NULL,
+                            cdng TEXT,
+                            well_number TEXT,
+                            deposit_area TEXT,
+                            oilfield TEXT,
+                            categoty_pressure TEXT,
+                            pressure_Ppl TEXT,
+                            pressure_Gst TEXT,
+                            date_measurement TEXT,
+                            categoty_h2s TEXT,
+                            h2s_pr TEXT,
+                            h2s_mg_l TEXT,
+                            h2s_mg_m TEXT,
+                            categoty_gf TEXT,
+                            gas_factor TEXT,
+                            today TEXT,
+                            region TEXT,
+                            costumer TEXT
+                        );
+                    """)
 
-                # Получение данных из Excel и запись их в базу данных
-                for index_row, row in enumerate(ws.iter_rows(min_row=2, values_only=True)):
-                    for col, value in enumerate(row):
-                        if not value is None and col <= 18:
-                            # print(value)
-                            if 'туймазин' in str(value).lower():
-                                check_param = 'ТГМ'
-                            if 'ишимбай' in str(value).lower():
-                                check_param = 'ИГМ'
-                            if 'чекмагуш' in str(value).lower():
-                                check_param = 'ЧГМ'
-                            if 'красно' in str(value).lower():
-                                check_param = 'КГМ'
-                            if 'арлан' in str(value).lower():
-                                check_param = 'АГМ'
-                            if '01.01.' in str(value) or '01.04.' in str(value) or '01.07.' in str(
-                                    value) or '01.10.' in str(value):
+                    # Загрузка файла Excel
+                    wb = load_workbook(fname)
+                    ws = wb.active
 
-                                version_year = re.findall(r'[0-9.]', str(value))
-                                version_year = ''.join(version_year)
-                                if version_year[-1] == '.':
-                                    version_year = version_year[:-1]
-                    if index_row > 18:
-                        break
-                # print(region_name, version_year)
-                # print(Check_param)
-                if check_param in region_name:
-                    mes = QMessageBox.warning(self, 'ВНИМАНИЕ ОШИБКА',
-                                              f'регион выбрано корректно  {region_name}')
-                    # try:
-                    # Получение данных из Excel и запись их в базу данных
+                    # Определение столбцов
+                    well_column, cdng, area_column, oilfield, categoty_pressure = None, None, None, None, None
+                    pressure_Gst, date_measurement, pressure_Ppl, categoty_h2s = None, None, None, None
+                    h2s_pr, h2s_mg_l, h2s_mg_m, categoty_gf, gas_factor = None, None, None, None, None
+                    area_row = None
+                    check_file = False
+
                     for index_row, row in enumerate(ws.iter_rows(min_row=2, values_only=True)):
                         if 'Классификация' in row:
                             check_file = True
-                            # print(f' класс {check_file}')
                         if 'Скважина' in row:
                             area_row = index_row + 2
                             for col, value in enumerate(row):
@@ -397,52 +391,60 @@ class Classifier_well(QMainWindow):
                                         h2s_pr = col + 1
                                         h2s_mg_l = col + 2
                                         h2s_mg_m = col + 3
-
                                     elif 'Газовый фактор' == value:
                                         categoty_gf = col
                                         gas_factor = col + 1
 
+                    # Вставка данных в таблицу
                     for index_row, row in enumerate(ws.iter_rows(min_row=2, values_only=True)):
-                        if index_row > area_row:
-
+                        if index_row > area_row and check_file:
                             well_number = row[well_column]
                             area_well = row[area_column]
                             oilfield_str = row[oilfield]
+                            version_year = None
+
+                            for col, value in enumerate(row):
+                                if not value is None and col <= 18:
+                                    if '01.01.' in str(value) or '01.04.' in str(value) or '01.07.' in str(
+                                            value) or '01.10.' in str(value):
+                                        version_year = re.findall(r'[0-9.]', str(value))
+                                        version_year = ''.join(version_year)
+                                        if version_year[-1] == '.':
+                                            version_year = version_year[:-1]
 
                             if well_number:
-                                cursor.execute(
-                                    f"INSERT INTO {region_name} (cdng, well_number, deposit_area, oilfield, "
-                                    f"categoty_pressure, pressure_Ppl, pressure_Gst, date_measurement,categoty_h2s, "
-                                    f"h2s_pr, h2s_mg_l, h2s_mg_m, categoty_gf, gas_factor, today, region) "
-                                    f"VALUES (?,?,?,?,?,?,?,?,?,?,?,?, ?, ?, ?, ?)",
-                                    (row[cdng], well_number, area_well, oilfield_str, row[categoty_pressure],
-                                     row[pressure_Ppl], row[pressure_Gst], row[date_measurement], row[categoty_h2s],
-                                     row[h2s_pr], row[h2s_mg_l], row[h2s_mg_m], row[categoty_gf], row[gas_factor],
-                                     version_year, region))
+                                cursor.execute(f"""
+                                    INSERT INTO {region_name} (
+                                        cdng, well_number, deposit_area, oilfield,
+                                        categoty_pressure, pressure_Ppl, pressure_Gst, date_measurement,
+                                        categoty_h2s, h2s_pr, h2s_mg_l, h2s_mg_m, categoty_gf, gas_factor,
+                                        today, region, costumer
+                                    )
+                                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
+                                """, (
+                                    row[cdng], well_number, area_well, oilfield_str, row[categoty_pressure],
+                                    row[pressure_Ppl], row[pressure_Gst], row[date_measurement], row[categoty_h2s],
+                                    row[h2s_pr], row[h2s_mg_l], row[h2s_mg_m], row[categoty_gf], row[gas_factor],
+                                    version_year, region, costumer
+                                ))
 
-                    mes = QMessageBox.information(self, 'данные обновлены', 'Данные обновлены')
-                    # except:
-                    #     mes = QMessageBox.warning(self, 'ОШИБКА', 'Выбран файл с не корректными данными')
+                    conn.commit()
 
-                else:
-                    mes = QMessageBox.warning(self, 'ВНИМАНИЕ ОШИБКА',
-                                              f'в Данном перечне отсутствую скважины {region_name}')
-
-        # Сохранение изменений
-        conn.commit()
-
-        # Закрытие соединения с базой данных
-        conn.close()
+        except (psycopg2.Error, Exception) as e:
+            print(f"Ошибка: {e}")
+        finally:
+            if conn:
+                conn.close()
 
 
 def read_database_gnkt(contractor, gnkt_number):
+
     # Подключение к базе данных SQLite
-    conn = sqlite3.connect('data_base\data_base_gnkt\gnkt_oilservice.dp')
-    cursor = conn.cursor()
+    conn = psycopg2.connect(dbname='gnkt_base', user='postgres', password='1953')
     if 'ойл-сервис' in contractor.lower():
         contractor = 'oil_service'
     cursor = conn.cursor()
-    cursor.execute(f"SELECT * FROM КГМ WHERE today =?", (gnkt_number, '1963'))
+    cursor.execute(f"SELECT * FROM КГМ WHERE today =(%s)", (gnkt_number, '1963'))
     print(f' база данных открыта')
     result = cursor.fetchone()
     print(result)
@@ -450,7 +452,7 @@ def read_database_gnkt(contractor, gnkt_number):
 
 def create_database_well_db(work_plan, number_dp):
     # print(row, well_data.count_row_well)
-    conn = sqlite3.connect('data_base/data_base_well/databaseWell.db')
+    conn = psycopg2.connect(dbname='databasewellwork', user='postgres', password='1953')
     cursor = conn.cursor()
 
     # Создаем таблицу для хранения данных
@@ -461,8 +463,7 @@ def create_database_well_db(work_plan, number_dp):
     cursor.execute(f'DROP TABLE IF EXISTS {number}')
 
     cursor.execute(f'CREATE TABLE IF NOT EXISTS {number}'
-                   f'(id INTEGER PRIMARY KEY AUTOINCREMENT,'
-                   f'index_row INTEGER,'
+                   f'(index_row INTEGER,'
                    f'current_bottom FLOAT,'
                    f'perforation TEXT, '
                    f'plast_all TEXT, '
@@ -498,19 +499,16 @@ def create_database_well_db(work_plan, number_dp):
                        problemWithEk_depth, problemWithEk_diametr)
 
         # Подготовленный запрос для вставки данных с параметрами
-        query = f"INSERT INTO {number} " \
-                f"(index_row, current_bottom, perforation, plast_all, plast_work, leakage, column_additional, fluid, " \
-                f"category_pressuar, category_h2s, category_gf, template_depth, skm_list, " \
-                f"problemWithEk_depth, problemWithEk_diametr) " \
-                f"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        query = f"INSERT INTO {number} VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
 
         # Выполнение запроса с использованием параметров
         cursor.execute(query, data_values)
 
+
     # Сохранить изменения и закрыть соединение
     conn.commit()
     conn.close()
-
+    mes = QMessageBox.information(None, 'база данных', 'Скважина добавлена в базу данных')
 
 if __name__ == "__main__":
     import sys

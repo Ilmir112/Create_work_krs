@@ -2,49 +2,82 @@ import sqlite3
 import psycopg2
 
 # Параметры подключения к SQLite
-sqlite_db_path = 'data_base/data_base_well/databaseWell.db'
+sqlite_db_path = 'data_base/data_base_gnkt/gnkt_base.dp'
 
-# Параметры подключения к PostgreSQL
-postgres_db_config = {
-    'host': 'localhost',
-    'database': 'databaseWell.db',
-    'user': 'postgres',
-    'password': '1953'
-}
+
+
+def copy_tables(sqlite_conn, postgres_conn):
+    # Получение списка таблиц из SQLite
+    sqlite_cursor = sqlite_conn.cursor()
+    sqlite_cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+    tables = sqlite_cursor.fetchall()
+    print(tables)
+    # Обработка каждой таблицы
+    for table_name in tables[1:]:
+
+        table_name = table_name[0]
+
+
+        # Получение схемы таблицы SQLite
+        sqlite_cursor.execute(f"SELECT sql FROM sqlite_master WHERE type='table' AND name='{table_name}';")
+        table_schema = sqlite_cursor.fetchone()[0].replace('AUTOINCREMENT', '')
+        print(f'jjf {table_schema}')
+
+        # Создание таблицы в PostgreSQL (если она не существует)
+        postgres_cursor = postgres_conn.cursor()
+        postgres_cursor.execute(f'{table_schema}')
+
+        # Получение данных из таблицы SQLite
+        sqlite_cursor.execute(f"SELECT * FROM {table_name};")
+        rows = sqlite_cursor.fetchall()
+
+        # Вставка данных в таблицу PostgreSQL
+        placeholders = ', '.join(['%s'] * len(rows[0]))
+        insert_query = f"INSERT INTO {table_name} VALUES ({placeholders});"
+        postgres_cursor.executemany(insert_query, rows)
+
+        postgres_conn.commit()
 
 # Подключение к базам данных
 sqlite_conn = sqlite3.connect(sqlite_db_path)
-postgres_conn = psycopg2.connect(*postgres_db_config)
-sqlite_cursor = sqlite_conn.cursor()
-postgres_cursor = postgres_conn.cursor()
+postgres_conn = psycopg2.connect(dbname='gnkt_base', user='postgres', password='1953')
 
-# Получение списка таблиц из SQLite
-sqlite_cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
-tables = sqlite_cursor.fetchall()
+# # Копирование таблиц
+copy_tables(sqlite_conn, postgres_conn)
+print('копирование завершено')
+cursor = postgres_conn.cursor()
+# # Выполнение запроса (например, выбор всех записей из таблицы "users")
+# cursor.execute("SELECT * FROM ЧГМ_классификатор")
+#
+# # Получение результатов
+# rows = cursor.fetchall()
+#
+# # Обработка результатов (например, печать каждой строки)
+# for row in rows:
+#     print(row)
 
-# Перенос данных для каждой таблицы
-for table_name, in tables:
-    # Получение схемы таблицы
-    sqlite_cursor.execute(f"PRAGMA table_info({table_name})")
-    table_info = sqlite_cursor.fetchall()
 
-    # Создание таблицы в PostgreSQL
-    create_table_sql = f"CREATE TABLE {table_name} ("
-    for column_info in table_info:
-        column_name, data_type, _, _, _, _ = column_info
-        create_table_sql += f"{column_name} {data_type},"
-    create_table_sql = create_table_sql[:-1] + ")"
-    postgres_cursor.execute(create_table_sql)
-
-    # Получение данных из SQLite
-    sqlite_cursor.execute(f"SELECT * FROM {table_name}")
-    data = sqlite_cursor.fetchall()
-
-    # Вставка данных в PostgreSQL
-    insert_sql = f"INSERT INTO {table_name} VALUES ({','.join(['%s' for _ in range(len(table_info))])})"
-    postgres_cursor.executemany(insert_sql, data)
-
-# Сохранение изменений и закрытие соединений
-postgres_conn.commit()
-sqlite_conn.close()
-postgres_conn.close()
+# import sqlite3
+# import psycopg2
+#
+#
+# # Параметры подключения к SQLite
+# sqlite_db_path = 'data_base/data_base_well/databaseWell.db'
+#
+# # Подключение к базам данных
+# sqlite_conn = sqlite3.connect(sqlite_db_path)
+# postgres_conn = psycopg2.connect(dbname='databasewell', user='postgres', password='1953')
+# sqlite_cursor = sqlite_conn.cursor()
+# postgres_cursor = postgres_conn.cursor()
+#
+# # Получение списка таблиц из SQLite
+# sqlite_cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
+# tables = sqlite_cursor.fetchall()
+#
+# for data in tables:
+#     postgres_cursor.execute("INSERT INTO table VALUES =(%s)", data)
+#
+# # Сохранение изменений и закрытие соединений
+# postgres_conn.commit()
+# sqlite_conn.close()
+# postgres_conn.close()

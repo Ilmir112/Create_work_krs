@@ -1372,8 +1372,8 @@ class AcidPakerWindow(QMainWindow):
                              f' {acid_proc_edit} %) '
         elif acid_edit == 'ВТ':
 
-            vt = self.tabWidget.currentWidget().sko_vt_edit.currentText()
-            acid_sel = f'Произвести кислотную обработку {plast_combo} {vt}  в присутствии представителя ' \
+            vt = self.tabWidget.currentWidget().sko_vt_edit.text()
+            acid_sel = f'Произвести кислотную обработку {plast_combo} {vt} в присутствии представителя ' \
                        f'Заказчика с составлением акта, не превышая давления закачки не более' \
                        f' Р={well_data.max_admissible_pressure._value}атм.'
             acid_sel_short = vt

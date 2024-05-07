@@ -217,7 +217,7 @@ class TabPage_SO_rir(QWidget):
             if paker_depth != '':
                 paker_khost = 10
                 self.paker_khost_edit.setText(f'{paker_khost}')
-                self.diametr_paker_edit.setText(f'{TabPage_SO.paker_diametr_select(self, int(paker_depth))}')
+                self.diametr_paker_edit.setText(f'{TabPage_SO.paker_diametr_select(self, int(float(paker_depth)))}')
     def update_depth_paker(self):
         from work_py.opressovka import TabPage_SO
         paker_depth = self.paker_depth_edit.text()

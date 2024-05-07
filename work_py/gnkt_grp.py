@@ -1,6 +1,7 @@
 import sqlite3
 from datetime import datetime
 
+import psycopg2
 from PyQt5.QtWidgets import QInputDialog, QMainWindow, QTabWidget, QWidget, QTableWidget, QApplication, QLabel, \
     QLineEdit, QGridLayout, QComboBox, QPushButton,QMessageBox
 from main import MyWindow
@@ -89,9 +90,9 @@ class TabPageDp(QWidget):
 
     def update_number_gnkt(self, number_gnkt):
 
-        conn = sqlite3.connect('data_base/data_base_well/databaseWell.db')
+        conn = psycopg2.connect(dbname='gnkt_base', user='postgres', password='1953')
         cursor = conn.cursor()
-        cursor.execute(f"SELECT * FROM КГМ WHERE today =?, ?", (number_gnkt, self.previous_well_edit.text()))
+        cursor.execute(f"SELECT * FROM КГМ WHERE today (%s), ?", (number_gnkt, self.previous_well_edit.text()))
 
         result_gnkt = cursor.fetchone()
         print(result_gnkt)

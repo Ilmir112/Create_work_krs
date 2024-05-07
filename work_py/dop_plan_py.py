@@ -1,6 +1,7 @@
 import json
-import sqlite3
 
+
+import psycopg2
 from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QTabWidget, \
     QMainWindow, QPushButton
 from datetime import datetime
@@ -91,13 +92,11 @@ class DopPlanWindow(QMainWindow):
         if str(fluid) not in str(well_data.fluid_work):
             well_data.fluid_work, well_data.fluid_work_short = GnoWindow.calc_work_fluid(self, fluid)
 
-
-
-
     def extraction_data(self):
 
         # Устанавливаем соединение с базой данных
-        conn1 = sqlite3.connect('data_base/data_base_well/databaseWell.db')
+        conn1 = psycopg2.connect(dbname='databasewellwork', user='postgres', password='1953')
+
         cursor1 = conn1.cursor()
 
         # Проверяем наличие таблицы с определенным именем
@@ -107,8 +106,15 @@ class DopPlanWindow(QMainWindow):
             work_plan = 'krs'
             table_name = json.dumps(well_data.well_number._value + well_data.well_area._value + work_plan,
                         ensure_ascii=False)
-            cursor1.execute(f"SELECT * FROM sqlite_master WHERE name = {table_name} AND type = 'table'")
-            result_table = cursor1.fetchall()
+            cursor1.execute("""
+                                SELECT EXISTS (
+                                    SELECT 1
+                                    FROM information_schema.tables 
+                                    WHERE table_schema = 'public'
+                                    AND table_name = %s
+                                );
+                            """, (table_name,))
+            result_table = cursor1.fetchone()[0]
         else:
             work_plan = f'dop_plan'
             table_name = json.dumps(well_data.well_number._value + well_data.well_area._value +
@@ -118,8 +124,15 @@ class DopPlanWindow(QMainWindow):
                     work_plan = f'dop_plan{i}'
                     table_name = json.dumps(well_data.well_number._value + well_data.well_area._value + work_plan + str(number_dp),
                         ensure_ascii=False)
-                    cursor1.execute(f"SELECT * FROM sqlite_master WHERE name = {table_name} AND type = 'table'")
-                    result_table = cursor1.fetchall()
+                    cursor1.execute("""
+            SELECT EXISTS (
+                SELECT 1
+                FROM information_schema.tables 
+                WHERE table_schema = 'public'
+                AND table_name = %s
+            );
+        """, (table_name,))
+                    result_table = cursor1.fetchone()[0]
 
                 except:
                     pass
@@ -129,8 +142,8 @@ class DopPlanWindow(QMainWindow):
         if result_table != 0:
             well_data.data_in_base = True
             cursor2 = conn1.cursor()
-            # print(result_table)
-            # print(f"Таблица {table_name}' существует в базе данных.")
+            print(result_table)
+            print(f"Таблица {table_name}' существует в базе данных.")
             cursor2.execute(f"SELECT * FROM {table_name}")
             result = cursor2.fetchall()
             well_data.paragraph_row, ok = QInputDialog.getInt(self, 'пункт плана работ',

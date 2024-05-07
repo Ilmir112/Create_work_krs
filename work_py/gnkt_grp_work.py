@@ -1,6 +1,7 @@
 import sqlite3
 from datetime import datetime
 
+import psycopg2
 from PyQt5.QtWidgets import QInputDialog, QMainWindow, QTabWidget, QWidget, QTableWidget, QApplication, QLabel, \
     QLineEdit, QGridLayout, QComboBox, QPushButton, QMessageBox
 # from PyQt5.uic.properties import QtWidgets
@@ -93,25 +94,30 @@ class TabPageDp(QWidget):
         self.previous_well_combo.currentTextChanged.connect(self.update_data_gnkt)
 
     def update_data_gnkt(self):
-
         previus_well = self.previous_well_combo.currentText()
 
         if previus_well:
-            conn = sqlite3.connect('data_base\data_base_gnkt\gnkt_base.dp')
+            conn = psycopg2.connect(dbname='gnkt_base', user='postgres', password='1953')
+
             cursor = conn.cursor()
+
             if 'ойл-сервис' in well_data.contractor.lower():
                 contractor = 'oil_service'
             print(previus_well)
-            cursor.execute(f"SELECT * FROM gnkt_{contractor} WHERE well_number =?", (previus_well,))
+
+            cursor.execute("""
+                SELECT * FROM gnkt_{contractor} WHERE well_number = %s;
+            """.format(contractor=contractor), (previus_well,))
 
             result_gnkt = cursor.fetchone()
             print(result_gnkt)
 
-            self.lenght_gnkt_edit.setText(f'{result_gnkt[3]}')
-            self.iznos_gnkt_edit.setText(f'{result_gnkt[5]}')
-            self.pipe_mileage_edit.setText(f'{result_gnkt[6]}')
-            self.pvo_number_edit.setText(f'{result_gnkt[10]}')
+            self.lenght_gnkt_edit.setText(str(result_gnkt[3]))
+            self.iznos_gnkt_edit.setText(str(result_gnkt[5]))
+            self.pipe_mileage_edit.setText(str(result_gnkt[6]))
+            self.pvo_number_edit.setText(str(result_gnkt[10]))
 
+            conn.close()
 
     def update_number_gnkt(self, gnkt_number):
         if gnkt_number != '':

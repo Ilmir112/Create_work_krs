@@ -183,6 +183,7 @@ class GnoWindow(QMainWindow):
         if work_plan != 'dop_plan':
 
             without_damping_True = well_data.without_damping
+            print(f'без глушения {without_damping_True}')
 
             if any([cater == 1 for cater in well_data.cat_P_1]):
                 well_data.kat_pvo, _ = QInputDialog.getInt(self, 'Категория скважины',

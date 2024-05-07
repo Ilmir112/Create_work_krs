@@ -1,6 +1,6 @@
-
+import psycopg2
 from PyQt5.QtWidgets import  QWidget, QLabel, QLineEdit, QPushButton, QMessageBox, QComboBox
-import sqlite3
+
 
 
 import well_data
@@ -40,10 +40,10 @@ class LoginWindow(QWidget):
         username = self.username.currentText()
         password = self.password.text()
         last_name, first_name, second_name, _ = username.split(' ')
-        conn = sqlite3.connect('data_base/users_database/users.db')
+        conn = psycopg2.connect(dbname='users', user='postgres', password='1953')
         cursor = conn.cursor()
         cursor.execute("SELECT last_name, first_name, second_name, password, position_in, organization FROM users "
-                       "WHERE last_name=? AND first_name=? AND second_name=?",
+                       "WHERE last_name=(%s) AND first_name=(%s) AND second_name=(%s)",
                        (last_name, first_name, second_name))
         password_base = cursor.fetchone()
 
@@ -60,7 +60,8 @@ class LoginWindow(QWidget):
 
     def get_list_users(self):
         # Создаем подключение к базе данных
-        conn = sqlite3.connect('data_base/users_database/users.db')
+
+        conn = psycopg2.connect(dbname='users', user='postgres', password='1953')
         cursor = conn.cursor()
         cursor.execute("SELECT last_name, first_name, second_name, position_in, organization  FROM users")
         users = cursor.fetchall()
@@ -141,12 +142,12 @@ class RegisterWindow(QWidget):
         password = self.password.text()
         password2 = self.password2.text()
 
-        conn = sqlite3.connect('data_base/users_database/users.db')
+        conn = psycopg2.connect(dbname='users', user='postgres', password='1953')
         cursor = conn.cursor()
 
         # Проверяем, существует ли пользователь с таким именем
         cursor.execute("SELECT last_name, first_name, second_name  FROM users "
-                       "WHERE last_name=? AND first_name=? AND second_name=?",
+                       "WHERE last_name(%s) AND first_name(%s) AND second_name(%s)",
                        (last_name, first_name, second_name))
         existing_user = cursor.fetchone()
 
@@ -157,7 +158,7 @@ class RegisterWindow(QWidget):
             if password == password2:
                 cursor.execute(
                     "INSERT INTO users ("
-                    "last_name, first_name, second_name, position_in, organization, password) VALUES (?, ?, ?, ?, ?, ?)",
+                    "last_name, first_name, second_name, position_in, organization, password) VALUES (%s, %s, %s, %s, %s, %s)",
                     (last_name, first_name, second_name, position_in, organization, password))
                 conn.commit()
                 conn.close()

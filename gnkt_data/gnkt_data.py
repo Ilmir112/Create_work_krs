@@ -1,6 +1,8 @@
 import sqlite3
 from datetime import datetime
 from collections import namedtuple
+
+import psycopg2
 from PyQt5.QtWidgets import  QMessageBox
 import well_data
 
@@ -75,13 +77,13 @@ dict_saddles = {
 
 def read_database_gnkt(contractor, gnkt_number):
     # Подключение к базе данных SQLite
-    conn = sqlite3.connect('data_base\data_base_gnkt\gnkt_base.dp')
+    conn = psycopg2.connect(dbname='gnkt_base', user='postgres', password='1953')
     cursor = conn.cursor()
 
     if 'ойл-сервис' in contractor.lower():
         contractor = 'oil_service'
 
-    cursor.execute(f"SELECT * FROM gnkt_{contractor} WHERE gnkt_number =?", (gnkt_number,))
+    cursor.execute(f"SELECT * FROM gnkt_{contractor} WHERE gnkt_number =(%s)", (gnkt_number,))
 
     result = cursor.fetchall()
 
@@ -101,7 +103,7 @@ def insert_data_base_gnkt(contractor, well_name, gnkt_number, gnkt_length, diame
 
 
     # Подключение к базе данных SQLite
-    conn = sqlite3.connect('data_base\data_base_gnkt\gnkt_base.dp')
+    conn = psycopg2.connect(dbname='gnkt_base', user='postgres', password='1953')
     cursor = conn.cursor()
 
     if 'ойл-сервис' in contractor.lower():
@@ -110,17 +112,12 @@ def insert_data_base_gnkt(contractor, well_name, gnkt_number, gnkt_length, diame
 
     filenames = f"{well_data.well_number._value} {well_data.well_area._value} "
 
-    query = f"SELECT * FROM gnkt_{contractor} WHERE well_number LIKE ?"
+    query = f"SELECT * FROM gnkt_{contractor} WHERE well_number LIKE  (%s)"
 
     # Выполнение запроса
     cursor.execute(query, ('%' + filenames + '%',))
 
     result = cursor.fetchall()
-
-    # Вывод результатов
-    for row in result:
-        print(row)
-
 
     if len(result) == 0:
         current_datetime = datetime.today().strftime('%d.%m.%Y')
@@ -132,7 +129,7 @@ def insert_data_base_gnkt(contractor, well_name, gnkt_number, gnkt_length, diame
         query = f"INSERT INTO gnkt_{contractor} " \
                 f"(gnkt_number, well_number, length_gnkt, diameter_gnkt, wear_gnkt, mileage_gnkt, " \
                 f"tubing_fatigue, previous_well, today, pvo_number) " \
-                f"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+                f"VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
 
         # Выполнение запроса с использованием параметров
         cursor.execute(query, data_values)
@@ -142,7 +139,7 @@ def insert_data_base_gnkt(contractor, well_name, gnkt_number, gnkt_length, diame
         mes = QMessageBox.question(None, 'база данных', f'Скважина уже есть в базе данных, обновить?')
         if mes == QMessageBox.StandardButton.Yes:
             # Подготовленный запрос для удаления
-            query1 = f"DELETE FROM gnkt_{contractor} WHERE well_number LIKE ?"
+            query1 = f"DELETE FROM gnkt_{contractor} WHERE well_number LIKE (%s)"
 
             # Выполнение запроса
             cursor.execute(query1, ('%' + filenames + '%',))
@@ -156,21 +153,20 @@ def insert_data_base_gnkt(contractor, well_name, gnkt_number, gnkt_length, diame
             query = f"INSERT INTO gnkt_{contractor} " \
                     f"(gnkt_number, well_number, length_gnkt, diameter_gnkt, wear_gnkt, mileage_gnkt, " \
                     f"tubing_fatigue, previous_well, today, pvo_number) " \
-                    f"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+                    f"VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
 
             # Выполнение запроса с использованием параметров
             cursor.execute(query, data_values)
             mes = QMessageBox.information(None, 'база данных', f'Скважина добавлена в базу данных')
 
-
-
     conn.commit()
 
     # Закрытие соединения с базой данных
     conn.close()
+
 # def create_data_base(contractor, gnkt_number):
 #     # Подключение к базе данных SQLite
-#     conn = sqlite3.connect('D:\python\Create_work_krs\data_base\data_base_gnkt\gnkt_base.dp')
+#     conn = psycopg2.connect(dbname='gnkt_base', user='postgres', password='1953')
 #     cursor = conn.cursor()
 #     if 'ойл-сервис' in contractor.lower():
 #         contractor = 'oil_service'
@@ -180,7 +176,7 @@ def insert_data_base_gnkt(contractor, well_name, gnkt_number, gnkt_length, diame
 #
 #     # Создание таблицы в базе данных
 #     cursor.execute(f'CREATE TABLE IF NOT EXISTS gnkt_{contractor}'
-#                    f'(id INTEGER PRIMARY KEY AUTOINCREMENT,'
+#                    f'(ID SERIAL PRIMARY KEY NOT NULL,'
 #                    f'gnkt_number TEXT,'
 #                    f'well_number TEXT,'
 #                    f'length_gnkt INT NOT NULL, '
@@ -195,7 +191,7 @@ def insert_data_base_gnkt(contractor, well_name, gnkt_number, gnkt_length, diame
 #     Gnkt_data = namedtuple("Gnkt_data",
 #                            ["gnkt_length", "diametr_length", "iznos", "pipe_mileage", 'pipe_fatigue',
 #                             "pvo"])
-#     gnkt_2 = Gnkt_data(2200, 38, 20, 35025, '25', 115)
+#     gnkt_2 = Gnkt_data(2200, 38, 20, 60875, '25', 115)
 #     gnkt_1 = Gnkt_data(3200, 38, 20, 42006, '25', 166)
 #     for ind, gnkt in enumerate([gnkt_1, gnkt_2]):
 #         if ind == 0:
@@ -207,7 +203,7 @@ def insert_data_base_gnkt(contractor, well_name, gnkt_number, gnkt_length, diame
 #         # Подготовленный запрос для вставки данных с параметрами
 #         query = f"INSERT INTO gnkt_{contractor} " \
 #                 f"(gnkt_number, well_number, length_gnkt, diameter_gnkt, wear_gnkt, mileage_gnkt, tubing_fatigue, previous_well, today, pvo_number) " \
-#                 f"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+#                 f"VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
 #
 #         # Выполнение запроса с использованием параметров
 #         cursor.execute(query, data_values)
