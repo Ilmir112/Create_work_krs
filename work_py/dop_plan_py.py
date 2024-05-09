@@ -70,7 +70,7 @@ class DopPlanWindow(QMainWindow):
     def add_work(self):
         from main import MyWindow
 
-        current_bottom = round(float(self.tabWidget.currentWidget().current_bottom_edit.text()), 1)
+        current_bottom = round(float(self.tabWidget.currentWidget().current_bottom_edit.text().replace(',', '.')), 1)
         fluid = round(float(self.tabWidget.currentWidget().fluid_edit.text().replace(',', '.')), 2)
         work_earlier = self.tabWidget.currentWidget().work_edit.text()
         well_data.current_bottom = current_bottom

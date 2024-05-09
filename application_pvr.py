@@ -26,8 +26,13 @@ class TabPage_SO_pvr(QWidget):
 
         self.number_brigada_label = QLabel('Номер бригады', self)
         self.number_brigada_combo = QComboBox(self)
-        brigada_list = list(well_data.dict_telephon.keys())
-        self.number_brigada_combo.addItems(brigada_list)
+        brigada_list = well_data.dict_telephon
+        self.number_brigada_combo.addItems(list(brigada_list.keys()))
+
+
+        self.number_telephone_label = QLabel('номер телефона, self')
+        self.number_telephone_edit = QLineEdit(self)
+
 
         self.date_new_label = QLabel('Дата заявки', self)
         self.date_new_edit = QLineEdit(self)
@@ -92,8 +97,11 @@ class TabPage_SO_pvr(QWidget):
 
         self.grid = QGridLayout(self)
 
-        self.grid.addWidget(self.number_brigada_label, 9, 2)
-        self.grid.addWidget(self.number_brigada_combo, 10, 2)
+        self.grid.addWidget(self.number_brigada_label, 7, 2)
+        self.grid.addWidget(self.number_brigada_combo, 8, 2)
+
+        self.grid.addWidget(self.number_telephone_label, 7, 3)
+        self.grid.addWidget(self.number_telephone_edit, 8, 3)
 
         self.grid.addWidget(self.date_new_label, 9, 3)
         self.grid.addWidget(self.date_new_edit, 10, 3)
@@ -102,26 +110,26 @@ class TabPage_SO_pvr(QWidget):
         self.grid.addWidget(self.time_new_edit, 10, 4)
 
         self.grid.addWidget(self.work_label, 11, 3, 1, 2)
-        self.grid.addWidget(self.work_edit, 12, 3, 1, 2)
+        self.grid.addWidget(self.work_edit, 12, 3, 2, 4)
 
-        self.grid.addWidget(self.nkt_label, 13, 2)
-        self.grid.addWidget(self.nkt_edit, 14, 2)
+        self.grid.addWidget(self.nkt_label, 15, 2)
+        self.grid.addWidget(self.nkt_edit, 16, 2)
 
-        self.grid.addWidget(self.nkt_shoe_label, 13, 3)
-        self.grid.addWidget(self.nkt_shoe_edit, 14, 3)
+        self.grid.addWidget(self.nkt_shoe_label, 15, 3)
+        self.grid.addWidget(self.nkt_shoe_edit, 16, 3)
 
-        self.grid.addWidget(self.nkt_com_label, 13, 4)
-        self.grid.addWidget(self.nkt_com_edit, 14, 4)
+        self.grid.addWidget(self.nkt_com_label, 15, 4)
+        self.grid.addWidget(self.nkt_com_edit, 16, 4)
 
 
-        self.grid.addWidget(self.paker_type_label, 15, 2)
-        self.grid.addWidget(self.paker_type, 16, 2)
+        self.grid.addWidget(self.paker_type_label, 17, 2)
+        self.grid.addWidget(self.paker_type, 18, 2)
 
-        self.grid.addWidget(self.pakerLabel, 15, 3)
-        self.grid.addWidget(self.paker_depth, 16, 3)
+        self.grid.addWidget(self.pakerLabel, 17, 3)
+        self.grid.addWidget(self.paker_depth, 18, 3)
 
-        self.grid.addWidget(self.fluid_label, 17, 3)
-        self.grid.addWidget(self.fluid_edit, 18, 3)
+        self.grid.addWidget(self.fluid_label, 19, 3)
+        self.grid.addWidget(self.fluid_edit, 20, 3)
 
         self.grid.addWidget(self.labelType, 22, 2)
         self.grid.addWidget(self.lineEditType, 23, 2)
@@ -140,6 +148,10 @@ class TabPage_SO_pvr(QWidget):
         self.grid.addWidget(self.label_type_pvr, 22, 7)
         self.grid.addWidget(self.combo_pvr_type, 23, 7)
 
+        self.number_brigada_combo.currentTextChanged.connect(self.update_brigade)
+
+    def update_brigade(self, index):
+        self.number_telephone_edit.setText(str(well_data.dict_telephon[self.number_brigada_combo.currentText()]))
 
 
 class TabWidget(QTabWidget):
@@ -168,8 +180,8 @@ class PvrApplication(QMainWindow):
             self.tableWidget.horizontalHeader().setSectionResizeMode(i, QHeaderView.Stretch)
 
 
-        self.tableWidget.setSortingEnabled(True)
-        self.tableWidget.setAlternatingRowColors(True)
+        # self.tableWidget.setSortingEnabled(True)
+        # self.tableWidget.setAlternatingRowColors(True)
 
         self.buttonAdd = QPushButton('Добавить интервалы перфорации в таблицу')
         self.buttonAdd.clicked.connect(self.addRowTable)
@@ -189,11 +201,14 @@ class PvrApplication(QMainWindow):
         vbox.addWidget(self.buttonadd_work, 3, 0)
         vbox.addWidget(self.buttonAddProject, 3, 1)
 
-
     def addPerfProject(self):
 
+        if len(well_data.pvr_row) == 0:
+
+            mes = QMessageBox.warning(self, 'Ошибка', 'Перфорация в плане работ не найдены')
+            return
+        rows = self.tableWidget.rowCount()
         for pvr in well_data.pvr_row:
-            rows = self.tableWidget.rowCount()
             self.tableWidget.insertRow(rows)
             self.tableWidget.setItem(rows, 0, QTableWidgetItem(str(pvr[0])))
             self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(pvr[2])))
@@ -201,7 +216,6 @@ class PvrApplication(QMainWindow):
             self.tableWidget.setItem(rows, 3, QTableWidgetItem(str(pvr[4])))
             self.tableWidget.setItem(rows, 4, QTableWidgetItem(str(pvr[5])))
             self.tableWidget.setItem(rows, 5, QTableWidgetItem(str(pvr[6])))
-
 
 
     def addRowTable(self):
@@ -237,14 +251,12 @@ class PvrApplication(QMainWindow):
 
     def copy_pvr(self, ws, work_list):
         for row in range(len(work_list)):
-            # print(len(work_list[row]))
-
             for col in range(42):
-
                 if work_list[row][col]:
-                    # print(work_list[row][col])
-                    # print(row, col)
+                    print(work_list[row][col])
+                    print(row, col)
                     ws.cell(row=row + 1, column=col + 1).value = work_list[row][col]
+
         # Перебираем строки и скрываем те, у которых все значения равны None
         for row_ind, row in enumerate(ws.iter_rows(values_only=True)):
             if all(value is None for value in row[:42]):
@@ -258,6 +270,7 @@ class PvrApplication(QMainWindow):
         # Выбираем активный лист
         self.ws_pvr = wb.active
         number_brigada = str(self.tabWidget.currentWidget().number_brigada_combo.currentText())
+        number_telephone = self.tabWidget.currentWidget().number_telephone_edit.text()
         date_new_edit = self.tabWidget.currentWidget().date_new_edit.text()
         time_new_edit = self.tabWidget.currentWidget().time_new_edit.text()
         work_edit = self.tabWidget.currentWidget().work_edit.text()
@@ -273,8 +286,9 @@ class PvrApplication(QMainWindow):
         else:
             type_pvr_str = '2.9.2'
         rows = self.tableWidget.rowCount()
+        perf_list = []
+
         for row in range(rows):
-            perf_list = []
             roof = self.tableWidget.item(row, 0).text()
             sole = self.tableWidget.item(row, 1).text()
             type_charge = self.tableWidget.item(row, 2).text()
@@ -292,11 +306,11 @@ class PvrApplication(QMainWindow):
                  None,
                  None])
 
-        work_list = self.application_pvr_def(number_brigada, date_new_edit, time_new_edit, work_edit, nkt_edit,
+        work_list = self.application_pvr_def(number_brigada, number_telephone, date_new_edit, time_new_edit, work_edit, nkt_edit,
                                              nkt_shoe_edit,  nkt_com_edit, paker_type, paker_depth, fluid)
 
-        for row in perf_list:
-            work_list[15] = row
+        for index, row in enumerate(perf_list):
+            work_list[15 + index] = row
 
         self.copy_pvr(self.ws_pvr, work_list)
 
@@ -326,7 +340,7 @@ class PvrApplication(QMainWindow):
         self.tableWidget.removeRow(row)
 
 
-    def application_pvr_def(self, number_brigada, date_new_edit, time_new_edit, work_edit, nkt_edit, nkt_shoe_edit,
+    def application_pvr_def(self, number_brigada, number_telephone, date_new_edit, time_new_edit, work_edit, nkt_edit, nkt_shoe_edit,
                             nkt_com_edit, paker_type, paker_depth, fluid):
 
         column_data = f'{well_data.column_diametr._value}мм x {well_data.column_wall_thickness._value} в инт ' \
@@ -878,7 +892,7 @@ class PvrApplication(QMainWindow):
             [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None,
              None, None, None, None, None, None, None, number_brigada, None, None, None, None,
-             well_data.dict_telephon[number_brigada],
+             number_telephone,
              None, None, None, None, None, None, None, None, None, None, None],
             [None, 'Заявку подал', None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None,

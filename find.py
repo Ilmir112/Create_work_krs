@@ -1,12 +1,14 @@
 from datetime import datetime
 
+from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QInputDialog, QMainWindow, QMessageBox
+from openpyxl.reader.excel import load_workbook
 from openpyxl.workbook import Workbook
 
 import well_data
 from category_correct import CategoryWindow
 from data_correct import DataWindow
-from main import ExcelWorker
+from main import ExcelWorker, MyWindow
 from perforation_correct import PerforationCorrect
 
 from work_py.leakage_column import LeakageWindow
@@ -76,6 +78,14 @@ class FindIndexPZ(QMainWindow):
 
             elif 'III. Состояние скважины к началу ремонта ' in row:
                 well_data.condition_of_wells = ProtectedIsDigit(row_ind)
+
+
+        if well_data.cat_well_max._value == 0:
+            mes = QMessageBox.warning(self, 'Ошибка', 'Не корректный файл excel, либо отсутствует строка с '
+                                                      'текстом ПЛАН-ЗАКАЗ или ПЛАН-РАБОТ')
+            MyWindow.pause_app()
+            return
+
         if well_data.cat_well_min._value == 0:
             well_data.cat_well_min = ProtectedIsDigit(QInputDialog.getInt(
                 self, 'индекс начала копирования', 'Программа не смогла определить строку начала копирования',
@@ -182,7 +192,7 @@ class FindIndexPZ(QMainWindow):
 
         if MyWindow.check_str_isdigit(self, str(string)) is True:
             if str(round(float(str(string).replace(',', '.')), 1))[-1] == "0":
-                return int(float(string))
+                return int(float(str(string).replace(',', '.')))
             else:
                 return round(float(str(string).replace(',', '.')), 4)
         elif str(string).replace(' ', '') == '-' or 'отсут' in str(string) or \
@@ -898,6 +908,15 @@ class Well_data(FindIndexPZ):
             well_data.pause = True
             self.data_window = None
 
+        if well_data.max_angle._value > 45 or 'gnkt' in well_data.work_plan:
+            angle_true_question = QMessageBox.question(self, 'Зенитный угол', 'Зенитный угол больше 45 градусов, '
+                                                                             'есть данные иклинометрии?')
+            if angle_true_question == QMessageBox.StandardButton.Yes:
+                well_data.angle_data = Well_data.read_angle_well()
+
+                print(well_data.angle_data)
+
+
         well_data.nkt_diam = 73 if well_data.column_diametr._value > 110 else 60
         well_data.nkt_template = 59.6 if well_data.column_diametr._value > 110 else 47.9
 
@@ -916,6 +935,50 @@ class Well_data(FindIndexPZ):
                                                  '878', '124', '549', '168']:
             QMessageBox.warning(self, 'Канатные технологии', f'Скважина согласована на канатные технологии')
             well_data.konte_true = True
+
+    @staticmethod
+    def read_angle_well():
+        fname, _ = QtWidgets.QFileDialog.getOpenFileName(None, 'Выберите файл', '.',
+                                                              "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
+        # Загрузка файла Excel
+        wb = load_workbook(fname)
+        ws = wb.active
+        angle_data = []
+        depth_column = ''
+        row_data = ''
+        angle_column = ''
+        curvature_column = ''
+        for index_row, row in enumerate(ws.iter_rows(min_row=1, max_row=50, values_only=True)):
+            for col, value in enumerate(row):
+                if not value is None:
+                    if 'глубина' in str(value).lower() and col <= 7:
+                        depth_column = col
+                        row_data = index_row
+                        print(f'угол{depth_column, row_data}')
+                    elif ('Угол, гpад' in str(value) and col <= 7) or 'зенитный' in str(value).lower():
+                        angle_column = col
+                        print(f'угол_ e {angle_column}')
+                    elif 'кривизна' in str(value).lower() or 'гр./10' in str(value).lower():
+                        curvature_column = col
+                        print(f'угол_e{curvature_column}')
+        if depth_column == '':
+            depth_column, ok = QInputDialog.getInt(None, 'номер столбца', 'Программа не смогла найти номер столбца с '
+                                                                          'указанием значений глубин')
+        if row_data == '':
+            row_data, ok = QInputDialog.getInt(None, 'номер столбца', 'Программа не смогла найти номер строки с '
+                                                                          'указанием данных строки')
+        if angle_column == '':
+            angle_column, ok = QInputDialog.getInt(None, 'номер столбца', 'Программа не смогла найти номер столбца с '
+                                                                          'указанием значений угла')
+        if curvature_column == '':
+            curvature_column, ok = QInputDialog.getInt(None, 'номер столбца', 'Программа не смогла найти номер столбца с '
+                                                                          'указанием интенсивности набора угла')
+
+        # Вставка данных в таблицу
+        for index_row, row in enumerate(ws.iter_rows(min_row=row_data, values_only=True)):
+            if str(row[depth_column]).replace(',','').replace('.','').isdigit():
+                angle_data.append((row[depth_column], row[angle_column], row[curvature_column]))
+        return angle_data
 class Well_perforation(FindIndexPZ):
     def __init__(self, ws):
 

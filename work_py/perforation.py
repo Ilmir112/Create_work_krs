@@ -21,20 +21,17 @@ class TabPage_SO(QWidget):
         self.labelTypeCharges = QLabel("Тип зарядов", self)
         self.ComboBoxCharges = QComboBox(self)
         self.ComboBoxCharges.addItems(['ГП', 'БО'])
-        # self.spinBox.setAlignment(QtCore.Qt.AlignCenter)
-        # self.spinBox.setMinimum(1917)
-        # self.spinBox.setMaximum(2060)
+
         self.ComboBoxCharges.setProperty("value", 'ГП')
 
         self.labelHolesMetr = QLabel("отверстий на 1п.м", self)
         self.lineEditHolesMetr = QComboBox(self)
         self.lineEditHolesMetr.addItems(['6', '8', '10', '16', '18', '20', '30'])
-        self.ComboBoxCharges.setProperty("value", '20')
-        # self.lineEditHolesMetr.setClearButtonEnabled(True)
+        self.lineEditHolesMetr.setProperty("value", '20')
 
-        # self.labelCountHoles = QLabel("Количество отверстий", self)
-        # self.lineEditCountHoles = QLineEdit(self)
-        # self.lineEditCountHoles.setClearButtonEnabled(True)
+        self.label_type_perforation = QLabel("Тип перфорации", self)
+        TabPage_SO.combobox_type_perforation = QComboBox(self)
+        TabPage_SO.combobox_type_perforation.addItems(['ПВР на кабеле', 'Трубная перфорация'])
 
         self.labelIndexFormation = QLabel("Индекс пласта", self)
         self.lineEditIndexFormation = QLineEdit(self)
@@ -44,23 +41,42 @@ class TabPage_SO(QWidget):
         self.lineEditDopInformation = QLineEdit(self)
         self.lineEditDopInformation.setClearButtonEnabled(True)
 
-        grid = QGridLayout(self)
-        grid.addWidget(self.labelType, 0, 0)
-        grid.addWidget(self.labelType2, 0, 1)
-        grid.addWidget(self.labelTypeCharges, 0, 2)
-        grid.addWidget(self.labelHolesMetr, 0, 3)
+        self.grid = QGridLayout(self)
+        self.grid.addWidget(self.labelType, 0, 0)
+        self.grid.addWidget(self.labelType2, 0, 1)
+        self.grid.addWidget(self.labelTypeCharges, 0, 2)
+        self.grid.addWidget(self.labelHolesMetr, 0, 3)
 
-        grid.addWidget(self.labelIndexFormation, 0, 4)
-        grid.addWidget(self.labelDopInformation, 0, 5)
-        grid.addWidget(self.lineEditType, 1, 0)
-        grid.addWidget(self.lineEditType2, 1, 1)
-        grid.addWidget(self.ComboBoxCharges, 1, 2)
-        grid.addWidget(self.lineEditHolesMetr, 1, 3)
-        grid.addWidget(self.lineEditIndexFormation, 1, 4)
-        grid.addWidget(self.lineEditDopInformation, 1, 5)
+        self.grid.addWidget(self.labelIndexFormation, 0, 4)
+        self.grid.addWidget(self.labelDopInformation, 0, 5)
+        self.grid.addWidget(self.lineEditType, 1, 0)
+        self.grid.addWidget(self.lineEditType2, 1, 1)
+        self.grid.addWidget(self.ComboBoxCharges, 1, 2)
+        self.grid.addWidget(self.lineEditHolesMetr, 1, 3)
+        self.grid.addWidget(self.lineEditIndexFormation, 1, 4)
+        self.grid.addWidget(self.lineEditDopInformation, 1, 5)
+        self.grid.addWidget(self.label_type_perforation, 0, 6)
+        self.grid.addWidget(TabPage_SO.combobox_type_perforation, 1, 6)
 
-        # grid.setRowStretch(4, 1)
+    def select_type_perforation(self, sole):
+        if len(well_data.angle_data) == 0 and well_data.max_angle._value < 50:
+            TabPage_SO.combobox_type_perforation.setCurrentIndex(0)
+        elif len(well_data.angle_data) == 0 and well_data.max_angle._value >= 50:
+            TabPage_SO.combobox_type_perforation.setCurrentIndex(1)
+        elif len(well_data.angle_data) != 0:
+            if sole != '':
+                angle_list = [(depth, angle) for depth, angle, curvature in well_data.angle_data
+                    if abs(float(depth) - float(sole)) <= 10]
+                print(angle_list)
+                depth_max = max([depth for depth, angle in angle_list])
+                angle_depth = max([angle for depth, angle in angle_list])
 
+                if depth_max < 50:
+                    TabPage_SO.combobox_type_perforation.setCurrentIndex(0)
+                    return ''
+                else:
+                    TabPage_SO.combobox_type_perforation.setCurrentIndex(1)
+                    return f'На глубине {depth_max}м угол {angle_depth}'
 
 class TabWidget(QTabWidget):
     def __init__(self):
@@ -131,6 +147,7 @@ class PerforationWindow(QMainWindow):
         if len(well_data.dict_perforation_project) != 0:
             for plast, data in well_data.dict_perforation_project.items():
                 for i in data['интервал']:
+                    TabPage_SO.select_type_perforation(self, i[1])
                     if well_data.grp_plan:
                         count_charge = int((max(i) - min(i)) * chargePM_GP)
                         # Вставка интервалов зарядов ГП
@@ -175,6 +192,7 @@ class PerforationWindow(QMainWindow):
 
                 if plast in well_data.plast_work:
                     for i in data['интервал']:
+                        TabPage_SO.select_type_perforation(self, i[1])
                         if i[1] <= well_data.current_bottom:
                             if well_data.grp_plan:
                                 # Вставка интервалов зарядов ГП
@@ -246,7 +264,7 @@ class PerforationWindow(QMainWindow):
             return
 
         chargesx = self.charge(int(float(editType2)))[0][:-2] + chargesx
-
+        TabPage_SO.select_type_perforation(self, editType2)
         self.tableWidget.setSortingEnabled(False)
         rows = self.tableWidget.rowCount()
         self.tableWidget.insertRow(rows)
@@ -266,6 +284,7 @@ class PerforationWindow(QMainWindow):
     def add_work(self):
 
         rows = self.tableWidget.rowCount()
+        type_perforation = self.tabWidget.currentWidget().combobox_type_perforation.currentText()
         if len(well_data.cat_P_1) > 1:
             well_data.category_pressuar = well_data.cat_P_1[1]
             well_data.category_h2s = well_data.cat_h2s_list[1]
@@ -296,14 +315,14 @@ class PerforationWindow(QMainWindow):
                         f' фотографии предоставить в ЦИТС Ойл-сервис',
                         None, None, None, None, None, None, None,
                         'Мастер КРС, подрядчик по ГИС', 1.2, None],
-                       [''.join(["ГИС (Перфорация на кабеле ЗАДАЧА 2.9.1)" if float(well_data.max_angle._value) <= 50
-                                 else "ГИС ( Трубная Перфорация ЗАДАЧА 2.9.2)"]), None,
-                        ''.join(["ГИС (Перфорация на кабеле ЗАДАЧА 2.9.1)" if float(well_data.max_angle._value) <= 50
-                                 else "ГИС ( Трубная Перфорация ЗАДАЧА 2.9.2)"]), None, None, None, None,
+                       ["ГИС (Перфорация на кабеле ЗАДАЧА 2.9.1)", None,
+                        "ГИС (Перфорация на кабеле ЗАДАЧА 2.9.1)", None, None, None, None,
                         None, None, None, 'подрядчик по ГИС', None],
                        [None, None, "Кровля", "-", "Подошва", "Тип заряда", "отв на 1 п.м.", "Кол-во отв",
                         "пласт", "Доп.данные", 'подрядчик по ГИС', None]
                        ]
+
+
 
         for row in range(rows):
             item = self.tableWidget.item(row, 1)
@@ -313,12 +332,15 @@ class PerforationWindow(QMainWindow):
                 if float(value) >= well_data.current_bottom:
                     msg = QMessageBox.information(self, 'Внимание', 'Подошва интервала перфорации ниже текущего забоя')
                     return
-        for row in range(rows):
             perf_list = []
             ["Кровля перфорации", "Подошва Перфорации", "Тип заряда", "отв на 1 п.м.", "Количество отверстий",
              "Вскрываемые пласты", "доп информация"]
             roof = self.tableWidget.item(row, 0).text()
             sool = self.tableWidget.item(row, 1).text()
+            pvr_str = TabPage_SO.select_type_perforation(self, sool)
+            perforation[2] = [f"ГИС ( Трубная Перфорация ЗАДАЧА 2.9.2)", None,
+                        f"ГИС ( Трубная Перфорация ЗАДАЧА 2.9.2). {pvr_str}", None, None, None, None,
+                        None, None, None, 'подрядчик по ГИС', None]
             type_charge = self.tableWidget.item(row, 2).text()
             count_otv = self.tableWidget.item(row, 3).text()
             count_charge = self.tableWidget.item(row, 4).text()
@@ -344,12 +366,14 @@ class PerforationWindow(QMainWindow):
 
             perforation.append(perf_list)
 
-        perforation.append([None, None, ''.join(["Произвести контрольную запись ЛМ;ТМ. Составить АКТ на "
-                                                 "перфорацию." if float(well_data.max_angle._value) <= 50 else ""
-                                                                                                               f"Подъем последних 5-ти НКТ{well_data.nkt_diam}мм и демонтаж перфоратора "
-                                                                                                               f"производить в присутствии ответственного "
-                                                                                                               f"представителя подрядчика по ГИС» (руководителя взрывных"
-                                                                                                               f" работ или взрывника)."]),
+        end_list = "Произвести контрольную запись ЛМ;ТМ. Составить АКТ на перфорацию." \
+            if type_perforation != 'Трубная перфорация' \
+            else f"Подъем последних 5-ти НКТ{well_data.nkt_diam}мм и демонтаж перфоратора "\
+                   f"производить в присутствии ответственного "\
+                   f"представителя подрядчика по ГИС» (руководителя взрывных"\
+                   f" работ или взрывника)."
+
+        perforation.append([None, None, end_list,
                             None, None, None, None, None, None, None,
                             'Подрядчик по ГИС', 2])
         # print([well_data.dict_perforation[plast] for plast in well_data.plast_work])
@@ -369,7 +393,7 @@ class PerforationWindow(QMainWindow):
             [None, None, 'Произвести ГИС привязку трубного перфоратора по ГК, ЛМ.',
              None, None, None, None, None, None, None,
              'Подрядчик по ГИС', None, None]]
-        if float(well_data.max_angle._value) >= 50:
+        if type_perforation == 'Трубная перфорация':
             for i in range(len(pipe_perforation)):
                 perforation.insert(i + 1, pipe_perforation[i])
 

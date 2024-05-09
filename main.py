@@ -263,7 +263,7 @@ class MyWindow(QMainWindow):
         from open_pz import CreatePZ
         from work_py.gnkt_frez import Work_with_gnkt
         from work_py.gnkt_grp import GnktOsvWindow
-        from application_pvr import PvrApplication
+
         action = self.sender()
         if action == self.create_KRS and self.table_widget == None:
             self.work_plan = 'krs'
@@ -469,7 +469,7 @@ class MyWindow(QMainWindow):
             self.fname, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
                                                                   "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
             if self.fname:
-                self.open_pvr_application(self.fname)
+                self.open_gis_application(self.fname)
 
 
         elif action == self.application_geophysical:
@@ -505,6 +505,21 @@ class MyWindow(QMainWindow):
             self.new_window = None  # Discard reference.
 
     def open_pvr_application(self, fname):
+        from open_pz import CreatePZ
+        from application_pvr import PvrApplication
+        if fname:
+            # try:
+            self.read_pz(fname)
+            well_data.pause = True
+            read_pz = CreatePZ(self.wb, self.ws, self.data_window, self.perforation_correct_window2)
+            sheet = read_pz.open_excel_file(self.ws, self.work_plan)
+            self.rir_window = PvrApplication(self.table_pvr)
+            self.rir_window.show()
+
+            self.pause_app()
+            well_data.pause = False
+
+    def open_gis_application(self, fname):
         from open_pz import CreatePZ
         from application_gis import GisApplication
         if fname:
@@ -855,6 +870,7 @@ class MyWindow(QMainWindow):
             well_data.dict_leakiness = {}
             well_data.leakiness = False
             well_data.emergency_well = False
+            well_data.angle_data = []
             well_data.emergency_count = 0
             well_data.skm_interval = []
             well_data.work_perforations = []
@@ -1290,7 +1306,6 @@ class MyWindow(QMainWindow):
     def read_pz(self, fname):
         self.wb = load_workbook(fname, data_only=True)
         name_list = self.wb.sheetnames
-        old_index = 1
         self.ws = self.wb.active
 
         for sheet in name_list:

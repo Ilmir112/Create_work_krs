@@ -131,6 +131,7 @@ emergency_well = False
 column_additional = False
 without_damping = False
 well_number = None
+angle_data = []
 well_area = None
 bvo = False
 old_version = True

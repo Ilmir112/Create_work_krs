@@ -22,6 +22,11 @@ class TabPage_SO_pvr(QWidget):
         brigada_list = list(well_data.dict_telephon.keys())
         self.number_brigada_combo.addItems(brigada_list)
 
+
+        self.number_telephone_label = QLabel('номер телефона, self')
+        self.number_telephone_edit = QLineEdit(self)
+
+
         self.date_new_label = QLabel('Дата заявки', self)
         self.date_new_edit = QLineEdit(self)
         self.date_new_edit.setText(f'{well_data.current_date}')
@@ -75,8 +80,11 @@ class TabPage_SO_pvr(QWidget):
 
         self.grid = QGridLayout(self)
 
-        self.grid.addWidget(self.number_brigada_label, 9, 2)
-        self.grid.addWidget(self.number_brigada_combo, 10, 2)
+        self.grid.addWidget(self.number_brigada_label, 7, 2)
+        self.grid.addWidget(self.number_brigada_combo, 8, 2)
+
+        self.grid.addWidget(self.number_telephone_label, 7, 3)
+        self.grid.addWidget(self.number_telephone_edit, 8, 3)
 
         self.grid.addWidget(self.date_new_label, 9, 3)
         self.grid.addWidget(self.date_new_edit, 10, 3)
@@ -85,7 +93,7 @@ class TabPage_SO_pvr(QWidget):
         self.grid.addWidget(self.time_new_edit, 10, 4)
 
         self.grid.addWidget(self.work_label, 11, 3, 1, 2)
-        self.grid.addWidget(self.work_edit, 12, 3, 1, 2)
+        self.grid.addWidget(self.work_edit, 12, 3, 2, 4)
 
         self.grid.addWidget(self.nkt_label, 13, 2)
         self.grid.addWidget(self.nkt_edit, 14, 2)
@@ -173,15 +181,19 @@ class GisApplication(QMainWindow):
         if len(well_data.gis_list) == 0:
             mes = QMessageBox.warning(self, 'Ошибка', 'Исследования в плане работ не найдены')
             return
+
         for pvr in well_data.gis_list:
-
             rows = self.tableWidget.rowCount()
-            type_gis = self.geophysic_sel(pvr)
+            try:
+                type_gis = self.geophysic_sel(pvr)
+                self.tableWidget.insertRow(rows)
+                self.tableWidget.setItem(rows, 0, QTableWidgetItem(type_gis[0]))
+                self.tableWidget.setItem(rows, 1, QTableWidgetItem(type_gis[1]))
+                self.tableWidget.setItem(rows, 2, QTableWidgetItem(type_gis[2]))
+            except:
+                mes = QMessageBox.information(self, 'Ошибка', f'Ошибка добавления исследования {pvr}')
 
-            self.tableWidget.insertRow(rows)
-            self.tableWidget.setItem(rows, 0, QTableWidgetItem(type_gis[0]))
-            self.tableWidget.setItem(rows, 1, QTableWidgetItem(type_gis[1]))
-            self.tableWidget.setItem(rows, 2, QTableWidgetItem(type_gis[2]))
+
 
     def geophysicalSelect(self, geophysic):
         return geophysic
@@ -211,61 +223,65 @@ class GisApplication(QMainWindow):
         self.tableWidget.setSortingEnabled(True)
 
     def geophysic_sel(self, row):
-
+        print(row)
         if 'АКЦ' in row:
             type = 'АКЦ'
             # Удаление всех символов, кроме цифр и тире
-            result_string = re.sub(r"[^\d-]", "", row[-15:]).split('-')
+            result_string = re.sub(r"[^\d-.]", "", row[-15:]).split('-')
             roof = result_string[0]
             sole = result_string[1]
         elif 'СГДТ' in row:
             type = 'СГДТ'
             # Удаление всех символов, кроме цифр и тире
-            result_string = re.sub(r"[^\d-]", "", row[-15:]).split('-')
+            result_string = re.sub(r"[^\d-.]", "", row[-15:]).split('-')
             roof = result_string[0]
             sole = result_string[1]
 
         elif 'Определение текущей нефтенасыщенности' in row:
             type = 'ИНГК'
             # Удаление всех символов, кроме цифр и тире
-            result_string = re.sub(r"[^\d-]", "", row[-15:]).split('-')
-
+            result_string = re.sub(r"[^\d-.]", "", row[-15:]).split('-')
             roof = result_string[0]
             sole = result_string[1]
 
         elif 'гироскоп' in row:
             type = 'Гироскоп'
             # Удаление всех символов, кроме цифр и тире
-            result_string = re.sub(r"[^\d-]", "", row[-15:]).split('-')
+            result_string = re.sub(r"[^\d-.]", "", row[-15:]).split('-')
             roof = result_string[0]
             sole = result_string[1]
         elif '2.4.1' in row:
             type = 'РК'
             # Удаление всех символов, кроме цифр и тире
-            result_string = re.sub(r"[^\d-]", "", row[-15:]).split('-')
+            result_string = re.sub(r"[^\d-.]", "", row[-15:]).split('-')
             roof = result_string[0]
             sole = result_string[1]
         elif '2.6.11' in row:
             type = 'ЭМДС'
             # Удаление всех символов, кроме цифр и тире
-            result_string = re.sub(r"[^\d-]", "", row[-15:]).split('-')
+            result_string = re.sub(r"[^\d-.]", "", row[-15:]).split('-')
             roof = result_string[0]
             sole = result_string[1]
         elif '2.6.10' in row:
             type = 'ПТС'
             # Удаление всех символов, кроме цифр и тире
-            result_string = re.sub(r"[^\d-]", "", row[-15:]).split('-')
+            result_string = re.sub(r"[^\d-.]", "", row[-15:]).split('-')
             roof = result_string[0]
             sole = result_string[1]
 
-        elif 'ГК и ЛМ' in row:
-            type = 'ГК и ЛМ'
-            # Удаление всех символов, кроме цифр и тире
-            result_string = re.sub(r"[^\d-]", "", row[-15:]).split('-')
-            roof = result_string[0]
-            sole = result_string[1]
+        # elif 'ГК и ЛМ' in row:
+        #     try:
+        #         type = 'ГК и ЛМ'
+        #         # Удаление всех символов, кроме цифр и тире
+        #         result_string = re.sub(r"[^\d-]", "", row[-15:]).split('-')
+        #         roof = result_string[0]
+        #         sole = result_string[1]
+        #     except IndexError:
+        #         pass
+
         elif 'ВП' in row or '№ 2.1.13' in row or 'ГПШ' in row or 'желонк' in row or '2.1.16' in row or '2.1.17' in row \
-                or 'РГД по колонне' in row or 'РГД по НКТ' in row or '2.3.2' in row or '2.3.3' in row or '2.3.1' in row:
+                or 'РГД по колонне' in row or 'РГД по НКТ' in row or '2.3.2' in row or '2.3.3' in row or '2.3.1' in row \
+                or '2.8.1' in row or '2.8.2' in row:
             type = row
             roof = ''
             sole = ''
@@ -276,8 +292,8 @@ class GisApplication(QMainWindow):
         for row in range(len(work_list)):
             for col in range(41):
                 if work_list[row][col]:
-                    # print(row, col)
-                    # print(work_list[row][col])
+                    print(row, col)
+                    print(work_list[row][col])
                     ws.cell(row=row + 1, column=col + 1).value = work_list[row][col]
         # Перебираем строки и скрываем те, у которых все значения равны None
         for row_ind, row in enumerate(ws.iter_rows(values_only=True)):
@@ -291,6 +307,7 @@ class GisApplication(QMainWindow):
         # Выбираем активный лист
         self.ws_pvr = wb.active
         number_brigada = str(self.tabWidget.currentWidget().number_brigada_combo.currentText())
+        number_telephone = self.tabWidget.currentWidget().number_telephone_edit.text()
         date_new_edit = self.tabWidget.currentWidget().date_new_edit.text()
         time_new_edit = self.tabWidget.currentWidget().time_new_edit.text()
         work_edit = self.tabWidget.currentWidget().work_edit.text()
@@ -336,6 +353,10 @@ class GisApplication(QMainWindow):
                     task_gis = 'ЗАДАЧА 9.5.2'
                 elif ' 2.3.2' in type_gis:
                     task_gis = 'ЗАДАЧА  2.3.2'
+                elif 'привязка' in type_gis:
+                    task_gis = 'ЗАДАЧА 2.8.1'
+                elif 'отбивка забоя' in type_gis:
+                    task_gis = 'ЗАДАЧА 2.8.2'
 
 
             else:
@@ -348,7 +369,7 @@ class GisApplication(QMainWindow):
                         None, None, f'{roof_gis}', None, None, None, f'{sole_gis}', None, None]
             gis_list.append(row_list)
 
-        work_list = self.application_pvr_def(number_brigada, date_new_edit, time_new_edit, work_edit, nkt_edit,
+        work_list = self.application_pvr_def(number_brigada, number_telephone, date_new_edit, time_new_edit, work_edit, nkt_edit,
                                              nkt_shoe_edit,  nkt_com_edit, paker_type, paker_depth, fluid, note_to_gis)
 
         for index, row in enumerate(gis_list):
@@ -384,7 +405,8 @@ class GisApplication(QMainWindow):
         self.tableWidget.removeRow(row)
 
 
-    def application_pvr_def(self, number_brigada, date_new_edit, time_new_edit, work_edit, nkt_edit, nkt_shoe_edit,
+    def application_pvr_def(self, number_brigada, number_telephone, date_new_edit, time_new_edit, work_edit,
+                            nkt_edit, nkt_shoe_edit,
                             nkt_com_edit, paker_type, paker_depth, fluid, note_to_gis):
 
         column_data = f'{well_data.column_diametr._value}мм x {well_data.column_wall_thickness._value} в инт ' \
@@ -535,7 +557,7 @@ class GisApplication(QMainWindow):
              None, None, None, None, None, None, None, None, None],
             [None, 'Скважина заполнена:', None, None, None, None, None, None, None, 'Тип:', None, None, 'тех.вода ',
              None, None, None, None, None, None, None, None, None, None, None, None, 'Уровень, м.', None, None, None,
-             well_data.static_level._value, None, None, None, None, None, None, None, None, None, None, None],
+              None, well_data.static_level._value, None,  None, None, None, None, None, None, None, None, None],
             [None, 'Плотность, г/см3', None, None, None, None, None, fluid, None, None, None, None, 'Вязкость, сек.',
              None, None, None, None, None, None, None, None, None, None, None, 'УЭС, Омм', None, None, None, None, None,
              None, None, None, None, None, None, None, None, None, None, None],
@@ -655,7 +677,7 @@ class GisApplication(QMainWindow):
              None, 'телефон', None, None, None, None, None, None, None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None, None, None, None, number_brigada, None, None, None, None,
-             well_data.dict_telephon[number_brigada], None,
+             number_telephone, None,
              None, None, None, None, None, None, None, None],
             [None, 'Заявку подал:', None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None, None, None, None, None, None, 'телефон', None, None, None, None, None, None,

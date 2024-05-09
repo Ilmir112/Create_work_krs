@@ -112,7 +112,7 @@ def insert_data_base_gnkt(contractor, well_name, gnkt_number, gnkt_length, diame
 
     filenames = f"{well_data.well_number._value} {well_data.well_area._value} "
 
-    query = f"SELECT * FROM gnkt_{contractor} WHERE well_number LIKE  (%s)"
+    query = f"SELECT * FROM gnkt_{contractor} WHERE well_number LIKE (%s)"
 
     # Выполнение запроса
     cursor.execute(query, ('%' + filenames + '%',))
