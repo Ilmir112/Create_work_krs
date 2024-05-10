@@ -47,7 +47,7 @@ class ExcelWorker(QThread):
     def check_well_existence(self, well_number, deposit_area, region):
 
         # Подключение к базе данных SQLite
-        conn = psycopg2.connect(dbname='databasewell', user='postgres', password='1953')
+        conn = psycopg2.connect(**well_data.postgres_params_classif)
         cursor = conn.cursor()
         current_year = datetime.now().year
         month = datetime.now().month
@@ -102,7 +102,7 @@ class ExcelWorker(QThread):
     def check_category(self, well_number, deposit_area, region):
 
         # Подключение к базе данных
-        conn = psycopg2.connect(dbname='databasewell', user='postgres', password='1953')
+        conn = psycopg2.connect(**well_data.postgres_params_classif)
 
         cursor = conn.cursor()
 

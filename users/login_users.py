@@ -40,7 +40,7 @@ class LoginWindow(QWidget):
         username = self.username.currentText()
         password = self.password.text()
         last_name, first_name, second_name, _ = username.split(' ')
-        conn = psycopg2.connect(dbname='users', user='postgres', password='1953')
+        conn = psycopg2.connect(**well_data.postgres_conn_user)
         cursor = conn.cursor()
         cursor.execute("SELECT last_name, first_name, second_name, password, position_in, organization FROM users "
                        "WHERE last_name=(%s) AND first_name=(%s) AND second_name=(%s)",
@@ -61,8 +61,9 @@ class LoginWindow(QWidget):
     def get_list_users(self):
         # Создаем подключение к базе данных
 
-        conn = psycopg2.connect(dbname='users', user='postgres', password='1953')
+        conn = psycopg2.connect(**well_data.postgres_conn_user)
         cursor = conn.cursor()
+        print(cursor)
         cursor.execute("SELECT last_name, first_name, second_name, position_in, organization  FROM users")
         users = cursor.fetchall()
         users_list = []
@@ -142,13 +143,14 @@ class RegisterWindow(QWidget):
         password = self.password.text()
         password2 = self.password2.text()
 
-        conn = psycopg2.connect(dbname='users', user='postgres', password='1953')
+        conn = psycopg2.connect(**well_data.postgres_conn_user)
         cursor = conn.cursor()
 
         # Проверяем, существует ли пользователь с таким именем
         cursor.execute("SELECT last_name, first_name, second_name  FROM users "
                        "WHERE last_name(%s) AND first_name(%s) AND second_name(%s)",
                        (last_name, first_name, second_name))
+
         existing_user = cursor.fetchone()
 
         if existing_user:  # Если пользователь уже существует

@@ -255,6 +255,35 @@ thin_border = Border(left=Side(style='thin'),
                      right=Side(style='thin'),
                      top=Side(style='thin'),
                      bottom=Side(style='thin'))
+postgres_params_classif = {
+            'database': 'databasewell',
+            'user': 'postgres',
+            'password': '1953',
+            'host': '87.242.85.51',
+            'port': '5432'
+        }
+
+postgres_conn_gnkt = {
+    'database': 'gnkt_base',
+    'user': 'postgres',
+    'password': '1953',
+    'host': '87.242.85.51',
+    'port': '5432'
+        }
+postgres_conn_work_well = {
+    'database': 'databasework',
+    'user': 'postgres',
+    'password': '1953',
+    'host': '87.242.85.51',
+    'port': '5432'
+}
+postgres_conn_user = {
+    'database': 'users',
+    'user': 'postgres',
+    'password': '1953',
+    'host': '87.242.85.51',
+    'port': '5432'
+}
 
 dict_telephon = {'Бригада № 1': 9228432791,
                  'Бригада № 2': 9174006602,
@@ -298,6 +327,7 @@ dict_telephon = {'Бригада № 1': 9228432791,
                  'Бригада № 55': 9279368415,
                  'Бригада № 56': 9279368421,
                  'Бригада № 58': 9270864957,
+                 'Бригада № 59': 9174002382,
                  'Бригада № 60 ': 9273460812,
                  'Бригада № 61': 9273029274,
                  'Бригада № 64': 9378452378,

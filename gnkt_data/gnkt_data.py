@@ -77,7 +77,7 @@ dict_saddles = {
 
 def read_database_gnkt(contractor, gnkt_number):
     # Подключение к базе данных SQLite
-    conn = psycopg2.connect(dbname='gnkt_base', user='postgres', password='1953')
+    conn = psycopg2.connect(**well_data.postgres_conn_gnkt)
     cursor = conn.cursor()
 
     if 'ойл-сервис' in contractor.lower():
@@ -103,7 +103,7 @@ def insert_data_base_gnkt(contractor, well_name, gnkt_number, gnkt_length, diame
 
 
     # Подключение к базе данных SQLite
-    conn = psycopg2.connect(dbname='gnkt_base', user='postgres', password='1953')
+    conn = psycopg2.connect(**well_data.postgres_conn_gnkt)
     cursor = conn.cursor()
 
     if 'ойл-сервис' in contractor.lower():

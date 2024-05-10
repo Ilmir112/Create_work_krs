@@ -66,7 +66,7 @@ cursor = postgres_conn.cursor()
 #
 # # Подключение к базам данных
 # sqlite_conn = sqlite3.connect(sqlite_db_path)
-# postgres_conn = psycopg2.connect(dbname='databasewell', user='postgres', password='1953')
+# postgres_conn = psycopg2.connect(**well_data.postgres_params_classif)
 # sqlite_cursor = sqlite_conn.cursor()
 # postgres_cursor = postgres_conn.cursor()
 #

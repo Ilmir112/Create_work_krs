@@ -122,15 +122,9 @@ class Classifier_well(QMainWindow):
     def get_data_from_db(self, region):
 
         # Параметры подключения к PostgreSQL
-        postgres_params = {
-            'database': 'databasewell',
-            'user': 'postgres',
-            'password': '1953'
-        }
-
         try:
             # Создание подключения к базе данных PostgreSQL
-            conn = psycopg2.connect(**postgres_params)
+            conn = psycopg2.connect(**well_data.postgres_params_classif)
 
             # Выполнение SQL-запроса для получения данных
             with conn.cursor() as cur:
@@ -151,15 +145,10 @@ class Classifier_well(QMainWindow):
 
     def get_data_from_class_well_db(self, region):
         # Параметры подключения к PostgreSQL
-        postgres_params = {
-            'database': 'databasewell',
-            'user': 'postgres',
-            'password': '1953',
-        }
 
         try:
             # Создание подключения к базе данных PostgreSQL
-            conn = psycopg2.connect(**postgres_params)
+            conn = psycopg2.connect(**well_data.postgres_params_classif)
 
             # Выполнение SQL-запроса для получения данных
             with conn.cursor() as cur:
@@ -182,7 +171,7 @@ class Classifier_well(QMainWindow):
 
     def export_to_sqlite_without_juming(self, fname, costumer, region):
         # Подключение к базе данных
-        conn = psycopg2.connect(dbname='databasewell', user='postgres', password='1953')
+        conn = psycopg2.connect(**well_data.postgres_params_classif)
         cursor = conn.cursor()
         region_list = ['ЧГМ', 'АГМ', 'ТГМ', 'ИГМ', 'КГМ', ]
 
@@ -309,27 +298,19 @@ class Classifier_well(QMainWindow):
 
     def export_to_sqlite_class_well(self, fname, costumer, region):
         # Параметры подключения к PostgreSQL
-        postgres_params = {
-            'database': 'databasewell',
-            'user': 'postgres',
-            'password': '1953',
-            'host': 'localhost',  # Укажите ваш хост, если отличается
-            'port': '5432'
-        }
 
         region_list = ['ЧГМ_классификатор', 'АГМ_классификатор', 'ТГМ_классификатор', 'ИГМ_классификатор',
                        'КГМ_классификатор']
 
         try:
             # Создание подключения к базе данных PostgreSQL
-            conn = psycopg2.connect(**postgres_params)
+            conn = psycopg2.connect(**well_data.postgres_params_classif)
             cursor = conn.cursor()
 
             for region_name in region_list:
                 if region in region_name:
                     # Удаление всех данных из таблицы (опционально)
                     cursor.execute(f"DROP TABLE IF EXISTS {region_name};")
-
 
                     # Создание таблицы, если она не существует
                     cursor.execute(f"""
@@ -394,40 +375,67 @@ class Classifier_well(QMainWindow):
                                     elif 'Газовый фактор' == value:
                                         categoty_gf = col
                                         gas_factor = col + 1
-
-                    # Вставка данных в таблицу
-                    for index_row, row in enumerate(ws.iter_rows(min_row=2, values_only=True)):
-                        if index_row > area_row and check_file:
-                            well_number = row[well_column]
-                            area_well = row[area_column]
-                            oilfield_str = row[oilfield]
-                            version_year = None
-
-                            for col, value in enumerate(row):
-                                if not value is None and col <= 18:
+                                    if 'туймазин' in str(value).lower():
+                                        check_param = 'ТГМ'
+                                    if 'ишимбай' in str(value).lower():
+                                        check_param = 'ИГМ'
+                                    if 'чекмагуш' in str(value).lower():
+                                        check_param = 'ЧГМ'
+                                    if 'красно' in str(value).lower():
+                                        check_param = 'КГМ'
+                                    if 'арлан' in str(value).lower():
+                                        check_param = 'АГМ'
                                     if '01.01.' in str(value) or '01.04.' in str(value) or '01.07.' in str(
                                             value) or '01.10.' in str(value):
+
                                         version_year = re.findall(r'[0-9.]', str(value))
                                         version_year = ''.join(version_year)
                                         if version_year[-1] == '.':
                                             version_year = version_year[:-1]
 
-                            if well_number:
-                                cursor.execute(f"""
-                                    INSERT INTO {region_name} (
-                                        cdng, well_number, deposit_area, oilfield,
-                                        categoty_pressure, pressure_Ppl, pressure_Gst, date_measurement,
-                                        categoty_h2s, h2s_pr, h2s_mg_l, h2s_mg_m, categoty_gf, gas_factor,
-                                        today, region, costumer
-                                    )
-                                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
-                                """, (
-                                    row[cdng], well_number, area_well, oilfield_str, row[categoty_pressure],
-                                    row[pressure_Ppl], row[pressure_Gst], row[date_measurement], row[categoty_h2s],
-                                    row[h2s_pr], row[h2s_mg_l], row[h2s_mg_m], row[categoty_gf], row[gas_factor],
-                                    version_year, region, costumer
-                                ))
+                    if check_param == region_name:
+                        mes = QMessageBox.warning(self, 'ВНИМАНИЕ ОШИБКА',
+                                                  f'регион выбрано корректно  {region_name}')
 
+                        try:
+                            # Вставка данных в таблицу
+                            for index_row, row in enumerate(ws.iter_rows(min_row=2, values_only=True)):
+                                if index_row > area_row and check_file:
+                                    well_number = row[well_column]
+                                    area_well = row[area_column]
+                                    oilfield_str = row[oilfield]
+                                    version_year = None
+
+                                    for col, value in enumerate(row):
+                                        if not value is None and col <= 18:
+                                            if '01.01.' in str(value) or '01.04.' in str(value) or '01.07.' in str(
+                                                    value) or '01.10.' in str(value):
+                                                version_year = re.findall(r'[0-9.]', str(value))
+                                                version_year = ''.join(version_year)
+                                                if version_year[-1] == '.':
+                                                    version_year = version_year[:-1]
+
+                                    if well_number:
+                                        cursor.execute(f"""
+                                            INSERT INTO {region_name} (
+                                                cdng, well_number, deposit_area, oilfield,
+                                                categoty_pressure, pressure_Ppl, pressure_Gst, date_measurement,
+                                                categoty_h2s, h2s_pr, h2s_mg_l, h2s_mg_m, categoty_gf, gas_factor,
+                                                today, region, costumer
+                                            )
+                                            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
+                                        """, (
+                                            row[cdng], well_number, area_well, oilfield_str, row[categoty_pressure],
+                                            row[pressure_Ppl], row[pressure_Gst], row[date_measurement], row[categoty_h2s],
+                                            row[h2s_pr], row[h2s_mg_l], row[h2s_mg_m], row[categoty_gf], row[gas_factor],
+                                            version_year, region, costumer
+                                        ))
+                        except:
+                            mes = QMessageBox.warning(self, 'ОШИБКА', 'Выбран файл с не корректными данными')
+
+                    else:
+                        mes = QMessageBox.warning(self, 'ВНИМАНИЕ ОШИБКА',
+                                                  f'в Данном перечне отсутствую скважины {region_name}')
                     conn.commit()
 
         except (psycopg2.Error, Exception) as e:
@@ -439,20 +447,21 @@ class Classifier_well(QMainWindow):
 
 def read_database_gnkt(contractor, gnkt_number):
 
-    # Подключение к базе данных SQLite
-    conn = psycopg2.connect(dbname='gnkt_base', user='postgres', password='1953')
+    # Подключение к базе данных
+    conn = psycopg2.connect(**well_data.postgres_conn_gnkt)
+
     if 'ойл-сервис' in contractor.lower():
         contractor = 'oil_service'
     cursor = conn.cursor()
     cursor.execute(f"SELECT * FROM КГМ WHERE today =(%s)", (gnkt_number, '1963'))
     print(f' база данных открыта')
     result = cursor.fetchone()
-    print(result)
+    # print(result)
 
 
 def create_database_well_db(work_plan, number_dp):
     # print(row, well_data.count_row_well)
-    conn = psycopg2.connect(dbname='databasewellwork', user='postgres', password='1953')
+    conn = psycopg2.connect(**well_data.postgres_conn_gnkt)
     cursor = conn.cursor()
 
     # Создаем таблицу для хранения данных

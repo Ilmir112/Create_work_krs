@@ -90,7 +90,7 @@ class TabPageDp(QWidget):
 
     def update_number_gnkt(self, number_gnkt):
 
-        conn = psycopg2.connect(dbname='gnkt_base', user='postgres', password='1953')
+        conn = psycopg2.connect(**well_data.postgres_conn_gnkt)
         cursor = conn.cursor()
         cursor.execute(f"SELECT * FROM КГМ WHERE today (%s), ?", (number_gnkt, self.previous_well_edit.text()))
 
