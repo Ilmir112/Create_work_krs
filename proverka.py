@@ -2,6 +2,8 @@ import sqlite3
 import psycopg2
 
 # Параметры подключения к SQLite
+import well_data
+
 sqlite_db_path = 'data_base/data_base_gnkt/gnkt_base.dp'
 
 
@@ -40,7 +42,7 @@ def copy_tables(sqlite_conn, postgres_conn):
 
 # Подключение к базам данных
 sqlite_conn = sqlite3.connect(sqlite_db_path)
-postgres_conn = psycopg2.connect(dbname='gnkt_base', user='postgres', password='1953')
+postgres_conn = psycopg2.connect(**well_data.postgres_conn_gnkt)
 
 # # Копирование таблиц
 copy_tables(sqlite_conn, postgres_conn)

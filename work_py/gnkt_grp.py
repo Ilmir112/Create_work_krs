@@ -90,16 +90,27 @@ class TabPageDp(QWidget):
 
     def update_number_gnkt(self, number_gnkt):
 
-        conn = psycopg2.connect(**well_data.postgres_conn_gnkt)
-        cursor = conn.cursor()
-        cursor.execute(f"SELECT * FROM КГМ WHERE today (%s), ?", (number_gnkt, self.previous_well_edit.text()))
+        try:
 
-        result_gnkt = cursor.fetchone()
-        print(result_gnkt)
-        self.lenght_gnkt_edit.setText(f'{result_gnkt[3]}')
-        self.iznos_gnkt_edit.setText(f'{round(result_gnkt[5], 1)}')
-        self.pipe_mileage_edit.setText(f'{result_gnkt[6]}')
-        self.pvo_number_edit.setText(f'{result_gnkt[8]}')
+            conn = psycopg2.connect(**well_data.postgres_conn_gnkt)
+            cursor = conn.cursor()
+            cursor.execute(f"SELECT * FROM КГМ WHERE today (%s), ?", (number_gnkt, self.previous_well_edit.text()))
+
+            result_gnkt = cursor.fetchone()
+
+            self.lenght_gnkt_edit.setText(f'{result_gnkt[3]}')
+            self.iznos_gnkt_edit.setText(f'{round(result_gnkt[5], 1)}')
+            self.pipe_mileage_edit.setText(f'{result_gnkt[6]}')
+            self.pvo_number_edit.setText(f'{result_gnkt[8]}')
+        except psycopg2.Error as e:
+            print('Ошибка подключения')
+
+        finally:
+            # Закройте курсор и соединение
+            if cursor:
+                cursor.close()
+            if conn:
+                conn.close()
 
 
 class TabWidget(QTabWidget):

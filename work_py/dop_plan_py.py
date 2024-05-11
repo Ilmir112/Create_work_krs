@@ -93,95 +93,102 @@ class DopPlanWindow(QMainWindow):
             well_data.fluid_work, well_data.fluid_work_short = GnoWindow.calc_work_fluid(self, fluid)
 
     def extraction_data(self):
+        try:
+            # Устанавливаем соединение с базой данных
+            conn1 = psycopg2.connect(**well_data.postgres_conn_work_well)
 
-        # Устанавливаем соединение с базой данных
-        conn1 = psycopg2.connect(dbname='databasewellwork', user='postgres', password='1953')
+            cursor1 = conn1.cursor()
 
-        cursor1 = conn1.cursor()
-
-        # Проверяем наличие таблицы с определенным именем
-        result_table = 0
-        number_dp = int(well_data.number_dp) - 1
-        if number_dp == 0:
-            work_plan = 'krs'
-            table_name = json.dumps(well_data.well_number._value + well_data.well_area._value + work_plan,
-                        ensure_ascii=False)
-            cursor1.execute("""
-                                SELECT EXISTS (
-                                    SELECT 1
-                                    FROM information_schema.tables 
-                                    WHERE table_schema = 'public'
-                                    AND table_name = %s
-                                );
-                            """, (table_name,))
-            result_table = cursor1.fetchone()[0]
-        else:
-            work_plan = f'dop_plan'
-            table_name = json.dumps(well_data.well_number._value + well_data.well_area._value +
-                                    work_plan + str(number_dp), ensure_ascii=False)
-            for i in range(1, number_dp + 1, -1):
-                try:
-                    work_plan = f'dop_plan{i}'
-                    table_name = json.dumps(well_data.well_number._value + well_data.well_area._value + work_plan + str(number_dp),
-                        ensure_ascii=False)
-                    cursor1.execute("""
-            SELECT EXISTS (
-                SELECT 1
-                FROM information_schema.tables 
-                WHERE table_schema = 'public'
-                AND table_name = %s
-            );
-        """, (table_name,))
-                    result_table = cursor1.fetchone()[0]
-
-                except:
-                    pass
-                if len(result_table) > 0:
-                    break
-
-        if result_table != 0:
-            well_data.data_in_base = True
-            cursor2 = conn1.cursor()
-            print(result_table)
-            print(f"Таблица {table_name}' существует в базе данных.")
-            cursor2.execute(f"SELECT * FROM {table_name}")
-            result = cursor2.fetchall()
-            well_data.paragraph_row, ok = QInputDialog.getInt(self, 'пункт плана работ',
-                                                              'Введите пункт плана работ после которого идет изменение')
-            while len(result) < well_data.paragraph_row:
-                mes = QMessageBox.warning(self, 'ОШИБКА', f'нет пункта {well_data.paragraph_row} в базе данных ')
-                well_data.paragraph_row, ok = QInputDialog.getInt(self, 'пункт плана работ',
-                                                              'Введите пункт плана работ после которого идет изменение')
-
-
-            well_data.current_bottom = result[well_data.paragraph_row][2]
-            well_data.dict_perforation = json.loads(result[well_data.paragraph_row][3])
-            well_data.plast_all = json.loads(result[well_data.paragraph_row][4])
-            well_data.plast_work = json.loads(result[well_data.paragraph_row][5])
-            well_data.leakage = json.loads(result[well_data.paragraph_row][6])
-            if result[well_data.paragraph_row][7] == 0:
-                well_data.column_additional = True
+            # Проверяем наличие таблицы с определенным именем
+            result_table = 0
+            number_dp = int(well_data.number_dp) - 1
+            if number_dp == 0:
+                work_plan = 'krs'
+                table_name = json.dumps(well_data.well_number._value + well_data.well_area._value + work_plan,
+                            ensure_ascii=False)
+                cursor1.execute("""
+                                    SELECT EXISTS (
+                                        SELECT 1
+                                        FROM information_schema.tables 
+                                        WHERE table_schema = 'public'
+                                        AND table_name = %s
+                                    );
+                                """, (table_name,))
+                result_table = cursor1.fetchone()[0]
             else:
-                well_data.column_additional = False
+                work_plan = f'dop_plan'
+                table_name = json.dumps(well_data.well_number._value + well_data.well_area._value +
+                                        work_plan + str(number_dp), ensure_ascii=False)
+                for i in range(1, number_dp + 1, -1):
+                    try:
+                        work_plan = f'dop_plan{i}'
+                        table_name = json.dumps(well_data.well_number._value + well_data.well_area._value + work_plan + str(number_dp),
+                            ensure_ascii=False)
+                        cursor1.execute("""
+                SELECT EXISTS (
+                    SELECT 1
+                    FROM information_schema.tables 
+                    WHERE table_schema = 'public'
+                    AND table_name = %s
+                );
+            """, (table_name,))
+                        result_table = cursor1.fetchone()[0]
 
-            well_data.fluid = result[well_data.paragraph_row][8]
-            well_data.category_pressuar = result[well_data.paragraph_row][9]
-            well_data.category_h2s = result[well_data.paragraph_row][0]
-            well_data.category_gf = result[well_data.paragraph_row][11]
-            well_data.template_depth = result[well_data.paragraph_row][12]
-            well_data.skm_list = json.loads(result[well_data.paragraph_row][13])
+                    except:
+                        pass
+                    if len(result_table) > 0:
+                        break
 
-            well_data.problemWithEk_depth = result[well_data.paragraph_row][14]
-            well_data.problemWithEk_diametr = result[well_data.paragraph_row][15]
-            well_data.dict_perforation_short = json.loads(result[well_data.paragraph_row][3])
+            if result_table != 0:
+                well_data.data_in_base = True
+                cursor2 = conn1.cursor()
+                print(result_table)
+                print(f"Таблица {table_name}' существует в базе данных.")
+                cursor2.execute(f"SELECT * FROM {table_name}")
+                result = cursor2.fetchall()
+                well_data.paragraph_row, ok = QInputDialog.getInt(self, 'пункт плана работ',
+                                                                  'Введите пункт плана работ после которого идет изменение')
+                while len(result) < well_data.paragraph_row:
+                    mes = QMessageBox.warning(self, 'ОШИБКА', f'нет пункта {well_data.paragraph_row} в базе данных ')
+                    well_data.paragraph_row, ok = QInputDialog.getInt(self, 'пункт плана работ',
+                                                                  'Введите пункт плана работ после которого идет изменение')
 
-        else:
-            mes = QMessageBox.warning(self, 'Проверка наличия таблицы в базе данных',
-                                      f"Таблицы '{table_name}' нет в базе данных.")
-        well_data.data_in_base = False
-        conn1.close()
 
-        self.close()
+                well_data.current_bottom = result[well_data.paragraph_row][2]
+                well_data.dict_perforation = json.loads(result[well_data.paragraph_row][3])
+                well_data.plast_all = json.loads(result[well_data.paragraph_row][4])
+                well_data.plast_work = json.loads(result[well_data.paragraph_row][5])
+                well_data.leakage = json.loads(result[well_data.paragraph_row][6])
+                if result[well_data.paragraph_row][7] == 0:
+                    well_data.column_additional = True
+                else:
+                    well_data.column_additional = False
+
+                well_data.fluid = result[well_data.paragraph_row][8]
+                well_data.category_pressuar = result[well_data.paragraph_row][9]
+                well_data.category_h2s = result[well_data.paragraph_row][0]
+                well_data.category_gf = result[well_data.paragraph_row][11]
+                well_data.template_depth = result[well_data.paragraph_row][12]
+                well_data.skm_list = json.loads(result[well_data.paragraph_row][13])
+
+                well_data.problemWithEk_depth = result[well_data.paragraph_row][14]
+                well_data.problemWithEk_diametr = result[well_data.paragraph_row][15]
+                well_data.dict_perforation_short = json.loads(result[well_data.paragraph_row][3])
+
+            else:
+                mes = QMessageBox.warning(self, 'Проверка наличия таблицы в базе данных',
+                                          f"Таблицы '{table_name}' нет в базе данных.")
+            well_data.data_in_base = False
+
+        except psycopg2.Error as e:
+            # Выведите сообщение об ошибке
+            mes = QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных, Скважина не добавлена в базу')
+        finally:
+            # Закройте курсор и соединение
+            if cursor1:
+                cursor1.close()
+            if conn1:
+                conn1.close()
 
     def work_list(self, work_earlier):
         krs_begin = [[None, None,

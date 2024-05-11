@@ -137,14 +137,6 @@ bvo = False
 old_version = True
 skm_depth = 0
 
-host = 'localhost',
-database = 'databaseWell',
-database_users = 'users'
-database_work = 'database_work'
-database_gnkt = 'gnkt_base'
-user = 'postgres',
-password = '1953'
-
 pakerTwoSKO = False
 normOfTime = 0
 Qoil = 0

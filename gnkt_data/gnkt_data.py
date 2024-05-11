@@ -76,74 +76,59 @@ dict_saddles = {
 }
 
 def read_database_gnkt(contractor, gnkt_number):
-    # Подключение к базе данных SQLite
-    conn = psycopg2.connect(**well_data.postgres_conn_gnkt)
-    cursor = conn.cursor()
+    # Подключение к базе данных
+    try:
+        conn = psycopg2.connect(**well_data.postgres_conn_gnkt)
+        cursor = conn.cursor()
 
-    if 'ойл-сервис' in contractor.lower():
-        contractor = 'oil_service'
+        if 'ойл-сервис' in contractor.lower():
+            contractor = 'oil_service'
 
-    cursor.execute(f"SELECT * FROM gnkt_{contractor} WHERE gnkt_number =(%s)", (gnkt_number,))
+        cursor.execute(f"SELECT * FROM gnkt_{contractor} WHERE gnkt_number =(%s)", (gnkt_number,))
 
-    result = cursor.fetchall()
+        result = cursor.fetchall()
 
-    well_previus_list = [(well[2], well[9]) for well in result]
-    well_previus_list = sorted(well_previus_list, key=lambda x:  datetime.strptime(x[1], "%d.%m.%Y"), reverse=True)
-    well_previus_list = list(map(lambda x: x[0], list(filter(lambda x: x[0], well_previus_list))))
-    # print(f' списа{well_previus_list}')
-    # print(f'список ремонтов {result}')
-    # Закрытие соединения с базой данных
-    conn.close()
+        well_previus_list = [(well[2], well[9]) for well in result]
+        well_previus_list = sorted(well_previus_list, key=lambda x:  datetime.strptime(x[1], "%d.%m.%Y"), reverse=True)
+        well_previus_list = list(map(lambda x: x[0], list(filter(lambda x: x[0], well_previus_list))))
+    except psycopg2.Error as e:
+        # Выведите сообщение об ошибке
+        mes = QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных')
+        return []
+    finally:
+        # Закройте курсор и соединение
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
 
-    return well_previus_list
+
+        return well_previus_list
 
 
 def insert_data_base_gnkt(contractor, well_name, gnkt_number, gnkt_length, diametr_length,
                      iznos, pipe_mileage, pipe_fatigue, pvo, previous_well):
 
+    try:
 
-    # Подключение к базе данных SQLite
-    conn = psycopg2.connect(**well_data.postgres_conn_gnkt)
-    cursor = conn.cursor()
+        # Подключение к базе данных
+        conn = psycopg2.connect(**well_data.postgres_conn_gnkt)
+        cursor = conn.cursor()
 
-    if 'ойл-сервис' in contractor.lower():
-        contractor = 'oil_service'
+        if 'ойл-сервис' in contractor.lower():
+            contractor = 'oil_service'
 
 
-    filenames = f"{well_data.well_number._value} {well_data.well_area._value} "
+        filenames = f"{well_data.well_number._value} {well_data.well_area._value} "
 
-    query = f"SELECT * FROM gnkt_{contractor} WHERE well_number LIKE (%s)"
+        query = f"SELECT * FROM gnkt_{contractor} WHERE well_number LIKE (%s)"
 
-    # Выполнение запроса
-    cursor.execute(query, ('%' + filenames + '%',))
+        # Выполнение запроса
+        cursor.execute(query, ('%' + filenames + '%',))
 
-    result = cursor.fetchall()
+        result = cursor.fetchall()
 
-    if len(result) == 0:
-        current_datetime = datetime.today().strftime('%d.%m.%Y')
-
-        data_values = (gnkt_number, well_name, gnkt_length, diametr_length, iznos,
-                       pipe_mileage, pipe_fatigue, previous_well, current_datetime, pvo)
-
-        # Подготовленный запрос для вставки данных с параметрами
-        query = f"INSERT INTO gnkt_{contractor} " \
-                f"(gnkt_number, well_number, length_gnkt, diameter_gnkt, wear_gnkt, mileage_gnkt, " \
-                f"tubing_fatigue, previous_well, today, pvo_number) " \
-                f"VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-
-        # Выполнение запроса с использованием параметров
-        cursor.execute(query, data_values)
-        mes = QMessageBox.information(None, 'база данных', f'Скважина добавлена в базу данных')
-
-    else:
-        mes = QMessageBox.question(None, 'база данных', f'Скважина уже есть в базе данных, обновить?')
-        if mes == QMessageBox.StandardButton.Yes:
-            # Подготовленный запрос для удаления
-            query1 = f"DELETE FROM gnkt_{contractor} WHERE well_number LIKE (%s)"
-
-            # Выполнение запроса
-            cursor.execute(query1, ('%' + filenames + '%',))
-
+        if len(result) == 0:
             current_datetime = datetime.today().strftime('%d.%m.%Y')
 
             data_values = (gnkt_number, well_name, gnkt_length, diametr_length, iznos,
@@ -159,14 +144,46 @@ def insert_data_base_gnkt(contractor, well_name, gnkt_number, gnkt_length, diame
             cursor.execute(query, data_values)
             mes = QMessageBox.information(None, 'база данных', f'Скважина добавлена в базу данных')
 
-    conn.commit()
+        else:
+            mes = QMessageBox.question(None, 'база данных', f'Скважина уже есть в базе данных, обновить?')
+            if mes == QMessageBox.StandardButton.Yes:
+                # Подготовленный запрос для удаления
+                query1 = f"DELETE FROM gnkt_{contractor} WHERE well_number LIKE (%s)"
 
-    # Закрытие соединения с базой данных
-    conn.close()
+                # Выполнение запроса
+                cursor.execute(query1, ('%' + filenames + '%',))
+
+                current_datetime = datetime.today().strftime('%d.%m.%Y')
+
+                data_values = (gnkt_number, well_name, gnkt_length, diametr_length, iznos,
+                               pipe_mileage, pipe_fatigue, previous_well, current_datetime, pvo)
+
+                # Подготовленный запрос для вставки данных с параметрами
+                query = f"INSERT INTO gnkt_{contractor} " \
+                        f"(gnkt_number, well_number, length_gnkt, diameter_gnkt, wear_gnkt, mileage_gnkt, " \
+                        f"tubing_fatigue, previous_well, today, pvo_number) " \
+                        f"VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+
+                # Выполнение запроса с использованием параметров
+                cursor.execute(query, data_values)
+                mes = QMessageBox.information(None, 'база данных', f'Скважина добавлена в базу данных')
+
+        conn.commit()
+    except psycopg2.Error as e:
+        # Выведите сообщение об ошибке
+        mes = QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных, Скважина не добавлена в базу')
+    finally:
+        # Закройте курсор и соединение
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+
 
 # def create_data_base(contractor, gnkt_number):
 #     # Подключение к базе данных SQLite
-#     conn = psycopg2.connect(dbname='gnkt_base', user='postgres', password='1953')
+#     conn = psycopg2.connect(**well_data.postgres_conn_gnkt)
 #     cursor = conn.cursor()
 #     if 'ойл-сервис' in contractor.lower():
 #         contractor = 'oil_service'
@@ -191,8 +208,8 @@ def insert_data_base_gnkt(contractor, well_name, gnkt_number, gnkt_length, diame
 #     Gnkt_data = namedtuple("Gnkt_data",
 #                            ["gnkt_length", "diametr_length", "iznos", "pipe_mileage", 'pipe_fatigue',
 #                             "pvo"])
-#     gnkt_2 = Gnkt_data(2200, 38, 20, 60875, '25', 115)
-#     gnkt_1 = Gnkt_data(3200, 38, 20, 42006, '25', 166)
+#     gnkt_2 = Gnkt_data(2200, 38, 20, 43056, '25', 115)
+#     gnkt_1 = Gnkt_data(3200, 38, 20, 60875, '25', 166)
 #     for ind, gnkt in enumerate([gnkt_1, gnkt_2]):
 #         if ind == 0:
 #             gnkt_number = 'ГНКТ №1'
@@ -214,5 +231,5 @@ def insert_data_base_gnkt(contractor, well_name, gnkt_number, gnkt_length, diame
 #     # Закрытие соединения с базой данных
 #     conn.close()
 # contractor = 'ООО "Ойл-Сервис'
-# print()
+# # print()
 # create_data_base(contractor, 'ГНКТ №1')

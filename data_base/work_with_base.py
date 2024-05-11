@@ -135,8 +135,8 @@ class Classifier_well(QMainWindow):
                 data = cur.fetchall()
 
         except psycopg2.Error as e:
-            print(f"Ошибка при подключении к базе данных или выполнении запроса: {e}")
-            return []
+            mes = QMessageBox.warning(self, 'Ошибка', 'Ошибка подключения к базе данных')
+
         finally:
             if conn:
                 conn.close()
@@ -161,7 +161,9 @@ class Classifier_well(QMainWindow):
                 data = cur.fetchall()
 
         except psycopg2.Error as e:
-            print(f"Ошибка при подключении к базе данных или выполнении запроса: {e}")
+            # Выведите сообщение об ошибке
+            mes = QMessageBox.warning(self, 'Ошибка', 'Ошибка подключения к базе данных')
+
             return []
         finally:
             if conn:
@@ -170,99 +172,108 @@ class Classifier_well(QMainWindow):
         return data
 
     def export_to_sqlite_without_juming(self, fname, costumer, region):
-        # Подключение к базе данных
-        conn = psycopg2.connect(**well_data.postgres_params_classif)
-        cursor = conn.cursor()
-        region_list = ['ЧГМ', 'АГМ', 'ТГМ', 'ИГМ', 'КГМ', ]
+        try:
+            # Подключение к базе данных
+            conn = psycopg2.connect(**well_data.postgres_params_classif)
+            cursor = conn.cursor()
+            region_list = ['ЧГМ', 'АГМ', 'ТГМ', 'ИГМ', 'КГМ', ]
 
-        for region_name in region_list:
-            if region_name == region:
-                # # Удаление всех данных из таблицы
-                # cursor.execute("DROP TABLE my_table")
+            for region_name in region_list:
+                if region_name == region:
+                    # # Удаление всех данных из таблицы
+                    # cursor.execute("DROP TABLE my_table")
 
-                # Удаление всех данных из таблицы
-                # cursor.execute(f"DELETE FROM {region_name}")
+                    # Удаление всех данных из таблицы
+                    # cursor.execute(f"DELETE FROM {region_name}")
 
-                # Создание таблицы в базе данных
-                cursor.execute(f'CREATE TABLE IF NOT EXISTS {region_name}'
-                               f'(well_number TEXT,'
-                               f'deposit_area TEXT, '
-                               f'today TEXT,'
-                               f'region TEXT,'
-                               f'costumer TEXT)')
+                    # Создание таблицы в базе данных
+                    cursor.execute(f'CREATE TABLE IF NOT EXISTS {region_name}'
+                                   f'(well_number TEXT,'
+                                   f'deposit_area TEXT, '
+                                   f'today TEXT,'
+                                   f'region TEXT,'
+                                   f'costumer TEXT)')
 
-                # Загрузка файла Excel
-                wb = load_workbook(fname)
-                ws = wb.active
+                    # Загрузка файла Excel
+                    wb = load_workbook(fname)
+                    ws = wb.active
 
-                # Получение данных из Excel и запись их в базу данных
-                for index_row, row in enumerate(ws.iter_rows(min_row=2, values_only=True)):
-                    for col, value in enumerate(row):
-                        if not value is None and col <= 18:
-                            # print(value)
-                            if 'туймазин' in str(value).lower():
-                                check_param = 'ТГМ'
-                            if 'ишимбай' in str(value).lower():
-                                check_param = 'ИГМ'
-                            if 'чекмагуш' in str(value).lower():
-                                check_param = 'ЧГМ'
-                            if 'красно' in str(value).lower():
-                                check_param = 'КГМ'
-                            if 'арлан' in str(value).lower():
-                                check_param = 'АГМ'
-                            if '01.01.' in str(value) or '01.04.' in str(value) or '01.07.' in str(
-                                    value) or '01.10.' in str(value):
+                    # Получение данных из Excel и запись их в базу данных
+                    for index_row, row in enumerate(ws.iter_rows(min_row=2, values_only=True)):
+                        for col, value in enumerate(row):
+                            if not value is None and col <= 18:
+                                # print(value)
+                                if 'туймазин' in str(value).lower():
+                                    check_param = 'ТГМ'
+                                if 'ишимбай' in str(value).lower():
+                                    check_param = 'ИГМ'
+                                if 'чекмагуш' in str(value).lower():
+                                    check_param = 'ЧГМ'
+                                if 'красно' in str(value).lower():
+                                    check_param = 'КГМ'
+                                if 'арлан' in str(value).lower():
+                                    check_param = 'АГМ'
+                                if '01.01.' in str(value) or '01.04.' in str(value) or '01.07.' in str(
+                                        value) or '01.10.' in str(value):
 
-                                version_year = re.findall(r'[0-9.]', str(value))
-                                version_year = ''.join(version_year)
-                                if version_year[-1] == '.':
-                                    version_year = version_year[:-1]
-                    if index_row > 18:
-                        break
-                # print(region_name, version_year)
-                # print(check_param)
-                if check_param == region_name:
-                    mes = QMessageBox.warning(self, 'ВНИМАНИЕ ОШИБКА',
-                                              f'регион выбрано корректно  {region_name}')
-                    try:
-                        # Получение данных из Excel и запись их в базу данных
-                        for index_row, row in enumerate(ws.iter_rows(min_row=2, values_only=True)):
-                            if 'ПЕРЕЧЕНЬ' in row:
-                                check_file = True
-                            if 'Скважина' in row:
-                                area_row = index_row + 2
-                                for col, value in enumerate(row):
-                                    if not value is None and col <= 20:
-                                        if 'Скважина' == value:
-                                            well_column = col
-                                        elif 'Площадь' == value:
-                                            area_column = col
+                                    version_year = re.findall(r'[0-9.]', str(value))
+                                    version_year = ''.join(version_year)
+                                    if version_year[-1] == '.':
+                                        version_year = version_year[:-1]
+                        if index_row > 18:
+                            break
+                    # print(region_name, version_year)
+                    # print(check_param)
+                    if check_param == region_name:
+                        mes = QMessageBox.warning(self, 'ВНИМАНИЕ ОШИБКА',
+                                                  f'регион выбрано корректно  {region_name}')
+                        try:
+                            # Получение данных из Excel и запись их в базу данных
+                            for index_row, row in enumerate(ws.iter_rows(min_row=2, values_only=True)):
+                                if 'ПЕРЕЧЕНЬ' in row:
+                                    check_file = True
+                                if 'Скважина' in row:
+                                    area_row = index_row + 2
+                                    for col, value in enumerate(row):
+                                        if not value is None and col <= 20:
+                                            if 'Скважина' == value:
+                                                well_column = col
+                                            elif 'Площадь' == value:
+                                                area_column = col
 
-                        for index_row, row in enumerate(ws.iter_rows(min_row=2, values_only=True)):
-                            if index_row > area_row:
+                            for index_row, row in enumerate(ws.iter_rows(min_row=2, values_only=True)):
+                                if index_row > area_row:
 
-                                well_number = row[well_column]
-                                area_well = row[area_column]
+                                    well_number = row[well_column]
+                                    area_well = row[area_column]
 
-                                if well_number:
-                                    cursor.execute(
-                                        f"INSERT INTO {region_name} (well_number, deposit_area, today, region, costumer) "
-                                        f"VALUES (%s, %s, %s, %s,%s)",
-                                        (well_number, area_well, version_year, region_name, costumer))
+                                    if well_number:
+                                        cursor.execute(
+                                            f"INSERT INTO {region_name} (well_number, deposit_area, today, region, costumer) "
+                                            f"VALUES (%s, %s, %s, %s,%s)",
+                                            (well_number, area_well, version_year, region_name, costumer))
 
-                        mes = QMessageBox.information(self, 'данные обновлены', 'Данные обновлены')
-                    except:
-                        mes = QMessageBox.warning(self, 'ОШИБКА', 'Выбран файл с не корректными данными')
+                            mes = QMessageBox.information(self, 'данные обновлены', 'Данные обновлены')
+                        except:
+                            mes = QMessageBox.warning(self, 'ОШИБКА', 'Выбран файл с не корректными данными')
 
-                else:
-                    mes = QMessageBox.warning(self, 'ВНИМАНИЕ ОШИБКА',
-                                              f'в Данном перечне отсутствую скважины {region_name}')
+                    else:
+                        mes = QMessageBox.warning(self, 'ВНИМАНИЕ ОШИБКА',
+                                                  f'в Данном перечне отсутствую скважины {region_name}')
 
-        # Сохранение изменений
-        conn.commit()
+            # Сохранение изменений
+            conn.commit()
 
-        # Закрытие соединения с базой данных
-        conn.close()
+        except psycopg2.Error as e:
+            # Выведите сообщение об ошибке
+            mes = QMessageBox.warning(self, 'Ошибка', 'Ошибка подключения к базе данных')
+        finally:
+            # Закройте курсор и соединение
+            if cursor:
+                cursor.close()
+            if conn:
+                conn.close()
+
 
     def filter(self, filter_text):
         for i in range(1, self.table_class.rowCount() + 1):
@@ -439,85 +450,110 @@ class Classifier_well(QMainWindow):
                     conn.commit()
 
         except (psycopg2.Error, Exception) as e:
-            print(f"Ошибка: {e}")
+            # Выведите сообщение об ошибке
+            mes = QMessageBox.warning(self, 'Ошибка', 'Ошибка подключения к базе данных')
         finally:
+            # Закройте курсор и соединение
+            if cursor:
+                cursor.close()
             if conn:
                 conn.close()
 
 
+
 def read_database_gnkt(contractor, gnkt_number):
+    try:
+        # Подключение к базе данных
+        conn = psycopg2.connect(**well_data.postgres_conn_gnkt)
 
-    # Подключение к базе данных
-    conn = psycopg2.connect(**well_data.postgres_conn_gnkt)
-
-    if 'ойл-сервис' in contractor.lower():
-        contractor = 'oil_service'
-    cursor = conn.cursor()
-    cursor.execute(f"SELECT * FROM КГМ WHERE today =(%s)", (gnkt_number, '1963'))
-    print(f' база данных открыта')
-    result = cursor.fetchone()
+        if 'ойл-сервис' in contractor.lower():
+            contractor = 'oil_service'
+        cursor = conn.cursor()
+        cursor.execute(f"SELECT * FROM КГМ WHERE today =(%s)", (gnkt_number, '1963'))
+        print(f' база данных открыта')
+        result = cursor.fetchone()
+    except psycopg2.Error as e:
+        # Выведите сообщение об ошибке
+        mes = QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных')
+    finally:
+        # Закройте курсор и соединение
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
     # print(result)
 
 
 def create_database_well_db(work_plan, number_dp):
     # print(row, well_data.count_row_well)
-    conn = psycopg2.connect(**well_data.postgres_conn_gnkt)
-    cursor = conn.cursor()
+    try:
 
-    # Создаем таблицу для хранения данных
-    number = json.dumps(str(well_data.well_number._value) + well_data.well_area._value + work_plan + str(number_dp),
-                        ensure_ascii=False)
+        conn = psycopg2.connect(**well_data.postgres_conn_work_well)
+        cursor = conn.cursor()
 
-    # Попытка удалить таблицу, если она существует
-    cursor.execute(f'DROP TABLE IF EXISTS {number}')
+        # Создаем таблицу для хранения данных
+        number = json.dumps(str(well_data.well_number._value) + well_data.well_area._value + work_plan + str(number_dp),
+                            ensure_ascii=False)
 
-    cursor.execute(f'CREATE TABLE IF NOT EXISTS {number}'
-                   f'(index_row INTEGER,'
-                   f'current_bottom FLOAT,'
-                   f'perforation TEXT, '
-                   f'plast_all TEXT, '
-                   f'plast_work TEXT, '
-                   f'leakage TEXT,'
-                   f'column_additional TEXT,'
-                   f'fluid TEXT,'
-                   f'category_pressuar TEXT,'
-                   f'category_h2s TEXT,'
-                   f'category_gf TEXT,'
-                   f'template_depth FLOAT,'
-                   f'skm_list TEXT,'
-                   f'problemWithEk_depth FLOAT,'
-                   f'problemWithEk_diametr FLOAT)')
+        # Попытка удалить таблицу, если она существует
+        cursor.execute(f'DROP TABLE IF EXISTS {number}')
 
-    for index, data in enumerate(well_data.data_list):
-        current_bottom = data[1]
-        dict_perforation_json = data[2]
-        plast_all = data[3]
-        plast_work = data[4]
-        dict_leakiness = data[5]
-        column_additional = data[6]
-        fluid_work = data[7]
-        template_depth = int(data[11])
-        skm_interval = data[12]
-        problemWithEk_depth = data[13]
-        problemWithEk_diametr = data[14]
+        cursor.execute(f'CREATE TABLE IF NOT EXISTS {number}'
+                       f'(index_row INTEGER,'
+                       f'current_bottom FLOAT,'
+                       f'perforation TEXT, '
+                       f'plast_all TEXT, '
+                       f'plast_work TEXT, '
+                       f'leakage TEXT,'
+                       f'column_additional TEXT,'
+                       f'fluid TEXT,'
+                       f'category_pressuar TEXT,'
+                       f'category_h2s TEXT,'
+                       f'category_gf TEXT,'
+                       f'template_depth FLOAT,'
+                       f'skm_list TEXT,'
+                       f'problemWithEk_depth FLOAT,'
+                       f'problemWithEk_diametr FLOAT)')
 
-        # Подготовленные данные для вставки (пример)
-        data_values = (index, current_bottom, dict_perforation_json, plast_all, plast_work,
-                       dict_leakiness, column_additional, fluid_work, well_data.category_pressuar,
-                       well_data.category_h2s, well_data.category_gf, template_depth, skm_interval,
-                       problemWithEk_depth, problemWithEk_diametr)
+        for index, data in enumerate(well_data.data_list):
+            current_bottom = data[1]
+            dict_perforation_json = data[2]
+            plast_all = data[3]
+            plast_work = data[4]
+            dict_leakiness = data[5]
+            column_additional = data[6]
+            fluid_work = data[7]
+            template_depth = int(data[11])
+            skm_interval = data[12]
+            problemWithEk_depth = data[13]
+            problemWithEk_diametr = data[14]
 
-        # Подготовленный запрос для вставки данных с параметрами
-        query = f"INSERT INTO {number} VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+            # Подготовленные данные для вставки (пример)
+            data_values = (index, current_bottom, dict_perforation_json, plast_all, plast_work,
+                           dict_leakiness, column_additional, fluid_work, well_data.category_pressuar,
+                           well_data.category_h2s, well_data.category_gf, template_depth, skm_interval,
+                           problemWithEk_depth, problemWithEk_diametr)
 
-        # Выполнение запроса с использованием параметров
-        cursor.execute(query, data_values)
+            # Подготовленный запрос для вставки данных с параметрами
+            query = f"INSERT INTO {number} VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+
+            # Выполнение запроса с использованием параметров
+            cursor.execute(query, data_values)
 
 
-    # Сохранить изменения и закрыть соединение
-    conn.commit()
-    conn.close()
-    mes = QMessageBox.information(None, 'база данных', 'Скважина добавлена в базу данных')
+        # Сохранить изменения и закрыть соединение
+        conn.commit()
+    except psycopg2.Error as e:
+        # Выведите сообщение об ошибке
+        mes = QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных, Скважине не добавлена в базу')
+    finally:
+        # Закройте курсор и соединение
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+        mes = QMessageBox.information(None, 'база данных', 'Скважина добавлена в базу данных')
 
 if __name__ == "__main__":
     import sys

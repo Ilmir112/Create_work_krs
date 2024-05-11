@@ -40,22 +40,32 @@ class LoginWindow(QWidget):
         username = self.username.currentText()
         password = self.password.text()
         last_name, first_name, second_name, _ = username.split(' ')
-        conn = psycopg2.connect(**well_data.postgres_conn_user)
-        cursor = conn.cursor()
-        cursor.execute("SELECT last_name, first_name, second_name, password, position_in, organization FROM users "
-                       "WHERE last_name=(%s) AND first_name=(%s) AND second_name=(%s)",
-                       (last_name, first_name, second_name))
-        password_base = cursor.fetchone()
+        try:
+            conn = psycopg2.connect(**well_data.postgres_conn_user)
+            cursor = conn.cursor()
+            cursor.execute("SELECT last_name, first_name, second_name, password, position_in, organization FROM users "
+                           "WHERE last_name=(%s) AND first_name=(%s) AND second_name=(%s)",
+                           (last_name, first_name, second_name))
+            password_base = cursor.fetchone()
 
-        password_base_short = f'{password_base[0]} {password_base[1]} {password_base[2]} '
-        if password_base_short == username and password_base[3] == str(password):
-            # mes = QMessageBox.information(self, 'Пароль', 'вход произведен')
-            self.close()
-            well_data.user = (password_base[4] + ' ' + password_base[5], password_base_short)
+            password_base_short = f'{password_base[0]} {password_base[1]} {password_base[2]} '
+            if password_base_short == username and password_base[3] == str(password):
+                # mes = QMessageBox.information(self, 'Пароль', 'вход произведен')
+                self.close()
+                well_data.user = (password_base[4] + ' ' + password_base[5], password_base_short)
 
-            well_data.pause = False
-        else:
-             mes = QMessageBox.critical(self, 'Пароль', 'логин и пароль не совпадает')
+                well_data.pause = False
+            else:
+                 mes = QMessageBox.critical(self, 'Пароль', 'логин и пароль не совпадает')
+        except psycopg2.Error as e:
+            # Выведите сообщение об ошибке
+            mes = QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных, проверьте наличие интернета')
+        finally:
+            # Закройте курсор и соединение
+            if cursor:
+                cursor.close()
+            if conn:
+                conn.close()
 
 
     def get_list_users(self):
@@ -63,7 +73,7 @@ class LoginWindow(QWidget):
 
         conn = psycopg2.connect(**well_data.postgres_conn_user)
         cursor = conn.cursor()
-        print(cursor)
+
         cursor.execute("SELECT last_name, first_name, second_name, position_in, organization  FROM users")
         users = cursor.fetchall()
         users_list = []
@@ -148,7 +158,7 @@ class RegisterWindow(QWidget):
 
         # Проверяем, существует ли пользователь с таким именем
         cursor.execute("SELECT last_name, first_name, second_name  FROM users "
-                       "WHERE last_name(%s) AND first_name(%s) AND second_name(%s)",
+                       "WHERE last_name=(%s) AND first_name=(%s) AND second_name=(%s)",
                        (last_name, first_name, second_name))
 
         existing_user = cursor.fetchone()

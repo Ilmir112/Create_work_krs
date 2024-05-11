@@ -95,29 +95,31 @@ class TabPageDp(QWidget):
 
     def update_data_gnkt(self):
         previus_well = self.previous_well_combo.currentText()
+        try:
+            if previus_well:
+                conn = psycopg2.connect(**well_data.postgres_conn_gnkt)
 
-        if previus_well:
-            conn = psycopg2.connect(**well_data.postgres_conn_gnkt)
+                cursor = conn.cursor()
 
-            cursor = conn.cursor()
+                if 'ойл-сервис' in well_data.contractor.lower():
+                    contractor = 'oil_service'
+                print(previus_well)
 
-            if 'ойл-сервис' in well_data.contractor.lower():
-                contractor = 'oil_service'
-            print(previus_well)
+                cursor.execute("""
+                    SELECT * FROM gnkt_{contractor} WHERE well_number = %s;
+                """.format(contractor=contractor), (previus_well,))
 
-            cursor.execute("""
-                SELECT * FROM gnkt_{contractor} WHERE well_number = %s;
-            """.format(contractor=contractor), (previus_well,))
+                result_gnkt = cursor.fetchone()
+                print(result_gnkt)
 
-            result_gnkt = cursor.fetchone()
-            print(result_gnkt)
+                self.lenght_gnkt_edit.setText(str(result_gnkt[3]))
+                self.iznos_gnkt_edit.setText(str(result_gnkt[5]))
+                self.pipe_mileage_edit.setText(str(result_gnkt[6]))
+                self.pvo_number_edit.setText(str(result_gnkt[10]))
 
-            self.lenght_gnkt_edit.setText(str(result_gnkt[3]))
-            self.iznos_gnkt_edit.setText(str(result_gnkt[5]))
-            self.pipe_mileage_edit.setText(str(result_gnkt[6]))
-            self.pvo_number_edit.setText(str(result_gnkt[10]))
-
-            conn.close()
+                conn.close()
+        except:
+            print('Ошибка подключения')
 
     def update_number_gnkt(self, gnkt_number):
         if gnkt_number != '':

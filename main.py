@@ -46,76 +46,96 @@ class ExcelWorker(QThread):
 
     def check_well_existence(self, well_number, deposit_area, region):
 
-        # Подключение к базе данных SQLite
-        conn = psycopg2.connect(**well_data.postgres_params_classif)
-        cursor = conn.cursor()
-        current_year = datetime.now().year
-        month = datetime.now().month
-        # print(f'месяц {month}')
-        if 1 <= month < 4:
-            date_string = datetime(current_year, 1, 1).strftime('%d.%m.%Y')
-            print(f'Корректная таблица перечня без глушения от {date_string}')
-        elif 4 <= month < 7:
-            date_string = datetime(current_year, 4, 1).strftime('%d.%m.%Y')
-            print(f'Корректная таблица перечня без глушения от {date_string}')
-        elif 7 <= month < 10:
-            date_string = datetime(current_year, 7, 1).strftime('%d.%m.%Y')
-            print(f'Корректная таблица перечня без глушения от {date_string}')
-        elif 10 >= month <= 12:
-            date_string = datetime(current_year, 10, 1).strftime('%d.%m.%Y')
-            print(f'Корректная таблица перечня без глушения от {date_string}')
-        print(f' регион {region}')
+        try:
+            # Подключение к базе данных SQLite
+            conn = psycopg2.connect(**well_data.postgres_params_classif)
 
-        # if region == 'КГМ':
-        # Проверка наличия записи в базе данных
-        cursor.execute(f"SELECT *  FROM {region} WHERE today=(%s)", (date_string,))
-        print(f' база данных открыта')
-        result = cursor.fetchone()
-        print(result)
-        if result is None:
-            mes = QMessageBox.warning(self, 'Некорректная дата перечня',
-                                      f'Необходимо обновить перечень скважин без '
-                                      f'глушения на текущий квартал {region}')
-        # Проверка наличия записи в базе данных
-        cursor.execute(f"SELECT * FROM {region} WHERE well_number=(%s) AND deposit_area=(%s)",
-                       (str(well_number), deposit_area))
-        result = cursor.fetchone()
-        # Закрытие соединения с базой данных
-        conn.close()
-        print(f'проверка {result}')
-        print(f' база данных закрыта')
+            cursor = conn.cursor()
 
-        # Если запись найдена, возвращается True, в противном случае возвращается False
-        if result:
-            mes = QMessageBox.information(None, 'перечень без глушения',
-                                          f'Скважина состоит в перечне скважин без глушения на текущий квартал, '
-                                          f'в перечне от  {region}')
-            check_true = True
-        else:
-            check_true = False
+            current_year = datetime.now().year
+            month = datetime.now().month
+            # print(f'месяц {month}')
+            if 1 <= month < 4:
+                date_string = datetime(current_year, 1, 1).strftime('%d.%m.%Y')
+                print(f'Корректная таблица перечня без глушения от {date_string}')
+            elif 4 <= month < 7:
+                date_string = datetime(current_year, 4, 1).strftime('%d.%m.%Y')
+                print(f'Корректная таблица перечня без глушения от {date_string}')
+            elif 7 <= month < 10:
+                date_string = datetime(current_year, 7, 1).strftime('%d.%m.%Y')
+                print(f'Корректная таблица перечня без глушения от {date_string}')
+            elif 10 >= month <= 12:
+                date_string = datetime(current_year, 10, 1).strftime('%d.%m.%Y')
+                print(f'Корректная таблица перечня без глушения от {date_string}')
 
+            # Проверка наличия записи в базе данных
+            cursor.execute(f"SELECT *  FROM {region} WHERE today=(%s)", (date_string,))
+
+            result = cursor.fetchone()
+
+            if result is None:
+                mes = QMessageBox.warning(self, 'Некорректная дата перечня',
+                                          f'Необходимо обновить перечень скважин без '
+                                          f'глушения на текущий квартал {region}')
+            # Проверка наличия записи в базе данных
+            cursor.execute(f"SELECT * FROM {region} WHERE well_number=(%s) AND deposit_area=(%s)",
+                           (str(well_number), deposit_area))
+            result = cursor.fetchone()
+            # Закрытие соединения с базой данных
+
+            print(f'проверка {result}')
+            print(f' база данных закрыта')
+
+            # Если запись найдена, возвращается True, в противном случае возвращается False
+            if result:
+                mes = QMessageBox.information(None, 'перечень без глушения',
+                                              f'Скважина состоит в перечне скважин без глушения на текущий квартал, '
+                                              f'в перечне от  {region}')
+                check_true = True
+            else:
+                check_true = False
+        except psycopg2.Error as e:
+            # Выведите сообщение об ошибке
+            mes = QMessageBox.warning(self, 'Ошибка', 'Ошибка подключения к базе данных')
+        finally:
+            # Закройте курсор и соединение
+            if cursor:
+                cursor.close()
+            if conn:
+                conn.close()
 
         # Завершение работы потока
         self.finished.emit()
         return check_true
 
     def check_category(self, well_number, deposit_area, region):
+        try:
+            # Подключение к базе данных
+            conn = psycopg2.connect(**well_data.postgres_params_classif)
 
-        # Подключение к базе данных
-        conn = psycopg2.connect(**well_data.postgres_params_classif)
+            cursor = conn.cursor()
 
-        cursor = conn.cursor()
+            # Проверка наличия записи в базе данных
+            cursor.execute(f"SELECT categoty_pressure, categoty_h2s, categoty_gf, today FROM {region}_классификатор "
+                           f"WHERE well_number =(%s) and deposit_area =(%s)", (str(well_number._value), deposit_area._value))
 
-        # Проверка наличия записи в базе данных
-        cursor.execute(f"SELECT categoty_pressure, categoty_h2s, categoty_gf, today FROM {region}_классификатор "
-                       f"WHERE well_number =(%s) and deposit_area =(%s)", (str(well_number._value), deposit_area._value))
-
-        result = cursor.fetchone()
-        # print(result)
-        # Закрытие соединения с базой данных
-        conn.close()
-        # # Завершение работы потока
-        # ExcelWorker.finished.emit()
+            result = cursor.fetchone()
+            # print(result)
+            # Закрытие соединения с базой данных
+            conn.close()
+            # # Завершение работы потока
+            # ExcelWorker.finished.emit()
+        except psycopg2.Error as e:
+            # Выведите сообщение об ошибке
+            mes = QMessageBox.warning(self, 'Ошибка', 'Ошибка подключения к базе данных, не получилось проверить '
+                                                      'корректность категории')
+            return
+        finally:
+            # Закройте курсор и соединение
+            if cursor:
+                cursor.close()
+            if conn:
+                conn.close()
         return result
 
 
