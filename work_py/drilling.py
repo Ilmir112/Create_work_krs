@@ -7,8 +7,6 @@ from PyQt5.QtCore import Qt
 
 from .rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
 
-
-
 class TabPage_SO_drill(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -69,7 +67,7 @@ class TabPage_SO_drill(QWidget):
         self.drill_True_label = QLabel("вид разбуриваемого материала", self)
         self.drill_label = QLabel("добавление поинтервального бурения", self)
         self.drill_cm_combo = QComboBox(self)
-        self.bottomType_list = ['ЦМ', 'РПК', 'РПП', 'ВП', 'Гипсовые отложения']
+        self.bottomType_list = ['ЦМ', 'РПК', 'РПП', 'ВП', 'Гипсовых отложений', 'проходимости']
         self.drill_cm_combo.addItems(self.bottomType_list)
 
         grid = QGridLayout(self)
@@ -198,7 +196,7 @@ class Drill_window(QMainWindow):
         roof_drill = self.tabWidget.currentWidget().roof_drill_line.text().replace(',', '.')
         sole_drill = self.tabWidget.currentWidget().sole_drill_line.text().replace(',', '.')
         drill_type_combo = QComboBox(self)
-        drill_type_combo.addItems(['ЦМ', 'РПК', 'РПП', 'ВП', 'Гипсовых отложений'])
+        drill_type_combo.addItems(['ЦМ', 'РПК', 'РПП', 'ВП', 'Гипсовых отложений', 'проходимости'])
         index_drill_True = self.tabWidget.currentWidget().drill_type_combo.currentIndex()
         drill_type_combo.setCurrentIndex(index_drill_True)
 
@@ -343,7 +341,6 @@ class Drill_window(QMainWindow):
                            f' забойный двигатель {downhole_motor} + НКТ{nkt_diam} 20м + репер '
             drilling_short = f'{drill_type_combo}-{drillingBit_diam} + ' \
                              f'забойный двигатель {downhole_motor}  + НКТ{nkt_diam} 20м + репер '
-
 
         elif well_data.column_additional is True:
             drilling_str = f'{drill_type_combo}-{drillingBit_diam} для ЭК {well_data.column_additional_diametr._value}мм х ' \
@@ -517,7 +514,7 @@ class Drill_window(QMainWindow):
             ]
 
 
-        if self.check_pressure(current_depth) == 0:
+        if self.check_pressure(current_depth) == True:
             drilling_list.append(
                 [f'Опрессовать ЭК и ЦМ на Р={well_data.max_admissible_pressure._value}атм', None,
                  f'Опрессовать ЭК и ЦМ на Р={well_data.max_admissible_pressure._value}атм в присутствии представителя '
@@ -531,11 +528,20 @@ class Drill_window(QMainWindow):
         well_data.current_bottom = current_depth
 
         for drill_sole, bottomType2 in drill_tuple:
-            # print(drill_sole, self.check_pressure(drill_sole))
             if self.check_pressure(drill_sole) is True:
                 for row in self.reply_drilling(drill_sole, bottomType2, drilling_str, nkt_diam):
                     drilling_list.append(row)
+        if len(drill_tuple) == 1:
+            for drill_sole, bottomType2 in drill_tuple:
+                for row in Drill_window.reply_drilling(self, drill_sole, bottomType2, drilling_str, nkt_diam):
+                    drilling_list.append(row)
 
+        else:
+            for drill_sole, bottomType2 in drill_tuple:
+                # print(drill_sole, self.check_pressure(drill_sole))
+                if self.check_pressure(drill_sole) is True:
+                    for row in self.reply_drilling(drill_sole, bottomType2, drilling_str, nkt_diam):
+                        drilling_list.append(row)
         drilling_list_end = [
             [None, None,
              f'ПРИМЕЧАНИЕ: РАСХОД РАБОЧЕЙ ЖИДКОСТИ 8-10 Л/С;'

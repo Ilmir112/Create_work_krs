@@ -136,7 +136,7 @@ class RegisterWindow(QWidget):
         self.label_password2 = QLabel("Повторить Пароль", self)
         self.label_password2.move(50, 350)
         self.password2 = QLineEdit(self)
-        self.password.setEchoMode(QLineEdit.Password)  # Устанавливаем режим скрытия пароля
+        self.password2.setEchoMode(QLineEdit.Password)  # Устанавливаем режим скрытия пароля
         self.password2.move(150, 350)
 
         self.button_register_user = QPushButton("Регистрация", self)
@@ -145,13 +145,13 @@ class RegisterWindow(QWidget):
         self.button_register_user.clicked.connect(self.register_user)
 
     def register_user(self):
-        last_name = self.last_name.text().title()
-        first_name = self.first_name.text().title()
-        second_name = self.second_name.text().title()
-        position_in = self.position.text()
-        organization = self.organization.text()
-        password = self.password.text()
-        password2 = self.password2.text()
+        last_name = self.last_name.text().title().strip()
+        first_name = self.first_name.text().title().strip()
+        second_name = self.second_name.text().title().strip()
+        position_in = self.position.text().strip()
+        organization = self.organization.text().strip()
+        password = self.password.text().strip()
+        password2 = self.password2.text().strip()
 
         conn = psycopg2.connect(**well_data.postgres_conn_user)
         cursor = conn.cursor()

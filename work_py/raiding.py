@@ -1,3 +1,5 @@
+import logging
+
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QLineEdit, QComboBox, QGridLayout, QTabWidget, \
     QTableWidget, QHeaderView, QPushButton, QTableWidgetItem, QApplication, QMainWindow
@@ -396,9 +398,14 @@ class Raid(MyWindow):
         if len(well_data.plast_work) == 0:
             acid_true_quest = QMessageBox.question(self, 'Необходимость смены объема',
                                                    'Нужно ли изменять удельный вес?')
-            if acid_true_quest == QMessageBox.StandardButton.Yes:
-                for row in fluid_change(self):
-                    ryber_list.insert(-1, row)
+            try:
+                if acid_true_quest == QMessageBox.StandardButton.Yes:
+                    for row in fluid_change(self):
+                        ryber_list.insert(-1, row)
+            except:
+                mes = QMessageBox.warning(self, 'ОШИБКА', 'Смена объема вставить не получитлось')
+
+
         return ryber_list
 
     def raiding_sbt(self, raiding_interval_tuple, ryber_key):

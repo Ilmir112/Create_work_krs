@@ -1,3 +1,4 @@
+import logging
 from collections import namedtuple
 
 from PyQt5.QtWidgets import QInputDialog, QMessageBox
@@ -272,19 +273,23 @@ def pvo_cat1(self):
 def fluid_change(self):
     from open_pz import CreatePZ
 
+    try:
+        CreatePZ.fluid_work, CreatePZ.fluid_work_short, plast, expected_pressure = check_h2s(self)
 
-    CreatePZ.fluid_work, CreatePZ.fluid_work_short, plast, expected_pressure = check_h2s(self)
 
-    fluid_change_list = [[f'Cмена объема {CreatePZ.fluid}г/см3- {round(well_volume(self, CreatePZ.current_bottom), 1)}м3' ,
-                          None,
-                          f'Произвести смену объема обратной промывкой по круговой циркуляции  жидкостью  {CreatePZ.fluid_work} '
-                          f'(по расчету по вскрываемому пласта Рожид- {expected_pressure}атм) в объеме не '
-                          f'менее {round(well_volume(self, CreatePZ.current_bottom), 1)}м3  в присутствии '
-                          f'представителя заказчика, Составить акт. '
-                          f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за '
-                          f'2 часа до начала работ)',
-                          None, None, None, None, None, None, None,
-                          'мастер КРС', well_volume_norm(well_volume(self, CreatePZ.current_bottom))]]
+        fluid_change_list = [[f'Cмена объема {CreatePZ.fluid}г/см3- {round(well_volume(self, CreatePZ.current_bottom), 1)}м3' ,
+                              None,
+                              f'Произвести смену объема обратной промывкой по круговой циркуляции  жидкостью  {CreatePZ.fluid_work} '
+                              f'(по расчету по вскрываемому пласта Рожид- {expected_pressure}атм) в объеме не '
+                              f'менее {round(well_volume(self, CreatePZ.current_bottom), 1)}м3  в присутствии '
+                              f'представителя заказчика, Составить акт. '
+                              f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за '
+                              f'2 часа до начала работ)',
+                              None, None, None, None, None, None, None,
+                              'мастер КРС', well_volume_norm(well_volume(self, CreatePZ.current_bottom))]]
+    except Exception as e:
+        logging.exception("Произошла ошибка")
+        return
 
     return fluid_change_list
 

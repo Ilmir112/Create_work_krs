@@ -237,16 +237,16 @@ class SandWindow(QMainWindow):
 
 
         filling_list = [
-            [f'Спустить  {self.sand_select()}  на НКТ{nkt_diam}м до глубины {round(sole_sand_edit-100,0)}м', None,
-         f' Спустить  {self.sand_select()}  на НКТ{nkt_diam}м до глубины {round(sole_sand_edit-100,0)}м с замером, '
+            [f'Спустить  {self.sand_select()}  на НКТ{nkt_diam}м до глубины {round(filling_depth-100,0)}м', None,
+         f' Спустить  {self.sand_select()}  на НКТ{nkt_diam}м до глубины {round(filling_depth-100,0)}м с замером, '
          f'шаблонированием шаблоном {well_data.nkt_template}мм. (При СПО первых десяти НКТ на '
          f'спайдере дополнительно устанавливать элеватор ЭХЛ)',
          None, None, None, None, None, None, None,
          'Мастер КР', descentNKT_norm(sole_sand_edit,1)],
             [f'отсыпка кварцевым песком в инт. {filling_depth} - {sole_sand_edit} в объеме {sand_volume}л',
              None, f'Произвести отсыпку кварцевым песком в инт. {filling_depth} - {sole_sand_edit} '
-                         f' в объеме {sand_volume}л '
-                         f'Закачать в НКТ кварцевый песок  с доводкой тех.жидкостью {well_data.fluid_work}',
+                 f'в объеме {sand_volume}л '
+                 f'Закачать в НКТ кварцевый песок  с доводкой тех.жидкостью {well_data.fluid_work}',
              None, None, None, None, None, None, None,
              'мастер КРС', 3.5],
             [f'Ожидание оседания песка 4 часа.',
@@ -255,8 +255,8 @@ class SandWindow(QMainWindow):
              'мастер КРС', 4],
             [None, None,
              f'Допустить компоновку с замером и шаблонированием НКТ до кровли песчаного моста '
-             f'(плановый забой -{filling_depth}м).'
-            f' Определить текущий забой скважины (перо от песчаного моста не поднимать, упереться в песчаный мост).',
+             f'(плановый забой -{filling_depth}м). '
+             f'Определить текущий забой скважины (перо от песчаного моста не поднимать, упереться в песчаный мост).',
              None, None, None, None, None, None, None,
              'мастер КРС', 1.2],
             [None, None,

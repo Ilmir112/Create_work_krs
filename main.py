@@ -1,15 +1,12 @@
 import json
 import os
-
 import sys
-
 import psycopg2
 import win32com.client
 import openpyxl
 import re
-
 import win32con
-from PyQt5.QtGui import QColor
+
 from openpyxl.reader.excel import load_workbook
 
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu, QMenuBar, QAction, QTableWidget, \
@@ -20,6 +17,7 @@ from openpyxl.utils import get_column_letter
 from PyQt5.QtCore import Qt
 from openpyxl.workbook import Workbook
 from openpyxl.styles import Border, Side, Alignment, Font
+from log_files import log
 
 import property_excel.property_excel_pvr
 from work_py.advanted_file import count_row_height, definition_plast_work, raid, remove_overlapping_intervals
@@ -1081,9 +1079,9 @@ class MyWindow(QMainWindow):
         emergency_menu.addAction(emergency_sticking_action)
         emergency_sticking_action.triggered.connect(self.emergency_sticking_action)
 
-        larNKT_action = QAction("печать + ЛАР на НКТ", self)
-        emergency_menu.addAction(larNKT_action)
-        larNKT_action.triggered.connect(self.larNKT_action)
+        emergency_print_action = QAction("СПО печати", self)
+        emergency_menu.addAction(emergency_print_action)
+        emergency_print_action.triggered.connect(self.emergency_print_action)
 
         lar_sbt_action = QAction("ЛАР на СБТ правое", self)
         emergency_menu.addAction(lar_sbt_action)
@@ -1224,9 +1222,18 @@ class MyWindow(QMainWindow):
             self.raid_window = None
 
     def magnet_action(self):
-        from work_py.emergencyWork import magnetWork
-        magnet_work_list = magnetWork(self)
-        self.populate_row(self.ins_ind, magnet_work_list, self.table_widget)
+
+        from work_py.emergency_magnit import Emergency_magnit
+        if self.raid_window is None:
+            self.raid_window = Emergency_magnit(well_data.ins_ind, self.table_widget)
+            # self.raid_window.setGeometry(200, 400, 300, 400)
+            self.raid_window.show()
+            self.pause_app()
+            well_data.pause = True
+            self.raid_window = None
+        else:
+            self.raid_window.close()  # Close window.
+            self.raid_window = None
 
     def emergency_sticking_action(self):
         from work_py.emergencyWork import emergency_sticking
@@ -1248,10 +1255,20 @@ class MyWindow(QMainWindow):
         emergency_sbt_list = emergence_sbt(self)
         self.populate_row(self.ins_ind, emergency_sbt_list, self.table_widget)
 
-    def larNKT_action(self):
-        from work_py.emergencyWork import emergencyNKT
-        emergencyNKT_list = emergencyNKT(self)
-        self.populate_row(self.ins_ind, emergencyNKT_list, self.table_widget)
+    def emergency_print_action(self):
+        from work_py.emergency_printing import Emergency_print
+        if self.raid_window is None:
+            self.raid_window = Emergency_print(well_data.ins_ind, self.table_widget)
+            # self.raid_window.setGeometry(200, 400, 300, 400)
+            self.raid_window.show()
+            self.pause_app()
+            well_data.pause = True
+            self.raid_window = None
+        else:
+            self.raid_window.close()  # Close window.
+            self.raid_window = None
+
+
 
     def rgdWithoutPaker_action(self):
         from work_py.rgdVcht import rgdWithoutPaker

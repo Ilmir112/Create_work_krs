@@ -4,19 +4,20 @@ import well_data
 from .rationingKRS import descentNKT_norm, liftingNKT_norm
 
 
-def magnet_select(self):
+def magnet_select(self, nkt_str):
 
     if well_data.column_additional is False or well_data.column_additional is True and\
             well_data.current_bottom <= well_data.head_column_additional._value:
-        magnet_select = f'НКТ{well_data.nkt_diam}мм 20м + репер'
+        magnet_select = f'{nkt_str}{well_data.nkt_diam}мм 20м + репер'
 
     elif well_data.column_additional is True and well_data.column_additional_diametr._value < 110 and \
             well_data.current_bottom >= well_data.head_column_additional._value:
-        magnet_select = f'НКТ60мм 20м + репер + НКТ60мм L- {round(well_data.current_bottom - well_data.head_column_additional._value, 1)}м'
+        magnet_select = f'{nkt_str}60мм 20м + репер + {nkt_str}60мм L- ' \
+                        f'{round(well_data.current_bottom - well_data.head_column_additional._value, 1)}м'
     elif well_data.column_additional is True and well_data.column_additional_diametr._value > 110 and\
             well_data.current_bottom >= well_data.head_column_additional._value:
-        magnet_select = f'НКТ{well_data.nkt_diam}мм со снятыми фасками 20м +' \
-                        f' НКТ{well_data.nkt_diam}мм со снятыми фасками' \
+        magnet_select = f'{nkt_str}{well_data.nkt_diam}мм со снятыми фасками 20м +' \
+                        f' {nkt_str}{well_data.nkt_diam}мм со снятыми фасками' \
                         f' L- {round(well_data.current_bottom - well_data.head_column_additional._value, 1)}м'
     return magnet_select
 
@@ -33,34 +34,7 @@ def sbt_select(self):
     return sbt_select
 
 
-def magnetWork(self):
 
-    magnet_list = [
-        [f'СПО МАгниТ до '
-         f'глубины {well_data.current_bottom}м',
-         None,
-         f'Спустить магнит-ловитель + опрессовочное седло  +{magnet_select(self)} на тНКТ{well_data.nkt_diam}мм до '
-         f'глубины {well_data.current_bottom}м с замером, шаблонированием '
-         f'шаблоном {well_data.nkt_template}мм. Опрессовать НКТ на 150атм. Вымыть шар. \n'
-         f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
-         None, None, None, None, None, None, None,
-         'мастер КРС', descentNKT_norm(well_data.current_bottom, 1)],
-        [None, None,
-         f'Произвести работу магнитом на глубине {well_data.current_bottom}м',
-         None, None, None, None, None, None, None,
-         'мастер КРС', 1.5],
-        [None, None,
-         f'Поднять {magnet_select(self)} на тНКТ{well_data.nkt_diam}мм с глубины {well_data.current_bottom}м '
-         f'с доливом скважины в объеме {round(well_data.current_bottom * 1.12 / 1000, 1)}м3 тех. жидкостью '
-         f'уд.весом {well_data.fluid_work}',
-         None, None, None, None, None, None, None,
-         'мастер КРС', liftingNKT_norm(well_data.current_bottom, 1)],
-        [None, None,
-         f'ПО результатам ревизии СПО магнита повторить',
-         None, None, None, None, None, None, None,
-         'мастер КРС', None]
-    ]
-    return magnet_list
 
 
 def emergencyECN(self):
@@ -97,51 +71,6 @@ def emergencyECN(self):
                        'мастер КРС', 1.7],
                       ]
     return emergency_list
-
-
-def emergencyNKT(self):
-
-    emergenceBottom, ok = QInputDialog.getDouble(self, 'Аварийный забой',
-                                                 'Введите глубину аварийного забоя:', int(well_data.current_bottom), 2,
-                                                 int(well_data.bottomhole_drill._value), 1)
-    emergencyNKT_list = [[f'СПо печати до Н={emergenceBottom}м', None,
-                          f'Спустить с замером торцевую печать {magnet_select(self)} до Н={emergenceBottom}м '
-                          f'(Аварийная голова) с замером.'
-                          f' (При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ) ',
-                          None, None, None, None, None, None, None,
-                          'мастер КРС', descentNKT_norm(emergenceBottom, 1)],
-                         [None, None,
-                          f'Произвести работу печатью на глубине {emergenceBottom}м с обратной промывкой с '
-                          f'разгрузкой до 5т.',
-                          None, None, None, None, None, None, None,
-                          'мастер КРС', 2.5],
-                         [None, None,
-                          f'Поднять {magnet_select(self)} с доливом тех жидкости в объеме '
-                          f'{round(well_data.current_bottom * 1.25 / 1000, 1)}м3 удельным весом {well_data.fluid_work}.',
-                          None, None, None, None, None, None, None,
-                          'Мастер', liftingNKT_norm(emergenceBottom, 1.2)],
-                         [None, None,
-                          f'По результату ревизии печати, согласовать с ПТО  и УСРСиСТ и '
-                          f'подобрать ловильный инструмент',
-                          None, None, None, None, None, None, None,
-                          'мастер КРС', None],
-                         [None, None,
-                          f'Спустить с замером ловильный инструмент НКТ до Н= {emergenceBottom}м с замером . ',
-                          None, None, None, None, None, None, None,
-                          'мастер КРС', descentNKT_norm(emergenceBottom, 1.2)],
-                         [None, None,
-                          f'Произвести  ловильные работы при представителе заказчика на глубине {emergenceBottom}м.',
-                          None, None, None, None, None, None, None,
-                          'мастер КРС', 5.5],
-                         [None, None,
-                          f'Расходить и извлечь аварийный инструмент.',
-                          None, None, None, None, None, None, None,
-                          'мастер КРС', liftingNKT_norm(emergenceBottom, 1.2)]]
-    well_data.current_bottom, ok = QInputDialog.getDouble(self, 'Текущий забой',
-                                                         'Введите Текущий забой после ЛАР',
-                                                         well_data.bottomhole_artificial._value, 1,
-                                                         well_data.bottomhole_drill._value, 1)
-    return emergencyNKT_list
 
 
 def emergency_hook(self):
@@ -181,7 +110,7 @@ def emergence_sbt(self):
     emergence_sbt = [[f'СПО ловильного оборудования ', None,
                       f' По согласованию с аварийной службой УСРСиСТ, сборка и спуск компоновки: ловильного инструмента '
                       f'(типоразмер согласовать с аварийной службой УСРСиСТ) + удлинитель (L=2м) + БП {sbt_select(self)} '
-                      f'на СБТ 2 7/8 до глубины нахождения аварийной головы. \n '
+                      f'на СБТ 2 7/8" до глубины нахождения аварийной головы. \n '
                       f'Включение в компоновку ударной компоновки дополнительно согласовать с УСРСиСТ',
                       None, None, None, None, None, None, None,
                       'мастер КРС', descentNKT_norm(well_data.current_bottom, 1)],
@@ -291,7 +220,7 @@ def emergency_sticking(self):
             emergency_list.append(row)
 
     seal_list = [[f'СПо печати', None,
-                  f'Спустить с замером торцевую печать {magnet_select(self)} до аварийная головы с замером.'
+                  f'Спустить с замером торцевую печать {magnet_select(self, "НКТ")} до аварийная головы с замером.'
                   f' (При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ) ',
                   None, None, None, None, None, None, None,
                   'мастер КРС', descentNKT_norm(well_data.current_bottom, 1.2)],
@@ -300,7 +229,7 @@ def emergency_sticking(self):
                   None, None, None, None, None, None, None,
                   'мастер КРС, УСРСиСТ', 2.5],
                  [None, None,
-                  f'Поднять {magnet_select(self)} с доливом тех жидкости в объеме{round(well_data.current_bottom * 1.25 / 1000, 1)}м3'
+                  f'Поднять {magnet_select(self, "НКТ")} с доливом тех жидкости в объеме{round(well_data.current_bottom * 1.25 / 1000, 1)}м3'
                   f' удельным весом {well_data.fluid_work}.',
                   None, None, None, None, None, None, None,
                   'Мастер КРС', liftingNKT_norm(well_data.current_bottom, 1.2)],

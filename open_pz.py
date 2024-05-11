@@ -51,8 +51,12 @@ class CreatePZ(QMainWindow):
 
         well_data.region = region(well_data.cdng._value)
         if well_data.work_plan == 'dop_plan':
-            well_data.number_dp, ok = QInputDialog.getText(self, 'Номер дополнительного плана работ',
-                                                           'Введите номер дополнительного плана работ')
+            number_list = list(map(str, range(1, 50)))
+
+            well_data.number_dp, ok = QInputDialog.getItem(self, 'Номер дополнительного плана работ',
+                                                           'Введите номер дополнительного плана работ',
+                                                           number_list, 0, False)
+
             DopPlanWindow.extraction_data(self)
 
         # if well_data.work_plan != 'dop_plan' and well_data.data_in_base is False:
