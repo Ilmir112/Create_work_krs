@@ -35,7 +35,7 @@ class TabPage_SO_sand(QWidget):
         self.privyazka_question_QCombo = QComboBox(self)
         self.privyazka_question_QCombo.addItems(['Нет', 'Да'])
 
-        self.rir_question_Label = QLabel("Нужно ли производить на данной компоновке", self)
+        self.rir_question_Label = QLabel("Нужно ли производить УЦМ на данной компоновке", self)
         self.rir_question_QCombo = QComboBox(self)
         self.rir_question_QCombo.addItems(['Нет', 'Да'])
 
@@ -48,8 +48,7 @@ class TabPage_SO_sand(QWidget):
         self.need_change_zgs_label = QLabel('Необходимо ли менять ЖГС', self)
         self.need_change_zgs_combo = QComboBox(self)
         self.need_change_zgs_combo.addItems(['Нет', 'Да'])
-        if len(well_data.plast_work) == 0:
-            self.need_change_zgs_combo.setCurrentIndex(1)
+
 
         self.fluid_new_label = QLabel('удельный вес ЖГС', self)
         self.fluid_new_edit = QLineEdit(self)
@@ -97,12 +96,14 @@ class TabPage_SO_sand(QWidget):
         self.grid.addWidget(self.pressuar_new_edit, 10, 5)
 
         self.need_change_zgs_combo.currentTextChanged.connect(self.update_change_fluid)
-        self.need_change_zgs_combo.setCurrentIndex(1)
+        self.need_change_zgs_combo.setCurrentIndex(0)
 
         self.roof_sand_edit.textChanged.connect(self.update_roof)
         self.rir_question_QCombo.currentTextChanged.connect(self.update_rir)
         self.rir_question_QCombo.setCurrentIndex(1)
         self.rir_question_QCombo.setCurrentIndex(0)
+        if len(well_data.plast_work) == 0:
+            self.need_change_zgs_combo.setCurrentIndex(1)
 
     def update_roof(self):
         roof_sand_edit = self.roof_sand_edit.text()
@@ -137,13 +138,7 @@ class TabPage_SO_sand(QWidget):
 
     def update_change_fluid(self, index):
         if index == 'Да':
-            # if len(well_data.plast_project) != 0:
-            #     self.plast_new_combo = QComboBox(self)
-            #     self.plast_new_combo.addItems(well_data.plast_project)
-            #     plast = self.plast_new_combo.currentText()
-            # else:
-            #     self.plast_new_combo = QLineEdit(self)
-            #     plast = self.plast_new_combo.text()
+
 
             cat_h2s_list_plan = list(map(int, [well_data.dict_category[plast]['по сероводороду'].category for plast in
                                                well_data.plast_project if well_data.dict_category.get(plast) and
@@ -217,12 +212,12 @@ class SandWindow(QMainWindow):
         elif well_data.column_additional is True and \
                 well_data.column_additional_diametr._value < 110 and \
                 well_data.current_bottom >= well_data.head_column_additional._value:
-            sand_select = f'перо + НКТ{60}мм 20м + реперный патрубок + НКТ60мм ' \
+            sand_select = f'обточную муфту + НКТ{60}мм 20м + реперный патрубок + НКТ60мм ' \
                           f'{round(well_data.current_bottom - well_data.head_column_additional._value, 0)}м '
         elif well_data.column_additional is True and \
                 well_data.column_additional_diametr._value > 110 and \
                 well_data.current_bottom >= well_data.head_column_additional._value:
-            sand_select = f'перо + НКТ{well_data.nkt_diam}мм со снятыми фасками {20}м + реперный патрубок + ' \
+            sand_select = f'обточную муфту + НКТ{well_data.nkt_diam}мм со снятыми фасками {20}м + реперный патрубок + ' \
                           f'НКТ{well_data.nkt_diam}мм со снятыми фасками ' \
                           f'{round(well_data.current_bottom - well_data.head_column_additional._value, 0)}м'
         return sand_select
@@ -237,7 +232,7 @@ class SandWindow(QMainWindow):
 
 
         filling_list = [
-            [f'Спустить  {self.sand_select()}  на НКТ{nkt_diam}м до глубины {round(filling_depth-100,0)}м', None,
+            [f'Спустить  {self.sand_select()} на НКТ{nkt_diam}м до глубины {round(filling_depth-100,0)}м', None,
          f' Спустить  {self.sand_select()}  на НКТ{nkt_diam}м до глубины {round(filling_depth-100,0)}м с замером, '
          f'шаблонированием шаблоном {well_data.nkt_template}мм. (При СПО первых десяти НКТ на '
          f'спайдере дополнительно устанавливать элеватор ЭХЛ)',

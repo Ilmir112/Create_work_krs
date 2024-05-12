@@ -68,12 +68,13 @@ class TabPage_SO_rir(QWidget):
 
         if len(well_data.plast_work) != 0:
             pakerDepth = well_data.perforation_sole - 20
+            if pakerDepth != '':
+                self.paker_depth_edit.setText(str(int(pakerDepth)))
         else:
             if well_data.leakiness:
                 pakerDepth = min([float(nek.split('-')[0]) - 10
                                   for nek in well_data.dict_perforation['НЭК']['интервал'].keys()])
 
-        self.paker_depth_edit.setText(str(int(pakerDepth)))
 
         self.pakerDepthZumpf_Label = QLabel("Глубина посадки для ЗУМПФа", self)
         self.pakerDepthZumpf_edit = QLineEdit(self)
@@ -92,8 +93,6 @@ class TabPage_SO_rir(QWidget):
         self.need_change_zgs_combo.addItems(['Нет', 'Да'])
         if len(well_data.plast_work) == 0:
             self.need_change_zgs_combo.setCurrentIndex(1)
-
-
 
         self.fluid_new_label = QLabel('удельный вес ЖГС', self)
         self.fluid_new_edit = QLineEdit(self)

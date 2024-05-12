@@ -788,7 +788,8 @@ class MyWindow(QMainWindow):
             else:
                 string_work = 'ГНКТ'
 
-            filenames = f"{well_data.well_number._value} {well_data.well_area._value} кат {int(well_data.cat_P_1[0])} " \
+            filenames = f"{well_data.well_number._value} {well_data.well_area._value} кат " \
+                        f"{int(well_data.category_pressuar)} " \
                         f"{string_work}.xlsx"
             full_path = path + "/" + filenames
             # print(f'10 - {ws2.max_row}')
@@ -881,6 +882,7 @@ class MyWindow(QMainWindow):
             well_data.well_volume_in_PZ = []
             well_data.expected_pick_up = {}
             well_data.current_bottom = 0
+            well_data.emergency_bottom = well_data.current_bottom
             well_data.fluid_work = 0
             well_data.static_level = ProtectedIsNonNone('не корректно')
             well_data.dinamic_level = ProtectedIsNonNone('не корректно')
@@ -1083,7 +1085,7 @@ class MyWindow(QMainWindow):
         emergency_menu.addAction(emergency_print_action)
         emergency_print_action.triggered.connect(self.emergency_print_action)
 
-        lar_sbt_action = QAction("ЛАР на СБТ правое", self)
+        lar_sbt_action = QAction("ловильные работы", self)
         emergency_menu.addAction(lar_sbt_action)
         lar_sbt_action.triggered.connect(self.lar_sbt_action)
 
@@ -1251,9 +1253,17 @@ class MyWindow(QMainWindow):
         self.populate_row(self.ins_ind, emergency_sbt_list, self.table_widget)
 
     def lar_sbt_action(self):
-        from work_py.emergencyWork import emergence_sbt
-        emergency_sbt_list = emergence_sbt(self)
-        self.populate_row(self.ins_ind, emergency_sbt_list, self.table_widget)
+        from work_py.emergency_lar import Emergency_lar
+        if self.raid_window is None:
+            self.raid_window = Emergency_lar(well_data.ins_ind, self.table_widget)
+            # self.raid_window.setGeometry(200, 400, 300, 400)
+            self.raid_window.show()
+            self.pause_app()
+            well_data.pause = True
+            self.raid_window = None
+        else:
+            self.raid_window.close()  # Close window.
+            self.raid_window = None
 
     def emergency_print_action(self):
         from work_py.emergency_printing import Emergency_print

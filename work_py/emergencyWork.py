@@ -22,54 +22,56 @@ def magnet_select(self, nkt_str):
     return magnet_select
 
 
-def sbt_select(self):
+def sbt_select(self, nkt_str_combo):
 
-    if well_data.column_additional is False or well_data.column_additional is True and \
+    if well_data.column_additional is False and well_data.column_additional_diametr._value < 127:
+        sbt_select = 'СБТ 2 3/8"'
+
+    elif well_data.column_additional is False or well_data.column_additional is True and \
             well_data.current_bottom <= well_data.head_column_additional._value:
-        sbt_select = ''
+        sbt_select = 'СБТ 2 7/8"'
 
     elif well_data.column_additional is True and well_data.column_additional_diametr._value < 127:
-        sbt_select = f'СБТ 2 3/8 L- {round(well_data.current_bottom - well_data.head_column_additional._value,0)}м '
+        sbt_select = f'СБТ 2 3/8 L- {round(well_data.current_bottom - well_data.head_column_additional._value,0)}м ' \
+                     f'на СБТ 2 7/8"'
+
 
     return sbt_select
 
-
-
-
-
 def emergencyECN(self):
-    emergency_list = [[None, None,
-                       f'При отрицательных результатах по срыву ЭЦН, по согласованию с УСРСиСТ увеличить нагрузку до 33т. '
-                       f'При отрицательных результатах:',
-                       None, None, None, None, None, None, None,
-                       'мастер КРС', None],
-                      [None, None,
-                       f'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС "Ойл-сервис". '
-                       f'Составить акт готовности скважины и передать его начальнику партии  ',
-                       None, None, None, None, None, None, None,
-                       'мастер КРС', None],
-                      [f'Произвести запись ПО по НКТ', None,
-                       f'Произвести запись ПО по НКТ, по результатам произвести отстрел тНКТ в внемуфтовое соединие в '
-                       f'интервале согласованном с УСРСиСТ. Поднять аварийные НКТ до устья. ЗАДАЧА 2.9.3. \n'
-                       f'При выявлении отложений солей и гипса, отобрать шлам. Сдать в лабораторию для проведения хим. '
-                       f'анализа.',
-                       None, None, None, None, None, None, None,
-                       'Мастер, подрядчик по ГИС', 12],
-                      [None, None,
-                       f'Поднять аварийные НКТ до устья. При выявлении отложений солей и гипса, отобрать шлам. '
-                       f'Сдать в лабораторию для проведения хим. анализа.',
-                       None, None, None, None, None, None, None,
-                       'мастер КРС', 6.5],
-                      [f'Завоз на скважину СБТ', None,
-                       f'Завоз на скважину СБТф73мм – Укладка труб на стеллажи.',
-                       None, None, None, None, None, None, None,
-                       'мастер КРС', 6.5],
-                      [None, None,
-                       f'Завоз на скважину инструмента для проведения аварийно-ловильных работ: Крючки, ВТ-73, ОВ-122, '
-                       f'кольцевой фрез (типоразмер согласовать с аварийной службой УСРСиСТ)',
-                       None, None, None, None, None, None, None,
-                       'мастер КРС', 1.7],
-                      ]
+    emergency_list = [
+        [None, None,
+           f'При отрицательных результатах по срыву ЭЦН, по согласованию с УСРСиСТ увеличить нагрузку до 33т. '
+           f'При отрицательных результатах:',
+           None, None, None, None, None, None, None,
+           'мастер КРС', None],
+          [None, None,
+           f'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС "Ойл-сервис". '
+           f'Составить акт готовности скважины и передать его начальнику партии  ',
+           None, None, None, None, None, None, None,
+           'мастер КРС', None],
+          [f'Произвести запись ПО по НКТ', None,
+           f'Произвести запись ПО по НКТ, по результатам произвести отстрел тНКТ в внемуфтовое соединие в '
+           f'интервале согласованном с УСРСиСТ. Поднять аварийные НКТ до устья. ЗАДАЧА 2.9.3. \n'
+           f'При выявлении отложений солей и гипса, отобрать шлам. Сдать в лабораторию для проведения хим. '
+           f'анализа.',
+           None, None, None, None, None, None, None,
+           'Мастер, подрядчик по ГИС', 12],
+          [None, None,
+           f'Поднять аварийные НКТ до устья. При выявлении отложений солей и гипса, отобрать шлам. '
+           f'Сдать в лабораторию для проведения хим. анализа.',
+           None, None, None, None, None, None, None,
+           'мастер КРС', 6.5],
+          [f'Завоз на скважину СБТ', None,
+           f'Завоз на скважину СБТф73мм – Укладка труб на стеллажи.',
+           None, None, None, None, None, None, None,
+           'мастер КРС', 6.5],
+          [None, None,
+           f'Завоз на скважину инструмента для проведения аварийно-ловильных работ: Крючки, ВТ-73, ОВ-122, '
+           f'кольцевой фрез (типоразмер согласовать с аварийной службой УСРСиСТ)',
+           None, None, None, None, None, None, None,
+           'мастер КРС', 1.7],
+          ]
     return emergency_list
 
 
@@ -105,69 +107,7 @@ def emergency_hook(self):
     return emergency_list
 
 
-def emergence_sbt(self):
 
-    emergence_sbt = [[f'СПО ловильного оборудования ', None,
-                      f' По согласованию с аварийной службой УСРСиСТ, сборка и спуск компоновки: ловильного инструмента '
-                      f'(типоразмер согласовать с аварийной службой УСРСиСТ) + удлинитель (L=2м) + БП {sbt_select(self)} '
-                      f'на СБТ 2 7/8" до глубины нахождения аварийной головы. \n '
-                      f'Включение в компоновку ударной компоновки дополнительно согласовать с УСРСиСТ',
-                      None, None, None, None, None, None, None,
-                      'мастер КРС', descentNKT_norm(well_data.current_bottom, 1)],
-                     [None, None,
-                      f'Во избежание срабатывания механизма фиксации плашек в освобожденном положении, спуск '
-                      f'следует производить без вращения труболовки',
-                      None, None, None, None, None, None, None,
-                      'мастер КРС', None],
-                     [f'монтаж ведущей трубы', None,
-                      f'Произвести монтаж ведущей трубы и мех.ротора.\n '
-                      f'За 2-5 метров до верхнего конца аварийного объекта при наличии циркуляции рекомендуется '
-                      f'восстановить '
-                      f'циркуляцию и промыть скважину тех водой {well_data.fluid_work}. При прокачке промывочной '
-                      f'жидкости спустить '
-                      f'труболовку до верхнего конца аварийной колонны.\n'
-                      f'Произвести ловильные работы на "голове" аварийной компоновки. Количество подходов и оборотов '
-                      f'инструмента  согласовать с аварийной службой супервайзинга.'],
-                     [None, None,
-                      f'Произвести расхаживание аварийной компоновки с постепенным увеличением'
-                      f' веса до 50т. Дальнейшие '
-                      f'увеличение нагрузки согласовать с УСРСиСТ. При отрицательных '
-                      f'результатах произвести освобождение ',
-                      None, None, None, None, None, None, None,
-                      'мастер КРС, УСРСиСТ', 10],
-                     [None, None,
-                      f'При положительных результатах расхаживания - демонтаж ведущей трубы и мех.ротора. '
-                      f'Поднять компоновку с доливом тех жидкости в '
-                      f'объеме {round(well_data.current_bottom * 1.25 / 1000, 1)}м3'
-                      f' удельным весом {well_data.fluid_work}.',
-                      None, None, None, None, None, None, None,
-                      'Мастер', liftingNKT_norm(well_data.current_bottom, 1)],
-                     [None, None,
-                      f'При необходимости: Сборка и спуск компоновки: кольцевой фрезер с удлинителем '
-                      f'L= 2,0м + СБТ, до глубины '
-                      f'нахождения аварийной "головы"',
-                      None, None, None, None, None, None, None,
-                      'мастер КРС, УСРСиСТ', descentNKT_norm(well_data.current_bottom, 1.2)],
-                     [None, None,
-                      f'Монтаж монтаж ведущей трубы и мех.ротора. Обуривание аварийной головы на глубины согласованной с '
-                      f'УСРСиСТ демонтаж мех ротора',
-                      None, None, None, None, None, None, None,
-                      'мастер КРС, УСРСиСТ', 10],
-                     [None, None,
-                      f'Поднять компоновку с доливом тех жидкости в объеме {round(well_data.current_bottom * 1.25 / 1000, 1)}м3'
-                      f' удельным весом {well_data.fluid_work}.',
-                      None, None, None, None, None, None, None,
-                      'Мастер, подрядчик по ГИС', liftingNKT_norm(well_data.current_bottom, 1)],
-                     [None, None,
-                      f'По согласованию заказчиком повторить ловильные аварийные работы'
-                      f' с подбором аварийного оборудования',
-                      None, None, None, None, None, None, None,
-                      'Мастер, подрядчик по ГИС', None],
-                     [None, None,
-                      f'При отрицательном результате дальнейшие работы по дополнительному плану работ',
-                      None, None, None, None, None, None, None,
-                      'Мастер, подрядчик по ГИС', None]]
-    return emergence_sbt
 
 
 def emergency_sticking(self):
@@ -229,7 +169,8 @@ def emergency_sticking(self):
                   None, None, None, None, None, None, None,
                   'мастер КРС, УСРСиСТ', 2.5],
                  [None, None,
-                  f'Поднять {magnet_select(self, "НКТ")} с доливом тех жидкости в объеме{round(well_data.current_bottom * 1.25 / 1000, 1)}м3'
+                  f'Поднять {magnet_select(self, "НКТ")} с доливом тех жидкости в '
+                  f'объеме{round(well_data.current_bottom * 1.25 / 1000, 1)}м3'
                   f' удельным весом {well_data.fluid_work}.',
                   None, None, None, None, None, None, None,
                   'Мастер КРС', liftingNKT_norm(well_data.current_bottom, 1.2)],

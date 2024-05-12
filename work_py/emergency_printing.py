@@ -71,7 +71,10 @@ class TabPage_SO_print(QWidget):
             self.nkt_select_combo.setCurrentIndex(1)
             self.nkt_select_combo.setCurrentIndex(0)
         else:
-            self.nkt_select_combo.setCurrentIndex(1)    
+            self.nkt_select_combo.setCurrentIndex(1)
+
+        if well_data.emergency_well is True:
+            self.emergency_bottom_line.setText(f'{well_data.emergency_bottom}')
     
     def update_raid_edit(self, index):
         if index == 'печать в ЭК':
