@@ -193,10 +193,12 @@ def raiding_interval(ryber_key):
                         if float(interval[1]) + 20 <= well_data.current_bottom and \
                                 well_data.shoe_column._value >= float(interval[1]) + 20:
                             crt = [float(interval[0]) - 20, float(interval[1]) + 20]
-
-                        elif float(interval[1]) + 20 >= well_data.shoe_column._value:
+                        elif float(interval[1]) + 20 >= well_data.shoe_column._value and \
+                                well_data.shoe_column._value > well_data.current_bottom:
                             crt = [float(interval[0]) - 20, well_data.shoe_column._value]
-
+                        elif float(interval[1]) + 20 >= well_data.shoe_column._value and \
+                                well_data.shoe_column._value <= well_data.current_bottom:
+                            crt = [float(interval[0]) - 20,  well_data.current_bottom]
                         elif float(interval[1]) + 20 < well_data.shoe_column._value and \
                                 float(interval[1] + 20) > well_data.current_bottom:
                             crt = [float(interval[0]) - 20, well_data.current_bottom]

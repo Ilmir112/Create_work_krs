@@ -338,9 +338,10 @@ class PerforationWindow(QMainWindow):
             roof = self.tableWidget.item(row, 0).text()
             sool = self.tableWidget.item(row, 1).text()
             pvr_str = TabPage_SO.select_type_perforation(self, sool)
-            perforation[2] = [f"ГИС ( Трубная Перфорация ЗАДАЧА 2.9.2)", None,
-                        f"ГИС ( Трубная Перфорация ЗАДАЧА 2.9.2). {pvr_str}", None, None, None, None,
-                        None, None, None, 'подрядчик по ГИС', None]
+            if type_perforation == 'Трубная перфорация':
+                perforation[2] = [f"ГИС ( Трубная Перфорация ЗАДАЧА 2.9.2)", None,
+                            f"ГИС ( Трубная Перфорация ЗАДАЧА 2.9.2). {pvr_str}", None, None, None, None,
+                            None, None, None, 'подрядчик по ГИС', None]
             type_charge = self.tableWidget.item(row, 2).text()
             count_otv = self.tableWidget.item(row, 3).text()
             count_charge = self.tableWidget.item(row, 4).text()

@@ -102,15 +102,17 @@ class DopPlanWindow(QMainWindow):
             # Проверяем наличие таблицы с определенным именем
             result_table = 0
             number_dp = int(well_data.number_dp) - 1
-            if number_dp == 0:
+            if well_data.work_plan in ['krs', 'plan_change']:
                 work_plan = 'krs'
-                table_name = f'"{well_data.well_number._value + well_data.well_area._value + work_plan}"'
+
+                table_name = f'{well_data.well_number._value + well_data.well_area._value + work_plan}'
                 print(f'имя таблицы в {table_name}')
+
                 cursor1.execute(f"SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = '{table_name}')")
                 result_table = cursor1.fetchone()
-            else:
-                work_plan = f'dop_plan'
-                table_name = f'"{well_data.well_number._value + well_data.well_area._value + work_plan}"'
+                print(result_table)
+            elif well_data.work_plan == f'dop_plan':
+                table_name = f'"{well_data.well_number._value + well_data.well_area._value + well_data.work_plan}"'
                 for i in range(1, number_dp + 1, -1):
                     try:
                         work_plan = f'dop_plan{i}'
@@ -126,43 +128,17 @@ class DopPlanWindow(QMainWindow):
                     if len(result_table) > 0:
                         break
 
-            if result_table != 0:
+            if result_table[0]:
                 well_data.data_in_base = True
                 cursor2 = conn1.cursor()
 
-                cursor2.execute(f"SELECT * FROM {table_name}")
+                cursor2.execute(f'SELECT * FROM "{table_name}"')
                 result = cursor2.fetchall()
-                well_data.paragraph_row, ok = QInputDialog.getInt(self, 'пункт плана работ',
-                                                                  'Введите пункт плана работ после которого идет изменение')
-                while len(result) < well_data.paragraph_row:
-                    mes = QMessageBox.warning(self, 'ОШИБКА', f'нет пункта {well_data.paragraph_row} в базе данных ')
-                    well_data.paragraph_row, ok = QInputDialog.getInt(self, 'пункт плана работ',
-                                                                  'Введите пункт плана работ после которого идет изменение')
+                if well_data.work_plan == 'dop_plan':
+                    DopPlanWindow.insert_data_dop_plan(self, result)
+                elif well_data.work_plan == 'plan_change':
+                    DopPlanWindow.insert_data_plan(self, result)
 
-
-
-                well_data.current_bottom = result[well_data.paragraph_row][1]
-                print(f'забой {well_data.current_bottom}')
-                well_data.dict_perforation = json.loads(result[well_data.paragraph_row][2])
-                well_data.plast_all = json.loads(result[well_data.paragraph_row][3])
-                well_data.plast_work = json.loads(result[well_data.paragraph_row][4])
-                well_data.leakage = json.loads(result[well_data.paragraph_row][5])
-                if result[well_data.paragraph_row][6] == 0:
-                    well_data.column_additional = True
-                else:
-                    well_data.column_additional = False
-
-                well_data.fluid = result[well_data.paragraph_row][7]
-                well_data.category_pressuar = result[well_data.paragraph_row][8]
-                well_data.category_h2s = result[well_data.paragraph_row][9]
-                well_data.category_gf = result[well_data.paragraph_row][10]
-                well_data.template_depth = result[well_data.paragraph_row][11]
-
-                well_data.skm_list = json.loads(result[well_data.paragraph_row][12])
-
-                well_data.problemWithEk_depth = result[well_data.paragraph_row][13]
-                well_data.problemWithEk_diametr = result[well_data.paragraph_row][14]
-                well_data.dict_perforation_short = json.loads(result[well_data.paragraph_row][2])
 
             else:
                 mes = QMessageBox.warning(self, 'Проверка наличия таблицы в базе данных',
@@ -171,13 +147,54 @@ class DopPlanWindow(QMainWindow):
 
         except psycopg2.Error as e:
             # Выведите сообщение об ошибке
-            mes = QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных, Скважина не добавлена в базу')
+            mes = QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных,')
         finally:
             # Закройте курсор и соединение
             if cursor1:
                 cursor1.close()
             if conn1:
                 conn1.close()
+
+    def insert_data_dop_plan(self, result):
+        well_data.paragraph_row, ok = QInputDialog.getInt(self, 'пункт плана работ',
+                                                          'Введите пункт плана работ после которого идет изменение')
+        while len(result) < well_data.paragraph_row:
+            mes = QMessageBox.warning(self, 'ОШИБКА', f'нет пункта {well_data.paragraph_row} в базе данных ')
+            well_data.paragraph_row, ok = QInputDialog.getInt(self, 'пункт плана работ',
+                                                              'Введите пункт плана работ после которого идет изменение')
+
+        well_data.current_bottom = result[well_data.paragraph_row][1]
+
+        well_data.dict_perforation = json.loads(result[well_data.paragraph_row][2])
+        well_data.plast_all = json.loads(result[well_data.paragraph_row][3])
+        well_data.plast_work = json.loads(result[well_data.paragraph_row][4])
+        well_data.leakage = json.loads(result[well_data.paragraph_row][5])
+        if result[well_data.paragraph_row][6] == 0:
+            well_data.column_additional = True
+        else:
+            well_data.column_additional = False
+
+        well_data.fluid = result[well_data.paragraph_row][7]
+        well_data.category_pressuar = result[well_data.paragraph_row][8]
+        well_data.category_h2s = result[well_data.paragraph_row][9]
+        well_data.category_gf = result[well_data.paragraph_row][10]
+        well_data.template_depth = result[well_data.paragraph_row][11]
+
+        well_data.skm_list = json.loads(result[well_data.paragraph_row][12])
+
+        well_data.problemWithEk_depth = result[well_data.paragraph_row][13]
+        well_data.problemWithEk_diametr = result[well_data.paragraph_row][14]
+        well_data.dict_perforation_short = json.loads(result[well_data.paragraph_row][2])
+
+    def insert_data_plan(self, result):
+        well_data.data_list = []
+        for row in result:
+            data_list = []
+            for data in row:
+                data_list.append(data)
+            well_data.data_list.append(data_list)
+
+
 
     def work_list(self, work_earlier):
         krs_begin = [[None, None,

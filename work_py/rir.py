@@ -435,57 +435,53 @@ class RirWindow(QMainWindow):
                                          roof_rir_edit, sole_rir_edit, pressureZUMPF_question = 'Не нужно',
                                          diametr_paker = 122, paker_khost= 0, paker_depth= 0):
 
+        rir_rpk_question = QMessageBox.question(self, 'посадку между пластами?', 'посадку между пластами?')
+        RirWindow.rir_rpk_plast_true = False
+        if rir_rpk_question == QMessageBox.StandardButton.Yes:
+            RirWindow.rir_rpk_plast_true = True
+
+
         # print(paker_need_Combo, plast_combo, diametr_paker, paker_khost,
         #            paker_depth, pressureZUMPF_question)
         rir_list = self.need_paker(paker_need_Combo, plast_combo, diametr_paker, paker_khost,
                    paker_depth, pressureZUMPF_question)
 
-        rir_rpk_question = QMessageBox.question(self, 'посадку между пластами?', 'посадку между пластами?')
 
-        if rir_rpk_question == QMessageBox.StandardButton.Yes:
-            rir_rpk_plast_true = True
+
+
+        if RirWindow.rir_rpk_plast_true:
+                rir_q_list = [
+              [f'посадить пакер на глубину {roof_rir_edit}м'
+                  , None,
+                           f'посадить пакер на глубину {roof_rir_edit}м',
+                            None, None, None, None, None, None, None,
+                            'мастер КРС', 1],
+              [f'Насыщение 5м3. Определить приемистость {plast_combo} при Р=80-100атм',
+               None,
+               f'Произвести насыщение скважины в объеме 5м3. Определить приемистость {plast_combo} при Р=80-100атм '
+               f'в присутствии представителя УСРСиСТ или подрядчика по РИР. (Вести контроль за отдачей жидкости '
+               f'после закачки, объем согласовать с подрядчиком по РИР). В случае приёмистости менее  250м3/сут '
+               f'при Р=100атм произвести соляно-кислотную обработку скважины в объеме 1м3 HCl-12% с целью увеличения '
+               f'приемистости по технологическому плану',
+                None, None, None, None, None, None, None,
+                'мастер КРС', 1.35]]
+                for row in rir_q_list:
+                    rir_list.insert(-1, row)
         else:
-            rir_rpk_plast_true = False
 
-
-        if rir_rpk_plast_true:
-            rir_q_list = [[f'Привязка по ГК и ЛМ', None,
-          f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС "Ойл-сервис". '
-          f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером от 14.10.2021г.'
-          f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины',
-          None, None, None, None, None, None, None,
-          'Мастер КРС, подрядчик по ГИС', 4],
-          [f'посадить пакер на глубину {paker_depth}м'
-              , None,
-                       f'посадить пакер на глубину {paker_depth}м',
-                        None, None, None, None, None, None, None,
-                        'мастер КРС', 1],
-          [f'Насыщение 5м3. Определить приемистость {plast_combo} при Р=80-100атм',
-           None,
-                       f'Произвести насыщение скважины в объеме 5м3. Определить приемистость {plast_combo} при Р=80-100атм '
-                       f'в присутствии представителя УСРСиСТ или подрядчика по РИР. (Вести контроль за отдачей жидкости '
-                       f'после закачки, объем согласовать с подрядчиком по РИР). В случае приёмистости менее  250м3/сут '
-                       f'при Р=100атм произвести соляно-кислотную обработку скважины в объеме 1м3 HCl-12% с целью увеличения '
-                       f'приемистости по технологическому плану',
-            None, None, None, None, None, None, None,
-            'мастер КРС', 1.35]]
-            for row in rir_q_list:
-                rir_list.insert(-1, row)
-        else:
-            rir_rpk_plast_true = False
-
-            rir_q_list = [
-                          [f'Насыщение 5м3. Определить Q {plast_combo} при Р=80-100атм',
-                           None,
-                           f'Произвести насыщение скважины в объеме 5м3. Определить приемистость {plast_combo} при Р=80-100атм '
-                           f'в присутствии представителя УСРСиСТ или подрядчика по РИР. (Вести контроль за отдачей жидкости '
-                           f'после закачки, объем согласовать с подрядчиком по РИР). В случае приёмистости менее  250м3/сут '
-                           f'при Р=100атм произвести соляно-кислотную обработку скважины в объеме 1м3 HCl-12% с целью увеличения '
-                           f'приемистости по технологическому плану',
-                           None, None, None, None, None, None, None,
-                           'мастер КРС', 1.35]]
-            for row in rir_q_list[::-1]:
-                rir_list.insert(-1, row)
+            if self.rir_type_Combo not in ['РИР с РПП']:
+                rir_q_list = [
+                  [f'Насыщение 5м3. Определить Q {plast_combo} при Р=80-100атм',
+                   None,
+                   f'Произвести насыщение скважины в объеме 5м3. Определить приемистость {plast_combo} при Р=80-100атм '
+                   f'в присутствии представителя УСРСиСТ или подрядчика по РИР. (Вести контроль за отдачей жидкости '
+                   f'после закачки, объем согласовать с подрядчиком по РИР). В случае приёмистости менее  250м3/сут '
+                   f'при Р=100атм произвести соляно-кислотную обработку скважины в объеме 1м3 HCl-12% с целью увеличения '
+                   f'приемистости по технологическому плану',
+                   None, None, None, None, None, None, None,
+                   'мастер КРС', 1.35]]
+                for row in rir_q_list[::-1]:
+                    rir_list.insert(-1, row)
 
         rir_work_list = [[f'СПО пакера РПК до глубины {roof_rir_edit}м', None,
                        f'Спустить   пакера РПК {self.rpk_nkt(roof_rir_edit)}  на тНКТ{well_data.nkt_diam}мм до глубины {roof_rir_edit}м с '
@@ -495,7 +491,7 @@ class RirWindow(QMainWindow):
                        f'РИР или УСРСиСТ.',
             None, None, None, None, None, None, None,
         'мастер КРС', descentNKT_norm(roof_rir_edit,1.2)],
-         [f'Привязкапо ГК и ЛМ', None,
+         [f'Привязка по ГК и ЛМ', None,
           f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС "Ойл-сервис". '
           f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером от 14.10.2021г. '
           f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины Отбить забой по ГК и ЛМ',
@@ -516,9 +512,9 @@ class RirWindow(QMainWindow):
           f'технологического "СТОП" ОЗЦ без давления.',
           None, None, None, None, None, None, None,
           'Мастер КРС, подрядчик РИР, УСРСиСТ', 16],
-         [f'{"".join([f"Опрессовать на Р={well_data.max_admissible_pressure._value}атм" if rir_rpk_plast_true is False else ""])}',
+         [f'{"".join([f"Опрессовать на Р={well_data.max_admissible_pressure._value}атм" if RirWindow.rir_rpk_plast_true is False else ""])}',
           None,
-          f'{"".join([f"Опрессовать цементный мост на Р={well_data.max_admissible_pressure._value}атм в присутствии представителя заказчика" if rir_rpk_plast_true is False else ""])} '
+          f'{"".join([f"Опрессовать цементный мост на Р={well_data.max_admissible_pressure._value}атм в присутствии представителя заказчика" if RirWindow.rir_rpk_plast_true is False else ""])} '
           f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ) ',
           None, None, None, None, None, None, None,
           'Мастер КРС, подрядчик РИР, УСРСиСТ',0.67],
@@ -886,16 +882,16 @@ class RirWindow(QMainWindow):
         if paker_need_Combo == 'Нужно СПО':
 
             rir_list = OpressovkaEK.paker_list(self, diametr_paker, paker_khost, paker_depth, pakerDepthZumpf, pressureZUMPF_question)
-
-            rir_q_list = [f'насыщение 5м3. Определить Q {plast_combo} при Р=80-100атм. СКВ', None,
-              f'Произвести насыщение скважины в объеме 5м3. Определить приемистость {plast_combo} при Р=80-100атм '
-              f'в присутствии представителя УСРСиСТ или подрядчика по РИР. (Вести контроль за отдачей жидкости '
-              f'после закачки, объем согласовать с подрядчиком по РИР). В случае приёмистости менее  250м3/сут '
-              f'при Р=100атм произвести соляно-кислотную обработку скважины в объеме 1м3 HCl-12% с целью увеличения '
-              f'приемистости по технологическому плану',
-              None, None, None, None, None, None, None,
-              'мастер КРС', 1.77]
-            rir_list.insert(-3, rir_q_list)
+            if RirWindow.rir_rpk_plast_true is False:
+                rir_q_list = [f'насыщение 5м3. Определить Q {plast_combo} при Р=80-100атм. СКВ', None,
+                  f'Произвести насыщение скважины в объеме 5м3. Определить приемистость {plast_combo} при Р=80-100атм '
+                  f'в присутствии представителя УСРСиСТ или подрядчика по РИР. (Вести контроль за отдачей жидкости '
+                  f'после закачки, объем согласовать с подрядчиком по РИР). В случае приёмистости менее  250м3/сут '
+                  f'при Р=100атм произвести соляно-кислотную обработку скважины в объеме 1м3 HCl-12% с целью увеличения '
+                  f'приемистости по технологическому плану',
+                  None, None, None, None, None, None, None,
+                  'мастер КРС', 1.77]
+                rir_list.insert(-3, rir_q_list)
         else:
             rir_list = []
 
@@ -957,7 +953,7 @@ class RirWindow(QMainWindow):
     def add_work(self):
 
         plast_combo = str(self.tabWidget.currentWidget().plast_combo.combo_box.currentText())
-        rir_type_Combo = str(self.tabWidget.currentWidget().rir_type_Combo.currentText())
+        self.rir_type_Combo = str(self.tabWidget.currentWidget().rir_type_Combo.currentText())
         roof_rir_edit = int(float(self.tabWidget.currentWidget().roof_rir_edit.text().replace(',', '.')))
         sole_rir_edit = int(float(self.tabWidget.currentWidget().sole_rir_edit.text().replace(',', '.')))
         paker_need_Combo = self.tabWidget.currentWidget().paker_need_Combo.currentText()
@@ -979,6 +975,11 @@ class RirWindow(QMainWindow):
                 return
             if MyWindow.check_depth_in_skm_interval(self, paker_depth) is False:
                 return
+            if pressureZUMPF_question == 'Да':
+                if paker_depth + paker_khost > well_data.current_bottom:
+                    mes = QMessageBox.critical(self, 'Ошибка', 'Компоновка ниже текущего забоя')
+                    return
+
 
 
         else:
@@ -986,7 +987,9 @@ class RirWindow(QMainWindow):
             paker_khost = 10
             paker_depth = 1000
 
-        if rir_type_Combo == 'РИР на пере': # ['РИР на пере', 'РИР с пакером', 'РИР с РПК', 'РИР с РПП']
+
+
+        if self.rir_type_Combo == 'РИР на пере': # ['РИР на пере', 'РИР с пакером', 'РИР с РПК', 'РИР с РПП']
             if (plast_new_combo == '' or fluid_new_edit == '' or pressuar_new_edit == '') and \
                     need_change_zgs_combo == 'Да':
                 mes = QMessageBox.critical(self, 'Ошибка', 'Введены не все параметры')
@@ -997,25 +1000,26 @@ class RirWindow(QMainWindow):
                 return
             if MyWindow.check_depth_in_skm_interval(self, paker_depth) is False:
                 return
+
             work_list = self.rirWithPero(paker_need_Combo, plast_combo,
                                          roof_rir_edit, sole_rir_edit, need_change_zgs_combo, plast_new_combo,
                     fluid_new_edit, pressuar_new_edit, pressureZUMPF_question,
                                          diametr_paker, paker_khost, paker_depth)
 
 
-        elif rir_type_Combo == 'РИР с пакером': # ['РИР на пере', 'РИР с пакером', 'РИР с РПК', 'РИР с РПП']
+        elif self.rir_type_Combo == 'РИР с пакером': # ['РИР на пере', 'РИР с пакером', 'РИР с РПК', 'РИР с РПП']
             # print(paker_need_Combo, plast_combo, roof_rir_edit, sole_rir_edit)
             work_list = self.rir_paker(paker_need_Combo, plast_combo,
                                          roof_rir_edit, sole_rir_edit, pressureZUMPF_question,
                                          diametr_paker, paker_khost, paker_depth)
 
-        elif rir_type_Combo == 'РИР с РПК': # ['РИР на пере', 'РИР с пакером', 'РИР с РПК', 'РИР с РПП']
+        elif self.rir_type_Combo == 'РИР с РПК': # ['РИР на пере', 'РИР с пакером', 'РИР с РПК', 'РИР с РПП']
 
             work_list = self.rir_rpk(paker_need_Combo, plast_combo,
                                          roof_rir_edit, sole_rir_edit, pressureZUMPF_question,
                                          diametr_paker, paker_khost, paker_depth)
 
-        elif rir_type_Combo == 'РИР с РПП': # ['РИР на пере', 'РИР с пакером', 'РИР с РПК', 'РИР с РПП']
+        elif self.rir_type_Combo == 'РИР с РПП': # ['РИР на пере', 'РИР с пакером', 'РИР с РПК', 'РИР с РПП']
 
             work_list = self.rir_rpp(paker_need_Combo, plast_combo,
                                          roof_rir_edit, sole_rir_edit, pressureZUMPF_question,
@@ -1041,8 +1045,6 @@ class RirWindow(QMainWindow):
         pakerIzvPaker, ok = QInputDialog.getInt(None, 'Глубина извлекаемого пакера',
                                           'Введите глубину установки извлекаемого пакера ',
                                           int(well_data.perforation_roof-50), 0, int(well_data.bottomhole_drill._value))
-
-
 
         well_data.pakerIzvPaker = pakerIzvPaker
         rir_list = [[f'СПО пакера извлекаемый до глубины {pakerIzvPaker}м',

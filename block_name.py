@@ -211,9 +211,18 @@ def razdel_1(self, region):
     if well_data.data_in_base is False:
         if len(well_data.plast_work) != 0:
             # print(well_data.plast_work, well_data.dict_category)
-            cat_P_1 = well_data.dict_category[well_data.plast_work[0]]['по давлению'].category
-            cat_h2s_list = well_data.dict_category[well_data.plast_work[0]]['по сероводороду'].category
-            cat_gaz = well_data.dict_category[well_data.plast_work[0]]['по газовому фактору'].category
+            try:
+                cat_P_1 = well_data.dict_category[well_data.plast_work[0]]['по давлению'].category
+                cat_h2s_list = well_data.dict_category[well_data.plast_work[0]]['по сероводороду'].category
+                cat_gaz = well_data.dict_category[well_data.plast_work[0]]['по газовому фактору'].category
+            except:
+                cat_P_1 = well_data.cat_P_1[0]
+                cat_h2s_list = well_data.cat_h2s_list[0]
+                cat_gaz = well_data.cat_gaz_f_pr[0]
+        else:
+            cat_P_1 = well_data.cat_P_1[0]
+            cat_h2s_list = well_data.cat_h2s_list[0]
+            cat_gaz = well_data.cat_gaz_f_pr[0]
         try:
             cat_P_1_plan = well_data.dict_category[well_data.plast_project[0]]['по давлению'].category
             cat_h2s_list_plan = well_data.dict_category[well_data.plast_project[0]]['по сероводороду'].category

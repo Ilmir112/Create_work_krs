@@ -58,7 +58,7 @@ cdng = ProtectedIsNonNone('не корректно')
 gnkt_number = 0
 gnkt_length = 0
 diametr_length = 0
-emergency_bottom
+emergency_bottom = ''
 iznos = 0
 pipe_mileage = 0
 pipe_fatigue = 0
@@ -169,7 +169,7 @@ fluid_work = 0
 static_level = 0
 dinamic_level = 0
 ins_ind = 0
-number_dp = ''
+number_dp = 0
 len_razdel_1 = 0
 current_bottom = 0
 count_template = 0

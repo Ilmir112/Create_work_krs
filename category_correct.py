@@ -70,13 +70,17 @@ class TabPage_SO(QWidget):
                         self.plast_all.append(work_plast)
                         work_plast_index = 1
             except:
-
-                work_plast, ok = QInputDialog.getText(None, 'индекс пласта', 'Введите индекc пласта вскрываемого')
-                while work_plast in well_data.plast_all:
-                    mes = QMessageBox.warning(self, 'Ошибка', 'Пласт есть в списке')
+                plast_index_str = QMessageBox.question(self, 'рабочие пласты',
+                                                       'Есть ли индекс пласта в интервалах перфорации')
+                if plast_index_str == QMessageBox.StandardButton.Yes:
+                    work_plast = well_data.plast_all[0]
+                else:
                     work_plast, ok = QInputDialog.getText(None, 'индекс пласта', 'Введите индекc пласта вскрываемого')
+                    while work_plast in well_data.plast_all:
+                        mes = QMessageBox.warning(self, 'Ошибка', 'Пласт есть в списке')
+                        work_plast, ok = QInputDialog.getText(None, 'индекс пласта', 'Введите индекc пласта вскрываемого')
 
-                self.plast_all.append(work_plast)
+                    self.plast_all.append(work_plast)
                 # well_data.plast_all.append(work_plast)
                 work_plast_index = 1
 

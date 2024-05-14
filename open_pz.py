@@ -14,7 +14,6 @@ from work_py.dop_plan_py import DopPlanWindow
 
 
 class CreatePZ(QMainWindow):
-
     def __init__(self, wb, ws, data_window, perforation_correct_window2, parent=None):
         super(CreatePZ, self).__init__(parent)
 
@@ -50,72 +49,76 @@ class CreatePZ(QMainWindow):
         Well_data.read_well(self, ws, well_data.cat_well_max._value, well_data.data_pvr_min._value)
 
         well_data.region = region(well_data.cdng._value)
-        if well_data.work_plan == 'dop_plan':
+        if work_plan == 'dop_plan':
             number_list = list(map(str, range(1, 50)))
 
             well_data.number_dp, ok = QInputDialog.getItem(self, 'Номер дополнительного плана работ',
                                                            'Введите номер дополнительного плана работ',
                                                            number_list, 0, False)
 
-            DopPlanWindow.extraction_data(self)
-
-        # if well_data.work_plan != 'dop_plan' and well_data.data_in_base is False:
         Well_perforation.read_well(self, ws, well_data.data_pvr_min._value, well_data.data_pvr_max._value + 1)
         Well_Category.read_well(self, ws, well_data.cat_well_min._value, well_data.data_well_min._value)
 
-        if work_plan not in ['application_pvr', 'application_gis']:
-            for row_ind, row in enumerate(ws.iter_rows(values_only=True)):
-                ws.row_dimensions[row_ind].hidden = False
+        if work_plan == 'plan_change':
+            DopPlanWindow.extraction_data(self)
+            ws.delete_rows(well_data.plan_correct_index._value, ws.max_row)
+            return ws
 
-                if any(['ПЛАН РАБОТ' in str(col).upper() for col in row]) \
-                        and work_plan == 'dop_plan':
-                    ws.cell(row=row_ind + 1, column=2).value = f'ДОПОЛНИТЕЛЬНЫЙ ПЛАН РАБОТ № {well_data.number_dp}'
-                    print(f'номер доп плана {well_data.number_dp}')
+        elif work_plan not in ['application_pvr', 'application_gis']:
+            if work_plan != 'plan_change':
+                for row_ind, row in enumerate(ws.iter_rows(values_only=True)):
+                    ws.row_dimensions[row_ind].hidden = False
 
-                if 'План-заказ' in row:
-                    # print(row)
+                    if any(['ПЛАН РАБОТ' in str(col).upper() for col in row]) \
+                            and work_plan == 'dop_plan':
+                        ws.cell(row=row_ind + 1, column=2).value = f'ДОПОЛНИТЕЛЬНЫЙ ПЛАН РАБОТ № {well_data.number_dp}'
+                        print(f'номер доп плана {well_data.number_dp}')
 
-                    ws.cell(row=row_ind + 1, column=2).value = 'ПЛАН РАБОТ'
+                    if 'План-заказ' in row:
+                        # print(row)
 
-                for col, value in enumerate(row):
-                    if not value is None and col <= 12:
-                        if 'гипс' in str(value).lower() or 'гидратн' in str(value).lower():
-                            well_data.gipsInWell = True
+                        ws.cell(row=row_ind + 1, column=2).value = 'ПЛАН РАБОТ'
 
-            if well_data.emergency_well is True:
-                emergency_quest = QMessageBox.question(self, 'Аварийные работы ',
-                                                       'Программа определела что в скважине'
-                                                       f'авария - {well_data.emergency_count}, верно ли?')
-                if emergency_quest == QMessageBox.StandardButton.Yes:
-                    well_data.emergency_well = True
-                    well_data.emergency_bottom = QInputDialog.getInt(self, 'Аварийный забой',
-                                                                     'Введите глубину аварийного забоя', 0, well_data.bottomhole_artificial)
-                else:
-                    well_data.emergency_well = False
-            if well_data.problemWithEk is True:
-                problemWithEk_quest = QMessageBox.question(self, 'ВНИМАНИЕ НЕПРОХОД ',
-                                                           f'Программа определела что в скважине '
-                                                           f'ссужение в ЭК -, верно ли?')
-                if problemWithEk_quest == QMessageBox.StandardButton.Yes:
-                    well_data.problemWithEk = True
-                    well_data.problemWithEk_depth, ok = QInputDialog.getInt(self, 'Глубина сужения',
-                                                                            "ВВедите глубину cсужения", 0, 0,
-                                                                            int(well_data.current_bottom))
-                    well_data.problemWithEk_diametr = QInputDialog.getInt(self, 'диаметр внутренний cсужения',
-                                                                          "ВВедите внутренний диаметр cсужения", 0, 0,
-                                                                          int(well_data.current_bottom))[0]
-                else:
-                    well_data.problemWithEk = ProtectedIsNonNone(False)
+                    for col, value in enumerate(row):
+                        if not value is None and col <= 12:
+                            if 'гипс' in str(value).lower() or 'гидратн' in str(value).lower():
+                                well_data.gipsInWell = True
 
-            if well_data.gipsInWell is True:
-                gips_true_quest = QMessageBox.question(self, 'Гипсовые отложения',
-                                                       'Программа определела что скважина осложнена гипсовыми отложениями '
-                                                       'и требуется предварительно определить забой на НКТ, верно ли это?')
+                if well_data.emergency_well is True:
+                    emergency_quest = QMessageBox.question(self, 'Аварийные работы ',
+                                                           'Программа определела что в скважине'
+                                                           f'авария - {well_data.emergency_count}, верно ли?')
+                    if emergency_quest == QMessageBox.StandardButton.Yes:
+                        well_data.emergency_well = True
+                        well_data.emergency_bottom = QInputDialog.getInt(self, 'Аварийный забой',
+                                                                         'Введите глубину аварийного забоя',
+                                                                         0, well_data.bottomhole_artificial._value)
+                    else:
+                        well_data.emergency_well = False
+                if well_data.problemWithEk is True:
+                    problemWithEk_quest = QMessageBox.question(self, 'ВНИМАНИЕ НЕПРОХОД ',
+                                                               f'Программа определела что в скважине '
+                                                               f'ссужение в ЭК -, верно ли?')
+                    if problemWithEk_quest == QMessageBox.StandardButton.Yes:
+                        well_data.problemWithEk = True
+                        well_data.problemWithEk_depth, ok = QInputDialog.getInt(self, 'Глубина сужения',
+                                                                                "ВВедите глубину cсужения", 0, 0,
+                                                                                int(well_data.current_bottom))
+                        well_data.problemWithEk_diametr = QInputDialog.getInt(self, 'диаметр внутренний cсужения',
+                                                                              "ВВедите внутренний диаметр cсужения", 0, 0,
+                                                                              int(well_data.current_bottom))[0]
+                    else:
+                        well_data.problemWithEk = ProtectedIsNonNone(False)
 
-                if gips_true_quest == QMessageBox.StandardButton.Yes:
-                    well_data.gipsInWell = True
-                else:
-                    well_data.gipsInWell = False
+                if well_data.gipsInWell is True:
+                    gips_true_quest = QMessageBox.question(self, 'Гипсовые отложения',
+                                                           'Программа определела что скважина осложнена гипсовыми отложениями '
+                                                           'и требуется предварительно определить забой на НКТ, верно ли это?')
+
+                    if gips_true_quest == QMessageBox.StandardButton.Yes:
+                        well_data.gipsInWell = True
+                    else:
+                        well_data.gipsInWell = False
 
             try:
                 # Копирование изображения
@@ -137,16 +140,16 @@ class CreatePZ(QMainWindow):
 
                     except:
                         pass
-
-            for j in range(well_data.data_x_min._value,
-                           well_data.data_x_max._value):  # Ожидаемые показатели после ремонта
-                lst = []
-                for i in range(0, 12):
-                    lst.append(ws.cell(row=j + 1, column=i + 1).value)
-                well_data.row_expected.append(lst)
+            if work_plan != 'plan_change':
+                for j in range(well_data.data_x_min._value,
+                               well_data.data_x_max._value):  # Ожидаемые показатели после ремонта
+                    lst = []
+                    for i in range(0, 12):
+                        lst.append(ws.cell(row=j + 1, column=i + 1).value)
+                    well_data.row_expected.append(lst)
 
             if well_data.work_plan not in ['gnkt_frez', 'application_pvr',
-                                           'application_gis', 'gnkt_after_grp', 'gnkt_opz']:
+                                           'application_gis', 'gnkt_after_grp', 'gnkt_opz', 'plan_change']:
                 # print(f'план работ {well_data.work_plan}')
                 delete_rows_pz(self, ws)
                 razdel = razdel_1(self, well_data.region)
@@ -225,6 +228,7 @@ class CreatePZ(QMainWindow):
                 MyWindow.create_database_well(self, work_plan)
 
             return ws
+
         elif work_plan in ['application_pvr']:
             for row_ind, row in enumerate(ws.iter_rows(values_only=True)):
                 for col_ind, col in enumerate(row):
