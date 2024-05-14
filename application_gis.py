@@ -75,7 +75,7 @@ class TabPage_SO_pvr(QWidget):
         self.ComboBoxGeophygist = QComboBox(self)
         self.ComboBoxGeophygist.addItems(
             ['Гироскоп', 'АКЦ', 'АКЦ + СГДТ', 'СГДТ', 'ИНГК', 'ЭМДС', 'ПТС', 'РК', 'ГК и ЛМ',
-             'отбивка забоя', 'привязка', 'ВП', 'РГД по колонне', 'РГД по НКТ'])
+             'отбивка забоя', 'привязка', 'ВП', 'РГД по колонне', 'РГД по НКТ', 'Цем желонки'])
         self.ComboBoxGeophygist.currentTextChanged.connect(self.geophygist_data)
 
         self.grid = QGridLayout(self)
@@ -93,7 +93,7 @@ class TabPage_SO_pvr(QWidget):
         self.grid.addWidget(self.time_new_edit, 10, 4)
 
         self.grid.addWidget(self.work_label, 11, 3, 1, 2)
-        self.grid.addWidget(self.work_edit, 12, 3, 2, 4)
+        self.grid.addWidget(self.work_edit, 12, 3, 1, 4)
 
         self.grid.addWidget(self.nkt_label, 13, 2)
         self.grid.addWidget(self.nkt_edit, 14, 2)
@@ -123,19 +123,20 @@ class TabPage_SO_pvr(QWidget):
         self.grid.addWidget(self.labelType2, 22, 4)
         self.grid.addWidget(self.lineEditType2, 23, 4)
 
+        self.number_brigada_combo.currentTextChanged.connect(self.update_brigade)
+
+    def update_brigade(self, index):
+        self.number_telephone_edit.setText(str(well_data.dict_telephon[self.number_brigada_combo.currentText()]))
     def geophygist_data(self):
 
         if self.ComboBoxGeophygist.currentText() in ['Гироскоп', 'АКЦ', 'ЭМДС', 'ПТС', 'РК', 'ГК и ЛМ']:
             self.lineEditType.setText('0')
             self.lineEditType2.setText(f'{well_data.current_bottom}')
 
-
-
 class TabWidget(QTabWidget):
     def __init__(self):
         super().__init__()
         self.addTab(TabPage_SO_pvr(self), 'Заявка на ГИС')
-
 
 class GisApplication(QMainWindow):
 
