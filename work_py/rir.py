@@ -444,7 +444,7 @@ class RirWindow(QMainWindow):
         # print(paker_need_Combo, plast_combo, diametr_paker, paker_khost,
         #            paker_depth, pressureZUMPF_question)
         rir_list = self.need_paker(paker_need_Combo, plast_combo, diametr_paker, paker_khost,
-                   paker_depth, pressureZUMPF_question)
+                   paker_depth, pressureZUMPF_question, rir_rpk_plast_true)
 
 
 
@@ -613,7 +613,7 @@ class RirWindow(QMainWindow):
         else:
             dict_nkt = {73: sole_rir_edit}
         rir_list = RirWindow.need_paker(self, paker_need_Combo, plast_combo, diametr_paker, paker_khost,
-                   paker_depth, pressureZUMPF_question)
+                   paker_depth, pressureZUMPF_question, rir_rpk_plast_true)
 
         volume_in_nkt, volume_in_ek = RirWindow.calc_buffer(self, roof_rir_edit, sole_rir_edit, dict_nkt)
 
@@ -870,7 +870,7 @@ class RirWindow(QMainWindow):
         return pero_select
 
     def need_paker(self, paker_need_Combo, plast_combo, diametr_paker, paker_khost,
-                   paker_depth, pressureZUMPF_question):
+                   paker_depth, pressureZUMPF_question, rir_rpk_plast_true = False):
 
         from .opressovka import OpressovkaEK
 
@@ -882,7 +882,7 @@ class RirWindow(QMainWindow):
         if paker_need_Combo == 'Нужно СПО':
 
             rir_list = OpressovkaEK.paker_list(self, diametr_paker, paker_khost, paker_depth, pakerDepthZumpf, pressureZUMPF_question)
-            if RirWindow.rir_rpk_plast_true is False:
+            if rir_rpk_plast_true is False:
                 rir_q_list = [f'насыщение 5м3. Определить Q {plast_combo} при Р=80-100атм. СКВ', None,
                   f'Произвести насыщение скважины в объеме 5м3. Определить приемистость {plast_combo} при Р=80-100атм '
                   f'в присутствии представителя УСРСиСТ или подрядчика по РИР. (Вести контроль за отдачей жидкости '
@@ -903,7 +903,7 @@ class RirWindow(QMainWindow):
        
 
         rir_list = self.need_paker(paker_need_Combo, plast_combo, diametr_paker, paker_khost,
-                   paker_depth, pressureZUMPF_question)
+                   paker_depth, pressureZUMPF_question, rir_rpk_plast_true)
 
         rir_paker_list = [[ f'РИР c пакером {plast_combo} c плановой кровлей на глубине {roof_rir_edit}м',
                             None,

@@ -1,44 +1,95 @@
-import sys
 import logging
-from PyQt5.QtWidgets import QApplication, QWidget, QTextEdit
+import sys
+from PyQt5 import QtWidgets
+from PyQt5.QtCore import Qt, QObject, pyqtSignal
 
-class QTextEditLogger(logging.Handler):
+import logging
+
+import sys
+from PyQt5.QtCore import Qt, QObject, pyqtSignal, QThread, pyqtSlot
+from PyQt5.QtWidgets import QPlainTextEdit, QApplication
+
+
+def except_hook(exctype, value, traceback):
+    # Записываем информацию об ошибке в логгер
+    logger.critical(f"Критическая ошибка: {exctype}, {value}, {traceback}")
+    sys.__excepthook__(exctype, value, traceback)
+
+
+sys.excepthook = except_hook
+
+# Создание логгера
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)  # Уровень логирования (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+
+# Создание обработчика (куда будут записываться логи)
+file_handler = logging.FileHandler('my_app.log')  # Запись в файл
+console_handler = logging.StreamHandler()  # Вывод в консоль
+
+# Формат логов
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+file_handler.setFormatter(formatter)
+console_handler.setFormatter(formatter)
+
+# Добавляем обработчики к логгеру
+logger.addHandler(file_handler)
+logger.addHandler(console_handler)
+
+from PyQt5.QtCore import Qt, QObject, pyqtSignal
+from PyQt5.QtWidgets import QPlainTextEdit
+
+
+
+class QPlainTextEditLogger(logging.Handler, QObject):
+    appendPlainText = pyqtSignal(str)
+
     def __init__(self, parent):
         super().__init__()
-        self.widget = QTextEdit(parent)
+        QObject.__init__(self)
+        self.widget = QPlainTextEdit(parent)
         self.widget.setReadOnly(True)
+        self.appendPlainText.connect(self.widget.appendPlainText)
 
     def emit(self, record):
         msg = self.format(record)
-        self.widget.append(msg)
+        self.appendPlainText.emit(msg)
 
-
-class MainWindow_log(QWidget):
+class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.initUI()
+        # ... другая инициализация главного окна ...
 
-    def initUI(self):
-        logTextBox = QTextEditLogger(self)
+        self.log_widget = QPlainTextEditLogger(self)
+        logger.addHandler(self.log_widget)
+        self.setCentralWidget(self.log_widget.widget)
 
-        # You can format what is printed to text box
-        formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-        logTextBox.setFormatter(formatter)
-        logging.getLogger().addHandler(logTextBox)
-        logging.getLogger().setLevel(logging.DEBUG)
 
-        self.setGeometry(300, 300, 500, 300)
-        self.setWindowTitle('Log Messages')
-        self.show()
+class MainWindow(QtWidgets.QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("PyQt Логирование")
 
-        # code for generate error
-        try:
-            1 / 0
-        except ZeroDivisionError as e:
-            logging.exception("Exception occurred")
+        # Добавляем кнопку для тестирования
+        button = QtWidgets.QPushButton("Нажми меня!")
+        button.clicked.connect(self.on_button_click)
 
+        # Логирование в виджет
+        self.log_widget = QPlainTextEditLogger(self)
+        logger.addHandler(self.log_widget)
+
+        # Добавляем виджеты на главное окно
+        central_widget = QtWidgets.QWidget()
+        layout = QtWidgets.QVBoxLayout()
+        layout.addWidget(button)
+        layout.addWidget(self.log_widget.widget)
+        central_widget.setLayout(layout)
+        self.setCentralWidget(central_widget)
+
+    def on_button_click(self):
+        logger.info("Кнопка нажата!")
 
 if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    ex = MainWindow_log()
+    app = QtWidgets.QApplication(sys.argv)
+    main_window = MainWindow()
+    main_window.show()
     sys.exit(app.exec_())

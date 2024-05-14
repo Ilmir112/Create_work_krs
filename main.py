@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 import sys
 import psycopg2
@@ -7,6 +8,7 @@ import openpyxl
 import re
 import win32con
 
+
 from openpyxl.reader.excel import load_workbook
 
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu, QMenuBar, QAction, QTableWidget, \
@@ -14,19 +16,20 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu, QMenuBar, QAction,
 from PyQt5 import QtCore, QtWidgets
 from datetime import datetime
 from openpyxl.utils import get_column_letter
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, pyqtSlot
 from openpyxl.workbook import Workbook
 from openpyxl.styles import Border, Side, Alignment, Font
 from log_files import log
 
 import property_excel.property_excel_pvr
+from log_files.log import logger, QPlainTextEditLogger
 from work_py.advanted_file import count_row_height, definition_plast_work, raid, remove_overlapping_intervals
 
 from openpyxl.drawing.image import Image
 
 import well_data
 from H2S import calc_h2s
-from PyQt5.QtCore import QThread, pyqtSignal
+from PyQt5.QtCore import QThread, pyqtSignal, pyqtSlot
 from data_correct_position_people import CorrectSignaturesWindow
 from work_py.dop_plan_py import DopPlanWindow
 from work_py.drilling import Drill_window
@@ -35,6 +38,19 @@ import threading
 import time
 import win32gui
 
+from PyQt5.QtCore import Qt, QObject, pyqtSignal
+from PyQt5.QtWidgets import QPlainTextEdit
+
+
+class UncaughtExceptions(QObject):
+    _exception_caught = pyqtSignal(object)
+
+    def __init__(self):
+        super().__init__()
+
+    @pyqtSlot(object)
+    def handleException(self, ex):
+        logger.critical(f"Критическая ошибка: {ex}")
 
 class ExcelWorker(QThread):
     finished = pyqtSignal()
@@ -171,11 +187,28 @@ class MyWindow(QMainWindow):
         self.table_pvr = None
         threading.Timer(2.0, self.close_splash).start()
 
-        if self.login_window == None:
-            self.login_window = LoginWindow()
-            self.login_window.show()
-            self.pause_app()
-            well_data.pause = False
+        self.log_widget = QPlainTextEditLogger(self)
+        logger.addHandler(self.log_widget)
+        self.setCentralWidget(self.log_widget.widget)
+
+        # Обработка критических ошибок
+        self.excepthook = UncaughtExceptions()
+        self.excepthook._exception_caught.connect(self.excepthook.handleException)
+
+        # Запускаем обработчик исключений в отдельном потоке
+        self.thread = QThread()
+        self.excepthook.moveToThread(self.thread)
+        # self.thread.started.connect(self.excepthook.handleException)
+        self.thread.start()
+        try:
+            if self.login_window == None:
+                self.login_window = LoginWindow()
+                self.login_window.show()
+                self.pause_app()
+                well_data.pause = False
+        except Exception as e:
+            mes = QMessageBox.warning(self, 'КРИТИЧЕСКАЯ ОШИБКА', 'КРитическая ошибка, смотри в лог')
+            self.excepthook._exception_caught.emit(e)
 
     def initUI(self):
 

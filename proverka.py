@@ -1,85 +1,114 @@
-import sqlite3
-import psycopg2
+import logging
+import sys
+from PyQt5 import QtWidgets
+from PyQt5.QtCore import Qt, QObject, pyqtSignal, QThread
 
-# Параметры подключения к SQLite
-import well_data
+import logging
+import sys
+from PyQt5.QtCore import Qt, QObject, pyqtSignal, QThread, pyqtSlot
+from PyQt5.QtWidgets import QPlainTextEdit, QApplication
 
-sqlite_db_path = 'data_base/data_base_gnkt/gnkt_base.dp'
+def except_hook(exctype, value, traceback):
+   # Записываем информацию об ошибке в логгер
+   logger.critical(f"Критическая ошибка: {exctype}, {value}, {traceback}")
+   sys.__excepthook__(exctype, value, traceback)
+
+sys.excepthook = except_hook
+
+# Создание логгера
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)  # Уровень логирования (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+
+# Создание обработчика (куда будут записываться логи)
+file_handler = logging.FileHandler('my_app.log')  # Запись в файл
+console_handler = logging.StreamHandler()  # Вывод в консоль
+
+# Формат логов
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+file_handler.setFormatter(formatter)
+console_handler.setFormatter(formatter)
+
+# Добавляем обработчики к логгеру
+logger.addHandler(file_handler)
+logger.addHandler(console_handler)
+
+from PyQt5.QtCore import Qt, QObject, pyqtSignal
+from PyQt5.QtWidgets import QPlainTextEdit
+
+class UncaughtExceptions(QObject):
+       _exception_caught = pyqtSignal(object)
+
+       def __init__(self):
+           super().__init__()
+
+       @pyqtSlot(object)
+       def handleException(self, ex):
+           logger.critical(f"Критическая ошибка: {ex}")
+class QPlainTextEditLogger(logging.Handler, QObject):
+    appendPlainText = pyqtSignal(str)
+
+    def __init__(self, parent):
+        super().__init__()
+        QObject.__init__(self)
+        self.widget = QPlainTextEdit(parent)
+        self.widget.setReadOnly(True)
+        self.appendPlainText.connect(self.widget.appendPlainText)
+
+    def emit(self, record):
+        msg = self.format(record)
+        self.appendPlainText.emit(msg)
+
+class MainWindow(QtWidgets.QMainWindow):
+    def __init__(self):
+        super().__init__()
+        # ... другая инициализация главного окна ...
+
+        self.log_widget = QPlainTextEditLogger(self)
+        logger.addHandler(self.log_widget)
+        self.setCentralWidget(self.log_widget.widget)
 
 
+class MainWindow(QtWidgets.QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("PyQt Логирование")
 
-def copy_tables(sqlite_conn, postgres_conn):
-    # Получение списка таблиц из SQLite
-    sqlite_cursor = sqlite_conn.cursor()
-    sqlite_cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
-    tables = sqlite_cursor.fetchall()
-    print(tables)
-    # Обработка каждой таблицы
-    for table_name in tables[1:]:
+        # Добавляем кнопку для тестирования
+        button = QtWidgets.QPushButton("Нажми меня!")
+        button.clicked.connect(self.on_button_click)
 
-        table_name = table_name[0]
+        # Логирование в виджет
+        self.log_widget = QPlainTextEditLogger(self)
+        logger.addHandler(self.log_widget)
 
+        # Добавляем виджеты на главное окно
+        central_widget = QtWidgets.QWidget()
+        layout = QtWidgets.QVBoxLayout()
+        layout.addWidget(button)
+        layout.addWidget(self.log_widget.widget)
+        central_widget.setLayout(layout)
+        self.setCentralWidget(central_widget)
 
-        # Получение схемы таблицы SQLite
-        sqlite_cursor.execute(f"SELECT sql FROM sqlite_master WHERE type='table' AND name='{table_name}';")
-        table_schema = sqlite_cursor.fetchone()[0].replace('AUTOINCREMENT', '')
-        print(f'jjf {table_schema}')
+        # Обработка критических ошибок
+        self.excepthook = UncaughtExceptions()
+        self.excepthook._exception_caught.connect(self.excepthook.handleException)
 
-        # Создание таблицы в PostgreSQL (если она не существует)
-        postgres_cursor = postgres_conn.cursor()
-        postgres_cursor.execute(f'{table_schema}')
+        # Запускаем обработчик исключений в отдельном потоке
+        self.thread = QThread()
+        self.excepthook.moveToThread(self.thread)
+        self.thread.started.connect(self.excepthook.handleException)
+        self.thread.start()
 
-        # Получение данных из таблицы SQLite
-        sqlite_cursor.execute(f"SELECT * FROM {table_name};")
-        rows = sqlite_cursor.fetchall()
+    def on_button_click(self):
+        # ... (ваш код) ...
+        try:
+            # Код, который может вызвать ошибку
+            result = 1 / 0  # Пример деления на ноль
+        except Exception as e:
+            self.excepthook._exception_caught.emit()
 
-        # Вставка данных в таблицу PostgreSQL
-        placeholders = ', '.join(['%s'] * len(rows[0]))
-        insert_query = f"INSERT INTO {table_name} VALUES ({placeholders});"
-        postgres_cursor.executemany(insert_query, rows)
-
-        postgres_conn.commit()
-
-# Подключение к базам данных
-sqlite_conn = sqlite3.connect(sqlite_db_path)
-postgres_conn = psycopg2.connect(**well_data.postgres_conn_gnkt)
-
-# # Копирование таблиц
-copy_tables(sqlite_conn, postgres_conn)
-print('копирование завершено')
-cursor = postgres_conn.cursor()
-# # Выполнение запроса (например, выбор всех записей из таблицы "users")
-# cursor.execute("SELECT * FROM ЧГМ_классификатор")
-#
-# # Получение результатов
-# rows = cursor.fetchall()
-#
-# # Обработка результатов (например, печать каждой строки)
-# for row in rows:
-#     print(row)
-
-
-# import sqlite3
-# import psycopg2
-#
-#
-# # Параметры подключения к SQLite
-# sqlite_db_path = 'data_base/data_base_well/databaseWell.db'
-#
-# # Подключение к базам данных
-# sqlite_conn = sqlite3.connect(sqlite_db_path)
-# postgres_conn = psycopg2.connect(**well_data.postgres_params_classif)
-# sqlite_cursor = sqlite_conn.cursor()
-# postgres_cursor = postgres_conn.cursor()
-#
-# # Получение списка таблиц из SQLite
-# sqlite_cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
-# tables = sqlite_cursor.fetchall()
-#
-# for data in tables:
-#     postgres_cursor.execute("INSERT INTO table VALUES =(%s)", data)
-#
-# # Сохранение изменений и закрытие соединений
-# postgres_conn.commit()
-# sqlite_conn.close()
-# postgres_conn.close()
+if __name__ == '__main__':
+    app = QtWidgets.QApplication(sys.argv)
+    main_window = MainWindow()
+    main_window.show()
+    sys.exit(app.exec_())
