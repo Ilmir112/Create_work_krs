@@ -50,7 +50,7 @@ class UncaughtExceptions(QObject):
 
     @pyqtSlot(object)
     def handleException(self, ex):
-        logger.critical(f"Критическая ошибка: {ex}")
+        logger.critical(f"{well_data.well_number._value} {well_data.well_area._value} Критическая ошибка: {ex}")
 
 class ExcelWorker(QThread):
     finished = pyqtSignal()
@@ -195,7 +195,7 @@ class MyWindow(QMainWindow):
         self.excepthook = UncaughtExceptions()
         self.excepthook._exception_caught.connect(self.excepthook.handleException)
 
-        # Запускаем обработчик исключений в отдельном потоке
+        # # Запускаем обработчик исключений в отдельном потоке
         self.thread = QThread()
         self.excepthook.moveToThread(self.thread)
         # self.thread.started.connect(self.excepthook.handleException)
@@ -207,12 +207,12 @@ class MyWindow(QMainWindow):
                 self.pause_app()
                 well_data.pause = False
         except Exception as e:
-            mes = QMessageBox.warning(self, 'КРИТИЧЕСКАЯ ОШИБКА', 'КРитическая ошибка, смотри в лог')
+            mes = QMessageBox.warning(self, 'КРИТИЧЕСКАЯ ОШИБКА', 'Критическая ошибка, смотри в лог')
             self.excepthook._exception_caught.emit(e)
 
     def initUI(self):
 
-        self.setWindowTitle("Main Window")
+        self.setWindowTitle("ZIMA")
         self.setGeometry(200, 100, 800, 800)
 
         self.createMenuBar()
@@ -1247,7 +1247,7 @@ class MyWindow(QMainWindow):
     def read_clicked_mouse_data(self, row):
 
         row = row - well_data.count_row_well
-
+        print(well_data.column_diametr._value)
         for index, data in enumerate(well_data.data_list):
             # print(index, data)
             if index == row:
@@ -1259,6 +1259,12 @@ class MyWindow(QMainWindow):
                 well_data.plast_work = json.loads(data[4])
                 well_data.dict_leakiness = json.loads(data[5])
                 well_data.column_additional = data[6]
+
+                # if well_data.column_additional == 'false':
+                #     well_data.column_additional = False
+                # else:
+                #     well_data.column_additional = True
+
                 well_data.fluid_work = data[7]
                 well_data.template_depth = int(data[11])
                 well_data.skm_interval = json.loads(data[12])

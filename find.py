@@ -69,7 +69,7 @@ class FindIndexPZ(QMainWindow):
             elif 'ХI Планируемый объём работ:' in row or 'ХI. Планируемый объём работ:' \
                     in row or 'ХIII Планируемый объём работ:' in row \
                     or 'ХI Планируемый объём работ:' in row or 'Порядок работы' in row:
-                well_data.data_x_max = ProtectedIsDigit(row_ind)
+                    well_data.data_x_max = ProtectedIsDigit(row_ind)
 
 
             elif any(['II. История эксплуатации скважины' in str(col) for col in row]):
@@ -1250,7 +1250,7 @@ class Well_Category(FindIndexPZ):
                                 ws.cell(row=row - 1, column=2).value):
                             for column in range(1, 13):
                                 col = ws.cell(row=row, column=column).value
-                                # print(f'ячейка {col}')
+                                print(f'ячейка {col}')
                                 if str(col) in ['%', 'мг/л', 'мг/дм3', 'мг/м3', 'мг/дм'] and \
                                         ws.cell(row=row, column=column - 2).value:
                                     # print(f'ячейка- 3 3 {col}')
@@ -1293,6 +1293,8 @@ class Well_Category(FindIndexPZ):
                             if cell2:
                                 well_data.h2s_mg_m3.append(float(str(
                                     FindIndexPZ.check_str_None(self, str(cell2).replace(',', '.')))) / 1000)
+
+            print(well_data.h2s_mg)
             if len(well_data.h2s_mg) == 0 and len(well_data.h2s_mg_m3) != 0:
                 for mg in well_data.h2s_mg_m3:
                     # print(f'значени{mg}')

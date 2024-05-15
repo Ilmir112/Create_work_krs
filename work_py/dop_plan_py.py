@@ -190,7 +190,13 @@ class DopPlanWindow(QMainWindow):
         well_data.data_list = []
         for row in result:
             data_list = []
-            for data in row:
+            for index, data in enumerate(row):
+                if index == 6:
+                    print(data)
+                    if data == 'false':
+                        data = False
+                    else:
+                        data = True
                 data_list.append(data)
             well_data.data_list.append(data_list)
 

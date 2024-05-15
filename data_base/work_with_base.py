@@ -490,6 +490,8 @@ def create_database_well_db(work_plan, number_dp):
 
         conn = psycopg2.connect(**well_data.postgres_conn_work_well)
         cursor = conn.cursor()
+        if number_dp == 0:
+            number_dp =''
 
         # Создаем таблицу для хранения данных
         number = json.dumps(str(well_data.well_number._value) + well_data.well_area._value + work_plan + str(number_dp),

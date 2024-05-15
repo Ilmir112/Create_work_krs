@@ -111,7 +111,11 @@ class TabPage_SO(QWidget):
             category_h2s2_edit.setText(str(self.ifNone(self.cat_h2s_list[num])))
             h2s_mg_edit = QLineEdit(self)
             print(self.h2s_mg)
-            h2s_mg_edit.setText(str(self.ifNone(self.h2s_mg[num])))
+            try:
+                h2s_mg_edit.setText(str(self.ifNone(self.h2s_mg[num])))
+            except:
+                h2s_mg_edit.setText(str(0))
+                mes = QMessageBox.warning(self, 'ОШИБКА', "Программа не нашла данные значению по сероводороду в мг/л")
 
             category_gf_edit = QLineEdit(self)
             category_gf_edit.setText(str(self.ifNone(self.cat_gaz_f_pr[num])))
