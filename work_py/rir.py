@@ -436,15 +436,15 @@ class RirWindow(QMainWindow):
                                          diametr_paker = 122, paker_khost= 0, paker_depth= 0):
 
         rir_rpk_question = QMessageBox.question(self, 'посадку между пластами?', 'посадку между пластами?')
-        RirWindow.rir_rpk_plast_true = False
+        rir_rpk_plast_true = False
         if rir_rpk_question == QMessageBox.StandardButton.Yes:
-            RirWindow.rir_rpk_plast_true = True
+            rir_rpk_plast_true = True
 
 
         # print(paker_need_Combo, plast_combo, diametr_paker, paker_khost,
         #            paker_depth, pressureZUMPF_question)
         rir_list = self.need_paker(paker_need_Combo, plast_combo, diametr_paker, paker_khost,
-                   paker_depth, pressureZUMPF_question, rir_rpk_plast_true)
+                   paker_depth, pressureZUMPF_question, RirWindow.rir_rpk_plast_true)
 
 
 
@@ -613,7 +613,7 @@ class RirWindow(QMainWindow):
         else:
             dict_nkt = {73: sole_rir_edit}
         rir_list = RirWindow.need_paker(self, paker_need_Combo, plast_combo, diametr_paker, paker_khost,
-                   paker_depth, pressureZUMPF_question, rir_rpk_plast_true)
+                   paker_depth, pressureZUMPF_question)
 
         volume_in_nkt, volume_in_ek = RirWindow.calc_buffer(self, roof_rir_edit, sole_rir_edit, dict_nkt)
 
@@ -903,7 +903,7 @@ class RirWindow(QMainWindow):
        
 
         rir_list = self.need_paker(paker_need_Combo, plast_combo, diametr_paker, paker_khost,
-                   paker_depth, pressureZUMPF_question, rir_rpk_plast_true)
+                   paker_depth, pressureZUMPF_question)
 
         rir_paker_list = [[ f'РИР c пакером {plast_combo} c плановой кровлей на глубине {roof_rir_edit}м',
                             None,
