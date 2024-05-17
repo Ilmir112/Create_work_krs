@@ -186,21 +186,21 @@ class MyWindow(QMainWindow):
         self.table_widget = None
         self.table_pvr = None
 
-        # threading.Timer(2.0, self.close_splash).start()
-        #
-        # self.log_widget = QPlainTextEditLogger(self)
-        # logger.addHandler(self.log_widget)
-        # self.setCentralWidget(self.log_widget.widget)
-        #
-        # # Обработка критических ошибок
-        # self.excepthook = UncaughtExceptions()
-        # self.excepthook._exception_caught.connect(self.excepthook.handleException)
-        #
-        # # # Запускаем обработчик исключений в отдельном потоке
-        # self.thread = QThread()
-        # self.excepthook.moveToThread(self.thread)
-        # # self.thread.started.connect(self.excepthook.handleException)
-        # self.thread.start()
+        threading.Timer(2.0, self.close_splash).start()
+
+        self.log_widget = QPlainTextEditLogger(self)
+        logger.addHandler(self.log_widget)
+        self.setCentralWidget(self.log_widget.widget)
+
+        # Обработка критических ошибок
+        self.excepthook = UncaughtExceptions()
+        self.excepthook._exception_caught.connect(self.excepthook.handleException)
+
+        # # Запускаем обработчик исключений в отдельном потоке
+        self.thread = QThread()
+        self.excepthook.moveToThread(self.thread)
+        # self.thread.started.connect(self.excepthook.handleException)
+        self.thread.start()
         try:
             if self.login_window == None:
                 self.login_window = LoginWindow()
@@ -209,7 +209,7 @@ class MyWindow(QMainWindow):
                 well_data.pause = False
         except Exception as e:
             mes = QMessageBox.warning(self, 'КРИТИЧЕСКАЯ ОШИБКА', 'Критическая ошибка, смотри в лог')
-            # self.excepthook._exception_caught.emit(e)
+            self.excepthook._exception_caught.emit(e)
 
     def initUI(self):
 
