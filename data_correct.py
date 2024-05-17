@@ -1,8 +1,11 @@
+import well_data
+import re
+
+
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.Qt import *
 from PyQt5.QtGui import QRegExpValidator, QColor, QPalette
 
-import well_data
 from perforation_correct import FloatLineEdit
 
 
@@ -106,15 +109,18 @@ class TabPage_SO(QWidget):
 
         self.bottomhole_drill_Label = QLabel('Пробуренный забой')
         self.bottomhole_drill_editType = FloatLineEdit(self)
-        self.bottomhole_drill_editType.setText(f'{self.ifNone(well_data.bottomhole_drill._value)}')
+        self.bottomhole_drill_editType.setText(
+            f'{self.remove_non_numeric_chars(self.ifNone(well_data.bottomhole_drill._value))}')
 
         self.bottomhole_artificial_Label = QLabel('Искусственный забой')
         self.bottomhole_artificial_editType = FloatLineEdit(self)
-        self.bottomhole_artificial_editType.setText(f'{self.ifNone(well_data.bottomhole_artificial._value)}')
+        self.bottomhole_artificial_editType.setText(
+            f'{self.remove_non_numeric_chars(self.ifNone(well_data.bottomhole_artificial._value))}')
 
         self.current_bottom_Label = QLabel('Текущий забой')
         self.current_bottom_editType = FloatLineEdit(self)
-        self.current_bottom_editType.setText(f'{self.ifNone(well_data.current_bottom)}')
+        self.current_bottom_editType.setText(
+            f'{self.remove_non_numeric_chars(self.ifNone(well_data.current_bottom))}')
 
         self.max_angle_Label = QLabel('Максимальный угол')
         self.max_angle_editType = FloatLineEdit(self)
@@ -126,11 +132,13 @@ class TabPage_SO(QWidget):
 
         self.max_expected_pressure_Label = QLabel('Максимальный ожидаемое давление')
         self.max_expected_pressure_editType = FloatLineEdit(self)
-        self.max_expected_pressure_editType.setText(f'{self.ifNone(well_data.max_expected_pressure._value)}')
+        self.max_expected_pressure_editType.setText(
+            f'{self.remove_non_numeric_chars(self.ifNone(well_data.max_expected_pressure._value))}')
 
         self.max_admissible_pressure_Label = QLabel('Максимальный допустимое давление')
         self.max_admissible_pressure_editType = FloatLineEdit(self)
-        self.max_admissible_pressure_editType.setText(f'{self.ifNone(well_data.max_admissible_pressure._value)}')
+        self.max_admissible_pressure_editType.setText(
+            f'{self.remove_non_numeric_chars(self.ifNone(well_data.max_admissible_pressure._value))}')
 
         self.pump_SHGN_do_Label = QLabel('Штанговый насос')
         self.pump_SHGN_do_editType = QLineEdit(self)
@@ -139,7 +147,8 @@ class TabPage_SO(QWidget):
         self.pump_SHGN_depth_do_Label = QLabel('Глубина штангового насоса')
         self.pump_SHGN_depth_do_editType = FloatLineEdit(self)
         if self.pump_SHGN_do_editType.text() != 'отсут':
-            self.pump_SHGN_depth_do_editType.setText(f'{self.ifNone(well_data.dict_pump_SHGN_h["do"])}')
+            self.pump_SHGN_depth_do_editType.setText(
+                f'{self.remove_non_numeric_chars(self.ifNone(well_data.dict_pump_SHGN_h["do"]))}')
         else:
             self.pump_SHGN_depth_do_editType.setText('отсут')
 
@@ -150,7 +159,8 @@ class TabPage_SO(QWidget):
         self.pump_SHGN_depth_posle_Label = QLabel('Плановая глубина спуска насоса')
         self.pump_SHGN_depth_posle_editType = FloatLineEdit(self)
         if self.pump_SHGN_posle_editType.text() != 'отсут':
-            self.pump_SHGN_depth_posle_editType.setText(f'{self.ifNone(well_data.dict_pump_SHGN_h["posle"])}')
+            self.pump_SHGN_depth_posle_editType.setText(
+                f'{self.remove_non_numeric_chars(self.ifNone(well_data.dict_pump_SHGN_h["posle"]))}')
         else:
             self.pump_SHGN_depth_posle_editType.setText('отсут')
 
@@ -161,7 +171,8 @@ class TabPage_SO(QWidget):
         self.pump_ECN_depth_do_Label = QLabel('Глубина спуска ЭЦН')
         self.pump_ECN_depth_do_editType = FloatLineEdit(self)
         if self.pump_ECN_do_editType.text() != 'отсут':
-            self.pump_ECN_depth_do_editType.setText(f'{self.ifNone(well_data.dict_pump_ECN_h["do"])}')
+            self.pump_ECN_depth_do_editType.setText(
+                f'{self.remove_non_numeric_chars(self.ifNone(well_data.dict_pump_ECN_h["do"]))}')
         else:
             self.pump_ECN_depth_do_editType.setText('отсут')
 
@@ -172,7 +183,8 @@ class TabPage_SO(QWidget):
         self.pump_ECN_depth_posle_Label = QLabel('Плановая глубина спуска ЭЦН')
         self.pump_ECN_depth_posle_editType = FloatLineEdit(self)
         if self.pump_ECN_posle_editType.text() != 'отсут':
-            self.pump_ECN_depth_posle_editType.setText(f'{self.ifNone(well_data.dict_pump_ECN_h["posle"])}')
+            self.pump_ECN_depth_posle_editType.setText(
+                f'{self.remove_non_numeric_chars(self.ifNone(well_data.dict_pump_ECN_h["posle"]))}')
         else:
             self.pump_ECN_depth_posle_editType.setText('отсут')
 
@@ -182,7 +194,8 @@ class TabPage_SO(QWidget):
 
         self.paker_depth_do_Label = QLabel('Глубина спуска пакера')
         self.paker_depth_do_editType = FloatLineEdit(self)
-        self.paker_depth_do_editType.setText(f'{self.ifNone(well_data.depth_fond_paker_do["do"])}')
+        self.paker_depth_do_editType.setText(
+            f'{self.remove_non_numeric_chars(self.ifNone(well_data.depth_fond_paker_do["do"]))}')
 
         self.paker_posle_Label = QLabel('пакер на спуск')
         self.paker_posle_editType = QLineEdit(self)
@@ -190,7 +203,8 @@ class TabPage_SO(QWidget):
 
         self.paker_depth_posle_Label = QLabel('Глубина спуска пакера')
         self.paker_depth_posle_editType = FloatLineEdit(self)
-        self.paker_depth_posle_editType.setText(f'{self.ifNone(well_data.depth_fond_paker_do["posle"])}')
+        self.paker_depth_posle_editType.setText(
+            f'{self.remove_non_numeric_chars(self.ifNone(well_data.depth_fond_paker_do["posle"]))}')
 
         self.paker2_do_Label = QLabel('Спущенный пакер')
         self.paker2_do_editType = QLineEdit(self)
@@ -198,7 +212,8 @@ class TabPage_SO(QWidget):
 
         self.paker2_depth_do_Label = QLabel('Глубина спуска пакера')
         self.paker2_depth_do_editType = FloatLineEdit(self)
-        self.paker2_depth_do_editType.setText(str(self.ifNone(str(well_data.depth_fond_paker2_do["do"]))))
+        self.paker2_depth_do_editType.setText(self.remove_non_numeric_chars(
+            self.ifNone(str(well_data.depth_fond_paker2_do["do"]))))
 
         self.paker2_posle_Label = QLabel('пакер на спуск')
         self.paker2_posle_editType = QLineEdit(self)
@@ -207,16 +222,17 @@ class TabPage_SO(QWidget):
 
         self.paker2_depth_posle_Label = QLabel('Глубина спуска пакера')
         self.paker2_depth_posle_editType = FloatLineEdit(self)
-        self.paker2_depth_posle_editType.setText(str(self.ifNone(str(well_data.depth_fond_paker2_do["posle"]))))
+        self.paker2_depth_posle_editType.setText(
+            self.remove_non_numeric_chars(self.ifNone(str(well_data.depth_fond_paker2_do["posle"]))))
         # print(f' насос спуск {well_data.dict_pump["posle"]}')
 
         self.static_level_Label = QLabel('Статический уровень в скважине')
         self.static_level_editType = FloatLineEdit(self)
-        self.static_level_editType.setText(str(self.ifNone(well_data.static_level._value)))
+        self.static_level_editType.setText(self.remove_non_numeric_chars(self.ifNone(well_data.static_level._value)))
 
         self.dinamic_level_Label = QLabel('Динамический уровень в скважине')
         self.dinamic_level_editType = FloatLineEdit(self)
-        self.dinamic_level_editType.setText(str(self.ifNone(well_data.dinamic_level._value)))
+        self.dinamic_level_editType.setText(self.remove_non_numeric_chars(self.ifNone(well_data.dinamic_level._value)))
 
         self.curator_Label = QLabel('Куратор ремонта')
         self.curator_Combo = QComboBox(self)
@@ -613,7 +629,7 @@ class TabPage_SO(QWidget):
 
     def ifNone(self, string):
 
-        if str(string) in ['0', str(None), '-']:
+        if str(string) in ['0', str(None), '-', '--']:
             return 'отсут'
         if '/' in str(string):
             return string.split('/')[0]
@@ -624,6 +640,14 @@ class TabPage_SO(QWidget):
                 round(float(str(string).replace(',', '.')), 1)
         else:
             return str(string)
+
+    def remove_non_numeric_chars(self, string):
+
+        pattern = r"[^\d\.,]"
+        if re.sub(pattern, "", str(string)) == '':
+            return string
+        else:
+            return re.sub(pattern, "", str(string))
 
     def updateLabel(self):
         # self.dinamic_level_Label

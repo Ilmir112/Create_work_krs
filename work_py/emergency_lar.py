@@ -153,7 +153,7 @@ class Emergency_lar(MyWindow):
         emergency_bottom_line = self.tabWidget.currentWidget().emergency_bottom_line.text().replace(',', '')
         bottom_line = self.tabWidget.currentWidget().bottom_line.text().replace(',', '')
         if bottom_line != '':
-            bottom_line = int(float(emergency_bottom_line))
+            bottom_line = int(float(bottom_line))
 
         if emergency_bottom_line != '':
             emergency_bottom_line = int(float(emergency_bottom_line))
@@ -183,6 +183,8 @@ class Emergency_lar(MyWindow):
         elif nkt_str_combo == 'СБТ':
             raid_list = self.emergence_sbt(lar_diametr_line, nkt_key, lar_type_combo,
                       emergency_bottom_line, bottom_line)
+        well_data.current_bottom = bottom_line
+
 
         MyWindow.populate_row(self, self.ins_ind, raid_list, self.table_widget)
         well_data.pause = False
@@ -275,6 +277,7 @@ class Emergency_lar(MyWindow):
              None, None, None, None, None, None, None,
              'мастер КРС', liftingNKT_norm(emergency_bottom_line, 1.2)]]
         well_data.current_bottom = bottom_line
+
         return emergencyNKT_list
 
 # if __name__ == "__main__":

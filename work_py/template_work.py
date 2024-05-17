@@ -746,6 +746,8 @@ class TabPage_SO_with(QWidget):
         for diam, diam_internal in template_first_diam_dict.items():
             if diam_internal[0] <= diam_internal_ek <= diam_internal[1]:
                 template_first_diam = diam
+        if 'ПОМ' in str(well_data.paker_do["posle"]).upper() and '122' in str(well_data.paker_do["posle"]):
+            template_second_diam = 126
         return (template_first_diam, template_second_diam)
 
     def template_diam_additional_ek(self):  # Выбор диаметра шаблонов при наличии в скважине дополнительной колонны

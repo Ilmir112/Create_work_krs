@@ -74,14 +74,15 @@ class TabPageGno(QWidget):
                 well_data.if_None(well_data.paker_do['do']) == 'отсут' \
                 and well_data.if_None(well_data.dict_pump_ECN["do"]) == 'отсут':
             lift_key = 'воронка'
-        elif well_data.if_None(well_data.dict_pump_SHGN["do"]) == 'отсут' and \
-                well_data.if_None(well_data.paker_do['do']) != 'отсут' \
-                and well_data.if_None(well_data.dict_pump_ECN["do"]) == 'отсут':
-            lift_key = 'пакер'
+
         elif '89' in well_data.dict_nkt.keys() and '48' in well_data.dict_nkt.keys() and \
                 well_data.if_None(
                     well_data.paker_do['do']) != 'отсут':
             lift_key = 'ОРЗ'
+        elif well_data.if_None(well_data.dict_pump_SHGN["do"]) == 'отсут' and \
+                well_data.if_None(well_data.paker_do['do']) != 'отсут' \
+                and well_data.if_None(well_data.dict_pump_ECN["do"]) == 'отсут':
+            lift_key = 'пакер'
         return lift_key
 
     def volume(self):

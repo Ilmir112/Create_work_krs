@@ -1468,7 +1468,7 @@ class AcidPakerWindow(QMainWindow):
         for row in acid_list_1:
             paker_list.append(row)
 
-        if well_data.curator == 'ОР' and well_data.dict_pump_ECN == 0:
+        if well_data.curator == 'ОР' and well_data.dict_pump_ECN["posle"] != 0:
             try:
                 well_data.expected_Q, ok = QInputDialog.getInt(self, 'Ожидаемая приемистость ',
                                                                f'Ожидаемая приемистость по пласту {plast_combo} ',

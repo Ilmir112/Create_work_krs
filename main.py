@@ -185,21 +185,22 @@ class MyWindow(QMainWindow):
         self.work_plan = 0
         self.table_widget = None
         self.table_pvr = None
-        threading.Timer(2.0, self.close_splash).start()
 
-        self.log_widget = QPlainTextEditLogger(self)
-        logger.addHandler(self.log_widget)
-        self.setCentralWidget(self.log_widget.widget)
-
-        # Обработка критических ошибок
-        self.excepthook = UncaughtExceptions()
-        self.excepthook._exception_caught.connect(self.excepthook.handleException)
-
-        # # Запускаем обработчик исключений в отдельном потоке
-        self.thread = QThread()
-        self.excepthook.moveToThread(self.thread)
-        # self.thread.started.connect(self.excepthook.handleException)
-        self.thread.start()
+        # threading.Timer(2.0, self.close_splash).start()
+        #
+        # self.log_widget = QPlainTextEditLogger(self)
+        # logger.addHandler(self.log_widget)
+        # self.setCentralWidget(self.log_widget.widget)
+        #
+        # # Обработка критических ошибок
+        # self.excepthook = UncaughtExceptions()
+        # self.excepthook._exception_caught.connect(self.excepthook.handleException)
+        #
+        # # # Запускаем обработчик исключений в отдельном потоке
+        # self.thread = QThread()
+        # self.excepthook.moveToThread(self.thread)
+        # # self.thread.started.connect(self.excepthook.handleException)
+        # self.thread.start()
         try:
             if self.login_window == None:
                 self.login_window = LoginWindow()
@@ -208,7 +209,7 @@ class MyWindow(QMainWindow):
                 well_data.pause = False
         except Exception as e:
             mes = QMessageBox.warning(self, 'КРИТИЧЕСКАЯ ОШИБКА', 'Критическая ошибка, смотри в лог')
-            self.excepthook._exception_caught.emit(e)
+            # self.excepthook._exception_caught.emit(e)
 
     def initUI(self):
 
@@ -1240,14 +1241,14 @@ class MyWindow(QMainWindow):
 
         self.ins_ind = r + 1
         well_data.ins_ind = r + 1
-        print(r, well_data.count_row_well)
+        # print(r, well_data.count_row_well)
         if r > well_data.count_row_well and self.work_plan in ['krs', 'plan_change']:
             data = self.read_clicked_mouse_data(r)
 
     def read_clicked_mouse_data(self, row):
 
         row = row - well_data.count_row_well
-        print(well_data.column_diametr._value)
+        # print(well_data.column_diametr._value)
         for index, data in enumerate(well_data.data_list):
             # print(index, data)
             if index == row:
@@ -1270,7 +1271,7 @@ class MyWindow(QMainWindow):
                 well_data.skm_interval = json.loads(data[12])
                 well_data.problemWithEk_depth = data[13]
                 well_data.problemWithEk_diametr = data[14]
-        print(well_data.skm_interval)
+        # print(well_data.skm_interval)
 
     @staticmethod
     def pause_app():

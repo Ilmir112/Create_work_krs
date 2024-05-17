@@ -90,9 +90,9 @@ class CreatePZ(QMainWindow):
                                                            f'авария - {well_data.emergency_count}, верно ли?')
                     if emergency_quest == QMessageBox.StandardButton.Yes:
                         well_data.emergency_well = True
-                        well_data.emergency_bottom = QInputDialog.getInt(self, 'Аварийный забой',
+                        well_data.emergency_bottom, ok = QInputDialog.getInt(self, 'Аварийный забой',
                                                                          'Введите глубину аварийного забоя',
-                                                                         0, well_data.bottomhole_artificial._value)
+                                                                         0, 0, int(well_data.bottomhole_artificial._value))
                     else:
                         well_data.emergency_well = False
                 if well_data.problemWithEk is True:
