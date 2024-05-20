@@ -357,14 +357,18 @@ def count_row_height(ws, ws2, work_list, merged_cells_dict, ind_ins):
             cell = ws2.cell(row=i, column=j)
 
             if cell and str(cell) != str(work_list[i - 1][j - 1]):
-
+                print(work_list[i - 1][j - 1])
                 if str(work_list[i - 1][j - 1]).replace('.', '').isdigit() and \
                         str(work_list[i - 1][j - 1]).count('.') != 2:
-
-                    cell.value = str(work_list[i - 1][j - 1]).replace('.', ',')
-                    # print(f'цифры {cell.value}')
+                    try:
+                        cell.value = str(work_list[i - 1][j - 1]).replace('.', ',')
+                    except:
+                        pass
                 else:
-                    cell.value = work_list[i - 1][j - 1]
+                    try:
+                        cell.value = work_list[i - 1][j - 1]
+                    except:
+                        pass
 
                 if i >= ind_ins:
                     if j != 1:

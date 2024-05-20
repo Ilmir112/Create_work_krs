@@ -1,5 +1,4 @@
 import json
-import logging
 import os
 import sys
 import psycopg2
@@ -8,9 +7,7 @@ import openpyxl
 import re
 import win32con
 
-
 from openpyxl.reader.excel import load_workbook
-
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu, QMenuBar, QAction, QTableWidget, \
     QLineEdit, QFileDialog, QToolBar, QPushButton, QMessageBox, QInputDialog, QTabWidget, QTableWidgetItem
 from PyQt5 import QtCore, QtWidgets
@@ -19,11 +16,11 @@ from openpyxl.utils import get_column_letter
 from PyQt5.QtCore import Qt, pyqtSlot
 from openpyxl.workbook import Workbook
 from openpyxl.styles import Border, Side, Alignment, Font
-from log_files import log
 
 import property_excel.property_excel_pvr
+
 from log_files.log import logger, QPlainTextEditLogger
-from work_py.advanted_file import count_row_height, definition_plast_work, raid, remove_overlapping_intervals
+from work_py.advanted_file import count_row_height, raid, remove_overlapping_intervals
 
 from openpyxl.drawing.image import Image
 
@@ -41,6 +38,8 @@ import win32gui
 from PyQt5.QtCore import Qt, QObject, pyqtSignal
 from PyQt5.QtWidgets import QPlainTextEdit
 
+from work_py.leakage_column import LeakageWindow
+
 
 class UncaughtExceptions(QObject):
     _exception_caught = pyqtSignal(object)
@@ -51,6 +50,7 @@ class UncaughtExceptions(QObject):
     @pyqtSlot(object)
     def handleException(self, ex):
         logger.critical(f"{well_data.well_number._value} {well_data.well_area._value} Критическая ошибка: {ex}")
+
 
 class ExcelWorker(QThread):
     finished = pyqtSignal()
@@ -233,6 +233,10 @@ class MyWindow(QMainWindow):
         self.correctPVRButton = QPushButton("Скорректировать работающие ПВР")
         self.correctPVRButton.clicked.connect(self.correctPVR)
         self.toolbar.addWidget(self.correctPVRButton)
+
+        self.correctNEKButton = QPushButton("Скорректировать НЭК")
+        self.correctNEKButton.clicked.connect(self.correctNEK)
+        self.toolbar.addWidget(self.correctNEKButton)
 
         self.closeFileButton = QPushButton("Закрыть проект")
         self.closeFileButton.clicked.connect(self.close_file)
@@ -444,9 +448,11 @@ class MyWindow(QMainWindow):
                 # if action == self.save_file:
                 #     open_pz.open_excel_file().wb.save("test_unmerge.xlsx")
 
+        elif action == self.create_GNKT_frez and self.table_widget != None:
+            mes = QMessageBox.information(self, 'Информация', 'Необходимо закрыть текущий проект')
 
         elif action == self.save_file:
-            self.save_to_excel
+            self.save_to_excel()
 
         elif action == self.save_file_as:
             self.saveFileDialog(self.wb2)
@@ -742,7 +748,6 @@ class MyWindow(QMainWindow):
                             row_lst.append(item.text().replace(',', '.'))
                         else:
                             row_lst.append(item.text())
-
                     else:
                         row_lst.append("")
 
@@ -872,6 +877,8 @@ class MyWindow(QMainWindow):
         from find import ProtectedIsDigit
 
         if not self.table_widget is None:
+            self.table_widget.clear()
+            self.table_widget.resizeColumnsToContents()
             self.table_widget = None
             self.tabWidget = None
             well_data.column_head_m = ''
@@ -975,6 +982,7 @@ class MyWindow(QMainWindow):
             well_data.count_template = 0
             well_data.cat_P_1 = []
             well_data.countAcid = 0
+            well_data.first_pressure = ProtectedIsDigit(0)
             well_data.swabTypeComboIndex = 1
             well_data.swab_true_edit_type = 1
             well_data.data_x_max = 0
@@ -1039,6 +1047,10 @@ class MyWindow(QMainWindow):
         perforation_action = QAction("Перфорация", self)
         geophysical.addAction(perforation_action)
         perforation_action.triggered.connect(self.perforationNewWindow)
+
+        po_action = QAction("прихватоопределить", self)
+        geophysical.addAction(po_action)
+        perforation_action.triggered.connect(self.poNewWindow)
 
         geophysical_action = QAction("Геофизические исследования", self)
         geophysical.addAction(geophysical_action)
@@ -1142,7 +1154,7 @@ class MyWindow(QMainWindow):
 
         emergency_sticking_action = QAction("Прихваченное оборудование", self)
         emergency_menu.addAction(emergency_sticking_action)
-        emergency_sticking_action.triggered.connect(self.emergency_sticking_action)
+        emergency_sticking_action.triggered.connect(self.lar_po_action)
 
         emergency_print_action = QAction("СПО печати", self)
         emergency_menu.addAction(emergency_print_action)
@@ -1328,6 +1340,19 @@ class MyWindow(QMainWindow):
         from work_py.emergency_lar import Emergency_lar
         if self.raid_window is None:
             self.raid_window = Emergency_lar(well_data.ins_ind, self.table_widget)
+            # self.raid_window.setGeometry(200, 400, 300, 400)
+            self.raid_window.show()
+            self.pause_app()
+            well_data.pause = True
+            self.raid_window = None
+        else:
+            self.raid_window.close()  # Close window.
+            self.raid_window = None
+
+    def lar_po_action(self):
+        from work_py.emergency_po import Emergency_po
+        if self.raid_window is None:
+            self.raid_window = Emergency_po(well_data.ins_ind, self.table_widget)
             # self.raid_window.setGeometry(200, 400, 300, 400)
             self.raid_window.show()
             self.pause_app()
@@ -1867,6 +1892,26 @@ class MyWindow(QMainWindow):
             self.perforation_correct_window2.close()
             self.perforation_correct_window2 = None
 
+    def correctNEK(self):
+        from find import WellCondition
+
+        if WellCondition.leakage_window is None:
+            WellCondition.leakage_window = LeakageWindow()
+            WellCondition.leakage_window.setWindowTitle("Корректировка негерметичности")
+            # WellCondition.leakage_window.setGeometry(200, 400, 300, 400)
+            WellCondition.leakage_window.show()
+
+            MyWindow.pause_app()
+            well_data.dict_leakiness = WellCondition.leakage_window.add_work()
+            # print(f'словарь нарушений {well_data.dict_leakiness}')
+            well_data.pause = True
+            WellCondition.leakage_window = None  # Discard reference.
+
+
+        else:
+            WellCondition.leakage_window.close()  # Close window.
+            WellCondition.leakage_window = None  # Discard reference.
+
     def correctData(self):
         from data_correct import DataWindow
 
@@ -1883,7 +1928,11 @@ class MyWindow(QMainWindow):
         else:
             self.correct_window.close()  # Close window.
             self.correct_window = None  # Discard reference.
+    def poNewWindow(self):
+        from work_py.emergencyWork import emergencyECN
 
+        template_pero_list = emergencyECN(self)
+        self.populate_row(self.ins_ind, template_pero_list, self.table_widget)
     def perforationNewWindow(self):
         from work_py.perforation import PerforationWindow
 

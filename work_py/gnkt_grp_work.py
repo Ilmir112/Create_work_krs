@@ -398,9 +398,9 @@ class GnktOsvWindow2(QMainWindow):
 
         title_list = [
             [None, None, None, None, None, None, None, None, None, None, None, None],
-            [None, None, None, None, None, None, None, None, None, None, None, None],
+            [None, 'ЗАКАЗЧИК:', None, None, None, None, None, None, None, None, None, None],
             [None, 'ООО «Башнефть-Добыча»', None, None, None, None, None, None, None, None, None, None],
-            [None, None, None, f'{well_data.cdng}', None, None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None],
             [None, 'ПЛАН РАБОТ НА СКВАЖИНЕ С ПОМОЩЬЮ УСТАНОВКИ С ГИБКОЙ ТРУБОЙ', None, None, None,
@@ -412,7 +412,7 @@ class GnktOsvWindow2(QMainWindow):
             [None, None, 'инв. №:', well_data.inv_number, None, None, None, None, 'Площадь: ', well_data.well_area,
              None,
              1],
-            [None, None, None, None, None, None, None, None, None, None, None, None]]
+            [None, None, None, None, None, None, None, 'цех:',  f'{well_data.cdng}', None, None, None]]
 
         razdel = razdel_1(self, well_data.region)
 
@@ -658,7 +658,7 @@ class GnktOsvWindow2(QMainWindow):
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Тек. забой по ПЗ ', None, None,
              None, None, None, None, None, None, well_data.bottom, None],
             [None, None, None, None, None, None, None, None, None, None, None, None,
-             'необходимый текущий забой ', None, None, None, None, None, None, None, None, well_data.current_bottom, None],
+             'необходимый текущий забой ', None, None, None, None, None, None, None, None, current_bottom_edit, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Искусственный забой  ', None,
              None, None, None, None, None, None, None, well_data.bottomhole_artificial._value, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Дополнительная информация', None,
@@ -693,15 +693,15 @@ class GnktOsvWindow2(QMainWindow):
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Р в межколонном пространстве',
              0, None, None, None, 0, None, ' ', None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Первоначальное Р опр-ки ЭК', None,
-             None, None, None, well_data.max_expected_pressure._value, None, None, None, None, None],
+             None, None, None, well_data.first_pressure._value, None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Результат предыдущей опрес-и ЭК',
-             None, None, None, None, well_data.max_expected_pressure._value, None, '', None, 'гермет.', None],
+             None, None, None, None, well_data.max_admissible_pressure._value, None, '', None, 'гермет.', None],
             [None, None, None, None, None, None, None, None, 'Тек.забой', None, None, None,
-             'Макс.допустимое Р опр-ки ЭК', None, None, None, None, well_data.max_expected_pressure._value,
+             'Макс.допустимое Р опр-ки ЭК', None, None, None, None, well_data.max_admissible_pressure._value,
              None, None, None, None, None],
             [None, None, None, None, None, None, None, None, current_bottom_edit, None, None, None,
              'Макс. ожидаемое Р на устье ',
-             None, None, None, None, well_data.max_admissible_pressure._value, None, None, None, None, None],
+             None, None, None, None, well_data.max_expected_pressure._value, None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, f'флот {gnkt_number_combo}',
@@ -766,6 +766,7 @@ class GnktOsvWindow2(QMainWindow):
         for index, pvr in enumerate(pvr_list):
             schema_well_list[26 + index] = pvr
 
+        well_data.current_bottom = round(float(current_bottom_edit), 1)
         return schema_well_list
 
 

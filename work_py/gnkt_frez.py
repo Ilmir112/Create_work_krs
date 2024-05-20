@@ -296,9 +296,9 @@ class Work_with_gnkt(QMainWindow):
 
         title_list = [
             [None, None, None, None, None, None, None, None, None, None, None, None],
-            [None, None, None, None, None, None, None, None, None, None, None, None],
+            [None, 'ЗАКАЗЧИК:', None, None, None, None, None, None, None, None, None, None],
             [None, 'ООО «Башнефть-Добыча»', None, None, None, None, None, None, None, None, None, None],
-            [None, None, None, f'{well_data.cdng._value}', None, None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None],
             [None, 'ПЛАН РАБОТ НА СКВАЖИНЕ С ПОМОЩЬЮ УСТАНОВКИ С ГИБКОЙ ТРУБОЙ', None, None, None,
@@ -310,7 +310,7 @@ class Work_with_gnkt(QMainWindow):
             [None, None, 'инв. №:', well_data.inv_number._value, None, None, None, None, 'Площадь: ',
              well_data.well_area._value, None,
              1],
-            [None, None, None, None, None, None, None, None, None, None, None, None]]
+            [None, None, None, None, None, None, None, None, 'цех', f'{well_data.cdng._value}', None, None]]
 
         razdel = razdel_1(self, well_data.region)
         for row in razdel:  # Добавлением работ

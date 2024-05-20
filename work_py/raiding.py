@@ -281,8 +281,8 @@ class Raid(MyWindow):
         ryber_key = self.tabWidget.currentWidget().raid_select_combo.currentText()
         rows = self.tableWidget.rowCount()
         raid_tuple = []
-        if len(rows) == 0:
-            mes = QMessageBox.warning(self, 'ОШИБКА', 'Нужно додавить интервалы')
+        if rows == 0:
+            mes = QMessageBox.warning(self, 'ОШИБКА', 'Нужно до,авить интервалы')
             return
         for row in range(rows):
             roof_raid = self.tableWidget.item(row, 0)

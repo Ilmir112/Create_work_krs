@@ -62,15 +62,6 @@ def emergencyECN(self):
            f'Сдать в лабораторию для проведения хим. анализа.',
            None, None, None, None, None, None, None,
            'мастер КРС', 6.5],
-          [f'Завоз на скважину СБТ', None,
-           f'Завоз на скважину СБТф73мм – Укладка труб на стеллажи.',
-           None, None, None, None, None, None, None,
-           'мастер КРС', 6.5],
-          [None, None,
-           f'Завоз на скважину инструмента для проведения аварийно-ловильных работ: Крючки, ВТ-73, ОВ-122, '
-           f'кольцевой фрез (типоразмер согласовать с аварийной службой УСРСиСТ)',
-           None, None, None, None, None, None, None,
-           'мастер КРС', 1.7],
           ]
     return emergency_list
 
@@ -110,7 +101,9 @@ def emergency_hook(self):
 
 
 
-def emergency_sticking(self):
+def emergency_sticking(self, lar_diametr_line, nkt_key, lar_type_combo,
+                      emergency_bottom_line, bottom_line):
+    from emergency_lar import Emergency_lar
 
     emergence_type_list = ['ЭЦН', 'пакер', 'НКТ']
     emergence_type, ok = QInputDialog.getItem(self, 'Вид прихватченного оборудования',
@@ -159,31 +152,32 @@ def emergency_sticking(self):
         for row in emergency_hook(self):
             emergency_list.append(row)
 
-    seal_list = [[f'СПо печати', None,
-                  f'Спустить с замером торцевую печать {magnet_select(self, "НКТ")} до аварийная головы с замером.'
-                  f' (При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ) ',
-                  None, None, None, None, None, None, None,
-                  'мастер КРС', descentNKT_norm(well_data.current_bottom, 1.2)],
-                 [None, None,
-                  f'Произвести работу печатью  с обратной промывкой с разгрузкой до 5т.',
-                  None, None, None, None, None, None, None,
-                  'мастер КРС, УСРСиСТ', 2.5],
-                 [None, None,
-                  f'Поднять {magnet_select(self, "НКТ")} с доливом тех жидкости в '
-                  f'объеме{round(well_data.current_bottom * 1.25 / 1000, 1)}м3'
-                  f' удельным весом {well_data.fluid_work}.',
-                  None, None, None, None, None, None, None,
-                  'Мастер КРС', liftingNKT_norm(well_data.current_bottom, 1.2)],
-                 [None, None,
-                  f'По результату ревизии печати, согласовать с ПТО  и УСРСиСТ и '
-                  f'подобрать ловильный инструмент',
-                  None, None, None, None, None, None, None,
-                  'мастер КРС', None]]
+    seal_list = [
+        [f'СПо печати', None,
+          f'Спустить с замером торцевую печать {magnet_select(self, "НКТ")} до аварийная головы с замером.'
+          f' (При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ) ',
+          None, None, None, None, None, None, None,
+          'мастер КРС', descentNKT_norm(well_data.current_bottom, 1.2)],
+         [None, None,
+          f'Произвести работу печатью  с обратной промывкой с разгрузкой до 5т.',
+          None, None, None, None, None, None, None,
+          'мастер КРС, УСРСиСТ', 2.5],
+         [None, None,
+          f'Поднять {magnet_select(self, "НКТ")} с доливом тех жидкости в '
+          f'объеме{round(well_data.current_bottom * 1.25 / 1000, 1)}м3'
+          f' удельным весом {well_data.fluid_work}.',
+          None, None, None, None, None, None, None,
+          'Мастер КРС', liftingNKT_norm(well_data.current_bottom, 1.2)],
+         [None, None,
+          f'По результату ревизии печати, согласовать с ПТО  и УСРСиСТ и '
+          f'подобрать ловильный инструмент',
+          None, None, None, None, None, None, None,
+          'мастер КРС', None]]
 
     for row in seal_list:
         emergency_list.append(row)
 
-    for row in emergence_sbt(self):
+    for row in Emergency_lar.emergence_sbt(self):
         emergency_list.append(row)
 
     well_data.current_bottom, ok = QInputDialog.getDouble(self, 'Текущий забой',
@@ -241,7 +235,6 @@ def lapel_tubing(self):
                        None, None, None, None, None, None, None,
                        'Мастер', None],
                       ]
-    for row in emergence_sbt(self):
-        emergency_list.append(row)
+
 
     return emergency_list

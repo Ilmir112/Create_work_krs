@@ -520,6 +520,12 @@ class WellHistory_data(FindIndexPZ):
                                                                                          well_data.max_expected_pressure,
                                                                                          row_index + begin_index,
                                                                                          col + 1, 1)
+                    elif 'Первоначальное давление опрессовки э/колонны' == value:
+                        well_data.first_pressure = ProtectedIsDigit(row[col + 3].value)
+                        # well_data.first_pressure = FindIndexPZ.definition_is_None(self,
+                        #                                                                  well_data.max_expected_pressure,
+                        #                                                                  row_index + begin_index,
+                        #                                                                  col + 1, 1)
 
                     elif 'Максимально допустимое давление'.lower() in str(value).lower():
                         well_data.max_admissible_pressure = ProtectedIsDigit(row[col + 1].value)

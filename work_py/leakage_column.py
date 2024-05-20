@@ -36,7 +36,6 @@ class TabWidget(QTabWidget):
         super().__init__()
         self.addTab(TabPage_SO_leakage(self), 'Негерметичность')
 
-
 class LeakageWindow(QMainWindow):
 
     def __init__(self, parent=None):

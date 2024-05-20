@@ -79,12 +79,21 @@ def copy_true_ws(ws, ws2, head):
             # print(cell.value)
             if 'катег' in str(cell.value).lower():
                 ws2.cell(row=row_number+1, column=col_number+1).alignment = Alignment(wrap_text=True, horizontal='left',
-                                                                        vertical='center')
-            if type(cell.value) == float:
-                ws2.cell(row_number + 1, col_number + 1, round(cell.value, 4))
-            else:
-                ws2.cell(row_number + 1, col_number + 1, cell.value)
-            # print(cell.value, row_number)
+                                                                           vertical='center')
+            try:
+                if type(cell.value) == float:
+                    ws2.cell(row_number + 1, col_number + 1, round(cell.value, 5))
+                else:
+                    ws2.cell(row_number + 1, col_number + 1, cell.value)
+            except:
+                pass
+            if 'по H2S' in str(cell.value) and 'по H2S' not in str(
+                    ws2.cell(row=row_number+1, column=col_number).value) and 'gnkt' in well_data.work_plan:
+
+                ws2.merge_cells(start_column=col_number+1, start_row=row_number+1,
+                                end_column=col_number+1, end_row=row_number + 2)
+                ws2.merge_cells(start_column=col_number + 3, start_row=row_number+1,
+                                end_column=col_number + 3, end_row=row_number + 2)
             if cell.has_style:
                 ws2.cell(row_number + 1, col_number + 1).font = copy(cell.font)
                 ws2.cell(row_number + 1, col_number + 1).fill = copy(cell.fill)

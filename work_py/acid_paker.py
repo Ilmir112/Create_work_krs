@@ -1336,8 +1336,8 @@ class AcidPakerWindow(QMainWindow):
 
         if QplastEdit == 'ДА' and well_data.curator == 'ОР':
             work_list = []
-            work_list.append(
-                [f'Насыщение 5м3. Определение Q пласт {plast_combo} при '
+            work_list.append(Определение
+                [f'Насыщение 5м3.  Q пласт {plast_combo} при '
                  f'Р={self.pressure_mode(well_data.expected_P, plast_combo)}атм', None,
                  f'Произвести насыщение скважины до стабилизации давления закачки '
                  f'не менее 5м3. Опробовать  '
@@ -1467,8 +1467,8 @@ class AcidPakerWindow(QMainWindow):
 
         for row in acid_list_1:
             paker_list.append(row)
-
-        if well_data.curator == 'ОР' and well_data.dict_pump_ECN["posle"] != 0:
+        print(f'ddffs{well_data.dict_pump_ECN["posle"], well_data.curator == "ОР", well_data.dict_pump_ECN["posle"] != "0", type(well_data.dict_pump_ECN["posle"])}')
+        if well_data.curator == 'ОР' and well_data.dict_pump_ECN["posle"] != '0':
             try:
                 well_data.expected_Q, ok = QInputDialog.getInt(self, 'Ожидаемая приемистость ',
                                                                f'Ожидаемая приемистость по пласту {plast_combo} ',

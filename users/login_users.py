@@ -13,7 +13,7 @@ class LoginWindow(QWidget):
         self.setGeometry(100, 100, 400, 300)
 
         self.label_username = QLabel("Пользователь:", self)
-        self.label_username.move(50, 30)
+        self.label_username.move(60, 30)
         self.username = QComboBox(self)
         users_list = list(map(lambda x:x[1], self.get_list_users()))
 
@@ -21,7 +21,7 @@ class LoginWindow(QWidget):
         self.username.move(120, 30)
 
         self.label_password = QLabel("Пароль:", self)
-        self.label_password.move(50, 70)
+        self.label_password.move(60, 70)
         self.password = QLineEdit(self)
         self.password.setEchoMode(QLineEdit.Password)  # Устанавливаем режим скрытия пароля
         self.password.setPlaceholderText('введите пароль')
@@ -35,6 +35,10 @@ class LoginWindow(QWidget):
         self.button_register = QPushButton("Регистрация", self)
         self.button_register.move(150, 120)
         self.button_register.clicked.connect(self.show_register_window)
+        self.username.currentTextChanged.connect(self.update_users)
+    def update_users(self):
+        users_list = list(map(lambda x: x[1], self.get_list_users()))
+        self.username.addItems(users_list)
 
     def login(self):
         username = self.username.currentText()
