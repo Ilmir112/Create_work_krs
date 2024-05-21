@@ -62,10 +62,10 @@ class TabPageDp(QWidget):
             self.fluid_edit.setText('1.18')
         else:
             self.fluid_edit.setText('1.01')
-
-        # self.osvoenie_label = QLabel('Необходимость освоения')
-        # self.osvoenie_combo = QComboBox(self)
-        # self.osvoenie_combo.addItems(['Да', 'Нет'])
+        if well_data.work_plan == 'gnkt_after_grp':
+            self.osvoenie_label = QLabel('Необходимость освоения')
+            self.osvoenie_combo = QComboBox(self)
+            self.osvoenie_combo.addItems(['Да', 'Нет'])
 
         self.grid = QGridLayout(self)
         self.grid.addWidget(self.gnkt_number_label, 0, 2, 1, 5)
@@ -88,8 +88,9 @@ class TabPageDp(QWidget):
         self.grid.addWidget(self.current_bottom_edit, 5, 2)
         self.grid.addWidget(self.fluid_label, 4, 3)
         self.grid.addWidget(self.fluid_edit, 5, 3)
-        # self.grid.addWidget(self.osvoenie_label, 4, 4)
-        # self.grid.addWidget(self.osvoenie_combo, 5, 4)
+        if well_data.work_plan == 'gnkt_after_grp':
+            self.grid.addWidget(self.osvoenie_label, 4, 4)
+            self.grid.addWidget(self.osvoenie_combo, 5, 4)
         self.gnkt_number_combo.currentTextChanged.connect(self.update_number_gnkt)
         self.previous_well_combo.currentTextChanged.connect(self.update_data_gnkt)
 
@@ -185,8 +186,9 @@ class GnktOsvWindow2(QMainWindow):
         GnktOsvWindow2.current_bottom_edit = int(float(current_bottom_edit))
         fluid_edit = self.tabWidget.currentWidget().fluid_edit.text()
         GnktOsvWindow2.fluid_edit = round(float(fluid_edit), 2)
-        # osvoenie_combo_need = self.tabWidget.currentWidget().osvoenie_combo.currentText()
-        # GnktOsvWindow2.osvoenie_combo_need = osvoenie_combo_need
+        if well_data.work_plan == 'gnkt_after_grp':
+            osvoenie_combo_need = self.tabWidget.currentWidget().osvoenie_combo.currentText()
+            GnktOsvWindow2.osvoenie_combo_need = osvoenie_combo_need
         pvo_number = self.tabWidget.currentWidget().pvo_number_edit.text()
         well_data.pvo = pvo_number
         previous_well_combo = self.tabWidget.currentWidget().previous_well_combo.currentText()

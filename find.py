@@ -143,19 +143,7 @@ class FindIndexPZ(QMainWindow):
                                     ' ожидаемых показателей',
                                     0, 0, 800)[0])
 
-        if well_data.condition_of_wells._value == 0:
-            well_data.condition_of_wells = ProtectedIsDigit(QInputDialog.getInt(
-                self, 'индекс копирования',
-                'Программа не смогла определить строку n\ III. '
-                'Состояние скважины к началу ремонта ',
-                0, 0, 800)[0])
-            while well_data.condition_of_wells < well_data.cat_well_min_value or \
-                    well_data.condition_of_wells > well_data.data_well_max._value:
-                mes = QMessageBox.warning(self, 'Ошибка', 'Не корректное значение')
-                well_data.condition_of_wells = ProtectedIsDigit(
-                    QInputDialog.getInt(self, 'индекс окончания копирования',
-                                        'Программа не смогла определить строку окончания копирования',
-                                        0, 0, 800)[0])
+
         if well_data.data_x_min._value == 0:
             well_data.data_x_min = ProtectedIsDigit(
                 QInputDialog.getInt(self, 'индекс начала копирования ожидаемых показателей',
@@ -182,6 +170,19 @@ class FindIndexPZ(QMainWindow):
                 QInputDialog.getInt(self, 'индекс начала строки с таблицей фондовыго оборудования',
                                     'Программа не смогла найти строку с таблицей фондового оборудования',
                                     0, 0, 800)[0])
+        if well_data.condition_of_wells._value == 0:
+            well_data.condition_of_wells = ProtectedIsDigit(QInputDialog.getInt(
+                self, 'индекс копирования',
+                'Программа не смогла определить строку n\ III. '
+                'Состояние скважины к началу ремонта ',
+                0, 0, 800)[0])
+            while well_data.condition_of_wells._value < well_data.cat_well_min._value or \
+                    well_data.condition_of_wells._value > well_data.data_well_max._value:
+                mes = QMessageBox.warning(self, 'Ошибка', 'Не корректное значение')
+                well_data.condition_of_wells = ProtectedIsDigit(
+                    QInputDialog.getInt(self, 'индекс окончания копирования',
+                                        'Программа не смогла определить строку окончания копирования',
+                                        0, 0, 800)[0])
         # print(well_data.cat_well_min._value, well_data.cat_well_max._value, well_data.data_well_min._value,
         #       well_data.data_pvr_max._value, well_data.condition_of_wells._value, well_data.data_well_max._value,
         #       well_data.pipes_ind._value, well_data.sucker_rod_ind._value

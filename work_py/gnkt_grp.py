@@ -171,6 +171,14 @@ class GnktOsvWindow(QMainWindow):
         self.copy_pvr(self.ws_schema, self.work_schema)
         # self.wb.save(f"{well_data.well_number._value} {well_data.well_area._value} ГНКТ освоение.xlsx")
         # print('файл сохранен')
+        for row_number, row in enumerate(self.ws_title.iter_rows(values_only=True)):
+            for col_number, cell in enumerate(row):
+                if 'по H2S' in str(self.ws_title.cell(row=row_number+1, column=col_number+1).value) and 'по H2S' not in str(
+                        self.ws_title.cell(row=row_number + 2, column=col_number).value):
+                    self.ws_title.merge_cells(start_column=col_number + 1, start_row=row_number + 1,
+                                    end_column=col_number + 1, end_row=row_number + 2)
+                    self.ws_title.merge_cells(start_column=col_number + 3, start_row=row_number + 1,
+                                    end_column=col_number + 3, end_row=row_number + 2)
 
         main.MyWindow.copy_pz(self, self.ws_title, table_title, self.work_plan, 13, 1)
         main.MyWindow.copy_pz(self, self.ws_schema, table_schema, self.work_plan, 23, 2)
