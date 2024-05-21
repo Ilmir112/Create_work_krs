@@ -832,7 +832,8 @@ class GnoDescentWindow(QMainWindow):
                     for row in TemplateKrs.pero(self):
                         pero_list.append(row)
 
-                    gno_list.extend(pero_list)
+                    for row in pero_list[::-1]:
+                        gno_list.insert(0, row)
 
         return gno_list
 

@@ -1257,8 +1257,8 @@ class Well_Category(FindIndexPZ):
                                 ws.cell(row=row - 1, column=2).value):
                             for column in range(1, 13):
                                 col = ws.cell(row=row, column=column).value
-                                print(f'ячейка {col}')
-                                if str(col) in ['%', 'мг/л', 'мг/дм3', 'мг/м3', 'мг/дм'] and \
+
+                                if str(col) in ['%', 'мг/л', 'мг/дм3', 'мг/м3', 'мг/дм', 'мгдм3'] and \
                                         ws.cell(row=row, column=column - 2).value:
                                     # print(f'ячейка- 3 3 {col}')
                                     well_data.cat_h2s_list.append(ws.cell(row=row, column=column - 2).value)
@@ -1271,7 +1271,7 @@ class Well_Category(FindIndexPZ):
                                     well_data.cat_gaz_f_pr.append(ws.cell(row=row, column=column - 2).value)
 
 
-                        elif 'мг/л' in str(cell) or 'мг/дм' in str(cell):
+                        elif 'мг/л' in str(cell) or 'мг/дм' in str(cell) or 'мгдм' in str(cell):
                             cell2 = ws.cell(row=row, column=col - 1).value
                             if cell2:
                                 well_data.h2s_mg.append(
@@ -1301,7 +1301,11 @@ class Well_Category(FindIndexPZ):
                                 well_data.h2s_mg_m3.append(float(str(
                                     FindIndexPZ.check_str_None(self, str(cell2).replace(',', '.')))) / 1000)
 
-            print(well_data.h2s_mg)
+            if len(well_data.cat_h2s_list) == 0:
+                cat_h2s, _ = QInputDialog.getint(self, 'Категория скважины',
+                                                   'Введите категорию скважины по сероводороду',3, 1, 3)
+                well_data.cat_h2s_list.append( cat_h2s)
+
             if len(well_data.h2s_mg) == 0 and len(well_data.h2s_mg_m3) != 0:
                 for mg in well_data.h2s_mg_m3:
                     # print(f'значени{mg}')

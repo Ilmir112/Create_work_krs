@@ -23,45 +23,45 @@ class TabPage_SO(QWidget):
         self.column_direction_diametr_Label = QLabel("диаметр направление", self)
         self.column_direction_diametr_edit = FloatLineEdit(self)
         if well_data.column_direction_True:
-            self.column_direction_diametr_edit.setText(f'{well_data.column_direction_diametr._value}')
+            self.column_direction_diametr_edit.setText(f'{str(well_data.column_direction_diametr._value).strip()}')
         else:
             self.column_direction_diametr_edit.setText(f'отсут')
 
         self.column_direction_wall_thickness_Label = QLabel("Толщина стенки направление", self)
         self.column_direction_wall_thickness_edit = FloatLineEdit(self)
         if well_data.column_direction_True:
-            self.column_direction_wall_thickness_edit.setText(f'{well_data.column_direction_wall_thickness._value}')
+            self.column_direction_wall_thickness_edit.setText(f'{str(well_data.column_direction_wall_thickness._value).strip()}')
         else:
             self.column_direction_wall_thickness_edit.setText(f'отсут')
         self.column_direction_lenght_Label = QLabel("башмак направления", self)
         self.column_direction_lenght_edit = FloatLineEdit(self)
         if well_data.column_direction_True:
-            self.column_direction_lenght_edit.setText(f'{well_data.column_direction_lenght._value}')
+            self.column_direction_lenght_edit.setText(f'{str(well_data.column_direction_lenght._value).strip()}')
         else:
             self.column_direction_lenght_edit.setText(f'отсут')
 
         self.level_cement_direction_Label = QLabel("Уровень цемента за направление", self)
         self.level_cement_direction_edit = FloatLineEdit(self)
         if well_data.column_direction_True:
-            self.level_cement_direction_edit.setText(f'{well_data.level_cement_direction._value}')
+            self.level_cement_direction_edit.setText(f'{str(well_data.level_cement_direction._value).strip()}')
         else:
             self.level_cement_direction_edit.setText(f'отсут')
 
         self.column_conductor_diametr_Label = QLabel("диаметр кондуктора", self)
         self.column_conductor_diametr_edit = FloatLineEdit(self)
-        self.column_conductor_diametr_edit.setText(f'{well_data.column_conductor_diametr._value}')
+        self.column_conductor_diametr_edit.setText(f'{str(well_data.column_conductor_diametr._value).strip()}')
 
         self.column_conductor_wall_thickness_Label = QLabel("Толщина стенки ", self)
         self.column_conductor_wall_thickness_edit = FloatLineEdit(self)
-        self.column_conductor_wall_thickness_edit.setText(f'{well_data.column_conductor_wall_thickness._value}')
+        self.column_conductor_wall_thickness_edit.setText(f'{str(well_data.column_conductor_wall_thickness._value).strip()}')
 
         self.column_conductor_lenght_Label = QLabel("башмак кондуктора", self)
         self.column_conductor_lenght_edit = FloatLineEdit(self)
-        self.column_conductor_lenght_edit.setText(f'{well_data.column_conductor_lenght._value}')
+        self.column_conductor_lenght_edit.setText(f'{str(well_data.column_conductor_lenght._value).strip()}')
 
         self.level_cement_conductor_Label = QLabel("Уровень цемента за кондуктором", self)
         self.level_cement_conductor_edit = FloatLineEdit(self)
-        self.level_cement_conductor_edit.setText(f'{well_data.level_cement_conductor._value}')
+        self.level_cement_conductor_edit.setText(f'{str(well_data.level_cement_conductor._value).strip()}')
 
         self.columnLabel = QLabel("диаметр ЭК", self)
         self.columnType = FloatLineEdit(self)

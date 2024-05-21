@@ -985,7 +985,7 @@ class MyWindow(QMainWindow):
             well_data.first_pressure = ProtectedIsDigit(0)
             well_data.swabTypeComboIndex = 1
             well_data.swab_true_edit_type = 1
-            well_data.data_x_max = 0
+            well_data.data_x_max = ProtectedIsDigit(0)
             well_data.drilling_interval = []
             well_data.max_angle = 0
             well_data.pakerTwoSKO = False
@@ -1018,12 +1018,13 @@ class MyWindow(QMainWindow):
             well_data.problemWithEk_depth = well_data.current_bottom
             well_data.problemWithEk_diametr = 220
             path = "imageFiles/image_work"
+
             for file in os.listdir(path):
                 file_path = os.path.join(path, file)
                 if os.path.isfile(file_path):
                     os.remove(file_path)
 
-        print("Closing current file")
+            mes = QMessageBox.information(self, 'Обновление', 'Данные обнулены')
 
     def on_finished(self):
         print("Работа с файлом Excel завершена.")

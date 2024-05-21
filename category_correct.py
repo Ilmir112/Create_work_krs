@@ -91,26 +91,37 @@ class TabPage_SO(QWidget):
             plast_index.setCurrentIndex(self.plast_all.index(work_plast))
 
             category_pressuar_line_edit = QLineEdit(self)
-            category_pressuar_line_edit.setText(str(self.ifNone(self.cat_P_1[num])))
-
+            try:
+                category_pressuar_line_edit.setText(str(self.ifNone(self.cat_P_1[num])))
+            except:
+                mes = QMessageBox.warning(self, 'ОШИБКА', 'не вставилось данные по категории')
             pressuar_data_edit = QLineEdit(self)
-            pressuar_data_edit.setText(str(self.ifNone(self.cat_P_P[num])))
+            try:
+                pressuar_data_edit.setText(str(self.ifNone(self.cat_P_P[num])))
+            except:
+                mes = QMessageBox.warning(self, 'ОШИБКА', 'не вставилось данные по давлению')
             # print(num)
             category_h2s_edit = QLineEdit(self)
-            print(self.cat_h2s_list)
-            category_h2s_edit.setText(str(self.ifNone(self.cat_h2s_list[num])))
+            try:
+                category_h2s_edit.setText(str(self.ifNone(self.cat_h2s_list[num])))
+            except:
+                mes = QMessageBox.warning(self, 'ОШИБКА', 'не вставилось данные по серовороду')
             h2s_pr_edit = QLineEdit(self)
-            if str(round(float(str(self.h2s_pr[num]).replace(',', '.')), 3))[-1] == "0":
-                h2s_pr = int(float(self.h2s_pr[num]))
-            else:
-                h2s_pr = round(float(str(self.h2s_pr[num]).replace(',', '.')), 4)
-
-            h2s_pr_edit.setText(str(h2s_pr))
+            try:
+                if str(round(float(str(self.h2s_pr[num]).replace(',', '.')), 3))[-1] == "0":
+                    h2s_pr = int(float(self.h2s_pr[num]))
+                else:
+                    h2s_pr = round(float(str(self.h2s_pr[num]).replace(',', '.')), 4)
+                h2s_pr_edit.setText(str(h2s_pr))
+            except:
+                mes = QMessageBox.warning(self, 'ОШИБКА', 'не вставилось данные по серовороду')
 
             category_h2s2_edit = QLineEdit(self)
-            category_h2s2_edit.setText(str(self.ifNone(self.cat_h2s_list[num])))
-            h2s_mg_edit = QLineEdit(self)
-            print(self.h2s_mg)
+            try:
+                category_h2s2_edit.setText(str(self.ifNone(self.cat_h2s_list[num])))
+                h2s_mg_edit = QLineEdit(self)
+            except:
+                mes = QMessageBox.warning(self, 'ОШИБКА', 'не вставилось данные по серовороду')
             try:
                 h2s_mg_edit.setText(str(self.ifNone(self.h2s_mg[num])))
             except:

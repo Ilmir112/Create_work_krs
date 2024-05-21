@@ -28,7 +28,6 @@ class TabPage_SO_rir(QWidget):
         plast_work = ['']
         plast_work.extend(well_data.plast_work)
 
-
         if well_data.leakiness:
             for nek in list(well_data.dict_leakiness['НЭК']['интервал'].keys()):
                 plast_work.append(f'НЭК {nek}')
@@ -37,7 +36,6 @@ class TabPage_SO_rir(QWidget):
         self.plast_combo = CheckableComboBox(self)
         self.plast_combo.combo_box.addItems(plast_work)
         self.plast_combo.combo_box.currentTextChanged.connect(self.update_plast_edit)
-
 
         self.roof_rir_label = QLabel("Плановая кровля РИР", self)
 
@@ -52,7 +50,6 @@ class TabPage_SO_rir(QWidget):
         self.sole_rir_edit.setValidator(self.validator_int)
         self.sole_rir_edit.setClearButtonEnabled(True)
 
-
         self.diametr_paker_labelType = QLabel("Диаметр пакера", self)
         self.diametr_paker_edit = QLineEdit(self)
         self.diametr_paker_edit.setValidator(self.validator_int)
@@ -65,6 +62,8 @@ class TabPage_SO_rir(QWidget):
         self.paker_depth_edit = QLineEdit(self)
         self.paker_depth_edit.setValidator(self.validator_int)
 
+        self.cement_volume_label = QLabel('Объем цемента')
+        self.cement_volume_line = QLineEdit(self)
 
         if len(well_data.plast_work) != 0:
             pakerDepth = well_data.perforation_sole - 20
@@ -74,7 +73,6 @@ class TabPage_SO_rir(QWidget):
             if well_data.leakiness:
                 pakerDepth = min([float(nek.split('-')[0]) - 10
                                   for nek in well_data.dict_perforation['НЭК']['интервал'].keys()])
-
 
         self.pakerDepthZumpf_Label = QLabel("Глубина посадки для ЗУМПФа", self)
         self.pakerDepthZumpf_edit = QLineEdit(self)
@@ -147,6 +145,13 @@ class TabPage_SO_rir(QWidget):
 
         self.grid.addWidget(self.pressuar_new_label, 9, 5)
         self.grid.addWidget(self.pressuar_new_edit, 10, 5)
+
+
+        self.cement_volume_line.setValidator(self.validator_float)
+
+
+        self.grid.addWidget(self.cement_volume_label, 4, 6)
+        self.grid.addWidget(self.cement_volume_line, 5, 6)
 
         self.need_change_zgs_combo.currentTextChanged.connect(self.update_change_fluid)
         self.need_change_zgs_combo.setCurrentIndex(1)
@@ -232,12 +237,16 @@ class TabPage_SO_rir(QWidget):
             self.fluid_new_edit.setParent(None)
             self.pressuar_new_label.setParent(None)
             self.pressuar_new_edit.setParent(None)
+            self.cement_volume_label.setParent(None)
+            self.cement_volume_line.setParent(None)
             self.paker_depth_edit.setText(f'{well_data.perforation_roof - 30}')
             self.roof_rir_edit.setText(f'{well_data.perforation_roof - 30}')
             self.sole_rir_edit.setText(f'{well_data.current_bottom}')
         elif index == 'РИР с РПК' or index == 'РИР с РПП': # ['РИР на пере', 'РИР с пакером', 'РИР с РПК', 'РИР с РПП']
             self.need_change_zgs_label.setParent(None)
             self.need_change_zgs_combo.setParent(None)
+            self.cement_volume_label.setParent(None)
+            self.cement_volume_line.setParent(None)
             self.plast_new_label.setParent(None)
             self.plast_new_combo.setParent(None)
             self.fluid_new_label.setParent(None)
@@ -254,6 +263,9 @@ class TabPage_SO_rir(QWidget):
                 self.paker_depth_edit.setText(f'{well_data.perforation_roof - 10}')
         elif index == 'РИР на пере': # ['РИР на пере', 'РИР с пакером', 'РИР с РПК', 'РИР с РПП']
 
+            self.grid.addWidget(self.cement_volume_label, 4, 6)
+            self.grid.addWidget(self.cement_volume_line, 5, 6)
+
             self.grid.addWidget(self.need_change_zgs_label, 9, 2)
             self.grid.addWidget(self.need_change_zgs_combo, 10, 2)
 
@@ -268,6 +280,10 @@ class TabPage_SO_rir(QWidget):
             self.roof_rir_edit.setText(f'{well_data.perforation_roof-50}')
             self.sole_rir_edit.setText(f'{well_data.current_bottom}')
             self.paker_depth_edit.setText(f'{well_data.perforation_roof-30}')
+
+            if self.roof_rir_edit.text() != '' and self.sole_rir_edit.text() != '':
+                self.cement_volume_line.setText(
+                    f'{round(volume_vn_ek(float(self.roof_rir_edit.text())) * (float(self.sole_rir_edit.text()) - float(self.roof_rir_edit.text())) / 1000, 1)}')
 
     def update_paker(self, index):
 
@@ -597,7 +613,7 @@ class RirWindow(QMainWindow):
 
 
     def rirWithPero(self, paker_need_Combo, plast_combo,
-                     roof_rir_edit, sole_rir_edit, need_change_zgs_combo = 'Нет', plast_new_combo = '',
+                     roof_rir_edit, sole_rir_edit, volume_cement, need_change_zgs_combo = 'Нет', plast_new_combo = '',
                     fluid_new_edit = '', pressuar_new_edit = '', pressureZUMPF_question = 'Не нужно',
                                          diametr_paker = 122, paker_khost= 0, paker_depth= 0):
 
@@ -677,7 +693,7 @@ class RirWindow(QMainWindow):
         else:
             rir_list = []
 
-        volume_cement = round(volume_vn_ek(roof_rir_edit) * (sole_rir_edit - roof_rir_edit)/1000, 1)
+
 
         uzmPero_list = [
             [f' СПО пера до глубины {sole_rir_edit}м Опрессовать НКТ на 200атм', None,
@@ -693,13 +709,13 @@ class RirWindow(QMainWindow):
              None, None, None, None, None, None, None,
              'мастер КРС', 2.5],
             [None, None,
-             f'Приготовить цементный раствор у=1,82г/см3 в объёме {volume_cement}м3'
-             f' (сухой цемент{round(volume_cement*1.25,1)}т) ',
+             f'Приготовить цементный раствор у=1,82г/см3 в объёме {round(volume_cement/1.25, 1)}м3'
+             f' (сухой цемент {volume_cement}т) ',
              None, None, None, None, None, None, None,
              'мастер КРС', 0.5],
             [None, None,
              f'Вызвать циркуляцию. Закачать в НКТ тех. воду у=1,00г/см3 в объеме {volume_in_ek}м3, цементный '
-             f'раствор в объеме {volume_cement}м3, '
+             f'раствор в объеме {round(volume_cement/1.25, 1)}м3, '
              f'довести тех.жидкостью у=1,00г/см3 в объёме {volume_in_nkt}м3, тех. жидкостью  в '
              f'объёме {round(volume_vn_nkt(dict_nkt)-volume_in_nkt,1)}м3. '
              f'Уравновешивание цементного раствора',
@@ -711,7 +727,8 @@ class RirWindow(QMainWindow):
              'мастер КРС', 0.5],
             [None, None,
              f'Открыть трубное пространство. Промыть скважину обратной промывкой (срезка) по круговой циркуляции '
-             f'тех.жидкостью  в объеме не менее {round(volume_vn_nkt(dict_nkt) * 1.5, 1)}м3 уд.весом {well_data.fluid_work} (Полуторакратный объем НКТ) '
+             f'тех.жидкостью  в объеме не менее {round(volume_vn_nkt(dict_nkt) * 1.5, 1)}м3 уд.весом '
+             f'{well_data.fluid_work} (Полуторакратный объем НКТ) '
              f'с расходом жидкости 8л/с (срезка) до чистой воды.',
              None, None, None, None, None, None, None,
              'мастер КРС', well_volume_norm(16)],
@@ -775,14 +792,14 @@ class RirWindow(QMainWindow):
                  None, None, None, None, None, None, None,
                  'мастер КРС', 2.5],
                 [None, None,
-                 f'Приготовить цементный раствор у=1,82г/см3 в объёме {volume_cement}м3'
-                 f' (сухой цемент{round(volume_cement * 1.25, 1)}т) ',
+                 f'Приготовить цементный раствор у=1,82г/см3 в объёме {round(volume_cement/1.25, 1)}м3'
+                 f' (сухой цемент{round(volume_cement, 1)}т) ',
                  None, None, None, None, None, None, None,
                  'мастер КРС', 0.5],
                 [None, None,
                  f'Вызвать циркуляцию. Закачать в НКТ тех. воду у=1,00г/см3 в объеме {volume_in_ek}м3,'
                  f' цементный раствор в '
-                 f'объеме {volume_cement}м3, '
+                 f'объеме {round(volume_cement/1.25, 1)}м3, '
                  f'довести тех.жидкостью у=1,00г/см3 в объёме {volume_in_nkt}м3, тех. жидкостью  в объёме '
                  f'{round(volume_vn_nkt(dict_nkt) - volume_in_nkt, 1)}м3. '
                  f'Уравновешивание цементного раствора',
@@ -954,11 +971,18 @@ class RirWindow(QMainWindow):
 
         plast_combo = str(self.tabWidget.currentWidget().plast_combo.combo_box.currentText())
         self.rir_type_Combo = str(self.tabWidget.currentWidget().rir_type_Combo.currentText())
-        roof_rir_edit = int(float(self.tabWidget.currentWidget().roof_rir_edit.text().replace(',', '.')))
-        sole_rir_edit = int(float(self.tabWidget.currentWidget().sole_rir_edit.text().replace(',', '.')))
+        roof_rir_edit = self.tabWidget.currentWidget().roof_rir_edit.text().replace(',', '.')
+        if roof_rir_edit != '':
+            roof_rir_edit = int(float(roof_rir_edit))
+        sole_rir_edit = self.tabWidget.currentWidget().sole_rir_edit.text().replace(',', '.')
+        if sole_rir_edit != '':
+            sole_rir_edit = int(float(sole_rir_edit))
         paker_need_Combo = self.tabWidget.currentWidget().paker_need_Combo.currentText()
         pressureZUMPF_question = self.tabWidget.currentWidget().pressureZUMPF_question_QCombo.currentText()
         need_change_zgs_combo = self.tabWidget.currentWidget().need_change_zgs_combo.currentText()
+        volume_cement = self.tabWidget.currentWidget().cement_volume_line.text().replace(',', '.')
+        if volume_cement != '':
+            volume_cement = round(float(volume_cement))
         if len(well_data.plast_project) != 0:
             plast_new_combo = self.tabWidget.currentWidget().plast_new_combo.currentText()
         else:
@@ -1002,7 +1026,7 @@ class RirWindow(QMainWindow):
                 return
 
             work_list = self.rirWithPero(paker_need_Combo, plast_combo,
-                                         roof_rir_edit, sole_rir_edit, need_change_zgs_combo, plast_new_combo,
+                                         roof_rir_edit, sole_rir_edit, volume_cement, need_change_zgs_combo, plast_new_combo,
                     fluid_new_edit, pressuar_new_edit, pressureZUMPF_question,
                                          diametr_paker, paker_khost, paker_depth)
 
