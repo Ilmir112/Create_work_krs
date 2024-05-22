@@ -329,16 +329,17 @@ class MyWindow(QMainWindow):
             self.fname, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
                                                                   "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
             if self.fname:
-                try:
-                    self.read_pz(self.fname)
-                    well_data.pause = True
-                    read_pz = CreatePZ(self.wb, self.ws, self.data_window, self.perforation_correct_window2)
-                    sheet = read_pz.open_excel_file(self.ws, self.work_plan)
+                # try:
+                self.read_pz(self.fname)
+                well_data.pause = True
+                read_pz = CreatePZ(self.wb, self.ws, self.data_window, self.perforation_correct_window2)
+                sheet = read_pz.open_excel_file(self.ws, self.work_plan)
 
-                    self.copy_pz(sheet, self.table_widget, self.work_plan)
 
-                except FileNotFoundError:
-                    print('Файл не найден')
+                self.copy_pz(sheet, self.table_widget, self.work_plan)
+
+                # except FileNotFoundError:
+                #     print('Файл не найден')
         elif action == self.create_KRS_DP and self.table_widget == None:
             self.work_plan = 'dop_plan'
             self.tableWidgetOpen(self.work_plan)
