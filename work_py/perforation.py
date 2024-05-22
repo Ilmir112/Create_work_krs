@@ -68,8 +68,8 @@ class TabPage_SO(QWidget):
                 angle_list = [(depth, angle) for depth, angle, curvature in well_data.angle_data
                     if abs(float(depth) - float(sole)) <= 10]
                 print(angle_list)
-                depth_max = max([depth for depth, angle in angle_list])
-                angle_depth = max([angle for depth, angle in angle_list])
+                depth_max = max([float(depth.replace(',', '.')) for depth, angle in angle_list])
+                angle_depth = max([float(angle.replace(',', '.')) for depth, angle in angle_list])
 
                 if depth_max < 50:
                     TabPage_SO.combobox_type_perforation.setCurrentIndex(0)

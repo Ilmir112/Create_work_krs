@@ -1336,7 +1336,7 @@ class AcidPakerWindow(QMainWindow):
 
         if QplastEdit == 'ДА' and well_data.curator == 'ОР':
             work_list = []
-            work_list.append(Определение
+            work_list.append(
                 [f'Насыщение 5м3.  Q пласт {plast_combo} при '
                  f'Р={self.pressure_mode(well_data.expected_P, plast_combo)}атм', None,
                  f'Произвести насыщение скважины до стабилизации давления закачки '

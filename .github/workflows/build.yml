@@ -49,7 +49,7 @@ jobs:
           --add-data "build_script.py;." 
           --add-data "block_name.py;." 
           --add-data "application_pvr.py;." 
-          --add-data "application_gis.py;."  
+          --add-data "application_gis.py;."          
           "main.py"
 
 
