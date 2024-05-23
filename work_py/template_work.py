@@ -990,7 +990,7 @@ class TemplateKrs(QMainWindow):
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика', 4],
             [
-                f'Промывка скважину уд.весом {well_data.fluid_work_short} в объеме {round(TemplateKrs.well_volume(self) * 1.5, 1)}м3 ',
+                f'Промывка скважину уд.весом {well_data.fluid_work} в объеме {round(TemplateKrs.well_volume(self) * 1.5, 1)}м3 ',
                 None,
                 f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {well_data.fluid_work}  при расходе '
                 f'жидкости 6-8 л/сек '

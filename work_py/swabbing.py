@@ -551,7 +551,8 @@ class Swab_Window(QMainWindow):
             self.tableWidget.insertRow(rows)
             self.tableWidget.setItem(rows, 0, QTableWidgetItem(plast_combo))
             self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(paker_khost)))
-            self.tableWidget.setCellWidget(rows, 2, swab_volume_edit)
+            self.tableWidget.setCellWidget(rows, 2, swab_edit_combo)
+            self.tableWidget.setItem(rows, 3, QTableWidgetItem(str(swab_volume_edit)))
 
         elif swab_true_edit_type in ['Опрессовка снижением уровня на шаблоне']:
             if rows != 0:
@@ -668,7 +669,7 @@ class Swab_Window(QMainWindow):
                 paker_depth = int(float(self.tableWidget.item(row, 2).text()))
                 swabTypeCombo = self.tableWidget.cellWidget(row, 3).currentText()
                 swab_volumeEdit = int(float(self.tableWidget.item(row, 4).text()))
-                if len(rows) == 1:
+                if rows == 1:
                     work_list = self.swabbing_with_paker(diametr_paker, paker_depth, paker_khost, plast_combo,
                                                          swabTypeCombo, swab_volumeEdit, depthGaugeCombo,
                                                          need_change_zgs_combo,

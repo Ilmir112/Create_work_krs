@@ -36,7 +36,7 @@ import time
 import win32gui
 
 from PyQt5.QtCore import Qt, QObject, pyqtSignal
-from PyQt5.QtWidgets import QPlainTextEdit
+
 
 from work_py.leakage_column import LeakageWindow
 
@@ -1835,26 +1835,27 @@ class MyWindow(QMainWindow):
         # print(f'схема ПВО {schema_pvo_set}')
 
         n = 0
-        for schema in list(schema_pvo_set):
-            coordinate = f'{get_column_letter(2)}{1 + n}'
-            schema_path = f'imageFiles/pvo/oil/схема {schema}.jpg'
-            img = openpyxl.drawing.image.Image(schema_path)
-            img.width = 750
-            img.height = 530
-            img.anchor = coordinate
-            ws5.add_image(img, coordinate)
-            n += 29
-        ws5.print_area = f'B1:M{n}'
-        ws5.page_setup.fitToPage = True
-        ws5.page_setup.fitToHeight = False
-        ws5.page_setup.fitToWidth = True
-        ws5.print_options.horizontalCentered = True
-        # зададим размер листа
-        ws5.page_setup.paperSize = ws5.PAPERSIZE_A4
-        # содержимое по ширине страницы
-        ws5.sheet_properties.pageSetUpPr.fitToPage = True
-        ws5.page_setup.fitToHeight = False
-        # Переместите второй лист перед первым
+        if schema_pvo_set:
+            for schema in list(schema_pvo_set):
+                coordinate = f'{get_column_letter(2)}{1 + n}'
+                schema_path = f'imageFiles/pvo/oil/схема {schema}.jpg'
+                img = openpyxl.drawing.image.Image(schema_path)
+                img.width = 750
+                img.height = 530
+                img.anchor = coordinate
+                ws5.add_image(img, coordinate)
+                n += 29
+            ws5.print_area = f'B1:M{n}'
+            ws5.page_setup.fitToPage = True
+            ws5.page_setup.fitToHeight = False
+            ws5.page_setup.fitToWidth = True
+            ws5.print_options.horizontalCentered = True
+            # зададим размер листа
+            ws5.page_setup.paperSize = ws5.PAPERSIZE_A4
+            # содержимое по ширине страницы
+            ws5.sheet_properties.pageSetUpPr.fitToPage = True
+            ws5.page_setup.fitToHeight = False
+            # Переместите второй лист перед первым
 
         return list(schema_pvo_set)
 
