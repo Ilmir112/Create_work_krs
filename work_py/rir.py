@@ -460,12 +460,9 @@ class RirWindow(QMainWindow):
         # print(paker_need_Combo, plast_combo, diametr_paker, paker_khost,
         #            paker_depth, pressureZUMPF_question)
         rir_list = self.need_paker(paker_need_Combo, plast_combo, diametr_paker, paker_khost,
-                   paker_depth, pressureZUMPF_question, RirWindow.rir_rpk_plast_true)
+                   paker_depth, pressureZUMPF_question, rir_rpk_plast_true)
 
-
-
-
-        if RirWindow.rir_rpk_plast_true:
+        if rir_rpk_plast_true:
                 rir_q_list = [
               [f'посадить пакер на глубину {roof_rir_edit}м'
                   , None,
@@ -1133,7 +1130,7 @@ class RirWindow(QMainWindow):
             well_data.current_bottom = pakerIzvPaker-20
         else:
             rir_list.append([None, None,
-             f'Поднять ИУГ до глубины {pakerIzvPaker - 120}м с доливом тех жидкости в объеме '
+             f'Поднять ИУГ c глубины {pakerIzvPaker}м с доливом тех жидкости в объеме '
              f'{round(pakerIzvPaker * 1.12 / 1000, 1)}м3 уд.весом {well_data.fluid_work}',
              None, None, None, None, None, None, None,
              'Мастер КРС, подрядчик по ГИС', 4])

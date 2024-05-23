@@ -1185,7 +1185,7 @@ class GnoWindow(QMainWindow):
             ]
             # print(f'ключ НКТ {list(map(int, well_data.dict_nkt.keys())), well_data.dict_nkt}')
             lift_orz = [[]]
-            if 89 in list(map(int, well_data.dict_nkt.keys())) and 48 in list(map(int, well_data.dict_nkt.keys())):
+            if '89' in list(map(str, well_data.dict_nkt.keys())) and '48' in list(map(str, well_data.dict_nkt.keys())):
                 lift_key = 'ОРЗ'
                 lift_orz = [
                     [f'глушение скважины в НКТ48мм в объеме {round(1.3 * well_data.dict_nkt["48"] / 1000, 1)}м3, '
