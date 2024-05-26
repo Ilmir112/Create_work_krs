@@ -1790,11 +1790,11 @@ class MyWindow(QMainWindow):
                             indent=4)
 
         # Подготовленные данные для вставки (пример)
-        data_values = (row_max, well_data.current_bottom, dict_perforation_json, plast_all_json, plast_work_json,
+        data_values = [row_max, well_data.current_bottom, dict_perforation_json, plast_all_json, plast_work_json,
                        leakage_json, well_data.column_additional, well_data.fluid_work,
                        well_data.category_pressuar, well_data.category_h2s, well_data.category_gf,
                        well_data.template_depth, skm_list_json,
-                       well_data.problemWithEk_depth, well_data.problemWithEk_diametr)
+                       well_data.problemWithEk_depth, well_data.problemWithEk_diametr]
 
         if len(well_data.data_list) == 0:
             well_data.data_list.append(data_values)
@@ -1895,6 +1895,11 @@ class MyWindow(QMainWindow):
             self.perforation_correct_window2.close()
             self.perforation_correct_window2 = None
 
+
+        well_data.data_list[-1][1] = well_data.current_bottom
+
+        well_data.data_list[-1][2] = json.dumps(well_data.dict_perforation, default=str, ensure_ascii=False, indent=4)
+
     def correctNEK(self):
         from find import WellCondition
 
@@ -1914,7 +1919,7 @@ class MyWindow(QMainWindow):
         else:
             WellCondition.leakage_window.close()  # Close window.
             WellCondition.leakage_window = None  # Discard reference.
-
+        well_data.data_list[-1][5] = json.dumps(well_data.dict_leakiness, default=str, ensure_ascii=False, indent=4)
     def correctData(self):
         from data_correct import DataWindow
 

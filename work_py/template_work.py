@@ -835,22 +835,41 @@ class TemplateKrs(QMainWindow):
 
     def addRowTable(self):
 
-        roof_skm = self.tabWidget.currentWidget().roof_skm_line.text().replace(',', '.')
-        sole_skm = self.tabWidget.currentWidget().sole_skm_line.text().replace(',', '.')
+        roof_skm = int(self.tabWidget.currentWidget().roof_skm_line.text())
+        sole_skm = int(self.tabWidget.currentWidget().sole_skm_line.text())
+        template_key = self.tabWidget.currentWidget().template_Combo.currentText()
+
         if not roof_skm or not sole_skm:
             msg = QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
             return
         if well_data.current_bottom < float(sole_skm):
-            msg = QMessageBox.information(self, 'Внимание', f'глубина НЭК ниже глубины нахождения '
+            msg = QMessageBox.information(self, 'Внимание', f'глубина забоя выше глубины нахождения '
                                                             f'СКМ {well_data.skm_depth}')
+            return
+
+        if template_key in ['ПСШ СКМ в доп колонне c хвостом',
+                            'ПСШ СКМ в доп колонне + открытый ствол', 'ПСШ СКМ в доп колонне без хвоста'] \
+                and (roof_skm < well_data.head_column_additional._value or
+                     sole_skm < well_data.head_column_additional._value):
+            mes = QMessageBox.warning(self, 'Ошибка',
+                                      f'кровля скреперования выше головы '
+                                      f'хвостовика {well_data.head_column_additional._value}')
+            return
+
+        elif template_key == 'ПСШ Доп колонна СКМ в основной колонне' and \
+                (sole_skm > well_data.head_column_additional._value or
+                 roof_skm >well_data.head_column_additional._value):
+            mes = QMessageBox.warning(self, 'Ошибка',
+                                      f'подошва скреперования ниже головы '
+                                      f'хвостовика {well_data.head_column_additional._value}')
             return
 
         self.tableWidget.setSortingEnabled(False)
         rows = self.tableWidget.rowCount()
         self.tableWidget.insertRow(rows)
 
-        self.tableWidget.setItem(rows, 0, QTableWidgetItem(roof_skm))
-        self.tableWidget.setItem(rows, 1, QTableWidgetItem(sole_skm))
+        self.tableWidget.setItem(rows, 0, QTableWidgetItem(str(roof_skm)))
+        self.tableWidget.setItem(rows, 1, QTableWidgetItem(f'{sole_skm}'))
 
         self.tableWidget.setSortingEnabled(False)
 
@@ -859,6 +878,7 @@ class TemplateKrs(QMainWindow):
 
         template_key = str(self.tabWidget.currentWidget().template_Combo.currentText())
         skm_interval = skm_interval(self, template_key)
+
         if len(skm_interval) == 0:
             mes = QMessageBox.warning(self, 'Ошибка',
                                       'Интервалы перфорации не отрайбированы,'

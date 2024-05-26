@@ -3,11 +3,12 @@ from PyQt5 import QtWidgets
 from PyQt5.Qt import QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, \
     QInputDialog, QTabWidget, QPushButton, Qt, QCheckBox
 from PyQt5.QtCore import QEvent, Qt
-from PyQt5.QtGui import QPalette, QFontMetrics, QStandardItem
+from PyQt5.QtGui import QPalette, QFontMetrics, QStandardItem, QIntValidator
 from PyQt5.QtWidgets import QVBoxLayout, QStyledItemDelegate, qApp, QMessageBox, QCompleter, QTableWidget, QHeaderView, \
     QTableWidgetItem, QMainWindow
 
 import well_data
+from perforation_correct import FloatLineEdit
 
 from work_py.alone_oreration import volume_vn_nkt, well_volume, kot_work
 from main import MyWindow
@@ -168,6 +169,8 @@ class TabPage_SO_acid(QWidget):
         self.grid = QGridLayout(self)
         self.tableWidget = tableWidget
 
+        self.validator_int = QIntValidator(0, 8000)
+
         self.paker_layout_label = QLabel("Компоновка пакеров", self)
         self.paker_layout_combo = QComboBox(self)
         paker_layout_list = ['воронка', 'однопакерная', 'двухпакерная',
@@ -248,7 +251,6 @@ class TabPage_SO_acid(QWidget):
         self.acidOilProcEdit = QLineEdit(self)
         self.acidOilProcEdit.setText('0')
 
-
         self.swabTypeLabel = QLabel("задача при освоении", self)
         self.swabTypeCombo = QComboBox(self)
         self.swabTypeCombo.addItems(['Задача №2.1.13', 'Задача №2.1.16', 'Задача №2.1.11', 'ГРР', 'своя задача'])
@@ -267,12 +269,26 @@ class TabPage_SO_acid(QWidget):
         self.iron_true_combo.addItems(['Нет', 'Да'])
         self.iron_volume_label = QLabel("Объем стабилизатора", self)
         self.iron_volume_edit = QLineEdit(self)
+        self.expected_P_label = QLabel('Ожидаемое давление закачки')
+        self.expected_P_edit =QLineEdit(self)
+        self.expected_Q_label = QLabel('Ожидаемая приемистость')
+        self.expected_P_edit.setValidator(self.validator_int)
+        self.expected_Q_edit = QLineEdit(self)
+        self.expected_Q_edit.setValidator(self.validator_int)
+        self.expected_P_edit.textChanged.connect(self.update_pressuar)
+        self.pressure_three_label = QLabel('Режимы ')
+        self.pressure_three_edit = QLineEdit(self)
+
 
         self.pressure_Label = QLabel("Давление закачки", self)
         self.pressure_edit = QLineEdit(self)
         self.pressure_edit.setClearButtonEnabled(True)
         self.pressure_edit.setText(str(well_data.max_admissible_pressure._value))
         self.paker_layout_combo.currentTextChanged.connect(self.update_paker_layout)
+
+        self.Qplast_after_labelType = QLabel("Нужно ли определять приемистоть после СКО", self)
+        self.Qplast_after_edit = QComboBox(self)
+        self.Qplast_after_edit.addItems(['ДА', 'НЕТ'])
 
         self.grid.addWidget(self.paker_layout_label, 0, 0, 1, 0)
         self.grid.addWidget(self.paker_layout_combo, 1, 0, 1, 0)
@@ -324,6 +340,18 @@ class TabPage_SO_acid(QWidget):
         self.grid.addWidget(self.swab_paker_depth, 9, 2)
         self.grid.addWidget(self.swab_volumeLabel, 8, 3)
         self.grid.addWidget(self.swab_volumeEdit, 9, 3)
+        self.grid.addWidget(self.Qplast_after_labelType, 10, 1)
+        self.grid.addWidget(self.Qplast_after_edit, 11, 1)
+
+
+        self.grid.addWidget(self.expected_Q_label, 10, 2)
+        self.grid.addWidget(self.expected_Q_edit, 11, 2)
+        self.grid.addWidget(self.expected_P_label, 10, 3)
+        self.grid.addWidget(self.expected_P_edit, 11, 3)
+        self.grid.addWidget(self.pressure_three_label, 10, 4)
+        self.grid.addWidget(self.pressure_three_edit, 11, 4)
+
+        self.Qplast_after_edit.currentTextChanged.connect(self.update_Qplast_after)
 
         if all([well_data.dict_perforation[plast]['отрайбировано'] for plast in well_data.plast_work]):
             self.paker_layout_combo.setCurrentIndex(2)
@@ -345,6 +373,51 @@ class TabPage_SO_acid(QWidget):
         self.iron_volume_edit.setText(f'{round(float(self.acid_volume_edit.text()), 1) * 10}')
         self.acid_volume_edit.textChanged.connect(self.change_volume_acid)
         self.acid_edit.currentTextChanged.connect(self.update_sko_type)
+        self.Qplast_after_edit.setCurrentIndex(1)
+        self.Qplast_after_edit.setCurrentIndex(0)
+
+
+
+        if well_data.curator == 'ОР':
+            self.Qplast_after_edit.setCurrentIndex(0)
+        else:
+            self.Qplast_after_edit.setCurrentIndex(1)
+
+    def update_Qplast_after(self, index):
+        if index == 'ДА':
+
+            try:
+                self.expected_Q_edit.setText(f'{well_data.expected_Q}')
+                # print(f'ожидаемая приемистисть{well_data.expected_Q}')
+            except:
+                pass
+
+
+            try:
+                self.expected_P_edit.setText(f'{well_data.expected_P}')
+            except:
+                pass
+
+
+
+
+            self.expected_Q_edit.setText(str(well_data.expected_Q))
+            self.expected_P_edit.setText(str(well_data.expected_P))
+
+            self.grid.addWidget(self.expected_Q_label, 10, 2)
+            self.grid.addWidget(self.expected_Q_edit, 11, 2)
+            self.grid.addWidget(self.expected_P_label, 10, 3)
+            self.grid.addWidget(self.expected_P_edit, 11, 3)
+            self.grid.addWidget(self.pressure_three_label, 10, 4)
+            self.grid.addWidget(self.pressure_three_edit, 11, 4)
+        else:
+            self.expected_Q_edit.setParent(None)
+            self.expected_P_label.setParent(None)
+            self.expected_P_label.setParent(None)
+            self.expected_P_edit.setParent(None)
+            self.pressure_three_label.setParent(None)
+            self.pressure_three_edit.setParent(None)
+
     def update_sko_type(self, type_sko):
 
         if type_sko == 'ВТ':
@@ -357,6 +430,13 @@ class TabPage_SO_acid(QWidget):
             self.sko_vt_edit = QLineEdit(self)
             self.sko_vt_label.setParent(None)
             self.sko_vt_edit.setParent(None)
+    def update_pressuar(self):
+        expected_P = self.expected_P_edit.text()
+        if expected_P.isdigit():
+            expected_P = int(float(expected_P))
+            self.pressure_three_edit.setText(
+                AcidPakerWindow.pressure_mode(expected_P, self.plast_combo.combo_box.currentText()))
+
     def change_volume_acid(self):
         if self.acid_volume_edit.text() != '':
             self.iron_volume_edit.setText(f'{round(float(self.acid_volume_edit.text().replace(",", ".")), 1) * 10}')
@@ -520,9 +600,6 @@ class TabPage_SO_acid(QWidget):
                 if self.paker_depth.text() != '':
                     self.paker2_depth.setText(f'{int(self.paker_depth.text()) - self.distance_between_packers}')
                     self.paker2_depth.setEnabled(False)
-
-
-
 
         elif self.paker_layout_combo.currentText() in ['воронка']:
             self.paker_khost.setText(f'{sole_plast}')
@@ -709,6 +786,10 @@ class AcidPakerWindow(QMainWindow):
 
         iron_true_combo = self.tabWidget.currentWidget().iron_true_combo.currentText()
         iron_volume_edit = self.tabWidget.currentWidget().acidOilProcEdit.text()
+        self.Qplast_after_edit = self.tabWidget.currentWidget().Qplast_after_edit.currentText()
+        self.expected_Q = self.tabWidget.currentWidget().expected_Q_edit.text()
+        self.expected_P = self.tabWidget.currentWidget().expected_P_edit.text()
+        self.pressure_three = self.tabWidget.currentWidget().pressure_three_edit.text()
 
         rows = self.tableWidget.rowCount()
 
@@ -797,8 +878,9 @@ class AcidPakerWindow(QMainWindow):
                 except:
                     acidOilProc = 0
 
-                work_template_list = self.paker_layout_one_with_zaglushka(swab_true_edit_type, diametr_paker, paker_khost,
-                                                               paker_depth, depth_gauge_combo)
+                work_template_list = self.paker_layout_one_with_zaglushka(swab_true_edit_type, diametr_paker,
+                                                                          paker_khost,
+                                                                          paker_depth, depth_gauge_combo)
             elif self.paker_layout_combo in ['воронка']:
                 plast_combo = self.tableWidget.item(row, 0).text()
                 if row == 0:
@@ -852,7 +934,6 @@ class AcidPakerWindow(QMainWindow):
             swabTypeCombo = str(self.tabWidget.currentWidget().swabTypeCombo.currentText())
             swab_volumeEdit = int(float(self.tabWidget.currentWidget().swab_volumeEdit.text()))
             paker_depth_swab = int(float(self.tabWidget.currentWidget().swab_paker_depth.text()))
-
 
             if self.paker_layout_combo == 'однопакерная':
                 if MyWindow.true_set_Paker(self, paker_depth_swab) is False:
@@ -917,13 +998,12 @@ class AcidPakerWindow(QMainWindow):
             return
         self.tableWidget.removeRow(row)
 
-
     def paker_layout_two(self, swab_true_edit_type, paker_diametr, paker_khost, paker_depth, paker2_depth,
                          depth_gauge_combo, iron_true_combo, iron_volume_edit):
         from work_py.alone_oreration import privyazkaNKT
         from .opressovka import OpressovkaEK, TabPage_SO
 
-        difference_paker = paker_depth -paker2_depth
+        difference_paker = paker_depth - paker2_depth
 
         if 'упорны' in self.paker_layout_combo:
             paker_type = 'ПУ'
@@ -940,7 +1020,7 @@ class AcidPakerWindow(QMainWindow):
 
         if (well_data.column_additional is False) or \
                 (well_data.column_additional is True and paker_depth < well_data.head_column_additional._value):
-            self.paker_select = f'заглушку + сбивной с ввертышем + {mtg_str} НКТ{nkt_diam}м {paker_khost}м '\
+            self.paker_select = f'заглушку + сбивной с ввертышем + {mtg_str} НКТ{nkt_diam}м {paker_khost}м ' \
                                 f'+ пакер {paker_type}-{paker_diametr}мм (либо аналог) ' \
                                 f'для ЭК {well_data.column_diametr._value}мм х ' \
                                 f'{well_data.column_wall_thickness._value}мм + ' \
@@ -1003,7 +1083,7 @@ class AcidPakerWindow(QMainWindow):
              f'Определить приемистость НЭК.',
              None, None, None, None, None, None, None,
              'мастер КРС', None]]
-        
+
         for plast in list(well_data.dict_perforation.keys()):
             for interval in well_data.dict_perforation[plast]['интервал']:
                 if abs(float(interval[1] - float(well_data.depth_fond_paker_do["posle"]))) < 10 or abs(
@@ -1022,7 +1102,7 @@ class AcidPakerWindow(QMainWindow):
                                   None, None, None, None, None, None, None,
                                   'мастер КРС', None])
         return paker_list
-    
+
     def select_diametr_nkt(self, paker_depth, swab_true_edit_type):
         if well_data.column_additional is True and float(well_data.column_additional_diametr._value) < 110 and \
                 paker_depth > well_data.head_column_additional._value and well_data.head_column_additional._value > 1000:
@@ -1037,8 +1117,9 @@ class AcidPakerWindow(QMainWindow):
         elif well_data.column_additional and well_data.head_column_additional._value <= 1000 and \
                 swab_true_edit_type == 'Нужно освоение':
             nkt_list = ["60", "73"]
-            nkt_diam, ok = QInputDialog.getItem(self, 'выбор диаметра НКТ', 'динамический уровень в скважине ниже головы хвостовика,'
-                                                                          'Выберете диаметр НКТ', nkt_list, 0, False)
+            nkt_diam, ok = QInputDialog.getItem(self, 'выбор диаметра НКТ',
+                                                'динамический уровень в скважине ниже головы хвостовика,'
+                                                'Выберете диаметр НКТ', nkt_list, 0, False)
             nkt_pod = '60мм'
             template_nkt_diam = '59.6мм, 47.9'
 
@@ -1050,7 +1131,7 @@ class AcidPakerWindow(QMainWindow):
             nkt_diam = 73
             nkt_pod = '73мм'
             template_nkt_diam = '59.6'
-                
+
         return nkt_diam, nkt_pod, template_nkt_diam
 
     def paker_layout_one(self, swab_true_edit_type, paker_diametr, paker_khost, paker_depth, depth_gauge_combo):
@@ -1157,7 +1238,8 @@ class AcidPakerWindow(QMainWindow):
 
         return paker_list
 
-    def paker_layout_one_with_zaglushka(self, swab_true_edit_type, paker_diametr, paker_khost, paker_depth, depth_gauge_combo):
+    def paker_layout_one_with_zaglushka(self, swab_true_edit_type, paker_diametr, paker_khost, paker_depth,
+                                        depth_gauge_combo):
         from work_py.alone_oreration import privyazkaNKT
         from .opressovka import OpressovkaEK, TabPage_SO
         # print(swab_true_edit_type, paker_diametr, paker_khost, paker_depth, depth_gauge_combo)
@@ -1215,7 +1297,7 @@ class AcidPakerWindow(QMainWindow):
                 ,
              None, None, None, None, None, None, None,
              'мастер КРС', descentNKT_norm(paker_depth, 1.2)],
-           ]
+        ]
         for plast in list(well_data.dict_perforation.keys()):
             for interval in well_data.dict_perforation[plast]['интервал']:
                 if abs(float(interval[1] - float(well_data.depth_fond_paker_do["posle"]))) < 10 or abs(
@@ -1235,7 +1317,6 @@ class AcidPakerWindow(QMainWindow):
                                   'мастер КРС', None])
 
         return paker_list
-
 
     def voronka_layout(self, swab_true_edit_type, paker_khost, depth_gauge_combo):
 
@@ -1338,16 +1419,16 @@ class AcidPakerWindow(QMainWindow):
             work_list = []
             work_list.append(
                 [f'Насыщение 5м3.  Q пласт {plast_combo} при '
-                 f'Р={self.pressure_mode(well_data.expected_P, plast_combo)}атм', None,
+                 f'Р={self.pressure_mode(self.expected_P, plast_combo)}атм', None,
                  f'Произвести насыщение скважины до стабилизации давления закачки '
                  f'не менее 5м3. Опробовать  '
                  f'пласт {plast_combo} на приемистость в трех режимах при '
-                 f'Р={self.pressure_mode(well_data.expected_P, plast_combo)}атм в присутствии '
+                 f'Р={self.pressure_mode(self.expected_P, plast_combo)}атм в присутствии '
                  f'представителя ЦДНГ. '
                  f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, '
                  f'с подтверждением за 2 часа до '
-                 f'начала работ). В СЛУЧАЕ ПРИЕМИСТОСТИ НИЖЕ {well_data.expected_Q}м3/сут '
-                 f'при давлении {well_data.expected_P}атм '
+                 f'начала работ). В СЛУЧАЕ ПРИЕМИСТОСТИ НИЖЕ {self.expected_Q}м3/сут '
+                 f'при давлении {self.expected_P}атм '
                  f'ДАЛЬНЕЙШИЕ РАБОТЫ СОГЛАСОВАТЬ С ЗАКАЗЧИКОМ',
                  None, None, None, None, None, None, None,
                  'мастер КРС', 0.17 + 0.52 + 0.2 + 0.2 + 0.2])
@@ -1410,7 +1491,6 @@ class AcidPakerWindow(QMainWindow):
         elif 'дву' in self.paker_layout_combo:
             layout_select = f'посадить пакера на глубине {paker_depth}/{paker2_depth}м'
 
-
         acid_list_1 = [
             [acid_sel_short, None,
              f'{acid_sel}'
@@ -1467,37 +1547,18 @@ class AcidPakerWindow(QMainWindow):
 
         for row in acid_list_1:
             paker_list.append(row)
-        print(f'ddffs{well_data.dict_pump_ECN["posle"], well_data.curator == "ОР", well_data.dict_pump_ECN["posle"] != "0", type(well_data.dict_pump_ECN["posle"])}')
-        if well_data.curator == 'ОР' and well_data.dict_pump_ECN["posle"] != '0':
-            try:
-                well_data.expected_Q, ok = QInputDialog.getInt(self, 'Ожидаемая приемистость ',
-                                                               f'Ожидаемая приемистость по пласту {plast_combo} ',
-                                                               well_data.expected_Q, 0,
-                                                               1600)
-                well_data.expected_P, ok = QInputDialog.getInt(self, 'Ожидаемое Давление закачки',
-                                                               f'Ожидаемое Давление закачки по пласту {plast_combo}',
-                                                               well_data.expected_P, 0,
-                                                               250)
-            except:
-                well_data.expected_Q, ok = QInputDialog.getInt(self, 'Ожидаемая приемистость ',
-                                                               f'Ожидаемая приемистость по пласту {plast_combo} ',
-                                                               100, 0,
-                                                               1600)
-                well_data.expected_P, ok = QInputDialog.getInt(self, f'Ожидаемое Давление закачки',
-                                                               f'Ожидаемое Давление закачки по пласту {plast_combo}',
-                                                               100, 0,
-                                                               250)
 
+        if self.Qplast_after_edit == 'ДА':
             paker_list.append([f'{layout_select}. насыщение 5м3', None,
                                f'{layout_select}. Произвести насыщение скважины до стабилизации '
                                f'давления закачки не менее 5м3. Опробовать  '
                                f'пласт {plast_combo} на приемистость в трех режимах при Р='
-                               f'{self.pressure_mode(well_data.expected_P, plast_combo)}атм в присутствии '
+                               f'{self.pressure_three}атм в присутствии '
                                f'представителя ЦДНГ. '
                                f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с '
                                f'подтверждением за 2 часа до '
-                               f'начала работ). В СЛУЧАЕ ПРИЕМИСТОСТИ НИЖЕ {well_data.expected_Q}м3/сут при '
-                               f'давлении {well_data.expected_P}атм '
+                               f'начала работ). В СЛУЧАЕ ПРИЕМИСТОСТИ НИЖЕ {self.expected_Q}м3/сут при '
+                               f'давлении {self.expected_P}атм '
                                f'ДАЛЬНЕЙШИЕ РАБОТЫ СОГЛАСОВАТЬ С ЗАКАЗЧИКОМ',
                                None, None, None, None, None, None, None,
                                'мастер КРС', 0.5 + 0.17 + 0.15 + 0.52 + 0.2 + 0.2 + 0.2])
@@ -1515,17 +1576,12 @@ class AcidPakerWindow(QMainWindow):
             mode_str = f'{mode}, {mode - 10}, {mode - 20}'
         else:
             mode_str = f'{mode - 10}, {mode}, {mode + 10}'
-
-        Qpr, _ = QInputDialog.getText(None, 'Режимы определения приемистости', 'Давления при определении приемистости',
-                                      text=mode_str)
-
-        return Qpr
+        return mode_str
 
         # промывка скважины после кислотной обработки в зависимости от интервала перфорации и компоновки и текущего
         # забоя
 
     def flushing_downhole(self, paker_depth, paker_khost, paker_layout):
-
 
         if 'одно' in paker_layout:
             if (well_data.perforation_roof - 5 + paker_khost >= well_data.current_bottom) or \

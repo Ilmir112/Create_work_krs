@@ -158,6 +158,8 @@ class TabPage_SO_rir(QWidget):
         self.rir_type_Combo.currentTextChanged.connect(self.update_rir_type)
         self.rir_type_Combo.setCurrentIndex(1)
         self.paker_depth_edit.textChanged.connect(self.update_depth_paker)
+        self.roof_rir_edit.textChanged.connect(self.update_volume_cement)
+        self.sole_rir_edit.textChanged.connect(self.update_volume_cement)
 
     def update_change_fluid(self, index):
         if index == 'Да':
@@ -192,7 +194,6 @@ class TabPage_SO_rir(QWidget):
             self.pressuar_new_label.setParent(None)
             self.pressuar_new_edit.setParent(None)
     def update_pakerZUMPF(self, index):
-       
         from .opressovka import OpressovkaEK, TabPage_SO
 
         if index == 'Да':
@@ -281,9 +282,10 @@ class TabPage_SO_rir(QWidget):
             self.sole_rir_edit.setText(f'{well_data.current_bottom}')
             self.paker_depth_edit.setText(f'{well_data.perforation_roof-30}')
 
-            if self.roof_rir_edit.text() != '' and self.sole_rir_edit.text() != '':
-                self.cement_volume_line.setText(
-                    f'{round(volume_vn_ek(float(self.roof_rir_edit.text())) * (float(self.sole_rir_edit.text()) - float(self.roof_rir_edit.text())) / 1000, 1)}')
+    def update_volume_cement(self):
+        if self.roof_rir_edit.text() != '' and self.sole_rir_edit.text() != '':
+            self.cement_volume_line.setText(
+                f'{round(volume_vn_ek(float(self.roof_rir_edit.text())) * (float(self.sole_rir_edit.text())- float(self.roof_rir_edit.text())) / 1000, 1)}')
 
     def update_paker(self, index):
 
@@ -620,9 +622,10 @@ class RirWindow(QMainWindow):
         nkt_diam = ''.join(['73' if well_data.column_diametr._value > 110 else '60'])
 
         
-        if well_data.column_additional is True and well_data.column_additional_diametr._value <110:
+        if well_data.column_additional is True and well_data.column_additional_diametr._value <110 and \
+                sole_rir_edit > well_data.head_column_additional._value:
             dict_nkt = {73: well_data.head_column_additional._value,
-                        60: well_data.head_column_additional._value-sole_rir_edit}
+                        60: sole_rir_edit - well_data.head_column_additional._value}
         else:
             dict_nkt = {73: sole_rir_edit}
         rir_list = RirWindow.need_paker(self, paker_need_Combo, plast_combo, diametr_paker, paker_khost,
@@ -675,8 +678,9 @@ class RirWindow(QMainWindow):
                  None, None, None, None, None, None, None,
                  'мастер КРС', well_volume_norm(24)]
             ]
+            print(f'fjg {volume_vn_nkt(dict_nkt)}')
             if volume_vn_nkt(dict_nkt) <= 5:
-                glin_list[3] = [None, None,
+                glin_list[2] = [None, None,
                                 f'Закачать в НКТ при открытом затрубном пространстве глинистый раствор в '
                                 f'объеме {volume_vn_nkt(dict_nkt)}м3. Закрыть затруб. '
                                 f'Продавить в НКТ остаток глинистого раствора в объеме '
@@ -979,7 +983,7 @@ class RirWindow(QMainWindow):
         need_change_zgs_combo = self.tabWidget.currentWidget().need_change_zgs_combo.currentText()
         volume_cement = self.tabWidget.currentWidget().cement_volume_line.text().replace(',', '.')
         if volume_cement != '':
-            volume_cement = round(float(volume_cement))
+            volume_cement = round(float(volume_cement),1)
         if len(well_data.plast_project) != 0:
             plast_new_combo = self.tabWidget.currentWidget().plast_new_combo.currentText()
         else:

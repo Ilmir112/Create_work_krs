@@ -1,5 +1,6 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.Qt import *
+from work_py.acid_paker import CheckableComboBox
 
 from collections import namedtuple
 
@@ -49,7 +50,7 @@ class TabPage_SO(QWidget):
         well_data.number_indez = []
 
         for num in range(len(list(set(well_data.cat_P_P)))):
-            plast_index = QComboBox(self)
+            plast_index = CheckableComboBox(self)
             if len(well_data.plast_work) != 0:
                 work_plast = well_data.plast_work[0]
                 work_plast_index = 0
@@ -85,10 +86,10 @@ class TabPage_SO(QWidget):
                 work_plast_index = 1
 
 
-            plast_index.addItems(self.plast_all)
+            plast_index.combo_box.addItems(self.plast_all)
             #
             # print(f'пласт {work_plast}')
-            plast_index.setCurrentIndex(self.plast_all.index(work_plast))
+            plast_index.combo_box.setCurrentIndex(self.plast_all.index(work_plast))
 
             category_pressuar_line_edit = QLineEdit(self)
             try:
@@ -243,7 +244,7 @@ class CategoryWindow(QMainWindow):
                         mes = QMessageBox.warning(self, 'Ошибка', 'ошибка в сохранении данных, не корректные данные ')
                         return
 
-                plast = self.tabWidget.currentWidget().labels_category[index][0].currentText()
+                plast = self.tabWidget.currentWidget().labels_category[index][0].combo_box.currentText()
 
                 plast_index.append(plast)
                 if plast not in well_data.plast_work:
