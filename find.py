@@ -1169,9 +1169,9 @@ class Well_perforation(FindIndexPZ):
                                                                                           []).append('0')
                     if zhgs:
                         well_data.dict_perforation.setdefault(plast, {}).setdefault('рабочая жидкость', []).append(zhgs)
-                    if row[col_date_pressuar_index]:
-                        well_data.dict_perforation.setdefault(
-                            plast, {}).setdefault('замер', []).append(row[col_date_pressuar_index])
+                        if row[col_date_pressuar_index]:
+                            well_data.dict_perforation.setdefault(
+                                plast, {}).setdefault('замер', []).append(row[col_date_pressuar_index])
 
                 elif any([str((i)).lower() == 'проект' for i in row]) is True and all(
                         [str(i).strip() is None for i in row]) is False and is_number(row[col_roof_index]) is True \
