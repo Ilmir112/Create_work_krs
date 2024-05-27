@@ -37,7 +37,7 @@ class LoginWindow(QWidget):
         self.button_register.clicked.connect(self.show_register_window)
         self.username.currentTextChanged.connect(self.update_users)
     def update_users(self):
-        self.username.clear()
+        # self.username.clear()
         users_list = list(map(lambda x: x[1], self.get_list_users()))
         self.username.addItems(users_list)
 

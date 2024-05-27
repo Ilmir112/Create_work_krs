@@ -2131,6 +2131,7 @@ class MyWindow(QMainWindow):
         ws4.cell(row=11, column=1).value = f'макс угол {well_data.max_angle._value} на {well_data.max_angle_H._value}'
         ws4.cell(row=1, column=2).value = well_data.cdng._value
         try:
+
             ws4.cell(row=2, column=3).value = \
                 f'Рпл - {well_data.dict_category[well_data.plast_work_short[0]]["по давлению"].category},' \
                 f' H2S -{well_data.dict_category[well_data.plast_work_short[0]]["по сероводороду"].category},' \

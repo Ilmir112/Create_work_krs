@@ -245,7 +245,7 @@ class GnktOpz(QMainWindow):
             mes = QMessageBox.critical(self, "Ошибка", "Нужно указать расстояние до ПНТЖ")
             return
         if acid_edit == 'ВТ':
-            self.vt = self.tabWidget.currentWidget().sko_vt_edit.currentText()
+            self.vt = self.tabWidget.currentWidget().sko_vt_edit.text()
             if self.vt == '':
                 mes = QMessageBox.critical(self, "Ошибка", "Нужно расписать объемы и вид кислоты")
                 return

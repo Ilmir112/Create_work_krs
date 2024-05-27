@@ -244,34 +244,35 @@ class CategoryWindow(QMainWindow):
                         mes = QMessageBox.warning(self, 'Ошибка', 'ошибка в сохранении данных, не корректные данные ')
                         return
 
-                plast = self.tabWidget.currentWidget().labels_category[index][0].combo_box.currentText()
+                plast_sel = self.tabWidget.currentWidget().labels_category[index][0].combo_box.currentText()
+                for plast in plast_sel.split(', '):
+                    plast_index.append(plast)
+                    if plast not in well_data.plast_work:
+                        well_data.plast_project.append(plast)
 
-                plast_index.append(plast)
-                if plast not in well_data.plast_work:
-                    well_data.plast_project.append(plast)
+                    CategoryWindow.dict_category.setdefault(plast, {}).setdefault(
+                        'по давлению',
+                        Pressuar(int(self.tabWidget.currentWidget().labels_category[index][1].text()),
+                            float(self.tabWidget.currentWidget().labels_category[index][7].text())))
 
-                CategoryWindow.dict_category.setdefault(plast, {}).setdefault(
-                    'по давлению',
-                    Pressuar(int(self.tabWidget.currentWidget().labels_category[index][1].text()),
-                        float(self.tabWidget.currentWidget().labels_category[index][7].text())))
+                    CategoryWindow.dict_category.setdefault(plast, {}).setdefault(
+                        'по сероводороду', Data_h2s(
+                            int(self.tabWidget.currentWidget().labels_category[index][2].text()),
+                            float(self.tabWidget.currentWidget().labels_category[index][4].text()),
+                            float(self.tabWidget.currentWidget().labels_category[index][5].text()),
+                            float(self.tabWidget.currentWidget().labels_category[index][9].text().replace(',','.'))))
 
-                CategoryWindow.dict_category.setdefault(plast, {}).setdefault(
-                    'по сероводороду', Data_h2s(
-                        int(self.tabWidget.currentWidget().labels_category[index][2].text()),
-                        float(self.tabWidget.currentWidget().labels_category[index][4].text()),
-                        float(self.tabWidget.currentWidget().labels_category[index][5].text()),
-                        float(self.tabWidget.currentWidget().labels_category[index][9].text().replace(',','.'))))
+                    CategoryWindow.dict_category.setdefault(plast, {}).setdefault(
+                        'по газовому фактору', Data_gaz(
+                            int(self.tabWidget.currentWidget().labels_category[index][3].text()),
+                            float(self.tabWidget.currentWidget().labels_category[index][6].text())))
 
-                CategoryWindow.dict_category.setdefault(plast, {}).setdefault(
-                    'по газовому фактору', Data_gaz(
-                        int(self.tabWidget.currentWidget().labels_category[index][3].text()),
-                        float(self.tabWidget.currentWidget().labels_category[index][6].text())))
+                    CategoryWindow.dict_category.setdefault(plast, {}).setdefault(
+                        'отключение', self.tabWidget.currentWidget().labels_category[index][8].currentText())
+                    # CategoryWindow.dict_category.setdefault(plast, {}).setdefault(
+                    #     'поглотитель', self.tabWidget.currentWidget().labels_category[index][9].currentText())
 
-                CategoryWindow.dict_category.setdefault(plast, {}).setdefault(
-                    'отключение', self.tabWidget.currentWidget().labels_category[index][8].currentText())
-                # CategoryWindow.dict_category.setdefault(plast, {}).setdefault(
-                #     'поглотитель', self.tabWidget.currentWidget().labels_category[index][9].currentText())
-        # print(f'кат {CategoryWindow.dict_category}')
+        print(f'кат {CategoryWindow.dict_category}')
         well_data.pause = False
         self.close()
 
