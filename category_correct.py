@@ -6,7 +6,7 @@ from collections import namedtuple
 
 import well_data
 from H2S import calv_h2s
-from perforation_correct import FloatLineEdit
+
 
 class TabPage_SO(QWidget):
     def __init__(self, parent=None):
@@ -56,35 +56,25 @@ class TabPage_SO(QWidget):
                 work_plast_index = 0
             else:
                 work_plast_index = 1
-            try:
-                if work_plast == work_plast_iter and well_data.work_plan not in \
-                        ['application_pvr',  'application_gis', 'gnkt_after_grp', 'gnkt_frez', 'gntk_opz']:
-                    if len(well_data.dict_perforation_project) != 0 and \
-                            any([plast not in well_data.plast_work for plast in well_data.plast_project]):
 
-                        if abs(self.cat_P_P[num] - list([well_data.dict_perforation_project[
-                                                             plast]['давление'] for plast in well_data.plast_project][0])[0]) < 1:
-                            work_plast = well_data.plast_project[0]
-                            work_plast_index = 1
-                    else:
-                        work_plast, ok = QInputDialog.getText(None, 'индекс пласта', 'Введите индекc пласта вскрываемого')
-                        self.plast_all.append(work_plast)
+            if work_plast == work_plast_iter and well_data.work_plan not in \
+                    ['application_pvr',  'application_gis', 'gnkt_after_grp', 'gnkt_frez', 'gntk_opz']:
+                if len(well_data.dict_perforation_project) != 0 and \
+                        any([plast not in well_data.plast_work for plast in well_data.plast_project]):
+
+                    if abs(self.cat_P_P[num] - list([well_data.dict_perforation_project[
+                                                         plast]['давление'] for plast in well_data.plast_project][0])[0]) < 1:
+                        work_plast = well_data.plast_project[0]
                         work_plast_index = 1
-            except:
-                plast_index_str = QMessageBox.question(self, 'рабочие пласты',
-                                                       'Есть ли индекс пласта в интервалах перфорации')
-                if plast_index_str == QMessageBox.StandardButton.Yes:
-                    work_plast = well_data.plast_all[0]
                 else:
-                    work_plast, ok = QInputDialog.getText(None, 'индекс пласта', 'Введите индекc пласта вскрываемого')
-                    while work_plast in well_data.plast_all:
-                        mes = QMessageBox.warning(self, 'Ошибка', 'Пласт есть в списке')
-                        work_plast, ok = QInputDialog.getText(None, 'индекс пласта', 'Введите индекc пласта вскрываемого')
+                    plast_index_str = QMessageBox.question(self, 'рабочие пласты',
+                                                           f'Есть ли индекс пласта категорийности {num+1}'
+                                                           f'в интервалах перфорации')
+                    if plast_index_str == QMessageBox.StandardButton.No:
+                        work_plast, ok = QInputDialog.getText(None, 'индекс пласта',
+                                                              'Введите индекc пласта вскрываемого')
 
-                    self.plast_all.append(work_plast)
-                # well_data.plast_all.append(work_plast)
-                work_plast_index = 1
-
+                self.plast_all.append(work_plast)
 
             plast_index.combo_box.addItems(self.plast_all)
             #
@@ -100,13 +90,13 @@ class TabPage_SO(QWidget):
             try:
                 pressuar_data_edit.setText(str(self.ifNone(self.cat_P_P[num])))
             except:
-                mes = QMessageBox.warning(self, 'ОШИБКА', 'не вставилось данные по давлению')
+                pass
             # print(num)
             category_h2s_edit = QLineEdit(self)
             try:
                 category_h2s_edit.setText(str(self.ifNone(self.cat_h2s_list[num])))
             except:
-                mes = QMessageBox.warning(self, 'ОШИБКА', 'не вставилось данные по серовороду')
+                pass
             h2s_pr_edit = QLineEdit(self)
             try:
                 if str(round(float(str(self.h2s_pr[num]).replace(',', '.')), 3))[-1] == "0":
@@ -115,24 +105,31 @@ class TabPage_SO(QWidget):
                     h2s_pr = round(float(str(self.h2s_pr[num]).replace(',', '.')), 4)
                 h2s_pr_edit.setText(str(h2s_pr))
             except:
-                mes = QMessageBox.warning(self, 'ОШИБКА', 'не вставилось данные по серовороду')
+                pass
 
             category_h2s2_edit = QLineEdit(self)
             try:
                 category_h2s2_edit.setText(str(self.ifNone(self.cat_h2s_list[num])))
                 h2s_mg_edit = QLineEdit(self)
             except:
-                mes = QMessageBox.warning(self, 'ОШИБКА', 'не вставилось данные по серовороду')
+                pass
             try:
-                h2s_mg_edit.setText(str(self.ifNone(self.h2s_mg[num])))
+                h2s_mg_edit.setText(str(self.h2s_mg[num]))
             except:
-                h2s_mg_edit.setText(str(0))
-                mes = QMessageBox.warning(self, 'ОШИБКА', "Программа не нашла данные значению по сероводороду в мг/л")
+
+                pass
 
             category_gf_edit = QLineEdit(self)
-            category_gf_edit.setText(str(self.ifNone(self.cat_gaz_f_pr[num])))
+            try:
+                category_gf_edit.setText(str(self.ifNone(self.cat_gaz_f_pr[num])))
+            except:
+                pass
             gaz_f_pr_edit = QLineEdit(self)
-            gaz_f_pr_edit.setText(str(self.ifNone(self.gaz_f_pr[num])))
+            try:
+                gaz_f_pr_edit.setText(str(self.ifNone(self.gaz_f_pr[num])))
+            except:
+                pass
+
             units_pressuar = QLabel('атм')
             units_h2s_pr = QLabel('%')
             units_h2s_pr.setFixedWidth(150)
@@ -146,8 +143,9 @@ class TabPage_SO(QWidget):
 
             calc_plast_h2s = QLineEdit(self)
           # print(Category_h2s_edit.text(), h2s_mg_edit.text(), h2s_pr_edit.text())
-            calc_plast_h2s.setText(str(calv_h2s(self, category_h2s_edit.text(),
-                                            float(h2s_mg_edit.text()), float(h2s_pr_edit.text()))))
+
+
+
 
             self.grid.addWidget(plast_index, 4, 1 + n)
             self.grid.addWidget(category_pressuar_line_edit, 5, 1 + n)
@@ -181,12 +179,17 @@ class TabPage_SO(QWidget):
             setattr(self, f"{units_gaz}_{n}_line", units_gaz)
             setattr(self, f"{isolated_plast}_{n}_line", isolated_plast)
 
+            calc_plast_h2s.setText(str(calv_h2s(self, category_h2s_edit.text(),
+                                                float(h2s_mg_edit.text()), float(h2s_pr_edit.text()))))
+
             self.labels_category[n] = (plast_index, category_pressuar_line_edit, category_h2s_edit,
                                        category_gf_edit, h2s_pr_edit, h2s_mg_edit, gaz_f_pr_edit,
                                        pressuar_data_edit, isolated_plast, calc_plast_h2s)
 
             well_data.number_indez.append(n)
             n += 3
+
+
 
     def ifNone(self, string):
 

@@ -839,7 +839,7 @@ class MyWindow(QMainWindow):
             ws2.page_setup.fitToHeight = False
 
             # path = 'workiii'
-            print(f'пПользоватль{well_data.user}')
+            # print(f'Пользоватль{well_data.user}')
             if 'Зуфаров' in well_data.user[1]:
                 path = 'D:\Documents\Desktop\ГТМ'
             else:

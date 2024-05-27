@@ -3,6 +3,7 @@ from datetime import datetime
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QInputDialog, QMainWindow, QMessageBox
 from openpyxl.reader.excel import load_workbook
+from openpyxl.utils import column_index_from_string
 from openpyxl.workbook import Workbook
 
 import well_data
@@ -15,6 +16,7 @@ from work_py.leakage_column import LeakageWindow
 from well_data import ProtectedIsDigit, ProtectedIsNonNone
 from block_name import region
 from work_py.advanted_file import definition_plast_work
+from openpyxl.utils.cell import get_column_letter
 
 
 class FindIndexPZ(QMainWindow):
@@ -1036,14 +1038,23 @@ class Well_perforation(FindIndexPZ):
         col_old_open_index = 0
         bokov_stvol = False
         osnov_stvol = False
+        col_plast_index = -1
+        col_vert_index = 0
+        col_roof_index = 0
+        col_sole_index =0
+        col_open_index = 0
+        col_close_index = 0
+        col_udlin_index = 0
+        col_pressuar_index = 0
+        col_date_pressuar_index = 0
 
         if len(well_data.dict_perforation) == 0:
             for row in ws.iter_rows(min_row=begin_index + 1, max_row=cancel_index + 2, values_only=True):
                 # print(row)
-                for col_index, column in enumerate(row):
+                for col_index, column in enumerate(row[:14]):
                     if 'оризонт'.lower() in str(column).lower() or 'пласт/'.lower() in str(column).lower():
                         col_plast_index = col_index - 1
-                        # print(f'пласт {col_plast_index}')
+                        print(f'пласт {col_plast_index}')
                     if 'по вертикали'.lower() in str(column).lower():
                         col_vert_index = col_index - 1
                         # print(f'вер {col_index}')
@@ -1063,10 +1074,10 @@ class Well_perforation(FindIndexPZ):
                         # print(f'удл {col_index}')
                         col_udlin_index = col_index - 1
                     if 'Рпл'.lower() in str(column).lower():
-                        # print(f'Рпл {col_index}')
+                        print(f'Рпл {col_index}')
                         col_pressuar_index = col_index - 1
                     if 'замера' in str(column).lower():
-                        # print(f'заме {col_index}')
+                        print(f'заме {col_index}')
                         col_date_pressuar_index = col_index - 1
                     if 'вскрыт'.lower() in str(column).lower() and 'откл'.lower() in str(column).lower():
                         well_data.old_version = True
@@ -1075,7 +1086,46 @@ class Well_perforation(FindIndexPZ):
                         osnov_stvol = True
                     if "боков" in str(column).lower():
                         bokov_stvol = True
-
+            column_list = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M']
+            if col_date_pressuar_index == 0:
+                col_date_pressuar_index = column_index_from_string(QInputDialog.getItem(self,
+                                                                 'Ошибка', 'Программа не смогла определить колонку '
+                                                                  'в таблице ПВР где указано в дата замера',
+                                                              column_list, 11)[0]) - 2
+                print(f'fjjар {col_date_pressuar_index}')
+            if col_pressuar_index == 0:
+                col_pressuar_index = column_index_from_string(QInputDialog.getItem(self, 'Ошибка', 'Программа не смогла определить колонку '
+                                                                              'в таблице ПВР где указано в Рпл',
+                                                              column_list, 10)[0]) - 2
+            if col_udlin_index == 0:
+                col_udlin_index = column_index_from_string(QInputDialog.getItem(self, 'Ошибка', 'Программа не смогла определить колонку '
+                                                                              'в таблице ПВР где указано в удлинение',
+                                                              column_list, 9)[0]) - 2
+            if col_close_index == 0:
+                col_close_index = column_index_from_string(QInputDialog.getItem(self, 'Ошибка', 'Программа не смогла определить колонку '
+                                                                              'в таблице ПВР где указано дата отключения',
+                                                             column_list, 6)[0]) - 2
+            if col_open_index == 0:
+                col_open_index = column_index_from_string(QInputDialog.getItem(self, 'Ошибка', 'Программа не смогла определить колонку '
+                                                                              'в таблице ПВР где указано дата вскрытия',
+                                                              column_list, 5)[0]) - 2
+            if col_sole_index == 0:
+                col_sole_index = column_index_from_string(QInputDialog.getItem(self, 'Ошибка', 'Программа не смогла определить колонку '
+                                                                              'в таблице ПВР где указано Подошва ИП',
+                                                             column_list, 4)[0]) - 2
+            if col_roof_index == 0:
+                col_roof_index = column_index_from_string(QInputDialog.getItem(self, 'Ошибка', 'Программа не смогла определить колонку '
+                                                                              'в таблице ПВР где указано кровля ИП',
+                                                              column_list, 3)[0]) - 2
+            if col_vert_index == 0:
+                col_vert_index = column_index_from_string(QInputDialog.getItem(self, 'Ошибка', 'Программа не смогла определить колонку '
+                                                                              'в таблице ПВР где указано вертикаль',
+                                                              column_list, 2)[0]) - 2
+            if col_plast_index == -1:
+                col_plast_index = column_index_from_string(QInputDialog.getItem(self, 'Ошибка', 'Программа не смогла определить колонку '
+                                                                              'в таблице ПВР где указано пласт',
+                                                              column_list, 1)[0]) - 2
+                print(f'fjjар {col_plast_index}')
             if osnov_stvol is True and bokov_stvol is True:
                 mes = QMessageBox.warning(self, 'ОШИБКА', 'Ошибка в определении рабочий интервалов перфорации')
                 begin_index = QInputDialog.getInt(self, 'Индекс начала', 'ВВедите индекс начала рабочих интервалов ПВР',
@@ -1169,9 +1219,9 @@ class Well_perforation(FindIndexPZ):
                                                                                           []).append('0')
                     if zhgs:
                         well_data.dict_perforation.setdefault(plast, {}).setdefault('рабочая жидкость', []).append(zhgs)
-                        if row[col_date_pressuar_index]:
-                            well_data.dict_perforation.setdefault(
-                                plast, {}).setdefault('замер', []).append(row[col_date_pressuar_index])
+                    if row[col_date_pressuar_index]:
+                        well_data.dict_perforation.setdefault(
+                            plast, {}).setdefault('замер', []).append(row[col_date_pressuar_index])
 
                 elif any([str((i)).lower() == 'проект' for i in row]) is True and all(
                         [str(i).strip() is None for i in row]) is False and is_number(row[col_roof_index]) is True \
@@ -1239,81 +1289,62 @@ class Well_Category(FindIndexPZ):
     def read_well(self, ws, begin_index, cancel_index):
         from main import MyWindow
         if well_data.data_in_base is False:
-            # print(f'индекс катего {begin_index, cancel_index}')
+            print(f'индекс катего {begin_index, cancel_index}')
             for row in range(begin_index, cancel_index):
                 for col in range(1, 13):
                     cell = ws.cell(row=row, column=col).value
                     if cell:
-                        if 'по Pпл' in str(cell):
-                            for column in range(1, 13):
-                                col = ws.cell(row=row, column=column).value
-                                # print(col)
-                                if str(col) in ['атм'] and ws.cell(row=row, column=column - 2).value:
-                                    well_data.cat_P_1.append(ws.cell(row=row, column=column - 2).value)
-                                    # print(well_data.cat_P_P)
-                                    well_data.cat_P_P.append(ws.cell(row=row, column=column - 1).value)
+                        if str(cell) in ['атм'] and ws.cell(row=row, column=col - 2).value:
+                            well_data.cat_P_1.append(ws.cell(row=row, column=col - 2).value)
+                            # print(well_data.cat_P_P)
+                            well_data.cat_P_P.append(ws.cell(row=row, column=col - 1).value)
 
-                        elif 'по H2S' in str(cell) and 'по H2S' not in str(
-                                ws.cell(row=row - 1, column=2).value):
-                            for column in range(1, 13):
-                                col = ws.cell(row=row, column=column).value
-
-                                if str(col) in ['%', 'мг/л', 'мг/дм3', 'мг/м3', 'мг/дм', 'мгдм3'] and \
-                                        ws.cell(row=row, column=column - 2).value:
-                                    # print(f'ячейка- 3 3 {col}')
-                                    well_data.cat_h2s_list.append(ws.cell(row=row, column=column - 2).value)
-
-
-                        elif 'газовому фактору' in str(cell):
-                            for column in range(1, 13):
-                                col = ws.cell(row=row, column=column).value
-                                if str(col) in ['м3/т']:
-                                    well_data.cat_gaz_f_pr.append(ws.cell(row=row, column=column - 2).value)
-
-
-                        elif 'мг/л' in str(cell) or 'мг/дм' in str(cell) or 'мгдм' in str(cell):
-                            cell2 = ws.cell(row=row, column=col - 1).value
-                            if cell2:
-                                well_data.h2s_mg.append(
-                                    float(FindIndexPZ.check_str_None(self, str(cell2).replace(',', '.'))))
-                        elif 'м3/т' in str(cell):
-                            cell2 = ws.cell(row=row, column=col - 1).value
-                            if cell2:
-                                well_data.gaz_f_pr.append(
-                                    round(float(FindIndexPZ.check_str_None(self, str(cell2).replace(',', '.'))), 1))
-                        elif '%' in str(cell):
-                            cell2 = ws.cell(row=row, column=col - 1).value
-                            # print(f'проц {cell2}')
-                            if type(cell2) in [float, int]:
-                                if str(round(float(str(cell2).replace(',', '.')), 3))[-1] == "0":
-                                    h2s_pr = int(float(str(cell2).replace(',', '.')))
+                        elif str(cell) in ['%', 'мг/л', 'мг/дм3', 'мг/м3', 'мг/дм', 'мгдм3']:
+                            if str(cell) == '%':
+                                if ws.cell(row=row, column=col - 2).value is None:
+                                    well_data.cat_h2s_list.append(ws.cell(row=row-1, column=col - 2).value)
                                 else:
-                                    h2s_pr = round(float(str(cell2).replace(',', '.')), 4)
-                                well_data.h2s_pr.append(float(str(h2s_pr).replace(',', '.')))
+                                    well_data.cat_h2s_list.append(ws.cell(row=row, column=col - 2).value)
+                                if str(ws.cell(row=row, column=col - 1).value).strip() in ['', '-', '0', 'None'] or \
+                                        'отс' in str(ws.cell(row=row, column=col - 1).value).lower():
+                                    well_data.h2s_pr.append(0)
+                                else:
+                                    well_data.h2s_pr.append(float(str(ws.cell(row=row, column=col - 1).value).replace(',', '.')))
+                            if str(cell) in ['мг/л', 'мг/дм3', 'мг/дм', 'мгдм3']:
+                                if str(ws.cell(row=row, column=col - 1).value).strip() in ['', '-', '0', 'None'] or \
+                                        'отс' in str(ws.cell(row=row, column=col - 1).value).lower():
+                                    well_data.h2s_mg.append(0)
+                                    print(well_data.h2s_mg)
+                                else:
+                                    print(ws.cell(row=row, column=col - 1).value)
+                                    well_data.h2s_mg.append(float(str(ws.cell(row=row, column=col - 1).value).replace(',', '.')))
+
+                            if str(cell) in ['мг/м3'] and ws.cell(row=row-1, column=col - 1).value not in \
+                                ['мг/л', 'мг/дм3', 'мг/дм', 'мгдм3'] and ws.cell(row=row+1, column=col - 1).value not in  \
+                                ['мг/л', 'мг/дм3', 'мг/дм', 'мгдм3']:
+                                if str(ws.cell(row=row, column=col - 1).value).strip() in ['', '-', '0', 'None'] or \
+                                        'отс' in str(ws.cell(row=row, column=col - 1).value).lower():
+                                    well_data.h2s_mg.append(0)
+                                    print(f'1{well_data.h2s_mg}')
+                                else:
+                                    well_data.h2s_mg.append(float(str(
+                                            FindIndexPZ.check_str_None(self, str(ws.cell(row=row, column=col - 1).value).replace(',', '.')))) / 1000)
+                                    print(f'2{well_data.h2s_mg}')
+
+                        elif str(cell) == 'м3/т':
+                            well_data.cat_gaz_f_pr.append(ws.cell(row=row, column=col - 2).value)
+                            if 'отс' in str(ws.cell(row=row, column=col - 1).value):
+                                well_data.gaz_f_pr.append(0)
                             else:
-                                h2s_pr = cell2
-                                well_data.h2s_pr.append(FindIndexPZ.check_str_None(self, str(cell2).replace(',', '.')))
-
-
-                        elif str(cell) in 'мг/м3':
-                            cell2 = ws.cell(row=row, column=col - 1).value
-                            if cell2:
-                                well_data.h2s_mg_m3.append(float(str(
-                                    FindIndexPZ.check_str_None(self, str(cell2).replace(',', '.')))) / 1000)
-
+                                well_data.gaz_f_pr.append(float(
+                                    str(ws.cell(row=row, column=col - 1).value).replace(',', '.')))
             if len(well_data.cat_h2s_list) == 0:
-                cat_h2s, _ = QInputDialog.getint(self, 'Категория скважины',
-                                                   'Введите категорию скважины по сероводороду',3, 1, 3)
-                well_data.cat_h2s_list.append( cat_h2s)
+                mes = QMessageBox.warning(self, 'ОШИБКА', 'Приложение не смогла найти значение '
+                                                          'сероводорода в %')
+                well_data.pause = True
+                self.pause_app()
 
-            if len(well_data.h2s_mg) == 0 and len(well_data.h2s_mg_m3) != 0:
-                for mg in well_data.h2s_mg_m3:
-                    # print(f'значени{mg}')
-                    well_data.h2s_mg.append(mg)
-            if len(well_data.h2s_mg) == 0:
-                h2s_mg, _ = QInputDialog.getDouble(self, 'сероводород в процентах',
-                                                   'Введите значение серовородода в мг/л', 0, 0, 100, 1)
-                well_data.h2s_mg.append(h2s_mg)
+
 
             if self.data_window is None:
                 self.data_window = CategoryWindow(self)
