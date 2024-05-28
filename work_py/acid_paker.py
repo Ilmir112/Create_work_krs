@@ -270,7 +270,7 @@ class TabPage_SO_acid(QWidget):
         self.iron_volume_label = QLabel("Объем стабилизатора", self)
         self.iron_volume_edit = QLineEdit(self)
         self.expected_P_label = QLabel('Ожидаемое давление закачки')
-        self.expected_P_edit =QLineEdit(self)
+        self.expected_P_edit = QLineEdit(self)
         self.expected_Q_label = QLabel('Ожидаемая приемистость')
         self.expected_P_edit.setValidator(self.validator_int)
         self.expected_Q_edit = QLineEdit(self)
@@ -278,7 +278,6 @@ class TabPage_SO_acid(QWidget):
         self.expected_P_edit.textChanged.connect(self.update_pressuar)
         self.pressure_three_label = QLabel('Режимы ')
         self.pressure_three_edit = QLineEdit(self)
-
 
         self.pressure_Label = QLabel("Давление закачки", self)
         self.pressure_edit = QLineEdit(self)
@@ -289,6 +288,9 @@ class TabPage_SO_acid(QWidget):
         self.Qplast_after_labelType = QLabel("Нужно ли определять приемистоть после СКО", self)
         self.Qplast_after_edit = QComboBox(self)
         self.Qplast_after_edit.addItems(['ДА', 'НЕТ'])
+
+        self.calculate_sko_label = QLabel('Расчет на п.м.')
+        self.calculate_sko_line = QLineEdit(self)
 
         self.grid.addWidget(self.paker_layout_label, 0, 0, 1, 0)
         self.grid.addWidget(self.paker_layout_combo, 1, 0, 1, 0)
@@ -332,6 +334,8 @@ class TabPage_SO_acid(QWidget):
         self.grid.addWidget(self.acidOilProcEdit, 7, 4)
         self.grid.addWidget(self.pressure_Label, 6, 5)
         self.grid.addWidget(self.pressure_edit, 7, 5)
+        self.grid.addWidget(self.calculate_sko_label, 6, 6)
+        self.grid.addWidget(self.calculate_sko_line, 7, 6)
         self.grid.addWidget(self.Qplast_labelType, 6, 0)
         self.grid.addWidget(self.QplastEdit, 7, 0)
         self.grid.addWidget(self.swabTypeLabel, 8, 1)
@@ -342,7 +346,6 @@ class TabPage_SO_acid(QWidget):
         self.grid.addWidget(self.swab_volumeEdit, 9, 3)
         self.grid.addWidget(self.Qplast_after_labelType, 10, 1)
         self.grid.addWidget(self.Qplast_after_edit, 11, 1)
-
 
         self.grid.addWidget(self.expected_Q_label, 10, 2)
         self.grid.addWidget(self.expected_Q_edit, 11, 2)
@@ -376,12 +379,24 @@ class TabPage_SO_acid(QWidget):
         self.Qplast_after_edit.setCurrentIndex(1)
         self.Qplast_after_edit.setCurrentIndex(0)
 
-
-
         if well_data.curator == 'ОР':
             self.Qplast_after_edit.setCurrentIndex(0)
         else:
             self.Qplast_after_edit.setCurrentIndex(1)
+        self.calculate_sko_line.textChanged.connect(self.update_calculate_sko)
+
+    def update_calculate_sko(self):
+        plasts = well_data.texts
+        metr_pvr = 0
+        for plast in well_data.plast_work:
+            for plast_sel in plasts:
+                if plast_sel == plast:
+                    for interval in well_data.dict_perforation[plast]['интервал']:
+                        metr_pvr += abs(interval[0] - interval[1])
+        calculate_sko = self.calculate_sko_line.text()
+        if calculate_sko != '':
+            calculate_sko.replace(',','.')
+        self.acid_volume_edit.setText(f'{round(metr_pvr * float(calculate_sko), 1)}')
 
     def update_Qplast_after(self, index):
         if index == 'ДА':
@@ -392,14 +407,10 @@ class TabPage_SO_acid(QWidget):
             except:
                 pass
 
-
             try:
                 self.expected_P_edit.setText(f'{well_data.expected_P}')
             except:
                 pass
-
-
-
 
             self.expected_Q_edit.setText(str(well_data.expected_Q))
             self.expected_P_edit.setText(str(well_data.expected_P))
@@ -430,6 +441,7 @@ class TabPage_SO_acid(QWidget):
             self.sko_vt_edit = QLineEdit(self)
             self.sko_vt_label.setParent(None)
             self.sko_vt_edit.setParent(None)
+
     def update_pressuar(self):
         expected_P = self.expected_P_edit.text()
         if expected_P.isdigit():
@@ -788,7 +800,7 @@ class AcidPakerWindow(QMainWindow):
         iron_volume_edit = self.tabWidget.currentWidget().acidOilProcEdit.text()
         self.Qplast_after_edit = self.tabWidget.currentWidget().Qplast_after_edit.currentText()
         self.expected_Q = self.tabWidget.currentWidget().expected_Q_edit.text()
-        self.expected_P = self.tabWidget.currentWidget().expected_P_edit.text()
+        self.expected_P = int(float(self.tabWidget.currentWidget().expected_P_edit.text()))
         self.pressure_three = self.tabWidget.currentWidget().pressure_three_edit.text()
 
         rows = self.tableWidget.rowCount()
@@ -1415,9 +1427,8 @@ class AcidPakerWindow(QMainWindow):
         from work_py.alone_oreration import volume_vn_nkt, well_volume
         paker_list = []
 
-        if QplastEdit == 'ДА' and well_data.curator == 'ОР':
-            work_list = []
-            work_list.append(
+        if QplastEdit == 'ДА':
+            paker_list.append(
                 [f'Насыщение 5м3.  Q пласт {plast_combo} при '
                  f'Р={self.pressure_mode(self.expected_P, plast_combo)}атм', None,
                  f'Произвести насыщение скважины до стабилизации давления закачки '

@@ -834,9 +834,12 @@ class TemplateKrs(QMainWindow):
         vbox.addWidget(self.buttonAddString, 3, 1)
 
     def addRowTable(self):
-
-        roof_skm = int(self.tabWidget.currentWidget().roof_skm_line.text())
-        sole_skm = int(self.tabWidget.currentWidget().sole_skm_line.text())
+        roof_skm = self.tabWidget.currentWidget().roof_skm_line.text()
+        sole_skm = self.tabWidget.currentWidget().sole_skm_line.text()
+        if roof_skm != '':
+            roof_skm = int(float(roof_skm))
+        if sole_skm != '':
+            roof_skm = int(float(sole_skm))
         template_key = self.tabWidget.currentWidget().template_Combo.currentText()
 
         if not roof_skm or not sole_skm:
