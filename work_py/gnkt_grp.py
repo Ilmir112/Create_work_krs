@@ -638,9 +638,9 @@ class GnktOsvWindow(QMainWindow):
             Work_with_gnkt.count_row_height(self, worksheet, work_list, sheet_name)
 
         # ws6 = GnktOsvWindow.wb.create_sheet(title="СХЕМЫ КНК_44,45")
-        # main.MyWindow.insert_image(self, ws6, 'imageFiles/schema_well/СХЕМЫ КНК_44,45.png', 'A1', 550, 900)
+        # main.MyWindow.insert_image(self, ws6, '_internal/imageFiles/schema_well/СХЕМЫ КНК_44,45.png', 'A1', 550, 900)
         ws7 = GnktOsvWindow.wb.create_sheet(title="СХЕМЫ КНК_38,1")
-        main.MyWindow.insert_image(self, ws7, 'imageFiles/schema_well/СХЕМЫ КНК_38,1.png', 'A1', 550, 900)
+        main.MyWindow.insert_image(self, ws7, '_internal/imageFiles/schema_well/СХЕМЫ КНК_38,1.png', 'A1', 550, 900)
 
 
         if 'Зуфаров' in well_data.user:
@@ -676,16 +676,16 @@ class GnktOsvWindow(QMainWindow):
 
         if well_data.paker_do["do"] != 0:
             coordinate_nkt_with_paker = 'F6'
-            main.MyWindow.insert_image(self, ws, 'imageFiles/schema_well/НКТ с пакером.png',
+            main.MyWindow.insert_image(self, ws, '_internal/imageFiles/schema_well/НКТ с пакером.png',
                                        coordinate_nkt_with_paker, 100, 470)
         else:
             coordinate_nkt_with_voronka = 'F6'
-            main.MyWindow.insert_image(self, ws, 'imageFiles/schema_well/НКТ с воронкой.png',
+            main.MyWindow.insert_image(self, ws, '_internal/imageFiles/schema_well/НКТ с воронкой.png',
                                        coordinate_nkt_with_voronka, 70, 470)
 
         coordinate_propant = 'F43'
         if self.work_plan == 'gnkt_after_grp':
-            main.MyWindow.insert_image(self, ws, 'imageFiles/schema_well/пропант.png', coordinate_propant, 90, 500)
+            main.MyWindow.insert_image(self, ws, '_internal/imageFiles/schema_well/пропант.png', coordinate_propant, 90, 500)
 
         n = 0
         m = 0
@@ -713,13 +713,13 @@ class GnktOsvWindow(QMainWindow):
                     ws.cell(row=48 + n, column=10).alignment = Alignment(wrap_text=True, horizontal='left',
                                                                          vertical='center')
                     n += 3
-                    main.MyWindow.insert_image(self, ws, 'imageFiles/schema_well/ПВР.png', coordinate_pvr, 85, 70)
+                    main.MyWindow.insert_image(self, ws, '_internal/imageFiles/schema_well/ПВР.png', coordinate_pvr, 85, 70)
             except:
                 mes = QMessageBox.critical(self, 'Ошибка', f'программа не смогла вставить интервал перфорации в схему'
                                                            f'{roof_plast}-{sole_plast}')
 
         coordinate_voln = f'E18'
-        main.MyWindow.insert_image(self, ws, 'imageFiles/schema_well/переход.png', coordinate_voln, 150, 60)
+        main.MyWindow.insert_image(self, ws, '_internal/imageFiles/schema_well/переход.png', coordinate_voln, 150, 60)
 
 
     def date_dmy(self, date_str):

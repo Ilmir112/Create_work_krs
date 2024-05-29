@@ -130,9 +130,9 @@ class CreatePZ(QMainWindow):
                 for col in range(1, 12):
                     try:
                         image = image_loader.get(f'{get_column_letter(col)}{row}')
-                        image.save(f'imageFiles/image_work/image{get_column_letter(col)}{row}.png')
+                        image.save(f'_internal/imageFiles/image_work/image{get_column_letter(col)}{row}.png')
                         image_size = image.size
-                        image_path = f'imageFiles/image_work/image{get_column_letter(col)}{row}.png'
+                        image_path = f'_internal/imageFiles/image_work/image{get_column_letter(col)}{row}.png'
 
                         coord = f'{get_column_letter(col)}{row + 17 - well_data.cat_well_min._value}'
 

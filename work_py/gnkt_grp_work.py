@@ -318,19 +318,19 @@ class GnktOsvWindow2(QMainWindow):
             for col, value in enumerate(row):
                 if 'А.Р. Хасаншин' in str(value):
                     coordinate = f'{get_column_letter(col + 1)}{row_ind - 1}'
-                    self.insert_image(ws2, 'imageFiles/Хасаншин.png', coordinate)
+                    self.insert_image(ws2, '_internal/imageFiles/Хасаншин.png', coordinate)
                 elif 'Д.Д. Шамигулов' in str(value):
                     coordinate = f'{get_column_letter(col + 1)}{row_ind - 2}'
-                    self.insert_image(ws2, 'imageFiles/Шамигулов.png', coordinate)
+                    self.insert_image(ws2, '_internal/imageFiles/Шамигулов.png', coordinate)
                 elif 'Зуфаров' in str(value):
                     coordinate = f'{get_column_letter(col - 2)}{row_ind}'
-                    self.insert_image(ws2, 'imageFiles/Зуфаров.png', coordinate)
+                    self.insert_image(ws2, '_internal/imageFiles/Зуфаров.png', coordinate)
                 elif 'М.К.Алиев' in str(value):
                     coordinate = f'{get_column_letter(col - 1)}{row_ind - 2}'
-                    self.insert_image(ws2, 'imageFiles/Алиев махир.png', coordinate)
+                    self.insert_image(ws2, '_internal/imageFiles/Алиев махир.png', coordinate)
                 elif 'З.К. Алиев' in str(value):
                     coordinate = f'{get_column_letter(col - 1)}{row_ind - 2}'
-                    self.insert_image(ws2, 'imageFiles/Алиев Заур.png', coordinate)
+                    self.insert_image(ws2, '_internal/imageFiles/Алиев Заур.png', coordinate)
                     break
         print(f'{sheet_name} - вставлена')
 
@@ -360,9 +360,9 @@ class GnktOsvWindow2(QMainWindow):
             self.wb.count_row_height(self, worksheet, work_list, sheet_name)
 
         ws6 = self.wb.create_sheet(title="СХЕМЫ КНК_44,45")
-        main.MyWindow.insert_image(self, ws6, 'imageFiles/schema_well/СХЕМЫ КНК_44,45.png', 'A1', 550, 900)
+        main.MyWindow.insert_image(self, ws6, '_internal/imageFiles/schema_well/СХЕМЫ КНК_44,45.png', 'A1', 550, 900)
         ws7 = self.wb.create_sheet(title="СХЕМЫ КНК_38,1")
-        main.MyWindow.insert_image(self, ws7, 'imageFiles/schema_well/СХЕМЫ КНК_38,1.png', 'A1', 550, 900)
+        main.MyWindow.insert_image(self, ws7, '_internal/imageFiles/schema_well/СХЕМЫ КНК_38,1.png', 'A1', 550, 900)
 
         # path = 'workiii'
         if 'Зуфаров' in well_data.user:

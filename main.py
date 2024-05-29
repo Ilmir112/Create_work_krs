@@ -792,25 +792,25 @@ class MyWindow(QMainWindow):
                 for col, value in enumerate(row):
                     if 'Зуфаров' in str(value):
                         coordinate = f'{get_column_letter(col - 2)}{row_ind - 2}'
-                        self.insert_image(ws2, 'imageFiles/Зуфаров.png', coordinate)
+                        self.insert_image(ws2, '_internal/imageFiles/Зуфаров.png', coordinate)
                     elif 'М.К.Алиев' in str(value):
                         coordinate = f'{get_column_letter(col - 1)}{row_ind - 1}'
-                        self.insert_image(ws2, 'imageFiles/Алиев махир.png', coordinate)
+                        self.insert_image(ws2, '_internal/imageFiles/Алиев махир.png', coordinate)
                     elif 'З.К. Алиев' in str(value):
                         coordinate = f'{get_column_letter(col - 1)}{row_ind - 1}'
-                        self.insert_image(ws2, 'imageFiles/Алиев Заур.png', coordinate)
+                        self.insert_image(ws2, '_internal/imageFiles/Алиев Заур.png', coordinate)
                         break
                     elif 'Расчет жидкости глушения производится согласно МУ' in str(value):
                         coordinate = f'{get_column_letter(6)}{row_ind + 1}'
-                        self.insert_image(ws2, 'imageFiles/schema_well/формула.png', coordinate, 330, 130)
+                        self.insert_image(ws2, '_internal/imageFiles/schema_well/формула.png', coordinate, 330, 130)
                         break
             if self.work_plan != 'dop_plan':
                 self.create_short_plan(wb2, plan_short)
 
             # print(f'9 - {ws2.max_row}')
             if self.work_plan != 'dop_plan':
-                self.insert_image(ws2, 'imageFiles/Хасаншин.png', 'H1')
-                self.insert_image(ws2, 'imageFiles/Шамигулов.png', 'H4')
+                self.insert_image(ws2, '_internal/imageFiles/Хасаншин.png', 'H1')
+                self.insert_image(ws2, '_internal/imageFiles/Шамигулов.png', 'H4')
 
                 try:
                     cat_h2s_list = well_data.dict_category[well_data.plast_work_short[0]]['по сероводороду'].category
@@ -1018,7 +1018,7 @@ class MyWindow(QMainWindow):
             well_data.problemWithEk = False
             well_data.problemWithEk_depth = well_data.current_bottom
             well_data.problemWithEk_diametr = 220
-            path = "imageFiles/image_work"
+            path = "_internal/imageFiles/image_work"
 
             for file in os.listdir(path):
                 file_path = os.path.join(path, file)
@@ -1838,7 +1838,7 @@ class MyWindow(QMainWindow):
         if schema_pvo_set:
             for schema in list(schema_pvo_set):
                 coordinate = f'{get_column_letter(2)}{1 + n}'
-                schema_path = f'imageFiles/pvo/oil/схема {schema}.jpg'
+                schema_path = f'_internal/imageFiles/pvo/oil/схема {schema}.jpg'
                 img = openpyxl.drawing.image.Image(schema_path)
                 img.width = 750
                 img.height = 530

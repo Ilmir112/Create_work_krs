@@ -18,7 +18,7 @@ class TabPage_SO(QWidget):
 
 
         # Открытие JSON файла и чтение данных
-        with open('podpisant.json', 'r', encoding='utf-8') as file:
+        with open('_internal/podpisant.json', 'r', encoding='utf-8') as file:
             self.podpis_dict = json.load(file)
         TabPage_SO.podpis_dict = self.podpis_dict
         self.region_list = [' ', 'АГМ', 'ИГМ', 'ТГМ', 'ЧГМ', 'КГМ']
@@ -247,7 +247,7 @@ class CorrectSignaturesWindow(QMainWindow):
             self.podpis_dict[selected_region]["grr"]['surname'] = representative_of_GRR_name_editType
 
 
-            with open('podpisant.json', 'w', encoding = 'utf-8') as json_file:
+            with open('_internal/podpisant.json', 'w', encoding = 'utf-8') as json_file:
                 json.dump(self.podpis_dict, json_file, indent=4, ensure_ascii=False)
 
             self.close()
