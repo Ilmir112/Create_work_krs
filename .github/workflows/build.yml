@@ -20,7 +20,7 @@ jobs:
 #              run: pyinstaller --onefile --hidden-import data_base.data_base_well.database_well main.py
       - name: Build executable
         run:
-           D:\python\django_create_krs\create_krs\ --noconfirm --onedir --icon=imageFiles/icon/zima_ico.ico --noconsole --name "ZIMA"
+            D:\python\djangocreatekrs\createkrs\ --noconfirm --onedir --icon=imageFiles/icon/zimaico.ico --noconsole --name "ZIMA"
           --add-data "work_py;work_py/" 
           --add-data "users;users/" 
           --add-data "tests;tests/" 
