@@ -275,7 +275,7 @@ postgres_conn_user = {
     'database': 'users',
     'user': 'postgres',
     'password': '1953',
-    'host': '87.242.85.51',
+    'host': 'localhost',
     'port': '5432'
 }
 

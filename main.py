@@ -201,15 +201,15 @@ class MyWindow(QMainWindow):
         self.excepthook.moveToThread(self.thread)
         # self.thread.started.connect(self.excepthook.handleException)
         self.thread.start()
-        try:
-            if self.login_window == None:
-                self.login_window = LoginWindow()
-                self.login_window.show()
-                self.pause_app()
-                well_data.pause = False
-        except Exception as e:
-            mes = QMessageBox.warning(self, 'КРИТИЧЕСКАЯ ОШИБКА', 'Критическая ошибка, смотри в лог')
-            self.excepthook._exception_caught.emit(e)
+        LoginWindow.login(self)
+        # try:
+
+
+            # self.pause_app()
+            # well_data.pause = False
+        # except Exception as e:
+        #     mes = QMessageBox.warning(self, 'КРИТИЧЕСКАЯ ОШИБКА', 'Критическая ошибка, смотри в лог')
+        #     self.excepthook._exception_caught.emit(e)
 
     def initUI(self):
 
