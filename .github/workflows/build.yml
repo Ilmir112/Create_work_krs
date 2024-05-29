@@ -21,15 +21,15 @@ jobs:
       - name: Build executable
         run:
           pyinstaller --noconfirm --onedir --icon=imageFiles/icon/zima_ico.ico --console --name "ZIMA"
-          --add-data "work_py;." 
-          --add-data "users;." 
-          --add-data "tests;." 
-          --add-data "log_files;." 
-          --add-data "property_excel;." 
-          --add-data "imageFiles;." 
-          --add-data "gnkt_data;." 
-          --add-data "data_base;." 
-          --add-data "podpisant.json;." 
+          --add-data "work_py;work_py/" 
+          --add-data "users;users/" 
+          --add-data "tests;tests/" 
+          --add-data "log_files;log_files/" 
+          --add-data "property_excel;property_excel/" 
+          --add-data "imageFiles;imageFiles/" 
+          --add-data "gnkt_data;gnkt_data/" 
+          --add-data "data_base;data_base/" 
+          --add-data "podpisant.json;podpisant.json" 
           --add-data "work_json.py;." 
           --add-data "well_data.py;." 
           --add-data "requirements.txt;." 
@@ -57,4 +57,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ZIMA
-          path: dist/*
+#          path: dist/*
