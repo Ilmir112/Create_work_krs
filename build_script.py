@@ -14,7 +14,7 @@ additional_files = [
     ('data_base/work_with_base.py', '.'),
     ('data_base/database_without_juming.db', '.'),
     ('gnkt_data/gnkt_data.py', '.'),
-    ('_internal/imageFiles', '.'),
+    ('imageFiles', '.'),
     ('users/login_users.py', '.'),
     ('work_py/acid_paker.py', '.'),
     ('work_py/acids.py', '.'),
