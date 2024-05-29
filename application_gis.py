@@ -304,7 +304,7 @@ class GisApplication(QMainWindow):
     def add_work(self):
         from main import MyWindow
 
-        wb = openpyxl.load_workbook('property_excel/template_gis.xlsx')
+        wb = openpyxl.load_workbook('imageFiles/property_excel/template_gis.xlsx')
         # Выбираем активный лист
         self.ws_pvr = wb.active
         number_brigada = str(self.tabWidget.currentWidget().number_brigada_combo.currentText())

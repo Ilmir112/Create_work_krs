@@ -13,11 +13,10 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu, QMenuBar, QAction,
 from PyQt5 import QtCore, QtWidgets
 from datetime import datetime
 from openpyxl.utils import get_column_letter
-from PyQt5.QtCore import Qt, pyqtSlot
 from openpyxl.workbook import Workbook
-from openpyxl.styles import Border, Side, Alignment, Font
+from openpyxl.styles import Alignment, Font
 
-import property_excel.property_excel_pvr
+import imageFiles.property_excel.property_excel_pvr
 
 from log_files.log import logger, QPlainTextEditLogger
 from work_py.advanted_file import count_row_height, raid, remove_overlapping_intervals
@@ -26,13 +25,12 @@ from openpyxl.drawing.image import Image
 
 import well_data
 from H2S import calc_h2s
-from PyQt5.QtCore import QThread, pyqtSignal, pyqtSlot
+from PyQt5.QtCore import QThread, pyqtSlot
 from data_correct_position_people import CorrectSignaturesWindow
 from work_py.dop_plan_py import DopPlanWindow
 from work_py.drilling import Drill_window
 from users.login_users import LoginWindow
 import threading
-import time
 import win32gui
 
 from PyQt5.QtCore import Qt, QObject, pyqtSignal
@@ -2049,12 +2047,12 @@ class MyWindow(QMainWindow):
                 table_widget.setColumnWidth(column, int(colWidth[column]))  # Здесь задайте требуемую ширину столбца
         elif work_plan in ['gnkt_after_grp', 'gnkt_opz'] and list_page == 2:
 
-            colWidth = property_excel.property_excel_pvr.colWidth_gnkt_osv
+            colWidth = imageFiles.property_excel.property_excel_pvr.colWidth_gnkt_osv
             for column in range(table_widget.columnCount()):
                 table_widget.setColumnWidth(column, int(colWidth[column] * 9))  # Здесь задайте требуемую ширину столбца
 
         elif work_plan == 'application_pvr':
-            from property_excel import property_excel_pvr
+            from imageFiles.property_excel import property_excel_pvr
             for column in range(table_widget.columnCount()):
                 table_widget.setColumnWidth(column, int(
                     property_excel_pvr.colWidth[column]))  # Здесь задайте требуемую ширину столбца
