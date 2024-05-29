@@ -1,10 +1,20 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIntValidator, QDoubleValidator
 from PyQt5.QtWidgets import QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QTabWidget, QMainWindow, QPushButton, \
-    QMessageBox, QTableWidget, QTableWidgetItem, QVBoxLayout, QHeaderView
+    QMessageBox, QApplication, QTableWidget, QTableWidgetItem, QVBoxLayout, QHeaderView
 import openpyxl
+from openpyxl.utils.cell import range_boundaries, get_column_letter
+from openpyxl.workbook import Workbook
 
+from block_name import region
+from property_excel.property_excel_pvr import boundaries, rowHeights1, colWidth
+
+from main import MyWindow
+from plan import copy_true_ws
 import well_data
+import sys
+
+from work_py.perforation import PerforationWindow
 
 
 class TabPage_SO_pvr(QWidget):
@@ -256,7 +266,7 @@ class PvrApplication(QMainWindow):
     def add_work(self):
         from main import MyWindow
 
-        wb = openpyxl.load_workbook('imageFiles/property_excel/template_pvr.xlsx')
+        wb = openpyxl.load_workbook('property_excel/template_pvr.xlsx')
         # Выбираем активный лист
         self.ws_pvr = wb.active
         number_brigada = str(self.tabWidget.currentWidget().number_brigada_combo.currentText())
