@@ -63,7 +63,7 @@ additional_files = [
     ('perforation_correct_gnkt_frez.py', '.'),
     ('plan.py', '.'),
     ('plan23.py', '.'),
-    ('_internal/podpisant.json', '.'),
+    (f'{well_data.path_image}podpisant.json', '.'),
     ('proverka.py', '.'),
     ('selectPlast.py', '.'),
     ('well_data.py', '.'),

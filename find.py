@@ -1333,7 +1333,8 @@ class Well_Category(FindIndexPZ):
 
                         elif str(cell) == 'м3/т':
                             well_data.cat_gaz_f_pr.append(ws.cell(row=row, column=col - 2).value)
-                            if 'отс' in str(ws.cell(row=row, column=col - 1).value):
+                            if 'отс' in str(ws.cell(row=row, column=col - 1).value) or \
+                                    'None' in str(ws.cell(row=row, column=col - 1).value):
                                 well_data.gaz_f_pr.append(0)
                             else:
                                 well_data.gaz_f_pr.append(float(

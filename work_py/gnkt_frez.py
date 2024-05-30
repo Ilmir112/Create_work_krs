@@ -215,19 +215,19 @@ class Work_with_gnkt(QMainWindow):
             for col, value in enumerate(row):
                 if 'А.Р. Хасаншин' in str(value):
                     coordinate = f'{get_column_letter(col + 1)}{row_ind - 1}'
-                    self.insert_image(ws2, '_internal/imageFiles/Хасаншин.png', coordinate)
+                    self.insert_image(ws2, f'{well_data.path_image}imageFiles/Хасаншин.png', coordinate)
                 elif 'Д.Д. Шамигулов' in str(value):
                     coordinate = f'{get_column_letter(col + 1)}{row_ind - 2}'
-                    self.insert_image(ws2, '_internal/imageFiles/Шамигулов.png', coordinate)
+                    self.insert_image(ws2, f'{well_data.path_image}imageFiles/Шамигулов.png', coordinate)
                 elif 'Зуфаров' in str(value):
                     coordinate = f'{get_column_letter(col - 2)}{row_ind}'
-                    self.insert_image(ws2, '_internal/imageFiles/Зуфаров.png', coordinate)
+                    self.insert_image(ws2, f'{well_data.path_image}imageFiles/Зуфаров.png', coordinate)
                 elif 'М.К.Алиев' in str(value):
                     coordinate = f'{get_column_letter(col - 1)}{row_ind - 2}'
-                    self.insert_image(ws2, '_internal/imageFiles/Алиев махир.png', coordinate)
+                    self.insert_image(ws2, f'{well_data.path_image}imageFiles/Алиев махир.png', coordinate)
                 elif 'З.К. Алиев' in str(value):
                     coordinate = f'{get_column_letter(col - 1)}{row_ind - 2}'
-                    self.insert_image(ws2, '_internal/imageFiles/Алиев Заур.png', coordinate)
+                    self.insert_image(ws2, f'{well_data.path_image}imageFiles/Алиев Заур.png', coordinate)
                     break
         print(f'{sheet_name} - вставлена')
 
@@ -257,9 +257,9 @@ class Work_with_gnkt(QMainWindow):
             Work_with_gnkt.count_row_height(self, worksheet, work_list, sheet_name)
 
         ws6 = Work_with_gnkt.wb_gnkt_frez.create_sheet(title="СХЕМЫ КНК_44,45")
-        main.MyWindow.insert_image(self, ws6, '_internal/imageFiles/schema_well/СХЕМЫ КНК_44,45.png', 'A1', 550, 900)
+        main.MyWindow.insert_image(self, ws6, f'{well_data.path_image}imageFiles/schema_well/СХЕМЫ КНК_44,45.png', 'A1', 550, 900)
         ws7 = Work_with_gnkt.wb_gnkt_frez.create_sheet(title="СХЕМЫ КНК_38,1")
-        main.MyWindow.insert_image(self, ws7, '_internal/imageFiles/schema_well/СХЕМЫ КНК_38,1.png', 'A1', 550, 900)
+        main.MyWindow.insert_image(self, ws7, f'{well_data.path_image}imageFiles/schema_well/СХЕМЫ КНК_38,1.png', 'A1', 550, 900)
 
         # path = 'workiii'
         if 'Зуфаров' in well_data.user:
@@ -754,7 +754,7 @@ class Work_with_gnkt(QMainWindow):
                 # print(f'вставка1 ')
                 column_img = f'H{value[1] + 6}'
 
-                main.MyWindow.insert_image(self, ws3, '_internal/imageFiles/schema_well/port.png', coordinate, 200, 200)
+                main.MyWindow.insert_image(self, ws3, f'{well_data.path_image}imageFiles/schema_well/port.png', coordinate, 200, 200)
 
             for i in range(3):
                 cell = ws3.cell(row=27, column=value[0] + i)
@@ -778,9 +778,9 @@ class Work_with_gnkt(QMainWindow):
 
         coordinate = f'B3'
 
-        main.MyWindow.insert_image(self, ws3, '_internal/imageFiles/schema_well/gorizont_1.png', coordinate, 237, 1023)
+        main.MyWindow.insert_image(self, ws3, f'{well_data.path_image}imageFiles/schema_well/gorizont_1.png', coordinate, 237, 1023)
         # print(Column_img)
-        main.MyWindow.insert_image(self, ws3, '_internal/imageFiles/schema_well/gorizont_12.png', column_img, 1800, 120)
+        main.MyWindow.insert_image(self, ws3, f'{well_data.path_image}imageFiles/schema_well/gorizont_12.png', column_img, 1800, 120)
 
         ws3.print_area = f'A1:AW{37}'
         ws3.page_setup.fitToPage = True

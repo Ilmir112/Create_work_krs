@@ -391,7 +391,8 @@ def count_row_height(ws, ws2, work_list, merged_cells_dict, ind_ins):
                             or 'заявку оформить за 16 часов' in str(cell.value).lower() \
                             or 'ЗАДАЧА 2.9.' in str(cell.value).upper() \
                             or 'ВСЕ ТЕХНОЛОГИЧЕСКИЕ ОПЕРАЦИИ' in str(cell.value).upper() \
-                            or 'за 48 часов до спуска' in str(cell.value).upper():
+                            or 'за 48 часов до спуска' in str(cell.value).upper()\
+                            or 'РИР' in str(cell.value).upper():
                         # print('есть жирный')
                         ws2.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=True)
                     elif 'порядок работы' in str(cell.value).lower() or \

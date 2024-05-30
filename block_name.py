@@ -13,7 +13,7 @@ def region(cdng):
 
 # выбор подписантов в зависимости от вида ГТМ
 def curator_sel(self, curator, region):
-    with open('_internal/podpisant.json', 'r', encoding='utf-8') as file:
+    with open(f'{well_data.path_image}podpisant.json', 'r', encoding='utf-8') as file:
         podpis_dict = json.load(file)
     if curator == 'ОР':
         return (podpis_dict[region]['ruk_orm']['post'], podpis_dict[region]["ruk_orm"]['surname'])
@@ -42,7 +42,7 @@ def pop_down(self, region, curator_sel):
     elif region == 'ИГМ':
         nach_tkrs = nach_tkrs_list[2]
 
-    with open('_internal/podpisant.json', 'r', encoding='utf-8') as file:
+    with open(f'{well_data.path_image}podpisant.json', 'r', encoding='utf-8') as file:
         podpis_dict = json.load(file)
 
 
@@ -168,7 +168,7 @@ def pop_down(self, region, curator_sel):
 def razdel_1(self, region):
 
 
-    with open('_internal/podpisant.json', 'r', encoding='utf-8') as file:
+    with open(f'{well_data.path_image}podpisant.json', 'r', encoding='utf-8') as file:
         podpis_dict = json.load(file)
 
     razdel_1 = [

@@ -382,22 +382,22 @@ class MyWindow(QMainWindow):
                                                                   "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
 
             if self.fname:
-                try:
-                    self.read_pz(self.fname)
-                    well_data.pause = True
-                    read_pz = CreatePZ(self.wb, self.ws, self.data_window, self.perforation_correct_window2)
-                    sheet = read_pz.open_excel_file(self.ws, self.work_plan)
+                # try:
+                self.read_pz(self.fname)
+                well_data.pause = True
+                read_pz = CreatePZ(self.wb, self.ws, self.data_window, self.perforation_correct_window2)
+                sheet = read_pz.open_excel_file(self.ws, self.work_plan)
 
-                    self.rir_window = GnktOsvWindow(self.ws,
-                                                    self.table_title, self.table_schema, self.table_widget,
-                                                    self.work_plan)
+                self.rir_window = GnktOsvWindow(self.ws,
+                                                self.table_title, self.table_schema, self.table_widget,
+                                                self.work_plan)
 
-                    self.pause_app()
-                    well_data.pause = True
+                self.pause_app()
+                well_data.pause = True
                     # self.copy_pz(sheet)
 
-                except FileNotFoundError:
-                    print('Файл не найден')
+                # except FileNotFoundError:
+                #     print('Файл не найден')
 
         elif action == self.create_GNKT_GRP and self.table_widget == None:
             self.work_plan = 'gnkt_after_grp'
@@ -792,25 +792,25 @@ class MyWindow(QMainWindow):
                 for col, value in enumerate(row):
                     if 'Зуфаров' in str(value):
                         coordinate = f'{get_column_letter(col - 2)}{row_ind - 2}'
-                        self.insert_image(ws2, '_internal/imageFiles/Зуфаров.png', coordinate)
+                        self.insert_image(ws2, f'{well_data.path_image}imageFiles/Зуфаров.png', coordinate)
                     elif 'М.К.Алиев' in str(value):
                         coordinate = f'{get_column_letter(col - 1)}{row_ind - 1}'
-                        self.insert_image(ws2, '_internal/imageFiles/Алиев махир.png', coordinate)
+                        self.insert_image(ws2, f'{well_data.path_image}imageFiles/Алиев махир.png', coordinate)
                     elif 'З.К. Алиев' in str(value):
                         coordinate = f'{get_column_letter(col - 1)}{row_ind - 1}'
-                        self.insert_image(ws2, '_internal/imageFiles/Алиев Заур.png', coordinate)
+                        self.insert_image(ws2, f'{well_data.path_image}imageFiles/Алиев Заур.png', coordinate)
                         break
                     elif 'Расчет жидкости глушения производится согласно МУ' in str(value):
                         coordinate = f'{get_column_letter(6)}{row_ind + 1}'
-                        self.insert_image(ws2, '_internal/imageFiles/schema_well/формула.png', coordinate, 330, 130)
+                        self.insert_image(ws2, f'{well_data.path_image}imageFiles/schema_well/формула.png', coordinate, 330, 130)
                         break
             if self.work_plan != 'dop_plan':
                 self.create_short_plan(wb2, plan_short)
 
             # print(f'9 - {ws2.max_row}')
             if self.work_plan != 'dop_plan':
-                self.insert_image(ws2, '_internal/imageFiles/Хасаншин.png', 'H1')
-                self.insert_image(ws2, '_internal/imageFiles/Шамигулов.png', 'H4')
+                self.insert_image(ws2, f'{well_data.path_image}imageFiles/Хасаншин.png', 'H1')
+                self.insert_image(ws2, f'{well_data.path_image}imageFiles/Шамигулов.png', 'H4')
 
                 try:
                     cat_h2s_list = well_data.dict_category[well_data.plast_work_short[0]]['по сероводороду'].category
@@ -1018,7 +1018,7 @@ class MyWindow(QMainWindow):
             well_data.problemWithEk = False
             well_data.problemWithEk_depth = well_data.current_bottom
             well_data.problemWithEk_diametr = 220
-            path = "_internal/imageFiles/image_work"
+            path = f"{well_data.path_image}/imageFiles/image_work"
 
             for file in os.listdir(path):
                 file_path = os.path.join(path, file)
@@ -1838,7 +1838,7 @@ class MyWindow(QMainWindow):
         if schema_pvo_set:
             for schema in list(schema_pvo_set):
                 coordinate = f'{get_column_letter(2)}{1 + n}'
-                schema_path = f'_internal/imageFiles/pvo/oil/схема {schema}.jpg'
+                schema_path = f'{well_data.path_image}imageFiles/pvo/oil/схема {schema}.jpg'
                 img = openpyxl.drawing.image.Image(schema_path)
                 img.width = 750
                 img.height = 530
