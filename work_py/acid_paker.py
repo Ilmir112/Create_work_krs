@@ -801,7 +801,7 @@ class AcidPakerWindow(QMainWindow):
         self.Qplast_after_edit = self.tabWidget.currentWidget().Qplast_after_edit.currentText()
         self.expected_Q = self.tabWidget.currentWidget().expected_Q_edit.text()
         self.expected_P = self.tabWidget.currentWidget().expected_P_edit.text()
-        if  self.expected_P not in [None, 'None', '']:
+        if self.expected_P not in [None, 'None', '']:
             self.expected_P = int(float(self.expected_P))
         self.pressure_three = self.tabWidget.currentWidget().pressure_three_edit.text()
 
