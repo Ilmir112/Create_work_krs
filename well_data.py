@@ -229,8 +229,8 @@ region = ''
 data_in_base = False
 dict_nkt = {}
 dict_nkt_po = {}
-# path_image = '_internal/'
-path_image = ''
+path_image = '_internal/'
+# path_image = ''
 
 dict_sucker_rod = {}
 dict_sucker_rod_po = {}
@@ -276,8 +276,8 @@ postgres_conn_work_well = {
 postgres_conn_user = {
     'database': 'users',
     'user': 'postgres',
-    'password': '1953',
-    'host': 'localhost',
+    'password': '195375AsD+',
+    'host': '87.242.85.51',
     'port': '5432'
 }
 

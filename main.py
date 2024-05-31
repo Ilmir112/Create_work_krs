@@ -2,7 +2,7 @@ import json
 import os
 import sys
 import psycopg2
-import win32com.client
+# import win32com.client
 import openpyxl
 import re
 import win32con
@@ -201,12 +201,13 @@ class MyWindow(QMainWindow):
         self.excepthook.moveToThread(self.thread)
         # self.thread.started.connect(self.excepthook.handleException)
         self.thread.start()
-        LoginWindow.login(self)
+        # LoginWindow.login(self)
         # try:
-
-
-            # self.pause_app()
-            # well_data.pause = False
+        if self.login_window == None:
+            self.login_window = LoginWindow()
+            self.login_window.show()
+            self.pause_app()
+            well_data.pause = False
         # except Exception as e:
         #     mes = QMessageBox.warning(self, 'КРИТИЧЕСКАЯ ОШИБКА', 'Критическая ошибка, смотри в лог')
         #     self.excepthook._exception_caught.emit(e)
@@ -697,7 +698,7 @@ class MyWindow(QMainWindow):
             mes = QMessageBox.critical(self, 'Ошибка', 'файл под таким именем открыт, закройте его')
         try:
             # Создаем объект Excel
-            excel = win32com.client.Dispatch("Excel.Application")
+            # excel = win32com.client.Dispatch("Excel.Application")
             # Открываем файл
             workbook = excel.Workbooks.Open(fileName)
             # Выбираем активный лист
@@ -777,33 +778,36 @@ class MyWindow(QMainWindow):
             # print(f' длина {len(work_list)}')
             CreatePZ.add_itog(self, ws2, self.table_widget.rowCount() + 1, self.work_plan)
             # print(f'45- {ws2.max_row}')
-            for row_ind, row in enumerate(ws2.iter_rows(values_only=True)):
-
-                if 15 < row_ind < 100:
-                    if all(cell in [None, ''] for cell in row) \
-                            and ('Интервалы темпа' not in str(ws2.cell(row=row_ind, column=2).value) \
-                                 and 'Замечания к эксплуатационному периоду' not in str(
-                                ws2.cell(row=row_ind, column=2).value) \
-                                 and 'Замечания к эксплуатационному периоду' not in str(
-                                ws2.cell(row=row_ind - 2, column=2).value)):
-                        # print(row_ind, ('Интервалы темпа' not in str(ws2.cell(row=row_ind, column=2).value)),
-                        #       str(ws2.cell(row=row_ind, column=2).value))
-                        ws2.row_dimensions[row_ind + 1].hidden = True
-                for col, value in enumerate(row):
-                    if 'Зуфаров' in str(value):
-                        coordinate = f'{get_column_letter(col - 2)}{row_ind - 2}'
-                        self.insert_image(ws2, f'{well_data.path_image}imageFiles/Зуфаров.png', coordinate)
-                    elif 'М.К.Алиев' in str(value):
-                        coordinate = f'{get_column_letter(col - 1)}{row_ind - 1}'
-                        self.insert_image(ws2, f'{well_data.path_image}imageFiles/Алиев махир.png', coordinate)
-                    elif 'З.К. Алиев' in str(value):
-                        coordinate = f'{get_column_letter(col - 1)}{row_ind - 1}'
-                        self.insert_image(ws2, f'{well_data.path_image}imageFiles/Алиев Заур.png', coordinate)
-                        break
-                    elif 'Расчет жидкости глушения производится согласно МУ' in str(value):
-                        coordinate = f'{get_column_letter(6)}{row_ind + 1}'
-                        self.insert_image(ws2, f'{well_data.path_image}imageFiles/schema_well/формула.png', coordinate, 330, 130)
-                        break
+            try:
+                for row_ind, row in enumerate(ws2.iter_rows(values_only=True)):
+        
+                    if 15 < row_ind < 100:
+                        if all(cell in [None, ''] for cell in row) \
+                                and ('Интервалы темпа' not in str(ws2.cell(row=row_ind, column=2).value) \
+                                     and 'Замечания к эксплуатационному периоду' not in str(
+                                    ws2.cell(row=row_ind, column=2).value) \
+                                     and 'Замечания к эксплуатационному периоду' not in str(
+                                    ws2.cell(row=row_ind - 2, column=2).value)):
+                            # print(row_ind, ('Интервалы темпа' not in str(ws2.cell(row=row_ind, column=2).value)),
+                            #       str(ws2.cell(row=row_ind, column=2).value))
+                            ws2.row_dimensions[row_ind + 1].hidden = True
+                    for col, value in enumerate(row):
+                        if 'Зуфаров' in str(value):
+                            coordinate = f'{get_column_letter(col - 2)}{row_ind - 2}'
+                            self.insert_image(ws2, f'{well_data.path_image}imageFiles/Зуфаров.png', coordinate)
+                        elif 'М.К.Алиев' in str(value):
+                            coordinate = f'{get_column_letter(col - 1)}{row_ind - 1}'
+                            self.insert_image(ws2, f'{well_data.path_image}imageFiles/Алиев махир.png', coordinate)
+                        elif 'З.К. Алиев' in str(value):
+                            coordinate = f'{get_column_letter(col - 1)}{row_ind - 1}'
+                            self.insert_image(ws2, f'{well_data.path_image}imageFiles/Алиев Заур.png', coordinate)
+                            break
+                        elif 'Расчет жидкости глушения производится согласно МУ' in str(value):
+                            coordinate = f'{get_column_letter(6)}{row_ind + 1}'
+                            self.insert_image(ws2, f'{well_data.path_image}imageFiles/schema_well/формула.png', coordinate, 330, 130)
+                            break
+            except:
+                mes = QMessageBox.warning(self, 'Ошибка', 'Нес могла вставить подписи')
             if self.work_plan != 'dop_plan':
                 self.create_short_plan(wb2, plan_short)
 
