@@ -4,10 +4,12 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QComboBo
 
 import well_data
 from main import MyWindow
+from .alone_oreration import volume_vn_ek
 from .rir import RirWindow
 
 from .opressovka import OpressovkaEK
 from .rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
+from .rir import TabPage_SO_rir
 
 
 class TabPage_SO_sand(QWidget):
@@ -65,6 +67,8 @@ class TabPage_SO_sand(QWidget):
         else:
             self.plast_new_label = QLabel('индекс нового пласта', self)
             self.plast_new_combo = QLineEdit(self)
+        self.cement_volume_label = QLabel('Объем цемента')
+        self.cement_volume_line = QLineEdit(self)
 
         self.grid = QGridLayout(self)
 
@@ -83,6 +87,9 @@ class TabPage_SO_sand(QWidget):
         self.grid.addWidget(self.roof_rir_edit, 7, 4)
         self.grid.addWidget(self.sole_rir_LabelType, 6, 5)
         self.grid.addWidget(self.sole_rir_edit, 7, 5)
+        self.grid.addWidget(self.cement_volume_label, 6, 6)
+        self.grid.addWidget(self.cement_volume_line, 7, 6)
+
         self.grid.addWidget(self.need_change_zgs_label, 9, 2)
         self.grid.addWidget(self.need_change_zgs_combo, 10, 2)
 
@@ -102,9 +109,15 @@ class TabPage_SO_sand(QWidget):
         self.rir_question_QCombo.currentTextChanged.connect(self.update_rir)
         self.rir_question_QCombo.setCurrentIndex(1)
         self.rir_question_QCombo.setCurrentIndex(0)
+        self.roof_rir_edit.textChanged.connect(self.update_volume_cement)
+        self.sole_rir_edit.textChanged.connect(self.update_volume_cement)
         if len(well_data.plast_work) == 0:
             self.need_change_zgs_combo.setCurrentIndex(1)
 
+    def update_volume_cement(self):
+        if self.roof_rir_edit.text() != '' and self.sole_rir_edit.text() != '':
+            self.cement_volume_line.setText(
+                f'{round(volume_vn_ek(float(self.roof_rir_edit.text())) * (float(self.sole_rir_edit.text())- float(self.roof_rir_edit.text())) / 1000, 1)}')
     def update_roof(self):
         roof_sand_edit = self.roof_sand_edit.text()
         if roof_sand_edit != '':
@@ -191,13 +204,16 @@ class SandWindow(QMainWindow):
         roof_sand_edit = int(float(self.tabWidget.currentWidget().roof_sand_edit.text()))
         sole_sand_edit = int(float(self.tabWidget.currentWidget().sole_sand_edit.text()))
         rir_question_QCombo = str(self.tabWidget.currentWidget().rir_question_QCombo.currentText())
+        volume_cement = self.tabWidget.currentWidget().cement_volume_line.text().replace(',', '.')
+        if volume_cement != '':
+            volume_cement = round(float(volume_cement),1)
 
         work_list = self.sandFilling(roof_sand_edit, sole_sand_edit, privyazka_question_QCombo)
         if rir_question_QCombo == "Да":
             work_list = work_list[:-1]
             roof_rir_edit = int(float(self.tabWidget.currentWidget().roof_rir_edit.text()))
             sole_rir_edit = int(float(self.tabWidget.currentWidget().sole_rir_edit.text()))
-            rir_list = RirWindow.rirWithPero(self, "Не нужно", '', roof_rir_edit, sole_rir_edit)
+            rir_list = RirWindow.rirWithPero(self, "Не нужно", '', roof_rir_edit, sole_rir_edit, volume_cement)
             work_list.extend(rir_list[1:])
 
         MyWindow.populate_row(self, self.ins_ind, work_list, self.table_widget)

@@ -229,8 +229,8 @@ region = ''
 data_in_base = False
 dict_nkt = {}
 dict_nkt_po = {}
-path_image = '_internal/'
-# path_image = ''
+# path_image = '_internal/'
+path_image = ''
 
 dict_sucker_rod = {}
 dict_sucker_rod_po = {}
@@ -254,7 +254,7 @@ thin_border = Border(left=Side(style='thin'),
 postgres_params_classif = {
             'database': 'databasewell',
             'user': 'postgres',
-            'password': '1953',
+            'password': '195375AsD+',
             'host': '87.242.85.51',
             'port': '5432'
         }
@@ -262,14 +262,14 @@ postgres_params_classif = {
 postgres_conn_gnkt = {
     'database': 'gnkt_base',
     'user': 'postgres',
-    'password': '1953',
+    'password': '195375AsD+',
     'host': '87.242.85.51',
     'port': '5432'
         }
 postgres_conn_work_well = {
     'database': 'databasework',
     'user': 'postgres',
-    'password': '1953',
+    'password': '195375AsD+',
     'host': '87.242.85.51',
     'port': '5432'
 }
