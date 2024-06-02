@@ -72,7 +72,7 @@ class TabPage_SO_rir(QWidget):
         else:
             if well_data.leakiness:
                 pakerDepth = min([float(nek.split('-')[0]) - 10
-                                  for nek in well_data.dict_perforation['НЭК']['интервал'].keys()])
+                                  for nek in well_data.dict_leakiness['НЭК']['интервал'].keys()])
 
         self.pakerDepthZumpf_Label = QLabel("Глубина посадки для ЗУМПФа", self)
         self.pakerDepthZumpf_edit = QLineEdit(self)

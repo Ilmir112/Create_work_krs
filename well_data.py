@@ -229,8 +229,8 @@ region = ''
 data_in_base = False
 dict_nkt = {}
 dict_nkt_po = {}
-path_image = '_internal/'
-# path_image = ''
+# path_image = '_internal/'
+path_image = ''
 
 dict_sucker_rod = {}
 dict_sucker_rod_po = {}
