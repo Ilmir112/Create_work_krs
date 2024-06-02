@@ -2,7 +2,7 @@ import json
 import os
 import sys
 import psycopg2
-# import win32com.client
+import win32com.client
 import openpyxl
 import re
 import win32con
@@ -698,7 +698,7 @@ class MyWindow(QMainWindow):
             mes = QMessageBox.critical(self, 'Ошибка', 'файл под таким именем открыт, закройте его')
         try:
             # Создаем объект Excel
-            # excel = win32com.client.Dispatch("Excel.Application")
+            excel = win32com.client.Dispatch("Excel.Application")
             # Открываем файл
             workbook = excel.Workbooks.Open(fileName)
             # Выбираем активный лист
