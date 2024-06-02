@@ -545,15 +545,16 @@ def create_database_well_db(work_plan, number_dp):
 
         # Сохранить изменения и закрыть соединение
         conn.commit()
-    except psycopg2.Error as e:
-        # Выведите сообщение об ошибке
-        mes = QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных, Скважине не добавлена в базу')
-    finally:
         # Закройте курсор и соединение
         if cursor:
             cursor.close()
         if conn:
             conn.close()
+    except psycopg2.Error as e:
+        # Выведите сообщение об ошибке
+        mes = QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных, Скважине не добавлена в базу')
+    finally:
+
 
         mes = QMessageBox.information(None, 'база данных', 'Скважина добавлена в базу данных')
 

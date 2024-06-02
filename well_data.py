@@ -254,23 +254,23 @@ thin_border = Border(left=Side(style='thin'),
 postgres_params_classif = {
             'database': 'databasewell',
             'user': 'postgres',
-            'password': '195375AsD+',
-            'host': '87.242.85.51',
+            'password': '1953',
+            'host': 'localhost',
             'port': '5432'
         }
 
 postgres_conn_gnkt = {
     'database': 'gnkt_base',
     'user': 'postgres',
-    'password': '195375AsD+',
-    'host': '87.242.85.51',
+    'password': '1953',
+    'host': 'localhost',
     'port': '5432'
         }
 postgres_conn_work_well = {
     'database': 'databasework',
     'user': 'postgres',
-    'password': '195375AsD+',
-    'host': '87.242.85.51',
+    'password': '1953',
+    'host': 'localhost',
     'port': '5432'
 }
 postgres_conn_user = {
