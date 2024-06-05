@@ -778,38 +778,37 @@ class MyWindow(QMainWindow):
             # print(f' длина {len(work_list)}')
             CreatePZ.add_itog(self, ws2, self.table_widget.rowCount() + 1, self.work_plan)
             # print(f'45- {ws2.max_row}')
-            try:
-                for row_ind, row in enumerate(ws2.iter_rows(values_only=True)):
-        
-                    if 15 < row_ind < 100:
-                        if all(cell in [None, ''] for cell in row) \
-                                and ('Интервалы темпа' not in str(ws2.cell(row=row_ind, column=2).value) \
-                                     and 'Замечания к эксплуатационному периоду' not in str(
-                                    ws2.cell(row=row_ind, column=2).value) \
-                                     and 'Замечания к эксплуатационному периоду' not in str(
-                                    ws2.cell(row=row_ind - 2, column=2).value)):
-                            # print(row_ind, ('Интервалы темпа' not in str(ws2.cell(row=row_ind, column=2).value)),
-                            #       str(ws2.cell(row=row_ind, column=2).value))
-                            ws2.row_dimensions[row_ind + 1].hidden = True
-                    for col, value in enumerate(row):
-                        if 'Зуфаров' in str(value):
-                            coordinate = f'{get_column_letter(col - 2)}{row_ind - 2}'
-                            self.insert_image(ws2, f'{well_data.path_image}imageFiles/Зуфаров.png', coordinate)
-                        elif 'М.К.Алиев' in str(value):
-                            coordinate = f'{get_column_letter(col - 1)}{row_ind - 1}'
-                            self.insert_image(ws2, f'{well_data.path_image}imageFiles/Алиев махир.png', coordinate)
-                        elif 'З.К. Алиев' in str(value):
-                            coordinate = f'{get_column_letter(col - 1)}{row_ind - 1}'
-                            self.insert_image(ws2, f'{well_data.path_image}imageFiles/Алиев Заур.png', coordinate)
-                            break
-                        elif 'Расчет жидкости глушения производится согласно МУ' in str(value):
-                            coordinate = f'{get_column_letter(6)}{row_ind + 1}'
-                            self.insert_image(ws2, f'{well_data.path_image}imageFiles/schema_well/формула.png', coordinate, 330, 130)
-                            break
-            except:
-                mes = QMessageBox.warning(self, 'Ошибка', 'Нес могла вставить подписи')
-            if self.work_plan != 'dop_plan':
-                self.create_short_plan(wb2, plan_short)
+            # try:
+            for row_ind, row in enumerate(ws2.iter_rows(values_only=True)):
+                if 15 < row_ind < 100:
+                    if all(cell in [None, ''] for cell in row) \
+                            and ('Интервалы темпа' not in str(ws2.cell(row=row_ind, column=2).value) \
+                                 and 'Замечания к эксплуатационному периоду' not in str(
+                                ws2.cell(row=row_ind, column=2).value) \
+                                 and 'Замечания к эксплуатационному периоду' not in str(
+                                ws2.cell(row=row_ind - 2, column=2).value)):
+                        # print(row_ind, ('Интервалы темпа' not in str(ws2.cell(row=row_ind, column=2).value)),
+                        #       str(ws2.cell(row=row_ind, column=2).value))
+                        ws2.row_dimensions[row_ind + 1].hidden = True
+                for col, value in enumerate(row):
+                    if 'Зуфаров' in str(value):
+                        coordinate = f'{get_column_letter(col - 2)}{row_ind - 2}'
+                        self.insert_image(ws2, f'{well_data.path_image}imageFiles/Зуфаров.png', coordinate)
+                    elif 'М.К.Алиев' in str(value):
+                        coordinate = f'{get_column_letter(col - 1)}{row_ind - 1}'
+                        self.insert_image(ws2, f'{well_data.path_image}imageFiles/Алиев махир.png', coordinate)
+                    elif 'З.К. Алиев' in str(value):
+                        coordinate = f'{get_column_letter(col - 1)}{row_ind - 1}'
+                        self.insert_image(ws2, f'{well_data.path_image}imageFiles/Алиев Заур.png', coordinate)
+                        break
+                    elif 'Расчет жидкости глушения производится согласно МУ' in str(value):
+                        coordinate = f'{get_column_letter(6)}{row_ind + 1}'
+                        self.insert_image(ws2, f'{well_data.path_image}imageFiles/schema_well/формула.png', coordinate, 330, 130)
+                        break
+            # except:
+            #     mes = QMessageBox.warning(self, 'Ошибка', 'Нес могла вставить подписи')
+            # if self.work_plan != 'dop_plan':
+            #     self.create_short_plan(wb2, plan_short)
 
             # print(f'9 - {ws2.max_row}')
             if self.work_plan != 'dop_plan':
@@ -859,9 +858,7 @@ class MyWindow(QMainWindow):
                         f"{int(well_data.category_pressuar)} " \
                         f"{string_work}.xlsx"
             full_path = path + "/" + filenames
-            # print(f'10 - {ws2.max_row}')
-            # print(wb2.path)
-            # print(f' кате {well_data.cat_P_1}')
+
             if well_data.bvo and self.work_plan != 'dop_plan':
                 ws5 = wb2.create_sheet('Sheet1')
                 ws5.title = "Схемы ПВО"
@@ -1748,7 +1745,6 @@ class MyWindow(QMainWindow):
         # print(f'ДОП {work_plan}')
 
         for i, row_data in enumerate(work_list):
-
             row = ins_ind + i
             if work_plan not in ['application_pvr', 'gnkt_frez', 'gnkt_opz', 'gnkt_after_grp', 'application_gis']:
                 MyWindow.insert_data_in_database(self, row, row_max + i)

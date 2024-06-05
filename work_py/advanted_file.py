@@ -418,8 +418,7 @@ def count_row_height(ws, ws2, work_list, merged_cells_dict, ind_ins):
             logo.width, logo.height = img[2][0] * 0.48, img[2][1] * 0.72
             ws2.add_image(logo, img[1])
 
-    # print(f'высота строк работ {ins_ind}')
-    # print(f'высота строк работ {len(rowHeights1)}')
+
     for index_row, row in enumerate(ws2.iter_rows()):  # Копирование высоты строки
         if all([col is None for col in row]):
             ws2.row_dimensions[index_row].hidden = True

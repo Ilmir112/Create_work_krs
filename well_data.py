@@ -145,6 +145,7 @@ Qoil = 0
 template_depth = 0
 nkt_diam = 73
 b_plan = 0
+host_krs = '31.129.99.186'
 expected_Q = 0
 expected_P = 0
 plast_select = ''
@@ -229,8 +230,8 @@ region = ''
 data_in_base = False
 dict_nkt = {}
 dict_nkt_po = {}
-path_image = '_internal/'
-# path_image = ''
+# path_image = '_internal/'
+path_image = ''
 
 dict_sucker_rod = {}
 dict_sucker_rod_po = {}
@@ -252,32 +253,32 @@ thin_border = Border(left=Side(style='thin'),
                      top=Side(style='thin'),
                      bottom=Side(style='thin'))
 postgres_params_classif = {
-            'database': 'databasewell',
-            'user': 'postgres',
-            'password': '1953',
-            'host': 'localhost',
-            'port': '5432'
+            f'database': 'databaseclassification',
+            f'user': 'postgres',
+            f'password': '195375AsD+',
+            f'host': f'{host_krs}',
+            f'port': '5432'
         }
 
 postgres_conn_gnkt = {
-    'database': 'gnkt_base',
+    'database': 'gnkt_database',
     'user': 'postgres',
-    'password': '1953',
-    'host': 'localhost',
+    'password': '195375AsD+',
+    f'host': f'{host_krs}',
     'port': '5432'
         }
 postgres_conn_work_well = {
-    'database': 'databasework',
+    'database': 'databasewellwork',
     'user': 'postgres',
-    'password': '1953',
-    'host': 'localhost',
+    'password': '195375AsD+',
+    f'host': f'{host_krs}',
     'port': '5432'
 }
 postgres_conn_user = {
     'database': 'users',
     'user': 'postgres',
     'password': '195375AsD+',
-    'host': '87.242.85.51',
+    f'host': f'{host_krs}',
     'port': '5432'
 }
 

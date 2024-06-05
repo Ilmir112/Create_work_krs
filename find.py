@@ -970,9 +970,8 @@ class Well_data(FindIndexPZ):
                 well_data.open_trunk_well = True
             else:
                 well_data.open_trunk_well = False
-        if str(well_data.well_number._value) in ['882', '667', "3375", '2064', '1160', '1034',
-                                                 '1685', '1686', "1571", "3374", "2360", "3354",
-                                                 '878', '124', '549', '168']:
+        if str(well_data.well_number._value) in ['2834', '187', "1685", '1686', '934', '43',
+                                                 '1685', '1686', "3354", "3379"]:
             QMessageBox.warning(self, 'Канатные технологии', f'Скважина согласована на канатные технологии')
             well_data.konte_true = True
 

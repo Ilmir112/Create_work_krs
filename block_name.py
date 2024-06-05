@@ -48,9 +48,9 @@ def pop_down(self, region, curator_sel):
 
 
     podp_down = [
-        [None, f'План работ составил {well_data.user[1]}', None, None, None, None, '___________________', None,
+        [None, f'План работ составил {well_data.user[0]}', None, None, None, None, '___________________', None,
          None,
-         f'{well_data.user[0]}', None, None],
+         f'{well_data.user[1]}', None, None],
         [None, None, None, None, None, None, None, None, 'дата составления', None, datetime.now().strftime('%d.%m.%Y'),
          None],
         [None, None, 'Начальник ЦТКРС ООО  " Ойл-Сервис"', None, None, None, None, None, None,
