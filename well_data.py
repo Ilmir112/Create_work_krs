@@ -145,8 +145,8 @@ Qoil = 0
 template_depth = 0
 nkt_diam = 73
 b_plan = 0
-host_krs = '31.129.99.186'
-# host_krs = '91.224.87.50'
+# host_krs = '31.129.99.186'
+host_krs = '176.109.106.199'
 expected_Q = 0
 expected_P = 0
 plast_select = ''
@@ -276,7 +276,7 @@ postgres_conn_work_well = {
     'port': '5432'
 }
 postgres_conn_user = {
-    'database': 'users',
+    'database': 'krs2',
     'user': 'postgres',
     'password': '195375AsD+',
     f'host': f'{host_krs}',
