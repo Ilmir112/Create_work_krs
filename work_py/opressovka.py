@@ -35,8 +35,11 @@ class TabPage_SO(QWidget):
             if well_data.leakiness:
                 pakerDepth = min([well_data.dict_leakiness['НЭК']['интервал'][nek][0] - 10
                                        for nek in well_data.dict_leakiness['НЭК']['интервал'].keys()])
+        try:
+            self.paker_depth_edit.setText(str(int(pakerDepth)))
+        except:
+            pass
 
-        self.paker_depth_edit.setText(str(int(pakerDepth)))
 
         self.pakerDepthZumpf_Label = QLabel("Глубина посадки для ЗУМПФа", self)
         self.pakerDepthZumpf_edit = QLineEdit(self)
@@ -80,7 +83,8 @@ class TabPage_SO(QWidget):
                 if well_data.leakiness:
                     pakerDepthZumpf = int(max([float(nek.split('-')[0])+10
                                            for nek in well_data.dict_perforation['НЭК']['интервал'].keys()]))
-            self.pakerDepthZumpf_edit.setText(f'{pakerDepthZumpf}')
+
+                    self.pakerDepthZumpf_edit.setText(f'{pakerDepthZumpf}')
 
             self.grid_layout.addWidget(self.pakerDepthZumpf_Label, 3, 5)
             self.grid_layout.addWidget(self.pakerDepthZumpf_edit, 4, 5)
