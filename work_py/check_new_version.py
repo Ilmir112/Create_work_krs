@@ -2,6 +2,7 @@ import json
 import subprocess
 import sys
 import os
+import urllib3
 import time
 import zipfile
 
@@ -38,11 +39,15 @@ class UpdateChecker(QWidget):
         self.progress_bar.setValue(0)
         self.progress_bar.setVisible(False)
 
+        self.complete_prog = QPushButton("Продолжить")
+        self.complete_prog.clicked.connect(self.def_complete_prog)
+
         # Вертикальный layout
         layout = QVBoxLayout()
         layout.addWidget(self.version_label)
         layout.addWidget(self.update_button)
         layout.addWidget(self.progress_bar)
+        layout.addWidget(self.complete_prog)
         self.setLayout(layout)
 
         # owner = "ilmir112"
@@ -53,6 +58,9 @@ class UpdateChecker(QWidget):
 
         # Запуск проверки версии
         self.check_version()
+
+    def def_complete_prog(self):
+        well_data.pause = False
 
     def start_update(self):
         self.update_button.setEnabled(False)
@@ -78,13 +86,29 @@ class UpdateChecker(QWidget):
 
     def check_version(self):
 
+
+        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+
         try:
-            url = "https://api.github.com/repos/Ilmir112/Create_work_krs/releases/latest"
+            url = "http://api.github.com/repos/Ilmir112/Create_work_krs/releases/latest"
+
             response = requests.get(url)
+
+            if response.status_code == 200:
+                remaining_requests = int(response.headers.get('X-RateLimit-Remaining'))
+                print(f"Осталось запросов: {remaining_requests}")
+            else:
+                print(f"Ошибка: {response.status_code}")
+
+
+            response = requests.get(url, verify=False)
             response.raise_for_status()  # Проверка на ошибки
 
             # Получение информации о последней версии из GitHub
             self.latest_version = response.json()["tag_name"]
+            print(self.latest_version)
+
             # Получение текущей версии из файла (например, "version.txt")
             self.current_version = self.get_current_version()
 
@@ -96,7 +120,7 @@ class UpdateChecker(QWidget):
                 self.update_button.setEnabled(True)
 
         except requests.exceptions.RequestException as e:
-            well_data.pause = False
+
             QMessageBox.warning(self, "Ошибка", f"Не удалось проверить обновления: {e}")
 
     def get_current_version(self):

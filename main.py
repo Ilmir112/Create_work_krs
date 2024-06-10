@@ -209,15 +209,15 @@ class MyWindow(QMainWindow):
             self.pause_app()
             well_data.pause = False
 
-        # try:
-        if self.login_window == None:
-            self.login_window = LoginWindow()
-            self.login_window.show()
-            self.pause_app()
-            well_data.pause = False
-        # except Exception as e:
-        #     mes = QMessageBox.warning(self, 'КРИТИЧЕСКАЯ ОШИБКА', 'Критическая ошибка, смотри в лог')
-        #     self.excepthook._exception_caught.emit(e)
+        try:
+            if self.login_window == None:
+                self.login_window = LoginWindow()
+                self.login_window.show()
+                self.pause_app()
+                well_data.pause = False
+        except Exception as e:
+            mes = QMessageBox.warning(self, 'КРИТИЧЕСКАЯ ОШИБКА', 'Критическая ошибка, смотри в лог')
+            self.excepthook._exception_caught.emit(e)
 
     def initUI(self):
 
