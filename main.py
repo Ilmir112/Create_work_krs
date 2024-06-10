@@ -206,7 +206,13 @@ class MyWindow(QMainWindow):
         # Замените "your_download_folder" на путь к папке загрузки
         download_folder = sys.executable
         print(f'папка сохранения {download_folder}')
-        UpdateChecker
+        if self.raid_window == None:
+            self.login_window = UpdateChecker()
+            self.login_window.show()
+            self.pause_app()
+            well_data.pause = False
+
+
 
         try:
             if self.login_window == None:

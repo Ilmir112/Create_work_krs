@@ -11,9 +11,9 @@ from PyQt5.QtWidgets import (
     QLabel,
     QPushButton,
     QVBoxLayout,
-    QMessageBox
+    QMessageBox, QProgressBar
 )
-from PyQt5.QtCore import QUrl, QProcess
+from PyQt5.QtCore import QUrl, QProcess, pyqtSignal, QThread
 
 
 class UpdateChecker(QWidget):
@@ -26,17 +26,45 @@ class UpdateChecker(QWidget):
         self.version_label = QLabel("Проверка версии...")
         # Кнопка для обновления
         self.update_button = QPushButton("Обновить")
-        self.update_button.clicked.connect(self.update_application)
+        self.update_button.clicked.connect(self.start_update)
         self.update_button.setEnabled(False)
+
+        # ProgressBar
+        self.progress_bar = QProgressBar()
+        self.progress_bar.setValue(0)
+        self.progress_bar.setVisible(False)
 
         # Вертикальный layout
         layout = QVBoxLayout()
         layout.addWidget(self.version_label)
         layout.addWidget(self.update_button)
+        layout.addWidget(self.progress_bar)
         self.setLayout(layout)
 
         # Запуск проверки версии
         self.check_version()
+
+    def start_update(self):
+        self.update_button.setEnabled(False)
+        self.version_label.setText("Загрузка обновления...")
+        self.progress_bar.setVisible(True)
+        self.progress_bar.setValue(0)
+        self.update_thread = UpdateThread(self)
+        self.update_thread.progress_signal.connect(self.update_progress)
+        self.update_thread.finished_signal.connect(self.update_finished)
+        self.update_thread.start()
+    def update_progress(self, value):
+        self.progress_bar.setValue(value)
+    def update_finished(self, success):
+        if success:
+            QMessageBox.information(self, "Обновление", "Приложение успешно обновлено!")
+            # Выход из приложения (или перезапуск)
+            QApplication.exit(0)
+        else:
+            QMessageBox.warning(self, "Ошибка", "Не удалось обновить приложение.")
+        self.update_button.setEnabled(True)
+        self.version_label.setText("Проверка версии...")
+        self.progress_bar.setVisible(False)
 
     def check_version(self):
         # Замените "your_username" и "your_repository" на ваши данные
@@ -67,26 +95,43 @@ class UpdateChecker(QWidget):
 
         return version_app
 
-    def update_application(self):
+class UpdateThread(QThread):
+    progress_signal = pyqtSignal(int)
+    finished_signal = pyqtSignal(bool)
 
-        # Замените "https://github.com/your_username/your_repository/archive/refs/heads/master.zip"
+    def __init__(self,  parent=None):
+        super().__init__( parent)
+        self.latest_version = UpdateChecker.get_current_version(self)
+
+
+    def run(self):
+
         # на URL архива для загрузки
         url = f"https://github.com/Ilmir112/Create_work_krs/releases/download/{self.latest_version}/ZIMA.zip"
 
         # Замените "your_download_folder" на путь к папке загрузки
         download_folder = sys.executable
 
+        print(f'место нахождения {download_folder}')
+
         # Загрузка архива
         try:
-            response = requests.get(url)
+            response = requests.get(url, stream=True)
             response.raise_for_status()
-            with open("zima.zip", "wb") as file:  # Сохраняем архив в папку tmp
-                file.write(response.content)
 
-            extract_dir = "tmp"
+            total_size = int(response.headers.get('content-length', 0))
+            downloaded = 0
+
+            with open("zima.zip", "wb") as file:  # Сохраняем архив в папку tmp
+                for data in response.iter_content(chunk_size=1024):
+                    downloaded += len(data)
+                    file.write(data)
+                    progress = (downloaded / total_size) * 100
+                    self.progress_signal.emit(int(progress))
+
 
             with zipfile.ZipFile("zima.zip", 'r') as zip_ref:
-                zip_ref.extractall(f'{download_folder}/{extract_dir}')
+                zip_ref.extractall(f'{download_folder}')
             # Путь к папке "tmp"
             folder_path = os.path.abspath("tmp")
 
@@ -97,10 +142,7 @@ class UpdateChecker(QWidget):
 
             # Обновление приложения (может потребоваться перезапуск)
             # ... (ваш код для обновления приложения)
-
-            QMessageBox.information(self, "Обновление", "Приложение успешно обновлено!")
-            # Выход из приложения (или перезапуск)
-            QApplication.exit(0)
+            self.finished_signal.emit(True)
 
         except requests.exceptions.RequestException as e:
             QMessageBox.warning(self, "Ошибка", f"Не удалось загрузить обновления: {e}")
