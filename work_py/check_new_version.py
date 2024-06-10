@@ -76,10 +76,10 @@ class UpdateChecker(QWidget):
             # Получение информации о последней версии из GitHub
             self.latest_version = response.json()["tag_name"]
             # Получение текущей версии из файла (например, "version.txt")
-            current_version = self.get_current_version()
+            self.current_version = self.get_current_version()
 
-            if current_version == self.latest_version:
-                self.version_label.setText(f"Текущая версия: {current_version}")
+            if self.current_version == self.latest_version:
+                self.version_label.setText(f"Текущая версия: {self.current_version}")
                 self.update_button.setEnabled(False)
             else:
                 self.version_label.setText(f"Доступна новая версия: {self.latest_version}")
@@ -143,9 +143,15 @@ class UpdateThread(QThread):
             # Обновление приложения (может потребоваться перезапуск)
             # ... (ваш код для обновления приложения)
             self.finished_signal.emit(True)
+            self.update_version(self.latest_version)
 
         except requests.exceptions.RequestException as e:
             QMessageBox.warning(self, "Ошибка", f"Не удалось загрузить обновления: {e}")
+
+    def update_version(new_version):
+        with open('plan_krs/version_app.json', 'r') as file:
+            data = json.load(file)
+            data['version'] = new_version
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

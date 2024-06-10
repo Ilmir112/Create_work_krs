@@ -91,6 +91,8 @@ class LoginWindow(QWidget):
             else:
                  mes = QMessageBox.critical(self, 'Пароль', 'логин и пароль не совпадает')
         except psycopg2.Error as e:
+            self.pause_app()
+            well_data.pause = False
             # Выведите сообщение об ошибке
             mes = QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных, проверьте наличие интернета')
         finally:

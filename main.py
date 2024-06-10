@@ -203,9 +203,6 @@ class MyWindow(QMainWindow):
         # self.thread.started.connect(self.excepthook.handleException)
         self.thread.start()
 
-        # Замените "your_download_folder" на путь к папке загрузки
-        download_folder = sys.executable
-        print(f'папка сохранения {download_folder}')
         if self.raid_window == None:
             self.login_window = UpdateChecker()
             self.login_window.show()
