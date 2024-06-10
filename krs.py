@@ -246,6 +246,7 @@ class GnoWindow(QMainWindow):
                              f'веса тех.жидкости',
                  None, None, None, None, None, None, None,
                  ' Мастер КРС.', 0.5],
+
                 [None, None,
                  f'Согласно инструкции ООО Башнефть-Добыча ПЗ-05 И-102089Ю ЮЛ-305 версия 2 п. 9.1.9 при отсутствии '
                  f'избыточного давления и '
@@ -268,6 +269,19 @@ class GnoWindow(QMainWindow):
             if well_data.bvo is True:
                 for row in mkp_revision_1_kateg(self):
                     krs_begin.insert(-3, row)
+
+            update_change_fluid_str = [None, None,
+                 f'При отсутствии избыточного давления произвести замер статического уровня в присутствии представителя'
+                 f' заказчика. Составить акт. По результатам замера статического уровня согласовать с заказчиком '
+                 f'глушение скважины уд. весом 1,17{well_data.fluid_work[4:]} в алгоритме указанном ниже. '
+                 f'При положительном результате глушения дальнейшие работ продолжить с учетом изменения уд.веса '
+                 f'рабочей жидкости',
+                 None, None, None, None, None, None, None,
+                 ' Мастер КРС.', None]
+
+            if float(fluid) > 1.18:
+                print(update_change_fluid_str)
+                krs_begin.insert(-1, update_change_fluid_str)
 
             posle_lift = [[None, None,
                            f'По результатам подъема провести ревизию НКТ в присутствии представителя ЦДНГ. В случае '

@@ -28,6 +28,7 @@ import well_data
 from H2S import calc_h2s
 from PyQt5.QtCore import QThread, pyqtSignal, pyqtSlot
 from data_correct_position_people import CorrectSignaturesWindow
+from work_py.check_new_version import UpdateChecker
 from work_py.dop_plan_py import DopPlanWindow
 from work_py.drilling import Drill_window
 from users.login_users import LoginWindow
@@ -205,16 +206,17 @@ class MyWindow(QMainWindow):
         # Замените "your_download_folder" на путь к папке загрузки
         download_folder = sys.executable
         print(f'папка сохранения {download_folder}')
-        # LoginWindow.login(self)
-        # try:
-        if self.login_window == None:
-            self.login_window = LoginWindow()
-            self.login_window.show()
-            self.pause_app()
-            well_data.pause = False
-        # except Exception as e:
-        #     mes = QMessageBox.warning(self, 'КРИТИЧЕСКАЯ ОШИБКА', 'Критическая ошибка, смотри в лог')
-        #     self.excepthook._exception_caught.emit(e)
+        UpdateChecker
+
+        try:
+            if self.login_window == None:
+                self.login_window = LoginWindow()
+                self.login_window.show()
+                self.pause_app()
+                well_data.pause = False
+        except Exception as e:
+            mes = QMessageBox.warning(self, 'КРИТИЧЕСКАЯ ОШИБКА', 'Критическая ошибка, смотри в лог')
+            self.excepthook._exception_caught.emit(e)
 
     def initUI(self):
 
