@@ -52,13 +52,7 @@ class UpdateChecker(QWidget):
         layout.addWidget(self.complete_prog)
         self.setLayout(layout)
 
-        # owner = "ilmir112"
-        # repo = "Create_work_krs"
-        # release_tag = "1.0.3"
-        #
-        # self.check_release_requests(owner, repo, release_tag)
-        cert_file = 'users/certs/root_cert.pem'
-        self.load_certificate(cert_file)
+
         # Запуск проверки версии
         self.check_version()
 
@@ -92,12 +86,10 @@ class UpdateChecker(QWidget):
 
     def check_version(self):
 
-
-
         try:
             url = "https://api.github.com/repos/Ilmir112/Create_work_krs/releases/latest"
         except:
-            url = "https://api.github.com/repos/Ilmir112/Create_work_krs/releases/latest"
+            url = "http://api.github.com/repos/Ilmir112/Create_work_krs/releases/latest"
 
         try:
 
@@ -132,27 +124,11 @@ class UpdateChecker(QWidget):
 
             QMessageBox.warning(self, "Ошибка", f"Не удалось проверить обновления: {e}")
 
-    def load_certificates(cert_file):
-        ssl_config = QSslConfiguration.defaultConfiguration()
-        ssl_config.setCaCertificates([QSslCertificate(cert_file)])
     def get_current_version(self):
         with open('D:/python/Create_work_krs/users/version_app.json', 'r') as file:
             data = json.load(file)
             version_app = data['version']
-
         return version_app
-    @staticmethod
-    def check_release_requests(owner, repo, release_tag):
-        url = f"https://api.github.com/repos/{owner}/{repo}/releases/tags/{release_tag}"
-        response = requests.get(url)
-
-        if response.status_code == 200:
-            remaining_requests = int(response.headers.get('X-RateLimit-Remaining'))
-            print(f"Осталось запросов: {remaining_requests}")
-        else:
-            print(f"Ошибка: {response.status_code}")
-
-
 
 class UpdateThread(QThread):
     progress_signal = pyqtSignal(int)
