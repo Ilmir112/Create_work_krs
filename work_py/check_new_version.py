@@ -27,6 +27,7 @@ class UpdateChecker(QWidget):
 
         # Лейбл для отображения версии
         self.version_label = QLabel("Проверка версии...")
+
         # Кнопка для обновления
         self.update_button = QPushButton("Обновить")
         self.update_button.clicked.connect(self.start_update)
@@ -44,11 +45,11 @@ class UpdateChecker(QWidget):
         layout.addWidget(self.progress_bar)
         self.setLayout(layout)
 
-        owner = "ilmir112"
-        repo = "Create_work_krs"
-        release_tag = "1.0.3"
-
-        self.check_release_requests(owner, repo, release_tag)
+        # owner = "ilmir112"
+        # repo = "Create_work_krs"
+        # release_tag = "1.0.3"
+        #
+        # self.check_release_requests(owner, repo, release_tag)
 
         # Запуск проверки версии
         self.check_version()
