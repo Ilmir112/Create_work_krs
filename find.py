@@ -262,8 +262,7 @@ class WellNkt(FindIndexPZ):
         a_plan = 0
         well_data.nkt_mistake = False
         for row in range(begin_index, cancel_index):  # словарь  количества НКТ и метраж
-
-            if ws.cell(row=row, column=3).value == 'План' or str(
+            if 'план' in str(ws.cell(row=row, column=3).value).lower() or str(
                     ws.cell(row=row, column=3).value).lower() == 'после ремонта':
                 a_plan = row
         if a_plan == 0:
@@ -304,7 +303,7 @@ class WellSucker_rod(FindIndexPZ):
         b_plan = 0
         if well_data.sucker_rod_ind._value != 0:
             for row in range(begin_index, cancel_index):  # словарь  количества штанг и метраж
-                if ws.cell(row=row, column=3).value == 'План' or str(
+                if 'план' in str(ws.cell(row=row, column=3).value) or str(
                         ws.cell(row=row, column=3).value).lower() == 'после ремонта' \
                         or str(
                     ws.cell(row=row, column=3).value).lower() == 'до ремонта':

@@ -208,9 +208,6 @@ class OpressovkaEK(QMainWindow):
     # Добавление строк с опрессовкой ЭК
     def paker_list(self, paker_diametr, paker_khost, paker_depth, pakerDepthZumpf, pressureZUMPF_question):
 
-
-
-
         if well_data.column_additional is False or well_data.column_additional is True \
                 and paker_depth < well_data.head_column_additional._value:
 
@@ -346,9 +343,10 @@ class OpressovkaEK(QMainWindow):
 
                     pakerNEK, ok = QInputDialog.getInt(None, 'опрессовка ЭК',
                                                        'Введите глубину посадки пакера для под НЭК',
-                                                       int(dict_leakinest_keys[0][0]) - 10, 0,
+                                                       int(float(dict_leakinest_keys[0].split('-')[0])) - 10, 0,
                                                        int(well_data.current_bottom))
-                    nek1 = "-".join(map(str, list(dict_leakinest_keys[0])))
+
+                    nek1 = "-".join(map(str, list(dict_leakinest_keys)))
                     paker_list = [
                         [f'СПО {paker_short} до глубины {pakerNEK}', None,
                          f'Спустить {paker_select} на НКТ{well_data.nkt_diam}мм до глубины {pakerNEK}м, воронкой '
@@ -453,34 +451,35 @@ class OpressovkaEK(QMainWindow):
                             pakerNEK = pakerNEK1
 
                     if len(dict_leakinest_keys) - ind_nek == 0:
-                        pressureNEK_list = [[f'При герметичности:  Допустить пакер до '
-                                             f'глубины {paker_depth}м', None,
-                                             f'При герметичности колонны в интервале 0 - {pakerNEK}м:  Допустить пакер до '
-                                             f'глубины {paker_depth}м',
-                                             None, None, None, None, None, None, None,
-                                             'мастер КРС', 0.4],
-                                            [f'Опрессовать '
-                                             f'в инт {paker_depth}-0м на Р={well_data.max_admissible_pressure._value}атм',
-                                             None,
-                                             f'{nktOpress_list[1]}. Посадить пакер. Опрессовать эксплуатационную колонну '
-                                             f'в интервале {paker_depth}-0м на Р={well_data.max_admissible_pressure._value}атм'
-                                             f' в течение 30 минут в присутствии представителя заказчика, составить акт.',
-                                             None, None, None, None, None, None, None,
-                                             'мастер КРС', 0.77],
-                                            [f'срыв пакера 30мин', None,
-                                             f'Произвести срыв пакера с поэтапным увеличением нагрузки на 3-4т выше веса '
-                                             f'НКТ в течении 30мин и с '
-                                             f'выдержкой 1ч для возврата резиновых элементов в исходное положение. ',
-                                             None, None, None, None, None, None, None,
-                                             'мастер КРС', 0.7],
-                                            [None, None,
-                                             f'Поднять {paker_select} на НКТ{well_data.nkt_diam} c глубины '
-                                             f'{paker_depth}м с доливом скважины в '
-                                             f'объеме {round(paker_depth * 1.12 / 1000, 1)}м3 удельным весом '
-                                             f'{well_data.fluid_work}',
-                                             None, None, None, None, None, None, None,
-                                             'мастер КРС', liftingNKT_norm(paker_depth, 1.2)]
-                                            ]
+                        pressureNEK_list = [
+                            [f'При герметичности:  Допустить пакер до '
+                                 f'глубины {paker_depth}м', None,
+                                 f'При герметичности колонны:  Допустить пакер до '
+                                 f'глубины {paker_depth}м',
+                                 None, None, None, None, None, None, None,
+                                 'мастер КРС', 0.4],
+                                [f'Опрессовать '
+                                 f'в инт {paker_depth}-0м на Р={well_data.max_admissible_pressure._value}атм',
+                                 None,
+                                 f'{nktOpress_list[1]}. Посадить пакер. Опрессовать эксплуатационную колонну '
+                                 f'в интервале {paker_depth}-0м на Р={well_data.max_admissible_pressure._value}атм'
+                                 f' в течение 30 минут в присутствии представителя заказчика, составить акт.',
+                                 None, None, None, None, None, None, None,
+                                 'мастер КРС', 0.77],
+                                [f'срыв пакера 30мин', None,
+                                 f'Произвести срыв пакера с поэтапным увеличением нагрузки на 3-4т выше веса '
+                                 f'НКТ в течении 30мин и с '
+                                 f'выдержкой 1ч для возврата резиновых элементов в исходное положение. ',
+                                 None, None, None, None, None, None, None,
+                                 'мастер КРС', 0.7],
+                                [None, None,
+                                 f'Поднять {paker_select} на НКТ{well_data.nkt_diam} c глубины '
+                                 f'{paker_depth}м с доливом скважины в '
+                                 f'объеме {round(paker_depth * 1.12 / 1000, 1)}м3 удельным весом '
+                                 f'{well_data.fluid_work}',
+                                 None, None, None, None, None, None, None,
+                                 'мастер КРС', liftingNKT_norm(paker_depth, 1.2)]
+                                ]
                         for row in pressureNEK_list:
                             paker_list.append(row)
 

@@ -6,9 +6,11 @@ from .rationingKRS import descentNKT_norm, liftingNKT_norm
 
 def magnet_select(self, nkt_str):
 
-    if well_data.column_additional is False or well_data.column_additional is True and\
-            well_data.current_bottom <= well_data.head_column_additional._value:
-        magnet_select = f'{nkt_str}{well_data.nkt_diam}мм 20м + репер'
+
+
+    if well_data.column_additional is False or (well_data.column_additional is True and\
+            well_data.current_bottom <= well_data.head_column_additional._value):
+        magnet_select = f'{nkt_str} {well_data.nkt_diam}мм 20м + репер'
 
     elif well_data.column_additional is True and well_data.column_additional_diametr._value < 110 and \
             well_data.current_bottom >= well_data.head_column_additional._value:

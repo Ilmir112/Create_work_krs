@@ -201,6 +201,10 @@ class MyWindow(QMainWindow):
         self.excepthook.moveToThread(self.thread)
         # self.thread.started.connect(self.excepthook.handleException)
         self.thread.start()
+
+        # Замените "your_download_folder" на путь к папке загрузки
+        download_folder = sys.executable
+        print(f'папка сохранения {download_folder}')
         # LoginWindow.login(self)
         # try:
         if self.login_window == None:
@@ -1019,7 +1023,7 @@ class MyWindow(QMainWindow):
             well_data.problemWithEk = False
             well_data.problemWithEk_depth = well_data.current_bottom
             well_data.problemWithEk_diametr = 220
-            path = f"{well_data.path_image}/imageFiles/image_work"
+            path = f"{well_data.path_image}/imageFiles/image_work"[1:]
 
             for file in os.listdir(path):
                 file_path = os.path.join(path, file)
@@ -1051,10 +1055,6 @@ class MyWindow(QMainWindow):
         geophysical.addAction(perforation_action)
         perforation_action.triggered.connect(self.perforationNewWindow)
 
-        po_action = QAction("прихватоопределить", self)
-        geophysical.addAction(po_action)
-        perforation_action.triggered.connect(self.poNewWindow)
-
         geophysical_action = QAction("Геофизические исследования", self)
         geophysical.addAction(geophysical_action)
         geophysical_action.triggered.connect(self.GeophysicalNewWindow)
@@ -1063,6 +1063,10 @@ class MyWindow(QMainWindow):
         rgdWithoutPaker_action = QAction("РГД по колонне", self)
         rgd_menu.addAction(rgdWithoutPaker_action)
         rgdWithoutPaker_action.triggered.connect(self.rgdWithoutPaker_action)
+
+        po_action = QAction("прихватоопределить", self)
+        geophysical.addAction(po_action)
+        po_action.triggered.connect(self.poNewWindow)
 
         rgdWithPaker_action = QAction("РГД с пакером", self)
         rgd_menu.addAction(rgdWithPaker_action)
@@ -1778,30 +1782,6 @@ class MyWindow(QMainWindow):
 
         well_data.number_dict = []
 
-    def insert_data_in_database(self, row_number, row_max):
-
-        dict_perforation_json = json.dumps(well_data.dict_perforation, default=str, ensure_ascii=False, indent=4)
-        # print(well_data.dict_leakiness)
-        leakage_json = json.dumps(well_data.dict_leakiness, default=str, ensure_ascii=False, indent=4)
-        plast_all_json = json.dumps(well_data.plast_all)
-        plast_work_json = json.dumps(well_data.plast_work)
-        skm_list_json = json.dumps(well_data.skm_interval)
-        number = json.dumps(str(well_data.well_number._value) + well_data.well_area._value, ensure_ascii=False,
-                            indent=4)
-
-        # Подготовленные данные для вставки (пример)
-        data_values = [row_max, well_data.current_bottom, dict_perforation_json, plast_all_json, plast_work_json,
-                       leakage_json, well_data.column_additional, well_data.fluid_work,
-                       well_data.category_pressuar, well_data.category_h2s, well_data.category_gf,
-                       well_data.template_depth, skm_list_json,
-                       well_data.problemWithEk_depth, well_data.problemWithEk_diametr]
-
-        if len(well_data.data_list) == 0:
-            well_data.data_list.append(data_values)
-        else:
-            row_number = row_number - well_data.count_row_well
-            well_data.data_list.insert(row_number, data_values)
-
     def acidPakerNewWindow(self):
         from work_py.acid_paker import AcidPakerWindow
 
@@ -1920,6 +1900,30 @@ class MyWindow(QMainWindow):
             WellCondition.leakage_window.close()  # Close window.
             WellCondition.leakage_window = None  # Discard reference.
         well_data.data_list[-1][5] = json.dumps(well_data.dict_leakiness, default=str, ensure_ascii=False, indent=4)
+
+    def insert_data_in_database(self, row_number, row_max):
+
+        dict_perforation_json = json.dumps(well_data.dict_perforation, default=str, ensure_ascii=False, indent=4)
+        # print(well_data.dict_leakiness)
+        leakage_json = json.dumps(well_data.dict_leakiness, default=str, ensure_ascii=False, indent=4)
+        plast_all_json = json.dumps(well_data.plast_all)
+        plast_work_json = json.dumps(well_data.plast_work)
+        skm_list_json = json.dumps(well_data.skm_interval)
+        number = json.dumps(str(well_data.well_number._value) + well_data.well_area._value, ensure_ascii=False,
+                            indent=4)
+
+        # Подготовленные данные для вставки (пример)
+        data_values = [row_max, well_data.current_bottom, dict_perforation_json, plast_all_json, plast_work_json,
+                       leakage_json, well_data.column_additional, well_data.fluid_work,
+                       well_data.category_pressuar, well_data.category_h2s, well_data.category_gf,
+                       well_data.template_depth, skm_list_json,
+                       well_data.problemWithEk_depth, well_data.problemWithEk_diametr]
+
+        if len(well_data.data_list) == 0:
+            well_data.data_list.append(data_values)
+        else:
+            row_number = row_number - well_data.count_row_well
+            well_data.data_list.insert(row_number, data_values)
     def correctData(self):
         from data_correct import DataWindow
 
@@ -1941,6 +1945,7 @@ class MyWindow(QMainWindow):
 
         template_pero_list = emergencyECN(self)
         self.populate_row(self.ins_ind, template_pero_list, self.table_widget)
+
     def perforationNewWindow(self):
         from work_py.perforation import PerforationWindow
 

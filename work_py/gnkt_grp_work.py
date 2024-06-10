@@ -492,12 +492,15 @@ class GnktOsvWindow2(QMainWindow):
                 pass
 
         koef_anomal = round(float(self.pressuar) * 101325 / (float(vertikal) * 9.81 * 1000), 1)
-        nkt = int(list(well_data.dict_nkt.keys())[0])
-        if nkt == 73:
+        nkt = list(well_data.dict_nkt.keys())[0]
+        if '73' in str(nkt):
+            nkt = 73
             nkt_widht = 5.5
-        elif nkt == 89:
+        elif '89' in str(nkt):
+            nkt = 89
             nkt_widht = 7.34
-        elif nkt == 60:
+        elif '60' in str(nkt):
+            nkt = 60
             nkt_widht = 5
 
         lenght_nkt = sum(list(map(int, well_data.dict_nkt.values())))
