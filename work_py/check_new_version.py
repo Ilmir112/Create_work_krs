@@ -16,6 +16,8 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtCore import QUrl, QProcess, pyqtSignal, QThread
 
+import well_data
+
 
 class UpdateChecker(QWidget):
     def __init__(self):
@@ -42,7 +44,11 @@ class UpdateChecker(QWidget):
         layout.addWidget(self.progress_bar)
         self.setLayout(layout)
 
-        self.check_api_limits()
+        owner = "ilmir112"
+        repo = "Create_work_krs"
+        release_tag = "1.0.3"
+
+        self.check_release_requests(owner, repo, release_tag)
 
         # Запуск проверки версии
         self.check_version()
@@ -70,9 +76,9 @@ class UpdateChecker(QWidget):
         self.progress_bar.setVisible(False)
 
     def check_version(self):
-        # Замените "your_username" и "your_repository" на ваши данные
-        url = "https://api.github.com/repos/Ilmir112/Create_work_krs/releases/latest"
+
         try:
+            url = "https://api.github.com/repos/Ilmir112/Create_work_krs/releases/latest"
             response = requests.get(url)
             response.raise_for_status()  # Проверка на ошибки
 
@@ -89,6 +95,7 @@ class UpdateChecker(QWidget):
                 self.update_button.setEnabled(True)
 
         except requests.exceptions.RequestException as e:
+            well_data.pause = False
             QMessageBox.warning(self, "Ошибка", f"Не удалось проверить обновления: {e}")
 
     def get_current_version(self):
@@ -98,16 +105,17 @@ class UpdateChecker(QWidget):
 
         return version_app
     @staticmethod
-    def check_api_limits():
-        url = "https://api.github.com/repos/Ilmir112/Create_work_krs"
-
+    def check_release_requests(owner, repo, release_tag):
+        url = f"https://api.github.com/repos/{owner}/{repo}/releases/tags/{release_tag}"
         response = requests.get(url)
 
-        remaining_requests = int(response.headers.get('X-RateLimit-Remaining'))
-        reset_time = int(response.headers.get('X-RateLimit-Reset'))
+        if response.status_code == 200:
+            remaining_requests = int(response.headers.get('X-RateLimit-Remaining'))
+            print(f"Осталось запросов: {remaining_requests}")
+        else:
+            print(f"Ошибка: {response.status_code}")
 
-        print(f"Осталось запросов: {remaining_requests}")
-        print(f"Время сброса лимита: {reset_time}")
+
 
 
 

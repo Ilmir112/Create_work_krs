@@ -209,8 +209,6 @@ class MyWindow(QMainWindow):
             self.pause_app()
             well_data.pause = False
 
-
-
         try:
             if self.login_window == None:
                 self.login_window = LoginWindow()
