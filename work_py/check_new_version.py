@@ -2,6 +2,7 @@ import json
 import subprocess
 import sys
 import os
+import time
 import zipfile
 
 import requests
@@ -40,6 +41,8 @@ class UpdateChecker(QWidget):
         layout.addWidget(self.update_button)
         layout.addWidget(self.progress_bar)
         self.setLayout(layout)
+
+        self.check_api_limits()
 
         # Запуск проверки версии
         self.check_version()
@@ -94,6 +97,19 @@ class UpdateChecker(QWidget):
             version_app = data['version']
 
         return version_app
+    @staticmethod
+    def check_api_limits():
+        url = "https://api.github.com/repos/Ilmir112/Create_work_krs"
+
+        response = requests.get(url)
+
+        remaining_requests = int(response.headers.get('X-RateLimit-Remaining'))
+        reset_time = int(response.headers.get('X-RateLimit-Reset'))
+
+        print(f"Осталось запросов: {remaining_requests}")
+        print(f"Время сброса лимита: {reset_time}")
+
+
 
 class UpdateThread(QThread):
     progress_signal = pyqtSignal(int)
