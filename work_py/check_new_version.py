@@ -153,7 +153,7 @@ class UpdateThread(QThread):
 
         # Получение информации о последней версии из GitHub
         self.latest_version = response.json()["tag_name"]
-        return  self.latest_version
+        return self.latest_version
 
 
     def run(self):
@@ -205,7 +205,7 @@ class UpdateThread(QThread):
             QMessageBox.warning(self, "Ошибка", f"Не удалось загрузить обновления: {e}")
 
     def update_version(new_version):
-        with open('plan_krs/version_app.json', 'r') as file:
+        with open('plan_krs/version_app.json', 'w') as file:
             data = json.load(file)
             data['version'] = new_version
 
