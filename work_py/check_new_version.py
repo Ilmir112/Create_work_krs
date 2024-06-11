@@ -58,6 +58,7 @@ class UpdateChecker(QWidget):
 
     def def_complete_prog(self):
         well_data.pause = False
+        self.close()
 
     def start_update(self):
         self.update_button.setEnabled(False)
@@ -125,7 +126,7 @@ class UpdateChecker(QWidget):
             QMessageBox.warning(self, "Ошибка", f"Не удалось проверить обновления: {e}")
 
     def get_current_version(self):
-        with open('users/version_app.json', 'r') as file:
+        with open(f'{well_data.path_image}users/version_app.json', 'r') as file:
             data = json.load(file)
             version_app = data['version']
         return version_app
@@ -180,6 +181,7 @@ class UpdateThread(QThread):
 
             self.finished_signal.emit(True)
             self.update_version(self.latest_version)
+            self.close()
 
         except requests.exceptions.RequestException as e:
             QMessageBox.warning(self, "Ошибка", f"Не удалось загрузить обновления: {e}")
