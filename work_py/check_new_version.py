@@ -21,7 +21,6 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import QUrl, QProcess, pyqtSignal, QThread
 
 
-
 class UpdateChecker(QWidget):
     def __init__(self):
         super().__init__()
@@ -52,7 +51,6 @@ class UpdateChecker(QWidget):
         layout.addWidget(self.complete_prog)
         self.setLayout(layout)
 
-
         # Запуск проверки версии
         self.check_version()
 
@@ -69,10 +67,9 @@ class UpdateChecker(QWidget):
         self.update_thread.progress_signal.connect(self.update_progress)
         self.update_thread.finished_signal.connect(self.update_finished)
         self.update_thread.start()
+
     def update_progress(self, value):
         self.progress_bar.setValue(value)
-
-
 
     def update_finished(self, success):
         if success:
@@ -93,8 +90,6 @@ class UpdateChecker(QWidget):
             url = "http://api.github.com/repos/Ilmir112/Create_work_krs/releases/latest"
 
         try:
-
-
             response = requests.get(url)
 
             if response.status_code == 200:
@@ -102,7 +97,6 @@ class UpdateChecker(QWidget):
                 print(f"Осталось запросов: {remaining_requests}")
             else:
                 print(f"Ошибка: {response.status_code}")
-
 
             response = requests.get(url, verify=False)
             response.raise_for_status()  # Проверка на ошибки
@@ -131,14 +125,14 @@ class UpdateChecker(QWidget):
             version_app = data['version']
         return version_app
 
+
 class UpdateThread(QThread):
     progress_signal = pyqtSignal(int)
     finished_signal = pyqtSignal(bool)
 
-    def __init__(self,  parent=None):
-        super().__init__( parent)
+    def __init__(self, parent=None):
+        super().__init__(parent)
         self.latest_version = UpdateChecker.get_current_version(self)
-
 
     def run(self):
 
@@ -182,6 +176,7 @@ class UpdateThread(QThread):
             self.finished_signal.emit(True)
             self.update_version(self.latest_version)
             self.close()
+            well_data.pause = False
 
         except requests.exceptions.RequestException as e:
             QMessageBox.warning(self, "Ошибка", f"Не удалось загрузить обновления: {e}")
@@ -190,6 +185,7 @@ class UpdateThread(QThread):
         with open('plan_krs/version_app.json', 'r') as file:
             data = json.load(file)
             data['version'] = new_version
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

@@ -204,10 +204,10 @@ class MyWindow(QMainWindow):
         self.thread.start()
 
         if self.raid_window == None:
-            self.login_window = UpdateChecker()
-            self.login_window.show()
+            self.raid_window = UpdateChecker()
+            self.raid_window.show()
             self.pause_app()
-            well_data.pause = False
+            well_data.pause = True
 
         try:
             if self.login_window == None:

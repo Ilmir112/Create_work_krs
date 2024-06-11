@@ -498,12 +498,14 @@ class RirWindow(QMainWindow):
                 for row in rir_q_list[::-1]:
                     rir_list.insert(-1, row)
 
-        rir_work_list = [[f'СПО пакера РПК до глубины {roof_rir_edit}м', None,
-                       f'Спустить   пакера РПК {self.rpk_nkt(roof_rir_edit)}  на тНКТ{well_data.nkt_diam}мм до глубины {roof_rir_edit}м с '
-                       f'замером, шаблонированием шаблоном {well_data.nkt_template}мм. '
-                       f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ) \n'
-                       f'Перед спуском технологического пакера произвести визуальный осмотр в присутствии представителя '
-                       f'РИР или УСРСиСТ.',
+        rir_work_list = [
+            [f'СПО пакера РПК до глубины {roof_rir_edit}м', None,
+           f'Спустить   пакера РПК {self.rpk_nkt(roof_rir_edit)}  на тНКТ{well_data.nkt_diam}мм до '
+           f'глубины {roof_rir_edit}м с '
+           f'замером, шаблонированием шаблоном {well_data.nkt_template}мм. '
+           f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ) \n'
+           f'Перед спуском технологического пакера произвести визуальный осмотр в присутствии представителя '
+           f'РИР или УСРСиСТ.',
             None, None, None, None, None, None, None,
         'мастер КРС', descentNKT_norm(roof_rir_edit,1.2)],
          [f'Привязка по ГК и ЛМ', None,
@@ -527,10 +529,11 @@ class RirWindow(QMainWindow):
           f'технологического "СТОП" ОЗЦ без давления.',
           None, None, None, None, None, None, None,
           'Мастер КРС, подрядчик РИР, УСРСиСТ', 16],
-         [f'{"".join([f"Опрессовать на Р={well_data.max_admissible_pressure._value}атм" if RirWindow.rir_rpk_plast_true is False else ""])}',
+         [f'{"".join([f"Опрессовать на Р={well_data.max_admissible_pressure._value}атм" if rir_rpk_plast_true is False else ""])}',
           None,
-          f'{"".join([f"Опрессовать цементный мост на Р={well_data.max_admissible_pressure._value}атм в присутствии представителя заказчика" if RirWindow.rir_rpk_plast_true is False else ""])} '
-          f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ) ',
+          f'{"".join([f"Опрессовать цементный мост на Р={well_data.max_admissible_pressure._value}атм в присутствии представителя заказчика" if rir_rpk_plast_true is False else ""])} '
+          f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа '
+          f'до начала работ) ',
           None, None, None, None, None, None, None,
           'Мастер КРС, подрядчик РИР, УСРСиСТ',0.67],
          [None, None,
