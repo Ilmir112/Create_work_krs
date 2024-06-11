@@ -125,7 +125,7 @@ class UpdateChecker(QWidget):
             QMessageBox.warning(self, "Ошибка", f"Не удалось проверить обновления: {e}")
 
     def get_current_version(self):
-        with open('D:/python/Create_work_krs/users/version_app.json', 'r') as file:
+        with open('users/version_app.json', 'r') as file:
             data = json.load(file)
             version_app = data['version']
         return version_app
@@ -164,9 +164,10 @@ class UpdateThread(QThread):
                     progress = (downloaded / total_size) * 100
                     self.progress_signal.emit(int(progress))
 
+            extract_dir = "tmp"
 
             with zipfile.ZipFile("zima.zip", 'r') as zip_ref:
-                zip_ref.extractall(f'{download_folder}')
+                zip_ref.extractall(f'{extract_dir}')
             # Путь к папке "tmp"
             folder_path = os.path.abspath("tmp")
 
@@ -176,7 +177,7 @@ class UpdateThread(QThread):
             os.remove("zima.zip")
 
             # Обновление приложения (может потребоваться перезапуск)
-            # ... (ваш код для обновления приложения)
+
             self.finished_signal.emit(True)
             self.update_version(self.latest_version)
 
