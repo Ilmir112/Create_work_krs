@@ -266,7 +266,7 @@ class PvrApplication(QMainWindow):
     def add_work(self):
         from main import MyWindow
 
-        wb = openpyxl.load_workbook('f'{well_data.path_image}property_excel/template_pvr.xlsx')
+        wb = openpyxl.load_workbook(f'{well_data.path_image}property_excel/template_pvr.xlsx')
         # Выбираем активный лист
         self.ws_pvr = wb.active
         number_brigada = str(self.tabWidget.currentWidget().number_brigada_combo.currentText())

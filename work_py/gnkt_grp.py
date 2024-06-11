@@ -134,7 +134,7 @@ class GnktOsvWindow(QMainWindow):
         self.table_schema = table_schema
 
         self.dict_perforation = well_data.dict_perforation
-        self.wb = load_workbook('f'{well_data.path_image}property_excel/tepmpale_gnkt_osv_grp.xlsx')
+        self.wb = load_workbook(f'{well_data.path_image}property_excel/tepmpale_gnkt_osv_grp.xlsx')
         GnktOsvWindow.wb = self.wb
         self.ws_schema = self.wb.active
 
