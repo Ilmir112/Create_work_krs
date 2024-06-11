@@ -132,7 +132,29 @@ class UpdateThread(QThread):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.latest_version = UpdateChecker.get_current_version(self)
+        self.latest_version = self.check_version()
+
+    def check_version(self):
+        try:
+            url = "https://api.github.com/repos/Ilmir112/Create_work_krs/releases/latest"
+        except:
+            url = "http://api.github.com/repos/Ilmir112/Create_work_krs/releases/latest"
+
+        response = requests.get(url)
+
+        if response.status_code == 200:
+            remaining_requests = int(response.headers.get('X-RateLimit-Remaining'))
+            print(f"Осталось запросов: {remaining_requests}")
+        else:
+            print(f"Ошибка: {response.status_code}")
+
+        response = requests.get(url, verify=False)
+        response.raise_for_status()  # Проверка на ошибки
+
+        # Получение информации о последней версии из GitHub
+        self.latest_version = response.json()["tag_name"]
+        return  self.latest_version
+
 
     def run(self):
 
@@ -152,19 +174,19 @@ class UpdateThread(QThread):
             total_size = int(response.headers.get('content-length', 0))
             downloaded = 0
 
-            with open("zima.zip", "wb") as file:  # Сохраняем архив в папку tmp
+            with open("zima.zip", "wb") as file:  # Сохраняем архив в папку
                 for data in response.iter_content(chunk_size=1024):
                     downloaded += len(data)
                     file.write(data)
                     progress = (downloaded / total_size) * 100
                     self.progress_signal.emit(int(progress))
 
-            extract_dir = "tmp"
+            extract_dir = ""
 
-            with zipfile.ZipFile("zima.zip", 'r') as zip_ref:
+            with zipfile.ZipFile("zima.zip", 'r', encodings= 'cp866') as zip_ref:
                 zip_ref.extractall(f'{extract_dir}')
             # Путь к папке "tmp"
-            folder_path = os.path.abspath("tmp")
+            folder_path = os.path.abspath("Zima")
 
             # Открываем папку "tmp" в проводнике Windows
             subprocess.Popen(f'explorer "{folder_path}"')
