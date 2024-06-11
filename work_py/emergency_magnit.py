@@ -143,6 +143,8 @@ class Emergency_magnit(MyWindow):
         nkt_key = self.tabWidget.currentWidget().nkt_select_combo.currentText()
         print_type_combo = self.tabWidget.currentWidget().print_type_combo.currentText()
         emergency_bottom_line = self.tabWidget.currentWidget().emergency_bottom_line.text().replace(',', '')
+        nkt_select_combo = self.tabWidget.currentWidget().nkt_select_combo.currentText()
+
         if emergency_bottom_line != '':
             emergency_bottom_line = int(float(emergency_bottom_line))
 
@@ -151,12 +153,12 @@ class Emergency_magnit(MyWindow):
                                       'Забой ниже глубины текущего забоя')
             return
 
-        if nkt_str_combo == 'магнит в ЭК' and well_data.column_additional and \
+        if nkt_select_combo == 'магнит в ЭК' and well_data.column_additional and \
                 emergency_bottom_line > well_data.head_column_additional._value:
             mes = QMessageBox.warning(self, 'Ошибка',
                                       'Не корректно выбрана компоновка печати для доп колонны')
             return
-        elif nkt_str_combo == 'магнит в ДП' and well_data.column_additional and \
+        elif nkt_select_combo == 'магнит в ДП' and well_data.column_additional and \
                 emergency_bottom_line < well_data.head_column_additional._value:
             mes = QMessageBox.warning(self, 'Ошибка',
                                       'Не корректно выбрана компоновка для основной колонны')
@@ -179,8 +181,9 @@ class Emergency_magnit(MyWindow):
             [f'СПО {print_type_combo}-{print_diametr_line}  до '
              f'глубины {emergency_bottom_line}м',
              None,
-             f'Спустить {print_type_combo}-{print_diametr_line} + опрессовочное седло  +{magnet_select(self, nkt_str_combo)} на '
-             f'НКТ{well_data.nkt_diam}мм до '
+             f'Спустить {print_type_combo}-{print_diametr_line} + опрессовочное седло + '
+             f'{magnet_select(self, nkt_str_combo)} на '
+             f'{nkt_str_combo}{well_data.nkt_diam}мм до '
              f'глубины {emergency_bottom_line}м с замером, шаблонированием '
              f'шаблоном {well_data.nkt_template}мм. Опрессовать НКТ на 150атм. Вымыть шар. \n'
              f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',

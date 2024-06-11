@@ -28,22 +28,33 @@ class TabPageGno(QWidget):
         self.gno_label = QLabel("вид поднимаемого ГНО", self)
         self.gno_combo = QComboBox(self)
         gno_list = ['пакер', 'ОРЗ', 'ОРД', 'воронка', 'НН с пакером', 'НВ с пакером',
-                    'ЭЦН с пакером', 'ЭЦН', 'НВ', 'НН']
+                    'ЭЦН с пакером', 'ЭЦН', 'НВ', 'НН', 'ЭЦН с автономными пакерами']
         self.gno_combo.addItems(gno_list)
         lift_key = self.select_gno()
-        # print(f' гно {gno_list.index(lift_key)}')
+
         self.gno_combo.setCurrentIndex(gno_list.index(lift_key))
 
-        grid = QGridLayout(self)
+        self.grid = QGridLayout(self)
 
-        grid.addWidget(self.gno_label, 4, 3)
-        grid.addWidget(self.gno_combo, 5, 3)
-        grid.addWidget(self.current_bottom_label, 4, 4)
-        grid.addWidget(self.current_bottom_edit, 5, 4)
-        grid.addWidget(self.fluid_label, 4, 5)
-        grid.addWidget(self.fluid_edit, 5, 5)
-        grid.addWidget(self.volume_jumping_label, 4, 6)
-        grid.addWidget(self.volume_jumping_edit, 5, 6)
+        self.grid.addWidget(self.gno_label, 4, 3)
+        self.grid.addWidget(self.gno_combo, 5, 3)
+        self.grid.addWidget(self.current_bottom_label, 4, 4)
+        self.grid.addWidget(self.current_bottom_edit, 5, 4)
+        self.grid.addWidget(self.fluid_label, 4, 5)
+        self.grid.addWidget(self.fluid_edit, 5, 5)
+        self.grid.addWidget(self.volume_jumping_label, 4, 6)
+        self.grid.addWidget(self.volume_jumping_edit, 5, 6)
+
+    def update_select_gno(self):
+        self.current_bottom_ecn_label = QLabel('голова извлекаемых пакеров')
+        self.current_bottom_ecn_edit = QLineEdit(self)
+
+        if self.gno_combo.currentText() == 'ЭЦН с автономными пакерами':
+            self.grid.addWidget(self.current_bottom_ecn_label, 4, 7)
+            self.grid.addWidget(self.current_bottom_ecn_edit, 5, 7)
+        else:
+            self.current_bottom_ecn_edit.setParent(None)
+            self.current_bottom_ecn_label.setParent(None)
 
     @staticmethod
     def select_gno():
@@ -161,15 +172,32 @@ class GnoWindow(QMainWindow):
 
     def add_work(self):
         from main import MyWindow
-        lift_key = str(self.tabWidget.currentWidget().gno_combo.currentText())
-        current_bottom = round(float(self.tabWidget.currentWidget().current_bottom_edit.text()), 1)
-        fluid = self.tabWidget.currentWidget().fluid_edit.text()
-        volume_well_jaming = round(float(self.tabWidget.currentWidget().volume_jumping_edit.text().replace(',', '.')), 1)
-        well_data.current_bottom = current_bottom
-        well_data.fluid_work, well_data.fluid_work_short = self.calc_work_fluid(fluid)
-        work_list = self.work_krs(self.work_plan, lift_key, volume_well_jaming, fluid)
+        try:
+            lift_key = self.tabWidget.currentWidget().gno_combo.currentText()
+            current_bottom = round(float(self.tabWidget.currentWidget().current_bottom_edit.text()), 1)
+            fluid = self.tabWidget.currentWidget().fluid_edit.text()
+            volume_well_jaming = round(
+                float(self.tabWidget.currentWidget().volume_jumping_edit.text().replace(',', '.')), 1)
 
+            well_data.fluid_work, well_data.fluid_work_short = self.calc_work_fluid(fluid)
+            work_list = self.work_krs(self.work_plan, lift_key, volume_well_jaming, fluid)
+            if lift_key == 'ЭЦН с автономными пакерами':
+                current_bottom_ecn_edit = round(float(self.tabWidget.currentWidget().current_bottom_ecn_edit.text()), 1)
+
+
+        except:
+            QMessageBox.warning(self, 'ОШИБКА', 'Не все данные корректны')
+            return
+
+        check_question = QMessageBox.question(self, 'Корректность забой', f'Забой который можно нормализовать '
+                                                                          f'без использования ВЗД на '
+                                                                          f'глубине {current_bottom}м, корректен?')
+
+        if check_question == QMessageBox.StandardButton.No:
+            return
         MyWindow.populate_row(self, self.ins_ind, work_list, self.table_widget)
+        well_data.current_bottom = current_bottom
+
         well_data.pause = False
         self.close()
 
@@ -271,13 +299,13 @@ class GnoWindow(QMainWindow):
                     krs_begin.insert(-3, row)
 
             update_change_fluid_str = [None, None,
-                 f'При отсутствии избыточного давления произвести замер статического уровня в присутствии представителя'
-                 f' заказчика. Составить акт. По результатам замера статического уровня согласовать с заказчиком '
-                 f'глушение скважины уд. весом 1,17{well_data.fluid_work[4:]} в алгоритме указанном ниже. '
-                 f'При положительном результате глушения дальнейшие работ продолжить с учетом изменения уд.веса '
-                 f'рабочей жидкости.',
-                 None, None, None, None, None, None, None,
-                 ' Мастер КРС.', None]
+                                       f'При отсутствии избыточного давления произвести замер статического уровня в присутствии представителя'
+                                       f' заказчика. Составить акт. По результатам замера статического уровня согласовать с заказчиком '
+                                       f'глушение скважины уд. весом 1,17{well_data.fluid_work[4:]} в алгоритме указанном ниже. '
+                                       f'При положительном результате глушения дальнейшие работ продолжить с учетом изменения уд.веса '
+                                       f'рабочей жидкости.',
+                                       None, None, None, None, None, None, None,
+                                       ' Мастер КРС.', None]
 
             if float(fluid) > 1.18:
                 print(update_change_fluid_str)
@@ -331,10 +359,11 @@ class GnoWindow(QMainWindow):
                            None, None, None, None, None,
                            'Мастер КРС представитель Заказчика', None]]
 
-            kvostovika_lenght = round(sum(list(well_data.dict_nkt.values())) - float(well_data.depth_fond_paker_do["do"]), 1)
+            kvostovika_lenght = round(
+                sum(list(well_data.dict_nkt.values())) - float(well_data.depth_fond_paker_do["do"]), 1)
 
             kvostovik = f' + хвостовиком {kvostovika_lenght}м ' if well_data.region == 'ТГМ' and \
-                                                                  kvostovika_lenght > 0.001 else ''
+                                                                   kvostovika_lenght > 0.001 else ''
 
             well_jamming_str = well_jamming(self, without_damping_True, lift_key,
                                             volume_well_jaming)  # экземпляр функции расчета глушения
@@ -443,6 +472,93 @@ class GnoWindow(QMainWindow):
                  None, None,
                  None, None, None, None, None,
                  'Мастер КРС', round(liftingGNO(well_data.dict_nkt) * 1.2, 2)]
+            ]
+            lift_ecn_with_2paker = [
+                [f'Опрессовать ГНО на Р=50атм', None,
+                 'Опрессовать ГНО на Р=50атм в течении 30мин в присутствии представителя ЦДНГ. Составить акт. (Вызов '
+                 'представителя осуществлять '
+                 'телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ) ПРИ НЕГЕРМЕТИЧНОСТИ НКТ'
+                 ' ПОДЪЕМ ВЕСТИ С КАЛИБРОВКОЙ',
+                 None, None, None, None, None, None, None,
+                 'Мастер КРС представитель Заказчика ', 0.7],
+                [f'Сбить сбивной клапан. {well_jamming_str[2]}', None,
+                 f'Сбить сбивной клапан. {well_jamming_str[0]}',
+                 None, None, None, None, None, None, None,
+                 'Мастер КРС, представ заказчика', 3.2],
+                [None, None, well_jamming_str[1],
+                 None, None, None, None, None, None, None,
+                 ' Мастер КРС', None],
+                [None, None,
+                 f'{lifting_unit(self)}', None, None, None, None, None, None, None,
+                 'Мастер КРС представитель Заказчика, пусков. Ком. ', 4.2],
+                [f'Сорвать планшайбу не более {round(weigth_pipe(well_data.dict_nkt) * 1.2, 1)}т. '
+                 f'(вес подвески ({round(weigth_pipe(well_data.dict_nkt), 1)}т) + 20%)', None,
+                 f'Разобрать устьевое оборудование. Сорвать планшайбу в присутствии представителя ЦДНГ, с '
+                 f'составлением акта. При срыве нагрузка не должна превышать предельно допустимую нагрузку на НКТ '
+                 f'не более {round(weigth_pipe(well_data.dict_nkt) * 1.2, 1)}т. '
+                 f'(вес подвески ({round(weigth_pipe(well_data.dict_nkt), 1)}т) + 20%). ПРИМЕЧАНИЕ: При отрицательном'
+                 f' результате согласовать с УСРСиСТ ступенчатое увеличение '
+                 f'нагрузки до 28т ( страг нагрузка НКТ по паспорту), по 3 т – 0,5 час , при необходимости  '
+                 f'с противодавлением в НКТ '
+                 f'(время на прибытие СТП ЦА 320 +  АЦ не более 4 часов). Общие время на расхаживание - не более 6 '
+                 f'часов, через 5 часов'
+                 f' с момента расхаживания пакера - выйти с согласование на УСРСиСТ, ПТО Региона - для составления '
+                 f'алгоритма'
+                 f' последующих работ. ', None, None,
+                 None, None, None, None, None,
+                 'Мастер КРС представитель Заказчика', 1.5],
+                [None, None,
+                 ''.join(["За 24 часа до готовности вызвать пусковую комиссию" if well_data.kat_pvo == 2
+                          else "На скважинах первой категории Подрядчик обязан пригласить представителя ПАСФ "
+                               "для проверки качества м/ж и опрессовки ПВО, документации и выдачи разрешения на "
+                               "производство "
+                               "работ по ремонту скважин. При обнаружении нарушений, которые могут повлечь за собой "
+                               "опасность для жизни людей"
+                               " и/или возникновению ГНВП и ОФ, дальнейшие работы должны быть прекращены. Представитель "
+                               "ПАСФ приглашается за 24 часа до проведения "
+                               "проверки монтажа ПВО телефонограммой. произвести практическое обучение по команде "
+                               "ВЫБРОС. Пусковой комиссией составить акт готовности "
+                               "подъёмного агрегата для ремонта скважины."]),
+                 None, None, None, None, None, None, None,
+                 'Мастер КРС', None],
+                [pvo_gno(well_data.kat_pvo)[1], None,
+                 pvo_gno(well_data.kat_pvo)[0],
+                 None,
+                 None,
+                 None, None, None, None, None,
+                 ''.join([
+                     'Мастер КРС, представ-ли ПАСФ и Заказчика, Пуск. ком'
+                     if well_data.kat_pvo == 1 else 'Мастер КРС, представ-ли  Заказчика']),
+                 [4.21 if 'схеме №1' in str(pvo_gno(well_data.kat_pvo)[0]) else 0.23 + 0.3 + 0.83 + 0.67 + 0.14][0]],
+                [None, None,
+                 f'Опрессовку ПВО проводить после каждого монтажа. (ОПРЕССОВКУ ПВО ЗАФИКСИРОВАТЬ В ВАХТОВОМ ЖУРНАЛЕ).',
+                 None, None,
+                 None, None, None, None, None,
+                 None, None],
+                [None, None,
+                 f'Мастеру бригады КРС осуществлять входной контроль за плотностью ввозимой жидкости глушения и '
+                 f'промывки с записью удельного веса в вахтовом журнале. ',
+                 None, None,
+                 None, None, None, None, None,
+                 None, None],
+                [None, None,
+                 f'Провести практическое обучение вахт по сигналу ВЫБРОС.', None, None,
+                 None, None, None, None, None,
+                 None, 1.2],
+                [
+                    f'Поднять  {well_data.dict_pump_ECN["do"]} с глубины {round(sum(list(well_data.dict_nkt.values())), 1)}м',
+                    None,
+                    f'Поднять  {well_data.dict_pump_ECN["do"]} с глубины '
+                    f'{round(sum(list(well_data.dict_nkt.values())), 1)}м '
+                    f'(компоновка НКТ{nkt_diam_fond}) на поверхность с замером, '
+                    f'накручиванием колпачков с доливом скважины '
+                    f'тех.жидкостью уд. весом {well_data.fluid_work}  '
+                    f'в объеме {round(round(sum(list(well_data.dict_nkt.values())), 1) * 1.12 / 1000, 1)}м3 с '
+                    f'контролем АСПО'
+                    f' на стенках НКТ.',
+                    None, None,
+                    None, None, None, None, None,
+                    'Мастер КРС', round(liftingGNO(well_data.dict_nkt) * 1.2, 2)],
             ]
             lift_ecn = [
                 [f'Опрессовать ГНО на Р=50атм', None,
@@ -1303,7 +1419,8 @@ class GnoWindow(QMainWindow):
 
             lift_dict = {'пакер': lift_paker, 'ОРЗ': lift_orz, 'ОРД': lift_ord, 'воронка': lift_voronka,
                          'НН с пакером': lift_pump_nn_with_paker, 'НВ с пакером': lift_pump_nv_with_paker,
-                         'ЭЦН с пакером': lift_ecn_with_paker, 'ЭЦН': lift_ecn, 'НВ': lift_pump_nv, 'НН': lift_pump_nn}
+                         'ЭЦН с пакером': lift_ecn_with_paker, 'ЭЦН': lift_ecn, 'НВ': lift_pump_nv, 'НН': lift_pump_nn,
+                         'ЭЦН с автономными пакерами': lift_ecn_with_2paker}
 
             lift_select = lift_dict[lift_key]
             if well_data.konte_true:
@@ -1316,7 +1433,7 @@ class GnoWindow(QMainWindow):
                 [None, None, 'Порядок работы', None, None, None, None, None, None, None, None, None],
                 [None, None, 'Наименование работ', None, None, None, None, None, None, None, 'Ответственный',
                  'Нормы времени \n мин/час.'],
-                ]
+            ]
             return krs_begin[:2]
 
     def calc_work_fluid(self, fluid_work_insert):

@@ -28,6 +28,10 @@ class TabPage_SO(QWidget):
         self.paker_depth_edit.setValidator(self.validator)
         self.paker_depth_edit.textChanged.connect(self.update_paker)
 
+        self.need_privyazka_Label = QLabel("Привязка оборудования", self)
+        self.need_privyazka_QCombo = QComboBox()
+        self.need_privyazka_QCombo.addItems(['Нет', 'Да'])
+
         if len(well_data.plast_work) != 0:
             pakerDepth = well_data.perforation_roof - 20
         else:
@@ -67,22 +71,17 @@ class TabPage_SO(QWidget):
         self.grid_layout.addWidget(self.pressureZUMPF_question_Label, 3, 4)
         self.grid_layout.addWidget(self.pressureZUMPF_question_QCombo, 4, 4)
 
-        # self.grid_layout.addWidget(self.pakerDepthZumpf_Label, 3, 5)
-        # self.grid_layout.addWidget(self.pakerDepthZumpf_edit, 4, 5)
-
-
-
+        self.grid_layout.addWidget(self.need_privyazka_Label, 3, 5)
+        self.grid_layout.addWidget(self.need_privyazka_QCombo, 4, 5)
 
     def update_paker(self, index):
-
-
         if index == 'Да':
             if len(well_data.plast_work) != 0:
                 pakerDepthZumpf = int(well_data.perforation_sole + 10)
             else:
                 if well_data.leakiness:
                     pakerDepthZumpf = int(max([float(nek.split('-')[0])+10
-                                           for nek in well_data.dict_perforation['НЭК']['интервал'].keys()]))
+                                           for nek in well_data.dict_leakiness['НЭК']['интервал'].keys()]))
 
                     self.pakerDepthZumpf_edit.setText(f'{pakerDepthZumpf}')
 
@@ -91,24 +90,34 @@ class TabPage_SO(QWidget):
         elif index == 'Нет':
             self.pakerDepthZumpf_Label.setParent(None)
             self.pakerDepthZumpf_edit.setParent(None)
+        paker_depth = self.paker_depth_edit.text()
+        if paker_depth != '':
+            if well_data.open_trunk_well is True:
 
-        if well_data.open_trunk_well is True:
-            paker_depth = self.paker_depth_edit.text()
-            if paker_depth != '':
                 paker_khost = well_data.current_bottom - int(paker_depth)
                 self.paker_khost_edit.setText(f'{paker_khost}')
                 self.diametr_paker_edit.setText(f'{self.paker_diametr_select(int(paker_depth))}')
-        else:
-            paker_depth = self.paker_depth_edit.text()
-            if paker_depth != '':
+            else:
                 paker_khost = 10
                 self.paker_khost_edit.setText(f'{paker_khost}')
                 self.diametr_paker_edit.setText(f'{self.paker_diametr_select(int(paker_depth))}')
+            need_count = 0
+            for plast in well_data.plast_all:
+                for roof, sole in well_data.dict_perforation[plast]['интервал']:
+                    if abs(float(roof) - float(paker_depth)) < 10 or abs(float(sole) - float(paker_depth))< 10:
+                        need_count += 1
+            if well_data.leakiness:
+                for roof, sole in well_data.dict_leakiness['НЭК']['интервал']:
+                    if abs(float(roof) - float(paker_depth)) < 10 or abs(float(sole) - float(paker_depth)) < 10:
+                        need_count += 1
+
+            if need_count == 0:
+                self.need_privyazka_QCombo.setCurrentIndex(0)
+            else:
+                self.need_privyazka_QCombo.setCurrentIndex(1)
+
 
     def paker_diametr_select(self, depth_landing):
-
-
-
         paker_diam_dict = {
             82: (88, 92),
             88: (92.1, 97),
@@ -173,6 +182,7 @@ class OpressovkaEK(QMainWindow):
         diametr_paker = int(float(self.tabWidget.currentWidget().diametr_paker_edit.text()))
         paker_khost = int(float(self.tabWidget.currentWidget().paker_khost_edit.text()))
         paker_depth = int(float(self.tabWidget.currentWidget().paker_depth_edit.text()))
+        self.need_privyazka_QCombo = self.tabWidget.currentWidget().need_privyazka_QCombo.currentText()
         try:
             pakerDepthZumpf = int(float(self.tabWidget.currentWidget().pakerDepthZumpf_edit.text()))
             if MyWindow.check_true_depth_template(self, paker_depth) is False:
@@ -483,12 +493,8 @@ class OpressovkaEK(QMainWindow):
                         for row in pressureNEK_list:
                             paker_list.append(row)
 
-        for plast in list(well_data.dict_perforation.keys()):
-            for interval in well_data.dict_perforation[plast]['интервал']:
-                if abs(float(interval[1] - float(paker_depth))) < 10 or abs(
-                        float(interval[0] - float(paker_depth))) < 10:
-                    if privyazkaNKT(self)[0] not in paker_list:
-                        paker_list.insert(1, privyazkaNKT(self)[0])
+        if self.need_privyazka_QCombo == "Да":
+            paker_list.insert(1, privyazkaNKT(self)[0])
 
         return paker_list
 

@@ -203,11 +203,11 @@ class MyWindow(QMainWindow):
         # self.thread.started.connect(self.excepthook.handleException)
         self.thread.start()
 
-        if self.raid_window == None:
-            self.raid_window = UpdateChecker()
-            self.raid_window.show()
-            self.pause_app()
-            well_data.pause = True
+        # if self.raid_window == None:
+        #     self.raid_window = UpdateChecker()
+        #     self.raid_window.show()
+        #     self.pause_app()
+        #     well_data.pause = True
 
         try:
             if self.login_window == None:
