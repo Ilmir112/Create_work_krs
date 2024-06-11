@@ -181,10 +181,11 @@ class UpdateThread(QThread):
                     progress = (downloaded / total_size) * 100
                     self.progress_signal.emit(int(progress))
 
-            extract_dir = "../zima"
+            extract_dir = ""
 
             with zipfile.ZipFile("zima.zip", 'r') as zip_ref:
-                zip_ref.extractall(f'{extract_dir}', encoding='cp866')
+                zip_ref.extractall(f'{extract_dir}')
+
             # Путь к папке "tmp"
             folder_path = os.path.abspath("Zima")
 

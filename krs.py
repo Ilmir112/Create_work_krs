@@ -45,14 +45,18 @@ class TabPageGno(QWidget):
         self.grid.addWidget(self.volume_jumping_label, 4, 6)
         self.grid.addWidget(self.volume_jumping_edit, 5, 6)
 
-    def update_select_gno(self):
+        self.gno_combo.currentTextChanged.connect(self.update_select_gno)
+
+    def update_select_gno(self, index):
         self.current_bottom_ecn_label = QLabel('голова извлекаемых пакеров')
         self.current_bottom_ecn_edit = QLineEdit(self)
 
-        if self.gno_combo.currentText() == 'ЭЦН с автономными пакерами':
+        if index == 'ЭЦН с автономными пакерами':
             self.grid.addWidget(self.current_bottom_ecn_label, 4, 7)
             self.grid.addWidget(self.current_bottom_ecn_edit, 5, 7)
         else:
+            # self.grid.addWidget(self.current_bottom_ecn_label, 4, 7)
+            # self.grid.addWidget(self.current_bottom_ecn_edit, 5, 7)
             self.current_bottom_ecn_edit.setParent(None)
             self.current_bottom_ecn_label.setParent(None)
 
@@ -183,6 +187,7 @@ class GnoWindow(QMainWindow):
             work_list = self.work_krs(self.work_plan, lift_key, volume_well_jaming, fluid)
             if lift_key == 'ЭЦН с автономными пакерами':
                 current_bottom_ecn_edit = round(float(self.tabWidget.currentWidget().current_bottom_ecn_edit.text()), 1)
+                well_data.current_bottom = current_bottom_ecn_edit
 
 
         except:
