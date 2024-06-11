@@ -103,9 +103,9 @@ class UpdateChecker(QWidget):
 
             # Получение информации о последней версии из GitHub
             self.latest_version = response.json()["tag_name"]
-            print(self.latest_version)
 
-            # Получение текущей версии из файла (например, "version.txt")
+            UpdateChecker.close(self)
+            # Получение текущей версии из файла
             self.current_version = self.get_current_version()
 
             if self.current_version == self.latest_version:
@@ -184,7 +184,11 @@ class UpdateThread(QThread):
             extract_dir = ""
 
             with zipfile.ZipFile("zima.zip", 'r') as zip_ref:
-                zip_ref.extractall(f'{extract_dir}')
+                for info in zip_ref.infolist():
+                    if info.filename.startswith("zima/"):  # Проверяем, начинается ли имя файла с "zima/"
+                        # Удаляем "zima/" из начала имени файла, чтобы извлечь только содержимое
+                        filename = info.filename[len("zima/"):]
+                        zip_ref.extract(info, os.path.join(extract_dir, filename))
 
             # Путь к папке "tmp"
             folder_path = os.path.abspath("Zima")
@@ -198,16 +202,21 @@ class UpdateThread(QThread):
 
             self.finished_signal.emit(True)
             self.update_version(self.latest_version)
-            self.close()
+
             well_data.pause = False
 
         except requests.exceptions.RequestException as e:
             QMessageBox.warning(self, "Ошибка", f"Не удалось загрузить обновления: {e}")
 
-    def update_version(new_version):
-        with open('plan_krs/version_app.json', 'w') as file:
+    def update_version(self, new_version):
+        # Открываем JSON файл для чтения
+        with open(f'{well_data.path_image}users/version_app.json', "r") as file:
             data = json.load(file)
-            data['version'] = new_version
+            data["version"] = new_version
+
+        with open(f'{well_data.path_image}users/version_app.json', 'w') as file:
+            json.dump(data, file, indent=4)
+
 
 
 if __name__ == "__main__":
