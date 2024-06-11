@@ -11,7 +11,7 @@ jobs:
           python-version: '3.8.8'
 
       - name: Install PyInstaller
-        run: pip install pyinstaller pywin32
+        run: pip install pyinstaller==5.13.2 pywin32
 #      - name: Install requirements
 #        run: pip install -r requirements.txt
       - name: Install dependencies
@@ -20,7 +20,7 @@ jobs:
 #              run: pyinstaller --onefile --hidden-import data_base.data_base_well.database_well main.py
       - name: Build executable
         run:
-          pyinstaller --noconfirm --onedir --icon=imageFiles/icon/zima_ico.ico --console --name "ZIMA"
+          pyinstaller --noconfirm   --console --name "ZIMA"
           --add-data "work_py;work_py/" 
           --add-data "users;users/" 
           --add-data "tests;tests/" 
