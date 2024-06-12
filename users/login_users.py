@@ -12,8 +12,8 @@ class LoginWindow(QWidget):
         self.setWindowTitle('окно входа')
         self.setGeometry(100, 100, 400, 300)
 
-        self.label_username = QLabel("Пользователь:", self)
-        self.label_username.move(60, 30)
+        self.label_username = QLabel("Пользоват_ель:", self)
+        self.label_username.move(80, 30)
         self.username = QComboBox(self)
         users_list = list(map(lambda x:x[1], self.get_list_users()))
 
@@ -21,7 +21,7 @@ class LoginWindow(QWidget):
         self.username.move(120, 30)
 
         self.label_password = QLabel("Пароль:", self)
-        self.label_password.move(60, 70)
+        self.label_password.move(80, 70)
         self.password = QLineEdit(self)
         self.password.setEchoMode(QLineEdit.Password)  # Устанавливаем режим скрытия пароля
         self.password.setPlaceholderText('введите пароль')
