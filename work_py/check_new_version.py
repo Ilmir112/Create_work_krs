@@ -181,7 +181,8 @@ class UpdateThread(QThread):
                     progress = (downloaded / total_size) * 100
                     self.progress_signal.emit(int(progress))
 
-            extract_dir = ""
+            extract_dir = os.path.dirname(os.path.abspath(__file__))
+            print(f'путь к извлечения {extract_dir}')
 
             with zipfile.ZipFile("zima.zip", 'r') as zip_ref:
                 for info in zip_ref.infolist():
@@ -190,11 +191,10 @@ class UpdateThread(QThread):
                         filename = info.filename[len("zima/"):]
                         zip_ref.extract(info, os.path.join(extract_dir, filename))
 
-            # Путь к папке "tmp"
-            folder_path = os.path.abspath("Zima")
+
 
             # Открываем папку "tmp" в проводнике Windows
-            subprocess.Popen(f'explorer "{folder_path}"')
+            subprocess.Popen(f'explorer "{extract_dir}"')
 
             os.remove("zima.zip")
 
