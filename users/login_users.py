@@ -12,7 +12,7 @@ class LoginWindow(QWidget):
         self.setWindowTitle('окно входа')
         self.setGeometry(100, 100, 400, 300)
 
-        self.label_username = QLabel("Пользоват_ель:", self)
+        self.label_username = QLabel("Пользова_т_ель:", self)
         self.label_username.move(80, 30)
         self.username = QComboBox(self)
         users_list = list(map(lambda x:x[1], self.get_list_users()))
