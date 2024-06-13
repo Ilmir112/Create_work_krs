@@ -231,7 +231,7 @@ class UpdateThread(QThread):
             #             # print(f'фат2 {filename}')
 
             # После обновления, перезапустите приложение
-            self.restartApplication(extract_dir, extract_dir, extract_len)
+            self.restartApplication(download_folder, extract_dir, extract_len)
 
 
 
