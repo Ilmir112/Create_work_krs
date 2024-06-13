@@ -212,7 +212,7 @@ class UpdateThread(QThread):
             extract_len = len('ZIMA\zima.exe')
             print(extract_len)
 
-            extract_dir = download_folder.replace('\zima.zip', '')
+            extract_dir = download_folder.replace('zima.zip', '')
             print(f'отпр {extract_dir}')
             print(f'путь к извлечения {extract_dir}')
 
@@ -242,7 +242,7 @@ class UpdateThread(QThread):
             # Открываем папку "tmp" в проводнике Windows
             subprocess.Popen(f'explorer "{extract_dir}"')
 
-            os.remove("zima.zip")
+            # os.remove("zima.zip")
 
             # Обновление приложения (может потребоваться перезапуск)
 
