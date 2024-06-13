@@ -163,7 +163,7 @@ class CheckableComboBoxChild(QComboBox):
 
 class TabPage_SO_acid(QWidget):
     def __init__(self, tableWidget, parent=None):
-        from .opressovka import TabPage_SO
+
         super().__init__(parent)
         self.le = QLineEdit()
         self.grid = QGridLayout(self)
@@ -645,8 +645,8 @@ class TabWidget(QTabWidget):
 class AcidPakerWindow(QMainWindow):
 
     def __init__(self, ins_ind, table_widget, parent=None):
-
         super().__init__(parent)
+        self.setWindowFlags(Qt.WindowFlags(Qt.WindowModal))
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
 

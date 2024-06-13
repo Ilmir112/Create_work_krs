@@ -1,5 +1,6 @@
 import psycopg2
 from PyQt5.QtWidgets import QWidget, QLabel, QLineEdit, QPushButton, QMessageBox, QComboBox, QBoxLayout, QGridLayout
+from PyQt5.QtCore import Qt
 
 import well_data
 
@@ -8,6 +9,10 @@ class LoginWindow(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle('окно входа')
+
+        # Установка флага `Qt.WindowModal`
+        self.setWindowModality(Qt.WindowModal)
+
 
         self.label_username = QLabel("Пользова_т_ель:", self)
         self.username = QComboBox(self)

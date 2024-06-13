@@ -2,16 +2,11 @@ import json
 import subprocess
 import sys
 import os
-
-import certifi
-import urllib3
-import time
+import requests
 import zipfile
+import well_data
 from PyQt5.QtNetwork import QSslConfiguration, QSslCertificate, QSslKey, QSsl
 
-import well_data
-
-import requests
 from PyQt5.QtWidgets import (
     QApplication,
     QWidget,
@@ -20,14 +15,24 @@ from PyQt5.QtWidgets import (
     QVBoxLayout,
     QMessageBox, QProgressBar
 )
-from PyQt5.QtCore import QUrl, QProcess, pyqtSignal, QThread
+from PyQt5.QtCore import QUrl, QProcess, pyqtSignal, QThread, Qt, QEvent
 
 
+class ModalWindow(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Модальное окно")
+        label = QLabel("Это модальное окно!", self)
+        label.move(50, 50)
 class UpdateChecker(QWidget):
     def __init__(self):
         super().__init__()
 
+        self.setWindowFlags(Qt.WindowFlags(Qt.WindowModal))
         self.setWindowTitle("Проверка обновлений")
+
+        # Установка флага `Qt.WindowModal`
+
 
         # Лейбл для отображения версии
         self.version_label = QLabel("Проверка версии...")
@@ -55,6 +60,20 @@ class UpdateChecker(QWidget):
 
         # Запуск проверки версии
         self.check_version()
+
+    def open_modal(self):
+        self.modal_window = ModalWindow()
+        self.modal_window.show()
+        self.block_events()
+
+    def block_events(self):
+        self.installEventFilter(self)
+
+    def eventFilter(self, obj, event):
+        if event.type() == QEvent.MouseButtonPress or event.type() == QEvent.KeyPress:
+            if self.modal_window:
+                return True  # Блокируем событие
+        return super().eventFilter(obj, event)
 
     def def_complete_prog(self):
         well_data.pause = False
@@ -196,18 +215,25 @@ class UpdateThread(QThread):
             print(len(extract_dir))
             print(f'путь к извлечения {extract_dir}')
 
+            # with zipfile.ZipFile("zima.zip", 'r') as zip_ref:
+            #     for info in zip_ref.infolist():
+            #         if "ZIMA.exe" not in info.filename:
+            #         #     # Извлекаем файл в текущую директорию
+            #         #     # Удаляем путь к папке "ZIMA/" из имени файла
+            #         #     filename = info.filename[len("ZIMA/"):]
+            #         #     zip_ref.extract(info, os.path.join(extract_dir, filename))
+            #         # elif info.filename.startswith("ZIMA/"):  # Проверяем, начинается ли имя файла с "zima/"
+            #             # Удаляем "zima/" из начала имени файла, чтобы извлечь только содержимое
+            #             filename = info.filename[len("ZIMA/"):]
+            #             zip_ref.extract(info, os.path.join(extract_dir, filename))
+            #             # print(f'фат2 {filename}')
+
             with zipfile.ZipFile("zima.zip", 'r') as zip_ref:
-                for info in zip_ref.infolist():
-                    if "ZIMA.exe" not in info.filename:
-                    #     # Извлекаем файл в текущую директорию
-                    #     # Удаляем путь к папке "ZIMA/" из имени файла
-                    #     filename = info.filename[len("ZIMA/"):]
-                    #     zip_ref.extract(info, os.path.join(extract_dir, filename))
-                    # elif info.filename.startswith("ZIMA/"):  # Проверяем, начинается ли имя файла с "zima/"
-                        # Удаляем "zima/" из начала имени файла, чтобы извлечь только содержимое
-                        filename = info.filename[len("ZIMA/"):]
-                        zip_ref.extract(info, os.path.join(extract_dir, filename))
-                        # print(f'фат2 {filename}')
+                zip_ref.extractall(extract_dir)
+
+            # Перезапуск приложения
+            os.system("python zima.exe")
+            quit()
 
 
 

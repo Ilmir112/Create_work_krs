@@ -207,12 +207,6 @@ class MyWindow(QMainWindow):
         # self.thread.started.connect(self.excepthook.handleException)
         self.thread.start()
 
-        if self.raid_window == None:
-            self.raid_window = UpdateChecker()
-            self.raid_window.show()
-            self.pause_app()
-            well_data.pause = True
-
         try:
             if self.login_window == None:
                 self.login_window = LoginWindow()
@@ -2324,7 +2318,11 @@ class MyWindow(QMainWindow):
 
 
 if __name__ == "__main__":
+    # app3 = QApplication(sys.argv)
+
     app = QApplication(sys.argv)
     window = MyWindow()
     window.show()
+    app2 = UpdateChecker()
+    app2.show()
     sys.exit(app.exec_())
