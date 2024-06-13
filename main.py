@@ -1,6 +1,7 @@
 import json
 import os
 import sys
+
 import psycopg2
 import win32com.client
 import openpyxl
@@ -50,7 +51,10 @@ class UncaughtExceptions(QObject):
 
     @pyqtSlot(object)
     def handleException(self, ex):
-        logger.critical(f"{well_data.well_number._value} {well_data.well_area._value} Критическая ошибка: {ex}")
+        try:
+            logger.critical(f"{well_data.well_number._value} {well_data.well_area._value} Критическая ошибка: {ex}")
+        except:
+            logger.critical(f"{well_data.well_number} {well_data.well_area} Критическая ошибка: {ex}")
 
 
 class ExcelWorker(QThread):

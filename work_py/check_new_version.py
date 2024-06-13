@@ -2,6 +2,8 @@ import json
 import subprocess
 import sys
 import os
+
+import certifi
 import urllib3
 import time
 import zipfile
@@ -85,13 +87,18 @@ class UpdateChecker(QWidget):
     def check_version(self):
 
         try:
+
             url = "https://api.github.com/repos/Ilmir112/Create_work_krs/releases/latest"
+            # http = urllib3.PoolManager(
+            #     cert_reqs="CERT_REQUIRED",
+            #     ca_certs=certifi.where())
+
         except:
             url = "http://api.github.com/repos/Ilmir112/Create_work_krs/releases/latest"
 
         try:
-            response = requests.get(url)
 
+            response = requests.get(url, verify=True)
             if response.status_code == 200:
                 remaining_requests = int(response.headers.get('X-RateLimit-Remaining'))
                 print(f"Осталось запросов: {remaining_requests}")
@@ -181,14 +188,15 @@ class UpdateThread(QThread):
                     progress = (downloaded / total_size) * 100
                     self.progress_signal.emit(int(progress))
 
-            extract_dir = os.path.dirname(os.path.abspath(__file__))
+            extract_dir = os.path.dirname(os.path.abspath(__file__))[:-8]
+            print(len(extract_dir))
             print(f'путь к извлечения {extract_dir}')
 
             with zipfile.ZipFile("zima.zip", 'r') as zip_ref:
                 for info in zip_ref.infolist():
-                    if info.filename.startswith("zima/"):  # Проверяем, начинается ли имя файла с "zima/"
+                    if info.filename.startswith("ZIMA/"):  # Проверяем, начинается ли имя файла с "zima/"
                         # Удаляем "zima/" из начала имени файла, чтобы извлечь только содержимое
-                        filename = info.filename[len("zima/"):]
+                        filename = info.filename[len("ZIMA/"):]
                         zip_ref.extract(info, os.path.join(extract_dir, filename))
 
 
