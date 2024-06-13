@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import json
 import subprocess
 import sys
@@ -208,11 +209,11 @@ class UpdateThread(QThread):
                     progress = (downloaded / total_size) * 100
                     self.progress_signal.emit(int(progress))
 
-            extract_len = len('ZIMA\ZIMA\_internal\work_py')
+            extract_len = len('\ZIMA\zima.exe')
             print(extract_len)
 
-            extract_dir = os.path.dirname(os.path.abspath(__file__))
-            print(extract_dir)
+            extract_dir = download_folder[:-extract_len]
+            print(f'отпр {extract_dir}')
             print(f'путь к извлечения {extract_dir}')
 
             # with zipfile.ZipFile("zima.zip", 'r') as zip_ref:
