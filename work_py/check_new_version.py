@@ -198,13 +198,16 @@ class UpdateThread(QThread):
 
             with zipfile.ZipFile("zima.zip", 'r') as zip_ref:
                 for info in zip_ref.infolist():
-                    if info.filename.startswith("ZIMA/ZIMA.exe"):
-                        filename = info.filename[len("ZIMA/"):]
-                        zip_ref.extract(info, filename)
-                    elif info.filename.startswith("ZIMA/"):  # Проверяем, начинается ли имя файла с "zima/"
+                    if "ZIMA.exe" not in info.filename:
+                    #     # Извлекаем файл в текущую директорию
+                    #     # Удаляем путь к папке "ZIMA/" из имени файла
+                    #     filename = info.filename[len("ZIMA/"):]
+                    #     zip_ref.extract(info, os.path.join(extract_dir, filename))
+                    # elif info.filename.startswith("ZIMA/"):  # Проверяем, начинается ли имя файла с "zima/"
                         # Удаляем "zima/" из начала имени файла, чтобы извлечь только содержимое
                         filename = info.filename[len("ZIMA/"):]
                         zip_ref.extract(info, os.path.join(extract_dir, filename))
+                        # print(f'фат2 {filename}')
 
 
 
