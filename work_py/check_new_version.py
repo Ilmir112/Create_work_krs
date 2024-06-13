@@ -212,7 +212,7 @@ class UpdateThread(QThread):
             extract_len = len('ZIMA\zima.exe')
             print(extract_len)
 
-            extract_dir = download_folder
+            extract_dir = download_folder.replace('\zima.zip', '')
             print(f'отпр {extract_dir}')
             print(f'путь к извлечения {extract_dir}')
 
@@ -228,6 +228,7 @@ class UpdateThread(QThread):
             #             filename = info.filename[len("ZIMA/"):]
             #             zip_ref.extract(info, os.path.join(extract_dir, filename))
             #             # print(f'фат2 {filename}')
+
 
             with zipfile.ZipFile(f"{download_folder}", 'r') as zip_ref:
                 zip_ref.extractall(extract_dir)
