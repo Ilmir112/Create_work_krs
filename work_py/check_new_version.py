@@ -189,13 +189,19 @@ class UpdateThread(QThread):
                     progress = (downloaded / total_size) * 100
                     self.progress_signal.emit(int(progress))
 
-            extract_dir = os.path.dirname(os.path.abspath(__file__))[:-8]
+            extract_len = len(well_data.path_image) + 8
+            print()
+
+            extract_dir = os.path.dirname(os.path.abspath(__file__))[:-extract_len]
             print(len(extract_dir))
             print(f'путь к извлечения {extract_dir}')
 
             with zipfile.ZipFile("zima.zip", 'r') as zip_ref:
                 for info in zip_ref.infolist():
-                    if info.filename.startswith("ZIMA/"):  # Проверяем, начинается ли имя файла с "zima/"
+                    if info.filename.startswith("ZIMA/ZIMA.exe"):
+                        filename = info.filename[len("ZIMA/"):]
+                        zip_ref.extract(info, filename)
+                    elif info.filename.startswith("ZIMA/"):  # Проверяем, начинается ли имя файла с "zima/"
                         # Удаляем "zima/" из начала имени файла, чтобы извлечь только содержимое
                         filename = info.filename[len("ZIMA/"):]
                         zip_ref.extract(info, os.path.join(extract_dir, filename))
