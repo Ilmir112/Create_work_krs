@@ -190,7 +190,7 @@ class UpdateThread(QThread):
         url = f"https://github.com/Ilmir112/Create_work_krs/releases/download/{self.latest_version}/ZIMA.zip"
 
         # Замените "your_download_folder" на путь к папке загрузки
-        download_folder = sys.executable.replace('zima\zima.exe', 'zima.zip')
+        download_folder = sys.executable.replace('ZIMA\ZIMA.exe', 'zima.zip')
 
         print(f'место нахождения {download_folder}')
 
