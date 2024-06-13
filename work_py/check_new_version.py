@@ -3,6 +3,7 @@ import json
 import subprocess
 import sys
 import os
+import psutil
 import requests
 import zipfile
 import well_data
@@ -209,7 +210,7 @@ class UpdateThread(QThread):
                     progress = (downloaded / total_size) * 100
                     self.progress_signal.emit(int(progress))
 
-            extract_len = len('ZIMA\zima.exe')
+            extract_len = 'ZIMA\zima.exe'
             print(extract_len)
 
             extract_dir = download_folder.replace('zima.zip', '')
@@ -230,11 +231,7 @@ class UpdateThread(QThread):
             #             # print(f'фат2 {filename}')
 
             # После обновления, перезапустите приложение
-            self.restartApplication()
-
-            with zipfile.ZipFile(f"{download_folder}", 'r') as zip_ref:
-                zip_ref.extractall(extract_dir)
-
+            self.restartApplication(extract_dir, extract_dir, extract_len)
 
 
 
@@ -254,14 +251,22 @@ class UpdateThread(QThread):
         except requests.exceptions.RequestException as e:
             QMessageBox.warning(self, "Ошибка", f"Не удалось загрузить обновления: {e}")
 
-    def restartApplication(self):
+    def restartApplication(self, download_folder, extract_dir,  extract_len):
         ret = QMessageBox.information(self, 'Restart Application',
                                       'PyQT has been updated. Do you want to restart the application now?',
                                       QMessageBox.Yes | QMessageBox.No)
 
         if ret == QMessageBox.Yes:
-            python = sys.executable
-            os.execl(python, python, *sys.argv)
+            # Находим процесс Zima.exe
+            for proc in psutil.process_iter():
+                if proc.name() == "Zima.exe":
+                    proc.kill()
+
+            with zipfile.ZipFile(f"{download_folder}", 'r') as zip_ref:
+                zip_ref.extractall(extract_dir)
+
+            # Запускаем приложение Zima.exe
+            subprocess.Popen([f"{extract_dir + '/' + extract_len}"])
 
     def update_version(self, new_version):
         # Открываем JSON файл для чтения
