@@ -144,6 +144,7 @@ class UpdateThread(QThread):
     def check_version(self):
         try:
             url = "https://api.github.com/repos/Ilmir112/Create_work_krs/releases/latest"
+            print(f'сработало проверка версии {url}')
         except:
             url = "http://api.github.com/repos/Ilmir112/Create_work_krs/releases/latest"
 
