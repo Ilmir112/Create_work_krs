@@ -252,21 +252,15 @@ class UpdateThread(QThread):
             QMessageBox.warning(self, "Ошибка", f"Не удалось загрузить обновления: {e}")
 
     def restartApplication(self, download_folder, extract_dir,  extract_len):
-        ret = QMessageBox.information(self, 'Restart Application',
-                                      'PyQT has been updated. Do you want to restart the application now?',
-                                      QMessageBox.Yes | QMessageBox.No)
+        for proc in psutil.process_iter():
+            if proc.name() == "Zima.exe":
+                proc.kill()
 
-        if ret == QMessageBox.Yes:
-            # Находим процесс Zima.exe
-            for proc in psutil.process_iter():
-                if proc.name() == "Zima.exe":
-                    proc.kill()
+        with zipfile.ZipFile(f"{download_folder}", 'r') as zip_ref:
+            zip_ref.extractall(extract_dir)
 
-            with zipfile.ZipFile(f"{download_folder}", 'r') as zip_ref:
-                zip_ref.extractall(extract_dir)
-
-            # Запускаем приложение Zima.exe
-            subprocess.Popen([f"{extract_dir + '/' + extract_len}"])
+        # Запускаем приложение Zima.exe
+        subprocess.Popen([f"{extract_dir + '/' + extract_len}"])
 
     def update_version(self, new_version):
         # Открываем JSON файл для чтения
