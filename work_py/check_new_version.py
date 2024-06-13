@@ -211,7 +211,7 @@ class UpdateThread(QThread):
             extract_len = len('ZIMA\ZIMA\_internal\work_py')
             print(extract_len)
 
-            extract_dir = os.path.dirname(os.path.abspath(__file__))[:-extract_len]
+            extract_dir = os.path.dirname(os.path.abspath(__file__))
             print(extract_dir)
             print(f'путь к извлечения {extract_dir}')
 
