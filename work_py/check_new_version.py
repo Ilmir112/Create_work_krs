@@ -229,12 +229,12 @@ class UpdateThread(QThread):
             #             zip_ref.extract(info, os.path.join(extract_dir, filename))
             #             # print(f'фат2 {filename}')
 
+            # После обновления, перезапустите приложение
+            self.restartApplication()
 
             with zipfile.ZipFile(f"{download_folder}", 'r') as zip_ref:
                 zip_ref.extractall(extract_dir)
 
-            # Перезапуск приложения
-            os.system("python zima.exe")
 
 
 
@@ -253,6 +253,15 @@ class UpdateThread(QThread):
 
         except requests.exceptions.RequestException as e:
             QMessageBox.warning(self, "Ошибка", f"Не удалось загрузить обновления: {e}")
+
+    def restartApplication(self):
+        ret = QMessageBox.information(self, 'Restart Application',
+                                      'PyQT has been updated. Do you want to restart the application now?',
+                                      QMessageBox.Yes | QMessageBox.No)
+
+        if ret == QMessageBox.Yes:
+            python = sys.executable
+            os.execl(python, python, *sys.argv)
 
     def update_version(self, new_version):
         # Открываем JSON файл для чтения
