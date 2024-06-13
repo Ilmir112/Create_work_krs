@@ -190,7 +190,7 @@ class UpdateThread(QThread):
         url = f"https://github.com/Ilmir112/Create_work_krs/releases/download/{self.latest_version}/ZIMA.zip"
 
         # Замените "your_download_folder" на путь к папке загрузки
-        download_folder = sys.executable
+        download_folder = sys.executable.replace('zima\zima.exe', 'zima.zip')
 
         print(f'место нахождения {download_folder}')
 
@@ -202,17 +202,17 @@ class UpdateThread(QThread):
             total_size = int(response.headers.get('content-length', 0))
             downloaded = 0
 
-            with open("zima.zip", "wb") as file:  # Сохраняем архив в папку
+            with open(f"{download_folder}", "wb") as file:  # Сохраняем архив в папку
                 for data in response.iter_content(chunk_size=1024):
                     downloaded += len(data)
                     file.write(data)
                     progress = (downloaded / total_size) * 100
                     self.progress_signal.emit(int(progress))
 
-            extract_len = len('\ZIMA\zima.exe')
+            extract_len = len('ZIMA\zima.exe')
             print(extract_len)
 
-            extract_dir = download_folder[:-extract_len]
+            extract_dir = download_folder
             print(f'отпр {extract_dir}')
             print(f'путь к извлечения {extract_dir}')
 
