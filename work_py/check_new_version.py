@@ -208,11 +208,11 @@ class UpdateThread(QThread):
                     progress = (downloaded / total_size) * 100
                     self.progress_signal.emit(int(progress))
 
-            extract_len = len(well_data.path_image) + 8
-            print()
+            extract_len = len('ZIMA\ZIMA\_internal\work_py')
+            print(extract_len)
 
             extract_dir = os.path.dirname(os.path.abspath(__file__))[:-extract_len]
-            print(len(extract_dir))
+            print(extract_dir)
             print(f'путь к извлечения {extract_dir}')
 
             # with zipfile.ZipFile("zima.zip", 'r') as zip_ref:
@@ -233,7 +233,7 @@ class UpdateThread(QThread):
 
             # Перезапуск приложения
             os.system("python zima.exe")
-            quit()
+
 
 
 
