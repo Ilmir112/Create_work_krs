@@ -229,7 +229,7 @@ class UpdateThread(QThread):
             #             zip_ref.extract(info, os.path.join(extract_dir, filename))
             #             # print(f'фат2 {filename}')
 
-            with zipfile.ZipFile("zima.zip", 'r') as zip_ref:
+            with zipfile.ZipFile(f"{download_folder}", 'r') as zip_ref:
                 zip_ref.extractall(extract_dir)
 
             # Перезапуск приложения
