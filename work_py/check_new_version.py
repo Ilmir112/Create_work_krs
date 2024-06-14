@@ -50,6 +50,10 @@ class UpdateChecker(QWidget):
         self.progress_bar.setValue(0)
         self.progress_bar.setVisible(False)
 
+        self.progress_zip_bar = QProgressBar()
+        self.progress_zip_bar.setValue(0)
+        self.progress_zip_bar.setVisible(False)
+
         self.complete_prog = QPushButton("Продолжить")
         self.complete_prog.clicked.connect(self.def_complete_prog)
 
@@ -209,7 +213,7 @@ class UpdateThread(QThread):
             extract_dir = os.path.dirname(os.path.abspath(__file__))[:-extract_len]
             print(len(extract_dir))
             print(f'путь к извлечения {extract_dir}')
-
+            self.close_process("ZIMA.exe")
             # with zipfile.ZipFile("zima.zip", 'r') as zip_ref:
             #     for info in zip_ref.infolist():
             #         if "ZIMA.exe" not in info.filename:
@@ -224,7 +228,7 @@ class UpdateThread(QThread):
             #             # print(f'фат2 {filename}')
 
             with zipfile.ZipFile("zima.zip", 'r') as zip_ref:
-                zip_ref.extractall(f'{extract_dir}')
+                zip_ref.extractall(extract_dir)
 
             # source_folder = "D:/ZIMA/ZIMA"
             # destination_folder = "D:/ZIMA"
@@ -239,9 +243,20 @@ class UpdateThread(QThread):
             # Проверяем местонахождение текущей версии приложения
             existing_version_path = "ZIMA/ZIMA.exe"
 
-        except requests.exceptions.RequestException as e:
-            QMessageBox.warning(self, "Ошибка", f"Не удалось загрузить обновления: {e}")
+            self.finished_signal.emit(True)
+            self.update_version(self.latest_version)
 
+            well_data.pause = False
+
+        except requests.exceptions.RequestException as e:
+            mes = QMessageBox.warning(self, "Ошибка", f"Не удалось загрузить обновления: {e}")
+
+    def close_process(process_name):
+        try:
+            subprocess.run(['taskkill', '/f', '/im', process_name], check=True)
+            print(f"Процесс {process_name} успешно закрыт.")
+        except subprocess.CalledProcessError:
+            print(f"Не удалось закрыть процесс {process_name}.")
     @staticmethod
     def update_version(new_version):
         # Открываем JSON файл для чтения
