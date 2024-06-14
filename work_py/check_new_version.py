@@ -260,8 +260,13 @@ class UpdateThread(QThread):
             if proc.name() == "Zima.exe":
                 proc.kill()
 
-        with zipfile.ZipFile(f"{download_folder}", 'r') as zip_ref:
-            zip_ref.extractall(extract_dir)
+        with zipfile.ZipFile(f'{download_folder}', 'r') as zip_ref:
+            for info in zip_ref.infolist():
+                filename = info.filename
+                zip_ref.extract(info, os.path.join(extract_dir, filename))
+                print(f'фат2 {filename}')
+        # with zipfile.ZipFile(f"{download_folder}", 'r') as zip_ref:
+        #     zip_ref.extractall(extract_dir)
 
         # Запускаем приложение Zima.exe
         subprocess.Popen([f"{file_path}"])
