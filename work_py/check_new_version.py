@@ -263,17 +263,26 @@ class UpdateThread(QThread):
         if not os.path.exists(os.path.join(file_path, 'ZIMA')):
             os.makedirs(os.path.join(file_path, 'ZIMA'))
 
-        with zipfile.ZipFile(f'{download_folder}', 'r') as zip_ref:
-            for info in zip_ref.infolist():
-                filename = info.filename
-                print(f'фат2 {filename}')
-                zip_ref.extract(info, os.path.join(file_path, filename))
+        self.extract_zip(extract_dir, extract_dir)
+
+        # with zipfile.ZipFile(f'{download_folder}', 'r') as zip_ref:
+        #     for info in zip_ref.infolist():
+        #         filename = info.filename
+        #         print(f'фат2 {filename}')
+        #         print(os.path.join(file_path, filename))
+        #         zip_ref.extract(info, os.path.join(file_path, filename))
 
         # with zipfile.ZipFile(f"{download_folder}", 'r') as zip_ref:
         #     zip_ref.extractall(extract_dir)
 
         # Запускаем приложение Zima.exe
         subprocess.Popen([f"{file_path}"])
+    @staticmethod
+    def extract_zip(zip_file_, extract_folder):
+
+        zf = zipfile.ZipFile(zip_file_, 'r')
+        for _ in zf.namelist():
+            zf.extractall(extract_folder)
     @staticmethod
     def update_version(new_version):
         # Открываем JSON файл для чтения
