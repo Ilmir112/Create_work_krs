@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
+import shutil
 import subprocess
 import sys
 import os
@@ -191,10 +192,12 @@ class UpdateThread(QThread):
         url = f"https://github.com/Ilmir112/Create_work_krs/releases/download/{self.latest_version}/ZIMA.zip"
 
         # Замените "your_download_folder" на путь к папке загрузки
-        extract_len = 'ZIMA\ZIMA.exe'
-        download_folder = sys.executable.replace(extract_len, 'zima.zip')
 
-        print(f'место нахождения {download_folder}')
+        extract_dir = sys.executable
+        extract_len = extract_dir.replace("ZIMA\ZIMA.exe", '')
+
+        print(f'место нахождения {extract_dir}')
+        print(extract_len)
 
         # Загрузка архива
         try:
@@ -204,34 +207,36 @@ class UpdateThread(QThread):
             total_size = int(response.headers.get('content-length', 0))
             downloaded = 0
 
-            with open(f"{download_folder}", "wb") as file:  # Сохраняем архив в папку
+            with open(f"ZIMA.zip", "wb") as file:  # Сохраняем архив в папку
                 for data in response.iter_content(chunk_size=1024):
                     downloaded += len(data)
                     file.write(data)
                     progress = (downloaded / total_size) * 100
                     self.progress_signal.emit(int(progress))
 
-            print(extract_len)
+            # Распаковываем архив
+            with zipfile.ZipFile("ZIMA.zip", "r") as zip_ref:
+                zip_ref.extractall("ZIMA_update")
 
-            extract_dir = download_folder.replace('zima.zip', '')
+            source_folder = "D:/ZIMA_update/ZIMA"
+            destination_folder = "D:/ZIMA"
+
+            if os.path.exists(source_folder):
+                # Копируем папку и все ее содержимое
+                shutil.copytree(source_folder, destination_folder)
+                print("Папка успешно скопирована.")
+            else:
+                print("Исходная папка не найдена и не может быть скопирована.")
+
+            # Проверяем местонахождение текущей версии приложения
+            existing_version_path = "ZIMA/ZIMA.exe"
+            if os.path.exists(existing_version_path):
+                os.remove(existing_version_path)
 
             print(f'путь к извлечения {extract_dir}')
 
-            # with zipfile.ZipFile("zima.zip", 'r') as zip_ref:
-            #     for info in zip_ref.infolist():
-            #         if "ZIMA.exe" not in info.filename:
-            #         #     # Извлекаем файл в текущую директорию
-            #         #     # Удаляем путь к папке "ZIMA/" из имени файла
-            #         #     filename = info.filename[len("ZIMA/"):]
-            #         #     zip_ref.extract(info, os.path.join(extract_dir, filename))
-            #         # elif info.filename.startswith("ZIMA/"):  # Проверяем, начинается ли имя файла с "zima/"
-            #             # Удаляем "zima/" из начала имени файла, чтобы извлечь только содержимое
-            #             filename = info.filename[len("ZIMA/"):]
-            #             zip_ref.extract(info, os.path.join(extract_dir, filename))
-            #             # print(f'фат2 {filename}')
-
-            # После обновления, перезапустите приложение
-            self.restartApplication(download_folder, extract_dir, extract_len)
+            # # После обновления, перезапустите приложение
+            # self.restartApplication(download_folder, extract_dir, extract_len)
 
             # Открываем папку "tmp" в проводнике Windows
             subprocess.Popen(f'explorer "{extract_dir}"')
@@ -248,41 +253,6 @@ class UpdateThread(QThread):
         except requests.exceptions.RequestException as e:
             QMessageBox.warning(self, "Ошибка", f"Не удалось загрузить обновления: {e}")
 
-    def restartApplication(self, download_folder, extract_dir,  extract_len):
-        # Устанавливаем права доступа на чтение, запись и выполнение для текущего пользователя
-
-        file_path = os.path.join(extract_dir, extract_len).replace(extract_len, '')
-        print(f' участо {file_path}')
-        if os.path.isdir(file_path):
-            os.chmod(file_path, 0o777)
-        for proc in psutil.process_iter():
-            if proc.name() == "Zima.exe":
-                proc.kill()
-
-        # Создание папки, если она не существует
-        if not os.path.exists(os.path.join(file_path, 'ZIMA')):
-            os.makedirs(os.path.join(file_path, 'ZIMA'))
-
-        self.extract_zip(extract_dir, extract_dir)
-
-        # with zipfile.ZipFile(f'{download_folder}', 'r') as zip_ref:
-        #     for info in zip_ref.infolist():
-        #         filename = info.filename
-        #         print(f'фат2 {filename}')
-        #         print(os.path.join(file_path, filename))
-        #         zip_ref.extract(info, os.path.join(file_path, filename))
-
-        # with zipfile.ZipFile(f"{download_folder}", 'r') as zip_ref:
-        #     zip_ref.extractall(extract_dir)
-
-        # Запускаем приложение Zima.exe
-        subprocess.Popen([f"{file_path}"])
-    @staticmethod
-    def extract_zip(zip_file_, extract_folder):
-
-        zf = zipfile.ZipFile(zip_file_, 'r')
-        for _ in zf.namelist():
-            zf.extractall(extract_folder)
     @staticmethod
     def update_version(new_version):
         # Открываем JSON файл для чтения
