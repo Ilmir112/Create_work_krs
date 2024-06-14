@@ -211,7 +211,6 @@ class UpdateThread(QThread):
                     progress = (downloaded / total_size) * 100
                     self.progress_signal.emit(int(progress))
 
-
             print(extract_len)
 
             extract_dir = download_folder.replace('zima.zip', '')
@@ -252,7 +251,7 @@ class UpdateThread(QThread):
     def restartApplication(self, download_folder, extract_dir,  extract_len):
         # Устанавливаем права доступа на чтение, запись и выполнение для текущего пользователя
 
-        file_path = f'{extract_dir}{extract_len}'
+        file_path = os.path.join(extract_dir, extract_len)
         print(f' участо {file_path}')
 
         os.chmod(file_path, 0o777)
@@ -260,18 +259,23 @@ class UpdateThread(QThread):
             if proc.name() == "Zima.exe":
                 proc.kill()
 
+        # Создание папки, если она не существует
+        if not os.path.exists(os.path.join(extract_dir, 'ZIMA')):
+            os.makedirs(os.path.join(extract_dir, 'ZIMA'))
+
         with zipfile.ZipFile(f'{download_folder}', 'r') as zip_ref:
             for info in zip_ref.infolist():
                 filename = info.filename
-                zip_ref.extract(info, os.path.join(extract_dir, filename))
                 print(f'фат2 {filename}')
+                zip_ref.extract(info, os.path.join(extract_dir, filename))
+
         # with zipfile.ZipFile(f"{download_folder}", 'r') as zip_ref:
         #     zip_ref.extractall(extract_dir)
 
         # Запускаем приложение Zima.exe
         subprocess.Popen([f"{file_path}"])
-
-    def update_version(self, new_version):
+    @staticmethod
+    def update_version(new_version):
         # Открываем JSON файл для чтения
         with open(f'{well_data.path_image}users/version_app.json', "r") as file:
             data = json.load(file)
