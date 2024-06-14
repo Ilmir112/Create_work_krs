@@ -251,23 +251,23 @@ class UpdateThread(QThread):
     def restartApplication(self, download_folder, extract_dir,  extract_len):
         # Устанавливаем права доступа на чтение, запись и выполнение для текущего пользователя
 
-        file_path = os.path.join(extract_dir, extract_len)
+        file_path = os.path.join(extract_dir, extract_len).replace(extract_len, '')
         print(f' участо {file_path}')
-
-        os.chmod(file_path, 0o777)
+        if os.path.isdir(file_path):
+            os.chmod(file_path, 0o777)
         for proc in psutil.process_iter():
             if proc.name() == "Zima.exe":
                 proc.kill()
 
         # Создание папки, если она не существует
-        if not os.path.exists(os.path.join(extract_dir, 'ZIMA')):
-            os.makedirs(os.path.join(extract_dir, 'ZIMA'))
+        if not os.path.exists(os.path.join(file_path, 'ZIMA')):
+            os.makedirs(os.path.join(file_path, 'ZIMA'))
 
         with zipfile.ZipFile(f'{download_folder}', 'r') as zip_ref:
             for info in zip_ref.infolist():
                 filename = info.filename
                 print(f'фат2 {filename}')
-                zip_ref.extract(info, os.path.join(extract_dir, filename))
+                zip_ref.extract(info, os.path.join(file_path, filename))
 
         # with zipfile.ZipFile(f"{download_folder}", 'r') as zip_ref:
         #     zip_ref.extractall(extract_dir)
