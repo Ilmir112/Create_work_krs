@@ -224,10 +224,7 @@ class UpdateThread(QThread):
             #             # print(f'фат2 {filename}')
 
             with zipfile.ZipFile("zima.zip", 'r') as zip_ref:
-
-                for info in zip_ref.infolist():
-                    filename = info.filename
-                    zip_ref.extract(info, os.path.join(extract_dir, filename))
+                zip_ref.extractall(f'{extract_dir}')
 
             # source_folder = "D:/ZIMA/ZIMA"
             # destination_folder = "D:/ZIMA"
