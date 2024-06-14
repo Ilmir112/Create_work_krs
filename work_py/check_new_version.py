@@ -252,6 +252,12 @@ class UpdateThread(QThread):
             QMessageBox.warning(self, "Ошибка", f"Не удалось загрузить обновления: {e}")
 
     def restartApplication(self, download_folder, extract_dir,  extract_len):
+        # Устанавливаем права доступа на чтение, запись и выполнение для текущего пользователя
+
+        file_path = f'{extract_dir + "/" + extract_len}'
+        print(f' участо {file_path}')
+
+        os.chmod(file_path, 0o777)
         for proc in psutil.process_iter():
             if proc.name() == "Zima.exe":
                 proc.kill()
@@ -260,7 +266,7 @@ class UpdateThread(QThread):
             zip_ref.extractall(extract_dir)
 
         # Запускаем приложение Zima.exe
-        subprocess.Popen([f"{extract_dir + '/' + extract_len}"])
+        subprocess.Popen([f"{file_path}"])
 
     def update_version(self, new_version):
         # Открываем JSON файл для чтения
