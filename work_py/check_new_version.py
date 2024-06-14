@@ -191,7 +191,8 @@ class UpdateThread(QThread):
         url = f"https://github.com/Ilmir112/Create_work_krs/releases/download/{self.latest_version}/ZIMA.zip"
 
         # Замените "your_download_folder" на путь к папке загрузки
-        download_folder = sys.executable.replace('ZIMA\ZIMA.exe', 'zima.zip')
+        extract_len = 'ZIMA\ZIMA.exe'
+        download_folder = sys.executable.replace(extract_len, 'zima.zip')
 
         print(f'место нахождения {download_folder}')
 
@@ -210,11 +211,11 @@ class UpdateThread(QThread):
                     progress = (downloaded / total_size) * 100
                     self.progress_signal.emit(int(progress))
 
-            extract_len = 'ZIMA\zima.exe'
+
             print(extract_len)
 
             extract_dir = download_folder.replace('zima.zip', '')
-            print(f'отпр {extract_dir}')
+
             print(f'путь к извлечения {extract_dir}')
 
             # with zipfile.ZipFile("zima.zip", 'r') as zip_ref:
@@ -232,9 +233,6 @@ class UpdateThread(QThread):
 
             # После обновления, перезапустите приложение
             self.restartApplication(download_folder, extract_dir, extract_len)
-
-
-
 
             # Открываем папку "tmp" в проводнике Windows
             subprocess.Popen(f'explorer "{extract_dir}"')
@@ -254,7 +252,7 @@ class UpdateThread(QThread):
     def restartApplication(self, download_folder, extract_dir,  extract_len):
         # Устанавливаем права доступа на чтение, запись и выполнение для текущего пользователя
 
-        file_path = f'{extract_dir + "/" + extract_len}'
+        file_path = f'{extract_dir}{extract_len}'
         print(f' участо {file_path}')
 
         os.chmod(file_path, 0o777)
