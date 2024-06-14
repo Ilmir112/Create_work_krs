@@ -170,14 +170,6 @@ class UpdateThread(QThread):
         except:
             url = "http://api.github.com/repos/Ilmir112/Create_work_krs/releases/latest"
 
-        response = requests.get(url)
-
-        if response.status_code == 200:
-            remaining_requests = int(response.headers.get('X-RateLimit-Remaining'))
-            print(f"Осталось запросов: {remaining_requests}")
-        else:
-            print(f"Ошибка: {response.status_code}")
-
         response = requests.get(url, verify=False)
         response.raise_for_status()  # Проверка на ошибки
 
@@ -192,12 +184,9 @@ class UpdateThread(QThread):
         url = f"https://github.com/Ilmir112/Create_work_krs/releases/download/{self.latest_version}/ZIMA.zip"
 
         # Замените "your_download_folder" на путь к папке загрузки
+        download_folder = sys.executable
 
-        extract_dir = sys.executable
-        extract_len = extract_dir.replace("ZIMA\ZIMA.exe", '')
-
-        print(f'место нахождения {extract_dir}')
-        print(extract_len)
+        print(f'место нахождения {download_folder}')
 
         # Загрузка архива
         try:
@@ -207,18 +196,37 @@ class UpdateThread(QThread):
             total_size = int(response.headers.get('content-length', 0))
             downloaded = 0
 
-            with open(f"ZIMA.zip", "wb") as file:  # Сохраняем архив в папку
+            with open("zima.zip", "wb") as file:  # Сохраняем архив в папку
                 for data in response.iter_content(chunk_size=1024):
                     downloaded += len(data)
                     file.write(data)
                     progress = (downloaded / total_size) * 100
                     self.progress_signal.emit(int(progress))
 
-            # Распаковываем архив
-            with zipfile.ZipFile("ZIMA.zip", "r") as zip_ref:
-                zip_ref.extractall("ZIMA_update")
+            extract_len = len(well_data.path_image) + 8
+            print()
 
-            source_folder = "D:/ZIMA_update/ZIMA"
+            extract_dir = os.path.dirname(os.path.abspath(__file__))[:-extract_len]
+            print(len(extract_dir))
+            print(f'путь к извлечения {extract_dir}')
+
+            # with zipfile.ZipFile("zima.zip", 'r') as zip_ref:
+            #     for info in zip_ref.infolist():
+            #         if "ZIMA.exe" not in info.filename:
+            #         #     # Извлекаем файл в текущую директорию
+            #         #     # Удаляем путь к папке "ZIMA/" из имени файла
+            #         #     filename = info.filename[len("ZIMA/"):]
+            #         #     zip_ref.extract(info, os.path.join(extract_dir, filename))
+            #         # elif info.filename.startswith("ZIMA/"):  # Проверяем, начинается ли имя файла с "zima/"
+            #             # Удаляем "zima/" из начала имени файла, чтобы извлечь только содержимое
+            #             filename = info.filename[len("ZIMA/"):]
+            #             zip_ref.extract(info, os.path.join(extract_dir, filename))
+            #             # print(f'фат2 {filename}')
+
+            with zipfile.ZipFile("zima.zip", 'r') as zip_ref:
+                zip_ref.extractall(extract_dir)
+
+            source_folder = "D:/ZIMA/ZIMA"
             destination_folder = "D:/ZIMA"
 
             if os.path.exists(source_folder):
@@ -230,25 +238,6 @@ class UpdateThread(QThread):
 
             # Проверяем местонахождение текущей версии приложения
             existing_version_path = "ZIMA/ZIMA.exe"
-            if os.path.exists(existing_version_path):
-                os.remove(existing_version_path)
-
-            print(f'путь к извлечения {extract_dir}')
-
-            # # После обновления, перезапустите приложение
-            # self.restartApplication(download_folder, extract_dir, extract_len)
-
-            # Открываем папку "tmp" в проводнике Windows
-            subprocess.Popen(f'explorer "{extract_dir}"')
-
-            # os.remove("zima.zip")
-
-            # Обновление приложения (может потребоваться перезапуск)
-
-            self.finished_signal.emit(True)
-            self.update_version(self.latest_version)
-
-            well_data.pause = False
 
         except requests.exceptions.RequestException as e:
             QMessageBox.warning(self, "Ошибка", f"Не удалось загрузить обновления: {e}")
