@@ -203,8 +203,8 @@ class UpdateThread(QThread):
                     progress = (downloaded / total_size) * 100
                     self.progress_signal.emit(int(progress))
 
-            extract_len = len(well_data.path_image) + 8
-            print()
+            extract_len = len(well_data.path_image) + len('ZIMA.exe')
+            print(extract_len, well_data.path_image + 'ZIMA.exe')
 
             extract_dir = os.path.dirname(os.path.abspath(__file__))[:-extract_len]
             print(len(extract_dir))
@@ -224,24 +224,20 @@ class UpdateThread(QThread):
             #             # print(f'фат2 {filename}')
 
             with zipfile.ZipFile("zima.zip", 'r') as zip_ref:
-                print(zip_ref.infolist())
+
                 for info in zip_ref.infolist():
+                    filename = info.filename
+                    zip_ref.extract(info, os.path.join(extract_dir, filename))
 
-                    if "ZIMA.exe" not in info.filename and info.filename.startswith("ZIMA/"):  # Проверяем, начинается ли имя файла с "zima/":
-                        # Извлекаем файл в текущую директорию
-                        # Удаляем путь к папке "ZIMA/" из имени файла
-                        filename = info.filename[len("ZIMA/"):]
-                        zip_ref.extract(info, os.path.join(extract_dir, filename))
+            # source_folder = "D:/ZIMA/ZIMA"
+            # destination_folder = "D:/ZIMA"
 
-            source_folder = "D:/ZIMA/ZIMA"
-            destination_folder = "D:/ZIMA"
-
-            if os.path.exists(source_folder):
-                # Копируем папку и все ее содержимое
-                shutil.copytree(source_folder, destination_folder)
-                print("Папка успешно скопирована.")
-            else:
-                print("Исходная папка не найдена и не может быть скопирована.")
+            # if os.path.exists(source_folder):
+            #     # Копируем папку и все ее содержимое
+            #     shutil.copytree(source_folder, destination_folder)
+            #     print("Папка успешно скопирована.")
+            # else:
+            #     print("Исходная папка не найдена и не может быть скопирована.")
 
             # Проверяем местонахождение текущей версии приложения
             existing_version_path = "ZIMA/ZIMA.exe"
