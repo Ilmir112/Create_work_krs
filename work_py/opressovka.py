@@ -71,8 +71,8 @@ class TabPage_SO(QWidget):
         self.grid_layout.addWidget(self.pressureZUMPF_question_Label, 3, 4)
         self.grid_layout.addWidget(self.pressureZUMPF_question_QCombo, 4, 4)
 
-        self.grid_layout.addWidget(self.need_privyazka_Label, 3, 5)
-        self.grid_layout.addWidget(self.need_privyazka_QCombo, 4, 5)
+        self.grid_layout.addWidget(self.need_privyazka_Label, 3, 6)
+        self.grid_layout.addWidget(self.need_privyazka_QCombo, 4, 6)
 
     def update_paker(self, index):
         if index == 'Да':
@@ -85,8 +85,8 @@ class TabPage_SO(QWidget):
 
                     self.pakerDepthZumpf_edit.setText(f'{pakerDepthZumpf}')
 
-            self.grid_layout.addWidget(self.pakerDepthZumpf_Label, 3, 5)
-            self.grid_layout.addWidget(self.pakerDepthZumpf_edit, 4, 5)
+            self.grid_layout.addWidget(self.pakerDepthZumpf_Label, 3, 6)
+            self.grid_layout.addWidget(self.pakerDepthZumpf_edit, 4, 6)
         elif index == 'Нет':
             self.pakerDepthZumpf_Label.setParent(None)
             self.pakerDepthZumpf_edit.setParent(None)

@@ -243,10 +243,14 @@ class UpdateThread(QThread):
             # Проверяем местонахождение текущей версии приложения
             existing_version_path = "ZIMA/ZIMA.exe"
 
+
             self.finished_signal.emit(True)
             self.update_version(self.latest_version)
 
             well_data.pause = False
+
+            # Запускаем приложение Zima.exe
+            subprocess.Popen([f"{download_folder.replace('ZIMA.zip', 'ZIMA.exe')}"])
 
         except requests.exceptions.RequestException as e:
             mes = QMessageBox.warning(self, "Ошибка", f"Не удалось загрузить обновления: {e}")

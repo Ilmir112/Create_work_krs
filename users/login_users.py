@@ -14,7 +14,7 @@ class LoginWindow(QWidget):
         self.setWindowModality(Qt.WindowModal)
 
 
-        self.label_username = QLabel("Пользова_т_ель:", self)
+        self.label_username = QLabel("Пользователь:", self)
         self.username = QComboBox(self)
         users_list = list(map(lambda x: x[1], self.get_list_users()))
 
