@@ -251,6 +251,7 @@ class UpdateThread(QThread):
         except requests.exceptions.RequestException as e:
             mes = QMessageBox.warning(self, "Ошибка", f"Не удалось загрузить обновления: {e}")
 
+    @staticmethod
     def close_process(process_name):
         try:
             subprocess.run(['taskkill', '/f', '/im', process_name], check=True)
