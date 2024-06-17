@@ -46,7 +46,6 @@ class TabPage_SO_drill(QWidget):
 
             self.drill_diametr_line.setText(str(self.drillingBit_diam_select(well_data.current_bottom)))
 
-
         else:
             if well_data.column_additional_diametr._value > 127:
                 self.downhole_motor_line.setText('Д-106')
@@ -71,33 +70,39 @@ class TabPage_SO_drill(QWidget):
         self.bottomType_list = ['ЦМ', 'РПК', 'РПП', 'ВП', 'Гипсовых отложений', 'проходимости']
         self.drill_cm_combo.addItems(self.bottomType_list)
 
-        grid = QGridLayout(self)
-        grid.setColumnMinimumWidth(1, 150)
+        self.need_privyazka_Label = QLabel("Привязка оборудования", self)
+        self.need_privyazka_QCombo = QComboBox()
+        self.need_privyazka_QCombo.addItems(['Нет', 'Да'])
 
-        grid.addWidget(self.drill_select_label, 2, 0)
-        grid.addWidget(self.drill_select_combo, 3, 0)
+        self.grid = QGridLayout(self)
+        self.grid.setColumnMinimumWidth(1, 150)
 
-        grid.addWidget(self.drill_type_label, 2, 1)
-        grid.addWidget(self.drill_cm_combo, 3, 1)
+        self.grid.addWidget(self.drill_select_label, 2, 0)
+        self.grid.addWidget(self.drill_select_combo, 3, 0)
 
-        grid.addWidget(self.drill_diametr_label, 2, 2)
-        grid.addWidget(self.drill_diametr_line, 3, 2)
+        self.grid.addWidget(self.drill_type_label, 2, 1)
+        self.grid.addWidget(self.drill_cm_combo, 3, 1)
 
-        grid.addWidget(self.nkt_str_label, 2, 3)
-        grid.addWidget(self.nkt_str_combo, 3, 3)
+        self.grid.addWidget(self.drill_diametr_label, 2, 2)
+        self.grid.addWidget(self.drill_diametr_line, 3, 2)
 
-        grid.addWidget(self.downhole_motor_label, 2, 4)
-        grid.addWidget(self.downhole_motor_line, 3, 4)
+        self.grid.addWidget(self.nkt_str_label, 2, 3)
+        self.grid.addWidget(self.nkt_str_combo, 3, 3)
 
-        grid.addWidget(self.drill_label, 4, 1, 2, 2)
+        self.grid.addWidget(self.downhole_motor_label, 2, 4)
+        self.grid.addWidget(self.downhole_motor_line, 3, 4)
 
-        grid.addWidget(self.roof_drill_label, 7, 0)
-        grid.addWidget(self.sole_drill_label, 7, 1)
-        grid.addWidget(self.drill_True_label, 7, 2)
+        self.grid.addWidget(self.drill_label, 4, 1, 2, 2)
 
-        grid.addWidget(self.roof_drill_line, 8, 0)
-        grid.addWidget(self.sole_drill_line, 8, 1)
-        grid.addWidget(self.drill_type_combo, 8, 2, 2, 1)
+        self.grid.addWidget(self.roof_drill_label, 7, 0)
+        self.grid.addWidget(self.sole_drill_label, 7, 1)
+        self.grid.addWidget(self.drill_True_label, 7, 2)
+
+        self.grid.addWidget(self.roof_drill_line, 8, 0)
+        self.grid.addWidget(self.sole_drill_line, 8, 1)
+        self.grid.addWidget(self.need_privyazka_Label, 2, 6)
+        self.grid.addWidget(self.need_privyazka_QCombo, 3, 6)
+        self.grid.addWidget(self.drill_type_combo, 8, 2, 2, 1)
 
 
         self.drill_select_combo.currentTextChanged.connect(self.update_drill_edit)
@@ -286,6 +291,7 @@ class Drill_window(QMainWindow):
         self.downhole_motor = self.tabWidget.currentWidget().downhole_motor_line.text()
         self.drill_cm_combo = self.tabWidget.currentWidget().drill_cm_combo.currentText()
         self.drill_type_combo = self.tabWidget.currentWidget().drill_type_combo.currentText()
+        self.need_privyazka_QCombo = self.tabWidget.currentWidget().need_privyazka_QCombo.currentText()
 
         rows = self.tableWidget.rowCount()
         if rows == 0:
@@ -336,7 +342,9 @@ class Drill_window(QMainWindow):
         self.tableWidget.removeRow(row)
 
     def drilling_nkt(self, drill_tuple, drill_type_combo, drillingBit_diam, downhole_motor):
-        print(drill_tuple, drill_type_combo, drillingBit_diam)
+        from work_py.alone_oreration import privyazkaNKT
+
+
         currentBottom = well_data.current_bottom
 
         current_depth = drill_tuple[-1][0]
@@ -420,6 +428,17 @@ class Drill_window(QMainWindow):
              None, None, None, None, None, None, None,
              'мастер КРС', liftingNKT_norm(well_data.current_bottom, 1.3)]
         ]
+        if self.need_privyazka_QCombo == 'Да':
+
+            privyazkaNKT_list = privyazkaNKT(self)[0]
+
+            drilling_list_end.insert(-1, privyazkaNKT_list)
+            drilling_list_end.insert(-1, [f'Удостоверится в наличии необходимого забоя', None,
+                                          f'На привязанных НКТ удостоверится, что текущий забой находится на '
+                                          f'глубине {well_data.current_bottom}м',
+             None, None, None, None, None, None, None,
+             'Мастер КРС, УСРСиСТ', None])
+
 
         drilling_list.extend(drilling_list_end)
 

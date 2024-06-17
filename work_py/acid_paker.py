@@ -104,13 +104,13 @@ class CheckableComboBoxChild(QComboBox):
                 well_data.texts.append(self.model().item(i).text())
 
         text = ", ".join(well_data.texts)
-        # print(text)
+        print(text)
 
-        # Compute elided text (with "...")
-        metrics = QFontMetrics(self.lineEdit().font())
-        elidedText = metrics.elidedText(text, Qt.ElideRight, self.lineEdit().width())
+        # # Compute elided text (with "...")
+        # metrics = QFontMetrics(self.lineEdit().font())
+        # elidedText = metrics.elidedText(text, Qt.ElideRight, self.lineEdit().width())
 
-        self.lineEdit().setText(elidedText)
+        self.lineEdit().setText(text)
 
     def addItem(self, text, data=None, checked=False):
         print(f' пласта {text}')
