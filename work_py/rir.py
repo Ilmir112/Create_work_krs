@@ -1124,7 +1124,8 @@ class RirWindow(QMainWindow):
 
         rir_list = [[f'СПО {RirWindow.pero_select(self, well_data.current_bottom).replace("перо", "перо-110мм")} до '
                      f'глубины {round(well_data.current_bottom, 0)}м', None,
-                     f' Спустить  {RirWindow.pero_select(self, well_data.current_bottom).replace("перо", "перо-110мм")}  на НКТ{well_data.nkt_diam}мм до '
+                     f'Спустить  {RirWindow.pero_select(self, well_data.current_bottom).replace("перо", "перо-110мм")}  '
+                     f'на НКТ{well_data.nkt_diam}мм до '
                      f'глубины {round(well_data.current_bottom, 0)}м с замером, шаблонированием шаблоном {well_data.nkt_template}мм. '
                      f'(При СПО первых десяти НКТ на '
                      f'спайдере дополнительно устанавливать элеватор ЭХЛ)',

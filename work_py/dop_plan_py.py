@@ -78,6 +78,7 @@ class DopPlanWindow(QMainWindow):
             # print(current_bottom, fluid, work_earlier)
             mes = QMessageBox.critical(self, 'Забой', 'не все значения введены')
             return
+        print(well_data.bottomhole_drill)
         if current_bottom > well_data.bottomhole_drill._value:
             mes = QMessageBox.critical(self, 'Забой', 'Текущий забой больше пробуренного забоя')
             return
@@ -107,26 +108,37 @@ class DopPlanWindow(QMainWindow):
 
                 table_name = f'{well_data.well_number._value + well_data.well_area._value + work_plan}'
                 print(f'имя таблицы в {table_name}')
-
+                # print(cursor1.execute(f"SELECT EXISTS (SELECT FROM information_schema.tables").fetchall())
                 cursor1.execute(f"SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = '{table_name}')")
                 result_table = cursor1.fetchone()
                 print(result_table)
             elif well_data.work_plan == f'dop_plan':
-                table_name = f'"{well_data.well_number._value + well_data.well_area._value + well_data.work_plan}"'
-                for i in range(1, number_dp + 1, -1):
-                    try:
-                        work_plan = f'dop_plan{i}'
-                        table_name = json.dumps(well_data.well_number._value + well_data.well_area._value +
-                                                work_plan + str(number_dp),
-                            ensure_ascii=False)
-                        cursor1.execute(f"SELECT EXISTS (SELECT FROM information_schema.tables "
-                                        f"WHERE table_name = '{table_name}')")
-                        result_table = cursor1.fetchone()[0]
+                if number_dp == 0:
+                    work_plan = 'krs'
+                    table_name = json.dumps(well_data.well_number._value + well_data.well_area._value +
+                                                    work_plan, ensure_ascii = False)[1:-1]
+                    print(f'равно {table_name == "1404Югомашевскаяkrs", table_name, "1404Югомашевскаяkrs"}')
+                    # print(cursor1.execute(f"SELECT EXISTS (SELECT FROM information_schema.tables").fetchall())
+                    cursor1.execute(f"SELECT EXISTS (SELECT FROM information_schema.tables "
+                                    f"WHERE table_name = '{table_name}')")
+                    print(f'имя таблицы в {table_name}')
+                    result_table = cursor1.fetchone()
+                    print(result_table)
+                else:
+                    for i in range(1, number_dp + 1, -1):
+                        try:
+                            work_plan = f'dop_plan{i}'
+                            table_name = json.dumps(well_data.well_number._value + well_data.well_area._value +
+                                                    work_plan + str(number_dp),
+                                ensure_ascii=False)
+                            cursor1.execute(f"SELECT EXISTS (SELECT FROM information_schema.tables "
+                                            f"WHERE table_name = '{table_name}')")
+                            result_table = cursor1.fetchone()[0]
 
-                    except:
-                        pass
-                    if len(result_table) > 0:
-                        break
+                        except:
+                            pass
+                        if len(result_table) > 0:
+                            break
 
             if result_table[0]:
                 well_data.data_in_base = True
@@ -143,7 +155,7 @@ class DopPlanWindow(QMainWindow):
             else:
                 mes = QMessageBox.warning(self, 'Проверка наличия таблицы в базе данных',
                                           f"Таблицы '{table_name}' нет в базе данных.")
-            well_data.data_in_base = False
+
 
         except psycopg2.Error as e:
             # Выведите сообщение об ошибке
@@ -159,7 +171,8 @@ class DopPlanWindow(QMainWindow):
         well_data.paragraph_row, ok = QInputDialog.getInt(self, 'пункт плана работ',
                                                           'Введите пункт плана работ после которого идет изменение')
         while len(result) < well_data.paragraph_row:
-            mes = QMessageBox.warning(self, 'ОШИБКА', f'нет пункта {well_data.paragraph_row} в базе данных ')
+            mes = QMessageBox.warning(self, 'ОШИБКА', f'нет пункта {well_data.paragraph_row} в базе данных, '
+                                                      f'максимальное п. {len(result)}' )
             well_data.paragraph_row, ok = QInputDialog.getInt(self, 'пункт плана работ',
                                                               'Введите пункт плана работ после которого идет изменение')
 

@@ -103,7 +103,7 @@ class TabPage_SO_sand(QWidget):
         self.grid.addWidget(self.pressuar_new_edit, 10, 5)
 
         self.need_change_zgs_combo.currentTextChanged.connect(self.update_change_fluid)
-        self.need_change_zgs_combo.setCurrentIndex(0)
+        self.need_change_zgs_combo.setCurrentIndex(1)
 
         self.roof_sand_edit.textChanged.connect(self.update_roof)
         self.rir_question_QCombo.currentTextChanged.connect(self.update_rir)

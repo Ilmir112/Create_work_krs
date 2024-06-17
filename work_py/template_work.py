@@ -72,6 +72,10 @@ class TabPage_SO_with(QWidget):
         self.sole_skm_line.setClearButtonEnabled(True)
         self.sole_skm_line.setValidator(validator)
 
+        self.current_bottom_label = QLabel('Забой текущий')
+        self.current_bottom_edit = QLineEdit(self)
+        self.current_bottom_edit.setText(f'{well_data.current_bottom}')
+
         self.grid = QGridLayout(self)
         if well_data.column_additional is False or \
                 (well_data.column_additional and well_data.current_bottom < well_data.head_column_additional._value):
@@ -131,6 +135,9 @@ class TabPage_SO_with(QWidget):
             self.grid.addWidget(self.template_second_Edit, 5, 8)
             self.grid.addWidget(self.lenght_template_second_Label, 4, 9)
             self.grid.addWidget(self.lenght_template_second_Edit, 5, 9)
+
+        self.grid.addWidget(self.current_bottom_label, 8, 3, 1, 2)
+        self.grid.addWidget(self.current_bottom_edit, 9, 3, 1, 2)
 
         self.grid.addWidget(self.template_str_Label, 11, 1, 1, 8)
         self.grid.addWidget(self.template_str_Edit, 12, 1, 1, 8)
@@ -951,6 +958,10 @@ class TemplateKrs(QMainWindow):
         well_data.skm_interval.extend(skm_tuple)
         # print(f'интервалы СКМ {well_data.skm_interval}')
         skm_list = sorted(skm_tuple, key=lambda x: x[0])
+        current_bottom = self.tabWidget.currentWidget().current_bottom_edit.text()
+        if current_bottom != '':
+            well_data.current_bottom = round(float(current_bottom), 1)
+
         work_template_list = self.template_ek(template_str, template_diametr, skm_list)
 
         MyWindow.populate_row(self, self.ins_ind, work_template_list, self.table_widget)
@@ -1140,20 +1151,21 @@ class TemplateKrs(QMainWindow):
         gipsPero_list = [
             [f'Спустить {pero_list}  на тНКТ{well_data.nkt_diam}мм', None,
              f'Спустить {pero_list}  на тНКТ{well_data.nkt_diam}мм до глубины {well_data.current_bottom}м '
-             f'с замером, шаблонированием шаблоном {well_data.nkt_template}мм. Опрессовать НКТ на 150атм. Вымыть шар. \n'
+             f'с замером, шаблонированием шаблоном {well_data.nkt_template}мм. Опрессовать НКТ на 200атм. Вымыть шар. \n'
              f'С ГЛУБИНЫ 1100м СНИЗИТЬ СКОРОСТЬ  СПУСКА до 0.25м/с ВОЗМОЖНО ОТЛОЖЕНИЕ ГИПСА'
              f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
              None, None, None, None, None, None, None,
              'мастер КРС', 2.5],
             [
-                f'Промывка уд.весом {well_data.fluid_work_short} в объеме {round(TemplateKrs.well_volume(self) * 1.5, 1)}м3 ',
-                None,
-                f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {well_data.fluid_work} при расходе жидкости '
-                f'6-8 л/сек в присутствии представителя Заказчика в объеме {round(TemplateKrs.well_volume(self) * 1.5, 1)}м3. ПРИ ПРОМЫВКЕ НЕ '
-                f'ПРЕВЫШАТЬ ДАВЛЕНИЕ {well_data.max_admissible_pressure._value}АТМ, ДОПУСТИМАЯ ОСЕВАЯ '
-                f'НАГРУЗКА НА ИНСТРУМЕНТ: 0,5-1,0 ТН',
-                None, None, None, None, None, None, None,
-                'Мастер КРС, представитель ЦДНГ', 1.5],
+            f'Промывка уд.весом {well_data.fluid_work_short} в объеме {round(TemplateKrs.well_volume(self) * 1.5, 1)}м3 ',
+            None,
+            f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {well_data.fluid_work} при расходе жидкости '
+            f'6-8 л/сек в присутствии представителя Заказчика в объеме {round(TemplateKrs.well_volume(self) * 1.5, 1)}м3. '
+            f'ПРИ ПРОМЫВКЕ НЕ '
+            f'ПРЕВЫШАТЬ ДАВЛЕНИЕ {well_data.max_admissible_pressure._value}АТМ, ДОПУСТИМАЯ ОСЕВАЯ '
+            f'НАГРУЗКА НА ИНСТРУМЕНТ: 0,5-1,0 ТН',
+            None, None, None, None, None, None, None,
+            'Мастер КРС, представитель ЦДНГ', 1.5],
             [None, None,
              f'Приподнять до глубины {round(well_data.current_bottom - 20, 1)}м. Тех отстой 2ч. Определение текущего забоя, '
              f'при необходимости повторная промывка.',
@@ -1196,6 +1208,38 @@ class TemplateKrs(QMainWindow):
                     gipsPero_list.append(row)
 
         return gipsPero_list
+
+    @staticmethod
+    def calc_combo_nkt(type_nkt, current):
+        if well_data.column_additional is False or \
+            well_data.column_additional and well_data.current_bottom <= well_data.head_column_additional._value:
+            if type_nkt == 'СБТ':
+                nkt_string = ''
+            else:
+                nkt_string = f' + НКТ{well_data.nkt_diam} 20м + репер'
+        else:
+            if well_data.column_additional_diametr._value > 110:
+                if type_nkt == 'СБТ':
+                    nkt_type = {type_nkt: '2" 7/8'}
+                else:
+                    nkt_type = {type_nkt: '73'}
+            else:
+                if type_nkt == 'СБТ':
+                    nkt_type = {type_nkt: '2" 3/8'}
+                elif 110 < well_data.column_additional_diametr._value < 125:
+                    nkt_type = {type_nkt: '73 c обточными муфтами'}
+                else:
+                    nkt_type = {type_nkt: '60'}
+
+            if type_nkt == 'СБТ':
+                nkt_string = f'{type_nkt}{nkt_type[type_nkt]}  ' \
+                             f'{round(well_data.head_column_additional._value - current, 0)}м '
+            else:
+                nkt_string = f'{type_nkt}{nkt_type[type_nkt]} 20м + репер + {type_nkt}{nkt_type[type_nkt]} ' \
+                             f'{round(well_data.head_column_additional._value - current - 20, 0)}м '
+        return nkt_string
+
+
 
 
 if __name__ == "__main__":

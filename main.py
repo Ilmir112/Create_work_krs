@@ -8,6 +8,10 @@ import win32com.client
 import openpyxl
 import re
 import win32con
+import property_excel.property_excel_pvr
+import threading
+import time
+import win32gui
 
 from openpyxl.reader.excel import load_workbook
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu, QMenuBar, QAction, QTableWidget, \
@@ -18,8 +22,6 @@ from openpyxl.utils import get_column_letter
 from PyQt5.QtCore import Qt, pyqtSlot
 from openpyxl.workbook import Workbook
 from openpyxl.styles import Border, Side, Alignment, Font
-
-import property_excel.property_excel_pvr
 
 from log_files.log import logger, QPlainTextEditLogger
 from work_py.advanted_file import count_row_height, raid, remove_overlapping_intervals
@@ -34,13 +36,7 @@ from work_py.check_new_version import UpdateChecker
 from work_py.dop_plan_py import DopPlanWindow
 from work_py.drilling import Drill_window
 from users.login_users import LoginWindow
-import threading
-import time
-import win32gui
-
 from PyQt5.QtCore import Qt, QObject, pyqtSignal
-
-
 from work_py.leakage_column import LeakageWindow
 
 
@@ -730,7 +726,7 @@ class MyWindow(QMainWindow):
     def save_to_krs(self):
         from open_pz import CreatePZ
         from work_py.alone_oreration import is_number
-        from data_base.work_with_base import create_database_well_db
+        from data_base.work_with_base import create_database_well_db, insert_database_well_data
 
         if not self.table_widget is None:
             wb2 = Workbook()
@@ -811,15 +807,11 @@ class MyWindow(QMainWindow):
                         coordinate = f'{get_column_letter(6)}{row_ind + 1}'
                         self.insert_image(ws2, f'{well_data.path_image}imageFiles/schema_well/формула.png', coordinate, 330, 130)
                         break
-            # except:
-            #     mes = QMessageBox.warning(self, 'Ошибка', 'Нес могла вставить подписи')
-            # if self.work_plan != 'dop_plan':
-            #     self.create_short_plan(wb2, plan_short)
 
-            # print(f'9 - {ws2.max_row}')
             if self.work_plan != 'dop_plan':
                 self.insert_image(ws2, f'{well_data.path_image}imageFiles/Хасаншин.png', 'H1')
                 self.insert_image(ws2, f'{well_data.path_image}imageFiles/Шамигулов.png', 'H4')
+                insert_database_well_data(well_data.data_well_dict)
 
                 try:
                     cat_h2s_list = well_data.dict_category[well_data.plast_work_short[0]]['по сероводороду'].category
@@ -871,6 +863,7 @@ class MyWindow(QMainWindow):
                 ws5 = wb2["Схемы ПВО"]
                 wb2.move_sheet(ws5, offset=-1)
                 schema_list = self.check_pvo_schema(ws5, ins_ind + 2)
+
 
             if wb2:
                 wb2.close()
@@ -986,8 +979,10 @@ class MyWindow(QMainWindow):
             well_data.leakiness_interval = []
             well_data.dict_pump_h = {"do": 0, "posle": 0}
             well_data.ins_ind = 0
+            well_data.current_bottom2 = 5000
             well_data.len_razdel_1 = 0
             well_data.count_template = 0
+            well_data.data_well_is_True = False
             well_data.cat_P_1 = []
             well_data.countAcid = 0
             well_data.first_pressure = ProtectedIsDigit(0)
@@ -1005,6 +1000,7 @@ class MyWindow(QMainWindow):
             well_data.lift_key = 0
             well_data.max_admissible_pressure = ProtectedIsNonNone(0)
             well_data.region = ''
+            well_data.forPaker_list = False
             well_data.dict_nkt = {}
             well_data.dict_nkt_po = {}
             well_data.data_well_max = ProtectedIsNonNone(0)
@@ -1102,15 +1098,6 @@ class MyWindow(QMainWindow):
         emptyString_action = QAction("добавить пустую строку", self)
         del_menu.addAction(emptyString_action)
         emptyString_action.triggered.connect(self.emptyString)
-
-        # gnkt_menu = context_menu.addMenu("ГНКТ")
-        # gnkt_opz_action = QAction("ГНКТ ОПЗ", self)
-        # gnkt_menu.addAction(gnkt_opz_action)
-        # gnkt_opz_action.triggered.connect(self.gnkt_opz)
-        #
-        # gnkt_opz_action = QAction("ГНКТ Освоение после ГРП", self)
-        # gnkt_menu.addAction(gnkt_opz_action)
-        # gnkt_opz_action.triggered.connect(self.gnkt_after_grp)
 
         deleteString_action = QAction("Удалить строку", self)
         del_menu.addAction(deleteString_action)
@@ -1236,14 +1223,11 @@ class MyWindow(QMainWindow):
 
         rir_menu = action_menu.addMenu('РИР')
 
-        pakerIzvlek_menu = rir_menu.addMenu('извлекаемый пакер')
-        pakerIzvlek_action = QAction('Установка пакера')
-        pakerIzvlek_menu.addAction(pakerIzvlek_action)
+
+        pakerIzvlek_action = QAction('извлекаемый пакер')
+        rir_menu.addAction(pakerIzvlek_action)
         pakerIzvlek_action.triggered.connect(self.pakerIzvlek_action)
 
-        izvlek_action = QAction('извлечение')
-        pakerIzvlek_menu.addAction(izvlek_action)
-        izvlek_action.triggered.connect(self.izvlek_action)
 
         rir_action = QAction('РИР')
         rir_menu.addAction(rir_action)
@@ -1451,15 +1435,19 @@ class MyWindow(QMainWindow):
             self.raid_window.close()  # Close window.
             self.raid_window = None
 
-    def izvlek_action(self):
-        from work_py.rir import RirWindow
-        izvlech_paker_work_list = RirWindow.izvlech_paker(self)
-        self.populate_row(self.ins_ind, izvlech_paker_work_list, self.table_widget)
 
     def pakerIzvlek_action(self):
-        from work_py.rir import RirWindow
-        rir_izvelPaker_work_list = RirWindow.rir_izvelPaker(self)
-        self.populate_row(self.ins_ind, rir_izvelPaker_work_list, self.table_widget)
+        from work_py.izv_paker import PakerIzvlek
+        if self.raid_window is None:
+            self.raid_window = PakerIzvlek(well_data.ins_ind, self.table_widget)
+            self.raid_window.setGeometry(200, 400, 300, 400)
+            self.raid_window.show()
+            self.pause_app()
+            well_data.pause = True
+            self.raid_window = None
+        else:
+            self.raid_window.close()  # Close window.
+            self.raid_window = None
 
     def read_pz(self, fname):
         self.wb = load_workbook(fname, data_only=True)
@@ -2318,6 +2306,7 @@ class MyWindow(QMainWindow):
                     return False
 
 
+
 if __name__ == "__main__":
     # app3 = QApplication(sys.argv)
 
@@ -2325,5 +2314,8 @@ if __name__ == "__main__":
     window = MyWindow()
     window.show()
     app2 = UpdateChecker()
-    app2.show()
+    app2.check_version()
+    if app2.window_close == True:
+        print(f'локом {UpdateChecker.window_close}')
+        app2.show()
     sys.exit(app.exec_())

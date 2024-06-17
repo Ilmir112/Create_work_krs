@@ -459,6 +459,109 @@ class Classifier_well(QMainWindow):
             if conn:
                 conn.close()
 
+def insert_database_well_data(data_well_dict):
+    # print(row, well_data.count_row_well)
+    try:
+
+        conn = psycopg2.connect(**well_data.postgres_params_data_well)
+        cursor = conn.cursor()
+
+        data_well = json.dumps(data_well_dict, ensure_ascii=False)
+
+
+        # Подготовленные данные для вставки (пример)
+        data_values = (str(well_data.well_number._value), well_data.well_area._value, data_well, datetime.now().date())
+
+        # Подготовленный запрос для вставки данных с параметрами
+        query = f"INSERT INTO wells VALUES (%s, %s, %s, %s)"
+
+        # Выполнение запроса с использованием параметров
+        cursor.execute(query, data_values)
+
+
+        # Сохранить изменения и закрыть соединение
+        conn.commit()
+        # Закройте курсор и соединение
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+        mes = QMessageBox.information(None, 'база данных', 'Скважина добавлена в базу данных well_data')
+
+    except psycopg2.Error as e:
+        # Выведите сообщение об ошибке
+        mes = QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных, Скважина не добавлена в базу')
+
+
+def check_in_database_well_data(number_well, area_well):
+    # print(row, well_data.count_row_well)
+    try:
+        conn = psycopg2.connect(**well_data.postgres_params_data_well)
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT data_well FROM wells WHERE well_number = %s AND area_well = %s",
+                       (str(number_well._value), area_well._value))
+        data_well = cursor.fetchone()
+        return data_well
+
+
+    except psycopg2.Error as e:
+        # Выведите сообщение об ошибке
+        mes = QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных, Скважина не добавлена в базу')
+
+def insert_data_well_dop_plan(data_well):
+    from well_data import ProtectedIsDigit
+
+    well_data_dict = json.loads(data_well)
+    well_data.column_direction_diametr = ProtectedIsDigit(well_data_dict["направление"]["диаметр"])
+    well_data.column_direction_wall_thickness = ProtectedIsDigit(well_data_dict["направление"]["толщина стенки"])
+    well_data.column_direction_lenght = ProtectedIsDigit(well_data_dict["направление"]["башмак"])
+    well_data.level_cement_direction = ProtectedIsDigit(well_data_dict["направление"]["цемент"])
+    well_data.column_conductor_diametr = ProtectedIsDigit(well_data_dict["кондуктор"]["диаметр"])
+    well_data.column_conductor_wall_thicknes = ProtectedIsDigit(well_data_dict["кондуктор"]["толщина стенки"])
+    well_data.column_conductor_lenght = ProtectedIsDigit(well_data_dict["кондуктор"]["башмак"])
+    well_data.level_cement_conductor = ProtectedIsDigit(well_data_dict["кондуктор"]["цемент"])
+    well_data.column_diametr = ProtectedIsDigit(well_data_dict["ЭК"]["диаметр"])
+    well_data.column_wall_thickness = ProtectedIsDigit(well_data_dict["ЭК"]["толщина стенки"])
+    well_data.shoe_column = ProtectedIsDigit(well_data_dict["ЭК"]["башмак"])
+    well_data.column_additional = well_data_dict["допколонна"]["наличие"]
+    well_data.column_additional_diametr = ProtectedIsDigit(well_data_dict["допколонна"]["диаметр"])
+    well_data.column_additional_wall_thicknes = ProtectedIsDigit(well_data_dict["допколонна"]["толщина стенки"])
+    well_data.shoe_column_additional = ProtectedIsDigit(well_data_dict["допколонна"]["башмак"])
+    well_data.head_column_additional = ProtectedIsDigit(well_data_dict["допколонна"]["голова"])
+    well_data.curator = well_data_dict["куратор"]
+    well_data.dict_pump_SHGN = well_data_dict["оборудование"]["ШГН"]["тип"]
+    well_data.dict_pump_SHGN_h = well_data_dict["оборудование"]["ШГН"]["глубина "]
+    well_data.dict_pump_ECN = well_data_dict["оборудование"]["ЭЦН"]["тип"]
+    well_data.dict_pump_ECN_h = well_data_dict["оборудование"]["ЭЦН"]["глубина "]
+    well_data.paker_do = well_data_dict["оборудование"]["пакер"]["тип"]
+    well_data.depth_fond_paker_do = well_data_dict["оборудование"]["пакер"]["глубина "]
+    well_data.paker2_do = well_data_dict["оборудование"]["пакер2"]["тип"]
+    well_data.depth_fond_paker2_do = well_data_dict["оборудование"]["пакер2"]["глубина "]
+    well_data.static_level = ProtectedIsDigit(well_data_dict["статика"])
+    well_data.dinamic_level = ProtectedIsDigit(well_data_dict["динамика"])
+    well_data.dict_nkt_po = well_data_dict["НКТ"]
+    well_data.dict_sucker_rod_po = well_data_dict["штанги"]
+    well_data.Qoil = well_data_dict['ожидаемые']['нефть']
+    well_data.Qwater = well_data_dict['ожидаемые']['вода']
+    well_data.proc_water = well_data_dict['ожидаемые']['обводненность']
+    well_data.expected_P = well_data_dict['ожидаемые']['давление']
+    well_data.expected_Q = well_data_dict['ожидаемые']['приемистость']
+
+    well_data.bottomhole_drill = ProtectedIsDigit(well_data_dict['данные']['пробуренный забой'])
+
+    well_data.bottomhole_artificial = ProtectedIsDigit(well_data_dict['данные']['искусственный забой'])
+
+    well_data.max_angle = ProtectedIsDigit(well_data_dict['данные']['максимальный угол'])
+    well_data.max_angle_H = ProtectedIsDigit(well_data_dict['данные']['глубина'])
+    well_data.max_expected_pressure = ProtectedIsDigit(well_data_dict['данные']['максимальное ожидаемое давление'])
+    well_data.max_admissible_pressure = ProtectedIsDigit(well_data_dict['данные']['максимальное допустимое давление'])
+
+
+
+    mes = QMessageBox.information(None, 'Данные с базы', "Данные вставлены из базы данных")
+
 
 
 def read_database_gnkt(contractor, gnkt_number):
@@ -491,7 +594,7 @@ def create_database_well_db(work_plan, number_dp):
         conn = psycopg2.connect(**well_data.postgres_conn_work_well)
         cursor = conn.cursor()
         if number_dp == 0:
-            number_dp =''
+            number_dp = ''
 
         # Создаем таблицу для хранения данных
         number = json.dumps(str(well_data.well_number._value) + well_data.well_area._value + work_plan + str(number_dp),

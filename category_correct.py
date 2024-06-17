@@ -145,9 +145,7 @@ class TabPage_SO(QWidget):
           # print(Category_h2s_edit.text(), h2s_mg_edit.text(), h2s_pr_edit.text())
 
 
-
-
-            self.grid.addWidget(plast_index, 4, 1 + n)
+            self.grid.addWidget(plast_index, 4, 1 + n, 1, 2)
             self.grid.addWidget(category_pressuar_line_edit, 5, 1 + n)
             self.grid.addWidget(category_h2s_edit, 6, 1 + n)
             self.grid.addWidget(category_h2s2_edit, 7, 1 + n)

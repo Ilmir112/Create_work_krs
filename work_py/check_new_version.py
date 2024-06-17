@@ -27,6 +27,8 @@ class ModalWindow(QWidget):
         self.setWindowTitle("Модальное окно")
         label = QLabel("Это модальное окно!", self)
         label.move(50, 50)
+
+
 class UpdateChecker(QWidget):
     def __init__(self):
         super().__init__()
@@ -35,7 +37,6 @@ class UpdateChecker(QWidget):
         self.setWindowTitle("Проверка обновлений")
 
         # Установка флага `Qt.WindowModal`
-
 
         # Лейбл для отображения версии
         self.version_label = QLabel("Проверка версии...")
@@ -113,17 +114,11 @@ class UpdateChecker(QWidget):
     def check_version(self):
 
         try:
-
             url = "https://api.github.com/repos/Ilmir112/Create_work_krs/releases/latest"
-            # http = urllib3.PoolManager(
-            #     cert_reqs="CERT_REQUIRED",
-            #     ca_certs=certifi.where())
-
         except:
             url = "http://api.github.com/repos/Ilmir112/Create_work_krs/releases/latest"
 
         try:
-
             response = requests.get(url, verify=True)
             if response.status_code == 200:
                 remaining_requests = int(response.headers.get('X-RateLimit-Remaining'))
@@ -140,18 +135,26 @@ class UpdateChecker(QWidget):
             UpdateChecker.close(self)
             # Получение текущей версии из файла
             self.current_version = self.get_current_version()
+            UpdateChecker.window_close = False
 
             if self.current_version == self.latest_version:
                 self.version_label.setText(f"Текущая версия: {self.current_version}")
+                self.close()
                 self.update_button.setEnabled(False)
+
+
             else:
                 self.version_label.setText(f"Доступна новая версия: {self.latest_version}")
                 self.update_button.setEnabled(True)
+                UpdateChecker.window_close = True
+
 
         except requests.exceptions.RequestException as e:
 
             QMessageBox.warning(self, "Ошибка", f"Не удалось проверить обновления: {e}")
 
+    def on_close(self):
+        UpdateChecker.close()
     def get_current_version(self):
         with open(f'{well_data.path_image}users/version_app.json', 'r') as file:
             data = json.load(file)
@@ -181,7 +184,6 @@ class UpdateThread(QThread):
         self.latest_version = response.json()["tag_name"]
         return self.latest_version
 
-
     def run(self):
 
         # на URL архива для загрузки
@@ -189,8 +191,6 @@ class UpdateThread(QThread):
 
         # Замените "your_download_folder" на путь к папке загрузки
         download_folder = sys.executable
-
-        print(f'место нахождения {download_folder}')
 
         # Загрузка архива
         try:
@@ -211,8 +211,8 @@ class UpdateThread(QThread):
             print(extract_len, well_data.path_image + 'ZIMA.exe')
 
             extract_dir = os.path.dirname(os.path.abspath(__file__))[:-extract_len]
-            print(len(extract_dir))
-            print(f'путь к извлечения {extract_dir}')
+            mes = QMessageBox.information(self, 'Обновление', 'Обновление скачано, необходимо разархивировать архив и '
+                                                              'перезапустить приложение')
             self.close_process("ZIMA.exe")
             # with zipfile.ZipFile("zima.zip", 'r') as zip_ref:
             #     for info in zip_ref.infolist():
@@ -243,7 +243,6 @@ class UpdateThread(QThread):
             # Проверяем местонахождение текущей версии приложения
             existing_version_path = "ZIMA/ZIMA.exe"
 
-
             self.finished_signal.emit(True)
             self.update_version(self.latest_version)
 
@@ -262,6 +261,7 @@ class UpdateThread(QThread):
             print(f"Процесс {process_name} успешно закрыт.")
         except subprocess.CalledProcessError:
             print(f"Не удалось закрыть процесс {process_name}.")
+
     @staticmethod
     def update_version(new_version):
         # Открываем JSON файл для чтения
@@ -273,9 +273,11 @@ class UpdateThread(QThread):
             json.dump(data, file, indent=4)
 
 
-
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = UpdateChecker()
-    window.show()
+    if window.window_close == True:
+        window.show()
+    # Подключение сигнала aboutToQuit к функции on_close
+    app.aboutToQuit.connect(window.on_close())
     sys.exit(app.exec_())

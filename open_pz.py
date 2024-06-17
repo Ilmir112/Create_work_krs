@@ -27,37 +27,47 @@ class CreatePZ(QMainWindow):
         from category_correct import CategoryWindow
         from main import MyWindow
         from find import WellNkt, Well_perforation, WellCondition, WellHistory_data, Well_data, Well_Category, \
-            WellFond_data, WellSucker_rod, Well_expected_pick_up
+            WellFond_data, WellSucker_rod, Well_expected_pick_up, WellData
+        from data_base.work_with_base import check_in_database_well_data, insert_data_well_dop_plan
 
         well_data.work_plan = work_plan
 
-        well_data.dict_category = CategoryWindow.dict_category
 
+        well_data.dict_category = CategoryWindow.dict_category
         # Запуск основного класса и всех дочерних классов в одной строке
         well_pz = FindIndexPZ(ws)
-        # well_pz.read_pz(ws)
 
         well_data.region = region(well_data.cdng._value)
-        WellNkt.read_well(self, ws, well_data.pipes_ind._value, well_data.condition_of_wells._value)
-        if well_data.work_plan not in ['application_pvr', 'application_gis']:
-            WellSucker_rod.read_well(self, ws, well_data.sucker_rod_ind._value, well_data.pipes_ind._value)
-            WellFond_data.read_well(self, ws, well_data.data_fond_min._value, well_data.condition_of_wells._value)
-        WellHistory_data.read_well(self, ws, well_data.data_pvr_max._value, well_data.data_fond_min._value)
-        WellCondition.read_well(self, ws, well_data.condition_of_wells._value, well_data.data_well_max._value)
 
-        Well_expected_pick_up.read_well(self, ws, well_data.data_x_min._value, well_data.data_x_max._value)
-        Well_data.read_well(self, ws, well_data.cat_well_max._value, well_data.data_pvr_min._value)
-
+        WellData.read_well(self, ws, well_data.cat_well_max._value, well_data.data_pvr_min._value)
         well_data.region = region(well_data.cdng._value)
+
         if work_plan == 'dop_plan':
             number_list = list(map(str, range(1, 50)))
 
             well_data.number_dp, ok = QInputDialog.getItem(self, 'Номер дополнительного плана работ',
                                                            'Введите номер дополнительного плана работ',
                                                            number_list, 0, False)
+            data_well = check_in_database_well_data(well_data.well_number, well_data.well_area)[0]
+            if data_well:
+                insert_data_well_dop_plan(data_well)
+                DopPlanWindow.extraction_data(self)
+                well_data.data_well_is_True = True
+            else:
+                well_data.data_well_is_True = False
+        if well_data.data_well_is_True is False:
+            WellNkt.read_well(self, ws, well_data.pipes_ind._value, well_data.condition_of_wells._value)
+            if well_data.work_plan not in ['application_pvr', 'application_gis']:
+                WellSucker_rod.read_well(self, ws, well_data.sucker_rod_ind._value, well_data.pipes_ind._value)
+                WellFond_data.read_well(self, ws, well_data.data_fond_min._value, well_data.condition_of_wells._value)
+            WellHistory_data.read_well(self, ws, well_data.data_pvr_max._value, well_data.data_fond_min._value)
+            WellCondition.read_well(self, ws, well_data.condition_of_wells._value, well_data.data_well_max._value)
 
-        Well_perforation.read_well(self, ws, well_data.data_pvr_min._value, well_data.data_pvr_max._value + 1)
-        Well_Category.read_well(self, ws, well_data.cat_well_min._value, well_data.data_well_min._value)
+            Well_expected_pick_up.read_well(self, ws, well_data.data_x_min._value, well_data.data_x_max._value)
+            Well_data.read_well(self, ws, well_data.cat_well_max._value, well_data.data_pvr_min._value)
+
+            Well_perforation.read_well(self, ws, well_data.data_pvr_min._value, well_data.data_pvr_max._value + 1)
+            Well_Category.read_well(self, ws, well_data.cat_well_min._value, well_data.data_well_min._value)
 
         if work_plan == 'plan_change':
             DopPlanWindow.extraction_data(self)
@@ -74,7 +84,7 @@ class CreatePZ(QMainWindow):
                         ws.cell(row=row_ind + 1, column=2).value = f'ДОПОЛНИТЕЛЬНЫЙ ПЛАН РАБОТ № {well_data.number_dp}'
                         print(f'номер доп плана {well_data.number_dp}')
 
-                    if 'План-заказ' in row:
+                    elif 'План-заказ' in row:
                         # print(row)
 
                         ws.cell(row=row_ind + 1, column=2).value = 'ПЛАН РАБОТ'

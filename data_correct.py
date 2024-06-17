@@ -1,7 +1,6 @@
 import well_data
 import re
 
-
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.Qt import *
 from PyQt5.QtGui import QRegExpValidator, QColor, QPalette
@@ -13,12 +12,10 @@ class TabPage_SO(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-
         self.labels_nkt = {}
         self.labels_nkt_po = {}
         self.labels_sucker = {}
         self.labels_sucker_po = {}
-
 
         self.column_direction_diametr_Label = QLabel("диаметр направление", self)
         self.column_direction_diametr_edit = FloatLineEdit(self)
@@ -30,7 +27,8 @@ class TabPage_SO(QWidget):
         self.column_direction_wall_thickness_Label = QLabel("Толщина стенки направление", self)
         self.column_direction_wall_thickness_edit = FloatLineEdit(self)
         if well_data.column_direction_True:
-            self.column_direction_wall_thickness_edit.setText(f'{str(well_data.column_direction_wall_thickness._value).strip()}')
+            self.column_direction_wall_thickness_edit.setText(
+                f'{str(well_data.column_direction_wall_thickness._value).strip()}')
         else:
             self.column_direction_wall_thickness_edit.setText(f'отсут')
         self.column_direction_lenght_Label = QLabel("башмак направления", self)
@@ -53,7 +51,8 @@ class TabPage_SO(QWidget):
 
         self.column_conductor_wall_thickness_Label = QLabel("Толщина стенки ", self)
         self.column_conductor_wall_thickness_edit = FloatLineEdit(self)
-        self.column_conductor_wall_thickness_edit.setText(f'{str(well_data.column_conductor_wall_thickness._value).strip()}')
+        self.column_conductor_wall_thickness_edit.setText(
+            f'{str(well_data.column_conductor_wall_thickness._value).strip()}')
 
         self.column_conductor_lenght_Label = QLabel("башмак кондуктора", self)
         self.column_conductor_lenght_edit = FloatLineEdit(self)
@@ -95,7 +94,8 @@ class TabPage_SO(QWidget):
 
         self.column_add_wall_thicknessLabel = QLabel("Толщина стенки доп.колонны", self)
         self.column_add_wall_thicknessEditType2 = FloatLineEdit(self)
-        self.column_add_wall_thicknessEditType2.setText(F'{self.ifNone(well_data.column_additional_wall_thickness._value)}')
+        self.column_add_wall_thicknessEditType2.setText(
+            F'{self.ifNone(well_data.column_additional_wall_thickness._value)}')
         # self.column_add_wall_thicknessEditType2.setClearButtonEnabled(True)
 
         self.head_column_addLabel = QLabel("Голова доп колонны", self)
@@ -349,10 +349,6 @@ class TabPage_SO(QWidget):
         self.grid.addWidget(self.sucker_rod_label, 35, 1)
         self.grid.addWidget(self.sucker_rod_po_label, 35, 5)
 
-
-
-
-
         # добавление строк с НКТ спущенных
         if len(self.dict_nkt) != 0:
             n = 1
@@ -531,15 +527,16 @@ class TabPage_SO(QWidget):
             self.grid.addWidget(self.proc_water_Label, 25, 3)
             self.grid.addWidget(self.proc_water_edit, 26, 3)
 
-        curator_list = ['ГРР', 'ОР', 'ГТМ','ГО', 'ВНС']
+        curator_list = ['ГРР', 'ОР', 'ГТМ', 'ГО', 'ВНС']
         self.curator_Combo.addItems(curator_list)
         # print(self.pump_SHGN_posle_editType.text() != 'отсут', self.pump_ECN_posle_editType.text() != 'отсут')
 
         curator = 'ОР' if (self.pump_SHGN_posle_editType.text() == 'отсут' \
-                          and self.pump_ECN_posle_editType.text() == 'отсут') else 'ГТМ'
+                           and self.pump_ECN_posle_editType.text() == 'отсут') else 'ГТМ'
         self.curator_Combo.currentTextChanged.connect(self.update_curator)
         # print(f'куратор индекс {curator, curator_list.index(curator)}')
         self.curator_Combo.setCurrentIndex(curator_list.index(curator))
+
     def update_curator(self):
 
         # Очистка и удаление существующих виджетов, если они уже были добавлены ранее
@@ -774,8 +771,7 @@ class DataWindow(QMainWindow):
         else:
             if self.tabWidget.currentWidget().labels_nkt_po[1][1].text():
                 well_data.dict_nkt[self.tabWidget.currentWidget().labels_nkt_po[1][0].text()] = self.if_None(
-                    int(float( self.tabWidget.currentWidget().labels_nkt_po[1][1].text())))
-
+                    int(float(self.tabWidget.currentWidget().labels_nkt_po[1][1].text())))
 
         if self.dict_sucker_rod.items():
             for key in range(1, len(self.dict_sucker_rod.items())):
@@ -796,31 +792,31 @@ class DataWindow(QMainWindow):
             close_file = False
 
         elif any([self.ifNum(data_well) is False for data_well in
-                     [column_additional_diametr, column_additional_wall_thickness,
-                      shoe_column_additional, head_column_additional]]):
+                  [column_additional_diametr, column_additional_wall_thickness,
+                   shoe_column_additional, head_column_additional]]) and well_data.column_additional is True:
             msg = QMessageBox.information(self, 'Внимание', 'Не все поля в доп колонне соответствуют значениям')
             close_file = False
         elif self.ifNum(bottomhole_artificial) is False \
-           or self.ifNum(bottomhole_drill) is False \
-           or self.ifNum(current_bottom) is False \
-           or self.ifNum(max_angle_H) is False \
-            or self.ifNum(max_angle) is False \
-            or self.ifNum(max_admissible_pressure) is False \
-           or self.ifNum(max_expected_pressure) is False:
+                or self.ifNum(bottomhole_drill) is False \
+                or self.ifNum(current_bottom) is False \
+                or self.ifNum(max_angle_H) is False \
+                or self.ifNum(max_angle) is False \
+                or self.ifNum(max_admissible_pressure) is False \
+                or self.ifNum(max_expected_pressure) is False:
             msg = QMessageBox.information(self, 'Внимание', 'Не все поля в забое соответствуют значениям')
             close_file = False
         elif self.ifNum(static_level) is False \
-           or self.ifNum(dinamic_level) is False:
+                or self.ifNum(dinamic_level) is False:
             msg = QMessageBox.information(self, 'Внимание', 'Не все поля в уровнях соответствуют значениям')
             close_file = False
         elif self.ifNum(dict_pump_ECN_h_do) is False \
-           or self.ifNum(dict_pump_ECN_h_posle) is False \
-           or self.ifNum(dict_pump_SHGN_h_do) is False \
-           or self.ifNum(dict_pump_SHGN_h_posle) is False \
-           or self.ifNum(depth_fond_paker_do) is False \
-           or self.ifNum(depth_fond_paker_posle) is False \
-           or self.ifNum(depth_fond_paker2_do) is False \
-           or self.ifNum(depth_fond_paker2_posle) is False:
+                or self.ifNum(dict_pump_ECN_h_posle) is False \
+                or self.ifNum(dict_pump_SHGN_h_do) is False \
+                or self.ifNum(dict_pump_SHGN_h_posle) is False \
+                or self.ifNum(depth_fond_paker_do) is False \
+                or self.ifNum(depth_fond_paker_posle) is False \
+                or self.ifNum(depth_fond_paker2_do) is False \
+                or self.ifNum(depth_fond_paker2_posle) is False:
             msg = QMessageBox.information(self, 'Внимание', 'Не все поля в спущенном оборудовании'
                                                             ' соответствуют значениям')
             close_file = False
@@ -829,17 +825,17 @@ class DataWindow(QMainWindow):
                 msg = QMessageBox.information(self, 'Внимание', 'доп колонна не может быть близко 0')
                 close_file = False
         elif self.ifNum(column_direction_diametr) is False \
-           or self.ifNum(column_direction_wall_thickness) is False \
-            or self.ifNum(column_direction_lenght) is False \
-            or  self.ifNum(level_cement_direction) is False:
+                or self.ifNum(column_direction_wall_thickness) is False \
+                or self.ifNum(column_direction_lenght) is False \
+                or self.ifNum(level_cement_direction) is False:
 
             msg = QMessageBox.information(self, 'Внимание', 'Не все поля в Направлении соответствуют значениям')
             close_file = False
         elif self.ifNum(column_conductor_diametr) is False \
-           or self.ifNum(column_conductor_wall_thickness) is False\
-           or self.ifNum(column_conductor_lenght) is False \
-           or self.ifNum(column_direction_lenght) is False \
-           or self.ifNum(level_cement_conductor) is False:
+                or self.ifNum(column_conductor_wall_thickness) is False \
+                or self.ifNum(column_conductor_lenght) is False \
+                or self.ifNum(column_direction_lenght) is False \
+                or self.ifNum(level_cement_conductor) is False:
 
             msg = QMessageBox.information(self, 'Внимание', 'Не все поля в кондукторе соответствуют значениям')
             close_file = False
@@ -847,28 +843,28 @@ class DataWindow(QMainWindow):
         elif any(['НВ' in dict_pump_SHGN_do.upper(), 'ШГН' in dict_pump_SHGN_do.upper(),
                   'НН' in dict_pump_SHGN_do.upper(), dict_pump_SHGN_do == 'отсут',
                   'RHAM' in dict_pump_SHGN_do]) is False \
-             or any(['НВ' in dict_pump_SHGN_posle.upper(), 'ШГН' in dict_pump_SHGN_posle.upper(),
-                     'НН' in dict_pump_SHGN_posle.upper(), dict_pump_SHGN_posle == 'отсут',
-                     'RHAM' in dict_pump_SHGN_do]) is False \
-             or any(['ЭЦН' in dict_pump_ECN_posle.upper(), 'ВНН' in dict_pump_ECN_posle.upper(),
-                     dict_pump_ECN_posle == 'отсут']) is False \
-             or (dict_pump_ECN_do != 'отсут' and dict_pump_ECN_h_do == 'отсут') \
-             or (dict_pump_ECN_posle != 'отсут' and dict_pump_ECN_h_posle == 'отсут') \
-             or (dict_pump_SHGN_do != 'отсут' and dict_pump_SHGN_h_do == 'отсут') \
-             or (dict_pump_SHGN_posle != 'отсут' and dict_pump_SHGN_h_posle == 'отсут') \
-             or (paker_do != 'отсут' and depth_fond_paker_do == 'отсут') \
-             or (paker_posle != 'отсут' and depth_fond_paker_posle == 'отсут') \
-             or (paker2_do != 'отсут' and depth_fond_paker2_do == 'отсут') \
-             or (paker2_posle != 'отсут' and depth_fond_paker2_posle == 'отсут') \
-             or any(['ЭЦН' in dict_pump_ECN_do.upper(), 'ВНН' in dict_pump_ECN_do.upper(),
-                     dict_pump_ECN_do == 'отсут']) is False:
+                or any(['НВ' in dict_pump_SHGN_posle.upper(), 'ШГН' in dict_pump_SHGN_posle.upper(),
+                        'НН' in dict_pump_SHGN_posle.upper(), dict_pump_SHGN_posle == 'отсут',
+                        'RHAM' in dict_pump_SHGN_do]) is False \
+                or any(['ЭЦН' in dict_pump_ECN_posle.upper(), 'ВНН' in dict_pump_ECN_posle.upper(),
+                        dict_pump_ECN_posle == 'отсут']) is False \
+                or (dict_pump_ECN_do != 'отсут' and dict_pump_ECN_h_do == 'отсут') \
+                or (dict_pump_ECN_posle != 'отсут' and dict_pump_ECN_h_posle == 'отсут') \
+                or (dict_pump_SHGN_do != 'отсут' and dict_pump_SHGN_h_do == 'отсут') \
+                or (dict_pump_SHGN_posle != 'отсут' and dict_pump_SHGN_h_posle == 'отсут') \
+                or (paker_do != 'отсут' and depth_fond_paker_do == 'отсут') \
+                or (paker_posle != 'отсут' and depth_fond_paker_posle == 'отсут') \
+                or (paker2_do != 'отсут' and depth_fond_paker2_do == 'отсут') \
+                or (paker2_posle != 'отсут' and depth_fond_paker2_posle == 'отсут') \
+                or any(['ЭЦН' in dict_pump_ECN_do.upper(), 'ВНН' in dict_pump_ECN_do.upper(),
+                        dict_pump_ECN_do == 'отсут']) is False:
 
             msg = QMessageBox.information(self, 'Внимание', 'Не все поля соответствуют значениям')
             close_file = False
         elif isinstance(self.ifNum(head_column_additional), str):
             # print(self.if_None(head_column_additional), isinstance(self.ifNum(head_column_additional), str))
             if self.if_None(20 if self.ifNum(head_column_additional) else head_column_additional) < 5:
-            # print(self.if_None(head_column_additional))
+                # print(self.if_None(head_column_additional))
                 msg = QMessageBox.information(self, 'Внимание', 'В скважине отсутствует доп колонна')
                 close_file = False
             else:
@@ -876,7 +872,7 @@ class DataWindow(QMainWindow):
                 close_file = False
 
         elif all([pump for pump in [self.ifNum(dict_pump_ECN_do), self.ifNum(paker2_do),
-                                               self.ifNum(dict_pump_SHGN_do), self.ifNum(paker_do)]]):
+                                    self.ifNum(dict_pump_SHGN_do), self.ifNum(paker_do)]]):
             voronka_question = QMessageBox.question(self, 'Внимание',
                                                     'Программа определила что в скважине до ремонта воронка, верно ли')
             if voronka_question == QMessageBox.StandardButton.No:
@@ -885,7 +881,7 @@ class DataWindow(QMainWindow):
                 close_file = True
 
         elif all([pump for pump in [self.ifNum(dict_pump_ECN_posle), self.ifNum(paker2_posle),
-                                               self.ifNum(dict_pump_SHGN_posle), self.ifNum(paker_posle)]]):
+                                    self.ifNum(dict_pump_SHGN_posle), self.ifNum(paker_posle)]]):
 
             voronka_question = QMessageBox.question(self, 'Внимание',
                                                     'Программа определила что в скважине После ремонта воронка, верно ли')
@@ -913,7 +909,7 @@ class DataWindow(QMainWindow):
                                               'Не все поля в Ожидаемых показателях соответствуют значениям')
                 close_file = False
         else:
-            if self.ifNum(Qwater_edit) is False or self.ifNum(Qoil_edit) is False or\
+            if self.ifNum(Qwater_edit) is False or self.ifNum(Qoil_edit) is False or \
                     self.ifNum(proc_water_edit) is False:
                 msg = QMessageBox.information(self, 'Внимание',
                                               'Не все поля в Ожидаемых показателях соответствуют значениям')
@@ -924,11 +920,13 @@ class DataWindow(QMainWindow):
             well_data.column_diametr = ProtectedIsDigit(self.if_None(columnType))
             well_data.column_wall_thickness = ProtectedIsDigit(self.if_None(column_wall_thickness))
             well_data.shoe_column = ProtectedIsDigit(int(float(self.if_None(shoe_column))))
-            well_data.column_additional_diametr = ProtectedIsDigit(self.if_None(column_additional_diametr))
-            well_data.column_additional_wall_thickness = ProtectedIsDigit(self.if_None(column_additional_wall_thickness))
-            well_data.shoe_column_additional = ProtectedIsDigit(int(float(self.if_None(shoe_column_additional))))
-            well_data.head_column_additional = ProtectedIsDigit(int(float(self.if_None(head_column_additional))))
-            if well_data.column_additional is False:
+            if well_data.column_additional:
+                well_data.column_additional_diametr = ProtectedIsDigit(self.if_None(column_additional_diametr))
+                well_data.column_additional_wall_thickness = ProtectedIsDigit(
+                    self.if_None(column_additional_wall_thickness))
+                well_data.shoe_column_additional = ProtectedIsDigit(int(float(self.if_None(shoe_column_additional))))
+                well_data.head_column_additional = ProtectedIsDigit(int(float(self.if_None(head_column_additional))))
+            else:
                 well_data.column_additional_diametr = ProtectedIsDigit(0)
                 well_data.column_additional_wall_thickness = ProtectedIsDigit(0)
                 well_data.shoe_column_additional = ProtectedIsDigit(0)
@@ -965,7 +963,6 @@ class DataWindow(QMainWindow):
             well_data.static_level = ProtectedIsDigit(self.if_None(static_level))
             well_data.dinamic_level = ProtectedIsDigit(self.if_None(dinamic_level))
 
-
             well_data.column_direction_diametr = ProtectedIsDigit(self.if_None(column_direction_diametr))
             well_data.column_direction_wall_thickness = ProtectedIsDigit(self.if_None(column_direction_wall_thickness))
             well_data.column_direction_lenght = ProtectedIsDigit(self.if_None(column_direction_lenght))
@@ -991,9 +988,76 @@ class DataWindow(QMainWindow):
                 well_data.bvo = True
             elif well_data.work_plan in ['gnkt_frez']:
                 well_data.bvo = True
+            well_data.data_well_dict = {
+                'направление': {
+                    'диаметр': well_data.column_direction_diametr._value,
+                    'толщина стенки': well_data.column_direction_wall_thickness._value,
+                    'башмак': well_data.column_direction_lenght._value,
+                    'цемент': well_data.level_cement_direction._value},
+                'кондуктор': {
+                    'диаметр': well_data.column_conductor_diametr._value,
+                    'толщина стенки': well_data.column_conductor_wall_thickness._value,
+                    'башмак': well_data.column_conductor_lenght._value,
+                    'цемент': well_data.level_cement_conductor._value},
+                'ЭК': {
+                    'диаметр': well_data.column_diametr._value,
+                    'толщина стенки': well_data.column_wall_thickness._value,
+                    'башмак': well_data.shoe_column._value,
+                    'цемент': well_data.level_cement_column._value},
+                'допколонна': {
+                    'наличие': well_data.column_additional,
+                    'диаметр': well_data.column_additional_diametr._value,
+                    'толщина стенки': well_data.column_additional_wall_thickness._value,
+                    'голова': well_data.head_column_additional._value,
+                    'башмак': well_data.shoe_column_additional._value},
+                'куратор': well_data.curator,
+                'оборудование': {
+                    'ЭЦН':
+                        {
+                            'тип': well_data.dict_pump_ECN,
+                            'глубина ': well_data.dict_pump_ECN_h
+                        },
+                    'ШГН':
+                        {
+                            'тип': well_data.dict_pump_SHGN,
+                            'глубина ': well_data.dict_pump_SHGN_h
+                        },
+                    'пакер':
+                        {
+                            'тип': well_data.paker_do,
+                            'глубина ': well_data.depth_fond_paker_do
+                        },
+                    'пакер2':
+                        {
+                            'тип': well_data.paker2_do,
+                            'глубина ': well_data.depth_fond_paker2_do
+                        },
+
+                },
+                'статика': well_data.static_level._value,
+                'динамика': well_data.dinamic_level._value,
+                'НКТ': well_data.dict_nkt_po,
+                'штанги': well_data.dict_sucker_rod_po,
+                'ожидаемые': {
+                    'нефть': well_data.Qoil,
+                    'вода': well_data.Qwater,
+                    'обводненность': well_data.proc_water,
+                    'давление': well_data.expected_P,
+                    'приемистость': well_data.expected_Q
+                },
+                'данные': {
+                    'пробуренный забой': well_data.bottomhole_drill._value,
+                    'искусственный забой': well_data.bottomhole_artificial._value,
+                    'максимальный угол': well_data.max_angle._value,
+                    'глубина': well_data.max_angle_H._value,
+                    'максимальное ожидаемое давление': well_data.max_expected_pressure._value,
+                    'максимальное допустимое давление': well_data.max_admissible_pressure._value
+                }
+
+            }
+            print(well_data.data_well_dict)
             well_data.pause = False
             self.close()
-
 
     def if_None(self, value):
         if value is None or 'отс' in str(value).lower() or value == '-' or str(value) == 0:
@@ -1011,7 +1075,6 @@ class DataWindow(QMainWindow):
         else:
             return value
 
-
     def if_string_list(self, string):
         try:
             if len(string.split('-')) == 2:
@@ -1026,7 +1089,6 @@ class DataWindow(QMainWindow):
                 return True
             else:
                 return False
-
 
     def ifNum(self, string):
         if str(string) == "['0']":

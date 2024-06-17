@@ -142,6 +142,7 @@ class GnoDescentWindow(QMainWindow):
         lift_key = str(self.tabWidget.currentWidget().gno_combo.currentText())
         nkt_edit = self.tabWidget.currentWidget().nkt_edit.text()
         sucker_edit = self.tabWidget.currentWidget().sucker_edit.text()
+
         if well_data.region == 'КГМ':
             need_juming_after_sko_combo = self.tabWidget.currentWidget().need_juming_after_sko_combo.currentText()
         else:

@@ -131,7 +131,8 @@ def remove_overlapping_intervals(perforating_intervals, skm_interval = None):
                     skipping_intervals.append([int(float(nek.split('-')[0])) - 90,
                                      well_data.skm_depth])
         # print(f'глубина СКМ {well_data.skm_depth, skipping_intervals}')
-        # print(perforating_intervals)
+        perforating_intervals = sorted(perforating_intervals, key=lambda x: x[0])
+        print(perforating_intervals)
         for pvr in sorted(perforating_intervals, key=lambda x: x[0]):
             if pvr[1] <= well_data.skm_depth:
                 # print(pvr, well_data.skm_depth)
@@ -157,12 +158,14 @@ def remove_overlapping_intervals(perforating_intervals, skm_interval = None):
             kroly_skm = int(skm[0])
             pod_skm = int(skm[1])
 
-            skm_range = list(range(kroly_skm, pod_skm + 1))
+            skm_range = list(range(kroly_skm, pod_skm))
             for pvr in sorted(perforating_intervals, key=lambda x: x[0]):
                 # print(int(pvr[0]) in skm_range, skm_range[0], int(pvr[0]))
                 if int(pvr[0]) in skm_range and int(pvr[1]) in skm_range and skm_range[0]+1 <= int(pvr[0] - 1):
                     if skm_range[0]+1 < int(pvr[0]) - 2:
                         skipping_intervals_new.append((skm_range[0]+1, int(pvr[0] - 2)))
+                        skm_range = skm_range[skm_range.index(int(pvr[1])):]
+                    else:
                         skm_range = skm_range[skm_range.index(int(pvr[1])):]
 
 

@@ -113,6 +113,7 @@ class CheckableComboBoxChild(QComboBox):
         self.lineEdit().setText(elidedText)
 
     def addItem(self, text, data=None, checked=False):
+        print(f' пласта {text}')
         item = QStandardItem()
         item.setText(text)
         if data is None:
@@ -120,7 +121,7 @@ class CheckableComboBoxChild(QComboBox):
         else:
             item.setData(data)
         item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsUserCheckable)
-        item.setData(Qt.Unchecked if not checked else Qt.Checked, Qt.CheckStateRole)
+        item.setData(Qt.Unchecked if not text in well_data.plast_work else Qt.Checked, Qt.CheckStateRole)
         self.model().appendRow(item)
 
     def addItems(self, texts, datalist=None):
@@ -1399,7 +1400,7 @@ class AcidPakerWindow(QMainWindow):
             [f'СКВ {skv_acid_edit} {skv_proc_edit}%', None,
              f'Произвести установку СКВ {skv_acid_edit} {skv_proc_edit}% концентрации '
              f'в объеме'
-             f' {skv_volume_edit}м3 (0,7т HCL 24%)(по спец. плану, составляет старший мастер)',
+             f' {skv_volume_edit}м3 ({round(skv_volume_edit*1.12/24, 1)}т HCL 24%) (по спец. плану, составляет старший мастер)',
              None, None, None, None, None, None, None,
              'мастер КРС, УСРСиСТ', 0.5],
             [None, None,
@@ -1412,8 +1413,8 @@ class AcidPakerWindow(QMainWindow):
              'мастер КРС, УСРСиСТ', 2],
             [f'Промывка, Q(повторно)', None,
              f'Промыть скважину тех.жидкостью круговой циркуляцией обратной промывкой в 1,5 '
-             f'кратном обьеме. Посадить пакер. Определить приемистость пласта в присутствии '
-             f'представителя ЦДНГ (составить акт). Сорвать пакер. '
+             f'кратном обьеме. Определить приемистость пласта в присутствии '
+             f'представителя ЦДНГ (составить акт). '
              f'При отсутствии приемистости СКВ повторить. При необходимости увеличить приемистость '
              f'методом дренирования.',
              None, None, None, None, None, None, None,

@@ -123,11 +123,12 @@ class Work_with_gnkt(QMainWindow):
             for j in range(1, 13):
                 cell = ws2.cell(row=i, column=j)
 
+
                 if cell and str(cell) != str(work_list[i - 1][j - 1]):
                     if str(work_list[i - 1][j - 1]).replace('.', '').isdigit() and \
                             str(work_list[i - 1][j - 1]).count('.') != 2:
                         cell.value = str(work_list[i - 1][j - 1]).replace('.', ',')
-                        # print(f'цифры {cell.value}')
+
                     else:
                         cell.value = work_list[i - 1][j - 1]
 

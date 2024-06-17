@@ -18,7 +18,7 @@ class TabPage_SO_magnit(QWidget):
         self.print_diametr_label = QLabel("Диаметр магнит", self)
         self.print_diametr_line = QLineEdit(self)
 
-        self.print_type_label = QLabel("Тип печати", self)
+        self.print_type_label = QLabel("Тип магнита", self)
         self.print_type_combo = QComboBox(self)
         raid_type_list = ['магнит']
         self.print_type_combo.addItems(raid_type_list)

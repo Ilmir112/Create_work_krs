@@ -51,6 +51,10 @@ class TabPage_SO(QWidget):
         self.dictance_template_second_Edit = QLineEdit(self)
         self.dictance_template_second_Edit.setValidator(validator)
 
+        self.current_bottom_label = QLabel('Забой текущий')
+        self.current_bottom_edit = QLineEdit(self)
+        self.current_bottom_edit.setText(f'{well_data.current_bottom}')
+
 
 
         self.grid = QGridLayout(self)
@@ -106,6 +110,8 @@ class TabPage_SO(QWidget):
             self.grid.addWidget(self.lenght_template_second_Label, 4, 7)
             self.grid.addWidget(self.lenght_template_second_Edit, 5, 7)
 
+        self.grid.addWidget(self.current_bottom_label, 8, 3, 1, 2)
+        self.grid.addWidget(self.current_bottom_edit, 9, 3, 1, 2)
 
         self.grid.addWidget(self.template_str_Label, 13, 1, 1, 8)
         self.grid.addWidget(self.template_str_Edit, 14, 1, 1, 8)
@@ -576,8 +582,9 @@ class Template_without_skm(QMainWindow):
             mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'Расстояние между шаблонами не корректно')
             return
 
-
-
+        current_bottom = self.tabWidget.currentWidget().current_bottom_edit.text()
+        if current_bottom != '':
+            well_data.current_bottom = round(float(current_bottom), 1)
         work_list = self.template_ek(template_str, template, template_diametr)
         MyWindow.populate_row(self, self.ins_ind, work_list, self.table_widget)
         well_data.pause = False
@@ -666,7 +673,8 @@ class Template_without_skm(QMainWindow):
                f'планового '
                f'текущего забоя. Подъем долота с забойным двигателем на  ТНКТ с гл.{well_data.current_bottom}м '
                f'вести с доливом '
-               f'скважины до устья т/ж удел.весом {well_data.fluid_work} в объеме {round(well_data.current_bottom * 1.12 / 1000, 1)}м3',
+               f'скважины до устья т/ж удел.весом {well_data.fluid_work} в объеме '
+               f'{round(well_data.current_bottom * 1.12 / 1000, 1)}м3',
                None, None, None, None, None, None, None, 'Мастер КРС',
                None],
             [None, None,
@@ -716,7 +724,7 @@ class Template_without_skm(QMainWindow):
                                                                                     'обратных клапанов перед ПСШ?')
             if kot_question == QMessageBox.StandardButton.Yes:
                 # print(f'Нужно вставить коты')
-                for row in kot_work(self)[::-1]:
+                for row in kot_work(self, well_data.current_bottom)[::-1]:
                     list_template_ek.insert(0, row)
 
         if well_data.gipsInWell is True:  # Добавление работ при наличии Гипсово-солевх отложений

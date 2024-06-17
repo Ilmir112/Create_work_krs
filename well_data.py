@@ -169,14 +169,14 @@ leakiness_Count = 0
 expected_pick_up = {}
 current_bottom = 0
 fluid_work = 0
-static_level = 0
-dinamic_level = 0
+
 ins_ind = 0
 number_dp = 0
 len_razdel_1 = 0
 current_bottom = 0
 count_template = 0
-
+forPaker_list = False
+current_bottom2 = 5000
 dict_leakiness = {}
 dict_perforation_short = {}
 
@@ -231,9 +231,10 @@ region = ''
 data_in_base = False
 dict_nkt = {}
 dict_nkt_po = {}
-path_image = '_internal/'
-# path_image = ''
-
+# path_image = '_internal/'
+path_image = ''
+data_well_dict = {}
+Qwater = 100
 dict_sucker_rod = {}
 dict_sucker_rod_po = {}
 row_expected = []
@@ -242,6 +243,7 @@ plast_project = []
 plast_work = []
 leakage_window = None
 cat_P_P = []
+data_well_is_True = False
 well_oilfield = 0
 template_depth_addition = 0
 nkt_template = 59
@@ -255,6 +257,13 @@ thin_border = Border(left=Side(style='thin'),
                      bottom=Side(style='thin'))
 postgres_params_classif = {
             f'database': 'databaseclassification',
+            f'user': 'postgres',
+            f'password': '195375AsD+',
+            f'host': f'{host_krs}',
+            f'port': '5432'
+        }
+postgres_params_data_well = {
+            f'database': 'well_data',
             f'user': 'postgres',
             f'password': '195375AsD+',
             f'host': f'{host_krs}',

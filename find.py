@@ -62,17 +62,13 @@ class FindIndexPZ(QMainWindow):
 
                 well_data.pipes_ind = ProtectedIsDigit(row_ind + 1)
 
-
-
             elif 'ШТАНГИ' == str(row[1]).upper():
                 well_data.sucker_rod_ind = ProtectedIsDigit(row_ind + 1)
-
 
             elif 'ХI Планируемый объём работ:' in row or 'ХI. Планируемый объём работ:' \
                     in row or 'ХIII Планируемый объём работ:' in row \
                     or 'ХI Планируемый объём работ:' in row or 'Порядок работы' in row:
                     well_data.data_x_max = ProtectedIsDigit(row_ind)
-
 
             elif any(['II. История эксплуатации скважины' in str(col) for col in row]):
                 well_data.data_pvr_max = ProtectedIsDigit(row_ind)
@@ -89,43 +85,23 @@ class FindIndexPZ(QMainWindow):
             return
 
         if well_data.cat_well_min._value == 0:
-            well_data.cat_well_min = ProtectedIsDigit(QInputDialog.getInt(
-                self, 'индекс начала копирования', 'Программа не смогла определить строку начала копирования',
-                0, 0, 800)[0])
-            while well_data.cat_well_min._value > 30:
-                mes = QMessageBox.warning(self, 'Ошибка', 'Не корректное значение')
-                well_data.cat_well_min = ProtectedIsDigit(QInputDialog.getInt(
-                    self, 'индекс начала копирования', 'Программа не смогла определить строку начала копирования',
-                    0, 0, 800)[0])
+            mes = QMessageBox.warning(self, 'индекс начала копирования',
+                                      'Программа не смогла определить строку начала копирования, нужно '
+                                      'добавить "Категория скважины" в ПЗ для определения начала копирования')
+            MyWindow.pause_app()
+            return
         if well_data.data_well_max._value == 0:
-            well_data.data_well_max = ProtectedIsDigit(
-                QInputDialog.getInt(self, 'индекс окончания копирования',
-                                    'Программа не смогла определить строку с IX. Мероприятия по предотвращению аварий ',
-                                    0, 0, 800)[0])
-            while well_data.data_well_max._value < 150:
-                mes = QMessageBox.warning(self, 'Ошибка', 'Не корректное значение')
-                well_data.data_well_max = ProtectedIsDigit(
-                    QInputDialog.getInt(self, 'индекс окончания копирования',
-                                        'Программа не смогла определить строку IX. Мероприятия по предотвращению аварий',
-                                        0, 0, 800)[0])
+            mes = QMessageBox.warning(self, 'индекс окончания копирования',
+                                    'Программа не смогла определить строку с IX. Мероприятия по предотвращению аварий '
+                                    'нужно добавить "IX. Мероприятия по предотвращению авари" в ПЗ')
+            MyWindow.pause_app()
+            return
         if well_data.data_well_min._value == 0:
-            well_data.data_well_min = ProtectedIsDigit(
-                QInputDialog.getInt(self, 'индекс начала строки после план заказ',
-                                    'Программа не смогла найти начала строки после план заказ',
-                                    0, 0, 800)[0])
-            while well_data.data_well_min._value < well_data.cat_well_min._value or \
-                    well_data.data_well_min._value > well_data.data_well_max._value:
-                mes = QMessageBox.warning(self, 'Ошибка', 'Не корректное значение')
-                well_data.data_well_min = ProtectedIsDigit(
-                    QInputDialog.getInt(self, 'индекс начала строки после план заказ',
-                                        'Программа не смогла найти начала строки после план заказ',
-                                        0, 0, 800)[0])
+            mes = QMessageBox.warning(self, 'индекс начала строки после план заказ',
+                                    'Программа не смогла найти начала строку с названием "План работ" или "план заказ"')
+            MyWindow.pause_app()
+            return
 
-        if well_data.cat_well_max._value == 0:
-            well_data.cat_well_max = ProtectedIsDigit(
-                QInputDialog.getInt(self, 'индекс начала копирования',
-                                    'Программа не смогла определить строку начала копирования',
-                                    0, 0, 800)[0])
         if well_data.sucker_rod_none:
             if well_data.sucker_rod_ind._value == 0:
                 sucker_mes = QMessageBox.question(self, 'ШТАНГИ', 'Программа определелила, что в скважине '
@@ -133,63 +109,52 @@ class FindIndexPZ(QMainWindow):
                 if sucker_mes == QMessageBox.StandardButton.Yes:
                     well_data.sucker_rod_ind = ProtectedIsDigit(0)
                 else:
-                    well_data.sucker_rod_ind = ProtectedIsDigit(
-                        QInputDialog.getInt(self, 'индекс начала строки со штангами',
-                                            'Программа не смогла найти строку со штангами',
-                                            0, 0, 800)[0])
+                    sucker_mes_info = QMessageBox.information(self, 'ШТАНГИ', 'Нужно добавить "ШТАНГИ" в таблицу?')
+                    MyWindow.pause_app()
+                    return
 
         if well_data.data_x_max._value == 0:
-            well_data.data_x_max = ProtectedIsDigit(
-                QInputDialog.getInt(self, 'индекс окончания копирования ожидаемых показателей',
+            mes = QMessageBox.warning(self, 'индекс окончания копирования ожидаемых показателей',
                                     'Программа не смогла определить строку окончания копирования'
-                                    ' ожидаемых показателей',
-                                    0, 0, 800)[0])
+                                    ' ожидаемых показателей')
+            MyWindow.pause_app()
+            return
 
 
         if well_data.data_x_min._value == 0:
-            well_data.data_x_min = ProtectedIsDigit(
-                QInputDialog.getInt(self, 'индекс начала копирования ожидаемых показателей',
-                                    'Программа не смогла определить строку начала копирования'
-                                    ' ожидаемых показателей',
-                                    0, 0, 800)[0])
+            mes = QMessageBox.warning(self, 'индекс начала копирования ожидаемых показателей',
+                                    'Программа не смогла определить строку начала копирования ожидаемых показателей')
+            MyWindow.pause_app()
+            return
 
         if well_data.data_pvr_max._value == 0:
-            well_data.data_pvr_max = ProtectedIsDigit(
-                QInputDialog.getInt(self, 'индекс историю',
-                                    'Программа не смогла найти "II. История эксплуатации скважины"',
-                                    0, 0, 800)[0])
+            mes = QMessageBox.warning(self, 'индекс историю',
+                                    'Программа не смогла найти "II. История эксплуатации скважины"')
+            MyWindow.pause_app()
+            return
 
         if well_data.pipes_ind._value == 0:
-            well_data.pipes_ind = ProtectedIsDigit(QInputDialog.getInt(self, 'индекс начала строки с НКТ',
-                                                                       'Программа не смогла найти строку с НКТ',
-                                                                       0, 0, 800)[0])
+            mes = QMessageBox.warning(self, 'индекс начала строки с НКТ',
+                                                                       'Программа не смогла найти строку с НКТ')
+            MyWindow.pause_app()
+            return
         if well_data.data_pvr_min._value == 0:
-            well_data.data_pvr_min = ProtectedIsDigit(QInputDialog.getInt(self, 'индекс начала начала ПВР',
-                                                                          'Программа не смогла найти индекс начала ПВР',
-                                                                          0, 0, 800)[0])
+            mes = QMessageBox.warning(self, 'индекс начала начала ПВР', 'Программа не смогла найти индекс начала ПВР')
+            MyWindow.pause_app()
+            return
         if well_data.data_fond_min._value == 0:
-            well_data.data_fond_min = ProtectedIsDigit(
-                QInputDialog.getInt(self, 'индекс начала строки с таблицей фондовыго оборудования',
-                                    'Программа не смогла найти строку с таблицей фондового оборудования',
-                                    0, 0, 800)[0])
+            mes = QMessageBox.warning(self, 'индекс начала строки с таблицей фондовыго оборудования',
+                                    'Программа не смогла найти строку с таблицей фондового оборудования')
+            MyWindow.pause_app()
+            return
         if well_data.condition_of_wells._value == 0:
-            well_data.condition_of_wells = ProtectedIsDigit(QInputDialog.getInt(
+            mes = QMessageBox.warning(
                 self, 'индекс копирования',
                 'Программа не смогла определить строку n\ III. '
-                'Состояние скважины к началу ремонта ',
-                0, 0, 800)[0])
-            while well_data.condition_of_wells._value < well_data.cat_well_min._value or \
-                    well_data.condition_of_wells._value > well_data.data_well_max._value:
-                mes = QMessageBox.warning(self, 'Ошибка', 'Не корректное значение')
-                well_data.condition_of_wells = ProtectedIsDigit(
-                    QInputDialog.getInt(self, 'индекс окончания копирования',
-                                        'Программа не смогла определить строку окончания копирования',
-                                        0, 0, 800)[0])
-        # print(well_data.cat_well_min._value, well_data.cat_well_max._value, well_data.data_well_min._value,
-        #       well_data.data_pvr_max._value, well_data.condition_of_wells._value, well_data.data_well_max._value,
-        #       well_data.pipes_ind._value, well_data.sucker_rod_ind._value
+                'Состояние скважины к началу ремонта ')
+            MyWindow.pause_app()
+            return
 
-    # )
     def check_str_None(self, string):
         from main import MyWindow
 
@@ -266,9 +231,11 @@ class WellNkt(FindIndexPZ):
                     ws.cell(row=row, column=3).value).lower() == 'после ремонта':
                 a_plan = row
         if a_plan == 0:
-            a_plan = QInputDialog.getDouble(self, 'Индекс планового НКТ',
-                                            'Программа не могла определить начала строку с ПЗ НКТ - план')[0]
-        # print(f'индекс a_plan {a_plan}')
+            mes = QMessageBox.warning(self, 'Индекс планового НКТ',
+                                            'Программа не могла определить начала строку с ПЗ НКТ - план')
+            MyWindow.pause_app()
+            return
+
         for row in range(begin_index, cancel_index + 1):
             # print(str(ws.cell(row=row, column=4).value))
             key = str(ws.cell(row=row, column=4).value)
@@ -320,8 +287,10 @@ class WellSucker_rod(FindIndexPZ):
                     well_data.sucker_rod_none = True
 
                 if well_data.sucker_rod_none == True:
-                    b_plan = QInputDialog.getDouble(self, 'Индекс планового НКТ',
+                    sucker_rod_question = QMessageBox.warning(self, 'Индекс планового НКТ',
                                                     'Программа не могла определить начала строку с ПЗ штанги - план')
+                    MyWindow.pause_app()
+                    return
             # print(f'б {b_plan}')
 
             for row in range(begin_index, cancel_index - 1):
@@ -331,14 +300,28 @@ class WellSucker_rod(FindIndexPZ):
                 if key != str(None) and key != '-' and key != '' and 'отсут' not in str(key).lower():
                     # print(key, value)
                     if key != None and row < b_plan:
-                        well_data.dict_sucker_rod[key] = well_data.dict_sucker_rod.get(key, 0) + int(
-                            float(str(value).replace(',', '.'))) + 1
+                        try:
+                            well_data.dict_sucker_rod[key] = well_data.dict_sucker_rod.get(key, 0) + int(
+                                float(str(value).replace(',', '.'))) + 1
+                        except:
+                            mes = QMessageBox.warning(self, 'Ошибка', 'Ошибка в определении длины штанг до ремонта, '
+                                                                      'скорректируйте план заказ')
+                            MyWindow.pause_app()
+                            break
+
+                            return
                     if key != None and row >= b_plan:
-                        well_data.dict_sucker_rod_po[key] = well_data.dict_sucker_rod_po.get(key, 0) + int(
-                            float(str(value).replace(',', '.')))
-        # except:
-        #     well_data.sucker_mistake = True
-        #     mes = QMessageBox.warning(self, 'Ошибка', 'Программа не смогла определить диаметры и длину штанг')
+                        try:
+                            well_data.dict_sucker_rod_po[key] = well_data.dict_sucker_rod_po.get(key, 0) + int(
+                                float(str(value).replace(',', '.')))
+                        except:
+                            mes = QMessageBox.warning(self, 'Ошибка', 'Ошибка в определении длины штанг до ремонта, '
+                                                                  'скорректируйте план заказ')
+                            MyWindow.pause_app()
+                            break
+
+                            return
+
 
 
 class WellFond_data(FindIndexPZ):
@@ -381,12 +364,12 @@ class WellFond_data(FindIndexPZ):
                     elif value == 'Насос' and row[col + 2].value == 'типоразмер':
                         if row[col_do].value:
                             if ('НВ' in str(row[col_do].value).upper() or 'ШГН' in str(row[col_do].value).upper() \
-                                or 'НН' in str(row[col_do].value).upper()) or 'RHAM' in str(row[col_do].value).upper():
+                                or 'НН' in str(row[col_do].value).upper()) or 'RH' in str(row[col_do].value).upper():
                                 well_data.dict_pump_SHGN["do"] = row[col_do].value
                                 if '/' in str(row[col_do].value):
                                     well_data.dict_pump_SHGN["do"] = [ecn for ecn in row[col_do].value.split('/')
                                                                       if 'НВ' in ecn or 'НН' in ecn or
-                                                                      'ШГН' in ecn or 'RHAM' in ecn][0]
+                                                                      'ШГН' in ecn or 'RH' in ecn][0]
 
                             if ('ЭЦН' in str(row[col_do].value).upper() or 'ВНН' in str(row[col_do].value).upper()):
                                 well_data.dict_pump_ECN["do"] = row[col_do].value
@@ -489,7 +472,6 @@ class WellHistory_data(FindIndexPZ):
             for col, cell in enumerate(row):
                 value = cell.value
                 if value:
-
                     if 'нэк' in str(value).lower() or 'негерм' in str(
                             value).lower() or 'нарушение э' in str(
                         value).lower() or \
@@ -684,8 +666,7 @@ class Well_expected_pick_up(FindIndexPZ):
             except:
                 print('Ошибка в определении ожидаемых показателей')
 
-
-class Well_data(FindIndexPZ):
+class WellData(FindIndexPZ):
 
     def __init__(self, ws):
 
@@ -700,6 +681,33 @@ class Well_data(FindIndexPZ):
         well_data.well_number = ProtectedIsNonNone('не корректно')
         well_data.inv_number = ProtectedIsNonNone('не корректно')
         well_data.cdng = ProtectedIsNonNone('не корректно')
+        for row_index, row in enumerate(ws.iter_rows(min_row=begin_index, max_row=cancel_index)):
+            row_index += begin_index
+
+            for col, cell in enumerate(row):
+                value = cell.value
+                if value:
+                    if 'площадь' in str(value):  # определение номера скважины
+                        well_data.well_number = ProtectedIsDigit(row[col - 1].value)
+                        well_data.well_area = ProtectedIsNonNone(row[col + 1].value)
+                    elif 'месторождение ' in str(value):  # определение номера скважины
+                        well_data.well_oilfield = ProtectedIsNonNone(row[col + 2].value)
+                    elif 'Инв. №' in str(value):
+                        well_data.inv_number = ProtectedIsNonNone(row[col + 1].value)
+                    elif 'цех' == value:
+                        well_data.cdng = ProtectedIsDigit(row[col + 1].value)
+                        # print(f' ЦДНГ {well_data.cdng._value}')
+class Well_data(FindIndexPZ):
+
+    def __init__(self, ws):
+
+        super().__init__(ws)
+        self.ws = ws
+        # self.read_well(self.ws, well_data.cat_well_max._value, well_data.data_pvr_min._value)
+
+    def read_well(self, ws, begin_index, cancel_index):
+        from main import MyWindow
+
         well_data.bottomhole_drill = ProtectedIsNonNone('не корректно')
         well_data.bottomhole_artificial = ProtectedIsNonNone('не корректно')
         well_data.max_angle = ProtectedIsNonNone('не корректно')
@@ -731,17 +739,7 @@ class Well_data(FindIndexPZ):
             for col, cell in enumerate(row):
                 value = cell.value
                 if value:
-                    if 'площадь' in str(value):  # определение номера скважины
-                        well_data.well_number = ProtectedIsDigit(row[col - 1].value)
-                        well_data.well_area = ProtectedIsNonNone(row[col + 1].value)
-                    elif 'месторождение ' in str(value):  # определение номера скважины
-                        well_data.well_oilfield = ProtectedIsNonNone(row[col + 2].value)
-                    elif 'Инв. №' in str(value):
-                        well_data.inv_number = ProtectedIsNonNone(row[col + 1].value)
-                    elif 'цех' == value:
-                        well_data.cdng = ProtectedIsDigit(row[col + 1].value)
-                        # print(f' ЦДНГ {well_data.cdng._value}')
-                    elif 'пробуренный забой' in str(value).lower():
+                    if 'пробуренный забой' in str(value).lower():
                         well_data.bottomhole_drill = ProtectedIsDigit(row[col + 2].value)
                         well_data.bottomhole_drill = FindIndexPZ.definition_is_None(self, well_data.bottomhole_drill,
                                                                                     row_index, col, 2)

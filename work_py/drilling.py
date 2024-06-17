@@ -64,6 +64,7 @@ class TabPage_SO_drill(QWidget):
         self.sole_drill_line = QLineEdit(self)
         self.sole_drill_line.setClearButtonEnabled(True)
 
+
         self.drill_True_label = QLabel("вид разбуриваемого материала", self)
         self.drill_label = QLabel("добавление поинтервального бурения", self)
         self.drill_cm_combo = QComboBox(self)
@@ -100,6 +101,17 @@ class TabPage_SO_drill(QWidget):
 
 
         self.drill_select_combo.currentTextChanged.connect(self.update_drill_edit)
+        self.sole_drill_line.textChanged.connect(self.update_drill_sole)
+
+    def update_drill_sole(self):
+        sole_drill_line = self.sole_drill_line.text()
+        if sole_drill_line != '':
+            sole_drill_line = int(float(sole_drill_line))
+        if well_data.forPaker_list:
+            if well_data.depth_paker_izv  <= sole_drill_line:
+                mes = QMessageBox.information(self, 'ОШИБКА', 'Необходимо извлечь извлекаемый пакер')
+                self.sole_drill_line.setText('')
+
 
     def update_drill_edit(self, index):
 
@@ -280,6 +292,8 @@ class Drill_window(QMainWindow):
             mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'Нужно добавить интервалы ,бурения')
             return
         drill_tuple = []
+
+
         for row in range(rows):
 
             roof_drill = self.tableWidget.item(row, 0)
@@ -303,7 +317,7 @@ class Drill_window(QMainWindow):
         try:
             MyWindow.populate_row(self, self.ins_ind, drill_list, self.table_widget)
             well_data.pause = False
-            print(f'dfkjkrf')
+
             self.close()
         except:
             print('ошибка ожидаемая')
@@ -391,8 +405,6 @@ class Drill_window(QMainWindow):
                 if self.check_pressure(drill_sole) is True:
                     for row in self.reply_drilling(drill_sole, bottomType2, drilling_str, nkt_diam):
                         drilling_list.append(row)
-
-
 
         drilling_list_end = [
             [None, None,
@@ -564,7 +576,7 @@ class Drill_window(QMainWindow):
 
     def check_pressure(self, depth):
 
-        print(depth)
+
         check_True = True
 
         for plast in well_data.plast_all:
