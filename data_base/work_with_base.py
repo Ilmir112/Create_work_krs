@@ -500,10 +500,14 @@ def check_in_database_well_data(number_well, area_well):
         conn = psycopg2.connect(**well_data.postgres_params_data_well)
         cursor = conn.cursor()
 
+
         cursor.execute("SELECT data_well FROM wells WHERE well_number = %s AND area_well = %s",
                        (str(number_well._value), area_well._value))
         data_well = cursor.fetchone()
-        return data_well
+        if data_well:
+            return data_well
+        else:
+            return False, data_well
 
 
     except psycopg2.Error as e:

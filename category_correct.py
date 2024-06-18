@@ -55,6 +55,7 @@ class TabPage_SO(QWidget):
                 work_plast = well_data.plast_work[0]
                 work_plast_index = 0
             else:
+                work_plast = well_data.plast_all[0]
                 work_plast_index = 1
 
             if work_plast == work_plast_iter and well_data.work_plan not in \
@@ -78,7 +79,7 @@ class TabPage_SO(QWidget):
 
             plast_index.combo_box.addItems(self.plast_all)
             #
-            # print(f'пласт {work_plast}')
+
             plast_index.combo_box.setCurrentIndex(self.plast_all.index(work_plast))
 
             category_pressuar_line_edit = QLineEdit(self)

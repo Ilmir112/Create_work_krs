@@ -104,7 +104,6 @@ class CheckableComboBoxChild(QComboBox):
                 well_data.texts.append(self.model().item(i).text())
 
         text = ", ".join(well_data.texts)
-        print(text)
 
         # # Compute elided text (with "...")
         # metrics = QFontMetrics(self.lineEdit().font())
@@ -113,7 +112,7 @@ class CheckableComboBoxChild(QComboBox):
         self.lineEdit().setText(text)
 
     def addItem(self, text, data=None, checked=False):
-        print(f' пласта {text}')
+
         item = QStandardItem()
         item.setText(text)
         if data is None:

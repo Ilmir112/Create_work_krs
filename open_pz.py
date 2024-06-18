@@ -51,8 +51,7 @@ class CreatePZ(QMainWindow):
             data_well = check_in_database_well_data(well_data.well_number, well_data.well_area)[0]
             if data_well:
                 insert_data_well_dop_plan(data_well)
-                DopPlanWindow.extraction_data(self)
-                well_data.data_well_is_True = True
+                DopPlanWindow.extraction_data(self, well_data.well_number._value + well_data.well_area._value +'krs', 1)
             else:
                 well_data.data_well_is_True = False
         if well_data.data_well_is_True is False:
@@ -70,7 +69,7 @@ class CreatePZ(QMainWindow):
             Well_Category.read_well(self, ws, well_data.cat_well_min._value, well_data.data_well_min._value)
 
         if work_plan == 'plan_change':
-            DopPlanWindow.extraction_data(self)
+            DopPlanWindow.extraction_data(self, well_data.well_number._value + well_data.well_area._value + 'krs', 1)
             ws.delete_rows(well_data.plan_correct_index._value, ws.max_row)
             return ws
 
@@ -82,7 +81,7 @@ class CreatePZ(QMainWindow):
                     if any(['ПЛАН РАБОТ' in str(col).upper() for col in row]) \
                             and work_plan == 'dop_plan':
                         ws.cell(row=row_ind + 1, column=2).value = f'ДОПОЛНИТЕЛЬНЫЙ ПЛАН РАБОТ № {well_data.number_dp}'
-                        print(f'номер доп плана {well_data.number_dp}')
+
 
                     elif 'План-заказ' in row:
                         # print(row)

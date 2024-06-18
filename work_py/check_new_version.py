@@ -113,10 +113,7 @@ class UpdateChecker(QWidget):
 
     def check_version(self):
 
-        try:
-            url = "https://api.github.com/repos/Ilmir112/Create_work_krs/releases/latest"
-        except:
-            url = "http://api.github.com/repos/Ilmir112/Create_work_krs/releases/latest"
+        url = "http://api.github.com/repos/Ilmir112/Create_work_krs/releases/latest"
 
         try:
             response = requests.get(url, verify=True)
@@ -142,7 +139,6 @@ class UpdateChecker(QWidget):
                 self.close()
                 self.update_button.setEnabled(False)
 
-
             else:
                 self.version_label.setText(f"Доступна новая версия: {self.latest_version}")
                 self.update_button.setEnabled(True)
@@ -152,6 +148,8 @@ class UpdateChecker(QWidget):
         except requests.exceptions.RequestException as e:
 
             QMessageBox.warning(self, "Ошибка", f"Не удалось проверить обновления: {e}")
+            well_data.pause = False
+
 
     def on_close(self):
         UpdateChecker.close()

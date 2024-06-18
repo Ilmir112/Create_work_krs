@@ -149,13 +149,13 @@ class TabPage_SO_raid(QWidget):
             190: (190.6, 203.6),
             204: (215, 221)
         }
-        print(well_data.column_additional is False, well_data.column_additional, well_data.column_diametr._value, well_data.column_additional_wall_thickness._value)
+
         if well_data.column_additional is False or (
                 well_data.column_additional is True and depth <= well_data.head_column_additional._value):
             diam_internal_ek = well_data.column_diametr._value - 2 * well_data.column_wall_thickness._value
         else:
             diam_internal_ek = well_data.column_additional_diametr._value - 2 * well_data.column_additional_wall_thickness._value
-        print(f'ваап {diam_internal_ek, (well_data.column_additional is True and depth <= well_data.head_column_additional._value)}')
+
         for diam, diam_internal_bit in raiding_Bit_dict.items():
             if diam_internal_bit[0] <= diam_internal_ek <= diam_internal_bit[1]:
                 bit_diametr = diam
