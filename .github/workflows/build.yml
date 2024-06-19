@@ -21,7 +21,7 @@ jobs:
 #              run: pyinstaller --onefile --hidden-import data_base.data_base_well.database_well main.py
       - name: Build executable
         run:
-          pyinstaller --noconfirm --onedir --icon=imageFiles/icon/zima_ico.ico --console --name "ZIMA"
+          pyinstaller --noconfirm --onedir --icon=imageFiles/icon/zima_ico.ico --noconsole --name "ZIMA"
           --add-data "work_py;work_py/" 
           --add-data "users;users/" 
           --add-data "tests;tests/" 
