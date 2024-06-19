@@ -56,7 +56,8 @@ def get_password(service_name, username):
     return keyring.get_password(service_name, username)
 
 
-password = get_password("zima_app", "postgres")
+# password = get_password("zima_app", "postgres")
+password = '195375AsD+'
 
 
 
