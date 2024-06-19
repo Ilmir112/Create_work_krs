@@ -170,6 +170,8 @@ class TabPage_SO_with(QWidget):
         self.dictance_three_Edit.textChanged.connect(self.update_template)
         self.template_second_Edit.textChanged.connect(self.update_template)
         self.lenght_template_second_Edit.textChanged.connect(self.update_template)
+        self.current_bottom_edit.textChanged.connect(self.update_template)
+        self.current_bottom_edit.textChanged.connect(self.update_template)
 
     def definition_pssh(self):
         # print(well_data.plast_work)
@@ -209,7 +211,10 @@ class TabPage_SO_with(QWidget):
             template_key = 'ПСШ СКМ в доп колонне без хвоста'
         return template_key
 
+
     def update_template(self):
+        if self.current_bottom_edit.text() != '':
+            well_data.current_bottom = round(float(self.current_bottom_edit.text()), 1)
 
         if self.template_first_Edit.text() != '':
                 first_template = self.template_first_Edit.text()
@@ -678,11 +683,11 @@ class TabPage_SO_with(QWidget):
                     elif well_data.open_trunk_well is True and dict_perforation[plast]['отрайбировано']:
                         roof_plast = well_data.shoe_column._value
                         roof_add_column_plast = well_data.current_bottom
-                        break
+
                     else:
                         roof_plast = min(list(map(lambda x: x[0], list(dict_perforation[plast]['интервал']))))
                         roof_add_column_plast = roof
-                        break
+
 
                 else:
                     roof_add_column_plast = roof_plast

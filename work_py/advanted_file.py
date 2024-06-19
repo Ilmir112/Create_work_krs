@@ -132,7 +132,7 @@ def remove_overlapping_intervals(perforating_intervals, skm_interval = None):
                                      well_data.skm_depth])
         # print(f'глубина СКМ {well_data.skm_depth, skipping_intervals}')
         perforating_intervals = sorted(perforating_intervals, key=lambda x: x[0])
-        print(perforating_intervals)
+
         for pvr in sorted(perforating_intervals, key=lambda x: x[0]):
             if pvr[1] <= well_data.skm_depth:
                 # print(pvr, well_data.skm_depth)
@@ -334,7 +334,7 @@ def count_row_height(ws, ws2, work_list, merged_cells_dict, ind_ins):
     boundaries_dict = {}
 
     text_width_dict = {35: (0, 100), 50: (101, 200), 70: (201, 300), 95: (301, 400), 110: (401, 500),
-                       130: (501, 600), 150: (601, 700), 170: (701, 800), 190: (801, 900), 210: (901, 1500)}
+                       130: (501, 600), 150: (601, 700), 170: (701, 800), 190: (801, 1000), 230: (1000, 1500)}
     for ind, _range in enumerate(ws.merged_cells.ranges):
         boundaries_dict[ind] = range_boundaries(str(_range))
 

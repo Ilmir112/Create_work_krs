@@ -163,6 +163,9 @@ class PerforationWindow(QMainWindow):
 
                         # Вставка интервалов зарядов БО
                         count_charge = int((max(i) - min(i)) * chargePM_BO)
+                        if count_charge < 0 or count_charge > 500:
+                            mes = QMessageBox.warning(self, 'НЕКОРРЕКТНО', 'ОБЪЕМ зарядов некорректен')
+                            return
                         self.tableWidget.insertRow(rows)
                         self.tableWidget.setItem(rows, 0, QTableWidgetItem(str(min(i))))
                         self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(max(i))))
@@ -176,6 +179,9 @@ class PerforationWindow(QMainWindow):
                     else:
                         # Вставка интервалов зарядов ГП без ГРП
                         count_charge = int((max(i) - min(i)) * chargePM)
+                        if count_charge < 0 or count_charge > 500:
+                            mes = QMessageBox.warning(self, 'НЕКОРРЕКТНО', 'ОБЪЕМ зарядов некорректен')
+                            return
 
                         self.tableWidget.insertRow(rows)
                         self.tableWidget.setItem(rows, 0, QTableWidgetItem(str(min(i))))
@@ -197,6 +203,9 @@ class PerforationWindow(QMainWindow):
                             if well_data.grp_plan:
                                 # Вставка интервалов зарядов ГП
                                 count_charge = int((max(i) - min(i)) * chargePM_GP)
+                                if count_charge < 0 or count_charge > 500:
+                                    mes = QMessageBox.warning(self, 'НЕКОРРЕКТНО', 'ОБЪЕМ зарядов некорректен')
+                                    return
 
                                 self.tableWidget.insertRow(rows)
                                 self.tableWidget.setItem(rows, 0, QTableWidgetItem(str(min(i))))
@@ -220,7 +229,10 @@ class PerforationWindow(QMainWindow):
                                 self.tableWidget.setItem(rows, 6, QTableWidgetItem(' '))
                             else:
                                 count_charge = int((max(i) - min(i)) * chargePM)
-                                # print(i)
+                                if count_charge < 0 or count_charge > 500:
+                                    mes = QMessageBox.warning(self, 'НЕКОРРЕКТНО', 'ОБЪЕМ зарядов некорректен')
+                                    return
+                                    # print(i)
                                 # print(str(min(i)))
                                 self.tableWidget.insertRow(rows)
                                 self.tableWidget.setItem(rows, 0, QTableWidgetItem(str(min(i))))
@@ -264,6 +276,10 @@ class PerforationWindow(QMainWindow):
             return
 
         chargesx = self.charge(int(float(editType2)))[0][:-2] + chargesx
+        count_otv = int((float(editType2) - float(editType)) * int(editHolesMetr))
+        if count_otv < 0:
+            mes = QMessageBox.warning(self, 'НЕКОРРЕКТНО', 'ОБЪЕМ зарядов некорректен')
+            return
         TabPage_SO.select_type_perforation(self, editType2)
         self.tableWidget.setSortingEnabled(False)
         rows = self.tableWidget.rowCount()
@@ -272,8 +288,7 @@ class PerforationWindow(QMainWindow):
         self.tableWidget.setItem(rows, 1, QTableWidgetItem(editType2))
         self.tableWidget.setItem(rows, 2, QTableWidgetItem(chargesx))
         self.tableWidget.setItem(rows, 3, QTableWidgetItem(editHolesMetr))
-        self.tableWidget.setItem(rows, 4, QTableWidgetItem(str(int((float(editType2) - float(
-            editType)) * int(editHolesMetr)))))
+        self.tableWidget.setItem(rows, 4, QTableWidgetItem(str(count_otv)))
         self.tableWidget.setItem(rows, 5, QTableWidgetItem(editIndexFormation))
         self.tableWidget.setItem(rows, 6, QTableWidgetItem(dopInformation))
         self.tableWidget.setSortingEnabled(True)
@@ -344,6 +359,11 @@ class PerforationWindow(QMainWindow):
                             None, None, None, 'подрядчик по ГИС', None]
             type_charge = self.tableWidget.item(row, 2).text()
             count_otv = self.tableWidget.item(row, 3).text()
+            if count_otv != '':
+                count_charge = float(count_otv)
+                if 0 > count_charge  or count_charge > 500:
+                    mes = QMessageBox.warning(self, 'НЕКОРРЕКТНО', 'ОБЪЕМ зарядов некорректен')
+                    return
             count_charge = self.tableWidget.item(row, 4).text()
             plast = self.tableWidget.item(row, 5).text()
             dop_information = self.tableWidget.item(row, 6).text()

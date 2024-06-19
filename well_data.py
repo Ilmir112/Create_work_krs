@@ -1,5 +1,7 @@
+import keyring
 from datetime import datetime
 from openpyxl.styles import Border, Side
+
 
 
 class ProtectedIsDigit:
@@ -45,6 +47,17 @@ class ProtectedIsNonNone:
         else:
             print(f'Ошибка: {value} - не корректное строковое значение')
             raise ValueError("Значение должно быть строкой")
+
+#
+# def save_password(service_name, username, password):
+#     keyring.set_password(service_name, username, password)
+
+def get_password(service_name, username):
+    return keyring.get_password(service_name, username)
+
+
+password = get_password("zima_app", "postgres")
+
 
 
 column_head_m = ''
@@ -258,14 +271,14 @@ thin_border = Border(left=Side(style='thin'),
 postgres_params_classif = {
             f'database': 'databaseclassification',
             f'user': 'postgres',
-            f'password': '195375AsD+',
+            f'password': f'{password}',
             f'host': f'{host_krs}',
             f'port': '5432'
         }
 postgres_params_data_well = {
             f'database': 'well_data',
             f'user': 'postgres',
-            f'password': '195375AsD+',
+            f'password': f'{password}',
             f'host': f'{host_krs}',
             f'port': '5432'
         }
@@ -273,21 +286,21 @@ postgres_params_data_well = {
 postgres_conn_gnkt = {
     'database': 'gnkt_database',
     'user': 'postgres',
-    'password': '195375AsD+',
+    'password': f'{password}',
     f'host': f'{host_krs}',
     'port': '5432'
         }
 postgres_conn_work_well = {
     'database': 'databasewellwork',
     'user': 'postgres',
-    'password': '195375AsD+',
+    'password': f'{password}',
     f'host': f'{host_krs}',
     'port': '5432'
 }
 postgres_conn_user = {
     'database': 'krs2',
     'user': 'postgres',
-    'password': '195375AsD+',
+    'password': f'{password}',
     f'host': f'{host_krs}',
     'port': '5432'
 }

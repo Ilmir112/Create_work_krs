@@ -184,6 +184,7 @@ class GnoWindow(QMainWindow):
                 float(self.tabWidget.currentWidget().volume_jumping_edit.text().replace(',', '.')), 1)
 
             well_data.fluid_work, well_data.fluid_work_short = self.calc_work_fluid(fluid)
+            well_data.current_bottom = current_bottom
             work_list = self.work_krs(self.work_plan, lift_key, volume_well_jaming, fluid)
             if lift_key == 'ЭЦН с автономными пакерами':
                 current_bottom_ecn_edit = round(float(self.tabWidget.currentWidget().current_bottom_ecn_edit.text()), 1)

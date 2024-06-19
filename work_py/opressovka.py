@@ -51,7 +51,7 @@ class TabPage_SO(QWidget):
 
         self.pressureZUMPF_question_Label = QLabel("Нужно ли опрессовывать ЗУМПФ", self)
         self.pressureZUMPF_question_QCombo = QComboBox(self)
-        self.pressureZUMPF_question_QCombo.currentTextChanged.connect(self.update_paker)
+        self.pressureZUMPF_question_QCombo.currentTextChanged.connect(self.update_paker_need)
 
         self.pressureZUMPF_question_QCombo.addItems(['Нет', 'Да'])
 
@@ -74,7 +74,7 @@ class TabPage_SO(QWidget):
         self.grid_layout.addWidget(self.need_privyazka_Label, 3, 4)
         self.grid_layout.addWidget(self.need_privyazka_QCombo, 4, 4)
 
-    def update_paker(self, index):
+    def update_paker_need(self, index):
         if index == 'Да':
             if len(well_data.plast_work) != 0:
                 pakerDepthZumpf = int(well_data.perforation_sole + 10)
@@ -90,6 +90,8 @@ class TabPage_SO(QWidget):
         elif index == 'Нет':
             self.pakerDepthZumpf_Label.setParent(None)
             self.pakerDepthZumpf_edit.setParent(None)
+
+    def update_paker(self):
         paker_depth = self.paker_depth_edit.text()
         if paker_depth != '':
             if well_data.open_trunk_well is True:

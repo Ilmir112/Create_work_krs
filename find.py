@@ -579,7 +579,7 @@ class WellCondition(FindIndexPZ):
                             well_data.well_volume_in_PZ.append(well_volume_in_PZ)
 
         if well_data.grp_plan:
-            grp_plan_quest = QMessageBox.question(self, 'Подготовка к ГРП', 'Программа определела что в скважине'
+            grp_plan_quest = QMessageBox.question(self, 'Подготовка к ГРП', 'Программа определела что в скважине '
                                                                             f'планируется ГРП, верно ли?')
             if grp_plan_quest == QMessageBox.StandardButton.Yes:
                 well_data.grp_plan = True
