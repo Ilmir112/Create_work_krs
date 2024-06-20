@@ -1,10 +1,10 @@
 import json
+import well_data
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.Qt import *
 from PyQt5.QtGui import QRegExpValidator, QColor, QPalette
 
-import re
 
 
 
