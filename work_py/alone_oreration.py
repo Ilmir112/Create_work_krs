@@ -52,9 +52,9 @@ def kot_work(self, current_bottom):
                 [None, None,
                  f'Поднять {kot_select(self, current_bottom)} на НКТ{well_data.nkt_diam}мм c глубины {current_bottom}м с доливом '
                  f'скважины в '
-                 f'объеме {round(current_bottom * 1.12 / 1000, 1)}м3 удельным весом {well_data.fluid_work}',
+                 f'объеме {round(float(current_bottom) * 1.12 / 1000, 1)}м3 удельным весом {well_data.fluid_work}',
                  None, None, None, None, None, None, None,
-                 'мастер КРС', liftingNKT_norm(current_bottom, 1)]
+                 'мастер КРС', liftingNKT_norm(float(current_bottom), 1)]
                 ]
 
     return kot_list

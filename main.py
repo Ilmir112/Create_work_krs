@@ -767,7 +767,8 @@ class MyWindow(QMainWindow):
 
             for i in range(1, len(work_list)):  # нумерация работ
                 if i >= ins_ind + 1:
-                    work_list[i][1] = i - ins_ind
+                    a = i
+                    work_list[i][1] = f'=ЕСЛИ(ЕПУСТО(C{a});"";СЧЁТЗ($C${a}:C{i}))'
                     if is_number(work_list[i][11]) is True:
                         well_data.normOfTime += float(str(work_list[i][11]).replace(',', '.'))
                     if work_list[i][0]:
@@ -863,7 +864,7 @@ class MyWindow(QMainWindow):
                 ws5 = wb2["Схемы ПВО"]
                 wb2.move_sheet(ws5, offset=-1)
                 schema_list = self.check_pvo_schema(ws5, ins_ind + 2)
-
+            wb2.calculation
 
             if wb2:
                 wb2.close()

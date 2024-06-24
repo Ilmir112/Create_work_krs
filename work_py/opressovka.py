@@ -347,7 +347,7 @@ class OpressovkaEK(QMainWindow):
                  'мастер КРС', liftingNKT_norm(paker_depth, 1.2)]]
 
         if len(well_data.dict_leakiness) != 0:
-            dict_leakinest_keys = sorted(list(well_data.dict_leakiness['НЭК']['интервал'].keys()), key=lambda x: x[0])
+            dict_leakinest_keys = sorted(list(well_data.dict_leakiness['НЭК']['интервал'].keys()), key=lambda x: x[0], reverse=True)
             if int(dict_leakinest_keys[0][0]) < paker_depth:
 
                 NEK_question = QMessageBox.question(self, 'Поинтервальная опрессовка НЭК',
@@ -547,8 +547,8 @@ class OpressovkaEK(QMainWindow):
         if well_data.leakiness is True:
             for nek in well_data.dict_leakiness['НЭК']['интервал']:
                 if well_data.dict_leakiness['НЭК']['интервал'][nek]['отключение'] is False and float(nek.split('-')[0]) < depth:
-                    interval_list.append(nek)
-                    check_true = False
+                    interval_list.append(list(map(float, nek.split('-'))))
+
         if any([float(interval[1]) < float(depth) for interval in interval_list]):
             check_true = True
             testing_pressure_str = f'Закачкой тех жидкости в затрубное пространство при Р=' \

@@ -1,4 +1,4 @@
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtWidgets
 from PyQt5.Qt import *
 from work_py.acid_paker import CheckableComboBox
 
@@ -7,20 +7,19 @@ from collections import namedtuple
 import well_data
 from H2S import calv_h2s
 
-
 class TabPage_SO(QWidget):
+    count_plast = []
     def __init__(self, parent=None):
         super().__init__(parent)
-       
+
         self.labels_category = {}
 
         self.plast_all = []
-        for plast in well_data.plast_all:
+        for plast in well_data.plast_all[::-1]:
             self.plast_all.append(plast)
 
         for plast in well_data.plast_project:
             self.plast_all.append(plast)
-
 
         self.cat_P_1 = well_data.cat_P_1
         self.cat_h2s_list = well_data.cat_h2s_list
@@ -50,26 +49,32 @@ class TabPage_SO(QWidget):
         well_data.number_indez = []
 
         for num in range(len(list(set(well_data.cat_P_P)))):
+
             plast_index = CheckableComboBox(self)
-            if len(well_data.plast_work) != 0:
-                work_plast = well_data.plast_work[0]
+            try:
+                work_plast = well_data.plast_work[num]
                 work_plast_index = 0
-            else:
-                work_plast = well_data.plast_all[0]
-                work_plast_index = 1
+            except:
+                if well_data.plast_project:
+                    work_plast = well_data.plast_project[0]
+                    work_plast_index = 1
+                else:
+                    work_plast = well_data.plast_all[num]
+                    work_plast_index = 2
 
             if work_plast == work_plast_iter and well_data.work_plan not in \
-                    ['application_pvr',  'application_gis', 'gnkt_after_grp', 'gnkt_frez', 'gntk_opz']:
+                    ['application_pvr', 'application_gis', 'gnkt_after_grp', 'gnkt_frez', 'gntk_opz']:
                 if len(well_data.dict_perforation_project) != 0 and \
                         any([plast not in well_data.plast_work for plast in well_data.plast_project]):
 
                     if abs(self.cat_P_P[num] - list([well_data.dict_perforation_project[
-                                                         plast]['давление'] for plast in well_data.plast_project][0])[0]) < 1:
+                                                         plast]['давление'] for plast in well_data.plast_project][0])[
+                        0]) < 1:
                         work_plast = well_data.plast_project[0]
                         work_plast_index = 1
                 else:
                     plast_index_str = QMessageBox.question(self, 'рабочие пласты',
-                                                           f'Есть ли индекс пласта категорийности {num+1}'
+                                                           f'Есть ли индекс пласта категорийности {num + 1}'
                                                            f'в интервалах перфорации')
                     if plast_index_str == QMessageBox.StandardButton.No:
                         work_plast, ok = QInputDialog.getText(None, 'индекс пласта',
@@ -78,7 +83,6 @@ class TabPage_SO(QWidget):
                 self.plast_all.append(work_plast)
 
             plast_index.combo_box.addItems(self.plast_all)
-            #
 
             plast_index.combo_box.setCurrentIndex(self.plast_all.index(work_plast))
 
@@ -105,30 +109,30 @@ class TabPage_SO(QWidget):
                 else:
                     h2s_pr = round(float(str(self.h2s_pr[num]).replace(',', '.')), 4)
                 h2s_pr_edit.setText(str(h2s_pr))
-            except:
+            except (IndexError, TypeError):
                 pass
 
             category_h2s2_edit = QLineEdit(self)
             try:
                 category_h2s2_edit.setText(str(self.ifNone(self.cat_h2s_list[num])))
                 h2s_mg_edit = QLineEdit(self)
-            except:
+            except (IndexError, TypeError):
                 pass
             try:
                 h2s_mg_edit.setText(str(self.h2s_mg[num]))
-            except:
+            except (IndexError, TypeError):
 
                 pass
 
             category_gf_edit = QLineEdit(self)
             try:
                 category_gf_edit.setText(str(self.ifNone(self.cat_gaz_f_pr[num])))
-            except:
+            except (IndexError, TypeError):
                 pass
             gaz_f_pr_edit = QLineEdit(self)
             try:
                 gaz_f_pr_edit.setText(str(self.ifNone(self.gaz_f_pr[num])))
-            except:
+            except (IndexError, TypeError):
                 pass
 
             units_pressuar = QLabel('атм')
@@ -143,8 +147,7 @@ class TabPage_SO(QWidget):
                 work_plast_iter = work_plast
 
             calc_plast_h2s = QLineEdit(self)
-          # print(Category_h2s_edit.text(), h2s_mg_edit.text(), h2s_pr_edit.text())
-
+            # print(Category_h2s_edit.text(), h2s_mg_edit.text(), h2s_pr_edit.text())
 
             self.grid.addWidget(plast_index, 4, 1 + n, 1, 2)
             self.grid.addWidget(category_pressuar_line_edit, 5, 1 + n)
@@ -188,8 +191,6 @@ class TabPage_SO(QWidget):
             well_data.number_indez.append(n)
             n += 3
 
-
-
     def ifNone(self, string):
 
         if str(string) in ['0', str(None), '-']:
@@ -230,7 +231,7 @@ class CategoryWindow(QMainWindow):
         vbox.addWidget(self.buttonAdd, 3, 0)
 
     def addRowTable(self):
-       
+
         # Пересохранение по сереводорода
 
         cat_P_1 = well_data.cat_P_1
@@ -247,37 +248,40 @@ class CategoryWindow(QMainWindow):
                         return
 
                 plast_sel = self.tabWidget.currentWidget().labels_category[index][0].combo_box.currentText()
+                if plast_sel == '':
+                    mes = QMessageBox.warning(self, 'Выбрать пласты', 'Необходимо выбрать пласты выбрать пласты')
+                    return
                 for plast in plast_sel.split(', '):
                     plast_index.append(plast)
                     if plast not in well_data.plast_work:
                         well_data.plast_project.append(plast)
+                    try:
+                        CategoryWindow.dict_category.setdefault(plast, {}).setdefault(
+                            'по давлению',
+                            Pressuar(int(self.tabWidget.currentWidget().labels_category[index][1].text()),
+                                     float(self.tabWidget.currentWidget().labels_category[index][7].text())))
 
-                    CategoryWindow.dict_category.setdefault(plast, {}).setdefault(
-                        'по давлению',
-                        Pressuar(int(self.tabWidget.currentWidget().labels_category[index][1].text()),
-                            float(self.tabWidget.currentWidget().labels_category[index][7].text())))
+                        CategoryWindow.dict_category.setdefault(plast, {}).setdefault(
+                            'по сероводороду', Data_h2s(
+                                int(self.tabWidget.currentWidget().labels_category[index][2].text()),
+                                float(self.tabWidget.currentWidget().labels_category[index][4].text()),
+                                float(self.tabWidget.currentWidget().labels_category[index][5].text()),
+                                float(
+                                    self.tabWidget.currentWidget().labels_category[index][9].text().replace(',', '.'))))
 
-                    CategoryWindow.dict_category.setdefault(plast, {}).setdefault(
-                        'по сероводороду', Data_h2s(
-                            int(self.tabWidget.currentWidget().labels_category[index][2].text()),
-                            float(self.tabWidget.currentWidget().labels_category[index][4].text()),
-                            float(self.tabWidget.currentWidget().labels_category[index][5].text()),
-                            float(self.tabWidget.currentWidget().labels_category[index][9].text().replace(',','.'))))
+                        CategoryWindow.dict_category.setdefault(plast, {}).setdefault(
+                            'по газовому фактору', Data_gaz(
+                                int(self.tabWidget.currentWidget().labels_category[index][3].text()),
+                                float(self.tabWidget.currentWidget().labels_category[index][6].text())))
 
-                    CategoryWindow.dict_category.setdefault(plast, {}).setdefault(
-                        'по газовому фактору', Data_gaz(
-                            int(self.tabWidget.currentWidget().labels_category[index][3].text()),
-                            float(self.tabWidget.currentWidget().labels_category[index][6].text())))
+                        CategoryWindow.dict_category.setdefault(plast, {}).setdefault(
+                            'отключение', self.tabWidget.currentWidget().labels_category[index][8].currentText())
 
-                    CategoryWindow.dict_category.setdefault(plast, {}).setdefault(
-                        'отключение', self.tabWidget.currentWidget().labels_category[index][8].currentText())
-                    # CategoryWindow.dict_category.setdefault(plast, {}).setdefault(
-                    #     'поглотитель', self.tabWidget.currentWidget().labels_category[index][9].currentText())
+                    except:
+                        mes = QMessageBox.warning(self, 'Ошибка', "Ошибка сохранения данных по категории")
 
-        print(f'кат {CategoryWindow.dict_category}')
         well_data.pause = False
         self.close()
-
 
     def ifNum(self, string):
         # метод для проверки и преобразования введенных значений

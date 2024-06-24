@@ -112,6 +112,7 @@ class CheckableComboBoxChild(QComboBox):
         self.lineEdit().setText(text)
 
     def addItem(self, text, data=None, checked=False):
+        from category_correct import TabPage_SO
 
         item = QStandardItem()
         item.setText(text)
@@ -120,7 +121,15 @@ class CheckableComboBoxChild(QComboBox):
         else:
             item.setData(data)
         item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsUserCheckable)
-        item.setData(Qt.Unchecked if not text in well_data.plast_work else Qt.Checked, Qt.CheckStateRole)
+        a = text
+        b = TabPage_SO.count_plast
+        if text in well_data.plast_work and not text in TabPage_SO.count_plast:
+            item.setData(Qt.Unchecked if not text in well_data.plast_work else Qt.Checked, Qt.CheckStateRole)
+            TabPage_SO.count_plast.append(text)
+        else:
+            if well_data.plast_project:
+                item.setData(Qt.Unchecked if not text in well_data.plast_project else Qt.Checked, Qt.CheckStateRole)
+
         self.model().appendRow(item)
 
     def addItems(self, texts, datalist=None):
@@ -949,7 +958,7 @@ class AcidPakerWindow(QMainWindow):
             swab_volumeEdit = int(float(self.tabWidget.currentWidget().swab_volumeEdit.text()))
             paker_depth_swab = int(float(self.tabWidget.currentWidget().swab_paker_depth.text()))
 
-            if self.paker_layout_combo == 'однопакерная':
+            if self.paker_layout_combo == 'однопакерная' or self.paker_layout_combo == 'пакер с заглушкой':
                 if MyWindow.true_set_Paker(self, paker_depth_swab) is False:
                     return
                 if MyWindow.check_depth_in_skm_interval(self, paker_depth_swab) is False:
@@ -960,6 +969,10 @@ class AcidPakerWindow(QMainWindow):
                 swab_work_list = Swab_Window.swabbing_with_paker(self, diametr_paker, paker_depth_swab, paker_khost,
                                                                  plast_combo, swabTypeCombo, swab_volumeEdit,
                                                                  depth_gauge_combo)
+                if self.paker_layout_combo == 'пакер с заглушкой':
+                    swab_work_list.pop(6)
+                    swab_work_list = swab_work_list[4:]
+
             elif self.paker_layout_combo == 'двухпакерная':
                 paker_depth_swab = int(self.tabWidget.currentWidget().swab_paker_depth.text())
                 if MyWindow.check_true_depth_template(self, paker_depth_swab) is False:

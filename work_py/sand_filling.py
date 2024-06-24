@@ -213,7 +213,7 @@ class SandWindow(QMainWindow):
             work_list = work_list[:-1]
             roof_rir_edit = int(float(self.tabWidget.currentWidget().roof_rir_edit.text()))
             sole_rir_edit = int(float(self.tabWidget.currentWidget().sole_rir_edit.text()))
-            rir_list = RirWindow.rirWithPero(self, "Не нужно", '', roof_rir_edit, sole_rir_edit, volume_cement)
+            rir_list = RirWindow.rirWithPero_gl(self, "Не нужно", '', roof_rir_edit, sole_rir_edit, volume_cement)
             work_list.extend(rir_list[1:])
 
         MyWindow.populate_row(self, self.ins_ind, work_list, self.table_widget)

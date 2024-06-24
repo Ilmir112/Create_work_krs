@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox, QTabWidget, QWidget, QLab
 
 import well_data
 from PyQt5.QtCore import Qt
-from .acid_paker import AcidPakerWindow
+
 from .rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
 from work_py.alone_oreration import kot_work
 from PyQt5.QtGui import QDoubleValidator
@@ -42,6 +42,31 @@ class TabPage_SO_with(QWidget):
         self.dictance_template_first_Edit.setValidator(validator)
 
 
+
+        self.privyazka_question_Label = QLabel("Нужно ли привязывать компоновку", self)
+        self.privyazka_question_QCombo = QComboBox(self)
+        self.privyazka_question_QCombo.addItems(['Нет', 'Да'])
+
+        if well_data.current_bottom - well_data.perforation_sole <= 10 and well_data.open_trunk_well is False:
+            self.privyazka_question_QCombo.setCurrentIndex(1)
+
+        self.note_Label = QLabel("Нужно ли добавлять примечание", self)
+        self.note_question_QCombo = QComboBox(self)
+        self.note_question_QCombo.addItems(['Нет', 'Да'])
+
+        self.solvent_Label = QLabel("объем растворителя", self)
+        self.solvent_volume_edit = QLineEdit(self)
+        self.solvent_volume_edit.setValidator(validator)
+        self.solvent_volume_edit.setText("2")
+
+        self.solvent_question_Label = QLabel("необходимость растворителя", self)
+        self.solvent_question_QCombo = QComboBox(self)
+        self.solvent_question_QCombo.addItems(['Нет', 'Да'])
+
+        if well_data.count_template == 0:
+            self.note_question_QCombo.setCurrentIndex(1)
+            self.solvent_question_QCombo.setCurrentIndex(1)
+
         self.skm_Label = QLabel("диаметр СКМ", self)
         self.skm_Edit = QLineEdit(self)
         self.skm_Edit.setValidator(validator)
@@ -75,6 +100,7 @@ class TabPage_SO_with(QWidget):
         self.current_bottom_label = QLabel('Забой текущий')
         self.current_bottom_edit = QLineEdit(self)
         self.current_bottom_edit.setText(f'{well_data.current_bottom}')
+
 
         self.grid = QGridLayout(self)
         if well_data.column_additional is False or \
@@ -136,8 +162,20 @@ class TabPage_SO_with(QWidget):
             self.grid.addWidget(self.lenght_template_second_Label, 4, 9)
             self.grid.addWidget(self.lenght_template_second_Edit, 5, 9)
 
-        self.grid.addWidget(self.current_bottom_label, 8, 3, 1, 2)
-        self.grid.addWidget(self.current_bottom_edit, 9, 3, 1, 2)
+        self.grid.addWidget(self.current_bottom_label, 8, 3)
+        self.grid.addWidget(self.current_bottom_edit, 9, 3)
+
+        self.grid.addWidget(self.solvent_question_Label, 8, 4)
+        self.grid.addWidget(self.solvent_question_QCombo, 9, 4)
+
+        self.grid.addWidget(self.solvent_Label, 8, 5)
+        self.grid.addWidget(self.solvent_volume_edit, 9, 5)
+
+        self.grid.addWidget(self.privyazka_question_Label, 8, 6)
+        self.grid.addWidget(self.privyazka_question_QCombo, 9, 6)
+
+        self.grid.addWidget(self.note_Label, 8, 7)
+        self.grid.addWidget(self.note_question_QCombo, 9, 7)
 
         self.grid.addWidget(self.template_str_Label, 11, 1, 1, 8)
         self.grid.addWidget(self.template_str_Edit, 12, 1, 1, 8)
@@ -172,6 +210,8 @@ class TabPage_SO_with(QWidget):
         self.lenght_template_second_Edit.textChanged.connect(self.update_template)
         self.current_bottom_edit.textChanged.connect(self.update_template)
         self.current_bottom_edit.textChanged.connect(self.update_template)
+
+
 
     def definition_pssh(self):
         # print(well_data.plast_work)
@@ -845,6 +885,7 @@ class TemplateKrs(QMainWindow):
         vbox.addWidget(self.buttonadd_work, 3, 0)
         vbox.addWidget(self.buttonAddString, 3, 1)
 
+
     def addRowTable(self):
         roof_skm = self.tabWidget.currentWidget().roof_skm_line.text()
         sole_skm = self.tabWidget.currentWidget().sole_skm_line.text()
@@ -912,6 +953,8 @@ class TemplateKrs(QMainWindow):
         template_key = str(self.tabWidget.currentWidget().template_Combo.currentText())
         distance_second = int(float(self.tabWidget.currentWidget().dictance_template_second_Edit.text()))
         distance_first = int(self.tabWidget.currentWidget().dictance_template_first_Edit.text())
+
+
         if well_data.column_additional is False or (
                 well_data.column_additional is True and float(
             well_data.head_column_additional._value) >= well_data.current_bottom):
@@ -963,9 +1006,6 @@ class TemplateKrs(QMainWindow):
         well_data.skm_interval.extend(skm_tuple)
         # print(f'интервалы СКМ {well_data.skm_interval}')
         skm_list = sorted(skm_tuple, key=lambda x: x[0])
-        current_bottom = self.tabWidget.currentWidget().current_bottom_edit.text()
-        if current_bottom != '':
-            well_data.current_bottom = round(float(current_bottom), 1)
 
         work_template_list = self.template_ek(template_str, template_diametr, skm_list)
 
@@ -981,7 +1021,6 @@ class TemplateKrs(QMainWindow):
         self.tableWidget.removeRow(row)
 
     def well_volume(self):
-
         if not well_data.column_additional:
 
             volume_well = 3.14 * (
@@ -1004,55 +1043,65 @@ class TemplateKrs(QMainWindow):
         # print(f'внут {skm_list}')
         skm_interval = raid(skm_list)
 
+        solvent_question = self.tabWidget.currentWidget().solvent_question_QCombo.currentText()
+        solvent_volume_edit = self.tabWidget.currentWidget().solvent_volume_edit.text()
+        if solvent_volume_edit != '':
+            solvent_volume_edit = round(float(solvent_volume_edit), 1)
+        privyazka_question = self.tabWidget.currentWidget().privyazka_question_QCombo.currentText()
+        note_question_QCombo = self.tabWidget.currentWidget().note_question_QCombo.currentText()
+
+        current_bottom = self.tabWidget.currentWidget().current_bottom_edit.text()
+        if current_bottom != '':
+            current_bottom = round(float(current_bottom), 1)
+
         list_template_ek = [
             [f'СПО  {template_str} на 'f'НКТ{well_data.nkt_diam}мм', None,
              f'Спустить  {template_str} на 'f'НКТ{well_data.nkt_diam}мм  с замером, шаблонированием НКТ. \n'
              f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
              None, None, None, None, None, None, None,
-             'мастер КРС', descentNKT_norm(well_data.current_bottom, 1.2)],
-            [
-                f'Произвести скреперование в интервале {skm_interval}м Допустить низ НКТ до гл. {well_data.current_bottom}м',
-                None,
-                f'Произвести скреперование э/к в интервале {skm_interval}м обратной промывкой и проработкой 5 раз каждого '
-                'наращивания. Работы производить согласно сборника технологических регламентов и инструкций в присутствии '
-                f'представителя Заказчика. Допустить низ НКТ до гл. {well_data.current_bottom}м, шаблон '
-                f'до глубины {well_data.template_depth}м. Составить акт. \n'
-                '(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ). ',
-                None, None, None, None, None, None, None,
-                'Мастер КРС, представитель УСРСиСТ', round(0.012 * 90 * 1.04 + 1.02 + 0.77, 2)],
-            [f'Очистить колонну от АСПО растворителем - 2м3', None,
+             'мастер КРС', descentNKT_norm(current_bottom, 1.2)],
+            [f'Произвести скреперование в интервале {skm_interval}м Допустить низ НКТ до гл. {current_bottom}м',
+            None,
+            f'Произвести скреперование э/к в интервале {skm_interval}м обратной промывкой и проработкой 5 раз каждого '
+            'наращивания. Работы производить согласно сборника технологических регламентов и инструкций в присутствии '
+            f'представителя Заказчика. Допустить низ НКТ до гл. {current_bottom}м, шаблон '
+            f'до глубины {well_data.template_depth}м. Составить акт. \n'
+            '(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ). ',
+            None, None, None, None, None, None, None,
+            'Мастер КРС, представитель УСРСиСТ', round(0.012 * 90 * 1.04 + 1.02 + 0.77, 2)],
+            [f'Очистить колонну от АСПО растворителем - {solvent_volume_edit}м3', None,
              f'По результатам ревизии ГНО, в случае наличия отложений АСПО:\n'
-             f'Очистить колонну от АСПО растворителем - 2м3. При открытом затрубном пространстве закачать в '
-             f'трубное пространство растворитель в объеме 2м3, продавить в трубное пространство тех.жидкостью '
-             f'в объеме {round(3 * well_data.current_bottom / 1000, 1)}м3. Приподнять. Закрыть трубное и затрубное '
+             f'Очистить колонну от АСПО растворителем - {solvent_volume_edit}м3. При открытом затрубном '
+             f'пространстве закачать в '
+             f'трубное пространство растворитель в объеме {solvent_volume_edit}м3, продавить в трубное '
+             f'пространство тех.жидкостью '
+             f'в объеме {round(3 * float(current_bottom) / 1000, 1)}м3. Приподнять. Закрыть трубное и затрубное '
              f'пространство. Реагирование 2 часа.',
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика', 4],
-            [
-                f'Промывка скважину уд.весом {well_data.fluid_work} в объеме {round(TemplateKrs.well_volume(self) * 1.5, 1)}м3 ',
-                None,
-                f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {well_data.fluid_work}  при расходе '
-                f'жидкости 6-8 л/сек '
-                f'в присутствии представителя Заказчика в объеме {round(TemplateKrs.well_volume(self) * 1.5, 1)}м3 ПРИ ПРОМЫВКЕ НЕ '
-                f'ПРЕВЫШАТЬ ДАВЛЕНИЕ {well_data.max_admissible_pressure._value}АТМ, '
-                f'ДОПУСТИМАЯ ОСЕВАЯ НАГРУЗКА НА ИНСТРУМЕНТ: 0,5-1,0 ТН',
-                None, None, None, None, None, None, None,
-                'Мастер КРС, представитель ЦДНГ', well_volume_norm(TemplateKrs.well_volume(self) * 1.5)],
+            [f'Промывка скважину уд.весом {well_data.fluid_work} в объеме {round(TemplateKrs.well_volume(self) * 1.5, 1)}м3 ',
+            None,
+            f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {well_data.fluid_work}  при расходе '
+            f'жидкости 6-8 л/сек '
+            f'в присутствии представителя Заказчика в объеме {round(TemplateKrs.well_volume(self) * 1.5, 1)}м3 ПРИ ПРОМЫВКЕ НЕ '
+            f'ПРЕВЫШАТЬ ДАВЛЕНИЕ {well_data.max_admissible_pressure._value}АТМ, '
+            f'ДОПУСТИМАЯ ОСЕВАЯ НАГРУЗКА НА ИНСТРУМЕНТ: 0,5-1,0 ТН',
+            None, None, None, None, None, None, None,
+            'Мастер КРС, представитель ЦДНГ', well_volume_norm(TemplateKrs.well_volume(self) * 1.5)],
             [None, None, f'При необходимости нормализовать забой обратной промывкой тех жидкостью уд.весом '
-                         f'{well_data.fluid_work} до глубины {well_data.current_bottom}м.', None, None, None, None,
-             None,
-             None, None,
+                         f'{well_data.fluid_work} до глубины {current_bottom}м.', None, None, None, None,
+             None, None, None,
              'Мастер КРС', None],
-            [f'Приподнять до глубины {round(well_data.current_bottom - 20, 1)}м. Тех отстой 2ч', None,
-             f'Приподнять до глубины {round(well_data.current_bottom - 20, 1)}м. Тех отстой 2ч. Определение текущего забоя, '
+            [f'Приподнять до глубины {round(float(current_bottom)- 20, 1)}м. Тех отстой 2ч', None,
+             f'Приподнять до глубины {round(float(current_bottom) - 20, 1)}м. Тех отстой 2ч. Определение текущего забоя, '
              f'при необходимости повторная промывка.',
              None, None, None, None, None, None, None,
              'Мастер КРС, представитель ЦДНГ', 2.49],
             [None, None,
-             f'Поднять {template_str} на НКТ{well_data.nkt_diam}мм с глубины {well_data.current_bottom}м с доливом скважины в '
+             f'Поднять {template_str} на НКТ{well_data.nkt_diam}мм с глубины {current_bottom}м с доливом скважины в '
              f'объеме {round(well_data.current_bottom * 1.12 / 1000, 1)}м3 тех. жидкостью  уд.весом {well_data.fluid_work}',
              None, None, None, None, None, None, None,
-             'Мастер КРС', liftingNKT_norm(well_data.current_bottom, 1.2)]
+             'Мастер КРС', liftingNKT_norm(float(current_bottom), 1.2)]
         ]
 
         notes_list = [
@@ -1062,9 +1111,9 @@ class TemplateKrs(QMainWindow):
              f'{template_diametr - 5}мм на ТНКТ под проработку в интервале посадки инструмента с допуском до '
              f'гл.{well_data.current_bottom}м с последующим СПО шаблона {template_diametr}мм на ТНКТ под промывку '
              f'скважины (по согласованию Заказчиком). Подъем райбера (шаблона {template_diametr}мм) '
-             f'на ТНКТ с гл. {well_data.current_bottom}м вести с доливом скважины до устья т/ж '
+             f'на ТНКТ с гл. {current_bottom}м вести с доливом скважины до устья т/ж '
              f'удел.весом {well_data.fluid_work} в '
-             f'объеме {round(well_data.current_bottom * 1.12 / 1000, 1)}м3 ',
+             f'объеме {round(float(current_bottom) * 1.12 / 1000, 1)}м3 ',
              None, None, None, None, None, None, None, 'Мастер КРС', None, None],
             [None, None,
              f'ПРИМЕЧАНИЕ №2: При отсутствия планового текущего забоя произвести СПО забойного двигателя с '
@@ -1075,37 +1124,37 @@ class TemplateKrs(QMainWindow):
              f'проходимости ствола  '
              f'и забоя скважины с применением мех.ротора, до текущего забоя с последующей нормализацией до '
              f'планового '
-             f'текущего забоя. Подъем долота с забойным двигателем на  ТНКТ с гл.{well_data.current_bottom}м '
+             f'текущего забоя. Подъем долота с забойным двигателем на  ТНКТ с гл.{current_bottom}м '
              f'вести с доливом '
              f'скважины до устья т/ж удел.весом {well_data.fluid_work} в объеме '
-             f'{round(well_data.current_bottom * 1.12 / 1000, 1)}м3',
+             f'{round(float(current_bottom) * 1.12 / 1000, 1)}м3',
              None, None, None, None, None, None, None, 'Мастер КРС',
              None],
             [None, None,
              f'ПРИМЕЧАНИЕ №3: В случае отсутствия проходки более 4 часов при нормализации забоя по примечанию '
              f'№2 произвести '
              f'СПО МЛ с последующим СПО торцевой печати. Подъем компоновки на ТНКТ с гл.'
-             f'{well_data.current_bottom}м вести с '
+             f'{current_bottom}м вести с '
              f'доливом скважины до устья т/ж удел.весом с доливом c'
              f'скважины до устья т/ж удел.весом {well_data.fluid_work} в объеме '
-             f'{round(well_data.current_bottom * 1.12 / 1000, 1)}м3',
+             f'{round(float(current_bottom) * 1.12 / 1000, 1)}м3',
              None, None, None, None, None, None, None, 'Мастер КРС', None],
             [None, None,
              f'Примечание №4: В случае отсутствия циркуляции при нормализации забоя произвести СПО КОТ-50 '
              f'до планового '
              f'текущего забоя обратной циркуляцией. СПО КОТ-50 повторить до полной нормализации. При жесткой посадке '
              f'КОТ-50 произвести взрыхление с СПО забойного двигателя с долотом . Подъем компоновки '
-             f'на ТНКТ с гл.{well_data.current_bottom}м'
+             f'на ТНКТ с гл.{current_bottom}м'
              f' вести с доливом скважины до устья т/ж удел.весом {well_data.fluid_work} в '
-             f'объеме {round(well_data.current_bottom * 1.12 / 1000, 1)}м3',
+             f'объеме {round(float(current_bottom) * 1.12 / 1000, 1)}м3',
              None, None, None, None, None, None, None, 'Мастер КРС', None, ''],
             [None, None,
              f'Примечание №5: В случае необходимости по результатам восстановления проходимости '
              f'экплуатационной колонны '
              f'по согласованию с УСРСиСТ произвести СПО пера под промывку скважины до планового текущего забоя на '
-             f'проходимость. Подъем компоновки на ТНКТ с гл.{well_data.current_bottom}м'
+             f'проходимость. Подъем компоновки на ТНКТ с гл.{current_bottom}м'
              f' вести с доливом скважины до устья т/ж удел.весом {well_data.fluid_work} в объеме '
-             f'{round(well_data.current_bottom * 1.12 / 1000, 1)}м3',
+             f'{round(float(current_bottom) * 1.12 / 1000, 1)}м3',
              None, None, None, None, None, None, None, 'Мастер КРС', None, None]]
 
         privyazka_nkt = [f'Привязка по ГК и ЛМ По привязому НКТ удостовериться в наличии текущего забоя', None,
@@ -1116,21 +1165,17 @@ class TemplateKrs(QMainWindow):
                          f'забой обратной промывкой тех жидкостью '
                          f'уд.весом {well_data.fluid_work}   до глубины {well_data.current_bottom}м',
                          None, None, None, None, None, None, None, 'Мастер КРС', None, None]
-        if well_data.current_bottom - well_data.perforation_sole <= 10 and well_data.open_trunk_well is False:
-            privyazka_question = QMessageBox.question(self, 'Привязка оборудования',
-                                                      f'зумпф составляет '
-                                                      f'{int(well_data.current_bottom - well_data.perforation_sole)}м '
-                                                      f'нужно ли привязывать компоновку?'
-                                                      )
-            if privyazka_question == QMessageBox.StandardButton.Yes:
-                list_template_ek.insert(-1, privyazka_nkt)
+
+
+        if privyazka_question == "Да":
+            list_template_ek.insert(-1, privyazka_nkt)
 
         if float(well_data.static_level._value) > 700:
             kot_question = QMessageBox.question(self, 'Низкий Статический уровень', 'Нужно ли произвести СПО '
                                                                                     'обратных клапанов перед ПСШ?')
             if kot_question == QMessageBox.StandardButton.Yes:
                 # print(f'Нужно вставить коты')
-                for row in kot_work(self, well_data.current_bottom)[::-1]:
+                for row in kot_work(self, current_bottom)[::-1]:
                     list_template_ek.insert(0, row)
 
         if well_data.gipsInWell is True:  # Добавление работ при наличии Гипсово-солевых отложений
@@ -1138,12 +1183,16 @@ class TemplateKrs(QMainWindow):
             for row in gips[::-1]:
                 list_template_ek.insert(0, row)
         # print(f'счет использования шаблн {well_data.count_template}')
-        if well_data.count_template == 0 and well_data.work_plan != 'dop_plan':
+        if note_question_QCombo == "Да":
             list_template_ek = list_template_ek + notes_list
             well_data.count_template += 1
         else:
             list_template_ek = list_template_ek
+
+        if solvent_question == 'Нет':
             list_template_ek.pop(2)
+
+        well_data.current_bottom = current_bottom
 
         return list_template_ek
 
@@ -1243,9 +1292,6 @@ class TemplateKrs(QMainWindow):
                 nkt_string = f'{type_nkt}{nkt_type[type_nkt]} 20м + репер + {type_nkt}{nkt_type[type_nkt]} ' \
                              f'{round(well_data.head_column_additional._value - current - 20, 0)}м '
         return nkt_string
-
-
-
 
 if __name__ == "__main__":
     import sys

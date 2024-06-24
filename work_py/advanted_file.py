@@ -325,7 +325,8 @@ def definition_plast_work(self):
 
     well_data.perforation_roof = perforation_roof
     well_data.perforation_sole = perforation_sole
-    # print(dict_perforation)
+    well_data.dict_perforation = dict(sorted(well_data.dict_perforation.items(), key=lambda item: (not item[1]['отключение'],
+                                                                                         item[0])))
     well_data.plast_all = list(well_data.dict_perforation.keys())
     well_data.plast_work = list(plast_work)
 def count_row_height(ws, ws2, work_list, merged_cells_dict, ind_ins):
@@ -351,7 +352,6 @@ def count_row_height(ws, ws2, work_list, merged_cells_dict, ind_ins):
                             ws2.row_dimensions[i + 1].height = int(key)
 
     head = plan.head_ind(0, ind_ins)
-    # print(f'head - {head}')
 
     plan.copy_true_ws(ws, ws2, head)
 
@@ -360,7 +360,7 @@ def count_row_height(ws, ws2, work_list, merged_cells_dict, ind_ins):
             cell = ws2.cell(row=i, column=j)
 
             if cell and str(cell) != str(work_list[i - 1][j - 1]):
-                # print(work_list[i - 1][j - 1])
+
                 if str(work_list[i - 1][j - 1]).replace('.', '').isdigit() and \
                         str(work_list[i - 1][j - 1]).count('.') != 2:
                     try:
@@ -394,8 +394,8 @@ def count_row_height(ws, ws2, work_list, merged_cells_dict, ind_ins):
                             or 'заявку оформить за 16 часов' in str(cell.value).lower() \
                             or 'ЗАДАЧА 2.9.' in str(cell.value).upper() \
                             or 'ВСЕ ТЕХНОЛОГИЧЕСКИЕ ОПЕРАЦИИ' in str(cell.value).upper() \
-                            or 'за 48 часов до спуска' in str(cell.value).upper()\
-                            or 'РИР' in str(cell.value).upper()\
+                            or 'за 48 часов до спуска' in str(cell.value).upper() \
+                            or 'РИР' in str(cell.value).upper() \
                             or 'При отсутствии избыточного давления' in str(cell.value):
                         # print('есть жирный')
                         ws2.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=True)
@@ -404,7 +404,7 @@ def count_row_height(ws, ws2, work_list, merged_cells_dict, ind_ins):
                         ws2.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=True)
                         ws2.cell(row=i, column=j).alignment = Alignment(wrap_text=True, horizontal='center',
                                                                         vertical='center')
-    # print(merged_cells_dict)
+        # print(merged_cells_dict)
     for row, col in merged_cells_dict.items():
         if len(col) != 2:
             # print(row)
@@ -414,14 +414,13 @@ def count_row_height(ws, ws2, work_list, merged_cells_dict, ind_ins):
         ws2.merge_cells(start_column=value[0], start_row=value[1],
                         end_column=value[2], end_row=value[3])
 
-    # вставка сохраненных изображение по координатам ячеек
+        # вставка сохраненных изображение по координатам ячеек
     if well_data.image_list:
         # print(f' схемы {well_data.image_list}')
         for img in well_data.image_list:
             logo = Image(img[0])
             logo.width, logo.height = img[2][0] * 0.48, img[2][1] * 0.72
             ws2.add_image(logo, img[1])
-
 
     for index_row, row in enumerate(ws2.iter_rows()):  # Копирование высоты строки
         if all([col is None for col in row]):

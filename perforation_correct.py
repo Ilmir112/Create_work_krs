@@ -208,8 +208,7 @@ class PerforationCorrect(QMainWindow):
                 self.close()
                 return
             else:
-                well_data.current_bottom, ok = QInputDialog.getDouble(self, 'Необходимый забой',
-                                                                     'Введите забой до которого нужно нормализовать')
+
                 return
         well_data.pause = False
         self.close()

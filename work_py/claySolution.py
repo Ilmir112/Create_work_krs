@@ -186,9 +186,9 @@ class ClayWindow(QMainWindow):
                               None, None, None, None, None, None, None,
                               'мастер КРС', descentNKT_norm(float(rirSole)-float(rirRoof), 1)])
             if (well_data.plast_work) != 0 or rirSole > well_data.perforation_sole:
-                rir_work_list = RirWindow.rirWithPero(self, 'Не нужно', '', roof_rir_edit, sole_rir_edit)
+                rir_work_list = RirWindow.rirWithPero_gl(self, 'Не нужно', '', roof_rir_edit, sole_rir_edit)
                 pero_list.extend(rir_work_list[-9:])
             else:
-                rir_work_list = RirWindow.rirWithPero(self,'Не нужно', '', roof_rir_edit, sole_rir_edit)
+                rir_work_list = RirWindow.rirWithPero_gl(self,'Не нужно', '', roof_rir_edit, sole_rir_edit)
                 pero_list.extend(rir_work_list[-10:])
         return pero_list

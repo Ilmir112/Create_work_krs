@@ -13,6 +13,7 @@ from main import MyWindow
 from work_py.change_fluid import TabPage_SO_swab, Change_fluid_Window
 
 from work_py.alone_oreration import privyazkaNKT, need_h2s
+from work_py.template_work import TabPage_SO_with
 from .rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
 
 
@@ -373,6 +374,23 @@ class TabPage_SO_swab(QWidget):
             self.pressuar_new_edit = QLineEdit(self)
             paker_layout_list_tab = ["забой", "глубина понижения", "вид освоения"]
 
+            first_template, template_second = TabPage_SO_with.template_diam_ek(self)
+            self.template_second_Label = QLabel("диаметр шаблона", self)
+            self.template_second_Edit = QLineEdit(self)
+            self.template_second_Edit.setValidator(self.validator_int)
+            self.template_second_Edit.setText(str(template_second))
+
+            self.lenght_template_second_Label = QLabel("длина шаблона", self)
+            self.lenght_template_second_Edit = QLineEdit(self)
+            self.lenght_template_second_Edit.setValidator(self.validator_int)
+            self.lenght_template_second_Edit.setText('4')
+
+            self.grid.addWidget(self.template_second_Label, 3, 3)
+            self.grid.addWidget(self.template_second_Edit, 4, 3)
+
+            self.grid.addWidget(self.lenght_template_second_Label, 3, 4)
+            self.grid.addWidget(self.lenght_template_second_Edit, 4, 4)
+
 
         elif self.swab_true_edit_type.currentText() == 'Опрессовка снижением уровня на пакере с заглушкой':
             self.paker2Label.setText('Глубина Понижения уровня')
@@ -590,34 +608,37 @@ class Swab_Window(QMainWindow):
         self.tableWidget.removeRow(row)
 
     def add_work(self):
+        try:
+            diametr_paker = int(float(self.tabWidget.currentWidget().diametr_paker_edit.text()))
+            swab_true_edit_type = self.tabWidget.currentWidget().swab_true_edit_type.currentText()
+            need_change_zgs_combo = self.tabWidget.currentWidget().need_change_zgs_combo.currentText()
+            depthGaugeCombo = self.tabWidget.currentWidget().depthGaugeCombo.currentText()
 
-        diametr_paker = int(float(self.tabWidget.currentWidget().diametr_paker_edit.text()))
-        swab_true_edit_type = self.tabWidget.currentWidget().swab_true_edit_type.currentText()
-        need_change_zgs_combo = self.tabWidget.currentWidget().need_change_zgs_combo.currentText()
-        depthGaugeCombo = self.tabWidget.currentWidget().depthGaugeCombo.currentText()
+            rows = self.tableWidget.rowCount()
+            if need_change_zgs_combo == 'Да':
+                if len(well_data.plast_project) != 0:
+                    plast_new_combo = self.tabWidget.currentWidget().plast_new_combo.currentText()
+                else:
+                    plast_new_combo = self.tabWidget.currentWidget().plast_new_combo.text()
 
-        rows = self.tableWidget.rowCount()
-        if need_change_zgs_combo == 'Да':
-            if len(well_data.plast_project) != 0:
-                plast_new_combo = self.tabWidget.currentWidget().plast_new_combo.currentText()
+                fluid_new_edit = self.tabWidget.currentWidget().fluid_new_edit.text()
+                if fluid_new_edit != '':
+                    fluid_new_edit = float(fluid_new_edit.replace(',', '.'))
+                pressuar_new_edit = self.tabWidget.currentWidget().pressuar_new_edit.text()
+
+                if pressuar_new_edit != '':
+                    pressuar_new_edit = int(float(pressuar_new_edit.replace(',', '.')))
             else:
-                plast_new_combo = self.tabWidget.currentWidget().plast_new_combo.text()
-
-            fluid_new_edit = self.tabWidget.currentWidget().fluid_new_edit.text()
-            if fluid_new_edit != '':
-                fluid_new_edit = float(fluid_new_edit.replace(',', '.'))
-            pressuar_new_edit = self.tabWidget.currentWidget().pressuar_new_edit.text()
-
-            if pressuar_new_edit != '':
-                pressuar_new_edit = int(float(pressuar_new_edit.replace(',', '.')))
-        else:
-            plast_new_combo = ''
-            fluid_new_edit = ''
-            pressuar_new_edit = ''
-        if (plast_new_combo == '' or fluid_new_edit == '' or pressuar_new_edit == '') and \
-                need_change_zgs_combo == 'Да':
+                plast_new_combo = ''
+                fluid_new_edit = ''
+                pressuar_new_edit = ''
+        except:
             mes = QMessageBox.critical(self, 'Ошибка', 'Введены не все параметры')
             return
+        if need_change_zgs_combo == 'Да':
+            if (plast_new_combo == '' or fluid_new_edit == '' or pressuar_new_edit == ''):
+                mes = QMessageBox.critical(self, 'Ошибка', 'Введены не все параметры')
+                return
 
         for row in range(rows):
             if swab_true_edit_type in ['двухпакерная', 'двухпакерная, упорные']:
@@ -716,9 +737,12 @@ class Swab_Window(QMainWindow):
                                                      swabTypeCombo, swab_volumeEdit, depthGaugeCombo, need_change_zgs_combo,
                                                     plast_new_combo, fluid_new_edit, pressuar_new_edit)
             elif swab_true_edit_type == 'Опрессовка снижением уровня на шаблоне':
+                template_second_Edit = self.tabWidget.currentWidget().template_second_Edit.text()
+                lenght_template_second_Edit = self.tabWidget.currentWidget().lenght_template_second_Edit.text()
+
                 paker2_depth = int(float(self.tableWidget.item(row, 1).text()))
                 work_list = self.swabbing_opy(paker2_depth, fluid_new_edit, need_change_zgs_combo,
-                                              plast_new_combo, pressuar_new_edit)
+                                              plast_new_combo, pressuar_new_edit,  template_second_Edit, lenght_template_second_Edit)
             elif swab_true_edit_type == 'Опрессовка снижением уровня на пакере с заглушкой':
                 paker2_depth = int(float(self.tableWidget.item(row, 3).text()))
                 paker_khost = int(float(self.tableWidget.item(row, 1).text()))
@@ -864,14 +888,11 @@ class Swab_Window(QMainWindow):
                    liftingNKT_norm(depth_opy + 200, 1)])
         return paker_list
 
-    def swabbing_opy(self, depth_opy, fluid_new, need_change_zgs_combo, plast_new, pressuar_new):
+    def swabbing_opy(self, depth_opy, fluid_new, need_change_zgs_combo, plast_new,
+                     pressuar_new, template_second, lenght_template_second):
         from .template_work import TabPage_SO_with
 
-        if well_data.column_additional is False or (well_data.column_additional and
-                                                   well_data.head_column_additional._value >= well_data.current_bottom):
-            first_template, template_second = TabPage_SO_with.template_diam_ek(self)
-        else:
-            first_template, template_second = TabPage_SO_with.template_diam_additional_ek(self)
+
 
         nkt_diam = ''.join(['73' if well_data.column_diametr._value > 110 or (
                 well_data.column_diametr._value > 110 and well_data.column_additional is True \
@@ -881,23 +902,25 @@ class Swab_Window(QMainWindow):
         if well_data.column_additional is False or well_data.column_additional is True and \
                 well_data.current_bottom < well_data.head_column_additional._value and \
                 well_data.head_column_additional._value > 600:
-            paker_select = f'воронку со свабоограничителем + шаблон {first_template}мм L-2 + НКТ{nkt_diam} + НКТ 10м + репер'
-            paker_short = f'воронку со с/о + шаблон {first_template} L-2 + НКТ{nkt_diam}  + НКТ 10м + репер'
+            paker_select = f'воронку со свабоограничителем + шаблон {template_second}мм L-{lenght_template_second} + НКТ{nkt_diam} + НКТ 10м + репер'
+            paker_short = f'воронку со с/о + шаблон {template_second} L-{lenght_template_second} + НКТ{nkt_diam}  + НКТ 10м + репер'
             dict_nkt = {73: depth_opy}
         elif well_data.column_additional is True and well_data.column_additional_diametr._value < 110 and \
                 well_data.current_bottom >= well_data.head_column_additional._value:
-            paker_select = f'воронку со свабоограничителем + шаблон {first_template} L-2 + НКТ60мм 10м + репер +НКТ60мм ' \
+            paker_select = f'воронку со свабоограничителем + шаблон {template_second} L-{lenght_template_second} + НКТ60мм 10м + репер +НКТ60мм ' \
                            f'{round(well_data.current_bottom - well_data.head_column_additional._value + 10, 0)}м'
-            paker_short = f'воронку со с/о + шаблон {first_template} L-2 + НКТ60мм 10м + репер +НКТ60мм'
+            paker_short = f'воронку со с/о + шаблон {template_second} L-{lenght_template_second} + НКТ60мм 10м + репер +НКТ60мм'
             dict_nkt = {73: well_data.head_column_additional._value,
                         60: int(well_data.current_bottom - well_data.head_column_additional._value)}
         elif well_data.column_additional is True and well_data.column_additional_diametr._value > 110 and \
                 well_data.current_bottom >= well_data.head_column_additional._value:
-            paker_select = f'воронку со свабоограничителем + шаблон {first_template}мм L-2 + НКТ{well_data.nkt_diam}мм ' \
+            paker_select = f'воронку со свабоограничителем + шаблон {template_second}мм L-{lenght_template_second} + ' \
+                           f'НКТ{well_data.nkt_diam}мм ' \
                            f'со снятыми фасками + ' \
                            f'НКТ{well_data.nkt_diam}мм со снятыми фасками 10м ' \
                            f'{round(well_data.current_bottom - well_data.head_column_additional._value + 10, 0)}м'
-            paker_short = f'в/у со c/о + шаблон {first_template} L-2 + НКТ{well_data.nkt_diam}мм со снятыми фасками + ' \
+            paker_short = f'в/у со c/о + шаблон {template_second} L-{lenght_template_second} + НКТ{well_data.nkt_diam}мм ' \
+                          f'со снятыми фасками + ' \
                           f'НКТ{well_data.nkt_diam}мм со снятыми фасками 10м'
             dict_nkt = {73: depth_opy}
         elif nkt_diam == 60:
