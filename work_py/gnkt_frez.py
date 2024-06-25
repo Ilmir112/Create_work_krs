@@ -123,7 +123,6 @@ class Work_with_gnkt(QMainWindow):
             for j in range(1, 13):
                 cell = ws2.cell(row=i, column=j)
 
-
                 if cell and str(cell) != str(work_list[i - 1][j - 1]):
                     if str(work_list[i - 1][j - 1]).replace('.', '').isdigit() and \
                             str(work_list[i - 1][j - 1]).count('.') != 2:
@@ -138,7 +137,15 @@ class Work_with_gnkt(QMainWindow):
                 # print(value)
                 ws2.merge_cells(start_column=value[0], start_row=value[1],
                                 end_column=value[2], end_row=value[3])
-            if sheet_name == 'СХЕМА':
+            if sheet_name == "Титульник":
+                for i, row_data in enumerate(work_list):
+                    # print(f'gghhg {work_list[i][2]}')
+                    for column, data in enumerate(row_data):
+                        if i < 2:
+                            ws2.cell(row=i + 1, column=column + 1).alignment = Alignment(horizontal='left',
+                                                                             vertical='center')
+
+            elif sheet_name == 'СХЕМА':
 
                 GnktOsvWindow.insert_image_schema(self, ws2)
                 ws2.print_area = f'B3:AP{70}'
@@ -230,7 +237,7 @@ class Work_with_gnkt(QMainWindow):
                     coordinate = f'{get_column_letter(col - 1)}{row_ind - 2}'
                     self.insert_image(ws2, f'{well_data.path_image}imageFiles/Алиев Заур.png', coordinate)
                     break
-        print(f'{sheet_name} - вставлена')
+
 
     def save_to_gnkt(self):
 
@@ -357,7 +364,6 @@ class Work_with_gnkt(QMainWindow):
             # for row in range(len(title_list)):  # Добавлением работ
             if a:
                 if a > row:
-                    # print(f'сссооссоссо {row + index_insert}')
                     ws2.merge_cells(start_row=row + index_insert, start_column=2, end_row=row + index_insert,
                                     end_column=6)
                     ws2.merge_cells(start_row=row + index_insert, start_column=8, end_row=row + index_insert,

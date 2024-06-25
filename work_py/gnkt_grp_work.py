@@ -555,6 +555,12 @@ class GnktOsvWindow2(QMainWindow):
                 wellhead_fittings = f'АУШГН-{well_data.column_diametr._value}/' \
                                     f'АУГРП {well_data.column_diametr._value}*14'
 
+        if well_data.work_plan == 'gnkt_bopz':
+            list_gnkt_bopz = [
+                None, None, None, None, None, None, None, None, None, None,  None, None,
+              None, None, None, None, f'{plast_work}\n{well_data.dict_perforation[plast_work]["кровля"]}-{well_data.dict_perforation[plast_work]["подошва"]}',None,
+             None, None, None, f'Тек. забой: \n{well_data.current_bottom}м ', None]
+
         schema_well_list = [
             [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None],
@@ -701,10 +707,12 @@ class GnktOsvWindow2(QMainWindow):
              None, None, None, well_data.first_pressure._value, None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Результат предыдущей опрес-и ЭК',
              None, None, None, None, well_data.max_admissible_pressure._value, None, '', None, 'гермет.', None],
-            [None, None, None, None, None, None, None, None, 'Тек.забой', None, None, None,
+            [None, None, None, None, None, None, None, None, 'Тек.забой' if well_data.work_plan != 'gnkt_bopz' else '',
+             None, None, None,
              'Макс.допустимое Р опр-ки ЭК', None, None, None, None, well_data.max_admissible_pressure._value,
              None, None, None, None, None],
-            [None, None, None, None, None, None, None, None, current_bottom_edit, None, None, None,
+            [None, None, None, None, None, None, None, None,
+             current_bottom_edit if well_data.work_plan  != 'gnkt_bopz' else '', None, None, None,
              'Макс. ожидаемое Р на устье ',
              None, None, None, None, well_data.max_expected_pressure._value, None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
@@ -729,7 +737,17 @@ class GnktOsvWindow2(QMainWindow):
              None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None],
+            [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+             None, None, None, None, None],
+            [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+             None, None, None, None, None],
+            [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+             None, None, None, None, None],
+            [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+             None, None, None, None, None],
         ]
+        if well_data.work_plan == 'gnkt_bopz':
+            schema_well_list.append(list_gnkt_bopz)
         if well_data.paker_do['do'] == 0:
             schema_well_list[21] = [None, None, None, None, None, None, None, None, None,  None,
              None, None,

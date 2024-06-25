@@ -268,6 +268,7 @@ class MyWindow(QMainWindow):
         self.create_GNKT_OPZ = self.create_GNKT.addAction(' ГНКТ ОПЗ', self.action_clicked)
         self.create_GNKT_frez = self.create_GNKT.addAction('ГНКТ Фрезерование', self.action_clicked)
         self.create_GNKT_GRP = self.create_GNKT.addAction('Освоение после ГРП', self.action_clicked)
+        self.create_GNKT_BOPZ = self.create_GNKT.addAction('БОПЗ ГНКТ', self.action_clicked)
         self.create_PRS = self.create_file.addAction('План ПРС', self.action_clicked)
         self.open_file = self.fileMenu.addAction('Открыть', self.action_clicked)
         self.save_file = self.fileMenu.addAction('Сохранить', self.action_clicked)
@@ -404,6 +405,30 @@ class MyWindow(QMainWindow):
 
         elif action == self.create_GNKT_GRP and self.table_widget == None:
             self.work_plan = 'gnkt_after_grp'
+            self.tableWidgetOpen(self.work_plan)
+
+            self.fname, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
+                                                                  "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
+
+            if self.fname:
+                try:
+                    self.read_pz(self.fname)
+                    well_data.pause = True
+                    read_pz = CreatePZ(self.wb, self.ws, self.data_window, self.perforation_correct_window2)
+                    sheet = read_pz.open_excel_file(self.ws, self.work_plan)
+                    self.rir_window = GnktOsvWindow(self.ws,
+                                                    self.table_title, self.table_schema, self.table_widget,
+                                                    self.work_plan)
+
+                    self.pause_app()
+                    well_data.pause = True
+                    # self.copy_pz(sheet)
+
+                except FileNotFoundError:
+                    print('Файл не найден')
+
+        elif action == self.create_GNKT_BOPZ and self.table_widget == None:
+            self.work_plan = 'gnkt_bopz'
             self.tableWidgetOpen(self.work_plan)
 
             self.fname, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
@@ -678,7 +703,7 @@ class MyWindow(QMainWindow):
             # Этот сигнал испускается всякий раз, когда ячейка в таблице нажата.
             # Указанная строка и столбец - это ячейка, которая была нажата.
             self.table_widget.cellPressed[int, int].connect(self.clickedRowColumn)
-            if work_plan in ['gnkt_frez', 'gnkt_after_grp', 'gnkt_opz']:
+            if work_plan in ['gnkt_frez', 'gnkt_after_grp', 'gnkt_opz', 'gnkt_bopz']:
                 self.table_title = QTableWidget()
                 self.tabWidget.addTab(self.table_title, 'Титульник')
                 self.table_schema = QTableWidget()
@@ -718,7 +743,7 @@ class MyWindow(QMainWindow):
 
         if self.work_plan in ['gnkt_frez']:
             Work_with_gnkt.save_to_gnkt(self)
-        elif self.work_plan in ['gnkt_after_grp', 'gnkt_opz']:
+        elif self.work_plan in ['gnkt_after_grp', 'gnkt_opz', 'gnkt_bopz']:
             GnktOsvWindow.save_to_gnkt(self)
         else:
             self.save_to_krs()
@@ -767,16 +792,15 @@ class MyWindow(QMainWindow):
 
             for i in range(1, len(work_list)):  # нумерация работ
                 if i >= ins_ind + 1:
-                    a = i
-                    work_list[i][1] = f'=ЕСЛИ(ЕПУСТО(C{a});"";СЧЁТЗ($C${a}:C{i}))'
                     if is_number(work_list[i][11]) is True:
                         well_data.normOfTime += float(str(work_list[i][11]).replace(',', '.'))
                     if work_list[i][0]:
                         plan_short += f'п.{work_list[i][1]} {work_list[i][0]} \n'
 
             count_row_height(self.ws, ws2, work_list, merged_cells_dict, ins_ind)
+
             # print(f'3 - {ws2.max_row}')
-            well_data.itog_ind_min = self.ins_ind_border
+            well_data.itog_ind_min = ins_ind
             well_data.itog_ind_max = len(work_list)
             # print(f' длина {len(work_list)}')
             CreatePZ.add_itog(self, ws2, self.table_widget.rowCount() + 1, self.work_plan)
@@ -843,7 +867,7 @@ class MyWindow(QMainWindow):
             # path = 'workiii'
             # print(f'Пользоватль{well_data.user}')
             if 'Зуфаров' in well_data.user[1]:
-                path = 'D:\Documents\Desktop\ГТМ'
+                path = 'D:/Documents/Desktop/ГТМ'
             else:
                 path = ""
             if self.work_plan == 'dop_plan':
@@ -864,7 +888,10 @@ class MyWindow(QMainWindow):
                 ws5 = wb2["Схемы ПВО"]
                 wb2.move_sheet(ws5, offset=-1)
                 schema_list = self.check_pvo_schema(ws5, ins_ind + 2)
-            wb2.calculation
+
+            # Перед сохранением установите режим расчета
+            wb2.calculation.calcMode = "auto"
+
 
             if wb2:
                 wb2.close()
@@ -1798,7 +1825,8 @@ class MyWindow(QMainWindow):
                     if value != None:
                         value = value.text()
 
-                        if 'схеме №' in value or 'схемы №' in value:
+                        if 'схеме №' in value or 'схемы №' in value or 'Схемы обвязки №' in value:
+                            print(value)
                             number_schema = value[value.index(' №') + 1:value.index(' №') + 4].replace(' ', '')
                             if '1' in number_schema:
                                 number_schema = "2"
@@ -1979,7 +2007,7 @@ class MyWindow(QMainWindow):
         table_widget.setColumnCount(count_col)
         rowHeights_exit = [sheet.row_dimensions[i + 1].height if sheet.row_dimensions[i + 1].height is not None else 18
                            for i in range(sheet.max_row)]
-        if work_plan not in ['application_pvr', 'gnkt_frez', 'gnkt_after_grp', 'gnkt_opz', 'plan_change']:
+        if work_plan not in ['application_pvr', 'gnkt_frez', 'gnkt_after_grp', 'gnkt_opz', 'gnkt_bopz', 'plan_change']:
             self.populate_row(table_widget.rowCount(), [
                 [None, None, 'Порядок работы', None, None, None, None, None, None, None, None, None],
                 [None, None, 'Наименование работ', None, None, None, None, None, None, None, 'Ответственный',
@@ -2043,7 +2071,7 @@ class MyWindow(QMainWindow):
                         13.0, 13.0, 13.0, 5.42578125, 13.0, 4.5703125, 2.28515625, 10.28515625]
             for column in range(table_widget.columnCount()):
                 table_widget.setColumnWidth(column, int(colWidth[column]))  # Здесь задайте требуемую ширину столбца
-        elif work_plan in ['gnkt_after_grp', 'gnkt_opz'] and list_page == 2:
+        elif work_plan in ['gnkt_after_grp', 'gnkt_opz', 'gnkt_after_grp', 'gnkt_bopz'] and list_page == 2:
 
             colWidth = property_excel.property_excel_pvr.colWidth_gnkt_osv
             for column in range(table_widget.columnCount()):

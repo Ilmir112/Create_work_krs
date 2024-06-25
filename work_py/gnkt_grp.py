@@ -23,6 +23,8 @@ from open_pz import CreatePZ
 from work_py.alone_oreration import well_volume
 
 from work_py.gnkt_grp_work import GnktOsvWindow2
+from gnkt_bopz import GnktBopz
+
 
 
 class TabPageDp(QWidget):
@@ -111,14 +113,10 @@ class TabPageDp(QWidget):
                 cursor.close()
             if conn:
                 conn.close()
-
-
 class TabWidget(QTabWidget):
     def __init__(self, work_plan):
         super().__init__()
-        self.addTab(TabPageDp(work_plan), 'ГНКТ освоение после ГРП')
-
-
+        self.addTab(TabPageDp(work_plan), 'ГНКТ')
 class GnktOsvWindow(QMainWindow):
     wb = None
 
@@ -134,7 +132,10 @@ class GnktOsvWindow(QMainWindow):
         self.table_schema = table_schema
 
         self.dict_perforation = well_data.dict_perforation
-        self.wb = load_workbook(f'{well_data.path_image}property_excel/tepmpale_gnkt_osv_grp.xlsx')
+        if work_plan in ['gnkt_bopz']:
+            self.wb = load_workbook(f'{well_data.path_image}property_excel/template_gnkt_bopz.xlsx')
+        else:
+            self.wb = load_workbook(f'{well_data.path_image}property_excel/tepmpale_gnkt_osv_grp.xlsx')
         GnktOsvWindow.wb = self.wb
         self.ws_schema = self.wb.active
 
@@ -145,9 +146,12 @@ class GnktOsvWindow(QMainWindow):
         self.ws_title = self.wb.create_sheet("Титульник", 0)
         self.ws_work = self.wb.create_sheet(title="Ход работ")
 
-        Work_with_gnkt.create_title_list(self, self.ws_title)
 
-        head = plan.head_ind(well_data.cat_well_min._value, well_data.cat_well_max._value)
+        Work_with_gnkt.create_title_list(self, self.ws_title)
+        bvo_int = 0
+        if well_data.bvo:
+            bvo_int += 5
+        head = plan.head_ind(well_data.cat_well_min._value + bvo_int, well_data.cat_well_max._value + bvo_int)
 
         plan.copy_true_ws(sheet, self.ws_title, head)
 
@@ -167,10 +171,9 @@ class GnktOsvWindow(QMainWindow):
         else:
             self.work_window.close()
             self.work_window = None
-        # schema_well = self.schema_well(self.ws_schema, )
+
         self.copy_pvr(self.ws_schema, self.work_schema)
-        # self.wb.save(f"{well_data.well_number._value} {well_data.well_area._value} ГНКТ освоение.xlsx")
-        # print('файл сохранен')
+
         for row_number, row in enumerate(self.ws_title.iter_rows(values_only=True)):
             for col_number, cell in enumerate(row):
                 if 'по H2S' in str(self.ws_title.cell(row=row_number+1, column=col_number+1).value) and 'по H2S' not in str(
@@ -187,6 +190,20 @@ class GnktOsvWindow(QMainWindow):
         if self.work_plan == 'gnkt_opz':
             if self.work_window is None:
                 self.work_window = GnktOpz(table_widget, well_data.gnkt_number, GnktOsvWindow2.fluid_edit)
+                self.work_window.show()
+                well_data.pause = True
+                MyWindow.pause_app()
+
+                work_well = self.work_window.add_work()
+                well_data.pause = True
+                self.work_window = None
+            else:
+                self.work_window.close()  # Close window.
+                self.work_window = None
+
+        elif self.work_plan == 'gnkt_bopz':
+            if self.work_window is None:
+                self.work_window = GnktBopz(table_widget, well_data.gnkt_number, GnktOsvWindow2.fluid_edit)
                 self.work_window.show()
                 well_data.pause = True
                 MyWindow.pause_app()
@@ -641,10 +658,10 @@ class GnktOsvWindow(QMainWindow):
                 work_list.append(row_lst)
             Work_with_gnkt.count_row_height(self, worksheet, work_list, sheet_name)
 
-        # ws6 = GnktOsvWindow.wb.create_sheet(title="СХЕМЫ КНК_44,45")
-        # main.MyWindow.insert_image(self, ws6, f'{well_data.path_image}imageFiles/schema_well/СХЕМЫ КНК_44,45.png', 'A1', 550, 900)
+
         ws7 = GnktOsvWindow.wb.create_sheet(title="СХЕМЫ КНК_38,1")
-        main.MyWindow.insert_image(self, ws7, f'{well_data.path_image}imageFiles/schema_well/СХЕМЫ КНК_38,1.png', 'A1', 550, 900)
+        main.MyWindow.insert_image(
+            self, ws7, f'{well_data.path_image}imageFiles/schema_well/СХЕМЫ КНК_38,1.png', 'A1', 550, 900)
 
 
         if 'Зуфаров' in well_data.user:
@@ -686,44 +703,53 @@ class GnktOsvWindow(QMainWindow):
             coordinate_nkt_with_voronka = 'F6'
             main.MyWindow.insert_image(self, ws, f'{well_data.path_image}imageFiles/schema_well/НКТ с воронкой.png',
                                        coordinate_nkt_with_voronka, 70, 470)
+        if self.work_plan in ['gnkt_bopz']:
+            coordinate = 'F65'
+            main.MyWindow.insert_image(self, ws, f'{well_data.path_image}imageFiles/schema_well/angle_well.png',
+                                       coordinate, 265, 373)
 
-        coordinate_propant = 'F43'
-        if self.work_plan == 'gnkt_after_grp':
+        elif self.work_plan in ['gnkt_after_grp']:
+            coordinate_propant = 'F43'
+
             main.MyWindow.insert_image(self, ws, f'{well_data.path_image}imageFiles/schema_well/пропант.png', coordinate_propant, 90, 500)
 
-        n = 0
-        m = 0
-        for plast in well_data.plast_all:
-            count_interval = well_data.dict_perforation[plast]['счет_объединение']
+            n = 0
+            m = 0
+            for plast in well_data.plast_all:
+                count_interval = well_data.dict_perforation[plast]['счет_объединение']
 
-            ws.merge_cells(start_column=23, start_row=27 + m,
-                                       end_column=23, end_row=27 + count_interval + m - 1)
-            ws.merge_cells(start_column=22, start_row=27 + m,
-                                       end_column=22, end_row=27 + count_interval + m - 1)
-            ws.merge_cells(start_column=21, start_row=27 + m,
-                                       end_column=21, end_row=27 + count_interval + m - 1)
-            m += count_interval
-            roof_plast = well_data.dict_perforation[plast]['кровля']
-            sole_plast = well_data.dict_perforation[plast]['подошва']
-            try:
-                if roof_plast > well_data.depth_fond_paker_do["do"] and roof_plast < well_data.current_bottom:
-                    interval_str = f'{plast} {roof_plast}-{sole_plast}'
-                    coordinate_pvr = f'F{48 + n}'
+                ws.merge_cells(start_column=23, start_row=27 + m,
+                                           end_column=23, end_row=27 + count_interval + m - 1)
+                ws.merge_cells(start_column=22, start_row=27 + m,
+                                           end_column=22, end_row=27 + count_interval + m - 1)
+                ws.merge_cells(start_column=21, start_row=27 + m,
+                                           end_column=21, end_row=27 + count_interval + m - 1)
+                m += count_interval
+                roof_plast = well_data.dict_perforation[plast]['кровля']
+                sole_plast = well_data.dict_perforation[plast]['подошва']
+                try:
+                    if roof_plast > well_data.depth_fond_paker_do["do"] and roof_plast < well_data.current_bottom:
+                        interval_str = f'{plast} {roof_plast}-{sole_plast}'
+                        coordinate_pvr = f'F{48 + n}'
 
-                    ws.cell(row=48 + n, column=10).value = interval_str
-                    ws.merge_cells(start_column=10, start_row=48 + n,
-                                   end_column=12, end_row=48 + n + 2)
-                    ws.cell(row=48 + n, column=10).font = Font(name='Arial', size=12, bold=True)
-                    ws.cell(row=48 + n, column=10).alignment = Alignment(wrap_text=True, horizontal='left',
-                                                                         vertical='center')
-                    n += 3
-                    main.MyWindow.insert_image(self, ws, f'{well_data.path_image}imageFiles/schema_well/ПВР.png', coordinate_pvr, 85, 70)
-            except:
-                mes = QMessageBox.critical(self, 'Ошибка', f'программа не смогла вставить интервал перфорации в схему'
-                                                           f'{roof_plast}-{sole_plast}')
+                        ws.cell(row=48 + n, column=10).value = interval_str
+                        ws.merge_cells(start_column=10, start_row=48 + n,
+                                       end_column=12, end_row=48 + n + 2)
+                        ws.cell(row=48 + n, column=10).font = Font(name='Arial', size=12, bold=True)
+                        ws.cell(row=48 + n, column=10).alignment = Alignment(wrap_text=True, horizontal='left',
+                                                                             vertical='center')
+                        n += 3
+                        main.MyWindow.insert_image(self, ws, f'{well_data.path_image}imageFiles/schema_well/ПВР.png',
+                                                   coordinate_pvr, 85, 70)
+                except:
+                    mes = QMessageBox.critical(self,
+                                               'Ошибка', f'программа не смогла вставить интервал перфорации в схему'
+                                                               f'{roof_plast}-{sole_plast}')
 
-        coordinate_voln = f'E18'
-        main.MyWindow.insert_image(self, ws, f'{well_data.path_image}imageFiles/schema_well/переход.png', coordinate_voln, 150, 60)
+            coordinate_voln = f'E18'
+            main.MyWindow.insert_image(self, ws,
+                                       f'{well_data.path_image}imageFiles/schema_well/переход.png',
+                                       coordinate_voln, 150, 60)
 
 
     def date_dmy(self, date_str):

@@ -176,6 +176,7 @@ class CreatePZ(QMainWindow):
                 dict_events_gnvp = {}
                 dict_events_gnvp['krs'] = events_gnvp()
                 dict_events_gnvp['gnkt_opz'] = events_gnvp_gnkt()
+                dict_events_gnvp['gnkt_bopz'] = events_gnvp_gnkt()
                 dict_events_gnvp['dop_plan'] = events_gnvp()
                 # if work_plan != 'dop_plan':
                 text_width_dict = {20: (0, 100), 30: (101, 200), 40: (201, 300), 60: (301, 400), 70: (401, 500),
@@ -274,11 +275,11 @@ class CreatePZ(QMainWindow):
     def add_itog(self, ws, ins_ind, work_plan):
 
         ws.delete_rows(ins_ind, self.table_widget.rowCount() - ins_ind + 1)
-        if work_plan not in ['gnkt_frez', 'application_pvr', 'gnkt_after_grp', 'gnkt_opz']:
-            for i in range(ins_ind, len(itog_1(self)) + ins_ind):  # Добавлением итогов
+        if work_plan not in ['gnkt_frez', 'application_pvr', 'gnkt_after_grp', 'gnkt_opz', 'gnkt_bopz']:
+            for i in range(ins_ind, len(itog_1()) + ins_ind):  # Добавлением итогов
                 if i < ins_ind + 6:
                     for j in range(1, 13):
-                        ws.cell(row=i, column=j).value = itog_1(self)[i - ins_ind][j - 1]
+                        ws.cell(row=i, column=j).value = itog_1()[i - ins_ind][j - 1]
                         if j != 1:
                             ws.cell(row=i, column=j).border = well_data.thin_border
                             ws.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=False)
@@ -289,7 +290,7 @@ class CreatePZ(QMainWindow):
                     for j in range(1, 13):
                         ws.row_dimensions[i].height = 50
 
-                        ws.cell(row=i, column=j).value = itog_1(self)[i - ins_ind][j - 1]
+                        ws.cell(row=i, column=j).value = itog_1()[i - ins_ind][j - 1]
                         ws.cell(row=i, column=j).border = well_data.thin_border
                         ws.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=False)
                         ws.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='left',
@@ -299,7 +300,7 @@ class CreatePZ(QMainWindow):
                     ws.cell(row=i + ins_ind, column=2).alignment = Alignment(wrap_text=True, horizontal='left',
                                                                              vertical='center')
 
-            ins_ind += len(itog_1(self)) + 2
+            ins_ind += len(itog_1()) + 2
 
         curator_s = curator_sel(self, well_data.curator, well_data.region)
         # print(f'куратор {curator_sel, well_data.curator}')

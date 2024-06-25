@@ -76,7 +76,6 @@ def copy_row(ws, ws2, head):
 def copy_true_ws(ws, ws2, head):
     for row_number, row in enumerate(ws[head]):
         for col_number, cell in enumerate(row):
-            # print(cell.value)
             if 'катег' in str(cell.value).lower():
                 ws2.cell(row=row_number+1, column=col_number+1).alignment = Alignment(wrap_text=True, horizontal='left',
                                                                             vertical='center')

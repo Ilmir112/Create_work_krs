@@ -3,10 +3,10 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox
 import plan
 import well_data
 from openpyxl.drawing.image import Image
-from openpyxl.styles import Border, Side, PatternFill, Font, GradientFill, Alignment
+from openpyxl.styles import Border, Side, PatternFill, Font, GradientFill, Alignment, numbers
 from PyQt5 import QtCore
 def skm_interval(self, template):
-   
+
 
     str_raid = []
     if well_data.paker_do["posle"] != 0:
@@ -108,7 +108,7 @@ def skm_interval(self, template):
 
 # Функция исключения из интервалов скреперования интервалов ПВР
 def remove_overlapping_intervals(perforating_intervals, skm_interval = None):
-   
+
 
     if skm_interval is None:
         # print(f' перфорация_ {perforating_intervals}')
@@ -352,6 +352,7 @@ def count_row_height(ws, ws2, work_list, merged_cells_dict, ind_ins):
                             ws2.row_dimensions[i + 1].height = int(key)
 
     head = plan.head_ind(0, ind_ins)
+    # print(f'head - {head}')
 
     plan.copy_true_ws(ws, ws2, head)
 
@@ -360,20 +361,11 @@ def count_row_height(ws, ws2, work_list, merged_cells_dict, ind_ins):
             cell = ws2.cell(row=i, column=j)
 
             if cell and str(cell) != str(work_list[i - 1][j - 1]):
-
-                if str(work_list[i - 1][j - 1]).replace('.', '').isdigit() and \
-                        str(work_list[i - 1][j - 1]).count('.') != 2:
-                    try:
-                        cell.value = str(work_list[i - 1][j - 1]).replace('.', ',')
-                    except:
-                        pass
-                else:
-                    try:
-                        cell.value = work_list[i - 1][j - 1]
-                    except:
-                        pass
-
+                # print(work_list[i - 1][j - 1])
+                cell.value = is_num(work_list[i - 1][j - 1])
                 if i >= ind_ins:
+                    if abs(i - ind_ins) > 1:
+                        ws2[F"B{i}"].value = f'=COUNTA($C${ind_ins+2}:C{i})'
                     if j != 1:
                         cell.border = well_data.thin_border
                     if j == 11:
@@ -394,8 +386,8 @@ def count_row_height(ws, ws2, work_list, merged_cells_dict, ind_ins):
                             or 'заявку оформить за 16 часов' in str(cell.value).lower() \
                             or 'ЗАДАЧА 2.9.' in str(cell.value).upper() \
                             or 'ВСЕ ТЕХНОЛОГИЧЕСКИЕ ОПЕРАЦИИ' in str(cell.value).upper() \
-                            or 'за 48 часов до спуска' in str(cell.value).upper() \
-                            or 'РИР' in str(cell.value).upper() \
+                            or 'за 48 часов до спуска' in str(cell.value).upper()\
+                            or 'РИР' in str(cell.value).upper()\
                             or 'При отсутствии избыточного давления' in str(cell.value):
                         # print('есть жирный')
                         ws2.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=True)
@@ -404,7 +396,7 @@ def count_row_height(ws, ws2, work_list, merged_cells_dict, ind_ins):
                         ws2.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=True)
                         ws2.cell(row=i, column=j).alignment = Alignment(wrap_text=True, horizontal='center',
                                                                         vertical='center')
-        # print(merged_cells_dict)
+    # print(merged_cells_dict)
     for row, col in merged_cells_dict.items():
         if len(col) != 2:
             # print(row)
@@ -414,7 +406,7 @@ def count_row_height(ws, ws2, work_list, merged_cells_dict, ind_ins):
         ws2.merge_cells(start_column=value[0], start_row=value[1],
                         end_column=value[2], end_row=value[3])
 
-        # вставка сохраненных изображение по координатам ячеек
+    # вставка сохраненных изображение по координатам ячеек
     if well_data.image_list:
         # print(f' схемы {well_data.image_list}')
         for img in well_data.image_list:
@@ -440,3 +432,20 @@ def count_row_height(ws, ws2, work_list, merged_cells_dict, ind_ins):
     ws2.column_dimensions[get_column_letter(6)].width = 18
 
     return 'Высота изменена'
+
+def is_num(num):
+   try:
+       if str(round(float(num), 5))[-1] != 0:
+           return round(float(num), 5)
+       elif str(round(float(num), 4))[-1] != 0:
+           return round(float(num), 4)
+       elif str(round(float(num), 3))[-1] != 0:
+           return round(float(num), 3)
+       elif str(round(float(num), 2))[-1] != 0:
+           return round(float(num), 2)
+       elif str(round(float(num), 1))[-1] != 0:
+           return round(float(num), 1)
+       elif str(round(float(num), 0))[-1] != 0:
+           return int(float(num))
+   except:
+       return num

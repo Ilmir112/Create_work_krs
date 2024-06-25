@@ -532,49 +532,20 @@ region_dict = {
 }
 
 
-def itog_1(self):
+def itog_1():
 
-    itog_1 = [
-        [None, 'ИТОГО:', None, None, None, None, None, None, None, None, None, well_data.normOfTime],
-        [None, 'Герметизация , разгерметизация  устья  скважины', None, None, None, None, None, None, None,
-         None, None, round(well_data.normOfTime / 11.5 * 11 / 60, 1)],
-        [None, 'Заправка ДВС', None, None, None, None, None, None, None, None, None,
-         round(well_data.normOfTime / 23 * 0.13, 1)],
-        [None, 'ПЗР в начале и конце смены с заполнением вахтового журнала', None, None, None, None, None,
-         None, None, None, None, round(well_data.normOfTime / 11.5 * 0.3, 1)],
-        [None, 'Непредвиденные  работы  : ', None, None, None, None, None, None, None, None, None,
-         round(well_data.normOfTime * float(well_data.bottomhole_artificial._value) / 100 * 0.0004, 1)],
-        [None, 'ВСЕГО  :', None, None, None, None, None, None, None, None, None, \
-         round(
-             well_data.normOfTime + well_data.normOfTime / 11.5 * 11 / 60 + well_data.normOfTime / 11.5 * 0.3 +
-             well_data.normOfTime * well_data.bottomhole_artificial._value / 100 * 0.0004,
-             1)],
-        [None,
-         'Примечания: В соответствии с регламентом на производство КРС – заблаговременно подавать заявки на '
-         'необходимое оборудование, а так же вызывать представителя Заказчика на геофизические работы, ПВР, '
-         'установку пакера, срыв планшайбы, опрессовку колонны и другие технологические операции, прием скважины в ремонт и сдача из ремонта.',
-         None, None, None, None, None, None, None, None, None, None],
-        [None, 'ПРИМЕЧАНИЕ:', None, ' ', None, None, None, None, None, None, None, None],
-        [None,
-         'При незначительных изменениях в плане работ (изменении компоновки подземного оборудования, объемов закачки и т.д.)  и доп. работах в виде единичных СПО, технол.операций и др. возможна работа без доп. плана - по письму Заказчика.   ',
-         None, None, None, None, None, None, None, None, None, None],
-        [None, 'поглощения жидкости не допускать', None, None, None, None, None, None, None, None, None,
-         None],
-        [None, 'Ответственный за соблюдением и создание безопасных условий работ – мастера КPС ', None, None,
-         None, None, None, None, None, None, None, None]]
     # itog_1 = [
-    #     [None, 'ИТОГО:', None, None, None, None, None, None, None, None, None,
-    #      f'=ROUND(SUM(L{well_data.itog_ind_min + 2}:L{well_data.itog_ind_max}),1)'],
+    #     [None, 'ИТОГО:', None, None, None, None, None, None, None, None, None, f'=ROUND(SUM(L{well_data.itog_ind_min}:L{itog_ind_max}),1)'],
     #     [None, 'Герметизация , разгерметизация  устья  скважины', None, None, None, None, None, None, None,
-    #      None, None, f'=ROUND(SUM(L{well_data.itog_ind_min + 2}:L{well_data.itog_ind_max - 1})/11.5*11/60 ,1)'],
+    #      None, None, f'=ROUND(L{itog_ind_max+1}/11.5*11/60,1)'],
     #     [None, 'Заправка ДВС', None, None, None, None, None, None, None, None, None,
-    #      f'=ROUND(SUM(L{well_data.itog_ind_min}:L{well_data.itog_ind_max - 1})/11.5*0.3    ,1)'],
+    #      f'=ROUND(L{itog_ind_max+1}/23*0.13 ,1)'],
     #     [None, 'ПЗР в начале и конце смены с заполнением вахтового журнала', None, None, None, None, None,
-    #      None, None, None, None, f'=ROUND(SUM(L{well_data.itog_ind_min}:L{well_data.itog_ind_max - 1})/11.5*0.3,1)'],
+    #      None, None, None, None, f'=ROUND(L{itog_ind_max+1}/11.5*0.3,1)'],
     #     [None, 'Непредвиденные  работы  : ', None, None, None, None, None, None, None, None, None,
-    #      f'=ROUND(SUM(L{well_data.itog_ind_min}:L{well_data.itog_ind_max+2})*{well_data.bottomhole_artificial._value}/100*0.0004 ,1)'],
+    #      f'=ROUND(L{itog_ind_max+1}*{well_data.bottomhole_artificial._value}/100*0.0004 ,1)'],
     #     [None, 'ВСЕГО  :', None, None, None, None, None, None, None, None, None, \
-    #      f'=ROUND(l{well_data.itog_ind_max + 1} + l{well_data.itog_ind_max + 2} + l{well_data.itog_ind_max + 3} + l{well_data.itog_ind_max + 4} +l{well_data.itog_ind_max + 5}, 1)'],
+    #      f'=ROUND(l{itog_ind_max+1} + l{itog_ind_max+2} + l{itog_ind_max+3} + l{itog_ind_max+4} +l{itog_ind_max+5}, 1)'],
     #     [None,
     #      'Примечания: В соответствии с регламентом на производство КРС – заблаговременно подавать заявки на '
     #      'необходимое оборудование, а так же вызывать представителя Заказчика на геофизические работы, ПВР, '
@@ -588,4 +559,30 @@ def itog_1(self):
     #      None],
     #     [None, 'Ответственный за соблюдением и создание безопасных условий работ – мастера КPС ', None, None,
     #      None, None, None, None, None, None, None, None]]
+    itog_1 = [
+        [None, 'ИТОГО:', None, None, None, None, None, None, None, None, None,
+         f'=ROUND(SUM(L{well_data.itog_ind_min + 2}:L{well_data.itog_ind_max}),1)'],
+        [None, 'Герметизация , разгерметизация  устья  скважины', None, None, None, None, None, None, None,
+         None, None, f'=ROUND(SUM(L{well_data.itog_ind_min + 2}:L{well_data.itog_ind_max - 1})/11.5*11/60 ,1)'],
+        [None, 'Заправка ДВС', None, None, None, None, None, None, None, None, None,
+         f'=ROUND(SUM(L{well_data.itog_ind_min}:L{well_data.itog_ind_max - 1})/11.5*0.3    ,1)'],
+        [None, 'ПЗР в начале и конце смены с заполнением вахтового журнала', None, None, None, None, None,
+         None, None, None, None, f'=ROUND(SUM(L{well_data.itog_ind_min}:L{well_data.itog_ind_max - 1})/11.5*0.3,1)'],
+        [None, 'Непредвиденные  работы  : ', None, None, None, None, None, None, None, None, None,
+         f'=ROUND(SUM(L{well_data.itog_ind_min}:L{well_data.itog_ind_max+2})*{well_data.bottomhole_artificial._value}/100*0.0004 ,1)'],
+        [None, 'ВСЕГО  :', None, None, None, None, None, None, None, None, None, \
+         f'=ROUND(l{well_data.itog_ind_max + 1} + l{well_data.itog_ind_max + 2} + l{well_data.itog_ind_max + 3} + l{well_data.itog_ind_max + 4} +l{well_data.itog_ind_max + 5}, 1)'],
+        [None,
+         'Примечания: В соответствии с регламентом на производство КРС – заблаговременно подавать заявки на '
+         'необходимое оборудование, а так же вызывать представителя Заказчика на геофизические работы, ПВР, '
+         'установку пакера, срыв планшайбы, опрессовку колонны и другие технологические операции, прием скважины в ремонт и сдача из ремонта.',
+         None, None, None, None, None, None, None, None, None, None],
+        [None, 'ПРИМЕЧАНИЕ:', None, ' ', None, None, None, None, None, None, None, None],
+        [None,
+         'При незначительных изменениях в плане работ (изменении компоновки подземного оборудования, объемов закачки и т.д.)  и доп. работах в виде единичных СПО, технол.операций и др. возможна работа без доп. плана - по письму Заказчика.   ',
+         None, None, None, None, None, None, None, None, None, None],
+        [None, 'поглощения жидкости не допускать', None, None, None, None, None, None, None, None, None,
+         None],
+        [None, 'Ответственный за соблюдением и создание безопасных условий работ – мастера КPС ', None, None,
+         None, None, None, None, None, None, None, None]]
     return itog_1
