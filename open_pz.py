@@ -73,6 +73,11 @@ class CreatePZ(QMainWindow):
             ws.delete_rows(well_data.plan_correct_index._value, ws.max_row)
             return ws
 
+        if well_data.inv_number._value == 'не корректно' or well_data.inv_number is None:
+            mes = QMessageBox.warning(self, 'Инвентарный номер отсутствует',
+                                      'Необходимо уточнить наличие инвентарного номера')
+            return
+
         elif work_plan not in ['application_pvr', 'application_gis']:
             if work_plan != 'plan_change':
                 for row_ind, row in enumerate(ws.iter_rows(values_only=True)):

@@ -697,6 +697,8 @@ class WellData(FindIndexPZ):
                     elif 'цех' == value:
                         well_data.cdng = ProtectedIsDigit(row[col + 1].value)
                         # print(f' ЦДНГ {well_data.cdng._value}')
+
+
 class Well_data(FindIndexPZ):
 
     def __init__(self, ws):

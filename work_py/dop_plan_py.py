@@ -1,12 +1,10 @@
 import json
 import well_data
 
-
 import psycopg2
 from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QTabWidget, \
     QMainWindow, QPushButton
 from datetime import datetime
-
 
 from krs import TabPageGno, GnoWindow
 from well_data import well_area, well_number
@@ -19,7 +17,7 @@ class TabPageDp(QWidget):
     def __init__(self, work_plan):
         super().__init__()
         self.work_plan = work_plan
-        self.table_name = well_data.well_number._value + well_data.well_area._value
+        self.table_name = str(well_data.well_number._value) + well_data.well_area._value
 
         self.current_bottom_label = QLabel('Забой текущий')
         self.current_bottom_edit = QLineEdit(self)
@@ -72,8 +70,6 @@ class TabPageDp(QWidget):
             print(well_data.fluid_work)
             self.fluid_edit.setText(str(well_data.fluid_work))
 
-
-
     def get_tables_starting_with(self, prefix):
         """
         Возвращает список таблиц, имена которых начинаются с заданного префикса.
@@ -92,9 +88,6 @@ class TabPageDp(QWidget):
 
         cursor.close()
         return tables
-
-
-
 
 
 class TabWidget(QTabWidget):
@@ -129,7 +122,6 @@ class DopPlanWindow(QMainWindow):
 
         work_earlier = self.tabWidget.currentWidget().work_edit.text()
 
-
         if well_data.data_in_base:
             fluid = self.tabWidget.currentWidget().fluid_edit.text()
 
@@ -147,8 +139,6 @@ class DopPlanWindow(QMainWindow):
 
             self.extraction_data(table_in_base_combo, index_change_line)
 
-
-
         if current_bottom == '' or fluid == '' or work_earlier == '':
             # print(current_bottom, fluid, work_earlier)
             mes = QMessageBox.critical(self, 'Забой', 'не все значения введены')
@@ -157,23 +147,24 @@ class DopPlanWindow(QMainWindow):
         if current_bottom > well_data.bottomhole_drill._value:
             mes = QMessageBox.critical(self, 'Забой', 'Текущий забой больше пробуренного забоя')
             return
-        if (0.87 <= float(fluid[:3]) <= 1.64) == False:
+        if (0.87 <= float(fluid[:3].replace(',', '.')) <= 1.64) == False:
             mes = QMessageBox.critical(self, 'рабочая жидкость',
                                        'уд. вес рабочей жидкости не может быть меньше 0,87 и больше 1,64')
             return
-
-        if 'г/см3' not in fluid:
-            mes = QMessageBox.critical(self, 'удвес', 'нужно добавить значение "г/см3" в уд.вес')
-            return
-        well_data.fluid_work = fluid
-        well_data.current_bottom = current_bottom
+        if well_data.data_in_base:
+            if 'г/см3' not in fluid:
+                mes = QMessageBox.critical(self, 'удвес', 'нужно добавить значение "г/см3" в уд.вес')
+                return
+            well_data.fluid_work = fluid
+            well_data.fluid_work_short = fluid[:7]
+            well_data.current_bottom = current_bottom
+            well_data.fluid = fluid[:4]
+        else:
+            well_data.fluid_work, well_data.fluid_work_short = GnoWindow.calc_work_fluid(self, fluid)
 
         work_list = self.work_list(work_earlier)
         MyWindow.populate_row(self, self.ins_ind + 2, work_list, self.table_widget, self.work_plan)
         well_data.pause = False
-
-        if str(fluid) not in str(well_data.fluid_work):
-            well_data.fluid_work, well_data.fluid_work_short = GnoWindow.calc_work_fluid(self, fluid)
 
     def extraction_data(self, table_name, paragraph_row):
         try:
@@ -191,7 +182,8 @@ class DopPlanWindow(QMainWindow):
                 table_name = f'{well_data.well_number._value + well_data.well_area._value + work_plan}'
 
                 # print(cursor1.execute(f"SELECT EXISTS (SELECT FROM information_schema.tables").fetchall())
-                cursor1.execute(f"SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = '{table_name}')")
+                cursor1.execute(
+                    f"SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = '{table_name}')")
                 result_table = cursor1.fetchone()
 
             elif well_data.work_plan == f'dop_plan':
@@ -230,7 +222,6 @@ class DopPlanWindow(QMainWindow):
             if conn1:
                 conn1.close()
 
-
     def insert_data_dop_plan(self, result, paragraph_row):
         try:
             paragraph_row = paragraph_row
@@ -246,7 +237,6 @@ class DopPlanWindow(QMainWindow):
             well_data.column_additional = True
         else:
             well_data.column_additional = False
-
 
         well_data.fluid_work = result[paragraph_row][7]
 
@@ -275,11 +265,9 @@ class DopPlanWindow(QMainWindow):
                 data_list.append(data)
             well_data.data_list.append(data_list)
 
-
-
     def work_list(self, work_earlier):
         krs_begin = [[None, None,
-             f' Ранее проведенные работ: \n {work_earlier}',
-             None, None, None, None, None, None, None,
-             'Мастер КРС', None]]
+                      f' Ранее проведенные работ: \n {work_earlier}',
+                      None, None, None, None, None, None, None,
+                      'Мастер КРС', None]]
         return krs_begin
