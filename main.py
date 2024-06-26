@@ -23,6 +23,7 @@ from PyQt5.QtCore import Qt, pyqtSlot
 from openpyxl.workbook import Workbook
 from openpyxl.styles import Border, Side, Alignment, Font
 
+
 from log_files.log import logger, QPlainTextEditLogger
 from work_py.advanted_file import count_row_height, raid, remove_overlapping_intervals
 
@@ -751,7 +752,7 @@ class MyWindow(QMainWindow):
     def save_to_krs(self):
         from open_pz import CreatePZ
         from work_py.alone_oreration import is_number
-        from data_base.work_with_base import create_database_well_db, insert_database_well_data
+        from data_base.work_with_base import create_database_well_db, insert_database_well_data, excel_in_json
 
         if not self.table_widget is None:
             wb2 = Workbook()
@@ -836,7 +837,8 @@ class MyWindow(QMainWindow):
             if self.work_plan != 'dop_plan':
                 self.insert_image(ws2, f'{well_data.path_image}imageFiles/Хасаншин.png', 'H1')
                 self.insert_image(ws2, f'{well_data.path_image}imageFiles/Шамигулов.png', 'H4')
-                insert_database_well_data(well_data.data_well_dict)
+                excel_data_dict = excel_in_json(ws2)
+                insert_database_well_data(well_data.data_well_dict,  excel_data_dict)
 
                 try:
                     cat_h2s_list = well_data.dict_category[well_data.plast_work_short[0]]['по сероводороду'].category

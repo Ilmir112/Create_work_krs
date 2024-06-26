@@ -1133,22 +1133,29 @@ class Well_perforation(FindIndexPZ):
                                                    'ВВедите индекс окончания рабочих интервалов ПВР', 0, 0, 300)[0] - 2
 
             perforations_intervals = []
-            for row_index, row in enumerate(
-                    ws.iter_rows(min_row=begin_index + 3, max_row=cancel_index + 2)):
-                lst = []
+            try:
+                for row_index, row in enumerate(
+                        ws.iter_rows(min_row=begin_index + 3, max_row=cancel_index + 2)):
+                    lst = []
 
-                if str(row[col_roof_index + 1].value).replace('.', '').replace(',', '').isdigit():
-                    if row[1].value != None:
-                        plast = row[1].value
-                        lst.append(plast)
-                    else:
-                        lst.append(plast)
+                    if str(row[col_roof_index + 1].value).replace('.', '').replace(',', '').isdigit():
+                        print(row_index)
+                        if row[1].value != None:
+                            plast = row[1].value
+                            lst.append(plast)
+                        else:
+                            lst.append(plast)
 
-                    for col in row[2:13]:
-                        lst.append(col.value)
+                        for col in row[2:13]:
+                            lst.append(col.value)
 
-                if all([str(i).strip() == 'None' or i is None for i in lst]) is False:
-                    perforations_intervals.append(lst)
+                    if all([str(i).strip() == 'None' or i is None for i in lst]) is False:
+                        perforations_intervals.append(lst)
+            except:
+                mes = QMessageBox.warning(self, 'ОШИБКА',
+                                          F'Приложение не смогло определить индекс пласта в строке {row_index}')
+                well_data.pause = True
+                MyWindow.pause_app()
 
             for ind, row in enumerate(perforations_intervals):
                 plast = row[col_plast_index]

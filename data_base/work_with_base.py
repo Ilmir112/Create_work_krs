@@ -1,6 +1,8 @@
 import json
 import re
 import sqlite3
+
+import openpyxl
 import psycopg2
 from PyQt5.QtWidgets import QInputDialog
 from collections import namedtuple
@@ -13,6 +15,8 @@ from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem, QLineEdit, QHeaderVie
     QTableWidget
 
 from openpyxl import load_workbook
+from openpyxl.styles import PatternFill, Font, Color
+from openpyxl.utils import get_column_letter, range_boundaries
 
 import well_data
 from main import MyWindow
@@ -459,7 +463,7 @@ class Classifier_well(QMainWindow):
             if conn:
                 conn.close()
 
-def insert_database_well_data(data_well_dict):
+def insert_database_well_data(data_well_dict, excel):
     # print(row, well_data.count_row_well)
     try:
 
@@ -468,16 +472,17 @@ def insert_database_well_data(data_well_dict):
 
         data_well = json.dumps(data_well_dict, ensure_ascii=False)
 
+        excel_json = json.dumps(excel, ensure_ascii=False)
 
         # Подготовленные данные для вставки (пример)
-        data_values = (str(well_data.well_number._value), well_data.well_area._value, data_well, datetime.now().date())
+        data_values = (str(well_data.well_number._value), well_data.well_area._value,
+                       data_well, datetime.now().date(), excel_json)
 
         # Подготовленный запрос для вставки данных с параметрами
-        query = f"INSERT INTO wells VALUES (%s, %s, %s, %s)"
+        query = f"INSERT INTO wells VALUES (%s, %s, %s, %s, %s)"
 
         # Выполнение запроса с использованием параметров
         cursor.execute(query, data_values)
-
 
         # Сохранить изменения и закрыть соединение
         conn.commit()
@@ -493,13 +498,11 @@ def insert_database_well_data(data_well_dict):
         # Выведите сообщение об ошибке
         mes = QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных, Скважина не добавлена в базу')
 
-
 def check_in_database_well_data(number_well, area_well):
     # print(row, well_data.count_row_well)
     try:
         conn = psycopg2.connect(**well_data.postgres_params_data_well)
         cursor = conn.cursor()
-
 
         cursor.execute("SELECT data_well FROM wells WHERE well_number = %s AND area_well = %s",
                        (str(number_well._value), area_well._value))
@@ -509,10 +512,61 @@ def check_in_database_well_data(number_well, area_well):
         else:
             return False, data_well
 
-
     except psycopg2.Error as e:
         # Выведите сообщение об ошибке
         mes = QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных, Скважина не добавлена в базу')
+
+def excel_in_json(sheet):
+    data = {}
+    for row_index, row in enumerate(sheet.iter_rows()):
+        row_data = []
+        if all(cell == None for cell in row[:13]) is False:
+            for cell in row[:13]:
+                # Получение значения и стилей
+                value = cell.value
+                font = cell.font
+                fill = cell.fill
+                # Преобразуем RGB в строковый формат
+                rgb_string = f"RGB({fill.fgColor.rgb})"
+
+                borders = cell.border
+                alignment = cell.alignment
+
+                row_data.append({
+                    'value': value,
+                    'font': {
+                        'name': font.name,
+                        'size': font.size,
+                        'bold': font.bold,
+                        'italic': font.italic
+                    },
+                    'fill': {
+                        'color': rgb_string
+                    },
+                    'borders': {
+                        'left': borders.left.style,
+                        'right': borders.right.style,
+                        'top': borders.top.style,
+                        'bottom': borders.bottom.style
+                    },
+                    'alignment': {
+                        'horizontal': alignment.horizontal,
+                        'vertical': alignment.vertical,
+                        'wrap_text': alignment.wrap_text
+                    },
+                })
+                data[row[0].row] = row_data
+
+    rowHeights = [sheet.row_dimensions[i + 1].height for i in range(sheet.max_row)]
+    colWidth = [sheet.column_dimensions[get_column_letter(i + 1)].width for i in range(0, 13)] + [None]
+    boundaries_dict = {}
+
+    for ind, _range in enumerate(sheet.merged_cells.ranges):
+        boundaries_dict[ind] = range_boundaries(str(_range))
+
+    data_excel = {'data': data, 'rowHeights': rowHeights, 'colWidth': colWidth, 'merged_cells': boundaries_dict}
+
+    return data_excel
 
 def insert_data_well_dop_plan(data_well):
     from well_data import ProtectedIsDigit
@@ -561,8 +615,6 @@ def insert_data_well_dop_plan(data_well):
     well_data.max_angle_H = ProtectedIsDigit(well_data_dict['данные']['глубина'])
     well_data.max_expected_pressure = ProtectedIsDigit(well_data_dict['данные']['максимальное ожидаемое давление'])
     well_data.max_admissible_pressure = ProtectedIsDigit(well_data_dict['данные']['максимальное допустимое давление'])
-
-
 
     mes = QMessageBox.information(None, 'Данные с базы', "Данные вставлены из базы данных")
 
@@ -664,6 +716,89 @@ def create_database_well_db(work_plan, number_dp):
             conn.close()
 
         mes = QMessageBox.information(None, 'база данных', 'Скважина добавлена в базу данных')
+
+
+def read_excel_in_base(well_name, area_well):
+    conn = psycopg2.connect(**well_data.postgres_params_data_well)
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT excel_json FROM wells WHERE well_number = %s AND area_well = %s",
+                   (well_name, area_well))
+    data_well = cursor.fetchall()
+
+    if cursor:
+        cursor.close()
+    if conn:
+        conn.close()
+
+    dict_well = json.loads(data_well[len(data_well) - 1][0])
+    data = dict_well['data']
+
+    rowHeights = dict_well['rowHeights']
+    colWidth = dict_well['colWidth']
+    boundaries_dict = dict_well['merged_cells']
+    return data, rowHeights, colWidth, boundaries_dict
+
+
+def insert_data_new_excel_file(data, rowHeights, colWidth, boundaries_dict):
+    wb_new = openpyxl.Workbook()
+    sheet_new = wb_new.active
+
+    for row_index, row_data in data.items():
+        for col_index, cell_data in enumerate(row_data, 1):
+            cell = sheet_new.cell(row=int(row_index), column=int(col_index))
+            if cell_data:
+                cell.value = cell_data['value']
+
+    for key, value in boundaries_dict.items():
+        sheet_new.merge_cells(start_column=value[0], start_row=value[1],
+                              end_column=value[2], end_row=value[3])
+
+    # Восстановление данных и стилей из словаря
+    for row_index, row_data in data.items():
+
+        for col_index, cell_data in enumerate(row_data, 1):
+            cell = sheet_new.cell(row=int(row_index), column=int(col_index))
+
+            # Получение строки RGB из JSON
+            rgb_string = cell_data['fill']['color']
+
+            # Извлечение значений R, G, B с помощью регулярных выражений
+            match = re.match(r"RGB\((\d+), (\d+), (\d+)\)", rgb_string)
+            if match:
+                r, g, b = int(match.group(1)), int(match.group(2)), int(match.group(3))
+
+                # Создание объекта Color
+                hex_color = f'{r:02X}{g:02X}{b:02X}'
+                color = Color(rgb=hex_color)
+
+                # Создание объекта заливки
+                fill = PatternFill(patternType='solid', fgColor=color)
+                cell.fill = fill
+            cell.font = Font(name=cell_data['font']['name'], size=cell_data['font']['size'],
+                             bold=cell_data['font']['bold'], italic=cell_data['font']['italic'])
+
+            cell.border = openpyxl.styles.Border(left=openpyxl.styles.Side(style=cell_data['borders']['left']),
+                                                 right=openpyxl.styles.Side(style=cell_data['borders']['right']),
+                                                 top=openpyxl.styles.Side(style=cell_data['borders']['top']),
+                                                 bottom=openpyxl.styles.Side(style=cell_data['borders']['bottom']))
+
+            wrap_true =  cell_data['alignment']['wrap_text']
+
+            cell.alignment = openpyxl.styles.Alignment(horizontal=cell_data['alignment']['horizontal'],
+                                                       vertical=cell_data['alignment']['vertical'],
+                                                       wrap_text=wrap_true)
+
+    for col in range(13):
+        sheet_new.column_dimensions[get_column_letter(col + 1)].width = colWidth[col]
+
+    for index_row, row in enumerate(sheet_new.iter_rows()):  # Копирование высоты строки
+        if all([col is None for col in row]):
+            sheet_new.row_dimensions[index_row].hidden = True
+        sheet_new.row_dimensions[index_row].height = rowHeights[index_row-1]
+
+    # Сохранение нового Excel-файла
+    wb_new.save('new_excel_file.xlsx')
 
 if __name__ == "__main__":
     import sys
