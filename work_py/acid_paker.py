@@ -405,7 +405,7 @@ class TabPage_SO_acid(QWidget):
         calculate_sko = self.calculate_sko_line.text()
         if calculate_sko != '':
             calculate_sko.replace(',', '.')
-        self.acid_volume_edit.setText(f'{round(metr_pvr * float(calculate_sko), 1)}')
+            self.acid_volume_edit.setText(f'{round(metr_pvr * float(calculate_sko), 1)}')
 
     def update_Qplast_after(self, index):
         if index == 'ДА':

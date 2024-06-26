@@ -757,8 +757,6 @@ class TabPage_SO_with(QWidget):
                         roof_plast = roof_plast_in
                         break
 
-        print(f'кровля райбированного ПВР {roof_plast, roof_add_column_plast}')
-
         return roof_plast, roof_add_column_plast
 
     def template_diam_ek(self):

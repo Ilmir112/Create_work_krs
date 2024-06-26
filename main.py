@@ -366,16 +366,16 @@ class MyWindow(QMainWindow):
             self.fname, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
                                                                   "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
             if self.fname:
-                try:
-                    self.read_pz(self.fname)
-                    well_data.pause = True
-                    read_pz = CreatePZ(self.wb, self.ws, self.data_window, self.perforation_correct_window2)
-                    sheet = read_pz.open_excel_file(self.ws, self.work_plan)
+                # try:
+                self.read_pz(self.fname)
+                well_data.pause = True
+                read_pz = CreatePZ(self.wb, self.ws, self.data_window, self.perforation_correct_window2)
+                sheet = read_pz.open_excel_file(self.ws, self.work_plan)
 
-                    self.copy_pz(sheet, self.table_widget, self.work_plan)
+                self.copy_pz(sheet, self.table_widget, self.work_plan)
 
-                except FileNotFoundError:
-                    print('Файл не найден')
+                # except FileNotFoundError:
+                #     print('Файл не найден')
 
         elif action == self.create_GNKT_OPZ and self.table_widget == None:
             self.work_plan = 'gnkt_opz'
@@ -874,6 +874,14 @@ class MyWindow(QMainWindow):
                 string_work = f' № {well_data.number_dp}'
             elif self.work_plan == 'krs':
                 string_work = 'ПР'
+            elif self.work_plan == 'plan_change':
+                string_work = 'ПР изм'
+            elif self.work_plan == 'gnkt_bopz':
+                string_work = 'ГНКТ БОПЗ ВНС'
+            elif self.work_plan == 'gnkt_opz':
+                string_work = 'ГНКТ ОПЗ'
+            elif self.work_plan == 'gnkt_after_grp':
+                string_work = 'ГНКТ ОСВ ГРП'
             else:
                 string_work = 'ГНКТ'
 
@@ -1826,7 +1834,7 @@ class MyWindow(QMainWindow):
                         value = value.text()
 
                         if 'схеме №' in value or 'схемы №' in value or 'Схемы обвязки №' in value:
-                            print(value)
+
                             number_schema = value[value.index(' №') + 1:value.index(' №') + 4].replace(' ', '')
                             if '1' in number_schema:
                                 number_schema = "2"
@@ -2314,7 +2322,7 @@ class MyWindow(QMainWindow):
                     well_data.skm_interval.append(skm)
                     well_data.skm_interval = sorted(well_data.skm_interval, key=lambda x: x[0])
                     raid_str = raid(remove_overlapping_intervals(perforating_intervals, well_data.skm_interval))
-                    print(f'скреперование {well_data.skm_interval}')
+
                     for row in range(self.table_widget.rowCount()):
                         for column in range(self.table_widget.columnCount()):
                             if column != 0:
@@ -2322,7 +2330,7 @@ class MyWindow(QMainWindow):
                                 if value != None:
                                     value = value.text()
                                     if 'Произвести скреперование э/к' in value:
-                                        print(value)
+
                                         ind_value = value.split(' ')
                                         ind_min = ind_value.index('интервале') + 1
                                         ind_max = ind_value.index('обратной')

@@ -285,13 +285,15 @@ class Drill_window(QMainWindow):
 
     def add_work(self):
         from main import MyWindow
-
-        self.nkt_str = self.tabWidget.currentWidget().nkt_str_combo.currentText()
-        self.drillingBit_diam = self.tabWidget.currentWidget().drill_diametr_line.text()
-        self.downhole_motor = self.tabWidget.currentWidget().downhole_motor_line.text()
-        self.drill_cm_combo = self.tabWidget.currentWidget().drill_cm_combo.currentText()
-        self.drill_type_combo = self.tabWidget.currentWidget().drill_type_combo.currentText()
-        self.need_privyazka_QCombo = self.tabWidget.currentWidget().need_privyazka_QCombo.currentText()
+        try:
+            self.nkt_str = self.tabWidget.currentWidget().nkt_str_combo.currentText()
+            self.drillingBit_diam = self.tabWidget.currentWidget().drill_diametr_line.text()
+            self.downhole_motor = self.tabWidget.currentWidget().downhole_motor_line.text()
+            self.drill_cm_combo = self.tabWidget.currentWidget().drill_cm_combo.currentText()
+            self.drill_type_combo = self.tabWidget.currentWidget().drill_type_combo.currentText()
+            need_privyazka_QCombo = self.tabWidget.currentWidget().need_privyazka_QCombo.currentText()
+        except:
+            mes = QMessageBox.warning(self, 'ОШИБКА', 'Не все данные введены корректно')
 
         rows = self.tableWidget.rowCount()
         if rows == 0:
@@ -316,9 +318,11 @@ class Drill_window(QMainWindow):
 
         drill_tuple = sorted(drill_tuple, key=lambda x: x[0])
         if self.nkt_str == 'НКТ':
-            drill_list = self.drilling_nkt(drill_tuple, self.drill_type_combo, self.drillingBit_diam, self.downhole_motor)
+            drill_list = self.drilling_nkt(drill_tuple, self.drill_type_combo,
+                                           self.drillingBit_diam, self.downhole_motor)
         elif self.nkt_str == 'СБТ':
-            drill_list = self.drilling_sbt(drill_tuple, self.drill_type_combo, self.drillingBit_diam, self.downhole_motor)
+            drill_list = self.drilling_sbt(drill_tuple, self.drill_type_combo,
+                                           self.drillingBit_diam, self.downhole_motor)
 
         try:
             MyWindow.populate_row(self, self.ins_ind, drill_list, self.table_widget)
@@ -326,8 +330,7 @@ class Drill_window(QMainWindow):
 
             self.close()
         except:
-            print('ошибка ожидаемая')
-            print(drill_list)
+
             well_data.pause = False
             self.close()
             return drill_list
@@ -341,7 +344,7 @@ class Drill_window(QMainWindow):
             return
         self.tableWidget.removeRow(row)
 
-    def drilling_nkt(self, drill_tuple, drill_type_combo, drillingBit_diam, downhole_motor):
+    def drilling_nkt(self, drill_tuple, drill_type_combo, drillingBit_diam, downhole_motor, need_privyazka_QCombo = 'Нет' ):
         from work_py.alone_oreration import privyazkaNKT
 
 
@@ -428,7 +431,7 @@ class Drill_window(QMainWindow):
              None, None, None, None, None, None, None,
              'мастер КРС', liftingNKT_norm(well_data.current_bottom, 1.3)]
         ]
-        if self.need_privyazka_QCombo == 'Да':
+        if need_privyazka_QCombo == 'Да':
 
             privyazkaNKT_list = privyazkaNKT(self)[0]
 

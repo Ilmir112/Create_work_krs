@@ -222,7 +222,8 @@ class GnoDescentWindow(QMainWindow):
              None, None, None, None, None, None, None,
              'мастер КРС', 1.2],
             [f'Спуск с пакером {well_data.paker_do["posle"]} '
-             f'на глубину {well_data.depth_fond_paker_do["posle"]}м, воронку на {sum(well_data.dict_nkt_po.values())}м.',
+             f'на глубину {well_data.depth_fond_paker_do["posle"]}м,'
+             f' воронку на {int(float(sum(well_data.dict_nkt_po.values())))}м.',
 
              None,
              f'Спустить подземное оборудование  согласно расчету и карте спуска ЦДНГ '
@@ -884,7 +885,7 @@ class GnoDescentWindow(QMainWindow):
                     f'в следующей последовательности:\n'
         n = 0
         for nkt, pressuar in calc_fond_dict.items():
-            press_str += f'Опрессовать НКТ в интервале {n} - {nkt} на давление {pressuar}атм \n'
+            press_str += f'Опрессовать НКТ в интервале {n} - {int(nkt)} на давление {pressuar}атм \n'
             n = nkt
 
         return press_str

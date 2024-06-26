@@ -133,7 +133,7 @@ class Kompress_Window(QMainWindow):
         depth_gauge_combo = str(self.tabWidget.currentWidget().depth_gauge_combo.currentText())
 
 
-        if int(khvost_edit) - (count_muft * int(dictance_without_murt)) - 100 < well_data.static_level:
+        if int(khvost_edit) - (count_muft * int(dictance_without_murt)) - 100 < well_data.static_level._value:
             mes = QMessageBox.warning(self, 'Некорректные данные',
                                       f'Статический уровень в скважине {well_data.static_level} ниже глубины '
                                       f'вверхней муфты {int(khvost_edit) - (count_muft * int(dictance_without_murt))}'

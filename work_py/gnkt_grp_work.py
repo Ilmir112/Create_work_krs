@@ -615,7 +615,7 @@ class GnktOsvWindow2(QMainWindow):
              column_data_add_wall_thickness, column_data_add_vn_volume, column_add_head, column_add_shoe, None,
              volume_pm_dp, well_volume_dp],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'колонна НКТ', None, None, nkt,
-             nkt_widht, nkt - 2 * nkt_widht, 0, lenght_nkt, None, '=R19^2*3.14/4/1000', '=U19*V19/1000'],
+             nkt_widht, nkt - 2 * nkt_widht, f'0-', lenght_nkt, None, '=R19^2*3.14/4/1000', '=T19*V19/1000'],
             [None, None, None, None, None, None, None, None, None, None, None, None, f'{well_data.paker_do["do"]}',
              None, None, None, None,
              50, well_data.depth_fond_paker_do["do"], well_data.depth_fond_paker_do["do"] + 2, 2, None, None],

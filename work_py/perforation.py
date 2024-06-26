@@ -415,6 +415,8 @@ class PerforationWindow(QMainWindow):
              None, None, None, None, None, None, None,
              'Подрядчик по ГИС', None, None]]
         if type_perforation == 'Трубная перфорация':
+            mes = QMessageBox.information(self, 'Проверка',
+                                          'Необходимо проверить длину шаблона, должна быть не менее 10м')
             for i in range(len(pipe_perforation)):
                 perforation.insert(i + 1, pipe_perforation[i])
 

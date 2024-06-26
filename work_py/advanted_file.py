@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from PyQt5.QtWidgets import QInputDialog, QMessageBox
 
 import plan
@@ -357,6 +359,17 @@ def count_row_height(ws, ws2, work_list, merged_cells_dict, ind_ins):
     plan.copy_true_ws(ws, ws2, head)
 
     for i in range(1, len(work_list) + 1):  # Добавлением работ
+        if 'код площади' in work_list[i-1]:
+            for j in range(1, 13):
+                cell = ws2.cell(row=i, column=j)
+                cell.number_format = 'General'
+                cell.value = str(work_list[i - 1][j - 1])
+        if 'по H2S' in work_list[i-1]:
+            for j in range(1, 13):
+                cell = ws2.cell(row=i, column=j)
+                cell.number_format = 'General'
+                cell.value = str(work_list[i - 1][j - 1])
+
         for j in range(1, 13):
             cell = ws2.cell(row=i, column=j)
 
@@ -434,8 +447,13 @@ def count_row_height(ws, ws2, work_list, merged_cells_dict, ind_ins):
     return 'Высота изменена'
 
 def is_num(num):
+
    try:
-       if str(round(float(num), 5))[-1] != 0:
+       if isinstance(num, datetime):
+           return num.strftime('%d.%m.%Y')
+       elif str(round(float(num), 6))[-1] != 0:
+           return round(float(num), 6)
+       elif str(round(float(num), 5))[-1] != 0:
            return round(float(num), 5)
        elif str(round(float(num), 4))[-1] != 0:
            return round(float(num), 4)

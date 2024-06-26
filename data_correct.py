@@ -633,7 +633,7 @@ class TabPage_SO(QWidget):
         elif str(string).replace('.', '').replace(',', '').isdigit():
 
             # print(str(round(float(string), 1))[-1] == '0', int(string), float(string))
-            return int(float(string)) if str(round(float(str(string).replace(',', '.')), 1))[-1] == "0" else \
+            return int(float(str(string).replace(',', '.'))) if str(round(float(str(string).replace(',', '.')), 1))[-1] == "0" else \
                 round(float(str(string).replace(',', '.')), 1)
         else:
             return str(string)
@@ -1055,7 +1055,7 @@ class DataWindow(QMainWindow):
                 }
 
             }
-            print(well_data.data_well_dict)
+            # print(well_data.data_well_dict)
             well_data.pause = False
             self.close()
 
