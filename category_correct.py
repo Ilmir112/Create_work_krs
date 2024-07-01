@@ -194,7 +194,7 @@ class TabPage_SO(QWidget):
     def ifNone(self, string):
 
         if str(string) in ['0', str(None), '-']:
-            return 'отсут'
+            return 0
         elif str(string).replace('.', '').replace(',', '').isdigit():
             if str(round(float(str(string).replace(',', '.')), 1))[-1] == "0":
                 return int(float(string))
@@ -279,6 +279,7 @@ class CategoryWindow(QMainWindow):
 
                     except:
                         mes = QMessageBox.warning(self, 'Ошибка', "Ошибка сохранения данных по категории")
+                        return
 
         well_data.pause = False
         self.close()

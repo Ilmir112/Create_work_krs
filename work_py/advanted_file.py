@@ -338,6 +338,7 @@ def count_row_height(ws, ws2, work_list, merged_cells_dict, ind_ins):
 
     text_width_dict = {35: (0, 100), 50: (101, 200), 70: (201, 300), 95: (301, 400), 110: (401, 500),
                        130: (501, 600), 150: (601, 700), 170: (701, 800), 190: (801, 1000), 230: (1000, 1500)}
+
     for ind, _range in enumerate(ws.merged_cells.ranges):
         boundaries_dict[ind] = range_boundaries(str(_range))
 
@@ -354,11 +355,14 @@ def count_row_height(ws, ws2, work_list, merged_cells_dict, ind_ins):
                             ws2.row_dimensions[i + 1].height = int(key)
 
     head = plan.head_ind(0, ind_ins)
-    # print(f'head - {head}')
+
 
     plan.copy_true_ws(ws, ws2, head)
-
+    boundaries_dict_index = 1000
     for i in range(1, len(work_list) + 1):  # Добавлением работ
+        if 'Наименование работ' in work_list[i-1]:
+            boundaries_dict_index = i+1
+
         if 'код площади' in work_list[i-1]:
             for j in range(1, 13):
                 cell = ws2.cell(row=i, column=j)
@@ -369,9 +373,16 @@ def count_row_height(ws, ws2, work_list, merged_cells_dict, ind_ins):
                 cell = ws2.cell(row=i, column=j)
                 cell.number_format = 'General'
                 cell.value = str(work_list[i - 1][j - 1])
+        a = value[1]
+
+        if well_data.work_plan == 'dop_plan_in_base' and boundaries_dict_index < value[1]:
+            ws2.unmerge_cells(start_column=value[0], start_row=value[1],
+                              end_column=value[2], end_row=value[3])
 
         for j in range(1, 13):
+
             cell = ws2.cell(row=i, column=j)
+
 
             if cell and str(cell) != str(work_list[i - 1][j - 1]):
                 # print(work_list[i - 1][j - 1])
@@ -415,9 +426,10 @@ def count_row_height(ws, ws2, work_list, merged_cells_dict, ind_ins):
             # print(row)
             ws2.merge_cells(start_row=row + 1, start_column=3, end_row=row + 1, end_column=10)
     for key, value in boundaries_dict.items():
-        # print(value)
+
         ws2.merge_cells(start_column=value[0], start_row=value[1],
                         end_column=value[2], end_row=value[3])
+
 
     # вставка сохраненных изображение по координатам ячеек
     if well_data.image_list:

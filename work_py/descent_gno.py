@@ -228,7 +228,8 @@ class GnoDescentWindow(QMainWindow):
              None,
              f'Спустить подземное оборудование  согласно расчету и карте спуска ЦДНГ '
              f'НКТ с пакером {well_data.paker_do["posle"]} '
-             f'на глубину {well_data.depth_fond_paker_do["posle"]}м, воронку на глубину {sum(well_data.dict_nkt_po.values())}м. '
+             f'на глубину {well_data.depth_fond_paker_do["posle"]}м, воронку на глубину '
+             f'{round(sum(well_data.dict_nkt_po.values()), 1)}м. '
              f'(Компоновку НКТ{nkt_edit}м) '
              f'прошаблонировать для проведения ГИС.',
              None, None, None, None, None, None, None,
@@ -357,7 +358,7 @@ class GnoDescentWindow(QMainWindow):
              f' {sucker_edit}'
                 , None,
              f'Обвязать устье скважины согласно схемы №3 утвержденной главным '
-             f'инженером от 14.10.2021г при СПО штанг (ПМШ 62х21 либо аналог). Опрессовать ПВО на '
+             f'инженером от {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г при СПО штанг (ПМШ 62х21 либо аналог). Опрессовать ПВО на '
              f'{well_data.max_admissible_pressure._value}атм.'
              f'Спустить {well_data.dict_pump_SHGN["posle"]} на компоновке штанг: '
              f'{sucker_edit}  '
@@ -410,7 +411,7 @@ class GnoDescentWindow(QMainWindow):
             [f'Спустить плунжер на компоновке штанг:'
              f' {sucker_edit}', None,
              f'Обвязать устье скважины согласно схемы №3 утвержденной главным '
-             f'инженером от 14.10.2021г при СПО штанг (ПМШ 62х21 либо аналог). Опрессовать ПВО на '
+             f'инженером от {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г при СПО штанг (ПМШ 62х21 либо аналог). Опрессовать ПВО на '
              f'{well_data.max_admissible_pressure._value}атм.'
              f'Спустить плунжер на компоновке штанг: {sucker_edit} '
              f'Окончательный компоновку штанг производить по расчету '
@@ -472,7 +473,7 @@ class GnoDescentWindow(QMainWindow):
             [f'Спустить {well_data.dict_pump_SHGN["posle"]} на компоновке штанг:'
              f' {sucker_edit}', None,
              f'Обвязать устье скважины согласно схемы №3 утвержденной главным '
-             f'инженером от 14.10.2021г при СПО штанг (ПМШ 62х21 либо аналог). '
+             f'инженером от {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г при СПО штанг (ПМШ 62х21 либо аналог). '
              f'Опрессовать ПВО на {well_data.max_admissible_pressure._value}атм.'
              f'Спустить {well_data.dict_pump_SHGN["posle"]} на компоновке штанг: '
              f'{sucker_edit}  Окончательный компоновку штанг '
@@ -542,7 +543,7 @@ class GnoDescentWindow(QMainWindow):
             [f'Спустить плунжер на компоновке штанг: {sucker_edit}м',
              None,
              f'Обвязать устье скважины согласно схемы №3 утвержденной главным '
-             f'инженером от 14.10.2021г при СПО штанг (ПМШ 62х21 либо аналог). Опрессовать ПВО на '
+             f'инженером от {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г при СПО штанг (ПМШ 62х21 либо аналог). Опрессовать ПВО на '
              f'{well_data.max_admissible_pressure._value}атм.'
              f'Спустить плунжер на компоновке штанг: {sucker_edit} '
              f'Окончательный компоновку штанг производить по расчету '
@@ -607,7 +608,7 @@ class GnoDescentWindow(QMainWindow):
              'Мастер КРС, предст. заказчика', 0.7],
             [f'СПО {well_data.dict_pump_SHGN["posle"]} на компоновке штанг', None,
              f'Обвязать устье скважины согласно схемы №3 утвержденной главным '
-             f'инженером от 14.10.2021г при СПО штанг (ПМШ 62х21 либо аналог). Опрессовать ПВО на'
+             f'инженером от {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г при СПО штанг (ПМШ 62х21 либо аналог). Опрессовать ПВО на'
              f' {well_data.max_admissible_pressure._value}атм.'
              f'Спустить {well_data.dict_pump_SHGN["posle"]} на компоновке штанг: '
              f'{sucker_edit}  Окончательный компоновку штанг производить по расчету '
@@ -644,9 +645,9 @@ class GnoDescentWindow(QMainWindow):
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика', descentNKT_norm(well_data.depth_fond_paker_do["posle"], 1.2)],
             [f'Привязка', None,
-             f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС "Ойл-сервис". '
+             f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {well_data.contractor}". '
              f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером '
-             f'от 14.10.2021г. '
+             f'от {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г. '
              f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины Отбить забой по ГК и ЛМ',
              None, None, None, None, None, None, None,
              'Мастер КРС, подрядчик по ГИС', 4],

@@ -688,7 +688,7 @@ class WellData(FindIndexPZ):
                 value = cell.value
                 if value:
                     if 'площадь' in str(value):  # определение номера скважины
-                        well_data.well_number = ProtectedIsDigit(row[col - 1].value)
+                        well_data.well_number = ProtectedIsNonNone(row[col - 1].value)
                         well_data.well_area = ProtectedIsNonNone(row[col + 1].value)
                     elif 'месторождение ' in str(value):  # определение номера скважины
                         well_data.well_oilfield = ProtectedIsNonNone(row[col + 2].value)
@@ -775,11 +775,15 @@ class Well_data(FindIndexPZ):
                         if well_data.column_direction_True:
                             for col1, cell in enumerate(row):
                                 if 'Уровень цемента' in str(cell.value):
-                                    if 'уст' in str(row[col1 + 2].value).lower() or str(row[col1 + 2].value).isdigit():
-                                        well_data.level_cement_direction = ProtectedIsDigit(0)
-                                    else:
-                                        well_data.level_cement_direction = ProtectedIsDigit(
-                                            str(row[col1 + 2].value.split('-')[0]).replace(" ", ""))
+                                    n = 1
+                                    while row[col1 + n].value == None or n > 6:
+                                        if 'уст' in str(row[col1 + 2].value).lower() or str(row[col1 + 2].value).isdigit():
+                                            well_data.level_cement_direction = ProtectedIsDigit(0)
+                                        else:
+                                            if '-' in str(row[col1 + 2].value):
+                                                well_data.level_cement_direction = ProtectedIsDigit(
+                                                    str(row[col1 + 2].value.split('-')[0]).replace(" ", ""))
+                                        n += 1
                         else:
                             well_data.level_cement_direction = ProtectedIsNonNone('отсут')
                         try:

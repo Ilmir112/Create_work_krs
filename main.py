@@ -265,6 +265,7 @@ class MyWindow(QMainWindow):
         self.create_KRS = self.create_file.addAction('План КРС', self.action_clicked)
         self.create_KRS_change = self.create_file.addAction('Корректировка плана КРС', self.action_clicked)
         self.create_KRS_DP = self.create_file.addAction('Дополнительный план КРС', self.action_clicked)
+        self.create_KRS_DP_in_base = self.create_file.addAction('Дополнительный план КРС из базы', self.action_clicked)
         self.create_GNKT = self.create_file.addMenu('&План ГНКТ')
         self.create_GNKT_OPZ = self.create_GNKT.addAction(' ГНКТ ОПЗ', self.action_clicked)
         self.create_GNKT_frez = self.create_GNKT.addAction('ГНКТ Фрезерование', self.action_clicked)
@@ -323,6 +324,7 @@ class MyWindow(QMainWindow):
 
     @QtCore.pyqtSlot()
     def action_clicked(self):
+        from data_base.work_with_base import read_excel_in_base, insert_data_new_excel_file
         from open_pz import CreatePZ
         from work_py.gnkt_frez import Work_with_gnkt
         from work_py.gnkt_grp import GnktOsvWindow
@@ -351,16 +353,35 @@ class MyWindow(QMainWindow):
             self.fname, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
                                                                   "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
             if self.fname:
-                # try:
-                self.read_pz(self.fname)
+                try:
+                    self.read_pz(self.fname)
+                    well_data.pause = True
+                    read_pz = CreatePZ(self.wb, self.ws, self.data_window, self.perforation_correct_window2)
+                    sheet = read_pz.open_excel_file(self.ws, self.work_plan)
+
+                    self.copy_pz(sheet, self.table_widget, self.work_plan)
+
+                except FileNotFoundError:
+                    mes = QMessageBox.warning(self, 'Ошибка', 'Ошибка при прочтении файла')
+        elif action == self.create_KRS_DP_in_base and self.table_widget == None:
+            self.work_plan = 'dop_plan_in_base'
+            well_data.work_plan = 'dop_plan_in_base'
+            self.tableWidgetOpen(self.work_plan)
+
+            try:
+                well_data.data_in_base = True
+                self.rir_window = DopPlanWindow(well_data.ins_ind, self.table_widget, self.work_plan)
+                # self.rir_window.setGeometry(200, 400, 100, 200)
+                self.rir_window.show()
                 well_data.pause = True
-                read_pz = CreatePZ(self.wb, self.ws, self.data_window, self.perforation_correct_window2)
-                sheet = read_pz.open_excel_file(self.ws, self.work_plan)
+                self.pause_app()
+                data, rowHeights, colWidth, boundaries_dict = read_excel_in_base(well_data.well_number, well_data.well_area)
+                self.ws = insert_data_new_excel_file(data, rowHeights, colWidth, boundaries_dict)
 
-                self.copy_pz(sheet, self.table_widget, self.work_plan)
+                self.copy_pz(self.ws, self.table_widget, self.work_plan)
 
-                # except FileNotFoundError:
-                #     mes = QMessageBox.warning(self, 'Ошибка', 'Ошибка при прочтении файла')
+            except FileNotFoundError:
+                mes = QMessageBox.warning(self, 'Ошибка', 'Ошибка при прочтении файла')
         elif action == self.create_KRS_change and self.table_widget == None:
             self.work_plan = 'plan_change'
             self.tableWidgetOpen(self.work_plan)
@@ -834,18 +855,21 @@ class MyWindow(QMainWindow):
                         self.insert_image(ws2, f'{well_data.path_image}imageFiles/schema_well/формула.png', coordinate, 330, 130)
                         break
 
-            if self.work_plan != 'dop_plan':
+            if self.work_plan not in ['dop_plan', 'dop_plan_in_base']:
                 self.insert_image(ws2, f'{well_data.path_image}imageFiles/Хасаншин.png', 'H1')
                 self.insert_image(ws2, f'{well_data.path_image}imageFiles/Шамигулов.png', 'H4')
                 excel_data_dict = excel_in_json(ws2)
-                insert_database_well_data(well_data.data_well_dict,  excel_data_dict)
+                insert_database_well_data(
+                    well_data.well_number._value, well_data.well_area._value, well_data.contractor, well_data.costumer,
+                    well_data.data_well_dict,  excel_data_dict
+                )
 
                 try:
                     cat_h2s_list = well_data.dict_category[well_data.plast_work_short[0]]['по сероводороду'].category
                     h2s_mg = well_data.dict_category[well_data.plast_work_short[0]]['по сероводороду'].data_mg_l
                     h2s_pr = well_data.dict_category[well_data.plast_work_short[0]]['по сероводороду'].data_procent
 
-                    if cat_h2s_list in [1, 2] and self.work_plan != 'dop_plan':
+                    if cat_h2s_list in [1, 2] and self.work_plan not in ['dop_plan', 'dop_plan_in_base']:
                         ws3 = wb2.create_sheet('Sheet1')
                         ws3.title = "Расчет необходимого количества поглотителя H2S"
                         ws3 = wb2["Расчет необходимого количества поглотителя H2S"]
@@ -872,7 +896,7 @@ class MyWindow(QMainWindow):
                 path = 'D:/Documents/Desktop/ГТМ'
             else:
                 path = ""
-            if self.work_plan == 'dop_plan':
+            if self.work_plan in ['dop_plan', 'dop_plan_in_base']:
                 string_work = f' № {well_data.number_dp}'
             elif self.work_plan == 'krs':
                 string_work = 'ПР'
@@ -902,18 +926,16 @@ class MyWindow(QMainWindow):
             # Перед сохранением установите режим расчета
             wb2.calculation.calcMode = "auto"
 
-
             if wb2:
                 wb2.close()
                 self.saveFileDialog(wb2, full_path)
                 # wb2.save(full_path)
                 print(f"Table data saved to Excel {full_path} {well_data.number_dp}")
-            if self.wb:
-                self.wb.close()
+
 
     def close_file(self):
-        from find import ProtectedIsNonNone
-        from find import ProtectedIsDigit
+        from find import ProtectedIsNonNone, ProtectedIsDigit
+
 
         if not self.table_widget is None:
             self.table_widget.clear()
@@ -1000,9 +1022,10 @@ class MyWindow(QMainWindow):
             well_data.work_perforations_dict = {}
             well_data.paker_do = {"do": 0, "posle": 0}
             well_data.column_additional = False
-            well_data.well_number = None
-            well_data.well_area = None
+            well_data.well_number = ProtectedIsNonNone('')
+            well_data.well_area = ProtectedIsNonNone('')
             well_data.values = []
+            well_data.dop_work_list = None
             well_data.depth_fond_paker_do = {"do": 0, "posle": 0}
             well_data.paker2_do = {"do": 0, "posle": 0}
             well_data.depth_fond_paker2_do = {"do": 0, "posle": 0}
@@ -1782,19 +1805,18 @@ class MyWindow(QMainWindow):
                 MyWindow.insert_data_in_database(self, row, row_max + i)
 
             table_widget.insertRow(row)
-
-            if len(str(row_data[1])) > 3 and work_plan in 'gnkt_frez':
+            print(f'row data {row_data}')
+            if len(str(row_data)[1]) > 3 and work_plan in 'gnkt_frez':
                 table_widget.setSpan(i + ins_ind, 1, 1, 12)
-
             else:
                 table_widget.setSpan(i + ins_ind, 2, 1, 8 + index_setSpan)
+
             for column, data in enumerate(row_data):
                 item = QtWidgets.QTableWidgetItem(str(data))
                 item.setFlags(item.flags() | Qt.ItemIsEditable)
 
                 if not data is None:
                     table_widget.setItem(row, column, item)
-
                 else:
                     table_widget.setItem(row, column, QtWidgets.QTableWidgetItem(str('')))
 
@@ -2018,10 +2040,14 @@ class MyWindow(QMainWindow):
         rowHeights_exit = [sheet.row_dimensions[i + 1].height if sheet.row_dimensions[i + 1].height is not None else 18
                            for i in range(sheet.max_row)]
         if work_plan not in ['application_pvr', 'gnkt_frez', 'gnkt_after_grp', 'gnkt_opz', 'gnkt_bopz', 'plan_change']:
-            self.populate_row(table_widget.rowCount(), [
+
+            work_list = [
                 [None, None, 'Порядок работы', None, None, None, None, None, None, None, None, None],
                 [None, None, 'Наименование работ', None, None, None, None, None, None, None, 'Ответственный',
-                 'Нормы времени \n мин/час.']], self.table_widget, self.work_plan)
+                 'Нормы времени \n мин/час.']]
+            if well_data.dop_work_list:
+                work_list.append(well_data.dop_work_list)
+            self.populate_row(table_widget.rowCount(), work_list, self.table_widget, self.work_plan)
 
         for row in range(1, rows + 2):
             if row > 1 and row < rows - 1:

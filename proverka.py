@@ -37,6 +37,7 @@ def insert_data_new_excel_file(data, rowHeights, colWidth, boundaries_dict):
     sheet_new = wb_new.active
 
 
+
     for row_index, row_data in data.items():
         for col_index, cell_data in enumerate(row_data, 1):
             cell = sheet_new.cell(row=int(row_index), column=int(col_index))

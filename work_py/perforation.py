@@ -27,7 +27,7 @@ class TabPage_SO(QWidget):
         self.labelHolesMetr = QLabel("отверстий на 1п.м", self)
         self.lineEditHolesMetr = QComboBox(self)
         self.lineEditHolesMetr.addItems(['6', '8', '10', '16', '18', '20', '30'])
-        self.lineEditHolesMetr.setProperty("value", '20')
+        self.lineEditHolesMetr.setCurrentIndex(5)
 
         self.label_type_perforation = QLabel("Тип перфорации", self)
         TabPage_SO.combobox_type_perforation = QComboBox(self)
@@ -66,8 +66,7 @@ class TabPage_SO(QWidget):
         elif len(well_data.angle_data) != 0:
             if sole != '':
                 angle_list = [(depth, angle) for depth, angle, curvature in well_data.angle_data
-                    if abs(float(depth) - float(sole)) <= 10]
-                print(angle_list)
+                              if abs(float(depth) - float(sole)) <= 10]
                 depth_max = max([float(depth.replace(',', '.')) for depth, angle in angle_list])
                 angle_depth = max([float(angle.replace(',', '.')) for depth, angle in angle_list])
 
@@ -89,7 +88,6 @@ class PerforationWindow(QMainWindow):
     def __init__(self, table_widget, ins_ind, parent=None):
 
         super(QMainWindow, self).__init__(parent)
-
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
         self.table_widget = table_widget
@@ -139,11 +137,8 @@ class PerforationWindow(QMainWindow):
                                            50)[0]
 
         self.tableWidget.setSortingEnabled(False)
-        # print(f' проект {self.dict_perforation_project}')
-        # print(f' текущий ПВР {self.dict_perforation}')
         rows = self.tableWidget.rowCount()
 
-        # print(f'проект {well_data.dict_perforation_project}')
         if len(well_data.dict_perforation_project) != 0:
             for plast, data in well_data.dict_perforation_project.items():
                 for i in data['интервал']:
@@ -296,6 +291,7 @@ class PerforationWindow(QMainWindow):
 
     def geophysicalSelect(self, geophysic):
         return geophysic
+
     def add_work(self):
 
         rows = self.tableWidget.rowCount()
@@ -309,35 +305,36 @@ class PerforationWindow(QMainWindow):
             if well_data.kat_pvo < kateg2:
                 well_data.kat_pvo = kateg2
 
-        perforation = [[None, None,
-                        f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через '
-                        f'ЦИТС "Ойл-сервис". '
-                        f'При необходимости  подготовить место для установки партии ГИС напротив мостков. '
-                        f'Произвести  монтаж ГИС согласно схемы  №8а утвержденной главным инженером от 14.10.2021г',
-                        None, None, None, None, None, None, None,
-                        'Мастер КРС', None, None, None],
-                       [None, None,
-                        f'Долить скважину до устья тех жидкостью уд.весом {well_data.fluid_work}. '
-                        f'Установить ПВО по схеме №8а утвержденной '
-                        f'главным инженером ООО "Ойл-сервис" от 14.10.2021г. Опрессовать  плашки  '
-                        f'ПВО (на давление опрессовки ЭК, но '
-                        f'не ниже максимального ожидаемого давления на устье) '
-                        f'{well_data.max_admissible_pressure._value}атм, по невозможности на давление поглощения, но '
-                        f'не менее 30атм в течении 30мин (ОПРЕССОВКУ ПВО ЗАФИКСИРОВАТЬ В ВАХТОВОМ ЖУРНАЛЕ). '
-                        f'Передать по сводке уровня жидкости до перфорации и после перфорации.'
-                        f'(Произвести фотографию перфоратора в заряженном состоянии, и после проведения '
-                        f'перфорации,'
-                        f' фотографии предоставить в ЦИТС Ойл-сервис',
-                        None, None, None, None, None, None, None,
-                        'Мастер КРС, подрядчик по ГИС', 1.2, None],
-                       ["ГИС (Перфорация на кабеле ЗАДАЧА 2.9.1)", None,
-                        "ГИС (Перфорация на кабеле ЗАДАЧА 2.9.1)", None, None, None, None,
-                        None, None, None, 'подрядчик по ГИС', None],
-                       [None, None, "Кровля", "-", "Подошва", "Тип заряда", "отв на 1 п.м.", "Кол-во отв",
-                        "пласт", "Доп.данные", 'подрядчик по ГИС', None]
-                       ]
-
-
+        perforation = [
+            [None, None,
+             f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через '
+             f'ЦИТС {well_data.contractor}". '
+             f'При необходимости  подготовить место для установки партии ГИС напротив мостков. '
+             f'Произвести  монтаж ГИС согласно схемы  №8а утвержденной главным инженером от '
+             f'{well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г',
+             None, None, None, None, None, None, None,
+             'Мастер КРС', None, None, None],
+            [None, None,
+             f'Долить скважину до устья тех жидкостью уд.весом {well_data.fluid_work}. '
+             f'Установить ПВО по схеме №8а утвержденной '
+             f'главным инженером {well_data.contractor} от '
+             f'{well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г. Опрессовать  плашки  '
+             f'ПВО (на давление опрессовки ЭК, но '
+             f'не ниже максимального ожидаемого давления на устье) '
+             f'{well_data.max_admissible_pressure._value}атм, по невозможности на давление поглощения, но '
+             f'не менее 30атм в течении 30мин (ОПРЕССОВКУ ПВО ЗАФИКСИРОВАТЬ В ВАХТОВОМ ЖУРНАЛЕ). '
+             f'Передать по сводке уровня жидкости до перфорации и после перфорации.'
+             f'(Произвести фотографию перфоратора в заряженном состоянии, и после проведения '
+             f'перфорации,'
+             f' фотографии предоставить в ЦИТС {well_data.contractor}',
+             None, None, None, None, None, None, None,
+             'Мастер КРС, подрядчик по ГИС', 1.2, None],
+            ["ГИС (Перфорация на кабеле ЗАДАЧА 2.9.1)", None,
+             "ГИС (Перфорация на кабеле ЗАДАЧА 2.9.1)", None, None, None, None,
+             None, None, None, 'подрядчик по ГИС', None],
+            [None, None, "Кровля", "-", "Подошва", "Тип заряда", "отв на 1 п.м.", "Кол-во отв",
+             "пласт", "Доп.данные", 'подрядчик по ГИС', None]
+        ]
 
         for row in range(rows):
             item = self.tableWidget.item(row, 1)
@@ -355,13 +352,13 @@ class PerforationWindow(QMainWindow):
             pvr_str = TabPage_SO.select_type_perforation(self, sool)
             if type_perforation == 'Трубная перфорация':
                 perforation[2] = [f"ГИС ( Трубная Перфорация ЗАДАЧА 2.9.2)", None,
-                            f"ГИС ( Трубная Перфорация ЗАДАЧА 2.9.2). {pvr_str}", None, None, None, None,
-                            None, None, None, 'подрядчик по ГИС', None]
+                                  f"ГИС ( Трубная Перфорация ЗАДАЧА 2.9.2). {pvr_str}", None, None, None, None,
+                                  None, None, None, 'подрядчик по ГИС', None]
             type_charge = self.tableWidget.item(row, 2).text()
             count_otv = self.tableWidget.item(row, 3).text()
             if count_otv != '':
                 count_charge = float(count_otv)
-                if 0 > count_charge  or count_charge > 500:
+                if 0 > count_charge or count_charge > 500:
                     mes = QMessageBox.warning(self, 'НЕКОРРЕКТНО', 'ОБЪЕМ зарядов некорректен')
                     return
             count_charge = self.tableWidget.item(row, 4).text()
@@ -389,10 +386,10 @@ class PerforationWindow(QMainWindow):
 
         end_list = "Произвести контрольную запись ЛМ;ТМ. Составить АКТ на перфорацию." \
             if type_perforation != 'Трубная перфорация' \
-            else f"Подъем последних 5-ти НКТ{well_data.nkt_diam}мм и демонтаж перфоратора "\
-                   f"производить в присутствии ответственного "\
-                   f"представителя подрядчика по ГИС» (руководителя взрывных"\
-                   f" работ или взрывника)."
+            else f"Подъем последних 5-ти НКТ{well_data.nkt_diam}мм и демонтаж перфоратора " \
+                 f"производить в присутствии ответственного " \
+                 f"представителя подрядчика по ГИС» (руководителя взрывных" \
+                 f" работ или взрывника)."
 
         perforation.append([None, None, end_list,
                             None, None, None, None, None, None, None,
@@ -405,7 +402,7 @@ class PerforationWindow(QMainWindow):
              f'(с шаблонировкой НКТ{well_data.nkt_diam}мм шаблоном {well_data.nkt_template}мм. '
              f'Спуск компоновки производить  со скоростью не более 0,30 м/с, не допуская резких ударов и вращения.'
              f'(Произвести фотографию перфоратора в заряженном состоянии, и после проведения перфорации, '
-             f'фотографии предоставить в ЦИТС Ойл-сервис, передать по сводке уровня '
+             f'фотографии предоставить в ЦИТС {well_data.contractor}, передать по сводке уровня '
              f'жидкости до перфорации и после перфорации) '
              f'(При СПО первых десяти НКТ на спайдере дополнительно '
              f'устанавливать элеватор ЭХЛ).',

@@ -186,9 +186,9 @@ class Classifier_well(QMainWindow):
                 if region_name == region:
                     # # Удаление всех данных из таблицы
                     # cursor.execute("DROP TABLE my_table")
-
-                    # Удаление всех данных из таблицы
-                    # cursor.execute(f"DELETE FROM {region_name}")
+                    #
+                    # Запрос на удаление таблицы
+                    cursor.execute(f"DROP TABLE IF EXISTS {region_name}")
 
                     # Создание таблицы в базе данных
                     cursor.execute(f'CREATE TABLE IF NOT EXISTS {region_name}'
@@ -209,13 +209,13 @@ class Classifier_well(QMainWindow):
                                 # print(value)
                                 if 'туймазин' in str(value).lower():
                                     check_param = 'ТГМ'
-                                if 'ишимбай' in str(value).lower():
+                                elif 'ишимбай' in str(value).lower():
                                     check_param = 'ИГМ'
-                                if 'чекмагуш' in str(value).lower():
+                                elif 'чекмагуш' in str(value).lower():
                                     check_param = 'ЧГМ'
-                                if 'красно' in str(value).lower():
+                                elif 'красно' in str(value).lower():
                                     check_param = 'КГМ'
-                                if 'арлан' in str(value).lower():
+                                elif 'арлан' in str(value).lower():
                                     check_param = 'АГМ'
                                 if '01.01.' in str(value) or '01.04.' in str(value) or '01.07.' in str(
                                         value) or '01.10.' in str(value):
@@ -228,7 +228,7 @@ class Classifier_well(QMainWindow):
                             break
                     # print(region_name, version_year)
                     # print(check_param)
-                    if check_param == region_name:
+                    if check_param in region_name:
                         mes = QMessageBox.warning(self, 'ВНИМАНИЕ ОШИБКА',
                                                   f'регион выбрано корректно  {region_name}')
                         try:
@@ -278,7 +278,6 @@ class Classifier_well(QMainWindow):
             if conn:
                 conn.close()
 
-
     def filter(self, filter_text):
         for i in range(1, self.table_class.rowCount() + 1):
             for j in range(0, 1, 2):
@@ -318,7 +317,7 @@ class Classifier_well(QMainWindow):
                        'КГМ_классификатор']
 
         try:
-            # Создание подключения к базе данных PostgreSQL
+        # Создание подключения к базе данных PostgreSQL
             conn = psycopg2.connect(**well_data.postgres_params_classif)
             cursor = conn.cursor()
 
@@ -361,11 +360,33 @@ class Classifier_well(QMainWindow):
                     h2s_pr, h2s_mg_l, h2s_mg_m, categoty_gf, gas_factor = None, None, None, None, None
                     area_row = None
                     check_file = False
+                    check_param = None
 
                     for index_row, row in enumerate(ws.iter_rows(min_row=2, values_only=True)):
                         if 'Классификация' in row:
                             check_file = True
-                        if 'Скважина' in row:
+                        elif any(['фонд' in str(value).lower() for col, value in enumerate(row)]):
+                            for col, value in enumerate(row):
+                                if 'туймазин' in str(value).lower():
+                                    check_param = 'ТГМ'
+                                if 'ишимбай' in str(value).lower():
+                                    check_param = 'ИГМ'
+                                if 'чекмагуш' in str(value).lower():
+                                    check_param = 'ЧГМ'
+                                if 'красно' in str(value).lower():
+                                    check_param = 'КГМ'
+                                if 'арлан' in str(value).lower():
+                                    check_param = 'АГМ'
+                        elif any(['по  состоянию' in str(value).lower() for col, value in enumerate(row)]):
+                            for col, value in enumerate(row):
+                                if '01.01.' in str(value) or '01.04.' in str(value) or '01.07.' in str(
+                                        value) or '01.10.' in str(value):
+
+                                    version_year = re.findall(r'[0-9.]', str(value))
+                                    version_year = ''.join(version_year)
+                                    if version_year[-1] == '.':
+                                        version_year = version_year[:-1]
+                        elif 'Скважина' in row:
                             area_row = index_row + 2
                             for col, value in enumerate(row):
                                 if not value is None and col <= 20:
@@ -390,25 +411,9 @@ class Classifier_well(QMainWindow):
                                     elif 'Газовый фактор' == value:
                                         categoty_gf = col
                                         gas_factor = col + 1
-                                    if 'туймазин' in str(value).lower():
-                                        check_param = 'ТГМ'
-                                    if 'ишимбай' in str(value).lower():
-                                        check_param = 'ИГМ'
-                                    if 'чекмагуш' in str(value).lower():
-                                        check_param = 'ЧГМ'
-                                    if 'красно' in str(value).lower():
-                                        check_param = 'КГМ'
-                                    if 'арлан' in str(value).lower():
-                                        check_param = 'АГМ'
-                                    if '01.01.' in str(value) or '01.04.' in str(value) or '01.07.' in str(
-                                            value) or '01.10.' in str(value):
 
-                                        version_year = re.findall(r'[0-9.]', str(value))
-                                        version_year = ''.join(version_year)
-                                        if version_year[-1] == '.':
-                                            version_year = version_year[:-1]
 
-                    if check_param == region_name:
+                    if check_param in region_name:
                         mes = QMessageBox.warning(self, 'ВНИМАНИЕ ОШИБКА',
                                                   f'регион выбрано корректно  {region_name}')
 
@@ -419,7 +424,6 @@ class Classifier_well(QMainWindow):
                                     well_number = row[well_column]
                                     area_well = row[area_column]
                                     oilfield_str = row[oilfield]
-                                    version_year = None
 
                                     for col, value in enumerate(row):
                                         if not value is None and col <= 18:
@@ -452,37 +456,73 @@ class Classifier_well(QMainWindow):
                         mes = QMessageBox.warning(self, 'ВНИМАНИЕ ОШИБКА',
                                                   f'в Данном перечне отсутствую скважины {region_name}')
                     conn.commit()
+            mes = QMessageBox.information(self, 'Успешно', 'Классификатор успешно обновлен')
 
         except (psycopg2.Error, Exception) as e:
             # Выведите сообщение об ошибке
             mes = QMessageBox.warning(self, 'Ошибка', 'Ошибка подключения к базе данных')
         finally:
+
             # Закройте курсор и соединение
             if cursor:
                 cursor.close()
             if conn:
                 conn.close()
 
-def insert_database_well_data(data_well_dict, excel):
+def insert_database_well_data(well_number, well_area, contractor, costumer, data_well_dict, excel):
     # print(row, well_data.count_row_well)
     try:
-
+        date_today = datetime.now()
         conn = psycopg2.connect(**well_data.postgres_params_data_well)
         cursor = conn.cursor()
+        # Проверка наличия строки с заданными параметрами
+        cursor.execute("""
+               SELECT EXISTS (
+                   SELECT 1 
+                   FROM wells
+                   WHERE well_number = %s AND area_well = %s AND contractor = %s AND costumer = %s
+               ), today -- Добавляем contractor в SELECT
+           FROM wells 
+           WHERE well_number = %s AND area_well = %s AND contractor = %s AND costumer = %s
+           """, (str(well_number), well_area, contractor, costumer, str(well_number), well_area, contractor, costumer))
+
+        row_exists = cursor.fetchone()
 
         data_well = json.dumps(data_well_dict, ensure_ascii=False)
 
         excel_json = json.dumps(excel, ensure_ascii=False)
 
-        # Подготовленные данные для вставки (пример)
-        data_values = (str(well_data.well_number._value), well_data.well_area._value,
-                       data_well, datetime.now().date(), excel_json)
+        if row_exists:
+            row_exists, date_in_base = row_exists
+            reply = QMessageBox.question(None, 'Строка найдена',
+                                         f'Строка с {well_number} {well_area} уже существует от {date_in_base}. '
+                                         f'Обновить данные?')
+            if reply == QMessageBox.Yes:
+                try:
+                    cursor.execute("""
+                                    UPDATE wells
+                                    SET data_well = %s, today = %s, excel_json = %s                                                                       
+                                    WHERE well_number = %s AND area_well = %s AND contractor = %s AND costumer = %s
+                                """, (data_well, date_today, excel_json, str(well_number), well_area, contractor, costumer))
 
-        # Подготовленный запрос для вставки данных с параметрами
-        query = f"INSERT INTO wells VALUES (%s, %s, %s, %s, %s)"
+                    QMessageBox.information(None, 'Успешно', 'Данные в обновлены обновлены')
+                except (Exception, psycopg2.Error) as error:
+                    QMessageBox.critical(None, 'Ошибка', f'Ошибка при обновлении данных: {error}')
+        else:
 
-        # Выполнение запроса с использованием параметров
-        cursor.execute(query, data_values)
+
+            # Подготовленные данные для вставки (пример)
+            data_values = (str(well_number), well_area,
+                           data_well, date_today, excel_json, contractor, well_data.costumer)
+
+            # Подготовленный запрос для вставки данных с параметрами
+            query = f"INSERT INTO wells VALUES (%s, %s, %s, %s, %s, %s, %s)"
+
+            # Выполнение запроса с использованием параметров
+            cursor.execute(query, data_values)
+
+            mes = QMessageBox.information(None, 'база данных', 'Скважина добавлена в базу данных well_data')
+
 
         # Сохранить изменения и закрыть соединение
         conn.commit()
@@ -492,11 +532,10 @@ def insert_database_well_data(data_well_dict, excel):
         if conn:
             conn.close()
 
-        mes = QMessageBox.information(None, 'база данных', 'Скважина добавлена в базу данных well_data')
 
     except psycopg2.Error as e:
         # Выведите сообщение об ошибке
-        mes = QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных, Скважина не добавлена в базу')
+        mes = QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных')
 
 def check_in_database_well_data(number_well, area_well):
     # print(row, well_data.count_row_well)
@@ -504,8 +543,10 @@ def check_in_database_well_data(number_well, area_well):
         conn = psycopg2.connect(**well_data.postgres_params_data_well)
         cursor = conn.cursor()
 
-        cursor.execute("SELECT data_well FROM wells WHERE well_number = %s AND area_well = %s",
-                       (str(number_well._value), area_well._value))
+        cursor.execute("SELECT data_well FROM wells WHERE well_number = %s AND area_well = %s "
+                       "AND contractor = %s AND costumer = %s",
+                       (str(number_well._value), area_well._value, well_data.contractor, well_data.costumer))
+
         data_well = cursor.fetchone()
         if data_well:
             return data_well
@@ -521,9 +562,15 @@ def excel_in_json(sheet):
     for row_index, row in enumerate(sheet.iter_rows()):
         row_data = []
         if all(cell == None for cell in row[:13]) is False:
+            if any([cell.value == "ИТОГО:" for cell in row[:4]]):
+                index_end_copy = row_index
+
+                break
             for cell in row[:13]:
                 # Получение значения и стилей
                 value = cell.value
+
+
                 font = cell.font
                 fill = cell.fill
                 # Преобразуем RGB в строковый формат
@@ -557,21 +604,24 @@ def excel_in_json(sheet):
                 })
                 data[row[0].row] = row_data
 
-    rowHeights = [sheet.row_dimensions[i + 1].height for i in range(sheet.max_row)]
+    rowHeights = [sheet.row_dimensions[i + 1].height for i in range(sheet.max_row) if i <= index_end_copy]
     colWidth = [sheet.column_dimensions[get_column_letter(i + 1)].width for i in range(0, 13)] + [None]
     boundaries_dict = {}
 
     for ind, _range in enumerate(sheet.merged_cells.ranges):
         boundaries_dict[ind] = range_boundaries(str(_range))
 
+    print(boundaries_dict)
+
     data_excel = {'data': data, 'rowHeights': rowHeights, 'colWidth': colWidth, 'merged_cells': boundaries_dict}
 
     return data_excel
 
 def insert_data_well_dop_plan(data_well):
-    from well_data import ProtectedIsDigit
+    from well_data import ProtectedIsDigit, ProtectedIsNonNone
 
     well_data_dict = json.loads(data_well)
+    print(well_data_dict)
     well_data.column_direction_diametr = ProtectedIsDigit(well_data_dict["направление"]["диаметр"])
     well_data.column_direction_wall_thickness = ProtectedIsDigit(well_data_dict["направление"]["толщина стенки"])
     well_data.column_direction_lenght = ProtectedIsDigit(well_data_dict["направление"]["башмак"])
@@ -608,13 +658,15 @@ def insert_data_well_dop_plan(data_well):
     well_data.expected_Q = well_data_dict['ожидаемые']['приемистость']
 
     well_data.bottomhole_drill = ProtectedIsDigit(well_data_dict['данные']['пробуренный забой'])
-
     well_data.bottomhole_artificial = ProtectedIsDigit(well_data_dict['данные']['искусственный забой'])
-
     well_data.max_angle = ProtectedIsDigit(well_data_dict['данные']['максимальный угол'])
     well_data.max_angle_H = ProtectedIsDigit(well_data_dict['данные']['глубина'])
     well_data.max_expected_pressure = ProtectedIsDigit(well_data_dict['данные']['максимальное ожидаемое давление'])
     well_data.max_admissible_pressure = ProtectedIsDigit(well_data_dict['данные']['максимальное допустимое давление'])
+
+    well_data.curator = well_data_dict['куратор']
+    well_data.region = well_data_dict['регион']
+    well_data.cdng = ProtectedIsNonNone(well_data_dict['ЦДНГ'])
 
     mes = QMessageBox.information(None, 'Данные с базы', "Данные вставлены из базы данных")
 
@@ -651,9 +703,18 @@ def create_database_well_db(work_plan, number_dp):
         cursor = conn.cursor()
         if number_dp == 0:
             number_dp = ''
+        if 'Ойл-Сервис' in well_data.contractor:
+            contractor = 'ОЙЛ'
+        elif 'РН-Сервис' in well_data.contractor:
+            contractor = 'РН'
+
+        if work_plan in ['krs', 'plan_change']:
+            work_plan = 'krs'
+
 
         # Создаем таблицу для хранения данных
-        number = json.dumps(str(well_data.well_number._value) + well_data.well_area._value + work_plan + str(number_dp),
+        number = json.dumps(
+            str(well_data.well_number._value) + " " +well_data.well_area._value  + " " + work_plan + str(number_dp) + ' ' + contractor,
                             ensure_ascii=False)
 
         # Попытка удалить таблицу, если она существует
@@ -718,12 +779,14 @@ def create_database_well_db(work_plan, number_dp):
         mes = QMessageBox.information(None, 'база данных', 'Скважина добавлена в базу данных')
 
 
-def read_excel_in_base(well_name, area_well):
+def read_excel_in_base(number_well, area_well):
     conn = psycopg2.connect(**well_data.postgres_params_data_well)
     cursor = conn.cursor()
 
-    cursor.execute("SELECT excel_json FROM wells WHERE well_number = %s AND area_well = %s",
-                   (well_name, area_well))
+    cursor.execute("SELECT excel_json FROM wells WHERE well_number = %s AND area_well = %s "
+                   "AND contractor = %s AND costumer = %s",
+                   (str(number_well._value), area_well._value, well_data.contractor, well_data.costumer))
+
     data_well = cursor.fetchall()
 
     if cursor:
@@ -756,7 +819,6 @@ def insert_data_new_excel_file(data, rowHeights, colWidth, boundaries_dict):
 
     # Восстановление данных и стилей из словаря
     for row_index, row_data in data.items():
-
         for col_index, cell_data in enumerate(row_data, 1):
             cell = sheet_new.cell(row=int(row_index), column=int(col_index))
 
@@ -791,14 +853,25 @@ def insert_data_new_excel_file(data, rowHeights, colWidth, boundaries_dict):
 
     for col in range(13):
         sheet_new.column_dimensions[get_column_letter(col + 1)].width = colWidth[col]
-
+    index_delete = 0
     for index_row, row in enumerate(sheet_new.iter_rows()):  # Копирование высоты строки
-        if all([col is None for col in row]):
-            sheet_new.row_dimensions[index_row].hidden = True
-        sheet_new.row_dimensions[index_row].height = rowHeights[index_row-1]
+        if any(['Наименование работ' in str(col.value) for col in row[:13]]):
+            index_delete = index_row
+            a = row
+        elif any(['ПЛАН РАБОТ' in str(col.value).upper() for col in row[:4]]):
+            sheet_new.cell(row=index_row+1, column=2).value = f'ДОПОЛНИТЕЛЬНЫЙ ПЛАН РАБОТ № {well_data.number_dp}'
 
-    # Сохранение нового Excel-файла
-    wb_new.save('new_excel_file.xlsx')
+        elif all([col is None for col in row[:13]]):
+            sheet_new.row_dimensions[index_row].hidden = True
+        try:
+            sheet_new.row_dimensions[index_row].height = rowHeights[index_row-1]
+        except:
+            pass
+
+    sheet_new.delete_rows(index_delete, sheet_new.max_row - index_delete)
+
+
+    return sheet_new
 
 if __name__ == "__main__":
     import sys

@@ -442,7 +442,7 @@ class GisApplication(QMainWindow):
             [None, 'Исполнитель', None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, 'по договору №', None, None, None, None, None, 'ГТМ', None, None, None, None, None, None, None,
              None, None, None, None, None, None, None, None, None],
-            [None, 'Заказчик', None, None, None, 'ООО Ойл-Сервис ', None, None, None, None, None, None, None, None, None,
+            [None, 'Заказчик', None, None, None, f'{well_data.contractor}', None, None, None, None, None, None, None, None, None,
              None, None, None, None, 'Цех', None, None, well_data.cdng._value, None, None, None, None, None, None, None, None,
              None, None, None, None, None, None, None, None, None, None],
             [None, 'Уполномоченный представитель', None, None, None, None, None, None, None, None, None, None, None,

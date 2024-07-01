@@ -215,7 +215,7 @@ class GnoWindow(QMainWindow):
         well_data.fluid_work, well_data.fluid_work_short = self.calc_work_fluid(fluid)
         nkt_diam_fond = TabPage_Gno.gno_nkt_opening(well_data.dict_nkt)
 
-        if work_plan != 'dop_plan':
+        if work_plan not in ['dop_plan', 'dop_plan_in_base']:
 
             without_damping_True = well_data.without_damping
             print(f'без глушения {without_damping_True}')
@@ -388,7 +388,7 @@ class GnoWindow(QMainWindow):
                 [f'подьем {well_data.dict_pump_SHGN["do"]}', None,
                  f'Сорвать насос штанговый насос {well_data.dict_pump_SHGN["do"]}(зафиксировать вес при срыве).'
                  f' Обвязать устье скважины согласно схемы №3 утвержденной главным '
-                 f'инженером от 14.10.2021г при СПО штанг (ПМШ 62х21 либо аналог). Опрессовать ПВО на '
+                 f'инженером от {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г при СПО штанг (ПМШ 62х21 либо аналог). Опрессовать ПВО на '
                  f'{well_data.max_admissible_pressure._value}атм. '
                  f'{"".join([" " if without_damping_True is True else f"Приподнять штангу. Произвести глушение в затрубное пространство в объеме{well_jamming_ord}м3 (объем колонны от пакера до устья уд.весом {well_data.fluid_work}. Техостой 2ч."])}'
                  f'Поднять на штангах насос с гл. {well_data.dict_pump_SHGN_h["do"]}м с доливом тех жидкости '
@@ -772,7 +772,7 @@ class GnoWindow(QMainWindow):
                 [f'Поднять {well_data.dict_pump_SHGN["do"]} с гл. {well_data.dict_pump_SHGN_h["do"]}м', None,
                  f'Сорвать насос {well_data.dict_pump_SHGN["do"]} (зафиксировать вес при срыве). Обвязать устье скважины '
                  f'согласно схемы №3 утвержденной главным '
-                 f'инженером от 14.10.2021г при СПО штанг (ПМШ 62х21 либо аналог). Опрессовать ПВО на '
+                 f'инженером от {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г при СПО штанг (ПМШ 62х21 либо аналог). Опрессовать ПВО на '
                  f'{well_data.max_admissible_pressure._value}атм. Поднять на штангах насос '
                  f'с гл. {int(well_data.dict_pump_SHGN_h["do"])}м с доливом тех жидкости уд.весом {well_data.fluid_work} '
                  f'Обеспечить не превышение расчетных нагрузок на штанговые колонны при срыве  насосов (не более 8 тн), '
@@ -861,7 +861,7 @@ class GnoWindow(QMainWindow):
                 [f'Поднять насос {well_data.dict_pump_SHGN["do"]}', None,
                  f'Сорвать насос {well_data.dict_pump_SHGN["do"]} (зафиксировать вес при срыве). Обвязать устье скважины '
                  f'согласно схемы №3 утвержденной главным '
-                 f'инженером от 14.10.2021г при СПО штанг (ПМШ 62х21 либо аналог). '
+                 f'инженером от {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г при СПО штанг (ПМШ 62х21 либо аналог). '
                  f'Опрессовать ПВО на {well_data.max_admissible_pressure._value}атм. '
                  f'{"".join([" " if without_damping_True is True else f"При наличии Избыточного давления не позволяющее сорвать пакера: Приподнять штангу. Произвести глушение в НКТ в объеме{volume_pod_NKT(self)}м3. Техостой 2ч."])}'
                  f' Поднять на штангах насос с гл. {float(well_data.dict_pump_SHGN_h["do"])}м с '
@@ -970,7 +970,7 @@ class GnoWindow(QMainWindow):
                 [f'поднять плунжен', None,
                  f'Сорвать  плунжер. (зафиксировать вес при срыве). Обвязать устье скважины согласно схемы №3 '
                  f'утвержденной главным '
-                 f'инженером от 14.10.2021г при СПО штанг (ПМШ 62х21 либо аналог). Опрессовать ПВО на '
+                 f'инженером от {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г при СПО штанг (ПМШ 62х21 либо аналог). Опрессовать ПВО на '
                  f'{well_data.max_admissible_pressure._value}атм. Заловить конус спуском одной '
                  f'штанги. Поднять на штангах плунжер с гл. {float(well_data.dict_pump_SHGN_h["do"])}м с доливом тех '
                  f'жидкости уд.весом {well_data.fluid_work} '
@@ -1060,7 +1060,7 @@ class GnoWindow(QMainWindow):
                 ['Поднять плунжер', None,
                  f'Сорвать плунжер насоса (зафиксировать вес при срыве). Обвязать устье скважины согласно '
                  f'схемы №3 утвержденной главным '
-                 f'инженером от 14.10.2021г при СПО штанг (ПМШ 62х21 либо аналог). Опрессовать ПВО на '
+                 f'инженером от {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г при СПО штанг (ПМШ 62х21 либо аналог). Опрессовать ПВО на '
                  f'{well_data.max_admissible_pressure._value}атм. Спуском одной штанги заловить конус. '
                  f'{"".join([" " if without_damping_True is True else f"При наличии Избыточного давления не позволяющее сорвать пакера: Приподнять штангу. Произвести глушение в НКТ в объеме{volume_pod_NKT(self)}м3. Техостой 2ч."])}'
 
@@ -1464,7 +1464,7 @@ class GnoWindow(QMainWindow):
                     pass
 
             expenditure_h2s = round(max(expenditure_h2s_list), 3)
-            fluid_work = f'{fluid_work_insert}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
+            fluid_work = f'{fluid_work_insert}г/см3 с добавлением погглушение скважины прямой промывкой глушение скважины прямой промывкой лотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
                          f'расчета {expenditure_h2s}кг/м3 '
             fluid_work_short = f'{fluid_work_insert}г/см3 c ' \
                                f'ХИМТЕХНО 101 Марка А - {expenditure_h2s}кг/м3 '

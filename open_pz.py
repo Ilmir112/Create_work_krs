@@ -48,12 +48,16 @@ class CreatePZ(QMainWindow):
             well_data.number_dp, ok = QInputDialog.getItem(self, 'Номер дополнительного плана работ',
                                                            'Введите номер дополнительного плана работ',
                                                            number_list, 0, False)
+
             data_well = check_in_database_well_data(well_data.well_number, well_data.well_area)[0]
             if data_well:
                 insert_data_well_dop_plan(data_well)
-                DopPlanWindow.extraction_data(self, well_data.well_number._value + well_data.well_area._value +'krs', 1)
+                table_name = str(well_data.well_number._value) + " " + well_data.well_area._value + " " + work_plan + str(well_data.number_dp) + " " + well_data.contractor
+                DopPlanWindow.extraction_data(self, table_name, 1)
             else:
                 well_data.data_well_is_True = False
+
+
         if well_data.data_well_is_True is False:
             WellNkt.read_well(self, ws, well_data.pipes_ind._value, well_data.condition_of_wells._value)
             if well_data.work_plan not in ['application_pvr', 'application_gis']:
@@ -278,11 +282,17 @@ class CreatePZ(QMainWindow):
                             well_data.gis_list.append(type_pvr)
 
     def add_itog(self, ws, ins_ind, work_plan):
+        if ws.merged_cells.ranges:
+            merged_cells_copy = list(ws.merged_cells.ranges)  # Создаем копию множества объединенных ячеек
+            for merged_cell in merged_cells_copy:
+                if merged_cell.min_row > ins_ind + 5:
+                    ws.unmerge_cells(str(merged_cell))
 
         ws.delete_rows(ins_ind, self.table_widget.rowCount() - ins_ind + 1)
         if work_plan not in ['gnkt_frez', 'application_pvr', 'gnkt_after_grp', 'gnkt_opz', 'gnkt_bopz']:
             for i in range(ins_ind, len(itog_1()) + ins_ind):  # Добавлением итогов
                 if i < ins_ind + 6:
+
                     for j in range(1, 13):
                         ws.cell(row=i, column=j).value = itog_1()[i - ins_ind][j - 1]
                         if j != 1:

@@ -381,7 +381,7 @@ class PvrApplication(QMainWindow):
              None, 'по договору №', None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None,
              None, None, None, None, None, None, None, None, None],
-            [None, 'Заказчик', None, None, None, 'Ойл-Сервис ООО', None, None, None, None, None, None, None, None, None,
+            [None, 'Заказчик', None, None, None, f'{well_data.contractor}', None, None, None, None, None, None, None, None, None,
              None,
              None, None, None, 'Цех', None, None, well_data.cdng._value, None, None, None, None, None, None, None, None,
              None,

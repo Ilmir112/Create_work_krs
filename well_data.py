@@ -146,9 +146,9 @@ leakiness = False
 emergency_well = False
 column_additional = False
 without_damping = False
-well_number = None
+well_number = ProtectedIsNonNone('0')
 angle_data = []
-well_area = None
+well_area = ProtectedIsNonNone(' ')
 bvo = False
 old_version = True
 skm_depth = 0
@@ -231,6 +231,7 @@ swab_true_edit_type = 1
 
 drilling_interval = []
 max_angle = 0
+dop_work_list = None
 
 privyazkaSKO = 0
 nkt_mistake = False

@@ -842,7 +842,7 @@ class DataWindow(QMainWindow):
 
         elif any(['НВ' in dict_pump_SHGN_do.upper(), 'ШГН' in dict_pump_SHGN_do.upper(),
                   'НН' in dict_pump_SHGN_do.upper(), dict_pump_SHGN_do == 'отсут',
-                  'RHAM' in dict_pump_SHGN_do]) is False \
+                  'RH' in dict_pump_SHGN_do.upper()]) is False \
                 or any(['НВ' in dict_pump_SHGN_posle.upper(), 'ШГН' in dict_pump_SHGN_posle.upper(),
                         'НН' in dict_pump_SHGN_posle.upper(), dict_pump_SHGN_posle == 'отсут',
                         'RHAM' in dict_pump_SHGN_do]) is False \
@@ -1010,7 +1010,9 @@ class DataWindow(QMainWindow):
                     'толщина стенки': well_data.column_additional_wall_thickness._value,
                     'голова': well_data.head_column_additional._value,
                     'башмак': well_data.shoe_column_additional._value},
-                'куратор': well_data.curator,
+                'куратор': curator,
+                'регион': well_data.region,
+                'ЦДНГ': well_data.cdng._value,
                 'оборудование': {
                     'ЭЦН':
                         {
@@ -1053,9 +1055,8 @@ class DataWindow(QMainWindow):
                     'максимальное ожидаемое давление': well_data.max_expected_pressure._value,
                     'максимальное допустимое давление': well_data.max_admissible_pressure._value
                 }
-
             }
-            # print(well_data.data_well_dict)
+
             well_data.pause = False
             self.close()
 
