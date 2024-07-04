@@ -27,9 +27,7 @@ def delete_rows_pz(self, ws):
 
     # print(sorted(boundaries_dict))
     well_data.rowHeights = rowHeights1
-    # print(rowHeights1[well_data.cat_well_min:])
-    # print(len(well_data.rowHeights))
-    # print(f'251po {16}')
+
     for _ in range(16):
         ws.insert_rows(1, 1)
     for key, value in boundaries_dict.items():

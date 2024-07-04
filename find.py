@@ -52,10 +52,18 @@ class FindIndexPZ(QMainWindow):
             elif 'Оборудование скважины ' in row:
                 well_data.data_fond_min = ProtectedIsDigit(row_ind)
 
+            elif any(['Вид и категория ремонта, его шифр'  in str(col) for col in row]):
+
+                well_data.type_kr = ws.cell(row=row_ind+2, column=1).value
+                n = 1
+                while  well_data.type_kr is None or n > 8:
+                    well_data.type_kr = ws.cell(row=row_ind + 2, column=1 +n).value
+                    n += 1
 
             elif any(['IX. Мероприятия по предотвращению' in str(col) for col in row]) or \
                     any(['IX. Мероприятия по предотвращению аварий, инцидентов и осложнений::' in str(col) for col in
                          row]):
+
                 well_data.data_well_max = ProtectedIsDigit(row_ind)
 
             elif 'НКТ' == str(row[1]).upper():
@@ -347,6 +355,8 @@ class WellFond_data(FindIndexPZ):
                         well_data.column_head_m = row[col_do].value
                     if 'Арматура устьевая' in str(value) and 'типоразмер' in str(row[col + 2].value):
                         well_data.wellhead_fittings = row[col_do].value
+                    if 'диаметр канавки' in str(value).lower():
+                        well_data.groove_diameter = row[col_do].value
 
                     if 'Пакер' in str(value) and 'типоразмер' in str(row[col + 2].value):
                         if '/' in str(row[col_do].value):
@@ -497,6 +507,8 @@ class WellHistory_data(FindIndexPZ):
                                                                                         well_data.date_drilling_cancel,
                                                                                         row_index + begin_index,
                                                                                         col + 1, 1)
+                    elif 'Дата ввода в экспл' in str(value):
+                        well_data.сommissioning_date = row[col + 2].value
 
                     elif 'Максимально ожидаемое давление на устье' == value:
                         well_data.max_expected_pressure = ProtectedIsDigit(row[col + 1].value)
@@ -958,8 +970,6 @@ class Well_data(FindIndexPZ):
             if angle_true_question == QMessageBox.StandardButton.Yes:
                 well_data.angle_data = Well_data.read_angle_well()
 
-                print(well_data.angle_data)
-
         well_data.nkt_diam = 73 if well_data.column_diametr._value > 110 else 60
         well_data.nkt_template = 59.6 if well_data.column_diametr._value > 110 else 47.9
 
@@ -973,7 +983,7 @@ class Well_data(FindIndexPZ):
                 well_data.open_trunk_well = True
             else:
                 well_data.open_trunk_well = False
-        if str(well_data.well_number._value) in ['2834', '187', "1685", '1686', '934', '43',
+        if str(well_data.well_number._value) in ['216', '269', "176", '1686', '934', '43',
                                                  '1685', '1686', "3354", "3379"]:
             QMessageBox.warning(self, 'Канатные технологии', f'Скважина согласована на канатные технологии')
             well_data.konte_true = True
@@ -996,13 +1006,13 @@ class Well_data(FindIndexPZ):
                     if 'глубина' in str(value).lower() and col <= 7:
                         depth_column = col
                         row_data = index_row
-                        print(f'угол{depth_column, row_data}')
+
                     elif ('Угол, гpад' in str(value) and col <= 7) or 'зенитный' in str(value).lower():
                         angle_column = col
-                        print(f'угол_ e {angle_column}')
+
                     elif 'кривизна' in str(value).lower() or 'гр./10' in str(value).lower():
                         curvature_column = col
-                        print(f'угол_e{curvature_column}')
+
         if depth_column == '':
             depth_column, ok = QInputDialog.getInt(None, 'номер столбца', 'Программа не смогла найти номер столбца с '
                                                                           'указанием значений глубин')
@@ -1056,7 +1066,7 @@ class Well_perforation(FindIndexPZ):
                 for col_index, column in enumerate(row[:14]):
                     if 'оризонт'.lower() in str(column).lower() or 'пласт/'.lower() in str(column).lower():
                         col_plast_index = col_index - 1
-                        print(f'пласт {col_plast_index}')
+
                     if 'по вертикали'.lower() in str(column).lower():
                         col_vert_index = col_index - 1
                         # print(f'вер {col_index}')
@@ -1076,10 +1086,10 @@ class Well_perforation(FindIndexPZ):
                         # print(f'удл {col_index}')
                         col_udlin_index = col_index - 1
                     if 'Рпл'.lower() in str(column).lower():
-                        print(f'Рпл {col_index}')
+
                         col_pressuar_index = col_index - 1
                     if 'замера' in str(column).lower():
-                        print(f'заме {col_index}')
+
                         col_date_pressuar_index = col_index - 1
                     if 'вскрыт'.lower() in str(column).lower() and 'откл'.lower() in str(column).lower():
                         well_data.old_version = True
@@ -1094,7 +1104,7 @@ class Well_perforation(FindIndexPZ):
                                                                  'Ошибка', 'Программа не смогла определить колонку '
                                                                   'в таблице ПВР где указано в дата замера',
                                                               column_list, 11)[0]) - 2
-                print(f'fjjар {col_date_pressuar_index}')
+
             if col_pressuar_index == 0:
                 col_pressuar_index = column_index_from_string(QInputDialog.getItem(self, 'Ошибка', 'Программа не смогла определить колонку '
                                                                               'в таблице ПВР где указано в Рпл',
@@ -1127,7 +1137,7 @@ class Well_perforation(FindIndexPZ):
                 col_plast_index = column_index_from_string(QInputDialog.getItem(self, 'Ошибка', 'Программа не смогла определить колонку '
                                                                               'в таблице ПВР где указано пласт',
                                                               column_list, 1)[0]) - 2
-                print(f'fjjар {col_plast_index}')
+
             if osnov_stvol is True and bokov_stvol is True:
                 mes = QMessageBox.warning(self, 'ОШИБКА', 'Ошибка в определении рабочий интервалов перфорации')
                 begin_index = QInputDialog.getInt(self, 'Индекс начала', 'ВВедите индекс начала рабочих интервалов ПВР',
@@ -1143,7 +1153,7 @@ class Well_perforation(FindIndexPZ):
                     lst = []
 
                     if str(row[col_roof_index + 1].value).replace('.', '').replace(',', '').isdigit():
-                        print(row_index)
+
                         if row[1].value != None:
                             plast = row[1].value
                             lst.append(plast)
@@ -1197,12 +1207,9 @@ class Well_perforation(FindIndexPZ):
 
                     if col_old_open_index != col_open_index:
                         if row[col_close_index] is None or row[col_close_index] == '-':
-                            print(f'вскрыт {plast} {row[col_close_index], col_close_index}')
-
                             well_data.dict_perforation.setdefault(plast, {}).setdefault('отключение', False)
                             well_data.dict_perforation_short.setdefault(plast, {}).setdefault('отключение', False)
                         else:
-                            print(f'отключ {plast} {row[col_close_index], col_close_index}')
                             well_data.dict_perforation.setdefault(plast, {}).setdefault('отключение', True)
                             well_data.dict_perforation_short.setdefault(plast, {}).setdefault('отключение', True)
                     else:
@@ -1298,7 +1305,7 @@ class Well_Category(FindIndexPZ):
     def read_well(self, ws, begin_index, cancel_index):
         from main import MyWindow
         if well_data.data_in_base is False:
-            print(f'индекс катего {begin_index, cancel_index}')
+
             for row in range(begin_index, cancel_index):
                 for col in range(1, 13):
                     cell = ws.cell(row=row, column=col).value
@@ -1323,9 +1330,9 @@ class Well_Category(FindIndexPZ):
                                 if str(ws.cell(row=row, column=col - 1).value).strip() in ['', '-', '0', 'None'] or \
                                         'отс' in str(ws.cell(row=row, column=col - 1).value).lower():
                                     well_data.h2s_mg.append(0)
-                                    print(well_data.h2s_mg)
+
                                 else:
-                                    print(ws.cell(row=row, column=col - 1).value)
+
                                     well_data.h2s_mg.append(float(str(ws.cell(row=row, column=col - 1).value).replace(',', '.')))
 
                             if str(cell) in ['мг/м3'] and ws.cell(row=row-1, column=col - 1).value not in \
@@ -1334,11 +1341,11 @@ class Well_Category(FindIndexPZ):
                                 if str(ws.cell(row=row, column=col - 1).value).strip() in ['', '-', '0', 'None'] or \
                                         'отс' in str(ws.cell(row=row, column=col - 1).value).lower():
                                     well_data.h2s_mg.append(0)
-                                    print(f'1{well_data.h2s_mg}')
+
                                 else:
                                     well_data.h2s_mg.append(float(str(
                                             FindIndexPZ.check_str_None(self, str(ws.cell(row=row, column=col - 1).value).replace(',', '.')))) / 1000)
-                                    print(f'2{well_data.h2s_mg}')
+
 
                         elif str(cell) == 'м3/т':
                             well_data.cat_gaz_f_pr.append(ws.cell(row=row, column=col - 2).value)

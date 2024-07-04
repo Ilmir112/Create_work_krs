@@ -21,7 +21,10 @@ def skm_interval(self, template):
             else:
                 str_raid.append([int(float(nek.split('-')[0])) - 90,
                                  well_data.current_bottom - 2])
-    if all([well_data.dict_perforation[plast]['отрайбировано'] is False for plast in well_data.plast_work]):
+    a = all([well_data.dict_perforation[plast]['отрайбировано'] is False for plast in well_data.plast_all])
+    b = all([well_data.dict_perforation[plast]['отрайбировано'] is True for plast in well_data.plast_all])
+
+    if all([well_data.dict_perforation[plast]['отрайбировано'] is False for plast in well_data.plast_all]):
         str_raid.append([well_data.perforation_roof - 90, well_data.skm_depth])
         if well_data.leakiness:
             for nek in list(well_data.dict_leakiness['НЭК']['интервал'].keys()):
@@ -33,7 +36,7 @@ def skm_interval(self, template):
                                      well_data.current_bottom - 2])
 
     elif all(
-            [well_data.dict_perforation[plast]['отрайбировано'] is True for plast in well_data.plast_work]):
+            [well_data.dict_perforation[plast]['отрайбировано'] is True for plast in well_data.plast_all]):
         str_raid = []
 
         perforating_intervals = []
@@ -176,7 +179,7 @@ def remove_overlapping_intervals(perforating_intervals, skm_interval = None):
     else:
         skipping_intervals_new = skm_interval
 
-    print(f'после разделения {skipping_intervals_new}')
+
     return skipping_intervals_new
 
 
@@ -360,6 +363,7 @@ def count_row_height(ws, ws2, work_list, merged_cells_dict, ind_ins):
     plan.copy_true_ws(ws, ws2, head)
     boundaries_dict_index = 1000
     for i in range(1, len(work_list) + 1):  # Добавлением работ
+        a = work_list[i-1]
         if 'Наименование работ' in work_list[i-1]:
             boundaries_dict_index = i+1
 
@@ -374,16 +378,13 @@ def count_row_height(ws, ws2, work_list, merged_cells_dict, ind_ins):
                 cell.number_format = 'General'
                 cell.value = str(work_list[i - 1][j - 1])
         a = value[1]
-
-        if well_data.work_plan == 'dop_plan_in_base' and boundaries_dict_index < value[1]:
-            ws2.unmerge_cells(start_column=value[0], start_row=value[1],
-                              end_column=value[2], end_row=value[3])
+        b = boundaries_dict_index
+        # if well_data.work_plan == 'dop_plan_in_base' and boundaries_dict_index < value[1]:
+        #     ws2.unmerge_cells(start_column=value[0], start_row=value[1],
+        #                       end_column=value[2], end_row=value[3])
 
         for j in range(1, 13):
-
             cell = ws2.cell(row=i, column=j)
-
-
             if cell and str(cell) != str(work_list[i - 1][j - 1]):
                 # print(work_list[i - 1][j - 1])
                 cell.value = is_num(work_list[i - 1][j - 1])

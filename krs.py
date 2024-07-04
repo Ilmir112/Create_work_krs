@@ -314,7 +314,7 @@ class GnoWindow(QMainWindow):
                                        ' Мастер КРС.', None]
 
             if float(fluid) > 1.18:
-                print(update_change_fluid_str)
+
                 krs_begin.insert(-1, update_change_fluid_str)
 
             posle_lift = [[None, None,
@@ -1464,7 +1464,7 @@ class GnoWindow(QMainWindow):
                     pass
 
             expenditure_h2s = round(max(expenditure_h2s_list), 3)
-            fluid_work = f'{fluid_work_insert}г/см3 с добавлением погглушение скважины прямой промывкой глушение скважины прямой промывкой лотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
+            fluid_work = f'{fluid_work_insert}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
                          f'расчета {expenditure_h2s}кг/м3 '
             fluid_work_short = f'{fluid_work_insert}г/см3 c ' \
                                f'ХИМТЕХНО 101 Марка А - {expenditure_h2s}кг/м3 '

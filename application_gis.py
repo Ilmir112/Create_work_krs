@@ -224,7 +224,7 @@ class GisApplication(QMainWindow):
         self.tableWidget.setSortingEnabled(True)
 
     def geophysic_sel(self, row):
-        print(row)
+
         if 'АКЦ' in row:
             type = 'АКЦ'
             # Удаление всех символов, кроме цифр и тире
@@ -293,8 +293,7 @@ class GisApplication(QMainWindow):
         for row in range(len(work_list)):
             for col in range(41):
                 if work_list[row][col]:
-                    print(row, col)
-                    print(work_list[row][col])
+
                     ws.cell(row=row + 1, column=col + 1).value = work_list[row][col]
         # Перебираем строки и скрываем те, у которых все значения равны None
         for row_ind, row in enumerate(ws.iter_rows(values_only=True)):

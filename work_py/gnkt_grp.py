@@ -149,8 +149,8 @@ class GnktOsvWindow(QMainWindow):
 
         Work_with_gnkt.create_title_list(self, self.ws_title)
         bvo_int = 0
-        if well_data.bvo:
-            bvo_int += 5
+        # if well_data.bvo:
+        #     bvo_int += 5
         head = plan.head_ind(well_data.cat_well_min._value + bvo_int, well_data.cat_well_max._value + bvo_int)
 
         plan.copy_true_ws(sheet, self.ws_title, head)
@@ -182,6 +182,13 @@ class GnktOsvWindow(QMainWindow):
                                     end_column=col_number + 1, end_row=row_number + 2)
                     self.ws_title.merge_cells(start_column=col_number + 3, start_row=row_number + 1,
                                     end_column=col_number + 3, end_row=row_number + 2)
+
+                    self.ws_title.cell(row=row_number + 1, column=col_number + 2).alignment = Alignment(wrap_text=True,
+                                                                                              horizontal='left',
+                                                                                              vertical='center')
+                    self.ws_title.cell(row=row_number + 3, column=col_number + 2).alignment = Alignment(wrap_text=True,
+                                                                                                        horizontal='left',
+                                                                                                        vertical='center')
 
         main.MyWindow.copy_pz(self, self.ws_title, table_title, self.work_plan, 13, 1)
         main.MyWindow.copy_pz(self, self.ws_schema, table_schema, self.work_plan, 23, 2)
@@ -275,12 +282,14 @@ class GnktOsvWindow(QMainWindow):
                       '(насадка-промывочная D-38мм + сдвоенный обратный клапан.)',
              None, None, None, None, None, None, None,
              'Мастер ГНКТ, бур-к КРС, машинист подъёмника, пред. УСРСиСТ', 0.5],
-            [None, 10, f'Произвести монтаж 4-х секционного превентора БП 80-70.00.00.000 (700атм) {pvo_number_edit} '
-                       f'и инжектора н'
-                       f'а устье скважины согласно «Схемы обвязки № 5 устья противовыбросовым оборудованием при '
-                       f'производстве работ по промывке скважины с установкой «ГНКТ» утвержденная главным '
-                       f'инженером от {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г. Произвести обвязку установки ГНКТ, насосно-компрессорного '
-                       f'агрегата, желобной циркуляционной системы.',
+            [None, 10,
+             f'Произвести монтаж 4-х секционного превентора БП 80-70.00.00.000 (700атм) {pvo_number_edit} '
+             f'и инжектора н'
+             f'а устье скважины согласно «Схемы обвязки № 5 устья противовыбросовым оборудованием при '
+             f'производстве работ по промывке скважины с установкой «ГНКТ» утвержденная главным '
+             f'инженером от {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г. Произвести обвязку '
+             f'установки ГНКТ, насосно-компрессорного '
+               f'агрегата, желобной циркуляционной системы.',
              None, None, None, None, None, None, None,
              'Мастер ГНКТ, представ.БВО (вызов по телефонограмме при необходимости)', 2],
             [None, 11, f'Внимание: Все требования ПБ и ОТ должны быть доведены до сведения работников, '
@@ -294,15 +303,16 @@ class GnktOsvWindow(QMainWindow):
                        f'г/трубы (получения ледяной пробки).',
              None, None, None, None, None, None, None,
              'Мастер ГНКТ', 2],
-            [None, 13, f'При закрытой центральной задвижке фондовой арматуры опрессовать ГНКТ и все '
-                       f'нагнетательные линии на {round(well_data.max_admissible_pressure._value * 1.5, 1)}атм. '
-                       f'Опрессовать ПВО, обратные клапана и выкидную линию от '
-                       f'устья скважины до желобной ёмкости (надёжно закрепить, оборудовать дроссельными задвижками) '
-                       f'опрессовать на {well_data.max_admissible_pressure._value}атм с выдержкой 30мин. '
-                       f'Опрессовку ПВО зафиксировать в вахтовом журнале. Установить на малом и большом затрубе '
-                       f'технологический манометр. Провести УТЗ и инструктаж. Опрессовку проводить в присутствии мастера, '
-                       f'бурильщика, машиниста подъемника и представителя супервайзерской службы. Получить разрешение на '
-                       f'проведение работ.',
+            [None, 13,
+             f'При закрытой центральной задвижке фондовой арматуры опрессовать ГНКТ и все '
+               f'нагнетательные линии на {round(well_data.max_admissible_pressure._value * 1.5, 1)}атм. '
+               f'Опрессовать ПВО, обратные клапана и выкидную линию от '
+               f'устья скважины до желобной ёмкости (надёжно закрепить, оборудовать дроссельными задвижками) '
+               f'опрессовать на {well_data.max_admissible_pressure._value}атм с выдержкой 30мин. '
+               f'Опрессовку ПВО зафиксировать в вахтовом журнале. Установить на малом и большом затрубе '
+               f'технологический манометр. Провести УТЗ и инструктаж. Опрессовку проводить в присутствии мастера, '
+               f'бурильщика, машиниста подъемника и представителя супервайзерской службы. Получить разрешение на '
+               f'проведение работ.',
              None, None, None, None, None, None, None,
              'Мастер ГНКТ, состав бригады, представит. Заказчика', 2],
             [None, 14, f'Ограничения веса и скоростей при СПО',
@@ -708,10 +718,11 @@ class GnktOsvWindow(QMainWindow):
             main.MyWindow.insert_image(self, ws, f'{well_data.path_image}imageFiles/schema_well/angle_well.png',
                                        coordinate, 265, 373)
 
-        elif self.work_plan in ['gnkt_after_grp']:
+        elif self.work_plan in ['gnkt_after_grp', 'gnkt_opz']:
             coordinate_propant = 'F43'
-
-            main.MyWindow.insert_image(self, ws, f'{well_data.path_image}imageFiles/schema_well/пропант.png', coordinate_propant, 90, 500)
+            if self.work_plan in ['gnkt_after_grp']:
+                main.MyWindow.insert_image(self, ws, f'{well_data.path_image}imageFiles/schema_well/пропант.png',
+                                           coordinate_propant, 90, 500)
 
             n = 0
             m = 0

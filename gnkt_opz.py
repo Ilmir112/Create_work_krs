@@ -225,22 +225,24 @@ class GnktOpz(QMainWindow):
         vbox.addWidget(self.buttonAdd, 2, 0)
 
     def add_work(self):
-
-        roof_plast = float(self.tabWidget.currentWidget().roof_edit.text())
-        sole_plast = float(self.tabWidget.currentWidget().sole_edit.text())
-        need_rast_combo = str(self.tabWidget.currentWidget().need_rast_combo.currentText())
-        volume_rast_edit = float(self.tabWidget.currentWidget().volume_rast_edit.text())
-        acid_true_edit = str(self.tabWidget.currentWidget().acid_true_edit.currentText())
-        acid_edit = self.tabWidget.currentWidget().acid_edit.currentText()
-        skv_volume_edit = float(self.tabWidget.currentWidget().skv_volume_edit.text().replace(',', '.'))
-        skv_proc_edit = int(self.tabWidget.currentWidget().skv_proc_edit.text().replace(',', '.'))
-        acid_volume_edit = float(self.tabWidget.currentWidget().acid_volume_edit.text().replace(',', '.'))
-        acid_proc_edit = int(self.tabWidget.currentWidget().acid_proc_edit.text().replace(',', '.'))
-        pressure_edit = int(self.tabWidget.currentWidget().pressure_edit.text())
-        plast_combo = str(self.tabWidget.currentWidget().plast_combo.combo_box.currentText())
-        svk_true_combo = str(self.tabWidget.currentWidget().svk_true_combo.currentText())
-        skv_acid_edit = str(self.tabWidget.currentWidget().skv_acid_edit.currentText())
-        self.distance = self.tabWidget.currentWidget().distance_pntzh_edit.text()
+        try:
+            roof_plast = round(float(self.tabWidget.currentWidget().roof_edit.text().replace(',', '.')), 1)
+            sole_plast = round(float(self.tabWidget.currentWidget().sole_edit.text().replace(',', '.')), 1)
+            need_rast_combo = str(self.tabWidget.currentWidget().need_rast_combo.currentText())
+            volume_rast_edit = float(self.tabWidget.currentWidget().volume_rast_edit.text())
+            acid_true_edit = str(self.tabWidget.currentWidget().acid_true_edit.currentText())
+            acid_edit = self.tabWidget.currentWidget().acid_edit.currentText()
+            skv_volume_edit = float(self.tabWidget.currentWidget().skv_volume_edit.text().replace(',', '.'))
+            skv_proc_edit = int(self.tabWidget.currentWidget().skv_proc_edit.text().replace(',', '.'))
+            acid_volume_edit = float(self.tabWidget.currentWidget().acid_volume_edit.text().replace(',', '.'))
+            acid_proc_edit = int(self.tabWidget.currentWidget().acid_proc_edit.text().replace(',', '.'))
+            pressure_edit = int(self.tabWidget.currentWidget().pressure_edit.text())
+            plast_combo = str(self.tabWidget.currentWidget().plast_combo.combo_box.currentText())
+            svk_true_combo = str(self.tabWidget.currentWidget().svk_true_combo.currentText())
+            skv_acid_edit = str(self.tabWidget.currentWidget().skv_acid_edit.currentText())
+            self.distance = self.tabWidget.currentWidget().distance_pntzh_edit.text()
+        except:
+            mes = QMessageBox.warning(self, 'Ошибка', 'ВВедены не корректные данные')
         if roof_plast in ['', None, 0] or sole_plast in ['', None, 0]:
             mes = QMessageBox.critical(self, "Ошибка", "Не введены данные по кровле и ли подошве обработки")
             return

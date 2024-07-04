@@ -301,6 +301,7 @@ class TabPage_SO_with(QWidget):
 
                 well_data.template_depth = int(well_data.current_bottom - int(dictance_template_first) -
                                                int(lenght_template_first)) - int(dictance_template_second)
+
                 well_data.skm_depth = well_data.template_depth + dictance_template_second
                 skm_teml_str = f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
 
@@ -321,6 +322,7 @@ class TabPage_SO_with(QWidget):
                                f'шаблон-{template_second}мм L-{lenght_template_second}м '
                 well_data.template_depth = int(well_data.current_bottom - int(dictance_template_first) -
                                                int(dictance_template_second) - int(lenght_template_first))
+
                 well_data.skm_depth = well_data.template_depth + dictance_template_second
                 skm_teml_str = f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
 
@@ -333,6 +335,7 @@ class TabPage_SO_with(QWidget):
                                    f'СКМ-{skm} + шаблон-{template_second}мм L-{lenght_template_second}м '
 
                     well_data.template_depth_addition = well_data.current_bottom - int(dictance_template_first)
+
 
                     well_data.template_depth = well_data.current_bottom - int(dictance_template_first) - \
                                                int(dictance_template_second) - int(dictance_three)
@@ -356,8 +359,11 @@ class TabPage_SO_with(QWidget):
                     well_data.template_depth = well_data.current_bottom - int(dictance_template_first) - \
                                                int(dictance_template_second) - int(dictance_three) - \
                                                int(lenght_template_first)
+
                     well_data.template_depth_addition = well_data.current_bottom - int(dictance_template_first) - \
                                                         int(dictance_template_second)
+
+
                     well_data.skm_depth = well_data.template_depth_addition + int(dictance_template_second)
 
                     skm_teml_str = f'шаблон-{first_template}мм до гл.{well_data.template_depth_addition}м, ' \
@@ -376,6 +382,7 @@ class TabPage_SO_with(QWidget):
 
                     well_data.template_depth = well_data.current_bottom - int(dictance_template_second) - \
                                                int(dictance_three) - int(lenght_template_first)
+
                     well_data.skm_depth = well_data.template_depth + int(dictance_three)
 
                     skm_teml_str = f'шаблон-{first_template}мм до гл.{well_data.template_depth_addition}м, ' \
@@ -398,6 +405,7 @@ class TabPage_SO_with(QWidget):
                     well_data.template_depth = well_data.current_bottom - int(dictance_template_first) - \
                                                int(dictance_template_second) - int(dictance_three) - \
                                                int(lenght_template_first)
+
                     well_data.skm_depth = well_data.template_depth_addition + int(dictance_template_second)
 
                     skm_teml_str = f'шаблон-{first_template}мм до гл.{well_data.template_depth_addition}м, ' \
@@ -883,14 +891,13 @@ class TemplateKrs(QMainWindow):
         vbox.addWidget(self.buttonadd_work, 3, 0)
         vbox.addWidget(self.buttonAddString, 3, 1)
 
-
     def addRowTable(self):
         roof_skm = self.tabWidget.currentWidget().roof_skm_line.text()
         sole_skm = self.tabWidget.currentWidget().sole_skm_line.text()
         if roof_skm != '':
             roof_skm = int(float(roof_skm))
         if sole_skm != '':
-            roof_skm = int(float(sole_skm))
+            sole_skm = int(float(sole_skm))
         template_key = self.tabWidget.currentWidget().template_Combo.currentText()
 
         if not roof_skm or not sole_skm:
@@ -951,7 +958,10 @@ class TemplateKrs(QMainWindow):
         template_key = str(self.tabWidget.currentWidget().template_Combo.currentText())
         distance_second = int(float(self.tabWidget.currentWidget().dictance_template_second_Edit.text()))
         distance_first = int(self.tabWidget.currentWidget().dictance_template_first_Edit.text())
+        template_lenght = int(float(self.tabWidget.currentWidget().lenght_template_second_Edit.text()))
+        if well_data.column_additional:
 
+            template_lenght_addition = int(float(self.tabWidget.currentWidget().lenght_template_first_Edit.text()))
 
         if well_data.column_additional is False or (
                 well_data.column_additional is True and float(
@@ -1004,7 +1014,9 @@ class TemplateKrs(QMainWindow):
         well_data.skm_interval.extend(skm_tuple)
         # print(f'интервалы СКМ {well_data.skm_interval}')
         skm_list = sorted(skm_tuple, key=lambda x: x[0])
-
+        well_data.template_lenght = template_lenght
+        if well_data.column_additional:
+            well_data.template_lenght_addition = template_lenght_addition
         work_template_list = self.template_ek(template_str, template_diametr, skm_list)
 
         MyWindow.populate_row(self, self.ins_ind, work_template_list, self.table_widget)
@@ -1154,7 +1166,7 @@ class TemplateKrs(QMainWindow):
              f' вести с доливом скважины до устья т/ж удел.весом {well_data.fluid_work} в объеме '
              f'{round(float(current_bottom) * 1.12 / 1000, 1)}м3',
              None, None, None, None, None, None, None, 'Мастер КРС', None, None]]
-
+        print(f'длина шаблона {well_data.template_lenght}')
         privyazka_nkt = [f'Привязка по ГК и ЛМ По привязому НКТ удостовериться в наличии текущего забоя', None,
                          f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {well_data.contractor}.'
                          f' ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины.'

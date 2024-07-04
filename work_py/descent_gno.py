@@ -65,7 +65,7 @@ class TabPage_Gno(QWidget):
 
     @staticmethod
     def gno_nkt_opening(dict_nkt_po):
-        print(dict_nkt_po)
+
         str_gno = ''
         for nkt, length_nkt in dict_nkt_po.items():
             str_gno += f'{nkt}мм - {round(float(length_nkt), 1)}м, '

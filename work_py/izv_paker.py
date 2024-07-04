@@ -110,7 +110,7 @@ class TabPage_SO_paker_izv(QWidget):
 
 
     def update_type_work(self, index):
-        print(f'индекс {index}')
+
         if index == 'установка':
             self.grid.addWidget(self.paker_type_label, 2, 1)
             self.grid.addWidget(self.paker_type_combo, 3, 1)

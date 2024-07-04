@@ -1,5 +1,6 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.Qt import *
+from PyQt5.QtGui import QIntValidator
 
 import well_data
 
@@ -7,14 +8,17 @@ import well_data
 class TabPage_SO_leakage(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.validator = QIntValidator(0, 8000)
 
         self.roof_leakage_label = QLabel("Кровля", self)
         self.roof_leakage_line = QLineEdit(self)
         self.roof_leakage_line.setClearButtonEnabled(True)
+        self.roof_leakage_line.setValidator(self.validator)
 
         self.sole_leakage_label = QLabel("Подошва", self)
         self.sole_leakage_line = QLineEdit(self)
         self.sole_leakage_line.setClearButtonEnabled(True)
+        self.sole_leakage_line.setValidator(self.validator)
 
         self.insulation_label = QLabel("Изоляция", self)
         self.insulation_combo = QComboBox(self)
@@ -87,7 +91,7 @@ class LeakageWindow(QMainWindow):
         #     msg = QMessageBox.information(self, 'Внимание', 'глубина НЭК ниже искусственного забоя')
         #     return
 
-        self.tableWidget.setSortingEnabled(False)
+
         rows = self.tableWidget.rowCount()
         self.tableWidget.insertRow(rows)
 
@@ -95,7 +99,7 @@ class LeakageWindow(QMainWindow):
         self.tableWidget.setItem(rows, 1, QTableWidgetItem(sole_leakage_line))
         self.tableWidget.setCellWidget(rows, 2, insulation_combo1)
 
-        self.tableWidget.setSortingEnabled(True)
+        self.tableWidget.sortItems(0)
 
     def addString(self):
        

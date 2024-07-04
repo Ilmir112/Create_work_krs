@@ -43,6 +43,19 @@ class TabPageDp(QWidget):
         self.current_bottom_edit = QLineEdit(self)
         self.current_bottom_edit.setValidator(self.validator_float)
         self.current_bottom_edit.setText(f'{well_data.current_bottom}')
+
+        self.template_depth_label = QLabel('Глубина спуска шаблона')
+        self.template_depth_edit = QLineEdit(self)
+        self.template_depth_edit.setValidator(self.validator_float)
+        self.template_depth_edit.setText(str(well_data.template_depth))
+
+        self.template_lenght_label = QLabel('Длина шаблона')
+        self.template_lenght_edit = QLineEdit(self)
+        self.template_lenght_edit.setValidator(self.validator_float)
+
+        self.skm_interval_label = QLabel('интервалы скреперованиея')
+        self.skm_interval_edit = QLineEdit(self)
+
         self.table_name = ''
 
         self.fluid_label = QLabel("уд.вес жидкости глушения", self)
@@ -77,11 +90,18 @@ class TabPageDp(QWidget):
         self.grid.addWidget(self.current_bottom_edit, 5, 4)
         self.grid.addWidget(self.fluid_label, 4, 5)
         self.grid.addWidget(self.fluid_edit, 5, 5)
-        self.grid.addWidget(self.work_label, 6, 6, 2, 4)
-        self.grid.addWidget(self.work_edit, 8, 6, 2, 4)
+        self.grid.addWidget(self.template_depth_label, 4, 6)
+        self.grid.addWidget(self.template_depth_edit, 5, 6)
+        self.grid.addWidget(self.template_lenght_label, 4, 7)
+        self.grid.addWidget(self.template_lenght_edit, 5, 7)
+        self.grid.addWidget(self.skm_interval_label, 4, 10)
+        self.grid.addWidget(self.skm_interval_edit, 5, 10)
+        self.grid.addWidget(self.work_label, 12, 6, 2, 4)
+        self.grid.addWidget(self.work_edit, 13, 6, 2, 4)
 
         self.well_area_edit.textChanged.connect(self.update_well)
         self.well_number_edit.textChanged.connect(self.update_well)
+
 
     def update_well(self):
 
@@ -89,6 +109,7 @@ class TabPageDp(QWidget):
         if well_data.data_in_base:
             self.table_in_base_label = QLabel('данные в таблице')
             self.table_in_base_combo = QComboBox()
+
             table_list = self.get_tables_starting_with(self.well_number_edit.text(), self.well_area_edit.text())
             if table_list:
                 self.table_in_base_combo.addItems(table_list)
@@ -96,10 +117,10 @@ class TabPageDp(QWidget):
             self.index_change_label = QLabel('пункт после которого происходят изменения')
             self.index_change_line = QLineEdit(self)
             self.index_change_line.setValidator(self.validator_int)
-            self.grid.addWidget(self.table_in_base_label, 4, 7)
-            self.grid.addWidget(self.table_in_base_combo, 5, 7)
-            self.grid.addWidget(self.index_change_label, 4, 8)
-            self.grid.addWidget(self.index_change_line, 5, 8)
+            self.grid.addWidget(self.table_in_base_label, 6, 4)
+            self.grid.addWidget(self.table_in_base_combo, 7, 4)
+            self.grid.addWidget(self.index_change_label, 6, 5)
+            self.grid.addWidget(self.index_change_line, 7, 5)
 
             self.index_change_line.textChanged.connect(self.update_table_in_base_combo)
             self.table_in_base_combo.currentTextChanged.connect(self.update_table_in_base_combo)
@@ -120,8 +141,35 @@ class TabPageDp(QWidget):
         if index_change_line != '':
             index_change_line = int(float(index_change_line))
             DopPlanWindow.extraction_data(self, table_in_base_combo, index_change_line)
+
+            a = well_data.column_additional
+            self.template_depth_edit.setText(str(well_data.template_depth))
+            self.template_lenght_edit.setText(str(well_data.template_lenght))
+            skm_interval = ''
+            a = well_data.skm_interval
+            if len(well_data.skm_interval) != 0:
+                for roof, sole in well_data.skm_interval:
+                    skm_interval += f'{roof}-{sole}, '
+
+            self.skm_interval_edit.setText(skm_interval[:-2])
             self.current_bottom_edit.setText(str(well_data.current_bottom))
             self.fluid_edit.setText(str(well_data.fluid_work))
+            if well_data.column_additional:
+                self.template_depth_addition_label = QLabel('Глубина спуска шаблона в доп колонне')
+                self.template_depth_addition_edit = QLineEdit(self)
+                self.template_depth_addition_edit.setValidator(self.validator_float)
+                self.template_depth_addition_edit.setText(str(well_data.template_depth_addition))
+
+                self.template_lenght_addition_label = QLabel('Длина шаблона в доп колонне')
+                self.template_lenght_addition_edit = QLineEdit(self)
+                self.template_lenght_addition_edit.setValidator(self.validator_float)
+                self.template_lenght_addition_edit.setText(str(well_data.template_lenght_addition))
+                self.grid.addWidget(self.template_depth_addition_label, 4, 8)
+                self.grid.addWidget(self.template_depth_addition_edit, 5, 8)
+                self.grid.addWidget(self.template_lenght_addition_label, 4, 9)
+                self.grid.addWidget(self.template_lenght_addition_edit, 5, 9)
+
+
 
     def get_tables_starting_with(self, well_number, well_area):
         """
@@ -147,8 +195,12 @@ class TabPageDp(QWidget):
             contractor = 'РН'
         tables_filter = list(filter(lambda x: contractor in x, tables))
         if len(tables_filter) == 0:
-            tables_filter = tables.insert(0,' ')
-        return tables_filter[::-1]
+            tables_filter = tables.insert(0, ' ')
+        try:
+            tables_filter = tables_filter[::-1]
+            return tables_filter
+        except:
+            return
 
 
 class TabWidget(QTabWidget):
@@ -176,18 +228,37 @@ class DopPlanWindow(QMainWindow):
         vbox.addWidget(self.buttonAdd, 2, 0)
 
     def add_work(self):
-        from data_base.work_with_base import check_in_database_well_data, insert_data_well_dop_plan
+        from data_base.work_with_base import check_in_database_well_data, insert_data_well_dop_plan, round_cell
         from well_data import ProtectedIsNonNone
         from main import MyWindow
         fluid = self.tabWidget.currentWidget().fluid_edit.text()
         current_bottom = self.tabWidget.currentWidget().current_bottom_edit.text()
         if current_bottom != '':
-            current_bottom = round(float(current_bottom.replace(',', '.')), 1)
+            current_bottom = round_cell(current_bottom.replace(',', '.'))
 
         work_earlier = self.tabWidget.currentWidget().work_edit.toPlainText()
 
+        template_depth_edit = self.tabWidget.currentWidget().template_depth_edit.text()
+        template_lenght_edit = self.tabWidget.currentWidget().template_lenght_edit.text()
+        if well_data.column_additional:
+            template_depth_addition_edit = self.tabWidget.currentWidget().template_depth_addition_edit.text()
+            template_lenght_addition_edit = self.tabWidget.currentWidget().template_lenght_addition_edit.text()
+        skm_interval_edit = self.tabWidget.currentWidget().skm_interval_edit.text()
+
+        if current_bottom == '' or fluid == '' or work_earlier == '' or \
+                template_depth_edit == '' or template_lenght_edit == '' or skm_interval_edit == '':
+            # print(current_bottom, fluid, work_earlier)
+            mes = QMessageBox.critical(self, 'Забой', 'не все значения введены')
+            return
+        if template_lenght_edit == '0':
+            mes = QMessageBox.critical(self, 'Длина шаблона', 'Введите длину шаблонов которые были спущены в скважину')
+            return
+        if float(template_depth_edit) > float(current_bottom):
+            mes = QMessageBox.critical(self, 'Забой', 'Шаблонирование не может быть ниже текущего забоя')
+            return
+
         if well_data.data_in_base:
-            fluid = self.tabWidget.currentWidget().fluid_edit.text()
+
             table_in_base_combo = str(self.tabWidget.currentWidget().table_in_base_combo.currentText())
             index_change_line = self.tabWidget.currentWidget().index_change_line.text()
             well_number = self.tabWidget.currentWidget().well_number_edit.text()
@@ -197,7 +268,6 @@ class DopPlanWindow(QMainWindow):
                     ProtectedIsNonNone(well_number), ProtectedIsNonNone(well_area)
             if index_change_line != '':
                 index_change_line = int(float(index_change_line))
-
             else:
                 mes = QMessageBox.critical(self, 'пункт', 'Необходимо выбрать пункт плана работ')
                 return
@@ -209,19 +279,13 @@ class DopPlanWindow(QMainWindow):
                 insert_data_well_dop_plan(data_well)
             self.extraction_data(table_in_base_combo, index_change_line)
 
-        if current_bottom == '' or fluid == '' or work_earlier == '':
-            # print(current_bottom, fluid, work_earlier)
-            mes = QMessageBox.critical(self, 'Забой', 'не все значения введены')
-            return
-
-
         if (0.87 <= float(fluid[:3].replace(',', '.')) <= 1.64) == False:
             mes = QMessageBox.critical(self, 'рабочая жидкость',
                                        'уд. вес рабочей жидкости не может быть меньше 0,87 и больше 1,64')
             return
         if well_data.data_in_base:
             if 'г/см3' not in fluid:
-                mes = QMessageBox.critical(self, 'удвес', 'нужно добавить значение "г/см3" в уд.вес')
+                mes = QMessageBox.critical(self, 'уд.вес', 'нужно добавить значение "г/см3" в уд.вес')
                 return
             well_data.fluid_work = fluid
             well_data.fluid_work_short = fluid[:7]
@@ -232,6 +296,36 @@ class DopPlanWindow(QMainWindow):
                 mes = QMessageBox.critical(self, 'Забой', 'Текущий забой больше пробуренного забоя')
                 return
             well_data.fluid_work, well_data.fluid_work_short = GnoWindow.calc_work_fluid(self, fluid)
+
+        well_data.template_depth = float(template_depth_edit)
+        well_data.template_lenght = float(template_lenght_edit)
+        if well_data.column_additional:
+
+            well_data.template_depth = float(template_depth_addition_edit)
+            well_data.template_lenght = float(template_lenght_addition_edit)
+
+
+        try:
+            skm_interval = []
+            if ',' in skm_interval_edit:
+                for skm in skm_interval_edit.split(','):
+                    if '-' in skm:
+                       skm_interval.append(skm)
+            else:
+                if '-' in skm_interval_edit:
+                    skm_interval.append(skm_interval_edit)
+
+            print(skm_interval)
+            well_data.skm_interval = skm_interval
+        except:
+            mes = QMessageBox.warning(self, 'Ошибка',
+                                      'в интервале скреперования отсутствует корректные интервалы скреперования')
+
+        if len(well_data.skm_interval) == 0:
+            mes = QMessageBox.warning(self, 'Ошибка',
+                                      'в интервале скреперования отсутствует корректные интервалы скреперования')
+            return
+
         if well_data.data_in_base:
             well_data.dop_work_list = self.work_list(work_earlier)
         else:
@@ -293,7 +387,7 @@ class DopPlanWindow(QMainWindow):
             if well_data.work_plan in ['krs', 'plan_change']:
                 work_plan = 'krs'
 
-                table_name = f'{str(well_data.well_number._value) + " " + well_data.well_area._value + " " + work_plan + str(number_dp) + " " + contractor}'
+                table_name = f'{str(well_data.well_number._value) + " " + well_data.well_area._value + " " + work_plan + " " + contractor}'
 
                 # print(cursor1.execute(f"SELECT EXISTS (SELECT FROM information_schema.tables").fetchall())
                 cursor1.execute(
@@ -318,7 +412,7 @@ class DopPlanWindow(QMainWindow):
                 if well_data.work_plan in ['dop_plan', 'dop_plan_in_base']:
                     DopPlanWindow.insert_data_dop_plan(self, result, paragraph_row)
                 elif well_data.work_plan == 'plan_change':
-                    DopPlanWindow.insert_data_plan(self, result, 1)
+                    DopPlanWindow.insert_data_plan(self, result)
                 well_data.data_well_is_True = True
 
             else:
@@ -346,14 +440,14 @@ class DopPlanWindow(QMainWindow):
         if len(result) < paragraph_row:
             mes = QMessageBox.warning(self, 'Ошибка', f'В плане работ только {len(result)} пункта')
             return
-
+        a = result[paragraph_row][6]
         well_data.current_bottom = result[paragraph_row][1]
 
         well_data.dict_perforation = json.loads(result[paragraph_row][2])
         well_data.plast_all = json.loads(result[paragraph_row][3])
         well_data.plast_work = json.loads(result[paragraph_row][4])
         well_data.leakage = json.loads(result[paragraph_row][5])
-        if result[paragraph_row][6] == 0:
+        if result[paragraph_row][6] == 'true':
             well_data.column_additional = True
         else:
             well_data.column_additional = False
@@ -363,9 +457,12 @@ class DopPlanWindow(QMainWindow):
         well_data.category_pressuar = result[paragraph_row][8]
         well_data.category_h2s = result[paragraph_row][9]
         well_data.category_gf = result[paragraph_row][10]
-        well_data.template_depth = result[paragraph_row][11]
+        try:
+            well_data.template_depth, well_data.template_lenght, well_data.template_depth_addition, well_data.template_lenght_addition = json.loads(result[paragraph_row][11])
+        except:
+            well_data.template_depth = result[paragraph_row][11]
+        well_data.skm_interval = json.loads(result[paragraph_row][12])
 
-        well_data.skm_list = json.loads(result[paragraph_row][12])
 
         well_data.problemWithEk_depth = result[paragraph_row][13]
         well_data.problemWithEk_diametr = result[paragraph_row][14]

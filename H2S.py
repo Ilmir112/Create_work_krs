@@ -243,7 +243,7 @@ def calv_h2s(self, cat_H2S, h2s_mg, h2s_pr):
             v_pod_gno = 3.14 * (
                         well_data.column_additional_diametr._value - well_data.column_additional_wall_thickness._value * 2) ** 2 / 4 / 1000 * (
                                     well_data.bottomhole_artificial._value - nkt_l) / 1000
-        print(f'под ГНО{well_data.dict_nkt.keys()}')
+
         volume_well = well_volume(self)
         if '73' in list(well_data.dict_nkt.keys())[0]:
             nkt_1 = 73
@@ -253,7 +253,7 @@ def calv_h2s(self, cat_H2S, h2s_mg, h2s_pr):
             nkt_1 = 48
         elif '89' in list(well_data.dict_nkt.keys())[0]:
             nkt_1 = 89
-            print(89)
+
 
         try:
             # print(list(well_data.dict_nkt.keys()))
@@ -273,7 +273,7 @@ def calv_h2s(self, cat_H2S, h2s_mg, h2s_pr):
         except:
             udel_vodoiz_nkt = udel_vodoiz_nkt
             # print(f'dnjhfzНКТ {udel_vodoiz_nkt}')
-        print(f'jggk {well_data.dict_nkt}')
+
         nkt_1_l = well_data.dict_nkt[list(well_data.dict_nkt.keys())[0]]
         vodoiz_nkt = nkt_1_l * udel_vodoiz_nkt / 1000
         try:

@@ -611,8 +611,6 @@ def excel_in_json(sheet):
     for ind, _range in enumerate(sheet.merged_cells.ranges):
         boundaries_dict[ind] = range_boundaries(str(_range))
 
-    print(boundaries_dict)
-
     data_excel = {'data': data, 'rowHeights': rowHeights, 'colWidth': colWidth, 'merged_cells': boundaries_dict}
 
     return data_excel
@@ -621,7 +619,7 @@ def insert_data_well_dop_plan(data_well):
     from well_data import ProtectedIsDigit, ProtectedIsNonNone
 
     well_data_dict = json.loads(data_well)
-    print(well_data_dict)
+
     well_data.column_direction_diametr = ProtectedIsDigit(well_data_dict["направление"]["диаметр"])
     well_data.column_direction_wall_thickness = ProtectedIsDigit(well_data_dict["направление"]["толщина стенки"])
     well_data.column_direction_lenght = ProtectedIsDigit(well_data_dict["направление"]["башмак"])
@@ -635,7 +633,7 @@ def insert_data_well_dop_plan(data_well):
     well_data.shoe_column = ProtectedIsDigit(well_data_dict["ЭК"]["башмак"])
     well_data.column_additional = well_data_dict["допколонна"]["наличие"]
     well_data.column_additional_diametr = ProtectedIsDigit(well_data_dict["допколонна"]["диаметр"])
-    well_data.column_additional_wall_thicknes = ProtectedIsDigit(well_data_dict["допколонна"]["толщина стенки"])
+    well_data.column_additional_wall_thickness = ProtectedIsDigit(well_data_dict["допколонна"]["толщина стенки"])
     well_data.shoe_column_additional = ProtectedIsDigit(well_data_dict["допколонна"]["башмак"])
     well_data.head_column_additional = ProtectedIsDigit(well_data_dict["допколонна"]["голова"])
     well_data.curator = well_data_dict["куратор"]
@@ -697,86 +695,87 @@ def read_database_gnkt(contractor, gnkt_number):
 
 def create_database_well_db(work_plan, number_dp):
     # print(row, well_data.count_row_well)
-    try:
+    # try:
 
-        conn = psycopg2.connect(**well_data.postgres_conn_work_well)
-        cursor = conn.cursor()
-        if number_dp == 0:
-            number_dp = ''
-        if 'Ойл-Сервис' in well_data.contractor:
-            contractor = 'ОЙЛ'
-        elif 'РН-Сервис' in well_data.contractor:
-            contractor = 'РН'
+    conn = psycopg2.connect(**well_data.postgres_conn_work_well)
+    cursor = conn.cursor()
+    if number_dp == 0:
+        number_dp = ''
+    if 'Ойл-Сервис' in well_data.contractor:
+        contractor = 'ОЙЛ'
+    elif 'РН-Сервис' in well_data.contractor:
+        contractor = 'РН'
 
-        if work_plan in ['krs', 'plan_change']:
-            work_plan = 'krs'
-
-
-        # Создаем таблицу для хранения данных
-        number = json.dumps(
-            str(well_data.well_number._value) + " " +well_data.well_area._value  + " " + work_plan + str(number_dp) + ' ' + contractor,
-                            ensure_ascii=False)
-
-        # Попытка удалить таблицу, если она существует
-        cursor.execute(f'DROP TABLE IF EXISTS {number}')
-
-        cursor.execute(f'CREATE TABLE IF NOT EXISTS {number}'
-                       f'(index_row INTEGER,'
-                       f'current_bottom FLOAT,'
-                       f'perforation TEXT, '
-                       f'plast_all TEXT, '
-                       f'plast_work TEXT, '
-                       f'leakage TEXT,'
-                       f'column_additional TEXT,'
-                       f'fluid TEXT,'
-                       f'category_pressuar TEXT,'
-                       f'category_h2s TEXT,'
-                       f'category_gf TEXT,'
-                       f'template_depth FLOAT,'
-                       f'skm_list TEXT,'
-                       f'problemWithEk_depth FLOAT,'
-                       f'problemWithEk_diametr FLOAT)')
-
-        for index, data in enumerate(well_data.data_list):
-            current_bottom = data[1]
-            dict_perforation_json = data[2]
-            plast_all = data[3]
-            plast_work = data[4]
-            dict_leakiness = data[5]
-            column_additional = data[6]
-            fluid_work = data[7]
-            template_depth = int(data[11])
-            skm_interval = data[12]
-            problemWithEk_depth = data[13]
-            problemWithEk_diametr = data[14]
-
-            # Подготовленные данные для вставки (пример)
-            data_values = (index, current_bottom, dict_perforation_json, plast_all, plast_work,
-                           dict_leakiness, column_additional, fluid_work, well_data.category_pressuar,
-                           well_data.category_h2s, well_data.category_gf, template_depth, skm_interval,
-                           problemWithEk_depth, problemWithEk_diametr)
-
-            # Подготовленный запрос для вставки данных с параметрами
-            query = f"INSERT INTO {number} VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-
-            # Выполнение запроса с использованием параметров
-            cursor.execute(query, data_values)
+    if work_plan in ['krs', 'plan_change']:
+        work_plan = 'krs'
 
 
-        # Сохранить изменения и закрыть соединение
-        conn.commit()
-        # Закройте курсор и соединение
+    # Создаем таблицу для хранения данных
+    number = json.dumps(
+        str(well_data.well_number._value) + " " +well_data.well_area._value  + " " + work_plan + str(number_dp) + ' ' + contractor,
+                        ensure_ascii=False)
 
-    except psycopg2.Error as e:
-        # Выведите сообщение об ошибке
-        mes = QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных, Скважина не добавлена в базу')
-    finally:
-        if cursor:
-            cursor.close()
-        if conn:
-            conn.close()
+    # Попытка удалить таблицу, если она существует
+    cursor.execute(f'DROP TABLE IF EXISTS {number}')
 
-        mes = QMessageBox.information(None, 'база данных', 'Скважина добавлена в базу данных')
+    cursor.execute(f'CREATE TABLE IF NOT EXISTS {number}'
+                   f'(index_row INTEGER,'
+                   f'current_bottom FLOAT,'
+                   f'perforation TEXT, '
+                   f'plast_all TEXT, '
+                   f'plast_work TEXT, '
+                   f'leakage TEXT,'
+                   f'column_additional TEXT,'
+                   f'fluid TEXT,'
+                   f'category_pressuar TEXT,'
+                   f'category_h2s TEXT,'
+                   f'category_gf TEXT,'
+                   f'template_depth TEXT,'
+                   f'skm_list TEXT,'
+                   f'problemWithEk_depth FLOAT,'
+                   f'problemWithEk_diametr FLOAT)')
+
+    for index, data in enumerate(well_data.data_list):
+        current_bottom = data[1]
+        dict_perforation_json = data[2]
+        plast_all = data[3]
+        plast_work = data[4]
+        dict_leakiness = data[5]
+        column_additional = data[6]
+        fluid_work = data[7]
+        template_depth = data[11]
+        print(template_depth)
+        skm_interval = data[12]
+        problemWithEk_depth = data[13]
+        problemWithEk_diametr = data[14]
+
+        # Подготовленные данные для вставки (пример)
+        data_values = (index, current_bottom, dict_perforation_json, plast_all, plast_work,
+                       dict_leakiness, column_additional, fluid_work, well_data.category_pressuar,
+                       well_data.category_h2s, well_data.category_gf, template_depth, skm_interval,
+                       problemWithEk_depth, problemWithEk_diametr)
+
+        # Подготовленный запрос для вставки данных с параметрами
+        query = f"INSERT INTO {number} VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+
+        # Выполнение запроса с использованием параметров
+        cursor.execute(query, data_values)
+
+
+    # Сохранить изменения и закрыть соединение
+    conn.commit()
+    # Закройте курсор и соединение
+
+    # except psycopg2.Error as e:
+    #     # Выведите сообщение об ошибке
+    #     mes = QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных, Скважина не добавлена в базу')
+    # finally:
+    #     if cursor:
+    #         cursor.close()
+    #     if conn:
+    #         conn.close()
+
+        # mes = QMessageBox.information(None, 'база данных', 'Скважина добавлена в базу данных')
 
 
 def read_excel_in_base(number_well, area_well):
@@ -802,6 +801,17 @@ def read_excel_in_base(number_well, area_well):
     boundaries_dict = dict_well['merged_cells']
     return data, rowHeights, colWidth, boundaries_dict
 
+def round_cell(data):
+    try:
+        if data is None:
+            return data
+        float_item = float(data)
+        if float_item.is_integer():
+            return int(float_item)
+        else:
+            return round(float_item, 4)
+    except ValueError:
+        return data
 
 def insert_data_new_excel_file(data, rowHeights, colWidth, boundaries_dict):
     wb_new = openpyxl.Workbook()
@@ -811,7 +821,7 @@ def insert_data_new_excel_file(data, rowHeights, colWidth, boundaries_dict):
         for col_index, cell_data in enumerate(row_data, 1):
             cell = sheet_new.cell(row=int(row_index), column=int(col_index))
             if cell_data:
-                cell.value = cell_data['value']
+                cell.value = round_cell(cell_data['value'])
 
     for key, value in boundaries_dict.items():
         sheet_new.merge_cells(start_column=value[0], start_row=value[1],

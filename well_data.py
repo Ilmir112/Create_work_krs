@@ -60,9 +60,10 @@ def get_password(service_name, username):
 password = '195375AsD+'
 
 
-
+type_kr = ''
 column_head_m = ''
 date_drilling_cancel = ''
+сommissioning_date = ''
 date_drilling_run = ''
 wellhead_fittings = ''
 well_area = ProtectedIsNonNone('не корректно')
@@ -196,6 +197,7 @@ dict_perforation_short = {}
 
 emergency_count = 0
 skm_interval = []
+template_lenght = 0
 category_pressuar = 3
 category_h2s = 3
 category_gf = 3
@@ -228,7 +230,7 @@ dict_contractor = {'ООО "Ойл-Сервис':
 countAcid = 0
 swabTypeComboIndex = 1
 swab_true_edit_type = 1
-
+groove_diameter = None
 drilling_interval = []
 max_angle = 0
 dop_work_list = None
@@ -262,6 +264,7 @@ cat_P_P = []
 data_well_is_True = False
 well_oilfield = 0
 template_depth_addition = 0
+template_lenght_addition = 0
 nkt_template = 59
 
 well_volume_in_PZ = []

@@ -347,9 +347,7 @@ class Drill_window(QMainWindow):
     def drilling_nkt(self, drill_tuple, drill_type_combo, drillingBit_diam, downhole_motor, need_privyazka_QCombo = 'Нет' ):
         from work_py.alone_oreration import privyazkaNKT
 
-
         currentBottom = well_data.current_bottom
-
         current_depth = drill_tuple[-1][0]
         bottomType = drill_tuple[-1][1]
 

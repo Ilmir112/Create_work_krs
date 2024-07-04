@@ -58,9 +58,7 @@ class TabPage_SO(QWidget):
                 if well_data.plast_project:
                     work_plast = well_data.plast_project[0]
                     work_plast_index = 1
-                else:
-                    work_plast = well_data.plast_all[num]
-                    work_plast_index = 2
+
 
             if work_plast == work_plast_iter and well_data.work_plan not in \
                     ['application_pvr', 'application_gis', 'gnkt_after_grp', 'gnkt_frez', 'gntk_opz']:
@@ -79,6 +77,8 @@ class TabPage_SO(QWidget):
                     if plast_index_str == QMessageBox.StandardButton.No:
                         work_plast, ok = QInputDialog.getText(None, 'индекс пласта',
                                                               'Введите индекc пласта вскрываемого')
+                        well_data.plast_project.append(work_plast)
+                        work_plast_index = 1
 
                 self.plast_all.append(work_plast)
 

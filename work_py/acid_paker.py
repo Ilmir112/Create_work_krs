@@ -836,9 +836,10 @@ class AcidPakerWindow(QMainWindow):
                 paker2_depth = int(float(self.tableWidget.item(row, 3).text()))
                 svk_true_combo = self.tableWidget.cellWidget(row, 4).currentText()
                 acid_edit = self.tableWidget.cellWidget(row, 5).currentText()
-                acid_volume_edit = round(float(self.tableWidget.item(row, 6).text()), 1)
+                acid_proc_edit = int(float(self.tableWidget.item(row, 6).text()))
+                acid_volume_edit = round(float(self.tableWidget.item(row, 7).text()), 1)
 
-                acid_proc_edit = int(float(self.tableWidget.item(row, 7).text()))
+
                 try:
                     acidOilProc = round(float(self.tableWidget.item(row, 8).text()))
                 except:

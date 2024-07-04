@@ -1061,7 +1061,7 @@ class DataWindow(QMainWindow):
             self.close()
 
     def if_None(self, value):
-        if value is None or 'отс' in str(value).lower() or value == '-' or str(value) == 0:
+        if value is None or 'отс' in str(value).lower() or value == '-' or str(value) == '0':
             return 0
         elif isinstance(value, int):
             return int(value)

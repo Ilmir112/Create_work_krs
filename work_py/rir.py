@@ -59,6 +59,7 @@ class TabPage_SO_rir(QWidget):
         self.paker_khost_Label = QLabel("Длина хвостовика", self)
         self.paker_khost_edit = QLineEdit(self)
         self.paker_khost_edit.setValidator(self.validator_int)
+        self.paker_khost_edit.setText('10')
 
         self.paker_depth_Label = QLabel("Глубина посадки", self)
         self.paker_depth_edit = QLineEdit(self)
@@ -394,7 +395,7 @@ class RirWindow(QMainWindow):
                 diametr_paker=122, paker_khost=0, paker_depth=0):
 
         rir_list = self.need_paker(paker_need_Combo, plast_combo, diametr_paker, paker_khost,
-                                   paker_depth, pressureZUMPF_question)
+                                   paker_depth, pressureZUMPF_question, True)
 
         rir_rpk_question = QMessageBox.question(self, 'посадку между пластами?', 'посадку между пластами?')
         if rir_rpk_question == QMessageBox.StandardButton.Yes:
@@ -404,44 +405,44 @@ class RirWindow(QMainWindow):
 
         rir_work_list = [
             [f'СПО РПП до глубины {roof_rir_edit}м', None,
-          f'Спустить пакер глухой {self.rpk_nkt(roof_rir_edit)}  на тНКТ{well_data.nkt_diam}мм '
-          f'до глубины {roof_rir_edit}м '
-          f'с замером, шаблонированием шаблоном {well_data.nkt_template}мм. '
-          f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ) \n'
-          f'Перед спуском технологического пакера произвести визуальный осмотр в присутствии '
-          f'представителя РИР или УСРСиСТ.',
-          None, None, None, None, None, None, None,
-          'мастер КРС', descentNKT_norm(roof_rir_edit, 1.2)],
-         [f'Привязка по ГК и ЛМ', None,
-          f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {well_data.contractor}". '
-          f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером от {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г. '
-          f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины',
-          None, None, None, None, None, None, None,
-          'Мастер КРС, подрядчик по ГИС', 4],
-         [f'опрессовать НКТ на 200атм', None,
-          f'При наличии циркуляции опрессовать НКТ на 200атм '
-          f'в присутствии порядчика по РИР. Составить акт. Вымыть шар обратной промывкой ',
-          None, None, None, None, None, None, None,
-          'Мастер КРС, подрядчик РИР, УСРСиСТ', 0.5 + 0.6],
-         [f'установка РПП на {roof_rir_edit}м', None,
-          f'Произвести установку глухого пакера  для изоляции {plast_combo} по технологическому плану '
-          f'подрядчика по РИР силами подрядчика по РИР '
-          f'с установкой пакера  на глубине {roof_rir_edit}м',
-          None, None, None, None, None, None, None,
-          'Мастер КРС, подрядчик РИР, УСРСиСТ', 8],
+              f'Спустить пакер глухой {self.rpk_nkt(roof_rir_edit)}  на тНКТ{well_data.nkt_diam}мм '
+              f'до глубины {roof_rir_edit}м '
+              f'с замером, шаблонированием шаблоном {well_data.nkt_template}мм. '
+              f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ) \n'
+              f'Перед спуском технологического пакера произвести визуальный осмотр в присутствии '
+              f'представителя РИР или УСРСиСТ.',
+              None, None, None, None, None, None, None,
+              'мастер КРС', descentNKT_norm(roof_rir_edit, 1.2)],
+             [f'Привязка по ГК и ЛМ', None,
+              f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {well_data.contractor}". '
+              f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером от {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г. '
+              f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины',
+              None, None, None, None, None, None, None,
+              'Мастер КРС, подрядчик по ГИС', 4],
+             [f'опрессовать НКТ на 200атм', None,
+              f'При наличии циркуляции опрессовать НКТ на 200атм '
+              f'в присутствии порядчика по РИР. Составить акт. Вымыть шар обратной промывкой ',
+              None, None, None, None, None, None, None,
+              'Мастер КРС, подрядчик РИР, УСРСиСТ', 0.5 + 0.6],
+             [f'установка РПП на {roof_rir_edit}м', None,
+              f'Произвести установку глухого пакера  для изоляции {plast_combo} по технологическому плану '
+              f'подрядчика по РИР силами подрядчика по РИР '
+              f'с установкой пакера  на глубине {roof_rir_edit}м',
+              None, None, None, None, None, None, None,
+              'Мастер КРС, подрядчик РИР, УСРСиСТ', 8],
 
-         [f'{"".join([f"Опрессовать на Р={well_data.max_admissible_pressure._value}атм" if rir_rpk_plast_true is False else ""])}',
-         None,
-         f'{"".join([f"Опрессовать эксплуатационную колонну на Р={well_data.max_admissible_pressure._value}атм в присутствии представителя заказчика" if rir_rpk_plast_true is False else ""])} '
-         f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с '
-         f'подтверждением за 2 часа до начала работ) ',
-         None, None, None, None, None, None, None,
-         'Мастер КРС, подрядчик РИР, УСРСиСТ', 0.67],
-         [None, None,
-          f'Поднять стыковочное устройство с глубины {roof_rir_edit}м с доливом скважины в объеме '
-          f'{round(well_data.current_bottom * 1.12 / 1000, 1)}м3 тех. жидкостью  уд.весом {well_data.fluid_work} ',
-          None, None, None, None, None, None, None,
-          'Мастер КРС, подрядчик РИР, УСРСиСТ', liftingNKT_norm(roof_rir_edit, 1.2)]]
+             [f'{"".join([f"Опрессовать на Р={well_data.max_admissible_pressure._value}атм" if rir_rpk_plast_true is False else ""])}',
+             None,
+             f'{"".join([f"Опрессовать эксплуатационную колонну на Р={well_data.max_admissible_pressure._value}атм в присутствии представителя заказчика" if rir_rpk_plast_true is False else ""])} '
+             f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с '
+             f'подтверждением за 2 часа до начала работ) ',
+             None, None, None, None, None, None, None,
+             'Мастер КРС, подрядчик РИР, УСРСиСТ', 0.67],
+             [None, None,
+              f'Поднять стыковочное устройство с глубины {roof_rir_edit}м с доливом скважины в объеме '
+              f'{round(well_data.current_bottom * 1.12 / 1000, 1)}м3 тех. жидкостью  уд.весом {well_data.fluid_work} ',
+              None, None, None, None, None, None, None,
+              'Мастер КРС, подрядчик РИР, УСРСиСТ', liftingNKT_norm(roof_rir_edit, 1.2)]]
 
         for row in rir_work_list:
             rir_list.append(row)
@@ -899,8 +900,8 @@ class RirWindow(QMainWindow):
             pakerDepthZumpf = 0
         if paker_need_Combo == 'Нужно СПО':
 
-            rir_list = OpressovkaEK.paker_list(self, diametr_paker, paker_khost, paker_depth, pakerDepthZumpf,
-                                               pressureZUMPF_question)
+            rir_list = OpressovkaEK.paker_list(self, diametr_paker, paker_khost, paker_depth,
+                                               pressureZUMPF_question, pakerDepthZumpf)
             if rir_rpk_plast_true is False:
                 rir_q_list = [f'насыщение 5м3. Определить Q {plast_combo} при Р=80-100атм. СКВ', None,
                               f'Произвести насыщение скважины в объеме 5м3. Определить приемистость {plast_combo} при Р=80-100атм '

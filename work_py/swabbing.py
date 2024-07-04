@@ -89,6 +89,7 @@ class TabPage_SO_swab(QWidget):
         self.need_change_zgs_combo = QComboBox(self)
         self.need_change_zgs_combo.addItems(['Нет', 'Да'])
 
+
         self.fluid_new_label = QLabel('удельный вес ЖГС', self)
         self.fluid_new_edit = QLineEdit(self)
         self.fluid_new_edit.setValidator(self.validator_float)
@@ -96,7 +97,7 @@ class TabPage_SO_swab(QWidget):
         self.pressuar_new_edit = QLineEdit(self)
         self.pressuar_new_edit.setValidator(self.validator_int)
 
-        if len(well_data.plast_project) == 0:
+        if len(well_data.plast_project) != 0:
             self.plast_new_label = QLabel('индекс нового пласта', self)
             self.plast_new_combo = QComboBox(self)
             self.plast_new_combo.addItems(well_data.plast_project)
@@ -131,15 +132,15 @@ class TabPage_SO_swab(QWidget):
         self.grid.addWidget(self.need_change_zgs_label, 9, 1)
         self.grid.addWidget(self.need_change_zgs_combo, 10, 1)
         self.diametr_paker_edit.setText('122')
-        # self.grid.addWidget(self.plast_new_label, 9, 3)
-        # self.grid.addWidget(self.plast_new_combo, 10, 3)
-        #
-        # self.grid.addWidget(self.fluid_new_label, 9, 4)
-        # self.grid.addWidget( self.fluid_new_edit, 10, 4)
-        #
-        # self.grid.addWidget(self.pressuar_new_label, 9, 5)
-        # self.grid.addWidget(self.pressuar_new_edit, 10, 5)
-        self.need_change_zgs_combo.currentTextChanged.connect(self.update_change_fluid)
+        self.grid.addWidget(self.plast_new_label, 9, 3)
+        self.grid.addWidget(self.plast_new_combo, 10, 3)
+
+        self.grid.addWidget(self.fluid_new_label, 9, 4)
+        self.grid.addWidget( self.fluid_new_edit, 10, 4)
+
+        self.grid.addWidget(self.pressuar_new_label, 9, 5)
+        self.grid.addWidget(self.pressuar_new_edit, 10, 5)
+
 
         if all(well_data.dict_perforation[plast]['отрайбировано'] for plast in list(well_data.dict_perforation.keys())):
             self.swab_true_edit_type.setCurrentIndex(0)
@@ -148,6 +149,8 @@ class TabPage_SO_swab(QWidget):
         self.pakerEdit.textChanged.connect(self.update_paker_edit)
         self.paker2Edit.textChanged.connect(self.update_paker_edit)
         self.pakerEdit.textChanged.connect(self.update_paker_diametr)
+        self.need_change_zgs_combo.currentTextChanged.connect(self.update_change_fluid)
+
 
     def update_change_fluid(self, index):
         if index == 'Да':
@@ -174,7 +177,6 @@ class TabPage_SO_swab(QWidget):
             self.grid.addWidget(self.pressuar_new_label, 9, 4)
             self.grid.addWidget(self.pressuar_new_edit, 10, 4)
         else:
-
             self.plast_new_label.setParent(None)
             self.plast_new_combo.setParent(None)
             self.fluid_new_label.setParent(None)
@@ -257,12 +259,7 @@ class TabPage_SO_swab(QWidget):
             self.grid.addWidget(self.diametr_paker_labelType, 0, 2)
             self.grid.addWidget(self.diametr_paker_edit, 1, 2)
 
-            self.plast_new_label.setParent(None)
-            self.plast_new_combo.setParent(None)
-            self.fluid_new_label.setParent(None)
-            self.fluid_new_edit.setParent(None)
-            self.pressuar_new_label.setParent(None)
-            self.pressuar_new_edit.setParent(None)
+
 
         elif self.swab_true_edit_type.currentText() == 'двухпакерная':
             self.pakerLabel.setText('Глубина нижнего пакера')
@@ -276,12 +273,7 @@ class TabPage_SO_swab(QWidget):
             self.grid.addWidget(self.paker2Edit, 1, 5)
             self.grid.addWidget(self.diametr_paker_labelType, 0, 2)
             self.grid.addWidget(self.diametr_paker_edit, 1, 2)
-            self.plast_new_label.setParent(None)
-            self.plast_new_combo.setParent(None)
-            self.fluid_new_label.setParent(None)
-            self.fluid_new_edit.setParent(None)
-            self.pressuar_new_label.setParent(None)
-            self.pressuar_new_edit.setParent(None)
+
             paker_layout_list_tab = ["Пласт", "хвост", "пакер", "2-й пакер", "вид освоения", "объем освоения"]
 
         elif self.swab_true_edit_type.currentText() == 'воронка':
@@ -309,12 +301,7 @@ class TabPage_SO_swab(QWidget):
             self.khvostEdit.setParent(None)
             self.pakerLabel.setParent(None)
             self.pakerEdit.setParent(None)
-            self.plast_new_label.setParent(None)
-            self.plast_new_combo.setParent(None)
-            self.fluid_new_label.setParent(None)
-            self.fluid_new_edit.setParent(None)
-            self.pressuar_new_label.setParent(None)
-            self.pressuar_new_edit.setParent(None)
+
             self.diametr_paker_labelType.setParent(None)
             self.diametr_paker_edit.setParent(None)
             self.pakerLabel.setText('Глубина пакера')
@@ -352,26 +339,16 @@ class TabPage_SO_swab(QWidget):
             self.grid.addWidget(self.paker2Label, 0, 5)
             self.grid.addWidget(self.paker2Edit, 1, 5)
 
-            self.need_change_zgs_label = QLabel('Необходимо ли менять ЖГС', self)
-            self.need_change_zgs_combo = QComboBox(self)
-            self.need_change_zgs_combo.addItems(['Нет', 'Да'])
+            self.grid.addWidget(self.plast_new_label, 9, 2)
+            self.grid.addWidget(self.plast_new_combo, 10, 2)
 
-            if len(well_data.plast_work) == 0:
-                self.need_change_zgs_combo.setCurrentIndex(1)
+            self.grid.addWidget(self.fluid_new_label, 9, 3)
+            self.grid.addWidget(self.fluid_new_edit, 10, 3)
 
-            if len(well_data.plast_project) == 0:
-                self.plast_new_label = QLabel('индекс нового пласта', self)
-                self.plast_new_combo = QComboBox(self)
-                self.plast_new_combo.addItems(well_data.plast_project)
-            else:
-                self.plast_new_label = QLabel('индекс нового пласта', self)
-                self.plast_new_combo = QLineEdit(self)
+            self.grid.addWidget(self.pressuar_new_label, 9, 4)
+            self.grid.addWidget(self.pressuar_new_edit, 10, 4)
 
-            self.fluid_new_label = QLabel('удельный вес ЖГС', self)
-            self.fluid_new_edit = QLineEdit(self)
 
-            self.pressuar_new_label = QLabel('Ожидаемое давление', self)
-            self.pressuar_new_edit = QLineEdit(self)
             paker_layout_list_tab = ["забой", "глубина понижения", "вид освоения"]
 
             first_template, template_second = TabPage_SO_with.template_diam_ek(self)
@@ -384,6 +361,8 @@ class TabPage_SO_swab(QWidget):
             self.lenght_template_second_Edit = QLineEdit(self)
             self.lenght_template_second_Edit.setValidator(self.validator_int)
             self.lenght_template_second_Edit.setText('4')
+
+
 
             self.grid.addWidget(self.template_second_Label, 3, 3)
             self.grid.addWidget(self.template_second_Edit, 4, 3)
@@ -573,6 +552,8 @@ class Swab_Window(QMainWindow):
             self.tableWidget.setItem(rows, 3, QTableWidgetItem(str(swab_volume_edit)))
 
         elif swab_true_edit_type in ['Опрессовка снижением уровня на шаблоне']:
+            well_data.template_lenght = float(self.tabWidget.currentWidget().lenght_template_second_Edit.text())
+            # well_data.template_lenght_addition = lenght_template_first
             if rows != 0:
                 mes = QMessageBox.warning(self, 'ОШИБКА', 'НЕЛЬЗЯ на одной и тоже компоновки освоивать повторно')
                 return
@@ -587,6 +568,8 @@ class Swab_Window(QMainWindow):
         elif swab_true_edit_type in ['Опрессовка снижением уровня на пакере с заглушкой']:
             paker_depth = AcidPakerWindow.if_None(self, self.tabWidget.currentWidget().pakerEdit.text())
             paker_khost = AcidPakerWindow.if_None(self, self.tabWidget.currentWidget().khvostEdit.text())
+
+
             if rows != 0:
                 mes = QMessageBox.warning(self, 'ОШИБКА', 'НЕЛЬЗЯ на одной и тоже компоновки освоивать повторно')
             paker_opy = self.tabWidget.currentWidget().paker2Edit.text()
@@ -892,8 +875,6 @@ class Swab_Window(QMainWindow):
                      pressuar_new, template_second, lenght_template_second):
         from .template_work import TabPage_SO_with
 
-
-
         nkt_diam = ''.join(['73' if well_data.column_diametr._value > 110 or (
                 well_data.column_diametr._value > 110 and well_data.column_additional is True \
                 and well_data.head_column_additional._value < depth_opy is True) else '60'])
@@ -982,7 +963,7 @@ class Swab_Window(QMainWindow):
         if need_change_zgs_combo == 'Да':
             if plast_new not in well_data.plast_project:
                 well_data.plast_project.append(plast_new)
-            print(f'после 1 {fluid_new}')
+
             well_data.fluid_work, well_data.fluid_work_short, plast, expected_pressure = need_h2s(
                 fluid_new, plast_new, pressuar_new)
 

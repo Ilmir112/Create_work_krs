@@ -73,7 +73,7 @@ class CreatePZ(QMainWindow):
             Well_Category.read_well(self, ws, well_data.cat_well_min._value, well_data.data_well_min._value)
 
         if work_plan == 'plan_change':
-            DopPlanWindow.extraction_data(self, well_data.well_number._value + well_data.well_area._value + 'krs', 1)
+            DopPlanWindow.extraction_data(self, str(well_data.well_number._value) + " " + well_data.well_area._value + " " + work_plan + " " + well_data.contractor, 1)
             ws.delete_rows(well_data.plan_correct_index._value, ws.max_row)
             return ws
 

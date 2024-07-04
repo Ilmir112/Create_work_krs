@@ -169,7 +169,7 @@ def need_h2s(fluid_new, plast_edit, expected_pressure):
         else:
             fluid_work = f'{fluid_new}г/см3 '
             fluid_work_short = f'{fluid_new}г/см3 '
-    print(f'')
+
     return (fluid_work, fluid_work_short, plast_edit, expected_pressure)
 
 def konte(self):

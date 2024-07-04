@@ -104,14 +104,14 @@ class TabPageDp(QWidget):
 
                 if 'ойл-сервис' in well_data.contractor.lower():
                     contractor = 'oil_service'
-                print(previus_well)
+
 
                 cursor.execute("""
                     SELECT * FROM gnkt_{contractor} WHERE well_number = %s;
                 """.format(contractor=contractor), (previus_well,))
 
                 result_gnkt = cursor.fetchone()
-                print(result_gnkt)
+
 
                 self.lenght_gnkt_edit.setText(str(result_gnkt[3]))
                 self.iznos_gnkt_edit.setText(str(result_gnkt[5]))
@@ -199,6 +199,11 @@ class GnktOsvWindow2(QMainWindow):
 
         if '' in [gnkt_number_combo, lenght_gnkt_edit, iznos_gnkt_edit, fluid_edit, pvo_number]:
             mes = QMessageBox.warning(self, 'Некорректные данные', f'Не все данные заполнены')
+            return
+
+        fluid_question = QMessageBox.question(self, 'Удельный вес',
+                                              f'Работы необходимо производить на тех воде {fluid_edit}г/см3?')
+        if fluid_question == QMessageBox.StandardButton.No:
             return
 
         work_list = self.schema_well(current_bottom_edit, fluid_edit, gnkt_number_combo,
@@ -512,7 +517,14 @@ class GnktOsvWindow2(QMainWindow):
             well_volume_ek = well_volume(self, well_data.head_column_additional._value)
         else:
             well_volume_ek = well_volume(self, well_data.current_bottom)
-        well_volume_dp = well_volume(self, well_data.current_bottom) - well_volume_ek
+        if abs(float(well_data.well_volume_in_PZ[0]) - well_volume_ek) > 0.2:
+            mes = QMessageBox.warning(None, 'Некорректный объем скважины',
+                                      f'Объем скважины указанный в ПЗ -{well_data.well_volume_in_PZ}м3 не совпадает '
+                                      f'с расчетным {well_volume_ek}м3')
+            well_volume_ek, _ = QInputDialog.getDouble(self,
+                                                       "корректный объем",
+                                                       'Введите корректный объем', well_data.well_volume_in_PZ[0], 1, 80, 1)
+            well_volume_dp = well_volume(self, well_data.current_bottom) - well_volume_ek
 
         volume_pm_ek = round(
             3.14 * (well_data.column_diametr._value - 2 * well_data.column_wall_thickness._value) ** 2 / 4 / 1000, 2)
@@ -549,17 +561,23 @@ class GnktOsvWindow2(QMainWindow):
 
         wellhead_fittings = well_data.wellhead_fittings
         if well_data.work_plan == 'gnkt_after_grp':
+
             if 'грп' in str(well_data.wellhead_fittings).lower():
                 wellhead_fittings = well_data.wellhead_fittings
             else:
                 wellhead_fittings = f'АУШГН-{well_data.column_diametr._value}/' \
                                     f'АУГРП {well_data.column_diametr._value}*14'
 
-        if well_data.work_plan == 'gnkt_bopz':
+        elif well_data.work_plan == 'gnkt_bopz':
+
             list_gnkt_bopz = [
                 None, None, None, None, None, None, None, None, None, None,  None, None,
-              None, None, None, None, f'{plast_work}\n{well_data.dict_perforation[plast_work]["кровля"]}-{well_data.dict_perforation[plast_work]["подошва"]}',None,
+              None, None, None, None,
+                f'{plast_work}\n{well_data.dict_perforation[plast_work]["кровля"]}-{well_data.dict_perforation[plast_work]["подошва"]}',None,
              None, None, None, f'Тек. забой: \n{well_data.current_bottom}м ', None]
+        lenght_paker = 2
+        if well_data.curator == 'ОР' and well_data.region == 'ТГМ':
+            lenght_paker =  round(float(well_data.depth_fond_paker2_do["do"]) - float(well_data.depth_fond_paker_do["do"]), 1)
 
         schema_well_list = [
             [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
@@ -586,7 +604,7 @@ class GnktOsvWindow2(QMainWindow):
              'Стол ротора', None, f'{well_data.stol_rotora._value}м',
              'Øнаруж мм', 'толщ, мм', 'Øвнут, мм', 'Интервал спуска, м', None, 'ВПЦ.\nДлина', 'Объем', None],
             [None, None, None, None, None, None, None, None, None, f'0-{well_data.shoe_column._value}м', None, None,
-             'Ø канавки', None, 211, None, None,
+             'Ø канавки', None, f'{well_data.groove_diameter}', None, None,
              None, None, None, None, 'л/п.м.', 'м3'],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Шахтное направление', None, None,
              "", None, None, "", "", '', None, None],
@@ -599,7 +617,7 @@ class GnktOsvWindow2(QMainWindow):
              None, None, well_data.column_conductor_diametr._value, well_data.column_conductor_wall_thickness._value,
              f'{round(well_data.column_conductor_diametr._value - 2 * well_data.column_conductor_wall_thickness._value)}',
              f'0-', well_data.column_conductor_lenght._value,
-             well_data.level_cement_conductor._value, None, None],
+             f'{well_data.level_cement_conductor._value}', None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Экспл. колонна', None, None,
              f'{well_data.column_diametr._value}', f'{well_data.column_wall_thickness._value}',
              f'{round(float(well_data.column_diametr._value - 2 * well_data.column_wall_thickness._value), 1)}',
@@ -618,7 +636,7 @@ class GnktOsvWindow2(QMainWindow):
              nkt_widht, nkt - 2 * nkt_widht, f'0-', lenght_nkt, None, '=R19^2*3.14/4/1000', '=T19*V19/1000'],
             [None, None, None, None, None, None, None, None, None, None, None, None, f'{well_data.paker_do["do"]}',
              None, None, None, None,
-             50, well_data.depth_fond_paker_do["do"], well_data.depth_fond_paker_do["do"] + 2, 2, None, None],
+             50, well_data.depth_fond_paker_do["do"], well_data.depth_fond_paker_do["do"] + lenght_paker, lenght_paker, None, None],
             [None, None, None, None, None, None, None, None, None, 'пакер', None, None, 'без патрубка', None, None,
              None, 0, 0, well_data.depth_fond_paker_do["do"], well_data.depth_fond_paker_do["do"], 0, 0, 0],
             [None, None, None, None, None, None, None, None, None, f'на гл {well_data.depth_fond_paker_do["do"]}м',
@@ -700,7 +718,7 @@ class GnktOsvWindow2(QMainWindow):
              self.date_dmy(well_data.date_drilling_cancel),
              None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Дата ввода в эксплуатацию', None,
-             None, None, None, '', None, None, None, None, None],
+             None, None, None, f'{self.date_dmy(well_data.сommissioning_date)}', None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Р в межколонном пространстве',
              0, None, None, None, 0, None, ' ', None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Первоначальное Р опр-ки ЭК', None,
@@ -737,9 +755,10 @@ class GnktOsvWindow2(QMainWindow):
              None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None],
-            [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-             None, None, None, None, None],
-            [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+            [None, None,  None, None, None, None, None, None, None, None, None, 'Вид и категория ремонта, его шифр',
+             None, None, None, None, None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None, None, None, None,
+             f'{well_data.type_kr}', None, None, None, None, None, None,
              None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None],

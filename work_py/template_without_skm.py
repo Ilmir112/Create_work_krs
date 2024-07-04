@@ -113,7 +113,7 @@ class TabPage_SO(QWidget):
             self.template_select_list = ['шаблон ДП с хвостом', 'шаблон ДП открытый ствол', 'шаблон ДП без хвоста']
             self.template_Combo.addItems(self.template_select_list)
             template_key = self.definition_pssh()
-            print(template_key)
+
             self.template_Combo.setCurrentIndex(self.template_select_list.index(template_key))
 
             self.grid.addWidget(self.template_labelType, 1, 2, 1, 8)
@@ -259,6 +259,8 @@ class TabPage_SO(QWidget):
                     well_data.template_depth = well_data.current_bottom
                     skm_teml_str = f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
 
+
+
             elif self.template_Combo.currentText() == 'шаблон открытый ствол':
                 if dictance_template_second != None:
                     self.template_first_Edit.setText('фильтр направление')
@@ -282,6 +284,7 @@ class TabPage_SO(QWidget):
                         dictance_template_second))
 
 
+
                     skm_teml_str = f'шаблон-{first_template}мм до гл.{well_data.template_depth_addition}м, ' \
                                    f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
 
@@ -296,6 +299,7 @@ class TabPage_SO(QWidget):
                                                     int(lenght_template_first))
                 well_data.template_depth_addition = math.ceil(
                     well_data.current_bottom - int(dictance_template_second))
+
 
                 skm_teml_str = f'шаблон-{first_template}мм до гл.{well_data.template_depth_addition}м, ' \
                                f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
@@ -314,6 +318,7 @@ class TabPage_SO(QWidget):
                     well_data.template_depth_addition = math.ceil(well_data.current_bottom - 2 -
                                                                  int(dictance_template_first) - int(
                         dictance_template_second))
+
 
                     skm_teml_str = f'шаблон-{first_template}мм до гл.{well_data.template_depth_addition}м, ' \
                                    f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
@@ -587,6 +592,9 @@ class Template_without_skm(QMainWindow):
         distance_first = int(self.tabWidget.currentWidget().dictance_template_first_Edit.text())
         template_str = str(self.tabWidget.currentWidget().template_str_Edit.text())
         template = str(self.tabWidget.currentWidget().template_Combo.currentText())
+        template_lenght = int(float(self.tabWidget.currentWidget().lenght_template_second_Edit.text()))
+        if well_data.column_additional:
+            template_lenght_addition = int(float(self.tabWidget.currentWidget().lenght_template_first_Edit.text()))
         if well_data.column_additional is False or (
                 well_data.column_additional is True and float(
             well_data.head_column_additional._value) >= well_data.current_bottom):
@@ -617,7 +625,9 @@ class Template_without_skm(QMainWindow):
         if distance_second < 0 or distance_first < 0:
             mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'Расстояние между шаблонами не корректно')
             return
-
+        well_data.template_lenght = template_lenght
+        if well_data.column_additional:
+            well_data.template_lenght_addition = template_lenght_addition
         current_bottom = self.tabWidget.currentWidget().current_bottom_edit.text()
         if current_bottom != '':
             well_data.current_bottom = round(float(current_bottom), 1)

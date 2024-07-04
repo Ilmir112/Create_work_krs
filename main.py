@@ -375,6 +375,7 @@ class MyWindow(QMainWindow):
                 self.rir_window.show()
                 well_data.pause = True
                 self.pause_app()
+
                 data, rowHeights, colWidth, boundaries_dict = read_excel_in_base(well_data.well_number, well_data.well_area)
                 self.ws = insert_data_new_excel_file(data, rowHeights, colWidth, boundaries_dict)
 
@@ -854,6 +855,8 @@ class MyWindow(QMainWindow):
                         coordinate = f'{get_column_letter(6)}{row_ind + 1}'
                         self.insert_image(ws2, f'{well_data.path_image}imageFiles/schema_well/формула.png', coordinate, 330, 130)
                         break
+            if self.work_plan in ['krs', 'plan_change']:
+                self.create_short_plan(wb2, plan_short)
 
             if self.work_plan not in ['dop_plan', 'dop_plan_in_base']:
                 self.insert_image(ws2, f'{well_data.path_image}imageFiles/Хасаншин.png', 'H1')
@@ -912,7 +915,7 @@ class MyWindow(QMainWindow):
                 string_work = 'ГНКТ'
 
             filenames = f"{well_data.well_number._value} {well_data.well_area._value} кат " \
-                        f"{int(well_data.category_pressuar)} " \
+                        f"{well_data.category_pressuar} " \
                         f"{string_work}.xlsx"
             full_path = path + "/" + filenames
 
@@ -1009,6 +1012,7 @@ class MyWindow(QMainWindow):
             well_data.current_bottom = 0
             well_data.emergency_bottom = well_data.current_bottom
             well_data.fluid_work = 0
+            well_data.groove_diameter = None
             well_data.static_level = ProtectedIsNonNone('не корректно')
             well_data.dinamic_level = ProtectedIsNonNone('не корректно')
             well_data.work_perforations_approved = False
@@ -1333,7 +1337,7 @@ class MyWindow(QMainWindow):
                 #     well_data.column_additional = True
 
                 well_data.fluid_work = data[7]
-                well_data.template_depth = int(data[11])
+                well_data.template_depth, well_data.template_lenght, well_data.template_depth_addition, well_data.template_lenght_addition = json.loads(data[11])
                 well_data.skm_interval = json.loads(data[12])
                 well_data.problemWithEk_depth = data[13]
                 well_data.problemWithEk_diametr = data[14]
@@ -1805,7 +1809,7 @@ class MyWindow(QMainWindow):
                 MyWindow.insert_data_in_database(self, row, row_max + i)
 
             table_widget.insertRow(row)
-            print(f'row data {row_data}')
+
             if len(str(row_data)[1]) > 3 and work_plan in 'gnkt_frez':
                 table_widget.setSpan(i + ins_ind, 1, 1, 12)
             else:
@@ -1962,12 +1966,13 @@ class MyWindow(QMainWindow):
         skm_list_json = json.dumps(well_data.skm_interval)
         number = json.dumps(str(well_data.well_number._value) + well_data.well_area._value, ensure_ascii=False,
                             indent=4)
+        template_ek = json.dumps([well_data.template_depth, well_data.template_lenght, well_data.template_depth_addition, well_data.template_lenght_addition])
 
         # Подготовленные данные для вставки (пример)
         data_values = [row_max, well_data.current_bottom, dict_perforation_json, plast_all_json, plast_work_json,
                        leakage_json, well_data.column_additional, well_data.fluid_work,
                        well_data.category_pressuar, well_data.category_h2s, well_data.category_gf,
-                       well_data.template_depth, skm_list_json,
+                       template_ek, skm_list_json,
                        well_data.problemWithEk_depth, well_data.problemWithEk_diametr]
 
         if len(well_data.data_list) == 0:

@@ -210,7 +210,7 @@ def events_gnvp_frez(self, distance, fluid):
                   f'{"".join(calc_pntzh(float(fluid), well_data.cdng._value))} на расстоянии {distance}км от скважины.'
                   f' {well_data.contractor} в случае необходимости '
                   '(аварийного глушения) обязуется обеспечить завоз жидкости глушения на объект работ.', None, None,
-         None, None, None, None, None, None, 'Заказчик', None],
+         None, None, None, None, None, None, 'Подрядчик по КРС', None],
         [None, 7,
          'До начала работ, а также на все время выполнения работ, всю технику, принимающую участие в технологических операциях, оборудовать искрогасителями.',
          None, None, None, None, None, None, None, None, 'Мастер ГНКТ', None],
