@@ -242,6 +242,10 @@ class MyWindow(QMainWindow):
         self.correctNEKButton.clicked.connect(self.correctNEK)
         self.toolbar.addWidget(self.correctNEKButton)
 
+        self.correct_curator_Button = QPushButton("Скорректировать куратора")
+        self.correct_curator_Button.clicked.connect(self.correct_curator)
+        self.toolbar.addWidget(self.correct_curator_Button)
+
         self.closeFileButton = QPushButton("Закрыть проект")
         self.closeFileButton.clicked.connect(self.close_file)
         self.toolbar.addWidget(self.closeFileButton)
@@ -337,7 +341,7 @@ class MyWindow(QMainWindow):
                                                                   "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
             if self.fname:
                 try:
-                    self.read_pz(self.fname)
+                    # self.read_pz(self.fname)
                     well_data.pause = True
                     read_pz = CreatePZ(self.wb, self.ws, self.data_window, self.perforation_correct_window2)
                     sheet = read_pz.open_excel_file(self.ws, self.work_plan)
@@ -1934,6 +1938,21 @@ class MyWindow(QMainWindow):
         well_data.data_list[-1][1] = well_data.current_bottom
 
         well_data.data_list[-1][2] = json.dumps(well_data.dict_perforation, default=str, ensure_ascii=False, indent=4)
+
+    def correct_curator(self):
+        from work_py.curators import SelectCurator
+
+        if self.new_window is None:
+            self.new_window = SelectCurator()
+            # WellCondition.leakage_window.setGeometry(200, 400, 300, 400)
+            self.new_window.show()
+            MyWindow.pause_app()
+            well_data.pause = True
+            self.new_window = None  # Discard reference.
+        else:
+            self.new_window.close()  # Close window.
+            self.new_window = None  # Discard reference.
+
 
     def correctNEK(self):
         from find import WellCondition

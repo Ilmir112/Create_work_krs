@@ -45,9 +45,6 @@ class CreatePZ(QMainWindow):
         if work_plan == 'dop_plan':
             number_list = list(map(str, range(1, 50)))
 
-            well_data.number_dp, ok = QInputDialog.getItem(self, 'Номер дополнительного плана работ',
-                                                           'Введите номер дополнительного плана работ',
-                                                           number_list, 0, False)
 
             data_well = check_in_database_well_data(well_data.well_number, well_data.well_area)[0]
             if data_well:

@@ -32,6 +32,7 @@ class LoginWindow(QWidget):
 
         self.button_register = QPushButton("Регистрация", self)
         self.button_register.clicked.connect(self.show_register_window)
+
         self.username.currentTextChanged.connect(self.update_users)
 
         self.box_layout = QGridLayout(self)
@@ -44,7 +45,6 @@ class LoginWindow(QWidget):
         self.box_layout.addWidget(self.button_register, 2, 2)
 
     def update_users(self):
-        self.username.clear()
 
         users_list = list(map(lambda x: x[1], self.get_list_users()))
         self.username.addItems(users_list)
