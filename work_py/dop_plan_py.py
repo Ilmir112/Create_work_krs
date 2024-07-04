@@ -53,7 +53,7 @@ class TabPageDp(QWidget):
         self.template_lenght_edit = QLineEdit(self)
         self.template_lenght_edit.setValidator(self.validator_float)
 
-        self.skm_interval_label = QLabel('интервалы скреперованиея')
+        self.skm_interval_label = QLabel('интервалы скреперования')
         self.skm_interval_edit = QLineEdit(self)
 
         self.table_name = ''
@@ -69,35 +69,35 @@ class TabPageDp(QWidget):
         self.work_label = QLabel("Ранее проведенные работы:", self)
         self.work_edit = QTextEdit(self)
 
-        self.work_edit.setFixedWidth(300)
+        # self.work_edit.setFixedWidth(300)
         self.work_edit.setAlignment(Qt.AlignLeft)
 
         self.grid = QGridLayout(self)
 
-        self.grid.addWidget(self.well_number_label, 2, 4)
-        self.grid.addWidget(self.well_number_edit, 3, 4)
+        self.grid.addWidget(self.well_number_label, 2, 1)
+        self.grid.addWidget(self.well_number_edit, 3, 1)
 
-        self.grid.addWidget(self.well_area_label, 2, 5)
-        self.grid.addWidget(self.well_area_edit, 3, 5)
+        self.grid.addWidget(self.well_area_label, 2, 2)
+        self.grid.addWidget(self.well_area_edit, 3, 2)
 
-        self.grid.addWidget(self.well_area_label, 2, 5)
-        self.grid.addWidget(self.well_area_edit, 3, 5)
+        self.grid.addWidget(self.well_area_label, 2, 3)
+        self.grid.addWidget(self.well_area_edit, 3, 3)
 
-        self.grid.addWidget(self.number_DP_label, 2, 6)
-        self.grid.addWidget(self.number_DP_Combo, 3, 6)
+        self.grid.addWidget(self.number_DP_label, 2, 4)
+        self.grid.addWidget(self.number_DP_Combo, 3, 4)
 
-        self.grid.addWidget(self.current_bottom_label, 4, 4)
-        self.grid.addWidget(self.current_bottom_edit, 5, 4)
-        self.grid.addWidget(self.fluid_label, 4, 5)
-        self.grid.addWidget(self.fluid_edit, 5, 5)
-        self.grid.addWidget(self.template_depth_label, 4, 6)
-        self.grid.addWidget(self.template_depth_edit, 5, 6)
-        self.grid.addWidget(self.template_lenght_label, 4, 7)
-        self.grid.addWidget(self.template_lenght_edit, 5, 7)
-        self.grid.addWidget(self.skm_interval_label, 4, 10)
-        self.grid.addWidget(self.skm_interval_edit, 5, 10)
-        self.grid.addWidget(self.work_label, 12, 6, 2, 4)
-        self.grid.addWidget(self.work_edit, 13, 6, 2, 4)
+        self.grid.addWidget(self.current_bottom_label, 4, 1)
+        self.grid.addWidget(self.current_bottom_edit, 5, 1)
+        self.grid.addWidget(self.fluid_label, 4, 5, 1, 6)
+        self.grid.addWidget(self.fluid_edit, 5, 5, 1, 6)
+        self.grid.addWidget(self.template_depth_label, 6, 1)
+        self.grid.addWidget(self.template_depth_edit, 7, 1)
+        self.grid.addWidget(self.template_lenght_label, 6, 2)
+        self.grid.addWidget(self.template_lenght_edit, 7, 2)
+        self.grid.addWidget(self.skm_interval_label, 8, 1, 1, 3)
+        self.grid.addWidget(self.skm_interval_edit, 9, 1, 1, 3)
+        self.grid.addWidget(self.work_label, 14, 1)
+        self.grid.addWidget(self.work_edit, 15, 1, 2, 4)
 
         self.well_area_edit.textChanged.connect(self.update_well)
         self.well_number_edit.textChanged.connect(self.update_well)
@@ -117,10 +117,10 @@ class TabPageDp(QWidget):
             self.index_change_label = QLabel('пункт после которого происходят изменения')
             self.index_change_line = QLineEdit(self)
             self.index_change_line.setValidator(self.validator_int)
-            self.grid.addWidget(self.table_in_base_label, 6, 4)
-            self.grid.addWidget(self.table_in_base_combo, 7, 4)
-            self.grid.addWidget(self.index_change_label, 6, 5)
-            self.grid.addWidget(self.index_change_line, 7, 5)
+            self.grid.addWidget(self.table_in_base_label, 2, 5)
+            self.grid.addWidget(self.table_in_base_combo, 3, 5)
+            self.grid.addWidget(self.index_change_label, 2, 7)
+            self.grid.addWidget(self.index_change_line, 3, 7)
 
             self.index_change_line.textChanged.connect(self.update_table_in_base_combo)
             self.table_in_base_combo.currentTextChanged.connect(self.update_table_in_base_combo)
@@ -164,10 +164,10 @@ class TabPageDp(QWidget):
                 self.template_lenght_addition_edit = QLineEdit(self)
                 self.template_lenght_addition_edit.setValidator(self.validator_float)
                 self.template_lenght_addition_edit.setText(str(well_data.template_lenght_addition))
-                self.grid.addWidget(self.template_depth_addition_label, 4, 8)
-                self.grid.addWidget(self.template_depth_addition_edit, 5, 8)
-                self.grid.addWidget(self.template_lenght_addition_label, 4, 9)
-                self.grid.addWidget(self.template_lenght_addition_edit, 5, 9)
+                self.grid.addWidget(self.template_depth_addition_label, 6, 4)
+                self.grid.addWidget(self.template_depth_addition_edit, 7, 4)
+                self.grid.addWidget(self.template_lenght_addition_label, 6, 5)
+                self.grid.addWidget(self.template_lenght_addition_edit, 7, 5)
 
 
 
