@@ -341,9 +341,10 @@ class MyWindow(QMainWindow):
                                                                   "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
             if self.fname:
                 try:
-                    # self.read_pz(self.fname)
+                    self.read_pz(self.fname)
                     well_data.pause = True
                     read_pz = CreatePZ(self.wb, self.ws, self.data_window, self.perforation_correct_window2)
+
                     sheet = read_pz.open_excel_file(self.ws, self.work_plan)
 
 
@@ -863,8 +864,9 @@ class MyWindow(QMainWindow):
                 self.create_short_plan(wb2, plan_short)
 
             if self.work_plan not in ['dop_plan', 'dop_plan_in_base']:
-                self.insert_image(ws2, f'{well_data.path_image}imageFiles/Хасаншин.png', 'H1')
-                self.insert_image(ws2, f'{well_data.path_image}imageFiles/Шамигулов.png', 'H4')
+                if 'Ойл' in well_data.contractor:
+                    self.insert_image(ws2, f'{well_data.path_image}imageFiles/Хасаншин.png', 'H1')
+                    self.insert_image(ws2, f'{well_data.path_image}imageFiles/Шамигулов.png', 'H4')
                 excel_data_dict = excel_in_json(ws2)
                 insert_database_well_data(
                     well_data.well_number._value, well_data.well_area._value, well_data.contractor, well_data.costumer,

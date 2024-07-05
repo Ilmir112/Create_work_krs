@@ -415,7 +415,7 @@ class RirWindow(QMainWindow):
               'мастер КРС', descentNKT_norm(roof_rir_edit, 1.2)],
              [f'Привязка по ГК и ЛМ', None,
               f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {well_data.contractor}". '
-              f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером от {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г. '
+              f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером  {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г. '
               f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины',
               None, None, None, None, None, None, None,
               'Мастер КРС, подрядчик по ГИС', 4],
@@ -513,7 +513,7 @@ class RirWindow(QMainWindow):
              'мастер КРС', descentNKT_norm(roof_rir_edit, 1.2)],
             [f'Привязка по ГК и ЛМ', None,
              f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {well_data.contractor}". '
-             f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером от {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г. '
+             f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером  {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г. '
              f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины Отбить забой по ГК и ЛМ',
              None, None, None, None, None, None, None,
              'Мастер КРС, подрядчик по ГИС', 4],

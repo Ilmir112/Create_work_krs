@@ -899,6 +899,11 @@ class TemplateKrs(QMainWindow):
         if sole_skm != '':
             sole_skm = int(float(sole_skm))
         template_key = self.tabWidget.currentWidget().template_Combo.currentText()
+        if sole_skm > well_data.skm_depth:
+            msg = QMessageBox.information(self, 'Внимание',
+                                          f'Глубина СКМ на {well_data.skm_depth}м не позволяет скреперовать в '
+                                          f'{roof_skm}-{sole_skm}м')
+            return
 
         if not roof_skm or not sole_skm:
             msg = QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
@@ -1166,7 +1171,7 @@ class TemplateKrs(QMainWindow):
              f' вести с доливом скважины до устья т/ж удел.весом {well_data.fluid_work} в объеме '
              f'{round(float(current_bottom) * 1.12 / 1000, 1)}м3',
              None, None, None, None, None, None, None, 'Мастер КРС', None, None]]
-        print(f'длина шаблона {well_data.template_lenght}')
+
         privyazka_nkt = [f'Привязка по ГК и ЛМ По привязому НКТ удостовериться в наличии текущего забоя', None,
                          f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {well_data.contractor}.'
                          f' ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины.'

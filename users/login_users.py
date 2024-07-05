@@ -49,33 +49,31 @@ class LoginWindow(QWidget):
         users_list = list(map(lambda x: x[1], self.get_list_users()))
         self.username.addItems(users_list)
 
-    def login(self):
-        try:
-            conn = psycopg2.connect(**well_data.postgres_conn_user)
-            cursor = conn.cursor()
-            cursor.execute("SELECT last_name, first_name, middle_name, position, organization FROM plan_krs_employee;")
-
-            password_base = cursor.fetchone()
-
-            well_data.user = (f'{password_base[0]} {password_base[1][0]}.{password_base[2][0]}.',
-                              f'{password_base[3]} {password_base[4]}')
-
-
-
-        except psycopg2.Error as e:
-            # well_data.user = ('Зуфаров Ильмир Мияссарович', 'Зам главного геолога ООО "Ойл-сервис"')
-            # Выведите сообщение об ошибке
-            mes = QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных django_users, '
-                                                      'проверьте наличие интернета')
-
-
-        finally:
-
-            # Закройте курсор и соединение
-            if cursor:
-                cursor.close()
-            if conn:
-                conn.close()
+    # def login(self):
+    #     try:
+    #         conn = psycopg2.connect(**well_data.postgres_conn_user)
+    #         cursor = conn.cursor()
+    #         cursor.execute("SELECT last_name, first_name, middle_name, position, organization FROM plan_krs_employee;")
+    #
+    #         password_base = cursor.fetchone()
+    #
+    #         well_data.user = (f'{password_base[0]} {password_base[1][0]}.{password_base[2][0]}.',
+    #                           f'{password_base[3]} {password_base[4]}')
+    #
+    #     except psycopg2.Error as e:
+    #         # well_data.user = ('Зуфаров Ильмир Мияссарович', 'Зам главного геолога ООО "Ойл-сервис"')
+    #         # Выведите сообщение об ошибке
+    #         mes = QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных django_users, '
+    #                                                   'проверьте наличие интернета')
+    #
+    #
+    #     finally:
+    #
+    #         # Закройте курсор и соединение
+    #         if cursor:
+    #             cursor.close()
+    #         if conn:
+    #             conn.close()
     def login(self):
         username = self.username.currentText()
         password = self.password.text()
@@ -93,7 +91,8 @@ class LoginWindow(QWidget):
                 # mes = QMessageBox.information(self, 'Пароль', 'вход произведен')
                 self.close()
                 well_data.user = (password_base[4] + ' ' + password_base[5], password_base_short)
-
+                a = password_base[5]
+                well_data.contractor = password_base[5]
                 well_data.pause = False
             else:
                 mes = QMessageBox.critical(self, 'Пароль', 'логин и пароль не совпадает')
@@ -123,6 +122,7 @@ class LoginWindow(QWidget):
             position = user[3] + " " + user[4]
             user_name = user[0] + " " + user[1] + ' ' + user[2] + ' '
             users_list.append((position, user_name))
+
         conn.close()
 
         return users_list
@@ -147,10 +147,13 @@ class RegisterWindow(QWidget):
         self.second_name = QLineEdit(self)
 
         self.label_position = QLabel("Должность:", self)
-        self.position = QLineEdit(self)
+        self.position = QComboBox(self)
+        self.position.addItems(['Ведущий геолог ', 'Главный геолог', 'геолог'])
 
         self.label_organization = QLabel("Организация:", self)
-        self.organization = QLineEdit(self)
+        self.organization = QComboBox(self)
+        self.organization.addItems(['ООО "Ойл-Сервис"', 'ООО "РН-Сервис"'])
+
 
         self.label_password = QLabel("Пароль", self)
         self.password = QLineEdit(self)
@@ -165,6 +168,11 @@ class RegisterWindow(QWidget):
         self.password.setEchoMode(QLineEdit.Password)  # Устанавливаем режим скрытия пароля
         self.button_register_user.clicked.connect(self.register_user)
 
+        self.label_region = QLabel("ЦЕХ:", self)
+        self.region = QComboBox(self)
+        self.region.addItems(
+            ['ЦТКРС № 1', 'ЦТКРС № 2', 'ЦТКРС № 3', 'ЦТКРС № 4', 'ЦТКРС № 5', 'ЦТКРС № 6', 'ЦТКРС № 7'])
+
         self.grid = QGridLayout(self)
         self.grid.addWidget(self.label_last_name, 0, 1)
         self.grid.addWidget(self.last_name, 0, 2)
@@ -176,18 +184,37 @@ class RegisterWindow(QWidget):
         self.grid.addWidget(self.position, 3, 2)
         self.grid.addWidget(self.label_organization, 4, 1)
         self.grid.addWidget(self.organization, 4, 2)
-        self.grid.addWidget(self.label_password, 5, 1)
-        self.grid.addWidget(self.password, 5, 2)
-        self.grid.addWidget(self.label_password2, 6, 1)
-        self.grid.addWidget(self.password2, 6, 2)
-        self.grid.addWidget(self.button_register_user, 7, 1, 2, 2)
+        self.grid.addWidget(self.label_password, 6, 1)
+        self.grid.addWidget(self.password, 6, 2)
+        self.grid.addWidget(self.label_password2, 7, 1)
+        self.grid.addWidget(self.password2, 7, 2)
+        self.grid.addWidget(self.button_register_user, 8, 1, 2, 2)
+        self.organization.currentTextChanged.connect(self.update_organization)
+        self.grid.addWidget(self.label_region, 5, 1)
+        self.grid.addWidget(self.region, 5, 2)
+
+    def update_organization(self, index):
+
+        if index == 'ООО "Ойл-Сервис"':
+            self.label_region = QLabel("ЦЕХ:", self)
+            self.region = QComboBox(self)
+            self.region.addItems(['ЦТКРС № 1', 'ЦТКРС № 2','ЦТКРС № 3','ЦТКРС № 4','ЦТКРС № 5','ЦТКРС № 6','ЦТКРС № 7'])
+        elif index == 'ООО "РН-Сервис"':
+            self.label_region = QLabel("Экспедиция:", self)
+            self.region = QComboBox(self)
+            self.region.addItems(['экспедиции №1', 'экспедиции №2', 'экспедиции №3', 'экспедиции №4',
+                                  'экспедиции №5', 'экспедиции №6',
+                                 'экспедиции №7'])
+
+
 
     def register_user(self):
         last_name = self.last_name.text().title().strip()
         first_name = self.first_name.text().title().strip()
         second_name = self.second_name.text().title().strip()
-        position_in = self.position.text().strip()
-        organization = self.organization.text().strip()
+        position_in = self.position.currentText().strip()
+        organization = self.organization.currentText().strip()
+        region = self.region.currentText().strip()
         password = self.password.text().strip()
         password2 = self.password2.text().strip()
 
@@ -204,7 +231,7 @@ class RegisterWindow(QWidget):
         if existing_user:  # Если пользователь уже существует
             QMessageBox.critical(self, 'Данный пользовать существует', 'Данный пользовать существует')
         else:  # Если пользователя с таким именем еще нет
-
+            position_in = position_in + " " + region
             if password == password2:
                 cursor.execute(
                     "INSERT INTO users ("

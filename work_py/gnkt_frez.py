@@ -221,22 +221,23 @@ class Work_with_gnkt(QMainWindow):
 
         for row_ind, row in enumerate(ws2.iter_rows(values_only=True)):
             for col, value in enumerate(row):
-                if 'А.Р. Хасаншин' in str(value):
-                    coordinate = f'{get_column_letter(col + 1)}{row_ind - 1}'
-                    self.insert_image(ws2, f'{well_data.path_image}imageFiles/Хасаншин.png', coordinate)
-                elif 'Д.Д. Шамигулов' in str(value):
-                    coordinate = f'{get_column_letter(col + 1)}{row_ind - 2}'
-                    self.insert_image(ws2, f'{well_data.path_image}imageFiles/Шамигулов.png', coordinate)
-                elif 'Зуфаров' in str(value):
-                    coordinate = f'{get_column_letter(col - 2)}{row_ind}'
-                    self.insert_image(ws2, f'{well_data.path_image}imageFiles/Зуфаров.png', coordinate)
-                elif 'М.К.Алиев' in str(value):
-                    coordinate = f'{get_column_letter(col - 1)}{row_ind - 2}'
-                    self.insert_image(ws2, f'{well_data.path_image}imageFiles/Алиев махир.png', coordinate)
-                elif 'З.К. Алиев' in str(value):
-                    coordinate = f'{get_column_letter(col - 1)}{row_ind - 2}'
-                    self.insert_image(ws2, f'{well_data.path_image}imageFiles/Алиев Заур.png', coordinate)
-                    break
+                if 'Ойл' in well_data.contractor:
+                    if 'А.Р. Хасаншин' in str(value):
+                        coordinate = f'{get_column_letter(col + 1)}{row_ind - 1}'
+                        self.insert_image(ws2, f'{well_data.path_image}imageFiles/Хасаншин.png', coordinate)
+                    elif 'Д.Д. Шамигулов' in str(value):
+                        coordinate = f'{get_column_letter(col + 1)}{row_ind - 2}'
+                        self.insert_image(ws2, f'{well_data.path_image}imageFiles/Шамигулов.png', coordinate)
+                    elif 'Зуфаров' in str(value):
+                        coordinate = f'{get_column_letter(col - 2)}{row_ind}'
+                        self.insert_image(ws2, f'{well_data.path_image}imageFiles/Зуфаров.png', coordinate)
+                    elif 'М.К.Алиев' in str(value):
+                        coordinate = f'{get_column_letter(col - 1)}{row_ind - 2}'
+                        self.insert_image(ws2, f'{well_data.path_image}imageFiles/Алиев махир.png', coordinate)
+                    elif 'З.К. Алиев' in str(value):
+                        coordinate = f'{get_column_letter(col - 1)}{row_ind - 2}'
+                        self.insert_image(ws2, f'{well_data.path_image}imageFiles/Алиев Заур.png', coordinate)
+                        break
 
 
     def save_to_gnkt(self):
@@ -320,7 +321,7 @@ class Work_with_gnkt(QMainWindow):
              1],
             [None, None, None, None, None, None, None, None, 'цех', f'{well_data.cdng._value}', None, None]]
 
-        razdel = razdel_1(self, well_data.region)
+        razdel = razdel_1(self, well_data.region, well_data.contractor)
         for row in razdel:  # Добавлением работ
             title_list.append(row)
 

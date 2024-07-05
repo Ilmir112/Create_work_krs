@@ -21,7 +21,7 @@ class TabPage_SO(QWidget):
         with open(f'{well_data.path_image}podpisant.json', 'r', encoding='utf-8') as file:
             self.podpis_dict = json.load(file)
         TabPage_SO.podpis_dict = self.podpis_dict
-        self.region_list = [' ', 'АГМ', 'ИГМ', 'ТГМ', 'ЧГМ', 'КГМ']
+        self.region_list = well_data.region_list
 
         self.productLavelLabel = QLabel("Заказчик", self)
         self.productLavelType = QLineEdit(self)

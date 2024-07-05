@@ -1,6 +1,6 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.Qt import *
-from PyQt5.QtGui import QIntValidator
+from PyQt5.QtGui import QIntValidator, QDoubleValidator
 
 import well_data
 
@@ -8,7 +8,7 @@ import well_data
 class TabPage_SO_leakage(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.validator = QIntValidator(0, 8000)
+        self.validator = QDoubleValidator(0, 8000, 1)
 
         self.roof_leakage_label = QLabel("Кровля", self)
         self.roof_leakage_line = QLineEdit(self)
@@ -87,10 +87,9 @@ class LeakageWindow(QMainWindow):
         if not roof_leakage or not sole_leakage_line:
             msg = QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
             return
-        # if well_data.bottomhole_artificial < float(sole_leakage_line):
-        #     msg = QMessageBox.information(self, 'Внимание', 'глубина НЭК ниже искусственного забоя')
-        #     return
-
+        if well_data.bottomhole_artificial > float(sole_leakage_line):
+            msg = QMessageBox.information(self, 'Внимание', 'глубина НЭК ниже искусственного забоя')
+            return
 
         rows = self.tableWidget.rowCount()
         self.tableWidget.insertRow(rows)
@@ -99,7 +98,7 @@ class LeakageWindow(QMainWindow):
         self.tableWidget.setItem(rows, 1, QTableWidgetItem(sole_leakage_line))
         self.tableWidget.setCellWidget(rows, 2, insulation_combo1)
 
-        self.tableWidget.sortItems(0)
+        # self.tableWidget.sortItems(0)
 
     def addString(self):
        
@@ -132,7 +131,7 @@ class LeakageWindow(QMainWindow):
             self.tableWidget.setItem(rows, 0, QTableWidgetItem(roof_leakage))
             self.tableWidget.setItem(rows, 1, QTableWidgetItem(sole_leakage))
             self.tableWidget.setCellWidget(rows, 2, insulation_combo)
-            self.tableWidget.setSortingEnabled(False)
+            # self.tableWidget.setSortingEnabled(False)
 
 
     def add_work(self):

@@ -33,14 +33,34 @@ current_datetime = datetime.today()
 # Выбор подписантов в зависимости от региона
 def pop_down(self, region, curator_sel):
     from users.login_users import LoginWindow
+    if 'Ойл' in well_data.contractor:
+        nach_tkrs_list = [' ', 'З.К. Алиев', 'М.К.Алиев']
+        if region == 'ЧГМ' or region == 'ТГМ':
+            nach_tkrs = nach_tkrs_list[0]
+        elif region == 'КГМ' or region == 'АГМ':
+            nach_tkrs = nach_tkrs_list[1]
+        elif region == 'ИГМ':
+            nach_tkrs = nach_tkrs_list[2]
 
-    nach_tkrs_list = [' ', 'З.К. Алиев', 'М.К.Алиев']
-    if region == 'ЧГМ' or region == 'ТГМ':
-        nach_tkrs = nach_tkrs_list[0]
-    elif region == 'КГМ' or region == 'АГМ':
-        nach_tkrs = nach_tkrs_list[1]
-    elif region == 'ИГМ':
-        nach_tkrs = nach_tkrs_list[2]
+        nach_list = [
+            [None, f'План работ составил {well_data.user[0]}', None, None, None, None, '___________________', None,
+             None,
+             f'{well_data.user[1]}', None, None],
+            [None, None, None, None, None, None, None, None, 'дата составления', None, datetime.now().strftime('%d.%m.%Y'),
+             None],
+            [None, None, f'Начальник ЦТКРС {well_data.contractor}', None, None, None, None, None, None,
+             ''.join(nach_tkrs), None, None],
+            [None, None, None, None, None, None, None, None, None, '     дата подписания', None, None]]
+    elif "РН" in well_data.contractor:
+        nach_list = [
+            [None, f'План работ составил {well_data.user[0]}', None, None, None, None, '___________________', None,
+             None,
+             f'{well_data.user[1]}', None, None],
+            [None, None, None, None, None, None, None, None, 'дата составления', None,
+             datetime.now().strftime('%d.%m.%Y'),
+             None]]
+
+
 
     with open(f'{well_data.path_image}podpisant.json', 'r', encoding='utf-8') as file:
         podpis_dict = json.load(file)
@@ -48,14 +68,6 @@ def pop_down(self, region, curator_sel):
 
 
     podp_down = [
-        [None, f'План работ составил {well_data.user[0]}', None, None, None, None, '___________________', None,
-         None,
-         f'{well_data.user[1]}', None, None],
-        [None, None, None, None, None, None, None, None, 'дата составления', None, datetime.now().strftime('%d.%m.%Y'),
-         None],
-        [None, None, f'Начальник ЦТКРС ООО  {well_data.contractor}', None, None, None, None, None, None,
-         ''.join(nach_tkrs), None, None],
-        [None, None, None, None, None, None, None, None, None, '     дата подписания', None, None],
         [None, ' ', 'Согласовано:', None, None, None, None, None, None, None, None, None],
         [None, None, None, None, None, None, '', None, None, '', None, None],
         [None, curator_sel[0], None, None, None, None, '___________________', None, None,
@@ -117,6 +129,9 @@ def pop_down(self, region, curator_sel):
          None, None, None, None],
         [None, None, None, None, None, None, None, None, None, None, None, None]]
 
+    for row in nach_list[::-1]:
+        podp_down.insert(0, row)
+
     ved_gtm_list = [None, podpis_dict[region]['ved_gtm']['post'], None, None, None, None, '_______________', None, None,
                     podpis_dict[region]['ved_gtm']['surname'], None, None]
 
@@ -165,14 +180,15 @@ def pop_down(self, region, curator_sel):
     return podp_down
 
 
-def razdel_1(self, region):
+def razdel_1(self, region, contractor):
 
 
     with open(f'{well_data.path_image}podpisant.json', 'r', encoding='utf-8') as file:
         podpis_dict = json.load(file)
+    if 'Ойл' in contractor:
 
-    razdel_1 = [
-        [None, 'СОГЛАСОВАНО:', None, None, None, None, None, 'УТВЕРЖДАЕМ:', None, None, None, None],
+        razdel_1 = [
+            [None, 'СОГЛАСОВАНО:', None, None, None, None, None, 'УТВЕРЖДАЕМ:', None, None, None, None],
                 [None, podpis_dict[region]['gi']['post'], None, None, None, None, None,
                  f'Главный Инженер {well_data.contractor}', None, None, None, None],
                 [None, f'____________{podpis_dict[region]["gi"]["surname"]}', None, None, None, None, None,
@@ -196,6 +212,36 @@ def razdel_1(self, region):
                 [None, None, None, None, None, None, None, None, None, None, None, None],
                 [None, None, None, None, None, None, None, None, None, None, None, None],
                 [None, None, None, None, None, None, None, None, None, None, None, None]]
+    elif 'РН' in contractor:
+        razdel_1 = [
+            [None, 'СОГЛАСОВАНО:', None, None, None, None, None, 'УТВЕРЖДАЕМ:', None, None, None, None],
+            [None, podpis_dict[region]['gi']['post'], None, None, None, None, None,
+             f'Главный Инженер {well_data.contractor} филиал г. Уфа ', None, None, None, None],
+            [None, f'____________{podpis_dict[region]["gi"]["surname"]}', None, None, None, None, None,
+             '_____________К.Н. Фазлиахметов ', None, None, None, None],
+            [None, f'"____"_____________________{current_datetime.year}г.', None, None, None, None, None,
+             f'"____"_____________________{current_datetime.year}г.', None, None, None, None],
+            [None, None, None, None, None, None, None, None, None, None, None, None],
+            [None, podpis_dict[region]['gg']['post'], None, None, None,
+             None,
+             None, 'Доверенность №27 от 01.09.2023г.', 'Доверенность №27 от 01.09.2023г.', None, None, None],
+            [None, None, None, None, None, None,
+             None, None, None,
+             None, None, None],
+                [None, f'_____________{podpis_dict[region]["gg"]["surname"]}', None, None, None, None, None,
+                 '', None, None, '',
+                 None],
+                [None, f'"____"_____________________{current_datetime.year}г.', None, None, '', None, None,
+                 f'', None, None, None, None],
+                [None, None, None, None, None, None, None, None, None, None, None, None],
+                [None, None, None, None, None, None, None, None, None, None, None, None],
+                [None, None, None, None, None, None, None, None, None, None, None, None],
+                [None, None, None, None, None, None, None, None, None, None, None, None],
+                [None, None, None, None, None, None, None, None, None, None, None, None],
+                [None, None, None, None, None, None, None, None, None, None, None, None],
+                [None, None, None, None, None, None, None, None, None, None, None, None],
+                [None, None, None, None, None, None, None, None, None, None, None, None]]
+
 
     podp_grp = [[None, 'Представитель подрядчика по ГРП', None, None, None, None, None, None, None, None, None,
                  None],

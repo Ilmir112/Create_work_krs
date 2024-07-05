@@ -315,7 +315,7 @@ class DopPlanWindow(QMainWindow):
                 if '-' in skm_interval_edit:
                     skm_interval.append(skm_interval_edit)
 
-            print(skm_interval)
+
             well_data.skm_interval = skm_interval
         except:
             mes = QMessageBox.warning(self, 'Ошибка',

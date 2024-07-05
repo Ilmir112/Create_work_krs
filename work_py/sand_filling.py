@@ -273,7 +273,7 @@ class SandWindow(QMainWindow):
             [None, None,
              f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {well_data.contractor}". При необходимости '
              f'подготовить место для установки партии ГИС напротив мостков. Произвести  монтаж ГИС согласно схемы  №8 при '
-             f'привязке утвержденной главным инженером от {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г.',
+             f'привязке утвержденной главным инженером  {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г.',
              None, None, None, None, None, None, None,
              'мастер КРС', None],
             [f'Привязка ', None,

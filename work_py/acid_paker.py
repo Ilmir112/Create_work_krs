@@ -1176,11 +1176,11 @@ class AcidPakerWindow(QMainWindow):
             mtg_str = 'контейнер с манометром МТГ'
         else:
             mtg_str = ''
-        if swab_true_edit_type == 'без освоения':
+        if swab_true_edit_type == 'без освоения' and 'Ойл' in well_data.contractor:
             swab_layout = 'Заглушку + щелевой фильтр'
             swab_layout2 = 'сбивной клапан с ввертышем'
         else:
-            swab_layout = 'воронку'
+            swab_layout = 'воронку c свабоограничителем'
             swab_layout2 = ''
 
         nkt_diam, nkt_pod, nkt_template = self.select_diametr_nkt(paker_depth, swab_true_edit_type)

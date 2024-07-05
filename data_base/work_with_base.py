@@ -744,7 +744,7 @@ def create_database_well_db(work_plan, number_dp):
         column_additional = data[6]
         fluid_work = data[7]
         template_depth = data[11]
-        print(template_depth)
+
         skm_interval = data[12]
         problemWithEk_depth = data[13]
         problemWithEk_diametr = data[14]

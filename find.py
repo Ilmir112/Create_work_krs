@@ -52,11 +52,10 @@ class FindIndexPZ(QMainWindow):
             elif 'Оборудование скважины ' in row:
                 well_data.data_fond_min = ProtectedIsDigit(row_ind)
 
-            elif any(['Вид и категория ремонта, его шифр'  in str(col) for col in row]):
-
+            elif any(['VIII. Вид и категория ремонта, его шифр' in str(col) for col in row]):
                 well_data.type_kr = ws.cell(row=row_ind+2, column=1).value
                 n = 1
-                while  well_data.type_kr is None or n > 8:
+                while well_data.type_kr is None or n > 8:
                     well_data.type_kr = ws.cell(row=row_ind + 2, column=1 +n).value
                     n += 1
 
@@ -155,6 +154,9 @@ class FindIndexPZ(QMainWindow):
                                     'Программа не смогла найти строку с таблицей фондового оборудования')
             MyWindow.pause_app()
             return
+        if well_data.type_kr == '':
+            mes = QMessageBox.information(self, 'Вид ГТМ', 'Приложение не смогло найти тип КР, '
+                                                           'необходимо внести вручную')
         if well_data.condition_of_wells._value == 0:
             mes = QMessageBox.warning(
                 self, 'индекс копирования',
@@ -590,13 +592,7 @@ class WellCondition(FindIndexPZ):
                                                                           70)
                             well_data.well_volume_in_PZ.append(well_volume_in_PZ)
 
-        if well_data.grp_plan:
-            grp_plan_quest = QMessageBox.question(self, 'Подготовка к ГРП', 'Программа определела что в скважине '
-                                                                            f'планируется ГРП, верно ли?')
-            if grp_plan_quest == QMessageBox.StandardButton.Yes:
-                well_data.grp_plan = True
-            else:
-                well_data.grp_plan = False
+
 
         if well_data.leakiness is True:
             leakiness_quest = QMessageBox.question(self, 'нарушение колонны',
@@ -1248,12 +1244,20 @@ class Well_perforation(FindIndexPZ):
                     roof_int = round(float(str(row[col_roof_index]).replace(',', '.')), 1)
                     sole_int = round(float(str(row[col_sole_index]).replace(',', '.')), 1)
 
+
                     if row[col_vert_index] != None:
+
                         well_data.dict_perforation_project.setdefault(
                             plast, {}).setdefault('вертикаль', []).append(round(float(str(
                             row[col_vert_index]).replace(',', '.')), 1))
-                    well_data.dict_perforation_project.setdefault(
-                        plast, {}).setdefault('интервал', []).append((roof_int, sole_int))
+                        try:
+                            if (roof_int, sole_int) in well_data.dict_perforation_project[plast]['интервал']:
+                                break
+                        except:
+                            pass
+                        well_data.dict_perforation_project.setdefault(
+                            plast, {}).setdefault('интервал', []).append((roof_int, sole_int))
+
 
                     if row[col_pressuar_index] != None:
                         well_data.dict_perforation_project.setdefault(plast, {}).setdefault('давление', []).append(

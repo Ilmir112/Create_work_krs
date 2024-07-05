@@ -287,6 +287,11 @@ class GnktOsvWindow2(QMainWindow):
                                 'внимание' in str(ws2.cell(row=i + 1, column=column + 1).value).lower() or \
                                 'мероприятия' in str(ws2.cell(row=i + 1, column=column + 1).value).lower() or \
                                 'порядок работ' in str(ws2.cell(row=i + 1, column=column + 1).value).lower() or \
+                                'ТЕХНОЛОГИЧЕСКИЕ ПРОЦЕССЫ' in str(ws2.cell(row=i + 1, column=column + 1).value).upper() or \
+                                'оказание первой (доврачебной) помощи' in str(ws2.cell(row=i + 1, column=column + 1).value).lower() or \
+                                'Контроль воздушной среды' in str(ws2.cell(row=i + 1, column=column + 1).value).lower() or \
+                                'Требования безопасности' in str(
+                            ws2.cell(row=i + 1, column=column + 1).value).lower() or \
                                 'По доп.согласованию с Заказчиком' in str(
                             ws2.cell(row=i + 1, column=column + 1).value).lower():
                             # print('есть жирный')
@@ -421,7 +426,7 @@ class GnktOsvWindow2(QMainWindow):
              1],
             [None, None, None, None, None, None, None, 'цех:',  f'{well_data.cdng}', None, None, None]]
 
-        razdel = razdel_1(self, well_data.region)
+        razdel = razdel_1(self, well_data.region, well_data.contractor)
 
         for row in razdel:  # Добавлением работ
             title_list.append(row)
@@ -525,7 +530,8 @@ class GnktOsvWindow2(QMainWindow):
                                                        "корректный объем",
                                                        'Введите корректный объем', well_data.well_volume_in_PZ[0], 1, 80, 1)
             well_volume_dp = well_volume(self, well_data.current_bottom) - well_volume_ek
-
+        else:
+            well_volume_dp = well_volume(self, well_data.current_bottom) - well_volume_ek
         volume_pm_ek = round(
             3.14 * (well_data.column_diametr._value - 2 * well_data.column_wall_thickness._value) ** 2 / 4 / 1000, 2)
         volume_pm_dp = round(3.14 * (well_data.column_additional_diametr._value - 2 *

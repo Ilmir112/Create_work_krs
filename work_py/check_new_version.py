@@ -206,7 +206,7 @@ class UpdateThread(QThread):
                     self.progress_signal.emit(int(progress))
 
             extract_len = len(well_data.path_image) + len('ZIMA.exe')
-            print(extract_len, well_data.path_image + 'ZIMA.exe')
+
 
             extract_dir = os.path.dirname(os.path.abspath(__file__))[:-extract_len]
             mes = QMessageBox.information(self, 'Обновление', 'Обновление скачано, необходимо разархивировать архив и '

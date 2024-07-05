@@ -173,12 +173,12 @@ class GeophysicWindow(MyWindow):
         geophysicalResearch = [
             [" ", None, f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {well_data.contractor}". '
                          f'При необходимости  подготовить место для установки партии ГИС напротив мостков. '
-                         f'Произвести  монтаж ГИС согласно схемы  №8а утвержденной главным инженером от {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г',
+                         f'Произвести  монтаж ГИС согласно схемы  №8а утвержденной главным инженером  {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г',
              None, None, None, None, None, None, None,
              'Мастер КРС', ' '],
             [' ', None,
              f'Долить скважину до устья тех жидкостью уд.весом {well_data.fluid_work} .Установить ПВО по схеме №8а утвержденной '
-             f'главным инженером {well_data.contractor} от {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г. Опрессовать  плашки  ПВО (на давление опрессовки ЭК, но '
+             f'главным инженером {well_data.contractor}  {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г. Опрессовать  плашки  ПВО (на давление опрессовки ЭК, но '
              f'не ниже максимального ожидаемого давления на устье) {well_data.max_admissible_pressure._value}атм, по невозможности на давление поглощения, но '
              f'не менее 30атм в течении 30мин (ОПРЕССОВКУ ПВО ЗАФИКСИРОВАТЬ В ВАХТОВОМ ЖУРНАЛЕ). ',
              None, None, None, None, None, None, None,

@@ -236,6 +236,13 @@ class TabPage_SO(QWidget):
 
         self.curator_Label = QLabel('Куратор ремонта')
         self.curator_Combo = QComboBox(self)
+        self.curator_Combo.setMinimumWidth(50)
+
+        self.region_Label = QLabel('Регион')
+        self.region_Combo = QComboBox(self)
+
+        self.type_kr_Label = QLabel('Вид и категория ремонта, его шифр')
+        self.type_kr_Combo = QComboBox(self)
 
         self.nkt_do_label = QLabel('НКТ  до ремонта')
         self.nkt_posle_label = QLabel('НКТ плановое согласно расчета')
@@ -250,6 +257,7 @@ class TabPage_SO(QWidget):
         self.dict_sucker_rod_po = well_data.dict_sucker_rod_po
 
         self.grid = QGridLayout(self)
+
         self.grid.addWidget(self.column_direction_diametr_Label, 0, 0)
         self.grid.addWidget(self.column_direction_diametr_edit, 1, 0)
         self.grid.addWidget(self.column_direction_wall_thickness_Label, 0, 1)
@@ -340,14 +348,23 @@ class TabPage_SO(QWidget):
         self.grid.addWidget(self.dinamic_level_Label, 21, 3)
         self.grid.addWidget(self.dinamic_level_editType, 22, 3)
 
-        self.grid.addWidget(self.curator_Label, 23, 3)
-        self.grid.addWidget(self.curator_Combo, 24, 3)
+        self.grid.addWidget(self.curator_Label, 23, 1)
+        self.grid.addWidget(self.curator_Combo, 24, 1)
+
+        self.grid.addWidget(self.region_Label, 23, 2)
+        self.grid.addWidget(self.region_Combo, 24, 2)
+
+        self.grid.addWidget(self.type_kr_Label, 23, 3)
+        self.grid.addWidget(self.type_kr_Combo, 24, 3)
 
         self.grid.addWidget(self.nkt_do_label, 27, 1)
         self.grid.addWidget(self.nkt_posle_label, 27, 5)
 
         self.grid.addWidget(self.sucker_rod_label, 35, 1)
         self.grid.addWidget(self.sucker_rod_po_label, 35, 5)
+
+        self.grid.setColumnStretch(3, 1)
+        self.grid.setColumnMinimumWidth(3, 50)
 
         # добавление строк с НКТ спущенных
         if len(self.dict_nkt) != 0:
@@ -536,6 +553,18 @@ class TabPage_SO(QWidget):
         self.curator_Combo.currentTextChanged.connect(self.update_curator)
         # print(f'куратор индекс {curator, curator_list.index(curator)}')
         self.curator_Combo.setCurrentIndex(curator_list.index(curator))
+        self.region_Combo.addItems(well_data.region_list)
+        self.region_Combo.setCurrentIndex(well_data.region_list.index(well_data.region))
+
+        self.type_kr_Combo.view().setWordWrap(True)
+        self.type_kr_Combo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
+
+        self.type_kr_Combo.addItems(well_data.type_kr_list)
+
+        try:
+            self.type_kr_Combo.setCurrentIndex(well_data.type_kr_list.index(well_data.type_kr))
+        except:
+            pass
 
     def update_curator(self):
 
@@ -681,9 +710,31 @@ class DataWindow(QMainWindow):
         vbox.addWidget(self.buttonAdd, 3, 0)
 
     def addRowTable(self):
-
         from find import ProtectedIsNonNone, ProtectedIsDigit
 
+        region_Combo = self.tabWidget.currentWidget().region_Combo.currentText()
+        type_kr_Combo = self.tabWidget.currentWidget().type_kr_Combo.currentText()
+
+
+        if region_Combo == '':
+            mes = QMessageBox.warning(self, 'ОШИБКА', 'Не выбран регион')
+            return
+        if type_kr_Combo == '':
+            mes = QMessageBox.warning(self, 'ОШИБКА', 'Не выбран Вид и категория ремонта')
+            return
+
+        if type_kr_Combo in ['КР13-1  Подготовительные работы к ГРП (ПР)',
+                            'КР13-2  Освоение скважины после ГРП (ЗР)',
+                            'КР13-1  Подготовительные работы к ГРП (ПР) КР13-2  Освоение скважины после ГРП (ЗР)',
+                            'КР13-5  Подготовка скважины к проведению работ по повышению н/отдачи пластов',
+                            'КР13-6  Подготовительные работы к ГГРП (ПР)',
+                            'КР13-7  Заключительные работы (ЗР) после ГГРП (освоение скважины и т.д.)',
+                             'КР7-2  Проведение ГРП',
+                             'КР7-3  Проведение ГГРП',
+                             'КР7-4  Проведение ГПП']:
+            well_data.grp_plan = True
+        else:
+            well_data.grp_plan = False
         columnType = self.tabWidget.currentWidget().columnType.text()
         column_wall_thickness = self.tabWidget.currentWidget().column_wall_thicknessEditType2.text()
         shoe_column = self.tabWidget.currentWidget().shoe_columnEditType2.text()

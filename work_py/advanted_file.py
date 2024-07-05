@@ -340,7 +340,7 @@ def count_row_height(ws, ws2, work_list, merged_cells_dict, ind_ins):
     boundaries_dict = {}
 
     text_width_dict = {35: (0, 100), 50: (101, 200), 70: (201, 300), 95: (301, 400), 110: (401, 500),
-                       130: (501, 600), 150: (601, 700), 170: (701, 800), 190: (801, 1000), 230: (1000, 1500)}
+                       150: (501, 600), 170: (601, 700), 190: (701, 800), 230: (801, 1000), 270: (1000, 1500)}
 
     for ind, _range in enumerate(ws.merged_cells.ranges):
         boundaries_dict[ind] = range_boundaries(str(_range))
@@ -411,7 +411,14 @@ def count_row_height(ws, ws2, work_list, merged_cells_dict, ind_ins):
                             or 'заявку оформить за 16 часов' in str(cell.value).lower() \
                             or 'ЗАДАЧА 2.9.' in str(cell.value).upper() \
                             or 'ВСЕ ТЕХНОЛОГИЧЕСКИЕ ОПЕРАЦИИ' in str(cell.value).upper() \
-                            or 'за 48 часов до спуска' in str(cell.value).upper()\
+                            or 'за 48 часов до спуска'.upper() in str(cell.value).upper() \
+                            or 'Требования безопасности'.upper() in str(cell.value).upper() \
+                            or 'Контроль воздушной среды проводится'.upper() in str(cell.value).upper() \
+                            or 'ТЕХНОЛОГИЧЕСКИЕ ПРОЦЕССЫ'.upper() in str(cell.value).upper() \
+                            or 'Требования безопасности при выполнении работ'.upper() in str(cell.value).upper() \
+                            or 'за 48 часов до спуска'.upper() in str(cell.value).upper() \
+                            or 'за 48 часов до спуска'.upper() in str(cell.value).upper() \
+                            or 'за 48 часов до спуска'.upper() in str(cell.value).upper()\
                             or 'РИР' in str(cell.value).upper()\
                             or 'При отсутствии избыточного давления' in str(cell.value):
                         # print('есть жирный')

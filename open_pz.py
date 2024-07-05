@@ -167,7 +167,7 @@ class CreatePZ(QMainWindow):
                                            'application_gis', 'gnkt_after_grp', 'gnkt_opz', 'plan_change']:
                 # print(f'план работ {well_data.work_plan}')
                 delete_rows_pz(self, ws)
-                razdel = razdel_1(self, well_data.region)
+                razdel = razdel_1(self, well_data.region, well_data.contractor)
 
                 for i in range(1, len(razdel)):  # Добавлением подписантов на вверху
                     for j in range(1, 13):
@@ -180,10 +180,10 @@ class CreatePZ(QMainWindow):
                 well_data.ins_ind += well_data.data_well_max._value - well_data.cat_well_min._value + 19
                 # print(f' индекс вставки ГНВП{well_data.ins_ind}')
                 dict_events_gnvp = {}
-                dict_events_gnvp['krs'] = events_gnvp()
+                dict_events_gnvp['krs'] = events_gnvp(well_data.contractor)
                 dict_events_gnvp['gnkt_opz'] = events_gnvp_gnkt()
                 dict_events_gnvp['gnkt_bopz'] = events_gnvp_gnkt()
-                dict_events_gnvp['dop_plan'] = events_gnvp()
+                dict_events_gnvp['dop_plan'] = events_gnvp(well_data.contractor)
                 # if work_plan != 'dop_plan':
                 text_width_dict = {20: (0, 100), 30: (101, 200), 40: (201, 300), 60: (301, 400), 70: (401, 500),
                                    90: (501, 600), 110: (601, 700), 120: (701, 800), 130: (801, 900),
@@ -195,6 +195,13 @@ class CreatePZ(QMainWindow):
                     data.value = dict_events_gnvp[work_plan][i - well_data.ins_ind][1]
 
                     if 'Мероприятия' in str(data.value) or \
+                            'Меры по предупреждению' in str(data.value) or \
+                            ' ТЕХНОЛОГИЧЕСКИЕ ПРОЦЕССЫ' in str(data.value) or \
+                            'Признаки отравления сернистым водородом' in str(data.value) or \
+                            'Контроль воздушной среды проводится:' in str(data.value) or \
+                            'Требования безопасности при выполнении работ:' in str(data.value) or \
+                            'Меры по предупреждению' in str(data.value) or \
+                            'Меры по предупреждению' in str(data.value) or \
                             'Меры по предупреждению' in str(data.value) or \
                             "о недопустимости нецелевого расхода" in str(data.value):
                         data.alignment = Alignment(wrap_text=True, horizontal='center',
