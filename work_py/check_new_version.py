@@ -211,7 +211,7 @@ class UpdateThread(QThread):
             extract_dir = os.path.dirname(os.path.abspath(__file__))[:-extract_len]
             mes = QMessageBox.information(self, 'Обновление', 'Обновление скачано, необходимо разархивировать архив и '
                                                               'перезапустить приложение')
-            self.close_process("ZIMA.exe")
+            self.close_process_update("ZIMA.exe")
             # with zipfile.ZipFile("zima.zip", 'r') as zip_ref:
             #     for info in zip_ref.infolist():
             #         if "ZIMA.exe" not in info.filename:
@@ -253,7 +253,7 @@ class UpdateThread(QThread):
             mes = QMessageBox.warning(self, "Ошибка", f"Не удалось загрузить обновления: {e}")
 
     @staticmethod
-    def close_process(process_name):
+    def close_process_update(process_name):
         try:
             subprocess.run(['taskkill', '/f', '/im', process_name], check=True)
             print(f"Процесс {process_name} успешно закрыт.")

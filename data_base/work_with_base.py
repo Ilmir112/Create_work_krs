@@ -701,9 +701,9 @@ def create_database_well_db(work_plan, number_dp):
     cursor = conn.cursor()
     if number_dp == 0:
         number_dp = ''
-    if 'Ойл-Сервис' in well_data.contractor:
+    if 'Ойл' in well_data.contractor:
         contractor = 'ОЙЛ'
-    elif 'РН-Сервис' in well_data.contractor:
+    elif 'РН' in well_data.contractor:
         contractor = 'РН'
 
     if work_plan in ['krs', 'plan_change']:

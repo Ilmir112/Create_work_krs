@@ -222,7 +222,7 @@ well_volume_in_PZ = []
 cat_P_1 = []
 costumer = 'ОАО "Башнефть"'
 contractor = ''
-dict_contractor = {'ООО "Ойл-Сервис"':
+dict_contractor = {'ООО "Ойл-сервис"':
     {
         'Дата ПВО': 'от 15.10.2021г'
     },

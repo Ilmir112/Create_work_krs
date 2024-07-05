@@ -3,6 +3,7 @@ import json
 import os
 import sys
 
+import psutil
 import psycopg2
 import win32com.client
 import openpyxl
@@ -214,6 +215,27 @@ class MyWindow(QMainWindow):
         except Exception as e:
             mes = QMessageBox.warning(self, 'КРИТИЧЕСКАЯ ОШИБКА', 'Критическая ошибка, смотри в лог')
             self.excepthook._exception_caught.emit(e)
+    @staticmethod
+    def check_process():
+        for proc in psutil.process_iter():
+            if proc.name() == 'zima.exe':
+                return True  # Процесс найден
+
+        return False  # Процесс не найден
+
+    @staticmethod
+    def close_process():
+        for proc in psutil.process_iter():
+            if proc.name() == 'zima.exe':
+                proc.terminate()  # Принудительное завершение
+
+
+    def show_confirmation(self):
+        reply = QMessageBox.question(None, 'Закрыть Zima?',
+                                     'Приложение Zima.exe работает. Вы хотите Перезапустить его?',
+                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            self.close_process()
 
     def initUI(self):
 
@@ -2402,6 +2424,8 @@ if __name__ == "__main__":
     # app3 = QApplication(sys.argv)
 
     app = QApplication(sys.argv)
+    if MyWindow.check_process():
+       MyWindow.show_confirmation()
     window = MyWindow()
     window.show()
     # app2 = UpdateChecker()
