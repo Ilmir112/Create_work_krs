@@ -217,8 +217,9 @@ class MyWindow(QMainWindow):
             self.excepthook._exception_caught.emit(e)
     @staticmethod
     def check_process():
+
         for proc in psutil.process_iter():
-            if proc.name() == 'zima.exe':
+            if proc.name() == 'ZIMA.exe':
                 return True  # Процесс найден
 
         return False  # Процесс не найден
@@ -226,16 +227,16 @@ class MyWindow(QMainWindow):
     @staticmethod
     def close_process():
         for proc in psutil.process_iter():
-            if proc.name() == 'zima.exe':
+            if proc.name() == 'ZIMA.exe':
                 proc.terminate()  # Принудительное завершение
 
-
-    def show_confirmation(self):
+    @staticmethod
+    def show_confirmation():
         reply = QMessageBox.question(None, 'Закрыть Zima?',
                                      'Приложение Zima.exe работает. Вы хотите Перезапустить его?',
                                      QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if reply == QMessageBox.Yes:
-            self.close_process()
+            MyWindow.close_process()
 
     def initUI(self):
 
