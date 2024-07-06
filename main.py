@@ -217,10 +217,12 @@ class MyWindow(QMainWindow):
             self.excepthook._exception_caught.emit(e)
     @staticmethod
     def check_process():
-
+        count_zima = 0
         for proc in psutil.process_iter():
             if proc.name() == 'ZIMA.exe':
-                return True  # Процесс найден
+                count_zima += count_zima
+        if count_zima > 1:
+            return True  # Процесс найден
 
         return False  # Процесс не найден
 
@@ -2429,9 +2431,9 @@ if __name__ == "__main__":
        MyWindow.show_confirmation()
     window = MyWindow()
     window.show()
-    # app2 = UpdateChecker()
-    # app2.check_version()
-    # if app2.window_close == True:
-    #     print(f'локом {UpdateChecker.window_close}')
-    #     app2.show()
+    app2 = UpdateChecker()
+    app2.check_version()
+    if app2.window_close == True:
+        print(f'локом {UpdateChecker.window_close}')
+        app2.show()
     sys.exit(app.exec_())

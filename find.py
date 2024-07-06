@@ -167,42 +167,46 @@ class FindIndexPZ(QMainWindow):
 
     def check_str_None(self, string):
         from main import MyWindow
+        try:
+            if MyWindow.check_str_isdigit(self, str(string)) is True:
+                if str(round(float(str(string).replace(',', '.')), 1))[-1] == "0":
+                    return int(float(str(string).replace(',', '.')))
+                else:
+                    return round(float(str(string).replace(',', '.')), 4)
+            elif str(string).replace(' ', '') == '-' or 'отсут' in str(string) or \
+                    str(string).strip() == '' or string is None:
+                return '0'
+            elif '(мм)' in string and '(м)' in string:
+                return string
+            elif len(str(string).split('/')) == 2:
+                lst = []
+                for i in str(string).split('/'):
+                    b = ''
+                    for j in i:
+                        if j in '0123456789.x':
+                            b = str(b) + j
+                        elif j == ',':
+                            b = str(b) + '.'
+                    lst.append(float(b))
+                return lst
+            elif len(str(string).split('-')) == 2:
+                lst = []
+                for i in str(string).split('-'):
+                    # print(i)
+                    lst.append(float(i.replace(',', '.').strip()))
+                return lst
 
-        if MyWindow.check_str_isdigit(self, str(string)) is True:
-            if str(round(float(str(string).replace(',', '.')), 1))[-1] == "0":
-                return int(float(str(string).replace(',', '.')))
             else:
-                return round(float(str(string).replace(',', '.')), 4)
-        elif str(string).replace(' ', '') == '-' or 'отсут' in str(string) or \
-                str(string).strip() == '' or string is None:
-            return '0'
-        elif '(мм)' in string and '(м)' in string:
-            return string
-        elif len(str(string).split('/')) == 2:
-            lst = []
-            for i in str(string).split('/'):
-                b = ''
-                for j in i:
-                    if j in '0123456789.x':
-                        b = str(b) + j
-                    elif j == ',':
-                        b = str(b) + '.'
-                lst.append(float(b))
-            return lst
-        elif len(str(string).split('-')) == 2:
-            lst = []
-            for i in str(string).split('-'):
-                # print(i)
-                lst.append(float(i.replace(',', '.').strip()))
-            return lst
+                b = 0
+                for i in str(string):
+                    i.replace(',', '.')
+                    if i in '0123456789,.x':
+                        b = str(b) + i
+                        b = float(b)
+                return b
+        except:
+            mes = QMessageBox.warning(self, 'Ошибка', f'Ошибка в прочтении файла в строке {string}, Проверьте excel файл')
 
-        else:
-            b = 0
-            for i in str(string):
-                i.replace(',', '.')
-                if i in '0123456789,.x':
-                    b = str(b) + i
-            return float(b)
 
     def definition_is_None(self, data, row, col, step, m=12):
         try:
