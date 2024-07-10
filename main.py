@@ -65,7 +65,7 @@ class ExcelWorker(QThread):
         super().__init__()
 
     def check_well_existence(self, well_number, deposit_area, region):
-
+        stop_app = False
         try:
 
             current_year = datetime.now().year
@@ -93,14 +93,11 @@ class ExcelWorker(QThread):
 
                 result = cursor.fetchone()
 
-                if result != None:
-                    mes = QMessageBox.warning(self, 'Некорректная дата перечня',
+                if result == None:
+                    mes = QMessageBox.warning(None, 'Некорректная дата перечня',
                                               f'Необходимо обновить перечень скважин без '
-                                              f'глушения на текущий квартал {region}')
-                    well_data.pause = True
-                    MyWindow.pause_app()
-                    return
-
+                                              f'глушения на текущий квартал {region}, необходимо обратиться к администратору')
+                    stop_app = True
 
                 try:
                     # Проверка наличия записи в базе данных
@@ -142,6 +139,7 @@ class ExcelWorker(QThread):
                         QMessageBox.warning(None, 'Некорректная дата перечня',
                                             f'Необходимо обновить перечень скважин без '
                                             f'глушения на текущий квартал {region}')
+                        stop_app = True
                         return False  # Возвращаем False, если запись с датой не найдена
 
                     # Проверка наличия записи о скважине
@@ -166,6 +164,9 @@ class ExcelWorker(QThread):
                         cursor.close()
                     if conn:
                         conn.close()
+            if stop_app == True:
+                MyWindow.pause_app()
+                window.close()
         except Exception as e:
             QMessageBox.warning(None, 'Ошибка', f"Ошибка при проверке записи: {e}")
 
