@@ -446,6 +446,7 @@ class MyWindow(QMainWindow):
         from work_py.gnkt_grp import GnktOsvWindow
 
         action = self.sender()
+
         if action == self.create_KRS and self.table_widget == None:
             self.work_plan = 'krs'
             self.tableWidgetOpen(self.work_plan)
@@ -462,8 +463,8 @@ class MyWindow(QMainWindow):
 
                     self.copy_pz(sheet, self.table_widget, self.work_plan)
 
-                except FileNotFoundError:
-                    mes = QMessageBox.warning(self, 'Ошибка', 'Ошибка при прочтении файла')
+                except FileNotFoundError as f:
+                    mes = QMessageBox.warning(self, 'Ошибка', f'Ошибка при прочтении файла {f}')
         elif action == self.create_KRS_DP and self.table_widget == None:
             self.work_plan = 'dop_plan'
             self.tableWidgetOpen(self.work_plan)
@@ -617,14 +618,13 @@ class MyWindow(QMainWindow):
                 # if action == self.save_file:
                 #     open_pz.open_excel_file().wb.save("test_unmerge.xlsx")
 
-        elif action == self.create_GNKT_frez and self.table_widget != None:
-            mes = QMessageBox.information(self, 'Информация', 'Необходимо закрыть текущий проект')
 
-        elif action == self.save_file:
-            self.save_to_excel()
 
-        elif action == self.save_file_as:
-            self.saveFileDialog(self.wb2)
+        # elif action == self.save_file:
+        #     self.save_to_excel()
+        #
+        # elif action == self.save_file_as:
+        #     self.saveFileDialog(self.wb2)
 
         elif action == self.signatories_Bnd:
             if self.signatures_window is None:
@@ -635,7 +635,6 @@ class MyWindow(QMainWindow):
             else:
                 self.signatures_window.close()
                 self.signatures_window = None
-
 
         elif action == self.without_jamming_TGM_reload:
             costumer = 'ООО Башнефть-добыча'
@@ -720,6 +719,10 @@ class MyWindow(QMainWindow):
 
         elif action == self.application_geophysical:
             pass
+        else:
+            mes = QMessageBox.question(self, 'Информация', 'Необходимо закрыть текущий проект, закрыть?')
+            if mes == QMessageBox.StandardButton.Yes:
+                self.close_file()
 
     def reload_class_well(self, costumer, region):
         from data_base.work_with_base import Classifier_well
@@ -1059,7 +1062,6 @@ class MyWindow(QMainWindow):
 
     def close_file(self):
         from find import ProtectedIsNonNone, ProtectedIsDigit
-
 
         if not self.table_widget is None:
             self.table_widget.clear()
