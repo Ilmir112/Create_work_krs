@@ -406,8 +406,9 @@ class Raid(MyWindow):
                 if acid_true_quest == QMessageBox.StandardButton.Yes:
                     for row in fluid_change(self):
                         ryber_list.insert(-1, row)
-            except:
-                mes = QMessageBox.warning(self, 'ОШИБКА', 'Смена объема вставить не получитлось')
+            except Exception as e:
+
+                mes = QMessageBox.warning(self, 'ОШИБКА', f'Смена объема вставить не получитлось {e}')
 
 
         return ryber_list

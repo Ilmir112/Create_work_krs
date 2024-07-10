@@ -43,7 +43,6 @@ class FindIndexPZ(QMainWindow):
                 well_data.cat_well_max = ProtectedIsDigit(row_ind)
                 well_data.data_well_min = ProtectedIsDigit(row_ind + 1)
 
-
             elif any(['Ожидаемые показатели после' in str(col) for col in row]):
                 well_data.data_x_min = ProtectedIsDigit(row_ind)
                 # print(f' индекс Ожидаемые показатели {well_data.data_x_min}')
@@ -53,11 +52,12 @@ class FindIndexPZ(QMainWindow):
                 well_data.data_fond_min = ProtectedIsDigit(row_ind)
 
             elif any(['VIII. Вид и категория ремонта, его шифр' in str(col) for col in row]):
-                well_data.type_kr = ws.cell(row=row_ind+2, column=1).value
+                type_kr = ws.cell(row=row_ind+2, column=1).value
                 n = 1
-                while well_data.type_kr is None or n > 8:
-                    well_data.type_kr = ws.cell(row=row_ind + 2, column=1 +n).value
+                while type_kr == None and n != 8:
+                    type_kr = ws.cell(row=row_ind + 2, column=1 +n).value
                     n += 1
+                well_data.type_kr =type_kr
 
             elif any(['IX. Мероприятия по предотвращению' in str(col) for col in row]) or \
                     any(['IX. Мероприятия по предотвращению аварий, инцидентов и осложнений::' in str(col) for col in
@@ -198,11 +198,11 @@ class FindIndexPZ(QMainWindow):
 
             else:
                 b = 0
-                for i in str(string):
+                for i in str(string.strip()):
                     i.replace(',', '.')
                     if i in '0123456789,.x':
                         b = str(b) + i
-                        b = float(b)
+                b = float(b)
                 return b
         except:
             mes = QMessageBox.warning(self, 'Ошибка', f'Ошибка в прочтении файла в строке {string}, Проверьте excel файл')
@@ -885,7 +885,8 @@ class Well_data(FindIndexPZ):
 
                                     well_data.shoe_column = ProtectedIsDigit(
                                         FindIndexPZ.check_str_None(self,
-                                                                   data_main_production_string[-1].split('-')[-1]))
+                                                                   data_main_production_string[-1].strip().split('-')[-1]))
+
                                 else:
                                     well_data.shoe_column = ProtectedIsDigit(
                                         FindIndexPZ.check_str_None(self, data_main_production_string[-1]))

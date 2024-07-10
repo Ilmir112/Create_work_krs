@@ -17,7 +17,7 @@ class TabPage_SO_drill(QWidget):
         self.drill_type_label = QLabel("Тип разрушающегося инструмента", self)
         self.drill_type_combo = QComboBox(self)
 
-        drill_type_list = ['долото', 'долото ВС', "фрез торцевой", "фрез кольцевой", "фрез пилотный"]
+        drill_type_list = ['', 'долото трехшарошечное', 'долото ВС', "фрез торцевой", "фрез кольцевой", "фрез пилотный"]
         self.drill_type_combo.addItems(drill_type_list)
 
         self.drill_diametr_label = QLabel("Диаметр долото", self)
@@ -54,7 +54,7 @@ class TabPage_SO_drill(QWidget):
             self.drill_select_combo.setCurrentIndex(1)
             self.drill_diametr_line.setText(str(self.drillingBit_diam_select(well_data.current_bottom)))
 
-        self.roof_drill_label = QLabel("Кровля", self)
+        self.roof_drill_label = QLabel("Текущий забой", self)
         self.roof_drill_line = QLineEdit(self)
         self.roof_drill_line.setText(f'{well_data.current_bottom}')
         self.roof_drill_line.setClearButtonEnabled(True)
@@ -64,11 +64,11 @@ class TabPage_SO_drill(QWidget):
         self.sole_drill_line.setClearButtonEnabled(True)
 
 
-        self.drill_True_label = QLabel("вид разбуриваемого материала", self)
+        self.drill_True_label = QLabel("Тип разбуриваемого материала", self)
         self.drill_label = QLabel("добавление поинтервального бурения", self)
         self.drill_cm_combo = QComboBox(self)
-        self.bottomType_list = ['ЦМ', 'РПК', 'РПП', 'ВП', 'Гипсовых отложений', 'проходимости']
-        self.drill_cm_combo.addItems(self.bottomType_list)
+
+        self.drill_cm_combo.addItems(well_data.bottomType_list)
 
         self.need_privyazka_Label = QLabel("Привязка оборудования", self)
         self.need_privyazka_QCombo = QComboBox()
@@ -81,7 +81,8 @@ class TabPage_SO_drill(QWidget):
         self.grid.addWidget(self.drill_select_combo, 3, 0)
 
         self.grid.addWidget(self.drill_type_label, 2, 1)
-        self.grid.addWidget(self.drill_cm_combo, 3, 1)
+        self.grid.addWidget(self.drill_type_combo, 3, 1)
+
 
         self.grid.addWidget(self.drill_diametr_label, 2, 2)
         self.grid.addWidget(self.drill_diametr_line, 3, 2)
@@ -102,8 +103,7 @@ class TabPage_SO_drill(QWidget):
         self.grid.addWidget(self.sole_drill_line, 8, 1)
         self.grid.addWidget(self.need_privyazka_Label, 2, 6)
         self.grid.addWidget(self.need_privyazka_QCombo, 3, 6)
-        self.grid.addWidget(self.drill_type_combo, 8, 2, 2, 1)
-
+        self.grid.addWidget(self.drill_cm_combo, 8, 2, 2, 1)
 
         self.drill_select_combo.currentTextChanged.connect(self.update_drill_edit)
         self.sole_drill_line.textChanged.connect(self.update_drill_sole)
@@ -177,6 +177,7 @@ class TabWidget(QTabWidget):
 class Drill_window(QMainWindow):
     def __init__(self, ins_ind, table_widget, parent=None):
         super(Drill_window, self).__init__(parent)
+
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
         self.ins_ind = ins_ind
@@ -212,27 +213,36 @@ class Drill_window(QMainWindow):
 
         roof_drill = self.tabWidget.currentWidget().roof_drill_line.text().replace(',', '.')
         sole_drill = self.tabWidget.currentWidget().sole_drill_line.text().replace(',', '.')
+        drill_type = self.tabWidget.currentWidget().drill_cm_combo.currentText()
         drill_type_combo = QComboBox(self)
-        drill_type_combo.addItems(['ЦМ', 'РПК', 'РПП', 'ВП', 'Гипсовых отложений', 'проходимости'])
-        index_drill_True = self.tabWidget.currentWidget().drill_type_combo.currentIndex()
+        drill_type_combo.addItems(well_data.bottomType_list)
+        index_drill_True = well_data.bottomType_list.index(drill_type)
         drill_type_combo.setCurrentIndex(index_drill_True)
 
         if not roof_drill or not sole_drill:
             msg = QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
             return
-        # if well_data.current_bottom < float(sole_drill):
-        #     msg = QMessageBox.information(self, 'Внимание', 'глубина НЭК ниже искусственного забоя')
-        #     return
+        if well_data.bottomhole_drill._value < float(sole_drill):
+            msg = QMessageBox.information(self, 'Внимание', 'глубина НЭК ниже искусственного забоя')
+            return
 
         self.tableWidget.setSortingEnabled(False)
         rows = self.tableWidget.rowCount()
+        if rows > 0:
+            if float(sole_drill) <= float(self.tableWidget.item(rows-1, 1).text()):
+                mes = QMessageBox.warning(self, 'ОШИБКА', ' Планируемая глубина равна или выше текущего забоя')
+                return
         self.tableWidget.insertRow(rows)
+        if rows > 0:
 
-        self.tableWidget.setItem(rows, 0, QTableWidgetItem(roof_drill))
+            roof_int = self.tableWidget.item(rows - 1, 1).text().replace(',', '.')
+            self.tableWidget.setItem(rows, 0, QTableWidgetItem(roof_int))
+        else:
+            self.tableWidget.setItem(rows, 0, QTableWidgetItem(roof_drill))
         self.tableWidget.setItem(rows, 1, QTableWidgetItem(sole_drill))
         self.tableWidget.setCellWidget(rows, 2, drill_type_combo)
-
         self.tableWidget.setSortingEnabled(False)
+
 
     def addString(self):
 
@@ -288,12 +298,17 @@ class Drill_window(QMainWindow):
         try:
             self.nkt_str = self.tabWidget.currentWidget().nkt_str_combo.currentText()
             self.drillingBit_diam = self.tabWidget.currentWidget().drill_diametr_line.text()
+
             self.downhole_motor = self.tabWidget.currentWidget().downhole_motor_line.text()
             self.drill_cm_combo = self.tabWidget.currentWidget().drill_cm_combo.currentText()
             self.drill_type_combo = self.tabWidget.currentWidget().drill_type_combo.currentText()
+            if self.drill_type_combo == '':
+                mes = QMessageBox.warning(self, 'ОШИБКА', 'Выберете тип долото')
+                return
             need_privyazka_QCombo = self.tabWidget.currentWidget().need_privyazka_QCombo.currentText()
-        except:
-            mes = QMessageBox.warning(self, 'ОШИБКА', 'Не все данные введены корректно')
+        except Exception as e:
+            QMessageBox.warning(self, 'Ошибка', f'Не корректное сохранение параметра: {e}')
+
 
         rows = self.tableWidget.rowCount()
         if rows == 0:
@@ -303,23 +318,32 @@ class Drill_window(QMainWindow):
 
 
         for row in range(rows):
-
             roof_drill = self.tableWidget.item(row, 0)
             sole_drill = self.tableWidget.item(row, 1)
             drill_type_combo = self.tableWidget.cellWidget(row, 2)
-
             if roof_drill and sole_drill:
                 roof = int(float(roof_drill.text()))
                 sole = int(float(sole_drill.text()))
                 drill_True = drill_type_combo.currentText()
+                if self.drillingBit_diam != '':
+                    if well_data.column_additional is False or (well_data.column_additional and sole > well_data.head_column_additional._value):
+                        if well_data.column_diametr._value - 2 * well_data.column_wall_thickness._value <= float(
+                                self.drillingBit_diam):
+                            mes = QMessageBox.warning(self, 'ОШИБКА', 'Не корректный диаметр долото')
+                            return
+                    else:
+                        if well_data.column_additional._value - 2 * well_data.column_additional_wall_thickness._value <= float(
+                                self.drillingBit_diam):
+                            mes = QMessageBox.warning(self, 'ОШИБКА', 'Не корректный диаметр долото')
+                            return
 
                 drill_tuple.append((sole, drill_True))
-                roof = sole
+
 
         drill_tuple = sorted(drill_tuple, key=lambda x: x[0])
         if self.nkt_str == 'НКТ':
             drill_list = self.drilling_nkt(drill_tuple, self.drill_type_combo,
-                                           self.drillingBit_diam, self.downhole_motor)
+                                           self.drillingBit_diam, self.downhole_motor, need_privyazka_QCombo)
         elif self.nkt_str == 'СБТ':
             drill_list = self.drilling_sbt(drill_tuple, self.drill_type_combo,
                                            self.drillingBit_diam, self.downhole_motor)
@@ -346,6 +370,7 @@ class Drill_window(QMainWindow):
 
     def drilling_nkt(self, drill_tuple, drill_type_combo, drillingBit_diam, downhole_motor, need_privyazka_QCombo = 'Нет' ):
         from work_py.alone_oreration import privyazkaNKT
+        from work_py.alone_oreration import well_volume
 
         currentBottom = well_data.current_bottom
         current_depth = drill_tuple[-1][0]
@@ -411,9 +436,15 @@ class Drill_window(QMainWindow):
         else:
             for drill_sole, bottomType2 in drill_tuple:
                 # print(drill_sole, self.check_pressure(drill_sole))
-                if self.check_pressure(drill_sole) is True:
-                    for row in self.reply_drilling(drill_sole, bottomType2, drilling_str, nkt_diam):
-                        drilling_list.append(row)
+                for row in self.reply_drilling(drill_sole, bottomType2, drilling_str, nkt_diam):
+                    drilling_list.append(row)
+            drilling_list.append([f'Промыть  {well_data.fluid_work} в объеме '
+                                             f'{round(well_volume(self, well_data.current_bottom) * 2, 1)}м3', None,
+                                             f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {well_data.fluid_work}  '
+                                             f'в присутствии представителя заказчика в объеме '
+                                             f'{round(well_volume(self, well_data.current_bottom) * 2, 1)}м3. Составить акт.',
+                                             None, None, None, None, None, None, None,
+                                             'мастер КРС, предст. заказчика', 1.5])
 
         drilling_list_end = [
             [None, None,
@@ -455,12 +486,17 @@ class Drill_window(QMainWindow):
 
             for row in self.drilling_sbt(drill_tuple, drill_type_combo, drillingBit_diam, downhole_motor):
                 drilling_list.append(row)
+            drilling_list.append([f'Промыть  {well_data.fluid_work} в объеме '
+                                  f'{round(well_volume(self, well_data.current_bottom) * 2, 1)}м3', None,
+                                  f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {well_data.fluid_work}  '
+                                  f'в присутствии представителя заказчика в объеме '
+                                  f'{round(well_volume(self, well_data.current_bottom) * 2, 1)}м3. Составить акт.',
+                                  None, None, None, None, None, None, None,
+                                  'мастер КРС, предст. заказчика', 1.5])
 
         return drilling_list
 
     def reply_drilling(self, current_depth, bottomtype, drilling_str, nkt_diam):
-
-        from work_py.alone_oreration import well_volume
 
         drilling_true_quest_list = [
             [f'Произвести нормализацию {bottomtype} до Н -{current_depth}м', None,
@@ -470,13 +506,6 @@ class Drill_window(QMainWindow):
              f' представителя заказчика.',
              None, None, None, None, None, None, None,
              'Мастер КРС, УСРСиСТ', 8, ],
-            [f'Промыть  {well_data.fluid_work} в объеме '
-             f'{round(well_volume(self, well_data.current_bottom) * 2, 1)}м3', None,
-             f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {well_data.fluid_work}  '
-             f'в присутствии представителя заказчика в объеме '
-             f'{round(well_volume(self, well_data.current_bottom) * 2, 1)}м3. Составить акт.',
-             None, None, None, None, None, None, None,
-             'мастер КРС, предст. заказчика', 1.5],
         ]
 
         if Drill_window.check_pressure(self, current_depth):
@@ -488,8 +517,9 @@ class Drill_window(QMainWindow):
                  f'подтверждением за 2 часа до начала работ) \n'
                  f'В случае негерметичности произвести РИР по согласованию с заказчиком',
                  None, None, None, None, None, None, None,
-                 'Мастер КРС, УСРСиСТ', 0.67]
-            )
+                 'Мастер КРС, УСРСиСТ', 0.67])
+
+
         well_data.current_bottom = current_depth
         return drilling_true_quest_list
 
@@ -571,9 +601,8 @@ class Drill_window(QMainWindow):
         else:
             for drill_sole, bottomType2 in drill_tuple:
                 # print(drill_sole, self.check_pressure(drill_sole))
-                if self.check_pressure(drill_sole) is True:
-                    for row in self.reply_drilling(drill_sole, bottomType2, drilling_str, nkt_diam):
-                        drilling_list.append(row)
+                for row in self.reply_drilling(drill_sole, bottomType2, drilling_str, nkt_diam):
+                    drilling_list.append(row)
         drilling_list_end = [
             [None, None,
              f'ПРИМЕЧАНИЕ: РАСХОД РАБОЧЕЙ ЖИДКОСТИ 8-10 Л/С;'

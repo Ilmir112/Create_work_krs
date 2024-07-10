@@ -681,7 +681,8 @@ class RirWindow(QMainWindow):
         ]
         RirWindow.perf_new(self, roof_rir_edit, sole_rir_edit)
         # print(plast_combo)
-
+        if OpressovkaEK.testing_pressure(self, roof_rir_edit):
+            uzmPero_list.pop(-2)
 
         well_data.current_bottom = roof_rir_edit
 
@@ -872,19 +873,19 @@ class RirWindow(QMainWindow):
         well_data.forPaker_list = None
         return rir_list
 
-    def pero_select(self, sole_rir_edit):
+    def pero_select(self, sole_rir_edit, pero_combo_QCombo = 'перо'):
 
         if well_data.column_additional is False or well_data.column_additional is True \
                 and sole_rir_edit < well_data.head_column_additional._value:
-            pero_select = f'перо + опрессовочное седло + НКТ{well_data.nkt_diam} 20м + репер'
+            pero_select = f'{pero_combo_QCombo} + опрессовочное седло + НКТ{well_data.nkt_diam} 20м + репер'
 
         elif well_data.column_additional is True and well_data.column_additional_diametr._value < 110 \
                 and sole_rir_edit > well_data.head_column_additional._value:
-            pero_select = f'перо + опрессовочное седло + НКТ60мм 20м + репер + НКТ60мм L- ' \
+            pero_select = f'{pero_combo_QCombo} + опрессовочное седло + НКТ60мм 20м + репер + НКТ60мм L- ' \
                           f'{round(sole_rir_edit - well_data.head_column_additional._value, 1)}м'
         elif well_data.column_additional is True and well_data.column_additional_diametr._value > 110 \
                 and sole_rir_edit > well_data.head_column_additional._value:
-            pero_select = f'воронку + опрессовочное седло + НКТ{well_data.nkt_diam}мм со снятыми фасками 20м + ' \
+            pero_select = f'{pero_combo_QCombo} + опрессовочное седло + НКТ{well_data.nkt_diam}мм со снятыми фасками 20м + ' \
                           f'НКТ{well_data.nkt_diam}мм со снятыми фасками' \
                           f' L- {sole_rir_edit - well_data.head_column_additional._value}м'
         return pero_select

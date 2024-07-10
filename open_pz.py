@@ -172,9 +172,9 @@ class CreatePZ(QMainWindow):
                 for i in range(1, len(razdel)):  # Добавлением подписантов на вверху
                     for j in range(1, 13):
                         ws.cell(row=i, column=j).value = razdel[i - 1][j - 1]
-                        ws.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=False)
+                        ws.cell(row=i, column=j).font = Font(name='Arial Cyr', size=13, bold=True)
                     ws.merge_cells(start_row=i, start_column=2, end_row=i, end_column=7)
-                    ws.merge_cells(start_row=i, start_column=8, end_row=i, end_column=13)
+                    ws.merge_cells(start_row=i, start_column=8, end_row=i, end_column=12)
                 well_data.ins_ind = 0
 
                 well_data.ins_ind += well_data.data_well_max._value - well_data.cat_well_min._value + 19
@@ -206,12 +206,14 @@ class CreatePZ(QMainWindow):
                             "о недопустимости нецелевого расхода" in str(data.value):
                         data.alignment = Alignment(wrap_text=True, horizontal='center',
                                                    vertical='center')
-                        data.font = Font(name='Arial', size=13, bold=True)
+                        data.fill = well_data.yellow_fill
+                        data.font = Font(name='Arial Cyr', size=13, bold=True)
 
                     else:
                         data.alignment = Alignment(wrap_text=True, horizontal='left',
                                                    vertical='top')
-                        data.font = Font(name='Arial', size=12)
+
+                        data.font = Font(name='Arial Cyr', size=12)
 
                     if not data.value is None:
                         text = data.value
@@ -228,7 +230,7 @@ class CreatePZ(QMainWindow):
                         ws.row_dimensions[well_data.ins_ind + i - 1].height = None
                         for j in range(1, 12):
                             if i == 1:
-                                ws.cell(row=i + well_data.ins_ind, column=j).font = Font(name='Arial', size=13,
+                                ws.cell(row=i + well_data.ins_ind, column=j).font = Font(name='Arial Cyr', size=13,
                                                                                          bold=True)
                                 ws.cell(row=i + well_data.ins_ind, column=j).alignment = Alignment(wrap_text=False,
                                                                                                    horizontal='center',
@@ -236,7 +238,7 @@ class CreatePZ(QMainWindow):
                                 ws.cell(row=i + well_data.ins_ind, column=j).value = well_data.row_expected[i - 1][
                                     j - 1]
                             else:
-                                ws.cell(row=i + well_data.ins_ind, column=j).font = Font(name='Arial', size=13,
+                                ws.cell(row=i + well_data.ins_ind, column=j).font = Font(name='Arial Cyr', size=13,
                                                                                          bold=True)
                                 ws.cell(row=i + well_data.ins_ind, column=j).alignment = Alignment(wrap_text=False,
                                                                                                    horizontal='left',

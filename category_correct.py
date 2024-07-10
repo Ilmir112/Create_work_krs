@@ -13,6 +13,9 @@ class TabPage_SO(QWidget):
         super().__init__(parent)
 
         self.labels_category = {}
+        self.type_absorbent_label = QLabel('Тип поглотителя')
+        self.type_absorbent = QComboBox()
+        self.type_absorbent.addItems(['ХИМТЕХНО 101 Марка А', 'СНПХ-1200', ' EVASORB марки 121'])
 
         self.plast_all = []
         for plast in well_data.plast_all[::-1]:
@@ -38,6 +41,8 @@ class TabPage_SO(QWidget):
         self.calc_h2s_Label = QLabel('расчет поглотителя H2S')
 
         self.grid = QGridLayout(self)
+        self.grid.addWidget(self.type_absorbent_label , 2, 1)
+        self.grid.addWidget(self.type_absorbent, 3, 1)
         self.grid.addWidget(self.category_pressuar_Label, 5, 1)
         self.grid.addWidget(self.category_h2s_Label, 6, 1)
         self.grid.addWidget(self.category_h2s2_Label, 7, 1)
@@ -147,6 +152,7 @@ class TabPage_SO(QWidget):
                 work_plast_iter = work_plast
 
             calc_plast_h2s = QLineEdit(self)
+
             # print(Category_h2s_edit.text(), h2s_mg_edit.text(), h2s_pr_edit.text())
 
             self.grid.addWidget(plast_index, 4, 1 + n, 1, 2)
@@ -235,7 +241,7 @@ class CategoryWindow(QMainWindow):
         # Пересохранение по сереводорода
 
         cat_P_1 = well_data.cat_P_1
-
+        well_data.type_absorbent = self.tabWidget.currentWidget().type_absorbent.currentText()
         plast_index = []
         Pressuar = namedtuple("Pressuar", "category data_pressuar")
         Data_h2s = namedtuple("Data_h2s", "category data_procent data_mg_l poglot")

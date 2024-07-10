@@ -1,4 +1,5 @@
 import json
+import sqlite3
 import time
 
 from openpyxl.styles import Font, Alignment
@@ -176,31 +177,61 @@ class TabPageDp(QWidget):
         Возвращает список таблиц, имена которых начинаются с заданного префикса.
         """
         prefix = well_number
-        conn = psycopg2.connect(**well_data.postgres_conn_work_well)
-        cursor = conn.cursor()
-        cursor.execute("""
-        SELECT table_name
-        FROM information_schema.tables
-        WHERE table_schema = 'public'
-        AND table_name LIKE %s
-        """, (prefix + '%',))
-
-        tables = [row[0] for row in cursor.fetchall()]
-        tables.insert(0, '')
-
-        cursor.close()
-        if 'Ойл-Сервис' in well_data.contractor:
+        if 'Ойл' in well_data.contractor:
             contractor = 'ОЙЛ'
-        elif 'РН-Сервис' in well_data.contractor:
+        elif 'РН' in well_data.contractor:
             contractor = 'РН'
-        tables_filter = list(filter(lambda x: contractor in x, tables))
-        if len(tables_filter) == 0:
-            tables_filter = tables.insert(0, ' ')
-        try:
-            tables_filter = tables_filter[::-1]
-            return tables_filter
-        except:
-            return
+        if well_data.connect_in_base:
+            conn = psycopg2.connect(**well_data.postgres_conn_work_well)
+            cursor = conn.cursor()
+            cursor.execute("""
+            SELECT table_name
+            FROM information_schema.tables
+            WHERE table_schema = 'public'
+            AND table_name LIKE %s
+            """, (prefix + '%',))
+
+            tables = [row[0] for row in cursor.fetchall()]
+            tables.insert(0, '')
+
+            cursor.close()
+
+            tables_filter = list(filter(lambda x: contractor in x, tables))
+            if len(tables_filter) == 0:
+                tables_filter = tables.insert(0, ' ')
+            try:
+                tables_filter = tables_filter[::-1]
+                return tables_filter
+            except:
+                return
+        else:
+            try:
+                conn = sqlite3.connect('data_base/data_base_well/databaseWell.db')
+                cursor = conn.cursor()
+
+                # Получаем все имена таблиц в базе данных
+                cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
+                tables = [row[0] for row in cursor.fetchall()]
+                tables.insert(0, '')
+
+                # Фильтруем таблицы по префиксу и подрядчику
+                tables_filter = list(filter(lambda x: contractor in x, tables))
+
+                # Добавляем пустую строку в начало списка
+                tables_filter.insert(0, '')
+
+                # Сортируем таблицы в обратном порядке
+                tables_filter = tables_filter[::-1]
+
+                return tables_filter
+
+            except sqlite3.Error as e:
+                print(f"Ошибка получения списка таблиц: {e}")
+            finally:
+                if cursor:
+                    cursor.close()
+                if conn:
+                    conn.close()
 
 
 class TabWidget(QTabWidget):
@@ -369,67 +400,117 @@ class DopPlanWindow(QMainWindow):
                                                                             vertical='center')
 
     def extraction_data(self, table_name, paragraph_row):
-        try:
-            # Устанавливаем соединение с базой данных
-            conn1 = psycopg2.connect(**well_data.postgres_conn_work_well)
+        if 'Ойл' in well_data.contractor:
+            contractor = 'ОЙЛ'
+        elif 'РН' in well_data.contractor:
+            contractor = 'РН'
+        if well_data.connect_in_base:
+            try:
+                # Устанавливаем соединение с базой данных
+                conn1 = psycopg2.connect(**well_data.postgres_conn_work_well)
 
-            cursor1 = conn1.cursor()
+                cursor1 = conn1.cursor()
 
-            if 'Ойл-Сервис' in well_data.contractor:
-                contractor = 'ОЙЛ'
-            elif 'РН-Сервис' in well_data.contractor:
-                contractor = 'РН'
+                # Проверяем наличие таблицы с определенным именем
+                result_table = 0
+                number_dp = int(float(well_data.number_dp)) - 1
+                a = well_data.work_plan
+                if well_data.work_plan in ['krs', 'plan_change']:
+                    work_plan = 'krs'
 
-            # Проверяем наличие таблицы с определенным именем
-            result_table = 0
-            number_dp = int(float(well_data.number_dp)) - 1
-            a = well_data.work_plan
-            if well_data.work_plan in ['krs', 'plan_change']:
-                work_plan = 'krs'
+                    table_name = f'{str(well_data.well_number._value) + " " + well_data.well_area._value + " " + work_plan + " " + contractor}'
 
-                table_name = f'{str(well_data.well_number._value) + " " + well_data.well_area._value + " " + work_plan + " " + contractor}'
+                    # print(cursor1.execute(f"SELECT EXISTS (SELECT FROM information_schema.tables").fetchall())
+                    cursor1.execute(
+                        f"SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = '{table_name}')")
+                    result_table = cursor1.fetchone()
 
-                # print(cursor1.execute(f"SELECT EXISTS (SELECT FROM information_schema.tables").fetchall())
-                cursor1.execute(
-                    f"SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = '{table_name}')")
-                result_table = cursor1.fetchone()
+                elif well_data.work_plan in ['dop_plan', 'dop_plan_in_base']:
 
-            elif well_data.work_plan in ['dop_plan', 'dop_plan_in_base']:
-
-                cursor1.execute(f"SELECT EXISTS (SELECT FROM information_schema.tables "
-                                f"WHERE table_name = '{table_name}')")
-                print(f'имя таблицы в {table_name}')
-                result_table = cursor1.fetchone()
-
-
-            if result_table[0]:
-                well_data.data_in_base = True
-                cursor2 = conn1.cursor()
-
-                cursor2.execute(f'SELECT * FROM "{table_name}"')
-                result = cursor2.fetchall()
-
-                if well_data.work_plan in ['dop_plan', 'dop_plan_in_base']:
-                    DopPlanWindow.insert_data_dop_plan(self, result, paragraph_row)
-                elif well_data.work_plan == 'plan_change':
-                    DopPlanWindow.insert_data_plan(self, result)
-                well_data.data_well_is_True = True
-
-            else:
-                well_data.data_in_base = False
-                mes = QMessageBox.warning(self, 'Проверка наличия таблицы в базе данных',
-                                          f"Таблицы '{table_name}' нет в базе данных.")
+                    cursor1.execute(f"SELECT EXISTS (SELECT FROM information_schema.tables "
+                                    f"WHERE table_name = '{table_name}')")
+                    print(f'имя таблицы в {table_name}')
+                    result_table = cursor1.fetchone()
 
 
-        except psycopg2.Error as e:
-            # Выведите сообщение об ошибке
-            mes = QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных,')
-        finally:
-            # Закройте курсор и соединение
-            if cursor1:
-                cursor1.close()
-            if conn1:
-                conn1.close()
+                if result_table[0]:
+                    well_data.data_in_base = True
+                    cursor2 = conn1.cursor()
+
+                    cursor2.execute(f'SELECT * FROM "{table_name}"')
+                    result = cursor2.fetchall()
+
+                    if well_data.work_plan in ['dop_plan', 'dop_plan_in_base']:
+                        DopPlanWindow.insert_data_dop_plan(self, result, paragraph_row)
+                    elif well_data.work_plan == 'plan_change':
+                        DopPlanWindow.insert_data_plan(self, result)
+                    well_data.data_well_is_True = True
+
+                else:
+                    well_data.data_in_base = False
+                    mes = QMessageBox.warning(self, 'Проверка наличия таблицы в базе данных',
+                                              f"Таблицы '{table_name}' нет в базе данных.")
+
+
+            except psycopg2.Error as e:
+                # Выведите сообщение об ошибке
+                mes = QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных,')
+            finally:
+                # Закройте курсор и соединение
+                if cursor1:
+                    cursor1.close()
+                if conn1:
+                    conn1.close()
+        else:
+            try:
+                conn = sqlite3.connect('data_base/data_base_well/databaseWell.db')
+                cursor = conn.cursor()
+
+                result_table = 0
+
+                if well_data.work_plan in ['krs', 'plan_change']:
+                    work_plan = 'krs'
+                    table_name = f'{str(well_data.well_number._value) + " " + well_data.well_area._value + " " + work_plan + " " + contractor}'
+                    cursor.execute(
+                        f"SELECT name FROM sqlite_master WHERE type='table' AND name=?",
+                        (table_name,))
+                    result_table = cursor.fetchone()
+
+                elif well_data.work_plan in ['dop_plan', 'dop_plan_in_base']:
+                    cursor.execute(
+                        f"SELECT name FROM sqlite_master WHERE type='table' AND name=?",
+                        (table_name,))
+                    result_table = cursor.fetchone()
+
+                if result_table:
+                    well_data.data_in_base = True
+                    cursor2 = conn.cursor()
+
+                    cursor2.execute(f'SELECT * FROM "{table_name}"')
+                    result = cursor2.fetchall()
+
+                    if well_data.work_plan in ['dop_plan', 'dop_plan_in_base']:
+                        DopPlanWindow.insert_data_dop_plan(self, result, paragraph_row)
+                    elif well_data.work_plan == 'plan_change':
+                        DopPlanWindow.insert_data_plan(self, result)
+                    well_data.data_well_is_True = True
+
+                else:
+                    well_data.data_in_base = False
+                    mes = QMessageBox.warning(self, 'Проверка наличия таблицы в базе данных',
+                                              f"Таблицы '{table_name}' нет в базе данных.")
+
+            except sqlite3.Error as e:
+                # Выведите сообщение об ошибке
+                mes = QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных.')
+
+            finally:
+                # Закройте курсор и соединение
+                if cursor:
+                    cursor.close()
+                if conn:
+                    conn.close()
+
         return
 
     def insert_data_dop_plan(self, result, paragraph_row):

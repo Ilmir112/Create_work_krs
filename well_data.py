@@ -1,7 +1,7 @@
 import keyring
+import socket
 from datetime import datetime
-from openpyxl.styles import Border, Side
-
+from openpyxl.styles import Border, Side, PatternFill
 
 
 class ProtectedIsDigit:
@@ -59,15 +59,13 @@ def get_password(service_name, username):
 # password = get_password("zima_app", "postgres")
 password = '195375AsD+'
 
-
+connect_in_base = True
 type_kr = ''
 column_head_m = ''
 date_drilling_cancel = ''
 сommissioning_date = ''
 date_drilling_run = ''
 wellhead_fittings = ''
-well_area = ProtectedIsNonNone('не корректно')
-well_number = ProtectedIsNonNone('не корректно')
 inv_number = ProtectedIsNonNone('не корректно')
 cdng = ProtectedIsNonNone('не корректно')
 gnkt_number = 0
@@ -75,6 +73,8 @@ gnkt_length = 0
 diametr_length = 0
 emergency_bottom = ''
 iznos = 0
+bottomType_list = ['ЦМ', 'РПК', 'РПП', 'ВП', 'Гипсовых отложений', 'проходимости']
+type_absorbent = ''
 pipe_mileage = 0
 pipe_fatigue = 0
 pvo = 0
@@ -108,7 +108,6 @@ column_direction_diametr = ProtectedIsNonNone('не корректно')
 column_direction_wall_thickness = ProtectedIsNonNone('не корректно')
 data_list = []
 problemWithEk_diametr = 220
-cdng = ProtectedIsNonNone('не корректно')
 data_fond_min = ProtectedIsDigit(0)
 cat_well_min = ProtectedIsDigit(0)
 cat_well_max = ProtectedIsDigit(0)
@@ -174,15 +173,11 @@ gaz_f_pr = []
 paker_diametr = 0
 cat_gaz_f_pr = []
 paker_layout = 0
-column_diametr = 0
-column_wall_thickness = 0
-shoe_column = 0
-bottomhole_artificial = 0
+
 max_expected_pressure = 0
 leakiness_Count = 0
 
 expected_pick_up = {}
-current_bottom = 0
 fluid_work = 0
 
 ins_ind = 0
@@ -218,17 +213,17 @@ dict_pump = {"do": '0', "posle": '0'}
 leakiness_interval = []
 dict_pump_h = {"do": 0, "posle": 0}
 
-well_volume_in_PZ = []
 cat_P_1 = []
 costumer = 'ОАО "Башнефть"'
 contractor = ''
-dict_contractor = {'ООО "Ойл-сервис"':
+dict_contractor = {
+    'ООО "Ойл-сервис"':
     {
-        'Дата ПВО': 'от 15.10.2021г'
+        'Дата ПВО': 'от 15.10.2021'
     },
     'ООО "РН-Сервис"':
     {
-        'Дата ПВО': ''
+        'Дата ПВО': '29.10.2021'
     }
 }
 countAcid = 0
@@ -270,7 +265,7 @@ well_oilfield = 0
 template_depth_addition = 0
 template_lenght_addition = 0
 nkt_template = 59
-
+yellow_fill = PatternFill(start_color="FFFF00", end_color="FFFF00", fill_type="solid")
 well_volume_in_PZ = []
 image_list = []
 problemWithEk_depth = 10000
@@ -593,3 +588,68 @@ type_kr_list = [
     'КР13-9  Ремонт водозаборных скважин со спуском дополнительн колонны и промывкой',
     'КР13-10  Ремонт поглощающей скважины'
 ]
+dict_calc_CaCl = {
+    1.01: (14.9, 997),
+    1.02: (29.5, 995),
+    1.03: (44.2, 993),
+    1.04: (58, 991),
+    1.05: (67.3, 988),
+    1.06: (84.4, 984),
+    1.07: (97.6, 980),
+    1.08: (104.5, 976),
+    1.09: (117.4, 973),
+    1.10: (126.8, 970),
+    1.11: (144.5, 965),
+    1.12: (160.5, 957),
+    1.13: (175, 952),
+    1.14: (195.3, 948),
+    1.15: (204.1, 943),
+    1.16: (218.8, 940),
+    1.17: (233.4, 935),
+    1.18: (248, 928),
+    1.19: (264.1, 925.9),
+    1.2: (277.2, 922.8),
+    1.21: (291.8, 918.2),
+    1.22: (306.4, 913.6),
+    1.23: (321.1, 908.9),
+    1.24: (332.9, 907.1),
+    1.25: (351, 899),
+    1.26: (366.4, 893.6),
+    1.27: (382, 888),
+    1.28: (398, 882),
+    1.29: (407.8, 872),
+    1.30: (430.7, 869.3),
+    1.31: (466, 844),
+    1.32: (482, 838)
+    }
+
+dict_calc_CaZHG = {
+    1.33: (498, 832),
+    1.34: (513, 827),
+    1.35: (529, 821),
+    1.36: (545, 815),
+    1.37: (560, 810),
+    1.38: (576, 804),
+    1.39: (592, 798),
+    1.40: (607, 793),
+    1.41: (623, 787),
+    1.42: (639, 781),
+    1.43: (654, 776),
+    1.44: (670, 770),
+    1.45: (686, 764),
+    1.46: (702, 759),
+    1.47: (717, 753),
+    1.48: (733, 747),
+    1.49: (749, 741),
+    1.50: (764, 736),
+    1.51: (780, 730),
+    1.52: (796, 724),
+    1.53: (811, 719),
+    1.54: (827, 713),
+    1.55: (845, 705),
+    1.56: (858, 698),
+    1.57: (880, 690),
+    1.58: (900, 680),
+    1.59: (915, 675),
+    1.60: (928, 667)
+    }

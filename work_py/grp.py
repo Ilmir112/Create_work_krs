@@ -261,7 +261,10 @@ class Grp_window(QMainWindow):
 
     def grpPaker(self, diametr_paker, paker_depth, paker_khost, gisOTZ_true_quest,
                                   normalization_true_quest, current_depth):
-
+        if 'Ойл' in well_data.contractor:
+            schema_grp = '7а'
+        elif 'РН' in well_data.contractor:
+            schema_grp = '6'
 
         nkt_diam = ''.join(['89' if well_data.column_diametr._value > 110 else '60'])
 
@@ -312,7 +315,7 @@ class Grp_window(QMainWindow):
              None, None, None, None, None, None, None,
              'Мастер КРС, заказчик', " "],
             [None, None,
-             f'Демонтировать ПВО. Обвязать устье скважины согласно схемы ПВО №7а утвержденной главным '
+             f'Демонтировать ПВО. Обвязать устье скважины согласно схемы ПВО №{schema_grp} утвержденной главным '
              f'инженером {well_data.contractor} '
              f' {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г для проведения ГРП на месторождениях ООО "БашнефтьДобыча". Посадить планшайбу. '
              f'Произвести демонтаж'

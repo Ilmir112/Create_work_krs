@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 import json
 import os
+import sqlite3
 import sys
+import socket
 
 import psutil
 import psycopg2
@@ -65,10 +67,6 @@ class ExcelWorker(QThread):
     def check_well_existence(self, well_number, deposit_area, region):
 
         try:
-            # Подключение к базе данных SQLite
-            conn = psycopg2.connect(**well_data.postgres_params_classif)
-
-            cursor = conn.cursor()
 
             current_year = datetime.now().year
             month = datetime.now().month
@@ -85,76 +83,150 @@ class ExcelWorker(QThread):
             elif 10 >= month <= 12:
                 date_string = datetime(current_year, 10, 1).strftime('%d.%m.%Y')
                 print(f'Корректная таблица перечня без глушения от {date_string}')
+            if well_data.connect_in_base:
+                # Подключение к базе данных SQLite
+                conn = psycopg2.connect(**well_data.postgres_params_classif)
 
-            # Проверка наличия записи в базе данных
-            cursor.execute(f"SELECT *  FROM {region} WHERE today=(%s)", (date_string,))
+                cursor = conn.cursor()
+                # Проверка наличия записи в базе данных
+                cursor.execute(f"SELECT *  FROM {region} WHERE today=(%s)", (date_string,))
 
-            result = cursor.fetchone()
+                result = cursor.fetchone()
 
-            if result is None:
-                mes = QMessageBox.warning(self, 'Некорректная дата перечня',
-                                          f'Необходимо обновить перечень скважин без '
-                                          f'глушения на текущий квартал {region}')
-            # Проверка наличия записи в базе данных
-            cursor.execute(f"SELECT * FROM {region} WHERE well_number=(%s) AND deposit_area=(%s)",
-                           (str(well_number), deposit_area))
-            result = cursor.fetchone()
-            # Закрытие соединения с базой данных
+                if result != None:
+                    mes = QMessageBox.warning(self, 'Некорректная дата перечня',
+                                              f'Необходимо обновить перечень скважин без '
+                                              f'глушения на текущий квартал {region}')
+                    well_data.pause = True
+                    MyWindow.pause_app()
+                    return
 
-            print(f'проверка {result}')
-            print(f' база данных закрыта')
 
-            # Если запись найдена, возвращается True, в противном случае возвращается False
-            if result:
-                mes = QMessageBox.information(None, 'перечень без глушения',
-                                              f'Скважина состоит в перечне скважин без глушения на текущий квартал, '
-                                              f'в перечне от  {region}')
-                check_true = True
+                try:
+                    # Проверка наличия записи в базе данных
+                    cursor.execute(f"SELECT * FROM {region} WHERE well_number=(%s) AND deposit_area=(%s)",
+                                   (str(well_number), deposit_area))
+                    result = cursor.fetchone()
+                    # Закрытие соединения с базой данных
+
+                    print(f'проверка {result}')
+                    print(f' база данных закрыта')
+
+                    # Если запись найдена, возвращается True, в противном случае возвращается False
+                    if result:
+                        mes = QMessageBox.information(None, 'перечень без глушения',
+                                                      f'Скважина состоит в перечне скважин без глушения на текущий квартал, '
+                                                      f'в перечне от  {region}')
+                        check_true = True
+                    else:
+                        check_true = False
+                except psycopg2.Error as e:
+                    # Выведите сообщение об ошибке
+                    mes = QMessageBox.warning(self, 'Ошибка', f'Ошибка подключения к базе данных {e}')
+                finally:
+                    # Закройте курсор и соединение
+                    if cursor:
+                        cursor.close()
+                    if conn:
+                        conn.close()
             else:
-                check_true = False
-        except psycopg2.Error as e:
-            # Выведите сообщение об ошибке
-            mes = QMessageBox.warning(self, 'Ошибка', 'Ошибка подключения к базе данных')
-        finally:
-            # Закройте курсор и соединение
-            if cursor:
-                cursor.close()
-            if conn:
-                conn.close()
+                try:
+                    conn = sqlite3.connect('data_base/databaseclassification.db')
+                    cursor = conn.cursor()
+
+                    # Проверка наличия записи с указанной датой
+                    cursor.execute(f"SELECT * FROM {region} WHERE today=?", (date_string,))
+                    result_date = cursor.fetchone()
+
+                    if result_date is None:
+                        QMessageBox.warning(None, 'Некорректная дата перечня',
+                                            f'Необходимо обновить перечень скважин без '
+                                            f'глушения на текущий квартал {region}')
+                        return False  # Возвращаем False, если запись с датой не найдена
+
+                    # Проверка наличия записи о скважине
+                    cursor.execute(f"SELECT * FROM {region} WHERE well_number=? AND deposit_area=?",
+                                   (str(well_number), deposit_area))
+                    result_well = cursor.fetchone()
+
+                    if result_well:
+                        QMessageBox.information(None, 'перечень без глушения',
+                                                f'Скважина состоит в перечне скважин без глушения на текущий квартал, '
+                                                f'в перечне от  {region}')
+                        check_true = True  # Возвращаем True, если запись о скважине найдена
+                    else:
+                        check_true = False  # Возвращаем False, если запись о скважине не найдена
+
+                except sqlite3.Error as e:
+                    QMessageBox.warning(None, 'Ошибка', f"Ошибка при проверке записи: {e}")
+                    return False  # Возвращаем False в случае ошибки
+
+                finally:
+                    if cursor:
+                        cursor.close()
+                    if conn:
+                        conn.close()
+        except Exception as e:
+            QMessageBox.warning(None, 'Ошибка', f"Ошибка при проверке записи: {e}")
 
         # Завершение работы потока
         self.finished.emit()
         return check_true
 
     def check_category(self, well_number, deposit_area, region):
-        try:
-            # Подключение к базе данных
-            conn = psycopg2.connect(**well_data.postgres_params_classif)
+        if well_data.connect_in_base:
+            try:
+                # Подключение к базе данных
+                conn = psycopg2.connect(**well_data.postgres_params_classif)
 
-            cursor = conn.cursor()
+                cursor = conn.cursor()
 
-            # Проверка наличия записи в базе данных
-            cursor.execute(f"SELECT categoty_pressure, categoty_h2s, categoty_gf, today FROM {region}_классификатор "
-                           f"WHERE well_number =(%s) and deposit_area =(%s)",
-                           (str(well_number._value), deposit_area._value))
+                # Проверка наличия записи в базе данных
+                cursor.execute(f"SELECT categoty_pressure, categoty_h2s, categoty_gf, today FROM {region}_классификатор "
+                               f"WHERE well_number =(%s) and deposit_area =(%s)",
+                               (str(well_number._value), deposit_area._value))
 
-            result = cursor.fetchone()
-            # print(result)
-            # Закрытие соединения с базой данных
-            conn.close()
-            # # Завершение работы потока
-            # ExcelWorker.finished.emit()
-        except psycopg2.Error as e:
-            # Выведите сообщение об ошибке
-            mes = QMessageBox.warning(self, 'Ошибка', 'Ошибка подключения к базе данных, не получилось проверить '
-                                                      'корректность категории')
-            return
-        finally:
-            # Закройте курсор и соединение
-            if cursor:
-                cursor.close()
-            if conn:
+                result = cursor.fetchone()
+                # print(result)
+                # Закрытие соединения с базой данных
                 conn.close()
+                # # Завершение работы потока
+                # ExcelWorker.finished.emit()
+            except psycopg2.Error as e:
+                # Выведите сообщение об ошибке
+                mes = QMessageBox.warning(self, 'Ошибка', f'Ошибка подключения к базе данных, не получилось проверить '
+                                                          f'корректность категории {e}')
+                return
+            finally:
+                # Закройте курсор и соединение
+                if cursor:
+                    cursor.close()
+                if conn:
+                    conn.close()
+        else:
+            try:
+                conn = sqlite3.connect('data_base/databaseclassification.db')
+                cursor = conn.cursor()
+
+                cursor.execute(
+                    f"SELECT categoty_pressure, categoty_h2s, categoty_gf, today FROM {region}_классификатор "
+                    f"WHERE well_number=? AND deposit_area=?",
+                    (str(well_number._value), deposit_area._value))
+                result = cursor.fetchone()
+
+                if result is False:
+                    QMessageBox.warning(None, 'Ошибка', 'Не удалось найти запись о классификации скважины.')
+
+
+            except sqlite3.Error as e:
+                QMessageBox.warning(None, 'Ошибка', f'Ошибка подключения к базе данных: {e}')
+                return None  # Возвращаем None в случае ошибки подключения
+
+            finally:
+                if cursor:
+                    cursor.close()
+                if conn:
+                    conn.close()
         return result
 
 
@@ -192,6 +264,8 @@ class MyWindow(QMainWindow):
 
         threading.Timer(2.0, self.close_splash).start()
 
+        well_data.connect_in_base = self.check_connection(well_data.host_krs)
+
         self.log_widget = QPlainTextEditLogger(self)
         logger.addHandler(self.log_widget)
         self.setCentralWidget(self.log_widget.widget)
@@ -206,15 +280,7 @@ class MyWindow(QMainWindow):
         # self.thread.started.connect(self.excepthook.handleException)
         self.thread.start()
 
-        try:
-            if self.login_window == None:
-                self.login_window = LoginWindow()
-                self.login_window.show()
-                self.pause_app()
-                well_data.pause = False
-        except Exception as e:
-            mes = QMessageBox.warning(self, 'КРИТИЧЕСКАЯ ОШИБКА', 'Критическая ошибка, смотри в лог')
-            self.excepthook._exception_caught.emit(e)
+
     @staticmethod
     def check_process():
         count_zima = 0
@@ -239,6 +305,21 @@ class MyWindow(QMainWindow):
                                      QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if reply == QMessageBox.Yes:
             MyWindow.close_process()
+
+    @staticmethod
+
+    def check_connection(host, port=5432):
+        """Проверяет соединение с удаленным хостом по указанному порту."""
+        try:
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.settimeout(2)  # Устанавливаем таймаут 2 секунды
+            sock.connect((host, port))
+            sock.close()
+            return True
+        except socket.error:
+            return False
+
+    # Остальная часть кода...
 
     def initUI(self):
 
@@ -301,9 +382,9 @@ class MyWindow(QMainWindow):
         self.create_GNKT_GRP = self.create_GNKT.addAction('Освоение после ГРП', self.action_clicked)
         self.create_GNKT_BOPZ = self.create_GNKT.addAction('БОПЗ ГНКТ', self.action_clicked)
         self.create_PRS = self.create_file.addAction('План ПРС', self.action_clicked)
-        self.open_file = self.fileMenu.addAction('Открыть', self.action_clicked)
-        self.save_file = self.fileMenu.addAction('Сохранить', self.action_clicked)
-        self.save_file_as = self.fileMenu.addAction('Сохранить как', self.action_clicked)
+        # self.open_file = self.fileMenu.addAction('Открыть', self.action_clicked)
+        # self.save_file = self.fileMenu.addAction('Сохранить', self.action_clicked)
+        # self.save_file_as = self.fileMenu.addAction('Сохранить как', self.action_clicked)
 
         self.class_well = self.classifierMenu.addMenu('&ООО Башнефть-Добыча')
         self.costumer_class_well = self.class_well.addMenu('Классификатор')
@@ -311,43 +392,48 @@ class MyWindow(QMainWindow):
 
         self.class_well_TGM = self.costumer_class_well.addMenu('&Туймазинский регион')
         self.class_well_TGM_open = self.class_well_TGM.addAction('&открыть перечень', self.action_clicked)
-        self.class_well_TGM_reload = self.class_well_TGM.addAction('&обновить', self.action_clicked)
 
         self.class_well_IGM = self.costumer_class_well.addMenu('&Ишимбайский регион')
+
         self.class_well_IGM_open = self.class_well_IGM.addAction('&открыть перечень', self.action_clicked)
-        self.class_well_IGM_reload = self.class_well_IGM.addAction('&обновить', self.action_clicked)
 
         self.class_well_CHGM = self.costumer_class_well.addMenu('&Чекмагушевский регион')
         self.class_well_CHGM_open = self.class_well_CHGM.addAction('&открыть перечень', self.action_clicked)
-        self.class_well_CHGM_reload = self.class_well_CHGM.addAction('&обновить', self.action_clicked)
 
         self.class_well_KGM = self.costumer_class_well.addMenu('&Краснохолмский регион')
         self.class_well_KGM_open = self.class_well_KGM.addAction('&открыть перечень', self.action_clicked)
-        self.class_well_KGM_reload = self.class_well_KGM.addAction('&обновить', self.action_clicked)
+
 
         self.class_well_AGM = self.costumer_class_well.addMenu('&Арланский регион')
         self.class_well_AGM_open = self.class_well_AGM.addAction('&открыть перечень', self.action_clicked)
-        self.class_well_AGM_reload = self.class_well_AGM.addAction('&обновить', self.action_clicked)
+
 
         self.without_jamming_TGM = self.costumer_select.addMenu('&Туймазинский регион')
         self.without_jamming_TGM_open = self.without_jamming_TGM.addAction('&открыть перечень', self.action_clicked)
-        self.without_jamming_TGM_reload = self.without_jamming_TGM.addAction('&обновить', self.action_clicked)
 
         self.without_jamming_IGM = self.costumer_select.addMenu('&Ишимбайский регион')
         self.without_jamming_IGM_open = self.without_jamming_IGM.addAction('&открыть перечень', self.action_clicked)
-        self.without_jamming_IGM_reload = self.without_jamming_IGM.addAction('&обновить', self.action_clicked)
 
         self.without_jamming_CHGM = self.costumer_select.addMenu('&Чекмагушевский регион')
         self.without_jamming_CHGM_open = self.without_jamming_CHGM.addAction('&открыть перечень', self.action_clicked)
-        self.without_jamming_CHGM_reload = self.without_jamming_CHGM.addAction('&обновить', self.action_clicked)
 
         self.without_jamming_KGM = self.costumer_select.addMenu('&Краснохолмский регион')
         self.without_jamming_KGM_open = self.without_jamming_KGM.addAction('&открыть перечень', self.action_clicked)
-        self.without_jamming_KGM_reload = self.without_jamming_KGM.addAction('&обновить', self.action_clicked)
 
         self.without_jamming_AGM = self.costumer_select.addMenu('&Арланский регион')
         self.without_jamming_AGM_open = self.without_jamming_AGM.addAction('&открыть перечень', self.action_clicked)
-        self.without_jamming_AGM_reload = self.without_jamming_AGM.addAction('&обновить', self.action_clicked)
+
+        if 'Зуфаров И.М.' in well_data.user[1]:
+            self.class_well_TGM_reload = self.class_well_TGM.addAction('&обновить', self.action_clicked)
+            self.class_well_IGM_reload = self.class_well_IGM.addAction('&обновить', self.action_clicked)
+            self.class_well_CHGM_reload = self.class_well_CHGM.addAction('&обновить', self.action_clicked)
+            self.class_well_KGM_reload = self.class_well_KGM.addAction('&обновить', self.action_clicked)
+            self.class_well_AGM_reload = self.class_well_AGM.addAction('&обновить', self.action_clicked)
+            self.without_jamming_TGM_reload = self.without_jamming_TGM.addAction('&обновить', self.action_clicked)
+            self.without_jamming_IGM_reload = self.without_jamming_IGM.addAction('&обновить', self.action_clicked)
+            self.without_jamming_CHGM_reload = self.without_jamming_CHGM.addAction('&обновить', self.action_clicked)
+            self.without_jamming_KGM_reload = self.without_jamming_KGM.addAction('&обновить', self.action_clicked)
+            self.without_jamming_AGM_reload = self.without_jamming_AGM.addAction('&обновить', self.action_clicked)
 
         self.signatories_Bnd = self.signatories.addAction('&БашНефть-Добыча', self.action_clicked)
 
@@ -699,12 +785,10 @@ class MyWindow(QMainWindow):
     def open_class_well(self, costumer, region):
         from data_base.work_with_base import Classifier_well
         if self.new_window is None:
-
             self.new_window = Classifier_well(costumer, region, 'classifier_well')
             self.new_window.setWindowTitle("Классификатор")
             self.new_window.setGeometry(200, 400, 300, 400)
             self.new_window.show()
-
         else:
             self.new_window.close()  # Close window.
             self.new_window = None  # Discard reference.
@@ -773,9 +857,9 @@ class MyWindow(QMainWindow):
                                                       f"{full_path}", "Excel Files (*.xlsx)")
             if fileName:
                 wb2.save(fileName)
+        except Exception as e:
 
-        except:
-            mes = QMessageBox.critical(self, 'Ошибка', 'файл под таким именем открыт, закройте его')
+            mes = QMessageBox.critical(self, 'Ошибка', f'файл под таким именем открыт, закройте его: {e}')
         try:
             # Создаем объект Excel
             excel = win32com.client.Dispatch("Excel.Application")
@@ -930,8 +1014,13 @@ class MyWindow(QMainWindow):
                 path = 'D:/Documents/Desktop/ГТМ'
             else:
                 path = ""
+
+            if 'РН' in well_data.contractor:
+                contractor = 'РН'
+            elif 'Ойл' in well_data.contractor:
+                contractor = 'РН'
             if self.work_plan in ['dop_plan', 'dop_plan_in_base']:
-                string_work = f' № {well_data.number_dp}'
+                string_work = f' ДП№ {well_data.number_dp}'
             elif self.work_plan == 'krs':
                 string_work = 'ПР'
             elif self.work_plan == 'plan_change':
@@ -947,7 +1036,7 @@ class MyWindow(QMainWindow):
 
             filenames = f"{well_data.well_number._value} {well_data.well_area._value} кат " \
                         f"{well_data.category_pressuar} " \
-                        f"{string_work}.xlsx"
+                        f"{string_work} {contractor}.xlsx"
             full_path = path + "/" + filenames
 
             if well_data.bvo and self.work_plan != 'dop_plan':
@@ -1292,6 +1381,10 @@ class MyWindow(QMainWindow):
         mkp_action = QAction('Ревизия МКП')
         alone_menu.addAction(mkp_action)
         mkp_action.triggered.connect(self.mkp_revision)
+
+        block_pack_action = QAction('Блок пачка')
+        alone_menu.addAction(block_pack_action)
+        block_pack_action.triggered.connect(self.block_pack)
 
         konte_action = QAction('Канатные технологии')
         alone_menu.addAction(konte_action)
@@ -1777,11 +1870,24 @@ class MyWindow(QMainWindow):
             self.work_window.close()  # Close window.
             self.work_window = None
 
-    def template_pero(self):
-        from work_py.template_work import TemplateKrs
+    def block_pack(self):
+        from work_py.block_pack_work import BlockPackWindow
 
-        template_pero_list = TemplateKrs.pero(self)
-        self.populate_row(self.ins_ind, template_pero_list, self.table_widget)
+        self.work_window = BlockPackWindow(well_data.ins_ind, self.table_widget)
+        # self.work_window.setGeometry(200, 400, 500, 500)
+        self.work_window.show()
+        self.pause_app()
+        well_data.pause = True
+        self.work_window = None
+    def template_pero(self):
+        from work_py.pero_work import PeroWindow
+
+        self.work_window = PeroWindow(well_data.ins_ind, self.table_widget)
+        # self.work_window.setGeometry(200, 400, 500, 500)
+        self.work_window.show()
+        self.pause_app()
+        well_data.pause = True
+        self.work_window = None
 
     def template_with_skm(self):
         from work_py.template_work import TemplateKrs
@@ -1892,11 +1998,9 @@ class MyWindow(QMainWindow):
                     if value != None:
                         value = value.text()
 
-                        if 'схеме №' in value or 'схемы №' in value or 'Схемы обвязки №' in value:
-
+                        if 'схеме №' in value or 'схемы №' in value or 'Схемы обвязки №' in value or 'схемы ПВО №' in value:
                             number_schema = value[value.index(' №') + 1:value.index(' №') + 4].replace(' ', '')
-                            if '1' in number_schema:
-                                number_schema = "2"
+
                             schema_pvo_set.add(number_schema)
         # print(f'схема ПВО {schema_pvo_set}')
 
@@ -1904,13 +2008,19 @@ class MyWindow(QMainWindow):
         if schema_pvo_set:
             for schema in list(schema_pvo_set):
                 coordinate = f'{get_column_letter(2)}{1 + n}'
-                schema_path = f'{well_data.path_image}imageFiles/pvo/oil/схема {schema}.jpg'
-                img = openpyxl.drawing.image.Image(schema_path)
-                img.width = 750
-                img.height = 530
-                img.anchor = coordinate
-                ws5.add_image(img, coordinate)
-                n += 29
+                if 'Ойл' in well_data.contractor:
+                    schema_path = f'{well_data.path_image}imageFiles/pvo/oil/схема {schema}.jpg'
+                elif 'РН' in well_data.contractor:
+                    schema_path = f'{well_data.path_image}imageFiles/pvo/rn/схема {schema}.png'
+                try:
+                    img = openpyxl.drawing.image.Image(schema_path)
+                    img.width = 750
+                    img.height = 530
+                    img.anchor = coordinate
+                    ws5.add_image(img, coordinate)
+                    n += 29
+                except FileNotFoundError as f:
+                    mes = QMessageBox.warning(self, 'Ошибка', f'Схему {schema} не удалось вставилось:\n {f}')
             ws5.print_area = f'B1:M{n}'
             ws5.page_setup.fitToPage = True
             ws5.page_setup.fitToHeight = False
@@ -2429,11 +2539,26 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     if MyWindow.check_process():
        MyWindow.show_confirmation()
+    try:
+
+
+        if well_data.connect_in_base is False:
+            mes = QMessageBox.information(None, 'Проверка соединения',
+                                          'Проверка показало что с облаком соединения нет, '
+                                          'будет использована локальная база данных')
+        MyWindow.login_window = LoginWindow()
+        MyWindow.login_window.show()
+        MyWindow.pause_app()
+        well_data.pause = False
+    except Exception as e:
+        mes = QMessageBox.warning(None, 'КРИТИЧЕСКАЯ ОШИБКА', f'Критическая ошибка, смотри в лог {e}')
+
     window = MyWindow()
     window.show()
-    app2 = UpdateChecker()
-    app2.check_version()
-    if app2.window_close == True:
-        print(f'локом {UpdateChecker.window_close}')
-        app2.show()
+
+    # app2 = UpdateChecker()
+    # app2.check_version()
+    # if app2.window_close == True:
+    #     print(f'локом {UpdateChecker.window_close}')
+    #     app2.show()
     sys.exit(app.exec_())

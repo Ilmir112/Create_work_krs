@@ -723,18 +723,7 @@ class DataWindow(QMainWindow):
             mes = QMessageBox.warning(self, 'ОШИБКА', 'Не выбран Вид и категория ремонта')
             return
 
-        if type_kr_Combo in ['КР13-1  Подготовительные работы к ГРП (ПР)',
-                            'КР13-2  Освоение скважины после ГРП (ЗР)',
-                            'КР13-1  Подготовительные работы к ГРП (ПР) КР13-2  Освоение скважины после ГРП (ЗР)',
-                            'КР13-5  Подготовка скважины к проведению работ по повышению н/отдачи пластов',
-                            'КР13-6  Подготовительные работы к ГГРП (ПР)',
-                            'КР13-7  Заключительные работы (ЗР) после ГГРП (освоение скважины и т.д.)',
-                             'КР7-2  Проведение ГРП',
-                             'КР7-3  Проведение ГГРП',
-                             'КР7-4  Проведение ГПП']:
-            well_data.grp_plan = True
-        else:
-            well_data.grp_plan = False
+
         columnType = self.tabWidget.currentWidget().columnType.text()
         column_wall_thickness = self.tabWidget.currentWidget().column_wall_thicknessEditType2.text()
         shoe_column = self.tabWidget.currentWidget().shoe_columnEditType2.text()
@@ -954,6 +943,19 @@ class DataWindow(QMainWindow):
                 msg = QMessageBox.information(self, 'Внимание', 'Ошибка в диаметре доп колонны')
                 close_file = False
 
+        if type_kr_Combo in ['КР13-1  Подготовительные работы к ГРП (ПР)',
+                             'КР13-2  Освоение скважины после ГРП (ЗР)',
+                             'КР13-1  Подготовительные работы к ГРП (ПР) КР13-2  Освоение скважины после ГРП (ЗР)',
+                             'КР13-5  Подготовка скважины к проведению работ по повышению н/отдачи пластов',
+                             'КР13-6  Подготовительные работы к ГГРП (ПР)',
+                             'КР13-7  Заключительные работы (ЗР) после ГГРП (освоение скважины и т.д.)',
+                             'КР7-2  Проведение ГРП',
+                             'КР7-3  Проведение ГГРП',
+                             'КР7-4  Проведение ГПП']:
+            well_data.grp_plan = True
+        else:
+            well_data.grp_plan = False
+
         if curator == 'ОР':
             if self.ifNum(expected_Q_edit) is False or self.ifNum(expected_P_edit) is False:
                 msg = QMessageBox.information(self, 'Внимание',
@@ -965,6 +967,10 @@ class DataWindow(QMainWindow):
                 msg = QMessageBox.information(self, 'Внимание',
                                               'Не все поля в Ожидаемых показателях соответствуют значениям')
                 close_file = False
+
+        if float(shoe_column) < 30:
+            mes = QMessageBox.warning(self, 'Ошибка', 'Башмак ЭК слишком короткий')
+            return
         if close_file is False:
             return
         elif close_file is True:

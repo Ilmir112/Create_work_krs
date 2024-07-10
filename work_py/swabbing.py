@@ -737,6 +737,10 @@ class Swab_Window(QMainWindow):
         self.close()
 
     def swabbing_opy_with_paker(self, diametr_paker, paker_khost, paker_depth, depth_opy):
+        if 'Ойл' in well_data.contractor:
+            schema_swab = '8'
+        elif 'РН' in well_data.contractor:
+            schema_swab = '7'
         if MyWindow.check_true_depth_template(self, paker_depth) is False:
             return
         if MyWindow.true_set_Paker(self, paker_depth) is False:
@@ -810,8 +814,8 @@ class Swab_Window(QMainWindow):
              None, None, None, None, None, None, None,
              'мастер КРС', None],
             [None, None,
-             f'Произвести  монтаж СВАБа согласно схемы  №8 при свабированиии утвержденной главным инженером от '
-             f'14.10.2021г. '
+             f'Произвести  монтаж СВАБа согласно схемы №{schema_swab} при свабированиии утвержденной главным инженером от '
+             f'{well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}. '
              f'Обвязать устье скважины с ЕДК на жесткую линию. Опрессовать ПВО максимально допустимое давление '
              f'опрессовки э/колонны на устье {well_data.max_admissible_pressure._value}атм,'
              f' по невозможности на давление поглощения, но не менее 30атм в течении 30мин Провести практическое '
@@ -907,6 +911,11 @@ class Swab_Window(QMainWindow):
         elif nkt_diam == 60:
             dict_nkt = {60: depth_opy}
 
+        if 'Ойл' in well_data.contractor:
+            schema_swab = '8'
+        elif 'РН' in well_data.contractor:
+            schema_swab = '7'
+
         paker_list = [
             [f'СПО {paker_short}до глубины {well_data.current_bottom}м', None,
              f'Спустить {paker_select} на НКТ{nkt_diam}м  до глубины {well_data.current_bottom}м'
@@ -938,7 +947,8 @@ class Swab_Window(QMainWindow):
              None, None, None, None, None, None, None,
              'мастер КРС', None],
             [None, None,
-             f'Произвести  монтаж СВАБа согласно схемы  №8 при свабированиии утвержденной главным инженером  {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г. '
+             f'Произвести  монтаж СВАБа согласно схемы №{schema_swab} при свабированиии утвержденной главным инженером '
+             f'{well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г. '
              f'Обвязать устье скважины с ЕДК на жесткую линию. Опрессовать ПВО максимально допустимое'
              f' давление опрессовки э/колонны на устье {well_data.max_admissible_pressure._value}атм,'
              f' по невозможности на давление поглощения, но не менее 30атм в течении 30мин Провести практическое '
@@ -1094,7 +1104,10 @@ class Swab_Window(QMainWindow):
             dict_nkt = {int(nkt_diam): paker_depth + paker_khost}
         elif nkt_diam == 60:
             dict_nkt = {60: paker_depth + paker_khost}
-
+        if 'Ойл' in well_data.contractor:
+            schema_swab = '8'
+        elif 'РН' in well_data.contractor:
+            schema_swab = '7'
         paker_list = [
             [f'СПО {paker_short} на НКТ{nkt_diam}м до H- {paker_depth}м, заглушкой до {paker_depth + paker_khost}м',
              None,
@@ -1116,7 +1129,8 @@ class Swab_Window(QMainWindow):
              None, None, None, None, None, None, None,
              'мастер КРС', None],
             [None, None,
-             f'Произвести  монтаж СВАБа согласно схемы  №8 при свабированиии утвержденной главным инженером  {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г.'
+             f'Произвести  монтаж СВАБа согласно схемы №{schema_swab} при свабированиии утвержденной главным инженером '
+             f'{well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г.'
              f'Обвязать устье скважины с ЕДК на жесткую линию. Опрессовать ПВО на максимально допустимое '
              f'давление на устье {well_data.max_admissible_pressure._value}атм,'
              f' по невозможности на давление поглощения, но не менее 30атм в течении 30мин Провести '
@@ -1235,6 +1249,10 @@ class Swab_Window(QMainWindow):
             dict_nkt = {int(nkt_diam): paker_depth + paker_khost}
         elif nkt_diam == 60:
             dict_nkt = {60: paker_depth + paker_khost}
+        if 'Ойл' in well_data.contractor:
+            schema_swab = '8'
+        elif 'РН' in well_data.contractor:
+            schema_swab = '7'
 
         paker_list = [
             [f'СПО {paker_short} на НКТ{nkt_diam}м до H- {paker_depth}м, воронкой до {paker_depth + paker_khost}м',
@@ -1268,7 +1286,8 @@ class Swab_Window(QMainWindow):
              None, None, None, None, None, None, None,
              'мастер КРС', None],
             [None, None,
-             f'Произвести  монтаж СВАБа согласно схемы  №8 при свабированиии утвержденной главным инженером  {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г.'
+             f'Произвести  монтаж СВАБа согласно схемы №{schema_swab} при свабированиии утвержденной главным инженером '
+             f'{well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г.'
              f'Обвязать устье скважины с ЕДК на жесткую линию. Опрессовать ПВО на максимально допустимое '
              f'давление на устье {well_data.max_admissible_pressure._value}атм,'
              f' по невозможности на давление поглощения, но не менее 30атм в течении 30мин Провести '
@@ -1389,7 +1408,10 @@ class Swab_Window(QMainWindow):
             dict_nkt = {73: paker1_depth + paker_khost}
         elif nkt_diam == 60:
             dict_nkt = {60: paker1_depth + paker_khost}
-
+        if 'Ойл' in well_data.contractor:
+            schema_swab = '8'
+        elif 'РН' in well_data.contractor:
+            schema_swab = '7'
         paker_list = [
             [f'Спуск {paker_short} до глубины {paker1_depth}/{paker2_depth}м', None,
              f'Спустить {paker_select} на НКТ{nkt_diam}м до глубины {paker1_depth}/{paker2_depth}м'
@@ -1421,10 +1443,12 @@ class Swab_Window(QMainWindow):
              None, None, None, None, None, None, None,
              'мастер КРС', None],
             [None, None,
-             f'Произвести  монтаж СВАБа согласно схемы  №8 при свабированиии утвержденной главным инженером  {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г. '
-             f'Обвязать устье скважины с ЕДК на жесткую линию. Опрессовать ПВО на максимально допустимое давление на устье {well_data.max_admissible_pressure._value}атм,'
-             f' по невозможности на давление поглощения, но не менее 30атм в течении 30мин Провести практическое обучение вахт по '
-             f'сигналу "выброс" с записью в журнале проведения учебных тревог',
+             f'Произвести  монтаж СВАБа согласно схемы №{schema_swab} при свабированиии утвержденной главным инженером '
+             f'{well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г. '
+             f'Обвязать устье скважины с ЕДК на жесткую линию. Опрессовать ПВО на максимально допустимое давление на '
+             f'устье {well_data.max_admissible_pressure._value}атм,'
+             f' по невозможности на давление поглощения, но не менее 30атм в течении 30мин Провести практическое '
+             f'обучение вахт по сигналу "выброс" с записью в журнале проведения учебных тревог',
              None, None, None, None, None, None, None,
              'Мастер КРС, подрядчик по ГИС', 1.3],
             [swab_short, None,
@@ -1503,7 +1527,10 @@ class Swab_Window(QMainWindow):
             paker_select = f'воронку со свабоограничителем  + НКТ{60}мм  + НКТ60мм 10м '
             paker_short = f'в/у + НКТ{60}мм  + НКТ60мм 10м + {round(paker_depth - well_data.head_column_additional._value, 1)}м {depthGauge}'
             dict_nkt = {60: paker_depth}
-
+        if 'Ойл' in well_data.contractor:
+            schema_swab = '8'
+        elif 'РН' in well_data.contractor:
+            schema_swab = '7'
         paker_list = [
             [paker_short, None,
              f'Спустить {paker_select} на НКТ{nkt_diam}м  воронкой до {paker_depth}м'
@@ -1518,10 +1545,12 @@ class Swab_Window(QMainWindow):
              None, None, None, None, None, None, None,
              'мастер КРС', None],
             [None, None,
-             f'Произвести  монтаж СВАБа согласно схемы  №8 при свабированиии утвержденной главным инженером  {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г. '
+             f'Произвести  монтаж СВАБа согласно схемы №{schema_swab} при свабированиии утвержденной главным инженером '
+             f'{well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г. '
              f'Обвязать устье скважины с ЕДК на жесткую линию. Опрессовать ПВО на максимально допустимое давление на устье '
              f'{well_data.max_admissible_pressure._value}атм,'
-             f' по невозможности на давление поглощения, но не менее 30атм в течении 30мин Провести практическое обучение вахт по '
+             f' по невозможности на давление поглощения, но не менее 30атм в течении 30мин Провести практическое '
+             f'обучение вахт по '
              f'сигналу "выброс" с записью в журнале проведения учебных тревог',
              None, None, None, None, None, None, None,
              'Мастер КРС, подрядчик по ГИС', 1.2],

@@ -190,9 +190,9 @@ class GnoWindow(QMainWindow):
                 current_bottom_ecn_edit = round(float(self.tabWidget.currentWidget().current_bottom_ecn_edit.text()), 1)
                 well_data.current_bottom = current_bottom_ecn_edit
 
+        except Exception as e:
+            QMessageBox.warning(self, 'Ошибка', f'Не корректное сохранение параметра: {e}')
 
-        except:
-            QMessageBox.warning(self, 'ОШИБКА', 'Не все данные корректны')
             return
 
         check_question = QMessageBox.question(self, 'Корректность забой', f'Забой который можно нормализовать '
@@ -1467,10 +1467,10 @@ class GnoWindow(QMainWindow):
                     pass
 
             expenditure_h2s = round(max(expenditure_h2s_list), 3)
-            fluid_work = f'{fluid_work_insert}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
+            fluid_work = f'{fluid_work_insert}г/см3 с добавлением поглотителя сероводорода {well_data.type_absorbent} из ' \
                          f'расчета {expenditure_h2s}кг/м3 '
             fluid_work_short = f'{fluid_work_insert}г/см3 c ' \
-                               f'ХИМТЕХНО 101 Марка А - {expenditure_h2s}кг/м3 '
+                               f'{well_data.type_absorbent} - {expenditure_h2s}кг/м3 '
         else:
             fluid_work = f'{fluid_work_insert}г/см3 '
             fluid_work_short = f'{fluid_work_insert}г/см3'

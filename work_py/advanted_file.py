@@ -21,8 +21,6 @@ def skm_interval(self, template):
             else:
                 str_raid.append([int(float(nek.split('-')[0])) - 90,
                                  well_data.current_bottom - 2])
-    a = all([well_data.dict_perforation[plast]['отрайбировано'] is False for plast in well_data.plast_all])
-    b = all([well_data.dict_perforation[plast]['отрайбировано'] is True for plast in well_data.plast_all])
 
     if all([well_data.dict_perforation[plast]['отрайбировано'] is False for plast in well_data.plast_all]):
         str_raid.append([well_data.perforation_roof - 90, well_data.skm_depth])
@@ -36,14 +34,16 @@ def skm_interval(self, template):
                                      well_data.current_bottom - 2])
 
     elif all(
-            [well_data.dict_perforation[plast]['отрайбировано'] is True for plast in well_data.plast_all]):
+            [well_data.dict_perforation[plast]['отрайбировано'] is True for plast in well_data.plast_all
+             if well_data.dict_perforation[plast]['подошва'] < well_data.current_bottom]):
         str_raid = []
 
         perforating_intervals = []
 
         for plast in well_data.plast_all:
             for interval in well_data.dict_perforation[plast]['интервал']:
-                perforating_intervals.append(list(interval))
+                if interval[1] < well_data.current_bottom:
+                    perforating_intervals.append(list(interval))
 
 
         str_raid.extend(remove_overlapping_intervals(perforating_intervals))
@@ -311,22 +311,17 @@ def definition_plast_work(self):
 
             if well_data.dict_perforation[plast]["отключение"] is False:
                 plast_work.add(plast)
-
+            roof = min(list(map(lambda x: x[0], list(well_data.dict_perforation[plast]['интервал']))))
+            sole = max(list(map(lambda x: x[1], list(well_data.dict_perforation[plast]['интервал']))))
+            well_data.dict_perforation[plast]["кровля"] = roof
+            well_data.dict_perforation[plast]["подошва"] = sole
             if well_data.dict_perforation[plast]["отключение"] is False:
-                roof = min(list(map(lambda x: x[0], list(well_data.dict_perforation[plast]['интервал']))))
-                sole = max(list(map(lambda x: x[1], list(well_data.dict_perforation[plast]['интервал']))))
-                well_data.dict_perforation[plast]["кровля"] = roof
-                well_data.dict_perforation[plast]["подошва"] = sole
+
                 if perforation_roof >= roof and well_data.current_bottom > roof:
                     perforation_roof = roof
                 if perforation_sole < sole and well_data.current_bottom > sole:
                     perforation_sole = sole
-            else:
-                well_data.dict_perforation[plast]["кровля"] = \
-                    min(list(map(lambda x: x[0], list(well_data.dict_perforation[plast]['интервал']))))
-                well_data.dict_perforation[plast]["подошва"] = \
-                    max(list(map(lambda x: x[1] if x[1] < well_data.current_bottom else 0,
-                                 list(well_data.dict_perforation[plast]['интервал']))))
+
 
     well_data.perforation_roof = perforation_roof
     well_data.perforation_sole = perforation_sole

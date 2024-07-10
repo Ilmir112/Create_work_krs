@@ -104,7 +104,7 @@ def need_h2s(fluid_new, plast_edit, expected_pressure):
 
         if cat_h2s_list_plan[0] in [1, 2, '1', '2'] and len(well_data.plast_work) == 0:
             expenditure_h2s = round(max([well_data.dict_category[plast]['по сероводороду'].poglot for plast in well_data.plast_project]), 3)
-            fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
+            fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода {well_data.type_absorbent} из ' \
                                   f'расчета {expenditure_h2s}кг/м3 '
             fluid_work_short = f'{fluid_new}г/см3 ХИМТЕХНО 101 {expenditure_h2s}кг/м3 '
         elif cat_h2s_list_plan[0] in [3, '3'] and len(well_data.plast_work) == 0:
@@ -124,7 +124,7 @@ def need_h2s(fluid_new, plast_edit, expected_pressure):
                 [well_data.dict_category[well_data.plast_work[0]]['по сероводороду'].poglot])
             expenditure_h2s = round(max([expenditure_h2s, expenditure_h2s_plan]), 2)
 
-            fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
+            fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода {well_data.type_absorbent} из ' \
                                   f'расчета {expenditure_h2s}кг/м3 '
             fluid_work_short = f'{fluid_new}г/см3 ХИМТЕХНО 101 {expenditure_h2s}кг/м3 '
         else:
@@ -163,7 +163,7 @@ def need_h2s(fluid_new, plast_edit, expected_pressure):
 
             expenditure_h2s = round(
                 max([well_data.dict_category[plast]['по сероводороду'].poglot for plast in well_data.plast_project]), 2)
-            fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода ХИМТЕХНО 101 Марка А из ' \
+            fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода {well_data.type_absorbent} из ' \
                     f'расчета {expenditure_h2s}кг/м3 '
             fluid_work_short = f'{fluid_new}г/см3 ХИМТЕХНО 101 {expenditure_h2s}кг/м3 '
         else:
@@ -174,33 +174,34 @@ def need_h2s(fluid_new, plast_edit, expected_pressure):
 
 def konte(self):
 
-    konte_list = [[f'Скважина согласована на проведение работ по технологии контейнерно-канатных технологий',
-                   None,
-                          f'Скважина согласована на проведение работ по технологии контейнерно-канатных технологий по '
-                          f'технологическому плану Таграс-РС.'
-                          f'Вызвать геофизическую партию. Заявку оформить за 24 часов сутки через '
-                          f'геологическую службу {well_data.contractor}. '
-                          f'Произвести  монтаж ПАРТИИ ГИС согласно утвержденной главным инженером от'
-                          f' {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}',
-                          None, None, None, None, None, None, None,
-                          'мастер КРС', 1.25],
-                  [None, None, f'Произвести работы указанные в плане работ силами спец подрядчика, при выполнении '
-                               f'из основного плана работ работы исключить',
-                   None, None, None, None, None, None, None,
-                   'мастер КРС', 12]
+    konte_list = [
+        [f'Скважина согласована на проведение работ по технологии контейнерно-канатных технологий', None,
+          f'Скважина согласована на проведение работ по технологии контейнерно-канатных технологий по '
+          f'технологическому плану Таграс-РС.'
+          f'Вызвать геофизическую партию. Заявку оформить за 24 часов сутки через '
+          f'геологическую службу {well_data.contractor}. '
+          f'Произвести монтаж ПАРТИИ ГИС согласно утвержденной главным инженером от'
+          f' {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}. Предварительно нужно заявить вставку №6',
+          None, None, None, None, None, None, None,
+          'мастер КРС', 1.25],
+          [None, None, f'Произвести работы указанные в плане работ силами спец подрядчика, при выполнении '
+                       f'из основного плана работ работы исключить',
+           None, None, None, None, None, None, None,
+           'мастер КРС', 12]
                   ]
     return konte_list
 def definition_Q(self):
 
-    definition_Q_list = [[f'Насыщение 5м3 определение Q при 80-120атм', None,
-                           f'Произвести насыщение скважины до стабилизации давления закачки не менее 5м3. Опробовать  '
-                           f' на приемистость в трех режимах при Р=80-120атм в '
-                           f'присутствии представителя супервайзерской службы или подрядчика по РИР. '
-                           f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, '
-                           f'с подтверждением за 2 часа до '
-                           f'начала работ). ',
-                           None, None, None, None, None, None, None,
-                           'мастер КРС', 0.17+0.2+0.2+0.2+0.15+0.52]]
+    definition_Q_list = [
+        [f'Насыщение 5м3 определение Q при 80-120атм', None,
+           f'Произвести насыщение скважины до стабилизации давления закачки не менее 5м3. Опробовать  '
+           f' на приемистость в трех режимах при Р=80-120атм в '
+           f'присутствии представителя супервайзерской службы или подрядчика по РИР. '
+           f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, '
+           f'с подтверждением за 2 часа до '
+           f'начала работ). ',
+           None, None, None, None, None, None, None,
+           'мастер КРС', 0.17+0.2+0.2+0.2+0.15+0.52]]
     return definition_Q_list
 
 def definition_Q_nek(self):
@@ -248,9 +249,9 @@ def pvo_cat1(self):
     if 'Ойл' in well_data.contractor:
         date_str = 'от 07.03.2024г'
     elif 'РН' in well_data.contractor:
-        date_str = ''
+        date_str = 'от 28.02.2024г'
 
-    pvo_1 = f'Установить ПВО  по  схеме №2 утвержденной главным инженером {well_data.contractor}  {date_str} ' \
+    pvo_1 = f'Установить ПВО по схеме №2 утвержденной главным инженером {well_data.contractor} {date_str} ' \
             f'(тип плашечный сдвоенный ПШП-2ФТ-160х21Г Крестовина КР160х21Г, ' \
             f'задвижка ЗМС 65х21 (3шт), Шарового крана 1КШ-73х21, авар. трубы (патрубок НКТ73х7-7-Е, ' \
             f' (при необходимости произвести монтаж переводника' \

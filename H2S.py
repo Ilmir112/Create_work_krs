@@ -219,14 +219,14 @@ def well_volume(self):
 def calv_h2s(self, cat_H2S, h2s_mg, h2s_pr):
     if '2' == str(cat_H2S) or '1' in str(cat_H2S):
         nkt_l = sum(list(well_data.dict_nkt.values()))
-
+        # Внутренний объем ЭК на 1 п.м.
         udel_vnutr_v = 10 * 3.14 * (
                     (well_data.column_diametr._value - well_data.column_wall_thickness._value * 2) * 0.01) ** 2 / 4
+
         if well_data.column_additional is True:
-            udel_vn__khv = 10 * 3.14 * ((
-                                                    well_data.column_additional_diametr._value - well_data.column_additional_wall_thickness._value * 2) * 0.01) ** 2 / 4
-        # print(f'ff{udel_vn__khv}')
-        # print(f' НКТ{well_data.column_diametr._value}2 {nkt_l, well_data.head_column_additional._value}88{well_data.column_diametr, well_data.column_wall_thickness._value}0{well_data.head_column_additional._value, well_data.bottomhole_artificial._value}')
+            udel_vn__khv = 10 * 3.14 * ((well_data.column_additional_diametr._value -
+                                         well_data.column_additional_wall_thickness._value * 2) * 0.01) ** 2 / 4
+
         if well_data.column_additional is False:
 
             v_pod_gno = 3.14 * (int(well_data.column_diametr._value) - int(

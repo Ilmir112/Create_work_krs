@@ -97,6 +97,10 @@ class TabPage_SO_with(QWidget):
         self.sole_skm_line.setClearButtonEnabled(True)
         self.sole_skm_line.setValidator(validator)
 
+        self.SKM_type_label = QLabel("Тип скрепера", self)
+        self.SKM_type_Combo = QComboBox(self)
+        self.SKM_type_Combo.addItems(['СКМ', 'СГМ'])
+
         self.current_bottom_label = QLabel('Забой текущий')
         self.current_bottom_edit = QLineEdit(self)
         self.current_bottom_edit.setText(f'{well_data.current_bottom}')
@@ -124,14 +128,16 @@ class TabPage_SO_with(QWidget):
             self.grid.addWidget(self.dictance_template_first_Edit, 5, 4)
             self.grid.addWidget(self.skm_Label, 4, 5)
             self.grid.addWidget(self.skm_Edit, 5, 5)
-            self.grid.addWidget(self.dictance_template_second_Label, 4, 6)
-            self.grid.addWidget(self.dictance_template_second_Edit, 5, 6)
-            self.grid.addWidget(self.template_second_Label, 4, 7)
-            self.grid.addWidget(self.template_second_Edit, 5, 7)
-            self.grid.addWidget(self.lenght_template_second_Label, 4, 8)
-            self.grid.addWidget(self.lenght_template_second_Edit, 5, 8)
-            self.grid.addWidget(self.dictance_three_Label, 4, 9)
-            self.grid.addWidget(self.dictance_three_Edit, 5, 9)
+            self.grid.addWidget(self.SKM_type_label, 4, 6)
+            self.grid.addWidget(self.SKM_type_Combo, 5, 6)
+            self.grid.addWidget(self.dictance_template_second_Label, 4, 7)
+            self.grid.addWidget(self.dictance_template_second_Edit, 5, 7)
+            self.grid.addWidget(self.template_second_Label, 4, 8)
+            self.grid.addWidget(self.template_second_Edit, 5, 8)
+            self.grid.addWidget(self.lenght_template_second_Label, 4, 9)
+            self.grid.addWidget(self.lenght_template_second_Edit, 5, 9)
+            self.grid.addWidget(self.dictance_three_Label, 4, 10)
+            self.grid.addWidget(self.dictance_three_Edit, 5, 10)
 
         else:
             self.template_select_list = ['ПСШ Доп колонна СКМ в основной колонне', 'ПСШ СКМ в доп колонне c хвостом',
@@ -155,12 +161,14 @@ class TabPage_SO_with(QWidget):
             self.grid.addWidget(self.dictance_template_second_Edit, 5, 5)
             self.grid.addWidget(self.skm_Label, 4, 6)
             self.grid.addWidget(self.skm_Edit, 5, 6)
-            self.grid.addWidget(self.dictance_three_Label, 4, 7)
-            self.grid.addWidget(self.dictance_three_Edit, 5, 7)
-            self.grid.addWidget(self.template_second_Label, 4, 8)
-            self.grid.addWidget(self.template_second_Edit, 5, 8)
-            self.grid.addWidget(self.lenght_template_second_Label, 4, 9)
-            self.grid.addWidget(self.lenght_template_second_Edit, 5, 9)
+            self.grid.addWidget(self.SKM_type_label, 4, 7)
+            self.grid.addWidget(self.SKM_type_Combo, 5, 7)
+            self.grid.addWidget(self.dictance_three_Label, 4, 8)
+            self.grid.addWidget(self.dictance_three_Edit, 5, 8)
+            self.grid.addWidget(self.template_second_Label, 4, 9)
+            self.grid.addWidget(self.template_second_Edit, 5, 9)
+            self.grid.addWidget(self.lenght_template_second_Label, 4, 10)
+            self.grid.addWidget(self.lenght_template_second_Edit, 5, 10)
 
         self.grid.addWidget(self.current_bottom_label, 8, 3)
         self.grid.addWidget(self.current_bottom_edit, 9, 3)
@@ -253,6 +261,7 @@ class TabPage_SO_with(QWidget):
 
 
     def update_template(self):
+        SKM_type = self.SKM_type_Combo.currentText()
         if self.current_bottom_edit.text() != '':
             well_data.current_bottom = round(float(self.current_bottom_edit.text()), 1)
 
@@ -295,7 +304,7 @@ class TabPage_SO_with(QWidget):
                 self.dictance_three_Label.setParent(None)
 
                 template_str = f'перо + шаблон-{int(first_template)}мм L-{int(lenght_template_first)}м + НКТ{nkt_diam}м ' \
-                               f'{int(dictance_template_first)}м + СКМ-{skm} +  ' \
+                               f'{int(dictance_template_first)}м + {SKM_type}-{skm} +  ' \
                                f'НКТ{nkt_diam}м {int(dictance_template_second)}м + шаблон-{template_second}мм ' \
                                f'L-{lenght_template_second}м '
 
@@ -308,7 +317,7 @@ class TabPage_SO_with(QWidget):
 
             elif self.template_Combo.currentText() == 'ПСШ без хвоста':
                 # if dictance_template_second != None:
-                template_str = f'перо + СКМ-{skm} + {dictance_template_second}м ' \
+                template_str = f'перо + {SKM_type}-{skm} + {dictance_template_second}м ' \
                                f'НКТ{nkt_diam}м + шаблон-{template_second}мм L-{lenght_template_second}м '
                 well_data.template_depth = math.ceil(well_data.current_bottom - int(dictance_template_second))
                 well_data.skm_depth = well_data.template_depth + dictance_template_second
@@ -318,7 +327,7 @@ class TabPage_SO_with(QWidget):
                 # if dictance_template_second != None:
                 self.template_first_Edit.setText('фильтр направление')
                 template_str = f'фильтр-направление L {lenght_template_first}м + НКТ{nkt_diam}м {dictance_template_first}м ' \
-                               f'+ СКМ-{skm} + {dictance_template_second}м НКТ{nkt_diam}м + ' \
+                               f'+ {SKM_type}-{skm} + {dictance_template_second}м НКТ{nkt_diam}м + ' \
                                f'шаблон-{template_second}мм L-{lenght_template_second}м '
                 well_data.template_depth = int(well_data.current_bottom - int(dictance_template_first) -
                                                int(dictance_template_second) - int(lenght_template_first))
@@ -332,7 +341,7 @@ class TabPage_SO_with(QWidget):
                                    f'НКТ{nkt_pod}  + {dictance_template_first}м + шаблон-{first_template}мм ' \
                                    f'L-{lenght_template_first}м + ' \
                                    f'НКТ{nkt_pod} {dictance_template_second}м + НКТ{nkt_diam} {dictance_three}м + ' \
-                                   f'СКМ-{skm} + шаблон-{template_second}мм L-{lenght_template_second}м '
+                                   f'{SKM_type}-{skm} + шаблон-{template_second}мм L-{lenght_template_second}м '
 
                     well_data.template_depth_addition = well_data.current_bottom - int(dictance_template_first)
 
@@ -350,7 +359,7 @@ class TabPage_SO_with(QWidget):
                     lenght_template_first != '' and first_template != '' and template_second != '' \
                         and lenght_template_second != '':
                     template_str = f'обточная муфта + НКТ{nkt_pod} {dictance_template_first}м ' \
-                                   f'+ СКМ-{skm} + НКТ{nkt_pod} {dictance_template_second}м + шаблон-{first_template}мм ' \
+                                   f'+ {SKM_type}-{skm} + НКТ{nkt_pod} {dictance_template_second}м + шаблон-{first_template}мм ' \
                                    f'L-{lenght_template_first}м + НКТ{nkt_pod} {dictance_three}м + ' \
                                    f'шаблон-{template_second}мм L-{lenght_template_second}м '
 
@@ -374,7 +383,7 @@ class TabPage_SO_with(QWidget):
                         lenght_template_first != '' and first_template != '' and template_second != '' \
                         and lenght_template_second != '':
 
-                    template_str = f'обточная муфта + СКМ-{skm} + НКТ{nkt_pod} {dictance_template_second} + ' \
+                    template_str = f'обточная муфта + {SKM_type}-{skm} + НКТ{nkt_pod} {dictance_template_second} + ' \
                                    f'шаблон-{first_template}мм L-{lenght_template_first}м + ' \
                                    f'НКТ{nkt_pod} {dictance_three}м + шаблон-{template_second}мм ' \
                                    f'L-{lenght_template_second}м '
@@ -394,7 +403,7 @@ class TabPage_SO_with(QWidget):
                         lenght_template_first != '' and first_template != '' and template_second != '' \
                         and lenght_template_second != '':
                     template_str = f'фильтр направление L-2м + НКТ{nkt_pod} {dictance_template_first}м ' \
-                                   f'+ СКМ-{skm} + НКТ{nkt_pod} {dictance_template_second}м + шаблон-{first_template}мм ' \
+                                   f'+ {SKM_type}-{skm} + НКТ{nkt_pod} {dictance_template_second}м + шаблон-{first_template}мм ' \
                                    f'L-{lenght_template_first}м' \
                                    f' + НКТ{nkt_pod} {dictance_three}м + шаблон-{template_second}мм ' \
                                    f'L-{lenght_template_second}м '
@@ -418,7 +427,7 @@ class TabPage_SO_with(QWidget):
                 self.skm_teml_str_Edit.setText(skm_teml_str)
 
     def update_template_edit(self, index):
-
+        SKM_type = self.SKM_type_Combo.currentText()
         nkt_diam = well_data.nkt_diam
         # print(well_data.column_additional, well_data.head_column_additional._value, well_data.current_bottom)
         if well_data.column_additional is False or (well_data.column_additional and
@@ -479,7 +488,7 @@ class TabPage_SO_with(QWidget):
             self.grid.addWidget(self.lenght_template_second_Edit, 5, 9)
 
             template_str = f'перо + шаблон-{first_template}мм L-{lenght_template_first}м + НКТ{nkt_diam}м ' \
-                           f'{dictance_template_first}м + СКМ-{skm} +  ' \
+                           f'{dictance_template_first}м + {SKM_type}-{skm} +  ' \
                            f'НКТ{nkt_diam}м {dictance_template_second}м + шаблон-{template_second}мм ' \
                            f'L-{lenght_template_second}м '
 
@@ -492,7 +501,7 @@ class TabPage_SO_with(QWidget):
 
 
         elif index == 'ПСШ без хвоста':
-            template_str = f'перо + СКМ-{skm} + {dictance_template_second}м ' \
+            template_str = f'перо + {SKM_type}-{skm} + {dictance_template_second}м ' \
                            f'НКТ{nkt_diam}м + шаблон-{template_second}мм L-{lenght_template_second}м '
             well_data.template_depth = math.ceil(well_data.current_bottom - int(dictance_template_second))
             well_data.skm_depth = well_data.current_bottom
@@ -516,7 +525,7 @@ class TabPage_SO_with(QWidget):
             dictance_template_second = int(self.dictance_template_second_Edit.text())
 
             template_str = f'фильтр-направление + НКТ{nkt_diam}м {dictance_template_first}м ' \
-                           f'+ СКМ-{skm} + {dictance_template_second}м НКТ{nkt_diam}м + ' \
+                           f'+ {SKM_type}-{skm} + {dictance_template_second}м НКТ{nkt_diam}м + ' \
                            f'шаблон-{template_second}мм L-{lenght_template_second}м '
             well_data.template_depth = int(
                 well_data.current_bottom - dictance_template_first - dictance_template_second)
@@ -559,7 +568,7 @@ class TabPage_SO_with(QWidget):
             template_str = f'обточная муфта  + ' \
                            f'НКТ{nkt_pod}  + {dictance_template_first}м + шаблон-{first_template}мм L-{lenght_template_first}м + ' \
                            f'НКТ{nkt_pod} {dictance_template_second}м +' \
-                           f'СКМ-{skm} + НКТ{nkt_diam} {dictance_template_three}м + шаблон-{template_second}мм L-{lenght_template_second}м '
+                           f'{SKM_type}-{skm} + НКТ{nkt_diam} {dictance_template_three}м + шаблон-{template_second}мм L-{lenght_template_second}м '
 
             well_data.template_depth_addition = int(well_data.current_bottom - dictance_template_first)
             well_data.template_depth = int(well_data.current_bottom - dictance_template_first - lenght_template_first -
@@ -595,7 +604,7 @@ class TabPage_SO_with(QWidget):
             self.dictance_three_Edit.setText(str(dictance_template_three))
 
             template_str = f'обточная муфта + НКТ{nkt_pod} {dictance_template_first}м ' \
-                           f'+ СКМ-{skm} + НКТ{nkt_pod} {dictance_template_second}м + шаблон-{first_template}мм ' \
+                           f'+ {SKM_type}-{skm} + НКТ{nkt_pod} {dictance_template_second}м + шаблон-{first_template}мм ' \
                            f'L-{lenght_template_first}м + НКТ{nkt_pod} {dictance_template_three}м + ' \
                            f'шаблон-{template_second}мм L-{lenght_template_second}м '
 
@@ -630,7 +639,7 @@ class TabPage_SO_with(QWidget):
             self.dictance_three_Edit.setText(str(dictance_template_three))
 
 
-            template_str = f'обточная муфта + СКМ-{skm} + НКТ{nkt_pod} {dictance_template_second} + ' \
+            template_str = f'обточная муфта + {SKM_type}-{skm} + НКТ{nkt_pod} {dictance_template_second} + ' \
                            f'шаблон-{first_template}мм L-{lenght_template_first}м + ' \
                            f'НКТ{nkt_pod} {dictance_template_three}м + шаблон-{template_second}мм ' \
                            f'L-{lenght_template_second}м '
@@ -669,7 +678,7 @@ class TabPage_SO_with(QWidget):
 
 
             template_str = f'фильтр направление L-2м + НКТ{nkt_pod} {dictance_template_first}м ' \
-                           f'+ СКМ-{skm} + НКТ{nkt_pod} {dictance_template_second}м + шаблон-{first_template}мм ' \
+                           f'+ {SKM_type}-{skm} + НКТ{nkt_pod} {dictance_template_second}м + шаблон-{first_template}мм ' \
                            f'L-{lenght_template_first}м' \
                            f' + НКТ{nkt_pod} {dictance_template_three}м + шаблон-{template_second}мм ' \
                            f'L-{lenght_template_second}м '
@@ -1225,6 +1234,10 @@ class TemplateKrs(QMainWindow):
              f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
              None, None, None, None, None, None, None,
              'мастер КРС', 2.5],
+            [None, None, f'При необходимости нормализовать забой обратной промывкой тех жидкостью уд.весом '
+                         f'{well_data.fluid_work} до глубины {well_data.current_bottom}м.', None, None, None, None,
+             None, None, None,
+             'Мастер КРС', None],
             [
             f'Промывка уд.весом {well_data.fluid_work_short} в объеме {round(TemplateKrs.well_volume(self) * 1.5, 1)}м3 ',
             None,

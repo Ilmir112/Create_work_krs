@@ -304,22 +304,25 @@ class PerforationWindow(QMainWindow):
 
             if well_data.kat_pvo < kateg2:
                 well_data.kat_pvo = kateg2
-
+        if 'Ойл' in well_data.contractor:
+            shema_str = 'a'
+        elif 'РН' in well_data.contractor:
+            if type_perforation == 'ПВР на кабеле':
+                shema_str = 'a'
+            else:
+                shema_str = 'б'
         perforation = [
             [None, None,
              f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через '
              f'ЦИТС {well_data.contractor}". '
              f'При необходимости  подготовить место для установки партии ГИС напротив мостков. '
-             f'Произвести  монтаж ГИС согласно схемы  №8а утвержденной главным инженером от '
+             f'Произвести  монтаж ГИС согласно схемы  №8{shema_str} утвержденной главным инженером от '
              f'{well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г',
              None, None, None, None, None, None, None,
              'Мастер КРС', None, None, None],
             [None, None,
              f'Долить скважину до устья тех жидкостью уд.весом {well_data.fluid_work}. '
-             f'Установить ПВО по схеме №8а утвержденной '
-             f'главным инженером {well_data.contractor} от '
-             f'{well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г. Опрессовать  плашки  '
-             f'ПВО (на давление опрессовки ЭК, но '
+             f'Опрессовать плашки ПВО (на давление опрессовки ЭК, но '
              f'не ниже максимального ожидаемого давления на устье) '
              f'{well_data.max_admissible_pressure._value}атм, по невозможности на давление поглощения, но '
              f'не менее 30атм в течении 30мин (ОПРЕССОВКУ ПВО ЗАФИКСИРОВАТЬ В ВАХТОВОМ ЖУРНАЛЕ). '

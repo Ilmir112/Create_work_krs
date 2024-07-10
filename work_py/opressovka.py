@@ -206,13 +206,16 @@ class OpressovkaEK(QMainWindow):
             msg = QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
             return
 
+
         if pressureZUMPF_combo == 'Да':
-            pakerDepthZumpf = int(float(self.tabWidget.currentWidget().pakerDepthZumpf_edit.text()))
-            if MyWindow.check_true_depth_template(self, paker_depth) is False:
+            pakerDepthZumpf = self.tabWidget.currentWidget().pakerDepthZumpf_edit.text()
+            if pakerDepthZumpf != '':
+                pakerDepthZumpf = int(float(pakerDepthZumpf))
+            if MyWindow.check_true_depth_template(self, pakerDepthZumpf) is False:
                 return
-            if MyWindow.true_set_Paker(self, paker_depth) is False:
+            if MyWindow.true_set_Paker(self, pakerDepthZumpf) is False:
                 return
-            if MyWindow.check_depth_in_skm_interval(self, paker_depth) is False:
+            if MyWindow.check_depth_in_skm_interval(self, pakerDepthZumpf) is False:
                 return
 
         else:

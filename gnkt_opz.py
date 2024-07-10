@@ -241,8 +241,8 @@ class GnktOpz(QMainWindow):
             svk_true_combo = str(self.tabWidget.currentWidget().svk_true_combo.currentText())
             skv_acid_edit = str(self.tabWidget.currentWidget().skv_acid_edit.currentText())
             self.distance = self.tabWidget.currentWidget().distance_pntzh_edit.text()
-        except:
-            mes = QMessageBox.warning(self, 'Ошибка', 'ВВедены не корректные данные')
+        except Exception as e:
+            mes = QMessageBox.warning(self, 'Ошибка', f'ВВедены не корректные данные {e}')
         if roof_plast in ['', None, 0] or sole_plast in ['', None, 0]:
             mes = QMessageBox.critical(self, "Ошибка", "Не введены данные по кровле и ли подошве обработки")
             return

@@ -101,7 +101,11 @@ class Gpp_window(QMainWindow):
         well_data.pause = False
         self.close()
     def grpGpp(self, gpp_depth, current_depth, diametr_paker):
-       
+
+        if 'Ойл' in well_data.contractor:
+            schema_grp = '7'
+        elif 'РН' in well_data.contractor:
+            schema_grp = '6'
 
         nkt_diam = ''.join(['89' if well_data.column_diametr._value > 110 else '60'])
 
@@ -150,7 +154,7 @@ class Gpp_window(QMainWindow):
              None, None, None, None, None, None, None,
              'Мастер КРС, заказчик', " "],
             [None, None,
-             f'Обвязать устье скважины согласно схемы ПВО №7 утвержденной главным инженером {well_data.contractor} '
+             f'Обвязать устье скважины согласно схемы ПВО №{schema_grp} утвержденной главным инженером {well_data.contractor} '
              f' {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г для проведения ГРП на месторождениях ООО "БашнефтьДобыча". Посадить планшайбу. '
              f'Произвести демонтаж'
              f' оборудования. Опрессовать установленную арматуру для ГРП на Р={well_data.max_admissible_pressure._value}атм, '
