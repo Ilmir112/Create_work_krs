@@ -175,6 +175,7 @@ class LoginWindow(QWidget):
             users_list = []
             try:
                 well_data.dp_path_user = os.path.join(os.path.dirname(__file__), "data_base/users_database/users.db")
+                print(f'юаза {well_data.dp_path_user}')
                 conn = sqlite3.connect(f'{well_data.dp_path_user}')
                 cursor = conn.cursor()
 
