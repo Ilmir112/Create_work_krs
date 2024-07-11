@@ -668,7 +668,6 @@ class MyWindow(QMainWindow):
             costumer = 'ООО Башнефть-добыча'
             self.open_without_damping(costumer, 'АГМ')
 
-
         elif action == self.class_well_TGM_reload:
             costumer = 'ООО Башнефть-добыча'
             self.reload_class_well(costumer, 'ТГМ')
