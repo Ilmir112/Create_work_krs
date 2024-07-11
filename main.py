@@ -1022,7 +1022,7 @@ class MyWindow(QMainWindow):
             if 'РН' in well_data.contractor:
                 contractor = 'РН'
             elif 'Ойл' in well_data.contractor:
-                contractor = 'РН'
+                contractor = 'Ойл'
             if self.work_plan in ['dop_plan', 'dop_plan_in_base']:
                 string_work = f' ДП№ {well_data.number_dp}'
             elif self.work_plan == 'krs':
@@ -1936,7 +1936,7 @@ class MyWindow(QMainWindow):
 
     def populate_row(self, ins_ind, work_list, table_widget, work_plan='krs'):
         text_width_dict = {20: (0, 100), 40: (101, 200), 60: (201, 300), 80: (301, 400), 100: (401, 500),
-                           120: (501, 600), 140: (601, 700), 160: (701, 800), 180: (801, 1500)}
+                           120: (501, 600), 140: (601, 700), 160: (701, 800), 180: (801, 900), 200: (901, 1500)}
         index_setSpan = 0
         if work_plan == 'gnkt_frez':
             index_setSpan = 1

@@ -216,7 +216,7 @@ class Emergency_po(MyWindow):
               'мастер КРС, УСРСиСТ', 2.5],
              [None, None,
               f'Поднять {magnet_select(self, "НКТ")} с доливом тех жидкости в '
-              f'объеме{round(well_data.current_bottom * 1.25 / 1000, 1)}м3'
+              f'объеме {round(well_data.current_bottom * 1.25 / 1000, 1)}м3'
               f' удельным весом {well_data.fluid_work}.',
               None, None, None, None, None, None, None,
               'Мастер КРС', liftingNKT_norm(well_data.current_bottom, 1.2)],
@@ -229,11 +229,6 @@ class Emergency_po(MyWindow):
         for row in seal_list:
             emergency_list.append(row)
 
-        for row in Emergency_lar.emergence_sbt(self, lar_diametr_line, nkt_key, lar_type_combo,
-                      emergency_bottom_line, bottom_line):
-            emergency_list.append(row)
-
-        well_data.current_bottom = bottom_line
         return emergency_list
 
 

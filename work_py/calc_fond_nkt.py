@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QInputDialog
+from PyQt5.QtWidgets import QInputDialog, QMessageBox
 
 
 class CalcFond:
@@ -24,17 +24,20 @@ class CalcFond:
         pressuar_nkt = self.pressuar_nkt
         calc_nkt_list = self.calc_nkt_dict()
         calc_pressuar_dict = {}
-        for nkt_l in calc_nkt_list:
-            if nkt_l <= float(self.static_level):
-                # print(f'ЖГС {self.fluid}')
-                p = round(float(self.fluid) * 9.81 * nkt_l / 100, 0)
-            else:
-                p = round(float(self.fluid) * 9.81 * nkt_l / 100-
-                          ((nkt_l - float(self.static_level)) * 9.81 * float(self.fluid)) / 100, 0)
+        try:
+            for nkt_l in calc_nkt_list:
+                if nkt_l <= float(self.static_level):
+                    # print(f'ЖГС {self.fluid}')
+                    p = round(float(self.fluid[:3]) * 9.81 * nkt_l / 100, 0)
+                else:
+                    p = round(float(self.fluid[:3]) * 9.81 * nkt_l / 100-
+                              ((nkt_l - float(self.static_level)) * 9.81 * float(self.fluid[:4])) / 100, 0)
 
-            if p >= 150:
-                p = 150
+                if p >= 150:
+                    p = 150
 
-            calc_pressuar_dict[nkt_l] = 149 - p if pressuar_nkt < 149 - p else pressuar_nkt
+                calc_pressuar_dict[nkt_l] = 149 - p if pressuar_nkt < 149 - p else pressuar_nkt
+        except Exception as e:
+            QMessageBox.warning(None, 'Ошибка', f'Ошибка расчета опрессовки НКТ {e}')
         return calc_pressuar_dict
 

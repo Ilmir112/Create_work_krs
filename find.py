@@ -1409,18 +1409,18 @@ class Well_Category(FindIndexPZ):
                     if str(categoty_pressure_well) != str(well_data.category_pressuar):
                         mes = QMessageBox.warning(None, 'Некорректная категория давления',
                                                   f'согласно классификатора от {data} категория скважина '
-                                                  f'по давлению {categoty_pressure_well}')
+                                                  f'по давлению {categoty_pressure_well} категории')
                 if categoty_h2s_well:
                     if str(well_data.cat_h2s_list[0]) != str(well_data.category_h2s):
                         # print(str(well_data.cat_h2s_list[0]), well_data.category_h2s)
                         #
                         mes = QMessageBox.warning(None, 'Некорректная категория давления',
                                                   f'согласно классификатора от {data} категория скважина '
-                                                  f'по сероводороду {categoty_h2s_well}')
+                                                  f'по сероводороду {categoty_h2s_well} категории')
                 if categoty_gf:
-                    if categoty_gf != well_data.category_gf:
+                    if str(categoty_gf) != str(well_data.category_gf):
                         mes = QMessageBox.warning(None, 'Некорректная категория давления',
                                                   f'согласно классификатора от {data} категория скважина '
-                                                  f'по газовому фактору {categoty_gf}')
-            except:
-                mes = QMessageBox.warning(self, 'Ошибка', 'Скважина не найдена в классификаторе')
+                                                  f'по газовому фактору {categoty_gf} категории')
+            except Exception as e:
+                mes = QMessageBox.warning(self, 'Ошибка', f'Скважина не найдена в классификаторе \n {e}')

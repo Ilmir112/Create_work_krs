@@ -1446,7 +1446,7 @@ class GnoWindow(QMainWindow):
             return krs_begin[:2]
 
     def calc_work_fluid(self, fluid_work_insert):
-        well_data.fluid = fluid_work_insert
+        well_data.fluid = float(fluid_work_insert)
         well_data.fluid_short = fluid_work_insert
 
         cat_h2s_list = [well_data.dict_category[plast]['по сероводороду'

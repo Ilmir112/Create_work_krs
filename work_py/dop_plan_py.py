@@ -38,7 +38,9 @@ class TabPageDp(QWidget):
         self.number_DP_label = QLabel('номер дополнительного плана')
         self.number_DP_Combo = QComboBox(self)
 
-        self.number_DP_Combo.addItems(['1', '2', '3'])
+        self.number_DP_Combo.addItems(['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'])
+        if well_data.number_dp != 0:
+            self.number_DP_Combo.setCurrentIndex(int(well_data.number_dp) - 1)
 
         self.current_bottom_label = QLabel('Забой текущий')
         self.current_bottom_edit = QLineEdit(self)
@@ -143,7 +145,6 @@ class TabPageDp(QWidget):
             index_change_line = int(float(index_change_line))
             DopPlanWindow.extraction_data(self, table_in_base_combo, index_change_line)
 
-            a = well_data.column_additional
             self.template_depth_edit.setText(str(well_data.template_depth))
             self.template_lenght_edit.setText(str(well_data.template_lenght))
             skm_interval = ''
@@ -268,6 +269,7 @@ class DopPlanWindow(QMainWindow):
             current_bottom = round_cell(current_bottom.replace(',', '.'))
 
         work_earlier = self.tabWidget.currentWidget().work_edit.toPlainText()
+        number_dp = self.tabWidget.currentWidget().number_DP_Combo.currentText()
 
         template_depth_edit = self.tabWidget.currentWidget().template_depth_edit.text()
         template_lenght_edit = self.tabWidget.currentWidget().template_lenght_edit.text()
@@ -287,6 +289,8 @@ class DopPlanWindow(QMainWindow):
         if float(template_depth_edit) > float(current_bottom):
             mes = QMessageBox.critical(self, 'Забой', 'Шаблонирование не может быть ниже текущего забоя')
             return
+        if number_dp != '':
+            well_data.number_dp = int(float(number_dp))
 
         if well_data.data_in_base:
 
@@ -323,6 +327,7 @@ class DopPlanWindow(QMainWindow):
             well_data.current_bottom = current_bottom
             well_data.fluid = fluid[:4]
         else:
+
             if float(current_bottom) > well_data.bottomhole_drill._value:
                 mes = QMessageBox.critical(self, 'Забой', 'Текущий забой больше пробуренного забоя')
                 return
@@ -413,7 +418,7 @@ class DopPlanWindow(QMainWindow):
 
                 # Проверяем наличие таблицы с определенным именем
                 result_table = 0
-                number_dp = int(float(well_data.number_dp)) - 1
+
                 a = well_data.work_plan
                 if well_data.work_plan in ['krs', 'plan_change']:
                     work_plan = 'krs'

@@ -91,7 +91,7 @@ def emergency_hook(self):
                        None, None, None, None, None, None, None,
                        'Мастер, подрядчик по ГИС', liftingNKT_norm(well_data.current_bottom, 1)],
                       [None, None,
-                       f'При результатам ревизии поднятого количества кабеля  произвести, по согласованию с аварийной '
+                       f'При результатам ревизии поднятого количества аварийного оборудования произвести, по согласованию с аварийной '
                        f'службой супервайзинга, повторить цикл работ - до полного извлечения из скважины '
                        f'кабеля расчётной длины',
                        None, None, None, None, None, None, None,
@@ -179,13 +179,7 @@ def emergency_sticking(self, lar_diametr_line, nkt_key, lar_type_combo,
     for row in seal_list:
         emergency_list.append(row)
 
-    for row in Emergency_lar.emergence_sbt(self):
-        emergency_list.append(row)
 
-    well_data.current_bottom, ok = QInputDialog.getDouble(self, 'Текущий забой',
-                                                         'Введите Текущий забой после ЛАР',
-                                                         well_data.bottomhole_artificial._value, 1,
-                                                         well_data.bottomhole_drill._value, 1)
     return emergency_list
 
 
