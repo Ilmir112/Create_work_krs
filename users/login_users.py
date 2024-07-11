@@ -1,3 +1,4 @@
+import os
 import sqlite3
 
 import psycopg2
@@ -113,7 +114,8 @@ class LoginWindow(QWidget):
                     conn.close()
         else:
             try:
-                conn = sqlite3.connect('data_base/users_database/users.db')
+                well_data.dp_path_user = os.path.join(os.path.dirname(__file__), "data_base/users_database/users.db")
+                conn = sqlite3.connect(well_data.dp_path_user)
                 cursor = conn.cursor()
                 cursor.execute(
                     "SELECT last_name, first_name, second_name, password, position_in, organization FROM users "
@@ -172,7 +174,7 @@ class LoginWindow(QWidget):
 
             users_list = []
             try:
-                conn = sqlite3.connect('data_base/users_database/users.db')
+                conn = sqlite3.connect(f'{well_data.dp_path_user}')
                 cursor = conn.cursor()
 
                 cursor.execute("SELECT last_name, first_name, second_name, position_in, organization FROM users")
@@ -311,7 +313,7 @@ class RegisterWindow(QWidget):
                     mes = QMessageBox.information(self, 'пароль', 'Пароли не совпадают')
         else:
             try:
-                conn = sqlite3.connect('data_base/users_database/users.db')
+                conn = sqlite3.connect(f'{well_data.dp_path_user}')
                 cursor = conn.cursor()
 
                 # Проверяем, существует ли пользователь с таким именем
