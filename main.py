@@ -265,7 +265,7 @@ class MyWindow(QMainWindow):
 
         threading.Timer(2.0, self.close_splash).start()
 
-        well_data.connect_in_base = self.check_connection(well_data.host_krs)
+
 
         self.log_widget = QPlainTextEditLogger(self)
         logger.addHandler(self.log_widget)
@@ -2543,8 +2543,7 @@ if __name__ == "__main__":
     if MyWindow.check_process():
        MyWindow.show_confirmation()
     try:
-
-
+        well_data.connect_in_base = MyWindow.check_connection(well_data.host_krs)
         if well_data.connect_in_base is False:
             mes = QMessageBox.information(None, 'Проверка соединения',
                                           'Проверка показало что с облаком соединения нет, '

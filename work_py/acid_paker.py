@@ -124,11 +124,13 @@ class CheckableComboBoxChild(QComboBox):
         a = text
         b = TabPage_SO.count_plast
         if text in well_data.plast_work and not text in TabPage_SO.count_plast:
-            item.setData(Qt.Unchecked if not text in well_data.plast_work else Qt.Checked, Qt.CheckStateRole)
-            TabPage_SO.count_plast.append(text)
+            if text not in TabPage_SO.count_plast:
+                item.setData(Qt.Unchecked if not text in well_data.plast_work else Qt.Checked, Qt.CheckStateRole)
+                TabPage_SO.count_plast.append(text)
         else:
             if well_data.plast_project:
-                item.setData(Qt.Unchecked if not text in well_data.plast_project else Qt.Checked, Qt.CheckStateRole)
+                if text not in TabPage_SO.count_plast:
+                    item.setData(Qt.Unchecked if not text in well_data.plast_project else Qt.Checked, Qt.CheckStateRole)
 
         self.model().appendRow(item)
 
