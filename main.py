@@ -2252,6 +2252,20 @@ class MyWindow(QMainWindow):
                                                  merged_cell.max_col - merged_cell.min_col + 1)
                 else:
                     item = QTableWidgetItem("")
+        for row in range(table_widget.rowCount()):
+            row_value_empty = True  # Флаг, указывающий, что все ячейки в строке пустые
+            # Проход по всем колонкам в текущей строке
+            for col in range(table_widget.columnCount()):
+                item = table_widget.item(row, col)
+                # Проверка, является ли содержимое ячейки пустым
+                if item is not None and item.text() != "":
+                    row_value_empty = False  # Если хотя бы одна ячейка не пустая, снимаем флаг
+                    break
+            # Если все ячейки в строке пустые, скрываем строку
+            if row_value_empty:
+                table_widget.setRowHidden(row, True)
+            else:
+                table_widget.setRowHidden(row, False)
 
         if work_plan == 'krs':
             if self.work_window is None:

@@ -192,7 +192,7 @@ class CreatePZ(QMainWindow):
                                    90: (501, 600), 110: (601, 700), 120: (701, 800), 130: (801, 900),
                                    150: (901, 1500), 270: (1500, 2300)}
 
-                for i in range(well_data.ins_ind, well_data.ins_ind + len(dict_events_gnvp[work_plan]) - 1):
+                for i in range(well_data.ins_ind, well_data.ins_ind + len(dict_events_gnvp[work_plan])):
                     ws.merge_cells(start_row=i, start_column=2, end_row=i, end_column=12)
                     data = ws.cell(row=i, column=2)
                     data.value = dict_events_gnvp[work_plan][i - well_data.ins_ind][1]

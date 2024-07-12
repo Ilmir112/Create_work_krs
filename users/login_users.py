@@ -223,8 +223,7 @@ class RegisterWindow(QWidget):
 
         self.label_organization = QLabel("Организация:", self)
         self.organization = QComboBox(self)
-        self.organization.addItems(['', 'ООО "Ойл-Сервис"', 'ООО "РН-Сервис"'])
-
+        self.organization.addItems(['', 'ООО "Ойл-cервис"', 'ООО "РН-Сервис"'])
 
         self.label_password = QLabel("Пароль", self)
         self.password = QLineEdit(self)

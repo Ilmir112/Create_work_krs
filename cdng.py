@@ -803,6 +803,7 @@ def events_gnvp(contractor):
              'с фиксацией выхода непрореагировавшего кислотного состава и последующим его хранением отдельно от ЖГ '
              'и утилизацией, в установленном порядке',
              None, None, None, None, None, None, None, None, None],
+            [None, None,  None, None, None, None, None, None, None, None, None],
         ]
 
     return events_gnvp

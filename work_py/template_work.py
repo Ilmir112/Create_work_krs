@@ -1225,12 +1225,15 @@ class TemplateKrs(QMainWindow):
         from .drilling import Drill_window, TabPage_SO_drill
 
         pero_list = RirWindow.pero_select(self, well_data.current_bottom)
-
+        if well_data.gipsInWell:
+            gips_str = f'С ГЛУБИНЫ 1100м СНИЗИТЬ СКОРОСТЬ  СПУСКА до 0.25м/с ВОЗМОЖНО ОТЛОЖЕНИЕ ГИПСА'
+        else:
+            gips_str = ''
         gipsPero_list = [
             [f'Спустить {pero_list}  на тНКТ{well_data.nkt_diam}мм', None,
              f'Спустить {pero_list}  на тНКТ{well_data.nkt_diam}мм до глубины {well_data.current_bottom}м '
-             f'с замером, шаблонированием шаблоном {well_data.nkt_template}мм. Опрессовать НКТ на 200атм. Вымыть шар. \n'
-             f'С ГЛУБИНЫ 1100м СНИЗИТЬ СКОРОСТЬ  СПУСКА до 0.25м/с ВОЗМОЖНО ОТЛОЖЕНИЕ ГИПСА'
+             f'с замером, шаблонированием шаблоном {well_data.nkt_template}мм. Опрессовать НКТ на 200атм. Вымыть шар. '
+             f' {gips_str} \n'             
              f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
              None, None, None, None, None, None, None,
              'мастер КРС', 2.5],
