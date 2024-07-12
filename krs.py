@@ -53,7 +53,7 @@ class TabPageGno(QWidget):
 
         for plast in well_data.plast_work:
             if plast in ['Сбоб-рад', 'Сбоб', 'Crr-bb', 'CI', 'CII', 'CIII', 'СIV0', 'CIV', 'CV', 'CVI', 'CVI0', 'D2ps',
-                         'Дпаш', 'Дкын', 'C1rd-bb-tl']:
+                         'Дпаш', 'Дкын', 'C1rd-bb-tl', 'Ctl']:
                 self.surfactant_hydrofabizer_Combo.setCurrentIndex(1)
 
 
