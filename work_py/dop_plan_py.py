@@ -12,6 +12,7 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QComboBo
     QMainWindow, QPushButton, QTextEdit
 from PyQt5.QtCore import Qt
 from datetime import datetime
+
 from krs import TabPageGno, GnoWindow
 
 from work_py.alone_oreration import lifting_unit, weigth_pipe, volume_pod_NKT, pvo_gno, volume_jamming_well
@@ -174,6 +175,7 @@ class TabPageDp(QWidget):
 
 
     def get_tables_starting_with(self, well_number, well_area):
+        from data_base.work_with_base import connect_to_db
         """
         Возвращает список таблиц, имена которых начинаются с заданного префикса.
         """
@@ -207,7 +209,9 @@ class TabPageDp(QWidget):
                 return
         else:
             try:
-                conn = sqlite3.connect('data_base/data_base_well/databaseWell.db')
+                # Формируем полный путь к файлу базы данных
+                db_path = connect_to_db('databaseWell.db', 'data_base_well')
+                conn = sqlite3.connect(db_path)
                 cursor = conn.cursor()
 
                 # Получаем все имена таблиц в базе данных
@@ -405,6 +409,8 @@ class DopPlanWindow(QMainWindow):
                                                                             vertical='center')
 
     def extraction_data(self, table_name, paragraph_row):
+        from data_base.work_with_base import connect_to_db
+
         if 'Ойл' in well_data.contractor:
             contractor = 'ОЙЛ'
         elif 'РН' in well_data.contractor:
@@ -468,7 +474,9 @@ class DopPlanWindow(QMainWindow):
                     conn1.close()
         else:
             try:
-                conn = sqlite3.connect('data_base/data_base_well/databaseWell.db')
+                # Формируем полный путь к файлу базы данных
+                db_path = connect_to_db('databaseWell.db', 'data_base_well')
+                conn = sqlite3.connect(db_path)
                 cursor = conn.cursor()
 
                 result_table = 0

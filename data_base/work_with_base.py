@@ -1,4 +1,5 @@
 import json
+import os
 import re
 import sqlite3
 
@@ -142,8 +143,9 @@ class Classifier_well(QMainWindow):
                     conn.close()
         else:
             # try:
+            db_path = connect_to_db('databaseclassification.db', '')
             # Создание подключения к базе данных SQLite
-            conn = sqlite3.connect('data_base/databaseclassification.db')
+            conn = sqlite3.connect(db_path)
 
             # Выполнение SQL-запроса для получения данных
             cursor = conn.cursor()
@@ -192,8 +194,9 @@ class Classifier_well(QMainWindow):
                     conn.close()
         else:
             try:
+                db_path = connect_to_db('databaseclassification.db', '')
                 # Создание подключения к базе данных SQLite
-                conn = sqlite3.connect('data_base/databaseclassification.db')
+                conn = sqlite3.connect(db_path)
 
                 # Выполнение SQL-запроса для получения данных
                 cursor = conn.cursor()
@@ -325,7 +328,9 @@ class Classifier_well(QMainWindow):
                     conn.close()
         else:
             try:
-                conn = sqlite3.connect('data_base/databaseclassification.db')
+                db_path = connect_to_db('databaseclassification.db', '')
+                # Создание подключения к базе данных SQLite
+                conn = sqlite3.connect(db_path)
                 cursor = conn.cursor()
                 region_list = ['ЧГМ', 'АГМ', 'ТГМ', 'ИГМ', 'КГМ']
 
@@ -587,7 +592,9 @@ class Classifier_well(QMainWindow):
                     conn.close()
         else:
             try:
-                conn = sqlite3.connect('data_base/databaseclassification.db')
+                db_path = connect_to_db('databaseclassification.db', '')
+                # Создание подключения к базе данных SQLite
+                conn = sqlite3.connect(db_path)
                 cursor = conn.cursor()
                 for region_name in region_list:
                     if region in region_name:
@@ -749,7 +756,11 @@ def insert_database_well_data(well_number, well_area, contractor, costumer, data
             mes = QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных')
     else:
         try:
-            conn = sqlite3.connect('data_base/data_base_well/well_data.db')
+
+            # Формируем полный путь к файлу базы данных
+            db_path = connect_to_db('well_data.db', 'data_base_well/')
+
+            conn = sqlite3.connect(f'{db_path}')
             cursor = conn.cursor()
             # Проверка наличия строки с заданными параметрами
             cursor.execute("""
@@ -807,6 +818,20 @@ def insert_database_well_data(well_number, well_area, contractor, costumer, data
             mes = QMessageBox.warning(None, 'Ошибка', f'Ошибка подключения к базе данных {e}')
 
 
+def connect_to_db(name_base, folder_base):
+    # Получаем текущий каталог приложения
+    current_dir = os.path.dirname(__file__)
+
+    # Определяем путь к папке с базой данных
+    db_folder = os.path.join(current_dir, folder_base)
+
+    # Формируем полный путь к файлу базы данных
+    db_path = os.path.join(db_folder, name_base)
+
+    return db_path
+
+
+
 def check_in_database_well_data(number_well, area_well):
     if well_data.connect_in_base:
         try:
@@ -828,7 +853,9 @@ def check_in_database_well_data(number_well, area_well):
             mes = QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных, Скважина не добавлена в базу')
     else:
         try:
-            conn = sqlite3.connect('data_base/data_base_well/well_data.db')
+            db_path = connect_to_db('well_data.db', 'data_base_well/')
+
+            conn = sqlite3.connect(f'{db_path}')
             cursor = conn.cursor()
 
             cursor.execute("SELECT data_well FROM wells WHERE well_number = ? AND area_well = ? "
@@ -1066,7 +1093,9 @@ def create_database_well_db(work_plan, number_dp):
         """Добавляет данные о скважине в SQLite базу данных."""
 
         try:
-            conn = sqlite3.connect('data_base/data_base_well/databaseWell.db')
+            # Формируем полный путь к файлу базы данных
+            db_path = connect_to_db('databaseWell.db', 'data_base_well')
+            conn = sqlite3.connect(db_path)
             cursor = conn.cursor()
 
             if number_dp == 0:
@@ -1178,7 +1207,9 @@ def read_excel_in_base(number_well, area_well):
             conn.close()
 
     else:
-        conn = sqlite3.connect('data_base/data_base_well/well_data.db')
+        db_path = connect_to_db('well_data.db', 'data_base_well/')
+
+        conn = sqlite3.connect(f'{db_path}')
         cursor = conn.cursor()
 
         cursor.execute("SELECT excel_json FROM wells WHERE well_number = ? AND area_well = ? "

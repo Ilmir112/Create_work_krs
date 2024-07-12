@@ -65,9 +65,11 @@ class ExcelWorker(QThread):
         super().__init__()
 
     def check_well_existence(self, well_number, deposit_area, region):
-        stop_app = False
-        try:
+        from data_base.work_with_base import connect_to_db
+        stop_app = True
+        check_true = True
 
+        try:
             current_year = datetime.now().year
             month = datetime.now().month
             # print(f'месяц {month}')
@@ -97,7 +99,9 @@ class ExcelWorker(QThread):
                     mes = QMessageBox.warning(None, 'Некорректная дата перечня',
                                               f'Необходимо обновить перечень скважин без '
                                               f'глушения на текущий квартал {region}, необходимо обратиться к администратору')
-                    stop_app = True
+                else:
+                    stop_app = False
+
 
                 try:
                     # Проверка наличия записи в базе данных
@@ -128,7 +132,11 @@ class ExcelWorker(QThread):
                         conn.close()
             else:
                 try:
-                    conn = sqlite3.connect('data_base/databaseclassification.db')
+
+                    # Формируем полный путь к файлу базы данных
+                    db_path = connect_to_db('databaseclassification.db', '')
+
+                    conn = sqlite3.connect(f'{db_path}')
                     cursor = conn.cursor()
 
                     # Проверка наличия записи с указанной датой
@@ -139,8 +147,10 @@ class ExcelWorker(QThread):
                         QMessageBox.warning(None, 'Некорректная дата перечня',
                                             f'Необходимо обновить перечень скважин без '
                                             f'глушения на текущий квартал {region}')
-                        stop_app = True
-                        return False  # Возвращаем False, если запись с датой не найдена
+                    else:
+                        stop_app = False
+
+
 
                     # Проверка наличия записи о скважине
                     cursor.execute(f"SELECT * FROM {region} WHERE well_number=? AND deposit_area=?",
@@ -164,17 +174,18 @@ class ExcelWorker(QThread):
                         cursor.close()
                     if conn:
                         conn.close()
-            if stop_app == True:
-                MyWindow.pause_app()
-                window.close()
+
         except Exception as e:
             QMessageBox.warning(None, 'Ошибка', f"Ошибка при проверке записи: {e}")
-
+        if stop_app == True:
+            MyWindow.pause_app()
+            window.close()
         # Завершение работы потока
         self.finished.emit()
         return check_true
 
     def check_category(self, well_number, deposit_area, region):
+        from data_base.work_with_base import connect_to_db
         if well_data.connect_in_base:
             try:
                 # Подключение к базе данных
@@ -206,7 +217,9 @@ class ExcelWorker(QThread):
                     conn.close()
         else:
             try:
-                conn = sqlite3.connect('data_base/databaseclassification.db')
+                db_path = connect_to_db('databaseclassification.db', '')
+
+                conn = sqlite3.connect(db_path)
                 cursor = conn.cursor()
 
                 cursor.execute(
@@ -636,21 +649,6 @@ class MyWindow(QMainWindow):
                 self.signatures_window.close()
                 self.signatures_window = None
 
-        elif action == self.without_jamming_TGM_reload:
-            costumer = 'ООО Башнефть-добыча'
-            self.reload_without_damping(costumer, 'ТГМ')
-        elif action == self.without_jamming_IGM_reload:
-            costumer = 'ООО Башнефть-добыча'
-            self.reload_without_damping(costumer, 'ИГМ')
-        elif action == self.without_jamming_CHGM_reload:
-            costumer = 'ООО Башнефть-добыча'
-            self.reload_without_damping(costumer, 'ЧГМ')
-        elif action == self.without_jamming_KGM_reload:
-            costumer = 'ООО Башнефть-добыча'
-            self.reload_without_damping(costumer, 'КГМ')
-        elif action == self.without_jamming_AGM_reload:
-            costumer = 'ООО Башнефть-добыча'
-            self.reload_without_damping(costumer, 'АГМ')
 
         elif action == self.without_jamming_TGM_open:
             costumer = 'ООО Башнефть-добыча'
@@ -667,24 +665,6 @@ class MyWindow(QMainWindow):
         elif action == self.without_jamming_AGM_open:
             costumer = 'ООО Башнефть-добыча'
             self.open_without_damping(costumer, 'АГМ')
-
-        elif action == self.class_well_TGM_reload:
-            costumer = 'ООО Башнефть-добыча'
-            self.reload_class_well(costumer, 'ТГМ')
-
-        elif action == self.class_well_IGM_reload:
-            costumer = 'ООО Башнефть-добыча'
-            self.reload_class_well(costumer, 'ИГМ')
-        elif action == self.class_well_CHGM_reload:
-            costumer = 'ООО Башнефть-добыча'
-            self.reload_class_well(costumer, 'ЧГМ')
-        elif action == self.class_well_KGM_reload:
-            costumer = 'ООО Башнефть-добыча'
-            self.reload_class_well(costumer, 'КГМ')
-        elif action == self.class_well_AGM_reload:
-            costumer = 'ООО Башнефть-добыча'
-            self.reload_class_well(costumer, 'АГМ')
-
         elif action == self.class_well_TGM_open:
             costumer = 'ООО Башнефть-добыча'
             self.open_class_well(costumer, 'ТГМ')
@@ -700,6 +680,42 @@ class MyWindow(QMainWindow):
         elif action == self.class_well_AGM_open:
             costumer = 'ООО Башнефть-добыча'
             self.open_class_well(costumer, 'АГМ')
+
+        elif 'Зуфаров И.М.' in well_data.user[1]:
+
+
+            if action == self.class_well_TGM_reload:
+                costumer = 'ООО Башнефть-добыча'
+                self.reload_class_well(costumer, 'ТГМ')
+            elif action == self.class_well_CHGM_reload:
+                costumer = 'ООО Башнефть-добыча'
+                self.reload_class_well(costumer, 'ЧГМ')
+            elif action == self.class_well_KGM_reload:
+                costumer = 'ООО Башнефть-добыча'
+                self.reload_class_well(costumer, 'КГМ')
+            elif action == self.class_well_AGM_reload:
+                costumer = 'ООО Башнефть-добыча'
+                self.reload_class_well(costumer, 'АГМ')
+            elif action == self.without_jamming_TGM_reload:
+                costumer = 'ООО Башнефть-добыча'
+                self.reload_without_damping(costumer, 'ТГМ')
+            elif action == self.without_jamming_CHGM_reload:
+                costumer = 'ООО Башнефть-добыча'
+                self.reload_without_damping(costumer, 'ЧГМ')
+            elif action == self.without_jamming_KGM_reload:
+                costumer = 'ООО Башнефть-добыча'
+                self.reload_without_damping(costumer, 'КГМ')
+            elif action == self.without_jamming_AGM_reload:
+                costumer = 'ООО Башнефть-добыча'
+                self.reload_without_damping(costumer, 'АГМ')
+            elif action == self.without_jamming_IGM_reload:
+                costumer = 'ООО Башнефть-добыча'
+                self.reload_without_damping(costumer, 'ИГМ')
+
+            elif action == self.class_well_IGM_reload:
+                costumer = 'ООО Башнефть-добыча'
+                self.reload_class_well(costumer, 'ИГМ')
+
         elif action == self.application_pvr:
             self.work_plan = 'application_pvr'
             # self.tableWidgetOpenPvr()
@@ -714,8 +730,6 @@ class MyWindow(QMainWindow):
                                                                   "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
             if self.fname:
                 self.open_gis_application(self.fname)
-
-
         elif action == self.application_geophysical:
             pass
         else:

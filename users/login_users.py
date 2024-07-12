@@ -8,6 +8,7 @@ from PyQt5.QtCore import Qt
 import well_data
 
 
+
 class LoginWindow(QWidget):
     def __init__(self):
         super().__init__()
@@ -78,6 +79,8 @@ class LoginWindow(QWidget):
     #         if conn:
     #             conn.close()
     def login(self):
+        from data_base.work_with_base import connect_to_db
+
         username = self.username.currentText()
         password = self.password.text()
         last_name, first_name, second_name, _ = username.split(' ')
@@ -114,8 +117,8 @@ class LoginWindow(QWidget):
                     conn.close()
         else:
             try:
-
-                conn = sqlite3.connect(well_data.dp_path_user)
+                db_path = connect_to_db('users.db', 'users_database')
+                conn = sqlite3.connect(f'{db_path}')
                 cursor = conn.cursor()
                 cursor.execute(
                     "SELECT last_name, first_name, second_name, password, position_in, organization FROM users "
@@ -155,6 +158,7 @@ class LoginWindow(QWidget):
 
 
     def get_list_users(self):
+        from data_base.work_with_base import connect_to_db
         # Создаем подключение к базе данных
         if well_data.connect_in_base:
             conn = psycopg2.connect(**well_data.postgres_conn_user)
@@ -174,9 +178,9 @@ class LoginWindow(QWidget):
 
             users_list = []
             try:
-                well_data.dp_path_user = os.path.join(os.path.dirname(__file__), 'users.db')
-                print(f'база sqlite {well_data.dp_path_user}')
-                conn = sqlite3.connect(f'{well_data.dp_path_user}')
+
+                db_path = connect_to_db('users.db', 'users_database')
+                conn = sqlite3.connect(f'{db_path}')
                 cursor = conn.cursor()
 
                 cursor.execute("SELECT last_name, first_name, second_name, position_in, organization FROM users")
@@ -277,6 +281,7 @@ class RegisterWindow(QWidget):
             self.grid.addWidget(self.label_region, 5, 1)
             self.grid.addWidget(self.region, 5, 2)
     def register_user(self):
+        from data_base.work_with_base import connect_to_db
         last_name = self.last_name.text().title().strip()
         first_name = self.first_name.text().title().strip()
         second_name = self.second_name.text().title().strip()
@@ -315,7 +320,8 @@ class RegisterWindow(QWidget):
                     mes = QMessageBox.information(self, 'пароль', 'Пароли не совпадают')
         else:
             try:
-                conn = sqlite3.connect(f'{well_data.dp_path_user}')
+                db_path = connect_to_db('users.db', 'users_database')
+                conn = sqlite3.connect(f'{db_path}')
                 cursor = conn.cursor()
 
                 # Проверяем, существует ли пользователь с таким именем
