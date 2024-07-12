@@ -221,13 +221,13 @@ def razdel_1(self, region, contractor):
              '_____________К.Н. Фазлиахметов ', None, None, None, None],
             [None, f'"____"_____________________{current_datetime.year}г.', None, None, None, None, None,
              f'"____"_____________________{current_datetime.year}г.', None, None, None, None],
-
-            [None, podpis_dict[region]['gg']['post'], None, None, None,
-             None,
-             None, 'Доверенность №27 от 01.09.2023г.', 'Доверенность №27 от 01.09.2023г.', None, None, None],
             [None, None, None, None, None, None,
              None, None, None,
              None, None, None],
+            [None, podpis_dict[region]['gg']['post'], None, None, None,
+             None,
+             None, 'Доверенность №27 от 01.09.2023г.', 'Доверенность №27 от 01.09.2023г.', None, None, None],
+
                 [None, f'_____________{podpis_dict[region]["gg"]["surname"]}', None, None, None, None, None,
                  '', None, None, '',
                  None],
