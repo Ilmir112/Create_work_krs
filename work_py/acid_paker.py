@@ -236,6 +236,10 @@ class TabPage_SO_acid(QWidget):
         self.skv_proc_edit.setClearButtonEnabled(True)
         self.skv_proc_edit.setText('15')
 
+        self.sko_true_label_type = QLabel("необходимость СКО", self)
+        self.sko_true_combo = QComboBox(self)
+        self.sko_true_combo.addItems(['Да', 'Нет'])
+
         self.Qplast_labelType = QLabel("Нужно ли определять приемистоть до СКО", self)
         self.QplastEdit = QComboBox(self)
         self.QplastEdit.addItems(['ДА', 'НЕТ'])
@@ -335,20 +339,23 @@ class TabPage_SO_acid(QWidget):
         self.grid.addWidget(self.iron_volume_label, 4, 5)
         self.grid.addWidget(self.iron_volume_edit, 5, 5)
 
-        self.grid.addWidget(self.acid_label_type, 6, 1)
-        self.grid.addWidget(self.acid_edit, 7, 1)
-        self.grid.addWidget(self.acid_volume_label, 6, 2)
-        self.grid.addWidget(self.acid_volume_edit, 7, 2)
-        self.grid.addWidget(self.acid_proc_label, 6, 3)
-        self.grid.addWidget(self.acid_proc_edit, 7, 3)
-        self.grid.addWidget(self.acidOilProcLabel, 6, 4)
-        self.grid.addWidget(self.acidOilProcEdit, 7, 4)
-        self.grid.addWidget(self.pressure_Label, 6, 5)
-        self.grid.addWidget(self.pressure_edit, 7, 5)
-        self.grid.addWidget(self.calculate_sko_label, 6, 7)
-        self.grid.addWidget(self.calculate_sko_line, 7, 7)
-        self.grid.addWidget(self.Qplast_labelType, 6, 0)
-        self.grid.addWidget(self.QplastEdit, 7, 0)
+        self.grid.addWidget(self.sko_true_label_type, 6, 0)
+        self.grid.addWidget(self.sko_true_combo, 7, 0)
+
+        self.grid.addWidget(self.acid_label_type, 6, 2)
+        self.grid.addWidget(self.acid_edit, 7, 2)
+        self.grid.addWidget(self.acid_volume_label, 6, 3)
+        self.grid.addWidget(self.acid_volume_edit, 7, 3)
+        self.grid.addWidget(self.acid_proc_label, 6, 4)
+        self.grid.addWidget(self.acid_proc_edit, 7, 4)
+        self.grid.addWidget(self.acidOilProcLabel, 6, 5)
+        self.grid.addWidget(self.acidOilProcEdit, 7, 5)
+        self.grid.addWidget(self.pressure_Label, 6, 6)
+        self.grid.addWidget(self.pressure_edit, 7, 6)
+        self.grid.addWidget(self.calculate_sko_label, 6, 8)
+        self.grid.addWidget(self.calculate_sko_line, 7, 8)
+        self.grid.addWidget(self.Qplast_labelType, 6, 1)
+        self.grid.addWidget(self.QplastEdit, 7, 1)
         self.grid.addWidget(self.swabTypeLabel, 8, 1)
         self.grid.addWidget(self.swabTypeCombo, 9, 1)
         self.grid.addWidget(self.swab_pakerLabel, 8, 2)
@@ -445,8 +452,8 @@ class TabPage_SO_acid(QWidget):
         if type_sko == 'ВТ':
             self.sko_vt_label = QLabel('Высокотехнологическое СКО', self)
             self.sko_vt_edit = QLineEdit(self)
-            self.grid.addWidget(self.sko_vt_label, 6, 6)
-            self.grid.addWidget(self.sko_vt_edit, 7, 6)
+            self.grid.addWidget(self.sko_vt_label, 6, 7)
+            self.grid.addWidget(self.sko_vt_edit, 7, 7)
         else:
             self.sko_vt_label = QLabel('Высокотехнологическое СКО', self)
             self.sko_vt_edit = QLineEdit(self)
@@ -596,17 +603,19 @@ class TabPage_SO_acid(QWidget):
         if self.paker_layout_combo.currentText() in ['однопакерная', 'однопакерная, упорный', 'пакер с заглушкой']:
 
             if paker_depth != '':
-                self.paker_khost.setText(str(int(sole_plast - int(paker_depth))))
+
                 self.swab_paker_depth.setText(f'{roof_plast - (int(sole_plast) - int(paker_depth))}')
                 if self.paker_layout_combo.currentText() in ['однопакерная, упорный', 'пакер с заглушкой']:
                     self.paker_khost.setText(str(int(well_data.current_bottom - int(paker_depth))))
                     self.swab_paker_depth.setText(f'{paker_depth}')
             if rows == 0:
+                self.paker_khost.setText(str(int(sole_plast - int(paker_depth))))
                 if paker_depth != '' and self.paker_khost.text() != '':
-                    self.distance_between_packers_voronka = int(self.paker_khost.text()) - int(self.paker_depth.text())
+                    self.distance_between_packers_voronka = int(self.paker_khost.text())
             else:
                 if self.paker_khost != '':
-                    self.paker_khost.setText(f'{int(self.paker_depth.text()) - self.distance_between_packers_voronka}')
+                    a = self.distance_between_packers_voronka
+                    self.paker_khost.setText(f'{self.distance_between_packers_voronka}')
                 self.paker_khost.setEnabled(False)
         elif self.paker_layout_combo.currentText() in ['двухпакерная', 'двухпакерная, упорные']:
             if paker_depth != '':
@@ -795,11 +804,12 @@ class AcidPakerWindow(QMainWindow):
 
     def add_work(self):
 
+
         self.paker_layout_combo = str(self.tabWidget.currentWidget().paker_layout_combo.currentText())
         swab_true_edit_type = self.tabWidget.currentWidget().swab_true_edit_type.currentText()
         diametr_paker = int(float(self.tabWidget.currentWidget().diametr_paker_edit.text()))
         depth_gauge_combo = str(self.tabWidget.currentWidget().depth_gauge_combo.currentText())
-
+        sko_true_combo = str(self.tabWidget.currentWidget().sko_true_combo.currentText())
         skv_acid_edit = str(self.tabWidget.currentWidget().skv_acid_edit.currentText())
         skv_volume_edit = float(self.tabWidget.currentWidget().skv_volume_edit.text().replace(',', '.'))
         skv_proc_edit = int(self.tabWidget.currentWidget().skv_proc_edit.text().replace(',', '.'))
@@ -929,32 +939,33 @@ class AcidPakerWindow(QMainWindow):
 
             if svk_true_combo == 'Нужно СКВ':
                 work_template_list.extend(self.skv_acid_work(skv_acid_edit, skv_proc_edit, skv_volume_edit))
-            if "двух" in self.paker_layout_combo:
-                if row == 0 and well_data.curator != 'ОР' and rows != 1:
+            if sko_true_combo == 'Да':
+                if "двух" in self.paker_layout_combo:
+                    if row == 0 and well_data.curator != 'ОР' and rows != 1:
+                        work_template_list.extend(self.acid_work(QplastEdit, plast_combo, paker_khost, acid_edit,
+                                                                 acid_volume_edit, acid_proc_edit, pressure_edit,
+                                                                 acidOilProcEdit, iron_true_combo, iron_volume_edit,
+                                                                 paker_depth, paker2_depth)[:-1])
+                    else:
+                        work_template_list.extend(self.acid_work(QplastEdit, plast_combo, paker_khost, acid_edit,
+                                                                 acid_volume_edit, acid_proc_edit, pressure_edit,
+                                                                 acidOilProcEdit, iron_true_combo, iron_volume_edit,
+                                                                 paker_depth, paker2_depth))
+                elif "одно" in self.paker_layout_combo or "заглуш" in self.paker_layout_combo:
+                    if row == 0 and well_data.curator != 'ОР' and rows != 1:
+                        work_template_list.extend(self.acid_work(QplastEdit, plast_combo, paker_khost, acid_edit,
+                                                                 acid_volume_edit, acid_proc_edit, pressure_edit,
+                                                                 acidOilProcEdit, iron_true_combo, iron_volume_edit,
+                                                                 paker_depth)[:-1])
+                    else:
+                        work_template_list.extend(self.acid_work(QplastEdit, plast_combo, paker_khost, acid_edit,
+                                                                 acid_volume_edit, acid_proc_edit, pressure_edit,
+                                                                 acidOilProcEdit, iron_true_combo, iron_volume_edit,
+                                                                 paker_depth))
+                elif "воронка" in self.paker_layout_combo:
                     work_template_list.extend(self.acid_work(QplastEdit, plast_combo, paker_khost, acid_edit,
                                                              acid_volume_edit, acid_proc_edit, pressure_edit,
-                                                             acidOilProcEdit, iron_true_combo, iron_volume_edit,
-                                                             paker_depth, paker2_depth)[:-1])
-                else:
-                    work_template_list.extend(self.acid_work(QplastEdit, plast_combo, paker_khost, acid_edit,
-                                                             acid_volume_edit, acid_proc_edit, pressure_edit,
-                                                             acidOilProcEdit, iron_true_combo, iron_volume_edit,
-                                                             paker_depth, paker2_depth))
-            elif "одно" in self.paker_layout_combo or "заглуш" in self.paker_layout_combo:
-                if row == 0 and well_data.curator != 'ОР' and rows != 1:
-                    work_template_list.extend(self.acid_work(QplastEdit, plast_combo, paker_khost, acid_edit,
-                                                             acid_volume_edit, acid_proc_edit, pressure_edit,
-                                                             acidOilProcEdit, iron_true_combo, iron_volume_edit,
-                                                             paker_depth)[:-1])
-                else:
-                    work_template_list.extend(self.acid_work(QplastEdit, plast_combo, paker_khost, acid_edit,
-                                                             acid_volume_edit, acid_proc_edit, pressure_edit,
-                                                             acidOilProcEdit, iron_true_combo, iron_volume_edit,
-                                                             paker_depth))
-            elif "воронка" in self.paker_layout_combo:
-                work_template_list.extend(self.acid_work(QplastEdit, plast_combo, paker_khost, acid_edit,
-                                                         acid_volume_edit, acid_proc_edit, pressure_edit,
-                                                         acidOilProcEdit, iron_true_combo, iron_volume_edit))
+                                                             acidOilProcEdit, iron_true_combo, iron_volume_edit))
 
         if swab_true_edit_type == "Нужно освоение":
             swabTypeCombo = str(self.tabWidget.currentWidget().swabTypeCombo.currentText())

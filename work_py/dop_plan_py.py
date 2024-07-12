@@ -267,7 +267,7 @@ class DopPlanWindow(QMainWindow):
         from data_base.work_with_base import check_in_database_well_data, insert_data_well_dop_plan, round_cell
         from well_data import ProtectedIsNonNone
         from main import MyWindow
-        fluid = self.tabWidget.currentWidget().fluid_edit.text()
+        fluid = self.tabWidget.currentWidget().fluid_edit.text().replace(',', '.')
         current_bottom = self.tabWidget.currentWidget().current_bottom_edit.text()
         if current_bottom != '':
             current_bottom = round_cell(current_bottom.replace(',', '.'))
@@ -328,7 +328,7 @@ class DopPlanWindow(QMainWindow):
                 return
             well_data.fluid_work = fluid
             well_data.fluid_work_short = fluid[:7]
-            well_data.current_bottom = current_bottom
+
             well_data.fluid = fluid[:4]
         else:
 
@@ -365,7 +365,7 @@ class DopPlanWindow(QMainWindow):
             mes = QMessageBox.warning(self, 'Ошибка',
                                       'в интервале скреперования отсутствует корректные интервалы скреперования')
             return
-
+        well_data.current_bottom = current_bottom
         if well_data.data_in_base:
             well_data.dop_work_list = self.work_list(work_earlier)
         else:

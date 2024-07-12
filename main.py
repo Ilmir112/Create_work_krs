@@ -2519,7 +2519,7 @@ class MyWindow(QMainWindow):
     def check_depth_in_skm_interval(self, depth):
         check_true = False
 
-        if any([interval[0] <= depth <= interval[1] for interval in well_data.skm_interval]):
+        if any([float(interval[0]) <= float(depth) <= float(interval[1]) for interval in well_data.skm_interval]):
             check_true = True
             return int(depth)
         else:
