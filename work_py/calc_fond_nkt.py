@@ -27,11 +27,11 @@ class CalcFond:
         try:
             for nkt_l in calc_nkt_list:
                 if nkt_l <= float(self.static_level):
-                    # print(f'ЖГС {self.fluid}')
-                    p = round(float(self.fluid[:3]) * 9.81 * nkt_l / 100, 0)
+                    a = self.fluid
+                    p = round(float(str(self.fluid)[:3]) * 9.81 * nkt_l / 100, 0)
                 else:
-                    p = round(float(self.fluid[:3]) * 9.81 * nkt_l / 100-
-                              ((nkt_l - float(self.static_level)) * 9.81 * float(self.fluid[:4])) / 100, 0)
+                    p = round(float(str(self.fluid)[:3]) * 9.81 * nkt_l / 100-
+                              ((nkt_l - float(self.static_level)) * 9.81 * float(str(self.fluid)[:3])) / 100, 0)
 
                 if p >= 150:
                     p = 150

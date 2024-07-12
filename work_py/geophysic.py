@@ -231,7 +231,7 @@ class GeophysicWindow(MyWindow):
                 self.table_widget.setItem(row, column, QtWidgets.QTableWidgetItem(str(data)))
 
                 if column == 0 or column == 2 or column == 10 or column == 11 or column == 12:
-                    if not data is None:
+                    if not data is None :
                         text = data
                         for key, value in text_width_dict.items():
                             if value[0] <= len(str(text)) <= value[1]:

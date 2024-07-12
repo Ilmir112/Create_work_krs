@@ -431,7 +431,10 @@ class PerforationWindow(QMainWindow):
             for i, row_data in enumerate(perforation):
                 row = self.ins_ind + i
                 self.table_widget.insertRow(row)
-                lst = [0, 1, 2, len(perforation) - 1]
+                if type_perforation == 'ПВР на кабеле':
+                    lst = [0, 1, 2, len(perforation) - 1]
+                else:
+                    lst = [0, 1, 2, 3, 4, len(perforation) - 1]
                 row_max = self.table_widget.rowCount()
                 definition_plast_work(self)
                 MyWindow.insert_data_in_database(self, row, row_max)
@@ -440,7 +443,6 @@ class PerforationWindow(QMainWindow):
                 if i in lst:  # Объединение ячеек по вертикале в столбце "отвественные и норма"
                     self.table_widget.setSpan(i + self.ins_ind, 2, 1, 8)
                 for column, data in enumerate(row_data):
-
                     self.table_widget.setItem(row, column, QtWidgets.QTableWidgetItem(str(data)))
 
                     if not data is None:

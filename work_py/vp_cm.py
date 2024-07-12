@@ -238,7 +238,7 @@ class VpWindow(QMainWindow):
             ]
 
             well_data.current_bottom = vp_depth-3
-        RirWindow.perf_new(vp_depth, well_data.current_bottom)
+        RirWindow.perf_new(self, well_data.current_bottom, vp_depth)
         return vp_list
 
 

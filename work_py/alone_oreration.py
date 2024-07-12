@@ -560,8 +560,22 @@ def well_jamming(self, without_damping, lift_key, volume_well_jaming):
                            f'глушение в коллектор, в случае отсутствия на желобную емкость)'
         well_jamming_short = f'Глушение в затруб уд.весом {well_data.fluid_work_short} в ' \
                              f'объеме {round(well_volume(self, well_data.current_bottom) - well_volume(self, well_data.depth_fond_paker_do["do"]), 1)}м3 '
+    elif without_damping is False and lift_key in ['НН', 'НВ', 'ЭЦН']:
+        well_jamming_str = f'Произвести глушение скважины в объеме {volume_well_jaming}м3 тех ' \
+                           f'жидкостью уд.весом {well_data.fluid_work}' \
+                           f' на циркуляцию в следующим алгоритме: \n Произвести закачку в затрубное пространство ' \
+                           f'тех жидкости в ' \
+                           f'объеме {round(well_volume(self, sum(list(well_data.dict_nkt.values()))), 1)}м3 на ' \
+                           f'циркуляцию. Закрыть трубное пространство. ' \
+                           f'Произвести закачку на поглощение не более {well_data.max_admissible_pressure._value}атм ' \
+                           f'тех жидкости в ' \
+                           f'объеме {round(volume_well_jaming - well_volume(self, sum(list(well_data.dict_nkt.values()))), 1)}м3. Закрыть скважину на ' \
+                           f'стабилизацию не менее 2 часов. (согласовать глушение в коллектор, в случае ' \
+                           f'отсутствия на желобную емкость'
+        well_jamming_short = f'Глушение в затруб в объеме {volume_well_jaming}м3 тех ' \
+                             f'жидкостью уд.весом {well_data.fluid_work_short}'
     elif abs(sum(list(well_data.dict_nkt.values())) - well_data.perforation_roof) > 150:
-        well_jamming_str = f'Произвести глушение скважины прямой промывкой в объеме {volume_well_jaming}м3 тех ' \
+        well_jamming_str = f'Произвести глушение скважины объеме {volume_well_jaming}м3 тех ' \
                            f'жидкостью уд.весом {well_data.fluid_work}' \
                            f' на циркуляцию в следующим алгоритме: \n Произвести закачку в затрубное пространство ' \
                            f'тех жидкости в ' \
@@ -575,7 +589,7 @@ def well_jamming(self, without_damping, lift_key, volume_well_jaming):
         well_jamming_short = f'Глушение в затруб в объеме {volume_well_jaming}м3 тех ' \
                              f'жидкостью уд.весом {well_data.fluid_work_short}'
     elif abs(sum(list(well_data.dict_nkt.values())) - well_data.perforation_roof) <= 150:
-        well_jamming_str = f'Произвести глушение скважины прямой промывкой в объеме {volume_well_jaming}м3 тех ' \
+        well_jamming_str = f'Произвести глушение скважины  в объеме {volume_well_jaming}м3 тех ' \
                            f'жидкостью уд.весом {well_data.fluid_work}' \
                            f' на циркуляцию. Закрыть скважину на ' \
                            f'стабилизацию не менее 2 часов. (согласовать глушение в коллектор, в случае отсутствия ' \
