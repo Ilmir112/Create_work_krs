@@ -210,6 +210,10 @@ class TabPage_SO_acid(QWidget):
         self.khovst_label = QLabel("Длина хвостовики", self)
         self.paker_khost = QLineEdit(self)
 
+        self.need_privyazka_Label = QLabel("Привязка оборудования", self)
+        self.need_privyazka_QCombo = QComboBox()
+        self.need_privyazka_QCombo.addItems(['Нет', 'Да'])
+
         plast_work = ['']
         plast_work.extend(well_data.plast_work)
 
@@ -325,6 +329,8 @@ class TabPage_SO_acid(QWidget):
         self.grid.addWidget(self.paker_depth, 3, 5)
         self.grid.addWidget(self.paker2Label, 2, 6)
         self.grid.addWidget(self.paker2_depth, 3, 6)
+        self.grid.addWidget(self.need_privyazka_Label, 2, 7)
+        self.grid.addWidget(self.need_privyazka_QCombo, 3, 7)
 
         self.grid.addWidget(self.skv_true_label_type, 4, 0)
         self.grid.addWidget(self.svk_true_combo, 5, 0)
@@ -482,12 +488,22 @@ class TabPage_SO_acid(QWidget):
     def update_paker_layout(self, index):
         self.paker_layout_index = index
 
+        if index in ['однопакерная', 'пакер с заглушкой', 'двухпакерная']:
+            paker_depth = self.paker_depth.text()
+            if paker_depth != '':
+                paker_depth = float(paker_depth)
+                for plast in well_data.dict_perforation:
+                    if any(abs(paker_depth- roof) < 10 or abs(paker_depth - sole) < 10
+                           for roof, sole in well_data.dict_perforation[plast]['интервал']):
+                        self.need_privyazka_QCombo.setCurrentIndex(1)
+
         if index in ['однопакерная', 'пакер с заглушкой', 'однопакерная, упорный', ]:
             paker_layout_list_tab = ["Пласт", "хвост", "пакер", "СКВ", "вид кислоты", "процент", "объем", "объем нефти"]
             self.grid.addWidget(self.pakerLabel, 2, 5)
             self.grid.addWidget(self.paker_depth, 3, 5)
             self.paker2Label.setParent(None)
             self.paker2_depth.setParent(None)
+
             if index == 'однопакерная, упорный' or 'пакер с заглушкой' == index:
                 paker_depth = self.paker_depth.text()
                 if paker_depth != '':
@@ -557,7 +573,8 @@ class TabPage_SO_acid(QWidget):
 
             if paker_depth != '':
                 self.paker_khost.setText(str(int(sole_plast - paker_depth)))
-                self.swab_paker_depth.setText(str(int(roof_plast - 30 - (sole_plast - paker_depth))))
+
+                self.swab_paker_depth.setText(str(int(roof_plast - 30 - int(float(self.paker_khost.text())))))
         elif self.paker_layout_combo.currentText() in ['однопакерная, упорный', 'пакер с заглушкой']:
 
             paker_depth = int(roof_plast - 20)
@@ -804,27 +821,31 @@ class AcidPakerWindow(QMainWindow):
 
     def add_work(self):
 
+        try:
+            self.need_privyazka_QCombo = self.tabWidget.currentWidget().need_privyazka_QCombo.currentText()
+            self.paker_layout_combo = str(self.tabWidget.currentWidget().paker_layout_combo.currentText())
+            swab_true_edit_type = self.tabWidget.currentWidget().swab_true_edit_type.currentText()
+            diametr_paker = int(float(self.tabWidget.currentWidget().diametr_paker_edit.text()))
+            depth_gauge_combo = str(self.tabWidget.currentWidget().depth_gauge_combo.currentText())
+            sko_true_combo = str(self.tabWidget.currentWidget().sko_true_combo.currentText())
+            skv_acid_edit = str(self.tabWidget.currentWidget().skv_acid_edit.currentText())
+            skv_volume_edit = float(self.tabWidget.currentWidget().skv_volume_edit.text().replace(',', '.'))
+            skv_proc_edit = int(self.tabWidget.currentWidget().skv_proc_edit.text().replace(',', '.'))
+            pressure_edit = int(self.tabWidget.currentWidget().pressure_edit.text())
+            QplastEdit = str(self.tabWidget.currentWidget().QplastEdit.currentText())
+            acidOilProcEdit = self.tabWidget.currentWidget().acidOilProcEdit.text()
 
-        self.paker_layout_combo = str(self.tabWidget.currentWidget().paker_layout_combo.currentText())
-        swab_true_edit_type = self.tabWidget.currentWidget().swab_true_edit_type.currentText()
-        diametr_paker = int(float(self.tabWidget.currentWidget().diametr_paker_edit.text()))
-        depth_gauge_combo = str(self.tabWidget.currentWidget().depth_gauge_combo.currentText())
-        sko_true_combo = str(self.tabWidget.currentWidget().sko_true_combo.currentText())
-        skv_acid_edit = str(self.tabWidget.currentWidget().skv_acid_edit.currentText())
-        skv_volume_edit = float(self.tabWidget.currentWidget().skv_volume_edit.text().replace(',', '.'))
-        skv_proc_edit = int(self.tabWidget.currentWidget().skv_proc_edit.text().replace(',', '.'))
-        pressure_edit = int(self.tabWidget.currentWidget().pressure_edit.text())
-        QplastEdit = str(self.tabWidget.currentWidget().QplastEdit.currentText())
-        acidOilProcEdit = self.tabWidget.currentWidget().acidOilProcEdit.text()
-
-        iron_true_combo = self.tabWidget.currentWidget().iron_true_combo.currentText()
-        iron_volume_edit = self.tabWidget.currentWidget().acidOilProcEdit.text()
-        self.Qplast_after_edit = self.tabWidget.currentWidget().Qplast_after_edit.currentText()
-        self.expected_Q = self.tabWidget.currentWidget().expected_Q_edit.text()
-        self.expected_P = self.tabWidget.currentWidget().expected_P_edit.text()
-        if self.expected_P not in [None, 'None', '', '-']:
-            self.expected_P = int(float(self.expected_P))
-        self.pressure_three = self.tabWidget.currentWidget().pressure_three_edit.text()
+            iron_true_combo = self.tabWidget.currentWidget().iron_true_combo.currentText()
+            iron_volume_edit = self.tabWidget.currentWidget().acidOilProcEdit.text()
+            self.Qplast_after_edit = self.tabWidget.currentWidget().Qplast_after_edit.currentText()
+            self.expected_Q = self.tabWidget.currentWidget().expected_Q_edit.text()
+            self.expected_P = self.tabWidget.currentWidget().expected_P_edit.text()
+            if self.expected_P not in [None, 'None', '', '-']:
+                self.expected_P = int(float(self.expected_P))
+            self.pressure_three = self.tabWidget.currentWidget().pressure_three_edit.text()
+        except Exception as e:
+            QMessageBox.warning(self, 'Ошибка', f'Ошибка сохранения данных {e}')
+            return
 
         rows = self.tableWidget.rowCount()
 
@@ -850,7 +871,6 @@ class AcidPakerWindow(QMainWindow):
                 acid_edit = self.tableWidget.cellWidget(row, 5).currentText()
                 acid_proc_edit = int(float(self.tableWidget.item(row, 6).text()))
                 acid_volume_edit = round(float(self.tableWidget.item(row, 7).text()), 1)
-
 
                 try:
                     acidOilProc = round(float(self.tableWidget.item(row, 8).text()))
@@ -968,9 +988,21 @@ class AcidPakerWindow(QMainWindow):
                                                              acidOilProcEdit, iron_true_combo, iron_volume_edit))
 
         if swab_true_edit_type == "Нужно освоение":
-            swabTypeCombo = str(self.tabWidget.currentWidget().swabTypeCombo.currentText())
-            swab_volumeEdit = int(float(self.tabWidget.currentWidget().swab_volumeEdit.text()))
-            paker_depth_swab = int(float(self.tabWidget.currentWidget().swab_paker_depth.text()))
+            try:
+                swabTypeCombo = str(self.tabWidget.currentWidget().swabTypeCombo.currentText())
+                swab_volumeEdit = int(float(self.tabWidget.currentWidget().swab_volumeEdit.text()))
+                paker_depth_swab = int(float(self.tabWidget.currentWidget().swab_paker_depth.text()))
+                for plast in plast_combo.split(' '):
+                    if abs(paker_khost + paker_depth_swab - well_data.dict_perforation[plast]['кровля']) < 20:
+                        mes = QMessageBox.question(self, 'Вопрос',
+                                                   f'Расстояние между низом компоновки {paker_khost + paker_depth_swab} '
+                                                   f'и кровлей ПВР меньше 20м {well_data.dict_perforation[plast]["кровля"]}, Продолжить?')
+                        if mes == QMessageBox.StandardButton.No:
+                            return
+            except Exception as e:
+                QMessageBox.warning(self, 'Ошибка', f'Ошибка сохранения данных {e}')
+                return
+
 
             if self.paker_layout_combo == 'однопакерная' or self.paker_layout_combo == 'пакер с заглушкой':
                 if MyWindow.true_set_Paker(self, paker_depth_swab) is False:
@@ -1125,12 +1157,9 @@ class AcidPakerWindow(QMainWindow):
              None, None, None, None, None, None, None,
              'мастер КРС', None]]
 
-        for plast in list(well_data.dict_perforation.keys()):
-            for interval in well_data.dict_perforation[plast]['интервал']:
-                if abs(float(interval[1] - float(well_data.depth_fond_paker_do["posle"]))) < 10 or abs(
-                        float(interval[0] - float(well_data.depth_fond_paker_do["posle"]))) < 10:
-                    if privyazkaNKT(self)[0] not in paker_list:
-                        paker_list.insert(1, privyazkaNKT(self)[0])
+        if self.need_privyazka_QCombo == 'Да' and self.paker_layout_combo in ['двухпакерная']:
+            if privyazkaNKT(self)[0] not in paker_list:
+                paker_list.insert(1, privyazkaNKT(self)[0])
         if depth_gauge_combo == 'Да':
             if self.paker_layout_combo in ['однопакерная', 'однопакерная, упорный', 'пакер с заглушкой']:
                 mtg_count = 2
@@ -1259,12 +1288,11 @@ class AcidPakerWindow(QMainWindow):
              f'Определить приемистость НЭК.',
              None, None, None, None, None, None, None,
              'мастер КРС', None]]
-        for plast in list(well_data.dict_perforation.keys()):
-            for interval in well_data.dict_perforation[plast]['интервал']:
-                if abs(float(interval[1] - float(well_data.depth_fond_paker_do["posle"]))) < 10 or abs(
-                        float(interval[0] - float(well_data.depth_fond_paker_do["posle"]))) < 10:
-                    if privyazkaNKT(self)[0] not in paker_list:
-                        paker_list.insert(1, privyazkaNKT(self)[0])
+
+        if self.need_privyazka_QCombo == 'Да' and self.paker_layout_combo in ['однопакерная', 'пакер с заглушкой']:
+            if privyazkaNKT(self)[0] not in paker_list:
+                paker_list.insert(1, privyazkaNKT(self)[0])
+
         if depth_gauge_combo == 'Да':
             if self.paker_layout_combo in ['однопакерная', 'однопакерная, упорный', 'пакер с заглушкой']:
                 mtg_count = 2

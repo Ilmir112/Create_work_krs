@@ -87,9 +87,9 @@ class LeakageWindow(QMainWindow):
         if not roof_leakage or not sole_leakage_line:
             msg = QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
             return
-        if well_data.bottomhole_artificial > float(sole_leakage_line):
-            msg = QMessageBox.information(self, 'Внимание', 'глубина НЭК ниже искусственного забоя')
-            return
+        # if float(well_data.bottomhole_artificial._value) > float(sole_leakage_line):
+        #     msg = QMessageBox.information(self, 'Внимание', 'глубина НЭК ниже искусственного забоя')
+        #     return
 
         rows = self.tableWidget.rowCount()
         self.tableWidget.insertRow(rows)
@@ -157,6 +157,8 @@ class LeakageWindow(QMainWindow):
                 dict_leakiness.setdefault(
                     'НЭК', {}).setdefault('интервал', {}).setdefault((f"{roof}-{sole}"), {}).setdefault(
                     'отрайбировано', False)
+        # well_data.dict_leakiness = dict_leakiness
+        # print(dict_leakiness)
 
         well_data.pause = False
         self.close()

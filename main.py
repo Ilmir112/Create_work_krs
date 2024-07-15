@@ -264,6 +264,9 @@ class MyWindow(QMainWindow):
         self.filter_widgets = []
         self.table_class = None
         self.table_juming = None
+        self.resize(1400, 800)
+        # self.setWindowState(Qt.WindowFullScreen)
+        # self.setWindowFlags(Qt.Window | Qt.WindowCloseButtonHint | Qt.WindowMinimizeButtonHint | Qt.WindowTitleHint | Qt.WindowSystemMenuHint)
 
         self.perforation_correct_window2 = None
         self.ws = None
@@ -2584,6 +2587,14 @@ if __name__ == "__main__":
 
     window = MyWindow()
     window.show()
+    # screen_geometry = QApplication.desktop().availableGeometry()
+    # window_width = int(screen_geometry.width() * 0.9)
+    # window_height = int(screen_geometry.height() * 0.9)
+    #
+    # window.setGeometry(0, 0, window_width, window_height)
+    #
+
+
 
     # app2 = UpdateChecker()
     # app2.check_version()

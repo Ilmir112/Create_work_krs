@@ -681,7 +681,7 @@ class RirWindow(QMainWindow):
         ]
         RirWindow.perf_new(self, roof_rir_edit, sole_rir_edit)
         # print(plast_combo)
-        if OpressovkaEK.testing_pressure(self, roof_rir_edit):
+        if OpressovkaEK.testing_pressure(self, roof_rir_edit)[2]:
             uzmPero_list.pop(-2)
 
         well_data.current_bottom = roof_rir_edit
@@ -720,7 +720,6 @@ class RirWindow(QMainWindow):
 
         if paker_need_Combo == "Нужно СПО":
             glin_list = [
-
                 [None, None,
                  f'По результатам определения приёмистости выполнить следующие работы: \n'
                  f'В случае приёмистости свыше 480 м3/сут при Р=100атм выполнить работы по закачке гдинистого раствора '
@@ -961,9 +960,10 @@ class RirWindow(QMainWindow):
                           ]
         RirWindow.perf_new(self, roof_rir_edit, sole_rir_edit)
         well_data.current_bottom = roof_rir_edit
-
-        if len(well_data.plast_work) != 0:
+        if OpressovkaEK.testing_pressure(self, roof_rir_edit)[2]:
             rir_paker_list.pop(-2)
+
+
         for row in rir_paker_list:
             rir_list.append(row)
 
@@ -981,6 +981,10 @@ class RirWindow(QMainWindow):
             sole_rir_edit = self.tabWidget.currentWidget().sole_rir_edit.text().replace(',', '.')
             if sole_rir_edit != '':
                 sole_rir_edit = int(float(sole_rir_edit))
+
+            if sole_rir_edit > well_data.current_bottom:
+                QMessageBox.warning(self, 'Ошибка', 'Подошва ЦМ ниже текущего забоя')
+                return
             paker_need_Combo = self.tabWidget.currentWidget().paker_need_Combo.currentText()
             pressureZUMPF_question = self.tabWidget.currentWidget().pressureZUMPF_question_QCombo.currentText()
             need_change_zgs_combo = self.tabWidget.currentWidget().need_change_zgs_combo.currentText()

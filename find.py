@@ -600,8 +600,8 @@ class WellCondition(FindIndexPZ):
 
         if well_data.leakiness is True:
             leakiness_quest = QMessageBox.question(self, 'нарушение колонны',
-                                                   'Программа определела что в скважине'
-                                                   f'есть нарушение - {well_data.leakiness_Count}, верно ли?')
+                                                   'Программа определила что в скважине'
+                                                   f' есть нарушение - {well_data.leakiness_Count}, верно ли?')
             if leakiness_quest == QMessageBox.StandardButton.Yes:
                 well_data.leakiness = True
                 if WellCondition.leakage_window is None:

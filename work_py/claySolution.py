@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QInputDialog, QMessageBox
 
 import well_data
-from work_py.alone_oreration import volume_vn_ek, volume_vn_nkt
+from work_py.alone_oreration import volume_vn_ek, volume_vn_nkt, well_volume
 
 from .rationingKRS import descentNKT_norm
 from main import MyWindow
@@ -24,6 +24,20 @@ class TabPage_SO_clay(QWidget):
         super().__init__(parent)
 
         self.validator = QIntValidator(0, 80000)
+
+        self.purpose_of_clay_label = QLabel("цель закачки глинистого раствора", self)
+        self.purpose_of_clay_combo = QComboBox(self)
+        self.purpose_of_clay_combo.addItems(['сбитие приемистости', 'в колонне'])
+
+        self.current_bottom_label = QLabel("забой", self)
+        self.current_bottom_edit = QLineEdit(self)
+        self.current_bottom_edit.setValidator(self.validator)
+        self.current_bottom_edit.setText(f'{well_data.current_bottom}')
+
+        self.volume_clay_label = QLabel("Объем глинистого раствора", self)
+        self.volume_clay_edit = QLineEdit(self)
+        self.volume_clay_edit.setValidator(self.validator)
+        self.volume_clay_edit.setText(f'{5}')
 
         self.roof_clay_label = QLabel("кровля ГР", self)
         self.roof_clay_edit = QLineEdit(self)
@@ -51,27 +65,55 @@ class TabPage_SO_clay(QWidget):
         self.sole_rir_edit.setText(f'{well_data.current_bottom}')
         self.sole_rir_edit.setClearButtonEnabled(True)
 
-
-
         self.grid = QGridLayout(self)
 
-        self.grid.addWidget(self.roof_clay_label, 4, 4)
-        self.grid.addWidget(self.roof_clay_edit, 5, 4)
-        self.grid.addWidget(self.sole_clay_LabelType, 4, 5)
-        self.grid.addWidget(self.sole_clay_edit, 5, 5)
-
-        self.grid.addWidget(self.rir_question_Label, 6, 3)
-        self.grid.addWidget(self.rir_question_QCombo, 7, 3)
-
-        self.grid.addWidget(self.roof_rir_label, 6, 4)
-        self.grid.addWidget(self.roof_rir_edit, 7, 4)
-        self.grid.addWidget(self.sole_rir_LabelType, 6, 5)
-        self.grid.addWidget(self.sole_rir_edit, 7, 5)
+        self.grid.addWidget(self.purpose_of_clay_label, 2, 4)
+        self.grid.addWidget(self.purpose_of_clay_combo, 3, 4)
 
         self.roof_clay_edit.textChanged.connect(self.update_roof)
         self.rir_question_QCombo.currentTextChanged.connect(self.update_rir)
         self.rir_question_QCombo.setCurrentIndex(1)
         self.rir_question_QCombo.setCurrentIndex(0)
+        self.purpose_of_clay_combo.currentTextChanged.connect(self.update_purpose_of_clay)
+        self.purpose_of_clay_combo.setCurrentIndex(1)
+    def update_purpose_of_clay(self, index):
+        if index == 'в колонне':
+            self.grid.addWidget(self.roof_clay_label, 4, 4)
+            self.grid.addWidget(self.roof_clay_edit, 5, 4)
+            self.grid.addWidget(self.sole_clay_LabelType, 4, 5)
+            self.grid.addWidget(self.sole_clay_edit, 5, 5)
+
+            self.grid.addWidget(self.rir_question_Label, 6, 3)
+            self.grid.addWidget(self.rir_question_QCombo, 7, 3)
+
+            self.grid.addWidget(self.roof_rir_label, 6, 4)
+            self.grid.addWidget(self.roof_rir_edit, 7, 4)
+            self.grid.addWidget(self.sole_rir_LabelType, 6, 5)
+            self.grid.addWidget(self.sole_rir_edit, 7, 5)
+
+            self.current_bottom_label.setParent(None)
+            self.current_bottom_edit.setParent(None)
+
+            self.volume_clay_label.setParent(None)
+            self.volume_clay_edit.setParent(None)
+
+        else:
+            self.roof_clay_label.setParent(None)
+            self.roof_clay_edit.setParent(None)
+            self.sole_clay_LabelType.setParent(None)
+            self.sole_clay_edit.setParent(None)
+
+            self.rir_question_Label.setParent(None)
+            self.rir_question_QCombo.setParent(None)
+
+            self.roof_rir_label.setParent(None)
+            self.roof_rir_edit.setParent(None)
+            self.sole_rir_LabelType.setParent(None)
+            self.sole_rir_edit.setParent(None)
+            self.grid.addWidget(self.current_bottom_label, 6, 4)
+            self.grid.addWidget(self.current_bottom_edit, 7, 4)
+            self.grid.addWidget(self.volume_clay_label, 6, 5)
+            self.grid.addWidget(self.volume_clay_edit, 7, 5)
 
     def update_roof(self):
         roof_clay_edit = self.roof_clay_edit.text()
@@ -118,23 +160,103 @@ class ClayWindow(QMainWindow):
         vbox.addWidget(self.buttonAdd, 2, 0)
 
     def add_work(self):
-        roof_clay_edit = int(float(self.tabWidget.currentWidget().roof_clay_edit.text()))
-        sole_clay_edit = int(float(self.tabWidget.currentWidget().sole_clay_edit.text()))
-        rir_question_QCombo = str(self.tabWidget.currentWidget().rir_question_QCombo.currentText())
-        roof_rir_edit = int(float(self.tabWidget.currentWidget().roof_rir_edit.text()))
-        sole_rir_edit = int(float(self.tabWidget.currentWidget().sole_rir_edit.text()))
-        if roof_clay_edit > sole_clay_edit:
-            mes = QMessageBox.warning(self, 'Ошибка', 'Не корректные интервалы ')
-            return
+        purpose_of_clay_combo = self.tabWidget.currentWidget().purpose_of_clay_combo.currentText()
+        if purpose_of_clay_combo == 'в колонне':
+            roof_clay_edit = int(float(self.tabWidget.currentWidget().roof_clay_edit.text()))
+            sole_clay_edit = int(float(self.tabWidget.currentWidget().sole_clay_edit.text()))
+            rir_question_QCombo = str(self.tabWidget.currentWidget().rir_question_QCombo.currentText())
+            roof_rir_edit = int(float(self.tabWidget.currentWidget().roof_rir_edit.text()))
+            sole_rir_edit = int(float(self.tabWidget.currentWidget().sole_rir_edit.text()))
+            if roof_clay_edit > sole_clay_edit:
+                mes = QMessageBox.warning(self, 'Ошибка', 'Не корректные интервалы ')
+                return
 
-        work_list = self.claySolutionDef(roof_clay_edit, sole_clay_edit, rir_question_QCombo,
-                                         roof_rir_edit, sole_rir_edit)
-
+            work_list = self.claySolutionDef(roof_clay_edit, sole_clay_edit, rir_question_QCombo,
+                                             roof_rir_edit, sole_rir_edit)
+        else:
+            current_bottom_edit = int(float(self.tabWidget.currentWidget().current_bottom_edit.text()))
+            volume_clay_edit = int(float(self.tabWidget.currentWidget().volume_clay_edit.text()))
+            work_list = self.clay_solution_q(current_bottom_edit, volume_clay_edit)
 
         MyWindow.populate_row(self, self.ins_ind, work_list, self.table_widget)
         well_data.pause = False
         self.close()
 
+    def clay_solution_q(self, current_bottom_edit, volume_clay_edit):
+        if well_data.column_additional is True and well_data.column_additional_diametr._value < 110 and \
+                current_bottom_edit > well_data.head_column_additional._value:
+            dict_nkt = {73: well_data.head_column_additional._value,
+                        60: current_bottom_edit - well_data.head_column_additional._value}
+        else:
+            dict_nkt = {73: current_bottom_edit}
+        glin_list = [
+            [f'СПО пера до глубины {current_bottom_edit}м. Опрессовать НКТ на 200атм', None,
+             f'Спустить {RirWindow.pero_select(self, current_bottom_edit)}  на тНКТ{well_data.nkt_diam}м до '
+             f'глубины {current_bottom_edit}м с замером, шаблонированием '
+             f'шаблоном {well_data.nkt_template}мм. \n'
+             f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
+             None, None, None, None, None, None, None,
+             'мастер КРС', descentNKT_norm(current_bottom_edit, 1)],
+            [None, None,
+             f'По результатам определения приёмистости выполнить следующие работы: \n'
+             f'В случае приёмистости свыше 480 м3/сут при Р=100атм выполнить работы по закачке гдинистого раствора '
+             f'(по согласованию с ГС и ПТО {well_data.contractor} и заказчика). \n'
+             f'В случае приёмистости менее 480 м3/сут при Р=100атм и более 120м3/сут при Р=100атм приступить '
+             f'к выполнению РИР',
+             None, None, None, None, None, None, None,
+             'мастер КРС, заказчик', None],
+            [None, None,
+             f'Объём глинистого р-ра скорректировать на устье на основании тех.возможности. \n'
+             f'Приготовить глинистый раствор в объёме 5м3 (расчет на 1 м3 - сухой глинопорошок массой 0,3т + '
+             f'вода у=1,00г/см3 в объёме 0,9м3) плотностью у=1,24г/см3',
+             None, None, None, None, None, None, None,
+             'мастер КРС', 3.5],
+            [f'Закачка глины для сбития приемистости', None,
+             f'Закачать в НКТ при открытом затрубном пространстве глинистый раствор в объеме {volume_clay_edit}м3 + тех. воду '
+             f'в объёме {round(volume_vn_nkt(dict_nkt) - volume_clay_edit, 1)}м3. Закрыть затруб. '
+             f'Продавить в НКТ тех. воду  в объёме {volume_vn_nkt(dict_nkt)}м3 при давлении не более '
+             f'{well_data.max_admissible_pressure._value}атм.',
+             None, None, None, None, None, None, None,
+             'мастер КРС', 0.5],
+            [f'Коагуляция 4 часа', None,
+             f'Коагуляция 4 часа (на основании конечного давления при продавке. '
+             f'В случае конечного давления менее 50атм, согласовать объем глинистого раствора с '
+             f'Заказчиком и продолжить приготовление следующего объема глинистого объема).',
+             None, None, None, None, None, None, None,
+             'мастер КРС', 4],
+            [None, None,
+             f'Определить приёмистость по НКТ при Р=100атм.',
+             None, None, None, None, None, None, None,
+             'мастер КРС', 0.35],
+            [None, None,
+             f'В случае необходимости выполнить работы по закачке глнистого раствора, с корректировкой '
+             f'по объёму раствора.',
+             None, None, None, None, None, None, None,
+             'мастер КРС', None],
+            [None, None,
+             f'Промыть скважину обратной промывкой по круговой циркуляции  жидкостью '
+             f'в объеме не менее {well_volume(self, volume_vn_nkt(dict_nkt))}м3 с расходом жидкости не менее 8 л/с.',
+             None, None, None, None, None, None, None,
+             'мастер КРС', well_volume_norm(24)],
+            [None, None,
+             f'Опрессовать НКТ на 200атм. Вымыть шар. Поднять перо на тНКТ{well_data.nkt_diam}м с глубины {current_bottom_edit}м с доливом скважины в объеме '
+             f'{round(current_bottom_edit * 1.12 / 1000, 1)}м3 тех. жидкостью '
+             f'уд.весом {well_data.fluid_work}',
+             None, None, None, None, None, None, None,
+             'мастер КРС', liftingNKT_norm(current_bottom_edit, 1)]
+        ]
+        a = volume_vn_nkt(dict_nkt)
+        if volume_vn_nkt(dict_nkt) <= 5:
+            glin_list[3] = [
+                None, None,
+                    f'Закачать в НКТ при открытом затрубном пространстве глинистый раствор в '
+                    f'объеме {volume_vn_nkt(dict_nkt)}м3. Закрыть затруб. '
+                    f'Продавить в НКТ остаток глинистого раствора в объеме '
+                    f'{round(volume_clay_edit - volume_vn_nkt(dict_nkt), 1)} и тех. воду  в объёме '
+                    f'{volume_vn_nkt(dict_nkt)}м3 при давлении не более {well_data.max_admissible_pressure._value}атм.',
+                    None, None, None, None, None, None, None,
+                    'мастер КРС', 0.5]
+        return glin_list
     def claySolutionDef(self, rirRoof, rirSole, rir_question_QCombo,
                                          roof_rir_edit, sole_rir_edit):
        

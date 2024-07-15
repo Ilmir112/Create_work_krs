@@ -362,9 +362,7 @@ class GnoWindow(QMainWindow):
                            f'5.3.14; Инструкция № П2-05.01 И-01447 ЮЛ-111.13 версия 1.00 п.5.34; 5-36)'
                            f'но не менее 30атм и  с составлением акта на опрессовку ПВО с представителем Заказчика '
                            f'(согласно ТИ № П2-05.01 ТИ-0001 версия 3.00 п. 5.3.14).  ',
-                           None,
-                           None,
-                           None, None, None, None, None,
+                           None,  None, None, None, None, None, None,
                            'Мастер КРС', 0.67],
                           [None, None,
                            f'Скорость спуска (подъема) погружного оборудования в скважину не должна превышать 0,25 м/с '
@@ -376,15 +374,13 @@ class GnoWindow(QMainWindow):
                            f'При отбраковке дать заявку в цех Заказчика на замену. Составить акт (при '
                            f'изменении альтитуды '
                            f'муфты э/колонны указать в акте).',
-                           None, None,
-                           None, None, None, None, None,
+                           None, None, None, None, None, None, None,
                            'Мастер КРС', None],
                           [None, None,
                            f'В СЛУЧАЕ ВЫНУЖДЕННОГО ПРОДОЛЖИТЕЛЬНОГО ПРОСТОЯ ПО ЗАВОЗУ ТЕХНОЛОГИЧЕСКОГО '
                            f'ИЛИ ФОНДОВОГО ОБОРУДОВАНИЯ В СКВАЖИНУ НЕОБХОДИМО СПУСКАТЬ '
                            f'ПРОТИВОФОНТАННЫЙ ЛИФТ ДЛИНОЙ 300м. ', None, None,
-                           None, None, None, None, None,
-                           'Мастер КРС представитель Заказчика', None]]
+                           None, None, None, None, None, 'Мастер КРС представитель Заказчика', None]]
 
             kvostovika_lenght = round(
                 sum(list(well_data.dict_nkt.values())) - float(well_data.depth_fond_paker_do["do"]), 1)
@@ -1451,6 +1447,12 @@ class GnoWindow(QMainWindow):
                          'ЭЦН с автономными пакерами': lift_ecn_with_2paker}
 
             lift_select = lift_dict[lift_key]
+            if lift_key in ['ЭЦН с пакером', 'ЭЦН', 'ЭЦН с автономными пакерами']:
+                posle_lift.append([None, None,
+                                   'В случае негерметичности фондовых НКТ при опрессовке, по согласованию '
+                                   'с УСРСиСТ и ПТО региона, произвести поинтервальную опрессовку фондовых'
+                                   ' НКТ либо на СПО ПСШ, либо отдельным СПО',
+                                   None, None, None, None, None, None, None, None, None])
             if well_data.konte_true:
                 konte_list = konte(self)
             else:

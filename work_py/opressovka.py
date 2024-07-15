@@ -623,7 +623,8 @@ class OpressovkaEK(QMainWindow):
         for plast in well_data.plast_all:
             if well_data.dict_perforation[plast]['отключение'] is False:
                 for interval in well_data.dict_perforation[plast]['интервал']:
-                    interval_list.append(interval)
+                    if interval[0] < well_data.current_bottom:
+                        interval_list.append(interval)
 
         if well_data.leakiness is True:
             for nek in well_data.dict_leakiness['НЭК']['интервал']:

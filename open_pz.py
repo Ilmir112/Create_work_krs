@@ -104,8 +104,8 @@ class CreatePZ(QMainWindow):
 
                 if well_data.emergency_well is True:
                     emergency_quest = QMessageBox.question(self, 'Аварийные работы ',
-                                                           'Программа определела что в скважине'
-                                                           f'авария - {well_data.emergency_count}, верно ли?')
+                                                           'Программа определила что в скважине'
+                                                           f' авария - {well_data.emergency_count}, верно ли?')
                     if emergency_quest == QMessageBox.StandardButton.Yes:
                         well_data.emergency_well = True
                         well_data.emergency_bottom, ok = QInputDialog.getInt(self, 'Аварийный забой',
@@ -115,7 +115,7 @@ class CreatePZ(QMainWindow):
                         well_data.emergency_well = False
                 if well_data.problemWithEk is True:
                     problemWithEk_quest = QMessageBox.question(self, 'ВНИМАНИЕ НЕПРОХОД ',
-                                                               f'Программа определела что в скважине '
+                                                               f'Программа определила что в скважине '
                                                                f'ссужение в ЭК -, верно ли?')
                     if problemWithEk_quest == QMessageBox.StandardButton.Yes:
                         well_data.problemWithEk = True
@@ -130,7 +130,7 @@ class CreatePZ(QMainWindow):
 
                 if well_data.gipsInWell is True:
                     gips_true_quest = QMessageBox.question(self, 'Гипсовые отложения',
-                                                           'Программа определела что скважина осложнена гипсовыми отложениями '
+                                                           'Программа определила что скважина осложнена гипсовыми отложениями '
                                                            'и требуется предварительно определить забой на НКТ, верно ли это?')
 
                     if gips_true_quest == QMessageBox.StandardButton.Yes:
