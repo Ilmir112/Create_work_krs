@@ -1,5 +1,7 @@
 import well_data
 from openpyxl.styles import Border, Side, Font,  Alignment
+from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QTabWidget, \
+    QMainWindow, QPushButton, QTextEdit
 
 def calc_h2s(ws3, h2s_pr, h2s_mg):
     from H2S import well_volume
@@ -245,25 +247,29 @@ def calv_h2s(self, cat_H2S, h2s_mg, h2s_pr):
                                     well_data.bottomhole_artificial._value - nkt_l) / 1000
 
         volume_well = well_volume(self)
-        if '73' in list(well_data.dict_nkt.keys())[0]:
-            nkt_1 = 73
-        elif '60' in list(well_data.dict_nkt.keys())[0]:
-            nkt_1 = 60
-        elif '48' in list(well_data.dict_nkt.keys())[0]:
-            nkt_1 = 48
-        elif '89' in list(well_data.dict_nkt.keys())[0]:
-            nkt_1 = 89
-
-
         try:
-            # print(list(well_data.dict_nkt.keys()))
-            nkt_2 = int(list(well_data.dict_nkt.keys())[1])
-            nkt_2_l = well_data.dict_nkt[nkt_2]
-        except:
-            nkt_2 = 0
-            nkt_2_l = 0
+            if '73' in list(well_data.dict_nkt.keys())[0]:
+                nkt_1 = 73
+            elif '60' in list(well_data.dict_nkt.keys())[0]:
+                nkt_1 = 60
+            elif '48' in list(well_data.dict_nkt.keys())[0]:
+                nkt_1 = 48
+            elif '89' in list(well_data.dict_nkt.keys())[0]:
+                nkt_1 = 89
 
-        udel_vodoiz_nkt = 10 * 3.14 * ((nkt_1 * 0.01) ** 2 - (nkt_1 * 0.01 - 5.5 * 2 * 0.01) ** 2) / 4
+
+            try:
+                # print(list(well_data.dict_nkt.keys()))
+                nkt_2 = int(list(well_data.dict_nkt.keys())[1])
+                nkt_2_l = well_data.dict_nkt[nkt_2]
+            except:
+                nkt_2 = 0
+                nkt_2_l = 0
+
+
+            udel_vodoiz_nkt = 10 * 3.14 * ((nkt_1 * 0.01) ** 2 - (nkt_1 * 0.01 - 5.5 * 2 * 0.01) ** 2) / 4
+        except Exception as e:
+            QMessageBox.warning(None, 'Ошибка', f'Ошибка обработки НКТ {e}')
         # print(f' удел {udel_vodoiz_nkt}')
         try:
             # print(f'НКТ-{nkt_2}')

@@ -766,11 +766,13 @@ class GnktOsvWindow2(QMainWindow):
             [None, None, None, None, None, None, None, None, None, None, None,
              f'{well_data.type_kr}', None, None, None, None, None, None,
              None, None, None, None, None],
-            [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+            [None, None, None, None, None, None, None, None, None, None,
+             f'{well_data.bur_rastvor}', None, None, None, None, None, None, None,
              None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None],
         ]
+        print(f'буровой {well_data.bur_rastvor}')
         if well_data.work_plan == 'gnkt_bopz':
             schema_well_list.append(list_gnkt_bopz)
         if well_data.paker_do['do'] == 0:
@@ -815,12 +817,18 @@ class GnktOsvWindow2(QMainWindow):
             schema_well_list[26 + index] = pvr
 
         well_data.current_bottom = round(float(current_bottom_edit), 1)
+        GnktOsvWindow2.current_bottom_edit, GnktOsvWindow2.fluid_edit, \
+        GnktOsvWindow2.gnkt_lenght, GnktOsvWindow2.iznos_gnkt_edit, GnktOsvWindow2.pvo_number, \
+        GnktOsvWindow2.diametr_length, GnktOsvWindow2.pipe_mileage_edit = current_bottom_edit, fluid_edit, \
+        gnkt_lenght, iznos_gnkt_edit, pvo_number, diametr_length, pipe_mileage_edit
         return schema_well_list
 
 
 
     def date_dmy(self, date_str):
-        if type(date_str) is str:
+        if '-' in str(date_str):
+            return date_str
+        elif type(date_str) is str:
             date_obj = datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
         else:
             date_obj = date_str
@@ -829,6 +837,8 @@ class GnktOsvWindow2(QMainWindow):
 
         if isinstance(date_obj, datetime):
             return date_obj.strftime('%d.%m.%Y')
+        elif date_obj is None:
+            return date_obj
         else:
             date_obj = datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
             # print(f' даь {date_obj}')

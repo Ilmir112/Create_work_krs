@@ -363,6 +363,8 @@ class WellFond_data(FindIndexPZ):
                         well_data.wellhead_fittings = row[col_do].value
                     if 'диаметр канавки' in str(value).lower():
                         well_data.groove_diameter = row[col_do].value
+                        if well_data.groove_diameter is None:
+                            well_data.groove_diameter = ''
 
                     if 'Пакер' in str(value) and 'типоразмер' in str(row[col + 2].value):
                         if '/' in str(row[col_do].value):
@@ -515,6 +517,8 @@ class WellHistory_data(FindIndexPZ):
                                                                                         col + 1, 1)
                     elif 'Дата ввода в экспл' in str(value):
                         well_data.сommissioning_date = row[col + 2].value
+                    elif 'ствол скважины' in str(row[col].value).lower() and 'буров' in str(row[col].value).lower():
+                        well_data.bur_rastvor = row[col].value
 
                     elif 'Максимально ожидаемое давление на устье' == value:
                         well_data.max_expected_pressure = ProtectedIsDigit(row[col + 1].value)
@@ -559,42 +563,44 @@ class WellCondition(FindIndexPZ):
             row_index += begin_index
             for col, cell in enumerate(row):
                 value = cell.value
+                if value != None:
+                    if 'нэк' in str(
+                            value).lower() or 'негерм' in str(value).lower() or 'нарушение э' in str(
+                        value).lower() or 'нарушение г' in str(value).lower():
+                        well_data.leakiness_Count += 1
+                        well_data.leakiness = True
+                    if ('авар' in str(value).lower() or 'расхаж' in str(value).lower() or 'лар' in str(value)) \
+                            and 'акт о расследовании аварии прилагается' not in str(value):
+                        well_data.emergency_well = True
+                        well_data.emergency_count += 1
+                    if value:
+                        if "Hст " in str(value):
+                            if '/' in str(row[col + 1].value):
+                                well_data.static_level = ProtectedIsDigit(row[col + 1].value.split('/')[0])
+                            else:
+                                well_data.static_level = ProtectedIsDigit(row[col + 1].value)
+                        elif 'Рмкп ( э/к и' in str(value):
+                            well_data.pressuar_mkp = ProtectedIsNonNone(row[col + 2].value)
+                        elif "грп" in str(value).lower():
+                            well_data.grp_plan = True
 
-                if 'нэк' in str(
-                        value).lower() or 'негерм' in str(value).lower() or 'нарушение э' in str(
-                    value).lower() or 'нарушение г' in str(value).lower():
-                    well_data.leakiness_Count += 1
-                    well_data.leakiness = True
-                if ('авар' in str(value).lower() or 'расхаж' in str(value).lower() or 'лар' in str(value)) \
-                        and 'акт о расследовании аварии прилагается' not in str(value):
-                    well_data.emergency_well = True
-                    well_data.emergency_count += 1
-                if value:
-                    if "Hст " in str(value):
-                        if '/' in str(row[col + 1].value):
-                            well_data.static_level = ProtectedIsDigit(row[col + 1].value.split('/')[0])
-                        else:
-                            well_data.static_level = ProtectedIsDigit(row[col + 1].value)
-                    if "грп" in str(value).lower():
-                        well_data.grp_plan = True
-
-                    if "Ндин " in str(value):
-                        well_data.dinamic_level = ProtectedIsDigit(row[col + 1].value)
-                    if "% воды " in str(value):
-                        well_data.proc_water = str(row[col + 1].value).strip().replace('%', '')
-                        well_data.proc_water = FindIndexPZ.definition_is_None(self, well_data.proc_water, row_index,
-                                                                              col + 1, 1)
-                    if 'Vжг' in str(value):
-                        try:
-                            well_volume_in_PZ = str(row[col + 1].value).replace(',', '.')
-                            # print(f'строка {well_volume_in_PZ}')
-                            # well_volume_in_PZ = FindIndexPZ.definition_is_None(self,well_volume_in_PZ, row_index, col + 1, 1)
-                            well_data.well_volume_in_PZ.append(round(float(well_volume_in_PZ), 1))
-                        except:
-                            well_volume_in_PZ, _ = QInputDialog.getDouble(self, 'Объем глушения',
-                                                                          'ВВедите объем глушения согласно ПЗ', 50, 1,
-                                                                          70)
-                            well_data.well_volume_in_PZ.append(well_volume_in_PZ)
+                        elif "Ндин " in str(value):
+                            well_data.dinamic_level = ProtectedIsDigit(row[col + 1].value)
+                        elif "% воды " in str(value):
+                            well_data.proc_water = str(row[col + 1].value).strip().replace('%', '')
+                            well_data.proc_water = FindIndexPZ.definition_is_None(self, well_data.proc_water, row_index,
+                                                                                  col + 1, 1)
+                        elif 'Vжг' in str(value):
+                            try:
+                                well_volume_in_PZ = str(row[col + 1].value).replace(',', '.')
+                                # print(f'строка {well_volume_in_PZ}')
+                                # well_volume_in_PZ = FindIndexPZ.definition_is_None(self,well_volume_in_PZ, row_index, col + 1, 1)
+                                well_data.well_volume_in_PZ.append(round(float(well_volume_in_PZ), 1))
+                            except:
+                                well_volume_in_PZ, _ = QInputDialog.getDouble(self, 'Объем глушения',
+                                                                              'ВВедите объем глушения согласно ПЗ', 50, 1,
+                                                                              70)
+                                well_data.well_volume_in_PZ.append(well_volume_in_PZ)
 
 
 
@@ -778,7 +784,7 @@ class Well_data(FindIndexPZ):
                         well_data.bottom = well_data.current_bottom
                     elif '10. Расстояние от стола ротора до среза муфты э/колонны ' in str(value):
                         well_data.stol_rotora = FindIndexPZ.definition_is_None(
-                            self, ProtectedIsDigit(row[col + 5].value), row_index, col, 1)
+                            self, ProtectedIsDigit(row[col + 5].value), row_index, col+1, 1)
 
                     elif 'Направление' in str(value) and 'Шахтное направление' not in str(value) and \
                             ws.cell(row=row_index + 1, column=col + 1).value != None and \
@@ -903,8 +909,7 @@ class Well_data(FindIndexPZ):
                                                                                        well_data.level_cement_column,
                                                                                        row_index,
                                                                                        col, 1)
-                    elif 'Рмкп ( э/к и' in str(cell):
-                        well_data.pressuar_mkp = ProtectedIsNonNone(row[col + 2].value)
+
                     elif 'онструкция хвостовика' in str(value):
 
                         data_column_additional = FindIndexPZ.check_str_None(self, ws.cell(row=row_index + 2,

@@ -562,9 +562,7 @@ class Swab_Window(QMainWindow):
         vbox = QGridLayout(self.centralWidget)
         vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
-        vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAddString, 2, 0)
-        vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
         vbox.addWidget(self.tableWidget, 1, 0, 1, 2)
 
         vbox.addWidget(self.buttonDel, 2, 1)

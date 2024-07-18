@@ -37,7 +37,7 @@ from H2S import calc_h2s
 from PyQt5.QtCore import QThread, pyqtSignal, pyqtSlot
 from data_correct_position_people import CorrectSignaturesWindow
 from work_py.check_new_version import UpdateChecker
-from work_py.dop_plan_py import DopPlanWindow
+
 from work_py.drilling import Drill_window
 from users.login_users import LoginWindow
 from PyQt5.QtCore import Qt, QObject, pyqtSignal
@@ -456,10 +456,11 @@ class MyWindow(QMainWindow):
 
     @QtCore.pyqtSlot()
     def action_clicked(self):
-        from data_base.work_with_base import read_excel_in_base, insert_data_new_excel_file
+        from data_base.work_with_base import insert_data_new_excel_file
         from open_pz import CreatePZ
         from work_py.gnkt_frez import Work_with_gnkt
         from work_py.gnkt_grp import GnktOsvWindow
+        from work_py.dop_plan_py import DopPlanWindow
 
         action = self.sender()
 
@@ -509,9 +510,7 @@ class MyWindow(QMainWindow):
                 self.rir_window.show()
                 well_data.pause = True
                 self.pause_app()
-
-                data, rowHeights, colWidth, boundaries_dict = read_excel_in_base(well_data.well_number, well_data.well_area)
-                self.ws = insert_data_new_excel_file(data, rowHeights, colWidth, boundaries_dict)
+                self.ws = insert_data_new_excel_file(well_data.data, well_data.rowHeights, well_data.colWidth, well_data.boundaries_dict)
 
                 self.copy_pz(self.ws, self.table_widget, self.work_plan)
 
@@ -597,7 +596,7 @@ class MyWindow(QMainWindow):
                     well_data.pause = True
                     read_pz = CreatePZ(self.wb, self.ws, self.data_window, self.perforation_correct_window2)
                     sheet = read_pz.open_excel_file(self.ws, self.work_plan)
-                    self.rir_window = GnktOsvWindow(self.ws,
+                    self.rir_window = GnktOsvWindow(sheet,
                                                     self.table_title, self.table_schema, self.table_widget,
                                                     self.work_plan)
 
@@ -1145,13 +1144,14 @@ class MyWindow(QMainWindow):
             well_data.max_expected_pressure = ProtectedIsNonNone('не корректно')
             well_data.head_column_additional = ProtectedIsNonNone('не корректно')
             well_data.leakiness_Count = 0
+            well_data.bur_rastvor = ''
             well_data.data_in_base = False
             well_data.well_volume_in_PZ = []
             well_data.expected_pick_up = {}
             well_data.current_bottom = 0
             well_data.emergency_bottom = well_data.current_bottom
             well_data.fluid_work = 0
-            well_data.groove_diameter = None
+            well_data.groove_diameter = ''
             well_data.static_level = ProtectedIsNonNone('не корректно')
             well_data.dinamic_level = ProtectedIsNonNone('не корректно')
             well_data.work_perforations_approved = False
@@ -2225,6 +2225,7 @@ class MyWindow(QMainWindow):
                 [None, None, 'Порядок работы', None, None, None, None, None, None, None, None, None],
                 [None, None, 'Наименование работ', None, None, None, None, None, None, None, 'Ответственный',
                  'Нормы времени \n мин/час.']]
+
             if well_data.dop_work_list:
                 work_list.append(well_data.dop_work_list)
             self.populate_row(table_widget.rowCount(), work_list, self.table_widget, self.work_plan)
@@ -2385,14 +2386,13 @@ class MyWindow(QMainWindow):
         ws4.cell(row=11, column=1).value = f'макс угол {well_data.max_angle._value} на {well_data.max_angle_H._value}'
         ws4.cell(row=1, column=2).value = well_data.cdng._value
         try:
-
             ws4.cell(row=2, column=3).value = \
                 f'Рпл - {well_data.dict_category[well_data.plast_work_short[0]]["по давлению"].category},' \
                 f' H2S -{well_data.dict_category[well_data.plast_work_short[0]]["по сероводороду"].category},' \
                 f' газ факт -{well_data.gaz_f_pr[0]}т/м3'
-        except IndexError:
+        except Exception as e:
             mes = QMessageBox.warning(self, 'ОШИБКА',
-                                      "Программа не смогла вставить данные в краткое содержание значения по Рпл")
+                                      f"Программа не смогла вставить данные в краткое содержание значения по Рпл {e}")
         column_well = f'{well_data.column_diametr._value}х{well_data.column_wall_thickness._value} в инт 0 - {well_data.shoe_column._value}м ' \
             if well_data.column_additional is False else f'{well_data.column_diametr._value} х {well_data.column_wall_thickness._value} \n' \
                                                          f'0 - {well_data.shoe_column._value}м/\n{well_data.column_additional_diametr._value}' \
@@ -2465,14 +2465,14 @@ class MyWindow(QMainWindow):
                 check = False
                 check_question = QMessageBox.question(self, 'Проверка глубины пакера',
                                                       f'Проверка показало что пакер с глубиной {depth}м спускается ниже '
-                                                      f'глубины  {well_data.template_depth_addition}')
+                                                      f'глубины  шаблонирования {well_data.template_depth_addition}')
                 if check_question == QMessageBox.StandardButton.Yes:
                     check = True
             if well_data.template_depth < depth and depth < well_data.head_column_additional._value:
                 check = False
                 check_question = QMessageBox.question(self, 'Проверка глубины пакера',
                                                       f'Проверка показало что пакер с глубиной {depth}м спускается ниже '
-                                                      f'глубины  {well_data.template_depth}')
+                                                      f'глубины шаблонирования {well_data.template_depth}')
                 if check_question == QMessageBox.StandardButton.Yes:
                     check = True
         else:
@@ -2481,7 +2481,7 @@ class MyWindow(QMainWindow):
                 check = False
                 check_question = QMessageBox.question(self, 'Проверка глубины пакера',
                                                       f'Проверка показало что пакер с глубиной {depth}м спускается ниже '
-                                                      f'глубины  {well_data.template_depth}')
+                                                      f'глубины шаблонирования {well_data.template_depth}')
                 if check_question == QMessageBox.StandardButton.Yes:
                     check = True
 
@@ -2521,14 +2521,15 @@ class MyWindow(QMainWindow):
 
     def check_depth_in_skm_interval(self, depth):
         check_true = False
-
-        if any([float(interval[0]) <= float(depth) <= float(interval[1]) for interval in well_data.skm_interval]):
-            check_true = True
-            return int(depth)
-        else:
+        a = well_data.skm_interval
+        for interval in well_data.skm_interval:
+            if float(interval[0]) <= float(depth) <= float(interval[1]):
+                check_true = True
+                return int(depth)
+        if check_true is False:
             false_question = QMessageBox.question(None, 'Проверка посадки пакера в интервал скреперования',
                                                   f'Проверка посадки показала, что пакер сажается не '
-                                                  f'в интервал скреперования, '
+                                                  f'в интервал скреперования {well_data.skm_interval}, '
                                                   f'Проигнорировать ошибку?')
             if false_question == QMessageBox.StandardButton.Yes:
                 return True

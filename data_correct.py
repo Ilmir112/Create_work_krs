@@ -967,10 +967,12 @@ class DataWindow(QMainWindow):
                 msg = QMessageBox.information(self, 'Внимание',
                                               'Не все поля в Ожидаемых показателях соответствуют значениям')
                 close_file = False
-
-        if float(shoe_column) < 30:
-            mes = QMessageBox.warning(self, 'Ошибка', 'Башмак ЭК слишком короткий')
-            return
+        try:
+            if float(shoe_column) < 30:
+                mes = QMessageBox.warning(self, 'Ошибка', 'Башмак ЭК слишком короткий')
+                return
+        except Exception as e:
+            mes = QMessageBox.warning(self, 'Ошибка', f'Башмак ЭК не корректен {e}')
         if close_file is False:
             return
         elif close_file is True:

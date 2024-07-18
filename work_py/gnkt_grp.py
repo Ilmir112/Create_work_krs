@@ -151,7 +151,7 @@ class GnktOsvWindow(QMainWindow):
         bvo_int = 0
         # if well_data.bvo:
         #     bvo_int += 5
-        head = plan.head_ind(well_data.cat_well_min._value + bvo_int, well_data.cat_well_max._value + bvo_int)
+        head = plan.head_ind(well_data.cat_well_min._value-1 + bvo_int, well_data.cat_well_max._value + bvo_int)
 
         plan.copy_true_ws(sheet, self.ws_title, head)
 
@@ -163,7 +163,11 @@ class GnktOsvWindow(QMainWindow):
             main.MyWindow.pause_app()
             well_data.pause = True
 
-            self.work_schema = self.work_window.add_work()
+            self.work_schema = self.work_window.schema_well(self.work_window.current_bottom_edit,
+                                                            self.work_window.fluid_edit, well_data.gnkt_number,
+                    self.work_window.gnkt_lenght, self.work_window.iznos_gnkt_edit,
+                                                            self.work_window.pvo_number, self.work_window.diametr_length,
+                                                            self.work_window.pipe_mileage_edit)
 
             # print(self.work_schema)
             self.work_window = None

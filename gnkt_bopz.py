@@ -40,7 +40,7 @@ class TabPage_gnkt(QWidget):
 
         self.need_drilling_mud_label = QLabel("вымыв бурового раствора", self)
         self.need_drilling_mud_combo = QComboBox(self)
-        self.need_drilling_mud_combo.addItems(['нужно', 'не нужно'])
+        self.need_drilling_mud_combo.addItems(['', 'Нужно', 'Не нужно'])
 
         self.volume_drilling_mud_label = QLabel("Объем бурового раствора", self)
         self.volume_drilling_mud_edit = QLineEdit(self)
@@ -126,6 +126,22 @@ class TabPage_gnkt(QWidget):
 
         self.acid_edit.currentTextChanged.connect(self.update_sko_type)
         self.plast_combo.combo_box.currentTextChanged.connect(self.update_plast_edit)
+        self.need_drilling_mud_combo.currentTextChanged.connect(self.update_drilling_mud_combo)
+
+    def update_drilling_mud_combo(self, index):
+        if index == 'Нужно':
+            self.mud_label = QLabel("Текст бурового растовра", self)
+            self.mud_edit = QLineEdit(self)
+            self.mud_edit.setText(well_data.bur_rastvor)
+            self.grid.addWidget(self.mud_label, 12, 1, 1, 3)
+            self.grid.addWidget(self.mud_edit, 13, 1, 1, 3)
+        else:
+            try:
+                self.mud_label.setParent(None)
+                self.mud_edit.setParent(None)
+            except:
+                pass
+
 
     def update_plast_edit(self):
 
@@ -189,6 +205,11 @@ class GnktBopz(QMainWindow):
             sole_plast = float(self.tabWidget.currentWidget().sole_edit.text())
             drilling_contractor_combo = self.tabWidget.currentWidget().drilling_contractor_combo.currentText()
             need_drilling_mud_combo = str(self.tabWidget.currentWidget().need_drilling_mud_combo.currentText())
+            if need_drilling_mud_combo == '':
+                return
+            elif need_drilling_mud_combo == 'Нужно':
+                well_data.bur_rastvor = self.tabWidget.currentWidget().acid_proc_edit.text()
+
             volume_drilling_mud_edit = float(self.tabWidget.currentWidget().volume_drilling_mud_edit.text())
             acid_true_edit = str(self.tabWidget.currentWidget().acid_true_edit.currentText())
             acid_edit = self.tabWidget.currentWidget().acid_edit.currentText()

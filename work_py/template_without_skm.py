@@ -59,7 +59,7 @@ class TabPage_SO(QWidget):
         self.privyazka_question_QCombo = QComboBox(self)
         self.privyazka_question_QCombo.addItems(['Нет', 'Да'])
 
-        if well_data.current_bottom - well_data.perforation_sole <= 10 and well_data.open_trunk_well is False:
+        if well_data.current_bottom - well_data.perforation_sole <= 10 and well_data.open_trunk_well is False and well_data.count_template != 0:
             self.privyazka_question_QCombo.setCurrentIndex(1)
 
         self.note_Label = QLabel("Нужно ли добавлять примечание", self)
@@ -70,6 +70,8 @@ class TabPage_SO(QWidget):
         self.solvent_volume_edit = QLineEdit(self)
         self.solvent_volume_edit.setValidator(validator)
         self.solvent_volume_edit.setText("2")
+
+
 
         self.solvent_question_Label = QLabel("необходимость растворителя", self)
         self.solvent_question_QCombo = QComboBox(self)
@@ -709,6 +711,8 @@ class Template_without_skm(QMainWindow):
              None, None, None, None, None, None, None,
              'Мастер КРС', liftingNKT_norm(current_bottom, 1.2)]
         ]
+        if abs(well_data.perforation_roof - current_bottom) < 15:
+            list_template_ek.pop(4)
 
         notes_list = [
             [None, None,

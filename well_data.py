@@ -221,6 +221,10 @@ dict_contractor = {
     {
         'Дата ПВО': 'от 15.10.2021'
     },
+    'ООО "Ойл-cервис"':
+    {
+        'Дата ПВО': 'от 15.10.2021'
+    },
     'ООО "РН-Сервис"':
     {
         'Дата ПВО': '29.10.2021'
@@ -229,7 +233,8 @@ dict_contractor = {
 countAcid = 0
 swabTypeComboIndex = 1
 swab_true_edit_type = 1
-groove_diameter = None
+groove_diameter = ''
+bur_rastvor = ''
 drilling_interval = []
 max_angle = 0
 dop_work_list = None
@@ -248,8 +253,8 @@ region = ''
 data_in_base = False
 dict_nkt = {}
 dict_nkt_po = {}
-path_image = '_internal/'
-# path_image = ''
+# path_image = '_internal/'
+path_image = ''
 data_well_dict = {}
 Qwater = 100
 dict_sucker_rod = {}
@@ -586,7 +591,8 @@ type_kr_list = [
     'КР13-7  Заключительные работы (ЗР) после ГГРП (освоение скважины и т.д.)',
     'КР13-8  Промывка забоя водозаборных и артезианских скважин с компрессором',
     'КР13-9  Ремонт водозаборных скважин со спуском дополнительн колонны и промывкой',
-    'КР13-10  Ремонт поглощающей скважины'
+    'КР13-10  Ремонт поглощающей скважины',
+    'КР14-4 Освоение эксплуатационной скважины с горизонтальным окончанием'
 ]
 dict_calc_CaCl = {
     1.01: (14.9, 997),

@@ -72,12 +72,12 @@ def copy_row(ws, ws2, head):
                     ws2.column_dimensions[get_column_letter(col_ind + 1)].width = colWidth[col_ind]
 
 def copy_true_ws(ws, ws2, head):
+
     for row_number, row in enumerate(ws[head]):
         for col_number, cell in enumerate(row):
             if 'катег' in str(cell.value).lower():
                 ws2.cell(row=row_number+1, column=col_number+1).alignment = Alignment(wrap_text=True, horizontal='left',
                                                                             vertical='center')
-
             if type(cell.value) == float:
                 ws2.cell(row_number + 1, col_number + 1, round(cell.value, 5))
             else:

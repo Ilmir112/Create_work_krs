@@ -753,7 +753,7 @@ def insert_database_well_data(well_number, well_area, contractor, costumer, data
 
         except psycopg2.Error as e:
             # Выведите сообщение об ошибке
-            mes = QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных')
+            mes = QMessageBox.warning(None, 'Ошибка', f'Ошибка подключения к базе данных  well_data {e}')
     else:
         try:
 
@@ -1047,8 +1047,9 @@ def create_database_well_db(work_plan, number_dp):
                            f'template_depth TEXT,'
                            f'skm_list TEXT,'
                            f'problemWithEk_depth FLOAT,'
-                           f'problemWithEk_diametr FLOAT)')
-
+                           f'problemWithEk_diametr FLOAT,'
+                           f'today DATE)')
+            date_create = datetime.now()
             for index, data in enumerate(well_data.data_list):
                 current_bottom = data[1]
                 dict_perforation_json = data[2]
@@ -1063,14 +1064,15 @@ def create_database_well_db(work_plan, number_dp):
                 problemWithEk_depth = data[13]
                 problemWithEk_diametr = data[14]
 
+
                 # Подготовленные данные для вставки (пример)
                 data_values = (index, current_bottom, dict_perforation_json, plast_all, plast_work,
                                dict_leakiness, column_additional, fluid_work, well_data.category_pressuar,
                                well_data.category_h2s, well_data.category_gf, template_depth, skm_interval,
-                               problemWithEk_depth, problemWithEk_diametr)
+                               problemWithEk_depth, problemWithEk_diametr, date_create)
 
                 # Подготовленный запрос для вставки данных с параметрами
-                query = f"INSERT INTO {number} VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+                query = f"INSERT INTO {number} VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
 
                 # Выполнение запроса с использованием параметров
                 cursor.execute(query, data_values)
@@ -1135,7 +1137,8 @@ def create_database_well_db(work_plan, number_dp):
                 f'template_depth TEXT, '
                 f'skm_list TEXT, '
                 f'problemWithEk_depth FLOAT, '
-                f'problemWithEk_diametr FLOAT)'
+                f'problemWithEk_diametr FLOAT'
+                f'today DATE)'
             )
 
             for index, data in enumerate(well_data.data_list):
@@ -1150,7 +1153,7 @@ def create_database_well_db(work_plan, number_dp):
                 skm_interval = data[12]
                 problemWithEk_depth = data[13]
                 problemWithEk_diametr = data[14]
-
+                date_create = datetime.now()
                 # Подготовленные данные для вставки
                 data_values = (
                     index,
@@ -1167,11 +1170,12 @@ def create_database_well_db(work_plan, number_dp):
                     template_depth,
                     skm_interval,
                     problemWithEk_depth,
-                    problemWithEk_diametr
+                    problemWithEk_diametr,
+                    date_create
                 )
 
                 # Подготовленный запрос для вставки данных
-                query = f"INSERT INTO {number} VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+                query = f"INSERT INTO {number} VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 
                 # Выполнение запроса с использованием параметров
                 cursor.execute(query, data_values)
@@ -1189,46 +1193,23 @@ def create_database_well_db(work_plan, number_dp):
             if conn:
                 conn.close()
 
+def get_table_creation_time(conn, table_name):
 
-def read_excel_in_base(number_well, area_well):
-    if well_data.connect_in_base:
-        conn = psycopg2.connect(**well_data.postgres_params_data_well)
-        cursor = conn.cursor()
+    with conn.cursor() as cur:
+        # Выполняем SQL-запрос для получения всех записей из таблицы
+        cur.execute(f"SELECT * FROM \"{table_name}\"")
 
-        cursor.execute("SELECT excel_json FROM wells WHERE well_number = %s AND area_well = %s "
-                       "AND contractor = %s AND costumer = %s",
-                       (str(number_well._value), area_well._value, well_data.contractor, well_data.costumer))
+        try:
+            # Получаем результаты запроса в виде списка кортежей
+            rows = cur.fetchall()[0][15]
+            return f' от {rows}'
+        except:
+            return ''
 
-        data_well = cursor.fetchall()
 
-        if cursor:
-            cursor.close()
-        if conn:
-            conn.close()
 
-    else:
-        db_path = connect_to_db('well_data.db', 'data_base_well/')
 
-        conn = sqlite3.connect(f'{db_path}')
-        cursor = conn.cursor()
 
-        cursor.execute("SELECT excel_json FROM wells WHERE well_number = ? AND area_well = ? "
-                       "AND contractor = ? AND costumer = ?",
-                       (str(number_well._value), area_well._value, well_data.contractor, well_data.costumer))
-        data_well = cursor.fetchall()
-        if cursor:
-            cursor.close()
-        if conn:
-            conn.close()
-
-    dict_well = json.loads(data_well[len(data_well) - 1][0])
-    data = dict_well['data']
-
-    rowHeights = dict_well['rowHeights']
-    colWidth = dict_well['colWidth']
-    boundaries_dict = dict_well['merged_cells']
-
-    return data, rowHeights, colWidth, boundaries_dict
 
 
 def round_cell(data):

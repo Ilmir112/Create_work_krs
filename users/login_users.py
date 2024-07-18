@@ -101,6 +101,10 @@ class LoginWindow(QWidget):
                     well_data.user = (password_base[4] + ' ' + password_base[5], f'{password_base[0]} {password_base[1][0]}.{password_base[2][0]}.')
                     a = well_data.user
                     well_data.contractor = password_base[5]
+                    # if 'Ойл' in password_base[5]:
+                    #     well_data.contractor = 'ООО "Ойл-cервис"'
+                    # elif 'РН' in password_base[5]:
+                    #     well_data.contractor = 'ООО "РН-Сервис"'
                     well_data.pause = False
                 else:
                     mes = QMessageBox.critical(self, 'Пароль', 'логин и пароль не совпадает')
@@ -238,10 +242,10 @@ class RegisterWindow(QWidget):
         self.password.setEchoMode(QLineEdit.Password)  # Устанавливаем режим скрытия пароля
         self.button_register_user.clicked.connect(self.register_user)
 
-        # self.label_region = QLabel("ЦЕХ:", self)
-        # self.region = QComboBox(self)
-        # self.region.addItems(
-        #     ['ЦТКРС № 1', 'ЦТКРС № 2', 'ЦТКРС № 3', 'ЦТКРС № 4', 'ЦТКРС № 5', 'ЦТКРС № 6', 'ЦТКРС № 7'])
+        self.label_region = QLabel("ЦЕХ:", self)
+        self.region = QComboBox(self)
+        self.region.addItems(
+            ['ЦТКРС № 1', 'ЦТКРС № 2', 'ЦТКРС № 3', 'ЦТКРС № 4', 'ЦТКРС № 5', 'ЦТКРС № 6', 'ЦТКРС № 7'])
 
         self.grid = QGridLayout(self)
         self.grid.addWidget(self.label_last_name, 0, 1)
@@ -254,6 +258,8 @@ class RegisterWindow(QWidget):
         self.grid.addWidget(self.position, 3, 2)
         self.grid.addWidget(self.label_organization, 4, 1)
         self.grid.addWidget(self.organization, 4, 2)
+        self.grid.addWidget(self.label_region, 5, 1)
+        self.grid.addWidget(self.region, 5, 2)
         self.grid.addWidget(self.label_password, 6, 1)
         self.grid.addWidget(self.password, 6, 2)
         self.grid.addWidget(self.label_password2, 7, 1)
@@ -264,11 +270,11 @@ class RegisterWindow(QWidget):
 
     def update_organization(self, index):
 
-        if index == 'ООО "Ойл-Сервис"':
+        if index == 'ООО "Ойл-cервис"':
             self.label_region = QLabel("ЦЕХ:", self)
             self.region = QComboBox(self)
             self.region.addItems(['ЦТКРС № 1', 'ЦТКРС № 2', 'ЦТКРС № 3', 'ЦТКРС № 4',
-                                  'ЦТКРС № 5', 'ЦТКРС № 6','ЦТКРС № 7'])
+                                  'ЦТКРС № 5', 'ЦТКРС № 6', 'ЦТКРС № 7'])
             self.grid.addWidget(self.label_region, 5, 1)
             self.grid.addWidget(self.region, 5, 2)
         elif index == 'ООО "РН-Сервис"':
@@ -277,8 +283,7 @@ class RegisterWindow(QWidget):
             self.region.addItems(['экспедиции №1', 'экспедиции №2', 'экспедиции №3', 'экспедиции №4',
                                   'экспедиции №5', 'экспедиции №6',
                                  'экспедиции №7'])
-            self.grid.addWidget(self.label_region, 5, 1)
-            self.grid.addWidget(self.region, 5, 2)
+
     def register_user(self):
         from data_base.work_with_base import connect_to_db
         last_name = self.last_name.text().title().strip()

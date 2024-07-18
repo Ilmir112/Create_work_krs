@@ -47,7 +47,7 @@ class TabPage_SO_with(QWidget):
         self.privyazka_question_QCombo = QComboBox(self)
         self.privyazka_question_QCombo.addItems(['Нет', 'Да'])
 
-        if well_data.current_bottom - well_data.perforation_sole <= 10 and well_data.open_trunk_well is False:
+        if well_data.current_bottom - well_data.perforation_sole <= 10 and well_data.open_trunk_well is False and well_data.count_template != 0:
             self.privyazka_question_QCombo.setCurrentIndex(1)
 
         self.note_Label = QLabel("Нужно ли добавлять примечание", self)
@@ -1123,10 +1123,14 @@ class TemplateKrs(QMainWindow):
              'Мастер КРС, представитель ЦДНГ', 2.49],
             [None, None,
              f'Поднять {template_str} на НКТ{well_data.nkt_diam}мм с глубины {current_bottom}м с доливом скважины в '
-             f'объеме {round(well_data.current_bottom * 1.12 / 1000, 1)}м3 тех. жидкостью  уд.весом {well_data.fluid_work}',
+             f'объеме {round(current_bottom * 1.12 / 1000, 1)}м3 тех. жидкостью  уд.весом {well_data.fluid_work}',
              None, None, None, None, None, None, None,
              'Мастер КРС', liftingNKT_norm(float(current_bottom), 1.2)]
         ]
+        if abs(well_data.perforation_roof - current_bottom) < 15:
+            list_template_ek.pop(5)
+
+
 
         notes_list = [
             [None, None,

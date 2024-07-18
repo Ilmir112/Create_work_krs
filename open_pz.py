@@ -82,9 +82,9 @@ class CreatePZ(QMainWindow):
                                       'Необходимо уточнить наличие инвентарного номера')
             return
 
-        elif work_plan not in ['application_pvr', 'application_gis']:
+        if work_plan not in ['application_pvr', 'application_gis', 'gnkt_bopz', 'gnkt_opz', 'gnkt_after_grp', 'gnkt_frez']:
             if work_plan != 'plan_change':
-                for row_ind, row in enumerate(ws.iter_rows(values_only=True)):
+                for row_ind, row in enumerate(ws.iter_rows(values_only=True, max_col=13)):
                     ws.row_dimensions[row_ind].hidden = False
 
                     if any(['ПЛАН РАБОТ' in str(col).upper() for col in row]) \
@@ -289,6 +289,8 @@ class CreatePZ(QMainWindow):
                                 'отбивка' not in str(col).lower():
                             type_pvr = ws.cell(row=row_ind + 1, column=3).value
                             well_data.gis_list.append(type_pvr)
+        else:
+            return ws
 
     def add_itog(self, ws, ins_ind, work_plan):
         if ws.merged_cells.ranges:
