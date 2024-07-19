@@ -388,9 +388,9 @@ class TabPage_SO_acid(QWidget):
         self.swab_true_edit_type.currentTextChanged.connect(self.update_need_swab)
         self.swab_true_edit_type.setCurrentIndex(1)
 
-        self.paker_depth.textChanged.connect(self.update_paker_depth)
-        self.paker_depth.textChanged.connect(self.update_paker_edit)
-        self.paker2_depth.textChanged.connect(self.update_paker_edit)
+        self.paker_depth.editingFinished.connect(self.update_paker_depth)
+        self.paker_depth.editingFinished.connect(self.update_paker_edit)
+        self.paker2_depth.editingFinished.connect(self.update_paker_edit)
 
         self.svk_true_combo.currentTextChanged.connect(self.update_skv_edit)
         self.svk_true_combo.setCurrentIndex(0)
@@ -407,7 +407,7 @@ class TabPage_SO_acid(QWidget):
             self.Qplast_after_edit.setCurrentIndex(0)
         else:
             self.Qplast_after_edit.setCurrentIndex(1)
-        self.calculate_sko_line.textChanged.connect(self.update_calculate_sko)
+        self.calculate_sko_line.editingFinished.connect(self.update_calculate_sko)
 
     def update_calculate_sko(self):
         plasts = well_data.texts
@@ -416,7 +416,8 @@ class TabPage_SO_acid(QWidget):
             for plast_sel in plasts:
                 if plast_sel == plast:
                     for interval in well_data.dict_perforation[plast]['интервал']:
-                        metr_pvr += abs(interval[0] - interval[1])
+                        if interval[1] < well_data.current_bottom:
+                            metr_pvr += abs(interval[0] - interval[1])
         calculate_sko = self.calculate_sko_line.text()
         if calculate_sko != '':
             calculate_sko = calculate_sko.replace(',', '.')

@@ -486,7 +486,7 @@ class Drill_window(QMainWindow):
 
             for row in self.drilling_sbt(drill_tuple, drill_type_combo, drillingBit_diam, downhole_motor):
                 drilling_list.append(row)
-            drilling_list.append([f'Промыть  {well_data.fluid_work} в объеме '
+            drilling_list.insert(-2, [f'Промыть  {well_data.fluid_work} в объеме '
                                   f'{round(well_volume(self, well_data.current_bottom) * 2, 1)}м3', None,
                                   f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {well_data.fluid_work}  '
                                   f'в присутствии представителя заказчика в объеме '

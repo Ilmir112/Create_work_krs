@@ -350,8 +350,8 @@ class PerforationWindow(QMainWindow):
             perf_list = []
             ["Кровля перфорации", "Подошва Перфорации", "Тип заряда", "отв на 1 п.м.", "Количество отверстий",
              "Вскрываемые пласты", "доп информация"]
-            roof = self.tableWidget.item(row, 0).text()
-            sool = self.tableWidget.item(row, 1).text()
+            roof = self.tableWidget.item(row, 0).text().replace(',', '.')
+            sool = self.tableWidget.item(row, 1).text().replace(',', '.')
             # pvr_str = TabPage_SO.select_type_perforation(self, sool)
             if type_perforation == 'Трубная перфорация':
                 perforation[2] = [f"ГИС ( Трубная Перфорация ЗАДАЧА 2.9.2)", None,

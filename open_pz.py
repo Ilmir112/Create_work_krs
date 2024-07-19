@@ -1,3 +1,5 @@
+import base64
+
 import well_data
 from datetime import datetime
 from PyQt5.QtWidgets import QInputDialog, QMessageBox, QMainWindow
@@ -143,7 +145,7 @@ class CreatePZ(QMainWindow):
                 image_loader = SheetImageLoader(ws)
             except:
                 mes = QMessageBox.warning(None, 'Ошибка', 'Ошибка в копировании изображений')
-
+            well_data.image_data = []
             for row in range(1, well_data.data_well_max._value):
                 for col in range(1, 12):
                     try:
@@ -155,6 +157,24 @@ class CreatePZ(QMainWindow):
                         coord = f'{get_column_letter(col)}{row + 17 - well_data.cat_well_min._value}'
 
                         well_data.image_list.append((image_path, coord, image_size))
+                        # Чтение изображения в байты
+                        with open(image_path, "rb") as f:
+                            image_bytes = f.read()
+                        # Преобразование в Base64
+                        image_base64 = base64.b64encode(image_bytes).decode("utf-8")
+
+                        # Создание словаря для изображения
+                        image_info = {
+                            "coord": coord,
+                            "width": image_size[0],
+                            "height": image_size[1],
+                            "data": image_base64
+                        }
+                        # Сохранение Base64 данных в файл (для проверки)
+                        with open("image_base64.txt", "w", encoding="utf-8") as f:
+                            f.write(image_base64)
+                        # Добавление информации в список
+                        well_data.image_data.append(image_info)
 
                     except:
                         pass

@@ -263,6 +263,7 @@ row_expected = []
 rowHeights = []
 plast_project = []
 plast_work = []
+image_data = []
 leakage_window = None
 cat_P_P = []
 data_well_is_True = False

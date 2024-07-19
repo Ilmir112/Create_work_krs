@@ -34,6 +34,7 @@ class TabPageDp(QWidget):
 
         self.well_number_label = QLabel('номер скважины')
         self.well_number_edit = QLineEdit(self)
+        self.well_number_edit.setValidator(self.validator_int)
         self.well_number_edit.setText(f'{well_data.well_number._value}')
 
         self.well_area_label = QLabel('площадь скважины')
@@ -72,7 +73,7 @@ class TabPageDp(QWidget):
 
         self.change_pvr_combo_label = QLabel('Были ли изменения в интервале перфорации')
         self.change_pvr_combo = QComboBox(self)
-        self.change_pvr_combo.addItems(['Нет', 'Да'])
+        self.change_pvr_combo.addItems(['', 'Нет', 'Да'])
 
         self.skm_interval_label = QLabel('интервалы скреперования')
         self.skm_interval_edit = QLineEdit(self)
@@ -150,11 +151,78 @@ class TabPageDp(QWidget):
         self.grid.addWidget(self.work_label, 25, 1)
         self.grid.addWidget(self.work_edit, 26, 1, 2, 4)
 
-        self.well_area_edit.textChanged.connect(self.update_well)
-        self.well_number_edit.textChanged.connect(self.update_well)
+        self.well_area_edit.editingFinished.connect(self.update_well)
+        self.well_number_edit.editingFinished.connect(self.update_well)
         self.change_pvr_combo.currentTextChanged.connect(self.update_change_pvr)
         self.change_pvr_combo.setCurrentIndex(1)
         self.change_pvr_combo.setCurrentIndex(0)
+
+
+    def check_in_database_well_data(self, number_well):
+        table_in_base_combo = self.table_in_base_combo.currentText()
+        if ' от' in table_in_base_combo:
+            table_in_base_combo = table_in_base_combo[:-14]
+
+        well_number, well_area = table_in_base_combo.split(" ")[:2]
+        self.well_number_edit.setText(well_number)
+        self.well_area_edit.setText(well_area)
+
+        if well_area != ' ':
+            if well_data.connect_in_base:
+                try:
+                    conn = psycopg2.connect(**well_data.postgres_params_data_well)
+                    cursor = conn.cursor()
+
+                    # Запрос для извлечения всех скважин с наличием данных
+                    cursor.execute(
+                        "SELECT well_number, area_well, contractor, costumer, today, work_plan FROM wells WHERE well_number=(%s) AND area_well=(%s)",
+                                       (str(number_well), well_area))
+
+                    # Получение всех результатов
+                    wells_with_data = cursor.fetchall()
+
+                    # Проверка, есть ли данные
+                    if wells_with_data:
+                        well_list = []
+                        for well in wells_with_data:
+                            try:
+                                if 'Ойл' in well[2]:
+                                    contractor = 'Ойл'
+                                elif 'РН' in well[2]:
+                                    contractor = 'РН'
+                            except:
+                                contractor = 'Ойл'
+                            # Формируем список скважин
+                            well_list.append(f'{well[0]} {well[1]} {contractor} {well[5]} от {well[4]}')
+                        return well_list[::-1]
+                    else:
+                        return False
+
+                except psycopg2.Error as e:
+                    # Выведите сообщение об ошибке
+                    mes = QMessageBox.warning(None, 'Ошибка',
+                                              f'Ошибка подключения к базе данных, Скважина не добавлена в базу: \n {e}')
+            else:
+                try:
+                    db_path = connect_to_db('well_data.db', 'data_base_well/')
+
+                    conn = sqlite3.connect(f'{db_path}')
+                    cursor = conn.cursor()
+
+                    cursor.execute("SELECT data_well FROM wells WHERE well_number = ? AND area_well = ? "
+                                   "AND contractor = ? AND costumer = ?",
+                                   (str(number_well._value), well_area._value, well_data.contractor, well_data.costumer))
+
+                    data_well = cursor.fetchone()
+                    if data_well:
+                        return data_well
+                    else:
+                        return False, data_well
+
+                except sqlite3.Error as e:
+                    # Выведите сообщение об ошибке
+                    mes = QMessageBox.warning(None, 'Ошибка',
+                                              'Ошибка подключения к базе данных, Скважина не добавлена в базу')
     def update_change_pvr(self, index):
         if self.old_index == 0:
             self.tableWidget.setHorizontalHeaderLabels(
@@ -218,12 +286,17 @@ class TabPageDp(QWidget):
 
     def update_well(self):
 
+
         self.table_name = str(self.well_number_edit.text()) + self.well_area_edit.text()
         if well_data.data_in_base:
             self.table_in_base_label = QLabel('данные в таблице')
             self.table_in_base_combo = QComboBox()
 
-            table_list = self.get_tables_starting_with(self.well_number_edit.text(), self.well_area_edit.text())
+            self.well_data_label = QLabel('данные скважины в базе')
+            self.well_data_in_base_combo = QComboBox()
+
+
+            table_list = self.get_tables_starting_with(self.well_number_edit.text(), self.well_area_edit.text())[::-1]
             if table_list:
                 self.table_in_base_combo.addItems(table_list)
 
@@ -232,21 +305,28 @@ class TabPageDp(QWidget):
             self.index_change_line.setValidator(self.validator_int)
             self.grid.addWidget(self.table_in_base_label, 2, 5)
             self.grid.addWidget(self.table_in_base_combo, 3, 5)
+            self.grid.addWidget(self.well_data_label, 2, 6)
+            self.grid.addWidget(self.well_data_in_base_combo, 3, 6)
             self.grid.addWidget(self.index_change_label, 2, 7)
             self.grid.addWidget(self.index_change_line, 3, 7)
 
-            self.index_change_line.textChanged.connect(self.update_table_in_base_combo)
-            self.table_in_base_combo.currentTextChanged.connect(self.update_table_in_base_combo)
+            self.index_change_line.editingFinished.connect(self.update_table_in_base_combo)
+            well_list = self.check_in_database_well_data(self.well_number_edit.text())
+            if well_list:
+                self.well_data_in_base_combo.addItems(well_list)
+
+            # self.table_in_base_combo.currentTextChanged.connect(self.update_table_in_base_combo)
 
     def update_table_name(self):
         self.index_change_line.setText('0')
     def update_table_in_base_combo(self):
-        time.sleep(0.1)
+
+        number_dp = self.number_DP_Combo.currentText()
         index_change_line = self.index_change_line.text()
         table_in_base_combo = self.table_in_base_combo.currentText()
         if ' от' in table_in_base_combo:
             table_in_base_combo = table_in_base_combo[:-14]
-        number_dp = self.number_DP_Combo.currentText()
+
         well_number, well_area = table_in_base_combo.split(" ")[:2]
         self.well_number_edit.setText(well_number)
         self.well_area_edit.setText(well_area)
@@ -260,7 +340,7 @@ class TabPageDp(QWidget):
             self.template_depth_edit.setText(str(well_data.template_depth))
             self.template_lenght_edit.setText(str(well_data.template_lenght))
             skm_interval = ''
-            a = well_data.skm_interval
+
             try:
                 if len(well_data.skm_interval) != 0:
                     for roof, sole in well_data.skm_interval:
@@ -421,7 +501,10 @@ class DopPlanWindow(QMainWindow):
         pressuar_pvr_edit = self.tabWidget.currentWidget().pressuar_pvr_edit.text()
         date_pressuar_edit = self.tabWidget.currentWidget().date_pressuar_edit.text()
         vertical_line = self.tabWidget.currentWidget().vertical_line.text()
-        udlin = float(roof_edit) - float(vertical_line)
+        try:
+            udlin = float(roof_edit) - float(vertical_line)
+        except:
+            pass
 
         if '' in [plast_line, roof_edit, sole_edit, count_pvr_edit,type_pvr_edit]:
             QMessageBox.warning(self, 'Ошибка', 'Не введены все даныые')
@@ -453,17 +536,24 @@ class DopPlanWindow(QMainWindow):
 
 
     def addPerfProject(self):
+        table_in_base_combo = str(self.tabWidget.currentWidget().table_in_base_combo.currentText())
+
+        if ' от' in table_in_base_combo:
+            data_table_in_base_combo = table_in_base_combo.split(' ')[-1]
+            table_in_base = table_in_base_combo.split(' ')[2]
+            table_in_base = table_in_base_combo.split(' ')[2].replace('krs', 'ПР').replace('dop_plan', 'ДП').replace(
+                'dop_plan_in_base', 'ДП')
         well_number = self.tabWidget.currentWidget().well_number_edit.text()
         well_area = self.tabWidget.currentWidget().well_area_edit.text()
         if well_number == '' or well_area == '':
             mes = QMessageBox.critical(self, 'ошибка', 'Ввведите номер площадь скважины')
             return
-        self.work_with_excel(well_number, well_area)
+        self.work_with_excel(well_number, well_area, table_in_base)
 
 
-    def work_with_excel(self,well_number, well_area):
+    def work_with_excel(self,well_number, well_area, work_plan):
         self.data, self.rowHeights, self.colWidth, self.boundaries_dict = self.read_excel_in_base(well_number,
-                                                                                                  well_area)
+                                                                                                  well_area, work_plan)
         self.target_row_index = 5000
         self.target_row_index_cancel = 5000
         self.bottom_row_index = 5000
@@ -500,14 +590,14 @@ class DopPlanWindow(QMainWindow):
             for index_col, col_pvr in enumerate(row_pvr):
                 if col_pvr != None:
                     self.tableWidget.setItem(rows, index_col - 1, QTableWidgetItem(str(col_pvr)))
-    def read_excel_in_base(self, number_well, area_well):
+    def read_excel_in_base(self, number_well, area_well, work_plan):
         if well_data.connect_in_base:
             conn = psycopg2.connect(**well_data.postgres_params_data_well)
             cursor = conn.cursor()
 
             cursor.execute("SELECT excel_json FROM wells WHERE well_number = %s AND area_well = %s "
-                           "AND contractor = %s AND costumer = %s",
-                           (str(number_well), area_well, well_data.contractor, well_data.costumer))
+                           "AND contractor = %s AND costumer = %s AND work_plan = %s",
+                           (str(number_well), area_well, well_data.contractor, well_data.costumer, work_plan))
 
             data_well = cursor.fetchall()
 
@@ -536,8 +626,9 @@ class DopPlanWindow(QMainWindow):
             rowHeights = dict_well['rowHeights']
             colWidth = dict_well['colWidth']
             boundaries_dict = dict_well['merged_cells']
-        except:
-            QMessageBox.warning(self, 'ОШибка', 'Введены не все параметры')
+
+        except Exception as e:
+            QMessageBox.warning(self, 'Ошибка', f'Введены не все параметры {e}')
             return
 
         return data, rowHeights, colWidth, boundaries_dict
@@ -545,13 +636,18 @@ class DopPlanWindow(QMainWindow):
                              current_bottom_date_edit, method_bottom_combo):
 
         for i, row in data.items():
-            for col in range(len(row)):
-                if 'Текущий забой ' in str(row[col]['value']):
-                    self.bottom_row_index = int(i)
-                    break
-        data[str(self.bottom_row_index)][3]['value'] = current_bottom
-        data[str(self.bottom_row_index)][5]['value'] = current_bottom_date_edit
-        data[str(self.bottom_row_index)][10 - self.old_index]['value'] = method_bottom_combo
+            if i != 'image':
+                for col in range(len(row)):
+                    if 'Текущий забой ' in str(row[col]['value']):
+                        self.bottom_row_index = int(i)
+                        break
+        try:
+            data[str(self.bottom_row_index)][3]['value'] = current_bottom
+            data[str(self.bottom_row_index)][5]['value'] = current_bottom_date_edit
+
+            data[str(self.bottom_row_index)][-1]['value'] = method_bottom_combo
+        except:
+            pass
         return data, rowHeights, colWidth, boundaries_dict
 
     def insert_row_in_pvr(self, data, rowHeights, colWidth, boundaries_dict, plast_list, current_bottom,
@@ -721,6 +817,9 @@ class DopPlanWindow(QMainWindow):
             return
 
         change_pvr_combo = self.tabWidget.currentWidget().change_pvr_combo.currentText()
+        if change_pvr_combo == '':
+            mes = QMessageBox.warning(self, 'Ошибка', 'Нужно выбрать пункт изменения ПВР')
+            return
         fluid = self.tabWidget.currentWidget().fluid_edit.text().replace(',', '.')
         current_bottom = self.tabWidget.currentWidget().current_bottom_edit.text()
         if current_bottom != '':
@@ -799,10 +898,29 @@ class DopPlanWindow(QMainWindow):
             return
 
         if well_data.data_in_base:
-
+            data_well_data_in_base_combo, data_table_in_base_combo = '', ''
             table_in_base_combo = str(self.tabWidget.currentWidget().table_in_base_combo.currentText())
+            well_data_in_base_combo = self.tabWidget.currentWidget().well_data_in_base_combo.currentText()
             if ' от' in table_in_base_combo:
-                table_in_base_combo = table_in_base_combo[:-14]
+
+                data_table_in_base_combo = table_in_base_combo.split(' ')[-1]
+                table_in_base = table_in_base_combo.split(' ')[2]
+                number_dp_in_base = "".join(c for c in table_in_base if c.isdigit())
+                table_in_base = table_in_base_combo.split(' ')[2].replace('krs', 'ПР').replace('dop_plan_in_base', 'ДП№').replace('dop_plan', 'ДП№')
+
+
+
+            if ' от' in well_data_in_base_combo:
+                data_well_data_in_base_combo = well_data_in_base_combo.split(' ')[-1]
+                well_data_in_base = well_data_in_base_combo.split(' ')[3]
+
+            if data_well_data_in_base_combo != data_table_in_base_combo:
+                mes = QMessageBox.critical(self, 'пункт', 'Даты в двух таблицах не совпадают')
+                return
+            if table_in_base != well_data_in_base:
+                mes = QMessageBox.critical(self, 'пункт', 'Планы в двух таблицах не совпадают')
+                return
+
             index_change_line = self.tabWidget.currentWidget().index_change_line.text()
             well_number = self.tabWidget.currentWidget().well_number_edit.text()
             well_area = self.tabWidget.currentWidget().well_area_edit.text()
@@ -817,16 +935,30 @@ class DopPlanWindow(QMainWindow):
             if table_in_base_combo == '':
                 mes = QMessageBox.critical(self, 'База данных', 'Необходимо выбрать план работ')
                 return
-            data_well = check_in_database_well_data(well_data.well_number, well_data.well_area)[0]
+
+            data_well = check_in_database_well_data(well_data.well_number, well_data.well_area, table_in_base)[0]
+
             if data_well:
                 insert_data_well_dop_plan(data_well)
-            self.extraction_data(table_in_base_combo, index_change_line)
+
+            self.work_with_excel(well_number, well_area, table_in_base)
+
+
+            name_table = table_in_base_combo[:-14]
+            if number_dp_in_base == number_dp:
+                mes = QMessageBox.question(self, 'номер дополнительно плана работ',
+                                           f'дополнительный плана работ №{number_dp} есть в базе, обновить?')
+                if QMessageBox.StandardButton.No == mes:
+                    return
+                else:
+                    self.delete_data(well_number, well_area, table_in_base)
+            self.extraction_data(name_table, index_change_line)
 
 
         well_data.current_bottom = current_bottom
 
         rows = self.tableWidget.rowCount()
-        self.work_with_excel(well_number, well_area)
+
         if change_pvr_combo == 'Да':
             if rows == 0:
                 mes = QMessageBox.warning(self, 'Ошибка', 'Нужно загрузить интервалы перфорации')
@@ -846,8 +978,6 @@ class DopPlanWindow(QMainWindow):
                 self.insert_row_in_pvr(self.data, self.rowHeights, self.colWidth, self.boundaries_dict, plast_row,
                                        current_bottom, current_bottom_date_edit, method_bottom_combo)
         else:
-
-
             well_data.data, well_data.rowHeights, well_data.colWidth, well_data.boundaries_dict = \
                 self.change_pvr_in_bottom(self.data, self.rowHeights, self.colWidth, self.boundaries_dict,
                                           current_bottom, current_bottom_date_edit, method_bottom_combo)
@@ -878,6 +1008,48 @@ class DopPlanWindow(QMainWindow):
 
         well_data.pause = False
         self.close()
+
+    def delete_data(self, number_well, area_well, work_plan):
+        if well_data.connect_in_base:
+            try:
+                conn = psycopg2.connect(**well_data.postgres_params_data_well)
+                cursor = conn.cursor()
+
+                cursor.execute("""
+                DELETE FROM wells 
+                WHERE well_number = %s AND area_well = %s AND contractor = %s AND costumer = %s AND work_plan= %s """,
+                       (str(number_well), area_well, well_data.contractor, well_data.costumer,  work_plan)
+                      )
+
+                conn.commit()
+                cursor.close()
+                conn.close()
+
+            except psycopg2.Error as e:
+                # Выведите сообщение об ошибке
+                mes = QMessageBox.warning(None, 'Ошибка',
+                                          f'Ошибка удаления {e}')
+        else:
+            try:
+                db_path = connect_to_db('well_data.db', 'data_base_well/')
+
+                conn = sqlite3.connect(f'{db_path}')
+                cursor = conn.cursor()
+
+                cursor.execute("DELETE FROM wells  WHERE well_number = ? AND area_well = ? "
+                               "AND contractor = ? AND costumer = ? AND work_plan=?",
+                               (str(number_well._value), area_well._value, well_data.contractor, well_data.costumer,
+                                work_plan))
+
+                conn.commit()
+                cursor.close()
+                conn.close()
+
+            except sqlite3.Error as e:
+                # Выведите сообщение об ошибке
+                mes = QMessageBox.warning(None, 'Ошибка',
+                                          f'Ошибка удаления {e}')
+
 
 
     def add_work_excel(self, ws2, work_list, ind_ins):
@@ -929,11 +1101,8 @@ class DopPlanWindow(QMainWindow):
                 # Проверяем наличие таблицы с определенным именем
                 result_table = 0
 
-                a = well_data.work_plan
                 if well_data.work_plan in ['krs', 'plan_change']:
                     work_plan = 'krs'
-
-                    table_name = f'{str(well_data.well_number._value) + " " + well_data.well_area._value + " " + work_plan + " " + contractor}'
 
                     # print(cursor1.execute(f"SELECT EXISTS (SELECT FROM information_schema.tables").fetchall())
                     cursor1.execute(
@@ -946,7 +1115,6 @@ class DopPlanWindow(QMainWindow):
                                     f"WHERE table_name = '{table_name}')")
                     print(f'имя таблицы в {table_name}')
                     result_table = cursor1.fetchone()
-
 
                 if result_table[0]:
                     well_data.data_in_base = True
@@ -1032,7 +1200,7 @@ class DopPlanWindow(QMainWindow):
 
     def insert_data_dop_plan(self, result, paragraph_row):
         try:
-            paragraph_row = paragraph_row
+            paragraph_row = paragraph_row -1
         except:
             paragraph_row = 1
         if len(result) < paragraph_row:

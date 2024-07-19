@@ -797,7 +797,7 @@ class Template_without_skm(QMainWindow):
         else:
             list_template_ek = list_template_ek
         if solvent_question == 'Нет':
-            list_template_ek.pop(2)
+            list_template_ek.pop(1)
 
         well_data.current_bottom = current_bottom
         return list_template_ek

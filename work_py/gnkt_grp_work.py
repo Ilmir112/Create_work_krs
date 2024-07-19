@@ -767,7 +767,7 @@ class GnktOsvWindow2(QMainWindow):
              f'{well_data.type_kr}', None, None, None, None, None, None,
              None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None,
-             f'{well_data.bur_rastvor}', None, None, None, None, None, None, None,
+              None,f'{well_data.bur_rastvor}', None, None, None, None, None, None,
              None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None],

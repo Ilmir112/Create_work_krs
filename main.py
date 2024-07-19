@@ -28,7 +28,7 @@ from openpyxl.styles import Border, Side, Alignment, Font
 
 
 from log_files.log import logger, QPlainTextEditLogger
-from work_py.advanted_file import count_row_height, raid, remove_overlapping_intervals
+
 
 from openpyxl.drawing.image import Image
 
@@ -484,6 +484,7 @@ class MyWindow(QMainWindow):
                     mes = QMessageBox.warning(self, 'Ошибка', f'Ошибка при прочтении файла {f}')
         elif action == self.create_KRS_DP and self.table_widget == None:
             self.work_plan = 'dop_plan'
+            well_data.work_plan = 'dop_plan'
             self.tableWidgetOpen(self.work_plan)
             self.fname, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
                                                                   "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
@@ -585,6 +586,7 @@ class MyWindow(QMainWindow):
 
         elif action == self.create_GNKT_BOPZ and self.table_widget == None:
             self.work_plan = 'gnkt_bopz'
+            well_data.bvo = True
             self.tableWidgetOpen(self.work_plan)
 
             self.fname, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
@@ -908,6 +910,7 @@ class MyWindow(QMainWindow):
         from open_pz import CreatePZ
         from work_py.alone_oreration import is_number
         from data_base.work_with_base import create_database_well_db, insert_database_well_data, excel_in_json
+        from work_py.advanted_file import count_row_height
 
         if not self.table_widget is None:
             wb2 = Workbook()
@@ -991,15 +994,19 @@ class MyWindow(QMainWindow):
             if self.work_plan in ['krs', 'plan_change']:
                 self.create_short_plan(wb2, plan_short)
 
-            if self.work_plan not in ['dop_plan', 'dop_plan_in_base']:
+            if self.work_plan not in ['dop_plan']:
                 if 'Ойл' in well_data.contractor:
                     self.insert_image(ws2, f'{well_data.path_image}imageFiles/Хасаншин.png', 'H1')
                     self.insert_image(ws2, f'{well_data.path_image}imageFiles/Шамигулов.png', 'H4')
-                excel_data_dict = excel_in_json(ws2)
-                insert_database_well_data(
-                    well_data.well_number._value, well_data.well_area._value, well_data.contractor, well_data.costumer,
-                    well_data.data_well_dict,  excel_data_dict
-                )
+
+            excel_data_dict = excel_in_json(ws2)
+            insert_database_well_data(
+                well_data.well_number._value, well_data.well_area._value, well_data.contractor, well_data.costumer,
+                well_data.data_well_dict, excel_data_dict, self.work_plan
+            )
+
+            if self.work_plan not in ['dop_plan', 'dop_plan_in_base']:
+
 
                 try:
                     cat_h2s_list = well_data.dict_category[well_data.plast_work_short[0]]['по сероводороду'].category
@@ -1183,6 +1190,7 @@ class MyWindow(QMainWindow):
             well_data.leakiness_interval = []
             well_data.dict_pump_h = {"do": 0, "posle": 0}
             well_data.ins_ind = 0
+            well_data.image_data = []
             well_data.current_bottom2 = 5000
             well_data.len_razdel_1 = 0
             well_data.count_template = 0
@@ -2286,6 +2294,7 @@ class MyWindow(QMainWindow):
                 self.work_window = None
 
         elif work_plan == 'dop_plan':
+            from work_py.dop_plan_py import DopPlanWindow
 
             self.rir_window = DopPlanWindow(well_data.ins_ind, self.table_widget, work_plan)
             # self.rir_window.setGeometry(200, 400, 100, 200)
@@ -2520,6 +2529,7 @@ class MyWindow(QMainWindow):
             return False
 
     def check_depth_in_skm_interval(self, depth):
+        from work_py.advanted_file import raid, remove_overlapping_intervals
         check_true = False
         a = well_data.skm_interval
         for interval in well_data.skm_interval:

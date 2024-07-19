@@ -238,6 +238,7 @@ class TabPage_SO(QWidget):
         self.curator_Combo = QComboBox(self)
         self.curator_Combo.setMinimumWidth(50)
 
+
         self.region_Label = QLabel('Регион')
         self.region_Combo = QComboBox(self)
 
@@ -550,6 +551,9 @@ class TabPage_SO(QWidget):
 
         curator = 'ОР' if (self.pump_SHGN_posle_editType.text() == 'отсут' \
                            and self.pump_ECN_posle_editType.text() == 'отсут') else 'ГТМ'
+        if well_data.work_plan in ['gnkt_frez', 'gnkt_bopz']:
+            curator = 'ВНС'
+
         self.curator_Combo.currentTextChanged.connect(self.update_curator)
         # print(f'куратор индекс {curator, curator_list.index(curator)}')
         self.curator_Combo.setCurrentIndex(curator_list.index(curator))

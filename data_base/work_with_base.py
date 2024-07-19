@@ -2,11 +2,13 @@ import json
 import os
 import re
 import sqlite3
+from io import BytesIO
 
 import openpyxl
 import psycopg2
-from PyQt5.QtWidgets import QInputDialog
-from collections import namedtuple
+import well_data
+import base64
+
 
 from datetime import datetime
 
@@ -19,8 +21,10 @@ from openpyxl import load_workbook
 from openpyxl.styles import PatternFill, Font, Color
 from openpyxl.utils import get_column_letter, range_boundaries
 
-import well_data
+
+from PIL import Image
 from main import MyWindow
+from work_py.advanted_file import definition_plast_work
 
 
 class Classifier_well(QMainWindow):
@@ -688,13 +692,19 @@ class Classifier_well(QMainWindow):
                     conn.close()
 
 
-def insert_database_well_data(well_number, well_area, contractor, costumer, data_well_dict, excel):
+def insert_database_well_data(well_number, well_area, contractor, costumer, data_well_dict, excel, work_plan):
+
     data_well = json.dumps(data_well_dict, ensure_ascii=False)
     excel_json = json.dumps(excel, ensure_ascii=False)
     date_today = datetime.now()
     # print(row, well_data.count_row_well)
+    if 'dop_plan' in work_plan:
+        work_plan_str = f'ДП№{well_data.number_dp}'
+    elif 'krs' in work_plan or 'plan' in work_plan:
+        work_plan_str = 'ПР'
     if well_data.connect_in_base:
         try:
+
             conn = psycopg2.connect(**well_data.postgres_params_data_well)
             cursor = conn.cursor()
             # Проверка наличия строки с заданными параметрами
@@ -702,19 +712,21 @@ def insert_database_well_data(well_number, well_area, contractor, costumer, data
                    SELECT EXISTS (
                        SELECT 1 
                        FROM wells
-                       WHERE well_number = %s AND area_well = %s AND contractor = %s AND costumer = %s
+                       WHERE well_number = %s AND area_well = %s AND contractor = %s AND costumer = %s AND work_plan = %s
                    ), today -- Добавляем contractor в SELECT
                FROM wells 
-               WHERE well_number = %s AND area_well = %s AND contractor = %s AND costumer = %s
+               WHERE well_number = %s AND area_well = %s AND contractor = %s AND costumer = %s AND work_plan = %s
                """, (
-                str(well_number), well_area, contractor, costumer, str(well_number), well_area, contractor, costumer))
+                str(well_number), well_area, contractor, costumer, work_plan_str, str(well_number), well_area, contractor, costumer, work_plan_str))
+
+            row_exists = cursor.fetchall()
 
             row_exists = cursor.fetchone()
 
             if row_exists:
                 row_exists, date_in_base = row_exists
                 reply = QMessageBox.question(None, 'Строка найдена',
-                                             f'Строка с {well_number} {well_area} уже существует от {date_in_base}. '
+                                             f'Строка с {well_number} {well_area} {work_plan} уже существует от {date_in_base}. '
                                              f'Обновить данные?')
                 if reply == QMessageBox.Yes:
                     try:
@@ -732,10 +744,10 @@ def insert_database_well_data(well_number, well_area, contractor, costumer, data
 
                 # Подготовленные данные для вставки (пример)
                 data_values = (str(well_number), well_area,
-                               data_well, date_today, excel_json, contractor, well_data.costumer)
+                               data_well, date_today, excel_json, contractor, well_data.costumer, work_plan_str)
 
                 # Подготовленный запрос для вставки данных с параметрами
-                query = f"INSERT INTO wells VALUES (%s, %s, %s, %s, %s, %s, %s)"
+                query = f"INSERT INTO wells VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
 
                 # Выполнение запроса с использованием параметров
                 cursor.execute(query, data_values)
@@ -767,12 +779,12 @@ def insert_database_well_data(well_number, well_area, contractor, costumer, data
                    SELECT EXISTS (
                        SELECT 1 
                        FROM wells
-                       WHERE well_number = ? AND area_well = ? AND contractor = ? AND costumer = ?
+                       WHERE well_number = ? AND area_well = ? AND contractor = ? AND costumer = ? AND work_plan = ?
                    ), today -- Добавляем contractor в SELECT
                FROM wells 
-               WHERE well_number = ? AND area_well = ? AND contractor = ? AND costumer = ?
+               WHERE well_number = ? AND area_well = ? AND contractor = ? AND costumer = ? AND work_plan = ?
                """, (
-                str(well_number), well_area, contractor, costumer, str(well_number), well_area, contractor, costumer))
+                str(well_number), well_area, contractor, costumer, str(well_number), well_area, contractor, costumer, work_plan_str))
 
             row_exists = cursor.fetchone()
 
@@ -786,9 +798,9 @@ def insert_database_well_data(well_number, well_area, contractor, costumer, data
                         cursor.execute("""
                                         UPDATE wells
                                         SET data_well = ?, today = ?, excel_json = ?                                                                       
-                                        WHERE well_number = ? AND area_well = ? AND contractor = ? AND costumer = ?
+                                        WHERE well_number = ? AND area_well = ? AND contractor = ? AND costumer = ? AND work_plan = ?
                                     """, (
-                            data_well, date_today, excel_json, str(well_number), well_area, contractor, costumer))
+                            data_well, date_today, excel_json, str(well_number), well_area, contractor, costumer, work_plan_str))
 
                         QMessageBox.information(None, 'Успешно', 'Данные в обновлены обновлены')
                     except sqlite3.Error as error:
@@ -796,10 +808,10 @@ def insert_database_well_data(well_number, well_area, contractor, costumer, data
             else:
                 # Подготовленные данные для вставки (пример)
                 datavalues = (
-                    str(well_number), well_area, data_well, date_today, excel_json, contractor, well_data.costumer)
+                    str(well_number), well_area, data_well, date_today, excel_json, contractor, well_data.costumer, work_plan_str)
 
                 # Подготовленный запрос для вставки данных с параметрами
-                query = "INSERT INTO wells VALUES (?, ?, ?, ?, ?, ?, ?)"
+                query = "INSERT INTO wells VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
 
                 # Выполнение запроса с использованием параметров
                 cursor.execute(query, datavalues)
@@ -832,15 +844,15 @@ def connect_to_db(name_base, folder_base):
 
 
 
-def check_in_database_well_data(number_well, area_well):
+def check_in_database_well_data(number_well, area_well, work_plan):
     if well_data.connect_in_base:
         try:
             conn = psycopg2.connect(**well_data.postgres_params_data_well)
             cursor = conn.cursor()
 
             cursor.execute("SELECT data_well FROM wells WHERE well_number = %s AND area_well = %s "
-                           "AND contractor = %s AND costumer = %s",
-                           (str(number_well._value), area_well._value, well_data.contractor, well_data.costumer))
+                           "AND contractor = %s AND costumer = %s AND work_plan= %s",
+                           (str(number_well._value), area_well._value, well_data.contractor, well_data.costumer, work_plan))
 
             data_well = cursor.fetchone()
             if data_well:
@@ -859,8 +871,8 @@ def check_in_database_well_data(number_well, area_well):
             cursor = conn.cursor()
 
             cursor.execute("SELECT data_well FROM wells WHERE well_number = ? AND area_well = ? "
-                           "AND contractor = ? AND costumer = ?",
-                           (str(number_well._value), area_well._value, well_data.contractor, well_data.costumer))
+                           "AND contractor = ? AND costumer = ? AND work_plan=?",
+                           (str(number_well._value), area_well._value, well_data.contractor, well_data.costumer, work_plan))
 
             data_well = cursor.fetchone()
             if data_well:
@@ -919,12 +931,15 @@ def excel_in_json(sheet):
                 })
                 data[row[0].row] = row_data
 
+    data['image'] = well_data.image_data
     rowHeights = [sheet.row_dimensions[i + 1].height for i in range(sheet.max_row) if i <= index_end_copy]
     colWidth = [sheet.column_dimensions[get_column_letter(i + 1)].width for i in range(0, 13)] + [None]
     boundaries_dict = {}
 
     for ind, _range in enumerate(sheet.merged_cells.ranges):
         boundaries_dict[ind] = range_boundaries(str(_range))
+
+
 
     data_excel = {'data': data, 'rowHeights': rowHeights, 'colWidth': colWidth, 'merged_cells': boundaries_dict}
 
@@ -935,6 +950,7 @@ def insert_data_well_dop_plan(data_well):
     from well_data import ProtectedIsDigit, ProtectedIsNonNone
 
     well_data_dict = json.loads(data_well)
+
 
     well_data.column_direction_diametr = ProtectedIsDigit(well_data_dict["направление"]["диаметр"])
     well_data.column_direction_wall_thickness = ProtectedIsDigit(well_data_dict["направление"]["толщина стенки"])
@@ -982,8 +998,10 @@ def insert_data_well_dop_plan(data_well):
     well_data.region = well_data_dict['регион']
     well_data.cdng = ProtectedIsNonNone(well_data_dict['ЦДНГ'])
 
+    well_data.data_well_dict = well_data_dict
     mes = QMessageBox.information(None, 'Данные с базы', "Данные вставлены из базы данных")
 
+    definition_plast_work(None)
 
 def read_database_gnkt(contractor, gnkt_number):
     try:
@@ -1230,10 +1248,11 @@ def insert_data_new_excel_file(data, rowHeights, colWidth, boundaries_dict):
     sheet_new = wb_new.active
 
     for row_index, row_data in data.items():
-        for col_index, cell_data in enumerate(row_data, 1):
-            cell = sheet_new.cell(row=int(row_index), column=int(col_index))
-            if cell_data:
-                cell.value = round_cell(cell_data['value'])
+        if row_index != 'image':
+            for col_index, cell_data in enumerate(row_data, 1):
+                cell = sheet_new.cell(row=int(row_index), column=int(col_index))
+                if cell_data:
+                    cell.value = round_cell(cell_data['value'])
 
     for key, value in boundaries_dict.items():
         sheet_new.merge_cells(start_column=value[0], start_row=value[1],
@@ -1241,37 +1260,45 @@ def insert_data_new_excel_file(data, rowHeights, colWidth, boundaries_dict):
 
     # Восстановление данных и стилей из словаря
     for row_index, row_data in data.items():
-        for col_index, cell_data in enumerate(row_data, 1):
-            cell = sheet_new.cell(row=int(row_index), column=int(col_index))
+        if row_index != 'image':
+            for col_index, cell_data in enumerate(row_data, 1):
+                cell = sheet_new.cell(row=int(row_index), column=int(col_index))
 
-            # Получение строки RGB из JSON
-            rgb_string = cell_data['fill']['color']
+                # Получение строки RGB из JSON
+                rgb_string = cell_data['fill']['color']
 
-            # Извлечение значений R, G, B с помощью регулярных выражений
-            match = re.match(r"RGB\((\d+), (\d+), (\d+)\)", rgb_string)
-            if match:
-                r, g, b = int(match.group(1)), int(match.group(2)), int(match.group(3))
+                # Извлечение значений R, G, B с помощью регулярных выражений
+                match = re.match(r"RGB\((\d+), (\d+), (\d+)\)", rgb_string)
+                if match:
+                    r, g, b = int(match.group(1)), int(match.group(2)), int(match.group(3))
 
-                # Создание объекта Color
-                hex_color = f'{r:02X}{g:02X}{b:02X}'
-                color = Color(rgb=hex_color)
+                    # Создание объекта Color
+                    hex_color = f'{r:02X}{g:02X}{b:02X}'
+                    color = Color(rgb=hex_color)
 
-                # Создание объекта заливки
-                fill = PatternFill(patternType='solid', fgColor=color)
-                cell.fill = fill
-            cell.font = Font(name=cell_data['font']['name'], size=cell_data['font']['size'],
-                             bold=cell_data['font']['bold'], italic=cell_data['font']['italic'])
+                    # Создание объекта заливки
+                    fill = PatternFill(patternType='solid', fgColor=color)
+                    cell.fill = fill
+                cell.font = Font(name=cell_data['font']['name'], size=cell_data['font']['size'],
+                                 bold=cell_data['font']['bold'], italic=cell_data['font']['italic'])
 
-            cell.border = openpyxl.styles.Border(left=openpyxl.styles.Side(style=cell_data['borders']['left']),
-                                                 right=openpyxl.styles.Side(style=cell_data['borders']['right']),
-                                                 top=openpyxl.styles.Side(style=cell_data['borders']['top']),
-                                                 bottom=openpyxl.styles.Side(style=cell_data['borders']['bottom']))
+                cell.border = openpyxl.styles.Border(left=openpyxl.styles.Side(style=cell_data['borders']['left']),
+                                                     right=openpyxl.styles.Side(style=cell_data['borders']['right']),
+                                                     top=openpyxl.styles.Side(style=cell_data['borders']['top']),
+                                                     bottom=openpyxl.styles.Side(style=cell_data['borders']['bottom']))
 
-            wrap_true = cell_data['alignment']['wrap_text']
+                wrap_true = cell_data['alignment']['wrap_text']
 
-            cell.alignment = openpyxl.styles.Alignment(horizontal=cell_data['alignment']['horizontal'],
-                                                       vertical=cell_data['alignment']['vertical'],
-                                                       wrap_text=wrap_true)
+                cell.alignment = openpyxl.styles.Alignment(horizontal=cell_data['alignment']['horizontal'],
+                                                           vertical=cell_data['alignment']['vertical'],
+                                                           wrap_text=wrap_true)
+
+    try:
+        well_data.image_data = data['image']
+                    # Добавьте обработку ошибки, например, пропуск изображения или запись информации об ошибке в лог
+    except ValueError as e:
+        print(f"Ошибка при вставке изображения: {e}")
+
 
     for col in range(13):
         sheet_new.column_dimensions[get_column_letter(col + 1)].width = colWidth[col]

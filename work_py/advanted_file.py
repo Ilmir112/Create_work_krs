@@ -1,4 +1,6 @@
+import base64
 from datetime import datetime
+from io import BytesIO
 
 from PyQt5.QtWidgets import QInputDialog, QMessageBox
 
@@ -7,6 +9,10 @@ import well_data
 from openpyxl.drawing.image import Image
 from openpyxl.styles import Border, Side, PatternFill, Font, GradientFill, Alignment, numbers
 from PyQt5 import QtCore
+
+from main import MyWindow
+
+
 def skm_interval(self, template):
 
 
@@ -331,6 +337,7 @@ def definition_plast_work(self):
     well_data.plast_work = list(plast_work)
 def count_row_height(ws, ws2, work_list, merged_cells_dict, ind_ins):
     from openpyxl.utils.cell import range_boundaries, get_column_letter
+    from PIL import Image
 
     boundaries_dict = {}
 
@@ -372,11 +379,7 @@ def count_row_height(ws, ws2, work_list, merged_cells_dict, ind_ins):
                 cell = ws2.cell(row=i, column=j)
                 cell.number_format = 'General'
                 cell.value = str(work_list[i - 1][j - 1])
-        a = value[1]
-        b = boundaries_dict_index
-        # if well_data.work_plan == 'dop_plan_in_base' and boundaries_dict_index < value[1]:
-        #     ws2.unmerge_cells(start_column=value[0], start_row=value[1],
-        #                       end_column=value[2], end_row=value[3])
+
 
         for j in range(1, 13):
             cell = ws2.cell(row=i, column=j)
@@ -433,14 +436,47 @@ def count_row_height(ws, ws2, work_list, merged_cells_dict, ind_ins):
         ws2.merge_cells(start_column=value[0], start_row=value[1],
                         end_column=value[2], end_row=value[3])
 
+    try:
+        # вставка сохраненных изображение по координатам ячеек
+        if well_data.image_list:
+            print(f' схемы {well_data.image_list}')
+            for img in well_data.image_list:
+                logo = Image(img[0])
+                logo.width, logo.height = img[2][0] * 0.48, img[2][1] * 0.72
+                ws2.add_image(logo, img[1])
+    except TypeError as e:
+        QMessageBox.warning(None, 'Ошибка', f'Ошибка сохранения изображение {e}')
+    if well_data.image_data:
+        for image_info in well_data.image_data:
+            coord = image_info["coord"]
+            width = image_info["width"]
+            height = image_info["height"]
+            image_base64 = image_info["data"]
 
-    # вставка сохраненных изображение по координатам ячеек
-    if well_data.image_list:
-        # print(f' схемы {well_data.image_list}')
-        for img in well_data.image_list:
-            logo = Image(img[0])
-            logo.width, logo.height = img[2][0] * 0.48, img[2][1] * 0.72
-            ws2.add_image(logo, img[1])
+            try:
+                # Декодирование из Base64 и создание изображения:
+                decoded_image_data = base64.b64decode(image_base64)
+
+                # Создаем объект PIL Image из декодированных данных
+                image = Image.open(BytesIO(decoded_image_data))
+
+                # Проверка размеров изображения:
+                print(f"Размеры изображения: {image.size}")
+
+                file = f'imageFiles/image_work/{coord}.png'
+
+                # # Преобразуем изображение в режим RGB
+                # image = image.convert('RGB')
+
+                image.save(file)
+
+                # Сохранение изображения в Excel файл:
+
+
+                MyWindow.insert_image(None, ws2, file, coord, width, height)
+
+            except ValueError as e:
+                print(f"Ошибка при вставке изображения: {e}")
 
     for index_row, row in enumerate(ws2.iter_rows()):  # Копирование высоты строки
         if all([col is None for col in row]):
