@@ -820,191 +820,263 @@ class DopPlanWindow(QMainWindow):
         if change_pvr_combo == '':
             mes = QMessageBox.warning(self, 'Ошибка', 'Нужно выбрать пункт изменения ПВР')
             return
-        fluid = self.tabWidget.currentWidget().fluid_edit.text().replace(',', '.')
-        current_bottom = self.tabWidget.currentWidget().current_bottom_edit.text()
-        if current_bottom != '':
-            current_bottom = round_cell(current_bottom.replace(',', '.'))
+        if well_data.work_plan == 'dop_plan_in_base':
 
-        work_earlier = self.tabWidget.currentWidget().work_edit.toPlainText()
-        number_dp = self.tabWidget.currentWidget().number_DP_Combo.currentText()
-        current_bottom_date_edit = self.tabWidget.currentWidget().current_bottom_date_edit.text()
+            fluid = self.tabWidget.currentWidget().fluid_edit.text().replace(',', '.')
+            current_bottom = self.tabWidget.currentWidget().current_bottom_edit.text()
+            if current_bottom != '':
+                current_bottom = round_cell(current_bottom.replace(',', '.'))
 
-        template_depth_edit = self.tabWidget.currentWidget().template_depth_edit.text()
-        template_lenght_edit = self.tabWidget.currentWidget().template_lenght_edit.text()
-        if well_data.column_additional:
-            template_depth_addition_edit = self.tabWidget.currentWidget().template_depth_addition_edit.text()
-            template_lenght_addition_edit = self.tabWidget.currentWidget().template_lenght_addition_edit.text()
-        skm_interval_edit = self.tabWidget.currentWidget().skm_interval_edit.text()
+            work_earlier = self.tabWidget.currentWidget().work_edit.toPlainText()
+            number_dp = self.tabWidget.currentWidget().number_DP_Combo.currentText()
+            current_bottom_date_edit = self.tabWidget.currentWidget().current_bottom_date_edit.text()
 
-        if current_bottom == '' or fluid == '' or work_earlier == '' or \
-                template_depth_edit == '' or template_lenght_edit == '' or skm_interval_edit == '':
-            # print(current_bottom, fluid, work_earlier)
-            mes = QMessageBox.critical(self, 'Забой', 'не все значения введены')
-            return
-        if template_lenght_edit == '0':
-            mes = QMessageBox.critical(self, 'Длина шаблона', 'Введите длину шаблонов которые были спущены в скважину')
-            return
-        if float(template_depth_edit) > float(current_bottom):
-            mes = QMessageBox.critical(self, 'Забой', 'Шаблонирование не может быть ниже текущего забоя')
-            return
-        if number_dp != '':
-            well_data.number_dp = int(float(number_dp))
+            template_depth_edit = self.tabWidget.currentWidget().template_depth_edit.text()
+            template_lenght_edit = self.tabWidget.currentWidget().template_lenght_edit.text()
+            if well_data.column_additional:
+                template_depth_addition_edit = self.tabWidget.currentWidget().template_depth_addition_edit.text()
+                template_lenght_addition_edit = self.tabWidget.currentWidget().template_lenght_addition_edit.text()
+            skm_interval_edit = self.tabWidget.currentWidget().skm_interval_edit.text()
 
-        if (0.87 <= float(fluid[:3].replace(',', '.')) <= 1.64) == False:
-            mes = QMessageBox.critical(self, 'рабочая жидкость',
-                                       'уд. вес рабочей жидкости не может быть меньше 0,87 и больше 1,64')
-            return
-        if well_data.data_in_base:
-            if 'г/см3' not in fluid:
-                mes = QMessageBox.critical(self, 'уд.вес', 'нужно добавить значение "г/см3" в уд.вес')
+            if current_bottom == '' or fluid == '' or work_earlier == '' or \
+                    template_depth_edit == '' or template_lenght_edit == '' or skm_interval_edit == '':
+                # print(current_bottom, fluid, work_earlier)
+                mes = QMessageBox.critical(self, 'Забой', 'не все значения введены')
                 return
-            well_data.fluid_work = fluid
-            well_data.fluid_work_short = fluid[:7]
+            if template_lenght_edit == '0':
+                mes = QMessageBox.critical(self, 'Длина шаблона', 'Введите длину шаблонов которые были спущены в скважину')
+                return
+            if float(template_depth_edit) > float(current_bottom):
+                mes = QMessageBox.critical(self, 'Забой', 'Шаблонирование не может быть ниже текущего забоя')
+                return
+            if number_dp != '':
+                well_data.number_dp = int(float(number_dp))
 
-            well_data.fluid = fluid[:4]
+            if (0.87 <= float(fluid[:3].replace(',', '.')) <= 1.64) == False:
+                mes = QMessageBox.critical(self, 'рабочая жидкость',
+                                           'уд. вес рабочей жидкости не может быть меньше 0,87 и больше 1,64')
+                return
+            if well_data.data_in_base:
+                if 'г/см3' not in fluid:
+                    mes = QMessageBox.critical(self, 'уд.вес', 'нужно добавить значение "г/см3" в уд.вес')
+                    return
+                well_data.fluid_work = fluid
+                well_data.fluid_work_short = fluid[:7]
+
+                well_data.fluid = fluid[:4]
+            else:
+
+                if float(current_bottom) > well_data.bottomhole_drill._value:
+                    mes = QMessageBox.critical(self, 'Забой', 'Текущий забой больше пробуренного забоя')
+                    return
+                well_data.fluid_work, well_data.fluid_work_short = GnoWindow.calc_work_fluid(self, fluid)
+
+            well_data.template_depth = float(template_depth_edit)
+            well_data.template_lenght = float(template_lenght_edit)
+            if well_data.column_additional:
+
+                well_data.template_depth = float(template_depth_addition_edit)
+                well_data.template_lenght = float(template_lenght_addition_edit)
+
+            try:
+                skm_interval = []
+                if ',' in skm_interval_edit:
+                    for skm in skm_interval_edit.split(','):
+                        if '-' in skm:
+                           skm_interval.append(skm.split('-'))
+                else:
+                    if '-' in skm_interval_edit:
+                        skm_interval.append(list(map(int, skm_interval_edit.split('-'))))
+
+
+                well_data.skm_interval = skm_interval
+            except:
+                mes = QMessageBox.warning(self, 'Ошибка',
+                                          'в интервале скреперования отсутствует корректные интервалы скреперования')
+
+            if len(well_data.skm_interval) == 0:
+                mes = QMessageBox.warning(self, 'Ошибка',
+                                          'в интервале скреперования отсутствует корректные интервалы скреперования')
+                return
+
+            if well_data.data_in_base:
+                data_well_data_in_base_combo, data_table_in_base_combo = '', ''
+                table_in_base_combo = str(self.tabWidget.currentWidget().table_in_base_combo.currentText())
+                well_data_in_base_combo = self.tabWidget.currentWidget().well_data_in_base_combo.currentText()
+                if ' от' in table_in_base_combo:
+
+                    data_table_in_base_combo = table_in_base_combo.split(' ')[-1]
+                    table_in_base = table_in_base_combo.split(' ')[2]
+                    number_dp_in_base = "".join(c for c in table_in_base if c.isdigit())
+                    table_in_base = table_in_base_combo.split(' ')[2].replace('krs', 'ПР').replace('dop_plan_in_base', 'ДП№').replace('dop_plan', 'ДП№')
+
+
+
+                if ' от' in well_data_in_base_combo:
+                    data_well_data_in_base_combo = well_data_in_base_combo.split(' ')[-1]
+                    well_data_in_base = well_data_in_base_combo.split(' ')[3]
+
+                if data_well_data_in_base_combo != data_table_in_base_combo:
+                    mes = QMessageBox.critical(self, 'пункт', 'Даты в двух таблицах не совпадают')
+                    return
+                if table_in_base != well_data_in_base:
+                    mes = QMessageBox.critical(self, 'пункт', 'Планы в двух таблицах не совпадают')
+                    return
+
+                index_change_line = self.tabWidget.currentWidget().index_change_line.text()
+                well_number = self.tabWidget.currentWidget().well_number_edit.text()
+                well_area = self.tabWidget.currentWidget().well_area_edit.text()
+                if well_area != '' and well_area != '':
+                    well_data.well_number, well_data.well_area = \
+                        ProtectedIsNonNone(well_number), ProtectedIsNonNone(well_area)
+                if index_change_line != '':
+                    index_change_line = int(float(index_change_line))
+                else:
+                    mes = QMessageBox.critical(self, 'пункт', 'Необходимо выбрать пункт плана работ')
+                    return
+                if table_in_base_combo == '':
+                    mes = QMessageBox.critical(self, 'База данных', 'Необходимо выбрать план работ')
+                    return
+
+                data_well = check_in_database_well_data(well_data.well_number, well_data.well_area, table_in_base)[0]
+
+                if data_well:
+                    insert_data_well_dop_plan(data_well)
+
+                self.work_with_excel(well_number, well_area, table_in_base)
+
+
+                name_table = table_in_base_combo[:-14]
+                if number_dp_in_base == number_dp:
+                    mes = QMessageBox.question(self, 'номер дополнительно плана работ',
+                                               f'дополнительный плана работ №{number_dp} есть в базе, обновить?')
+                    if QMessageBox.StandardButton.No == mes:
+                        return
+                    else:
+                        self.delete_data(well_number, well_area, table_in_base)
+                self.extraction_data(name_table, index_change_line)
+
+
+            well_data.current_bottom = current_bottom
+
+            rows = self.tableWidget.rowCount()
+
+            if change_pvr_combo == 'Да':
+                if rows == 0:
+                    mes = QMessageBox.warning(self, 'Ошибка', 'Нужно загрузить интервалы перфорации')
+                    return
+
+                plast_row = []
+                for row in range(rows):
+                    list_row = []
+                    for col in range(13):
+                        item = self.tableWidget.item(row, col)
+                        if item is not None:
+                            list_row.append(item.text())
+                        else:
+                            list_row.append(None)
+                    plast_row.append(list_row)
+                well_data.data, well_data.rowHeights, well_data.colWidth, well_data.boundaries_dict = \
+                    self.insert_row_in_pvr(self.data, self.rowHeights, self.colWidth, self.boundaries_dict, plast_row,
+                                           current_bottom, current_bottom_date_edit, method_bottom_combo)
+            else:
+                well_data.data, well_data.rowHeights, well_data.colWidth, well_data.boundaries_dict = \
+                    self.change_pvr_in_bottom(self.data, self.rowHeights, self.colWidth, self.boundaries_dict,
+                                              current_bottom, current_bottom_date_edit, method_bottom_combo)
+            if well_data.data_in_base:
+                well_data.dop_work_list = self.work_list(work_earlier)
+            else:
+                work_list = [self.work_list(work_earlier)]
+                MyWindow.populate_row(self, self.ins_ind + 2, work_list, self.table_widget, self.work_plan)
+
+            if len(self.dict_perforation) != 0:
+                for plast, vertical_line, roof_int, sole_int, date_pvr_edit, count_pvr_edit,\
+                type_pvr_edit, pressuar_pvr_edit, date_pressuar_edit in self.dict_perforation:
+
+
+                    well_data.dict_perforation.setdefault(plast, {}).setdefault('отрайбировано', False)
+                    well_data.dict_perforation.setdefault(plast, {}).setdefault('Прошаблонировано', False)
+
+                    well_data.dict_perforation.setdefault(plast, {}).setdefault('интервал', []).append(
+                        (roof_int, sole_int))
+                    well_data.dict_perforation_short.setdefault(plast, {}).setdefault('интервал', []).append(
+                        (roof_int, sole_int))
+                    well_data.dict_perforation.setdefault(plast, {}).setdefault('отключение', False)
+                    well_data.dict_perforation_short.setdefault(plast, {}).setdefault('отключение', False)
+
         else:
+            fluid = self.tabWidget.currentWidget().fluid_edit.text()
+            current_bottom = self.tabWidget.currentWidget().current_bottom_edit.text()
+            if current_bottom != '':
+                current_bottom = round_cell(current_bottom.replace(',', '.'))
+
+            work_earlier = self.tabWidget.currentWidget().work_edit.toPlainText()
+            number_dp = self.tabWidget.currentWidget().number_DP_Combo.currentText()
+
+            template_depth_edit = self.tabWidget.currentWidget().template_depth_edit.text()
+            template_lenght_edit = self.tabWidget.currentWidget().template_lenght_edit.text()
+            if well_data.column_additional:
+                template_depth_addition_edit = self.tabWidget.currentWidget().template_depth_addition_edit.text()
+                template_lenght_addition_edit = self.tabWidget.currentWidget().template_lenght_addition_edit.text()
+            skm_interval_edit = self.tabWidget.currentWidget().skm_interval_edit.text()
+
+            if current_bottom == '' or fluid == '' or work_earlier == '' or \
+                    template_depth_edit == '' or template_lenght_edit == '' or skm_interval_edit == '':
+                # print(current_bottom, fluid, work_earlier)
+                mes = QMessageBox.critical(self, 'Забой', 'не все значения введены')
+                return
+            if template_lenght_edit == '0':
+                mes = QMessageBox.critical(self, 'Длина шаблона',
+                                           'Введите длину шаблонов которые были спущены в скважину')
+                return
+            if float(template_depth_edit) > float(current_bottom):
+                mes = QMessageBox.critical(self, 'Забой', 'Шаблонирование не может быть ниже текущего забоя')
+                return
+            if number_dp != '':
+                well_data.number_dp = int(float(number_dp))
+
+
+
+            if (0.87 <= float(fluid[:3].replace(',', '.')) <= 1.64) == False:
+                mes = QMessageBox.critical(self, 'рабочая жидкость',
+                                           'уд. вес рабочей жидкости не может быть меньше 0,87 и больше 1,64')
+                return
+
 
             if float(current_bottom) > well_data.bottomhole_drill._value:
                 mes = QMessageBox.critical(self, 'Забой', 'Текущий забой больше пробуренного забоя')
                 return
             well_data.fluid_work, well_data.fluid_work_short = GnoWindow.calc_work_fluid(self, fluid)
 
-        well_data.template_depth = float(template_depth_edit)
-        well_data.template_lenght = float(template_lenght_edit)
-        if well_data.column_additional:
+            well_data.template_depth = float(template_depth_edit)
+            well_data.template_lenght = float(template_lenght_edit)
+            if well_data.column_additional:
+                well_data.template_depth = float(template_depth_addition_edit)
+                well_data.template_lenght = float(template_lenght_addition_edit)
 
-            well_data.template_depth = float(template_depth_addition_edit)
-            well_data.template_lenght = float(template_lenght_addition_edit)
-
-        try:
-            skm_interval = []
-            if ',' in skm_interval_edit:
-                for skm in skm_interval_edit.split(','):
-                    if '-' in skm:
-                       skm_interval.append(skm.split('-'))
-            else:
-                if '-' in skm_interval_edit:
-                    skm_interval.append(list(map(int, skm_interval_edit.split('-'))))
-
-
-            well_data.skm_interval = skm_interval
-        except:
-            mes = QMessageBox.warning(self, 'Ошибка',
-                                      'в интервале скреперования отсутствует корректные интервалы скреперования')
-
-        if len(well_data.skm_interval) == 0:
-            mes = QMessageBox.warning(self, 'Ошибка',
-                                      'в интервале скреперования отсутствует корректные интервалы скреперования')
-            return
-
-        if well_data.data_in_base:
-            data_well_data_in_base_combo, data_table_in_base_combo = '', ''
-            table_in_base_combo = str(self.tabWidget.currentWidget().table_in_base_combo.currentText())
-            well_data_in_base_combo = self.tabWidget.currentWidget().well_data_in_base_combo.currentText()
-            if ' от' in table_in_base_combo:
-
-                data_table_in_base_combo = table_in_base_combo.split(' ')[-1]
-                table_in_base = table_in_base_combo.split(' ')[2]
-                number_dp_in_base = "".join(c for c in table_in_base if c.isdigit())
-                table_in_base = table_in_base_combo.split(' ')[2].replace('krs', 'ПР').replace('dop_plan_in_base', 'ДП№').replace('dop_plan', 'ДП№')
-
-
-
-            if ' от' in well_data_in_base_combo:
-                data_well_data_in_base_combo = well_data_in_base_combo.split(' ')[-1]
-                well_data_in_base = well_data_in_base_combo.split(' ')[3]
-
-            if data_well_data_in_base_combo != data_table_in_base_combo:
-                mes = QMessageBox.critical(self, 'пункт', 'Даты в двух таблицах не совпадают')
-                return
-            if table_in_base != well_data_in_base:
-                mes = QMessageBox.critical(self, 'пункт', 'Планы в двух таблицах не совпадают')
-                return
-
-            index_change_line = self.tabWidget.currentWidget().index_change_line.text()
-            well_number = self.tabWidget.currentWidget().well_number_edit.text()
-            well_area = self.tabWidget.currentWidget().well_area_edit.text()
-            if well_area != '' and well_area != '':
-                well_data.well_number, well_data.well_area = \
-                    ProtectedIsNonNone(well_number), ProtectedIsNonNone(well_area)
-            if index_change_line != '':
-                index_change_line = int(float(index_change_line))
-            else:
-                mes = QMessageBox.critical(self, 'пункт', 'Необходимо выбрать пункт плана работ')
-                return
-            if table_in_base_combo == '':
-                mes = QMessageBox.critical(self, 'База данных', 'Необходимо выбрать план работ')
-                return
-
-            data_well = check_in_database_well_data(well_data.well_number, well_data.well_area, table_in_base)[0]
-
-            if data_well:
-                insert_data_well_dop_plan(data_well)
-
-            self.work_with_excel(well_number, well_area, table_in_base)
-
-
-            name_table = table_in_base_combo[:-14]
-            if number_dp_in_base == number_dp:
-                mes = QMessageBox.question(self, 'номер дополнительно плана работ',
-                                           f'дополнительный плана работ №{number_dp} есть в базе, обновить?')
-                if QMessageBox.StandardButton.No == mes:
-                    return
+            try:
+                skm_interval = []
+                if ',' in skm_interval_edit:
+                    for skm in skm_interval_edit.split(','):
+                        if '-' in skm:
+                            skm_interval.append(skm)
                 else:
-                    self.delete_data(well_number, well_area, table_in_base)
-            self.extraction_data(name_table, index_change_line)
+                    if '-' in skm_interval_edit:
+                        skm_interval.append(skm_interval_edit)
 
+                well_data.skm_interval = skm_interval
+            except:
+                mes = QMessageBox.warning(self, 'Ошибка',
+                                          'в интервале скреперования отсутствует корректные интервалы скреперования')
 
-        well_data.current_bottom = current_bottom
-
-        rows = self.tableWidget.rowCount()
-
-        if change_pvr_combo == 'Да':
-            if rows == 0:
-                mes = QMessageBox.warning(self, 'Ошибка', 'Нужно загрузить интервалы перфорации')
+            if len(well_data.skm_interval) == 0:
+                mes = QMessageBox.warning(self, 'Ошибка',
+                                          'в интервале скреперования отсутствует корректные интервалы скреперования')
                 return
 
-            plast_row = []
-            for row in range(rows):
-                list_row = []
-                for col in range(13):
-                    item = self.tableWidget.item(row, col)
-                    if item is not None:
-                        list_row.append(item.text())
-                    else:
-                        list_row.append(None)
-                plast_row.append(list_row)
-            well_data.data, well_data.rowHeights, well_data.colWidth, well_data.boundaries_dict = \
-                self.insert_row_in_pvr(self.data, self.rowHeights, self.colWidth, self.boundaries_dict, plast_row,
-                                       current_bottom, current_bottom_date_edit, method_bottom_combo)
-        else:
-            well_data.data, well_data.rowHeights, well_data.colWidth, well_data.boundaries_dict = \
-                self.change_pvr_in_bottom(self.data, self.rowHeights, self.colWidth, self.boundaries_dict,
-                                          current_bottom, current_bottom_date_edit, method_bottom_combo)
-        if well_data.data_in_base:
-            well_data.dop_work_list = self.work_list(work_earlier)
-        else:
+
             work_list = [self.work_list(work_earlier)]
             MyWindow.populate_row(self, self.ins_ind + 2, work_list, self.table_widget, self.work_plan)
-
-        if len(self.dict_perforation) != 0:
-            for plast, vertical_line, roof_int, sole_int, date_pvr_edit, count_pvr_edit,\
-            type_pvr_edit, pressuar_pvr_edit, date_pressuar_edit in self.dict_perforation:
-
-
-                well_data.dict_perforation.setdefault(plast, {}).setdefault('отрайбировано', False)
-                well_data.dict_perforation.setdefault(plast, {}).setdefault('Прошаблонировано', False)
-
-                well_data.dict_perforation.setdefault(plast, {}).setdefault('интервал', []).append(
-                    (roof_int, sole_int))
-                well_data.dict_perforation_short.setdefault(plast, {}).setdefault('интервал', []).append(
-                    (roof_int, sole_int))
-                well_data.dict_perforation.setdefault(plast, {}).setdefault('отключение', False)
-                well_data.dict_perforation_short.setdefault(plast, {}).setdefault('отключение', False)
-
-
-
-
 
         well_data.pause = False
         self.close()

@@ -51,7 +51,7 @@ class CreatePZ(QMainWindow):
                                                            number_list, 0, False)
 
 
-            data_well = check_in_database_well_data(well_data.well_number, well_data.well_area)[0]
+            data_well = check_in_database_well_data(well_data.well_number, well_data.well_area,well_data.work_plan )[0]
             if data_well:
                 insert_data_well_dop_plan(data_well)
                 table_name = str(well_data.well_number._value) + " " + well_data.well_area._value + " " + work_plan + str(well_data.number_dp) + " " + well_data.contractor
@@ -73,9 +73,12 @@ class CreatePZ(QMainWindow):
 
             Well_perforation.read_well(self, ws, well_data.data_pvr_min._value, well_data.data_pvr_max._value + 1)
             Well_Category.read_well(self, ws, well_data.cat_well_min._value, well_data.data_well_min._value)
-
+        if 'Ойл' in well_data.contractor:
+            contractor = 'ОЙЛ'
+        elif 'РН' in well_data.contractor:
+            contractor = 'РН'
         if work_plan == 'plan_change':
-            DopPlanWindow.extraction_data(self, str(well_data.well_number._value) + " " + well_data.well_area._value + " " + work_plan + " " + well_data.contractor, 1)
+            DopPlanWindow.extraction_data(self, str(well_data.well_number._value) + " " + well_data.well_area._value + " " + 'krs' + " " + contractor, 1)
             ws.delete_rows(well_data.plan_correct_index._value, ws.max_row)
             return ws
 

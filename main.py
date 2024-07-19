@@ -497,8 +497,8 @@ class MyWindow(QMainWindow):
 
                     self.copy_pz(sheet, self.table_widget, self.work_plan)
 
-                except FileNotFoundError:
-                    mes = QMessageBox.warning(self, 'Ошибка', 'Ошибка при прочтении файла')
+                except FileNotFoundError as f:
+                    mes = QMessageBox.warning(self, 'Ошибка', f'Ошибка при прочтении файла {f}')
         elif action == self.create_KRS_DP_in_base and self.table_widget == None:
             self.work_plan = 'dop_plan_in_base'
             well_data.work_plan = 'dop_plan_in_base'
