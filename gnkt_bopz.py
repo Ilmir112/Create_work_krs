@@ -284,7 +284,7 @@ class GnktBopz(QMainWindow):
             [None, 1,
              f'Спуск ГНКТ. ВЫМЫВ БУРОВОГО РАСТВОРА в V-{volume_drilling_mud_edit}м3 ({drilling_contractor_combo}). '
              f'Нормализация забоя до гл. {well_data.current_bottom}м. '
-             f'Проведение кислотной обработки {acid_volume_edit}% {acid_edit} в V={acid_proc_edit}м3. Глушение скважины '
+             f'Проведение кислотной обработки {acid_proc_edit}% {acid_edit} в V={acid_volume_edit}м3. Глушение скважины '
              f'{fluid_project}г/см3 в объеме {volume_well_jumping}м3',
              None, None, None, None, None, None, None, None, None],
             [None, 2,
