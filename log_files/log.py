@@ -86,7 +86,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setCentralWidget(central_widget)
 
     def on_button_click(self):
-        logger.info("Кнопка нажата!")
+       pass
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)

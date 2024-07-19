@@ -719,7 +719,6 @@ def insert_database_well_data(well_number, well_area, contractor, costumer, data
                """, (
                 str(well_number), well_area, contractor, costumer, work_plan_str, str(well_number), well_area, contractor, costumer, work_plan_str))
 
-            row_exists = cursor.fetchall()
 
             row_exists = cursor.fetchone()
 
@@ -733,9 +732,9 @@ def insert_database_well_data(well_number, well_area, contractor, costumer, data
                         cursor.execute("""
                                         UPDATE wells
                                         SET data_well = %s, today = %s, excel_json = %s                                                                       
-                                        WHERE well_number = %s AND area_well = %s AND contractor = %s AND costumer = %s
+                                        WHERE well_number = %s AND area_well = %s AND contractor = %s AND costumer = %s AND geolog = %s
                                     """, (
-                            data_well, date_today, excel_json, str(well_number), well_area, contractor, costumer))
+                            data_well, date_today, excel_json, str(well_number), well_area, contractor, costumer, well_data.user))
 
                         QMessageBox.information(None, 'Успешно', 'Данные в обновлены обновлены')
                     except (Exception, psycopg2.Error) as error:
@@ -744,15 +743,16 @@ def insert_database_well_data(well_number, well_area, contractor, costumer, data
 
                 # Подготовленные данные для вставки (пример)
                 data_values = (str(well_number), well_area,
-                               data_well, date_today, excel_json, contractor, well_data.costumer, work_plan_str)
+                               data_well, date_today, excel_json, contractor, well_data.costumer, work_plan_str,well_data.user)
 
                 # Подготовленный запрос для вставки данных с параметрами
-                query = f"INSERT INTO wells VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+                query = f"INSERT INTO wells VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
 
                 # Выполнение запроса с использованием параметров
                 cursor.execute(query, data_values)
 
-                mes = QMessageBox.information(None, 'база данных', 'Скважина добавлена в базу данных well_data')
+                mes = QMessageBox.information(None, 'база данных',
+                                              f'Скважина {well_data.well_number} добавлена в базу данных c excel фалами')
 
             # Сохранить изменения и закрыть соединение
             conn.commit()
