@@ -140,7 +140,7 @@ class Classifier_well(QMainWindow):
                     data = cur.fetchall()
 
             except psycopg2.Error as e:
-                mes = QMessageBox.warning(self, 'Ошибка', 'Ошибка подключения к базе данных')
+                mes = QMessageBox.warning(self, 'Ошибка', f'Ошибка подключения к базе данных: {e}')
 
             finally:
                 if conn:
@@ -395,7 +395,7 @@ class Classifier_well(QMainWindow):
 
             except sqlite3.Error as e:
                 # Выведите сообщение об ошибке
-                QMessageBox.warning(None, 'Ошибка', f'Ошибка подключения к базе данных: {e}')
+                QMessageBox.warning(None, 'Ошибка', f'Ошибка подключения к базе данных: /n {e}')
             finally:
                 # Закройте курсор и соединение
                 if cursor:
@@ -683,7 +683,7 @@ class Classifier_well(QMainWindow):
 
             except sqlite3.Error as e:
                 # Выведите сообщение об ошибке
-                QMessageBox.warning(None, 'Ошибка', f'Ошибка подключения к базе данных: {e}')
+                QMessageBox.warning(None, 'Ошибка', f'Ошибка подключения к базе данных : {e}')
             finally:
                 # Закройте курсор и соединение
                 if cursor:
@@ -741,9 +741,9 @@ def insert_database_well_data(well_number, well_area, contractor, costumer, data
                         QMessageBox.critical(None, 'Ошибка', f'Ошибка при обновлении данных: {error}')
             else:
 
-                # Подготовленные данные для вставки (пример)
+                # Подготовленные данные для вставки
                 data_values = (str(well_number), well_area,
-                               data_well, date_today, excel_json, contractor, well_data.costumer, work_plan_str,well_data.user)
+                               data_well, date_today, excel_json, contractor, well_data.costumer, work_plan_str, well_data.user)
 
                 # Подготовленный запрос для вставки данных с параметрами
                 query = f"INSERT INTO wells VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
@@ -784,7 +784,7 @@ def insert_database_well_data(well_number, well_area, contractor, costumer, data
                FROM wells 
                WHERE well_number = ? AND area_well = ? AND contractor = ? AND costumer = ? AND work_plan = ?
                """, (
-                str(well_number), well_area, contractor, costumer, str(well_number), well_area, contractor, costumer, work_plan_str))
+                str(well_number), well_area, contractor, costumer, work_plan_str, str(well_number), well_area, contractor, costumer, work_plan_str))
 
             row_exists = cursor.fetchone()
 
@@ -807,14 +807,16 @@ def insert_database_well_data(well_number, well_area, contractor, costumer, data
                         QMessageBox.critical(None, 'Ошибка', f'Ошибка при обновлении данных: {error}')
             else:
                 # Подготовленные данные для вставки (пример)
-                datavalues = (
-                    str(well_number), well_area, data_well, date_today, excel_json, contractor, well_data.costumer, work_plan_str)
+                data_values = [str(well_number), well_area,
+                               data_well, date_today, excel_json, contractor, well_data.costumer, work_plan_str,
+                               well_data.user]
 
-                # Подготовленный запрос для вставки данных с параметрами
-                query = "INSERT INTO wells VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+
 
                 # Выполнение запроса с использованием параметров
-                cursor.execute(query, datavalues)
+                cursor.execute("INSERT INTO " \
+                        "wells (well_number, area_well, data_well, today, excel_json, contractor, costumer, work_plan, geolog) VALUES" \
+                        "(?, ?, ?, ?, ?, ?, ?, ?, ?)", data_values)
 
                 mes = QMessageBox.information(None, 'база данных', 'Скважина добавлена в базу данных welldata')
 
@@ -827,7 +829,7 @@ def insert_database_well_data(well_number, well_area, contractor, costumer, data
                 conn.close()
         except sqlite3.Error as e:
             # Выведите сообщение об ошибке
-            mes = QMessageBox.warning(None, 'Ошибка', f'Ошибка подключения к базе данных {e}')
+            mes = QMessageBox.warning(None, 'Ошибка', f'Ошибка подключения к базе данных hg{e}')
 
 
 def connect_to_db(name_base, folder_base):
@@ -1155,7 +1157,7 @@ def create_database_well_db(work_plan, number_dp):
                 f'template_depth TEXT, '
                 f'skm_list TEXT, '
                 f'problemWithEk_depth FLOAT, '
-                f'problemWithEk_diametr FLOAT'
+                f'problemWithEk_diametr FLOAT,'
                 f'today DATE)'
             )
 
