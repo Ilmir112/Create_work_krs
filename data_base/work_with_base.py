@@ -806,27 +806,26 @@ def insert_database_well_data(well_number, well_area, contractor, costumer, data
                     except sqlite3.Error as error:
                         QMessageBox.critical(None, 'Ошибка', f'Ошибка при обновлении данных: {error}')
             else:
-                # Подготовленные данные для вставки (пример)
-                data_values = [str(well_number), well_area,
-                               data_well, date_today, excel_json, contractor, well_data.costumer, work_plan_str,
-                               well_data.user]
-
-
-
+                # Подготовленные данные для вставки
+                data_values = [str(well_number), well_area, data_well, date_today, excel_json, contractor,
+                               well_data.costumer, work_plan_str, well_data.user]
+                data_in = f"""
+                    INSERT INTO wells (well_number, area_well, data_well, today, excel_json, contractor, costumer, work_plan, geolog) 
+                    VALUES {data_values}
+                    """,
                 # Выполнение запроса с использованием параметров
-                cursor.execute("INSERT INTO " \
-                        "wells (well_number, area_well, data_well, today, excel_json, contractor, costumer, work_plan, geolog) VALUES" \
-                        "(?, ?, ?, ?, ?, ?, ?, ?, ?)", data_values)
+                cursor.execute(data_in)  # Передаем список
 
                 mes = QMessageBox.information(None, 'база данных', 'Скважина добавлена в базу данных welldata')
 
-            # Сохранить изменения и закрыть соединение
-            conn.commit()
-            # Закройте курсор и соединение
-            if cursor:
-                cursor.close()
-            if conn:
-                conn.close()
+                # Сохранить изменения и закрыть соединение
+                conn.commit()
+                # Закройте курсор и соединение
+                if cursor:
+                    cursor.close()
+                if conn:
+                    conn.close()
+
         except sqlite3.Error as e:
             # Выведите сообщение об ошибке
             mes = QMessageBox.warning(None, 'Ошибка', f'Ошибка подключения к базе данных hg{e}')
@@ -1214,14 +1213,26 @@ def create_database_well_db(work_plan, number_dp):
                 conn.close()
 
 def get_table_creation_time(conn, table_name):
+    if well_data.connect_in_base:
+        with conn.cursor() as cur:
+            # Выполняем SQL-запрос для получения всех записей из таблицы
+            cur.execute(f"SELECT * FROM \"{table_name}\"")
 
-    with conn.cursor() as cur:
+            try:
+                # Получаем результаты запроса в виде списка кортежей
+                rows = cur.fetchall()[0][15]
+                return f' от {rows}'
+            except:
+                return ''
+    else:
+        cur = conn.cursor()
         # Выполняем SQL-запрос для получения всех записей из таблицы
-        cur.execute(f"SELECT * FROM \"{table_name}\"")
+        cur.execute(f"SELECT * FROM '{table_name}'")
 
         try:
             # Получаем результаты запроса в виде списка кортежей
-            rows = cur.fetchall()[0][15]
+            rows = cur.fetchall()[0][14]
+
             return f' от {rows}'
         except:
             return ''

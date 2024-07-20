@@ -178,25 +178,9 @@ class TabPageDp(QWidget):
                         "SELECT well_number, area_well, contractor, costumer, today, work_plan FROM wells WHERE well_number=(%s) AND area_well=(%s)",
                                        (str(number_well), well_area))
 
-                    # Получение всех результатов
-                    wells_with_data = cursor.fetchall()
 
-                    # Проверка, есть ли данные
-                    if wells_with_data:
-                        well_list = []
-                        for well in wells_with_data:
-                            try:
-                                if 'Ойл' in well[2]:
-                                    contractor = 'Ойл'
-                                elif 'РН' in well[2]:
-                                    contractor = 'РН'
-                            except:
-                                contractor = 'Ойл'
-                            # Формируем список скважин
-                            well_list.append(f'{well[0]} {well[1]} {contractor} {well[5]} от {well[4]}')
-                        return well_list[::-1]
-                    else:
-                        return False
+
+
 
                 except psycopg2.Error as e:
                     # Выведите сообщение об ошибке
@@ -211,18 +195,32 @@ class TabPageDp(QWidget):
 
                     cursor.execute("SELECT data_well FROM wells WHERE well_number = ? AND area_well = ? "
                                    "AND contractor = ? AND costumer = ?",
-                                   (str(number_well._value), well_area._value, well_data.contractor, well_data.costumer))
+                                   (str(well_number), well_area, well_data.contractor, well_data.costumer))
 
-                    data_well = cursor.fetchone()
-                    if data_well:
-                        return data_well
-                    else:
-                        return False, data_well
+
 
                 except sqlite3.Error as e:
                     # Выведите сообщение об ошибке
                     mes = QMessageBox.warning(None, 'Ошибка',
                                               'Ошибка подключения к базе данных, Скважина не добавлена в базу')
+            # Получение всех результатов
+            wells_with_data = cursor.fetchall()
+            # Проверка, есть ли данные
+            if wells_with_data:
+                well_list = []
+                for well in wells_with_data:
+                    try:
+                        if 'Ойл' in well[2]:
+                            contractor = 'Ойл'
+                        elif 'РН' in well[2]:
+                            contractor = 'РН'
+                    except:
+                        contractor = 'Ойл'
+                    # Формируем список скважин
+                    well_list.append(f'{well[0]} {well[1]} {contractor} {well[5]} от {well[4]}')
+                return well_list[::-1]
+            else:
+                return False
     def update_change_pvr(self, index):
         if self.old_index == 0:
             self.tableWidget.setHorizontalHeaderLabels(
@@ -394,7 +392,7 @@ class TabPageDp(QWidget):
                 data_in = get_table_creation_time(conn, row[0])
 
                 tables.append(row[0] + data_in)
-            tables.insert(0, '')
+            # tables.insert(0, '')
 
             cursor.close()
 
@@ -418,17 +416,19 @@ class TabPageDp(QWidget):
                 cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
 
                 tables = []
+                table_in_base = cursor.fetchall()[1:]
 
-                for row in cursor.fetchall():
-                    data_in = get_table_creation_time(conn, row[0])
-                    tables.append(row[0] + data_in)
-                tables.insert(0, '')
+                for table_name in table_in_base:
+                    if prefix in table_name[0].split(' ')[0]:
+                        data_in = get_table_creation_time(conn, table_name[0])
+                        tables.append(table_name[0] + data_in)
+                # tables.insert(0, '')
 
                 # Фильтруем таблицы по префиксу и подрядчику
                 tables_filter = list(filter(lambda x: contractor in x, tables))
 
-                # Добавляем пустую строку в начало списка
-                tables_filter.insert(0, '')
+                # # Добавляем пустую строку в начало списка
+                # tables_filter.insert(0, '')
 
                 # Сортируем таблицы в обратном порядке
                 tables_filter = tables_filter[::-1]
