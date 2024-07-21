@@ -696,7 +696,7 @@ def insert_database_well_data(well_number, well_area, contractor, costumer, data
 
     data_well = json.dumps(data_well_dict, ensure_ascii=False)
     excel_json = json.dumps(excel, ensure_ascii=False)
-    date_today = datetime.now()
+    date_today = datetime.now().strftime("%d.%m.%Y")
     # print(row, well_data.count_row_well)
     if 'dop_plan' in work_plan:
         work_plan_str = f'ДП№{well_data.number_dp}'
@@ -752,7 +752,7 @@ def insert_database_well_data(well_number, well_area, contractor, costumer, data
                 cursor.execute(query, data_values)
 
                 mes = QMessageBox.information(None, 'база данных',
-                                              f'Скважина {well_data.well_number} добавлена в базу данных c excel фалами')
+                                              f'Скважина {well_data.well_number._value} добавлена в базу данных c excel фалами')
 
             # Сохранить изменения и закрыть соединение
             conn.commit()
@@ -798,33 +798,39 @@ def insert_database_well_data(well_number, well_area, contractor, costumer, data
                         cursor.execute("""
                                         UPDATE wells
                                         SET data_well = ?, today = ?, excel_json = ?                                                                       
-                                        WHERE well_number = ? AND area_well = ? AND contractor = ? AND costumer = ? AND work_plan = ?
+                                        WHERE well_number = ? AND area_well = ? 
+                                        AND contractor = ? AND costumer = ? AND work_plan = ? AND geolog = ?
                                     """, (
-                            data_well, date_today, excel_json, str(well_number), well_area, contractor, costumer, work_plan_str))
+                            data_well, date_today, excel_json, str(well_number),
+                            well_area, contractor, costumer, work_plan_str, well_data.user[1]))
 
                         QMessageBox.information(None, 'Успешно', 'Данные в обновлены обновлены')
                     except sqlite3.Error as error:
                         QMessageBox.critical(None, 'Ошибка', f'Ошибка при обновлении данных: {error}')
             else:
+
                 # Подготовленные данные для вставки
-                data_values = [str(well_number), well_area, data_well, date_today, excel_json, contractor,
-                               well_data.costumer, work_plan_str, well_data.user]
-                data_in = f"""
-                    INSERT INTO wells (well_number, area_well, data_well, today, excel_json, contractor, costumer, work_plan, geolog) 
-                    VALUES {data_values}
-                    """,
+                data_values = (str(well_number), well_area,
+                               data_well, date_today, excel_json, contractor, well_data.costumer, work_plan_str,
+                               well_data.user[1])
+
+                # Подготовленный запрос для вставки данных с параметрами
+                query = """INSERT INTO wells(well_number, area_well, data_well, today, excel_json, 
+                contractor, costumer, work_plan, geolog) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);"""
+
                 # Выполнение запроса с использованием параметров
-                cursor.execute(data_in)  # Передаем список
+                cursor.execute(query, data_values)
 
-                mes = QMessageBox.information(None, 'база данных', 'Скважина добавлена в базу данных welldata')
+                mes = QMessageBox.information(None, 'база данных', f'Скважина {well_data.well_number._value} '
+                                                                   f'добавлена в базу данных welldata')
 
-                # Сохранить изменения и закрыть соединение
-                conn.commit()
-                # Закройте курсор и соединение
-                if cursor:
-                    cursor.close()
-                if conn:
-                    conn.close()
+            # Сохранить изменения и закрыть соединение
+            conn.commit()
+            # Закройте курсор и соединение
+            if cursor:
+                cursor.close()
+            if conn:
+                conn.close()
 
         except sqlite3.Error as e:
             # Выведите сообщение об ошибке
@@ -1172,7 +1178,7 @@ def create_database_well_db(work_plan, number_dp):
                 skm_interval = data[12]
                 problemWithEk_depth = data[13]
                 problemWithEk_diametr = data[14]
-                date_create = datetime.now()
+                date_create = datetime.now().strftime("%d.%m.%Y")
                 # Подготовленные данные для вставки
                 data_values = (
                     index,
@@ -1220,7 +1226,7 @@ def get_table_creation_time(conn, table_name):
 
             try:
                 # Получаем результаты запроса в виде списка кортежей
-                rows = cur.fetchall()[0][15]
+                rows = cur.fetchall()[0][15].split(' ')[0]
                 return f' от {rows}'
             except:
                 return ''
@@ -1231,7 +1237,7 @@ def get_table_creation_time(conn, table_name):
 
         try:
             # Получаем результаты запроса в виде списка кортежей
-            rows = cur.fetchall()[0][14]
+            rows = cur.fetchall()[0][15]
 
             return f' от {rows}'
         except:

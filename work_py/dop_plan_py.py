@@ -193,7 +193,7 @@ class TabPageDp(QWidget):
                     conn = sqlite3.connect(f'{db_path}')
                     cursor = conn.cursor()
 
-                    cursor.execute("SELECT data_well FROM wells WHERE well_number = ? AND area_well = ? "
+                    cursor.execute("SELECT  well_number, area_well, contractor, costumer, today, work_plan FROM wells WHERE well_number = ? AND area_well = ? "
                                    "AND contractor = ? AND costumer = ?",
                                    (str(well_number), well_area, well_data.contractor, well_data.costumer))
 
@@ -283,7 +283,6 @@ class TabPageDp(QWidget):
 
 
     def update_well(self):
-
 
         self.table_name = str(self.well_number_edit.text()) + self.well_area_edit.text()
         if well_data.data_in_base:
@@ -1005,7 +1004,7 @@ class DopPlanWindow(QMainWindow):
                     well_data.dict_perforation_short.setdefault(plast, {}).setdefault('отключение', False)
 
         else:
-            fluid = self.tabWidget.currentWidget().fluid_edit.text()
+            fluid = self.tabWidget.currentWidget().fluid_edit.text().replace(',', '.')
             current_bottom = self.tabWidget.currentWidget().current_bottom_edit.text()
             if current_bottom != '':
                 current_bottom = round_cell(current_bottom.replace(',', '.'))

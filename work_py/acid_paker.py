@@ -388,9 +388,9 @@ class TabPage_SO_acid(QWidget):
         self.swab_true_edit_type.currentTextChanged.connect(self.update_need_swab)
         self.swab_true_edit_type.setCurrentIndex(1)
 
-        self.paker_depth.editingFinished.connect(self.update_paker_depth)
-        self.paker_depth.editingFinished.connect(self.update_paker_edit)
-        self.paker2_depth.editingFinished.connect(self.update_paker_edit)
+        self.paker_depth.textChanged.connect(self.update_paker_depth)
+        self.paker_depth.textChanged.connect(self.update_paker_edit)
+        self.paker2_depth.textChanged.connect(self.update_paker_edit)
 
         self.svk_true_combo.currentTextChanged.connect(self.update_skv_edit)
         self.svk_true_combo.setCurrentIndex(0)
