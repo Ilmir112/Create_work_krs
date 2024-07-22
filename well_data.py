@@ -247,6 +247,7 @@ cat_h2s_list = []
 h2s_mg = []
 h2s_mg_m3 = []
 lift_key = 0
+check_data_in_pz = []
 dict_category = {}
 max_admissible_pressure = 0
 region = ''

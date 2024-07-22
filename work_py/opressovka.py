@@ -56,8 +56,6 @@ class TabPage_SO(QWidget):
 
         self.pressureZUMPF_question_QCombo.addItems(['Нет', 'Да'])
 
-
-
         self.grid_layout = QGridLayout(self)
 
         self.grid_layout.addWidget(self.diametr_paker_labelType, 3, 1)

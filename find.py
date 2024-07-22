@@ -57,7 +57,7 @@ class FindIndexPZ(QMainWindow):
                 while type_kr == None and n != 8:
                     type_kr = ws.cell(row=row_ind + 2, column=1 +n).value
                     n += 1
-                well_data.type_kr =type_kr
+                well_data.type_kr = type_kr
 
             elif any(['IX. Мероприятия по предотвращению' in str(col) for col in row]) or \
                     any(['IX. Мероприятия по предотвращению аварий, инцидентов и осложнений::' in str(col) for col in
@@ -164,6 +164,9 @@ class FindIndexPZ(QMainWindow):
                 'Состояние скважины к началу ремонта ')
             MyWindow.pause_app()
             return
+        if well_data.type_kr in ['', None]:
+            well_data.check_data_in_pz.append('Не указан Вид и категория ремонта, его шифр\n')
+
 
     def check_str_None(self, string):
         from main import MyWindow
@@ -285,9 +288,9 @@ class WellSucker_rod(FindIndexPZ):
         if well_data.sucker_rod_ind._value != 0:
             for row in range(begin_index, cancel_index):  # словарь  количества штанг и метраж
                 if 'план' in str(ws.cell(row=row, column=3).value) or str(
-                        ws.cell(row=row, column=3).value).lower() == 'после ремонта' \
+                        ws.cell(row=row, column=3).value).lower() == 'план' \
                         or str(
-                    ws.cell(row=row, column=3).value).lower() == 'до ремонта':
+                    ws.cell(row=row, column=3).value).lower() == 'после ремонта':
                     b_plan = row
 
             if b_plan == 0 and well_data.sucker_rod_none is True:
@@ -346,6 +349,7 @@ class WellFond_data(FindIndexPZ):
         # self.read_well(ws, well_data.data_fond_min._value, well_data.condition_of_wells._value)
 
     def read_well(self, ws, begin_index, cancel_index):
+        from work_py.opressovka import TabPage_SO
 
         well_data.old_index = 1
         for row_index, row in enumerate(ws.iter_rows(min_row=begin_index, max_row=cancel_index)):
@@ -465,10 +469,39 @@ class WellFond_data(FindIndexPZ):
                             if well_data.paker_do["posle"] != 0:
                                 well_data.depth_fond_paker_do["posle"] = row[col_plan].value
         if well_data.wellhead_fittings in [None, '']:
-            well_data.wellhead_fitting, _ = QInputDialog.getText(self, 'Ошибка',
-                                                                 'ПРограмма не могла найти устьевую арматуру, '
-                                                                 'Введите вид фонтанной арматуры')
-            print(f'арматура {well_data.wellhead_fitting}')
+            well_data.check_data_in_pz.append('Не указан тип устьевой арматуры\n')
+        if well_data.column_head_m in [None, '']:
+            well_data.check_data_in_pz.append('Не указан тип Колонной головки или завод-изготовитель\n')
+        if well_data.groove_diameter in [None, '']:
+            well_data.check_data_in_pz.append('Не указан Диаметр канавки устьевой арматуры или тип резьбы\n ')
+
+        if str(well_data.paker_do['do']).lower() not in ['0', 0, '-', 'отсут', '', 'none', None]:
+            a = well_data.paker_do['do']
+
+            if '/' in str(well_data.depth_fond_paker_do['do']):
+                paker_diametr = TabPage_SO.paker_diametr_select(self,
+                                                                well_data.depth_fond_paker_do['do'].split('/')[0])
+                if paker_diametr not in well_data.paker_do['do']:
+                    well_data.check_data_in_pz.append(f'Не корректно указан диаметр фондового пакера в карте спуска '
+                                                      f'ремонта {well_data.paker_do["do"].split("/")[0]} трубуется пакер '
+                                                      f'диаметром {paker_diametr}')
+            else:
+                paker_diametr = TabPage_SO.paker_diametr_select(self,
+                                                                well_data.depth_fond_paker_do['do'])
+                well_data.check_data_in_pz.append(f'Не корректно указан диаметр фондового пакера в карте спуска '
+                                                  f'ремонта {well_data.paker_do["do"]} требуется пакер '
+                                                  f'диаметром {paker_diametr}м')
+        a = well_data.dict_pump_ECN['do'], well_data.dict_pump_SHGN['do'], well_data.paker_do['do']
+        aa = well_data.dict_pump_ECN['posle'], well_data.dict_pump_SHGN['posle'], well_data.paker_do['posle']
+        if well_data.dict_pump_ECN['do'] != '0' and well_data.dict_pump_SHGN['do'] != '0':
+            if well_data.paker_do['do'] in ['0', None, 0]:
+                well_data.check_data_in_pz.append(f'В план заказе не указано посадка пакера при спущенной компоновке ОРД ')
+        if well_data.dict_pump_ECN['posle'] != '0' and well_data.dict_pump_SHGN['posle'] != '0':
+            if well_data.paker_do['do'] in ['0', None, 0]:
+                well_data.check_data_in_pz.append(f'В план заказе не указано посадка пакера при cпуске ОРД ')
+
+
+
 
 
 class WellHistory_data(FindIndexPZ):
@@ -528,10 +561,7 @@ class WellHistory_data(FindIndexPZ):
                                                                                          col + 1, 1)
                     elif 'Первоначальное давление опрессовки э/колонны' == value:
                         well_data.first_pressure = ProtectedIsDigit(row[col + 3].value)
-                        # well_data.first_pressure = FindIndexPZ.definition_is_None(self,
-                        #                                                                  well_data.max_expected_pressure,
-                        #                                                                  row_index + begin_index,
-                        #                                                                  col + 1, 1)
+
 
                     elif 'Максимально допустимое давление'.lower() in str(value).lower():
                         well_data.max_admissible_pressure = ProtectedIsDigit(row[col + 1].value)
@@ -539,6 +569,12 @@ class WellHistory_data(FindIndexPZ):
                                                                                            well_data.max_admissible_pressure,
                                                                                            row_index + begin_index,
                                                                                            col + 1, 1)
+        if well_data.date_drilling_run == '':
+            well_data.check_data_in_pz.append('не указано начало бурения\n')
+        if well_data.date_drilling_cancel == '':
+            well_data.check_data_in_pz.append('не указано окончание бурения\n')
+
+
 
 
 class WellCondition(FindIndexPZ):
@@ -602,6 +638,10 @@ class WellCondition(FindIndexPZ):
                                                                               70)
                                 well_data.well_volume_in_PZ.append(well_volume_in_PZ)
 
+        if well_data.static_level._value == 'не корректно':
+            well_data.check_data_in_pz.append('не указано статический уровень \n')
+        if well_data.pressuar_mkp._value in ['не корректно', '-']:
+            well_data.check_data_in_pz.append('не указано наличие наличие устройство замера давления и наличие давления в МКП\n')
 
 
         if well_data.leakiness is True:
@@ -960,6 +1000,15 @@ class Well_data(FindIndexPZ):
                             well_data.head_column_additional = ProtectedIsNonNone('отсут')
                             well_data.shoe_column_additional = ProtectedIsNonNone('отсут')
 
+        if well_data.stol_rotora._value in ['не корректно', None, '']:
+            well_data.check_data_in_pz.append('не указано Стол ротора \n')
+        if well_data.max_angle._value in ['не корректно', None, '']:
+            well_data.check_data_in_pz.append('не указано максимальный угол \n')
+        if well_data.max_angle_H._value in ['не корректно', None, '']:
+            well_data.check_data_in_pz.append('не указано глубина максимального угла\n')
+        if well_data.level_cement_column._value in ['не корректно', None, '']:
+            well_data.check_data_in_pz.append('не указан уровень цемент за колонной\n')
+
         if self.data_window is None:
             self.data_window = DataWindow(self)
             self.data_window.setWindowTitle("Сверка данных")
@@ -1309,6 +1358,8 @@ class Well_perforation(FindIndexPZ):
             well_data.plast_project = list(well_data.dict_perforation_project.keys())
 
 
+
+
 class Well_Category(FindIndexPZ):
 
     def __init__(self, ws):
@@ -1338,12 +1389,17 @@ class Well_Category(FindIndexPZ):
                                 if str(ws.cell(row=row, column=col - 1).value).strip() in ['', '-', '0', 'None'] or \
                                         'отс' in str(ws.cell(row=row, column=col - 1).value).lower():
                                     well_data.h2s_pr.append(0)
+                                    if ws.cell(row=row-1, column=col - 2).value not in ['3', 3]:
+                                        well_data.check_data_in_pz.append('Не указано значение сероводорода в процентах')
                                 else:
                                     well_data.h2s_pr.append(float(str(ws.cell(row=row, column=col - 1).value).replace(',', '.')))
                             if str(cell) in ['мг/л', 'мг/дм3', 'мг/дм', 'мгдм3']:
                                 if str(ws.cell(row=row, column=col - 1).value).strip() in ['', '-', '0', 'None'] or \
                                         'отс' in str(ws.cell(row=row, column=col - 1).value).lower():
                                     well_data.h2s_mg.append(0)
+                                    a = ws.cell(row=row, column=col-2).value
+                                    if ws.cell(row=row, column=col-2).value not in ['3', 3]:
+                                        well_data.check_data_in_pz.append('Не указано значение сероводорода в мг/л')
 
                                 else:
 
@@ -1415,6 +1471,8 @@ class Well_Category(FindIndexPZ):
                         mes = QMessageBox.warning(None, 'Некорректная категория давления',
                                                   f'согласно классификатора от {data} категория скважина '
                                                   f'по давлению {categoty_pressure_well} категории')
+                        well_data.check_data_in_pz.append(f'согласно классификатора от {data} категория скважины ' \
+                                                      f'по давлению {categoty_pressure_well} категории\n')
                 if categoty_h2s_well:
                     if str(well_data.cat_h2s_list[0]) != str(well_data.category_h2s):
                         # print(str(well_data.cat_h2s_list[0]), well_data.category_h2s)
@@ -1422,10 +1480,17 @@ class Well_Category(FindIndexPZ):
                         mes = QMessageBox.warning(None, 'Некорректная категория давления',
                                                   f'согласно классификатора от {data} категория скважина '
                                                   f'по сероводороду {categoty_h2s_well} категории')
+                        well_data.check_data_in_pz.append(f'согласно классификатора от {data} категория скважина ' \
+                                                      f'по сероводороду {categoty_h2s_well} категории\n')
+
                 if categoty_gf:
                     if str(categoty_gf) != str(well_data.category_gf):
                         mes = QMessageBox.warning(None, 'Некорректная категория давления',
                                                   f'согласно классификатора от {data} категория скважина '
                                                   f'по газовому фактору {categoty_gf} категории')
+                        well_data.check_data_in_pz.append(f'согласно классификатора от {data} категория скважина ' \
+                                                      f'по газовому фактору {categoty_gf} категории\n')
             except Exception as e:
                 mes = QMessageBox.warning(self, 'Ошибка', f'Скважина не найдена в классификаторе \n {e}')
+
+

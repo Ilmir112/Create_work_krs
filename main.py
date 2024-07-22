@@ -494,7 +494,9 @@ class MyWindow(QMainWindow):
                     well_data.pause = True
                     read_pz = CreatePZ(self.wb, self.ws, self.data_window, self.perforation_correct_window2)
                     sheet = read_pz.open_excel_file(self.ws, self.work_plan)
-
+                    if well_data.data_in_base:
+                        sheet = insert_data_new_excel_file(well_data.data, well_data.rowHeights, well_data.colWidth,
+                                                         well_data.boundaries_dict)
                     self.copy_pz(sheet, self.table_widget, self.work_plan)
 
                 except FileNotFoundError as f:
@@ -1107,6 +1109,7 @@ class MyWindow(QMainWindow):
             well_data.normOfTime = 0
             well_data.lift_ecn_can = False
             well_data.pause = True
+            well_data.check_data_in_pz = []
             well_data.sucker_rod_none = True
             well_data.curator = '0'
             well_data.lift_ecn_can_addition = False
@@ -1506,11 +1509,15 @@ class MyWindow(QMainWindow):
         drilling_work_list = Drill_window.frezer_ports(self)
         self.populate_row(self.ins_ind, drilling_work_list, self.table_widget)
 
+    def set_modal_window(self, window):
+        # Установка модальности окна
+        window.setWindowModality(Qt.ApplicationModal)
+        window.show()
+
     def drilling_action_nkt(self):
         if self.raid_window is None:
             self.raid_window = Drill_window(well_data.ins_ind, self.table_widget)
-            self.raid_window.setGeometry(200, 400, 300, 400)
-            self.raid_window.show()
+            self.set_modal_window(self.raid_window)
             self.pause_app()
             well_data.pause = True
             self.raid_window = None
@@ -1524,7 +1531,7 @@ class MyWindow(QMainWindow):
         if self.raid_window is None:
             self.raid_window = Emergency_magnit(well_data.ins_ind, self.table_widget)
             # self.raid_window.setGeometry(200, 400, 300, 400)
-            self.raid_window.show()
+            self.set_modal_window(self.raid_window)
             self.pause_app()
             well_data.pause = True
             self.raid_window = None
@@ -1552,7 +1559,8 @@ class MyWindow(QMainWindow):
         if self.raid_window is None:
             self.raid_window = Emergency_lar(well_data.ins_ind, self.table_widget)
             # self.raid_window.setGeometry(200, 400, 300, 400)
-            self.raid_window.show()
+
+            self.set_modal_window(self.raid_window)
             self.pause_app()
             well_data.pause = True
             self.raid_window = None
@@ -1565,7 +1573,8 @@ class MyWindow(QMainWindow):
         if self.raid_window is None:
             self.raid_window = Emergency_po(well_data.ins_ind, self.table_widget)
             # self.raid_window.setGeometry(200, 400, 300, 400)
-            self.raid_window.show()
+
+            self.set_modal_window(self.raid_window)
             self.pause_app()
             well_data.pause = True
             self.raid_window = None
@@ -1578,7 +1587,8 @@ class MyWindow(QMainWindow):
         if self.raid_window is None:
             self.raid_window = Emergency_print(well_data.ins_ind, self.table_widget)
             # self.raid_window.setGeometry(200, 400, 300, 400)
-            self.raid_window.show()
+
+            self.set_modal_window(self.raid_window)
             self.pause_app()
             well_data.pause = True
             self.raid_window = None
@@ -1644,8 +1654,8 @@ class MyWindow(QMainWindow):
 
         if self.raid_window is None:
             self.raid_window = GonsWindow(well_data.ins_ind, self.table_widget)
-            self.raid_window.setGeometry(200, 400, 300, 400)
-            self.raid_window.show()
+
+            self.set_modal_window(self.raid_window)
             self.pause_app()
             well_data.pause = True
             self.raid_window = None
@@ -1658,8 +1668,7 @@ class MyWindow(QMainWindow):
         from work_py.izv_paker import PakerIzvlek
         if self.raid_window is None:
             self.raid_window = PakerIzvlek(well_data.ins_ind, self.table_widget)
-            self.raid_window.setGeometry(200, 400, 300, 400)
-            self.raid_window.show()
+            self.set_modal_window(self.raid_window)
             self.pause_app()
             well_data.pause = True
             self.raid_window = None
@@ -1688,6 +1697,7 @@ class MyWindow(QMainWindow):
             self.rir_window = Change_fluid_Window(well_data.ins_ind, self.table_widget)
             # self.rir_window.setGeometry(200, 400, 100, 200)
             self.rir_window.show()
+            self.set_modal_window(self.rir_window)
             self.pause_app()
             well_data.pause = True
             self.rir_window = None
@@ -1700,8 +1710,8 @@ class MyWindow(QMainWindow):
         if self.rir_window is None:
             well_data.countAcid = 0
             self.rir_window = ClayWindow(well_data.ins_ind, self.table_widget)
-            # self.rir_window.setGeometry(200, 400, 100, 200)
-            self.rir_window.show()
+
+            self.set_modal_window(self.rir_window)
             self.pause_app()
             well_data.pause = True
             self.rir_window = None
@@ -1716,7 +1726,8 @@ class MyWindow(QMainWindow):
             well_data.countAcid = 0
             self.rir_window = RirWindow(well_data.ins_ind, self.table_widget)
             # self.rir_window.setGeometry(200, 400, 300, 400)
-            self.rir_window.show()
+
+            self.set_modal_window(self.rir_window)
             self.pause_app()
             well_data.pause = True
             self.rir_window = None
@@ -1730,7 +1741,7 @@ class MyWindow(QMainWindow):
         if self.work_window is None:
             self.work_window = Grp_window(well_data.ins_ind, self.table_widget)
             # self.work_window.setGeometry(200, 400, 500, 500)
-            self.work_window.show()
+            self.set_modal_window(self.work_window)
             self.pause_app()
             well_data.pause = True
             self.work_window = None
@@ -1744,7 +1755,7 @@ class MyWindow(QMainWindow):
         if self.work_window is None:
             self.work_window = Gpp_window(well_data.ins_ind, self.table_widget)
             # self.work_window.setGeometry(200, 400, 500, 500)
-            self.work_window.show()
+            self.set_modal_window(self.work_window)
             self.pause_app()
             well_data.pause = True
             self.work_window = None
@@ -1758,7 +1769,7 @@ class MyWindow(QMainWindow):
         if self.work_window is None:
             self.work_window = SandWindow(well_data.ins_ind, self.table_widget)
             # self.work_window.setGeometry(200, 400, 500, 500)
-            self.work_window.show()
+            self.set_modal_window(self.work_window)
             self.pause_app()
             well_data.pause = True
             self.work_window = None
@@ -1804,7 +1815,7 @@ class MyWindow(QMainWindow):
         if self.work_window is None:
             self.work_window = VpWindow(well_data.ins_ind, self.table_widget)
             # self.work_window.setGeometry(200, 400, 500, 500)
-            self.work_window.show()
+            self.set_modal_window(self.work_window)
             self.pause_app()
             well_data.pause = True
             self.work_window = None
@@ -1817,8 +1828,7 @@ class MyWindow(QMainWindow):
 
         if self.work_window is None:
             self.work_window = Swab_Window(well_data.ins_ind, self.table_widget)
-            # self.work_window.setGeometry(200, 400, 500, 500)
-            self.work_window.show()
+            self.set_modal_window(self.work_window)
             self.pause_app()
             well_data.pause = True
             self.work_window = None
@@ -1831,8 +1841,7 @@ class MyWindow(QMainWindow):
 
         if self.work_window is None:
             self.work_window = Kompress_Window(well_data.ins_ind, self.table_widget)
-            # self.work_window.setGeometry(200, 400, 300, 400)
-            self.work_window.show()
+            self.set_modal_window(self.work_window)
             self.pause_app()
             well_data.pause = True
             self.work_window = None
@@ -1845,8 +1854,7 @@ class MyWindow(QMainWindow):
 
         if self.work_window is None:
             self.work_window = Raid(well_data.ins_ind, self.table_widget)
-            # self.work_window.setGeometry(200, 400, 300, 400)
-            self.work_window.show()
+            self.set_modal_window(self.work_window)
             self.pause_app()
             well_data.pause = True
             self.work_window = None
@@ -1864,7 +1872,7 @@ class MyWindow(QMainWindow):
 
         if self.work_window is None:
             self.work_window = GnktOpz(well_data.ins_ind, self.table_widget)
-            self.work_window.show()
+            self.set_modal_window(self.work_window)
             self.pause_app()
             well_data.pause = True
             self.work_window = None
@@ -1877,7 +1885,7 @@ class MyWindow(QMainWindow):
 
         if self.work_window is None:
             self.work_window = GnoDescentWindow(well_data.ins_ind, self.table_widget)
-            self.work_window.show()
+            self.set_modal_window(self.work_window)
             self.pause_app()
             well_data.pause = True
             self.work_window = None
@@ -1890,8 +1898,7 @@ class MyWindow(QMainWindow):
 
         if self.work_window is None:
             self.work_window = OpressovkaEK(well_data.ins_ind, self.table_widget)
-            # self.work_window.setGeometry(200, 400, 300, 400)
-            self.work_window.show()
+            self.set_modal_window(self.work_window)
             self.pause_app()
             well_data.pause = True
             self.work_window = None
@@ -1903,8 +1910,7 @@ class MyWindow(QMainWindow):
         from work_py.block_pack_work import BlockPackWindow
 
         self.work_window = BlockPackWindow(well_data.ins_ind, self.table_widget)
-        # self.work_window.setGeometry(200, 400, 500, 500)
-        self.work_window.show()
+        self.set_modal_window(self.work_window)
         self.pause_app()
         well_data.pause = True
         self.work_window = None
@@ -1912,8 +1918,7 @@ class MyWindow(QMainWindow):
         from work_py.pero_work import PeroWindow
 
         self.work_window = PeroWindow(well_data.ins_ind, self.table_widget)
-        # self.work_window.setGeometry(200, 400, 500, 500)
-        self.work_window.show()
+        self.set_modal_window(self.work_window)
         self.pause_app()
         well_data.pause = True
         self.work_window = None
@@ -1923,8 +1928,7 @@ class MyWindow(QMainWindow):
 
         if self.work_window is None:
             self.work_window = TemplateKrs(well_data.ins_ind, self.table_widget)
-            # self.work_window.setGeometry(200, 400, 500, 500)
-            self.work_window.show()
+            self.set_modal_window(self.work_window)
             self.pause_app()
             well_data.pause = True
             self.work_window = None
@@ -1937,8 +1941,7 @@ class MyWindow(QMainWindow):
 
         if self.work_window is None:
             self.work_window = PakerAspo(well_data.ins_ind, self.table_widget)
-            # self.work_window.setGeometry(200, 400, 500, 500)
-            self.work_window.show()
+            self.set_modal_window(self.work_window)
             self.pause_app()
             well_data.pause = True
             self.work_window = None
@@ -1951,8 +1954,7 @@ class MyWindow(QMainWindow):
 
         if self.work_window is None:
             self.work_window = Template_without_skm(well_data.ins_ind, self.table_widget)
-            # self.work_window.setGeometry(200, 400, 500, 500)
-            self.work_window.show()
+            self.set_modal_window(self.work_window)
             self.pause_app()
             well_data.pause = True
             self.work_window = None
@@ -2008,9 +2010,7 @@ class MyWindow(QMainWindow):
         if self.acid_windowPaker is None:
 
             self.acid_windowPaker = AcidPakerWindow(self.ins_ind, self.table_widget)
-
-            # self.acid_windowPaker.setGeometry(200, 400, 300, 400)
-            self.acid_windowPaker.show()
+            self.set_modal_window(self.acid_windowPaker)
             self.pause_app()
             well_data.pause = True
 
@@ -2070,8 +2070,7 @@ class MyWindow(QMainWindow):
         if self.new_window is None:
             self.new_window = GeophysicWindow(self.table_widget, self.ins_ind)
             self.new_window.setWindowTitle("Геофизические исследования")
-            # self.new_window.setGeometry(200, 400, 300, 400)
-            self.new_window.show()
+            self.set_modal_window(self.new_window)
             self.pause_app()
             well_data.pause = True
             self.new_window = None  # Discard reference.
@@ -2089,9 +2088,7 @@ class MyWindow(QMainWindow):
         if self.perforation_correct_window2 is None:
             self.perforation_correct_window2 = PerforationCorrect(self)
             self.perforation_correct_window2.setWindowTitle("Сверка данных перфорации")
-            # self.perforation_correct_window2.setGeometry(200, 400, 100, 400)
-
-            self.perforation_correct_window2.show()
+            self.set_modal_window(self.perforation_correct_window2)
             self.pause_app()
             well_data.pause = True
             self.perforation_correct_window2 = None
@@ -2111,7 +2108,7 @@ class MyWindow(QMainWindow):
         if self.new_window is None:
             self.new_window = SelectCurator()
             # WellCondition.leakage_window.setGeometry(200, 400, 300, 400)
-            self.new_window.show()
+            self.set_modal_window(self.new_window)
             MyWindow.pause_app()
             well_data.pause = True
             self.new_window = None  # Discard reference.
@@ -2127,7 +2124,7 @@ class MyWindow(QMainWindow):
             WellCondition.leakage_window = LeakageWindow()
             WellCondition.leakage_window.setWindowTitle("Корректировка негерметичности")
             # WellCondition.leakage_window.setGeometry(200, 400, 300, 400)
-            WellCondition.leakage_window.show()
+            self.set_modal_window(WellCondition.leakage_window.show())
 
             MyWindow.pause_app()
             well_data.dict_leakiness = WellCondition.leakage_window.add_work()
@@ -2173,7 +2170,7 @@ class MyWindow(QMainWindow):
             self.correct_window = DataWindow()
             self.correct_window.setWindowTitle("Окно корректировки")
             # self.correct_window.setGeometry(100, 400, 300, 400)
-            self.correct_window.show()
+            self.set_modal_window(self.correct_window)
             self.pause_app()
             well_data.pause = True
             self.correct_window = None
@@ -2200,7 +2197,7 @@ class MyWindow(QMainWindow):
             self.new_window = PerforationWindow(self.table_widget, self.ins_ind)
             self.new_window.setWindowTitle("Перфорация")
             # self.new_window.setGeometry(200, 400, 300, 400)
-            self.new_window.show()
+            self.set_modal_window(self.new_window)
             self.pause_app()
             well_data.pause = True
 
@@ -2295,15 +2292,7 @@ class MyWindow(QMainWindow):
                 self.work_window.close()  # Close window.
                 self.work_window = None
 
-        elif work_plan == 'dop_plan':
-            from work_py.dop_plan_py import DopPlanWindow
 
-            self.rir_window = DopPlanWindow(well_data.ins_ind, self.table_widget, work_plan)
-            # self.rir_window.setGeometry(200, 400, 100, 200)
-            self.rir_window.show()
-            self.pause_app()
-            well_data.pause = True
-            self.rir_window = None
 
         if work_plan in ['gnkt_frez'] and list_page == 2:
             colWidth = [2.28515625, 13.0, 4.5703125, 13.0, 13.0, 13.0, 5.7109375, 13.0, 13.0, 13.0, 4.7109375,

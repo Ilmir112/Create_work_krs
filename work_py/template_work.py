@@ -346,8 +346,8 @@ class TabPage_SO_with(QWidget):
                     well_data.template_depth_addition = well_data.current_bottom - int(dictance_template_first)
 
 
-                    well_data.template_depth = well_data.current_bottom - int(dictance_template_first) - \
-                                               int(dictance_template_second) - int(dictance_three)
+                    well_data.template_depth = int(float(well_data.current_bottom - int(dictance_template_first) - \
+                                               int(dictance_template_second) - int(dictance_three)))
                     well_data.skm_depth = well_data.template_depth + dictance_three
                     # template_str = template_SKM_DP_EK
                     skm_teml_str = f'шаблон-{first_template}мм до гл.{well_data.template_depth_addition}м, ' \
@@ -365,11 +365,11 @@ class TabPage_SO_with(QWidget):
 
 
 
-                    well_data.template_depth = well_data.current_bottom - int(dictance_template_first) - \
+                    well_data.template_depth = int(well_data.current_bottom) - int(dictance_template_first) - \
                                                int(dictance_template_second) - int(dictance_three) - \
                                                int(lenght_template_first)
 
-                    well_data.template_depth_addition = well_data.current_bottom - int(dictance_template_first) - \
+                    well_data.template_depth_addition = int(well_data.current_bottom) - int(dictance_template_first) - \
                                                         int(dictance_template_second)
 
 
@@ -389,7 +389,7 @@ class TabPage_SO_with(QWidget):
                                    f'L-{lenght_template_second}м '
                     well_data.template_depth_addition = well_data.current_bottom - int(dictance_template_second)
 
-                    well_data.template_depth = well_data.current_bottom - int(dictance_template_second) - \
+                    well_data.template_depth = int(well_data.current_bottom) - int(dictance_template_second) - \
                                                int(dictance_three) - int(lenght_template_first)
 
                     well_data.skm_depth = well_data.template_depth + int(dictance_three)
@@ -408,10 +408,10 @@ class TabPage_SO_with(QWidget):
                                    f' + НКТ{nkt_pod} {dictance_three}м + шаблон-{template_second}мм ' \
                                    f'L-{lenght_template_second}м '
                     # if dictance_three and dictance_template_second and dictance_template_first and lenght_template_first:
-                    well_data.template_depth_addition = well_data.current_bottom - int(dictance_template_first) - \
+                    well_data.template_depth_addition = int(well_data.current_bottom) - int(dictance_template_first) - \
                                                         int(dictance_template_second)
 
-                    well_data.template_depth = well_data.current_bottom - int(dictance_template_first) - \
+                    well_data.template_depth = int(well_data.current_bottom) - int(dictance_template_first) - \
                                                int(dictance_template_second) - int(dictance_three) - \
                                                int(lenght_template_first)
 
@@ -541,10 +541,10 @@ class TabPage_SO_with(QWidget):
             self.grid.addWidget(self.template_first_Edit, 5, 3)
             self.grid.addWidget(self.lenght_template_first_Label, 4, 4)
             self.grid.addWidget(self.lenght_template_first_Edit, 5, 4)
-            self.grid.addWidget(self.lenght_template_second_Label, 4, 9)
-            self.grid.addWidget(self.lenght_template_second_Edit, 5, 9)
-            self.grid.addWidget(self.dictance_three_Label, 4, 7)
-            self.grid.addWidget(self.dictance_three_Edit, 5, 7)
+            self.grid.addWidget(self.lenght_template_second_Label, 4, 11)
+            self.grid.addWidget(self.lenght_template_second_Edit, 5, 11)
+            self.grid.addWidget(self.dictance_three_Label, 4, 10)
+            self.grid.addWidget(self.dictance_three_Edit, 5, 10)
 
             self.lenght_template_first_Edit.setText(str(lenght_template_first))
             lenght_template_first = int(self.lenght_template_first_Edit.text())
@@ -661,10 +661,10 @@ class TabPage_SO_with(QWidget):
             self.grid.addWidget(self.template_first_Edit, 5, 3)
             self.grid.addWidget(self.lenght_template_first_Label, 4, 4)
             self.grid.addWidget(self.lenght_template_first_Edit, 5, 4)
-            self.grid.addWidget(self.lenght_template_second_Label, 4, 9)
-            self.grid.addWidget(self.lenght_template_second_Edit, 5, 9)
-            self.grid.addWidget(self.dictance_three_Label, 4, 7)
-            self.grid.addWidget(self.dictance_three_Edit, 5, 7)
+            self.grid.addWidget(self.lenght_template_second_Label, 4, 11)
+            self.grid.addWidget(self.lenght_template_second_Edit, 5, 11)
+            self.grid.addWidget(self.dictance_three_Label, 4, 10)
+            self.grid.addWidget(self.dictance_three_Edit, 5, 10)
 
             skm = str(well_data.column_additional_diametr._value)
             self.skm_Edit.setText(skm)

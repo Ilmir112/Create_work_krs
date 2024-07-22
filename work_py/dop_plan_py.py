@@ -35,13 +35,13 @@ class TabPageDp(QWidget):
         self.well_number_label = QLabel('номер скважины')
         self.well_number_edit = QLineEdit(self)
         self.well_number_edit.setValidator(self.validator_int)
-        self.well_number_edit.setText(f'{well_data.well_number._value}')
+
 
         self.well_area_label = QLabel('площадь скважины')
         self.well_area_edit = QLineEdit(self)
-        self.well_area_edit.setText(f"{well_data.well_area._value}")
 
-        self.number_DP_label = QLabel('номер дополнительного плана')
+
+        self.number_DP_label = QLabel('номер \nдополнительного плана')
         self.number_DP_Combo = QComboBox(self)
 
         self.number_DP_Combo.addItems(['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'])
@@ -58,11 +58,11 @@ class TabPageDp(QWidget):
         self.current_bottom_date_edit.setDisplayFormat("dd.MM.yyyy")
         self.current_bottom_date_edit.setDate(datetime.now())
 
-        self.method_bottom_label = QLabel('Метод определения забоя')
+        self.method_bottom_label = QLabel('Метод определения \nзабоя')
         self.method_bottom_combo = QComboBox(self)
         self.method_bottom_combo.addItems(['', 'ГИС', 'НКТ'])
 
-        self.template_depth_label = QLabel('Глубина спуска шаблона')
+        self.template_depth_label = QLabel('Глубина спуска \nшаблона')
         self.template_depth_edit = QLineEdit(self)
         self.template_depth_edit.setValidator(self.validator_float)
         self.template_depth_edit.setText(str(well_data.template_depth))
@@ -71,11 +71,11 @@ class TabPageDp(QWidget):
         self.template_lenght_edit = QLineEdit(self)
         self.template_lenght_edit.setValidator(self.validator_float)
 
-        self.change_pvr_combo_label = QLabel('Были ли изменения в интервале перфорации')
+        self.change_pvr_combo_label = QLabel('Были ли изменения \nв интервале перфорации')
         self.change_pvr_combo = QComboBox(self)
         self.change_pvr_combo.addItems(['', 'Нет', 'Да'])
 
-        self.skm_interval_label = QLabel('интервалы скреперования')
+        self.skm_interval_label = QLabel('интервалы \nскреперования')
         self.skm_interval_edit = QLineEdit(self)
 
         self.table_name = ''
@@ -151,76 +151,111 @@ class TabPageDp(QWidget):
         self.grid.addWidget(self.work_label, 25, 1)
         self.grid.addWidget(self.work_edit, 26, 1, 2, 4)
 
-        self.well_area_edit.editingFinished.connect(self.update_well)
+        self.well_area_edit.setText(f"{well_data.well_area._value}")
+        self.well_area_edit.textChanged.connect(self.update_well)
         self.well_number_edit.editingFinished.connect(self.update_well)
         self.change_pvr_combo.currentTextChanged.connect(self.update_change_pvr)
         self.change_pvr_combo.setCurrentIndex(1)
         self.change_pvr_combo.setCurrentIndex(0)
+        if well_data.work_plan not in ['dop_plan_in_base']:
+            self.well_number_edit.setText(f'{well_data.well_number._value}')
+
+        if well_data.data_in_base:
+            self.table_in_base_label = QLabel('данные по скважине      ')
+            self.table_in_base_combo = QComboBox()
+            self.table_in_base_combo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents)
+
+            self.well_data_label = QLabel('данные скважины в базе')
+            self.well_data_in_base_combo = QComboBox()
+            self.well_data_in_base_combo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents)
+
+            table_list = self.get_tables_starting_with(self.well_number_edit.text(), self.well_area_edit.text())[::-1]
+            if table_list:
+                self.table_in_base_combo.addItems(table_list)
+
+            self.index_change_label = QLabel('пункт после которого происходят изменения')
+            self.index_change_line = QLineEdit(self)
+            self.index_change_line.setValidator(self.validator_int)
+            self.grid.addWidget(self.table_in_base_label, 2, 5)
+            self.grid.addWidget(self.table_in_base_combo, 3, 5)
+            self.grid.addWidget(self.well_data_label, 2, 6)
+            self.grid.addWidget(self.well_data_in_base_combo, 3, 6)
+            self.grid.addWidget(self.index_change_label, 2, 7)
+            self.grid.addWidget(self.index_change_line, 3, 7)
+
+
+            self.index_change_line.editingFinished.connect(self.update_table_in_base_combo)
+            well_list = self.check_in_database_well_data(self.well_number_edit.text())
+            if well_list:
+                self.well_data_in_base_combo.addItems(well_list)
 
 
     def check_in_database_well_data(self, number_well):
         table_in_base_combo = self.table_in_base_combo.currentText()
         if ' от' in table_in_base_combo:
             table_in_base_combo = table_in_base_combo[:-14]
+        if number_well:
+            well_number, well_area = table_in_base_combo.split(" ")[:2]
+            self.well_number_edit.setText(well_number)
+            self.well_area_edit.setText(well_area)
 
-        well_number, well_area = table_in_base_combo.split(" ")[:2]
-        self.well_number_edit.setText(well_number)
-        self.well_area_edit.setText(well_area)
-
-        if well_area != ' ':
-            if well_data.connect_in_base:
-                try:
-                    conn = psycopg2.connect(**well_data.postgres_params_data_well)
-                    cursor = conn.cursor()
-
-                    # Запрос для извлечения всех скважин с наличием данных
-                    cursor.execute(
-                        "SELECT well_number, area_well, contractor, costumer, today, work_plan FROM wells WHERE well_number=(%s) AND area_well=(%s)",
-                                       (str(number_well), well_area))
-
-
-
-
-
-                except psycopg2.Error as e:
-                    # Выведите сообщение об ошибке
-                    mes = QMessageBox.warning(None, 'Ошибка',
-                                              f'Ошибка подключения к базе данных, Скважина не добавлена в базу: \n {e}')
-            else:
-                try:
-                    db_path = connect_to_db('well_data.db', 'data_base_well/')
-
-                    conn = sqlite3.connect(f'{db_path}')
-                    cursor = conn.cursor()
-
-                    cursor.execute("SELECT  well_number, area_well, contractor, costumer, today, work_plan FROM wells WHERE well_number = ? AND area_well = ? "
-                                   "AND contractor = ? AND costumer = ?",
-                                   (str(well_number), well_area, well_data.contractor, well_data.costumer))
-
-
-
-                except sqlite3.Error as e:
-                    # Выведите сообщение об ошибке
-                    mes = QMessageBox.warning(None, 'Ошибка',
-                                              'Ошибка подключения к базе данных, Скважина не добавлена в базу')
-            # Получение всех результатов
-            wells_with_data = cursor.fetchall()
-            # Проверка, есть ли данные
-            if wells_with_data:
-                well_list = []
-                for well in wells_with_data:
+            if well_area != ' ':
+                if well_data.connect_in_base:
                     try:
-                        if 'Ойл' in well[2]:
+                        conn = psycopg2.connect(**well_data.postgres_params_data_well)
+                        cursor = conn.cursor()
+
+                        # Запрос для извлечения всех скважин с наличием данных
+                        cursor.execute(
+                            "SELECT well_number, area_well, contractor, costumer, today, work_plan FROM wells "
+                            "WHERE well_number=(%s) AND area_well=(%s)",
+                                           (str(number_well), well_area))
+
+
+                    except psycopg2.Error as e:
+                        # Выведите сообщение об ошибке
+                        mes = QMessageBox.warning(None, 'Ошибка',
+                                                  f'Ошибка подключения к базе данных, Скважина не добавлена в базу: \n {e}')
+                else:
+                    try:
+                        db_path = connect_to_db('well_data.db', 'data_base_well/')
+
+                        conn = sqlite3.connect(f'{db_path}')
+                        cursor = conn.cursor()
+
+                        cursor.execute("SELECT  well_number, area_well, contractor, costumer, today, work_plan FROM wells "
+                                       "WHERE well_number = ? AND area_well = ? "
+                                       "AND contractor = ? AND costumer = ?",
+                                       (str(well_number), well_area, well_data.contractor, well_data.costumer))
+
+
+
+                    except sqlite3.Error as e:
+                        # Выведите сообщение об ошибке
+                        mes = QMessageBox.warning(None, 'Ошибка',
+                                                  f'Ошибка подключения к базе данных, Скважина не добавлена в базу: \n {e}')
+                # Получение всех результатов
+                wells_with_data = cursor.fetchall()
+                # Проверка, есть ли данные
+                if wells_with_data:
+                    well_list = []
+                    for well in wells_with_data:
+                        try:
+                            if 'Ойл' in well[2]:
+                                contractor = 'Ойл'
+                            elif 'РН' in well[2]:
+                                contractor = 'РН'
+                        except:
                             contractor = 'Ойл'
-                        elif 'РН' in well[2]:
-                            contractor = 'РН'
-                    except:
-                        contractor = 'Ойл'
-                    # Формируем список скважин
-                    well_list.append(f'{well[0]} {well[1]} {contractor} {well[5]} от {well[4]}')
-                return well_list[::-1]
-            else:
-                return False
+                        # Формируем список скважин
+                        well_list.append(f'{well[0]} {well[1]} {contractor} {well[5]} от {well[4]}')
+                        self.grid.setColumnMinimumWidth(5, self.table_in_base_combo.sizeHint().width())
+                        a = self.well_data_in_base_combo.sizeHint().width()
+                        self.grid.setColumnMinimumWidth(6, self.well_data_in_base_combo.sizeHint().width())
+
+                    return well_list[::-1]
+                else:
+                    return False
     def update_change_pvr(self, index):
         if self.old_index == 0:
             self.tableWidget.setHorizontalHeaderLabels(
@@ -286,26 +321,11 @@ class TabPageDp(QWidget):
 
         self.table_name = str(self.well_number_edit.text()) + self.well_area_edit.text()
         if well_data.data_in_base:
-            self.table_in_base_label = QLabel('данные в таблице')
-            self.table_in_base_combo = QComboBox()
-
-            self.well_data_label = QLabel('данные скважины в базе')
-            self.well_data_in_base_combo = QComboBox()
 
 
             table_list = self.get_tables_starting_with(self.well_number_edit.text(), self.well_area_edit.text())[::-1]
             if table_list:
                 self.table_in_base_combo.addItems(table_list)
-
-            self.index_change_label = QLabel('пункт после которого происходят изменения')
-            self.index_change_line = QLineEdit(self)
-            self.index_change_line.setValidator(self.validator_int)
-            self.grid.addWidget(self.table_in_base_label, 2, 5)
-            self.grid.addWidget(self.table_in_base_combo, 3, 5)
-            self.grid.addWidget(self.well_data_label, 2, 6)
-            self.grid.addWidget(self.well_data_in_base_combo, 3, 6)
-            self.grid.addWidget(self.index_change_label, 2, 7)
-            self.grid.addWidget(self.index_change_line, 3, 7)
 
             self.index_change_line.editingFinished.connect(self.update_table_in_base_combo)
             well_list = self.check_in_database_well_data(self.well_number_edit.text())
@@ -376,71 +396,71 @@ class TabPageDp(QWidget):
         elif 'РН' in well_data.contractor:
             contractor = 'РН'
 
-        if well_data.connect_in_base:
-            conn = psycopg2.connect(**well_data.postgres_conn_work_well)
-            cursor = conn.cursor()
-            cursor.execute("""
-            SELECT table_name
-            FROM information_schema.tables
-            WHERE table_schema = 'public'
-            AND table_name LIKE %s
-            """, (prefix + '%',))
-            tables = []
-
-            for row in cursor.fetchall():
-                data_in = get_table_creation_time(conn, row[0])
-
-                tables.append(row[0] + data_in)
-            # tables.insert(0, '')
-
-            cursor.close()
-
-
-            tables_filter = list(filter(lambda x: contractor in x, tables))
-            if len(tables_filter) == 0:
-                tables_filter = tables.insert(0, ' ')
-            try:
-                tables_filter = tables_filter[::-1]
-                return tables_filter
-            except:
-                return
-        else:
-            try:
-                # Формируем полный путь к файлу базы данных
-                db_path = connect_to_db('databaseWell.db', 'data_base_well')
-                conn = sqlite3.connect(db_path)
+        if prefix != '':
+            if well_data.connect_in_base:
+                conn = psycopg2.connect(**well_data.postgres_conn_work_well)
                 cursor = conn.cursor()
-
-                # Получаем все имена таблиц в базе данных
-                cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
-
+                cursor.execute("""
+                SELECT table_name
+                FROM information_schema.tables
+                WHERE table_schema = 'public'
+                AND table_name LIKE %s
+                """, (prefix + '%',))
                 tables = []
-                table_in_base = cursor.fetchall()[1:]
 
-                for table_name in table_in_base:
-                    if prefix in table_name[0].split(' ')[0]:
-                        data_in = get_table_creation_time(conn, table_name[0])
-                        tables.append(table_name[0] + data_in)
+                for row in cursor.fetchall():
+                    data_in = get_table_creation_time(conn, row[0])
+
+                    tables.append(row[0] + data_in)
                 # tables.insert(0, '')
 
-                # Фильтруем таблицы по префиксу и подрядчику
+                cursor.close()
+
+
                 tables_filter = list(filter(lambda x: contractor in x, tables))
+                if len(tables_filter) == 0:
+                    tables_filter = tables.insert(0, ' ')
+                try:
+                    tables_filter = tables_filter[::-1]
+                    return tables_filter
+                except:
+                    return
+            else:
+                try:
+                    # Формируем полный путь к файлу базы данных
+                    db_path = connect_to_db('databaseWell.db', 'data_base_well')
+                    conn = sqlite3.connect(db_path)
+                    cursor = conn.cursor()
 
-                # # Добавляем пустую строку в начало списка
-                # tables_filter.insert(0, '')
+                    # Получаем все имена таблиц в базе данных
+                    cursor.execute("""SELECT name FROM sqlite_master WHERE type='table' AND name LIKE ?""", (prefix + '%',))
 
-                # Сортируем таблицы в обратном порядке
-                tables_filter = tables_filter[::-1]
+                    tables = []
+                    table_in_base = cursor.fetchall()[1:]
 
-                return tables_filter
+                    for table_name in table_in_base:
+                        if prefix in table_name[0].split(' ')[0]:
+                            data_in = get_table_creation_time(conn, table_name[0])
+                            tables.append(table_name[0] + data_in)
+                    # tables.insert(0, '')
 
-            except sqlite3.Error as e:
-                print(f"Ошибка получения списка таблиц: {e}")
-            finally:
-                if cursor:
-                    cursor.close()
-                if conn:
-                    conn.close()
+                    # Фильтруем таблицы по префиксу и подрядчику
+                    tables_filter = list(filter(lambda x: contractor in x, tables))
+
+                    # Сортируем таблицы в обратном порядке
+                    tables_filter = tables_filter[::-1]
+
+                    return tables_filter
+
+                except sqlite3.Error as e:
+                    print(f"Ошибка получения списка таблиц: {e}")
+                finally:
+                    if cursor:
+                        cursor.close()
+                    if conn:
+                        conn.close()
+        else:
+            return []
 
 
 class TabWidget(QTabWidget):
@@ -467,8 +487,6 @@ class DopPlanWindow(QMainWindow):
         self.target_row_index_cancel = None
         self.old_index = 0
         self.tableWidget = QTableWidget(0, 12)
-
-
 
         self.tabWidget = TabWidget(self.work_plan, self.tableWidget, self.old_index)
         self.tableWidget.setSortingEnabled(True)
@@ -654,7 +672,7 @@ class DopPlanWindow(QMainWindow):
         count_row_insert = len(plast_list)
         count_row_in_plan = self.target_row_index_cancel - self.target_row_index-2
         boundaries_dict_new = {}
-        if self.target_row_index is not 5000:
+        if self.target_row_index != 5000:
             n = len(data)
             if count_row_in_plan < count_row_insert:
                 count_row_insert = count_row_insert - count_row_in_plan
@@ -819,7 +837,7 @@ class DopPlanWindow(QMainWindow):
         if change_pvr_combo == '':
             mes = QMessageBox.warning(self, 'Ошибка', 'Нужно выбрать пункт изменения ПВР')
             return
-        if well_data.work_plan == 'dop_plan_in_base':
+        if well_data.data_in_base:
 
             fluid = self.tabWidget.currentWidget().fluid_edit.text().replace(',', '.')
             current_bottom = self.tabWidget.currentWidget().current_bottom_edit.text()
@@ -907,7 +925,8 @@ class DopPlanWindow(QMainWindow):
                     data_table_in_base_combo = table_in_base_combo.split(' ')[-1]
                     table_in_base = table_in_base_combo.split(' ')[2]
                     number_dp_in_base = "".join(c for c in table_in_base if c.isdigit())
-                    table_in_base = table_in_base_combo.split(' ')[2].replace('krs', 'ПР').replace('dop_plan_in_base', 'ДП№').replace('dop_plan', 'ДП№')
+                    table_in_base = table_in_base_combo.split(' ')[2].replace('krs', 'ПР').replace('dop_plan_in_base',
+                                                                                                   'ДП№').replace('dop_plan', 'ДП№')
 
 
 
@@ -1042,9 +1061,9 @@ class DopPlanWindow(QMainWindow):
                 return
 
 
-            if float(current_bottom) > well_data.bottomhole_drill._value:
-                mes = QMessageBox.critical(self, 'Забой', 'Текущий забой больше пробуренного забоя')
-                return
+            # if float(current_bottom) > well_data.bottomhole_drill._value:
+            #     mes = QMessageBox.critical(self, 'Забой', 'Текущий забой больше пробуренного забоя')
+            #     return
             well_data.fluid_work, well_data.fluid_work_short = GnoWindow.calc_work_fluid(self, fluid)
 
             well_data.template_depth = float(template_depth_edit)
@@ -1075,7 +1094,7 @@ class DopPlanWindow(QMainWindow):
 
 
             work_list = [self.work_list(work_earlier)]
-            MyWindow.populate_row(self, self.ins_ind + 2, work_list, self.table_widget, self.work_plan)
+            # MyWindow.populate_row(self, self.ins_ind + 2, work_list, self.table_widget, self.work_plan)
 
         well_data.pause = False
         self.close()
@@ -1295,7 +1314,8 @@ class DopPlanWindow(QMainWindow):
         well_data.category_h2s = result[paragraph_row][9]
         well_data.category_gf = result[paragraph_row][10]
         try:
-            well_data.template_depth, well_data.template_lenght, well_data.template_depth_addition, well_data.template_lenght_addition = json.loads(result[paragraph_row][11])
+            well_data.template_depth, well_data.template_lenght, well_data.template_depth_addition, \
+            well_data.template_lenght_addition = json.loads(result[paragraph_row][11])
         except:
             well_data.template_depth = result[paragraph_row][11]
         well_data.skm_interval = json.loads(result[paragraph_row][12])

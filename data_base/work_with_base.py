@@ -696,7 +696,7 @@ def insert_database_well_data(well_number, well_area, contractor, costumer, data
 
     data_well = json.dumps(data_well_dict, ensure_ascii=False)
     excel_json = json.dumps(excel, ensure_ascii=False)
-    date_today = datetime.now().strftime("%d.%m.%Y")
+    date_today = datetime.now()
     # print(row, well_data.count_row_well)
     if 'dop_plan' in work_plan:
         work_plan_str = f'ДП№{well_data.number_dp}'
@@ -852,14 +852,15 @@ def connect_to_db(name_base, folder_base):
 
 
 def check_in_database_well_data(number_well, area_well, work_plan):
+    work_plan = 'krs'
     if well_data.connect_in_base:
         try:
             conn = psycopg2.connect(**well_data.postgres_params_data_well)
             cursor = conn.cursor()
 
             cursor.execute("SELECT data_well FROM wells WHERE well_number = %s AND area_well = %s "
-                           "AND contractor = %s AND costumer = %s AND work_plan= %s",
-                           (str(number_well._value), area_well._value, well_data.contractor, well_data.costumer, work_plan))
+                           "AND contractor = %s AND costumer = %s",
+                           (str(number_well._value), area_well._value, well_data.contractor, well_data.costumer))
 
             data_well = cursor.fetchone()
             if data_well:
@@ -1225,8 +1226,9 @@ def get_table_creation_time(conn, table_name):
             cur.execute(f"SELECT * FROM \"{table_name}\"")
 
             try:
+
                 # Получаем результаты запроса в виде списка кортежей
-                rows = cur.fetchall()[0][15].split(' ')[0]
+                rows = cur.fetchone()[15]
                 return f' от {rows}'
             except:
                 return ''

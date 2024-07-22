@@ -254,6 +254,7 @@ class TabPage_SO(QWidget):
         self.dict_nkt = well_data.dict_nkt
         self.dict_nkt_po = well_data.dict_nkt_po
         # print(well_data.dict_nkt,  well_data.dict_nkt_po)
+        a = well_data.dict_sucker_rod
         self.dict_sucker_rod = well_data.dict_sucker_rod
         self.dict_sucker_rod_po = well_data.dict_sucker_rod_po
 

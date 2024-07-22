@@ -13,6 +13,7 @@ from find import ProtectedIsNonNone
 from plan import delete_rows_pz
 from block_name import region, razdel_1, curator_sel, pop_down
 from work_py.dop_plan_py import DopPlanWindow
+from work_py.check_in_pz import CustomMessageBox
 
 
 class CreatePZ(QMainWindow):
@@ -27,6 +28,7 @@ class CreatePZ(QMainWindow):
     def open_excel_file(self, ws, work_plan):
         from find import FindIndexPZ
         from category_correct import CategoryWindow
+        from work_py.opressovka import TabPage_SO
         from main import MyWindow
         from find import WellNkt, Well_perforation, WellCondition, WellHistory_data, Well_data, Well_Category, \
             WellFond_data, WellSucker_rod, Well_expected_pick_up, WellData
@@ -45,20 +47,31 @@ class CreatePZ(QMainWindow):
         well_data.region = region(well_data.cdng._value)
 
         if work_plan == 'dop_plan':
+
+            data_well = check_in_database_well_data(well_data.well_number, well_data.well_area, well_data.work_plan)[0]
+            if data_well:
+                change_work_work_plan = QMessageBox.question(self,
+                                                             'Наличие в базе данных',
+                                                             'Проверка показала что данные по скважине есть в базе данных, '
+                                                             'загрузить с базы?')
+            if change_work_work_plan == QMessageBox.StandardButton.Yes:
+                well_data.work_plan = 'dop_plan_in_base'
+                self.work_plan = 'dop_plan_in_base'
+                well_data.data_in_base = True
+                self.rir_window = DopPlanWindow(well_data.ins_ind, None, work_plan)
+                # self.rir_window.setGeometry(200, 400, 100, 200)
+                self.rir_window.show()
+                MyWindow.pause_app()
+                well_data.pause = True
+                self.rir_window = None
+
+                return
+
+            well_data.data_well_is_True = False
             number_list = list(map(str, range(1, 50)))
             well_data.number_dp, ok = QInputDialog.getItem(self, 'Номер дополнительного плана работ',
                                                            'Введите номер дополнительного плана работ',
                                                            number_list, 0, False)
-
-
-            data_well = check_in_database_well_data(well_data.well_number, well_data.well_area,well_data.work_plan )[0]
-            if data_well:
-                insert_data_well_dop_plan(data_well)
-                table_name = str(well_data.well_number._value) + " " + well_data.well_area._value + " " + work_plan + str(well_data.number_dp) + " " + well_data.contractor
-                DopPlanWindow.extraction_data(self, table_name, 1)
-            else:
-                well_data.data_well_is_True = False
-
 
         if well_data.data_well_is_True is False:
             WellNkt.read_well(self, ws, well_data.pipes_ind._value, well_data.condition_of_wells._value)
@@ -77,8 +90,26 @@ class CreatePZ(QMainWindow):
             contractor = 'ОЙЛ'
         elif 'РН' in well_data.contractor:
             contractor = 'РН'
+
+        if str(well_data.paker_do['posle']).lower() not in ['0', 0, '-', 'отсут', '', None]:
+            a = well_data.depth_fond_paker_do['posle']
+            if '/' in str(well_data.depth_fond_paker_do['posle']):
+                paker_diametr = TabPage_SO.paker_diametr_select(self, well_data.depth_fond_paker_do['posle'].split('/')[0])
+                if paker_diametr not in well_data.paker_do['posle']:
+
+                    well_data.check_data_in_pz.append(f'Не корректно указан диаметр фондового пакера в карте спуска '
+                                                      f'ремонта {well_data.paker_do["posle"].split("/")[0]} трубуется пакер '
+                                                      f'диаметром {paker_diametr}')
+            else:
+                paker_diametr = TabPage_SO.paker_diametr_select(self,
+                                                                    well_data.depth_fond_paker_do['posle'])
+                well_data.check_data_in_pz.append(f'Не корректно указан диаметр фондового пакера в карте спуска '
+                                                  f'ремонта {well_data.paker_do["posle"]} трубуется пакер '
+                                                  f'диаметром {paker_diametr}м')
+
         if work_plan == 'plan_change':
-            DopPlanWindow.extraction_data(self, str(well_data.well_number._value) + " " + well_data.well_area._value + " " + 'krs' + " " + contractor, 1)
+            DopPlanWindow.extraction_data(self, str(well_data.well_number._value) + " " +
+                                          well_data.well_area._value + " " + 'krs' + " " + contractor, 1)
             ws.delete_rows(well_data.plan_correct_index._value, ws.max_row)
             return ws
 
@@ -148,6 +179,14 @@ class CreatePZ(QMainWindow):
                 image_loader = SheetImageLoader(ws)
             except:
                 mes = QMessageBox.warning(None, 'Ошибка', 'Ошибка в копировании изображений')
+
+            if len(well_data.check_data_in_pz) != 0:
+                check_str = ''
+                for ind, check_data in enumerate(well_data.check_data_in_pz):
+                    if check_data not in check_str:
+                        check_str += f'{ind+1}. {check_data} \n'
+                self.show_info_message(check_str)
+
             well_data.image_data = []
             for row in range(1, well_data.data_well_max._value):
                 for col in range(1, 12):
@@ -315,6 +354,10 @@ class CreatePZ(QMainWindow):
         else:
             return ws
 
+    @staticmethod
+    def show_info_message(message):
+        dialog = CustomMessageBox(message)
+        dialog.exec_()  # Открываем диалоговое окно в модальном режиме
     def add_itog(self, ws, ins_ind, work_plan):
         if ws.merged_cells.ranges:
             merged_cells_copy = list(ws.merged_cells.ranges)  # Создаем копию множества объединенных ячеек
