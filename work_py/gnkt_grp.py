@@ -639,7 +639,7 @@ class GnktOsvWindow(QMainWindow):
         for row in range(len(work_list)):
             for col in range(23):
                 if work_list[row][col]:
-                    # print(row, col)
+
                     ws.cell(row=row + 1, column=col + 1).value = work_list[row][col]
         # Перебираем строки и скрываем те, у которых все значения равны None
         for row_ind, row in enumerate(ws.iter_rows(values_only=True)):
@@ -712,7 +712,7 @@ class GnktOsvWindow(QMainWindow):
         if well_data.paker_do["do"] != 0:
             coordinate_nkt_with_paker = 'F6'
             main.MyWindow.insert_image(self, ws, f'{well_data.path_image}imageFiles/schema_well/НКТ с пакером.png',
-                                       coordinate_nkt_with_paker, 100, 470)
+                                       coordinate_nkt_with_paker, 100, 510)
         else:
             coordinate_nkt_with_voronka = 'F6'
             main.MyWindow.insert_image(self, ws, f'{well_data.path_image}imageFiles/schema_well/НКТ с воронкой.png',

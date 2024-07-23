@@ -54,7 +54,7 @@ class TabPageDp(QWidget):
 
         self.current_bottom_label = QLabel('необходимый текущий забой')
         self.current_bottom_edit = QLineEdit(self)
-        self.current_bottom_edit.setText(f'{well_data.current_bottom}')
+        # self.current_bottom_edit.setText(f'{well_data.current_bottom}')
 
         self.fluid_label = QLabel("уд.вес жидкости глушения", self)
         self.fluid_edit = QLineEdit(self)
@@ -183,6 +183,15 @@ class GnktOsvWindow2(QMainWindow):
         well_data.pipe_mileage = pipe_mileage_edit
         well_data.iznos = iznos_gnkt_edit
         current_bottom_edit = self.tabWidget.currentWidget().current_bottom_edit.text()
+        if current_bottom_edit == '':
+            mes = QMessageBox.warning(self, 'Некорректные данные', f'не указан текущий забоя')
+            return
+        else:
+            current_bottom_edit = float(current_bottom_edit.replace(',', '.'))
+            if current_bottom_edit > float(well_data.bottomhole_drill._value):
+                mes = QMessageBox.warning(self, 'Некорректные данные',
+                                          f'Текущий забой ниже пробуренного забоя {well_data.bottomhole_drill._value}')
+                return
         GnktOsvWindow2.current_bottom_edit = int(float(current_bottom_edit))
         fluid_edit = self.tabWidget.currentWidget().fluid_edit.text()
         GnktOsvWindow2.fluid_edit = round(float(fluid_edit), 2)
@@ -502,22 +511,64 @@ class GnktOsvWindow2(QMainWindow):
                 pass
 
         koef_anomal = round(float(self.pressuar) * 101325 / (float(vertikal) * 9.81 * 1000), 1)
-        nkt = list(well_data.dict_nkt.keys())[0]
-        nkt_str = ''
-        if '73' in str(nkt):
-            nkt = 73
-            nkt_str += f'{nkt} '
-            nkt_widht = 5.5
-        elif '89' in str(nkt):
-            nkt = 89
-            nkt_str += f'{nkt} '
-            nkt_widht = 7.34
-        elif '60' in str(nkt):
-            nkt = 60
-            nkt_str += f'{nkt} '
-            nkt_widht = 5
 
-        lenght_nkt = sum(list(map(int, well_data.dict_nkt.values())))
+        nkt_str = ''
+        lenght_str = '0-'
+        vn_str = ''
+        nkt_widht_str = ''
+        sorted_dict = dict(sorted(well_data.dict_nkt.items(), reverse=True))
+        len_a = 0
+        volume_vn_str = ''
+        volume_str = ''
+        for nkt_in, lenght in sorted_dict.items():
+
+            if '60' in str(nkt_in):
+                nkt_in = 60
+                nkt_str += f'{nkt_in}\n'
+                nkt_widht = 5
+                nkt_widht_str += f'{nkt_widht }\n'
+                vn_str += f'{nkt_in - 2 * nkt_widht}\n'
+                volume_vn = round((nkt_in - 2 * nkt_widht)**2*3.14/4/1000, 1)
+                volume_vn_str += f'{volume_vn}\n'
+                volume = round((volume_vn * lenght) / 1000, 1)
+                volume_str += f'{volume}\n'
+
+            elif '73' in str(nkt_in):
+                nkt_in = 73
+                nkt_str += f'{nkt_in}\n'
+                nkt_widht = 5.5
+                nkt_widht_str += f'{nkt_widht}\n'
+                vn_str += f'{nkt_in - 2 * nkt_widht}\n'
+                volume_vn = round((nkt_in - 2 * nkt_widht) ** 2 * 3.14 / 4 / 1000, 1)
+                volume_vn_str += f'{volume_vn}\n'
+                volume = round((volume_vn * lenght) / 1000, 1)
+                volume_str += f'{volume}\n'
+            elif '89' in str(nkt_in):
+                nkt_in = 89
+                nkt_str += f'{nkt_in}\n'
+                nkt_widht = 7.34
+                nkt_widht_str += f'{nkt_widht}\n'
+                vn_str += f'{nkt_in - 2 * nkt_widht}\n'
+                volume_vn = round((nkt_in - 2 * nkt_widht) ** 2 * 3.14 / 4 / 1000, 1)
+                volume_vn_str += f'{volume_vn}\n'
+                volume = round((volume_vn * lenght) / 1000, 1)
+                volume_str += f'{volume}\n'
+
+            lenght_str += f'{lenght+len_a}\n{lenght}-'
+            len_a += lenght
+
+
+        nkt_widht_str = nkt_widht_str[:-1]
+        lenght_str = lenght_str.split('\n')
+        lenght_str = lenght_str[:-1]
+        volume_str = volume_str.split('\n')[:-1]
+        volume_str = '\n'.join(volume_str)
+        volume_vn_str = volume_vn_str.split('\n')[:-1]
+        volume_vn_str = '\n'.join(volume_vn_str)
+        nkt_str = nkt_str[:-1]
+        vn_str = vn_str[:-1]
+
+        lenght_nkt = '\n'.join(lenght_str)
 
         volume_vn_gnkt = round(30.2 ** 2 * 3.14 / (4 * 1000), 2)
 
@@ -569,6 +620,9 @@ class GnktOsvWindow2(QMainWindow):
             Qwater = f'{well_data.Qwater}м3/сут'
             proc_water = f'{well_data.proc_water}%'
 
+
+        nkt = list(well_data.dict_nkt.keys())[0]
+
         wellhead_fittings = well_data.wellhead_fittings
         if well_data.work_plan == 'gnkt_after_grp':
 
@@ -587,8 +641,8 @@ class GnktOsvWindow2(QMainWindow):
              None, None, None, f'Тек. забой: \n{well_data.current_bottom}м ', None]
         lenght_paker = 2
         if well_data.curator == 'ОР' and well_data.region == 'ТГМ':
-            lenght_paker =  round(float(well_data.depth_fond_paker2_do["do"]) - float(well_data.depth_fond_paker_do["do"]), 1)
-
+            lenght_paker = round(float(well_data.depth_fond_paker2_do["do"]) - float(well_data.depth_fond_paker_do["do"]), 1)
+            voronka = well_data.depth_fond_paker_do["do"] + lenght_paker
         schema_well_list = [
             [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None],
@@ -623,7 +677,7 @@ class GnktOsvWindow2(QMainWindow):
              f'{well_data.column_direction_diametr._value}', well_data.column_direction_wall_thickness._value,
              round(well_data.column_direction_diametr._value - 2 * well_data.column_direction_wall_thickness._value, 1),
              f'0-', well_data.column_direction_lenght._value, f'{well_data.level_cement_direction._value}', None, None],
-            [None, None, None, None, None, None, None, None, None, f'0-{lenght_nkt}м', None, None, 'Кондуктор',
+            [None, None, None, None, None, None, None, None, None, f'{lenght_nkt}м', None, None, 'Кондуктор',
              None, None, well_data.column_conductor_diametr._value, well_data.column_conductor_wall_thickness._value,
              f'{round(well_data.column_conductor_diametr._value - 2 * well_data.column_conductor_wall_thickness._value)}',
              f'0-', well_data.column_conductor_lenght._value,
@@ -643,7 +697,7 @@ class GnktOsvWindow2(QMainWindow):
              column_data_add_wall_thickness, column_data_add_vn_volume, column_add_head, column_add_shoe, None,
              volume_pm_dp, well_volume_dp],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'колонна НКТ', None, None, nkt_str,
-             nkt_widht, nkt - 2 * nkt_widht, f'0-', lenght_nkt, None, '=R19^2*3.14/4/1000', '=T19*V19/1000'],
+             nkt_widht_str, vn_str, lenght_nkt, None, None, volume_vn_str, volume_str],
             [None, None, None, None, None, None, None, None, None, None, None, None, f'{well_data.paker_do["do"]}',
              None, None, None, None,
              50, well_data.depth_fond_paker_do["do"], well_data.depth_fond_paker_do["do"] + lenght_paker, lenght_paker, None, None],
@@ -652,7 +706,7 @@ class GnktOsvWindow2(QMainWindow):
             [None, None, None, None, None, None, None, None, None, f'на гл {well_data.depth_fond_paker_do["do"]}м',
              None, None,
              'воронка', None, None, nkt, None,
-             None, well_data.depth_fond_paker_do["do"], None, None, None, None],
+             None, well_data.depth_fond_paker_do["do"] + lenght_paker, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Данные о перфорации', None, None,
              None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
@@ -728,13 +782,13 @@ class GnktOsvWindow2(QMainWindow):
              self.date_dmy(well_data.date_drilling_cancel),
              None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Дата ввода в эксплуатацию', None,
-             None, None, None, f'{self.date_dmy(well_data.сommissioning_date)}', None, None, None, None, None],
+             None, None, None, f'{well_data.сommissioning_date}', None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Р в межколонном пространстве',
              0, None, None, None, 0, None, ' ', None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Первоначальное Р опр-ки ЭК', None,
              None, None, None, well_data.first_pressure._value, None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Результат предыдущей опрес-и ЭК',
-             None, None, None, None, well_data.max_admissible_pressure._value, None, '', None, 'гермет.', None],
+             None, None, None, None, well_data.rezult_pressuar._value, None, '', None, 'гермет.', None],
             [None, None, None, None, None, None, None, None, 'Тек.забой' if well_data.work_plan != 'gnkt_bopz' else '',
              None, None, None,
              'Макс.допустимое Р опр-ки ЭК', None, None, None, None, well_data.max_admissible_pressure._value,
@@ -776,7 +830,7 @@ class GnktOsvWindow2(QMainWindow):
             [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None],
         ]
-        print(f'буровой {well_data.bur_rastvor}')
+
         if well_data.work_plan == 'gnkt_bopz':
             schema_well_list.append(list_gnkt_bopz)
         if well_data.paker_do['do'] == 0:
@@ -833,7 +887,7 @@ class GnktOsvWindow2(QMainWindow):
         if '-' in str(date_str):
             return date_str
         elif type(date_str) is str:
-            date_obj = datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
+            date_obj = datetime.strftime('%d.%m.%Y')
         else:
             date_obj = date_str
             # print(date_obj)

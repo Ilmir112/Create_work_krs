@@ -519,7 +519,7 @@ class WellHistory_data(FindIndexPZ):
 
         well_data.max_expected_pressure = ProtectedIsNonNone('не корректно')
         well_data.max_admissible_pressure = ProtectedIsNonNone('не корректно')
-
+        well_data.rezult_pressuar = ProtectedIsNonNone('не корректно')
         # print(begin_index, cancel_index)
         for row_index, row in enumerate(ws.iter_rows(min_row=begin_index, max_row=cancel_index)):
             for col, cell in enumerate(row):
@@ -552,6 +552,8 @@ class WellHistory_data(FindIndexPZ):
                                                                                         col + 1, 1)
                     elif 'Дата ввода в экспл' in str(value):
                         well_data.сommissioning_date = row[col + 2].value
+                        if type(well_data.сommissioning_date) is datetime:
+                            well_data.сommissioning_date = well_data.сommissioning_date.strftime('%d.%m.%Y')
                     elif 'ствол скважины' in str(row[col].value).lower() and 'буров' in str(row[col].value).lower():
                         well_data.bur_rastvor = row[col].value
 
@@ -561,6 +563,13 @@ class WellHistory_data(FindIndexPZ):
                                                                                          well_data.max_expected_pressure,
                                                                                          row_index + begin_index,
                                                                                          col + 1, 1)
+                    elif 'Результат предыдущей ' in str(value):
+                        well_data.rezult_pressuar = ProtectedIsDigit(row[col + 1].value)
+                        well_data.rezult_pressuar = FindIndexPZ.definition_is_None(self,
+                                                                                         well_data.rezult_pressuar,
+                                                                                         row_index + begin_index,
+                                                                                         col + 1, 1)
+
                     elif 'Первоначальное давление опрессовки э/колонны' == value:
                         well_data.first_pressure = ProtectedIsDigit(row[col + 3].value)
 
