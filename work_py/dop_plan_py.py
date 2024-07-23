@@ -62,7 +62,7 @@ class TabPageDp(QWidget):
         self.method_bottom_combo = QComboBox(self)
         self.method_bottom_combo.addItems(['', 'ГИС', 'НКТ'])
 
-        self.template_depth_label = QLabel('Глубина спуска \nшаблона')
+        self.template_depth_label = QLabel('Глубина \nшаблонирования ЭК')
         self.template_depth_edit = QLineEdit(self)
         self.template_depth_edit.setValidator(self.validator_float)
         self.template_depth_edit.setText(str(well_data.template_depth))
@@ -907,6 +907,7 @@ class DopPlanWindow(QMainWindow):
 
 
                 well_data.skm_interval = skm_interval
+                b = well_data.skm_interval
             except:
                 mes = QMessageBox.warning(self, 'Ошибка',
                                           'в интервале скреперования отсутствует корректные интервалы скреперования')
@@ -977,6 +978,13 @@ class DopPlanWindow(QMainWindow):
 
             well_data.current_bottom = current_bottom
 
+            if skm_interval_edit not in ['', 0, '0-0'] and '-' in skm_interval_edit:
+                if ',' in skm_interval_edit:
+                    for skm_int in skm_interval_edit.split(','):
+                        well_data.skm_interval.append(list(map(int, skm_int.split('-'))))
+                else:
+                    well_data.skm_interval.append(list(map(int, skm_interval_edit.split('-'))))
+
             rows = self.tableWidget.rowCount()
 
             if change_pvr_combo == 'Да':
@@ -1037,9 +1045,22 @@ class DopPlanWindow(QMainWindow):
                 template_depth_addition_edit = self.tabWidget.currentWidget().template_depth_addition_edit.text()
                 template_lenght_addition_edit = self.tabWidget.currentWidget().template_lenght_addition_edit.text()
             skm_interval_edit = self.tabWidget.currentWidget().skm_interval_edit.text()
+            try:
+
+                if skm_interval_edit not in ['', 0, '0-0'] and '-' in skm_interval_edit:
+                    if ',' in skm_interval_edit:
+                        for skm_int in skm_interval_edit.split(','):
+                            well_data.skm_interval.append(list(map(int, skm_int.split('-'))))
+                    else:
+                        well_data.skm_interval.append(list(map(int, skm_interval_edit.split('-'))))
+
+            except:
+                mes = QMessageBox.warning(self, 'Ошибка',
+                                          'в интервале скреперования отсутствует корректные интервалы скреперования')
+                return
 
             if current_bottom == '' or fluid == '' or work_earlier == '' or \
-                    template_depth_edit == '' or template_lenght_edit == '' or skm_interval_edit == '':
+                    template_depth_edit == '' or template_lenght_edit == '':
                 # print(current_bottom, fluid, work_earlier)
                 mes = QMessageBox.critical(self, 'Забой', 'не все значения введены')
                 return
@@ -1072,20 +1093,7 @@ class DopPlanWindow(QMainWindow):
                 well_data.template_depth = float(template_depth_addition_edit)
                 well_data.template_lenght = float(template_lenght_addition_edit)
 
-            try:
-                skm_interval = []
-                if ',' in skm_interval_edit:
-                    for skm in skm_interval_edit.split(','):
-                        if '-' in skm:
-                            skm_interval.append(skm)
-                else:
-                    if '-' in skm_interval_edit:
-                        skm_interval.append(skm_interval_edit)
 
-                well_data.skm_interval = skm_interval
-            except:
-                mes = QMessageBox.warning(self, 'Ошибка',
-                                          'в интервале скреперования отсутствует корректные интервалы скреперования')
 
             if len(well_data.skm_interval) == 0:
                 mes = QMessageBox.warning(self, 'Ошибка',
@@ -1094,7 +1102,7 @@ class DopPlanWindow(QMainWindow):
 
 
             work_list = [self.work_list(work_earlier)]
-            # MyWindow.populate_row(self, self.ins_ind + 2, work_list, self.table_widget, self.work_plan)
+            MyWindow.populate_row(self, self.ins_ind + 2, work_list, self.table_widget, self.work_plan)
 
         well_data.pause = False
         self.close()
@@ -1319,6 +1327,7 @@ class DopPlanWindow(QMainWindow):
         except:
             well_data.template_depth = result[paragraph_row][11]
         well_data.skm_interval = json.loads(result[paragraph_row][12])
+        a = well_data.skm_interval
         b = json.loads(result[paragraph_row][12])
 
 

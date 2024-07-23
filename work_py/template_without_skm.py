@@ -711,8 +711,8 @@ class Template_without_skm(QMainWindow):
              None, None, None, None, None, None, None,
              'Мастер КРС', liftingNKT_norm(current_bottom, 1.2)]
         ]
-        if abs(well_data.perforation_roof - current_bottom) < 15:
-            list_template_ek.pop(4)
+        if abs(well_data.perforation_sole - current_bottom) < 15:
+            list_template_ek.pop(-2)
 
         notes_list = [
             [None, None,

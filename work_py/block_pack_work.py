@@ -184,6 +184,7 @@ class BlockPackWindow(QMainWindow):
     def block_pack_work(self, current_edit, pero_combo_QCombo,
                               type_of_block_processing_combo, block_volume_edit, oil_volume_edit, fluid_new_edit, block_type_edit):
         from .rir import RirWindow
+        from work_py.alone_oreration import well_volume, volume_nkt, volume_nkt_metal
         from .template_work import TemplateKrs
         if 1 < fluid_new_edit < 1.34:
             type_of_chemistry = 'CaCl'
@@ -195,7 +196,7 @@ class BlockPackWindow(QMainWindow):
             volume_chemistry = round(well_data.dict_calc_CaZHG[fluid_new_edit][0] * block_volume_edit - oil_volume_edit - block_type_edit/1000, 1)
 
 
-
+        volume_zatrub = well_volume(self, current_edit) - volume_nkt_metal(well_data.dict_nkt) -volume_nkt(well_data.dict_nkt)
         count_cycle = int(block_volume_edit / 4)
 
         pero_list = RirWindow.pero_select(self, current_edit, pero_combo_QCombo)
@@ -208,7 +209,7 @@ class BlockPackWindow(QMainWindow):
                  None, None, None, None, None, None, None,
                  'мастер КРС', 2.5],
                 [None, None,
-                 f'Завезти пресной воды 1,01г/см3-{water_fresh}м3, {type_of_chemistry}-{volume_chemistry}т, '
+                 f'Завезти пресной воды -{water_fresh}м3, {type_of_chemistry}-{volume_chemistry}т, '
                  f'эмульгатор «Девон-4» в объеме {block_type_edit}м3, '
                  f'дегазированную нефть-{oil_volume_edit}м3. ', None, None, None, None,
                  None, None, None,
@@ -255,8 +256,7 @@ class BlockPackWindow(QMainWindow):
                  f'объеме {round(current_edit * 1.12 / 1000, 1)}м3 тех. жидкостью  уд.весом {well_data.fluid_work}',
                  None, None, None, None, None, None, None,
                  'Мастер КРС',
-                 round(
-                     current_edit / 9.5 * 0.028 * 1.2 * 1.04 + 0.005 * current_edit / 9.5 + 0.17 + 0.5,
+                 round(current_edit / 9.5 * 0.028 * 1.2 * 1.04 + 0.005 * current_edit / 9.5 + 0.17 + 0.5,
                      2)] ]
         else:
             block_pack_list = [
@@ -280,8 +280,8 @@ class BlockPackWindow(QMainWindow):
                 [None, None,
                  f'Приготовить блокирующую пачку в объеме {block_volume_edit}м3 плотностью {fluid_new_edit}г/см3 с '
                  f'использованием насосного агрегата ЦА-320:\n'
-                 f'- в мерник агрегата перекачать нефть в объеме {round(oil_volume_edit / count_cycle, 1)}м3 и эмульгатор в объеме '
-                 f'{round(block_type_edit, 1)}м3,и перемешать в течение 15-20 мин;\n'
+                 f'- в мерник агрегата перекачать нефть в объеме {round(oil_volume_edit / count_cycle, 1)}м3 и '
+                 f'эмульгатор в объеме {round(block_type_edit, 1)}м3,и перемешать в течение 15-20 мин;\n'
                  f'- при перемешивании насосного агрегата «на себя» произвести подачу солевого раствора CaCl в объеме '
                  f' {round((block_volume_edit - oil_volume_edit - block_type_edit) / count_cycle, 1)}м3 в емкость '
                  f'агрегата. Скорость подачи солевого'
@@ -298,12 +298,12 @@ class BlockPackWindow(QMainWindow):
                  None, None, None, None, None, None, None,
                  'Мастер КРС, представитель ЦДНГ', 2.49],
                 [None, None,
-                 f'Провести закачку блок-пачки в трубное пространство скважины до гл.{current_edit}м в '
-                 f'объеме {block_volume_edit}м3. Довести тех.водой уд.весом {well_data.fluid_work}г/см3 в '
-                 f'объеме {round(3 * current_edit / 1000, 1)}м3. '
+                 f'Провести закачку блок-пачки в затрубное пространство скважины до гл.{current_edit}м в '
+                 f'объеме {volume_zatrub}м3.' 
                  f'Закрыть затрубное пространство. '
-                 f'Продавить блок-пачку в интервал перфорации ствола продавочной жидкостью {well_data.fluid_work}г/см3 '
-                 f'в объеме {round(3 * current_edit / 1000, 1)}м3. '
+                 f'Продавить блок-пачку в интервал перфорации оставшимся объемом блок пачки и продавочной жидкостью '
+                 f'{well_data.fluid_work}г/см3 '
+                 f'в объеме {volume_zatrub}м3. '
                  f'Технологический отстой - 2 часа. Для предотвращения срыва блокирующей пачки, при проведении '
                  f'спускоподъемных операций на скважине, запрещается превышать предельную нормативную скорость подъема '
                  f'подземного (глубинного) скважинного оборудования.',

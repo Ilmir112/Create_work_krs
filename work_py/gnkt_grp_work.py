@@ -503,14 +503,18 @@ class GnktOsvWindow2(QMainWindow):
 
         koef_anomal = round(float(self.pressuar) * 101325 / (float(vertikal) * 9.81 * 1000), 1)
         nkt = list(well_data.dict_nkt.keys())[0]
+        nkt_str = ''
         if '73' in str(nkt):
             nkt = 73
+            nkt_str += f'{nkt} '
             nkt_widht = 5.5
         elif '89' in str(nkt):
             nkt = 89
+            nkt_str += f'{nkt} '
             nkt_widht = 7.34
         elif '60' in str(nkt):
             nkt = 60
+            nkt_str += f'{nkt} '
             nkt_widht = 5
 
         lenght_nkt = sum(list(map(int, well_data.dict_nkt.values())))
@@ -614,7 +618,7 @@ class GnktOsvWindow2(QMainWindow):
              None, None, None, None, 'л/п.м.', 'м3'],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Шахтное направление', None, None,
              "", None, None, "", "", '', None, None],
-            [None, None, None, None, None, None, None, None, None, f'НКТ {nkt}мм', None, None, 'Направление', None,
+            [None, None, None, None, None, None, None, None, None, f'НКТ {nkt_str}мм', None, None, 'Направление', None,
              None,
              f'{well_data.column_direction_diametr._value}', well_data.column_direction_wall_thickness._value,
              round(well_data.column_direction_diametr._value - 2 * well_data.column_direction_wall_thickness._value, 1),
@@ -638,7 +642,7 @@ class GnktOsvWindow2(QMainWindow):
              column_data_add_diam,
              column_data_add_wall_thickness, column_data_add_vn_volume, column_add_head, column_add_shoe, None,
              volume_pm_dp, well_volume_dp],
-            [None, None, None, None, None, None, None, None, None, None, None, None, 'колонна НКТ', None, None, nkt,
+            [None, None, None, None, None, None, None, None, None, None, None, None, 'колонна НКТ', None, None, nkt_str,
              nkt_widht, nkt - 2 * nkt_widht, f'0-', lenght_nkt, None, '=R19^2*3.14/4/1000', '=T19*V19/1000'],
             [None, None, None, None, None, None, None, None, None, None, None, None, f'{well_data.paker_do["do"]}',
              None, None, None, None,

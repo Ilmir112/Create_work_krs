@@ -1,3 +1,5 @@
+import re
+import well_data
 from datetime import datetime
 
 from PyQt5 import QtWidgets
@@ -6,7 +8,6 @@ from openpyxl.reader.excel import load_workbook
 from openpyxl.utils import column_index_from_string
 from openpyxl.workbook import Workbook
 
-import well_data
 from category_correct import CategoryWindow
 from data_correct import DataWindow
 from main import ExcelWorker, MyWindow
@@ -475,30 +476,31 @@ class WellFond_data(FindIndexPZ):
         if well_data.groove_diameter in [None, '']:
             well_data.check_data_in_pz.append('Не указан Диаметр канавки устьевой арматуры или тип резьбы\n ')
 
-        if str(well_data.paker_do['do']).lower() not in ['0', 0, '-', 'отсут', '', 'none', None]:
-            a = well_data.paker_do['do']
+        if type(well_data.column_diametr._value) in [float, int]:
+            if str(well_data.paker_do['do']).lower() not in ['0', 0, '-', 'отсут', '', 'none', None]:
+                a = well_data.paker_do['do']
 
-            if '/' in str(well_data.depth_fond_paker_do['do']):
-                paker_diametr = TabPage_SO.paker_diametr_select(self,
-                                                                well_data.depth_fond_paker_do['do'].split('/')[0])
-                if paker_diametr not in well_data.paker_do['do']:
+                if '/' in str(well_data.depth_fond_paker_do['do']):
+                    paker_diametr = TabPage_SO.paker_diametr_select(self,
+                                                                    well_data.depth_fond_paker_do['do'].split('/')[0])
+                    if paker_diametr not in well_data.paker_do['do']:
+                        well_data.check_data_in_pz.append(f'Не корректно указан диаметр фондового пакера в карте спуска '
+                                                          f'ремонта {well_data.paker_do["do"].split("/")[0]} требуется пакер '
+                                                          f'диаметром {paker_diametr}мм')
+                else:
+                    paker_diametr = TabPage_SO.paker_diametr_select(self,
+                                                                    well_data.depth_fond_paker_do['do'])
                     well_data.check_data_in_pz.append(f'Не корректно указан диаметр фондового пакера в карте спуска '
-                                                      f'ремонта {well_data.paker_do["do"].split("/")[0]} трубуется пакер '
-                                                      f'диаметром {paker_diametr}')
-            else:
-                paker_diametr = TabPage_SO.paker_diametr_select(self,
-                                                                well_data.depth_fond_paker_do['do'])
-                well_data.check_data_in_pz.append(f'Не корректно указан диаметр фондового пакера в карте спуска '
-                                                  f'ремонта {well_data.paker_do["do"]} требуется пакер '
-                                                  f'диаметром {paker_diametr}м')
-        a = well_data.dict_pump_ECN['do'], well_data.dict_pump_SHGN['do'], well_data.paker_do['do']
-        aa = well_data.dict_pump_ECN['posle'], well_data.dict_pump_SHGN['posle'], well_data.paker_do['posle']
-        if well_data.dict_pump_ECN['do'] != '0' and well_data.dict_pump_SHGN['do'] != '0':
-            if well_data.paker_do['do'] in ['0', None, 0]:
-                well_data.check_data_in_pz.append(f'В план заказе не указано посадка пакера при спущенной компоновке ОРД ')
-        if well_data.dict_pump_ECN['posle'] != '0' and well_data.dict_pump_SHGN['posle'] != '0':
-            if well_data.paker_do['do'] in ['0', None, 0]:
-                well_data.check_data_in_pz.append(f'В план заказе не указано посадка пакера при cпуске ОРД ')
+                                                      f'ремонта {well_data.paker_do["do"]} требуется пакер '
+                                                      f'диаметром {paker_diametr}мv')
+            a = well_data.dict_pump_ECN['do'], well_data.dict_pump_SHGN['do'], well_data.paker_do['do']
+            aa = well_data.dict_pump_ECN['posle'], well_data.dict_pump_SHGN['posle'], well_data.paker_do['posle']
+            if well_data.dict_pump_ECN['do'] != '0' and well_data.dict_pump_SHGN['do'] != '0':
+                if well_data.paker_do['do'] in ['0', None, 0]:
+                    well_data.check_data_in_pz.append(f'В план заказе не указано посадка пакера при спущенной компоновке ОРД ')
+            if well_data.dict_pump_ECN['posle'] != '0' and well_data.dict_pump_SHGN['posle'] != '0':
+                if well_data.paker_do['do'] in ['0', None, 0]:
+                    well_data.check_data_in_pz.append(f'В план заказе не указано посадка пакера при cпуске ОРД ')
 
 
 
@@ -639,9 +641,9 @@ class WellCondition(FindIndexPZ):
                                 well_data.well_volume_in_PZ.append(well_volume_in_PZ)
 
         if well_data.static_level._value == 'не корректно':
-            well_data.check_data_in_pz.append('не указано статический уровень \n')
-        if well_data.pressuar_mkp._value in ['не корректно', '-']:
-            well_data.check_data_in_pz.append('не указано наличие наличие устройство замера давления и наличие давления в МКП\n')
+            well_data.check_data_in_pz.append('не указано статический уровень')
+        if str(well_data.pressuar_mkp._value).lower() in ['не корректно', '-', 'нет', 'отсут']:
+            well_data.check_data_in_pz.append('не указано наличие наличие устройство замера давления и наличие давления в МКП')
 
 
         if well_data.leakiness is True:
@@ -1339,6 +1341,40 @@ class Well_perforation(FindIndexPZ):
                         merged_segments[-1] = [merged_segments[-1][0], max(sole_int, merged_segments[-1][1])]
 
                 well_data.dict_perforation[plast]['интервал'] = merged_segments
+        for plast in well_data.dict_perforation:
+            if well_data.dict_perforation[plast]['отключение'] is False:
+                try:
+                    zamer = well_data.dict_perforation[plast]['замер'][0]
+                    zamer = zamer.split(' ')
+                    for string in zamer:
+                        if string.count('.') == 2:
+                            string = re.sub(r'[^.\d]', '', string)
+                            zamer_str = datetime.strptime(string, '%d.%m.%Y').date()
+                    date_now = datetime.now().date()
+
+                    # Вычитаем даты, получая timedelta (разницу в днях)
+                    difference = date_now - zamer_str
+
+                    if well_data.category_pressuar == 3:
+                        if difference.days > 90:
+                            well_data.check_data_in_pz.append(f'замер по пласту {plast} не соответствует регламенту '
+                                                              f'для скважин 3-й категории не более 3 месяцев до '
+                                                              f'начала ремонта')
+                    elif well_data.category_pressuar == 2:
+                        if difference.days > 30:
+                            well_data.check_data_in_pz.append(f'замер по пласту {plast} не соответствует регламенту '
+                                                              f'для скважин 3-й категории не более 1 месяца до '
+                                                              f'начала ремонта')
+                    elif well_data.category_pressuar == 1:
+                        if difference.days > 3:
+                            well_data.check_data_in_pz.append(f'замер по пласту {plast} не соответствует регламенту '
+                                                              f'для скважин 3-й категории не более 3 дней до '
+                                                              f'начала ремонта')
+
+
+                except:
+                    pass
+
 
         if self.perforation_correct_window2 is None:
             self.perforation_correct_window2 = PerforationCorrect(self)

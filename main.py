@@ -498,6 +498,13 @@ class MyWindow(QMainWindow):
                         sheet = insert_data_new_excel_file(well_data.data, well_data.rowHeights, well_data.colWidth,
                                                          well_data.boundaries_dict)
                     self.copy_pz(sheet, self.table_widget, self.work_plan)
+                    if self.work_plan == 'dop_plan':
+                        self.rir_window = DopPlanWindow(well_data.ins_ind, self.table_widget, self.work_plan)
+                        # self.rir_window.setGeometry(200, 400, 100, 200)
+                        self.rir_window.show()
+                        MyWindow.pause_app()
+                        well_data.pause = True
+                        self.rir_window = None
 
                 except FileNotFoundError as f:
                     mes = QMessageBox.warning(self, 'Ошибка', f'Ошибка при прочтении файла {f}')
@@ -1495,6 +1502,7 @@ class MyWindow(QMainWindow):
                 well_data.fluid_work = data[7]
                 well_data.template_depth, well_data.template_lenght, well_data.template_depth_addition, well_data.template_lenght_addition = json.loads(data[11])
                 well_data.skm_interval = json.loads(data[12])
+                a= well_data.skm_interval
                 well_data.problemWithEk_depth = data[13]
                 well_data.problemWithEk_diametr = data[14]
         # print(well_data.skm_interval)

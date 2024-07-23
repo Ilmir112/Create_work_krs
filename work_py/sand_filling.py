@@ -49,7 +49,7 @@ class TabPage_SO_sand(QWidget):
 
         self.need_change_zgs_label = QLabel('Необходимо ли менять ЖГС', self)
         self.need_change_zgs_combo = QComboBox(self)
-        self.need_change_zgs_combo.addItems(['Нет', 'Да'])
+        self.need_change_zgs_combo.addItems(['Да', 'Нет'])
 
 
         self.fluid_new_label = QLabel('удельный вес ЖГС', self)
@@ -105,6 +105,7 @@ class TabPage_SO_sand(QWidget):
         self.need_change_zgs_combo.currentTextChanged.connect(self.update_change_fluid)
         self.need_change_zgs_combo.setCurrentIndex(1)
 
+
         self.roof_sand_edit.textChanged.connect(self.update_roof)
         self.rir_question_QCombo.currentTextChanged.connect(self.update_rir)
         self.rir_question_QCombo.setCurrentIndex(1)
@@ -141,6 +142,8 @@ class TabPage_SO_sand(QWidget):
             self.grid.addWidget(self.roof_rir_edit, 7, 4)
             self.grid.addWidget(self.sole_rir_LabelType, 6, 5)
             self.grid.addWidget(self.sole_rir_edit, 7, 5)
+            self.grid.addWidget(self.cement_volume_label, 6, 6)
+            self.grid.addWidget(self.cement_volume_line, 7, 6)
             self.sole_rir_edit.setText(f'{roof_sand_edit}')
             self.roof_rir_edit.setText(f'{roof_sand_edit - 50}')
         else:
@@ -148,6 +151,8 @@ class TabPage_SO_sand(QWidget):
             self.roof_rir_edit.setParent(None)
             self.sole_rir_LabelType.setParent(None)
             self.sole_rir_edit.setParent(None)
+            self.cement_volume_label.setParent(None)
+            self.cement_volume_line.setParent(None)
 
     def update_change_fluid(self, index):
         if index == 'Да':

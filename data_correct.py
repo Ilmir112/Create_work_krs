@@ -8,7 +8,7 @@ from PyQt5.QtGui import QRegExpValidator, QColor, QPalette
 from perforation_correct import FloatLineEdit
 
 
-class TabPage_SO(QWidget):
+class TabPage_SO_correct(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
 
@@ -690,7 +690,7 @@ class TabPage_SO(QWidget):
 class TabWidget(QTabWidget):
     def __init__(self):
         super().__init__()
-        self.addTab(TabPage_SO(self), 'Проверка корректности данных')
+        self.addTab(TabPage_SO_correct(self), 'Проверка корректности данных')
 
 
 class DataWindow(QMainWindow):
@@ -716,6 +716,7 @@ class DataWindow(QMainWindow):
 
     def addRowTable(self):
         from find import ProtectedIsNonNone, ProtectedIsDigit
+        from work_py.opressovka import TabPage_SO
 
         region_Combo = self.tabWidget.currentWidget().region_Combo.currentText()
         type_kr_Combo = self.tabWidget.currentWidget().type_kr_Combo.currentText()
@@ -831,7 +832,7 @@ class DataWindow(QMainWindow):
 
         close_file = True
 
-        if any([self.ifNum(data_well) is False for data_well in
+        if any([self.ifNum(data_well) is False or data_well in ['не корректно', 0, 'отсут'] for data_well in
                 [columnType, column_wall_thickness, shoe_column]]):
             msg = QMessageBox.information(self, 'Внимание', 'Не все поля в данных колонне соответствуют значениям')
             close_file = False
@@ -978,6 +979,8 @@ class DataWindow(QMainWindow):
                 return
         except Exception as e:
             mes = QMessageBox.warning(self, 'Ошибка', f'Башмак ЭК не корректен {e}')
+
+
         if close_file is False:
             return
         elif close_file is True:
@@ -1121,6 +1124,20 @@ class DataWindow(QMainWindow):
                 }
             }
 
+            if str(well_data.paker_do['posle']).lower() not in ['0', 0, '-', 'отсут', '', None]:
+                a = well_data.depth_fond_paker_do['posle']
+                try:
+
+                    paker_diametr = TabPage_SO.paker_diametr_select(self, float(well_data.depth_fond_paker_do['posle']))
+                    if str(paker_diametr) not in str(well_data.paker_do['posle']):
+                        well_data.check_data_in_pz.append(
+                            f'Не корректно указан диаметр фондового пакера в карте спуска '
+                            f'ремонта {well_data.paker_do["posle"].split("/")[0]} трубуется пакер '
+                            f'диаметром {paker_diametr}')
+
+                except Exception as e:
+                    mes = QMessageBox.information(self, 'Ошибка обработки', f'ошибка проверки ПЗ в части соответствия '
+                                                                            f'диаметра пакера \n {e}')
             well_data.pause = False
             self.close()
 

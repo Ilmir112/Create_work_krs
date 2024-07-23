@@ -54,20 +54,23 @@ class CreatePZ(QMainWindow):
                                                              'Наличие в базе данных',
                                                              'Проверка показала что данные по скважине есть в базе данных, '
                                                              'загрузить с базы?')
-            if change_work_work_plan == QMessageBox.StandardButton.Yes:
-                well_data.work_plan = 'dop_plan_in_base'
-                self.work_plan = 'dop_plan_in_base'
-                well_data.data_in_base = True
-                self.rir_window = DopPlanWindow(well_data.ins_ind, None, work_plan)
-                # self.rir_window.setGeometry(200, 400, 100, 200)
-                self.rir_window.show()
-                MyWindow.pause_app()
-                well_data.pause = True
-                self.rir_window = None
+                if change_work_work_plan == QMessageBox.StandardButton.Yes:
+                    well_data.work_plan = 'dop_plan_in_base'
+                    self.work_plan = 'dop_plan_in_base'
+                    well_data.data_in_base = True
+                    self.rir_window = DopPlanWindow(well_data.ins_ind, None, work_plan)
+                    # self.rir_window.setGeometry(200, 400, 100, 200)
+                    self.rir_window.show()
+                    MyWindow.pause_app()
+                    well_data.pause = True
+                    self.rir_window = None
 
-                return
+                    return
 
-            well_data.data_well_is_True = False
+
+
+        well_data.data_well_is_True = False
+        if work_plan == 'dop_plan':
             number_list = list(map(str, range(1, 50)))
             well_data.number_dp, ok = QInputDialog.getItem(self, 'Номер дополнительного плана работ',
                                                            'Введите номер дополнительного плана работ',
@@ -91,21 +94,7 @@ class CreatePZ(QMainWindow):
         elif 'РН' in well_data.contractor:
             contractor = 'РН'
 
-        if str(well_data.paker_do['posle']).lower() not in ['0', 0, '-', 'отсут', '', None]:
-            a = well_data.depth_fond_paker_do['posle']
-            if '/' in str(well_data.depth_fond_paker_do['posle']):
-                paker_diametr = TabPage_SO.paker_diametr_select(self, well_data.depth_fond_paker_do['posle'].split('/')[0])
-                if paker_diametr not in well_data.paker_do['posle']:
 
-                    well_data.check_data_in_pz.append(f'Не корректно указан диаметр фондового пакера в карте спуска '
-                                                      f'ремонта {well_data.paker_do["posle"].split("/")[0]} трубуется пакер '
-                                                      f'диаметром {paker_diametr}')
-            else:
-                paker_diametr = TabPage_SO.paker_diametr_select(self,
-                                                                    well_data.depth_fond_paker_do['posle'])
-                well_data.check_data_in_pz.append(f'Не корректно указан диаметр фондового пакера в карте спуска '
-                                                  f'ремонта {well_data.paker_do["posle"]} трубуется пакер '
-                                                  f'диаметром {paker_diametr}м')
 
         if work_plan == 'plan_change':
             DopPlanWindow.extraction_data(self, str(well_data.well_number._value) + " " +
@@ -179,6 +168,7 @@ class CreatePZ(QMainWindow):
                 image_loader = SheetImageLoader(ws)
             except:
                 mes = QMessageBox.warning(None, 'Ошибка', 'Ошибка в копировании изображений')
+
 
             if len(well_data.check_data_in_pz) != 0:
                 check_str = ''
