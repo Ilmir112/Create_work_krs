@@ -1456,7 +1456,6 @@ class MyWindow(QMainWindow):
         rir_menu.addAction(pakerIzvlek_action)
         pakerIzvlek_action.triggered.connect(self.pakerIzvlek_action)
 
-
         rir_action = QAction('РИР')
         rir_menu.addAction(rir_action)
         rir_action.triggered.connect(self.rirAction)
@@ -2590,7 +2589,7 @@ if __name__ == "__main__":
                                           'Проверка показало что с облаком соединения нет, '
                                           'будет использована локальная база данных')
         MyWindow.login_window = LoginWindow()
-        MyWindow.login_window.show()
+        MyWindow.set_modal_window(None, MyWindow.login_window)
         MyWindow.pause_app()
         well_data.pause = False
     except Exception as e:
@@ -2600,7 +2599,10 @@ if __name__ == "__main__":
         app2 = UpdateChecker()
         app2.check_version()
     if app2.window_close == True:
-        app2.show()
+        MyWindow.set_modal_window(None, app2)
+        well_data.pause = True
+        MyWindow.pause_app()
+        well_data.pause = False
 
     window = MyWindow()
     window.show()

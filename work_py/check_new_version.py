@@ -213,12 +213,12 @@ class UpdateThread(QThread):
             update_thread = threading.Thread(target=self.update_process)
             update_thread.start()
 
-            mes = QMessageBox.information(None, 'Обновление', 'Обновление скачано, необходимо разархивировать архив и '
-                                                              'перезапустить приложение')
-
+            # mes = QMessageBox.information(None, 'Обновление', 'Обновление скачано, необходимо разархивировать архив и '
+            #                                                   'перезапустить приложение')
+            well_data.pause = False
 
         except requests.exceptions.RequestException as e:
-            mes = QMessageBox.warning(self, "Ошибка", f"Не удалось загрузить обновления: {e}")
+            mes = QMessageBox.warning(None, "Ошибка", f"Не удалось загрузить обновления: {e}")
 
     def update_process(self):
 
@@ -228,17 +228,40 @@ class UpdateThread(QThread):
         extract_len = len(well_data.path_image) + len('ZIMA.exe')
 
         extract_dir = os.path.dirname(os.path.abspath(__file__))[:-extract_len]
-
+        new_extract_dir = extract_dir + '/ZimaUpdate'
         # Переименовываем текущую версию
         os.rename(f"{os.path.dirname(sys.executable)}/ZIMA.exe", f"{os.path.dirname(sys.executable)}/ZIMA.exe.old")
         print(f"Переименование {os.path.dirname(sys.executable)}/ZIMA.exe", f"{os.path.dirname(sys.executable)}/ZIMA.exe.old")
 
         with zipfile.ZipFile("ZIMA.zip", 'r') as zip_ref:
-            zip_ref.extractall(extract_dir)
+            zip_ref.extractall(f'{new_extract_dir}')
 
-        # # Перемещаем обновленную версию
-        # os.rename(f"{extract_dir}/ZIMA.exe", f"{os.path.dirname(sys.executable)}/ZIMA.exe")
-        # print(f"{extract_dir}/ZIMA.exe", f"{os.path.dirname(sys.executable)}/ZIMA.exe")
+        # Перемещаем обновленную версию
+        try:
+            shutil.move(f"{new_extract_dir}/ZIMA.exe", f"{os.path.dirname(sys.executable)}/ZIMA.exe")
+        except PermissionError:
+            QMessageBox.warning(self, "Ошибка",
+                                f"Не удалось переместить файл ZIMA.exe. Возможно, он используется другой программой.")
+            return
+
+        try:
+            # Удаляем папку
+            shutil.rmtree(f'{new_extract_dir}')
+            print(f"Папка '{new_extract_dir}' удалена.")
+        except FileNotFoundError:
+            print(f"Папка '{new_extract_dir}' не найдена.")
+        except PermissionError:
+            print(f"Нет прав для удаления папки '{new_extract_dir}'.")
+
+        try:
+            # Удаляем архив
+            os.remove(f"{os.path.dirname(sys.executable)}/ZIMA.exe.old")
+            os.remove(f'{new_extract_dir + "/ZIMA.zip"}')
+            print(f'Архив {new_extract_dir + "/ZIMA.zip"} удален.')
+        except FileNotFoundError:
+            print(f'Архив {new_extract_dir + "/ZIMA.zip"} не найден.')
+        except PermissionError:
+            print(f"Нет прав для удаления архива {new_extract_dir + '/ZIMA.zip'}.")
 
         self.finished_signal.emit(True)
         self.update_version(self.latest_version)
