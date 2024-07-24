@@ -201,12 +201,12 @@ class UpdateThread(QThread):
             total_size = int(response.headers.get('content-length', 0))
             downloaded = 0
 
-            # with open("ZIMA.zip", "wb") as file:  # Сохраняем архив в папку
-            #     for data in response.iter_content(chunk_size=1024):
-            #         downloaded += len(data)
-            #         file.write(data)
-            #         progress = (downloaded / total_size) * 100
-            #         self.progress_signal.emit(int(progress))
+            with open("ZIMA.zip", "wb") as file:  # Сохраняем архив в папку
+                for data in response.iter_content(chunk_size=1024):
+                    downloaded += len(data)
+                    file.write(data)
+                    progress = (downloaded / total_size) * 100
+                    self.progress_signal.emit(int(progress))
 
 
 

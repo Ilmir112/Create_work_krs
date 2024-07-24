@@ -1243,9 +1243,8 @@ class MyWindow(QMainWindow):
             well_data.problemWithEk = False
             well_data.problemWithEk_depth = well_data.current_bottom
             well_data.problemWithEk_diametr = 220
-            path = ''
-            if path:
-                path = f"{well_data.path_image}/imageFiles/image_work"[1:]
+            path = f"{well_data.path_image}/imageFiles/image_work"[1:]
+
 
             for file in os.listdir(path):
                 file_path = os.path.join(path, file)
