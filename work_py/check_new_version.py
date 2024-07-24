@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
+import logging
 import shutil
 import subprocess
 import sys
@@ -200,12 +201,12 @@ class UpdateThread(QThread):
             total_size = int(response.headers.get('content-length', 0))
             downloaded = 0
 
-            with open("ZIMA.zip", "wb") as file:  # Сохраняем архив в папку
-                for data in response.iter_content(chunk_size=1024):
-                    downloaded += len(data)
-                    file.write(data)
-                    progress = (downloaded / total_size) * 100
-                    self.progress_signal.emit(int(progress))
+            # with open("ZIMA.zip", "wb") as file:  # Сохраняем архив в папку
+            #     for data in response.iter_content(chunk_size=1024):
+            #         downloaded += len(data)
+            #         file.write(data)
+            #         progress = (downloaded / total_size) * 100
+            #         self.progress_signal.emit(int(progress))
 
 
 
@@ -243,21 +244,24 @@ class UpdateThread(QThread):
 
         ada = os.path.exists(database_file)
         print(f'Местонаходение папки {database_file}')
+
         if os.path.exists(database_file):
 
             print(f'файл databaseWell.db существует')
             # Файл databaseWell.db существует, перемещаем все, кроме исключений
             for filename in os.listdir(extract_dir):
-                if filename not in ["databaseWell.db", "well_data.db", "users.db", 'version_app.json']:
+                if filename not in ["databaseWell.db", "well_data.db", "users.db", 'version_app.json', 'my_app.log']:
                     source_path = os.path.join(extract_dir, filename)
                     destination_path = os.path.join(os.path.dirname(sys.executable), filename)
                     try:
                         shutil.move(source_path, destination_path)
-                        print(f"Перемещен файл: {filename}")
+                        # print(f"Перемещен файл: {filename}")
                     except PermissionError:
                         QMessageBox.warning(self, "Ошибка",
                                             f"Не удалось переместить файл {filename}. Возможно, он используется другой программой.")
                         return
+                else:
+                    print(f"Не Перемещен файл: {filename}")
         else:
             # Файл databaseWell.db не существует, перемещаем все файлы
             try:
