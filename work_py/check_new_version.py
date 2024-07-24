@@ -224,9 +224,6 @@ class UpdateThread(QThread):
 
     def update_process(self):
 
-        # путь к папке загрузки
-        download_folder = sys.executable
-
         extract_len = len(well_data.path_image) + len('ZIMA.exe')
 
         extract_dir = os.path.dirname(os.path.abspath(__file__))[:-extract_len]
@@ -254,10 +251,11 @@ class UpdateThread(QThread):
                     source_path = os.path.join(extract_dir, filename)
                     destination_path = os.path.join(os.path.dirname(sys.executable), filename)
                     try:
+                        print(f"Перемещен {source_path} {destination_path} файл: {filename}")
                         shutil.move(source_path, destination_path)
                         # print(f"Перемещен файл: {filename}")
                     except PermissionError:
-                        QMessageBox.warning(self, "Ошибка",
+                        QMessageBox.warning(None, "Ошибка",  # Передаем self
                                             f"Не удалось переместить файл {filename}. Возможно, он используется другой программой.")
                         return
                 else:
