@@ -200,7 +200,7 @@ class UpdateThread(QThread):
             total_size = int(response.headers.get('content-length', 0))
             downloaded = 0
 
-            with open("zima.zip", "wb") as file:  # Сохраняем архив в папку
+            with open("Zima.zip", "wb") as file:  # Сохраняем архив в папку
                 for data in response.iter_content(chunk_size=1024):
                     downloaded += len(data)
                     file.write(data)
@@ -213,7 +213,7 @@ class UpdateThread(QThread):
             update_thread = threading.Thread(target=self.update_process)
             update_thread.start()
 
-            mes = QMessageBox.information(self, 'Обновление', 'Обновление скачано, необходимо разархивировать архив и '
+            mes = QMessageBox.information(None, 'Обновление', 'Обновление скачано, необходимо разархивировать архив и '
                                                               'перезапустить приложение')
 
 
@@ -229,10 +229,15 @@ class UpdateThread(QThread):
 
         extract_dir = os.path.dirname(os.path.abspath(__file__))[:-extract_len]
 
+        # Переименовываем текущую версию
+        os.rename(f"{os.path.dirname(sys.executable)}/ZIMA.exe", f"{os.path.dirname(sys.executable)}/ZIMA.exe.old")
+        print(f"Переименование {os.path.dirname(sys.executable)}/ZIMA.exe", f"{os.path.dirname(sys.executable)}/ZIMA.exe.old")
+
         # Перемещаем обновленную версию
         os.rename(f"{extract_dir}/ZIMA.exe", f"{os.path.dirname(sys.executable)}/ZIMA.exe")
+        print(f"{extract_dir}/ZIMA.exe", f"{os.path.dirname(sys.executable)}/ZIMA.exe")
 
-        with zipfile.ZipFile("zima.zip", 'r') as zip_ref:
+        with zipfile.ZipFile("Zima.zip", 'r') as zip_ref:
             zip_ref.extractall(extract_dir)
 
         # Проверяем местонахождение текущей версии приложения
@@ -242,6 +247,7 @@ class UpdateThread(QThread):
         self.update_version(self.latest_version)
 
         well_data.pause = False
+        print(f'изменился файл json')
 
 
         # Запускаем обновленную версию
