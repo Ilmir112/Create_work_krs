@@ -231,7 +231,7 @@ class UpdateThread(QThread):
         extract_dir = os.path.dirname(os.path.abspath(__file__))[:-extract_len]
         new_extract_dir = extract_dir + '/ZimaUpdate'
         # # Переименовываем текущую версию
-        os.rename(f"{os.path.dirname(sys.executable)}/ZIMA.exe", f"{os.path.dirname(sys.executable)}/ZIMA.exe.old")
+        # os.rename(f"{os.path.dirname(sys.executable)}/ZIMA.exe", f"{os.path.dirname(sys.executable)}/ZIMA.exe.old")
         # print(f"Переименование {os.path.dirname(sys.executable)}/ZIMA.exe", f"{os.path.dirname(sys.executable)}/ZIMA.exe.old")
 
         with zipfile.ZipFile("ZIMA.zip", 'r') as zip_ref:
