@@ -181,11 +181,11 @@ class Emergency_magnit(MyWindow):
             [f'СПО {print_type_combo}-{print_diametr_line}  до '
              f'глубины {emergency_bottom_line}м',
              None,
-             f'Спустить {print_type_combo}-{print_diametr_line} + опрессовочное седло + '
+             f'Спустить {print_type_combo}-{print_diametr_line}  '
              f'{magnet_select(self, nkt_str_combo)} на '
              f'{nkt_str_combo}{well_data.nkt_diam}мм до '
              f'глубины {emergency_bottom_line}м с замером, шаблонированием '
-             f'шаблоном {well_data.nkt_template}мм. Опрессовать НКТ на 150атм. Вымыть шар. \n'
+             f'шаблоном {well_data.nkt_template}мм.  \n'
              f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
              None, None, None, None, None, None, None,
              'мастер КРС', descentNKT_norm(well_data.current_bottom, 1)],

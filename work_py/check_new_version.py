@@ -4,6 +4,8 @@ import shutil
 import subprocess
 import sys
 import os
+import threading
+
 import psutil
 import requests
 import zipfile
@@ -184,11 +186,11 @@ class UpdateThread(QThread):
 
     def run(self):
 
+
         # на URL архива для загрузки
         url = f"https://github.com/Ilmir112/Create_work_krs/releases/download/{self.latest_version}/ZIMA.zip"
 
-        # Замените "your_download_folder" на путь к папке загрузки
-        download_folder = sys.executable
+
 
         # Загрузка архива
         try:
@@ -205,52 +207,48 @@ class UpdateThread(QThread):
                     progress = (downloaded / total_size) * 100
                     self.progress_signal.emit(int(progress))
 
-            extract_len = len(well_data.path_image) + len('ZIMA.exe')
 
 
-            extract_dir = os.path.dirname(os.path.abspath(__file__))[:-extract_len]
+            # Запускаем обновление в отдельном потоке
+            update_thread = threading.Thread(target=self.update_process)
+            update_thread.start()
+
             mes = QMessageBox.information(self, 'Обновление', 'Обновление скачано, необходимо разархивировать архив и '
                                                               'перезапустить приложение')
-            self.close_process_update("ZIMA.exe")
-            # with zipfile.ZipFile("zima.zip", 'r') as zip_ref:
-            #     for info in zip_ref.infolist():
-            #         if "ZIMA.exe" not in info.filename:
-            #         #     # Извлекаем файл в текущую директорию
-            #         #     # Удаляем путь к папке "ZIMA/" из имени файла
-            #         #     filename = info.filename[len("ZIMA/"):]
-            #         #     zip_ref.extract(info, os.path.join(extract_dir, filename))
-            #         # elif info.filename.startswith("ZIMA/"):  # Проверяем, начинается ли имя файла с "zima/"
-            #             # Удаляем "zima/" из начала имени файла, чтобы извлечь только содержимое
-            #             filename = info.filename[len("ZIMA/"):]
-            #             zip_ref.extract(info, os.path.join(extract_dir, filename))
-            #             # print(f'фат2 {filename}')
 
-            with zipfile.ZipFile("zima.zip", 'r') as zip_ref:
-                zip_ref.extractall(extract_dir)
-
-            # source_folder = "D:/ZIMA/ZIMA"
-            # destination_folder = "D:/ZIMA"
-
-            # if os.path.exists(source_folder):
-            #     # Копируем папку и все ее содержимое
-            #     shutil.copytree(source_folder, destination_folder)
-            #     print("Папка успешно скопирована.")
-            # else:
-            #     print("Исходная папка не найдена и не может быть скопирована.")
-
-            # Проверяем местонахождение текущей версии приложения
-            existing_version_path = "ZIMA/ZIMA.exe"
-
-            self.finished_signal.emit(True)
-            self.update_version(self.latest_version)
-
-            well_data.pause = False
-
-            # Запускаем приложение Zima.exe
-            subprocess.Popen([f"{download_folder.replace('ZIMA.zip', 'ZIMA.exe')}"])
 
         except requests.exceptions.RequestException as e:
             mes = QMessageBox.warning(self, "Ошибка", f"Не удалось загрузить обновления: {e}")
+
+    def update_process(self):
+
+        # путь к папке загрузки
+        download_folder = sys.executable
+
+        extract_len = len(well_data.path_image) + len('ZIMA.exe')
+
+        extract_dir = os.path.dirname(os.path.abspath(__file__))[:-extract_len]
+
+        # Перемещаем обновленную версию
+        os.rename(f"{extract_dir}/ZIMA.exe", f"{os.path.dirname(sys.executable)}/ZIMA.exe")
+
+        with zipfile.ZipFile("zima.zip", 'r') as zip_ref:
+            zip_ref.extractall(extract_dir)
+
+        # Проверяем местонахождение текущей версии приложения
+        existing_version_path = "ZIMA/ZIMA.exe"
+
+        self.finished_signal.emit(True)
+        self.update_version(self.latest_version)
+
+        well_data.pause = False
+
+
+        # Запускаем обновленную версию
+        subprocess.Popen([f"{os.path.dirname(sys.executable)}/ZIMA.exe"])
+
+        # Прекращаем работу текущего процесса
+        os._exit(0)  # Прекращаем процесс (не используйте sys.exit())
 
     @staticmethod
     def close_process_update(process_name):

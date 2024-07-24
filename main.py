@@ -2605,10 +2605,10 @@ if __name__ == "__main__":
     #
 
 
+    if well_data.connect_in_base:
+        app2 = UpdateChecker()
+        app2.check_version()
+    if app2.window_close == True:
 
-    # app2 = UpdateChecker()
-    # app2.check_version()
-    # if app2.window_close == True:
-    #     print(f'локом {UpdateChecker.window_close}')
-    #     app2.show()
+        app2.show()
     sys.exit(app.exec_())
