@@ -216,10 +216,10 @@ class UpdateThread(QThread):
             # mes = QMessageBox.information(None, 'Обновление', 'Обновление скачано, необходимо разархивировать архив и '
             #                                                   'перезапустить приложение')
 
-            well_data.pause = False
+
         except requests.exceptions.RequestException as e:
             mes = QMessageBox.warning(None, "Ошибка", f"Не удалось загрузить обновления: {e}")
-            well_data.pause = False
+
 
     def update_process(self):
 
@@ -238,10 +238,11 @@ class UpdateThread(QThread):
             zip_ref.extractall(f'{new_extract_dir}')
 
         # Проверяем, существует ли файл databaseWell.db
-        data_base_path = os.path.join(os.path.dirname(sys.executable), "data_base", "data_base_well")
+        data_base_path = os.path.join(os.path.dirname(sys.executable), "_internal/data_base", "data_base_well")
         database_file = os.path.join(data_base_path, "databaseWell.db")
 
-
+        ada = os.path.exists(database_file)
+        print(f'Местонаходение папки {database_file}')
         if os.path.exists(database_file):
 
             print(f'файл databaseWell.db существует')
