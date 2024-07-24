@@ -2589,7 +2589,7 @@ if __name__ == "__main__":
                                           'Проверка показало что с облаком соединения нет, '
                                           'будет использована локальная база данных')
         MyWindow.login_window = LoginWindow()
-        MyWindow.set_modal_window(None, MyWindow.login_window)
+        MyWindow.login_window.show()
         MyWindow.pause_app()
         well_data.pause = False
     except Exception as e:
@@ -2598,12 +2598,12 @@ if __name__ == "__main__":
     if well_data.connect_in_base:
         app2 = UpdateChecker()
         app2.check_version()
-    if app2.window_close == True:
-        MyWindow.set_modal_window(None, app2)
-        well_data.pause = True
-        MyWindow.pause_app()
-        well_data.pause = False
-        app2.close()
+        if app2.window_close == True:
+            MyWindow.set_modal_window(None, app2)
+            well_data.pause = True
+            MyWindow.pause_app()
+            well_data.pause = False
+            app2.close()
 
     window = MyWindow()
     window.show()
