@@ -200,7 +200,7 @@ class UpdateThread(QThread):
             total_size = int(response.headers.get('content-length', 0))
             downloaded = 0
 
-            with open("Zima.zip", "wb") as file:  # Сохраняем архив в папку
+            with open("ZIMA.zip", "wb") as file:  # Сохраняем архив в папку
                 for data in response.iter_content(chunk_size=1024):
                     downloaded += len(data)
                     file.write(data)
@@ -233,22 +233,18 @@ class UpdateThread(QThread):
         os.rename(f"{os.path.dirname(sys.executable)}/ZIMA.exe", f"{os.path.dirname(sys.executable)}/ZIMA.exe.old")
         print(f"Переименование {os.path.dirname(sys.executable)}/ZIMA.exe", f"{os.path.dirname(sys.executable)}/ZIMA.exe.old")
 
-        # Перемещаем обновленную версию
-        os.rename(f"{extract_dir}/ZIMA.exe", f"{os.path.dirname(sys.executable)}/ZIMA.exe")
-        print(f"{extract_dir}/ZIMA.exe", f"{os.path.dirname(sys.executable)}/ZIMA.exe")
-
-        with zipfile.ZipFile("Zima.zip", 'r') as zip_ref:
+        with zipfile.ZipFile("ZIMA.zip", 'r') as zip_ref:
             zip_ref.extractall(extract_dir)
 
-        # Проверяем местонахождение текущей версии приложения
-        existing_version_path = "ZIMA/ZIMA.exe"
+        # # Перемещаем обновленную версию
+        # os.rename(f"{extract_dir}/ZIMA.exe", f"{os.path.dirname(sys.executable)}/ZIMA.exe")
+        # print(f"{extract_dir}/ZIMA.exe", f"{os.path.dirname(sys.executable)}/ZIMA.exe")
 
         self.finished_signal.emit(True)
         self.update_version(self.latest_version)
 
         well_data.pause = False
         print(f'изменился файл json')
-
 
         # Запускаем обновленную версию
         subprocess.Popen([f"{os.path.dirname(sys.executable)}/ZIMA.exe"])

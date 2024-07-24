@@ -2582,6 +2582,7 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     if MyWindow.check_process():
        MyWindow.show_confirmation()
+
     try:
         well_data.connect_in_base = MyWindow.check_connection(well_data.host_krs)
         if well_data.connect_in_base is False:
@@ -2595,6 +2596,12 @@ if __name__ == "__main__":
     except Exception as e:
         mes = QMessageBox.warning(None, 'КРИТИЧЕСКАЯ ОШИБКА', f'Критическая ошибка, смотри в лог {e}')
 
+    if well_data.connect_in_base:
+        app2 = UpdateChecker()
+        app2.check_version()
+    if app2.window_close == True:
+        app2.show()
+
     window = MyWindow()
     window.show()
     # screen_geometry = QApplication.desktop().availableGeometry()
@@ -2604,11 +2611,4 @@ if __name__ == "__main__":
     # window.setGeometry(0, 0, window_width, window_height)
     #
 
-
-    if well_data.connect_in_base:
-        app2 = UpdateChecker()
-        app2.check_version()
-    if app2.window_close == True:
-
-        app2.show()
     sys.exit(app.exec_())
