@@ -275,7 +275,6 @@ class UpdateThread(QThread):
 
         try:
             # Удаляем архив
-            os.remove("ZIMA.exe.old")
             os.remove('ZIMA.zip')
             print(f'Архив "ZIMA.zip" удален.')
         except FileNotFoundError:
