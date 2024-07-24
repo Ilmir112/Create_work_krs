@@ -2603,6 +2603,7 @@ if __name__ == "__main__":
         well_data.pause = True
         MyWindow.pause_app()
         well_data.pause = False
+        app2.close()
 
     window = MyWindow()
     window.show()

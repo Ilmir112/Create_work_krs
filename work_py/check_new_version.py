@@ -150,7 +150,7 @@ class UpdateChecker(QWidget):
         except requests.exceptions.RequestException as e:
 
             QMessageBox.warning(self, "Ошибка", f"Не удалось проверить обновления: {e}")
-            well_data.pause = False
+
 
 
     def on_close(self):
@@ -215,10 +215,11 @@ class UpdateThread(QThread):
 
             # mes = QMessageBox.information(None, 'Обновление', 'Обновление скачано, необходимо разархивировать архив и '
             #                                                   'перезапустить приложение')
-            well_data.pause = False
 
+            well_data.pause = False
         except requests.exceptions.RequestException as e:
             mes = QMessageBox.warning(None, "Ошибка", f"Не удалось загрузить обновления: {e}")
+            well_data.pause = False
 
     def update_process(self):
 
@@ -229,9 +230,9 @@ class UpdateThread(QThread):
 
         extract_dir = os.path.dirname(os.path.abspath(__file__))[:-extract_len]
         new_extract_dir = extract_dir + '/ZimaUpdate'
-        # Переименовываем текущую версию
-        os.rename(f"{os.path.dirname(sys.executable)}/ZIMA.exe", f"{os.path.dirname(sys.executable)}/ZIMA.exe.old")
-        print(f"Переименование {os.path.dirname(sys.executable)}/ZIMA.exe", f"{os.path.dirname(sys.executable)}/ZIMA.exe.old")
+        # # Переименовываем текущую версию
+        # os.rename(f"{os.path.dirname(sys.executable)}/ZIMA.exe", f"{os.path.dirname(sys.executable)}/ZIMA.exe.old")
+        # print(f"Переименование {os.path.dirname(sys.executable)}/ZIMA.exe", f"{os.path.dirname(sys.executable)}/ZIMA.exe.old")
 
         with zipfile.ZipFile("ZIMA.zip", 'r') as zip_ref:
             zip_ref.extractall(f'{new_extract_dir}')
@@ -255,18 +256,17 @@ class UpdateThread(QThread):
 
         try:
             # Удаляем архив
-            os.remove(f"{os.path.dirname(sys.executable)}/ZIMA.exe.old")
-            os.remove(f'{new_extract_dir + "/ZIMA.zip"}')
-            print(f'Архив {new_extract_dir + "/ZIMA.zip"} удален.')
+            os.remove("ZIMA.exe.old")
+            os.remove('ZIMA.zip')
+            print(f'Архив "ZIMA.zip" удален.')
         except FileNotFoundError:
-            print(f'Архив {new_extract_dir + "/ZIMA.zip"} не найден.')
+            print(f'Архив "ZIMA.zip" не найден.')
         except PermissionError:
-            print(f"Нет прав для удаления архива {new_extract_dir + '/ZIMA.zip'}.")
+            print(f"Нет прав для удаления архива ZIMA.zip.")
 
         self.finished_signal.emit(True)
         self.update_version(self.latest_version)
 
-        well_data.pause = False
         print(f'изменился файл json')
 
         # Запускаем обновленную версию
@@ -274,6 +274,7 @@ class UpdateThread(QThread):
 
         # Прекращаем работу текущего процесса
         os._exit(0)  # Прекращаем процесс (не используйте sys.exit())
+
 
     @staticmethod
     def close_process_update(process_name):
