@@ -245,7 +245,7 @@ class UpdateThread(QThread):
             if os.path.exists(database_file):
                 # Файл databaseWell.db существует, перемещаем все, кроме него
                 for filename in os.listdir(extract_dir):
-                    if filename != "databaseWell.db" and filename != "well_data.db" and filename != "users.db":
+                    if filename not in ["databaseWell.db", "well_data.db", "users.db", 'version_app.json']:
                         source_path = os.path.join(extract_dir, filename)
                         destination_path = os.path.join(os.path.dirname(sys.executable), filename)
                         try:
