@@ -877,10 +877,11 @@ def check_in_database_well_data(number_well, area_well, work_plan):
 
             conn = sqlite3.connect(f'{db_path}')
             cursor = conn.cursor()
+            a = well_data.contractor
 
             cursor.execute("SELECT data_well FROM wells WHERE well_number = ? AND area_well = ? "
-                           "AND contractor = ? AND costumer = ? AND work_plan=?",
-                           (str(number_well._value), area_well._value, well_data.contractor, well_data.costumer, work_plan))
+                           "AND contractor = ? AND costumer = ?",
+                           (str(number_well._value), area_well._value, well_data.contractor, well_data.costumer))
 
             data_well = cursor.fetchone()
             if data_well:

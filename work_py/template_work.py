@@ -21,8 +21,6 @@ class TabPage_SO_with(QWidget):
         self.template_labelType = QLabel("Вид компоновки ПСШ", self)
         self.template_Combo = QComboBox(self)
 
-        self.template_Combo.currentTextChanged.connect(self.update_template_edit)
-
         self.template_str_Label = QLabel("строчка с шаблонами", self)
         self.template_str_Edit = QLineEdit(self)
 
@@ -40,8 +38,6 @@ class TabPage_SO_with(QWidget):
         self.dictance_template_first_Label = QLabel("расстояние", self)
         self.dictance_template_first_Edit = QLineEdit(self)
         self.dictance_template_first_Edit.setValidator(validator)
-
-
 
         self.privyazka_question_Label = QLabel("Нужно ли привязывать компоновку", self)
         self.privyazka_question_QCombo = QComboBox(self)
@@ -107,68 +103,8 @@ class TabPage_SO_with(QWidget):
 
 
         self.grid = QGridLayout(self)
-        if well_data.column_additional is False or \
-                (well_data.column_additional and well_data.current_bottom < well_data.head_column_additional._value):
-            self.template_select_list = ['ПСШ ЭК', 'ПСШ открытый ствол', 'ПСШ без хвоста']
-
-            self.template_Combo.addItems(self.template_select_list)
-
-            template_key = self.definition_pssh()
-            # print(self.template_select_list, template_key)
-            self.template_Combo.setCurrentIndex(self.template_select_list.index(template_key))
-
-
-            self.grid.addWidget(self.template_labelType, 1, 2, 1, 8)
-            self.grid.addWidget(self.template_Combo, 2, 2, 2, 8)
-            self.grid.addWidget(self.template_first_Label, 4, 2)
-            self.grid.addWidget(self.template_first_Edit, 5, 2)
-            self.grid.addWidget(self.lenght_template_first_Label, 4, 3)
-            self.grid.addWidget(self.lenght_template_first_Edit, 5, 3)
-            self.grid.addWidget(self.dictance_template_first_Label, 4, 4)
-            self.grid.addWidget(self.dictance_template_first_Edit, 5, 4)
-            self.grid.addWidget(self.skm_Label, 4, 5)
-            self.grid.addWidget(self.skm_Edit, 5, 5)
-            self.grid.addWidget(self.SKM_type_label, 4, 6)
-            self.grid.addWidget(self.SKM_type_Combo, 5, 6)
-            self.grid.addWidget(self.dictance_template_second_Label, 4, 7)
-            self.grid.addWidget(self.dictance_template_second_Edit, 5, 7)
-            self.grid.addWidget(self.template_second_Label, 4, 8)
-            self.grid.addWidget(self.template_second_Edit, 5, 8)
-            self.grid.addWidget(self.lenght_template_second_Label, 4, 9)
-            self.grid.addWidget(self.lenght_template_second_Edit, 5, 9)
-            self.grid.addWidget(self.dictance_three_Label, 4, 10)
-            self.grid.addWidget(self.dictance_three_Edit, 5, 10)
-
-        else:
-            self.template_select_list = ['ПСШ Доп колонна СКМ в основной колонне', 'ПСШ СКМ в доп колонне c хвостом',
-                                         'ПСШ СКМ в доп колонне + открытый ствол', 'ПСШ СКМ в доп колонне без хвоста']
-            self.template_Combo.addItems(self.template_select_list)
-            template_key = self.definition_pssh()
-            # print(template_key)
-            self.template_Combo.setCurrentIndex(self.template_select_list.index(template_key))
-
-            self.grid.addWidget(self.template_labelType, 1, 2, 1, 8)
-            self.grid.addWidget(self.template_Combo, 2, 2, 2, 8)
-            self.grid.addWidget(self.dictance_template_first_Label, 4, 2)
-            self.grid.addWidget(self.dictance_template_first_Edit, 5, 2)
-
-            self.grid.addWidget(self.template_first_Label, 4, 3)
-            self.grid.addWidget(self.template_first_Edit, 5, 3)
-
-            self.grid.addWidget(self.lenght_template_first_Label, 4, 4)
-            self.grid.addWidget(self.lenght_template_first_Edit, 5, 4)
-            self.grid.addWidget(self.dictance_template_second_Label, 4, 5)
-            self.grid.addWidget(self.dictance_template_second_Edit, 5, 5)
-            self.grid.addWidget(self.skm_Label, 4, 6)
-            self.grid.addWidget(self.skm_Edit, 5, 6)
-            self.grid.addWidget(self.SKM_type_label, 4, 7)
-            self.grid.addWidget(self.SKM_type_Combo, 5, 7)
-            self.grid.addWidget(self.dictance_three_Label, 4, 8)
-            self.grid.addWidget(self.dictance_three_Edit, 5, 8)
-            self.grid.addWidget(self.template_second_Label, 4, 9)
-            self.grid.addWidget(self.template_second_Edit, 5, 9)
-            self.grid.addWidget(self.lenght_template_second_Label, 4, 10)
-            self.grid.addWidget(self.lenght_template_second_Edit, 5, 10)
+        self.template_Combo.currentTextChanged.connect(self.update_template_edit)
+        self.definition_template_work(float(self.current_bottom_edit.text()))
 
         self.grid.addWidget(self.current_bottom_label, 8, 3)
         self.grid.addWidget(self.current_bottom_edit, 9, 3)
@@ -208,42 +144,102 @@ class TabPage_SO_with(QWidget):
 
         self.lenght_template_first_Edit.setText(str(4))
 
-        self.dictance_template_first_Edit.textChanged.connect(self.update_template)
-        self.template_first_Edit.textChanged.connect(self.update_template)
-        self.lenght_template_first_Edit.textChanged.connect(self.update_template)
-        self.dictance_template_second_Edit.textChanged.connect(self.update_template)
-        self.skm_Edit.textChanged.connect(self.update_template)
-        self.dictance_three_Edit.textChanged.connect(self.update_template)
-        self.template_second_Edit.textChanged.connect(self.update_template)
-        self.lenght_template_second_Edit.textChanged.connect(self.update_template)
-        self.current_bottom_edit.textChanged.connect(self.update_template)
-        self.current_bottom_edit.textChanged.connect(self.update_template)
+        self.dictance_template_first_Edit.editingFinished.connect(self.update_template)
+        self.template_first_Edit.editingFinished.connect(self.update_template)
+        self.lenght_template_first_Edit.editingFinished.connect(self.update_template)
+        self.dictance_template_second_Edit.editingFinished.connect(self.update_template)
+        self.skm_Edit.editingFinished.connect(self.update_template)
+        self.dictance_three_Edit.editingFinished.connect(self.update_template)
+        self.template_second_Edit.editingFinished.connect(self.update_template)
+        self.lenght_template_second_Edit.editingFinished.connect(self.update_template)
+        self.current_bottom_edit.editingFinished.connect(self.update_template)
+        self.SKM_type_Combo.currentTextChanged.connect(self.update_template)
 
 
+    def definition_template_work(self, current_bottom):
+        if well_data.column_additional is False or \
+                (well_data.column_additional and current_bottom < well_data.head_column_additional._value):
+            self.template_select_list = ['', 'ПСШ ЭК', 'ПСШ открытый ствол', 'ПСШ без хвоста']
 
-    def definition_pssh(self):
-        # print(well_data.plast_work)
-        #
-        # print(list(well_data.dict_perforation.keys()))
-        # print(well_data.dict_perforation[plast]['отрайбировано'] for plast in well_data.plast_work)
+            self.template_Combo.addItems(self.template_select_list)
+
+            template_key = self.definition_pssh(current_bottom)
+            self.template_Combo.setCurrentIndex(self.template_select_list.index(template_key))
+
+
+            self.grid.addWidget(self.template_labelType, 1, 2, 1, 8)
+            self.grid.addWidget(self.template_Combo, 2, 2, 2, 8)
+            self.grid.addWidget(self.template_first_Label, 4, 2)
+            self.grid.addWidget(self.template_first_Edit, 5, 2)
+            self.grid.addWidget(self.lenght_template_first_Label, 4, 3)
+            self.grid.addWidget(self.lenght_template_first_Edit, 5, 3)
+            self.grid.addWidget(self.dictance_template_first_Label, 4, 4)
+            self.grid.addWidget(self.dictance_template_first_Edit, 5, 4)
+            self.grid.addWidget(self.skm_Label, 4, 5)
+            self.grid.addWidget(self.skm_Edit, 5, 5)
+            self.grid.addWidget(self.SKM_type_label, 4, 6)
+            self.grid.addWidget(self.SKM_type_Combo, 5, 6)
+            self.grid.addWidget(self.dictance_template_second_Label, 4, 7)
+            self.grid.addWidget(self.dictance_template_second_Edit, 5, 7)
+            self.grid.addWidget(self.template_second_Label, 4, 8)
+            self.grid.addWidget(self.template_second_Edit, 5, 8)
+            self.grid.addWidget(self.lenght_template_second_Label, 4, 9)
+            self.grid.addWidget(self.lenght_template_second_Edit, 5, 9)
+            self.grid.addWidget(self.dictance_three_Label, 4, 10)
+            self.grid.addWidget(self.dictance_three_Edit, 5, 10)
+
+        else:
+            self.template_select_list = ['', 'ПСШ Доп колонна СКМ в основной колонне',
+                                         'ПСШ СКМ в доп колонне + открытый ствол',
+                                         'ПСШ СКМ в доп колонне c хвостом',
+                                         'ПСШ СКМ в доп колонне без хвоста']
+            self.template_Combo.addItems(self.template_select_list)
+            template_key = self.definition_pssh(current_bottom)
+            # print(template_key)
+            self.template_Combo.setCurrentIndex(self.template_select_list.index(template_key))
+
+            self.grid.addWidget(self.template_labelType, 1, 2, 1, 8)
+            self.grid.addWidget(self.template_Combo, 2, 2, 2, 8)
+            self.grid.addWidget(self.dictance_template_first_Label, 4, 2)
+            self.grid.addWidget(self.dictance_template_first_Edit, 5, 2)
+
+            self.grid.addWidget(self.template_first_Label, 4, 3)
+            self.grid.addWidget(self.template_first_Edit, 5, 3)
+
+            self.grid.addWidget(self.lenght_template_first_Label, 4, 4)
+            self.grid.addWidget(self.lenght_template_first_Edit, 5, 4)
+            self.grid.addWidget(self.dictance_template_second_Label, 4, 5)
+            self.grid.addWidget(self.dictance_template_second_Edit, 5, 5)
+            self.grid.addWidget(self.skm_Label, 4, 6)
+            self.grid.addWidget(self.skm_Edit, 5, 6)
+            self.grid.addWidget(self.SKM_type_label, 4, 7)
+            self.grid.addWidget(self.SKM_type_Combo, 5, 7)
+            self.grid.addWidget(self.dictance_three_Label, 4, 8)
+            self.grid.addWidget(self.dictance_three_Edit, 5, 8)
+            self.grid.addWidget(self.template_second_Label, 4, 9)
+            self.grid.addWidget(self.template_second_Edit, 5, 9)
+            self.grid.addWidget(self.lenght_template_second_Label, 4, 10)
+            self.grid.addWidget(self.lenght_template_second_Edit, 5, 10)
+    def definition_pssh(self, current_bottom):
+
 
         if well_data.column_additional is False and well_data.open_trunk_well is False and all(
                 [well_data.dict_perforation[plast]['отрайбировано'] for plast in well_data.plast_work]) is False or \
                 (well_data.column_additional is True and well_data.open_trunk_well is False and all(
             [well_data.dict_perforation[plast]['отрайбировано'] for plast in well_data.plast_work]) is False and \
-                 well_data.current_bottom <= well_data.head_column_additional._value):
+                 current_bottom <= well_data.head_column_additional._value):
             template_key = 'ПСШ ЭК'
 
         elif well_data.column_additional is False and well_data.open_trunk_well is True or \
                 ( well_data.column_additional is True and well_data.open_trunk_well is True and \
-                  well_data.current_bottom <= well_data.head_column_additional._value and well_data.open_trunk_well):
+                  current_bottom <= well_data.head_column_additional._value and well_data.open_trunk_well):
             template_key = 'ПСШ открытый ствол'
 
         elif well_data.column_additional is False and well_data.open_trunk_well is False and all(
                 [well_data.dict_perforation[plast]['отрайбировано'] for plast in well_data.plast_work]) is True or \
                 (well_data.column_additional is True and well_data.open_trunk_well is False and all(
                 [well_data.dict_perforation[plast]['отрайбировано'] for plast in well_data.plast_work]) is True and \
-                 well_data.current_bottom <= well_data.head_column_additional._value):
+                 current_bottom <= well_data.head_column_additional._value):
             template_key = 'ПСШ без хвоста'
 
         elif well_data.column_additional is True and well_data.open_trunk_well is False and all(
@@ -262,8 +258,14 @@ class TabPage_SO_with(QWidget):
 
     def update_template(self):
         SKM_type = self.SKM_type_Combo.currentText()
+
+        self.template_Combo.setCurrentIndex(0)
+        current_bottom = float(self.current_bottom_edit.text())
+        template_key = self.definition_pssh(current_bottom)
+        self.template_Combo.setCurrentIndex(self.template_select_list.index(template_key))
+        current_bottom = float(self.current_bottom_edit.text())
         if self.current_bottom_edit.text() != '':
-            well_data.current_bottom = round(float(self.current_bottom_edit.text()), 1)
+            current_bottom = round(float(self.current_bottom_edit.text()), 1)
 
         if self.template_first_Edit.text() != '':
                 first_template = self.template_first_Edit.text()
@@ -290,36 +292,37 @@ class TabPage_SO_with(QWidget):
         nkt_diam = well_data.nkt_diam
 
         if well_data.column_additional or \
-                (well_data.head_column_additional._value >= well_data.current_bottom and well_data.column_additional is False):
+                (well_data.head_column_additional._value >= current_bottom and well_data.column_additional is False):
             nkt_pod = '60мм' if well_data.column_additional_diametr._value < 110 else '73мм со снятыми фасками'
 
         if first_template != '' and lenght_template_first != '' and \
                 template_second != '' and lenght_template_second != '' and \
                 skm != '' and dictance_template_first != '' and \
                 dictance_template_second != '' and first_template != '':
-
+            template_str = ''
             if self.template_Combo.currentText() == 'ПСШ ЭК':
                 # if dictance_template_second != '':
                 self.dictance_three_Edit.setParent(None)
                 self.dictance_three_Label.setParent(None)
+                if first_template != 'фильтр направление':
+                    template_str = f'перо + шаблон-{int(first_template)}мм L-{int(lenght_template_first)}м + НКТ{nkt_diam}м ' \
+                                   f'{int(dictance_template_first)}м + {SKM_type}-{skm} +  ' \
+                                   f'НКТ{nkt_diam}м {int(dictance_template_second)}м + шаблон-{template_second}мм ' \
+                                   f'L-{lenght_template_second}м '
 
-                template_str = f'перо + шаблон-{int(first_template)}мм L-{int(lenght_template_first)}м + НКТ{nkt_diam}м ' \
-                               f'{int(dictance_template_first)}м + {SKM_type}-{skm} +  ' \
-                               f'НКТ{nkt_diam}м {int(dictance_template_second)}м + шаблон-{template_second}мм ' \
-                               f'L-{lenght_template_second}м '
+                    well_data.template_depth = int(current_bottom - int(dictance_template_first) -
+                                                   int(lenght_template_first)) - int(dictance_template_second)
 
-                well_data.template_depth = int(well_data.current_bottom - int(dictance_template_first) -
-                                               int(lenght_template_first)) - int(dictance_template_second)
+                    well_data.skm_depth = well_data.template_depth + dictance_template_second
+                    skm_teml_str = f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
 
-                well_data.skm_depth = well_data.template_depth + dictance_template_second
-                skm_teml_str = f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
 
 
             elif self.template_Combo.currentText() == 'ПСШ без хвоста':
                 # if dictance_template_second != None:
                 template_str = f'перо + {SKM_type}-{skm} + {dictance_template_second}м ' \
                                f'НКТ{nkt_diam}м + шаблон-{template_second}мм L-{lenght_template_second}м '
-                well_data.template_depth = math.ceil(well_data.current_bottom - int(dictance_template_second))
+                well_data.template_depth = math.ceil(current_bottom - int(dictance_template_second))
                 well_data.skm_depth = well_data.template_depth + dictance_template_second
                 skm_teml_str = f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
 
@@ -329,7 +332,7 @@ class TabPage_SO_with(QWidget):
                 template_str = f'фильтр-направление L {lenght_template_first}м + НКТ{nkt_diam}м {dictance_template_first}м ' \
                                f'+ {SKM_type}-{skm} + {dictance_template_second}м НКТ{nkt_diam}м + ' \
                                f'шаблон-{template_second}мм L-{lenght_template_second}м '
-                well_data.template_depth = int(well_data.current_bottom - int(dictance_template_first) -
+                well_data.template_depth = int(current_bottom - int(dictance_template_first) -
                                                int(dictance_template_second) - int(lenght_template_first))
 
                 well_data.skm_depth = well_data.template_depth + dictance_template_second
@@ -343,10 +346,10 @@ class TabPage_SO_with(QWidget):
                                    f'НКТ{nkt_pod} {dictance_template_second}м + НКТ{nkt_diam} {dictance_three}м + ' \
                                    f'{SKM_type}-{skm} + шаблон-{template_second}мм L-{lenght_template_second}м '
 
-                    well_data.template_depth_addition = well_data.current_bottom - int(dictance_template_first)
+                    well_data.template_depth_addition = current_bottom - int(dictance_template_first)
 
 
-                    well_data.template_depth = int(float(well_data.current_bottom - int(dictance_template_first) - \
+                    well_data.template_depth = int(float(current_bottom - int(dictance_template_first) - \
                                                int(dictance_template_second) - int(dictance_three)))
                     well_data.skm_depth = well_data.template_depth + dictance_three
                     # template_str = template_SKM_DP_EK
@@ -365,11 +368,11 @@ class TabPage_SO_with(QWidget):
 
 
 
-                    well_data.template_depth = int(well_data.current_bottom) - int(dictance_template_first) - \
+                    well_data.template_depth = int(current_bottom) - int(dictance_template_first) - \
                                                int(dictance_template_second) - int(dictance_three) - \
                                                int(lenght_template_first)
 
-                    well_data.template_depth_addition = int(well_data.current_bottom) - int(dictance_template_first) - \
+                    well_data.template_depth_addition = int(current_bottom) - int(dictance_template_first) - \
                                                         int(dictance_template_second)
 
 
@@ -387,9 +390,9 @@ class TabPage_SO_with(QWidget):
                                    f'шаблон-{first_template}мм L-{lenght_template_first}м + ' \
                                    f'НКТ{nkt_pod} {dictance_three}м + шаблон-{template_second}мм ' \
                                    f'L-{lenght_template_second}м '
-                    well_data.template_depth_addition = well_data.current_bottom - int(dictance_template_second)
+                    well_data.template_depth_addition = current_bottom - int(dictance_template_second)
 
-                    well_data.template_depth = int(well_data.current_bottom) - int(dictance_template_second) - \
+                    well_data.template_depth = int(current_bottom) - int(dictance_template_second) - \
                                                int(dictance_three) - int(lenght_template_first)
 
                     well_data.skm_depth = well_data.template_depth + int(dictance_three)
@@ -408,10 +411,10 @@ class TabPage_SO_with(QWidget):
                                    f' + НКТ{nkt_pod} {dictance_three}м + шаблон-{template_second}мм ' \
                                    f'L-{lenght_template_second}м '
                     # if dictance_three and dictance_template_second and dictance_template_first and lenght_template_first:
-                    well_data.template_depth_addition = int(well_data.current_bottom) - int(dictance_template_first) - \
+                    well_data.template_depth_addition = int(current_bottom) - int(dictance_template_first) - \
                                                         int(dictance_template_second)
 
-                    well_data.template_depth = int(well_data.current_bottom) - int(dictance_template_first) - \
+                    well_data.template_depth = int(current_bottom) - int(dictance_template_first) - \
                                                int(dictance_template_second) - int(dictance_three) - \
                                                int(lenght_template_first)
 
@@ -421,283 +424,320 @@ class TabPage_SO_with(QWidget):
                                    f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
             if dictance_template_second != '' and dictance_template_first != '' and \
                     lenght_template_first != '' and first_template != '' and template_second != '' \
-                    and lenght_template_second != '':
+                    and lenght_template_second != '' and template_str != '' :
 
                 self.template_str_Edit.setText(template_str)
                 self.skm_teml_str_Edit.setText(skm_teml_str)
 
     def update_template_edit(self, index):
-        SKM_type = self.SKM_type_Combo.currentText()
-        nkt_diam = well_data.nkt_diam
-        # print(well_data.column_additional, well_data.head_column_additional._value, well_data.current_bottom)
-        if well_data.column_additional is False or (well_data.column_additional and
-                                                    well_data.head_column_additional._value >= well_data.current_bottom):
-            first_template, template_second = self.template_diam_ek()
-            # print(f'диаметры шаблонов {first_template, template_second}')
-        else:
-            first_template, template_second = self.template_diam_additional_ek()
-            # print(f'диаметры шаблонов {first_template, template_second}')
+        current_bottom = float(self.current_bottom_edit.text())
+        if index != '':
+            SKM_type = self.SKM_type_Combo.currentText()
 
-        self.template_first_Edit.setText(str(first_template))
-        self.template_second_Edit.setText(str(template_second))
-        self.skm_Edit.setText(str(well_data.column_diametr._value))
-        self.dictance_template_second_Edit.setText(str(10))
+            nkt_diam = well_data.nkt_diam
+            # print(well_data.column_additional, well_data.head_column_additional._value, current_bottom)
+            if well_data.column_additional is False or (well_data.column_additional and
+                                                        well_data.head_column_additional._value >= current_bottom):
+                first_template, template_second = self.template_diam_ek()
+                # print(f'диаметры шаблонов {first_template, template_second}')
+            else:
+                first_template, template_second = self.template_diam_additional_ek()
+                # print(f'диаметры шаблонов {first_template, template_second}')
 
-        roof_plast, roof_add_column_plast = self.definition_roof_not_raiding()
+            if 'ПОМ' in str(well_data.paker_do["posle"]).upper() and '122' in str(well_data.paker_do["posle"]):
+                self.template_second_Edit.setText(str(126))
 
-        # print(f'кровля отрайби интерва {roof_plast, roof_add_column_plast}')
-        dictance_template_first = int(well_data.current_bottom - roof_plast + 5)
-        self.dictance_template_first_Edit.setText(str(dictance_template_first))
-
-        lenght_template_first, lenght_template_second = self.definition_ECN_true(well_data.dict_pump_ECN_h["posle"])
-        self.lenght_template_first_Edit.setText(lenght_template_first)
-        self.lenght_template_second_Edit.setText(str(lenght_template_second))
-
-        first_template = self.template_first_Edit.text()
-        template_second = int(self.template_second_Edit.text())
-        lenght_template_first = int(self.lenght_template_first_Edit.text())
-
-        lenght_template_second = int(self.lenght_template_second_Edit.text())
-        dictance_template_second = int(self.dictance_template_second_Edit.text())
-        skm = self.skm_Edit.text()
-
-        self.template_first_Label.setParent(None)
-        self.template_first_Edit.setParent(None)
-        self.lenght_template_first_Label.setParent(None)
-        self.lenght_template_first_Edit.setParent(None)
-        self.dictance_three_Edit.setParent(None)
-        self.dictance_three_Edit.setParent(None)
-        self.dictance_template_first_Label.setParent(None)
-        self.dictance_template_first_Edit.setParent(None)
-        self.dictance_three_Label.setParent(None)
-        self.dictance_three_Edit.setParent(None)
-
-        if well_data.column_additional or \
-                (well_data.head_column_additional._value >= well_data.current_bottom and \
-                 well_data.column_additional is False):
-            nkt_pod = '60мм' if well_data.column_additional_diametr._value < 110 else '73мм со снятыми фасками'
-
-        if index == 'ПСШ ЭК':
-            self.grid.addWidget(self.template_first_Label, 4, 2)
-            self.grid.addWidget(self.template_first_Edit, 5, 2)
-            self.grid.addWidget(self.lenght_template_first_Label, 4, 3)
-            self.grid.addWidget(self.lenght_template_first_Edit, 5, 3)
-            self.grid.addWidget(self.dictance_template_first_Label, 4, 4)
-            self.grid.addWidget(self.dictance_template_first_Edit, 5, 4)
-            self.grid.addWidget(self.lenght_template_second_Label, 4, 9)
-            self.grid.addWidget(self.lenght_template_second_Edit, 5, 9)
-
-            template_str = f'перо + шаблон-{first_template}мм L-{lenght_template_first}м + НКТ{nkt_diam}м ' \
-                           f'{dictance_template_first}м + {SKM_type}-{skm} +  ' \
-                           f'НКТ{nkt_diam}м {dictance_template_second}м + шаблон-{template_second}мм ' \
-                           f'L-{lenght_template_second}м '
-
-            # print(f'строка шаблона {template_str}')
-            well_data.template_depth = int(well_data.current_bottom - int(dictance_template_first) -
-                                           int(lenght_template_first)) - int(dictance_template_second)
-            well_data.skm_depth = well_data.template_depth + dictance_template_second
-            skm_teml_str = f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
-
-
-
-        elif index == 'ПСШ без хвоста':
-            template_str = f'перо + {SKM_type}-{skm} + {dictance_template_second}м ' \
-                           f'НКТ{nkt_diam}м + шаблон-{template_second}мм L-{lenght_template_second}м '
-            well_data.template_depth = math.ceil(well_data.current_bottom - int(dictance_template_second))
-            well_data.skm_depth = well_data.current_bottom
-            skm_teml_str = f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
-
-        elif index == 'ПСШ открытый ствол':
-
-            # self.grid.addWidget(self.template_first_Label, 4, 2)
-            # self.grid.addWidget(self.template_first_Edit, 5, 2)
-            self.grid.addWidget(self.lenght_template_first_Label, 4, 3)
-            self.grid.addWidget(self.lenght_template_first_Edit, 5, 3)
-            self.grid.addWidget(self.dictance_template_first_Label, 4, 4)
-            self.grid.addWidget(self.dictance_template_first_Edit, 5, 4)
-            self.grid.addWidget(self.lenght_template_second_Label, 4, 9)
-            self.grid.addWidget(self.lenght_template_second_Edit, 5, 9)
-
-            self.template_first_Edit.setText('фильтр направление')
-            self.dictance_template_first_Edit.setText(str(dictance_template_first))
-            self.dictance_template_second_Edit.setText(str(10))
-            dictance_template_first = int(self.dictance_template_first_Edit.text())
-            dictance_template_second = int(self.dictance_template_second_Edit.text())
-
-            template_str = f'фильтр-направление + НКТ{nkt_diam}м {dictance_template_first}м ' \
-                           f'+ {SKM_type}-{skm} + {dictance_template_second}м НКТ{nkt_diam}м + ' \
-                           f'шаблон-{template_second}мм L-{lenght_template_second}м '
-            well_data.template_depth = int(
-                well_data.current_bottom - dictance_template_first - dictance_template_second)
-            well_data.skm_depth = well_data.template_depth + dictance_template_second
-
-            skm_teml_str = f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
-
-        elif index == 'ПСШ Доп колонна СКМ в основной колонне':
-
-            self.grid.addWidget(self.dictance_template_first_Label, 4, 2)
-            self.grid.addWidget(self.dictance_template_first_Edit, 5, 2)
-            self.grid.addWidget(self.template_first_Label, 4, 3)
-            self.grid.addWidget(self.template_first_Edit, 5, 3)
-            self.grid.addWidget(self.lenght_template_first_Label, 4, 4)
-            self.grid.addWidget(self.lenght_template_first_Edit, 5, 4)
-            self.grid.addWidget(self.lenght_template_second_Label, 4, 11)
-            self.grid.addWidget(self.lenght_template_second_Edit, 5, 11)
-            self.grid.addWidget(self.dictance_three_Label, 4, 10)
-            self.grid.addWidget(self.dictance_three_Edit, 5, 10)
-
-            self.lenght_template_first_Edit.setText(str(lenght_template_first))
-            lenght_template_first = int(self.lenght_template_first_Edit.text())
-            dictance_template_first1 = int(well_data.current_bottom - roof_add_column_plast + 5)
-
-            # print(f'дистанци {dictance_template_first }')
+            self.template_first_Edit.setText(str(first_template))
+            self.template_second_Edit.setText(str(template_second))
             self.skm_Edit.setText(str(well_data.column_diametr._value))
-            self.dictance_template_first_Edit.setText(str(dictance_template_first1))
-            dictance_template_first = int(self.dictance_template_first_Edit.text())
-            dictance_template_second = int(well_data.current_bottom - dictance_template_first1 - \
-                               lenght_template_first - well_data.head_column_additional._value +5)
-            self.dictance_template_second_Edit.setText(str(dictance_template_second))
+            self.dictance_template_second_Edit.setText(str(10))
 
+            roof_plast, roof_add_column_plast = self.definition_roof_not_raiding(current_bottom)
+
+            # print(f'кровля отрайби интерва {roof_plast, roof_add_column_plast}')
+            dictance_template_first = int(current_bottom - roof_plast + 5)
+            self.dictance_template_first_Edit.setText(str(dictance_template_first))
+
+            lenght_template_first, lenght_template_second = self.definition_ECN_true(well_data.dict_pump_ECN_h["posle"])
+            self.lenght_template_first_Edit.setText(lenght_template_first)
             self.lenght_template_second_Edit.setText(str(lenght_template_second))
 
-            dictance_template_three = round(well_data.current_bottom - dictance_template_first - \
-                                       int(dictance_template_second) - lenght_template_first - roof_plast + 10, 0)
-            self.dictance_three_Edit.setText(str(dictance_template_three))
+            first_template = self.template_first_Edit.text()
+            template_second = int(self.template_second_Edit.text())
+            lenght_template_first = int(self.lenght_template_first_Edit.text())
 
+            lenght_template_second = int(self.lenght_template_second_Edit.text())
+            dictance_template_second = int(self.dictance_template_second_Edit.text())
+            skm = self.skm_Edit.text()
 
-            template_str = f'обточная муфта  + ' \
-                           f'НКТ{nkt_pod}  + {dictance_template_first}м + шаблон-{first_template}мм L-{lenght_template_first}м + ' \
-                           f'НКТ{nkt_pod} {dictance_template_second}м +' \
-                           f'{SKM_type}-{skm} + НКТ{nkt_diam} {dictance_template_three}м + шаблон-{template_second}мм L-{lenght_template_second}м '
+            self.template_first_Label.setParent(None)
+            self.template_first_Edit.setParent(None)
+            self.lenght_template_first_Label.setParent(None)
+            self.lenght_template_first_Edit.setParent(None)
+            self.dictance_three_Edit.setParent(None)
+            self.dictance_three_Edit.setParent(None)
+            self.dictance_template_first_Label.setParent(None)
+            self.dictance_template_first_Edit.setParent(None)
+            self.dictance_three_Label.setParent(None)
+            self.dictance_three_Edit.setParent(None)
 
-            well_data.template_depth_addition = int(well_data.current_bottom - dictance_template_first)
-            well_data.template_depth = int(well_data.current_bottom - dictance_template_first - lenght_template_first -
-                                           dictance_template_second - dictance_template_three)
-            well_data.skm_depth = well_data.template_depth + dictance_template_three
-            # template_str = template_SKM_DP_EK
-            skm_teml_str = f'шаблон-{first_template}мм до гл.{well_data.template_depth_addition}м, ' \
-                           f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
+            if well_data.column_additional or \
+                    (well_data.head_column_additional._value >= current_bottom and \
+                     well_data.column_additional is False):
+                nkt_pod = '60мм' if well_data.column_additional_diametr._value < 110 else '73мм со снятыми фасками'
 
+            if index == 'ПСШ ЭК':
 
-        elif index == 'ПСШ СКМ в доп колонне c хвостом':
+                template_str = f'перо + шаблон-{first_template}мм L-{lenght_template_first}м + НКТ{nkt_diam}м ' \
+                               f'{dictance_template_first}м + {SKM_type}-{skm} +  ' \
+                               f'НКТ{nkt_diam}м {dictance_template_second}м + шаблон-{template_second}мм ' \
+                               f'L-{lenght_template_second}м '
 
-            self.grid.addWidget(self.dictance_template_first_Label, 4, 2)
-            self.grid.addWidget(self.dictance_template_first_Edit, 5, 2)
-            self.grid.addWidget(self.template_first_Label, 4, 3)
-            self.grid.addWidget(self.template_first_Edit, 5, 3)
-            self.grid.addWidget(self.lenght_template_first_Label, 4, 4)
-            self.grid.addWidget(self.lenght_template_first_Edit, 5, 4)
-            self.grid.addWidget(self.lenght_template_second_Label, 4, 9)
-            self.grid.addWidget(self.lenght_template_second_Edit, 5, 9)
-            self.grid.addWidget(self.dictance_three_Label, 4, 7)
-            self.grid.addWidget(self.dictance_three_Edit, 5, 7)
+                # print(f'строка шаблона {template_str}')
+                well_data.template_depth = int(current_bottom - int(dictance_template_first) -
+                                               int(lenght_template_first)) - int(dictance_template_second)
+                well_data.skm_depth = well_data.template_depth + dictance_template_second
+                skm_teml_str = f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
 
-            skm = str(well_data.column_additional_diametr._value)
-            self.skm_Edit.setText(skm)
-
-            dictance_template_first = int(well_data.current_bottom - roof_add_column_plast + 5)
-            self.dictance_template_first_Edit.setText(str(dictance_template_first))
-
-            dictance_template_three = round((well_data.current_bottom - dictance_template_first - \
-                                      int(dictance_template_second) - lenght_template_first) - roof_plast + 10, 0)
-
-            self.dictance_three_Edit.setText(str(dictance_template_three))
-
-            template_str = f'обточная муфта + НКТ{nkt_pod} {dictance_template_first}м ' \
-                           f'+ {SKM_type}-{skm} + НКТ{nkt_pod} {dictance_template_second}м + шаблон-{first_template}мм ' \
-                           f'L-{lenght_template_first}м + НКТ{nkt_pod} {dictance_template_three}м + ' \
-                           f'шаблон-{template_second}мм L-{lenght_template_second}м '
-
-            well_data.template_depth = math.ceil(well_data.current_bottom -
-                                                 dictance_template_first - dictance_template_second -
-                                                 lenght_template_first - dictance_template_three)
-
-            well_data.template_depth_addition = math.ceil(well_data.current_bottom - dictance_template_first -
-                                                          dictance_template_second)
-
-            well_data.skm_depth = well_data.template_depth_addition + dictance_template_second
-
-            skm_teml_str = f'шаблон-{first_template}мм до гл.{well_data.template_depth_addition}м, ' \
-                           f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
-
-        elif index == 'ПСШ СКМ в доп колонне без хвоста':
-
-            self.grid.addWidget(self.dictance_three_Label, 4, 7)
-            self.grid.addWidget(self.dictance_three_Edit, 5, 7)
-
-            dictance_template_first = 0
-            self.dictance_template_first_Edit.setText(str(dictance_template_first))
-
-            skm = str(well_data.column_additional_diametr._value)
-            self.skm_Edit.setText(skm)
-            dictance_template_second = 10
-            self.dictance_template_second_Edit.setText(str(dictance_template_second))
-
-            dictance_template_three = round((well_data.current_bottom - dictance_template_first - \
-                                       int(dictance_template_second) - lenght_template_first) - roof_plast + 10, 0)
-
-            self.dictance_three_Edit.setText(str(dictance_template_three))
-
-
-            template_str = f'обточная муфта + {SKM_type}-{skm} + НКТ{nkt_pod} {dictance_template_second} + ' \
-                           f'шаблон-{first_template}мм L-{lenght_template_first}м + ' \
-                           f'НКТ{nkt_pod} {dictance_template_three}м + шаблон-{template_second}мм ' \
-                           f'L-{lenght_template_second}м '
-
-            well_data.template_depth = math.ceil(well_data.current_bottom - dictance_template_second -
-                                                 lenght_template_first - dictance_template_three)
-            well_data.template_depth_addition = math.ceil(well_data.current_bottom - dictance_template_second)
-            well_data.skm_depth = well_data.template_depth_addition + dictance_template_second
-            skm_teml_str = f'шаблон-{first_template}мм до гл.{well_data.template_depth_addition}м, ' \
-                           f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
+                self.grid.addWidget(self.template_first_Label, 4, 2)
+                self.grid.addWidget(self.template_first_Edit, 5, 2)
+                self.grid.addWidget(self.lenght_template_first_Label, 4, 3)
+                self.grid.addWidget(self.lenght_template_first_Edit, 5, 3)
+                self.grid.addWidget(self.dictance_template_first_Label, 4, 4)
+                self.grid.addWidget(self.dictance_template_first_Edit, 5, 4)
+                self.grid.addWidget(self.lenght_template_second_Label, 4, 9)
+                self.grid.addWidget(self.lenght_template_second_Edit, 5, 9)
 
 
 
-        elif index == 'ПСШ СКМ в доп колонне + открытый ствол':
+            elif index == 'ПСШ без хвоста':
+                template_str = f'перо + {SKM_type}-{skm} + {dictance_template_second}м ' \
+                               f'НКТ{nkt_diam}м + шаблон-{template_second}мм L-{lenght_template_second}м '
+                well_data.template_depth = math.ceil(current_bottom - int(dictance_template_second))
+                well_data.skm_depth = current_bottom
+                skm_teml_str = f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
 
-            self.grid.addWidget(self.dictance_template_first_Label, 4, 2)
-            self.grid.addWidget(self.dictance_template_first_Edit, 5, 2)
-            self.grid.addWidget(self.template_first_Label, 4, 3)
-            self.grid.addWidget(self.template_first_Edit, 5, 3)
-            self.grid.addWidget(self.lenght_template_first_Label, 4, 4)
-            self.grid.addWidget(self.lenght_template_first_Edit, 5, 4)
-            self.grid.addWidget(self.lenght_template_second_Label, 4, 11)
-            self.grid.addWidget(self.lenght_template_second_Edit, 5, 11)
-            self.grid.addWidget(self.dictance_three_Label, 4, 10)
-            self.grid.addWidget(self.dictance_three_Edit, 5, 10)
+            elif index == 'ПСШ открытый ствол':
 
-            skm = str(well_data.column_additional_diametr._value)
-            self.skm_Edit.setText(skm)
-
-            dictance_template_first = int(well_data.current_bottom - roof_add_column_plast + 5)
-            self.dictance_template_first_Edit.setText(str(dictance_template_first))
-
-            dictance_template_three = round((well_data.current_bottom - dictance_template_first - \
-                                       int(dictance_template_second) - lenght_template_first) - roof_plast + 10, 0)
-            self.dictance_three_Edit.setText(str(dictance_template_three))
+                # self.grid.addWidget(self.template_first_Label, 4, 2)
+                # self.grid.addWidget(self.template_first_Edit, 5, 2)
 
 
-            template_str = f'фильтр направление L-2м + НКТ{nkt_pod} {dictance_template_first}м ' \
-                           f'+ {SKM_type}-{skm} + НКТ{nkt_pod} {dictance_template_second}м + шаблон-{first_template}мм ' \
-                           f'L-{lenght_template_first}м' \
-                           f' + НКТ{nkt_pod} {dictance_template_three}м + шаблон-{template_second}мм ' \
-                           f'L-{lenght_template_second}м '
+                self.template_first_Edit.setText('фильтр направление')
+                self.dictance_template_first_Edit.setText(str(dictance_template_first))
+                self.dictance_template_second_Edit.setText(str(10))
+                dictance_template_first = int(self.dictance_template_first_Edit.text())
+                dictance_template_second = int(self.dictance_template_second_Edit.text())
 
-            well_data.template_depth = math.ceil(well_data.current_bottom -
-                                                 dictance_template_first - dictance_template_second -
-                                                 lenght_template_first - dictance_template_three)
-            well_data.template_depth_addition = math.ceil(well_data.current_bottom -
-                                                          dictance_template_first - dictance_template_second)
-            well_data.skm_depth = well_data.template_depth_addition + dictance_template_second
+                template_str = f'фильтр-направление + НКТ{nkt_diam}м {dictance_template_first}м ' \
+                               f'+ {SKM_type}-{skm} + {dictance_template_second}м НКТ{nkt_diam}м + ' \
+                               f'шаблон-{template_second}мм L-{lenght_template_second}м '
+                well_data.template_depth = int(
+                    current_bottom - dictance_template_first - dictance_template_second)
+                well_data.skm_depth = well_data.template_depth + dictance_template_second
 
-            skm_teml_str = f'шаблон-{first_template}мм до гл.{well_data.template_depth_addition}м, ' \
-                           f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
+                skm_teml_str = f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
 
-        self.template_str_Edit.setText(template_str)
-        self.skm_teml_str_Edit.setText(skm_teml_str)
+                self.grid.addWidget(self.lenght_template_first_Label, 4, 3)
+                self.grid.addWidget(self.lenght_template_first_Edit, 5, 3)
+                self.grid.addWidget(self.dictance_template_first_Label, 4, 4)
+                self.grid.addWidget(self.dictance_template_first_Edit, 5, 4)
+                self.grid.addWidget(self.lenght_template_second_Label, 4, 9)
+                self.grid.addWidget(self.lenght_template_second_Edit, 5, 9)
 
-        if 'ПОМ' in str(well_data.paker_do["posle"]).upper() and '122' in str(well_data.paker_do["posle"]):
-            self.template_second_Edit.setText(str(126))
+            elif index == 'ПСШ Доп колонна СКМ в основной колонне':
+
+                self.lenght_template_first_Edit.setText(str(lenght_template_first))
+                lenght_template_first = int(self.lenght_template_first_Edit.text())
+                dictance_template_first1 = int(current_bottom - roof_add_column_plast + 5)
+
+                # print(f'дистанци {dictance_template_first }')
+                self.skm_Edit.setText(str(well_data.column_diametr._value))
+                self.dictance_template_first_Edit.setText(str(dictance_template_first1))
+                dictance_template_first = int(self.dictance_template_first_Edit.text())
+                dictance_template_second = int(current_bottom - dictance_template_first1 - \
+                                   lenght_template_first - well_data.head_column_additional._value +5)
+                self.dictance_template_second_Edit.setText(str(dictance_template_second))
+
+                self.lenght_template_second_Edit.setText(str(lenght_template_second))
+
+                dictance_template_three = round(current_bottom - dictance_template_first - \
+                                           int(dictance_template_second) - lenght_template_first - roof_plast + 10, 0)
+                self.dictance_three_Edit.setText(str(dictance_template_three))
+
+
+                template_str = f'обточная муфта  + ' \
+                               f'НКТ{nkt_pod}  + {dictance_template_first}м + шаблон-{first_template}мм L-{lenght_template_first}м + ' \
+                               f'НКТ{nkt_pod} {dictance_template_second}м +' \
+                               f'{SKM_type}-{skm} + НКТ{nkt_diam} {dictance_template_three}м + шаблон-{template_second}мм L-{lenght_template_second}м '
+
+                well_data.template_depth_addition = int(current_bottom - dictance_template_first)
+                well_data.template_depth = int(current_bottom - dictance_template_first - lenght_template_first -
+                                               dictance_template_second - dictance_template_three)
+                well_data.skm_depth = well_data.template_depth + dictance_template_three
+                # template_str = template_SKM_DP_EK
+                skm_teml_str = f'шаблон-{first_template}мм до гл.{well_data.template_depth_addition}м, ' \
+                               f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
+
+                self.grid.addWidget(self.dictance_template_first_Label, 4, 2)
+                self.grid.addWidget(self.dictance_template_first_Edit, 5, 2)
+                self.grid.addWidget(self.template_first_Label, 4, 3)
+                self.grid.addWidget(self.template_first_Edit, 5, 3)
+                self.grid.addWidget(self.lenght_template_first_Label, 4, 4)
+                self.grid.addWidget(self.lenght_template_first_Edit, 5, 4)
+                self.grid.addWidget(self.lenght_template_second_Label, 4, 11)
+                self.grid.addWidget(self.lenght_template_second_Edit, 5, 11)
+                self.grid.addWidget(self.dictance_three_Label, 4, 10)
+                self.grid.addWidget(self.dictance_three_Edit, 5, 10)
+
+
+            elif index == 'ПСШ СКМ в доп колонне c хвостом':
+
+
+
+                skm = str(well_data.column_additional_diametr._value)
+                self.skm_Edit.setText(skm)
+
+                dictance_template_first = int(current_bottom - roof_add_column_plast + 5)
+                self.dictance_template_first_Edit.setText(str(dictance_template_first))
+
+                dictance_template_three = round((current_bottom - dictance_template_first - \
+                                          int(dictance_template_second) - lenght_template_first) - roof_plast + 10, 0)
+
+                self.dictance_three_Edit.setText(str(dictance_template_three))
+
+                template_str = f'обточная муфта + НКТ{nkt_pod} {dictance_template_first}м ' \
+                               f'+ {SKM_type}-{skm} + НКТ{nkt_pod} {dictance_template_second}м + шаблон-{first_template}мм ' \
+                               f'L-{lenght_template_first}м + НКТ{nkt_pod} {dictance_template_three}м + ' \
+                               f'шаблон-{template_second}мм L-{lenght_template_second}м '
+
+                well_data.template_depth = math.ceil(current_bottom -
+                                                     dictance_template_first - dictance_template_second -
+                                                     lenght_template_first - dictance_template_three)
+
+                well_data.template_depth_addition = math.ceil(current_bottom - dictance_template_first -
+                                                              dictance_template_second)
+
+                well_data.skm_depth = well_data.template_depth_addition + dictance_template_second
+
+                skm_teml_str = f'шаблон-{first_template}мм до гл.{well_data.template_depth_addition}м, ' \
+                               f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
+
+                self.grid.addWidget(self.dictance_template_first_Label, 4, 2)
+                self.grid.addWidget(self.dictance_template_first_Edit, 5, 2)
+                self.grid.addWidget(self.template_first_Label, 4, 3)
+                self.grid.addWidget(self.template_first_Edit, 5, 3)
+                self.grid.addWidget(self.lenght_template_first_Label, 4, 4)
+                self.grid.addWidget(self.lenght_template_first_Edit, 5, 4)
+                self.grid.addWidget(self.lenght_template_second_Label, 4, 9)
+                self.grid.addWidget(self.lenght_template_second_Edit, 5, 9)
+                self.grid.addWidget(self.dictance_three_Label, 4, 7)
+                self.grid.addWidget(self.dictance_three_Edit, 5, 7)
+
+            elif index == 'ПСШ СКМ в доп колонне без хвоста':
+
+                self.grid.addWidget(self.dictance_three_Label, 4, 7)
+                self.grid.addWidget(self.dictance_three_Edit, 5, 7)
+
+                dictance_template_first = 0
+                self.dictance_template_first_Edit.setText(str(dictance_template_first))
+
+                skm = str(well_data.column_additional_diametr._value)
+                self.skm_Edit.setText(skm)
+                dictance_template_second = 10
+                self.dictance_template_second_Edit.setText(str(dictance_template_second))
+
+                dictance_template_three = round((current_bottom - dictance_template_first - \
+                                           int(dictance_template_second) - lenght_template_first) - roof_plast + 10, 0)
+
+                self.dictance_three_Edit.setText(str(dictance_template_three))
+
+
+                template_str = f'обточная муфта + {SKM_type}-{skm} + НКТ{nkt_pod} {dictance_template_second} + ' \
+                               f'шаблон-{first_template}мм L-{lenght_template_first}м + ' \
+                               f'НКТ{nkt_pod} {dictance_template_three}м + шаблон-{template_second}мм ' \
+                               f'L-{lenght_template_second}м '
+
+                well_data.template_depth = math.ceil(current_bottom - dictance_template_second -
+                                                     lenght_template_first - dictance_template_three)
+                well_data.template_depth_addition = math.ceil(current_bottom - dictance_template_second)
+                well_data.skm_depth = well_data.template_depth_addition + dictance_template_second
+                skm_teml_str = f'шаблон-{first_template}мм до гл.{well_data.template_depth_addition}м, ' \
+                               f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
+
+                self.grid.addWidget(self.dictance_template_first_Label, 4, 2)
+                self.grid.addWidget(self.dictance_template_first_Edit, 5, 2)
+                self.grid.addWidget(self.template_first_Label, 4, 3)
+                self.grid.addWidget(self.template_first_Edit, 5, 3)
+                self.grid.addWidget(self.lenght_template_first_Label, 4, 4)
+                self.grid.addWidget(self.lenght_template_first_Edit, 5, 4)
+                self.grid.addWidget(self.lenght_template_second_Label, 4, 9)
+                self.grid.addWidget(self.lenght_template_second_Edit, 5, 9)
+                self.grid.addWidget(self.dictance_three_Label, 4, 7)
+                self.grid.addWidget(self.dictance_three_Edit, 5, 7)
+
+
+
+            elif index == 'ПСШ СКМ в доп колонне + открытый ствол':
+
+
+
+                skm = str(well_data.column_additional_diametr._value)
+                self.skm_Edit.setText(skm)
+
+                dictance_template_first = int(current_bottom - roof_add_column_plast + 5)
+                self.dictance_template_first_Edit.setText(str(dictance_template_first))
+
+                dictance_template_three = round((current_bottom - dictance_template_first - \
+                                           int(dictance_template_second) - lenght_template_first) - roof_plast + 10, 0)
+                self.dictance_three_Edit.setText(str(dictance_template_three))
+
+
+                template_str = f'фильтр направление L-2м + НКТ{nkt_pod} {dictance_template_first}м ' \
+                               f'+ {SKM_type}-{skm} + НКТ{nkt_pod} {dictance_template_second}м + шаблон-{first_template}мм ' \
+                               f'L-{lenght_template_first}м' \
+                               f' + НКТ{nkt_pod} {dictance_template_three}м + шаблон-{template_second}мм ' \
+                               f'L-{lenght_template_second}м '
+
+                well_data.template_depth = math.ceil(current_bottom -
+                                                     dictance_template_first - dictance_template_second -
+                                                     lenght_template_first - dictance_template_three)
+                well_data.template_depth_addition = math.ceil(current_bottom -
+                                                              dictance_template_first - dictance_template_second)
+                well_data.skm_depth = well_data.template_depth_addition + dictance_template_second
+
+                skm_teml_str = f'шаблон-{first_template}мм до гл.{well_data.template_depth_addition}м, ' \
+                               f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
+                self.grid.addWidget(self.dictance_template_first_Label, 4, 2)
+                self.grid.addWidget(self.dictance_template_first_Edit, 5, 2)
+                self.grid.addWidget(self.template_first_Label, 4, 3)
+                self.grid.addWidget(self.template_first_Edit, 5, 3)
+                self.grid.addWidget(self.lenght_template_first_Label, 4, 4)
+                self.grid.addWidget(self.lenght_template_first_Edit, 5, 4)
+                self.grid.addWidget(self.lenght_template_second_Label, 4, 11)
+                self.grid.addWidget(self.lenght_template_second_Edit, 5, 11)
+                self.grid.addWidget(self.dictance_three_Label, 4, 10)
+                self.grid.addWidget(self.dictance_three_Edit, 5, 10)
+
+            # if index == '':
+            #     template_str = ''
+            #     skm_teml_str = ''
+            #     self.template_first_Label.setParent(None)
+            #     self.template_first_Edit.setParent(None)
+            #     self.lenght_template_first_Label.setParent(None)
+            #     self.lenght_template_first_Edit.setParent(None)
+            #     self.dictance_three_Edit.setParent(None)
+            #     self.dictance_three_Edit.setParent(None)
+            #     self.dictance_template_first_Label.setParent(None)
+            #     self.dictance_template_first_Edit.setParent(None)
+            #     self.dictance_three_Label.setParent(None)
+            #     self.dictance_three_Edit.setParent(None)
+
+
+            self.template_str_Edit.setText(template_str)
+            self.skm_teml_str_Edit.setText(skm_teml_str)
+
+
 
     def definition_ECN_true(self, depth_ecn):
 
@@ -723,23 +763,23 @@ class TabPage_SO_with(QWidget):
 
             # print(f' ЭЦН длина" {well_data.lift_ecn_can, well_data.lift_ecn_can_addition, "ЭЦН" in str(well_data.dict_pump["posle"][0]).upper()}')
 
-    def definition_roof_not_raiding(self):
+    def definition_roof_not_raiding(self, current_bottom):
 
         dict_perforation = well_data.dict_perforation
         plast_all = list(dict_perforation.keys())
-        roof_plast = well_data.current_bottom
+        roof_plast = current_bottom
         roof_add_column_plast = well_data.head_column_additional._value
         if well_data.column_additional is False or (
-                well_data.column_additional and well_data.head_column_additional._value >= well_data.current_bottom):
+                well_data.column_additional and well_data.head_column_additional._value >= current_bottom):
             for plast in plast_all:
                 roof = min(list(map(lambda x: x[0], list(dict_perforation[plast]['интервал']))))
 
-                if roof_plast > roof and roof < well_data.current_bottom:
+                if roof_plast > roof and roof < current_bottom:
                     if dict_perforation[plast]['отрайбировано'] and well_data.open_trunk_well is False:
                         roof_add_column_plast = roof_plast
                     elif well_data.open_trunk_well is True and dict_perforation[plast]['отрайбировано']:
                         roof_plast = well_data.shoe_column._value
-                        roof_add_column_plast = well_data.current_bottom
+                        roof_add_column_plast = current_bottom
 
                     else:
                         roof_plast = min(list(map(lambda x: x[0], list(dict_perforation[plast]['интервал']))))
@@ -754,18 +794,18 @@ class TabPage_SO_with(QWidget):
             for plast in plast_all:
                 roof_plast_in = dict_perforation[plast]['кровля']
 
-                if well_data.head_column_additional._value <= roof_plast_in and roof_plast_in < well_data.current_bottom:
+                if well_data.head_column_additional._value <= roof_plast_in and roof_plast_in < current_bottom:
                     if dict_perforation[plast]['отрайбировано'] and well_data.open_trunk_well is False:
-                        roof_add_column_plast = well_data.current_bottom
+                        roof_add_column_plast = current_bottom
                     elif well_data.open_trunk_well is True and dict_perforation[plast]['отрайбировано']:
-                        roof_add_column_plast = well_data.current_bottom
+                        roof_add_column_plast = current_bottom
                     else:
                         roof_add_column_plast = roof_plast_in
                         break
             for plast in plast_all:
                 roof_plast_in = dict_perforation[plast]['кровля']
                 roof_plast = well_data.head_column_additional._value
-                if well_data.head_column_additional._value > roof_plast_in and roof_plast_in < well_data.current_bottom:
+                if well_data.head_column_additional._value > roof_plast_in and roof_plast_in < current_bottom:
                     if dict_perforation[plast]['отрайбировано'] and well_data.open_trunk_well is False:
                         roof_plast = well_data.head_column_additional._value
                     elif well_data.open_trunk_well is True and dict_perforation[plast]['отрайбировано']:

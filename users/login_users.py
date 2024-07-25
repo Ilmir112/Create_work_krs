@@ -30,6 +30,9 @@ class LoginWindow(QWidget):
         self.password.setPlaceholderText('введите пароль')
         self.password.setEchoMode(QLineEdit.Password)
 
+        self.button = QPushButton("обновить")
+        self.button.clicked.connect(self.update_users)
+
         self.button_login = QPushButton("вход", self)
         self.button_login.move(50, 120)
         self.button_login.clicked.connect(self.login)
@@ -37,12 +40,14 @@ class LoginWindow(QWidget):
         self.button_register = QPushButton("Регистрация", self)
         self.button_register.clicked.connect(self.show_register_window)
 
-        self.username.currentTextChanged.connect(self.update_users)
+
 
         self.box_layout = QGridLayout(self)
 
         self.box_layout.addWidget(self.label_username, 0, 1)
         self.box_layout.addWidget(self.username, 0, 2)
+        self.box_layout.addWidget(self.button, 0, 3)
+
         self.box_layout.addWidget(self.label_password, 1, 1)
         self.box_layout.addWidget(self.password, 1, 2)
         self.box_layout.addWidget(self.button_login, 2, 1)
@@ -51,33 +56,10 @@ class LoginWindow(QWidget):
     def update_users(self):
 
         users_list = list(map(lambda x: x[1], self.get_list_users()))
+        self.username.clear()
         self.username.addItems(users_list)
 
-    # def login(self):
-    #     try:
-    #         conn = psycopg2.connect(**well_data.postgres_conn_user)
-    #         cursor = conn.cursor()
-    #         cursor.execute("SELECT last_name, first_name, middle_name, position, organization FROM plan_krs_employee;")
-    #
-    #         password_base = cursor.fetchone()
-    #
-    #         well_data.user = (f'{password_base[0]} {password_base[1][0]}.{password_base[2][0]}.',
-    #                           f'{password_base[3]} {password_base[4]}')
-    #
-    #     except psycopg2.Error as e:
-    #         # well_data.user = ('Зуфаров Ильмир Мияссарович', 'Зам главного геолога ООО "Ойл-сервис"')
-    #         # Выведите сообщение об ошибке
-    #         mes = QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных django_users, '
-    #                                                   'проверьте наличие интернета')
-    #
-    #
-    #     finally:
-    #
-    #         # Закройте курсор и соединение
-    #         if cursor:
-    #             cursor.close()
-    #         if conn:
-    #             conn.close()
+
     def login(self):
         from data_base.work_with_base import connect_to_db
 
@@ -159,6 +141,8 @@ class LoginWindow(QWidget):
                 if conn:
                     conn.close()
 
+        if 'РН' in well_data.contractor:
+            well_data.connect_in_base = False
 
 
     def get_list_users(self):
@@ -270,19 +254,22 @@ class RegisterWindow(QWidget):
 
     def update_organization(self, index):
 
+
         if index == 'ООО "Ойл-cервис"':
-            self.label_region = QLabel("ЦЕХ:", self)
-            self.region = QComboBox(self)
+
+            self.label_region.setText("ЦЕХ:")
+            self.region.clear()
             self.region.addItems(['ЦТКРС № 1', 'ЦТКРС № 2', 'ЦТКРС № 3', 'ЦТКРС № 4',
                                   'ЦТКРС № 5', 'ЦТКРС № 6', 'ЦТКРС № 7'])
-            self.grid.addWidget(self.label_region, 5, 1)
-            self.grid.addWidget(self.region, 5, 2)
+
         elif index == 'ООО "РН-Сервис"':
-            self.label_region = QLabel("Экспедиция:", self)
-            self.region = QComboBox(self)
+            self.label_region.setText("Экспедиция:")
+            self.region.clear()
             self.region.addItems(['экспедиции №1', 'экспедиции №2', 'экспедиции №3', 'экспедиции №4',
                                   'экспедиции №5', 'экспедиции №6',
                                  'экспедиции №7'])
+        self.grid.addWidget(self.label_region, 5, 1)
+        self.grid.addWidget(self.region, 5, 2)
 
     def register_user(self):
         from data_base.work_with_base import connect_to_db

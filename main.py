@@ -1492,15 +1492,10 @@ class MyWindow(QMainWindow):
                 well_data.dict_leakiness = json.loads(data[5])
                 well_data.column_additional = data[6]
 
-                # if well_data.column_additional == 'false':
-                #     well_data.column_additional = False
-                # else:
-                #     well_data.column_additional = True
-
                 well_data.fluid_work = data[7]
                 well_data.template_depth, well_data.template_lenght, well_data.template_depth_addition, well_data.template_lenght_addition = json.loads(data[11])
                 well_data.skm_interval = json.loads(data[12])
-                a= well_data.skm_interval
+
                 well_data.problemWithEk_depth = data[13]
                 well_data.problemWithEk_diametr = data[14]
         # print(well_data.skm_interval)

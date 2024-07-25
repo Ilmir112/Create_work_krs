@@ -161,11 +161,11 @@ class TabPageDp(QWidget):
             self.well_number_edit.setText(f'{well_data.well_number._value}')
 
         if well_data.data_in_base:
-            self.table_in_base_label = QLabel('данные по скважине      ')
+            self.table_in_base_label = QLabel('данные по скважине')
             self.table_in_base_combo = QComboBox()
             self.table_in_base_combo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents)
 
-            self.well_data_label = QLabel('данные скважины в базе')
+            self.well_data_label = QLabel('файл excel')
             self.well_data_in_base_combo = QComboBox()
             self.well_data_in_base_combo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents)
 
@@ -247,10 +247,18 @@ class TabPageDp(QWidget):
                                 contractor = 'РН'
                         except:
                             contractor = 'Ойл'
+                        date_string = well[4]
+
+                        # Преобразуем строку в объект datetime
+                        datetime_object = datetime.strptime(date_string, "%Y-%m-%d %H:%M:%S.%f")
+
+                        # Форматируем объект datetime в нужный формат
+                        formatted_date = datetime_object.strftime("%d.%m.%Y")
+
                         # Формируем список скважин
-                        well_list.append(f'{well[0]} {well[1]} {contractor} {well[5]} от {well[4]}')
+                        well_list.append(f'{well[0]} {well[1]} {contractor} {well[5]} от {formatted_date}')
+
                         self.grid.setColumnMinimumWidth(5, self.table_in_base_combo.sizeHint().width())
-                        a = self.well_data_in_base_combo.sizeHint().width()
                         self.grid.setColumnMinimumWidth(6, self.well_data_in_base_combo.sizeHint().width())
 
                     return well_list[::-1]
@@ -432,8 +440,7 @@ class TabPageDp(QWidget):
                     conn = sqlite3.connect(db_path)
                     cursor = conn.cursor()
 
-                    # Получаем все имена таблиц в базе данных
-                    cursor.execute("""SELECT name FROM sqlite_master WHERE type='table' AND name LIKE ?""", (prefix + '%',))
+                    cursor.execute("""SELECT name FROM sqlite_master WHERE type='table'""")
 
                     tables = []
                     table_in_base = cursor.fetchall()[1:]
@@ -556,8 +563,6 @@ class DopPlanWindow(QMainWindow):
         table_in_base_combo = str(self.tabWidget.currentWidget().table_in_base_combo.currentText())
 
         if ' от' in table_in_base_combo:
-            data_table_in_base_combo = table_in_base_combo.split(' ')[-1]
-            table_in_base = table_in_base_combo.split(' ')[2]
             table_in_base = table_in_base_combo.split(' ')[2].replace('krs', 'ПР').replace('dop_plan', 'ДП').replace(
                 'dop_plan_in_base', 'ДП')
         well_number = self.tabWidget.currentWidget().well_number_edit.text()
@@ -856,13 +861,15 @@ class DopPlanWindow(QMainWindow):
             skm_interval_edit = self.tabWidget.currentWidget().skm_interval_edit.text()
 
             if current_bottom == '' or fluid == '' or work_earlier == '' or \
-                    template_depth_edit == '' or template_lenght_edit == '' or skm_interval_edit == '':
+                    template_depth_edit == '' or template_lenght_edit == '':
                 # print(current_bottom, fluid, work_earlier)
                 mes = QMessageBox.critical(self, 'Забой', 'не все значения введены')
                 return
-            if template_lenght_edit == '0':
-                mes = QMessageBox.critical(self, 'Длина шаблона', 'Введите длину шаблонов которые были спущены в скважину')
-                return
+            if template_lenght_edit == '0' or template_lenght_edit == '':
+                mes = QMessageBox.question(self, 'Длина шаблона', 'в скважину во время ремонта не был спущен шаблон, '
+                                                                  'так ли это?')
+                if mes == QMessageBox.StandardButton.No:
+                    return
             if float(template_depth_edit) > float(current_bottom):
                 mes = QMessageBox.critical(self, 'Забой', 'Шаблонирование не может быть ниже текущего забоя')
                 return
@@ -907,15 +914,16 @@ class DopPlanWindow(QMainWindow):
 
 
                 well_data.skm_interval = skm_interval
-                b = well_data.skm_interval
+
             except:
                 mes = QMessageBox.warning(self, 'Ошибка',
                                           'в интервале скреперования отсутствует корректные интервалы скреперования')
 
             if len(well_data.skm_interval) == 0:
-                mes = QMessageBox.warning(self, 'Ошибка',
-                                          'в интервале скреперования отсутствует корректные интервалы скреперования')
-                return
+                mes = QMessageBox.question(self, 'Ошибка',
+                                           'Интервалы скреперования отсутствуют, так ли это?')
+                if mes == QMessageBox.StandardButton.No:
+                    return
 
             if well_data.data_in_base:
                 data_well_data_in_base_combo, data_table_in_base_combo = '', ''
@@ -928,8 +936,6 @@ class DopPlanWindow(QMainWindow):
                     number_dp_in_base = "".join(c for c in table_in_base if c.isdigit())
                     table_in_base = table_in_base_combo.split(' ')[2].replace('krs', 'ПР').replace('dop_plan_in_base',
                                                                                                    'ДП№').replace('dop_plan', 'ДП№')
-
-
 
                 if ' от' in well_data_in_base_combo:
                     data_well_data_in_base_combo = well_data_in_base_combo.split(' ')[-1]
@@ -1092,13 +1098,6 @@ class DopPlanWindow(QMainWindow):
             if well_data.column_additional:
                 well_data.template_depth = float(template_depth_addition_edit)
                 well_data.template_lenght = float(template_lenght_addition_edit)
-
-
-
-            if len(well_data.skm_interval) == 0:
-                mes = QMessageBox.warning(self, 'Ошибка',
-                                          'в интервале скреперования отсутствует корректные интервалы скреперования')
-                return
 
 
             work_list = [self.work_list(work_earlier)]

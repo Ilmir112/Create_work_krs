@@ -790,7 +790,7 @@ def events_gnvp(contractor):
              None, None, None, None, None, None, None, None, None, None, None],
             [None,'Если в течение суток уровень в скважине стабилен при установленном объеме долива, временной '
              'промежуток между отбивкой уровней возможно  увеличить  по согласованию с технологическими службами '
-             'заказчика и подрядчика.', None, None, None, None, None, None, None, None, None, None, None]
+             'заказчика и подрядчика.', None, None, None, None, None, None, None, None, None, None, None],
             [None,
              'Мероприятия по недопущению ситуации с исчезновением приёмистости подрядчикам после ОПЗ',
              None, None, None, None, None, None, None, None, None],
