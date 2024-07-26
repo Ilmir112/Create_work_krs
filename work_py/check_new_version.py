@@ -224,9 +224,11 @@ class UpdateThread(QThread):
 
     def move_file(self, source_path, destination_path):
         try:
+            print(os.name)
             if os.name == 'nt':
                 subprocess.check_call(
                     ["cmd", "/c", "start", "/wait", "/min", "cmd", "/c", "move", source_path, destination_path])
+                print(f'windows {source_path, destination_path}')
             elif os.name == 'posix':
                 subprocess.check_call(["sudo", "mv", source_path, destination_path])
         except subprocess.CalledProcessError as e:
@@ -255,14 +257,16 @@ class UpdateThread(QThread):
         print(f'Местонаходение папки {database_file}')
 
 
-        if os.path.exists(database_file) :
+        if os.path.exists(database_file):
 
             print(f'файл databaseWell.db существует')
             # Файл databaseWell.db существует, перемещаем все, кроме исключений
             for filename in os.listdir(extract_dir):
                 if filename not in ["databaseWell.db", "well_data.db", "users.db", 'version_app.json', 'my_app.log']:
                     source_path = os.path.join(extract_dir, filename)
+                    print(source_path)
                     destination_path = os.path.join(os.path.dirname(sys.executable), filename)
+                    print(destination_path)
                     self.move_file(source_path, destination_path)
                     print(f"Перемещен файл: {filename}")
                 else:

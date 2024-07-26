@@ -19,7 +19,7 @@ class TabPage_SO(QWidget):
         self.template_labelType = QLabel("Вид компоновки шаблона", self)
         self.template_Combo = QComboBox(self)
 
-        self.template_Combo.currentTextChanged.connect(self.update_template_edit)
+
 
         self.template_str_Label = QLabel("строчка с шаблонами", self)
         self.template_str_Edit = QLineEdit(self)
@@ -76,6 +76,8 @@ class TabPage_SO(QWidget):
         self.solvent_question_Label = QLabel("необходимость растворителя", self)
         self.solvent_question_QCombo = QComboBox(self)
         self.solvent_question_QCombo.addItems(['Нет', 'Да'])
+
+        self.template_Combo.currentTextChanged.connect(self.update_template_edit)
 
         if well_data.count_template == 0:
             self.note_question_QCombo.setCurrentIndex(1)
@@ -342,7 +344,7 @@ class TabPage_SO(QWidget):
             first_template, template_second = TabPage_SO_with.template_diam_additional_ek(self)
             # print(f'диаметры шаблонов {first_template, template_second}')
 
-        current_bottom = float(self.current_bottom_edit.text)
+        current_bottom = float(self.current_bottom_edit.text())
 
         self.template_first_Edit.setText(str(first_template))
         self.template_second_Edit.setText(str(template_second))
