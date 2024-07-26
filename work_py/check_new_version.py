@@ -256,9 +256,9 @@ class UpdateThread(QThread):
         ada = os.path.exists(database_file)
         print(f'Местонаходение папки {database_file,  ada}')
 
-
-        # if os.path.exists(database_file):
-        if 0 != 0:
+        self.close_zima()
+        if os.path.exists(database_file):
+        # if 0 != 0:
 
             print(f'файл databaseWell.db существует')
             ad = os.listdir(new_extract_dir)
@@ -287,7 +287,7 @@ class UpdateThread(QThread):
                     shutil.move(f"{extract_dir}/{filename}", f"{os.path.dirname(sys.executable)}/{filename}")
 
             except PermissionError:
-                QMessageBox.warning(self, "Ошибка",
+                QMessageBox.warning(None, "Ошибка",
                                     f"Не удалось переместить файл ZIMA.exe. Возможно, он используется другой программой.")
                 return
 
@@ -338,7 +338,14 @@ class UpdateThread(QThread):
 
         with open(f'{well_data.path_image}users/version_app.json', 'w') as file:
             json.dump(data, file, indent=4)
+    @staticmethod
+    def close_zima():
+        """Закрывает процесс ZIMA.exe."""
 
+        if os.name == 'nt':  # Windows
+            subprocess.run(["taskkill", "/f", "/im", "ZIMA.exe"], check=True)
+        else:  # Linux/macOS
+            subprocess.run(["pkill", "ZIMA.exe"], check=True)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

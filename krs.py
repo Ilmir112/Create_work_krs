@@ -230,7 +230,7 @@ class GnoWindow(QMainWindow):
         nkt_diam_fond = TabPage_Gno.gno_nkt_opening(well_data.dict_nkt)
         surfactant_hydrofabizer_str = ''
         if self.surfactant_hydrofabizer_Combo == 'Да':
-            surfactant_hydrofabizer_str = 'с добавлением в жидкость глушения гидрофобизатора из расчеёта 0,05% на 1м3 (0,5л)'
+            surfactant_hydrofabizer_str = 'с добавлением в жидкость глушения гидрофобизатора из расчёта 0,05% на 1м3 (0,5л)'
 
 
         if work_plan not in ['dop_plan', 'dop_plan_in_base']:
