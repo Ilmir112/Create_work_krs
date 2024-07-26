@@ -673,13 +673,13 @@ class Template_without_skm(QMainWindow):
        
 
         list_template_ek = [
-            [f'Cпустить  {template_str} на НКТ{well_data.nkt_diam}мм', None,
+            [f'Cпустить {template_str} на НКТ{well_data.nkt_diam}мм', None,
              f'Спустить  {template_str} на 'f'НКТ{well_data.nkt_diam}мм  с замером, шаблонированием НКТ. \n'
              f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
              None, None, None, None, None, None, None,
              'мастер КРС', descentNKT_norm(current_bottom, 1.2)],
 
-            [f'Обработка растворителем {solvent_volume_edit}', None,
+            [f'Обработка растворителем в V-{solvent_volume_edit}', None,
              f'По результатам ревизии ГНО, в случае наличия отложений АСПО:\n'
              f'Очистить колонну от АСПО растворителем - {solvent_volume_edit}м3. При открытом затрубном пространстве закачать в '
              f'трубное пространство растворитель в объеме {solvent_volume_edit}м3, продавить в трубное пространство тех.жидкостью '

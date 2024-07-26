@@ -264,7 +264,7 @@ class UpdateThread(QThread):
                     source_path = os.path.join(extract_dir, filename)
                     destination_path = os.path.join(os.path.dirname(sys.executable), filename)
                     self.move_file(source_path, destination_path)
-                    # print(f"Перемещен файл: {filename}")
+                    print(f"Перемещен файл: {filename}")
                 else:
                     print(f"Не Перемещен файл: {filename}")
         else:
