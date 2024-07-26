@@ -932,7 +932,7 @@ class DopPlanWindow(QMainWindow):
                                            'Интервалы скреперования отсутствуют, так ли это?')
                 if mes == QMessageBox.StandardButton.No:
                     return
-
+            well_data.count_template = 1
             if well_data.data_in_base:
                 data_well_data_in_base_combo, data_table_in_base_combo = '', ''
                 table_in_base_combo = str(self.tabWidget.currentWidget().table_in_base_combo.currentText())
