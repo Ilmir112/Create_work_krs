@@ -257,8 +257,8 @@ class UpdateThread(QThread):
         print(f'Местонаходение папки {database_file,  ada}')
 
 
-        if os.path.exists(database_file):
-        # if 0==0:
+        # if os.path.exists(database_file):
+        if 0 != 0:
 
             print(f'файл databaseWell.db существует')
             ad = os.listdir(new_extract_dir)
