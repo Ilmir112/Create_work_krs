@@ -222,6 +222,17 @@ class UpdateThread(QThread):
         except requests.exceptions.RequestException as e:
             mes = QMessageBox.warning(None, "Ошибка", f"Не удалось загрузить обновления: {e}")
 
+    def move_file(source_path, destination_path):
+        try:
+            if os.name == 'nt':
+                subprocess.check_call(
+                    ["cmd", "/c", "start", "/wait", "/min", "cmd", "/c", "move", source_path, destination_path])
+            elif os.name == 'posix':
+                subprocess.check_call(["sudo", "mv", source_path, destination_path])
+        except subprocess.CalledProcessError as e:
+            QMessageBox.warning(None, "Ошибка",
+                                f"Не удалось переместить файл {os.path.basename(source_path)}. Возможно, он используется другой программой. Код ошибки: {e.returncode}")
+            return
 
     def update_process(self):
 
@@ -252,22 +263,8 @@ class UpdateThread(QThread):
                 if filename not in ["databaseWell.db", "well_data.db", "users.db", 'version_app.json', 'my_app.log']:
                     source_path = os.path.join(extract_dir, filename)
                     destination_path = os.path.join(os.path.dirname(sys.executable), filename)
-                    try:
-                        if '_internal' in filename:
-                            print(f"{source_path}/{filename}")
-
-                            # 1. Переименовываем файл в tmp_file.log
-                            os.rename(f"{source_path}/{filename}", f"{os.path.dirname(sys.executable)}/a/{filename}")
-
-                            shutil.move(source_path, destination_path)
-                            os.remove(f"{source_path}/a{filename}")
-                        else:
-                            shutil.move(source_path, destination_path)
-                        # print(f"Перемещен файл: {filename}")
-                    except PermissionError:
-                        QMessageBox.warning(None, "Ошибка",  # Передаем self
-                                            f"Не удалось переместить файл {filename}. Возможно, он используется другой программой.")
-                        return
+                    self.move_file(source_path, destination_path)
+                    # print(f"Перемещен файл: {filename}")
                 else:
                     print(f"Не Перемещен файл: {filename}")
         else:
