@@ -926,7 +926,7 @@ class MyWindow(QMainWindow):
             ws2 = wb2.get_sheet_by_name('Sheet')
             ws2.title = "План работ"
 
-            ins_ind = self.ins_ind_border
+            ins_ind = well_data.ins_ind2
 
             merged_cells = []  # Список индексов объединения ячеек
 
@@ -1200,6 +1200,7 @@ class MyWindow(QMainWindow):
             well_data.leakiness_interval = []
             well_data.dict_pump_h = {"do": 0, "posle": 0}
             well_data.ins_ind = 0
+            well_data.ins_ind2 = 0
             well_data.image_data = []
             well_data.current_bottom2 = 5000
             well_data.len_razdel_1 = 0
@@ -1993,6 +1994,7 @@ class MyWindow(QMainWindow):
                 else:
                     table_widget.setItem(row, column, QtWidgets.QTableWidgetItem(str('')))
 
+
                 if column == 2:
                     if not data is None:
                         text = data
@@ -2000,6 +2002,14 @@ class MyWindow(QMainWindow):
                             if value[0] <= len(text) <= value[1]:
                                 text_width = key
                                 table_widget.setRowHeight(row, int(text_width))
+        for row in range(self.table_widget.rowCount()):
+            if row >= well_data.ins_ind2:
+                a = row - well_data.ins_ind2 + 1
+                ab = well_data.ins_ind2
+                # Добавляем нумерацию в первую колонку
+                item_number = QtWidgets.QTableWidgetItem(str(row - well_data.ins_ind2 + 1))  # Номер строки + 1
+                table_widget.setItem(row, 1, item_number)
+
 
     def create_database_well(self, work_plan):
 
@@ -2224,19 +2234,12 @@ class MyWindow(QMainWindow):
             for cell in row:
                 border_styles[(cell.row, cell.column)] = cell.border
 
+
+
         table_widget.setColumnCount(count_col)
         rowHeights_exit = [sheet.row_dimensions[i + 1].height if sheet.row_dimensions[i + 1].height is not None else 18
                            for i in range(sheet.max_row)]
-        if work_plan not in ['application_pvr', 'gnkt_frez', 'gnkt_after_grp', 'gnkt_opz', 'gnkt_bopz', 'plan_change']:
 
-            work_list = [
-                [None, None, 'Порядок работы', None, None, None, None, None, None, None, None, None],
-                [None, None, 'Наименование работ', None, None, None, None, None, None, None, 'Ответственный',
-                 'Нормы времени \n мин/час.']]
-
-            if well_data.dop_work_list:
-                work_list.append(well_data.dop_work_list)
-            self.populate_row(table_widget.rowCount(), work_list, self.table_widget, self.work_plan)
 
         for row in range(1, rows + 2):
             if row > 1 and row < rows - 1:
@@ -2264,6 +2267,9 @@ class MyWindow(QMainWindow):
                                                  merged_cell.max_col - merged_cell.min_col + 1)
                 else:
                     item = QTableWidgetItem("")
+
+        if well_data.dop_work_list:
+            self.populate_row(table_widget.rowCount(), well_data.dop_work_list, self.table_widget, self.work_plan)
         for row in range(table_widget.rowCount()):
             row_value_empty = True  # Флаг, указывающий, что все ячейки в строке пустые
             # Проход по всем колонкам в текущей строке
@@ -2592,12 +2598,12 @@ if __name__ == "__main__":
     if well_data.connect_in_base:
         app2 = UpdateChecker()
         app2.check_version()
-        if app2.window_close == True:
-            MyWindow.set_modal_window(None, app2)
-            well_data.pause = True
-            MyWindow.pause_app()
-            well_data.pause = False
-            app2.close()
+        # if app2.window_close == True:
+        #     MyWindow.set_modal_window(None, app2)
+        #     well_data.pause = True
+        #     MyWindow.pause_app()
+        #     well_data.pause = False
+        #     app2.close()
 
     window = MyWindow()
     window.show()

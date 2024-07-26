@@ -136,7 +136,8 @@ class UpdateChecker(QWidget):
             # Получение текущей версии из файла
             self.current_version = self.get_current_version()
             UpdateChecker.window_close = False
-
+            dd = self.current_version
+            vvrb =self.get_current_version()
             if self.current_version == self.latest_version:
                 self.version_label.setText(f"Текущая версия: {self.current_version}")
                 self.close()
@@ -242,7 +243,8 @@ class UpdateThread(QThread):
         ada = os.path.exists(database_file)
         print(f'Местонаходение папки {database_file}')
 
-        if os.path.exists(database_file):
+
+        if os.path.exists(database_file) :
 
             print(f'файл databaseWell.db существует')
             # Файл databaseWell.db существует, перемещаем все, кроме исключений
@@ -251,8 +253,11 @@ class UpdateThread(QThread):
                     source_path = os.path.join(extract_dir, filename)
                     destination_path = os.path.join(os.path.dirname(sys.executable), filename)
                     try:
-                        print(f"Перемещен {source_path} {destination_path} файл: {filename}")
+                        # 1. Переименовываем файл в tmp_file.log
+                        os.rename(f"{source_path}/{filename}", f"{os.path.dirname(sys.executable)}/a{filename}")
+
                         shutil.move(source_path, destination_path)
+                        os.remove(f"{source_path}/a{filename}")
                         # print(f"Перемещен файл: {filename}")
                     except PermissionError:
                         QMessageBox.warning(None, "Ошибка",  # Передаем self

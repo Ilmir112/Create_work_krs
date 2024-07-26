@@ -342,12 +342,14 @@ class TabPage_SO(QWidget):
             first_template, template_second = TabPage_SO_with.template_diam_additional_ek(self)
             # print(f'диаметры шаблонов {first_template, template_second}')
 
+        current_bottom = float(self.current_bottom_edit.text)
+
         self.template_first_Edit.setText(str(first_template))
         self.template_second_Edit.setText(str(template_second))
         # self.skm_Edit.setText(str(well_data.column_diametr._value))
         self.dictance_template_second_Edit.setText(str(10))
 
-        roof_plast, roof_add_column_plast = TabPage_SO_with.definition_roof_not_raiding(self)
+        roof_plast, roof_add_column_plast = TabPage_SO_with.definition_roof_not_raiding(self, current_bottom)
         dictance_template_first = int(well_data.current_bottom - roof_plast + 5)
         # print(f'дистанция первая {dictance_template_first}')
         self.dictance_template_first_Edit.setText(str(dictance_template_first))

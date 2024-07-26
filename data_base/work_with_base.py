@@ -1327,8 +1327,9 @@ def insert_data_new_excel_file(data, rowHeights, colWidth, boundaries_dict):
     index_delete = 0
     for index_row, row in enumerate(sheet_new.iter_rows()):  # Копирование высоты строки
         if any(['Наименование работ' in str(col.value) for col in row[:13]]):
-            index_delete = index_row
-            a = row
+            index_delete = index_row+2
+            well_data.ins_ind2 = index_row +2
+
         elif any(['ПЛАН РАБОТ' in str(col.value).upper() for col in row[:4]]):
             sheet_new.cell(row=index_row + 1, column=2).value = f'ДОПОЛНИТЕЛЬНЫЙ ПЛАН РАБОТ № {well_data.number_dp}'
 

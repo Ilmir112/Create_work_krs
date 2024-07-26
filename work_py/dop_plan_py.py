@@ -15,6 +15,7 @@ from datetime import datetime
 
 from data_base.work_with_base import connect_to_db
 from krs import TabPageGno, GnoWindow
+from work_py.advanted_file import merge_overlapping_intervals
 
 from work_py.alone_oreration import lifting_unit, weigth_pipe, volume_pod_NKT, pvo_gno, volume_jamming_well
 from work_py.mkp import mkp_revision_1_kateg
@@ -171,6 +172,7 @@ class TabPageDp(QWidget):
 
             table_list = self.get_tables_starting_with(self.well_number_edit.text(), self.well_area_edit.text())[::-1]
             if table_list:
+                self.table_in_base_combo.clear()
                 self.table_in_base_combo.addItems(table_list)
 
             self.index_change_label = QLabel('пункт после которого происходят изменения')
@@ -187,6 +189,7 @@ class TabPageDp(QWidget):
             self.index_change_line.editingFinished.connect(self.update_table_in_base_combo)
             well_list = self.check_in_database_well_data(self.well_number_edit.text())
             if well_list:
+                self.well_data_in_base_combo.clear()
                 self.well_data_in_base_combo.addItems(well_list)
 
 
@@ -248,12 +251,14 @@ class TabPageDp(QWidget):
                         except:
                             contractor = 'Ойл'
                         date_string = well[4]
+                        try:
+                            # Преобразуем строку в объект datetime
+                            datetime_object = datetime.strptime(date_string, "%Y-%m-%d %H:%M:%S.%f")
 
-                        # Преобразуем строку в объект datetime
-                        datetime_object = datetime.strptime(date_string, "%Y-%m-%d %H:%M:%S.%f")
-
-                        # Форматируем объект datetime в нужный формат
-                        formatted_date = datetime_object.strftime("%d.%m.%Y")
+                            # Форматируем объект datetime в нужный формат
+                            formatted_date = datetime_object.strftime("%d.%m.%Y")
+                        except:
+                            formatted_date = well[4]
 
                         # Формируем список скважин
                         well_list.append(f'{well[0]} {well[1]} {contractor} {well[5]} от {formatted_date}')
@@ -333,11 +338,13 @@ class TabPageDp(QWidget):
 
             table_list = self.get_tables_starting_with(self.well_number_edit.text(), self.well_area_edit.text())[::-1]
             if table_list:
+                self.table_in_base_combo.clear()
                 self.table_in_base_combo.addItems(table_list)
 
             self.index_change_line.editingFinished.connect(self.update_table_in_base_combo)
             well_list = self.check_in_database_well_data(self.well_number_edit.text())
             if well_list:
+                self.well_data_in_base_combo.clear()
                 self.well_data_in_base_combo.addItems(well_list)
 
             # self.table_in_base_combo.currentTextChanged.connect(self.update_table_in_base_combo)
@@ -907,13 +914,14 @@ class DopPlanWindow(QMainWindow):
                 if ',' in skm_interval_edit:
                     for skm in skm_interval_edit.split(','):
                         if '-' in skm:
-                           skm_interval.append(skm.split('-'))
+                           skm_interval.append(list(map(int, skm.split('-'))))
                 else:
                     if '-' in skm_interval_edit:
                         skm_interval.append(list(map(int, skm_interval_edit.split('-'))))
 
+                skm_interval_new = merge_overlapping_intervals(skm_interval)
 
-                well_data.skm_interval = skm_interval
+                well_data.skm_interval = skm_interval_new
 
             except:
                 mes = QMessageBox.warning(self, 'Ошибка',
@@ -1019,7 +1027,7 @@ class DopPlanWindow(QMainWindow):
                 well_data.dop_work_list = self.work_list(work_earlier)
             else:
                 work_list = [self.work_list(work_earlier)]
-                MyWindow.populate_row(self, self.ins_ind + 2, work_list, self.table_widget, self.work_plan)
+                MyWindow.populate_row(self, self.ins_ind + 3, work_list, self.table_widget, self.work_plan)
 
             if len(self.dict_perforation) != 0:
                 for plast, vertical_line, roof_int, sole_int, date_pvr_edit, count_pvr_edit,\
@@ -1101,6 +1109,7 @@ class DopPlanWindow(QMainWindow):
 
 
             work_list = [self.work_list(work_earlier)]
+            well_data.ins_ind2 = self.ins_ind + 2
             MyWindow.populate_row(self, self.ins_ind + 2, work_list, self.table_widget, self.work_plan)
 
         well_data.pause = False
@@ -1177,6 +1186,7 @@ class DopPlanWindow(QMainWindow):
 
                         if 'порядок работы' in str(cell.value).lower() or \
                                 'наименование работ' in str(cell.value).lower():
+                            well_data.ins_ind2 = i + 1
                             ws2.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=True)
                             ws2.cell(row=i, column=j).alignment = Alignment(wrap_text=True, horizontal='center',
                                                                             vertical='center')
@@ -1349,9 +1359,9 @@ class DopPlanWindow(QMainWindow):
             well_data.data_list.append(data_list)
 
     def work_list(self, work_earlier):
-        krs_begin = [None, None,
+        krs_begin = [[None, None,
                       f' Ранее проведенные работ: \n {work_earlier}',
                       None, None, None, None, None, None, None,
-                      'Мастер КРС', None]
+                      'Мастер КРС', None]]
 
         return krs_begin

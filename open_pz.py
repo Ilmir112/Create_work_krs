@@ -303,6 +303,28 @@ class CreatePZ(QMainWindow):
                     ws.merge_cells(start_column=2, start_row=well_data.ins_ind + 1, end_column=12,
                                    end_row=well_data.ins_ind + 1)
                     well_data.ins_ind += len(well_data.row_expected)
+                if work_plan not in ['application_pvr', 'gnkt_frez', 'gnkt_after_grp', 'gnkt_opz', 'gnkt_bopz',
+                                     'plan_change']:
+                    work_list = [
+                        [None, None, 'Порядок работы', None, None, None, None, None, None, None, None, None],
+                        [None, None, 'Наименование работ', None, None, None, None, None, None, None, 'Ответственный',
+                         'Нормы времени \n мин/час.']]
+
+                    for i in range(1, len(work_list) + 1):  # Добавление  показатели после ремонта
+                        for j in range(1, 13):
+                            ws.cell(row=i + well_data.ins_ind, column=j).font = Font(name='Arial Cyr', size=13,
+                                                                                     bold=True)
+                            ws.cell(row=i + well_data.ins_ind, column=j).alignment = Alignment(wrap_text=False,
+                                                                                               horizontal='center',
+                                                                                               vertical='center')
+                            ws.cell(row=i + well_data.ins_ind, column=j).value = work_list[i - 1][
+                                j - 1]
+                        if i == 1:
+                            ws.merge_cells(start_column=3, start_row=well_data.ins_ind+i, end_column=12,
+                                       end_row=well_data.ins_ind+i)
+                        elif i == 2:
+                            ws.merge_cells(start_column=3, start_row=well_data.ins_ind+i, end_column=10,
+                                       end_row=well_data.ins_ind+i)
 
                 self.ins_ind_border = well_data.ins_ind
                 MyWindow.create_database_well(self, work_plan)
@@ -353,7 +375,10 @@ class CreatePZ(QMainWindow):
             merged_cells_copy = list(ws.merged_cells.ranges)  # Создаем копию множества объединенных ячеек
             for merged_cell in merged_cells_copy:
                 if merged_cell.min_row > ins_ind + 5:
-                    ws.unmerge_cells(str(merged_cell))
+                    try:
+                        ws.unmerge_cells(str(merged_cell))
+                    except:
+                        pass
 
         ws.delete_rows(ins_ind, self.table_widget.rowCount() - ins_ind + 1)
         if work_plan not in ['gnkt_frez', 'application_pvr', 'gnkt_after_grp', 'gnkt_opz', 'gnkt_bopz']:

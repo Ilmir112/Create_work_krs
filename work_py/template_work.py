@@ -259,14 +259,17 @@ class TabPage_SO_with(QWidget):
     def update_template(self):
         SKM_type = self.SKM_type_Combo.currentText()
 
-        self.template_Combo.setCurrentIndex(0)
-        current_bottom = float(self.current_bottom_edit.text())
-        template_key = self.definition_pssh(current_bottom)
-        self.template_Combo.setCurrentIndex(self.template_select_list.index(template_key))
-        current_bottom = float(self.current_bottom_edit.text())
+
+
         if self.current_bottom_edit.text() != '':
             current_bottom = round(float(self.current_bottom_edit.text()), 1)
 
+        roof_plast, roof_add_column_plast = self.definition_roof_not_raiding(current_bottom)
+
+        # print(f'кровля отрайби интерва {roof_plast, roof_add_column_plast}')
+        dictance_template_first = int(current_bottom - roof_plast + 5)
+
+        self.dictance_template_first_Edit.setText(str(dictance_template_first))
         if self.template_first_Edit.text() != '':
                 first_template = self.template_first_Edit.text()
         if self.lenght_template_first_Edit.text() != '':
@@ -629,15 +632,15 @@ class TabPage_SO_with(QWidget):
                 self.grid.addWidget(self.template_first_Edit, 5, 3)
                 self.grid.addWidget(self.lenght_template_first_Label, 4, 4)
                 self.grid.addWidget(self.lenght_template_first_Edit, 5, 4)
-                self.grid.addWidget(self.lenght_template_second_Label, 4, 9)
-                self.grid.addWidget(self.lenght_template_second_Edit, 5, 9)
-                self.grid.addWidget(self.dictance_three_Label, 4, 7)
-                self.grid.addWidget(self.dictance_three_Edit, 5, 7)
+                self.grid.addWidget(self.lenght_template_second_Label, 4, 11)
+                self.grid.addWidget(self.lenght_template_second_Edit, 5, 11)
+                self.grid.addWidget(self.dictance_three_Label, 4, 10)
+                self.grid.addWidget(self.dictance_three_Edit, 5, 10)
 
             elif index == 'ПСШ СКМ в доп колонне без хвоста':
 
-                self.grid.addWidget(self.dictance_three_Label, 4, 7)
-                self.grid.addWidget(self.dictance_three_Edit, 5, 7)
+                self.grid.addWidget(self.dictance_three_Label, 4, 10)
+                self.grid.addWidget(self.dictance_three_Edit, 5, 10)
 
                 dictance_template_first = 0
                 self.dictance_template_first_Edit.setText(str(dictance_template_first))
@@ -671,10 +674,10 @@ class TabPage_SO_with(QWidget):
                 self.grid.addWidget(self.template_first_Edit, 5, 3)
                 self.grid.addWidget(self.lenght_template_first_Label, 4, 4)
                 self.grid.addWidget(self.lenght_template_first_Edit, 5, 4)
-                self.grid.addWidget(self.lenght_template_second_Label, 4, 9)
-                self.grid.addWidget(self.lenght_template_second_Edit, 5, 9)
-                self.grid.addWidget(self.dictance_three_Label, 4, 7)
-                self.grid.addWidget(self.dictance_three_Edit, 5, 7)
+                self.grid.addWidget(self.lenght_template_second_Label, 4, 11)
+                self.grid.addWidget(self.lenght_template_second_Edit, 5, 11)
+                self.grid.addWidget(self.dictance_three_Label, 4, 10)
+                self.grid.addWidget(self.dictance_three_Edit, 5, 10)
 
 
 
@@ -1065,13 +1068,14 @@ class TemplateKrs(QMainWindow):
                 sole = int(sole_skm.text())
                 skm_tuple.append((roof, sole))
 
-        well_data.skm_interval.extend(skm_tuple)
         # print(f'интервалы СКМ {well_data.skm_interval}')
         skm_list = sorted(skm_tuple, key=lambda x: x[0])
         well_data.template_lenght = template_lenght
         if well_data.column_additional:
             well_data.template_lenght_addition = template_lenght_addition
         work_template_list = self.template_ek(template_str, template_diametr, skm_list)
+        if skm_tuple not in well_data.skm_interval:
+            well_data.skm_interval.extend(skm_list)
 
         MyWindow.populate_row(self, self.ins_ind, work_template_list, self.table_widget)
         well_data.pause = False

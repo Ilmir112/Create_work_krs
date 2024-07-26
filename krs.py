@@ -176,6 +176,7 @@ class GnoWindow(QMainWindow):
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
         self.ins_ind = ins_ind
+        well_data.ins_ind2 = ins_ind
         self.table_widget = table_widget
         self.work_plan = work_plan
         self.tabWidget = TabWidget(self.work_plan)
