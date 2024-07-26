@@ -253,11 +253,16 @@ class UpdateThread(QThread):
                     source_path = os.path.join(extract_dir, filename)
                     destination_path = os.path.join(os.path.dirname(sys.executable), filename)
                     try:
-                        # 1. Переименовываем файл в tmp_file.log
-                        os.rename(f"{source_path}/{filename}", f"{os.path.dirname(sys.executable)}/a{filename}")
+                        if '_internal' in filename:
+                            print(f"{source_path}/{filename}")
 
-                        shutil.move(source_path, destination_path)
-                        os.remove(f"{source_path}/a{filename}")
+                            # 1. Переименовываем файл в tmp_file.log
+                            os.rename(f"{source_path}/{filename}", f"{os.path.dirname(sys.executable)}/a/{filename}")
+
+                            shutil.move(source_path, destination_path)
+                            os.remove(f"{source_path}/a{filename}")
+                        else:
+                            shutil.move(source_path, destination_path)
                         # print(f"Перемещен файл: {filename}")
                     except PermissionError:
                         QMessageBox.warning(None, "Ошибка",  # Передаем self
