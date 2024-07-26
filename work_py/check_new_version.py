@@ -222,7 +222,7 @@ class UpdateThread(QThread):
         except requests.exceptions.RequestException as e:
             mes = QMessageBox.warning(None, "Ошибка", f"Не удалось загрузить обновления: {e}")
 
-    def move_file(source_path, destination_path):
+    def move_file(self, source_path, destination_path):
         try:
             if os.name == 'nt':
                 subprocess.check_call(
