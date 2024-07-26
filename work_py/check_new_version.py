@@ -257,8 +257,8 @@ class UpdateThread(QThread):
         print(f'Местонаходение папки {database_file,  ada}')
 
 
-        # if os.path.exists(database_file):
-        if 0==0:
+        if os.path.exists(database_file):
+        # if 0==0:
 
             print(f'файл databaseWell.db существует')
             ad = os.listdir(new_extract_dir)
@@ -270,20 +270,22 @@ class UpdateThread(QThread):
                     print(f'source_path {source_path}')
                     destination_path = source_path.replace('/ZimaUpdate', '')
                     print(f'destination_path {destination_path}')
-                    try:
-                        shutil.copy2(source_path, destination_path)
-                        # print(f"Скопирован файл: {filename}")
-                    except PermissionError:
-                        QMessageBox.warning(None, "Ошибка",
-                                            f"Не удалось скопировать файл {os.path.basename(source_path)}. Возможно, он используется другой программой.")
-                    # self.move_file(source_path, destination_path)
+                    # try:
+                    #     shutil.copy2(source_path, destination_path)
+                    #     # print(f"Скопирован файл: {filename}")
+                    # except PermissionError:
+                    #     QMessageBox.warning(None, "Ошибка",
+                    #                         f"Не удалось скопировать файл {os.path.basename(source_path)}. Возможно, он используется другой программой.")
+                    self.move_file(source_path, destination_path)
                     print(f"Перемещен файл: {filename} в папку {destination_path}")
                 else:
                     print(f"Не Перемещен файл: {filename}")
         else:
             # Файл databaseWell.db не существует, перемещаем все файлы
             try:
-                shutil.move(f"{extract_dir}/ZIMA.exe", f"{os.path.dirname(sys.executable)}/ZIMA.exe")
+                for filename in os.listdir(new_extract_dir):
+                    shutil.move(f"{extract_dir}/{filename}", f"{os.path.dirname(sys.executable)}/{filename}")
+
             except PermissionError:
                 QMessageBox.warning(self, "Ошибка",
                                     f"Не удалось переместить файл ZIMA.exe. Возможно, он используется другой программой.")
