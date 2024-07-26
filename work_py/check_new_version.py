@@ -257,17 +257,20 @@ class UpdateThread(QThread):
         print(f'Местонаходение папки {database_file,  ada}')
 
 
-        if 0 == 0:
+        if os.path.exists(database_file):
 
             print(f'файл databaseWell.db существует')
             ad = os.listdir(new_extract_dir)
             print(new_extract_dir, ad)
             # Файл databaseWell.db существует, перемещаем все, кроме исключений
             for filename in os.listdir(new_extract_dir):
+                amn = os.listdir(new_extract_dir)
+                print(amn)
                 if filename not in ["databaseWell.db", "well_data.db", "users.db", 'version_app.json', 'my_app.log']:
-                    source_path = os.path.join(new_extract_dir + '/', filename)
-
-                    destination_path = os.path.join(new_extract_dir + '/', filename).replace('/ZimaUpdate', '')
+                    source_path = os.path.join(new_extract_dir + '/', filename).replace('/ZimaUpdate', '')
+                    print(f'source_path {source_path}')
+                    destination_path = os.path.join(new_extract_dir + '/', filename)
+                    print(f'source_path {destination_path}')
 
                     self.move_file(source_path, destination_path)
                     print(f"Перемещен файл: {filename} в папку {destination_path}")

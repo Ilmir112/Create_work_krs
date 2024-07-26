@@ -230,7 +230,9 @@ class TabPage_SO(QWidget):
             dictance_template_second = int(float(self.dictance_template_second_Edit.text()))
         else:
             dictance_template_second = ''
-
+        current_bottom = float(self.current_bottom_edit.text())
+        roof_plast, roof_add_column_plast = TabPage_SO_with.definition_roof_not_raiding(self, current_bottom)
+        dictance_template_first = int(well_data.current_bottom - roof_plast + 5)
 
         nkt_diam = well_data.nkt_diam
 
