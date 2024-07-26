@@ -224,7 +224,7 @@ class UpdateThread(QThread):
 
     def move_file(self, source_path, destination_path):
         try:
-            print(os.name)
+
             if os.name == 'nt':
                 subprocess.check_call(
                     ["cmd", "/c", "start", "/wait", "/min", "cmd", "/c", "move", source_path, destination_path])
@@ -254,21 +254,23 @@ class UpdateThread(QThread):
         database_file = os.path.join(data_base_path, "databaseWell.db")
 
         ada = os.path.exists(database_file)
-        print(f'Местонаходение папки {database_file}')
+        print(f'Местонаходение папки {database_file,  ada}')
 
 
-        if os.path.exists(database_file):
+        if 0 == 0:
 
             print(f'файл databaseWell.db существует')
+            ad = os.listdir(new_extract_dir)
+            print(new_extract_dir, ad)
             # Файл databaseWell.db существует, перемещаем все, кроме исключений
-            for filename in os.listdir(extract_dir):
+            for filename in os.listdir(new_extract_dir):
                 if filename not in ["databaseWell.db", "well_data.db", "users.db", 'version_app.json', 'my_app.log']:
-                    source_path = os.path.join(extract_dir, filename)
-                    print(source_path)
-                    destination_path = os.path.join(os.path.dirname(sys.executable), filename)
-                    print(destination_path)
+                    source_path = os.path.join(new_extract_dir + '/', filename)
+
+                    destination_path = os.path.join(new_extract_dir + '/', filename).replace('/ZimaUpdate', '')
+
                     self.move_file(source_path, destination_path)
-                    print(f"Перемещен файл: {filename}")
+                    print(f"Перемещен файл: {filename} в папку {destination_path}")
                 else:
                     print(f"Не Перемещен файл: {filename}")
         else:
