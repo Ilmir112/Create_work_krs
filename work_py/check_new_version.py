@@ -257,22 +257,26 @@ class UpdateThread(QThread):
         print(f'Местонаходение папки {database_file,  ada}')
 
 
-        if os.path.exists(database_file):
+        # if os.path.exists(database_file):
+        if 0==0:
 
             print(f'файл databaseWell.db существует')
             ad = os.listdir(new_extract_dir)
-            print(new_extract_dir, ad)
+            print(f'папка архива {new_extract_dir}')
             # Файл databaseWell.db существует, перемещаем все, кроме исключений
             for filename in os.listdir(new_extract_dir):
-                amn = os.listdir(new_extract_dir)
-                print(amn)
                 if filename not in ["databaseWell.db", "well_data.db", "users.db", 'version_app.json', 'my_app.log']:
-                    source_path = os.path.join(new_extract_dir + '/', filename).replace('/ZimaUpdate', '')
+                    source_path = os.path.join(new_extract_dir, filename)
                     print(f'source_path {source_path}')
-                    destination_path = os.path.join(new_extract_dir + '/', filename)
-                    print(f'source_path {destination_path}')
-
-                    self.move_file(source_path, destination_path)
+                    destination_path = source_path.replace('/ZimaUpdate', '')
+                    print(f'destination_path {destination_path}')
+                    try:
+                        shutil.copy2(source_path, destination_path)
+                        # print(f"Скопирован файл: {filename}")
+                    except PermissionError:
+                        QMessageBox.warning(None, "Ошибка",
+                                            f"Не удалось скопировать файл {os.path.basename(source_path)}. Возможно, он используется другой программой.")
+                    # self.move_file(source_path, destination_path)
                     print(f"Перемещен файл: {filename} в папку {destination_path}")
                 else:
                     print(f"Не Перемещен файл: {filename}")
