@@ -192,8 +192,6 @@ class UpdateThread(QThread):
         # на URL архива для загрузки
         url = f"https://github.com/Ilmir112/Create_work_krs/releases/download/{self.latest_version}/ZIMA.zip"
 
-
-
         # Загрузка архива
         try:
             response = requests.get(url, stream=True)
@@ -227,8 +225,10 @@ class UpdateThread(QThread):
 
             if os.name == 'nt':
                 subprocess.check_call(
-                    ["cmd", "/c", "start", "/wait", "/min", "cmd", "/c", "move", source_path, destination_path])
+                    ["cmd", "/c", "start", "/wait", "/min", "cmd", "/c", "move", source_path, destination_path, "cmd", "/c", "start", destination_path])
                 print(f'windows {source_path, destination_path}')
+                self.close_zima()
+
             elif os.name == 'posix':
                 subprocess.check_call(["sudo", "mv", source_path, destination_path])
         except subprocess.CalledProcessError as e:
@@ -256,40 +256,40 @@ class UpdateThread(QThread):
         ada = os.path.exists(database_file)
         print(f'Местонаходение папки {database_file,  ada}')
 
-        self.close_zima()
-        if os.path.exists(database_file):
-        # if 0 != 0:
 
-            print(f'файл databaseWell.db существует')
-            ad = os.listdir(new_extract_dir)
-            print(f'папка архива {new_extract_dir}')
-            # Файл databaseWell.db существует, перемещаем все, кроме исключений
-            for filename in os.listdir(new_extract_dir):
-                if filename not in ["databaseWell.db", "well_data.db", "users.db", 'version_app.json', 'my_app.log']:
-                    source_path = os.path.join(new_extract_dir, filename)
-                    print(f'source_path {source_path}')
-                    destination_path = source_path.replace('/ZimaUpdate', '')
-                    print(f'destination_path {destination_path}')
-                    # try:
-                    #     shutil.copy2(source_path, destination_path)
-                    #     # print(f"Скопирован файл: {filename}")
-                    # except PermissionError:
-                    #     QMessageBox.warning(None, "Ошибка",
-                    #                         f"Не удалось скопировать файл {os.path.basename(source_path)}. Возможно, он используется другой программой.")
-                    self.move_file(source_path, destination_path)
-                    print(f"Перемещен файл: {filename} в папку {destination_path}")
-                else:
-                    print(f"Не Перемещен файл: {filename}")
-        else:
-            # Файл databaseWell.db не существует, перемещаем все файлы
-            try:
-                for filename in os.listdir(new_extract_dir):
-                    shutil.move(f"{extract_dir}/{filename}", f"{os.path.dirname(sys.executable)}/{filename}")
+        # if os.path.exists(database_file):
+        # # if 0 != 0:
 
-            except PermissionError:
-                QMessageBox.warning(None, "Ошибка",
-                                    f"Не удалось переместить файл ZIMA.exe. Возможно, он используется другой программой.")
-                return
+        print(f'файл databaseWell.db существует')
+        ad = os.listdir(new_extract_dir)
+        print(f'папка архива {new_extract_dir}')
+        # Файл databaseWell.db существует, перемещаем все, кроме исключений
+        for filename in os.listdir(new_extract_dir):
+            if filename not in ["databaseWell.db", "well_data.db", "users.db", 'version_app.json', 'my_app.log']:
+                source_path = os.path.join(new_extract_dir, filename)
+                print(f'source_path {source_path}')
+                destination_path = source_path.replace('ZIMA/ZimaUpdate', '')
+                print(f'destination_path {destination_path}')
+                # try:
+                #     shutil.copy2(source_path, destination_path)
+                #     # print(f"Скопирован файл: {filename}")
+                # except PermissionError:
+                #     QMessageBox.warning(None, "Ошибка",
+                #                         f"Не удалось скопировать файл {os.path.basename(source_path)}. Возможно, он используется другой программой.")
+                self.move_file(source_path, destination_path)
+                print(f"Перемещен файл: {filename} в папку {destination_path}")
+            else:
+                print(f"Не Перемещен файл: {filename}")
+        # else:
+        #     # Файл databaseWell.db не существует, перемещаем все файлы
+        #     try:
+        #         for filename in os.listdir(new_extract_dir):
+        #             shutil.move(f"{extract_dir}/{filename}", f"{os.path.dirname(sys.executable)}/{filename}")
+
+            # except PermissionError:
+            #     QMessageBox.warning(None, "Ошибка",
+            #                         f"Не удалось переместить файл ZIMA.exe. Возможно, он используется другой программой.")
+            #     return
 
         try:
             # Удаляем папку
@@ -319,7 +319,10 @@ class UpdateThread(QThread):
 
         # Прекращаем работу текущего процесса
         os._exit(0)  # Прекращаем процесс (не используйте sys.exit())
-
+    @staticmethod
+    def run_zima(zima_path):
+        """Запускает ZIMA.exe."""
+        subprocess.Popen([zima_path])
 
     @staticmethod
     def close_process_update(process_name):
