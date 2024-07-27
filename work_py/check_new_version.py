@@ -224,15 +224,20 @@ class UpdateThread(QThread):
     def move_file(self, source_path, destination_path):
         try:
 
+
             if os.name == 'nt':
                 print(f'windows {source_path, destination_path}')
                 time.sleep(5)
+                zima_process_name = "ZIMA.exe"
+                # Ожидаем завершения процесса
+                self.wait_for_process_to_close(zima_process_name)
                 subprocess.check_call(
                     ["cmd", "/c", "start", "/wait", "cmd", "/c", "move", source_path, destination_path])
+
                 subprocess.check_call(
                     ["cmd", "/c", "start", "/wait", "cmd", "/c", "start", destination_path])
 
-                self.close_zima()
+
 
             elif os.name == 'posix':
                 subprocess.check_call(["sudo", "mv", source_path, destination_path])
@@ -240,6 +245,19 @@ class UpdateThread(QThread):
             QMessageBox.warning(None, "Ошибка",
                                 f"Не удалось переместить файл {os.path.basename(source_path)}. Возможно, он используется другой программой. Код ошибки: {e.returncode}")
             return
+
+    def wait_for_process_to_close(self, process_name):
+        """
+        Ждем, пока процесс с указанным именем не завершится.
+        """
+        while True:
+            # Получаем список всех процессов
+            tasks = subprocess.check_output("tasklist", shell=True).decode()
+            if process_name not in tasks:
+                break
+            else:
+                self.close_zima()
+
 
     def update_process(self):
 
@@ -273,7 +291,8 @@ class UpdateThread(QThread):
             if filename not in ["databaseWell.db", "well_data.db", "users.db", 'version_app.json', 'my_app.log']:
                 source_path = os.path.join(new_extract_dir, filename)
                 print(f'source_path {source_path}')
-                destination_path = source_path.replace('ZIMA/ZimaUpdate', '')
+                absolute_path = os.path.abspath(__file__)
+                destination_path = absolute_path[:21]
                 print(f'destination_path {destination_path}')
                 # try:
                 #     shutil.copy2(source_path, destination_path)
