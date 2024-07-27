@@ -6,6 +6,7 @@ import subprocess
 import sys
 import os
 import threading
+import time
 
 import psutil
 import requests
@@ -224,9 +225,13 @@ class UpdateThread(QThread):
         try:
 
             if os.name == 'nt':
-                subprocess.check_call(
-                    ["cmd", "/c", "start", "/wait", "/min", "cmd", "/c", "move", source_path, destination_path, "cmd", "/c", "start", destination_path])
                 print(f'windows {source_path, destination_path}')
+                time.sleep(5)
+                subprocess.check_call(
+                    ["cmd", "/c", "start", "/wait", "cmd", "/c", "move", source_path, destination_path])
+                subprocess.check_call(
+                    ["cmd", "/c", "start", "/wait", "cmd", "/c", "start", destination_path])
+
                 self.close_zima()
 
             elif os.name == 'posix':
