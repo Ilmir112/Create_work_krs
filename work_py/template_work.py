@@ -259,17 +259,15 @@ class TabPage_SO_with(QWidget):
     def update_template(self):
         SKM_type = self.SKM_type_Combo.currentText()
 
-
-
         if self.current_bottom_edit.text() != '':
             current_bottom = round(float(self.current_bottom_edit.text()), 1)
 
         roof_plast, roof_add_column_plast = self.definition_roof_not_raiding(current_bottom)
-
-        # print(f'кровля отрайби интерва {roof_plast, roof_add_column_plast}')
         dictance_template_first = int(current_bottom - roof_plast + 5)
-
-        self.dictance_template_first_Edit.setText(str(dictance_template_first))
+        if int(float(self.dictance_template_first_Edit.text())) == dictance_template_first:
+            self.dictance_template_first_Edit.setText(str(dictance_template_first))
+        else:
+            dictance_template_first = int(float(self.dictance_template_first_Edit.text()))
         if self.template_first_Edit.text() != '':
                 first_template = self.template_first_Edit.text()
         if self.lenght_template_first_Edit.text() != '':
@@ -280,8 +278,7 @@ class TabPage_SO_with(QWidget):
             lenght_template_second = self.lenght_template_second_Edit.text()
         if self.skm_Edit.text() != '':
             skm = self.skm_Edit.text()
-        if self.dictance_template_first_Edit.text() != '':
-            dictance_template_first = int(float(self.dictance_template_first_Edit.text()))
+
         else:
             dictance_template_first = ''
         if self.dictance_template_second_Edit.text() != '':

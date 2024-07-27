@@ -27,6 +27,7 @@ class CreatePZ(QMainWindow):
 
     def open_excel_file(self, ws, work_plan):
         from find import FindIndexPZ
+        from work_py.leakage_column import LeakageWindow
         from category_correct import CategoryWindow
         from work_py.opressovka import TabPage_SO
         from main import MyWindow
@@ -45,6 +46,8 @@ class CreatePZ(QMainWindow):
 
         WellData.read_well(self, ws, well_data.cat_well_max._value, well_data.data_pvr_min._value)
         well_data.region = region(well_data.cdng._value)
+
+
 
         if work_plan == 'dop_plan':
 
@@ -106,6 +109,25 @@ class CreatePZ(QMainWindow):
             mes = QMessageBox.warning(self, 'Инвентарный номер отсутствует',
                                       'Необходимо уточнить наличие инвентарного номера')
             return
+
+        a = well_data.leakiness
+        if well_data.leakiness is True:
+
+
+            if WellCondition.leakage_window is None:
+                WellCondition.leakage_window = LeakageWindow()
+                WellCondition.leakage_window.setWindowTitle("Геофизические исследования")
+                # WellCondition.leakage_window.setGeometry(200, 400, 300, 400)
+                WellCondition.leakage_window.show()
+
+                MyWindow.pause_app()
+                well_data.dict_leakiness = WellCondition.leakage_window.add_work()
+                # print(f'словарь нарушений {well_data.dict_leakiness}')
+                well_data.pause = True
+                WellCondition.leakage_window = None  # Discard reference.
+
+            else:
+                well_data.leakiness = False
 
         if work_plan not in ['application_pvr', 'application_gis', 'gnkt_bopz', 'gnkt_opz', 'gnkt_after_grp', 'gnkt_frez']:
             if work_plan != 'plan_change':

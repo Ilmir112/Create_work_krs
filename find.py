@@ -661,24 +661,6 @@ class WellCondition(FindIndexPZ):
                                                    f' есть нарушение - {well_data.leakiness_Count}, верно ли?')
             if leakiness_quest == QMessageBox.StandardButton.Yes:
                 well_data.leakiness = True
-                if WellCondition.leakage_window is None:
-                    WellCondition.leakage_window = LeakageWindow()
-                    WellCondition.leakage_window.setWindowTitle("Геофизические исследования")
-                    # WellCondition.leakage_window.setGeometry(200, 400, 300, 400)
-                    WellCondition.leakage_window.show()
-
-                    MyWindow.pause_app()
-                    well_data.dict_leakiness = WellCondition.leakage_window.add_work()
-                    # print(f'словарь нарушений {well_data.dict_leakiness}')
-                    well_data.pause = True
-                    WellCondition.leakage_window = None  # Discard reference.
-
-
-                else:
-                    WellCondition.leakage_window.close()  # Close window.
-                    WellCondition.leakage_window = None  # Discard reference.
-
-
             else:
                 well_data.leakiness = False
 
