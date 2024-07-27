@@ -2135,7 +2135,7 @@ class MyWindow(QMainWindow):
             WellCondition.leakage_window = LeakageWindow()
             WellCondition.leakage_window.setWindowTitle("Корректировка негерметичности")
             # WellCondition.leakage_window.setGeometry(200, 400, 300, 400)
-            self.set_modal_window(WellCondition.leakage_window.show())
+            self.set_modal_window(WellCondition.leakage_window)
 
             MyWindow.pause_app()
             well_data.dict_leakiness = WellCondition.leakage_window.add_work()

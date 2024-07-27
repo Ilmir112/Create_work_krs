@@ -35,6 +35,9 @@ class TabPage_SO_leakage(QWidget):
         grid.addWidget(self.insulation_combo, 1, 2)
 
 
+
+
+
 class TabWidget(QTabWidget):
     def __init__(self):
         super().__init__()
@@ -74,6 +77,25 @@ class LeakageWindow(QMainWindow):
         vbox.addWidget(self.buttonadd_work, 3, 0)
         vbox.addWidget(self.buttonAddString, 3, 1)
 
+        if len(well_data.dict_leakiness) != 0:
+
+            ffa = well_data.dict_leakiness['НЭК']
+            for nek in well_data.dict_leakiness['НЭК']['интервал']:
+                rows = self.tableWidget.rowCount()
+
+                roof_leakage, sole_leakage_line = nek.split('-')
+                self.tableWidget.insertRow(rows)
+                insulation_combo1 = QComboBox(self)
+                insulation_combo1.addItems(['не изолирован', 'изолирован'])
+                if well_data.dict_leakiness['НЭК']['интервал'][nek]['отключение']:
+                    insulation_combo1.setCurrentIndex(1)
+                self.tableWidget.setItem(rows, 0, QTableWidgetItem(roof_leakage))
+                self.tableWidget.setItem(rows, 1, QTableWidgetItem(sole_leakage_line))
+                self.tableWidget.setCellWidget(rows, 2, insulation_combo1)
+
+                self.tableWidget.sortItems(0)
+
+
     def addRowTable(self):
 
         roof_leakage = self.tabWidget.currentWidget().roof_leakage_line.text().replace(',', '.')
@@ -83,7 +105,9 @@ class LeakageWindow(QMainWindow):
         index_insulation = self.tabWidget.currentWidget().insulation_combo.currentIndex()
         # print(index_insulation)
         insulation_combo1.setCurrentIndex(index_insulation)
-
+        if float(roof_leakage) > float(sole_leakage_line):
+            msg = QMessageBox.information(self, 'Внимание', 'Кровля больше подошвы')
+            return
         if not roof_leakage or not sole_leakage_line:
             msg = QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
             return
