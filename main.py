@@ -2588,7 +2588,7 @@ if __name__ == "__main__":
     # app3 = QApplication(sys.argv)
 
     app = QApplication(sys.argv)
-    MyWindow.delete_files()
+    # MyWindow.delete_files()
 
 
     if MyWindow.check_process():
