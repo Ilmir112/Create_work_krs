@@ -88,7 +88,7 @@ class Work_with_gnkt(QMainWindow):
         main.MyWindow.copy_pz(self, self.ws_schema, table_schema, 'gnkt_frez', 47, 2)
         main.MyWindow.copy_pz(self, self.ws_work, table_widget, 'gnkt_frez', 12, 3)
         work_well = self.work_gnkt_frez(self.ports_data, self.plast_work)
-        main.MyWindow.populate_row(self, 0, work_well, table_widget)
+        main.MyWindow.populate_row(self, 0, work_well, table_widget, self.work_plan)
 
         CreatePZ.add_itog(self, self.ws_work, self.table_widget.rowCount() + 1, self.work_plan)
 

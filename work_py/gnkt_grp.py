@@ -231,7 +231,7 @@ class GnktOsvWindow(QMainWindow):
                 GnktOsvWindow2.fluid_edit, well_data.pvo, GnktOsvWindow2.current_bottom_edit,
              GnktOsvWindow2.osvoenie_combo_need)
         if work_well:
-            main.MyWindow.populate_row(self, 0, work_well, table_widget)
+            main.MyWindow.populate_row(self, 0, work_well, table_widget, self.work_plan)
             CreatePZ.add_itog(self, self.ws_work, self.table_widget.rowCount() + 1, self.work_plan)
 
 

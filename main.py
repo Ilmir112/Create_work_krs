@@ -2003,13 +2003,13 @@ class MyWindow(QMainWindow):
                             if value[0] <= len(text) <= value[1]:
                                 text_width = key
                                 table_widget.setRowHeight(row, int(text_width))
-        for row in range(self.table_widget.rowCount()):
-            if row >= well_data.ins_ind2:
-                a = row - well_data.ins_ind2 + 1
-                ab = well_data.ins_ind2
-                # Добавляем нумерацию в первую колонку
-                item_number = QtWidgets.QTableWidgetItem(str(row - well_data.ins_ind2 + 1))  # Номер строки + 1
-                table_widget.setItem(row, 1, item_number)
+        if work_plan in ['krs', 'dop_plan', 'dop_plan_in_base']:
+            for row in range(self.table_widget.rowCount()):
+                if row >= well_data.ins_ind2:
+
+                    # Добавляем нумерацию в первую колонку
+                    item_number = QtWidgets.QTableWidgetItem(str(row - well_data.ins_ind2 + 1))  # Номер строки + 1
+                    table_widget.setItem(row, 1, item_number)
 
 
     def create_database_well(self, work_plan):
@@ -2608,15 +2608,15 @@ if __name__ == "__main__":
     except Exception as e:
         mes = QMessageBox.warning(None, 'КРИТИЧЕСКАЯ ОШИБКА', f'Критическая ошибка, смотри в лог {e}')
 
-    # if well_data.connect_in_base:
-        # app2 = UpdateChecker()
-        # app2.check_version()
-        # if app2.window_close == True:
-        #     MyWindow.set_modal_window(None, app2)
-        #     well_data.pause = True
-        #     MyWindow.pause_app()
-        #     well_data.pause = False
-        #     app2.close()
+    if well_data.connect_in_base:
+        app2 = UpdateChecker()
+        app2.check_version()
+        if app2.window_close == True:
+            MyWindow.set_modal_window(None, app2)
+            well_data.pause = True
+            MyWindow.pause_app()
+            well_data.pause = False
+            app2.close()
 
     window = MyWindow()
     window.show()
