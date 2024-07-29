@@ -2609,8 +2609,8 @@ if __name__ == "__main__":
         mes = QMessageBox.warning(None, 'КРИТИЧЕСКАЯ ОШИБКА', f'Критическая ошибка, смотри в лог {e}')
 
     if well_data.connect_in_base:
-        app2 = UpdateChecker()
-        app2.check_version()
+        # app2 = UpdateChecker()
+        # app2.check_version()
         if app2.window_close == True:
             MyWindow.set_modal_window(None, app2)
             well_data.pause = True
