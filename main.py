@@ -2588,7 +2588,7 @@ if __name__ == "__main__":
     # app3 = QApplication(sys.argv)
 
     app = QApplication(sys.argv)
-    # MyWindow.delete_files()
+    MyWindow.delete_files()
 
 
     if MyWindow.check_process():
@@ -2600,6 +2600,7 @@ if __name__ == "__main__":
             mes = QMessageBox.information(None, 'Проверка соединения',
                                           'Проверка показало что с облаком соединения нет, '
                                           'будет использована локальная база данных')
+
         MyWindow.login_window = LoginWindow()
         MyWindow.login_window.show()
         MyWindow.pause_app()
