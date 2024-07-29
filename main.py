@@ -2608,7 +2608,7 @@ if __name__ == "__main__":
     except Exception as e:
         mes = QMessageBox.warning(None, 'КРИТИЧЕСКАЯ ОШИБКА', f'Критическая ошибка, смотри в лог {e}')
 
-    if well_data.connect_in_base:
+    # if well_data.connect_in_base:
         # app2 = UpdateChecker()
         # app2.check_version()
         # if app2.window_close == True:
