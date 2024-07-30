@@ -2585,6 +2585,7 @@ class MyWindow(QMainWindow):
             os.remove(zip_path)  # Удаляет файл Zima.zip
 
 
+
 if __name__ == "__main__":
     # app3 = QApplication(sys.argv)
 
