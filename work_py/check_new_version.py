@@ -222,33 +222,33 @@ class UpdateThread(QThread):
             mes = QMessageBox.warning(None, "Ошибка", f"Не удалось загрузить обновления: {e}")
 
     def move_file(self, source_path, destination_path):
+        zima_process_name = "ZIMA.exe"
+        print("Ожидание 5 секунд перед закрытием приложения...")
+        time.sleep(5)
+
+        # Закрываем приложение
+        self.close_zima(zima_process_name)
+        print("Приложение закрыто.")
+
+        print("Ожидание 5 секунд перед перемещением файлов...")
+        time.sleep(5)
+
+        # Перемещаем файл
         try:
-
-
-            if os.name == 'nt':
-                print(f'windows {source_path, destination_path}')
-                time.sleep(5)
-                zima_process_name = "ZIMA.exe"
-                time.sleep(5)
-
-                subprocess.check_call(
-                    ["cmd", "/c", "start", "/wait", "cmd", "/c", "move", source_path, destination_path])
-
-                # Ожидаем завершения процесса
-                self.close_zima(zima_process_name)
-                time.sleep(5)
-
-                subprocess.check_call(
-                    ["cmd", "/c", "start", "/wait", "cmd", "/c", "start", destination_path])
-
-
-
-            elif os.name == 'posix':
-                subprocess.check_call(["sudo", "mv", source_path, destination_path])
+            subprocess.check_call(["cmd", "/c", "move", source_path, destination_path])
+            print(f"Файл перемещен из {source_path} в {destination_path}.")
         except subprocess.CalledProcessError as e:
-            QMessageBox.warning(None, "Ошибка",
-                                f"Не удалось переместить файл {os.path.basename(source_path)}. Возможно, он используется другой программой. Код ошибки: {e.returncode}")
-            return
+            print(f"Ошибка при перемещении файла: {e}")
+
+        print("Ожидание 5 секунд перед запуском обновленного приложения...")
+        time.sleep(5)
+
+        # Запускаем обновленное приложение
+        try:
+            subprocess.check_call(["cmd", "/c", "start", destination_path])
+            print("Приложение успешно запущено.")
+        except subprocess.CalledProcessError as e:
+            print(f"Ошибка при запуске приложения: {e}")
 
     # def wait_for_process_to_close(self, process_name):
     #     """
@@ -372,12 +372,11 @@ class UpdateThread(QThread):
             json.dump(data, file, indent=4)
     @staticmethod
     def close_zima(zima_process_name):
-        """Закрывает процесс ZIMA.exe."""
-
-        if os.name == 'nt':  # Windows
-            subprocess.run(["taskkill", "/f", "/im", zima_process_name], check=True)
-        else:  # Linux/macOS
-            subprocess.run(["pkill", zima_process_name], check=True)
+        """Закрывает процесс по его имени."""
+        for proc in psutil.process_iter(attrs=['pid', 'name']):
+            if proc.info['name'] == zima_process_name:
+                proc.terminate()  # Остановка процесса ZIMA.exe
+                proc.wait()  # Ожидание завершения
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
