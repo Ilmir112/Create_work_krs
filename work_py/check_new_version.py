@@ -226,12 +226,7 @@ class UpdateThread(QThread):
         print("Ожидание 5 секунд перед закрытием приложения...")
         time.sleep(5)
 
-        # Закрываем приложение
-        self.close_zima(zima_process_name)
-        print("Приложение закрыто.")
 
-        print("Ожидание 5 секунд перед перемещением файлов...")
-        time.sleep(5)
 
         # Перемещаем файл
         try:
@@ -239,6 +234,12 @@ class UpdateThread(QThread):
             print(f"Файл перемещен из {source_path} в {destination_path}.")
         except subprocess.CalledProcessError as e:
             print(f"Ошибка при перемещении файла: {e}")
+
+        # Закрываем приложение
+        self.close_zima(zima_process_name)
+        print("Приложение закрыто.")
+
+
 
         print("Ожидание 5 секунд перед запуском обновленного приложения...")
         time.sleep(5)
@@ -376,7 +377,7 @@ class UpdateThread(QThread):
         for proc in psutil.process_iter(attrs=['pid', 'name']):
             if proc.info['name'] == zima_process_name:
                 proc.terminate()  # Остановка процесса ZIMA.exe
-                proc.wait()  # Ожидание завершения
+                  # Ожидание завершения
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
