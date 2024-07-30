@@ -226,7 +226,9 @@ class UpdateThread(QThread):
         print("Ожидание 5 секунд перед закрытием приложения...")
         time.sleep(5)
 
-
+        # Закрываем приложение
+        self.close_zima(zima_process_name)
+        print("Приложение закрыто.")
 
         # Перемещаем файл
         try:
@@ -235,9 +237,7 @@ class UpdateThread(QThread):
         except subprocess.CalledProcessError as e:
             print(f"Ошибка при перемещении файла: {e}")
 
-        # Закрываем приложение
-        self.close_zima(zima_process_name)
-        print("Приложение закрыто.")
+
 
 
 
