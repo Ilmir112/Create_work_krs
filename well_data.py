@@ -257,6 +257,7 @@ dict_nkt_po = {}
 path_image = '_internal/'
 # path_image = ''
 data_well_dict = {}
+ins_ind2 = 0
 Qwater = 100
 dict_sucker_rod = {}
 dict_sucker_rod_po = {}
