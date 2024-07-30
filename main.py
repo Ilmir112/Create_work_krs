@@ -2592,6 +2592,7 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     MyWindow.delete_files()
 
+
     if MyWindow.check_process():
        MyWindow.show_confirmation()
 
