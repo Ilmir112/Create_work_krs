@@ -45,6 +45,7 @@ from PyQt5.QtCore import Qt, QObject, pyqtSignal
 from work_py.leakage_column import LeakageWindow
 
 
+
 class UncaughtExceptions(QObject):
     _exception_caught = pyqtSignal(object)
 
