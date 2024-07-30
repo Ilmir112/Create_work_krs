@@ -1026,7 +1026,7 @@ class DopPlanWindow(QMainWindow):
             if well_data.data_in_base:
                 well_data.dop_work_list = self.work_list(work_earlier)
             else:
-                work_list = [self.work_list(work_earlier)]
+                work_list = self.work_list(work_earlier)
                 MyWindow.populate_row(self, self.ins_ind + 3, work_list, self.table_widget, self.work_plan)
 
             if len(self.dict_perforation) != 0:
@@ -1108,7 +1108,7 @@ class DopPlanWindow(QMainWindow):
                 well_data.template_lenght = float(template_lenght_addition_edit)
 
 
-            work_list = [self.work_list(work_earlier)]
+            work_list = self.work_list(work_earlier)
             well_data.ins_ind2 = self.ins_ind + 2
             MyWindow.populate_row(self, self.ins_ind + 2, work_list, self.table_widget, self.work_plan)
 
