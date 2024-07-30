@@ -262,7 +262,6 @@ dict_sucker_rod = {}
 dict_sucker_rod_po = {}
 row_expected = []
 rowHeights = []
-
 plast_project = []
 plast_work = []
 image_data = []

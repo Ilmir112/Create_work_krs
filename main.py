@@ -45,7 +45,6 @@ from PyQt5.QtCore import Qt, QObject, pyqtSignal
 from work_py.leakage_column import LeakageWindow
 
 
-
 class UncaughtExceptions(QObject):
     _exception_caught = pyqtSignal(object)
 
@@ -2004,13 +2003,13 @@ class MyWindow(QMainWindow):
                             if value[0] <= len(text) <= value[1]:
                                 text_width = key
                                 table_widget.setRowHeight(row, int(text_width))
-        if work_plan in ['krs', 'dop_plan', 'dop_plan_in_base']:
-            for row in range(self.table_widget.rowCount()):
-                if row >= well_data.ins_ind2:
-
-                    # Добавляем нумерацию в первую колонку
-                    item_number = QtWidgets.QTableWidgetItem(str(row - well_data.ins_ind2 + 1))  # Номер строки + 1
-                    table_widget.setItem(row, 1, item_number)
+        for row in range(self.table_widget.rowCount()):
+            if row >= well_data.ins_ind2:
+                a = row - well_data.ins_ind2 + 1
+                ab = well_data.ins_ind2
+                # Добавляем нумерацию в первую колонку
+                item_number = QtWidgets.QTableWidgetItem(str(row - well_data.ins_ind2 + 1))  # Номер строки + 1
+                table_widget.setItem(row, 1, item_number)
 
 
     def create_database_well(self, work_plan):
@@ -2576,20 +2575,22 @@ class MyWindow(QMainWindow):
                     return False
     @staticmethod
     def delete_files():
-        zip_path = os.path.dirname(os.path.abspath(__file__)).replace('_internal/ZIMA', 'ZIMA.zip')
+        zip_path = os.path.dirname(os.path.abspath(__file__)) + '/ZIMA.zip'
         print(zip_path)
-        destination_path = os.path.dirname(os.path.abspath(__file__)).replace('_internal/ZIMA', 'ZimaUpdate')
+        destination_path = os.path.dirname(os.path.abspath(__file__)) + '/ZimaUpdate'
+        a = os.path.exists(destination_path)
         if os.path.exists(destination_path):
             shutil.rmtree(destination_path)  # Удаляет папку ZimaUpdate
         if os.path.exists(zip_path):
             os.remove(zip_path)  # Удаляет файл Zima.zip
 
 
+
 if __name__ == "__main__":
     # app3 = QApplication(sys.argv)
 
     app = QApplication(sys.argv)
-    # MyWindow.delete_files()
+    MyWindow.delete_files()
 
 
     if MyWindow.check_process():
@@ -2601,7 +2602,6 @@ if __name__ == "__main__":
             mes = QMessageBox.information(None, 'Проверка соединения',
                                           'Проверка показало что с облаком соединения нет, '
                                           'будет использована локальная база данных')
-
         MyWindow.login_window = LoginWindow()
         MyWindow.login_window.show()
         MyWindow.pause_app()

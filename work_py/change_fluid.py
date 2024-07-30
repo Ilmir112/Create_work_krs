@@ -111,10 +111,10 @@ class Change_fluid_Window(QMainWindow):
         if (plast_new_combo == '' or fluid_new_edit == '' or pressuar_new_edit == ''):
             mes = QMessageBox.critical(self, 'Ошибка', 'Введены не все параметры')
             return
-        if 0.87 <= fluid_new_edit < 1.65 is False:
+        if 0.87 <= fluid_new_edit < 1.65 == False:
             mes = QMessageBox.critical(self, 'Ошибка', 'Жидкость не может быть данным удельным весом')
             return
-        if pressuar_new_edit < 10 is False:
+        if pressuar_new_edit < 10 == False:
             mes = QMessageBox.critical(self, 'Ошибка', 'Ожидаемое давление слишком низкое')
             return
         work_list = self.fluid_change(plast_new_combo, fluid_new_edit, pressuar_new_edit)
