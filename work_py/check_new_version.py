@@ -229,8 +229,10 @@ class UpdateThread(QThread):
                 print(f'windows {source_path, destination_path}')
                 time.sleep(5)
                 zima_process_name = "ZIMA.exe"
+                time.sleep(5)
                 # Ожидаем завершения процесса
-                self.wait_for_process_to_close(zima_process_name)
+                self.close_zima(zima_process_name)
+                time.sleep(5)
                 subprocess.check_call(
                     ["cmd", "/c", "start", "/wait", "cmd", "/c", "move", source_path, destination_path])
 
@@ -246,17 +248,17 @@ class UpdateThread(QThread):
                                 f"Не удалось переместить файл {os.path.basename(source_path)}. Возможно, он используется другой программой. Код ошибки: {e.returncode}")
             return
 
-    def wait_for_process_to_close(self, process_name):
-        """
-        Ждем, пока процесс с указанным именем не завершится.
-        """
-        while True:
-            # Получаем список всех процессов
-            tasks = subprocess.check_output("tasklist", shell=True).decode()
-            if process_name not in tasks:
-                break
-            else:
-                self.close_zima()
+    # def wait_for_process_to_close(self, process_name):
+    #     """
+    #     Ждем, пока процесс с указанным именем не завершится.
+    #     """
+    #     while True:
+    #         # Получаем список всех процессов
+    #         tasks = subprocess.check_output("tasklist", shell=True).decode('Windows-1251')
+    #         if process_name not in tasks:
+    #             break
+    #         else:
+    #             self.close_zima()
 
 
     def update_process(self):
@@ -367,13 +369,13 @@ class UpdateThread(QThread):
         with open(f'{well_data.path_image}users/version_app.json', 'w') as file:
             json.dump(data, file, indent=4)
     @staticmethod
-    def close_zima():
+    def close_zima(zima_process_name):
         """Закрывает процесс ZIMA.exe."""
 
         if os.name == 'nt':  # Windows
-            subprocess.run(["taskkill", "/f", "/im", "ZIMA.exe"], check=True)
+            subprocess.run(["taskkill", "/f", "/im", zima_process_name], check=True)
         else:  # Linux/macOS
-            subprocess.run(["pkill", "ZIMA.exe"], check=True)
+            subprocess.run(["pkill", zima_process_name], check=True)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
