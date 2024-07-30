@@ -124,7 +124,7 @@ class FindIndexPZ(QMainWindow):
         if well_data.data_x_max._value == 0:
             mes = QMessageBox.warning(self, 'индекс окончания копирования ожидаемых показателей',
                                     'Программа не смогла определить строку окончания копирования'
-                                    ' ожидаемых показателей')
+                                    ' ожидаемых показателей "ХI Планируемый объём работ"')
             MyWindow.pause_app()
             return
 

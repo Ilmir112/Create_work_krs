@@ -293,7 +293,7 @@ class UpdateThread(QThread):
                 print(f'source_path {source_path}')
                 absolute_path = os.path.abspath(__file__)
                 print(absolute_path)
-                destination_path = absolute_path[:35]
+                destination_path = absolute_path[:-len('\_internal\work_py\check_new_version.pyc')]
                 print(f'destination_path {destination_path}')
                 # try:
                 #     shutil.copy2(source_path, destination_path)
