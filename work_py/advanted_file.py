@@ -467,8 +467,10 @@ def count_row_height(ws, ws2, work_list, merged_cells_dict, ind_ins):
 
                 # # Преобразуем изображение в режим RGB
                 # image = image.convert('RGB')
-
-                image.save(file)
+                try:
+                    image.save(file)
+                except FileNotFoundError as f:
+                    QMessageBox.warning(None, 'Ошибка', f'Не получилось вставить изображение {f}')
 
                 # Сохранение изображения в Excel файл:
 

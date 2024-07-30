@@ -2590,7 +2590,7 @@ if __name__ == "__main__":
     # app3 = QApplication(sys.argv)
 
     app = QApplication(sys.argv)
-    MyWindow.delete_files()
+    # MyWindow.delete_files()
 
 
     if MyWindow.check_process():
@@ -2609,15 +2609,15 @@ if __name__ == "__main__":
     except Exception as e:
         mes = QMessageBox.warning(None, 'КРИТИЧЕСКАЯ ОШИБКА', f'Критическая ошибка, смотри в лог {e}')
 
-    if well_data.connect_in_base:
-        app2 = UpdateChecker()
-        app2.check_version()
-        if app2.window_close == True:
-            MyWindow.set_modal_window(None, app2)
-            well_data.pause = True
-            MyWindow.pause_app()
-            well_data.pause = False
-            app2.close()
+    # if well_data.connect_in_base:
+    #     app2 = UpdateChecker()
+    #     app2.check_version()
+    #     if app2.window_close == True:
+    #         MyWindow.set_modal_window(None, app2)
+    #         well_data.pause = True
+    #         MyWindow.pause_app()
+    #         well_data.pause = False
+    #         app2.close()
 
     window = MyWindow()
     window.show()
