@@ -456,14 +456,14 @@ def count_row_height(ws, ws2, work_list, merged_cells_dict, ind_ins):
             try:
                 # Декодирование из Base64 и создание изображения:
                 decoded_image_data = base64.b64decode(image_base64)
-
+                print(decoded_image_data)
                 # Создаем объект PIL Image из декодированных данных
                 image = Image.open(BytesIO(decoded_image_data))
-
+                print(image)
                 # Проверка размеров изображения:
                 print(f"Размеры изображения: {image.size}")
 
-                file = f'imageFiles/image_work/{coord}.png'
+                file = f'{well_data.path_image}imageFiles/image_work/{coord}.png'
 
                 # # Преобразуем изображение в режим RGB
                 # image = image.convert('RGB')
@@ -471,6 +471,7 @@ def count_row_height(ws, ws2, work_list, merged_cells_dict, ind_ins):
                     image.save(file)
                 except FileNotFoundError as f:
                     QMessageBox.warning(None, 'Ошибка', f'Не получилось вставить изображение {f}')
+                    continue
 
                 # Сохранение изображения в Excel файл:
 
