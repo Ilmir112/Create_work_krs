@@ -230,11 +230,13 @@ class UpdateThread(QThread):
                 time.sleep(5)
                 zima_process_name = "ZIMA.exe"
                 time.sleep(5)
+
+                subprocess.check_call(
+                    ["cmd", "/c", "start", "/wait", "cmd", "/c", "move", source_path, destination_path])
+
                 # Ожидаем завершения процесса
                 self.close_zima(zima_process_name)
                 time.sleep(5)
-                subprocess.check_call(
-                    ["cmd", "/c", "start", "/wait", "cmd", "/c", "move", source_path, destination_path])
 
                 subprocess.check_call(
                     ["cmd", "/c", "start", "/wait", "cmd", "/c", "start", destination_path])
