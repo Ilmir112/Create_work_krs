@@ -2576,9 +2576,9 @@ class MyWindow(QMainWindow):
                     return False
     @staticmethod
     def delete_files():
-        zip_path = os.path.dirname(os.path.abspath(__file__)) + '/ZIMA.zip'
+        zip_path = os.path.dirname(os.path.abspath(__file__)).replace('_internal/ZIMA', 'ZIMA.zip')
         print(zip_path)
-        destination_path = os.path.dirname(os.path.abspath(__file__)) + '/ZimaUpdate'
+        destination_path = os.path.dirname(os.path.abspath(__file__)).replace('_internal/ZIMA', 'ZimaUpdate')
         if os.path.exists(destination_path):
             shutil.rmtree(destination_path)  # Удаляет папку ZimaUpdate
         if os.path.exists(zip_path):
@@ -2589,7 +2589,7 @@ if __name__ == "__main__":
     # app3 = QApplication(sys.argv)
 
     app = QApplication(sys.argv)
-    MyWindow.delete_files()
+    # MyWindow.delete_files()
 
 
     if MyWindow.check_process():
