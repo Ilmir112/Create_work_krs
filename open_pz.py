@@ -51,7 +51,7 @@ class CreatePZ(QMainWindow):
 
         if work_plan == 'dop_plan':
 
-            data_well = check_in_database_well_data(well_data.well_number._value, well_data._value, well_data.work_plan)[0]
+            data_well = check_in_database_well_data(well_data.well_number._value, well_data.well_area._value, well_data.work_plan)[0]
             if data_well:
                 change_work_work_plan = QMessageBox.question(self,
                                                              'Наличие в базе данных',
