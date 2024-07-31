@@ -367,6 +367,7 @@ def count_row_height(ws, ws2, work_list, merged_cells_dict, ind_ins):
     for i in range(1, len(work_list) + 1):  # Добавлением работ
         a = work_list[i-1]
         if 'Наименование работ' in work_list[i-1]:
+
             boundaries_dict_index = i+1
 
         if 'код площади' in work_list[i-1]:

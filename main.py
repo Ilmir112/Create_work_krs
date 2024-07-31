@@ -462,6 +462,7 @@ class MyWindow(QMainWindow):
         from work_py.gnkt_frez import Work_with_gnkt
         from work_py.gnkt_grp import GnktOsvWindow
         from work_py.dop_plan_py import DopPlanWindow
+        from work_py.correct_plan import CorrectPlanWindow
 
         action = self.sender()
 
@@ -521,7 +522,8 @@ class MyWindow(QMainWindow):
                 self.rir_window.show()
                 well_data.pause = True
                 self.pause_app()
-                self.ws = insert_data_new_excel_file(well_data.data, well_data.rowHeights, well_data.colWidth, well_data.boundaries_dict)
+                self.ws = insert_data_new_excel_file(well_data.data, well_data.rowHeights,
+                                                     well_data.colWidth, well_data.boundaries_dict)
 
                 self.copy_pz(self.ws, self.table_widget, self.work_plan)
 
@@ -529,20 +531,22 @@ class MyWindow(QMainWindow):
                 mes = QMessageBox.warning(self, 'Ошибка', 'Ошибка при прочтении файла')
         elif action == self.create_KRS_change and self.table_widget == None:
             self.work_plan = 'plan_change'
+            well_data.work_plan = 'plan_change'
             self.tableWidgetOpen(self.work_plan)
-            self.fname, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
-                                                                  "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
-            if self.fname:
-                # try:
-                self.read_pz(self.fname)
+            try:
+                well_data.data_in_base = True
+                self.rir_window = CorrectPlanWindow(well_data.ins_ind, self.table_widget, self.work_plan)
+                # self.rir_window.setGeometry(200, 400, 100, 200)
+                self.rir_window.show()
                 well_data.pause = True
-                read_pz = CreatePZ(self.wb, self.ws, self.data_window, self.perforation_correct_window2)
-                sheet = read_pz.open_excel_file(self.ws, self.work_plan)
+                self.pause_app()
+                self.ws = insert_data_new_excel_file(well_data.data, well_data.rowHeights, well_data.colWidth,
+                                                     well_data.boundaries_dict)
 
-                self.copy_pz(sheet, self.table_widget, self.work_plan)
+                self.copy_pz(self.ws, self.table_widget, self.work_plan)
 
-                # except FileNotFoundError:
-                #     print('Файл не найден')
+            except FileNotFoundError:
+                mes = QMessageBox.warning(self, 'Ошибка', 'Ошибка при прочтении файла')
 
         elif action == self.create_GNKT_OPZ and self.table_widget == None:
             self.work_plan = 'gnkt_opz'
@@ -1480,26 +1484,27 @@ class MyWindow(QMainWindow):
 
     def read_clicked_mouse_data(self, row):
 
+        aca = well_data.count_row_well
         row = row - well_data.count_row_well
         # print(well_data.column_diametr._value)
-        for index, data in enumerate(well_data.data_list):
-            # print(index, data)
-            if index == row:
-                well_data.current_bottom = data[1]
-                well_data.dict_perforation = json.loads(data[2])
-                # print(f' строка {well_data.dict_perforation}')
+        data = well_data.data_list
 
-                well_data.plast_all = json.loads(data[3])
-                well_data.plast_work = json.loads(data[4])
-                well_data.dict_leakiness = json.loads(data[5])
-                well_data.column_additional = data[6]
+        well_data.current_bottom = data[row][1]
+        well_data.dict_perforation = json.loads(data[row][2])
+        # print(f' строка {well_data.dict_perforation}')
 
-                well_data.fluid_work = data[7]
-                well_data.template_depth, well_data.template_lenght, well_data.template_depth_addition, well_data.template_lenght_addition = json.loads(data[11])
-                well_data.skm_interval = json.loads(data[12])
+        well_data.plast_all = json.loads(data[row][3])
+        well_data.plast_work = json.loads(data[row][4])
+        well_data.dict_leakiness = json.loads(data[row][5])
+        well_data.column_additional = data[row][6]
 
-                well_data.problemWithEk_depth = data[13]
-                well_data.problemWithEk_diametr = data[14]
+        well_data.fluid_work = data[row][7]
+        well_data.template_depth, well_data.template_lenght, well_data.template_depth_addition, well_data.template_lenght_addition = json.loads(data[row][11])
+        well_data.skm_interval = json.loads(data[row][12])
+
+        well_data.problemWithEk_depth = data[row][13]
+        well_data.problemWithEk_diametr = data[row][14]
+
         # print(well_data.skm_interval)
 
     @staticmethod
@@ -2003,13 +2008,14 @@ class MyWindow(QMainWindow):
                             if value[0] <= len(text) <= value[1]:
                                 text_width = key
                                 table_widget.setRowHeight(row, int(text_width))
-        for row in range(self.table_widget.rowCount()):
-            if row >= well_data.ins_ind2:
-                a = row - well_data.ins_ind2 + 1
-                ab = well_data.ins_ind2
-                # Добавляем нумерацию в первую колонку
-                item_number = QtWidgets.QTableWidgetItem(str(row - well_data.ins_ind2 + 1))  # Номер строки + 1
-                table_widget.setItem(row, 1, item_number)
+        if 'gnkt' not in work_plan:
+            for row in range(self.table_widget.rowCount()):
+                if row >= well_data.ins_ind2:
+                    a = row - well_data.ins_ind2 + 1
+                    ab = well_data.ins_ind2
+                    # Добавляем нумерацию в первую колонку
+                    item_number = QtWidgets.QTableWidgetItem(str(row - well_data.ins_ind2 + 1))  # Номер строки + 1
+                    table_widget.setItem(row, 1, item_number)
 
 
     def create_database_well(self, work_plan):
@@ -2394,10 +2400,23 @@ class MyWindow(QMainWindow):
         ws4.cell(row=11, column=1).value = f'макс угол {well_data.max_angle._value} на {well_data.max_angle_H._value}'
         ws4.cell(row=1, column=2).value = well_data.cdng._value
         try:
+            try:
+                category_pressuar = well_data.dict_category[well_data.plast_work_short[0]]["по давлению"].category
+            except:
+                category_pressuar = well_data.category_pressuar2
+            try:
+                category_h2s = well_data.dict_category[well_data.plast_work_short[0]]["по сероводороду"].category
+            except:
+                category_h2s = well_data.category_h2s_2
+            try:
+                gaz_f_pr = well_data.gaz_f_pr[0]
+            except:
+                gaz_f_pr = well_data.gaz_f_pr_2
+
             ws4.cell(row=2, column=3).value = \
-                f'Рпл - {well_data.dict_category[well_data.plast_work_short[0]]["по давлению"].category},' \
-                f' H2S -{well_data.dict_category[well_data.plast_work_short[0]]["по сероводороду"].category},' \
-                f' газ факт -{well_data.gaz_f_pr[0]}т/м3'
+                f'Рпл - {category_pressuar},' \
+                f' H2S -{category_h2s},' \
+                f' газ факт -{gaz_f_pr}т/м3'
         except Exception as e:
             mes = QMessageBox.warning(self, 'ОШИБКА',
                                       f"Программа не смогла вставить данные в краткое содержание значения по Рпл {e}")
@@ -2590,7 +2609,7 @@ if __name__ == "__main__":
     # app3 = QApplication(sys.argv)
 
     app = QApplication(sys.argv)
-    MyWindow.delete_files()
+    # MyWindow.delete_files()
 
 
     if MyWindow.check_process():
@@ -2609,15 +2628,15 @@ if __name__ == "__main__":
     except Exception as e:
         mes = QMessageBox.warning(None, 'КРИТИЧЕСКАЯ ОШИБКА', f'Критическая ошибка, смотри в лог {e}')
 
-    if well_data.connect_in_base:
-        app2 = UpdateChecker()
-        app2.check_version()
-        if app2.window_close == True:
-            MyWindow.set_modal_window(None, app2)
-            well_data.pause = True
-            MyWindow.pause_app()
-            well_data.pause = False
-            app2.close()
+    # if well_data.connect_in_base:
+    #     app2 = UpdateChecker()
+    #     app2.check_version()
+    #     if app2.window_close == True:
+    #         MyWindow.set_modal_window(None, app2)
+    #         well_data.pause = True
+    #         MyWindow.pause_app()
+    #         well_data.pause = False
+    #         app2.close()
 
     window = MyWindow()
     window.show()

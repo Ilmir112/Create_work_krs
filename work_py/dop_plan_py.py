@@ -580,7 +580,7 @@ class DopPlanWindow(QMainWindow):
         self.work_with_excel(well_number, well_area, table_in_base)
 
 
-    def work_with_excel(self,well_number, well_area, work_plan):
+    def work_with_excel(self, well_number, well_area, work_plan):
         self.data, self.rowHeights, self.colWidth, self.boundaries_dict = self.read_excel_in_base(well_number,
                                                                                                   well_area, work_plan)
         self.target_row_index = 5000
@@ -588,37 +588,51 @@ class DopPlanWindow(QMainWindow):
         self.bottom_row_index = 5000
 
         perforation_list = []
-
+        aasa= self.data
         for i, row in self.data.items():
             list_row = []
+
             for col in range(len(row)):
+                if col == 2:
+                    print(i, str(row[col]['value']))
+
                 if 'оризонт' in str(row[col]['value']) or 'пласт/' in str(row[col]['value']).lower():
                     self.target_row_index = int(i) + 1
                 elif 'вскрытия/отключения' in str(row[col]['value']):
                     self.old_index = 1
 
-                elif 'II. История эксплуатации скважины' in str(row[col]['value']):
+                elif 'II. История эксплуатации скважины' in str(row[col]['value']) and well_data.work_plan not in ['plan_change']:
+                    self.target_row_index_cancel = int(i) - 1
+                    break
+                elif 'Порядок работы' == str(row[col]['value']) and well_data.data_x_max._value == 0:
+
+                    well_data.data_x_max = well_data.ProtectedIsDigit(int(i)+1)
+                    break
+                elif 'ИТОГО:' in str(row[col]['value']) and well_data.work_plan in ['plan_change']:
                     self.target_row_index_cancel = int(i) - 1
                     break
                 elif 'Текущий забой ' in str(row[col]['value']):
                     self.bottom_row_index = int(i)
                 if int(i) > self.target_row_index:
                     list_row.append(row[col]['value'])
-            if int(i) > self.target_row_index_cancel:
-                break
+
+            if i != 'image':
+                if int(i) > self.target_row_index_cancel:
+                    break
             if len(list_row) != 0 and not 'внутренний диаметр ( d шарошечного долота) необсаженной части ствола' in list_row:
 
                 if all([col == None or col == '' for col in list_row]) is False:
                     perforation_list.append(list_row)
+        well_data.ins_ind2 = well_data.data_x_max._value
+        if well_data.work_plan != 'plan_change':
+            self.tableWidget.setSortingEnabled(False)
+            rows = self.tableWidget.rowCount()
 
-        self.tableWidget.setSortingEnabled(False)
-        rows = self.tableWidget.rowCount()
-
-        for row_pvr in perforation_list[::-1]:
-            self.tableWidget.insertRow(rows)
-            for index_col, col_pvr in enumerate(row_pvr):
-                if col_pvr != None:
-                    self.tableWidget.setItem(rows, index_col - 1, QTableWidgetItem(str(col_pvr)))
+            for row_pvr in perforation_list[::-1]:
+                self.tableWidget.insertRow(rows)
+                for index_col, col_pvr in enumerate(row_pvr):
+                    if col_pvr != None:
+                        self.tableWidget.setItem(rows, index_col - 1, QTableWidgetItem(str(col_pvr)))
     def read_excel_in_base(self, number_well, area_well, work_plan):
         if well_data.connect_in_base:
             conn = psycopg2.connect(**well_data.postgres_params_data_well)
@@ -661,8 +675,8 @@ class DopPlanWindow(QMainWindow):
             return
 
         return data, rowHeights, colWidth, boundaries_dict
-    def change_pvr_in_bottom(self, data, rowHeights, colWidth, boundaries_dict, current_bottom,
-                             current_bottom_date_edit, method_bottom_combo):
+    def change_pvr_in_bottom(self, data, rowHeights, colWidth, boundaries_dict, current_bottom = 0,
+                             current_bottom_date_edit = 0, method_bottom_combo = 0):
 
         for i, row in data.items():
             if i != 'image':
@@ -971,7 +985,7 @@ class DopPlanWindow(QMainWindow):
                     mes = QMessageBox.critical(self, 'База данных', 'Необходимо выбрать план работ')
                     return
 
-                data_well = check_in_database_well_data(well_data.well_number, well_data.well_area, table_in_base)[0]
+                data_well = check_in_database_well_data(well_number, well_area, table_in_base)[0]
 
                 if data_well:
                     insert_data_well_dop_plan(data_well)
@@ -1347,7 +1361,15 @@ class DopPlanWindow(QMainWindow):
 
     def insert_data_plan(self, result):
         well_data.data_list = []
-        for row in result:
+        for ind, row in enumerate(result):
+            if ind == 1:
+                well_data.bottom = row[1]
+                well_data.category_pressuar2 = row[8]
+                well_data.category_h2s_2 = row[9]
+                well_data.gaz_f_pr_2 = row[10]
+
+                well_data.plast_work_short = json.dumps(row[3], ensure_ascii=False)
+
             data_list = []
             for index, data in enumerate(row[:-1]):
                 if index == 6:
@@ -1357,6 +1379,7 @@ class DopPlanWindow(QMainWindow):
                         data = True
                 data_list.append(data)
             well_data.data_list.append(data_list)
+        well_data.plast_work_short = well_data.plast_work
 
     def work_list(self, work_earlier):
         krs_begin = [[None, None,

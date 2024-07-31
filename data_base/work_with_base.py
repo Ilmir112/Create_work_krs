@@ -731,10 +731,11 @@ def insert_database_well_data(well_number, well_area, contractor, costumer, data
                     try:
                         cursor.execute("""
                                         UPDATE wells
-                                        SET data_well = %s, today = %s, excel_json = %s                                                                       
-                                        WHERE well_number = %s AND area_well = %s AND contractor = %s AND costumer = %s AND geolog = %s
+                                        SET data_well =%s, today =%s, excel_json =%s, work_plan=%s, geolog =%s                                                                 
+                                        WHERE well_number =%s AND area_well =%s AND contractor = %s AND costumer =%s AND work_plan =%s
                                     """, (
-                            data_well, date_today, excel_json, str(well_number), well_area, contractor, costumer, well_data.user))
+                            data_well, date_today, excel_json,  work_plan_str, well_data.user[1],
+                            str(well_number), well_area, contractor, costumer, work_plan_str))
 
                         QMessageBox.information(None, 'Успешно', 'Данные в обновлены обновлены')
                     except (Exception, psycopg2.Error) as error:
@@ -743,7 +744,7 @@ def insert_database_well_data(well_number, well_area, contractor, costumer, data
 
                 # Подготовленные данные для вставки
                 data_values = (str(well_number), well_area,
-                               data_well, date_today, excel_json, contractor, well_data.costumer, work_plan_str, well_data.user)
+                               data_well, date_today, excel_json, contractor, well_data.costumer, work_plan_str, well_data.user[1])
 
                 # Подготовленный запрос для вставки данных с параметрами
                 query = f"INSERT INTO wells VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
@@ -752,7 +753,7 @@ def insert_database_well_data(well_number, well_area, contractor, costumer, data
                 cursor.execute(query, data_values)
 
                 mes = QMessageBox.information(None, 'база данных',
-                                              f'Скважина {well_data.well_number._value} добавлена в базу данных c excel фалами')
+                                              f'Скважина {well_data.well_number._value} добавлена в базу данных c excel файлами')
 
             # Сохранить изменения и закрыть соединение
             conn.commit()
@@ -797,12 +798,11 @@ def insert_database_well_data(well_number, well_area, contractor, costumer, data
                     try:
                         cursor.execute("""
                                         UPDATE wells
-                                        SET data_well = ?, today = ?, excel_json = ?                                                                       
+                                        SET data_well = ?, today = ?, excel_json = ?, work_plan = ?, geolog = ?,                                                                      
                                         WHERE well_number = ? AND area_well = ? 
                                         AND contractor = ? AND costumer = ? AND work_plan = ? AND geolog = ?
                                     """, (
-                            data_well, date_today, excel_json, str(well_number),
-                            well_area, contractor, costumer, work_plan_str, well_data.user[1]))
+                            data_well, date_today, excel_json,  work_plan_str, well_data.user[1]))
 
                         QMessageBox.information(None, 'Успешно', 'Данные в обновлены обновлены')
                     except sqlite3.Error as error:
@@ -860,7 +860,7 @@ def check_in_database_well_data(number_well, area_well, work_plan):
 
             cursor.execute("SELECT data_well FROM wells WHERE well_number = %s AND area_well = %s "
                            "AND contractor = %s AND costumer = %s",
-                           (str(number_well._value), area_well._value, well_data.contractor, well_data.costumer))
+                           (str(number_well), area_well, well_data.contractor, well_data.costumer))
 
             data_well = cursor.fetchone()
             if data_well:
@@ -1325,12 +1325,13 @@ def insert_data_new_excel_file(data, rowHeights, colWidth, boundaries_dict):
     for col in range(13):
         sheet_new.column_dimensions[get_column_letter(col + 1)].width = colWidth[col]
     index_delete = 0
+    a = sheet_new.max_row
     for index_row, row in enumerate(sheet_new.iter_rows()):  # Копирование высоты строки
-        if any(['Наименование работ' in str(col.value) for col in row[:13]]):
+        if any(['Наименование работ' in str(col.value) for col in row[:13]]) and well_data.work_plan not in ['plan_change']:
             index_delete = index_row+2
             well_data.ins_ind2 = index_row +2
 
-        elif any(['ПЛАН РАБОТ' in str(col.value).upper() for col in row[:4]]):
+        elif any(['ПЛАН РАБОТ' in str(col.value).upper() for col in row[:4]]) and well_data.work_plan not in ['plan_change']:
             sheet_new.cell(row=index_row + 1, column=2).value = f'ДОПОЛНИТЕЛЬНЫЙ ПЛАН РАБОТ № {well_data.number_dp}'
 
         elif all([col is None for col in row[:13]]):
@@ -1339,8 +1340,8 @@ def insert_data_new_excel_file(data, rowHeights, colWidth, boundaries_dict):
             sheet_new.row_dimensions[index_row].height = rowHeights[index_row - 1]
         except:
             pass
-
-    sheet_new.delete_rows(index_delete, sheet_new.max_row - index_delete)
+    if well_data.work_plan not in ['plan_change']:
+        sheet_new.delete_rows(index_delete, sheet_new.max_row - index_delete)
 
     return sheet_new
 
