@@ -993,13 +993,14 @@ class AcidPakerWindow(QMainWindow):
                 swabTypeCombo = str(self.tabWidget.currentWidget().swabTypeCombo.currentText())
                 swab_volumeEdit = int(float(self.tabWidget.currentWidget().swab_volumeEdit.text()))
                 paker_depth_swab = int(float(self.tabWidget.currentWidget().swab_paker_depth.text()))
-                for plast in plast_combo.split(' '):
-                    if abs(paker_khost + paker_depth_swab - well_data.dict_perforation[plast]['кровля']) < 20:
-                        mes = QMessageBox.question(self, 'Вопрос',
-                                                   f'Расстояние между низом компоновки {paker_khost + paker_depth_swab} '
-                                                   f'и кровлей ПВР меньше 20м {well_data.dict_perforation[plast]["кровля"]}, Продолжить?')
-                        if mes == QMessageBox.StandardButton.No:
-                            return
+                for plast in plast_combo.split(','):
+                    if plast in well_data.plast_work:
+                        if abs(paker_khost + paker_depth_swab - well_data.dict_perforation[plast]['кровля']) < 20:
+                            mes = QMessageBox.question(self, 'Вопрос',
+                                                       f'Расстояние между низом компоновки {paker_khost + paker_depth_swab} '
+                                                       f'и кровлей ПВР меньше 20м {well_data.dict_perforation[plast]["кровля"]}, Продолжить?')
+                            if mes == QMessageBox.StandardButton.No:
+                                return
             except Exception as e:
                 QMessageBox.warning(self, 'Ошибка', f'Ошибка сохранения данных {e}')
                 return

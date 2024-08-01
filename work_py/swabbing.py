@@ -411,9 +411,9 @@ class TabPage_SO_swab(QWidget):
             paker_layout_list_tab = ["Пласт", "воронка", "вид освоения", "объем освоения"]
 
         elif self.swab_true_edit_type.currentText() == 'пакер с заглушкой':
-            self.swabTypeLabel.setParent(None)
-            self.swabTypeCombo.setParent(None)
-            self.swab_volumeEdit.setParent(None)
+            # self.swabTypeLabel.setParent(None)
+            # self.swabTypeCombo.setParent(None)
+            # self.swab_volumeEdit.setParent(None)
 
             self.khovst_label.setParent(None)
             self.khvostEdit.setParent(None)
@@ -422,9 +422,9 @@ class TabPage_SO_swab(QWidget):
 
             self.diametr_paker_labelType.setParent(None)
             self.diametr_paker_edit.setParent(None)
-            self.pakerLabel.setText('Глубина пакера')
-            self.paker2Label.setText('Глубина понижения')
-            self.paker2Edit.setText(f'{well_data.current_bottom - 250}')
+            # self.pakerLabel.setText('Глубина пакера')
+            # self.paker2Label.setText('Глубина понижения')
+            self.paker2Edit.setText(f'{well_data.perforation_roof + 10}')
             self.grid.addWidget(self.paker2Label, 0, 5)
             self.grid.addWidget(self.paker2Edit, 1, 5)
 

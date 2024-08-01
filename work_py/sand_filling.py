@@ -105,13 +105,13 @@ class TabPage_SO_sand(QWidget):
         self.need_change_zgs_combo.currentTextChanged.connect(self.update_change_fluid)
         self.need_change_zgs_combo.setCurrentIndex(1)
 
-
+        self.roof_rir_edit.textChanged.connect(self.update_volume_cement)
+        self.sole_rir_edit.textChanged.connect(self.update_volume_cement)
         self.roof_sand_edit.textChanged.connect(self.update_roof)
         self.rir_question_QCombo.currentTextChanged.connect(self.update_rir)
         self.rir_question_QCombo.setCurrentIndex(1)
         self.rir_question_QCombo.setCurrentIndex(0)
-        self.roof_rir_edit.textChanged.connect(self.update_volume_cement)
-        self.sole_rir_edit.textChanged.connect(self.update_volume_cement)
+
         if len(well_data.plast_work) == 0:
             self.need_change_zgs_combo.setCurrentIndex(1)
 
@@ -212,6 +212,10 @@ class SandWindow(QMainWindow):
         volume_cement = self.tabWidget.currentWidget().cement_volume_line.text().replace(',', '.')
         if volume_cement != '':
             volume_cement = round(float(volume_cement),1)
+        elif volume_cement == '' and rir_question_QCombo == "Да":
+            mes = QMessageBox.question(self, 'Вопрос',
+                                                       f'Не указан объем цемента')
+            return
 
         work_list = self.sandFilling(roof_sand_edit, sole_sand_edit, privyazka_question_QCombo)
         if rir_question_QCombo == "Да":
