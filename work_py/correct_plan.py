@@ -96,8 +96,6 @@ class TabPageDp(QWidget):
             self.grid.addWidget(self.well_data_label, 2, 6)
             self.grid.addWidget(self.well_data_in_base_combo, 3, 6)
 
-
-
             well_list = self.check_in_database_well_data(self.well_number_edit.text())
             if well_list:
                 self.well_data_in_base_combo.clear()
@@ -429,7 +427,7 @@ class CorrectPlanWindow(QMainWindow):
             if table_in_base_combo == '':
                 mes = QMessageBox.critical(self, 'База данных', 'Необходимо выбрать план работ')
                 return
-            if well_area != table_in_base_combo.split(' ')[0]:
+            if well_area != table_in_base_combo.split(' ')[1]:
                 mes = QMessageBox.critical(self, 'База данных', 'Площадь не совпадает с базой')
                 return
 

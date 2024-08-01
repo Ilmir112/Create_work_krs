@@ -593,8 +593,6 @@ class DopPlanWindow(QMainWindow):
             list_row = []
 
             for col in range(len(row)):
-                if col == 2:
-                    print(i, str(row[col]['value']))
 
                 if 'оризонт' in str(row[col]['value']) or 'пласт/' in str(row[col]['value']).lower():
                     self.target_row_index = int(i) + 1

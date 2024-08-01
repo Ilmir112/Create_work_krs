@@ -54,6 +54,7 @@ class TabPage_SO(QWidget):
         well_data.number_indez = []
         work_plast = ''
         work_plast_index = 1
+
         for num in range(len(list(set(well_data.cat_P_P)))):
 
             plast_index = CheckableComboBox(self)
@@ -87,11 +88,7 @@ class TabPage_SO(QWidget):
                         work_plast_index = 1
 
                 self.plast_all.append(work_plast)
-            else:
-                work_plast, ok = QInputDialog.getText(None, 'индекс пласта',
-                                                      'Введите индекc пласта вскрываемого')
-                well_data.plast_project.append(work_plast)
-                self.plast_all.append(work_plast)
+
 
             plast_index.combo_box.addItems(self.plast_all)
 
