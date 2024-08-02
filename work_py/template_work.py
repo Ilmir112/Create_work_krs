@@ -319,6 +319,9 @@ class TabPage_SO_with(QWidget):
 
 
             elif self.template_Combo.currentText() == 'ПСШ без хвоста':
+                if well_data.current_bottom - well_data.perforation_sole < 15:
+                    self.dictance_template_second_Edit.setText('1')
+                    dictance_template_second = self.dictance_template_second_Edit.text()
                 # if dictance_template_second != None:
                 template_str = f'перо + {SKM_type}-{skm} + {dictance_template_second}м ' \
                                f'НКТ{nkt_diam}м + шаблон-{template_second}мм L-{lenght_template_second}м '

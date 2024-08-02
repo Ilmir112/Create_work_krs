@@ -884,23 +884,17 @@ class GnktOsvWindow2(QMainWindow):
 
 
     def date_dmy(self, date_str):
+        print(date_str, type(date_str))
         if '-' in str(date_str):
             return date_str
-        elif type(date_str) is str:
+        elif type(date_str) is datetime:
             date_obj = datetime.strftime('%d.%m.%Y')
         else:
             date_obj = date_str
-            # print(date_obj)
-        # print(date_str)
 
-        if isinstance(date_obj, datetime):
-            return date_obj.strftime('%d.%m.%Y')
-        elif date_obj is None:
-            return date_obj
-        else:
-            date_obj = datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
-            # print(f' даь {date_obj}')
-        return date_obj.strftime('%d.%m.%Y')
+        return date_obj
+
+
 
     # Функция для получения глубины начала интервала
     def get_start_depth(self, interval):

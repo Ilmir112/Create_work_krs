@@ -673,11 +673,7 @@ class RirWindow(QMainWindow):
              f'В случае головы ЦМ ниже планового РИР повторить  с учетом корректировки мощности моста ',
              None, None, None, None, None, None, None,
              'мастер КРС', 0.67],
-            [None, None,
-             f'Поднять перо на тНКТ{nkt_diam}м с глубины {roof_rir_edit}м с доливом скважины в объеме 2,2м3 тех. жидкостью '
-             f'уд.весом {well_data.fluid_work}',
-             None, None, None, None, None, None, None,
-             'мастер КРС', descentNKT_norm(roof_rir_edit, 1)],
+
         ]
         RirWindow.perf_new(self, roof_rir_edit, sole_rir_edit)
         # print(plast_combo)
@@ -697,6 +693,13 @@ class RirWindow(QMainWindow):
                              f'уд.весом {well_data.fluid_work}',
                              None, None, None, None, None, None, None,
                              'мастер КРС', liftingNKT_norm(roof_rir_edit, 1)])
+        else:
+            uzmPero_list.append([None, None,
+                                 f'Поднять перо на тНКТ{nkt_diam}м с глубины {roof_rir_edit}м с доливом скважины в объеме '
+                                 f'{round(roof_rir_edit * 1.12 / 1000, 1)}м3 тех. жидкостью '
+                                 f'уд.весом {well_data.fluid_work}',
+                                 None, None, None, None, None, None, None,
+                                 'мастер КРС', liftingNKT_norm(roof_rir_edit, 1)])
         well_data.forPaker_list = None
         return uzmPero_list
 
@@ -1024,13 +1027,7 @@ class RirWindow(QMainWindow):
                     need_change_zgs_combo == 'Да':
                 mes = QMessageBox.critical(self, 'Ошибка', 'Введены не все параметры')
                 return
-            if need_change_zgs_combo == 'Да':
-                if MyWindow.check_true_depth_template(self, paker_depth) is False:
-                    return
-                if MyWindow.true_set_Paker(self, paker_depth) is False:
-                    return
-                if MyWindow.check_depth_in_skm_interval(self, paker_depth) is False:
-                    return
+
 
             work_list = self.rirWithPero(paker_need_Combo, plast_combo,
                                          roof_rir_edit, sole_rir_edit, volume_cement, need_change_zgs_combo,

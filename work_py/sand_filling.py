@@ -210,6 +210,17 @@ class SandWindow(QMainWindow):
         sole_sand_edit = int(float(self.tabWidget.currentWidget().sole_sand_edit.text()))
         rir_question_QCombo = str(self.tabWidget.currentWidget().rir_question_QCombo.currentText())
         volume_cement = self.tabWidget.currentWidget().cement_volume_line.text().replace(',', '.')
+        need_change_zgs_combo = self.tabWidget.currentWidget().need_change_zgs_combo.currentText()
+        if len(well_data.plast_project) != 0:
+            plast_new_combo = self.tabWidget.currentWidget().plast_new_combo.currentText()
+        else:
+            plast_new_combo = self.tabWidget.currentWidget().plast_new_combo.text()
+        fluid_new_edit = self.tabWidget.currentWidget().fluid_new_edit.text()
+        pressuar_new_edit = self.tabWidget.currentWidget().pressuar_new_edit.text()
+        if (plast_new_combo == '' or fluid_new_edit == '' or pressuar_new_edit == '') and \
+                need_change_zgs_combo == 'Да':
+            mes = QMessageBox.critical(self, 'Ошибка', 'Введены не все параметры')
+            return
         if volume_cement != '':
             volume_cement = round(float(volume_cement),1)
         elif volume_cement == '' and rir_question_QCombo == "Да":
@@ -222,7 +233,8 @@ class SandWindow(QMainWindow):
             work_list = work_list[:-1]
             roof_rir_edit = int(float(self.tabWidget.currentWidget().roof_rir_edit.text()))
             sole_rir_edit = int(float(self.tabWidget.currentWidget().sole_rir_edit.text()))
-            rir_list = RirWindow.rirWithPero_gl(self, "Не нужно", '', roof_rir_edit, sole_rir_edit, volume_cement)
+            rir_list = RirWindow.rirWithPero_gl(self, "Не нужно", '', roof_rir_edit, sole_rir_edit, volume_cement,
+                                                need_change_zgs_combo, plast_new_combo, fluid_new_edit, pressuar_new_edit)
             work_list.extend(rir_list[1:])
 
         MyWindow.populate_row(self, self.ins_ind, work_list, self.table_widget)
