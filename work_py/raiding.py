@@ -191,7 +191,7 @@ class Raid(MyWindow):
         self.tableWidget.setAlternatingRowColors(True)
 
         self.buttonAdd = QPushButton('Добавить записи в таблицу')
-        self.buttonAdd.clicked.connect(self.addRowTable)
+        self.buttonAdd.clicked.connect(self.add_row_table)
         self.buttonDel = QPushButton('Удалить записи из таблице')
         self.buttonDel.clicked.connect(self.del_row_table)
         self.buttonadd_work = QPushButton('Добавить в план работ')
@@ -207,7 +207,7 @@ class Raid(MyWindow):
         vbox.addWidget(self.buttonadd_work, 3, 0)
         vbox.addWidget(self.buttonAddString, 3, 1)
 
-    def addRowTable(self):
+    def add_row_table(self):
 
         roof_raid = self.tabWidget.currentWidget().roof_raid_line.text().replace(',', '.')
         sole_raid = self.tabWidget.currentWidget().sole_raid_line.text().replace(',', '.')

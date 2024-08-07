@@ -140,7 +140,7 @@ class Classifier_well(QMainWindow):
                     data = cur.fetchall()
 
             except psycopg2.Error as e:
-                mes = QMessageBox.warning(self, 'Ошибка', f'Ошибка подключения к базе данных: {e}')
+                 QMessageBox.warning(self, 'Ошибка', f'Ошибка подключения к базе данных: {e}')
 
             finally:
                 if conn:
@@ -160,7 +160,7 @@ class Classifier_well(QMainWindow):
             data = cursor.fetchall()
 
             # except sqlite3.Error as e:
-            #     mes = QMessageBox.warning(self, 'Ошибка', 'Ошибка подключения к базе данных')
+            #      QMessageBox.warning(self, 'Ошибка', 'Ошибка подключения к базе данных')
             #
             # finally:
             #     # Закрыть курсор и соединение
@@ -190,7 +190,7 @@ class Classifier_well(QMainWindow):
 
             except psycopg2.Error as e:
                 # Выведите сообщение об ошибке
-                mes = QMessageBox.warning(self, 'Ошибка', 'Ошибка подключения к базе данных')
+                QMessageBox.warning(self, 'Ошибка', 'Ошибка подключения к базе данных')
 
                 return []
             finally:
@@ -214,7 +214,7 @@ class Classifier_well(QMainWindow):
 
             except sqlite3.Error as e:
                 # Выведите сообщение об ошибке
-                mes = QMessageBox.warning(self, 'Ошибка', 'Ошибка подключения к базе данных')
+                QMessageBox.warning(self, 'Ошибка', 'Ошибка подключения к базе данных')
 
                 return
             finally:
@@ -282,7 +282,7 @@ class Classifier_well(QMainWindow):
                         # print(region_name, version_year)
                         # print(check_param)
                         if check_param in region_name:
-                            mes = QMessageBox.warning(self, 'ВНИМАНИЕ ОШИБКА',
+                            QMessageBox.warning(self, 'ВНИМАНИЕ ОШИБКА',
                                                       f'регион выбрано корректно  {region_name}')
                             try:
                                 # Получение данных из Excel и запись их в базу данных
@@ -312,10 +312,10 @@ class Classifier_well(QMainWindow):
 
                                 mes = QMessageBox.information(self, 'данные обновлены', 'Данные обновлены')
                             except:
-                                mes = QMessageBox.warning(self, 'ОШИБКА', 'Выбран файл с не корректными данными')
+                                 QMessageBox.warning(self, 'ОШИБКА', 'Выбран файл с не корректными данными')
 
                         else:
-                            mes = QMessageBox.warning(self, 'ВНИМАНИЕ ОШИБКА',
+                             QMessageBox.warning(self, 'ВНИМАНИЕ ОШИБКА',
                                                       f'в Данном перечне отсутствую скважины {region_name}')
 
                 # Сохранение изменений
@@ -323,7 +323,7 @@ class Classifier_well(QMainWindow):
 
             except psycopg2.Error as e:
                 # Выведите сообщение об ошибке
-                mes = QMessageBox.warning(self, 'Ошибка', 'Ошибка подключения к базе данных')
+                 QMessageBox.warning(self, 'Ошибка', 'Ошибка подключения к базе данных')
             finally:
                 # Закройте курсор и соединение
                 if cursor:
@@ -529,7 +529,7 @@ class Classifier_well(QMainWindow):
                         """)
 
                         if check_param in region_name:
-                            mes = QMessageBox.warning(self, 'ВНИМАНИЕ ОШИБКА',
+                            QMessageBox.warning(self, 'ВНИМАНИЕ ОШИБКА',
                                                       f'регион выбрано корректно  {region_name}')
 
                             try:
@@ -577,17 +577,17 @@ class Classifier_well(QMainWindow):
                                                 version_year, region, costumer
                                             ))
                             except:
-                                mes = QMessageBox.warning(self, 'ОШИБКА', 'Выбран файл с не корректными данными')
+                                 QMessageBox.warning(self, 'ОШИБКА', 'Выбран файл с не корректными данными')
 
                         else:
-                            mes = QMessageBox.warning(self, 'ВНИМАНИЕ ОШИБКА',
+                             QMessageBox.warning(self, 'ВНИМАНИЕ ОШИБКА',
                                                       f'в Данном перечне отсутствую скважины {region_name}')
                         conn.commit()
                 mes = QMessageBox.information(self, 'Успешно', 'Классификатор успешно обновлен')
 
             except (psycopg2.Error, Exception) as e:
                 # Выведите сообщение об ошибке
-                mes = QMessageBox.warning(self, 'Ошибка', 'Ошибка подключения к базе данных')
+                 QMessageBox.warning(self, 'Ошибка', 'Ошибка подключения к базе данных')
             finally:
                 # Закройте курсор и соединение
                 if cursor:
@@ -728,6 +728,7 @@ def insert_database_well_data(well_number, well_area, contractor, costumer, data
                                              f'Строка с {well_number} {well_area} {work_plan} уже существует от {date_in_base}. '
                                              f'Обновить данные?')
                 if reply == QMessageBox.Yes:
+                    create_database_well_db(well_data.work_plan, well_data.number_dp)
                     try:
                         cursor.execute("""
                                         UPDATE wells
@@ -737,10 +738,11 @@ def insert_database_well_data(well_number, well_area, contractor, costumer, data
                             data_well, date_today, excel_json,  work_plan_str, well_data.user[1],
                             str(well_number), well_area, contractor, costumer, work_plan_str))
 
-                        QMessageBox.information(None, 'Успешно', 'Данные в обновлены обновлены')
+                        QMessageBox.information(None, 'Успешно', 'Данные обновлены')
                     except (Exception, psycopg2.Error) as error:
                         QMessageBox.critical(None, 'Ошибка', f'Ошибка при обновлении данных: {error}')
             else:
+                create_database_well_db(well_data.work_plan, well_data.number_dp)
 
                 # Подготовленные данные для вставки
                 data_values = (str(well_number), well_area,
@@ -766,7 +768,7 @@ def insert_database_well_data(well_number, well_area, contractor, costumer, data
 
         except psycopg2.Error as e:
             # Выведите сообщение об ошибке
-            mes = QMessageBox.warning(None, 'Ошибка', f'Ошибка подключения к базе данных  well_data {e}')
+             QMessageBox.warning(None, 'Ошибка', f'Ошибка подключения к базе данных  well_data {e}')
     else:
         try:
 
@@ -834,7 +836,7 @@ def insert_database_well_data(well_number, well_area, contractor, costumer, data
 
         except sqlite3.Error as e:
             # Выведите сообщение об ошибке
-            mes = QMessageBox.warning(None, 'Ошибка', f'Ошибка подключения к базе данных hg{e}')
+             QMessageBox.warning(None, 'Ошибка', f'Ошибка подключения к базе данных hg{e}')
 
 
 def connect_to_db(name_base, folder_base):
@@ -870,7 +872,7 @@ def check_in_database_well_data(number_well, area_well, work_plan):
 
         except psycopg2.Error as e:
             # Выведите сообщение об ошибке
-            mes = QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных, Скважина не добавлена в базу')
+             QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных, Скважина не добавлена в базу')
     else:
         try:
             db_path = connect_to_db('well_data.db', 'data_base_well/')
@@ -891,7 +893,7 @@ def check_in_database_well_data(number_well, area_well, work_plan):
 
         except sqlite3.Error as e:
             # Выведите сообщение об ошибке
-            mes = QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных, Скважина не добавлена в базу')
+             QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных, Скважина не добавлена в базу')
 
 
 def excel_in_json(sheet):
@@ -1025,7 +1027,7 @@ def read_database_gnkt(contractor, gnkt_number):
         result = cursor.fetchone()
     except psycopg2.Error as e:
         # Выведите сообщение об ошибке
-        mes = QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных')
+         QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных')
     finally:
         # Закройте курсор и соединение
         if cursor:
@@ -1110,14 +1112,14 @@ def create_database_well_db(work_plan, number_dp):
 
         except psycopg2.Error as e:
             # Выведите сообщение об ошибке
-            mes = QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных, Скважина не добавлена в базу')
+             QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных, Скважина не добавлена в базу')
         finally:
             if cursor:
                 cursor.close()
             if conn:
                 conn.close()
 
-            mes = QMessageBox.information(None, 'база данных', 'Скважина добавлена в базу данных')
+
     else:
         """Добавляет данные о скважине в SQLite базу данных."""
 
@@ -1209,7 +1211,7 @@ def create_database_well_db(work_plan, number_dp):
 
             # Сохранить изменения и закрыть соединение
             conn.commit()
-            QMessageBox.information(None, 'база данных', 'Скважина добавлена в базу данных')
+
 
         except sqlite3.Error as e:
             # Выведите сообщение об ошибке

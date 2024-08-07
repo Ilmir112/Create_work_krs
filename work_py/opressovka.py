@@ -46,9 +46,9 @@ class TabPage_SO(QWidget):
             pass
 
 
-        self.pakerDepthZumpf_Label = QLabel("Глубина посадки для ЗУМПФа", self)
-        self.pakerDepthZumpf_edit = QLineEdit(self)
-        self.pakerDepthZumpf_edit.setValidator(self.validator)
+        self.paker_depth_zumpf_Label = QLabel("Глубина посадки для ЗУМПФа", self)
+        self.paker_depth_zumpf_edit = QLineEdit(self)
+        self.paker_depth_zumpf_edit.setValidator(self.validator)
 
         self.pressureZUMPF_question_Label = QLabel("Нужно ли опрессовывать ЗУМПФ", self)
         self.pressureZUMPF_question_QCombo = QComboBox(self)
@@ -76,19 +76,19 @@ class TabPage_SO(QWidget):
     def update_paker_need(self, index):
         if index == 'Да':
             if len(well_data.plast_work) != 0:
-                pakerDepthZumpf = int(well_data.perforation_sole + 10)
+                paker_depth_zumpf = int(well_data.perforation_sole + 10)
             else:
                 if well_data.leakiness:
-                    pakerDepthZumpf = int(max([float(nek.split('-')[0])+10
+                    paker_depth_zumpf = int(max([float(nek.split('-')[0])+10
                                            for nek in well_data.dict_leakiness['НЭК']['интервал'].keys()]))
 
-                    self.pakerDepthZumpf_edit.setText(f'{pakerDepthZumpf}')
+                    self.paker_depth_zumpf_edit.setText(f'{paker_depth_zumpf}')
 
-            self.grid_layout.addWidget(self.pakerDepthZumpf_Label, 3, 6)
-            self.grid_layout.addWidget(self.pakerDepthZumpf_edit, 4, 6)
+            self.grid_layout.addWidget(self.paker_depth_zumpf_Label, 3, 6)
+            self.grid_layout.addWidget(self.paker_depth_zumpf_edit, 4, 6)
         elif index == 'Нет':
-            self.pakerDepthZumpf_Label.setParent(None)
-            self.pakerDepthZumpf_edit.setParent(None)
+            self.paker_depth_zumpf_Label.setParent(None)
+            self.paker_depth_zumpf_edit.setParent(None)
 
     def update_paker(self):
         paker_depth = self.paker_depth_edit.text()
@@ -179,7 +179,7 @@ class OpressovkaEK(QMainWindow):
             self.tableWidget.horizontalHeader().setSectionResizeMode(i, QHeaderView.Stretch)
 
         self.buttonAdd = QPushButton('Добавить записи в таблицу')
-        self.buttonAdd.clicked.connect(self.addRowTable)
+        self.buttonAdd.clicked.connect(self.add_row_table)
         self.buttonDel = QPushButton('Удалить записи из таблице')
         self.buttonDel.clicked.connect(self.del_row_table)
         self.buttonadd_work = QPushButton('Добавить в план работ')
@@ -195,7 +195,7 @@ class OpressovkaEK(QMainWindow):
         vbox.addWidget(self.buttonadd_work, 3, 0)
         vbox.addWidget(self.buttonAddString, 3, 1)
 
-    def addRowTable(self):
+    def add_row_table(self):
 
         paker_khost = int(float(self.tabWidget.currentWidget().paker_khost_edit.text()))
         paker_depth = int(float(self.tabWidget.currentWidget().paker_depth_edit.text()))
@@ -206,22 +206,22 @@ class OpressovkaEK(QMainWindow):
 
 
         if pressureZUMPF_combo == 'Да':
-            pakerDepthZumpf = self.tabWidget.currentWidget().pakerDepthZumpf_edit.text()
-            if pakerDepthZumpf != '':
-                pakerDepthZumpf = int(float(pakerDepthZumpf))
-            if MyWindow.check_true_depth_template(self, pakerDepthZumpf) is False:
+            paker_depth_zumpf = self.tabWidget.currentWidget().paker_depth_zumpf_edit.text()
+            if paker_depth_zumpf != '':
+                paker_depth_zumpf = int(float(paker_depth_zumpf))
+            if MyWindow.check_true_depth_template(self, paker_depth_zumpf) is False:
                 return
-            if MyWindow.true_set_Paker(self, pakerDepthZumpf) is False:
+            if MyWindow.true_set_Paker(self, paker_depth_zumpf) is False:
                 return
-            if MyWindow.check_depth_in_skm_interval(self, pakerDepthZumpf) is False:
+            if MyWindow.check_depth_in_skm_interval(self, paker_depth_zumpf) is False:
                 return
 
         else:
-            pakerDepthZumpf = 0
+            paker_depth_zumpf = 0
 
         if int(paker_khost) + int(paker_depth) > well_data.current_bottom and pressureZUMPF_combo == 'Нет' \
                 or int(paker_khost) + int(
-            pakerDepthZumpf) > well_data.current_bottom and pressureZUMPF_combo == 'Да':
+            paker_depth_zumpf) > well_data.current_bottom and pressureZUMPF_combo == 'Да':
             mes = QMessageBox.warning(self, 'Некорректные данные', f'Компоновка НКТ c хвостовик + пакер '
                                                                    f'ниже текущего забоя')
             return
@@ -253,9 +253,9 @@ class OpressovkaEK(QMainWindow):
         diametr_paker = int(float(self.tabWidget.currentWidget().diametr_paker_edit.text()))
         pressureZUMPF_question_QCombo = self.tabWidget.currentWidget().pressureZUMPF_question_QCombo.currentText()
         if pressureZUMPF_question_QCombo == 'Да':
-            pakerDepthZumpf = int(float(self.tabWidget.currentWidget().pakerDepthZumpf_edit.text()))
+            paker_depth_zumpf = int(float(self.tabWidget.currentWidget().paker_depth_zumpf_edit.text()))
         else:
-            pakerDepthZumpf = 0
+            paker_depth_zumpf = 0
         self.need_privyazka_QCombo = self.tabWidget.currentWidget().need_privyazka_QCombo.currentText()
 
         if rows == 0:
@@ -270,14 +270,14 @@ class OpressovkaEK(QMainWindow):
 
 
             work_list = OpressovkaEK.paker_list(self, diametr_paker, paker_khost, paker_depth,
-                                            pressureZUMPF_question_QCombo, pakerDepthZumpf)
+                                            pressureZUMPF_question_QCombo, paker_depth_zumpf)
         else:
             depth_paker_list = []
             for row in range(rows):
                 paker_depth = self.tableWidget.item(row, 1)
                 depth_paker_list.append(int(float(paker_depth.text())))
                 pressureZUMPF_question = self.tableWidget.item(row, 2)
-            work_list = OpressovkaEK.interval_pressure_testing(self, paker_khost, diametr_paker, depth_paker_list, pressureZUMPF_question, pakerDepthZumpf)
+            work_list = OpressovkaEK.interval_pressure_testing(self, paker_khost, diametr_paker, depth_paker_list, pressureZUMPF_question, paker_depth_zumpf)
 
         MyWindow.populate_row(self, self.ins_ind, work_list, self.table_widget)
         well_data.pause = False
@@ -291,56 +291,56 @@ class OpressovkaEK(QMainWindow):
             paker_select = f'воронку + НКТ{well_data.nkt_diam}мм {paker_khost}м +' \
                            f' пакер ПРО-ЯМО-{paker_diametr}мм (либо аналог) ' \
                            f'для ЭК {well_data.column_diametr._value}мм х {well_data.column_wall_thickness._value}мм +' \
-                           f' {OpressovkaEK.nktOpress(self)[0]}'
+                           f' {OpressovkaEK.nkt_opress(self)[0]}'
             paker_short = f'в-у + НКТ{well_data.nkt_diam}мм {paker_khost}м +' \
                           f' пакер ПРО-ЯМО-{paker_diametr}мм  +' \
-                          f' {OpressovkaEK.nktOpress(self)[0]}'
+                          f' {OpressovkaEK.nkt_opress(self)[0]}'
         elif well_data.column_additional is True and well_data.column_additional_diametr._value < 110 and \
                 paker_depth > well_data.head_column_additional._value:
             paker_select = f'воронку + НКТ{60}мм {paker_khost}м + пакер ПРО-ЯМО-' \
                            f'{paker_diametr}мм ' \
                            f'(либо аналог)  ' \
                            f'для ЭК {well_data.column_additional_diametr._value}мм х ' \
-                           f'{well_data.column_additional_wall_thickness._value}мм  + {OpressovkaEK.nktOpress(self)[0]} ' \
+                           f'{well_data.column_additional_wall_thickness._value}мм  + {OpressovkaEK.nkt_opress(self)[0]} ' \
                            f'+ НКТ60мм L- {round(paker_depth - well_data.head_column_additional._value, 0)}м'
             paker_short = f'в-у + НКТ{60}мм {paker_khost}м + пакер ПРО-ЯМО-' \
                           f'{paker_diametr}мм ' \
-                          f' + {OpressovkaEK.nktOpress(self)[0]} ' \
+                          f' + {OpressovkaEK.nkt_opress(self)[0]} ' \
                           f'+ НКТ60мм L- {round(paker_depth - well_data.head_column_additional._value, 0)}м'
         elif well_data.column_additional is True and well_data.column_additional_diametr._value > 110 and \
                 paker_depth > well_data.head_column_additional._value:
             paker_select = f'воронку + НКТ{well_data.nkt_diam}мм со снятыми фасками {paker_khost}м + ' \
                            f'пакер ПРО-ЯМО-{paker_diametr}мм (либо аналог) ' \
                            f'для ЭК {well_data.column_additional_diametr._value}мм х ' \
-                           f'{well_data.column_additional_wall_thickness._value}мм  + {OpressovkaEK.nktOpress(self)[0]}' \
+                           f'{well_data.column_additional_wall_thickness._value}мм  + {OpressovkaEK.nkt_opress(self)[0]}' \
                            f'+ НКТ{well_data.nkt_diam}мм со снятыми фасками L- ' \
                            f'{round(paker_depth - well_data.head_column_additional._value, 0)}м'
             paker_short = f'в-у + НКТ{well_data.nkt_diam}мм со снятыми фасками {paker_khost}м + ' \
-                          f'пакер ПРО-ЯМО-{paker_diametr}мм + {OpressovkaEK.nktOpress(self)[0]}' \
+                          f'пакер ПРО-ЯМО-{paker_diametr}мм + {OpressovkaEK.nkt_opress(self)[0]}' \
                           f'+ НКТ{well_data.nkt_diam}мм со снятыми фасками L- ' \
                           f'{round(paker_depth - well_data.head_column_additional._value, 0)}м'
 
-        nktOpress_list = OpressovkaEK.nktOpress(self)
-        return paker_select, paker_short, nktOpress_list
+        nkt_opress_list = OpressovkaEK.nkt_opress(self)
+        return paker_select, paker_short, nkt_opress_list
 
-    def paker_list(self, paker_diametr, paker_khost, paker_depth, pressureZUMPF_question, pakerDepthZumpf = 0):
+    def paker_list(self, paker_diametr, paker_khost, paker_depth, pressureZUMPF_question, paker_depth_zumpf = 0):
 
-        paker_select, paker_short, nktOpress_list = OpressovkaEK.select_combo_paker(self, paker_khost, paker_depth, paker_diametr)
+        paker_select, paker_short, nkt_opress_list = OpressovkaEK.select_combo_paker(self, paker_khost, paker_depth, paker_diametr)
 
         if pressureZUMPF_question == 'Да':
             paker_list = [
-                [f'СПО {paker_short} до глубины {pakerDepthZumpf}', None,
-                 f'Спустить {paker_select} на НКТ{well_data.nkt_diam}мм до глубины {pakerDepthZumpf}м,'
-                 f' воронкой до {pakerDepthZumpf + paker_khost}м'
-                 f' с замером, шаблонированием шаблоном {well_data.nkt_template}мм. {nktOpress_list[1]} '
+                [f'СПО {paker_short} до глубины {paker_depth_zumpf}', None,
+                 f'Спустить {paker_select} на НКТ{well_data.nkt_diam}мм до глубины {paker_depth_zumpf}м,'
+                 f' воронкой до {paker_depth_zumpf + paker_khost}м'
+                 f' с замером, шаблонированием шаблоном {well_data.nkt_template}мм. {nkt_opress_list[1]} '
                  f'{("Произвести пробную посадку на глубине 50м" if well_data.column_additional is False else "")} '
                  f'ПРИ ОТСУТСТВИИ ЦИРКУЛЯЦИИ ПРЕДУСМОТРЕТЬ НАЛИЧИИ В КОМПОНОВКЕ УРАВНИТЕЛЬНЫХ КЛАПАНОВ ИЛИ СБИВНОГО '
                  f'КЛАПАНА С ВВЕРТЫШЕМ НАД ПАКЕРОМ',
                  None, None, None, None, None, None, None,
-                 'мастер КРС', descentNKT_norm(pakerDepthZumpf, 1.2)],
-                [f'Опрессовать ЗУМПФ в инт {pakerDepthZumpf} - {well_data.current_bottom}м на '
+                 'мастер КРС', descentNKT_norm(paker_depth_zumpf, 1.2)],
+                [f'Опрессовать ЗУМПФ в инт {paker_depth_zumpf} - {well_data.current_bottom}м на '
                  f'Р={well_data.max_admissible_pressure._value}атм', None,
-                 f'Посадить пакер. Опрессовать ЗУМПФ в интервале {pakerDepthZumpf} - {well_data.current_bottom}м на '
+                 f'Посадить пакер. Опрессовать ЗУМПФ в интервале {paker_depth_zumpf} - {well_data.current_bottom}м на '
                  f'Р={well_data.max_admissible_pressure._value}атм в течение 30 минут в присутствии представителя заказчика, '
                  f'составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, '
                  f'с подтверждением за 2 часа до начала работ)',
@@ -382,7 +382,7 @@ class OpressovkaEK(QMainWindow):
                 [f'СПо {paker_short} до глубины {paker_depth}м', None,
                  f'Спустить {paker_select} на НКТ{well_data.nkt_diam}мм до глубины {paker_depth}м, '
                  f'воронкой до {paker_depth + paker_khost}м'
-                 f' с замером, шаблонированием шаблоном {well_data.nkt_template}мм. {nktOpress_list[1]} '
+                 f' с замером, шаблонированием шаблоном {well_data.nkt_template}мм. {nkt_opress_list[1]} '
                  f'{("Произвести пробную посадку на глубине 50м" if well_data.column_additional is False else "")} '
                  f'ПРИ ОТСУТСТВИИ ЦИРКУЛЯЦИИ ПРЕДУСМОТРЕТЬ НАЛИЧИИ В КОМПОНОВКЕ УРАВНИТЕЛЬНЫХ КЛАПАНОВ ИЛИ СБИВНОГО '
                  f'КЛАПАНА С ВВЕРТЫШЕМ НАД ПАКЕРОМ',
@@ -448,15 +448,15 @@ class OpressovkaEK(QMainWindow):
         self.tableWidget.sortItems(1)
 
     def interval_pressure_testing(self, paker_khost, diametr_paker, depth_paker_list,
-                                  pressureZUMPF_question, pakerDepthZumpf = 0):
+                                  pressureZUMPF_question, paker_depth_zumpf = 0):
         paker_depth = sorted(depth_paker_list)[0]
-        paker_select, paker_short, nktOpress_list = OpressovkaEK.select_combo_paker(self, paker_khost, paker_depth, diametr_paker)
+        paker_select, paker_short, nkt_opress_list = OpressovkaEK.select_combo_paker(self, paker_khost, paker_depth, diametr_paker)
 
         paker_list = [
             [f'Спо {paker_short} до глубины {paker_depth}м', None,
              f'Спустить {paker_select} на НКТ{well_data.nkt_diam}мм до глубины {paker_depth}м, '
              f'воронкой до {paker_depth + paker_khost}м'
-             f' с замером, шаблонированием шаблоном {well_data.nkt_template}мм. {nktOpress_list[1]} '
+             f' с замером, шаблонированием шаблоном {well_data.nkt_template}мм. {nkt_opress_list[1]} '
              f'{("Произвести пробную посадку на глубине 50м" if well_data.column_additional is False else "")} '
              f'ПРИ ОТСУТСТВИИ ЦИРКУЛЯЦИИ ПРЕДУСМОТРЕТЬ НАЛИЧИИ В КОМПОНОВКЕ УРАВНИТЕЛЬНЫХ КЛАПАНОВ ИЛИ СБИВНОГО '
              f'КЛАПАНА С ВВЕРТЫШЕМ НАД ПАКЕРОМ',
@@ -506,7 +506,7 @@ class OpressovkaEK(QMainWindow):
                  None, None, None, None, None, None, None,
                  'мастер КРС', descentNKT_norm(pakerNEK -paker_depth, 1.2)],
                 [f'Опрессовать в инт 0-{pakerNEK}м на Р={well_data.max_admissible_pressure._value}атм', None,
-                 f'{nktOpress_list[1]}. Посадить пакер. Опрессовать эксплуатационную колонну в '
+                 f'{nkt_opress_list[1]}. Посадить пакер. Опрессовать эксплуатационную колонну в '
                  f'интервале {pakerNEK}-0м на Р={well_data.max_admissible_pressure._value}атм'
                  f' в течение 30 минут в присутствии представителя заказчика, составить акт.',
                  None, None, None, None, None, None, None,
@@ -534,13 +534,13 @@ class OpressovkaEK(QMainWindow):
 
         if pressureZUMPF_question == "Да":
             zumpf_list = [
-                [f'Допустить пакер до глубины {pakerDepthZumpf}м', None,
-                 f'Допустить пакер до глубины {pakerDepthZumpf}м',
+                [f'Допустить пакер до глубины {paker_depth_zumpf}м', None,
+                 f'Допустить пакер до глубины {paker_depth_zumpf}м',
                  None, None, None, None, None, None, None,
                  'мастер КРС', 0.77],
-                [f'Опрессовать ЗУМПФ в инт {pakerDepthZumpf} - {well_data.current_bottom}м на '
+                [f'Опрессовать ЗУМПФ в инт {paker_depth_zumpf} - {well_data.current_bottom}м на '
                  f'Р={well_data.max_admissible_pressure._value}атм', None,
-                 f'Посадить пакер. Опрессовать ЗУМПФ в интервале {pakerDepthZumpf} - {well_data.current_bottom}м на '
+                 f'Посадить пакер. Опрессовать ЗУМПФ в интервале {paker_depth_zumpf} - {well_data.current_bottom}м на '
                  f'Р={well_data.max_admissible_pressure._value}атм в течение 30 минут в присутствии представителя заказчика, '
                  f'составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, '
                  f'с подтверждением за 2 часа до начала работ)',
@@ -580,10 +580,10 @@ class OpressovkaEK(QMainWindow):
 
 
 
-    def nktOpress(self):
+    def nkt_opress(self):
 
-        if well_data.nktOpressTrue is False:
-            well_data.nktOpressTrue is True
+        if well_data.nkt_opressTrue is False:
+            well_data.nkt_opressTrue is True
             return 'НКТ + опрессовочное седло', 'Опрессовать НКТ на 200атм. Вымыть шар'
         else:
             return 'НКТ', ''

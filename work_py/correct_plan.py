@@ -1,25 +1,19 @@
 import json
 import sqlite3
-import time
 
 import well_data
 import psycopg2
 from openpyxl.styles import Font, Alignment
 
-from PyQt5.Qt import *
 from PyQt5.QtGui import QIntValidator, QDoubleValidator
-from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QTabWidget, \
-    QMainWindow, QPushButton, QTextEdit, QDateEdit
+from PyQt5.QtWidgets import QMessageBox, QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QTabWidget, \
+    QMainWindow, QPushButton
 from PyQt5.QtCore import Qt
 from datetime import datetime
 
 from data_base.work_with_base import connect_to_db
-from krs import TabPageGno, GnoWindow
-from work_py.advanted_file import merge_overlapping_intervals
 
-from work_py.alone_oreration import lifting_unit, weigth_pipe, volume_pod_NKT, pvo_gno, volume_jamming_well
-from work_py.mkp import mkp_revision_1_kateg
-from work_py.rationingKRS import liftingNKT_norm
+from work_py.advanted_file import definition_plast_work
 
 
 class TabPageDp(QWidget):
@@ -38,13 +32,6 @@ class TabPageDp(QWidget):
 
         self.well_area_label = QLabel('площадь скважины')
         self.well_area_edit = QLineEdit(self)
-
-        # self.number_DP_label = QLabel('номер \nдополнительного плана')
-        # self.number_DP_Combo = QComboBox(self)
-        #
-        # self.number_DP_Combo.addItems(['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'])
-        # if well_data.number_dp != 0:
-        #     self.number_DP_Combo.setCurrentIndex(int(well_data.number_dp) - 1)
 
         self.table_name = ''
 
@@ -86,7 +73,6 @@ class TabPageDp(QWidget):
             self.grid.addWidget(self.table_in_base_combo, 3, 5)
             self.grid.addWidget(self.well_data_label, 2, 6)
             self.grid.addWidget(self.well_data_in_base_combo, 3, 6)
-
 
             self.table_in_base_combo.currentTextChanged.connect(self.update_area)
 
@@ -418,7 +404,6 @@ class CorrectPlanWindow(QMainWindow):
                 DopPlanWindow.change_pvr_in_bottom(self, self.data, self.rowHeights, self.colWidth,
                                                    self.boundaries_dict)
 
-            aaded = well_data.data
             name_table = table_in_base_combo[:-14]
 
             self.extraction_data(name_table)
@@ -617,7 +602,7 @@ class CorrectPlanWindow(QMainWindow):
                     cursor.close()
                 if conn:
                     conn.close()
-
+        definition_plast_work(self)
         return
 
     def insert_data_dop_plan(self, result, paragraph_row):

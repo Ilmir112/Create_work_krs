@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox, QMainWindow
 from openpyxl_image_loader import SheetImageLoader
 from openpyxl.utils.cell import get_column_letter
 from openpyxl.styles import Font, Alignment
-from main import ExcelWorker
+
 
 from cdng import events_gnvp, itog_1, events_gnvp_gnkt
 from find import ProtectedIsNonNone
@@ -29,11 +29,10 @@ class CreatePZ(QMainWindow):
         from find import FindIndexPZ
         from work_py.leakage_column import LeakageWindow
         from category_correct import CategoryWindow
-        from work_py.opressovka import TabPage_SO
         from main import MyWindow
         from find import WellNkt, Well_perforation, WellCondition, WellHistory_data, Well_data, Well_Category, \
             WellFond_data, WellSucker_rod, Well_expected_pick_up, WellData
-        from data_base.work_with_base import check_in_database_well_data, insert_data_well_dop_plan
+        from data_base.work_with_base import check_in_database_well_data
 
         well_data.work_plan = work_plan
 
@@ -44,7 +43,7 @@ class CreatePZ(QMainWindow):
 
         well_data.region = region(well_data.cdng._value)
 
-        WellData.read_well(self, ws, well_data.cat_well_max._value, well_data.data_pvr_min._value)
+        WellData.read_well(WellData, ws, well_data.cat_well_max._value, well_data.data_pvr_min._value)
         well_data.region = region(well_data.cdng._value)
 
 
@@ -288,7 +287,7 @@ class CreatePZ(QMainWindow):
 
                     else:
                         data.alignment = Alignment(wrap_text=True, horizontal='left',
-                                                   vertical='top')
+                                                   vertical='center')
 
                         data.font = Font(name='Arial Cyr', size=12)
 
@@ -403,7 +402,7 @@ class CreatePZ(QMainWindow):
                         pass
 
         itog_list = itog_1()
-        aasd = len(itog_1()) + ins_ind, ins_ind
+
         if work_plan not in ['gnkt_frez', 'application_pvr', 'gnkt_after_grp', 'gnkt_opz', 'gnkt_bopz']:
             for i in range(ins_ind, len(itog_list) + ins_ind):  # Добавлением итогов
                 if i < ins_ind + 6:
@@ -413,7 +412,7 @@ class CreatePZ(QMainWindow):
                         if j != 1:
                             ws.cell(row=i, column=j).border = well_data.thin_border
                             ws.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=False)
-                    aaawqaad = ws.max_row
+
                     ws.merge_cells(start_row=i, start_column=2, end_row=i, end_column=11)
                     ws.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='left',
                                                                    vertical='center')
@@ -426,16 +425,16 @@ class CreatePZ(QMainWindow):
                         ws.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=False)
                         ws.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='left',
                                                                        vertical='center')
-                    aaawqaadad = ws.max_row
+
 
                     ws.merge_cells(start_row=i, start_column=2, end_row=i, end_column=12)
-                    ws.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='left',
+                    ws.cell(row=i, column=2).alignment = Alignment(wrap_text=False, horizontal='left',
                                                                              vertical='center')
-                    aaawqaad2= ws.max_row
+
 
             ins_ind += len(itog_1()) + 2
 
-        curator_s = curator_sel(self, well_data.curator, well_data.region)
+        curator_s = curator_sel(well_data.curator, well_data.region)
         # print(f'куратор {curator_sel, well_data.curator}')
         podp_down = pop_down(self, well_data.region, curator_s)
 
@@ -446,21 +445,19 @@ class CreatePZ(QMainWindow):
                 ws.cell(row=i, column=j).value = podp_down[i - 1 - ins_ind][j - 1]
                 ws.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=False)
 
-            if i in range(1 + ins_ind + 7, 1 + ins_ind + 14):
-                ws.merge_cells(start_row=i, start_column=2, end_row=i, end_column=6)
-                # ws.cell(row=i, column=2).alignment = Alignment(wrap_text=False, vertical='bottom', horizontal='left')
-                # ws.row_dimensions[i - 1].height = 30
+            if i in range(ins_ind + 7, 1 + ins_ind + 15):
+                # ws.merge_cells(start_row=i, start_column=2, end_row=i, end_column=6)
+                ws.cell(row=i, column=2).alignment = Alignment(wrap_text=True, vertical='bottom', horizontal='left')
+        ws.row_dimensions[ins_ind + 7].height = 30
+        ws.row_dimensions[ins_ind + 9].height = 25
 
-                # if i == 1 + ins_ind + 11:
-                #     ws.row_dimensions[i].height = 55
-            aaawqwii = ws.max_row
         ins_ind += len(podp_down)
         aaa = ws.max_row
         # Удалить строки ниже ins_ind (включительно)
 
         ws.delete_rows(ins_ind, aaa - ins_ind)
 
-        aaaa = ws.max_row
+
 
     def is_valid_date(date):
         try:

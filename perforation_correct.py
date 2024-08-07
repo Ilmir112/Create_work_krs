@@ -139,14 +139,14 @@ class PerforationCorrect(QMainWindow):
         self.tabWidget = TabWidget()
 
         self.buttonAdd = QPushButton('сохранить данные')
-        self.buttonAdd.clicked.connect(self.addRowTable)
+        self.buttonAdd.clicked.connect(self.add_row_table)
 
         vbox = QGridLayout(self.centralWidget)
         vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
         # vbox.addWidget(self.tableWidget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 3, 0)
 
-    def addRowTable(self):
+    def add_row_table(self):
 
         # Пересохранение данных по интервалам перфорации
         self.dict_perforation = well_data.dict_perforation

@@ -67,12 +67,12 @@ class TabPage_SO_pvr(QWidget):
 
 
         self.labelType = QLabel("Кровля  перфорации", self)
-        self.lineEditType = QLineEdit(self)
-        self.lineEditType.setClearButtonEnabled(True)
+        self.lineedit_type = QLineEdit(self)
+        self.lineedit_type.setClearButtonEnabled(True)
 
         self.labelType2 = QLabel("Подошва  перфорации", self)
-        self.lineEditType2 = QLineEdit(self)
-        self.lineEditType2.setClearButtonEnabled(True)
+        self.lineedit_type2 = QLineEdit(self)
+        self.lineedit_type2.setClearButtonEnabled(True)
 
         self.labelTypeCharges = QLabel("Тип зарядов", self)
         self.ComboBoxCharges = QComboBox(self)
@@ -132,10 +132,10 @@ class TabPage_SO_pvr(QWidget):
         self.grid.addWidget(self.fluid_edit, 20, 3)
 
         self.grid.addWidget(self.labelType, 22, 2)
-        self.grid.addWidget(self.lineEditType, 23, 2)
+        self.grid.addWidget(self.lineedit_type, 23, 2)
 
         self.grid.addWidget(self.labelType2, 22, 3)
-        self.grid.addWidget(self.lineEditType2, 23, 3)
+        self.grid.addWidget(self.lineedit_type2, 23, 3)
 
         self.grid.addWidget(self.labelTypeCharges, 22, 4)
         self.grid.addWidget(self.ComboBoxCharges, 23, 4)
@@ -184,7 +184,7 @@ class PvrApplication(QMainWindow):
         # self.tableWidget.setAlternatingRowColors(True)
 
         self.buttonAdd = QPushButton('Добавить интервалы перфорации в таблицу')
-        self.buttonAdd.clicked.connect(self.addRowTable)
+        self.buttonAdd.clicked.connect(self.add_row_table)
         self.buttonDel = QPushButton('Удалить интервалы перфорации в таблице')
         self.buttonDel.clicked.connect(self.del_row_table)
         self.buttonadd_work = QPushButton('Создать заявку')
@@ -218,36 +218,36 @@ class PvrApplication(QMainWindow):
             self.tableWidget.setItem(rows, 5, QTableWidgetItem(str(pvr[6])))
 
 
-    def addRowTable(self):
+    def add_row_table(self):
 
-        editType = self.tabWidget.currentWidget().lineEditType.text().replace(',', '.')
-        editType2 = self.tabWidget.currentWidget().lineEditType2.text().replace(',', '.')
+        edit_type = self.tabWidget.currentWidget().lineedit_type.text().replace(',', '.')
+        edit_type2 = self.tabWidget.currentWidget().lineedit_type2.text().replace(',', '.')
         chargesx = str(self.tabWidget.currentWidget().ComboBoxCharges.currentText())
         editHolesMetr = self.tabWidget.currentWidget().lineEditHolesMetr.currentText()
         editIndexFormation = self.tabWidget.currentWidget().lineEditIndexFormation.text()
         dopInformation = self.tabWidget.currentWidget().lineEditDopInformation.text()
-        if not editType or not editType2 or not chargesx or not editIndexFormation:
+        if not edit_type or not edit_type2 or not chargesx or not editIndexFormation:
             msg = QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
             return
-        if float(editType2.replace(',', '.')) >= float(well_data.current_bottom):
+        if float(edit_type2.replace(',', '.')) >= float(well_data.current_bottom):
             msg = QMessageBox.information(self, 'Внимание', 'Подошва интервала перфорации ниже текущего забоя')
             return
 
-        # chargesx = PerforationWindow.charge(self, int(float(editType2)))[0][:-2] + chargesx)
+        # chargesx = PerforationWindow.charge(self, int(float(edit_type2)))[0][:-2] + chargesx)
 
         self.tableWidget.setSortingEnabled(False)
         rows = self.tableWidget.rowCount()
         self.tableWidget.insertRow(rows)
-        self.tableWidget.setItem(rows, 0, QTableWidgetItem(editType))
-        self.tableWidget.setItem(rows, 1, QTableWidgetItem(editType2))
+        self.tableWidget.setItem(rows, 0, QTableWidgetItem(edit_type))
+        self.tableWidget.setItem(rows, 1, QTableWidgetItem(edit_type2))
         self.tableWidget.setItem(rows, 2, QTableWidgetItem(chargesx))
         self.tableWidget.setItem(rows, 3, QTableWidgetItem(editHolesMetr))
-        self.tableWidget.setItem(rows, 4, QTableWidgetItem(str(int((float(editType2) - float(
-            editType)) * int(editHolesMetr)))))
+        self.tableWidget.setItem(rows, 4, QTableWidgetItem(str(int((float(edit_type2) - float(
+            edit_type)) * int(editHolesMetr)))))
         self.tableWidget.setItem(rows, 5, QTableWidgetItem(editIndexFormation))
         self.tableWidget.setItem(rows, 6, QTableWidgetItem(dopInformation))
         self.tableWidget.setSortingEnabled(True)
-        # print(editType, spinYearOfIssue, editSerialNumber, editSpecifications)
+        # print(edit_type, spinYearOfIssue, editSerialNumber, editSpecifications)
 
     def copy_pvr(self, ws, work_list):
         for row in range(len(work_list)):

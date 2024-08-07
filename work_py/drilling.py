@@ -193,7 +193,7 @@ class Drill_window(QMainWindow):
         self.tableWidget.setAlternatingRowColors(True)
 
         self.buttonAdd = QPushButton('Добавить записи в таблицу')
-        self.buttonAdd.clicked.connect(self.addRowTable)
+        self.buttonAdd.clicked.connect(self.add_row_table)
         self.buttonDel = QPushButton('Удалить записи из таблице')
         self.buttonDel.clicked.connect(self.del_row_table)
         self.buttonadd_work = QPushButton('Добавить в план работ')
@@ -209,7 +209,7 @@ class Drill_window(QMainWindow):
         vbox.addWidget(self.buttonadd_work, 3, 0)
         vbox.addWidget(self.buttonAddString, 3, 1)
 
-    def addRowTable(self):
+    def add_row_table(self):
 
         roof_drill = self.tabWidget.currentWidget().roof_drill_line.text().replace(',', '.')
         sole_drill = self.tabWidget.currentWidget().sole_drill_line.text().replace(',', '.')

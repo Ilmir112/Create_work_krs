@@ -118,7 +118,7 @@ class PakerAspo(QMainWindow):
             paker_select = f'Заглушка сбивной клапан с ввертышем + НКТ{well_data.nkt_diam}мм {paker_khost}м +' \
                            f' пакер ПРО-ЯМО-{paker_diametr}мм (либо аналог) ' \
                            f'для ЭК {well_data.column_diametr._value}мм х {well_data.column_wall_thickness._value}мм + щелевой фильтр' \
-                           f' {OpressovkaEK.nktOpress(self)[0]}'
+                           f' {OpressovkaEK.nkt_opress(self)[0]}'
             paker_short = f'Заглушка сбивной клапан с ввертышем + + НКТ{well_data.nkt_diam}мм {paker_khost}м +' \
                           f' пакер ПРО-ЯМО-{paker_diametr}мм  + ' \
                           f'  + щелевой фильтр'
@@ -145,14 +145,14 @@ class PakerAspo(QMainWindow):
                           f'+ НКТ{well_data.nkt_diam}мм со снятыми фасками L- ' \
                           f'{round(paker_depth - well_data.head_column_additional._value, 0)}м'
 
-        nktOpress_list = OpressovkaEK.nktOpress(self)
+        nkt_opress_list = OpressovkaEK.nkt_opress(self)
 
 
         paker_list = [
                 [f'СПо {paker_short} до глубины {paker_depth}м', None,
                  f'Спустить {paker_select} на НКТ{well_data.nkt_diam}мм до глубины {paker_depth}м, '
                  f'воронкой до {paker_depth + paker_khost}м'
-                 f' с замером, шаблонированием шаблоном {well_data.nkt_template}мм. {nktOpress_list[1]} '
+                 f' с замером, шаблонированием шаблоном {well_data.nkt_template}мм. {nkt_opress_list[1]} '
                  f'{("Произвести пробную посадку на глубине 50м" if well_data.column_additional is False else "")} '
                  f'ПРИ ОТСУТСТВИИ ЦИРКУЛЯЦИИ ПРЕДУСМОТРЕТЬ НАЛИЧИИ В КОМПОНОВКЕ УРАВНИТЕЛЬНЫХ КЛАПАНОВ ИЛИ СБИВНОГО '
                  f'КЛАПАНА С ВВЕРТЫШЕМ НАД ПАКЕРОМ',

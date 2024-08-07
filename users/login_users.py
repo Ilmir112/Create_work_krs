@@ -1,12 +1,8 @@
-import os
 import sqlite3
-
-import psycopg2
-from PyQt5.QtWidgets import QWidget, QLabel, QLineEdit, QPushButton, QMessageBox, QComboBox, QBoxLayout, QGridLayout
-from PyQt5.QtCore import Qt
-
 import well_data
-
+import psycopg2
+from PyQt5.QtWidgets import QWidget, QLabel, QLineEdit, QPushButton, QMessageBox, QComboBox, QGridLayout
+from PyQt5.QtCore import Qt
 
 
 class LoginWindow(QWidget):
@@ -16,7 +12,6 @@ class LoginWindow(QWidget):
 
         # Установка флага `Qt.WindowModal`
         self.setWindowModality(Qt.WindowModal)
-
 
         self.label_username = QLabel("Пользователь:", self)
         self.username = QComboBox(self)
@@ -40,8 +35,6 @@ class LoginWindow(QWidget):
         self.button_register = QPushButton("Регистрация", self)
         self.button_register.clicked.connect(self.show_register_window)
 
-
-
         self.box_layout = QGridLayout(self)
 
         self.box_layout.addWidget(self.label_username, 0, 1)
@@ -59,7 +52,6 @@ class LoginWindow(QWidget):
         self.username.clear()
         self.username.addItems(users_list)
 
-
     def login(self):
         from data_base.work_with_base import connect_to_db
 
@@ -71,30 +63,30 @@ class LoginWindow(QWidget):
             try:
                 conn = psycopg2.connect(**well_data.postgres_conn_user)
                 cursor = conn.cursor()
-                cursor.execute("SELECT last_name, first_name, second_name, password, position_in, organization FROM users "
-                               "WHERE last_name=(%s) AND first_name=(%s) AND second_name=(%s)",
-                               (last_name, first_name, second_name))
+                cursor.execute(
+                    "SELECT last_name, first_name, second_name, password, position_in, organization FROM users "
+                    "WHERE last_name=(%s) AND first_name=(%s) AND second_name=(%s)",
+                    (last_name, first_name, second_name))
                 password_base = cursor.fetchone()
 
                 password_base_short = f'{password_base[0]} {password_base[1]} {password_base[2]} '
                 if password_base_short == username and password_base[3] == str(password):
                     # mes = QMessageBox.information(self, 'Пароль', 'вход произведен')
                     self.close()
-                    well_data.user = (password_base[4] + ' ' + password_base[5], f'{password_base[0]} {password_base[1][0]}.{password_base[2][0]}.')
-                    a = well_data.user
+                    well_data.user = (password_base[4] + ' ' + password_base[5],
+                                      f'{password_base[0]} {password_base[1][0]}.{password_base[2][0]}.')
+
                     well_data.contractor = password_base[5]
-                    # if 'Ойл' in password_base[5]:
-                    #     well_data.contractor = 'ООО "Ойл-cервис"'
-                    # elif 'РН' in password_base[5]:
-                    #     well_data.contractor = 'ООО "РН-Сервис"'
+
                     well_data.pause = False
                 else:
-                    mes = QMessageBox.critical(self, 'Пароль', 'логин и пароль не совпадает')
+                    QMessageBox.critical(self, 'Пароль', 'логин и пароль не совпадает')
             except psycopg2.Error as e:
                 self.pause_app()
                 well_data.pause = False
                 # Выведите сообщение об ошибке
-                mes = QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных, проверьте наличие интернета')
+                QMessageBox.warning(None, 'Ошибка',
+                                    f'Ошибка подключения к базе данных, проверьте наличие интернета {e}')
             finally:
                 # Закройте курсор и соединение
                 if cursor:
@@ -132,7 +124,7 @@ class LoginWindow(QWidget):
                     return False
 
             except sqlite3.Error as e:
-                QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных, проверьте наличие интернета')
+                QMessageBox.warning(None, 'Ошибка', f'Ошибка подключения к базе данных, проверьте наличие интернет {e}')
                 return False
             finally:
                 # Закройте курсор и соединение
@@ -143,7 +135,6 @@ class LoginWindow(QWidget):
 
         if 'РН' in well_data.contractor:
             well_data.connect_in_base = False
-
 
     def get_list_users(self):
         from data_base.work_with_base import connect_to_db
@@ -251,9 +242,7 @@ class RegisterWindow(QWidget):
         self.grid.addWidget(self.button_register_user, 8, 1, 2, 2)
         self.organization.currentTextChanged.connect(self.update_organization)
 
-
     def update_organization(self, index):
-
 
         if index == 'ООО "Ойл-cервис"':
 
@@ -267,7 +256,7 @@ class RegisterWindow(QWidget):
             self.region.clear()
             self.region.addItems(['экспедиции №1', 'экспедиции №2', 'экспедиции №3', 'экспедиции №4',
                                   'экспедиции №5', 'экспедиции №6',
-                                 'экспедиции №7'])
+                                  'экспедиции №7'])
         self.grid.addWidget(self.label_region, 5, 1)
         self.grid.addWidget(self.region, 5, 2)
 
@@ -300,7 +289,8 @@ class RegisterWindow(QWidget):
                 if password == password2:
                     cursor.execute(
                         "INSERT INTO users ("
-                        "last_name, first_name, second_name, position_in, organization, password) VALUES (%s, %s, %s, %s, %s, %s)",
+                        "last_name, first_name, second_name, position_in, organization, password) "
+                        "VALUES (%s, %s, %s, %s, %s, %s)",
                         (last_name, first_name, second_name, position_in, organization, password))
                     conn.commit()
                     conn.close()
@@ -317,7 +307,8 @@ class RegisterWindow(QWidget):
 
                 # Проверяем, существует ли пользователь с таким именем
                 cursor.execute(
-                    "SELECT last_name, first_name, second_name FROM users WHERE last_name=? AND first_name=? AND second_name=?",
+                    "SELECT last_name, first_name, second_name FROM users WHERE last_name=? AND first_name=? "
+                    "AND second_name=?",
                     (last_name, first_name, second_name)
                 )
                 existing_user = cursor.fetchone()
@@ -330,7 +321,8 @@ class RegisterWindow(QWidget):
                     position_in = position_in + " " + region
                     if password == password2:
                         cursor.execute(
-                            "INSERT INTO users (last_name, first_name, second_name, position_in, organization, password) VALUES (?, ?, ?, ?, ?, ?)",
+                            "INSERT INTO users (last_name, first_name, second_name, position_in, organization, password) "
+                            "VALUES (?, ?, ?, ?, ?, ?)",
                             (last_name, first_name, second_name, position_in, organization, password)
                         )
                         conn.commit()
@@ -346,4 +338,3 @@ class RegisterWindow(QWidget):
             except sqlite3.Error as e:
                 QMessageBox.critical(None, 'Ошибка', f"Ошибка при регистрации: {e}")
                 return False
-

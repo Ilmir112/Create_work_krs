@@ -1,10 +1,8 @@
 import well_data
 import re
 
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtWidgets
 from PyQt5.Qt import *
-from PyQt5.QtGui import QRegExpValidator, QColor, QPalette
-
 from perforation_correct import FloatLineEdit
 
 
@@ -69,14 +67,14 @@ class TabPage_SO_correct(QWidget):
         # self.columnType.setClearButtonEnabled(True)
 
         self.column_wall_thicknessLabel = QLabel("Толщина стенки ЭК", self)
-        self.column_wall_thicknessEditType2 = FloatLineEdit(self)
-        self.column_wall_thicknessEditType2.setText(f"{self.ifNone(well_data.column_wall_thickness._value)}")
-        # self.column_wall_thicknessEditType2.setClearButtonEnabled(True)
+        self.column_wall_thicknessedit_type2 = FloatLineEdit(self)
+        self.column_wall_thicknessedit_type2.setText(f"{self.ifNone(well_data.column_wall_thickness._value)}")
+        # self.column_wall_thicknessedit_type2.setClearButtonEnabled(True)
 
         self.shoe_columnLabel = QLabel("башмак ЭК", self)
-        self.shoe_columnEditType2 = FloatLineEdit(self)
-        self.shoe_columnEditType2.setText(f"{self.ifNone(well_data.shoe_column._value)}")
-        # self.shoe_columnEditType2.setClearButtonEnabled(True)
+        self.shoe_columnedit_type2 = FloatLineEdit(self)
+        self.shoe_columnedit_type2.setText(f"{self.ifNone(well_data.shoe_column._value)}")
+        # self.shoe_columnedit_type2.setClearButtonEnabled(True)
 
         self.column_add_trueLabel = QLabel("наличие Доп. колонны", self)
         self.column_add_true_comboBox = QComboBox(self)
@@ -88,151 +86,151 @@ class TabPage_SO_correct(QWidget):
         self.column_add_true_comboBox.setCurrentIndex(column_add)
 
         self.column_addLabel = QLabel("диаметр доп. колонны", self)
-        self.column_addEditType = FloatLineEdit(self)
-        self.column_addEditType.setText(f"{self.ifNone(well_data.column_additional_diametr._value)}")
-        # self.column_addEditType.setClearButtonEnabled(True)
+        self.column_addedit_type = FloatLineEdit(self)
+        self.column_addedit_type.setText(f"{self.ifNone(well_data.column_additional_diametr._value)}")
+        # self.column_addedit_type.setClearButtonEnabled(True)
 
         self.column_add_wall_thicknessLabel = QLabel("Толщина стенки доп.колонны", self)
-        self.column_add_wall_thicknessEditType2 = FloatLineEdit(self)
-        self.column_add_wall_thicknessEditType2.setText(
+        self.column_add_wall_thicknessedit_type2 = FloatLineEdit(self)
+        self.column_add_wall_thicknessedit_type2.setText(
             F'{self.ifNone(well_data.column_additional_wall_thickness._value)}')
-        # self.column_add_wall_thicknessEditType2.setClearButtonEnabled(True)
+        # self.column_add_wall_thicknessedit_type2.setClearButtonEnabled(True)
 
         self.head_column_addLabel = QLabel("Голова доп колонны", self)
-        self.head_column_add_editType2 = FloatLineEdit(self)
-        self.head_column_add_editType2.setText(f'{self.ifNone(well_data.head_column_additional._value)}')
+        self.head_column_add_edit_type2 = FloatLineEdit(self)
+        self.head_column_add_edit_type2.setText(f'{self.ifNone(well_data.head_column_additional._value)}')
 
         self.shoe_column_addLabel = QLabel("башмак доп колонны", self)
-        self.shoe_column_add_editType2 = FloatLineEdit(self)
-        self.shoe_column_add_editType2.setText(f'{self.ifNone(well_data.shoe_column_additional._value)}')
-        # self.shoe_column_add_editType2.setClearButtonEnabled(True)
+        self.shoe_column_add_edit_type2 = FloatLineEdit(self)
+        self.shoe_column_add_edit_type2.setText(f'{self.ifNone(well_data.shoe_column_additional._value)}')
+        # self.shoe_column_add_edit_type2.setClearButtonEnabled(True)
 
         self.bottomhole_drill_Label = QLabel('Пробуренный забой')
-        self.bottomhole_drill_editType = FloatLineEdit(self)
-        self.bottomhole_drill_editType.setText(
+        self.bottomhole_drill_edit_type = FloatLineEdit(self)
+        self.bottomhole_drill_edit_type.setText(
             f'{self.remove_non_numeric_chars(self.ifNone(well_data.bottomhole_drill._value))}')
 
         self.bottomhole_artificial_Label = QLabel('Искусственный забой')
-        self.bottomhole_artificial_editType = FloatLineEdit(self)
-        self.bottomhole_artificial_editType.setText(
+        self.bottomhole_artificial_edit_type = FloatLineEdit(self)
+        self.bottomhole_artificial_edit_type.setText(
             f'{self.remove_non_numeric_chars(self.ifNone(well_data.bottomhole_artificial._value))}')
 
         self.current_bottom_Label = QLabel('Текущий забой')
-        self.current_bottom_editType = FloatLineEdit(self)
-        self.current_bottom_editType.setText(
+        self.current_bottom_edit_type = FloatLineEdit(self)
+        self.current_bottom_edit_type.setText(
             f'{self.remove_non_numeric_chars(self.ifNone(well_data.current_bottom))}')
 
         self.max_angle_Label = QLabel('Максимальный угол')
-        self.max_angle_editType = FloatLineEdit(self)
-        self.max_angle_editType.setText(f'{self.ifNone(well_data.max_angle._value)}')
+        self.max_angle_edit_type = FloatLineEdit(self)
+        self.max_angle_edit_type.setText(f'{self.ifNone(well_data.max_angle._value)}')
 
         self.max_angle_H_Label = QLabel('Глубина максимального угла')
-        self.max_angle_H_editType = FloatLineEdit(self)
-        self.max_angle_H_editType.setText(f'{self.ifNone(well_data.max_angle_H._value)}')
+        self.max_angle_H_edit_type = FloatLineEdit(self)
+        self.max_angle_H_edit_type.setText(f'{self.ifNone(well_data.max_angle_H._value)}')
 
         self.max_expected_pressure_Label = QLabel('Максимальный ожидаемое давление')
-        self.max_expected_pressure_editType = FloatLineEdit(self)
-        self.max_expected_pressure_editType.setText(
+        self.max_expected_pressure_edit_type = FloatLineEdit(self)
+        self.max_expected_pressure_edit_type.setText(
             f'{self.remove_non_numeric_chars(self.ifNone(well_data.max_expected_pressure._value))}')
 
         self.max_admissible_pressure_Label = QLabel('Максимальный допустимое давление')
-        self.max_admissible_pressure_editType = FloatLineEdit(self)
-        self.max_admissible_pressure_editType.setText(
+        self.max_admissible_pressure_edit_type = FloatLineEdit(self)
+        self.max_admissible_pressure_edit_type.setText(
             f'{self.remove_non_numeric_chars(self.ifNone(well_data.max_admissible_pressure._value))}')
 
         self.pump_SHGN_do_Label = QLabel('Штанговый насос')
-        self.pump_SHGN_do_editType = QLineEdit(self)
-        self.pump_SHGN_do_editType.setText(f'{self.ifNone(well_data.dict_pump_SHGN["do"])}')
+        self.pump_SHGN_do_edit_type = QLineEdit(self)
+        self.pump_SHGN_do_edit_type.setText(f'{self.ifNone(well_data.dict_pump_SHGN["do"])}')
 
         self.pump_SHGN_depth_do_Label = QLabel('Глубина штангового насоса')
-        self.pump_SHGN_depth_do_editType = FloatLineEdit(self)
-        if self.pump_SHGN_do_editType.text() != 'отсут':
-            self.pump_SHGN_depth_do_editType.setText(
+        self.pump_SHGN_depth_do_edit_type = FloatLineEdit(self)
+        if self.pump_SHGN_do_edit_type.text() != 'отсут':
+            self.pump_SHGN_depth_do_edit_type.setText(
                 f'{self.remove_non_numeric_chars(self.ifNone(well_data.dict_pump_SHGN_h["do"]))}')
         else:
-            self.pump_SHGN_depth_do_editType.setText('отсут')
+            self.pump_SHGN_depth_do_edit_type.setText('отсут')
 
         self.pump_SHGN_posle_Label = QLabel('Плановый штанговый насос')
-        self.pump_SHGN_posle_editType = QLineEdit(self)
-        self.pump_SHGN_posle_editType.setText(f'{self.ifNone(well_data.dict_pump_SHGN["posle"])}')
+        self.pump_SHGN_posle_edit_type = QLineEdit(self)
+        self.pump_SHGN_posle_edit_type.setText(f'{self.ifNone(well_data.dict_pump_SHGN["posle"])}')
 
         self.pump_SHGN_depth_posle_Label = QLabel('Плановая глубина спуска насоса')
-        self.pump_SHGN_depth_posle_editType = FloatLineEdit(self)
-        if self.pump_SHGN_posle_editType.text() != 'отсут':
-            self.pump_SHGN_depth_posle_editType.setText(
+        self.pump_SHGN_depth_posle_edit_type = FloatLineEdit(self)
+        if self.pump_SHGN_posle_edit_type.text() != 'отсут':
+            self.pump_SHGN_depth_posle_edit_type.setText(
                 f'{self.remove_non_numeric_chars(self.ifNone(well_data.dict_pump_SHGN_h["posle"]))}')
         else:
-            self.pump_SHGN_depth_posle_editType.setText('отсут')
+            self.pump_SHGN_depth_posle_edit_type.setText('отсут')
 
         self.pump_ECN_do_Label = QLabel('Спущенный ЭЦН')
-        self.pump_ECN_do_editType = QLineEdit(self)
-        self.pump_ECN_do_editType.setText(f'{self.ifNone(well_data.dict_pump_ECN["do"])}')
+        self.pump_ECN_do_edit_type = QLineEdit(self)
+        self.pump_ECN_do_edit_type.setText(f'{self.ifNone(well_data.dict_pump_ECN["do"])}')
 
         self.pump_ECN_depth_do_Label = QLabel('Глубина спуска ЭЦН')
-        self.pump_ECN_depth_do_editType = FloatLineEdit(self)
-        if self.pump_ECN_do_editType.text() != 'отсут':
-            self.pump_ECN_depth_do_editType.setText(
+        self.pump_ECN_depth_do_edit_type = FloatLineEdit(self)
+        if self.pump_ECN_do_edit_type.text() != 'отсут':
+            self.pump_ECN_depth_do_edit_type.setText(
                 f'{self.remove_non_numeric_chars(self.ifNone(well_data.dict_pump_ECN_h["do"]))}')
         else:
-            self.pump_ECN_depth_do_editType.setText('отсут')
+            self.pump_ECN_depth_do_edit_type.setText('отсут')
 
         self.pump_ECN_posle_Label = QLabel('Плановый ЭЦН на спуск')
-        self.pump_ECN_posle_editType = QLineEdit(self)
-        self.pump_ECN_posle_editType.setText(f'{self.ifNone(well_data.dict_pump_ECN["posle"])}')
+        self.pump_ECN_posle_edit_type = QLineEdit(self)
+        self.pump_ECN_posle_edit_type.setText(f'{self.ifNone(well_data.dict_pump_ECN["posle"])}')
 
         self.pump_ECN_depth_posle_Label = QLabel('Плановая глубина спуска ЭЦН')
-        self.pump_ECN_depth_posle_editType = FloatLineEdit(self)
-        if self.pump_ECN_posle_editType.text() != 'отсут':
-            self.pump_ECN_depth_posle_editType.setText(
+        self.pump_ECN_depth_posle_edit_type = FloatLineEdit(self)
+        if self.pump_ECN_posle_edit_type.text() != 'отсут':
+            self.pump_ECN_depth_posle_edit_type.setText(
                 f'{self.remove_non_numeric_chars(self.ifNone(well_data.dict_pump_ECN_h["posle"]))}')
         else:
-            self.pump_ECN_depth_posle_editType.setText('отсут')
+            self.pump_ECN_depth_posle_edit_type.setText('отсут')
 
         self.paker_do_Label = QLabel('Спущенный пакер')
-        self.paker_do_editType = QLineEdit(self)
-        self.paker_do_editType.setText(f'{self.ifNone(well_data.paker_do["do"])}')
+        self.paker_do_edit_type = QLineEdit(self)
+        self.paker_do_edit_type.setText(f'{self.ifNone(well_data.paker_do["do"])}')
 
         self.paker_depth_do_Label = QLabel('Глубина спуска пакера')
-        self.paker_depth_do_editType = FloatLineEdit(self)
-        self.paker_depth_do_editType.setText(
+        self.paker_depth_do_edit_type = FloatLineEdit(self)
+        self.paker_depth_do_edit_type.setText(
             f'{self.remove_non_numeric_chars(self.ifNone(well_data.depth_fond_paker_do["do"]))}')
 
         self.paker_posle_Label = QLabel('пакер на спуск')
-        self.paker_posle_editType = QLineEdit(self)
-        self.paker_posle_editType.setText(f'{self.ifNone(well_data.paker_do["posle"])}')
+        self.paker_posle_edit_type = QLineEdit(self)
+        self.paker_posle_edit_type.setText(f'{self.ifNone(well_data.paker_do["posle"])}')
 
         self.paker_depth_posle_Label = QLabel('Глубина спуска пакера')
-        self.paker_depth_posle_editType = FloatLineEdit(self)
-        self.paker_depth_posle_editType.setText(
+        self.paker_depth_posle_edit_type = FloatLineEdit(self)
+        self.paker_depth_posle_edit_type.setText(
             f'{self.remove_non_numeric_chars(self.ifNone(well_data.depth_fond_paker_do["posle"]))}')
 
         self.paker2_do_Label = QLabel('Спущенный пакер')
-        self.paker2_do_editType = QLineEdit(self)
-        self.paker2_do_editType.setText(f'{self.ifNone(well_data.paker2_do["do"])}')
+        self.paker2_do_edit_type = QLineEdit(self)
+        self.paker2_do_edit_type.setText(f'{self.ifNone(well_data.paker2_do["do"])}')
 
         self.paker2_depth_do_Label = QLabel('Глубина спуска пакера')
-        self.paker2_depth_do_editType = FloatLineEdit(self)
-        self.paker2_depth_do_editType.setText(self.remove_non_numeric_chars(
+        self.paker2_depth_do_edit_type = FloatLineEdit(self)
+        self.paker2_depth_do_edit_type.setText(self.remove_non_numeric_chars(
             self.ifNone(str(well_data.depth_fond_paker2_do["do"]))))
 
         self.paker2_posle_Label = QLabel('пакер на спуск')
-        self.paker2_posle_editType = QLineEdit(self)
+        self.paker2_posle_edit_type = QLineEdit(self)
         # print(well_data.paker2_do[self.ifNone("posle")])
-        self.paker2_posle_editType.setText(str(self.ifNone(well_data.paker2_do["posle"])))
+        self.paker2_posle_edit_type.setText(str(self.ifNone(well_data.paker2_do["posle"])))
 
         self.paker2_depth_posle_Label = QLabel('Глубина спуска пакера')
-        self.paker2_depth_posle_editType = FloatLineEdit(self)
-        self.paker2_depth_posle_editType.setText(
+        self.paker2_depth_posle_edit_type = FloatLineEdit(self)
+        self.paker2_depth_posle_edit_type.setText(
             self.remove_non_numeric_chars(self.ifNone(str(well_data.depth_fond_paker2_do["posle"]))))
         # print(f' насос спуск {well_data.dict_pump["posle"]}')
 
         self.static_level_Label = QLabel('Статический уровень в скважине')
-        self.static_level_editType = FloatLineEdit(self)
-        self.static_level_editType.setText(self.remove_non_numeric_chars(self.ifNone(well_data.static_level._value)))
+        self.static_level_edit_type = FloatLineEdit(self)
+        self.static_level_edit_type.setText(self.remove_non_numeric_chars(self.ifNone(well_data.static_level._value)))
 
         self.dinamic_level_Label = QLabel('Динамический уровень в скважине')
-        self.dinamic_level_editType = FloatLineEdit(self)
-        self.dinamic_level_editType.setText(self.remove_non_numeric_chars(self.ifNone(well_data.dinamic_level._value)))
+        self.dinamic_level_edit_type = FloatLineEdit(self)
+        self.dinamic_level_edit_type.setText(self.remove_non_numeric_chars(self.ifNone(well_data.dinamic_level._value)))
 
         self.curator_Label = QLabel('Куратор ремонта')
         self.curator_Combo = QComboBox(self)
@@ -281,74 +279,74 @@ class TabPage_SO_correct(QWidget):
         self.grid.addWidget(self.columnLabel, 8, 0)
         self.grid.addWidget(self.columnType, 9, 0)
         self.grid.addWidget(self.column_wall_thicknessLabel, 8, 1)
-        self.grid.addWidget(self.column_wall_thicknessEditType2, 9, 1)
+        self.grid.addWidget(self.column_wall_thicknessedit_type2, 9, 1)
         self.grid.addWidget(self.shoe_columnLabel, 8, 2)
-        self.grid.addWidget(self.shoe_columnEditType2, 9, 2)
+        self.grid.addWidget(self.shoe_columnedit_type2, 9, 2)
         self.grid.addWidget(self.column_add_trueLabel, 8, 3)
         self.grid.addWidget(self.column_add_true_comboBox, 9, 3)
         self.grid.addWidget(self.column_addLabel, 8, 4)
-        self.grid.addWidget(self.column_addEditType, 9, 4)
+        self.grid.addWidget(self.column_addedit_type, 9, 4)
         self.grid.addWidget(self.column_add_wall_thicknessLabel, 8, 5)
-        self.grid.addWidget(self.column_add_wall_thicknessEditType2, 9, 5)
+        self.grid.addWidget(self.column_add_wall_thicknessedit_type2, 9, 5)
         self.grid.addWidget(self.head_column_addLabel, 8, 6)
-        self.grid.addWidget(self.head_column_add_editType2, 9, 6)
+        self.grid.addWidget(self.head_column_add_edit_type2, 9, 6)
         self.grid.addWidget(self.shoe_column_addLabel, 8, 7)
-        self.grid.addWidget(self.shoe_column_add_editType2, 9, 7)
+        self.grid.addWidget(self.shoe_column_add_edit_type2, 9, 7)
 
         self.grid.addWidget(self.bottomhole_drill_Label, 10, 0)
-        self.grid.addWidget(self.bottomhole_drill_editType, 11, 0)
+        self.grid.addWidget(self.bottomhole_drill_edit_type, 11, 0)
         self.grid.addWidget(self.bottomhole_artificial_Label, 10, 1)
-        self.grid.addWidget(self.bottomhole_artificial_editType, 11, 1)
+        self.grid.addWidget(self.bottomhole_artificial_edit_type, 11, 1)
         self.grid.addWidget(self.current_bottom_Label, 10, 2)
-        self.grid.addWidget(self.current_bottom_editType, 11, 2)
+        self.grid.addWidget(self.current_bottom_edit_type, 11, 2)
         self.grid.addWidget(self.max_angle_Label, 10, 3)
-        self.grid.addWidget(self.max_angle_editType, 11, 3)
+        self.grid.addWidget(self.max_angle_edit_type, 11, 3)
         self.grid.addWidget(self.max_angle_H_Label, 10, 4)
-        self.grid.addWidget(self.max_angle_H_editType, 11, 4)
+        self.grid.addWidget(self.max_angle_H_edit_type, 11, 4)
         self.grid.addWidget(self.max_expected_pressure_Label, 10, 5)
-        self.grid.addWidget(self.max_expected_pressure_editType, 11, 5)
+        self.grid.addWidget(self.max_expected_pressure_edit_type, 11, 5)
         self.grid.addWidget(self.max_admissible_pressure_Label, 10, 6)
-        self.grid.addWidget(self.max_admissible_pressure_editType, 11, 6)
+        self.grid.addWidget(self.max_admissible_pressure_edit_type, 11, 6)
         self.grid.addWidget(self.pump_ECN_do_Label, 13, 0)
-        self.grid.addWidget(self.pump_ECN_do_editType, 14, 0)
+        self.grid.addWidget(self.pump_ECN_do_edit_type, 14, 0)
         self.grid.addWidget(self.pump_ECN_depth_do_Label, 13, 1)
-        self.grid.addWidget(self.pump_ECN_depth_do_editType, 14, 1)
+        self.grid.addWidget(self.pump_ECN_depth_do_edit_type, 14, 1)
         self.grid.addWidget(self.pump_ECN_posle_Label, 13, 4)
-        self.grid.addWidget(self.pump_ECN_posle_editType, 14, 4)
+        self.grid.addWidget(self.pump_ECN_posle_edit_type, 14, 4)
         self.grid.addWidget(self.pump_ECN_depth_posle_Label, 13, 5)
-        self.grid.addWidget(self.pump_ECN_depth_posle_editType, 14, 5)
+        self.grid.addWidget(self.pump_ECN_depth_posle_edit_type, 14, 5)
 
         self.grid.addWidget(self.pump_SHGN_do_Label, 15, 0)
-        self.grid.addWidget(self.pump_SHGN_do_editType, 16, 0)
+        self.grid.addWidget(self.pump_SHGN_do_edit_type, 16, 0)
         self.grid.addWidget(self.pump_SHGN_depth_do_Label, 15, 1)
-        self.grid.addWidget(self.pump_SHGN_depth_do_editType, 16, 1)
+        self.grid.addWidget(self.pump_SHGN_depth_do_edit_type, 16, 1)
         self.grid.addWidget(self.pump_SHGN_posle_Label, 15, 4)
-        self.grid.addWidget(self.pump_SHGN_posle_editType, 16, 4)
+        self.grid.addWidget(self.pump_SHGN_posle_edit_type, 16, 4)
         self.grid.addWidget(self.pump_SHGN_depth_posle_Label, 15, 5)
-        self.grid.addWidget(self.pump_SHGN_depth_posle_editType, 16, 5)
+        self.grid.addWidget(self.pump_SHGN_depth_posle_edit_type, 16, 5)
 
         self.grid.addWidget(self.paker_do_Label, 17, 0)
-        self.grid.addWidget(self.paker_do_editType, 18, 0)
+        self.grid.addWidget(self.paker_do_edit_type, 18, 0)
         self.grid.addWidget(self.paker_depth_do_Label, 17, 1)
-        self.grid.addWidget(self.paker_depth_do_editType, 18, 1)
+        self.grid.addWidget(self.paker_depth_do_edit_type, 18, 1)
         self.grid.addWidget(self.paker_posle_Label, 17, 4)
-        self.grid.addWidget(self.paker_posle_editType, 18, 4)
+        self.grid.addWidget(self.paker_posle_edit_type, 18, 4)
         self.grid.addWidget(self.paker_depth_posle_Label, 17, 5)
-        self.grid.addWidget(self.paker_depth_posle_editType, 18, 5)
+        self.grid.addWidget(self.paker_depth_posle_edit_type, 18, 5)
 
         self.grid.addWidget(self.paker2_do_Label, 19, 0)
-        self.grid.addWidget(self.paker2_do_editType, 20, 0)
+        self.grid.addWidget(self.paker2_do_edit_type, 20, 0)
         self.grid.addWidget(self.paker2_depth_do_Label, 19, 1)
-        self.grid.addWidget(self.paker2_depth_do_editType, 20, 1)
+        self.grid.addWidget(self.paker2_depth_do_edit_type, 20, 1)
         self.grid.addWidget(self.paker2_posle_Label, 19, 4)
-        self.grid.addWidget(self.paker2_posle_editType, 20, 4)
+        self.grid.addWidget(self.paker2_posle_edit_type, 20, 4)
         self.grid.addWidget(self.paker2_depth_posle_Label, 19, 5)
-        self.grid.addWidget(self.paker2_depth_posle_editType, 20, 5)
+        self.grid.addWidget(self.paker2_depth_posle_edit_type, 20, 5)
 
         self.grid.addWidget(self.static_level_Label, 21, 2)
-        self.grid.addWidget(self.static_level_editType, 22, 2)
+        self.grid.addWidget(self.static_level_edit_type, 22, 2)
         self.grid.addWidget(self.dinamic_level_Label, 21, 3)
-        self.grid.addWidget(self.dinamic_level_editType, 22, 3)
+        self.grid.addWidget(self.dinamic_level_edit_type, 22, 3)
 
         self.grid.addWidget(self.curator_Label, 23, 1)
         self.grid.addWidget(self.curator_Combo, 24, 1)
@@ -548,10 +546,10 @@ class TabPage_SO_correct(QWidget):
 
         curator_list = ['ГРР', 'ОР', 'ГТМ', 'ГО', 'ВНС']
         self.curator_Combo.addItems(curator_list)
-        # print(self.pump_SHGN_posle_editType.text() != 'отсут', self.pump_ECN_posle_editType.text() != 'отсут')
+        # print(self.pump_SHGN_posle_edit_type.text() != 'отсут', self.pump_ECN_posle_edit_type.text() != 'отсут')
 
-        curator = 'ОР' if (self.pump_SHGN_posle_editType.text() == 'отсут' \
-                           and self.pump_ECN_posle_editType.text() == 'отсут') else 'ГТМ'
+        curator = 'ОР' if (self.pump_SHGN_posle_edit_type.text() == 'отсут' \
+                           and self.pump_ECN_posle_edit_type.text() == 'отсут') else 'ГТМ'
         if well_data.work_plan in ['gnkt_frez', 'gnkt_bopz']:
             curator = 'ВНС'
 
@@ -683,7 +681,7 @@ class TabPage_SO_correct(QWidget):
     def updateLabel(self):
         # self.dinamic_level_Label
         self.columnType.setText()
-        self.column_addEditType.setText()
+        self.column_addedit_type.setText()
         self.update()
 
 
@@ -707,14 +705,14 @@ class DataWindow(QMainWindow):
         # self.labels_nkt = labels_nkt
 
         self.buttonAdd = QPushButton('сохранить данные')
-        self.buttonAdd.clicked.connect(self.addRowTable)
+        self.buttonAdd.clicked.connect(self.add_row_table)
 
         vbox = QGridLayout(self.centralWidget)
         vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
         # vbox.addWidget(self.tableWidget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 3, 0)
 
-    def addRowTable(self):
+    def add_row_table(self):
         from find import ProtectedIsNonNone, ProtectedIsDigit
         from work_py.opressovka import TabPage_SO
         from work_py.advanted_file import definition_plast_work
@@ -724,32 +722,32 @@ class DataWindow(QMainWindow):
 
 
         if region_Combo == '':
-            mes = QMessageBox.warning(self, 'ОШИБКА', 'Не выбран регион')
+            QMessageBox.warning(self, 'ОШИБКА', 'Не выбран регион')
             return
         if type_kr_Combo == '':
-            mes = QMessageBox.warning(self, 'ОШИБКА', 'Не выбран Вид и категория ремонта')
+            QMessageBox.warning(self, 'ОШИБКА', 'Не выбран Вид и категория ремонта')
             return
 
 
         columnType = self.tabWidget.currentWidget().columnType.text()
-        column_wall_thickness = self.tabWidget.currentWidget().column_wall_thicknessEditType2.text()
-        shoe_column = self.tabWidget.currentWidget().shoe_columnEditType2.text()
+        column_wall_thickness = self.tabWidget.currentWidget().column_wall_thicknessedit_type2.text()
+        shoe_column = self.tabWidget.currentWidget().shoe_columnedit_type2.text()
         column_add_True = str(self.tabWidget.currentWidget().column_add_true_comboBox.currentText())
         if column_add_True == 'в наличии':
             well_data.column_additional = True
         else:
             well_data.column_additional = False
-        column_additional_diametr = self.tabWidget.currentWidget().column_addEditType.text()
-        column_additional_wall_thickness = self.tabWidget.currentWidget().column_add_wall_thicknessEditType2.text()
-        shoe_column_additional = self.tabWidget.currentWidget().shoe_column_add_editType2.text()
-        head_column_additional = self.tabWidget.currentWidget().head_column_add_editType2.text()
-        bottomhole_drill = self.tabWidget.currentWidget().bottomhole_drill_editType.text()
-        bottomhole_artificial = self.tabWidget.currentWidget().bottomhole_artificial_editType.text()
-        current_bottom = self.tabWidget.currentWidget().current_bottom_editType.text().replace(',', '.')
-        max_angle_H = self.tabWidget.currentWidget().max_angle_H_editType.text()
-        max_angle = self.tabWidget.currentWidget().max_angle_editType.text()
-        max_expected_pressure = self.tabWidget.currentWidget().max_expected_pressure_editType.text()
-        max_admissible_pressure = self.tabWidget.currentWidget().max_admissible_pressure_editType.text()
+        column_additional_diametr = self.tabWidget.currentWidget().column_addedit_type.text()
+        column_additional_wall_thickness = self.tabWidget.currentWidget().column_add_wall_thicknessedit_type2.text()
+        shoe_column_additional = self.tabWidget.currentWidget().shoe_column_add_edit_type2.text()
+        head_column_additional = self.tabWidget.currentWidget().head_column_add_edit_type2.text()
+        bottomhole_drill = self.tabWidget.currentWidget().bottomhole_drill_edit_type.text()
+        bottomhole_artificial = self.tabWidget.currentWidget().bottomhole_artificial_edit_type.text()
+        current_bottom = self.tabWidget.currentWidget().current_bottom_edit_type.text().replace(',', '.')
+        max_angle_H = self.tabWidget.currentWidget().max_angle_H_edit_type.text()
+        max_angle = self.tabWidget.currentWidget().max_angle_edit_type.text()
+        max_expected_pressure = self.tabWidget.currentWidget().max_expected_pressure_edit_type.text()
+        max_admissible_pressure = self.tabWidget.currentWidget().max_admissible_pressure_edit_type.text()
 
         column_direction_diametr = self.tabWidget.currentWidget().column_direction_diametr_edit.text()
         column_direction_wall_thickness = self.tabWidget.currentWidget().column_direction_wall_thickness_edit.text()
@@ -760,31 +758,31 @@ class DataWindow(QMainWindow):
         column_conductor_lenght = self.tabWidget.currentWidget().column_conductor_lenght_edit.text()
         level_cement_conductor = self.tabWidget.currentWidget().level_cement_conductor_edit.text()
 
-        dict_pump_SHGN_do = str(self.tabWidget.currentWidget().pump_SHGN_do_editType.text())
-        dict_pump_SHGN_h_do = self.tabWidget.currentWidget().pump_SHGN_depth_do_editType.text()
+        dict_pump_SHGN_do = str(self.tabWidget.currentWidget().pump_SHGN_do_edit_type.text())
+        dict_pump_SHGN_h_do = self.tabWidget.currentWidget().pump_SHGN_depth_do_edit_type.text()
 
-        dict_pump_SHGN_posle = str(self.tabWidget.currentWidget().pump_SHGN_posle_editType.text())
-        dict_pump_SHGN_h_posle = str(self.tabWidget.currentWidget().pump_SHGN_depth_posle_editType.text())
+        dict_pump_SHGN_posle = str(self.tabWidget.currentWidget().pump_SHGN_posle_edit_type.text())
+        dict_pump_SHGN_h_posle = str(self.tabWidget.currentWidget().pump_SHGN_depth_posle_edit_type.text())
 
-        dict_pump_ECN_do = str(self.tabWidget.currentWidget().pump_ECN_do_editType.text())
-        dict_pump_ECN_h_do = self.tabWidget.currentWidget().pump_ECN_depth_do_editType.text()
+        dict_pump_ECN_do = str(self.tabWidget.currentWidget().pump_ECN_do_edit_type.text())
+        dict_pump_ECN_h_do = self.tabWidget.currentWidget().pump_ECN_depth_do_edit_type.text()
 
-        dict_pump_ECN_posle = str(self.tabWidget.currentWidget().pump_ECN_posle_editType.text())
-        dict_pump_ECN_h_posle = str(self.tabWidget.currentWidget().pump_ECN_depth_posle_editType.text())
+        dict_pump_ECN_posle = str(self.tabWidget.currentWidget().pump_ECN_posle_edit_type.text())
+        dict_pump_ECN_h_posle = str(self.tabWidget.currentWidget().pump_ECN_depth_posle_edit_type.text())
 
         # print(f'прио {type(dict_pump_h_posle)}')
-        paker_do = str(self.tabWidget.currentWidget().paker_do_editType.text())
-        depth_fond_paker_do = str(self.tabWidget.currentWidget().paker_depth_do_editType.text())
-        paker_posle = self.tabWidget.currentWidget().paker_posle_editType.text()
-        depth_fond_paker_posle = self.tabWidget.currentWidget().paker_depth_posle_editType.text()
+        paker_do = str(self.tabWidget.currentWidget().paker_do_edit_type.text())
+        depth_fond_paker_do = str(self.tabWidget.currentWidget().paker_depth_do_edit_type.text())
+        paker_posle = self.tabWidget.currentWidget().paker_posle_edit_type.text()
+        depth_fond_paker_posle = self.tabWidget.currentWidget().paker_depth_posle_edit_type.text()
 
-        paker2_do = str(self.tabWidget.currentWidget().paker2_do_editType.text())
-        depth_fond_paker2_do = self.tabWidget.currentWidget().paker2_depth_do_editType.text()
-        paker2_posle = self.tabWidget.currentWidget().paker2_posle_editType.text()
-        depth_fond_paker2_posle = self.tabWidget.currentWidget().paker2_depth_posle_editType.text()
+        paker2_do = str(self.tabWidget.currentWidget().paker2_do_edit_type.text())
+        depth_fond_paker2_do = self.tabWidget.currentWidget().paker2_depth_do_edit_type.text()
+        paker2_posle = self.tabWidget.currentWidget().paker2_posle_edit_type.text()
+        depth_fond_paker2_posle = self.tabWidget.currentWidget().paker2_depth_posle_edit_type.text()
 
-        static_level = self.tabWidget.currentWidget().static_level_editType.text()
-        dinamic_level = self.tabWidget.currentWidget().dinamic_level_editType.text()
+        static_level = self.tabWidget.currentWidget().static_level_edit_type.text()
+        dinamic_level = self.tabWidget.currentWidget().dinamic_level_edit_type.text()
         curator = str(self.tabWidget.currentWidget().curator_Combo.currentText())
 
         if curator == 'ОР':
@@ -975,15 +973,15 @@ class DataWindow(QMainWindow):
         else:
             if self.ifNum(Qwater_edit) is False or self.ifNum(Qoil_edit) is False or \
                     self.ifNum(proc_water_edit) is False:
-                msg = QMessageBox.information(self, 'Внимание',
+                QMessageBox.information(self, 'Внимание',
                                               'Не все поля в Ожидаемых показателях соответствуют значениям')
                 close_file = False
         try:
             if float(shoe_column) < 30:
-                mes = QMessageBox.warning(self, 'Ошибка', 'Башмак ЭК слишком короткий')
+                QMessageBox.warning(self, 'Ошибка', 'Башмак ЭК слишком короткий')
                 return
         except Exception as e:
-            mes = QMessageBox.warning(self, 'Ошибка', f'Башмак ЭК не корректен {e}')
+             QMessageBox.warning(self, 'Ошибка', f'Башмак ЭК не корректен {e}')
 
 
 

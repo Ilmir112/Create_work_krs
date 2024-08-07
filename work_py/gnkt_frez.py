@@ -43,7 +43,7 @@ class Work_with_gnkt(QMainWindow):
             self.perforation_correct_window2.show()
             main.MyWindow.pause_app()
             well_data.pause = True
-            self.dict_ports = self.perforation_correct_window2.addRowTable()
+            self.dict_ports = self.perforation_correct_window2.add_row_table()
             self.perforation_correct_window2 = None
 
         else:

@@ -64,12 +64,12 @@ class TabPage_SO_pvr(QWidget):
         self.fluid_edit = QLineEdit(self)
 
         self.labelType = QLabel("Кровля записи", self)
-        self.lineEditType = QLineEdit(self)
-        self.lineEditType.setClearButtonEnabled(True)
+        self.lineedit_type = QLineEdit(self)
+        self.lineedit_type.setClearButtonEnabled(True)
 
         self.labelType2 = QLabel("Подошва записи", self)
-        self.lineEditType2 = QLineEdit(self)
-        self.lineEditType2.setClearButtonEnabled(True)
+        self.lineedit_type2 = QLineEdit(self)
+        self.lineedit_type2.setClearButtonEnabled(True)
 
         self.labelGeores = QLabel("вид исследования", self)
         self.ComboBoxGeophygist = QComboBox(self)
@@ -118,10 +118,10 @@ class TabPage_SO_pvr(QWidget):
         self.grid.addWidget(self.ComboBoxGeophygist, 23, 2)
 
         self.grid.addWidget(self.labelType, 22, 3)
-        self.grid.addWidget(self.lineEditType, 23, 3)
+        self.grid.addWidget(self.lineedit_type, 23, 3)
 
         self.grid.addWidget(self.labelType2, 22, 4)
-        self.grid.addWidget(self.lineEditType2, 23, 4)
+        self.grid.addWidget(self.lineedit_type2, 23, 4)
 
         self.number_brigada_combo.currentTextChanged.connect(self.update_brigade)
 
@@ -130,8 +130,8 @@ class TabPage_SO_pvr(QWidget):
     def geophygist_data(self):
 
         if self.ComboBoxGeophygist.currentText() in ['Гироскоп', 'АКЦ', 'ЭМДС', 'ПТС', 'РК', 'ГК и ЛМ']:
-            self.lineEditType.setText('0')
-            self.lineEditType2.setText(f'{well_data.current_bottom}')
+            self.lineedit_type.setText('0')
+            self.lineedit_type2.setText(f'{well_data.current_bottom}')
 
 class TabWidget(QTabWidget):
     def __init__(self):
@@ -159,7 +159,7 @@ class GisApplication(QMainWindow):
         self.tableWidget.setAlternatingRowColors(True)
 
         self.buttonAdd = QPushButton('Добавить исследования в таблицу')
-        self.buttonAdd.clicked.connect(self.addRowTable)
+        self.buttonAdd.clicked.connect(self.add_row_table)
         self.buttonDel = QPushButton('Удалить интервалы перфорации в таблице')
         self.buttonDel.clicked.connect(self.del_row_table)
         self.buttonadd_work = QPushButton('Создать заявку')
@@ -180,7 +180,7 @@ class GisApplication(QMainWindow):
     def addPerfProject(self):
 
         if len(well_data.gis_list) == 0:
-            mes = QMessageBox.warning(self, 'Ошибка', 'Исследования в плане работ не найдены')
+             QMessageBox.warning(self, 'Ошибка', 'Исследования в плане работ не найдены')
             return
 
         for pvr in well_data.gis_list:
@@ -199,17 +199,17 @@ class GisApplication(QMainWindow):
     def geophysicalSelect(self, geophysic):
         return geophysic
 
-    def addRowTable(self):
+    def add_row_table(self):
 
-        editType = self.tabWidget.currentWidget().lineEditType.text().replace(',', '.')
-        editType2 = self.tabWidget.currentWidget().lineEditType2.text().replace(',', '.')
+        edit_type = self.tabWidget.currentWidget().lineedit_type.text().replace(',', '.')
+        edit_type2 = self.tabWidget.currentWidget().lineedit_type2.text().replace(',', '.')
         researchGis = self.tabWidget.currentWidget().ComboBoxGeophygist.currentText()
 
 
-        if not editType or not editType2 or not researchGis:
+        if not edit_type or not edit_type2 or not researchGis:
             msg = QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
             return
-        if well_data.current_bottom < float(editType2):
+        if well_data.current_bottom < float(edit_type2):
             msg = QMessageBox.information(self, 'Внимание', 'глубина исследований ниже текущего забоя')
             return
 
@@ -218,8 +218,8 @@ class GisApplication(QMainWindow):
         self.tableWidget.insertRow(rows)
 
         self.tableWidget.setItem(rows, 0, QTableWidgetItem(researchGis))
-        self.tableWidget.setItem(rows, 1, QTableWidgetItem(editType))
-        self.tableWidget.setItem(rows, 2, QTableWidgetItem(editType2))
+        self.tableWidget.setItem(rows, 1, QTableWidgetItem(edit_type))
+        self.tableWidget.setItem(rows, 2, QTableWidgetItem(edit_type2))
 
         self.tableWidget.setSortingEnabled(True)
 

@@ -1,14 +1,13 @@
 from PyQt5 import QtWidgets
 
 from PyQt5.Qt import QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, \
-    QInputDialog, QTabWidget, QPushButton, Qt, QCheckBox
+    QInputDialog, QTabWidget, QPushButton
 from PyQt5.QtCore import QEvent, Qt
-from PyQt5.QtGui import QPalette, QFontMetrics, QStandardItem, QIntValidator
-from PyQt5.QtWidgets import QVBoxLayout, QStyledItemDelegate, qApp, QMessageBox, QCompleter, QTableWidget, QHeaderView, \
+from PyQt5.QtGui import QPalette, QStandardItem, QIntValidator
+from PyQt5.QtWidgets import QVBoxLayout, QStyledItemDelegate, qApp, QMessageBox, QCompleter, QTableWidget, \
     QTableWidgetItem, QMainWindow
 
 import well_data
-from perforation_correct import FloatLineEdit
 
 from work_py.alone_oreration import volume_vn_nkt, well_volume, kot_work
 from main import MyWindow
@@ -104,10 +103,6 @@ class CheckableComboBoxChild(QComboBox):
                 well_data.texts.append(self.model().item(i).text())
 
         text = ", ".join(well_data.texts)
-
-        # # Compute elided text (with "...")
-        # metrics = QFontMetrics(self.lineEdit().font())
-        # elidedText = metrics.elidedText(text, Qt.ElideRight, self.lineEdit().width())
 
         self.lineEdit().setText(text)
 
@@ -494,7 +489,7 @@ class TabPage_SO_acid(QWidget):
             if paker_depth != '':
                 paker_depth = float(paker_depth)
                 for plast in well_data.dict_perforation:
-                    if any(abs(paker_depth- roof) < 10 or abs(paker_depth - sole) < 10
+                    if any(abs(paker_depth - roof) < 10 or abs(paker_depth - sole) < 10
                            for roof, sole in well_data.dict_perforation[plast]['интервал']):
                         self.need_privyazka_QCombo.setCurrentIndex(1)
 
@@ -1005,7 +1000,6 @@ class AcidPakerWindow(QMainWindow):
                 QMessageBox.warning(self, 'Ошибка', f'Ошибка сохранения данных {e}')
                 return
 
-
             if self.paker_layout_combo == 'однопакерная' or self.paker_layout_combo == 'пакер с заглушкой':
                 if MyWindow.true_set_Paker(self, paker_depth_swab) is False:
                     return
@@ -1456,7 +1450,7 @@ class AcidPakerWindow(QMainWindow):
             [f'СКВ {skv_acid_edit} {skv_proc_edit}%', None,
              f'Произвести установку СКВ {skv_acid_edit} {skv_proc_edit}% концентрации '
              f'в объеме'
-             f' {skv_volume_edit}м3 ({round(skv_volume_edit*1.12/24, 1)}т HCL 24%) (по спец. плану, составляет старший мастер)',
+             f' {skv_volume_edit}м3 ({round(skv_volume_edit * 1.12 / 24, 1)}т HCL 24%) (по спец. плану, составляет старший мастер)',
              None, None, None, None, None, None, None,
              'мастер КРС, УСРСиСТ', 0.5],
             [None, None,

@@ -62,7 +62,7 @@ class LeakageWindow(QMainWindow):
         self.tableWidget.setAlternatingRowColors(True)
 
         self.buttonAdd = QPushButton('Добавить записи в таблицу')
-        self.buttonAdd.clicked.connect(self.addRowTable)
+        self.buttonAdd.clicked.connect(self.add_row_table)
         self.buttonDel = QPushButton('Удалить записи из таблице')
         self.buttonDel.clicked.connect(self.del_row_table)
         self.buttonadd_work = QPushButton('Добавить в план работ')
@@ -96,7 +96,7 @@ class LeakageWindow(QMainWindow):
                 self.tableWidget.sortItems(0)
 
 
-    def addRowTable(self):
+    def add_row_table(self):
 
         roof_leakage = self.tabWidget.currentWidget().roof_leakage_line.text().replace(',', '.')
         sole_leakage_line = self.tabWidget.currentWidget().sole_leakage_line.text().replace(',', '.')

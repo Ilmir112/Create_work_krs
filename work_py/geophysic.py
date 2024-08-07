@@ -10,12 +10,12 @@ class TabPage_SO(QWidget):
         super().__init__(parent)
 
         self.labelType = QLabel("Кровля записи", self)
-        self.lineEditType = QLineEdit(self)
-        self.lineEditType.setClearButtonEnabled(True)
+        self.lineedit_type = QLineEdit(self)
+        self.lineedit_type.setClearButtonEnabled(True)
 
         self.labelType2 = QLabel("Подошва записи", self)
-        self.lineEditType2 = QLineEdit(self)
-        self.lineEditType2.setClearButtonEnabled(True)
+        self.lineedit_type2 = QLineEdit(self)
+        self.lineedit_type2.setClearButtonEnabled(True)
 
         self.labelGeores = QLabel("вид исследования", self)
         self.ComboBoxGeophygist = QComboBox(self)
@@ -34,15 +34,15 @@ class TabPage_SO(QWidget):
         grid.addWidget(self.labelDopInformation, 0, 3)
 
         grid.addWidget(self.ComboBoxGeophygist, 1, 0)
-        grid.addWidget(self.lineEditType, 1, 1)
-        grid.addWidget(self.lineEditType2, 1, 2)
+        grid.addWidget(self.lineedit_type, 1, 1)
+        grid.addWidget(self.lineedit_type2, 1, 2)
         grid.addWidget(self.lineEditDopInformation, 1, 3)
 
     def geophygist_data(self):
 
         if self.ComboBoxGeophygist.currentText() in ['Гироскоп', 'АКЦ', 'ЭМДС', 'ПТС', 'РК', 'ГК и ЛМ']:
-            self.lineEditType.setText('0')
-            self.lineEditType2.setText(f'{well_data.current_bottom}')
+            self.lineedit_type.setText('0')
+            self.lineedit_type2.setText(f'{well_data.current_bottom}')
 
 
 
@@ -71,7 +71,7 @@ class GeophysicWindow(MyWindow):
         self.tableWidget.setAlternatingRowColors(True)
 
         self.buttonAdd = QPushButton('Добавить записи в таблицу')
-        self.buttonAdd.clicked.connect(self.addRowTable)
+        self.buttonAdd.clicked.connect(self.add_row_table)
         self.buttonDel = QPushButton('Удалить записи из таблице')
         self.buttonDel.clicked.connect(self.del_row_table)
         self.buttonadd_work = QPushButton('Добавить в план работ')
@@ -87,18 +87,18 @@ class GeophysicWindow(MyWindow):
 
         return geophysic
 
-    def addRowTable(self):
+    def add_row_table(self):
 
 
-        editType = self.tabWidget.currentWidget().lineEditType.text().replace(',', '.')
-        editType2 = self.tabWidget.currentWidget().lineEditType2.text().replace(',', '.')
+        edit_type = self.tabWidget.currentWidget().lineedit_type.text().replace(',', '.')
+        edit_type2 = self.tabWidget.currentWidget().lineedit_type2.text().replace(',', '.')
         researchGis = self.geophysicalSelect(str(self.tabWidget.currentWidget().ComboBoxGeophygist.currentText()))
 
         dopInformation = self.tabWidget.currentWidget().lineEditDopInformation.text()
-        if not editType or not editType2 or not researchGis:
+        if not edit_type or not edit_type2 or not researchGis:
             msg = QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
             return
-        if well_data.current_bottom < float(editType2):
+        if well_data.current_bottom < float(edit_type2):
             msg = QMessageBox.information(self, 'Внимание', 'глубина исследований ниже текущего забоя')
             return
 
@@ -107,53 +107,53 @@ class GeophysicWindow(MyWindow):
         self.tableWidget.insertRow(rows)
 
         self.tableWidget.setItem(rows, 0, QTableWidgetItem(researchGis))
-        self.tableWidget.setItem(rows, 1, QTableWidgetItem(editType))
-        self.tableWidget.setItem(rows, 2, QTableWidgetItem(editType2))
+        self.tableWidget.setItem(rows, 1, QTableWidgetItem(edit_type))
+        self.tableWidget.setItem(rows, 2, QTableWidgetItem(edit_type2))
         self.tableWidget.setItem(rows, 3, QTableWidgetItem(dopInformation))
         self.tableWidget.setSortingEnabled(True)
-    def geophysic_sel(self, geophysic, editType, editType2):
+    def geophysic_sel(self, geophysic, edit_type, edit_type2):
 
         if geophysic == 'АКЦ':
             research = f'ЗАДАЧА 2.7.1 Определение состояния цементного камня (АКЦ, АК сканирование) в ' \
-                       f'интервале {editType}-{editType2}м. '
-            research_short = f'АКЦ в интервале {editType}-{editType2}м.'
+                       f'интервале {edit_type}-{edit_type2}м. '
+            research_short = f'АКЦ в интервале {edit_type}-{edit_type2}м.'
         elif geophysic == 'СГДТ':
             research = f'ЗАДАЧА 2.7.2 Определение плотности, дефектов цементного камня, эксцентриситета колонны ' \
-                       f'(СГДТ) в интервале {editType}-{editType2}м.'
-            research_short = f'СГДТ в интервале {editType}-{editType2}м.'
+                       f'(СГДТ) в интервале {edit_type}-{edit_type2}м.'
+            research_short = f'СГДТ в интервале {edit_type}-{edit_type2}м.'
         elif geophysic == 'АКЦ + СГДТ':
             research = f'ЗАДАЧА 2.7.3  Определение состояния цементного камня (АКЦ, АК сканирование). в интервале ' \
-                       f'{editType}-{editType2}м,' \
+                       f'{edit_type}-{edit_type2}м,' \
                        f'Определение плотности, дефектов цементного камня, эксцентриситета колонны (СГДТ) в ' \
                        f'интервале 0 - {well_data.perforation_roof - 20} '
-            research_short = f'АКЦ в интервале {editType}-{editType2}м.' \
+            research_short = f'АКЦ в интервале {edit_type}-{edit_type2}м.' \
                              f'СГДТ в интервале 0 - {well_data.perforation_roof - 20}'
 
         elif geophysic == 'ИНГК':
             research = f'ЗАДАЧА 2.4.3 Определение текущей нефтенасыщенности по данным интегрального импульсного ' \
                        f'нейтронного' \
-                       f'каротажа пласта  в интервале {editType}-{editType2}м. '
-            research_short = f'ИНГК в интервале {editType}-{editType2}м.'
+                       f'каротажа пласта  в интервале {edit_type}-{edit_type2}м. '
+            research_short = f'ИНГК в интервале {edit_type}-{edit_type2}м.'
 
         elif geophysic == 'Гироскоп':
             research = f'ЗАДАЧА 2.7.4. Определение траектории ствола скважины гироскопическим инклинометром ' \
-                       f'в интервале {editType}-{editType2}м. '
-            research_short = f'Гироскоп в интервале {editType}-{editType2}м.'
+                       f'в интервале {edit_type}-{edit_type2}м. '
+            research_short = f'Гироскоп в интервале {edit_type}-{edit_type2}м.'
         elif geophysic == 'РК':
-            research = f'ЗАДАЧА 2.4.1 РК в интервале {editType}-{editType2}м. '
-            research_short = f'РК в интервале {editType}-{editType2}м.'
+            research = f'ЗАДАЧА 2.4.1 РК в интервале {edit_type}-{edit_type2}м. '
+            research_short = f'РК в интервале {edit_type}-{edit_type2}м.'
         elif geophysic == 'ЭМДС':
             research = f' ЗАДАЧА 2.6.11. Определение интервалов дефектов и толщины колонн и НКТ с ' \
                        f'использованием электромагнитной дефектоскопии  и толщинометрии в ' \
-                       f'интервале {editType}-{editType2}м.'
-            research_short = f'ЭМДС в интервале {editType}-{editType2}м.'
+                       f'интервале {edit_type}-{edit_type2}м.'
+            research_short = f'ЭМДС в интервале {edit_type}-{edit_type2}м.'
         elif geophysic == 'ПТС':
-            research = f'ЗАДАЧА 2.6.10 Профилимер в интервале {editType}-{editType2}м.'
-            research_short = f'ПТС в интервале {editType}-{editType2}м.'
+            research = f'ЗАДАЧА 2.6.10 Профилимер в интервале {edit_type}-{edit_type2}м.'
+            research_short = f'ПТС в интервале {edit_type}-{edit_type2}м.'
 
         elif geophysic == 'ГК и ЛМ':
-            research = f'Произвести записи ГК и ЛМ интервале {editType}-{editType2}м. '
-            research_short = f'ГК и ЛМ в интервале {editType}-{editType2}м.'
+            research = f'Произвести записи ГК и ЛМ интервале {edit_type}-{edit_type2}м. '
+            research_short = f'ГК и ЛМ в интервале {edit_type}-{edit_type2}м.'
 
         return research, research_short
 
