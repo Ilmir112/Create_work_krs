@@ -972,12 +972,11 @@ class MyWindow(QMainWindow):
 
             count_row_height(self.ws, ws2, work_list, merged_cells_dict, ins_ind)
 
-            # print(f'3 - {ws2.max_row}')
             well_data.itog_ind_min = ins_ind
             well_data.itog_ind_max = len(work_list)
             # print(f' длина {len(work_list)}')
             CreatePZ.add_itog(self, ws2, self.table_widget.rowCount() + 1, self.work_plan)
-            # print(f'45- {ws2.max_row}')
+
             # try:
             for row_ind, row in enumerate(ws2.iter_rows(values_only=True)):
                 if 15 < row_ind < 100:
@@ -1020,8 +1019,6 @@ class MyWindow(QMainWindow):
             )
 
             if self.work_plan not in ['dop_plan', 'dop_plan_in_base']:
-
-
                 try:
                     cat_h2s_list = well_data.dict_category[well_data.plast_work_short[0]]['по сероводороду'].category
                     h2s_mg = well_data.dict_category[well_data.plast_work_short[0]]['по сероводороду'].data_mg_l
@@ -2241,8 +2238,6 @@ class MyWindow(QMainWindow):
             for cell in row:
                 border_styles[(cell.row, cell.column)] = cell.border
 
-
-
         table_widget.setColumnCount(count_col)
         rowHeights_exit = [sheet.row_dimensions[i + 1].height if sheet.row_dimensions[i + 1].height is not None else 18
                            for i in range(sheet.max_row)]
@@ -2529,9 +2524,9 @@ class MyWindow(QMainWindow):
                 check_true = True
 
         if check_true is False:
-            paker_warning = QMessageBox.warning(None, 'Проверка посадки пакера в интервал перфорации',
-                                                f'Проверка посадки показала пакер сажается в интервал перфорации, '
-                                                f'необходимо изменить глубину посадки!!!')
+            QMessageBox.warning(None, 'Проверка посадки пакера в интервал перфорации',
+                                    f'Проверка посадки показала пакер сажается в интервал перфорации, '
+                                    f'необходимо изменить глубину посадки!!!')
 
         return check_true
 
@@ -2555,43 +2550,12 @@ class MyWindow(QMainWindow):
                 check_true = True
                 return int(depth)
         if check_true is False:
-            false_question = QMessageBox.question(None, 'Проверка посадки пакера в интервал скреперования',
+            false_question = QMessageBox.warning(None, 'Проверка посадки пакера в интервал скреперования',
                                                   f'Проверка посадки показала, что пакер сажается не '
-                                                  f'в интервал скреперования {well_data.skm_interval}, '
-                                                  f'Проигнорировать ошибку?')
-            if false_question == QMessageBox.StandardButton.Yes:
-                return True
-            else:
-                kroly_skm = depth - 20
-                pod_skm = depth + 20
-                skm = (kroly_skm, pod_skm)
-                perforating_intervals = []
+                                                  f'в интервал скреперования {well_data.skm_interval}, \n'
+                                                  f'Нужно скорректировать интервалы скреперования ')
+            return False
 
-                skm_question = QMessageBox.question(None, 'Скреперование',
-                                                    f'добавить интервал скреперования {skm}')
-                if skm_question == QMessageBox.StandardButton.Yes:
-                    well_data.skm_interval.append(skm)
-                    well_data.skm_interval = sorted(well_data.skm_interval, key=lambda x: x[0])
-                    raid_str = raid(remove_overlapping_intervals(perforating_intervals, well_data.skm_interval))
-
-                    for row in range(self.table_widget.rowCount()):
-                        for column in range(self.table_widget.columnCount()):
-                            if column != 0:
-                                value = self.table_widget.item(row, column)
-                                if value != None:
-                                    value = value.text()
-                                    if 'Произвести скреперование э/к' in value:
-
-                                        ind_value = value.split(' ')
-                                        ind_min = ind_value.index('интервале') + 1
-                                        ind_max = ind_value.index('обратной')
-                                        new_value = QtWidgets.QTableWidgetItem(f'{" ".join(ind_value[:ind_min])} '
-                                                                               f'{raid_str}м {" ".join(ind_value[ind_max:])}')
-
-                                        self.table_widget.setItem(row, column, new_value)
-                    return True
-                else:
-                    return False
     @staticmethod
     def delete_files():
         zip_path = os.path.dirname(os.path.abspath(__file__)) + '/ZIMA.zip'

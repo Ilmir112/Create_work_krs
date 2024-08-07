@@ -231,8 +231,6 @@ class TabPageDp(QWidget):
                                        "AND contractor = ? AND costumer = ?",
                                        (str(well_number), well_area, well_data.contractor, well_data.costumer))
 
-
-
                     except sqlite3.Error as e:
                         # Выведите сообщение об ошибке
                         mes = QMessageBox.warning(None, 'Ошибка',
@@ -622,6 +620,7 @@ class DopPlanWindow(QMainWindow):
                 if all([col == None or col == '' for col in list_row]) is False:
                     perforation_list.append(list_row)
         well_data.ins_ind2 = well_data.data_x_max._value
+
         if well_data.work_plan != 'plan_change':
             self.tableWidget.setSortingEnabled(False)
             rows = self.tableWidget.rowCount()

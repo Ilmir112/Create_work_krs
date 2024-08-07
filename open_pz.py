@@ -402,32 +402,36 @@ class CreatePZ(QMainWindow):
                     except:
                         pass
 
-        ws.delete_rows(ins_ind, self.table_widget.rowCount() - ins_ind + 1)
+        itog_list = itog_1()
+        aasd = len(itog_1()) + ins_ind, ins_ind
         if work_plan not in ['gnkt_frez', 'application_pvr', 'gnkt_after_grp', 'gnkt_opz', 'gnkt_bopz']:
-            for i in range(ins_ind, len(itog_1()) + ins_ind):  # Добавлением итогов
+            for i in range(ins_ind, len(itog_list) + ins_ind):  # Добавлением итогов
                 if i < ins_ind + 6:
 
                     for j in range(1, 13):
-                        ws.cell(row=i, column=j).value = itog_1()[i - ins_ind][j - 1]
+                        ws.cell(row=i, column=j).value = itog_list[i - ins_ind][j - 1]
                         if j != 1:
                             ws.cell(row=i, column=j).border = well_data.thin_border
                             ws.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=False)
+                    aaawqaad = ws.max_row
                     ws.merge_cells(start_row=i, start_column=2, end_row=i, end_column=11)
                     ws.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='left',
                                                                    vertical='center')
                 else:
+                    ws.row_dimensions[i].height = 50
                     for j in range(1, 13):
-                        ws.row_dimensions[i].height = 50
 
-                        ws.cell(row=i, column=j).value = itog_1()[i - ins_ind][j - 1]
+                        ws.cell(row=i, column=j).value = itog_list[i - ins_ind][j - 1]
                         ws.cell(row=i, column=j).border = well_data.thin_border
                         ws.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=False)
                         ws.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='left',
                                                                        vertical='center')
+                    aaawqaadad = ws.max_row
 
                     ws.merge_cells(start_row=i, start_column=2, end_row=i, end_column=12)
-                    ws.cell(row=i + ins_ind, column=2).alignment = Alignment(wrap_text=True, horizontal='left',
+                    ws.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='left',
                                                                              vertical='center')
+                    aaawqaad2= ws.max_row
 
             ins_ind += len(itog_1()) + 2
 
@@ -435,20 +439,28 @@ class CreatePZ(QMainWindow):
         # print(f'куратор {curator_sel, well_data.curator}')
         podp_down = pop_down(self, well_data.region, curator_s)
 
-        for i in range(1 + ins_ind, 1 + ins_ind + len(podp_down)):  # Добавлением подписантов внизу
+        for i in range(1 + ins_ind, 1 + ins_ind + len(podp_down)):
+
+            # Добавлением подписантов внизу
             for j in range(1, 13):
                 ws.cell(row=i, column=j).value = podp_down[i - 1 - ins_ind][j - 1]
                 ws.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=False)
-            if i in [1 + ins_ind + 7, 1 + ins_ind + 8, 1 + ins_ind + 9,
-                     1 + ins_ind + 10, 1 + ins_ind + 11,
-                     1 + ins_ind + 12, 1 + ins_ind + 13, 1 + ins_ind + 14]:
-                ws.merge_cells(start_row=i, start_column=2, end_row=i, end_column=6)
-                ws.cell(row=i, column=2).alignment = Alignment(wrap_text=False, vertical='bottom', horizontal='left')
-                ws.row_dimensions[i - 1].height = 30
 
-                if i == 1 + ins_ind + 11:
-                    ws.row_dimensions[i].height = 55
+            if i in range(1 + ins_ind + 7, 1 + ins_ind + 14):
+                ws.merge_cells(start_row=i, start_column=2, end_row=i, end_column=6)
+                # ws.cell(row=i, column=2).alignment = Alignment(wrap_text=False, vertical='bottom', horizontal='left')
+                # ws.row_dimensions[i - 1].height = 30
+
+                # if i == 1 + ins_ind + 11:
+                #     ws.row_dimensions[i].height = 55
+            aaawqwii = ws.max_row
         ins_ind += len(podp_down)
+        aaa = ws.max_row
+        # Удалить строки ниже ins_ind (включительно)
+
+        ws.delete_rows(ins_ind, aaa - ins_ind)
+
+        aaaa = ws.max_row
 
     def is_valid_date(date):
         try:

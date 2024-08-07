@@ -393,22 +393,22 @@ class Raid(MyWindow):
              None, None, None, None, None, None, None,
              'мастер КРС, предст. заказчика', well_volume_norm(TemplateKrs.well_volume(self))],
             [None, None,
-             f'Поднять  {ryber_str} на НКТ{nkt_diam}м с глубины {current_str}м с доливом скважины в '
+             f'Поднять {ryber_str} на НКТ{nkt_diam}м с глубины {current_str}м с доливом скважины в '
              f'объеме {round(well_data.current_bottom * 1.12 / 1000, 1)}м3 тех. жидкостью  уд.весом {well_data.fluid_work}',
              None, None, None, None, None, None, None,
              'мастер КРС', liftingNKT_norm(current_str, 1.2)]]
 
         # print(f' после отрайбирования {[well_data.dict_perforation[plast]["отрайбировано"] for plast in well_data.plast_work]}')
-        if len(well_data.plast_work) == 0:
-            acid_true_quest = QMessageBox.question(self, 'Необходимость смены объема',
-                                                   'Нужно ли изменять удельный вес?')
-            try:
-                if acid_true_quest == QMessageBox.StandardButton.Yes:
-                    for row in fluid_change(self):
-                        ryber_list.insert(-1, row)
-            except Exception as e:
-
-                mes = QMessageBox.warning(self, 'ОШИБКА', f'Смена объема вставить не получитлось {e}')
+        # if len(well_data.plast_work) == 0:
+        #     acid_true_quest = QMessageBox.question(self, 'Необходимость смены объема',
+        #                                            'Нужно ли изменять удельный вес?')
+        #     try:
+        #         if acid_true_quest == QMessageBox.StandardButton.Yes:
+        #             for row in fluid_change(self):
+        #                 ryber_list.insert(-1, row)
+        #     except Exception as e:
+        #
+        #         mes = QMessageBox.warning(self, 'ОШИБКА', f'Смена объема вставить не получитлось {e}')
 
 
         return ryber_list

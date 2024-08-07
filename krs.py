@@ -189,16 +189,18 @@ class GnoWindow(QMainWindow):
 
     def add_work(self):
         from main import MyWindow
+        from work_py.advanted_file import definition_plast_work
         try:
             self.surfactant_hydrofabizer_Combo =  self.tabWidget.currentWidget().surfactant_hydrofabizer_Combo.currentText()
             lift_key = self.tabWidget.currentWidget().gno_combo.currentText()
-            current_bottom = round(float(self.tabWidget.currentWidget().current_bottom_edit.text()), 1)
+            current_bottom = round(float(self.tabWidget.currentWidget().current_bottom_edit.text().replace(',', '.')), 1)
             fluid = self.tabWidget.currentWidget().fluid_edit.text()
             volume_well_jaming = round(
                 float(self.tabWidget.currentWidget().volume_jumping_edit.text().replace(',', '.')), 1)
 
             well_data.fluid_work, well_data.fluid_work_short = self.calc_work_fluid(fluid)
             well_data.current_bottom = current_bottom
+            definition_plast_work(self)
             work_list = self.work_krs(self.work_plan, lift_key, volume_well_jaming, fluid)
             if lift_key == 'ЭЦН с автономными пакерами':
                 current_bottom_ecn_edit = round(float(self.tabWidget.currentWidget().current_bottom_ecn_edit.text()), 1)
@@ -1458,6 +1460,7 @@ class GnoWindow(QMainWindow):
                 konte_list = konte(self)
             else:
                 konte_list = []
+
             return krs_begin + lift_select + posle_lift + konte_list
         else:
             krs_begin = [

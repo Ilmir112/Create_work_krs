@@ -245,7 +245,7 @@ def calv_h2s(self, cat_H2S, h2s_mg, h2s_pr):
             v_pod_gno = 3.14 * (
                         well_data.column_additional_diametr._value - well_data.column_additional_wall_thickness._value * 2) ** 2 / 4 / 1000 * (
                                     well_data.bottomhole_artificial._value - nkt_l) / 1000
-
+        udel_vodoiz_nkt = 0
         volume_well = well_volume(self)
         try:
             if '73' in list(well_data.dict_nkt.keys())[0]:
@@ -279,8 +279,10 @@ def calv_h2s(self, cat_H2S, h2s_mg, h2s_pr):
         except:
             udel_vodoiz_nkt = udel_vodoiz_nkt
             # print(f'dnjhfzНКТ {udel_vodoiz_nkt}')
-
-        nkt_1_l = well_data.dict_nkt[list(well_data.dict_nkt.keys())[0]]
+        try:
+            nkt_1_l = well_data.dict_nkt[list(well_data.dict_nkt.keys())[0]]
+        except:
+            nkt_1_l = 73
         vodoiz_nkt = nkt_1_l * udel_vodoiz_nkt / 1000
         try:
             vodoiz_nkt += nkt_2_l * udel_vodoiz_nkt_2 / 1000
@@ -305,12 +307,16 @@ def calv_h2s(self, cat_H2S, h2s_mg, h2s_pr):
 
         oil_mass = float(v_pod_gno * (100 - well_data.proc_water) * 0.9 / 100)
         # print(f'oil {oil_mass}-{type(oil_mass)} , {well_data.gaz_f_pr[0]}-{type(well_data.gaz_f_pr[0])}')
-        volume_h2s = well_data.gaz_f_pr[0] * oil_mass * (float(h2s_pr)) / 100
+        try:
+            volume_h2s = well_data.gaz_f_pr[0] * oil_mass * (float(h2s_pr)) / 100
+        except:
+            well_data.gaz_f_pr = [11]
+            volume_h2s = well_data.gaz_f_pr[0] * oil_mass * (float(h2s_pr)) / 100
 
         h2s_mass_in_oil = (34 * volume_h2s * 1000 / 22.14)
         # print(type(vodoiz_sucker), type(vodoiz_nkt), h2s_mg, float(h2s_mg))
         h2s_mass_in_water = float(vodoiz_sucker + vodoiz_nkt) * h2s_mg
-        # print(f'h2a{h2s_mass_in_water}')
+        # print(f'h2a{h2s_mass_in_water}')2
         mass_oil_pog_gno = (vodoiz_sucker + vodoiz_nkt) * (100 - well_data.proc_water) * 0.9 / 100
         h2s_volume_pod_gno = mass_oil_pog_gno * well_data.gaz_f_pr[0] * h2s_pr / 100
         mass_h2s_gas = 34 * h2s_volume_pod_gno / 22.14

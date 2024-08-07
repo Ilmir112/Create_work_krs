@@ -11,7 +11,7 @@ from H2S import calv_h2s
 
 from work_py.alone_oreration import well_volume
 from main import MyWindow
-from work_py.change_fluid import TabPage_SO_swab, Change_fluid_Window
+from work_py.change_fluid import Change_fluid_Window
 
 from work_py.alone_oreration import privyazkaNKT, need_h2s
 from work_py.template_work import TabPage_SO_with
@@ -151,11 +151,8 @@ class TabPage_SO_swab(QWidget):
         self.paker2Edit.textChanged.connect(self.update_paker_edit)
         self.pakerEdit.textChanged.connect(self.update_paker_diametr)
         self.need_change_zgs_combo.currentTextChanged.connect(self.update_change_fluid)
-
-
     def update_change_fluid(self, index):
         if index == 'Да':
-
             cat_h2s_list_plan = list(
                 map(int, [well_data.dict_category[plast]['по сероводороду'].category for plast in
                           well_data.plast_project if well_data.dict_category.get(plast) and
@@ -229,33 +226,36 @@ class TabPage_SO_swab(QWidget):
             self.grid.addWidget(self.pressuar_new_label, 9, 4)
             self.grid.addWidget(self.pressuar_new_edit, 10, 4)
         else:
-            self.category_pressuar_Label.setParent(None)
-            self.category_pressuar_line_combo.setParent(None)
+            try:
+                self.category_pressuar_Label.setParent(None)
+                self.category_pressuar_line_combo.setParent(None)
 
-            self.category_h2s_Label.setParent(None)
-            self.category_h2s_edit.setParent(None)
+                self.category_h2s_Label.setParent(None)
+                self.category_h2s_edit.setParent(None)
 
-            self.h2s_pr_label.setParent(None)
-            self.h2s_pr_edit.setParent(None)
+                self.h2s_pr_label.setParent(None)
+                self.h2s_pr_edit.setParent(None)
 
-            self.h2s_mg_label.setParent(None)
-            self.h2s_mg_edit.setParent(None)
+                self.h2s_mg_label.setParent(None)
+                self.h2s_mg_edit.setParent(None)
 
-            self.category_gf_Label.setParent(None)
-            self.category_gf.setParent(None)
-            self.calc_plast_h2s.setParent(None)
+                self.category_gf_Label.setParent(None)
+                self.category_gf.setParent(None)
+                self.calc_plast_h2s.setParent(None)
 
-            self.gf_label.setParent(None)
-            self.gf_edit.setParent(None)
+                self.gf_label.setParent(None)
+                self.gf_edit.setParent(None)
 
-            self.calc_h2s_Label.setParent(None)
+                self.calc_h2s_Label.setParent(None)
 
-            self.plast_new_label.setParent(None)
-            self.plast_new_combo.setParent(None)
-            self.fluid_new_label.setParent(None)
-            self.fluid_new_edit.setParent(None)
-            self.pressuar_new_label.setParent(None)
-            self.pressuar_new_edit.setParent(None)
+                self.plast_new_label.setParent(None)
+                self.plast_new_combo.setParent(None)
+                self.fluid_new_label.setParent(None)
+                self.fluid_new_edit.setParent(None)
+                self.pressuar_new_label.setParent(None)
+                self.pressuar_new_edit.setParent(None)
+            except:
+                pass
 
     def update_calculate_h2s(self):
         if self.category_h2s_edit.currentText() in ['3', 3]:
@@ -267,38 +267,7 @@ class TabPage_SO_swab(QWidget):
                                                         float(self.h2s_pr_edit.text().replace(',', '.')))))
 
 
-        if self.h2s_pr_edit.text() != '' and self.h2s_mg_edit.text() != ''\
-            and self.gf_edit.text() != '' and self.calc_plast_h2s.text() != '':
-            Pressuar = namedtuple("Pressuar", "category data_pressuar")
-            Data_h2s = namedtuple("Data_h2s", "category data_procent data_mg_l poglot")
-            Data_gaz = namedtuple("Data_gaz", "category data")
-            if len(well_data.plast_project) != 0:
-                plast_new = self.plast_new_combo.currentText()
-            else:
-                plast_new = self.plast_new_combo.text()
 
-            well_data.dict_category.setdefault(plast_new, {}).setdefault(
-                'по давлению',
-                Pressuar(int(float(self.category_pressuar_line_combo.currentText())),
-                         float(self.pressuar_new_edit.text())))
-
-            well_data.dict_category.setdefault(plast_new, {}).setdefault(
-                'по сероводороду', Data_h2s(
-                    int(float(self.category_h2s_edit.currentText())),
-                    float(self.h2s_pr_edit.text().replace(',', '.')),
-                    float(self.h2s_mg_edit.text().replace(',', '.')),
-                    float(self.calc_plast_h2s.text().replace(',', '.'))))
-
-            well_data.dict_category.setdefault(plast_new, {}).setdefault(
-                'по газовому фактору', Data_gaz(
-                    int(self.category_gf.currentText()),
-                    float(self.gf_edit.text().replace(',', '.'))))
-
-            well_data.dict_category.setdefault(plast_new, {}).setdefault(
-                'отключение', 'планируемый')
-
-
-        print(f' категория {well_data.dict_category}')
 
 
 
@@ -722,12 +691,54 @@ class Swab_Window(QMainWindow):
 
                 if pressuar_new_edit != '':
                     pressuar_new_edit = int(float(pressuar_new_edit.replace(',', '.')))
+                h2s_pr_edit = self.tabWidget.currentWidget().h2s_pr_edit.text()
+                h2s_mg_edit = self.tabWidget.currentWidget().h2s_mg_edit.text()
+                gf_edit = self.tabWidget.currentWidget().gf_edit.text()
+                calc_plast_h2s = self.tabWidget.currentWidget().calc_plast_h2s.text()
+                if h2s_pr_edit != '' and h2s_mg_edit and gf_edit != '' and calc_plast_h2s != '' and pressuar_new_edit != '':
+
+                    asdwd = well_data.dict_category
+
+                    Pressuar = namedtuple("Pressuar", "category data_pressuar")
+                    Data_h2s = namedtuple("Data_h2s", "category data_procent data_mg_l poglot")
+                    Data_gaz = namedtuple("Data_gaz", "category data")
+
+                    category_pressuar_line_combo = self.tabWidget.currentWidget().category_pressuar_line_combo.currentText()
+                    category_h2s_edit = self.tabWidget.currentWidget().category_h2s_edit.currentText()
+                    h2s_pr_edit = self.tabWidget.currentWidget().h2s_pr_edit.text()
+                    h2s_mg_edit = self.tabWidget.currentWidget().h2s_mg_edit.text()
+                    calc_plast_h2s = self.tabWidget.currentWidget().calc_plast_h2s.text()
+                    category_gf = self.tabWidget.currentWidget().category_gf.currentText()
+                    gf_edit = self.tabWidget.currentWidget().gf_edit.text().replace(',', '.')
+
+                    well_data.dict_category.setdefault(plast_new_combo, {}).setdefault(
+                        'по давлению',
+                        Pressuar(int(float(category_pressuar_line_combo)),
+                                 float(pressuar_new_edit)))
+
+                    well_data.dict_category.setdefault(plast_new_combo, {}).setdefault(
+                        'по сероводороду', Data_h2s(
+                            int(float(category_h2s_edit)),
+                            float(h2s_pr_edit.replace(',', '.')),
+                            float(h2s_mg_edit.replace(',', '.')),
+                            float(calc_plast_h2s.replace(',', '.'))))
+
+                    well_data.dict_category.setdefault(plast_new_combo, {}).setdefault(
+                        'по газовому фактору', Data_gaz(
+                            int(category_gf),
+                            float(gf_edit)))
+                    try:
+                        well_data.dict_category[plast_new_combo]['отключение'] = 'планируемый'
+                    except:
+                        well_data.dict_category.setdefault(plast_new_combo, {}).setdefault(
+                            'отключение', 'планируемый')
+
             else:
                 plast_new_combo = ''
                 fluid_new_edit = ''
                 pressuar_new_edit = ''
-        except:
-            mes = QMessageBox.critical(self, 'Ошибка', 'Введены не все параметры')
+        except Exception as e:
+            mes = QMessageBox.critical(self, 'Ошибка', f'Введены не все параметры {e}')
             return
         if need_change_zgs_combo == 'Да':
             if (plast_new_combo == '' or fluid_new_edit == '' or pressuar_new_edit == ''):
@@ -1014,6 +1025,7 @@ class Swab_Window(QMainWindow):
             paker_select = f'воронку со свабоограничителем + шаблон {template_second}мм L-{lenght_template_second} + НКТ{nkt_diam} + НКТ 10м + репер'
             paker_short = f'воронку со с/о + шаблон {template_second} L-{lenght_template_second} + НКТ{nkt_diam}  + НКТ 10м + репер'
             dict_nkt = {73: depth_opy}
+            well_data.template_depth = well_data.current_bottom
         elif well_data.column_additional is True and well_data.column_additional_diametr._value < 110 and \
                 well_data.current_bottom >= well_data.head_column_additional._value:
             paker_select = f'воронку со свабоограничителем + шаблон {template_second} L-{lenght_template_second} + НКТ60мм 10м + репер +НКТ60мм ' \
@@ -1021,6 +1033,7 @@ class Swab_Window(QMainWindow):
             paker_short = f'воронку со с/о + шаблон {template_second} L-{lenght_template_second} + НКТ60мм 10м + репер +НКТ60мм'
             dict_nkt = {73: well_data.head_column_additional._value,
                         60: int(well_data.current_bottom - well_data.head_column_additional._value)}
+            well_data.template_depth = well_data.current_bottom
         elif well_data.column_additional is True and well_data.column_additional_diametr._value > 110 and \
                 well_data.current_bottom >= well_data.head_column_additional._value:
             paker_select = f'воронку со свабоограничителем + шаблон {template_second}мм L-{lenght_template_second} + ' \
@@ -1032,6 +1045,7 @@ class Swab_Window(QMainWindow):
                           f'со снятыми фасками + ' \
                           f'НКТ{well_data.nkt_diam}мм со снятыми фасками 10м'
             dict_nkt = {73: depth_opy}
+            well_data.template_depth_addition = well_data.current_bottom
         elif nkt_diam == 60:
             dict_nkt = {60: depth_opy}
 
@@ -1484,7 +1498,7 @@ class Swab_Window(QMainWindow):
     def swabbing_with_2paker(self, diametr_paker, paker1_depth, paker2_depth, paker_khost, plast_combo, swabTypeCombo,
                              swab_volumeEdit, depthGaugeCombo, need_change_zgs_combo,
                                              plast_new, fluid_new, pressuar_new):
-       
+
         from .opressovka import OpressovkaEK
 
         swab_short, swab_select = Swab_Window.swab_select(self, swabTypeCombo, plast_combo, swab_volumeEdit)
@@ -1631,7 +1645,7 @@ class Swab_Window(QMainWindow):
 
     def swabbing_with_voronka(self, paker_depth, plast_combo, swabTypeCombo, swab_volumeEdit, depthGaugeCombo,
                               need_change_zgs_combo, plast_new, fluid_new, pressuar_new):
-       
+
         swab_short, swab_select = Swab_Window.swab_select(self, swabTypeCombo, plast_combo, swab_volumeEdit)
         nkt_diam = '73' if well_data.column_diametr._value > 110 or (
                 well_data.column_diametr._value > 110 and well_data.column_additional is True and \

@@ -717,6 +717,7 @@ class DataWindow(QMainWindow):
     def addRowTable(self):
         from find import ProtectedIsNonNone, ProtectedIsDigit
         from work_py.opressovka import TabPage_SO
+        from work_py.advanted_file import definition_plast_work
 
         region_Combo = self.tabWidget.currentWidget().region_Combo.currentText()
         type_kr_Combo = self.tabWidget.currentWidget().type_kr_Combo.currentText()
@@ -744,7 +745,7 @@ class DataWindow(QMainWindow):
         head_column_additional = self.tabWidget.currentWidget().head_column_add_editType2.text()
         bottomhole_drill = self.tabWidget.currentWidget().bottomhole_drill_editType.text()
         bottomhole_artificial = self.tabWidget.currentWidget().bottomhole_artificial_editType.text()
-        current_bottom = self.tabWidget.currentWidget().current_bottom_editType.text()
+        current_bottom = self.tabWidget.currentWidget().current_bottom_editType.text().replace(',', '.')
         max_angle_H = self.tabWidget.currentWidget().max_angle_H_editType.text()
         max_angle = self.tabWidget.currentWidget().max_angle_editType.text()
         max_expected_pressure = self.tabWidget.currentWidget().max_expected_pressure_editType.text()
@@ -835,6 +836,10 @@ class DataWindow(QMainWindow):
         if any([self.ifNum(data_well) is False or data_well in ['не корректно', 0, 'отсут'] for data_well in
                 [columnType, column_wall_thickness, shoe_column]]):
             msg = QMessageBox.information(self, 'Внимание', 'Не все поля в данных колонне соответствуют значениям')
+            close_file = False
+
+        elif float(bottomhole_artificial) > 10000 or float(bottomhole_drill) > 10000:
+            QMessageBox.information(self, 'Внимание', 'Забой не корректный')
             close_file = False
 
         elif any([self.ifNum(data_well) is False for data_well in
@@ -979,6 +984,7 @@ class DataWindow(QMainWindow):
                 return
         except Exception as e:
             mes = QMessageBox.warning(self, 'Ошибка', f'Башмак ЭК не корректен {e}')
+
 
 
         if close_file is False:
@@ -1138,6 +1144,8 @@ class DataWindow(QMainWindow):
                 except Exception as e:
                     mes = QMessageBox.information(self, 'Ошибка обработки', f'ошибка проверки ПЗ в части соответствия '
                                                                             f'диаметра пакера \n {e}')
+
+
             well_data.pause = False
             self.close()
 

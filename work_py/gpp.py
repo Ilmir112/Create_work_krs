@@ -36,6 +36,16 @@ class TabPage_SO_grp(QWidget):
         self.current_depth_edit.setValidator(validator)
         self.current_depth_edit.setText(str(int(well_data.current_bottom)))
 
+        self.otz_after_question_Label = QLabel("Нужно ли отбивать забой после нормализации", self)
+        self.otz_after_question_QCombo = QComboBox(self)
+        self.otz_after_question_QCombo.currentTextChanged.connect(self.update_paker)
+        self.otz_after_question_QCombo.addItems(['Да', 'Нет'])
+
+        if self.current_depth_edit.text() != '':
+            if self.current_depth_edit.text() - well_data.perforation_sole < 50 \
+                    or (well_data.max_angle > 60 and well_data.max_angle_H._value > well_data.perforation_roof) \
+                    or well_data.open_trunk_well is True:
+                self.otz_after_question_QCombo.setCurrentIndex(1)
 
         self.grid_layout = QGridLayout(self)
 
@@ -47,6 +57,8 @@ class TabPage_SO_grp(QWidget):
 
         self.grid_layout.addWidget(self.current_depth_label, 3, 5)
         self.grid_layout.addWidget(self.current_depth_edit, 4, 5)
+        self.grid_layout.addWidget(self.otz_after_question_Label, 3, 6)
+        self.grid_layout.addWidget(self.otz_after_question_QCombo, 4, 6)
 
 
     def update_paker(self):
@@ -83,24 +95,21 @@ class Gpp_window(QMainWindow):
         vbox.addWidget(self.buttonAdd, 2, 0)
 
     def add_work(self):
-       
-
-
         diametr_paker = int(float(self.tabWidget.currentWidget().diametr_paker_edit.text()))
-
         paker_depth = int(float(self.tabWidget.currentWidget().paker_depth_edit.text()))
         current_depth = int(float(self.tabWidget.currentWidget().current_depth_edit.text()))
+        gisOTZ_after_true_quest = self.tabWidget.currentWidget().otz_after_question_QCombo.currentText()
 
         if int(paker_depth) > well_data.current_bottom:
             mes = QMessageBox.warning(self, 'Некорректные данные', f'Компоновка НКТ c хвостовик + пакер '
                                                                    f'ниже текущего забоя')
             return
-        work_list = self.grpGpp(paker_depth, current_depth, diametr_paker)
+        work_list = self.grpGpp(paker_depth, current_depth, diametr_paker, gisOTZ_after_true_quest)
 
         MyWindow.populate_row(self, self.ins_ind, work_list, self.table_widget)
         well_data.pause = False
         self.close()
-    def grpGpp(self, gpp_depth, current_depth, diametr_paker):
+    def grpGpp(self, gpp_depth, current_depth, diametr_paker, gisOTZ_after_true_quest):
 
         if 'Ойл' in well_data.contractor:
             schema_grp = '7'
@@ -208,12 +217,13 @@ class Gpp_window(QMainWindow):
             [f'смену объема  уд.весом {well_data.fluid_work} на циркуляцию '
              f'в объеме {krs.volume_jamming_well(self, well_data.current_bottom)}м3', None,
              f'Произвести смену объема обратной промывкой тех жидкостью уд.весом {well_data.fluid_work} на циркуляцию '
-             f'в объеме {krs.volume_jamming_well(self, well_data.current_bottom)}м3. Закрыть скважину на стабилизацию не менее 2 часов. \n'
+             f'в объеме {krs.volume_jamming_well(self, well_data.current_bottom)}м3. Закрыть скважину на '
+             f'стабилизацию не менее 2 часов. \n'
              f'(согласовать глушение в коллектор, в случае отсутствия на желобную емкость)',
              None, None, None, None, None, None, None,
              'Мастер КРС, представ. заказчика', well_volume_norm(krs.volume_jamming_well(self, well_data.current_bottom))],
             [None, None,
-             f'Вести контроль плотности на  выходе в конце глушения. В случае отсутствия циркуляции на выходе жидкости '
+             f'Вести контроль плотности на выходе в конце глушения. В случае отсутствия циркуляции на выходе жидкости '
              f'глушения уд.весом  или Рбуф при глушении скважины, дальнейшие промывки и удельный вес жидкостей промывок '
              f'согласовать с Заказчиком.',
              None, None, None, None, None, None, None,
@@ -232,18 +242,20 @@ class Gpp_window(QMainWindow):
              f'{round(gpp_depth * 1.12 / 1000, 1)}м3. \n'
              f'На демонтаж пригласить представителя подрядчика по ГРП',
              None, None, None, None, None, None, None,
-             'Мастер КРС, представ. заказчика', liftingNKT_norm(gpp_depth,1.2)],
+             'Мастер КРС, представ. заказчика', liftingNKT_norm(gpp_depth, 1.2)],
         ]
 
 
 
-        for row in Grp_window.normalization(self, current_depth, diametr_paker):
+        for row in Grp_window.normalization(self, current_depth, diametr_paker, gisOTZ_after_true_quest):
             gpp_list.append(row)
 
         return gpp_list
 
 
     def check_gpp_upa(self):
+        mes = QMessageBox.information(self, 'Смена подъемника',
+                                      'Согласно регламента для проведения ГПП ГРП необходим тяжелый подьемник')
         for row in range(self.table_widget.rowCount()):
             for column in range(self.table_widget.columnCount()):
                 value = self.table_widget.item(row, column)

@@ -261,9 +261,12 @@ class Drill_window(QMainWindow):
             # print(well_data.dict_leakiness)
             leakness_list = []
             for nek in list(well_data.dict_leakiness['НЭК']['интервал'].keys()):
-                nek_bur = float(nek.split('-')[1]) +10
-                # print(nek_bur)
-                leakness_list.append(nek_bur)
+                nek_bur = float(nek.split('-')[1]) + 10
+                if len(leakness_list) == 0:
+                    leakness_list.append(nek_bur)
+                else:
+                    if leakness_list[-1] < nek_bur:
+                        leakness_list.append(nek_bur)
 
 
             drilling_interval.extend(leakness_list)
@@ -448,7 +451,7 @@ class Drill_window(QMainWindow):
 
         drilling_list_end = [
             [None, None,
-             f'ПРИМЕЧАНИЕ: РАСХОД РАБОЧЕЙ ЖИДКОСТИ 8-10 Л/С;'
+             f'ПРИМЕЧАНИЕ: РАСХОД РАБОЧЕЙ ЖИДКОСТИ 8-10 Л/С;  трёхкратно проработать интервал' 
              f' ОСЕВАЯ НАГРУЗКА НЕ БОЛЕЕ 75% ОТ ДОПУСТИМОЙ НАГРУЗКИ (УТОЧНИТЬ ПО ПАСПОРТУ ЗАВЕЗЁННОГО ГЗД И ДОЛОТА);'
              f' РАБОЧЕЕ ДАВЛЕНИЕ 4-10 МПА (УТОЧНИТЬ ПО ПАСПОРТУ ЗАВЕЗЁННОГО ВЗД);'
              f' ПРЕДУСМОТРЕТЬ КОМПЕНСАЦИЮ РЕАКТИВНОГО МОМЕНТА НА ВЕДУЩЕЙ ТРУБЕ))',

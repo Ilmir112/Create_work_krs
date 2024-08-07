@@ -1,3 +1,4 @@
+import json
 import math
 from PyQt5.QtWidgets import QInputDialog, QMessageBox, QTabWidget, QWidget, QLabel, QComboBox, QMainWindow, QLineEdit, \
     QGridLayout, QPushButton, QBoxLayout, QTableWidget, QHeaderView, QTableWidgetItem, QApplication
@@ -596,8 +597,6 @@ class TabPage_SO_with(QWidget):
 
             elif index == 'ПСШ СКМ в доп колонне c хвостом':
 
-
-
                 skm = str(well_data.column_additional_diametr._value)
                 self.skm_Edit.setText(skm)
 
@@ -743,13 +742,14 @@ class TabPage_SO_with(QWidget):
 
 
     def definition_ECN_true(self, depth_ecn):
-
+        a =well_data.perforation_sole
         if well_data.column_additional is False and well_data.dict_pump_ECN["posle"] != 0 and \
                 well_data.column_diametr._value > 168:
             return "4", "4"
-
         elif well_data.column_additional is False and well_data.dict_pump_ECN["posle"] != 0:
             return "4", "30"
+        elif well_data.column_additional is False and well_data.max_angle._value > 45:
+            return "4", "10"
         elif well_data.column_additional is True and well_data.dict_pump_ECN["posle"] != 0 \
                 and well_data.column_additional_diametr._value < 170:
             if well_data.dict_pump_ECN["posle"] != 0 and float(depth_ecn) < well_data.head_column_additional._value and \
@@ -757,10 +757,13 @@ class TabPage_SO_with(QWidget):
                 return "4", "4"
             elif well_data.dict_pump_ECN["posle"] != 0 and float(depth_ecn) < well_data.head_column_additional._value:
                 return "4", "30"
-
             elif well_data.dict_pump_ECN["posle"] != 0 and float(depth_ecn) >= well_data.head_column_additional._value:
-
                 return "30", "4"
+
+        elif well_data.max_angle._value > 45 and well_data.current_bottom > well_data.head_column_additional._value:
+            return "10", "4"
+        elif well_data.max_angle._value > 45 and well_data.current_bottom < well_data.head_column_additional._value:
+            return "4", "10"
         else:
             return "4", "4"
 
@@ -1125,7 +1128,8 @@ class TemplateKrs(QMainWindow):
         list_template_ek = [
             [f'СПО  {template_str} на 'f'НКТ{well_data.nkt_diam}мм', None,
              f'Спустить  {template_str} на 'f'НКТ{well_data.nkt_diam}мм  с замером, шаблонированием НКТ. \n'
-             f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
+             f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ) \n'
+             f'(при недохождении до нужного интервала допускается посадка инструмента не более 2т)',
              None, None, None, None, None, None, None,
              'мастер КРС', descentNKT_norm(current_bottom, 1.2)],
             [f'Произвести скреперование в интервале {skm_interval}м Допустить низ НКТ до гл. {current_bottom}м',
@@ -1250,6 +1254,9 @@ class TemplateKrs(QMainWindow):
                 for row in kot_work(self, current_bottom)[::-1]:
                     list_template_ek.insert(0, row)
 
+        self.update_skm_interval(well_data.ins_ind, skm_list)
+
+
         if well_data.gipsInWell is True:  # Добавление работ при наличии Гипсово-солевых отложений
             gips = TemplateKrs.pero(self)
             for row in gips[::-1]:
@@ -1267,6 +1274,31 @@ class TemplateKrs(QMainWindow):
         well_data.current_bottom = current_bottom
 
         return list_template_ek
+
+    def update_skm_interval(self, index_plan, skm_list):
+        data_well = well_data.data_list
+        aaa = well_data.count_row_well
+        row_index = index_plan - well_data.count_row_well
+        template_ek = json.dumps(
+            [well_data.template_depth, well_data.template_lenght, well_data.template_depth_addition,
+             well_data.template_lenght_addition])
+        for index, data in enumerate(well_data.data_list):
+            if index == index:
+                old_skm_2 = json.loads(well_data.data_list[index][12])
+                template_ek_2 = well_data.data_list[index][11]
+            if row_index < index:
+                old_skm = json.loads(well_data.data_list[index][12])
+                old_skm.extend(skm_list)
+                well_data.data_list[index][12] = json.dumps(old_skm)
+                if well_data.data_list[index][11] == template_ek_2:
+                    well_data.data_list[index][11] = template_ek
+
+
+
+
+
+
+
 
     def pero(self):
         from .rir import RirWindow

@@ -2,7 +2,6 @@ import json
 import sqlite3
 import time
 
-
 import well_data
 import psycopg2
 from openpyxl.styles import Font, Alignment
@@ -40,7 +39,6 @@ class TabPageDp(QWidget):
         self.well_area_label = QLabel('площадь скважины')
         self.well_area_edit = QLineEdit(self)
 
-
         # self.number_DP_label = QLabel('номер \nдополнительного плана')
         # self.number_DP_Combo = QComboBox(self)
         #
@@ -48,10 +46,7 @@ class TabPageDp(QWidget):
         # if well_data.number_dp != 0:
         #     self.number_DP_Combo.setCurrentIndex(int(well_data.number_dp) - 1)
 
-
         self.table_name = ''
-
-
 
         self.grid = QGridLayout(self)
 
@@ -63,9 +58,6 @@ class TabPageDp(QWidget):
 
         self.grid.addWidget(self.well_area_label, 2, 3)
         self.grid.addWidget(self.well_area_edit, 3, 3)
-
-
-
 
         self.well_area_edit.setText(f"{well_data.well_area._value}")
         # self.well_area_edit.textChanged.connect(self.update_well)
@@ -85,21 +77,17 @@ class TabPageDp(QWidget):
             self.well_data_in_base_combo = QComboBox()
             self.well_data_in_base_combo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents)
 
-            table_list = self.get_tables_starting_with(self.well_number_edit.text(), self.well_area_edit.text())[::-1]
+            table_list = self.get_tables_starting_with(self.well_number_edit.text(), self.well_area_edit.text())
             if table_list:
                 self.table_in_base_combo.clear()
-                self.table_in_base_combo.addItems(table_list)
-
+                self.table_in_base_combo.addItems(table_list[::-1])
 
             self.grid.addWidget(self.table_in_base_label, 2, 5)
             self.grid.addWidget(self.table_in_base_combo, 3, 5)
             self.grid.addWidget(self.well_data_label, 2, 6)
             self.grid.addWidget(self.well_data_in_base_combo, 3, 6)
 
-            well_list = self.check_in_database_well_data(self.well_number_edit.text())
-            if well_list:
-                self.well_data_in_base_combo.clear()
-                self.well_data_in_base_combo.addItems(well_list)
+
             self.table_in_base_combo.currentTextChanged.connect(self.update_area)
 
     def update_area(self):
@@ -107,12 +95,19 @@ class TabPageDp(QWidget):
         if len(table_in_base_combo.split(" ")) > 1:
             well_area = table_in_base_combo.split(" ")[1]
             self.well_area_edit.setText(well_area)
+            self.well_number_edit.setText(table_in_base_combo.split(" ")[0])
+
+            well_list = self.check_in_database_well_data(self.well_number_edit.text())
+            if well_list:
+                self.well_data_in_base_combo.clear()
+                self.well_data_in_base_combo.addItems(well_list)
 
     def check_in_database_well_data(self, number_well):
         table_in_base_combo = self.table_in_base_combo.currentText()
         if ' от' in table_in_base_combo:
             table_in_base_combo = table_in_base_combo[:-14]
-        if number_well:
+
+        if number_well and len(table_in_base_combo.split(" ")) > 3:
             well_number, well_area = table_in_base_combo.split(" ")[:2]
             self.well_number_edit.setText(well_number)
             self.well_area_edit.setText(well_area)
@@ -127,7 +122,7 @@ class TabPageDp(QWidget):
                         cursor.execute(
                             "SELECT well_number, area_well, contractor, costumer, today, work_plan FROM wells "
                             "WHERE well_number=(%s) AND area_well=(%s)",
-                                           (str(number_well), well_area))
+                            (str(number_well), well_area))
 
 
                     except psycopg2.Error as e:
@@ -141,10 +136,11 @@ class TabPageDp(QWidget):
                         conn = sqlite3.connect(f'{db_path}')
                         cursor = conn.cursor()
 
-                        cursor.execute("SELECT  well_number, area_well, contractor, costumer, today, work_plan FROM wells "
-                                       "WHERE well_number = ? AND area_well = ? "
-                                       "AND contractor = ? AND costumer = ?",
-                                       (str(well_number), well_area, well_data.contractor, well_data.costumer))
+                        cursor.execute(
+                            "SELECT  well_number, area_well, contractor, costumer, today, work_plan FROM wells "
+                            "WHERE well_number = ? AND area_well = ? "
+                            "AND contractor = ? AND costumer = ?",
+                            (str(well_number), well_area, well_data.contractor, well_data.costumer))
 
 
 
@@ -185,16 +181,13 @@ class TabPageDp(QWidget):
                 else:
                     return False
 
-
-
-
     def update_well(self):
 
         self.table_name = str(self.well_number_edit.text()) + self.well_area_edit.text()
         if well_data.data_in_base:
 
             table_list = self.get_tables_starting_with(self.well_number_edit.text(), self.well_area_edit.text())
-            
+
             if table_list:
                 table_list = table_list[::-1]
                 self.table_in_base_combo.clear()
@@ -204,9 +197,6 @@ class TabPageDp(QWidget):
             if well_list:
                 self.well_data_in_base_combo.clear()
                 self.well_data_in_base_combo.addItems(well_list)
-
-
-
 
     def update_table_in_base_combo(self):
         from work_py.dop_plan_py import DopPlanWindow
@@ -224,10 +214,6 @@ class TabPageDp(QWidget):
             well_data.number_dp = int(float(number_dp))
 
             DopPlanWindow.extraction_data(self, table_in_base_combo, 1)
-
-
-
-
 
     def get_tables_starting_with(self, well_number, well_area):
         from data_base.work_with_base import connect_to_db, get_table_creation_time
@@ -259,7 +245,6 @@ class TabPageDp(QWidget):
                 # tables.insert(0, '')
 
                 cursor.close()
-
 
                 tables_filter = list(filter(lambda x: contractor in x, tables))
                 if len(tables_filter) == 0:
@@ -307,14 +292,13 @@ class TabPageDp(QWidget):
 
 
 class TabWidget(QTabWidget):
-    def __init__(self, work_plan,  tableWidget = 0, old_index = 0):
+    def __init__(self, work_plan, tableWidget=0, old_index=0):
         super().__init__()
         self.addTab(TabPageDp(work_plan, tableWidget, old_index), 'Корректировка плана работ')
 
 
-
 class CorrectPlanWindow(QMainWindow):
-    def __init__(self, ins_ind, table_widget, work_plan, ws = None, parent=None):
+    def __init__(self, ins_ind, table_widget, work_plan, ws=None, parent=None):
 
         super(CorrectPlanWindow, self).__init__(parent)
         self.centralWidget = QWidget()
@@ -330,21 +314,15 @@ class CorrectPlanWindow(QMainWindow):
         self.target_row_index_cancel = None
         self.old_index = 0
 
-
         self.tabWidget = TabWidget(self.work_plan)
-
-
 
         self.buttonadd_work = QPushButton('Загрузить план работ')
         self.buttonadd_work.clicked.connect(self.add_work, Qt.QueuedConnection)
-
 
         vbox = QGridLayout(self.centralWidget)
         vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
 
         vbox.addWidget(self.buttonadd_work, 3, 0, 1, 2)
-
-
 
     def read_excel_in_base(self, number_well, area_well, work_plan):
         if well_data.connect_in_base:
@@ -389,8 +367,6 @@ class CorrectPlanWindow(QMainWindow):
 
         return data, rowHeights, colWidth, boundaries_dict
 
-
-
     def add_work(self):
         from data_base.work_with_base import check_in_database_well_data, insert_data_well_dop_plan, round_cell
         from work_py.dop_plan_py import DopPlanWindow
@@ -406,12 +382,12 @@ class CorrectPlanWindow(QMainWindow):
             table_in_base_combo = str(self.tabWidget.currentWidget().table_in_base_combo.currentText())
             well_data_in_base_combo = self.tabWidget.currentWidget().well_data_in_base_combo.currentText()
             if ' от' in table_in_base_combo:
-
                 data_table_in_base_combo = table_in_base_combo.split(' ')[-1]
                 table_in_base = table_in_base_combo.split(' ')[2]
                 number_dp_in_base = "".join(c for c in table_in_base if c.isdigit())
                 table_in_base = table_in_base_combo.split(' ')[2].replace('krs', 'ПР').replace('dop_plan_in_base',
-                                                                                               'ДП№').replace('dop_plan', 'ДП№')
+                                                                                               'ДП№').replace(
+                    'dop_plan', 'ДП№')
 
             if ' от' in well_data_in_base_combo:
                 data_well_data_in_base_combo = well_data_in_base_combo.split(' ')[-1]
@@ -439,7 +415,8 @@ class CorrectPlanWindow(QMainWindow):
             DopPlanWindow.work_with_excel(self, well_number, well_area, table_in_base)
 
             well_data.data, well_data.rowHeights, well_data.colWidth, well_data.boundaries_dict = \
-                DopPlanWindow.change_pvr_in_bottom(self, self.data, self.rowHeights, self.colWidth, self.boundaries_dict)
+                DopPlanWindow.change_pvr_in_bottom(self, self.data, self.rowHeights, self.colWidth,
+                                                   self.boundaries_dict)
 
             aaded = well_data.data
             name_table = table_in_base_combo[:-14]
@@ -451,8 +428,6 @@ class CorrectPlanWindow(QMainWindow):
             well_data.pause = False
             self.close()
 
-
-
     def delete_data(self, number_well, area_well, work_plan):
         if well_data.connect_in_base:
             try:
@@ -462,8 +437,8 @@ class CorrectPlanWindow(QMainWindow):
                 cursor.execute("""
                 DELETE FROM wells 
                 WHERE well_number = %s AND area_well = %s AND contractor = %s AND costumer = %s AND work_plan= %s """,
-                       (str(number_well), area_well, well_data.contractor, well_data.costumer,  work_plan)
-                      )
+                               (str(number_well), area_well, well_data.contractor, well_data.costumer, work_plan)
+                               )
 
                 conn.commit()
                 cursor.close()
@@ -493,8 +468,6 @@ class CorrectPlanWindow(QMainWindow):
                 # Выведите сообщение об ошибке
                 mes = QMessageBox.warning(None, 'Ошибка',
                                           f'Ошибка удаления {e}')
-
-
 
     def add_work_excel(self, ws2, work_list, ind_ins):
         from well_data import ProtectedIsDigit
@@ -532,7 +505,7 @@ class CorrectPlanWindow(QMainWindow):
                             ws2.cell(row=i, column=j).alignment = Alignment(wrap_text=True, horizontal='center',
                                                                             vertical='center')
 
-    def extraction_data(self, table_name, paragraph_row = 0):
+    def extraction_data(self, table_name, paragraph_row=0):
         from data_base.work_with_base import connect_to_db
         from work_py.dop_plan_py import DopPlanWindow
 
@@ -649,7 +622,7 @@ class CorrectPlanWindow(QMainWindow):
 
     def insert_data_dop_plan(self, result, paragraph_row):
         try:
-            paragraph_row = paragraph_row -1
+            paragraph_row = paragraph_row - 1
         except:
             paragraph_row = 1
         if len(result) < paragraph_row:

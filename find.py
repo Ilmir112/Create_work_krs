@@ -30,8 +30,10 @@ class FindIndexPZ(QMainWindow):
         self.perforation_correct_window2 = None
 
     def read_pz(self, ws):
+        from work_py.dop_plan_py import TabPageDp
 
         cat_well_min = []
+
         for row_ind, row in enumerate(ws.iter_rows(values_only=True)):
             ws.row_dimensions[row_ind].hidden = False
 
@@ -73,9 +75,9 @@ class FindIndexPZ(QMainWindow):
             elif 'ШТАНГИ' == str(row[1]).upper():
                 well_data.sucker_rod_ind = ProtectedIsDigit(row_ind + 1)
 
-            elif 'ХI Планируемый объём работ:' in row or 'ХI. Планируемый объём работ:' \
+            elif ('ХI Планируемый объём работ:' in row or 'ХI. Планируемый объём работ:' \
                     in row or 'ХIII Планируемый объём работ:' in row \
-                    or 'ХI Планируемый объём работ:' in row or 'Порядок работы' in row:
+                    or 'ХI Планируемый объём работ:' in row or 'Порядок работы' in row) and well_data.data_x_max._value == 0:
                     well_data.data_x_max = ProtectedIsDigit(row_ind)
 
             elif any(['II. История эксплуатации скважины' in str(col) for col in row]):
@@ -167,6 +169,7 @@ class FindIndexPZ(QMainWindow):
             return
         if well_data.type_kr in ['', None]:
             well_data.check_data_in_pz.append('Не указан Вид и категория ремонта, его шифр\n')
+
 
 
     def check_str_None(self, string):
@@ -726,7 +729,7 @@ class WellData(FindIndexPZ):
         # self.read_well(self.ws, well_data.cat_well_max._value, well_data.data_pvr_min._value)
 
     def read_well(self, ws, begin_index, cancel_index):
-        from main import MyWindow
+        from work_py.dop_plan_py import TabPageDp
 
         well_data.well_area = ProtectedIsNonNone('не корректно')
         well_data.well_number = ProtectedIsNonNone('не корректно')
@@ -748,6 +751,20 @@ class WellData(FindIndexPZ):
                     elif 'цех' == value:
                         well_data.cdng = ProtectedIsDigit(row[col + 1].value)
                         # print(f' ЦДНГ {well_data.cdng._value}')
+        tables_filter = TabPageDp.get_tables_starting_with(self, well_data.well_number._value,
+                                                           well_data.well_area._value)
+        if tables_filter:
+            number = [wells for wells in tables_filter
+                      if wells.split(' ')[0] == well_data.well_number._value
+                      and wells.split(' ')[1] == well_data.well_area._value]
+
+            if number:
+                mes = QMessageBox.question(self, 'Наличие в базе',
+                                           f'В базе имеются план работ по скважине:\n {number}. '
+                                           f'При продолжении план пересохранится, продолжить?')
+                if mes == QMessageBox.StandardButton.No:
+                    MyWindow.pause_app()
+                    return
 
 
 class Well_data(FindIndexPZ):

@@ -1,3 +1,4 @@
+import json
 import math
 import well_data
 
@@ -553,13 +554,16 @@ class TabPage_SO(QWidget):
        
         if well_data.column_additional is False and well_data.dict_pump_ECN["posle"] != 0:
             return "2", "30"
+        elif well_data.column_additional is False and well_data.max_angle._value > 45:
+            return "2", "10"
         elif well_data.column_additional is True and well_data.dict_pump_ECN["posle"] != 0:
             if well_data.dict_pump_ECN["posle"] != 0 and float(depth_ecn) < well_data.head_column_additional._value:
                 return "2", "30"
 
             elif well_data.dict_pump_ECN["posle"] != 0 and float(depth_ecn) >= well_data.head_column_additional._value:
-
                 return "30", "4"
+            elif well_data.max_angle._value > 45:
+                return "10", "4"
         else:
             return "2", "4"
 
@@ -639,12 +643,25 @@ class Template_without_skm(QMainWindow):
         current_bottom = self.tabWidget.currentWidget().current_bottom_edit.text()
         if current_bottom != '':
             well_data.current_bottom = round(float(current_bottom), 1)
+
+        self.update_template(well_data.ins_ind)
         work_list = self.template_ek(template_str, template, template_diametr)
         MyWindow.populate_row(self, self.ins_ind, work_list, self.table_widget)
         well_data.pause = False
         self.close()
 
+    def update_template(self, index_plan):
 
+        row_index = index_plan - well_data.count_row_well
+        template_ek = json.dumps(
+            [well_data.template_depth, well_data.template_lenght, well_data.template_depth_addition,
+             well_data.template_lenght_addition])
+        for index, data in enumerate(well_data.data_list):
+            if index == index:
+                template_ek_old = well_data.data_list[index][11]
+            if row_index < index:
+                if well_data.data_list[index][11] == template_ek_old:
+                    well_data.data_list[index][11] = template_ek
     def well_volume(self):
        
         # print(well_data.column_additional)

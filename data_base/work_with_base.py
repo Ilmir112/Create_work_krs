@@ -1276,9 +1276,13 @@ def insert_data_new_excel_file(data, rowHeights, colWidth, boundaries_dict):
                 if cell_data:
                     cell.value = round_cell(cell_data['value'])
 
+    row_max = sheet_new.max_row
+
     for key, value in boundaries_dict.items():
-        sheet_new.merge_cells(start_column=value[0], start_row=value[1],
-                              end_column=value[2], end_row=value[3])
+        if value[1] <= row_max:
+            sheet_new.merge_cells(start_column=value[0], start_row=value[1],
+                                  end_column=value[2], end_row=value[3])
+    addad = sheet_new.max_row
 
     # Восстановление данных и стилей из словаря
     for row_index, row_data in data.items():
@@ -1326,13 +1330,21 @@ def insert_data_new_excel_file(data, rowHeights, colWidth, boundaries_dict):
         sheet_new.column_dimensions[get_column_letter(col + 1)].width = colWidth[col]
     index_delete = 0
     a = sheet_new.max_row
-    for index_row, row in enumerate(sheet_new.iter_rows()):  # Копирование высоты строки
+    for index_row, row in enumerate(sheet_new.iter_rows()):
+        asasa = any(['ИТОГО:' in str(col.value).upper() for col in row[:4]])
+        adef =  [str(col.value).upper() for col in row[:4]]
+        aasaaa = well_data.work_plan
+        # Копирование высоты строки
         if any(['Наименование работ' in str(col.value) for col in row[:13]]) and well_data.work_plan not in ['plan_change']:
             index_delete = index_row+2
             well_data.ins_ind2 = index_row +2
 
         elif any(['ПЛАН РАБОТ' in str(col.value).upper() for col in row[:4]]) and well_data.work_plan not in ['plan_change']:
             sheet_new.cell(row=index_row + 1, column=2).value = f'ДОПОЛНИТЕЛЬНЫЙ ПЛАН РАБОТ № {well_data.number_dp}'
+
+        elif any(['ИТОГО:' in str(col.value).upper() for col in row[:4]]) and well_data.work_plan in ['plan_change']:
+            index_delete = index_row + 2
+            well_data.ins_ind2 = index_row + 2
 
         elif all([col is None for col in row[:13]]):
             sheet_new.row_dimensions[index_row].hidden = True

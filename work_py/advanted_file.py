@@ -341,6 +341,7 @@ def count_row_height(ws, ws2, work_list, merged_cells_dict, ind_ins):
 
     boundaries_dict = {}
 
+
     text_width_dict = {35: (0, 100), 50: (101, 200), 70: (201, 300), 95: (301, 400), 110: (401, 500),
                        150: (501, 600), 170: (601, 700), 190: (701, 800), 230: (801, 1000), 270: (1000, 1500)}
 
@@ -361,9 +362,9 @@ def count_row_height(ws, ws2, work_list, merged_cells_dict, ind_ins):
 
     head = plan.head_ind(0, ind_ins)
 
-
     plan.copy_true_ws(ws, ws2, head)
     boundaries_dict_index = 1000
+    stop_str = 1500
     for i in range(1, len(work_list) + 1):  # Добавлением работ
         a = work_list[i-1]
         if 'Наименование работ' in work_list[i-1]:
@@ -375,11 +376,13 @@ def count_row_height(ws, ws2, work_list, merged_cells_dict, ind_ins):
                 cell = ws2.cell(row=i, column=j)
                 cell.number_format = 'General'
                 cell.value = str(work_list[i - 1][j - 1])
-        if 'по H2S' in work_list[i-1]:
+        elif 'по H2S' in work_list[i-1]:
             for j in range(1, 13):
                 cell = ws2.cell(row=i, column=j)
                 cell.number_format = 'General'
                 cell.value = str(work_list[i - 1][j - 1])
+        elif 'ИТОГО:' in work_list[i - 1]:
+            stop_str = i
 
 
         for j in range(1, 13):
@@ -388,7 +391,7 @@ def count_row_height(ws, ws2, work_list, merged_cells_dict, ind_ins):
                 # print(work_list[i - 1][j - 1])
                 cell.value = is_num(work_list[i - 1][j - 1])
                 if i >= ind_ins:
-                    if abs(i - ind_ins) > 1:
+                    if abs(i - ind_ins) > 1 and stop_str < i:
                         ws2[F"B{i}"].value = f'=COUNTA($C${ind_ins+2}:C{i})'
                     if j != 1:
                         cell.border = well_data.thin_border
@@ -432,10 +435,12 @@ def count_row_height(ws, ws2, work_list, merged_cells_dict, ind_ins):
         if len(col) != 2:
             # print(row)
             ws2.merge_cells(start_row=row + 1, start_column=3, end_row=row + 1, end_column=10)
-    for key, value in boundaries_dict.items():
 
-        ws2.merge_cells(start_column=value[0], start_row=value[1],
-                        end_column=value[2], end_row=value[3])
+    for key, value in boundaries_dict.items():
+        aaa = value[1]
+        if value[1] < boundaries_dict_index:
+            ws2.merge_cells(start_column=value[0], start_row=value[1],
+                            end_column=value[2], end_row=value[3])
 
     try:
         # вставка сохраненных изображение по координатам ячеек

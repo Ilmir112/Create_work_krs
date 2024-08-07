@@ -147,16 +147,17 @@ class LeakageWindow(QMainWindow):
         rows = self.tableWidget.rowCount()
         for leakiness in leakiness_column.replace('м', '').replace(' ', '').split(','):
 
-            self.tableWidget.insertRow(rows)
+
             roof_leakage = str(min(map(float, leakiness.split('-'))))
             sole_leakage = str(max(map(float, leakiness.split('-'))))
             insulation_combo = QComboBox(self)
             insulation_combo.addItems(['не изолирован', 'изолирован'])
-
-            self.tableWidget.setItem(rows, 0, QTableWidgetItem(roof_leakage))
-            self.tableWidget.setItem(rows, 1, QTableWidgetItem(sole_leakage))
-            self.tableWidget.setCellWidget(rows, 2, insulation_combo)
-            # self.tableWidget.setSortingEnabled(False)
+            if roof_leakage != sole_leakage:
+                self.tableWidget.insertRow(rows)
+                self.tableWidget.setItem(rows, 0, QTableWidgetItem(roof_leakage))
+                self.tableWidget.setItem(rows, 1, QTableWidgetItem(sole_leakage))
+                self.tableWidget.setCellWidget(rows, 2, insulation_combo)
+                # self.tableWidget.setSortingEnabled(False)
 
 
     def add_work(self):

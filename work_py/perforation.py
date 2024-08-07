@@ -27,7 +27,7 @@ class TabPage_SO(QWidget):
         self.labelHolesMetr = QLabel("отверстий на 1п.м", self)
         self.lineEditHolesMetr = QComboBox(self)
         self.lineEditHolesMetr.addItems(['6', '8', '10', '16', '18', '20', '30'])
-        self.lineEditHolesMetr.setCurrentIndex(5)
+        self.lineEditHolesMetr.setCurrentIndex(3)
 
         self.label_type_perforation = QLabel("Тип перфорации", self)
         TabPage_SO.combobox_type_perforation = QComboBox(self)
@@ -129,11 +129,11 @@ class PerforationWindow(QMainWindow):
                                               'кол-во отверстий на 1 п.м. зарядов ГП', 20, 5,
                                               50)[0]
             chargePM_BO = QInputDialog.getInt(self, 'кол-во отверстий на 1 п.м.',
-                                              'кол-во отверстий на 1 п.м. зарядов БО', 20, 5,
+                                              'кол-во отверстий на 1 п.м. зарядов БО', 10, 5,
                                               50)[0]
         else:
             chargePM = QInputDialog.getInt(self, 'кол-во отверстий на 1 п.м.',
-                                           'кол-во отверстий на 1 п.м.', 20, 5,
+                                           'кол-во отверстий на 1 п.м.', 16, 5,
                                            50)[0]
 
         self.tableWidget.setSortingEnabled(False)
@@ -438,8 +438,7 @@ class PerforationWindow(QMainWindow):
                 row_max = self.table_widget.rowCount()
                 definition_plast_work(self)
                 MyWindow.insert_data_in_database(self, row, row_max)
-                if float(well_data.max_angle._value) >= 50:
-                    lst.extend([3, 4])
+
                 if i in lst:  # Объединение ячеек по вертикале в столбце "отвественные и норма"
                     self.table_widget.setSpan(i + self.ins_ind, 2, 1, 8)
                 for column, data in enumerate(row_data):

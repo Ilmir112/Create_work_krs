@@ -1,16 +1,11 @@
-from PyQt5 import QtWidgets
+import krs
+import well_data
 from PyQt5.QtGui import QDoubleValidator
 from PyQt5.QtWidgets import QInputDialog, QMessageBox, QLabel, QLineEdit, QComboBox, QGridLayout, QWidget, QTabWidget, \
     QMainWindow, QPushButton
-# from PyQt5.uic.properties import QtWidgets
-
-import krs
-import main
-import well_data
 from main import MyWindow
 from work_py.alone_oreration import kot_select
-from .opressovka import OpressovkaEK
-from .rationingKRS import descentNKT_norm, liftingNKT_norm,well_volume_norm
+from .rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
 from .opressovka import OpressovkaEK, TabPage_SO
 
 
@@ -49,6 +44,17 @@ class TabPage_SO_grp(QWidget):
         self.current_depth_edit.setValidator(validator)
         self.current_depth_edit.setText(str(int(well_data.current_bottom)))
 
+        self.otz_after_question_Label = QLabel("Нужно ли отбивать забой после нормализации", self)
+        self.otz_after_question_QCombo = QComboBox(self)
+        self.otz_after_question_QCombo.currentTextChanged.connect(self.update_paker)
+        self.otz_after_question_QCombo.addItems(['Да', 'Нет'])
+
+        if self.current_depth_edit.text() != '':
+            if self.current_depth_edit.text() - well_data.perforation_sole < 100 \
+                    or (well_data.max_angle > 60 and well_data.max_angle_H._value > well_data.perforation_roof) \
+                    or well_data.open_trunk_well is True:
+                self.otz_after_question_QCombo.setCurrentIndex(1)
+                self.otz_question_QCombo.setCurrentIndex(1)
 
         self.grid_layout = QGridLayout(self)
 
@@ -70,6 +76,8 @@ class TabPage_SO_grp(QWidget):
         self.grid_layout.addWidget(self.current_depth_label, 3, 6)
         self.grid_layout.addWidget(self.current_depth_edit, 4, 6)
 
+        self.grid_layout.addWidget(self.otz_after_question_Label, 3, 7)
+        self.grid_layout.addWidget(self.otz_after_question_QCombo, 4, 7)
 
     def update_paker(self):
 
@@ -86,10 +94,12 @@ class TabPage_SO_grp(QWidget):
                 self.paker_khost_edit.setText(f'{paker_khost}')
                 self.diametr_paker_edit.setText(f'{TabPage_SO.paker_diametr_select(self, int(paker_depth))}')
 
+
 class TabWidget(QTabWidget):
     def __init__(self):
         super().__init__()
         self.addTab(TabPage_SO_grp(self), 'пакер ГРП')
+
 
 class Grp_window(QMainWindow):
     def __init__(self, ins_ind, table_widget):
@@ -109,12 +119,11 @@ class Grp_window(QMainWindow):
         vbox.addWidget(self.buttonAdd, 2, 0)
 
     def add_work(self):
-
-
         diametr_paker = int(float(self.tabWidget.currentWidget().diametr_paker_edit.text()))
         paker_khost = int(float(self.tabWidget.currentWidget().paker_khost_edit.text()))
         paker_depth = int(float(self.tabWidget.currentWidget().paker_depth_edit.text()))
         gisOTZ_true_quest = self.tabWidget.currentWidget().otz_question_QCombo.currentText()
+        gisOTZ_after_true_quest = self.tabWidget.currentWidget().otz_after_question_QCombo.currentText()
         normalization_true_quest = self.tabWidget.currentWidget().normalization_QCombo.currentText()
         current_depth = int(float(self.tabWidget.currentWidget().current_depth_edit.text()))
         if MyWindow.check_true_depth_template(self, paker_depth) is False:
@@ -124,23 +133,21 @@ class Grp_window(QMainWindow):
         if MyWindow.check_depth_in_skm_interval(self, paker_depth) is False:
             return
 
-
         if int(paker_khost) + int(paker_depth) > well_data.current_bottom:
             mes = QMessageBox.warning(self, 'Некорректные данные', f'Компоновка НКТ c хвостовик + пакер '
                                                                    f'ниже текущего забоя')
             return
-        work_list = self.grpPaker(diametr_paker, paker_depth, paker_khost, gisOTZ_true_quest,
+        work_list = self.grpPaker(diametr_paker, paker_depth, paker_khost, gisOTZ_true_quest, gisOTZ_after_true_quest,
                                   normalization_true_quest, current_depth)
 
         MyWindow.populate_row(self, self.ins_ind, work_list, self.table_widget)
         well_data.pause = False
         self.close()
 
-    def normalization(self, current_depth, diametr_paker):
+    def normalization(self, current_depth, diametr_paker, gisOTZ_after_true_quest):
 
         from .opressovka import TabPage_SO
-        nkt_diam = ''.join(['73' if well_data.column_diametr._value > 110 else '60'])
-
+        nkt_diam = well_data.nkt_diam
 
         normalization_list = [
             [f'Согласовать Алгоритм нормализации до H- {current_depth}м', None,
@@ -160,13 +167,14 @@ class Grp_window(QMainWindow):
              None, None, None, None, None, None, None,
              'Мастер КРС', descentNKT_norm(well_data.current_bottom, 1)],
             [f'нормализацию забоя до гл. {current_depth}м', None,
-             f'Произвести нормализацию забоя  с наращиванием, комбинированной  промывкой по круговой циркуляции  жидкостью '
+             f'Произвести нормализацию забоя  с наращиванием, комбинированной промывкой по круговой циркуляции жидкостью '
              f'с расходом жидкости не менее 8 л/с до гл. {current_depth}м. Тех отстой 2ч. Повторное определение '
              f'текущего забоя, при необходимости повторно вымыть.',
              None, None, None, None, None, None, None,
              'Мастер КРС', 2.5],
             [None, None,
-             f'Поднять перо с глубины {current_depth}м с доливом скважины тех.жидкостью уд. весом {well_data.fluid_work}  в объеме '
+             f'Поднять перо с глубины {current_depth}м с доливом скважины тех.жидкостью уд. весом {well_data.fluid_work} '
+             f'в объеме '
              f'{round(current_depth * 1.12 / 1000, 1)}м3',
              None, None, None, None, None, None, None,
              'Мастер КРС', liftingNKT_norm(current_depth, 1)],
@@ -185,7 +193,8 @@ class Grp_window(QMainWindow):
              None, None, None, None, None, None, None,
              'мастер КРС, предст. заказчика', None],
             [None, None,
-             f'Поднять {kot_select(self, current_depth)} на НКТ{well_data.nkt_diam}мм c глубины {current_depth}м с доливом скважины в '
+             f'Поднять {kot_select(self, current_depth)} на НКТ{well_data.nkt_diam}мм c глубины {current_depth}м с '
+             f'доливом скважины в '
              f'объеме {round(current_depth * 1.12 / 1000, 1)}м3 удельным весом {well_data.fluid_work}',
              None, None, None, None, None, None, None,
              'мастер КРС', liftingNKT_norm(current_depth, 1)],
@@ -213,17 +222,20 @@ class Grp_window(QMainWindow):
              f' {well_data.fluid_work}  в объеме '
              f'{round(well_data.current_bottom * 1.12 / 1000, 1)}м3',
              None, None, None, None, None, None, None,
-             'Мастер КРС', liftingNKT_norm(current_depth,1.2)],
+             'Мастер КРС', liftingNKT_norm(current_depth, 1.2)],
             [f'по согласованию с заказчиком: Отбивка забоя',
              None, f'по согласованию с заказчиком: \n'
-                 f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {well_data.contractor}". '
-                 f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером  {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г. '
-                 f'ЗАДАЧА 2.8.2 Отбить забой по ГК и ЛМ',
+                   f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {well_data.contractor}". '
+                   f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером '
+                   f'{well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г. '
+                   f'ЗАДАЧА 2.8.2 Отбить забой по ГК и ЛМ',
              None, None, None, None, None, None, None,
              'Мастер КРС, подрядчик по ГИС', 4]]
+
+        if gisOTZ_after_true_quest == 'Нет':
+            normalization_list = normalization_list[:-1]
+
         return normalization_list
-
-
 
     def paker_select(self, paker_depth, diametr_paker):
 
@@ -241,7 +253,7 @@ class Grp_window(QMainWindow):
                            f'опрессовочный узел +НКТ{nkt_diam}м - 10м, реперный патрубок НКТ{nkt_diam}м - 2м'
             paker_short = f'воронка, НКТ{nkt_diam}м - 1,5м, пакер ГРП {diametr_paker}мм для ЭК {well_data.column_diametr._value}мм ' \
                           f'х {well_data.column_wall_thickness._value}мм +' \
-                           f'опрессовочный узел +НКТ{nkt_diam}м - 10м, реперный патрубок НКТ{nkt_diam}м - 2м'
+                          f'опрессовочный узел +НКТ{nkt_diam}м - 10м, реперный патрубок НКТ{nkt_diam}м - 2м'
 
         else:
             paker_select = f'воронка, НКТ{nkt_diam}м - 1,5м, пакер ГРП- {diametr_paker}мм для ЭК ' \
@@ -253,21 +265,24 @@ class Grp_window(QMainWindow):
             paker_short = f'воронка, НКТ{nkt_diam}м - 1,5м, пакер ГРП - {diametr_paker}мм для ЭК ' \
                           f'{well_data.column_additional_diametr._value}мм х ' \
                           f'{well_data.column_additional_wall_thickness._value}мм+' \
-                           f'опрессовочный узел +НКТ{nkt_diam}м - 10м, реперный патрубок НКТ{nkt_diam}м - 2м,' \
+                          f'опрессовочный узел +НКТ{nkt_diam}м - 10м, реперный патрубок НКТ{nkt_diam}м - 2м,' \
                           f' + НКТ{nkt_diam} ' \
-                           f' L-{round(paker_depth - well_data.head_column_additional._value, 0)}м'
+                          f' L-{round(paker_depth - well_data.head_column_additional._value, 0)}м'
         return paker_select, paker_short
 
-
-    def grpPaker(self, diametr_paker, paker_depth, paker_khost, gisOTZ_true_quest,
-                                  normalization_true_quest, current_depth):
+    def grpPaker(self, diametr_paker, paker_depth, paker_khost, gisOTZ_true_quest, gisOTZ_after_true_quest,
+                 normalization_true_quest, current_depth):
         if 'Ойл' in well_data.contractor:
             schema_grp = '7а'
         elif 'РН' in well_data.contractor:
             schema_grp = '6'
 
-        nkt_diam = ''.join(['89' if well_data.column_diametr._value > 110 else '60'])
-
+        if well_data.column_diametr._value > 133:
+            nkt_diam = 89
+        elif 110 < well_data.column_diametr._value <= 133:
+            nkt_diam = 73
+        else:
+            nkt_diam = 60
 
         paker_list = [
             [f'За 48 часов оформить заявку на завоз оборудования ГРП.', None,
@@ -285,7 +300,7 @@ class Grp_window(QMainWindow):
              f'НКТ{nkt_diam}м на глубину {paker_depth}м, с замером, шаблонированием НКТ. '
              f'{"".join(["(Произвести пробную посадку на глубине 50м)" if well_data.column_additional is False else " "])}',
              None, None, None, None, None, None, None,
-             'мастер КРС', descentNKT_norm(paker_depth,1.2)],
+             'мастер КРС', descentNKT_norm(paker_depth, 1.2)],
             [None, None,
              f'При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ) '
              f'Сборку компоновки производить только под руководством представителя подрядчика по ГРП'
@@ -402,7 +417,7 @@ class Grp_window(QMainWindow):
              f'{round(well_data.current_bottom * 1.12 / 1000, 1)}м3. \n'
              f'На демонтаж пригласить представителя подрядчика по ГРП',
              None, None, None, None, None, None, None,
-             'Мастер КРС, представ. заказчика', liftingNKT_norm(paker_depth,1.2)],
+             'Мастер КРС, представ. заказчика', liftingNKT_norm(paker_depth, 1.2)],
             [None, None,
              f'Опрессовать глухие плашки превентора на максимально допустимое давление '
              f'{well_data.max_admissible_pressure._value}атм, но не выше '
@@ -416,7 +431,6 @@ class Grp_window(QMainWindow):
              'Мастер КРС', 0.67]
         ]
 
-
         if gisOTZ_true_quest == 'Да':
             paker_list.append(
                 [f'Отбить забой по ГК и ЛМ', None,
@@ -429,7 +443,7 @@ class Grp_window(QMainWindow):
             pass
 
         if normalization_true_quest == 'Да':
-            for row in self.normalization(current_depth, diametr_paker):
+            for row in self.normalization(current_depth, diametr_paker, gisOTZ_after_true_quest):
                 paker_list.append(row)
         else:
             pass
@@ -446,14 +460,12 @@ class Grp_window(QMainWindow):
         else:
             nkt_diam = '60'
 
-
-
         paker_diametr = TabPage_SO.paker_diametr_select(self, paker_depth)
         if well_data.column_additional is False or well_data.column_additional is True and paker_depth < well_data.head_column_additional._value:
             paker_select = f'воронка, НКТ{nkt_diam}м - {paker_khost}м, пакер ПРО-ЯМО-{paker_diametr} (либо аналог) +' \
                            f'опрессовочный узел +НКТ{nkt_diam}м - 10м, реперный патрубок НКТ{nkt_diam}м - 2м,'
             paker_short = f'в-ка, НКТ{nkt_diam}м - {paker_khost}м, пакер {paker_diametr}  +' \
-                           f'опрессовочный узел +НКТ{nkt_diam}м - 10м, репер НКТ{nkt_diam}м - 2м,'
+                          f'опрессовочный узел +НКТ{nkt_diam}м - 10м, репер НКТ{nkt_diam}м - 2м,'
         elif well_data.column_additional is True and well_data.column_additional_diametr._value < 110 and \
                 paker_depth > well_data.head_column_additional._value:
             nkt_diam_add = '60'
@@ -464,12 +476,9 @@ class Grp_window(QMainWindow):
                           f'опрессовочный узел +НКТ{nkt_diam_add}м - 10м, репер НКТ{nkt_diam_add}м - 2м,' \
                           f'{round(paker_depth - well_data.head_column_additional._value, 0)}м'
 
-
         return paker_select, paker_short
 
-
     def nktGrp(self):
-
 
         if well_data.column_additional is False or (
                 well_data.column_additional is True and well_data.current_bottom >= well_data.head_column_additional._value):
@@ -477,4 +486,5 @@ class Grp_window(QMainWindow):
         elif well_data.column_additional is True and well_data.column_additional_diametr._value < 110:
             return f'НКТ60мм L- {round(well_data.current_bottom - well_data.head_column_additional._value + 20, 0)}'
         elif well_data.column_additional is True and well_data.column_additional_diametr._value > 110:
-            return f'НКТ{well_data.nkt_diam}мм со снятыми фасками L- {round(well_data.current_bottom - well_data.head_column_additional._value + 20, 0)}'
+            return f'НКТ{well_data.nkt_diam}мм со снятыми фасками L-' \
+                   f'{round(well_data.current_bottom - well_data.head_column_additional._value + 20, 0)}'

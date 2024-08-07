@@ -65,10 +65,9 @@ class TabPage_SO(QWidget):
                 if well_data.plast_project:
                     work_plast = well_data.plast_project[0]
                     work_plast_index = 1
+            av= work_plast, work_plast_iter, well_data.dict_perforation_project
 
-
-            if work_plast == work_plast_iter and well_data.work_plan not in \
-                    ['application_pvr', 'application_gis', 'gnkt_after_grp', 'gnkt_frez', 'gntk_opz']:
+            if num != 0:
                 if len(well_data.dict_perforation_project) != 0 and \
                         any([plast not in well_data.plast_work for plast in well_data.plast_project]):
 
@@ -87,7 +86,7 @@ class TabPage_SO(QWidget):
                         well_data.plast_project.append(work_plast)
                         work_plast_index = 1
 
-                self.plast_all.append(work_plast)
+                    self.plast_all.append(work_plast)
 
 
             plast_index.combo_box.addItems(self.plast_all)
@@ -262,7 +261,8 @@ class CategoryWindow(QMainWindow):
                     return
                 for plast in plast_sel.split(', '):
                     plast_index.append(plast)
-                    if plast not in well_data.plast_work:
+
+                    if self.tabWidget.currentWidget().labels_category[index][8].currentText() == 'планируемый':
                         well_data.plast_project.append(plast)
                     try:
                         CategoryWindow.dict_category.setdefault(plast, {}).setdefault(

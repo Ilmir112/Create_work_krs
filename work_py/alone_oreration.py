@@ -1,6 +1,8 @@
+import json
 import logging
 from collections import namedtuple
 
+from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QInputDialog, QMessageBox
 
 import H2S
@@ -32,6 +34,9 @@ def kot_select(self, current_bottom):
 
 def kot_work(self, current_bottom):
 
+    current_bottom, _ = QInputDialog.getDouble(None,
+                                            'Глубина забоя',
+                                            'Введите глубину необходимого текущего забоя', current_bottom, 1, 10000, 1)
 
     kot_list = [[f'статической уровень {well_data.static_level._value}', None,
                  f'При отсутствии циркуляции:\n'
@@ -56,7 +61,7 @@ def kot_work(self, current_bottom):
                  None, None, None, None, None, None, None,
                  'мастер КРС', liftingNKT_norm(float(current_bottom), 1)]
                 ]
-
+    well_data.current_bottom =current_bottom
     return kot_list
 
 
@@ -92,6 +97,7 @@ def check_h2s(self, plast= 0, fluid_new = 0, expected_pressure = 0):
     return fluid_new, plast, expected_pressure
 
 def need_h2s(fluid_new, plast_edit, expected_pressure):
+    asd=well_data.dict_category
     сat_h2s_list = list(map(int, [well_data.dict_category[plast]['по сероводороду'].category for plast in
                                   well_data.plast_work if well_data.dict_category.get(plast) and
                                   well_data.dict_category[plast]['отключение'] == 'рабочий']))
@@ -209,7 +215,7 @@ def definition_Q_nek(self):
     plast = well_data.plast_select
     definition_Q_list = [[f'Насыщение 5м3 Q-{plast} при {well_data.max_admissible_pressure._value}', None,
                           f'Произвести насыщение скважины по затрубу до стабилизации давления закачки не '
-                           f'менее 5м3. Опробовать  '
+                           f'менее 5м3. Опробовать по затрубу'
                            f' на приемистость {plast} при Р={well_data.max_admissible_pressure._value}атм в присутствии '
                            f'представителя ЦДНГ. '
                            f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, '
@@ -220,8 +226,10 @@ def definition_Q_nek(self):
 
     return definition_Q_list
 def privyazkaNKT(self):
-    priv_list = [[f'ГИС Привязка по ГК и ЛМ', None, f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {well_data.contractor}". '
-                 f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером  {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г. '
+    priv_list = [[f'ГИС Привязка по ГК и ЛМ', None,
+                  f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {well_data.contractor}". '
+                 f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером '
+                  f'{well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г. '
                  f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины',
      None, None, None, None, None, None, None,
      'Мастер КРС, подрядчик по ГИС', 4]]
@@ -239,7 +247,8 @@ def definitionBottomGKLM(self):
 def pressuar_gis(self):
     priv_list = [[f'Замер Рпл', None,
                  f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {well_data.contractor}". '
-                 f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером  {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г. '
+                 f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером '
+                 f'{well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г. '
                  f'Произвести замер Рпл в течении 4часов. При необходимости согласовать с заказчиком смену категории',
                  None, None, None, None, None, None, None,
                  'Мастер КРС, подрядчик по ГИС', 8]]
@@ -287,24 +296,50 @@ def fluid_change(self):
     from open_pz import CreatePZ
 
     try:
-        CreatePZ.fluid_work, CreatePZ.fluid_work_short, plast, expected_pressure = check_h2s(self)
+        fluid_work, fluid_work_short, plast, expected_pressure = check_h2s(self)
+
+        well_data.fluid_work, well_data.fluid_work_short = fluid_work, fluid_work_short
+
+        fluid_change_list = [
+            [f'Cмена объема {well_data.fluid}г/см3- {round(well_volume(self,well_data.current_bottom), 1)}м3' ,
+              None,
+              f'Произвести смену объема обратной промывкой по круговой циркуляции  жидкостью  {well_data.fluid_work} '
+              f'(по расчету по вскрываемому пласта Рожид- {expected_pressure}атм) в объеме не '
+              f'менее {round(well_volume(self, well_data.current_bottom), 1)}м3  в присутствии '
+              f'представителя заказчика, Составить акт. '
+              f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за '
+              f'2 часа до начала работ)',
+              None, None, None, None, None, None, None,
+              'мастер КРС', well_volume_norm(well_volume(self, well_data.current_bottom))]
+        ]
 
 
-        fluid_change_list = [[f'Cмена объема {CreatePZ.fluid}г/см3- {round(well_volume(self, CreatePZ.current_bottom), 1)}м3' ,
-                              None,
-                              f'Произвести смену объема обратной промывкой по круговой циркуляции  жидкостью  {CreatePZ.fluid_work} '
-                              f'(по расчету по вскрываемому пласта Рожид- {expected_pressure}атм) в объеме не '
-                              f'менее {round(well_volume(self, CreatePZ.current_bottom), 1)}м3  в присутствии '
-                              f'представителя заказчика, Составить акт. '
-                              f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за '
-                              f'2 часа до начала работ)',
-                              None, None, None, None, None, None, None,
-                              'мастер КРС', well_volume_norm(well_volume(self, CreatePZ.current_bottom))]]
     except Exception as e:
         logging.exception("Произошла ошибка")
         return
 
     return fluid_change_list
+def update_fluid(index_plan, fluid_str, table_widget):
+    row_index = index_plan - well_data.count_row_well
+    aaa = well_data.data_list
+    for index_row, data in enumerate(well_data.data_list):
+        if index_row == row_index:
+            fluid_str_old = well_data.data_list[index_row][7]
+        if row_index <= index_row:
+            aaad = well_data.data_list[index_row][7]
+            if well_data.data_list[index_row][7] == fluid_str_old:
+                well_data.data_list[index_row][7] = fluid_str
+                ccc = well_data.data_list[index_row][7]
+                for column in range(table_widget.columnCount()):
+                    if column == 2 or column == 0:
+                        row_change = index_row + well_data.count_row_well
+                        value = table_widget.item(row_change, column).text()
+                        if value != None or value != '':
+                            if fluid_str_old in value:
+                                new_value = value.replace(fluid_str_old, fluid_str)
+                                new_value = QtWidgets.QTableWidgetItem(f'{new_value}')
+                                table_widget.setItem(row_change, column, new_value)
+
 
 def calculationFluidWork(vertical, pressure):
     if (isinstance(vertical, float) or isinstance(vertical, int)) and (
