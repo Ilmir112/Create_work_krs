@@ -38,6 +38,6 @@ class CalcFond:
 
                 calc_pressuar_dict[nkt_l] = 149 - p if pressuar_nkt < 149 - p else pressuar_nkt
         except Exception as e:
-            QMessageBox.warning(None, 'Ошибка', f'Ошибка расчета опрессовки НКТ {e}')
+            QMessageBox.warning(None, 'Ошибка', f'Ошибка расчета опрессовки НКТ {type(e).__name__}\n\n{str(e)}')
         return calc_pressuar_dict
 

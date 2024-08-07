@@ -140,7 +140,7 @@ class Classifier_well(QMainWindow):
                     data = cur.fetchall()
 
             except psycopg2.Error as e:
-                 QMessageBox.warning(self, 'Ошибка', f'Ошибка подключения к базе данных: {e}')
+                 QMessageBox.warning(self, 'Ошибка', f'Ошибка подключения к базе данных: {type(e).__name__}\n\n{str(e)}')
 
             finally:
                 if conn:
@@ -384,7 +384,7 @@ class Classifier_well(QMainWindow):
 
                                 QMessageBox.information(None, 'данные обновлены', 'Данные обновлены')
                             except Exception as e:
-                                QMessageBox.warning(None, 'ОШИБКА', f'Выбран файл с не корректными данными: {e}')
+                                QMessageBox.warning(None, 'ОШИБКА', f'Выбран файл с не корректными данными: {type(e).__name__}\n\n{str(e)}')
 
                         else:
                             QMessageBox.warning(None, 'ВНИМАНИЕ ОШИБКА',
@@ -395,7 +395,7 @@ class Classifier_well(QMainWindow):
 
             except sqlite3.Error as e:
                 # Выведите сообщение об ошибке
-                QMessageBox.warning(None, 'Ошибка', f'Ошибка подключения к базе данных: /n {e}')
+                QMessageBox.warning(None, 'Ошибка', f'Ошибка подключения к базе данных: /n {type(e).__name__}\n\n{str(e)}')
             finally:
                 # Закройте курсор и соединение
                 if cursor:
@@ -673,7 +673,7 @@ class Classifier_well(QMainWindow):
                                 QMessageBox.information(None, 'данные обновлены', 'Данные обновлены')
 
                             except Exception as e:
-                                QMessageBox.warning(None, 'ОШИБКА', f'Выбран файл с не корректными данными: {e}')
+                                QMessageBox.warning(None, 'ОШИБКА', f'Выбран файл с не корректными данными: {type(e).__name__}\n\n{str(e)}')
 
                         else:
                             QMessageBox.warning(None, 'ВНИМАНИЕ ОШИБКА',
@@ -683,7 +683,7 @@ class Classifier_well(QMainWindow):
 
             except sqlite3.Error as e:
                 # Выведите сообщение об ошибке
-                QMessageBox.warning(None, 'Ошибка', f'Ошибка подключения к базе данных : {e}')
+                QMessageBox.warning(None, 'Ошибка', f'Ошибка подключения к базе данных : {type(e).__name__}\n\n{str(e)}')
             finally:
                 # Закройте курсор и соединение
                 if cursor:
@@ -768,7 +768,7 @@ def insert_database_well_data(well_number, well_area, contractor, costumer, data
 
         except psycopg2.Error as e:
             # Выведите сообщение об ошибке
-             QMessageBox.warning(None, 'Ошибка', f'Ошибка подключения к базе данных  well_data {e}')
+             QMessageBox.warning(None, 'Ошибка', f'Ошибка подключения к базе данных  well_data {type(e).__name__}\n\n{str(e)}')
     else:
         try:
 
@@ -836,7 +836,7 @@ def insert_database_well_data(well_number, well_area, contractor, costumer, data
 
         except sqlite3.Error as e:
             # Выведите сообщение об ошибке
-             QMessageBox.warning(None, 'Ошибка', f'Ошибка подключения к базе данных hg{e}')
+             QMessageBox.warning(None, 'Ошибка', f'Ошибка подключения к базе данных hg{type(e).__name__}\n\n{str(e)}')
 
 
 def connect_to_db(name_base, folder_base):
@@ -1215,7 +1215,7 @@ def create_database_well_db(work_plan, number_dp):
 
         except sqlite3.Error as e:
             # Выведите сообщение об ошибке
-            QMessageBox.warning(None, 'Ошибка', f'Ошибка добавления скважины в базу данных: {e}')
+            QMessageBox.warning(None, 'Ошибка', f'Ошибка добавления скважины в базу данных: {type(e).__name__}\n\n{str(e)}')
         finally:
             if cursor:
                 cursor.close()
@@ -1325,7 +1325,7 @@ def insert_data_new_excel_file(data, rowHeights, colWidth, boundaries_dict):
         well_data.image_data = data['image']
                     # Добавьте обработку ошибки, например, пропуск изображения или запись информации об ошибке в лог
     except ValueError as e:
-        print(f"Ошибка при вставке изображения: {e}")
+        print(f"Ошибка при вставке изображения: {type(e).__name__}\n\n{str(e)}")
 
 
     for col in range(13):

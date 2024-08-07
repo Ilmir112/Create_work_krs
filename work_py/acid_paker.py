@@ -840,7 +840,7 @@ class AcidPakerWindow(QMainWindow):
                 self.expected_P = int(float(self.expected_P))
             self.pressure_three = self.tabWidget.currentWidget().pressure_three_edit.text()
         except Exception as e:
-            QMessageBox.warning(self, 'Ошибка', f'Ошибка сохранения данных {e}')
+            QMessageBox.warning(self, 'Ошибка', f'Ошибка сохранения данных {type(e).__name__}\n\n{str(e)}')
             return
 
         rows = self.tableWidget.rowCount()
@@ -997,7 +997,7 @@ class AcidPakerWindow(QMainWindow):
                             if mes == QMessageBox.StandardButton.No:
                                 return
             except Exception as e:
-                QMessageBox.warning(self, 'Ошибка', f'Ошибка сохранения данных {e}')
+                QMessageBox.warning(self, 'Ошибка', f'Ошибка сохранения данных {type(e).__name__}\n\n{str(e)}')
                 return
 
             if self.paker_layout_combo == 'однопакерная' or self.paker_layout_combo == 'пакер с заглушкой':

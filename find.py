@@ -1536,4 +1536,4 @@ class Well_Category(FindIndexPZ):
                         well_data.check_data_in_pz.append(f'согласно классификатора от {data} категория скважина ' \
                                                           f'по газовому фактору {categoty_gf} категории\n')
             except Exception as e:
-                mes = QMessageBox.warning(self, 'Ошибка', f'Скважина не найдена в классификаторе \n {e}')
+                mes = QMessageBox.warning(self, 'Ошибка', f'Скважина не найдена в классификаторе \n {type(e).__name__}\n\n{str(e)}')

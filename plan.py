@@ -17,8 +17,11 @@ def delete_rows_pz(self, ws):
     # rowHeights_top = [None, 18.0, 18, 18,None, 18.0, 18, 18,None, 18.0, 18, 18, 18.0, 18, 18, 18.0, 18, 18, 18.0, 18, 18]
     rowHeights1 = [ws.row_dimensions[i + 1].height for i in range(well_data.cat_well_min._value, ws.max_row)]
     for key, value in boundaries_dict.items():
-        ws.unmerge_cells(start_column=value[0], start_row=value[1],
-                         end_column=value[2], end_row=value[3])
+        try:
+            ws.unmerge_cells(start_column=value[0], start_row=value[1],
+                             end_column=value[2], end_row=value[3])
+        except:
+            pass
     # print(f'индекс удаления {1, well_data.cat_well_min - 1} , {well_data.data_well_max + 2, ws.max_row - well_data.data_well_max}')
 
     ws.delete_rows(well_data.data_x_max._value, ws.max_row - well_data.data_x_max._value)

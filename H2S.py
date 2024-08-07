@@ -269,7 +269,7 @@ def calv_h2s(self, cat_H2S, h2s_mg, h2s_pr):
 
             udel_vodoiz_nkt = 10 * 3.14 * ((nkt_1 * 0.01) ** 2 - (nkt_1 * 0.01 - 5.5 * 2 * 0.01) ** 2) / 4
         except Exception as e:
-            QMessageBox.warning(None, 'Ошибка', f'Ошибка обработки НКТ {e}')
+            QMessageBox.warning(None, 'Ошибка', f'Ошибка обработки НКТ {type(e).__name__}\n\n{str(e)}')
         # print(f' удел {udel_vodoiz_nkt}')
         try:
             # print(f'НКТ-{nkt_2}')

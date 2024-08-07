@@ -152,7 +152,7 @@ class UpdateChecker(QWidget):
 
         except requests.exceptions.RequestException as e:
 
-            QMessageBox.warning(self, "Ошибка", f"Не удалось проверить обновления: {e}")
+            QMessageBox.warning(self, "Ошибка", f"Не удалось проверить обновления: {type(e).__name__}\n\n{str(e)}")
 
 
 
@@ -219,7 +219,7 @@ class UpdateThread(QThread):
 
 
         except requests.exceptions.RequestException as e:
-            mes = QMessageBox.warning(None, "Ошибка", f"Не удалось загрузить обновления: {e}")
+            mes = QMessageBox.warning(None, "Ошибка", f"Не удалось загрузить обновления: {type(e).__name__}\n\n{str(e)}")
 
     def move_file(self, source_path, destination_path):
         zima_process_name = "ZIMA.exe"
@@ -235,7 +235,7 @@ class UpdateThread(QThread):
             subprocess.check_call(["cmd", "/c", "move", source_path, destination_path])
             print(f"Файл перемещен из {source_path} в {destination_path}.")
         except subprocess.CalledProcessError as e:
-            print(f"Ошибка при перемещении файла: {e}")
+            print(f"Ошибка при перемещении файла: {type(e).__name__}\n\n{str(e)}")
 
 
 
@@ -249,7 +249,7 @@ class UpdateThread(QThread):
             subprocess.check_call(["cmd", "/c", "start", destination_path])
             print("Приложение успешно запущено.")
         except subprocess.CalledProcessError as e:
-            print(f"Ошибка при запуске приложения: {e}")
+            print(f"Ошибка при запуске приложения: {type(e).__name__}\n\n{str(e)}")
 
     # def wait_for_process_to_close(self, process_name):
     #     """

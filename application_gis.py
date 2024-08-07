@@ -192,7 +192,7 @@ class GisApplication(QMainWindow):
                 self.tableWidget.setItem(rows, 1, QTableWidgetItem(type_gis[1]))
                 self.tableWidget.setItem(rows, 2, QTableWidgetItem(type_gis[2]))
             except Exception as e:
-                mes = QMessageBox.information(self, 'Ошибка', f'Ошибка добавления исследования {e}')
+                mes = QMessageBox.information(self, 'Ошибка', f'Ошибка добавления исследования {type(e).__name__}\n\n{str(e)}')
 
 
 

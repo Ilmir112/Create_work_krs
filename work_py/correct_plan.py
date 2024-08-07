@@ -115,7 +115,7 @@ class TabPageDp(QWidget):
                     except psycopg2.Error as e:
                         # Выведите сообщение об ошибке
                         mes = QMessageBox.warning(None, 'Ошибка',
-                                                  f'Ошибка подключения к базе данных, Скважина не добавлена в базу: \n {e}')
+                                                  f'Ошибка подключения к базе данных, Скважина не добавлена в базу: \n {type(e).__name__}\n\n{str(e)}')
                 else:
                     try:
                         db_path = connect_to_db('well_data.db', 'data_base_well/')
@@ -134,7 +134,7 @@ class TabPageDp(QWidget):
                     except sqlite3.Error as e:
                         # Выведите сообщение об ошибке
                         mes = QMessageBox.warning(None, 'Ошибка',
-                                                  f'Ошибка подключения к базе данных, Скважина не добавлена в базу: \n {e}')
+                                                  f'Ошибка подключения к базе данных, Скважина не добавлена в базу: \n {type(e).__name__}\n\n{str(e)}')
                 # Получение всех результатов
                 wells_with_data = cursor.fetchall()
                 # Проверка, есть ли данные
@@ -268,7 +268,7 @@ class TabPageDp(QWidget):
                     return tables_filter
 
                 except sqlite3.Error as e:
-                    print(f"Ошибка получения списка таблиц: {e}")
+                    print(f"Ошибка получения списка таблиц: {type(e).__name__}\n\n{str(e)}")
                 finally:
                     if cursor:
                         cursor.close()
@@ -349,7 +349,7 @@ class CorrectPlanWindow(QMainWindow):
             boundaries_dict = dict_well['merged_cells']
 
         except Exception as e:
-            QMessageBox.warning(self, 'Ошибка', f'Введены не все параметры {e}')
+            QMessageBox.warning(self, 'Ошибка', f'Введены не все параметры {type(e).__name__}\n\n{str(e)}')
             return
 
         return data, rowHeights, colWidth, boundaries_dict
@@ -433,7 +433,7 @@ class CorrectPlanWindow(QMainWindow):
             except psycopg2.Error as e:
                 # Выведите сообщение об ошибке
                 mes = QMessageBox.warning(None, 'Ошибка',
-                                          f'Ошибка удаления {e}')
+                                          f'Ошибка удаления {type(e).__name__}\n\n{str(e)}')
         else:
             try:
                 db_path = connect_to_db('well_data.db', 'data_base_well/')
@@ -453,7 +453,7 @@ class CorrectPlanWindow(QMainWindow):
             except sqlite3.Error as e:
                 # Выведите сообщение об ошибке
                 mes = QMessageBox.warning(None, 'Ошибка',
-                                          f'Ошибка удаления {e}')
+                                          f'Ошибка удаления {type(e).__name__}\n\n{str(e)}')
 
     def add_work_excel(self, ws2, work_list, ind_ins):
         from well_data import ProtectedIsDigit

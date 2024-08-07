@@ -207,7 +207,7 @@ class GnoWindow(QMainWindow):
                 well_data.current_bottom = current_bottom_ecn_edit
 
         except Exception as e:
-            QMessageBox.warning(self, 'Ошибка', f'Не корректное сохранение параметра: {e}')
+            QMessageBox.warning(self, 'Ошибка', f'Не корректное сохранение параметра: {type(e).__name__}\n\n{str(e)}')
 
             return
 

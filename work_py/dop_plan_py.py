@@ -208,7 +208,7 @@ class TabPageDp(QWidget):
                         # Выведите сообщение об ошибке
                         mes = QMessageBox.warning(None, 'Ошибка',
                                                   f'Ошибка подключения к базе данных, Скважина не '
-                                                  f'добавлена в базу: \n {e}')
+                                                  f'добавлена в базу: \n {type(e).__name__}\n\n{str(e)}')
                 else:
                     try:
                         db_path = connect_to_db('well_data.db', 'data_base_well/')
@@ -226,7 +226,7 @@ class TabPageDp(QWidget):
                         # Выведите сообщение об ошибке
                         mes = QMessageBox.warning(None, 'Ошибка',
                                                   f'Ошибка подключения к базе данных, Скважина не '
-                                                  f'добавлена в базу: \n {e}')
+                                                  f'добавлена в базу: \n {type(e).__name__}\n\n{str(e)}')
                 # Получение всех результатов
                 wells_with_data = cursor.fetchall()
                 # Проверка, есть ли данные
@@ -369,7 +369,7 @@ class TabPageDp(QWidget):
                         if f'{roof}-{sole}' not in skm_interval:
                             skm_interval += f'{roof}-{sole}, '
             except Exception as e:
-                QMessageBox.warning(self, 'Ошибка', f'Не получилось сохранить данные скреперования {e}')
+                QMessageBox.warning(self, 'Ошибка', f'Не получилось сохранить данные скреперования {type(e).__name__}\n\n{str(e)}')
 
             self.skm_interval_edit.setText(skm_interval[:-2])
             self.current_bottom_edit.setText(str(well_data.current_bottom))
@@ -394,7 +394,7 @@ class TabPageDp(QWidget):
         """
         Возвращает список таблиц, имена которых начинаются с заданного префикса.
         """
-        prefix = well_number
+        prefix = str(well_number)
         if 'Ойл' in well_data.contractor:
             contractor = 'ОЙЛ'
         elif 'РН' in well_data.contractor:
@@ -455,7 +455,7 @@ class TabPageDp(QWidget):
                     return tables_filter
 
                 except sqlite3.Error as e:
-                    print(f"Ошибка получения списка таблиц: {e}")
+                    print(f"Ошибка получения списка таблиц: {type(e).__name__}\n\n{str(e)}")
                 finally:
                     if cursor:
                         cursor.close()
@@ -512,17 +512,17 @@ class DopPlanWindow(QMainWindow):
         vbox.addWidget(self.buttonAddProject, 3, 1)
 
     def add_row_table(self):
-        self.current_widget = self.tabWidget.currentWidget()
+        current_widget = self.tabWidget.currentWidget()
 
-        plast_line = self.current_widget.plast_line.text()
-        roof_edit = self.current_widget.roof_edit.text()
-        sole_edit = self.current_widget.sole_edit.text()
-        date_pvr_edit = self.current_widget.date_pvr_edit.text()
-        count_pvr_edit = self.current_widget.count_pvr_edit.text()
-        type_pvr_edit = self.current_widget.type_pvr_edit.text()
-        pressuar_pvr_edit = self.current_widget.pressuar_pvr_edit.text()
-        date_pressuar_edit = self.current_widget.date_pressuar_edit.text()
-        vertical_line = self.current_widget.vertical_line.text()
+        plast_line = current_widget.plast_line.text()
+        roof_edit = current_widget.roof_edit.text()
+        sole_edit = current_widget.sole_edit.text()
+        date_pvr_edit = current_widget.date_pvr_edit.text()
+        count_pvr_edit = current_widget.count_pvr_edit.text()
+        type_pvr_edit = current_widget.type_pvr_edit.text()
+        pressuar_pvr_edit = current_widget.pressuar_pvr_edit.text()
+        date_pressuar_edit = current_widget.date_pressuar_edit.text()
+        vertical_line = current_widget.vertical_line.text()
         try:
             udlin = float(roof_edit) - float(vertical_line)
         except Exception as e:
@@ -558,13 +558,14 @@ class DopPlanWindow(QMainWindow):
             self.tableWidget.setItem(rows, 9, QTableWidgetItem(str(date_pressuar_edit)))
 
     def addPerfProject(self):
-        table_in_base_combo = str(self.current_widget.table_in_base_combo.currentText())
+        current_widget = self.tabWidget.currentWidget()
+        table_in_base_combo = str(current_widget.table_in_base_combo.currentText())
 
         if ' от' in table_in_base_combo:
             table_in_base = table_in_base_combo.split(' ')[2].replace('krs', 'ПР').replace('dop_plan', 'ДП').replace(
                 'dop_plan_in_base', 'ДП')
-        well_number = self.current_widget.well_number_edit.text()
-        well_area = self.current_widget.well_area_edit.text()
+        well_number = current_widget.well_number_edit.text()
+        well_area = current_widget.well_area_edit.text()
         if well_number == '' or well_area == '':
             mes = QMessageBox.critical(self, 'ошибка', 'Ввведите номер площадь скважины')
             return
@@ -662,7 +663,7 @@ class DopPlanWindow(QMainWindow):
             boundaries_dict = dict_well['merged_cells']
 
         except Exception as e:
-            QMessageBox.warning(self, 'Ошибка', f'Введены не все параметры {e}')
+            QMessageBox.warning(self, 'Ошибка', f'Введены не все параметры {type(e).__name__}\n\n{str(e)}')
             return
 
         return data, rowHeights, colWidth, boundaries_dict
@@ -845,33 +846,33 @@ class DopPlanWindow(QMainWindow):
         from data_base.work_with_base import check_in_database_well_data, insert_data_well_dop_plan, round_cell
         from well_data import ProtectedIsNonNone
         from main import MyWindow
-        self.current_widget = self.tabWidget.currentWidget()
-        method_bottom_combo = self.current_widget.method_bottom_combo.currentText()
+        current_widget = self.tabWidget.currentWidget()
+        method_bottom_combo = current_widget.method_bottom_combo.currentText()
         if method_bottom_combo == '':
             mes = QMessageBox.critical(self, 'Забой', 'Выберете метод определения забоя')
             return
 
-        change_pvr_combo = self.current_widget.change_pvr_combo.currentText()
+        change_pvr_combo = current_widget.change_pvr_combo.currentText()
         if change_pvr_combo == '':
             mes = QMessageBox.warning(self, 'Ошибка', 'Нужно выбрать пункт изменения ПВР')
             return
         if well_data.data_in_base:
 
-            fluid = self.current_widget.fluid_edit.text().replace(',', '.')
-            current_bottom = self.current_widget.current_bottom_edit.text()
+            fluid = current_widget.fluid_edit.text().replace(',', '.')
+            current_bottom = current_widget.current_bottom_edit.text()
             if current_bottom != '':
                 current_bottom = round_cell(current_bottom.replace(',', '.'))
 
-            work_earlier = self.current_widget.work_edit.toPlainText()
-            number_dp = self.current_widget.number_DP_Combo.currentText()
-            current_bottom_date_edit = self.current_widget.current_bottom_date_edit.text()
+            work_earlier = current_widget.work_edit.toPlainText()
+            number_dp = current_widget.number_DP_Combo.currentText()
+            current_bottom_date_edit = current_widget.current_bottom_date_edit.text()
 
-            template_depth_edit = self.current_widget.template_depth_edit.text()
-            template_lenght_edit = self.current_widget.template_lenght_edit.text()
+            template_depth_edit = current_widget.template_depth_edit.text()
+            template_lenght_edit = current_widget.template_lenght_edit.text()
             if well_data.column_additional:
-                template_depth_addition_edit = self.current_widget.template_depth_addition_edit.text()
-                template_lenght_addition_edit = self.current_widget.template_lenght_addition_edit.text()
-            skm_interval_edit = self.current_widget.skm_interval_edit.text()
+                template_depth_addition_edit = current_widget.template_depth_addition_edit.text()
+                template_lenght_addition_edit = current_widget.template_lenght_addition_edit.text()
+            skm_interval_edit = current_widget.skm_interval_edit.text()
 
             if current_bottom == '' or fluid == '' or work_earlier == '' or \
                     template_depth_edit == '' or template_lenght_edit == '':
@@ -906,7 +907,7 @@ class DopPlanWindow(QMainWindow):
                 if float(current_bottom) > well_data.bottomhole_drill._value:
                     mes = QMessageBox.critical(self, 'Забой', 'Текущий забой больше пробуренного забоя')
                     return
-                well_data.fluid_work, well_data.fluid_work_short = GnoWindow.calc_work_fluid(self, fluid)
+                well_data.fluid_work, well_data.fluid_work_short = GnoWindow.calc_work_fluid(GnoWindow, fluid)
 
             well_data.template_depth = float(template_depth_edit)
             well_data.template_lenght = float(template_lenght_edit)
@@ -940,8 +941,8 @@ class DopPlanWindow(QMainWindow):
             well_data.count_template = 1
             if well_data.data_in_base:
                 data_well_data_in_base_combo, data_table_in_base_combo = '', ''
-                table_in_base_combo = str(self.current_widget.table_in_base_combo.currentText())
-                well_data_in_base_combo = self.current_widget.well_data_in_base_combo.currentText()
+                table_in_base_combo = str(current_widget.table_in_base_combo.currentText())
+                well_data_in_base_combo = current_widget.well_data_in_base_combo.currentText()
                 if ' от' in table_in_base_combo:
                     data_table_in_base_combo = table_in_base_combo.split(' ')[-1]
                     table_in_base = table_in_base_combo.split(' ')[2]
@@ -961,9 +962,9 @@ class DopPlanWindow(QMainWindow):
                     mes = QMessageBox.critical(self, 'пункт', 'Планы в двух таблицах не совпадают')
                     return
 
-                index_change_line = self.current_widget.index_change_line.text()
-                well_number = self.current_widget.well_number_edit.text()
-                well_area = self.current_widget.well_area_edit.text()
+                index_change_line = current_widget.index_change_line.text()
+                well_number = current_widget.well_number_edit.text()
+                well_area = current_widget.well_area_edit.text()
                 if well_area != '' and well_area != '':
                     well_data.well_number, well_data.well_area = \
                         ProtectedIsNonNone(well_number), ProtectedIsNonNone(well_area)
@@ -1046,20 +1047,20 @@ class DopPlanWindow(QMainWindow):
                     well_data.dict_perforation_short.setdefault(plast, {}).setdefault('отключение', False)
 
         else:
-            fluid = self.current_widget.fluid_edit.text().replace(',', '.')
-            current_bottom = self.current_widget.current_bottom_edit.text()
+            fluid = current_widget.fluid_edit.text().replace(',', '.')
+            current_bottom = current_widget.current_bottom_edit.text()
             if current_bottom != '':
                 current_bottom = round_cell(current_bottom.replace(',', '.'))
 
-            work_earlier = self.current_widget.work_edit.toPlainText()
-            number_dp = self.current_widget.number_DP_Combo.currentText()
+            work_earlier = current_widget.work_edit.toPlainText()
+            number_dp = current_widget.number_DP_Combo.currentText()
 
-            template_depth_edit = self.current_widget.template_depth_edit.text()
-            template_lenght_edit = self.current_widget.template_lenght_edit.text()
+            template_depth_edit = current_widget.template_depth_edit.text()
+            template_lenght_edit = current_widget.template_lenght_edit.text()
             if well_data.column_additional:
-                template_depth_addition_edit = self.current_widget.template_depth_addition_edit.text()
-                template_lenght_addition_edit = self.current_widget.template_lenght_addition_edit.text()
-            skm_interval_edit = self.current_widget.skm_interval_edit.text()
+                template_depth_addition_edit = current_widget.template_depth_addition_edit.text()
+                template_lenght_addition_edit = current_widget.template_lenght_addition_edit.text()
+            skm_interval_edit = current_widget.skm_interval_edit.text()
             try:
 
                 if skm_interval_edit not in ['', 0, '0-0'] and '-' in skm_interval_edit:
@@ -1131,7 +1132,7 @@ class DopPlanWindow(QMainWindow):
             except psycopg2.Error as e:
                 # Выведите сообщение об ошибке
                 mes = QMessageBox.warning(None, 'Ошибка',
-                                          f'Ошибка удаления {e}')
+                                          f'Ошибка удаления {type(e).__name__}\n\n{str(e)}')
         else:
             try:
                 db_path = connect_to_db('well_data.db', 'data_base_well/')
@@ -1151,7 +1152,7 @@ class DopPlanWindow(QMainWindow):
             except sqlite3.Error as e:
                 # Выведите сообщение об ошибке
                 mes = QMessageBox.warning(None, 'Ошибка',
-                                          f'Ошибка удаления {e}')
+                                          f'Ошибка удаления {type(e).__name__}\n\n{str(e)}')
 
     def add_work_excel(self, ws2, work_list, ind_ins):
         for i in range(1, len(work_list) + 1):  # Добавлением работ

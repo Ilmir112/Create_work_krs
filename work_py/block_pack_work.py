@@ -172,7 +172,7 @@ class BlockPackWindow(QMainWindow):
             fluid_new_edit = float(self.tabWidget.currentWidget().fluid_new_edit.text().replace(',', '.'))
             block_type_edit = round(float(self.tabWidget.currentWidget().block_type_volume_edit.text().replace(',', '.')),1)
         except Exception as e:
-            QMessageBox.warning(self, 'Ошибка', f'Не корректное сохранение параметра: {e}')
+            QMessageBox.warning(self, 'Ошибка', f'Не корректное сохранение параметра: {type(e).__name__}\n\n{str(e)}')
 
         work_list = self.block_pack_work(current_edit, pero_combo_QCombo,
                               type_of_block_processing_combo, block_volume_edit, oil_volume_edit, fluid_new_edit, block_type_edit)

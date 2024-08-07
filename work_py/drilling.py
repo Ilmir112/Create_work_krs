@@ -310,7 +310,7 @@ class Drill_window(QMainWindow):
                 return
             need_privyazka_QCombo = self.tabWidget.currentWidget().need_privyazka_QCombo.currentText()
         except Exception as e:
-            QMessageBox.warning(self, 'Ошибка', f'Не корректное сохранение параметра: {e}')
+            QMessageBox.warning(self, 'Ошибка', f'Не корректное сохранение параметра: {type(e).__name__}\n\n{str(e)}')
 
 
         rows = self.tableWidget.rowCount()

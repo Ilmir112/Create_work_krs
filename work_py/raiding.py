@@ -408,7 +408,7 @@ class Raid(MyWindow):
         #                 ryber_list.insert(-1, row)
         #     except Exception as e:
         #
-        #         mes = QMessageBox.warning(self, 'ОШИБКА', f'Смена объема вставить не получитлось {e}')
+        #         mes = QMessageBox.warning(self, 'ОШИБКА', f'Смена объема вставить не получитлось {type(e).__name__}\n\n{str(e)}')
 
 
         return ryber_list

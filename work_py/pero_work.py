@@ -160,7 +160,7 @@ class PeroWindow(QMainWindow):
             if solvent_volume_edit != '':
                 solvent_volume_edit = round(float(solvent_volume_edit),1)
         except Exception as e:
-            QMessageBox.warning(self, 'Ошибка', f'Не корректное сохранение параметра: {e}')
+            QMessageBox.warning(self, 'Ошибка', f'Не корректное сохранение параметра: {type(e).__name__}\n\n{str(e)}')
 
         work_list = self.pero(current_edit, pero_combo_QCombo, solvent_question_QCombo, solvent_volume_edit)
 

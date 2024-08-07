@@ -86,7 +86,7 @@ class LoginWindow(QWidget):
                 well_data.pause = False
                 # Выведите сообщение об ошибке
                 QMessageBox.warning(None, 'Ошибка',
-                                    f'Ошибка подключения к базе данных, проверьте наличие интернета {e}')
+                                    f'Ошибка подключения к базе данных, проверьте наличие интернета {type(e).__name__}\n\n{str(e)}')
             finally:
                 # Закройте курсор и соединение
                 if cursor:
@@ -124,7 +124,7 @@ class LoginWindow(QWidget):
                     return False
 
             except sqlite3.Error as e:
-                QMessageBox.warning(None, 'Ошибка', f'Ошибка подключения к базе данных, проверьте наличие интернет {e}')
+                QMessageBox.warning(None, 'Ошибка', f'Ошибка подключения к базе данных, проверьте наличие интернет {type(e).__name__}\n\n{str(e)}')
                 return False
             finally:
                 # Закройте курсор и соединение
@@ -173,7 +173,7 @@ class LoginWindow(QWidget):
                 conn.close()
                 return users_list
             except sqlite3.Error as e:
-                print(f"Ошибка подключения к SQLite: {e}")
+                print(f"Ошибка подключения к SQLite: {type(e).__name__}\n\n{str(e)}")
                 return []
         return users_list
 
@@ -336,5 +336,5 @@ class RegisterWindow(QWidget):
                         return False
 
             except sqlite3.Error as e:
-                QMessageBox.critical(None, 'Ошибка', f"Ошибка при регистрации: {e}")
+                QMessageBox.critical(None, 'Ошибка', f"Ошибка при регистрации: {type(e).__name__}\n\n{str(e)}")
                 return False

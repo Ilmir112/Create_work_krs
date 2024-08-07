@@ -67,11 +67,14 @@ class ExcelWorker(QThread):
         stop_app = True
         check_true = True
         cursor = ''
+        conn = ''
+
 
         try:
             current_year = datetime.now().year
             month = datetime.now().month
             # print(f'месяц {month}')
+            date_string = ''
             if 1 <= month < 4:
                 date_string = datetime(current_year, 1, 1).strftime('%d.%m.%Y')
                 print(f'Корректная таблица перечня без глушения от {date_string}')
@@ -122,7 +125,8 @@ class ExcelWorker(QThread):
                         check_true = False
                 except psycopg2.Error as e:
                     # Выведите сообщение об ошибке
-                    QMessageBox.warning(MyWindow, 'Ошибка', f'Ошибка подключения к базе данных {e}')
+                    QMessageBox.warning(MyWindow, 'Ошибка', f'Ошибка подключения к базе данных '
+                                                            f'{type(e).__name__}\n\n{str(e)}')
                 finally:
                     # Закройте курсор и соединение
                     if cursor:
@@ -163,7 +167,7 @@ class ExcelWorker(QThread):
                         check_true = False  # Возвращаем False, если запись о скважине не найдена
 
                 except sqlite3.Error as e:
-                    QMessageBox.warning(None, 'Ошибка', f"Ошибка при проверке записи: {e}")
+                    QMessageBox.warning(None, 'Ошибка', f"Ошибка при проверке записи: {type(e).__name__}\n\n{str(e)}")
                     return False  # Возвращаем False в случае ошибки
 
                 finally:
@@ -173,7 +177,7 @@ class ExcelWorker(QThread):
                         conn.close()
 
         except Exception as e:
-            QMessageBox.warning(None, 'Ошибка', f"Ошибка при проверке записи: {e}")
+            QMessageBox.warning(None, 'Ошибка', f"Ошибка при проверке записи: {type(e).__name__}\n\n{str(e)}")
         if stop_app == True:
             MyWindow.pause_app()
             window.close()
@@ -183,6 +187,8 @@ class ExcelWorker(QThread):
 
     def check_category(self, well_number, deposit_area, region):
         from data_base.work_with_base import connect_to_db
+        cursor = ''
+        conn = ''
         if well_data.connect_in_base:
             try:
                 # Подключение к базе данных
@@ -204,8 +210,8 @@ class ExcelWorker(QThread):
                 # ExcelWorker.finished.emit()
             except psycopg2.Error as e:
                 # Выведите сообщение об ошибке
-                mes = QMessageBox.warning(self, 'Ошибка', f'Ошибка подключения к базе данных, не получилось проверить '
-                                                          f'корректность категории {e}')
+                mes = QMessageBox.warning(MyWindow, 'Ошибка', f'Ошибка подключения к базе данных, не получилось проверить '
+                                                          f'корректность категории {type(e).__name__}\n\n{str(e)}')
                 return
             finally:
                 # Закройте курсор и соединение
@@ -231,7 +237,7 @@ class ExcelWorker(QThread):
 
 
             except sqlite3.Error as e:
-                QMessageBox.warning(None, 'Ошибка', f'Ошибка подключения к базе данных: {e}')
+                QMessageBox.warning(None, 'Ошибка', f'Ошибка подключения к базе данных: {type(e).__name__}\n\n{str(e)}')
                 return None  # Возвращаем None в случае ошибки подключения
 
             finally:
@@ -750,7 +756,7 @@ class MyWindow(QMainWindow):
                                                               "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
         if self.fname:
             try:
-                copy = Classifier_well.export_to_sqlite_class_well(self, self.fname, costumer, region)
+                Classifier_well.export_to_sqlite_class_well(self, self.fname, costumer, region)
 
             except FileNotFoundError:
                 print('Файл не найден')
@@ -823,7 +829,7 @@ class MyWindow(QMainWindow):
                                                               "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
         if self.fname:
             try:
-                copy = Classifier_well.export_to_sqlite_without_juming(self, self.fname, costumer, region)
+                Classifier_well.export_to_sqlite_without_juming(self, self.fname, costumer, region)
 
             except FileNotFoundError:
                 print('Файл не найден')
@@ -882,7 +888,7 @@ class MyWindow(QMainWindow):
             if file_name:
                 wb2.save(file_name)
         except Exception as e:
-            mes = QMessageBox.critical(self, 'Ошибка', f'файл под таким именем открыт, закройте его: {e}')
+            mes = QMessageBox.critical(self, 'Ошибка', f'файл под таким именем открыт, закройте его: {type(e).__name__}\n\n{str(e)}')
             return
         try:
             # Создаем объект Excel
@@ -896,7 +902,7 @@ class MyWindow(QMainWindow):
             worksheet.PageSetup.PrintArea = "B:L"
 
         except Exception as e:
-            print(f"Ошибка при работе с Excel: {e}")
+            print(f"Ошибка при работе с Excel: {type(e).__name__}\n\n{str(e)}")
 
     def save_to_excel(self):
         from work_py.gnkt_frez import Work_with_gnkt
@@ -1153,6 +1159,7 @@ class MyWindow(QMainWindow):
             well_data.head_column_additional = ProtectedIsNonNone('не корректно')
             well_data.leakiness_Count = 0
             well_data.bur_rastvor = ''
+            well_data.data, well_data.rowHeights, well_data.colWidth,  well_data.boundaries_dict = '', '', '', ''
             well_data.data_in_base = False
             well_data.well_volume_in_PZ = []
             well_data.expected_pick_up = {}
@@ -2400,7 +2407,7 @@ class MyWindow(QMainWindow):
                 f' газ факт -{gaz_f_pr}т/м3'
         except Exception as e:
             mes = QMessageBox.warning(self, 'ОШИБКА',
-                                      f"Программа не смогла вставить данные в краткое содержание значения по Рпл {e}")
+                                      f"Программа не смогла вставить данные в краткое содержание значения по Рпл {type(e).__name__}\n\n{str(e)}")
         column_well = f'{well_data.column_diametr._value}х{well_data.column_wall_thickness._value} в инт 0 - {well_data.shoe_column._value}м ' \
             if well_data.column_additional is False else f'{well_data.column_diametr._value} х {well_data.column_wall_thickness._value} \n' \
                                                          f'0 - {well_data.shoe_column._value}м/\n{well_data.column_additional_diametr._value}' \
@@ -2574,7 +2581,7 @@ if __name__ == "__main__":
         MyWindow.pause_app()
         well_data.pause = False
     except Exception as e:
-        mes = QMessageBox.warning(None, 'КРИТИЧЕСКАЯ ОШИБКА', f'Критическая ошибка, смотри в лог {e}')
+        mes = QMessageBox.warning(None, 'КРИТИЧЕСКАЯ ОШИБКА', f'Критическая ошибка, смотри в лог {type(e).__name__}\n\n{str(e)}')
 
     # if well_data.connect_in_base:
     #     app2 = UpdateChecker()

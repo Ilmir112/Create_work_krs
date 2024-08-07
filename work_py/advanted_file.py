@@ -441,7 +441,7 @@ def count_row_height(ws, ws2, work_list, merged_cells_dict, ind_ins):
                 logo.width, logo.height = img[2][0] * 0.48, img[2][1] * 0.72
                 ws2.add_image(logo, img[1])
     except TypeError as e:
-        QMessageBox.warning(None, 'Ошибка', f'Ошибка сохранения изображение {e}')
+        QMessageBox.warning(None, 'Ошибка', f'Ошибка сохранения изображение {type(e).__name__}\n\n{str(e)}')
     if well_data.image_data:
         for image_info in well_data.image_data:
             coord = image_info["coord"]
@@ -474,7 +474,7 @@ def count_row_height(ws, ws2, work_list, merged_cells_dict, ind_ins):
                 MyWindow.insert_image(None, ws2, file, coord, width, height)
 
             except ValueError as e:
-                print(f"Ошибка при вставке изображения: {e}")
+                print(f"Ошибка при вставке изображения: {type(e).__name__}\n\n{str(e)}")
 
     for index_row, row in enumerate(ws2.iter_rows()):  # Копирование высоты строки
         if all([col is None for col in row]):

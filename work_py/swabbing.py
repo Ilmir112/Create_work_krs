@@ -738,7 +738,7 @@ class Swab_Window(QMainWindow):
                 fluid_new_edit = ''
                 pressuar_new_edit = ''
         except Exception as e:
-            mes = QMessageBox.critical(self, 'Ошибка', f'Введены не все параметры {e}')
+            mes = QMessageBox.critical(self, 'Ошибка', f'Введены не все параметры {type(e).__name__}\n\n{str(e)}')
             return
         if need_change_zgs_combo == 'Да':
             if (plast_new_combo == '' or fluid_new_edit == '' or pressuar_new_edit == ''):
