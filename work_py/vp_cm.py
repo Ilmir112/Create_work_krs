@@ -123,7 +123,7 @@ class VpWindow(QMainWindow):
                 return
             if MyWindow.check_depth_in_skm_interval(self, vp_depth) is False:
                 return
-            work_list = self.vp(vp_type_QCombo, vp_depth, cement_vp)
+            work_list = self.vp(vp_type_QCombo, vp_depth, cement_vp, need_question_QCombo)
         elif need_question_QCombo == "Нет":
             if MyWindow.check_true_depth_template(self, vp_depth) is False:
                 return
@@ -145,7 +145,7 @@ class VpWindow(QMainWindow):
         well_data.pause = False
         self.close()
 
-    def vp(self, vp_type_QCombo, vp_depth, cement_vp_edit, need_question_QCombo):
+    def vp(self, vp_type_QCombo, vp_depth, cement_vp_edit, need_question_QCombo ):
 
         if well_data.perforation_roof > vp_depth:
             vp_list = [

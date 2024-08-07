@@ -1993,7 +1993,7 @@ class MyWindow(QMainWindow):
                                 text_width = key
                                 table_widget.setRowHeight(row, int(text_width))
         if 'gnkt' not in work_plan:
-            for row in range(self.table_widget.rowCount()):
+            for row in range(table_widget.rowCount()):
                 if row >= well_data.ins_ind2:
                     a = row - well_data.ins_ind2 + 1
                     ab = well_data.ins_ind2

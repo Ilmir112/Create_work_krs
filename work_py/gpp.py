@@ -41,11 +41,7 @@ class TabPage_SO_grp(QWidget):
         self.otz_after_question_QCombo.currentTextChanged.connect(self.update_paker)
         self.otz_after_question_QCombo.addItems(['Да', 'Нет'])
 
-        if self.current_depth_edit.text() != '':
-            if self.current_depth_edit.text() - well_data.perforation_sole < 50 \
-                    or (well_data.max_angle > 60 and well_data.max_angle_H._value > well_data.perforation_roof) \
-                    or well_data.open_trunk_well is True:
-                self.otz_after_question_QCombo.setCurrentIndex(1)
+
 
         self.grid_layout = QGridLayout(self)
 

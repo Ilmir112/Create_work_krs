@@ -91,6 +91,7 @@ class TabPage_SO_sand(QWidget):
 
         self.need_change_zgs_combo.currentTextChanged.connect(self.update_change_fluid)
         self.need_change_zgs_combo.setCurrentIndex(1)
+        self.need_change_zgs_combo.setCurrentIndex(0)
 
         if len(well_data.plast_work) == 0:
             self.need_change_zgs_combo.setCurrentIndex(1)
@@ -125,7 +126,7 @@ class TabPage_SO_sand(QWidget):
 class TabWidget(QTabWidget):
     def __init__(self):
         super().__init__()
-        self.addTab(TabPage_SO_sand(self), 'отсыпка')
+        self.addTab(TabPage_SO_sand(self), 'перо')
 
 class PeroWindow(QMainWindow):
     work_sand_window = None
