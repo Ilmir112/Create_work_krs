@@ -1465,7 +1465,7 @@ class GnoWindow(QMainWindow):
         else:
             krs_begin = [
                 [None, None, 'Порядок работы', None, None, None, None, None, None, None, None, None],
-                [None, None, 'Наименование работ', None, None, None, None, None, None, None, 'Ответственный',
+                [None, 'п/п', 'Наименование работ', None, None, None, None, None, None, None, 'Ответственный',
                  'Нормы времени \n мин/час.'],
             ]
             return krs_begin[:2]

@@ -253,7 +253,7 @@ class GnktOsvWindow(QMainWindow):
 
 
 
-        block_gnvp_list = events_gnvp_frez(self, distance, float(fluid_work_insert))
+        block_gnvp_list = events_gnvp_frez(distance, float(fluid_work_insert))
 
         aaa = well_data.depth_fond_paker_do["do"]
         if well_data.depth_fond_paker_do["do"] != 0:

@@ -842,7 +842,7 @@ class Work_with_gnkt(QMainWindow):
 
         fluid_work, well_data.fluid_work_short = GnoWindow.calc_work_fluid(self, fluid_work_insert)
 
-        block_gnvp_list = events_gnvp_frez(self, distance, fluid_work_insert)
+        block_gnvp_list = events_gnvp_frez(distance, fluid_work_insert)
         gnkt_work_firts = [
             [None, 'ЦЕЛЬ ПРОГРАММЫ', None, None, None, None, None, None, None, None, None, None, None],
             [None, 1,

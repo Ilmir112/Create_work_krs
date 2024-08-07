@@ -363,9 +363,11 @@ class TabPageDp(QWidget):
             skm_interval = ''
 
             try:
+                asd = well_data.skm_interval
                 if len(well_data.skm_interval) != 0:
                     for roof, sole in well_data.skm_interval:
-                        skm_interval += f'{roof}-{sole}, '
+                        if f'{roof}-{sole}' not in skm_interval:
+                            skm_interval += f'{roof}-{sole}, '
             except Exception as e:
                 QMessageBox.warning(self, 'Ошибка', f'Не получилось сохранить данные скреперования {e}')
 
@@ -479,7 +481,7 @@ class DopPlanWindow(QMainWindow):
         self.table_widget = table_widget
         self.work_plan = work_plan
         self.dict_perforation = []
-        self.current_widget = self.tabWidget.currentWidget()
+
 
         self.ws = ws
         self.data, self.rowHeights, self.colWidth, self.boundaries_dict = None, None, None, None
@@ -510,6 +512,7 @@ class DopPlanWindow(QMainWindow):
         vbox.addWidget(self.buttonAddProject, 3, 1)
 
     def add_row_table(self):
+        self.current_widget = self.tabWidget.currentWidget()
 
         plast_line = self.current_widget.plast_line.text()
         roof_edit = self.current_widget.roof_edit.text()
@@ -704,7 +707,7 @@ class DopPlanWindow(QMainWindow):
             else:
 
                 for key, value in boundaries_dict.items():
-                    v = value[1]
+
                     if int(self.target_row_index) + 1 <= value[1] <= int(self.target_row_index_cancel - 4):
                         value = [value[0], value[1], value[0], value[3]]
                     boundaries_dict_new[key] = value
@@ -842,6 +845,7 @@ class DopPlanWindow(QMainWindow):
         from data_base.work_with_base import check_in_database_well_data, insert_data_well_dop_plan, round_cell
         from well_data import ProtectedIsNonNone
         from main import MyWindow
+        self.current_widget = self.tabWidget.currentWidget()
         method_bottom_combo = self.current_widget.method_bottom_combo.currentText()
         if method_bottom_combo == '':
             mes = QMessageBox.critical(self, 'Забой', 'Выберете метод определения забоя')

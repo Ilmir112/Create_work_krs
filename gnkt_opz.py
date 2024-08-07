@@ -264,12 +264,11 @@ class GnktOpz(QMainWindow):
         well_data.pause = False
         self.close()
         return work_list
-
     def gnkt_work(self, roof_plast, sole_plast, need_rast_combo, volume_rast_edit, acid_true_edit,
                   acid_edit, skv_volume_edit, skv_proc_edit, acid_volume_edit, acid_proc_edit, pressure_edit,
                   plast_combo, svk_true_combo, skv_acid_edit, gnkt_number_combo, fluid_work_insert):
 
-        block_gnvp_list = events_gnvp_frez(self, self.distance, float(fluid_work_insert))
+        block_gnvp_list = events_gnvp_frez(self.distance, float(fluid_work_insert))
 
         if gnkt_number_combo == 'ГНКТ №2':
             gnkt_number = gnkt_data.gnkt_2
@@ -338,7 +337,7 @@ class GnktOpz(QMainWindow):
 
         gnkt_opz = [
             [None, 'Порядок работы', None, None, None, None, None, None, None, None, None, None],
-            [None, None, 'Наименование работ', None, None, None, None, None, None, None,
+            [None, 'п/п', 'Наименование работ', None, None, None, None, None, None, None,
              'Ответственный', 'Нормы'],
             [None, 1,
              'ВНИМАНИЕ: Перед спуском и вовремя проведения СПО бурильщикам и мастеру производить осмотр '

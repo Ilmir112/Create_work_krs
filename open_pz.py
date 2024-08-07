@@ -302,7 +302,7 @@ class CreatePZ(QMainWindow):
                 ws.row_dimensions[2].height = 30
 
                 if len(well_data.row_expected) != 0:
-                    for i in range(1, len(well_data.row_expected) + 1):  # Добавление  показатели после ремонта
+                    for i in range(1, len(well_data.row_expected) + 1):  # Добавление показатели после ремонта
                         ws.row_dimensions[well_data.ins_ind + i - 1].height = None
                         for j in range(1, 12):
                             if i == 1:
@@ -328,7 +328,7 @@ class CreatePZ(QMainWindow):
                                      'plan_change']:
                     work_list = [
                         [None, None, 'Порядок работы', None, None, None, None, None, None, None, None, None],
-                        [None, None, 'Наименование работ', None, None, None, None, None, None, None, 'Ответственный',
+                        [None, 'п/п', 'Наименование работ', None, None, None, None, None, None, None, 'Ответственный',
                          'Нормы времени \n мин/час.']]
 
                     for i in range(1, len(work_list) + 1):  # Добавление  показатели после ремонта
@@ -406,7 +406,6 @@ class CreatePZ(QMainWindow):
         if work_plan not in ['gnkt_frez', 'application_pvr', 'gnkt_after_grp', 'gnkt_opz', 'gnkt_bopz']:
             for i in range(ins_ind, len(itog_list) + ins_ind):  # Добавлением итогов
                 if i < ins_ind + 6:
-
                     for j in range(1, 13):
                         ws.cell(row=i, column=j).value = itog_list[i - ins_ind][j - 1]
                         if j != 1:
@@ -414,21 +413,20 @@ class CreatePZ(QMainWindow):
                             ws.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=False)
 
                     ws.merge_cells(start_row=i, start_column=2, end_row=i, end_column=11)
-                    ws.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='left',
+                    ws.cell(row=i, column=j).alignment = Alignment(wrap_text=True, horizontal='left',
                                                                    vertical='center')
                 else:
-                    ws.row_dimensions[i].height = 50
+                    ws.row_dimensions[ins_ind + 6].height = 50
+                    ws.row_dimensions[ins_ind + 8].height = 50
                     for j in range(1, 13):
-
                         ws.cell(row=i, column=j).value = itog_list[i - ins_ind][j - 1]
                         ws.cell(row=i, column=j).border = well_data.thin_border
                         ws.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=False)
-                        ws.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='left',
+                        ws.cell(row=i, column=j).alignment = Alignment(wrap_text=True, horizontal='left',
                                                                        vertical='center')
 
-
                     ws.merge_cells(start_row=i, start_column=2, end_row=i, end_column=12)
-                    ws.cell(row=i, column=2).alignment = Alignment(wrap_text=False, horizontal='left',
+                    ws.cell(row=i, column=j).alignment = Alignment(wrap_text=False, horizontal='left',
                                                                              vertical='center')
 
 
@@ -446,14 +444,15 @@ class CreatePZ(QMainWindow):
                 ws.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=False)
 
             if i in range(ins_ind + 7, 1 + ins_ind + 15):
-                # ws.merge_cells(start_row=i, start_column=2, end_row=i, end_column=6)
-                ws.cell(row=i, column=2).alignment = Alignment(wrap_text=True, vertical='bottom', horizontal='left')
+                ws.merge_cells(start_row=i, start_column=2, end_row=i, end_column=6)
+                ws.cell(row=i, column=2).alignment = Alignment(wrap_text=True, vertical='center', horizontal='left')
+            else:
+                ws.cell(row=i, column=2).alignment = Alignment(wrap_text=False, vertical='center', horizontal='left')
         ws.row_dimensions[ins_ind + 7].height = 30
         ws.row_dimensions[ins_ind + 9].height = 25
 
         ins_ind += len(podp_down)
         aaa = ws.max_row
-        # Удалить строки ниже ins_ind (включительно)
 
         ws.delete_rows(ins_ind, aaa - ins_ind)
 

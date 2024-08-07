@@ -1,3 +1,4 @@
+
 import json
 import sqlite3
 
@@ -544,7 +545,7 @@ class CorrectPlanWindow(QMainWindow):
 
             except psycopg2.Error as e:
                 # Выведите сообщение об ошибке
-                mes = QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных,')
+                QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных,')
             finally:
                 # Закройте курсор и соединение
                 if cursor1:
@@ -553,6 +554,8 @@ class CorrectPlanWindow(QMainWindow):
                     conn1.close()
         else:
             try:
+
+
                 # Формируем полный путь к файлу базы данных
                 db_path = connect_to_db('databaseWell.db', 'data_base_well')
                 conn = sqlite3.connect(db_path)
@@ -563,8 +566,9 @@ class CorrectPlanWindow(QMainWindow):
                 if well_data.work_plan in ['krs', 'plan_change']:
                     work_plan = 'krs'
                     table_name = f'{str(well_data.well_number._value) + " " + well_data.well_area._value + " " + work_plan + " " + contractor}'
+
                     cursor.execute(
-                        f"SELECT name FROM sqlite_master WHERE type='table' AND name=?",
+                        f"SELECT name FROM sqlite_master WHERE type='table' AND name=? ",
                         (table_name,))
                     result_table = cursor.fetchone()
 

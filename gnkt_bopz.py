@@ -257,7 +257,7 @@ class GnktBopz(QMainWindow):
         from krs import volume_jamming_well, volume_pod_NKT
         from work_py.alone_oreration import volume_vn_nkt
 
-        block_gnvp_list = events_gnvp_frez(self, self.distance, float(fluid_work_insert))
+        block_gnvp_list = events_gnvp_frez(self.distance, float(fluid_work_insert))
 
         if gnkt_number_combo == 'ГНКТ №2':
             gnkt_number = gnkt_data.gnkt_2

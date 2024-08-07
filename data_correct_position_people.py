@@ -162,7 +162,7 @@ class CorrectSignaturesWindow(QMainWindow):
 
         # self.selected_region = instance.selected_region
         self.podpis_dict = TabPageSO.podpis_dict
-        self.current_widget = self.tabWidget.currentWidget()
+
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
         self.setWindowModality(QtCore.Qt.ApplicationModal)  # Устанавливаем модальность окна
@@ -182,6 +182,7 @@ class CorrectSignaturesWindow(QMainWindow):
 
     def add_row_table(self):
         selected_region = TabPageSO.selected_region
+        self.current_widget = self.tabWidget.currentWidget()
         
 
         chief_engineer_edit_type = self.current_widget.chief_engineer_edit_type.text()
