@@ -359,7 +359,7 @@ class CorrectPlanWindow(QMainWindow):
         from work_py.dop_plan_py import DopPlanWindow
 
         from well_data import ProtectedIsNonNone
-        from main import MyWindow
+
 
         well_number = self.tabWidget.currentWidget().well_number_edit.text()
         well_area = self.tabWidget.currentWidget().well_area_edit.text()
@@ -495,10 +495,7 @@ class CorrectPlanWindow(QMainWindow):
         from data_base.work_with_base import connect_to_db
         from work_py.dop_plan_py import DopPlanWindow
 
-        if 'Ойл' in well_data.contractor:
-            contractor = 'ОЙЛ'
-        elif 'РН' in well_data.contractor:
-            contractor = 'РН'
+
         if well_data.connect_in_base:
             try:
                 # Устанавливаем соединение с базой данных
@@ -510,7 +507,6 @@ class CorrectPlanWindow(QMainWindow):
                 result_table = 0
 
                 if well_data.work_plan in ['krs', 'plan_change']:
-                    work_plan = 'krs'
 
                     # print(cursor1.execute(f"SELECT EXISTS (SELECT FROM information_schema.tables").fetchall())
                     cursor1.execute(
@@ -521,7 +517,7 @@ class CorrectPlanWindow(QMainWindow):
 
                     cursor1.execute(f"SELECT EXISTS (SELECT FROM information_schema.tables "
                                     f"WHERE table_name = '{table_name}')")
-                    print(f'имя таблицы в {table_name}')
+
                     result_table = cursor1.fetchone()
 
                 if result_table[0]:
@@ -554,19 +550,13 @@ class CorrectPlanWindow(QMainWindow):
                     conn1.close()
         else:
             try:
-
-
                 # Формируем полный путь к файлу базы данных
                 db_path = connect_to_db('databaseWell.db', 'data_base_well')
                 conn = sqlite3.connect(db_path)
                 cursor = conn.cursor()
-
                 result_table = 0
 
                 if well_data.work_plan in ['krs', 'plan_change']:
-                    work_plan = 'krs'
-                    table_name = f'{str(well_data.well_number._value) + " " + well_data.well_area._value + " " + work_plan + " " + contractor}'
-
                     cursor.execute(
                         f"SELECT name FROM sqlite_master WHERE type='table' AND name=? ",
                         (table_name,))
@@ -656,6 +646,8 @@ class CorrectPlanWindow(QMainWindow):
                         data = True
                 data_list.append(data)
             well_data.data_list.append(data_list)
+
+        well_data.fluid_work_short = well_data.fluid_work_short
 
     def work_list(self, work_earlier):
         krs_begin = [[None, None,

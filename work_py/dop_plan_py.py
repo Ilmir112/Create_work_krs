@@ -14,7 +14,9 @@ from datetime import datetime
 
 from data_base.work_with_base import connect_to_db
 from krs import GnoWindow
-from work_py.advanted_file import merge_overlapping_intervals
+from work_py.advanted_file import merge_overlapping_intervals, definition_plast_work
+
+
 class TabPageDp(QWidget):
     def __init__(self, work_plan, tableWidget, old_index):
         super().__init__()
@@ -369,7 +371,8 @@ class TabPageDp(QWidget):
                         if f'{roof}-{sole}' not in skm_interval:
                             skm_interval += f'{roof}-{sole}, '
             except Exception as e:
-                QMessageBox.warning(self, 'Ошибка', f'Не получилось сохранить данные скреперования {type(e).__name__}\n\n{str(e)}')
+                QMessageBox.warning(self, 'Ошибка', f'Не получилось сохранить данные скреперования '
+                                                    f'{type(e).__name__}\n\n{str(e)}')
 
             self.skm_interval_edit.setText(skm_interval[:-2])
             self.current_bottom_edit.setText(str(well_data.current_bottom))
@@ -579,36 +582,37 @@ class DopPlanWindow(QMainWindow):
         self.bottom_row_index = 5000
 
         perforation_list = []
-        aasa = self.data
+        aaaaa = self.data
         for i, row in self.data.items():
-            list_row = []
-
-            for col in range(len(row)):
-
-                if 'оризонт' in str(row[col]['value']) or 'пласт/' in str(row[col]['value']).lower():
-                    self.target_row_index = int(i) + 1
-                elif 'вскрытия/отключения' in str(row[col]['value']):
-                    self.old_index = 1
-
-                elif 'II. История эксплуатации скважины' in str(row[col]['value']) and \
-                        well_data.work_plan not in ['plan_change']:
-                    self.target_row_index_cancel = int(i) - 1
-                    break
-                elif 'Порядок работы' == str(row[col]['value']) and well_data.data_x_max._value == 0:
-
-                    well_data.data_x_max = well_data.ProtectedIsDigit(int(i) + 1)
-                    break
-                elif 'ИТОГО:' in str(row[col]['value']) and well_data.work_plan in ['plan_change']:
-                    self.target_row_index_cancel = int(i) - 1
-                    break
-                elif 'Текущий забой ' in str(row[col]['value']):
-                    self.bottom_row_index = int(i)
-                if int(i) > self.target_row_index:
-                    list_row.append(row[col]['value'])
-
             if i != 'image':
-                if int(i) > self.target_row_index_cancel:
-                    break
+                list_row = []
+
+                for col in range(len(row)):
+
+                    if 'оризонт' in str(row[col]['value']) or 'пласт/' in str(row[col]['value']).lower():
+                        self.target_row_index = int(i) + 1
+                    elif 'вскрытия/отключения' in str(row[col]['value']):
+                        self.old_index = 1
+
+                    elif 'II. История эксплуатации скважины' in str(row[col]['value']) and \
+                            well_data.work_plan not in ['plan_change']:
+                        self.target_row_index_cancel = int(i) - 1
+                        break
+                    elif 'Порядок работы' == str(row[col]['value']) and well_data.data_x_max._value == 0:
+
+                        well_data.data_x_max = well_data.ProtectedIsDigit(int(i) + 1)
+                        break
+                    elif 'ИТОГО:' in str(row[col]['value']) and well_data.work_plan in ['plan_change']:
+                        self.target_row_index_cancel = int(i) - 1
+                        break
+                    elif 'Текущий забой ' in str(row[col]['value']):
+                        self.bottom_row_index = int(i)
+                    if int(i) > self.target_row_index:
+                        list_row.append(row[col]['value'])
+
+
+                    if int(i) > self.target_row_index_cancel:
+                        break
             if len(list_row) != 0 and not 'внутренний диаметр ( d шарошечного долота) не обсаженной части ствола' in list_row:
 
                 if all([col == None or col == '' for col in list_row]) is False:
@@ -956,10 +960,10 @@ class DopPlanWindow(QMainWindow):
                     well_data_in_base = well_data_in_base_combo.split(' ')[3]
 
                 if data_well_data_in_base_combo != data_table_in_base_combo:
-                    mes = QMessageBox.critical(self, 'пункт', 'Даты в двух таблицах не совпадают')
+                    QMessageBox.critical(self, 'пункт', 'Даты в двух таблицах не совпадают')
                     return
                 if table_in_base != well_data_in_base:
-                    mes = QMessageBox.critical(self, 'пункт', 'Планы в двух таблицах не совпадают')
+                    QMessageBox.critical(self, 'пункт', 'Планы в двух таблицах не совпадают')
                     return
 
                 index_change_line = current_widget.index_change_line.text()
@@ -1339,6 +1343,8 @@ class DopPlanWindow(QMainWindow):
         well_data.problemWithEk_diametr = result[paragraph_row][14]
         well_data.dict_perforation_short = json.loads(result[paragraph_row][2])
 
+        definition_plast_work(None)
+
     def insert_data_plan(self, result):
         well_data.data_list = []
         for ind, row in enumerate(result):
@@ -1360,6 +1366,7 @@ class DopPlanWindow(QMainWindow):
                 data_list.append(data)
             well_data.data_list.append(data_list)
         well_data.plast_work_short = well_data.plast_work
+        definition_plast_work(None)
 
     def work_list(self, work_earlier):
         krs_begin = [[None, None,

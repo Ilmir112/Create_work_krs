@@ -91,6 +91,7 @@ class TabPage_SO_swab(QWidget):
         self.need_change_zgs_combo.addItems(['Нет', 'Да'])
 
 
+
         self.fluid_new_label = QLabel('удельный вес ЖГС', self)
         self.fluid_new_edit = QLineEdit(self)
         self.fluid_new_edit.setValidator(self.validator_float)
@@ -151,6 +152,8 @@ class TabPage_SO_swab(QWidget):
         self.paker2Edit.textChanged.connect(self.update_paker_edit)
         self.pakerEdit.textChanged.connect(self.update_paker_diametr)
         self.need_change_zgs_combo.currentTextChanged.connect(self.update_change_fluid)
+        self.need_change_zgs_combo.setCurrentIndex(1)
+        self.need_change_zgs_combo.setCurrentIndex(0)
     def update_change_fluid(self, index):
         if index == 'Да':
             cat_h2s_list_plan = list(
@@ -265,12 +268,6 @@ class TabPage_SO_swab(QWidget):
                 self.calc_plast_h2s.setText(str(calv_h2s(self, self.category_h2s_edit.currentText(),
                                                          float(self.h2s_mg_edit.text().replace(',', '.')),
                                                         float(self.h2s_pr_edit.text().replace(',', '.')))))
-
-
-
-
-
-
     def update_paker_edit(self):
         dict_perforation = well_data.dict_perforation
         rows = self.tableWidget.rowCount()
@@ -373,6 +370,9 @@ class TabPage_SO_swab(QWidget):
             self.diametr_paker_labelType.setParent(None)
             self.diametr_paker_edit.setParent(None)
 
+            self.plast_new_label.setParent(None)
+            self.plast_new_combo.setParent(None)
+
             self.fluid_new_label.setParent(None)
             self.fluid_new_edit.setParent(None)
             self.pressuar_new_label.setParent(None)
@@ -422,7 +422,10 @@ class TabPage_SO_swab(QWidget):
             self.diametr_paker_labelType.setParent(None)
             self.diametr_paker_edit.setParent(None)
             self.paker2Label.setText('Глубина Понижения уровня')
-            self.paker2Edit.setText(f'{well_data.current_bottom - 250}')
+            depth_swab = int(float(well_data.current_bottom - 250))
+            if depth_swab > 1500:
+                depth_swab = 1500
+            self.paker2Edit.setText(f'{depth_swab}')
             self.grid.addWidget(self.paker2Label, 0, 5)
             self.grid.addWidget(self.paker2Edit, 1, 5)
 
@@ -814,7 +817,6 @@ class Swab_Window(QMainWindow):
 
             elif swab_true_edit_type == 'воронка':
                 plast_combo = self.tableWidget.item(row, 0).text()
-
                 paker_depth = int(float(self.tableWidget.item(row, 1).text()))
                 swabTypeCombo = self.tableWidget.cellWidget(row, 2).currentText()
                 swab_volumeEdit = int(float(self.tableWidget.item(row, 3).text()))

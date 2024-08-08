@@ -7,8 +7,6 @@ import well_data
 
 
 def delete_rows_pz(self, ws):
-
-
     boundaries_dict = {}
 
     for ind, _range in enumerate(ws.merged_cells.ranges):
@@ -60,12 +58,9 @@ def copy_row(ws, ws2, head):
                          end_column=value[2], end_row=value[3])
     copy_true_ws(ws, ws2, head)
 
-
-
-    # print(f'Вставлены данные по скважине')
     for key, value in boundaries_dict.items():
-       ws2.merge_cells(start_column=value[0], start_row=value[1],
-                           end_column=value[2], end_row=value[3])
+        ws2.merge_cells(start_column=value[0], start_row=value[1],
+                        end_column=value[2], end_row=value[3])
 
     for index_row, row in enumerate(ws.iter_rows()):  # Копирование высоты строки
         ws2.row_dimensions[index_row].height = rowHeights1[index_row]
@@ -74,18 +69,18 @@ def copy_row(ws, ws2, head):
                 if col_ind <= 12:
                     ws2.column_dimensions[get_column_letter(col_ind + 1)].width = colWidth[col_ind]
 
-def copy_true_ws(ws, ws2, head):
 
+def copy_true_ws(ws, ws2, head):
     for row_number, row in enumerate(ws[head]):
         for col_number, cell in enumerate(row):
             if 'катег' in str(cell.value).lower():
-                ws2.cell(row=row_number+1, column=col_number+1).alignment = Alignment(wrap_text=True, horizontal='left',
-                                                                            vertical='center')
+                ws2.cell(row=row_number + 1, column=col_number + 1).alignment = Alignment(wrap_text=True,
+                                                                                          horizontal='left',
+                                                                                          vertical='center')
             if type(cell.value) == float:
                 ws2.cell(row_number + 1, col_number + 1, round(cell.value, 5))
             else:
                 ws2.cell(row_number + 1, col_number + 1, cell.value)
-
 
             if cell.has_style:
                 ws2.cell(row_number + 1, col_number + 1).font = copy(cell.font)
@@ -101,4 +96,3 @@ def copy_true_ws(ws, ws2, head):
                     cell.quotePrefix)
                 ws2.cell(row_number + 1, col_number + 1).pivotButton = copy(
                     cell.pivotButton)
-

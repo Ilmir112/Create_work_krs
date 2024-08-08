@@ -1647,6 +1647,8 @@ class AcidPakerWindow(QMainWindow):
 
     def flushing_downhole(self, paker_depth, paker_khost, paker_layout):
 
+        well_data.fluid_work_short = well_data.fluid_work[:4]
+
         if 'одно' in paker_layout:
             if (well_data.perforation_roof - 5 + paker_khost >= well_data.current_bottom) or \
                     (all([well_data.dict_perforation[plast]['отрайбировано'] for plast in well_data.plast_work])):
@@ -1662,7 +1664,7 @@ class AcidPakerWindow(QMainWindow):
                                          f'увеличить объем продавки кислотного состава в 1,5 кратном объеме НКТ'
 
                 flushing_downhole_short = f'При наличии ЦИРКУЛЯЦИИ: Допустить до Н- {well_data.current_bottom}м. Промыть уд.весом ' \
-                                          f'{well_data.fluid_work_short}' \
+                                          f'{well_data.fluid_work[:4]}' \
                                           f'не менее {round(well_volume(self, paker_depth + paker_khost) * 1.5, 1)}м3 '
 
             elif well_data.perforation_roof - 5 + paker_khost < well_data.current_bottom:
@@ -1701,7 +1703,7 @@ class AcidPakerWindow(QMainWindow):
                                      f'жидкостью большей плотностью с последующей промывкой'
 
             flushing_downhole_short = f'При наличии ЦИРКУЛЯЦИИ: Допустить до Н- {well_data.current_bottom}м. Промыть уд.весом ' \
-                                      f'{well_data.fluid_work_short}' \
+                                      f'{well_data.fluid_work}' \
                                       f'не менее {round(well_volume(self, paker_depth + paker_khost) * 1.5, 1)}м3 '
         else:
             flushing_downhole_list = f'При наличии ЦИРКУЛЯЦИИ: При наличии избыточного давления:' \
@@ -1715,7 +1717,7 @@ class AcidPakerWindow(QMainWindow):
                                      f'При отсутствии циркуляции произвести замещения продуктов реакции тех ' \
                                      f'жидкостью большей плотностью с последующей промывкой'
             flushing_downhole_short = f'При наличии избыточного давления: Промыть уд.весом ' \
-                                      f'{well_data.fluid_work_short}' \
+                                      f'{well_data.fluid_work_short} ' \
                                       f'не менее {round(well_volume(self, paker_depth + paker_khost) * 1.5, 1)}м3 '
 
         return flushing_downhole_list, flushing_downhole_short

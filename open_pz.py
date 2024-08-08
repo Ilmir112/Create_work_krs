@@ -7,7 +7,6 @@ from openpyxl_image_loader import SheetImageLoader
 from openpyxl.utils.cell import get_column_letter
 from openpyxl.styles import Font, Alignment
 
-
 from cdng import events_gnvp, itog_1, events_gnvp_gnkt
 from find import ProtectedIsNonNone
 from plan import delete_rows_pz
@@ -36,7 +35,6 @@ class CreatePZ(QMainWindow):
 
         well_data.work_plan = work_plan
 
-
         well_data.dict_category = CategoryWindow.dict_category
         # Запуск основного класса и всех дочерних классов в одной строке
         well_pz = FindIndexPZ(ws)
@@ -46,11 +44,11 @@ class CreatePZ(QMainWindow):
         WellData.read_well(WellData, ws, well_data.cat_well_max._value, well_data.data_pvr_min._value)
         well_data.region = region(well_data.cdng._value)
 
-
-
         if work_plan == 'dop_plan':
 
-            data_well = check_in_database_well_data(well_data.well_number._value, well_data.well_area._value, well_data.work_plan)[0]
+            data_well = \
+            check_in_database_well_data(well_data.well_number._value, well_data.well_area._value, well_data.work_plan)[
+                0]
             if data_well:
                 change_work_work_plan = QMessageBox.question(self,
                                                              'Наличие в базе данных',
@@ -68,8 +66,6 @@ class CreatePZ(QMainWindow):
                     self.rir_window = None
 
                     return
-
-
 
         well_data.data_well_is_True = False
         if work_plan == 'dop_plan':
@@ -96,8 +92,6 @@ class CreatePZ(QMainWindow):
         elif 'РН' in well_data.contractor:
             contractor = 'РН'
 
-
-
         if work_plan == 'plan_change':
             DopPlanWindow.extraction_data(self, str(well_data.well_number._value) + " " +
                                           well_data.well_area._value + " " + 'krs' + " " + contractor, 1)
@@ -109,10 +103,7 @@ class CreatePZ(QMainWindow):
                                       'Необходимо уточнить наличие инвентарного номера')
             return
 
-        a = well_data.leakiness
         if well_data.leakiness is True:
-
-
             if WellCondition.leakage_window is None:
                 WellCondition.leakage_window = LeakageWindow()
                 WellCondition.leakage_window.setWindowTitle("Геофизические исследования")
@@ -128,7 +119,8 @@ class CreatePZ(QMainWindow):
             else:
                 well_data.leakiness = False
 
-        if work_plan not in ['application_pvr', 'application_gis', 'gnkt_bopz', 'gnkt_opz', 'gnkt_after_grp', 'gnkt_frez']:
+        if work_plan not in ['application_pvr', 'application_gis', 'gnkt_bopz', 'gnkt_opz', 'gnkt_after_grp',
+                             'gnkt_frez']:
             if work_plan != 'plan_change':
                 for row_ind, row in enumerate(ws.iter_rows(values_only=True, max_col=13)):
                     ws.row_dimensions[row_ind].hidden = False
@@ -155,8 +147,9 @@ class CreatePZ(QMainWindow):
                     if emergency_quest == QMessageBox.StandardButton.Yes:
                         well_data.emergency_well = True
                         well_data.emergency_bottom, ok = QInputDialog.getInt(self, 'Аварийный забой',
-                                                                         'Введите глубину аварийного забоя',
-                                                                         0, 0, int(well_data.bottomhole_artificial._value))
+                                                                             'Введите глубину аварийного забоя',
+                                                                             0, 0,
+                                                                             int(well_data.bottomhole_artificial._value))
                     else:
                         well_data.emergency_well = False
                 if well_data.problemWithEk is True:
@@ -169,7 +162,8 @@ class CreatePZ(QMainWindow):
                                                                                 "ВВедите глубину cсужения", 0, 0,
                                                                                 int(well_data.current_bottom))
                         well_data.problemWithEk_diametr = QInputDialog.getInt(self, 'диаметр внутренний cсужения',
-                                                                              "ВВедите внутренний диаметр cсужения", 0, 0,
+                                                                              "ВВедите внутренний диаметр cсужения", 0,
+                                                                              0,
                                                                               int(well_data.current_bottom))[0]
                     else:
                         well_data.problemWithEk = ProtectedIsNonNone(False)
@@ -190,12 +184,11 @@ class CreatePZ(QMainWindow):
             except:
                 mes = QMessageBox.warning(None, 'Ошибка', 'Ошибка в копировании изображений')
 
-
             if len(well_data.check_data_in_pz) != 0:
                 check_str = ''
                 for ind, check_data in enumerate(well_data.check_data_in_pz):
                     if check_data not in check_str:
-                        check_str += f'{ind+1}. {check_data} \n'
+                        check_str += f'{ind + 1}. {check_data} \n'
                 self.show_info_message(check_str)
 
             well_data.image_data = []
@@ -203,7 +196,8 @@ class CreatePZ(QMainWindow):
                 for col in range(1, 12):
                     try:
                         image = image_loader.get(f'{get_column_letter(col)}{row}')
-                        image.save(f'{well_data.path_image}imageFiles/image_work/image{get_column_letter(col)}{row}.png')
+                        image.save(
+                            f'{well_data.path_image}imageFiles/image_work/image{get_column_letter(col)}{row}.png')
                         image_size = image.size
                         image_path = f'{well_data.path_image}imageFiles/image_work/image{get_column_letter(col)}{row}.png'
 
@@ -341,11 +335,11 @@ class CreatePZ(QMainWindow):
                             ws.cell(row=i + well_data.ins_ind, column=j).value = work_list[i - 1][
                                 j - 1]
                         if i == 1:
-                            ws.merge_cells(start_column=3, start_row=well_data.ins_ind+i, end_column=12,
-                                       end_row=well_data.ins_ind+i)
+                            ws.merge_cells(start_column=3, start_row=well_data.ins_ind + i, end_column=12,
+                                           end_row=well_data.ins_ind + i)
                         elif i == 2:
-                            ws.merge_cells(start_column=3, start_row=well_data.ins_ind+i, end_column=10,
-                                       end_row=well_data.ins_ind+i)
+                            ws.merge_cells(start_column=3, start_row=well_data.ins_ind + i, end_column=10,
+                                           end_row=well_data.ins_ind + i)
 
                 self.ins_ind_border = well_data.ins_ind
                 MyWindow.create_database_well(self, work_plan)
@@ -391,6 +385,7 @@ class CreatePZ(QMainWindow):
     def show_info_message(message):
         dialog = CustomMessageBox(message)
         dialog.exec_()  # Открываем диалоговое окно в модальном режиме
+
     def add_itog(self, ws, ins_ind, work_plan):
         if ws.merged_cells.ranges:
             merged_cells_copy = list(ws.merged_cells.ranges)  # Создаем копию множества объединенных ячеек
@@ -401,9 +396,8 @@ class CreatePZ(QMainWindow):
                     except:
                         pass
 
-        itog_list = itog_1()
-
         if work_plan not in ['gnkt_frez', 'application_pvr', 'gnkt_after_grp', 'gnkt_opz', 'gnkt_bopz']:
+            itog_list = itog_1()
             for i in range(ins_ind, len(itog_list) + ins_ind):  # Добавлением итогов
                 if i < ins_ind + 6:
                     for j in range(1, 13):
@@ -427,8 +421,7 @@ class CreatePZ(QMainWindow):
 
                     ws.merge_cells(start_row=i, start_column=2, end_row=i, end_column=12)
                     ws.cell(row=i, column=j).alignment = Alignment(wrap_text=False, horizontal='left',
-                                                                             vertical='center')
-
+                                                                   vertical='center')
 
             ins_ind += len(itog_1()) + 2
 
@@ -445,7 +438,7 @@ class CreatePZ(QMainWindow):
 
             if i in range(ins_ind + 7, 1 + ins_ind + 15):
                 ws.merge_cells(start_row=i, start_column=2, end_row=i, end_column=6)
-                ws.cell(row=i, column=2).alignment = Alignment(wrap_text=True, vertical='center', horizontal='left')
+                ws.cell(row=i, column=2).alignment = Alignment(wrap_text=False, vertical='center', horizontal='left')
             else:
                 ws.cell(row=i, column=2).alignment = Alignment(wrap_text=False, vertical='center', horizontal='left')
         ws.row_dimensions[ins_ind + 7].height = 30
@@ -455,8 +448,6 @@ class CreatePZ(QMainWindow):
         aaa = ws.max_row
 
         ws.delete_rows(ins_ind, aaa - ins_ind)
-
-
 
     def is_valid_date(date):
         try:

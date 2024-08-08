@@ -35,7 +35,7 @@ import well_data
 from H2S import calc_h2s
 from PyQt5.QtCore import QThread, pyqtSlot
 from data_correct_position_people import CorrectSignaturesWindow
-
+from PyQt5.QtGui import QBrush, QColor, QPen
 from work_py.drilling import Drill_window
 from users.login_users import LoginWindow
 from PyQt5.QtCore import Qt, QObject, pyqtSignal
@@ -1014,7 +1014,7 @@ class MyWindow(QMainWindow):
                 well_data.data_well_dict, excel_data_dict, self.work_plan
             )
 
-            if self.work_plan not in ['dop_plan', 'dop_plan_in_base']:
+            if self.work_plan not in ['dop_plan', 'dop_plan_in_base', 'plan_change']:
                 try:
                     cat_h2s_list = well_data.dict_category[well_data.plast_work_short[0]]['по сероводороду'].category
                     h2s_mg = well_data.dict_category[well_data.plast_work_short[0]]['по сероводороду'].data_mg_l
@@ -1470,7 +1470,7 @@ class MyWindow(QMainWindow):
         self.ins_ind = r + 1
         well_data.ins_ind = r + 1
         # print(r, well_data.count_row_well)
-        if r > well_data.count_row_well and self.work_plan in ['krs', 'plan_change']:
+        if r > well_data.count_row_well and 'gnkt' not in self.work_plan:
             data = self.read_clicked_mouse_data(r)
 
     def read_clicked_mouse_data(self, row):
@@ -1636,7 +1636,7 @@ class MyWindow(QMainWindow):
     def kot_work(self):
         from work_py.alone_oreration import kot_work
 
-        kot_work_list = kot_work(self, well_data.current_bottom)
+        kot_work_list = kot_work(self)
         self.populate_row(self.ins_ind, kot_work_list, self.table_widget)
 
     def konte_action(self):
@@ -2253,6 +2253,7 @@ class MyWindow(QMainWindow):
                     item = QtWidgets.QTableWidgetItem(str(cell_value))
 
                     table_widget.setItem(row - 1, col - 1, item)
+
                     # Проверяем, является ли текущая ячейка объединенной
                     for merged_cell in merged_cells:
                         if row in range(merged_cell.min_row, merged_cell.max_row + 1) and \
@@ -2261,8 +2262,18 @@ class MyWindow(QMainWindow):
                             table_widget.setSpan(row - 1, col - 1,
                                                  merged_cell.max_row - merged_cell.min_row + 1,
                                                  merged_cell.max_col - merged_cell.min_col + 1)
+
                 else:
                     item = QTableWidgetItem("")
+
+
+
+
+
+
+
+
+
 
         if well_data.dop_work_list:
             self.populate_row(table_widget.rowCount(), well_data.dop_work_list, self.table_widget, self.work_plan)

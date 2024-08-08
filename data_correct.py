@@ -981,7 +981,7 @@ class DataWindow(QMainWindow):
                 QMessageBox.warning(self, 'Ошибка', 'Башмак ЭК слишком короткий')
                 return
         except Exception as e:
-             QMessageBox.warning(self, 'Ошибка', f'Башмак ЭК не корректен {e}')
+             QMessageBox.warning(self, 'Ошибка', f'Башмак ЭК не корректен {type(e).__name__}\n\n{str(e)}')
 
 
 
@@ -1141,7 +1141,7 @@ class DataWindow(QMainWindow):
 
                 except Exception as e:
                     mes = QMessageBox.information(self, 'Ошибка обработки', f'ошибка проверки ПЗ в части соответствия '
-                                                                            f'диаметра пакера \n {e}')
+                                                                            f'диаметра пакера \n {type(e).__name__}\n\n{str(e)}')
 
 
             well_data.pause = False

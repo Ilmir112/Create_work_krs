@@ -797,19 +797,22 @@ def insert_database_well_data(well_number, well_area, contractor, costumer, data
                                              f'Строка с {well_number} {well_area} уже существует от {date_in_base}. '
                                              f'Обновить данные?')
                 if reply == QMessageBox.Yes:
+                    create_database_well_db(well_data.work_plan, well_data.number_dp)
                     try:
                         cursor.execute("""
                                         UPDATE wells
-                                        SET data_well = ?, today = ?, excel_json = ?, work_plan = ?, geolog = ?,                                                                      
+                                        SET data_well = ?, today = ?, excel_json = ?, work_plan = ?, geolog = ?                                                                      
                                         WHERE well_number = ? AND area_well = ? 
                                         AND contractor = ? AND costumer = ? AND work_plan = ? AND geolog = ?
                                     """, (
-                            data_well, date_today, excel_json,  work_plan_str, well_data.user[1]))
+                            data_well, date_today, excel_json,  work_plan_str, well_data.user[1],
+                        well_number, well_area, contractor, costumer, work_plan, well_data.user[1]))
 
                         QMessageBox.information(None, 'Успешно', 'Данные в обновлены обновлены')
                     except sqlite3.Error as error:
                         QMessageBox.critical(None, 'Ошибка', f'Ошибка при обновлении данных: {error}')
             else:
+                create_database_well_db(well_data.work_plan, well_data.number_dp)
 
                 # Подготовленные данные для вставки
                 data_values = (str(well_number), well_area,
@@ -823,7 +826,7 @@ def insert_database_well_data(well_number, well_area, contractor, costumer, data
                 # Выполнение запроса с использованием параметров
                 cursor.execute(query, data_values)
 
-                mes = QMessageBox.information(None, 'база данных', f'Скважина {well_data.well_number._value} '
+                QMessageBox.information(None, 'база данных', f'Скважина {well_data.well_number._value} '
                                                                    f'добавлена в базу данных welldata')
 
             # Сохранить изменения и закрыть соединение
@@ -883,7 +886,7 @@ def check_in_database_well_data(number_well, area_well, work_plan):
 
             cursor.execute("SELECT data_well FROM wells WHERE well_number = ? AND area_well = ? "
                            "AND contractor = ? AND costumer = ?",
-                           (str(number_well._value), area_well._value, well_data.contractor, well_data.costumer))
+                           (str(number_well), area_well, well_data.contractor, well_data.costumer))
 
             data_well = cursor.fetchone()
             if data_well:
@@ -1249,11 +1252,6 @@ def get_table_creation_time(conn, table_name):
             return ''
 
 
-
-
-
-
-
 def round_cell(data):
     try:
         if data is None:
@@ -1284,7 +1282,6 @@ def insert_data_new_excel_file(data, rowHeights, colWidth, boundaries_dict):
         if value[1] <= row_max:
             sheet_new.merge_cells(start_column=value[0], start_row=value[1],
                                   end_column=value[2], end_row=value[3])
-    addad = sheet_new.max_row
 
     # Восстановление данных и стилей из словаря
     for row_index, row_data in data.items():
@@ -1331,11 +1328,8 @@ def insert_data_new_excel_file(data, rowHeights, colWidth, boundaries_dict):
     for col in range(13):
         sheet_new.column_dimensions[get_column_letter(col + 1)].width = colWidth[col]
     index_delete = 0
-    a = sheet_new.max_row
+
     for index_row, row in enumerate(sheet_new.iter_rows()):
-        asasa = any(['ИТОГО:' in str(col.value).upper() for col in row[:4]])
-        adef =  [str(col.value).upper() for col in row[:4]]
-        aasaaa = well_data.work_plan
         # Копирование высоты строки
         if any(['Наименование работ' in str(col.value) for col in row[:13]]) and well_data.work_plan not in ['plan_change']:
             index_delete = index_row+2
@@ -1355,7 +1349,7 @@ def insert_data_new_excel_file(data, rowHeights, colWidth, boundaries_dict):
         except:
             pass
     if well_data.work_plan not in ['plan_change']:
-        sheet_new.delete_rows(index_delete, sheet_new.max_row - index_delete)
+        sheet_new.delete_rows(index_delete, sheet_new.max_row - index_delete )
 
     return sheet_new
 

@@ -15,6 +15,7 @@ class TabPage_Gno(QWidget):
         self.nkt_edit = QLineEdit(self)
         self.nkt_edit.setText(f'{self.gno_nkt_opening(well_data.dict_nkt_po)}')
 
+
         self.gno_label = QLabel("вид спускаемого ГНО", self)
         self.gno_combo = QComboBox(self)
         gno_list = ['пакер', 'ОРЗ', 'ОРД', 'воронка', 'НН с пакером', 'НВ с пакером',
@@ -24,9 +25,9 @@ class TabPage_Gno(QWidget):
         self.rgd_question_combo = QComboBox(self)
         self.rgd_question_combo.addItems(['Да', 'Нет'])
 
-        self.sucker_label = QLabel('компоновка НКТ')
+        self.sucker_label = QLabel('компоновка штанг')
         self.sucker_edit = QLineEdit(self)
-        self.sucker_edit.setText(f'{self.gno_nkt_opening(well_data.dict_sucker_rod_po)}')
+
 
         self.gno_combo.addItems(gno_list)
 
@@ -39,13 +40,20 @@ class TabPage_Gno(QWidget):
         self.grid.addWidget(self.gno_combo, 5, 3)
         self.grid.addWidget(self.nkt_label, 4, 4)
         self.grid.addWidget(self.nkt_edit, 5, 4)
+        self.grid.setColumnMinimumWidth(4, len(self.nkt_edit.text()) * 6)
 
-        if well_data.region == 'КГМ':
-            self.need_juming_after_sko_label = QLabel('Нужно ли проводить промывку после СКО')
-            self.need_juming_after_sko_combo = QComboBox(self)
-            self.need_juming_after_sko_combo.addItems(['Да', 'Нет'])
-            self.grid.addWidget(self.need_juming_after_sko_label, 4, 7)
-            self.grid.addWidget(self.need_juming_after_sko_combo, 5, 7)
+
+        self.need_juming_after_sko_label = QLabel('Нужно ли проводить промывку после СКО')
+        self.need_juming_after_sko_combo = QComboBox(self)
+        self.need_juming_after_sko_combo.addItems(['Да', 'Нет'])
+        self.grid.addWidget(self.need_juming_after_sko_label, 4, 7)
+        self.grid.addWidget(self.need_juming_after_sko_combo, 5, 7)
+
+        if well_data.region != 'КГМ':
+            self.need_juming_after_sko_label.setParent(None)
+            self.need_juming_after_sko_combo.setParent(None)
+            self.need_juming_after_sko_combo.setCurrentIndex(1)
+
         self.gno_combo.currentTextChanged.connect(self.update_lift_key)
         self.gno_combo.setCurrentIndex(3)
         self.gno_combo.setCurrentIndex(gno_list.index(lift_key))
@@ -56,10 +64,17 @@ class TabPage_Gno(QWidget):
             self.grid.addWidget(self.rgd_question_combo, 5, 5)
             self.sucker_label.setParent(None)
             self.sucker_edit.setParent(None)
-
+            self.need_juming_after_sko_label.setParent(None)
+            self.need_juming_after_sko_combo.setParent(None)
+        elif index in ['пакер', 'ОРЗ', 'воронка', 'ЭЦН с пакером', 'ЭЦН']:
+            self.sucker_label.setParent(None)
+            self.sucker_edit.setParent(None)
+            self.rgd_question_label.setParent(None)
+            self.rgd_question_combo.setParent(None)
         else:
             self.grid.addWidget(self.sucker_label, 4, 5)
             self.grid.addWidget(self.sucker_edit, 5, 5)
+            self.grid.setColumnMinimumWidth(5, len(self.sucker_edit.text()) * 6)
             self.rgd_question_label.setParent(None)
             self.rgd_question_combo.setParent(None)
 
@@ -73,7 +88,6 @@ class TabPage_Gno(QWidget):
 
     @staticmethod
     def select_gno():
-
 
         if well_data.if_None(well_data.dict_pump_ECN["posle"]) != 'отсут' and \
                 well_data.if_None(well_data.dict_pump_SHGN["posle"]) != 'отсут':

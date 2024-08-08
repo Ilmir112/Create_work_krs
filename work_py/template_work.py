@@ -742,7 +742,7 @@ class TabPage_SO_with(QWidget):
 
 
     def definition_ECN_true(self, depth_ecn):
-        a =well_data.perforation_sole
+
         if well_data.column_additional is False and well_data.dict_pump_ECN["posle"] != 0 and \
                 well_data.column_diametr._value > 168:
             return "4", "4"

@@ -32,36 +32,36 @@ def kot_select(self, current_bottom):
     return kot_select
 
 
-def kot_work(self, current_bottom):
+def kot_work(self, current_bottom=0):
+    if current_bottom == 0:
+        current_bottom, _ = QInputDialog.getDouble(None,
+                                                'Глубина забоя',
+                                                'Введите глубину необходимого текущего забоя',
+                                                   current_bottom, 1, 10000, 1)
 
-    current_bottom, _ = QInputDialog.getDouble(None,
-                                            'Глубина забоя',
-                                            'Введите глубину необходимого текущего забоя', current_bottom, 1, 10000, 1)
-
-    kot_list = [[f'статической уровень {well_data.static_level._value}', None,
-                 f'При отсутствии циркуляции:\n'
-                 f'Спустить {kot_select(self, current_bottom)} на НКТ{well_data.nkt_diam}мм до глубины {current_bottom}м'
-                 f' с замером, шаблонированием шаблоном {well_data.nkt_template}мм.',
-                 None, None, None, None, None, None, None,
-                 'мастер КРС', descentNKT_norm(current_bottom, 1)],
-                [f'{kot_select(self, current_bottom)} до H-{current_bottom} закачкой обратной промывкой', None,
-                 f'Произвести очистку забоя скважины до гл.{current_bottom}м закачкой обратной промывкой тех '
-                 f'жидкости уд.весом {well_data.fluid_work}, по согласованию с Заказчиком',
-                 None, None, None, None, None, None, None,
-                 'мастер КРС', 0.4],
-                [None, None,
-                 f'При необходимости согласовать закачку блок пачки по технологическому плану работ подрядчика',
-                 None, None, None, None, None, None, None,
-                 'мастер КРС, предст. заказчика', None],
-
-                [None, None,
-                 f'Поднять {kot_select(self, current_bottom)} на НКТ{well_data.nkt_diam}мм c глубины {current_bottom}м с доливом '
-                 f'скважины в '
-                 f'объеме {round(float(current_bottom) * 1.12 / 1000, 1)}м3 удельным весом {well_data.fluid_work}',
-                 None, None, None, None, None, None, None,
-                 'мастер КРС', liftingNKT_norm(float(current_bottom), 1)]
-                ]
-    well_data.current_bottom =current_bottom
+    kot_list = [
+        [f'статической уровень {well_data.static_level._value}', None,
+         f'При отсутствии циркуляции:\n'
+         f'Спустить {kot_select(self, current_bottom)} на НКТ{well_data.nkt_diam}мм до глубины {current_bottom}м'
+         f' с замером, шаблонированием шаблоном {well_data.nkt_template}мм.',
+         None, None, None, None, None, None, None,
+         'мастер КРС', descentNKT_norm(current_bottom, 1)],
+        [f'{kot_select(self, current_bottom)} до H-{current_bottom} закачкой обратной промывкой', None,
+         f'Произвести очистку забоя скважины до гл.{current_bottom}м закачкой обратной промывкой тех '
+         f'жидкости уд.весом {well_data.fluid_work}, по согласованию с Заказчиком',
+         None, None, None, None, None, None, None, 'мастер КРС', 0.4],
+        [None, None,
+         f'При необходимости согласовать закачку блок пачки по технологическому плану работ подрядчика',
+         None, None, None, None, None, None, None,
+         'мастер КРС, предст. заказчика', None],
+        [None, None,
+         f'Поднять {kot_select(self, current_bottom)} на НКТ{well_data.nkt_diam}мм c глубины '
+         f'{current_bottom}м с доливом скважины в объеме {round(float(current_bottom) * 1.12 / 1000, 1)}м3 '
+         f'удельным весом {well_data.fluid_work}',
+         None, None, None, None, None, None, None,
+         'мастер КРС', liftingNKT_norm(float(current_bottom), 1)]
+    ]
+    well_data.current_bottom = current_bottom
     return kot_list
 
 

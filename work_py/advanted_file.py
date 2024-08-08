@@ -435,7 +435,7 @@ def count_row_height(ws, ws2, work_list, merged_cells_dict, ind_ins):
     try:
         # вставка сохраненных изображение по координатам ячеек
         if well_data.image_list:
-            print(f' схемы {well_data.image_list}')
+
             for img in well_data.image_list:
                 logo = Image(img[0])
                 logo.width, logo.height = img[2][0] * 0.48, img[2][1] * 0.72

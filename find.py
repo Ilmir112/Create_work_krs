@@ -64,14 +64,13 @@ class FindIndexPZ(QMainWindow):
                 well_data.data_well_max = ProtectedIsDigit(row_ind)
 
             elif 'НКТ' == str(row[1]).upper():
-
                 well_data.pipes_ind = ProtectedIsDigit(row_ind + 1)
 
             elif 'ШТАНГИ' == str(row[1]).upper():
                 well_data.sucker_rod_ind = ProtectedIsDigit(row_ind + 1)
 
-            elif (
-                    'ХI Планируемый объём работ:' in row or 'ХI. Планируемый объём работ:' in row or 'ХIII Планируемый объём работ:' in row \
+            elif ('ХI Планируемый объём работ:' in row or
+                    'ХI. Планируемый объём работ:' in row or 'ХIII Планируемый объём работ:' in row
                     or 'ХI Планируемый объём работ:' in row or 'Порядок работы' in row) \
                     and well_data.data_x_max._value == 0:
                 well_data.data_x_max = ProtectedIsDigit(row_ind)
@@ -140,7 +139,7 @@ class FindIndexPZ(QMainWindow):
 
         if well_data.pipes_ind._value == 0:
             QMessageBox.warning(self, 'индекс начала строки с НКТ',
-                                'Программа не смогла найти строку с НКТ')
+                                'Программа не смогла найти строку с НКТ, необходимо проверить столбец В')
             MyWindow.pause_app()
             return
         if well_data.data_pvr_min._value == 0:
