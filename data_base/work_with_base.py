@@ -900,15 +900,17 @@ def check_in_database_well_data(number_well, area_well, work_plan):
 
 
 def excel_in_json(sheet):
+    index_end_copy = 46
+
     data = {}
     for row_index, row in enumerate(sheet.iter_rows()):
         row_data = []
-        if all(cell == None for cell in row[:13]) is False:
+        if all(cell == None for cell in row[:32]) is False:
             if any([cell.value == "ИТОГО:" for cell in row[:4]]):
                 index_end_copy = row_index
 
                 break
-            for cell in row[:13]:
+            for cell in row[:32]:
                 # Получение значения и стилей
                 value = cell.value
 
@@ -947,11 +949,13 @@ def excel_in_json(sheet):
 
     data['image'] = well_data.image_data
     rowHeights = [sheet.row_dimensions[i + 1].height for i in range(sheet.max_row) if i <= index_end_copy]
-    colWidth = [sheet.column_dimensions[get_column_letter(i + 1)].width for i in range(0, 13)] + [None]
+    # rowHeights = [sheet.row_dimensions[i + 1].height for i in range(sheet.max_row)if i <= 46]
+    colWidth = [sheet.column_dimensions[get_column_letter(i + 1)].width for i in range(0, 80)] + [None]
     boundaries_dict = {}
 
     for ind, _range in enumerate(sheet.merged_cells.ranges):
-        boundaries_dict[ind] = range_boundaries(str(_range))
+        if range_boundaries(str(_range))[1] < index_end_copy:
+            boundaries_dict[ind] = range_boundaries(str(_range))
 
 
 
@@ -1254,7 +1258,7 @@ def get_table_creation_time(conn, table_name):
 
 def round_cell(data):
     try:
-        if data is None:
+        if data is None or type(data) is datetime:
             return data
         float_item = float(data)
         if float_item.is_integer():
@@ -1291,19 +1295,19 @@ def insert_data_new_excel_file(data, rowHeights, colWidth, boundaries_dict):
 
                 # Получение строки RGB из JSON
                 rgb_string = cell_data['fill']['color']
+                # Извлекаем шестнадцатеричный код цвета
+                hex_color = rgb_string[4:-1]
 
-                # Извлечение значений R, G, B с помощью регулярных выражений
-                match = re.match(r"RGB\((\d+), (\d+), (\d+)\)", rgb_string)
-                if match:
-                    r, g, b = int(match.group(1)), int(match.group(2)), int(match.group(3))
+                if hex_color != '00000000':
 
-                    # Создание объекта Color
-                    hex_color = f'{r:02X}{g:02X}{b:02X}'
-                    color = Color(rgb=hex_color)
+                    try:
+                        color = Color(rgb=hex_color)
 
-                    # Создание объекта заливки
-                    fill = PatternFill(patternType='solid', fgColor=color)
-                    cell.fill = fill
+                        # Создание объекта заливки
+                        fill = PatternFill(patternType='solid', fgColor=color)
+                        cell.fill = fill
+                    except:
+                        pass
                 cell.font = Font(name=cell_data['font']['name'], size=cell_data['font']['size'],
                                  bold=cell_data['font']['bold'], italic=cell_data['font']['italic'])
 
@@ -1317,6 +1321,8 @@ def insert_data_new_excel_file(data, rowHeights, colWidth, boundaries_dict):
                 cell.alignment = openpyxl.styles.Alignment(horizontal=cell_data['alignment']['horizontal'],
                                                            vertical=cell_data['alignment']['vertical'],
                                                            wrap_text=wrap_true)
+    # wb_new.save('1234.xlsx')
+
 
     try:
         well_data.image_data = data['image']
@@ -1327,7 +1333,7 @@ def insert_data_new_excel_file(data, rowHeights, colWidth, boundaries_dict):
 
     for col in range(13):
         sheet_new.column_dimensions[get_column_letter(col + 1)].width = colWidth[col]
-    index_delete = 0
+    index_delete = 46
 
     for index_row, row in enumerate(sheet_new.iter_rows()):
         # Копирование высоты строки

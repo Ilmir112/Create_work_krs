@@ -17,19 +17,21 @@ class TabPageSO(QWidget):
         with open(f'{well_data.path_image}podpisant.json', 'r', encoding='utf-8') as file:
             self.podpis_dict = json.load(file)
         TabPageSO.podpis_dict = self.podpis_dict
-        if 'Ойл' in well_data.contractor:
-            self.region_list = well_data.region_list.extend('БНД', 'Ойл')
-        elif 'РН' in well_data.contractor:
-            self.region_list = well_data.region_list.extend('БНД', 'РН')
 
         self.productLavelLabel = QLabel("Заказчик", self)
-        self.productLavelType = QLineEdit(self)
-        self.productLavelType.setText(f"ООО Башнефть_добыча")
+        self.productLavelType = QComboBox(self)
+        self.productLavelType.addItems(["ООО Башнефть_добыча"])
 
         self.regionLabel = QLabel("Регион", self)
         self.regioncomboBox = QComboBox(self)
+        self.region_list = well_data.region_list
         self.regioncomboBox.addItems(self.region_list)
         self.regioncomboBox.currentIndexChanged.connect(self.update_line_edit)
+
+        if 'Ойл' in well_data.contractor and 'Ойл' not in self.productLavelType.currentText():
+            self.productLavelType.addItems(['Ойл'])
+        elif 'РН' in well_data.contractor and 'РН' not in self.productLavelType.currentText():
+            self.productLavelType.addItems(['РН'])
 
         self.region_select = self.regioncomboBox.currentText()
 
@@ -119,34 +121,34 @@ class TabPageSO(QWidget):
         selected_region = self.regioncomboBox.currentText()
         TabPageSO.selected_region = selected_region
 
-        self.chief_engineer_edit_type.setText(self.podpis_dict["регион"][selected_region]['gi']['post'])
-        self.chief_engineer_name_edit_type.setText(self.podpis_dict["регион"][selected_region]['gi']["surname"])
+        self.chief_engineer_edit_type.setText(self.podpis_dict['регион'][selected_region]['gi']['post'])
+        self.chief_engineer_name_edit_type.setText(self.podpis_dict['регион'][selected_region]['gi']["surname"])
 
-        self.chief_geologist_edit_type.setText(self.podpis_dict["регион"][selected_region]['gg']['post'])
-        self.chief_geologist_name_edit_type.setText(self.podpis_dict["регион"][selected_region]['gg']['surname'])
+        self.chief_geologist_edit_type.setText(self.podpis_dict['регион'][selected_region]['gg']['post'])
+        self.chief_geologist_name_edit_type.setText(self.podpis_dict['регион'][selected_region]['gg']['surname'])
 
-        self.head_of_orm_edit_type.setText(self.podpis_dict["регион"][selected_region]["ruk_orm"]['post'])
-        self.head_of_orm_name_edit_type.setText(self.podpis_dict["регион"][selected_region]["ruk_orm"]['surname'])
+        self.head_of_orm_edit_type.setText(self.podpis_dict['регион'][selected_region]["ruk_orm"]['post'])
+        self.head_of_orm_name_edit_type.setText(self.podpis_dict['регион'][selected_region]["ruk_orm"]['surname'])
 
-        self.representative_of_orm_edit_type.setText(self.podpis_dict["регион"][selected_region]["ved_orm"]['post'])
+        self.representative_of_orm_edit_type.setText(self.podpis_dict['регион'][selected_region]["ved_orm"]['post'])
         self.representative_of_orm_name_edit_type.setText(
-            self.podpis_dict["регион"][selected_region]["ved_orm"]['surname'])
+            self.podpis_dict['регион'][selected_region]["ved_orm"]['surname'])
 
-        self.head_of_gtm_edit_type.setText(self.podpis_dict["регион"][selected_region]["ruk_gtm"]['post'])
-        self.head_of_gtm_name_edit_type.setText(self.podpis_dict["регион"][selected_region]["ruk_gtm"]['surname'])
+        self.head_of_gtm_edit_type.setText(self.podpis_dict['регион'][selected_region]["ruk_gtm"]['post'])
+        self.head_of_gtm_name_edit_type.setText(self.podpis_dict['регион'][selected_region]["ruk_gtm"]['surname'])
 
-        self.representative_of_gtm_edit_type.setText(self.podpis_dict["регион"][selected_region]["ved_gtm"]['post'])
+        self.representative_of_gtm_edit_type.setText(self.podpis_dict['регион'][selected_region]["ved_gtm"]['post'])
         self.representative_of_gtm_name_edit_type.setText(
-            self.podpis_dict["регион"][selected_region]["ved_gtm"]['surname'])
+            self.podpis_dict['регион'][selected_region]["ved_gtm"]['surname'])
 
-        self.representative_of_go_edit_type.setText(self.podpis_dict["регион"][selected_region]["go"]['post'])
-        self.representative_of_go_name_edit_type.setText(self.podpis_dict["регион"][selected_region]["go"]['surname'])
+        self.representative_of_go_edit_type.setText(self.podpis_dict['регион'][selected_region]["go"]['post'])
+        self.representative_of_go_name_edit_type.setText(self.podpis_dict['регион'][selected_region]["go"]['surname'])
 
-        self.head_of_usrsist_edit_type.setText(self.podpis_dict["регион"][selected_region]["usrs"]['post'])
-        self.head_of_usrsist_name_edit_type.setText(self.podpis_dict["регион"][selected_region]["usrs"]['surname'])
+        self.head_of_usrsist_edit_type.setText(self.podpis_dict['регион'][selected_region]["usrs"]['post'])
+        self.head_of_usrsist_name_edit_type.setText(self.podpis_dict['регион'][selected_region]["usrs"]['surname'])
 
-        self.representative_of_grr_edit_type.setText(self.podpis_dict["регион"][selected_region]["grr"]['post'])
-        self.representative_of_grr_name_edit_type.setText(self.podpis_dict["регион"][selected_region]["grr"]['surname'])
+        self.representative_of_grr_edit_type.setText(self.podpis_dict['регион'][selected_region]["grr"]['post'])
+        self.representative_of_grr_name_edit_type.setText(self.podpis_dict['регион'][selected_region]["grr"]['surname'])
 
 
 class TabWidget(QTabWidget):
@@ -219,33 +221,34 @@ class CorrectSignaturesWindow(QMainWindow):
             return
 
         else:
+            self.podpis_dict = TabPageSO.podpis_dict
+            aaaa = self.podpis_dict
+            self.podpis_dict['регион'][selected_region]['gi']['post'] = chief_engineer_edit_type
+            self.podpis_dict['регион'][selected_region]['gi']["surname"] = chief_engineer_name_edit_type
 
-            self.podpis_dict["регион"][selected_region]['gi']['post'] = chief_engineer_edit_type
-            self.podpis_dict["регион"][selected_region]['gi']["surname"] = chief_engineer_name_edit_type
+            self.podpis_dict['регион'][selected_region]['gg']['post'] = chief_geologist_edit_type
+            self.podpis_dict['регион'][selected_region]['gg']['surname'] = chief_geologist_name_edit_type
 
-            self.podpis_dict["регион"][selected_region]['gg']['post'] = chief_geologist_edit_type
-            self.podpis_dict["регион"][selected_region]['gg']['surname'] = chief_geologist_name_edit_type
+            self.podpis_dict['регион'][selected_region]["ruk_orm"]['post'] = head_of_orm_edit_type
+            self.podpis_dict['регион'][selected_region]["ruk_orm"]['surname'] = head_of_orm_name_edit_type
 
-            self.podpis_dict["регион"][selected_region]["ruk_orm"]['post'] = head_of_orm_edit_type
-            self.podpis_dict["регион"][selected_region]["ruk_orm"]['surname'] = head_of_orm_name_edit_type
+            self.podpis_dict['регион'][selected_region]["ved_orm"]['post'] = representative_of_orm_edit_type
+            self.podpis_dict['регион'][selected_region]["ved_orm"]['surname'] = representative_of_orm_name_edit_type
 
-            self.podpis_dict["регион"][selected_region]["ved_orm"]['post'] = representative_of_orm_edit_type
-            self.podpis_dict["регион"][selected_region]["ved_orm"]['surname'] = representative_of_orm_name_edit_type
+            self.podpis_dict['регион'][selected_region]["ruk_gtm"]['post'] = head_of_gtm_edit_type
+            self.podpis_dict['регион'][selected_region]["ruk_gtm"]['surname'] = head_of_gtm_name_edit_type
 
-            self.podpis_dict["регион"][selected_region]["ruk_gtm"]['post'] = head_of_gtm_edit_type
-            self.podpis_dict["регион"][selected_region]["ruk_gtm"]['surname'] = head_of_gtm_name_edit_type
+            self.podpis_dict['регион'][selected_region]["ved_gtm"]['post'] = representative_of_gtm_edit_type
+            self.podpis_dict['регион'][selected_region]["ved_gtm"]['surname'] = representative_of_gtm_name_edit_type
 
-            self.podpis_dict["регион"][selected_region]["ved_gtm"]['post'] = representative_of_gtm_edit_type
-            self.podpis_dict["регион"][selected_region]["ved_gtm"]['surname'] = representative_of_gtm_name_edit_type
+            self.podpis_dict['регион'][selected_region]["go"]['post'] = representative_of_go_edit_type
+            self.podpis_dict['регион'][selected_region]["go"]['surname'] = representative_of_go_name_edit_type
 
-            self.podpis_dict["регион"][selected_region]["go"]['post'] = representative_of_go_edit_type
-            self.podpis_dict["регион"][selected_region]["go"]['surname'] = representative_of_go_name_edit_type
+            self.podpis_dict['регион'][selected_region]["usrs"]['post'] = head_of_usrsist_edit_type
+            self.podpis_dict['регион'][selected_region]["usrs"]['surname'] = head_of_usrsist_name_edit_type
 
-            self.podpis_dict["регион"][selected_region]["usrs"]['post'] = head_of_usrsist_edit_type
-            self.podpis_dict["регион"][selected_region]["usrs"]['surname'] = head_of_usrsist_name_edit_type
-
-            self.podpis_dict["регион"][selected_region]["grr"]['post'] = representative_of_grr_edit_type
-            self.podpis_dict["регион"][selected_region]["grr"]['surname'] = representative_of_grr_name_edit_type
+            self.podpis_dict['регион'][selected_region]["grr"]['post'] = representative_of_grr_edit_type
+            self.podpis_dict['регион'][selected_region]["grr"]['surname'] = representative_of_grr_name_edit_type
 
             with open(f'{well_data.path_image}podpisant.json', 'w', encoding='utf-8') as json_file:
                 json.dump(self.podpis_dict, json_file, indent=4, ensure_ascii=False)

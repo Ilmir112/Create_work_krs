@@ -27,6 +27,7 @@ from openpyxl.utils import get_column_letter
 from openpyxl.workbook import Workbook
 from openpyxl.styles import Alignment, Font
 
+
 from log_files.log import logger, QPlainTextEditLogger
 
 from openpyxl.drawing.image import Image
@@ -389,6 +390,8 @@ class MyWindow(QMainWindow):
         self.application_gis = self.application_geophysical.addAction('Заявка на ГИС', self.action_clicked)
 
         self.create_file = self.fileMenu.addMenu('&Создать')
+        self.create_file_normir = self.fileMenu.addMenu('&Нормирование')
+        self.create_file_normir_new = self.create_file_normir.addAction('Новый', self.action_norm_clicked)
         self.create_KRS = self.create_file.addAction('План КРС', self.action_clicked)
         self.create_KRS_change = self.create_file.addAction('Корректировка плана КРС', self.action_clicked)
         self.create_KRS_DP = self.create_file.addAction('Дополнительный план КРС', self.action_clicked)
@@ -452,6 +455,46 @@ class MyWindow(QMainWindow):
 
         self.signatories_Bnd = self.signatories.addAction('&БашНефть-Добыча', self.action_clicked)
 
+    @QtCore.pyqtSlot()
+    def action_norm_clicked(self):
+        from open_pz import CreatePZ
+        from data_base.work_with_base import excel_in_json
+        from data_base.work_with_base import insert_data_new_excel_file
+        from normir.normir_excel import normir_excel_dict
+        action = self.sender()
+
+        if action == self.create_file_normir_new and self.table_widget == None:
+
+            self.work_plan = 'normir_new'
+            self.tableWidgetOpenNormir(self.work_plan)
+            self.fname, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
+                                                                  "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
+            if self.fname:
+
+                try:
+                    self.read_pz(self.fname)
+                    well_data.pause = True
+                    # read_pz = CreatePZ(self.wb, self.ws, self.data_window, self.perforation_correct_window2)
+
+                    # sheet = read_pz.open_excel_file(self.ws, self.work_plan)
+                    # wb = openpyxl.load_workbook(f'{well_data.path_image}property_excel/template_normir_new.xlsm')
+                    #
+                    # # Выбираем активный лист
+                    # sheet = wb.active
+                    # sheet.delete_rows(46, sheet.max_row - 46)
+                    #
+                    # excel_data_dict = excel_in_json(sheet)
+                    # print(excel_data_dict)
+
+                    data, rowHeights, colWidth, boundaries_dict = \
+                        normir_excel_dict['data'], normir_excel_dict['rowHeights'], \
+                        normir_excel_dict['colWidth'], normir_excel_dict['merged_cells']
+
+                    self.ws = insert_data_new_excel_file(data, rowHeights, colWidth, boundaries_dict)
+                    self.copy_norm(self.ws, self.table_widget, self.work_plan)
+
+                except FileNotFoundError as f:
+                    mes = QMessageBox.warning(self, 'Ошибка', f'Ошибка при прочтении файла {f}')
     @QtCore.pyqtSlot()
     def action_clicked(self):
         from data_base.work_with_base import insert_data_new_excel_file
@@ -657,7 +700,7 @@ class MyWindow(QMainWindow):
             if self.signatures_window is None:
                 self.signatures_window = CorrectSignaturesWindow()
                 self.signatures_window.setWindowTitle("Подписанты")
-                self.signatures_window.setGeometry(200, 400, 300, 400)
+                # self.signatures_window.setGeometry(200, 400, 300, 400)
                 self.signatures_window.show()
             else:
                 self.signatures_window.close()
@@ -833,6 +876,26 @@ class MyWindow(QMainWindow):
 
             except FileNotFoundError:
                 print('Файл не найден')
+
+    def tableWidgetOpenNormir(self, work_plan):
+
+        if self.table_widget is None:
+
+            # Создание объекта TabWidget
+            self.tabWidget = QTabWidget()
+            self.table_widget = QTableWidget()
+
+            self.table_widget.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+            self.table_widget.customContextMenuRequested.connect(self.openContextMenuNormir)
+            self.setCentralWidget(self.tabWidget)
+            self.model = self.table_widget.model()
+
+            # Этот сигнал испускается всякий раз, когда ячейка в таблице нажата.
+            # Указанная строка и столбец - это ячейка, которая была нажата.
+            self.table_widget.cellPressed[int, int].connect(self.clickedRowColumn)
+            self.tabWidget.addTab(self.table_widget, 'Нормирование')
+
+
 
     def tableWidgetOpenPvr(self):
 
@@ -1091,6 +1154,18 @@ class MyWindow(QMainWindow):
     def close_file(self):
         from find import ProtectedIsNonNone, ProtectedIsDigit
 
+        temp_folder = r'C:\Windows\Temp'
+
+        try:
+            for filename in os.listdir(temp_folder):
+                file_path = os.path.join(temp_folder, filename)
+                # Удаляем только файлы, а не директории
+                if os.path.isfile(file_path):
+                    os.remove(file_path)
+
+        except Exception as e:
+            QMessageBox.critical(window, "Ошибка", f"Не удалось очистить папку с временными файлами: {e}")
+
         if not self.table_widget is None:
             self.table_widget.clear()
             self.table_widget.resizeColumnsToContents()
@@ -1263,6 +1338,10 @@ class MyWindow(QMainWindow):
         img.anchor = coordinate
         ws.add_image(img, coordinate)
 
+    def openContextMenuNormir(self, position):
+        context_menu = QMenu(self)
+        action_menu = context_menu.addMenu("вид работ")
+        geophysical = action_menu.addMenu("Геофизические работы")
     def openContextMenu(self, position):
 
         context_menu = QMenu(self)
@@ -1680,9 +1759,7 @@ class MyWindow(QMainWindow):
         name_list = self.wb.sheetnames
         self.ws = self.wb.active
 
-        for sheet in name_list:
-            if sheet in self.wb.sheetnames and (sheet != 'наряд-заказ КРС' or sheet != 'План работ'):
-                self.wb.remove(self.wb[sheet])
+
 
     def pvo_cat1(self):
         from work_py.alone_oreration import pvo_cat1
@@ -2218,6 +2295,73 @@ class MyWindow(QMainWindow):
     def insertPerf(self):
         self.populate_row(self.ins_ind, self.perforation_list)
 
+    def copy_norm(self, sheet, table_widget, work_plan='normir_new', count_col=31, list_page=1):
+
+
+        rows =46
+        merged_cells = sheet.merged_cells
+        table_widget.setRowCount(rows)
+        well_data.count_row_well = table_widget.rowCount()
+
+        border_styles = {}
+        # for row in sheet.iter_rows():
+        #     for cell in row:
+        #         border_styles[(cell.row, cell.column)] = cell.border
+
+        table_widget.setColumnCount(count_col)
+
+        rowHeights_exit = [sheet.row_dimensions[i + 1].height if sheet.row_dimensions[i + 1].height is not None else 18
+                           for i in range(rows)]
+
+        colWidth = [sheet.column_dimensions[get_column_letter(col_ind + 1)].width*4 for col_ind in range(46)]
+
+        for row in range(1, rows + 2):
+            if row > 1 and row < rows - 1:
+                try:
+                    table_widget.setRowHeight(row, int(rowHeights_exit[row]))
+                except:
+                    pass
+            for col in range(1, count_col + 1):
+                if not sheet.cell(row=row, column=col).value is None:
+                    if isinstance(sheet.cell(row=row, column=col).value, float) and row > 25:
+                        cell_value = str(round(sheet.cell(row=row, column=col).value, 2))
+                    elif isinstance(sheet.cell(row=row, column=col).value, datetime):
+                        cell_value = sheet.cell(row=row, column=col).value.strftime('%d.%m.%Y')
+                    else:
+                        cell_value = str(sheet.cell(row=row, column=col).value)
+
+                    item = QtWidgets.QTableWidgetItem(str(cell_value))
+
+                    table_widget.setItem(row - 1, col - 1, item)
+
+                    # Проверяем, является ли текущая ячейка объединенной
+                for merged_cell in merged_cells:
+                    if row in range(merged_cell.min_row, merged_cell.max_row + 1) and \
+                            col in range(merged_cell.min_col, merged_cell.max_col + 1):
+                        # Устанавливаем количество объединяемых строк и столбцов для текущей ячейки
+                        table_widget.setSpan(row - 1, col - 1,
+                                             merged_cell.max_row - merged_cell.min_row + 1,
+                                             merged_cell.max_col - merged_cell.min_col + 1)
+
+                else:
+                    item = QTableWidgetItem("")
+
+        for column in range(table_widget.columnCount()):
+            table_widget.setColumnWidth(column, int(colWidth[column]))
+
+        # if self.work_window is None:
+        #     self.work_window = GnoWindow(table_widget.rowCount(), self.table_widget, self.work_plan)
+        #
+        #     # self.work_window.setGeometry(100, 400, 200, 500)
+        #     self.work_window.show()
+        #
+        #     self.pause_app()
+        #     well_data.pause = True
+        #     self.work_window = None
+        # else:
+        #     self.work_window.close()  # Close window.
+        #     self.work_window = None
+
     def copy_pz(self, sheet, table_widget, work_plan='krs', count_col=12, list_page=1):
         from krs import GnoWindow
 
@@ -2254,25 +2398,17 @@ class MyWindow(QMainWindow):
 
                     table_widget.setItem(row - 1, col - 1, item)
 
-                    # Проверяем, является ли текущая ячейка объединенной
-                    for merged_cell in merged_cells:
-                        if row in range(merged_cell.min_row, merged_cell.max_row + 1) and \
-                                col in range(merged_cell.min_col, merged_cell.max_col + 1):
-                            # Устанавливаем количество объединяемых строк и столбцов для текущей ячейки
-                            table_widget.setSpan(row - 1, col - 1,
-                                                 merged_cell.max_row - merged_cell.min_row + 1,
-                                                 merged_cell.max_col - merged_cell.min_col + 1)
+                # Проверяем, является ли текущая ячейка объединенной
+                for merged_cell in merged_cells:
+                    if row in range(merged_cell.min_row, merged_cell.max_row + 1) and \
+                            col in range(merged_cell.min_col, merged_cell.max_col + 1):
+                        # Устанавливаем количество объединяемых строк и столбцов для текущей ячейки
+                        table_widget.setSpan(row - 1, col - 1,
+                                             merged_cell.max_row - merged_cell.min_row + 1,
+                                             merged_cell.max_col - merged_cell.min_col + 1)
 
                 else:
                     item = QTableWidgetItem("")
-
-
-
-
-
-
-
-
 
 
         if well_data.dop_work_list:

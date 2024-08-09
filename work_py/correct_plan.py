@@ -495,19 +495,16 @@ class CorrectPlanWindow(QMainWindow):
         from data_base.work_with_base import connect_to_db
         from work_py.dop_plan_py import DopPlanWindow
 
-
         if well_data.connect_in_base:
             try:
                 # Устанавливаем соединение с базой данных
                 conn1 = psycopg2.connect(**well_data.postgres_conn_work_well)
-
                 cursor1 = conn1.cursor()
 
                 # Проверяем наличие таблицы с определенным именем
                 result_table = 0
 
                 if well_data.work_plan in ['krs', 'plan_change']:
-
                     # print(cursor1.execute(f"SELECT EXISTS (SELECT FROM information_schema.tables").fetchall())
                     cursor1.execute(
                         f"SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = '{table_name}')")

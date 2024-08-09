@@ -254,95 +254,96 @@ class CreatePZ(QMainWindow):
                 dict_events_gnvp['gnkt_opz'] = events_gnvp_gnkt()
                 dict_events_gnvp['gnkt_bopz'] = events_gnvp_gnkt()
                 dict_events_gnvp['dop_plan'] = events_gnvp(well_data.contractor)
+                dict_events_gnvp['normir_new'] = events_gnvp(well_data.contractor)
                 # if work_plan != 'dop_plan':
                 text_width_dict = {20: (0, 100), 30: (101, 200), 40: (201, 300), 60: (301, 400), 70: (401, 500),
                                    90: (501, 600), 110: (601, 700), 120: (701, 800), 130: (801, 900),
                                    150: (901, 1500), 270: (1500, 2300)}
+                if work_plan != 'normir':
+                    for i in range(well_data.ins_ind, well_data.ins_ind + len(dict_events_gnvp[work_plan])):
+                        ws.merge_cells(start_row=i, start_column=2, end_row=i, end_column=12)
+                        data = ws.cell(row=i, column=2)
+                        data.value = dict_events_gnvp[work_plan][i - well_data.ins_ind][1]
 
-                for i in range(well_data.ins_ind, well_data.ins_ind + len(dict_events_gnvp[work_plan])):
-                    ws.merge_cells(start_row=i, start_column=2, end_row=i, end_column=12)
-                    data = ws.cell(row=i, column=2)
-                    data.value = dict_events_gnvp[work_plan][i - well_data.ins_ind][1]
+                        if 'Мероприятия' in str(data.value) or \
+                                'Меры по предупреждению' in str(data.value) or \
+                                ' ТЕХНОЛОГИЧЕСКИЕ ПРОЦЕССЫ' in str(data.value) or \
+                                'Признаки отравления сернистым водородом' in str(data.value) or \
+                                'Контроль воздушной среды проводится:' in str(data.value) or \
+                                'Требования безопасности при выполнении работ:' in str(data.value) or \
+                                'Меры по предупреждению' in str(data.value) or \
+                                'Меры по предупреждению' in str(data.value) or \
+                                'Меры по предупреждению' in str(data.value) or \
+                                "о недопустимости нецелевого расхода" in str(data.value):
+                            data.alignment = Alignment(wrap_text=True, horizontal='center',
+                                                       vertical='center')
+                            data.fill = well_data.yellow_fill
+                            data.font = Font(name='Arial Cyr', size=13, bold=True)
 
-                    if 'Мероприятия' in str(data.value) or \
-                            'Меры по предупреждению' in str(data.value) or \
-                            ' ТЕХНОЛОГИЧЕСКИЕ ПРОЦЕССЫ' in str(data.value) or \
-                            'Признаки отравления сернистым водородом' in str(data.value) or \
-                            'Контроль воздушной среды проводится:' in str(data.value) or \
-                            'Требования безопасности при выполнении работ:' in str(data.value) or \
-                            'Меры по предупреждению' in str(data.value) or \
-                            'Меры по предупреждению' in str(data.value) or \
-                            'Меры по предупреждению' in str(data.value) or \
-                            "о недопустимости нецелевого расхода" in str(data.value):
-                        data.alignment = Alignment(wrap_text=True, horizontal='center',
-                                                   vertical='center')
-                        data.fill = well_data.yellow_fill
-                        data.font = Font(name='Arial Cyr', size=13, bold=True)
+                        else:
+                            data.alignment = Alignment(wrap_text=True, horizontal='left',
+                                                       vertical='center')
 
-                    else:
-                        data.alignment = Alignment(wrap_text=True, horizontal='left',
-                                                   vertical='center')
+                            data.font = Font(name='Arial Cyr', size=12)
 
-                        data.font = Font(name='Arial Cyr', size=12)
+                        if not data.value is None:
+                            text = data.value
+                            for key, value in text_width_dict.items():
+                                if value[0] <= len(text) <= value[1]:
+                                    ws.row_dimensions[i].height = int(key)
 
-                    if not data.value is None:
-                        text = data.value
-                        for key, value in text_width_dict.items():
-                            if value[0] <= len(text) <= value[1]:
-                                ws.row_dimensions[i].height = int(key)
+                    well_data.ins_ind += len(dict_events_gnvp[work_plan]) - 1
 
-                well_data.ins_ind += len(dict_events_gnvp[work_plan]) - 1
+                    ws.row_dimensions[2].height = 30
 
-                ws.row_dimensions[2].height = 30
+                    if len(well_data.row_expected) != 0:
+                        for i in range(1, len(well_data.row_expected) + 1):  # Добавление показатели после ремонта
+                            ws.row_dimensions[well_data.ins_ind + i - 1].height = None
+                            for j in range(1, 12):
+                                if i == 1:
+                                    ws.cell(row=i + well_data.ins_ind, column=j).font = Font(name='Arial Cyr', size=13,
+                                                                                             bold=True)
+                                    ws.cell(row=i + well_data.ins_ind, column=j).alignment = Alignment(wrap_text=False,
+                                                                                                       horizontal='center',
+                                                                                                       vertical='center')
+                                    ws.cell(row=i + well_data.ins_ind, column=j).value = well_data.row_expected[i - 1][
+                                        j - 1]
+                                else:
+                                    ws.cell(row=i + well_data.ins_ind, column=j).font = Font(name='Arial Cyr', size=13,
+                                                                                             bold=True)
+                                    ws.cell(row=i + well_data.ins_ind, column=j).alignment = Alignment(wrap_text=False,
+                                                                                                       horizontal='left',
+                                                                                                       vertical='center')
+                                    ws.cell(row=i + well_data.ins_ind, column=j).value = well_data.row_expected[i - 1][
+                                        j - 1]
+                        ws.merge_cells(start_column=2, start_row=well_data.ins_ind + 1, end_column=12,
+                                       end_row=well_data.ins_ind + 1)
+                        well_data.ins_ind += len(well_data.row_expected)
+                    if work_plan not in ['application_pvr', 'gnkt_frez', 'gnkt_after_grp', 'gnkt_opz', 'gnkt_bopz',
+                                         'plan_change']:
+                        work_list = [
+                            [None, None, 'Порядок работы', None, None, None, None, None, None, None, None, None],
+                            [None, 'п/п', 'Наименование работ', None, None, None, None, None, None, None, 'Ответственный',
+                             'Нормы времени \n мин/час.']]
 
-                if len(well_data.row_expected) != 0:
-                    for i in range(1, len(well_data.row_expected) + 1):  # Добавление показатели после ремонта
-                        ws.row_dimensions[well_data.ins_ind + i - 1].height = None
-                        for j in range(1, 12):
-                            if i == 1:
+                        for i in range(1, len(work_list) + 1):  # Добавление  показатели после ремонта
+                            for j in range(1, 13):
                                 ws.cell(row=i + well_data.ins_ind, column=j).font = Font(name='Arial Cyr', size=13,
                                                                                          bold=True)
                                 ws.cell(row=i + well_data.ins_ind, column=j).alignment = Alignment(wrap_text=False,
                                                                                                    horizontal='center',
                                                                                                    vertical='center')
-                                ws.cell(row=i + well_data.ins_ind, column=j).value = well_data.row_expected[i - 1][
+                                ws.cell(row=i + well_data.ins_ind, column=j).value = work_list[i - 1][
                                     j - 1]
-                            else:
-                                ws.cell(row=i + well_data.ins_ind, column=j).font = Font(name='Arial Cyr', size=13,
-                                                                                         bold=True)
-                                ws.cell(row=i + well_data.ins_ind, column=j).alignment = Alignment(wrap_text=False,
-                                                                                                   horizontal='left',
-                                                                                                   vertical='center')
-                                ws.cell(row=i + well_data.ins_ind, column=j).value = well_data.row_expected[i - 1][
-                                    j - 1]
-                    ws.merge_cells(start_column=2, start_row=well_data.ins_ind + 1, end_column=12,
-                                   end_row=well_data.ins_ind + 1)
-                    well_data.ins_ind += len(well_data.row_expected)
-                if work_plan not in ['application_pvr', 'gnkt_frez', 'gnkt_after_grp', 'gnkt_opz', 'gnkt_bopz',
-                                     'plan_change']:
-                    work_list = [
-                        [None, None, 'Порядок работы', None, None, None, None, None, None, None, None, None],
-                        [None, 'п/п', 'Наименование работ', None, None, None, None, None, None, None, 'Ответственный',
-                         'Нормы времени \n мин/час.']]
+                            if i == 1:
+                                ws.merge_cells(start_column=3, start_row=well_data.ins_ind + i, end_column=12,
+                                               end_row=well_data.ins_ind + i)
+                            elif i == 2:
+                                ws.merge_cells(start_column=3, start_row=well_data.ins_ind + i, end_column=10,
+                                               end_row=well_data.ins_ind + i)
 
-                    for i in range(1, len(work_list) + 1):  # Добавление  показатели после ремонта
-                        for j in range(1, 13):
-                            ws.cell(row=i + well_data.ins_ind, column=j).font = Font(name='Arial Cyr', size=13,
-                                                                                     bold=True)
-                            ws.cell(row=i + well_data.ins_ind, column=j).alignment = Alignment(wrap_text=False,
-                                                                                               horizontal='center',
-                                                                                               vertical='center')
-                            ws.cell(row=i + well_data.ins_ind, column=j).value = work_list[i - 1][
-                                j - 1]
-                        if i == 1:
-                            ws.merge_cells(start_column=3, start_row=well_data.ins_ind + i, end_column=12,
-                                           end_row=well_data.ins_ind + i)
-                        elif i == 2:
-                            ws.merge_cells(start_column=3, start_row=well_data.ins_ind + i, end_column=10,
-                                           end_row=well_data.ins_ind + i)
-
-                self.ins_ind_border = well_data.ins_ind
-                MyWindow.create_database_well(self, work_plan)
+                    self.ins_ind_border = well_data.ins_ind
+                    MyWindow.create_database_well(self, work_plan)
 
             return ws
 

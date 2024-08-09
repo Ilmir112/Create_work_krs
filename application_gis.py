@@ -180,7 +180,7 @@ class GisApplication(QMainWindow):
     def addPerfProject(self):
 
         if len(well_data.gis_list) == 0:
-             QMessageBox.warning(self, 'Ошибка', 'Исследования в плане работ не найдены')
+            QMessageBox.warning(self, 'Ошибка', 'Исследования в плане работ не найдены')
             return
 
         for pvr in well_data.gis_list:
@@ -304,8 +304,10 @@ class GisApplication(QMainWindow):
         from main import MyWindow
 
         wb = openpyxl.load_workbook(f'{well_data.path_image}property_excel/template_gis.xlsx')
+
         # Выбираем активный лист
         self.ws_pvr = wb.active
+
         number_brigada = str(self.tabWidget.currentWidget().number_brigada_combo.currentText())
         number_telephone = self.tabWidget.currentWidget().number_telephone_edit.text()
         date_new_edit = self.tabWidget.currentWidget().date_new_edit.text()
