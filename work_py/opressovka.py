@@ -122,7 +122,7 @@ class TabPage_SO(QWidget):
 
     def paker_diametr_select(self, depth_landing):
         paker_diam_dict = {
-            82: (88, 92),
+            82: (84, 92),
             88: (92.1, 97),
             92: (97.1, 102),
             100: (102.1, 109),

@@ -67,7 +67,7 @@ class CreatePZ(QMainWindow):
 
                     return
 
-        well_data.data_well_is_True = False
+        # well_data.data_well_is_True = False
         if work_plan == 'dop_plan':
             number_list = list(map(str, range(1, 50)))
             well_data.number_dp, ok = QInputDialog.getItem(self, 'Номер дополнительного плана работ',

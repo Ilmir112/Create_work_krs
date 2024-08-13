@@ -76,21 +76,26 @@ class TabPage_SO_swab(QWidget):
 
         self.swabTypeLabel = QLabel("задача при освоении", self)
         self.swabTypeCombo = QComboBox(self)
-        self.swabTypeCombo.addItems(['Задача №2.1.13', 'Задача №2.1.16', 'Задача №2.1.11', 'ГРР'
+        self.swabTypeCombo.addItems(['Задача №2.1.13', 'Задача №2.1.14', 'Задача №2.1.16', 'Задача №2.1.11',
+                                     'Задача №2.1.16 + герметичность пакера', 'ГРР'
                                      'своя задача'])
         self.swabTypeCombo.setCurrentIndex(well_data.swabTypeComboIndex)
-        self.swabTypeCombo.setProperty('value', 'Задача №2.1.16')
+
 
         self.swab_volumeEditLabel = QLabel("объем освоения", self)
         self.swab_volumeEdit = QLineEdit(self)
         self.swab_volumeEdit.setValidator(self.validator_int)
-        self.swab_volumeEdit.setText('20')
+        if well_data.curator in ['КР', 'АР']:
+            self.swabTypeCombo.setProperty('value', 'Задача №2.1.16')
+            self.swab_volumeEdit.setText('20')
+        else:
+            self.swabTypeCombo.setProperty('value', 'Задача №2.1.13')
+            self.swab_volumeEdit.setText('25')
+
 
         self.need_change_zgs_label = QLabel('Необходимо ли менять ЖГС', self)
         self.need_change_zgs_combo = QComboBox(self)
         self.need_change_zgs_combo.addItems(['Нет', 'Да'])
-
-
 
         self.fluid_new_label = QLabel('удельный вес ЖГС', self)
         self.fluid_new_edit = QLineEdit(self)
@@ -134,8 +139,8 @@ class TabPage_SO_swab(QWidget):
         self.grid.addWidget(self.need_change_zgs_label, 9, 1)
         self.grid.addWidget(self.need_change_zgs_combo, 10, 1)
         self.diametr_paker_edit.setText('122')
-        self.grid.addWidget(self.plast_new_label, 9, 3)
-        self.grid.addWidget(self.plast_new_combo, 10, 3)
+        self.grid.addWidget(self.plast_new_label, 9, 2)
+        self.grid.addWidget(self.plast_new_combo, 10, 2)
 
         self.grid.addWidget(self.fluid_new_label, 9, 4)
         self.grid.addWidget( self.fluid_new_edit, 10, 4)
@@ -546,7 +551,8 @@ class Swab_Window(QMainWindow):
         swab_true_edit_type = self.tabWidget.currentWidget().swab_true_edit_type.currentText()
         plast_combo = self.tabWidget.currentWidget().plast_combo.combo_box.currentText()
         swabTypeCombo = self.tabWidget.currentWidget().swabTypeCombo.currentText()
-        swab_list = ['Задача №2.1.13', 'Задача №2.1.16', 'Задача №2.1.11', 'ГРР'
+        swab_list = ['Задача №2.1.13', 'Задача №2.1.14', 'Задача №2.1.16', 'Задача №2.1.11',
+                     'Задача №2.1.16 + герметичность пакера', 'ГРР'
                                                                'своя задача']
 
         swab_edit_combo = QComboBox(self)
@@ -1163,12 +1169,22 @@ class Swab_Window(QMainWindow):
                           f'{swab_volumeEdit - 5}, {swab_volumeEdit}м3,' \
                           f' своевременно подавать телефонограммы на завоз тары и вывоз проб'
             swab_short = f'сваб не менее {swab_volumeEdit}м3 + профиль притока'
+        elif swabTypeCombo == 'Задача №2.1.14':
+            swab_select = f'Произвести  геофизические исследования {plast_combo} по технологической задаче № 2.1.14 ' \
+                          f'Определение профиля и состава притока, дебита, источника обводнения и технического ' \
+                          f'состояния эксплуатационной колонны и НКТ с использованием малогабаритного пакерного ' \
+                          f'расходомера (РН) после свабирования не менее {swab_volumeEdit}м3. \n' \
+                          f'Пробы при свабировании отбирать в стандартной таре на {swab_volumeEdit - 10}, ' \
+                          f'{swab_volumeEdit - 5}, {swab_volumeEdit}м3,' \
+                          f' своевременно подавать телефонограммы на завоз тары и вывоз проб'
+            swab_short = f'сваб не менее {swab_volumeEdit}м3 + профиль притока Малогабаритный прибор'
+
         elif swabTypeCombo == 'Задача №2.1.16':
             swab_select = f'Произвести  геофизические исследования {plast_combo} по технологической задаче № 2.1.16 ' \
                           f'Определение дебита и ' \
                           f'обводнённости по прослеживанию уровней, ВНР и по регистрации забойного ' \
                           f'давления после освоения ' \
-                          f'свабированием  не менее не менее {swab_volumeEdit}м3. \n' \
+                          f'свабированием  не менее {swab_volumeEdit}м3. \n' \
                           f'Пробы при свабировании отбирать в стандартной таре на {swab_volumeEdit - 10}, ' \
                           f'{swab_volumeEdit - 5}, {swab_volumeEdit}м3,' \
                           f' своевременно подавать телефонограммы на завоз тары и вывоз проб'
@@ -1181,6 +1197,17 @@ class Swab_Window(QMainWindow):
                           f'(объем не менее 10литров).' \
                           f'Обязательная сдача в этот день в ЦДНГ'
             swab_short = f'сваб не менее {swab_volumeEdit}м3'
+
+        elif swabTypeCombo == 'Задача №2.1.16 + герметичность пакера':
+            swab_select = f'Произвести фоновую запись. Понизить до стабильного динамического уровня. ' \
+                          f'Произвести записи по определению герметичности пакера. При герметичности произвести ' \
+                          f'геофизические исследования {plast_combo} по технологической задаче № 2.1.16' \
+                          f'свабирование в объеме не менее  {swab_volumeEdit}м3. \n ' \
+                          f'Отобрать пробу на химический анализ воды на ОСТ-39 при последнем рейсе сваба ' \
+                          f'(объем не менее 10литров).' \
+                          f'Обязательная сдача в этот день в ЦДНГ'
+            swab_short = f'сваб не менее {swab_volumeEdit}м3'
+
         elif swabTypeCombo == 'ГРР':
             swab_select = f'Провести освоение объекта {plast_combo} свабированием (объем согласовать с ОГРР) не менее ' \
                           f'{swab_volumeEdit}м3 с отбором поверхностных ' \

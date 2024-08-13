@@ -740,6 +740,8 @@ class WellData(FindIndexPZ):
                         well_data.inv_number = ProtectedIsNonNone(row[col + 1].value)
                     elif 'цех' == value:
                         well_data.cdng = ProtectedIsDigit(row[col + 1].value)
+                    elif 'назначение' == value:
+                        well_data.appointment = ProtectedIsDigit(row[col + 1].value)
                         # print(f' ЦДНГ {well_data.cdng._value}')
         tables_filter = TabPageDp.get_tables_starting_with(self, well_data.well_number._value,
                                                            well_data.well_area._value)
@@ -1238,10 +1240,10 @@ class Well_perforation(FindIndexPZ):
                 MyWindow.pause_app()
 
             for ind, row in enumerate(perforations_intervals):
-                plast = row[col_plast_index]
+                plast = row[col_plast_index].strip()
                 # print(f'пласт {plast}')
                 if plast is None:
-                    plast = perforations_intervals[ind - 1][col_plast_index]
+                    plast = perforations_intervals[ind - 1][col_plast_index].strip()
                 # print(f'пластs {plast}')
 
                 if any(['проект' in str((i)).lower() or 'не пер' in str((i)).lower() for i in row]) is False and all(

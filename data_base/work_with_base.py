@@ -1333,7 +1333,7 @@ def insert_data_new_excel_file(data, rowHeights, colWidth, boundaries_dict):
 
     for col in range(13):
         sheet_new.column_dimensions[get_column_letter(col + 1)].width = colWidth[col]
-    index_delete = 46
+    index_delete = 47
 
     for index_row, row in enumerate(sheet_new.iter_rows()):
         # Копирование высоты строки

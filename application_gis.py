@@ -22,10 +22,8 @@ class TabPage_SO_pvr(QWidget):
         brigada_list = list(well_data.dict_telephon.keys())
         self.number_brigada_combo.addItems(brigada_list)
 
-
         self.number_telephone_label = QLabel('номер телефона, self')
         self.number_telephone_edit = QLineEdit(self)
-
 
         self.date_new_label = QLabel('Дата заявки', self)
         self.date_new_edit = QLineEdit(self)

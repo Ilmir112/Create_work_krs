@@ -27,7 +27,7 @@ class TabPage_Gno(QWidget):
 
         self.sucker_label = QLabel('компоновка штанг')
         self.sucker_edit = QLineEdit(self)
-
+        self.sucker_edit.setText(f'{self.gno_nkt_opening(well_data.dict_sucker_rod_po)}')
 
         self.gno_combo.addItems(gno_list)
 

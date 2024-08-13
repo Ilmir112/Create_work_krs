@@ -27,7 +27,6 @@ from openpyxl.utils import get_column_letter
 from openpyxl.workbook import Workbook
 from openpyxl.styles import Alignment, Font
 
-
 from log_files.log import logger, QPlainTextEditLogger
 
 from openpyxl.drawing.image import Image
@@ -69,7 +68,6 @@ class ExcelWorker(QThread):
         check_true = True
         cursor = ''
         conn = ''
-
 
         try:
             current_year = datetime.now().year
@@ -211,8 +209,9 @@ class ExcelWorker(QThread):
                 # ExcelWorker.finished.emit()
             except psycopg2.Error as e:
                 # Выведите сообщение об ошибке
-                mes = QMessageBox.warning(MyWindow, 'Ошибка', f'Ошибка подключения к базе данных, не получилось проверить '
-                                                          f'корректность категории {type(e).__name__}\n\n{str(e)}')
+                mes = QMessageBox.warning(MyWindow, 'Ошибка',
+                                          f'Ошибка подключения к базе данных, не получилось проверить '
+                                          f'корректность категории {type(e).__name__}\n\n{str(e)}')
                 return
             finally:
                 # Закройте курсор и соединение
@@ -390,8 +389,7 @@ class MyWindow(QMainWindow):
         self.application_gis = self.application_geophysical.addAction('Заявка на ГИС', self.action_clicked)
 
         self.create_file = self.fileMenu.addMenu('&Создать')
-        self.create_file_normir = self.fileMenu.addMenu('&Нормирование')
-        self.create_file_normir_new = self.create_file_normir.addAction('Новый', self.action_norm_clicked)
+
         self.create_KRS = self.create_file.addAction('План КРС', self.action_clicked)
         self.create_KRS_change = self.create_file.addAction('Корректировка плана КРС', self.action_clicked)
         self.create_KRS_DP = self.create_file.addAction('Дополнительный план КРС', self.action_clicked)
@@ -456,46 +454,6 @@ class MyWindow(QMainWindow):
         self.signatories_Bnd = self.signatories.addAction('&БашНефть-Добыча', self.action_clicked)
 
     @QtCore.pyqtSlot()
-    def action_norm_clicked(self):
-        from open_pz import CreatePZ
-        from data_base.work_with_base import excel_in_json
-        from data_base.work_with_base import insert_data_new_excel_file
-        from normir.normir_excel import normir_excel_dict
-        action = self.sender()
-
-        if action == self.create_file_normir_new and self.table_widget == None:
-
-            self.work_plan = 'normir_new'
-            self.tableWidgetOpenNormir(self.work_plan)
-            self.fname, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
-                                                                  "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
-            if self.fname:
-
-                try:
-                    self.read_pz(self.fname)
-                    well_data.pause = True
-                    # read_pz = CreatePZ(self.wb, self.ws, self.data_window, self.perforation_correct_window2)
-
-                    # sheet = read_pz.open_excel_file(self.ws, self.work_plan)
-                    # wb = openpyxl.load_workbook(f'{well_data.path_image}property_excel/template_normir_new.xlsm')
-                    #
-                    # # Выбираем активный лист
-                    # sheet = wb.active
-                    # sheet.delete_rows(46, sheet.max_row - 46)
-                    #
-                    # excel_data_dict = excel_in_json(sheet)
-                    # print(excel_data_dict)
-
-                    data, rowHeights, colWidth, boundaries_dict = \
-                        normir_excel_dict['data'], normir_excel_dict['rowHeights'], \
-                        normir_excel_dict['colWidth'], normir_excel_dict['merged_cells']
-
-                    self.ws = insert_data_new_excel_file(data, rowHeights, colWidth, boundaries_dict)
-                    self.copy_norm(self.ws, self.table_widget, self.work_plan)
-
-                except FileNotFoundError as f:
-                    mes = QMessageBox.warning(self, 'Ошибка', f'Ошибка при прочтении файла {f}')
-    @QtCore.pyqtSlot()
     def action_clicked(self):
         from data_base.work_with_base import insert_data_new_excel_file
         from open_pz import CreatePZ
@@ -516,10 +474,12 @@ class MyWindow(QMainWindow):
                     self.read_pz(self.fname)
                     well_data.pause = True
                     read_pz = CreatePZ(self.wb, self.ws, self.data_window, self.perforation_correct_window2)
-
                     sheet = read_pz.open_excel_file(self.ws, self.work_plan)
 
                     self.copy_pz(sheet, self.table_widget, self.work_plan)
+                    MyWindow.pause_app()
+                    well_data.pause = True
+                    self.rir_window = None
 
                 except FileNotFoundError as f:
                     mes = QMessageBox.warning(self, 'Ошибка', f'Ошибка при прочтении файла {f}')
@@ -880,7 +840,6 @@ class MyWindow(QMainWindow):
     def tableWidgetOpenNormir(self, work_plan):
 
         if self.table_widget is None:
-
             # Создание объекта TabWidget
             self.tabWidget = QTabWidget()
             self.table_widget = QTableWidget()
@@ -894,8 +853,6 @@ class MyWindow(QMainWindow):
             # Указанная строка и столбец - это ячейка, которая была нажата.
             self.table_widget.cellPressed[int, int].connect(self.clickedRowColumn)
             self.tabWidget.addTab(self.table_widget, 'Нормирование')
-
-
 
     def tableWidgetOpenPvr(self):
 
@@ -947,11 +904,12 @@ class MyWindow(QMainWindow):
         try:
 
             file_name, _ = QFileDialog.getSaveFileName(self, "Save excel-file",
-                                                      f"{full_path}", "Excel Files (*.xlsx)")
+                                                       f"{full_path}", "Excel Files (*.xlsx)")
             if file_name:
                 wb2.save(file_name)
         except Exception as e:
-            mes = QMessageBox.critical(self, 'Ошибка', f'файл под таким именем открыт, закройте его: {type(e).__name__}\n\n{str(e)}')
+            mes = QMessageBox.critical(self, 'Ошибка',
+                                       f'файл под таким именем открыт, закройте его: {type(e).__name__}\n\n{str(e)}')
             return
         try:
             # Создаем объект Excel
@@ -1234,7 +1192,7 @@ class MyWindow(QMainWindow):
             well_data.head_column_additional = ProtectedIsNonNone('не корректно')
             well_data.leakiness_Count = 0
             well_data.bur_rastvor = ''
-            well_data.data, well_data.rowHeights, well_data.colWidth,  well_data.boundaries_dict = '', '', '', ''
+            well_data.data, well_data.rowHeights, well_data.colWidth, well_data.boundaries_dict = '', '', '', ''
             well_data.data_in_base = False
             well_data.well_volume_in_PZ = []
             well_data.expected_pick_up = {}
@@ -1342,6 +1300,7 @@ class MyWindow(QMainWindow):
         context_menu = QMenu(self)
         action_menu = context_menu.addMenu("вид работ")
         geophysical = action_menu.addMenu("Геофизические работы")
+
     def openContextMenu(self, position):
 
         context_menu = QMenu(self)
@@ -1554,7 +1513,6 @@ class MyWindow(QMainWindow):
 
     def read_clicked_mouse_data(self, row):
 
-        aca = well_data.count_row_well
         row = row - well_data.count_row_well
         # print(well_data.column_diametr._value)
         data = well_data.data_list
@@ -1758,8 +1716,6 @@ class MyWindow(QMainWindow):
         self.wb = load_workbook(fname, data_only=True)
         name_list = self.wb.sheetnames
         self.ws = self.wb.active
-
-
 
     def pvo_cat1(self):
         from work_py.alone_oreration import pvo_cat1
@@ -2297,8 +2253,7 @@ class MyWindow(QMainWindow):
 
     def copy_norm(self, sheet, table_widget, work_plan='normir_new', count_col=31, list_page=1):
 
-
-        rows =46
+        rows = 46
         merged_cells = sheet.merged_cells
         table_widget.setRowCount(rows)
         well_data.count_row_well = table_widget.rowCount()
@@ -2313,7 +2268,7 @@ class MyWindow(QMainWindow):
         rowHeights_exit = [sheet.row_dimensions[i + 1].height if sheet.row_dimensions[i + 1].height is not None else 18
                            for i in range(rows)]
 
-        colWidth = [sheet.column_dimensions[get_column_letter(col_ind + 1)].width*4 for col_ind in range(46)]
+        colWidth = [sheet.column_dimensions[get_column_letter(col_ind + 1)].width * 4 for col_ind in range(46)]
 
         for row in range(1, rows + 2):
             if row > 1 and row < rows - 1:
@@ -2322,19 +2277,19 @@ class MyWindow(QMainWindow):
                 except:
                     pass
             for col in range(1, count_col + 1):
-                if not sheet.cell(row=row, column=col).value is None:
-                    if isinstance(sheet.cell(row=row, column=col).value, float) and row > 25:
-                        cell_value = str(round(sheet.cell(row=row, column=col).value, 2))
-                    elif isinstance(sheet.cell(row=row, column=col).value, datetime):
-                        cell_value = sheet.cell(row=row, column=col).value.strftime('%d.%m.%Y')
-                    else:
-                        cell_value = str(sheet.cell(row=row, column=col).value)
+                # if not sheet.cell(row=row, column=col).value is None:
+                # if isinstance(sheet.cell(row=row, column=col).value, float) and row > 25:
+                #     cell_value = str(round(sheet.cell(row=row, column=col).value, 2))
+                # elif isinstance(sheet.cell(row=row, column=col).value, datetime):
+                #     cell_value = sheet.cell(row=row, column=col).value.strftime('%d.%m.%Y')
+                # else:
+                #     cell_value = str(sheet.cell(row=row, column=col).value)
+                #
+                # item = QtWidgets.QTableWidgetItem(str(cell_value))
+                #
+                # table_widget.setItem(row - 1, col - 1, item)
 
-                    item = QtWidgets.QTableWidgetItem(str(cell_value))
-
-                    table_widget.setItem(row - 1, col - 1, item)
-
-                    # Проверяем, является ли текущая ячейка объединенной
+                # Проверяем, является ли текущая ячейка объединенной
                 for merged_cell in merged_cells:
                     if row in range(merged_cell.min_row, merged_cell.max_row + 1) and \
                             col in range(merged_cell.min_col, merged_cell.max_col + 1):
@@ -2409,7 +2364,6 @@ class MyWindow(QMainWindow):
 
                 else:
                     item = QTableWidgetItem("")
-
 
         if well_data.dop_work_list:
             self.populate_row(table_widget.rowCount(), well_data.dop_work_list, self.table_widget, self.work_plan)
@@ -2728,7 +2682,8 @@ if __name__ == "__main__":
         MyWindow.pause_app()
         well_data.pause = False
     except Exception as e:
-        mes = QMessageBox.warning(None, 'КРИТИЧЕСКАЯ ОШИБКА', f'Критическая ошибка, смотри в лог {type(e).__name__}\n\n{str(e)}')
+        mes = QMessageBox.warning(None, 'КРИТИЧЕСКАЯ ОШИБКА',
+                                  f'Критическая ошибка, смотри в лог {type(e).__name__}\n\n{str(e)}')
 
     # if well_data.connect_in_base:
     #     app2 = UpdateChecker()

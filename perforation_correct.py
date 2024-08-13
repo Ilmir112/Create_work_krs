@@ -1,12 +1,8 @@
+import well_data
+import re
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.Qt import *
 from PyQt5.QtGui import QRegExpValidator, QColor, QPalette
-
-import well_data
-
-
-import re
-
 from work_py.advanted_file import definition_plast_work
 
 
@@ -41,6 +37,7 @@ class TabPage_SO(QWidget):
 
         self.labels_plast = {}
         self.dict_perforation = well_data.dict_perforation
+        self.dict_perforation_project = well_data.dict_perforation_project
 
         self.plast_label = QLabel("пласта")
         self.roof_label = QLabel("Кровля")
@@ -60,13 +57,12 @@ class TabPage_SO(QWidget):
 
 
         plast_all = list(self.dict_perforation.keys())
-
-
+        plast_projects = list(self.dict_perforation_project.keys())
 
         index_interval = 1
         for plast in plast_all:
-            for index, (roof, sole) in enumerate(list(sorted(self.dict_perforation[plast]["интервал"], key =lambda x:x[0]))):
-                # print(index_interval, (roof, sole))
+            for index, (roof, sole) in enumerate(list(sorted(self.dict_perforation[plast]["интервал"],
+                                                             key=lambda x:x[0]))):
 
                 plast_edit = QLineEdit(self)
                 plast_edit.setText(plast)
@@ -78,7 +74,7 @@ class TabPage_SO(QWidget):
                 sole_edit.setText(str(sole))
 
                 plast_status_ComboBox = QComboBox(self)
-                plast_status_ComboBox.addItems(['отключен', 'вскрыт'])
+                plast_status_ComboBox.addItems(['отключен', 'вскрыт', 'проект', 'отсутствует'])
                 plast_status_ComboBox.setCurrentIndex(self.check_plast_status(plast))
 
                 template_status_ComboBox = QComboBox(self)
@@ -109,6 +105,51 @@ class TabPage_SO(QWidget):
                 self.labels_plast[index_interval] = (plast_edit, roof_edit, sole_edit, plast_status_ComboBox,
                                           template_status_ComboBox, raiding_status_ComboBox)
                 index_interval += 1
+        if len(well_data.dict_perforation) != 0:
+            for plast in plast_projects:
+                for index, (roof, sole) in enumerate(list(sorted(self.dict_perforation_project[plast]["интервал"],
+                                                                 key=lambda x: x[0]))):
+                    plast_edit = QLineEdit(self)
+                    plast_edit.setText(plast)
+
+                    roof_edit = QLineEdit(self)
+                    roof_edit.setText(str(roof))
+
+                    sole_edit = QLineEdit(self)
+                    sole_edit.setText(str(sole))
+
+                    plast_status_ComboBox = QComboBox(self)
+                    plast_status_ComboBox.addItems(['отключен', 'вскрыт', 'проект', 'отсутствует'])
+                    plast_status_ComboBox.setCurrentIndex(2)
+
+                    template_status_ComboBox = QComboBox(self)
+                    template_status_ComboBox.addItems(['Прошаблонировано', 'Не прошаблонировано'])
+                    # template_status_ComboBox.setText('Прошаблонировано')
+                    template_status_ComboBox.setCurrentIndex(1)
+
+                    raiding_status_ComboBox = QComboBox(self)
+                    raiding_status_ComboBox.addItems(['отрайбировано', 'Не отрайбировано'])
+                    # raiding_status_ComboBox.setText('отрайбировано')
+                    raiding_status_ComboBox.setCurrentIndex(1)
+
+                    grid.addWidget(plast_edit, index_interval, 0)
+                    grid.addWidget(roof_edit, index_interval, 1)
+                    grid.addWidget(sole_edit, index_interval, 2)
+                    grid.addWidget(plast_status_ComboBox, index_interval, 3)
+                    grid.addWidget(template_status_ComboBox, index_interval, 4)
+                    grid.addWidget(raiding_status_ComboBox, index_interval, 5)
+
+                    # Переименование атрибута
+                    setattr(self, f"plast_{index_interval}_edit", plast_edit)
+                    setattr(self, f"roof_{index_interval}_edit", roof_edit)
+                    setattr(self, f"sole_{index_interval}_edit", sole_edit)
+                    setattr(self, f"plast_status_{index_interval}_edit", plast_status_ComboBox)
+                    setattr(self, f"template_status_{index_interval}_edit", template_status_ComboBox)
+                    setattr(self, f"raiding_status_{index_interval}_edit", raiding_status_ComboBox)
+
+                    self.labels_plast[index_interval] = (plast_edit, roof_edit, sole_edit, plast_status_ComboBox,
+                                                         template_status_ComboBox, raiding_status_ComboBox)
+                    index_interval += 1
 
     def check_plast_status(self, plast):
         return 0 if self.dict_perforation[plast]['отключение'] else 1
@@ -148,38 +189,58 @@ class PerforationCorrect(QMainWindow):
 
     def add_row_table(self):
 
-        # Пересохранение данных по интервалам перфорации
         self.dict_perforation = well_data.dict_perforation
+        plast_all = self.tabWidget.currentWidget().labels_plast
+        self.dict_perforation_project = {}
 
-        plast_all = list(self.dict_perforation.keys())
-        index = 0
-        for plast in plast_all:
-            plast_oktl = []
-            plast_templ = []
-            plast_raid = []
-            for interval in self.dict_perforation[plast]["интервал"]:
-                if self.tabWidget.currentWidget().labels_plast[index + 1][3].currentText() == 'отключен':
-                    plast_oktl.append(True)
-                    # print(f'отключ {plast, self.tabWidget.currentWidget().labels_plast[index + 1][3].currentText()}')
+        plast_list = []
+        plast_oktl = []
+        plast_templ = []
+        plast_raid = []
+        plast_project = []
+        plast_del = []
+
+        for index, plast_dict in plast_all.items():
+            plast = plast_dict[0].text()
+            roof = plast_dict[1].text()
+            sole = plast_dict[2].text()
+            plast_status = plast_dict[3].currentText()
+            template = plast_dict[4].currentText()
+            raid = plast_dict[5].currentText()
+            if plast not in plast_list:
+                plast_oktl = []
+                plast_templ = []
+                plast_raid = []
+                plast_project = []
+
+
+            if plast_status == 'отключен':
+                plast_oktl.append(True)
+            elif plast_status == 'вскрыт':
+                plast_oktl.append(False)
+            elif plast_status == 'проект':
+                plast_project.append(plast)
+            elif plast_status == 'отсутствует':
+                plast_del.append(plast)
+
+            if template == 'Прошаблонировано':
+                plast_templ.append(True)
+            else:
+                plast_templ.append(False)
+
+            if raid == 'отрайбировано':
+                plast_raid.append(True)
+            else:
+                plast_raid.append(False)
+
+            if len(plast_project) > 0:
+                plast_project_list = list(well_data.dict_perforation_project.keys())
+                if plast_project[0] not in plast_project_list:
+                    well_data.dict_perforation_project.setdefault(
+                        plast, {}).setdefault('интервал', []).append((float(roof), float(sole)))
                 else:
-                    plast_oktl.append(False)
-                    # print(f'отключ {plast, self.tabWidget.currentWidget().labels_plast[index + 1][3].currentText()}')
-
-                if self.tabWidget.currentWidget().labels_plast[index + 1][4].currentText() == 'Прошаблонировано':
-                    plast_templ.append(True)
-                else:
-                    plast_templ.append(False)
-
-                if self.tabWidget.currentWidget().labels_plast[index + 1][5].currentText() == 'отрайбировано':
-                    plast_raid.append(True)
-
-                else:
-                    plast_raid.append(False)
-
-                index += 1
-            if well_data.data_in_base is False:
-                # print(well_data.data_in_base)
-
+                    well_data.dict_perforation_project[plast]['интервал'] = (float(roof), float(sole))
+            else:
                 if all([oktl is True for oktl in plast_oktl]):
                     well_data.dict_perforation_short[plast]['отключение'] = True
                     well_data.dict_perforation[plast]["отключение"] = True
@@ -190,10 +251,15 @@ class PerforationCorrect(QMainWindow):
                     well_data.dict_perforation[plast]['Прошаблонировано'] = True
                 else:
                     well_data.dict_perforation[plast]['Прошаблонировано'] = False
-                if  all([oktl is True for oktl in plast_raid]):
+                if all([oktl is True for oktl in plast_raid]):
                     well_data.dict_perforation[plast]['отрайбировано'] = True
                 else:
                     well_data.dict_perforation[plast]['отрайбировано'] = False
+
+            if len(plast_del) > 0:
+                for plast in plast_del:
+                    well_data.dict_perforation.pop(plast)
+
 
         definition_plast_work(self)
         well_data.plast_work_short = well_data.plast_work
@@ -212,10 +278,6 @@ class PerforationCorrect(QMainWindow):
                 return
         well_data.pause = False
         self.close()
-
-
-
-
 
 
 if __name__ == "__main__":

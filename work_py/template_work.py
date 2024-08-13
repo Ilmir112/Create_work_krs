@@ -870,6 +870,7 @@ class TabPage_SO_with(QWidget):
             well_data.column_additional_wall_thickness._value)
 
         template_second_diam_dict = {
+            82: (84, 88),
             84: (88, 92),
             90: (92.1, 97),
             94: (97.1, 102),
@@ -897,7 +898,11 @@ class TabPage_SO_with(QWidget):
                 template_first_diam = diam
         if 'ПОМ' in str(well_data.paker_do["posle"]).upper() and '122' in str(well_data.paker_do["posle"]):
             template_second_diam = 126
-        return (template_first_diam, template_second_diam)
+
+        try:
+            return (template_first_diam, template_second_diam)
+        except Exception as e:
+            QMessageBox.warning(self, 'Ошибка ',f'Ошибка  определения диаметра шаблонов {e}')
 
 
 class TabWidget(QTabWidget):
