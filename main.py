@@ -1174,6 +1174,7 @@ class MyWindow(QMainWindow):
             well_data.gaz_f_pr = []
             well_data.paker_layout = 0
             well_data.cat_P_P = []
+            well_data.ribbing_interval = []
             well_data.column_direction_diametr = ProtectedIsNonNone('не корректно')
             well_data.column_direction_wall_thickness = ProtectedIsNonNone('не корректно')
             well_data.column_direction_lenght = ProtectedIsNonNone('не корректно')
@@ -2507,13 +2508,16 @@ class MyWindow(QMainWindow):
                 f' H2S -{category_h2s},' \
                 f' газ факт -{gaz_f_pr}т/м3'
         except Exception as e:
-            mes = QMessageBox.warning(self, 'ОШИБКА',
-                                      f"Программа не смогла вставить данные в краткое содержание значения по Рпл {type(e).__name__}\n\n{str(e)}")
-        column_well = f'{well_data.column_diametr._value}х{well_data.column_wall_thickness._value} в инт 0 - {well_data.shoe_column._value}м ' \
-            if well_data.column_additional is False else f'{well_data.column_diametr._value} х {well_data.column_wall_thickness._value} \n' \
-                                                         f'0 - {well_data.shoe_column._value}м/\n{well_data.column_additional_diametr._value}' \
-                                                         f' х {well_data.column_additional_wall_thickness._value} в инт ' \
-                                                         f'{well_data.head_column_additional._value}-{well_data.head_column_additional._value}м'
+            QMessageBox.warning(self, 'ОШИБКА',
+                                f"Программа не смогла вставить данные в краткое содержание значения по "
+                                f"Рпл {type(e).__name__}\n\n{str(e)}")
+        column_well = f'{well_data.column_diametr._value}х{well_data.column_wall_thickness._value} в ' \
+                      f'инт 0 - {well_data.shoe_column._value}м ' \
+            if well_data.column_additional is False else \
+            f'{well_data.column_diametr._value} х {well_data.column_wall_thickness._value} \n' \
+            f'0 - {well_data.shoe_column._value}м/\n{well_data.column_additional_diametr._value}' \
+            f' х {well_data.column_additional_wall_thickness._value} в инт ' \
+            f'{well_data.head_column_additional._value}-{well_data.head_column_additional._value}м'
         ws4.cell(row=1, column=7).value = column_well
         ws4.cell(row=4, column=7).value = f'Пробур забой {well_data.bottomhole_drill._value}м'
         ws4.cell(row=5, column=7).value = f'Исскус забой {well_data.bottomhole_artificial._value}м'
@@ -2568,9 +2572,10 @@ class MyWindow(QMainWindow):
                 if value != None:
                     value = value.text()
                     if 'Установить подъёмный агрегат на устье не менее 40т' in value:
-                        new_value = QtWidgets.QTableWidgetItem(f'Установить подъёмный агрегат на устье не менее 60т. '
-                                                               f'Пусковой комиссией составить акт готовности подьемного '
-                                                               f'агрегата и бригады для проведения ремонта скважины.')
+                        new_value = QtWidgets.QTableWidgetItem(
+                            f'Установить подъёмный агрегат на устье не менее 60т. '
+                            f'Пусковой комиссией составить акт готовности подьемного '
+                            f'агрегата и бригады для проведения ремонта скважины.')
                         table_widget.setItem(row, column, new_value)
 
     def check_true_depth_template(self, depth):
@@ -2579,25 +2584,29 @@ class MyWindow(QMainWindow):
 
             if well_data.template_depth_addition < depth and depth > well_data.head_column_additional._value:
                 check = False
-                check_question = QMessageBox.question(self, 'Проверка глубины пакера',
-                                                      f'Проверка показало что пакер с глубиной {depth}м спускается ниже '
-                                                      f'глубины  шаблонирования {well_data.template_depth_addition}')
+                check_question = QMessageBox.question(
+                    self,
+                    'Проверка глубины пакера',
+                    f'Проверка показало что пакер с глубиной {depth}м спускается ниже'
+                    f' глубины  шаблонирования {well_data.template_depth_addition}')
                 if check_question == QMessageBox.StandardButton.Yes:
                     check = True
             if well_data.template_depth < depth and depth < well_data.head_column_additional._value:
                 check = False
-                check_question = QMessageBox.question(self, 'Проверка глубины пакера',
-                                                      f'Проверка показало что пакер с глубиной {depth}м спускается ниже '
-                                                      f'глубины шаблонирования {well_data.template_depth}')
+                check_question = QMessageBox.question(
+                    self,
+                    'Проверка глубины пакера',
+                    f'Проверка показало что пакер с глубиной {depth}м спускается ниже '
+                    f'глубины шаблонирования {well_data.template_depth}')
                 if check_question == QMessageBox.StandardButton.Yes:
                     check = True
         else:
             # print(f'глубина {well_data.template_depth, depth}')
             if well_data.template_depth < depth:
                 check = False
-                check_question = QMessageBox.question(self, 'Проверка глубины пакера',
-                                                      f'Проверка показало что пакер с глубиной {depth}м спускается ниже '
-                                                      f'глубины шаблонирования {well_data.template_depth}')
+                check_question = QMessageBox.question(
+                    self, 'Проверка глубины пакера', f'Проверка показало что пакер с глубиной {depth}м спускается ниже '
+                    f'глубины шаблонирования {well_data.template_depth}')
                 if check_question == QMessageBox.StandardButton.Yes:
                     check = True
 
@@ -2638,17 +2647,32 @@ class MyWindow(QMainWindow):
     def check_depth_in_skm_interval(self, depth):
         from work_py.advanted_file import raid, remove_overlapping_intervals
         check_true = False
-        a = well_data.skm_interval
+        check_ribbing = False
+
         for interval in well_data.skm_interval:
             if float(interval[0]) <= float(depth) <= float(interval[1]):
                 check_true = True
                 return int(depth)
-        if check_true is False:
+
+        for interval in well_data.ribbing_interval:
+            if float(interval[0]) <= float(depth) <= float(interval[1]):
+                check_ribbing = True
+        if check_true is False and check_ribbing is False:
             false_question = QMessageBox.warning(None, 'Проверка посадки пакера в интервал скреперования',
                                                  f'Проверка посадки показала, что пакер сажается не '
-                                                 f'в интервал скреперования {well_data.skm_interval}, \n'
+                                                 f'в интервал скреперования {well_data.skm_interval}, и '
+                                                 f'райбирования {well_data.ribbing_interval} \n'
                                                  f'Нужно скорректировать интервалы скреперования ')
             return False
+        if check_true is True and check_ribbing is False:
+            false_question = QMessageBox.question(None, 'Проверка посадки пакера в интервал скреперования',
+                                                  f'Проверка посадки показала, что пакер сажается не '
+                                                  f'в интервал скреперования {well_data.skm_interval}, '
+                                                  f'но сажается в интервал райбирования '
+                                                  f'райбирования {well_data.ribbing_interval} \n'
+                                                  f'Продолжить?')
+            if false_question == QMessageBox.StandardButton.No:
+                return False
 
     @staticmethod
     def delete_files():

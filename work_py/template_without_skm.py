@@ -85,7 +85,6 @@ class TabPage_SO(QWidget):
             self.solvent_question_QCombo.setCurrentIndex(1)
 
 
-
         self.grid = QGridLayout(self)
         if well_data.column_additional is False or \
                 (well_data.column_additional and well_data.current_bottom < well_data.head_column_additional._value):
@@ -809,7 +808,8 @@ class Template_without_skm(QMainWindow):
                 for row in kot_work(self, well_data.current_bottom)[::-1]:
                     list_template_ek.insert(0, row)
 
-        if well_data.gipsInWell is True:  # Добавление работ при наличии Гипсово-солевых отложений
+        if well_data.gipsInWell is True and well_data.count_template == 0:
+            # Добавление работ при наличии Гипсово-солевых отложений
             gips = TemplateKrs.pero(self)
             for row in gips[::-1]:
                 list_template_ek.insert(0, row)

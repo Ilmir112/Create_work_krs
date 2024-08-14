@@ -304,6 +304,8 @@ class Raid(MyWindow):
         else:
             raid_list = self.raiding_sbt(raid_tuple[::-1], ryber_key)
 
+        well_data.ribbing_interval.extend(raid_tuple[::-1])
+
         MyWindow.populate_row(self, self.ins_ind, raid_list, self.table_widget)
         well_data.pause = False
         self.close()

@@ -187,7 +187,7 @@ def raiding_interval(ryber_key):
                 well_data.dict_perforation[plast]['кровля'] <= well_data.current_bottom:
 
             for interval in well_data.dict_perforation[plast]['интервал']:
-                if interval[1] < well_data.current_bottom:
+                if interval[1] < well_data.current_bottom and interval[0] < interval[1]:
                     if well_data.column_additional is False or \
                             (well_data.column_additional and \
                              well_data.head_column_additional._value > well_data.current_bottom):
@@ -217,14 +217,12 @@ def raiding_interval(ryber_key):
                     str_raid.append(crt)
 
     if len(well_data.drilling_interval) != 0:
-        # print(well_data.drilling_interval)
         for interval in well_data.drilling_interval:
-            # print(interval)
-            if float(interval[1]) + 20 <= well_data.current_bottom:
+            if float(interval[1]) + 20 <= well_data.current_bottom and interval[0] < interval[1]:
                 str_raid.append((float(interval[0]) - 20, float(interval[1]) + 20))
-            else:
+            elif float(interval[1]) + 20 > well_data.current_bottom and interval[0] < interval[1]:
                 str_raid.append((float(interval[0]) - 20, well_data.current_bottom))
-    # print(well_data.leakiness)
+
     if len(well_data.dict_leakiness) != 0:
 
         for nek in list(well_data.dict_leakiness['НЭК']['интервал'].keys()):
@@ -381,7 +379,7 @@ def count_row_height(ws, ws2, work_list, merged_cells_dict, ind_ins):
                 # print(work_list[i - 1][j - 1])
                 cell.value = is_num(work_list[i - 1][j - 1])
                 if i >= ind_ins:
-                    if abs(i - ind_ins) > 1 and stop_str < i:
+                    if abs(i - ind_ins) > 1 and stop_str > i:
                         ws2[F"B{i}"].value = f'=COUNTA($C${ind_ins + 2}:C{i})'
                     if j != 1:
                         cell.border = well_data.thin_border
@@ -391,14 +389,20 @@ def count_row_height(ws, ws2, work_list, merged_cells_dict, ind_ins):
                     #     cell.value = work_list[i - 1][j - 1]
                     else:
                         cell.font = Font(name='Arial', size=13, bold=False)
-                    ws2.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='center',
-                                                                    vertical='center')
-                    ws2.cell(row=i, column=11).alignment = Alignment(wrap_text=True, horizontal='center',
-                                                                     vertical='center')
-                    ws2.cell(row=i, column=12).alignment = Alignment(wrap_text=True, horizontal='center',
-                                                                     vertical='center')
-                    ws2.cell(row=i, column=3).alignment = Alignment(wrap_text=True, horizontal='left',
-                                                                    vertical='center')
+                    if work_list[i - 1][4]:
+                        ws2.cell(row=i-1, column=2).alignment = Alignment(wrap_text=True, horizontal='center',
+                                                                        vertical='center')
+                        ws2.cell(row=i, column=j).alignment = Alignment(wrap_text=True, horizontal='center',
+                                                                        vertical='center')
+                    else:
+                        ws2.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='center',
+                                                                        vertical='center')
+                        ws2.cell(row=i, column=11).alignment = Alignment(wrap_text=True, horizontal='center',
+                                                                         vertical='center')
+                        ws2.cell(row=i, column=12).alignment = Alignment(wrap_text=True, horizontal='center',
+                                                                         vertical='center')
+                        ws2.cell(row=i, column=3).alignment = Alignment(wrap_text=True, horizontal='left',
+                                                                        vertical='center')
                     if 'примечание' in str(cell.value).lower() \
                             or 'заявку оформить за 16 часов' in str(cell.value).lower() \
                             or 'ЗАДАЧА 2.9.' in str(cell.value).upper() \

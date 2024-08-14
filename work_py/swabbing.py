@@ -446,6 +446,9 @@ class TabPage_SO_swab(QWidget):
             paker_layout_list_tab = ["забой", "глубина понижения", "вид освоения"]
 
             first_template, template_second = TabPage_SO_with.template_diam_ek(self)
+            self.template_second_need_label = QLabel('Необходимость шаблонов в компоновке')
+            self.template_second_need_combo = QComboBox(self)
+            self.template_second_need_combo.addItems(['Да', 'Нет'])
             self.template_second_Label = QLabel("диаметр шаблона", self)
             self.template_second_Edit = QLineEdit(self)
             self.template_second_Edit.setValidator(self.validator_int)
@@ -455,6 +458,9 @@ class TabPage_SO_swab(QWidget):
             self.lenght_template_second_Edit = QLineEdit(self)
             self.lenght_template_second_Edit.setValidator(self.validator_int)
             self.lenght_template_second_Edit.setText('4')
+
+            self.grid.addWidget(self.template_second_need_label, 3, 2)
+            self.grid.addWidget(self.template_second_need_combo, 4, 2)
 
             self.grid.addWidget(self.template_second_Label, 3, 3)
             self.grid.addWidget(self.template_second_Edit, 4, 3)
@@ -473,6 +479,8 @@ class TabPage_SO_swab(QWidget):
             self.grid.addWidget(self.diametr_paker_labelType, 0, 2)
             self.grid.addWidget(self.diametr_paker_edit, 1, 2)
             paker_layout_list_tab = ["забой", "хвост", "посадка пакера", "глубина понижения"]
+            self.need_change_zgs_combo.setCurrentIndex(1)
+            self.need_change_zgs_combo.setCurrentIndex(0)
         self.tableWidget.setHorizontalHeaderLabels([])
         self.tableWidget.setHorizontalHeaderLabels(paker_layout_list_tab)
     def update_plast_edit(self):
@@ -641,6 +649,7 @@ class Swab_Window(QMainWindow):
             self.tableWidget.setItem(rows, 3, QTableWidgetItem(str(swab_volume_edit)))
 
         elif swab_true_edit_type in ['Опрессовка снижением уровня на шаблоне']:
+
             well_data.template_lenght = float(self.tabWidget.currentWidget().lenght_template_second_Edit.text())
             # well_data.template_lenght_addition = lenght_template_first
             if rows != 0:
@@ -850,6 +859,7 @@ class Swab_Window(QMainWindow):
                                                      swabTypeCombo, swab_volumeEdit, depthGaugeCombo, need_change_zgs_combo,
                                                     plast_new_combo, fluid_new_edit, pressuar_new_edit)
             elif swab_true_edit_type == 'Опрессовка снижением уровня на шаблоне':
+                template_second_need_combo = self.tabWidget.currentWidget().template_second_need_combo.currentText()
                 if need_change_zgs_combo == 'Да':
                     cat_h2s_list_plan = list(
                         map(int, [well_data.dict_category[plast]['по сероводороду'].category for plast in
@@ -867,8 +877,10 @@ class Swab_Window(QMainWindow):
                 lenght_template_second_Edit = self.tabWidget.currentWidget().lenght_template_second_Edit.text()
 
                 paker2_depth = int(float(self.tableWidget.item(row, 1).text()))
-                work_list = self.swabbing_opy(paker2_depth, fluid_new_edit, need_change_zgs_combo,
-                                              plast_new_combo, pressuar_new_edit,  template_second_Edit, lenght_template_second_Edit)
+                work_list = self.swabbing_opy(
+                    paker2_depth, fluid_new_edit, need_change_zgs_combo,
+                      plast_new_combo, pressuar_new_edit,  template_second_Edit, lenght_template_second_Edit,
+                    template_second_need_combo)
             elif swab_true_edit_type == 'Опрессовка снижением уровня на пакере с заглушкой':
                 paker2_depth = int(float(self.tableWidget.item(row, 3).text()))
                 paker_khost = int(float(self.tableWidget.item(row, 1).text()))
@@ -1019,8 +1031,13 @@ class Swab_Window(QMainWindow):
         return paker_list
 
     def swabbing_opy(self, depth_opy, fluid_new, need_change_zgs_combo, plast_new,
-                     pressuar_new, template_second, lenght_template_second):
+                     pressuar_new, template_second, lenght_template_second, template_second_need_combo):
         from .template_work import TabPage_SO_with
+
+        template_second_str = ''
+        if template_second_need_combo == 'Да':
+            template_second_str = f'+ шаблон {template_second}мм L-{lenght_template_second}'
+
 
         nkt_diam = ''.join(['73' if well_data.column_diametr._value > 110 or (
                 well_data.column_diametr._value > 110 and well_data.column_additional is True \
@@ -1030,21 +1047,21 @@ class Swab_Window(QMainWindow):
         if well_data.column_additional is False or well_data.column_additional is True and \
                 well_data.current_bottom < well_data.head_column_additional._value and \
                 well_data.head_column_additional._value > 600:
-            paker_select = f'воронку со свабоограничителем + шаблон {template_second}мм L-{lenght_template_second} + НКТ{nkt_diam} + НКТ 10м + репер'
-            paker_short = f'воронку со с/о + шаблон {template_second} L-{lenght_template_second} + НКТ{nkt_diam}  + НКТ 10м + репер'
+            paker_select = f'воронку со свабоограничителем {template_second_str} + НКТ{nkt_diam} + НКТ 10м + репер'
+            paker_short = f'воронку со с/о  + НКТ{nkt_diam}  + НКТ 10м + репер'
             dict_nkt = {73: depth_opy}
             well_data.template_depth = well_data.current_bottom
         elif well_data.column_additional is True and well_data.column_additional_diametr._value < 110 and \
                 well_data.current_bottom >= well_data.head_column_additional._value:
-            paker_select = f'воронку со свабоограничителем + шаблон {template_second} L-{lenght_template_second} + НКТ60мм 10м + репер +НКТ60мм ' \
+            paker_select = f'воронку со свабоограничителем {template_second_str} + НКТ60мм 10м + репер +НКТ60мм ' \
                            f'{round(well_data.current_bottom - well_data.head_column_additional._value + 10, 0)}м'
-            paker_short = f'воронку со с/о + шаблон {template_second} L-{lenght_template_second} + НКТ60мм 10м + репер +НКТ60мм'
+            paker_short = f'воронку со с/о {template_second_str} + НКТ60мм 10м + репер +НКТ60мм'
             dict_nkt = {73: well_data.head_column_additional._value,
                         60: int(well_data.current_bottom - well_data.head_column_additional._value)}
             well_data.template_depth = well_data.current_bottom
         elif well_data.column_additional is True and well_data.column_additional_diametr._value > 110 and \
                 well_data.current_bottom >= well_data.head_column_additional._value:
-            paker_select = f'воронку со свабоограничителем + шаблон {template_second}мм L-{lenght_template_second} + ' \
+            paker_select = f'воронку со свабоограничителем {template_second_str} + ' \
                            f'НКТ{well_data.nkt_diam}мм ' \
                            f'со снятыми фасками + ' \
                            f'НКТ{well_data.nkt_diam}мм со снятыми фасками 10м ' \

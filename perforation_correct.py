@@ -232,34 +232,35 @@ class PerforationCorrect(QMainWindow):
                 plast_raid.append(True)
             else:
                 plast_raid.append(False)
-
+            asad = well_data.dict_perforation_project
             if len(plast_project) > 0:
                 plast_project_list = list(well_data.dict_perforation_project.keys())
                 if plast_project[0] not in plast_project_list:
                     well_data.dict_perforation_project.setdefault(
-                        plast, {}).setdefault('интервал', []).append((float(roof), float(sole)))
+                        plast, {}).setdefault('интервал', []).append([float(roof), float(sole)])
                 else:
-                    well_data.dict_perforation_project[plast]['интервал'] = (float(roof), float(sole))
+                    well_data.dict_perforation_project[plast]['интервал'] = [(float(roof), float(sole))]
             else:
-                if all([oktl is True for oktl in plast_oktl]):
-                    well_data.dict_perforation_short[plast]['отключение'] = True
-                    well_data.dict_perforation[plast]["отключение"] = True
-                else:
-                    well_data.dict_perforation_short[plast]['отключение'] = False
-                    well_data.dict_perforation[plast]['отключение'] = False
-                if all([oktl is True for oktl in plast_templ]):
-                    well_data.dict_perforation[plast]['Прошаблонировано'] = True
-                else:
-                    well_data.dict_perforation[plast]['Прошаблонировано'] = False
-                if all([oktl is True for oktl in plast_raid]):
-                    well_data.dict_perforation[plast]['отрайбировано'] = True
-                else:
-                    well_data.dict_perforation[plast]['отрайбировано'] = False
+                if plast in well_data.dict_perforation:
+                    if all([oktl is True for oktl in plast_oktl]):
+                        well_data.dict_perforation_short[plast]['отключение'] = True
+                        well_data.dict_perforation[plast]["отключение"] = True
+                    else:
+                        well_data.dict_perforation_short[plast]['отключение'] = False
+                        well_data.dict_perforation[plast]['отключение'] = False
+                    if all([oktl is True for oktl in plast_templ]):
+                        well_data.dict_perforation[plast]['Прошаблонировано'] = True
+                    else:
+                        well_data.dict_perforation[plast]['Прошаблонировано'] = False
+                    if all([oktl is True for oktl in plast_raid]):
+                        well_data.dict_perforation[plast]['отрайбировано'] = True
+                    else:
+                        well_data.dict_perforation[plast]['отрайбировано'] = False
 
             if len(plast_del) > 0:
                 for plast in plast_del:
                     well_data.dict_perforation.pop(plast)
-
+        a =well_data.dict_perforation_project
 
         definition_plast_work(self)
         well_data.plast_work_short = well_data.plast_work

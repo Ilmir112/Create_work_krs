@@ -1174,7 +1174,7 @@ class AcidPakerWindow(QMainWindow):
                 paker_depth > well_data.head_column_additional._value and well_data.head_column_additional._value > 1000:
             nkt_diam = 73
             nkt_pod = '60'
-            template_nkt_diam = '59.6мм, 47.9'
+            template_nkt_diam = '59.6мм, 47.9мм'
         elif well_data.column_additional is True and float(well_data.column_additional_diametr._value) > 110 and \
                 paker_depth > well_data.head_column_additional._value:
             nkt_diam = 73
@@ -1187,16 +1187,20 @@ class AcidPakerWindow(QMainWindow):
                                                 'динамический уровень в скважине ниже головы хвостовика,'
                                                 'Выберете диаметр НКТ', nkt_list, 0, False)
             nkt_pod = '60мм'
-            template_nkt_diam = '59.6мм, 47.9'
+            template_nkt_diam = '59.6мм, 47.9мм'
+        elif well_data.column_additional and well_data.column_additional_diametr._value < 110:
+            nkt_diam = '73мм'
+            nkt_pod = '60мм'
+            template_nkt_diam = '59.6мм, 47.9мм'
 
         elif well_data.column_additional is False and well_data.column_diametr._value < 110:
             nkt_diam = 60
             nkt_pod = '60мм'
-            template_nkt_diam = '47.9'
+            template_nkt_diam = '47.9мм'
         else:
             nkt_diam = 73
             nkt_pod = '73мм'
-            template_nkt_diam = '59.6'
+            template_nkt_diam = '59.6мм'
 
         return nkt_diam, nkt_pod, template_nkt_diam
 
@@ -1245,11 +1249,11 @@ class AcidPakerWindow(QMainWindow):
                                 f'{well_data.column_additional_wall_thickness._value}мм + {swab_layout2} ' \
                                 f'НКТ{nkt_pod} 10м + репер + НКТ{nkt_pod}' \
                                 f'{round(well_data.head_column_additional._value - well_data.current_bottom, 1)}м ' \
-                                f'{gidroyakor_str} {mtg_str}'
+                                f'{mtg_str}'
             self.paker_short = f'{swab_layout} 2" + НКТ{nkt_pod} {float(paker_khost)}м + пакер {paker_type}-' \
                                f'{paker_diametr}мм  + {swab_layout2} НКТ{nkt_pod} 10м + репер НКТ{nkt_pod} ' \
                                f'{round(well_data.head_column_additional._value - well_data.current_bottom, 1)}м ' \
-                               f'{gidroyakor_str} {mtg_str}'
+                               f'{mtg_str}'
             self.dict_nkt = {
                 nkt_diam: round(well_data.head_column_additional._value - well_data.current_bottom, 0),
                 nkt_pod: int(float(paker_depth) + float(paker_khost) - round(

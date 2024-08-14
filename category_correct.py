@@ -15,14 +15,16 @@ class TabPage_SO(QWidget):
         self.labels_category = {}
         self.type_absorbent_label = QLabel('Тип поглотителя')
         self.type_absorbent = QComboBox()
-        self.type_absorbent.addItems(['ХИМТЕХНО 101 Марка А', 'СНПХ-1200', ' EVASORB марки 121'])
+        self.type_absorbent.addItems(['СНПХ-1200', 'ХИМТЕХНО 101 Марка А', ' EVASORB марки 121'])
 
         self.plast_all = []
         for plast in well_data.plast_all[::-1]:
-            self.plast_all.append(plast)
+            if plast not in self.plast_all:
+                self.plast_all.append(plast)
 
         for plast in well_data.plast_project:
-            self.plast_all.append(plast)
+            if plast not in self.plast_all:
+                self.plast_all.append(plast)
 
         self.cat_P_1 = well_data.cat_P_1
         self.cat_h2s_list = well_data.cat_h2s_list
@@ -65,7 +67,6 @@ class TabPage_SO(QWidget):
                 if well_data.plast_project:
                     work_plast = well_data.plast_project[0]
                     work_plast_index = 1
-            av= work_plast, work_plast_iter, well_data.dict_perforation_project
 
             if num != 0:
                 if len(well_data.dict_perforation_project) != 0 and \

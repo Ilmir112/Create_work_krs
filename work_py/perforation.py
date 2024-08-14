@@ -141,6 +141,7 @@ class PerforationWindow(QMainWindow):
 
         if len(well_data.dict_perforation_project) != 0:
             for plast, data in well_data.dict_perforation_project.items():
+                a = data['интервал']
                 for i in data['интервал']:
                     TabPage_SO.select_type_perforation(self, i[1])
                     if well_data.grp_plan:
