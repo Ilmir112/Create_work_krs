@@ -258,8 +258,9 @@ class PerforationCorrect(QMainWindow):
                         well_data.dict_perforation[plast]['отрайбировано'] = False
 
             if len(plast_del) > 0:
-                for plast in plast_del:
+                for plast in plast_del and plast in well_data.dict_perforation:
                     well_data.dict_perforation.pop(plast)
+
         a =well_data.dict_perforation_project
 
         definition_plast_work(self)

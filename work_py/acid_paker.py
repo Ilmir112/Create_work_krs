@@ -306,6 +306,14 @@ class TabPage_SO_acid(QWidget):
         self.calculate_sko_label = QLabel('Расчет на п.м.')
         self.calculate_sko_line = QLineEdit(self)
 
+        self.paker_depth_zumpf_Label = QLabel("Глубина посадки для ЗУМПФа", self)
+        self.paker_depth_zumpf_edit = QLineEdit(self)
+        self.paker_depth_zumpf_edit.setValidator(self.validator_int)
+
+        self.pressureZUMPF_question_Label = QLabel("Нужно ли опрессовывать ЗУМПФ", self)
+        self.pressureZUMPF_question_QCombo = QComboBox(self)
+        self.pressureZUMPF_question_QCombo.addItems(["Нет", "Да"])
+
         self.grid.addWidget(self.paker_layout_label, 0, 0, 1, 0)
         self.grid.addWidget(self.paker_layout_combo, 1, 0, 1, 0)
 
@@ -326,6 +334,12 @@ class TabPage_SO_acid(QWidget):
         self.grid.addWidget(self.paker2_depth, 3, 6)
         self.grid.addWidget(self.need_privyazka_Label, 2, 7)
         self.grid.addWidget(self.need_privyazka_QCombo, 3, 7)
+
+        self.grid.addWidget(self.pressureZUMPF_question_Label, 2, 8)
+        self.grid.addWidget(self.pressureZUMPF_question_QCombo, 3, 8)
+        self.grid.addWidget(self.paker_depth_zumpf_Label, 2, 9)
+        self.grid.addWidget(self.paker_depth_zumpf_edit, 3, 9)
+
 
         self.grid.addWidget(self.skv_true_label_type, 4, 0)
         self.grid.addWidget(self.svk_true_combo, 5, 0)
@@ -404,6 +418,26 @@ class TabPage_SO_acid(QWidget):
             self.Qplast_after_edit.setCurrentIndex(1)
         self.calculate_sko_line.editingFinished.connect(self.update_calculate_sko)
 
+        self.pressureZUMPF_question_QCombo.currentTextChanged.connect(self.update_paker_need)
+        self.pressureZUMPF_question_QCombo.setCurrentIndex(1)
+        self.pressureZUMPF_question_QCombo.setCurrentIndex(0)
+
+    def update_paker_need(self, index):
+        if index == 'Да':
+            if len(well_data.plast_work) != 0:
+                paker_depth_zumpf = int(well_data.perforation_sole + 10)
+            else:
+                if well_data.leakiness:
+                    paker_depth_zumpf = int(max([float(nek.split('-')[0])+10
+                                           for nek in well_data.dict_leakiness['НЭК']['интервал'].keys()]))
+
+            self.paker_depth_zumpf_edit.setText(f'{paker_depth_zumpf}')
+
+            self.grid.addWidget(self.paker_depth_zumpf_Label, 2, 9)
+            self.grid.addWidget(self.paker_depth_zumpf_edit, 3, 9)
+        elif index == 'Нет':
+            self.paker_depth_zumpf_Label.setParent(None)
+            self.paker_depth_zumpf_edit.setParent(None)
     def update_calculate_sko(self):
         plasts = well_data.texts
         metr_pvr = 0
@@ -484,7 +518,15 @@ class TabPage_SO_acid(QWidget):
     def update_paker_layout(self, index):
         self.paker_layout_index = index
 
+        if index not in ['однопакерная']:
+            self.pressureZUMPF_question_Label.setParent(None)
+            self.pressureZUMPF_question_QCombo.setParent(None)
+        else:
+            self.grid.addWidget(self.pressureZUMPF_question_Label, 2, 8)
+            self.grid.addWidget(self.pressureZUMPF_question_QCombo, 3, 8)
+
         if index in ['однопакерная', 'пакер с заглушкой', 'двухпакерная']:
+
             paker_depth = self.paker_depth.text()
             if paker_depth != '':
                 paker_depth = float(paker_depth)
@@ -839,6 +881,31 @@ class AcidPakerWindow(QMainWindow):
             if self.expected_P not in [None, 'None', '', '-']:
                 self.expected_P = int(float(self.expected_P))
             self.pressure_three = self.tabWidget.currentWidget().pressure_three_edit.text()
+
+            pressureZUMPF_combo = self.tabWidget.currentWidget().pressureZUMPF_question_QCombo.currentText()
+            paker_khost = int(float(self.tableWidget.currentWidget().pressureZUMPF_question_QCombo.text()))
+
+            if pressureZUMPF_combo == 'Да':
+                paker_depth_zumpf = self.tabWidget.currentWidget().paker_depth_zumpf_edit.text()
+                if paker_depth_zumpf == '':
+                    paker_depth_zumpf = int(float(self.tabWidget.currentWidget().paker_depth_zumpf_edit.text()))
+                    if paker_khost + paker_depth_zumpf >= well_data.current_bottom:
+                        mes = QMessageBox.warning(self, 'ОШИБКА', 'Длина хвостовика и пакера ниже текущего забоя')
+                        return
+                    QMessageBox.warning(self, 'Ошибка', f'не введены глубина опрессовки ЗУМПФа')
+                    return
+                if paker_depth_zumpf != '':
+                    paker_depth_zumpf = int(float(paker_depth_zumpf))
+                if MyWindow.check_true_depth_template(self, paker_depth_zumpf) is False:
+                    return
+                if MyWindow.true_set_Paker(self, paker_depth_zumpf) is False:
+                    return
+                if MyWindow.check_depth_in_skm_interval(self, paker_depth_zumpf) is False:
+                    return
+
+            else:
+                paker_depth_zumpf = 0
+
         except Exception as e:
             QMessageBox.warning(self, 'Ошибка', f'Ошибка сохранения данных {type(e).__name__}\n\n{str(e)}')
             return
@@ -903,7 +970,7 @@ class AcidPakerWindow(QMainWindow):
 
                 if row == 0:
                     work_template_list = self.paker_layout_one(swab_true_edit_type, diametr_paker, paker_khost,
-                                                               paker_depth, depth_gauge_combo)
+                                                               paker_depth, depth_gauge_combo, pressureZUMPF_combo, paker_depth_zumpf)
                 else:
                     work_template_list.append(
                         [f'установить пакер на глубине {paker_depth}, '
@@ -1204,7 +1271,8 @@ class AcidPakerWindow(QMainWindow):
 
         return nkt_diam, nkt_pod, template_nkt_diam
 
-    def paker_layout_one(self, swab_true_edit_type, paker_diametr, paker_khost, paker_depth, depth_gauge_combo):
+    def paker_layout_one(self, swab_true_edit_type, paker_diametr, paker_khost, paker_depth,
+                         depth_gauge_combo, pressureZUMPF_combo='Нет', paker_depth_zumpf=0):
         from work_py.alone_oreration import privyazkaNKT
         from .opressovka import OpressovkaEK, TabPage_SO
         # print(swab_true_edit_type, paker_diametr, paker_khost, paker_depth, depth_gauge_combo)
@@ -1258,36 +1326,80 @@ class AcidPakerWindow(QMainWindow):
                 nkt_diam: round(well_data.head_column_additional._value - well_data.current_bottom, 0),
                 nkt_pod: int(float(paker_depth) + float(paker_khost) - round(
                     well_data.head_column_additional._value - well_data.current_bottom, 0))}
+        if pressureZUMPF_combo == 'Нет':
+            paker_list = [
+                [f' СПО {self.paker_short} до глубины {paker_depth}м, воронкой до {paker_depth + paker_khost}м', None,
+                 f'Спустить {self.paker_select} + {gidroyakor_str} на НКТ{nkt_diam}мм до глубины '
+                 f'{paker_depth}м, воронкой до {paker_depth + paker_khost}м'
+                 f' с замером, шаблонированием шаблоном {nkt_template}мм. '
+                 f'{("Произвести пробную посадку на глубине 50м" if well_data.column_additional is False else "")} '
+                    ,
+                 None, None, None, None, None, None, None,
+                 'мастер КРС', descentNKT_norm(paker_depth, 1.2)],
+                [f'Посадить пакер на глубине {paker_depth}м', None, f'Посадить пакер на глубине {paker_depth}м'
+                    ,
+                 None, None, None, None, None, None, None,
+                 'мастер КРС', 0.5],
+                [OpressovkaEK.testing_pressure(self, paker_depth)[1], None,
+                 OpressovkaEK.testing_pressure(self, paker_depth)[0],
+                 None, None, None, None, None, None, None,
+                 'мастер КРС, предст. заказчика', 0.83 + 0.58],
+                [f'срыв 30мин', None,
+                 f'Произвести срыв пакера с поэтапным увеличением нагрузки на 3-4т выше веса НКТ в течении 30мин и с '
+                 f'выдержкой 1ч для возврата резиновых элементов в исходное положение. ',
+                 None, None, None, None, None, None, None,
+                 'мастер КРС', 0.7],
+                [None, None,
+                 f'В случае негерметичности э/к, по согласованию с заказчиком произвести ОТСЭК для определения интервала '
+                 f'негерметичности эксплуатационной колонны с точностью до одного НКТ или запись РГД, ВЧТ с '
+                 f'целью определения места нарушения в присутствии представителя заказчика, составить акт. '
+                 f'Определить приемистость НЭК.',
+                 None, None, None, None, None, None, None,
+                 'мастер КРС', None]]
+        else:
+            paker_list = [
+                [f' СПО {self.paker_short} до глубины {paker_depth}м, воронкой до {paker_depth + paker_khost}м', None,
+                 f'Спустить {self.paker_select} + {gidroyakor_str} на НКТ{nkt_diam}мм до глубины '
+                 f'{paker_depth}м, воронкой до {paker_depth + paker_khost}м'
+                 f' с замером, шаблонированием шаблоном {nkt_template}мм. '
+                 f'{("Произвести пробную посадку на глубине 50м" if well_data.column_additional is False else "")} ',
+                 None, None, None, None, None, None, None,
+                 'мастер КРС', descentNKT_norm(paker_depth, 1.2)],
+                [f'Опрессовать ЗУМПФ в инт {paker_depth_zumpf} - {well_data.current_bottom}м на '
+                 f'Р={well_data.max_admissible_pressure._value}атм', None,
+                 f'Посадить пакер. Опрессовать ЗУМПФ в интервале {paker_depth_zumpf} - {well_data.current_bottom}м на '
+                 f'Р={well_data.max_admissible_pressure._value}атм в течение 30 минут в присутствии представителя заказчика, '
+                 f'составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, '
+                 f'с подтверждением за 2 часа до начала работ)',
+                 None, None, None, None, None, None, None,
+                 'мастер КРС', 0.77],
+                [f'срыв пакера 30мин + 1ч', None,
+                 f'Произвести срыв пакера с поэтапным увеличением нагрузки на 3-4т выше веса НКТ в течении 30мин и с '
+                 f'выдержкой 1ч для возврата резиновых элементов в исходное положение. ',
+                 None, None, None, None, None, None, None,
+                 'мастер КРС', 0.7],
+                [f'Приподнять и посадить пакер на глубине {paker_depth}м',
+                 None, f'Приподнять и посадить пакер на глубине {paker_depth}м',
+                 None, None, None, None, None, None, None,
+                 'мастер КРС', 0.4],
+                [OpressovkaEK.testing_pressure(self, paker_depth)[1], None,
+                 OpressovkaEK.testing_pressure(self, paker_depth)[0],
+                 None, None, None, None, None, None, None,
+                 'мастер КРС, предст. заказчика', 0.67],
+                [f'срыв пакера 30мин + 1ч', None,
+                 f'Произвести срыв пакера с поэтапным увеличением нагрузки на 3-4т выше веса НКТ в течении 30мин и с '
+                 f'выдержкой 1ч для возврата резиновых элементов в исходное положение. ',
+                 None, None, None, None, None, None, None,
+                 'мастер КРС', 0.7],
+                [None, None,
+                 f'В случае негерметичности э/к, по согласованию с заказчиком '
+                 f'произвести ОТСЭК для определения интервала '
+                 f'негерметичности эксплуатационной колонны с точностью до одного НКТ или запись РГД, ВЧТ с '
+                 f'целью определения места нарушения в присутствии представителя заказчика, составить акт. '
+                 f'Определить приемистость НЭК.',
+                 None, None, None, None, None, None, None,
+                 'мастер КРС', None]]
 
-        paker_list = [
-            [f' СПО {self.paker_short} до глубины {paker_depth}м, воронкой до {paker_depth + paker_khost}м', None,
-             f'Спустить {self.paker_select} + {gidroyakor_str} на НКТ{nkt_diam}мм до глубины '
-             f'{paker_depth}м, воронкой до {paker_depth + paker_khost}м'
-             f' с замером, шаблонированием шаблоном {nkt_template}мм. '
-             f'{("Произвести пробную посадку на глубине 50м" if well_data.column_additional is False else "")} '
-                ,
-             None, None, None, None, None, None, None,
-             'мастер КРС', descentNKT_norm(paker_depth, 1.2)],
-            [f'Посадить пакер на глубине {paker_depth}м', None, f'Посадить пакер на глубине {paker_depth}м'
-                ,
-             None, None, None, None, None, None, None,
-             'мастер КРС', 0.5],
-            [OpressovkaEK.testing_pressure(self, paker_depth)[1], None,
-             OpressovkaEK.testing_pressure(self, paker_depth)[0],
-             None, None, None, None, None, None, None,
-             'мастер КРС, предст. заказчика', 0.83 + 0.58],
-            [f'срыв 30мин', None,
-             f'Произвести срыв пакера с поэтапным увеличением нагрузки на 3-4т выше веса НКТ в течении 30мин и с '
-             f'выдержкой 1ч для возврата резиновых элементов в исходное положение. ',
-             None, None, None, None, None, None, None,
-             'мастер КРС', 0.7],
-            [None, None,
-             f'В случае негерметичности э/к, по согласованию с заказчиком произвести ОТСЭК для определения интервала '
-             f'негерметичности эксплуатационной колонны с точностью до одного НКТ или запись РГД, ВЧТ с '
-             f'целью определения места нарушения в присутствии представителя заказчика, составить акт. '
-             f'Определить приемистость НЭК.',
-             None, None, None, None, None, None, None,
-             'мастер КРС', None]]
 
         if self.need_privyazka_QCombo == 'Да' and self.paker_layout_combo in ['однопакерная', 'пакер с заглушкой']:
             if privyazkaNKT(self)[0] not in paker_list:

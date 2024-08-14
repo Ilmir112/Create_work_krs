@@ -336,6 +336,7 @@ class WellSucker_rod(FindIndexPZ):
                             return
 
 
+
 class WellFond_data(FindIndexPZ):
 
     def __init__(self, ws):
@@ -656,6 +657,19 @@ class WellCondition(FindIndexPZ):
             else:
                 well_data.leakiness = False
 
+
+        if well_data.dict_pump_SHGN["do"] != '0' and len(well_data.dict_sucker_rod) == 0:
+            QMessageBox.warning(self, 'ОШИБКА', f'при спущенном насосе {well_data.dict_pump_SHGN["do"]} '
+                                                f'не указаны штанги, либо не корректно прочитаны данные ')
+            MyWindow.pause_app()
+
+            return
+        if well_data.dict_pump_SHGN["posle"] != '0' and len(well_data.dict_sucker_rod_po) == 0:
+            QMessageBox.warning(self, 'ОШИБКА', f'при плановом насосе {well_data.dict_pump_SHGN["do"]} '
+                                                f'не указаны штанги, либо не корректно прочитаны данные ')
+            MyWindow.pause_app()
+
+            return
 
 class Well_expected_pick_up(FindIndexPZ):
 

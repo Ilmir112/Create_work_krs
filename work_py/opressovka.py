@@ -82,7 +82,7 @@ class TabPage_SO(QWidget):
                     paker_depth_zumpf = int(max([float(nek.split('-')[0])+10
                                            for nek in well_data.dict_leakiness['НЭК']['интервал'].keys()]))
 
-                    self.paker_depth_zumpf_edit.setText(f'{paker_depth_zumpf}')
+            self.paker_depth_zumpf_edit.setText(f'{paker_depth_zumpf}')
 
             self.grid_layout.addWidget(self.paker_depth_zumpf_Label, 3, 6)
             self.grid_layout.addWidget(self.paker_depth_zumpf_edit, 4, 6)
@@ -254,6 +254,10 @@ class OpressovkaEK(QMainWindow):
         pressureZUMPF_question_QCombo = self.tabWidget.currentWidget().pressureZUMPF_question_QCombo.currentText()
         if pressureZUMPF_question_QCombo == 'Да':
             paker_depth_zumpf = int(float(self.tabWidget.currentWidget().paker_depth_zumpf_edit.text()))
+            if paker_khost + paker_depth_zumpf >= well_data.current_bottom:
+                mes = QMessageBox.warning(self, 'ОШИБКА', 'Длина хвостовика и пакера ниже текущего забоя')
+                return
+
         else:
             paker_depth_zumpf = 0
         self.need_privyazka_QCombo = self.tabWidget.currentWidget().need_privyazka_QCombo.currentText()
@@ -263,10 +267,8 @@ class OpressovkaEK(QMainWindow):
             return
         elif rows == 1:
             for row in range(rows):
-
                 paker_depth = self.tableWidget.item(row, 1)
                 paker_depth = int(float(paker_depth.text()))
-
 
 
             work_list = OpressovkaEK.paker_list(self, diametr_paker, paker_khost, paker_depth,
