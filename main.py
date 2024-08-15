@@ -1297,10 +1297,7 @@ class MyWindow(QMainWindow):
         img.anchor = coordinate
         ws.add_image(img, coordinate)
 
-    def openContextMenuNormir(self, position):
-        context_menu = QMenu(self)
-        action_menu = context_menu.addMenu("вид работ")
-        geophysical = action_menu.addMenu("Геофизические работы")
+
 
     def openContextMenu(self, position):
 
@@ -2354,14 +2351,15 @@ class MyWindow(QMainWindow):
 
                     table_widget.setItem(row - 1, col - 1, item)
 
-                # Проверяем, является ли текущая ячейка объединенной
-                for merged_cell in merged_cells:
-                    if row in range(merged_cell.min_row, merged_cell.max_row + 1) and \
-                            col in range(merged_cell.min_col, merged_cell.max_col + 1):
-                        # Устанавливаем количество объединяемых строк и столбцов для текущей ячейки
-                        table_widget.setSpan(row - 1, col - 1,
-                                             merged_cell.max_row - merged_cell.min_row + 1,
-                                             merged_cell.max_col - merged_cell.min_col + 1)
+                    # Проверяем, является ли текущая ячейка объединенной
+                    for merged_cell in merged_cells:
+                        range_row = range(merged_cell.min_row, merged_cell.max_row + 1)
+                        range_col = (merged_cell.min_col, merged_cell.max_col + 1)
+                        if row in range_row and col in range_col:
+                            # Устанавливаем количество объединяемых строк и столбцов для текущей ячейки
+                            table_widget.setSpan(row - 1, col - 1,
+                                                 merged_cell.max_row - merged_cell.min_row + 1,
+                                                 merged_cell.max_col - merged_cell.min_col + 1)
 
                 else:
                     item = QTableWidgetItem("")

@@ -9,7 +9,7 @@ if fname:
     print(ws_summary)
 
     normir_list = []
-    for row_ind, row in enumerate(ws_summary.iter_rows(max_col=32)):
+    for row_ind, row in enumerate(ws_summary.iter_rows(min_col=58, max_col=66)):
         list = []
         if row_ind < 46:
             for col, value in enumerate(row):

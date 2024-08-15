@@ -869,6 +869,7 @@ class DopPlanWindow(QMainWindow):
 
             work_earlier = current_widget.work_edit.toPlainText()
             number_dp = current_widget.number_DP_Combo.currentText()
+
             current_bottom_date_edit = current_widget.current_bottom_date_edit.text()
 
             template_depth_edit = current_widget.template_depth_edit.text()
@@ -947,6 +948,10 @@ class DopPlanWindow(QMainWindow):
                 data_well_data_in_base_combo, data_table_in_base_combo = '', ''
                 table_in_base_combo = str(current_widget.table_in_base_combo.currentText())
                 well_data_in_base_combo = current_widget.well_data_in_base_combo.currentText()
+
+
+
+
                 if ' от' in table_in_base_combo:
                     data_table_in_base_combo = table_in_base_combo.split(' ')[-1]
                     table_in_base = table_in_base_combo.split(' ')[2]
@@ -977,6 +982,14 @@ class DopPlanWindow(QMainWindow):
                 else:
                     mes = QMessageBox.critical(self, 'пункт', 'Необходимо выбрать пункт плана работ')
                     return
+                list_dop_plan = TabPageDp.get_tables_starting_with(self, well_data.well_number._value,
+                                                                                well_data.well_area._value)[::-1]
+
+                if any([f'dop_plan{number_dp}' in dop_plan
+                        or f'dop_plan_in_base{number_dp}' in dop_plan for dop_plan in list_dop_plan]):
+                    QMessageBox.warning(self, 'Ошибка', f'дополнительный план работ № {number_dp} есть в базе ')
+                    return
+
                 if table_in_base_combo == '':
                     mes = QMessageBox.critical(self, 'База данных', 'Необходимо выбрать план работ')
                     return
