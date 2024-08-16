@@ -883,9 +883,10 @@ class AcidPakerWindow(QMainWindow):
             self.pressure_three = self.tabWidget.currentWidget().pressure_three_edit.text()
 
             pressureZUMPF_combo = self.tabWidget.currentWidget().pressureZUMPF_question_QCombo.currentText()
-            paker_khost = int(float(self.tableWidget.currentWidget().pressureZUMPF_question_QCombo.text()))
+
 
             if pressureZUMPF_combo == 'Да':
+                paker_khost = int(float(self.tableWidget.currentWidget().paker_khost.text()))
                 paker_depth_zumpf = self.tabWidget.currentWidget().paker_depth_zumpf_edit.text()
                 if paker_depth_zumpf == '':
                     paker_depth_zumpf = int(float(self.tabWidget.currentWidget().paker_depth_zumpf_edit.text()))

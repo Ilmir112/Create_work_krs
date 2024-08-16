@@ -159,7 +159,7 @@ class TabPageDp(QWidget):
             self.table_in_base_combo = QComboBox()
             self.table_in_base_combo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents)
 
-            self.well_data_label = QLabel('файл excel')
+            self.well_data_label = QLabel('файл excel сохранный в базе')
             self.well_data_in_base_combo = QComboBox()
             self.well_data_in_base_combo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents)
 

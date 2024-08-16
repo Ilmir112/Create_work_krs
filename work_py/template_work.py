@@ -946,12 +946,13 @@ class TemplateKrs(QMainWindow):
             roof_skm = int(float(roof_skm))
         if sole_skm != '':
             sole_skm = int(float(sole_skm))
+            if sole_skm > well_data.skm_depth :
+                msg = QMessageBox.information(self, 'Внимание',
+                                              f'Глубина СКМ на {well_data.skm_depth}м не позволяет скреперовать в '
+                                              f'{roof_skm}-{sole_skm}м')
+                return
         template_key = self.tabWidget.currentWidget().template_Combo.currentText()
-        if sole_skm > well_data.skm_depth:
-            msg = QMessageBox.information(self, 'Внимание',
-                                          f'Глубина СКМ на {well_data.skm_depth}м не позволяет скреперовать в '
-                                          f'{roof_skm}-{sole_skm}м')
-            return
+
 
         if not roof_skm or not sole_skm:
             msg = QMessageBox.information(self, 'Внимание', 'Заполните все поля!')

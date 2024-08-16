@@ -729,8 +729,9 @@ class Swab_Window(QMainWindow):
             depthGaugeCombo = self.tabWidget.currentWidget().depthGaugeCombo.currentText()
 
             pressureZUMPF_combo = self.tabWidget.currentWidget().pressureZUMPF_question_QCombo.currentText()
-            paker_khost = int(float(self.tabWidget.currentWidget().paker_khost.text()))
+
             if pressureZUMPF_combo == 'Да':
+                paker_khost = int(float(self.tabWidget.currentWidget().paker_khost.text()))
                 paker_depth_zumpf = int(float(self.tabWidget.currentWidget().paker_depth_zumpf_edit.text()))
                 if paker_khost + paker_depth_zumpf >= well_data.current_bottom:
                     mes = QMessageBox.warning(self, 'ОШИБКА', 'Длина хвостовика и пакера ниже текущего забоя')
@@ -762,47 +763,46 @@ class Swab_Window(QMainWindow):
 
                 if pressuar_new_edit != '':
                     pressuar_new_edit = int(float(pressuar_new_edit.replace(',', '.')))
-                h2s_pr_edit = self.tabWidget.currentWidget().h2s_pr_edit.text()
-                h2s_mg_edit = self.tabWidget.currentWidget().h2s_mg_edit.text()
-                gf_edit = self.tabWidget.currentWidget().gf_edit.text()
-                calc_plast_h2s = self.tabWidget.currentWidget().calc_plast_h2s.text()
-                if h2s_pr_edit != '' and h2s_mg_edit and gf_edit != '' and calc_plast_h2s != '' and pressuar_new_edit != '':
 
-                    asdwd = well_data.dict_category
-
-                    Pressuar = namedtuple("Pressuar", "category data_pressuar")
-                    Data_h2s = namedtuple("Data_h2s", "category data_procent data_mg_l poglot")
-                    Data_gaz = namedtuple("Data_gaz", "category data")
-
-                    category_pressuar_line_combo = self.tabWidget.currentWidget().category_pressuar_line_combo.currentText()
-                    category_h2s_edit = self.tabWidget.currentWidget().category_h2s_edit.currentText()
+                if well_data.dict_category[plast_new_combo]['отключение'] != 'планируемый':
                     h2s_pr_edit = self.tabWidget.currentWidget().h2s_pr_edit.text()
                     h2s_mg_edit = self.tabWidget.currentWidget().h2s_mg_edit.text()
+                    gf_edit = self.tabWidget.currentWidget().gf_edit.text()
                     calc_plast_h2s = self.tabWidget.currentWidget().calc_plast_h2s.text()
-                    category_gf = self.tabWidget.currentWidget().category_gf.currentText()
-                    gf_edit = self.tabWidget.currentWidget().gf_edit.text().replace(',', '.')
+                    if h2s_pr_edit != '' and h2s_mg_edit and gf_edit != '' and calc_plast_h2s != '' and pressuar_new_edit != '':
 
-                    well_data.dict_category.setdefault(plast_new_combo, {}).setdefault(
-                        'по давлению',
-                        Pressuar(int(float(category_pressuar_line_combo)),
-                                 float(pressuar_new_edit)))
+                        asdwd = well_data.dict_category
 
-                    well_data.dict_category.setdefault(plast_new_combo, {}).setdefault(
-                        'по сероводороду', Data_h2s(
-                            int(float(category_h2s_edit)),
-                            float(h2s_pr_edit.replace(',', '.')),
-                            float(h2s_mg_edit.replace(',', '.')),
-                            float(calc_plast_h2s.replace(',', '.'))))
+                        Pressuar = namedtuple("Pressuar", "category data_pressuar")
+                        Data_h2s = namedtuple("Data_h2s", "category data_procent data_mg_l poglot")
+                        Data_gaz = namedtuple("Data_gaz", "category data")
 
-                    well_data.dict_category.setdefault(plast_new_combo, {}).setdefault(
-                        'по газовому фактору', Data_gaz(
-                            int(category_gf),
-                            float(gf_edit)))
-                    try:
-                        well_data.dict_category[plast_new_combo]['отключение'] = 'планируемый'
-                    except:
+                        category_pressuar_line_combo = self.tabWidget.currentWidget().category_pressuar_line_combo.currentText()
+                        category_h2s_edit = self.tabWidget.currentWidget().category_h2s_edit.currentText()
+
+                        category_gf = self.tabWidget.currentWidget().category_gf.currentText()
+
                         well_data.dict_category.setdefault(plast_new_combo, {}).setdefault(
-                            'отключение', 'планируемый')
+                            'по давлению',
+                            Pressuar(int(float(category_pressuar_line_combo)),
+                                     float(pressuar_new_edit)))
+
+                        well_data.dict_category.setdefault(plast_new_combo, {}).setdefault(
+                            'по сероводороду', Data_h2s(
+                                int(float(category_h2s_edit)),
+                                float(h2s_pr_edit.replace(',', '.')),
+                                float(h2s_mg_edit.replace(',', '.')),
+                                float(calc_plast_h2s.replace(',', '.'))))
+
+                        well_data.dict_category.setdefault(plast_new_combo, {}).setdefault(
+                            'по газовому фактору', Data_gaz(
+                                int(category_gf),
+                                float(gf_edit)))
+                        try:
+                            well_data.dict_category[plast_new_combo]['отключение'] = 'планируемый'
+                        except:
+                            well_data.dict_category.setdefault(plast_new_combo, {}).setdefault(
+                                'отключение', 'планируемый')
 
             else:
                 plast_new_combo = ''

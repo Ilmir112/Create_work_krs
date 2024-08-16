@@ -91,8 +91,11 @@ class TabPage_SO(QWidget):
 
 
             plast_index.combo_box.addItems(self.plast_all)
-
-            plast_index.combo_box.setCurrentIndex(self.plast_all.index(work_plast))
+            try:
+                plast_index.combo_box.setCurrentIndex(self.plast_all.index(work_plast))
+            except:
+                self.plast_all.append('')
+                plast_index.combo_box.setCurrentIndex(self.plast_all.index(work_plast))
 
             category_pressuar_line_edit = QLineEdit(self)
             try:
