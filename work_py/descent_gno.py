@@ -15,7 +15,6 @@ class TabPage_Gno(QWidget):
         self.nkt_edit = QLineEdit(self)
         self.nkt_edit.setText(f'{self.gno_nkt_opening(well_data.dict_nkt_po)}')
 
-
         self.gno_label = QLabel("вид спускаемого ГНО", self)
         self.gno_combo = QComboBox(self)
         gno_list = ['пакер', 'ОРЗ', 'ОРД', 'воронка', 'НН с пакером', 'НВ с пакером',
@@ -29,6 +28,10 @@ class TabPage_Gno(QWidget):
         self.sucker_edit = QLineEdit(self)
         self.sucker_edit.setText(f'{self.gno_nkt_opening(well_data.dict_sucker_rod_po)}')
 
+        self.distance_between_nkt_label = QLabel('Расстояние между НКТ')
+        self.distance_between_nkt_edit = QLineEdit(self)
+        self.distance_between_nkt_edit.setText(f'{300}')
+
         self.gno_combo.addItems(gno_list)
 
         lift_key = self.select_gno()
@@ -40,8 +43,9 @@ class TabPage_Gno(QWidget):
         self.grid.addWidget(self.gno_combo, 5, 3)
         self.grid.addWidget(self.nkt_label, 4, 4)
         self.grid.addWidget(self.nkt_edit, 5, 4)
+        self.grid.addWidget(self.distance_between_nkt_label, 4, 7)
+        self.grid.addWidget(self.distance_between_nkt_edit, 5, 7)
         self.grid.setColumnMinimumWidth(4, len(self.nkt_edit.text()) * 6)
-
 
         self.need_juming_after_sko_label = QLabel('Нужно ли проводить промывку после СКО')
         self.need_juming_after_sko_combo = QComboBox(self)
@@ -156,6 +160,7 @@ class GnoDescentWindow(QMainWindow):
         lift_key = str(self.tabWidget.currentWidget().gno_combo.currentText())
         nkt_edit = self.tabWidget.currentWidget().nkt_edit.text()
         sucker_edit = self.tabWidget.currentWidget().sucker_edit.text()
+        distance_between_nkt_edit = self.tabWidget.currentWidget().distance_between_nkt_edit.text()
 
         if well_data.region == 'КГМ':
             need_juming_after_sko_combo = self.tabWidget.currentWidget().need_juming_after_sko_combo.currentText()
@@ -167,20 +172,23 @@ class GnoDescentWindow(QMainWindow):
                      (well_data.column_additional and \
                       well_data.current_bottom < well_data.head_column_additional._value)):
 
-                mes = QMessageBox.critical(self, 'Ошибка', f'Нельзя спускать пакер {well_data.depth_fond_paker_do["posle"]}м'
-                                                           f'ниже глубины шаблонирования ЭК {well_data.template_depth}м')
+                mes = QMessageBox.critical(self, 'Ошибка',
+                                           f'Нельзя спускать пакер {well_data.depth_fond_paker_do["posle"]}м'
+                                           f'ниже глубины шаблонирования ЭК {well_data.template_depth}м')
                 return
             elif well_data.depth_fond_paker_do["posle"] < well_data.head_column_additional._value and \
                     well_data.depth_fond_paker_do["posle"] > well_data.template_depth and well_data.column_additional:
-                mes = QMessageBox.critical(self, 'Ошибка', f'Нельзя спускать пакер {well_data.depth_fond_paker_do["posle"]}м'
-                                                           f'ниже глубины шаблонирования ЭК {well_data.template_depth}м')
+                mes = QMessageBox.critical(self, 'Ошибка',
+                                           f'Нельзя спускать пакер {well_data.depth_fond_paker_do["posle"]}м'
+                                           f'ниже глубины шаблонирования ЭК {well_data.template_depth}м')
                 return
             elif well_data.depth_fond_paker_do["posle"] > well_data.head_column_additional._value and \
                     well_data.depth_fond_paker_do["posle"] > well_data.template_depth_addition \
                     and well_data.column_additional:
-                mes = QMessageBox.critical(self, 'Ошибка', f'Нельзя спускать пакер {well_data.depth_fond_paker_do["posle"]}м'
-                                                           f'ниже глубины шаблонирования ЭК '
-                                                           f'{well_data.template_depth_addition}м')
+                mes = QMessageBox.critical(self, 'Ошибка',
+                                           f'Нельзя спускать пакер {well_data.depth_fond_paker_do["posle"]}м'
+                                           f'ниже глубины шаблонирования ЭК '
+                                           f'{well_data.template_depth_addition}м')
                 return
             rgd_question_combo = self.tabWidget.currentWidget().rgd_question_combo.currentText()
             work_list = self.paker_down(nkt_edit, rgd_question_combo)
@@ -203,7 +211,8 @@ class GnoDescentWindow(QMainWindow):
                                                                f'ниже глубины шаблонирования ЭК {well_data.template_depth}м')
                     return
                 elif well_data.dict_pump_ECN_h["posle"] > well_data.head_column_additional._value and \
-                        well_data.dict_pump_ECN_h["posle"] > well_data.template_depth_addition and well_data.column_additional:
+                        well_data.dict_pump_ECN_h[
+                            "posle"] > well_data.template_depth_addition and well_data.column_additional:
                     mes = QMessageBox.critical(self, 'Ошибка', f'Нельзя спускать ЭЦН {well_data.paker_do["posle"]}м'
                                                                f'ниже глубины шаблонирования ЭК '
                                                                f'{well_data.template_depth_addition}м')
@@ -316,7 +325,7 @@ class GnoDescentWindow(QMainWindow):
         ]
         return descent_voronka
 
-    def gno_down(self, lift_key, nkt_edit, sucker_edit, need_juming_after_sko_combo = 'Нет'):
+    def gno_down(self, lift_key, nkt_edit, sucker_edit, distance_between_nkt_edit, need_juming_after_sko_combo='Нет'):
 
         from .opressovka import OpressovkaEK
 
@@ -329,7 +338,7 @@ class GnoDescentWindow(QMainWindow):
 
         # print(f'ключ {lift_key}')
         if lift_key in ['ЭЦН', 'НВ', 'НН', 'НН с пакером', 'ЭЦН с пакером', 'НВ с пакером', 'ОРД']:
-            calc_fond_nkt_str = self.calc_fond_nkt(sum(list(well_data.dict_nkt_po.values())))
+            calc_fond_nkt_str = self.calc_fond_nkt(sum(list(well_data.dict_nkt_po.values())), distance_between_nkt_edit)
         else:
             calc_fond_nkt_str = None
 
@@ -908,8 +917,8 @@ class GnoDescentWindow(QMainWindow):
         lift_dict = {
             'НН с пакером': descent_nn_with_paker,
             'НВ с пакером': descent_nv_with_paker,
-             'ЭЦН с пакером': descent_ecn_with_paker,
-             'ЭЦН': descent_ecn,
+            'ЭЦН с пакером': descent_ecn_with_paker,
+            'ЭЦН': descent_ecn,
             'НВ': descent_nv,
             'НН': descent_nn,
             'ОРД': descentORD,
@@ -935,9 +944,9 @@ class GnoDescentWindow(QMainWindow):
             else:
                 if need_juming_after_sko_combo == 'Да':
                     pero_list = [[None, None,
-                                        'С целью вымыва продуктов реакции:',
-                                        None, None, None, None, None, None, None,
-                                        'мастер КРС', '']]
+                                  'С целью вымыва продуктов реакции:',
+                                  None, None, None, None, None, None, None,
+                                  'мастер КРС', '']]
                     for row in TemplateKrs.pero(self):
                         pero_list.append(row)
 
@@ -972,13 +981,11 @@ class GnoDescentWindow(QMainWindow):
         else:
             return well_data.expected_P
 
-    def calc_fond_nkt(self, len_nkt):
+    def calc_fond_nkt(self, len_nkt, distance_between_nkt=300):
         # расчет необходимого давления опрессовки НКТ при спуске
         static_level = well_data.static_level._value
         fluid = float(well_data.fluid_work[:4])
-        distance_between_nkt, ok = QInputDialog.getInt(self, 'Расстояние между НКТ',
-                                                       f'Расстояние между НКТ для опрессовки', 300, 50,
-                                                       501)
+
         pressuar = 40
         # print(f' ЭЦН {well_data.dict_pump_ECN["posle"]}')
         if well_data.dict_pump_ECN["posle"] != "0":

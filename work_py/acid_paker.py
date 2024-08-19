@@ -281,6 +281,9 @@ class TabPage_SO_acid(QWidget):
         self.iron_label_type = QLabel("необходимость стабилизатора железа", self)
         self.iron_true_combo = QComboBox(self)
         self.iron_true_combo.addItems(['Нет', 'Да'])
+        if well_data.stabilizator_true:
+            self.iron_true_combo.setCurrentIndex(1)
+
         self.iron_volume_label = QLabel("Объем стабилизатора", self)
         self.iron_volume_edit = QLineEdit(self)
         self.expected_P_label = QLabel('Ожидаемое давление закачки')
@@ -438,6 +441,7 @@ class TabPage_SO_acid(QWidget):
         elif index == 'Нет':
             self.paker_depth_zumpf_Label.setParent(None)
             self.paker_depth_zumpf_edit.setParent(None)
+
     def update_calculate_sko(self):
         plasts = well_data.texts
         metr_pvr = 0
@@ -788,7 +792,7 @@ class AcidPakerWindow(QMainWindow):
         rows = self.tableWidget.rowCount()
 
         if paker_layout_combo in ['однопакерная', 'однопакерная, упорный', 'пакер с заглушкой']:
-            paker_khost = self.if_None((self.tabWidget.currentWidget().paker_khost.text()))
+            paker_khost = self.if_None(self.tabWidget.currentWidget().paker_khost.text())
             paker_depth = self.if_None(self.tabWidget.currentWidget().paker_depth.text())
 
             if well_data.current_bottom < float(paker_khost + paker_depth) or \
@@ -847,7 +851,7 @@ class AcidPakerWindow(QMainWindow):
             self.tableWidget.setItem(rows, 6, QTableWidgetItem(str(acid_proc_edit)))
             self.tableWidget.setItem(rows, 7, QTableWidgetItem(str(acid_volume_edit)))
         elif paker_layout_combo in ['воронка']:
-            paker_khost = self.if_None((self.tabWidget.currentWidget().paker_khost.text()))
+            paker_khost = self.if_None(self.tabWidget.currentWidget().paker_khost.text())
 
             self.tableWidget.insertRow(rows)
             self.tableWidget.setItem(rows, 0, QTableWidgetItem(plast_combo))
@@ -886,17 +890,20 @@ class AcidPakerWindow(QMainWindow):
 
 
             if pressureZUMPF_combo == 'Да':
-                paker_khost = int(float(self.tableWidget.currentWidget().paker_khost.text()))
+                paker_khost = self.if_None(self.tabWidget.currentWidget().paker_khost.text())
                 paker_depth_zumpf = self.tabWidget.currentWidget().paker_depth_zumpf_edit.text()
+
+
                 if paker_depth_zumpf == '':
-                    paker_depth_zumpf = int(float(self.tabWidget.currentWidget().paker_depth_zumpf_edit.text()))
-                    if paker_khost + paker_depth_zumpf >= well_data.current_bottom:
-                        mes = QMessageBox.warning(self, 'ОШИБКА', 'Длина хвостовика и пакера ниже текущего забоя')
-                        return
                     QMessageBox.warning(self, 'Ошибка', f'не введены глубина опрессовки ЗУМПФа')
                     return
-                if paker_depth_zumpf != '':
+                else:
                     paker_depth_zumpf = int(float(paker_depth_zumpf))
+
+                if paker_khost + paker_depth_zumpf >= well_data.current_bottom:
+                    mes = QMessageBox.warning(self, 'ОШИБКА', 'Длина хвостовика и пакера ниже текущего забоя')
+                    return
+
                 if MyWindow.check_true_depth_template(self, paker_depth_zumpf) is False:
                     return
                 if MyWindow.true_set_Paker(self, paker_depth_zumpf) is False:

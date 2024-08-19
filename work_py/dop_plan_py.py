@@ -599,14 +599,14 @@ class DopPlanWindow(QMainWindow):
                         self.target_row_index_cancel = int(i) - 1
                         break
                     elif 'Порядок работы' == str(row[col]['value']) and well_data.data_x_max._value == 0:
-
                         well_data.data_x_max = well_data.ProtectedIsDigit(int(i) + 1)
                         break
                     elif 'ИТОГО:' in str(row[col]['value']) and well_data.work_plan in ['plan_change']:
                         self.target_row_index_cancel = int(i) - 1
                         break
-                    elif 'Текущий забой ' in str(row[col]['value']):
+                    elif 'Текущий забой ' == str(row[col]['value']):
                         self.bottom_row_index = int(i)
+                        a = int(i)
                     if int(i) > self.target_row_index:
                         list_row.append(row[col]['value'])
 
@@ -678,11 +678,18 @@ class DopPlanWindow(QMainWindow):
         for i, row in data.items():
             if i != 'image':
                 for col in range(len(row)):
-                    if 'Текущий забой ' in str(row[col]['value']):
+                    if 'Текущий забой ' == str(row[col]['value']):
                         self.bottom_row_index = int(i)
                         break
         try:
+            aadaf = self.bottom_row_index
+            aa1a = data[str(self.bottom_row_index)][2]['value']
+            aaaa = data[str(self.bottom_row_index)][3]['value']
+            aa3aa = data[str(self.bottom_row_index)][4]['value']
+            a3a3da = data[str(self.bottom_row_index)][5]['value']
+            aa3adsa = data[str(self.bottom_row_index)][6]['value']
             data[str(self.bottom_row_index)][3]['value'] = current_bottom
+
             data[str(self.bottom_row_index)][5]['value'] = current_bottom_date_edit
 
             data[str(self.bottom_row_index)][-1]['value'] = method_bottom_combo

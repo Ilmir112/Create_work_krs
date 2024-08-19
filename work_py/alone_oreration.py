@@ -1,9 +1,9 @@
-import json
+
 import logging
 from collections import namedtuple
 
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QInputDialog, QMessageBox
+from PyQt5.QtWidgets import QInputDialog
 
 import H2S
 import well_data
@@ -20,11 +20,11 @@ def kot_select(self, current_bottom):
 
     elif well_data.column_additional is True and well_data.column_additional_diametr._value < 110 and \
             current_bottom >= well_data.head_column_additional._value:
-        kot_select = f'КОТ-50 (клапан обратный тарельчатый) +НКТ{60}мм 10м + репер + ' \
+        kot_select = f'КОТ-50 (клапан обратный тарельчатый) + НКТ{60}мм 10м + репер + ' \
                      f'НКТ60мм L- {round(current_bottom - well_data.head_column_additional._value, 0)}м'
     elif well_data.column_additional is True and well_data.column_additional_diametr._value > 110 and \
             current_bottom >= well_data.head_column_additional._value:
-        kot_select = f'КОТ-50 (клапан обратный тарельчатый) +НКТ{73}мм со снятыми фасками 10м + репер + ' \
+        kot_select = f'КОТ-50 (клапан обратный тарельчатый) + НКТ{73}мм со снятыми фасками 10м + репер + ' \
                      f'НКТ{well_data.nkt_diam}мм со снятыми фасками' \
                      f' L- {round(current_bottom - well_data.head_column_additional._value, 0)}м'
 
@@ -36,7 +36,7 @@ def kot_work(self, current_bottom=0):
         current_bottom, _ = QInputDialog.getDouble(None,
                                                    'Глубина забоя',
                                                    'Введите глубину необходимого текущего забоя',
-                                                   current_bottom, 1, 10000, 1)
+                                                   well_data.current_bottom, 1, 10000, 1)
 
     kot_list = [
         [f'статической уровень {well_data.static_level._value}', None,
@@ -271,7 +271,8 @@ def pvo_cat1(self):
             f' (при необходимости произвести монтаж переводника' \
             f' П178х168 или П168 х 146 или ' \
             f'П178 х 146 в зависимости от типоразмера крестовины и колонной головки). Спустить и посадить ' \
-            f'пакер на глубину 10м. Опрессовать ПВО (трубные плашки превентора) на Р-{well_data.max_admissible_pressure._value}атм ' \
+            f'пакер на глубину 10м. Опрессовать ПВО (трубные плашки превентора) на ' \
+            f'Р-{well_data.max_admissible_pressure._value}атм ' \
             f'(на максимально допустимое давление опрессовки ' \
             f'эксплуатационной колонны в течении 30мин), сорвать и извлечь пакер. \n' \
             f'- Обеспечить о обогрев превентора, станции управления ПВО оборудовать теплоизоляционными ' \

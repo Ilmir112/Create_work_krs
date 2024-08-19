@@ -40,6 +40,8 @@ class FindIndexPZ(QMainWindow):
                     and row_ind < 50:
                 well_data.cat_well_max = ProtectedIsDigit(row_ind)
                 well_data.data_well_min = ProtectedIsDigit(row_ind + 1)
+            elif 'стабилизатор железа' in row:
+                well_data.stabilizator_true = True
 
             elif any(['Ожидаемые показатели после' in str(col) for col in row]):
                 well_data.data_x_min = ProtectedIsDigit(row_ind)

@@ -270,7 +270,7 @@ class SandWindow(QMainWindow):
 
         filling_list = [
             [f'Спустить  {self.sand_select()} на НКТ{nkt_diam}м до глубины {round(filling_depth-100,0)}м', None,
-         f' Спустить  {self.sand_select()}  на НКТ{nkt_diam}м до глубины {round(filling_depth-100,0)}м с замером, '
+         f'Спустить  {self.sand_select()}  на НКТ{nkt_diam}м до глубины {round(filling_depth-100,0)}м с замером, '
          f'шаблонированием шаблоном {well_data.nkt_template}мм. (При СПО первых десяти НКТ на '
          f'спайдере дополнительно устанавливать элеватор ЭХЛ)',
          None, None, None, None, None, None, None,
@@ -357,7 +357,7 @@ class SandWindow(QMainWindow):
                                                     well_data.current_bottom, 0, 6000, 1)
         washingOut_list = [
             [f'СПО пера до {round(well_data.current_bottom,0)}м', None,
-         f' Спустить  {SandWindow.sand_select(self)}  на НКТ{nkt_diam}м до глубины {round(well_data.current_bottom,0)}м с '
+         f'Спустить  {SandWindow.sand_select(self)}  на НКТ{nkt_diam}м до глубины {round(well_data.current_bottom,0)}м с '
          f'замером,'
          f' шаблонированием шаблоном {well_data.nkt_template}мм. '
          f'(При СПО первых десяти НКТ на '

@@ -1129,6 +1129,7 @@ class MyWindow(QMainWindow):
             self.table_widget.resizeColumnsToContents()
             self.table_widget = None
             self.tabWidget = None
+            well_data.stabilizator_true = False
             well_data.column_head_m = ''
             well_data.date_drilling_cancel = ''
             well_data.date_drilling_run = ''
@@ -1458,6 +1459,10 @@ class MyWindow(QMainWindow):
         alone_menu.addAction(block_pack_action)
         block_pack_action.triggered.connect(self.block_pack)
 
+        tubing_pressure_testing_action = QAction('Опрессовка поинтервальная НКТ')
+        alone_menu.addAction(tubing_pressure_testing_action)
+        tubing_pressure_testing_action.triggered.connect(self.tubing_pressure_testing)
+
         konte_action = QAction('Канатные технологии')
         alone_menu.addAction(konte_action)
         konte_action.triggered.connect(self.konte_action)
@@ -1508,6 +1513,19 @@ class MyWindow(QMainWindow):
         # print(r, well_data.count_row_well)
         if r > well_data.count_row_well and 'gnkt' not in self.work_plan:
             data = self.read_clicked_mouse_data(r)
+
+    def tubing_pressure_testing(self):
+        from work_py.tubing_pressuar_testing import TubingPressuarWindow
+
+        if self.raid_window is None:
+            self.raid_window = TubingPressuarWindow(well_data.ins_ind, self.table_widget)
+            self.set_modal_window(self.raid_window)
+            self.pause_app()
+            well_data.pause = True
+            self.raid_window = None
+        else:
+            self.raid_window.close()  # Close window.
+            self.raid_window = None
 
     def read_clicked_mouse_data(self, row):
 

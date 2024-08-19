@@ -353,7 +353,7 @@ class PakerIzvlek(MyWindow):
         rir_list = [
             [f'СПО {RirWindow.pero_select(self, well_data.current_bottom).replace("перо", f"перо-{pero_diametr_line}мм")} до '
              f'глубины {round(well_data.current_bottom, 0)}м', None,
-             f' Спустить {RirWindow.pero_select(self, well_data.current_bottom).replace("перо", f"перо-{pero_diametr_line}мм")}  '
+             f'Спустить {RirWindow.pero_select(self, well_data.current_bottom).replace("перо", f"перо-{pero_diametr_line}мм")}  '
              f'{TemplateKrs.calc_combo_nkt("НКТ", paker_depth_line)} на НКТ{well_data.nkt_diam}мм до '
              f'глубины {round(well_data.current_bottom, 0)}м с замером, шаблонированием шаблоном {well_data.nkt_template}мм. '
              f'(При СПО первых десяти НКТ на '

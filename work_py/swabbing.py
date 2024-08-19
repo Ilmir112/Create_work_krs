@@ -722,6 +722,7 @@ class Swab_Window(QMainWindow):
         self.tableWidget.removeRow(row)
 
     def add_work(self):
+        from work_py.acid_paker import AcidPakerWindow
         try:
             diametr_paker = int(float(self.tabWidget.currentWidget().diametr_paker_edit.text()))
             swab_true_edit_type = self.tabWidget.currentWidget().swab_true_edit_type.currentText()
@@ -730,18 +731,19 @@ class Swab_Window(QMainWindow):
 
             pressureZUMPF_combo = self.tabWidget.currentWidget().pressureZUMPF_question_QCombo.currentText()
 
-            if pressureZUMPF_combo == 'Да':
-                paker_khost = int(float(self.tabWidget.currentWidget().paker_khost.text()))
+            if pressureZUMPF_combo == 'Да':                
+                paker_khost = AcidPakerWindow.if_None(self, self.tabWidget.currentWidget().khvostEdit.text())
                 paker_depth_zumpf = int(float(self.tabWidget.currentWidget().paker_depth_zumpf_edit.text()))
-                if paker_khost + paker_depth_zumpf >= well_data.current_bottom:
-                    mes = QMessageBox.warning(self, 'ОШИБКА', 'Длина хвостовика и пакера ниже текущего забоя')
-                    return
-
                 if paker_depth_zumpf == '':
                     QMessageBox.warning(self, 'Ошибка', f'не введены глубина опрессовки ЗУМПФа')
                     return
-                if paker_depth_zumpf != '':
+                else:
                     paker_depth_zumpf = int(float(paker_depth_zumpf))
+                if paker_khost + paker_depth_zumpf >= well_data.current_bottom:
+                    QMessageBox.warning(self, 'ОШИБКА', 'Длина хвостовика и пакера ниже текущего забоя')
+                    return
+
+
                 if MyWindow.check_true_depth_template(self, paker_depth_zumpf) is False:
                     return
                 if MyWindow.true_set_Paker(self, paker_depth_zumpf) is False:
