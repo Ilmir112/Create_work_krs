@@ -3,7 +3,7 @@ from work_py.alone_oreration import privyazkaNKT
 from .rationingKRS import descentNKT_norm, descent_sucker_pod
 from .calc_fond_nkt import CalcFond
 from .template_work import TemplateKrs
-from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QTabWidget, \
+from PyQt5.QtWidgets import  QMessageBox, QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QTabWidget, \
     QMainWindow, QPushButton
 
 
@@ -43,8 +43,8 @@ class TabPage_Gno(QWidget):
         self.grid.addWidget(self.gno_combo, 5, 3)
         self.grid.addWidget(self.nkt_label, 4, 4)
         self.grid.addWidget(self.nkt_edit, 5, 4)
-        self.grid.addWidget(self.distance_between_nkt_label, 4, 7)
-        self.grid.addWidget(self.distance_between_nkt_edit, 5, 7)
+        self.grid.addWidget(self.distance_between_nkt_label, 4, 8)
+        self.grid.addWidget(self.distance_between_nkt_edit, 5, 8)
         self.grid.setColumnMinimumWidth(4, len(self.nkt_edit.text()) * 6)
 
         self.need_juming_after_sko_label = QLabel('Нужно ли проводить промывку после СКО')
@@ -161,6 +161,8 @@ class GnoDescentWindow(QMainWindow):
         nkt_edit = self.tabWidget.currentWidget().nkt_edit.text()
         sucker_edit = self.tabWidget.currentWidget().sucker_edit.text()
         distance_between_nkt_edit = self.tabWidget.currentWidget().distance_between_nkt_edit.text()
+        if distance_between_nkt_edit != '':
+            distance_between_nkt_edit = int(float(distance_between_nkt_edit))
 
         if well_data.region == 'КГМ':
             need_juming_after_sko_combo = self.tabWidget.currentWidget().need_juming_after_sko_combo.currentText()
@@ -172,7 +174,7 @@ class GnoDescentWindow(QMainWindow):
                      (well_data.column_additional and \
                       well_data.current_bottom < well_data.head_column_additional._value)):
 
-                mes = QMessageBox.critical(self, 'Ошибка',
+                QMessageBox.critical(self, 'Ошибка',
                                            f'Нельзя спускать пакер {well_data.depth_fond_paker_do["posle"]}м'
                                            f'ниже глубины шаблонирования ЭК {well_data.template_depth}м')
                 return
@@ -218,7 +220,7 @@ class GnoDescentWindow(QMainWindow):
                                                                f'{well_data.template_depth_addition}м')
                     return
 
-            work_list = self.gno_down(lift_key, nkt_edit, sucker_edit, need_juming_after_sko_combo)
+            work_list = self.gno_down(lift_key, nkt_edit, sucker_edit, distance_between_nkt_edit, need_juming_after_sko_combo)
 
         for row in self.end_list:
             work_list.append(row)

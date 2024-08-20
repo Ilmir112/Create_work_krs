@@ -884,13 +884,12 @@ class RirWindow(QMainWindow):
         if need_change_zgs_combo == "Да":
             for row in Change_fluid_Window.fluid_change(self, plast_new_combo, fluid_new_edit,
                                                         pressuar_new_edit):
-                rir_list.insert(-1, row)
+                rir_list.append(row)
 
         rir_list.append([None, None,
                          f'Поднять перо на тНКТ{nkt_diam}м с глубины {roof_rir_edit}м с доливом скважины в объеме '
                          f'{round(roof_rir_edit * 1.12 / 1000, 1)}м3 тех. жидкостью '
-                         f'уд.весом {well_data.fluid_work}',
-                         None, None, None, None, None, None, None,
+                         f'уд.весом {well_data.fluid_work}', None, None, None, None, None, None, None,
                          'мастер КРС', liftingNKT_norm(roof_rir_edit, 1)])
         well_data.forPaker_list = None
         return rir_list
