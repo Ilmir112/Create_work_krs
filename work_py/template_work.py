@@ -44,7 +44,8 @@ class TabPage_SO_with(QWidget):
         self.privyazka_question_QCombo = QComboBox(self)
         self.privyazka_question_QCombo.addItems(['Нет', 'Да'])
 
-        if well_data.current_bottom - well_data.perforation_sole <= 10 and well_data.open_trunk_well is False and well_data.count_template != 0:
+        if well_data.current_bottom - well_data.perforation_sole <= 10 \
+                and well_data.open_trunk_well is False and well_data.count_template != 0:
             self.privyazka_question_QCombo.setCurrentIndex(1)
 
         self.note_Label = QLabel("Нужно ли добавлять примечание", self)
@@ -431,6 +432,11 @@ class TabPage_SO_with(QWidget):
     def update_template_edit(self, index):
         current_bottom = float(self.current_bottom_edit.text())
         if index != '':
+
+            kot_str = ''
+            if float(well_data.static_level._value) > 700:
+                kot_str = '+ КОТ'
+
             SKM_type = self.SKM_type_Combo.currentText()
 
             nkt_diam = well_data.nkt_diam
@@ -488,7 +494,7 @@ class TabPage_SO_with(QWidget):
             if index == 'ПСШ ЭК':
                 template_str = f'перо + шаблон-{first_template}мм L-{lenght_template_first}м + НКТ{nkt_diam}м ' \
                                f'{dictance_template_first}м + {SKM_type}-{skm} +  ' \
-                               f'НКТ{nkt_diam}м {dictance_template_second}м + шаблон-{template_second}мм ' \
+                               f'НКТ{nkt_diam}м {dictance_template_second}м {kot_str} +  шаблон-{template_second}мм ' \
                                f'L-{lenght_template_second}м '
 
                 # print(f'строка шаблона {template_str}')
@@ -509,7 +515,7 @@ class TabPage_SO_with(QWidget):
 
             elif index == 'ПСШ без хвоста':
                 template_str = f'перо + {SKM_type}-{skm} + {dictance_template_second}м ' \
-                               f'НКТ{nkt_diam}м + шаблон-{template_second}мм L-{lenght_template_second}м '
+                               f'НКТ{nkt_diam}м {kot_str}+ шаблон-{template_second}мм L-{lenght_template_second}м '
                 well_data.template_depth = math.ceil(current_bottom - int(dictance_template_second))
                 well_data.skm_depth = current_bottom
                 skm_teml_str = f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
@@ -526,7 +532,7 @@ class TabPage_SO_with(QWidget):
                 dictance_template_second = int(self.dictance_template_second_Edit.text())
 
                 template_str = f'фильтр-направление + НКТ{nkt_diam}м {dictance_template_first}м ' \
-                               f'+ {SKM_type}-{skm} + {dictance_template_second}м НКТ{nkt_diam}м + ' \
+                               f'+ {SKM_type}-{skm} + {dictance_template_second}м НКТ{nkt_diam}м + {kot_str}' \
                                f'шаблон-{template_second}мм L-{lenght_template_second}м '
                 well_data.template_depth = int(
                     current_bottom - dictance_template_first - dictance_template_second)
@@ -563,9 +569,11 @@ class TabPage_SO_with(QWidget):
                 self.dictance_three_Edit.setText(str(dictance_template_three))
 
                 template_str = f'обточная муфта  + ' \
-                               f'НКТ{nkt_pod}  + {dictance_template_first}м + шаблон-{first_template}мм L-{lenght_template_first}м + ' \
+                               f'НКТ{nkt_pod}  + {dictance_template_first}м + шаблон-{first_template}мм ' \
+                               f'L-{lenght_template_first}м + ' \
                                f'НКТ{nkt_pod} {dictance_template_second}м +' \
-                               f'{SKM_type}-{skm} + НКТ{nkt_diam} {dictance_template_three}м + шаблон-{template_second}мм L-{lenght_template_second}м '
+                               f'{SKM_type}-{skm} + НКТ{nkt_diam} {dictance_template_three}м + {kot_str}' \
+                               f' шаблон-{template_second}мм L-{lenght_template_second}м '
 
                 well_data.template_depth_addition = int(current_bottom - dictance_template_first)
                 well_data.template_depth = int(current_bottom - dictance_template_first - lenght_template_first -
@@ -602,7 +610,7 @@ class TabPage_SO_with(QWidget):
                 self.dictance_three_Edit.setText(str(dictance_template_three))
 
                 template_str = f'обточная муфта + НКТ{nkt_pod} {dictance_template_first}м ' \
-                               f'+ {SKM_type}-{skm} + НКТ{nkt_pod} {dictance_template_second}м + шаблон-{first_template}мм ' \
+                               f'+ {SKM_type}-{skm} {kot_str} + НКТ{nkt_pod} {dictance_template_second}м + шаблон-{first_template}мм ' \
                                f'L-{lenght_template_first}м + НКТ{nkt_pod} {dictance_template_three}м + ' \
                                f'шаблон-{template_second}мм L-{lenght_template_second}м '
 
@@ -648,7 +656,7 @@ class TabPage_SO_with(QWidget):
 
                 self.dictance_three_Edit.setText(str(dictance_template_three))
 
-                template_str = f'обточная муфта + {SKM_type}-{skm} + НКТ{nkt_pod} {dictance_template_second} + ' \
+                template_str = f'обточная муфта + {SKM_type}-{skm} + {kot_str} НКТ{nkt_pod} {dictance_template_second} + ' \
                                f'шаблон-{first_template}мм L-{lenght_template_first}м + ' \
                                f'НКТ{nkt_pod} {dictance_template_three}м + шаблон-{template_second}мм ' \
                                f'L-{lenght_template_second}м '
@@ -687,7 +695,8 @@ class TabPage_SO_with(QWidget):
                 self.dictance_three_Edit.setText(str(dictance_template_three))
 
                 template_str = f'фильтр направление L-2м + НКТ{nkt_pod} {dictance_template_first}м ' \
-                               f'+ {SKM_type}-{skm} + НКТ{nkt_pod} {dictance_template_second}м + шаблон-{first_template}мм ' \
+                               f'+ {SKM_type}-{skm} {kot_str} + НКТ{nkt_pod} {dictance_template_second}м + ' \
+                               f'шаблон-{first_template}мм ' \
                                f'L-{lenght_template_first}м' \
                                f' + НКТ{nkt_pod} {dictance_template_three}м + шаблон-{template_second}мм ' \
                                f'L-{lenght_template_second}м '

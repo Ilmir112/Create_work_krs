@@ -104,7 +104,6 @@ class TabPage_SO(QWidget):
             self.grid.addWidget(self.dictance_template_first_Label, 4, 4)
             self.grid.addWidget(self.dictance_template_first_Edit, 5, 4)
 
-
             self.grid.addWidget(self.template_second_Label, 4, 7)
             self.grid.addWidget(self.template_second_Edit, 5, 7)
             self.grid.addWidget(self.lenght_template_second_Label, 4, 8)
@@ -246,11 +245,14 @@ class TabPage_SO(QWidget):
                 dictance_template_first != '' and \
                 dictance_template_second != '' and first_template != '':
 
+            kot_str = ''
+            if float(well_data.static_level._value) > 700:
+                kot_str = '+ КОТ'
 
             if self.template_Combo.currentText() == 'шаблон ЭК с хвостом':
                 if dictance_template_second != '':
 
-                    template_str = f'перо + шаблон-{int(first_template)}мм L-{int(lenght_template_first)}м + НКТ{nkt_diam}м ' \
+                    template_str = f'перо {kot_str} + шаблон-{int(first_template)}мм L-{int(lenght_template_first)}м + НКТ{nkt_diam}м ' \
                                    f'{int(dictance_template_first)}м  + шаблон-{template_second}мм L-{lenght_template_second}'
 
                     well_data.template_depth = int(well_data.current_bottom - int(dictance_template_first) -
@@ -261,7 +263,7 @@ class TabPage_SO(QWidget):
 
             elif self.template_Combo.currentText() == 'шаблон без хвоста':
                 if dictance_template_second != None:
-                    template_str = f'перо + шаблон-{template_second}мм L-{lenght_template_second}м '
+                    template_str = f'перо {kot_str} + шаблон-{template_second}мм L-{lenght_template_second}м '
                     well_data.template_depth = well_data.current_bottom
                     skm_teml_str = f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
 
@@ -270,7 +272,7 @@ class TabPage_SO(QWidget):
             elif self.template_Combo.currentText() == 'шаблон открытый ствол':
                 if dictance_template_second != None:
                     self.template_first_Edit.setText('фильтр направление')
-                    template_str = f'фильтр-направление + НКТ{nkt_diam}м {dictance_template_first}м ' \
+                    template_str = f'фильтр-направление + НКТ{nkt_diam}м {dictance_template_first}м {kot_str} ' \
                                    f'шаблон-{template_second}мм L-{lenght_template_second}м '
                     well_data.template_depth = int(well_data.current_bottom - int(dictance_template_first))
 
@@ -278,7 +280,7 @@ class TabPage_SO(QWidget):
 
             elif self.template_Combo.currentText() == 'шаблон ДП с хвостом':
                 if dictance_template_second != None:
-                    template_str = f'обточная муфта + НКТ{nkt_pod} {dictance_template_first}м ' \
+                    template_str = f'обточная муфта + {kot_str} НКТ{nkt_pod} {dictance_template_first}м ' \
                                    f'+ шаблон-{first_template}мм ' \
                                    f'L-{lenght_template_first}м + НКТ{nkt_pod} {dictance_template_second}м + ' \
                                    f'шаблон-{template_second}мм L-{lenght_template_second}м '
@@ -296,7 +298,7 @@ class TabPage_SO(QWidget):
 
             elif self.template_Combo.currentText() == 'шаблон ДП без хвоста':
 
-                template_str = f'обточная муфта + ' \
+                template_str = f'обточная муфта {kot_str} + ' \
                                f'шаблон-{first_template}мм L-{lenght_template_first}м + ' \
                                f'НКТ{nkt_pod} {dictance_template_second}м + шаблон-{template_second}мм ' \
                                f'L-{lenght_template_second}м '
@@ -314,7 +316,7 @@ class TabPage_SO(QWidget):
             elif self.template_Combo.currentText() == 'шаблон ДП открытый ствол':
                 if dictance_template_second != None:
                     template_str = f'фильтр направление L-2м + НКТ{nkt_pod} {dictance_template_first}м ' \
-                                   f' + шаблон-{first_template}мм ' \
+                                   f' {kot_str} + шаблон-{first_template}мм ' \
                                    f'L-{lenght_template_first}м' \
                                    f' + НКТ{nkt_pod} + шаблон-{template_second}мм ' \
                                    f'L-{lenght_template_second}м '
