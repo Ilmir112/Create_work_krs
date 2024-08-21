@@ -728,7 +728,7 @@ class Swab_Window(QMainWindow):
             swab_true_edit_type = self.tabWidget.currentWidget().swab_true_edit_type.currentText()
             need_change_zgs_combo = self.tabWidget.currentWidget().need_change_zgs_combo.currentText()
             depthGaugeCombo = self.tabWidget.currentWidget().depthGaugeCombo.currentText()
-
+            paker_depth_zumpf = ''
             pressureZUMPF_combo = self.tabWidget.currentWidget().pressureZUMPF_question_QCombo.currentText()
 
             if pressureZUMPF_combo == 'Да':                

@@ -261,7 +261,7 @@ class PerforationCorrect(QMainWindow):
                 for plast in plast_del and plast in well_data.dict_perforation:
                     well_data.dict_perforation.pop(plast)
 
-        a =well_data.dict_perforation_project
+        a = well_data.dict_perforation_project
 
         definition_plast_work(self)
         well_data.plast_work_short = well_data.plast_work

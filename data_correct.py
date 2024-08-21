@@ -742,7 +742,7 @@ class DataWindow(QMainWindow):
         shoe_column_additional = self.tabWidget.currentWidget().shoe_column_add_edit_type2.text()
         head_column_additional = self.tabWidget.currentWidget().head_column_add_edit_type2.text()
         bottomhole_drill = self.tabWidget.currentWidget().bottomhole_drill_edit_type.text()
-        bottomhole_artificial = self.tabWidget.currentWidget().bottomhole_artificial_edit_type.text()
+        bottomhole_artificial = self.tabWidget.currentWidget().bottomhole_artificial_edit_type.text().replace(',', '.')
         current_bottom = self.tabWidget.currentWidget().current_bottom_edit_type.text().replace(',', '.')
         max_angle_H = self.tabWidget.currentWidget().max_angle_H_edit_type.text()
         max_angle = self.tabWidget.currentWidget().max_angle_edit_type.text()

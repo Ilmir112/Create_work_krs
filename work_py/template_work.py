@@ -327,7 +327,7 @@ class TabPage_SO_with(QWidget):
                 template_str = f'перо + {SKM_type}-{skm} + НКТ{nkt_diam}м {dictance_template_second}м ' \
                                f'{kot_str} + шаблон-{template_second}мм L-{lenght_template_second}м '
                 well_data.template_depth = math.ceil(current_bottom - int(dictance_template_second))
-                well_data.skm_depth = well_data.template_depth + dictance_template_second
+                well_data.skm_depth = well_data.template_depth + int(dictance_template_second)
                 skm_teml_str = f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
 
             elif self.template_Combo.currentText() == 'ПСШ открытый ствол':

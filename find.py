@@ -1332,6 +1332,9 @@ class Well_perforation(FindIndexPZ):
                     roof_int = round(float(str(row[col_roof_index]).replace(',', '.')), 1)
                     sole_int = round(float(str(row[col_sole_index]).replace(',', '.')), 1)
 
+                    if len(perforations_intervals) > ind+1 and perforations_intervals[ind+1][4] is None:
+                        perforations_intervals[ind+1][4] = 'проект'
+
                     if row[col_vert_index] != None:
 
                         well_data.dict_perforation_project.setdefault(

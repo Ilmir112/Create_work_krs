@@ -1024,7 +1024,7 @@ class RirWindow(QMainWindow):
                 plast_new_combo = current_widget.plast_new_combo.currentText()
             else:
                 plast_new_combo = current_widget.plast_new_combo.text()
-            fluid_new_edit = current_widget.fluid_new_edit.text()
+            fluid_new_edit = current_widget.fluid_new_edit.text().replace(',', '.')
             pressuar_new_edit = current_widget.pressuar_new_edit.text()
         except:
             mes = QMessageBox.warning(self, 'ОШИБКА', 'Введены не все данные')

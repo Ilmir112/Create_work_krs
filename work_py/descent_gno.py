@@ -986,7 +986,7 @@ class GnoDescentWindow(QMainWindow):
     def calc_fond_nkt(self, len_nkt, distance_between_nkt=300):
         # расчет необходимого давления опрессовки НКТ при спуске
         static_level = well_data.static_level._value
-        fluid = float(well_data.fluid_work[:4])
+        fluid = float(well_data.fluid_work[:4].replace(',', '.'))
 
         pressuar = 40
         # print(f' ЭЦН {well_data.dict_pump_ECN["posle"]}')
