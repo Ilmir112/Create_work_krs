@@ -181,8 +181,8 @@ class CreatePZ(QMainWindow):
             try:
                 # Копирование изображения
                 image_loader = SheetImageLoader(ws)
-            except:
-                mes = QMessageBox.warning(None, 'Ошибка', 'Ошибка в копировании изображений')
+            except Exception as e:
+                mes = QMessageBox.warning(None, 'Ошибка', f'Ошибка в копировании изображений {e}')
 
             if len(well_data.check_data_in_pz) != 0:
                 check_str = ''

@@ -771,7 +771,7 @@ class TabPage_SO_with(QWidget):
         dict_perforation = well_data.dict_perforation
         plast_all = list(dict_perforation.keys())
         roof_plast = current_bottom
-        roof_add_column_plast = well_data.head_column_additional._value
+        roof_add_column_plast = current_bottom
         if well_data.column_additional is False or (
                 well_data.column_additional and well_data.head_column_additional._value >= current_bottom):
             for plast in plast_all:

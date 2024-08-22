@@ -930,7 +930,7 @@ class MyWindow(QMainWindow):
         from work_py.gnkt_grp import GnktOsvWindow
 
         if self.work_plan in ['gnkt_frez']:
-            Work_with_gnkt.save_to_gnkt(MyWindow)
+            Work_with_gnkt.save_to_gnkt(self)
         elif self.work_plan in ['gnkt_after_grp', 'gnkt_opz', 'gnkt_bopz']:
             GnktOsvWindow.save_to_gnkt(self)
         else:

@@ -74,7 +74,7 @@ class TabPage_SO_swab(QWidget):
 
         self.swabTypeLabel = QLabel("задача при освоении", self)
         self.swabTypeCombo = QComboBox(self)
-        self.swabTypeCombo.addItems(['Задача №2.1.13', 'Задача №2.1.14', 'Задача №2.1.16', 'Задача №2.1.11',
+        self.swabTypeCombo.addItems(['', 'Задача №2.1.13', 'Задача №2.1.14', 'Задача №2.1.16', 'Задача №2.1.11',
                                      'Задача №2.1.16 + герметичность пакера', 'ГРР'
                                                                               'своя задача'])
         self.swabTypeCombo.setCurrentIndex(well_data.swabTypeComboIndex)
@@ -595,7 +595,7 @@ class Swab_Window(QMainWindow):
         swab_true_edit_type = self.tabWidget.currentWidget().swab_true_edit_type.currentText()
         plast_combo = self.tabWidget.currentWidget().plast_combo.combo_box.currentText()
         swabTypeCombo = self.tabWidget.currentWidget().swabTypeCombo.currentText()
-        swab_list = ['Задача №2.1.13', 'Задача №2.1.14', 'Задача №2.1.16', 'Задача №2.1.11',
+        swab_list = ['', 'Задача №2.1.13', 'Задача №2.1.14', 'Задача №2.1.16', 'Задача №2.1.11',
                      'Задача №2.1.16 + герметичность пакера', 'ГРР'
                                                               'своя задача']
 
@@ -675,11 +675,11 @@ class Swab_Window(QMainWindow):
             if rows != 0:
                 mes = QMessageBox.warning(self, 'ОШИБКА', 'НЕЛЬЗЯ на одной и тоже компоновки освоивать повторно')
                 return
-            paker_khost = self.tabWidget.currentWidget().khvostEdit.text()
+            paker_depth = AcidPakerWindow.if_None(self, self.tabWidget.currentWidget().pakerEdit.text())
 
             self.tableWidget.insertRow(rows)
             self.tableWidget.setItem(rows, 0, QTableWidgetItem(plast_combo))
-            self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(paker_khost)))
+            self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(paker_depth)))
             self.tableWidget.setCellWidget(rows, 2, swab_edit_combo)
             self.tableWidget.setItem(rows, 3, QTableWidgetItem(str(swab_volume_edit)))
 
@@ -1102,7 +1102,8 @@ class Swab_Window(QMainWindow):
         nkt_diam = ''.join(['73' if well_data.column_diametr._value > 110 or (
                 well_data.column_diametr._value > 110 and well_data.column_additional is True \
                 and well_data.head_column_additional._value < depth_opy is True) else '60'])
-        if well_data.head_column_additional._value > depth_opy + 200:
+
+        if well_data.head_column_additional._value < depth_opy + 200:
             nkt_diam = '60'
         if well_data.column_additional is False or well_data.column_additional is True and \
                 well_data.current_bottom < well_data.head_column_additional._value and \

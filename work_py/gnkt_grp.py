@@ -246,7 +246,7 @@ class GnktOsvWindow(QMainWindow):
         from cdng import events_gnvp_frez
         from work_py.alone_oreration import volume_vn_nkt, volume_jamming_well, volume_pod_NKT
 
-        fluid_work, well_data.fluid_work_short = GnoWindow.calc_work_fluid(self, fluid_work_insert)
+        fluid_work, well_data.fluid_work_short = GnoWindow.calc_work_fluid(fluid_work_insert)
 
         distance, _ = QInputDialog.getInt(None, 'Расстояние НПТЖ', 'Введите Расстояние до ПНТЖ')
 

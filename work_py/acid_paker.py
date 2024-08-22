@@ -851,11 +851,11 @@ class AcidPakerWindow(QMainWindow):
             self.tableWidget.setItem(rows, 6, QTableWidgetItem(str(acid_proc_edit)))
             self.tableWidget.setItem(rows, 7, QTableWidgetItem(str(acid_volume_edit)))
         elif paker_layout_combo in ['воронка']:
-            paker_khost = self.if_None(self.tabWidget.currentWidget().paker_khost.text())
+            paker_depth = int(self.if_None(self.tabWidget.currentWidget().paker_depth.text()))
 
             self.tableWidget.insertRow(rows)
             self.tableWidget.setItem(rows, 0, QTableWidgetItem(plast_combo))
-            self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(paker_khost)))
+            self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(paker_depth)))
             self.tableWidget.setCellWidget(rows, 2, svk_true_combo)
             self.tableWidget.setCellWidget(rows, 3, acid_edit_combo)
             self.tableWidget.setItem(rows, 4, QTableWidgetItem(str(acid_proc_edit)))

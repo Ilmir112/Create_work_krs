@@ -72,8 +72,6 @@ class TabPage_SO(QWidget):
         self.solvent_volume_edit.setValidator(validator)
         self.solvent_volume_edit.setText("2")
 
-
-
         self.solvent_question_Label = QLabel("необходимость растворителя", self)
         self.solvent_question_QCombo = QComboBox(self)
         self.solvent_question_QCombo.addItems(['Нет', 'Да'])
@@ -172,18 +170,21 @@ class TabPage_SO(QWidget):
 
 
     def definition_pssh(self):
-       
 
 
         if well_data.column_additional is False and well_data.open_trunk_well is False and all(
-                [well_data.dict_perforation[plast]['отрайбировано'] for plast in well_data.plast_work]) is False:
+                [well_data.dict_perforation[plast]['отрайбировано'] for plast in well_data.plast_work]) is False or \
+            (well_data.column_additional is True and well_data.current_bottom < well_data.head_column_additional._value and well_data.open_trunk_well is False):
             template_key = 'шаблон ЭК с хвостом'
 
         elif well_data.column_additional is False and well_data.open_trunk_well is True:
             template_key = 'шаблон открытый ствол'
 
         elif well_data.column_additional is False and well_data.open_trunk_well is False and all(
-                [well_data.dict_perforation[plast]['отрайбировано'] for plast in well_data.plast_work]) is True:
+                [well_data.dict_perforation[plast]['отрайбировано'] for plast in well_data.plast_work]) is True or \
+               (well_data.column_additional is True and \
+                well_data.current_bottom < well_data.head_column_additional._value and \
+                well_data.open_trunk_well is False):
             template_key = 'шаблон без хвоста'
 
         # elif well_data.column_additional is True and well_data.head_column_additional._value > roof_skm:

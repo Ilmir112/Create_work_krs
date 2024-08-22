@@ -282,7 +282,7 @@ class GnktOpz(QMainWindow):
         else:
             acid_true_quest = False
 
-        fluid_work, well_data.fluid_work_short = GnoWindow.calc_work_fluid(self, fluid_work_insert)
+        fluid_work, well_data.fluid_work_short = GnoWindow.calc_work_fluid(fluid_work_insert)
 
         if need_rast_combo == 'нужно':
             volume_rast_edit = volume_rast_edit

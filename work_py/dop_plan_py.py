@@ -919,7 +919,7 @@ class DopPlanWindow(QMainWindow):
                 if float(current_bottom) > well_data.bottomhole_drill._value:
                     mes = QMessageBox.critical(self, 'Забой', 'Текущий забой больше пробуренного забоя')
                     return
-                well_data.fluid_work, well_data.fluid_work_short = GnoWindow.calc_work_fluid(GnoWindow, fluid)
+                well_data.fluid_work, well_data.fluid_work_short = GnoWindow.calc_work_fluid(fluid)
 
             well_data.template_depth = float(template_depth_edit)
             well_data.template_lenght = float(template_lenght_edit)
@@ -1122,7 +1122,7 @@ class DopPlanWindow(QMainWindow):
             # if float(current_bottom) > well_data.bottomhole_drill._value:
             #     mes = QMessageBox.critical(self, 'Забой', 'Текущий забой больше пробуренного забоя')
             #     return
-            well_data.fluid_work, well_data.fluid_work_short = GnoWindow.calc_work_fluid(self, fluid)
+            well_data.fluid_work, well_data.fluid_work_short = GnoWindow.calc_work_fluid(fluid)
 
             well_data.template_depth = float(template_depth_edit)
             well_data.template_lenght = float(template_lenght_edit)

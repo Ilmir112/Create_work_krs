@@ -564,10 +564,18 @@ class TabPage_SO_correct(QWidget):
 
         self.type_kr_Combo.addItems(well_data.type_kr_list)
 
-        try:
-            self.type_kr_Combo.setCurrentIndex(well_data.type_kr_list.index(well_data.type_kr))
-        except:
-            pass
+        self.type_kr_Combo.setCurrentIndex(self.select_type_kr())
+
+
+    def select_type_kr(self):
+        kr = well_data.type_kr.split(' ')[0]
+        index_sel = 0
+        for index, type_kr in enumerate(well_data.type_kr_list):
+            if kr in type_kr:
+                index_sel = index
+        return index_sel
+
+
 
     def update_curator(self):
 

@@ -269,7 +269,7 @@ class GnktBopz(QMainWindow):
         shoe_nkt = sum(list(well_data.dict_nkt.values()))
 
 
-        fluid_work, well_data.fluid_work_short = GnoWindow.calc_work_fluid(self, fluid_work_insert)
+        fluid_work, well_data.fluid_work_short = GnoWindow.calc_work_fluid(fluid_work_insert)
 
         if need_drilling_mud_combo == 'нужно':
             volume_drilling_mud_edit = volume_drilling_mud_edit

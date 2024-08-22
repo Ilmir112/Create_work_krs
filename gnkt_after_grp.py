@@ -9,7 +9,7 @@ def gnkt_work(self, V_gntk, fluid_work_insert):
 
 
 
-    fluid_work, well_data.fluid_work_short = GnoWindow.calc_work_fluid(self, fluid_work_insert)
+    fluid_work, well_data.fluid_work_short = GnoWindow.calc_work_fluid(fluid_work_insert)
     aaa = well_data.depth_fond_paker_do["do"]
     if well_data.depth_fond_paker_do["do"] != '0':
         niz_nkt = well_data.depth_fond_paker_do["do"]
