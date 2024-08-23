@@ -1823,7 +1823,9 @@ class Swab_Window(QMainWindow):
         else:
             depthGauge = ''
 
-        if well_data.column_additional is False or well_data.column_additional is True and paker_depth < well_data.head_column_additional._value:
+        paker_short = ''
+        asd = well_data.column_additional,paker_depth, well_data.head_column_additional._value, paker_depth < well_data.head_column_additional._value
+        if well_data.column_additional is False or (well_data.column_additional is True and paker_depth <= well_data.head_column_additional._value):
             paker_select = f'воронку + {depthGauge} свабоограничитель  НКТ{nkt_diam} +репер + НКТ 10м'
             paker_short = f'в/у + {depthGauge} со с/о НКТ{nkt_diam} +репер + НКТ 10м'
             dict_nkt = {73: paker_depth}

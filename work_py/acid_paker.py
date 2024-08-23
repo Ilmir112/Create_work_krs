@@ -1114,7 +1114,7 @@ class AcidPakerWindow(QMainWindow):
                                                                   need_change_zgs_combo='Нет', plast_new='',
                                                                   fluid_new='', pressuar_new='')
             elif self.paker_layout_combo == 'воронка':
-                swab_work_list = Swab_Window.swabbing_with_voronka(self, paker_depth, plast_combo, swabTypeCombo,
+                swab_work_list = Swab_Window.swabbing_with_voronka(self, paker_khost, plast_combo, swabTypeCombo,
                                                                    swab_volumeEdit, depth_gauge_combo)
 
             work_template_list.extend(swab_work_list[-10:])

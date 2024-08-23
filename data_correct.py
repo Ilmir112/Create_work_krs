@@ -666,7 +666,7 @@ class TabPage_SO_correct(QWidget):
 
     def ifNone(self, string):
 
-        if str(string) in ['0', str(None), '-', '--']:
+        if str(string).lower() in ['0', str(None), '-', '--', 'отсутствует']:
             return 'отсут'
         if '/' in str(string):
             return string.split('/')[0]

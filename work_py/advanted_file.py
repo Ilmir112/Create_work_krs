@@ -137,21 +137,20 @@ def remove_overlapping_intervals(perforating_intervals, skm_interval=None):
         perforating_intervals = sorted(perforating_intervals, key=lambda x: x[0])
 
         for pvr in sorted(perforating_intervals, key=lambda x: x[0]):
-            if pvr[1] <= well_data.skm_depth:
-                # print(pvr, well_data.skm_depth)
-                if pvr[1] + 40 < well_data.skm_depth and pvr[0] < well_data.skm_depth:
+
+            if pvr[1] + 40 < well_data.skm_depth:
+                skipping_intervals.append([pvr[0] - 90, pvr[0] - 2])
+                if well_data.skm_depth >= pvr[1] + 40:
+                    if [pvr[1] + 2, pvr[1] + 40] not in skipping_intervals:
+                        skipping_intervals.append([pvr[1] + 2, pvr[1] + 40])
+                else:
+                    if [pvr[1] + 2, well_data.skm_depth] not in skipping_intervals:
+                        skipping_intervals.append([pvr[1] + 2, well_data.skm_depth])
+            elif pvr[1] + 40 > well_data.skm_depth:
+                if [pvr[0] - 90, pvr[0] - 2] not in skipping_intervals:
                     skipping_intervals.append([pvr[0] - 90, pvr[0] - 2])
-                    if well_data.skm_depth >= pvr[1] + 40:
-                        if [pvr[1] + 2, pvr[1] + 40] not in skipping_intervals:
-                            skipping_intervals.append([pvr[1] + 2, pvr[1] + 40])
-                    else:
-                        if [pvr[1] + 2, well_data.skm_depth] not in skipping_intervals:
-                            skipping_intervals.append([pvr[1] + 2, well_data.skm_depth])
-                elif pvr[1] + 40 > well_data.skm_depth and pvr[0] < well_data.skm_depth:
-                    if [pvr[0] - 90, pvr[0] - 2] not in skipping_intervals:
-                        skipping_intervals.append([pvr[0] - 90, pvr[0] - 2])
-                    if [pvr[1] + 1, well_data.skm_depth] not in skipping_intervals:
-                        skipping_intervals.append([pvr[1] + 1, well_data.skm_depth])
+                if [pvr[1] + 1, well_data.skm_depth] not in skipping_intervals:
+                    skipping_intervals.append([pvr[1] + 1, well_data.skm_depth])
 
         # print(f'СКМ на основе ПВР{sorted(skipping_intervals, key=lambda x: x[0])}')
 
@@ -272,11 +271,12 @@ def merge_overlapping_intervals(intervals):
     merged = []
     intervals = sorted(intervals, key=lambda x: x[0])
     for interval in intervals:
-        if not merged or interval[0] > merged[-1][1]:
-            merged.append(interval)
-        else:
-            if interval[0] < interval[1]:
-                merged[-1] = (merged[-1][0], max(merged[-1][1], interval[1]))
+        if interval[0] < interval[1]:
+            if not merged or interval[0] > merged[-1][1]:
+                merged.append(interval)
+            else:
+                if interval[0] < interval[1]:
+                    merged[-1] = (merged[-1][0], max(merged[-1][1], interval[1]))
     # print(f'интервалы СКМ {merged}')
 
     return merged

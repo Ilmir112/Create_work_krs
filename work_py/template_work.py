@@ -315,7 +315,8 @@ class TabPage_SO_with(QWidget):
                                                    int(lenght_template_first)) - int(dictance_template_second)
 
                     well_data.skm_depth = well_data.template_depth + dictance_template_second
-                    skm_teml_str = f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
+                    skm_teml_str = f'{SKM_type}-{skm} до глубины {well_data.skm_depth}м, ' \
+                                   f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
 
 
 
@@ -340,7 +341,8 @@ class TabPage_SO_with(QWidget):
                                                int(dictance_template_second) - int(lenght_template_first))
 
                 well_data.skm_depth = well_data.template_depth + dictance_template_second
-                skm_teml_str = f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
+                skm_teml_str = f'{SKM_type}-{skm} до глубины {well_data.skm_depth}м, ' \
+                               f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
 
             elif self.template_Combo.currentText() == 'ПСШ Доп колонна СКМ в основной колонне':
                 if dictance_template_second != '' and dictance_template_first != '' and dictance_three != '':
@@ -357,6 +359,7 @@ class TabPage_SO_with(QWidget):
                     well_data.skm_depth = well_data.template_depth + dictance_three
                     # template_str = template_SKM_DP_EK
                     skm_teml_str = f'шаблон-{first_template}мм до гл.{well_data.template_depth_addition}м, ' \
+                                   f'{SKM_type}-{skm} до глубины {well_data.skm_depth}м, ' \
                                    f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
 
 
@@ -380,6 +383,7 @@ class TabPage_SO_with(QWidget):
                     well_data.skm_depth = well_data.template_depth_addition + int(dictance_template_second)
 
                     skm_teml_str = f'шаблон-{first_template}мм до гл.{well_data.template_depth_addition}м, ' \
+                                   f'{SKM_type}-{skm} до глубины {well_data.skm_depth}м, ' \
                                    f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
 
             elif self.template_Combo.currentText() == 'ПСШ СКМ в доп колонне без хвоста':
@@ -398,6 +402,7 @@ class TabPage_SO_with(QWidget):
                     well_data.skm_depth = well_data.template_depth + int(dictance_three)
 
                     skm_teml_str = f'шаблон-{first_template}мм до гл.{well_data.template_depth_addition}м, ' \
+                                   f'{SKM_type}-{skm} до глубины {well_data.skm_depth}м, ' \
                                    f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
 
 
@@ -422,6 +427,7 @@ class TabPage_SO_with(QWidget):
                     well_data.skm_depth = well_data.template_depth_addition + int(dictance_template_second)
 
                     skm_teml_str = f'шаблон-{first_template}мм до гл.{well_data.template_depth_addition}м, ' \
+                                   f'{SKM_type}-{skm} до глубины {well_data.skm_depth}м, ' \
                                    f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
             if dictance_template_second != '' and dictance_template_first != '' and \
                     lenght_template_first != '' and first_template != '' and template_second != '' \
@@ -955,13 +961,12 @@ class TemplateKrs(QMainWindow):
             roof_skm = int(float(roof_skm))
         if sole_skm != '':
             sole_skm = int(float(sole_skm))
-            if sole_skm > well_data.skm_depth :
+            if sole_skm > well_data.skm_depth:
                 msg = QMessageBox.information(self, 'Внимание',
                                               f'Глубина СКМ на {well_data.skm_depth}м не позволяет скреперовать в '
                                               f'{roof_skm}-{sole_skm}м')
                 return
         template_key = self.tabWidget.currentWidget().template_Combo.currentText()
-
 
         if not roof_skm or not sole_skm:
             msg = QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
@@ -1025,7 +1030,16 @@ class TemplateKrs(QMainWindow):
         template_lenght = int(float(self.tabWidget.currentWidget().lenght_template_second_Edit.text()))
         if well_data.column_additional:
             template_lenght_addition = int(float(self.tabWidget.currentWidget().lenght_template_first_Edit.text()))
-
+        if well_data.skm_depth > well_data.perforation_roof:
+            question = QMessageBox.question(self, 'Проверка глубины СКМ',
+                                            f'Согласно указания главного инженера СКМ (на глубине '
+                                            f'{well_data.skm_depth}м) не должен '
+                                            f'спускаться ниже кровли перфорации {well_data.perforation_roof}м,'
+                                            ' если даже интервал перфорации отрайбирован, Каждый спуск ниже кровли '
+                                            'ИП должен '
+                                            'быть согласован с заказчиком письменной телефонограммой, продолжить?')
+            if question == QMessageBox.StandardButton.No:
+                return
         if well_data.column_additional is False or (
                 well_data.column_additional is True and float(
             well_data.head_column_additional._value) >= well_data.current_bottom):

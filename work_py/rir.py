@@ -727,6 +727,7 @@ class RirWindow(QMainWindow):
                     roof_rir_edit, sole_rir_edit, volume_cement, need_change_zgs_combo='Нет', plast_new_combo='',
                     fluid_new_edit='', pressuar_new_edit='', pressureZUMPF_question='Не нужно',
                     diametr_paker=122, paker_khost=0, paker_depth=0):
+        from .claySolution import ClayWindow
 
         nkt_diam = ''.join(['73' if well_data.column_diametr._value > 110 else '60'])
 
@@ -870,8 +871,26 @@ class RirWindow(QMainWindow):
              f'начала работ) В случае негерметичности цементного моста дальнейшие работы согласовать с Заказчиком '
              f'В случае головы ЦМ ниже планового РИР повторить  с учетом корректировки мощности моста ',
              None, None, None, None, None, None, None,
-             'мастер КРС', 0.67],
+             'мастер КРС', 0.67]
         ]
+
+        if paker_need_Combo != "Нужно СПО":
+            work_list_clay = ClayWindow.clay_solution_q(self, sole_rir_edit, 5)[1:-2]
+            for row in work_list_clay[::-1]:
+                rirPero_list.insert(1, row)
+
+        if 'КР11' in well_data.type_kr and well_data.perforation_roof > roof_rir_edit:
+
+            well_data.fluid_work = '1.18г/см3'
+            rirPero_list.append([f"{well_data.fluid_work} в объеме "
+             f"{well_volume(self, roof_rir_edit)}м3, обработанным ингибитором коррозии",
+             None,
+             f"В интервале {roof_rir_edit}-30м заполнить ствол скважины тех. жидкостью уд.в. 1,18г\см3 в объеме "
+             f"{well_volume(self, roof_rir_edit)}м3, обработанным ингибитором коррозии "
+             f"{well_volume(self, roof_rir_edit) * 11}гр с удельной дозировкой 11гр/м3 ",
+             None, None, None, None, None, None, None,
+             'мастер КРС', 0.67])
+
 
         for row in rirPero_list:
             rir_list.append(row)

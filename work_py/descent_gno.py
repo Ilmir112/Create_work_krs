@@ -18,7 +18,7 @@ class TabPage_Gno(QWidget):
         self.gno_label = QLabel("вид спускаемого ГНО", self)
         self.gno_combo = QComboBox(self)
         gno_list = ['пакер', 'ОРЗ', 'ОРД', 'воронка', 'НН с пакером', 'НВ с пакером',
-                    'ЭЦН с пакером', 'ЭЦН', 'НВ', 'НН']
+                    'ЭЦН с пакером', 'ЭЦН', 'НВ', 'НН', 'консервация']
 
         self.rgd_question_label = QLabel("проведение РГД", self)
         self.rgd_question_combo = QComboBox(self)
@@ -128,6 +128,8 @@ class TabPage_Gno(QWidget):
                 well_data.if_None(well_data.paker_do["posle"]) != 'отсут' \
                 and well_data.if_None(well_data.dict_pump_ECN["posle"]) == 'отсут':
             lift_key = 'пакер'
+        if 'КР11' in well_data.type_kr:
+            lift_key = 'консервация'
 
         return lift_key
 
@@ -196,6 +198,10 @@ class GnoDescentWindow(QMainWindow):
             work_list = self.paker_down(nkt_edit, rgd_question_combo)
         elif lift_key == 'воронка':
             work_list = self.voronka_down(lift_key, nkt_edit)
+
+        elif lift_key == 'консервация':
+            work_list = self.konservation_well(nkt_edit)
+
         else:
             if lift_key in ['ОРД', 'ЭЦН с пакером', 'ЭЦН']:
                 # print(f'ЭЦН, Шаблон {well_data.dict_pump_ECN_h["posle"], well_data.template_depth}')
@@ -249,7 +255,6 @@ class GnoDescentWindow(QMainWindow):
             [f'Спуск с пакером {well_data.paker_do["posle"]} '
              f'на глубину {well_data.depth_fond_paker_do["posle"]}м,'
              f' воронку на {int(float(sum(well_data.dict_nkt_po.values())))}м.',
-
              None,
              f'Спустить подземное оборудование  согласно расчету и карте спуска ЦДНГ '
              f'НКТ с пакером {well_data.paker_do["posle"]} '
@@ -289,6 +294,53 @@ class GnoDescentWindow(QMainWindow):
                     paker_descent.append(row)
         return paker_descent
 
+    def konservation_well(self, nkt_edit):
+
+        descent_voronka = [
+            [None, None,
+             f'Заменить технологические НКТ на опрессованные эксплуатационные НКТ. Заменить подвесной патрубок на '
+             f'сертифицированный.',
+             None, None, None, None, None, None, None,
+             'Мастер КРС, предст. заказчика', None],
+            [None, None,
+             f'В случае незавоза новых или завоза неопрессованных НКТ, согласовать алгоритм опрессовки с ЦДНГ, '
+             f'произвести спуск '
+             f'фондовых НКТ с поинтервальной опрессовкой через каждые 300м  с учетом статического уровня уровня',
+             None, None, None, None, None, None, None,
+             'Мастер КРС, предст. заказчика', None],
+            [f'СПО воронки {sum(list(well_data.dict_nkt_po.values()))}м', None,
+             f'Спустить предварительно воронку на НКТ{nkt_edit} (завоз с УСО ГНО, '
+             f'ремонтные/новые) на '
+             f'гл. {sum(list(well_data.dict_nkt_po.values()))}м. Спуск НКТ производить с шаблонированием и '
+             f'смазкой резьбовых соединений.',
+             None, None, None, None, None, None, None,
+             'Мастер КРС, предст. заказчика', descentNKT_norm(sum(list(well_data.dict_nkt_po.values())), 1)],
+            [f'Не замерзающая жидкость 0,3м3', None,
+             f'Заполнить скважину в интервале 0-30м незамерзающей жидкостью (растворитель РКД 0,3м3)',
+             None, None, None, None, None, None, None,
+             'Мастер КРС, предст. заказчика', descentNKT_norm(sum(list(well_data.dict_nkt_po.values())), 1)],
+            [None, None,
+             f'Демонтировать превентор. Монтаж устьевой арматуры. При монтаже использовать только сертифицированное'
+             f' оборудование (переводники, муфты, переходные катушки). МОНТАЖ БЕЗ ПОДВЕСНОГО ПАТРУБКА ЗАПРЕЩЕН. '
+             f'произвести разделку'
+             f' кабеля под устьевой сальник произвести герметизацию устья. ',
+             None, None, None, None, None, None, None,
+             'Мастер КРС, предст. заказчика', 1.27],
+            [None, None,
+             f'Произвести опрессовку фонтанной арматуры после монтажа на устье скважины '
+             f'на давление {well_data.max_admissible_pressure._value}атм в присутствии представителя заказчика'
+             f'(давление на максимальное возможное давление опрессовки эскплуатационной колонны)',
+             None, None, None, None, None, None, None,
+             'Мастер КРС, предст. заказчика', 0.7],
+            [None, None,
+             f'На устье законсервированных скважин установить металлическую табличку с обозначением: '
+             f'скв.№ {well_data.well_number._value} {well_data.well_oilfield._value} месторождение, ПАО АНК Башнефть, '
+             f'дата начала и окончания консервации силами ЦДНГ после съезда бригады. ")',
+             None, None, None, None, None, None, None,
+             'ЦДНГ ', 2],
+        ]
+        return descent_voronka
+
     def voronka_down(self, lift_key, nkt_edit):
 
         descent_voronka = [
@@ -303,7 +355,6 @@ class GnoDescentWindow(QMainWindow):
              f'фондовых НКТ с поинтервальной опрессовкой через каждые 300м  с учетом статического уровня уровня',
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика', None],
-
             [f'СПО воронки {sum(list(well_data.dict_nkt_po.values()))}м', None,
              f'Спустить предварительно воронку на НКТ{nkt_edit} (завоз с УСО ГНО, '
              f'ремонтные/новые) на '
@@ -343,7 +394,7 @@ class GnoDescentWindow(QMainWindow):
             calc_fond_nkt_str = self.calc_fond_nkt(sum(list(well_data.dict_nkt_po.values())), distance_between_nkt_edit)
         else:
             calc_fond_nkt_str = None
-
+        konservation = []
         descent_nv = [
             [None, None,
              f'Заменить технологические НКТ на опрессованные эксплуатационные НКТ. Заменить подвесной'

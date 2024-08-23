@@ -3,9 +3,7 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox
 import well_data
 from work_py.alone_oreration import volume_vn_ek, volume_vn_nkt, well_volume
 
-from .rationingKRS import descentNKT_norm
-from main import MyWindow
-from .rir import RirWindow
+
 
 from PyQt5.QtGui import QDoubleValidator,QIntValidator
 from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QTabWidget, \

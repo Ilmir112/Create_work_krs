@@ -602,7 +602,7 @@ class DopPlanWindow(QMainWindow):
                         well_data.data_x_max = well_data.ProtectedIsDigit(int(i) + 1)
                         break
                     elif 'ИТОГО:' in str(row[col]['value']) and well_data.work_plan in ['plan_change']:
-                        self.target_row_index_cancel = int(i) - 1
+                        self.target_row_index_cancel = int(i)+1
                         break
                     elif 'Текущий забой ' == str(row[col]['value']):
                         self.bottom_row_index = int(i)
@@ -614,7 +614,6 @@ class DopPlanWindow(QMainWindow):
                     if int(i) > self.target_row_index_cancel:
                         break
             if len(list_row) != 0 and not 'внутренний диаметр ( d шарошечного долота) не обсаженной части ствола' in list_row:
-
                 if all([col == None or col == '' for col in list_row]) is False:
                     perforation_list.append(list_row)
         well_data.ins_ind2 = well_data.data_x_max._value
@@ -682,12 +681,7 @@ class DopPlanWindow(QMainWindow):
                         self.bottom_row_index = int(i)
                         break
         try:
-            aadaf = self.bottom_row_index
-            aa1a = data[str(self.bottom_row_index)][2]['value']
-            aaaa = data[str(self.bottom_row_index)][3]['value']
-            aa3aa = data[str(self.bottom_row_index)][4]['value']
-            a3a3da = data[str(self.bottom_row_index)][5]['value']
-            aa3adsa = data[str(self.bottom_row_index)][6]['value']
+
             data[str(self.bottom_row_index)][3]['value'] = current_bottom
 
             data[str(self.bottom_row_index)][5]['value'] = current_bottom_date_edit
@@ -994,8 +988,10 @@ class DopPlanWindow(QMainWindow):
 
                 if any([f'dop_plan{number_dp}' in dop_plan
                         or f'dop_plan_in_base{number_dp}' in dop_plan for dop_plan in list_dop_plan]):
-                    QMessageBox.warning(self, 'Ошибка', f'дополнительный план работ № {number_dp} есть в базе ')
-                    return
+                    question = QMessageBox.question(self, 'Ошибка', f'дополнительный план работ № {number_dp} '
+                                                                    f'есть в базе, обновить доп план?')
+                    if question == QMessageBox.StandardButton.No:
+                        return
 
                 if table_in_base_combo == '':
                     mes = QMessageBox.critical(self, 'База данных', 'Необходимо выбрать план работ')
