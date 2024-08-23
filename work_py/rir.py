@@ -695,6 +695,16 @@ class RirWindow(QMainWindow):
              'мастер КРС', 0.67],
 
         ]
+        if 'КР11' in well_data.type_kr and well_data.perforation_roof > roof_rir_edit:
+            well_data.fluid_work = '1.18г/см3'
+            uzmPero_list.append([f"{well_data.fluid_work} в объеме "
+                                 f"{well_volume(self, roof_rir_edit)}м3, обработанным ингибитором коррозии",
+                                 None,
+                                 f"В интервале {roof_rir_edit}-30м заполнить ствол скважины тех. жидкостью уд.в. 1,18г\см3 в объеме "
+                                 f"{well_volume(self, roof_rir_edit)}м3, обработанным ингибитором коррозии "
+                                 f"{well_volume(self, roof_rir_edit) * 11}гр с удельной дозировкой 11гр/м3 ",
+                                 None, None, None, None, None, None, None,
+                                 'мастер КРС', 0.67])
         RirWindow.perf_new(self, roof_rir_edit, sole_rir_edit)
         # print(plast_combo)
         if OpressovkaEK.testing_pressure(self, roof_rir_edit)[2]:

@@ -224,8 +224,7 @@ class SandWindow(QMainWindow):
         if volume_cement != '':
             volume_cement = round(float(volume_cement),1)
         elif volume_cement == '' and rir_question_QCombo == "Да":
-            mes = QMessageBox.question(self, 'Вопрос',
-                                                       f'Не указан объем цемента')
+            mes = QMessageBox.question(self, 'Вопрос', f'Не указан объем цемента')
             return
 
         work_list = self.sandFilling(roof_sand_edit, sole_sand_edit, privyazka_question_QCombo)
