@@ -1824,15 +1824,15 @@ class Swab_Window(QMainWindow):
             depthGauge = ''
 
         paker_short = ''
-        asd = well_data.column_additional,paker_depth, well_data.head_column_additional._value, paker_depth < well_data.head_column_additional._value
         if well_data.column_additional is False or (well_data.column_additional is True and paker_depth <= well_data.head_column_additional._value):
             paker_select = f'воронку + {depthGauge} свабоограничитель  НКТ{nkt_diam} +репер + НКТ 10м'
             paker_short = f'в/у + {depthGauge} со с/о НКТ{nkt_diam} +репер + НКТ 10м'
             dict_nkt = {73: paker_depth}
         elif well_data.column_additional is True and well_data.column_additional_diametr._value < 110 and \
                 paker_depth > well_data.head_column_additional._value:
-            paker_select = f'воронку со свабоограничителем  + НКТ{60}мм  + НКТ60мм 10м '
-            paker_short = f'в/у + НКТ{60}мм  + НКТ60мм 10м + {round(paker_depth - well_data.head_column_additional._value, 1)}м {depthGauge}'
+            paker_select = f'воронку со свабоограничителем  + НКТ{60}мм  {round(paker_depth - well_data.head_column_additional._value, 1)}м {depthGauge}'
+            paker_short = f'обточ муфту + НКТ{60}мм {round(paker_depth - well_data.head_column_additional._value, 1)}м ' \
+                          f'{depthGauge}'
             dict_nkt = {60: paker_depth}
         if 'Ойл' in well_data.contractor:
             schema_swab = '8'

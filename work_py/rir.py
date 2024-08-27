@@ -208,7 +208,7 @@ class TabPage_SO_rir(QWidget):
             else:
                 if well_data.leakiness:
                     paker_depth_zumpf = max([float(nek.split('-')[0]) + 10
-                                           for nek in well_data.dict_leakiness['НЭК']['интервал'].keys()])
+                                             for nek in well_data.dict_leakiness['НЭК']['интервал'].keys()])
             self.paker_depth_zumpf_edit.setText(f'{paker_depth_zumpf}')
 
             self.grid.addWidget(self.paker_depth_zumpf_Label, 1, 5)
@@ -603,7 +603,7 @@ class RirWindow(QMainWindow):
                              f' {OpressovkaEK.nkt_opress(self)[0]} ' \
                              f'+ НКТ60мм + репер + НКТ60мм L- ' \
                              f'{round(paker_depth - well_data.head_column_additional._value, 0)}м '
-        elif well_data.column_additional is True and well_data.column_additional_diametr._value > 110 and\
+        elif well_data.column_additional is True and well_data.column_additional_diametr._value > 110 and \
                 paker_depth > well_data.head_column_additional._value:
             rpk_nkt_select = f' для ЭК {well_data.column_additional_diametr._value}мм х ' \
                              f'{well_data.column_additional_wall_thickness._value}мм  + ' \
@@ -667,7 +667,8 @@ class RirWindow(QMainWindow):
              None, None, None, None, None, None, None,
              'мастер КРС', well_volume_norm(16)],
             [None, None,
-             f'Поднять перо на безопасную зону до гл. {roof_rir_edit - 300}м с доливом скважины в объеме 0,3м3 тех. жидкостью '
+             f'Поднять перо на безопасную зону до гл. {roof_rir_edit - 300}м с доливом скважины '
+             f'в объеме 0,3м3 тех. жидкостью '
              f'уд.весом {well_data.fluid_work}.',
              None, None, None, None, None, None, None,
              'мастер КРС', 0.5],
@@ -697,15 +698,16 @@ class RirWindow(QMainWindow):
         ]
         if 'КР11' in well_data.type_kr and well_data.perforation_roof > roof_rir_edit:
             well_data.fluid_work = '1.18г/см3'
-            uzmPero_list.append([f"{well_data.fluid_work} в объеме "
-                                 f"{well_volume(self, roof_rir_edit)}м3, обработанным ингибитором коррозии",
-                                 None,
-                                 f"В интервале {roof_rir_edit}-30м заполнить ствол скважины тех. жидкостью уд.в."
-                                 f" {well_data.fluid_work} в объеме "
-                                 f"{well_volume(self, roof_rir_edit)}м3, обработанным ингибитором коррозии "
-                                 f"{well_volume(self, roof_rir_edit) * 11}гр с удельной дозировкой 11гр/м3 ",
-                                 None, None, None, None, None, None, None,
-                                 'мастер КРС', 0.67])
+            uzmPero_list.append([
+                f"{well_data.fluid_work} в объеме "
+                f"{well_volume(self, roof_rir_edit)}м3, обработанным ингибитором коррозии",
+                None,
+                f"В интервале {roof_rir_edit}-30м заполнить ствол скважины тех. жидкостью уд.в."
+                f" {well_data.fluid_work} в объеме "
+                f"{well_volume(self, roof_rir_edit)}м3, обработанным ингибитором коррозии "
+                f"{well_volume(self, roof_rir_edit) * 11}гр с удельной дозировкой 11гр/м3 ",
+                None, None, None, None, None, None, None,
+                'мастер КРС', 0.67])
         RirWindow.perf_new(self, roof_rir_edit, sole_rir_edit)
         # print(plast_combo)
         if OpressovkaEK.testing_pressure(self, roof_rir_edit)[2]:
@@ -717,20 +719,22 @@ class RirWindow(QMainWindow):
             for row in Change_fluid_Window.fluid_change(self, plast_new_combo, fluid_new_edit,
                                                         pressuar_new_edit):
                 uzmPero_list.insert(-1, row)
-            uzmPero_list.append([None, None,
-                                 f'Поднять перо на тНКТ{nkt_diam}м с глубины {roof_rir_edit}м с доливом скважины в '
-                                 f'объеме '
-                                 f'{round(roof_rir_edit * 1.12 / 1000, 1)}м3 тех. жидкостью '
-                                 f'уд.весом {well_data.fluid_work}',
-                                 None, None, None, None, None, None, None,
-                                 'мастер КРС', liftingNKT_norm(roof_rir_edit, 1)])
+            uzmPero_list.append([
+                None, None,
+                f'Поднять перо на тНКТ{nkt_diam}м с глубины {roof_rir_edit}м с доливом скважины в '
+                f'объеме '
+                f'{round(roof_rir_edit * 1.12 / 1000, 1)}м3 тех. жидкостью '
+                f'уд.весом {well_data.fluid_work}',
+                None, None, None, None, None, None, None,
+                'мастер КРС', liftingNKT_norm(roof_rir_edit, 1)])
         else:
-            uzmPero_list.append([None, None,
-                                 f'Поднять перо на тНКТ{nkt_diam}м с глубины {roof_rir_edit}м с доливом скважины в объеме '
-                                 f'{round(roof_rir_edit * 1.12 / 1000, 1)}м3 тех. жидкостью '
-                                 f'уд.весом {well_data.fluid_work}',
-                                 None, None, None, None, None, None, None,
-                                 'мастер КРС', liftingNKT_norm(roof_rir_edit, 1)])
+            uzmPero_list.append([
+                None, None,
+                f'Поднять перо на тНКТ{nkt_diam}м с глубины {roof_rir_edit}м с доливом скважины в объеме '
+                f'{round(roof_rir_edit * 1.12 / 1000, 1)}м3 тех. жидкостью '
+                f'уд.весом {well_data.fluid_work}',
+                None, None, None, None, None, None, None,
+                'мастер КРС', liftingNKT_norm(roof_rir_edit, 1)])
         well_data.forPaker_list = None
         return uzmPero_list
 
@@ -793,20 +797,22 @@ class RirWindow(QMainWindow):
                  'мастер КРС', None],
                 [None, None,
                  f'Промыть скважину обратной промывкой по круговой циркуляции  жидкостью '
-                 f'в объеме не менее {well_volume(self, volume_vn_nkt(dict_nkt))}м3 с расходом жидкости не менее 8 л/с.',
+                 f'в объеме не менее {well_volume(self, volume_vn_nkt(dict_nkt))}м3 с '
+                 f'расходом жидкости не менее 8 л/с.',
                  None, None, None, None, None, None, None,
                  'мастер КРС', well_volume_norm(24)]
             ]
 
             if volume_vn_nkt(dict_nkt) <= 5:
-                glin_list[2] = [None, None,
-                                f'Закачать в НКТ при открытом затрубном пространстве глинистый раствор в '
-                                f'объеме {volume_vn_nkt(dict_nkt)}м3. Закрыть затруб. '
-                                f'Продавить в НКТ остаток глинистого раствора в объеме '
-                                f'{round(5 - volume_vn_nkt(dict_nkt), 1)} и тех. воду  в объёме '
-                                f'{volume_vn_nkt(dict_nkt)}м3 при давлении не более {well_data.max_admissible_pressure._value}атм.',
-                                None, None, None, None, None, None, None,
-                                'мастер КРС', 0.5]
+                glin_list[2] = [
+                    None, None,
+                    f'Закачать в НКТ при открытом затрубном пространстве глинистый раствор в '
+                    f'объеме {volume_vn_nkt(dict_nkt)}м3. Закрыть затруб. '
+                    f'Продавить в НКТ остаток глинистого раствора в объеме '
+                    f'{round(5 - volume_vn_nkt(dict_nkt), 1)} и тех. воду  в объёме '
+                    f'{volume_vn_nkt(dict_nkt)}м3 при давлении не более {well_data.max_admissible_pressure._value}атм.',
+                    None, None, None, None, None, None, None,
+                    'мастер КРС', 0.5]
 
             for row in glin_list:
                 rir_list.insert(-3, row)
@@ -858,7 +864,8 @@ class RirWindow(QMainWindow):
              None, None, None, None, None, None, None,
              'мастер КРС', well_volume_norm(16)],
             [None, None,
-             f'Поднять перо на безопасную зону до гл. {roof_rir_edit - 300}м с доливом скважины в объеме 0,3м3 тех. жидкостью '
+             f'Поднять перо на безопасную зону до гл. {roof_rir_edit - 300}м с доливом '
+             f'скважины в объеме 0,3м3 тех. жидкостью '
              f'уд.весом {well_data.fluid_work}.',
              None, None, None, None, None, None, None,
              'мастер КРС', 1.2],
@@ -876,7 +883,8 @@ class RirWindow(QMainWindow):
              'мастер КРС', 1.2],
             [f'Опрессовать цементный мост на Р={well_data.max_admissible_pressure._value}атм',
              None,
-             f'Опрессовать цементный мост на Р={well_data.max_admissible_pressure._value}атм в присутствии представителя '
+             f'Опрессовать цементный мост на Р={well_data.max_admissible_pressure._value}атм в'
+             f'присутствии представителя '
              f'УСРСиСТ Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, '
              f'с подтверждением за 2 часа до '
              f'начала работ) В случае негерметичности цементного моста дальнейшие работы согласовать с Заказчиком '
@@ -891,17 +899,16 @@ class RirWindow(QMainWindow):
                 rirPero_list.insert(1, row)
 
         if 'КР11' in well_data.type_kr and well_data.perforation_roof > roof_rir_edit:
-
             well_data.fluid_work = '1.18г/см3'
-            rirPero_list.append([f"{well_data.fluid_work} в объеме "
-             f"{well_volume(self, roof_rir_edit)}м3, обработанным ингибитором коррозии",
-             None,
-             f"В интервале {roof_rir_edit}-30м заполнить ствол скважины тех. жидкостью уд.в. 1,18г\см3 в объеме "
-             f"{well_volume(self, roof_rir_edit)}м3, обработанным ингибитором коррозии "
-             f"{well_volume(self, roof_rir_edit) * 11}гр с удельной дозировкой 11гр/м3 ",
-             None, None, None, None, None, None, None,
-             'мастер КРС', 0.67])
-
+            rirPero_list.append([
+                f"{well_data.fluid_work} в объеме "
+                f"{well_volume(self, roof_rir_edit)}м3, обработанным ингибитором коррозии",
+                None,
+                f"В интервале {roof_rir_edit}-30м заполнить ствол скважины тех. жидкостью уд.в. 1,18г\см3 в объеме "
+                f"{well_volume(self, roof_rir_edit)}м3, обработанным ингибитором коррозии "
+                f"{well_volume(self, roof_rir_edit) * 11}гр с удельной дозировкой 11гр/м3 ",
+                None, None, None, None, None, None, None,
+                'мастер КРС', 0.67])
 
         for row in rirPero_list:
             rir_list.append(row)
@@ -916,11 +923,12 @@ class RirWindow(QMainWindow):
                                                         pressuar_new_edit):
                 rir_list.append(row)
 
-        rir_list.append([None, None,
-                         f'Поднять перо на тНКТ{nkt_diam}м с глубины {roof_rir_edit}м с доливом скважины в объеме '
-                         f'{round(roof_rir_edit * 1.12 / 1000, 1)}м3 тех. жидкостью '
-                         f'уд.весом {well_data.fluid_work}', None, None, None, None, None, None, None,
-                         'мастер КРС', liftingNKT_norm(roof_rir_edit, 1)])
+        rir_list.append(
+            [None, None,
+             f'Поднять перо на тНКТ{nkt_diam}м с глубины {roof_rir_edit}м с доливом скважины в объеме '
+             f'{round(roof_rir_edit * 1.12 / 1000, 1)}м3 тех. жидкостью '
+             f'уд.весом {well_data.fluid_work}', None, None, None, None, None, None, None,
+             'мастер КРС', liftingNKT_norm(roof_rir_edit, 1)])
         well_data.forPaker_list = None
         return rir_list
 
@@ -957,14 +965,15 @@ class RirWindow(QMainWindow):
             if rir_rpk_plast_true is False:
                 rir_q_list = [
                     f'насыщение 5м3. Определить Q {plast_combo} при Р=80-100атм. СКВ', None,
-                  f'Произвести насыщение скважины в объеме 5м3. Определить приемистость {plast_combo} при Р=80-100атм '
-                  f'в присутствии представителя УСРСиСТ или подрядчика по РИР. (Вести контроль за отдачей жидкости '
-                  f'после закачки, объем согласовать с подрядчиком по РИР). В случае приёмистости менее  250м3/сут '
-                  f'при Р=100атм произвести соляно-кислотную обработку скважины в объеме 1м3 HCl-12% с целью'
-                  f' увеличения '
-                  f'приемистости по технологическому плану',
-                  None, None, None, None, None, None, None,
-                  'мастер КРС', 1.77]
+                    f'Произвести насыщение скважины в объеме 5м3. Определить приемистость '
+                    f'{plast_combo} при Р=80-100атм '
+                    f'в присутствии представителя УСРСиСТ или подрядчика по РИР. (Вести контроль за отдачей жидкости '
+                    f'после закачки, объем согласовать с подрядчиком по РИР). В случае приёмистости менее  250м3/сут '
+                    f'при Р=100атм произвести соляно-кислотную обработку скважины в объеме 1м3 HCl-12% с целью'
+                    f' увеличения '
+                    f'приемистости по технологическому плану',
+                    None, None, None, None, None, None, None,
+                    'мастер КРС', 1.77]
                 rir_list.insert(-3, rir_q_list)
         else:
             rir_list = []
@@ -978,45 +987,46 @@ class RirWindow(QMainWindow):
         rir_list = self.need_paker(paker_need_Combo, plast_combo, diametr_paker, paker_khost,
                                    paker_depth, pressureZUMPF_question)
 
-        rir_paker_list = [[f'РИР c пакером {plast_combo} c плановой кровлей на глубине {roof_rir_edit}м',
-                           None,
-                           f'Произвести РИР {plast_combo} c плановой кровлей на глубине {roof_rir_edit}м по '
-                           f'технологическому плану'
-                           f' подрядчика по РИР силами подрядчика по РИР '
-                           f'Перед спуском технологического пакера произвести испытание гидроякоря в присутсвии '
-                           f'представителя '
-                           f'РИР или УСРСиСТ.',
-                           None, None, None, None, None, None, None,
-                           'Мастер КРС, подрядчик РИР, УСРСиСТ', 8],
-                          [f'ОЗЦ 16-24 часа', None,
-                           f'ОЗЦ 16-24 часа: (по качеству пробы) с момента отстыковки пакера В случае не получения '
-                           f'технологического "СТОП" ОЗЦ без давления.',
-                           None, None, None, None, None, None, None,
-                           'Мастер КРС, подрядчик РИР, УСРСиСТ', 24],
-                          [f'Определение кровли', None,
-                           f'Допустить компоновку с замером и шаблонированием НКТ до кровли цементного моста '
-                           f'(плановый на '
-                           f'гл. {roof_rir_edit}м'
-                           f' с прямой промывкой и разгрузкой на забой 3т',
-                           None, None, None, None, None, None, None,
-                           'Мастер КРС, подрядчик РИР, УСРСиСТ', 1.2],
-                          [f'Опрессовать на Р={well_data.max_admissible_pressure._value}атм', None,
-                           f'Опрессовать цементный мост на Р={well_data.max_admissible_pressure._value}атм в '
-                           f'присутствии '
-                           f'представителя заказчика '
-                           f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, '
-                           f'с подтверждением за 2 часа до начала '
-                           f'работ) В случае негерметичности цементного моста дальнейшие работы согласовать с'
-                           f' Заказчиком.',
-                           None, None, None, None, None, None, None,
-                           'Мастер КРС, подрядчик РИР, УСРСиСТ', 0.67],
-                          [None, None,
-                           f'Поднять компоновку РИР на тНКТ{well_data.nkt_diam}мм с глубины {roof_rir_edit}м '
-                           f'с доливом скважины в объеме '
-                           f'{round(roof_rir_edit * 1.12 / 1000, 1)}м3 тех. жидкостью уд.весом {well_data.fluid_work}',
-                           None, None, None, None, None, None, None,
-                           'Мастер КРС, подрядчик РИР, УСРСиСТ', liftingNKT_norm(roof_rir_edit, 1.2)]
-                          ]
+        rir_paker_list = [
+            [f'РИР c пакером {plast_combo} c плановой кровлей на глубине {roof_rir_edit}м',
+             None,
+             f'Произвести РИР {plast_combo} c плановой кровлей на глубине {roof_rir_edit}м по '
+             f'технологическому плану'
+             f' подрядчика по РИР силами подрядчика по РИР '
+             f'Перед спуском технологического пакера произвести испытание гидроякоря в присутсвии '
+             f'представителя '
+             f'РИР или УСРСиСТ.',
+             None, None, None, None, None, None, None,
+             'Мастер КРС, подрядчик РИР, УСРСиСТ', 8],
+            [f'ОЗЦ 16-24 часа', None,
+             f'ОЗЦ 16-24 часа: (по качеству пробы) с момента отстыковки пакера В случае не получения '
+             f'технологического "СТОП" ОЗЦ без давления.',
+             None, None, None, None, None, None, None,
+             'Мастер КРС, подрядчик РИР, УСРСиСТ', 24],
+            [f'Определение кровли', None,
+             f'Допустить компоновку с замером и шаблонированием НКТ до кровли цементного моста '
+             f'(плановый на '
+             f'гл. {roof_rir_edit}м'
+             f' с прямой промывкой и разгрузкой на забой 3т',
+             None, None, None, None, None, None, None,
+             'Мастер КРС, подрядчик РИР, УСРСиСТ', 1.2],
+            [f'Опрессовать на Р={well_data.max_admissible_pressure._value}атм', None,
+             f'Опрессовать цементный мост на Р={well_data.max_admissible_pressure._value}атм в '
+             f'присутствии '
+             f'представителя заказчика '
+             f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, '
+             f'с подтверждением за 2 часа до начала '
+             f'работ) В случае негерметичности цементного моста дальнейшие работы согласовать с'
+             f' Заказчиком.',
+             None, None, None, None, None, None, None,
+             'Мастер КРС, подрядчик РИР, УСРСиСТ', 0.67],
+            [None, None,
+             f'Поднять компоновку РИР на тНКТ{well_data.nkt_diam}мм с глубины {roof_rir_edit}м '
+             f'с доливом скважины в объеме '
+             f'{round(roof_rir_edit * 1.12 / 1000, 1)}м3 тех. жидкостью уд.весом {well_data.fluid_work}',
+             None, None, None, None, None, None, None,
+             'Мастер КРС, подрядчик РИР, УСРСиСТ', liftingNKT_norm(roof_rir_edit, 1.2)]
+        ]
         RirWindow.perf_new(self, roof_rir_edit, sole_rir_edit)
         well_data.current_bottom = roof_rir_edit
         if OpressovkaEK.testing_pressure(self, roof_rir_edit)[2]:
@@ -1142,9 +1152,9 @@ class RirWindow(QMainWindow):
     def rir_izvelPaker(self):
 
         paker_izv_paker, ok = QInputDialog.getInt(None, 'Глубина извлекаемого пакера',
-                                                'Введите глубину установки извлекаемого пакера ',
-                                                int(well_data.perforation_roof - 50), 0,
-                                                int(well_data.bottomhole_drill._value))
+                                                  'Введите глубину установки извлекаемого пакера ',
+                                                  int(well_data.perforation_roof - 50), 0,
+                                                  int(well_data.bottomhole_drill._value))
 
         well_data.paker_izv_paker = paker_izv_paker
         rir_list = [[f'СПО пакера извлекаемый до глубины {paker_izv_paker}м',
@@ -1252,22 +1262,22 @@ class RirWindow(QMainWindow):
 
         emer_list = [
             [f'СПО лов. инст до до Н= {well_data.current_bottom}', None,
-              f'Спустить с замером ловильный инструмент на НКТ до Н= {well_data.current_bottom}м с замером. ',
-              None, None, None, None, None, None, None,
-              'мастер КРС', liftingNKT_norm(well_data.current_bottom, 1)],
-             [f'Вымыв песка до {well_data.paker_izv_paker}м. Извлечение пакера', None,
-              f'Произвести нормализацию (вымыв кварцевого песка) на ловильном инструменте до глубины '
-              f'{well_data.paker_izv_paker}м обратной '
-              f'промывкой уд.весом {well_data.fluid_work} \n'
-              f'Произвести  ловильный работы при представителе заказчика на глубине {well_data.paker_izv_paker}м.',
-              None, None, None, None, None, None, None,
-              'мастер КРС', liftingNKT_norm(well_data.paker_izv_paker, 1)],
-             [None, None,
-              f'Расходить и поднять компоновку НКТ{well_data.nkt_diam}мм с глубины {well_data.paker_izv_paker}м с '
-              f'доливом скважины в объеме {round(well_data.paker_izv_paker * 1.12 / 1000, 1)}м3 тех. жидкостью '
-              f'уд.весом {well_data.fluid_work}',
-              None, None, None, None, None, None, None,
-              'мастер КРС', liftingNKT_norm(well_data.paker_izv_paker, 1)]]
+             f'Спустить с замером ловильный инструмент на НКТ до Н= {well_data.current_bottom}м с замером. ',
+             None, None, None, None, None, None, None,
+             'мастер КРС', liftingNKT_norm(well_data.current_bottom, 1)],
+            [f'Вымыв песка до {well_data.paker_izv_paker}м. Извлечение пакера', None,
+             f'Произвести нормализацию (вымыв кварцевого песка) на ловильном инструменте до глубины '
+             f'{well_data.paker_izv_paker}м обратной '
+             f'промывкой уд.весом {well_data.fluid_work} \n'
+             f'Произвести  ловильный работы при представителе заказчика на глубине {well_data.paker_izv_paker}м.',
+             None, None, None, None, None, None, None,
+             'мастер КРС', liftingNKT_norm(well_data.paker_izv_paker, 1)],
+            [None, None,
+             f'Расходить и поднять компоновку НКТ{well_data.nkt_diam}мм с глубины {well_data.paker_izv_paker}м с '
+             f'доливом скважины в объеме {round(well_data.paker_izv_paker * 1.12 / 1000, 1)}м3 тех. жидкостью '
+             f'уд.весом {well_data.fluid_work}',
+             None, None, None, None, None, None, None,
+             'мастер КРС', liftingNKT_norm(well_data.paker_izv_paker, 1)]]
         for row in emer_list:
             rir_list.append(row)
 

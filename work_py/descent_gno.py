@@ -3,7 +3,7 @@ from work_py.alone_oreration import privyazkaNKT
 from .rationingKRS import descentNKT_norm, descent_sucker_pod
 from .calc_fond_nkt import CalcFond
 from .template_work import TemplateKrs
-from PyQt5.QtWidgets import  QMessageBox, QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QTabWidget, \
+from PyQt5.QtWidgets import QMessageBox, QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QTabWidget, \
     QMainWindow, QPushButton
 
 
@@ -177,8 +177,8 @@ class GnoDescentWindow(QMainWindow):
                       well_data.current_bottom < well_data.head_column_additional._value)):
 
                 QMessageBox.critical(self, 'Ошибка',
-                                           f'Нельзя спускать пакер {well_data.depth_fond_paker_do["posle"]}м'
-                                           f'ниже глубины шаблонирования ЭК {well_data.template_depth}м')
+                                     f'Нельзя спускать пакер {well_data.depth_fond_paker_do["posle"]}м'
+                                     f'ниже глубины шаблонирования ЭК {well_data.template_depth}м')
                 return
             elif well_data.depth_fond_paker_do["posle"] < well_data.head_column_additional._value and \
                     well_data.depth_fond_paker_do["posle"] > well_data.template_depth and well_data.column_additional:
@@ -226,7 +226,8 @@ class GnoDescentWindow(QMainWindow):
                                                                f'{well_data.template_depth_addition}м')
                     return
 
-            work_list = self.gno_down(lift_key, nkt_edit, sucker_edit, distance_between_nkt_edit, need_juming_after_sko_combo)
+            work_list = self.gno_down(lift_key, nkt_edit, sucker_edit, distance_between_nkt_edit,
+                                      need_juming_after_sko_combo)
 
         for row in self.end_list:
             work_list.append(row)
@@ -293,6 +294,42 @@ class GnoDescentWindow(QMainWindow):
                 for row in rgdWithPaker(self):
                     paker_descent.append(row)
         return paker_descent
+    def konservation_down(self, nkt_edit):
+
+        from work_py.alone_oreration import volume_jamming_well, volume_rod, volume_nkt_metal
+        volume_well_30 = volume_jamming_well(self, 30) / 1.1
+        dict_nkt = {}
+        dict_nkt[nkt_edit] = 1
+
+        if '73' in str(nkt_edit):
+            volume_nkt_metal = 1.17 * 1.0 / 1000
+        elif '60' in str(nkt_edit):
+            volume_nkt_metal = 0.87 * 1.0 / 1000
+        elif '89' in str(nkt_edit):
+            volume_nkt_metal = 1.7 * 1.0 / 1000
+        elif '48' in str(nkt_edit):
+            volume_nkt_metal = 0.55 * 1.0 / 1000
+
+        lenght_nkt = volume_well_30 / volume_nkt_metal
+
+
+        descent_voronka = [
+            [f'Не замерзающая жидкость 0,3м3', None,
+             f'С целью вытеснения техжидкости из скважины и заполнения скважины не замерзающей жидкостью: '
+             f'Допустить компоновку на технологических НКТ на глубину '
+             f'{sum(list(well_data.dict_nkt_po.values())) + lenght_nkt}м. ',
+             None, None, None, None, None, None, None,
+             'Мастер КРС, предст. заказчика', descentNKT_norm(lenght_nkt, 1)],
+             [None, None,
+              f'Поднять тНКТ до глубины {sum(list(well_data.dict_nkt_po.values()))}м с доливом незамерзающей'
+              f' жидкостью (растворитель РКД 0,3м3) до устья',
+              None, None, None, None, None, None, None,
+              'Мастер КРС, предст. заказчика', descentNKT_norm(lenght_nkt, 1)]
+            [None, None,
+             f'Заполнить полость НКТ в интервале 0-30м незамерзающей жидкостью полость НКТ (растворитель РКД 0,09м3)',
+             None, None, None, None, None, None, None,
+             'Мастер КРС, предст. заказчика', descentNKT_norm(sum(list(well_data.dict_nkt_po.values())), 1)]]
+        return descent_voronka
 
     def konservation_well(self, nkt_edit):
 
@@ -302,12 +339,6 @@ class GnoDescentWindow(QMainWindow):
              f'сертифицированный.',
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика', None],
-            [None, None,
-             f'В случае незавоза новых или завоза неопрессованных НКТ, согласовать алгоритм опрессовки с ЦДНГ, '
-             f'произвести спуск '
-             f'фондовых НКТ с поинтервальной опрессовкой через каждые 300м  с учетом статического уровня уровня',
-             None, None, None, None, None, None, None,
-             'Мастер КРС, предст. заказчика', None],
             [f'СПО воронки {sum(list(well_data.dict_nkt_po.values()))}м', None,
              f'Спустить предварительно воронку на НКТ{nkt_edit} (завоз с УСО ГНО, '
              f'ремонтные/новые) на '
@@ -315,15 +346,14 @@ class GnoDescentWindow(QMainWindow):
              f'смазкой резьбовых соединений.',
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика', descentNKT_norm(sum(list(well_data.dict_nkt_po.values())), 1)],
-            [f'Не замерзающая жидкость 0,3м3', None,
-             f'Заполнить скважину в интервале 0-30м незамерзающей жидкостью (растворитель РКД 0,3м3)',
-             None, None, None, None, None, None, None,
-             'Мастер КРС, предст. заказчика', descentNKT_norm(sum(list(well_data.dict_nkt_po.values())), 1)],
+
             [None, None,
-             f'Демонтировать превентор. Монтаж устьевой арматуры. При монтаже использовать только сертифицированное'
-             f' оборудование (переводники, муфты, переходные катушки). МОНТАЖ БЕЗ ПОДВЕСНОГО ПАТРУБКА ЗАПРЕЩЕН. '
-             f'произвести разделку'
-             f' кабеля под устьевой сальник произвести герметизацию устья. ',
+             'Демонтировать превентор. Монтаж устьевой арматуры. При монтаже использовать только '
+             'сертифицированное оборудование в коррозионностойком исполнении, снять штурвалы с задвижек, крайние '
+             'флянцы задвижек, крайние флянцы задвижек оборудовать заглушками, снять манометры. Установить '
+             'паспортизированный подвесной патрубок под планшайбой. Составить АКТ. При несоответствии технических '
+             'параметров, отсутствия паспорта, отсутствия сертификата, отсутствие или нечитаемости номера и '
+             'даты выпуска-подвесного патрубок считается не пригодным к применению. ',
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика', 1.27],
             [None, None,
@@ -333,12 +363,15 @@ class GnoDescentWindow(QMainWindow):
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика', 0.7],
             [None, None,
-             f'На устье законсервированных скважин установить металлическую табличку с обозначением: '
+             f'Устье скважины оборудовать площадкой размером 2х2м. На устье законсервированных скважин установить '
+             f'металлическую табличку с обозначением'
              f'скв.№ {well_data.well_number._value} {well_data.well_oilfield._value} месторождение, ПАО АНК Башнефть, '
              f'дата начала и окончания консервации силами ЦДНГ после съезда бригады. ")',
              None, None, None, None, None, None, None,
              'ЦДНГ ', 2],
         ]
+        for row in self.konservation_down(nkt_edit)[::-1]:
+            descent_voronka.insert(2, row)
         return descent_voronka
 
     def voronka_down(self, lift_key, nkt_edit):
@@ -1011,7 +1044,7 @@ class GnoDescentWindow(QMainWindow):
     end_list = [
         [None, None,
          f'Все работы производить с соблюдением т/б и технологии'
-         f' согласно утвержденному плану. Демонтировать подьемный агрегат и оборудование. Пустить скважину в работу.',
+         f' согласно утвержденному плану. Демонтировать подьемный агрегат и оборудование. ',
          None, None, None, None, None, None, None,
          'мастер КРС', float(8.5)],
         [None, None,

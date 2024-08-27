@@ -476,6 +476,7 @@ class MyWindow(QMainWindow):
                     read_pz = CreatePZ(self.wb, self.ws, self.data_window, self.perforation_correct_window2)
                     sheet = read_pz.open_excel_file(self.ws, self.work_plan)
 
+
                     self.copy_pz(sheet, self.table_widget, self.work_plan)
                     MyWindow.pause_app()
                     well_data.pause = True
@@ -903,6 +904,7 @@ class MyWindow(QMainWindow):
     def saveFileDialog(self, wb2, full_path):
         try:
 
+
             file_name, _ = QFileDialog.getSaveFileName(self, "Save excel-file",
                                                        f"{full_path}", "Excel Files (*.xlsx)")
             if file_name:
@@ -924,6 +926,7 @@ class MyWindow(QMainWindow):
 
         except Exception as e:
             print(f"Ошибка при работе с Excel: {type(e).__name__}\n\n{str(e)}")
+
 
     def save_to_excel(self):
         from work_py.gnkt_frez import Work_with_gnkt
@@ -986,12 +989,14 @@ class MyWindow(QMainWindow):
                     if work_list[i][0]:
                         plan_short += f'п.{work_list[i][1]} {work_list[i][0]} \n'
 
-            count_row_height(self.ws, ws2, work_list, merged_cells_dict, ins_ind)
+            count_row_height(wb2, self.ws, ws2, work_list, merged_cells_dict, ins_ind)
 
             well_data.itog_ind_min = ins_ind
             well_data.itog_ind_max = len(work_list)
             # print(f' длина {len(work_list)}')
             CreatePZ.add_itog(self, ws2, self.table_widget.rowCount() + 1, self.work_plan)
+
+
 
             # try:
             for row_ind, row in enumerate(ws2.iter_rows(values_only=True)):
@@ -1023,8 +1028,8 @@ class MyWindow(QMainWindow):
                         break
             if self.work_plan in ['krs', 'plan_change']:
                 self.create_short_plan(wb2, plan_short)
-
-            if self.work_plan not in ['dop_plan']:
+            #
+            if self.work_plan not in ['dop_plan', 'dop_plan_in_base']:
                 if 'Ойл' in well_data.contractor:
                     self.insert_image(ws2, f'{well_data.path_image}imageFiles/Хасаншин.png', 'H1')
                     self.insert_image(ws2, f'{well_data.path_image}imageFiles/Шамигулов.png', 'H4')
@@ -1035,21 +1040,21 @@ class MyWindow(QMainWindow):
                 well_data.data_well_dict, excel_data_dict, self.work_plan
             )
 
-            if self.work_plan not in ['dop_plan', 'dop_plan_in_base', 'plan_change']:
-                try:
-                    cat_h2s_list = well_data.dict_category[well_data.plast_work_short[0]]['по сероводороду'].category
-                    h2s_mg = well_data.dict_category[well_data.plast_work_short[0]]['по сероводороду'].data_mg_l
-                    h2s_pr = well_data.dict_category[well_data.plast_work_short[0]]['по сероводороду'].data_procent
-
-                    if cat_h2s_list in [1, 2] and self.work_plan not in ['dop_plan', 'dop_plan_in_base']:
-                        ws3 = wb2.create_sheet('Sheet1')
-                        ws3.title = "Расчет необходимого количества поглотителя H2S"
-                        ws3 = wb2["Расчет необходимого количества поглотителя H2S"]
-                        calc_h2s(ws3, h2s_pr, h2s_mg)
-                    else:
-                        print(f'Расчет поглотителя сероводорода не требуется')
-                except:
-                    mes = QMessageBox.warning(self, 'Ошибка', 'Программа не смогла создать лист с расчетом поглотителя')
+            # if self.work_plan not in ['dop_plan', 'dop_plan_in_base', 'plan_change']:
+            #     try:
+            #         cat_h2s_list = well_data.dict_category[well_data.plast_work_short[0]]['по сероводороду'].category
+            #         h2s_mg = well_data.dict_category[well_data.plast_work_short[0]]['по сероводороду'].data_mg_l
+            #         h2s_pr = well_data.dict_category[well_data.plast_work_short[0]]['по сероводороду'].data_procent
+            #
+            #         if cat_h2s_list in [1, 2] and self.work_plan not in ['dop_plan', 'dop_plan_in_base']:
+            #             ws3 = wb2.create_sheet('Sheet1')
+            #             ws3.title = "Расчет необходимого количества поглотителя H2S"
+            #             # ws3 = wb2["Расчет необходимого количества поглотителя H2S"]
+            #             calc_h2s(ws3, h2s_pr, h2s_mg)
+            #         else:
+            #             print(f'Расчет поглотителя сероводорода не требуется')
+            #     except:
+            #         mes = QMessageBox.warning(self, 'Ошибка', 'Программа не смогла создать лист с расчетом поглотителя')
 
             ws2.print_area = f'B1:L{self.table_widget.rowCount() + 45}'
             ws2.page_setup.fitToPage = True
@@ -2267,71 +2272,7 @@ class MyWindow(QMainWindow):
     def insertPerf(self):
         self.populate_row(self.ins_ind, self.perforation_list)
 
-    def copy_norm(self, sheet, table_widget, work_plan='normir_new', count_col=31, list_page=1):
 
-        rows = 46
-        merged_cells = sheet.merged_cells
-        table_widget.setRowCount(rows)
-        well_data.count_row_well = table_widget.rowCount()
-
-        border_styles = {}
-        # for row in sheet.iter_rows():
-        #     for cell in row:
-        #         border_styles[(cell.row, cell.column)] = cell.border
-
-        table_widget.setColumnCount(count_col)
-
-        rowHeights_exit = [sheet.row_dimensions[i + 1].height if sheet.row_dimensions[i + 1].height is not None else 18
-                           for i in range(rows)]
-
-        colWidth = [sheet.column_dimensions[get_column_letter(col_ind + 1)].width * 4 for col_ind in range(46)]
-
-        for row in range(1, rows + 2):
-            if row > 1 and row < rows - 1:
-                try:
-                    table_widget.setRowHeight(row, int(rowHeights_exit[row]))
-                except:
-                    pass
-            for col in range(1, count_col + 1):
-                # if not sheet.cell(row=row, column=col).value is None:
-                # if isinstance(sheet.cell(row=row, column=col).value, float) and row > 25:
-                #     cell_value = str(round(sheet.cell(row=row, column=col).value, 2))
-                # elif isinstance(sheet.cell(row=row, column=col).value, datetime):
-                #     cell_value = sheet.cell(row=row, column=col).value.strftime('%d.%m.%Y')
-                # else:
-                #     cell_value = str(sheet.cell(row=row, column=col).value)
-                #
-                # item = QtWidgets.QTableWidgetItem(str(cell_value))
-                #
-                # table_widget.setItem(row - 1, col - 1, item)
-
-                # Проверяем, является ли текущая ячейка объединенной
-                for merged_cell in merged_cells:
-                    if row in range(merged_cell.min_row, merged_cell.max_row + 1) and \
-                            col in range(merged_cell.min_col, merged_cell.max_col + 1):
-                        # Устанавливаем количество объединяемых строк и столбцов для текущей ячейки
-                        table_widget.setSpan(row - 1, col - 1,
-                                             merged_cell.max_row - merged_cell.min_row + 1,
-                                             merged_cell.max_col - merged_cell.min_col + 1)
-
-                else:
-                    item = QTableWidgetItem("")
-
-        for column in range(table_widget.columnCount()):
-            table_widget.setColumnWidth(column, int(colWidth[column]))
-
-        # if self.work_window is None:
-        #     self.work_window = GnoWindow(table_widget.rowCount(), self.table_widget, self.work_plan)
-        #
-        #     # self.work_window.setGeometry(100, 400, 200, 500)
-        #     self.work_window.show()
-        #
-        #     self.pause_app()
-        #     well_data.pause = True
-        #     self.work_window = None
-        # else:
-        #     self.work_window.close()  # Close window.
-        #     self.work_window = None
 
     def copy_pz(self, sheet, table_widget, work_plan='krs', count_col=12, list_page=1):
         from krs import GnoWindow
@@ -2400,18 +2341,15 @@ class MyWindow(QMainWindow):
                 table_widget.setRowHidden(row, False)
 
         if work_plan == 'krs':
-            if self.work_window is None:
-                self.work_window = GnoWindow(table_widget.rowCount(), self.table_widget, self.work_plan)
 
-                # self.work_window.setGeometry(100, 400, 200, 500)
-                self.work_window.show()
+            self.work_window = GnoWindow(table_widget.rowCount(), self.table_widget, self.work_plan)
 
-                self.pause_app()
-                well_data.pause = True
-                self.work_window = None
-            else:
-                self.work_window.close()  # Close window.
-                self.work_window = None
+            # self.work_window.setGeometry(100, 400, 200, 500)
+            self.work_window.show()
+
+            self.pause_app()
+            well_data.pause = True
+            self.work_window = None
 
         if work_plan in ['gnkt_frez'] and list_page == 2:
             colWidth = [2.28515625, 13.0, 4.5703125, 13.0, 13.0, 13.0, 5.7109375, 13.0, 13.0, 13.0, 4.7109375,

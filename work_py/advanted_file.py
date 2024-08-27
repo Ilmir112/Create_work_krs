@@ -326,7 +326,7 @@ def definition_plast_work(self):
     well_data.plast_work = list(plast_work)
 
 
-def count_row_height(ws, ws2, work_list, merged_cells_dict, ind_ins):
+def count_row_height(wb2, ws, ws2, work_list, merged_cells_dict, ind_ins):
     from openpyxl.utils.cell import range_boundaries, get_column_letter
     from PIL import Image
 
@@ -357,7 +357,7 @@ def count_row_height(ws, ws2, work_list, merged_cells_dict, ind_ins):
     stop_str = 1500
     for i in range(1, len(work_list) + 1):  # Добавлением работ
         a = work_list[i - 1]
-        if 'Наименование работ' in work_list[i - 1]:
+        if 'Наименование работ' in work_list[i - 1][2]:
             boundaries_dict_index = i + 1
 
         if 'код площади' in work_list[i - 1]:
@@ -432,9 +432,10 @@ def count_row_height(ws, ws2, work_list, merged_cells_dict, ind_ins):
 
     for key, value in boundaries_dict.items():
         aaa = value[1]
-        if value[1] < boundaries_dict_index:
+        if value[1] <= boundaries_dict_index-3:
             ws2.merge_cells(start_column=value[0], start_row=value[1],
                             end_column=value[2], end_row=value[3])
+
 
     try:
         # вставка сохраненных изображение по координатам ячеек
