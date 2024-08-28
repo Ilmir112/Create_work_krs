@@ -2297,7 +2297,6 @@ class MyWindow(QMainWindow):
             if row > 1 and row < rows - 1:
                 table_widget.setRowHeight(row, int(rowHeights_exit[row]))
             for col in range(1, count_col + 1):
-
                 if not sheet.cell(row=row, column=col).value is None:
                     if isinstance(sheet.cell(row=row, column=col).value, float) and row > 25:
                         cell_value = str(round(sheet.cell(row=row, column=col).value, 2))
@@ -2307,13 +2306,12 @@ class MyWindow(QMainWindow):
                         cell_value = str(sheet.cell(row=row, column=col).value)
 
                     item = QtWidgets.QTableWidgetItem(str(cell_value))
-
                     table_widget.setItem(row - 1, col - 1, item)
 
                     # Проверяем, является ли текущая ячейка объединенной
                     for merged_cell in merged_cells:
                         range_row = range(merged_cell.min_row, merged_cell.max_row + 1)
-                        range_col = (merged_cell.min_col, merged_cell.max_col + 1)
+                        range_col = range(merged_cell.min_col, merged_cell.max_col + 1)
                         if row in range_row and col in range_col:
                             # Устанавливаем количество объединяемых строк и столбцов для текущей ячейки
                             table_widget.setSpan(row - 1, col - 1,
