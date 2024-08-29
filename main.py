@@ -1286,8 +1286,9 @@ class MyWindow(QMainWindow):
 
             for file in os.listdir(path):
                 file_path = os.path.join(path, file)
-                if os.path.isfile(file_path):
-                    os.remove(file_path)
+                if path in file_path:
+                    if os.path.isfile(file_path):
+                        os.remove(file_path)
 
             mes = QMessageBox.information(self, 'Обновление', 'Данные обнулены')
 

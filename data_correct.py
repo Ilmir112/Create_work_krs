@@ -568,7 +568,7 @@ class TabPage_SO_correct(QWidget):
 
 
     def select_type_kr(self):
-        kr = well_data.type_kr.split(' ')[0]
+        kr = well_data.type_kr.split(' ')[0] + ' '
         index_sel = 0
         for index, type_kr in enumerate(well_data.type_kr_list):
             if kr in type_kr:
@@ -666,7 +666,7 @@ class TabPage_SO_correct(QWidget):
 
     def ifNone(self, string):
 
-        if str(string).lower() in ['0', str(None), '-', '--', 'отсутствует']:
+        if str(string).lower() in ['0', 'none', '-', '--', 'отсутствует', 'отсут']:
             return 'отсут'
         if '/' in str(string):
             return string.split('/')[0]
