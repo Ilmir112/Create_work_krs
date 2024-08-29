@@ -1,4 +1,3 @@
-
 import logging
 from collections import namedtuple
 
@@ -58,7 +57,11 @@ def kot_work(self, current_bottom=0):
          f'{current_bottom}м с доливом скважины в объеме {round(float(current_bottom) * 1.12 / 1000, 1)}м3 '
          f'удельным весом {well_data.fluid_work}',
          None, None, None, None, None, None, None,
-         'мастер КРС', liftingNKT_norm(float(current_bottom), 1)]
+         'мастер КРС', liftingNKT_norm(float(current_bottom), 1)],
+        [None, None,
+         f'По согласованию с УСРСиСТ СПО КОТ повторить',
+         None, None, None, None, None, None, None,
+         'мастер КРС', None]
     ]
     well_data.current_bottom = current_bottom
     return kot_list
