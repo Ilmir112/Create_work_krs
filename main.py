@@ -1029,7 +1029,7 @@ class MyWindow(QMainWindow):
             if self.work_plan in ['krs', 'plan_change']:
                 self.create_short_plan(wb2, plan_short)
             #
-            if self.work_plan not in ['dop_plan', 'dop_plan_in_base']:
+            if self.work_plan not in ['dop_plan']:
                 if 'Ойл' in well_data.contractor:
                     self.insert_image(ws2, f'{well_data.path_image}imageFiles/Хасаншин.png', 'H1')
                     self.insert_image(ws2, f'{well_data.path_image}imageFiles/Шамигулов.png', 'H4')

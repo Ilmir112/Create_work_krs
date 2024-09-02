@@ -329,13 +329,13 @@ class Drill_window(QMainWindow):
                 sole = int(float(sole_drill.text()))
                 drill_True = drill_type_combo.currentText()
                 if self.drillingBit_diam != '':
-                    if well_data.column_additional is False or (well_data.column_additional and sole > well_data.head_column_additional._value):
+                    if well_data.column_additional is False or (well_data.column_additional and sole < well_data.head_column_additional._value):
                         if well_data.column_diametr._value - 2 * well_data.column_wall_thickness._value <= float(
                                 self.drillingBit_diam):
                             mes = QMessageBox.warning(self, 'ОШИБКА', 'Не корректный диаметр долото')
                             return
                     else:
-                        if well_data.column_additional._value - 2 * well_data.column_additional_wall_thickness._value <= float(
+                        if well_data.column_additional_diametr._value - 2 * well_data.column_additional_wall_thickness._value <= float(
                                 self.drillingBit_diam):
                             mes = QMessageBox.warning(self, 'ОШИБКА', 'Не корректный диаметр долото')
                             return
