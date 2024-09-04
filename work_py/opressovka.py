@@ -38,7 +38,8 @@ class TabPage_SO(QWidget):
         else:
             # print(well_data.dict_perforation)
             if well_data.leakiness:
-                pakerDepth = min([well_data.dict_leakiness['НЭК']['интервал'][nek][0] - 10
+                aaaaa = well_data.dict_leakiness['НЭК']['интервал']
+                pakerDepth = min([float(nek.split('-')[0]) - 10
                                        for nek in well_data.dict_leakiness['НЭК']['интервал'].keys()])
         try:
             self.paker_depth_edit.setText(str(int(pakerDepth)))

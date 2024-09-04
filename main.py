@@ -1120,11 +1120,12 @@ class MyWindow(QMainWindow):
         temp_folder = r'C:\Windows\Temp'
 
         try:
-            for filename in os.listdir(temp_folder):
-                file_path = os.path.join(temp_folder, filename)
-                # Удаляем только файлы, а не директории
-                if os.path.isfile(file_path):
-                    os.remove(file_path)
+            if 'Зуфаров' in well_data.user:
+                for filename in os.listdir(temp_folder):
+                    file_path = os.path.join(temp_folder, filename)
+                    # Удаляем только файлы, а не директории
+                    if os.path.isfile(file_path):
+                        os.remove(file_path)
 
         except Exception as e:
             QMessageBox.critical(window, "Ошибка", f"Не удалось очистить папку с временными файлами: {e}")

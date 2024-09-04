@@ -18,6 +18,7 @@ def skm_interval(self, template):
             [float(well_data.depth_fond_paker_do["posle"]) - 20, float(well_data.depth_fond_paker_do["posle"]) + 20])
 
     if well_data.leakiness:
+        a = well_data.dict_leakiness
         for nek in list(well_data.dict_leakiness['НЭК']['интервал'].keys()):
             if int(float(nek.split('-')[1])) + 20 < well_data.current_bottom:
                 str_raid.append([int(float(nek.split('-')[0])) - 90, int(float(nek.split('-')[1])) + 20])
@@ -50,14 +51,16 @@ def skm_interval(self, template):
 
         str_raid.extend(remove_overlapping_intervals(perforating_intervals))
 
-    if well_data.dict_perforation_project is None and any(
+    if len(well_data.dict_perforation_project) != 0 and any(
             [plast in well_data.plast_all for plast in list(well_data.dict_perforation_project.keys())]) is False:
-        if well_data.dict_perforation_project[plast]['интервал'][1] < well_data.current_bottom:
-            str_raid.append([well_data.dict_perforation_project[plast]['интервал'][1] + 10,
-                             well_data.dict_perforation_project[plast]['интервал'][1] + 50])
-        else:
-            str_raid.append([well_data.dict_perforation_project[plast]['интервал'][1] + 10,
-                             well_data.current_bottom - 2])
+        for plast in well_data.dict_perforation_project:
+            aaaaa = well_data.dict_perforation_project
+            aaa = well_data.dict_perforation_project[plast]
+            for interval in well_data.dict_perforation_project[plast]['интервал']:
+                if interval[1] < well_data.current_bottom:
+                    str_raid.append([interval[0] - 70, interval[1] + 20])
+                else:
+                    str_raid.append([interval[0] - 70, well_data.current_bottom - 2])
 
     # print(f'скреперо {str_raid}')
     merged_segments = merge_overlapping_intervals(str_raid)
@@ -163,12 +166,12 @@ def remove_overlapping_intervals(perforating_intervals, skm_interval=None):
             skm_range = list(range(kroly_skm, pod_skm))
             for pvr in sorted(perforating_intervals, key=lambda x: x[0]):
                 # print(int(pvr[0]) in skm_range, skm_range[0], int(pvr[0]))
-                if int(pvr[0]) in skm_range and int(pvr[1]) in skm_range and skm_range[0] + 1 <= int(pvr[0] - 1):
+                if int(pvr[0]) in skm_range and int(pvr[1]) in skm_range and skm_range[0] + 1 <= int(pvr[0]):
                     if skm_range[0] + 1 < int(pvr[0]) - 2:
                         skipping_intervals_new.append((skm_range[0] + 1, int(pvr[0] - 2)))
                         skm_range = skm_range[skm_range.index(int(pvr[1])):]
                     else:
-                        skm_range = skm_range[skm_range.index(int(pvr[1])):]
+                        skm_range = skm_range[skm_range.index(int(pvr[1]+1)):]
 
             skipping_intervals_new.append((skm_range[0], pod_skm))
     else:

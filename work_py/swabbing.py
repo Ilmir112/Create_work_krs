@@ -1460,12 +1460,14 @@ class Swab_Window(QMainWindow):
         nkt_diam = ''.join(['73' if well_data.column_diametr._value > 110 or (
                 well_data.column_diametr._value > 110 and well_data.column_additional is True and
                 well_data.head_column_additional._value > 800) else '60'])
+        aaaa =  (well_data.column_additional is True and \
+                                                    paker_depth < well_data.head_column_additional._value and \
+                                                    well_data.head_column_additional._value > 800)
 
+        aaaaa = (well_data.column_additional_diametr._value < 110 and paker_depth > well_data.head_column_additional._value)
         if well_data.column_additional is False or (well_data.column_additional is True and \
                                                     paker_depth < well_data.head_column_additional._value and \
-                                                    well_data.head_column_additional._value > 800) or \
-                (
-                        well_data.column_additional_diametr._value < 110 and paker_depth > well_data.head_column_additional._value):
+                                                    well_data.head_column_additional._value > 800):
             paker_select = f'воронку со свабоограничителем + {depthGauge} НКТ{nkt_diam} {paker_khost}м + пакер ' \
                            f'ПРО-ЯМО-{diametr_paker}мм (либо аналог) ' \
                            f'для ЭК {well_data.column_diametr._value}мм х {well_data.column_wall_thickness._value}мм ' \
@@ -1479,11 +1481,14 @@ class Swab_Window(QMainWindow):
             paker_select = f'воронку со свабоограничителем+ НКТ{60}мм {paker_khost}м + пакер ПРО-ЯМО-' \
                            f'{diametr_paker}мм (либо аналог) ' \
                            f'для ЭК {well_data.column_additional_diametr._value}мм х' \
-                           f' {well_data.column_additional_wall_thickness._value}мм + НКТ60мм 10м '
+                           f' {well_data.column_additional_wall_thickness._value}мм + НКТ60мм 10м + репер + НКТ60мм ' \
+                           f'{round(paker_depth - well_data.head_column_additional._value, 0)}м '
             paker_short = f'в-ку со свабоогр.+ НКТ{60}мм {paker_khost}м + пакер ПРО-ЯМО-{diametr_paker}мм  + ' \
-                          f'НКТ60мм 10м '
+                          f'НКТ60мм 10м + НКТ60мм{round(paker_depth - well_data.head_column_additional._value, 0)}м '
+
             dict_nkt = {int(nkt_diam): well_data.head_column_additional._value, 60:
                 int(paker_depth - well_data.head_column_additional._value)}
+
         elif well_data.column_additional is True and well_data.column_additional_diametr._value > 110 \
                 and paker_depth > well_data.head_column_additional._value:
             paker_select = f'воронку со свабоограничителем+ НКТ{well_data.nkt_diam}мм со' \
@@ -1491,10 +1496,14 @@ class Swab_Window(QMainWindow):
                            f'пакер ПРО-ЯМО-{diametr_paker}мм (либо аналог) ' \
                            f'для ЭК {well_data.column_additional_diametr._value}мм х ' \
                            f'{well_data.column_additional_wall_thickness._value}мм' \
-                           f' + НКТ{well_data.nkt_diam}мм со снятыми фасками 10м'
+                           f' + НКТ{well_data.nkt_diam}мм со снятыми фасками 10м + НКТ{well_data.nkt_diam}мм ' \
+                          f'со снятыми фасками' \
+                           f'{round(paker_depth - well_data.head_column_additional._value, 0)}м '
             paker_short = f'в-ку со свабоогр.+ НКТ{well_data.nkt_diam}мм со снятыми фасками {paker_khost}м + ' \
                           f'пакер ПРО-ЯМО-{diametr_paker}мм + НКТ{well_data.nkt_diam}мм ' \
-                          f'со снятыми фасками 10м'
+                          f'со снятыми фасками 10м + НКТ{well_data.nkt_diam}мм ' \
+                          f'со снятыми фасками {round(paker_depth - well_data.head_column_additional._value, 0)}м '
+
             dict_nkt = {int(nkt_diam): paker_depth + paker_khost}
         elif nkt_diam == 60:
             dict_nkt = {60: paker_depth + paker_khost}
