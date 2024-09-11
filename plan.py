@@ -74,9 +74,10 @@ def copy_true_ws(ws, ws2, head):
     for row_number, row in enumerate(ws[head]):
         for col_number, cell in enumerate(row):
             if 'катег' in str(cell.value).lower():
-                ws2.cell(row=row_number + 1, column=col_number + 1).alignment = Alignment(wrap_text=True,
-                                                                                          horizontal='left',
-                                                                                          vertical='center')
+                if well_data.work_plan not in ['krs', 'dop_plan', 'dop_plan_in_base']:
+                    ws2.cell(row=row_number + 1, column=col_number + 1).alignment = Alignment(wrap_text=True,
+                                                                                              horizontal='left',
+                                                                                              vertical='center')
             if type(cell.value) == float:
                 ws2.cell(row_number + 1, col_number + 1, round(cell.value, 5))
             else:

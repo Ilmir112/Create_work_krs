@@ -1485,7 +1485,7 @@ class GnoWindow(QMainWindow):
                 try:
                     poglot = [well_data.dict_category[plast]['по сероводороду'
                               ].poglot for plast in list(well_data.dict_category.keys())
-                              if well_data.dict_category[plast]['по сероводороду'].category in [1, 2]][0]
+                              if well_data.dict_category[plast]['по сероводороду'].category in [1, 2]][0]/1.065
                     expenditure_h2s_list.append(poglot)
 
                 except ValueError:
@@ -1493,9 +1493,9 @@ class GnoWindow(QMainWindow):
 
             expenditure_h2s = round(max(expenditure_h2s_list), 3)
             fluid_work = f'{fluid_work_insert}г/см3 с добавлением поглотителя сероводорода {well_data.type_absorbent} из ' \
-                         f'расчета {expenditure_h2s}кг/м3 '
+                         f'расчета {expenditure_h2s}л/м3 '
             fluid_work_short = f'{fluid_work_insert}г/см3 c ' \
-                               f'{well_data.type_absorbent} - {expenditure_h2s}кг/м3 '
+                               f'{well_data.type_absorbent} - {expenditure_h2s}л/м3 '
         else:
             fluid_work = f'{fluid_work_insert}г/см3 '
             fluid_work_short = f'{fluid_work_insert}г/см3'

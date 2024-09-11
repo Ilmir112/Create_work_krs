@@ -544,7 +544,7 @@ class TabPage_SO_correct(QWidget):
             self.grid.addWidget(self.proc_water_Label, 25, 3)
             self.grid.addWidget(self.proc_water_edit, 26, 3)
 
-        curator_list = ['ГРР', 'ОР', 'ГТМ', 'ГО', 'ВНС']
+        curator_list = ['', 'ГРР', 'ОР', 'ГТМ', 'ГО', 'ВНС']
         self.curator_Combo.addItems(curator_list)
         # print(self.pump_SHGN_posle_edit_type.text() != 'отсут', self.pump_ECN_posle_edit_type.text() != 'отсут')
 
@@ -793,6 +793,10 @@ class DataWindow(QMainWindow):
         dinamic_level = self.tabWidget.currentWidget().dinamic_level_edit_type.text()
         curator = str(self.tabWidget.currentWidget().curator_Combo.currentText())
 
+        question = QMessageBox.question(self, 'выбор куратора', f'Куратор ремонта сектор {curator}, верно ли?')
+        if question == QMessageBox.StandardButton.No:
+            return
+
         if curator == 'ОР':
             expected_Q_edit = self.tabWidget.currentWidget().expected_Q_edit.text()
             expected_P_edit = self.tabWidget.currentWidget().expected_P_edit.text()
@@ -879,8 +883,16 @@ class DataWindow(QMainWindow):
             close_file = False
         elif well_data.column_additional:
             if int(float(str(head_column_additional).replace(',', '.'))) < 10:
-                msg = QMessageBox.information(self, 'Внимание', 'доп колонна не может быть близко 0')
-                close_file = False
+                msg = QMessageBox.question(self, 'Внимание', 'доп колонна начинается с устья?')
+                if msg == QMessageBox.StandardButton.Yes:
+                    shoe_column = shoe_column_additional
+                    columnType = column_additional_diametr
+                    column_wall_thickness = column_additional_wall_thickness
+                    well_data.column_additional = False
+
+
+
+
         elif self.ifNum(column_direction_diametr) is False \
                 or self.ifNum(column_direction_wall_thickness) is False \
                 or self.ifNum(column_direction_lenght) is False \

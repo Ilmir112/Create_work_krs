@@ -439,17 +439,17 @@ class MyWindow(QMainWindow):
         self.without_jamming_AGM = self.costumer_select.addMenu('&Арланский регион')
         self.without_jamming_AGM_open = self.without_jamming_AGM.addAction('&открыть перечень', self.action_clicked)
 
-        if 'Зуфаров И.М.' in well_data.user[1]:
-            self.class_well_TGM_reload = self.class_well_TGM.addAction('&обновить', self.action_clicked)
-            self.class_well_IGM_reload = self.class_well_IGM.addAction('&обновить', self.action_clicked)
-            self.class_well_CHGM_reload = self.class_well_CHGM.addAction('&обновить', self.action_clicked)
-            self.class_well_KGM_reload = self.class_well_KGM.addAction('&обновить', self.action_clicked)
-            self.class_well_AGM_reload = self.class_well_AGM.addAction('&обновить', self.action_clicked)
-            self.without_jamming_TGM_reload = self.without_jamming_TGM.addAction('&обновить', self.action_clicked)
-            self.without_jamming_IGM_reload = self.without_jamming_IGM.addAction('&обновить', self.action_clicked)
-            self.without_jamming_CHGM_reload = self.without_jamming_CHGM.addAction('&обновить', self.action_clicked)
-            self.without_jamming_KGM_reload = self.without_jamming_KGM.addAction('&обновить', self.action_clicked)
-            self.without_jamming_AGM_reload = self.without_jamming_AGM.addAction('&обновить', self.action_clicked)
+        # if 'Зуфаров И.М.' in well_data.user[1]:
+        self.class_well_TGM_reload = self.class_well_TGM.addAction('&обновить', self.action_clicked)
+        self.class_well_IGM_reload = self.class_well_IGM.addAction('&обновить', self.action_clicked)
+        self.class_well_CHGM_reload = self.class_well_CHGM.addAction('&обновить', self.action_clicked)
+        self.class_well_KGM_reload = self.class_well_KGM.addAction('&обновить', self.action_clicked)
+        self.class_well_AGM_reload = self.class_well_AGM.addAction('&обновить', self.action_clicked)
+        self.without_jamming_TGM_reload = self.without_jamming_TGM.addAction('&обновить', self.action_clicked)
+        self.without_jamming_IGM_reload = self.without_jamming_IGM.addAction('&обновить', self.action_clicked)
+        self.without_jamming_CHGM_reload = self.without_jamming_CHGM.addAction('&обновить', self.action_clicked)
+        self.without_jamming_KGM_reload = self.without_jamming_KGM.addAction('&обновить', self.action_clicked)
+        self.without_jamming_AGM_reload = self.without_jamming_AGM.addAction('&обновить', self.action_clicked)
 
         self.signatories_Bnd = self.signatories.addAction('&БашНефть-Добыча', self.action_clicked)
 
@@ -467,6 +467,9 @@ class MyWindow(QMainWindow):
         if action == self.create_KRS and self.table_widget == None:
             self.work_plan = 'krs'
             self.tableWidgetOpen(self.work_plan)
+            QMessageBox.information(self, 'ВНИМАНИЕ', 'Для корректного прочтения план заказа, план заказ должен быть '
+                                                      'пересохранен в формат .xlsx (КНИГА EXCEL, '
+                                                      'excel версия от 2010г и выше)')
             self.fname, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
                                                                   "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
             if self.fname:
@@ -699,39 +702,39 @@ class MyWindow(QMainWindow):
             costumer = 'ООО Башнефть-добыча'
             self.open_class_well(costumer, 'АГМ')
 
-        elif 'Зуфаров И.М.' in well_data.user[1]:
+        # elif 'Зуфаров И.М.' in well_data.user[1]:
 
-            if action == self.class_well_TGM_reload:
-                costumer = 'ООО Башнефть-добыча'
-                self.reload_class_well(costumer, 'ТГМ')
-            elif action == self.class_well_CHGM_reload:
-                costumer = 'ООО Башнефть-добыча'
-                self.reload_class_well(costumer, 'ЧГМ')
-            elif action == self.class_well_KGM_reload:
-                costumer = 'ООО Башнефть-добыча'
-                self.reload_class_well(costumer, 'КГМ')
-            elif action == self.class_well_AGM_reload:
-                costumer = 'ООО Башнефть-добыча'
-                self.reload_class_well(costumer, 'АГМ')
-            elif action == self.without_jamming_TGM_reload:
-                costumer = 'ООО Башнефть-добыча'
-                self.reload_without_damping(costumer, 'ТГМ')
-            elif action == self.without_jamming_CHGM_reload:
-                costumer = 'ООО Башнефть-добыча'
-                self.reload_without_damping(costumer, 'ЧГМ')
-            elif action == self.without_jamming_KGM_reload:
-                costumer = 'ООО Башнефть-добыча'
-                self.reload_without_damping(costumer, 'КГМ')
-            elif action == self.without_jamming_AGM_reload:
-                costumer = 'ООО Башнефть-добыча'
-                self.reload_without_damping(costumer, 'АГМ')
-            elif action == self.without_jamming_IGM_reload:
-                costumer = 'ООО Башнефть-добыча'
-                self.reload_without_damping(costumer, 'ИГМ')
+        if action == self.class_well_TGM_reload:
+            costumer = 'ООО Башнефть-добыча'
+            self.reload_class_well(costumer, 'ТГМ')
+        elif action == self.class_well_CHGM_reload:
+            costumer = 'ООО Башнефть-добыча'
+            self.reload_class_well(costumer, 'ЧГМ')
+        elif action == self.class_well_KGM_reload:
+            costumer = 'ООО Башнефть-добыча'
+            self.reload_class_well(costumer, 'КГМ')
+        elif action == self.class_well_AGM_reload:
+            costumer = 'ООО Башнефть-добыча'
+            self.reload_class_well(costumer, 'АГМ')
+        elif action == self.without_jamming_TGM_reload:
+            costumer = 'ООО Башнефть-добыча'
+            self.reload_without_damping(costumer, 'ТГМ')
+        elif action == self.without_jamming_CHGM_reload:
+            costumer = 'ООО Башнефть-добыча'
+            self.reload_without_damping(costumer, 'ЧГМ')
+        elif action == self.without_jamming_KGM_reload:
+            costumer = 'ООО Башнефть-добыча'
+            self.reload_without_damping(costumer, 'КГМ')
+        elif action == self.without_jamming_AGM_reload:
+            costumer = 'ООО Башнефть-добыча'
+            self.reload_without_damping(costumer, 'АГМ')
+        elif action == self.without_jamming_IGM_reload:
+            costumer = 'ООО Башнефть-добыча'
+            self.reload_without_damping(costumer, 'ИГМ')
 
-            elif action == self.class_well_IGM_reload:
-                costumer = 'ООО Башнефть-добыча'
-                self.reload_class_well(costumer, 'ИГМ')
+        elif action == self.class_well_IGM_reload:
+            costumer = 'ООО Башнефть-добыча'
+            self.reload_class_well(costumer, 'ИГМ')
 
         elif action == self.application_pvr:
             self.work_plan = 'application_pvr'
