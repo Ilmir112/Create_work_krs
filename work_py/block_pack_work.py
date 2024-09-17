@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QComboBo
     QMainWindow, QPushButton
 
 import well_data
-from main import MyWindow
+from main import MyMainWindow
 from .acid_paker import CheckableComboBox
 from .alone_oreration import volume_vn_ek
 from .rir import RirWindow
@@ -15,7 +15,7 @@ from .rir import TabPage_SO_rir
 
 class TabPage_SO_block(QWidget):
     def __init__(self, parent=None):
-        super().__init__(parent)
+        super().__init__()
 
         self.validator = QIntValidator(0, 80000)
 
@@ -134,10 +134,10 @@ class TabWidget(QTabWidget):
         super().__init__()
         self.addTab(TabPage_SO_block(self), 'отсыпка')
 
-class BlockPackWindow(QMainWindow):
+class BlockPackWindow(MyMainWindow):
     work_sand_window = None
     def __init__(self, ins_ind, table_widget, parent=None):
-        super(QMainWindow, self).__init__(parent)
+        super().__init__()
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
 
@@ -177,7 +177,7 @@ class BlockPackWindow(QMainWindow):
         work_list = self.block_pack_work(current_edit, pero_combo_QCombo,
                               type_of_block_processing_combo, block_volume_edit, oil_volume_edit, fluid_new_edit, block_type_edit)
 
-        MyWindow.populate_row(self, self.ins_ind, work_list, self.table_widget)
+        self.populate_row(self.ins_ind, work_list, self.table_widget)
         well_data.pause = False
         self.close()
 

@@ -1,6 +1,6 @@
 import sqlite3
 from datetime import datetime
-
+from main import MyMainWindow
 import psycopg2
 from PyQt5.QtWidgets import QInputDialog, QMainWindow, QTabWidget, QWidget, QTableWidget, QApplication, QLabel, \
     QLineEdit, QGridLayout, QComboBox, QPushButton, QMessageBox
@@ -130,19 +130,7 @@ class TabPageDp(QWidget):
             self.previous_well_combo.clear()
             self.previous_well_combo.addItems(list(map(str, well_previus_list)))
 
-            # conn = sqlite3.connect('data_base\data_base_gnkt\gnkt_base.dp')
-            # cursor = conn.cursor()
-            # if 'ойл-сервис' in well_data.contractor.lower():
-            #     contractor = 'oil_service'
-            #
-            # cursor.execute(f"SELECT * FROM gnkt_{contractor} WHERE gnkt_number =?", (gnkt_number,))
-            #
-            # result_gnkt = cursor.fetchone()
-            #
-            # self.lenght_gnkt_edit.setText(f'{result_gnkt[3]}')
-            # self.iznos_gnkt_edit.setText(f'{result_gnkt[5]}')
-            # self.pipe_mileage_edit.setText(f'{result_gnkt[6]}')
-            # self.pvo_number_edit.setText(f'{result_gnkt[10]}')
+
 
 
 
@@ -153,9 +141,9 @@ class TabWidget(QTabWidget):
         self.addTab(TabPageDp(), 'Данные по ГНКТ')
 
 
-class GnktOsvWindow2(QMainWindow):
+class GnktOsvWindow2(MyMainWindow):
     def __init__(self, parent=None):
-        super(QMainWindow, self).__init__(parent)
+        super().__init__()
 
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
@@ -404,7 +392,7 @@ class GnktOsvWindow2(QMainWindow):
         if self.wb:
             self.wb.remove(self.wb['Sheet'])
 
-            main.MyWindow.saveFileDialog(self, self.wb, full_path)
+            self.saveFileDialog(self.wb, full_path)
 
             self.wb.close()
             print(f"Table data saved to Excel {full_path} {well_data.number_dp}")

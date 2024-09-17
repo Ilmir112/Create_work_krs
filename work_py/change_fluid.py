@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, 
 
 import well_data
 from H2S import calv_h2s
+from main import MyMainWindow
 from work_py.alone_oreration import  need_h2s
 from .rationingKRS import well_volume_norm
 
@@ -177,9 +178,9 @@ class TabWidget(QTabWidget):
         self.addTab(TabPage_SO_change(self), 'Смена объема')
 
 
-class Change_fluid_Window(QMainWindow):
+class Change_fluid_Window(MyMainWindow):
     def __init__(self, ins_ind, table_widget, parent=None):
-        super(QMainWindow, self).__init__(parent)
+        super().__init__()
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
         self.table_widget = table_widget
@@ -195,7 +196,7 @@ class Change_fluid_Window(QMainWindow):
         vbox.addWidget(self.buttonAdd, 2, 0)
 
     def add_work(self):
-        from main import MyWindow
+        from main import MyMainWindow
         if well_data.plast_project:
             plast_new_combo = str(self.tabWidget.currentWidget().plast_new_combo.currentText())
         else:
@@ -274,7 +275,7 @@ class Change_fluid_Window(QMainWindow):
 
 
         work_list = self.fluid_change(plast_new_combo, fluid_new_edit, pressuar_new_edit)
-        MyWindow.populate_row(self, self.ins_ind, work_list, self.table_widget)
+        self.populate_row(self.ins_ind, work_list, self.table_widget)
         well_data.pause = False
         self.close()
 

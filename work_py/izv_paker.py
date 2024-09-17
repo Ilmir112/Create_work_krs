@@ -8,7 +8,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QLineEdit, QComboBox, QGridLayout, QTabWidget, \
     QTableWidget, QHeaderView, QPushButton, QTableWidgetItem, QApplication, QMainWindow
 
-from main import MyWindow
+from main import MyMainWindow
 from work_py.alone_oreration import well_volume
 from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
 from work_py.rir import RirWindow
@@ -17,7 +17,7 @@ from  work_py.opressovka import TabPage_SO
 
 class TabPage_SO_paker_izv(QWidget):
     def __init__(self, parent=None):
-        super().__init__(parent)
+        super().__init__()
 
         self.validator = QIntValidator(0, 80000)
 
@@ -175,9 +175,9 @@ class TabWidget(QTabWidget):
         self.addTab(TabPage_SO_paker_izv(), 'извлекаемый пакер')
 
 
-class PakerIzvlek(MyWindow):
+class PakerIzvlek(MyMainWindow):
     def __init__(self, ins_ind, table_widget, parent=None):
-        super(MyWindow, self).__init__(parent)
+        super().__init__()
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
 
@@ -249,11 +249,11 @@ class PakerIzvlek(MyWindow):
                 mes = QMessageBox.warning(self, 'Некорректные данные', f'Компоновка НКТ c хвостовик + пакер '
                                                                        f'ниже текущего забоя')
                 return
-            if MyWindow.check_true_depth_template(self, paker_depth_line) is False:
+            if self.check_true_depth_template(paker_depth_line) is False:
                 return
-            if MyWindow.true_set_Paker(self, paker_depth_line) is False:
+            if self.true_set_Paker( paker_depth_line) is False:
                 return
-            if MyWindow.check_depth_in_skm_interval(self, paker_depth_line) is False:
+            if self.check_depth_in_skm_interval(paker_depth_line) is False:
                 return
 
 
@@ -262,7 +262,7 @@ class PakerIzvlek(MyWindow):
         else:
             raid_list = PakerIzvlek.izvlech_paker(self, pero_diametr_line, paker_depth_line, current_bottom)
 
-        MyWindow.populate_row(self, self.ins_ind, raid_list, self.table_widget)
+        self.populate_row(self.ins_ind, raid_list, self.table_widget)
         well_data.pause = False
         self.close()
 

@@ -2,12 +2,12 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.Qt import *
 
 import well_data
-from main import MyWindow
+from main import MyMainWindow
 
 
 class TabPage_SO(QWidget):
     def __init__(self, parent=None):
-        super().__init__(parent)
+        super().__init__()
 
         self.labelType = QLabel("Кровля записи", self)
         self.lineedit_type = QLineEdit(self)
@@ -52,10 +52,10 @@ class TabWidget(QTabWidget):
         self.addTab(TabPage_SO(self), 'Перфорация')
 
 
-class GeophysicWindow(MyWindow):
+class GeophysicWindow(MyMainWindow):
 
     def __init__(self, table_widget, ins_ind, parent=None):
-        super(MyWindow, self).__init__(parent)
+        super().__init__()
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
         self.table_widget = table_widget
@@ -220,7 +220,7 @@ class GeophysicWindow(MyWindow):
             row = self.ins_ind + i
             self.table_widget.insertRow(row)
             row_max = self.table_widget.rowCount()
-            MyWindow.insert_data_in_database(self, row, row_max)
+            self.insert_data_in_database(row, row_max)
             # lst = [1, 0, 2, len(geophysicalResearch)-1]
             # if float(well_data.max_angle._value) >= 50:
             #     lst.extend([3, 4])

@@ -23,11 +23,11 @@ from openpyxl.utils import get_column_letter, range_boundaries
 
 
 from PIL import Image
-from main import MyWindow
+from main import MyMainWindow
 from work_py.advanted_file import definition_plast_work
 
 
-class Classifier_well(QMainWindow):
+class Classifier_well(MyMainWindow):
     number_well = None
 
     def __init__(self, costumer, region, classifier_well, parent=None):

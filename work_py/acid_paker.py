@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import QVBoxLayout, QStyledItemDelegate, qApp, QMessageBox,
 import well_data
 
 from work_py.alone_oreration import volume_vn_nkt, well_volume, kot_work
-from main import MyWindow
+from main import MyMainWindow
 
 from .rationingKRS import descentNKT_norm, well_volume_norm, liftingNKT_norm
 from .swabbing import Swab_Window
@@ -170,7 +170,7 @@ class CheckableComboBoxChild(QComboBox):
 class TabPage_SO_acid(QWidget):
     def __init__(self, tableWidget, parent=None):
 
-        super().__init__(parent)
+        super().__init__()
         self.le = QLineEdit()
         self.grid = QGridLayout(self)
         self.tableWidget = tableWidget
@@ -721,10 +721,10 @@ class TabWidget(QTabWidget):
         self.addTab(TabPage_SO_acid(tableWidget), 'Кислотная обработка')
 
 
-class AcidPakerWindow(QMainWindow):
+class AcidPakerWindow(MyMainWindow):
 
     def __init__(self, ins_ind, table_widget, parent=None):
-        super().__init__(parent)
+        super().__init__()
         self.setWindowFlags(Qt.WindowFlags(Qt.WindowModal))
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
@@ -801,11 +801,11 @@ class AcidPakerWindow(QMainWindow):
                                               f'Компоновка ниже {paker_khost + paker_depth}м текущего забоя '
                                               f'{well_data.current_bottom}м')
                 return
-            if MyWindow.check_true_depth_template(self, paker_depth) is False:
+            if self.check_true_depth_template(paker_depth) is False:
                 return
-            if MyWindow.true_set_Paker(self, paker_depth) is False:
+            if self.true_set_Paker(paker_depth) is False:
                 return
-            if MyWindow.check_depth_in_skm_interval(self, paker_depth) is False:
+            if self.check_depth_in_skm_interval(paker_depth) is False:
                 return
 
             self.tableWidget.insertRow(rows)
@@ -823,17 +823,17 @@ class AcidPakerWindow(QMainWindow):
             paker_khost = self.if_None((self.tabWidget.currentWidget().paker_khost.text()))
             paker_depth = int(self.if_None(self.tabWidget.currentWidget().paker_depth.text()))
             paker2_depth = int(self.if_None(self.tabWidget.currentWidget().paker2_depth.text()))
-            if MyWindow.check_true_depth_template(self, paker_depth) is False:
+            if self.check_true_depth_template(paker_depth) is False:
                 return
-            if MyWindow.true_set_Paker(self, paker_depth) is False:
+            if self.true_set_Paker(paker_depth) is False:
                 return
-            if MyWindow.check_depth_in_skm_interval(self, paker_depth) is False:
+            if self.check_depth_in_skm_interval(paker_depth) is False:
                 return
-            if MyWindow.check_true_depth_template(self, paker2_depth) is False:
+            if self.check_true_depth_template(paker2_depth) is False:
                 return
-            if MyWindow.true_set_Paker(self, paker2_depth) is False:
+            if self.true_set_Paker( paker2_depth) is False:
                 return
-            if MyWindow.check_depth_in_skm_interval(self, paker2_depth) is False:
+            if self.check_depth_in_skm_interval(paker2_depth) is False:
                 return
 
             if well_data.current_bottom < float(paker_khost + paker2_depth):
@@ -904,11 +904,11 @@ class AcidPakerWindow(QMainWindow):
                     mes = QMessageBox.warning(self, 'ОШИБКА', 'Длина хвостовика и пакера ниже текущего забоя')
                     return
 
-                if MyWindow.check_true_depth_template(self, paker_depth_zumpf) is False:
+                if self.check_true_depth_template(paker_depth_zumpf) is False:
                     return
-                if MyWindow.true_set_Paker(self, paker_depth_zumpf) is False:
+                if self.true_set_Paker( paker_depth_zumpf) is False:
                     return
-                if MyWindow.check_depth_in_skm_interval(self, paker_depth_zumpf) is False:
+                if self.check_depth_in_skm_interval(paker_depth_zumpf) is False:
                     return
 
             else:
@@ -1076,11 +1076,11 @@ class AcidPakerWindow(QMainWindow):
                 return
 
             if self.paker_layout_combo == 'однопакерная' or self.paker_layout_combo == 'пакер с заглушкой':
-                if MyWindow.true_set_Paker(self, paker_depth_swab) is False:
+                if self.true_set_Paker( paker_depth_swab) is False:
                     return
-                if MyWindow.check_depth_in_skm_interval(self, paker_depth_swab) is False:
+                if self.check_depth_in_skm_interval(paker_depth_swab) is False:
                     return
-                if MyWindow.check_true_depth_template(self, paker_depth_swab) is False:
+                if self.check_true_depth_template(paker_depth_swab) is False:
                     return
 
                 swab_work_list = Swab_Window.swabbing_with_paker(self, diametr_paker, paker_depth_swab, paker_khost,
@@ -1092,19 +1092,19 @@ class AcidPakerWindow(QMainWindow):
 
             elif self.paker_layout_combo == 'двухпакерная':
                 paker_depth_swab = int(self.tabWidget.currentWidget().swab_paker_depth.text())
-                if MyWindow.check_true_depth_template(self, paker_depth_swab) is False:
+                if self.check_true_depth_template(paker_depth_swab) is False:
                     return
-                if MyWindow.true_set_Paker(self, paker_depth_swab) is False:
+                if self.true_set_Paker( paker_depth_swab) is False:
                     return
-                if MyWindow.check_depth_in_skm_interval(self, paker_depth_swab) is False:
+                if self.check_depth_in_skm_interval(paker_depth_swab) is False:
                     return
 
                 paker_depth2_swab = paker_depth_swab - (paker_depth - paker2_depth)
-                if MyWindow.check_true_depth_template(self, paker_depth2_swab) is False:
+                if self.check_true_depth_template(paker_depth2_swab) is False:
                     return
-                if MyWindow.true_set_Paker(self, paker_depth2_swab) is False:
+                if self.true_set_Paker( paker_depth2_swab) is False:
                     return
-                if MyWindow.check_depth_in_skm_interval(self, paker_depth2_swab) is False:
+                if self.check_depth_in_skm_interval(paker_depth2_swab) is False:
                     return
 
                 swab_work_list = Swab_Window.swabbing_with_2paker(self, diametr_paker, paker_depth_swab,
@@ -1131,7 +1131,7 @@ class AcidPakerWindow(QMainWindow):
                                        liftingNKT_norm(well_data.current_bottom, 1)])
         if well_data.region == 'ТГМ' and well_data.curator == 'ОР' and well_data.dict_pump_ECN == 0:
             work_template_list.extend(kot_work(self, well_data.current_bottom))
-        MyWindow.populate_row(self, self.ins_ind, work_template_list, self.table_widget)
+        self.populate_row(self.ins_ind, work_template_list, self.table_widget)
         well_data.pause = False
         self.close()
 

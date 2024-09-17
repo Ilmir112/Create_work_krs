@@ -7,13 +7,13 @@ from PyQt5.QtGui import QIntValidator, QDoubleValidator
 from PyQt5.QtWidgets import QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QTabWidget, QMainWindow, QPushButton, \
     QMessageBox, QApplication, QTableWidget, QTableWidgetItem, QVBoxLayout, QHeaderView
 
-
+from main import  MyMainWindow
 
 
 class TabPage_SO_pvr(QWidget):
 
     def __init__(self, parent=None):
-        super().__init__(parent)
+        super().__init__()
         self.validator_int = QIntValidator(0, 600)
         self.validator_float = QDoubleValidator(0.87, 1.65, 2)
 
@@ -136,10 +136,10 @@ class TabWidget(QTabWidget):
         super().__init__()
         self.addTab(TabPage_SO_pvr(self), 'Заявка на ГИС')
 
-class GisApplication(QMainWindow):
+class GisApplication( MyMainWindow):
 
     def __init__(self, table_pvr, parent=None):
-        super(QMainWindow, self).__init__()
+        super( MyMainWindow, self).__init__()
 
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
@@ -299,7 +299,7 @@ class GisApplication(QMainWindow):
                 ws.row_dimensions[row_ind+1].hidden = True
 
     def add_work(self):
-        from main import MyWindow
+        from main import  MyMainWindow
 
         wb = openpyxl.load_workbook(f'{well_data.path_image}property_excel/template_gis.xlsx')
 
@@ -378,7 +378,7 @@ class GisApplication(QMainWindow):
 
         self.copy_pvr(self.ws_pvr, work_list)
 
-        # MyWindow.copy_pz(self, self.ws_pvr, self.table_pvr, 'application_pvr', 42)
+        #  MyMainWindow.copy_pz(self, self.ws_pvr, self.table_pvr, 'application_pvr', 42)
 
         well_data.pause = False
         self.close()
@@ -391,7 +391,7 @@ class GisApplication(QMainWindow):
         full_path = path + "/" + filenames
         if wb:
             wb.close()
-            MyWindow.saveFileDialog(self, wb, full_path)
+            self.saveFileDialog(wb, full_path)
             # wb2.save(full_path)
             print(f"Table data saved to Excel {full_path} {well_data.number_dp}")
         if wb:

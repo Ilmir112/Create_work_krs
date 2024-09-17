@@ -10,14 +10,14 @@ from openpyxl.workbook import Workbook
 
 from category_correct import CategoryWindow
 from data_correct import DataWindow
-from main import ExcelWorker, MyWindow
+from main import ExcelWorker, MyMainWindow, MyWindow
 from perforation_correct import PerforationCorrect
 
 from well_data import ProtectedIsDigit, ProtectedIsNonNone
 from work_py.advanted_file import definition_plast_work
 
 
-class FindIndexPZ(QMainWindow):
+class FindIndexPZ(MyMainWindow):
     wb_pvr = Workbook()
 
     def __init__(self, ws):
@@ -88,25 +88,25 @@ class FindIndexPZ(QMainWindow):
         if well_data.cat_well_max._value == 0:
             QMessageBox.warning(self, 'Ошибка', 'Не корректный файл excel, либо отсутствует строка с '
                                                 'текстом ПЛАН-ЗАКАЗ или ПЛАН-РАБОТ')
-            MyWindow.pause_app()
+            self.pause_app()
             return
 
         if well_data.cat_well_min._value == 0:
             QMessageBox.warning(self, 'индекс начала копирования',
                                 'Программа не смогла определить строку начала копирования, нужно '
                                 'добавить "Категория скважины" в ПЗ для определения начала копирования')
-            MyWindow.pause_app()
+            self.pause_app()
             return
         if well_data.data_well_max._value == 0:
             QMessageBox.warning(self, 'индекс окончания копирования',
                                 'Программа не смогла определить строку с IX. Мероприятия по предотвращению аварий '
                                 'нужно добавить "IX. Мероприятия по предотвращению аварии" в ПЗ')
-            MyWindow.pause_app()
+            self.pause_app()
             return
         if well_data.data_well_min._value == 0:
             QMessageBox.warning(self, 'индекс начала строки после план заказ',
                                 'Программа не смогла найти начала строку с названием "План работ" или "план заказ"')
-            MyWindow.pause_app()
+            self.pause_app()
             return
 
         if well_data.sucker_rod_none:
@@ -117,41 +117,41 @@ class FindIndexPZ(QMainWindow):
                     well_data.sucker_rod_ind = ProtectedIsDigit(0)
                 else:
                     QMessageBox.information(self, 'ШТАНГИ', 'Нужно добавить "ШТАНГИ" в таблицу?')
-                    MyWindow.pause_app()
+                    self.pause_app()
                     return
 
         if well_data.data_x_max._value == 0:
             QMessageBox.warning(self, 'индекс окончания копирования ожидаемых показателей',
                                 'Программа не смогла определить строку окончания копирования'
                                 ' ожидаемых показателей "ХI Планируемый объём работ"')
-            MyWindow.pause_app()
+            self.pause_app()
             return
 
         if well_data.data_x_min._value == 0:
             QMessageBox.warning(self, 'индекс начала копирования ожидаемых показателей',
                                 'Программа не смогла определить строку начала копирования ожидаемых показателей')
-            MyWindow.pause_app()
+            self.pause_app()
             return
 
         if well_data.data_pvr_max._value == 0:
             QMessageBox.warning(self, 'индекс историю',
                                 'Программа не смогла найти "II. История эксплуатации скважины"')
-            MyWindow.pause_app()
+            self.pause_app()
             return
 
         if well_data.pipes_ind._value == 0:
             QMessageBox.warning(self, 'индекс начала строки с НКТ',
                                 'Программа не смогла найти строку с НКТ, необходимо проверить столбец В')
-            MyWindow.pause_app()
+            self.pause_app()
             return
         if well_data.data_pvr_min._value == 0:
             QMessageBox.warning(self, 'индекс начала начала ПВР', 'Программа не смогла найти индекс начала ПВР')
-            MyWindow.pause_app()
+            self.pause_app()
             return
         if well_data.data_fond_min._value == 0:
             QMessageBox.warning(self, 'индекс начала строки с таблицей фондовыго оборудования',
                                 'Программа не смогла найти строку с таблицей фондового оборудования')
-            MyWindow.pause_app()
+            self.pause_app()
             return
         if well_data.type_kr == '':
             QMessageBox.information(self, 'Вид ГТМ', 'Приложение не смогло найти тип КР, '
@@ -161,13 +161,13 @@ class FindIndexPZ(QMainWindow):
                 self, 'индекс копирования',
                 'Программа не смогла определить строку n\ III. '
                 'Состояние скважины к началу ремонта ')
-            MyWindow.pause_app()
+            self.pause_app()
             return
         if well_data.type_kr in ['', None]:
             well_data.check_data_in_pz.append('Не указан Вид и категория ремонта, его шифр\n')
 
     def check_str_None(self, string):
-        from main import MyWindow
+        from main import MyMainWindow
         try:
             if MyWindow.check_str_isdigit(self, str(string)) is True:
                 if str(round(float(str(string).replace(',', '.')), 1))[-1] == "0":
@@ -248,7 +248,7 @@ class WellNkt(FindIndexPZ):
         if a_plan == 0:
             mes = QMessageBox.warning(self, 'Индекс планового НКТ',
                                       'Программа не могла определить начала строку с ПЗ НКТ - план')
-            MyWindow.pause_app()
+            self.pause_app()
             return
 
         for row in range(begin_index, cancel_index + 1):
@@ -304,7 +304,7 @@ class WellSucker_rod(FindIndexPZ):
                 if well_data.sucker_rod_none == True:
                     sucker_rod_question = QMessageBox.warning(self, 'Индекс планового НКТ',
                                                               'Программа не могла определить начала строку с ПЗ штанги - план')
-                    MyWindow.pause_app()
+                    self.pause_app()
                     return
             # print(f'б {b_plan}')
 
@@ -321,7 +321,7 @@ class WellSucker_rod(FindIndexPZ):
                         except:
                             mes = QMessageBox.warning(self, 'Ошибка', 'Ошибка в определении длины штанг до ремонта, '
                                                                       'скорректируйте план заказ')
-                            MyWindow.pause_app()
+                            self.pause_app()
                             break
 
                             return
@@ -332,7 +332,7 @@ class WellSucker_rod(FindIndexPZ):
                         except:
                             mes = QMessageBox.warning(self, 'Ошибка', 'Ошибка в определении длины штанг до ремонта, '
                                                                       'скорректируйте план заказ')
-                            MyWindow.pause_app()
+                            self.pause_app()
                             break
 
                             return
@@ -594,7 +594,7 @@ class WellCondition(FindIndexPZ):
         # self.read_well(ws, well_data.condition_of_wells._value, well_data.data_well_max._value)
 
     def read_well(self, ws, begin_index, cancel_index):
-        from main import MyWindow
+        from main import MyMainWindow
 
         well_data.static_level = ProtectedIsNonNone('не корректно')
         well_data.dinamic_level = ProtectedIsNonNone('не корректно')
@@ -663,13 +663,13 @@ class WellCondition(FindIndexPZ):
         if well_data.dict_pump_SHGN["do"] != '0' and len(well_data.dict_sucker_rod) == 0:
             QMessageBox.warning(self, 'ОШИБКА', f'при спущенном насосе {well_data.dict_pump_SHGN["do"]} '
                                                 f'не указаны штанги, либо не корректно прочитаны данные ')
-            MyWindow.pause_app()
+            self.pause_app()
 
             return
         if well_data.dict_pump_SHGN["posle"] != '0' and len(well_data.dict_sucker_rod_po) == 0:
             QMessageBox.warning(self, 'ОШИБКА', f'при плановом насосе {well_data.dict_pump_SHGN["do"]} '
                                                 f'не указаны штанги, либо не корректно прочитаны данные ')
-            MyWindow.pause_app()
+            self.pause_app()
 
             return
 
@@ -772,7 +772,7 @@ class WellData(FindIndexPZ):
                                            f'В базе имеются план работ по скважине:\n {number}. '
                                            f'При продолжении план пересохранится, продолжить?')
                 if mes == QMessageBox.StandardButton.No:
-                    MyWindow.pause_app()
+                    self.pause_app()
                     return
 
 
@@ -785,7 +785,7 @@ class Well_data(FindIndexPZ):
         # self.read_well(self.ws, well_data.cat_well_max._value, well_data.data_pvr_min._value)
 
     def read_well(self, ws, begin_index, cancel_index):
-        from main import MyWindow
+        from main import MyMainWindow
 
         well_data.bottomhole_drill = ProtectedIsNonNone('не корректно')
         well_data.bottomhole_artificial = ProtectedIsNonNone('не корректно')
@@ -1036,7 +1036,7 @@ class Well_data(FindIndexPZ):
             self.data_window.setGeometry(100, 100, 300, 400)
 
             self.data_window.show()
-            MyWindow.pause_app()
+            self.pause_app()
             well_data.pause = True
             self.data_window = None
 
@@ -1120,7 +1120,7 @@ class Well_perforation(FindIndexPZ):
 
     def read_well(self, ws, begin_index, cancel_index):
         from work_py.alone_oreration import is_number, calculationFluidWork
-        from main import MyWindow
+        from main import MyMainWindow
         # print(f'перфорация доп {well_data.dict_perforation}')
         well_data.old_version = True
         col_old_open_index = 0
@@ -1253,7 +1253,7 @@ class Well_perforation(FindIndexPZ):
                 mes = QMessageBox.warning(self, 'ОШИБКА',
                                           F'Приложение не смогло определить индекс пласта в строке {row_index}')
                 well_data.pause = True
-                MyWindow.pause_app()
+                self.pause_app()
 
             for ind, row in enumerate(perforations_intervals):
                 plast = row[col_plast_index].strip()
@@ -1409,7 +1409,7 @@ class Well_perforation(FindIndexPZ):
             # self.perforation_correct_window2.setGeometry(200, 400, 100, 400)
 
             self.perforation_correct_window2.show()
-            MyWindow.pause_app()
+            self.pause_app()
             well_data.pause = True
             self.perforation_correct_window2 = None
             definition_plast_work(self)
@@ -1429,7 +1429,7 @@ class Well_Category(FindIndexPZ):
         # self.read_well(ws, well_data.cat_well_min._value, well_data.data_well_min._value)
 
     def read_well(self, ws, begin_index, cancel_index):
-        from main import MyWindow
+        from main import MyMainWindow
         if well_data.data_in_base is False:
 
             for row in range(begin_index, cancel_index):
@@ -1505,7 +1505,7 @@ class Well_Category(FindIndexPZ):
                 self.data_window.setWindowTitle("Сверка данных")
                 # self.data_window.setGeometry(200, 200, 200, 200)
                 self.data_window.show()
-                MyWindow.pause_app()
+                self.pause_app()
                 well_data.pause = True
             else:
                 self.data_window.close()

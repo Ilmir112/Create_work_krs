@@ -9,13 +9,13 @@ from PyQt5.QtCore import Qt
 from .rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
 from work_py.alone_oreration import kot_work
 from PyQt5.QtGui import QDoubleValidator
-from main import MyWindow
+from main import  MyMainWindow
 
 
 class TabPage_SO_with(QWidget):
     def __init__(self, parent=None):
 
-        super().__init__(parent)
+        super().__init__()
 
         validator = QDoubleValidator(0.0, 80000.0, 2)
 
@@ -914,7 +914,7 @@ class TabWidget(QTabWidget):
         self.addTab(TabPage_SO_with(self), 'Выбор компоновки шаблонов')
 
 
-class TemplateKrs(QMainWindow):
+class TemplateKrs( MyMainWindow):
 
     def __init__(self, ins_ind, table_widget, parent=None):
         super().__init__()
@@ -1097,7 +1097,7 @@ class TemplateKrs(QMainWindow):
         if skm_tuple not in well_data.skm_interval:
             well_data.skm_interval.extend(skm_list)
 
-        MyWindow.populate_row(self, self.ins_ind, work_template_list, self.table_widget)
+        self.populate_row(self.ins_ind, work_template_list, self.table_widget)
         well_data.pause = False
         self.close()
 

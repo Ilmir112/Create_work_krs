@@ -3,12 +3,12 @@ from PyQt5.QtWidgets import QInputDialog, QWidget, QLabel, QLineEdit, QComboBox,
     QMessageBox
 
 import well_data
-from main import MyWindow
+from main import MyMainWindow
 from .rationingKRS import descentNKT_norm, liftingNKT_norm
 
 class TabPage_SO_lar(QWidget):
     def __init__(self, parent=None):
-        super().__init__(parent)
+        super().__init__()
 
         self.po_type_label = QLabel("Прихваченное оборудование", self)
         self.po_type_combo = QComboBox(self)
@@ -96,10 +96,10 @@ class TabWidget(QTabWidget):
         self.addTab(TabPage_SO_lar(), 'ловильные работы')
 
 
-class Emergency_po(MyWindow):
+class EmergencyPo(MyMainWindow):
 
     def __init__(self, ins_ind, table_widget, parent=None):
-        super(MyWindow, self).__init__(parent)
+        super(EmergencyPo, self).__init__()
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
 
@@ -153,7 +153,7 @@ class Emergency_po(MyWindow):
                                            emergency_bottom_line, bottom_line)
         well_data.current_bottom = bottom_line
 
-        MyWindow.populate_row(self, self.ins_ind, raid_list, self.table_widget)
+        self.populate_row(self.ins_ind, raid_list, self.table_widget)
         well_data.pause = False
         self.close()
 

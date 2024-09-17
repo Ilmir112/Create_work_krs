@@ -8,7 +8,7 @@ import plan
 import well_data
 
 from openpyxl.styles import Font, Alignment
-from main import MyWindow
+from main import MyMainWindow
 
 
 def skm_interval(self, template):

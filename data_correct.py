@@ -3,12 +3,14 @@ import re
 
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.Qt import *
+
+from main import MyMainWindow
 from perforation_correct import FloatLineEdit
 
 
 class TabPage_SO_correct(QWidget):
     def __init__(self, parent=None):
-        super().__init__(parent)
+        super().__init__()
 
         self.labels_nkt = {}
         self.labels_nkt_po = {}
@@ -699,7 +701,7 @@ class TabWidget(QTabWidget):
         self.addTab(TabPage_SO_correct(self), 'Проверка корректности данных')
 
 
-class DataWindow(QMainWindow):
+class DataWindow(MyMainWindow):
 
     def __init__(self, parent=None):
         super(DataWindow, self).__init__()

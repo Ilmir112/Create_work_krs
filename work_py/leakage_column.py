@@ -3,11 +3,12 @@ from PyQt5.Qt import *
 from PyQt5.QtGui import QIntValidator, QDoubleValidator
 
 import well_data
+from main import MyMainWindow
 
 
 class TabPage_SO_leakage(QWidget):
     def __init__(self, parent=None):
-        super().__init__(parent)
+        super().__init__()
         self.validator = QDoubleValidator(0, 8000, 1)
 
         self.roof_leakage_label = QLabel("Кровля", self)
@@ -43,11 +44,11 @@ class TabWidget(QTabWidget):
         super().__init__()
         self.addTab(TabPage_SO_leakage(self), 'Негерметичность')
 
-class LeakageWindow(QMainWindow):
+class LeakageWindow(MyMainWindow):
 
     def __init__(self, parent=None):
 
-        super(LeakageWindow, self).__init__(parent)
+        super(LeakageWindow, self).__init__()
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
 

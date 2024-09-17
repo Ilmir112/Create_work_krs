@@ -9,7 +9,7 @@ from openpyxl.workbook import Workbook
 from block_name import region
 from property_excel.property_excel_pvr import boundaries, rowHeights1, colWidth
 
-from main import MyWindow
+from main import MyMainWindow, MyMainWindow
 from plan import copy_true_ws
 import well_data
 import sys
@@ -20,7 +20,7 @@ from work_py.perforation import PerforationWindow
 class TabPage_SO_pvr(QWidget):
 
     def __init__(self, parent=None):
-        super().__init__(parent)
+        super().__init__()
         self.validator_int = QIntValidator(0, 600)
         self.validator_float = QDoubleValidator(0.87, 1.65, 2)
 
@@ -160,9 +160,9 @@ class TabWidget(QTabWidget):
         self.addTab(TabPage_SO_pvr(self), 'Заявка на ПВР')
 
 
-class PvrApplication(QMainWindow):
+class PvrApplication(MyMainWindow):
     def __init__(self, table_pvr, parent=None):
-        super(QMainWindow, self).__init__()
+        super().__init__()
         layout = QVBoxLayout()
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
@@ -263,7 +263,7 @@ class PvrApplication(QMainWindow):
                 ws.row_dimensions[row_ind+1].hidden = True
 
     def add_work(self):
-        from main import MyWindow
+        
 
         wb = openpyxl.load_workbook(f'{well_data.path_image}property_excel/template_pvr.xlsx')
         # Выбираем активный лист
@@ -324,7 +324,7 @@ class PvrApplication(QMainWindow):
         full_path = path + "/" + filenames
         if wb:
             wb.close()
-            MyWindow.saveFileDialog(self, wb, full_path)
+            self.saveFileDialog(wb, full_path)
             # wb2.save(full_path)
             print(f"Table data saved to Excel {full_path} {well_data.number_dp}")
         if wb:

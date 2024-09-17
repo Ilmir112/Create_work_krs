@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QInputDialog, QWidget, QLabel, QComboBox, QLineEdit,
     QGridLayout, QMessageBox
 
 import well_data
+from main import MyMainWindow
 from .rationingKRS import descentNKT_norm, liftingNKT_norm,well_volume_norm
 from .template_work import TemplateKrs
 
@@ -101,9 +102,9 @@ class TabWidget(QTabWidget):
         self.addTab(TabPage_SO_kompress(self), 'Освоение компрессором')
 
 
-class Kompress_Window(QMainWindow):
+class KompressWindow(MyMainWindow):
     def __init__(self, ins_ind, table_widget, parent=None):
-        super(QMainWindow, self).__init__(parent)
+        super().__init__()
 
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
@@ -120,7 +121,7 @@ class Kompress_Window(QMainWindow):
         vbox.addWidget(self.buttonAdd, 2, 0)
 
     def add_work(self):
-        from main import MyWindow
+        from main import MyMainWindow
 
         kompress_true_combo = self.tabWidget.currentWidget().kompress_true_combo.currentText()
         depth_gauge_combo = self.tabWidget.currentWidget().depth_gauge_combo.currentText()
@@ -152,7 +153,7 @@ class Kompress_Window(QMainWindow):
         else:
             pass
 
-        MyWindow.populate_row(self, self.ins_ind, work_list, self.table_widget)
+        self.populate_row(self.ins_ind, work_list, self.table_widget)
         well_data.pause = False
         self.close()
 

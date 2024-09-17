@@ -6,7 +6,7 @@ from PyQt5 import QtWidgets
 import well_data
 from cdng import events_gnvp_frez
 from krs import GnoWindow
-from main import MyWindow
+from main import MyMainWindow
 from work_py.acid_paker import CheckableComboBox, AcidPakerWindow
 from gnkt_data import gnkt_data
 from collections import namedtuple
@@ -16,7 +16,7 @@ class TabPage_gnkt(QWidget):
 
     def __init__(self, parent=None):
         from krs import volume_jamming_well
-        super().__init__(parent)
+        super().__init__()
 
         self.validator_int = QIntValidator(0, 8000)
         self.validator_float = QDoubleValidator(0, 8000, 2)
@@ -177,10 +177,10 @@ class TabWidget(QTabWidget):
         self.addTab(TabPage_gnkt(self), 'ГНКТ БОПЗ')
 
 
-class GnktBopz(QMainWindow):
+class GnktBopz(MyMainWindow):
 
     def __init__(self, table_widget, gnkt_number_combo, fluid_edit, parent=None): #
-        super(GnktBopz, self).__init__(parent=None)
+        super(GnktBopz, self).__init__()
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
 

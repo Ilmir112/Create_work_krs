@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QComboBo
 from datetime import datetime
 
 import well_data
+from main import MyMainWindow
 from work_py.alone_oreration import lifting_unit, weigth_pipe, volume_pod_NKT, pvo_gno, volume_jamming_well
 from work_py.mkp import mkp_revision_1_kateg
 from work_py.rationingKRS import liftingNKT_norm
@@ -169,10 +170,10 @@ class TabWidget(QTabWidget):
         self.addTab(TabPageGno(work_plan), 'Подьем ГНО')
 
 
-class GnoWindow(QMainWindow):
+class GnoWindow(MyMainWindow):
     def __init__(self, ins_ind, table_widget, work_plan, parent=None):
 
-        super(GnoWindow, self).__init__(parent)
+        super(GnoWindow, self).__init__()
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
         self.ins_ind = ins_ind
@@ -188,7 +189,7 @@ class GnoWindow(QMainWindow):
         vbox.addWidget(self.buttonAdd, 2, 0)
 
     def add_work(self):
-        from main import MyWindow
+        from main import MyMainWindow
         from work_py.advanted_file import definition_plast_work
         try:
             self.surfactant_hydrofabizer_Combo =  self.tabWidget.currentWidget().surfactant_hydrofabizer_Combo.currentText()
@@ -217,7 +218,7 @@ class GnoWindow(QMainWindow):
 
         if check_question == QMessageBox.StandardButton.No:
             return
-        MyWindow.populate_row(self, self.ins_ind, work_list, self.table_widget)
+        self.populate_row(self.ins_ind, work_list, self.table_widget)
         well_data.current_bottom = current_bottom
 
         well_data.pause = False

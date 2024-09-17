@@ -13,6 +13,7 @@ from PyQt5.QtCore import Qt
 from datetime import datetime
 
 from data_base.work_with_base import connect_to_db
+from main  import MyMainWindow
 
 from work_py.advanted_file import definition_plast_work
 
@@ -284,10 +285,10 @@ class TabWidget(QTabWidget):
         self.addTab(TabPageDp(work_plan, tableWidget, old_index), 'Корректировка плана работ')
 
 
-class CorrectPlanWindow(QMainWindow):
+class CorrectPlanWindow(MyMainWindow):
     def __init__(self, ins_ind, table_widget, work_plan, ws=None, parent=None):
 
-        super(CorrectPlanWindow, self).__init__(parent)
+        super(CorrectPlanWindow, self).__init__()
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
         self.ins_ind = ins_ind

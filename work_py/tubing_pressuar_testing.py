@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QComboBo
     QMainWindow, QPushButton
 
 import well_data
-from main import MyWindow
+from main import MyMainWindow
 from .acid_paker import CheckableComboBox
 from .alone_oreration import volume_vn_ek
 from .rir import RirWindow
@@ -15,7 +15,7 @@ from .rir import TabPage_SO_rir
 
 class TabPage_SO_block(QWidget):
     def __init__(self, parent=None):
-        super().__init__(parent)
+        super().__init__()
 
         self.validator = QIntValidator(0, 80000)
 
@@ -77,11 +77,11 @@ class TabWidget(QTabWidget):
         self.addTab(TabPage_SO_block(self), 'Опрессовка НКТ')
 
 
-class TubingPressuarWindow(QMainWindow):
+class TubingPressuarWindow(MyMainWindow):
 
 
     def __init__(self, ins_ind, table_widget, parent=None):
-        super(QMainWindow, self).__init__(parent)
+        super().__init__()
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
 
@@ -122,7 +122,7 @@ class TubingPressuarWindow(QMainWindow):
         work_list = self.pressuar_nkt_work(current_edit, select_nkt_combo, length_nkt_edit, pressuar_edit,
                                            distance_between_nkt_edit)
 
-        MyWindow.populate_row(self, self.ins_ind, work_list, self.table_widget)
+        self.populate_row(self.ins_ind, work_list, self.table_widget)
         well_data.pause = False
         self.close()
 

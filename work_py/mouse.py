@@ -8,7 +8,7 @@ from .perforation import PerforationWindow
 class TableWidget(QTableWidget):
     perforation_window = None
     def __init__(self, parent=None):
-        super(TableWidget, self).__init__(parent)
+        super(TableWidget, self).__init__()
         self.mouse_press = None
 
         # self.on_context_menu()

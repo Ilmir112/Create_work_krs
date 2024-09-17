@@ -4,7 +4,7 @@ from datetime import datetime
 import psycopg2
 from PyQt5.QtWidgets import QInputDialog, QMainWindow, QTabWidget, QWidget, QTableWidget, QApplication, QLabel, \
     QLineEdit, QGridLayout, QComboBox, QPushButton,QMessageBox
-from main import MyWindow
+from main import MyMainWindow
 
 import well_data
 from gnkt_data.gnkt_data import gnkt_1, gnkt_2, gnkt_dict, read_database_gnkt, insert_data_base_gnkt
@@ -123,11 +123,11 @@ class TabWidget(QTabWidget):
     def __init__(self, work_plan):
         super().__init__()
         self.addTab(TabPageDp(work_plan), 'ГНКТ')
-class GnktOsvWindow(QMainWindow):
+class GnktOsvWindow(MyMainWindow):
     wb = None
 
     def __init__(self, sheet, table_title, table_schema, table_widget, work_plan):
-        super(QMainWindow, self).__init__()
+        super().__init__()
         from work_py.gnkt_frez import Work_with_gnkt
 
         self.centralWidget = QWidget()
@@ -166,7 +166,7 @@ class GnktOsvWindow(QMainWindow):
             self.work_window.setWindowTitle("Данные по ГНКТ")
             self.work_window.setGeometry(200, 400, 100, 400)
             self.work_window.show()
-            main.MyWindow.pause_app()
+            self.pause_app()
             well_data.pause = True
 
             self.work_schema = self.work_window.schema_well(self.work_window.current_bottom_edit,
@@ -209,7 +209,7 @@ class GnktOsvWindow(QMainWindow):
                 self.work_window = GnktOpz(table_widget, well_data.gnkt_number, GnktOsvWindow2.fluid_edit)
                 self.work_window.show()
                 well_data.pause = True
-                MyWindow.pause_app()
+                self.pause_app()
 
                 work_well = self.work_window.add_work()
                 well_data.pause = True
@@ -223,7 +223,7 @@ class GnktOsvWindow(QMainWindow):
                 self.work_window = GnktBopz(table_widget, well_data.gnkt_number, GnktOsvWindow2.fluid_edit)
                 self.work_window.show()
                 well_data.pause = True
-                MyWindow.pause_app()
+                self.pause_app()
 
                 work_well = self.work_window.add_work()
                 well_data.pause = True
@@ -237,7 +237,7 @@ class GnktOsvWindow(QMainWindow):
                 GnktOsvWindow2.fluid_edit, well_data.pvo, GnktOsvWindow2.current_bottom_edit,
              GnktOsvWindow2.osvoenie_combo_need)
         if work_well:
-            main.MyWindow.populate_row(self, 0, work_well, table_widget, self.work_plan)
+            self.populate_row(0, work_well, table_widget, self.work_plan)
             CreatePZ.add_itog(self, self.ws_work, self.table_widget.rowCount() + 1, self.work_plan)
 
 
@@ -708,7 +708,7 @@ class GnktOsvWindow(QMainWindow):
 
     def save_to_gnkt(self):
         from work_py.gnkt_frez import Work_with_gnkt
-        from main import MyWindow
+        from main import MyMainWindow
 
         sheets = ["Титульник", 'СХЕМА', 'Ход работ']
         tables = [self.table_title, self.table_schema, self.table_widget]
@@ -756,10 +756,10 @@ class GnktOsvWindow(QMainWindow):
             ws5.title = "Схемы ПВО"
             ws5 = GnktOsvWindow.wb["Схемы ПВО"]
             GnktOsvWindow.wb.move_sheet(ws5, offset=-1)
-            schema_list = MyWindow.check_pvo_schema(self, ws5, 1)
+            schema_list = self.check_pvo_schema(ws5, 1)
 
         if GnktOsvWindow.wb:
-            main.MyWindow.saveFileDialog(self, GnktOsvWindow.wb, full_path)
+            self.saveFileDialog(GnktOsvWindow.wb, full_path)
             Work_with_gnkt.wb_gnkt_frez.close()
             print(f"Table data saved to Excel {full_path} {well_data.number_dp}")
         if self.wb:

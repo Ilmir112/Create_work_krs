@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QComboBo
     QMainWindow, QPushButton
 
 import well_data
-from main import MyWindow
+from main import MyMainWindow
 from .rir import RirWindow
 
 from .opressovka import OpressovkaEK
@@ -19,7 +19,7 @@ from .rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
 
 class TabPage_SO_clay(QWidget):
     def __init__(self, parent=None):
-        super().__init__(parent)
+        super().__init__()
 
         self.validator = QIntValidator(0, 80000)
 
@@ -140,10 +140,10 @@ class TabWidget(QTabWidget):
         self.addTab(TabPage_SO_clay(self), 'отсыпка')
 
 
-class ClayWindow(QMainWindow):
+class ClayWindow(MyMainWindow):
     work_clay_window = None
     def __init__(self, ins_ind, table_widget, parent=None):
-        super(QMainWindow, self).__init__(parent)
+        super().__init__()
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
 
@@ -176,7 +176,7 @@ class ClayWindow(QMainWindow):
             volume_clay_edit = int(float(self.tabWidget.currentWidget().volume_clay_edit.text()))
             work_list = self.clay_solution_q(current_bottom_edit, volume_clay_edit)
 
-        MyWindow.populate_row(self, self.ins_ind, work_list, self.table_widget)
+        self.populate_row(self.ins_ind, work_list, self.table_widget)
         well_data.pause = False
         self.close()
 

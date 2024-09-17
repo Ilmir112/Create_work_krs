@@ -2,13 +2,13 @@ from PyQt5 import QtWidgets
 from PyQt5.Qt import *
 
 import well_data
-from main import MyWindow
+from main import MyMainWindow
 from .advanted_file import definition_plast_work
 
 
 class TabPage_SO(QWidget):
     def __init__(self, parent=None):
-        super().__init__(parent)
+        super().__init__()
 
         self.labelType = QLabel("Кровля  перфорации", self)
         self.lineedit_type = QLineEdit(self)
@@ -83,11 +83,11 @@ class TabWidget(QTabWidget):
         self.addTab(TabPage_SO(self), 'Перфорация')
 
 
-class PerforationWindow(QMainWindow):
+class PerforationWindow(MyMainWindow):
 
     def __init__(self, table_widget, ins_ind, parent=None):
 
-        super(QMainWindow, self).__init__(parent)
+        super(PerforationWindow, self).__init__()
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
         self.table_widget = table_widget
@@ -438,7 +438,7 @@ class PerforationWindow(QMainWindow):
                     lst = [0, 1, 2, 3, 4, len(perforation) - 1]
                 row_max = self.table_widget.rowCount()
                 definition_plast_work(self)
-                MyWindow.insert_data_in_database(self, row, row_max)
+                self.insert_data_in_database(row, row_max)
 
                 if i in lst:  # Объединение ячеек по вертикале в столбце "отвественные и норма"
                     self.table_widget.setSpan(i + self.ins_ind, 2, 1, 8)

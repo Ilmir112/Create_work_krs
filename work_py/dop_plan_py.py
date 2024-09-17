@@ -14,6 +14,7 @@ from datetime import datetime
 
 from data_base.work_with_base import connect_to_db
 from krs import GnoWindow
+from main import MyMainWindow
 from work_py.advanted_file import merge_overlapping_intervals, definition_plast_work
 
 
@@ -474,10 +475,10 @@ class TabWidget(QTabWidget):
         self.addTab(TabPageDp(work_plan, tableWidget, old_index), 'Дополнительный план работ')
 
 
-class DopPlanWindow(QMainWindow):
+class DopPlanWindow(MyMainWindow):
     def __init__(self, ins_ind, table_widget, work_plan, ws=None, parent=None):
 
-        super(DopPlanWindow, self).__init__(parent)
+        super(DopPlanWindow, self).__init__()
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
         self.ins_ind = ins_ind
@@ -850,7 +851,7 @@ class DopPlanWindow(QMainWindow):
     def add_work(self):
         from data_base.work_with_base import check_in_database_well_data, insert_data_well_dop_plan, round_cell
         from well_data import ProtectedIsNonNone
-        from main import MyWindow
+        from main import MyMainWindow
         current_widget = self.tabWidget.currentWidget()
         method_bottom_combo = current_widget.method_bottom_combo.currentText()
         if method_bottom_combo == '':
@@ -1051,7 +1052,7 @@ class DopPlanWindow(QMainWindow):
                 well_data.dop_work_list = self.work_list(work_earlier)
             else:
                 work_list = self.work_list(work_earlier)
-                MyWindow.populate_row(self, self.ins_ind + 3, work_list, self.table_widget, self.work_plan)
+                self.populate_row(self.ins_ind + 3, work_list, self.table_widget, self.work_plan)
 
             if len(self.dict_perforation) != 0:
                 for plast, vertical_line, roof_int, sole_int, date_pvr_edit, count_pvr_edit, \
@@ -1128,7 +1129,7 @@ class DopPlanWindow(QMainWindow):
 
             work_list = self.work_list(work_earlier)
             well_data.ins_ind2 = self.ins_ind + 2
-            MyWindow.populate_row(self, self.ins_ind + 2, work_list, self.table_widget, self.work_plan)
+            self.populate_row(self.ins_ind + 2, work_list, self.table_widget, self.work_plan)
 
         well_data.pause = False
         self.close()

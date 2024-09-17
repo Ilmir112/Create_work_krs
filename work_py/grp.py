@@ -3,7 +3,7 @@ import well_data
 from PyQt5.QtGui import QDoubleValidator
 from PyQt5.QtWidgets import QInputDialog, QMessageBox, QLabel, QLineEdit, QComboBox, QGridLayout, QWidget, QTabWidget, \
     QMainWindow, QPushButton
-from main import MyWindow
+from main import MyMainWindow
 from work_py.alone_oreration import kot_select
 from .rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
 from .opressovka import OpressovkaEK, TabPage_SO
@@ -12,7 +12,7 @@ from .opressovka import OpressovkaEK, TabPage_SO
 class TabPage_SO_grp(QWidget):
     def __init__(self, parent=None):
 
-        super().__init__(parent)
+        super().__init__()
 
         validator = QDoubleValidator(0.0, 80000.0, 2)
 
@@ -102,7 +102,7 @@ class TabWidget(QTabWidget):
         self.addTab(TabPage_SO_grp(self), 'пакер ГРП')
 
 
-class Grp_window(QMainWindow):
+class Grp_window(MyMainWindow):
     def __init__(self, ins_ind, table_widget):
         super(Grp_window, self).__init__()
 
@@ -127,11 +127,11 @@ class Grp_window(QMainWindow):
         gisOTZ_after_true_quest = self.tabWidget.currentWidget().otz_after_question_QCombo.currentText()
         normalization_true_quest = self.tabWidget.currentWidget().normalization_QCombo.currentText()
         current_depth = int(float(self.tabWidget.currentWidget().current_depth_edit.text()))
-        if MyWindow.check_true_depth_template(self, paker_depth) is False:
+        if self.check_true_depth_template(paker_depth) is False:
             return
-        if MyWindow.true_set_Paker(self, paker_depth) is False:
+        if self.true_set_Paker(paker_depth) is False:
             return
-        if MyWindow.check_depth_in_skm_interval(self, paker_depth) is False:
+        if self.check_depth_in_skm_interval(paker_depth) is False:
             return
 
         if int(paker_khost) + int(paker_depth) > well_data.current_bottom:
@@ -141,7 +141,7 @@ class Grp_window(QMainWindow):
         work_list = self.grpPaker(diametr_paker, paker_depth, paker_khost, gisOTZ_true_quest, gisOTZ_after_true_quest,
                                   normalization_true_quest, current_depth)
 
-        MyWindow.populate_row(self, self.ins_ind, work_list, self.table_widget)
+        self.populate_row(self.ins_ind, work_list, self.table_widget)
         well_data.pause = False
         self.close()
 

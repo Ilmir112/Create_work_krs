@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QComboBo
     QMainWindow, QPushButton
 
 import well_data
-from main import MyWindow
+from main import MyMainWindow
 from .alone_oreration import volume_vn_ek
 from .rir import RirWindow
 
@@ -14,7 +14,7 @@ from .rir import TabPage_SO_rir
 
 class TabPage_SO_sand(QWidget):
     def __init__(self, parent=None):
-        super().__init__(parent)
+        super().__init__()
 
         self.validator = QIntValidator(0, 80000)
 
@@ -186,10 +186,10 @@ class TabWidget(QTabWidget):
         super().__init__()
         self.addTab(TabPage_SO_sand(self), 'отсыпка')
 
-class SandWindow(QMainWindow):
+class SandWindow(MyMainWindow):
     work_sand_window = None
     def __init__(self, ins_ind, table_widget, parent=None):
-        super(QMainWindow, self).__init__(parent)
+        super().__init__()
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
 
@@ -236,7 +236,7 @@ class SandWindow(QMainWindow):
                                                 need_change_zgs_combo, plast_new_combo, fluid_new_edit, pressuar_new_edit)
             work_list.extend(rir_list[1:])
 
-        MyWindow.populate_row(self, self.ins_ind, work_list, self.table_widget)
+        self.populate_row(self.ins_ind, work_list, self.table_widget)
         well_data.pause = False
         self.close()
     def sand_select(self):

@@ -9,15 +9,16 @@ from openpyxl.styles import Font, Alignment, Border, Side
 
 from cdng import events_gnvp, itog_1, events_gnvp_gnkt
 from find import ProtectedIsNonNone
+from main import MyMainWindow
 from plan import delete_rows_pz
 from block_name import region, razdel_1, curator_sel, pop_down
 from work_py.dop_plan_py import DopPlanWindow
 from work_py.check_in_pz import CustomMessageBox
 
 
-class CreatePZ(QMainWindow):
+class CreatePZ(MyMainWindow):
     def __init__(self, wb, ws, data_window, perforation_correct_window2, parent=None):
-        super(CreatePZ, self).__init__(parent)
+        super(CreatePZ, self).__init__()
 
         self.wb = wb
         self.ws = ws
@@ -28,7 +29,7 @@ class CreatePZ(QMainWindow):
         from find import FindIndexPZ
         from work_py.leakage_column import LeakageWindow
         from category_correct import CategoryWindow
-        from main import MyWindow
+        from main import MyMainWindow
         from find import WellNkt, Well_perforation, WellCondition, WellHistory_data, Well_data, Well_Category, \
             WellFond_data, WellSucker_rod, Well_expected_pick_up, WellData
         from data_base.work_with_base import check_in_database_well_data
@@ -62,7 +63,7 @@ class CreatePZ(QMainWindow):
                     self.rir_window = DopPlanWindow(well_data.ins_ind, None, work_plan)
                     # self.rir_window.setGeometry(200, 400, 100, 200)
                     self.rir_window.show()
-                    MyWindow.pause_app()
+                    self.pause_app()
                     well_data.pause = True
                     self.rir_window = None
 
@@ -111,7 +112,7 @@ class CreatePZ(QMainWindow):
                 # WellCondition.leakage_window.setGeometry(200, 400, 300, 400)
                 WellCondition.leakage_window.show()
 
-                MyWindow.pause_app()
+                self.pause_app()
                 well_data.dict_leakiness = WellCondition.leakage_window.add_work()
                 # print(f'словарь нарушений {well_data.dict_leakiness}')
                 well_data.pause = True
@@ -423,7 +424,7 @@ class CreatePZ(QMainWindow):
                                                end_row=well_data.ins_ind + i)
 
                     self.ins_ind_border = well_data.ins_ind
-                    MyWindow.create_database_well(self, work_plan)
+
 
             return ws
 

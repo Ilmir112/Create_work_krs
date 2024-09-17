@@ -2,7 +2,7 @@ from PyQt5 import Qt
 from PyQt5.QtGui import QDoubleValidator
 
 import well_data
-from main import MyWindow
+from main import MyMainWindow
 from PyQt5.QtWidgets import QMessageBox, QInputDialog, QMainWindow, QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, \
     QTabWidget, QPushButton, QHeaderView, QTableWidget, QTableWidgetItem
 
@@ -13,7 +13,7 @@ from .rationingKRS import descentNKT_norm, liftingNKT_norm
 class TabPage_SO(QWidget):
     def __init__(self, parent=None):
 
-        super().__init__(parent)
+        super().__init__()
 
         self.validator = QDoubleValidator(0.0, 80000.0, 2)
 
@@ -161,9 +161,9 @@ class TabWidget(QTabWidget):
         self.addTab(TabPage_SO(self), 'Опрессовка')
 
 
-class OpressovkaEK(QMainWindow):
+class OpressovkaEK(MyMainWindow):
     def __init__(self, ins_ind, table_widget, forRirTrue=False, parent=None):
-        super().__init__(parent)
+        super().__init__()
 
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
@@ -210,11 +210,11 @@ class OpressovkaEK(QMainWindow):
             paker_depth_zumpf = self.tabWidget.currentWidget().paker_depth_zumpf_edit.text()
             if paker_depth_zumpf != '':
                 paker_depth_zumpf = int(float(paker_depth_zumpf))
-            if MyWindow.check_true_depth_template(self, paker_depth_zumpf) is False:
+            if self.check_true_depth_template(paker_depth_zumpf) is False:
                 return
-            if MyWindow.true_set_Paker(self, paker_depth_zumpf) is False:
+            if self.true_set_Paker( paker_depth_zumpf) is False:
                 return
-            if MyWindow.check_depth_in_skm_interval(self, paker_depth_zumpf) is False:
+            if self.check_depth_in_skm_interval(paker_depth_zumpf) is False:
                 return
 
         else:
@@ -226,11 +226,11 @@ class OpressovkaEK(QMainWindow):
             mes = QMessageBox.warning(self, 'Некорректные данные', f'Компоновка НКТ c хвостовик + пакер '
                                                                    f'ниже текущего забоя')
             return
-        if MyWindow.check_true_depth_template(self, paker_depth) is False:
+        if self.check_true_depth_template(paker_depth) is False:
             return
-        if MyWindow.true_set_Paker(self, paker_depth) is False:
+        if self.true_set_Paker(paker_depth) is False:
             return
-        if MyWindow.check_depth_in_skm_interval(self, paker_depth) is False:
+        if self.check_depth_in_skm_interval(paker_depth) is False:
             return
 
 
@@ -282,7 +282,7 @@ class OpressovkaEK(QMainWindow):
                 pressureZUMPF_question = self.tableWidget.item(row, 2)
             work_list = OpressovkaEK.interval_pressure_testing(self, paker_khost, diametr_paker, depth_paker_list, pressureZUMPF_question, paker_depth_zumpf)
 
-        MyWindow.populate_row(self, self.ins_ind, work_list, self.table_widget)
+        self.populate_row(self.ins_ind, work_list, self.table_widget)
         well_data.pause = False
         self.close()
 

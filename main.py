@@ -34,12 +34,11 @@ from openpyxl.drawing.image import Image
 import well_data
 from H2S import calc_h2s
 from PyQt5.QtCore import QThread, pyqtSlot
-from data_correct_position_people import CorrectSignaturesWindow
+
 from PyQt5.QtGui import QBrush, QColor, QPen
-from work_py.drilling import Drill_window
+
 from users.login_users import LoginWindow
 from PyQt5.QtCore import Qt, QObject, pyqtSignal
-from work_py.leakage_column import LeakageWindow
 
 
 class UncaughtExceptions(QObject):
@@ -97,9 +96,10 @@ class ExcelWorker(QThread):
                 result = cursor.fetchone()
 
                 if result == None:
-                    mes = QMessageBox.warning(None, 'Некорректная дата перечня',
-                                              f'Необходимо обновить перечень скважин без '
-                                              f'глушения на текущий квартал {region}, необходимо обратиться к администратору')
+                    QMessageBox.warning(None, 'Некорректная дата перечня',
+                                        f'Необходимо обновить перечень скважин без '
+                                        f'глушения на текущий квартал {region}, '
+                                        f'необходимо обратиться к администратору')
                 else:
                     stop_app = False
 
@@ -124,8 +124,8 @@ class ExcelWorker(QThread):
                         check_true = False
                 except psycopg2.Error as e:
                     # Выведите сообщение об ошибке
-                    QMessageBox.warning(MyWindow, 'Ошибка', f'Ошибка подключения к базе данных '
-                                                            f'{type(e).__name__}\n\n{str(e)}')
+                    QMessageBox.warning(MyMainWindow, 'Ошибка', f'Ошибка подключения к базе данных '
+                                                                f'{type(e).__name__}\n\n{str(e)}')
                 finally:
                     # Закройте курсор и соединение
                     if cursor:
@@ -178,7 +178,7 @@ class ExcelWorker(QThread):
         except Exception as e:
             QMessageBox.warning(None, 'Ошибка', f"Ошибка при проверке записи: {type(e).__name__}\n\n{str(e)}")
         if stop_app == True:
-            MyWindow.pause_app()
+            self.pause_app()
             window.close()
         # Завершение работы потока
         self.finished.emit()
@@ -248,7 +248,246 @@ class ExcelWorker(QThread):
         return result
 
 
-class MyWindow(QMainWindow):
+class MyMainWindow(QMainWindow):
+
+    def __init__(self):
+        super().__init__()
+
+    def saveFileDialog(self, wb2, full_path):
+        try:
+            file_name, _ = QFileDialog.getSaveFileName(self, "Save excel-file",
+                                                       f"{full_path}", "Excel Files (*.xlsx)")
+            if file_name:
+                wb2.save(file_name)
+        except Exception as e:
+            QMessageBox.critical(self, 'Ошибка',
+                                 f'файл под таким именем открыт, закройте его: {type(e).__name__}\n\n{str(e)}')
+            return
+        try:
+            # Создаем объект Excel
+            excel = win32com.client.Dispatch("Excel.Application")
+            # Открываем файл
+            workbook = excel.Workbooks.Open(file_name)
+            # Выбираем активный лист
+            worksheet = workbook.ActiveSheet
+
+            # Назначаем область печати с колонок B до L
+            worksheet.PageSetup.PrintArea = "B:L"
+
+        except Exception as e:
+            print(f"Ошибка при работе с Excel: {type(e).__name__}\n\n{str(e)}")
+
+    @staticmethod
+    def pause_app():
+        while well_data.pause is True:
+            QtCore.QCoreApplication.instance().processEvents()
+
+    def check_pvo_schema(self, ws5, ind):
+        schema_pvo_set = set()
+        for row in range(self.table_widget.rowCount()):
+            if row > ind:
+                for column in range(self.table_widget.columnCount()):
+                    value = self.table_widget.item(row, column)
+                    if value != None:
+                        value = value.text()
+
+                        if 'схеме №' in value or 'схемы №' in value or 'Схемы обвязки №' in value or 'схемы ПВО №' in value:
+                            number_schema = value[value.index(' №') + 1:value.index(' №') + 4].replace(' ', '')
+
+                            schema_pvo_set.add(number_schema)
+        # print(f'схема ПВО {schema_pvo_set}')
+
+        n = 0
+        if schema_pvo_set:
+            for schema in list(schema_pvo_set):
+                coordinate = f'{get_column_letter(2)}{1 + n}'
+                if 'Ойл' in well_data.contractor:
+                    schema_path = f'{well_data.path_image}imageFiles/pvo/oil/схема {schema}.jpg'
+                elif 'РН' in well_data.contractor:
+                    schema_path = f'{well_data.path_image}imageFiles/pvo/rn/схема {schema}.png'
+                try:
+                    img = openpyxl.drawing.image.Image(schema_path)
+                    img.width = 750
+                    img.height = 530
+                    img.anchor = coordinate
+                    ws5.add_image(img, coordinate)
+                    n += 29
+                except FileNotFoundError as f:
+                    mes = QMessageBox.warning(self, 'Ошибка', f'Схему {schema} не удалось вставилось:\n {f}')
+            ws5.print_area = f'B1:M{n}'
+            ws5.page_setup.fitToPage = True
+            ws5.page_setup.fitToHeight = False
+            ws5.page_setup.fitToWidth = True
+            ws5.print_options.horizontalCentered = True
+            # зададим размер листа
+            ws5.page_setup.paperSize = ws5.PAPERSIZE_A4
+            # содержимое по ширине страницы
+            ws5.sheet_properties.pageSetUpPr.fitToPage = True
+            ws5.page_setup.fitToHeight = False
+            # Переместите второй лист перед первым
+
+        return list(schema_pvo_set)
+
+    def insert_data_in_database(self, row_number, row_max):
+
+        dict_perforation_json = json.dumps(well_data.dict_perforation, default=str, ensure_ascii=False, indent=4)
+        # print(well_data.dict_leakiness)
+        leakage_json = json.dumps(well_data.dict_leakiness, default=str, ensure_ascii=False, indent=4)
+        plast_all_json = json.dumps(well_data.plast_all)
+        plast_work_json = json.dumps(well_data.plast_work)
+        skm_list_json = json.dumps(well_data.skm_interval)
+        number = json.dumps(str(well_data.well_number._value) + well_data.well_area._value, ensure_ascii=False,
+                            indent=4)
+        template_ek = json.dumps(
+            [well_data.template_depth, well_data.template_lenght, well_data.template_depth_addition,
+             well_data.template_lenght_addition])
+
+        # Подготовленные данные для вставки (пример)
+        data_values = [row_max, well_data.current_bottom, dict_perforation_json, plast_all_json, plast_work_json,
+                       leakage_json, well_data.column_additional, well_data.fluid_work,
+                       well_data.category_pressuar, well_data.category_h2s, well_data.category_gf,
+                       template_ek, skm_list_json,
+                       well_data.problemWithEk_depth, well_data.problemWithEk_diametr]
+
+        if len(well_data.data_list) == 0:
+            well_data.data_list.append(data_values)
+        else:
+            row_number = row_number - well_data.count_row_well
+            well_data.data_list.insert(row_number, data_values)
+
+    def check_depth_in_skm_interval(self, depth):
+
+        check_true = False
+        check_ribbing = False
+
+        for interval in well_data.skm_interval:
+            if float(interval[0]) <= float(depth) <= float(interval[1]):
+                check_true = True
+                return int(depth)
+
+        for interval in well_data.ribbing_interval:
+            if float(interval[0]) <= float(depth) <= float(interval[1]):
+                check_ribbing = True
+        if check_true is False and check_ribbing is False:
+            false_question = QMessageBox.warning(None, 'Проверка посадки пакера в интервал скреперования',
+                                                 f'Проверка посадки показала, что пакер сажается не '
+                                                 f'в интервал скреперования {well_data.skm_interval}, и '
+                                                 f'райбирования {well_data.ribbing_interval} \n'
+                                                 f'Нужно скорректировать интервалы скреперования ')
+            return False
+        if check_true is True and check_ribbing is False:
+            false_question = QMessageBox.question(None, 'Проверка посадки пакера в интервал скреперования',
+                                                  f'Проверка посадки показала, что пакер сажается не '
+                                                  f'в интервал скреперования {well_data.skm_interval}, '
+                                                  f'но сажается в интервал райбирования '
+                                                  f'райбирования {well_data.ribbing_interval} \n'
+                                                  f'Продолжить?')
+            if false_question == QMessageBox.StandardButton.No:
+                return False
+
+    def true_set_Paker(self, depth):
+
+        check_true = False
+
+        for plast in well_data.plast_all:
+            if len(well_data.dict_perforation[plast]['интервал']) >= 1:
+                for interval in well_data.dict_perforation[plast]['интервал']:
+                    if interval[0] < depth < interval[1]:
+                        check_true = False
+                    else:
+                        check_true = True
+            elif len(well_data.dict_perforation[plast]['интервал']) == 0:
+                check_true = True
+
+        if check_true is False:
+            QMessageBox.warning(None, 'Проверка посадки пакера в интервал перфорации',
+                                f'Проверка посадки показала пакер сажается в интервал перфорации, '
+                                f'необходимо изменить глубину посадки!!!')
+
+        return check_true
+
+    def populate_row(self, ins_ind, work_list, table_widget, work_plan='krs'):
+        text_width_dict = {20: (0, 100), 40: (101, 200), 60: (201, 300), 80: (301, 400), 100: (401, 500),
+                           120: (501, 600), 140: (601, 700), 160: (701, 800), 180: (801, 900), 200: (901, 1500)}
+        index_setSpan = 0
+        if work_plan == 'gnkt_frez':
+            index_setSpan = 1
+        row_max = table_widget.rowCount()
+        # print(f'ДОП {work_plan}')
+
+        for i, row_data in enumerate(work_list):
+            row = ins_ind + i
+            if work_plan not in ['application_pvr', 'gnkt_frez', 'gnkt_opz', 'gnkt_after_grp', 'application_gis']:
+                self.insert_data_in_database(row, row_max + i)
+
+            table_widget.insertRow(row)
+
+            if len(str(row_data)[1]) > 3 and work_plan in 'gnkt_frez':
+                table_widget.setSpan(i + ins_ind, 1, 1, 12)
+            else:
+                table_widget.setSpan(i + ins_ind, 2, 1, 8 + index_setSpan)
+
+            for column, data in enumerate(row_data):
+                item = QtWidgets.QTableWidgetItem(str(data))
+                item.setFlags(item.flags() | Qt.ItemIsEditable)
+
+                if not data is None:
+                    table_widget.setItem(row, column, item)
+                else:
+                    table_widget.setItem(row, column, QtWidgets.QTableWidgetItem(str('')))
+
+                if column == 2:
+                    if not data is None:
+                        text = data
+                        for key, value in text_width_dict.items():
+                            if value[0] <= len(text) <= value[1]:
+                                text_width = key
+                                table_widget.setRowHeight(row, int(text_width))
+        if 'gnkt' not in work_plan:
+            for row in range(table_widget.rowCount()):
+                if row >= well_data.ins_ind2:
+                    a = row - well_data.ins_ind2 + 1
+                    ab = well_data.ins_ind2
+                    # Добавляем нумерацию в первую колонку
+                    item_number = QtWidgets.QTableWidgetItem(str(row - well_data.ins_ind2 + 1))  # Номер строки + 1
+                    table_widget.setItem(row, 1, item_number)
+
+    def check_true_depth_template(self, depth):
+        check = True
+        if well_data.column_additional:
+
+            if well_data.template_depth_addition < depth and depth > well_data.head_column_additional._value:
+                check = False
+                check_question = QMessageBox.question(
+                    self,
+                    'Проверка глубины пакера',
+                    f'Проверка показало что пакер с глубиной {depth}м спускается ниже'
+                    f' глубины  шаблонирования {well_data.template_depth_addition}')
+                if check_question == QMessageBox.StandardButton.Yes:
+                    check = True
+            if well_data.template_depth < depth and depth < well_data.head_column_additional._value:
+                check = False
+                check_question = QMessageBox.question(
+                    self,
+                    'Проверка глубины пакера',
+                    f'Проверка показало что пакер с глубиной {depth}м спускается ниже '
+                    f'глубины шаблонирования {well_data.template_depth}')
+                if check_question == QMessageBox.StandardButton.Yes:
+                    check = True
+        else:
+            # print(f'глубина {well_data.template_depth, depth}')
+            if well_data.template_depth < depth:
+                check = False
+                check_question = QMessageBox.question(
+                    self, 'Проверка глубины пакера', f'Проверка показало что пакер с глубиной {depth}м спускается ниже '
+                                                     f'глубины шаблонирования {well_data.template_depth}')
+                if check_question == QMessageBox.StandardButton.Yes:
+                    check = True
+
+        return check
+
+
+class MyWindow(MyMainWindow):
 
     def __init__(self):
         super().__init__()
@@ -455,12 +694,14 @@ class MyWindow(QMainWindow):
 
     @QtCore.pyqtSlot()
     def action_clicked(self):
+        from data_correct_position_people import CorrectSignaturesWindow
         from data_base.work_with_base import insert_data_new_excel_file
         from open_pz import CreatePZ
         from work_py.gnkt_frez import Work_with_gnkt
         from work_py.gnkt_grp import GnktOsvWindow
         from work_py.dop_plan_py import DopPlanWindow
         from work_py.correct_plan import CorrectPlanWindow
+        from work_py.drilling import Drill_window
 
         action = self.sender()
 
@@ -479,9 +720,8 @@ class MyWindow(QMainWindow):
                     read_pz = CreatePZ(self.wb, self.ws, self.data_window, self.perforation_correct_window2)
                     sheet = read_pz.open_excel_file(self.ws, self.work_plan)
 
-
                     self.copy_pz(sheet, self.table_widget, self.work_plan)
-                    MyWindow.pause_app()
+                    self.pause_app()
                     well_data.pause = True
                     self.rir_window = None
 
@@ -507,7 +747,7 @@ class MyWindow(QMainWindow):
                         self.rir_window = DopPlanWindow(well_data.ins_ind, self.table_widget, self.work_plan)
                         # self.rir_window.setGeometry(200, 400, 100, 200)
                         self.rir_window.show()
-                        MyWindow.pause_app()
+                        self.pause_app()
                         well_data.pause = True
                         self.rir_window = None
 
@@ -532,6 +772,7 @@ class MyWindow(QMainWindow):
 
             except FileNotFoundError:
                 mes = QMessageBox.warning(self, 'Ошибка', 'Ошибка при прочтении файла')
+
         elif action == self.create_KRS_change and self.table_widget == None:
             self.work_plan = 'plan_change'
             well_data.work_plan = 'plan_change'
@@ -702,6 +943,25 @@ class MyWindow(QMainWindow):
             costumer = 'ООО Башнефть-добыча'
             self.open_class_well(costumer, 'АГМ')
 
+
+
+        elif action == self.application_pvr:
+            self.work_plan = 'application_pvr'
+            # self.tableWidgetOpenPvr()
+            self.fname, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
+                                                                  "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
+            if self.fname:
+                self.open_pvr_application(self.fname)
+        elif action == self.application_gis:
+            self.work_plan = 'application_gis'
+            # self.tableWidgetOpenPvr()
+            self.fname, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
+                                                                  "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
+            if self.fname:
+                self.open_gis_application(self.fname)
+        elif action == self.application_geophysical:
+            pass
+
         elif 'Зуфаров И.М.' in well_data.user[1]:
 
             if action == self.class_well_TGM_reload:
@@ -736,22 +996,6 @@ class MyWindow(QMainWindow):
                 costumer = 'ООО Башнефть-добыча'
                 self.reload_class_well(costumer, 'ИГМ')
 
-        elif action == self.application_pvr:
-            self.work_plan = 'application_pvr'
-            # self.tableWidgetOpenPvr()
-            self.fname, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
-                                                                  "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
-            if self.fname:
-                self.open_pvr_application(self.fname)
-        elif action == self.application_gis:
-            self.work_plan = 'application_gis'
-            # self.tableWidgetOpenPvr()
-            self.fname, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
-                                                                  "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
-            if self.fname:
-                self.open_gis_application(self.fname)
-        elif action == self.application_geophysical:
-            pass
         else:
             mes = QMessageBox.question(self, 'Информация', 'Необходимо закрыть текущий проект, закрыть?')
             if mes == QMessageBox.StandardButton.Yes:
@@ -904,33 +1148,6 @@ class MyWindow(QMainWindow):
             else:
                 self.tabWidget.addTab(self.table_widget, 'Ход работ')
 
-    def saveFileDialog(self, wb2, full_path):
-        try:
-
-
-            file_name, _ = QFileDialog.getSaveFileName(self, "Save excel-file",
-                                                       f"{full_path}", "Excel Files (*.xlsx)")
-            if file_name:
-                wb2.save(file_name)
-        except Exception as e:
-            mes = QMessageBox.critical(self, 'Ошибка',
-                                       f'файл под таким именем открыт, закройте его: {type(e).__name__}\n\n{str(e)}')
-            return
-        try:
-            # Создаем объект Excel
-            excel = win32com.client.Dispatch("Excel.Application")
-            # Открываем файл
-            workbook = excel.Workbooks.Open(file_name)
-            # Выбираем активный лист
-            worksheet = workbook.ActiveSheet
-
-            # Назначаем область печати с колонок B до L
-            worksheet.PageSetup.PrintArea = "B:L"
-
-        except Exception as e:
-            print(f"Ошибка при работе с Excel: {type(e).__name__}\n\n{str(e)}")
-
-
     def save_to_excel(self):
         from work_py.gnkt_frez import Work_with_gnkt
         from work_py.gnkt_grp import GnktOsvWindow
@@ -998,8 +1215,6 @@ class MyWindow(QMainWindow):
             well_data.itog_ind_max = len(work_list)
             # print(f' длина {len(work_list)}')
             CreatePZ.add_itog(self, ws2, self.table_widget.rowCount() + 1, self.work_plan)
-
-
 
             # try:
             for row_ind, row in enumerate(ws2.iter_rows(values_only=True)):
@@ -1308,8 +1523,6 @@ class MyWindow(QMainWindow):
         img.anchor = coordinate
         ws.add_image(img, coordinate)
 
-
-
     def openContextMenu(self, position):
 
         context_menu = QMenu(self)
@@ -1566,11 +1779,6 @@ class MyWindow(QMainWindow):
 
         # print(well_data.skm_interval)
 
-    @staticmethod
-    def pause_app():
-        while well_data.pause is True:
-            QtCore.QCoreApplication.instance().processEvents()
-
     def frezering_port_action(self):
         from work_py.drilling import Drill_window
         drilling_work_list = Drill_window.frezer_ports(self)
@@ -1583,6 +1791,7 @@ class MyWindow(QMainWindow):
 
     def drilling_action_nkt(self):
         if self.raid_window is None:
+            from work_py.drilling import Drill_window
             self.raid_window = Drill_window(well_data.ins_ind, self.table_widget)
             self.set_modal_window(self.raid_window)
             self.pause_app()
@@ -1636,9 +1845,9 @@ class MyWindow(QMainWindow):
             self.raid_window = None
 
     def lar_po_action(self):
-        from work_py.emergency_po import Emergency_po
+        from work_py.emergency_po import EmergencyPo
         if self.raid_window is None:
-            self.raid_window = Emergency_po(well_data.ins_ind, self.table_widget)
+            self.raid_window = EmergencyPo(well_data.ins_ind, self.table_widget)
             # self.raid_window.setGeometry(200, 400, 300, 400)
 
             self.set_modal_window(self.raid_window)
@@ -1899,10 +2108,10 @@ class MyWindow(QMainWindow):
             self.work_window = None
 
     def kompress_with_voronka(self):
-        from work_py.kompress import Kompress_Window
+        from work_py.kompress import KompressWindow
 
         if self.work_window is None:
-            self.work_window = Kompress_Window(well_data.ins_ind, self.table_widget)
+            self.work_window = KompressWindow(well_data.ins_ind, self.table_widget)
             self.set_modal_window(self.work_window)
             self.pause_app()
             well_data.pause = True
@@ -2038,56 +2247,6 @@ class MyWindow(QMainWindow):
             self.work_window.close()  # Close window.
             self.work_window = None
 
-    def populate_row(self, ins_ind, work_list, table_widget, work_plan='krs'):
-        text_width_dict = {20: (0, 100), 40: (101, 200), 60: (201, 300), 80: (301, 400), 100: (401, 500),
-                           120: (501, 600), 140: (601, 700), 160: (701, 800), 180: (801, 900), 200: (901, 1500)}
-        index_setSpan = 0
-        if work_plan == 'gnkt_frez':
-            index_setSpan = 1
-        row_max = table_widget.rowCount()
-        # print(f'ДОП {work_plan}')
-
-        for i, row_data in enumerate(work_list):
-            row = ins_ind + i
-            if work_plan not in ['application_pvr', 'gnkt_frez', 'gnkt_opz', 'gnkt_after_grp', 'application_gis']:
-                MyWindow.insert_data_in_database(self, row, row_max + i)
-
-            table_widget.insertRow(row)
-
-            if len(str(row_data)[1]) > 3 and work_plan in 'gnkt_frez':
-                table_widget.setSpan(i + ins_ind, 1, 1, 12)
-            else:
-                table_widget.setSpan(i + ins_ind, 2, 1, 8 + index_setSpan)
-
-            for column, data in enumerate(row_data):
-                item = QtWidgets.QTableWidgetItem(str(data))
-                item.setFlags(item.flags() | Qt.ItemIsEditable)
-
-                if not data is None:
-                    table_widget.setItem(row, column, item)
-                else:
-                    table_widget.setItem(row, column, QtWidgets.QTableWidgetItem(str('')))
-
-                if column == 2:
-                    if not data is None:
-                        text = data
-                        for key, value in text_width_dict.items():
-                            if value[0] <= len(text) <= value[1]:
-                                text_width = key
-                                table_widget.setRowHeight(row, int(text_width))
-        if 'gnkt' not in work_plan:
-            for row in range(table_widget.rowCount()):
-                if row >= well_data.ins_ind2:
-                    a = row - well_data.ins_ind2 + 1
-                    ab = well_data.ins_ind2
-                    # Добавляем нумерацию в первую колонку
-                    item_number = QtWidgets.QTableWidgetItem(str(row - well_data.ins_ind2 + 1))  # Номер строки + 1
-                    table_widget.setItem(row, 1, item_number)
-
-    def create_database_well(self, work_plan):
-
-        well_data.number_dict = []
-
     def acidPakerNewWindow(self):
         from work_py.acid_paker import AcidPakerWindow
 
@@ -2101,52 +2260,6 @@ class MyWindow(QMainWindow):
         else:
             self.acid_windowPaker.close()  # Close window.
             self.acid_windowPaker = None
-
-    def check_pvo_schema(self, ws5, ind):
-        schema_pvo_set = set()
-        for row in range(self.table_widget.rowCount()):
-            if row > ind:
-                for column in range(self.table_widget.columnCount()):
-                    value = self.table_widget.item(row, column)
-                    if value != None:
-                        value = value.text()
-
-                        if 'схеме №' in value or 'схемы №' in value or 'Схемы обвязки №' in value or 'схемы ПВО №' in value:
-                            number_schema = value[value.index(' №') + 1:value.index(' №') + 4].replace(' ', '')
-
-                            schema_pvo_set.add(number_schema)
-        # print(f'схема ПВО {schema_pvo_set}')
-
-        n = 0
-        if schema_pvo_set:
-            for schema in list(schema_pvo_set):
-                coordinate = f'{get_column_letter(2)}{1 + n}'
-                if 'Ойл' in well_data.contractor:
-                    schema_path = f'{well_data.path_image}imageFiles/pvo/oil/схема {schema}.jpg'
-                elif 'РН' in well_data.contractor:
-                    schema_path = f'{well_data.path_image}imageFiles/pvo/rn/схема {schema}.png'
-                try:
-                    img = openpyxl.drawing.image.Image(schema_path)
-                    img.width = 750
-                    img.height = 530
-                    img.anchor = coordinate
-                    ws5.add_image(img, coordinate)
-                    n += 29
-                except FileNotFoundError as f:
-                    mes = QMessageBox.warning(self, 'Ошибка', f'Схему {schema} не удалось вставилось:\n {f}')
-            ws5.print_area = f'B1:M{n}'
-            ws5.page_setup.fitToPage = True
-            ws5.page_setup.fitToHeight = False
-            ws5.page_setup.fitToWidth = True
-            ws5.print_options.horizontalCentered = True
-            # зададим размер листа
-            ws5.page_setup.paperSize = ws5.PAPERSIZE_A4
-            # содержимое по ширине страницы
-            ws5.sheet_properties.pageSetUpPr.fitToPage = True
-            ws5.page_setup.fitToHeight = False
-            # Переместите второй лист перед первым
-
-        return list(schema_pvo_set)
 
     def GeophysicalNewWindow(self):
         from work_py.geophysic import GeophysicWindow
@@ -2192,7 +2305,7 @@ class MyWindow(QMainWindow):
             self.new_window = SelectCurator()
             # WellCondition.leakage_window.setGeometry(200, 400, 300, 400)
             self.set_modal_window(self.new_window)
-            MyWindow.pause_app()
+            self.pause_app()
             well_data.pause = True
             self.new_window = None  # Discard reference.
         else:
@@ -2201,6 +2314,7 @@ class MyWindow(QMainWindow):
 
     def correctNEK(self):
         from find import WellCondition
+        from work_py.leakage_column import LeakageWindow
 
         if WellCondition.leakage_window is None:
             WellCondition.leakage_window = LeakageWindow()
@@ -2208,7 +2322,7 @@ class MyWindow(QMainWindow):
             # WellCondition.leakage_window.setGeometry(200, 400, 300, 400)
             self.set_modal_window(WellCondition.leakage_window)
 
-            MyWindow.pause_app()
+            self.pause_app()
             well_data.dict_leakiness = WellCondition.leakage_window.add_work()
             # print(f'словарь нарушений {well_data.dict_leakiness}')
             well_data.pause = True
@@ -2219,33 +2333,6 @@ class MyWindow(QMainWindow):
             WellCondition.leakage_window.close()  # Close window.
             WellCondition.leakage_window = None  # Discard reference.
         well_data.data_list[-1][5] = json.dumps(well_data.dict_leakiness, default=str, ensure_ascii=False, indent=4)
-
-    def insert_data_in_database(self, row_number, row_max):
-
-        dict_perforation_json = json.dumps(well_data.dict_perforation, default=str, ensure_ascii=False, indent=4)
-        # print(well_data.dict_leakiness)
-        leakage_json = json.dumps(well_data.dict_leakiness, default=str, ensure_ascii=False, indent=4)
-        plast_all_json = json.dumps(well_data.plast_all)
-        plast_work_json = json.dumps(well_data.plast_work)
-        skm_list_json = json.dumps(well_data.skm_interval)
-        number = json.dumps(str(well_data.well_number._value) + well_data.well_area._value, ensure_ascii=False,
-                            indent=4)
-        template_ek = json.dumps(
-            [well_data.template_depth, well_data.template_lenght, well_data.template_depth_addition,
-             well_data.template_lenght_addition])
-
-        # Подготовленные данные для вставки (пример)
-        data_values = [row_max, well_data.current_bottom, dict_perforation_json, plast_all_json, plast_work_json,
-                       leakage_json, well_data.column_additional, well_data.fluid_work,
-                       well_data.category_pressuar, well_data.category_h2s, well_data.category_gf,
-                       template_ek, skm_list_json,
-                       well_data.problemWithEk_depth, well_data.problemWithEk_diametr]
-
-        if len(well_data.data_list) == 0:
-            well_data.data_list.append(data_values)
-        else:
-            row_number = row_number - well_data.count_row_well
-            well_data.data_list.insert(row_number, data_values)
 
     def correctData(self):
         from data_correct import DataWindow
@@ -2293,8 +2380,6 @@ class MyWindow(QMainWindow):
 
     def insertPerf(self):
         self.populate_row(self.ins_ind, self.perforation_list)
-
-
 
     def copy_pz(self, sheet, table_widget, work_plan='krs', count_col=12, list_page=1):
         from krs import GnoWindow
@@ -2361,7 +2446,6 @@ class MyWindow(QMainWindow):
                 table_widget.setRowHidden(row, False)
 
         if work_plan == 'krs':
-
             self.work_window = GnoWindow(table_widget.rowCount(), self.table_widget, self.work_plan)
 
             # self.work_window.setGeometry(100, 400, 200, 500)
@@ -2552,61 +2636,6 @@ class MyWindow(QMainWindow):
                             f'агрегата и бригады для проведения ремонта скважины.')
                         table_widget.setItem(row, column, new_value)
 
-    def check_true_depth_template(self, depth):
-        check = True
-        if well_data.column_additional:
-
-            if well_data.template_depth_addition < depth and depth > well_data.head_column_additional._value:
-                check = False
-                check_question = QMessageBox.question(
-                    self,
-                    'Проверка глубины пакера',
-                    f'Проверка показало что пакер с глубиной {depth}м спускается ниже'
-                    f' глубины  шаблонирования {well_data.template_depth_addition}')
-                if check_question == QMessageBox.StandardButton.Yes:
-                    check = True
-            if well_data.template_depth < depth and depth < well_data.head_column_additional._value:
-                check = False
-                check_question = QMessageBox.question(
-                    self,
-                    'Проверка глубины пакера',
-                    f'Проверка показало что пакер с глубиной {depth}м спускается ниже '
-                    f'глубины шаблонирования {well_data.template_depth}')
-                if check_question == QMessageBox.StandardButton.Yes:
-                    check = True
-        else:
-            # print(f'глубина {well_data.template_depth, depth}')
-            if well_data.template_depth < depth:
-                check = False
-                check_question = QMessageBox.question(
-                    self, 'Проверка глубины пакера', f'Проверка показало что пакер с глубиной {depth}м спускается ниже '
-                    f'глубины шаблонирования {well_data.template_depth}')
-                if check_question == QMessageBox.StandardButton.Yes:
-                    check = True
-
-        return check
-
-    def true_set_Paker(self, depth):
-
-        check_true = False
-
-        for plast in well_data.plast_all:
-            if len(well_data.dict_perforation[plast]['интервал']) >= 1:
-                for interval in well_data.dict_perforation[plast]['интервал']:
-                    if interval[0] < depth < interval[1]:
-                        check_true = False
-                    else:
-                        check_true = True
-            elif len(well_data.dict_perforation[plast]['интервал']) == 0:
-                check_true = True
-
-        if check_true is False:
-            QMessageBox.warning(None, 'Проверка посадки пакера в интервал перфорации',
-                                f'Проверка посадки показала пакер сажается в интервал перфорации, '
-                                f'необходимо изменить глубину посадки!!!')
-
-        return check_true
-
     def check_str_isdigit(self, string):
 
         # Паттерн для проверки: допустимы только цифры, точка и запятая
@@ -2617,36 +2646,6 @@ class MyWindow(QMainWindow):
             return True
         else:
             return False
-
-    def check_depth_in_skm_interval(self, depth):
-        from work_py.advanted_file import raid, remove_overlapping_intervals
-        check_true = False
-        check_ribbing = False
-
-        for interval in well_data.skm_interval:
-            if float(interval[0]) <= float(depth) <= float(interval[1]):
-                check_true = True
-                return int(depth)
-
-        for interval in well_data.ribbing_interval:
-            if float(interval[0]) <= float(depth) <= float(interval[1]):
-                check_ribbing = True
-        if check_true is False and check_ribbing is False:
-            false_question = QMessageBox.warning(None, 'Проверка посадки пакера в интервал скреперования',
-                                                 f'Проверка посадки показала, что пакер сажается не '
-                                                 f'в интервал скреперования {well_data.skm_interval}, и '
-                                                 f'райбирования {well_data.ribbing_interval} \n'
-                                                 f'Нужно скорректировать интервалы скреперования ')
-            return False
-        if check_true is True and check_ribbing is False:
-            false_question = QMessageBox.question(None, 'Проверка посадки пакера в интервал скреперования',
-                                                  f'Проверка посадки показала, что пакер сажается не '
-                                                  f'в интервал скреперования {well_data.skm_interval}, '
-                                                  f'но сажается в интервал райбирования '
-                                                  f'райбирования {well_data.ribbing_interval} \n'
-                                                  f'Продолжить?')
-            if false_question == QMessageBox.StandardButton.No:
-                return False
 
     @staticmethod
     def delete_files():
@@ -2664,7 +2663,7 @@ if __name__ == "__main__":
     # app3 = QApplication(sys.argv)
 
     app = QApplication(sys.argv)
-    # MyWindow.delete_files()
+    #  MyMainWindow.delete_files()
 
     if MyWindow.check_process():
         MyWindow.show_confirmation()
@@ -2677,7 +2676,7 @@ if __name__ == "__main__":
                                           'будет использована локальная база данных')
         MyWindow.login_window = LoginWindow()
         MyWindow.login_window.show()
-        MyWindow.pause_app()
+        MyMainWindow.pause_app()
         well_data.pause = False
     except Exception as e:
         mes = QMessageBox.warning(None, 'КРИТИЧЕСКАЯ ОШИБКА',
@@ -2689,7 +2688,7 @@ if __name__ == "__main__":
     #     if app2.window_close == True:
     #         MyWindow.set_modal_window(None, app2)
     #         well_data.pause = True
-    #         MyWindow.pause_app()
+    #         self.pause_app()
     #         well_data.pause = False
     #         app2.close()
 

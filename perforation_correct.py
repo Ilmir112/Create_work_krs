@@ -3,12 +3,14 @@ import re
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.Qt import *
 from PyQt5.QtGui import QRegExpValidator, QColor, QPalette
+
+from main import MyMainWindow
 from work_py.advanted_file import definition_plast_work
 
 
 class FloatLineEdit(QLineEdit):
     def __init__(self, parent=None):
-        super(FloatLineEdit, self).__init__(parent)
+        super(FloatLineEdit, self).__init__()
 
         # Устанавливаем валидатор для проверки на float
 
@@ -32,7 +34,7 @@ class FloatLineEdit(QLineEdit):
 
 class TabPage_SO(QWidget):
     def __init__(self, parent=None):
-        super().__init__(parent)
+        super().__init__()
        
 
         self.labels_plast = {}
@@ -168,7 +170,7 @@ class TabWidget(QTabWidget):
         self.addTab(TabPage_SO(self), 'Проверка корректности данных перфорации')
 
 
-class PerforationCorrect(QMainWindow):
+class PerforationCorrect(MyMainWindow):
 
     def __init__(self, parent=None):
         super(PerforationCorrect, self).__init__()

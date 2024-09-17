@@ -4,6 +4,7 @@ import well_data
 from PyQt5 import QtCore,  QtWidgets
 from PyQt5.Qt import *
 
+from main import  MyMainWindow
 
 
 class TabPageSO(QWidget):
@@ -11,7 +12,7 @@ class TabPageSO(QWidget):
     podpis_dict = None
 
     def __init__(self, parent=None):
-        super().__init__(parent)
+        super().__init__()
 
         # Открытие JSON файла и чтение данных
         with open(f'{well_data.path_image}podpisant.json', 'r', encoding='utf-8') as file:
@@ -157,7 +158,7 @@ class TabWidget(QTabWidget):
         self.addTab(TabPageSO(self), 'Изменение данных')
 
 
-class CorrectSignaturesWindow(QMainWindow):
+class CorrectSignaturesWindow( MyMainWindow):
 
     def __init__(self):
         super(CorrectSignaturesWindow, self).__init__()

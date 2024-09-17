@@ -1,4 +1,5 @@
 import well_data
+from main import MyMainWindow
 from work_py.alone_oreration import privyazkaNKT
 from .rationingKRS import descentNKT_norm, descent_sucker_pod
 from .calc_fond_nkt import CalcFond
@@ -140,9 +141,9 @@ class TabWidget(QTabWidget):
         self.addTab(TabPage_Gno(), 'Спуск ГНО')
 
 
-class GnoDescentWindow(QMainWindow):
+class GnoDescentWindow(MyMainWindow):
     def __init__(self, ins_ind, table_widget, parent=None):
-        super(GnoDescentWindow, self).__init__(parent)
+        super(GnoDescentWindow, self).__init__()
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
         self.ins_ind = ins_ind
@@ -157,7 +158,7 @@ class GnoDescentWindow(QMainWindow):
         vbox.addWidget(self.buttonAdd, 2, 0)
 
     def add_work(self):
-        from main import MyWindow
+        from main import MyMainWindow
 
         lift_key = str(self.tabWidget.currentWidget().gno_combo.currentText())
         nkt_edit = self.tabWidget.currentWidget().nkt_edit.text()
@@ -232,7 +233,7 @@ class GnoDescentWindow(QMainWindow):
         for row in self.end_list:
             work_list.append(row)
 
-        MyWindow.populate_row(self, self.ins_ind, work_list, self.table_widget)
+        self.populate_row(self.ins_ind, work_list, self.table_widget)
         well_data.pause = False
         self.close()
 

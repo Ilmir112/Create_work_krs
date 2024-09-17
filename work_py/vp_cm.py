@@ -3,12 +3,12 @@ from PyQt5.QtWidgets import QInputDialog, QTabWidget, QMainWindow, QWidget, QLin
     QPushButton, QMessageBox
 
 import well_data
-from main import MyWindow
+from main import MyMainWindow
 from .rir import RirWindow
 
 class TabPage_Vp(QWidget):
     def __init__(self, parent=None):
-        super().__init__(parent)
+        super().__init__()
 
         self.validator = QIntValidator(0, 80000)
 
@@ -93,10 +93,10 @@ class TabWidget(QTabWidget):
         self.addTab(TabPage_Vp(self), 'Установка ВП')
 
 
-class VpWindow(QMainWindow):
+class VpWindow(MyMainWindow):
     work_clay_window = None
     def __init__(self, ins_ind, table_widget, parent=None):
-        super(QMainWindow, self).__init__(parent)
+        super().__init__()
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
 
@@ -117,19 +117,19 @@ class VpWindow(QMainWindow):
         vp_depth = int(float(self.tabWidget.currentWidget().vp_depth_edit.text()))
         cement_vp = int(float(self.tabWidget.currentWidget().cement_vp_edit.text()))
         if need_question_QCombo == "Да":
-            if MyWindow.check_true_depth_template(self, vp_depth) is False:
+            if self.check_true_depth_template(vp_depth) is False:
                 return
-            if MyWindow.true_set_Paker(self, vp_depth) is False:
+            if self.true_set_Paker( vp_depth) is False:
                 return
-            if MyWindow.check_depth_in_skm_interval(self, vp_depth) is False:
+            if self.check_depth_in_skm_interval(vp_depth) is False:
                 return
             work_list = self.vp(vp_type_QCombo, vp_depth, cement_vp, need_question_QCombo)
         elif need_question_QCombo == "Нет":
-            if MyWindow.check_true_depth_template(self, vp_depth) is False:
+            if self.check_true_depth_template(vp_depth) is False:
                 return
-            if MyWindow.true_set_Paker(self, vp_depth) is False:
+            if self.true_set_Paker( vp_depth) is False:
                 return
-            if MyWindow.check_depth_in_skm_interval(self, vp_depth) is False:
+            if self.check_depth_in_skm_interval(vp_depth) is False:
                 return
             work_list = self.vp(vp_type_QCombo, vp_depth, cement_vp, need_question_QCombo)
         else:
@@ -141,7 +141,7 @@ class VpWindow(QMainWindow):
 
 
 
-        MyWindow.populate_row(self, self.ins_ind, work_list, self.table_widget)
+        self.populate_row(self.ins_ind, work_list, self.table_widget)
         well_data.pause = False
         self.close()
 

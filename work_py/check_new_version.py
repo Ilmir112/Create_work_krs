@@ -170,7 +170,7 @@ class UpdateThread(QThread):
     finished_signal = pyqtSignal(bool)
 
     def __init__(self, parent=None):
-        super().__init__(parent)
+        super().__init__()
         self.latest_version = self.check_version()
 
     def check_version(self):

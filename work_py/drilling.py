@@ -4,12 +4,12 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QLineEdi
 import well_data
 from PyQt5.QtCore import Qt
 
-
+from main import MyMainWindow
 from .rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
 
 class TabPage_SO_drill(QWidget):
     def __init__(self, parent=None):
-        super().__init__(parent)
+        super().__init__()
 
         self.drill_select_label = QLabel("компоновка НКТ", self)
         self.drill_select_combo = QComboBox(self)
@@ -174,9 +174,9 @@ class TabWidget(QTabWidget):
         self.addTab(TabPage_SO_drill(self), 'Бурение')
 
 
-class Drill_window(QMainWindow):
+class Drill_window(MyMainWindow):
     def __init__(self, ins_ind, table_widget, parent=None):
-        super(Drill_window, self).__init__(parent)
+        super(Drill_window, self).__init__()
 
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
@@ -297,7 +297,7 @@ class Drill_window(QMainWindow):
                 break
 
     def add_work(self):
-        from main import MyWindow
+        from main import MyMainWindow
         try:
             self.nkt_str = self.tabWidget.currentWidget().nkt_str_combo.currentText()
             self.drillingBit_diam = self.tabWidget.currentWidget().drill_diametr_line.text()
@@ -352,7 +352,7 @@ class Drill_window(QMainWindow):
                                            self.drillingBit_diam, self.downhole_motor)
 
         try:
-            MyWindow.populate_row(self, self.ins_ind, drill_list, self.table_widget)
+            self.populate_row(self.ins_ind, drill_list, self.table_widget)
             well_data.pause = False
 
             self.close()

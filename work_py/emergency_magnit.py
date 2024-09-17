@@ -5,7 +5,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QLineEdit, QComboBox, QGridLayout, QTabWidget, \
     QTableWidget, QHeaderView, QPushButton, QTableWidgetItem, QApplication, QMainWindow
 
-from main import MyWindow
+from main import MyMainWindow
 from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
 
 
@@ -13,7 +13,7 @@ from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_n
 
 class TabPage_SO_magnit(QWidget):
     def __init__(self, parent=None):
-        super().__init__(parent)
+        super().__init__()
 
         self.print_diametr_label = QLabel("Диаметр магнит", self)
         self.print_diametr_line = QLineEdit(self)
@@ -117,9 +117,9 @@ class TabWidget(QTabWidget):
         self.addTab(TabPage_SO_magnit(), 'Работа печатью')
 
 
-class Emergency_magnit(MyWindow):
+class Emergency_magnit(MyMainWindow):
     def __init__(self, ins_ind, table_widget, parent=None):
-        super(MyWindow, self).__init__(parent)
+        super(Emergency_magnit, self).__init__()
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
 
@@ -167,7 +167,7 @@ class Emergency_magnit(MyWindow):
         raid_list = self.emergency_magnit(print_diametr_line, nkt_str_combo, print_type_combo, nkt_key,
                                       emergency_bottom_line)
 
-        MyWindow.populate_row(self, self.ins_ind, raid_list, self.table_widget)
+        self.populate_row(self.ins_ind, raid_list, self.table_widget)
         well_data.pause = False
         self.close()
 

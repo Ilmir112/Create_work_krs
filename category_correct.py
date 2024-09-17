@@ -1,5 +1,7 @@
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.Qt import *
+
+from main import  MyMainWindow
 from work_py.acid_paker import CheckableComboBox
 
 from collections import namedtuple
@@ -10,7 +12,7 @@ from H2S import calv_h2s
 class TabPage_SO(QWidget):
     count_plast = []
     def __init__(self, parent=None):
-        super().__init__(parent)
+        super().__init__()
 
         self.labels_category = {}
         self.type_absorbent_label = QLabel('Тип поглотителя')
@@ -222,7 +224,7 @@ class TabWidget(QTabWidget):
         self.addTab(TabPage_SO(self), 'Проверка корректности данных')
 
 
-class CategoryWindow(QMainWindow):
+class CategoryWindow( MyMainWindow):
     dict_category = {}
 
     def __init__(self, parent=None):

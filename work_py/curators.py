@@ -3,12 +3,12 @@ from PyQt5.QtWidgets import QInputDialog, QWidget, QLabel, QLineEdit, QComboBox,
     QMessageBox
 
 import well_data
-from main import MyWindow
+from main import MyMainWindow
 from .rationingKRS import descentNKT_norm, liftingNKT_norm
 
 class TabPage_SO_curator(QWidget):
     def __init__(self, parent=None):
-        super().__init__(parent)
+        super().__init__()
 
         self.curator_label = QLabel("Куратор", self)
         self.curator_combo = QComboBox(self)
@@ -26,10 +26,10 @@ class TabWidget(QTabWidget):
         self.addTab(TabPage_SO_curator(), 'Куратор')
 
 
-class SelectCurator(MyWindow):
+class SelectCurator(MyMainWindow):
 
     def __init__(self, parent=None):
-        super(MyWindow, self).__init__(parent)
+        super().__init__()
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
 

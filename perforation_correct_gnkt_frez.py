@@ -3,11 +3,12 @@ from PyQt5.Qt import *
 
 import well_data
 from gnkt_data.gnkt_data import dict_saddles
+from main import MyMainWindow
 
 
 class TabPage_SO(QWidget):
     def __init__(self, parent=None):
-        super().__init__(parent)
+        super().__init__()
        
 
         manufacturer_list = ['НТЦ ЗЭРС', 'Зенит', 'Барбус']
@@ -164,7 +165,7 @@ class TabWidget(QTabWidget):
         self.addTab(TabPage_SO(self), 'Проверка корректности данных перфорации')
 
 
-class PerforationCorrectGnktFrez(QMainWindow):
+class PerforationCorrectGnktFrez(MyMainWindow):
 
     def __init__(self, parent=None):
         super(PerforationCorrectGnktFrez, self).__init__()

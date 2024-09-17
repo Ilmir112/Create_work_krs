@@ -8,13 +8,13 @@ from .rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
 from work_py.alone_oreration import kot_work
 from PyQt5.QtGui import QDoubleValidator
 from .template_work import TemplateKrs, TabPage_SO_with
-from main import MyWindow
+from main import MyMainWindow
 
 
 class TabPage_SO(QWidget):
     def __init__(self, parent=None):
 
-        super().__init__(parent)
+        super().__init__()
 
         validator = QDoubleValidator(0.0, 80000.0, 2)
 
@@ -562,10 +562,10 @@ class TabWidget(QTabWidget):
         self.addTab(TabPage_SO(self), 'Выбор компоновки шаблонов')
 
 
-class Template_without_skm(QMainWindow):
+class Template_without_skm(MyMainWindow):
     def __init__(self, ins_ind, table_widget):
 
-        super(QMainWindow, self).__init__()
+        super().__init__()
 
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
@@ -630,7 +630,9 @@ class Template_without_skm(QMainWindow):
 
         self.update_template(well_data.ins_ind)
         work_list = self.template_ek(template_str, template, template_diametr)
-        MyWindow.populate_row(self, self.ins_ind, work_list, self.table_widget)
+
+        self.populate_row(self.ins_ind, work_list, self.table_widget)
+
         well_data.pause = False
         self.close()
 
@@ -883,7 +885,7 @@ class Template_without_skm(QMainWindow):
                     self.raid_window = Drill_window(self.table_widget, self.ins_ind)
                     # self.raid_window.setGeometry(200, 400, 300, 400)
                     self.raid_window.show()
-                    MyWindow.pause_app()
+                    self.pause_app()
                     drill_work_list = self.raid_window.add_work()
                     well_data.pause = True
 
@@ -899,7 +901,7 @@ class Template_without_skm(QMainWindow):
                     self.raid_window = Drill_window(self.table_widget, self.ins_ind)
                     # self.raid_window.setGeometry(200, 400, 300, 400)
                     self.raid_window.show()
-                    MyWindow.pause_app()
+                    self.pause_app()
                     drill_work_list = self.raid_window.add_work()
                     well_data.pause = True
 

@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox, QLabel, QLineEdit, QCombo
 import krs
 import main
 import well_data
-from main import MyWindow
+from main import MyMainWindow
 from work_py.alone_oreration import kot_select
 from .opressovka import OpressovkaEK
 from .rationingKRS import descentNKT_norm, liftingNKT_norm,well_volume_norm
@@ -18,7 +18,7 @@ from .grp import Grp_window
 class TabPage_SO_grp(QWidget):
     def __init__(self, parent=None):
        
-        super().__init__(parent)
+        super().__init__()
 
         validator = QDoubleValidator(0.0, 80000.0, 2)
 
@@ -73,7 +73,7 @@ class TabWidget(QTabWidget):
         super().__init__()
         self.addTab(TabPage_SO_grp(self), 'ГПП')
 
-class Gpp_window(QMainWindow):
+class Gpp_window(MyMainWindow):
     def __init__(self,  ins_ind, table_widget):
         super(Gpp_window, self).__init__()
 
@@ -102,7 +102,7 @@ class Gpp_window(QMainWindow):
             return
         work_list = self.grpGpp(paker_depth, current_depth, diametr_paker, gisOTZ_after_true_quest)
 
-        MyWindow.populate_row(self, self.ins_ind, work_list, self.table_widget)
+        self.populate_row(self.ins_ind, work_list, self.table_widget)
         well_data.pause = False
         self.close()
     def grpGpp(self, gpp_depth, current_depth, diametr_paker, gisOTZ_after_true_quest):
@@ -115,7 +115,7 @@ class Gpp_window(QMainWindow):
         nkt_diam = ''.join(['89' if well_data.column_diametr._value > 110 else '60'])
 
 
-        gPP_300 = MyWindow.check_depth_in_skm_interval(self, gpp_depth)
+        gPP_300 = self.check_depth_in_skm_interval(gpp_depth)
         # print(self.table_widget)
 
         main.MyWindow.check_gpp_upa(self, self.table_widget)

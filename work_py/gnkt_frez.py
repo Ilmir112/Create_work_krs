@@ -19,13 +19,13 @@ from work_py.gnkt_grp import GnktOsvWindow
 from work_py.gnkt_grp_work import GnktOsvWindow2
 from .data_informations import dict_data_cdng, calc_pntzh
 
-class Work_with_gnkt(QMainWindow):
+class Work_with_gnkt(main.MyWindow):
     wb_gnkt_frez = Workbook()
 
     def __init__(self, ws, table_title, table_schema, table_widget):
         from open_pz import CreatePZ
 
-        super(QMainWindow, self).__init__()
+        super().__init__()
         self.table_widget = table_widget
         self.table_title = table_title
         self.table_schema = table_schema
@@ -41,7 +41,7 @@ class Work_with_gnkt(QMainWindow):
             self.perforation_correct_window2.setWindowTitle("Сверка данных по муфтам")
             # self.perforation_correct_window2.setGeometry(200, 400, 100, 400)
             self.perforation_correct_window2.show()
-            main.MyWindow.pause_app()
+            self.pause_app()
             well_data.pause = True
             self.dict_ports = self.perforation_correct_window2.add_row_table()
             self.perforation_correct_window2 = None
@@ -56,7 +56,7 @@ class Work_with_gnkt(QMainWindow):
             self.perforation_correct_window.setGeometry(200, 400, 100, 400)
             self.perforation_correct_window.show()
             well_data.pause = True
-            main.MyWindow.pause_app()
+            self.pause_app()
             self.perforation_correct_window = None
 
         else:
@@ -88,7 +88,7 @@ class Work_with_gnkt(QMainWindow):
         main.MyWindow.copy_pz(self, self.ws_schema, table_schema, 'gnkt_frez', 47, 2)
         main.MyWindow.copy_pz(self, self.ws_work, table_widget, 'gnkt_frez', 12, 3)
         work_well = self.work_gnkt_frez(self.ports_data, self.plast_work)
-        main.MyWindow.populate_row(self, 0, work_well, table_widget, self.work_plan)
+        self.populate_row(0, work_well, table_widget, self.work_plan)
 
         CreatePZ.add_itog(self, self.ws_work, self.table_widget.rowCount() + 1, self.work_plan)
 
@@ -291,7 +291,7 @@ class Work_with_gnkt(QMainWindow):
         if Work_with_gnkt.wb_gnkt_frez:
             Work_with_gnkt.wb_gnkt_frez.remove(Work_with_gnkt.wb_gnkt_frez['Sheet'])
 
-            main.MyWindow.saveFileDialog(self, Work_with_gnkt.wb_gnkt_frez, full_path)
+            self.saveFileDialog(Work_with_gnkt.wb_gnkt_frez, full_path)
 
             Work_with_gnkt.wb_gnkt_frez.close()
 

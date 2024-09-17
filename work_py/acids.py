@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QComboBo
 import krs
 import well_data
 from gnkt_data.gnkt_data import gnkt_dict
-from main import MyWindow
+from main import MyMainWindow
 from .acid_paker import CheckableComboBox
 from .alone_oreration import well_volume
 
@@ -112,9 +112,9 @@ class TabWidget(QTabWidget):
         self.addTab(TabPageDp(), 'ГОНС')
 
 
-class GonsWindow(QMainWindow):
+class GonsWindow(MyMainWindow):
     def __init__(self, ins_ind, table_widget, parent=None):
-        super(QMainWindow, self).__init__(parent)
+        super(GonsWindow, self).__init__()
 
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
@@ -151,7 +151,7 @@ class GonsWindow(QMainWindow):
 
         work_list = self.acidGons(plast_combo, acid_edit, acid_volume_edit, acid_proc_edit, poins_sko_edit, bottom_point,
                                   acid_calcul_Edit, pressure_edit, iron_true_combo, iron_volume_edit)
-        MyWindow.populate_row(self, self.ins_ind, work_list, self.table_widget)
+        self.populate_row(self.ins_ind, work_list, self.table_widget)
         well_data.pause = False
         self.close()
         return work_list

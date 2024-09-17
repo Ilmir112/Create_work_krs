@@ -6,7 +6,7 @@ from work_py.alone_oreration import volume_vn_ek, well_volume, volume_vn_nkt
 from .change_fluid import Change_fluid_Window
 from .opressovka import OpressovkaEK, TabPage_SO
 
-from main import MyWindow
+from main import MyMainWindow
 from .rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
 from .acid_paker import CheckableComboBox
 
@@ -14,7 +14,7 @@ from .acid_paker import CheckableComboBox
 class TabPage_SO_rir(QWidget):
     def __init__(self, parent=None):
 
-        super().__init__(parent)
+        super().__init__()
 
         self.validator_int = QIntValidator(0, 8000)
         self.validator_float = QDoubleValidator(0.0, 1.65, 2)
@@ -371,12 +371,12 @@ class TabWidget(QTabWidget):
         self.addTab(TabPage_SO_rir(self), 'Ремонтно-Изоляционные работы')
 
 
-class RirWindow(QMainWindow):
+class RirWindow(MyMainWindow):
     work_rir_window = None
 
     def __init__(self, ins_ind, table_widget, parent=None):
 
-        super(QMainWindow, self).__init__(parent)
+        super().__init__()
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
 
@@ -1072,11 +1072,11 @@ class RirWindow(QMainWindow):
             diametr_paker = int(float(current_widget.diametr_paker_edit.text()))
             paker_khost = int(float(current_widget.paker_khost_edit.text()))
             paker_depth = int(float(current_widget.paker_depth_edit.text()))
-            if MyWindow.check_true_depth_template(self, paker_depth) is False:
+            if self.check_true_depth_template(paker_depth) is False:
                 return
-            if MyWindow.true_set_Paker(self, paker_depth) is False:
+            if self.true_set_Paker(paker_depth) is False:
                 return
-            if MyWindow.check_depth_in_skm_interval(self, paker_depth) is False:
+            if self.check_depth_in_skm_interval(paker_depth) is False:
                 return
             if pressureZUMPF_question == 'Да':
                 if paker_depth + paker_khost > well_data.current_bottom:
@@ -1105,11 +1105,11 @@ class RirWindow(QMainWindow):
                 mes = QMessageBox.critical(self, 'Ошибка', 'Введены не все параметры')
                 return
             if need_change_zgs_combo == 'Да':
-                if MyWindow.check_true_depth_template(self, paker_depth) is False:
+                if self.check_true_depth_template(paker_depth) is False:
                     return
-                if MyWindow.true_set_Paker(self, paker_depth) is False:
+                if self.true_set_Paker(paker_depth) is False:
                     return
-                if MyWindow.check_depth_in_skm_interval(self, paker_depth) is False:
+                if self.check_depth_in_skm_interval(paker_depth) is False:
                     return
 
             work_list = self.rirWithPero_gl(paker_need_Combo, plast_combo,
@@ -1137,7 +1137,7 @@ class RirWindow(QMainWindow):
                                      roof_rir_edit, sole_rir_edit, pressureZUMPF_question,
                                      diametr_paker, paker_khost, paker_depth)
 
-        MyWindow.populate_row(MyWindow, self.ins_ind, work_list, self.table_widget)
+        self.populate_row(self.ins_ind, work_list, self.table_widget)
         well_data.pause = False
         self.close()
 

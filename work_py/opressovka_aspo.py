@@ -1,7 +1,7 @@
 from PyQt5.QtGui import QDoubleValidator, QIntValidator
 
 import well_data
-from main import MyWindow
+from main import MyMainWindow
 from PyQt5.QtWidgets import QMessageBox, QInputDialog, QMainWindow, QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, \
     QTabWidget, QPushButton
 
@@ -14,7 +14,7 @@ from .rationingKRS import descentNKT_norm, liftingNKT_norm
 class TabPage_SO_aspo(QWidget):
     def __init__(self, parent=None):
 
-        super().__init__(parent)
+        super().__init__()
 
         self.validator = QIntValidator(0, 5000)
 
@@ -73,9 +73,9 @@ class TabWidget(QTabWidget):
         super().__init__()
         self.addTab(TabPage_SO(self), 'Очистка колонны с пакером')
 
-class PakerAspo(QMainWindow):
+class PakerAspo(MyMainWindow):
     def __init__(self, ins_ind, table_widget, parent=None):
-        super().__init__(parent)
+        super().__init__()
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
         self.table_widget = table_widget
@@ -98,15 +98,15 @@ class PakerAspo(QMainWindow):
             mes = QMessageBox.warning(self, 'Некорректные данные', f'Компоновка НКТ c хвостовик + пакер '
                                                                    f'ниже текущего забоя')
             return
-        if MyWindow.check_true_depth_template(self, paker_depth) is False:
+        if self.check_true_depth_template(paker_depth) is False:
             return
-        if MyWindow.true_set_Paker(self, paker_depth) is False:
+        if self.true_set_Paker(paker_depth) is False:
             return
-        if MyWindow.check_depth_in_skm_interval(self, paker_depth) is False:
+        if self.check_depth_in_skm_interval(paker_depth) is False:
             return
 
         work_list = PakerAspo.paker_list(self, diametr_paker, paker_khost, paker_depth)
-        MyWindow.populate_row(self, self.ins_ind, work_list, self.table_widget)
+        self.populate_row(self.ins_ind, work_list, self.table_widget)
         well_data.pause = False
         self.close()
 

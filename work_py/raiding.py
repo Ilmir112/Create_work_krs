@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QLineEdi
     QTableWidget, QHeaderView, QPushButton, QTableWidgetItem, QApplication, QMainWindow
 
 import well_data
-from main import MyWindow
+from main import MyMainWindow
 
 from .rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
 from .advanted_file import change_True_raid
@@ -14,7 +14,7 @@ from .advanted_file import change_True_raid
 
 class TabPage_SO_raid(QWidget):
     def __init__(self, parent=None):
-        super().__init__(parent)
+        super().__init__()
 
         self.raid_diametr_label = QLabel("Диаметр райбера", self)
         self.raid_diametr_line = QLineEdit(self)
@@ -172,9 +172,9 @@ class TabWidget(QTabWidget):
         self.addTab(TabPage_SO_raid(), 'Райбер')
 
 
-class Raid(MyWindow):
+class Raid(MyMainWindow):
     def __init__(self, ins_ind, table_widget, parent=None):
-        super(MyWindow, self).__init__(parent)
+        super(Raid, self).__init__()
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
 
@@ -306,7 +306,7 @@ class Raid(MyWindow):
 
         well_data.ribbing_interval.extend(raid_tuple[::-1])
 
-        MyWindow.populate_row(self, self.ins_ind, raid_list, self.table_widget)
+        self.populate_row(self.ins_ind, raid_list, self.table_widget)
         well_data.pause = False
         self.close()
 

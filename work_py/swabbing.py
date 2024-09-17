@@ -10,7 +10,7 @@ import well_data
 from H2S import calv_h2s
 
 from work_py.alone_oreration import well_volume
-from main import MyWindow
+from main import MyMainWindow
 from work_py.change_fluid import Change_fluid_Window
 
 from work_py.alone_oreration import privyazkaNKT, need_h2s
@@ -557,9 +557,9 @@ class TabWidget(QTabWidget):
         self.addTab(TabPage_SO_swab(tableWidget), 'Свабирование')
 
 
-class Swab_Window(QMainWindow):
+class Swab_Window(MyMainWindow):
     def __init__(self, ins_ind, table_widget, parent=None):
-        super(QMainWindow, self).__init__(parent)
+        super().__init__()
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
         self.table_widget = table_widget
@@ -626,11 +626,11 @@ class Swab_Window(QMainWindow):
                                               f'Компоновка ниже {paker_khost + paker_depth}м текущего забоя '
                                               f'{well_data.current_bottom}м')
                 return
-            if MyWindow.check_true_depth_template(self, paker_depth) is False:
+            if self.check_true_depth_template(paker_depth) is False:
                 return
-            if MyWindow.true_set_Paker(self, paker_depth) is False:
+            if self.true_set_Paker(paker_depth) is False:
                 return
-            if MyWindow.check_depth_in_skm_interval(self, paker_depth) is False:
+            if self.check_depth_in_skm_interval(paker_depth) is False:
                 return
 
             self.tableWidget.insertRow(rows)
@@ -645,17 +645,17 @@ class Swab_Window(QMainWindow):
             paker_khost = AcidPakerWindow.if_None(self, self.tabWidget.currentWidget().khvostEdit.text())
             paker_depth = AcidPakerWindow.if_None(self, self.tabWidget.currentWidget().pakerEdit.text())
             paker2_depth = AcidPakerWindow.if_None(self, self.tabWidget.currentWidget().paker2Edit.text())
-            if MyWindow.check_true_depth_template(self, paker_depth) is False:
+            if self.check_true_depth_template(paker_depth) is False:
                 return
-            if MyWindow.true_set_Paker(self, paker_depth) is False:
+            if self.true_set_Paker(paker_depth) is False:
                 return
-            if MyWindow.check_depth_in_skm_interval(self, paker_depth) is False:
+            if self.check_depth_in_skm_interval(paker_depth) is False:
                 return
-            if MyWindow.check_true_depth_template(self, paker2_depth) is False:
+            if self.check_true_depth_template(paker2_depth) is False:
                 return
-            if MyWindow.true_set_Paker(self, paker2_depth) is False:
+            if self.true_set_Paker( paker2_depth) is False:
                 return
-            if MyWindow.check_depth_in_skm_interval(self, paker2_depth) is False:
+            if self.check_depth_in_skm_interval(paker2_depth) is False:
                 return
 
             if well_data.current_bottom < float(paker_khost + paker2_depth):
@@ -744,11 +744,11 @@ class Swab_Window(QMainWindow):
                     return
 
 
-                if MyWindow.check_true_depth_template(self, paker_depth_zumpf) is False:
+                if self.check_true_depth_template(paker_depth_zumpf) is False:
                     return
-                if MyWindow.true_set_Paker(self, paker_depth_zumpf) is False:
+                if self.true_set_Paker( paker_depth_zumpf) is False:
                     return
-                if MyWindow.check_depth_in_skm_interval(self, paker_depth_zumpf) is False:
+                if self.check_depth_in_skm_interval(paker_depth_zumpf) is False:
                     return
 
             rows = self.tableWidget.rowCount()
@@ -948,7 +948,7 @@ class Swab_Window(QMainWindow):
                 paker_depth = int(float(self.tableWidget.item(row, 2).text()))
                 work_list = self.swabbing_opy_with_paker(diametr_paker, paker_khost, paker_depth, paker2_depth)
 
-        MyWindow.populate_row(self, self.ins_ind, work_list, self.table_widget)
+        self.populate_row(self.ins_ind, work_list, self.table_widget)
         well_data.pause = False
         self.close()
 
@@ -957,11 +957,11 @@ class Swab_Window(QMainWindow):
             schema_swab = '8'
         elif 'РН' in well_data.contractor:
             schema_swab = '7'
-        if MyWindow.check_true_depth_template(self, paker_depth) is False:
+        if self.check_true_depth_template(paker_depth) is False:
             return
-        if MyWindow.true_set_Paker(self, paker_depth) is False:
+        if self.true_set_Paker(paker_depth) is False:
             return
-        if MyWindow.check_depth_in_skm_interval(self, paker_depth) is False:
+        if self.check_depth_in_skm_interval(paker_depth) is False:
             return
         need_change_zgs_combo = str(self.tabWidget.currentWidget().need_change_zgs_combo.currentText())
         if need_change_zgs_combo == 'Да':
