@@ -3,7 +3,7 @@ import math
 import well_data
 
 from PyQt5.QtWidgets import QInputDialog, QMessageBox, QTabWidget, QWidget, QLabel, QComboBox, QMainWindow, QLineEdit, \
-    QGridLayout, QPushButton, QBoxLayout
+    QGridLayout, QPushButton, QBoxLayout, QApplication
 from .rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
 from work_py.alone_oreration import kot_work
 from PyQt5.QtGui import QDoubleValidator
@@ -229,7 +229,7 @@ class TabPage_SO(QWidget):
             dictance_template_second = ''
         current_bottom = float(self.current_bottom_edit.text())
         roof_plast, roof_add_column_plast = TabPage_SO_with.definition_roof_not_raiding(self, current_bottom)
-        dictance_template_first = int(well_data.current_bottom - roof_plast + 5)
+
 
         nkt_diam = well_data.nkt_diam
 
@@ -911,3 +911,12 @@ class Template_without_skm(QMainWindow):
                     gipsPero_list.append(row)
 
         return gipsPero_list
+
+if __name__ == "__main__":
+    import sys
+
+    app = QApplication(sys.argv)
+    # app.setStyleSheet()
+    window = Template_without_skm(22, 22)
+    window.show()
+    app.exec_()

@@ -12,6 +12,12 @@ from main import MyWindow
 
 
 def skm_interval(self, template):
+    sgm_True = False
+    if template in ['СГМ ЭК', 'СГМ открытый ствол' 'СГМ в основной колонне',
+                                         'СГМ в доп колонне + открытый ствол',
+                                         'СГМ в доп колонне']:
+        sgm_True = True
+
     str_raid = []
     if well_data.paker_do["posle"] != 0:
         str_raid.append(
@@ -26,20 +32,9 @@ def skm_interval(self, template):
                 str_raid.append([int(float(nek.split('-')[0])) - 90,
                                  well_data.current_bottom - 2])
 
-    if all([well_data.dict_perforation[plast]['отрайбировано'] is False for plast in well_data.plast_all]):
-        str_raid.append([well_data.perforation_roof - 90, well_data.skm_depth])
-        if well_data.leakiness:
-            for nek in list(well_data.dict_leakiness['НЭК']['интервал'].keys()):
-                # print(f' наруш {nek}')
-                if float(nek.split('-')[1]) + 20 < well_data.current_bottom:
-                    str_raid.append([int(float(nek.split('-')[0])) - 90, int(float(nek.split('-')[1])) + 20])
-                else:
-                    str_raid.append([int(float(nek.split('-')[0])) - 90,
-                                     well_data.current_bottom - 2])
-
-    elif all(
+    if all(
             [well_data.dict_perforation[plast]['отрайбировано'] is True for plast in well_data.plast_all
-             if well_data.dict_perforation[plast]['подошва'] < well_data.current_bottom]):
+             if well_data.dict_perforation[plast]['подошва'] < well_data.current_bottom]) or sgm_True:
         str_raid = []
 
         perforating_intervals = []
@@ -51,11 +46,22 @@ def skm_interval(self, template):
 
         str_raid.extend(remove_overlapping_intervals(perforating_intervals))
 
+    elif all([well_data.dict_perforation[plast]['отрайбировано'] is False for plast in well_data.plast_all]):
+        str_raid.append([well_data.perforation_roof - 90, well_data.skm_depth])
+        if well_data.leakiness:
+            for nek in list(well_data.dict_leakiness['НЭК']['интервал'].keys()):
+                # print(f' наруш {nek}')
+                if float(nek.split('-')[1]) + 20 < well_data.current_bottom:
+                    str_raid.append([int(float(nek.split('-')[0])) - 90, int(float(nek.split('-')[1])) + 20])
+                else:
+                    str_raid.append([int(float(nek.split('-')[0])) - 90,
+                                     well_data.current_bottom - 2])
+
+
     if len(well_data.dict_perforation_project) != 0 and any(
             [plast in well_data.plast_all for plast in list(well_data.dict_perforation_project.keys())]) is False:
         for plast in well_data.dict_perforation_project:
-            aaaaa = well_data.dict_perforation_project
-            aaa = well_data.dict_perforation_project[plast]
+
             for interval in well_data.dict_perforation_project[plast]['интервал']:
                 if interval[1] < well_data.current_bottom:
                     str_raid.append([interval[0] - 70, interval[1] + 20])
@@ -69,7 +75,7 @@ def skm_interval(self, template):
 
     for interval in merged_segments:
 
-        if template in ['ПСШ ЭК', 'ПСШ без хвоста', 'ПСШ открытый ствол']:
+        if template in ['ПСШ ЭК', 'ПСШ без хвоста', 'ПСШ открытый ствол', 'СГМ ЭК', 'СГМ открытый ствол']:
             if well_data.skm_depth >= interval[1] and interval[1] > interval[0]:
                 merged_segments_new.append(interval)
             elif well_data.skm_depth <= interval[1] and well_data.skm_depth >= interval[0] and interval[1] > interval[
@@ -77,7 +83,9 @@ def skm_interval(self, template):
                 merged_segments_new.append([interval[0], well_data.skm_depth])
 
         elif template in ['ПСШ СКМ в доп колонне c хвостом', 'ПСШ СКМ в доп колонне без хвоста',
-                          'ПСШ СКМ в доп колонне + открытый ствол'] and well_data.skm_depth >= interval[1]:
+                          'ПСШ СКМ в доп колонне + открытый ствол',
+                                         'СГМ в доп колонне + открытый ствол',
+                                         'СГМ в доп колонне'] and well_data.skm_depth >= interval[1]:
 
             if interval[0] > float(well_data.head_column_additional._value) and interval[1] >= float(
                     well_data.head_column_additional._value) and well_data.skm_depth >= interval[1] \
@@ -98,7 +106,7 @@ def skm_interval(self, template):
                 merged_segments_new.append((well_data.head_column_additional._value + 2, interval[1]))
                 # print(f'3 {interval, merged_segments}')
 
-        elif template in ['ПСШ Доп колонна СКМ в основной колонне']:
+        elif template in ['ПСШ Доп колонна СКМ в основной колонне', 'СГМ в основной колонне']:
             if interval[0] < float(well_data.head_column_additional._value) and interval[1] < float(
                     well_data.head_column_additional._value) and well_data.skm_depth >= interval[1] and interval[1] > \
                     interval[0]:
@@ -121,7 +129,7 @@ def remove_overlapping_intervals(perforating_intervals, skm_interval=None):
         if well_data.paker_do["posle"] != 0:
             if well_data.skm_depth > well_data.depth_fond_paker_do["posle"] + 20:
                 skipping_intervals.append(
-                    [float(well_data.depth_fond_paker_do["posle"]) - 20,
+                    [float(well_data.depth_fond_paker_do["posle"]) - 70,
                      float(well_data.depth_fond_paker_do["posle"]) + 20])
                 # print(f'1 {skipping_intervals}')
             elif well_data.skm_depth > well_data.depth_fond_paker_do["posle"]:

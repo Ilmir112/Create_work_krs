@@ -1103,8 +1103,9 @@ class Swab_Window(QMainWindow):
                 well_data.column_diametr._value > 110 and well_data.column_additional is True \
                 and well_data.head_column_additional._value < depth_opy is True) else '60'])
 
-        if well_data.head_column_additional._value < depth_opy + 200:
+        if well_data.head_column_additional._value < depth_opy + 200 and well_data.column_additional:
             nkt_diam = '60'
+
         if well_data.column_additional is False or well_data.column_additional is True and \
                 well_data.current_bottom < well_data.head_column_additional._value and \
                 well_data.head_column_additional._value > 600:
@@ -1112,6 +1113,7 @@ class Swab_Window(QMainWindow):
             paker_short = f'воронку со с/о  + НКТ{nkt_diam}  + НКТ 10м + репер'
             dict_nkt = {73: depth_opy}
             well_data.template_depth = well_data.current_bottom
+
         elif well_data.column_additional is True and well_data.column_additional_diametr._value < 110 and \
                 well_data.current_bottom >= well_data.head_column_additional._value:
             paker_select = f'воронку со свабоограничителем {template_second_str} + НКТ60мм 10м + репер +НКТ60мм ' \

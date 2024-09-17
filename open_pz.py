@@ -5,7 +5,7 @@ from datetime import datetime
 from PyQt5.QtWidgets import QInputDialog, QMessageBox, QMainWindow
 from openpyxl_image_loader import SheetImageLoader
 from openpyxl.utils.cell import get_column_letter
-from openpyxl.styles import Font, Alignment
+from openpyxl.styles import Font, Alignment, Border, Side
 
 from cdng import events_gnvp, itog_1, events_gnvp_gnkt
 from find import ProtectedIsNonNone
@@ -47,8 +47,9 @@ class CreatePZ(QMainWindow):
         if work_plan == 'dop_plan':
 
             data_well = \
-            check_in_database_well_data(well_data.well_number._value, well_data.well_area._value, well_data.work_plan)[
-                0]
+                check_in_database_well_data(well_data.well_number._value, well_data.well_area._value,
+                                            well_data.work_plan)[
+                    0]
             if data_well:
                 change_work_work_plan = QMessageBox.question(self,
                                                              'Наличие в базе данных',
@@ -259,38 +260,116 @@ class CreatePZ(QMainWindow):
                 text_width_dict = {20: (0, 100), 30: (101, 200), 40: (201, 300), 60: (301, 400), 70: (401, 500),
                                    90: (501, 600), 110: (601, 700), 120: (701, 800), 130: (801, 900),
                                    150: (901, 1500), 270: (1500, 2300)}
+
+                # Устанавливаем параметры границы
+                red = 'FF0000'  # Красный цвет в формате HEX
+                thin_border = Border(left=Side(style='thin', color=red),
+                                     right=Side(style='thin', color=red),
+                                     top=Side(style='thin', color=red),
+                                     bottom=Side(style='thin', color=red))
+
                 if work_plan != 'normir':
-                    for i in range(well_data.ins_ind, well_data.ins_ind + len(dict_events_gnvp[work_plan])):
-                        ws.merge_cells(start_row=i, start_column=2, end_row=i, end_column=12)
-                        data = ws.cell(row=i, column=2)
-                        data.value = dict_events_gnvp[work_plan][i - well_data.ins_ind][1]
+                    if 'Ойл' in well_data.contractor:
+                        for i in range(well_data.ins_ind, well_data.ins_ind + len(dict_events_gnvp[work_plan])):
+                            ws.merge_cells(start_row=i, start_column=2, end_row=i, end_column=12)
+                            data = ws.cell(row=i, column=2)
+                            data.value = dict_events_gnvp[work_plan][i - well_data.ins_ind][1]
 
-                        if 'Мероприятия' in str(data.value) or \
-                                'Меры по предупреждению' in str(data.value) or \
-                                ' ТЕХНОЛОГИЧЕСКИЕ ПРОЦЕССЫ' in str(data.value) or \
-                                'Признаки отравления сернистым водородом' in str(data.value) or \
-                                'Контроль воздушной среды проводится:' in str(data.value) or \
-                                'Требования безопасности при выполнении работ:' in str(data.value) or \
-                                'Меры по предупреждению' in str(data.value) or \
-                                'Меры по предупреждению' in str(data.value) or \
-                                'Меры по предупреждению' in str(data.value) or \
-                                "о недопустимости нецелевого расхода" in str(data.value):
-                            data.alignment = Alignment(wrap_text=True, horizontal='center',
-                                                       vertical='center')
-                            data.fill = well_data.yellow_fill
-                            data.font = Font(name='Arial Cyr', size=13, bold=True)
+                            if 'Мероприятия' in str(data.value) or \
+                                    'Меры по предупреждению' in str(data.value) or \
+                                    ' ТЕХНОЛОГИЧЕСКИЕ ПРОЦЕССЫ' in str(data.value) or \
+                                    'Признаки отравления сернистым водородом' in str(data.value) or \
+                                    'Контроль воздушной среды проводится:' in str(data.value) or \
+                                    'Требования безопасности при выполнении работ:' in str(data.value) or \
+                                    'Меры по предупреждению' in str(data.value) or \
+                                    'Меры по предупреждению' in str(data.value) or \
+                                    'Меры по предупреждению' in str(data.value) or \
+                                    "о недопустимости нецелевого расхода" in str(data.value):
+                                data.alignment = Alignment(wrap_text=True, horizontal='center',
+                                                           vertical='center')
+                                data.fill = well_data.yellow_fill
+                                data.font = Font(name='Arial Cyr', size=13, bold=True)
 
-                        else:
-                            data.alignment = Alignment(wrap_text=True, horizontal='left',
-                                                       vertical='center')
+                            else:
+                                data.alignment = Alignment(wrap_text=True, horizontal='left',
+                                                           vertical='center')
 
-                            data.font = Font(name='Arial Cyr', size=12)
+                                data.font = Font(name='Arial Cyr', size=12)
+                            if not data.value is None:
+                                text = data.value
+                                for key, value in text_width_dict.items():
+                                    if value[0] <= len(text) <= value[1]:
+                                        ws.row_dimensions[i].height = int(key)
 
-                        if not data.value is None:
-                            text = data.value
-                            for key, value in text_width_dict.items():
-                                if value[0] <= len(text) <= value[1]:
-                                    ws.row_dimensions[i].height = int(key)
+                    elif 'РН' in well_data.contractor:
+                        # Устанавливаем красный цвет для текста
+                        red_font = Font(name='Arial Cyr', size=13, color='FF0000', bold=True)
+                        for i in range(well_data.ins_ind, well_data.ins_ind + len(dict_events_gnvp[work_plan])):
+                            for col in range(12):
+                                data = ws.cell(row=i, column=col + 1)
+                                data.border = thin_border
+                                data.value = dict_events_gnvp[work_plan][i - well_data.ins_ind][col]
+
+                                data_2 = ws.cell(row=i, column=3).value
+                                data_1 = ws.cell(row=i, column=2).value
+                                ws.cell(row=i, column=col+1).font = Font(name='Arial Cyr', size=13, bold=False)
+
+
+
+
+
+                            if 'IX.I. Мероприятия по предотвращению технологических аварий при ремонте скважин:' in str(
+                                    data_1):
+                                ws.merge_cells(start_row=i, start_column=2, end_row=i, end_column=12)
+                                ws.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='center',
+                                                                               vertical='center')
+
+                                ws.cell(row=i, column=2).font = Font(name='Arial Cyr', size=13, bold=True)
+                            elif 'При работе с вертлюгами обеспечить' in str(data_2) \
+                                    or 'На основании приказа' in str(data_2) \
+                                    or 'Согласно мероприятий по снижению а' in str(data_2) \
+                                    or 'Во время нештатных ' in str(data_2) \
+                                    or 'Для предотвращения падения ' in str(data_2) \
+                                    or 'После герметизации устья' in str(data_2) \
+                                    or 'При свинчивании и развинчивании' in str(data_2) \
+                                    or 'Сборку фрезерующего, ' in str(data_2) \
+                                    or 'При нулевых и отрицательных' in str(data_2):
+                                ws.merge_cells(start_row=i, start_column=3, end_row=i, end_column=11)
+                                ws.cell(row=i, column=3).alignment = Alignment(wrap_text=True, horizontal='left',
+                                                                               vertical='center')
+                                ws.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='left',
+                                                                               vertical='center')
+                                ws.cell(row=i, column=12).alignment = Alignment(wrap_text=True, horizontal='center',
+                                                                                vertical='center')
+                                ws.cell(row=i, column=3).font = Font(name='Arial Cyr', size=13, bold=True)
+                                ws.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='center',
+                                                                               vertical='center')
+
+
+
+                            else:
+                                ws.merge_cells(start_row=i, start_column=3, end_row=i, end_column=11)
+                                ws.cell(row=i, column=3).alignment = Alignment(wrap_text=True, horizontal='left',
+                                                                               vertical='center')
+
+                                ws.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='center',
+                                                                               vertical='center')
+                                ws.cell(row=i, column=12).alignment = Alignment(wrap_text=True, horizontal='center',
+                                                                                vertical='center')
+                                ws.cell(row=i, column=3).font = Font(name='Arial Cyr', size=13, bold=False)
+
+                            if 'ВЫ ДОЛЖНЫ ОТКАЗАТЬСЯ' in str(data_2):
+                                ws.cell(row=i, column=3).font = red_font
+
+                            if not data_2 is None:
+                                text = data_2
+                                for key, value in text_width_dict.items():
+
+                                    if value[0] <= len(text) <= value[1]:
+                                        if '\n' in text:
+                                            ws.row_dimensions[i].height = int(len(text) / 4 + text.count('\n') * 5)
+                                        else:
+                                            ws.row_dimensions[i].height = int(len(text) / 4)
 
                     well_data.ins_ind += len(dict_events_gnvp[work_plan]) - 1
 
@@ -302,7 +381,7 @@ class CreatePZ(QMainWindow):
                             for j in range(1, 12):
                                 if i == 1:
                                     ws.cell(row=i + well_data.ins_ind, column=j).font = Font(name='Arial Cyr', size=13,
-                                                                                             bold=True)
+                                                                                             bold=False)
                                     ws.cell(row=i + well_data.ins_ind, column=j).alignment = Alignment(wrap_text=False,
                                                                                                        horizontal='center',
                                                                                                        vertical='center')
@@ -310,7 +389,7 @@ class CreatePZ(QMainWindow):
                                         j - 1]
                                 else:
                                     ws.cell(row=i + well_data.ins_ind, column=j).font = Font(name='Arial Cyr', size=13,
-                                                                                             bold=True)
+                                                                                             bold=False)
                                     ws.cell(row=i + well_data.ins_ind, column=j).alignment = Alignment(wrap_text=False,
                                                                                                        horizontal='left',
                                                                                                        vertical='center')
@@ -323,7 +402,8 @@ class CreatePZ(QMainWindow):
                                          'plan_change']:
                         work_list = [
                             [None, None, 'Порядок работы', None, None, None, None, None, None, None, None, None],
-                            [None, 'п/п', 'Наименование работ', None, None, None, None, None, None, None, 'Ответственный',
+                            [None, 'п/п', 'Наименование работ', None, None, None, None, None, None, None,
+                             'Ответственный',
                              'Нормы времени \n мин/час.']]
 
                         for i in range(1, len(work_list) + 1):  # Добавление  показатели после ремонта
@@ -449,8 +529,6 @@ class CreatePZ(QMainWindow):
         aaa = ws.max_row
 
         ws.delete_rows(ins_ind, aaa - ins_ind)
-
-
 
     def is_valid_date(date):
         try:

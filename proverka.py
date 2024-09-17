@@ -41,26 +41,15 @@ def get_tables_starting_with(well_number, well_area):
 
 
 
-wb = load_workbook('D:\Documents\Create_work_krs\Копия Поглотитель сероводорода.xlsx', data_only=True)
+wb = load_workbook('912.xlsx', data_only=True)
 name_list = wb.sheetnames
 ws = wb.active
 lll = []
-for row_ind, row in enumerate(ws.iter_rows(values_only=True, max_col=5)):
+for row_ind, row in enumerate(ws.iter_rows(values_only=True, max_col=11, min_row=156, max_row=180)):
+    ll = []
+    for col_ind, col in enumerate(row):
+        ll.append(col)
+    lll.append(ll)
 
 
-    if row[0] not in [None, 'Скважины']:
-        well_number = row[0]
-        well_area = row[1].replace('ое', 'ая')
-        rezult = get_tables_starting_with(well_number, well_area)
-        if rezult:
-
-            ws.cell(row=row_ind+ 1, column=4).value = rezult[0]
-            if rezult[0] != '3':
-                aaaa = rezult[1][10:]
-                ws.cell(row=row_ind + 1, column=5).value = 'Применялся'
-                ws.cell(row=row_ind + 1, column=6).value = aaaa
-            else:
-                ws.cell(row=row_ind + 1, column=5).value = 'Не применялся'
-
-
-wb.save('12236.xlsx')
+print(lll)

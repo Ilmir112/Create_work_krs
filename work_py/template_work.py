@@ -90,7 +90,7 @@ class TabPage_SO_with(QWidget):
         self.roof_skm_line.setValidator(validator)
         self.roof_skm_line.setClearButtonEnabled(True)
 
-        self.sole_skm_label = QLabel("Кровля скреперования", self)
+        self.sole_skm_label = QLabel("Подошва скреперования", self)
         self.sole_skm_line = QLineEdit(self)
         self.sole_skm_line.setClearButtonEnabled(True)
         self.sole_skm_line.setValidator(validator)
