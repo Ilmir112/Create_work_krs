@@ -146,14 +146,15 @@ class TabPageDp(QWidget):
         self.grid.addWidget(self.work_label, 25, 1)
         self.grid.addWidget(self.work_edit, 26, 1, 2, 4)
 
+        self.well_number_edit.editingFinished.connect(self.update_well)
+        self.well_number_edit.setText(f"{well_data.well_number._value}")
         self.well_area_edit.setText(f"{well_data.well_area._value}")
         # self.well_area_edit.textChanged.connect(self.update_well)
-        self.well_number_edit.editingFinished.connect(self.update_well)
+
         self.change_pvr_combo.currentTextChanged.connect(self.update_change_pvr)
         self.change_pvr_combo.setCurrentIndex(1)
         self.change_pvr_combo.setCurrentIndex(0)
-        if well_data.work_plan not in ['dop_plan_in_base']:
-            self.well_number_edit.setText(f'{well_data.well_number._value}')
+
 
         if well_data.data_in_base:
 
@@ -173,6 +174,9 @@ class TabPageDp(QWidget):
             self.grid.addWidget(self.well_data_in_base_combo, 3, 6)
             self.grid.addWidget(self.index_change_label, 2, 7)
             self.grid.addWidget(self.index_change_line, 3, 7)
+
+
+
 
             self.index_change_line.editingFinished.connect(self.update_table_in_base_combo)
 

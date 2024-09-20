@@ -1275,38 +1275,7 @@ def insert_data_new_excel_file(data, rowHeights, colWidth, boundaries_dict):
                 cell.alignment = openpyxl.styles.Alignment(horizontal=cell_data['alignment']['horizontal'],
                                                            vertical=cell_data['alignment']['vertical'],
                                                            wrap_text=wrap_true)
-    for col_index, cell_data in enumerate(row_data, 1):
-        cell = sheet_new.cell(row=int(row_index), column=int(col_index))
 
-        # Получение строки RGB из JSON
-        rgb_string = cell_data['fill']['color']
-        # Извлекаем шестнадцатеричный код цвета
-        hex_color = rgb_string[4:-1]
-
-        if hex_color != '00000000':
-
-            try:
-                color = Color(rgb=hex_color)
-
-                # Создание объекта заливки
-                fill = PatternFill(patternType='solid', fgColor=color)
-                cell.fill = fill
-            except:
-                pass
-        cell.font = Font(name=cell_data['font']['name'], size=cell_data['font']['size'],
-                         bold=cell_data['font']['bold'], italic=cell_data['font']['italic'])
-
-        cell.border = openpyxl.styles.Border(left=openpyxl.styles.Side(style=cell_data['borders']['left']),
-                                             right=openpyxl.styles.Side(style=cell_data['borders']['right']),
-                                             top=openpyxl.styles.Side(style=cell_data['borders']['top']),
-                                             bottom=openpyxl.styles.Side(style=cell_data['borders']['bottom']))
-
-        wrap_true = cell_data['alignment']['wrap_text']
-
-        cell.alignment = openpyxl.styles.Alignment(horizontal=cell_data['alignment']['horizontal'],
-                                                   vertical=cell_data['alignment']['vertical'],
-                                                   wrap_text=wrap_true)
-    wb_new.save('1234.xlsx')
 
 
     try:

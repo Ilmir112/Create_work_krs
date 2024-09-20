@@ -759,17 +759,16 @@ class WellData(FindIndexPZ):
                     elif 'назначение' == value:
                         well_data.appointment = ProtectedIsDigit(row[col + 1].value)
                         # print(f' ЦДНГ {well_data.cdng._value}')
-        tables_filter = self.get_tables_starting_with(self, well_data.well_number._value,
-                                                           well_data.well_area._value, 'ПР', well_data.type_kr.split(' ')[0])
-        if tables_filter:
-
-
-            mes = QMessageBox.question(None, 'Наличие в базе',
-                                       f'В базе имеются план работ по скважине:\n {" ".join(tables_filter)}. '
-                                       f'При продолжении план пересохранится, продолжить?')
-            if mes == QMessageBox.StandardButton.No:
-                self.pause_app()
-                return
+        if well_data.work_plan == 'krs':
+            tables_filter = self.get_tables_starting_with(self, well_data.well_number._value,
+                                                               well_data.well_area._value, 'ПР', well_data.type_kr.split(' ')[0])
+            if tables_filter:
+                mes = QMessageBox.question(None, 'Наличие в базе',
+                                           f'В базе имеются план работ по скважине:\n {" ".join(tables_filter)}. '
+                                           f'При продолжении план пересохранится, продолжить?')
+                if mes == QMessageBox.StandardButton.No:
+                    self.pause_app()
+                    return
 
 
 class Well_data(FindIndexPZ):
