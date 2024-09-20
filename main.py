@@ -253,6 +253,53 @@ class MyMainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
+    def insert_image(self, ws, file, coordinate, width=200, height=180):
+        # Загружаем изображение с помощью библиотеки Pillow
+
+        img = openpyxl.drawing.image.Image(file)
+        img.width = width
+        img.height = height
+        img.anchor = coordinate
+        ws.add_image(img, coordinate)
+
+    def get_tables_starting_with(self, well_number, well_area, work_plan, type_kr):
+        from data_base.work_with_base import connect_to_db
+        if well_number != '':
+            if well_data.connect_in_base:
+                try:
+                    conn = psycopg2.connect(**well_data.postgres_params_data_well)
+                    cursor = conn.cursor()
+                    param = '%s'
+                except psycopg2.Error as e:
+                    print(f"Ошибка получения списка таблиц: {type(e).__name__}\n\n{str(e)}")
+
+            else:
+                try:
+                    # Формируем полный путь к файлу базы данных
+                    db_path = connect_to_db('well_data.db', 'data_base_well')
+                    conn = sqlite3.connect(db_path)
+                    cursor = conn.cursor()
+                    param = '?'
+
+                except sqlite3.Error as e:
+                    print(f"Ошибка получения списка таблиц: {type(e).__name__}\n\n{str(e)}")
+
+            cursor.execute(f"""
+                            SELECT well_number, area_well, type_kr, work_plan
+                            FROM wells
+                            WHERE well_number={param} AND area_well={param} AND type_kr={param} AND work_plan={param}""",
+                           (str(well_number), well_area, type_kr, work_plan))
+
+            rezult = cursor.fetchone()
+
+            if cursor:
+                cursor.close()
+            if conn:
+                conn.close()
+            return rezult
+        else:
+            return []
+
     def saveFileDialog(self, wb2, full_path):
         try:
             file_name, _ = QFileDialog.getSaveFileName(self, "Save excel-file",
@@ -786,6 +833,7 @@ class MyWindow(MyMainWindow):
                 self.pause_app()
                 self.ws = insert_data_new_excel_file(well_data.data, well_data.rowHeights, well_data.colWidth,
                                                      well_data.boundaries_dict)
+                a =self.ws
 
                 self.copy_pz(self.ws, self.table_widget, self.work_plan)
 
@@ -890,16 +938,7 @@ class MyWindow(MyMainWindow):
                 except FileNotFoundError:
                     print('Файл не найден')
 
-                # if action == self.save_file:
-                #     open_pz.open_excel_file().wb.save("test_unmerge.xlsx")
 
-
-
-        # elif action == self.save_file:
-        #     self.save_to_excel()
-        #
-        # elif action == self.save_file_as:
-        #     self.saveFileDialog(self.wb2)
 
         elif action == self.signatories_Bnd:
             if self.signatures_window is None:
@@ -1162,7 +1201,7 @@ class MyWindow(MyMainWindow):
     def save_to_krs(self):
         from open_pz import CreatePZ
         from work_py.alone_oreration import is_number
-        from data_base.work_with_base import create_database_well_db, insert_database_well_data, excel_in_json
+        from data_base.work_with_base import  insert_database_well_data, excel_in_json
         from work_py.advanted_file import count_row_height
 
         if not self.table_widget is None:
@@ -1209,7 +1248,7 @@ class MyWindow(MyMainWindow):
                     if work_list[i][0]:
                         plan_short += f'п.{work_list[i][1]} {work_list[i][0]} \n'
 
-            count_row_height(wb2, self.ws, ws2, work_list, merged_cells_dict, ins_ind)
+            count_row_height(self, wb2, self.ws, ws2, work_list, merged_cells_dict, ins_ind)
 
             well_data.itog_ind_min = ins_ind
             well_data.itog_ind_max = len(work_list)
@@ -1311,7 +1350,8 @@ class MyWindow(MyMainWindow):
             else:
                 string_work = 'ГНКТ'
 
-            filenames = f"{well_data.well_number._value} {well_data.well_area._value} кат " \
+            filenames = f"{well_data.well_number._value} {well_data.well_area._value} {well_data.type_kr.split(' ')[0]} " \
+                        f"кат " \
                         f"{well_data.category_pressuar} " \
                         f"{string_work} {contractor}.xlsx"
             full_path = path + "/" + filenames
@@ -1513,15 +1553,6 @@ class MyWindow(MyMainWindow):
 
     def on_finished(self):
         print("Работа с файлом Excel завершена.")
-
-    def insert_image(self, ws, file, coordinate, width=200, height=180):
-        # Загружаем изображение с помощью библиотеки Pillow
-
-        img = openpyxl.drawing.image.Image(file)
-        img.width = width
-        img.height = height
-        img.anchor = coordinate
-        ws.add_image(img, coordinate)
 
     def openContextMenu(self, position):
 
@@ -1762,7 +1793,7 @@ class MyWindow(MyMainWindow):
 
         well_data.current_bottom = data[row][1]
         well_data.dict_perforation = json.loads(data[row][2])
-        # print(f' строка {well_data.dict_perforation}')
+        aaaa = well_data.dict_perforation
 
         well_data.plast_all = json.loads(data[row][3])
         well_data.plast_work = json.loads(data[row][4])
@@ -1776,6 +1807,8 @@ class MyWindow(MyMainWindow):
 
         well_data.problemWithEk_depth = data[row][13]
         well_data.problemWithEk_diametr = data[row][14]
+
+
 
         # print(well_data.skm_interval)
 
@@ -2388,9 +2421,10 @@ class MyWindow(MyMainWindow):
         merged_cells = sheet.merged_cells
         table_widget.setRowCount(rows)
         well_data.count_row_well = table_widget.rowCount()
+
         if work_plan == 'plan_change':
             well_data.count_row_well = well_data.data_x_max._value
-
+        a = well_data.count_row_well
         border_styles = {}
         for row in sheet.iter_rows():
             for cell in row:

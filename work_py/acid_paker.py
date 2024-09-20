@@ -281,6 +281,8 @@ class TabPage_SO_acid(QWidget):
         self.iron_label_type = QLabel("необходимость стабилизатора железа", self)
         self.iron_true_combo = QComboBox(self)
         self.iron_true_combo.addItems(['Нет', 'Да'])
+
+        aa = well_data.stabilizator_true
         if well_data.stabilizator_true:
             self.iron_true_combo.setCurrentIndex(1)
 

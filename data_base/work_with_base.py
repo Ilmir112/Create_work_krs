@@ -697,6 +697,8 @@ def insert_database_well_data(well_number, well_area, contractor, costumer, data
     data_well = json.dumps(data_well_dict, ensure_ascii=False)
     excel_json = json.dumps(excel, ensure_ascii=False)
     date_today = datetime.now()
+    type_kr = well_data.type_kr.split(' ')[0]
+    data_paragraph = json.dumps(well_data.data_list, ensure_ascii=False)
     # print(row, well_data.count_row_well)
     if 'dop_plan' in work_plan:
         work_plan_str = f'ДП№{well_data.number_dp}'
@@ -708,67 +710,14 @@ def insert_database_well_data(well_number, well_area, contractor, costumer, data
             conn = psycopg2.connect(**well_data.postgres_params_data_well)
             cursor = conn.cursor()
             # Проверка наличия строки с заданными параметрами
-            cursor.execute("""
-                   SELECT EXISTS (
-                       SELECT 1 
-                       FROM wells
-                       WHERE well_number = %s AND area_well = %s AND contractor = %s AND costumer = %s AND work_plan = %s
-                   ), today -- Добавляем contractor в SELECT
-               FROM wells 
-               WHERE well_number = %s AND area_well = %s AND contractor = %s AND costumer = %s AND work_plan = %s
-               """, (
-                str(well_number), well_area, contractor, costumer, work_plan_str, str(well_number), well_area, contractor, costumer, work_plan_str))
 
-
-            row_exists = cursor.fetchone()
-
-            if row_exists:
-                row_exists, date_in_base = row_exists
-                reply = QMessageBox.question(None, 'Строка найдена',
-                                             f'Строка с {well_number} {well_area} {work_plan} уже существует от {date_in_base}. '
-                                             f'Обновить данные?')
-                if reply == QMessageBox.Yes:
-                    create_database_well_db(well_data.work_plan, well_data.number_dp)
-                    try:
-                        cursor.execute("""
-                                        UPDATE wells
-                                        SET data_well =%s, today =%s, excel_json =%s, work_plan=%s, geolog =%s                                                                 
-                                        WHERE well_number =%s AND area_well =%s AND contractor = %s AND costumer =%s AND work_plan =%s
-                                    """, (
-                            data_well, date_today, excel_json,  work_plan_str, well_data.user[1],
-                            str(well_number), well_area, contractor, costumer, work_plan_str))
-
-                        QMessageBox.information(None, 'Успешно', 'Данные обновлены')
-                    except (Exception, psycopg2.Error) as error:
-                        QMessageBox.critical(None, 'Ошибка', f'Ошибка при обновлении данных: {error}')
-            else:
-                create_database_well_db(well_data.work_plan, well_data.number_dp)
-
-                # Подготовленные данные для вставки
-                data_values = (str(well_number), well_area,
-                               data_well, date_today, excel_json, contractor, well_data.costumer, work_plan_str, well_data.user[1])
-
-                # Подготовленный запрос для вставки данных с параметрами
-                query = f"INSERT INTO wells VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
-
-                # Выполнение запроса с использованием параметров
-                cursor.execute(query, data_values)
-
-                mes = QMessageBox.information(None, 'база данных',
-                                              f'Скважина {well_data.well_number._value} добавлена в базу данных c excel файлами')
-
-            # Сохранить изменения и закрыть соединение
-            conn.commit()
-            # Закройте курсор и соединение
-            if cursor:
-                cursor.close()
-            if conn:
-                conn.close()
+            param = '%s'
 
 
         except psycopg2.Error as e:
             # Выведите сообщение об ошибке
-             QMessageBox.warning(None, 'Ошибка', f'Ошибка подключения к базе данных  well_data {type(e).__name__}\n\n{str(e)}')
+             QMessageBox.warning(None, 'Ошибка', f'Ошибка подключения к базе данных  well_data'
+                                                 f' {type(e).__name__}\n\n{str(e)}')
     else:
         try:
 
@@ -777,69 +726,76 @@ def insert_database_well_data(well_number, well_area, contractor, costumer, data
 
             conn = sqlite3.connect(f'{db_path}')
             cursor = conn.cursor()
-            # Проверка наличия строки с заданными параметрами
-            cursor.execute("""
-                   SELECT EXISTS (
-                       SELECT 1 
-                       FROM wells
-                       WHERE well_number = ? AND area_well = ? AND contractor = ? AND costumer = ? AND work_plan = ?
-                   ), today -- Добавляем contractor в SELECT
-               FROM wells 
-               WHERE well_number = ? AND area_well = ? AND contractor = ? AND costumer = ? AND work_plan = ?
-               """, (
-                str(well_number), well_area, contractor, costumer, work_plan_str, str(well_number), well_area, contractor, costumer, work_plan_str))
 
-            row_exists = cursor.fetchone()
+            param = '?'
 
-            if row_exists:
-                row_exists, date_in_base = row_exists
-                reply = QMessageBox.question(None, 'Строка найдена',
-                                             f'Строка с {well_number} {well_area} уже существует от {date_in_base}. '
-                                             f'Обновить данные?')
-                if reply == QMessageBox.Yes:
-                    create_database_well_db(well_data.work_plan, well_data.number_dp)
-                    try:
-                        cursor.execute("""
-                                        UPDATE wells
-                                        SET data_well = ?, today = ?, excel_json = ?, work_plan = ?, geolog = ?                                                                      
-                                        WHERE well_number = ? AND area_well = ? 
-                                        AND contractor = ? AND costumer = ? AND work_plan = ? AND geolog = ?
-                                    """, (
-                            data_well, date_today, excel_json,  work_plan_str, well_data.user[1],
-                        well_number, well_area, contractor, costumer, work_plan, well_data.user[1]))
-
-                        QMessageBox.information(None, 'Успешно', 'Данные в обновлены обновлены')
-                    except sqlite3.Error as error:
-                        QMessageBox.critical(None, 'Ошибка', f'Ошибка при обновлении данных: {error}')
-            else:
-                create_database_well_db(well_data.work_plan, well_data.number_dp)
-
-                # Подготовленные данные для вставки
-                data_values = (str(well_number), well_area,
-                               data_well, date_today, excel_json, contractor, well_data.costumer, work_plan_str,
-                               well_data.user[1])
-
-                # Подготовленный запрос для вставки данных с параметрами
-                query = """INSERT INTO wells(well_number, area_well, data_well, today, excel_json, 
-                contractor, costumer, work_plan, geolog) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);"""
-
-                # Выполнение запроса с использованием параметров
-                cursor.execute(query, data_values)
-
-                QMessageBox.information(None, 'база данных', f'Скважина {well_data.well_number._value} '
-                                                                   f'добавлена в базу данных welldata')
-
-            # Сохранить изменения и закрыть соединение
-            conn.commit()
-            # Закройте курсор и соединение
-            if cursor:
-                cursor.close()
-            if conn:
-                conn.close()
 
         except sqlite3.Error as e:
             # Выведите сообщение об ошибке
              QMessageBox.warning(None, 'Ошибка', f'Ошибка подключения к базе данных hg{type(e).__name__}\n\n{str(e)}')
+
+    cursor.execute(f"""
+                       SELECT EXISTS (
+                           SELECT 1 
+                           FROM wells
+                           WHERE well_number = {param} AND area_well = {param} AND contractor = {param} 
+                           AND costumer = {param} AND work_plan = {param}
+                       ), today -- Добавляем contractor в SELECT
+                   FROM wells 
+                   WHERE well_number = {param} AND area_well ={param} AND contractor = {param} AND 
+                   costumer = {param} AND work_plan ={param}
+                   """, (
+        str(well_number), well_area, contractor, costumer, work_plan_str,
+        str(well_number), well_area, contractor, costumer, work_plan_str))
+
+    row_exists = cursor.fetchone()
+
+    data_values = (str(well_number), well_area,
+                   data_well, date_today, excel_json, contractor, well_data.costumer, work_plan_str,
+                   well_data.user[1], type_kr, data_paragraph)
+
+    if row_exists:
+        row_exists, date_in_base = row_exists
+        reply = QMessageBox.question(None, 'Строка найдена',
+                                     f'Строка с {well_number} {well_area} {work_plan} уже существует от {date_in_base}. '
+                                     f'Обновить данные?')
+        if reply == QMessageBox.Yes:
+            # create_database_well_db(well_data.work_plan, well_data.number_dp)
+            try:
+                cursor.execute(f"""
+                            UPDATE wells
+                            SET data_well ={param}, today ={param}, excel_json ={param},
+                             work_plan={param}, geolog ={param}, 
+                            type_kr={param}, data_change_paragraph={param}                                                                
+                            WHERE well_number ={param} AND area_well ={param} AND contractor ={param}
+                             AND costumer ={param} AND work_plan ={param}
+                                        """, (
+                    data_well, date_today, excel_json, work_plan_str, well_data.user[1], type_kr, data_paragraph,
+                    str(well_number), well_area, contractor, costumer, work_plan_str))
+
+                QMessageBox.information(None, 'Успешно', 'Данные обновлены')
+            except (Exception, psycopg2.Error) as error:
+                QMessageBox.critical(None, 'Ошибка', f'Ошибка при обновлении данных: {error}')
+    else:
+        # create_database_well_db(well_data.work_plan, well_data.number_dp)
+
+        # Подготовленный запрос для вставки данных с параметрами
+        query = f"INSERT INTO wells VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+
+        # Выполнение запроса с использованием параметров
+        cursor.execute(query, data_values)
+
+        mes = QMessageBox.information(None, 'база данных',
+                                      f'Скважина {well_data.well_number._value} добавлена в базу '
+                                      f'данных c excel файлами')
+
+    # Сохранить изменения и закрыть соединение
+    conn.commit()
+    # Закройте курсор и соединение
+    if cursor:
+        cursor.close()
+    if conn:
+        conn.close()
 
 
 def connect_to_db(name_base, folder_base):
@@ -862,16 +818,8 @@ def check_in_database_well_data(number_well, area_well, work_plan):
         try:
             conn = psycopg2.connect(**well_data.postgres_params_data_well)
             cursor = conn.cursor()
+            param = '%s'
 
-            cursor.execute("SELECT data_well FROM wells WHERE well_number = %s AND area_well = %s "
-                           "AND contractor = %s AND costumer = %s",
-                           (str(number_well), area_well, well_data.contractor, well_data.costumer))
-
-            data_well = cursor.fetchone()
-            if data_well:
-                return data_well
-            else:
-                return False, data_well
 
         except psycopg2.Error as e:
             # Выведите сообщение об ошибке
@@ -882,21 +830,27 @@ def check_in_database_well_data(number_well, area_well, work_plan):
 
             conn = sqlite3.connect(f'{db_path}')
             cursor = conn.cursor()
-            a = well_data.contractor
+            param ='?'
 
-            cursor.execute("SELECT data_well FROM wells WHERE well_number = ? AND area_well = ? "
-                           "AND contractor = ? AND costumer = ?",
-                           (str(number_well), area_well, well_data.contractor, well_data.costumer))
-
-            data_well = cursor.fetchone()
-            if data_well:
-                return data_well
-            else:
-                return False, data_well
 
         except sqlite3.Error as e:
             # Выведите сообщение об ошибке
              QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных, Скважина не добавлена в базу')
+
+    cursor.execute(f"SELECT data_well FROM wells WHERE well_number = {param} AND area_well = {param} "
+                   f"AND contractor = {param} AND costumer = {param}",
+                   (str(number_well), area_well, well_data.contractor, well_data.costumer))
+
+    data_well = cursor.fetchone()
+    if cursor:
+        cursor.close()
+    if conn:
+        conn.close()
+
+    if data_well:
+        return data_well
+    else:
+        return False, data_well
 
 
 def excel_in_json(sheet):
@@ -954,7 +908,7 @@ def excel_in_json(sheet):
     boundaries_dict = {}
 
     for ind, _range in enumerate(sheet.merged_cells.ranges):
-        if range_boundaries(str(_range))[1] < index_end_copy:
+        if range_boundaries(str(_range))[1] <= index_end_copy:
             boundaries_dict[ind] = range_boundaries(str(_range))
 
 
@@ -1062,7 +1016,7 @@ def create_database_well_db(work_plan, number_dp):
             # Создаем таблицу для хранения данных
             number = json.dumps(
                 str(well_data.well_number._value) + " " + well_data.well_area._value + " " + work_plan + str(
-                    number_dp) + ' ' + contractor,
+                    number_dp) + ' ' + contractor + well_data.type_kr.split(' ')[0],
                 ensure_ascii=False)
 
             # Попытка удалить таблицу, если она существует
@@ -1132,7 +1086,7 @@ def create_database_well_db(work_plan, number_dp):
 
         try:
             # Формируем полный путь к файлу базы данных
-            db_path = connect_to_db('databaseWell.db', 'data_base_well')
+            db_path = connect_to_db('well_data.db', 'data_base_well')
             conn = sqlite3.connect(db_path)
             cursor = conn.cursor()
 
@@ -1321,7 +1275,38 @@ def insert_data_new_excel_file(data, rowHeights, colWidth, boundaries_dict):
                 cell.alignment = openpyxl.styles.Alignment(horizontal=cell_data['alignment']['horizontal'],
                                                            vertical=cell_data['alignment']['vertical'],
                                                            wrap_text=wrap_true)
-    # wb_new.save('1234.xlsx')
+    for col_index, cell_data in enumerate(row_data, 1):
+        cell = sheet_new.cell(row=int(row_index), column=int(col_index))
+
+        # Получение строки RGB из JSON
+        rgb_string = cell_data['fill']['color']
+        # Извлекаем шестнадцатеричный код цвета
+        hex_color = rgb_string[4:-1]
+
+        if hex_color != '00000000':
+
+            try:
+                color = Color(rgb=hex_color)
+
+                # Создание объекта заливки
+                fill = PatternFill(patternType='solid', fgColor=color)
+                cell.fill = fill
+            except:
+                pass
+        cell.font = Font(name=cell_data['font']['name'], size=cell_data['font']['size'],
+                         bold=cell_data['font']['bold'], italic=cell_data['font']['italic'])
+
+        cell.border = openpyxl.styles.Border(left=openpyxl.styles.Side(style=cell_data['borders']['left']),
+                                             right=openpyxl.styles.Side(style=cell_data['borders']['right']),
+                                             top=openpyxl.styles.Side(style=cell_data['borders']['top']),
+                                             bottom=openpyxl.styles.Side(style=cell_data['borders']['bottom']))
+
+        wrap_true = cell_data['alignment']['wrap_text']
+
+        cell.alignment = openpyxl.styles.Alignment(horizontal=cell_data['alignment']['horizontal'],
+                                                   vertical=cell_data['alignment']['vertical'],
+                                                   wrap_text=wrap_true)
+    wb_new.save('1234.xlsx')
 
 
     try:
@@ -1354,7 +1339,7 @@ def insert_data_new_excel_file(data, rowHeights, colWidth, boundaries_dict):
             sheet_new.row_dimensions[index_row].height = rowHeights[index_row - 1]
         except:
             pass
-    aaa = sheet_new.max_row, index_delete
+
     if well_data.work_plan not in ['plan_change']:
         sheet_new.delete_rows(index_delete, sheet_new.max_row - index_delete + 1)
 

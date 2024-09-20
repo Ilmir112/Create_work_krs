@@ -892,6 +892,8 @@ class RirWindow(MyMainWindow):
              None, None, None, None, None, None, None,
              'мастер КРС', 0.67]
         ]
+        if OpressovkaEK.testing_pressure(self, roof_rir_edit)[2]:
+            rirPero_list.pop(-1)
 
         if paker_need_Combo != "Нужно СПО":
             work_list_clay = ClayWindow.clay_solution_q(self, sole_rir_edit, 5)[1:-2]
@@ -915,8 +917,7 @@ class RirWindow(MyMainWindow):
         RirWindow.perf_new(self, roof_rir_edit, well_data.current_bottom)
         well_data.current_bottom = roof_rir_edit
 
-        if OpressovkaEK.testing_pressure(self, roof_rir_edit)[2]:
-            rir_list.pop(-1)
+
 
         if need_change_zgs_combo == "Да":
             for row in Change_fluid_Window.fluid_change(self, plast_new_combo, fluid_new_edit,

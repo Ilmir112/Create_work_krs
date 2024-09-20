@@ -40,7 +40,7 @@ class FindIndexPZ(MyMainWindow):
                     and row_ind < 50:
                 well_data.cat_well_max = ProtectedIsDigit(row_ind)
                 well_data.data_well_min = ProtectedIsDigit(row_ind + 1)
-            elif 'стабилизатор железа' in row:
+            elif any(['стабилизатор' in str(col).lower() and 'желез' in str(col).lower() for col in row]):
                 well_data.stabilizator_true = True
 
             elif any(['Ожидаемые показатели после' in str(col) for col in row]):
@@ -759,21 +759,17 @@ class WellData(FindIndexPZ):
                     elif 'назначение' == value:
                         well_data.appointment = ProtectedIsDigit(row[col + 1].value)
                         # print(f' ЦДНГ {well_data.cdng._value}')
-        tables_filter = TabPageDp.get_tables_starting_with(self, well_data.well_number._value,
-                                                           well_data.well_area._value)
+        tables_filter = self.get_tables_starting_with(self, well_data.well_number._value,
+                                                           well_data.well_area._value, 'ПР', well_data.type_kr.split(' ')[0])
         if tables_filter:
-            number = [wells for wells in tables_filter
-                      if wells.split(' ')[0] == well_data.well_number._value
-                      and wells.split(' ')[1] == well_data.well_area._value]
 
-            if number:
 
-                mes = QMessageBox.question(None, 'Наличие в базе',
-                                           f'В базе имеются план работ по скважине:\n {number}. '
-                                           f'При продолжении план пересохранится, продолжить?')
-                if mes == QMessageBox.StandardButton.No:
-                    self.pause_app()
-                    return
+            mes = QMessageBox.question(None, 'Наличие в базе',
+                                       f'В базе имеются план работ по скважине:\n {" ".join(tables_filter)}. '
+                                       f'При продолжении план пересохранится, продолжить?')
+            if mes == QMessageBox.StandardButton.No:
+                self.pause_app()
+                return
 
 
 class Well_data(FindIndexPZ):
@@ -1431,69 +1427,70 @@ class Well_Category(FindIndexPZ):
     def read_well(self, ws, begin_index, cancel_index):
         from main import MyMainWindow
         if well_data.data_in_base is False:
+            try:
+                for row in range(begin_index, cancel_index):
+                    for col in range(1, 13):
+                        cell = ws.cell(row=row, column=col).value
+                        if cell:
+                            if str(cell) in ['атм'] and ws.cell(row=row, column=col - 2).value:
+                                well_data.cat_P_1.append(ws.cell(row=row, column=col - 2).value)
+                                # print(well_data.cat_P_P)
+                                well_data.cat_P_P.append(ws.cell(row=row, column=col - 1).value)
 
-            for row in range(begin_index, cancel_index):
-                for col in range(1, 13):
-                    cell = ws.cell(row=row, column=col).value
-                    if cell:
-                        if str(cell) in ['атм'] and ws.cell(row=row, column=col - 2).value:
-                            well_data.cat_P_1.append(ws.cell(row=row, column=col - 2).value)
-                            # print(well_data.cat_P_P)
-                            well_data.cat_P_P.append(ws.cell(row=row, column=col - 1).value)
+                            elif str(cell) in ['%', 'мг/л', 'мг/дм3', 'мг/м3', 'мг/дм', 'мгдм3']:
+                                if str(cell) == '%':
+                                    if ws.cell(row=row, column=col - 2).value is None:
+                                        well_data.cat_h2s_list.append(ws.cell(row=row - 1, column=col - 2).value)
+                                    else:
+                                        well_data.cat_h2s_list.append(ws.cell(row=row, column=col - 2).value)
+                                    if str(ws.cell(row=row, column=col - 1).value).strip() in ['', '-', '0', 'None'] or \
+                                            'отс' in str(ws.cell(row=row, column=col - 1).value).lower():
+                                        well_data.h2s_pr.append(0)
+                                        if ws.cell(row=row - 1, column=col - 2).value not in ['3', 3]:
+                                            well_data.check_data_in_pz.append(
+                                                'Не указано значение сероводорода в процентах')
+                                    else:
+                                        well_data.h2s_pr.append(
+                                            float(str(ws.cell(row=row, column=col - 1).value).replace(',', '.')))
+                                if str(cell) in ['мг/л', 'мг/дм3', 'мг/дм', 'мгдм3']:
+                                    if str(ws.cell(row=row, column=col - 1).value).strip() in ['', '-', '0', 'None'] or \
+                                            'отс' in str(ws.cell(row=row, column=col - 1).value).lower():
+                                        well_data.h2s_mg.append(0)
+                                        a = ws.cell(row=row, column=col - 2).value
+                                        if ws.cell(row=row, column=col - 2).value not in ['3', 3]:
+                                            well_data.check_data_in_pz.append('Не указано значение сероводорода в мг/л')
 
-                        elif str(cell) in ['%', 'мг/л', 'мг/дм3', 'мг/м3', 'мг/дм', 'мгдм3']:
-                            if str(cell) == '%':
-                                if ws.cell(row=row, column=col - 2).value is None:
-                                    well_data.cat_h2s_list.append(ws.cell(row=row - 1, column=col - 2).value)
+                                    else:
+
+                                        well_data.h2s_mg.append(
+                                            float(str(ws.cell(row=row, column=col - 1).value).replace(',', '.')))
+
+                                if str(cell) in ['мг/м3'] and ws.cell(row=row - 1, column=col - 1).value not in \
+                                        ['мг/л', 'мг/дм3', 'мг/дм', 'мгдм3'] and ws.cell(row=row + 1,
+                                                                                         column=col - 1).value not in \
+                                        ['мг/л', 'мг/дм3', 'мг/дм', 'мгдм3']:
+                                    if str(ws.cell(row=row, column=col - 1).value).strip() in ['', '-', '0', 'None'] or \
+                                            'отс' in str(ws.cell(row=row, column=col - 1).value).lower():
+                                        well_data.h2s_mg.append(0)
+
+                                    else:
+                                        well_data.h2s_mg.append(float(str(
+                                            FindIndexPZ.check_str_None(self,
+                                                                       str(ws.cell(row=row, column=col - 1).value).replace(
+                                                                           ',', '.')))) / 1000)
+
+                            elif str(cell) == 'м3/т':
+
+                                well_data.cat_gaz_f_pr.append(ws.cell(row=row, column=col - 2).value)
+                                if 'отс' in str(ws.cell(row=row, column=col - 1).value) or \
+                                        'None' in str(ws.cell(row=row, column=col - 1).value) or \
+                                        '-' in str(ws.cell(row=row, column=col - 1).value):
+                                    well_data.gaz_f_pr.append(3)
                                 else:
-                                    well_data.cat_h2s_list.append(ws.cell(row=row, column=col - 2).value)
-                                if str(ws.cell(row=row, column=col - 1).value).strip() in ['', '-', '0', 'None'] or \
-                                        'отс' in str(ws.cell(row=row, column=col - 1).value).lower():
-                                    well_data.h2s_pr.append(0)
-                                    if ws.cell(row=row - 1, column=col - 2).value not in ['3', 3]:
-                                        well_data.check_data_in_pz.append(
-                                            'Не указано значение сероводорода в процентах')
-                                else:
-                                    well_data.h2s_pr.append(
-                                        float(str(ws.cell(row=row, column=col - 1).value).replace(',', '.')))
-                            if str(cell) in ['мг/л', 'мг/дм3', 'мг/дм', 'мгдм3']:
-                                if str(ws.cell(row=row, column=col - 1).value).strip() in ['', '-', '0', 'None'] or \
-                                        'отс' in str(ws.cell(row=row, column=col - 1).value).lower():
-                                    well_data.h2s_mg.append(0)
-                                    a = ws.cell(row=row, column=col - 2).value
-                                    if ws.cell(row=row, column=col - 2).value not in ['3', 3]:
-                                        well_data.check_data_in_pz.append('Не указано значение сероводорода в мг/л')
-
-                                else:
-
-                                    well_data.h2s_mg.append(
-                                        float(str(ws.cell(row=row, column=col - 1).value).replace(',', '.')))
-
-                            if str(cell) in ['мг/м3'] and ws.cell(row=row - 1, column=col - 1).value not in \
-                                    ['мг/л', 'мг/дм3', 'мг/дм', 'мгдм3'] and ws.cell(row=row + 1,
-                                                                                     column=col - 1).value not in \
-                                    ['мг/л', 'мг/дм3', 'мг/дм', 'мгдм3']:
-                                if str(ws.cell(row=row, column=col - 1).value).strip() in ['', '-', '0', 'None'] or \
-                                        'отс' in str(ws.cell(row=row, column=col - 1).value).lower():
-                                    well_data.h2s_mg.append(0)
-
-                                else:
-                                    well_data.h2s_mg.append(float(str(
-                                        FindIndexPZ.check_str_None(self,
-                                                                   str(ws.cell(row=row, column=col - 1).value).replace(
-                                                                       ',', '.')))) / 1000)
-
-
-                        elif str(cell) == 'м3/т':
-
-                            well_data.cat_gaz_f_pr.append(ws.cell(row=row, column=col - 2).value)
-                            if 'отс' in str(ws.cell(row=row, column=col - 1).value) or \
-                                    'None' in str(ws.cell(row=row, column=col - 1).value) or \
-                                    '-' in str(ws.cell(row=row, column=col - 1).value):
-                                well_data.gaz_f_pr.append(3)
-                            else:
-                                well_data.gaz_f_pr.append(float(
-                                    str(ws.cell(row=row, column=col - 1).value).replace(',', '.')))
+                                    well_data.gaz_f_pr.append(float(
+                                        str(ws.cell(row=row, column=col - 1).value).replace(',', '.')))
+            except Exception as e:
+                QMessageBox.warning(self, 'Ошибка', f'Ошибка обработки данных по категориям {e}')
             if len(well_data.cat_h2s_list) == 0:
                 mes = QMessageBox.warning(self, 'ОШИБКА', 'Приложение не смогла найти значение '
                                                           'сероводорода в %')

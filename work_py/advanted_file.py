@@ -309,8 +309,9 @@ def raid(string):
 def definition_plast_work(self):
     # Определение работающих пластов
     plast_work = set()
-    perforation_roof = well_data.current_bottom
+    perforation_roof = 10000
     perforation_sole = 0
+    aaaaa = well_data.current_bottom
 
     for plast, value in well_data.dict_perforation.items():
         for interval in value['интервал']:
@@ -337,7 +338,7 @@ def definition_plast_work(self):
     well_data.plast_work = list(plast_work)
 
 
-def count_row_height(wb2, ws, ws2, work_list, merged_cells_dict, ind_ins):
+def count_row_height(self, wb2, ws, ws2, work_list, merged_cells_dict, ind_ins):
     from openpyxl.utils.cell import range_boundaries, get_column_letter
     from PIL import Image
 
@@ -453,11 +454,12 @@ def count_row_height(wb2, ws, ws2, work_list, merged_cells_dict, ind_ins):
         if well_data.image_list:
 
             for img in well_data.image_list:
-                logo = Image(img[0])
+                image_path = img[0]
+                logo = Image(image_path) # Используем open для открытия изображения
                 logo.width, logo.height = img[2][0] * 0.48, img[2][1] * 0.72
                 ws2.add_image(logo, img[1])
     except TypeError as e:
-        QMessageBox.warning(None, 'Ошибка', f'Ошибка сохранения изображение {type(e).__name__}\n\n{str(e)}')
+        QMessageBox.warning(None, 'Ошибка', f'Ошибка Изменения размера изображения {type(e).__name__}\n\n{str(e)}')
     if well_data.image_data:
         for image_info in well_data.image_data:
             coord = image_info["coord"]
@@ -468,7 +470,7 @@ def count_row_height(wb2, ws, ws2, work_list, merged_cells_dict, ind_ins):
             try:
                 # Декодирование из Base64 и создание изображения:
                 decoded_image_data = base64.b64decode(image_base64)
-                print(decoded_image_data)
+
                 # Создаем объект PIL Image из декодированных данных
                 image = Image.open(BytesIO(decoded_image_data))
                 print(image)
@@ -487,7 +489,7 @@ def count_row_height(wb2, ws, ws2, work_list, merged_cells_dict, ind_ins):
 
                 # Сохранение изображения в Excel файл:
 
-                MyWindow.insert_image(None, ws2, file, coord, width, height)
+                self.insert_image(ws2, file, coord, width, height)
 
             except ValueError as e:
                 print(f"Ошибка при вставке изображения: {type(e).__name__}\n\n{str(e)}")
