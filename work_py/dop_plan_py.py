@@ -888,10 +888,11 @@ class DopPlanWindow(MyMainWindow):
                     mes = QMessageBox.critical(self, 'База данных', 'Необходимо выбрать план работ')
                     return
 
-                data_well = check_in_database_well_data(well_number, well_area, table_in_base)[0]
+                data_well = check_in_database_well_data(well_number, well_area, table_in_base)
 
                 if data_well:
-                    insert_data_well_dop_plan(data_well)
+                    well_data.type_kr = data_well[2]
+                    insert_data_well_dop_plan(data_well[0])
 
                 self.work_with_excel(well_number, well_area, table_in_base)
 

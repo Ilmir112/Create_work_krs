@@ -2563,12 +2563,15 @@ class MyWindow(MyMainWindow):
             elif well_data.dict_perforation_short[plast]['отключение'] and plast in well_data.dict_perforation_short:
                 for interval in well_data.dict_perforation_short[plast]["интервал"]:
                     plast_str += f'{plast[:4]} :{interval[0]}- {interval[1]} (изол)\n'
-
-            filter_list_pressuar = list(
-                filter(lambda x: type(x) in [int, float], list(well_data.dict_perforation_short[plast]["давление"])))
-            # print(f'фильтр -{filter_list_pressuar}')
-            if filter_list_pressuar:
-                pressur_set.add(f'{plast[:4]} - {filter_list_pressuar}')
+            try:
+                a = well_data.dict_perforation_short
+                filter_list_pressuar = list(
+                    filter(lambda x: type(x) in [int, float], list(well_data.dict_perforation_short[plast]["давление"])))
+                # print(f'фильтр -{filter_list_pressuar}')
+                if filter_list_pressuar:
+                    pressur_set.add(f'{plast[:4]} - {filter_list_pressuar}')
+            except Exception as e:
+                QMessageBox.warning(self, 'Ошибка', f'Ошибка вставки давления в краткое описание {e}')
 
         ws4.cell(row=6, column=1).value = f'НКТ: \n {TabPage_Gno.gno_nkt_opening(well_data.dict_nkt)}'
         ws4.cell(row=7, column=1).value = f'Рпл: \n {" ".join(list(pressur_set))}атм'

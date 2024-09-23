@@ -45,29 +45,36 @@ class CreatePZ(MyMainWindow):
         WellData.read_well(WellData, ws, well_data.cat_well_max._value, well_data.data_pvr_min._value)
         well_data.region = region(well_data.cdng._value)
 
+        aaa = well_data.current_date
+        date_str2 = datetime.strptime('2024-09-19', '%Y-%m-%d')
         if work_plan == 'dop_plan':
 
             data_well = \
                 check_in_database_well_data(well_data.well_number._value, well_data.well_area._value,
-                                            well_data.work_plan)[
-                    0]
+                                            well_data.work_plan)
+            date_str1 = datetime.strptime(f'{data_well[1]}', '%Y-%m-%d')
             if data_well:
-                change_work_work_plan = QMessageBox.question(self,
-                                                             'Наличие в базе данных',
-                                                             'Проверка показала что данные по скважине есть в базе данных, '
-                                                             'загрузить с базы?')
-                if change_work_work_plan == QMessageBox.StandardButton.Yes:
-                    well_data.work_plan = 'dop_plan_in_base'
-                    self.work_plan = 'dop_plan_in_base'
-                    well_data.data_in_base = True
-                    self.rir_window = DopPlanWindow(well_data.ins_ind, None, work_plan)
-                    # self.rir_window.setGeometry(200, 400, 100, 200)
-                    self.rir_window.show()
-                    self.pause_app()
-                    well_data.pause = True
-                    self.rir_window = None
+                if date_str1 > date_str2:
 
-                    return
+                    change_work_work_plan = QMessageBox.question(self,
+                                                                 'Наличие в базе данных',
+                                                                 'Проверка показала что данные по скважине есть в базе данных, '
+                                                                 'загрузить с базы?')
+
+
+                    if change_work_work_plan == QMessageBox.StandardButton.Yes:
+                        well_data.type_kr = data_well[2]
+                        well_data.work_plan = 'dop_plan_in_base'
+                        self.work_plan = 'dop_plan_in_base'
+                        well_data.data_in_base = True
+                        self.rir_window = DopPlanWindow(well_data.ins_ind, None, work_plan)
+                        # self.rir_window.setGeometry(200, 400, 100, 200)
+                        self.rir_window.show()
+                        self.pause_app()
+                        well_data.pause = True
+                        self.rir_window = None
+
+                        return
 
         # well_data.data_well_is_True = False
         if work_plan == 'dop_plan':

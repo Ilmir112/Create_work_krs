@@ -31,7 +31,7 @@ class TabPageDp(QWidget):
 
         self.well_number_label = QLabel('номер скважины')
         self.well_number_edit = QLineEdit(self)
-        self.well_number_edit.setValidator(self.validator_int)
+        # self.well_number_edit.setValidator(self.validator_int)
 
         self.well_area_label = QLabel('площадь скважины')
         self.well_area_edit = QLineEdit(self)
@@ -183,10 +183,11 @@ class CorrectPlanWindow(MyMainWindow):
                 data_well_data_in_base_combo = well_data_in_base_combo.split(' ')[-1]
                 well_data_in_base = well_data_in_base_combo.split(' ')[3]
 
-            data_well = check_in_database_well_data(well_number, well_area, well_data_in_base)[0]
+            data_well = check_in_database_well_data(well_number, well_area, well_data_in_base)
 
             if data_well:
-                insert_data_well_dop_plan(data_well)
+                well_data.type_kr = data_well[2]
+                insert_data_well_dop_plan(data_well[0])
 
             DopPlanWindow.work_with_excel(self, well_number, well_area, well_data_in_base)
 

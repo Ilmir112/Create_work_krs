@@ -837,11 +837,12 @@ def check_in_database_well_data(number_well, area_well, work_plan):
             # Выведите сообщение об ошибке
              QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных, Скважина не добавлена в базу')
 
-    cursor.execute(f"SELECT data_well FROM wells WHERE well_number = {param} AND area_well = {param} "
+    cursor.execute(f"SELECT data_well, today, type_kr FROM wells WHERE well_number = {param} AND area_well = {param} "
                    f"AND contractor = {param} AND costumer = {param}",
                    (str(number_well), area_well, well_data.contractor, well_data.costumer))
 
     data_well = cursor.fetchone()
+
     if cursor:
         cursor.close()
     if conn:
