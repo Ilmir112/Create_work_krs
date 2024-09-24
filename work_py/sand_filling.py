@@ -209,7 +209,7 @@ class SandWindow(MyMainWindow):
         roof_sand_edit = int(float(self.tabWidget.currentWidget().roof_sand_edit.text()))
         sole_sand_edit = int(float(self.tabWidget.currentWidget().sole_sand_edit.text()))
         rir_question_QCombo = str(self.tabWidget.currentWidget().rir_question_QCombo.currentText())
-        volume_cement = self.tabWidget.currentWidget().cement_volume_line.text().replace(',', '.')
+
         need_change_zgs_combo = self.tabWidget.currentWidget().need_change_zgs_combo.currentText()
         if len(well_data.plast_project) != 0:
             plast_new_combo = self.tabWidget.currentWidget().plast_new_combo.currentText()
@@ -221,6 +221,7 @@ class SandWindow(MyMainWindow):
                 need_change_zgs_combo == 'Да':
             mes = QMessageBox.critical(self, 'Ошибка', 'Введены не все параметры')
             return
+        volume_cement = self.tabWidget.currentWidget().cement_volume_line.text().replace(',', '.')
         if volume_cement != '':
             volume_cement = round(float(volume_cement),1)
         elif volume_cement == '' and rir_question_QCombo == "Да":
@@ -308,7 +309,7 @@ class SandWindow(MyMainWindow):
              None, None, None, None, None, None, None,
              'мастер КРС', None]
         ]
-        if OpressovkaEK.testing_pressure(self, filling_depth):
+        if OpressovkaEK.testing_pressure(self, filling_depth) is False:
             filling_list.insert(-1,
                         [f'Опрессовать в инт{filling_depth}-0м на Р={well_data.max_admissible_pressure._value}атм',
                          None, f'Опрессовать эксплуатационную колонну в интервале {filling_depth}-0м на'

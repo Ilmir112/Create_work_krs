@@ -531,15 +531,7 @@ class TabPage_SO_acid(QWidget):
             self.grid.addWidget(self.pressureZUMPF_question_Label, 2, 8)
             self.grid.addWidget(self.pressureZUMPF_question_QCombo, 3, 8)
 
-        if index in ['однопакерная', 'пакер с заглушкой', 'двухпакерная']:
 
-            paker_depth = self.paker_depth.text()
-            if paker_depth != '':
-                paker_depth = float(paker_depth)
-                for plast in well_data.dict_perforation:
-                    if any(abs(paker_depth - roof) < 10 or abs(paker_depth - sole) < 10
-                           for roof, sole in well_data.dict_perforation[plast]['интервал']):
-                        self.need_privyazka_QCombo.setCurrentIndex(1)
 
         if index in ['однопакерная', 'пакер с заглушкой', 'однопакерная, упорный', ]:
             paker_layout_list_tab = ["Пласт", "хвост", "пакер", "СКВ", "вид кислоты", "процент", "объем", "объем нефти"]
@@ -661,6 +653,15 @@ class TabPage_SO_acid(QWidget):
                     if sole_plast <= dict_perforation[plast]['подошва']:
                         sole_plast = dict_perforation[plast]['подошва']
         paker_depth = self.paker_depth.text()
+
+        if self.paker_layout_combo.currentText() in ['однопакерная', 'пакер с заглушкой', 'двухпакерная']:
+            if paker_depth != '':
+                paker_depth = float(paker_depth)
+                for plast in well_data.dict_perforation:
+                    if any(abs(paker_depth - roof) < 10 or abs(paker_depth - sole) < 10
+                           for roof, sole in well_data.dict_perforation[plast]['интервал']):
+                        self.need_privyazka_QCombo.setCurrentIndex(1)
+
         if self.paker_layout_combo.currentText() in ['однопакерная', 'однопакерная, упорный', 'пакер с заглушкой']:
 
             if paker_depth != '':
@@ -867,6 +868,12 @@ class AcidPakerWindow(MyMainWindow):
 
         try:
             self.need_privyazka_QCombo = self.tabWidget.currentWidget().need_privyazka_QCombo.currentText()
+            if self.need_privyazka_QCombo == 'Да':
+                mes = QMessageBox.question(self, 'Привязка', 'Расстояние между пакером и ИП меньше 10м. '
+                                                             'Нужна привязка корректно ли?')
+                if mes == QMessageBox.StandardButton.No:
+                    return
+
             self.paker_layout_combo = str(self.tabWidget.currentWidget().paker_layout_combo.currentText())
             swab_true_edit_type = self.tabWidget.currentWidget().swab_true_edit_type.currentText()
             diametr_paker = int(float(self.tabWidget.currentWidget().diametr_paker_edit.text()))

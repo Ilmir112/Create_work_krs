@@ -711,7 +711,7 @@ class RirWindow(MyMainWindow):
         RirWindow.perf_new(self, roof_rir_edit, sole_rir_edit)
         # print(plast_combo)
         if OpressovkaEK.testing_pressure(self, roof_rir_edit)[2]:
-            uzmPero_list.pop(-2)
+            uzmPero_list.pop(-1)
 
         well_data.current_bottom = roof_rir_edit
 

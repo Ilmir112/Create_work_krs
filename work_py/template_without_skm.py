@@ -675,6 +675,11 @@ class Template_without_skm(MyMainWindow):
         if solvent_volume_edit != '':
             solvent_volume_edit = round(float(solvent_volume_edit), 1)
         privyazka_question = self.tabWidget.currentWidget().privyazka_question_QCombo.currentText()
+        if privyazka_question == 'Да':
+            mes = QMessageBox.question(self, 'Привязка', 'ЗУМПФ меньше 10м. '
+                                                         'Нужна привязка, корректно ли?')
+            if mes == QMessageBox.StandardButton.No:
+                return
         note_question_QCombo = self.tabWidget.currentWidget().note_question_QCombo.currentText()
 
         current_bottom = self.tabWidget.currentWidget().current_bottom_edit.text()
