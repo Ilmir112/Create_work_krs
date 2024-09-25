@@ -289,7 +289,7 @@ class TabPage_SO_with(QWidget):
             dictance_three = ''
         nkt_diam = well_data.nkt_diam
         kot_str = ''
-        if float(well_data.static_level._value) > 700:
+        if 'Ойл' in well_data.contractor:
             kot_str = '+ КОТ'
         if well_data.column_additional or \
                 (well_data.head_column_additional._value >= current_bottom and well_data.column_additional is False):
@@ -305,10 +305,10 @@ class TabPage_SO_with(QWidget):
                 self.dictance_three_Edit.setParent(None)
                 self.dictance_three_Label.setParent(None)
                 if first_template != 'фильтр направление':
-                    template_str = f'перо + шаблон-{int(first_template)}мм L-{int(lenght_template_first)}м + ' \
+                    template_str = f'перо {kot_str}+ шаблон-{int(first_template)}мм L-{int(lenght_template_first)}м + ' \
                                    f'НКТ{nkt_diam}м ' \
                                    f'{int(dictance_template_first)}м + {SKM_type}-{skm} +  ' \
-                                   f'НКТ{nkt_diam}м {int(dictance_template_second)}м {kot_str} + шаблон-{template_second}мм ' \
+                                   f'НКТ{nkt_diam}м {int(dictance_template_second)}м + шаблон-{template_second}мм ' \
                                    f'L-{lenght_template_second}м '
 
                     well_data.template_depth = int(current_bottom - int(dictance_template_first) -
@@ -325,8 +325,8 @@ class TabPage_SO_with(QWidget):
                     self.dictance_template_second_Edit.setText('1')
                     dictance_template_second = self.dictance_template_second_Edit.text()
                 # if dictance_template_second != None:
-                template_str = f'перо + {SKM_type}-{skm} + НКТ{nkt_diam}м {dictance_template_second}м ' \
-                               f'{kot_str} + шаблон-{template_second}мм L-{lenght_template_second}м '
+                template_str = f'перо {kot_str}+ {SKM_type}-{skm} + НКТ{nkt_diam}м {dictance_template_second}м ' \
+                               f' + шаблон-{template_second}мм L-{lenght_template_second}м '
                 well_data.template_depth = math.ceil(current_bottom - int(dictance_template_second))
                 well_data.skm_depth = well_data.template_depth + int(dictance_template_second)
                 skm_teml_str = f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
@@ -334,8 +334,8 @@ class TabPage_SO_with(QWidget):
             elif self.template_Combo.currentText() == 'ПСШ открытый ствол':
                 # if dictance_template_second != None:
                 self.template_first_Edit.setText('фильтр направление')
-                template_str = f'фильтр-направление L {lenght_template_first}м + НКТ{nkt_diam}м {dictance_template_first}м ' \
-                               f'+ {SKM_type}-{skm} +  НКТ{nkt_diam}м {dictance_template_second}м + {kot_str}' \
+                template_str = f'фильтр-направление L {lenght_template_first}м {kot_str}+ НКТ{nkt_diam}м {dictance_template_first}м ' \
+                               f'+ {SKM_type}-{skm} +  НКТ{nkt_diam}м {dictance_template_second}м + ' \
                                f'шаблон-{template_second}мм L-{lenght_template_second}м '
                 well_data.template_depth = int(current_bottom - int(dictance_template_first) -
                                                int(dictance_template_second) - int(lenght_template_first))
@@ -367,8 +367,8 @@ class TabPage_SO_with(QWidget):
                 if dictance_three != '' and dictance_template_second != '' and dictance_template_first != '' and \
                         lenght_template_first != '' and first_template != '' and template_second != '' \
                         and lenght_template_second != '':
-                    template_str = f'обточная муфта + НКТ{nkt_pod} {dictance_template_first}м ' \
-                                   f'+ {SKM_type}-{skm} + НКТ{nkt_pod} {dictance_template_second}м {kot_str} +' \
+                    template_str = f'обточная муфта {kot_str}+ НКТ{nkt_pod} {dictance_template_first}м ' \
+                                   f'+ {SKM_type}-{skm} + НКТ{nkt_pod} {dictance_template_second}м  +' \
                                    f' шаблон-{first_template}мм ' \
                                    f'L-{lenght_template_first}м + НКТ{nkt_pod} {dictance_three}м + ' \
                                    f'шаблон-{template_second}мм L-{lenght_template_second}м '
@@ -390,8 +390,8 @@ class TabPage_SO_with(QWidget):
                 if dictance_three != '' and dictance_template_second != '' and dictance_template_first != '' and \
                         lenght_template_first != '' and first_template != '' and template_second != '' \
                         and lenght_template_second != '':
-                    template_str = f'обточная муфта + {SKM_type}-{skm} + НКТ{nkt_pod} {dictance_template_second} + ' \
-                                   f'{kot_str} шаблон-{first_template}мм L-{lenght_template_first}м + ' \
+                    template_str = f'обточная муфта {kot_str} + {SKM_type}-{skm} + НКТ{nkt_pod} {dictance_template_second} + ' \
+                                   f' шаблон-{first_template}мм L-{lenght_template_first}м + ' \
                                    f'НКТ{nkt_pod} {dictance_three}м + шаблон-{template_second}мм ' \
                                    f'L-{lenght_template_second}м '
                     well_data.template_depth_addition = current_bottom - int(dictance_template_second)
@@ -410,8 +410,8 @@ class TabPage_SO_with(QWidget):
                 if dictance_three != '' and dictance_template_second != '' and dictance_template_first != '' and \
                         lenght_template_first != '' and first_template != '' and template_second != '' \
                         and lenght_template_second != '':
-                    template_str = f'фильтр направление L-2м + НКТ{nkt_pod} {dictance_template_first}м ' \
-                                   f'+ {SKM_type}-{skm} + НКТ{nkt_pod} {dictance_template_second}м + {kot_str}' \
+                    template_str = f'фильтр направление L-2м {kot_str} + НКТ{nkt_pod} {dictance_template_first}м ' \
+                                   f'+ {SKM_type}-{skm} + НКТ{nkt_pod} {dictance_template_second}м + ' \
                                    f' шаблон-{first_template}мм ' \
                                    f'L-{lenght_template_first}м' \
                                    f' + НКТ{nkt_pod} {dictance_three}м + шаблон-{template_second}мм ' \
@@ -440,7 +440,7 @@ class TabPage_SO_with(QWidget):
         if index != '':
 
             kot_str = ''
-            if float(well_data.static_level._value) > 700:
+            if 'Ойл' in well_data.contractor:
                 kot_str = '+ КОТ'
 
             SKM_type = self.SKM_type_Combo.currentText()
@@ -498,9 +498,9 @@ class TabPage_SO_with(QWidget):
                 nkt_pod = '60мм' if well_data.column_additional_diametr._value < 110 else '73мм со снятыми фасками'
 
             if index == 'ПСШ ЭК':
-                template_str = f'перо + шаблон-{first_template}мм L-{lenght_template_first}м + НКТ{nkt_diam}м ' \
+                template_str = f'перо {kot_str} + шаблон-{first_template}мм L-{lenght_template_first}м + НКТ{nkt_diam}м ' \
                                f'{dictance_template_first}м + {SKM_type}-{skm} +  ' \
-                               f'НКТ{nkt_diam}м {dictance_template_second}м {kot_str} +  шаблон-{template_second}мм ' \
+                               f'НКТ{nkt_diam}м {dictance_template_second}м  +  шаблон-{template_second}мм ' \
                                f'L-{lenght_template_second}м '
 
                 # print(f'строка шаблона {template_str}')
@@ -520,7 +520,7 @@ class TabPage_SO_with(QWidget):
 
 
             elif index == 'ПСШ без хвоста':
-                template_str = f'перо + {SKM_type}-{skm} + {dictance_template_second}м ' \
+                template_str = f'перо {kot_str}+ {SKM_type}-{skm} + {dictance_template_second}м ' \
                                f'НКТ{nkt_diam}м {kot_str}+ шаблон-{template_second}мм L-{lenght_template_second}м '
                 well_data.template_depth = math.ceil(current_bottom - int(dictance_template_second))
                 well_data.skm_depth = current_bottom
@@ -537,8 +537,8 @@ class TabPage_SO_with(QWidget):
                 dictance_template_first = int(self.dictance_template_first_Edit.text())
                 dictance_template_second = int(self.dictance_template_second_Edit.text())
 
-                template_str = f'фильтр-направление + НКТ{nkt_diam}м {dictance_template_first}м ' \
-                               f'+ {SKM_type}-{skm} + {dictance_template_second}м НКТ{nkt_diam}м + {kot_str}' \
+                template_str = f'фильтр-направление {kot_str} + НКТ{nkt_diam}м {dictance_template_first}м ' \
+                               f'+ {SKM_type}-{skm} + {dictance_template_second}м НКТ{nkt_diam}м + ' \
                                f'шаблон-{template_second}мм L-{lenght_template_second}м '
                 well_data.template_depth = int(
                     current_bottom - dictance_template_first - dictance_template_second)
@@ -1267,13 +1267,6 @@ class TemplateKrs( MyMainWindow):
         if privyazka_question == "Да":
             list_template_ek.insert(-1, privyazka_nkt)
 
-        if float(well_data.static_level._value) > 700 and well_data.region in ['КГМ']:
-            kot_question = QMessageBox.question(self, 'Низкий Статический уровень', 'Нужно ли произвести СПО '
-                                                                                    'обратных клапанов перед ПСШ?')
-            if kot_question == QMessageBox.StandardButton.Yes:
-                # print(f'Нужно вставить коты')
-                for row in kot_work(self, current_bottom)[::-1]:
-                    list_template_ek.insert(0, row)
 
         self.update_skm_interval(well_data.ins_ind, skm_list)
 
@@ -1316,14 +1309,14 @@ class TemplateKrs( MyMainWindow):
         from .rir import RirWindow
         from .drilling import Drill_window, TabPage_SO_drill
 
-        pero_list = RirWindow.pero_select(self, well_data.current_bottom)
+        pero_list = RirWindow.pero_select(self, well_data.current_bottom, 'перо + КОТ')
         if well_data.gipsInWell:
             gips_str = f'С ГЛУБИНЫ 1100м СНИЗИТЬ СКОРОСТЬ  СПУСКА до 0.25м/с ВОЗМОЖНО ОТЛОЖЕНИЕ ГИПСА'
         else:
             gips_str = ''
         gipsPero_list = [
-            [f'Спустить {pero_list}  на тНКТ{well_data.nkt_diam}мм', None,
-             f'Спустить {pero_list}  на тНКТ{well_data.nkt_diam}мм до глубины {well_data.current_bottom}м '
+            [f'Спустить {pero_list[3:]}  на тНКТ{well_data.nkt_diam}мм', None,
+             f'Спустить {pero_list[3:]}  на тНКТ{well_data.nkt_diam}мм до глубины {well_data.current_bottom}м '
              f'с замером, шаблонированием шаблоном {well_data.nkt_template}мм. Опрессовать НКТ на 200атм. Вымыть шар. '
              f' {gips_str} \n'
              f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
