@@ -27,10 +27,10 @@ class TabPage_SO_sand(QWidget):
 
         self.pero_combo_Label = QLabel("выбор пера", self)
         self.pero_combo_QCombo = QComboBox(self)
-        self.pero_combo_QCombo.addItems(['перо', 'обточную муфту', 'перо-110мм', 'пило-муфту'])
+        self.pero_combo_QCombo.addItems(['перо + КОТ', 'Перо', 'обточную муфту + КОТ', 'обточную муфту', 'перо-110мм', 'пило-муфту'])
 
         if well_data.column_additional or well_data.column_diametr._value < 120:
-            self.pero_combo_QCombo.setCurrentIndex(1)
+            self.pero_combo_QCombo.setCurrentIndex(2)
 
         self.solvent_question_Label = QLabel("необходимость растворителя", self)
         self.solvent_question_QCombo = QComboBox(self)
