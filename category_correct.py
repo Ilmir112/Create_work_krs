@@ -88,11 +88,12 @@ class TabPage_SO(QWidget):
                                                               'Введите индекc пласта вскрываемого')
                         well_data.plast_project.append(work_plast)
                         work_plast_index = 1
-
-                    self.plast_all.append(work_plast)
+                    if work_plast not in self.plast_all:
+                        self.plast_all.append(work_plast)
 
 
             plast_index.combo_box.addItems(self.plast_all)
+            aaaa = self.plast_all
             try:
                 plast_index.combo_box.setCurrentIndex(self.plast_all.index(work_plast))
             except:
@@ -132,6 +133,7 @@ class TabPage_SO(QWidget):
             except (IndexError, TypeError):
                 pass
             try:
+
                 h2s_mg_edit.setText(str(self.h2s_mg[num]))
             except (IndexError, TypeError):
 

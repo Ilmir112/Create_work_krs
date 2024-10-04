@@ -241,7 +241,7 @@ def calv_h2s(self, cat_H2S, h2s_mg, h2s_pr):
                                     well_data.column_additional_diametr._value - well_data.column_additional_wall_thickness._value * 2) ** 2 / 4 / 1000 * (
                                     well_data.bottomhole_artificial._value - float(
                                 well_data.head_column_additional._value)) / 1000
-        elif nkt_l < float(well_data.head_column_additional._value):
+        elif nkt_l <= float(well_data.head_column_additional._value):
             v_pod_gno = 3.14 * (
                         well_data.column_additional_diametr._value - well_data.column_additional_wall_thickness._value * 2) ** 2 / 4 / 1000 * (
                                     well_data.bottomhole_artificial._value - nkt_l) / 1000

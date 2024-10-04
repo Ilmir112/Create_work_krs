@@ -1159,7 +1159,7 @@ class Swab_Window(MyMainWindow):
              None, None, None, None, None, None, None,
              'Мастер КРС, представитель ЦДНГ', 1.5],
             [None, None,
-             f'При необходимости нормализовать забой обратной промывкой тех жидкостью уд.весом '
+             f'Нормализовать забой обратной промывкой тех жидкостью уд.весом '
              f'{well_data.fluid_work} до глубины {well_data.current_bottom}м.', None, None, None, None, None,
              None, None,
              'Мастер КРС', None],

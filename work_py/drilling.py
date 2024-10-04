@@ -754,6 +754,9 @@ class Drill_window(MyMainWindow):
             kot_list.append(row)
 
         well_data.current_bottom = current_depth
+
+        kot_list.extend(kot_work(self, current_depth))
+
         # print(f'забой {well_data.current_bottom }')
 
         return kot_list

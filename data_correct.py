@@ -734,6 +734,7 @@ class DataWindow(MyMainWindow):
         if region_Combo == '':
             QMessageBox.warning(self, 'ОШИБКА', 'Не выбран регион')
             return
+        well_data.region = region_Combo
         if type_kr_Combo == '':
             QMessageBox.warning(self, 'ОШИБКА', 'Не выбран Вид и категория ремонта')
             return

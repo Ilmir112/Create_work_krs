@@ -439,7 +439,7 @@ class MyMainWindow(QMainWindow):
         for plast in well_data.plast_all:
             if len(well_data.dict_perforation[plast]['интервал']) >= 1:
                 for interval in well_data.dict_perforation[plast]['интервал']:
-                    if interval[0] < depth < interval[1]:
+                    if float(interval[0]) < depth < float(interval[1]):
                         check_true = False
                     else:
                         check_true = True
@@ -725,7 +725,8 @@ class MyWindow(MyMainWindow):
         self.without_jamming_AGM = self.costumer_select.addMenu('&Арланский регион')
         self.without_jamming_AGM_open = self.without_jamming_AGM.addAction('&открыть перечень', self.action_clicked)
 
-        if 'Зуфаров И.М.' in well_data.user[1]:
+        asd = well_data.user[1]
+        if 'Зуфаров' in well_data.user[1] and 'И' in well_data.user[1] and 'М' in well_data.user[1]:
             self.class_well_TGM_reload = self.class_well_TGM.addAction('&обновить', self.action_clicked)
             self.class_well_IGM_reload = self.class_well_IGM.addAction('&обновить', self.action_clicked)
             self.class_well_CHGM_reload = self.class_well_CHGM.addAction('&обновить', self.action_clicked)
@@ -1001,7 +1002,7 @@ class MyWindow(MyMainWindow):
         elif action == self.application_geophysical:
             pass
 
-        elif 'Зуфаров И.М.' in well_data.user[1]:
+        elif 'Зуфаров' in well_data.user[1] and 'И' in well_data.user[1] and 'М' in well_data.user[1]:
 
             if action == self.class_well_TGM_reload:
                 costumer = 'ООО Башнефть-добыча'

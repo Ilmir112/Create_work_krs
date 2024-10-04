@@ -182,7 +182,7 @@ class PeroWindow(MyMainWindow):
              f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
              None, None, None, None, None, None, None,
              'мастер КРС', 2.5],
-            [None, None, f'При необходимости нормализовать забой обратной промывкой тех жидкостью уд.весом '
+            [None, None, f'Нормализовать забой обратной промывкой тех жидкостью уд.весом '
                          f'{well_data.fluid_work} до глубины {well_data.current_bottom}м.', None, None, None, None,
              None, None, None,
              'Мастер КРС', None],

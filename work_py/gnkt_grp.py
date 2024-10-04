@@ -665,18 +665,16 @@ class GnktOsvWindow(MyMainWindow):
                        f'скважины для оседания твёрдых частиц – в течении 2 часов',
              None, None, None, None, None, None, None,
              'Мастер ГНКТ', 2],
-            [None, 29, f'По истечении 2х часов, произвести допуск КНК-1 на г/трубе в скважину '
-                       f'«без циркуляции» до гл. {current_bottom_edit}м.'
-                       f' Забой должен соответствовать – {current_bottom_edit}м. '
-                       f'Составить АКТ на забой совмесно с представителем Заказчика. '
-                       f'При отсутствии нормализованного забоя на гл. {current_bottom_edit}м '
-                       f'(по согласованию с Заказчиком) - провести работы по нормализации забоя.',
-             None, None, None, None, None, None, None,
-             'Мастер ГНКТ', 0.5],
+            [None, 29,
+             f'По истечении 2х часов, произвести допуск КНК-1 на г/трубе в скважину '
+             f'«без циркуляции» до гл. {current_bottom_edit}м. Забой должен соответствовать – {current_bottom_edit}м. '
+             f'Составить АКТ на забой совмесно с представителем Заказчика. При отсутствии нормализованного забоя на '
+             f'гл. {current_bottom_edit}м (по согласованию с Заказчиком) - провести работы по нормализации забоя.',
+             None, None, None, None, None, None, None, 'Мастер ГНКТ', 0.5]
         ]
         if osvoenie_combo_need == 'Да':
             for index, row in enumerate(osvoenie_list):
-                gnkt_opz.insert(index + 32, row)
+                gnkt_opz.insert(index + 31, row)
 
         for row in block_gnvp_list[::-1]:
             gnkt_opz.insert(0, row)

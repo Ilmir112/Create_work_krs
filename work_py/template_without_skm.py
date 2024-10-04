@@ -197,7 +197,7 @@ class TabPage_SO(QWidget):
         elif well_data.column_additional is True and all(
                 [well_data.dict_perforation[plast]['отрайбировано'] for plast in
                  well_data.plast_work]) is True and well_data.open_trunk_well is False:
-            template_key = 'шаблон ДП с хвоста'
+            template_key = 'шаблон ДП с хвостом'
         return template_key
 
         # self.sole_rir_Edit.setText()
@@ -209,6 +209,8 @@ class TabPage_SO(QWidget):
         #     enable.setEnabled(False)
 
     def update_template(self):
+        first_template, lenght_template_first, template_second, dictance_template_first, dictance_template_second \
+            = '', '', '', '', ''
 
         if self.template_first_Edit.text() != '':
             first_template = self.template_first_Edit.text()
@@ -245,7 +247,7 @@ class TabPage_SO(QWidget):
 
             kot_str = ''
             if 'Ойл' in well_data.contractor:
-                kot_str = '+ КОТ'
+                kot_str = '+ КОТ-50'
 
             if self.template_Combo.currentText() == 'шаблон ЭК с хвостом':
                 if dictance_template_second != '':
@@ -269,7 +271,7 @@ class TabPage_SO(QWidget):
             elif self.template_Combo.currentText() == 'шаблон открытый ствол':
                 if dictance_template_second != None:
                     self.template_first_Edit.setText('фильтр направление')
-                    template_str = f'фильтр-направление + НКТ{nkt_diam}м {dictance_template_first}м {kot_str} ' \
+                    template_str = f'фильтр-направление {kot_str} + НКТ{nkt_diam}м {dictance_template_first}м  ' \
                                    f'шаблон-{template_second}мм L-{lenght_template_second}м '
                     well_data.template_depth = int(well_data.current_bottom - int(dictance_template_first))
 
@@ -301,7 +303,7 @@ class TabPage_SO(QWidget):
                 well_data.template_depth = math.ceil(well_data.current_bottom - int(dictance_template_second) -
                                                      int(lenght_template_first))
                 well_data.template_depth_addition = math.ceil(
-                    well_data.current_bottom - int(dictance_template_second))
+                    well_data.current_bottom)
 
                 skm_teml_str = f'шаблон-{first_template}мм до гл.{well_data.template_depth_addition}м, ' \
                                f'шаблон-{template_second}мм до гл.{well_data.template_depth}м'
@@ -632,6 +634,13 @@ class Template_without_skm(MyMainWindow):
             well_data.current_bottom = round(float(current_bottom), 1)
 
         self.update_template(well_data.ins_ind)
+        self.privyazka_question = self.tabWidget.currentWidget().privyazka_question_QCombo.currentText()
+        if self.privyazka_question == 'Да':
+            mes = QMessageBox.question(self, 'Привязка', 'ЗУМПФ меньше 10м. '
+                                                         'Привязка нужна, корректно ли?')
+            if mes == QMessageBox.StandardButton.No:
+                return
+
         work_list = self.template_ek(template_str, template, template_diametr)
 
         self.populate_row(self.ins_ind, work_list, self.table_widget)
@@ -677,12 +686,8 @@ class Template_without_skm(MyMainWindow):
         solvent_volume_edit = self.tabWidget.currentWidget().solvent_volume_edit.text()
         if solvent_volume_edit != '':
             solvent_volume_edit = round(float(solvent_volume_edit), 1)
-        privyazka_question = self.tabWidget.currentWidget().privyazka_question_QCombo.currentText()
-        if privyazka_question == 'Да':
-            mes = QMessageBox.question(self, 'Привязка', 'ЗУМПФ меньше 10м. '
-                                                         'Нужна привязка, корректно ли?')
-            if mes == QMessageBox.StandardButton.No:
-                return
+
+
         note_question_QCombo = self.tabWidget.currentWidget().note_question_QCombo.currentText()
 
         current_bottom = self.tabWidget.currentWidget().current_bottom_edit.text()
@@ -705,7 +710,7 @@ class Template_without_skm(MyMainWindow):
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика', 4],
             [f'Нормализовать до глубины {current_bottom}м.',
-             None, f'При необходимости нормализовать забой обратной промывкой тех жидкостью уд.весом '
+             None, f'Нормализовать забой обратной промывкой тех жидкостью уд.весом '
                    f'{well_data.fluid_work} до глубины {current_bottom}м.', None, None, None, None, None,
              None, None,
              'Мастер КРС', None],
@@ -811,10 +816,10 @@ class Template_without_skm(MyMainWindow):
                          f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {well_data.contractor}".'
                          f' ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины.'
                          f' По привязому НКТ удостовериться в наличии'
-                         f'текущего забоя с плановым, при необходимости нормализовать забой обратной промывкой тех жидкостью '
+                         f'текущего забоя с плановым, Нормализовать забой обратной промывкой тех жидкостью '
                          f'уд.весом {well_data.fluid_work}   до глубины {current_bottom}м',
                          None, None, None, None, None, None, None, 'Мастер КРС', None, None]
-        if privyazka_question == "Да":
+        if self.privyazka_question == "Да":
             list_template_ek.insert(-1, privyazka_nkt)
 
 

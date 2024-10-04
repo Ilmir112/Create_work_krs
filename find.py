@@ -1132,33 +1132,33 @@ class Well_perforation(FindIndexPZ):
         col_date_pressuar_index = 0
 
         if len(well_data.dict_perforation) == 0:
-            for row in ws.iter_rows(min_row=begin_index + 1, max_row=cancel_index + 2, values_only=True):
+            for row in ws.iter_rows(min_row=begin_index + 1, max_row=begin_index + 4, values_only=True):
                 # print(row)
                 for col_index, column in enumerate(row[:14]):
                     if 'оризонт'.lower() in str(column).lower() or 'пласт/'.lower() in str(column).lower():
                         col_plast_index = col_index - 1
 
-                    if 'по вертикали'.lower() in str(column).lower():
+                    elif 'по вертикали'.lower() in str(column).lower():
                         col_vert_index = col_index - 1
                         # print(f'вер {col_index}')
-                    if 'кровля'.lower() in str(column).lower():
+                    elif 'кровля'.lower() in str(column).lower():
                         col_roof_index = col_index - 1
                         # print(f'кров {col_index}')
-                    if 'подошва'.lower() in str(column).lower():
+                    elif 'подошва'.lower() in str(column).lower():
                         # print(f'подо {col_index}')
                         col_sole_index = col_index - 1
-                    if 'вскрытия'.lower() in str(column).lower():
+                    elif 'вскрытия'.lower() in str(column).lower():
                         # print(f'вскр {col_index}')
                         col_open_index = col_index - 1
-                    if 'отключ'.lower() in str(column).lower() and col_index < 8:
+                    elif 'отключен'.lower() in str(column).lower() and col_index < 8:
                         # print(f'октл {col_index}')
                         col_close_index = col_index - 1
-                    if 'удлине'.lower() in str(column).lower():
+                    elif 'удлине'.lower() in str(column).lower():
                         # print(f'удл {col_index}')
                         col_udlin_index = col_index - 1
-                    if 'Рпл'.lower() in str(column).lower():
+                    elif 'Рпл'.lower() in str(column).lower():
                         col_pressuar_index = col_index - 1
-                    if 'замера' in str(column).lower():
+                    elif 'замера' in str(column).lower():
                         col_date_pressuar_index = col_index - 1
                     if 'вскрыт'.lower() in str(column).lower() and 'откл'.lower() in str(column).lower():
                         well_data.old_version = True
@@ -1285,6 +1285,7 @@ class Well_perforation(FindIndexPZ):
                         row[col_open_index])
 
                     if col_old_open_index != col_open_index:
+                        aaass = row[col_close_index]
                         if row[col_close_index] is None or row[col_close_index] == '-':
                             well_data.dict_perforation.setdefault(plast, {}).setdefault('отключение', False)
                             well_data.dict_perforation_short.setdefault(plast, {}).setdefault('отключение', False)
@@ -1292,6 +1293,7 @@ class Well_perforation(FindIndexPZ):
                             well_data.dict_perforation.setdefault(plast, {}).setdefault('отключение', True)
                             well_data.dict_perforation_short.setdefault(plast, {}).setdefault('отключение', True)
                     else:
+                        dadwd = row[col_old_open_index]
                         if isinstance(row[col_old_open_index], datetime):
                             well_data.dict_perforation.setdefault(plast, {}).setdefault('отключение', False)
                             well_data.dict_perforation_short.setdefault(plast, {}).setdefault('отключение', False)
@@ -1300,6 +1302,7 @@ class Well_perforation(FindIndexPZ):
                             well_data.dict_perforation_short.setdefault(plast, {}).setdefault('отключение', True)
 
                     zhgs = 1.01
+                    aaaa = row[col_pressuar_index], row[col_vert_index]
                     if str(row[col_pressuar_index]).replace(',', '').replace('.', '').isdigit() and row[col_vert_index]:
                         data_p = float(str(row[col_pressuar_index]).replace(',', '.'))
                         well_data.dict_perforation.setdefault(plast, {}).setdefault('давление',

@@ -24,7 +24,15 @@ class TabPageGno(QWidget):
 
         self.volume_jumping_label = QLabel("Объем глушения", self)
         self.volume_jumping_edit = QLineEdit(self)
-        self.volume_jumping_edit.setText(f'{self.volume()}')
+        volume_well_jaming = self.volume()
+        if abs(float(well_data.well_volume_in_PZ[0]) - volume_well_jaming) > 0.5:
+            mes = QMessageBox.warning(None, 'Некорректный объем скважины',
+                                      f'Объем скважины указанный в ПЗ -{well_data.well_volume_in_PZ}м3 не совпадает '
+                                      f'с расчетным {volume_well_jaming}м3')
+            volume_well_jaming, _ = QInputDialog.getDouble(self,
+                                                           "корректный объем",
+                                                           'Введите корректный объем', volume_well_jaming, 1, 80, 1)
+        self.volume_jumping_edit.setText(f'{volume_well_jaming}')
 
         self.gno_label = QLabel("вид поднимаемого ГНО", self)
         self.gno_combo = QComboBox(self)
@@ -65,8 +73,8 @@ class TabPageGno(QWidget):
         self.current_bottom_ecn_edit = QLineEdit(self)
 
         if index == 'ЭЦН с автономными пакерами':
-            self.grid.addWidget(self.current_bottom_ecn_label, 4, 7)
-            self.grid.addWidget(self.current_bottom_ecn_edit, 5, 7)
+            self.grid.addWidget(self.current_bottom_ecn_label, 4, 8)
+            self.grid.addWidget(self.current_bottom_ecn_edit, 5, 8)
         else:
             # self.grid.addWidget(self.current_bottom_ecn_label, 4, 7)
             # self.grid.addWidget(self.current_bottom_ecn_edit, 5, 7)
@@ -118,13 +126,7 @@ class TabPageGno(QWidget):
 
         volume_well_jaming = round((volume_jamming_well(self, well_data.current_bottom) - volume_nkt_metal(
             well_data.dict_nkt) - volume_rod(self, well_data.dict_sucker_rod) - 0.2) * 1.1, 1)
-        if abs(float(well_data.well_volume_in_PZ[0]) - volume_well_jaming) > 0.5:
-            mes = QMessageBox.warning(None, 'Некорректный объем скважины',
-                                      f'Объем скважины указанный в ПЗ -{well_data.well_volume_in_PZ}м3 не совпадает '
-                                      f'с расчетным {volume_well_jaming}м3')
-            volume_well_jaming, _ = QInputDialog.getDouble(self,
-                                                           "корректный объем",
-                                                           'Введите корректный объем', volume_well_jaming, 1, 80, 1)
+
         return volume_well_jaming
 
     @staticmethod
@@ -146,8 +148,9 @@ class TabPageGno(QWidget):
             fluid_p = 1.02
         else:
             fluid_p = 1.01
-
+        aase = well_data.plast_work
         for plast in well_data.plast_work:
+
             if float(list(well_data.dict_perforation[plast]['рабочая жидкость'])[0]) > fluid_p:
                 fluid_p = list(well_data.dict_perforation[plast]['рабочая жидкость'])[0]
         fluid_list.append(fluid_p)
@@ -572,12 +575,11 @@ class GnoWindow(MyMainWindow):
                  f'Провести практическое обучение вахт по сигналу ВЫБРОС.', None, None,
                  None, None, None, None, None,
                  None, 1.2],
-                [
-                    f'Поднять  {well_data.dict_pump_ECN["do"]} с глубины {round(sum(list(well_data.dict_nkt.values())), 1)}м',
+                [f'Поднять {well_data.dict_pump_ECN["do"]} с глубины {round(well_data.dict_pump_ECN_h["do"], 1)}м',
                     None,
                     f'Поднять  {well_data.dict_pump_ECN["do"]} с глубины '
-                    f'{round(sum(list(well_data.dict_nkt.values())), 1)}м '
-                    f'(компоновка НКТ{nkt_diam_fond}) на поверхность с замером, '
+                    f'{round(well_data.dict_pump_ECN_h["do"], 1)}м '
+                    f' на поверхность с замером, '
                     f'накручиванием колпачков с доливом скважины '
                     f'тех.жидкостью уд. весом {well_data.fluid_work}  '
                     f'в объеме {round(round(sum(list(well_data.dict_nkt.values())), 1) * 1.12 / 1000, 1)}м3 с '
@@ -660,12 +662,11 @@ class GnoWindow(MyMainWindow):
                  None, None, None, None, None,
                  None, 1.2],
                 [
-                    f'Поднять  {well_data.dict_pump_ECN["do"]} с глубины {round(sum(list(well_data.dict_nkt.values())), 1)}м',
+                    f'Поднять  {well_data.dict_pump_ECN["do"]} с глубины {round(well_data.dict_pump_ECN_h["do"], 1)}м',
                     None,
                     f'Поднять  {well_data.dict_pump_ECN["do"]} с глубины '
-                    f'{round(sum(list(well_data.dict_nkt.values())), 1)}м '
-                    f'(компоновка НКТ{nkt_diam_fond}) на поверхность с замером, '
-                    f'накручиванием колпачков с доливом скважины '
+                    f'{round(well_data.dict_pump_ECN_h["do"], 1)}м '
+                    f'на поверхность с замером, накручиванием колпачков с доливом скважины '
                     f'тех.жидкостью уд. весом {well_data.fluid_work}  '
                     f'в объеме {round(round(sum(list(well_data.dict_nkt.values())), 1) * 1.12 / 1000, 1)}м3 с '
                     f'контролем АСПО'
@@ -706,10 +707,8 @@ class GnoWindow(MyMainWindow):
                  f'противодавлением в НКТ '
                  f'(время на прибытие СТП ЦА 320 +  АЦ не более 4 часов). Общие время на расхаживание - '
                  f'не более 6 часов, '
-                 f'через 5 часов'
-                 f' с момента расхаживания пакера - выйти с согласование на УСРСиСТ, ПТО Региона -  для составления '
-                 f'алгоритма'
-                 f' последующих работ. ', None, None,
+                 f'через 5 часов с момента расхаживания пакера - выйти с согласование на УСРСиСТ, ПТО Региона '
+                 f'- для составления алгоритма последующих работ. ', None, None,
                  None, None, None, None, None,
                  'Мастер КРС представитель Заказчика', 1.5],
                 [well_jamming_str[2], None,
@@ -1058,7 +1057,7 @@ class GnoWindow(MyMainWindow):
                  None, None, None, None, None,
                  None, 1.2],
                 [f'Поднять  {well_data.dict_pump_SHGN["do"]}', None,
-                 f'Поднять  {well_data.dict_pump_SHGN["do"]} с глубины {round(sum(list(well_data.dict_nkt.values())), 1)}м '
+                 f'Поднять  {well_data.dict_pump_SHGN["do"]} с глубины {round(well_data.dict_pump_SHGN_h["do"], 1)}м '
                  f'(компоновка НКТ{nkt_diam_fond}) на поверхность с замером, накручиванием колпачков с доливом скважины '
                  f'тех.жидкостью уд. весом {well_data.fluid_work}  '
                  f'в объеме {round(round(sum(list(well_data.dict_nkt.values())), 1) * 1.12 / 1000, 1)}м3 с контролем АСПО '
@@ -1481,16 +1480,20 @@ class GnoWindow(MyMainWindow):
 
         if 2 in cat_h2s_list or 1 in cat_h2s_list:
             expenditure_h2s_list = []
-            for plast in well_data.plast_work:
-
+            if well_data.plast_work:
                 try:
-                    poglot = [well_data.dict_category[plast]['по сероводороду'
-                              ].poglot for plast in list(well_data.dict_category.keys())
-                              if well_data.dict_category[plast]['по сероводороду'].category in [1, 2]][0]/1.065
-                    expenditure_h2s_list.append(poglot)
-
+                    for plast in well_data.plast_work:
+                        poglot = [well_data.dict_category[plast]['по сероводороду'
+                                  ].poglot for plast in list(well_data.dict_category.keys())
+                                  if well_data.dict_category[plast]['по сероводороду'].category in [1, 2]][0]/1.065
+                        expenditure_h2s_list.append(poglot)
                 except ValueError:
                     pass
+            else:
+                expenditure_h2s, _ = QInputDialog.getDouble(None,
+                                                'Расчет поглотителя',
+                                              'Отсутствуют рабочие пласты, нужно ввести необходимый расчет поглотителя',
+                                                            0.01, 0, 10, 2)
 
             expenditure_h2s = round(max(expenditure_h2s_list), 3)
             fluid_work = f'{fluid_work_insert}г/см3 с добавлением поглотителя сероводорода {well_data.type_absorbent} из ' \

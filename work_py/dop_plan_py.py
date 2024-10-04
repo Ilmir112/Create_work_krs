@@ -8,7 +8,7 @@ import psycopg2
 from PyQt5.Qt import *
 from PyQt5.QtGui import QIntValidator, QDoubleValidator
 from PyQt5.QtWidgets import QMessageBox, QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QTabWidget, \
-    QMainWindow, QPushButton, QTextEdit, QDateEdit
+    QPushButton, QTextEdit, QDateEdit
 from PyQt5.QtCore import Qt
 from datetime import datetime
 
@@ -145,10 +145,10 @@ class TabPageDp(QWidget):
 
         self.grid.addWidget(self.work_label, 25, 1)
         self.grid.addWidget(self.work_edit, 26, 1, 2, 4)
-
+        self.well_area_edit.setText(f"{well_data.well_area._value}")
         self.well_number_edit.editingFinished.connect(self.update_well)
         self.well_number_edit.setText(f"{well_data.well_number._value}")
-        self.well_area_edit.setText(f"{well_data.well_area._value}")
+
         # self.well_area_edit.textChanged.connect(self.update_well)
 
         self.change_pvr_combo.currentTextChanged.connect(self.update_change_pvr)
@@ -420,28 +420,25 @@ class DopPlanWindow(MyMainWindow):
         current_widget = self.tabWidget.currentWidget()
 
         plast_line = current_widget.plast_line.text()
-        roof_edit = current_widget.roof_edit.text()
-        sole_edit = current_widget.sole_edit.text()
+        roof_edit = current_widget.roof_edit.text().replace(',', '.')
+        sole_edit = current_widget.sole_edit.text().replace(',', '.')
         date_pvr_edit = current_widget.date_pvr_edit.text()
         count_pvr_edit = current_widget.count_pvr_edit.text()
         type_pvr_edit = current_widget.type_pvr_edit.text()
-        pressuar_pvr_edit = current_widget.pressuar_pvr_edit.text()
+        pressuar_pvr_edit = current_widget.pressuar_pvr_edit.text().replace(',', '.')
         date_pressuar_edit = current_widget.date_pressuar_edit.text()
-        vertical_line = current_widget.vertical_line.text()
-        try:
-            udlin = float(roof_edit) - float(vertical_line)
-        except Exception as e:
-            pass
+        vertical_line = current_widget.vertical_line.text().replace(',', '.')
 
         if '' in [plast_line, roof_edit, sole_edit, count_pvr_edit, type_pvr_edit]:
             QMessageBox.warning(self, 'Ошибка', 'Не введены все даныые')
             return
+        udlin = round(float(roof_edit) - float(vertical_line), 1)
         if [plast_line, vertical_line, roof_edit, sole_edit, date_pvr_edit, count_pvr_edit,
             type_pvr_edit, pressuar_pvr_edit, date_pressuar_edit] not in self.dict_perforation:
             self.dict_perforation.append(
                 [plast_line, vertical_line, roof_edit, sole_edit, date_pvr_edit, count_pvr_edit,
                  type_pvr_edit, pressuar_pvr_edit, date_pressuar_edit])
-        rows = self.tableWidget.rowCount()
+        rows = 0
         self.tableWidget.insertRow(rows)
 
         self.tableWidget.setItem(rows, 0, QTableWidgetItem(str(plast_line)))
@@ -449,6 +446,7 @@ class DopPlanWindow(MyMainWindow):
         self.tableWidget.setItem(rows, 2, QTableWidgetItem(str(roof_edit)))
         self.tableWidget.setItem(rows, 3, QTableWidgetItem(str(sole_edit)))
         self.tableWidget.setItem(rows, 4, QTableWidgetItem(str(date_pvr_edit)))
+        aaaa = self.old_index
         if self.old_index == 0:
             self.tableWidget.setItem(rows, 6, QTableWidgetItem(str(count_pvr_edit)))
             self.tableWidget.setItem(rows, 7, QTableWidgetItem(str(type_pvr_edit)))
@@ -464,21 +462,23 @@ class DopPlanWindow(MyMainWindow):
 
     def addPerfProject(self):
         current_widget = self.tabWidget.currentWidget()
-        table_in_base_combo = str(current_widget.table_in_base_combo.currentText())
+        table_in_base_combo = str(current_widget.well_data_in_base_combo.currentText())
 
         if ' от' in table_in_base_combo:
-            table_in_base = table_in_base_combo.split(' ')[2].replace('krs', 'ПР').replace('dop_plan', 'ДП').replace(
+            asdf = table_in_base_combo.split(' ')
+            table_in_base = table_in_base_combo.split(' ')[3].replace('krs', 'ПР').replace('dop_plan', 'ДП').replace(
                 'dop_plan_in_base', 'ДП')
+            type_kr = table_in_base_combo.split(' ')[2]
         well_number = current_widget.well_number_edit.text()
         well_area = current_widget.well_area_edit.text()
         if well_number == '' or well_area == '':
             mes = QMessageBox.critical(self, 'ошибка', 'Ввведите номер площадь скважины')
             return
-        self.work_with_excel(well_number, well_area, table_in_base)
+        self.work_with_excel(well_number, well_area, table_in_base, type_kr)
 
-    def work_with_excel(self, well_number, well_area, work_plan):
+    def work_with_excel(self, well_number, well_area, work_plan, type_kr):
         self.data, self.rowHeights, self.colWidth, self.boundaries_dict = self.read_excel_in_base(well_number,
-                                                                                                  well_area, work_plan)
+                                                                                                  well_area, work_plan, type_kr)
         self.target_row_index = 5000
         self.target_row_index_cancel = 5000
         self.bottom_row_index = 5000
@@ -488,17 +488,18 @@ class DopPlanWindow(MyMainWindow):
         for i, row in self.data.items():
             if i != 'image':
                 list_row = []
-
                 for col in range(len(row)):
-
                     if 'оризонт' in str(row[col]['value']) or 'пласт/' in str(row[col]['value']).lower():
                         self.target_row_index = int(i) + 1
                     elif 'вскрытия/отключения' in str(row[col]['value']):
                         self.old_index = 1
-
-                    elif 'II. История эксплуатации скважины' in str(row[col]['value']) and \
+                    elif 'II. История эксплуатации скважины' in str(row[col]['value'])  and \
                             well_data.work_plan not in ['plan_change']:
                         self.target_row_index_cancel = int(i) - 1
+                        break
+                    elif 'внутренний диаметр ( d шарошечного долота) необсаженной части ствола' in str(row[col]['value']) and \
+                            well_data.work_plan not in ['plan_change']:
+                        self.target_row_index_cancel = int(i)
                         break
                     elif 'Порядок работы' == str(row[col]['value']) and well_data.data_x_max._value == 0:
                         well_data.data_x_max = well_data.ProtectedIsDigit(int(i) + 1)
@@ -508,14 +509,14 @@ class DopPlanWindow(MyMainWindow):
                         break
                     elif 'Текущий забой ' == str(row[col]['value']):
                         self.bottom_row_index = int(i)
-                        a = int(i)
-                    if int(i) > self.target_row_index:
-                        list_row.append(row[col]['value'])
 
+                    if int(i) > self.target_row_index and self.target_row_index_cancel > int(i):
+                        list_row.append(row[col]['value'])
 
                     if int(i) > self.target_row_index_cancel:
                         break
-            if len(list_row) != 0 and not 'внутренний диаметр ( d шарошечного долота) не обсаженной части ствола' in list_row:
+
+            if len(list_row) != 0 and not 'внутренний диаметр ( d шарошечного долота) необсаженной части ствола' in list_row:
                 if all([col == None or col == '' for col in list_row]) is False:
                     perforation_list.append(list_row)
         well_data.ins_ind2 = well_data.data_x_max._value
@@ -523,21 +524,20 @@ class DopPlanWindow(MyMainWindow):
         if well_data.work_plan != 'plan_change':
             self.tableWidget.setSortingEnabled(False)
             rows = self.tableWidget.rowCount()
-
             for row_pvr in perforation_list[::-1]:
                 self.tableWidget.insertRow(rows)
                 for index_col, col_pvr in enumerate(row_pvr):
                     if col_pvr != None:
                         self.tableWidget.setItem(rows, index_col - 1, QTableWidgetItem(str(col_pvr)))
 
-    def read_excel_in_base(self, number_well, area_well, work_plan):
+    def read_excel_in_base(self, number_well, area_well, work_plan, type_kr):
         if well_data.connect_in_base:
             conn = psycopg2.connect(**well_data.postgres_params_data_well)
             cursor = conn.cursor()
 
             cursor.execute("SELECT excel_json FROM wells WHERE well_number = %s AND area_well = %s "
-                           "AND contractor = %s AND costumer = %s AND work_plan = %s",
-                           (str(number_well), area_well, well_data.contractor, well_data.costumer, work_plan))
+                           "AND contractor = %s AND costumer = %s AND work_plan = %s AND type_kr = %s",
+                           (str(number_well), area_well, well_data.contractor, well_data.costumer, work_plan, type_kr))
 
             data_well = cursor.fetchall()
 
@@ -596,13 +596,13 @@ class DopPlanWindow(MyMainWindow):
     def insert_row_in_pvr(self, data, rowHeights, colWidth, boundaries_dict, plast_list, current_bottom,
                           current_bottom_date_edit, method_bottom_combo):
         count_row_insert = len(plast_list)
-        count_row_in_plan = self.target_row_index_cancel - self.target_row_index - 2
+        count_row_in_plan = self.target_row_index_cancel - self.target_row_index - 1
         boundaries_dict_new = {}
         if self.target_row_index != 5000:
-            n = len(data)
+            n = len(data)-1
             if count_row_in_plan < count_row_insert:
                 count_row_insert = count_row_insert - count_row_in_plan
-                while n != int(self.target_row_index):
+                while n+1 != int(self.target_row_index):
                     data.update({str(n + count_row_insert): data[str(n)]})
                     n -= 1
                 rowHeights.insert(int(self.target_row_index) + count_row_insert, None)
@@ -742,7 +742,6 @@ class DopPlanWindow(MyMainWindow):
         return data, rowHeights, colWidth, boundaries_dict_new
 
     def del_row_table(self):
-
         row = self.tableWidget.currentRow()
         if row == -1:
             msg = QMessageBox.information(self, 'Внимание', 'Выберите строку для удаления')
@@ -894,7 +893,7 @@ class DopPlanWindow(MyMainWindow):
                     well_data.type_kr = data_well[2]
                     insert_data_well_dop_plan(data_well[0])
 
-                self.work_with_excel(well_number, well_area, table_in_base)
+                # self.work_with_excel(well_number, well_area, table_in_base, type_kr)
 
                 self.extraction_data(well_data_in_base_combo, index_change_line)
 
@@ -938,15 +937,15 @@ class DopPlanWindow(MyMainWindow):
                 self.populate_row(self.ins_ind + 3, work_list, self.table_widget, self.work_plan)
 
             if len(self.dict_perforation) != 0:
-                for plast, vertical_line, roof_int, sole_int, date_pvr_edit, count_pvr_edit, \
+                for plast, vertical_line,  roof_int, sole_int, date_pvr_edit, count_pvr_edit, \
                     type_pvr_edit, pressuar_pvr_edit, date_pressuar_edit in self.dict_perforation:
                     well_data.dict_perforation.setdefault(plast, {}).setdefault('отрайбировано', False)
                     well_data.dict_perforation.setdefault(plast, {}).setdefault('Прошаблонировано', False)
 
                     well_data.dict_perforation.setdefault(plast, {}).setdefault('интервал', []).append(
-                        (roof_int, sole_int))
+                        (float(roof_int), float(sole_int)))
                     well_data.dict_perforation_short.setdefault(plast, {}).setdefault('интервал', []).append(
-                        (roof_int, sole_int))
+                        (float(roof_int), float(sole_int)))
                     well_data.dict_perforation.setdefault(plast, {}).setdefault('отключение', False)
                     well_data.dict_perforation_short.setdefault(plast, {}).setdefault('отключение', False)
 
@@ -1167,7 +1166,7 @@ class DopPlanWindow(MyMainWindow):
         well_data.current_bottom = result[paragraph_row][1]
 
         well_data.dict_perforation = json.loads(result[paragraph_row][2])
-
+        aakka = well_data.dict_perforation
 
         well_data.plast_all = json.loads(result[paragraph_row][3])
         well_data.plast_work = json.loads(result[paragraph_row][4])
