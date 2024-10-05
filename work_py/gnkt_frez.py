@@ -300,7 +300,7 @@ class Work_with_gnkt(main.MyWindow):
 
     def create_title_list(self, ws2):
 
-        well_data.region = block_name.region(well_data.cdng._value)
+        well_data.region = block_name.region_select(well_data.cdng._value)
         self.region = well_data.region
 
         title_list = [

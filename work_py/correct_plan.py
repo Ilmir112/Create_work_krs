@@ -127,6 +127,7 @@ class CorrectPlanWindow(MyMainWindow):
             conn = psycopg2.connect(**well_data.postgres_params_data_well)
             cursor = conn.cursor()
 
+
             cursor.execute("SELECT excel_json FROM wells WHERE well_number = %s AND area_well = %s "
                            "AND contractor = %s AND costumer = %s AND work_plan = %s",
                            (str(number_well), area_well, well_data.contractor, well_data.costumer, work_plan))

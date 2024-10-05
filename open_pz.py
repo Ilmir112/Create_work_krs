@@ -11,7 +11,7 @@ from cdng import events_gnvp, itog_1, events_gnvp_gnkt
 from find import ProtectedIsNonNone
 from main import MyMainWindow
 from plan import delete_rows_pz
-from block_name import region, razdel_1, curator_sel, pop_down
+from block_name import region_select, razdel_1, curator_sel, pop_down
 from work_py.dop_plan_py import DopPlanWindow
 from work_py.check_in_pz import CustomMessageBox
 
@@ -40,10 +40,10 @@ class CreatePZ(MyMainWindow):
         # Запуск основного класса и всех дочерних классов в одной строке
         well_pz = FindIndexPZ(ws)
 
-        well_data.region = region(well_data.cdng._value)
+        well_data.region = region_select(well_data.cdng._value)
 
         WellData.read_well(WellData, ws, well_data.cat_well_max._value, well_data.data_pvr_min._value)
-        well_data.region = region(well_data.cdng._value)
+        well_data.region = region_select(well_data.cdng._value)
 
         aaa = well_data.current_date
         date_str2 = datetime.strptime('2024-09-19', '%Y-%m-%d')
