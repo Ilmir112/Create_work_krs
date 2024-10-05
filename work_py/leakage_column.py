@@ -112,18 +112,18 @@ class LeakageWindow(MyMainWindow):
         if not roof_leakage or not sole_leakage_line:
             msg = QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
             return
-        ada = float(well_data.bottomhole_artificial._value)
-        if float(well_data.bottomhole_artificial._value) <= float(sole_leakage_line):
-            msg = QMessageBox.information(self, 'Внимание', 'глубина НЭК ниже искусственного забоя')
-            return
+        # ada = float(well_data.bottomhole_artificial._value)
+        # if float(well_data.bottomhole_artificial._value) <= float(sole_leakage_line):
+        #     msg = QMessageBox.information(self, 'Внимание', 'глубина НЭК ниже искусственного забоя')
+        #     return
 
-        rows = self.tableWidget.rowCount()
+        rows = 0
         self.tableWidget.insertRow(rows)
 
         self.tableWidget.setItem(rows, 0, QTableWidgetItem(roof_leakage))
         self.tableWidget.setItem(rows, 1, QTableWidgetItem(sole_leakage_line))
         self.tableWidget.setCellWidget(rows, 2, insulation_combo1)
-
+        self.tableWidget.setSortingEnabled(False)
         self.tableWidget.sortItems(0)
 
     def addString(self):
@@ -145,7 +145,7 @@ class LeakageWindow(MyMainWindow):
 
         leakiness_column.replace('м', '').strip()
         # print(leakiness_column)
-        rows = self.tableWidget.rowCount()
+        rows = 0
         for leakiness in leakiness_column.replace('м', '').replace(' ', '').split(','):
 
 
@@ -158,7 +158,8 @@ class LeakageWindow(MyMainWindow):
                 self.tableWidget.setItem(rows, 0, QTableWidgetItem(roof_leakage))
                 self.tableWidget.setItem(rows, 1, QTableWidgetItem(sole_leakage))
                 self.tableWidget.setCellWidget(rows, 2, insulation_combo)
-                # self.tableWidget.setSortingEnabled(False)
+            self.tableWidget.setSortingEnabled(False)
+            self.tableWidget.sortItems(0)
 
 
     def add_work(self):
