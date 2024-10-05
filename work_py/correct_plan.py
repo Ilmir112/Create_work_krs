@@ -190,7 +190,7 @@ class CorrectPlanWindow(MyMainWindow):
                 well_data.type_kr = data_well[2]
                 insert_data_well_dop_plan(data_well[0])
 
-            DopPlanWindow.work_with_excel(self, well_number, well_area, well_data_in_base)
+            DopPlanWindow.work_with_excel(self, well_number, well_area, well_data_in_base, well_data.type_kr)
 
             well_data.data, well_data.rowHeights, well_data.colWidth, well_data.boundaries_dict = \
                 DopPlanWindow.change_pvr_in_bottom(self, self.data, self.rowHeights, self.colWidth,

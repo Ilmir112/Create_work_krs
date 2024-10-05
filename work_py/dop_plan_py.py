@@ -477,8 +477,10 @@ class DopPlanWindow(MyMainWindow):
         self.work_with_excel(well_number, well_area, table_in_base, type_kr)
 
     def work_with_excel(self, well_number, well_area, work_plan, type_kr):
-        self.data, self.rowHeights, self.colWidth, self.boundaries_dict = self.read_excel_in_base(well_number,
-                                                                                                  well_area, work_plan, type_kr)
+
+        self.data, self.rowHeights, self.colWidth, self.boundaries_dict = \
+            DopPlanWindow.read_excel_in_base(well_number, well_area, work_plan, type_kr)
+
         self.target_row_index = 5000
         self.target_row_index_cancel = 5000
         self.bottom_row_index = 5000
@@ -529,8 +531,8 @@ class DopPlanWindow(MyMainWindow):
                 for index_col, col_pvr in enumerate(row_pvr):
                     if col_pvr != None:
                         self.tableWidget.setItem(rows, index_col - 1, QTableWidgetItem(str(col_pvr)))
-
-    def read_excel_in_base(self, number_well, area_well, work_plan, type_kr):
+    @staticmethod
+    def read_excel_in_base(number_well, area_well, work_plan, type_kr):
         if well_data.connect_in_base:
             conn = psycopg2.connect(**well_data.postgres_params_data_well)
             cursor = conn.cursor()
@@ -568,7 +570,7 @@ class DopPlanWindow(MyMainWindow):
             boundaries_dict = dict_well['merged_cells']
 
         except Exception as e:
-            QMessageBox.warning(self, 'Ошибка', f'Введены не все параметры {type(e).__name__}\n\n{str(e)}')
+            QMessageBox.warning(None, 'Ошибка', f'Введены не все параметры {type(e).__name__}\n\n{str(e)}')
             return
 
         return data, rowHeights, colWidth, boundaries_dict
@@ -1096,7 +1098,7 @@ class DopPlanWindow(MyMainWindow):
         date_table = table_name.split(' ')[-1]
         well_number = table_name.split(' ')[0]
         well_area = table_name.split(' ')[1]
-        type_kr = table_name.split(' ')[2]
+        type_kr = table_name.split(' ')[2].replace('None', 'null')
 
         work_plan = table_name.split(' ')[3]
 
@@ -1107,7 +1109,6 @@ class DopPlanWindow(MyMainWindow):
 
                 cursor = conn.cursor()
                 param = '%s'
-
 
 
             except psycopg2.Error as e:
@@ -1128,8 +1129,10 @@ class DopPlanWindow(MyMainWindow):
                 mes = QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных.')
 
 
-        cursor.execute(f'''SELECT data_change_paragraph FROM wells WHERE well_number={param} AND area_well={param} AND type_kr={param}  AND work_plan={param}''',
-                        (str(well_number), well_area, type_kr, work_plan))
+        cursor.execute(f'''
+        SELECT data_change_paragraph FROM wells 
+        WHERE well_number={param} AND area_well={param} AND type_kr={param} AND work_plan={param} AND today={param}''',
+        (str(well_number), well_area, type_kr, work_plan, date_table))
 
         result_table = cursor.fetchone()
         # Закройте курсор и соединение
@@ -1137,6 +1140,10 @@ class DopPlanWindow(MyMainWindow):
             cursor.close()
         if conn:
             conn.close()
+        if result_table is None:
+            QMessageBox.warning(self, 'Ошибка',
+                                f'В базе данных скв {well_number} {well_area} отсутствует данные, '
+                                f'используйте excel вариант плана работ')
 
         if result_table[0]:
             result = json.loads(result_table[0])
