@@ -1787,6 +1787,7 @@ class MyWindow(MyMainWindow):
             self.raid_window = None
 
     def read_clicked_mouse_data(self, row):
+        from work_py.advanted_file import definition_plast_work
 
         row = row - well_data.count_row_well
         # print(well_data.column_diametr._value)
@@ -1809,6 +1810,7 @@ class MyWindow(MyMainWindow):
         well_data.problemWithEk_depth = data[row][13]
         well_data.problemWithEk_diametr = data[row][14]
 
+        definition_plast_work(self)
 
 
         # print(well_data.skm_interval)

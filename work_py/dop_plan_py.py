@@ -472,7 +472,7 @@ class DopPlanWindow(MyMainWindow):
         well_number = current_widget.well_number_edit.text()
         well_area = current_widget.well_area_edit.text()
         if well_number == '' or well_area == '':
-            mes = QMessageBox.critical(self, 'ошибка', 'Ввведите номер площадь скважины')
+            QMessageBox.critical(self, 'ошибка', 'Ввведите номер площадь скважины')
             return
         self.work_with_excel(well_number, well_area, table_in_base, type_kr)
 
@@ -753,16 +753,16 @@ class DopPlanWindow(MyMainWindow):
     def add_work(self):
         from data_base.work_with_base import check_in_database_well_data, insert_data_well_dop_plan, round_cell
         from well_data import ProtectedIsNonNone
-        from main import MyMainWindow
+        
         current_widget = self.tabWidget.currentWidget()
         method_bottom_combo = current_widget.method_bottom_combo.currentText()
         if method_bottom_combo == '':
-            mes = QMessageBox.critical(self, 'Забой', 'Выберете метод определения забоя')
+            QMessageBox.critical(self, 'Забой', 'Выберете метод определения забоя')
             return
 
         change_pvr_combo = current_widget.change_pvr_combo.currentText()
         if change_pvr_combo == '':
-            mes = QMessageBox.warning(self, 'Ошибка', 'Нужно выбрать пункт изменения ПВР')
+            QMessageBox.warning(self, 'Ошибка', 'Нужно выбрать пункт изменения ПВР')
             return
         if well_data.data_in_base:
 
@@ -786,26 +786,26 @@ class DopPlanWindow(MyMainWindow):
             if current_bottom == '' or fluid == '' or work_earlier == '' or \
                     template_depth_edit == '' or template_lenght_edit == '':
                 # print(current_bottom, fluid, work_earlier)
-                mes = QMessageBox.critical(self, 'Забой', 'не все значения введены')
+                QMessageBox.critical(self, 'Забой', 'не все значения введены')
                 return
             if template_lenght_edit == '0' or template_lenght_edit == '':
                 mes = QMessageBox.question(self, 'Длина шаблона', 'в скважину во время ремонта не был спущен шаблон, '
                                                                   'так ли это?')
                 if mes == QMessageBox.StandardButton.No:
                     return
-            if float(template_depth_edit) > float(current_bottom):
-                mes = QMessageBox.critical(self, 'Забой', 'Шаблонирование не может быть ниже текущего забоя')
+            if float(template_depth_edit) > float(well_data.bottomhole_artificial._value):
+                QMessageBox.critical(self, 'Забой', 'Шаблонирование не может быть ниже текущего забоя')
                 return
             if number_dp != '':
                 well_data.number_dp = int(float(number_dp))
 
             if (0.87 <= float(fluid[:3].replace(',', '.')) <= 1.64) == False:
-                mes = QMessageBox.critical(self, 'рабочая жидкость',
+                QMessageBox.critical(self, 'рабочая жидкость',
                                            'уд. вес рабочей жидкости не может быть меньше 0,87 и больше 1,64')
                 return
             if well_data.data_in_base:
                 if 'г/см3' not in fluid:
-                    mes = QMessageBox.critical(self, 'уд.вес', 'нужно добавить значение "г/см3" в уд.вес')
+                    QMessageBox.critical(self, 'уд.вес', 'нужно добавить значение "г/см3" в уд.вес')
                     return
                 well_data.fluid_work = fluid
                 well_data.fluid_work_short = fluid[:7]
@@ -814,7 +814,7 @@ class DopPlanWindow(MyMainWindow):
             else:
 
                 if float(current_bottom) > well_data.bottomhole_drill._value:
-                    mes = QMessageBox.critical(self, 'Забой', 'Текущий забой больше пробуренного забоя')
+                    QMessageBox.critical(self, 'Забой', 'Текущий забой больше пробуренного забоя')
                     return
                 well_data.fluid_work, well_data.fluid_work_short = GnoWindow.calc_work_fluid(fluid)
 
@@ -873,7 +873,7 @@ class DopPlanWindow(MyMainWindow):
                 if index_change_line != '':
                     index_change_line = int(float(index_change_line))
                 else:
-                    mes = QMessageBox.critical(self, 'пункт', 'Необходимо выбрать пункт плана работ')
+                    QMessageBox.critical(self, 'пункт', 'Необходимо выбрать пункт плана работ')
                     return
                 list_dop_plan = self.get_tables_starting_with(well_data.well_number._value,
                                                                                 well_data.well_area._value, table_in_base, type_kr)
@@ -886,7 +886,7 @@ class DopPlanWindow(MyMainWindow):
 
 
                 if well_data_in_base_combo == '':
-                    mes = QMessageBox.critical(self, 'База данных', 'Необходимо выбрать план работ')
+                    QMessageBox.critical(self, 'База данных', 'Необходимо выбрать план работ')
                     return
 
                 data_well = check_in_database_well_data(well_number, well_area, table_in_base)
@@ -983,25 +983,25 @@ class DopPlanWindow(MyMainWindow):
             if current_bottom == '' or fluid == '' or work_earlier == '' or \
                     template_depth_edit == '' or template_lenght_edit == '':
                 # print(current_bottom, fluid, work_earlier)
-                mes = QMessageBox.critical(self, 'Забой', 'не все значения введены')
+                QMessageBox.critical(self, 'Забой', 'не все значения введены')
                 return
             if template_lenght_edit == '0':
-                mes = QMessageBox.critical(self, 'Длина шаблона',
+                QMessageBox.critical(self, 'Длина шаблона',
                                            'Введите длину шаблонов которые были спущены в скважину')
                 return
             if float(template_depth_edit) > float(current_bottom):
-                mes = QMessageBox.critical(self, 'Забой', 'Шаблонирование не может быть ниже текущего забоя')
+                QMessageBox.critical(self, 'Забой', 'Шаблонирование не может быть ниже текущего забоя')
                 return
             if number_dp != '':
                 well_data.number_dp = int(float(number_dp))
 
             if (0.87 <= float(fluid[:3].replace(',', '.')) <= 1.64) == False:
-                mes = QMessageBox.critical(self, 'рабочая жидкость',
+                QMessageBox.critical(self, 'рабочая жидкость',
                                            'уд. вес рабочей жидкости не может быть меньше 0,87 и больше 1,64')
                 return
 
             # if float(current_bottom) > well_data.bottomhole_drill._value:
-            #     mes = QMessageBox.critical(self, 'Забой', 'Текущий забой больше пробуренного забоя')
+            #     QMessageBox.critical(self, 'Забой', 'Текущий забой больше пробуренного забоя')
             #     return
             well_data.fluid_work, well_data.fluid_work_short = GnoWindow.calc_work_fluid(fluid)
 
