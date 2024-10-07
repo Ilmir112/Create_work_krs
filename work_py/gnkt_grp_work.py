@@ -615,6 +615,7 @@ class GnktOsvWindow2(MyMainWindow):
                 None,
                 None, None, None, f'Тек. забой: \n{well_data.current_bottom}м ', None]
         lenght_paker = 2
+        voronka = well_data.depth_fond_paker2_do["do"]
         if well_data.curator == 'ОР' and well_data.region == 'ТГМ':
             lenght_paker = round(
                 float(well_data.depth_fond_paker2_do["do"]) - float(well_data.depth_fond_paker_do["do"]), 1)

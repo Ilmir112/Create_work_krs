@@ -38,37 +38,37 @@ jobs:
           "DB_HOST=$DB_HOST" | Out-File -FilePath .env -Encoding utf8 -Append
           "DB_PORT=$DB_PORT" | Out-File -FilePath .env -Encoding utf8 -Append
           
-          pyinstaller --noconfirm --onedir --icon=imageFiles/icon/zima_ico.ico --console --name "ZIMA" \
-            --add-data "work_py;work_py/" \
-            --add-data "users;users/" \
-            --add-data "tests;tests/" \
-            --add-data "log_files;log_files/" \
-            --add-data "property_excel;property_excel/" \
-            --add-data "imageFiles;imageFiles/" \
-            --add-data "gnkt_data;gnkt_data/" \
-            --add-data "data_base;data_base/" \
-            --add-data "podpisant.json;." \
-            --add-data "work_json.py;." \
-            --add-data "well_data.py;." \
-            --add-data "requirements.txt;." \
-            --add-data "plan.py;." \
-            --add-data "perforation_correct_gnkt_frez.py;." \
-            --add-data "perforation_correct.py;." \
-            --add-data "open_pz.py;." \
-            --add-data "krs.py;." \
-            --add-data "H2S.py;." \
-            --add-data "gnkt_opz.py;." \
-            --add-data "gnkt_after_grp.py;." \
-            --add-data "find.py;." \
-            --add-data "data_correct_position_people.py;." \
-            --add-data "data_correct.py;." \
-            --add-data "cdng.py;." \
-            --add-data "category_correct.py;." \
-            --add-data "build_script.py;." \
-            --add-data "block_name.py;." \
-            --add-data "application_pvr.py;." \
-            --add-data "application_gis.py;." \
-            main.py
+          pyinstaller --noconfirm --onedir --icon=imageFiles/icon/zima_ico.ico --console --name "ZIMA" 
+            --add-data "work_py;work_py/" 
+            --add-data "users;users/" 
+            --add-data "tests;tests/" 
+            --add-data "log_files;log_files/" 
+            --add-data "property_excel;property_excel/" 
+            --add-data "imageFiles;imageFiles/" 
+            --add-data "gnkt_data;gnkt_data/" 
+            --add-data "data_base;data_base/" 
+            --add-data "podpisant.json;." 
+            --add-data "work_json.py;." 
+            --add-data "well_data.py;." 
+            --add-data "requirements.txt;." 
+            --add-data "plan.py;." 
+            --add-data "perforation_correct_gnkt_frez.py;." 
+            --add-data "perforation_correct.py;." 
+            --add-data "open_pz.py;." 
+            --add-data "krs.py;." 
+            --add-data "H2S.py;." 
+            --add-data "gnkt_opz.py;." 
+            --add-data "gnkt_after_grp.py;." 
+            --add-data "find.py;." 
+            --add-data "data_correct_position_people.py;." 
+            --add-data "data_correct.py;." 
+            --add-data "cdng.py;." 
+            --add-data "category_correct.py;." 
+            --add-data "build_script.py;." 
+            --add-data "block_name.py;." 
+            --add-data "application_pvr.py;." 
+            --add-data "application_gis.py;." 
+            "main.py"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
