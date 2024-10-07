@@ -214,39 +214,39 @@ class PakerIzvlek(MyMainWindow):
 
         if nkt_select_combo == 'пакер в ЭК' and well_data.column_additional and \
                 paker_depth_line > well_data.head_column_additional._value:
-            mes = QMessageBox.warning(self, 'Ошибка',
+            QMessageBox.warning(self, 'Ошибка',
                                       'Не корректно выбрана компоновка печати для доп колонны')
             return
         elif nkt_select_combo == 'пакер в ДП' and well_data.column_additional and \
                 paker_depth_line < well_data.head_column_additional._value:
-            mes = QMessageBox.warning(self, 'Ошибка',
+            QMessageBox.warning(self, 'Ошибка',
                                       'Не корректно выбрана компоновка для основной колонны')
             return
 
         if type_work_combo == 'установка':
             if paker_depth_line == '':
-                pmes = QMessageBox.warning(self, 'Ошибка',
+                pQMessageBox.warning(self, 'Ошибка',
                                           'Введите данные по глубине установки пакера')
                 return
 
             if paker_depth_line > well_data.current_bottom:
-                mes = QMessageBox.warning(self, 'Ошибка',
+                QMessageBox.warning(self, 'Ошибка',
                                           'Забой ниже глубины текущего забоя')
                 return
             elif paker_depth_line == '' or pero_diametr_line == '':
-                mes = QMessageBox.warning(self, 'ПРОВЕРКА', 'Необходимо добавить глубину посадки пакера')
+                QMessageBox.warning(self, 'ПРОВЕРКА', 'Необходимо добавить глубину посадки пакера')
                 return
             if well_data.column_additional and int(paker_depth_line) > well_data.head_column_additional._value and \
                     nkt_key == 'пакер в ЭК':
-                msg = QMessageBox.information(self, 'Внимание', 'Компоновка подобрана не корректно')
+                QMessageBox.information(self, 'Внимание', 'Компоновка подобрана не корректно')
                 return
             if well_data.column_additional and int(paker_depth_line) < well_data.head_column_additional._value \
                     and nkt_key == 'пакер в ДП':
-                msg = QMessageBox.information(self, 'Внимание', 'Компоновка подобрана не корректно')
+                QMessageBox.information(self, 'Внимание', 'Компоновка подобрана не корректно')
                 return
 
             if int(paker_depth_line) > well_data.current_bottom:
-                mes = QMessageBox.warning(self, 'Некорректные данные', f'Компоновка НКТ c хвостовик + пакер '
+                QMessageBox.warning(self, 'Некорректные данные', f'Компоновка НКТ c хвостовик + пакер '
                                                                        f'ниже текущего забоя')
                 return
             if self.check_true_depth_template(paker_depth_line) is False:

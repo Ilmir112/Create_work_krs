@@ -1,4 +1,4 @@
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtWidgets
 from PyQt5.Qt import *
 
 import well_data
@@ -39,11 +39,9 @@ class TabPage_SO(QWidget):
         grid.addWidget(self.lineEditDopInformation, 1, 3)
 
     def geophygist_data(self):
-
         if self.ComboBoxGeophygist.currentText() in ['Гироскоп', 'АКЦ', 'ЭМДС', 'ПТС', 'РК', 'ГК и ЛМ']:
             self.lineedit_type.setText('0')
             self.lineedit_type2.setText(f'{well_data.current_bottom}')
-
 
 
 class TabWidget(QTabWidget):
@@ -54,7 +52,7 @@ class TabWidget(QTabWidget):
 
 class GeophysicWindow(MyMainWindow):
 
-    def __init__(self, table_widget, ins_ind, parent=None):
+    def __init__(self, table_widget, ins_ind):
         super().__init__()
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
@@ -89,17 +87,16 @@ class GeophysicWindow(MyMainWindow):
 
     def add_row_table(self):
 
-
         edit_type = self.tabWidget.currentWidget().lineedit_type.text().replace(',', '.')
         edit_type2 = self.tabWidget.currentWidget().lineedit_type2.text().replace(',', '.')
         researchGis = self.geophysicalSelect(str(self.tabWidget.currentWidget().ComboBoxGeophygist.currentText()))
 
         dopInformation = self.tabWidget.currentWidget().lineEditDopInformation.text()
         if not edit_type or not edit_type2 or not researchGis:
-            msg = QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
+            QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
             return
         if well_data.current_bottom < float(edit_type2):
-            msg = QMessageBox.information(self, 'Внимание', 'глубина исследований ниже текущего забоя')
+            QMessageBox.information(self, 'Внимание', 'глубина исследований ниже текущего забоя')
             return
 
         self.tableWidget.setSortingEnabled(False)
@@ -111,7 +108,9 @@ class GeophysicWindow(MyMainWindow):
         self.tableWidget.setItem(rows, 2, QTableWidgetItem(edit_type2))
         self.tableWidget.setItem(rows, 3, QTableWidgetItem(dopInformation))
         self.tableWidget.setSortingEnabled(True)
+
     def geophysic_sel(self, geophysic, edit_type, edit_type2):
+        research, research_short = '', ''
 
         if geophysic == 'АКЦ':
             research = f'ЗАДАЧА 2.7.1 Определение состояния цементного камня (АКЦ, АК сканирование) в ' \
@@ -162,24 +161,31 @@ class GeophysicWindow(MyMainWindow):
         if isinstance(value, int) or isinstance(value, float):
             return int(value)
 
-        elif str(value).replace('.','').replace(',','').isdigit():
-            if str(round(float(value.replace(',','.')), 1))[-1] == 0:
-                return int(float(value.replace(',','.')))
+        elif str(value).replace('.', '').replace(',', '').isdigit():
+            if str(round(float(value.replace(',', '.')), 1))[-1] == 0:
+                return int(float(value.replace(',', '.')))
         else:
             return 0
+
     def add_work(self):
 
         rows = self.tableWidget.rowCount()
         geophysicalResearch = [
-            [" ", None, f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {well_data.contractor}". '
-                         f'При необходимости  подготовить место для установки партии ГИС напротив мостков. '
-                         f'Произвести  монтаж ГИС согласно схемы  №8а утвержденной главным инженером  {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г',
+            [" ", None,
+             f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {well_data.contractor}". '
+             f'При необходимости  подготовить место для установки партии ГИС напротив мостков. '
+             f'Произвести  монтаж ГИС согласно схемы  №8а утвержденной главным инженером '
+             f'{well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г',
              None, None, None, None, None, None, None,
              'Мастер КРС', ' '],
             [' ', None,
-             f'Долить скважину до устья тех жидкостью уд.весом {well_data.fluid_work} .Установить ПВО по схеме №8а утвержденной '
-             f'главным инженером {well_data.contractor}  {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г. Опрессовать  плашки  ПВО (на давление опрессовки ЭК, но '
-             f'не ниже максимального ожидаемого давления на устье) {well_data.max_admissible_pressure._value}атм, по невозможности на давление поглощения, но '
+             f'Долить скважину до устья тех жидкостью уд.весом {well_data.fluid_work} .Установить ПВО по'
+             f' схеме №8а утвержденной '
+             f'главным инженером {well_data.contractor} '
+             f'{well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г. Опрессовать  плашки  ПВО '
+             f'(на давление опрессовки ЭК, но '
+             f'не ниже максимального ожидаемого давления на устье) {well_data.max_admissible_pressure._value}атм, '
+             f'по невозможности на давление поглощения, но '
              f'не менее 30атм в течении 30мин (ОПРЕССОВКУ ПВО ЗАФИКСИРОВАТЬ В ВАХТОВОМ ЖУРНАЛЕ). ',
              None, None, None, None, None, None, None,
              'Мастер КРС, подрядчик по ГИС', 1.2]
@@ -231,7 +237,7 @@ class GeophysicWindow(MyMainWindow):
                 self.table_widget.setItem(row, column, QtWidgets.QTableWidgetItem(str(data)))
 
                 if column == 0 or column == 2 or column == 10 or column == 11 or column == 12:
-                    if not data is None :
+                    if not data is None:
                         text = data
                         for key, value in text_width_dict.items():
                             if value[0] <= len(str(text)) <= value[1]:
@@ -248,7 +254,7 @@ class GeophysicWindow(MyMainWindow):
     def del_row_table(self):
         row = self.tableWidget.currentRow()
         if row == -1:
-            msg = QMessageBox.information(self, 'Внимание', 'Выберите строку для удаления')
+            QMessageBox.information(self, 'Внимание', 'Выберите строку для удаления')
             return
         self.tableWidget.removeRow(row)
 
@@ -257,7 +263,7 @@ if __name__ == "__main__":
     import sys
 
     app = QtWidgets.QApplication(sys.argv)
-    app.setStyleSheet()
-    window = GeophysicWindow()
+    # app.setStyleSheet()
+    window = GeophysicWindow(22, 22)
     window.show()
     sys.exit(app.exec_())

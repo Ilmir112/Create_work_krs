@@ -152,12 +152,12 @@ class GnktOsvWindow2(MyMainWindow):
         well_data.iznos = iznos_gnkt_edit
         current_bottom_edit = self.tabWidget.currentWidget().current_bottom_edit.text()
         if current_bottom_edit == '':
-            mes = QMessageBox.warning(self, 'Некорректные данные', f'не указан текущий забоя')
+            QMessageBox.warning(self, 'Некорректные данные', f'не указан текущий забоя')
             return
         else:
             current_bottom_edit = float(current_bottom_edit.replace(',', '.'))
             if current_bottom_edit > float(well_data.bottomhole_drill._value):
-                mes = QMessageBox.warning(self, 'Некорректные данные',
+                QMessageBox.warning(self, 'Некорректные данные',
                                           f'Текущий забой ниже пробуренного забоя {well_data.bottomhole_drill._value}')
                 return
         GnktOsvWindow2.current_bottom_edit = int(float(current_bottom_edit))
@@ -175,7 +175,7 @@ class GnktOsvWindow2(MyMainWindow):
         well_data.diametr_length = 38
 
         if '' in [gnkt_number_combo, lenght_gnkt_edit, iznos_gnkt_edit, fluid_edit, pvo_number]:
-            mes = QMessageBox.warning(self, 'Некорректные данные', f'Не все данные заполнены')
+            QMessageBox.warning(self, 'Некорректные данные', f'Не все данные заполнены')
             return
 
         fluid_question = QMessageBox.question(self, 'Удельный вес',
@@ -551,7 +551,7 @@ class GnktOsvWindow2(MyMainWindow):
         else:
             well_volume_ek = well_volume(self, well_data.current_bottom)
         if abs(float(well_data.well_volume_in_PZ[0]) - well_volume_ek) > 0.2:
-            mes = QMessageBox.warning(None, 'Некорректный объем скважины',
+            QMessageBox.warning(None, 'Некорректный объем скважины',
                                       f'Объем скважины указанный в ПЗ -{well_data.well_volume_in_PZ}м3 не совпадает '
                                       f'с расчетным {well_volume_ek}м3')
             well_volume_ek, _ = QInputDialog.getDouble(self,

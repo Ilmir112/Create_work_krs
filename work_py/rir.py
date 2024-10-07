@@ -1068,7 +1068,7 @@ class RirWindow(MyMainWindow):
             fluid_new_edit = current_widget.fluid_new_edit.text().replace(',', '.')
             pressuar_new_edit = current_widget.pressuar_new_edit.text()
         except:
-            mes = QMessageBox.warning(self, 'ОШИБКА', 'Введены не все данные')
+            QMessageBox.warning(self, 'ОШИБКА', 'Введены не все данные')
         if paker_need_Combo == 'Нужно СПО':
             diametr_paker = int(float(current_widget.diametr_paker_edit.text()))
             paker_khost = int(float(current_widget.paker_khost_edit.text()))

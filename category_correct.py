@@ -1,7 +1,9 @@
 from PyQt5 import QtCore, QtWidgets
-from PyQt5.Qt import *
+from PyQt5.Qt import QWidget, QLabel, QComboBox
+from PyQt5.QtCore import QTimer
+from PyQt5.QtWidgets import QGridLayout, QMessageBox, QInputDialog, QLineEdit, QTabWidget, QPushButton
 
-from main import  MyMainWindow
+from main import MyMainWindow
 from work_py.acid_paker import CheckableComboBox
 
 from collections import namedtuple
@@ -9,15 +11,17 @@ from collections import namedtuple
 import well_data
 from H2S import calv_h2s
 
+
 class TabPage_SO(QWidget):
     count_plast = []
+
     def __init__(self, parent=None):
         super().__init__()
 
         self.labels_category = {}
         self.type_absorbent_label = QLabel('Тип поглотителя')
         self.type_absorbent = QComboBox()
-        self.type_absorbent.addItems(['СНПХ-1200', 'ХИМТЕХНО 101 Марка А', ' EVASORB марки 121'])
+        self.type_absorbent.addItems(['EVASORB марки 121', 'СНПХ-1200', 'ХИМТЕХНО 101 Марка А'])
 
         self.plast_all = []
         for plast in well_data.plast_all[::-1]:
@@ -45,7 +49,7 @@ class TabPage_SO(QWidget):
         self.calc_h2s_Label = QLabel('расчет поглотителя H2S')
 
         self.grid = QGridLayout(self)
-        self.grid.addWidget(self.type_absorbent_label , 2, 1)
+        self.grid.addWidget(self.type_absorbent_label, 2, 1)
         self.grid.addWidget(self.type_absorbent, 3, 1)
         self.grid.addWidget(self.category_pressuar_Label, 5, 1)
         self.grid.addWidget(self.category_h2s_Label, 6, 1)
@@ -91,7 +95,6 @@ class TabPage_SO(QWidget):
                     if work_plast not in self.plast_all:
                         self.plast_all.append(work_plast)
 
-
             plast_index.combo_box.addItems(self.plast_all)
             aaaa = self.plast_all
             try:
@@ -104,7 +107,7 @@ class TabPage_SO(QWidget):
             try:
                 category_pressuar_line_edit.setText(str(self.ifNone(self.cat_P_1[num])))
             except:
-                mes = QMessageBox.warning(self, 'ОШИБКА', 'не вставилось данные по категории')
+                QMessageBox.warning(self, 'ОШИБКА', 'не вставилось данные по категории')
             pressuar_data_edit = QLineEdit(self)
             try:
                 pressuar_data_edit.setText(str(self.ifNone(self.cat_P_P[num])))
@@ -226,7 +229,7 @@ class TabWidget(QTabWidget):
         self.addTab(TabPage_SO(self), 'Проверка корректности данных')
 
 
-class CategoryWindow( MyMainWindow):
+class CategoryWindow(MyMainWindow):
     dict_category = {}
 
     def __init__(self, parent=None):
@@ -260,12 +263,12 @@ class CategoryWindow( MyMainWindow):
             for index in well_data.number_indez:
                 for ind in range(1, 6):
                     if self.ifNum(self.tabWidget.currentWidget().labels_category[index][ind].text()) is False:
-                        mes = QMessageBox.warning(self, 'Ошибка', 'ошибка в сохранении данных, не корректные данные ')
+                        QMessageBox.warning(self, 'Ошибка', 'ошибка в сохранении данных, не корректные данные ')
                         return
 
                 plast_sel = self.tabWidget.currentWidget().labels_category[index][0].combo_box.currentText()
                 if plast_sel == '':
-                    mes = QMessageBox.warning(self, 'Выбрать пласты', 'Необходимо выбрать пласты выбрать пласты')
+                    QMessageBox.warning(self, 'Выбрать пласты', 'Необходимо выбрать пласты выбрать пласты')
                     return
                 for plast in plast_sel.split(', '):
                     plast_index.append(plast)
@@ -295,7 +298,7 @@ class CategoryWindow( MyMainWindow):
                             'отключение', self.tabWidget.currentWidget().labels_category[index][8].currentText())
 
                     except:
-                        mes = QMessageBox.warning(self, 'Ошибка', "Ошибка сохранения данных по категории")
+                        QMessageBox.warning(self, 'Ошибка', "Ошибка сохранения данных по категории")
                         return
 
         well_data.pause = False

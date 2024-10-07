@@ -959,17 +959,17 @@ class TemplateKrs(MyMainWindow):
         if sole_skm != '':
             sole_skm = int(float(sole_skm))
             if sole_skm > well_data.skm_depth:
-                msg = QMessageBox.information(self, 'Внимание',
+                QMessageBox.information(self, 'Внимание',
                                               f'Глубина СКМ на {well_data.skm_depth}м не позволяет скреперовать в '
                                               f'{roof_skm}-{sole_skm}м')
                 return
         template_key = self.tabWidget.currentWidget().template_Combo.currentText()
 
         if not roof_skm or not sole_skm:
-            msg = QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
+            QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
             return
         if well_data.current_bottom < float(sole_skm):
-            msg = QMessageBox.information(self, 'Внимание', f'глубина забоя выше глубины нахождения '
+            QMessageBox.information(self, 'Внимание', f'глубина забоя выше глубины нахождения '
                                                             f'СКМ {well_data.skm_depth}')
             return
 
@@ -977,7 +977,7 @@ class TemplateKrs(MyMainWindow):
                             'ПСШ СКМ в доп колонне + открытый ствол', 'ПСШ СКМ в доп колонне без хвоста'] \
                 and (roof_skm < well_data.head_column_additional._value or
                      sole_skm < well_data.head_column_additional._value):
-            mes = QMessageBox.warning(self, 'Ошибка',
+            QMessageBox.warning(self, 'Ошибка',
                                       f'кровля скреперования выше головы '
                                       f'хвостовика {well_data.head_column_additional._value}')
             return
@@ -985,7 +985,7 @@ class TemplateKrs(MyMainWindow):
         elif template_key == 'ПСШ Доп колонна СКМ в основной колонне' and \
                 (sole_skm > well_data.head_column_additional._value or
                  roof_skm > well_data.head_column_additional._value):
-            mes = QMessageBox.warning(self, 'Ошибка',
+            QMessageBox.warning(self, 'Ошибка',
                                       f'подошва скреперования ниже головы '
                                       f'хвостовика {well_data.head_column_additional._value}')
             return
@@ -1006,7 +1006,7 @@ class TemplateKrs(MyMainWindow):
         skm_interval = skm_interval(self, template_key)
 
         if len(skm_interval) == 0:
-            mes = QMessageBox.warning(self, 'Ошибка',
+            QMessageBox.warning(self, 'Ошибка',
                                       'Интервалы перфорации не отрайбированы,'
                                       'данная компоновка не позволяет скреперовать посадку пакера')
             return
@@ -1046,36 +1046,36 @@ class TemplateKrs(MyMainWindow):
         # print(well_data.problemWithEk_diametr)
         if (template_diametr >= int(well_data.problemWithEk_diametr) - 2
                 and well_data.template_depth > float(well_data.problemWithEk_depth)):
-            mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже глубины не прохода')
+            QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже глубины не прохода')
             return
         if (template_diametr >= int(well_data.problemWithEk_diametr) - 2
                 and well_data.template_depth > int(well_data.problemWithEk_depth)):
-            mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже глубины не прохода')
+            QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже глубины не прохода')
             return
         if well_data.column_additional is False or \
                 well_data.column_additional and well_data.current_bottom <= well_data.head_column_additional._value:
             if well_data.template_depth >= well_data.current_bottom:
-                mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже текущего забоя')
+                QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже текущего забоя')
                 return
         else:
             if well_data.template_depth_addition >= well_data.current_bottom:
-                mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже текущего забоя')
+                QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже текущего забоя')
                 return
             if well_data.template_depth >= well_data.head_column_additional._value:
-                mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже головы хвостовика')
+                QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже головы хвостовика')
                 return
             if template_key == 'ПСШ Доп колонна СКМ в основной колонне' and \
                     well_data.skm_depth >= well_data.head_column_additional._value:
-                mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'СКМ спускается ниже головы хвостовика')
+                QMessageBox.warning(self, "ВНИМАНИЕ", 'СКМ спускается ниже головы хвостовика')
                 return
         if distance_second < 0 or distance_first < 0:
-            mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'Расстояние между шаблонами не корректно')
+            QMessageBox.warning(self, "ВНИМАНИЕ", 'Расстояние между шаблонами не корректно')
             return
 
         skm_tuple = []
         rows = self.tableWidget.rowCount()
         if rows == 0:
-            mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'Нужно добавить интервалы скреперования')
+            QMessageBox.warning(self, "ВНИМАНИЕ", 'Нужно добавить интервалы скреперования')
             return
         for row in range(rows):
             roof_skm = self.tableWidget.item(row, 0)
@@ -1108,7 +1108,7 @@ class TemplateKrs(MyMainWindow):
     def del_row_table(self):
         row = self.tableWidget.currentRow()
         if row == -1:
-            msg = QMessageBox.information(self, 'Внимание', 'Выберите строку для удаления')
+            QMessageBox.information(self, 'Внимание', 'Выберите строку для удаления')
             return
         self.tableWidget.removeRow(row)
 

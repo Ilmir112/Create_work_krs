@@ -114,7 +114,7 @@ class TabPage_SO_drill(QWidget):
             sole_drill_line = int(float(sole_drill_line))
         if well_data.forPaker_list:
             if well_data.depth_paker_izv  <= sole_drill_line:
-                mes = QMessageBox.information(self, 'ОШИБКА', 'Необходимо извлечь извлекаемый пакер')
+                QMessageBox.information(self, 'ОШИБКА', 'Необходимо извлечь извлекаемый пакер')
                 self.sole_drill_line.setText('')
 
 
@@ -220,17 +220,17 @@ class Drill_window(MyMainWindow):
         drill_type_combo.setCurrentIndex(index_drill_True)
 
         if not roof_drill or not sole_drill:
-            msg = QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
+            QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
             return
         if well_data.bottomhole_drill._value < float(sole_drill):
-            msg = QMessageBox.information(self, 'Внимание', 'глубина НЭК ниже искусственного забоя')
+            QMessageBox.information(self, 'Внимание', 'глубина НЭК ниже искусственного забоя')
             return
 
         self.tableWidget.setSortingEnabled(False)
         rows = self.tableWidget.rowCount()
         if rows > 0:
             if float(sole_drill) <= float(self.tableWidget.item(rows-1, 1).text()):
-                mes = QMessageBox.warning(self, 'ОШИБКА', ' Планируемая глубина равна или выше текущего забоя')
+                QMessageBox.warning(self, 'ОШИБКА', ' Планируемая глубина равна или выше текущего забоя')
                 return
         self.tableWidget.insertRow(rows)
         if rows > 0:
@@ -252,7 +252,7 @@ class Drill_window(MyMainWindow):
         self.nkt_str = self.tabWidget.currentWidget().nkt_str_combo.currentText()
         current_depth = self.tabWidget.currentWidget().sole_drill_line.text()
         if not current_depth:
-            msg = QMessageBox.information(self, 'Внимание', 'Не заполнен необходимый забой')
+            QMessageBox.information(self, 'Внимание', 'Не заполнен необходимый забой')
             return
 
         drilling_interval = list(set([well_data.dict_perforation[plast]["подошва"] for plast in well_data.plast_all]))
@@ -306,7 +306,7 @@ class Drill_window(MyMainWindow):
             self.drill_cm_combo = self.tabWidget.currentWidget().drill_cm_combo.currentText()
             self.drill_type_combo = self.tabWidget.currentWidget().drill_type_combo.currentText()
             if self.drill_type_combo == '':
-                mes = QMessageBox.warning(self, 'ОШИБКА', 'Выберете тип долото')
+                QMessageBox.warning(self, 'ОШИБКА', 'Выберете тип долото')
                 return
             need_privyazka_QCombo = self.tabWidget.currentWidget().need_privyazka_QCombo.currentText()
         except Exception as e:
@@ -315,7 +315,7 @@ class Drill_window(MyMainWindow):
 
         rows = self.tableWidget.rowCount()
         if rows == 0:
-            mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'Нужно добавить интервалы ,бурения')
+            QMessageBox.warning(self, "ВНИМАНИЕ", 'Нужно добавить интервалы ,бурения')
             return
         drill_tuple = []
 
@@ -332,12 +332,12 @@ class Drill_window(MyMainWindow):
                     if well_data.column_additional is False or (well_data.column_additional and sole < well_data.head_column_additional._value):
                         if well_data.column_diametr._value - 2 * well_data.column_wall_thickness._value <= float(
                                 self.drillingBit_diam):
-                            mes = QMessageBox.warning(self, 'ОШИБКА', 'Не корректный диаметр долото')
+                            QMessageBox.warning(self, 'ОШИБКА', 'Не корректный диаметр долото')
                             return
                     else:
                         if well_data.column_additional_diametr._value - 2 * well_data.column_additional_wall_thickness._value <= float(
                                 self.drillingBit_diam):
-                            mes = QMessageBox.warning(self, 'ОШИБКА', 'Не корректный диаметр долото')
+                            QMessageBox.warning(self, 'ОШИБКА', 'Не корректный диаметр долото')
                             return
 
                 drill_tuple.append((sole, drill_True))
@@ -367,7 +367,7 @@ class Drill_window(MyMainWindow):
     def del_row_table(self):
         row = self.tableWidget.currentRow()
         if row == -1:
-            msg = QMessageBox.information(self, 'Внимание', 'Выберите строку для удаления')
+            QMessageBox.information(self, 'Внимание', 'Выберите строку для удаления')
             return
         self.tableWidget.removeRow(row)
 

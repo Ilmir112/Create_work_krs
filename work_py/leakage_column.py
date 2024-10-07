@@ -107,14 +107,14 @@ class LeakageWindow(MyMainWindow):
         # print(index_insulation)
         insulation_combo1.setCurrentIndex(index_insulation)
         if float(roof_leakage) > float(sole_leakage_line):
-            msg = QMessageBox.information(self, 'Внимание', 'Кровля больше подошвы')
+            QMessageBox.information(self, 'Внимание', 'Кровля больше подошвы')
             return
         if not roof_leakage or not sole_leakage_line:
-            msg = QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
+            QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
             return
         # ada = float(well_data.bottomhole_artificial._value)
         # if float(well_data.bottomhole_artificial._value) <= float(sole_leakage_line):
-        #     msg = QMessageBox.information(self, 'Внимание', 'глубина НЭК ниже искусственного забоя')
+        #     QMessageBox.information(self, 'Внимание', 'глубина НЭК ниже искусственного забоя')
         #     return
 
         rows = 0
@@ -137,7 +137,7 @@ class LeakageWindow(MyMainWindow):
 
             return dict_leakiness
         except:
-            mes = QMessageBox.warning(self, 'Ошибка', 'Данные введены не корректно')
+            QMessageBox.warning(self, 'Ошибка', 'Данные введены не корректно')
             LeakageWindow.addString(self)
 
 
@@ -195,7 +195,7 @@ class LeakageWindow(MyMainWindow):
     def del_row_table(self):
         row = self.tableWidget.currentRow()
         if row == -1:
-            msg = QMessageBox.information(self, 'Внимание', 'Выберите строку для удаления')
+            QMessageBox.information(self, 'Внимание', 'Выберите строку для удаления')
             return
         self.tableWidget.removeRow(row)
 

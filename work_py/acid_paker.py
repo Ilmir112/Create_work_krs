@@ -735,6 +735,7 @@ class AcidPakerWindow(MyMainWindow):
         self.paker_select = None
         self.dict_nkt = {}
         self.work_window = None
+        self.sko_volume_all = 0
         self.le = QLineEdit()
 
         self.ins_ind = ins_ind
@@ -788,7 +789,7 @@ class AcidPakerWindow(MyMainWindow):
         svk_true_combo.setCurrentIndex(svk_true_list.index(svk_true_combo_str))
 
         if not plast_combo or not acid_edit or not acid_volume_edit or not acid_proc_edit:
-            msg = QMessageBox.information(self, 'Внимание', 'Заполните данные по объему')
+            QMessageBox.information(self, 'Внимание', 'Заполните данные по объему')
             return
 
         self.tableWidget.setSortingEnabled(False)
@@ -800,7 +801,7 @@ class AcidPakerWindow(MyMainWindow):
 
             if well_data.current_bottom < float(paker_khost + paker_depth) or \
                     0 < paker_khost + paker_depth < well_data.current_bottom is False:
-                msg = QMessageBox.information(self, 'Внимание',
+                QMessageBox.information(self, 'Внимание',
                                               f'Компоновка ниже {paker_khost + paker_depth}м текущего забоя '
                                               f'{well_data.current_bottom}м')
                 return
@@ -840,7 +841,7 @@ class AcidPakerWindow(MyMainWindow):
                 return
 
             if well_data.current_bottom < float(paker_khost + paker2_depth):
-                msg = QMessageBox.information(self, 'Внимание',
+                QMessageBox.information(self, 'Внимание',
                                               f'Компоновка ниже {paker_khost + paker_depth}м текущего забоя '
                                               f'{well_data.current_bottom}м')
                 return
@@ -897,11 +898,9 @@ class AcidPakerWindow(MyMainWindow):
 
             pressureZUMPF_combo = self.tabWidget.currentWidget().pressureZUMPF_question_QCombo.currentText()
 
-
             if pressureZUMPF_combo == 'Да':
                 paker_khost = self.if_None(self.tabWidget.currentWidget().paker_khost.text())
                 paker_depth_zumpf = self.tabWidget.currentWidget().paker_depth_zumpf_edit.text()
-
 
                 if paker_depth_zumpf == '':
                     QMessageBox.warning(self, 'Ошибка', f'не введены глубина опрессовки ЗУМПФа')
@@ -910,7 +909,7 @@ class AcidPakerWindow(MyMainWindow):
                     paker_depth_zumpf = int(float(paker_depth_zumpf))
 
                 if paker_khost + paker_depth_zumpf >= well_data.current_bottom:
-                    mes = QMessageBox.warning(self, 'ОШИБКА', 'Длина хвостовика и пакера ниже текущего забоя')
+                    QMessageBox.warning(self, 'ОШИБКА', 'Длина хвостовика и пакера ниже текущего забоя')
                     return
 
                 if self.check_true_depth_template(paker_depth_zumpf) is False:
@@ -930,7 +929,7 @@ class AcidPakerWindow(MyMainWindow):
         rows = self.tableWidget.rowCount()
 
         if rows == 0:
-            mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'Нужно добавить интервалы обработки')
+            QMessageBox.warning(self, "ВНИМАНИЕ", 'Нужно добавить интервалы обработки')
             return
 
         for row in range(rows):
@@ -939,7 +938,7 @@ class AcidPakerWindow(MyMainWindow):
                 if row == 0:
                     paker_khost = int(float(self.tableWidget.item(row, 1).text()))
                     if paker_khost < 0:
-                        mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'Не корректная компоновка')
+                        QMessageBox.warning(self, "ВНИМАНИЕ", 'Не корректная компоновка')
                         return
                     well_data.paker_khost = paker_khost
                 else:
@@ -951,7 +950,8 @@ class AcidPakerWindow(MyMainWindow):
                 acid_edit = self.tableWidget.cellWidget(row, 5).currentText()
                 acid_proc_edit = int(float(self.tableWidget.item(row, 6).text()))
                 acid_volume_edit = round(float(self.tableWidget.item(row, 7).text()), 1)
-
+                if acid_edit == 'HCl':
+                    self.sko_volume_all += acid_volume_edit
                 try:
                     acidOilProc = round(float(self.tableWidget.item(row, 8).text()))
                 except:
@@ -979,6 +979,8 @@ class AcidPakerWindow(MyMainWindow):
                 acid_edit = self.tableWidget.cellWidget(row, 4).currentText()
                 acid_proc_edit = int(float(self.tableWidget.item(row, 5).text()))
                 acid_volume_edit = round(float(self.tableWidget.item(row, 6).text()), 1)
+                if acid_edit == 'HCl':
+                    self.sko_volume_all += acid_volume_edit
 
                 try:
                     acidOilProc = round(float(self.tableWidget.item(row, 7).text()))
@@ -1008,6 +1010,8 @@ class AcidPakerWindow(MyMainWindow):
                 acid_edit = self.tableWidget.cellWidget(row, 4).currentText()
                 acid_proc_edit = int(float(self.tableWidget.item(row, 5).text()))
                 acid_volume_edit = round(float(self.tableWidget.item(row, 6).text()), 1)
+                if acid_edit == 'HCl':
+                    self.sko_volume_all += acid_volume_edit
 
                 try:
                     acidOilProc = round(float(self.tableWidget.item(row, 7).text()))
@@ -1029,6 +1033,8 @@ class AcidPakerWindow(MyMainWindow):
                 acid_edit = self.tableWidget.cellWidget(row, 3).currentText()
                 acid_volume_edit = round(float(self.tableWidget.item(row, 4).text()), 1)
                 acid_proc_edit = int(float(self.tableWidget.item(row, 5).text()))
+                if acid_edit == 'HCl':
+                    self.sko_volume_all += acid_volume_edit
 
                 try:
                     acidOilProc = round(float(self.tableWidget.item(row, 6).text()))
@@ -1066,6 +1072,13 @@ class AcidPakerWindow(MyMainWindow):
                     work_template_list.extend(self.acid_work(QplastEdit, plast_combo, paker_khost, acid_edit,
                                                              acid_volume_edit, acid_proc_edit, pressure_edit,
                                                              acidOilProcEdit, iron_true_combo, iron_volume_edit))
+        if self.sko_volume_all < 13 and acid_edit is 'HCl':
+            mes = QMessageBox.question(self, 'Увеличение объема кислоты',
+                                 'С целью проведения кислоты Крезолом необходимо согласовать '
+                                 'увеличение объема кислотной обработки на 13м3')
+            if mes == QMessageBox.StandardButton.No:
+                return
+
 
         if swab_true_edit_type == "Нужно освоение":
             try:
@@ -1147,7 +1160,7 @@ class AcidPakerWindow(MyMainWindow):
     def del_row_table(self):
         row = self.tableWidget.currentRow()
         if row == -1:
-            msg = QMessageBox.information(self, 'Внимание', 'Выберите строку для удаления')
+            QMessageBox.information(self, 'Внимание', 'Выберите строку для удаления')
             return
         self.tableWidget.removeRow(row)
 
@@ -1644,7 +1657,8 @@ class AcidPakerWindow(MyMainWindow):
                        f'(для приготовления соляной кислоты в объеме {acid_volume_edit}м3 - {acid_proc_edit}% ' \
                        f'необходимо ' \
                        f'замешать {round(acid_volume_edit * acid_proc_edit / 24 * 1.118, 1)}т HCL 24% и' \
-                       f' пресной воды {round(float(acid_volume_edit) - float(acid_volume_edit) * float(acid_proc_edit) / 24 * 1.118, 1)}м3) ' \
+                       f' пресной воды ' \
+                       f'{round(float(acid_volume_edit) - float(acid_volume_edit) * float(acid_proc_edit) / 24 * 1.118, 1)}м3) ' \
                        f'Согласовать с Заказчиком проведение кислотной обработки силами ООО Крезол. '
             acid_sel_short = f'Произвести  СКО {plast_combo}  в V  {acid_volume_edit}м3  ({acid_edit} -' \
                              f' {acid_proc_edit} %) '

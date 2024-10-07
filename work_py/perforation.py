@@ -160,7 +160,7 @@ class PerforationWindow(MyMainWindow):
                         # Вставка интервалов зарядов БО
                         count_charge = int((max(i) - min(i)) * chargePM_BO)
                         if count_charge < 0 or count_charge > 500:
-                            mes = QMessageBox.warning(self, 'НЕКОРРЕКТНО', 'ОБЪЕМ зарядов некорректен')
+                            QMessageBox.warning(self, 'НЕКОРРЕКТНО', 'ОБЪЕМ зарядов некорректен')
                             return
                         self.tableWidget.insertRow(rows)
                         self.tableWidget.setItem(rows, 0, QTableWidgetItem(str(min(i))))
@@ -176,7 +176,7 @@ class PerforationWindow(MyMainWindow):
                         # Вставка интервалов зарядов ГП без ГРП
                         count_charge = int((max(i) - min(i)) * chargePM)
                         if count_charge < 0 or count_charge > 500:
-                            mes = QMessageBox.warning(self, 'НЕКОРРЕКТНО', 'ОБЪЕМ зарядов некорректен')
+                            QMessageBox.warning(self, 'НЕКОРРЕКТНО', 'ОБЪЕМ зарядов некорректен')
                             return
 
                         self.tableWidget.insertRow(rows)
@@ -200,7 +200,7 @@ class PerforationWindow(MyMainWindow):
                                 # Вставка интервалов зарядов ГП
                                 count_charge = int((max(i) - min(i)) * chargePM_GP)
                                 if count_charge < 0 or count_charge > 500:
-                                    mes = QMessageBox.warning(self, 'НЕКОРРЕКТНО', 'ОБЪЕМ зарядов некорректен')
+                                    QMessageBox.warning(self, 'НЕКОРРЕКТНО', 'ОБЪЕМ зарядов некорректен')
                                     return
 
                                 self.tableWidget.insertRow(rows)
@@ -226,7 +226,7 @@ class PerforationWindow(MyMainWindow):
                             else:
                                 count_charge = int((max(i) - min(i)) * chargePM)
                                 if count_charge < 0 or count_charge > 500:
-                                    mes = QMessageBox.warning(self, 'НЕКОРРЕКТНО', 'ОБЪЕМ зарядов некорректен')
+                                    QMessageBox.warning(self, 'НЕКОРРЕКТНО', 'ОБЪЕМ зарядов некорректен')
                                     return
                                     # print(i)
                                 # print(str(min(i)))
@@ -265,16 +265,16 @@ class PerforationWindow(MyMainWindow):
         editIndexFormation = self.tabWidget.currentWidget().lineEditIndexFormation.text()
         dopInformation = self.tabWidget.currentWidget().lineEditDopInformation.text()
         if not edit_type or not edit_type2 or not chargesx or not editIndexFormation:
-            msg = QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
+            QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
             return
         if float(edit_type2.replace(',', '.')) >= float(well_data.current_bottom):
-            msg = QMessageBox.information(self, 'Внимание', 'Подошва интервала перфорации ниже текущего забоя')
+            QMessageBox.information(self, 'Внимание', 'Подошва интервала перфорации ниже текущего забоя')
             return
 
         chargesx = self.charge(int(float(edit_type2)))[0][:-2] + chargesx
         count_otv = int((float(edit_type2) - float(edit_type)) * int(editHolesMetr))
         if count_otv < 0:
-            mes = QMessageBox.warning(self, 'НЕКОРРЕКТНО', 'ОБЪЕМ зарядов некорректен')
+            QMessageBox.warning(self, 'НЕКОРРЕКТНО', 'ОБЪЕМ зарядов некорректен')
             return
         TabPage_SO.select_type_perforation(self, edit_type2)
         self.tableWidget.setSortingEnabled(False)
@@ -346,7 +346,7 @@ class PerforationWindow(MyMainWindow):
                 value = item.text()
                 # print(f'dff{value}')
                 if float(value) >= well_data.current_bottom:
-                    msg = QMessageBox.information(self, 'Внимание', 'Подошва интервала перфорации ниже текущего забоя')
+                    QMessageBox.information(self, 'Внимание', 'Подошва интервала перфорации ниже текущего забоя')
                     return
             perf_list = []
             ["Кровля перфорации", "Подошва Перфорации", "Тип заряда", "отв на 1 п.м.", "Количество отверстий",
@@ -363,7 +363,7 @@ class PerforationWindow(MyMainWindow):
             if count_otv != '':
                 count_charge = float(count_otv)
                 if 0 > count_charge or count_charge > 500:
-                    mes = QMessageBox.warning(self, 'НЕКОРРЕКТНО', 'ОБЪЕМ зарядов некорректен')
+                    QMessageBox.warning(self, 'НЕКОРРЕКТНО', 'ОБЪЕМ зарядов некорректен')
                     return
             count_charge = self.tableWidget.item(row, 4).text()
             plast = self.tableWidget.item(row, 5).text()
@@ -416,7 +416,7 @@ class PerforationWindow(MyMainWindow):
              None, None, None, None, None, None, None,
              'Подрядчик по ГИС', None, None]]
         if type_perforation == 'Трубная перфорация':
-            mes = QMessageBox.information(self, 'Проверка',
+            QMessageBox.information(self, 'Проверка',
                                           'Необходимо проверить длину шаблона, должна быть не менее 10м')
             for i in range(len(pipe_perforation)):
                 perforation.insert(i + 1, pipe_perforation[i])
@@ -426,7 +426,7 @@ class PerforationWindow(MyMainWindow):
         # print(len(perforation))
 
         if len(perforation) < 6:
-            msg = QMessageBox.information(self, 'Внимание', 'Не добавлены интервалы перфорации!!!')
+            QMessageBox.information(self, 'Внимание', 'Не добавлены интервалы перфорации!!!')
         else:
 
             for i, row_data in enumerate(perforation):
@@ -462,7 +462,7 @@ class PerforationWindow(MyMainWindow):
     def del_row_table(self):
         row = self.tableWidget.currentRow()
         if row == -1:
-            msg = QMessageBox.information(self, 'Внимание', 'Выберите строку для удаления')
+            QMessageBox.information(self, 'Внимание', 'Выберите строку для удаления')
             return
         self.tableWidget.removeRow(row)
 

@@ -71,7 +71,7 @@ class LoginWindow(QWidget):
 
                 password_base_short = f'{password_base[0]} {password_base[1]} {password_base[2]} '
                 if password_base_short == username and password_base[3] == str(password):
-                    # mes = QMessageBox.information(self, 'Пароль', 'вход произведен')
+                    # QMessageBox.information(self, 'Пароль', 'вход произведен')
                     self.close()
                     well_data.user = (password_base[4] + ' ' + password_base[5],
                                       f'{password_base[0]} {password_base[1][0]}.{password_base[2][0]}.')
@@ -109,7 +109,7 @@ class LoginWindow(QWidget):
                     password_base_short = f'{password_base[0]} {password_base[1]} {password_base[2]} '
                     if password_base_short == username and password_base[3] == str(password):
 
-                        # mes = QMessageBox.information(self, 'Пароль', 'вход произведен')
+                        # QMessageBox.information(self, 'Пароль', 'вход произведен')
                         self.close()
                         well_data.user = (password_base[4] + ' ' + password_base[5], password_base_short)
 
@@ -295,10 +295,10 @@ class RegisterWindow(QWidget):
                     conn.commit()
                     conn.close()
 
-                    mes = QMessageBox.information(self, 'Регистрация', 'пользователь успешно создан')
+                    QMessageBox.information(self, 'Регистрация', 'пользователь успешно создан')
                     self.close()
                 else:
-                    mes = QMessageBox.information(self, 'пароль', 'Пароли не совпадают')
+                    QMessageBox.information(self, 'пароль', 'Пароли не совпадают')
         else:
             try:
                 db_path = connect_to_db('users.db', 'users_database')

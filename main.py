@@ -115,7 +115,7 @@ class ExcelWorker(QThread):
 
                     # Если запись найдена, возвращается True, в противном случае возвращается False
                     if result:
-                        mes = QMessageBox.information(None, 'перечень без глушения',
+                        QMessageBox.information(None, 'перечень без глушения',
                                                       f'Скважина состоит в перечне скважин без глушения на текущий '
                                                       f'квартал, '
                                                       f'в перечне от  {region}')
@@ -209,7 +209,7 @@ class ExcelWorker(QThread):
                 # ExcelWorker.finished.emit()
             except psycopg2.Error as e:
                 # Выведите сообщение об ошибке
-                mes = QMessageBox.warning(MyWindow, 'Ошибка',
+                QMessageBox.warning(MyWindow, 'Ошибка',
                                           f'Ошибка подключения к базе данных, не получилось проверить '
                                           f'корректность категории {type(e).__name__}\n\n{str(e)}')
                 return
@@ -285,10 +285,10 @@ class MyMainWindow(QMainWindow):
                     print(f"Ошибка получения списка таблиц: {type(e).__name__}\n\n{str(e)}")
 
             cursor.execute(f"""
-                            SELECT well_number, area_well, type_kr, work_plan
-                            FROM wells
-                            WHERE well_number={param} AND area_well={param} AND type_kr={param} AND work_plan={param}""",
-                           (str(well_number), well_area, type_kr, work_plan))
+                        SELECT well_number, area_well, type_kr, work_plan
+                        FROM wells
+                        WHERE well_number={param} AND area_well={param} AND type_kr={param} AND work_plan={param}""",
+                       (str(well_number), well_area, type_kr, work_plan))
 
             rezult = cursor.fetchone()
 
@@ -360,7 +360,7 @@ class MyMainWindow(QMainWindow):
                     ws5.add_image(img, coordinate)
                     n += 29
                 except FileNotFoundError as f:
-                    mes = QMessageBox.warning(self, 'Ошибка', f'Схему {schema} не удалось вставилось:\n {f}')
+                    QMessageBox.warning(self, 'Ошибка', f'Схему {schema} не удалось вставилось:\n {f}')
             ws5.print_area = f'B1:M{n}'
             ws5.page_setup.fitToPage = True
             ws5.page_setup.fitToHeight = False
@@ -774,7 +774,7 @@ class MyWindow(MyMainWindow):
                     self.rir_window = None
 
                 except FileNotFoundError as f:
-                    mes = QMessageBox.warning(self, 'Ошибка', f'Ошибка при прочтении файла {f}')
+                    QMessageBox.warning(self, 'Ошибка', f'Ошибка при прочтении файла {f}')
         elif action == self.create_KRS_DP and self.table_widget == None:
             self.work_plan = 'dop_plan'
             well_data.work_plan = 'dop_plan'
@@ -800,7 +800,7 @@ class MyWindow(MyMainWindow):
                         self.rir_window = None
 
                 except FileNotFoundError as f:
-                    mes = QMessageBox.warning(self, 'Ошибка', f'Ошибка при прочтении файла {f}')
+                    QMessageBox.warning(self, 'Ошибка', f'Ошибка при прочтении файла {f}')
         elif action == self.create_KRS_DP_in_base and self.table_widget == None:
             self.work_plan = 'dop_plan_in_base'
             well_data.work_plan = 'dop_plan_in_base'
@@ -819,7 +819,7 @@ class MyWindow(MyMainWindow):
                 self.copy_pz(self.ws, self.table_widget, self.work_plan)
 
             except FileNotFoundError:
-                mes = QMessageBox.warning(self, 'Ошибка', 'Ошибка при прочтении файла')
+                QMessageBox.warning(self, 'Ошибка', 'Ошибка при прочтении файла')
 
         elif action == self.create_KRS_change and self.table_widget == None:
             self.work_plan = 'plan_change'
@@ -839,7 +839,7 @@ class MyWindow(MyMainWindow):
                 self.copy_pz(self.ws, self.table_widget, self.work_plan)
 
             except FileNotFoundError:
-                mes = QMessageBox.warning(self, 'Ошибка', 'Ошибка при прочтении файла')
+                QMessageBox.warning(self, 'Ошибка', 'Ошибка при прочтении файла')
 
         elif action == self.create_GNKT_OPZ and self.table_widget == None:
             self.work_plan = 'gnkt_opz'
@@ -1312,7 +1312,7 @@ class MyWindow(MyMainWindow):
             #         else:
             #             print(f'Расчет поглотителя сероводорода не требуется')
             #     except:
-            #         mes = QMessageBox.warning(self, 'Ошибка', 'Программа не смогла создать лист с расчетом поглотителя')
+            #         QMessageBox.warning(self, 'Ошибка', 'Программа не смогла создать лист с расчетом поглотителя')
 
             ws2.print_area = f'B1:L{self.table_widget.rowCount() + 45}'
             ws2.page_setup.fitToPage = True
@@ -1550,7 +1550,7 @@ class MyWindow(MyMainWindow):
                     if os.path.isfile(file_path):
                         os.remove(file_path)
 
-            mes = QMessageBox.information(self, 'Обновление', 'Данные обнулены')
+            QMessageBox.information(self, 'Обновление', 'Данные обнулены')
 
     def on_finished(self):
         print("Работа с файлом Excel завершена.")
@@ -1571,17 +1571,17 @@ class MyWindow(MyMainWindow):
         geophysical_action.triggered.connect(self.GeophysicalNewWindow)
 
         rgd_menu = geophysical.addMenu("РГД")
-        rgdWithoutPaker_action = QAction("РГД по колонне", self)
-        rgd_menu.addAction(rgdWithoutPaker_action)
-        rgdWithoutPaker_action.triggered.connect(self.rgdWithoutPaker_action)
+        rgd_without_paker_action = QAction("РГД по колонне", self)
+        rgd_menu.addAction(rgd_without_paker_action)
+        rgd_without_paker_action.triggered.connect(self.rgd_without_paker_action)
 
         po_action = QAction("прихватоопределить", self)
         geophysical.addAction(po_action)
         po_action.triggered.connect(self.poNewWindow)
 
-        rgdWithPaker_action = QAction("РГД с пакером", self)
-        rgd_menu.addAction(rgdWithPaker_action)
-        rgdWithPaker_action.triggered.connect(self.rgdWithPaker_action)
+        rgd_with_paker_action = QAction("РГД с пакером", self)
+        rgd_menu.addAction(rgd_with_paker_action)
+        rgd_with_paker_action.triggered.connect(self.rgd_with_paker_action)
 
         privyazka_action = QAction("Привязка НКТ", self)
         geophysical.addAction(privyazka_action)
@@ -1908,15 +1908,15 @@ class MyWindow(MyMainWindow):
             self.raid_window.close()  # Close window.
             self.raid_window = None
 
-    def rgdWithoutPaker_action(self):
-        from work_py.rgdVcht import rgdWithoutPaker
-        rgdWithoutPaker_list = rgdWithoutPaker(self)
-        self.populate_row(self.ins_ind, rgdWithoutPaker_list, self.table_widget)
+    def rgd_without_paker_action(self):
+        from work_py.rgdVcht import rgd_without_paker
+        rgd_without_paker_list = rgd_without_paker(self)
+        self.populate_row(self.ins_ind, rgd_without_paker_list, self.table_widget)
 
-    def rgdWithPaker_action(self):
-        from work_py.rgdVcht import rgdWithPaker
-        rgdWithPaker_list = rgdWithPaker(self)
-        self.populate_row(self.ins_ind, rgdWithPaker_list, self.table_widget)
+    def rgd_with_paker_action(self):
+        from work_py.rgdVcht import rgd_with_paker
+        rgd_with_paker_list = rgd_with_paker(self)
+        self.populate_row(self.ins_ind, rgd_with_paker_list, self.table_widget)
 
     def pressuar_gis(self):
         from work_py.alone_oreration import pressuar_gis
@@ -2711,7 +2711,7 @@ if __name__ == "__main__":
     try:
         well_data.connect_in_base = MyWindow.check_connection(well_data.host_krs)
         if well_data.connect_in_base is False:
-            mes = QMessageBox.information(None, 'Проверка соединения',
+            QMessageBox.information(None, 'Проверка соединения',
                                           'Проверка показало что с облаком соединения нет, '
                                           'будет использована локальная база данных')
         MyWindow.login_window = LoginWindow()
@@ -2719,7 +2719,7 @@ if __name__ == "__main__":
         MyMainWindow.pause_app()
         well_data.pause = False
     except Exception as e:
-        mes = QMessageBox.warning(None, 'КРИТИЧЕСКАЯ ОШИБКА',
+        QMessageBox.warning(None, 'КРИТИЧЕСКАЯ ОШИБКА',
                                   f'Критическая ошибка, смотри в лог {type(e).__name__}\n\n{str(e)}')
 
     # if well_data.connect_in_base:

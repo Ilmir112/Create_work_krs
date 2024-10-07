@@ -108,7 +108,7 @@ class CreatePZ(MyMainWindow):
             return ws
 
         if well_data.inv_number._value == 'не корректно' or well_data.inv_number is None:
-            mes = QMessageBox.warning(self, 'Инвентарный номер отсутствует',
+            QMessageBox.warning(self, 'Инвентарный номер отсутствует',
                                       'Необходимо уточнить наличие инвентарного номера')
             return
 
@@ -191,7 +191,7 @@ class CreatePZ(MyMainWindow):
                 # Копирование изображения
                 image_loader = SheetImageLoader(ws)
             except Exception as e:
-                mes = QMessageBox.warning(None, 'Ошибка', f'Ошибка в копировании изображений {e}')
+                QMessageBox.warning(None, 'Ошибка', f'Ошибка в копировании изображений {e}')
 
             if len(well_data.check_data_in_pz) != 0:
                 check_str = ''

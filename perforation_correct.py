@@ -260,8 +260,10 @@ class PerforationCorrect(MyMainWindow):
                         well_data.dict_perforation[plast]['отрайбировано'] = False
 
             if len(plast_del) > 0:
-                for plast in plast_del and plast in well_data.dict_perforation:
-                    well_data.dict_perforation.pop(plast)
+                aaa = well_data.dict_perforation
+                for plast in list(well_data.dict_perforation.keys()):
+                    if plast in plast_del:
+                        well_data.dict_perforation.pop(plast)
 
         a = well_data.dict_perforation_project
 

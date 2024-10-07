@@ -192,7 +192,7 @@ class TabPageDp(QWidget):
 
             except psycopg2.Error as e:
                 # Выведите сообщение об ошибке
-                mes = QMessageBox.warning(None, 'Ошибка',
+                QMessageBox.warning(None, 'Ошибка',
                                           f'Ошибка подключения к базе данных, Скважина не '
                                           f'добавлена в базу: \n {type(e).__name__}\n\n{str(e)}')
         else:
@@ -207,7 +207,7 @@ class TabPageDp(QWidget):
 
             except sqlite3.Error as e:
                 # Выведите сообщение об ошибке
-                mes = QMessageBox.warning(None, 'Ошибка',
+                QMessageBox.warning(None, 'Ошибка',
                                           f'Ошибка подключения к базе данных, Скважина не '
                                           f'добавлена в базу: \n {type(e).__name__}\n\n{str(e)}')
 
@@ -536,32 +536,25 @@ class DopPlanWindow(MyMainWindow):
         if well_data.connect_in_base:
             conn = psycopg2.connect(**well_data.postgres_params_data_well)
             cursor = conn.cursor()
-
-            cursor.execute("SELECT excel_json FROM wells WHERE well_number = %s AND area_well = %s "
-                           "AND contractor = %s AND costumer = %s AND work_plan = %s AND type_kr = %s",
-                           (str(number_well), area_well, well_data.contractor, well_data.costumer, work_plan, type_kr))
-
-            data_well = cursor.fetchall()
-
-            if cursor:
-                cursor.close()
-            if conn:
-                conn.close()
+            param = '%s'
 
         else:
             db_path = connect_to_db('well_data.db', 'data_base_well/')
 
             conn = sqlite3.connect(f'{db_path}')
             cursor = conn.cursor()
-
-            cursor.execute("SELECT excel_json FROM wells WHERE well_number = ? AND area_well = ? "
-                           "AND contractor = ? AND costumer = ?",
-                           (str(number_well), area_well, well_data.contractor, well_data.costumer))
-            data_well = cursor.fetchall()
-            if cursor:
-                cursor.close()
-            if conn:
-                conn.close()
+            param = '?'
+        aaa = well_data.contractor
+        cursor.execute(f"SELECT excel_json "
+                       f"FROM wells "
+                       f"WHERE well_number={param} AND area_well={param} AND contractor={param} "
+                       f"AND costumer={param} AND work_plan={param} AND type_kr={param}",
+                       (str(number_well), area_well, well_data.contractor, well_data.costumer, work_plan, type_kr))
+        data_well = cursor.fetchall()
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
         try:
             dict_well = json.loads(data_well[len(data_well) - 1][0])
             data = dict_well['data']
@@ -746,7 +739,7 @@ class DopPlanWindow(MyMainWindow):
     def del_row_table(self):
         row = self.tableWidget.currentRow()
         if row == -1:
-            msg = QMessageBox.information(self, 'Внимание', 'Выберите строку для удаления')
+            QMessageBox.information(self, 'Внимание', 'Выберите строку для удаления')
             return
         self.tableWidget.removeRow(row)
 
@@ -839,7 +832,7 @@ class DopPlanWindow(MyMainWindow):
                 well_data.skm_interval = skm_interval_new
 
             except:
-                mes = QMessageBox.warning(self, 'Ошибка',
+                QMessageBox.warning(self, 'Ошибка',
                                           'в интервале скреперования отсутствует корректные интервалы скреперования')
 
             if len(well_data.skm_interval) == 0:
@@ -893,6 +886,8 @@ class DopPlanWindow(MyMainWindow):
 
                 if data_well:
                     well_data.type_kr = data_well[2]
+                    if data_well[3]:
+                        well_data.dict_category = json.loads(data_well[3])
                     insert_data_well_dop_plan(data_well[0])
 
                 # self.work_with_excel(well_number, well_area, table_in_base, type_kr)
@@ -912,7 +907,7 @@ class DopPlanWindow(MyMainWindow):
 
             if change_pvr_combo == 'Да':
                 if rows == 0:
-                    mes = QMessageBox.warning(self, 'Ошибка', 'Нужно загрузить интервалы перфорации')
+                    QMessageBox.warning(self, 'Ошибка', 'Нужно загрузить интервалы перфорации')
                     return
 
                 plast_row = []
@@ -976,7 +971,7 @@ class DopPlanWindow(MyMainWindow):
                         well_data.skm_interval.append(list(map(int, skm_interval_edit.split('-'))))
 
             except:
-                mes = QMessageBox.warning(self, 'Ошибка',
+                QMessageBox.warning(self, 'Ошибка',
                                           'в интервале скреперования отсутствует корректные интервалы скреперования')
                 return
 
@@ -1036,7 +1031,7 @@ class DopPlanWindow(MyMainWindow):
 
             except psycopg2.Error as e:
                 # Выведите сообщение об ошибке
-                mes = QMessageBox.warning(None, 'Ошибка',
+                QMessageBox.warning(None, 'Ошибка',
                                           f'Ошибка удаления {type(e).__name__}\n\n{str(e)}')
         else:
             try:
@@ -1056,7 +1051,7 @@ class DopPlanWindow(MyMainWindow):
 
             except sqlite3.Error as e:
                 # Выведите сообщение об ошибке
-                mes = QMessageBox.warning(None, 'Ошибка',
+                QMessageBox.warning(None, 'Ошибка',
                                           f'Ошибка удаления {type(e).__name__}\n\n{str(e)}')
 
     def add_work_excel(self, ws2, work_list, ind_ins):
@@ -1113,7 +1108,7 @@ class DopPlanWindow(MyMainWindow):
 
             except psycopg2.Error as e:
                 # Выведите сообщение об ошибке
-                mes = QMessageBox.warning(None, 'Ошибка', f"Тип ошибки: {e}. Проверьте количество переданных аргументов.")
+                QMessageBox.warning(None, 'Ошибка', f"Тип ошибки: {e}. Проверьте количество переданных аргументов.")
 
         else:
             try:
@@ -1126,7 +1121,7 @@ class DopPlanWindow(MyMainWindow):
 
             except sqlite3.Error as e:
                 # Выведите сообщение об ошибке
-                mes = QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных.')
+                QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных.')
 
 
         cursor.execute(f'''
@@ -1156,7 +1151,7 @@ class DopPlanWindow(MyMainWindow):
 
         else:
             well_data.data_in_base = False
-            mes = QMessageBox.warning(self, 'Проверка наличия таблицы в базе данных',
+            QMessageBox.warning(self, 'Проверка наличия таблицы в базе данных',
                                       f"Таблицы '{table_name}' нет в базе данных.")
 
         return
@@ -1167,7 +1162,7 @@ class DopPlanWindow(MyMainWindow):
         except:
             paragraph_row = 1
         if len(result) < paragraph_row:
-            mes = QMessageBox.warning(self, 'Ошибка', f'В плане работ только {len(result)} пункта')
+            QMessageBox.warning(self, 'Ошибка', f'В плане работ только {len(result)} пункта')
             return
 
         well_data.current_bottom = result[paragraph_row][1]

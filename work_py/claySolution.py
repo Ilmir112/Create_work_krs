@@ -185,7 +185,7 @@ class ClayWindow(MyMainWindow):
                 mes = QMessageBox.question(self, 'Вопрос', f'Не указан объем цемента')
                 return
             if roof_clay_edit > sole_clay_edit:
-                mes = QMessageBox.warning(self, 'Ошибка', 'Не корректные интервалы ')
+                QMessageBox.warning(self, 'Ошибка', 'Не корректные интервалы ')
                 return
 
             work_list = self.claySolutionDef(roof_clay_edit, sole_clay_edit, rir_question_QCombo,

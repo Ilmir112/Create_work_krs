@@ -205,7 +205,7 @@ class PvrApplication(MyMainWindow):
 
         if len(well_data.pvr_row) == 0:
 
-            mes = QMessageBox.warning(self, 'Ошибка', 'Перфорация в плане работ не найдены')
+            QMessageBox.warning(self, 'Ошибка', 'Перфорация в плане работ не найдены')
             return
         rows = self.tableWidget.rowCount()
         for pvr in well_data.pvr_row:
@@ -227,10 +227,10 @@ class PvrApplication(MyMainWindow):
         editIndexFormation = self.tabWidget.currentWidget().lineEditIndexFormation.text()
         dopInformation = self.tabWidget.currentWidget().lineEditDopInformation.text()
         if not edit_type or not edit_type2 or not chargesx or not editIndexFormation:
-            msg = QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
+            QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
             return
         if float(edit_type2.replace(',', '.')) >= float(well_data.current_bottom):
-            msg = QMessageBox.information(self, 'Внимание', 'Подошва интервала перфорации ниже текущего забоя')
+            QMessageBox.information(self, 'Внимание', 'Подошва интервала перфорации ниже текущего забоя')
             return
 
         # chargesx = PerforationWindow.charge(self, int(float(edit_type2)))[0][:-2] + chargesx)
@@ -334,7 +334,7 @@ class PvrApplication(MyMainWindow):
     def del_row_table(self):
         row = self.tableWidget.currentRow()
         if row == -1:
-            msg = QMessageBox.information(self, 'Внимание', 'Выберите строку для удаления')
+            QMessageBox.information(self, 'Внимание', 'Выберите строку для удаления')
             return
         self.tableWidget.removeRow(row)
 

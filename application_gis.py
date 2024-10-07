@@ -190,7 +190,7 @@ class GisApplication( MyMainWindow):
                 self.tableWidget.setItem(rows, 1, QTableWidgetItem(type_gis[1]))
                 self.tableWidget.setItem(rows, 2, QTableWidgetItem(type_gis[2]))
             except Exception as e:
-                mes = QMessageBox.information(self, 'Ошибка', f'Ошибка добавления исследования {type(e).__name__}\n\n{str(e)}')
+                QMessageBox.information(self, 'Ошибка', f'Ошибка добавления исследования {type(e).__name__}\n\n{str(e)}')
 
 
 
@@ -205,10 +205,10 @@ class GisApplication( MyMainWindow):
 
 
         if not edit_type or not edit_type2 or not researchGis:
-            msg = QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
+            QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
             return
         if well_data.current_bottom < float(edit_type2):
-            msg = QMessageBox.information(self, 'Внимание', 'глубина исследований ниже текущего забоя')
+            QMessageBox.information(self, 'Внимание', 'глубина исследований ниже текущего забоя')
             return
 
         self.tableWidget.setSortingEnabled(False)
@@ -400,7 +400,7 @@ class GisApplication( MyMainWindow):
     def del_row_table(self):
         row = self.tableWidget.currentRow()
         if row == -1:
-            msg = QMessageBox.information(self, 'Внимание', 'Выберите строку для удаления')
+            QMessageBox.information(self, 'Внимание', 'Выберите строку для удаления')
             return
         self.tableWidget.removeRow(row)
 

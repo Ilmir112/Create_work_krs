@@ -239,7 +239,7 @@ class GnoDescentWindow(MyMainWindow):
 
     def paker_down(self, nkt_edit, rgd_question_combo, sucker_edit='', need_juming_after_sko_combo='Нет'):
         from work_py.opressovka import OpressovkaEK
-        from .rgdVcht import rgdWithPaker, rgdWithoutPaker
+        from .rgdVcht import rgd_with_paker, rgd_without_paker
         paker_descent = [
             [None, None,
              f'Заменить технологические НКТ на опрессованные эксплуатационные НКТ. Заменить подвесной '
@@ -288,11 +288,11 @@ class GnoDescentWindow(MyMainWindow):
         if rgd_question_combo == 'Да':
             if well_data.column_additional and well_data.depth_fond_paker_do[
                 'posle'] >= well_data.head_column_additional._value:
-                # print(rgdWithoutPaker(self))
-                for row in rgdWithoutPaker(self)[::-1]:
+                # print(rgd_without_paker(self))
+                for row in rgd_without_paker(self)[::-1]:
                     paker_descent.insert(0, row)
             else:
-                for row in rgdWithPaker(self):
+                for row in rgd_with_paker(self):
                     paker_descent.append(row)
         return paker_descent
     def konservation_down(self, nkt_edit):

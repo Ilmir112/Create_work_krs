@@ -93,7 +93,7 @@ def read_database_gnkt(contractor, gnkt_number):
         well_previus_list = list(map(lambda x: x[0], list(filter(lambda x: x[0], well_previus_list))))
     except psycopg2.Error as e:
         # Выведите сообщение об ошибке
-        mes = QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных')
+        QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных')
         return []
     finally:
         # Закройте курсор и соединение
@@ -142,7 +142,7 @@ def insert_data_base_gnkt(contractor, well_name, gnkt_number, gnkt_length, diame
 
             # Выполнение запроса с использованием параметров
             cursor.execute(query, data_values)
-            mes = QMessageBox.information(None, 'база данных', f'Скважина добавлена в базу данных')
+            QMessageBox.information(None, 'база данных', f'Скважина добавлена в базу данных')
 
         else:
             mes = QMessageBox.question(None, 'база данных', f'Скважина уже есть в базе данных, обновить?')
@@ -166,12 +166,12 @@ def insert_data_base_gnkt(contractor, well_name, gnkt_number, gnkt_length, diame
 
                 # Выполнение запроса с использованием параметров
                 cursor.execute(query, data_values)
-                mes = QMessageBox.information(None, 'база данных', f'Скважина добавлена в базу данных')
+                QMessageBox.information(None, 'база данных', f'Скважина добавлена в базу данных')
 
         conn.commit()
     except psycopg2.Error as e:
         # Выведите сообщение об ошибке
-        mes = QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных, Скважина не добавлена в базу')
+        QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных, Скважина не добавлена в базу')
     finally:
         # Закройте курсор и соединение
         if cursor:

@@ -607,7 +607,7 @@ class Swab_Window(MyMainWindow):
 
         if (not plast_combo or not swab_volume_edit) and swab_true_edit_type in ['однопакерная', 'пакер с заглушкой',
                                                                                  'воронка', 'двухпакерная']:
-            msg = QMessageBox.information(self, 'Внимание', 'Заполните данные по объему')
+            QMessageBox.information(self, 'Внимание', 'Заполните данные по объему')
             return
 
         self.tableWidget.setSortingEnabled(False)
@@ -615,14 +615,14 @@ class Swab_Window(MyMainWindow):
 
         if swab_true_edit_type in ['однопакерная', 'пакер с заглушкой']:
             if rows != 0:
-                mes = QMessageBox.warning(self, 'ОШИБКА', 'НЕЛЬЗЯ на одной и тоже компоновки освоивать повторно')
+                QMessageBox.warning(self, 'ОШИБКА', 'НЕЛЬЗЯ на одной и тоже компоновки освоивать повторно')
                 return
             paker_khost = AcidPakerWindow.if_None(self, self.tabWidget.currentWidget().khvostEdit.text())
             paker_depth = AcidPakerWindow.if_None(self, self.tabWidget.currentWidget().pakerEdit.text())
 
             if well_data.current_bottom < float(paker_khost + paker_depth) or \
                     0 < paker_khost + paker_depth < well_data.current_bottom is False:
-                msg = QMessageBox.information(self, 'Внимание',
+                QMessageBox.information(self, 'Внимание',
                                               f'Компоновка ниже {paker_khost + paker_depth}м текущего забоя '
                                               f'{well_data.current_bottom}м')
                 return
@@ -659,7 +659,7 @@ class Swab_Window(MyMainWindow):
                 return
 
             if well_data.current_bottom < float(paker_khost + paker2_depth):
-                msg = QMessageBox.information(self, 'Внимание',
+                QMessageBox.information(self, 'Внимание',
                                               f'Компоновка ниже {paker_khost + paker_depth}м текущего забоя '
                                               f'{well_data.current_bottom}м')
                 return
@@ -673,7 +673,7 @@ class Swab_Window(MyMainWindow):
 
         elif swab_true_edit_type in ['воронка']:
             if rows != 0:
-                mes = QMessageBox.warning(self, 'ОШИБКА', 'НЕЛЬЗЯ на одной и тоже компоновки освоивать повторно')
+                QMessageBox.warning(self, 'ОШИБКА', 'НЕЛЬЗЯ на одной и тоже компоновки освоивать повторно')
                 return
             paker_depth = AcidPakerWindow.if_None(self, self.tabWidget.currentWidget().pakerEdit.text())
 
@@ -688,7 +688,7 @@ class Swab_Window(MyMainWindow):
             well_data.template_lenght = float(self.tabWidget.currentWidget().lenght_template_second_Edit.text())
             # well_data.template_lenght_addition = lenght_template_first
             if rows != 0:
-                mes = QMessageBox.warning(self, 'ОШИБКА', 'НЕЛЬЗЯ на одной и тоже компоновки освоивать повторно')
+                QMessageBox.warning(self, 'ОШИБКА', 'НЕЛЬЗЯ на одной и тоже компоновки освоивать повторно')
                 return
             paker_opy = self.tabWidget.currentWidget().paker2Edit.text()
             if paker_opy != '':
@@ -703,7 +703,7 @@ class Swab_Window(MyMainWindow):
             paker_khost = AcidPakerWindow.if_None(self, self.tabWidget.currentWidget().khvostEdit.text())
 
             if rows != 0:
-                mes = QMessageBox.warning(self, 'ОШИБКА', 'НЕЛЬЗЯ на одной и тоже компоновки освоивать повторно')
+                QMessageBox.warning(self, 'ОШИБКА', 'НЕЛЬЗЯ на одной и тоже компоновки освоивать повторно')
             paker_opy = self.tabWidget.currentWidget().paker2Edit.text()
             if paker_opy != '':
                 paker_opy = int(float(str(paker_opy).replace(',', '.')))
@@ -717,7 +717,7 @@ class Swab_Window(MyMainWindow):
     def del_row_table(self):
         row = self.tableWidget.currentRow()
         if row == -1:
-            msg = QMessageBox.information(self, 'Внимание', 'Выберите строку для удаления')
+            QMessageBox.information(self, 'Внимание', 'Выберите строку для удаления')
             return
         self.tableWidget.removeRow(row)
 
@@ -824,7 +824,7 @@ class Swab_Window(MyMainWindow):
                 if row == 0:
                     paker_khost = int(float(self.tableWidget.item(row, 1).text()))
                     if paker_khost < 0:
-                        mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'Не корректная компоновка')
+                        QMessageBox.warning(self, "ВНИМАНИЕ", 'Не корректная компоновка')
                         return
                     well_data.paker_khost = paker_khost
                 else:
@@ -860,7 +860,7 @@ class Swab_Window(MyMainWindow):
                 if rows == row + 1:
                     paker_khost = int(float(self.tableWidget.item(row, 1).text()))
                     if paker_khost < 0:
-                        mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'Не корректная компоновка')
+                        QMessageBox.warning(self, "ВНИМАНИЕ", 'Не корректная компоновка')
                         return
                     well_data.paker_khost = paker_khost
                 else:
@@ -904,7 +904,7 @@ class Swab_Window(MyMainWindow):
                 if row == 0:
                     paker_khost = int(float(self.tableWidget.item(row, 1).text()))
                     if paker_khost < 0:
-                        mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'Не корректная компоновка')
+                        QMessageBox.warning(self, "ВНИМАНИЕ", 'Не корректная компоновка')
                         return
                     well_data.paker_khost = paker_khost
                 else:

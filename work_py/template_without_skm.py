@@ -605,26 +605,26 @@ class Template_without_skm(MyMainWindow):
         # print(f'проблема ЭК {well_data.problemWithEk_diametr}')
         if (template_diametr >= int(well_data.problemWithEk_diametr) - 2
                 and well_data.template_depth > int(well_data.problemWithEk_depth)):
-            mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже глубины не прохода')
+            QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже глубины не прохода')
             return
         if well_data.column_additional is False or \
                 well_data.column_additional and well_data.current_bottom < well_data.head_column_additional._value:
             if well_data.template_depth > well_data.current_bottom:
-                mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже текущего забоя')
+                QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже текущего забоя')
                 return
         else:
             if well_data.template_depth_addition > well_data.current_bottom:
-                mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже текущего забоя')
+                QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже текущего забоя')
                 return
             if well_data.template_depth >= well_data.head_column_additional._value:
-                mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже головы хвостовика')
+                QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже головы хвостовика')
                 return
             # if self.template_Combo.currentText() == 'ПСШ Доп колонна СКМ в основной колонне' and\
             #         well_data.skm_depth >= well_data.head_column_additional._value:
-            #     mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'СКМ спускается ниже головы хвостовика')
+            #     QMessageBox.warning(self, "ВНИМАНИЕ", 'СКМ спускается ниже головы хвостовика')
             #     return
         if distance_second < 0 or distance_first < 0:
-            mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'Расстояние между шаблонами не корректно')
+            QMessageBox.warning(self, "ВНИМАНИЕ", 'Расстояние между шаблонами не корректно')
             return
         well_data.template_lenght = template_lenght
         if well_data.column_additional:

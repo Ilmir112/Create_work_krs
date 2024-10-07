@@ -310,7 +310,7 @@ class Classifier_well(MyMainWindow):
                                                 f"VALUES (%s, %s, %s, %s,%s)",
                                                 (well_number, area_well, version_year, region_name, costumer))
 
-                                mes = QMessageBox.information(self, 'данные обновлены', 'Данные обновлены')
+                                QMessageBox.information(self, 'данные обновлены', 'Данные обновлены')
                             except:
                                  QMessageBox.warning(self, 'ОШИБКА', 'Выбран файл с не корректными данными')
 
@@ -583,7 +583,7 @@ class Classifier_well(MyMainWindow):
                              QMessageBox.warning(self, 'ВНИМАНИЕ ОШИБКА',
                                                       f'в Данном перечне отсутствую скважины {region_name}')
                         conn.commit()
-                mes = QMessageBox.information(self, 'Успешно', 'Классификатор успешно обновлен')
+                QMessageBox.information(self, 'Успешно', 'Классификатор успешно обновлен')
 
             except (psycopg2.Error, Exception) as e:
                 # Выведите сообщение об ошибке
@@ -700,6 +700,7 @@ def insert_database_well_data(well_number, well_area, contractor, costumer, data
     type_kr = well_data.type_kr.split(' ')[0]
     data_paragraph = json.dumps(well_data.data_list, ensure_ascii=False)
     cdng = well_data.cdng._value
+    category_dict =json.dumps(well_data.dict_category, ensure_ascii=False)
     # print(row, well_data.count_row_well)
     if 'dop_plan' in work_plan:
         work_plan_str = f'ДП№{well_data.number_dp}'
@@ -714,7 +715,7 @@ def insert_database_well_data(well_number, well_area, contractor, costumer, data
 
             param = '%s'
             # Подготовленный запрос для вставки данных с параметрами
-            query = f"INSERT INTO wells VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+            query = f"INSERT INTO wells VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
 
 
         except psycopg2.Error as e:
@@ -732,7 +733,7 @@ def insert_database_well_data(well_number, well_area, contractor, costumer, data
 
             param = '?'
             # Подготовленный запрос для вставки данных с параметрами
-            query = f"INSERT INTO wells VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+            query = f"INSERT INTO wells VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 
 
         except sqlite3.Error as e:
@@ -757,7 +758,7 @@ def insert_database_well_data(well_number, well_area, contractor, costumer, data
 
     data_values = (str(well_number), well_area,
                    data_well, date_today, excel_json, contractor, well_data.costumer, work_plan_str,
-                   well_data.user[1], type_kr, data_paragraph, cdng)
+                   well_data.user[1], type_kr, data_paragraph, cdng, category_dict)
 
     if row_exists:
         row_exists, date_in_base = row_exists
@@ -771,12 +772,12 @@ def insert_database_well_data(well_number, well_area, contractor, costumer, data
                             UPDATE wells
                             SET data_well ={param}, today ={param}, excel_json ={param},
                              work_plan={param}, geolog ={param}, 
-                            type_kr={param}, data_change_paragraph={param}, cdng={param}                                                                
+                            type_kr={param}, data_change_paragraph={param}, cdng={param}, category_dict={param}                                                                
                             WHERE well_number ={param} AND area_well ={param} AND contractor ={param}
-                             AND costumer ={param} AND work_plan ={param} 
+                             AND costumer ={param} AND work_plan ={param} AND type_kr={param}
                                         """, (
                     data_well, date_today, excel_json, work_plan_str, well_data.user[1], type_kr, data_paragraph, cdng,
-                    str(well_number), well_area, contractor, costumer, work_plan_str))
+                    category_dict, str(well_number), well_area, contractor, costumer, work_plan_str, type_kr))
 
                 QMessageBox.information(None, 'Успешно', 'Данные обновлены')
             except (Exception, psycopg2.Error) as error:
@@ -784,12 +785,10 @@ def insert_database_well_data(well_number, well_area, contractor, costumer, data
     else:
         # create_database_well_db(well_data.work_plan, well_data.number_dp)
 
-
-
         # Выполнение запроса с использованием параметров
         cursor.execute(query, data_values)
 
-        mes = QMessageBox.information(None, 'база данных',
+        QMessageBox.information(None, 'база данных',
                                       f'Скважина {well_data.well_number._value} добавлена в базу '
                                       f'данных c excel файлами')
 
@@ -817,13 +816,12 @@ def connect_to_db(name_base, folder_base):
 
 
 def check_in_database_well_data(number_well, area_well, work_plan):
-    work_plan = 'krs'
+
     if well_data.connect_in_base:
         try:
             conn = psycopg2.connect(**well_data.postgres_params_data_well)
             cursor = conn.cursor()
             param = '%s'
-
 
         except psycopg2.Error as e:
             # Выведите сообщение об ошибке
@@ -836,14 +834,15 @@ def check_in_database_well_data(number_well, area_well, work_plan):
             cursor = conn.cursor()
             param ='?'
 
-
         except sqlite3.Error as e:
             # Выведите сообщение об ошибке
              QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных, Скважина не добавлена в базу')
 
-    cursor.execute(f"SELECT data_well, today, type_kr FROM wells WHERE well_number = {param} AND area_well = {param} "
-                   f"AND contractor = {param} AND costumer = {param}",
-                   (str(number_well), area_well, well_data.contractor, well_data.costumer))
+    cursor.execute(f"SELECT data_well, today, type_kr, category_dict "
+                   f"FROM wells "
+                   f"WHERE well_number = {param} AND area_well = {param} "
+                   f"AND contractor = {param} AND costumer = {param} AND work_plan={param}",
+                   (str(number_well), area_well, well_data.contractor, well_data.costumer, work_plan))
 
     data_well = cursor.fetchone()
 
@@ -976,7 +975,7 @@ def insert_data_well_dop_plan(data_well):
     well_data.cdng = ProtectedIsNonNone(well_data_dict['ЦДНГ'])
 
     well_data.data_well_dict = well_data_dict
-    mes = QMessageBox.information(None, 'Данные с базы', "Данные вставлены из базы данных")
+    QMessageBox.information(None, 'Данные с базы', "Данные вставлены из базы данных")
 
     definition_plast_work(None)
 
