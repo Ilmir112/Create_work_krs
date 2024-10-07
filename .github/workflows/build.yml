@@ -37,6 +37,9 @@ jobs:
           Add-Content -Path .env -Value "DB_HOST=$Env:DB_HOST"
           Add-Content -Path .env -Value "DB_PORT=$Env:DB_PORT"
 
+
+
+      - name: Build executablb
           pyinstaller --noconfirm --onedir --icon=imageFiles/icon/zima_ico.ico --console --name "ZIMA" `
             --add-data "work_py;work_py/" `
             --add-data "users;users/" `
