@@ -709,7 +709,7 @@ def insert_database_well_data(well_number, well_area, contractor, costumer, data
     if well_data.connect_in_base:
         try:
 
-            conn = connect_to_database(DB_NAME_WELL_DATA)
+            conn = connect_to_database(DB_WELL_DATA)
             cursor = conn.cursor()
             # Проверка наличия строки с заданными параметрами
 

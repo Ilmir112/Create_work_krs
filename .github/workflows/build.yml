@@ -29,13 +29,14 @@ jobs:
           DB_HOST: ${{ secrets.DB_HOST }}
           DB_PORT: ${{ secrets.DB_PORT }}
         run:
-          echo "DB_WELL_DATA=${DB_WELL_DATA}" | Out-File -Append -FilePath .env
-          echo "DB_NAME_USER=${DB_NAME_USER}" | Out-File -Append -FilePath .env
-          echo "DB_CLASSIFICATION=${DB_CLASSIFICATION}" | Out-File -Append -FilePath .env
-          echo "DB_NAME_GNKT=${DB_NAME_GNKT}" | Out-File -Append -FilePath .env
-          echo "DB_PASSWORD=${DB_PASSWORD}" | Out-File -Append -FilePath .env
-          echo "DB_HOST=${DB_HOST}" | Out-File -Append -FilePath .env
-          echo "DB_PORT=${DB_PORT}" | Out-File -Append -FilePath .env
+
+          echo "DB_WELL_DATA=${DB_WELL_DATA}"  >> .env
+          echo "DB_NAME_USER=${DB_NAME_USER}" >> .env
+          echo "DB_CLASSIFICATION=${DB_CLASSIFICATION}" >> .env
+          echo "DB_NAME_GNKT=${DB_NAME_GNKT}" >> .env
+          echo "DB_PASSWORD=${DB_PASSWORD}" >> .env
+          echo "DB_HOST=${DB_HOST}" >> .env
+          echo "DB_PORT=${DB_PORT}" >> .env
           
           pyinstaller --noconfirm --onedir --icon=imageFiles/icon/zima_ico.ico --console --name "ZIMA"
           --add-data "work_py;work_py/" 

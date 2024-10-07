@@ -47,13 +47,20 @@ class CreatePZ(MyMainWindow):
 
         aaa = well_data.current_date
         date_str2 = datetime.strptime('2024-09-19', '%Y-%m-%d')
+        # well_data.data_well_is_True = False
+
         if work_plan == 'dop_plan':
+            number_list = list(map(str, range(1, 50)))
+            well_data.number_dp, ok = QInputDialog.getItem(self, 'Номер дополнительного плана работ',
+                                                           'Введите номер дополнительного плана работ',
+                                                           number_list, 0, False)
 
             data_well = \
                 check_in_database_well_data(well_data.well_number._value, well_data.well_area._value,
-                                            well_data.work_plan)
-            date_str1 = datetime.strptime(f'{data_well[1]}', '%Y-%m-%d')
+                                            f'ДП№{well_data.number_dp}')
+
             if data_well:
+                date_str1 = datetime.strptime(f'{data_well[1]}', '%Y-%m-%d')
                 if date_str1 > date_str2:
 
                     change_work_work_plan = QMessageBox.question(self,
@@ -76,12 +83,7 @@ class CreatePZ(MyMainWindow):
 
                         return
 
-        # well_data.data_well_is_True = False
-        if work_plan == 'dop_plan':
-            number_list = list(map(str, range(1, 50)))
-            well_data.number_dp, ok = QInputDialog.getItem(self, 'Номер дополнительного плана работ',
-                                                           'Введите номер дополнительного плана работ',
-                                                           number_list, 0, False)
+
 
         if well_data.data_well_is_True is False:
             WellNkt.read_well(self, ws, well_data.pipes_ind._value, well_data.condition_of_wells._value)
