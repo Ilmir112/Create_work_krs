@@ -40,6 +40,7 @@ jobs:
 
 
       - name: Build executablb
+        run:
           pyinstaller --noconfirm --onedir --icon=imageFiles/icon/zima_ico.ico --console --name "ZIMA" `
             --add-data "work_py;work_py/" `
             --add-data "users;users/" `
