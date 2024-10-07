@@ -12,6 +12,7 @@ from PyQt5.QtWidgets import QMessageBox, QWidget, QLabel, QComboBox, QLineEdit, 
 from PyQt5.QtCore import Qt
 from datetime import datetime
 
+from data_base.config_base import connect_to_database, DB_WELL_DATA
 from data_base.work_with_base import connect_to_db
 from krs import GnoWindow
 from main import MyMainWindow
@@ -185,7 +186,7 @@ class TabPageDp(QWidget):
 
         if well_data.connect_in_base:
             try:
-                conn = psycopg2.connect(**well_data.postgres_params_data_well)
+                conn = connect_to_database(DB_WELL_DATA)
                 cursor = conn.cursor()
                 param = '%s'
 
@@ -534,7 +535,7 @@ class DopPlanWindow(MyMainWindow):
     @staticmethod
     def read_excel_in_base(number_well, area_well, work_plan, type_kr):
         if well_data.connect_in_base:
-            conn = psycopg2.connect(**well_data.postgres_params_data_well)
+            conn = connect_to_database(DB_WELL_DATA)
             cursor = conn.cursor()
             param = '%s'
 
@@ -1016,7 +1017,7 @@ class DopPlanWindow(MyMainWindow):
     def delete_data(self, number_well, area_well, work_plan, type_kr):
         if well_data.connect_in_base:
             try:
-                conn = psycopg2.connect(**well_data.postgres_params_data_well)
+                conn = connect_to_database(DB_WELL_DATA)
                 cursor = conn.cursor()
 
                 cursor.execute("""
@@ -1100,7 +1101,7 @@ class DopPlanWindow(MyMainWindow):
         if well_data.connect_in_base:
             try:
                 # Устанавливаем соединение с базой данных
-                conn = psycopg2.connect(**well_data.postgres_params_data_well)
+                conn = connect_to_database(DB_WELL_DATA)
 
                 cursor = conn.cursor()
                 param = '%s'

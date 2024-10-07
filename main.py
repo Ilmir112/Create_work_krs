@@ -27,6 +27,7 @@ from openpyxl.utils import get_column_letter
 from openpyxl.workbook import Workbook
 from openpyxl.styles import Alignment, Font
 
+from data_base.config_base import connect_to_database, DB_CLASSIFICATION
 from log_files.log import logger, QPlainTextEditLogger
 
 from openpyxl.drawing.image import Image
@@ -87,7 +88,7 @@ class ExcelWorker(QThread):
                 print(f'Корректная таблица перечня без глушения от {date_string}')
             if well_data.connect_in_base:
                 # Подключение к базе данных SQLite
-                conn = psycopg2.connect(**well_data.postgres_params_classif)
+                conn = connect_to_database(DB_CLASSIFICATION)
 
                 cursor = conn.cursor()
                 # Проверка наличия записи в базе данных
@@ -191,7 +192,7 @@ class ExcelWorker(QThread):
         if well_data.connect_in_base:
             try:
                 # Подключение к базе данных
-                conn = psycopg2.connect(**well_data.postgres_params_classif)
+                conn = connect_to_database(DB_CLASSIFICATION)
 
                 cursor = conn.cursor()
 
@@ -267,7 +268,7 @@ class MyMainWindow(QMainWindow):
         if well_number != '':
             if well_data.connect_in_base:
                 try:
-                    conn = psycopg2.connect(**well_data.postgres_params_data_well)
+                    conn = connect_to_db()
                     cursor = conn.cursor()
                     param = '%s'
                 except psycopg2.Error as e:

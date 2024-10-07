@@ -20,7 +20,21 @@ jobs:
 #          - name: Build executable
 #              run: pyinstaller --onefile --hidden-import data_base.data_base_well.database_well main.py
       - name: Build executable
+        env:
+          DB_NAME: ${{ secrets.DB_NAME }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_PORT: ${{ secrets.DB_PORT }}
+
+
         run:
+          echo "DB_NAME=${DB_NAME}" >> .env
+          echo "DB_USER=${DB_USER}" >> .env
+          echo "DB_PASSWORD=${DB_PASSWORD}" >> .env
+          echo "DB_HOST=${DB_HOST}" >> .env
+          echo "DB_PORT=${DB_PORT}" >> .env
+          
           pyinstaller --noconfirm --onedir --icon=imageFiles/icon/zima_ico.ico --console --name "ZIMA"
           --add-data "work_py;work_py/" 
           --add-data "users;users/" 
@@ -54,8 +68,14 @@ jobs:
           "main.py"
 
 
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: ZIMA
           path: dist/*
+
+      - name: Clean up
+        run: rm -f .env
+
+

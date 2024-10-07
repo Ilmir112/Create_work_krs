@@ -1072,7 +1072,7 @@ class AcidPakerWindow(MyMainWindow):
                     work_template_list.extend(self.acid_work(QplastEdit, plast_combo, paker_khost, acid_edit,
                                                              acid_volume_edit, acid_proc_edit, pressure_edit,
                                                              acidOilProcEdit, iron_true_combo, iron_volume_edit))
-        if self.sko_volume_all < 13 and acid_edit is 'HCl':
+        if self.sko_volume_all < 13 and acid_edit == 'HCl':
             mes = QMessageBox.question(self, 'Увеличение объема кислоты',
                                  'С целью проведения кислоты Крезолом необходимо согласовать '
                                  'увеличение объема кислотной обработки на 13м3')

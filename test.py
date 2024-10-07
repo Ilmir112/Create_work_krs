@@ -4,8 +4,9 @@ import psycopg2
 
 # Создание подключения
 import well_data
+from data_base.config_base import connect_to_database, DB_CLASSIFICATION
 
-conn = psycopg2.connect(**well_data.postgres_params_classif)
+conn = connect_to_database(DB_CLASSIFICATION)
 
 with conn:
     with conn.cursor() as cursor:

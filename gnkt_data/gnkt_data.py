@@ -5,6 +5,7 @@ from collections import namedtuple
 import psycopg2
 from PyQt5.QtWidgets import  QMessageBox
 import well_data
+from data_base.config_base import connect_to_database, DB_NAME_GNKT
 
 Saddles = namedtuple('Saddles', ['saddle', 'ball'])
 
@@ -78,7 +79,7 @@ dict_saddles = {
 def read_database_gnkt(contractor, gnkt_number):
     # Подключение к базе данных
     try:
-        conn = psycopg2.connect(**well_data.postgres_conn_gnkt)
+        conn = connect_to_database(DB_NAME_GNKT)
         cursor = conn.cursor()
 
         if 'ойл-сервис' in contractor.lower():
@@ -112,7 +113,7 @@ def insert_data_base_gnkt(contractor, well_name, gnkt_number, gnkt_length, diame
     try:
 
         # Подключение к базе данных
-        conn = psycopg2.connect(**well_data.postgres_conn_gnkt)
+        conn = connect_to_database(DB_NAME_GNKT)
         cursor = conn.cursor()
 
         if 'ойл-сервис' in contractor.lower():

@@ -4,6 +4,8 @@ from datetime import datetime
 import psycopg2
 from PyQt5.QtWidgets import QInputDialog, QMainWindow, QTabWidget, QWidget, QTableWidget, QApplication, QLabel, \
     QLineEdit, QGridLayout, QComboBox, QPushButton,QMessageBox
+
+from data_base.config_base import connect_to_database, DB_NAME_GNKT
 from main import MyMainWindow
 
 import well_data
@@ -100,7 +102,7 @@ class TabPageDp(QWidget):
 
         try:
 
-            conn = psycopg2.connect(**well_data.postgres_conn_gnkt)
+            conn = connect_to_database(DB_NAME_GNKT)
             cursor = conn.cursor()
             cursor.execute(f"SELECT * FROM КГМ WHERE today (%s), ?", (number_gnkt, self.previous_well_edit.text()))
 

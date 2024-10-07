@@ -3,6 +3,7 @@ import well_data
 import psycopg2
 from PyQt5.QtWidgets import QWidget, QLabel, QLineEdit, QPushButton, QMessageBox, QComboBox, QGridLayout
 from PyQt5.QtCore import Qt
+from data_base.config_base import connect_to_database, DB_NAME_USER
 
 
 class LoginWindow(QWidget):
@@ -61,7 +62,7 @@ class LoginWindow(QWidget):
 
         if well_data.connect_in_base:
             try:
-                conn = psycopg2.connect(**well_data.postgres_conn_user)
+                conn = connect_to_database(DB_NAME_USER)
                 cursor = conn.cursor()
                 cursor.execute(
                     "SELECT last_name, first_name, second_name, password, position_in, organization FROM users "
@@ -140,7 +141,7 @@ class LoginWindow(QWidget):
         from data_base.work_with_base import connect_to_db
         # Создаем подключение к базе данных
         if well_data.connect_in_base:
-            conn = psycopg2.connect(**well_data.postgres_conn_user)
+            conn = connect_to_database(DB_NAME_USER)
             cursor = conn.cursor()
 
             cursor.execute("SELECT last_name, first_name, second_name, position_in, organization  FROM users")
@@ -272,7 +273,7 @@ class RegisterWindow(QWidget):
         password2 = self.password2.text().strip()
 
         if well_data.connect_in_base:
-            conn = psycopg2.connect(**well_data.postgres_conn_user)
+            conn = connect_to_database(DB_NAME_USER)
             cursor = conn.cursor()
 
             # Проверяем, существует ли пользователь с таким именем

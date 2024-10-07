@@ -3,6 +3,8 @@ import main
 import well_data
 
 from datetime import datetime
+
+from data_base.config_base import connect_to_database, DB_NAME_GNKT
 from main import MyMainWindow
 import psycopg2
 from PyQt5.QtWidgets import QInputDialog, QTabWidget, QWidget, QApplication, QLabel, \
@@ -86,7 +88,7 @@ class TabPageDp(QWidget):
         previus_well = self.previous_well_combo.currentText()
         try:
             if previus_well:
-                conn = psycopg2.connect(**well_data.postgres_conn_gnkt)
+                conn = connect_to_database(DB_NAME_GNKT)
 
                 cursor = conn.cursor()
 

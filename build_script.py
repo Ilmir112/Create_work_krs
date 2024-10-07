@@ -9,7 +9,7 @@ additional_options = ['--onedir', '--windowed']  # Пример: скрыть к
 
 # Указываем все зависимости явно для включения в сборку
 additional_files = [
-    ('data_base/data_base_well/database_well.py', '.'),  # Пример включения другой зависимости
+    ('data_base/data_base_well/config_base.py', '.'),  # Пример включения другой зависимости
     ('data_base/data_base_well/databaseWell.db', '.'),
     ('data_base/work_with_base.py', '.'),
     ('data_base/databaseclassification.db', '.'),
