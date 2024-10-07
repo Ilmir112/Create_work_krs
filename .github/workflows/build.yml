@@ -21,17 +21,21 @@ jobs:
 #              run: pyinstaller --onefile --hidden-import data_base.data_base_well.database_well main.py
       - name: Build executable
         env:
-          DB_NAME: ${{ secrets.DB_NAME }}
-          DB_USER: ${{ secrets.DB_USER }}
+          DB_WELL_DATA: ${{ secrets.DB_WELL_DATA }}
+          DB_CLASSIFICATION: ${{ secrets.DB_CLASSIFICATION }}
+          DB_NAME_GNKT: ${{ secrets.DB_NAME_GNKT }}
+          DB_NAME_USER: ${{ secrets.DB_NAME_USER }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           DB_HOST: ${{ secrets.DB_HOST }}
           DB_PORT: ${{ secrets.DB_PORT }}
         run:
-          echo "DB_NAME=${DB_NAME}" >> .env
-          echo "DB_USER=${DB_USER}" >> .env
-          echo "DB_PASSWORD=${DB_PASSWORD}" >> .env
-          echo "DB_HOST=${DB_HOST}" >> .env
-          echo "DB_PORT=${DB_PORT}" >> .env
+          echo "DB_WELL_DATA=${DB_WELL_DATA}" | Out-File -Append -FilePath .env
+          echo "DB_NAME_USER=${DB_NAME_USER}" | Out-File -Append -FilePath .env
+          echo "DB_CLASSIFICATION=${DB_CLASSIFICATION}" | Out-File -Append -FilePath .env
+          echo "DB_NAME_GNKT=${DB_NAME_GNKT}" | Out-File -Append -FilePath .env
+          echo "DB_PASSWORD=${DB_PASSWORD}" | Out-File -Append -FilePath .env
+          echo "DB_HOST=${DB_HOST}" | Out-File -Append -FilePath .env
+          echo "DB_PORT=${DB_PORT}" | Out-File -Append -FilePath .env
           
           pyinstaller --noconfirm --onedir --icon=imageFiles/icon/zima_ico.ico --console --name "ZIMA"
           --add-data "work_py;work_py/" 
@@ -71,3 +75,4 @@ jobs:
         with:
           name: ZIMA
           path: dist/*
+
