@@ -28,18 +28,20 @@ jobs:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           DB_HOST: ${{ secrets.DB_HOST }}
           DB_PORT: ${{ secrets.DB_PORT }}
+
         run:
 
-          Add-Content -Path .env -Value "DB_WELL_DATA=${DB_WELL_DATA}"
-          Add-Content -Path .env -Value "DB_NAME_USER=${DB_NAME_USER}"
-          Add-Content -Path .env -Value "DB_CLASSIFICATION=${DB_CLASSIFICATION}"
-          Add-Content -Path .env -Value "DB_NAME_GNKT=${DB_NAME_GNKT}"
-          Add-Content -Path .env -Value "DB_PASSWORD=${DB_PASSWORD}"
-          Add-Content -Path .env -Value "DB_HOST=${DB_HOST}"
-          Add-Content -Path .env -Value "DB_PORT=${DB_PORT}"
-          
-          
-          pyinstaller --noconfirm --onedir --icon=imageFiles/icon/zima_ico.ico --console --name "ZIMA"
+          "DB_WELL_DATA=$DB_WELL_DATA" | Out-File -FilePath .env -Encoding utf8
+          "DB_CLASSIFICATION=$DB_CLASSIFICATION" | Out-File -FilePath .env -Encoding utf8
+          "DB_NAME_GNKT=$DB_NAME_GNKT" | Out-File -FilePath .env -Encoding utf8
+          "DB_USER=$DB_USER" | Out-File -FilePath .env -Encoding utf8 -Append
+          "DB_PASSWORD=$DB_PASSWORD" | Out-File -FilePath .env -Encoding utf8 -Append
+          "DB_HOST=$DB_HOST" | Out-File -FilePath .env -Encoding utf8 -Append
+          "DB_PORT=$DB_PORT" | Out-File -FilePath .env -Encoding utf8 -Append
+              
+              
+              
+              pyinstaller --noconfirm --onedir --icon=imageFiles/icon/zima_ico.ico --console --name "ZIMA"
           --add-data "work_py;work_py/" 
           --add-data "users;users/" 
           --add-data "tests;tests/" 
