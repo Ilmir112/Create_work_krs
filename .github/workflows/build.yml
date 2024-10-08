@@ -13,16 +13,13 @@ jobs:
           python-version: '3.8.8'
 
       - name: Create virtual enviroment
-        run: python -m venv .env
+        run: python -m venv env
 
       - name: Activate virtual enviroment
-        run: .env\Scripts\activate.bat
+        run: env\Scripts\activate.bat
 
       - name: Install PyInstaller
         run: pip install pyinstaller pywin32
-
-      - name: Install dependencies
-        run: pip install -r requirements.txt
 
       - name: Create .env file
         env:
@@ -39,16 +36,14 @@ jobs:
           echo "My_APP_ID: $My_APP_ID"
 
           
-          # Отладка значений переменных среды
-          
-          echo "DB_WELL_DATA: ${{ secrets.DB_WELL_DATA }}" >> .env
-          echo "DB_CLASSIFICATION: ${{ secrets.DB_CLASSIFICATION }}" >> .env
-          echo "DB_NAME_GNKT: ${{ secrets.DB_NAME_GNKT }}" >> .env
-          echo "DB_NAME_USER: ${{ secrets.DB_NAME_USER }}" >> .env
-          echo "DB_USER: ${{ secrets.DB_USER }}" >> .env
-          echo "DB_PASSWORD: ${{ secrets.DB_PASSWORD }}" >> .env 
-          echo "DB_HOST: ${{ secrets.DB_HOST }}" >> .env
-          echo "DB_PORT: ${{ secrets.DB_PORT }}" >> .env
+          run: |
+            Set-Content -Path .env -Value "DB_WELL_DATA=$($Env:DB_WELL_DATA)"
+            Add-Content -Path .env -Value "DB_CLASSIFICATION=$($Env:DB_CLASSIFICATION)"
+            Add-Content -Path .env -Value "DB_NAME_GNKT=$($Env:DB_NAME_GNKT)"
+            Add-Content -Path .env -Value "DB_USER=$($Env:DB_NAME_USER)"
+            Add-Content -Path .env -Value "DB_PASSWORD=$($Env:DB_PASSWORD)"
+            Add-Content -Path .env -Value "DB_HOST=$($Env:DB_HOST)"
+            Add-Content -Path .env -Value "DB_PORT=$($Env:DB_PORT)"
           
           if (${secrets.DB_USER} -eq 'postgres') {
             Write-Host "Совпадает"
@@ -64,15 +59,9 @@ jobs:
           
 
 
-#        run: |
-#            Set-Content -Path .env -Value "DB_WELL_DATA=$($Env:DB_WELL_DATA)"
-#            Add-Content -Path .env -Value "DB_CLASSIFICATION=$($Env:DB_CLASSIFICATION)"
-#            Add-Content -Path .env -Value "DB_NAME_GNKT=$($Env:DB_NAME_GNKT)"
-#            Add-Content -Path .env -Value "DB_USER=$($Env:DB_NAME_USER)"
-#            Add-Content -Path .env -Value "DB_PASSWORD=$($Env:DB_PASSWORD)"
-#            Add-Content -Path .env -Value "DB_HOST=$($Env:DB_HOST)"
-#            Add-Content -Path .env -Value "DB_PORT=$($Env:DB_PORT)"
 
+      - name: Install dependencies
+        run: pip install -r requirements.txt
       - name: Build executablb
         run:
           pyinstaller --noconfirm --onedir --icon=imageFiles/icon/zima_ico.ico --console --name "ZIMA" `
