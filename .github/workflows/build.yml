@@ -42,7 +42,7 @@ jobs:
           echo "DB_HOST: ${{ secrets.DB_HOST }}" >> .env
           echo "DB_PORT: ${{ secrets.DB_PORT }}" >> .env
           
-          if [[ -z "${{ secrets.DB_PASSWORD }}" ]]; then
+          if ([[ -z "${{ secrets.DB_PASSWORD }}" ]]; then
             echo "Ошибка: Секрет DB_PASSWORD не задан!"
             exit 1
           else
