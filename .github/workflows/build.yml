@@ -27,7 +27,7 @@ jobs:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           DB_HOST: ${{ secrets.DB_HOST }}
           DB_PORT: ${{ secrets.DB_PORT }}
-
+          run:
           # Отладка значений переменных среды
           echo "DB_WELL_DATA: $Env:DB_WELL_DATA"
           echo "DB_CLASSIFICATION: $Env:DB_CLASSIFICATION"
@@ -37,7 +37,7 @@ jobs:
           echo "DB_HOST: $Env:DB_HOST"
           echo "DB_PORT: $Env:DB_PORT"
 
-          run: |
+        run: |
             Set-Content -Path .env -Value "DB_WELL_DATA=$($Env:DB_WELL_DATA)"
             Add-Content -Path .env -Value "DB_CLASSIFICATION=$($Env:DB_CLASSIFICATION)"
             Add-Content -Path .env -Value "DB_NAME_GNKT=$($Env:DB_NAME_GNKT)"
