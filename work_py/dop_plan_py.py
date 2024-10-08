@@ -186,7 +186,7 @@ class TabPageDp(QWidget):
 
         if well_data.connect_in_base:
             try:
-                conn = connect_to_database(DB_WELL_DATA)
+                conn = connect_to_database(wel_data.DB_WELL_DATA)
                 cursor = conn.cursor()
                 param = '%s'
 
@@ -535,7 +535,7 @@ class DopPlanWindow(MyMainWindow):
     @staticmethod
     def read_excel_in_base(number_well, area_well, work_plan, type_kr):
         if well_data.connect_in_base:
-            conn = connect_to_database(DB_WELL_DATA)
+            conn = connect_to_database(wel_data.DB_WELL_DATA)
             cursor = conn.cursor()
             param = '%s'
 
@@ -905,7 +905,8 @@ class DopPlanWindow(MyMainWindow):
                     well_data.skm_interval.append(list(map(int, skm_interval_edit.split('-'))))
 
             rows = self.tableWidget.rowCount()
-            aaa = change_pvr_combo
+
+            self.work_with_excel(well_number, well_area, table_in_base, type_kr)
             if change_pvr_combo == 'Да':
                 if rows == 0:
                     QMessageBox.warning(self, 'Ошибка', 'Нужно загрузить интервалы перфорации')
@@ -925,6 +926,7 @@ class DopPlanWindow(MyMainWindow):
                     self.insert_row_in_pvr(self.data, self.rowHeights, self.colWidth, self.boundaries_dict, plast_row,
                                            current_bottom, current_bottom_date_edit, method_bottom_combo)
             else:
+
                 well_data.data, well_data.rowHeights, well_data.colWidth, well_data.boundaries_dict = \
                     self.change_pvr_in_bottom(self.data, self.rowHeights, self.colWidth, self.boundaries_dict,
                                               current_bottom, current_bottom_date_edit, method_bottom_combo)
@@ -1017,7 +1019,7 @@ class DopPlanWindow(MyMainWindow):
     def delete_data(self, number_well, area_well, work_plan, type_kr):
         if well_data.connect_in_base:
             try:
-                conn = connect_to_database(DB_WELL_DATA)
+                conn = connect_to_database(wel_data.DB_WELL_DATA)
                 cursor = conn.cursor()
 
                 cursor.execute("""
@@ -1101,7 +1103,7 @@ class DopPlanWindow(MyMainWindow):
         if well_data.connect_in_base:
             try:
                 # Устанавливаем соединение с базой данных
-                conn = connect_to_database(DB_WELL_DATA)
+                conn = connect_to_database(wel_data.DB_WELL_DATA)
 
                 cursor = conn.cursor()
                 param = '%s'

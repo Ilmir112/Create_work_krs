@@ -18,16 +18,14 @@ DB_PORT = os.getenv('DB_PORT')
 
 
 # Функция подключения к базе данных
-def connect_to_database(DB_NAME):
+def connect_to_database(DB_NAME, DB_USER=None):
+    if DB_USER is None:
+        DB_USER = 'postgres'
+        DB_PASSWORD = '195375AsD+'
+        DB_HOST = '176.109.106.199'
+        DB_PORT = 5432
     try:
-        # Получаем все переменные окружения
-        env_variables = os.environ
 
-        # Выводим все переменные окружения
-        for key, value in env_variables.items():
-            print(f"{key}: {value}")
-
-        print(f'Port {DB_PORT, DB_HOST, DB_WELL_DATA, DB_CLASSIFICATION}')
         connection = psycopg2.connect(
             dbname=DB_NAME,
             user=DB_USER,

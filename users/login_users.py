@@ -62,7 +62,7 @@ class LoginWindow(QWidget):
 
         if well_data.connect_in_base:
             try:
-                conn = connect_to_database(DB_NAME_USER)
+                conn = connect_to_database(wel_data.DB_NAME_USER)
                 if conn:
 
                     cursor = conn.cursor()
@@ -145,7 +145,7 @@ class LoginWindow(QWidget):
         from data_base.work_with_base import connect_to_db
         # Создаем подключение к базе данных
         if well_data.connect_in_base:
-            conn = connect_to_database(DB_NAME_USER)
+            conn = connect_to_database(wel_data.DB_NAME_USER)
             cursor = conn.cursor()
 
             cursor.execute("SELECT last_name, first_name, second_name, position_in, organization  FROM users")
@@ -277,7 +277,7 @@ class RegisterWindow(QWidget):
         password2 = self.password2.text().strip()
 
         if well_data.connect_in_base:
-            conn = connect_to_database(DB_NAME_USER)
+            conn = connect_to_database(wel_data.DB_NAME_USER)
             cursor = conn.cursor()
 
             # Проверяем, существует ли пользователь с таким именем
