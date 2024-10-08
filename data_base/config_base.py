@@ -29,8 +29,6 @@ def connect_to_database(DB_NAME):
     print(env_path)
     # Загрузите переменные окружения из файла .env
 
-
-
     print(DB_USER)
 
     try:

@@ -27,7 +27,7 @@ from openpyxl.utils import get_column_letter
 from openpyxl.workbook import Workbook
 from openpyxl.styles import Alignment, Font
 
-from data_base.config_base import connect_to_database, DB_CLASSIFICATION, DB_WELL_DATA
+from data_base.config_base import connect_to_database
 from log_files.log import logger, QPlainTextEditLogger
 
 from openpyxl.drawing.image import Image

@@ -3,7 +3,7 @@ import well_data
 import psycopg2
 from PyQt5.QtWidgets import QWidget, QLabel, QLineEdit, QPushButton, QMessageBox, QComboBox, QGridLayout
 from PyQt5.QtCore import Qt
-from data_base.config_base import connect_to_database, DB_NAME_USER
+from data_base.config_base import connect_to_database
 
 
 class LoginWindow(QWidget):

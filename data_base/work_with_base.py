@@ -20,7 +20,7 @@ from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem, QLineEdit, QHeaderVie
 from openpyxl import load_workbook
 from openpyxl.styles import PatternFill, Font, Color
 from openpyxl.utils import get_column_letter, range_boundaries
-from data_base.config_base import connect_to_database, DB_NAME_GNKT, DB_WELL_DATA, DB_CLASSIFICATION
+from data_base.config_base import connect_to_database
 
 from PIL import Image
 from main import MyMainWindow

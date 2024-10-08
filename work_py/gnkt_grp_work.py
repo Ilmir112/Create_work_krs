@@ -4,7 +4,7 @@ import well_data
 
 from datetime import datetime
 
-from data_base.config_base import connect_to_database, DB_NAME_GNKT
+from data_base.config_base import connect_to_database
 from main import MyMainWindow
 import psycopg2
 from PyQt5.QtWidgets import QInputDialog, QTabWidget, QWidget, QApplication, QLabel, \

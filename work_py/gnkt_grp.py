@@ -5,7 +5,7 @@ import psycopg2
 from PyQt5.QtWidgets import QInputDialog, QMainWindow, QTabWidget, QWidget, QTableWidget, QApplication, QLabel, \
     QLineEdit, QGridLayout, QComboBox, QPushButton,QMessageBox
 
-from data_base.config_base import connect_to_database, DB_NAME_GNKT
+from data_base.config_base import connect_to_database
 from main import MyMainWindow
 
 import well_data

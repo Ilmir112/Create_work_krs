@@ -12,7 +12,7 @@ from PyQt5.QtWidgets import QMessageBox, QWidget, QLabel, QComboBox, QLineEdit, 
 from PyQt5.QtCore import Qt
 from datetime import datetime
 
-from data_base.config_base import connect_to_database, DB_WELL_DATA
+from data_base.config_base import connect_to_database
 from data_base.work_with_base import connect_to_db
 from krs import GnoWindow
 from main import MyMainWindow

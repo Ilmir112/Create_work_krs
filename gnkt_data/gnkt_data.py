@@ -5,7 +5,7 @@ from collections import namedtuple
 import psycopg2
 from PyQt5.QtWidgets import  QMessageBox
 import well_data
-from data_base.config_base import connect_to_database, DB_NAME_GNKT
+from data_base.config_base import connect_to_database
 
 Saddles = namedtuple('Saddles', ['saddle', 'ball'])
 
