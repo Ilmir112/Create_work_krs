@@ -31,17 +31,17 @@ jobs:
         echo "DB_PORT=${{ secrets.DB_PORT }}" >> .env
         echo "My_APP_ID=${{ vars.APP-ID }}" >> .env
 
-        if [[ "${{ secrets.DB_USER }}" == "postgres" ]]; then
-          echo "Approved"
-        else
-          echo "User data for the database did not load"
-        fi
-
-        if [[ "${{ secrets.DB_WELL_DATA }}" == "well_data" ]]; then
-          echo "Approved"
-        else
-          echo "Well data for the database did not load"
-        fi
+        if (${secrets.DB_USER} -eq 'postgres') {
+            Write-Host "Совпадает"
+          } else {
+            Write-Host "Не подгрузилось данные для базы данных"
+          }
+          
+        if (${secrets.DB_WELL_DATA} -eq 'well_data') {
+            Write-Host "Совпадает"
+          } else {
+            Write-Host "Не подгрузилось данные для базы данных"
+          }
 
     - name: Build executable
       run: |
