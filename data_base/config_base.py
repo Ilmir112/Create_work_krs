@@ -19,10 +19,15 @@ DB_PORT = os.getenv('DB_PORT')
 
 # Функция подключения к базе данных
 def connect_to_database(DB_NAME):
+
+    # Загрузите переменные окружения из файла .env
+    load_dotenv()
+
     DB_USER = os.getenv('DB_USER')
     DB_PASSWORD = os.getenv('DB_PASSWORD')
     DB_HOST = os.getenv('DB_HOST')
     DB_PORT = os.getenv('DB_PORT')
+    print(DB_HOST, DB_USER)
     if DB_USER is None:
         DB_USER = 'postgres'
         DB_PASSWORD = '195375AsD+'
