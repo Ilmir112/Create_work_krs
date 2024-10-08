@@ -13,13 +13,19 @@ jobs:
       with:
         python-version: '3.8.8'
 
-#    - name: Create virtual environment and install dependencies
-#      run: |
-#        python -m venv env
-#        env\Scripts\activate.bat
-#        pip install pyinstaller pywin32
-#        pip install -r requirements.txt
-
+    - name: Create virtual environment and install dependencies
+      run: |
+        python -m venv env
+        env\Scripts\activate.bat
+        pip install pyinstaller pywin32
+        pip install -r requirements.txt
+    - name: Check database secrets
+      run: |
+        if ($env:DB_USER -ne "") {
+          Write-Host "Данные для базы данных загружены"
+        } else {
+          Write-Host "Не подгрузились данные для базы данных"
+        }
     - name: Create .env file
       run: |
         echo "DB_WELL_DATA=${{ secrets.DB_WELL_DATA }}" > .env
@@ -44,7 +50,7 @@ jobs:
 
     - name: Build executable
       run: |
-        env\Scripts\activate.bat
+
         pyinstaller --noconfirm --onedir --icon=imageFiles/icon/zima_ico.ico --console --name "ZIMA" `
           --add-data "work_py;work_py/" `
           --add-data "users;users/" `
