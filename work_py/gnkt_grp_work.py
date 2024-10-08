@@ -88,7 +88,7 @@ class TabPageDp(QWidget):
         previus_well = self.previous_well_combo.currentText()
         try:
             if previus_well:
-                conn = connect_to_database(wel_data.DB_NAME_GNKT)
+                conn = connect_to_database(well_data.DB_NAME_GNKT)
 
                 cursor = conn.cursor()
 

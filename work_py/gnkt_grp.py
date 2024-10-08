@@ -102,7 +102,7 @@ class TabPageDp(QWidget):
 
         try:
 
-            conn = connect_to_database(wel_data.DB_NAME_GNKT)
+            conn = connect_to_database(well_data.DB_NAME_GNKT)
             cursor = conn.cursor()
             cursor.execute(f"SELECT * FROM КГМ WHERE today (%s), ?", (number_gnkt, self.previous_well_edit.text()))
 

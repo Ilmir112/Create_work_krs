@@ -186,7 +186,7 @@ class TabPageDp(QWidget):
 
         if well_data.connect_in_base:
             try:
-                conn = connect_to_database(wel_data.DB_WELL_DATA)
+                conn = connect_to_database(well_data.DB_WELL_DATA)
                 cursor = conn.cursor()
                 param = '%s'
 
@@ -535,7 +535,7 @@ class DopPlanWindow(MyMainWindow):
     @staticmethod
     def read_excel_in_base(number_well, area_well, work_plan, type_kr):
         if well_data.connect_in_base:
-            conn = connect_to_database(wel_data.DB_WELL_DATA)
+            conn = connect_to_database(well_data.DB_WELL_DATA)
             cursor = conn.cursor()
             param = '%s'
 
@@ -1019,7 +1019,7 @@ class DopPlanWindow(MyMainWindow):
     def delete_data(self, number_well, area_well, work_plan, type_kr):
         if well_data.connect_in_base:
             try:
-                conn = connect_to_database(wel_data.DB_WELL_DATA)
+                conn = connect_to_database(well_data.DB_WELL_DATA)
                 cursor = conn.cursor()
 
                 cursor.execute("""
@@ -1103,7 +1103,7 @@ class DopPlanWindow(MyMainWindow):
         if well_data.connect_in_base:
             try:
                 # Устанавливаем соединение с базой данных
-                conn = connect_to_database(wel_data.DB_WELL_DATA)
+                conn = connect_to_database(well_data.DB_WELL_DATA)
 
                 cursor = conn.cursor()
                 param = '%s'

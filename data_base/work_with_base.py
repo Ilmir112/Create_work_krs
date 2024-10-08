@@ -177,7 +177,7 @@ class Classifier_well(MyMainWindow):
         if well_data.connect_in_base:
             try:
                 # Создание подключения к базе данных PostgreSQL
-                conn = connect_to_database(wel_data.DB_CLASSIFICATION)
+                conn = connect_to_database(well_data.DB_CLASSIFICATION)
 
                 # Выполнение SQL-запроса для получения данных
                 with conn.cursor() as cur:
@@ -260,7 +260,7 @@ class Classifier_well(MyMainWindow):
         if well_data.connect_in_base:
             try:
                 # Подключение к базе данных
-                conn = connect_to_database(wel_data.DB_CLASSIFICATION)
+                conn = connect_to_database(well_data.DB_CLASSIFICATION)
                 cursor = conn.cursor()
                 region_list = ['ЧГМ', 'АГМ', 'ТГМ', 'ИГМ', 'КГМ', ]
 
@@ -497,7 +497,7 @@ class Classifier_well(MyMainWindow):
         if well_data.connect_in_base:
             try:
                 # Создание подключения к базе данных PostgreSQL
-                conn = connect_to_database(wel_data.DB_CLASSIFICATION)
+                conn = connect_to_database(well_data.DB_CLASSIFICATION)
                 cursor = conn.cursor()
 
                 for region_name in region_list:
@@ -703,14 +703,23 @@ def insert_database_well_data(well_number, well_area, contractor, costumer, data
     cdng = well_data.cdng._value
     category_dict =json.dumps(well_data.dict_category, ensure_ascii=False)
     # print(row, well_data.count_row_well)
+
+
     if 'dop_plan' in work_plan:
         work_plan_str = f'ДП№{well_data.number_dp}'
-    elif 'krs' in work_plan or 'plan' in work_plan:
+    elif 'krs' in work_plan:
         work_plan_str = 'ПР'
+    elif work_plan == 'plan_change':
+        if well_data.work_plan_change == 'krs':
+            work_plan_str = 'ПР'
+        else:
+            work_plan_str = f'ДП№{well_data.number_dp}'
+
+
     if well_data.connect_in_base:
         try:
 
-            conn = connect_to_database(wel_data.DB_WELL_DATA)
+            conn = connect_to_database(well_data.DB_WELL_DATA)
             cursor = conn.cursor()
             # Проверка наличия строки с заданными параметрами
 
@@ -820,7 +829,7 @@ def check_in_database_well_data(number_well, area_well, work_plan):
 
     if well_data.connect_in_base:
         try:
-            conn = connect_to_database(wel_data.DB_WELL_DATA)
+            conn = connect_to_database(well_data.DB_WELL_DATA)
             cursor = conn.cursor()
             param = '%s'
 
@@ -983,7 +992,7 @@ def insert_data_well_dop_plan(data_well):
 def read_database_gnkt(contractor, gnkt_number):
     try:
         # Подключение к базе данных
-        conn = connect_to_database(wel_data.DB_NAME_GNKT)
+        conn = connect_to_database(well_data.DB_NAME_GNKT)
 
         if 'ойл-сервис' in contractor.lower():
             contractor = 'oil_service'

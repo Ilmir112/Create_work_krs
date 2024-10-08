@@ -79,7 +79,7 @@ dict_saddles = {
 def read_database_gnkt(contractor, gnkt_number):
     # Подключение к базе данных
     try:
-        conn = connect_to_database(wel_data.DB_NAME_GNKT)
+        conn = connect_to_database(well_data.DB_NAME_GNKT)
         cursor = conn.cursor()
 
         if 'ойл-сервис' in contractor.lower():
@@ -113,7 +113,7 @@ def insert_data_base_gnkt(contractor, well_name, gnkt_number, gnkt_length, diame
     try:
 
         # Подключение к базе данных
-        conn = connect_to_database(wel_data.DB_NAME_GNKT)
+        conn = connect_to_database(well_data.DB_NAME_GNKT)
         cursor = conn.cursor()
 
         if 'ойл-сервис' in contractor.lower():

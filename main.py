@@ -88,7 +88,7 @@ class ExcelWorker(QThread):
                 print(f'Корректная таблица перечня без глушения от {date_string}')
             if well_data.connect_in_base:
                 # Подключение к базе данных SQLite
-                conn = connect_to_database(wel_data.DB_CLASSIFICATION)
+                conn = connect_to_database(well_data.DB_CLASSIFICATION)
 
                 cursor = conn.cursor()
                 # Проверка наличия записи в базе данных
@@ -192,7 +192,7 @@ class ExcelWorker(QThread):
         if well_data.connect_in_base:
             try:
                 # Подключение к базе данных
-                conn = connect_to_database(wel_data.DB_CLASSIFICATION)
+                conn = connect_to_database(well_data.DB_CLASSIFICATION)
 
                 cursor = conn.cursor()
 
@@ -268,7 +268,7 @@ class MyMainWindow(QMainWindow):
         if well_number != '':
             if well_data.connect_in_base:
                 try:
-                    conn =connect_to_database(wel_data.DB_WELL_DATA)
+                    conn =connect_to_database(well_data.DB_WELL_DATA)
                     cursor = conn.cursor()
                     param = '%s'
                 except psycopg2.Error as e:

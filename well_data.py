@@ -85,7 +85,7 @@ pipe_fatigue = 0
 pvo = 0
 previous_well = 0
 bottomhole_drill = ProtectedIsNonNone('не корректно')
-bottomhole_artificial = ProtectedIsNonNone('не корректно')
+bottomhole_artificial = ProtectedIsDigit(5000)
 max_angle = ProtectedIsNonNone('не корректно')
 max_angle_H = ProtectedIsNonNone('не корректно')
 stol_rotora = ProtectedIsNonNone('не корректно')
@@ -130,6 +130,11 @@ dinamic_level = ProtectedIsNonNone('не корректно')
 sucker_rod_ind = ProtectedIsDigit(0)
 data_x_max = ProtectedIsDigit(0)
 data_x_min = ProtectedIsDigit(0)
+
+DB_WELL_DATA = 'well_data'
+DB_NAME_USER = 'krs2'
+DB_NAME_GNKT = 'gnkt_database'
+DB_CLASSIFICATION = 'databaseclassification'
 
 problemWithEk = False
 plast_all = []
