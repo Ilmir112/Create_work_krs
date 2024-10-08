@@ -36,6 +36,7 @@ jobs:
           @{Name='DB_NAME_GNKT'; Value=$Env:DB_NAME_GNKT},
           @{Name='DB_CLASSIFICATION'; Value=$Env:DB_CLASSIFICATION}
         )
+        
 
         foreach ($secret in $secrets) {
           if ([string]::IsNullOrEmpty($secret.Value)) {

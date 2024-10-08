@@ -5,11 +5,6 @@ from dotenv import load_dotenv
 import psycopg2
 
 
-# Загрузите переменные окружения из файла .env
-import well_data
-
-load_dotenv()
-
 
 
 
@@ -23,7 +18,7 @@ def connect_to_database(DB_NAME):
     #     env_path = '.env'
 
     load_dotenv()  # Получаем путь к .env
-
+    print("DB_USER:", os.getenv('DB_USER'))
     DB_USER = os.getenv('DB_USER')
     DB_PASSWORD = os.getenv('DB_PASSWORD')
     DB_HOST = os.getenv('DB_HOST')
