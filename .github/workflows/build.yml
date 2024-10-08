@@ -27,14 +27,24 @@ jobs:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           DB_HOST: ${{ secrets.DB_HOST }}
           DB_PORT: ${{ secrets.DB_PORT }}
-        run: |
-          Set-Content -Path .env -Value "DB_WELL_DATA=$($Env:DB_WELL_DATA)"
-          Add-Content -Path .env -Value "DB_CLASSIFICATION=$($Env:DB_CLASSIFICATION)"
-          Add-Content -Path .env -Value "DB_NAME_GNKT=$($Env:DB_NAME_GNKT)"
-          Add-Content -Path .env -Value "DB_USER=$($Env:DB_NAME_USER)"
-          Add-Content -Path .env -Value "DB_PASSWORD=$($Env:DB_PASSWORD)"
-          Add-Content -Path .env -Value "DB_HOST=$($Env:DB_HOST)"
-          Add-Content -Path .env -Value "DB_PORT=$($Env:DB_PORT)"
+
+          # Отладка значений переменных среды
+          echo "DB_WELL_DATA: $Env:DB_WELL_DATA"
+          echo "DB_CLASSIFICATION: $Env:DB_CLASSIFICATION"
+          echo "DB_NAME_GNKT: $Env:DB_NAME_GNKT"
+          echo "DB_USER: $Env:DB_NAME_USER"
+          echo "DB_PASSWORD: $Env:DB_PASSWORD"
+          echo "DB_HOST: $Env:DB_HOST"
+          echo "DB_PORT: $Env:DB_PORT"
+
+          run: |
+            Set-Content -Path .env -Value "DB_WELL_DATA=$($Env:DB_WELL_DATA)"
+            Add-Content -Path .env -Value "DB_CLASSIFICATION=$($Env:DB_CLASSIFICATION)"
+            Add-Content -Path .env -Value "DB_NAME_GNKT=$($Env:DB_NAME_GNKT)"
+            Add-Content -Path .env -Value "DB_USER=$($Env:DB_NAME_USER)"
+            Add-Content -Path .env -Value "DB_PASSWORD=$($Env:DB_PASSWORD)"
+            Add-Content -Path .env -Value "DB_HOST=$($Env:DB_HOST)"
+            Add-Content -Path .env -Value "DB_PORT=$($Env:DB_PORT)"
 
       - name: Build executablb
         run:
