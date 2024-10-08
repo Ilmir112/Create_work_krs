@@ -63,25 +63,29 @@ class LoginWindow(QWidget):
         if well_data.connect_in_base:
             try:
                 conn = connect_to_database(DB_NAME_USER)
-                cursor = conn.cursor()
-                cursor.execute(
-                    "SELECT last_name, first_name, second_name, password, position_in, organization FROM users "
-                    "WHERE last_name=(%s) AND first_name=(%s) AND second_name=(%s)",
-                    (last_name, first_name, second_name))
-                password_base = cursor.fetchone()
+                if conn:
 
-                password_base_short = f'{password_base[0]} {password_base[1]} {password_base[2]} '
-                if password_base_short == username and password_base[3] == str(password):
-                    # QMessageBox.information(self, 'Пароль', 'вход произведен')
-                    self.close()
-                    well_data.user = (password_base[4] + ' ' + password_base[5],
-                                      f'{password_base[0]} {password_base[1][0]}.{password_base[2][0]}.')
+                    cursor = conn.cursor()
+                    cursor.execute(
+                        "SELECT last_name, first_name, second_name, password, position_in, organization FROM users "
+                        "WHERE last_name=(%s) AND first_name=(%s) AND second_name=(%s)",
+                        (last_name, first_name, second_name))
+                    password_base = cursor.fetchone()
 
-                    well_data.contractor = password_base[5]
+                    password_base_short = f'{password_base[0]} {password_base[1]} {password_base[2]} '
+                    if password_base_short == username and password_base[3] == str(password):
+                        # QMessageBox.information(self, 'Пароль', 'вход произведен')
+                        self.close()
+                        well_data.user = (password_base[4] + ' ' + password_base[5],
+                                          f'{password_base[0]} {password_base[1][0]}.{password_base[2][0]}.')
 
-                    well_data.pause = False
+                        well_data.contractor = password_base[5]
+
+                        well_data.pause = False
+                    else:
+                        QMessageBox.critical(self, 'Пароль', 'логин и пароль не совпадает')
                 else:
-                    QMessageBox.critical(self, 'Пароль', 'логин и пароль не совпадает')
+                    self.pause_app()
             except psycopg2.Error as e:
                 self.pause_app()
                 well_data.pause = False
