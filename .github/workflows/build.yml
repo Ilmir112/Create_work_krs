@@ -41,6 +41,7 @@ jobs:
         } else {
           Write-Host "Не подгрузились данные для базы данных"
         }
+
     - name: Create .env file
       run: |
         # Создание .env файла
@@ -97,7 +98,7 @@ jobs:
           --add-data "block_name.py;." `
           --add-data "application_pvr.py;." `
           --add-data "application_gis.py;." `
-          --add-data ".env:." `
+          --add-data ".env;." `
           main.py
 
     - name: Upload artifact
