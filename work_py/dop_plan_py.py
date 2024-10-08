@@ -905,7 +905,7 @@ class DopPlanWindow(MyMainWindow):
                     well_data.skm_interval.append(list(map(int, skm_interval_edit.split('-'))))
 
             rows = self.tableWidget.rowCount()
-
+            aaa = change_pvr_combo
             if change_pvr_combo == 'Да':
                 if rows == 0:
                     QMessageBox.warning(self, 'Ошибка', 'Нужно загрузить интервалы перфорации')

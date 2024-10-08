@@ -15,7 +15,9 @@ jobs:
 
     - name: Create virtual environment and install dependencies
       run: |
-        pip install pyinstaller pywin32
+        python -m venv env
+        env\Scripts\activate.bat
+        pip install pyinstaller 
         pip install -r requirements.txt
     - name: Check database secrets
       env:
@@ -39,16 +41,17 @@ jobs:
         } else {
           Write-Host "Не подгрузились данные для базы данных"
         }
-#    - name: Create .env file
-#      run: |
-#        echo "DB_WELL_DATA=${{ secrets.DB_WELL_DATA }}" > .env
-#        echo "DB_CLASSIFICATION=${{ secrets.DB_CLASSIFICATION }}" >> .env
-#        echo "DB_NAME_GNKT=${{ secrets.DB_NAME_GNKT }}" >> .env
-#        echo "DB_USER=${{ secrets.DB_NAME_USER }}" >> .env
-#        echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
-#        echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env
-#        echo "DB_PORT=${{ secrets.DB_PORT }}" >> .env
-#        echo "My_APP_ID=${{ vars.APP-ID }}" >> .env
+    - name: Create .env file
+      run: |
+        # Создание .env файла
+        Set-Content -Path .env -Value "DB_WELL_DATA=$Env:DB_WELL_DATA"
+        Add-Content -Path .env -Value "DB_CLASSIFICATION=$Env:DB_CLASSIFICATION"
+        Add-Content -Path .env -Value "DB_NAME_GNKT=$Env:DB_NAME_GNKT"
+        Add-Content -Path .env -Value "DB_USER=$Env:DB_USER"
+        Add-Content -Path .env -Value "DB_PASSWORD=$Env:DB_PASSWORD"
+        Add-Content -Path .env -Value "DB_NAME_USER=$Env:DB_NAME_USER"
+        Add-Content -Path .env -Value "DB_HOST=$Env:DB_HOST"
+        Add-Content -Path .env -Value "DB_PORT=$Env:DB_PORT"
     
     
 
