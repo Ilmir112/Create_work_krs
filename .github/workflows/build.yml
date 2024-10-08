@@ -20,7 +20,7 @@ jobs:
 
       - name: Create .env file
         env:
-          My_APP_ID: ${{ vars.APP-ID }}
+
           DB_WELL_DATA: ${{ secrets.DB_WELL_DATA }}
           DB_CLASSIFICATION: ${{ secrets.DB_CLASSIFICATION }}
           DB_NAME_GNKT: ${{ secrets.DB_NAME_GNKT }}
@@ -28,11 +28,13 @@ jobs:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           DB_HOST: ${{ secrets.DB_HOST }}
           DB_PORT: ${{ secrets.DB_PORT }}
+          My_APP_ID: ${{ vars.APP-ID }}
         run: |
+          echo "My_APP_ID: $My_APP_ID"
+
           
           # Отладка значений переменных среды
-          echo "Secrets is ${{ secrets.DOES_NOT_EXIST }}"
-          echo "Secret value: ${{ secrets.MY_SECRET }}"
+          
           echo "DB_WELL_DATA: ${{ secrets.DB_WELL_DATA }}" >> .env
           echo "DB_CLASSIFICATION: ${{ secrets.DB_CLASSIFICATION }}" >> .env
           echo "DB_NAME_GNKT: ${{ secrets.DB_NAME_GNKT }}" >> .env
@@ -47,7 +49,13 @@ jobs:
           } else {
             Write-Host "Не подгрузилось данные для базы данных"
           }
-
+          
+          if (${secrets.DB_WELL_DATA} -eq 'well_data') {
+            Write-Host "Совпадает"
+          } else {
+            Write-Host "Не подгрузилось данные для базы данных"
+          }
+          
 
 
 #        run: |
