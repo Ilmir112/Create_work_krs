@@ -22,7 +22,7 @@ def connect_to_database(DB_NAME):
     else:
         env_path = '.env'
 
-    load_dotenv(f'{well_data.path_image}.env')  # Получаем путь к .env
+    load_dotenv(env_path)  # Получаем путь к .env
 
     DB_USER = os.getenv('DB_USER')
     DB_PASSWORD = os.getenv('DB_PASSWORD')
@@ -31,9 +31,7 @@ def connect_to_database(DB_NAME):
 
         # Если не исполняемый файл, используем текущую директорию
     print(env_path)
-    # Загрузите переменные окружения из файла .env
 
-    print(DB_USER)
 
     try:
 
