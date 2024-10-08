@@ -29,19 +29,22 @@ jobs:
           DB_HOST: ${{ secrets.DB_HOST }}
           DB_PORT: ${{ secrets.DB_PORT }}
         run: |
-          if ([ "DB_USER" == "krs2" ]
-          then
-            echo "Расчет корректен"
+          
           # Отладка значений переменных среды
           echo "Secrets is ${{ secrets.DOES_NOT_EXIST }}"
           echo "Secret value: ${{ secrets.MY_SECRET }}"
           echo "DB_WELL_DATA: ${{ secrets.DB_WELL_DATA }}" >> .env
           echo "DB_CLASSIFICATION: ${{ secrets.DB_CLASSIFICATION }}" >> .env
           echo "DB_NAME_GNKT: ${{ secrets.DB_NAME_GNKT }}" >> .env
-          echo "DB_USER: ${{ secrets.DB_NAME_USER }}" >> .env
+          echo "DB_NAME_USER: ${{ secrets.DB_NAME_USER }}" >> .env
+          echo "DB_USER: ${{ secrets.DB_USER }}" >> .env
           echo "DB_PASSWORD: ${{ secrets.DB_PASSWORD }}" >> .env 
           echo "DB_HOST: ${{ secrets.DB_HOST }}" >> .env
           echo "DB_PORT: ${{ secrets.DB_PORT }}" >> .env
+          
+          if [ "DB_USER" == "postgres" ]
+          then
+            echo "Расчет корректен"
 
 #        run: |
 #            Set-Content -Path .env -Value "DB_WELL_DATA=$($Env:DB_WELL_DATA)"
