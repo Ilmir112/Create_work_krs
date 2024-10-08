@@ -33,11 +33,12 @@ jobs:
     
     
 
-        if (-not [string]::IsNullOrEmpty(${secrets.DB_USER}) -{
+        if (-not [string]::IsNullOrEmpty($secrets.DB_USER)) {
             Write-Host "Совпадает"
-          } else {
+            }
+        else {
             Write-Host "Не подгрузилось данные для базы данных"
-          }
+        }
           
         
 
