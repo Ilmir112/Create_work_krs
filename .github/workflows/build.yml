@@ -20,31 +20,46 @@ jobs:
         pip install pyinstaller pywin32
         pip install -r requirements.txt
     - name: Check database secrets
+      env:
+        DB_USER: ${{ secrets.DB_USER }}
+        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        DB_HOST: ${{ secrets.DB_HOST }}
+        DB_NAME: ${{ secrets.DB_NAME }}
+        DB_WELL_DATA: ${{ secrets.DB_WELL_DATA }}
+        DB_NAME_USER: ${{ secrets.DB_NAME_USER }}
+        DB_NAME_GNKT: ${{ secrets.DB_NAME_GNKT }}
+        DB_CLASSIFICATION: ${{ secrets.DB_CLASSIFICATION }}
+
       run: |
         if ($env:DB_USER -ne "") {
           Write-Host "Данные для базы данных загружены"
         } else {
           Write-Host "Не подгрузились данные для базы данных"
         }
-    - name: Create .env file
-      run: |
-        echo "DB_WELL_DATA=${{ secrets.DB_WELL_DATA }}" > .env
-        echo "DB_CLASSIFICATION=${{ secrets.DB_CLASSIFICATION }}" >> .env
-        echo "DB_NAME_GNKT=${{ secrets.DB_NAME_GNKT }}" >> .env
-        echo "DB_USER=${{ secrets.DB_NAME_USER }}" >> .env
-        echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
-        echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env
-        echo "DB_PORT=${{ secrets.DB_PORT }}" >> .env
-        echo "My_APP_ID=${{ vars.APP-ID }}" >> .env
+        if ($env:DB_PASSWORD -ne "") {
+          Write-Host "Данные для базы данных загружены"
+        } else {
+          Write-Host "Не подгрузились данные для базы данных"
+        }
+#    - name: Create .env file
+#      run: |
+#        echo "DB_WELL_DATA=${{ secrets.DB_WELL_DATA }}" > .env
+#        echo "DB_CLASSIFICATION=${{ secrets.DB_CLASSIFICATION }}" >> .env
+#        echo "DB_NAME_GNKT=${{ secrets.DB_NAME_GNKT }}" >> .env
+#        echo "DB_USER=${{ secrets.DB_NAME_USER }}" >> .env
+#        echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+#        echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env
+#        echo "DB_PORT=${{ secrets.DB_PORT }}" >> .env
+#        echo "My_APP_ID=${{ vars.APP-ID }}" >> .env
     
     
 
-        if (-not [string]::IsNullOrEmpty($secrets.DB_USER)) {
-            Write-Host "Совпадает"
-            }
-        else {
-            Write-Host "Не подгрузилось данные для базы данных"
-        }
+#        if (-not [string]::IsNullOrEmpty($secrets.DB_USER)) {
+#            Write-Host "Совпадает"
+#            }
+#        else {
+#            Write-Host "Не подгрузилось данные для базы данных"
+#        }
           
         
 
