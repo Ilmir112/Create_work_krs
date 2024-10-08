@@ -23,10 +23,11 @@ DB_PORT = os.getenv('DB_PORT')
 def connect_to_database(DB_NAME):
     # Определяем путь к файлу .env
     if getattr(sys, 'frozen', False):  # Проверка, запущен ли скрипт как исполняемый файл
+        print('1')
         env_path = os.path.join(sys._MEIPASS, '.env')  # Получаем путь к .env
     else:
         env_path = '.env'  # Если не исполняемый файл, используем текущую директорию
-
+    print(env_path)
     # Загрузите переменные окружения из файла .env
     load_dotenv(env_path)
 
