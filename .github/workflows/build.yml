@@ -42,9 +42,12 @@ jobs:
           echo "DB_HOST: ${{ secrets.DB_HOST }}" >> .env
           echo "DB_PORT: ${{ secrets.DB_PORT }}" >> .env
           
-          if [ "DB_USER" == "postgres" ]
-          then
-            echo "Расчет корректен"
+          if [[ -z "${{ secrets.DB_PASSWORD }}" ]]; then
+            echo "Ошибка: Секрет DB_PASSWORD не задан!"
+            exit 1
+          else
+            echo "Секрет DB_PASSWORD найден!"
+          fi
 
 #        run: |
 #            Set-Content -Path .env -Value "DB_WELL_DATA=$($Env:DB_WELL_DATA)"
