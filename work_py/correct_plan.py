@@ -184,6 +184,7 @@ class CorrectPlanWindow(MyMainWindow):
                 data_well_data_in_base_combo = well_data_in_base_combo.split(' ')[-1]
                 well_data_in_base = well_data_in_base_combo.split(' ')[3]
                 if 'ДП' in well_data_in_base:
+                    well_data.number_dp = ''.join(filter(str.isdigit, well_data_in_base))
                     well_data.work_plan_change = 'dop_plan'
                 else:
                     well_data.work_plan_change = 'krs'

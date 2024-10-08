@@ -1342,7 +1342,11 @@ class MyWindow(MyMainWindow):
             elif self.work_plan == 'krs':
                 string_work = 'ПР'
             elif self.work_plan == 'plan_change':
-                string_work = 'ПР изм'
+                if well_data.work_plan_change == 'krs':
+                    string_work = 'ПР изм'
+                else:
+                    string_work = f'ДП№{well_data.number_dp} изм '
+
             elif self.work_plan == 'gnkt_bopz':
                 string_work = 'ГНКТ БОПЗ ВНС'
             elif self.work_plan == 'gnkt_opz':
