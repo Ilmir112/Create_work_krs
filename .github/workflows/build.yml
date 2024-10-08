@@ -30,23 +30,26 @@ jobs:
         echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env
         echo "DB_PORT=${{ secrets.DB_PORT }}" >> .env
         echo "My_APP_ID=${{ vars.APP-ID }}" >> .env
+    
+    
 
-    - name: Check secret
-      run: |
-        if (-not [string]::IsNullOrEmpty('${{ secrets.DB_WELL_DATA }}')) {
-            Write-Host "Secret loaded successfully."
-        } else {
-            Write-Host "Failed to load secret."
-        }
-      
-
-        if (${secrets.DB_USER} -eq 'postgres') {
+        if (${secrets.DB_USER} -eq None) {
             Write-Host "Совпадает"
           } else {
             Write-Host "Не подгрузилось данные для базы данных"
           }
           
-        if (${secrets.DB_WELL_DATA} -eq 'well_data') {
+        if (${secrets.DB_WELL_DATA} -eq 'None') {
+            Write-Host "Совпадает"
+          } else {
+            Write-Host "Не подгрузилось данные для базы данных"
+          }
+        if (${secrets.DB_WELL_DATA} -eq 'Null') {
+            Write-Host "Совпадает"
+          } else {
+            Write-Host "Не подгрузилось данные для базы данных"
+          }
+                if (${secrets.DB_WELL_DATA} -eq Null) {
             Write-Host "Совпадает"
           } else {
             Write-Host "Не подгрузилось данные для базы данных"
