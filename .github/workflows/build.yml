@@ -39,7 +39,8 @@ jobs:
         } else {
           Write-Host "Не подгрузились данные для базы данных"
         }
-
+    - name: Test printing your secret (Remove this step in production)
+      run: cat $HOME/secrets/my_secret.json
     - name: Create .env file
       run: |
         # Создание .env файла
