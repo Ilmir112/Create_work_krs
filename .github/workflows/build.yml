@@ -1,102 +1,85 @@
-
 # -*- coding: utf-8 -*-
 name: Build PyInstaller
-on:  ['push', 'pull_request']
+on: [push, pull_request]
+
 jobs:
   build:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.8.8'
+    - uses: actions/checkout@v4
 
-      - name: Create virtual enviroment
-        run: python -m venv env
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.8.8'
 
-      - name: Activate virtual enviroment
-        run: env\Scripts\activate.bat
+    - name: Create virtual environment and install dependencies
+      run: |
+        python -m venv env
+        env\Scripts\activate.bat
+        pip install pyinstaller pywin32
+        pip install -r requirements.txt
 
-      - name: Install PyInstaller
-        run: pip install pyinstaller pywin32
+    - name: Create .env file
+      run: |
+        echo "DB_WELL_DATA=${{ secrets.DB_WELL_DATA }}" > .env
+        echo "DB_CLASSIFICATION=${{ secrets.DB_CLASSIFICATION }}" >> .env
+        echo "DB_NAME_GNKT=${{ secrets.DB_NAME_GNKT }}" >> .env
+        echo "DB_USER=${{ secrets.DB_NAME_USER }}" >> .env
+        echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+        echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env
+        echo "DB_PORT=${{ secrets.DB_PORT }}" >> .env
+        echo "My_APP_ID=${{ vars.APP-ID }}" >> .env
 
-      - name: Create .env file
-        env:
-          DB_WELL_DATA: ${{ secrets.DB_WELL_DATA }}
-          DB_CLASSIFICATION: ${{ secrets.DB_CLASSIFICATION }}
-          DB_NAME_GNKT: ${{ secrets.DB_NAME_GNKT }}
-          DB_NAME_USER: ${{ secrets.DB_NAME_USER }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          DB_HOST: ${{ secrets.DB_HOST }}
-          DB_PORT: ${{ secrets.DB_PORT }}
-          My_APP_ID: ${{ vars.APP-ID }}
+        if [[ "${{ secrets.DB_USER }}" == "postgres" ]]; then
+          echo "Approved"
+        else
+          echo "User data for the database did not load"
+        fi
 
-        run: |
-          echo "My_APP_ID: $My_APP_ID"
-          
-          Set-Content -Path .env -Value "DB_WELL_DATA=$($Env:DB_WELL_DATA)"
-          Add-Content -Path .env -Value "DB_CLASSIFICATION=$($Env:DB_CLASSIFICATION)"
-          Add-Content -Path .env -Value "DB_NAME_GNKT=$($Env:DB_NAME_GNKT)"
-          Add-Content -Path .env -Value "DB_USER=$($Env:DB_NAME_USER)"
-          Add-Content -Path .env -Value "DB_PASSWORD=$($Env:DB_PASSWORD)"
-          Add-Content -Path .env -Value "DB_HOST=$($Env:DB_HOST)"
-          Add-Content -Path .env -Value "DB_PORT=$($Env:DB_PORT)"
+        if [[ "${{ secrets.DB_WELL_DATA }}" == "well_data" ]]; then
+          echo "Approved"
+        else
+          echo "Well data for the database did not load"
+        fi
 
-          
-          if (${secrets.DB_USER} -eq 'postgres') {
-            Write-Host "Совпадает"
-          } else {
-            Write-Host "Не подгрузилось данные для базы данных"
-          }
-          
-          if (${secrets.DB_WELL_DATA} -eq 'well_data') {
-            Write-Host "Совпадает"
-          } else {
-            Write-Host "Не подгрузилось данные для базы данных"
-          }
-          
+    - name: Build executable
+      run: |
+        env\Scripts\activate.bat
+        pyinstaller --noconfirm --onedir --icon=imageFiles/icon/zima_ico.ico --console --name "ZIMA" `
+          --add-data "work_py;work_py/" `
+          --add-data "users;users/" `
+          --add-data "tests;tests/" `
+          --add-data "log_files;log_files/" `
+          --add-data "property_excel;property_excel/" `
+          --add-data "imageFiles;imageFiles/" `
+          --add-data "gnkt_data;gnkt_data/" `
+          --add-data "data_base;data_base/" `
+          --add-data "podpisant.json;." `
+          --add-data "work_json.py;." `
+          --add-data "well_data.py;." `
+          --add-data "requirements.txt;." `
+          --add-data "plan.py;." `
+          --add-data "perforation_correct_gnkt_frez.py;." `
+          --add-data "perforation_correct.py;." `
+          --add-data "open_pz.py;." `
+          --add-data "krs.py;." `
+          --add-data "H2S.py;." `
+          --add-data "gnkt_opz.py;." `
+          --add-data "gnkt_after_grp.py;." `
+          --add-data "find.py;." `
+          --add-data "data_correct_position_people.py;." `
+          --add-data "data_correct.py;." `
+          --add-data "cdng.py;." `
+          --add-data "category_correct.py;." `
+          --add-data "build_script.py;." `
+          --add-data "block_name.py;." `
+          --add-data "application_pvr.py;." `
+          --add-data "application_gis.py;." `
+          main.py
 
-
-
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-      - name: Build executablb
-        run:
-          pyinstaller --noconfirm --onedir --icon=imageFiles/icon/zima_ico.ico --console --name "ZIMA" `
-            --add-data "work_py;work_py/" `
-            --add-data "users;users/" `
-            --add-data "tests;tests/" `
-            --add-data "log_files;log_files/" `
-            --add-data "property_excel;property_excel/" `
-            --add-data "imageFiles;imageFiles/" `
-            --add-data "gnkt_data;gnkt_data/" `
-            --add-data "data_base;data_base/" `
-            --add-data "podpisant.json;." `
-            --add-data "work_json.py;." `
-            --add-data "well_data.py;." `
-            --add-data "requirements.txt;." `
-            --add-data "plan.py;." `
-            --add-data "perforation_correct_gnkt_frez.py;." `
-            --add-data "perforation_correct.py;." `
-            --add-data "open_pz.py;." `
-            --add-data "krs.py;." `
-            --add-data "H2S.py;." `
-            --add-data "gnkt_opz.py;." `
-            --add-data "gnkt_after_grp.py;." `
-            --add-data "find.py;." `
-            --add-data "data_correct_position_people.py;." `
-            --add-data "data_correct.py;." `
-            --add-data "cdng.py;." `
-            --add-data "category_correct.py;." `
-            --add-data "build_script.py;." `
-            --add-data "block_name.py;." `
-            --add-data "application_pvr.py;." `
-            --add-data "application_gis.py;." `
-            main.py
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ZIMA
-          path: dist/*
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ZIMA
+        path: dist/*
