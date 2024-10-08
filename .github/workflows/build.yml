@@ -42,11 +42,12 @@ jobs:
           echo "DB_HOST: ${{ secrets.DB_HOST }}" >> .env
           echo "DB_PORT: ${{ secrets.DB_PORT }}" >> .env
           
-          if ($null -eq ${{ secrets.DB_HOST }}") {
-            Write-Host "Строка пустая."
+          if (${secrets.DB_HOST} -eq 5432) {
+            Write-Host "Совпадает"
           } else {
-            Write-Host "Строка не пустая."
+            Write-Host "Не совпадает"
           }
+
 
 
 #        run: |
