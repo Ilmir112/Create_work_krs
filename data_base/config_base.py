@@ -20,6 +20,10 @@ DB_PORT = os.getenv('DB_PORT')
 # Функция подключения к базе данных
 def connect_to_database(DB_NAME):
     try:
+        load_dotenv()
+        DB_PASSWORD = os.getenv('DB_PASSWORD')
+        DB_HOST = os.getenv('DB_HOST')
+        DB_PORT = os.getenv('DB_PORT')
         print(f'Port {DB_PORT, DB_HOST, DB_WELL_DATA, DB_CLASSIFICATION}')
         connection = psycopg2.connect(
             dbname=DB_NAME,
