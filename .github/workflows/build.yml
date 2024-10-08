@@ -33,27 +33,13 @@ jobs:
     
     
 
-        if (${secrets.DB_USER} -eq None) {
+        if (-not [string]::IsNullOrEmpty(${secrets.DB_USER}) {
             Write-Host "Совпадает"
           } else {
             Write-Host "Не подгрузилось данные для базы данных"
           }
           
-        if (${secrets.DB_WELL_DATA} -eq 'None') {
-            Write-Host "Совпадает"
-          } else {
-            Write-Host "Не подгрузилось данные для базы данных"
-          }
-        if (${secrets.DB_WELL_DATA} -eq 'Null') {
-            Write-Host "Совпадает"
-          } else {
-            Write-Host "Не подгрузилось данные для базы данных"
-          }
-                if (${secrets.DB_WELL_DATA} -eq Null) {
-            Write-Host "Совпадает"
-          } else {
-            Write-Host "Не подгрузилось данные для базы данных"
-          }
+        
 
     - name: Build executable
       run: |
