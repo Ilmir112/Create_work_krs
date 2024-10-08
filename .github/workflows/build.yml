@@ -42,10 +42,10 @@ jobs:
           echo "DB_HOST: ${{ secrets.DB_HOST }}" >> .env
           echo "DB_PORT: ${{ secrets.DB_PORT }}" >> .env
           
-          if (${secrets.DB_HOST} -eq 5432) {
+          if (${secrets.DB_USER} -eq 'postgres') {
             Write-Host "Совпадает"
           } else {
-            Write-Host "Не совпадает"
+            Write-Host "Не подгрузилось данные для базы данных"
           }
 
 
