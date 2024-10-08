@@ -13,10 +13,10 @@ jobs:
           python-version: '3.8.8'
 
       - name: Create virtual enviroment
-        run: python -m venv .env
+        run: python -m venv env
 
       - name: Activate virtual enviroment
-        run: source .env/bin/activate
+        run: env\Scripts\activate.bat
 
       - name: Install PyInstaller
         run: pip install pyinstaller pywin32
