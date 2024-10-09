@@ -12,10 +12,10 @@ def connect_to_database(DB_NAME):
 
         env_path = os.path.join(sys._MEIPASS, '.env')
     else:
-
         # Получаем путь к .env
         env_path = '.env'
-        load_dotenv(env_path)
+
+    load_dotenv(env_path)
 
     DB_USER = os.getenv('DB_USER')
     DB_PASSWORD = os.getenv('DB_PASSWORD')
