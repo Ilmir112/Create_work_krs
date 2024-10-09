@@ -167,7 +167,7 @@ class FindIndexPZ(MyMainWindow):
             well_data.check_data_in_pz.append('Не указан Вид и категория ремонта, его шифр\n')
 
     def check_str_None(self, string):
-        from main import MyMainWindow
+
         try:
             if MyWindow.check_str_isdigit(self, str(string)) is True:
                 if str(round(float(str(string).replace(',', '.')), 1))[-1] == "0":
@@ -383,7 +383,12 @@ class WellFond_data(FindIndexPZ):
 
                     elif value == 'Насос' and row[col + 2].value == 'типоразмер':
                         if row[col_do].value:
-                            if ('НВ' in str(row[col_do].value).upper() or 'ШГН' in str(row[col_do].value).upper() \
+                            if ('ЭЦН' in str(row[col_do].value).upper() or 'ВНН' in str(row[col_do].value).upper()):
+                                well_data.dict_pump_ECN["do"] = row[col_do].value
+                                if '/' in str(row[col_do].value):
+                                    well_data.dict_pump_ECN["do"] = [ecn for ecn in row[col_do].value.split('/')
+                                                                     if 'ЭЦН' in ecn or 'ВНН' in ecn][0]
+                            elif ('НВ' in str(row[col_do].value).upper() or 'ШГН' in str(row[col_do].value).upper() \
                                 or 'НН' in str(row[col_do].value).upper()) or 'RH' in str(row[col_do].value).upper():
                                 well_data.dict_pump_SHGN["do"] = row[col_do].value
                                 if '/' in str(row[col_do].value):
@@ -391,14 +396,16 @@ class WellFond_data(FindIndexPZ):
                                                                       if 'НВ' in ecn or 'НН' in ecn or
                                                                       'ШГН' in ecn or 'RH' in ecn][0]
 
-                            if ('ЭЦН' in str(row[col_do].value).upper() or 'ВНН' in str(row[col_do].value).upper()):
-                                well_data.dict_pump_ECN["do"] = row[col_do].value
-                                if '/' in str(row[col_do].value):
-                                    well_data.dict_pump_ECN["do"] = [ecn for ecn in row[col_do].value.split('/')
-                                                                     if 'ЭЦН' in ecn or 'ВНН' in ecn][0]
                                 # print(well_data.dict_pump_ECN["do"])
                         if row[col_plan].value:
-                            if ('НВ' in str(row[col_plan].value).upper() or 'ШГН' in str(
+                            if ('ЭЦН' in str(row[col_plan].value).upper() or 'ВНН' in str(
+                                    row[col_plan].value).upper()):
+                                well_data.dict_pump_ECN["posle"] = row[col_plan].value
+                                if '/' in str(row[col_plan].value):
+                                    well_data.dict_pump_ECN["posle"] = [ecn for ecn in row[col_plan].value.split('/')
+                                                                        if 'ЭЦН' in ecn or 'ВНН' in ecn][0]
+
+                            elif ('НВ' in str(row[col_plan].value).upper() or 'ШГН' in str(
                                     row[col_plan].value).upper() \
                                 or 'НН' in str(row[col_plan].value).upper()) \
                                     or 'RHAM' in str(row[col_plan].value).upper():
@@ -408,12 +415,7 @@ class WellFond_data(FindIndexPZ):
                                                                          if 'НВ' in ecn or 'НН' in ecn or
                                                                          'ШГН' in ecn or 'RHAM' in ecn][0]
 
-                            if ('ЭЦН' in str(row[col_plan].value).upper() or 'ВНН' in str(
-                                    row[col_plan].value).upper()):
-                                well_data.dict_pump_ECN["posle"] = row[col_plan].value
-                                if '/' in str(row[col_plan].value):
-                                    well_data.dict_pump_ECN["posle"] = [ecn for ecn in row[col_plan].value.split('/')
-                                                                        if 'ЭЦН' in ecn or 'ВНН' in ecn][0]
+
 
                         if well_data.dict_pump_ECN["do"] != 0:
                             well_data.dict_pump_ECN_h["do"] = FindIndexPZ.check_str_None(self,
@@ -1337,13 +1339,9 @@ class Well_perforation(FindIndexPZ):
                         well_data.dict_perforation_project.setdefault(
                             plast, {}).setdefault('вертикаль', []).append(round(float(str(
                             row[col_vert_index]).replace(',', '.')), 1))
-                        try:
-                            if (roof_int, sole_int) in well_data.dict_perforation_project[plast]['интервал']:
-                                break
-                        except:
-                            pass
-                        well_data.dict_perforation_project.setdefault(
-                            plast, {}).setdefault('интервал', []).append((roof_int, sole_int))
+                        if (roof_int, sole_int) not in well_data.dict_perforation_project[plast]['интервал']:
+                            well_data.dict_perforation_project.setdefault(
+                                plast, {}).setdefault('интервал', []).append((roof_int, sole_int))
 
                     if row[col_pressuar_index] != None:
                         well_data.dict_perforation_project.setdefault(plast, {}).setdefault('давление', []).append(

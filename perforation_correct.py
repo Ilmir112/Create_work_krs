@@ -240,8 +240,7 @@ class PerforationCorrect(MyMainWindow):
 
                     self.dict_perforation_project.setdefault(
                             plast, {}).setdefault('интервал', []).append([float(roof), float(sole)])
-                    well_data.dict_perforation_project[plast]['интервал'] = self.dict_perforation_project[plast][
-                        'интервал']
+
 
 
 
