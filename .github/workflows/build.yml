@@ -28,23 +28,7 @@ jobs:
 
     - name: Check database secrets
       run: |
-        $secrets = @(
-          @{Name='DB_USER'; Value=$Env:DB_USER},
-          @{Name='DB_PASSWORD'; Value=$Env:DB_PASSWORD},
-          @{Name='DB_HOST'; Value=$Env:DB_HOST},
-          @{Name='DB_WELL_DATA'; Value=$Env:DB_WELL_DATA},
-          @{Name='DB_NAME_USER'; Value=$Env:DB_NAME_USER},
-          @{Name='DB_NAME_GNKT'; Value=$Env:DB_NAME_GNKT},
-          @{Name='DB_CLASSIFICATION'; Value=$Env:DB_CLASSIFICATION},
-          @{Name='DB_PORT'; Value=$Env:DB_PORT}
-        )       
-
-        foreach ($secret in $secrets) {
-          if ([string]::IsNullOrEmpty($secret.Value)) {
-            Write-Host "Не подгрузилось данные для базы данных: $($secret.Name)"
-          } else {
-            Write-Host "Данные для базы данных загружены: $($secret.Name)"
-          }
+        
         
         if (Test-Path ".env") {
           Get-Content ".env" | Out-Host
