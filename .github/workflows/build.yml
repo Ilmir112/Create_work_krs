@@ -2,6 +2,15 @@
 name: Build PyInstaller
 on: [push, pull_request]
 
+env:
+  DB_USER: ${{ secrets.DB_USER }}
+  DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+  DB_HOST: ${{ secrets.DB_HOST }}
+  DB_WELL_DATA: ${{ secrets.DB_WELL_DATA }}
+  DB_NAME_USER: ${{ secrets.DB_NAME_USER }}
+  DB_NAME_GNKT: ${{ secrets.DB_NAME_GNKT }}
+  DB_CLASSIFICATION: ${{ secrets.DB_CLASSIFICATION }}
+
 jobs:
   build:
     runs-on: windows-latest
@@ -18,16 +27,9 @@ jobs:
         pip install pyinstaller 
         pip install -r requirements.txt
     - name: Check database secrets
-      env:
-        DB_USER: ${{ secrets.DB_USER }}
-        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-        DB_HOST: ${{ secrets.DB_HOST }}
-        DB_WELL_DATA: ${{ secrets.DB_WELL_DATA }}
-        DB_NAME_USER: ${{ secrets.DB_NAME_USER }}
-        DB_NAME_GNKT: ${{ secrets.DB_NAME_GNKT }}
-        DB_CLASSIFICATION: ${{ secrets.DB_CLASSIFICATION }}
+
       run: |
-        echo 
+       
         $secrets = @(
           @{Name='DB_USER'; Value=$Env:DB_USER},
           @{Name='DB_PASSWORD'; Value=$Env:DB_PASSWORD},
