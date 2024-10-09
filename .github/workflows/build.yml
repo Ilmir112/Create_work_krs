@@ -69,11 +69,7 @@ jobs:
         $folderPath = Split-Path -Path $envFilePath
         Write-Host "Путь к папке: $folderPath"
         
-        if (empty($folderPath)) {
-            echo "Переменная пустая";
-        } else {
-            echo $folderPath;
-        }
+        
         
         Write-Host "Путь к папке:  $envFilePath"
                 
