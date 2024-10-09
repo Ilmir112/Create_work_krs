@@ -69,13 +69,7 @@ jobs:
         $folderPath = Split-Path -Path $envFilePath
         Write-Host "Путь к папке: $folderPath"
         
-        # Выводим список файлов в папке
-        $files = Get-ChildItem -Path $folderPath
-        Write-Host "Содержимое папки:"
-        foreach ($file in $files) {
-            Write-Host $file.Name
-        }
-
+        
         
         Write-Host "Путь к папке:  $envFilePath"
                 
@@ -132,7 +126,7 @@ jobs:
           --add-data "build_script.py;." `
           --add-data "block_name.py;." `
           --add-data "application_pvr.py;." `
-          --add-data "application_gis.py;." `          
+          --add-data "application_gis.py;." `
           main.py
 
     - name: Upload artifact
