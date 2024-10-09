@@ -140,6 +140,7 @@ class PerforationWindow(MyMainWindow):
         rows = self.tableWidget.rowCount()
 
         if len(well_data.dict_perforation_project) != 0:
+            aa = well_data.dict_perforation_project
             for plast, data in well_data.dict_perforation_project.items():
                 a = data['интервал']
                 for i in data['интервал']:

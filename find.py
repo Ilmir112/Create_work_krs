@@ -1353,7 +1353,7 @@ class Well_perforation(FindIndexPZ):
 
             if len(well_data.dict_perforation_project) != 0:
                 well_data.plast_project = list(well_data.dict_perforation_project.keys())
-
+            aaaag = well_data.dict_perforation_project
             # объединение интервалов перфорации если они пересекаются
             for plast, value in well_data.dict_perforation.items():
                 intervals = value['интервал']
