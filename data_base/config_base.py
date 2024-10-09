@@ -8,8 +8,7 @@ import psycopg2
 # Функция подключения к базе данных
 def connect_to_database(DB_NAME):
     # Определяем путь к файлу .env
-    if getattr(sys, 'frozen', False):  # Проверка, запущен ли скрипт как исполняемый файл
-
+    if getattr(sys, 'frozen', False): # Проверка, запущен ли скрипт как исполняемый файл
         env_path = os.path.join(sys._MEIPASS, '.env')
     else:
         # Получаем путь к .env
@@ -23,16 +22,9 @@ def connect_to_database(DB_NAME):
     DB_PORT = os.getenv('DB_PORT')
 
     if DB_USER:
-        print(f"The value of MY_SECRET is: {DB_USER}")
+        print(f"The value of MY_SECRET is: {env_path, DB_USER}")
     else:
         print("MY_SECRET is not set.")
-
-    env_vars = os.environ
-
-    # Печатаем имена и значения переменных окружения
-    for key, value in env_vars.items():
-        print(f'{key}: {value}')
-
 
     try:
 

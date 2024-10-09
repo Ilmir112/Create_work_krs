@@ -49,7 +49,7 @@ jobs:
       run: |
         # Путь к файлу .env
         $envFilePath = ".env"
-        
+
         # Проверка наличия файла .env
         if (-Not (Test-Path $envFilePath)) {
             # Если файла нет, создаем его и добавляем содержимое
@@ -65,13 +65,11 @@ jobs:
             Write-Host ".env file already exists."
         }
         
-        # Выводим путь к папке, в которой находится файл .env
-        $folderPath = Split-Path -Path $envFilePath
-        Write-Host "Путь к папке: $folderPath"
-        
-        
-        
-        Write-Host "Путь к папке:  $envFilePath"
+        if (Test-Path ".env") {
+          Get-Content ".env" | Out-Host
+        } else {
+          Write-Host ".env file does not exist."
+        }
                 
     - name: Create virtual environment and install dependencies
       run: |
@@ -84,15 +82,6 @@ jobs:
     - name: Print secret value
       run: |
         echo "My secret value is: ${{ secrets.DB_USER }}"
-
-#        if (-not [string]::IsNullOrEmpty($secrets.DB_USER)) {
-#            Write-Host "Совпадает"
-#            }
-#        else {
-#            Write-Host "Не подгрузилось данные для базы данных"
-#        }
-          
-        
 
     - name: Build executable
       run: |
@@ -127,6 +116,7 @@ jobs:
           --add-data "block_name.py;." `
           --add-data "application_pvr.py;." `
           --add-data "application_gis.py;." `
+          --add-data ".env;." `
           main.py
 
     - name: Upload artifact
@@ -134,3 +124,4 @@ jobs:
       with:
         name: ZIMA
         path: dist/*
+
