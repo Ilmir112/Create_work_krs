@@ -2,9 +2,6 @@
 name: Build PyInstaller
 on: [push, pull_request]
 
-
-
-
 jobs:
   build:
     runs-on: windows-latest
@@ -30,9 +27,7 @@ jobs:
         file_name: .env
 
     - name: Check database secrets
-
       run: |
-       
         $secrets = @(
           @{Name='DB_USER'; Value=$Env:DB_USER},
           @{Name='DB_PASSWORD'; Value=$Env:DB_PASSWORD},
@@ -40,7 +35,7 @@ jobs:
           @{Name='DB_WELL_DATA'; Value=$Env:DB_WELL_DATA},
           @{Name='DB_NAME_USER'; Value=$Env:DB_NAME_USER},
           @{Name='DB_NAME_GNKT'; Value=$Env:DB_NAME_GNKT},
-          @{Name='DB_CLASSIFICATION'; Value=$Env:DB_CLASSIFICATION}
+          @{Name='DB_CLASSIFICATION'; Value=$Env:DB_CLASSIFICATION},
           @{Name='DB_PORT'; Value=$Env:DB_PORT}
         )       
 
@@ -57,31 +52,27 @@ jobs:
         # Путь к файлу .env
         $envFilePath = ".env"
 
-        Set-Content -Path $envFilePath -Value "DB_WELL_DATA=$($Env:DB_WELL_DATA)"
-        Add-Content -Path $envFilePath -Value "DB_CLASSIFICATION=$($Env:DB_CLASSIFICATION)"
-        Add-Content -Path $envFilePath -Value "DB_NAME_GNKT=$($Env:DB_NAME_GNKT)"
-        Add-Content -Path $envFilePath -Value "DB_USER=$($Env:DB_NAME_USER)"
-        Add-Content -Path $envFilePath -Value "DB_PASSWORD=$($Env:DB_PASSWORD)"
-        Add-Content -Path $envFilePath -Value "DB_HOST=$($Env:DB_HOST)"
-        Add-Content -Path $envFilePath -Value "DB_PORT=$($Env:DB_PORT)"
-        
-        
+#        Set-Content -Path $envFilePath -Value "DB_WELL_DATA=$($Env:DB_WELL_DATA)"
+#        Add-Content -Path $envFilePath -Value "DB_CLASSIFICATION=$($Env:DB_CLASSIFICATION)"
+#        Add-Content -Path $envFilePath -Value "DB_NAME_GNKT=$($Env:DB_NAME_GNKT)"
+#        Add-Content -Path $envFilePath -Value "DB_USER=$($Env:DB_USER)"
+#        Add-Content -Path $envFilePath -Value "DB_PASSWORD=$($Env:DB_PASSWORD)"
+#        Add-Content -Path $envFilePath -Value "DB_HOST=$($Env:DB_HOST)"
+#        Add-Content -Path $envFilePath -Value "DB_PORT=$($Env:DB_PORT)"
+#
         if (Test-Path ".env") {
           Get-Content ".env" | Out-Host
         } else {
           Write-Host ".env file does not exist."
         }
-                
+
     - name: Create virtual environment and install dependencies
       run: |
         pip install pyinstaller 
         pip install -r requirements.txt
-    
-    
 
     - name: Build executable
       run: |
-
         pyinstaller --noconfirm --onedir --icon=imageFiles/icon/zima_ico.ico --console --name "ZIMA" `
           --add-data "work_py;work_py/" `
           --add-data "users;users/" `
@@ -120,4 +111,3 @@ jobs:
       with:
         name: ZIMA
         path: dist/*
-
