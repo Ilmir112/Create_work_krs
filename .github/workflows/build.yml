@@ -16,6 +16,8 @@ jobs:
     - name: Make envfile
       uses: SpicyPizza/create-envfile@v2.0
       with:
+        envkey_DEBUG: false
+        envkey_SOME_API_KEY: "123456abcdef"
         DB_USER: ${{ secrets.DB_USER }}
         DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         DB_HOST: ${{ secrets.DB_HOST }}
@@ -24,19 +26,50 @@ jobs:
         DB_NAME_GNKT: ${{ secrets.DB_NAME_GNKT }}
         DB_CLASSIFICATION: ${{ secrets.DB_CLASSIFICATION }}
         DB_PORT: ${{ secrets.DB_PORT }}
+        some_other_variable: foobar
         file_name: .env
+        fail_on_empty: false
+        sort_keys: false
 
     - name: Check database secrets
       run: |
-        
-        
-        if (Test-Path ".env") {
-          Get-Content ".env" | Out-Host
-        } else {
-          Write-Host ".env file does not exist."
+        $secrets = @(
+          @{Name='DB_USER'; Value=$Env:DB_USER},
+          @{Name='DB_PASSWORD'; Value=$Env:DB_PASSWORD},
+          @{Name='DB_HOST'; Value=$Env:DB_HOST},
+          @{Name='DB_WELL_DATA'; Value=$Env:DB_WELL_DATA},
+          @{Name='DB_NAME_USER'; Value=$Env:DB_NAME_USER},
+          @{Name='DB_NAME_GNKT'; Value=$Env:DB_NAME_GNKT},
+          @{Name='DB_CLASSIFICATION'; Value=$Env:DB_CLASSIFICATION},
+          @{Name='DB_PORT'; Value=$Env:DB_PORT}
+        )       
+
+        foreach ($secret in $secrets) {
+          if ([string]::IsNullOrEmpty($secret.Value)) {
+            Write-Host "Не подгрузилось данные для базы данных: $($secret.Name)"
+          } else {
+            Write-Host "Данные для базы данных загружены: $($secret.Name)"
+          }
         }
 
-            
+#    - name: Create .env files
+#      run: |
+#        # Путь к файлу .env
+#        $envFilePath = ".env"
+#
+#        Set-Content -Path $envFilePath -Value "DB_WELL_DATA=$($Env:DB_WELL_DATA)"
+#        Add-Content -Path $envFilePath -Value "DB_CLASSIFICATION=$($Env:DB_CLASSIFICATION)"
+#        Add-Content -Path $envFilePath -Value "DB_NAME_GNKT=$($Env:DB_NAME_GNKT)"
+#        Add-Content -Path $envFilePath -Value "DB_USER=$($Env:DB_USER)"
+#        Add-Content -Path $envFilePath -Value "DB_PASSWORD=$($Env:DB_PASSWORD)"
+#        Add-Content -Path $envFilePath -Value "DB_HOST=$($Env:DB_HOST)"
+#        Add-Content -Path $envFilePath -Value "DB_PORT=$($Env:DB_PORT)"
+#
+#        if (Test-Path ".env") {
+#          Get-Content ".env" | Out-Host
+#        } else {
+#          Write-Host ".env file does not exist."
+#        }
 
     - name: Create virtual environment and install dependencies
       run: |
