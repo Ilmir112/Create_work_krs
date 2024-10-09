@@ -50,28 +50,28 @@ jobs:
 
     - name: Create .env files
       run: |
-        # Получаем путь к временной папке
-        $tempPath = [System.IO.Path]::GetTempPath()
-        $envFilePath = Join-Path -Path $tempPath -ChildPath ".env"
-        
-        # Создание .env файла во временной папке
-        Set-Content -Path $envFilePath -Value "DB_WELL_DATA=$($Env:DB_WELL_DATA)"
-        Add-Content -Path $envFilePath -Value "DB_CLASSIFICATION=$($Env:DB_CLASSIFICATION)"
-        Add-Content -Path $envFilePath -Value "DB_NAME_GNKT=$($Env:DB_NAME_GNKT)"
-        Add-Content -Path $envFilePath -Value "DB_USER=$($Env:DB_NAME_USER)"
-        Add-Content -Path $envFilePath -Value "DB_PASSWORD=$($Env:DB_PASSWORD)"
-        Add-Content -Path $envFilePath -Value "DB_HOST=$($Env:DB_HOST)"
-        Add-Content -Path $envFilePath -Value "DB_PORT=$($Env:DB_PORT)"
+        # Путь к файлу .env
+        $envFilePath = ".env"
         
         # Проверка наличия файла .env
-        if (Test-Path -Path $envFilePath) {
-            Write-Host "Файл .env создан по пути: $envFilePath"
+        if (-Not (Test-Path $envFilePath)) {
+            # Если файла нет, создаем его и добавляем содержимое
+            Set-Content -Path $envFilePath -Value "DB_WELL_DATA=$($Env:DB_WELL_DATA)"
+            Add-Content -Path $envFilePath -Value "DB_CLASSIFICATION=$($Env:DB_CLASSIFICATION)"
+            Add-Content -Path $envFilePath -Value "DB_NAME_GNKT=$($Env:DB_NAME_GNKT)"
+            Add-Content -Path $envFilePath -Value "DB_USER=$($Env:DB_NAME_USER)"
+            Add-Content -Path $envFilePath -Value "DB_PASSWORD=$($Env:DB_PASSWORD)"
+            Add-Content -Path $envFilePath -Value "DB_HOST=$($Env:DB_HOST)"
+            Add-Content -Path $envFilePath -Value "DB_PORT=$($Env:DB_PORT)"
+            Write-Host ".env file has been created."
         } else {
-            Write-Host "Файл .env не создан."
+            Write-Host ".env file already exists."
         }
+        $envFilePath = ".env"
+        
 
-#    - name: Show all environment variables
-#      run: printenv
+    - name: Show all environment variables
+      run: printenv
 
     - name: Print secret value
       run: |
