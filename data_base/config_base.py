@@ -11,9 +11,18 @@ DB_PASSWORD = os.getenv('DB_PASSWORD')
 DB_HOST = os.getenv('DB_HOST')
 DB_PORT = os.getenv('DB_PORT')
 
+
+def print_environment_variables():
+    # Получаем все переменные окружения
+    env_vars = os.environ
+
+    # Печатаем имена и значения переменных окружения
+    for key, value in env_vars.items():
+        print(f'{key}: {value}')
+
 # Функция подключения к базе данных
 def connect_to_database(DB_NAME):
-
+    print_environment_variables()
     try:
         connection = psycopg2.connect(
             dbname=DB_NAME,
