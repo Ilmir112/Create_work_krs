@@ -72,12 +72,6 @@ jobs:
         pip install pyinstaller 
         pip install -r requirements.txt
 
-    - name: Show all environment variables
-      run: printenv
-
-    - name: Print secret value
-      run: |
-        echo "My secret value is: ${{ secrets.DB_USER }}"
 
     - name: Build executable
       run: |

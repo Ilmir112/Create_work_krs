@@ -8,13 +8,10 @@ import psycopg2
 # Функция подключения к базе данных
 def connect_to_database(DB_NAME):
     # Определяем путь к файлу .env
-    if getattr(sys, 'frozen', False): # Проверка, запущен ли скрипт как исполняемый файл
-        env_path = os.path.join(sys._MEIPASS, '.env')
-    else:
-        # Получаем путь к .env
-        env_path = '.env'
-
-    load_dotenv(env_path)
+    extDataDir = os.getcwd()
+    if getattr(sys, 'frozen', False):
+        extDataDir = sys._MEIPASS
+    load_dotenv(dotenv_path=os.path.join(extDataDir, '.env'))
 
     DB_USER = os.getenv('DB_USER')
     DB_PASSWORD = os.getenv('DB_PASSWORD')
@@ -22,7 +19,7 @@ def connect_to_database(DB_NAME):
     DB_PORT = os.getenv('DB_PORT')
 
     if DB_USER:
-        print(f"The value of MY_SECRET is: {env_path, DB_USER}")
+        print(f"The value of MY_SECRET is: {extDataDir, DB_USER}")
     else:
         print("MY_SECRET is not set.")
 
