@@ -22,10 +22,7 @@ jobs:
       with:
         python-version: '3.8.8'
 
-    - name: Create virtual environment and install dependencies
-      run: |
-        pip install pyinstaller 
-        pip install -r requirements.txt
+
     - name: Check database secrets
 
       run: |
@@ -71,7 +68,19 @@ jobs:
         # Выводим путь к папке, в которой находится файл .env
         $folderPath = Split-Path -Path $envFilePath
         Write-Host "Путь к папке: $folderPath"
+        
+        if (empty($folderPath)) {
+            echo "Переменная пустая";
+        } else {
+            echo $folderPath;
+        }
+        
+        Write-Host "Путь к папке:  $envFilePath"
                 
+    - name: Create virtual environment and install dependencies
+      run: |
+        pip install pyinstaller 
+        pip install -r requirements.txt
 
     - name: Show all environment variables
       run: printenv
