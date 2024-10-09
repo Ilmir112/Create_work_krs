@@ -52,9 +52,6 @@ jobs:
         # Путь к файлу .env
         $envFilePath = ".env"
 
-#        # Проверка наличия файла .env
-#        if (-Not (Test-Path $envFilePath)) {
-            # Если файла нет, создаем его и добавляем содержимое
         Set-Content -Path $envFilePath -Value "DB_WELL_DATA=$($Env:DB_WELL_DATA)"
         Add-Content -Path $envFilePath -Value "DB_CLASSIFICATION=$($Env:DB_CLASSIFICATION)"
         Add-Content -Path $envFilePath -Value "DB_NAME_GNKT=$($Env:DB_NAME_GNKT)"
@@ -62,10 +59,7 @@ jobs:
         Add-Content -Path $envFilePath -Value "DB_PASSWORD=$($Env:DB_PASSWORD)"
         Add-Content -Path $envFilePath -Value "DB_HOST=$($Env:DB_HOST)"
         Add-Content -Path $envFilePath -Value "DB_PORT=$($Env:DB_PORT)"
-        Write-Host ".env file has been created."
-#        } else {
-#            Write-Host ".env file already exists."
-#        }
+        
         
         if (Test-Path ".env") {
           Get-Content ".env" | Out-Host
