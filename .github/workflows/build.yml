@@ -27,6 +27,7 @@ jobs:
         DB_NAME_GNKT: ${{ secrets.DB_NAME_GNKT }}
         DB_CLASSIFICATION: ${{ secrets.DB_CLASSIFICATION }}
       run: |
+        echo 
         $secrets = @(
           @{Name='DB_USER'; Value=$Env:DB_USER},
           @{Name='DB_PASSWORD'; Value=$Env:DB_PASSWORD},
@@ -49,18 +50,21 @@ jobs:
     - name: Create .env files
       run: |
         # Создание .env файла
-        Set-Content -Path .env -Value "DB_WELL_DATA=$Env:DB_WELL_DATA"
-        Add-Content -Path .env -Value "DB_CLASSIFICATION=$Env:DB_CLASSIFICATION"
-        Add-Content -Path .env -Value "DB_NAME_GNKT=$Env:DB_NAME_GNKT"
-        Add-Content -Path .env -Value "DB_USER=$Env:DB_USER"
-        Add-Content -Path .env -Value "DB_PASSWORD=$Env:DB_PASSWORD"
-        Add-Content -Path .env -Value "DB_NAME_USER=$Env:DB_NAME_USER"
-        Add-Content -Path .env -Value "DB_HOST=$Env:DB_HOST"
-        Add-Content -Path .env -Value "DB_PORT=$Env:DB_PORT"
+        echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+        echo "DB_USER=${{ secrets.DB_USER }}" >> .env
+        echo "DB_PORT=${{ secrets.DB_PORT }}" >> .env
+        echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env
+        echo "DB_WELL_DATA=${{ secrets.DB_WELL_DATA }}" >> .env
+        echo "DB_CLASSIFICATION=${{ secrets.DB_CLASSIFICATION }}" >> .env
+        echo "DB_NAME_GNKT=${{ secrets.DB_NAME_GNKT }}" >> .env
+        
 
     - name: Show all environment variables
       run: printenv
-    
+
+    - name: Print secret value
+      run: |
+        echo "My secret value is: ${{ secrets.DB_USER }}"
 
 #        if (-not [string]::IsNullOrEmpty($secrets.DB_USER)) {
 #            Write-Host "Совпадает"
