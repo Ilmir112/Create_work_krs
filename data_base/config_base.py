@@ -5,9 +5,6 @@ from dotenv import load_dotenv
 import psycopg2
 
 
-
-
-
 # Функция подключения к базе данных
 def connect_to_database(DB_NAME):
     # Определяем путь к файлу .env

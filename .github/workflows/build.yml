@@ -46,7 +46,7 @@ jobs:
           }
         }
 
-    - name: Create .env filea
+    - name: Create .env files
       run: |
         # Создание .env файла
         Set-Content -Path .env -Value "DB_WELL_DATA=$Env:DB_WELL_DATA"
@@ -57,7 +57,9 @@ jobs:
         Add-Content -Path .env -Value "DB_NAME_USER=$Env:DB_NAME_USER"
         Add-Content -Path .env -Value "DB_HOST=$Env:DB_HOST"
         Add-Content -Path .env -Value "DB_PORT=$Env:DB_PORT"
-    
+
+    - name: Show all environment variables
+      run: printenv
     
 
 #        if (-not [string]::IsNullOrEmpty($secrets.DB_USER)) {
