@@ -38,8 +38,7 @@ jobs:
           @{Name='DB_NAME_USER'; Value=$Env:DB_NAME_USER},
           @{Name='DB_NAME_GNKT'; Value=$Env:DB_NAME_GNKT},
           @{Name='DB_CLASSIFICATION'; Value=$Env:DB_CLASSIFICATION}
-        )
-        
+        )       
 
         foreach ($secret in $secrets) {
           if ([string]::IsNullOrEmpty($secret.Value)) {
@@ -48,18 +47,6 @@ jobs:
             Write-Host "Данные для базы данных загружены: $($secret.Name)"
           }
         }
-
-    - name: Create .env files
-      run: |
-        # Создание .env файла
-        echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
-        echo "DB_USER=${{ secrets.DB_USER }}" >> .env
-        echo "DB_PORT=${{ secrets.DB_PORT }}" >> .env
-        echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env
-        echo "DB_WELL_DATA=${{ secrets.DB_WELL_DATA }}" >> .env
-        echo "DB_CLASSIFICATION=${{ secrets.DB_CLASSIFICATION }}" >> .env
-        echo "DB_NAME_GNKT=${{ secrets.DB_NAME_GNKT }}" >> .env
-        
 
     - name: Show all environment variables
       run: printenv
