@@ -18,10 +18,6 @@ def connect_to_database(DB_NAME):
     DB_HOST = os.getenv('DB_HOST')
     DB_PORT = os.getenv('DB_PORT')
 
-    if DB_USER:
-        print(f"The value of MY_SECRET is: {extDataDir, DB_USER}")
-    else:
-        print("MY_SECRET is not set.")
 
     try:
 

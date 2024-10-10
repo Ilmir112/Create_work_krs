@@ -578,15 +578,12 @@ class DopPlanWindow(MyMainWindow):
                     if 'Текущий забой ' == str(row[col]['value']):
                         self.bottom_row_index = int(i)
                         break
-        try:
+        if 0 not in [current_bottom, current_bottom_date_edit, method_bottom_combo]:
 
             data[str(self.bottom_row_index)][3]['value'] = current_bottom
-
             data[str(self.bottom_row_index)][5]['value'] = current_bottom_date_edit
-
             data[str(self.bottom_row_index)][-1]['value'] = method_bottom_combo
-        except:
-            pass
+
         return data, rowHeights, colWidth, boundaries_dict
 
     def insert_row_in_pvr(self, data, rowHeights, colWidth, boundaries_dict, plast_list, current_bottom,

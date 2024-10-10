@@ -153,8 +153,8 @@ class Emergency_lar(MyMainWindow):
             return
         nkt_key = self.tabWidget.currentWidget().nkt_select_combo.currentText()
         lar_type_combo = self.tabWidget.currentWidget().lar_type_combo.currentText()
-        emergency_bottom_line = self.tabWidget.currentWidget().emergency_bottom_line.text().replace(',', '')
-        bottom_line = self.tabWidget.currentWidget().bottom_line.text().replace(',', '')
+        emergency_bottom_line = self.tabWidget.currentWidget().emergency_bottom_line.text().replace(',', '.')
+        bottom_line = self.tabWidget.currentWidget().bottom_line.text().replace(',', '.')
         if lar_type_combo in ['метчик', 'колокол', 'МЭС', 'МБУ'] and nkt_str_combo == 'НКТ':
             QMessageBox.warning(self, 'Недопустимая операция', 'Нельзя спускать не извлекаемые ловитель на НКТ')
             return

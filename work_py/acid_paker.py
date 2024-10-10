@@ -1659,7 +1659,8 @@ class AcidPakerWindow(MyMainWindow):
                        f'замешать {round(acid_volume_edit * acid_proc_edit / 24 * 1.118, 1)}т HCL 24% и' \
                        f' пресной воды ' \
                        f'{round(float(acid_volume_edit) - float(acid_volume_edit) * float(acid_proc_edit) / 24 * 1.118, 1)}м3) ' \
-                       f'Согласовать с Заказчиком проведение кислотной обработки силами ООО Крезол. '
+                       f'Согласовать с Заказчиком проведение кислотной обработки силами ООО Крезол по технологическому' \
+                       f' плану работ СК КРЕЗОЛ. '
             acid_sel_short = f'Произвести  СКО {plast_combo}  в V  {acid_volume_edit}м3  ({acid_edit} -' \
                              f' {acid_proc_edit} %) '
         elif acid_edit == 'ВТ':

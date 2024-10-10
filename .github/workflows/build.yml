@@ -2,6 +2,16 @@
 name: Build PyInstaller
 on: [push, pull_request]
 
+env:
+  DB_USER: ${{ secrets.DB_USER }}
+  DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+  DB_HOST: ${{ secrets.DB_HOST }}
+  DB_WELL_DATA: ${{ secrets.DB_WELL_DATA }}
+  DB_NAME_USER: ${{ secrets.DB_NAME_USER }}
+  DB_NAME_GNKT: ${{ secrets.DB_NAME_GNKT }}
+  DB_CLASSIFICATION: ${{ secrets.DB_CLASSIFICATION }}
+  DB_PORT: ${{ secrets.DB_PORT }}
+
 jobs:
   build:
     runs-on: windows-latest
@@ -13,46 +23,11 @@ jobs:
       with:
         python-version: '3.8.8'
 
-    - name: Make envfile
-      uses: SpicyPizza/create-envfile@v2.0
-      with:
-        envkey_DEBUG: false
-        envkey_SOME_API_KEY: "123456abcdef"
-        DB_USER: ${{ secrets.DB_USER }}
-        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-        DB_HOST: ${{ secrets.DB_HOST }}
-        DB_WELL_DATA: ${{ secrets.DB_WELL_DATA }}
-        DB_NAME_USER: ${{ secrets.DB_NAME_USER }}
-        DB_NAME_GNKT: ${{ secrets.DB_NAME_GNKT }}
-        DB_CLASSIFICATION: ${{ secrets.DB_CLASSIFICATION }}
-        DB_PORT: ${{ secrets.DB_PORT }}
-        some_other_variable: foobar
-        file_name: .env
-        fail_on_empty: false
-        sort_keys: false
-
-    - name: Create .env files
-      run: |
-        # Путь к файлу .env
-        $envFilePath = ".env"
-
-        Set-Content -Path $envFilePath -Value "DB_WELL_DATA=$($Env:DB_WELL_DATA)"
-        Add-Content -Path $envFilePath -Value "DB_CLASSIFICATION=$($Env:DB_CLASSIFICATION)"
-        Add-Content -Path $envFilePath -Value "DB_NAME_GNKT=$($Env:DB_NAME_GNKT)"
-        Add-Content -Path $envFilePath -Value "DB_USER=$($Env:DB_USER)"
-        Add-Content -Path $envFilePath -Value "DB_PASSWORD=$($Env:DB_PASSWORD)"
-        Add-Content -Path $envFilePath -Value "DB_HOST=$($Env:DB_HOST)"
-        Add-Content -Path $envFilePath -Value "DB_PORT=$($Env:DB_PORT)"
-
-        if (Test-Path ".env") {
-          Get-Content ".env" | Out-Host
-        } else {
-          Write-Host ".env file does not exist."
-        }
-    
 
     - name: Check database secrets
+
       run: |
+       
         $secrets = @(
           @{Name='DB_USER'; Value=$Env:DB_USER},
           @{Name='DB_PASSWORD'; Value=$Env:DB_PASSWORD},
@@ -72,14 +47,47 @@ jobs:
           }
         }
 
+    - name: Create .env files
+      run: |
+        # Путь к файлу .env
+        $envFilePath = ".env"
+
+        Set-Content -Path $envFilePath -Value "DB_WELL_DATA=$($Env:DB_WELL_DATA)"
+        Add-Content -Path $envFilePath -Value "DB_CLASSIFICATION=$($Env:DB_CLASSIFICATION)"
+        Add-Content -Path $envFilePath -Value "DB_NAME_GNKT=$($Env:DB_NAME_GNKT)"
+        Add-Content -Path $envFilePath -Value "DB_USER=$($Env:DB_NAME_USER)"
+        Add-Content -Path $envFilePath -Value "DB_PASSWORD=$($Env:DB_PASSWORD)"
+        Add-Content -Path $envFilePath -Value "DB_HOST=$($Env:DB_HOST)"
+        Add-Content -Path $envFilePath -Value "DB_PORT=$($Env:DB_PORT)"
+        
+        
+        if (Test-Path ".env") {
+          Get-Content ".env" | Out-Host
+        } else {
+          Write-Host ".env file does not exist."
+        }
 
     - name: Create virtual environment and install dependencies
       run: |
         pip install pyinstaller 
         pip install -r requirements.txt
 
+    - name: Make envfile
+      uses: SpicyPizza/create-envfile@v2.0
+      with:
+        envkey_DEBUG: false
+        envkey_SOME_API_KEY: "123456abcdef"
+        envkey_SECRET_KEY: ${{ secrets.SECRET_KEY }}
+        envkey_VARIABLE: ${{ vars.SOME_ACTION_VARIABLE }}
+        some_other_variable: foobar
+        directory: <directory_name>
+        file_name: .env
+        fail_on_empty: false
+        sort_keys: false
+
     - name: Build executable
       run: |
+
         pyinstaller --noconfirm --onedir --icon=imageFiles/icon/zima_ico.ico --console --name "ZIMA" `
           --add-data "work_py;work_py/" `
           --add-data "users;users/" `
@@ -118,3 +126,4 @@ jobs:
       with:
         name: ZIMA
         path: dist/*
+

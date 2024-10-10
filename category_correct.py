@@ -200,8 +200,12 @@ class TabPage_SO(QWidget):
             setattr(self, f"{units_gaz}_{n}_line", units_gaz)
             setattr(self, f"{isolated_plast}_{n}_line", isolated_plast)
 
-            calc_plast_h2s.setText(str(calv_h2s(self, category_h2s_edit.text(),
-                                                float(h2s_mg_edit.text()), float(h2s_pr_edit.text()))))
+            try:
+                calc_plast_h2s.setText(str(calv_h2s(self, category_h2s_edit.text(),
+                                                    float(h2s_mg_edit.text()), float(h2s_pr_edit.text()))))
+            except Exception as e:
+                QMessageBox.warning(self, 'Ошибка', f'Приложение не смогла произвести расчет поглотителя H2S, '
+                                                    f'Нужно проверить таблицу по категорийности, {e}')
 
             self.labels_category[n] = (plast_index, category_pressuar_line_edit, category_h2s_edit,
                                        category_gf_edit, h2s_pr_edit, h2s_mg_edit, gaz_f_pr_edit,

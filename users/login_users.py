@@ -55,6 +55,7 @@ class LoginWindow(QWidget):
 
     def login(self):
         from data_base.work_with_base import connect_to_db
+        from main import MyMainWindow
 
         username = self.username.currentText()
         password = self.password.text()
@@ -85,7 +86,7 @@ class LoginWindow(QWidget):
                     else:
                         QMessageBox.critical(self, 'Пароль', 'логин и пароль не совпадает')
                 else:
-                    self.pause_app()
+                    MyMainWindow.pause_app(self)
             except psycopg2.Error as e:
                 self.pause_app()
                 well_data.pause = False
