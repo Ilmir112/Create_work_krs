@@ -133,11 +133,6 @@ jobs:
     - name: Check .env file
       run: ls -la .env
 
-    - name: Upload .env file
-      uses: actions/upload-artifact@v2
-      with:
-        name: env-file
-        path: .env
 
 
 
