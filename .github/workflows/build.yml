@@ -72,18 +72,7 @@ jobs:
         pip install pyinstaller 
         pip install -r requirements.txt
 
-    - name: Make envfile
-      uses: SpicyPizza/create-envfile@v2.0
-      with:
-        envkey_DEBUG: false
-        envkey_SOME_API_KEY: "123456abcdef"
-        envkey_SECRET_KEY: ${{ secrets.SECRET_KEY }}
-        envkey_VARIABLE: ${{ vars.SOME_ACTION_VARIABLE }}
-        some_other_variable: foobar
-        directory: _internal
-        file_name: .env
-        fail_on_empty: false
-        sort_keys: false
+    
 
     - name: Build executable
       run: |
@@ -126,4 +115,17 @@ jobs:
       with:
         name: ZIMA
         path: dist/*
+
+    - name: Make envfile
+      uses: SpicyPizza/create-envfile@v2.0
+      with:
+        envkey_DEBUG: false
+        envkey_SOME_API_KEY: "123456abcdef"
+        envkey_SECRET_KEY: ${{ secrets.SECRET_KEY }}
+        envkey_VARIABLE: ${{ vars.SOME_ACTION_VARIABLE }}
+        some_other_variable: foobar
+        directory: _internal
+        file_name: .env
+        fail_on_empty: false
+        sort_keys: false
 
