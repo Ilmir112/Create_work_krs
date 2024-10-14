@@ -116,7 +116,15 @@ jobs:
         name: ZIMA
         path: dist/*
     - name: Check .env file
-      run: ls -la .env
+      run: |
+        # Проверяем, существует ли файл .env
+        if (Test-Path .env) {
+            # Если файл существует, выводим его свойства
+            Get-Item .env | Format-List *
+        } else {
+            # Если файла нет, выводим сообщение
+            Write-Host ".env файл не найден."
+        }
 
     - name: Make envfile
       uses: SpicyPizza/create-envfile@v2.0
@@ -131,7 +139,15 @@ jobs:
         sort_keys: false
 
     - name: Check .env file
-      run: ls -la .env
+      run: |
+        # Проверяем, существует ли файл .env
+        if (Test-Path .env) {
+            # Если файл существует, выводим его свойства
+            Get-Item .env | Format-List *
+        } else {
+            # Если файла нет, выводим сообщение
+            Write-Host ".env файл не найден."
+        }
 
 
 
