@@ -71,7 +71,6 @@ jobs:
       run: |
         pip install pyinstaller 
         pip install -r requirements.txt
-
     
 
     - name: Build executable
@@ -114,39 +113,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: ZIMA
-        path: dist/*
-    - name: Check .env file
-      run: |
-        # Проверяем наличие файла .env
-          if (Test-Path ".env") {
-              # Перемещаем файл .env в папку .internal
-              Move-Item -Path ".env" -Destination "._internal\.env" -Force
-          } else {
-              Write-Host "Файл .env не найден."
-          }
-
-    - name: Make envfile
-      uses: SpicyPizza/create-envfile@v2.0
-      with:
-        envkey_DEBUG: false
-        envkey_SOME_API_KEY: "123456abcdef"
-        envkey_SECRET_KEY: ${{ secrets.SECRET_KEY }}
-        envkey_VARIABLE: ${{ vars.SOME_ACTION_VARIABLE }}
-        some_other_variable: foobar
-        file_name: .env
-        fail_on_empty: false
-        sort_keys: false
-
-    - name: Check .env file
-      run: |
-        # Проверяем, существует ли файл .env
-        if (Test-Path .env) {
-            # Если файл существует, выводим его свойства
-            Get-Item .env | Format-List *
-        } else {
-            # Если файла нет, выводим сообщение
-            Write-Host ".env файл не найден."
-        }
+        path: dist/_internal/*
 
 
 
