@@ -58,9 +58,6 @@ def get_password(service_name, username):
     return keyring.get_password(service_name, username)
 
 
-# password = get_password("zima_app", "postgres")
-password = '195375AsD+'
-
 connect_in_base = True
 type_kr = ''
 column_head_m = ''
@@ -169,8 +166,7 @@ Qoil = 0
 template_depth = 0
 nkt_diam = 73
 b_plan = 0
-# host_krs = '31.129.99.186'
-host_krs = '176.109.106.199'
+
 expected_Q = 0
 expected_P = 0
 stabilizator_true = False
@@ -513,6 +509,8 @@ type_kr_list = [
     'КР6-9  Зарезка и бурение бокового горизонтального ствола в аварийной скважине',
     'КР7  Обработка призабойной зоны пласта и вызов притока',
     'КР7-1  Проведение кислотной обработки:',
+    'КР7-1-1 - Проведение соляной кислотной обработки',
+
     'КР7-1.1  соляной кислотой',
     'КР7-1.2  грязевой кислотой',
     'КР7-1.3  пенокислотная обработка',
