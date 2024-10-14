@@ -124,7 +124,6 @@ jobs:
         envkey_SECRET_KEY: ${{ secrets.SECRET_KEY }}
         envkey_VARIABLE: ${{ vars.SOME_ACTION_VARIABLE }}
         some_other_variable: foobar
-        directory: _internal
         file_name: .env
         fail_on_empty: false
         sort_keys: false
