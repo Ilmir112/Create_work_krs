@@ -58,6 +58,7 @@ def get_password(service_name, username):
     return keyring.get_password(service_name, username)
 
 
+
 connect_in_base = True
 type_kr = ''
 column_head_m = ''
@@ -264,8 +265,8 @@ region = ''
 data_in_base = False
 dict_nkt = {}
 dict_nkt_po = {}
-# path_image = '_internal/'
-path_image = ''
+path_image = '_internal/'
+# path_image = ''
 data_well_dict = {}
 ins_ind2 = 0
 data = ''

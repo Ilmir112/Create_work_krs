@@ -2714,7 +2714,7 @@ if __name__ == "__main__":
         MyWindow.show_confirmation()
 
     try:
-        well_data.connect_in_base = MyWindow.check_connection(well_data.host_krs)
+        well_data.connect_in_base = connect_to_database('well_data')
         if well_data.connect_in_base is False:
             QMessageBox.information(None, 'Проверка соединения',
                                           'Проверка показало что с облаком соединения нет, '

@@ -47,25 +47,6 @@ jobs:
           }
         }
 
-    - name: Create .env files
-      run: |
-        # Путь к файлу .env
-        $envFilePath = ".env"
-
-        Set-Content -Path $envFilePath -Value "DB_WELL_DATA=$($Env:DB_WELL_DATA)"
-        Add-Content -Path $envFilePath -Value "DB_CLASSIFICATION=$($Env:DB_CLASSIFICATION)"
-        Add-Content -Path $envFilePath -Value "DB_NAME_GNKT=$($Env:DB_NAME_GNKT)"
-        Add-Content -Path $envFilePath -Value "DB_USER=$($Env:DB_NAME_USER)"
-        Add-Content -Path $envFilePath -Value "DB_PASSWORD=$($Env:DB_PASSWORD)"
-        Add-Content -Path $envFilePath -Value "DB_HOST=$($Env:DB_HOST)"
-        Add-Content -Path $envFilePath -Value "DB_PORT=$($Env:DB_PORT)"
-        
-        
-        if (Test-Path ".env") {
-          Get-Content ".env" | Out-Host
-        } else {
-          Write-Host ".env file does not exist."
-        }
 
     - name: Create virtual environment and install dependencies
       run: |
@@ -109,11 +90,32 @@ jobs:
           --add-data ".env;." `
           main.py
 
+    - name: Create .env files
+      run: |
+        # Путь к файлу .env
+        $envFilePath = ".env"
+
+        Set-Content -Path $envFilePath -Value "DB_WELL_DATA=$($Env:DB_WELL_DATA)"
+        Add-Content -Path $envFilePath -Value "DB_CLASSIFICATION=$($Env:DB_CLASSIFICATION)"
+        Add-Content -Path $envFilePath -Value "DB_NAME_GNKT=$($Env:DB_NAME_GNKT)"
+        Add-Content -Path $envFilePath -Value "DB_USER=$($Env:DB_NAME_USER)"
+        Add-Content -Path $envFilePath -Value "DB_PASSWORD=$($Env:DB_PASSWORD)"
+        Add-Content -Path $envFilePath -Value "DB_HOST=$($Env:DB_HOST)"
+        Add-Content -Path $envFilePath -Value "DB_PORT=$($Env:DB_PORT)"
+        
+        
+        if (Test-Path ".env") {
+          Get-Content ".env" | Out-Host
+        } else {
+          Write-Host ".env file does not exist."
+        }
+
+
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
         name: ZIMA
-        path: dist/_internal/*
+        path: dist/*
 
 
 
