@@ -595,7 +595,9 @@ class GnktOsvWindow2(MyMainWindow):
             Qwater = f'{well_data.Qwater}м3/сут'
             proc_water = f'{well_data.proc_water}%'
 
-        nkt = list(well_data.dict_nkt.keys())[0]
+        nkt = list(well_data.dict_nkt.keys())
+        if len(nkt) != 0:
+            nkt = nkt[0]
 
         wellhead_fittings = well_data.wellhead_fittings
         if well_data.work_plan == 'gnkt_after_grp':

@@ -225,7 +225,7 @@ def calv_h2s(self, cat_H2S, h2s_mg, h2s_pr):
         udel_vnutr_v = round(10 * 3.14 * (
                     (well_data.column_diametr._value - well_data.column_wall_thickness._value * 2) * 0.01) ** 2 / 4, 2)
 
-        if well_data.column_additional is True:
+        if well_data.column_additional:
             udel_vn_khv = round(10 * 3.14 * ((well_data.column_additional_diametr._value -
                                          well_data.column_additional_wall_thickness._value * 2) * 0.01) ** 2 / 4, 2)
 
@@ -248,6 +248,9 @@ def calv_h2s(self, cat_H2S, h2s_mg, h2s_pr):
         udel_vodoiz_nkt = 0
         volume_well = well_volume(self, well_data.current_bottom)
         aaa = well_data.dict_nkt
+
+        vodoiz_nkt = 0
+
 
         for nkt_key, nkt_values in well_data.dict_nkt.items():
             if '73' in nkt_key:

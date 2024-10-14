@@ -785,7 +785,7 @@ class Well_data(FindIndexPZ):
         from main import MyMainWindow
 
         well_data.bottomhole_drill = ProtectedIsNonNone('не корректно')
-        well_data.bottomhole_artificial = ProtectedIsNonNone('не корректно')
+        well_data.bottomhole_artificial = ProtectedIsNonNone(5000)
         well_data.max_angle = ProtectedIsNonNone('не корректно')
         well_data.max_angle_H = ProtectedIsNonNone('не корректно')
         well_data.stol_rotora = ProtectedIsNonNone('не корректно')

@@ -1459,7 +1459,7 @@ class MyWindow(MyMainWindow):
             well_data.column_diametr = ProtectedIsNonNone('не корректно')
             well_data.column_wall_thickness = ProtectedIsNonNone('не корректно')
             well_data.shoe_column = ProtectedIsNonNone('не корректно')
-            well_data.bottomhole_artificial = ProtectedIsNonNone('не корректно')
+            well_data.bottomhole_artificial = ProtectedIsNonNone(5000)
             well_data.max_expected_pressure = ProtectedIsNonNone('не корректно')
             well_data.head_column_additional = ProtectedIsNonNone('не корректно')
             well_data.leakiness_Count = 0

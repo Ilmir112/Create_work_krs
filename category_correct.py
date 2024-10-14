@@ -200,6 +200,7 @@ class TabPage_SO(QWidget):
             setattr(self, f"{units_gaz}_{n}_line", units_gaz)
             setattr(self, f"{isolated_plast}_{n}_line", isolated_plast)
 
+            aaa = h2s_mg_edit.text(), h2s_pr_edit.text()
             try:
                 calc_plast_h2s.setText(str(calv_h2s(self, category_h2s_edit.text(),
                                                     float(h2s_mg_edit.text()), float(h2s_pr_edit.text()))))

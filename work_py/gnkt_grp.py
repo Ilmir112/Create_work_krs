@@ -1,32 +1,29 @@
-import sqlite3
+
 from datetime import datetime
 
 import psycopg2
-from PyQt5.QtWidgets import QInputDialog, QMainWindow, QTabWidget, QWidget, QTableWidget, QApplication, QLabel, \
-    QLineEdit, QGridLayout, QComboBox, QPushButton,QMessageBox
+from PyQt5.QtWidgets import QInputDialog, QTabWidget, QWidget, QApplication, QLabel, \
+    QLineEdit, QGridLayout, QComboBox, QMessageBox
 
 from data_base.config_base import connect_to_database
 from main import MyMainWindow
 
 import well_data
-from gnkt_data.gnkt_data import gnkt_1, gnkt_2, gnkt_dict, read_database_gnkt, insert_data_base_gnkt
+from gnkt_data.gnkt_data import gnkt_dict, read_database_gnkt, insert_data_base_gnkt
 from gnkt_opz import GnktOpz
 from krs import TabPageGno, GnoWindow
-from perforation_correct import PerforationCorrect
 
-import block_name
 import main
 import plan
-from block_name import razdel_1
-from openpyxl.styles import Border, Side, PatternFill, Font, Alignment
+
+from openpyxl.styles import  Font, Alignment
 from openpyxl.reader.excel import load_workbook
-from openpyxl.workbook import Workbook
+
 from open_pz import CreatePZ
-from work_py.alone_oreration import well_volume
+
 
 from work_py.gnkt_grp_work import GnktOsvWindow2
 from gnkt_bopz import GnktBopz
-
 
 
 class TabPageDp(QWidget):
@@ -41,13 +38,11 @@ class TabPageDp(QWidget):
         self.lenght_gnkt_label = QLabel('длина ГНКТ')
         self.lenght_gnkt_edit = QLineEdit(self)
 
-
         self.iznos_gnkt_label = QLabel('Износ трубы')
         self.iznos_gnkt_edit = QLineEdit(self)
 
         self.pipe_mileage_label = QLabel('Пробег трубы')
         self.pipe_mileage_edit = QLineEdit(self)
-
 
         self.pvo_number_label = QLabel('Номер ПВО')
         self.pvo_number_edit = QLineEdit(self)
@@ -121,10 +116,14 @@ class TabPageDp(QWidget):
                 cursor.close()
             if conn:
                 conn.close()
+
+
 class TabWidget(QTabWidget):
     def __init__(self, work_plan):
         super().__init__()
         self.addTab(TabPageDp(work_plan), 'ГНКТ')
+
+
 class GnktOsvWindow(MyMainWindow):
     wb = None
 
@@ -154,12 +153,11 @@ class GnktOsvWindow(MyMainWindow):
         self.ws_title = self.wb.create_sheet("Титульник", 0)
         self.ws_work = self.wb.create_sheet(title="Ход работ")
 
-
         Work_with_gnkt.create_title_list(self, self.ws_title)
         bvo_int = 0
         # if well_data.bvo:
         #     bvo_int += 5
-        head = plan.head_ind(well_data.cat_well_min._value-1 + bvo_int, well_data.cat_well_max._value + bvo_int)
+        head = plan.head_ind(well_data.cat_well_min._value - 1 + bvo_int, well_data.cat_well_max._value + bvo_int)
 
         plan.copy_true_ws(sheet, self.ws_title, head)
 
@@ -173,8 +171,10 @@ class GnktOsvWindow(MyMainWindow):
 
             self.work_schema = self.work_window.schema_well(self.work_window.current_bottom_edit,
                                                             self.work_window.fluid_edit, well_data.gnkt_number,
-                    self.work_window.gnkt_lenght, self.work_window.iznos_gnkt_edit,
-                                                            self.work_window.pvo_number, self.work_window.diametr_length,
+                                                            self.work_window.gnkt_lenght,
+                                                            self.work_window.iznos_gnkt_edit,
+                                                            self.work_window.pvo_number,
+                                                            self.work_window.diametr_length,
                                                             self.work_window.pipe_mileage_edit)
 
             # print(self.work_schema)
@@ -188,16 +188,17 @@ class GnktOsvWindow(MyMainWindow):
 
         for row_number, row in enumerate(self.ws_title.iter_rows(values_only=True)):
             for col_number, cell in enumerate(row):
-                if 'по H2S' in str(self.ws_title.cell(row=row_number+1, column=col_number+1).value) and 'по H2S' not in str(
-                        self.ws_title.cell(row=row_number + 2, column=col_number).value):
+                if 'по H2S' in str(
+                        self.ws_title.cell(row=row_number + 1, column=col_number + 1).value) and 'по H2S' not in str(
+                    self.ws_title.cell(row=row_number + 2, column=col_number).value):
                     self.ws_title.merge_cells(start_column=col_number + 1, start_row=row_number + 1,
-                                    end_column=col_number + 1, end_row=row_number + 2)
+                                              end_column=col_number + 1, end_row=row_number + 2)
                     self.ws_title.merge_cells(start_column=col_number + 3, start_row=row_number + 1,
-                                    end_column=col_number + 3, end_row=row_number + 2)
+                                              end_column=col_number + 3, end_row=row_number + 2)
 
                     self.ws_title.cell(row=row_number + 1, column=col_number + 2).alignment = Alignment(wrap_text=True,
-                                                                                              horizontal='left',
-                                                                                              vertical='center')
+                                                                                                        horizontal='left',
+                                                                                                        vertical='center')
                     self.ws_title.cell(row=row_number + 3, column=col_number + 2).alignment = Alignment(wrap_text=True,
                                                                                                         horizontal='left',
                                                                                                         vertical='center')
@@ -237,12 +238,10 @@ class GnktOsvWindow(MyMainWindow):
         elif self.work_plan == 'gnkt_after_grp':
             work_well = self.gnkt_work(
                 GnktOsvWindow2.fluid_edit, well_data.pvo, GnktOsvWindow2.current_bottom_edit,
-             GnktOsvWindow2.osvoenie_combo_need)
+                GnktOsvWindow2.osvoenie_combo_need)
         if work_well:
             self.populate_row(0, work_well, table_widget, self.work_plan)
             CreatePZ.add_itog(self, self.ws_work, self.table_widget.rowCount() + 1, self.work_plan)
-
-
 
     def gnkt_work(self, fluid_work_insert, pvo_number_edit, current_bottom_edit, osvoenie_combo_need):
         from cdng import events_gnvp_frez
@@ -251,9 +250,6 @@ class GnktOsvWindow(MyMainWindow):
         fluid_work, well_data.fluid_work_short = GnoWindow.calc_work_fluid(fluid_work_insert)
 
         distance, _ = QInputDialog.getInt(None, 'Расстояние НПТЖ', 'Введите Расстояние до ПНТЖ')
-
-
-
 
         block_gnvp_list = events_gnvp_frez(distance, float(fluid_work_insert))
 
@@ -264,23 +260,24 @@ class GnktOsvWindow(MyMainWindow):
                          f'в объеме {self.calc_volume_jumping()}м3 (объем хвостовика + объем НКТ + 20 % запаса) ' \
                          f'с ПРОТЯЖКОЙ ГНКТ СНИЗУ ВВЕРХ с выходом по малому затрубу. ' \
                          f'Тех отстой 2ч. В случае отрицательного результата по глушению скважины ' \
-                         f'произвести перерасчет ЖГС и повторить операцию.'\
-                       f'ПРИ ПРОВЕДЕНИИ ВЕСТИ ГЛУШЕНИЯ КОНТРОЛЬ ЗА БАЛАНСОМ МЕЖДУ ОБЪЕМОМ'\
-                       f' ЗАКАЧИВАЕМОЙ И ВЫХОДЯЩЕЙ ЖИДКОСТЬЮ'
-            up_gnkt_str = f'Скорость спуска по интервалам:\n'\
-                       f'в устьевом оборудовании не более 0.5м/мин;\n'\
-                       f'в интервале 2 -{niz_nkt - 20}м не более 10-15м/мин '\
-                       f'(первичный-последующий спуск);\n'\
-                       f'в интервале {niz_nkt - 20}-{well_data.perforation_roof - 10}м не '\
-                       f'более 2м/мин;\n'\
-                       f'в интервале {well_data.perforation_roof - 10}-{well_data.perforation_sole + 10}м не более 10 м/мин;\n'\
-                       f'в интервале {well_data.perforation_sole + 10}-{current_bottom_edit}м не более 2-5 м/мин;'
-            down_gntk_str = f'Скорость подъёма по интервалам:\n'\
-                       f'в интервале забой-{well_data.perforation_sole + 10}м не более 10 м/мин;\n'\
-                       f'в интервале {well_data.perforation_sole + 10}-{well_data.perforation_roof - 10} не более 2 м/мин;\n'\
-                       f'в интервале {niz_nkt - 20}-2м не более 15-20 м/мин;\n'\
-                       f'в устьевом оборудовании не более 0.5 м/мин.'
-        else:
+                         f'произвести перерасчет ЖГС и повторить операцию.' \
+                         f'ПРИ ПРОВЕДЕНИИ ВЕСТИ ГЛУШЕНИЯ КОНТРОЛЬ ЗА БАЛАНСОМ МЕЖДУ ОБЪЕМОМ' \
+                         f' ЗАКАЧИВАЕМОЙ И ВЫХОДЯЩЕЙ ЖИДКОСТЬЮ'
+            up_gnkt_str = f'Скорость спуска по интервалам:\n' \
+                          f'в устьевом оборудовании не более 0.5м/мин;\n' \
+                          f'в интервале 2 -{niz_nkt - 20}м не более 10-15м/мин ' \
+                          f'(первичный-последующий спуск);\n' \
+                          f'в интервале {niz_nkt - 20}-{well_data.perforation_roof - 10}м не ' \
+                          f'более 2м/мин;\n' \
+                          f'в интервале {well_data.perforation_roof - 10}-{well_data.perforation_sole + 10}м не более 10 м/мин;\n' \
+                          f'в интервале {well_data.perforation_sole + 10}-{current_bottom_edit}м не более 2-5 м/мин;'
+            down_gntk_str = f'Скорость подъёма по интервалам:\n' \
+                            f'в интервале забой-{well_data.perforation_sole + 10}м не более 10 м/мин;\n' \
+                            f'в интервале {well_data.perforation_sole + 10}-{well_data.perforation_roof - 10} не более 2 м/мин;\n' \
+                            f'в интервале {niz_nkt - 20}-2м не более 15-20 м/мин;\n' \
+                            f'в устьевом оборудовании не более 0.5 м/мин.'
+        elif well_data.dict_nkt:
+
             niz_nkt = sum(well_data.dict_nkt.values())
 
             volume_well_jumping = round(volume_jamming_well(self, well_data.current_bottom) * 1.2, 1)
@@ -288,21 +285,20 @@ class GnktOsvWindow(MyMainWindow):
             volume_well_at_shoe = round(volume_jamming_well(self, niz_nkt) * 1.2, 1) - volume_vn_nkt
             volume_current_shoe_nkt = round(volume_pod_NKT(self) * 1.2, 1) - volume_vn_nkt
 
-            volume_str = 'Произвести замер избыточного давления в течении 2ч при условии заполнения ствола ствола '\
-             f'жидкостью уд.весом {fluid_work}. Произвести перерасчет забойного давления, Согласовать с заказчиком '\
-             f'глушение скважин и необходимый удельный вес жидкости глушения, допустить КНК до '\
-             f'{well_data.current_bottom}м. Произвести перевод на тех жидкость расчетного удельного веса '\
-             f' в объеме {volume_well_jumping}м3 '\
-             '((объем ствола э/к + объем открытого ствола и минут объем НКТ  + 20 % запаса), вывести циркуляцию '\
-             'с большого затруба  с ПРОТЯЖКОЙ ГНКТ СНИЗУ ВВЕРХ  с выходом циркуляции по большому затрубу до башмака '\
-             f'НКТ до гл. {niz_nkt}м в объеме открытого ствола {volume_current_shoe_nkt}м3. '\
-             f'В башмаке НКТ Н={niz_nkt}м промыть до выхода жидкости '\
-             f'глушения по большому затрубу в объеме {volume_well_at_shoe}м3. '\
-             f'Заместить на жидкость глушения НКТ в объеме {volume_vn_nkt}м3.  '\
-             'Тех отстой 2ч. В случае отрицательного результата по глушению скважины произвести перерасчет ЖГС и '\
-             'повторить операцию. ПРИ ПРОВЕДЕНИИ ВЕСТИ ГЛУШЕНИЯ КОНТРОЛЬ ЗА БАЛАНСОМ МЕЖДУ ОБЪЕМОМ ЗАКАЧИВАЕМОЙ И '\
-             'ВЫХОДЯЩЕЙ ЖИДКОСТЬЮ'
-
+            volume_str = 'Произвести замер избыточного давления в течении 2ч при условии заполнения ствола ствола ' \
+                         f'жидкостью уд.весом {fluid_work}. Произвести перерасчет забойного давления, Согласовать с заказчиком ' \
+                         f'глушение скважин и необходимый удельный вес жидкости глушения, допустить КНК до ' \
+                         f'{well_data.current_bottom}м. Произвести перевод на тех жидкость расчетного удельного веса ' \
+                         f' в объеме {volume_well_jumping}м3 ' \
+                         '((объем ствола э/к + объем открытого ствола и минут объем НКТ  + 20 % запаса), вывести циркуляцию ' \
+                         'с большого затруба  с ПРОТЯЖКОЙ ГНКТ СНИЗУ ВВЕРХ  с выходом циркуляции по большому затрубу до башмака ' \
+                         f'НКТ до гл. {niz_nkt}м в объеме открытого ствола {volume_current_shoe_nkt}м3. ' \
+                         f'В башмаке НКТ Н={niz_nkt}м промыть до выхода жидкости ' \
+                         f'глушения по большому затрубу в объеме {volume_well_at_shoe}м3. ' \
+                         f'Заместить на жидкость глушения НКТ в объеме {volume_vn_nkt}м3.  ' \
+                         'Тех отстой 2ч. В случае отрицательного результата по глушению скважины произвести перерасчет ЖГС и ' \
+                         'повторить операцию. ПРИ ПРОВЕДЕНИИ ВЕСТИ ГЛУШЕНИЯ КОНТРОЛЬ ЗА БАЛАНСОМ МЕЖДУ ОБЪЕМОМ ЗАКАЧИВАЕМОЙ И ' \
+                         'ВЫХОДЯЩЕЙ ЖИДКОСТЬЮ'
 
             up_gnkt_str = f'Скорость спуска по интервалам:\n' \
                           f'в устьевом оборудовании не более 0.5м/мин;\n' \
@@ -317,10 +313,35 @@ class GnktOsvWindow(MyMainWindow):
             f'в интервале {niz_nkt - 20}-2м не более 15-20 м/мин;\n'
             f'в устьевом оборудовании не более 0.5 м/мин.'
 
+        else:
+            niz_nkt = sum(well_data.dict_nkt.values())
+
+            volume_well_jumping = round(volume_jamming_well(self, well_data.current_bottom) * 1.2, 1)
+
+            volume_str = f'Произвести замер избыточного давления в течении 2ч при условии заполнения ствола ствола ' \
+                         f'жидкостью уд.весом {fluid_work}. Произвести перерасчет забойного давления, Согласовать с заказчиком ' \
+                         f'глушение скважин и необходимый удельный вес жидкости глушения, допустить КНК до ' \
+                         f'{well_data.current_bottom}м. Произвести перевод на тех жидкость расчетного удельного веса ' \
+                         f' в объеме {volume_well_jumping}м3 ' \
+                         f'(объем ствола э/к  + 20 % запаса), вывести циркуляцию ' \
+                         f'с большого затруба  с ПРОТЯЖКОЙ ГНКТ СНИЗУ ВВЕРХ.  ' \
+                         'Тех отстой 2ч. В случае отрицательного результата по глушению скважины произвести перерасчет ЖГС и ' \
+                         'повторить операцию. ПРИ ПРОВЕДЕНИИ ВЕСТИ ГЛУШЕНИЯ КОНТРОЛЬ ЗА БАЛАНСОМ МЕЖДУ ОБЪЕМОМ ЗАКАЧИВАЕМОЙ И ' \
+                         'ВЫХОДЯЩЕЙ ЖИДКОСТЬЮ'
+
+            up_gnkt_str = f'Скорость спуска по интервалам:\n' \
+                          f'в устьевом оборудовании не более 0.5м/мин;\n' \
+                          f'в интервале 2 -{well_data.perforation_roof - 10}-{well_data.current_bottom}м не более 2-5 м/мин;' \
+                          f'в интервале {well_data.perforation_roof - 10}-{well_data.current_bottom}м не более 2м/мин;'
+
+            down_gntk_str = f'Скорость подъёма по интервалам:\n' \
+                            f'в интервале забой-{well_data.perforation_roof - 10}м не более 10 м/мин;\n' \
+                            f'в интервале {well_data.perforation_roof - 10}-2м не более 15-20 м/мин;\n' \
+                            f'в устьевом оборудовании не более 0.5 м/мин.'
 
         gnkt_opz = [
-            [None, 'Порядок работы', None,  None, None, None, None, None, None, None, None, None],
-            [None,  None, 'Наименование работ',  None, None, None, None, None, None, None,
+            [None, 'Порядок работы', None, None, None, None, None, None, None, None, None, None],
+            [None, None, 'Наименование работ', None, None, None, None, None, None, None,
              'Ответственный', 'Нормы'],
             [None,
              None, 'Ознакомить бригаду с планом работ и режимными параметрами '
@@ -367,7 +388,7 @@ class GnktOsvWindow(MyMainWindow):
              f'производстве работ по промывке скважины с установкой «ГНКТ» утвержденная главным '
              f'инженером  {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г. Произвести обвязку '
              f'установки ГНКТ, насосно-компрессорного '
-               f'агрегата, желобной циркуляционной системы.',
+             f'агрегата, желобной циркуляционной системы.',
              None, None, None, None, None, None, None,
              'Мастер ГНКТ, представ.БВО (вызов по телефонограмме при необходимости)', 2],
             [None, 11, f'Внимание: Все требования ПБ и ОТ должны быть доведены до сведения работников, '
@@ -383,14 +404,14 @@ class GnktOsvWindow(MyMainWindow):
              'Мастер ГНКТ', 2],
             [None, 13,
              f'При закрытой центральной задвижке фондовой арматуры опрессовать ГНКТ и все '
-               f'нагнетательные линии на {round(well_data.max_admissible_pressure._value * 1.5, 1)}атм. '
-               f'Опрессовать ПВО, обратные клапана и выкидную линию от '
-               f'устья скважины до желобной ёмкости (надёжно закрепить, оборудовать дроссельными задвижками) '
-               f'опрессовать на {well_data.max_admissible_pressure._value}атм с выдержкой 30мин. '
-               f'Опрессовку ПВО зафиксировать в вахтовом журнале. Установить на малом и большом затрубе '
-               f'технологический манометр. Провести УТЗ и инструктаж. Опрессовку проводить в присутствии мастера, '
-               f'бурильщика, машиниста подъемника и представителя супервайзерской службы. Получить разрешение на '
-               f'проведение работ.',
+             f'нагнетательные линии на {round(well_data.max_admissible_pressure._value * 1.5, 1)}атм. '
+             f'Опрессовать ПВО, обратные клапана и выкидную линию от '
+             f'устья скважины до желобной ёмкости (надёжно закрепить, оборудовать дроссельными задвижками) '
+             f'опрессовать на {well_data.max_admissible_pressure._value}атм с выдержкой 30мин. '
+             f'Опрессовку ПВО зафиксировать в вахтовом журнале. Установить на малом и большом затрубе '
+             f'технологический манометр. Провести УТЗ и инструктаж. Опрессовку проводить в присутствии мастера, '
+             f'бурильщика, машиниста подъемника и представителя супервайзерской службы. Получить разрешение на '
+             f'проведение работ.',
              None, None, None, None, None, None, None,
              'Мастер ГНКТ, состав бригады, представит. Заказчика', 2],
             [None, 14, f'Ограничения веса и скоростей при СПО',
@@ -419,7 +440,7 @@ class GnktOsvWindow(MyMainWindow):
              f'пакера и '
              f'промыться до выхода чистой тех. жидкости (без мех.примесей) и '
              f'только после этого продолжить промывку ниже пакера', 2.5],
-            [None,  f'НОРМАЛИЗАЦИЯ ЗАБОЯ СКВАЖИНЫ', None,
+            [None, f'НОРМАЛИЗАЦИЯ ЗАБОЯ СКВАЖИНЫ', None,
              None, None, None, None, None, None, None,
              'Мастер ГНКТ,', None],
             [None, 25,
@@ -503,14 +524,14 @@ class GnktOsvWindow(MyMainWindow):
             [None, 29, f'Закрыв скважину и записав число оборотов задвижки – зафиксировать дату и время.',
              None, None, None, None, None, None, None,
              'Мастер ГНКТ', None],
-            [None,  f'ОТБИВКА ЗАБОЯ ПО ГК и ЛМ', None,
+            [None, f'ОТБИВКА ЗАБОЯ ПО ГК и ЛМ', None,
              None, None, None, None, None, None, None,
              'Мастер ГНКТ', None],
             [None, 29, f'По согласованию с Заказчиком, проведение ГИС - отбивка забоя по ГК, МЛМ.'
                        f'Заявку на промыслово-геофизические исследования для подтверждения забоя подавать за 24 часа',
              None, None, None, None, None, None, None,
              'Мастер ГНКТ', 4],
-            [None,  f'ДЕМОНТАЖ И ОСВОБОЖДЕНИЕ ТЕРРИТОРИИ', None,
+            [None, f'ДЕМОНТАЖ И ОСВОБОЖДЕНИЕ ТЕРРИТОРИИ', None,
              None, None, None, None, None, None, None,
              'Мастер ГНКТ', None],
             [None, 29, f'После закрытия задвижки - отдуть г/трубу азотом.',
@@ -557,16 +578,16 @@ class GnktOsvWindow(MyMainWindow):
              'Мастер ГНКТ', None],
             [None, 29,
              f'При отрицательных температурах окружающего воздуха перед открытием задвижки прокачать по '
-                   f'ГНКТ (горячий солевой раствор в объеме ГНКТ) для предотвращения замерзания раствора внутри ГНКТ '
-                   f'(получения ледяной пробки). ВНИМАНИЕ: Во время промывки возможен резкий вынос большого '
-                   f'объёма проппанта из пласта, что может привести к потере циркуляции и последующему прихвату ГНКТ. '
-                   f'Данную ситуацию можно проследить; при этом вес ГНКТ резко понизиться, а циркуляционное давление начнёт повышаться. '
-                   f'а) Необходимо спуск г/трубы приостановить – произвести промывку с добавлением понизителя трения (0.4-1 л/м3) '
-                   f'до стабилизации рабочего давления, но не менее 4 пачек по 4 м3 каждая. '
-                   f'Продолжить промывку. б) В случае поглощения промывочной жидкости в процессе промывки интервала перфорации - '
-                   f'производить прокачку по г/трубе (вязких пачек V-от 2 м3 до 4 м3), а на забое '
-                   f'(пачку V- 4 м)3 и сопровождение вязкой пачки в пакер через каждые 2м промывки интервала '
-                   f'до полного выноса проппанта на желобную ёмкость.',
+             f'ГНКТ (горячий солевой раствор в объеме ГНКТ) для предотвращения замерзания раствора внутри ГНКТ '
+             f'(получения ледяной пробки). ВНИМАНИЕ: Во время промывки возможен резкий вынос большого '
+             f'объёма проппанта из пласта, что может привести к потере циркуляции и последующему прихвату ГНКТ. '
+             f'Данную ситуацию можно проследить; при этом вес ГНКТ резко понизиться, а циркуляционное давление начнёт повышаться. '
+             f'а) Необходимо спуск г/трубы приостановить – произвести промывку с добавлением понизителя трения (0.4-1 л/м3) '
+             f'до стабилизации рабочего давления, но не менее 4 пачек по 4 м3 каждая. '
+             f'Продолжить промывку. б) В случае поглощения промывочной жидкости в процессе промывки интервала перфорации - '
+             f'производить прокачку по г/трубе (вязких пачек V-от 2 м3 до 4 м3), а на забое '
+             f'(пачку V- 4 м)3 и сопровождение вязкой пачки в пакер через каждые 2м промывки интервала '
+             f'до полного выноса проппанта на желобную ёмкость.',
              None, None, None, None, None, None, None,
              'Мастер ГНКТ', None],
             [None, 29,
@@ -630,14 +651,16 @@ class GnktOsvWindow(MyMainWindow):
              None, None, None, None, None, None, None,
              'Мастер ГНКТ', None]
         ]
-        osvoenie_list = [[None,  f'ОСВОЕНИЕ СКВАЖИНЫ', None,
+        osvoenie_list = [
+            [None, f'ОСВОЕНИЕ СКВАЖИНЫ', None,
              None, None, None, None, None, None, None,
              None, None],
-            [None, 29, f'Установить КНК-1 на гл.{niz_nkt - 20}м, произвести вывод на '
-                       f'режим мобильного азотного комплекса. Дождаться выхода пузыря азота. '
-                       f'В случае отсутствия выхода пузыря азота более 1-1.5 часа - начать постепенный приподъём ГНКТ, не '
-                       f'прекращая отдувки, до выхода пузыря азота. После получения прорыва азота и выхода пузыря - '
-                       f'произвести допуск ГНКТ с одновременной отдувкой азотом до гл. {current_bottom_edit}м',
+            [None, 29,
+             f'Установить КНК-1 на гл.{niz_nkt - 20}м, произвести вывод на '
+             f'режим мобильного азотного комплекса. Дождаться выхода пузыря азота. '
+             f'В случае отсутствия выхода пузыря азота более 1-1.5 часа - начать постепенный приподъём ГНКТ, не '
+             f'прекращая отдувки, до выхода пузыря азота. После получения прорыва азота и выхода пузыря - '
+             f'произвести допуск ГНКТ с одновременной отдувкой азотом до гл. {current_bottom_edit}м',
              None, None, None, None, None, None, None,
              'Мастер ГНКТ', 1],
             [None, 29,
@@ -646,17 +669,18 @@ class GnktOsvWindow(MyMainWindow):
              f'Второй час освоения - расход азота не менее 16м3/мин; ',
              None, None, None, None, None, None, None,
              'Мастер ГНКТ', 4],
-            [None, 29, f'Последующие 2 часа освоения производить на выбранном оптимальном режиме освоения '
-                       f'(по согласованию с Заказчиком) позволяющим производить оптимальный отбор флюида из пласта. '
-                       f'В ПРОЦЕССЕ ОСВОЕНИЯ (не оставлять г/трубу без движения) ПРОИЗВОДИТЬ ПРИПОДЪЁМЫ '
-                       f'ГНКТ ЧЕРЕЗ 15-20 МИНУТ ВВЕРХ-ВНИЗ НА 20м. '
-                       f'В процессе освоения проводить замеры притока каждый час и общее количество '
-                       f'отобранной из пласта жидкости. В сводке отразить: процентное содержание нефти '
-                       f'в возвратной жидкости, средний приток пластового флюида, количество отобранной из '
-                       f'пласта жидкости. Отбор проб производить каждый  час. Пробы отбирать через пробоотборник, '
-                       f'расположенный согласно схеме обвязки устья. По отдельному запросу геологической службы, '
-                       f'пробы предоставлять оператору ЦДНГ для определения КВЧ и процентного содержания воды, '
-                       f'с составлением акта передачи проб.',
+            [None, 29,
+             f'Последующие 2 часа освоения производить на выбранном оптимальном режиме освоения '
+             f'(по согласованию с Заказчиком) позволяющим производить оптимальный отбор флюида из пласта. '
+             f'В ПРОЦЕССЕ ОСВОЕНИЯ (не оставлять г/трубу без движения) ПРОИЗВОДИТЬ ПРИПОДЪЁМЫ '
+             f'ГНКТ ЧЕРЕЗ 15-20 МИНУТ ВВЕРХ-ВНИЗ НА 20м. '
+             f'В процессе освоения проводить замеры притока каждый час и общее количество '
+             f'отобранной из пласта жидкости. В сводке отразить: процентное содержание нефти '
+             f'в возвратной жидкости, средний приток пластового флюида, количество отобранной из '
+             f'пласта жидкости. Отбор проб производить каждый  час. Пробы отбирать через пробоотборник, '
+             f'расположенный согласно схеме обвязки устья. По отдельному запросу геологической службы, '
+             f'пробы предоставлять оператору ЦДНГ для определения КВЧ и процентного содержания воды, '
+             f'с составлением акта передачи проб.',
              None, None, None, None, None, None, None,
              'Мастер ГНКТ', None],
             [None, f'ПОДТВЕРЖДЕНИЕ НОРМАЛИЗОВАННОГО ЗАБОЯ', None,
@@ -697,14 +721,11 @@ class GnktOsvWindow(MyMainWindow):
         for row in range(len(work_list)):
             for col in range(23):
                 if work_list[row][col]:
-
                     ws.cell(row=row + 1, column=col + 1).value = work_list[row][col]
         # Перебираем строки и скрываем те, у которых все значения равны None
         for row_ind, row in enumerate(ws.iter_rows(values_only=True)):
             if all(value is None for value in row[:42]):
                 ws.row_dimensions[row_ind + 1].hidden = True
-
-
 
     def save_to_gnkt(self):
         from work_py.gnkt_frez import Work_with_gnkt
@@ -730,11 +751,9 @@ class GnktOsvWindow(MyMainWindow):
                 work_list.append(row_lst)
             Work_with_gnkt.count_row_height(self, worksheet, work_list, sheet_name)
 
-
         ws7 = GnktOsvWindow.wb.create_sheet(title="СХЕМЫ КНК_38,1")
         main.MyWindow.insert_image(
             self, ws7, f'{well_data.path_image}imageFiles/schema_well/СХЕМЫ КНК_38,1.png', 'A1', 550, 900)
-
 
         if 'Зуфаров' in well_data.user:
             path = 'D:\Documents\Desktop\ГТМ'
@@ -747,7 +766,7 @@ class GnktOsvWindow(MyMainWindow):
 
         insert_data_base_gnkt(well_data.contractor, filenames, well_data.gnkt_number, int(well_data.gnkt_length),
                               float(well_data.diametr_length),
-                              float(well_data.iznos)*1.014,
+                              float(well_data.iznos) * 1.014,
                               int(well_data.pipe_mileage) + int(well_data.current_bottom * 1.1),
                               well_data.pipe_fatigue, int(well_data.pvo), well_data.previous_well)
 
@@ -792,11 +811,11 @@ class GnktOsvWindow(MyMainWindow):
                 count_interval = well_data.dict_perforation[plast]['счет_объединение']
 
                 ws.merge_cells(start_column=23, start_row=27 + m,
-                                           end_column=23, end_row=27 + count_interval + m - 1)
+                               end_column=23, end_row=27 + count_interval + m - 1)
                 ws.merge_cells(start_column=22, start_row=27 + m,
-                                           end_column=22, end_row=27 + count_interval + m - 1)
+                               end_column=22, end_row=27 + count_interval + m - 1)
                 ws.merge_cells(start_column=21, start_row=27 + m,
-                                           end_column=21, end_row=27 + count_interval + m - 1)
+                               end_column=21, end_row=27 + count_interval + m - 1)
                 m += count_interval
                 roof_plast = well_data.dict_perforation[plast]['кровля']
                 sole_plast = well_data.dict_perforation[plast]['подошва']
@@ -817,13 +836,12 @@ class GnktOsvWindow(MyMainWindow):
                 except:
                     mes = QMessageBox.critical(self,
                                                'Ошибка', f'программа не смогла вставить интервал перфорации в схему'
-                                                               f'{roof_plast}-{sole_plast}')
+                                                         f'{roof_plast}-{sole_plast}')
 
             coordinate_voln = f'E18'
             main.MyWindow.insert_image(self, ws,
                                        f'{well_data.path_image}imageFiles/schema_well/переход.png',
                                        coordinate_voln, 150, 60)
-
 
     def date_dmy(self, date_str):
         date_obj = datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
