@@ -202,7 +202,7 @@ class OpressovkaEK(MyMainWindow):
         paker_depth = int(float(self.tabWidget.currentWidget().paker_depth_edit.text()))
         pressureZUMPF_combo = self.tabWidget.currentWidget().pressureZUMPF_question_QCombo.currentText()
         if not paker_khost or not paker_depth:
-            msg = QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
+            QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
             return
 
 
@@ -223,7 +223,7 @@ class OpressovkaEK(MyMainWindow):
         if int(paker_khost) + int(paker_depth) > well_data.current_bottom and pressureZUMPF_combo == 'Нет' \
                 or int(paker_khost) + int(
             paker_depth_zumpf) > well_data.current_bottom and pressureZUMPF_combo == 'Да':
-            mes = QMessageBox.warning(self, 'Некорректные данные', f'Компоновка НКТ c хвостовик + пакер '
+            QMessageBox.warning(self, 'Некорректные данные', f'Компоновка НКТ c хвостовик + пакер '
                                                                    f'ниже текущего забоя')
             return
         if self.check_true_depth_template(paker_depth) is False:
@@ -245,7 +245,7 @@ class OpressovkaEK(MyMainWindow):
     def del_row_table(self):
         row = self.tableWidget.currentRow()
         if row == -1:
-            msg = QMessageBox.information(self, 'Внимание', 'Выберите строку для удаления')
+            QMessageBox.information(self, 'Внимание', 'Выберите строку для удаления')
             return
         self.tableWidget.removeRow(row)
     def add_work(self):
@@ -256,7 +256,7 @@ class OpressovkaEK(MyMainWindow):
         if pressureZUMPF_question_QCombo == 'Да':
             paker_depth_zumpf = int(float(self.tabWidget.currentWidget().paker_depth_zumpf_edit.text()))
             if paker_khost + paker_depth_zumpf >= well_data.current_bottom:
-                mes = QMessageBox.warning(self, 'ОШИБКА', 'Длина хвостовика и пакера ниже текущего забоя')
+                QMessageBox.warning(self, 'ОШИБКА', 'Длина хвостовика и пакера ниже текущего забоя')
                 return
 
         else:
@@ -264,7 +264,7 @@ class OpressovkaEK(MyMainWindow):
         self.need_privyazka_QCombo = self.tabWidget.currentWidget().need_privyazka_QCombo.currentText()
 
         if rows == 0:
-            mes = QMessageBox.warning(self, 'ОШИБКА', 'Нужно добавить интервалы')
+            QMessageBox.warning(self, 'ОШИБКА', 'Нужно добавить интервалы')
             return
         elif rows == 1:
             for row in range(rows):

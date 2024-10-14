@@ -135,7 +135,7 @@ class Grp_window(MyMainWindow):
             return
 
         if int(paker_khost) + int(paker_depth) > well_data.current_bottom:
-            mes = QMessageBox.warning(self, 'Некорректные данные', f'Компоновка НКТ c хвостовик + пакер '
+            QMessageBox.warning(self, 'Некорректные данные', f'Компоновка НКТ c хвостовик + пакер '
                                                                    f'ниже текущего забоя')
             return
         work_list = self.grpPaker(diametr_paker, paker_depth, paker_khost, gisOTZ_true_quest, gisOTZ_after_true_quest,
@@ -154,33 +154,31 @@ class Grp_window(MyMainWindow):
             [f'Согласовать Алгоритм нормализации до H- {current_depth}м', None,
              f'Алгоритм работ согласовать с Заказчиком: \n'
              f'В случае освоения скважины ГНКТ и дохождение до гл. не ниже {well_data.current_bottom}м '
-             f'перейти к отбивки забоя '
+             f'работы по нормализации не планировать'
              f'В случае если скважину не осваивали ГНКТ продолжить работы со следующего пункта.\n'
-             f'В случае наличия ЗУМПФА не менее 10м продолжить работы со следующего пункта.\n'
-             f'В случае наличия циркуляции при глушении скважины произвести работы  СПО пера \n'
-             f'В случае отсутствия циркуляции при глушении скважины произвести работы  СПО КОТ',
+             f'В случае наличия ЗУМПФА не менее 10м продолжить работы со следующего пункта.\n',
              None, None, None, None, None, None, None,
              'Мастер КРС', None],
+            # [None, None,
+            #  f'Спустить компоновку с замером и шаблонированием НКТ: перо (1м), {self.nktGrp()} на НКТ{nkt_diam} '
+            #  f'до гл.текущего забоя.'
+            #  f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ) ',
+            #  None, None, None, None, None, None, None,
+            #  'Мастер КРС', descentNKT_norm(well_data.current_bottom, 1)],
+            # [f'нормализацию забоя до гл. {current_depth}м', None,
+            #  f'Произвести нормализацию забоя  с наращиванием, комбинированной промывкой по круговой циркуляции жидкостью '
+            #  f'с расходом жидкости не менее 8 л/с до гл. {current_depth}м. Тех отстой 2ч. Повторное определение '
+            #  f'текущего забоя, при необходимости повторно вымыть.',
+            #  None, None, None, None, None, None, None,
+            #  'Мастер КРС', 2.5],
+            # [None, None,
+            #  f'Поднять перо с глубины {current_depth}м с доливом скважины тех.жидкостью уд. весом {well_data.fluid_work} '
+            #  f'в объеме '
+            #  f'{round(current_depth * 1.12 / 1000, 1)}м3',
+            #  None, None, None, None, None, None, None,
+            #  'Мастер КРС', liftingNKT_norm(current_depth, 1)],
             [None, None,
-             f'Спустить компоновку с замером и шаблонированием НКТ: перо (1м), {self.nktGrp()} на НКТ{nkt_diam} '
-             f'до гл.текущего забоя.'
-             f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ) ',
-             None, None, None, None, None, None, None,
-             'Мастер КРС', descentNKT_norm(well_data.current_bottom, 1)],
-            [f'нормализацию забоя до гл. {current_depth}м', None,
-             f'Произвести нормализацию забоя  с наращиванием, комбинированной промывкой по круговой циркуляции жидкостью '
-             f'с расходом жидкости не менее 8 л/с до гл. {current_depth}м. Тех отстой 2ч. Повторное определение '
-             f'текущего забоя, при необходимости повторно вымыть.',
-             None, None, None, None, None, None, None,
-             'Мастер КРС', 2.5],
-            [None, None,
-             f'Поднять перо с глубины {current_depth}м с доливом скважины тех.жидкостью уд. весом {well_data.fluid_work} '
-             f'в объеме '
-             f'{round(current_depth * 1.12 / 1000, 1)}м3',
-             None, None, None, None, None, None, None,
-             'Мастер КРС', liftingNKT_norm(current_depth, 1)],
-            [None, None,
-             f'Спустить {kot_select(self, current_depth)} на НКТ{well_data.nkt_diam}мм до глубины текущего забоя'
+             f'Спустить {kot_select(self, current_depth)} на НКТ{nkt_diam}мм до глубины текущего забоя'
              f' с замером, шаблонированием шаблоном {well_data.nkt_template}мм.',
              None, None, None, None, None, None, None,
              'мастер КРС', descentNKT_norm(well_data.current_bottom, 1)],
@@ -194,7 +192,7 @@ class Grp_window(MyMainWindow):
              None, None, None, None, None, None, None,
              'мастер КРС, предст. заказчика', None],
             [None, None,
-             f'Поднять {kot_select(self, current_depth)} на НКТ{well_data.nkt_diam}мм c глубины {current_depth}м с '
+             f'Поднять {kot_select(self, current_depth)} на НКТ{nkt_diam}мм c глубины {current_depth}м с '
              f'доливом скважины в '
              f'объеме {round(current_depth * 1.12 / 1000, 1)}м3 удельным весом {well_data.fluid_work}',
              None, None, None, None, None, None, None,
@@ -235,6 +233,7 @@ class Grp_window(MyMainWindow):
 
         if gisOTZ_after_true_quest == 'Нет':
             normalization_list = normalization_list[:-1]
+        well_data.current_bottom = current_depth
 
         return normalization_list
 

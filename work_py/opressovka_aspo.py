@@ -95,7 +95,7 @@ class PakerAspo(MyMainWindow):
         paker_depth = int(float(self.tabWidget.currentWidget().paker_depth_edit.text()))
 
         if int(paker_khost) + int(paker_depth) > well_data.current_bottom:
-            mes = QMessageBox.warning(self, 'Некорректные данные', f'Компоновка НКТ c хвостовик + пакер '
+            QMessageBox.warning(self, 'Некорректные данные', f'Компоновка НКТ c хвостовик + пакер '
                                                                    f'ниже текущего забоя')
             return
         if self.check_true_depth_template(paker_depth) is False:

@@ -142,11 +142,11 @@ class GonsWindow(MyMainWindow):
         iron_volume_edit = self.tabWidget.currentWidget().iron_volume_edit.text()
 
         if int(bottom_point) >= well_data.current_bottom:
-            mes = QMessageBox.warning(self, "ВНИМАНИЕ", 'Не корректная компоновка')
+            QMessageBox.warning(self, "ВНИМАНИЕ", 'Не корректная компоновка')
             return
         if not acid_edit or not acid_volume_edit or not acid_proc_edit or not bottom_point or not acid_calcul_Edit \
                 or not poins_sko_edit or not pressure_edit:
-            msg = QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
+            QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
             return
 
         work_list = self.acidGons(plast_combo, acid_edit, acid_volume_edit, acid_proc_edit, poins_sko_edit, bottom_point,

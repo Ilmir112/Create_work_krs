@@ -5,7 +5,7 @@ from cdng import region_dict
 import json
 
 
-def region(cdng):
+def region_select(cdng):
     region_work = ''.join([key for key, value in region_dict.items() if cdng in value])
     return region_work
 

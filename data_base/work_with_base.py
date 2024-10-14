@@ -20,7 +20,7 @@ from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem, QLineEdit, QHeaderVie
 from openpyxl import load_workbook
 from openpyxl.styles import PatternFill, Font, Color
 from openpyxl.utils import get_column_letter, range_boundaries
-
+from data_base.config_base import connect_to_database
 
 from PIL import Image
 from main import MyMainWindow
@@ -128,8 +128,9 @@ class Classifier_well(MyMainWindow):
 
             # Параметры подключения к PostgreSQL
             try:
+
                 # Создание подключения к базе данных PostgreSQL
-                conn = psycopg2.connect(**well_data.postgres_params_classif)
+                conn = connect_to_database(well_data.DB_CLASSIFICATION)
 
                 # Выполнение SQL-запроса для получения данных
                 with conn.cursor() as cur:
@@ -176,7 +177,7 @@ class Classifier_well(MyMainWindow):
         if well_data.connect_in_base:
             try:
                 # Создание подключения к базе данных PostgreSQL
-                conn = psycopg2.connect(**well_data.postgres_params_classif)
+                conn = connect_to_database(well_data.DB_CLASSIFICATION)
 
                 # Выполнение SQL-запроса для получения данных
                 with conn.cursor() as cur:
@@ -259,7 +260,7 @@ class Classifier_well(MyMainWindow):
         if well_data.connect_in_base:
             try:
                 # Подключение к базе данных
-                conn = psycopg2.connect(**well_data.postgres_params_classif)
+                conn = connect_to_database(well_data.DB_CLASSIFICATION)
                 cursor = conn.cursor()
                 region_list = ['ЧГМ', 'АГМ', 'ТГМ', 'ИГМ', 'КГМ', ]
 
@@ -310,7 +311,7 @@ class Classifier_well(MyMainWindow):
                                                 f"VALUES (%s, %s, %s, %s,%s)",
                                                 (well_number, area_well, version_year, region_name, costumer))
 
-                                mes = QMessageBox.information(self, 'данные обновлены', 'Данные обновлены')
+                                QMessageBox.information(self, 'данные обновлены', 'Данные обновлены')
                             except:
                                  QMessageBox.warning(self, 'ОШИБКА', 'Выбран файл с не корректными данными')
 
@@ -496,7 +497,7 @@ class Classifier_well(MyMainWindow):
         if well_data.connect_in_base:
             try:
                 # Создание подключения к базе данных PostgreSQL
-                conn = psycopg2.connect(**well_data.postgres_params_classif)
+                conn = connect_to_database(well_data.DB_CLASSIFICATION)
                 cursor = conn.cursor()
 
                 for region_name in region_list:
@@ -583,7 +584,7 @@ class Classifier_well(MyMainWindow):
                              QMessageBox.warning(self, 'ВНИМАНИЕ ОШИБКА',
                                                       f'в Данном перечне отсутствую скважины {region_name}')
                         conn.commit()
-                mes = QMessageBox.information(self, 'Успешно', 'Классификатор успешно обновлен')
+                QMessageBox.information(self, 'Успешно', 'Классификатор успешно обновлен')
 
             except (psycopg2.Error, Exception) as e:
                 # Выведите сообщение об ошибке
@@ -699,19 +700,32 @@ def insert_database_well_data(well_number, well_area, contractor, costumer, data
     date_today = datetime.now()
     type_kr = well_data.type_kr.split(' ')[0]
     data_paragraph = json.dumps(well_data.data_list, ensure_ascii=False)
+    cdng = well_data.cdng._value
+    category_dict =json.dumps(well_data.dict_category, ensure_ascii=False)
     # print(row, well_data.count_row_well)
+
+
     if 'dop_plan' in work_plan:
         work_plan_str = f'ДП№{well_data.number_dp}'
-    elif 'krs' in work_plan or 'plan' in work_plan:
+    elif 'krs' in work_plan:
         work_plan_str = 'ПР'
+    elif work_plan == 'plan_change':
+        if well_data.work_plan_change == 'krs':
+            work_plan_str = 'ПР'
+        else:
+            work_plan_str = f'ДП№{well_data.number_dp}'
+
+
     if well_data.connect_in_base:
         try:
 
-            conn = psycopg2.connect(**well_data.postgres_params_data_well)
+            conn = connect_to_database(well_data.DB_WELL_DATA)
             cursor = conn.cursor()
             # Проверка наличия строки с заданными параметрами
 
             param = '%s'
+            # Подготовленный запрос для вставки данных с параметрами
+            query = f"INSERT INTO wells VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
 
 
         except psycopg2.Error as e:
@@ -728,6 +742,8 @@ def insert_database_well_data(well_number, well_area, contractor, costumer, data
             cursor = conn.cursor()
 
             param = '?'
+            # Подготовленный запрос для вставки данных с параметрами
+            query = f"INSERT INTO wells VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 
 
         except sqlite3.Error as e:
@@ -752,7 +768,7 @@ def insert_database_well_data(well_number, well_area, contractor, costumer, data
 
     data_values = (str(well_number), well_area,
                    data_well, date_today, excel_json, contractor, well_data.costumer, work_plan_str,
-                   well_data.user[1], type_kr, data_paragraph)
+                   well_data.user[1], type_kr, data_paragraph, cdng, category_dict)
 
     if row_exists:
         row_exists, date_in_base = row_exists
@@ -766,12 +782,12 @@ def insert_database_well_data(well_number, well_area, contractor, costumer, data
                             UPDATE wells
                             SET data_well ={param}, today ={param}, excel_json ={param},
                              work_plan={param}, geolog ={param}, 
-                            type_kr={param}, data_change_paragraph={param}                                                                
+                            type_kr={param}, data_change_paragraph={param}, cdng={param}, category_dict={param}                                                                
                             WHERE well_number ={param} AND area_well ={param} AND contractor ={param}
-                             AND costumer ={param} AND work_plan ={param}
+                             AND costumer ={param} AND work_plan ={param} AND type_kr={param}
                                         """, (
-                    data_well, date_today, excel_json, work_plan_str, well_data.user[1], type_kr, data_paragraph,
-                    str(well_number), well_area, contractor, costumer, work_plan_str))
+                    data_well, date_today, excel_json, work_plan_str, well_data.user[1], type_kr, data_paragraph, cdng,
+                    category_dict, str(well_number), well_area, contractor, costumer, work_plan_str, type_kr))
 
                 QMessageBox.information(None, 'Успешно', 'Данные обновлены')
             except (Exception, psycopg2.Error) as error:
@@ -779,13 +795,10 @@ def insert_database_well_data(well_number, well_area, contractor, costumer, data
     else:
         # create_database_well_db(well_data.work_plan, well_data.number_dp)
 
-        # Подготовленный запрос для вставки данных с параметрами
-        query = f"INSERT INTO wells VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-
         # Выполнение запроса с использованием параметров
         cursor.execute(query, data_values)
 
-        mes = QMessageBox.information(None, 'база данных',
+        QMessageBox.information(None, 'база данных',
                                       f'Скважина {well_data.well_number._value} добавлена в базу '
                                       f'данных c excel файлами')
 
@@ -813,13 +826,12 @@ def connect_to_db(name_base, folder_base):
 
 
 def check_in_database_well_data(number_well, area_well, work_plan):
-    work_plan = 'krs'
+
     if well_data.connect_in_base:
         try:
-            conn = psycopg2.connect(**well_data.postgres_params_data_well)
+            conn = connect_to_database(well_data.DB_WELL_DATA)
             cursor = conn.cursor()
             param = '%s'
-
 
         except psycopg2.Error as e:
             # Выведите сообщение об ошибке
@@ -832,16 +844,18 @@ def check_in_database_well_data(number_well, area_well, work_plan):
             cursor = conn.cursor()
             param ='?'
 
-
         except sqlite3.Error as e:
             # Выведите сообщение об ошибке
              QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных, Скважина не добавлена в базу')
 
-    cursor.execute(f"SELECT data_well FROM wells WHERE well_number = {param} AND area_well = {param} "
-                   f"AND contractor = {param} AND costumer = {param}",
-                   (str(number_well), area_well, well_data.contractor, well_data.costumer))
+    cursor.execute(f"SELECT data_well, today, type_kr, category_dict "
+                   f"FROM wells "
+                   f"WHERE well_number = {param} AND area_well = {param} "
+                   f"AND contractor = {param} AND costumer = {param} AND work_plan={param}",
+                   (str(number_well), area_well, well_data.contractor, well_data.costumer, work_plan))
 
     data_well = cursor.fetchone()
+
     if cursor:
         cursor.close()
     if conn:
@@ -971,14 +985,14 @@ def insert_data_well_dop_plan(data_well):
     well_data.cdng = ProtectedIsNonNone(well_data_dict['ЦДНГ'])
 
     well_data.data_well_dict = well_data_dict
-    mes = QMessageBox.information(None, 'Данные с базы', "Данные вставлены из базы данных")
+    QMessageBox.information(None, 'Данные с базы', "Данные вставлены из базы данных")
 
     definition_plast_work(None)
 
 def read_database_gnkt(contractor, gnkt_number):
     try:
         # Подключение к базе данных
-        conn = psycopg2.connect(**well_data.postgres_conn_gnkt)
+        conn = connect_to_database(well_data.DB_NAME_GNKT)
 
         if 'ойл-сервис' in contractor.lower():
             contractor = 'oil_service'
@@ -997,191 +1011,6 @@ def read_database_gnkt(contractor, gnkt_number):
             conn.close()
     # print(result)
 
-
-def create_database_well_db(work_plan, number_dp):
-    if well_data.connect_in_base:
-        try:
-            conn = psycopg2.connect(**well_data.postgres_conn_work_well)
-            cursor = conn.cursor()
-            if number_dp == 0:
-                number_dp = ''
-            if 'Ойл' in well_data.contractor:
-                contractor = 'ОЙЛ'
-            elif 'РН' in well_data.contractor:
-                contractor = 'РН'
-
-            if work_plan in ['krs', 'plan_change']:
-                work_plan = 'krs'
-
-            # Создаем таблицу для хранения данных
-            number = json.dumps(
-                str(well_data.well_number._value) + " " + well_data.well_area._value + " " + work_plan + str(
-                    number_dp) + ' ' + contractor + well_data.type_kr.split(' ')[0],
-                ensure_ascii=False)
-
-            # Попытка удалить таблицу, если она существует
-            cursor.execute(f'DROP TABLE IF EXISTS {number}')
-
-            cursor.execute(f'CREATE TABLE IF NOT EXISTS {number}'
-                           f'(index_row INTEGER,'
-                           f'current_bottom FLOAT,'
-                           f'perforation TEXT, '
-                           f'plast_all TEXT, '
-                           f'plast_work TEXT, '
-                           f'leakage TEXT,'
-                           f'column_additional TEXT,'
-                           f'fluid TEXT,'
-                           f'category_pressuar TEXT,'
-                           f'category_h2s TEXT,'
-                           f'category_gf TEXT,'
-                           f'template_depth TEXT,'
-                           f'skm_list TEXT,'
-                           f'problemWithEk_depth FLOAT,'
-                           f'problemWithEk_diametr FLOAT,'
-                           f'today DATE)')
-            date_create = datetime.now()
-            for index, data in enumerate(well_data.data_list):
-                current_bottom = data[1]
-                dict_perforation_json = data[2]
-                plast_all = data[3]
-                plast_work = data[4]
-                dict_leakiness = data[5]
-                column_additional = data[6]
-                fluid_work = data[7]
-                template_depth = data[11]
-
-                skm_interval = data[12]
-                problemWithEk_depth = data[13]
-                problemWithEk_diametr = data[14]
-
-
-                # Подготовленные данные для вставки (пример)
-                data_values = (index, current_bottom, dict_perforation_json, plast_all, plast_work,
-                               dict_leakiness, column_additional, fluid_work, well_data.category_pressuar,
-                               well_data.category_h2s, well_data.category_gf, template_depth, skm_interval,
-                               problemWithEk_depth, problemWithEk_diametr, date_create)
-
-                # Подготовленный запрос для вставки данных с параметрами
-                query = f"INSERT INTO {number} VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-
-                # Выполнение запроса с использованием параметров
-                cursor.execute(query, data_values)
-
-            # Сохранить изменения и закрыть соединение
-            conn.commit()
-        # Закройте курсор и соединение
-
-        except psycopg2.Error as e:
-            # Выведите сообщение об ошибке
-             QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных, Скважина не добавлена в базу')
-        finally:
-            if cursor:
-                cursor.close()
-            if conn:
-                conn.close()
-
-
-    else:
-        """Добавляет данные о скважине в SQLite базу данных."""
-
-        try:
-            # Формируем полный путь к файлу базы данных
-            db_path = connect_to_db('well_data.db', 'data_base_well')
-            conn = sqlite3.connect(db_path)
-            cursor = conn.cursor()
-
-            if number_dp == 0:
-                number_dp = ''
-
-            if 'Ойл' in well_data.contractor:
-                contractor = 'ОЙЛ'
-            elif 'РН' in well_data.contractor:
-                contractor = 'РН'
-
-            if work_plan in ['krs', 'plan_change']:
-                work_plan = 'krs'
-
-            # Создаем таблицу для хранения данных
-            number = json.dumps(
-                str(well_data.well_number._value) + " " + well_data.well_area._value + " " + work_plan + str(
-                    number_dp) + ' ' + contractor,
-                ensure_ascii=False
-            )
-
-            # Попытка удалить таблицу, если она существует
-            cursor.execute(f'DROP TABLE IF EXISTS {number}')
-
-            cursor.execute(
-                f'CREATE TABLE IF NOT EXISTS {number} ('
-                f'index_row INTEGER, '
-                f'current_bottom FLOAT, '
-                f'perforation TEXT, '
-                f'plast_all TEXT, '
-                f'plast_work TEXT, '
-                f'leakage TEXT, '
-                f'column_additional TEXT, '
-                f'fluid TEXT, '
-                f'category_pressuar TEXT, '
-                f'category_h2s TEXT, '
-                f'category_gf TEXT, '
-                f'template_depth TEXT, '
-                f'skm_list TEXT, '
-                f'problemWithEk_depth FLOAT, '
-                f'problemWithEk_diametr FLOAT,'
-                f'today DATE)'
-            )
-
-            for index, data in enumerate(well_data.data_list):
-                current_bottom = data[1]
-                dict_perforation_json = data[2]
-                plast_all = data[3]
-                plast_work = data[4]
-                dict_leakiness = data[5]
-                column_additional = data[6]
-                fluid_work = data[7]
-                template_depth = data[11]
-                skm_interval = data[12]
-                problemWithEk_depth = data[13]
-                problemWithEk_diametr = data[14]
-                date_create = datetime.now().strftime("%d.%m.%Y")
-                # Подготовленные данные для вставки
-                data_values = (
-                    index,
-                    current_bottom,
-                    dict_perforation_json,
-                    plast_all,
-                    plast_work,
-                    dict_leakiness,
-                    column_additional,
-                    fluid_work,
-                    well_data.category_pressuar,
-                    well_data.category_h2s,
-                    well_data.category_gf,
-                    template_depth,
-                    skm_interval,
-                    problemWithEk_depth,
-                    problemWithEk_diametr,
-                    date_create
-                )
-
-                # Подготовленный запрос для вставки данных
-                query = f"INSERT INTO {number} VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-
-                # Выполнение запроса с использованием параметров
-                cursor.execute(query, data_values)
-
-            # Сохранить изменения и закрыть соединение
-            conn.commit()
-
-
-        except sqlite3.Error as e:
-            # Выведите сообщение об ошибке
-            QMessageBox.warning(None, 'Ошибка', f'Ошибка добавления скважины в базу данных: {type(e).__name__}\n\n{str(e)}')
-        finally:
-            if cursor:
-                cursor.close()
-            if conn:
-                conn.close()
 
 def get_table_creation_time(conn, table_name):
     if well_data.connect_in_base:

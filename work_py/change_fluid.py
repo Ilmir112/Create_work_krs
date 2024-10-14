@@ -20,7 +20,7 @@ class TabPage_SO_change(QWidget):
         self.validator_int = QIntValidator(0, 600)
         self.validator_float = QDoubleValidator(0.87, 1.65, 2)
 
-        self.need_change_zgs_label = QLabel('Необходимо ли менять ЖГС', self)
+        self.need_change_zgs_label = QLabel('Расчет по новому пласту?', self)
         self.need_change_zgs_combo = QComboBox(self)
         self.need_change_zgs_combo.addItems(['Нет', 'Да'])
 
@@ -48,8 +48,8 @@ class TabPage_SO_change(QWidget):
         # self.grid.addWidget(self.plast_new_label, 3, 3)
         # self.grid.addWidget(self.plast_new_combo, 4, 3)
         #
-        # self.grid.addWidget(self.fluid_new_label, 3, 4)
-        # self.grid.addWidget(self.fluid_new_edit, 4, 4)
+        self.grid.addWidget(self.fluid_new_label, 3, 4)
+        self.grid.addWidget(self.fluid_new_edit, 4, 4)
         #
         # self.grid.addWidget(self.pressuar_new_label, 3, 5)
         # self.grid.addWidget(self.pressuar_new_edit, 4, 5)
@@ -125,8 +125,7 @@ class TabPage_SO_change(QWidget):
             self.grid.addWidget(self.plast_new_label, 9, 2)
             self.grid.addWidget(self.plast_new_combo, 10, 2)
 
-            self.grid.addWidget(self.fluid_new_label, 9, 3)
-            self.grid.addWidget(self.fluid_new_edit, 10, 3)
+
 
             self.grid.addWidget(self.pressuar_new_label, 9, 4)
             self.grid.addWidget(self.pressuar_new_edit, 10, 4)
@@ -155,8 +154,7 @@ class TabPage_SO_change(QWidget):
 
                 self.plast_new_label.setParent(None)
                 self.plast_new_combo.setParent(None)
-                self.fluid_new_label.setParent(None)
-                self.fluid_new_edit.setParent(None)
+
                 self.pressuar_new_label.setParent(None)
                 self.pressuar_new_edit.setParent(None)
             except:
@@ -196,88 +194,117 @@ class Change_fluid_Window(MyMainWindow):
         vbox.addWidget(self.buttonAdd, 2, 0)
 
     def add_work(self):
-        from main import MyMainWindow
-        if well_data.plast_project:
-            plast_new_combo = str(self.tabWidget.currentWidget().plast_new_combo.currentText())
+        currentWidget = self.tabWidget.currentWidget()
+        self.need_change_zgs_combo = currentWidget.need_change_zgs_combo.currentText()
+        fluid_new_edit = currentWidget.fluid_new_edit.text().replace(',', '.')
+        if fluid_new_edit == '':
+            QMessageBox.information(self, 'Ошибка', 'Не введен расчетный уд.вес')
+            return
         else:
-            plast_new_combo = str(self.tabWidget.currentWidget().plast_new_combo.text())
-
-        fluid_new_edit = round(float(float(self.tabWidget.currentWidget().fluid_new_edit.text().replace(',', '.'))), 2)
-        pressuar_new_edit = float(self.tabWidget.currentWidget().pressuar_new_edit.text())
-
-        if (plast_new_combo == '' or fluid_new_edit == '' or pressuar_new_edit == ''):
-            mes = QMessageBox.critical(self, 'Ошибка', 'Введены не все параметры')
-            return
-        if fluid_new_edit > 1.65 or fluid_new_edit < 0.87:
-            mes = QMessageBox.critical(self, 'Ошибка', 'Жидкость не может быть данным удельным весом')
-            return
-        if pressuar_new_edit < 10 == False:
-            mes = QMessageBox.critical(self, 'Ошибка', 'Ожидаемое давление слишком низкое')
-            return
-
-        if len(well_data.plast_project) != 0:
-            plast_new_combo = self.tabWidget.currentWidget().plast_new_combo.currentText()
-        else:
-            plast_new_combo = self.tabWidget.currentWidget().plast_new_combo.text()
-
-        fluid_new_edit = self.tabWidget.currentWidget().fluid_new_edit.text()
-        if fluid_new_edit != '':
-            fluid_new_edit = float(fluid_new_edit.replace(',', '.'))
-        pressuar_new_edit = self.tabWidget.currentWidget().pressuar_new_edit.text()
-
-        if pressuar_new_edit != '':
-            pressuar_new_edit = int(float(pressuar_new_edit.replace(',', '.')))
-
-        aassdaad = well_data.dict_category
-
-        if well_data.dict_category[plast_new_combo]['отключение'] != 'планируемый':
-            h2s_pr_edit = self.tabWidget.currentWidget().h2s_pr_edit.text().replace(',', '.')
-            h2s_mg_edit = self.tabWidget.currentWidget().h2s_mg_edit.text().replace(',', '.')
-            gf_edit = self.tabWidget.currentWidget().gf_edit.text().replace(',', '.')
-            calc_plast_h2s = self.tabWidget.currentWidget().calc_plast_h2s.text()
-            if h2s_pr_edit != '' and h2s_mg_edit and gf_edit != '' and calc_plast_h2s != '' and pressuar_new_edit != '':
-
-                asdwd = well_data.dict_category
-
-                Pressuar = namedtuple("Pressuar", "category data_pressuar")
-                Data_h2s = namedtuple("Data_h2s", "category data_procent data_mg_l poglot")
-                Data_gaz = namedtuple("Data_gaz", "category data")
-
-                category_pressuar_line_combo = self.tabWidget.currentWidget().category_pressuar_line_combo.currentText()
-                category_h2s_edit = self.tabWidget.currentWidget().category_h2s_edit.currentText()
-
-                category_gf = self.tabWidget.currentWidget().category_gf.currentText()
-                gf_edit = self.tabWidget.currentWidget().gf_edit.text().replace(',', '.')
-
-                well_data.dict_category.setdefault(plast_new_combo, {}).setdefault(
-                    'по давлению',
-                    Pressuar(int(float(category_pressuar_line_combo)),
-                             float(pressuar_new_edit)))
-
-                well_data.dict_category.setdefault(plast_new_combo, {}).setdefault(
-                    'по сероводороду', Data_h2s(
-                        int(float(category_h2s_edit)),
-                        float(h2s_pr_edit.replace(',', '.')),
-                        float(h2s_mg_edit.replace(',', '.')),
-                        float(calc_plast_h2s.replace(',', '.'))))
-
-                well_data.dict_category.setdefault(plast_new_combo, {}).setdefault(
-                    'по газовому фактору', Data_gaz(
-                        int(category_gf),
-                        float(gf_edit)))
-                try:
-                    well_data.dict_category[plast_new_combo]['отключение'] = 'планируемый'
-                except:
-                    well_data.dict_category.setdefault(plast_new_combo, {}).setdefault(
-                        'отключение', 'планируемый')
+            fluid_new_edit = round(float(fluid_new_edit), 2)
+        if self.need_change_zgs_combo == 'Да':
+            if well_data.plast_project:
+                plast_new_combo = currentWidget.plast_new_combo.currentText()
             else:
+                plast_new_combo = currentWidget.plast_new_combo.text()
+
+
+            pressuar_new_edit = float(self.tabWidget.currentWidget().pressuar_new_edit.text())
+
+            if (plast_new_combo == '' or fluid_new_edit == '' or pressuar_new_edit == ''):
+                mes = QMessageBox.critical(self, 'Ошибка', 'Введены не все параметры')
+                return
+            if fluid_new_edit > 1.65 or fluid_new_edit < 0.87:
+                mes = QMessageBox.critical(self, 'Ошибка', 'Жидкость не может быть данным удельным весом')
+                return
+            if pressuar_new_edit < 10 == False:
+                mes = QMessageBox.critical(self, 'Ошибка', 'Ожидаемое давление слишком низкое')
                 return
 
+            if len(well_data.plast_project) != 0:
+                plast_new_combo = self.tabWidget.currentWidget().plast_new_combo.currentText()
+            else:
+                plast_new_combo = self.tabWidget.currentWidget().plast_new_combo.text()
 
-        work_list = self.fluid_change(plast_new_combo, fluid_new_edit, pressuar_new_edit)
+
+            pressuar_new_edit = self.tabWidget.currentWidget().pressuar_new_edit.text()
+
+            if pressuar_new_edit != '':
+                pressuar_new_edit = int(float(pressuar_new_edit.replace(',', '.')))
+
+            aassdaad = well_data.dict_category
+
+            if well_data.dict_category[plast_new_combo]['отключение'] != 'планируемый':
+                h2s_pr_edit = self.tabWidget.currentWidget().h2s_pr_edit.text().replace(',', '.')
+                h2s_mg_edit = self.tabWidget.currentWidget().h2s_mg_edit.text().replace(',', '.')
+                gf_edit = self.tabWidget.currentWidget().gf_edit.text().replace(',', '.')
+                calc_plast_h2s = self.tabWidget.currentWidget().calc_plast_h2s.text()
+                if h2s_pr_edit != '' and h2s_mg_edit and gf_edit != '' and calc_plast_h2s != '' and pressuar_new_edit != '':
+
+                    asdwd = well_data.dict_category
+
+                    Pressuar = namedtuple("Pressuar", "category data_pressuar")
+                    Data_h2s = namedtuple("Data_h2s", "category data_procent data_mg_l poglot")
+                    Data_gaz = namedtuple("Data_gaz", "category data")
+
+                    category_pressuar_line_combo = self.tabWidget.currentWidget().category_pressuar_line_combo.currentText()
+                    category_h2s_edit = self.tabWidget.currentWidget().category_h2s_edit.currentText()
+
+                    category_gf = self.tabWidget.currentWidget().category_gf.currentText()
+                    gf_edit = self.tabWidget.currentWidget().gf_edit.text().replace(',', '.')
+
+                    well_data.dict_category.setdefault(plast_new_combo, {}).setdefault(
+                        'по давлению',
+                        Pressuar(int(float(category_pressuar_line_combo)),
+                                 float(pressuar_new_edit)))
+
+                    well_data.dict_category.setdefault(plast_new_combo, {}).setdefault(
+                        'по сероводороду', Data_h2s(
+                            int(float(category_h2s_edit)),
+                            float(h2s_pr_edit.replace(',', '.')),
+                            float(h2s_mg_edit.replace(',', '.')),
+                            float(calc_plast_h2s.replace(',', '.'))))
+
+                    well_data.dict_category.setdefault(plast_new_combo, {}).setdefault(
+                        'по газовому фактору', Data_gaz(
+                            int(category_gf),
+                            float(gf_edit)))
+                    try:
+                        well_data.dict_category[plast_new_combo]['отключение'] = 'планируемый'
+                    except:
+                        well_data.dict_category.setdefault(plast_new_combo, {}).setdefault(
+                            'отключение', 'планируемый')
+                else:
+                    return
+
+        if self.need_change_zgs_combo == 'Да':
+            work_list = self.fluid_change(plast_new_combo, fluid_new_edit, pressuar_new_edit)
+        else:
+            work_list = self.fluid_change_old_plast(fluid_new_edit)
         self.populate_row(self.ins_ind, work_list, self.table_widget)
         well_data.pause = False
         self.close()
+
+    def fluid_change_old_plast(self, fluid_new_edit):
+        from work_py.alone_oreration import well_volume, update_fluid
+        fluid_work = str(fluid_new_edit) + well_data.fluid_work[4:]
+        well_data.fluid_work_short = str(fluid_new_edit) + well_data.fluid_work_short[4:]
+
+        fluid_change_list = [
+            [f'Cмена объема {well_data.fluid_work_short}- {round(well_volume(self, well_data.current_bottom), 1)}м3',
+             None,
+             f'Произвести смену объема обратной промывкой по круговой циркуляции  жидкостью  {fluid_work} '
+             f' в объеме не '
+             f'менее {round(well_volume(self, well_data.current_bottom), 1)}м3  в присутствии '
+             f'представителя заказчика, Составить акт. '
+             f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за '
+             f'2 часа до начала работ)',
+             None, None, None, None, None, None, None,
+             'мастер КРС', well_volume_norm(well_volume(self, well_data.current_bottom))]]
+
+        update_fluid(well_data.ins_ind, fluid_work, self.table_widget)
+        well_data.fluid_work = fluid_work
+        return fluid_change_list
 
     def fluid_change(self, plast_new, fluid_new, pressuar_new):
         from work_py.alone_oreration import well_volume, update_fluid

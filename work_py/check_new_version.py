@@ -214,12 +214,12 @@ class UpdateThread(QThread):
             update_thread = threading.Thread(target=self.update_process)
             update_thread.start()
 
-            # mes = QMessageBox.information(None, 'Обновление', 'Обновление скачано, необходимо разархивировать архив и '
+            # QMessageBox.information(None, 'Обновление', 'Обновление скачано, необходимо разархивировать архив и '
             #                                                   'перезапустить приложение')
 
 
         except requests.exceptions.RequestException as e:
-            mes = QMessageBox.warning(None, "Ошибка", f"Не удалось загрузить обновления: {type(e).__name__}\n\n{str(e)}")
+            QMessageBox.warning(None, "Ошибка", f"Не удалось загрузить обновления: {type(e).__name__}\n\n{str(e)}")
 
     def move_file(self, source_path, destination_path):
         zima_process_name = "ZIMA.exe"

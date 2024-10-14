@@ -734,6 +734,7 @@ class DataWindow(MyMainWindow):
         if region_Combo == '':
             QMessageBox.warning(self, 'ОШИБКА', 'Не выбран регион')
             return
+        well_data.region = region_Combo
         if type_kr_Combo == '':
             QMessageBox.warning(self, 'ОШИБКА', 'Не выбран Вид и категория ремонта')
             return
@@ -847,7 +848,7 @@ class DataWindow(MyMainWindow):
 
         if any([self.ifNum(data_well) is False or data_well in ['не корректно', 0, 'отсут'] for data_well in
                 [columnType, column_wall_thickness, shoe_column]]):
-            msg = QMessageBox.information(self, 'Внимание', 'Не все поля в данных колонне соответствуют значениям')
+            QMessageBox.information(self, 'Внимание', 'Не все поля в данных колонне соответствуют значениям')
             close_file = False
 
         elif float(bottomhole_artificial) > 10000 or float(bottomhole_drill) > 10000:
@@ -857,7 +858,7 @@ class DataWindow(MyMainWindow):
         elif any([self.ifNum(data_well) is False for data_well in
                   [column_additional_diametr, column_additional_wall_thickness,
                    shoe_column_additional, head_column_additional]]) and well_data.column_additional is True:
-            msg = QMessageBox.information(self, 'Внимание', 'Не все поля в доп колонне соответствуют значениям')
+            QMessageBox.information(self, 'Внимание', 'Не все поля в доп колонне соответствуют значениям')
             close_file = False
         elif self.ifNum(bottomhole_artificial) is False \
                 or self.ifNum(bottomhole_drill) is False \
@@ -866,11 +867,11 @@ class DataWindow(MyMainWindow):
                 or self.ifNum(max_angle) is False \
                 or self.ifNum(max_admissible_pressure) is False \
                 or self.ifNum(max_expected_pressure) is False:
-            msg = QMessageBox.information(self, 'Внимание', 'Не все поля в забое соответствуют значениям')
+            QMessageBox.information(self, 'Внимание', 'Не все поля в забое соответствуют значениям')
             close_file = False
         elif self.ifNum(static_level) is False \
                 or self.ifNum(dinamic_level) is False:
-            msg = QMessageBox.information(self, 'Внимание', 'Не все поля в уровнях соответствуют значениям')
+            QMessageBox.information(self, 'Внимание', 'Не все поля в уровнях соответствуют значениям')
             close_file = False
         elif self.ifNum(dict_pump_ECN_h_do) is False \
                 or self.ifNum(dict_pump_ECN_h_posle) is False \
@@ -880,7 +881,7 @@ class DataWindow(MyMainWindow):
                 or self.ifNum(depth_fond_paker_posle) is False \
                 or self.ifNum(depth_fond_paker2_do) is False \
                 or self.ifNum(depth_fond_paker2_posle) is False:
-            msg = QMessageBox.information(self, 'Внимание', 'Не все поля в спущенном оборудовании'
+            QMessageBox.information(self, 'Внимание', 'Не все поля в спущенном оборудовании'
                                                             ' соответствуют значениям')
             close_file = False
         elif well_data.column_additional:
@@ -900,7 +901,7 @@ class DataWindow(MyMainWindow):
                 or self.ifNum(column_direction_lenght) is False \
                 or self.ifNum(level_cement_direction) is False:
 
-            msg = QMessageBox.information(self, 'Внимание', 'Не все поля в Направлении соответствуют значениям')
+            QMessageBox.information(self, 'Внимание', 'Не все поля в Направлении соответствуют значениям')
             close_file = False
         elif self.ifNum(column_conductor_diametr) is False \
                 or self.ifNum(column_conductor_wall_thickness) is False \
@@ -908,7 +909,7 @@ class DataWindow(MyMainWindow):
                 or self.ifNum(column_direction_lenght) is False \
                 or self.ifNum(level_cement_conductor) is False:
 
-            msg = QMessageBox.information(self, 'Внимание', 'Не все поля в кондукторе соответствуют значениям')
+            QMessageBox.information(self, 'Внимание', 'Не все поля в кондукторе соответствуют значениям')
             close_file = False
 
         elif any(['НВ' in dict_pump_SHGN_do.upper(), 'ШГН' in dict_pump_SHGN_do.upper(),
@@ -930,16 +931,16 @@ class DataWindow(MyMainWindow):
                 or any(['ЭЦН' in dict_pump_ECN_do.upper(), 'ВНН' in dict_pump_ECN_do.upper(),
                         dict_pump_ECN_do == 'отсут']) is False:
 
-            msg = QMessageBox.information(self, 'Внимание', 'Не все поля соответствуют значениям')
+            QMessageBox.information(self, 'Внимание', 'Не все поля соответствуют значениям')
             close_file = False
         elif isinstance(self.ifNum(head_column_additional), str):
             # print(self.if_None(head_column_additional), isinstance(self.ifNum(head_column_additional), str))
             if self.if_None(20 if self.ifNum(head_column_additional) else head_column_additional) < 5:
                 # print(self.if_None(head_column_additional))
-                msg = QMessageBox.information(self, 'Внимание', 'В скважине отсутствует доп колонна')
+                QMessageBox.information(self, 'Внимание', 'В скважине отсутствует доп колонна')
                 close_file = False
             else:
-                msg = QMessageBox.information(self, 'Внимание', 'В скважине отсутствует доп колонна')
+                QMessageBox.information(self, 'Внимание', 'В скважине отсутствует доп колонна')
                 close_file = False
 
         elif all([pump for pump in [self.ifNum(dict_pump_ECN_do), self.ifNum(paker2_do),
@@ -961,17 +962,17 @@ class DataWindow(MyMainWindow):
             else:
                 close_file = True
         elif (well_data.nkt_mistake is True and len(well_data.dict_nkt) == 0):
-            msg = QMessageBox.information(self, 'Внимание',
+            QMessageBox.information(self, 'Внимание',
                                           'При вызванной ошибке НКТ до ремонта не может быть пустым')
             close_file = False
         elif well_data.nkt_mistake is True and len(well_data.dict_nkt_po) == 0:
-            msg = QMessageBox.information(self, 'Внимание',
+            QMessageBox.information(self, 'Внимание',
                                           'При вызванной ошибке НКТ после ремонта не может быть пустым')
             close_file = False
 
         elif well_data.column_additional:
             if int(column_additional_diametr) >= int(columnType):
-                msg = QMessageBox.information(self, 'Внимание', 'Ошибка в диаметре доп колонны')
+                QMessageBox.information(self, 'Внимание', 'Ошибка в диаметре доп колонны')
                 close_file = False
 
         if type_kr_Combo in ['КР13-1  Подготовительные работы к ГРП (ПР)',
@@ -989,7 +990,7 @@ class DataWindow(MyMainWindow):
 
         if curator == 'ОР':
             if self.ifNum(expected_Q_edit) is False or self.ifNum(expected_P_edit) is False:
-                msg = QMessageBox.information(self, 'Внимание',
+                QMessageBox.information(self, 'Внимание',
                                               'Не все поля в Ожидаемых показателях соответствуют значениям')
                 close_file = False
         else:
@@ -1162,7 +1163,7 @@ class DataWindow(MyMainWindow):
                             f'диаметром {paker_diametr}')
 
                 except Exception as e:
-                    mes = QMessageBox.information(self, 'Ошибка обработки', f'ошибка проверки ПЗ в части соответствия '
+                    QMessageBox.information(self, 'Ошибка обработки', f'ошибка проверки ПЗ в части соответствия '
                                                                             f'диаметра пакера \n {type(e).__name__}\n\n{str(e)}')
 
 

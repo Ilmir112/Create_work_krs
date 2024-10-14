@@ -198,19 +198,19 @@ def calc_h2s(ws3, h2s_pr, h2s_mg):
     ws3.print_area = 'A1:F77'
 
 
-def well_volume(self):
+def well_volume(self, current_bottom):
     # print(well_data.column_additional)
     if well_data.column_additional is False:
 
         volume_well = 3.14 * (
                     well_data.column_diametr._value - well_data.column_wall_thickness._value * 2) ** 2 / 4 / 1000000 * (
-                          well_data.bottomhole_artificial._value)
+                          current_bottom)
         return volume_well
     else:
 
         volume_well = (3.14 * (
                     well_data.column_additional_diametr._value - well_data.column_wall_thickness._value * 2) ** 2 / 4 / 1000 * (
-                               well_data.bottomhole_artificial._value - float(
+                               current_bottom - float(
                            well_data.head_column_additional._value)) / 1000) + (
                               3.14 * (
                                   well_data.column_diametr._value - well_data.column_wall_thickness._value * 2) ** 2 / 4 / 1000 * (
@@ -219,93 +219,75 @@ def well_volume(self):
 
 
 def calv_h2s(self, cat_H2S, h2s_mg, h2s_pr):
-    if '2' == str(cat_H2S) or '1' in str(cat_H2S):
+    if '2' in str(cat_H2S) or '1' in str(cat_H2S):
         nkt_l = sum(list(well_data.dict_nkt.values()))
         # Внутренний объем ЭК на 1 п.м.
-        udel_vnutr_v = 10 * 3.14 * (
-                    (well_data.column_diametr._value - well_data.column_wall_thickness._value * 2) * 0.01) ** 2 / 4
+        udel_vnutr_v = round(10 * 3.14 * (
+                    (well_data.column_diametr._value - well_data.column_wall_thickness._value * 2) * 0.01) ** 2 / 4, 2)
 
-        if well_data.column_additional is True:
-            udel_vn__khv = 10 * 3.14 * ((well_data.column_additional_diametr._value -
-                                         well_data.column_additional_wall_thickness._value * 2) * 0.01) ** 2 / 4
+        if well_data.column_additional:
+            udel_vn_khv = round(10 * 3.14 * ((well_data.column_additional_diametr._value -
+                                         well_data.column_additional_wall_thickness._value * 2) * 0.01) ** 2 / 4, 2)
 
         if well_data.column_additional is False:
 
-            v_pod_gno = 3.14 * (int(well_data.column_diametr._value) - int(
+            v_pod_gno = round(3.14 * (int(well_data.column_diametr._value) - int(
                 well_data.column_wall_thickness._value) * 2) ** 2 / 4 / 1000 * (
-                                    well_data.bottomhole_artificial._value - int(nkt_l)) / 1000
+                                    well_data.current_bottom - int(nkt_l)) / 1000, 2)
         elif nkt_l > float(well_data.head_column_additional._value):
-            v_pod_gno = 3.14 * (
+            v_pod_gno = round(3.14 * (
                         well_data.column_diametr._value - well_data.column_wall_thickness._value * 2) ** 2 / 4 / 1000 * (
                                     float(well_data.head_column_additional._value) - nkt_l) / 1000 + 3.14 * (
                                     well_data.column_additional_diametr._value - well_data.column_additional_wall_thickness._value * 2) ** 2 / 4 / 1000 * (
-                                    well_data.bottomhole_artificial._value - float(
-                                well_data.head_column_additional._value)) / 1000
-        elif nkt_l < float(well_data.head_column_additional._value):
-            v_pod_gno = 3.14 * (
+                                    well_data.current_bottom - float(
+                                well_data.head_column_additional._value)) / 1000, 2)
+        elif nkt_l <= float(well_data.head_column_additional._value):
+            v_pod_gno = round(3.14 * (
                         well_data.column_additional_diametr._value - well_data.column_additional_wall_thickness._value * 2) ** 2 / 4 / 1000 * (
-                                    well_data.bottomhole_artificial._value - nkt_l) / 1000
+                            well_data.current_bottom - nkt_l) / 1000,2)
         udel_vodoiz_nkt = 0
-        volume_well = well_volume(self)
-        try:
-            if '73' in list(well_data.dict_nkt.keys())[0]:
+        volume_well = well_volume(self, well_data.current_bottom)
+        aaa = well_data.dict_nkt
+
+        vodoiz_nkt = 0
+
+
+        for nkt_key, nkt_values in well_data.dict_nkt.items():
+            if '73' in nkt_key:
                 nkt_1 = 73
-            elif '60' in list(well_data.dict_nkt.keys())[0]:
+                nkt_width = 5.5
+            elif '60' in nkt_key:
                 nkt_1 = 60
-            elif '48' in list(well_data.dict_nkt.keys())[0]:
+                nkt_width = 5
+            elif '48' in nkt_key:
                 nkt_1 = 48
-            elif '89' in list(well_data.dict_nkt.keys())[0]:
+                nkt_width = 4
+            elif '89' in nkt_key:
                 nkt_1 = 89
+                nkt_width = 6.5
 
 
-            try:
-                # print(list(well_data.dict_nkt.keys()))
-                nkt_2 = int(list(well_data.dict_nkt.keys())[1])
-                nkt_2_l = well_data.dict_nkt[nkt_2]
-            except:
-                nkt_2 = 0
-                nkt_2_l = 0
+            vodoiz_nkt = round(10 * 3.14 * ((nkt_1 * 0.01) ** 2 - (nkt_1 * 0.01 - nkt_width * 2 * 0.01) ** 2) / 4, 2)
+            udel_vodoiz_nkt += vodoiz_nkt*nkt_values/1000
 
+        sucker_rod_l_25 = 0
+        sucker_rod_l_22 = 0
+        sucker_rod_l_19 = 0
 
-            udel_vodoiz_nkt = 10 * 3.14 * ((nkt_1 * 0.01) ** 2 - (nkt_1 * 0.01 - 5.5 * 2 * 0.01) ** 2) / 4
-        except Exception as e:
-            QMessageBox.warning(None, 'Ошибка', f'Ошибка обработки НКТ {type(e).__name__}\n\n{str(e)}')
-        # print(f' удел {udel_vodoiz_nkt}')
-        try:
-            # print(f'НКТ-{nkt_2}')
-            if nkt_2 != 0:
-                udel_vodoiz_nkt_2 = 10 * 3.14 * ((nkt_2 * 0.01) ** 2 + (nkt_2 * 0.01 - 5 * 2 * 0.01) ** 2) / 4
-                # print(f'dnjhfzНКТ {udel_vodoiz_nkt_2}')
-        except:
-            udel_vodoiz_nkt = udel_vodoiz_nkt
-            # print(f'dnjhfzНКТ {udel_vodoiz_nkt}')
-        try:
-            nkt_1_l = well_data.dict_nkt[list(well_data.dict_nkt.keys())[0]]
-        except:
-            nkt_1_l = 73
-        vodoiz_nkt = nkt_1_l * udel_vodoiz_nkt / 1000
-        try:
-            vodoiz_nkt += nkt_2_l * udel_vodoiz_nkt_2 / 1000
-        except:
-            vodoiz_nkt = vodoiz_nkt
-        try:
-            sucker_rod_l_25 = well_data.dict_sucker_rod['25']
-        except:
-            sucker_rod_l_25 = 0
-        try:
-            sucker_rod_l_22 = well_data.dict_sucker_rod['22']
-        except:
-            sucker_rod_l_22 = 0
-        try:
-            sucker_rod_l_19 = well_data.dict_sucker_rod["19"]
-        except:
-            sucker_rod_l_19 = 0
+        for sucker_key, sucker_value in well_data.dict_sucker_rod.items():
+            if '25' in sucker_key:
+                sucker_rod_l_25 =  sucker_value
+            elif '22' in sucker_key:
+                sucker_rod_l_22 = sucker_value
+            elif '19' in sucker_key:
+                sucker_rod_l_19 = sucker_value
+
 
         vodoiz_sucker = (10 * 3.14 * ((25 * 0.01) ** 2 / 4) * sucker_rod_l_25 / 1000) + (
                     10 * 3.14 * ((25 * 0.01) ** 2 / 4) * sucker_rod_l_22 / 1000) + (
                                     10 * 3.14 * ((25 * 0.01) ** 2 / 4) * sucker_rod_l_19 / 1000)
-
-        oil_mass = float(v_pod_gno * (100 - well_data.proc_water) * 0.9 / 100)
+        aaaa= well_data.proc_water
+        oil_mass = round(float(udel_vodoiz_nkt * (100 - well_data.proc_water) * 0.9 / 100),2)
         # print(f'oil {oil_mass}-{type(oil_mass)} , {well_data.gaz_f_pr[0]}-{type(well_data.gaz_f_pr[0])}')
         try:
             volume_h2s = well_data.gaz_f_pr[0] * oil_mass * (float(h2s_pr)) / 100
@@ -313,14 +295,14 @@ def calv_h2s(self, cat_H2S, h2s_mg, h2s_pr):
             well_data.gaz_f_pr = [11]
             volume_h2s = well_data.gaz_f_pr[0] * oil_mass * (float(h2s_pr)) / 100
 
-        h2s_mass_in_oil = (34 * volume_h2s * 1000 / 22.14)
+        h2s_mass_in_oil = round(34 * volume_h2s * 1000 / 22.14, 0)
         # print(type(vodoiz_sucker), type(vodoiz_nkt), h2s_mg, float(h2s_mg))
-        h2s_mass_in_water = float(vodoiz_sucker + vodoiz_nkt) * h2s_mg
+        h2s_mass_in_water = round(float(vodoiz_sucker + vodoiz_nkt) * h2s_mg, 0)
         # print(f'h2a{h2s_mass_in_water}')2
-        mass_oil_pog_gno = (vodoiz_sucker + vodoiz_nkt) * (100 - well_data.proc_water) * 0.9 / 100
+        mass_oil_pog_gno = v_pod_gno * (100 - well_data.proc_water) * 0.9 / 100
         h2s_volume_pod_gno = mass_oil_pog_gno * well_data.gaz_f_pr[0] * h2s_pr / 100
-        mass_h2s_gas = 34 * h2s_volume_pod_gno / 22.14
-        mass_h2s_water = v_pod_gno * h2s_mg
+        mass_h2s_gas = round(34 * h2s_volume_pod_gno * 1000/ 22.14, 0)
+        mass_h2s_water = round(v_pod_gno * h2s_mg, 0)
         # print(f'mass{mass_h2s_water}')
         mass_h2s_all = h2s_mass_in_water + h2s_mass_in_oil + mass_h2s_gas + mass_h2s_water
         # print(f'mass_h2 {mass_h2s_all}')
@@ -333,7 +315,7 @@ def calv_h2s(self, cat_H2S, h2s_mg, h2s_pr):
         koeff_zapas = 1.25
         mass_reag_s_zapas = raschet_mass * koeff_zapas
         # print(f'mass{mass_reag_s_zapas}')
-        udel_mas_raskhod = mass_reag_s_zapas / volume_well
+        udel_mas_raskhod = mass_reag_s_zapas / volume_well /plotn_reag
         # print(udel_mas_raskhod)
 
         if udel_mas_raskhod <= 0.01:

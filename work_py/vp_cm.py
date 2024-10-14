@@ -136,7 +136,7 @@ class VpWindow(MyMainWindow):
             work_list = self.czh(cement_vp)
 
         # if roof_clay_edit > sole_clay_edit:
-        #     mes = QMessageBox.warning(self, 'Ошибка', 'Не корректные интервалы ')
+        #     QMessageBox.warning(self, 'Ошибка', 'Не корректные интервалы ')
         #     return
 
 

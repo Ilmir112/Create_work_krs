@@ -1,27 +1,18 @@
-import sqlite3
-from datetime import datetime
-from main import MyMainWindow
-import psycopg2
-from PyQt5.QtWidgets import QInputDialog, QMainWindow, QTabWidget, QWidget, QTableWidget, QApplication, QLabel, \
-    QLineEdit, QGridLayout, QComboBox, QPushButton, QMessageBox
-# from PyQt5.uic.properties import QtWidgets
-from openpyxl.styles import Alignment
-from openpyxl.utils import get_column_letter
-from collections import namedtuple
-
-import well_data
-from gnkt_data.gnkt_data import gnkt_1, gnkt_2, gnkt_dict, read_database_gnkt
-from krs import TabPageGno
-from perforation_correct import PerforationCorrect
-
 import block_name
 import main
-import plan
-from block_name import razdel_1
-from openpyxl.styles import Border, Side, PatternFill, Font, Alignment
-from openpyxl.reader.excel import load_workbook
-from openpyxl.workbook import Workbook
+import well_data
 
+from datetime import datetime
+
+from data_base.config_base import connect_to_database
+from main import MyMainWindow
+import psycopg2
+from PyQt5.QtWidgets import QInputDialog, QTabWidget, QWidget, QApplication, QLabel, \
+    QLineEdit, QGridLayout, QComboBox, QPushButton, QMessageBox
+from openpyxl.utils import get_column_letter
+from gnkt_data.gnkt_data import gnkt_1, gnkt_2, gnkt_dict, read_database_gnkt
+from block_name import razdel_1
+from openpyxl.styles import PatternFill, Font, Alignment
 from work_py.alone_oreration import well_volume
 
 
@@ -50,7 +41,6 @@ class TabPageDp(QWidget):
 
         self.previous_well_label = QLabel('Предыдущая скважина')
         self.previous_well_combo = QComboBox(self)
-
 
         self.current_bottom_label = QLabel('необходимый текущий забой')
         self.current_bottom_edit = QLineEdit(self)
@@ -98,20 +88,18 @@ class TabPageDp(QWidget):
         previus_well = self.previous_well_combo.currentText()
         try:
             if previus_well:
-                conn = psycopg2.connect(**well_data.postgres_conn_gnkt)
+                conn = connect_to_database(well_data.DB_NAME_GNKT)
 
                 cursor = conn.cursor()
 
                 if 'ойл-сервис' in well_data.contractor.lower():
                     contractor = 'oil_service'
 
-
                 cursor.execute("""
                     SELECT * FROM gnkt_{contractor} WHERE well_number = %s;
                 """.format(contractor=contractor), (previus_well,))
 
                 result_gnkt = cursor.fetchone()
-
 
                 self.lenght_gnkt_edit.setText(str(result_gnkt[3]))
                 self.iznos_gnkt_edit.setText(str(result_gnkt[5]))
@@ -124,15 +112,10 @@ class TabPageDp(QWidget):
 
     def update_number_gnkt(self, gnkt_number):
         if gnkt_number != '':
-
             well_previus_list = read_database_gnkt(well_data.contractor, gnkt_number)
 
             self.previous_well_combo.clear()
             self.previous_well_combo.addItems(list(map(str, well_previus_list)))
-
-
-
-
 
 
 class TabWidget(QTabWidget):
@@ -164,7 +147,6 @@ class GnktOsvWindow2(MyMainWindow):
 
         well_data.pipe_fatigue = 0
 
-
         well_data.gnkt_length = lenght_gnkt_edit
         iznos_gnkt_edit = self.tabWidget.currentWidget().iznos_gnkt_edit.text().replace(',', '.')
         pipe_mileage_edit = self.tabWidget.currentWidget().pipe_mileage_edit.text()
@@ -172,12 +154,12 @@ class GnktOsvWindow2(MyMainWindow):
         well_data.iznos = iznos_gnkt_edit
         current_bottom_edit = self.tabWidget.currentWidget().current_bottom_edit.text()
         if current_bottom_edit == '':
-            mes = QMessageBox.warning(self, 'Некорректные данные', f'не указан текущий забоя')
+            QMessageBox.warning(self, 'Некорректные данные', f'не указан текущий забоя')
             return
         else:
             current_bottom_edit = float(current_bottom_edit.replace(',', '.'))
             if current_bottom_edit > float(well_data.bottomhole_drill._value):
-                mes = QMessageBox.warning(self, 'Некорректные данные',
+                QMessageBox.warning(self, 'Некорректные данные',
                                           f'Текущий забой ниже пробуренного забоя {well_data.bottomhole_drill._value}')
                 return
         GnktOsvWindow2.current_bottom_edit = int(float(current_bottom_edit))
@@ -195,7 +177,7 @@ class GnktOsvWindow2(MyMainWindow):
         well_data.diametr_length = 38
 
         if '' in [gnkt_number_combo, lenght_gnkt_edit, iznos_gnkt_edit, fluid_edit, pvo_number]:
-            mes = QMessageBox.warning(self, 'Некорректные данные', f'Не все данные заполнены')
+            QMessageBox.warning(self, 'Некорректные данные', f'Не все данные заполнены')
             return
 
         fluid_question = QMessageBox.question(self, 'Удельный вес',
@@ -284,9 +266,12 @@ class GnktOsvWindow2(MyMainWindow):
                                 'внимание' in str(ws2.cell(row=i + 1, column=column + 1).value).lower() or \
                                 'мероприятия' in str(ws2.cell(row=i + 1, column=column + 1).value).lower() or \
                                 'порядок работ' in str(ws2.cell(row=i + 1, column=column + 1).value).lower() or \
-                                'ТЕХНОЛОГИЧЕСКИЕ ПРОЦЕССЫ' in str(ws2.cell(row=i + 1, column=column + 1).value).upper() or \
-                                'оказание первой (доврачебной) помощи' in str(ws2.cell(row=i + 1, column=column + 1).value).lower() or \
-                                'Контроль воздушной среды' in str(ws2.cell(row=i + 1, column=column + 1).value).lower() or \
+                                'ТЕХНОЛОГИЧЕСКИЕ ПРОЦЕССЫ' in str(
+                            ws2.cell(row=i + 1, column=column + 1).value).upper() or \
+                                'оказание первой (доврачебной) помощи' in str(
+                            ws2.cell(row=i + 1, column=column + 1).value).lower() or \
+                                'Контроль воздушной среды' in str(
+                            ws2.cell(row=i + 1, column=column + 1).value).lower() or \
                                 'Требования безопасности' in str(
                             ws2.cell(row=i + 1, column=column + 1).value).lower() or \
                                 'По доп.согласованию с Заказчиком' in str(
@@ -339,7 +324,7 @@ class GnktOsvWindow2(MyMainWindow):
                     coordinate = f'{get_column_letter(col - 1)}{row_ind - 2}'
                     self.insert_image(ws2, f'{well_data.path_image}imageFiles/Алиев Заур.png', coordinate)
                     break
-        print(f'{sheet_name} - вставлена')
+
 
     def save_to_gnkt(self):
 
@@ -367,9 +352,11 @@ class GnktOsvWindow2(MyMainWindow):
             self.wb.count_row_height(self, worksheet, work_list, sheet_name)
 
         ws6 = self.wb.create_sheet(title="СХЕМЫ КНК_44,45")
-        main.MyWindow.insert_image(self, ws6, f'{well_data.path_image}imageFiles/schema_well/СХЕМЫ КНК_44,45.png', 'A1', 550, 900)
+        main.MyWindow.insert_image(self, ws6, f'{well_data.path_image}imageFiles/schema_well/СХЕМЫ КНК_44,45.png', 'A1',
+                                   550, 900)
         ws7 = self.wb.create_sheet(title="СХЕМЫ КНК_38,1")
-        main.MyWindow.insert_image(self, ws7, f'{well_data.path_image}imageFiles/schema_well/СХЕМЫ КНК_38,1.png', 'A1', 550, 900)
+        main.MyWindow.insert_image(self, ws7, f'{well_data.path_image}imageFiles/schema_well/СХЕМЫ КНК_38,1.png', 'A1',
+                                   550, 900)
 
         # path = 'workiii'
         if 'Зуфаров' in well_data.user:
@@ -402,7 +389,7 @@ class GnktOsvWindow2(MyMainWindow):
     def create_title_list(self, ws2):
 
         # print(f'цднг {well_data.cdng._value}')
-        well_data.region = block_name.region(well_data.cdng._value)
+        well_data.region = block_name.region_select(well_data.cdng._value)
         self.region = well_data.region
 
         title_list = [
@@ -421,7 +408,7 @@ class GnktOsvWindow2(MyMainWindow):
             [None, None, 'инв. №:', well_data.inv_number, None, None, None, None, 'Площадь: ', well_data.well_area,
              None,
              1],
-            [None, None, None, None, None, None, None, 'цех:',  f'{well_data.cdng}', None, None, None]]
+            [None, None, None, None, None, None, None, 'цех:', f'{well_data.cdng}', None, None, None]]
 
         razdel = razdel_1(self, well_data.region, well_data.contractor)
 
@@ -508,15 +495,16 @@ class GnktOsvWindow2(MyMainWindow):
         len_a = 0
         volume_vn_str = ''
         volume_str = ''
+        nkt_lenght = 0
         for nkt_in, lenght in sorted_dict.items():
-
+            nkt_lenght += lenght
             if '60' in str(nkt_in):
                 nkt_in = 60
                 nkt_str += f'{nkt_in}\n'
                 nkt_widht = 5
-                nkt_widht_str += f'{nkt_widht }\n'
+                nkt_widht_str += f'{nkt_widht}\n'
                 vn_str += f'{nkt_in - 2 * nkt_widht}\n'
-                volume_vn = round((nkt_in - 2 * nkt_widht)**2*3.14/4/1000, 1)
+                volume_vn = round((nkt_in - 2 * nkt_widht) ** 2 * 3.14 / 4 / 1000, 1)
                 volume_vn_str += f'{volume_vn}\n'
                 volume = round((volume_vn * lenght) / 1000, 1)
                 volume_str += f'{volume}\n'
@@ -542,9 +530,8 @@ class GnktOsvWindow2(MyMainWindow):
                 volume = round((volume_vn * lenght) / 1000, 1)
                 volume_str += f'{volume}\n'
 
-            lenght_str += f'{lenght+len_a}\n{lenght}-'
+            lenght_str += f'{lenght + len_a}\n{lenght}-'
             len_a += lenght
-
 
         nkt_widht_str = nkt_widht_str[:-1]
         lenght_str = lenght_str.split('\n')
@@ -566,12 +553,13 @@ class GnktOsvWindow2(MyMainWindow):
         else:
             well_volume_ek = well_volume(self, well_data.current_bottom)
         if abs(float(well_data.well_volume_in_PZ[0]) - well_volume_ek) > 0.2:
-            mes = QMessageBox.warning(None, 'Некорректный объем скважины',
+            QMessageBox.warning(None, 'Некорректный объем скважины',
                                       f'Объем скважины указанный в ПЗ -{well_data.well_volume_in_PZ}м3 не совпадает '
                                       f'с расчетным {well_volume_ek}м3')
             well_volume_ek, _ = QInputDialog.getDouble(self,
                                                        "корректный объем",
-                                                       'Введите корректный объем', well_data.well_volume_in_PZ[0], 1, 80, 1)
+                                                       'Введите корректный объем', well_data.well_volume_in_PZ[0], 1,
+                                                       80, 1)
             well_volume_dp = well_volume(self, well_data.current_bottom) - well_volume_ek
         else:
             well_volume_dp = well_volume(self, well_data.current_bottom) - well_volume_ek
@@ -579,7 +567,6 @@ class GnktOsvWindow2(MyMainWindow):
             3.14 * (well_data.column_diametr._value - 2 * well_data.column_wall_thickness._value) ** 2 / 4 / 1000, 2)
         volume_pm_dp = round(3.14 * (well_data.column_additional_diametr._value - 2 *
                                      well_data.column_additional_wall_thickness._value) ** 2 / 4 / 1000, 2)
-
 
         if well_data.column_additional:
             column_data_add_diam = well_data.column_additional_diametr._value
@@ -608,8 +595,9 @@ class GnktOsvWindow2(MyMainWindow):
             Qwater = f'{well_data.Qwater}м3/сут'
             proc_water = f'{well_data.proc_water}%'
 
-
-        nkt = list(well_data.dict_nkt.keys())[0]
+        nkt = list(well_data.dict_nkt.keys())
+        if len(nkt) != 0:
+            nkt = nkt[0]
 
         wellhead_fittings = well_data.wellhead_fittings
         if well_data.work_plan == 'gnkt_after_grp':
@@ -623,14 +611,17 @@ class GnktOsvWindow2(MyMainWindow):
         elif well_data.work_plan == 'gnkt_bopz':
 
             list_gnkt_bopz = [
-                None, None, None, None, None, None, None, None, None, None,  None, None,
-              None, None, None, None,
-                f'{plast_work}\n{well_data.dict_perforation[plast_work]["кровля"]}-{well_data.dict_perforation[plast_work]["подошва"]}',None,
-             None, None, None, f'Тек. забой: \n{well_data.current_bottom}м ', None]
+                None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None,
+                f'{plast_work}\n{well_data.dict_perforation[plast_work]["кровля"]}-{well_data.dict_perforation[plast_work]["подошва"]}',
+                None,
+                None, None, None, f'Тек. забой: \n{well_data.current_bottom}м ', None]
         lenght_paker = 2
+        voronka = well_data.depth_fond_paker2_do["do"]
         if well_data.curator == 'ОР' and well_data.region == 'ТГМ':
-            lenght_paker = round(float(well_data.depth_fond_paker2_do["do"]) - float(well_data.depth_fond_paker_do["do"]), 1)
-            voronka = well_data.depth_fond_paker_do["do"] + lenght_paker
+            lenght_paker = round(
+                float(well_data.depth_fond_paker2_do["do"]) - float(well_data.depth_fond_paker_do["do"]), 1)
+            voronka = round(nkt_lenght + lenght_paker, 1)
         schema_well_list = [
             [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None],
@@ -688,13 +679,14 @@ class GnktOsvWindow2(MyMainWindow):
              nkt_widht_str, vn_str, lenght_nkt, None, None, volume_vn_str, volume_str],
             [None, None, None, None, None, None, None, None, None, None, None, None, f'{well_data.paker_do["do"]}',
              None, None, None, None,
-             50, well_data.depth_fond_paker_do["do"], well_data.depth_fond_paker_do["do"] + lenght_paker, lenght_paker, None, None],
+             50, well_data.depth_fond_paker_do["do"], round(well_data.depth_fond_paker_do["do"] + lenght_paker, 1),
+             lenght_paker, None, None],
             [None, None, None, None, None, None, None, None, None, 'пакер', None, None, 'без патрубка', None, None,
-             None, 0, 0, well_data.depth_fond_paker_do["do"], well_data.depth_fond_paker_do["do"], 0, 0, 0],
+             None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, f'на гл {well_data.depth_fond_paker_do["do"]}м',
              None, None,
              'воронка', None, None, nkt, None,
-             None, well_data.depth_fond_paker_do["do"] + lenght_paker, None, None, None, None],
+             None, voronka, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Данные о перфорации', None, None,
              None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
@@ -702,7 +694,7 @@ class GnktOsvWindow2(MyMainWindow):
             [None, None, None, None, None, None, None, None, None, 'воронка', None, None, 'Пласт\nгоризонт', None,
              'Глубина пласта по вертикали', None, 'Интервал перфорации', None, None, None, 'вскрытия/\nотключения',
              'Рпл. атм', None],
-            [None, None, None, None, None, None, None, None, None, f'на гл.{lenght_nkt}м', None, None, None, None, None,
+            [None, None, None, None, None, None, None, None, None, f'на гл.{voronka}м', None, None, None, None, None,
              None, 'от', None, 'до', None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None, None, None],
@@ -782,7 +774,7 @@ class GnktOsvWindow2(MyMainWindow):
              'Макс.допустимое Р опр-ки ЭК', None, None, None, None, well_data.max_admissible_pressure._value,
              None, None, None, None, None],
             [None, None, None, None, None, None, None, None,
-             current_bottom_edit if well_data.work_plan  != 'gnkt_bopz' else '', None, None, None,
+             current_bottom_edit if well_data.work_plan != 'gnkt_bopz' else '', None, None, None,
              'Макс. ожидаемое Р на устье ',
              None, None, None, None, well_data.max_expected_pressure._value, None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
@@ -807,13 +799,13 @@ class GnktOsvWindow2(MyMainWindow):
              None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None],
-            [None, None,  None, None, None, None, None, None, None, None, None, 'Вид и категория ремонта, его шифр',
+            [None, None, None, None, None, None, None, None, None, None, None, 'Вид и категория ремонта, его шифр',
              None, None, None, None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None,
              f'{well_data.type_kr}', None, None, None, None, None, None,
              None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None,
-              None,f'{well_data.bur_rastvor}', None, None, None, None, None, None,
+             None, f'{well_data.bur_rastvor}', None, None, None, None, None, None,
              None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None],
@@ -822,18 +814,19 @@ class GnktOsvWindow2(MyMainWindow):
         if well_data.work_plan == 'gnkt_bopz':
             schema_well_list.append(list_gnkt_bopz)
         if well_data.paker_do['do'] == 0:
-            schema_well_list[21] = [None, None, None, None, None, None, None, None, None,  None,
-             None, None,
-             'воронка', None, None, nkt, None,
-             None, well_data.depth_fond_paker_do["do"], None, None, None, None]
-            schema_well_list[20] = [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-             None, None, None, None, None, None, None, None]
+            schema_well_list[21] = [None, None, None, None, None, None, None, None, None, None,
+                                    None, None,
+                                    'воронка', None, None, nkt, None,
+                                    None, well_data.depth_fond_paker_do["do"], None, None, None, None]
+            schema_well_list[20] = [None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                                    None,
+                                    None, None, None, None, None, None, None, None]
             schema_well_list[19] = [None, None, None, None, None, None, None, None, None, None, None, None, None, None,
                                     None,
                                     None, None, None, None, None, None, None, None]
 
         pvr_list = []
-        for plast in sorted(well_data.plast_all, key = lambda x: self.get_start_depth(
+        for plast in sorted(well_data.plast_all, key=lambda x: self.get_start_depth(
                 well_data.dict_perforation[x]['интервал'][0])):
             count_interval = 0
             for interval in well_data.dict_perforation[plast]['интервал']:
@@ -858,7 +851,6 @@ class GnktOsvWindow2(MyMainWindow):
                      zamer, None], )
             well_data.dict_perforation[plast]['счет_объединение'] = count_interval
 
-
         for index, pvr in enumerate(pvr_list):
             schema_well_list[26 + index] = pvr
 
@@ -866,10 +858,8 @@ class GnktOsvWindow2(MyMainWindow):
         GnktOsvWindow2.current_bottom_edit, GnktOsvWindow2.fluid_edit, \
         GnktOsvWindow2.gnkt_lenght, GnktOsvWindow2.iznos_gnkt_edit, GnktOsvWindow2.pvo_number, \
         GnktOsvWindow2.diametr_length, GnktOsvWindow2.pipe_mileage_edit = current_bottom_edit, fluid_edit, \
-        gnkt_lenght, iznos_gnkt_edit, pvo_number, diametr_length, pipe_mileage_edit
+                                                                          gnkt_lenght, iznos_gnkt_edit, pvo_number, diametr_length, pipe_mileage_edit
         return schema_well_list
-
-
 
     def date_dmy(self, date_str):
         print(date_str, type(date_str))
@@ -882,11 +872,10 @@ class GnktOsvWindow2(MyMainWindow):
 
         return date_obj
 
-
-
     # Функция для получения глубины начала интервала
     def get_start_depth(self, interval):
         return interval[0]
+
     def calc_fluid(self):
 
         fluid_list = []

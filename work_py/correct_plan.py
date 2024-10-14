@@ -31,7 +31,7 @@ class TabPageDp(QWidget):
 
         self.well_number_label = QLabel('номер скважины')
         self.well_number_edit = QLineEdit(self)
-        self.well_number_edit.setValidator(self.validator_int)
+        # self.well_number_edit.setValidator(self.validator_int)
 
         self.well_area_label = QLabel('площадь скважины')
         self.well_area_edit = QLineEdit(self)
@@ -122,48 +122,49 @@ class CorrectPlanWindow(MyMainWindow):
 
         vbox.addWidget(self.buttonadd_work, 3, 0, 1, 2)
 
-    def read_excel_in_base(self, number_well, area_well, work_plan):
-        if well_data.connect_in_base:
-            conn = psycopg2.connect(**well_data.postgres_params_data_well)
-            cursor = conn.cursor()
-
-            cursor.execute("SELECT excel_json FROM wells WHERE well_number = %s AND area_well = %s "
-                           "AND contractor = %s AND costumer = %s AND work_plan = %s",
-                           (str(number_well), area_well, well_data.contractor, well_data.costumer, work_plan))
-
-            data_well = cursor.fetchall()
-
-            if cursor:
-                cursor.close()
-            if conn:
-                conn.close()
-
-        else:
-            db_path = connect_to_db('well_data.db', 'data_base_well/')
-
-            conn = sqlite3.connect(f'{db_path}')
-            cursor = conn.cursor()
-
-            cursor.execute("SELECT excel_json FROM wells WHERE well_number = ? AND area_well = ? "
-                           "AND contractor = ? AND costumer = ?",
-                           (str(number_well), area_well, well_data.contractor, well_data.costumer))
-            data_well = cursor.fetchall()
-            if cursor:
-                cursor.close()
-            if conn:
-                conn.close()
-        try:
-            dict_well = json.loads(data_well[len(data_well) - 1][0])
-            data = dict_well['data']
-            rowHeights = dict_well['rowHeights']
-            colWidth = dict_well['colWidth']
-            boundaries_dict = dict_well['merged_cells']
-
-        except Exception as e:
-            QMessageBox.warning(self, 'Ошибка', f'Введены не все параметры {type(e).__name__}\n\n{str(e)}')
-            return
-
-        return data, rowHeights, colWidth, boundaries_dict
+    # def read_excel_in_base(self, number_well, area_well, work_plan):
+    #     if well_data.connect_in_base:
+    #         conn = psycopg2.connect(**well_data.postgres_params_data_well)
+    #         cursor = conn.cursor()
+    #
+    #
+    #         cursor.execute("SELECT excel_json FROM wells WHERE well_number = %s AND area_well = %s "
+    #                        "AND contractor = %s AND costumer = %s AND work_plan = %s",
+    #                        (str(number_well), area_well, well_data.contractor, well_data.costumer, work_plan))
+    #
+    #         data_well = cursor.fetchall()
+    #
+    #         if cursor:
+    #             cursor.close()
+    #         if conn:
+    #             conn.close()
+    #
+    #     else:
+    #         db_path = connect_to_db('well_data.db', 'data_base_well/')
+    #
+    #         conn = sqlite3.connect(f'{db_path}')
+    #         cursor = conn.cursor()
+    #
+    #         cursor.execute("SELECT excel_json FROM wells WHERE well_number = ? AND area_well = ? "
+    #                        "AND contractor = ? AND costumer = ?",
+    #                        (str(number_well), area_well, well_data.contractor, well_data.costumer))
+    #         data_well = cursor.fetchall()
+    #         if cursor:
+    #             cursor.close()
+    #         if conn:
+    #             conn.close()
+    #     try:
+    #         dict_well = json.loads(data_well[len(data_well) - 1][0])
+    #         data = dict_well['data']
+    #         rowHeights = dict_well['rowHeights']
+    #         colWidth = dict_well['colWidth']
+    #         boundaries_dict = dict_well['merged_cells']
+    #
+    #     except Exception as e:
+    #         QMessageBox.warning(self, 'Ошибка', f'Введены не все параметры {type(e).__name__}\n\n{str(e)}')
+    #         return
+    #
+    #     return data, rowHeights, colWidth, boundaries_dict
 
     def add_work(self):
         from data_base.work_with_base import check_in_database_well_data, insert_data_well_dop_plan, round_cell
@@ -182,13 +183,23 @@ class CorrectPlanWindow(MyMainWindow):
             if ' от' in well_data_in_base_combo:
                 data_well_data_in_base_combo = well_data_in_base_combo.split(' ')[-1]
                 well_data_in_base = well_data_in_base_combo.split(' ')[3]
+                if 'ДП' in well_data_in_base:
+                    well_data.number_dp = ''.join(filter(str.isdigit, well_data_in_base))
+                    well_data.work_plan_change = 'dop_plan'
+                else:
+                    well_data.work_plan_change = 'krs'
 
-            data_well = check_in_database_well_data(well_number, well_area, well_data_in_base)[0]
+            data_well = check_in_database_well_data(well_number, well_area, well_data_in_base)
 
             if data_well:
-                insert_data_well_dop_plan(data_well)
+                well_data.type_kr = data_well[2]
 
-            DopPlanWindow.work_with_excel(self, well_number, well_area, well_data_in_base)
+                if data_well[3]:
+                    well_data.dict_category = json.loads(data_well[3])
+                    aaaa = well_data.dict_category
+                insert_data_well_dop_plan(data_well[0])
+
+            DopPlanWindow.work_with_excel(self, well_number, well_area, well_data_in_base, well_data.type_kr)
 
             well_data.data, well_data.rowHeights, well_data.colWidth, well_data.boundaries_dict = \
                 DopPlanWindow.change_pvr_in_bottom(self, self.data, self.rowHeights, self.colWidth,
@@ -201,49 +212,49 @@ class CorrectPlanWindow(MyMainWindow):
 
             well_data.pause = False
             self.close()
-
-    def delete_data(self, number_well, area_well, work_plan):
-        if well_data.connect_in_base:
-            try:
-                conn = psycopg2.connect(**well_data.postgres_params_data_well)
-                cursor = conn.cursor()
-
-                cursor.execute("""
-                DELETE FROM wells 
-                WHERE well_number = %s AND area_well = %s AND contractor = %s AND costumer = %s AND work_plan= %s """,
-                               (str(number_well), area_well, well_data.contractor, well_data.costumer, work_plan)
-                               )
-
-                conn.commit()
-                cursor.close()
-                conn.close()
-
-            except psycopg2.Error as e:
-                # Выведите сообщение об ошибке
-                mes = QMessageBox.warning(None, 'Ошибка',
-                                          f'Ошибка удаления {type(e).__name__}\n\n{str(e)}')
-        else:
-            try:
-                db_path = connect_to_db('well_data.db', 'data_base_well/')
-
-                conn = sqlite3.connect(f'{db_path}')
-                cursor = conn.cursor()
-
-                cursor.execute("DELETE FROM wells  WHERE well_number = ? AND area_well = ? "
-                               "AND contractor = ? AND costumer = ? AND work_plan=?",
-                               (str(number_well._value), area_well._value, well_data.contractor, well_data.costumer,
-                                work_plan))
-
-                conn.commit()
-                cursor.close()
-                conn.close()
-
-            except sqlite3.Error as e:
-                # Выведите сообщение об ошибке
-                mes = QMessageBox.warning(None, 'Ошибка',
-                                          f'Ошибка удаления {type(e).__name__}\n\n{str(e)}')
-
-    def add_work_excel(self, ws2, work_list, ind_ins):
+    # @staticmethod
+    # def delete_data(number_well, area_well, work_plan):
+    #     if well_data.connect_in_base:
+    #         try:
+    #             conn = psycopg2.connect(**well_data.postgres_params_data_well)
+    #             cursor = conn.cursor()
+    #
+    #             cursor.execute("""
+    #             DELETE FROM wells
+    #             WHERE well_number = %s AND area_well = %s AND contractor = %s AND costumer = %s AND work_plan= %s """,
+    #                            (str(number_well), area_well, well_data.contractor, well_data.costumer, work_plan)
+    #                            )
+    #
+    #             conn.commit()
+    #             cursor.close()
+    #             conn.close()
+    #
+    #         except psycopg2.Error as e:
+    #             # Выведите сообщение об ошибке
+    #             QMessageBox.warning(None, 'Ошибка',
+    #                                       f'Ошибка удаления {type(e).__name__}\n\n{str(e)}')
+    #     else:
+    #         try:
+    #             db_path = connect_to_db('well_data.db', 'data_base_well/')
+    #
+    #             conn = sqlite3.connect(f'{db_path}')
+    #             cursor = conn.cursor()
+    #
+    #             cursor.execute("DELETE FROM wells  WHERE well_number = ? AND area_well = ? "
+    #                            "AND contractor = ? AND costumer = ? AND work_plan=?",
+    #                            (str(number_well._value), area_well._value, well_data.contractor, well_data.costumer,
+    #                             work_plan))
+    #
+    #             conn.commit()
+    #             cursor.close()
+    #             conn.close()
+    #
+    #         except sqlite3.Error as e:
+    #             # Выведите сообщение об ошибке
+    #             QMessageBox.warning(None, 'Ошибка',
+    #                                       f'Ошибка удаления {type(e).__name__}\n\n{str(e)}')
+    @staticmethod
+    def add_work_excel(ws2, work_list, ind_ins):
         from well_data import ProtectedIsDigit
         for i in range(1, len(work_list) + 1):  # Добавлением работ
             for j in range(1, 13):
@@ -285,7 +296,7 @@ class CorrectPlanWindow(MyMainWindow):
         except:
             paragraph_row = 1
         if len(result) < paragraph_row:
-            mes = QMessageBox.warning(self, 'Ошибка', f'В плане работ только {len(result)} пункта')
+            QMessageBox.warning(self, 'Ошибка', f'В плане работ только {len(result)} пункта')
             return
 
         well_data.current_bottom = result[paragraph_row][1]

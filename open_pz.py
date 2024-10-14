@@ -11,7 +11,7 @@ from cdng import events_gnvp, itog_1, events_gnvp_gnkt
 from find import ProtectedIsNonNone
 from main import MyMainWindow
 from plan import delete_rows_pz
-from block_name import region, razdel_1, curator_sel, pop_down
+from block_name import region_select, razdel_1, curator_sel, pop_down
 from work_py.dop_plan_py import DopPlanWindow
 from work_py.check_in_pz import CustomMessageBox
 
@@ -40,41 +40,50 @@ class CreatePZ(MyMainWindow):
         # Запуск основного класса и всех дочерних классов в одной строке
         well_pz = FindIndexPZ(ws)
 
-        well_data.region = region(well_data.cdng._value)
+        well_data.region = region_select(well_data.cdng._value)
 
         WellData.read_well(WellData, ws, well_data.cat_well_max._value, well_data.data_pvr_min._value)
-        well_data.region = region(well_data.cdng._value)
+        well_data.region = region_select(well_data.cdng._value)
 
-        if work_plan == 'dop_plan':
-
-            data_well = \
-                check_in_database_well_data(well_data.well_number._value, well_data.well_area._value,
-                                            well_data.work_plan)[
-                    0]
-            if data_well:
-                change_work_work_plan = QMessageBox.question(self,
-                                                             'Наличие в базе данных',
-                                                             'Проверка показала что данные по скважине есть в базе данных, '
-                                                             'загрузить с базы?')
-                if change_work_work_plan == QMessageBox.StandardButton.Yes:
-                    well_data.work_plan = 'dop_plan_in_base'
-                    self.work_plan = 'dop_plan_in_base'
-                    well_data.data_in_base = True
-                    self.rir_window = DopPlanWindow(well_data.ins_ind, None, work_plan)
-                    # self.rir_window.setGeometry(200, 400, 100, 200)
-                    self.rir_window.show()
-                    self.pause_app()
-                    well_data.pause = True
-                    self.rir_window = None
-
-                    return
-
+        aaa = well_data.current_date
+        date_str2 = datetime.strptime('2024-09-19', '%Y-%m-%d')
         # well_data.data_well_is_True = False
+
         if work_plan == 'dop_plan':
             number_list = list(map(str, range(1, 50)))
             well_data.number_dp, ok = QInputDialog.getItem(self, 'Номер дополнительного плана работ',
                                                            'Введите номер дополнительного плана работ',
                                                            number_list, 0, False)
+
+            data_well = \
+                check_in_database_well_data(well_data.well_number._value, well_data.well_area._value,
+                                            f'ДП№{well_data.number_dp}')
+
+            if data_well:
+                date_str1 = datetime.strptime(f'{data_well[1]}', '%Y-%m-%d')
+                if date_str1 > date_str2:
+
+                    change_work_work_plan = QMessageBox.question(self,
+                                                                 'Наличие в базе данных',
+                                                                 'Проверка показала что данные по скважине есть в базе данных, '
+                                                                 'загрузить с базы?')
+
+
+                    if change_work_work_plan == QMessageBox.StandardButton.Yes:
+                        well_data.type_kr = data_well[2]
+                        well_data.work_plan = 'dop_plan_in_base'
+                        self.work_plan = 'dop_plan_in_base'
+                        well_data.data_in_base = True
+                        self.rir_window = DopPlanWindow(well_data.ins_ind, None, work_plan)
+                        # self.rir_window.setGeometry(200, 400, 100, 200)
+                        self.rir_window.show()
+                        self.pause_app()
+                        well_data.pause = True
+                        self.rir_window = None
+
+                        return
+
+
 
         if well_data.data_well_is_True is False:
             WellNkt.read_well(self, ws, well_data.pipes_ind._value, well_data.condition_of_wells._value)
@@ -101,7 +110,7 @@ class CreatePZ(MyMainWindow):
             return ws
 
         if well_data.inv_number._value == 'не корректно' or well_data.inv_number is None:
-            mes = QMessageBox.warning(self, 'Инвентарный номер отсутствует',
+            QMessageBox.warning(self, 'Инвентарный номер отсутствует',
                                       'Необходимо уточнить наличие инвентарного номера')
             return
 
@@ -184,7 +193,7 @@ class CreatePZ(MyMainWindow):
                 # Копирование изображения
                 image_loader = SheetImageLoader(ws)
             except Exception as e:
-                mes = QMessageBox.warning(None, 'Ошибка', f'Ошибка в копировании изображений {e}')
+                QMessageBox.warning(None, 'Ошибка', f'Ошибка в копировании изображений {e}')
 
             if len(well_data.check_data_in_pz) != 0:
                 check_str = ''

@@ -197,7 +197,7 @@ def raiding_interval(ryber_key):
                 well_data.dict_perforation[plast]['кровля'] <= well_data.current_bottom:
 
             for interval in well_data.dict_perforation[plast]['интервал']:
-                if interval[1] < well_data.current_bottom and interval[0] < interval[1]:
+                if float(interval[1]) < well_data.current_bottom and float(interval[0]) < float(interval[1]):
                     if well_data.column_additional is False or \
                             (well_data.column_additional and \
                              well_data.head_column_additional._value > well_data.current_bottom):
@@ -318,8 +318,8 @@ def definition_plast_work(self):
 
             if well_data.dict_perforation[plast]["отключение"] is False:
                 plast_work.add(plast)
-            roof = min(list(map(lambda x: x[0], list(well_data.dict_perforation[plast]['интервал']))))
-            sole = max(list(map(lambda x: x[1], list(well_data.dict_perforation[plast]['интервал']))))
+            roof = min(list(map(lambda x: float(x[0]), list(well_data.dict_perforation[plast]['интервал']))))
+            sole = max(list(map(lambda x: float(x[1]), list(well_data.dict_perforation[plast]['интервал']))))
             well_data.dict_perforation[plast]["кровля"] = roof
             well_data.dict_perforation[plast]["подошва"] = sole
             if well_data.dict_perforation[plast]["отключение"] is False:

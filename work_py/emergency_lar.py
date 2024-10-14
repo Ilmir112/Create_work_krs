@@ -148,15 +148,16 @@ class Emergency_lar(MyMainWindow):
         udlinitelel = self.tabWidget.currentWidget().udlinitelel.currentText()
         udlinitelel_lenght = self.tabWidget.currentWidget().udlinitelel_lenght.text()
         if lar_diametr_line == '':
-            mes = QMessageBox.warning(self, 'Ошибка',
+            QMessageBox.warning(self, 'Ошибка',
                                       'Выберете диаметр ловильного оборудования')
             return
         nkt_key = self.tabWidget.currentWidget().nkt_select_combo.currentText()
         lar_type_combo = self.tabWidget.currentWidget().lar_type_combo.currentText()
-        emergency_bottom_line = self.tabWidget.currentWidget().emergency_bottom_line.text().replace(',', '')
-        bottom_line = self.tabWidget.currentWidget().bottom_line.text().replace(',', '')
+        emergency_bottom_line = self.tabWidget.currentWidget().emergency_bottom_line.text().replace(',', '.')
+        bottom_line = self.tabWidget.currentWidget().bottom_line.text().replace(',', '.')
         if lar_type_combo in ['метчик', 'колокол', 'МЭС', 'МБУ'] and nkt_str_combo == 'НКТ':
-            QMessageBox.warning(self, 'Недопустимая операция', 'Нельзя спускать не извлекаемые ловитель на НКТ')
+            QMessageBox.warning(self, 'Недопустимая операция', f'Нельзя спускать {lar_type_combo} '
+                                                               f'на не извлекаемые ловитель на НКТ')
             return
         if bottom_line != '':
             bottom_line = int(float(bottom_line))
@@ -165,22 +166,22 @@ class Emergency_lar(MyMainWindow):
             emergency_bottom_line = int(float(emergency_bottom_line))
 
             if emergency_bottom_line > well_data.current_bottom:
-                mes = QMessageBox.warning(self, 'Ошибка',
+                QMessageBox.warning(self, 'Ошибка',
                                           'Забой ниже глубины текущего забоя')
                 return
         else:
-            mes = QMessageBox.warning(self, 'Ошибка',
+            QMessageBox.warning(self, 'Ошибка',
                                       'ВВедите аварийный забой')
             return
 
         if nkt_key == 'оборудование в ЭК' and well_data.column_additional and \
                 emergency_bottom_line > well_data.head_column_additional._value:
-            mes = QMessageBox.warning(self, 'Ошибка',
+            QMessageBox.warning(self, 'Ошибка',
                                       'Не корректно выбрана компоновка для доп колонны')
             return
         elif nkt_key == 'оборудование в ДП' and well_data.column_additional and \
                 emergency_bottom_line < well_data.head_column_additional._value:
-            mes = QMessageBox.warning(self, 'Ошибка',
+            QMessageBox.warning(self, 'Ошибка',
                                       'Не корректно выбрана компоновка для основной колонны')
             return
         if nkt_str_combo == 'НКТ':

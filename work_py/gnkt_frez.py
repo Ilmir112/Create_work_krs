@@ -300,7 +300,7 @@ class Work_with_gnkt(main.MyWindow):
 
     def create_title_list(self, ws2):
 
-        well_data.region = block_name.region(well_data.cdng._value)
+        well_data.region = block_name.region_select(well_data.cdng._value)
         self.region = well_data.region
 
         title_list = [
@@ -1375,7 +1375,7 @@ class Work_with_gnkt(main.MyWindow):
                  f'{self.zhgs} (при Рпл={self.pressuar}атм).  До завоза раствора, '\
                  f'скважину разряжать. Перед замещением КНК установить '\
                  f'в интервале нижнего фрак-порта.\nПрокачать на циркуляцию жидкость глушения в объеме не менее '\
-                 f'{ self.volume_dumping(self, ntk_true, paker_true, self.bottom_muft)}м3 '\
+                 f'{ self.volume_dumping(ntk_true, paker_true, self.bottom_muft)}м3 '\
                  f'(трубного пространства) с одновременным подъемом ГНКТ (с протяжкой ГНКТ перевести хвостовик). '\
                  f'В процессе перевода соблюдать равенство объемов закаченной и отобранной из скважины жидкости, '\
                  f'т.е. не допускать режима фонтанирования (поглощения).'

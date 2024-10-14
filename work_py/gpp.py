@@ -1,23 +1,22 @@
 from PyQt5 import QtWidgets
 from PyQt5.QtGui import QDoubleValidator
-from PyQt5.QtWidgets import QInputDialog, QMessageBox, QLabel, QLineEdit, QComboBox, QGridLayout, QWidget, QTabWidget, \
-    QMainWindow, QPushButton
-# from PyQt5.uic.properties import QtWidgets
+from PyQt5.QtWidgets import QMessageBox, QLabel, QLineEdit, QComboBox, QGridLayout, QWidget, QTabWidget, \
+     QPushButton
+
 
 import krs
 import main
 import well_data
 from main import MyMainWindow
-from work_py.alone_oreration import kot_select
-from .opressovka import OpressovkaEK
-from .rationingKRS import descentNKT_norm, liftingNKT_norm,well_volume_norm
-from .opressovka import OpressovkaEK, TabPage_SO
+
+from .rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
+from .opressovka import TabPage_SO
 from .grp import Grp_window
 
 
 class TabPage_SO_grp(QWidget):
     def __init__(self, parent=None):
-       
+
         super().__init__()
 
         validator = QDoubleValidator(0.0, 80000.0, 2)
@@ -41,8 +40,6 @@ class TabPage_SO_grp(QWidget):
         self.otz_after_question_QCombo.currentTextChanged.connect(self.update_paker)
         self.otz_after_question_QCombo.addItems(['Да', 'Нет'])
 
-
-
         self.grid_layout = QGridLayout(self)
 
         self.grid_layout.addWidget(self.diametr_paker_labelType, 3, 1)
@@ -56,9 +53,8 @@ class TabPage_SO_grp(QWidget):
         self.grid_layout.addWidget(self.otz_after_question_Label, 3, 6)
         self.grid_layout.addWidget(self.otz_after_question_QCombo, 4, 6)
 
-
     def update_paker(self):
-       
+
         if well_data.open_trunk_well is True:
             paker_depth = self.paker_depth_edit.text()
             if paker_depth != '':
@@ -68,13 +64,15 @@ class TabPage_SO_grp(QWidget):
             if paker_depth != '':
                 self.diametr_paker_edit.setText(f'{TabPage_SO.paker_diametr_select(self, int(paker_depth))}')
 
+
 class TabWidget(QTabWidget):
     def __init__(self):
         super().__init__()
         self.addTab(TabPage_SO_grp(self), 'ГПП')
 
+
 class Gpp_window(MyMainWindow):
-    def __init__(self,  ins_ind, table_widget):
+    def __init__(self, ins_ind, table_widget):
         super(Gpp_window, self).__init__()
 
         self.centralWidget = QWidget()
@@ -97,14 +95,15 @@ class Gpp_window(MyMainWindow):
         gisOTZ_after_true_quest = self.tabWidget.currentWidget().otz_after_question_QCombo.currentText()
 
         if int(paker_depth) > well_data.current_bottom:
-            mes = QMessageBox.warning(self, 'Некорректные данные', f'Компоновка НКТ c хвостовик + пакер '
-                                                                   f'ниже текущего забоя')
+            QMessageBox.warning(self, 'Некорректные данные', f'Компоновка НКТ c хвостовик + пакер '
+                                                             f'ниже текущего забоя')
             return
         work_list = self.grpGpp(paker_depth, current_depth, diametr_paker, gisOTZ_after_true_quest)
 
         self.populate_row(self.ins_ind, work_list, self.table_widget)
         well_data.pause = False
         self.close()
+
     def grpGpp(self, gpp_depth, current_depth, diametr_paker, gisOTZ_after_true_quest):
 
         if 'Ойл' in well_data.contractor:
@@ -113,7 +112,6 @@ class Gpp_window(MyMainWindow):
             schema_grp = '6'
 
         nkt_diam = ''.join(['89' if well_data.column_diametr._value > 110 else '60'])
-
 
         gPP_300 = self.check_depth_in_skm_interval(gpp_depth)
         # print(self.table_widget)
@@ -126,12 +124,14 @@ class Gpp_window(MyMainWindow):
              None, None, None, None, None, None, None,
              'мастер КРС', None],
             [None, None,
-             f'Спуск производить с применением спец.смазки  и рекомендуемым моментом свинчивания для НКТ{nkt_diam}м(N-80)'
+             f'Спуск производить с применением спец.смазки  и рекомендуемым моментом свинчивания для НКТ{nkt_diam}м'
+             f'(N-80)'
              f' согласно плана от подрядчика по ГРП.',
              None, None, None, None, None, None, None,
              'мастер КРС', None],
             [f'СПО: {self.gpp_select(gpp_depth)[0]} на НКТ{nkt_diam} на Н {gpp_depth}м', None,
-             f'Спустить компоновку с замером и шаблонированием НКТ: {self.gpp_select(gpp_depth)[0]} на НКТ{nkt_diam} на '
+             f'Спустить компоновку с замером и шаблонированием НКТ: {self.gpp_select(gpp_depth)[0]} на НКТ{nkt_diam} '
+             f'на '
              f'глубину {gpp_depth}м, с замером, шаблонированием НКТ. В компоновке предусмотреть пакер с установкой '
              f'на глубине 300м для внештатных ситуаций во время ГРП'
                 ,
@@ -144,14 +144,16 @@ class Gpp_window(MyMainWindow):
              None, None, None, None, None, None, None,
              'мастер КРС', ''],
             [f'Привязка по ГК и ЛМ',
-             None, f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {well_data.contractor}". '
-             f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером  {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г. '
-             f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины',
+             None, f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС '
+                   f'{well_data.contractor}". '
+                   f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером '
+                   f'{well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г. '
+                   f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины',
              None, None, None, None, None, None, None,
              'Мастер КРС, подрядчик по ГИС', 4],
             [f'Установить ГПП  на гл. {gpp_depth}м', None,
              f'Установить ГПП  на гл. {gpp_depth}м. В случае отсутствия представителя подрядчика по ГРП ltd '
-                 f'оповестить Заказчика письменной телефонограммой и выйти в вынужденный простой.',
+             f'оповестить Заказчика письменной телефонограммой и выйти в вынужденный простой.',
              None, None, None, None, None, None, None,
              'Мастер КРС, подрядчик по ГРП', 1.2],
             [None, None,
@@ -159,10 +161,13 @@ class Gpp_window(MyMainWindow):
              None, None, None, None, None, None, None,
              'Мастер КРС, заказчик', " "],
             [None, None,
-             f'Обвязать устье скважины согласно схемы ПВО №{schema_grp} утвержденной главным инженером {well_data.contractor} '
-             f' {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г для проведения ГРП на месторождениях ООО "БашнефтьДобыча". Посадить планшайбу. '
+             f'Обвязать устье скважины согласно схемы ПВО №{schema_grp} утвержденной главным инженером'
+             f' {well_data.contractor} '
+             f' {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г для проведения ГРП на месторождениях'
+             f' ООО "БашнефтьДобыча". Посадить планшайбу. '
              f'Произвести демонтаж'
-             f' оборудования. Опрессовать установленную арматуру для ГРП на Р={well_data.max_admissible_pressure._value}атм, '
+             f' оборудования. Опрессовать установленную арматуру для ГРП на '
+             f'Р={well_data.max_admissible_pressure._value}атм, '
              f'составить акт в присутствии следующих представителей: УСРСиСТ (супервайзер), подрядчика по ГРП. '
              f'В случае негерметичности арматуры, составить акт и устранить негерметичность под руководством следующих '
              f'представителей:  УСРСиСТ (супервайзер), подрядчика по ГРП .',
@@ -199,8 +204,10 @@ class Gpp_window(MyMainWindow):
              None, None, None, None, None, None, None,
              'Мастер КРС, представ. заказчика', 0.37],
             [None, None,
-             f'После разрядки скважины в объеме не менее 25м3, подтвержденной представителями ЦДНГ согласовать проведение '
-             f'ГИС -пластомер для расчета жидкости глушения, произвести перерасчет ЖГ и проглушить скважину соответствующей '
+             f'После разрядки скважины в объеме не менее 25м3, подтвержденной представителями ЦДНГ согласовать '
+             f'проведение '
+             f'ГИС -пластомер для расчета жидкости глушения, произвести перерасчет ЖГ и проглушить скважину '
+             f'соответствующей '
              f'жидкостью. Дальнейшие работы продолжить на жидкости глушения согласно расчета. В случае отрицательных '
              f'результатов согласовать съезд бригады',
              None, None, None, None, None, None, None,
@@ -217,10 +224,12 @@ class Gpp_window(MyMainWindow):
              f'стабилизацию не менее 2 часов. \n'
              f'(согласовать глушение в коллектор, в случае отсутствия на желобную емкость)',
              None, None, None, None, None, None, None,
-             'Мастер КРС, представ. заказчика', well_volume_norm(krs.volume_jamming_well(self, well_data.current_bottom))],
+             'Мастер КРС, представ. заказчика',
+             well_volume_norm(krs.volume_jamming_well(self, well_data.current_bottom))],
             [None, None,
              f'Вести контроль плотности на выходе в конце глушения. В случае отсутствия циркуляции на выходе жидкости '
-             f'глушения уд.весом  или Рбуф при глушении скважины, дальнейшие промывки и удельный вес жидкостей промывок '
+             f'глушения уд.весом  или Рбуф при глушении скважины, дальнейшие промывки и удельный вес жидкостей '
+             f'промывок '
              f'согласовать с Заказчиком.',
              None, None, None, None, None, None, None,
              'Мастер КРС, представ. заказчика', None],
@@ -241,16 +250,13 @@ class Gpp_window(MyMainWindow):
              'Мастер КРС, представ. заказчика', liftingNKT_norm(gpp_depth, 1.2)],
         ]
 
-
-
         for row in Grp_window.normalization(self, current_depth, diametr_paker, gisOTZ_after_true_quest):
             gpp_list.append(row)
 
         return gpp_list
 
-
     def check_gpp_upa(self):
-        mes = QMessageBox.information(self, 'Смена подъемника',
+        QMessageBox.information(self, 'Смена подъемника',
                                       'Согласно регламента для проведения ГПП ГРП необходим тяжелый подьемник')
         for row in range(self.table_widget.rowCount()):
             for column in range(self.table_widget.columnCount()):
@@ -258,17 +264,15 @@ class Gpp_window(MyMainWindow):
                 if value != None:
                     value = value.text()
                     if 'Установить подъёмный агрегат на устье не менее 40т' in value:
-                        new_value = QtWidgets.QTableWidgetItem(f'Установить подъёмный агрегат на устье не менее 60т. '
-                                                               f'Пусковой комиссией составить акт готовности подьемного '
-                                                               f'агрегата и бригады для проведения ремонта скважины.')
+                        new_value = QtWidgets.QTableWidgetItem(
+                            f'Установить подъёмный агрегат на устье не менее 60т. '
+                            f'Пусковой комиссией составить акт готовности подьемного '
+                            f'агрегата и бригады для проведения ремонта скважины.')
 
                         self.table_widget.setItem(row, column, new_value)
 
-
-
-
     def gpp_select(self, paker_depth):
-       
+
         from .opressovka import TabPage_SO
         if well_data.column_diametr._value > 120:
             nkt_diam = '89'
@@ -279,27 +283,32 @@ class Gpp_window(MyMainWindow):
 
         if well_data.column_additional is False or (
                 well_data.column_additional is True and paker_depth < well_data.head_column_additional._value):
-            paker_select = f'гидропескоструйный перфоратор под ЭК {well_data.column_diametr._value}мм-{well_data.column_wall_thickness._value}мм+' \
+            paker_select = f'гидропескоструйный перфоратор под ЭК {well_data.column_diametr._value}мм-' \
+                           f'{well_data.column_wall_thickness._value}мм+' \
                            f'опрессовочный узел +НКТ{nkt_diam}м - 10м, реперный патрубок НКТ{nkt_diam}м - 2м,'
-            paker_short = f'ГПП под ЭК {well_data.column_diametr._value}мм-{well_data.column_wall_thickness._value}мм+' \
-                           f'опрессовочный узел +НКТ{nkt_diam}м - 10м, репер НКТ{nkt_diam}м - 2м,'
+            paker_short = f'ГПП под ЭК {well_data.column_diametr._value}мм' \
+                          f'-{well_data.column_wall_thickness._value}мм+' \
+                          f'опрессовочный узел +НКТ{nkt_diam}м - 10м, репер НКТ{nkt_diam}м - 2м,'
         else:
 
-            paker_select = f'гидропескоструйный перфоратор под ЭК {well_data.column_additional_diametr._value}мм-{well_data.column_additional_wall_thickness._value}мм +' \
-                           f'опрессовочный узел +НКТ{nkt_diam_add}мм - 10м, реперный патрубок НКТ{nkt_diam_add}мм - 2м, + НКТ{nkt_diam_add} L-' \
+            paker_select = f'гидропескоструйный перфоратор под ЭК {well_data.column_additional_diametr._value}мм-' \
+                           f'{well_data.column_additional_wall_thickness._value}мм +' \
+                           f'опрессовочный узел +НКТ{nkt_diam_add}мм - 10м, реперный патрубок НКТ{nkt_diam_add}мм -' \
+                           f' 2м, + НКТ{nkt_diam_add} L-' \
                            f'{round(paker_depth - well_data.head_column_additional._value, 0)}м'
-            paker_short = f'ГПП под ЭК {well_data.column_additional_diametr._value}мм-{well_data.column_additional_wall_thickness._value}мм +' \
-                           f'опрессовочный узел +НКТ{nkt_diam_add}мм - 10м, репер НКТ{nkt_diam_add}мм - 2м, + НКТ{nkt_diam_add} L-' \
-                           f'{round(paker_depth - well_data.head_column_additional._value, 0)}м'
+            paker_short = f'ГПП под ЭК {well_data.column_additional_diametr._value}мм-' \
+                          f'{well_data.column_additional_wall_thickness._value}мм +' \
+                          f'опрессовочный узел +НКТ{nkt_diam_add}мм - 10м, репер НКТ{nkt_diam_add}мм - 2м,+ ' \
+                          f'НКТ{nkt_diam_add} L-' \
+                          f'{round(paker_depth - well_data.head_column_additional._value, 0)}м'
 
         return paker_select, paker_short
 
-
     def nktGrp(self):
-       
 
         if well_data.column_additional is False or (
-                well_data.column_additional is True and well_data.current_bottom >= well_data.head_column_additional._value):
+                well_data.column_additional is True and
+                well_data.current_bottom >= well_data.head_column_additional._value):
             return f'НКТ{well_data.nkt_diam}мм'
         elif well_data.column_additional is True and well_data.column_additional_diametr._value < 110:
             return f'НКТ60мм L- {round(well_data.current_bottom - well_data.head_column_additional._value + 20, 0)}'

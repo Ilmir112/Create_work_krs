@@ -220,19 +220,19 @@ class Raid(MyMainWindow):
         raid_True_combo.setCurrentIndex(index_raid_True)
 
         if not roof_raid or not sole_raid:
-            msg = QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
+            QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
             return
         if well_data.column_additional and int(roof_raid) > well_data.head_column_additional._value and \
                 ryber_key == 'райбер в ЭК':
-            msg = QMessageBox.information(self, 'Внимание', 'Компоновка подобрана не корректно')
+            QMessageBox.information(self, 'Внимание', 'Компоновка подобрана не корректно')
             return
         if well_data.column_additional and int(sole_raid) < well_data.head_column_additional._value \
                 and ryber_key == 'райбер в ДП':
-            msg = QMessageBox.information(self, 'Внимание', 'Компоновка подобрана не корректно')
+            QMessageBox.information(self, 'Внимание', 'Компоновка подобрана не корректно')
             return
 
         if well_data.current_bottom < float(sole_raid):
-            msg = QMessageBox.information(self, 'Внимание', 'глубина НЭК ниже искусственного забоя')
+            QMessageBox.information(self, 'Внимание', 'глубина НЭК ниже искусственного забоя')
             return
 
         self.tableWidget.setSortingEnabled(False)
@@ -255,16 +255,16 @@ class Raid(MyMainWindow):
         if raiding_interval:
             if ryber_key == 'райбер в ЭК' and well_data.column_additional and \
                     raiding_interval[0][1] > well_data.head_column_additional._value:
-                mes = QMessageBox.warning(self, 'Ошибка',
+                QMessageBox.warning(self, 'Ошибка',
                                           'Не корректно выбрана компоновка')
                 return
             elif ryber_key == 'райбер в ДП' and well_data.column_additional and \
                     raiding_interval[0][0] < well_data.head_column_additional._value:
-                mes = QMessageBox.warning(self, 'Ошибка',
+                QMessageBox.warning(self, 'Ошибка',
                                           'Не корректно выбрана компоновка')
                 return
         if len(raiding_interval) == 0:
-            mes = QMessageBox.warning(self, 'Ошибка',
+            QMessageBox.warning(self, 'Ошибка',
                                       'Не выбраны интервалы райбирования')
             return
 
@@ -282,7 +282,7 @@ class Raid(MyMainWindow):
         rows = self.tableWidget.rowCount()
         raid_tuple = []
         if rows == 0:
-            mes = QMessageBox.warning(self, 'ОШИБКА', 'Нужно добавить интервалы')
+            QMessageBox.warning(self, 'ОШИБКА', 'Нужно добавить интервалы')
             return
         for row in range(rows):
             roof_raid = self.tableWidget.item(row, 0)
@@ -292,7 +292,7 @@ class Raid(MyMainWindow):
                 roof = int(roof_raid.text())
                 sole = int(sole_raid.text())
                 if sole > well_data.current_bottom:
-                    mes = QMessageBox.warning(self, 'Ошибка',
+                    QMessageBox.warning(self, 'Ошибка',
                                               f'подошвы райбирования {sole}м больше текущего забоя'
                                               f' {well_data.current_bottom}м')
                     return
@@ -313,7 +313,7 @@ class Raid(MyMainWindow):
     def del_row_table(self):
         row = self.tableWidget.currentRow()
         if row == -1:
-            msg = QMessageBox.information(self, 'Внимание', 'Выберите строку для удаления')
+            QMessageBox.information(self, 'Внимание', 'Выберите строку для удаления')
             return
         self.tableWidget.removeRow(row)
 
@@ -410,7 +410,7 @@ class Raid(MyMainWindow):
         #                 ryber_list.insert(-1, row)
         #     except Exception as e:
         #
-        #         mes = QMessageBox.warning(self, 'ОШИБКА', f'Смена объема вставить не получитлось {type(e).__name__}\n\n{str(e)}')
+        #         QMessageBox.warning(self, 'ОШИБКА', f'Смена объема вставить не получитлось {type(e).__name__}\n\n{str(e)}')
 
 
         return ryber_list

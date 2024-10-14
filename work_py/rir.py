@@ -711,7 +711,7 @@ class RirWindow(MyMainWindow):
         RirWindow.perf_new(self, roof_rir_edit, sole_rir_edit)
         # print(plast_combo)
         if OpressovkaEK.testing_pressure(self, roof_rir_edit)[2]:
-            uzmPero_list.pop(-2)
+            uzmPero_list.pop(-1)
 
         well_data.current_bottom = roof_rir_edit
 
@@ -1068,7 +1068,7 @@ class RirWindow(MyMainWindow):
             fluid_new_edit = current_widget.fluid_new_edit.text().replace(',', '.')
             pressuar_new_edit = current_widget.pressuar_new_edit.text()
         except:
-            mes = QMessageBox.warning(self, 'ОШИБКА', 'Введены не все данные')
+            QMessageBox.warning(self, 'ОШИБКА', 'Введены не все данные')
         if paker_need_Combo == 'Нужно СПО':
             diametr_paker = int(float(current_widget.diametr_paker_edit.text()))
             paker_khost = int(float(current_widget.paker_khost_edit.text()))

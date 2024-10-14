@@ -150,22 +150,22 @@ class Emergency_print(MyMainWindow):
             emergency_bottom_line = int(float(emergency_bottom_line))
 
             if emergency_bottom_line > well_data.current_bottom:
-                mes = QMessageBox.warning(self, 'Ошибка',
+                QMessageBox.warning(self, 'Ошибка',
                                           'Забой ниже глубины текущего забоя')
                 return
         else:
-            mes = QMessageBox.warning(self, 'Ошибка',
+            QMessageBox.warning(self, 'Ошибка',
                                       'ВВедите аварийный забой')
             return
 
         if nkt_str_combo == 'печать в ЭК' and well_data.column_additional and \
                 emergency_bottom_line > well_data.head_column_additional._value:
-            mes = QMessageBox.warning(self, 'Ошибка',
+            QMessageBox.warning(self, 'Ошибка',
                                       'Не корректно выбрана компоновка печати для доп колонны')
             return
         elif nkt_str_combo == 'печать в ДП' and well_data.column_additional and \
                 emergency_bottom_line < well_data.head_column_additional._value:
-            mes = QMessageBox.warning(self, 'Ошибка',
+            QMessageBox.warning(self, 'Ошибка',
                                       'Не корректно выбрана компоновка для основной колонны')
             return
 

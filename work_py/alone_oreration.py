@@ -112,8 +112,8 @@ def need_h2s(fluid_new, plast_edit, expected_pressure):
             expenditure_h2s = round(
                 max([well_data.dict_category[plast]['по сероводороду'].poglot for plast in well_data.plast_project]), 3)
             fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода {well_data.type_absorbent} из ' \
-                         f'расчета {expenditure_h2s}кг/м3 '
-            fluid_work_short = f'{fluid_new}г/см3 ХИМТЕХНО 101 {expenditure_h2s}кг/м3 '
+                         f'расчета {expenditure_h2s}кг/м3 либо аналог'
+            fluid_work_short = f'{fluid_new}г/см3 {well_data.type_absorbent} {expenditure_h2s}кг/м3 '
         elif cat_h2s_list_plan[0] in [3, '3'] and len(well_data.plast_work) == 0:
             fluid_work = f'{fluid_new}г/см3 '
             fluid_work_short = f'{fluid_new}г/см3 '
@@ -132,7 +132,7 @@ def need_h2s(fluid_new, plast_edit, expected_pressure):
             expenditure_h2s = round(max([expenditure_h2s, expenditure_h2s_plan]), 2)
 
             fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода {well_data.type_absorbent} из ' \
-                         f'расчета {expenditure_h2s}кг/м3 '
+                         f'расчета {expenditure_h2s}кг/м3 либо аналог'
             fluid_work_short = f'{fluid_new}г/см3 ХИМТЕХНО 101 {expenditure_h2s}кг/м3 '
         else:
             fluid_work = f'{fluid_new}г/см3 '
@@ -171,8 +171,8 @@ def need_h2s(fluid_new, plast_edit, expected_pressure):
             expenditure_h2s = round(
                 max([well_data.dict_category[plast]['по сероводороду'].poglot for plast in well_data.plast_project]), 2)
             fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода {well_data.type_absorbent} из ' \
-                         f'расчета {expenditure_h2s}кг/м3 '
-            fluid_work_short = f'{fluid_new}г/см3 ХИМТЕХНО 101 {expenditure_h2s}кг/м3 '
+                         f'расчета {expenditure_h2s}кг/м3  либо аналог'
+            fluid_work_short = f'{fluid_new}г/см3 {well_data.type_absorbent} {expenditure_h2s}кг/м3 '
         else:
             fluid_work = f'{fluid_new}г/см3 '
             fluid_work_short = f'{fluid_new}г/см3 '

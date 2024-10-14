@@ -135,14 +135,14 @@ class KompressWindow(MyMainWindow):
 
 
         if int(khvost_edit) - (count_muft * int(dictance_without_murt)) - 100 < well_data.static_level._value:
-            mes = QMessageBox.warning(self, 'Некорректные данные',
+            QMessageBox.warning(self, 'Некорректные данные',
                                       f'Статический уровень в скважине {well_data.static_level} ниже глубины '
                                       f'вверхней муфты {int(khvost_edit) - (count_muft * int(dictance_without_murt))}'
                                        f'ниже текущего забоя')
             return
 
         if int(khvost_edit) - (count_muft * int(dictance_without_murt)) - 100 < 600:
-            mes = QMessageBox.warning(self, 'Некорректные данные',
+            QMessageBox.warning(self, 'Некорректные данные',
                           f'вверхняя муфта на Н -{int(khvost_edit) - (count_muft * int(dictance_without_murt))},'
                            f'это слишком высото')
             return

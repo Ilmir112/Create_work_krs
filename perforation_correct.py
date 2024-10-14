@@ -234,14 +234,16 @@ class PerforationCorrect(MyMainWindow):
                 plast_raid.append(True)
             else:
                 plast_raid.append(False)
-            asad = well_data.dict_perforation_project
+
             if len(plast_project) > 0:
-                plast_project_list = list(well_data.dict_perforation_project.keys())
-                if plast_project[0] not in plast_project_list:
-                    well_data.dict_perforation_project.setdefault(
-                        plast, {}).setdefault('интервал', []).append([float(roof), float(sole)])
-                else:
-                    well_data.dict_perforation_project[plast]['интервал'] = [(float(roof), float(sole))]
+                if plast in self.dict_perforation_project:
+
+                    self.dict_perforation_project.setdefault(
+                            plast, {}).setdefault('интервал', []).append([float(roof), float(sole)])
+
+
+
+
             else:
                 if plast in well_data.dict_perforation:
                     if all([oktl is True for oktl in plast_oktl]):
@@ -260,11 +262,13 @@ class PerforationCorrect(MyMainWindow):
                         well_data.dict_perforation[plast]['отрайбировано'] = False
 
             if len(plast_del) > 0:
-                for plast in plast_del and plast in well_data.dict_perforation:
-                    well_data.dict_perforation.pop(plast)
+                aaa = well_data.dict_perforation
+                for plast in list(well_data.dict_perforation.keys()):
+                    if plast in plast_del:
+                        well_data.dict_perforation.pop(plast)
 
-        a = well_data.dict_perforation_project
 
+        adafw = well_data.dict_perforation_project
         definition_plast_work(self)
         well_data.plast_work_short = well_data.plast_work
 

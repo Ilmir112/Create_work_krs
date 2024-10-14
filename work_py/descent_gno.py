@@ -239,7 +239,7 @@ class GnoDescentWindow(MyMainWindow):
 
     def paker_down(self, nkt_edit, rgd_question_combo, sucker_edit='', need_juming_after_sko_combo='Нет'):
         from work_py.opressovka import OpressovkaEK
-        from .rgdVcht import rgdWithPaker, rgdWithoutPaker
+        from .rgdVcht import rgd_with_paker, rgd_without_paker
         paker_descent = [
             [None, None,
              f'Заменить технологические НКТ на опрессованные эксплуатационные НКТ. Заменить подвесной '
@@ -288,13 +288,14 @@ class GnoDescentWindow(MyMainWindow):
         if rgd_question_combo == 'Да':
             if well_data.column_additional and well_data.depth_fond_paker_do[
                 'posle'] >= well_data.head_column_additional._value:
-                # print(rgdWithoutPaker(self))
-                for row in rgdWithoutPaker(self)[::-1]:
+                # print(rgd_without_paker(self))
+                for row in rgd_without_paker(self)[::-1]:
                     paker_descent.insert(0, row)
             else:
-                for row in rgdWithPaker(self):
+                for row in rgd_with_paker(self):
                     paker_descent.append(row)
         return paker_descent
+
     def konservation_down(self, nkt_edit):
 
         from work_py.alone_oreration import volume_jamming_well, volume_rod, volume_nkt_metal
@@ -313,7 +314,6 @@ class GnoDescentWindow(MyMainWindow):
 
         lenght_nkt = volume_well_30 / volume_nkt_metal
 
-
         descent_voronka = [
             [f'Не замерзающая жидкость 0,3м3', None,
              f'С целью вытеснения техжидкости из скважины и заполнения скважины не замерзающей жидкостью: '
@@ -321,11 +321,11 @@ class GnoDescentWindow(MyMainWindow):
              f'{sum(list(well_data.dict_nkt_po.values())) + lenght_nkt}м. ',
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика', descentNKT_norm(lenght_nkt, 1)],
-             [None, None,
-              f'Поднять тНКТ до глубины {sum(list(well_data.dict_nkt_po.values()))}м с доливом незамерзающей'
-              f' жидкостью (растворитель РКД 0,3м3) до устья',
-              None, None, None, None, None, None, None,
-              'Мастер КРС, предст. заказчика', descentNKT_norm(lenght_nkt, 1)]
+            [None, None,
+             f'Поднять тНКТ до глубины {sum(list(well_data.dict_nkt_po.values()))}м с доливом незамерзающей'
+             f' жидкостью (растворитель РКД 0,3м3) до устья',
+             None, None, None, None, None, None, None,
+             'Мастер КРС, предст. заказчика', descentNKT_norm(lenght_nkt, 1)]
             [None, None,
              f'Заполнить полость НКТ в интервале 0-30м незамерзающей жидкостью полость НКТ (растворитель РКД 0,09м3)',
              None, None, None, None, None, None, None,

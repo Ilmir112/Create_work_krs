@@ -233,7 +233,7 @@ class GnktBopz(MyMainWindow):
                 mes = QMessageBox.critical(self, "Ошибка", "Нужно указать расстояние до ПНТЖ")
                 return
         except:
-            mes = QMessageBox.information(self, 'Ошибка', 'Введите корректные данные')
+            QMessageBox.information(self, 'Ошибка', 'Введите корректные данные')
 
         if acid_edit == 'ВТ':
             self.vt = self.tabWidget.currentWidget().sko_vt_edit.text()

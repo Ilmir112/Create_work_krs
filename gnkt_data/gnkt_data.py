@@ -5,6 +5,7 @@ from collections import namedtuple
 import psycopg2
 from PyQt5.QtWidgets import  QMessageBox
 import well_data
+from data_base.config_base import connect_to_database
 
 Saddles = namedtuple('Saddles', ['saddle', 'ball'])
 
@@ -78,7 +79,7 @@ dict_saddles = {
 def read_database_gnkt(contractor, gnkt_number):
     # Подключение к базе данных
     try:
-        conn = psycopg2.connect(**well_data.postgres_conn_gnkt)
+        conn = connect_to_database(well_data.DB_NAME_GNKT)
         cursor = conn.cursor()
 
         if 'ойл-сервис' in contractor.lower():
@@ -93,7 +94,7 @@ def read_database_gnkt(contractor, gnkt_number):
         well_previus_list = list(map(lambda x: x[0], list(filter(lambda x: x[0], well_previus_list))))
     except psycopg2.Error as e:
         # Выведите сообщение об ошибке
-        mes = QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных')
+        QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных')
         return []
     finally:
         # Закройте курсор и соединение
@@ -112,7 +113,7 @@ def insert_data_base_gnkt(contractor, well_name, gnkt_number, gnkt_length, diame
     try:
 
         # Подключение к базе данных
-        conn = psycopg2.connect(**well_data.postgres_conn_gnkt)
+        conn = connect_to_database(well_data.DB_NAME_GNKT)
         cursor = conn.cursor()
 
         if 'ойл-сервис' in contractor.lower():
@@ -142,7 +143,7 @@ def insert_data_base_gnkt(contractor, well_name, gnkt_number, gnkt_length, diame
 
             # Выполнение запроса с использованием параметров
             cursor.execute(query, data_values)
-            mes = QMessageBox.information(None, 'база данных', f'Скважина добавлена в базу данных')
+            QMessageBox.information(None, 'база данных', f'Скважина добавлена в базу данных')
 
         else:
             mes = QMessageBox.question(None, 'база данных', f'Скважина уже есть в базе данных, обновить?')
@@ -166,12 +167,12 @@ def insert_data_base_gnkt(contractor, well_name, gnkt_number, gnkt_length, diame
 
                 # Выполнение запроса с использованием параметров
                 cursor.execute(query, data_values)
-                mes = QMessageBox.information(None, 'база данных', f'Скважина добавлена в базу данных')
+                QMessageBox.information(None, 'база данных', f'Скважина добавлена в базу данных')
 
         conn.commit()
     except psycopg2.Error as e:
         # Выведите сообщение об ошибке
-        mes = QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных, Скважина не добавлена в базу')
+        QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных, Скважина не добавлена в базу')
     finally:
         # Закройте курсор и соединение
         if cursor:

@@ -167,7 +167,7 @@ class FindIndexPZ(MyMainWindow):
             well_data.check_data_in_pz.append('Не указан Вид и категория ремонта, его шифр\n')
 
     def check_str_None(self, string):
-        from main import MyMainWindow
+
         try:
             if MyWindow.check_str_isdigit(self, str(string)) is True:
                 if str(round(float(str(string).replace(',', '.')), 1))[-1] == "0":
@@ -206,7 +206,7 @@ class FindIndexPZ(MyMainWindow):
                 b = float(b)
                 return b
         except:
-            mes = QMessageBox.warning(self, 'Ошибка',
+            QMessageBox.warning(self, 'Ошибка',
                                       f'Ошибка в прочтении файла в строке {string}, Проверьте excel файл')
 
     def definition_is_None(self, data, row, col, step, m=12):
@@ -246,7 +246,7 @@ class WellNkt(FindIndexPZ):
                     ws.cell(row=row, column=3).value).lower() == 'после ремонта':
                 a_plan = row
         if a_plan == 0:
-            mes = QMessageBox.warning(self, 'Индекс планового НКТ',
+            QMessageBox.warning(self, 'Индекс планового НКТ',
                                       'Программа не могла определить начала строку с ПЗ НКТ - план')
             self.pause_app()
             return
@@ -267,7 +267,7 @@ class WellNkt(FindIndexPZ):
             # well_data.shoe_nkt = float(sum(well_data.dict_nkt.values()))
         # except:
         #     well_data.nkt_mistake = True
-        #     mes = QMessageBox.warning(self, 'Ошибка', 'Программа не смогла определить диаметры и длину НКТ')
+        #     QMessageBox.warning(self, 'Ошибка', 'Программа не смогла определить диаметры и длину НКТ')
 
 
 class WellSucker_rod(FindIndexPZ):
@@ -319,7 +319,7 @@ class WellSucker_rod(FindIndexPZ):
                             well_data.dict_sucker_rod[key] = well_data.dict_sucker_rod.get(key, 0) + int(
                                 float(str(value).replace(',', '.'))) + 1
                         except:
-                            mes = QMessageBox.warning(self, 'Ошибка', 'Ошибка в определении длины штанг до ремонта, '
+                            QMessageBox.warning(self, 'Ошибка', 'Ошибка в определении длины штанг до ремонта, '
                                                                       'скорректируйте план заказ')
                             self.pause_app()
                             break
@@ -330,7 +330,7 @@ class WellSucker_rod(FindIndexPZ):
                             well_data.dict_sucker_rod_po[key] = well_data.dict_sucker_rod_po.get(key, 0) + int(
                                 float(str(value).replace(',', '.')))
                         except:
-                            mes = QMessageBox.warning(self, 'Ошибка', 'Ошибка в определении длины штанг до ремонта, '
+                            QMessageBox.warning(self, 'Ошибка', 'Ошибка в определении длины штанг до ремонта, '
                                                                       'скорректируйте план заказ')
                             self.pause_app()
                             break
@@ -383,7 +383,12 @@ class WellFond_data(FindIndexPZ):
 
                     elif value == 'Насос' and row[col + 2].value == 'типоразмер':
                         if row[col_do].value:
-                            if ('НВ' in str(row[col_do].value).upper() or 'ШГН' in str(row[col_do].value).upper() \
+                            if ('ЭЦН' in str(row[col_do].value).upper() or 'ВНН' in str(row[col_do].value).upper()):
+                                well_data.dict_pump_ECN["do"] = row[col_do].value
+                                if '/' in str(row[col_do].value):
+                                    well_data.dict_pump_ECN["do"] = [ecn for ecn in row[col_do].value.split('/')
+                                                                     if 'ЭЦН' in ecn or 'ВНН' in ecn][0]
+                            elif ('НВ' in str(row[col_do].value).upper() or 'ШГН' in str(row[col_do].value).upper() \
                                 or 'НН' in str(row[col_do].value).upper()) or 'RH' in str(row[col_do].value).upper():
                                 well_data.dict_pump_SHGN["do"] = row[col_do].value
                                 if '/' in str(row[col_do].value):
@@ -391,14 +396,16 @@ class WellFond_data(FindIndexPZ):
                                                                       if 'НВ' in ecn or 'НН' in ecn or
                                                                       'ШГН' in ecn or 'RH' in ecn][0]
 
-                            if ('ЭЦН' in str(row[col_do].value).upper() or 'ВНН' in str(row[col_do].value).upper()):
-                                well_data.dict_pump_ECN["do"] = row[col_do].value
-                                if '/' in str(row[col_do].value):
-                                    well_data.dict_pump_ECN["do"] = [ecn for ecn in row[col_do].value.split('/')
-                                                                     if 'ЭЦН' in ecn or 'ВНН' in ecn][0]
                                 # print(well_data.dict_pump_ECN["do"])
                         if row[col_plan].value:
-                            if ('НВ' in str(row[col_plan].value).upper() or 'ШГН' in str(
+                            if ('ЭЦН' in str(row[col_plan].value).upper() or 'ВНН' in str(
+                                    row[col_plan].value).upper()):
+                                well_data.dict_pump_ECN["posle"] = row[col_plan].value
+                                if '/' in str(row[col_plan].value):
+                                    well_data.dict_pump_ECN["posle"] = [ecn for ecn in row[col_plan].value.split('/')
+                                                                        if 'ЭЦН' in ecn or 'ВНН' in ecn][0]
+
+                            elif ('НВ' in str(row[col_plan].value).upper() or 'ШГН' in str(
                                     row[col_plan].value).upper() \
                                 or 'НН' in str(row[col_plan].value).upper()) \
                                     or 'RHAM' in str(row[col_plan].value).upper():
@@ -408,12 +415,7 @@ class WellFond_data(FindIndexPZ):
                                                                          if 'НВ' in ecn or 'НН' in ecn or
                                                                          'ШГН' in ecn or 'RHAM' in ecn][0]
 
-                            if ('ЭЦН' in str(row[col_plan].value).upper() or 'ВНН' in str(
-                                    row[col_plan].value).upper()):
-                                well_data.dict_pump_ECN["posle"] = row[col_plan].value
-                                if '/' in str(row[col_plan].value):
-                                    well_data.dict_pump_ECN["posle"] = [ecn for ecn in row[col_plan].value.split('/')
-                                                                        if 'ЭЦН' in ecn or 'ВНН' in ecn][0]
+
 
                         if well_data.dict_pump_ECN["do"] != 0:
                             well_data.dict_pump_ECN_h["do"] = FindIndexPZ.check_str_None(self,
@@ -760,8 +762,8 @@ class WellData(FindIndexPZ):
                         well_data.appointment = ProtectedIsDigit(row[col + 1].value)
                         # print(f' ЦДНГ {well_data.cdng._value}')
         if well_data.work_plan == 'krs':
-            tables_filter = self.get_tables_starting_with(self, well_data.well_number._value,
-                                                               well_data.well_area._value, 'ПР', well_data.type_kr.split(' ')[0])
+            tables_filter = self.get_tables_starting_with(
+                self, well_data.well_number._value, well_data.well_area._value, 'ПР', well_data.type_kr.split(' ')[0])
             if tables_filter:
                 mes = QMessageBox.question(None, 'Наличие в базе',
                                            f'В базе имеются план работ по скважине:\n {" ".join(tables_filter)}. '
@@ -783,7 +785,7 @@ class Well_data(FindIndexPZ):
         from main import MyMainWindow
 
         well_data.bottomhole_drill = ProtectedIsNonNone('не корректно')
-        well_data.bottomhole_artificial = ProtectedIsNonNone('не корректно')
+        well_data.bottomhole_artificial = ProtectedIsNonNone(5000)
         well_data.max_angle = ProtectedIsNonNone('не корректно')
         well_data.max_angle_H = ProtectedIsNonNone('не корректно')
         well_data.stol_rotora = ProtectedIsNonNone('не корректно')
@@ -1115,8 +1117,7 @@ class Well_perforation(FindIndexPZ):
 
     def read_well(self, ws, begin_index, cancel_index):
         from work_py.alone_oreration import is_number, calculationFluidWork
-        from main import MyMainWindow
-        # print(f'перфорация доп {well_data.dict_perforation}')
+
         well_data.old_version = True
         col_old_open_index = 0
         bokov_stvol = False
@@ -1132,33 +1133,33 @@ class Well_perforation(FindIndexPZ):
         col_date_pressuar_index = 0
 
         if len(well_data.dict_perforation) == 0:
-            for row in ws.iter_rows(min_row=begin_index + 1, max_row=cancel_index + 2, values_only=True):
+            for row in ws.iter_rows(min_row=begin_index + 1, max_row=begin_index + 3, values_only=True):
                 # print(row)
                 for col_index, column in enumerate(row[:14]):
                     if 'оризонт'.lower() in str(column).lower() or 'пласт/'.lower() in str(column).lower():
                         col_plast_index = col_index - 1
 
-                    if 'по вертикали'.lower() in str(column).lower():
+                    elif 'по вертикали'.lower() in str(column).lower():
                         col_vert_index = col_index - 1
                         # print(f'вер {col_index}')
-                    if 'кровля'.lower() in str(column).lower():
+                    elif 'кровля'.lower() in str(column).lower():
                         col_roof_index = col_index - 1
                         # print(f'кров {col_index}')
-                    if 'подошва'.lower() in str(column).lower():
+                    elif 'подошва'.lower() in str(column).lower():
                         # print(f'подо {col_index}')
                         col_sole_index = col_index - 1
-                    if 'вскрытия'.lower() in str(column).lower():
+                    elif 'вскрытия'.lower() in str(column).lower():
                         # print(f'вскр {col_index}')
                         col_open_index = col_index - 1
-                    if 'отключ'.lower() in str(column).lower() and col_index < 8:
+                    elif 'отключен'.lower() in str(column).lower() and col_index < 8:
                         # print(f'октл {col_index}')
                         col_close_index = col_index - 1
-                    if 'удлине'.lower() in str(column).lower():
+                    elif 'удлине'.lower() in str(column).lower():
                         # print(f'удл {col_index}')
                         col_udlin_index = col_index - 1
-                    if 'Рпл'.lower() in str(column).lower():
+                    elif 'Рпл,атм'.lower() in str(column).lower():
                         col_pressuar_index = col_index - 1
-                    if 'замера' in str(column).lower():
+                    elif 'замера' in str(column).lower():
                         col_date_pressuar_index = col_index - 1
                     if 'вскрыт'.lower() in str(column).lower() and 'откл'.lower() in str(column).lower():
                         well_data.old_version = True
@@ -1217,7 +1218,7 @@ class Well_perforation(FindIndexPZ):
                                          column_list, 1)[0]) - 2
 
             if osnov_stvol is True and bokov_stvol is True:
-                mes = QMessageBox.warning(self, 'ОШИБКА', 'Ошибка в определении рабочий интервалов перфорации')
+                QMessageBox.warning(self, 'ОШИБКА', 'Ошибка в определении рабочий интервалов перфорации')
                 begin_index = QInputDialog.getInt(self, 'Индекс начала', 'ВВедите индекс начала рабочих интервалов ПВР',
                                                   0, 0, 300)[0] - 3
 
@@ -1245,7 +1246,7 @@ class Well_perforation(FindIndexPZ):
                     if all([str(i).strip() == 'None' or i is None for i in lst]) is False:
                         perforations_intervals.append(lst)
             except:
-                mes = QMessageBox.warning(self, 'ОШИБКА',
+                QMessageBox.warning(self, 'ОШИБКА',
                                           F'Приложение не смогло определить индекс пласта в строке {row_index}')
                 well_data.pause = True
                 self.pause_app()
@@ -1285,6 +1286,7 @@ class Well_perforation(FindIndexPZ):
                         row[col_open_index])
 
                     if col_old_open_index != col_open_index:
+                        aaass = row[col_close_index]
                         if row[col_close_index] is None or row[col_close_index] == '-':
                             well_data.dict_perforation.setdefault(plast, {}).setdefault('отключение', False)
                             well_data.dict_perforation_short.setdefault(plast, {}).setdefault('отключение', False)
@@ -1292,6 +1294,7 @@ class Well_perforation(FindIndexPZ):
                             well_data.dict_perforation.setdefault(plast, {}).setdefault('отключение', True)
                             well_data.dict_perforation_short.setdefault(plast, {}).setdefault('отключение', True)
                     else:
+                        dadwd = row[col_old_open_index]
                         if isinstance(row[col_old_open_index], datetime):
                             well_data.dict_perforation.setdefault(plast, {}).setdefault('отключение', False)
                             well_data.dict_perforation_short.setdefault(plast, {}).setdefault('отключение', False)
@@ -1300,6 +1303,7 @@ class Well_perforation(FindIndexPZ):
                             well_data.dict_perforation_short.setdefault(plast, {}).setdefault('отключение', True)
 
                     zhgs = 1.01
+                    aaaa = row[col_pressuar_index], row[col_vert_index]
                     if str(row[col_pressuar_index]).replace(',', '').replace('.', '').isdigit() and row[col_vert_index]:
                         data_p = float(str(row[col_pressuar_index]).replace(',', '.'))
                         well_data.dict_perforation.setdefault(plast, {}).setdefault('давление',
@@ -1335,13 +1339,9 @@ class Well_perforation(FindIndexPZ):
                         well_data.dict_perforation_project.setdefault(
                             plast, {}).setdefault('вертикаль', []).append(round(float(str(
                             row[col_vert_index]).replace(',', '.')), 1))
-                        try:
-                            if (roof_int, sole_int) in well_data.dict_perforation_project[plast]['интервал']:
-                                break
-                        except:
-                            pass
-                        well_data.dict_perforation_project.setdefault(
-                            plast, {}).setdefault('интервал', []).append((roof_int, sole_int))
+                        if (roof_int, sole_int) not in well_data.dict_perforation_project[plast]['интервал']:
+                            well_data.dict_perforation_project.setdefault(
+                                plast, {}).setdefault('интервал', []).append((roof_int, sole_int))
 
                     if row[col_pressuar_index] != None:
                         well_data.dict_perforation_project.setdefault(plast, {}).setdefault('давление', []).append(
@@ -1351,7 +1351,7 @@ class Well_perforation(FindIndexPZ):
 
             if len(well_data.dict_perforation_project) != 0:
                 well_data.plast_project = list(well_data.dict_perforation_project.keys())
-
+            aaaag = well_data.dict_perforation_project
             # объединение интервалов перфорации если они пересекаются
             for plast, value in well_data.dict_perforation.items():
                 intervals = value['интервал']
@@ -1491,7 +1491,7 @@ class Well_Category(FindIndexPZ):
             except Exception as e:
                 QMessageBox.warning(self, 'Ошибка', f'Ошибка обработки данных по категориям {e}')
             if len(well_data.cat_h2s_list) == 0:
-                mes = QMessageBox.warning(self, 'ОШИБКА', 'Приложение не смогла найти значение '
+                QMessageBox.warning(self, 'ОШИБКА', 'Приложение не смогла найти значение '
                                                           'сероводорода в %')
                 well_data.pause = True
                 self.pause_app()
@@ -1508,7 +1508,7 @@ class Well_Category(FindIndexPZ):
                 self.data_window = None
 
             if len(well_data.h2s_pr) == 0:
-                mes = QMessageBox.warning(self, 'Ошибка', 'Программа не смогла найти данные по содержания '
+                QMessageBox.warning(self, 'Ошибка', 'Программа не смогла найти данные по содержания '
                                                           'сероводорода в процентах')
                 h2s_pr, _ = QInputDialog.getDouble(self, 'сероводород в процентах',
                                                    'Введите значение серовородода в процентах', 0, 0, 100, 5)
@@ -1531,7 +1531,7 @@ class Well_Category(FindIndexPZ):
 
                 if categoty_pressure_well:
                     if str(categoty_pressure_well) != str(well_data.category_pressuar):
-                        mes = QMessageBox.warning(None, 'Некорректная категория давления',
+                        QMessageBox.warning(None, 'Некорректная категория давления',
                                                   f'согласно классификатора от {data} категория скважина '
                                                   f'по давлению {categoty_pressure_well} категории')
                         well_data.check_data_in_pz.append(f'согласно классификатора от {data} категория скважины ' \
@@ -1540,7 +1540,7 @@ class Well_Category(FindIndexPZ):
                     if str(well_data.cat_h2s_list[0]) != str(well_data.category_h2s):
                         # print(str(well_data.cat_h2s_list[0]), well_data.category_h2s)
                         #
-                        mes = QMessageBox.warning(None, 'Некорректная категория давления',
+                        QMessageBox.warning(None, 'Некорректная категория давления',
                                                   f'согласно классификатора от {data} категория скважина '
                                                   f'по сероводороду {categoty_h2s_well} категории')
                         well_data.check_data_in_pz.append(f'согласно классификатора от {data} категория скважина ' \
@@ -1548,10 +1548,10 @@ class Well_Category(FindIndexPZ):
 
                 if categoty_gf:
                     if str(categoty_gf) != str(well_data.category_gf):
-                        mes = QMessageBox.warning(None, 'Некорректная категория давления',
+                        QMessageBox.warning(None, 'Некорректная категория давления',
                                                   f'согласно классификатора от {data} категория скважина '
                                                   f'по газовому фактору {categoty_gf} категории')
                         well_data.check_data_in_pz.append(f'согласно классификатора от {data} категория скважина ' \
                                                           f'по газовому фактору {categoty_gf} категории\n')
             except Exception as e:
-                mes = QMessageBox.warning(self, 'Ошибка', f'Скважина не найдена в классификаторе \n {type(e).__name__}\n\n{str(e)}')
+                QMessageBox.warning(self, 'Ошибка', f'Скважина не найдена в классификаторе \n {type(e).__name__}\n\n{str(e)}')
