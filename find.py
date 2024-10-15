@@ -1339,8 +1339,7 @@ class Well_perforation(FindIndexPZ):
                         well_data.dict_perforation_project.setdefault(
                             plast, {}).setdefault('вертикаль', []).append(round(float(str(
                             row[col_vert_index]).replace(',', '.')), 1))
-                        if (roof_int, sole_int) not in well_data.dict_perforation_project[plast]['интервал']:
-                            well_data.dict_perforation_project.setdefault(
+                        well_data.dict_perforation_project.setdefault(
                                 plast, {}).setdefault('интервал', []).append((roof_int, sole_int))
 
                     if row[col_pressuar_index] != None:
