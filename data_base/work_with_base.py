@@ -744,6 +744,7 @@ def insert_database_well_data(well_number, well_area, contractor, costumer, data
             param = '?'
             # Подготовленный запрос для вставки данных с параметрами
             query = f"INSERT INTO wells VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+            date_today = str(date_today).split(' ')[0]
 
 
         except sqlite3.Error as e:

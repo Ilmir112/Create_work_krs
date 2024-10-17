@@ -840,9 +840,11 @@ class DopPlanWindow(MyMainWindow):
                     return
             well_data.count_template = 1
             if well_data.data_in_base:
-                data_well_data_in_base_combo, data_table_in_base_combo = '', ''
-                # table_in_base_combo = str(current_widget.table_in_base_combo.currentText())
+
                 well_data_in_base_combo = current_widget.well_data_in_base_combo.currentText()
+                if well_data_in_base_combo == '':
+                    QMessageBox.warning(self, 'Ошибка', 'Не выбрана скважина в базе данных')
+                    return
 
                 if ' от' in well_data_in_base_combo:
                     asd = well_data_in_base_combo.split(' ')
@@ -1094,7 +1096,7 @@ class DopPlanWindow(MyMainWindow):
         well_number = table_name.split(' ')[0]
         well_area = table_name.split(' ')[1]
         type_kr = table_name.split(' ')[2].replace('None', 'null')
-
+        contractor = well_data.contractor
         work_plan = table_name.split(' ')[3]
 
         if well_data.connect_in_base:
@@ -1123,11 +1125,13 @@ class DopPlanWindow(MyMainWindow):
                 # Выведите сообщение об ошибке
                 QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных.')
 
-
-        cursor.execute(f'''
+        query = f'''
         SELECT data_change_paragraph FROM wells 
-        WHERE well_number={param} AND area_well={param} AND type_kr={param} AND work_plan={param} AND today={param}''',
-        (str(well_number), well_area, type_kr, work_plan, date_table))
+        WHERE well_number={param} AND area_well={param} AND type_kr={param} 
+        AND work_plan={param} AND today={param} AND contractor={param}'''
+
+        cursor.execute(query,
+        (str(well_number), well_area, type_kr, work_plan, date_table, contractor))
 
         result_table = cursor.fetchone()
         # Закройте курсор и соединение
@@ -1157,10 +1161,7 @@ class DopPlanWindow(MyMainWindow):
         return
 
     def insert_data_dop_plan(self, result, paragraph_row):
-        try:
-            paragraph_row = paragraph_row - 1
-        except:
-            paragraph_row = 1
+
         if len(result) < paragraph_row:
             QMessageBox.warning(self, 'Ошибка', f'В плане работ только {len(result)} пункта')
             return
