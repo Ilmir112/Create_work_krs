@@ -324,7 +324,7 @@ class PvrApplication(MyMainWindow):
         full_path = path + "/" + filenames
         if wb:
             wb.close()
-            self.saveFileDialog(wb, full_path)
+            self.save_file_dialog(wb, full_path)
             # wb2.save(full_path)
             print(f"Table data saved to Excel {full_path} {well_data.number_dp}")
         if wb:

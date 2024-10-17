@@ -129,7 +129,7 @@ class Grp_window(MyMainWindow):
         current_depth = int(float(self.tabWidget.currentWidget().current_depth_edit.text()))
         if self.check_true_depth_template(paker_depth) is False:
             return
-        if self.true_set_Paker(paker_depth) is False:
+        if self.true_set_paker(paker_depth) is False:
             return
         if self.check_depth_in_skm_interval(paker_depth) is False:
             return

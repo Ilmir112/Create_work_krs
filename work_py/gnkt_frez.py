@@ -291,7 +291,7 @@ class Work_with_gnkt(main.MyWindow):
         if Work_with_gnkt.wb_gnkt_frez:
             Work_with_gnkt.wb_gnkt_frez.remove(Work_with_gnkt.wb_gnkt_frez['Sheet'])
 
-            self.saveFileDialog(Work_with_gnkt.wb_gnkt_frez, full_path)
+            self.save_file_dialog(Work_with_gnkt.wb_gnkt_frez, full_path)
 
             Work_with_gnkt.wb_gnkt_frez.close()
 

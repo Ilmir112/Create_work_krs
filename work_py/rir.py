@@ -1075,7 +1075,7 @@ class RirWindow(MyMainWindow):
             paker_depth = int(float(current_widget.paker_depth_edit.text()))
             if self.check_true_depth_template(paker_depth) is False:
                 return
-            if self.true_set_Paker(paker_depth) is False:
+            if self.true_set_paker(paker_depth) is False:
                 return
             if self.check_depth_in_skm_interval(paker_depth) is False:
                 return
@@ -1108,7 +1108,7 @@ class RirWindow(MyMainWindow):
             if need_change_zgs_combo == 'Да':
                 if self.check_true_depth_template(paker_depth) is False:
                     return
-                if self.true_set_Paker(paker_depth) is False:
+                if self.true_set_paker(paker_depth) is False:
                     return
                 if self.check_depth_in_skm_interval(paker_depth) is False:
                     return

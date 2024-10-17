@@ -379,7 +379,7 @@ class GnktOsvWindow2(MyMainWindow):
         if self.wb:
             self.wb.remove(self.wb['Sheet'])
 
-            self.saveFileDialog(self.wb, full_path)
+            self.save_file_dialog(self.wb, full_path)
 
             self.wb.close()
             print(f"Table data saved to Excel {full_path} {well_data.number_dp}")

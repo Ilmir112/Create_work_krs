@@ -778,7 +778,7 @@ class GnktOsvWindow(MyMainWindow):
             schema_list = self.check_pvo_schema(ws5, 1)
 
         if GnktOsvWindow.wb:
-            self.saveFileDialog(GnktOsvWindow.wb, full_path)
+            self.save_file_dialog(GnktOsvWindow.wb, full_path)
             Work_with_gnkt.wb_gnkt_frez.close()
             print(f"Table data saved to Excel {full_path} {well_data.number_dp}")
         if self.wb:

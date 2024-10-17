@@ -119,7 +119,7 @@ class VpWindow(MyMainWindow):
         if need_question_QCombo == "Да":
             if self.check_true_depth_template(vp_depth) is False:
                 return
-            if self.true_set_Paker( vp_depth) is False:
+            if self.true_set_paker( vp_depth) is False:
                 return
             if self.check_depth_in_skm_interval(vp_depth) is False:
                 return
@@ -127,7 +127,7 @@ class VpWindow(MyMainWindow):
         elif need_question_QCombo == "Нет":
             if self.check_true_depth_template(vp_depth) is False:
                 return
-            if self.true_set_Paker( vp_depth) is False:
+            if self.true_set_paker( vp_depth) is False:
                 return
             if self.check_depth_in_skm_interval(vp_depth) is False:
                 return

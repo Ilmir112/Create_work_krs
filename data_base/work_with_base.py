@@ -9,7 +9,6 @@ import psycopg2
 import well_data
 import base64
 
-
 from datetime import datetime
 
 from PyQt5 import QtWidgets
@@ -141,7 +140,7 @@ class Classifier_well(MyMainWindow):
                     data = cur.fetchall()
 
             except psycopg2.Error as e:
-                 QMessageBox.warning(self, 'Ошибка', f'Ошибка подключения к базе данных: {type(e).__name__}\n\n{str(e)}')
+                QMessageBox.warning(self, 'Ошибка', f'Ошибка подключения к базе данных: {type(e).__name__}\n\n{str(e)}')
 
             finally:
                 if conn:
@@ -284,7 +283,7 @@ class Classifier_well(MyMainWindow):
                         # print(check_param)
                         if check_param in region_name:
                             QMessageBox.warning(self, 'ВНИМАНИЕ ОШИБКА',
-                                                      f'регион выбрано корректно  {region_name}')
+                                                f'регион выбрано корректно  {region_name}')
                             try:
                                 # Получение данных из Excel и запись их в базу данных
                                 for index_row, row in enumerate(ws.iter_rows(min_row=2, values_only=True)):
@@ -313,18 +312,18 @@ class Classifier_well(MyMainWindow):
 
                                 QMessageBox.information(self, 'данные обновлены', 'Данные обновлены')
                             except:
-                                 QMessageBox.warning(self, 'ОШИБКА', 'Выбран файл с не корректными данными')
+                                QMessageBox.warning(self, 'ОШИБКА', 'Выбран файл с не корректными данными')
 
                         else:
-                             QMessageBox.warning(self, 'ВНИМАНИЕ ОШИБКА',
-                                                      f'в Данном перечне отсутствую скважины {region_name}')
+                            QMessageBox.warning(self, 'ВНИМАНИЕ ОШИБКА',
+                                                f'в Данном перечне отсутствую скважины {region_name}')
 
                 # Сохранение изменений
                 conn.commit()
 
             except psycopg2.Error as e:
                 # Выведите сообщение об ошибке
-                 QMessageBox.warning(self, 'Ошибка', 'Ошибка подключения к базе данных')
+                QMessageBox.warning(self, 'Ошибка', 'Ошибка подключения к базе данных')
             finally:
                 # Закройте курсор и соединение
                 if cursor:
@@ -385,7 +384,8 @@ class Classifier_well(MyMainWindow):
 
                                 QMessageBox.information(None, 'данные обновлены', 'Данные обновлены')
                             except Exception as e:
-                                QMessageBox.warning(None, 'ОШИБКА', f'Выбран файл с не корректными данными: {type(e).__name__}\n\n{str(e)}')
+                                QMessageBox.warning(None, 'ОШИБКА',
+                                                    f'Выбран файл с не корректными данными: {type(e).__name__}\n\n{str(e)}')
 
                         else:
                             QMessageBox.warning(None, 'ВНИМАНИЕ ОШИБКА',
@@ -396,7 +396,8 @@ class Classifier_well(MyMainWindow):
 
             except sqlite3.Error as e:
                 # Выведите сообщение об ошибке
-                QMessageBox.warning(None, 'Ошибка', f'Ошибка подключения к базе данных: /n {type(e).__name__}\n\n{str(e)}')
+                QMessageBox.warning(None, 'Ошибка',
+                                    f'Ошибка подключения к базе данных: /n {type(e).__name__}\n\n{str(e)}')
             finally:
                 # Закройте курсор и соединение
                 if cursor:
@@ -531,7 +532,7 @@ class Classifier_well(MyMainWindow):
 
                         if check_param in region_name:
                             QMessageBox.warning(self, 'ВНИМАНИЕ ОШИБКА',
-                                                      f'регион выбрано корректно  {region_name}')
+                                                f'регион выбрано корректно  {region_name}')
 
                             try:
                                 # Вставка данных в таблицу
@@ -578,17 +579,17 @@ class Classifier_well(MyMainWindow):
                                                 version_year, region, costumer
                                             ))
                             except:
-                                 QMessageBox.warning(self, 'ОШИБКА', 'Выбран файл с не корректными данными')
+                                QMessageBox.warning(self, 'ОШИБКА', 'Выбран файл с не корректными данными')
 
                         else:
-                             QMessageBox.warning(self, 'ВНИМАНИЕ ОШИБКА',
-                                                      f'в Данном перечне отсутствую скважины {region_name}')
+                            QMessageBox.warning(self, 'ВНИМАНИЕ ОШИБКА',
+                                                f'в Данном перечне отсутствую скважины {region_name}')
                         conn.commit()
                 QMessageBox.information(self, 'Успешно', 'Классификатор успешно обновлен')
 
             except (psycopg2.Error, Exception) as e:
                 # Выведите сообщение об ошибке
-                 QMessageBox.warning(self, 'Ошибка', 'Ошибка подключения к базе данных')
+                QMessageBox.warning(self, 'Ошибка', 'Ошибка подключения к базе данных')
             finally:
                 # Закройте курсор и соединение
                 if cursor:
@@ -674,7 +675,8 @@ class Classifier_well(MyMainWindow):
                                 QMessageBox.information(None, 'данные обновлены', 'Данные обновлены')
 
                             except Exception as e:
-                                QMessageBox.warning(None, 'ОШИБКА', f'Выбран файл с не корректными данными: {type(e).__name__}\n\n{str(e)}')
+                                QMessageBox.warning(None, 'ОШИБКА',
+                                                    f'Выбран файл с не корректными данными: {type(e).__name__}\n\n{str(e)}')
 
                         else:
                             QMessageBox.warning(None, 'ВНИМАНИЕ ОШИБКА',
@@ -684,7 +686,8 @@ class Classifier_well(MyMainWindow):
 
             except sqlite3.Error as e:
                 # Выведите сообщение об ошибке
-                QMessageBox.warning(None, 'Ошибка', f'Ошибка подключения к базе данных : {type(e).__name__}\n\n{str(e)}')
+                QMessageBox.warning(None, 'Ошибка',
+                                    f'Ошибка подключения к базе данных : {type(e).__name__}\n\n{str(e)}')
             finally:
                 # Закройте курсор и соединение
                 if cursor:
@@ -694,16 +697,14 @@ class Classifier_well(MyMainWindow):
 
 
 def insert_database_well_data(well_number, well_area, contractor, costumer, data_well_dict, excel, work_plan):
-
     data_well = json.dumps(data_well_dict, ensure_ascii=False)
     excel_json = json.dumps(excel, ensure_ascii=False)
     date_today = datetime.now()
     type_kr = well_data.type_kr.split(' ')[0]
     data_paragraph = json.dumps(well_data.data_list, ensure_ascii=False)
     cdng = well_data.cdng._value
-    category_dict =json.dumps(well_data.dict_category, ensure_ascii=False)
+    category_dict = json.dumps(well_data.dict_category, ensure_ascii=False)
     # print(row, well_data.count_row_well)
-
 
     if 'dop_plan' in work_plan:
         work_plan_str = f'ДП№{well_data.number_dp}'
@@ -714,7 +715,6 @@ def insert_database_well_data(well_number, well_area, contractor, costumer, data
             work_plan_str = 'ПР'
         else:
             work_plan_str = f'ДП№{well_data.number_dp}'
-
 
     if well_data.connect_in_base:
         try:
@@ -730,8 +730,8 @@ def insert_database_well_data(well_number, well_area, contractor, costumer, data
 
         except psycopg2.Error as e:
             # Выведите сообщение об ошибке
-             QMessageBox.warning(None, 'Ошибка', f'Ошибка подключения к базе данных  well_data'
-                                                 f' {type(e).__name__}\n\n{str(e)}')
+            QMessageBox.warning(None, 'Ошибка', f'Ошибка подключения к базе данных  well_data'
+                                                f' {type(e).__name__}\n\n{str(e)}')
     else:
         try:
 
@@ -749,7 +749,7 @@ def insert_database_well_data(well_number, well_area, contractor, costumer, data
 
         except sqlite3.Error as e:
             # Выведите сообщение об ошибке
-             QMessageBox.warning(None, 'Ошибка', f'Ошибка подключения к базе данных hg{type(e).__name__}\n\n{str(e)}')
+            QMessageBox.warning(None, 'Ошибка', f'Ошибка подключения к базе данных hg{type(e).__name__}\n\n{str(e)}')
 
     cursor.execute(f"""
                        SELECT EXISTS (
@@ -800,8 +800,8 @@ def insert_database_well_data(well_number, well_area, contractor, costumer, data
         cursor.execute(query, data_values)
 
         QMessageBox.information(None, 'база данных',
-                                      f'Скважина {well_data.well_number._value} добавлена в базу '
-                                      f'данных c excel файлами')
+                                f'Скважина {well_data.well_number._value} добавлена в базу '
+                                f'данных c excel файлами')
 
     # Сохранить изменения и закрыть соединение
     conn.commit()
@@ -825,9 +825,7 @@ def connect_to_db(name_base, folder_base):
     return db_path
 
 
-
 def check_in_database_well_data(number_well, area_well, work_plan):
-
     if well_data.connect_in_base:
         try:
             conn = connect_to_database(well_data.DB_WELL_DATA)
@@ -836,18 +834,18 @@ def check_in_database_well_data(number_well, area_well, work_plan):
 
         except psycopg2.Error as e:
             # Выведите сообщение об ошибке
-             QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных, Скважина не добавлена в базу')
+            QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных, Скважина не добавлена в базу')
     else:
         try:
             db_path = connect_to_db('well_data.db', 'data_base_well/')
 
             conn = sqlite3.connect(f'{db_path}')
             cursor = conn.cursor()
-            param ='?'
+            param = '?'
 
         except sqlite3.Error as e:
             # Выведите сообщение об ошибке
-             QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных, Скважина не добавлена в базу')
+            QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных, Скважина не добавлена в базу')
 
     cursor.execute(f"SELECT data_well, today, type_kr, category_dict "
                    f"FROM wells "
@@ -880,41 +878,113 @@ def excel_in_json(sheet):
 
                 break
             for cell in row[:32]:
-                # Получение значения и стилей
-                value = cell.value
+                if any([cell.value == "ИТОГО:" for cell in row[:4]]):
+                    index_end_copy = row_index
 
-                font = cell.font
-                fill = cell.fill
-                # Преобразуем RGB в строковый формат
-                rgb_string = f"RGB({fill.fgColor.rgb})"
+                    break
+                row_data = []
+                if all(cell == None for cell in row[:32]) is False:
+                    if any([cell.value == "ИТОГО:" for cell in row[:4]]):
+                        index_end_copy = row_index
 
-                borders = cell.border
-                alignment = cell.alignment
+                        break
+                    for cell in row[:32]:
+                        # Получение значения и стилей
+                        value = cell.value
 
-                row_data.append({
-                    'value': value,
-                    'font': {
-                        'name': font.name,
-                        'size': font.size,
-                        'bold': font.bold,
-                        'italic': font.italic
-                    },
-                    'fill': {
-                        'color': rgb_string
-                    },
-                    'borders': {
-                        'left': borders.left.style,
-                        'right': borders.right.style,
-                        'top': borders.top.style,
-                        'bottom': borders.bottom.style
-                    },
-                    'alignment': {
-                        'horizontal': alignment.horizontal,
-                        'vertical': alignment.vertical,
-                        'wrap_text': alignment.wrap_text
-                    },
-                })
-                data[row[0].row] = row_data
+                        font = cell.font
+                        if font.color:
+                            # Преобразуем RGB в строковый формат
+                            rgb_string = f"RGB({font.color.rgb})"
+                        else:
+                            rgb_string = None
+
+                        fill = cell.fill
+                        # Преобразуем RGB в строковый формат
+                        rgb_string_fill = f"RGB({fill.fgColor.rgb})"
+
+                        borders = cell.border
+                        left_border = None
+                        right_border = None
+                        top_border = None
+                        bottom_border = None
+                        borders_style_left =None
+                        borders_style_right =None
+                        borders_style_top =None
+                        borders_style_bottom =None
+                        if borders.left.style:
+                            borders_style_left = borders.left.style
+                        if borders.left.color:
+                            left_border = f"RGB({borders.left.color.rgb})"
+                            if left_border == "RGB(Values must be of type <class 'str'>)":
+                                left_border = None
+                        else:
+                            left_border = None
+                        if borders.right.style:
+                            borders_style_right = borders.right.style
+                        if borders.right.color:
+                            right_border = f"RGB({borders.right.color.rgb})"
+                            if right_border == "RGB(Values must be of type <class 'str'>)":
+                                right_border = None
+                        else:
+                            right_border = None
+                        if borders.top.style:
+                            borders_style_top = borders.top.style
+                        if borders.top.color:
+                            top_border = f"RGB({borders.top.color.rgb})"
+                            if top_border == "RGB(Values must be of type <class 'str'>)":
+                                top_border = None
+                        else:
+                            top_border = None
+
+                        if borders.bottom.style:
+                            borders_style_bottom = borders.bottom.style
+                        if borders.bottom.color:
+                            bottom_border = f"RGB({borders.bottom.color.rgb})"
+                            if bottom_border == "RGB(Values must be of type <class 'str'>)":
+                                bottom_border = None
+                        else:
+                            bottom_border = None
+                        alignment = cell.alignment
+
+                        row_data.append({
+                            'value': value,
+                            'font': {
+                                'name': font.name,
+                                'size': font.size,
+                                'bold': font.bold,
+                                'italic': font.italic,
+                                'color': rgb_string
+                            },
+                            'fill': {
+                                'color': rgb_string_fill
+                            },
+                            'borders': {
+                                'left': {
+                                    'style': borders_style_left,
+                                    'color': left_border
+                                },
+                                'right': {
+                                    'style': borders_style_right,
+                                    'color': right_border
+                                },
+                                'top':  {
+                                    'style': borders_style_top,
+                                    'color': top_border
+                                },
+                                'bottom':  {
+                                    'style': borders_style_bottom,
+                                    'color': bottom_border
+                                },
+                            },
+                            'alignment': {
+                                'horizontal': alignment.horizontal,
+                                'vertical': alignment.vertical,
+                                'wrap_text': alignment.wrap_text
+                            },
+                        })
+                        data[row[0].row] = row_data
+
 
     data['image'] = well_data.image_data
     rowHeights = [sheet.row_dimensions[i + 1].height for i in range(sheet.max_row) if i <= index_end_copy]
@@ -926,8 +996,6 @@ def excel_in_json(sheet):
         if range_boundaries(str(_range))[1] <= index_end_copy:
             boundaries_dict[ind] = range_boundaries(str(_range))
 
-
-
     data_excel = {'data': data, 'rowHeights': rowHeights, 'colWidth': colWidth, 'merged_cells': boundaries_dict}
 
     return data_excel
@@ -937,7 +1005,6 @@ def insert_data_well_dop_plan(data_well):
     from well_data import ProtectedIsDigit, ProtectedIsNonNone
 
     well_data_dict = json.loads(data_well)
-
 
     well_data.column_direction_diametr = ProtectedIsDigit(well_data_dict["направление"]["диаметр"])
     well_data.column_direction_wall_thickness = ProtectedIsDigit(well_data_dict["направление"]["толщина стенки"])
@@ -990,6 +1057,7 @@ def insert_data_well_dop_plan(data_well):
 
     definition_plast_work(None)
 
+
 def read_database_gnkt(contractor, gnkt_number):
     try:
         # Подключение к базе данных
@@ -1003,7 +1071,7 @@ def read_database_gnkt(contractor, gnkt_number):
         result = cursor.fetchone()
     except psycopg2.Error as e:
         # Выведите сообщение об ошибке
-         QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных')
+        QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных')
     finally:
         # Закройте курсор и соединение
         if cursor:
@@ -1079,26 +1147,59 @@ def insert_data_new_excel_file(data, rowHeights, colWidth, boundaries_dict):
 
                 # Получение строки RGB из JSON
                 rgb_string = cell_data['fill']['color']
-                # Извлекаем шестнадцатеричный код цвета
-                hex_color = rgb_string[4:-1]
+                if 'color' in list(cell_data['font'].keys()):
 
-                if hex_color != '00000000':
 
-                    try:
-                        color = Color(rgb=hex_color)
+                    color_font = change_rgb_to_hex(rgb_string)
 
-                        # Создание объекта заливки
-                        fill = PatternFill(patternType='solid', fgColor=color)
-                        cell.fill = fill
-                    except:
-                        pass
-                cell.font = Font(name=cell_data['font']['name'], size=cell_data['font']['size'],
-                                 bold=cell_data['font']['bold'], italic=cell_data['font']['italic'])
 
-                cell.border = openpyxl.styles.Border(left=openpyxl.styles.Side(style=cell_data['borders']['left']),
-                                                     right=openpyxl.styles.Side(style=cell_data['borders']['right']),
-                                                     top=openpyxl.styles.Side(style=cell_data['borders']['top']),
-                                                     bottom=openpyxl.styles.Side(style=cell_data['borders']['bottom']))
+
+                    cell.font = Font(name=cell_data['font']['name'], size=cell_data['font']['size'],
+                                     bold=cell_data['font']['bold'], italic=cell_data['font']['italic'],
+                                     color=color_font)
+                else:
+                    # Извлекаем шестнадцатеричный код цвета
+                    hex_color = rgb_string[4:-1]
+
+                    if hex_color != '00000000':
+
+                        try:
+                            color = Color(rgb=hex_color)
+
+                            # Создание объекта заливки
+                            fill = PatternFill(patternType='solid', fgColor=color)
+                            cell.fill = fill
+                        except:
+                            pass
+                    cell.font = Font(name=cell_data['font']['name'], size=cell_data['font']['size'],
+                                     bold=cell_data['font']['bold'], italic=cell_data['font']['italic'])
+
+                if 'color' in list(cell_data['borders']['left'].keys()):
+                    rgb_string_left = cell_data['borders']['left']['color']
+
+                    color_font_left = change_rgb_to_hex(rgb_string_left)
+
+                    cell.border = openpyxl.styles.Border(
+                        left=openpyxl.styles.Side(
+                            style=cell_data['borders']['left']['style'],
+                            color=color_font_left),
+                        right=openpyxl.styles.Side(
+                            style=cell_data['borders']['right']['style'],
+                            color= change_rgb_to_hex(cell_data['borders']['right']['color'])),
+                        top=openpyxl.styles.Side(
+                            style=cell_data['borders']['top']['style'],
+                            color=change_rgb_to_hex(cell_data['borders']['top']['color'])),
+                        bottom=openpyxl.styles.Side(
+                            style=cell_data['borders']['bottom']['style'],
+                            color=change_rgb_to_hex(cell_data['borders']['bottom']['color'])),
+                    )
+                else:
+                    cell.border = openpyxl.styles.Border(
+                        left=openpyxl.styles.Side(style=cell_data['borders']['left']),
+                        right=openpyxl.styles.Side(style=cell_data['borders']['right']),
+                        top=openpyxl.styles.Side(style=cell_data['borders']['top']),
+                        bottom=openpyxl.styles.Side(style=cell_data['borders']['bottom'])
+                        )
 
                 wrap_true = cell_data['alignment']['wrap_text']
 
@@ -1106,14 +1207,11 @@ def insert_data_new_excel_file(data, rowHeights, colWidth, boundaries_dict):
                                                            vertical=cell_data['alignment']['vertical'],
                                                            wrap_text=wrap_true)
 
-
-
     try:
         well_data.image_data = data['image']
-                    # Добавьте обработку ошибки, например, пропуск изображения или запись информации об ошибке в лог
+        # Добавьте обработку ошибки, например, пропуск изображения или запись информации об ошибке в лог
     except ValueError as e:
         print(f"Ошибка при вставке изображения: {type(e).__name__}\n\n{str(e)}")
-
 
     for col in range(13):
         sheet_new.column_dimensions[get_column_letter(col + 1)].width = colWidth[col]
@@ -1121,11 +1219,13 @@ def insert_data_new_excel_file(data, rowHeights, colWidth, boundaries_dict):
 
     for index_row, row in enumerate(sheet_new.iter_rows()):
         # Копирование высоты строки
-        if any(['Наименование работ' in str(col.value) for col in row[:13]]) and well_data.work_plan not in ['plan_change']:
+        if any(['Наименование работ' in str(col.value) for col in row[:13]]) and well_data.work_plan not in [
+            'plan_change']:
             index_delete = index_row + 2
             well_data.ins_ind2 = index_row + 2
 
-        elif any(['ПЛАН РАБОТ' in str(col.value).upper() for col in row[:4]]) and well_data.work_plan not in ['plan_change']:
+        elif any(['ПЛАН РАБОТ' in str(col.value).upper() for col in row[:4]]) and well_data.work_plan not in [
+            'plan_change']:
             sheet_new.cell(row=index_row + 1, column=2).value = f'ДОПОЛНИТЕЛЬНЫЙ ПЛАН РАБОТ № {well_data.number_dp}'
 
         elif any(['ИТОГО:' in str(col.value).upper() for col in row[:4]]) and well_data.work_plan in ['plan_change']:
@@ -1143,6 +1243,17 @@ def insert_data_new_excel_file(data, rowHeights, colWidth, boundaries_dict):
         sheet_new.delete_rows(index_delete, sheet_new.max_row - index_delete + 1)
 
     return sheet_new
+
+
+def change_rgb_to_hex(rgb_string_font_color):
+    if rgb_string_font_color is None or rgb_string_font_color == "RGB(Values must be of type <class 'str'>)":
+        rgb_string_font_color = 'RGB(00000000)'
+
+    # Извлекаем шестнадцатеричный код цвета
+    hex_color_font = rgb_string_font_color[4:-1]
+
+    color_font = Color(rgb=hex_color_font)
+    return color_font
 
 
 if __name__ == "__main__":

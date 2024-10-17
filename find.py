@@ -735,9 +735,8 @@ class WellData(FindIndexPZ):
         super().__init__(ws)
         self.ws = ws
         # self.read_well(self.ws, well_data.cat_well_max._value, well_data.data_pvr_min._value)
-
-    def read_well(self, ws, begin_index, cancel_index):
-        from work_py.dop_plan_py import TabPageDp
+    @classmethod
+    def read_well(cls, ws, begin_index, cancel_index):
 
         well_data.well_area = ProtectedIsNonNone('не корректно')
         well_data.well_number = ProtectedIsNonNone('не корректно')
@@ -762,14 +761,14 @@ class WellData(FindIndexPZ):
                         well_data.appointment = ProtectedIsDigit(row[col + 1].value)
                         # print(f' ЦДНГ {well_data.cdng._value}')
         if well_data.work_plan == 'krs':
-            tables_filter = self.get_tables_starting_with(
-                self, well_data.well_number._value, well_data.well_area._value, 'ПР', well_data.type_kr.split(' ')[0])
+            tables_filter = cls.get_tables_starting_with(
+                well_data.well_number._value, well_data.well_area._value, 'ПР', well_data.type_kr.split(' ')[0])
             if tables_filter:
                 mes = QMessageBox.question(None, 'Наличие в базе',
                                            f'В базе имеются план работ по скважине:\n {" ".join(tables_filter)}. '
                                            f'При продолжении план пересохранится, продолжить?')
                 if mes == QMessageBox.StandardButton.No:
-                    self.pause_app()
+                    cls.pause_app()
                     return
 
 
