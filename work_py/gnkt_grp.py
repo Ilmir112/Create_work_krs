@@ -752,8 +752,7 @@ class GnktOsvWindow(MyMainWindow):
             Work_with_gnkt.count_row_height(self, worksheet, work_list, sheet_name)
 
         ws7 = GnktOsvWindow.wb.create_sheet(title="СХЕМЫ КНК_38,1")
-        main.MyWindow.insert_image(
-            self, ws7, f'{well_data.path_image}imageFiles/schema_well/СХЕМЫ КНК_38,1.png', 'A1', 550, 900)
+        self.insert_image(ws7, f'{well_data.path_image}imageFiles/schema_well/СХЕМЫ КНК_38,1.png', 'A1', 550, 900)
 
         if 'Зуфаров' in well_data.user:
             path = 'D:\Documents\Desktop\ГТМ'
@@ -788,21 +787,21 @@ class GnktOsvWindow(MyMainWindow):
 
         if well_data.paker_do["do"] != 0:
             coordinate_nkt_with_paker = 'F6'
-            main.MyWindow.insert_image(self, ws, f'{well_data.path_image}imageFiles/schema_well/НКТ с пакером.png',
+            self.insert_image(ws, f'{well_data.path_image}imageFiles/schema_well/НКТ с пакером.png',
                                        coordinate_nkt_with_paker, 100, 510)
         else:
             coordinate_nkt_with_voronka = 'F6'
-            main.MyWindow.insert_image(self, ws, f'{well_data.path_image}imageFiles/schema_well/НКТ с воронкой.png',
+            self.insert_image( ws, f'{well_data.path_image}imageFiles/schema_well/НКТ с воронкой.png',
                                        coordinate_nkt_with_voronka, 70, 470)
         if self.work_plan in ['gnkt_bopz']:
             coordinate = 'F65'
-            main.MyWindow.insert_image(self, ws, f'{well_data.path_image}imageFiles/schema_well/angle_well.png',
+            self.insert_image(ws, f'{well_data.path_image}imageFiles/schema_well/angle_well.png',
                                        coordinate, 265, 373)
 
         elif self.work_plan in ['gnkt_after_grp', 'gnkt_opz']:
             coordinate_propant = 'F43'
             if self.work_plan in ['gnkt_after_grp']:
-                main.MyWindow.insert_image(self, ws, f'{well_data.path_image}imageFiles/schema_well/пропант.png',
+                self.insert_image(ws, f'{well_data.path_image}imageFiles/schema_well/пропант.png',
                                            coordinate_propant, 90, 500)
 
             n = 0
@@ -831,15 +830,15 @@ class GnktOsvWindow(MyMainWindow):
                         ws.cell(row=48 + n, column=10).alignment = Alignment(wrap_text=True, horizontal='left',
                                                                              vertical='center')
                         n += 3
-                        main.MyWindow.insert_image(self, ws, f'{well_data.path_image}imageFiles/schema_well/ПВР.png',
+                        self.insert_image(ws, f'{well_data.path_image}imageFiles/schema_well/ПВР.png',
                                                    coordinate_pvr, 85, 70)
                 except:
-                    mes = QMessageBox.critical(self,
+                    QMessageBox.critical(self,
                                                'Ошибка', f'программа не смогла вставить интервал перфорации в схему'
                                                          f'{roof_plast}-{sole_plast}')
 
             coordinate_voln = f'E18'
-            main.MyWindow.insert_image(self, ws,
+            self.insert_image(ws,
                                        f'{well_data.path_image}imageFiles/schema_well/переход.png',
                                        coordinate_voln, 150, 60)
 

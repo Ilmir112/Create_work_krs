@@ -1549,12 +1549,14 @@ class MyWindow(MyMainWindow):
             well_data.problemWithEk_depth = well_data.current_bottom
             well_data.problemWithEk_diametr = 220
             path = f"{well_data.path_image}/imageFiles/image_work"[1:]
-
-            for file in os.listdir(path):
-                file_path = os.path.join(path, file)
-                if path in file_path:
-                    if os.path.isfile(file_path):
-                        os.remove(file_path)
+            try:
+                for file in os.listdir(path):
+                    file_path = os.path.join(path, file)
+                    if path in file_path:
+                        if os.path.isfile(file_path):
+                            os.remove(file_path)
+            except:
+                pass
 
             QMessageBox.information(self, 'Обновление', 'Данные обнулены')
 

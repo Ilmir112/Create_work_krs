@@ -861,7 +861,7 @@ def check_in_database_well_data(number_well, area_well, work_plan):
         conn.close()
 
     if data_well:
-        return data_well
+        return True,data_well
     else:
         return False, data_well
 
@@ -1174,7 +1174,9 @@ def insert_data_new_excel_file(data, rowHeights, colWidth, boundaries_dict):
                     cell.font = Font(name=cell_data['font']['name'], size=cell_data['font']['size'],
                                      bold=cell_data['font']['bold'], italic=cell_data['font']['italic'])
 
-                if 'color' in list(cell_data['borders']['left'].keys()):
+                aa = cell_data['borders']['left']
+                if cell_data['borders']['left'] and type(list(cell_data['borders']['left'])) is dict:
+
                     rgb_string_left = cell_data['borders']['left']['color']
 
                     color_font_left = change_rgb_to_hex(rgb_string_left)
@@ -1185,7 +1187,7 @@ def insert_data_new_excel_file(data, rowHeights, colWidth, boundaries_dict):
                             color=color_font_left),
                         right=openpyxl.styles.Side(
                             style=cell_data['borders']['right']['style'],
-                            color= change_rgb_to_hex(cell_data['borders']['right']['color'])),
+                            color=change_rgb_to_hex(cell_data['borders']['right']['color'])),
                         top=openpyxl.styles.Side(
                             style=cell_data['borders']['top']['style'],
                             color=change_rgb_to_hex(cell_data['borders']['top']['color'])),
@@ -1199,7 +1201,9 @@ def insert_data_new_excel_file(data, rowHeights, colWidth, boundaries_dict):
                         right=openpyxl.styles.Side(style=cell_data['borders']['right']),
                         top=openpyxl.styles.Side(style=cell_data['borders']['top']),
                         bottom=openpyxl.styles.Side(style=cell_data['borders']['bottom'])
-                        )
+                    )
+
+
 
                 wrap_true = cell_data['alignment']['wrap_text']
 

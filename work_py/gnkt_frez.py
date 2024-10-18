@@ -266,9 +266,9 @@ class Work_with_gnkt(main.MyWindow):
             Work_with_gnkt.count_row_height(self, worksheet, work_list, sheet_name)
 
         ws6 = Work_with_gnkt.wb_gnkt_frez.create_sheet(title="СХЕМЫ КНК_44,45")
-        main.MyWindow.insert_image(self, ws6, f'{well_data.path_image}imageFiles/schema_well/СХЕМЫ КНК_44,45.png', 'A1', 550, 900)
+        self.insert_image(ws6, f'{well_data.path_image}imageFiles/schema_well/СХЕМЫ КНК_44,45.png', 'A1', 550, 900)
         ws7 = Work_with_gnkt.wb_gnkt_frez.create_sheet(title="СХЕМЫ КНК_38,1")
-        main.MyWindow.insert_image(self, ws7, f'{well_data.path_image}imageFiles/schema_well/СХЕМЫ КНК_38,1.png', 'A1', 550, 900)
+        self.insert_image(ws7, f'{well_data.path_image}imageFiles/schema_well/СХЕМЫ КНК_38,1.png', 'A1', 550, 900)
 
         # path = 'workiii'
         if 'Зуфаров' in well_data.user:
@@ -762,7 +762,7 @@ class Work_with_gnkt(main.MyWindow):
                 # print(f'вставка1 ')
                 column_img = f'H{value[1] + 6}'
 
-                main.MyWindow.insert_image(self, ws3, f'{well_data.path_image}imageFiles/schema_well/port.png', coordinate, 200, 200)
+                self.insert_image(ws3, f'{well_data.path_image}imageFiles/schema_well/port.png', coordinate, 200, 200)
 
             for i in range(3):
                 cell = ws3.cell(row=27, column=value[0] + i)
@@ -786,9 +786,9 @@ class Work_with_gnkt(main.MyWindow):
 
         coordinate = f'B3'
 
-        main.MyWindow.insert_image(self, ws3, f'{well_data.path_image}imageFiles/schema_well/gorizont_1.png', coordinate, 237, 1023)
+        self.insert_image(ws3, f'{well_data.path_image}imageFiles/schema_well/gorizont_1.png', coordinate, 237, 1023)
         # print(Column_img)
-        main.MyWindow.insert_image(self, ws3, f'{well_data.path_image}imageFiles/schema_well/gorizont_12.png', column_img, 1800, 120)
+        self.insert_image(ws3, f'{well_data.path_image}imageFiles/schema_well/gorizont_12.png', column_img, 1800, 120)
 
         ws3.print_area = f'A1:AW{37}'
         ws3.page_setup.fitToPage = True

@@ -2,7 +2,7 @@ import base64
 
 import well_data
 from datetime import datetime
-from PyQt5.QtWidgets import QInputDialog, QMessageBox, QMainWindow
+from PyQt5.QtWidgets import QInputDialog, QMessageBox
 from openpyxl_image_loader import SheetImageLoader
 from openpyxl.utils.cell import get_column_letter
 from openpyxl.styles import Font, Alignment, Border, Side
@@ -29,7 +29,7 @@ class CreatePZ(MyMainWindow):
         from find import FindIndexPZ
         from work_py.leakage_column import LeakageWindow
         from category_correct import CategoryWindow
-        from main import MyMainWindow
+
         from find import WellNkt, Well_perforation, WellCondition, WellHistory_data, Well_data, Well_Category, \
             WellFond_data, WellSucker_rod, Well_expected_pick_up, WellData
         from data_base.work_with_base import check_in_database_well_data
@@ -45,9 +45,7 @@ class CreatePZ(MyMainWindow):
         WellData.read_well(ws, well_data.cat_well_max._value, well_data.data_pvr_min._value)
         well_data.region = region_select(well_data.cdng._value)
 
-        aaa = well_data.current_date
         date_str2 = datetime.strptime('2024-09-19', '%Y-%m-%d')
-        # well_data.data_well_is_True = False
 
         if work_plan == 'dop_plan':
             number_list = list(map(str, range(1, 50)))
@@ -59,13 +57,14 @@ class CreatePZ(MyMainWindow):
                 check_in_database_well_data(well_data.well_number._value, well_data.well_area._value,
                                             f'ДП№{well_data.number_dp}')
 
-            if data_well:
+            if data_well[0]:
                 date_str1 = datetime.strptime(f'{data_well[1]}', '%Y-%m-%d')
                 if date_str1 > date_str2:
 
                     change_work_work_plan = QMessageBox.question(self,
                                                                  'Наличие в базе данных',
-                                                                 'Проверка показала что данные по скважине есть в базе данных, '
+                                                                 'Проверка показала что данные по скважине есть в'
+                                                                 ' базе данных, '
                                                                  'загрузить с базы?')
 
                     if change_work_work_plan == QMessageBox.StandardButton.Yes:
@@ -78,7 +77,6 @@ class CreatePZ(MyMainWindow):
                         self.rir_window.show()
                         self.pause_app()
                         well_data.pause = True
-                        self.rir_window = None
 
                         return
 
@@ -367,8 +365,8 @@ class CreatePZ(MyMainWindow):
                                     text_lenght = len(text)
                                     if value[0] <= text_lenght <= value[1]:
                                         if '\n' in text:
-                                            row_dimension_value =int(len(text) / 4 + text.count('\n') * 5)
-                                            ws.row_dimensions[i].height =row_dimension_value
+                                            row_dimension_value = int(len(text) / 4 + text.count('\n') * 5)
+                                            ws.row_dimensions[i].height = row_dimension_value
                                         else:
                                             row_dimension_value = int(len(text) / 4)
                                             ws.row_dimensions[i].height = int(len(text) / 4)
