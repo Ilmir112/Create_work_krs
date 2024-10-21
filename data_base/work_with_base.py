@@ -1149,9 +1149,7 @@ def insert_data_new_excel_file(data, rowHeights, colWidth, boundaries_dict):
                 rgb_string = cell_data['fill']['color']
                 if 'color' in list(cell_data['font'].keys()):
 
-
                     color_font = change_rgb_to_hex(rgb_string)
-
 
 
                     cell.font = Font(name=cell_data['font']['name'], size=cell_data['font']['size'],
@@ -1174,8 +1172,8 @@ def insert_data_new_excel_file(data, rowHeights, colWidth, boundaries_dict):
                     cell.font = Font(name=cell_data['font']['name'], size=cell_data['font']['size'],
                                      bold=cell_data['font']['bold'], italic=cell_data['font']['italic'])
 
-                aa = cell_data['borders']['left']
-                if cell_data['borders']['left'] and type(list(cell_data['borders']['left'])) is dict:
+
+                if type(cell_data['borders']['left']) is dict:
 
                     rgb_string_left = cell_data['borders']['left']['color']
 
