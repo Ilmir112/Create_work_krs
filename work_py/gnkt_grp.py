@@ -708,11 +708,12 @@ class GnktOsvWindow(MyMainWindow):
 
     def calc_volume_jumping(self):
         from work_py.alone_oreration import volume_vn_ek, volume_vn_nkt, volume_jamming_well
+
         if well_data.depth_fond_paker_do["do"] != '0':
+
             volume = round((volume_vn_ek(well_data.current_bottom) *
                             (well_data.current_bottom - well_data.depth_fond_paker_do["do"]) / 1000 +
-                            volume_vn_nkt(well_data.dict_nkt) *
-                            well_data.depth_fond_paker_do["do"] / 1000) * 1.2, 1)
+                            volume_vn_nkt(well_data.dict_nkt) ) * 1.2, 1)
         else:
             volume = volume_jamming_well(well_data.current_bottom)
         return volume

@@ -1163,14 +1163,13 @@ class DopPlanWindow(MyMainWindow):
 
     def insert_data_dop_plan(self, result, paragraph_row):
 
-        if len(result) < paragraph_row:
+        if len(result) < paragraph_row-1:
             QMessageBox.warning(self, 'Ошибка', f'В плане работ только {len(result)} пункта')
             return
 
         well_data.current_bottom = result[paragraph_row][1]
 
         well_data.dict_perforation = json.loads(result[paragraph_row][2])
-        aakka = well_data.dict_perforation
 
         well_data.plast_all = json.loads(result[paragraph_row][3])
         well_data.plast_work = json.loads(result[paragraph_row][4])

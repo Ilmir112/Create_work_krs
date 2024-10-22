@@ -19,8 +19,7 @@ class VolumeWell(ABC):
         pass
 
     def area_calculate(self):
-        a = self.column_diametr
-        aa = self.column_wall_thickness
+
         return ((self.column_diametr - 2 * self.column_wall_thickness)/1000)**2 * math.pi /4
 
 class VolumeWellWithoutExstraColumn(VolumeWell):
@@ -35,14 +34,14 @@ class VolumeWellWithExstraColumn(VolumeWell):
     def __init__(self):
         super().__init__()
 
+    @classmethod
+    def volume_well_calculate(cls):
+        cls.area_column = cls.area_calculate()
+        cls.area_column_additional = cls.area_calculate()
 
-    def volume_well_calculate(self):
-        self.area_column = self.area_calculate()
-        self.area_column_additional = self.area_calculate()
-
-        return round(self.area_column * self.head_column_additional +
-                     self.area_column_additional *
-                     (self.head_column_additional - self.current_bottom), 1)
+        return round(cls.area_column * cls.head_column_additional +
+                     cls.area_column_additional *
+                     (cls.head_column_additional - cls.current_bottom), 1)
 
 
 
