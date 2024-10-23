@@ -2,6 +2,7 @@
 from datetime import datetime
 
 import psycopg2
+from PyQt5.QtGui import QIntValidator
 from PyQt5.QtWidgets import QInputDialog, QTabWidget, QWidget, QApplication, QLabel, \
     QLineEdit, QGridLayout, QComboBox, QMessageBox
 
@@ -16,7 +17,7 @@ from krs import TabPageGno, GnoWindow
 import main
 import plan
 
-from openpyxl.styles import  Font, Alignment
+from openpyxl.styles import Font, Alignment
 from openpyxl.reader.excel import load_workbook
 
 from open_pz import CreatePZ
@@ -31,15 +32,19 @@ class TabPageDp(QWidget):
         super().__init__()
         self.work_plan = work_plan
 
+        self.validator_int = QIntValidator(0, 8000)
+
         self.gnkt_number_label = QLabel('Номер флота ГНКТ')
         self.gnkt_number_combo = QComboBox(self)
         self.gnkt_number_combo.addItems(gnkt_dict["Ойл-сервис"])
 
         self.lenght_gnkt_label = QLabel('длина ГНКТ')
         self.lenght_gnkt_edit = QLineEdit(self)
+        self.lenght_gnkt_edit.setValidator(self.validator_int)
 
         self.iznos_gnkt_label = QLabel('Износ трубы')
         self.iznos_gnkt_edit = QLineEdit(self)
+
 
         self.pipe_mileage_label = QLabel('Пробег трубы')
         self.pipe_mileage_edit = QLineEdit(self)
@@ -63,10 +68,13 @@ class TabPageDp(QWidget):
         else:
             self.fluid_edit.setText(f'{well_data.fluid_work}')
 
+        self.distance_pntzh_label = QLabel('Расстояние до ПНТЖ')
+        self.distance_pntzh_line = QLineEdit(self)
+        self.distance_pntzh_line.setValidator(self.validator_int)
         self.osvoenie_label = QLabel('Необходимость освоения')
         self.osvoenie_combo = QComboBox(self)
         self.osvoenie_combo.addItems('Да', 'Нет')
-        self.fluid_project_label = QLabel('Рассчетная ЖГС', self)
+        self.fluid_project_label = QLabel('Расчетная ЖГС', self)
         self.fluid_project_edit = QLineEdit(self)
 
         self.fluid_project_edit.setValidator(self.validator_float)
@@ -89,6 +97,8 @@ class TabPageDp(QWidget):
         self.grid.addWidget(self.fluid_edit, 5, 3)
         self.grid.addWidget(self.osvoenie_label, 4, 4)
         self.grid.addWidget(self.osvoenie_combo, 5, 4)
+        self.grid.addWidget(self.distance_pntzh_label, 4, 5)
+        self.grid.addWidget(self.distance_pntzh_line, 5, 5)
         self.grid.addWidget(self.fluid_project_label, 8, 1)
         self.grid.addWidget(self.fluid_project_edit, 9, 1)
         self.gnkt_number_combo.textChanged.connect(self.update_number_gnkt)
@@ -248,12 +258,12 @@ class GnktOsvWindow(MyMainWindow):
         from work_py.alone_oreration import volume_vn_nkt, volume_jamming_well, volume_pod_NKT
 
         fluid_work, well_data.fluid_work_short = GnoWindow.calc_work_fluid(fluid_work_insert)
+        self.distance = self.tabWidget.currentWidget().distance_pntzh.text()
 
-        distance, _ = QInputDialog.getInt(None, 'Расстояние НПТЖ', 'Введите Расстояние до ПНТЖ')
 
-        block_gnvp_list = events_gnvp_frez(distance, float(fluid_work_insert))
+        block_gnvp_list = events_gnvp_frez(self.distance, float(fluid_work_insert))
 
-        aaa = well_data.depth_fond_paker_do["do"]
+
         if well_data.depth_fond_paker_do["do"] != 0:
             niz_nkt = well_data.depth_fond_paker_do["do"]
             volume_str = f'Произвести перевод на тех жидкость расчетного удельного веса ' \
@@ -879,6 +889,6 @@ class GnktOsvWindow(MyMainWindow):
 
 if __name__ == '__main__':
     app = QApplication([])
-    window = GnktOsvWindow()
+    window = GnktOsvWindow(2,2,2,2,1)
     window.show()
     app.exec_()
