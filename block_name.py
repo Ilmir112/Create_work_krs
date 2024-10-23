@@ -1,12 +1,12 @@
 from datetime import datetime
 
 import well_data
-from cdng import region_dict
+from cdng import REGION_BASHNEFT_DICT
 import json
 
 
 def region_select(cdng):
-    region_work = ''.join([key for key, value in region_dict.items() if cdng in value])
+    region_work = ''.join([key for key, value in REGION_BASHNEFT_DICT.items() if cdng in value])
     return region_work
 
 
@@ -221,9 +221,9 @@ def razdel_1(self, region, contractor):
         razdel_1 = [
             [None, 'СОГЛАСОВАНО:', None, None, None, None, None, 'УТВЕРЖДАЕМ:', None, None, None, None],
             [None, podpis_dict["регион"][region]['gi']['post'], None, None, None, None, None,
-             f'Главный Инженер Экспедиции № 3 {well_data.contractor} филиал г. Уфа ', None, None, None, None],
+             f'Главный Инженер Экспедиции № 5 {well_data.contractor} филиал г. Уфа ', None, None, None, None],
             [None, f'____________{podpis_dict["регион"][region]["gi"]["surname"]}', None, None, None, None, None,
-             '_____________К.Н. Фазлиахметов ', None, None, None, None],
+             '_____________А.А. Фаррахов ', None, None, None, None],
             [None, f'"____"_____________________{current_datetime.year}г.', None, None, None, None, None,
              f'"____"_____________________{current_datetime.year}г.', None, None, None, None],
             [None, None, None, None, None, None,
@@ -231,10 +231,10 @@ def razdel_1(self, region, contractor):
              None, None, None],
             [None, podpis_dict["регион"][region]['gg']['post'], None, None, None,
              None,
-             None, f'Главный геолог Экспедиции № 3 {well_data.contractor} филиал г.Уфа', None, None, None, None],
+             None, f'Главный геолог Экспедиции № 5 {well_data.contractor} филиал г.Уфа', None, None, None, None],
 
             [None, f'_____________{podpis_dict["регион"][region]["gg"]["surname"]}', None, None, None, None, None,
-             f'_____________Д.Д. Филлипов', None, None, '',
+             f'_____________Е.А. Самойлова', None, None, '',
              None],
             [None, f'"____"_____________________{current_datetime.year}г.', None, None, '', None, None,
              f'"____"_____________________{current_datetime.year}г.', None, None, None, None],

@@ -563,8 +563,7 @@ def volume_jamming_well(self, current_bottom):  # объем глушения с
         (well_volume(self, current_bottom) - volume_nkt_metal(well_data.dict_nkt) - volume_rod(self,
                                                                                                well_data.dict_sucker_rod)) * 1.1,
         1)
-    # print(f' объем глушения {well_volume(self, well_data.current_bottom), volume_jamming_well}')
-    # print(f' объем {volume_nkt_metal(well_data.dict_nkt)} , {volume_rod(self, well_data.dict_sucker_rod)}')
+
     return volume_jamming_well
 
 

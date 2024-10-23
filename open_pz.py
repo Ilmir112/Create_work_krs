@@ -2,12 +2,12 @@ import base64
 
 import well_data
 from datetime import datetime
-from PyQt5.QtWidgets import QInputDialog, QMessageBox, QMainWindow
+from PyQt5.QtWidgets import QInputDialog, QMessageBox
 from openpyxl_image_loader import SheetImageLoader
 from openpyxl.utils.cell import get_column_letter
 from openpyxl.styles import Font, Alignment, Border, Side
 
-from cdng import events_gnvp, itog_1, events_gnvp_gnkt
+from cdng import events_gnvp, add_itog, events_gnvp_gnkt
 from find import ProtectedIsNonNone
 from main import MyMainWindow
 from plan import delete_rows_pz
@@ -29,7 +29,7 @@ class CreatePZ(MyMainWindow):
         from find import FindIndexPZ
         from work_py.leakage_column import LeakageWindow
         from category_correct import CategoryWindow
-        from main import MyMainWindow
+
         from find import WellNkt, Well_perforation, WellCondition, WellHistory_data, Well_data, Well_Category, \
             WellFond_data, WellSucker_rod, Well_expected_pick_up, WellData
         from data_base.work_with_base import check_in_database_well_data
@@ -42,12 +42,10 @@ class CreatePZ(MyMainWindow):
 
         well_data.region = region_select(well_data.cdng._value)
 
-        WellData.read_well(WellData, ws, well_data.cat_well_max._value, well_data.data_pvr_min._value)
+        WellData.read_well(ws, well_data.cat_well_max._value, well_data.data_pvr_min._value)
         well_data.region = region_select(well_data.cdng._value)
 
-        aaa = well_data.current_date
         date_str2 = datetime.strptime('2024-09-19', '%Y-%m-%d')
-        # well_data.data_well_is_True = False
 
         if work_plan == 'dop_plan':
             number_list = list(map(str, range(1, 50)))
@@ -59,15 +57,15 @@ class CreatePZ(MyMainWindow):
                 check_in_database_well_data(well_data.well_number._value, well_data.well_area._value,
                                             f'ДП№{well_data.number_dp}')
 
-            if data_well:
+            if data_well[0]:
                 date_str1 = datetime.strptime(f'{data_well[1]}', '%Y-%m-%d')
                 if date_str1 > date_str2:
 
                     change_work_work_plan = QMessageBox.question(self,
                                                                  'Наличие в базе данных',
-                                                                 'Проверка показала что данные по скважине есть в базе данных, '
+                                                                 'Проверка показала что данные по скважине есть в'
+                                                                 ' базе данных, '
                                                                  'загрузить с базы?')
-
 
                     if change_work_work_plan == QMessageBox.StandardButton.Yes:
                         well_data.type_kr = data_well[2]
@@ -79,11 +77,8 @@ class CreatePZ(MyMainWindow):
                         self.rir_window.show()
                         self.pause_app()
                         well_data.pause = True
-                        self.rir_window = None
 
                         return
-
-
 
         if well_data.data_well_is_True is False:
             WellNkt.read_well(self, ws, well_data.pipes_ind._value, well_data.condition_of_wells._value)
@@ -111,7 +106,7 @@ class CreatePZ(MyMainWindow):
 
         if well_data.inv_number._value == 'не корректно' or well_data.inv_number is None:
             QMessageBox.warning(self, 'Инвентарный номер отсутствует',
-                                      'Необходимо уточнить наличие инвентарного номера')
+                                'Необходимо уточнить наличие инвентарного номера')
             return
 
         if well_data.leakiness is True:
@@ -322,11 +317,7 @@ class CreatePZ(MyMainWindow):
 
                                 data_2 = ws.cell(row=i, column=3).value
                                 data_1 = ws.cell(row=i, column=2).value
-                                ws.cell(row=i, column=col+1).font = Font(name='Arial Cyr', size=13, bold=False)
-
-
-
-
+                                ws.cell(row=i, column=col + 1).font = Font(name='Arial Cyr', size=13, bold=False)
 
                             if 'IX.I. Мероприятия по предотвращению технологических аварий при ремонте скважин:' in str(
                                     data_1):
@@ -354,9 +345,6 @@ class CreatePZ(MyMainWindow):
                                 ws.cell(row=i, column=3).font = Font(name='Arial Cyr', size=13, bold=True)
                                 ws.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='center',
                                                                                vertical='center')
-
-
-
                             else:
                                 ws.merge_cells(start_row=i, start_column=3, end_row=i, end_column=11)
                                 ws.cell(row=i, column=3).alignment = Alignment(wrap_text=True, horizontal='left',
@@ -374,11 +362,13 @@ class CreatePZ(MyMainWindow):
                             if not data_2 is None:
                                 text = data_2
                                 for key, value in text_width_dict.items():
-
-                                    if value[0] <= len(text) <= value[1]:
+                                    text_lenght = len(text)
+                                    if value[0] <= text_lenght <= value[1]:
                                         if '\n' in text:
-                                            ws.row_dimensions[i].height = int(len(text) / 4 + text.count('\n') * 5)
+                                            row_dimension_value = int(len(text) / 4 + text.count('\n') * 5)
+                                            ws.row_dimensions[i].height = row_dimension_value
                                         else:
+                                            row_dimension_value = int(len(text) / 4)
                                             ws.row_dimensions[i].height = int(len(text) / 4)
 
                     well_data.ins_ind += len(dict_events_gnvp[work_plan]) - 1
@@ -434,7 +424,6 @@ class CreatePZ(MyMainWindow):
 
                     self.ins_ind_border = well_data.ins_ind
 
-
             return ws
 
         elif work_plan in ['application_pvr']:
@@ -488,7 +477,7 @@ class CreatePZ(MyMainWindow):
                         pass
 
         if work_plan not in ['gnkt_frez', 'application_pvr', 'gnkt_after_grp', 'gnkt_opz', 'gnkt_bopz']:
-            itog_list = itog_1()
+            itog_list = add_itog()
             for i in range(ins_ind, len(itog_list) + ins_ind):  # Добавлением итогов
                 if i < ins_ind + 6:
                     for j in range(1, 13):
@@ -514,7 +503,7 @@ class CreatePZ(MyMainWindow):
                     ws.cell(row=i, column=j).alignment = Alignment(wrap_text=False, horizontal='left',
                                                                    vertical='center')
 
-            ins_ind += len(itog_1()) + 2
+            ins_ind += len(add_itog()) + 2
 
         curator_s = curator_sel(well_data.curator, well_data.region)
         # print(f'куратор {curator_sel, well_data.curator}')

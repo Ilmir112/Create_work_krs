@@ -352,10 +352,10 @@ class GnktOsvWindow2(MyMainWindow):
             self.wb.count_row_height(self, worksheet, work_list, sheet_name)
 
         ws6 = self.wb.create_sheet(title="СХЕМЫ КНК_44,45")
-        main.MyWindow.insert_image(self, ws6, f'{well_data.path_image}imageFiles/schema_well/СХЕМЫ КНК_44,45.png', 'A1',
+        self.insert_image(ws6, f'{well_data.path_image}imageFiles/schema_well/СХЕМЫ КНК_44,45.png', 'A1',
                                    550, 900)
         ws7 = self.wb.create_sheet(title="СХЕМЫ КНК_38,1")
-        main.MyWindow.insert_image(self, ws7, f'{well_data.path_image}imageFiles/schema_well/СХЕМЫ КНК_38,1.png', 'A1',
+        self.insert_image(ws7, f'{well_data.path_image}imageFiles/schema_well/СХЕМЫ КНК_38,1.png', 'A1',
                                    550, 900)
 
         # path = 'workiii'
@@ -379,7 +379,7 @@ class GnktOsvWindow2(MyMainWindow):
         if self.wb:
             self.wb.remove(self.wb['Sheet'])
 
-            self.saveFileDialog(self.wb, full_path)
+            self.save_file_dialog(self.wb, full_path)
 
             self.wb.close()
             print(f"Table data saved to Excel {full_path} {well_data.number_dp}")
@@ -617,7 +617,7 @@ class GnktOsvWindow2(MyMainWindow):
                 None,
                 None, None, None, f'Тек. забой: \n{well_data.current_bottom}м ', None]
         lenght_paker = 2
-        voronka = well_data.depth_fond_paker2_do["do"]
+        voronka = well_data.depth_fond_paker_do["do"]
         if well_data.curator == 'ОР' and well_data.region == 'ТГМ':
             lenght_paker = round(
                 float(well_data.depth_fond_paker2_do["do"]) - float(well_data.depth_fond_paker_do["do"]), 1)

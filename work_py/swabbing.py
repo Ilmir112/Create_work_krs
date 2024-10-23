@@ -628,7 +628,7 @@ class Swab_Window(MyMainWindow):
                 return
             if self.check_true_depth_template(paker_depth) is False:
                 return
-            if self.true_set_Paker(paker_depth) is False:
+            if self.true_set_paker(paker_depth) is False:
                 return
             if self.check_depth_in_skm_interval(paker_depth) is False:
                 return
@@ -647,13 +647,13 @@ class Swab_Window(MyMainWindow):
             paker2_depth = AcidPakerWindow.if_None(self, self.tabWidget.currentWidget().paker2Edit.text())
             if self.check_true_depth_template(paker_depth) is False:
                 return
-            if self.true_set_Paker(paker_depth) is False:
+            if self.true_set_paker(paker_depth) is False:
                 return
             if self.check_depth_in_skm_interval(paker_depth) is False:
                 return
             if self.check_true_depth_template(paker2_depth) is False:
                 return
-            if self.true_set_Paker( paker2_depth) is False:
+            if self.true_set_paker( paker2_depth) is False:
                 return
             if self.check_depth_in_skm_interval(paker2_depth) is False:
                 return
@@ -746,7 +746,7 @@ class Swab_Window(MyMainWindow):
 
                 if self.check_true_depth_template(paker_depth_zumpf) is False:
                     return
-                if self.true_set_Paker( paker_depth_zumpf) is False:
+                if self.true_set_paker( paker_depth_zumpf) is False:
                     return
                 if self.check_depth_in_skm_interval(paker_depth_zumpf) is False:
                     return
@@ -959,7 +959,7 @@ class Swab_Window(MyMainWindow):
             schema_swab = '7'
         if self.check_true_depth_template(paker_depth) is False:
             return
-        if self.true_set_Paker(paker_depth) is False:
+        if self.true_set_paker(paker_depth) is False:
             return
         if self.check_depth_in_skm_interval(paker_depth) is False:
             return

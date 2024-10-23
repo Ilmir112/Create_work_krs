@@ -33,10 +33,9 @@ from log_files.log import logger, QPlainTextEditLogger
 from openpyxl.drawing.image import Image
 
 import well_data
-from H2S import calc_h2s
+
 from PyQt5.QtCore import QThread, pyqtSlot
 
-from PyQt5.QtGui import QBrush, QColor, QPen
 
 from users.login_users import LoginWindow
 from PyQt5.QtCore import Qt, QObject, pyqtSignal
@@ -179,7 +178,7 @@ class ExcelWorker(QThread):
         except Exception as e:
             QMessageBox.warning(None, 'Ошибка', f"Ошибка при проверке записи: {type(e).__name__}\n\n{str(e)}")
         if stop_app == True:
-            self.pause_app()
+
             window.close()
         # Завершение работы потока
         self.finished.emit()
@@ -253,8 +252,9 @@ class MyMainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
-
-    def insert_image(self, ws, file, coordinate, width=200, height=180):
+        
+    @staticmethod
+    def insert_image(ws, file, coordinate, width=200, height=180):
         # Загружаем изображение с помощью библиотеки Pillow
 
         img = openpyxl.drawing.image.Image(file)
@@ -262,9 +262,10 @@ class MyMainWindow(QMainWindow):
         img.height = height
         img.anchor = coordinate
         ws.add_image(img, coordinate)
-
-    def get_tables_starting_with(self, well_number, well_area, work_plan, type_kr):
+    @staticmethod
+    def get_tables_starting_with(well_number, well_area, work_plan, type_kr):
         from data_base.work_with_base import connect_to_db
+        cursor = None
         if well_number != '':
             if well_data.connect_in_base:
                 try:
@@ -301,7 +302,7 @@ class MyMainWindow(QMainWindow):
         else:
             return []
 
-    def saveFileDialog(self, wb2, full_path):
+    def save_file_dialog(self, wb2, full_path):
         try:
             file_name, _ = QFileDialog.getSaveFileName(self, "Save excel-file",
                                                        f"{full_path}", "Excel Files (*.xlsx)")
@@ -375,8 +376,8 @@ class MyMainWindow(QMainWindow):
             # Переместите второй лист перед первым
 
         return list(schema_pvo_set)
-
-    def insert_data_in_database(self, row_number, row_max):
+    @staticmethod
+    def insert_data_in_database(row_number, row_max):
 
         dict_perforation_json = json.dumps(well_data.dict_perforation, default=str, ensure_ascii=False, indent=4)
         # print(well_data.dict_leakiness)
@@ -402,8 +403,8 @@ class MyMainWindow(QMainWindow):
         else:
             row_number = row_number - well_data.count_row_well
             well_data.data_list.insert(row_number, data_values)
-
-    def check_depth_in_skm_interval(self, depth):
+    @staticmethod
+    def check_depth_in_skm_interval(depth):
 
         check_true = False
         check_ribbing = False
@@ -417,7 +418,7 @@ class MyMainWindow(QMainWindow):
             if float(interval[0]) <= float(depth) <= float(interval[1]):
                 check_ribbing = True
         if check_true is False and check_ribbing is False:
-            false_question = QMessageBox.warning(None, 'Проверка посадки пакера в интервал скреперования',
+            QMessageBox.warning(None, 'Проверка посадки пакера в интервал скреперования',
                                                  f'Проверка посадки показала, что пакер сажается не '
                                                  f'в интервал скреперования {well_data.skm_interval}, и '
                                                  f'райбирования {well_data.ribbing_interval} \n'
@@ -432,8 +433,8 @@ class MyMainWindow(QMainWindow):
                                                   f'Продолжить?')
             if false_question == QMessageBox.StandardButton.No:
                 return False
-
-    def true_set_Paker(self, depth):
+    @staticmethod
+    def true_set_paker(depth):
 
         check_true = False
 
@@ -1374,7 +1375,7 @@ class MyWindow(MyMainWindow):
 
             if wb2:
                 wb2.close()
-                self.saveFileDialog(wb2, full_path)
+                self.save_file_dialog(wb2, full_path)
                 # wb2.save(full_path)
                 print(f"Table data saved to Excel {full_path} {well_data.number_dp}")
 
@@ -1548,12 +1549,14 @@ class MyWindow(MyMainWindow):
             well_data.problemWithEk_depth = well_data.current_bottom
             well_data.problemWithEk_diametr = 220
             path = f"{well_data.path_image}/imageFiles/image_work"[1:]
-
-            for file in os.listdir(path):
-                file_path = os.path.join(path, file)
-                if path in file_path:
-                    if os.path.isfile(file_path):
-                        os.remove(file_path)
+            try:
+                for file in os.listdir(path):
+                    file_path = os.path.join(path, file)
+                    if path in file_path:
+                        if os.path.isfile(file_path):
+                            os.remove(file_path)
+            except:
+                pass
 
             QMessageBox.information(self, 'Обновление', 'Данные обнулены')
 

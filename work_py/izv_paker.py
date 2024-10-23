@@ -251,7 +251,7 @@ class PakerIzvlek(MyMainWindow):
                 return
             if self.check_true_depth_template(paker_depth_line) is False:
                 return
-            if self.true_set_Paker( paker_depth_line) is False:
+            if self.true_set_paker( paker_depth_line) is False:
                 return
             if self.check_depth_in_skm_interval(paker_depth_line) is False:
                 return

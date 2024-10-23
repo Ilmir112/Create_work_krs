@@ -282,7 +282,7 @@ class TabPage_SO_acid(QWidget):
         self.iron_true_combo = QComboBox(self)
         self.iron_true_combo.addItems(['Нет', 'Да'])
 
-        aa = well_data.stabilizator_true
+
         if well_data.stabilizator_true:
             self.iron_true_combo.setCurrentIndex(1)
 
@@ -807,7 +807,7 @@ class AcidPakerWindow(MyMainWindow):
                 return
             if self.check_true_depth_template(paker_depth) is False:
                 return
-            if self.true_set_Paker(paker_depth) is False:
+            if self.true_set_paker(paker_depth) is False:
                 return
             if self.check_depth_in_skm_interval(paker_depth) is False:
                 return
@@ -829,13 +829,13 @@ class AcidPakerWindow(MyMainWindow):
             paker2_depth = int(self.if_None(self.tabWidget.currentWidget().paker2_depth.text()))
             if self.check_true_depth_template(paker_depth) is False:
                 return
-            if self.true_set_Paker(paker_depth) is False:
+            if self.true_set_paker(paker_depth) is False:
                 return
             if self.check_depth_in_skm_interval(paker_depth) is False:
                 return
             if self.check_true_depth_template(paker2_depth) is False:
                 return
-            if self.true_set_Paker( paker2_depth) is False:
+            if self.true_set_paker( paker2_depth) is False:
                 return
             if self.check_depth_in_skm_interval(paker2_depth) is False:
                 return
@@ -914,7 +914,7 @@ class AcidPakerWindow(MyMainWindow):
 
                 if self.check_true_depth_template(paker_depth_zumpf) is False:
                     return
-                if self.true_set_Paker( paker_depth_zumpf) is False:
+                if self.true_set_paker( paker_depth_zumpf) is False:
                     return
                 if self.check_depth_in_skm_interval(paker_depth_zumpf) is False:
                     return
@@ -1098,7 +1098,7 @@ class AcidPakerWindow(MyMainWindow):
                 return
 
             if self.paker_layout_combo == 'однопакерная' or self.paker_layout_combo == 'пакер с заглушкой':
-                if self.true_set_Paker( paker_depth_swab) is False:
+                if self.true_set_paker( paker_depth_swab) is False:
                     return
                 if self.check_depth_in_skm_interval(paker_depth_swab) is False:
                     return
@@ -1116,7 +1116,7 @@ class AcidPakerWindow(MyMainWindow):
                 paker_depth_swab = int(self.tabWidget.currentWidget().swab_paker_depth.text())
                 if self.check_true_depth_template(paker_depth_swab) is False:
                     return
-                if self.true_set_Paker( paker_depth_swab) is False:
+                if self.true_set_paker( paker_depth_swab) is False:
                     return
                 if self.check_depth_in_skm_interval(paker_depth_swab) is False:
                     return
@@ -1124,7 +1124,7 @@ class AcidPakerWindow(MyMainWindow):
                 paker_depth2_swab = paker_depth_swab - (paker_depth - paker2_depth)
                 if self.check_true_depth_template(paker_depth2_swab) is False:
                     return
-                if self.true_set_Paker( paker_depth2_swab) is False:
+                if self.true_set_paker( paker_depth2_swab) is False:
                     return
                 if self.check_depth_in_skm_interval(paker_depth2_swab) is False:
                     return

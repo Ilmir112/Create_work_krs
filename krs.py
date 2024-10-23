@@ -148,9 +148,7 @@ class TabPageGno(QWidget):
             fluid_p = 1.02
         else:
             fluid_p = 1.01
-        aase = well_data.plast_work
 
-        a = well_data.dict_perforation
         for plast in well_data.plast_work:
 
             if float(list(well_data.dict_perforation[plast]['рабочая жидкость'])[0]) > fluid_p:
@@ -202,7 +200,11 @@ class GnoWindow(MyMainWindow):
             lift_key = current_widget.gno_combo.currentText()
             current_bottom = round(float(current_widget.current_bottom_edit.text().replace(',', '.')),
                                    1)
-            fluid = current_widget.fluid_edit.text()
+            fluid = current_widget.fluid_edit.text().replace(',', '.')
+            if 0.85 > float(fluid) > 1.64:
+                QMessageBox.warning(self, 'Ошибка',
+                                    'удельный вес рабочей жидкости не может быть меньше 0.85 и больше 1.64')
+                return
             volume_well_jaming = round(
                 float(current_widget.volume_jumping_edit.text().replace(',', '.')), 1)
 
