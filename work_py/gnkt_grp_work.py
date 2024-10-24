@@ -19,6 +19,10 @@ from work_py.alone_oreration import well_volume
 class TabPageDp(QWidget):
     def __init__(self):
         super().__init__()
+
+        self.validator_int = QIntValidator(0, 8000)
+        self.validator_float = QDoubleValidator(0, 8000, 1)
+
         self.gnkt_number_label = QLabel('Номер флота ГНКТ')
         self.gnkt_number_combo = QComboBox(self)
         self.gnkt_number_combo.addItems(gnkt_dict["Ойл-сервис"])
@@ -44,7 +48,7 @@ class TabPageDp(QWidget):
 
         self.current_bottom_label = QLabel('необходимый текущий забой')
         self.current_bottom_edit = QLineEdit(self)
-        # self.current_bottom_edit.setText(f'{well_data.current_bottom}')
+        self.current_bottom_edit.setText(f'{well_data.current_bottom}')
 
         self.fluid_label = QLabel("уд.вес жидкости глушения", self)
         self.fluid_edit = QLineEdit(self)
@@ -59,6 +63,11 @@ class TabPageDp(QWidget):
 
             self.distance_pntzh_label = QLabel('Расстояние до ПНТЖ')
             self.distance_pntzh_line = QLineEdit(self)
+
+            self.acids_work_label = QLabel('Проведение ОПЗ')
+            self.acids_work_combo = QComboBox(self)
+            self.acids_work_combo.addItems(['Нет', 'Да'])
+
 
 
         self.grid = QGridLayout(self)
@@ -87,8 +96,55 @@ class TabPageDp(QWidget):
             self.grid.addWidget(self.osvoenie_combo, 5, 4)
             self.grid.addWidget(self.distance_pntzh_label, 4, 5)
             self.grid.addWidget(self.distance_pntzh_line, 5, 5)
+            self.grid.addWidget(self.acids_work_label, 6, 1)
+            self.grid.addWidget(self.acids_work_combo, 7, 1)
+
+            self.acids_work_combo.currentTextChanged.connect(self.update_acids_work)
+
         self.gnkt_number_combo.currentTextChanged.connect(self.update_number_gnkt)
         self.previous_well_combo.currentTextChanged.connect(self.update_data_gnkt)
+
+    def update_acids_work(self, index):
+        if index == 'Нет':
+            self.acids_type_label.setParent(None)
+            self.acids_type_combo.setParent(None)
+            self.acid_volume_label.setParent(None)
+            self.acid_volume_edit.setParent(None)
+            self.acid_proc_label.setParent(None)
+            self.acid_proc_edit.setParent(None)
+            self.pressure_Label.setParent(None)
+            self.pressure_edit.setParent(None)
+        else:
+            self.acids_type_label = QLabel('Вид кислоты')
+            self.acids_type_combo = QComboBox(self)
+            self.acids_type_combo.addItems(['HCl', 'HF', 'Лимонная кислота'])
+
+            self.acid_volume_label = QLabel("Объем кислотной обработки", self)
+            self.acid_volume_edit = QLineEdit(self)
+            self.acid_volume_edit.setValidator(self.validator_float)
+            self.acid_volume_edit.setText("10")
+            self.acid_volume_edit.setClearButtonEnabled(True)
+
+            self.acid_proc_label = QLabel("Концентрация кислоты", self)
+            self.acid_proc_edit = QLineEdit(self)
+            self.acid_proc_edit.setText('15')
+            self.acid_proc_edit.setClearButtonEnabled(True)
+            self.acid_proc_edit.setValidator(self.validator_int)
+
+            self.pressure_Label = QLabel("Давление закачки", self)
+            self.pressure_edit = QLineEdit(self)
+            self.pressure_edit.setText(f'{well_data.max_admissible_pressure._value}')
+            self.pressure_edit.setValidator(self.validator_int)
+
+            self.grid.addWidget(self.acids_type_label, 6, 2)
+            self.grid.addWidget(self.acids_type_combo, 7, 2)
+            self.grid.addWidget(self.acid_volume_label, 6, 3)
+            self.grid.addWidget(self.acid_volume_edit, 7, 3)
+            self.grid.addWidget(self.acid_proc_label, 6, 4)
+            self.grid.addWidget(self.acid_proc_edit, 7, 4)
+            self.grid.addWidget(self.pressure_Label, 6, 5)
+            self.grid.addWidget(self.pressure_edit, 7, 5)
+
 
     def update_data_gnkt(self):
         previus_well = self.previous_well_combo.currentText()
@@ -155,8 +211,6 @@ class GnktOsvWindow2(MyMainWindow):
 
         well_data.gnkt_length = lenght_gnkt_edit
         iznos_gnkt_edit = self.tabWidget.currentWidget().iznos_gnkt_edit.text().replace(',', '.')
-        self.distance_pntzh_line = self.tabWidget.currentWidget().distance_pntzh_line.text().replace(',', '.')
-        GnktOsvWindow2.distance_pntzh_line =self.distance_pntzh_line
         pipe_mileage_edit = self.tabWidget.currentWidget().pipe_mileage_edit.text()
         well_data.pipe_mileage = pipe_mileage_edit
         well_data.iznos = iznos_gnkt_edit

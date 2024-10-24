@@ -226,20 +226,20 @@ class GnktOpz(MyMainWindow):
 
     def add_work(self):
         try:
-            roof_plast = round(float(self.tabWidget.currentWidget().roof_edit.text().replace(',', '.')), 1)
-            sole_plast = round(float(self.tabWidget.currentWidget().sole_edit.text().replace(',', '.')), 1)
-            need_rast_combo = str(self.tabWidget.currentWidget().need_rast_combo.currentText())
-            volume_rast_edit = float(self.tabWidget.currentWidget().volume_rast_edit.text())
-            acid_true_edit = str(self.tabWidget.currentWidget().acid_true_edit.currentText())
-            acid_edit = self.tabWidget.currentWidget().acid_edit.currentText()
-            skv_volume_edit = float(self.tabWidget.currentWidget().skv_volume_edit.text().replace(',', '.'))
-            skv_proc_edit = int(self.tabWidget.currentWidget().skv_proc_edit.text().replace(',', '.'))
-            acid_volume_edit = float(self.tabWidget.currentWidget().acid_volume_edit.text().replace(',', '.'))
-            acid_proc_edit = int(self.tabWidget.currentWidget().acid_proc_edit.text().replace(',', '.'))
-            pressure_edit = int(self.tabWidget.currentWidget().pressure_edit.text())
-            plast_combo = str(self.tabWidget.currentWidget().plast_combo.combo_box.currentText())
-            svk_true_combo = str(self.tabWidget.currentWidget().svk_true_combo.currentText())
-            skv_acid_edit = str(self.tabWidget.currentWidget().skv_acid_edit.currentText())
+            self.roof_plast = round(float(self.tabWidget.currentWidget().roof_edit.text().replace(',', '.')), 1)
+            self.sole_plast = round(float(self.tabWidget.currentWidget().sole_edit.text().replace(',', '.')), 1)
+            self.need_rast_combo = str(self.tabWidget.currentWidget().need_rast_combo.currentText())
+            self.volume_rast_edit = float(self.tabWidget.currentWidget().volume_rast_edit.text())
+            self.acid_true_edit = str(self.tabWidget.currentWidget().acid_true_edit.currentText())
+            self.acid_edit = self.tabWidget.currentWidget().acid_edit.currentText()
+            self.skv_volume_edit = float(self.tabWidget.currentWidget().skv_volume_edit.text().replace(',', '.'))
+            self.skv_proc_edit = int(self.tabWidget.currentWidget().skv_proc_edit.text().replace(',', '.'))
+            self.acid_volume_edit = float(self.tabWidget.currentWidget().acid_volume_edit.text().replace(',', '.'))
+            self.acid_proc_edit = int(self.tabWidget.currentWidget().acid_proc_edit.text().replace(',', '.'))
+            self.pressure_edit = int(self.tabWidget.currentWidget().pressure_edit.text())
+            self.plast_combo = str(self.tabWidget.currentWidget().plast_combo.combo_box.currentText())
+            self.svk_true_combo = str(self.tabWidget.currentWidget().svk_true_combo.currentText())
+            self.skv_acid_edit = str(self.tabWidget.currentWidget().skv_acid_edit.currentText())
             self.distance = self.tabWidget.currentWidget().distance_pntzh_edit.text()
         except Exception as e:
             QMessageBox.warning(self, 'Ошибка', f'ВВедены не корректные данные {type(e).__name__}\n\n{str(e)}')
@@ -250,74 +250,35 @@ class GnktOpz(MyMainWindow):
         if self.distance == '':
             mes = QMessageBox.critical(self, "Ошибка", "Нужно указать расстояние до ПНТЖ")
             return
-        if acid_edit == 'ВТ':
+        if self.acid_edit == 'ВТ':
             self.vt = self.tabWidget.currentWidget().sko_vt_edit.text()
             if self.vt == '':
                 mes = QMessageBox.critical(self, "Ошибка", "Нужно расписать объемы и вид кислоты")
                 return
 
-        work_list = self.gnkt_work(roof_plast, sole_plast, need_rast_combo, volume_rast_edit, acid_true_edit,
-                                   acid_edit, skv_volume_edit, skv_proc_edit, acid_volume_edit, acid_proc_edit,
-                                   pressure_edit,
-                                   plast_combo, svk_true_combo, skv_acid_edit, self.gnkt_number_combo, self.fluid_edit)
+        work_list = self.gnkt_work()
 
         well_data.pause = False
         self.close()
         return work_list
-    def gnkt_work(self, roof_plast, sole_plast, need_rast_combo, volume_rast_edit, acid_true_edit,
-                  acid_edit, skv_volume_edit, skv_proc_edit, acid_volume_edit, acid_proc_edit, pressure_edit,
-                  plast_combo, svk_true_combo, skv_acid_edit, gnkt_number_combo, fluid_work_insert):
+
+    def gnkt_work(self):
 
         block_gnvp_list = events_gnvp_frez(self.distance, float(fluid_work_insert))
 
-        if gnkt_number_combo == 'ГНКТ №2':
-            gnkt_number = gnkt_data.gnkt_2
-        elif gnkt_number_combo == 'ГНКТ №1':
-            gnkt_number = gnkt_data.gnkt_1
 
-        V_gntk = round(gnkt_number.gnkt_length * 0.74 / 1000, 1)
 
-        if acid_true_edit == "нужно":
+        if self.acid_true_edit == "нужно":
             acid_true_quest = True
         else:
             acid_true_quest = False
 
         fluid_work, well_data.fluid_work_short = GnoWindow.calc_work_fluid(fluid_work_insert)
 
-        if need_rast_combo == 'нужно':
-            volume_rast_edit = volume_rast_edit
+        if self.need_rast_combo == 'нужно':
+            volume_rast_edit = self.volume_rast_edit
 
-        if acid_edit == 'HCl':
-            acid_24 = round(acid_volume_edit * acid_proc_edit / 24 * 1.118, 1)
-            acid_sel = f'Произвести  солянокислотную обработку {plast_combo} в объеме {acid_volume_edit}м3 ' \
-                       f' ({acid_edit} - {acid_proc_edit} %) силами/' \
-                       f' Крезол НС с протяжкой БДТ вдоль интервалов перфорации {roof_plast}-{sole_plast}м ' \
-                       f'(снизу вверх) в ' \
-                       f'присутствии представителя Заказчика с составлением акта, не превышая давления' \
-                       f' закачки не более Р={well_data.max_admissible_pressure._value}атм.\n' \
-                       f' (для приготовления соляной кислоты в объеме {acid_volume_edit}м3 - ' \
-                       f'{acid_proc_edit}% необходимо замешать {acid_24}т HCL 24% и пресной воды ' \
-                       f'{round(acid_volume_edit - acid_24, 1)}м3)'
-            acid_sel_short = f'СКО пласта {plast_combo}  в объеме  {acid_volume_edit}м3  ' \
-                             f'({acid_edit} - {acid_proc_edit} %)'
-        elif acid_edit == 'ВТ':
 
-            acid_sel = f'Произвести кислотную обработку пласта {plast_combo} {self.vt}  силами Крезол ' \
-                       f'НС с протяжкой БДТ вдоль интервалов перфорации {roof_plast}-' \
-                       f'{sole_plast}м (снизу вверх) в присутствии представителя ' \
-                       f'Заказчика с составлением акта, не превышая давления закачки не более ' \
-                       f'Р = {well_data.max_admissible_pressure._value}атм.'
-            acid_sel_short = f'{self.vt} пласта {plast_combo}  в объеме ' \
-                             f'{acid_volume_edit}м3  ({acid_edit} - {acid_proc_edit} %)'
-        elif acid_edit == 'HF':
-            acid_sel = f'Произвести глинокислотную обработку пласта {plast_combo} в объеме ' \
-                       f'{acid_volume_edit}м3 ' \
-                       f'(концентрация в смеси HF 3% / HCl 13%) силами Крезол ' \
-                       f'НС с протяжкой БДТ вдоль интервалов перфорации {roof_plast}-' \
-                       f'{sole_plast}м (снизу вверх) в присутствии представителя ' \
-                       f'Заказчика с составлением акта, не превышая давления закачки не более ' \
-                       f'Р={well_data.max_admissible_pressure._value}атм.'
-            acid_sel_short = f'ГКО пласта {plast_combo}  в объеме  {acid_volume_edit}м3'
 
         paker_opr = [f'Опрессовать пакер на {well_data.max_admissible_pressure._value}атм',
                      5, f'Опрессовать пакер на {well_data.max_admissible_pressure._value}атм с выдержкой 30 мин с '
@@ -326,14 +287,14 @@ class GnktOpz(MyMainWindow):
                      None, None, None, None, None, None, None,
                      'Мастер ГНКТ, предст. Заказчика', 1]
         if well_data.depth_fond_paker_do["do"] == 0:
-            depth_fond_paker_do = sum(list(well_data.dict_nkt.values()))
-            # print(depth_fond_paker_do)
-            if depth_fond_paker_do >= well_data.current_bottom:
-                depth_fond_paker_do, ok = QInputDialog.getDouble(self, 'глубина НКТ',
+            self.depth_fond_paker_do = sum(list(well_data.dict_nkt.values()))
+
+            if self.depth_fond_paker_do >= well_data.current_bottom:
+                self.depth_fond_paker_do, ok = QInputDialog.getDouble(self, 'глубина НКТ',
                                                                  'Введите Глубины башмака НКТ', 500,
                                                                  0, well_data.current_bottom)
         else:
-            depth_fond_paker_do = well_data.depth_fond_paker_do["do"]
+            self.depth_fond_paker_do = well_data.depth_fond_paker_do["do"]
 
         gnkt_opz = [
             [None, 'Порядок работы', None, None, None, None, None, None, None, None, None, None],
@@ -341,19 +302,19 @@ class GnktOpz(MyMainWindow):
              'Ответственный', 'Нормы'],
             [None, 1,
              'ВНИМАНИЕ: Перед спуском и вовремя проведения СПО бурильщикам и мастеру производить осмотр '
-              'ГНКТ на наличие '
-              '"меток" на г/трубы, установленных запрещённым способом.\nПри обнаружении - доложить руководству'
-              f' {well_data.contractor}'
-              'по согласованию произвести отрезание ГНКТ выше "метки" с составлением АКТа и указанием метража '
-              'отрезанного участка ГНКТ. '
-              'Установку меток на г/трубе производить ТОЛЬКО безопасным способом - (краской, лентой фум, '
-              'шкемарём, и тд.) '
-              'КАТЕГОРИЧЕСКИ ЗАПРЕЩАЕТСЯ устанавливать "метки" опасным способом - вальцевателем (труборезом) или '
-              'другим инструментом - '
-              'который причиняет механические повреждения на теле г/трубы и может привести к снижению прочностных '
-              'характеристик ГНКТ. '
-              'Запросить у Заказчика внутренние диаметры спущенной компоновки для исключения заклинивания низа'
-              ' компоновки',
+             'ГНКТ на наличие '
+             '"меток" на г/трубы, установленных запрещённым способом.\nПри обнаружении - доложить руководству'
+             f' {well_data.contractor}'
+             'по согласованию произвести отрезание ГНКТ выше "метки" с составлением АКТа и указанием метража '
+             'отрезанного участка ГНКТ. '
+             'Установку меток на г/трубе производить ТОЛЬКО безопасным способом - (краской, лентой фум, '
+             'шкемарём, и тд.) '
+             'КАТЕГОРИЧЕСКИ ЗАПРЕЩАЕТСЯ устанавливать "метки" опасным способом - вальцевателем (труборезом) или '
+             'другим инструментом - '
+             'который причиняет механические повреждения на теле г/трубы и может привести к снижению прочностных '
+             'характеристик ГНКТ. '
+             'Запросить у Заказчика внутренние диаметры спущенной компоновки для исключения заклинивания низа'
+             ' компоновки',
              None, None, None, None, None, None, None,
              'Мастер КРС,бурильщик', None],
             [None, 1, 'Провести приемку скважины в ремонт у Заказчика с составлением акта. Переезд бригады КРС '
@@ -417,14 +378,14 @@ class GnktOpz(MyMainWindow):
              'Мастер ГНКТ, представ.БВО (вызов по телефонограмме при необходимости)', 'факт'],
             [None, 11,
              f'При закрытой центральной задвижке фондовой арматуры. Опрессовать превентор, глухие и трубные  '
-               f'плашки на '
-               f'устье скважины на Р={well_data.max_admissible_pressure._value}атм с выдержкой 30 мин (опрессовку ПВО '
-               f'зафиксировать'
-               f' в вахтовом журнале). Оформить соответствующий акт в присутствии представителя Башкирского '
-               f'военизированного '
-               f'отряда с выдачей разрешения на дальнейшее проведение работ (вызов представителя БВО по '
-               f'телефонограмме за 24 '
-               f'часа). Провести учебно-тренировочное занятие по сигналу "Выброс" с записью в журнале.',
+             f'плашки на '
+             f'устье скважины на Р={well_data.max_admissible_pressure._value}атм с выдержкой 30 мин (опрессовку ПВО '
+             f'зафиксировать'
+             f' в вахтовом журнале). Оформить соответствующий акт в присутствии представителя Башкирского '
+             f'военизированного '
+             f'отряда с выдачей разрешения на дальнейшее проведение работ (вызов представителя БВО по '
+             f'телефонограмме за 24 '
+             f'часа). Провести учебно-тренировочное занятие по сигналу "Выброс" с записью в журнале.',
              None, None, None, None, None, None, None,
              'Мастер ГНКТ, представ.БВО (вызов по телефонограмме при необходимости)', 0.47],
             [None, 12,
@@ -457,7 +418,7 @@ class GnktOpz(MyMainWindow):
              None, None, None, None, None, None, None,
              'Мастер ГНКТ, состав бригады, представитель Заказчика', 1.92],
             [None, 15,
-             f'Приподнять БДТ до {int(depth_fond_paker_do) - 20}м. Произвести круговую циркуляцию растворителя в '
+             f'Приподнять БДТ до {int(self.depth_fond_paker_do) - 20}м. Произвести круговую циркуляцию растворителя в '
              f'течении 2часов. Составить Акт',
              None, None, None, None, None, None, None,
              'Мастер ГНКТ, состав бригады', 2.06],
@@ -513,48 +474,9 @@ class GnktOpz(MyMainWindow):
              'Мастер ГНКТ, представитель Заказчика', None],
         ]
 
-        opz = [
-            ['Допустить БДТ до забоя. Промыть скважину ',
-             16, f'Допустить БДТ до забоя. Промыть скважину  мин.водой уд.веса {fluid_work}  с составлением '
-                 f'соответствующего акта. При отсутствии циркуляции дальнейшие промывки исключить. Определить '
-                 f'приемистость пласта в трубное пространство при давлении не более '
-                 f'{well_data.max_admissible_pressure._value}атм'
-                 f'  (перед определением приемистости произвести закачку тех.воды не менее 6м3 или при установившемся '
-                 f'давлении закачки, но не более 1 часа). Установить БДТ на гл.{well_data.current_bottom}м.',
-             None, None, None, None, None, None, None,
-             'Мастер ГНКТ, состав бригады, представитель Заказчика', 1.33],
-            [acid_sel_short,
-             17, acid_sel,
-             None, None, None, None, None, None, None,
-             'Мастер ГНКТ, состав бригады, подрядчик по ОПЗ', 2],
-            [None,
-             18, f'Закачку {V_gntk}м3 кислоты производить при открытом малом затрубном пространстве на '
-                 f'циркуляции. Закачку оставшейся '
-                 f'кислоты в объеме {round(acid_volume_edit - V_gntk, 1)}м3 производить при закрытом затрубном '
-                 f'пространстве. Составить Акт.',
-             None, None, None, None, None, None, None,
-             'Мастер ГНКТ, состав бригады', 2.88],
-            [None, 19, f'Продавить кислоту в пласт мин.водой уд.веса {fluid_work} в объёме 3м3 при давлении не более '
-                       f'{well_data.max_admissible_pressure._value}атм. Составить Акт',
-             None, None, None, None, None, None, None,
-             'Мастер ГНКТ, состав бригады', 1.11],
-            [None, 20,
-             f'Приподнять БДТ на {int(depth_fond_paker_do) - 20}м. Стоянка на реакции 2 часа. В СЛУЧАЕ ОТСУТСТВИЯ ДАВЛЕНИЯ '
-             f'ПРОДАВКИ ПРИ СКО, РАБОТЫ ПРОИЗВОДИМ БЕЗ РЕАГИРОВАНИЯ.СОСТАВИТЬ АКТ)',
-             None, None, None, None, None, None, None,
-             'Мастер ГНКТ, состав бригады', 3.06],
-            ['разрядку скважины для извлечения продуктов',
-             21, 'Произвести разрядку скважины для извлечения продуктов реакции кислоты в объёме не менее объёма '
-                 'закаченной кислоты + объём малого затрубного пространства (из расчета 1,88л на 1 м пространства между '
-                 '73мм колонной НКТ и БДТ;'
-                 ' 0,46л между 60мм НКТ и БДТ; 3,38л между 89мм НКТ и БДТ) + 3м3. Разрядку производить до чистой промывочной '
-                 'жидкости (без признаков продуктов реакции кислоты), но не более 2 часов. Зафиксировать избыточное давление '
-                 'на устье скважины, объём и описание скважинной жидкости на выходе с отражением их в акте, суточном рапорте '
-                 'работы бригад. Составить Акт.',
-             None, None, None, None, None, None, None,
-             'Мастер ГНКТ, состав бригады', 1]]
+        opz = self.acid_work()
         n = 17
-        if well_data.depth_fond_paker_do['do'] != 0:  # вставка строк при наличии пакера
+        if well_data.self.depth_fond_paker_do['do'] != 0:  # вставка строк при наличии пакера
             gnkt_opz.insert(7, paker_opr)
             n += 1
 
@@ -575,7 +497,95 @@ class GnktOpz(MyMainWindow):
                 number_punkt = 1
 
         return gnkt_opz
+    def select_acid_type(self, acid_edit, plast_combo):
+        if acid_edit == 'HCl':
+            acid_24 = round(acid_volume_edit * acid_proc_edit / 24 * 1.118, 1)
+            acid_sel = f'Произвести  солянокислотную обработку {plast_combo} в объеме {acid_volume_edit}м3 ' \
+                       f' ({acid_edit} - {acid_proc_edit} %) силами/' \
+                       f' Крезол НС с протяжкой БДТ вдоль интервалов перфорации {roof_plast}-{sole_plast}м ' \
+                       f'(снизу вверх) в ' \
+                       f'присутствии представителя Заказчика с составлением акта, не превышая давления' \
+                       f' закачки не более Р={well_data.max_admissible_pressure._value}атм.\n' \
+                       f' (для приготовления соляной кислоты в объеме {acid_volume_edit}м3 - ' \
+                       f'{acid_proc_edit}% необходимо замешать {acid_24}т HCL 24% и пресной воды ' \
+                       f'{round(acid_volume_edit - acid_24, 1)}м3)'
+            acid_sel_short = f'СКО пласта {plast_combo}  в объеме  {acid_volume_edit}м3  ' \
+                             f'({acid_edit} - {acid_proc_edit} %)'
 
+        elif acid_edit == 'ВТ':
+            acid_sel = f'Произвести кислотную обработку пласта {plast_combo} {self.vt}  силами Крезол ' \
+                       f'НС с протяжкой БДТ вдоль интервалов перфорации {roof_plast}-' \
+                       f'{sole_plast}м (снизу вверх) в присутствии представителя ' \
+                       f'Заказчика с составлением акта, не превышая давления закачки не более ' \
+                       f'Р = {well_data.max_admissible_pressure._value}атм.'
+            acid_sel_short = f'{self.vt} пласта {plast_combo}  в объеме ' \
+                             f'{acid_volume_edit}м3  ({acid_edit} - {acid_proc_edit} %)'
+        elif acid_edit == 'HF':
+            acid_sel = f'Произвести глинокислотную обработку пласта {plast_combo} в объеме ' \
+                       f'{acid_volume_edit}м3 ' \
+                       f'(концентрация в смеси HF 3% / HCl 13%) силами Крезол ' \
+                       f'НС с протяжкой БДТ вдоль интервалов перфорации {roof_plast}-' \
+                       f'{sole_plast}м (снизу вверх) в присутствии представителя ' \
+                       f'Заказчика с составлением акта, не превышая давления закачки не более ' \
+                       f'Р={well_data.max_admissible_pressure._value}атм.'
+            acid_sel_short = f'ГКО пласта {plast_combo}  в объеме  {acid_volume_edit}м3'
+        elif acid_edit == 'лимонная кислота':
+            acid_sel = f'Произвести кислотную обработку пласта {plast_combo} в объеме ' \
+                       f'{acid_volume_edit}м3 лимонной кислотой (снизу вверх) в присутствии представителя ' \
+                       f'Заказчика с составлением акта, не превышая давления закачки не более ' \
+                       f'Р={well_data.max_admissible_pressure._value}атм.'
+            acid_sel_short = f'ГКО пласта {plast_combo}  в объеме  {acid_volume_edit}м3'
+        return acid_sel, acid_sel_short
+    def acid_work(self):
+        if self.gnkt_number_combo == 'ГНКТ №2':
+            self.gnkt_number = gnkt_data.gnkt_2
+        elif self.gnkt_number_combo == 'ГНКТ №1':
+            self.gnkt_number = gnkt_data.gnkt_1
+
+        acid_sel, acid_sel_short = self.select_acid_type(self.acid_true_edit, plast_combo)
+
+        V_gntk = round(gnkt_number.gnkt_length * 0.74 / 1000, 1)
+        acid_list = [
+            ['Допустить БДТ до забоя. Промыть скважину ',
+             16, f'Допустить БДТ до забоя. Промыть скважину  мин.водой уд.веса {well_data.fluid_work}  с составлением '
+                 f'соответствующего акта. При отсутствии циркуляции дальнейшие промывки исключить. Определить '
+                 f'приемистость пласта в трубное пространство при давлении не более '
+                 f'{well_data.max_admissible_pressure._value}атм'
+                 f'  (перед определением приемистости произвести закачку тех.воды не менее 6м3 или при установившемся '
+                 f'давлении закачки, но не более 1 часа). Установить БДТ на гл.{well_data.current_bottom}м.',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ, состав бригады, представитель Заказчика', 1.33],
+            [acid_sel_short,
+             17, acid_sel,
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ, состав бригады, подрядчик по ОПЗ', 2],
+            [None,
+             18, f'Закачку {V_gntk}м3 кислоты производить при открытом малом затрубном пространстве на '
+                 f'циркуляции. Закачку оставшейся '
+                 f'кислоты в объеме {round(self.acid_volume_edit - V_gntk, 1)}м3 производить при закрытом затрубном '
+                 f'пространстве. Составить Акт.',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ, состав бригады', 2.88],
+            [None, 19, f'Продавить кислоту в пласт мин.водой уд.веса {well_data.fluid_work} в объёме 3м3 при давлении не более '
+                       f'{well_data.max_admissible_pressure._value}атм. Составить Акт',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ, состав бригады', 1.11],
+            [None, 20,
+             f'Приподнять БДТ на {int(self.depth_fond_paker_do) - 20}м. Стоянка на реакции 2 часа. В СЛУЧАЕ ОТСУТСТВИЯ ДАВЛЕНИЯ '
+             f'ПРОДАВКИ ПРИ СКО, РАБОТЫ ПРОИЗВОДИМ БЕЗ РЕАГИРОВАНИЯ.СОСТАВИТЬ АКТ)',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ, состав бригады', 3.06],
+            ['разрядку скважины для извлечения продуктов',
+             21, 'Произвести разрядку скважины для извлечения продуктов реакции кислоты в объёме не менее объёма '
+                 'закаченной кислоты + объём малого затрубного пространства (из расчета 1,88л на 1 м пространства между '
+                 '73мм колонной НКТ и БДТ;'
+                 ' 0,46л между 60мм НКТ и БДТ; 3,38л между 89мм НКТ и БДТ) + 3м3. Разрядку производить до чистой промывочной '
+                 'жидкости (без признаков продуктов реакции кислоты), но не более 2 часов. Зафиксировать избыточное давление '
+                 'на устье скважины, объём и описание скважинной жидкости на выходе с отражением их в акте, суточном рапорте '
+                 'работы бригад. Составить Акт.',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ, состав бригады', 1]]
+        return acid_list
 
 if __name__ == "__main__":
     import sys
