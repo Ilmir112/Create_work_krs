@@ -57,6 +57,10 @@ class TabPageDp(QWidget):
             self.osvoenie_combo = QComboBox(self)
             self.osvoenie_combo.addItems(['Да', 'Нет'])
 
+            self.distance_pntzh_label = QLabel('Расстояние до ПНТЖ')
+            self.distance_pntzh_line = QLineEdit(self)
+
+
         self.grid = QGridLayout(self)
         self.grid.addWidget(self.gnkt_number_label, 0, 2, 1, 5)
         self.grid.addWidget(self.gnkt_number_combo, 1, 2, 1, 5)
@@ -81,6 +85,8 @@ class TabPageDp(QWidget):
         if well_data.work_plan == 'gnkt_after_grp':
             self.grid.addWidget(self.osvoenie_label, 4, 4)
             self.grid.addWidget(self.osvoenie_combo, 5, 4)
+            self.grid.addWidget(self.distance_pntzh_label, 4, 5)
+            self.grid.addWidget(self.distance_pntzh_line, 5, 5)
         self.gnkt_number_combo.currentTextChanged.connect(self.update_number_gnkt)
         self.previous_well_combo.currentTextChanged.connect(self.update_data_gnkt)
 
@@ -149,6 +155,8 @@ class GnktOsvWindow2(MyMainWindow):
 
         well_data.gnkt_length = lenght_gnkt_edit
         iznos_gnkt_edit = self.tabWidget.currentWidget().iznos_gnkt_edit.text().replace(',', '.')
+        self.distance_pntzh_line = self.tabWidget.currentWidget().distance_pntzh_line.text().replace(',', '.')
+        GnktOsvWindow2.distance_pntzh_line =self.distance_pntzh_line
         pipe_mileage_edit = self.tabWidget.currentWidget().pipe_mileage_edit.text()
         well_data.pipe_mileage = pipe_mileage_edit
         well_data.iznos = iznos_gnkt_edit
