@@ -120,13 +120,13 @@ class Grp_window(MyMainWindow):
         vbox.addWidget(self.buttonAdd, 2, 0)
 
     def add_work(self):
-        diametr_paker = int(float(self.tabWidget.currentWidget().diametr_paker_edit.text()))
-        paker_khost = int(float(self.tabWidget.currentWidget().paker_khost_edit.text()))
-        paker_depth = int(float(self.tabWidget.currentWidget().paker_depth_edit.text()))
+        diametr_paker = int(float(self.tabWidget.currentWidget().diametr_paker_edit.text().replace(',', '.')))
+        paker_khost = int(float(self.tabWidget.currentWidget().paker_khost_edit.text().replace(',', '.')))
+        paker_depth = int(float(self.tabWidget.currentWidget().paker_depth_edit.text().replace(',', '.')))
         gisOTZ_true_quest = self.tabWidget.currentWidget().otz_question_QCombo.currentText()
         gisOTZ_after_true_quest = self.tabWidget.currentWidget().otz_after_question_QCombo.currentText()
         normalization_true_quest = self.tabWidget.currentWidget().normalization_QCombo.currentText()
-        current_depth = int(float(self.tabWidget.currentWidget().current_depth_edit.text()))
+        current_depth = int(float(self.tabWidget.currentWidget().current_depth_edit.text().replace(',', '.')))
         if self.check_true_depth_template(paker_depth) is False:
             return
         if self.true_set_paker(paker_depth) is False:
