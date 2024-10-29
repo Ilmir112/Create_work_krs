@@ -194,9 +194,10 @@ class CorrectPlanWindow(MyMainWindow):
             if data_well:
                 well_data.type_kr = data_well[1][2]
 
+
                 if data_well[1][3]:
                     well_data.dict_category = json.loads(data_well[1][3])
-                    aaaa = well_data.dict_category
+
                 insert_data_well_dop_plan(data_well[1][0])
 
             DopPlanWindow.work_with_excel(self, well_number, well_area, well_data_in_base, well_data.type_kr)

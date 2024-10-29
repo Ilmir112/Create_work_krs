@@ -177,6 +177,8 @@ class BlockPackWindow(MyMainWindow):
         work_list = self.block_pack_work(current_edit, pero_combo_QCombo,
                               type_of_block_processing_combo, block_volume_edit, oil_volume_edit, fluid_new_edit, block_type_edit)
 
+        self.calculate_chemistry('ЕЛАН', block_type_edit)
+
         self.populate_row(self.ins_ind, work_list, self.table_widget)
         well_data.pause = False
         self.close()

@@ -27,7 +27,9 @@ from openpyxl.utils import get_column_letter
 from openpyxl.workbook import Workbook
 from openpyxl.styles import Alignment, Font
 
+
 from data_base.config_base import connect_to_database
+
 from log_files.log import logger, QPlainTextEditLogger
 
 from openpyxl.drawing.image import Image
@@ -39,6 +41,8 @@ from PyQt5.QtCore import QThread, pyqtSlot
 
 from users.login_users import LoginWindow
 from PyQt5.QtCore import Qt, QObject, pyqtSignal
+
+
 
 
 class UncaughtExceptions(QObject):
@@ -301,6 +305,37 @@ class MyMainWindow(QMainWindow):
             return rezult
         else:
             return []
+
+
+    @staticmethod
+    def calculate_chemistry(type_chemistry, volume):
+        if type_chemistry in ['HCl', 'Нефтекислотка']:
+            well_data.dict_volume_chemistry['HCl'] += volume
+        elif type_chemistry == 'HF':
+            well_data.dict_volume_chemistry['HF'] += volume
+        elif type_chemistry == 'ВТ':
+            well_data.dict_volume_chemistry['ВТ СКО'] += volume
+        elif type_chemistry == 'Противогипсовая обработка':
+            well_data.dict_volume_chemistry['NaOH'] += volume
+        elif type_chemistry == 'цемент':
+            well_data.dict_volume_chemistry['цемент'] += volume
+        elif type_chemistry == 'Глина':
+            well_data.dict_volume_chemistry['Глина'] += volume
+        elif type_chemistry == 'растворитель':
+            well_data.dict_volume_chemistry['растворитель'] += volume
+        elif type_chemistry == 'песок':
+            well_data.dict_volume_chemistry['песок'] += volume
+        elif type_chemistry == 'РПК':
+            well_data.dict_volume_chemistry['РПК'] += 1
+        elif type_chemistry == 'РИР 2С':
+            well_data.dict_volume_chemistry['РИР 2С'] += 1
+        elif type_chemistry == "РИР ОВП":
+            well_data.dict_volume_chemistry["РИР ОВП"] += 1
+        elif type_chemistry == 'гидрофабизатор':
+            well_data.dict_volume_chemistry['гидрофабизатор'] += volume
+
+
+
 
     def save_file_dialog(self, wb2, full_path):
         try:
@@ -748,10 +783,10 @@ class MyWindow(MyMainWindow):
         from data_base.work_with_base import insert_data_new_excel_file
         from open_pz import CreatePZ
         from work_py.gnkt_frez import Work_with_gnkt
-        from work_py.gnkt_grp import GnktOsvWindow
         from work_py.dop_plan_py import DopPlanWindow
         from work_py.correct_plan import CorrectPlanWindow
         from work_py.drilling import Drill_window
+        from work_py.gnkt_grp import GnktOsvWindow
 
         action = self.sender()
 
@@ -1204,8 +1239,9 @@ class MyWindow(MyMainWindow):
     def save_to_krs(self):
         from open_pz import CreatePZ
         from work_py.alone_oreration import is_number
-        from data_base.work_with_base import  insert_database_well_data, excel_in_json
+        from data_base.work_with_base import insert_database_well_data, excel_in_json
         from work_py.advanted_file import count_row_height
+        from data_base.work_with_base import Classifier_well
 
         if not self.table_widget is None:
             wb2 = Workbook()
@@ -1247,7 +1283,7 @@ class MyWindow(MyMainWindow):
             for i in range(1, len(work_list)):  # нумерация работ
                 if i >= ins_ind + 1:
                     if is_number(work_list[i][11]) is True:
-                        well_data.normOfTime += float(str(work_list[i][11]).replace(',', '.'))
+                        well_data.normOfTime += round(float(str(work_list[i][11]).replace(',', '.')), 1)
                     if work_list[i][0]:
                         plan_short += f'п.{work_list[i][1]} {work_list[i][0]} \n'
 
@@ -1376,192 +1412,22 @@ class MyWindow(MyMainWindow):
             if wb2:
                 wb2.close()
                 self.save_file_dialog(wb2, full_path)
+
+
+
+                if self.work_plan in ['dop_plan', 'dop_plan_in_base']:
+                    string_work = f' ДП№ {well_data.number_dp}'
+                elif self.work_plan == 'krs':
+                    string_work = 'ПР'
+                elif self.work_plan == 'plan_change':
+                    if well_data.work_plan_change == 'krs':
+                        string_work = 'ПР изм'
+                    else:
+                        string_work = f'ДП№{well_data.number_dp} изм '
+
+
                 # wb2.save(full_path)
                 print(f"Table data saved to Excel {full_path} {well_data.number_dp}")
-
-    def close_file(self):
-        from find import ProtectedIsNonNone, ProtectedIsDigit
-
-        temp_folder = r'C:\Windows\Temp'
-
-        try:
-            if 'Зуфаров' in well_data.user:
-                for filename in os.listdir(temp_folder):
-                    file_path = os.path.join(temp_folder, filename)
-                    # Удаляем только файлы, а не директории
-                    if os.path.isfile(file_path):
-                        os.remove(file_path)
-
-        except Exception as e:
-            QMessageBox.critical(window, "Ошибка", f"Не удалось очистить папку с временными файлами: {e}")
-
-        if not self.table_widget is None:
-            self.table_widget.clear()
-            self.table_widget.resizeColumnsToContents()
-            self.table_widget = None
-            self.tabWidget = None
-            well_data.stabilizator_true = False
-            well_data.column_head_m = ''
-            well_data.date_drilling_cancel = ''
-            well_data.date_drilling_run = ''
-            well_data.wellhead_fittings = ''
-            well_data.dict_perforation_short = {}
-            well_data.plast_work_short = []
-            self.table_widget = None
-            well_data.normOfTime = 0
-            well_data.gipsInWell = False
-            well_data.grp_plan = False
-            well_data.bottom = 0
-            well_data.nkt_opressTrue = False
-            well_data.bottomhole_drill = ProtectedIsNonNone(0)
-            well_data.open_trunk_well = False
-            well_data.normOfTime = 0
-            well_data.lift_ecn_can = False
-            well_data.pause = True
-            well_data.check_data_in_pz = []
-            well_data.sucker_rod_none = True
-            well_data.curator = '0'
-            well_data.lift_ecn_can_addition = False
-            well_data.column_passability = False
-            well_data.column_additional_passability = False
-            well_data.template_depth = 0
-            well_data.gnkt_number = 0
-            well_data.gnkt_length = 0
-            well_data.diametr_length = 0
-            well_data.iznos = 0
-            well_data.pipe_mileage = 0
-            well_data.pipe_fatigue = 0
-            well_data.pvo = 0
-            well_data.previous_well = 0
-            well_data.b_plan = 0
-            well_data.pipes_ind = ProtectedIsDigit(0)
-            well_data.sucker_rod_ind = ProtectedIsDigit(0)
-            well_data.expected_Q = 0
-            well_data.expected_P = 0
-            well_data.plast_select = ''
-            well_data.dict_perforation = {}
-            well_data.dict_perforation_project = {}
-            well_data.itog_ind_min = 0
-            well_data.kat_pvo = 2
-            well_data.gaz_f_pr = []
-            well_data.paker_layout = 0
-            well_data.cat_P_P = []
-            well_data.ribbing_interval = []
-            well_data.column_direction_diametr = ProtectedIsNonNone('не корректно')
-            well_data.column_direction_wall_thickness = ProtectedIsNonNone('не корректно')
-            well_data.column_direction_lenght = ProtectedIsNonNone('не корректно')
-            well_data.column_conductor_diametr = ProtectedIsNonNone('не корректно')
-            well_data.column_conductor_wall_thickness = ProtectedIsNonNone('не корректно')
-            well_data.column_conductor_lenght = ProtectedIsNonNone('не корректно')
-            well_data.column_additional_diametr = ProtectedIsNonNone('не корректно')
-            well_data.column_additional_wall_thickness = ProtectedIsNonNone('не корректно')
-            well_data.head_column_additional = ProtectedIsNonNone('не корректно')
-            well_data.shoe_column_additional = ProtectedIsNonNone('не корректно')
-            well_data.column_diametr = ProtectedIsNonNone('не корректно')
-            well_data.column_wall_thickness = ProtectedIsNonNone('не корректно')
-            well_data.shoe_column = ProtectedIsNonNone('не корректно')
-            well_data.bottomhole_artificial = ProtectedIsNonNone(5000)
-            well_data.max_expected_pressure = ProtectedIsNonNone('не корректно')
-            well_data.head_column_additional = ProtectedIsNonNone('не корректно')
-            well_data.leakiness_Count = 0
-            well_data.bur_rastvor = ''
-            well_data.data, well_data.rowHeights, well_data.colWidth, well_data.boundaries_dict = '', '', '', ''
-            well_data.data_in_base = False
-            well_data.well_volume_in_PZ = []
-            well_data.expected_pick_up = {}
-            well_data.current_bottom = 0
-            well_data.emergency_bottom = well_data.current_bottom
-            well_data.fluid_work = 0
-            well_data.groove_diameter = ''
-            well_data.static_level = ProtectedIsNonNone('не корректно')
-            well_data.dinamic_level = ProtectedIsNonNone('не корректно')
-            well_data.work_perforations_approved = False
-            well_data.dict_leakiness = {}
-            well_data.leakiness = False
-            well_data.emergency_well = False
-            well_data.angle_data = []
-            well_data.emergency_count = 0
-            well_data.skm_interval = []
-            well_data.work_perforations = []
-            well_data.work_perforations_dict = {}
-            well_data.paker_do = {"do": 0, "posle": 0}
-            well_data.column_additional = False
-            well_data.well_number = ProtectedIsNonNone('')
-            well_data.well_area = ProtectedIsNonNone('')
-            well_data.values = []
-            well_data.dop_work_list = None
-            well_data.depth_fond_paker_do = {"do": 0, "posle": 0}
-            well_data.paker2_do = {"do": 0, "posle": 0}
-            well_data.depth_fond_paker2_do = {"do": 0, "posle": 0}
-            well_data.perforation_roof = 50000
-            well_data.data_x_min = 0
-            well_data.perforation_sole = 0
-            well_data.dict_pump_SHGN = {"do": '0', "posle": '0'}
-            well_data.dict_pump_ECN = {"do": '0', "posle": '0'}
-            well_data.dict_pump_SHGN_h = {"do": '0', "posle": '0'}
-            well_data.dict_pump_ECN_h = {"do": '0', "posle": '0'}
-            well_data.dict_pump = {"do": '0', "posle": '0'}
-            well_data.leakiness_interval = []
-            well_data.dict_pump_h = {"do": 0, "posle": 0}
-            well_data.ins_ind = 0
-            well_data.ins_ind2 = 0
-            well_data.image_data = []
-            well_data.current_bottom2 = 5000
-            well_data.len_razdel_1 = 0
-            well_data.count_template = 0
-            well_data.data_well_is_True = False
-            well_data.cat_P_1 = []
-            well_data.countAcid = 0
-            well_data.first_pressure = ProtectedIsDigit(0)
-            well_data.swabTypeComboIndex = 1
-            well_data.swab_true_edit_type = 1
-            well_data.data_x_max = ProtectedIsDigit(0)
-            well_data.drilling_interval = []
-            well_data.max_angle = 0
-            well_data.pakerTwoSKO = False
-            well_data.privyazkaSKO = 0
-            well_data.h2s_pr = []
-            well_data.cat_h2s_list = []
-            well_data.dict_perforation_short = {}
-            well_data.h2s_mg = []
-            well_data.lift_key = 0
-            well_data.max_admissible_pressure = ProtectedIsNonNone(0)
-            well_data.region = ''
-            well_data.forPaker_list = False
-            well_data.dict_nkt = {}
-            well_data.dict_nkt_po = {}
-            well_data.data_well_max = ProtectedIsNonNone(0)
-            well_data.data_pvr_max = ProtectedIsNonNone(0)
-            well_data.dict_sucker_rod = {}
-            well_data.dict_sucker_rod_po = {}
-            well_data.row_expected = []
-            well_data.rowHeights = []
-            well_data.plast_project = []
-            well_data.plast_work = []
-            well_data.leakiness_Count = 0
-            well_data.plast_all = []
-            well_data.condition_of_wells = ProtectedIsNonNone(0)
-            well_data.cat_well_min = ProtectedIsNonNone(0)
-            well_data.bvo = False
-            well_data.old_version = False
-            well_data.image_list = []
-            well_data.problemWithEk = False
-            well_data.problemWithEk_depth = well_data.current_bottom
-            well_data.problemWithEk_diametr = 220
-            path = f"{well_data.path_image}/imageFiles/image_work"[1:]
-            try:
-                for file in os.listdir(path):
-                    file_path = os.path.join(path, file)
-                    if path in file_path:
-                        if os.path.isfile(file_path):
-                            os.remove(file_path)
-            except:
-                pass
-
-            QMessageBox.information(self, 'Обновление', 'Данные обнулены')
-
-    def on_finished(self):
-        print("Работа с файлом Excel завершена.")
 
     def openContextMenu(self, position):
 
@@ -1781,6 +1647,196 @@ class MyWindow(MyMainWindow):
         if r > well_data.count_row_well and 'gnkt' not in self.work_plan:
             data = self.read_clicked_mouse_data(r)
 
+    def close_file(self):
+        from find import ProtectedIsNonNone, ProtectedIsDigit
+
+        temp_folder = r'C:\Windows\Temp'
+
+        try:
+            if 'Зуфаров' in well_data.user:
+                for filename in os.listdir(temp_folder):
+                    file_path = os.path.join(temp_folder, filename)
+                    # Удаляем только файлы, а не директории
+                    if os.path.isfile(file_path):
+                        os.remove(file_path)
+
+        except Exception as e:
+            QMessageBox.critical(window, "Ошибка", f"Не удалось очистить папку с временными файлами: {e}")
+
+        if not self.table_widget is None:
+            self.table_widget.clear()
+            self.table_widget.resizeColumnsToContents()
+            self.table_widget = None
+            self.tabWidget = None
+            well_data.stabilizator_true = False
+            well_data.column_head_m = ''
+            well_data.date_drilling_cancel = ''
+            well_data.date_drilling_run = ''
+            well_data.wellhead_fittings = ''
+            well_data.dict_perforation_short = {}
+            well_data.plast_work_short = []
+            self.table_widget = None
+            well_data.normOfTime = 0
+            well_data.gipsInWell = False
+            well_data.grp_plan = False
+            well_data.bottom = 0
+            well_data.nkt_opressTrue = False
+            well_data.bottomhole_drill = ProtectedIsNonNone(0)
+            well_data.open_trunk_well = False
+            well_data.normOfTime = 0
+            well_data.lift_ecn_can = False
+            well_data.pause = True
+            well_data.check_data_in_pz = []
+            well_data.sucker_rod_none = True
+            well_data.curator = '0'
+            well_data.lift_ecn_can_addition = False
+            well_data.column_passability = False
+            well_data.column_additional_passability = False
+            well_data.template_depth = 0
+            well_data.gnkt_number = 0
+            well_data.gnkt_length = 0
+            well_data.diametr_length = 0
+            well_data.iznos = 0
+            well_data.pipe_mileage = 0
+            well_data.pipe_fatigue = 0
+            well_data.pvo = 0
+            well_data.previous_well = 0
+            well_data.b_plan = 0
+            well_data.pipes_ind = ProtectedIsDigit(0)
+            well_data.sucker_rod_ind = ProtectedIsDigit(0)
+            well_data.expected_Q = 0
+            well_data.expected_P = 0
+            well_data.plast_select = ''
+            well_data.dict_perforation = {}
+            well_data.dict_perforation_project = {}
+            well_data.itog_ind_min = 0
+            well_data.kat_pvo = 2
+            well_data.gaz_f_pr = []
+            well_data.paker_layout = 0
+            well_data.cat_P_P = []
+            well_data.ribbing_interval = []
+            well_data.column_direction_diametr = ProtectedIsNonNone('не корректно')
+            well_data.column_direction_wall_thickness = ProtectedIsNonNone('не корректно')
+            well_data.column_direction_lenght = ProtectedIsNonNone('не корректно')
+            well_data.column_conductor_diametr = ProtectedIsNonNone('не корректно')
+            well_data.column_conductor_wall_thickness = ProtectedIsNonNone('не корректно')
+            well_data.column_conductor_lenght = ProtectedIsNonNone('не корректно')
+            well_data.column_additional_diametr = ProtectedIsNonNone('не корректно')
+            well_data.column_additional_wall_thickness = ProtectedIsNonNone('не корректно')
+            well_data.head_column_additional = ProtectedIsNonNone('не корректно')
+            well_data.shoe_column_additional = ProtectedIsNonNone('не корректно')
+            well_data.column_diametr = ProtectedIsNonNone('не корректно')
+            well_data.column_wall_thickness = ProtectedIsNonNone('не корректно')
+            well_data.shoe_column = ProtectedIsNonNone('не корректно')
+            well_data.bottomhole_artificial = ProtectedIsNonNone(5000)
+            well_data.max_expected_pressure = ProtectedIsNonNone('не корректно')
+            well_data.head_column_additional = ProtectedIsNonNone('не корректно')
+            well_data.leakiness_Count = 0
+            well_data.bur_rastvor = ''
+            well_data.data, well_data.rowHeights, well_data.colWidth, well_data.boundaries_dict = '', '', '', ''
+            well_data.data_in_base = False
+            well_data.well_volume_in_PZ = []
+            well_data.expected_pick_up = {}
+            well_data.current_bottom = 0
+            well_data.emergency_bottom = well_data.current_bottom
+            well_data.fluid_work = 0
+            well_data.groove_diameter = ''
+            well_data.static_level = ProtectedIsNonNone('не корректно')
+            well_data.dinamic_level = ProtectedIsNonNone('не корректно')
+            well_data.work_perforations_approved = False
+            well_data.dict_leakiness = {}
+            well_data.leakiness = False
+            well_data.emergency_well = False
+            well_data.angle_data = []
+            well_data.emergency_count = 0
+            well_data.dict_volume_chemistry = {'пункт': [], 'цемент': 0.0, 'HCl': 0.0, 'HF': 0.0, 'NaOH': 0.0, 'ВТ СКО': 0.0,
+                         'Глина': 0.0, 'растворитель': 0.0, 'уд.вес': 0.0,
+                         'песок': 0.0, 'РПК': 0.0, 'РПП': 0.0, "извлекаемый пакер": 0.0, "ЕЛАН": 0.0,
+                         'РИР 2С': 0.0, 'РИР ОВП': 0.0, 'гидрофабизатор': 0.0}
+            well_data.skm_interval = []
+            well_data.work_perforations = []
+            well_data.work_perforations_dict = {}
+            well_data.paker_do = {"do": 0, "posle": 0}
+            well_data.column_additional = False
+            well_data.well_number = ProtectedIsNonNone('')
+            well_data.well_area = ProtectedIsNonNone('')
+            well_data.values = []
+            well_data.dop_work_list = None
+            well_data.depth_fond_paker_do = {"do": 0, "posle": 0}
+            well_data.paker2_do = {"do": 0, "posle": 0}
+            well_data.depth_fond_paker2_do = {"do": 0, "posle": 0}
+            well_data.perforation_roof = 50000
+            well_data.data_x_min = 0
+            well_data.perforation_sole = 0
+            well_data.dict_pump_SHGN = {"do": '0', "posle": '0'}
+            well_data.dict_pump_ECN = {"do": '0', "posle": '0'}
+            well_data.dict_pump_SHGN_h = {"do": '0', "posle": '0'}
+            well_data.dict_pump_ECN_h = {"do": '0', "posle": '0'}
+            well_data.dict_pump = {"do": '0', "posle": '0'}
+            well_data.leakiness_interval = []
+            well_data.dict_pump_h = {"do": 0, "posle": 0}
+            well_data.ins_ind = 0
+            well_data.ins_ind2 = 0
+            well_data.image_data = []
+            well_data.current_bottom2 = 5000
+            well_data.len_razdel_1 = 0
+            well_data.count_template = 0
+            well_data.data_well_is_True = False
+            well_data.cat_P_1 = []
+            well_data.countAcid = 0
+            well_data.first_pressure = ProtectedIsDigit(0)
+            well_data.swabTypeComboIndex = 1
+            well_data.swab_true_edit_type = 1
+            well_data.data_x_max = ProtectedIsDigit(0)
+            well_data.drilling_interval = []
+            well_data.max_angle = 0
+            well_data.pakerTwoSKO = False
+            well_data.privyazkaSKO = 0
+            well_data.h2s_pr = []
+            well_data.cat_h2s_list = []
+            well_data.dict_perforation_short = {}
+            well_data.h2s_mg = []
+            well_data.lift_key = 0
+            well_data.max_admissible_pressure = ProtectedIsNonNone(0)
+            well_data.region = ''
+            well_data.forPaker_list = False
+            well_data.dict_nkt = {}
+            well_data.dict_nkt_po = {}
+            well_data.data_well_max = ProtectedIsNonNone(0)
+            well_data.data_pvr_max = ProtectedIsNonNone(0)
+            well_data.dict_sucker_rod = {}
+            well_data.dict_sucker_rod_po = {}
+            well_data.row_expected = []
+            well_data.rowHeights = []
+            well_data.plast_project = []
+            well_data.plast_work = []
+            well_data.leakiness_Count = 0
+            well_data.plast_all = []
+            well_data.condition_of_wells = ProtectedIsNonNone(0)
+            well_data.cat_well_min = ProtectedIsNonNone(0)
+            well_data.bvo = False
+            well_data.old_version = False
+            well_data.image_list = []
+            well_data.problemWithEk = False
+            well_data.problemWithEk_depth = well_data.current_bottom
+            well_data.problemWithEk_diametr = 220
+            path = f"{well_data.path_image}/imageFiles/image_work"[1:]
+            try:
+                for file in os.listdir(path):
+                    file_path = os.path.join(path, file)
+                    if path in file_path:
+                        if os.path.isfile(file_path):
+                            os.remove(file_path)
+            except:
+                pass
+
+            QMessageBox.information(self, 'Обновление', 'Данные обнулены')
+
+    def on_finished(self):
+        print("Работа с файлом Excel завершена.")
+
+
+
     def tubing_pressure_testing(self):
         from work_py.tubing_pressuar_testing import TubingPressuarWindow
 
@@ -1808,6 +1864,7 @@ class MyWindow(MyMainWindow):
         well_data.plast_all = json.loads(data[row][3])
         well_data.plast_work = json.loads(data[row][4])
         well_data.dict_leakiness = json.loads(data[row][5])
+        aaaaaaa= well_data.dict_leakiness
         well_data.column_additional = data[row][6]
 
         well_data.fluid_work = data[row][7]
@@ -2377,6 +2434,7 @@ class MyWindow(MyMainWindow):
             WellCondition.leakage_window.close()  # Close window.
             WellCondition.leakage_window = None  # Discard reference.
         well_data.data_list[-1][5] = json.dumps(well_data.dict_leakiness, default=str, ensure_ascii=False, indent=4)
+
 
     def correctData(self):
         from data_correct import DataWindow

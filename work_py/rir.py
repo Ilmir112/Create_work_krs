@@ -30,7 +30,7 @@ class TabPage_SO_rir(QWidget):
         plast_work = ['']
         plast_work.extend(well_data.plast_work)
 
-        if well_data.leakiness:
+        if len(well_data.dict_leakiness['НЭК']) != 0:
             for nek in list(well_data.dict_leakiness['НЭК']['интервал'].keys()):
                 plast_work.append(f'НЭК {nek}')
 
@@ -75,7 +75,7 @@ class TabPage_SO_rir(QWidget):
             if pakerDepth != '':
                 self.paker_depth_edit.setText(str(int(pakerDepth)))
         else:
-            if well_data.leakiness:
+            if well_data.dict_leakiness['НЭК']:
                 pakerDepth = min([float(nek.split('-')[0]) - 10
                                   for nek in well_data.dict_leakiness['НЭК']['интервал'].keys()])
 
@@ -347,7 +347,7 @@ class TabPage_SO_rir(QWidget):
                     except:
                         pass
 
-            if well_data.leakiness:
+            if len(well_data.dict_leakiness['НЭК']):
                 for nek in list(well_data.dict_leakiness['НЭК']['интервал'].keys()):
 
                     if nek in plast_sel:
@@ -696,6 +696,7 @@ class RirWindow(MyMainWindow):
              'мастер КРС', 0.67],
 
         ]
+        self.calculate_chemistry('цемент', volume_cement)
         if 'КР11' in well_data.type_kr and well_data.perforation_roof > roof_rir_edit:
             well_data.fluid_work = '1.18г/см3'
             uzmPero_list.append([
@@ -816,6 +817,7 @@ class RirWindow(MyMainWindow):
 
             for row in glin_list:
                 rir_list.insert(-3, row)
+            self.calculate_chemistry('глина', 5)
         else:
             rir_list = []
 
@@ -917,7 +919,7 @@ class RirWindow(MyMainWindow):
         RirWindow.perf_new(self, roof_rir_edit, well_data.current_bottom)
         well_data.current_bottom = roof_rir_edit
 
-
+        self.calculate_chemistry('цемент', volume_cement)
 
         if need_change_zgs_combo == "Да":
             for row in Change_fluid_Window.fluid_change(self, plast_new_combo, fluid_new_edit,
@@ -1159,6 +1161,7 @@ class RirWindow(MyMainWindow):
                                          plast_new_combo,
                                          fluid_new_edit, pressuar_new_edit, pressureZUMPF_question,
                                          diametr_paker, paker_khost, paker_depth)
+
         elif self.rir_type_Combo == 'УЦМ в глухой колонне':  # ['РИР на пере', 'РИР с пакером с 2С', 'РИР с РПК', 'РИР с РПП']
             if (plast_new_combo == '' or fluid_new_edit == '' or pressuar_new_edit == '') and \
                     need_change_zgs_combo == 'Да':
@@ -1179,29 +1182,33 @@ class RirWindow(MyMainWindow):
                                             diametr_paker, paker_khost, paker_depth)
 
 
-        elif self.rir_type_Combo in ['РИР с пакером с 2С']:  # ['РИР на пере', 'РИР с пакером с 2С', 'РИР с РПК', 'РИР с РПП']
+        elif self.rir_type_Combo in ['РИР с пакером с 2С']:
             # print(paker_need_Combo, plast_combo, roof_rir_edit, sole_rir_edit)
             work_list = self.rir_paker(paker_need_Combo, plast_combo,
                                        roof_rir_edit, sole_rir_edit, pressureZUMPF_question,
                                        diametr_paker, paker_khost, paker_depth)
+            self.calculate_chemistry('РИР 2С', 1)
 
-        elif self.rir_type_Combo in ['РИР ОВП с пакером']:  # ['РИР на пере', 'РИР с пакером с 2С', 'РИР с РПК', 'РИР с РПП']
+        elif self.rir_type_Combo in ['РИР ОВП с пакером']:
             # print(paker_need_Combo, plast_combo, roof_rir_edit, sole_rir_edit)
             work_list = self.rir_paker_ovp(paker_need_Combo, plast_combo,
                                        roof_rir_edit, sole_rir_edit, pressureZUMPF_question,
                                        diametr_paker, paker_khost, paker_depth)
+            self.calculate_chemistry('РИР ОВП', 1)
 
         elif self.rir_type_Combo == 'РИР с РПК':  # ['РИР на пере', 'РИР с пакером с 2С', 'РИР с РПК', 'РИР с РПП']
 
             work_list = self.rir_rpk(paker_need_Combo, plast_combo,
                                      roof_rir_edit, sole_rir_edit, pressureZUMPF_question,
                                      diametr_paker, paker_khost, paker_depth)
+            self.calculate_chemistry('РПК', 1)
 
         elif self.rir_type_Combo == 'РИР с РПП':  # ['РИР на пере', 'РИР с пакером с 2С', 'РИР с РПК', 'РИР с РПП']
 
             work_list = self.rir_rpp(paker_need_Combo, plast_combo,
                                      roof_rir_edit, sole_rir_edit, pressureZUMPF_question,
                                      diametr_paker, paker_khost, paker_depth)
+            self.calculate_chemistry('РПП', volume_cement)
 
         self.populate_row(self.ins_ind, work_list, self.table_widget)
         well_data.pause = False

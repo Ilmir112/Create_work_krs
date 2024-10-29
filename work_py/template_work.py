@@ -1282,6 +1282,8 @@ class TemplateKrs(MyMainWindow):
 
         if solvent_question == 'Нет':
             list_template_ek.pop(2)
+        else:
+            self.calculate_chemistry('растворитель', solvent_volume_edit)
 
         well_data.current_bottom = current_bottom
 

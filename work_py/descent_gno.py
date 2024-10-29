@@ -325,7 +325,7 @@ class GnoDescentWindow(MyMainWindow):
              f'Поднять тНКТ до глубины {sum(list(well_data.dict_nkt_po.values()))}м с доливом незамерзающей'
              f' жидкостью (растворитель РКД 0,3м3) до устья',
              None, None, None, None, None, None, None,
-             'Мастер КРС, предст. заказчика', descentNKT_norm(lenght_nkt, 1)]
+             'Мастер КРС, предст. заказчика', descentNKT_norm(lenght_nkt, 1)],
             [None, None,
              f'Заполнить полость НКТ в интервале 0-30м незамерзающей жидкостью полость НКТ (растворитель РКД 0,09м3)',
              None, None, None, None, None, None, None,
@@ -333,6 +333,7 @@ class GnoDescentWindow(MyMainWindow):
         return descent_voronka
 
     def konservation_well(self, nkt_edit):
+
 
         descent_voronka = [
             [None, None,
@@ -368,7 +369,7 @@ class GnoDescentWindow(MyMainWindow):
             [None, None,
              f'Устье скважины оборудовать площадкой размером 2х2м. На устье законсервированных скважин установить '
              f'металлическую табличку с обозначением'
-             f'скв.№ {well_data.well_number._value} {well_data.well_oilfield._value} месторождение, ПАО АНК Башнефть, '
+             f'скв.№ {well_data.well_number._value} {well_data.well_area._value} месторождение, ПАО АНК Башнефть, '
              f'дата начала и окончания консервации силами ЦДНГ после съезда бригады. ")',
              None, None, None, None, None, None, None,
              'ЦДНГ ', 2],

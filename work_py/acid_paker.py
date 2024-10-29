@@ -1080,6 +1080,8 @@ class AcidPakerWindow(MyMainWindow):
                 return
 
 
+
+
         if swab_true_edit_type == "Нужно освоение":
             try:
                 swabTypeCombo = str(self.tabWidget.currentWidget().swabTypeCombo.currentText())
@@ -1153,9 +1155,14 @@ class AcidPakerWindow(MyMainWindow):
                                        liftingNKT_norm(well_data.current_bottom, 1)])
         if well_data.region == 'ТГМ' and well_data.curator == 'ОР' and well_data.dict_pump_ECN == 0:
             work_template_list.extend(kot_work(self, well_data.current_bottom))
+
+        self.calculate_chemistry(acid_edit, acid_volume_edit)
+
         self.populate_row(self.ins_ind, work_template_list, self.table_widget)
         well_data.pause = False
         self.close()
+
+
 
     def del_row_table(self):
         row = self.tableWidget.currentRow()
@@ -1462,7 +1469,7 @@ class AcidPakerWindow(MyMainWindow):
         else:
             mtg_str = ''
 
-        swab_layout = 'Заглушку +'
+        swab_layout = 'Заглушку + сбивной с ввертышем '
 
         nkt_diam, nkt_pod, nkt_template = self.select_diametr_nkt(paker_depth, swab_true_edit_type)
 
@@ -1616,6 +1623,7 @@ class AcidPakerWindow(MyMainWindow):
              None, None, None, None, None, None, None,
              'мастер КРС, УСРСиСТ', 0.83 + 0.2 + 0.83 + 0.5 + 0.5]
         ]
+        self.calculate_chemistry('HCl', skv_volume_edit)
         return skv_list
 
     def acid_work(self, QplastEdit, plast_combo, paker_khost, acid_edit,

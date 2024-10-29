@@ -148,7 +148,6 @@ class GnktOsvWindow(MyMainWindow):
         self.table_title = table_title
         self.table_schema = table_schema
 
-
         self.dict_perforation = well_data.dict_perforation
         if work_plan in ['gnkt_bopz']:
             self.wb = load_workbook(f'{well_data.path_image}property_excel/template_gnkt_bopz.xlsx')
@@ -249,7 +248,7 @@ class GnktOsvWindow(MyMainWindow):
         elif self.work_plan == 'gnkt_after_grp':
             work_well = self.gnkt_work(
                 GnktOsvWindow2.fluid_edit, well_data.pvo, GnktOsvWindow2.current_bottom_edit,
-                GnktOsvWindow2.osvoenie_combo_need, )
+                GnktOsvWindow2.osvoenie_combo_need)
         if work_well:
             self.populate_row(0, work_well, table_widget, self.work_plan)
             CreatePZ.add_itog(self, self.ws_work, self.table_widget.rowCount() + 1, self.work_plan)
@@ -259,10 +258,10 @@ class GnktOsvWindow(MyMainWindow):
         from work_py.alone_oreration import volume_vn_nkt, volume_jamming_well, volume_pod_NKT
 
         fluid_work, well_data.fluid_work_short = GnoWindow.calc_work_fluid(fluid_work_insert)
+        self.distance = self.tabWidget.currentWidget().distance_pntzh.text()
 
 
-
-        block_gnvp_list = events_gnvp_frez(GnktOsvWindow2.distance_pntzh_line, float(fluid_work_insert))
+        block_gnvp_list = events_gnvp_frez(self.distance, float(fluid_work_insert))
 
 
         if well_data.depth_fond_paker_do["do"] != 0:

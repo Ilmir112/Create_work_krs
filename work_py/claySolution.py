@@ -3,9 +3,7 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox
 import well_data
 from work_py.alone_oreration import volume_vn_ek, volume_vn_nkt, well_volume
 
-
-
-from PyQt5.QtGui import QDoubleValidator,QIntValidator
+from PyQt5.QtGui import QDoubleValidator, QIntValidator
 from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QTabWidget, \
     QMainWindow, QPushButton
 
@@ -39,15 +37,15 @@ class TabPage_SO_clay(QWidget):
 
         self.roof_clay_label = QLabel("кровля ГР", self)
         self.roof_clay_edit = QLineEdit(self)
-        self.roof_clay_edit.setValidator( self.validator)
+        self.roof_clay_edit.setValidator(self.validator)
 
-        self.roof_clay_edit.setText(f'{well_data.perforation_sole +70}')
+        self.roof_clay_edit.setText(f'{well_data.perforation_sole + 70}')
         self.roof_clay_edit.setClearButtonEnabled(True)
 
         self.sole_clay_LabelType = QLabel("Подошва ГР", self)
         self.sole_clay_edit = QLineEdit(self)
         self.sole_clay_edit.setText(f'{well_data.current_bottom}')
-        self.sole_clay_edit.setValidator(self.validator)       
+        self.sole_clay_edit.setValidator(self.validator)
 
         self.rir_question_Label = QLabel("Нужно ли УЦМ производить на данной компоновке", self)
         self.rir_question_QCombo = QComboBox(self)
@@ -75,6 +73,7 @@ class TabPage_SO_clay(QWidget):
         self.rir_question_QCombo.currentTextChanged.connect(self.update_rir)
         self.purpose_of_clay_combo.currentTextChanged.connect(self.update_purpose_of_clay)
         self.purpose_of_clay_combo.setCurrentIndex(1)
+
     def update_purpose_of_clay(self, index):
         if index == 'в колонне':
             self.grid.addWidget(self.roof_clay_label, 4, 4)
@@ -89,7 +88,6 @@ class TabPage_SO_clay(QWidget):
             self.grid.addWidget(self.roof_rir_edit, 7, 4)
             self.grid.addWidget(self.sole_rir_LabelType, 6, 5)
             self.grid.addWidget(self.sole_rir_edit, 7, 5)
-
 
             self.current_bottom_label.setParent(None)
             self.current_bottom_edit.setParent(None)
@@ -120,8 +118,7 @@ class TabPage_SO_clay(QWidget):
 
         if roof_clay_edit != '':
             self.sole_rir_edit.setText(f'{float(roof_clay_edit)}')
-            self.roof_rir_edit.setText(f'{float(roof_clay_edit)-50}')
-
+            self.roof_rir_edit.setText(f'{float(roof_clay_edit) - 50}')
 
     def update_rir(self, index):
 
@@ -141,6 +138,7 @@ class TabPage_SO_clay(QWidget):
             self.grid.addWidget(self.cement_volume_line, 7, 6)
             self.roof_rir_edit.editingFinished.connect(self.update_volume_cement)
             self.sole_rir_edit.editingFinished.connect(self.update_volume_cement)
+
     def update_volume_cement(self):
         if self.roof_rir_edit.text() != '' and self.sole_rir_edit.text() != '':
             self.cement_volume_line.setText(
@@ -155,6 +153,7 @@ class TabWidget(QTabWidget):
 
 class ClayWindow(MyMainWindow):
     work_clay_window = None
+
     def __init__(self, ins_ind, table_widget, parent=None):
         super().__init__()
         self.centralWidget = QWidget()
@@ -262,30 +261,31 @@ class ClayWindow(MyMainWindow):
              None, None, None, None, None, None, None,
              'мастер КРС', liftingNKT_norm(current_bottom_edit, 1)]
         ]
-        a = volume_vn_nkt(dict_nkt)
+
         if volume_vn_nkt(dict_nkt) <= 5:
             glin_list[3] = [
                 None, None,
-                    f'Закачать в НКТ при открытом затрубном пространстве глинистый раствор в '
-                    f'объеме {volume_vn_nkt(dict_nkt)}м3. Закрыть затруб. '
-                    f'Продавить в НКТ остаток глинистого раствора в объеме '
-                    f'{round(volume_clay_edit - volume_vn_nkt(dict_nkt), 1)} и тех. воду  в объёме '
-                    f'{volume_vn_nkt(dict_nkt)}м3 при давлении не более {well_data.max_admissible_pressure._value}атм.',
-                    None, None, None, None, None, None, None,
-                    'мастер КРС', 0.5]
+                f'Закачать в НКТ при открытом затрубном пространстве глинистый раствор в '
+                f'объеме {volume_vn_nkt(dict_nkt)}м3. Закрыть затруб. '
+                f'Продавить в НКТ остаток глинистого раствора в объеме '
+                f'{round(volume_clay_edit - volume_vn_nkt(dict_nkt), 1)} и тех. воду  в объёме '
+                f'{volume_vn_nkt(dict_nkt)}м3 при давлении не более {well_data.max_admissible_pressure._value}атм.',
+                None, None, None, None, None, None, None,
+                'мастер КРС', 0.5]
+        self.calculate_chemistry('глина', volume_clay_edit)
         return glin_list
+
     def claySolutionDef(self, rirRoof, rirSole, rir_question_QCombo,
-                                         roof_rir_edit, sole_rir_edit, volume_cement):
-       
+                        roof_rir_edit, sole_rir_edit, volume_cement):
+
         nkt_diam = ''.join(['73' if well_data.column_diametr._value > 110 else '60'])
 
-        if well_data.column_additional is True and well_data.column_additional_diametr._value <110 and\
+        if well_data.column_additional is True and well_data.column_additional_diametr._value < 110 and \
                 rirSole > well_data.head_column_additional._value:
             dict_nkt = {73: well_data.head_column_additional._value,
-                        60: well_data.head_column_additional._value-rirSole}
+                        60: well_data.head_column_additional._value - rirSole}
         else:
             dict_nkt = {73: rirSole}
-    
 
         dict_nkt = {73: rirRoof}
         pero_list = [
@@ -295,39 +295,44 @@ class ClayWindow(MyMainWindow):
              f'шаблоном {well_data.nkt_template}мм. \n'
              f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
              None, None, None, None, None, None, None,
-             'мастер КРС',descentNKT_norm(rirSole, 1)],
+             'мастер КРС', descentNKT_norm(rirSole, 1)],
             [f'закачку глинистого раствора в интервале {rirSole}-{rirRoof}м в объеме {volume_cement}м3 '
-             f'({round(volume_cement*0.45,2)}т'
+             f'({round(volume_cement * 0.45, 2)}т'
              f' сухого порошка)', None,
-             f'Произвести закачку глинистого раствора с добавлением ингибитора коррозии {round(volume_cement*11,1)}гр с '
+             f'Произвести закачку глинистого раствора с добавлением ингибитора коррозии {round(volume_cement * 11, 1)}гр с '
              f'удельной дозировкой 11гр/м3 '
              f'удельным весом не менее 1,24г/см3 в интервале {rirSole}-{rirRoof}м.\n'
              f'- Приготовить и закачать в глинистый раствор уд.весом не менее 1,24г/см3 в объеме {volume_cement}м3 '
-             f'({round(volume_cement*0.45,2)}т'
+             f'({round(volume_cement * 0.45, 2)}т'
              f' сухого порошка).\n'
              f'-Продавить тех жидкостью  в объеме {volume_vn_nkt(dict_nkt)}м3.',
              None, None, None, None, None, None, None,
              'мастер КРС', 2.5]]
+
+        self.calculate_chemistry('глина', volume_cement * 0.45)
+
         well_data.current_bottom = rirRoof
 
         if rir_question_QCombo == 'Нет':
             pero_list.append([None, None,
-             f'Поднять перо на тНКТ{nkt_diam}м с глубины {rirSole}м с доливом скважины в объеме '
-             f'{round(rirSole*1.3/1000, 1)}м3 тех. жидкостью '
-             f'уд.весом {well_data.fluid_work}',
-             None, None, None, None, None, None, None,
-             'мастер КРС', descentNKT_norm(rirRoof, 1)])
+                              f'Поднять перо на тНКТ{nkt_diam}м с глубины {rirSole}м с доливом скважины в объеме '
+                              f'{round(rirSole * 1.3 / 1000, 1)}м3 тех. жидкостью '
+                              f'уд.весом {well_data.fluid_work}',
+                              None, None, None, None, None, None, None,
+                              'мастер КРС', descentNKT_norm(rirRoof, 1)])
         else:
             pero_list.append([None, None,
                               f'Поднять перо на тНКТ{nkt_diam}м до глубины {rirRoof}м с доливом скважины в объеме'
-                              f' {round((rirSole-rirRoof)*1.3/1000, 1)}м3 тех. жидкостью '
+                              f' {round((rirSole - rirRoof) * 1.3 / 1000, 1)}м3 тех. жидкостью '
                               f'уд.весом {well_data.fluid_work}',
                               None, None, None, None, None, None, None,
-                              'мастер КРС', descentNKT_norm(float(rirSole)-float(rirRoof), 1)])
+                              'мастер КРС', descentNKT_norm(float(rirSole) - float(rirRoof), 1)])
             if (well_data.plast_work) != 0 or rirSole > well_data.perforation_sole:
-                rir_work_list = RirWindow.rirWithPero_gl(self, 'Не нужно', '', roof_rir_edit, sole_rir_edit, volume_cement)
+                rir_work_list = RirWindow.rirWithPero_gl(self, 'Не нужно', '', roof_rir_edit, sole_rir_edit,
+                                                         volume_cement)
                 pero_list.extend(rir_work_list[-9:])
             else:
-                rir_work_list = RirWindow.rirWithPero_gl(self, 'Не нужно', '', roof_rir_edit, sole_rir_edit, volume_cement)
+                rir_work_list = RirWindow.rirWithPero_gl(self, 'Не нужно', '', roof_rir_edit, sole_rir_edit,
+                                                         volume_cement)
                 pero_list.extend(rir_work_list[-10:])
         return pero_list

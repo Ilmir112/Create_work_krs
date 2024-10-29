@@ -4,7 +4,6 @@ from datetime import datetime
 from openpyxl.styles import Border, Side, PatternFill
 
 
-
 class ProtectedIsDigit:
     def __init__(self, default_value=None, name=None):
         self._value = default_value
@@ -56,7 +55,6 @@ class ProtectedIsNonNone:
 
 def get_password(service_name, username):
     return keyring.get_password(service_name, username)
-
 
 
 connect_in_base = True
@@ -223,7 +221,7 @@ dict_pump_h = {"do": 0, "posle": 0}
 
 cat_P_1 = []
 costumer = 'ОАО "Башнефть"'
-contractor = ''
+contractor = 'ойл-сервис'
 dict_contractor = {
     'ООО "Ойл-сервис"':
         {
@@ -267,6 +265,12 @@ dict_nkt = {}
 dict_nkt_po = {}
 path_image = '_internal/'
 # path_image = ''
+
+dict_volume_chemistry = {'пункт': [], 'цемент': 0.0, 'HCl': 0.0, 'HF': 0.0, 'NaOH': 0.0, 'ВТ СКО': 0.0,
+                         'Глина': 0.0, 'растворитель': 0.0, 'уд.вес': 0.0,
+                         'песок': 0.0, 'РПК': 0.0, 'РПП': 0.0, "извлекаемый пакер": 0.0, "ЕЛАН": 0.0,
+                         'РИР 2С': 0.0, 'РИР ОВП': 0.0, 'гидрофабизатор': 0.0}
+
 data_well_dict = {}
 ins_ind2 = 0
 data = ''

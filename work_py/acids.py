@@ -66,8 +66,6 @@ class TabPageDp(QWidget):
         self.grid.addWidget(self.acid_calcul_Label, 2, 3)
         self.grid.addWidget(self.acid_calcul_Edit, 3, 3)
 
-
-
         self.grid.addWidget(self.iron_label_type, 2, 4)
         self.grid.addWidget(self.iron_true_combo, 3, 4)
 
@@ -152,6 +150,7 @@ class GonsWindow(MyMainWindow):
         work_list = self.acidGons(plast_combo, acid_edit, acid_volume_edit, acid_proc_edit, poins_sko_edit, bottom_point,
                                   acid_calcul_Edit, pressure_edit, iron_true_combo, iron_volume_edit)
         self.populate_row(self.ins_ind, work_list, self.table_widget)
+        self.calculate_chemistry(acid_edit, acid_volume_edit)
         well_data.pause = False
         self.close()
         return work_list

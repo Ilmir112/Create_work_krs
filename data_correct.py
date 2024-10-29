@@ -738,6 +738,8 @@ class DataWindow(MyMainWindow):
         if type_kr_Combo == '':
             QMessageBox.warning(self, 'ОШИБКА', 'Не выбран Вид и категория ремонта')
             return
+        else:
+            well_data.type_kr = type_kr_Combo
 
 
         columnType = self.tabWidget.currentWidget().columnType.text()

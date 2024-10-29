@@ -758,6 +758,7 @@ class DopPlanWindow(MyMainWindow):
         if well_data.data_in_base:
 
             fluid = current_widget.fluid_edit.text().replace(',', '.')
+
             current_bottom = current_widget.current_bottom_edit.text()
             if current_bottom != '':
                 current_bottom = round_cell(current_bottom.replace(',', '.'))
@@ -794,6 +795,7 @@ class DopPlanWindow(MyMainWindow):
                 QMessageBox.critical(self, 'рабочая жидкость',
                                            'уд. вес рабочей жидкости не может быть меньше 0,87 и больше 1,64')
                 return
+
             if well_data.data_in_base:
                 if 'г/см3' not in fluid:
                     QMessageBox.critical(self, 'уд.вес', 'нужно добавить значение "г/см3" в уд.вес')
@@ -801,8 +803,9 @@ class DopPlanWindow(MyMainWindow):
                 well_data.fluid_work = fluid
                 well_data.fluid_work_short = fluid[:7]
 
-                well_data.fluid = fluid[:4]
+                well_data.fluid = float(fluid[:4].replace('г', ''))
             else:
+                well_data.fluid = float(fluid)
 
                 if float(current_bottom) > well_data.bottomhole_drill._value:
                     QMessageBox.critical(self, 'Забой', 'Текущий забой больше пробуренного забоя')
@@ -1199,6 +1202,9 @@ class DopPlanWindow(MyMainWindow):
 
     def insert_data_plan(self, result):
         well_data.data_list = []
+        well_data.fluid = float(result[0][7][:4].replace('г', ''))
+
+
         for ind, row in enumerate(result):
             if ind == 1:
                 well_data.bottom = row[1]

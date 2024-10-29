@@ -241,9 +241,7 @@ class GnoWindow(MyMainWindow):
         well_data.fluid_work, well_data.fluid_work_short = self.calc_work_fluid(fluid)
         nkt_diam_fond = TabPage_Gno.gno_nkt_opening(well_data.dict_nkt)
         surfactant_hydrofabizer_str = ''
-        if self.surfactant_hydrofabizer_Combo == 'Да':
-            surfactant_hydrofabizer_str = 'с добавлением в жидкость глушения гидрофобизатора из расчёта' \
-                                          ' 0,05% на 1м3 (0,5л)'
+
 
         if work_plan not in ['dop_plan', 'dop_plan_in_base']:
 
@@ -263,6 +261,11 @@ class GnoWindow(MyMainWindow):
                      f"жидкостью уд.веса {well_data.fluid_work} при давлении не более " \
                      f"{well_data.max_admissible_pressure._value}атм. " \
                      f"Тех отстой 1-2 часа. Произвести замер избыточного давления в скважине."
+
+            if self.surfactant_hydrofabizer_Combo == 'Да':
+                self.calculate_chemistry('гидрофабизатор', round(volume_well_jaming * 0.05, 2))
+                surfactant_hydrofabizer_str = 'с добавлением в жидкость глушения гидрофобизатора из расчёта' \
+                                              ' 0,05% на 1м3 (0,5л)'
 
             krs_begin = [
                 [None, None,

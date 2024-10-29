@@ -309,6 +309,7 @@ class SandWindow(MyMainWindow):
              None, None, None, None, None, None, None,
              'мастер КРС', None]
         ]
+
         if OpressovkaEK.testing_pressure(self, filling_depth) is False:
             filling_list.insert(-1,
                         [f'Опрессовать в инт{filling_depth}-0м на Р={well_data.max_admissible_pressure._value}атм',
@@ -343,6 +344,8 @@ class SandWindow(MyMainWindow):
              None, None, None, None, None, None, None,
              'мастер КРС', liftingNKT_norm(filling_depth, 1)])
         well_data.current_bottom = filling_depth
+
+        self.calculate_chemistry('песок', sand_volume)
 
         return filling_list
 

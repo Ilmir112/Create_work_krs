@@ -259,6 +259,7 @@ class PakerIzvlek(MyMainWindow):
 
             raid_list = PakerIzvlek.rir_izvelPaker(
                 self, paker_depth_line,  pero_diametr_line, paker_type_combo, sand_question, roof_sand_edit)
+            self.calculate_chemistry("извлекаемый пакер", 1)
         else:
             raid_list = PakerIzvlek.izvlech_paker(self, pero_diametr_line, paker_depth_line, current_bottom)
 
@@ -290,10 +291,12 @@ class PakerIzvlek(MyMainWindow):
              None, None, None, None, None, None, None,
              'Мастер КРС, подрядчик по ГИС', 4]
             ]
-        volume_sand = abs(round(
-            well_volume(self, paker_depth_line) / paker_depth_line * 1000 * (paker_depth_line - roof_sand_edit), 0))
+
 
         if sand_question == 'Да':
+            volume_sand = abs(round(
+                well_volume(self, paker_depth_line) / paker_depth_line * 1000 * (paker_depth_line - roof_sand_edit), 0))
+
             filling_list = [
                 [None, None,
                  f'Поднять ИУГ до глубины {roof_sand_edit - 120}м с доливом тех жидкости в '
@@ -334,6 +337,7 @@ class PakerIzvlek(MyMainWindow):
             well_data.current_bottom2 = well_data.current_bottom
             well_data.current_bottom = roof_sand_edit
             well_data.depth_paker_izv = paker_depth_line
+            self.calculate_chemistry('песок', volume_sand)
         else:
             rir_list.append([None, None,
                              f'Поднять ИУГ c глубины {paker_depth_line}м с доливом тех жидкости в объеме '

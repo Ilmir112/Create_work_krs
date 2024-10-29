@@ -10,7 +10,6 @@ from .opressovka import OpressovkaEK, TabPage_SO
 from .rationingKRS import descentNKT_norm, liftingNKT_norm
 
 
-
 class TabPage_SO_aspo(QWidget):
     def __init__(self, parent=None):
 
@@ -36,7 +35,7 @@ class TabPage_SO_aspo(QWidget):
         else:
             if well_data.leakiness:
                 pakerDepth = min([well_data.dict_leakiness['НЭК']['интервал'][nek][0] - 10
-                                       for nek in well_data.dict_leakiness['НЭК']['интервал'].keys()])
+                                  for nek in well_data.dict_leakiness['НЭК']['интервал'].keys()])
 
         self.paker_depth_edit.setText(str(int(pakerDepth)))
 
@@ -50,7 +49,6 @@ class TabPage_SO_aspo(QWidget):
 
         self.grid_layout.addWidget(self.paker_depth_Label, 3, 3)
         self.grid_layout.addWidget(self.paker_depth_edit, 4, 3)
-
 
     def update_paker(self):
 
@@ -72,6 +70,7 @@ class TabWidget(QTabWidget):
     def __init__(self):
         super().__init__()
         self.addTab(TabPage_SO(self), 'Очистка колонны с пакером')
+
 
 class PakerAspo(MyMainWindow):
     def __init__(self, ins_ind, table_widget, parent=None):
@@ -96,7 +95,7 @@ class PakerAspo(MyMainWindow):
 
         if int(paker_khost) + int(paker_depth) > well_data.current_bottom:
             QMessageBox.warning(self, 'Некорректные данные', f'Компоновка НКТ c хвостовик + пакер '
-                                                                   f'ниже текущего забоя')
+                                                             f'ниже текущего забоя')
             return
         if self.check_true_depth_template(paker_depth) is False:
             return
@@ -147,60 +146,43 @@ class PakerAspo(MyMainWindow):
 
         nkt_opress_list = OpressovkaEK.nkt_opress(self)
 
-
         paker_list = [
-                [f'СПо {paker_short} до глубины {paker_depth}м', None,
-                 f'Спустить {paker_select} на НКТ{well_data.nkt_diam}мм до глубины {paker_depth}м, '
-                 f'воронкой до {paker_depth + paker_khost}м'
-                 f' с замером, шаблонированием шаблоном {well_data.nkt_template}мм. {nkt_opress_list[1]} '
-                 f'{("Произвести пробную посадку на глубине 50м" if well_data.column_additional is False else "")} '
-                 f'ПРИ ОТСУТСТВИИ ЦИРКУЛЯЦИИ ПРЕДУСМОТРЕТЬ НАЛИЧИИ В КОМПОНОВКЕ УРАВНИТЕЛЬНЫХ КЛАПАНОВ ИЛИ СБИВНОГО '
-                 f'КЛАПАНА С ВВЕРТЫШЕМ НАД ПАКЕРОМ',
-                 None, None, None, None, None, None, None,
-                 'мастер КРС', descentNKT_norm(paker_depth, 1.2)],
-                [None, None, f'Посадить пакер на глубине {paker_depth}м',
-                 None, None, None, None, None, None, None,
-                 'мастер КРС', 0.4],
-                [f'Очистить колонну от АСПО растворителем - 2м3', None,
-                 f'Очистить колонну от АСПО растворителем - 2м3. При открытом затрубном пространстве закачать в '
-                 f'трубное пространство растворитель в объеме 2м3, продавить в трубное пространство тех.жидкостью '
-                 f'в объеме {round(3 * well_data.current_bottom / 1000, 1)}м3. Приподнять. Закрыть трубное и затрубное '
-                 f'пространство. Реагирование 2 часа.',
-                 None, None, None, None, None, None, None,
-                 'Мастер КРС, предст. заказчика', 4],
-                [f'cрыв пакера 30мин +1ч', None,
-                 f'Сбить ввертыш. Произвести срыв пакера с поэтапным увеличением нагрузки на 3-4т выше веса НКТ '
-                 f'в течении 30мин и с '
-                 f'выдержкой 1ч для возврата резиновых элементов в исходное положение. ',
-                 None, None, None, None, None, None, None,
-                 'мастер КРС', 0.7],
-
-                [None, None,
-                 f'В случае негерметичности э/к, по согласованию с заказчиком произвести ОТСЭК для определения интервала '
-                 f'негерметичности эксплуатационной колонны с точностью до одного НКТ или запись РГД, ВЧТ с '
-                 f'целью определения места нарушения в присутствии представителя заказчика, составить акт. '
-                 f'Определить приемистость НЭК.',
-                 None, None, None, None, None, None, None,
-                 'мастер КРС', None],
-                [None, None,
-                 f'Поднять {paker_select} на НКТ{well_data.nkt_diam}мм c глубины {paker_depth}м с доливом скважины в '
-                 f'объеме {round(paker_depth * 1.12 / 1000, 1)}м3 удельным весом {well_data.fluid_work}',
-                 None, None, None, None, None, None, None,
-                 'мастер КРС', liftingNKT_norm(paker_depth, 1.2)]]
-
-
+            [f'СПо {paker_short} до глубины {paker_depth}м', None,
+             f'Спустить {paker_select} на НКТ{well_data.nkt_diam}мм до глубины {paker_depth}м, '
+             f'воронкой до {paker_depth + paker_khost}м'
+             f' с замером, шаблонированием шаблоном {well_data.nkt_template}мм. {nkt_opress_list[1]} '
+             f'{("Произвести пробную посадку на глубине 50м" if well_data.column_additional is False else "")} '
+             f'ПРИ ОТСУТСТВИИ ЦИРКУЛЯЦИИ ПРЕДУСМОТРЕТЬ НАЛИЧИИ В КОМПОНОВКЕ УРАВНИТЕЛЬНЫХ КЛАПАНОВ ИЛИ СБИВНОГО '
+             f'КЛАПАНА С ВВЕРТЫШЕМ НАД ПАКЕРОМ',
+             None, None, None, None, None, None, None,
+             'мастер КРС', descentNKT_norm(paker_depth, 1.2)],
+            [None, None, f'Посадить пакер на глубине {paker_depth}м',
+             None, None, None, None, None, None, None,
+             'мастер КРС', 0.4],
+            [f'Очистить колонну от АСПО растворителем - 2м3', None,
+             f'Очистить колонну от АСПО растворителем - 2м3. При открытом затрубном пространстве закачать в '
+             f'трубное пространство растворитель в объеме 2м3, продавить в трубное пространство тех.жидкостью '
+             f'в объеме {round(3 * well_data.current_bottom / 1000, 1)}м3. Приподнять. Закрыть трубное и затрубное '
+             f'пространство. Реагирование 2 часа.',
+             None, None, None, None, None, None, None,
+             'Мастер КРС, предст. заказчика', 4],
+            [f'cрыв пакера 30мин +1ч', None,
+             f'Сбить ввертыш. Произвести срыв пакера с поэтапным увеличением нагрузки на 3-4т выше веса НКТ '
+             f'в течении 30мин и с '
+             f'выдержкой 1ч для возврата резиновых элементов в исходное положение. ',
+             None, None, None, None, None, None, None,
+             'мастер КРС', 0.7],
+            [None, None,
+             f'В случае негерметичности э/к, по согласованию с заказчиком произвести ОТСЭК для определения интервала '
+             f'негерметичности эксплуатационной колонны с точностью до одного НКТ или запись РГД, ВЧТ с '
+             f'целью определения места нарушения в присутствии представителя заказчика, составить акт. '
+             f'Определить приемистость НЭК.',
+             None, None, None, None, None, None, None,
+             'мастер КРС', None],
+            [None, None,
+             f'Поднять {paker_select} на НКТ{well_data.nkt_diam}мм c глубины {paker_depth}м с доливом скважины в '
+             f'объеме {round(paker_depth * 1.12 / 1000, 1)}м3 удельным весом {well_data.fluid_work}',
+             None, None, None, None, None, None, None,
+             'мастер КРС', liftingNKT_norm(paker_depth, 1.2)]]
 
         return paker_list
-
-
-
-
-
-
-
-
-
-
-
-
-

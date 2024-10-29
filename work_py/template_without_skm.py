@@ -837,6 +837,8 @@ class Template_without_skm(MyMainWindow):
             list_template_ek = list_template_ek
         if solvent_question == 'Нет':
             list_template_ek.pop(1)
+        else:
+            self.calculate_chemistry('растворитель', solvent_volume_edit)
 
         well_data.current_bottom = current_bottom
         return list_template_ek
