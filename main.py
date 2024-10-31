@@ -27,7 +27,6 @@ from openpyxl.utils import get_column_letter
 from openpyxl.workbook import Workbook
 from openpyxl.styles import Alignment, Font
 
-
 from data_base.config_base import connect_to_database
 
 from log_files.log import logger, QPlainTextEditLogger
@@ -38,11 +37,8 @@ import well_data
 
 from PyQt5.QtCore import QThread, pyqtSlot
 
-
 from users.login_users import LoginWindow
 from PyQt5.QtCore import Qt, QObject, pyqtSignal
-
-
 
 
 class UncaughtExceptions(QObject):
@@ -120,9 +116,9 @@ class ExcelWorker(QThread):
                     # Если запись найдена, возвращается True, в противном случае возвращается False
                     if result:
                         QMessageBox.information(None, 'перечень без глушения',
-                                                      f'Скважина состоит в перечне скважин без глушения на текущий '
-                                                      f'квартал, '
-                                                      f'в перечне от  {region}')
+                                                f'Скважина состоит в перечне скважин без глушения на текущий '
+                                                f'квартал, '
+                                                f'в перечне от  {region}')
                         check_true = True
                     else:
                         check_true = False
@@ -182,7 +178,6 @@ class ExcelWorker(QThread):
         except Exception as e:
             QMessageBox.warning(None, 'Ошибка', f"Ошибка при проверке записи: {type(e).__name__}\n\n{str(e)}")
         if stop_app == True:
-
             window.close()
         # Завершение работы потока
         self.finished.emit()
@@ -214,8 +209,8 @@ class ExcelWorker(QThread):
             except psycopg2.Error as e:
                 # Выведите сообщение об ошибке
                 QMessageBox.warning(MyWindow, 'Ошибка',
-                                          f'Ошибка подключения к базе данных, не получилось проверить '
-                                          f'корректность категории {type(e).__name__}\n\n{str(e)}')
+                                    f'Ошибка подключения к базе данных, не получилось проверить '
+                                    f'корректность категории {type(e).__name__}\n\n{str(e)}')
                 return
             finally:
                 # Закройте курсор и соединение
@@ -256,7 +251,10 @@ class MyMainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
-        
+        self.data_window = None
+        self.perforation_correct_window2 = None
+        self.work_plan = None
+
     @staticmethod
     def insert_image(ws, file, coordinate, width=200, height=180):
         # Загружаем изображение с помощью библиотеки Pillow
@@ -266,6 +264,153 @@ class MyMainWindow(QMainWindow):
         img.height = height
         img.anchor = coordinate
         ws.add_image(img, coordinate)
+
+    def open_read_excel_file_pz(self):
+        from open_pz import CreatePZ
+        from data_base.work_with_base import insert_data_new_excel_file
+        from work_py.correct_plan import CorrectPlanWindow
+        from work_py.dop_plan_py import DopPlanWindow
+        from work_py.gnkt_grp import GnktOsvWindow
+        from work_py.gnkt_frez import Work_with_gnkt
+
+        if self.work_plan in ['krs', 'dop_plan', 'gnkt_opz', 'gnkt_after_grp', 'gnkt_bopz', 'gnkt_frez']:
+            QMessageBox.information(self, 'ВНИМАНИЕ', 'Для корректного прочтения план заказа, план заказ должен быть '
+                                                      'пересохранен в формат .xlsx (КНИГА EXCEL, '
+                                                      'excel версия от 2010г и выше)')
+            self.fname, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
+                                                                  "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
+            if self.fname:
+                try:
+                    self.read_pz(self.fname)
+                    well_data.pause = True
+                    read_pz = CreatePZ(self.wb, self.ws)
+                    self.ws = read_pz.open_excel_file(self.ws, self.work_plan)
+                except FileNotFoundError as f:
+                    QMessageBox.warning(self, 'Ошибка', f'Ошибка при прочтении файла {f}')
+
+            if self.work_plan in ['krs', 'dop_plan']:
+                self.copy_pz(self.ws, self.table_widget, self.work_plan)
+            elif self.work_plan in ['gnkt_opz', 'gnkt_after_grp', 'gnkt_bopz']:
+                self.gnkt_data = GnktOsvWindow(self.ws,
+                                               self.table_title, self.table_schema, self.table_widget,
+                                               self.work_plan)
+            elif self.work_plan == 'gnkt_frez':
+                self.gnkt_data = Work_with_gnkt(self.ws, self.table_title, self.table_schema, self.table_widget)
+
+
+        elif self.work_plan in ['plan_change', 'dop_plan_in_base']:
+            well_data.data_in_base = True
+            if self.work_plan == 'plan_change':
+                self.rir_window = CorrectPlanWindow(well_data.ins_ind, self.table_widget, self.work_plan)
+            elif self.work_plan == 'dop_plan_in_base':
+                self.rir_window = DopPlanWindow(well_data.ins_ind, self.table_widget, self.work_plan)
+
+            self.rir_window.setGeometry(200, 400, 800, 200)
+            self.rir_window.show()
+            well_data.pause = True
+            self.pause_app()
+
+            self.ws = insert_data_new_excel_file(well_data.data, well_data.rowHeights, well_data.colWidth,
+                                                 well_data.boundaries_dict)
+
+            self.copy_pz(self.ws, self.table_widget, self.work_plan)
+        self.pause_app()
+        well_data.pause = True
+        self.rir_window = None
+
+        return self.ws
+
+    def read_pz(self, fname):
+        self.wb = load_workbook(fname, data_only=True)
+        name_list = self.wb.sheetnames
+        self.ws = self.wb.active
+
+    def definition_filenames(self):
+        if 'РН' in well_data.contractor:
+            contractor = 'РН'
+        elif 'Ойл' in well_data.contractor:
+            contractor = 'Ойл'
+
+        if self.work_plan in ['dop_plan', 'dop_plan_in_base']:
+            string_work = f' ДП№ {well_data.number_dp}'
+        elif self.work_plan == 'krs':
+            string_work = 'ПР'
+        elif self.work_plan == 'plan_change':
+            if well_data.work_plan_change == 'krs':
+                string_work = 'ПР изм'
+            else:
+                string_work = f'ДП№{well_data.number_dp} изм '
+
+        elif self.work_plan == 'gnkt_bopz':
+            string_work = 'ГНКТ БОПЗ ВНС'
+        elif self.work_plan == 'gnkt_opz':
+            string_work = 'ГНКТ ОПЗ'
+        elif self.work_plan == 'gnkt_after_grp':
+            string_work = 'ГНКТ ОСВ ГРП'
+        else:
+            string_work = 'ГНКТ'
+
+        filenames = f"{well_data.well_number._value} {well_data.well_area._value} {well_data.type_kr.split(' ')[0]} " \
+                    f"кат " \
+                    f"{well_data.category_pressuar} " \
+                    f"{string_work} {contractor}.xlsx"
+        return filenames
+
+    def save_to_gnkt(self):
+
+        sheets = ["Титульник", 'СХЕМА', 'Ход работ']
+        tables = [self.table_title, self.table_schema, self.table_widget]
+
+        for i, sheet_name in enumerate(sheets):
+            worksheet = self.gnkt_data.wb_gnkt[sheet_name]
+            table = tables[i]
+
+            work_list = []
+            for row in range(table.rowCount()):
+                row_lst = []
+                # self.ins_ind_border += 1
+                for column in range(table.columnCount()):
+
+                    item = table.item(row, column)
+                    if not item is None:
+
+                        row_lst.append(item.text())
+                        # print(item.text())
+                    else:
+                        row_lst.append("")
+                work_list.append(row_lst)
+            self.gnkt_data.count_row_height(worksheet, work_list, sheet_name)
+
+        ws6 = self.gnkt_data.wb_gnkt.create_sheet(title="СХЕМЫ КНК_44,45")
+        self.insert_image(ws6, f'{well_data.path_image}imageFiles/schema_well/СХЕМЫ КНК_44,45.png', 'A1',
+                          550, 900)
+        ws7 = self.gnkt_data.wb_gnkt.create_sheet(title="СХЕМЫ КНК_38,1")
+        self.insert_image(ws7, f'{well_data.path_image}imageFiles/schema_well/СХЕМЫ КНК_38,1.png', 'A1',
+                          550, 900)
+
+        # path = 'workiii'
+        if 'Зуфаров' in well_data.user:
+            path = 'D:\Documents\Desktop\ГТМ'
+        else:
+            path = ""
+        filenames = self.definition_filenames()
+        full_path = path + '/' + filenames
+
+        if well_data.bvo is True:
+            ws5 = self.gnkt_data.wb_gnkt.create_sheet('Sheet1')
+            ws5.title = "Схемы ПВО"
+            ws5 = self.gnkt_data.wb_gnkt["Схемы ПВО"]
+            self.gnkt_data.wb_gnkt.move_sheet(ws5, offset=-1)
+            schema_list = self.check_pvo_schema(ws5, 2)
+
+        if self.gnkt_data.wb_gnkt:
+            self.save_file_dialog(self.gnkt_data.wb_gnkt, full_path)
+
+            self.gnkt_data.wb_gnkt.close()
+            print(f"Table data saved to Excel {full_path} {well_data.number_dp}")
+        if self.wb:
+            self.wb.close()
+
     @staticmethod
     def get_tables_starting_with(well_number, well_area, work_plan, type_kr):
         from data_base.work_with_base import connect_to_db
@@ -273,7 +418,7 @@ class MyMainWindow(QMainWindow):
         if well_number != '':
             if well_data.connect_in_base:
                 try:
-                    conn =connect_to_database(well_data.DB_WELL_DATA)
+                    conn = connect_to_database(well_data.DB_WELL_DATA)
                     cursor = conn.cursor()
                     param = '%s'
                 except psycopg2.Error as e:
@@ -294,7 +439,7 @@ class MyMainWindow(QMainWindow):
                         SELECT well_number, area_well, type_kr, work_plan
                         FROM wells
                         WHERE well_number={param} AND area_well={param} AND type_kr={param} AND work_plan={param}""",
-                       (str(well_number), well_area, type_kr, work_plan))
+                           (str(well_number), well_area, type_kr, work_plan))
 
             rezult = cursor.fetchone()
 
@@ -305,7 +450,6 @@ class MyMainWindow(QMainWindow):
             return rezult
         else:
             return []
-
 
     @staticmethod
     def calculate_chemistry(type_chemistry, volume):
@@ -333,9 +477,6 @@ class MyMainWindow(QMainWindow):
             well_data.dict_volume_chemistry["РИР ОВП"] += 1
         elif type_chemistry == 'гидрофабизатор':
             well_data.dict_volume_chemistry['гидрофабизатор'] += volume
-
-
-
 
     def save_file_dialog(self, wb2, full_path):
         try:
@@ -411,6 +552,7 @@ class MyMainWindow(QMainWindow):
             # Переместите второй лист перед первым
 
         return list(schema_pvo_set)
+
     @staticmethod
     def insert_data_in_database(row_number, row_max):
 
@@ -420,6 +562,7 @@ class MyMainWindow(QMainWindow):
         plast_all_json = json.dumps(well_data.plast_all)
         plast_work_json = json.dumps(well_data.plast_work)
         skm_list_json = json.dumps(well_data.skm_interval)
+        raiding_list_json = json.dumps(well_data.ribbing_interval)
         number = json.dumps(str(well_data.well_number._value) + well_data.well_area._value, ensure_ascii=False,
                             indent=4)
         template_ek = json.dumps(
@@ -431,13 +574,14 @@ class MyMainWindow(QMainWindow):
                        leakage_json, well_data.column_additional, well_data.fluid_work,
                        well_data.category_pressuar, well_data.category_h2s, well_data.category_gf,
                        template_ek, skm_list_json,
-                       well_data.problemWithEk_depth, well_data.problemWithEk_diametr]
+                       well_data.problemWithEk_depth, well_data.problemWithEk_diametr, raiding_list_json]
 
         if len(well_data.data_list) == 0:
             well_data.data_list.append(data_values)
         else:
             row_number = row_number - well_data.count_row_well
             well_data.data_list.insert(row_number, data_values)
+
     @staticmethod
     def check_depth_in_skm_interval(depth):
 
@@ -454,10 +598,10 @@ class MyMainWindow(QMainWindow):
                 check_ribbing = True
         if check_true is False and check_ribbing is False:
             QMessageBox.warning(None, 'Проверка посадки пакера в интервал скреперования',
-                                                 f'Проверка посадки показала, что пакер сажается не '
-                                                 f'в интервал скреперования {well_data.skm_interval}, и '
-                                                 f'райбирования {well_data.ribbing_interval} \n'
-                                                 f'Нужно скорректировать интервалы скреперования ')
+                                f'Проверка посадки показала, что пакер сажается не '
+                                f'в интервал скреперования {well_data.skm_interval}, и '
+                                f'райбирования {well_data.ribbing_interval} \n'
+                                f'Нужно скорректировать интервалы скреперования ')
             return False
         if check_true is True and check_ribbing is False:
             false_question = QMessageBox.question(None, 'Проверка посадки пакера в интервал скреперования',
@@ -468,6 +612,7 @@ class MyMainWindow(QMainWindow):
                                                   f'Продолжить?')
             if false_question == QMessageBox.StandardButton.No:
                 return False
+
     @staticmethod
     def true_set_paker(depth):
 
@@ -501,7 +646,7 @@ class MyMainWindow(QMainWindow):
 
         for i, row_data in enumerate(work_list):
             row = ins_ind + i
-            if work_plan not in ['application_pvr', 'gnkt_frez', 'gnkt_opz', 'gnkt_after_grp', 'application_gis']:
+            if work_plan not in ['application_pvr', 'gnkt_frez', 'gnkt_opz', 'gnkt_bopz', 'gnkt_after_grp', 'application_gis']:
                 self.insert_data_in_database(row, row_max + i)
 
             table_widget.insertRow(row)
@@ -570,6 +715,102 @@ class MyMainWindow(QMainWindow):
 
         return check
 
+    def copy_pz(self, sheet, table_widget, work_plan='krs', count_col=12, list_page=1):
+        from krs import GnoWindow
+
+        rows = sheet.max_row
+        merged_cells = sheet.merged_cells
+        table_widget.setRowCount(rows)
+        well_data.count_row_well = table_widget.rowCount()
+
+        if work_plan == 'plan_change':
+            well_data.count_row_well = well_data.data_x_max._value
+
+        border_styles = {}
+        for row in sheet.iter_rows():
+            for cell in row:
+                border_styles[(cell.row, cell.column)] = cell.border
+
+        table_widget.setColumnCount(count_col)
+        rowHeights_exit = [sheet.row_dimensions[i + 1].height if sheet.row_dimensions[i + 1].height is not None else 18
+                           for i in range(sheet.max_row)]
+
+        for row in range(1, rows + 2):
+            if row > 1 and row < rows - 1:
+                table_widget.setRowHeight(row, int(rowHeights_exit[row]))
+            for col in range(1, count_col + 1):
+                if not sheet.cell(row=row, column=col).value is None:
+                    if isinstance(sheet.cell(row=row, column=col).value, float) and row > 25:
+                        cell_value = str(round(sheet.cell(row=row, column=col).value, 2))
+                    elif isinstance(sheet.cell(row=row, column=col).value, datetime):
+                        cell_value = sheet.cell(row=row, column=col).value.strftime('%d.%m.%Y')
+                    else:
+                        cell_value = str(sheet.cell(row=row, column=col).value)
+
+                    item = QtWidgets.QTableWidgetItem(str(cell_value))
+                    table_widget.setItem(row - 1, col - 1, item)
+
+                    # Проверяем, является ли текущая ячейка объединенной
+                    for merged_cell in merged_cells:
+                        range_row = range(merged_cell.min_row, merged_cell.max_row + 1)
+                        range_col = range(merged_cell.min_col, merged_cell.max_col + 1)
+                        if row in range_row and col in range_col:
+                            # Устанавливаем количество объединяемых строк и столбцов для текущей ячейки
+                            table_widget.setSpan(row - 1, col - 1,
+                                                 merged_cell.max_row - merged_cell.min_row + 1,
+                                                 merged_cell.max_col - merged_cell.min_col + 1)
+
+                else:
+                    item = QTableWidgetItem("")
+
+        if well_data.dop_work_list:
+            self.populate_row(table_widget.rowCount(), well_data.dop_work_list, self.table_widget, self.work_plan)
+        for row in range(table_widget.rowCount()):
+            row_value_empty = True  # Флаг, указывающий, что все ячейки в строке пустые
+            # Проход по всем колонкам в текущей строке
+            for col in range(table_widget.columnCount()):
+                item = table_widget.item(row, col)
+                # Проверка, является ли содержимое ячейки пустым
+                if item is not None and item.text() != "":
+                    row_value_empty = False  # Если хотя бы одна ячейка не пустая, снимаем флаг
+                    break
+            # Если все ячейки в строке пустые, скрываем строку
+            if row_value_empty:
+                table_widget.setRowHidden(row, True)
+            else:
+                table_widget.setRowHidden(row, False)
+
+        if work_plan == 'krs':
+            self.work_window = GnoWindow(table_widget.rowCount(), self.table_widget, self.work_plan)
+
+            # self.work_window.setGeometry(100, 400, 200, 500)
+            self.work_window.show()
+
+            self.pause_app()
+            well_data.pause = True
+            self.work_window = None
+
+        if work_plan in ['gnkt_frez'] and list_page == 2:
+            colWidth = [2.28515625, 13.0, 4.5703125, 13.0, 13.0, 13.0, 5.7109375, 13.0, 13.0, 13.0, 4.7109375,
+                        13.0, 5.140625, 13.0, 13.0, 13.0, 13.0, 13.0, 4.7109375, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0,
+                        13.0,
+                        13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0,
+                        13.0, 13.0, 13.0, 5.42578125, 13.0, 4.5703125, 2.28515625, 10.28515625]
+            for column in range(table_widget.columnCount()):
+                table_widget.setColumnWidth(column, int(colWidth[column]))  # Здесь задайте требуемую ширину столбца
+        elif work_plan in ['gnkt_after_grp', 'gnkt_opz', 'gnkt_after_grp', 'gnkt_bopz'] and list_page == 2:
+
+            colWidth = property_excel.property_excel_pvr.colWidth_gnkt_osv
+            for column in range(table_widget.columnCount()):
+                table_widget.setColumnWidth(column, int(colWidth[column] * 9))  # Здесь задайте требуемую ширину столбца
+
+        elif work_plan == 'application_pvr':
+            from property_excel import property_excel_pvr
+            for column in range(table_widget.columnCount()):
+                table_widget.setColumnWidth(column, int(
+                    property_excel_pvr.colWidth[column]))  # Здесь задайте требуемую ширину столбца
+        well_data.pause = True
+
 
 class MyWindow(MyMainWindow):
 
@@ -621,6 +862,61 @@ class MyWindow(MyMainWindow):
         self.excepthook.moveToThread(self.thread)
         # self.thread.started.connect(self.excepthook.handleException)
         self.thread.start()
+
+    def insert_data_in_chemistry(self):
+        query = f"INSERT INTO chemistry " \
+                f"VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, " \
+                f"%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+
+        if well_data.work_plan in ['dop_plan', 'dop_plan_in_base']:
+            string_work = f' ДП№ {well_data.number_dp}'
+        elif well_data.work_plan == 'krs':
+            string_work = 'ПР'
+        elif well_data.work_plan == 'plan_change':
+            if well_data.work_plan_change == 'krs':
+                string_work = 'ПР изм'
+            else:
+                string_work = f'ДП№{well_data.number_dp} изм '
+
+        elif well_data.work_plan == 'gnkt_bopz':
+            string_work = 'ГНКТ БОПЗ ВНС'
+        elif well_data.work_plan == 'gnkt_opz':
+            string_work = 'ГНКТ ОПЗ'
+        elif well_data.work_plan == 'gnkt_after_grp':
+            string_work = 'ГНКТ ОСВ ГРП'
+        else:
+            string_work = 'ГНКТ'
+
+        date_today = datetime.now()
+        data_work = (well_data.well_number._value,
+                     well_data.well_area._value,
+                     well_data.region,
+                     well_data.costumer,
+                     well_data.contractor,
+                     string_work,
+                     well_data.type_kr.split(" ")[0],
+                     date_today,
+                     well_data.dict_volume_chemistry['цемент'],
+                     well_data.dict_volume_chemistry['HCl'],
+                     well_data.dict_volume_chemistry['HF'],
+                     well_data.dict_volume_chemistry['NaOH'],
+                     well_data.dict_volume_chemistry['ВТ СКО'],
+                     well_data.dict_volume_chemistry['Глина'],
+                     well_data.dict_volume_chemistry['песок'],
+                     well_data.dict_volume_chemistry['РПК'],
+                     well_data.dict_volume_chemistry['РПП'],
+                     well_data.dict_volume_chemistry["извлекаемый пакер"],
+                     well_data.dict_volume_chemistry["ЕЛАН"],
+                     well_data.dict_volume_chemistry['растворитель'],
+                     well_data.dict_volume_chemistry["РИР 2С"],
+                     well_data.dict_volume_chemistry["РИР ОВП"],
+                     well_data.dict_volume_chemistry['гидрофабизатор'],
+                     round(well_data.normOfTime, 1),
+                     well_data.fluid
+                     )
+
+        from data_base.work_with_base import Classifier_well
+        Classifier_well.insert_database('well_data', data_work, query)
 
     @staticmethod
     def check_process():
@@ -718,7 +1014,7 @@ class MyWindow(MyMainWindow):
         self.create_KRS_DP = self.create_file.addAction('Дополнительный план КРС', self.action_clicked)
         self.create_KRS_DP_in_base = self.create_file.addAction('Дополнительный план КРС из базы', self.action_clicked)
         self.create_GNKT = self.create_file.addMenu('&План ГНКТ')
-        self.create_GNKT_OPZ = self.create_GNKT.addAction(' ГНКТ ОПЗ', self.action_clicked)
+        self.create_gnkt_opz = self.create_GNKT.addAction(' ГНКТ ОПЗ', self.action_clicked)
         self.create_GNKT_frez = self.create_GNKT.addAction('ГНКТ Фрезерование', self.action_clicked)
         self.create_GNKT_GRP = self.create_GNKT.addAction('Освоение после ГРП', self.action_clicked)
         self.create_GNKT_BOPZ = self.create_GNKT.addAction('БОПЗ ГНКТ', self.action_clicked)
@@ -780,201 +1076,57 @@ class MyWindow(MyMainWindow):
     @QtCore.pyqtSlot()
     def action_clicked(self):
         from data_correct_position_people import CorrectSignaturesWindow
-        from data_base.work_with_base import insert_data_new_excel_file
-        from open_pz import CreatePZ
-        from work_py.gnkt_frez import Work_with_gnkt
-        from work_py.dop_plan_py import DopPlanWindow
-        from work_py.correct_plan import CorrectPlanWindow
-        from work_py.drilling import Drill_window
-        from work_py.gnkt_grp import GnktOsvWindow
 
         action = self.sender()
 
         if action == self.create_KRS and self.table_widget == None:
             self.work_plan = 'krs'
             self.tableWidgetOpen(self.work_plan)
-            QMessageBox.information(self, 'ВНИМАНИЕ', 'Для корректного прочтения план заказа, план заказ должен быть '
-                                                      'пересохранен в формат .xlsx (КНИГА EXCEL, '
-                                                      'excel версия от 2010г и выше)')
-            self.fname, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
-                                                                  "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
-            if self.fname:
-                try:
-                    self.read_pz(self.fname)
-                    well_data.pause = True
-                    read_pz = CreatePZ(self.wb, self.ws, self.data_window, self.perforation_correct_window2)
-                    sheet = read_pz.open_excel_file(self.ws, self.work_plan)
+            self.ws = self.open_read_excel_file_pz()
 
-                    self.copy_pz(sheet, self.table_widget, self.work_plan)
-                    self.pause_app()
-                    well_data.pause = True
-                    self.rir_window = None
-
-                except FileNotFoundError as f:
-                    QMessageBox.warning(self, 'Ошибка', f'Ошибка при прочтении файла {f}')
         elif action == self.create_KRS_DP and self.table_widget == None:
             self.work_plan = 'dop_plan'
             well_data.work_plan = 'dop_plan'
             self.tableWidgetOpen(self.work_plan)
-            self.fname, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
-                                                                  "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
-            if self.fname:
-                try:
-                    self.read_pz(self.fname)
-                    well_data.pause = True
-                    read_pz = CreatePZ(self.wb, self.ws, self.data_window, self.perforation_correct_window2)
-                    sheet = read_pz.open_excel_file(self.ws, self.work_plan)
-                    if well_data.data_in_base:
-                        sheet = insert_data_new_excel_file(well_data.data, well_data.rowHeights, well_data.colWidth,
-                                                           well_data.boundaries_dict)
-                    self.copy_pz(sheet, self.table_widget, self.work_plan)
-                    if self.work_plan == 'dop_plan':
-                        self.rir_window = DopPlanWindow(well_data.ins_ind, self.table_widget, self.work_plan)
-                        # self.rir_window.setGeometry(200, 400, 100, 200)
-                        self.rir_window.show()
-                        self.pause_app()
-                        well_data.pause = True
-                        self.rir_window = None
-
-                except FileNotFoundError as f:
-                    QMessageBox.warning(self, 'Ошибка', f'Ошибка при прочтении файла {f}')
+            self.ws = self.open_read_excel_file_pz()
         elif action == self.create_KRS_DP_in_base and self.table_widget == None:
             self.work_plan = 'dop_plan_in_base'
             well_data.work_plan = 'dop_plan_in_base'
             self.tableWidgetOpen(self.work_plan)
-
-            try:
-                well_data.data_in_base = True
-                self.rir_window = DopPlanWindow(well_data.ins_ind, self.table_widget, self.work_plan)
-                # self.rir_window.setGeometry(200, 400, 100, 200)
-                self.rir_window.show()
-                well_data.pause = True
-                self.pause_app()
-                self.ws = insert_data_new_excel_file(well_data.data, well_data.rowHeights,
-                                                     well_data.colWidth, well_data.boundaries_dict)
-
-                self.copy_pz(self.ws, self.table_widget, self.work_plan)
-
-            except FileNotFoundError:
-                QMessageBox.warning(self, 'Ошибка', 'Ошибка при прочтении файла')
+            self.ws = self.open_read_excel_file_pz()
 
         elif action == self.create_KRS_change and self.table_widget == None:
             self.work_plan = 'plan_change'
             well_data.work_plan = 'plan_change'
             self.tableWidgetOpen(self.work_plan)
-            try:
-                well_data.data_in_base = True
-                self.rir_window = CorrectPlanWindow(well_data.ins_ind, self.table_widget, self.work_plan)
-                # self.rir_window.setGeometry(200, 400, 100, 200)
-                self.rir_window.show()
-                well_data.pause = True
-                self.pause_app()
-                self.ws = insert_data_new_excel_file(well_data.data, well_data.rowHeights, well_data.colWidth,
-                                                     well_data.boundaries_dict)
-                a =self.ws
+            self.ws = self.open_read_excel_file_pz()
 
-                self.copy_pz(self.ws, self.table_widget, self.work_plan)
-
-            except FileNotFoundError:
-                QMessageBox.warning(self, 'Ошибка', 'Ошибка при прочтении файла')
-
-        elif action == self.create_GNKT_OPZ and self.table_widget == None:
+        elif action == self.create_gnkt_opz and self.table_widget == None:
             self.work_plan = 'gnkt_opz'
-
             self.tableWidgetOpen(self.work_plan)
+            self.ws = self.open_read_excel_file_pz()
 
-            self.fname, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
-                                                                  "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
-
-            if self.fname:
-                # try:
-                self.read_pz(self.fname)
-                well_data.pause = True
-                read_pz = CreatePZ(self.wb, self.ws, self.data_window, self.perforation_correct_window2)
-                sheet = read_pz.open_excel_file(self.ws, self.work_plan)
-
-                self.rir_window = GnktOsvWindow(self.ws,
-                                                self.table_title, self.table_schema, self.table_widget,
-                                                self.work_plan)
-
-                self.pause_app()
-                well_data.pause = True
-                # self.copy_pz(sheet)
-
-                # except FileNotFoundError:
-                #     print('Файл не найден')
 
         elif action == self.create_GNKT_GRP and self.table_widget == None:
             self.work_plan = 'gnkt_after_grp'
             self.tableWidgetOpen(self.work_plan)
+            self.ws = self.open_read_excel_file_pz()
 
-            self.fname, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
-                                                                  "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
 
-            if self.fname:
-                try:
-                    self.read_pz(self.fname)
-                    well_data.pause = True
-                    read_pz = CreatePZ(self.wb, self.ws, self.data_window, self.perforation_correct_window2)
-                    sheet = read_pz.open_excel_file(self.ws, self.work_plan)
-                    self.rir_window = GnktOsvWindow(self.ws,
-                                                    self.table_title, self.table_schema, self.table_widget,
-                                                    self.work_plan)
-
-                    self.pause_app()
-                    well_data.pause = True
-                    # self.copy_pz(sheet)
-
-                except FileNotFoundError:
-                    print('Файл не найден')
 
         elif action == self.create_GNKT_BOPZ and self.table_widget == None:
             self.work_plan = 'gnkt_bopz'
             well_data.bvo = True
             self.tableWidgetOpen(self.work_plan)
+            self.ws = self.open_read_excel_file_pz()
 
-            self.fname, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
-                                                                  "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
 
-            if self.fname:
-                try:
-                    self.read_pz(self.fname)
-                    well_data.pause = True
-                    read_pz = CreatePZ(self.wb, self.ws, self.data_window, self.perforation_correct_window2)
-                    sheet = read_pz.open_excel_file(self.ws, self.work_plan)
-                    self.rir_window = GnktOsvWindow(sheet,
-                                                    self.table_title, self.table_schema, self.table_widget,
-                                                    self.work_plan)
-
-                    self.pause_app()
-                    well_data.pause = True
-                    # self.copy_pz(sheet)
-
-                except FileNotFoundError:
-                    print('Файл не найден')
 
         elif action == self.create_GNKT_frez and self.table_widget == None:
             self.work_plan = 'gnkt_frez'
             self.tableWidgetOpen(self.work_plan)
+            self.ws = self.open_read_excel_file_pz()
 
-            self.fname, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
-                                                                  "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
-
-            if self.fname:
-                try:
-                    self.read_pz(self.fname)
-                    well_data.pause = True
-                    read_pz = CreatePZ(self.wb, self.ws, self.data_window, self.perforation_correct_window2)
-                    sheet = read_pz.open_excel_file(self.ws, self.work_plan)
-
-                    self.rir_window = Work_with_gnkt(self.ws, self.table_title, self.table_schema, self.table_widget)
-
-                    self.pause_app()
-                    well_data.pause = True
-                    # self.copy_pz(sheet)
-
-                except FileNotFoundError:
-                    print('Файл не найден')
 
 
 
@@ -1115,7 +1267,7 @@ class MyWindow(MyMainWindow):
             # try:
             self.read_pz(fname)
             well_data.pause = True
-            read_pz = CreatePZ(self.wb, self.ws, self.data_window, self.perforation_correct_window2)
+            read_pz = CreatePZ(self.wb, self.ws)
             sheet = read_pz.open_excel_file(self.ws, self.work_plan)
             self.rir_window = PvrApplication(self.table_pvr)
             self.rir_window.show()
@@ -1130,7 +1282,7 @@ class MyWindow(MyMainWindow):
             # try:
             self.read_pz(fname)
             well_data.pause = True
-            read_pz = CreatePZ(self.wb, self.ws, self.data_window, self.perforation_correct_window2)
+            read_pz = CreatePZ(self.wb, self.ws)
             sheet = read_pz.open_excel_file(self.ws, self.work_plan)
             self.rir_window = GisApplication(self.table_pvr)
             self.rir_window.show()
@@ -1226,13 +1378,10 @@ class MyWindow(MyMainWindow):
                 self.tabWidget.addTab(self.table_widget, 'Ход работ')
 
     def save_to_excel(self):
-        from work_py.gnkt_frez import Work_with_gnkt
-        from work_py.gnkt_grp import GnktOsvWindow
-
         if self.work_plan in ['gnkt_frez']:
-            Work_with_gnkt.save_to_gnkt(self)
+            self.save_to_gnkt()
         elif self.work_plan in ['gnkt_after_grp', 'gnkt_opz', 'gnkt_bopz']:
-            GnktOsvWindow.save_to_gnkt(self)
+            self.save_to_gnkt()
         else:
             self.save_to_krs()
 
@@ -1241,7 +1390,6 @@ class MyWindow(MyMainWindow):
         from work_py.alone_oreration import is_number
         from data_base.work_with_base import insert_database_well_data, excel_in_json
         from work_py.advanted_file import count_row_height
-        from data_base.work_with_base import Classifier_well
 
         if not self.table_widget is None:
             wb2 = Workbook()
@@ -1336,21 +1484,7 @@ class MyWindow(MyMainWindow):
                 well_data.data_well_dict, excel_data_dict, self.work_plan
             )
 
-            # if self.work_plan not in ['dop_plan', 'dop_plan_in_base', 'plan_change']:
-            #     try:
-            #         cat_h2s_list = well_data.dict_category[well_data.plast_work_short[0]]['по сероводороду'].category
-            #         h2s_mg = well_data.dict_category[well_data.plast_work_short[0]]['по сероводороду'].data_mg_l
-            #         h2s_pr = well_data.dict_category[well_data.plast_work_short[0]]['по сероводороду'].data_procent
-            #
-            #         if cat_h2s_list in [1, 2] and self.work_plan not in ['dop_plan', 'dop_plan_in_base']:
-            #             ws3 = wb2.create_sheet('Sheet1')
-            #             ws3.title = "Расчет необходимого количества поглотителя H2S"
-            #             # ws3 = wb2["Расчет необходимого количества поглотителя H2S"]
-            #             calc_h2s(ws3, h2s_pr, h2s_mg)
-            #         else:
-            #             print(f'Расчет поглотителя сероводорода не требуется')
-            #     except:
-            #         QMessageBox.warning(self, 'Ошибка', 'Программа не смогла создать лист с расчетом поглотителя')
+            self.insert_data_in_chemistry()
 
             ws2.print_area = f'B1:L{self.table_widget.rowCount() + 45}'
             ws2.page_setup.fitToPage = True
@@ -1370,33 +1504,7 @@ class MyWindow(MyMainWindow):
             else:
                 path = ""
 
-            if 'РН' in well_data.contractor:
-                contractor = 'РН'
-            elif 'Ойл' in well_data.contractor:
-                contractor = 'Ойл'
-            if self.work_plan in ['dop_plan', 'dop_plan_in_base']:
-                string_work = f' ДП№ {well_data.number_dp}'
-            elif self.work_plan == 'krs':
-                string_work = 'ПР'
-            elif self.work_plan == 'plan_change':
-                if well_data.work_plan_change == 'krs':
-                    string_work = 'ПР изм'
-                else:
-                    string_work = f'ДП№{well_data.number_dp} изм '
-
-            elif self.work_plan == 'gnkt_bopz':
-                string_work = 'ГНКТ БОПЗ ВНС'
-            elif self.work_plan == 'gnkt_opz':
-                string_work = 'ГНКТ ОПЗ'
-            elif self.work_plan == 'gnkt_after_grp':
-                string_work = 'ГНКТ ОСВ ГРП'
-            else:
-                string_work = 'ГНКТ'
-
-            filenames = f"{well_data.well_number._value} {well_data.well_area._value} {well_data.type_kr.split(' ')[0]} " \
-                        f"кат " \
-                        f"{well_data.category_pressuar} " \
-                        f"{string_work} {contractor}.xlsx"
+            filenames = self.definition_filenames()
             full_path = path + "/" + filenames
 
             if well_data.bvo and self.work_plan != 'dop_plan':
@@ -1413,8 +1521,6 @@ class MyWindow(MyMainWindow):
                 wb2.close()
                 self.save_file_dialog(wb2, full_path)
 
-
-
                 if self.work_plan in ['dop_plan', 'dop_plan_in_base']:
                     string_work = f' ДП№ {well_data.number_dp}'
                 elif self.work_plan == 'krs':
@@ -1424,7 +1530,6 @@ class MyWindow(MyMainWindow):
                         string_work = 'ПР изм'
                     else:
                         string_work = f'ДП№{well_data.number_dp} изм '
-
 
                 # wb2.save(full_path)
                 print(f"Table data saved to Excel {full_path} {well_data.number_dp}")
@@ -1749,10 +1854,12 @@ class MyWindow(MyMainWindow):
             well_data.emergency_well = False
             well_data.angle_data = []
             well_data.emergency_count = 0
-            well_data.dict_volume_chemistry = {'пункт': [], 'цемент': 0.0, 'HCl': 0.0, 'HF': 0.0, 'NaOH': 0.0, 'ВТ СКО': 0.0,
-                         'Глина': 0.0, 'растворитель': 0.0, 'уд.вес': 0.0,
-                         'песок': 0.0, 'РПК': 0.0, 'РПП': 0.0, "извлекаемый пакер": 0.0, "ЕЛАН": 0.0,
-                         'РИР 2С': 0.0, 'РИР ОВП': 0.0, 'гидрофабизатор': 0.0}
+            well_data.dict_volume_chemistry = {'пункт': [], 'цемент': 0.0, 'HCl': 0.0, 'HF': 0.0, 'NaOH': 0.0,
+                                               'ВТ СКО': 0.0,
+                                               'Глина': 0.0, 'растворитель': 0.0, 'уд.вес': 0.0,
+                                               'песок': 0.0, 'РПК': 0.0, 'РПП': 0.0, "извлекаемый пакер": 0.0,
+                                               "ЕЛАН": 0.0,
+                                               'РИР 2С': 0.0, 'РИР ОВП': 0.0, 'гидрофабизатор': 0.0}
             well_data.skm_interval = []
             well_data.work_perforations = []
             well_data.work_perforations_dict = {}
@@ -1835,8 +1942,6 @@ class MyWindow(MyMainWindow):
     def on_finished(self):
         print("Работа с файлом Excel завершена.")
 
-
-
     def tubing_pressure_testing(self):
         from work_py.tubing_pressuar_testing import TubingPressuarWindow
 
@@ -1864,7 +1969,7 @@ class MyWindow(MyMainWindow):
         well_data.plast_all = json.loads(data[row][3])
         well_data.plast_work = json.loads(data[row][4])
         well_data.dict_leakiness = json.loads(data[row][5])
-        aaaaaaa= well_data.dict_leakiness
+        aaaaaaa = well_data.dict_leakiness
         well_data.column_additional = data[row][6]
 
         well_data.fluid_work = data[row][7]
@@ -1876,7 +1981,11 @@ class MyWindow(MyMainWindow):
         well_data.problemWithEk_diametr = data[row][14]
 
         definition_plast_work(self)
-
+        try:
+            well_data.ribbing_interval = json.loads(data[row][15])
+            ade=  well_data.ribbing_interval
+        except:
+            pass
 
         # print(well_data.skm_interval)
 
@@ -2051,11 +2160,6 @@ class MyWindow(MyMainWindow):
         else:
             self.raid_window.close()  # Close window.
             self.raid_window = None
-
-    def read_pz(self, fname):
-        self.wb = load_workbook(fname, data_only=True)
-        name_list = self.wb.sheetnames
-        self.ws = self.wb.active
 
     def pvo_cat1(self):
         from work_py.alone_oreration import pvo_cat1
@@ -2238,19 +2342,6 @@ class MyWindow(MyMainWindow):
         from gnkt_after_grp import gnkt_work
         gnkt_work_list = gnkt_work(self)
         self.populate_row(self.ins_ind, gnkt_work_list, self.table_widget)
-
-    def gnkt_opz(self):
-        from gnkt_opz import GnktOpz
-
-        if self.work_window is None:
-            self.work_window = GnktOpz(well_data.ins_ind, self.table_widget)
-            self.set_modal_window(self.work_window)
-            self.pause_app()
-            well_data.pause = True
-            self.work_window = None
-        else:
-            self.work_window.close()  # Close window.
-            self.work_window = None
 
     def gno_bottom(self):
         from work_py.descent_gno import GnoDescentWindow
@@ -2435,7 +2526,6 @@ class MyWindow(MyMainWindow):
             WellCondition.leakage_window = None  # Discard reference.
         well_data.data_list[-1][5] = json.dumps(well_data.dict_leakiness, default=str, ensure_ascii=False, indent=4)
 
-
     def correctData(self):
         from data_correct import DataWindow
 
@@ -2482,102 +2572,6 @@ class MyWindow(MyMainWindow):
 
     def insertPerf(self):
         self.populate_row(self.ins_ind, self.perforation_list)
-
-    def copy_pz(self, sheet, table_widget, work_plan='krs', count_col=12, list_page=1):
-        from krs import GnoWindow
-
-        rows = sheet.max_row
-        merged_cells = sheet.merged_cells
-        table_widget.setRowCount(rows)
-        well_data.count_row_well = table_widget.rowCount()
-
-        if work_plan == 'plan_change':
-            well_data.count_row_well = well_data.data_x_max._value
-        a = well_data.count_row_well
-        border_styles = {}
-        for row in sheet.iter_rows():
-            for cell in row:
-                border_styles[(cell.row, cell.column)] = cell.border
-
-        table_widget.setColumnCount(count_col)
-        rowHeights_exit = [sheet.row_dimensions[i + 1].height if sheet.row_dimensions[i + 1].height is not None else 18
-                           for i in range(sheet.max_row)]
-
-        for row in range(1, rows + 2):
-            if row > 1 and row < rows - 1:
-                table_widget.setRowHeight(row, int(rowHeights_exit[row]))
-            for col in range(1, count_col + 1):
-                if not sheet.cell(row=row, column=col).value is None:
-                    if isinstance(sheet.cell(row=row, column=col).value, float) and row > 25:
-                        cell_value = str(round(sheet.cell(row=row, column=col).value, 2))
-                    elif isinstance(sheet.cell(row=row, column=col).value, datetime):
-                        cell_value = sheet.cell(row=row, column=col).value.strftime('%d.%m.%Y')
-                    else:
-                        cell_value = str(sheet.cell(row=row, column=col).value)
-
-                    item = QtWidgets.QTableWidgetItem(str(cell_value))
-                    table_widget.setItem(row - 1, col - 1, item)
-
-                    # Проверяем, является ли текущая ячейка объединенной
-                    for merged_cell in merged_cells:
-                        range_row = range(merged_cell.min_row, merged_cell.max_row + 1)
-                        range_col = range(merged_cell.min_col, merged_cell.max_col + 1)
-                        if row in range_row and col in range_col:
-                            # Устанавливаем количество объединяемых строк и столбцов для текущей ячейки
-                            table_widget.setSpan(row - 1, col - 1,
-                                                 merged_cell.max_row - merged_cell.min_row + 1,
-                                                 merged_cell.max_col - merged_cell.min_col + 1)
-
-                else:
-                    item = QTableWidgetItem("")
-
-        if well_data.dop_work_list:
-            self.populate_row(table_widget.rowCount(), well_data.dop_work_list, self.table_widget, self.work_plan)
-        for row in range(table_widget.rowCount()):
-            row_value_empty = True  # Флаг, указывающий, что все ячейки в строке пустые
-            # Проход по всем колонкам в текущей строке
-            for col in range(table_widget.columnCount()):
-                item = table_widget.item(row, col)
-                # Проверка, является ли содержимое ячейки пустым
-                if item is not None and item.text() != "":
-                    row_value_empty = False  # Если хотя бы одна ячейка не пустая, снимаем флаг
-                    break
-            # Если все ячейки в строке пустые, скрываем строку
-            if row_value_empty:
-                table_widget.setRowHidden(row, True)
-            else:
-                table_widget.setRowHidden(row, False)
-
-        if work_plan == 'krs':
-            self.work_window = GnoWindow(table_widget.rowCount(), self.table_widget, self.work_plan)
-
-            # self.work_window.setGeometry(100, 400, 200, 500)
-            self.work_window.show()
-
-            self.pause_app()
-            well_data.pause = True
-            self.work_window = None
-
-        if work_plan in ['gnkt_frez'] and list_page == 2:
-            colWidth = [2.28515625, 13.0, 4.5703125, 13.0, 13.0, 13.0, 5.7109375, 13.0, 13.0, 13.0, 4.7109375,
-                        13.0, 5.140625, 13.0, 13.0, 13.0, 13.0, 13.0, 4.7109375, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0,
-                        13.0,
-                        13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0,
-                        13.0, 13.0, 13.0, 5.42578125, 13.0, 4.5703125, 2.28515625, 10.28515625]
-            for column in range(table_widget.columnCount()):
-                table_widget.setColumnWidth(column, int(colWidth[column]))  # Здесь задайте требуемую ширину столбца
-        elif work_plan in ['gnkt_after_grp', 'gnkt_opz', 'gnkt_after_grp', 'gnkt_bopz'] and list_page == 2:
-
-            colWidth = property_excel.property_excel_pvr.colWidth_gnkt_osv
-            for column in range(table_widget.columnCount()):
-                table_widget.setColumnWidth(column, int(colWidth[column] * 9))  # Здесь задайте требуемую ширину столбца
-
-        elif work_plan == 'application_pvr':
-            from property_excel import property_excel_pvr
-            for column in range(table_widget.columnCount()):
-                table_widget.setColumnWidth(column, int(
-                    property_excel_pvr.colWidth[column]))  # Здесь задайте требуемую ширину столбца
-        well_data.pause = True
 
     def create_short_plan(self, wb2, plan_short):
         from work_py.descent_gno import TabPage_Gno
@@ -2635,7 +2629,8 @@ class MyWindow(MyMainWindow):
             try:
                 a = well_data.dict_perforation_short
                 filter_list_pressuar = list(
-                    filter(lambda x: type(x) in [int, float], list(well_data.dict_perforation_short[plast]["давление"])))
+                    filter(lambda x: type(x) in [int, float],
+                           list(well_data.dict_perforation_short[plast]["давление"])))
                 # print(f'фильтр -{filter_list_pressuar}')
                 if filter_list_pressuar:
                     pressur_set.add(f'{plast[:4]} - {filter_list_pressuar}')
@@ -2776,17 +2771,18 @@ if __name__ == "__main__":
 
     try:
         well_data.connect_in_base = connect_to_database('well_data')
+
         if well_data.connect_in_base is False:
             QMessageBox.information(None, 'Проверка соединения',
-                                          'Проверка показало что с облаком соединения нет, '
-                                          'будет использована локальная база данных')
+                                    'Проверка показало что с облаком соединения нет, '
+                                    'будет использована локальная база данных')
         MyWindow.login_window = LoginWindow()
         MyWindow.login_window.show()
         MyMainWindow.pause_app()
         well_data.pause = False
     except Exception as e:
         QMessageBox.warning(None, 'КРИТИЧЕСКАЯ ОШИБКА',
-                                  f'Критическая ошибка, смотри в лог {type(e).__name__}\n\n{str(e)}')
+                            f'Критическая ошибка, смотри в лог {type(e).__name__}\n\n{str(e)}')
 
     # if well_data.connect_in_base:
     #     app2 = UpdateChecker()

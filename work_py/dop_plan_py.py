@@ -74,6 +74,9 @@ class TabPageDp(QWidget):
         self.skm_interval_label = QLabel('интервалы \nскреперования')
         self.skm_interval_edit = QLineEdit(self)
 
+        self.raiding_interval_label = QLabel('интервалы \n Райбирования')
+        self.raiding_interval_edit = QLineEdit(self)
+
         self.table_name = ''
 
         self.fluid_label = QLabel("уд.вес жидкости глушения", self)
@@ -139,8 +142,10 @@ class TabPageDp(QWidget):
         self.grid.addWidget(self.template_depth_edit, 7, 1)
         self.grid.addWidget(self.template_lenght_label, 6, 2)
         self.grid.addWidget(self.template_lenght_edit, 7, 2)
-        self.grid.addWidget(self.skm_interval_label, 8, 1, 1, 3)
-        self.grid.addWidget(self.skm_interval_edit, 9, 1, 1, 3)
+        self.grid.addWidget(self.skm_interval_label, 8, 1, 1, 2)
+        self.grid.addWidget(self.skm_interval_edit, 9, 1, 1, 2)
+        self.grid.addWidget(self.raiding_interval_label, 8, 3, 1, 3)
+        self.grid.addWidget(self.raiding_interval_edit, 9, 3, 1, 3)
         self.grid.addWidget(self.change_pvr_combo_label, 10, 1)
         self.grid.addWidget(self.change_pvr_combo, 11, 1)
 
@@ -343,7 +348,7 @@ class TabPageDp(QWidget):
             skm_interval = ''
 
             try:
-                asd = well_data.skm_interval
+
                 if len(well_data.skm_interval) != 0:
                     for roof, sole in well_data.skm_interval:
                         if f'{roof}-{sole}' not in skm_interval:
@@ -352,7 +357,21 @@ class TabPageDp(QWidget):
                 QMessageBox.warning(self, 'Ошибка', f'Не получилось сохранить данные скреперования '
                                                     f'{type(e).__name__}\n\n{str(e)}')
 
+            raiding_interval = ''
+
+            try:
+
+                if len(well_data.ribbing_interval) != 0:
+                    asddfg = well_data.ribbing_interval
+                    for roof, sole in well_data.ribbing_interval:
+                        if f'{roof}-{sole}' not in raiding_interval:
+                            raiding_interval += f'{roof}-{sole}, '
+            except Exception as e:
+                QMessageBox.warning(self, 'Ошибка', f'Не получилось сохранить данные Райбирования '
+                                                    f'{type(e).__name__}\n\n{str(e)}')
+
             self.skm_interval_edit.setText(skm_interval[:-2])
+            self.raiding_interval_edit.setText(raiding_interval[:-2])
             self.current_bottom_edit.setText(str(well_data.current_bottom))
             self.fluid_edit.setText(str(well_data.fluid_work))
             if well_data.column_additional:
@@ -774,6 +793,7 @@ class DopPlanWindow(MyMainWindow):
                 template_depth_addition_edit = current_widget.template_depth_addition_edit.text()
                 template_lenght_addition_edit = current_widget.template_lenght_addition_edit.text()
             skm_interval_edit = current_widget.skm_interval_edit.text()
+            raiding_interval_edit = current_widget.raiding_interval_edit.text()
 
             if current_bottom == '' or fluid == '' or work_earlier == '' or \
                     template_depth_edit == '' or template_lenght_edit == '':
@@ -835,12 +855,41 @@ class DopPlanWindow(MyMainWindow):
             except:
                 QMessageBox.warning(self, 'Ошибка',
                                           'в интервале скреперования отсутствует корректные интервалы скреперования')
+                return
+
+            try:
+                raiding_interval = []
+                if ',' in raiding_interval_edit:
+                    for skm in raiding_interval_edit.split(','):
+                        if '-' in skm:
+                            raiding_interval.append(list(map(int, skm.split('-'))))
+                else:
+                    if '-' in raiding_interval_edit:
+                        raid = raiding_interval_edit.split('-')
+                        raiding_interval.append(list(map(int,  raid)))
+
+                raiding_interval_new = merge_overlapping_intervals(raiding_interval)
+
+                well_data.ribbing_interval = raiding_interval_new
+
+            except Exception as e:
+                QMessageBox.warning(self, 'Ошибка',
+                                          f'в интервале райбирования отсутствует корректные интервалы '
+                                          f' {e}')
+                return
 
             if len(well_data.skm_interval) == 0:
                 mes = QMessageBox.question(self, 'Ошибка',
                                            'Интервалы скреперования отсутствуют, так ли это?')
                 if mes == QMessageBox.StandardButton.No:
                     return
+
+            if len(well_data.ribbing_interval) == 0:
+                mes = QMessageBox.question(self, 'Ошибка',
+                                           'Интервалы Райбирования отсутствуют, так ли это?')
+                if mes == QMessageBox.StandardButton.No:
+                    return
+
             well_data.count_template = 1
             if well_data.data_in_base:
 
@@ -1154,7 +1203,7 @@ class DopPlanWindow(MyMainWindow):
             if well_data.work_plan in ['dop_plan', 'dop_plan_in_base']:
                 DopPlanWindow.insert_data_dop_plan(self, result, paragraph_row)
             elif well_data.work_plan == 'plan_change':
-                DopPlanWindow.insert_data_plan(self, result)
+                DopPlanWindow.insert_data_dop_plan(self, result, 1)
             well_data.data_well_is_True = True
 
         else:
@@ -1165,9 +1214,10 @@ class DopPlanWindow(MyMainWindow):
         return
 
     def insert_data_dop_plan(self, result, paragraph_row):
-
-        if len(result) < paragraph_row-1:
-            QMessageBox.warning(self, 'Ошибка', f'В плане работ только {len(result)} пункта')
+        paragraph_row = paragraph_row - 1
+        aaas = len(result)
+        if len(result) <= paragraph_row:
+            QMessageBox.warning(self, 'Ошибка', f'В плане работ только {len(result)} пунктов')
             return
 
         well_data.current_bottom = result[paragraph_row][1]
@@ -1198,39 +1248,11 @@ class DopPlanWindow(MyMainWindow):
         well_data.problemWithEk_diametr = result[paragraph_row][14]
         well_data.dict_perforation_short = json.loads(result[paragraph_row][2])
 
-        definition_plast_work(None)
+        try:
 
-    def insert_data_plan(self, result):
-        well_data.data_list = []
-        well_data.fluid = float(result[0][7][:4].replace('г', ''))
-
-
-        for ind, row in enumerate(result):
-            if ind == 1:
-                well_data.bottom = row[1]
-                well_data.category_pressuar2 = row[8]
-                well_data.category_h2s_2 = row[9]
-                well_data.gaz_f_pr_2 = row[10]
-
-                well_data.plast_work_short = json.dumps(row[3], ensure_ascii=False)
-
-            data_list = []
-            for index, data in enumerate(row):
-                if index == 6:
-                    if data == 'false' or data == 0 or data == '0':
-                        data = False
-                    else:
-                        data = True
-                data_list.append(data)
-            well_data.data_list.append(data_list)
-        well_data.current_bottom = result[ind][1]
-        well_data.dict_perforation = json.loads(result[ind][2])
-
-        well_data.plast_all = json.loads(result[ind][3])
-        well_data.plast_work = json.loads(result[ind][4])
-        well_data.leakage = json.loads(result[ind][5])
-        well_data.dict_perforation_short = json.loads(result[ind][2])
-
+            well_data.ribbing_interval = json.loads(result[paragraph_row][15])
+        except:
+            pass
 
         definition_plast_work(None)
 
@@ -1241,3 +1263,14 @@ class DopPlanWindow(MyMainWindow):
                       'Мастер КРС', None]]
 
         return krs_begin
+
+
+if __name__ == "__main__":
+    import sys
+
+    app = QApplication(sys.argv)
+    # app.setStyleSheet()
+
+    window = DopPlanWindow(1, 1, 1)
+    window.show()
+    sys.exit(app.exec_())

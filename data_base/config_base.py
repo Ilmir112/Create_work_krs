@@ -1,6 +1,7 @@
 import os
 import sys
 
+from PyQt5.QtWidgets import QMessageBox
 from dotenv import load_dotenv
 import psycopg2
 
@@ -31,7 +32,7 @@ def connect_to_database(DB_NAME):
 
         return connection
     except Exception as e:
-        print(f"Ошибка подключения к базе данных: {e}")
+        QMessageBox.warning(None, 'Ошибка', f'Ошибка подключения к базе {type(e).__name__}\n\n{str(e)}')
         return None
 
 # print(connect_to_database(DB_NAME))

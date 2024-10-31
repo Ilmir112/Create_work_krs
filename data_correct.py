@@ -798,9 +798,7 @@ class DataWindow(MyMainWindow):
         dinamic_level = self.tabWidget.currentWidget().dinamic_level_edit_type.text()
         curator = str(self.tabWidget.currentWidget().curator_Combo.currentText())
 
-        question = QMessageBox.question(self, 'выбор куратора', f'Куратор ремонта сектор {curator}, верно ли?')
-        if question == QMessageBox.StandardButton.No:
-            return
+
 
         if curator == 'ОР':
             expected_Q_edit = self.tabWidget.currentWidget().expected_Q_edit.text()
@@ -846,6 +844,10 @@ class DataWindow(MyMainWindow):
                     self.tabWidget.currentWidget().labels_sucker_po[1][0].text()] = self.if_None(
                     self.tabWidget.currentWidget().labels_sucker_po[1][1].text())
 
+        question = QMessageBox.question(self, 'выбор куратора', f'Куратор ремонта сектор {curator}, верно ли?')
+        if question == QMessageBox.StandardButton.No:
+            return
+
         close_file = True
 
         if any([self.ifNum(data_well) is False or data_well in ['не корректно', 0, 'отсут'] for data_well in
@@ -853,15 +855,25 @@ class DataWindow(MyMainWindow):
             QMessageBox.information(self, 'Внимание', 'Не все поля в данных колонне соответствуют значениям')
             close_file = False
 
+
         elif float(bottomhole_artificial) > 10000 or float(bottomhole_drill) > 10000:
             QMessageBox.information(self, 'Внимание', 'Забой не корректный')
             close_file = False
 
         elif any([self.ifNum(data_well) is False for data_well in
                   [column_additional_diametr, column_additional_wall_thickness,
-                   shoe_column_additional, head_column_additional]]) and well_data.column_additional is True:
+                   shoe_column_additional, head_column_additional]]) and well_data.column_additional:
             QMessageBox.information(self, 'Внимание', 'Не все поля в доп колонне соответствуют значениям')
             close_file = False
+        elif well_data.column_additional:
+
+            if any([70 > float(column_additional_diametr),   float(column_additional_diametr) > 150,
+                    5 > float(column_additional_wall_thickness), float(column_additional_wall_thickness) > 13,
+                    5 > float(column_conductor_wall_thickness), float(column_conductor_wall_thickness) > 13,
+                    5 > float(column_wall_thickness), float(column_wall_thickness) > 13]):
+                QMessageBox.information(self, 'Внимание', 'Проверьте толщину колонны')
+                close_file = False
+
         elif self.ifNum(bottomhole_artificial) is False \
                 or self.ifNum(bottomhole_drill) is False \
                 or self.ifNum(current_bottom) is False \

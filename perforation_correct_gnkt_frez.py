@@ -215,6 +215,7 @@ class PerforationCorrectGnktFrez(MyMainWindow):
             dict_ports.setdefault(manufacturer, {}).setdefault(type_column, {}).setdefault(
                 f'№{index + 1}', {}).setdefault('тип', type_sanddles)
         # print(dict_ports)
+        self.dict_ports = dict_ports
 
         well_data.pause = False
         self.close()

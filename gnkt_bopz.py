@@ -11,6 +11,8 @@ from work_py.acid_paker import CheckableComboBox, AcidPakerWindow
 from gnkt_data import gnkt_data
 from collections import namedtuple
 
+from work_py.gnkt_grp_work import GnktModel
+
 
 class TabPage_gnkt(QWidget):
 
@@ -82,10 +84,6 @@ class TabPage_gnkt(QWidget):
 
         self.fluid_project_edit.setValidator(self.validator_float)
 
-        self.distance_pntzh_label = QLabel('Расстояние  до ПНТЖ', self)
-        self.distance_pntzh_edit = QLineEdit(self)
-        self.distance_pntzh_edit.setValidator(self.validator_int)
-
         self.grid = QGridLayout(self)
 
         self.grid.addWidget(self.plast_label, 0, 1)
@@ -121,8 +119,7 @@ class TabPage_gnkt(QWidget):
         self.grid.addWidget(self.fluid_project_label, 8, 1)
         self.grid.addWidget(self.fluid_project_edit, 9, 1)
 
-        self.grid.addWidget(self.distance_pntzh_label, 10, 1, 1, 3)
-        self.grid.addWidget(self.distance_pntzh_edit, 11, 1, 1, 3)
+
 
         self.acid_edit.currentTextChanged.connect(self.update_sko_type)
         self.plast_combo.combo_box.currentTextChanged.connect(self.update_plast_edit)
@@ -177,17 +174,17 @@ class TabWidget(QTabWidget):
         self.addTab(TabPage_gnkt(self), 'ГНКТ БОПЗ')
 
 
-class GnktBopz(MyMainWindow):
+class GnktBopz(GnktModel):
 
-    def __init__(self, table_widget, gnkt_number_combo, fluid_edit, parent=None): #
+    def __init__(self, table_widget, data_gnkt, parent=None): #
         super(GnktBopz, self).__init__()
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
 
         self.work_plan = 'gnkt_bopz'
         self.paker_select = None
-        self.gnkt_number_combo = gnkt_number_combo
-        self.fluid_edit = fluid_edit
+        self.data_gnkt = data_gnkt
+        self.fluid_edit = self.data_gnkt.fluid_edit
 
         self.table_widget = table_widget
         self.tabWidget = TabWidget()
@@ -201,91 +198,80 @@ class GnktBopz(MyMainWindow):
 
     def add_work(self):
         try:
-            roof_plast = float(self.tabWidget.currentWidget().roof_edit.text())
-            sole_plast = float(self.tabWidget.currentWidget().sole_edit.text())
-            drilling_contractor_combo = self.tabWidget.currentWidget().drilling_contractor_combo.currentText()
-            need_drilling_mud_combo = str(self.tabWidget.currentWidget().need_drilling_mud_combo.currentText())
-            if need_drilling_mud_combo == '':
+            self.roof_plast = float(self.tabWidget.currentWidget().roof_edit.text())
+            self.sole_plast = float(self.tabWidget.currentWidget().sole_edit.text())
+            self.drilling_contractor_combo = self.tabWidget.currentWidget().drilling_contractor_combo.currentText()
+            self.need_drilling_mud_combo = str(self.tabWidget.currentWidget().need_drilling_mud_combo.currentText())
+            if self.need_drilling_mud_combo == '':
                 return
-            elif need_drilling_mud_combo == 'Нужно':
+            elif self.need_drilling_mud_combo == 'Нужно':
                 well_data.bur_rastvor = self.tabWidget.currentWidget().acid_proc_edit.text()
 
-            volume_drilling_mud_edit = float(self.tabWidget.currentWidget().volume_drilling_mud_edit.text())
-            acid_true_edit = str(self.tabWidget.currentWidget().acid_true_edit.currentText())
-            acid_edit = self.tabWidget.currentWidget().acid_edit.currentText()
+            self.volume_drilling_mud_edit = float(self.tabWidget.currentWidget().volume_drilling_mud_edit.text())
+            self.acid_true_edit = str(self.tabWidget.currentWidget().acid_true_edit.currentText())
+            self.acid_edit = self.tabWidget.currentWidget().acid_edit.currentText()
 
-            acid_volume_edit = float(self.tabWidget.currentWidget().acid_volume_edit.text().replace(',', '.'))
-            acid_proc_edit = int(self.tabWidget.currentWidget().acid_proc_edit.text().replace(',', '.'))
-            pressure_edit = int(self.tabWidget.currentWidget().pressure_edit.text())
-            plast_combo = str(self.tabWidget.currentWidget().plast_combo.combo_box.currentText())
-            self.distance = self.tabWidget.currentWidget().distance_pntzh_edit.text()
-            fluid_project = self.tabWidget.currentWidget().fluid_project_edit.text().replace(',', '.')
-            if fluid_project == "":
-                mes = QMessageBox.critical(self, "Ошибка", "Нужно указать расчетный ЖГС")
+            self.acid_volume_edit = float(self.tabWidget.currentWidget().acid_volume_edit.text().replace(',', '.'))
+            self.acid_proc_edit = int(self.tabWidget.currentWidget().acid_proc_edit.text().replace(',', '.'))
+            self.pressure_edit = int(self.tabWidget.currentWidget().pressure_edit.text())
+            self.plast_combo = str(self.tabWidget.currentWidget().plast_combo.combo_box.currentText())
+
+            self.fluid_project = self.tabWidget.currentWidget().fluid_project_edit.text().replace(',', '.')
+            if self.fluid_project == "":
+                QMessageBox.critical(self, "Ошибка", "Нужно указать расчетный ЖГС")
                 return
-            if 1.01 > float(fluid_project) > 1.64:
-                mes = QMessageBox.critical(self, "Ошибка", "расчетный ЖГС не корректен")
+            if 1.01 > float(self.fluid_project) > 1.64:
+                QMessageBox.critical(self, "Ошибка", "расчетный ЖГС не корректен")
                 return
-            if drilling_contractor_combo == '':
-                mes = QMessageBox.critical(self, "Ошибка", "Нужно указать подрядчика по бурению")
+            if self.drilling_contractor_combo == '':
+                QMessageBox.critical(self, "Ошибка", "Нужно указать подрядчика по бурению")
                 return
-            if self.distance == '':
-                mes = QMessageBox.critical(self, "Ошибка", "Нужно указать расстояние до ПНТЖ")
-                return
+
         except:
             QMessageBox.information(self, 'Ошибка', 'Введите корректные данные')
 
-        if acid_edit == 'ВТ':
+        if self.acid_edit == 'ВТ':
             self.vt = self.tabWidget.currentWidget().sko_vt_edit.text()
             if self.vt == '':
                 mes = QMessageBox.critical(self, "Ошибка", "Нужно расписать объемы и вид кислоты")
                 return
 
-        work_list = self.gnkt_work(
-            roof_plast, sole_plast, need_drilling_mud_combo, volume_drilling_mud_edit, acid_true_edit,
-           acid_edit, acid_volume_edit, acid_proc_edit, pressure_edit,
-           plast_combo, self.gnkt_number_combo, self.fluid_edit, drilling_contractor_combo, fluid_project)
+        work_list = self.gnkt_work(self.data_gnkt)
 
         well_data.pause = False
         self.close()
         return work_list
 
-    def gnkt_work(self,
-                  roof_plast, sole_plast, need_drilling_mud_combo, volume_drilling_mud_edit, acid_true_edit,
-                  acid_edit, acid_volume_edit, acid_proc_edit, pressure_edit, plast_combo, gnkt_number_combo,
-                  fluid_work_insert, drilling_contractor_combo, fluid_project):
+    def gnkt_work(self, data_gnkt):
         from krs import volume_jamming_well, volume_pod_NKT
         from work_py.alone_oreration import volume_vn_nkt
 
-        block_gnvp_list = events_gnvp_frez(self.distance, float(fluid_work_insert))
+        block_gnvp_list = events_gnvp_frez(data_gnkt.distance_pntzh, float(self.fluid_edit))
 
-        if gnkt_number_combo == 'ГНКТ №2':
-            gnkt_number = gnkt_data.gnkt_2
-        elif gnkt_number_combo == 'ГНКТ №1':
-            gnkt_number = gnkt_data.gnkt_1
 
-        V_gntk = round(gnkt_number.gnkt_length * 0.74 / 1000, 1)
+        volume_gntk = round(float(data_gnkt.lenght_gnkt_edit) * 0.74 / 1000, 1)
 
         shoe_nkt = sum(list(well_data.dict_nkt.values()))
 
 
-        fluid_work, well_data.fluid_work_short = GnoWindow.calc_work_fluid(fluid_work_insert)
+        fluid_work, well_data.fluid_work_short = GnoWindow.calc_work_fluid(self.fluid_edit)
 
-        if need_drilling_mud_combo == 'нужно':
-            volume_drilling_mud_edit = volume_drilling_mud_edit
+        if self.need_drilling_mud_combo == 'нужно':
+            self.volume_drilling_mud_edit = self.volume_drilling_mud_edit
 
-        volume_well_jumping = round(volume_drilling_mud_edit*1.2, 1)
+        volume_well_jumping = round(self.volume_drilling_mud_edit*1.2, 1)
         volume_vn_nkt = round(volume_vn_nkt(well_data.dict_nkt) * 1.2, 1)
-        volume_well_at_shoe = round(volume_jamming_well(self, shoe_nkt) * 1.2, 1) - volume_vn_nkt
-        volume_current_shoe_nkt = round(volume_pod_NKT(self)*1.2, 1) - volume_vn_nkt
+        volume_well_at_shoe = round(volume_jamming_well(self, shoe_nkt) * 1.2 - volume_vn_nkt, 1)
+        volume_current_shoe_nkt = round(volume_pod_NKT(self)*1.2 - volume_vn_nkt, 1)
 
         gnkt_bopz = [
             [None, 'ЦЕЛЬ ПРОГРАММЫ', None, None, None, None, None, None, None, None, None, None],
             [None, 1,
-             f'Спуск ГНКТ. ВЫМЫВ БУРОВОГО РАСТВОРА в V-{volume_drilling_mud_edit}м3 ({drilling_contractor_combo}). '
+             f'Спуск ГНКТ. ВЫМЫВ БУРОВОГО РАСТВОРА в V-{self.volume_drilling_mud_edit}м3 ({self.drilling_contractor_combo}). '
              f'Нормализация забоя до гл. {well_data.current_bottom}м. '
-             f'Проведение кислотной обработки {acid_proc_edit}% {acid_edit} в V={acid_volume_edit}м3. Глушение скважины '
-             f'{fluid_project}г/см3 в объеме {volume_well_jumping}м3',
+             f'Проведение кислотной обработки {self.acid_proc_edit}% {self.acid_edit} в V={self.acid_volume_edit}м3. '
+             f'Глушение скважины '
+             f'{self.fluid_project}г/см3 в объеме {volume_well_jumping}м3',
              None, None, None, None, None, None, None, None, None],
             [None, 2,
              'Внимание: Для проведения технологических операций завоз жидкости производить с ПНТЖ, согласованного с '
@@ -326,10 +312,11 @@ class GnktBopz(MyMainWindow):
              'Собрать Компоновку Низа Колонны-1 далее КНК-1: (насадка-промывочная D-38мм + сдвоенный обратный клапан.)',
              None, None, None, None, None, None, None, None, 'Мастер ГНКТ'],
             [None, 9,
-             'Произвести монтаж 4-х секционного превентора БП 80-70.00.00.000 (700атм) и инжектора на устье скважины '
-             'согласно «Схемы обвязки №5 устья противовыбросовым оборудованием при производстве работ по промывке '
-             'скважины с установкой «ГНКТ» утвержденная главным инженером  {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г. Произвести обвязку установки '
-             'ГНКТ, насосно-компрессорного агрегата, желобной циркуляционной системы.',
+             f'Произвести монтаж 4-х секционного превентора БП 80-70.00.00.000 (700атм) и инжектора на устье скважины '
+             f'согласно «Схемы обвязки №5 устья противовыбросовым оборудованием при производстве работ по промывке '
+             f'скважины с установкой «ГНКТ» утвержденная главным инженером  '
+             f'{well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г. Произвести обвязку установки '
+             f'ГНКТ, насосно-компрессорного агрегата, желобной циркуляционной системы.',
              None, None, None, None, None, None, None, None, 'Мастер ГНКТ'],
             [None, 10,
              'Внимание: Все требования ПБ и ОТ должны быть доведены до сведения работников, персонал должен быть '
@@ -365,19 +352,21 @@ class GnktBopz(MyMainWindow):
              f' жидкости в обратной ёмкости на наличие мех. примесей. Скорость спуска при промывке НКТ до гл.{shoe_nkt}м '
              f'не более 5м/мин. Контрольная проверка веса при вымыве  - через каждые 100м промывки на высоту не менее '
              f'5-10м со скоростью подъёма ГНКТ при проверке веса не более 5м/мин. Внимание: после промывки НКТ до '
-             f'гл.{shoe_nkt}м приподнять ГТ на 20м выше пакера и промыться до выхода чистой тех. жидкости (без мех.примесей)'
+             f'гл.{shoe_nkt}м приподнять ГТ на 20м выше пакера и промыться до выхода чистой '
+             f'тех. жидкости (без мех.примесей)'
              f' и только после этого продолжить промывку ниже пакера',
              None, None, None, None, None, None, None, None, 'Мастер ГНКТ'],
             [None, 23,
              f'Произвести допуск компоновки с промывкой со скоростью 2 м/мин, с проверкой веса на подъём со скоростью '
-             f'не более 3 м/мин через каждые 10-20м интервала промывки до глубины {well_data.current_bottom}м. В случае отсутствия проходки, '
+             f'не более 3 м/мин через каждые 10-20м интервала промывки до глубины {well_data.current_bottom}м. '
+             f'В случае отсутствия проходки, '
              f'согласовать максимально достигнутый забой с Заказчиком.',
              None, None, None, None, None, None, None, None, 'Мастер ГНКТ'],
             [None, 'Вымыв бурового раствора', None, None, None, None, None, None, None, None, None, None],
             [None, 24,
              'Подать заявку не позднее, чем за 12ч., и не ранее, чем за 24ч. до требуемого времени вывоза '
-             f'на вывоз бурового раствора в  объеме {volume_drilling_mud_edit}м3 подрядчику по бурению '
-             f'({drilling_contractor_combo}) \nПРИМЕЧАНИЕ: \n-в '
+             f'на вывоз бурового раствора в  объеме {self.volume_drilling_mud_edit}м3 подрядчику по бурению '
+             f'({self.drilling_contractor_combo}) \nПРИМЕЧАНИЕ: \n-в '
              'эксплуатационном бурении, если на соседней скважине куста находится буровая бригада, заявку на вывоз ОБР '
              'следует передать мастеру буровой бригады, предварительно получив визу Бурового супервайзера;\n-Буровой '
              'мастер обязан принять заявку для исполнения либо принять ОБР в емкость для сбора ОБР, либо в шламовый '
@@ -388,7 +377,7 @@ class GnktBopz(MyMainWindow):
              None, None, None, None, None, None,
              None, None, 'Мастер ГНКТ'],
             [None, 26,
-             f'Произвести Вымыв бурового раствора по большому затрубу в объеме {volume_drilling_mud_edit}м3 тех '
+             f'Произвести Вымыв бурового раствора по большому затрубу в объеме {self.volume_drilling_mud_edit}м3 тех '
              f'жидкостью уд.весом {fluid_work} до '
              f'чистой жидкости. Произвести вымыв бурового раствора по малому затрубу в объеме '
              f'{round(shoe_nkt*3/1000, 1)}м3',
@@ -397,16 +386,16 @@ class GnktBopz(MyMainWindow):
              None, None, None, None, None, None, None, None, 'Мастер ГНКТ'],
             [None, 'КИСЛОТНАЯ ОРАБОТКА', None, None, None, None, None, None, None, None, None, None],
             [None, 29,
-             f'Произвести БСКО пласта {plast_combo} в интервале {roof_plast}-{sole_plast}м в объеме '
-             f'{acid_volume_edit}м3 не превышая давление закачки 80атм, по тех. плану подрядчика по ОПЗ ООО  '
+             f'Произвести БСКО пласта {self.plast_combo} в интервале {self.roof_plast}-{self.sole_plast}м в объеме '
+             f'{self.acid_volume_edit}м3 не превышая давление закачки 80атм, по тех. плану подрядчика по ОПЗ ООО  '
              f'"Крезол-НефтеСервис": установить КНК-1 на глубину {well_data.current_bottom-2}м (2м выше текущего забоя).'
              f' На глубине {well_data.current_bottom-2}м начать закачку кислотного раствора на циркуляции (при '
-             f'открытом малом затрубе) в объеме {V_gntk}м3 (Vгнкт), закрыть малый затруб и продолжить закачку с '
+             f'открытом малом затрубе) в объеме {volume_gntk}м3 (Vгнкт), закрыть малый затруб и продолжить закачку с '
              f'продавкой на пласт (при закрытом малом затрубе), оставшегося кислотного состава + тех.жидкость в '
-             f'объеме {V_gntk + 0.5}м3 с одновременным подъемом КНК до гл. {roof_plast}м, равномерно распределяя '
+             f'объеме {volume_gntk + 0.5}м3 с одновременным подъемом КНК до гл. {self.roof_plast}м, равномерно распределяя '
              f'весь объем кислоты по всему интервалу обработки. Закачку кислоты в пласт производить при давлении '
-             f'закачки не более {pressure_edit}атм, при росте давления более '
-             f'{pressure_edit}атм, Подъём КНК-1 на безопасное расстояние (не глубже {shoe_nkt-20}м). дальнейшие работы '
+             f'закачки не более {self.pressure_edit}атм, при росте давления более '
+             f'{self.pressure_edit}атм, Подъём КНК-1 на безопасное расстояние (не глубже {shoe_nkt-20}м). дальнейшие работы '
              f'согласовать с Закачиком. Составить акт',
              None, None, None, None, None, None, None, None, 'Мастер ГНКТ'],
             [None, 31,
@@ -426,7 +415,7 @@ class GnktBopz(MyMainWindow):
              f'жидкостью уд.весом {fluid_work}. Произвести перерасчет забойного давления, Согласовать с заказчиком '
              f'глушение скважин и необходимый удельный вес жидкости глушения, допустить КНК до '
              f'{well_data.current_bottom}м. Произвести перевод на тех жидкость расчетного удельного веса '
-             f'(предварительно {fluid_project}г/см3) в объеме {volume_well_jumping}м3 '
+             f'(предварительно {self.fluid_project}г/см3) в объеме {volume_well_jumping}м3 '
              '((объем ствола э/к + объем открытого ствола и минут объем НКТ  + 20 % запаса), вывести циркуляцию '
              'с большого затруба  с ПРОТЯЖКОЙ ГНКТ СНИЗУ ВВЕРХ  с выходом циркуляции по большому затрубу до башмака '
              f'НКТ до гл. {shoe_nkt}м в объеме открытого ствола {volume_current_shoe_nkt}м3. '
@@ -495,7 +484,8 @@ class GnktBopz(MyMainWindow):
             [None, 38, 
              'ВНИМАНИЕ: При наличии посадок КНК - спуск производить с остановками для промежуточных '
              'промывок. В случае прихвата ГНКТ в скважине - проинформировсть ответственного представителя Заказчика и '
-             f'руководство ГНКТ {well_data.contractor}. Дальнейшие действия производить в присутствии представителя Заказчика '
+             f'руководство ГНКТ {well_data.contractor}. Дальнейшие действия производить в '
+             f'присутствии представителя Заказчика '
              'с составлением АКТа согласно "Плана-Схемы действий при прихватах ГНКТ" ТЕХНОЛОГИЧЕСКОЙ ИНСТРУКЦИИ ОАО '
              '«Башнефть добыча»', None, None, None, None, None, None, None, None, 
              'Мастер ГНКТ, предст.Заказчика Мастер по сложным работам ГНКТ'], 

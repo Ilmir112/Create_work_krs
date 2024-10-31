@@ -55,7 +55,7 @@ class TabPageDp(QWidget):
         # self.change_pvr_combo.currentTextChanged.connect(self.update_change_pvr)
         # self.change_pvr_combo.setCurrentIndex(1)
         # self.change_pvr_combo.setCurrentIndex(0)
-        if well_data.work_plan not in ['dop_plan_in_base']:
+        if self.work_plan not in ['dop_plan_in_base']:
             self.well_number_edit.setText(f'{well_data.well_number._value}')
 
         if well_data.data_in_base:
@@ -97,8 +97,8 @@ class TabWidget(QTabWidget):
 
 class CorrectPlanWindow(MyMainWindow):
     def __init__(self, ins_ind, table_widget, work_plan, ws=None, parent=None):
-
         super(CorrectPlanWindow, self).__init__()
+
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
         self.ins_ind = ins_ind
@@ -291,55 +291,9 @@ class CorrectPlanWindow(MyMainWindow):
                             ws2.cell(row=i, column=j).alignment = Alignment(wrap_text=True, horizontal='center',
                                                                             vertical='center')
 
-    def insert_data_dop_plan(self, result, paragraph_row):
-        try:
-            paragraph_row = paragraph_row - 1
-        except:
-            paragraph_row = 1
-        if len(result) < paragraph_row:
-            QMessageBox.warning(self, 'Ошибка', f'В плане работ только {len(result)} пункта')
-            return
 
-        well_data.current_bottom = result[paragraph_row][1]
 
-        well_data.dict_perforation = json.loads(result[paragraph_row][2])
-        well_data.plast_all = json.loads(result[paragraph_row][3])
-        well_data.plast_work = json.loads(result[paragraph_row][4])
-        well_data.leakage = json.loads(result[paragraph_row][5])
-        if result[paragraph_row][6] == 'true':
-            well_data.column_additional = True
-        else:
-            well_data.column_additional = False
 
-        well_data.fluid_work = result[paragraph_row][7]
-
-        well_data.category_pressuar = result[paragraph_row][8]
-        well_data.category_h2s = result[paragraph_row][9]
-        well_data.category_gf = result[paragraph_row][10]
-        try:
-            well_data.template_depth, well_data.template_lenght, well_data.template_depth_addition, \
-            well_data.template_lenght_addition = json.loads(result[paragraph_row][11])
-        except:
-            well_data.template_depth = result[paragraph_row][11]
-        well_data.skm_interval = json.loads(result[paragraph_row][12])
-        well_data.problemWithEk_depth = result[paragraph_row][13]
-        well_data.problemWithEk_diametr = result[paragraph_row][14]
-        well_data.dict_perforation_short = json.loads(result[paragraph_row][2])
-
-    def insert_data_plan(self, result):
-        well_data.data_list = []
-        for row in result:
-            data_list = []
-            for index, data in enumerate(row[:-1]):
-                if index == 6:
-                    if data == 'false' or data == 0 or data == '0':
-                        data = False
-                    else:
-                        data = True
-                data_list.append(data)
-            well_data.data_list.append(data_list)
-
-        well_data.fluid_work_short = well_data.fluid_work_short
 
     def work_list(self, work_earlier):
         krs_begin = [[None, None,

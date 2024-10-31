@@ -5,7 +5,7 @@ import work_py.alone_oreration
 from krs import GnoWindow
 
 
-def gnkt_work(self, V_gntk, fluid_work_insert):
+def gnkt_work(self, volume_gntk, fluid_work_insert):
 
 
 

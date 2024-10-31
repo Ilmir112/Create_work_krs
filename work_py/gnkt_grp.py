@@ -2,9 +2,10 @@
 from datetime import datetime
 
 import psycopg2
-from PyQt5.QtGui import QIntValidator
-from PyQt5.QtWidgets import QInputDialog, QTabWidget, QWidget, QApplication, QLabel, \
+from PyQt5.QtGui import QIntValidator, QDoubleValidator
+from PyQt5.QtWidgets import QInputDialog, QTabWidget, QWidget, QApplication, \
     QLineEdit, QGridLayout, QComboBox, QMessageBox
+from openpyxl.workbook import Workbook
 
 from data_base.config_base import connect_to_database
 from main import MyMainWindow
@@ -23,61 +24,31 @@ from openpyxl.reader.excel import load_workbook
 from open_pz import CreatePZ
 
 
-from work_py.gnkt_grp_work import GnktOsvWindow2
+from work_py.gnkt_grp_work import GnktOsvWindow2, GnktModel
 from gnkt_bopz import GnktBopz
+from abc import ABC, abstractmethod
 
-
-class TabPageDp(QWidget):
+class TabPageAll(QWidget):
     def __init__(self, work_plan):
         super().__init__()
         self.work_plan = work_plan
 
         self.validator_int = QIntValidator(0, 8000)
-
-        self.gnkt_number_label = QLabel('Номер флота ГНКТ')
-        self.gnkt_number_combo = QComboBox(self)
-        self.gnkt_number_combo.addItems(gnkt_dict["Ойл-сервис"])
-
-        self.lenght_gnkt_label = QLabel('длина ГНКТ')
-        self.lenght_gnkt_edit = QLineEdit(self)
-        self.lenght_gnkt_edit.setValidator(self.validator_int)
-
-        self.iznos_gnkt_label = QLabel('Износ трубы')
-        self.iznos_gnkt_edit = QLineEdit(self)
+        self.validator_float = QDoubleValidator(0, 8000, 2)
+        self.init_it()
 
 
-        self.pipe_mileage_label = QLabel('Пробег трубы')
-        self.pipe_mileage_edit = QLineEdit(self)
 
-        self.pvo_number_label = QLabel('Номер ПВО')
-        self.pvo_number_edit = QLineEdit(self)
+    @abstractmethod
+    def init_it(self):
+        pass
 
-        self.previous_well_label = QLabel('Предыдущая скважина')
-        self.previous_well_combo = QComboBox(self)
-        well_previus_list = read_database_gnkt(well_data.contractor, self.gnkt_number_combo.currentText())
-        self.previous_well_combo.addItems(well_previus_list)
+class TabPageDp(TabPageAll):
+    def __init__(self, work_plan):
+        super().__init__()
+        self.work_plan = work_plan
 
-        self.current_bottom_label = QLabel('необходимый текущий забой')
-        self.current_bottom_edit = QLineEdit(self)
-        self.current_bottom_edit.setText(f'{well_data.current_bottom}')
-
-        self.fluid_label = QLabel("уд.вес жидкости глушения", self)
-        self.fluid_edit = QLineEdit(self)
-        if well_data.fluid_work == '':
-            self.fluid_edit.setText(f'{TabPageGno.calc_fluid(self.work_plan, well_data.current_bottom)}')
-        else:
-            self.fluid_edit.setText(f'{well_data.fluid_work}')
-
-        self.distance_pntzh_label = QLabel('Расстояние до ПНТЖ')
-        self.distance_pntzh_line = QLineEdit(self)
-        self.distance_pntzh_line.setValidator(self.validator_int)
-        self.osvoenie_label = QLabel('Необходимость освоения')
-        self.osvoenie_combo = QComboBox(self)
-        self.osvoenie_combo.addItems('Да', 'Нет')
-        self.fluid_project_label = QLabel('Расчетная ЖГС', self)
-        self.fluid_project_edit = QLineEdit(self)
-
-        self.fluid_project_edit.setValidator(self.validator_float)
+    def init_it(self):
 
         self.grid = QGridLayout(self)
         self.grid.addWidget(self.gnkt_number_label, 2, 2, 3, 1)
@@ -134,12 +105,13 @@ class TabWidget(QTabWidget):
         self.addTab(TabPageDp(work_plan), 'ГНКТ')
 
 
-class GnktOsvWindow(MyMainWindow):
-    wb = None
+class GnktOsvWindow(GnktModel):
+
 
     def __init__(self, sheet, table_title, table_schema, table_widget, work_plan):
         super().__init__()
-        from work_py.gnkt_frez import Work_with_gnkt
+
+        self.wb_gnkt = Workbook()
 
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
@@ -147,54 +119,13 @@ class GnktOsvWindow(MyMainWindow):
         self.table_widget = table_widget
         self.table_title = table_title
         self.table_schema = table_schema
-
-        self.dict_perforation = well_data.dict_perforation
-        if work_plan in ['gnkt_bopz']:
-            self.wb = load_workbook(f'{well_data.path_image}property_excel/template_gnkt_bopz.xlsx')
-        else:
-            self.wb = load_workbook(f'{well_data.path_image}property_excel/tepmpale_gnkt_osv_grp.xlsx')
-        GnktOsvWindow.wb = self.wb
-        self.ws_schema = self.wb.active
-
         self.work_plan = work_plan
+        self.sheet = sheet
+        self.data_gnkt = None
 
-        self.work_window = None
-        self.wb.sheetnames.insert(0, "Титульник")
-        self.ws_title = self.wb.create_sheet("Титульник", 0)
-        self.ws_work = self.wb.create_sheet(title="Ход работ")
+        self.work_with_excel()
 
-        Work_with_gnkt.create_title_list(self, self.ws_title)
-        bvo_int = 0
-        # if well_data.bvo:
-        #     bvo_int += 5
-        head = plan.head_ind(well_data.cat_well_min._value - 1 + bvo_int, well_data.cat_well_max._value + bvo_int)
-
-        plan.copy_true_ws(sheet, self.ws_title, head)
-
-        if self.work_window is None:
-            self.work_window = GnktOsvWindow2(self)
-            self.work_window.setWindowTitle("Данные по ГНКТ")
-            self.work_window.setGeometry(200, 400, 100, 400)
-            self.work_window.show()
-            self.pause_app()
-            well_data.pause = True
-
-            self.work_schema = self.work_window.schema_well(self.work_window.current_bottom_edit,
-                                                            self.work_window.fluid_edit, well_data.gnkt_number,
-                                                            self.work_window.gnkt_lenght,
-                                                            self.work_window.iznos_gnkt_edit,
-                                                            self.work_window.pvo_number,
-                                                            self.work_window.diametr_length,
-                                                            self.work_window.pipe_mileage_edit)
-
-            # print(self.work_schema)
-            self.work_window = None
-
-        else:
-            self.work_window.close()
-            self.work_window = None
-
-        self.copy_pvr(self.ws_schema, self.work_schema)
+        self.work_with_data_gnkt()
 
         for row_number, row in enumerate(self.ws_title.iter_rows(values_only=True)):
             for col_number, cell in enumerate(row):
@@ -213,55 +144,81 @@ class GnktOsvWindow(MyMainWindow):
                                                                                                         horizontal='left',
                                                                                                         vertical='center')
 
-        main.MyWindow.copy_pz(self, self.ws_title, table_title, self.work_plan, 13, 1)
-        main.MyWindow.copy_pz(self, self.ws_schema, table_schema, self.work_plan, 23, 2)
+        self.copy_pz(self.ws_title, table_title, self.work_plan, 13, 1)
+        self.copy_pz(self.ws_schema, table_schema, self.work_plan, 23, 2)
 
-        main.MyWindow.copy_pz(self, self.ws_work, table_widget, self.work_plan, 12, 3)
-        if self.work_plan == 'gnkt_opz':
-            if self.work_window is None:
-                self.work_window = GnktOpz(table_widget, well_data.gnkt_number, GnktOsvWindow2.fluid_edit)
-                self.work_window.show()
-                well_data.pause = True
-                self.pause_app()
+        self.copy_pz(self.ws_work, table_widget, self.work_plan, 12, 3)
 
-                work_well = self.work_window.add_work()
-                well_data.pause = True
-                self.work_window = None
-            else:
-                self.work_window.close()  # Close window.
-                self.work_window = None
+        work_well = self.select_work_plan_opz()
 
-        elif self.work_plan == 'gnkt_bopz':
-            if self.work_window is None:
-                self.work_window = GnktBopz(table_widget, well_data.gnkt_number, GnktOsvWindow2.fluid_edit)
-                self.work_window.show()
-                well_data.pause = True
-                self.pause_app()
-
-                work_well = self.work_window.add_work()
-                well_data.pause = True
-                self.work_window = None
-            else:
-                self.work_window.close()  # Close window.
-                self.work_window = None
-
-        elif self.work_plan == 'gnkt_after_grp':
-            work_well = self.gnkt_work(
-                GnktOsvWindow2.fluid_edit, well_data.pvo, GnktOsvWindow2.current_bottom_edit,
-                GnktOsvWindow2.osvoenie_combo_need)
         if work_well:
             self.populate_row(0, work_well, table_widget, self.work_plan)
             CreatePZ.add_itog(self, self.ws_work, self.table_widget.rowCount() + 1, self.work_plan)
 
-    def gnkt_work(self, fluid_work_insert, pvo_number_edit, current_bottom_edit, osvoenie_combo_need):
+
+
+
+    def select_work_plan_opz(self):
+        if self.work_plan == 'gnkt_opz':
+
+            self.data_gnkt_opz = GnktOpz(self.table_widget, self.data_gnkt.fluid_edit)
+            self.data_gnkt_opz.show()
+            well_data.pause = True
+            self.pause_app()
+
+            work_well = self.data_gnkt_opz.gnkt_work_opz(self.data_gnkt)
+            well_data.pause = True
+
+            self.data_gnkt_opz.close()  # Close window.
+
+
+        elif self.work_plan == 'gnkt_bopz':
+
+            self.data_gnkt_opz = GnktBopz(self.table_widget,
+                                          self.data_gnkt, self.data_gnkt.fluid_edit)
+            self.data_gnkt_opz.show()
+            well_data.pause = True
+            self.pause_app()
+
+            work_well = self.data_gnkt_opz.add_work()
+            well_data.pause = True
+            self.data_gnkt_opz.close()
+        elif self.work_plan == 'gnkt_after_grp':
+            work_well = self.gnkt_work(self.data_gnkt.fluid_edit, self.data_gnkt.current_bottom_edit)
+
+        return work_well
+    def work_with_excel(self):
+        from work_py.gnkt_frez import Work_with_gnkt
+
+        if self.work_plan in ['gnkt_bopz']:
+            self.wb_gnkt = load_workbook(f'{well_data.path_image}property_excel/template_gnkt_bopz.xlsx')
+        else:
+            self.wb_gnkt = load_workbook(f'{well_data.path_image}property_excel/tepmpale_gnkt_osv_grp.xlsx')
+
+
+        self.ws_schema = self.wb_gnkt.active
+
+        self.data_gnkt = None
+        self.wb_gnkt.sheetnames.insert(0, "Титульник")
+        self.ws_title = self.wb_gnkt.create_sheet("Титульник", 0)
+        self.ws_work = self.wb_gnkt.create_sheet("Ход работ", 2)
+
+
+        self.create_title_list(self.ws_title)
+        bvo_int = 0
+        # if well_data.bvo:
+        #     bvo_int += 5
+        head = plan.head_ind(well_data.cat_well_min._value - 1 + bvo_int, well_data.cat_well_max._value + bvo_int)
+
+        plan.copy_true_ws(self.sheet, self.ws_title, head)
+
+    def gnkt_work(self, fluid_work_insert, current_bottom_edit):
         from cdng import events_gnvp_frez
         from work_py.alone_oreration import volume_vn_nkt, volume_jamming_well, volume_pod_NKT
 
-        fluid_work, well_data.fluid_work_short = GnoWindow.calc_work_fluid(fluid_work_insert)
-        self.distance = self.tabWidget.currentWidget().distance_pntzh.text()
+        well_data.fluid_work, well_data.fluid_work_short = GnoWindow.calc_work_fluid(fluid_work_insert)
 
-
-        block_gnvp_list = events_gnvp_frez(self.distance, float(fluid_work_insert))
+        block_gnvp_list = events_gnvp_frez(self.data_gnkt.distance_pntzh, float(fluid_work_insert))
 
 
         if well_data.depth_fond_paker_do["do"] != 0:
@@ -296,7 +253,7 @@ class GnktOsvWindow(MyMainWindow):
             volume_current_shoe_nkt = round(volume_pod_NKT(self) * 1.2, 1) - volume_vn_nkt
 
             volume_str = 'Произвести замер избыточного давления в течении 2ч при условии заполнения ствола ствола ' \
-                         f'жидкостью уд.весом {fluid_work}. Произвести перерасчет забойного давления, Согласовать с заказчиком ' \
+                         f'жидкостью уд.весом {well_data.fluid_work}. Произвести перерасчет забойного давления, Согласовать с заказчиком ' \
                          f'глушение скважин и необходимый удельный вес жидкости глушения, допустить КНК до ' \
                          f'{well_data.current_bottom}м. Произвести перевод на тех жидкость расчетного удельного веса ' \
                          f' в объеме {volume_well_jumping}м3 ' \
@@ -329,7 +286,7 @@ class GnktOsvWindow(MyMainWindow):
             volume_well_jumping = round(volume_jamming_well(self, well_data.current_bottom) * 1.2, 1)
 
             volume_str = f'Произвести замер избыточного давления в течении 2ч при условии заполнения ствола ствола ' \
-                         f'жидкостью уд.весом {fluid_work}. Произвести перерасчет забойного давления, Согласовать с заказчиком ' \
+                         f'жидкостью уд.весом {well_data.fluid_work}. Произвести перерасчет забойного давления, Согласовать с заказчиком ' \
                          f'глушение скважин и необходимый удельный вес жидкости глушения, допустить КНК до ' \
                          f'{well_data.current_bottom}м. Произвести перевод на тех жидкость расчетного удельного веса ' \
                          f' в объеме {volume_well_jumping}м3 ' \
@@ -367,7 +324,7 @@ class GnktOsvWindow(MyMainWindow):
              None, None, None, None, None, None, None,
              'Мастер ГНКТ, состав бригады', None],
             [None, 3, 'Произвести завоз технологической жидкости в V не менее 10м3 '
-                      f'плотностью {fluid_work}. Солевой раствор солевой раствор в объеме ГНКТ',
+                      f'плотностью {well_data.fluid_work}. Солевой раствор солевой раствор в объеме ГНКТ',
              None, None, None, None, None, None, None,
              'Мастер ГНКТ, состав бригады', None],
             [None, 4, 'При наличии, согласно плана заказа Н2S, добавить в завезенную промывочную '
@@ -392,7 +349,7 @@ class GnktOsvWindow(MyMainWindow):
              None, None, None, None, None, None, None,
              'Мастер ГНКТ, бур-к КРС, машинист подъёмника, пред. УСРСиСТ', 0.5],
             [None, 10,
-             f'Произвести монтаж 4-х секционного превентора БП 80-70.00.00.000 (700атм) {pvo_number_edit} '
+             f'Произвести монтаж 4-х секционного превентора БП 80-70.00.00.000 (700атм) {self.data_gnkt.pvo_number} '
              f'и инжектора н'
              f'а устье скважины согласно «Схемы обвязки № 5 устья противовыбросовым оборудованием при '
              f'производстве работ по промывке скважины с установкой «ГНКТ» утвержденная главным '
@@ -509,18 +466,80 @@ class GnktOsvWindow(MyMainWindow):
                        f'с представителем Заказчика. При отсутствии нормализованного забоя на гл.{current_bottom_edit}м, '
                        f'по согласованию с Заказчиком, провести работы по нормализации забоя.',
              None, None, None, None, None, None, None,
-             'Мастер ГНКТ', 0.5],
-            [None, 29, f'Дальнейшие работы, согласовать с Заказчиком, по результам 1го цикла освоения: \n'
-                       f' проведение кислотной обработки 12% лимонной кислотой в V=3м3;\n'
-                       f'- прекращение / продолжение освоения (количество и продолжительность циклов);\n'
-                       f'- подтверждение / отмена проведения ГИС О.З.', 8],
+             'Мастер ГНКТ', 0.5]]
+        if self.data_gnkt.osvoenie_combo_need == 'Да':
+            osvoenie_list = [
+                [None, f'ОСВОЕНИЕ СКВАЖИНЫ', None,
+                 None, None, None, None, None, None, None,
+                 None, None],
+                [None, 29,
+                 f'Установить КНК-1 на гл.{niz_nkt - 20}м, произвести вывод на '
+                 f'режим мобильного азотного комплекса. Дождаться выхода пузыря азота. '
+                 f'В случае отсутствия выхода пузыря азота более 1-1.5 часа - начать постепенный приподъём ГНКТ, не '
+                 f'прекращая отдувки, до выхода пузыря азота. После получения прорыва азота и выхода пузыря - '
+                 f'произвести допуск ГНКТ с одновременной отдувкой азотом до гл. {current_bottom_edit}м',
+                 None, None, None, None, None, None, None,
+                 'Мастер ГНКТ', 1],
+                [None, 29,
+                 f'Произвести освоение скважины один цикл в течении 4х часов с расходом по азоту в процессе освоения: \n'
+                 f'Первый час освоения - расход азота не менее 14м3/мин; \n'
+                 f'Второй час освоения - расход азота не менее 16м3/мин; ',
+                 None, None, None, None, None, None, None,
+                 'Мастер ГНКТ', 4],
+                [None, 29,
+                 f'Последующие 2 часа освоения производить на выбранном оптимальном режиме освоения '
+                 f'(по согласованию с Заказчиком) позволяющим производить оптимальный отбор флюида из пласта. '
+                 f'В ПРОЦЕССЕ ОСВОЕНИЯ (не оставлять г/трубу без движения) ПРОИЗВОДИТЬ ПРИПОДЪЁМЫ '
+                 f'ГНКТ ЧЕРЕЗ 15-20 МИНУТ ВВЕРХ-ВНИЗ НА 20м. '
+                 f'В процессе освоения проводить замеры притока каждый час и общее количество '
+                 f'отобранной из пласта жидкости. В сводке отразить: процентное содержание нефти '
+                 f'в возвратной жидкости, средний приток пластового флюида, количество отобранной из '
+                 f'пласта жидкости. Отбор проб производить каждый  час. Пробы отбирать через пробоотборник, '
+                 f'расположенный согласно схеме обвязки устья. По отдельному запросу геологической службы, '
+                 f'пробы предоставлять оператору ЦДНГ для определения КВЧ и процентного содержания воды, '
+                 f'с составлением акта передачи проб.',
+                 None, None, None, None, None, None, None,
+                 'Мастер ГНКТ', None],
+                [None, f'ПОДТВЕРЖДЕНИЕ НОРМАЛИЗОВАННОГО ЗАБОЯ', None,
+                 None, None, None, None, None, None, None,
+                 None, None],
+                [None, 29, f'По окончании освоения, остановить закачку азота, '
+                           f'дождаться полного выхода азота из скважины и произвести тех.отстой '
+                           f'скважины для оседания твёрдых частиц – в течении 2 часов',
+                 None, None, None, None, None, None, None,
+                 'Мастер ГНКТ', 2],
+                [None, 29,
+                 f'По истечении 2х часов, произвести допуск КНК-1 на г/трубе в скважину '
+                 f'«без циркуляции» до гл. {current_bottom_edit}м. Забой должен соответствовать – {current_bottom_edit}м. '
+                 f'Составить АКТ на забой совмесно с представителем Заказчика. При отсутствии нормализованного забоя на '
+                 f'гл. {current_bottom_edit}м (по согласованию с Заказчиком) - провести работы по нормализации забоя.',
+                 None, None, None, None, None, None, None, 'Мастер ГНКТ', 0.5],
 
-            [None, 29, f'При наличии забоя на гл.{current_bottom_edit}м, '
+                [None, 29, f'Дальнейшие работы, согласовать с Заказчиком, по результам 1го цикла освоения: \n'
+                           f' проведение кислотной обработки ;\n'
+                           f'- прекращение / продолжение освоения (количество и продолжительность циклов);\n'
+                           f'- подтверждение / отмена проведения ГИС О.З.', 8],
+            ]
+            gnkt_opz.extend(osvoenie_list)
+
+        if self.data_gnkt.acids_work_combo == 'Да':
+            acid_sel, acid_sel_short, depth_fond_paker_do, acid_volume_edit = self.select_text_acid(self.data_gnkt)
+            work_list = self.work_opz_gnkt(acid_sel, acid_sel_short, depth_fond_paker_do, acid_volume_edit)
+
+            gnkt_opz.extend([['', 'По согласованию с заказчиком произвести следующие работы:',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ, представитель Заказчика', None]])
+
+            gnkt_opz.extend(work_list)
+
+
+        work_list = [
+                [None, 29, f'При наличии забоя на гл.{current_bottom_edit}м, '
                        f'по согласованию с Заказчиком: ',
              None, None, None, None, None, None, None,
              'Мастер ГНКТ', None],
             [None, 29, f'Произвести замер избыточного давления в течении 2ч при условии заполнения '
-                       f'ствола ствола жидкостью уд.весом {fluid_work}г/см3. Произвести перерасчет '
+                       f'ствола ствола жидкостью уд.весом {well_data.fluid_work}г/см3. Произвести перерасчет '
                        f'забойного давления, Согласовать с заказчиком глушение скважин и необходимый '
                        f'удельный вес жидкости глушения, допустить КНК до {current_bottom_edit}м ',
              None, None, None, None, None, None, None,
@@ -661,56 +680,8 @@ class GnktOsvWindow(MyMainWindow):
              None, None, None, None, None, None, None,
              'Мастер ГНКТ', None]
         ]
-        osvoenie_list = [
-            [None, f'ОСВОЕНИЕ СКВАЖИНЫ', None,
-             None, None, None, None, None, None, None,
-             None, None],
-            [None, 29,
-             f'Установить КНК-1 на гл.{niz_nkt - 20}м, произвести вывод на '
-             f'режим мобильного азотного комплекса. Дождаться выхода пузыря азота. '
-             f'В случае отсутствия выхода пузыря азота более 1-1.5 часа - начать постепенный приподъём ГНКТ, не '
-             f'прекращая отдувки, до выхода пузыря азота. После получения прорыва азота и выхода пузыря - '
-             f'произвести допуск ГНКТ с одновременной отдувкой азотом до гл. {current_bottom_edit}м',
-             None, None, None, None, None, None, None,
-             'Мастер ГНКТ', 1],
-            [None, 29,
-             f'Произвести освоение скважины один цикл в течении 4х часов с расходом по азоту в процессе освоения: \n'
-             f'Первый час освоения - расход азота не менее 14м3/мин; \n'
-             f'Второй час освоения - расход азота не менее 16м3/мин; ',
-             None, None, None, None, None, None, None,
-             'Мастер ГНКТ', 4],
-            [None, 29,
-             f'Последующие 2 часа освоения производить на выбранном оптимальном режиме освоения '
-             f'(по согласованию с Заказчиком) позволяющим производить оптимальный отбор флюида из пласта. '
-             f'В ПРОЦЕССЕ ОСВОЕНИЯ (не оставлять г/трубу без движения) ПРОИЗВОДИТЬ ПРИПОДЪЁМЫ '
-             f'ГНКТ ЧЕРЕЗ 15-20 МИНУТ ВВЕРХ-ВНИЗ НА 20м. '
-             f'В процессе освоения проводить замеры притока каждый час и общее количество '
-             f'отобранной из пласта жидкости. В сводке отразить: процентное содержание нефти '
-             f'в возвратной жидкости, средний приток пластового флюида, количество отобранной из '
-             f'пласта жидкости. Отбор проб производить каждый  час. Пробы отбирать через пробоотборник, '
-             f'расположенный согласно схеме обвязки устья. По отдельному запросу геологической службы, '
-             f'пробы предоставлять оператору ЦДНГ для определения КВЧ и процентного содержания воды, '
-             f'с составлением акта передачи проб.',
-             None, None, None, None, None, None, None,
-             'Мастер ГНКТ', None],
-            [None, f'ПОДТВЕРЖДЕНИЕ НОРМАЛИЗОВАННОГО ЗАБОЯ', None,
-             None, None, None, None, None, None, None,
-             None, None],
-            [None, 29, f'По окончании освоения, остановить закачку азота, '
-                       f'дождаться полного выхода азота из скважины и произвести тех.отстой '
-                       f'скважины для оседания твёрдых частиц – в течении 2 часов',
-             None, None, None, None, None, None, None,
-             'Мастер ГНКТ', 2],
-            [None, 29,
-             f'По истечении 2х часов, произвести допуск КНК-1 на г/трубе в скважину '
-             f'«без циркуляции» до гл. {current_bottom_edit}м. Забой должен соответствовать – {current_bottom_edit}м. '
-             f'Составить АКТ на забой совмесно с представителем Заказчика. При отсутствии нормализованного забоя на '
-             f'гл. {current_bottom_edit}м (по согласованию с Заказчиком) - провести работы по нормализации забоя.',
-             None, None, None, None, None, None, None, 'Мастер ГНКТ', 0.5]
-        ]
-        if osvoenie_combo_need == 'Да':
-            for index, row in enumerate(osvoenie_list):
-                gnkt_opz.insert(index + 31, row)
+
+        gnkt_opz.extend(work_list)
 
         for row in block_gnvp_list[::-1]:
             gnkt_opz.insert(0, row)
@@ -737,121 +708,6 @@ class GnktOsvWindow(MyMainWindow):
         for row_ind, row in enumerate(ws.iter_rows(values_only=True)):
             if all(value is None for value in row[:42]):
                 ws.row_dimensions[row_ind + 1].hidden = True
-
-    def save_to_gnkt(self):
-        from work_py.gnkt_frez import Work_with_gnkt
-        from main import MyMainWindow
-
-        sheets = ["Титульник", 'СХЕМА', 'Ход работ']
-        tables = [self.table_title, self.table_schema, self.table_widget]
-
-        for i, sheet_name in enumerate(sheets):
-            worksheet = GnktOsvWindow.wb[sheet_name]
-            table = tables[i]
-            work_list = []
-
-            for row in range(table.rowCount()):
-                row_lst = []
-
-                for column in range(table.columnCount()):
-                    item = table.item(row, column)
-                    if not item is None:
-                        row_lst.append(item.text())
-                    else:
-                        row_lst.append("")
-                work_list.append(row_lst)
-            Work_with_gnkt.count_row_height(self, worksheet, work_list, sheet_name)
-
-        ws7 = GnktOsvWindow.wb.create_sheet(title="СХЕМЫ КНК_38,1")
-        self.insert_image(ws7, f'{well_data.path_image}imageFiles/schema_well/СХЕМЫ КНК_38,1.png', 'A1', 550, 900)
-
-        if 'Зуфаров' in well_data.user:
-            path = 'D:\Documents\Desktop\ГТМ'
-        else:
-            path = ''
-
-        filenames = f"{well_data.well_number._value} {well_data.well_area._value} кат {well_data.cat_P_1[0]} " \
-                    f"{self.work_plan}.xlsx"
-        full_path = path + '/' + filenames
-
-        insert_data_base_gnkt(well_data.contractor, filenames, well_data.gnkt_number, int(well_data.gnkt_length),
-                              float(well_data.diametr_length),
-                              float(well_data.iznos) * 1.014,
-                              int(well_data.pipe_mileage) + int(well_data.current_bottom * 1.1),
-                              well_data.pipe_fatigue, int(well_data.pvo), well_data.previous_well)
-
-        if well_data.bvo is True:
-            ws5 = GnktOsvWindow.wb.create_sheet('Sheet1')
-            ws5.title = "Схемы ПВО"
-            ws5 = GnktOsvWindow.wb["Схемы ПВО"]
-            GnktOsvWindow.wb.move_sheet(ws5, offset=-1)
-            schema_list = self.check_pvo_schema(ws5, 1)
-
-        if GnktOsvWindow.wb:
-            self.save_file_dialog(GnktOsvWindow.wb, full_path)
-            Work_with_gnkt.wb_gnkt_frez.close()
-            print(f"Table data saved to Excel {full_path} {well_data.number_dp}")
-        if self.wb:
-            self.wb.close()
-
-    def insert_image_schema(self, ws):
-
-        if well_data.paker_do["do"] != 0:
-            coordinate_nkt_with_paker = 'F6'
-            self.insert_image(ws, f'{well_data.path_image}imageFiles/schema_well/НКТ с пакером.png',
-                                       coordinate_nkt_with_paker, 100, 510)
-        else:
-            coordinate_nkt_with_voronka = 'F6'
-            self.insert_image( ws, f'{well_data.path_image}imageFiles/schema_well/НКТ с воронкой.png',
-                                       coordinate_nkt_with_voronka, 70, 470)
-        if self.work_plan in ['gnkt_bopz']:
-            coordinate = 'F65'
-            self.insert_image(ws, f'{well_data.path_image}imageFiles/schema_well/angle_well.png',
-                                       coordinate, 265, 373)
-
-        elif self.work_plan in ['gnkt_after_grp', 'gnkt_opz']:
-            coordinate_propant = 'F43'
-            if self.work_plan in ['gnkt_after_grp']:
-                self.insert_image(ws, f'{well_data.path_image}imageFiles/schema_well/пропант.png',
-                                           coordinate_propant, 90, 500)
-
-            n = 0
-            m = 0
-            for plast in well_data.plast_all:
-                count_interval = well_data.dict_perforation[plast]['счет_объединение']
-
-                ws.merge_cells(start_column=23, start_row=27 + m,
-                               end_column=23, end_row=27 + count_interval + m - 1)
-                ws.merge_cells(start_column=22, start_row=27 + m,
-                               end_column=22, end_row=27 + count_interval + m - 1)
-                ws.merge_cells(start_column=21, start_row=27 + m,
-                               end_column=21, end_row=27 + count_interval + m - 1)
-                m += count_interval
-                roof_plast = well_data.dict_perforation[plast]['кровля']
-                sole_plast = well_data.dict_perforation[plast]['подошва']
-                try:
-                    if roof_plast > well_data.depth_fond_paker_do["do"] and roof_plast < well_data.current_bottom:
-                        interval_str = f'{plast} {roof_plast}-{sole_plast}'
-                        coordinate_pvr = f'F{48 + n}'
-
-                        ws.cell(row=48 + n, column=10).value = interval_str
-                        ws.merge_cells(start_column=10, start_row=48 + n,
-                                       end_column=12, end_row=48 + n + 2)
-                        ws.cell(row=48 + n, column=10).font = Font(name='Arial', size=12, bold=True)
-                        ws.cell(row=48 + n, column=10).alignment = Alignment(wrap_text=True, horizontal='left',
-                                                                             vertical='center')
-                        n += 3
-                        self.insert_image(ws, f'{well_data.path_image}imageFiles/schema_well/ПВР.png',
-                                                   coordinate_pvr, 85, 70)
-                except:
-                    QMessageBox.critical(self,
-                                               'Ошибка', f'программа не смогла вставить интервал перфорации в схему'
-                                                         f'{roof_plast}-{sole_plast}')
-
-            coordinate_voln = f'E18'
-            self.insert_image(ws,
-                                       f'{well_data.path_image}imageFiles/schema_well/переход.png',
-                                       coordinate_voln, 150, 60)
 
     def date_dmy(self, date_str):
         date_obj = datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")

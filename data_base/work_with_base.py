@@ -221,10 +221,6 @@ class Classifier_well(MyMainWindow):
             cursor.execute(query, data_work)
 
 
-        # cursor.execute(query)
-
-
-
         # Сохранение изменений
         conn.commit()
 
@@ -770,6 +766,7 @@ def insert_database_well_data(well_number, well_area, contractor, costumer, data
     excel_json = json.dumps(excel, ensure_ascii=False)
     date_today = datetime.now()
     type_kr = well_data.type_kr.split(' ')[0]
+    adedaas = well_data.data_list
     data_paragraph = json.dumps(well_data.data_list, ensure_ascii=False)
     cdng = well_data.cdng._value
     category_dict = json.dumps(well_data.dict_category, ensure_ascii=False)

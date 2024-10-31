@@ -17,13 +17,13 @@ from work_py.check_in_pz import CustomMessageBox
 
 
 class CreatePZ(MyMainWindow):
-    def __init__(self, wb, ws, data_window, perforation_correct_window2, parent=None):
+    def __init__(self, wb, ws,  parent=None):
         super(CreatePZ, self).__init__()
 
         self.wb = wb
         self.ws = ws
-        self.data_window = data_window
-        self.perforation_correct_window2 = perforation_correct_window2
+
+
 
     def open_excel_file(self, ws, work_plan):
         from find import FindIndexPZ
@@ -58,7 +58,8 @@ class CreatePZ(MyMainWindow):
                                             f'ДП№{well_data.number_dp}')
 
             if data_well[0]:
-                date_str1 = datetime.strptime(f'{data_well[1]}', '%Y-%m-%d')
+
+                date_str1 = datetime.strptime(f'{data_well[1][1]}', '%Y-%m-%d')
                 if date_str1 > date_str2:
 
                     change_work_work_plan = QMessageBox.question(self,

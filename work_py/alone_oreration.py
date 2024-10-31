@@ -333,15 +333,15 @@ def fluid_change(self):
 
 def update_fluid(index_plan, fluid_str, table_widget):
     row_index = index_plan - well_data.count_row_well
-    aaa = well_data.data_list
+
     for index_row, data in enumerate(well_data.data_list):
         if index_row == row_index:
             fluid_str_old = well_data.data_list[index_row][7]
         if row_index <= index_row:
-            aaad = well_data.data_list[index_row][7]
+
             if well_data.data_list[index_row][7] == fluid_str_old:
                 well_data.data_list[index_row][7] = fluid_str
-                ccc = well_data.data_list[index_row][7]
+
                 for column in range(table_widget.columnCount()):
                     if column == 2 or column == 0:
                         row_change = index_row + well_data.count_row_well

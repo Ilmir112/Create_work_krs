@@ -168,62 +168,7 @@ def insert_data_base_gnkt(contractor, well_name, gnkt_number, gnkt_length, diame
                 cursor.execute(query, data_values)
                 QMessageBox.information(None, 'база данных', f'Скважина добавлена в базу данных')
 
-                query = f"INSERT INTO chemistry " \
-                        f"VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, " \
-                        f"%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-                if 'РН' in well_data.contractor:
-                    contractor = 'РН'
-                elif 'Ойл' in well_data.contractor:
-                    contractor = 'Ойл'
-                if well_data.work_plan in ['dop_plan', 'dop_plan_in_base']:
-                    string_work = f' ДП№ {well_data.number_dp}'
-                elif well_data.work_plan == 'krs':
-                    string_work = 'ПР'
-                elif well_data.work_plan == 'plan_change':
-                    if well_data.work_plan_change == 'krs':
-                        string_work = 'ПР изм'
-                    else:
-                        string_work = f'ДП№{well_data.number_dp} изм '
 
-                elif well_data.work_plan == 'gnkt_bopz':
-                    string_work = 'ГНКТ БОПЗ ВНС'
-                elif well_data.work_plan == 'gnkt_opz':
-                    string_work = 'ГНКТ ОПЗ'
-                elif well_data.work_plan == 'gnkt_after_grp':
-                    string_work = 'ГНКТ ОСВ ГРП'
-                else:
-                    string_work = 'ГНКТ'
-
-                date_today = datetime.now()
-                data_work = (well_data.well_number._value,
-                             well_data.well_area._value,
-                             well_data.region,
-                             well_data.costumer,
-                             well_data.contractor,
-                             string_work,
-                             well_data.type_kr.split(" ")[0],
-                             date_today,
-                             well_data.dict_volume_chemistry['цемент'],
-                             well_data.dict_volume_chemistry['HCl'],
-                             well_data.dict_volume_chemistry['HF'],
-                             well_data.dict_volume_chemistry['NaOH'],
-                             well_data.dict_volume_chemistry['ВТ СКО'],
-                             well_data.dict_volume_chemistry['Глина'],
-                             well_data.dict_volume_chemistry['песок'],
-                             well_data.dict_volume_chemistry['РПК'],
-                             well_data.dict_volume_chemistry['РПП'],
-                             well_data.dict_volume_chemistry["извлекаемый пакер"],
-                             well_data.dict_volume_chemistry["ЕЛАН"],
-                             well_data.dict_volume_chemistry['растворитель'],
-                             well_data.dict_volume_chemistry["РИР 2С"],
-                             well_data.dict_volume_chemistry["РИР ОВП"],
-                             well_data.dict_volume_chemistry['гидрофабизатор'],
-                             well_data.normOfTime,
-                             well_data.fluid
-                             )
-
-                from data_base.work_with_base import Classifier_well
-                Classifier_well.insert_database('well_data', data_work, query)
 
         conn.commit()
     except psycopg2.Error as e:
