@@ -501,7 +501,7 @@ class Work_with_gnkt(GnktModel):
         # print(Column_img)
         self.insert_image(ws3, f'{well_data.path_image}imageFiles/schema_well/gorizont_12.png', column_img, 1800, 120)
 
-        ws3.print_area = f'A1:AW{37}'
+        ws3.print_area = f'B1:AW{37}'
         ws3.page_setup.fitToPage = True
         ws3.page_setup.fitToHeight = False
         ws3.page_setup.fitToWidth = True

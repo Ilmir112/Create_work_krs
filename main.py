@@ -82,7 +82,7 @@ class ExcelWorker(QThread):
             elif 7 <= month < 10:
                 date_string = datetime(current_year, 7, 1).strftime('%d.%m.%Y')
                 print(f'Корректная таблица перечня без глушения от {date_string}')
-            elif 10 >= month <= 12:
+            elif 10 <= month <= 12:
                 date_string = datetime(current_year, 10, 1).strftime('%d.%m.%Y')
                 print(f'Корректная таблица перечня без глушения от {date_string}')
             if well_data.connect_in_base:
@@ -98,7 +98,7 @@ class ExcelWorker(QThread):
                 if result == None:
                     QMessageBox.warning(None, 'Некорректная дата перечня',
                                         f'Необходимо обновить перечень скважин без '
-                                        f'глушения на текущий квартал {region}, '
+                                        f'глушения на текущий квартал {region} от {date_string}, '
                                         f'необходимо обратиться к администратору')
                 else:
                     stop_app = False
@@ -251,6 +251,9 @@ class MyMainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
+        self.table_schema = None
+        self.table_widget = None
+        self.table_title = None
         self.data_window = None
         self.perforation_correct_window2 = None
         self.work_plan = None
@@ -265,6 +268,11 @@ class MyMainWindow(QMainWindow):
         img.anchor = coordinate
         ws.add_image(img, coordinate)
 
+    @staticmethod
+    def set_modal_window(window):
+        # Установка модальности окна
+        window.setWindowModality(Qt.ApplicationModal)
+        window.show()
     def open_read_excel_file_pz(self):
         from open_pz import CreatePZ
         from data_base.work_with_base import insert_data_new_excel_file
@@ -356,7 +364,9 @@ class MyMainWindow(QMainWindow):
                     f"{string_work} {contractor}.xlsx"
         return filenames
 
+
     def save_to_gnkt(self):
+        from gnkt_data.gnkt_data import insert_data_base_gnkt
 
         sheets = ["Титульник", 'СХЕМА', 'Ход работ']
         tables = [self.table_title, self.table_schema, self.table_widget]
@@ -380,13 +390,14 @@ class MyMainWindow(QMainWindow):
                         row_lst.append("")
                 work_list.append(row_lst)
             self.gnkt_data.count_row_height(worksheet, work_list, sheet_name)
+        if "СХЕМЫ КНК_38,1" not in self.gnkt_data.wb_gnkt.sheetnames:
+            # ws6 = self.gnkt_data.wb_gnkt.create_sheet(title="СХЕМЫ КНК_44,45")
+            # self.insert_image(ws6, f'{well_data.path_image}imageFiles/schema_well/СХЕМЫ КНК_44,45.png', 'A1',
+            #                   550, 900)
 
-        ws6 = self.gnkt_data.wb_gnkt.create_sheet(title="СХЕМЫ КНК_44,45")
-        self.insert_image(ws6, f'{well_data.path_image}imageFiles/schema_well/СХЕМЫ КНК_44,45.png', 'A1',
-                          550, 900)
-        ws7 = self.gnkt_data.wb_gnkt.create_sheet(title="СХЕМЫ КНК_38,1")
-        self.insert_image(ws7, f'{well_data.path_image}imageFiles/schema_well/СХЕМЫ КНК_38,1.png', 'A1',
-                          550, 900)
+            ws7 = self.gnkt_data.wb_gnkt.create_sheet(title="СХЕМЫ КНК_38,1")
+            self.insert_image(ws7, f'{well_data.path_image}imageFiles/schema_well/СХЕМЫ КНК_38,1.png', 'A1',
+                              550, 900)
 
         # path = 'workiii'
         if 'Зуфаров' in well_data.user:
@@ -395,6 +406,15 @@ class MyMainWindow(QMainWindow):
             path = ""
         filenames = self.definition_filenames()
         full_path = path + '/' + filenames
+        gnkt_data = self.gnkt_data.data_gnkt
+
+        insert_data_base_gnkt(well_data.contractor, filenames, gnkt_data.gnkt_number_combo,
+                              int(gnkt_data.lenght_gnkt_edit),
+                              float(gnkt_data.diametr_length),
+                              float(gnkt_data.iznos_gnkt_edit) * 1.014,
+                              int(gnkt_data.pipe_mileage_edit) + int(gnkt_data.current_bottom_edit * 1.1),
+                              gnkt_data.pipe_fatigue, int(gnkt_data.pvo_number),
+                              gnkt_data.previous_well_combo)
 
         if well_data.bvo is True:
             ws5 = self.gnkt_data.wb_gnkt.create_sheet('Sheet1')
@@ -782,6 +802,7 @@ class MyMainWindow(QMainWindow):
 
         if work_plan == 'krs':
             self.work_window = GnoWindow(table_widget.rowCount(), self.table_widget, self.work_plan)
+            self.set_modal_window(self.work_window)
 
             # self.work_window.setGeometry(100, 400, 200, 500)
             self.work_window.show()
@@ -1378,9 +1399,7 @@ class MyWindow(MyMainWindow):
                 self.tabWidget.addTab(self.table_widget, 'Ход работ')
 
     def save_to_excel(self):
-        if self.work_plan in ['gnkt_frez']:
-            self.save_to_gnkt()
-        elif self.work_plan in ['gnkt_after_grp', 'gnkt_opz', 'gnkt_bopz']:
+        if self.work_plan in ['gnkt_frez', 'gnkt_after_grp', 'gnkt_opz', 'gnkt_bopz']:
             self.save_to_gnkt()
         else:
             self.save_to_krs()
@@ -1947,6 +1966,7 @@ class MyWindow(MyMainWindow):
 
         if self.raid_window is None:
             self.raid_window = TubingPressuarWindow(well_data.ins_ind, self.table_widget)
+            self.raid_window.setGeometry(50, 50, 900, 500)
             self.set_modal_window(self.raid_window)
             self.pause_app()
             well_data.pause = True
@@ -1994,10 +2014,7 @@ class MyWindow(MyMainWindow):
         drilling_work_list = Drill_window.frezer_ports(self)
         self.populate_row(self.ins_ind, drilling_work_list, self.table_widget)
 
-    def set_modal_window(self, window):
-        # Установка модальности окна
-        window.setWindowModality(Qt.ApplicationModal)
-        window.show()
+
 
     def drilling_action_nkt(self):
         if self.raid_window is None:
@@ -2445,6 +2462,7 @@ class MyWindow(MyMainWindow):
         if self.acid_windowPaker is None:
 
             self.acid_windowPaker = AcidPakerWindow(self.ins_ind, self.table_widget)
+            self.acid_windowPaker.setGeometry(50, 50, 900, 500)
             self.set_modal_window(self.acid_windowPaker)
             self.pause_app()
             well_data.pause = True

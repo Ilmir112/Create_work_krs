@@ -106,8 +106,6 @@ class TabWidget(QTabWidget):
 
 
 class GnktOsvWindow(GnktModel):
-
-
     def __init__(self, sheet, table_title, table_schema, table_widget, work_plan):
         super().__init__()
 
@@ -188,7 +186,7 @@ class GnktOsvWindow(GnktModel):
 
         return work_well
     def work_with_excel(self):
-        from work_py.gnkt_frez import Work_with_gnkt
+
 
         if self.work_plan in ['gnkt_bopz']:
             self.wb_gnkt = load_workbook(f'{well_data.path_image}property_excel/template_gnkt_bopz.xlsx')

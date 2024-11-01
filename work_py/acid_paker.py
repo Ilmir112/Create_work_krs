@@ -1899,6 +1899,6 @@ if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     # app.setStyleSheet()
 
-    window = AcidPakerWindow()
+    window = AcidPakerWindow(1, 1)
     window.show()
     sys.exit(app.exec_())

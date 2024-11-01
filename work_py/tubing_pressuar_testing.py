@@ -1,16 +1,9 @@
 from PyQt5.QtGui import QDoubleValidator, QIntValidator
-from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QTabWidget, \
-    QMainWindow, QPushButton
+from PyQt5.QtWidgets import  QMessageBox, QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QTabWidget, QPushButton
 
 import well_data
 from main import MyMainWindow
-from .acid_paker import CheckableComboBox
-from .alone_oreration import volume_vn_ek
-from .rir import RirWindow
 
-from .opressovka import OpressovkaEK
-from .rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
-from .rir import TabPage_SO_rir
 
 
 class TabPage_SO_block(QWidget):

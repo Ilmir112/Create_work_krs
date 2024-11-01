@@ -339,9 +339,12 @@ class GnktModel(MyMainWindow):
 
         for i in range(1, len(work_list) + 1):  # Добавлением работ
             if sheet_name == 'Ход работ':
-                if len(str(work_list[i - 1][1])) <= 3 and str(work_list[i - 1][1]) != '№':  # Нумерация
+                if len(str(work_list[i - 1][1])) <= 3 and str(work_list[i - 1][1]) != '№' and \
+                        str(work_list[i - 1][1]) != 'п/п':  # Нумерация
                     work_list[i - 1][1] = str(ins_ind)
                     ins_ind += 1
+                elif str(work_list[i - 1][1]) == 'п/п':
+                    ins_ind = 1
 
             for j in range(1, 13):
                 cell = ws2.cell(row=i, column=j)
@@ -353,6 +356,7 @@ class GnktModel(MyMainWindow):
 
                     else:
                         cell.value = work_list[i - 1][j - 1]
+
 
         # print(merged_cells_dict)
         if sheet_name != 'Ход работ':
@@ -369,14 +373,8 @@ class GnktModel(MyMainWindow):
                                                                              vertical='center')
 
             elif sheet_name == 'СХЕМА' and self.work_plan != 'gnkt_frez':
-
                 self.insert_image_schema(ws2)
-                ws2.print_area = f'B3:AP{70}'
-                # print(ws2, type(ws2))
-                # ws2.page_setup.fitToPage = True
-                # ws2.page_setup.fitToHeight = False
-                # ws2.page_setup.fitToWidth = True
-                ws2.print_options.horizontalCentered = True
+
 
         elif sheet_name == 'Ход работ':
             for i, row_data in enumerate(work_list):
@@ -504,6 +502,7 @@ class GnktModel(MyMainWindow):
         self.iznos_gnkt_edit = self.current_widget.iznos_gnkt_edit.text().replace(',', '.')
         self.pipe_mileage_edit = self.current_widget.pipe_mileage_edit.text()
         self.distance_pntzh = self.current_widget.distance_pntzh_line.text()
+        self.pipe_fatigue = 0
 
 
 
@@ -647,7 +646,8 @@ class GnktModel(MyMainWindow):
             [None,
              18, f'Закачку {volume_gntk}м3 кислоты производить при открытом малом затрубном пространстве на '
                  f'циркуляции. Закачку оставшейся '
-                 f'кислоты в объеме {round(acid_volume_edit - volume_gntk, 1)}м3 производить при закрытом затрубном '
+                 f'кислоты в объеме {round(acid_volume_edit - volume_gntk, 1)}м3 производить '
+                 f'при закрытом малом затрубном '
                  f'пространстве. Составить Акт.',
              None, None, None, None, None, None, None,
              'Мастер ГНКТ, состав бригады', 2.88],
