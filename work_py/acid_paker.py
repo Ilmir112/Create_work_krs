@@ -865,6 +865,11 @@ class AcidPakerWindow(MyMainWindow):
             self.tableWidget.setItem(rows, 4, QTableWidgetItem(str(acid_proc_edit)))
             self.tableWidget.setItem(rows, 5, QTableWidgetItem(str(acid_volume_edit)))
 
+    def closeEvent(self, event):
+                # Закрываем основное окно при закрытии окна входа
+        self.operation_window = None
+        event.accept()  # Принимаем событие закрытия
+
     def add_work(self):
 
         try:

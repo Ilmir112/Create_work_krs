@@ -11,6 +11,7 @@ from PyQt5.QtWidgets import QMessageBox, QWidget, QLabel, QComboBox, QLineEdit, 
 from PyQt5.QtCore import Qt
 from datetime import datetime
 
+from data_base.config_base import connection_to_database, WorkDatabaseWell
 from data_base.work_with_base import connect_to_db
 from work_py.advanted_file import merge_overlapping_intervals, definition_plast_work
 from main import MyMainWindow
@@ -82,7 +83,7 @@ class TabPageDp(QWidget):
 
         if well_data.data_in_base:
 
-            well_list =TabPageDp.check_in_database_well_data(self, self.well_number_edit.text())
+            well_list =TabPageDp.check_in_database_well_data2(self, self.well_number_edit.text())
 
             if well_list:
                 self.well_data_in_base_combo.clear()
@@ -167,7 +168,7 @@ class CorrectPlanWindow(MyMainWindow):
     #     return data, rowHeights, colWidth, boundaries_dict
 
     def add_work(self):
-        from data_base.work_with_base import check_in_database_well_data, insert_data_well_dop_plan, round_cell
+        from data_base.work_with_base import insert_data_well_dop_plan, round_cell
         from work_py.dop_plan_py import DopPlanWindow
 
         from well_data import ProtectedIsNonNone
@@ -189,16 +190,19 @@ class CorrectPlanWindow(MyMainWindow):
                 else:
                     well_data.work_plan_change = 'krs'
 
-            data_well = check_in_database_well_data(well_number, well_area, well_data_in_base)
+            db = connection_to_database(well_data.DB_WELL_DATA)
+            data_well_base = WorkDatabaseWell(db)
+
+            data_well = data_well_base.check_in_database_well_data(well_number, well_area, well_data_in_base)
 
             if data_well:
-                well_data.type_kr = data_well[1][2]
+                well_data.type_kr = data_well[2]
 
 
-                if data_well[1][3]:
-                    well_data.dict_category = json.loads(data_well[1][3])
+                if data_well[3]:
+                    well_data.dict_category = json.loads(data_well[3])
 
-                insert_data_well_dop_plan(data_well[1][0])
+                insert_data_well_dop_plan(data_well[0])
 
             DopPlanWindow.work_with_excel(self, well_number, well_area, well_data_in_base, well_data.type_kr)
 
@@ -213,47 +217,6 @@ class CorrectPlanWindow(MyMainWindow):
 
             well_data.pause = False
             self.close()
-    # @staticmethod
-    # def delete_data(number_well, area_well, work_plan):
-    #     if well_data.connect_in_base:
-    #         try:
-    #             conn = psycopg2.connect(**well_data.postgres_params_data_well)
-    #             cursor = conn.cursor()
-    #
-    #             cursor.execute("""
-    #             DELETE FROM wells
-    #             WHERE well_number = %s AND area_well = %s AND contractor = %s AND costumer = %s AND work_plan= %s """,
-    #                            (str(number_well), area_well, well_data.contractor, well_data.costumer, work_plan)
-    #                            )
-    #
-    #             conn.commit()
-    #             cursor.close()
-    #             conn.close()
-    #
-    #         except psycopg2.Error as e:
-    #             # Выведите сообщение об ошибке
-    #             QMessageBox.warning(None, 'Ошибка',
-    #                                       f'Ошибка удаления {type(e).__name__}\n\n{str(e)}')
-    #     else:
-    #         try:
-    #             db_path = connect_to_db('well_data.db', 'data_base_well/')
-    #
-    #             conn = sqlite3.connect(f'{db_path}')
-    #             cursor = conn.cursor()
-    #
-    #             cursor.execute("DELETE FROM wells  WHERE well_number = ? AND area_well = ? "
-    #                            "AND contractor = ? AND costumer = ? AND work_plan=?",
-    #                            (str(number_well._value), area_well._value, well_data.contractor, well_data.costumer,
-    #                             work_plan))
-    #
-    #             conn.commit()
-    #             cursor.close()
-    #             conn.close()
-    #
-    #         except sqlite3.Error as e:
-    #             # Выведите сообщение об ошибке
-    #             QMessageBox.warning(None, 'Ошибка',
-    #                                       f'Ошибка удаления {type(e).__name__}\n\n{str(e)}')
     @staticmethod
     def add_work_excel(ws2, work_list, ind_ins):
         from well_data import ProtectedIsDigit

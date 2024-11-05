@@ -30,7 +30,7 @@ class TabPage_SO_rir(QWidget):
         plast_work = ['']
         plast_work.extend(well_data.plast_work)
 
-        if len(well_data.dict_leakiness['НЭК']) != 0:
+        if len(well_data.dict_leakiness) != 0:
             for nek in list(well_data.dict_leakiness['НЭК']['интервал'].keys()):
                 plast_work.append(f'НЭК {nek}')
 
@@ -347,7 +347,7 @@ class TabPage_SO_rir(QWidget):
                     except:
                         pass
 
-            if len(well_data.dict_leakiness['НЭК']):
+            if len(well_data.dict_leakiness):
                 for nek in list(well_data.dict_leakiness['НЭК']['интервал'].keys()):
 
                     if nek in plast_sel:

@@ -952,6 +952,10 @@ class Swab_Window(MyMainWindow):
         well_data.pause = False
         self.close()
 
+    def closeEvent(self, event):
+                # Закрываем основное окно при закрытии окна входа
+        self.operation_window = None
+        event.accept()  # Принимаем событие закрытия
     def swabbing_opy_with_paker(self, diametr_paker, paker_khost, paker_depth, depth_opy):
         if 'Ойл' in well_data.contractor:
             schema_swab = '8'

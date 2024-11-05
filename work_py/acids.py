@@ -154,6 +154,11 @@ class GonsWindow(MyMainWindow):
         well_data.pause = False
         self.close()
         return work_list
+
+    def closeEvent(self, event):
+                # Закрываем основное окно при закрытии окна входа
+        self.operation_window = None
+        event.accept()  # Принимаем событие закрытия
     def acidGons(self, plast_combo, acid_edit, acid_volume_edit, acid_proc_edit, poins_sko_edit, bottom_point,
                                   acid_calcul_Edit, pressure_edit, iron_true_combo, iron_volume_edit):
         if iron_true_combo == 'Да':

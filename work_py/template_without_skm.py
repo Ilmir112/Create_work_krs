@@ -648,6 +648,11 @@ class Template_without_skm(MyMainWindow):
         well_data.pause = False
         self.close()
 
+    def closeEvent(self, event):
+                # Закрываем основное окно при закрытии окна входа
+        self.operation_window = None
+        event.accept()  # Принимаем событие закрытия
+
     def update_template(self, index_plan):
 
         row_index = index_plan - well_data.count_row_well

@@ -174,7 +174,7 @@ class TabWidget(QTabWidget):
 
 class Raid(MyMainWindow):
     def __init__(self, ins_ind, table_widget, parent=None):
-        super(Raid, self).__init__()
+        super(MyMainWindow, self).__init__()
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
 
@@ -317,6 +317,11 @@ class Raid(MyMainWindow):
             return
         self.tableWidget.removeRow(row)
 
+    def closeEvent(self, event):
+
+                # Закрываем основное окно при закрытии окна входа
+        MyMainWindow.operation_window = None
+        event.accept()  # Принимаем событие закрытия
     def raidingColumn(self, raiding_interval_tuple, ryber_key):
         from .template_work import TemplateKrs
         from .advanted_file import raiding_interval, raid

@@ -119,6 +119,11 @@ class TubingPressuarWindow(MyMainWindow):
         well_data.pause = False
         self.close()
 
+    def closeEvent(self, event):
+                # Закрываем основное окно при закрытии окна входа
+        self.operation_window = None
+        event.accept()  # Принимаем событие закрытия
+
     def pressuar_nkt_work(self, current_edit, select_nkt_combo, length_nkt_edit, pressuar_edit,
                           distance_between_nkt_edit):
         from .descent_gno import GnoDescentWindow

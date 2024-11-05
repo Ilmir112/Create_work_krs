@@ -999,6 +999,10 @@ class TemplateKrs(MyMainWindow):
 
         self.tableWidget.setSortingEnabled(False)
 
+    def closeEvent(self, event):
+                # Закрываем основное окно при закрытии окна входа
+        self.operation_window = None
+        event.accept()  # Принимаем событие закрытия
     def addString(self):
         from .advanted_file import skm_interval
 

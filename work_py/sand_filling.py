@@ -240,6 +240,11 @@ class SandWindow(MyMainWindow):
         self.populate_row(self.ins_ind, work_list, self.table_widget)
         well_data.pause = False
         self.close()
+
+    def closeEvent(self, event):
+                # Закрываем основное окно при закрытии окна входа
+        self.operation_window = None
+        event.accept()  # Принимаем событие закрытия
     def sand_select(self):
 
         if well_data.column_additional is False or (well_data.column_additional is True and \

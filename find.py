@@ -9,6 +9,7 @@ from openpyxl.utils import column_index_from_string
 from openpyxl.workbook import Workbook
 
 from category_correct import CategoryWindow
+from data_base.config_base import WorkDatabaseWell, connect_to_database, connection_to_database
 from data_correct import DataWindow
 from main import ExcelWorker, MyMainWindow, MyWindow
 from perforation_correct import PerforationCorrect
@@ -735,13 +736,8 @@ class WellData(FindIndexPZ):
         super().__init__(ws)
         self.ws = ws
         # self.read_well(self.ws, well_data.cat_well_max._value, well_data.data_pvr_min._value)
-    @classmethod
-    def read_well(cls, ws, begin_index, cancel_index):
 
-        well_data.well_area = ProtectedIsNonNone('не корректно')
-        well_data.well_number = ProtectedIsNonNone('не корректно')
-        well_data.inv_number = ProtectedIsNonNone('не корректно')
-        well_data.cdng = ProtectedIsNonNone('не корректно')
+    def read_well(self, ws, begin_index, cancel_index):
         for row_index, row in enumerate(ws.iter_rows(min_row=begin_index, max_row=cancel_index)):
             row_index += begin_index
 
@@ -761,14 +757,17 @@ class WellData(FindIndexPZ):
                         well_data.appointment = ProtectedIsDigit(row[col + 1].value)
                         # print(f' ЦДНГ {well_data.cdng._value}')
         if well_data.work_plan == 'krs':
-            tables_filter = cls.get_tables_starting_with(
-                well_data.well_number._value, well_data.well_area._value, 'ПР', well_data.type_kr.split(' ')[0])
+            db = connection_to_database(well_data.DB_WELL_DATA)
+            check_in_base = WorkDatabaseWell(db)
+            tables_filter = check_in_base.get_tables_starting_with(well_data.well_number._value,
+                                                                   well_data.well_area._value, 'ПР',
+                                                                   well_data.type_kr.split(' ')[0])
             if tables_filter:
                 mes = QMessageBox.question(None, 'Наличие в базе',
-                                           f'В базе имеются план работ по скважине:\n {" ".join(tables_filter)}. '
+                                           f'В базе имеется план работ по скважине:\n {" ".join(tables_filter)}. '
                                            f'При продолжении план пересохранится, продолжить?')
                 if mes == QMessageBox.StandardButton.No:
-                    cls.pause_app()
+                    self.pause_app()
                     return
 
 
@@ -1422,7 +1421,7 @@ class Well_Category(FindIndexPZ):
         # self.read_well(ws, well_data.cat_well_min._value, well_data.data_well_min._value)
 
     def read_well(self, ws, begin_index, cancel_index):
-        from main import MyMainWindow
+
         if well_data.data_in_base is False:
             try:
                 for row in range(begin_index, cancel_index):
@@ -1520,8 +1519,10 @@ class Well_Category(FindIndexPZ):
 
             thread = ExcelWorker()
 
-            well_data.without_damping = thread.check_well_existence(
+            well_data.without_damping, stop_app = thread.check_well_existence(
                 well_data.well_number._value, well_data.well_area._value, well_data.region)
+            if stop_app:
+                self.pause_app()
 
             try:
                 categoty_pressure_well, categoty_h2s_well, categoty_gf, data = thread.check_category(

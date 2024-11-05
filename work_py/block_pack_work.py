@@ -183,6 +183,11 @@ class BlockPackWindow(MyMainWindow):
         well_data.pause = False
         self.close()
 
+    def closeEvent(self, event):
+                # Закрываем основное окно при закрытии окна входа
+        self.operation_window = None
+        event.accept()  # Принимаем событие закрытия
+
     def block_pack_work(self, current_edit, pero_combo_QCombo,
                               type_of_block_processing_combo, block_volume_edit, oil_volume_edit, fluid_new_edit, block_type_edit):
         from .rir import RirWindow

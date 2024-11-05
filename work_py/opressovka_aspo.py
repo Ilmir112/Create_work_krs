@@ -109,6 +109,11 @@ class PakerAspo(MyMainWindow):
         well_data.pause = False
         self.close()
 
+    def closeEvent(self, event):
+                # Закрываем основное окно при закрытии окна входа
+        self.operation_window = None
+        event.accept()  # Принимаем событие закрытия
+
     # Добавление строк с опрессовкой ЭК
     def paker_list(self, paker_diametr, paker_khost, paker_depth):
         if well_data.column_additional is False or well_data.column_additional is True \

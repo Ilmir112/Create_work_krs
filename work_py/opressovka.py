@@ -196,6 +196,10 @@ class OpressovkaEK(MyMainWindow):
         vbox.addWidget(self.buttonadd_work, 3, 0)
         vbox.addWidget(self.buttonAddString, 3, 1)
 
+    def closeEvent(self, event):
+                # Закрываем основное окно при закрытии окна входа
+        self.operation_window = None
+        event.accept()  # Принимаем событие закрытия
     def add_row_table(self):
 
         paker_khost = int(float(self.tabWidget.currentWidget().paker_khost_edit.text()))

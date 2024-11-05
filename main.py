@@ -2,12 +2,12 @@
 import json
 import os
 import shutil
-import sqlite3
+
 import sys
 import socket
 
 import psutil
-import psycopg2
+
 import win32com.client
 import openpyxl
 import re
@@ -27,8 +27,7 @@ from openpyxl.utils import get_column_letter
 from openpyxl.workbook import Workbook
 from openpyxl.styles import Alignment, Font
 
-from data_base.config_base import connect_to_database
-
+from data_base.config_base import connect_to_database, CheckWellExistence, connection_to_database, WorkDatabaseWell
 from log_files.log import logger, QPlainTextEditLogger
 
 from openpyxl.drawing.image import Image
@@ -62,188 +61,23 @@ class ExcelWorker(QThread):
         super().__init__()
 
     def check_well_existence(self, well_number, deposit_area, region):
-        from data_base.work_with_base import connect_to_db
-        stop_app = True
+
         check_true = True
-        cursor = ''
-        conn = ''
 
         try:
-            current_year = datetime.now().year
-            month = datetime.now().month
-            # print(f'месяц {month}')
-            date_string = ''
-            if 1 <= month < 4:
-                date_string = datetime(current_year, 1, 1).strftime('%d.%m.%Y')
-                print(f'Корректная таблица перечня без глушения от {date_string}')
-            elif 4 <= month < 7:
-                date_string = datetime(current_year, 4, 1).strftime('%d.%m.%Y')
-                print(f'Корректная таблица перечня без глушения от {date_string}')
-            elif 7 <= month < 10:
-                date_string = datetime(current_year, 7, 1).strftime('%d.%m.%Y')
-                print(f'Корректная таблица перечня без глушения от {date_string}')
-            elif 10 <= month <= 12:
-                date_string = datetime(current_year, 10, 1).strftime('%d.%m.%Y')
-                print(f'Корректная таблица перечня без глушения от {date_string}')
-            if well_data.connect_in_base:
-                # Подключение к базе данных SQLite
-                conn = connect_to_database(well_data.DB_CLASSIFICATION)
-
-                cursor = conn.cursor()
-                # Проверка наличия записи в базе данных
-                cursor.execute(f"SELECT *  FROM {region} WHERE today=(%s)", (date_string,))
-
-                result = cursor.fetchone()
-
-                if result == None:
-                    QMessageBox.warning(None, 'Некорректная дата перечня',
-                                        f'Необходимо обновить перечень скважин без '
-                                        f'глушения на текущий квартал {region} от {date_string}, '
-                                        f'необходимо обратиться к администратору')
-                else:
-                    stop_app = False
-
-                try:
-                    # Проверка наличия записи в базе данных
-                    cursor.execute(f"SELECT * FROM {region} WHERE well_number=(%s) AND deposit_area=(%s)",
-                                   (str(well_number), deposit_area))
-                    result = cursor.fetchone()
-                    # Закрытие соединения с базой данных
-
-                    print(f'проверка {result}')
-                    print(f' база данных закрыта')
-
-                    # Если запись найдена, возвращается True, в противном случае возвращается False
-                    if result:
-                        QMessageBox.information(None, 'перечень без глушения',
-                                                f'Скважина состоит в перечне скважин без глушения на текущий '
-                                                f'квартал, '
-                                                f'в перечне от  {region}')
-                        check_true = True
-                    else:
-                        check_true = False
-                except psycopg2.Error as e:
-                    # Выведите сообщение об ошибке
-                    QMessageBox.warning(MyMainWindow, 'Ошибка', f'Ошибка подключения к базе данных '
-                                                                f'{type(e).__name__}\n\n{str(e)}')
-                finally:
-                    # Закройте курсор и соединение
-                    if cursor:
-                        cursor.close()
-                    if conn:
-                        conn.close()
-            else:
-                try:
-
-                    # Формируем полный путь к файлу базы данных
-                    db_path = connect_to_db('databaseclassification.db', '')
-
-                    conn = sqlite3.connect(f'{db_path}')
-                    cursor = conn.cursor()
-
-                    # Проверка наличия записи с указанной датой
-                    cursor.execute(f"SELECT * FROM {region} WHERE today=?", (date_string,))
-                    result_date = cursor.fetchone()
-
-                    if result_date is None:
-                        QMessageBox.warning(None, 'Некорректная дата перечня',
-                                            f'Необходимо обновить перечень скважин без '
-                                            f'глушения на текущий квартал {region}')
-                    else:
-                        stop_app = False
-
-                    # Проверка наличия записи о скважине
-                    cursor.execute(f"SELECT * FROM {region} WHERE well_number=? AND deposit_area=?",
-                                   (str(well_number), deposit_area))
-                    result_well = cursor.fetchone()
-
-                    if result_well:
-                        QMessageBox.information(None, 'перечень без глушения',
-                                                f'Скважина состоит в перечне скважин без глушения на текущий квартал, '
-                                                f'в перечне от  {region}')
-                        check_true = True  # Возвращаем True, если запись о скважине найдена
-                    else:
-                        check_true = False  # Возвращаем False, если запись о скважине не найдена
-
-                except sqlite3.Error as e:
-                    QMessageBox.warning(None, 'Ошибка', f"Ошибка при проверке записи: {type(e).__name__}\n\n{str(e)}")
-                    return False  # Возвращаем False в случае ошибки
-
-                finally:
-                    if cursor:
-                        cursor.close()
-                    if conn:
-                        conn.close()
+            db = connection_to_database(well_data.DB_CLASSIFICATION)
+            self.check_correct_well = CheckWellExistence(db)
+            check_true, stop_app = self.check_correct_well.checking_well_database_without_juming(well_number, deposit_area, region)
 
         except Exception as e:
             QMessageBox.warning(None, 'Ошибка', f"Ошибка при проверке записи: {type(e).__name__}\n\n{str(e)}")
-        if stop_app == True:
-            window.close()
+
         # Завершение работы потока
         self.finished.emit()
-        return check_true
+        return check_true, stop_app
 
     def check_category(self, well_number, deposit_area, region):
-        from data_base.work_with_base import connect_to_db
-        cursor = ''
-        conn = ''
-        if well_data.connect_in_base:
-            try:
-                # Подключение к базе данных
-                conn = connect_to_database(well_data.DB_CLASSIFICATION)
-
-                cursor = conn.cursor()
-
-                # Проверка наличия записи в базе данных
-                cursor.execute(
-                    f"SELECT categoty_pressure, categoty_h2s, categoty_gf, today FROM {region}_классификатор "
-                    f"WHERE well_number =(%s) and deposit_area =(%s)",
-                    (str(well_number._value), deposit_area._value))
-
-                result = cursor.fetchone()
-                # print(result)
-                # Закрытие соединения с базой данных
-                conn.close()
-                # # Завершение работы потока
-                # ExcelWorker.finished.emit()
-            except psycopg2.Error as e:
-                # Выведите сообщение об ошибке
-                QMessageBox.warning(MyWindow, 'Ошибка',
-                                    f'Ошибка подключения к базе данных, не получилось проверить '
-                                    f'корректность категории {type(e).__name__}\n\n{str(e)}')
-                return
-            finally:
-                # Закройте курсор и соединение
-                if cursor:
-                    cursor.close()
-                if conn:
-                    conn.close()
-        else:
-            try:
-                db_path = connect_to_db('databaseclassification.db', '')
-
-                conn = sqlite3.connect(db_path)
-                cursor = conn.cursor()
-
-                cursor.execute(
-                    f"SELECT categoty_pressure, categoty_h2s, categoty_gf, today FROM {region}_классификатор "
-                    f"WHERE well_number=? AND deposit_area=?",
-                    (str(well_number._value), deposit_area._value))
-                result = cursor.fetchone()
-
-                if result is False:
-                    QMessageBox.warning(None, 'Ошибка', 'Не удалось найти запись о классификации скважины.')
-
-
-            except sqlite3.Error as e:
-                QMessageBox.warning(None, 'Ошибка', f'Ошибка подключения к базе данных: {type(e).__name__}\n\n{str(e)}')
-                return None  # Возвращаем None в случае ошибки подключения
-
-            finally:
-                if cursor:
-                    cursor.close()
-                if conn:
-                    conn.close()
+        result = self.check_correct_well.check_category(well_number, deposit_area, region)
         return result
 
 
@@ -251,6 +85,7 @@ class MyMainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
+        self.operation_window = None
         self.table_schema = None
         self.table_widget = None
         self.table_title = None
@@ -365,6 +200,7 @@ class MyMainWindow(QMainWindow):
         return filenames
 
 
+
     def save_to_gnkt(self):
         from gnkt_data.gnkt_data import insert_data_base_gnkt
 
@@ -431,45 +267,7 @@ class MyMainWindow(QMainWindow):
         if self.wb:
             self.wb.close()
 
-    @staticmethod
-    def get_tables_starting_with(well_number, well_area, work_plan, type_kr):
-        from data_base.work_with_base import connect_to_db
-        cursor = None
-        if well_number != '':
-            if well_data.connect_in_base:
-                try:
-                    conn = connect_to_database(well_data.DB_WELL_DATA)
-                    cursor = conn.cursor()
-                    param = '%s'
-                except psycopg2.Error as e:
-                    print(f"Ошибка получения списка таблиц: {type(e).__name__}\n\n{str(e)}")
 
-            else:
-                try:
-                    # Формируем полный путь к файлу базы данных
-                    db_path = connect_to_db('well_data.db', 'data_base_well')
-                    conn = sqlite3.connect(db_path)
-                    cursor = conn.cursor()
-                    param = '?'
-
-                except sqlite3.Error as e:
-                    print(f"Ошибка получения списка таблиц: {type(e).__name__}\n\n{str(e)}")
-
-            cursor.execute(f"""
-                        SELECT well_number, area_well, type_kr, work_plan
-                        FROM wells
-                        WHERE well_number={param} AND area_well={param} AND type_kr={param} AND work_plan={param}""",
-                           (str(well_number), well_area, type_kr, work_plan))
-
-            rezult = cursor.fetchone()
-
-            if cursor:
-                cursor.close()
-            if conn:
-                conn.close()
-            return rezult
-        else:
-            return []
 
     @staticmethod
     def calculate_chemistry(type_chemistry, volume):
@@ -526,6 +324,8 @@ class MyMainWindow(QMainWindow):
     def pause_app():
         while well_data.pause is True:
             QtCore.QCoreApplication.instance().processEvents()
+
+
 
     def check_pvo_schema(self, ws5, ind):
         schema_pvo_set = set()
@@ -840,6 +640,7 @@ class MyWindow(MyMainWindow):
 
         self.initUI()
         self.login_window = None
+        self.operation_window = None
         self.new_window = None
         self.raid_window = None
         self.leakage_window = None
@@ -885,9 +686,7 @@ class MyWindow(MyMainWindow):
         self.thread.start()
 
     def insert_data_in_chemistry(self):
-        query = f"INSERT INTO chemistry " \
-                f"VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, " \
-                f"%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+
 
         if well_data.work_plan in ['dop_plan', 'dop_plan_in_base']:
             string_work = f' ДП№ {well_data.number_dp}'
@@ -935,6 +734,10 @@ class MyWindow(MyMainWindow):
                      round(well_data.normOfTime, 1),
                      well_data.fluid
                      )
+
+        query = f"INSERT INTO chemistry " \
+                f"VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, " \
+                f"%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
 
         from data_base.work_with_base import Classifier_well
         Classifier_well.insert_database('well_data', data_work, query)
@@ -1257,7 +1060,7 @@ class MyWindow(MyMainWindow):
                                                               "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
         if self.fname:
             try:
-                Classifier_well.export_to_sqlite_class_well(self, self.fname, costumer, region)
+                Classifier_well.export_to_database_class_well(self, self.fname, costumer, region)
 
             except FileNotFoundError:
                 print('Файл не найден')
@@ -1274,7 +1077,7 @@ class MyWindow(MyMainWindow):
 
             self.new_window = Classifier_well(costumer, region, 'damping')
             self.new_window.setWindowTitle("Перечень скважин без глушения")
-            self.new_window.setGeometry(200, 400, 300, 400)
+            # self.new_window.setGeometry(200, 400, 300, 400)
             self.new_window.show()
 
         else:
@@ -1318,7 +1121,7 @@ class MyWindow(MyMainWindow):
         if self.new_window is None:
             self.new_window = Classifier_well(costumer, region, 'classifier_well')
             self.new_window.setWindowTitle("Классификатор")
-            self.new_window.setGeometry(200, 400, 300, 400)
+            # self.new_window.setGeometry(200, 400, 300, 400)
             self.new_window.show()
         else:
             self.new_window.close()  # Close window.
@@ -1407,7 +1210,7 @@ class MyWindow(MyMainWindow):
     def save_to_krs(self):
         from open_pz import CreatePZ
         from work_py.alone_oreration import is_number
-        from data_base.work_with_base import insert_database_well_data, excel_in_json
+        from data_base.work_with_base import excel_in_json
         from work_py.advanted_file import count_row_height
 
         if not self.table_widget is None:
@@ -1498,12 +1301,15 @@ class MyWindow(MyMainWindow):
                     self.insert_image(ws2, f'{well_data.path_image}imageFiles/Шамигулов.png', 'H4')
 
             excel_data_dict = excel_in_json(ws2)
-            insert_database_well_data(
-                well_data.well_number._value, well_data.well_area._value, well_data.contractor, well_data.costumer,
-                well_data.data_well_dict, excel_data_dict, self.work_plan
-            )
+            db = connection_to_database(well_data.DB_WELL_DATA)
+            data_well_base = WorkDatabaseWell(db)
+            data_well_base.insert_in_database_well_data(well_data.well_number._value, well_data.well_area._value,
+                                                        well_data.contractor, well_data.costumer,
+                well_data.data_well_dict, excel_data_dict, self.work_plan)
 
-            self.insert_data_in_chemistry()
+
+            data_well_base.insert_data_in_chemistry()
+
 
             ws2.print_area = f'B1:L{self.table_widget.rowCount() + 45}'
             ws2.page_setup.fitToPage = True
@@ -1964,16 +1770,16 @@ class MyWindow(MyMainWindow):
     def tubing_pressure_testing(self):
         from work_py.tubing_pressuar_testing import TubingPressuarWindow
 
-        if self.raid_window is None:
-            self.raid_window = TubingPressuarWindow(well_data.ins_ind, self.table_widget)
-            self.raid_window.setGeometry(50, 50, 900, 500)
-            self.set_modal_window(self.raid_window)
+        if self.operation_window is None:
+            self.operation_window = TubingPressuarWindow(well_data.ins_ind, self.table_widget)
+            self.operation_window.setGeometry(50, 50, 900, 500)
+            self.set_modal_window(self.operation_window)
             self.pause_app()
             well_data.pause = True
-            self.raid_window = None
+            self.operation_window = None
         else:
-            self.raid_window.close()  # Close window.
-            self.raid_window = None
+            self.operation_window.close()  # Close window.
+            self.operation_window = None
 
     def read_clicked_mouse_data(self, row):
         from work_py.advanted_file import definition_plast_work
@@ -2017,30 +1823,30 @@ class MyWindow(MyMainWindow):
 
 
     def drilling_action_nkt(self):
-        if self.raid_window is None:
+        if self.operation_window is None:
             from work_py.drilling import Drill_window
-            self.raid_window = Drill_window(well_data.ins_ind, self.table_widget)
-            self.set_modal_window(self.raid_window)
+            self.operation_window = Drill_window(well_data.ins_ind, self.table_widget)
+            self.set_modal_window(self.operation_window)
             self.pause_app()
             well_data.pause = True
-            self.raid_window = None
+            self.operation_window = None
         else:
-            self.raid_window.close()  # Close window.
-            self.raid_window = None
+            self.operation_window.close()  # Close window.
+            self.operation_window = None
 
     def magnet_action(self):
 
         from work_py.emergency_magnit import Emergency_magnit
-        if self.raid_window is None:
-            self.raid_window = Emergency_magnit(well_data.ins_ind, self.table_widget)
-            # self.raid_window.setGeometry(200, 400, 300, 400)
-            self.set_modal_window(self.raid_window)
+        if self.operation_window is None:
+            self.operation_window = Emergency_magnit(well_data.ins_ind, self.table_widget)
+            # self.operation_window.setGeometry(200, 400, 300, 400)
+            self.set_modal_window(self.operation_window)
             self.pause_app()
             well_data.pause = True
-            self.raid_window = None
+            self.operation_window = None
         else:
-            self.raid_window.close()  # Close window.
-            self.raid_window = None
+            self.operation_window.close()  # Close window.
+            self.operation_window = None
 
     def emergency_sticking_action(self):
         from work_py.emergencyWork import emergency_sticking
@@ -2059,45 +1865,45 @@ class MyWindow(MyMainWindow):
 
     def lar_sbt_action(self):
         from work_py.emergency_lar import Emergency_lar
-        if self.raid_window is None:
-            self.raid_window = Emergency_lar(well_data.ins_ind, self.table_widget)
-            # self.raid_window.setGeometry(200, 400, 300, 400)
+        if self.operation_window is None:
+            self.operation_window = Emergency_lar(well_data.ins_ind, self.table_widget)
+            # self.operation_window.setGeometry(200, 400, 300, 400)
 
-            self.set_modal_window(self.raid_window)
+            self.set_modal_window(self.operation_window)
             self.pause_app()
             well_data.pause = True
-            self.raid_window = None
+            self.operation_window = None
         else:
-            self.raid_window.close()  # Close window.
-            self.raid_window = None
+            self.operation_window.close()  # Close window.
+            self.operation_window = None
 
     def lar_po_action(self):
         from work_py.emergency_po import EmergencyPo
-        if self.raid_window is None:
-            self.raid_window = EmergencyPo(well_data.ins_ind, self.table_widget)
-            # self.raid_window.setGeometry(200, 400, 300, 400)
+        if self.operation_window is None:
+            self.operation_window = EmergencyPo(well_data.ins_ind, self.table_widget)
+            # self.operation_window.setGeometry(200, 400, 300, 400)
 
-            self.set_modal_window(self.raid_window)
+            self.set_modal_window(self.operation_window)
             self.pause_app()
             well_data.pause = True
-            self.raid_window = None
+            self.operation_window = None
         else:
-            self.raid_window.close()  # Close window.
-            self.raid_window = None
+            self.operation_window.close()  # Close window.
+            self.operation_window = None
 
     def emergency_print_action(self):
         from work_py.emergency_printing import Emergency_print
-        if self.raid_window is None:
-            self.raid_window = Emergency_print(well_data.ins_ind, self.table_widget)
-            # self.raid_window.setGeometry(200, 400, 300, 400)
+        if self.operation_window is None:
+            self.operation_window = Emergency_print(well_data.ins_ind, self.table_widget)
+            # self.operation_window.setGeometry(200, 400, 300, 400)
 
-            self.set_modal_window(self.raid_window)
+            self.set_modal_window(self.operation_window)
             self.pause_app()
             well_data.pause = True
-            self.raid_window = None
+            self.operation_window = None
         else:
-            self.raid_window.close()  # Close window.
-            self.raid_window = None
+            self.operation_window.close()  # Close window.
+            self.operation_window = None
 
     def rgd_without_paker_action(self):
         from work_py.rgdVcht import rgd_without_paker
@@ -2155,28 +1961,28 @@ class MyWindow(MyMainWindow):
     def acid_action_gons(self):
         from work_py.acids import GonsWindow
 
-        if self.raid_window is None:
-            self.raid_window = GonsWindow(well_data.ins_ind, self.table_widget)
+        if self.operation_window is None:
+            self.operation_window = GonsWindow(well_data.ins_ind, self.table_widget)
 
-            self.set_modal_window(self.raid_window)
+            self.set_modal_window(self.operation_window)
             self.pause_app()
             well_data.pause = True
-            self.raid_window = None
+            self.operation_window = None
         else:
-            self.raid_window.close()  # Close window.
-            self.raid_window = None
+            self.operation_window.close()  # Close window.
+            self.operation_window = None
 
     def pakerIzvlek_action(self):
         from work_py.izv_paker import PakerIzvlek
-        if self.raid_window is None:
-            self.raid_window = PakerIzvlek(well_data.ins_ind, self.table_widget)
-            self.set_modal_window(self.raid_window)
+        if self.operation_window is None:
+            self.operation_window = PakerIzvlek(well_data.ins_ind, self.table_widget)
+            self.set_modal_window(self.operation_window)
             self.pause_app()
             well_data.pause = True
-            self.raid_window = None
+            self.operation_window = None
         else:
-            self.raid_window.close()  # Close window.
-            self.raid_window = None
+            self.operation_window.close()  # Close window.
+            self.operation_window = None
 
     def pvo_cat1(self):
         from work_py.alone_oreration import pvo_cat1
@@ -2231,44 +2037,44 @@ class MyWindow(MyMainWindow):
     def grpWithPaker(self):
         from work_py.grp import Grp_window
 
-        if self.work_window is None:
-            self.work_window = Grp_window(well_data.ins_ind, self.table_widget)
-            # self.work_window.setGeometry(200, 400, 500, 500)
-            self.set_modal_window(self.work_window)
+        if self.operation_window is None:
+            self.operation_window = Grp_window(well_data.ins_ind, self.table_widget)
+            # self.operation_window.setGeometry(200, 400, 500, 500)
+            self.set_modal_window(self.operation_window)
             self.pause_app()
             well_data.pause = True
-            self.work_window = None
+            self.operation_window = None
         else:
-            self.work_window.close()  # Close window.
-            self.work_window = None
+            self.operation_window.close()  # Close window.
+            self.operation_window = None
 
     def grpWithGpp(self):
         from work_py.gpp import Gpp_window
 
-        if self.work_window is None:
-            self.work_window = Gpp_window(well_data.ins_ind, self.table_widget)
-            # self.work_window.setGeometry(200, 400, 500, 500)
-            self.set_modal_window(self.work_window)
+        if self.operation_window is None:
+            self.operation_window = Gpp_window(well_data.ins_ind, self.table_widget)
+            # self.operation_window.setGeometry(200, 400, 500, 500)
+            self.set_modal_window(self.operation_window)
             self.pause_app()
             well_data.pause = True
-            self.work_window = None
+            self.operation_window = None
         else:
-            self.work_window.close()  # Close window.
-            self.work_window = None
+            self.operation_window.close()  # Close window.
+            self.operation_window = None
 
     def filling_sand(self):
         from work_py.sand_filling import SandWindow
 
-        if self.work_window is None:
-            self.work_window = SandWindow(well_data.ins_ind, self.table_widget)
-            # self.work_window.setGeometry(200, 400, 500, 500)
-            self.set_modal_window(self.work_window)
+        if self.operation_window is None:
+            self.operation_window = SandWindow(well_data.ins_ind, self.table_widget)
+            # self.operation_window.setGeometry(200, 400, 500, 500)
+            self.set_modal_window(self.operation_window)
             self.pause_app()
             well_data.pause = True
-            self.work_window = None
+            self.operation_window = None
         else:
-            self.work_window.close()  # Close window.
-            self.work_window = None
+            self.operation_window.close()  # Close window.
+            self.operation_window = None
 
     def washing_sand(self):
         from work_py.sand_filling import SandWindow
@@ -2305,55 +2111,55 @@ class MyWindow(MyMainWindow):
     def vp_action(self):
         from work_py.vp_cm import VpWindow
 
-        if self.work_window is None:
-            self.work_window = VpWindow(well_data.ins_ind, self.table_widget)
-            # self.work_window.setGeometry(200, 400, 500, 500)
-            self.set_modal_window(self.work_window)
+        if self.operation_window is None:
+            self.operation_window = VpWindow(well_data.ins_ind, self.table_widget)
+            # self.operation_window.setGeometry(200, 400, 500, 500)
+            self.set_modal_window(self.operation_window)
             self.pause_app()
             well_data.pause = True
-            self.work_window = None
+            self.operation_window = None
         else:
-            self.work_window.close()  # Close window.
-            self.work_window = None
+            self.operation_window.close()  # Close window.
+            self.operation_window = None
 
     def swibbing_with_paker(self):
         from work_py.swabbing import Swab_Window
 
-        if self.work_window is None:
-            self.work_window = Swab_Window(well_data.ins_ind, self.table_widget)
-            self.set_modal_window(self.work_window)
+        if self.operation_window is None:
+            self.operation_window = Swab_Window(well_data.ins_ind, self.table_widget)
+            self.set_modal_window(self.operation_window)
             self.pause_app()
             well_data.pause = True
-            self.work_window = None
+            self.operation_window = None
         else:
-            self.work_window.close()  # Close window.
-            self.work_window = None
+            self.operation_window.close()  # Close window.
+            self.operation_window = None
 
     def kompress_with_voronka(self):
         from work_py.kompress import KompressWindow
 
-        if self.work_window is None:
-            self.work_window = KompressWindow(well_data.ins_ind, self.table_widget)
-            self.set_modal_window(self.work_window)
+        if self.operation_window is None:
+            self.operation_window = KompressWindow(well_data.ins_ind, self.table_widget)
+            self.set_modal_window(self.operation_window)
             self.pause_app()
             well_data.pause = True
-            self.work_window = None
+            self.operation_window = None
         else:
-            self.work_window.close()  # Close window.
-            self.work_window = None
+            self.operation_window.close()  # Close window.
+            self.operation_window = None
 
     def ryber_add(self):
         from work_py.raiding import Raid
 
-        if self.work_window is None:
-            self.work_window = Raid(well_data.ins_ind, self.table_widget)
-            self.set_modal_window(self.work_window)
+        if self.operation_window is None:
+            self.operation_window = Raid(well_data.ins_ind, self.table_widget)
+            self.set_modal_window(self.operation_window)
             self.pause_app()
             well_data.pause = True
-            self.work_window = None
+            self.operation_window = None
         else:
-            self.work_window.close()  # Close window.
-            self.work_window = None
+            self.operation_window.close()  # Close window.
+            self.operation_window = None
 
     def gnkt_after_grp(self):
         from gnkt_after_grp import gnkt_work
@@ -2363,98 +2169,98 @@ class MyWindow(MyMainWindow):
     def gno_bottom(self):
         from work_py.descent_gno import GnoDescentWindow
 
-        if self.work_window is None:
-            self.work_window = GnoDescentWindow(well_data.ins_ind, self.table_widget)
-            self.set_modal_window(self.work_window)
+        if self.operation_window is None:
+            self.operation_window = GnoDescentWindow(well_data.ins_ind, self.table_widget)
+            self.set_modal_window(self.operation_window)
             self.pause_app()
             well_data.pause = True
-            self.work_window = None
+            self.operation_window = None
         else:
-            self.work_window.close()  # Close window.
-            self.work_window = None
+            self.operation_window.close()  # Close window.
+            self.operation_window = None
 
     def pressureTest(self):
         from work_py.opressovka import OpressovkaEK
 
-        if self.work_window is None:
-            self.work_window = OpressovkaEK(well_data.ins_ind, self.table_widget)
-            self.set_modal_window(self.work_window)
+        if self.operation_window is None:
+            self.operation_window = OpressovkaEK(well_data.ins_ind, self.table_widget)
+            self.set_modal_window(self.operation_window)
             self.pause_app()
             well_data.pause = True
-            self.work_window = None
+            self.operation_window = None
         else:
-            self.work_window.close()  # Close window.
-            self.work_window = None
+            self.operation_window.close()  # Close window.
+            self.operation_window = None
 
     def block_pack(self):
         from work_py.block_pack_work import BlockPackWindow
 
-        self.work_window = BlockPackWindow(well_data.ins_ind, self.table_widget)
-        self.set_modal_window(self.work_window)
+        self.operation_window = BlockPackWindow(well_data.ins_ind, self.table_widget)
+        self.set_modal_window(self.operation_window)
         self.pause_app()
         well_data.pause = True
-        self.work_window = None
+        self.operation_window = None
 
     def template_pero(self):
         from work_py.pero_work import PeroWindow
 
-        self.work_window = PeroWindow(well_data.ins_ind, self.table_widget)
-        self.set_modal_window(self.work_window)
+        self.operation_window = PeroWindow(well_data.ins_ind, self.table_widget)
+        self.set_modal_window(self.operation_window)
         self.pause_app()
         well_data.pause = True
-        self.work_window = None
+        self.operation_window = None
 
     def template_with_skm(self):
         from work_py.template_work import TemplateKrs
 
-        if self.work_window is None:
-            self.work_window = TemplateKrs(well_data.ins_ind, self.table_widget)
-            self.set_modal_window(self.work_window)
+        if self.operation_window is None:
+            self.operation_window = TemplateKrs(well_data.ins_ind, self.table_widget)
+            self.set_modal_window(self.operation_window)
             self.pause_app()
             well_data.pause = True
-            self.work_window = None
+            self.operation_window = None
         else:
-            self.work_window.close()  # Close window.
-            self.work_window = None
+            self.operation_window.close()  # Close window.
+            self.operation_window = None
 
     def sgm_work(self):
         from work_py.sgm_work import TemplateKrs
 
-        if self.work_window is None:
-            self.work_window = TemplateKrs(well_data.ins_ind, self.table_widget)
-            self.set_modal_window(self.work_window)
+        if self.operation_window is None:
+            self.operation_window = TemplateKrs(well_data.ins_ind, self.table_widget)
+            self.set_modal_window(self.operation_window)
             self.pause_app()
             well_data.pause = True
-            self.work_window = None
+            self.operation_window = None
         else:
-            self.work_window.close()  # Close window.
-            self.work_window = None
+            self.operation_window.close()  # Close window.
+            self.operation_window = None
 
     def paker_clear_aspo(self):
         from work_py.opressovka_aspo import PakerAspo
 
-        if self.work_window is None:
-            self.work_window = PakerAspo(well_data.ins_ind, self.table_widget)
-            self.set_modal_window(self.work_window)
+        if self.operation_window is None:
+            self.operation_window = PakerAspo(well_data.ins_ind, self.table_widget)
+            self.set_modal_window(self.operation_window)
             self.pause_app()
             well_data.pause = True
-            self.work_window = None
+            self.operation_window = None
         else:
-            self.work_window.close()  # Close window.
-            self.work_window = None
+            self.operation_window.close()  # Close window.
+            self.operation_window = None
 
     def template_without_skm(self):
         from work_py.template_without_skm import Template_without_skm
 
-        if self.work_window is None:
-            self.work_window = Template_without_skm(well_data.ins_ind, self.table_widget)
-            self.set_modal_window(self.work_window)
+        if self.operation_window is None:
+            self.operation_window = Template_without_skm(well_data.ins_ind, self.table_widget)
+            self.set_modal_window(self.operation_window)
             self.pause_app()
             well_data.pause = True
-            self.work_window = None
+            self.operation_window = None
         else:
-            self.work_window.close()  # Close window.
-            self.work_window = None
+            self.operation_window.close()  # Close window.
+            self.operation_window = None
 
     def acidPakerNewWindow(self):
         from work_py.acid_paker import AcidPakerWindow
@@ -2474,18 +2280,18 @@ class MyWindow(MyMainWindow):
     def GeophysicalNewWindow(self):
         from work_py.geophysic import GeophysicWindow
 
-        if self.new_window is None:
-            self.new_window = GeophysicWindow(self.table_widget, self.ins_ind)
-            self.new_window.setWindowTitle("Геофизические исследования")
-            self.set_modal_window(self.new_window)
+        if self.operation_window is None:
+            self.operation_window = GeophysicWindow(self.table_widget, self.ins_ind)
+            self.operation_window.setWindowTitle("Геофизические исследования")
+            self.set_modal_window(self.operation_window)
             self.pause_app()
             well_data.pause = True
-            self.new_window = None  # Discard reference.
+            self.operation_window = None  # Discard reference.
 
 
         else:
-            self.new_window.close()  # Close window.
-            self.new_window = None  # Discard reference.
+            self.operation_window.close()  # Close window.
+            self.operation_window = None  # Discard reference.
 
     def correctPVR(self):
         from perforation_correct import PerforationCorrect
@@ -2575,18 +2381,18 @@ class MyWindow(MyMainWindow):
                 msc = QMessageBox.information(self, 'Внимание', 'Не произведен монтаж первой категории')
                 return
 
-        if self.new_window is None:
+        if self.operation_window is None:
 
-            self.new_window = PerforationWindow(self.table_widget, self.ins_ind)
-            self.new_window.setWindowTitle("Перфорация")
+            self.operation_window = PerforationWindow(self.table_widget, self.ins_ind)
+            self.operation_window.setWindowTitle("Перфорация")
             # self.new_window.setGeometry(200, 400, 300, 400)
-            self.set_modal_window(self.new_window)
+            self.set_modal_window(self.operation_window)
             self.pause_app()
             well_data.pause = True
 
         else:
-            self.new_window.close()  # Close window.
-            self.new_window = None  # Discard reference.
+            self.operation_window.close()  # Close window.
+            self.operation_window = None  # Discard reference.
 
     def insertPerf(self):
         self.populate_row(self.ins_ind, self.perforation_list)
@@ -2787,20 +2593,7 @@ if __name__ == "__main__":
     if MyWindow.check_process():
         MyWindow.show_confirmation()
 
-    try:
-        well_data.connect_in_base = connect_to_database('well_data')
 
-        if well_data.connect_in_base is False:
-            QMessageBox.information(None, 'Проверка соединения',
-                                    'Проверка показало что с облаком соединения нет, '
-                                    'будет использована локальная база данных')
-        MyWindow.login_window = LoginWindow()
-        MyWindow.login_window.show()
-        MyMainWindow.pause_app()
-        well_data.pause = False
-    except Exception as e:
-        QMessageBox.warning(None, 'КРИТИЧЕСКАЯ ОШИБКА',
-                            f'Критическая ошибка, смотри в лог {type(e).__name__}\n\n{str(e)}')
 
     # if well_data.connect_in_base:
     #     app2 = UpdateChecker()
@@ -2810,15 +2603,24 @@ if __name__ == "__main__":
     #         well_data.pause = True
     #         self.pause_app()
     #         well_data.pause = False
-    #         app2.close()
+    #         app2.close()dow = MyWindow()
+
+
+    try:
+        well_data.connect_in_base = connect_to_database('krs2')
+
+        login_window = LoginWindow()
+        login_window.setWindowModality(Qt.ApplicationModal)
+
+        login_window.show()
+        MyMainWindow.pause_app()
+        well_data.pause = False
+    except Exception as e:
+        QMessageBox.warning(None, 'КРИТИЧЕСКАЯ ОШИБКА',
+                            f'Критическая ошибка, смотри в лог {type(e).__name__}\n\n{str(e)}')
 
     window = MyWindow()
     window.show()
-    # screen_geometry = QApplication.desktop().availableGeometry()
-    # window_width = int(screen_geometry.width() * 0.9)
-    # window_height = int(screen_geometry.height() * 0.9)
-    #
-    # window.setGeometry(0, 0, window_width, window_height)
-    #
+
 
     sys.exit(app.exec_())

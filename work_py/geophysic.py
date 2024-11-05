@@ -85,6 +85,10 @@ class GeophysicWindow(MyMainWindow):
 
         return geophysic
 
+    def closeEvent(self, event):
+                # Закрываем основное окно при закрытии окна входа
+        self.operation_window = None
+        event.accept()  # Принимаем событие закрытия
     def add_row_table(self):
 
         edit_type = self.tabWidget.currentWidget().lineedit_type.text().replace(',', '.')

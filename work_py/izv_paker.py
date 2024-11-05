@@ -193,6 +193,10 @@ class PakerIzvlek(MyMainWindow):
         vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonadd_work, 3, 0)
 
+    def closeEvent(self, event):
+                # Закрываем основное окно при закрытии окна входа
+        self.operation_window = None
+        event.accept()  # Принимаем событие закрытия
     def add_work(self):
         type_work_combo = self.tabWidget.currentWidget().type_work_combo.currentText()
         pero_diametr_line = self.tabWidget.currentWidget().pero_diametr_line.text()

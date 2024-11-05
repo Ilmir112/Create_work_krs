@@ -119,6 +119,10 @@ class Grp_window(MyMainWindow):
         vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
 
+    def closeEvent(self, event):
+                # Закрываем основное окно при закрытии окна входа
+        self.operation_window = None
+        event.accept()  # Принимаем событие закрытия
     def add_work(self):
         diametr_paker = int(float(self.tabWidget.currentWidget().diametr_paker_edit.text().replace(',', '.')))
         paker_khost = int(float(self.tabWidget.currentWidget().paker_khost_edit.text().replace(',', '.')))

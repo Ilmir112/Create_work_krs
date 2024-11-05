@@ -285,6 +285,11 @@ class Change_fluid_Window(MyMainWindow):
         well_data.pause = False
         self.close()
 
+    def closeEvent(self, event):
+                # Закрываем основное окно при закрытии окна входа
+        self.operation_window = None
+        event.accept()  # Принимаем событие закрытия
+
     def fluid_change_old_plast(self, fluid_new_edit):
         from work_py.alone_oreration import well_volume, update_fluid
         fluid_work = str(fluid_new_edit) + well_data.fluid_work[4:]

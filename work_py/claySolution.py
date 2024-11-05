@@ -53,16 +53,18 @@ class TabPage_SO_clay(QWidget):
 
         self.roof_rir_label = QLabel("Плановая кровля РИР", self)
         self.roof_rir_edit = QLineEdit(self)
+        self.roof_rir_edit.editingFinished.connect(self.update_volume_cement)
+
         self.roof_rir_edit.setText(f'{well_data.current_bottom - 50}')
         self.roof_rir_edit.setClearButtonEnabled(True)
 
         self.sole_rir_LabelType = QLabel("Подошва РИР", self)
         self.sole_rir_edit = QLineEdit(self)
+        self.sole_rir_edit.editingFinished.connect(self.update_volume_cement)
         self.sole_rir_edit.setText(f'{well_data.current_bottom}')
         self.sole_rir_edit.setClearButtonEnabled(True)
 
-        self.cement_volume_label = QLabel('Объем цемента')
-        self.cement_volume_line = QLineEdit(self)
+
 
         self.grid = QGridLayout(self)
 
@@ -130,14 +132,15 @@ class TabPage_SO_clay(QWidget):
             self.cement_volume_label.setParent(None)
             self.cement_volume_line.setParent(None)
         else:
+            self.cement_volume_label = QLabel('Объем цемента')
+            self.cement_volume_line = QLineEdit(self)
             self.grid.addWidget(self.roof_rir_label, 6, 4)
             self.grid.addWidget(self.roof_rir_edit, 7, 4)
             self.grid.addWidget(self.sole_rir_LabelType, 6, 5)
             self.grid.addWidget(self.sole_rir_edit, 7, 5)
             self.grid.addWidget(self.cement_volume_label, 6, 6)
             self.grid.addWidget(self.cement_volume_line, 7, 6)
-            self.roof_rir_edit.editingFinished.connect(self.update_volume_cement)
-            self.sole_rir_edit.editingFinished.connect(self.update_volume_cement)
+
 
     def update_volume_cement(self):
         if self.roof_rir_edit.text() != '' and self.sole_rir_edit.text() != '':
@@ -330,7 +333,7 @@ class ClayWindow(MyMainWindow):
             if (well_data.plast_work) != 0 or rirSole > well_data.perforation_sole:
                 rir_work_list = RirWindow.rirWithPero_gl(self, 'Не нужно', '', roof_rir_edit, sole_rir_edit,
                                                          volume_cement)
-                pero_list.extend(rir_work_list[-9:])
+                pero_list.extend(rir_work_list[1:])
             else:
                 rir_work_list = RirWindow.rirWithPero_gl(self, 'Не нужно', '', roof_rir_edit, sole_rir_edit,
                                                          volume_cement)

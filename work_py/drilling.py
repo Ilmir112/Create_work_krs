@@ -209,6 +209,10 @@ class Drill_window(MyMainWindow):
         vbox.addWidget(self.buttonadd_work, 3, 0)
         vbox.addWidget(self.buttonAddString, 3, 1)
 
+    def closeEvent(self, event):
+                # Закрываем основное окно при закрытии окна входа
+        self.operation_window = None
+        event.accept()  # Принимаем событие закрытия
     def add_row_table(self):
 
         roof_drill = self.tabWidget.currentWidget().roof_drill_line.text().replace(',', '.')

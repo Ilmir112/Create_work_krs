@@ -1,10 +1,10 @@
 import json
-import sqlite3
+
 
 from openpyxl.styles import Font, Alignment
 
 import well_data
-import psycopg2
+
 from PyQt5.Qt import *
 from PyQt5.QtGui import QIntValidator, QDoubleValidator
 from PyQt5.QtWidgets import QMessageBox, QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QTabWidget, \
@@ -12,8 +12,8 @@ from PyQt5.QtWidgets import QMessageBox, QWidget, QLabel, QComboBox, QLineEdit, 
 from PyQt5.QtCore import Qt
 from datetime import datetime
 
-from data_base.config_base import connect_to_database
-from data_base.work_with_base import connect_to_db
+from data_base.config_base import connection_to_database, WorkDatabaseWell
+
 from krs import GnoWindow
 from main import MyMainWindow
 from work_py.advanted_file import merge_overlapping_intervals, definition_plast_work
@@ -171,6 +171,7 @@ class TabPageDp(QWidget):
             self.well_data_label = QLabel('файл excel сохранный в базе')
             self.well_data_in_base_combo = QComboBox()
             self.well_data_in_base_combo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents)
+            self.well_data_in_base_combo.currentTextChanged.connect(self.update_well_data_in_base_combo)
 
             self.index_change_label = QLabel('пункт после которого происходят изменения')
             self.index_change_line = QLineEdit(self)
@@ -186,45 +187,19 @@ class TabPageDp(QWidget):
 
             self.index_change_line.editingFinished.connect(self.update_table_in_base_combo)
 
+    def update_well_data_in_base_combo(self, index):
+        if index:
+            if index.split(' ')[3] != 'ПР':
+                number_dp_in_base = [num for num in index.split(' ')[3] if num.isdigit()][0]
+                self.number_DP_Combo.setCurrentIndex(int(number_dp_in_base))
 
-    def check_in_database_well_data(self, number_well):
+    def check_in_database_well_data2(self, number_well):
+        db = connection_to_database(well_data.DB_WELL_DATA)
+        data_well_base = WorkDatabaseWell(db)
 
-        if well_data.connect_in_base:
-            try:
-                conn = connect_to_database(well_data.DB_WELL_DATA)
-                cursor = conn.cursor()
-                param = '%s'
-
-
-            except psycopg2.Error as e:
-                # Выведите сообщение об ошибке
-                QMessageBox.warning(None, 'Ошибка',
-                                          f'Ошибка подключения к базе данных, Скважина не '
-                                          f'добавлена в базу: \n {type(e).__name__}\n\n{str(e)}')
-        else:
-            try:
-                db_path = connect_to_db('well_data.db', 'data_base_well/')
-
-                conn = sqlite3.connect(f'{db_path}')
-                cursor = conn.cursor()
-                param = '?'
-
-
-
-            except sqlite3.Error as e:
-                # Выведите сообщение об ошибке
-                QMessageBox.warning(None, 'Ошибка',
-                                          f'Ошибка подключения к базе данных, Скважина не '
-                                          f'добавлена в базу: \n {type(e).__name__}\n\n{str(e)}')
-
-        # Запрос для извлечения всех скважин с наличием данных
-        cursor.execute(
-            f"SELECT well_number, area_well, type_kr, today, work_plan FROM wells "
-            f"WHERE well_number={param} AND contractor={param} AND costumer ={param}",
-            (str(number_well), well_data.contractor, well_data.costumer))
 
         # Получение всех результатов
-        wells_with_data = cursor.fetchall()
+        wells_with_data = data_well_base.check_well_in_database_well_data(number_well)
         # Проверка, есть ли данные
         if wells_with_data:
             well_list = []
@@ -314,7 +289,7 @@ class TabPageDp(QWidget):
         self.table_name = str(self.well_number_edit.text()) + self.well_area_edit.text()
         if well_data.data_in_base:
 
-            well_list = self.check_in_database_well_data(self.well_number_edit.text())
+            well_list = self.check_in_database_well_data2(self.well_number_edit.text())
             if well_list:
                 self.well_data_in_base_combo.clear()
                 self.well_data_in_base_combo.addItems(well_list)
@@ -439,46 +414,46 @@ class DopPlanWindow(MyMainWindow):
     def add_row_table(self):
         current_widget = self.tabWidget.currentWidget()
 
-        plast_line = current_widget.plast_line.text()
-        roof_edit = current_widget.roof_edit.text().replace(',', '.')
-        sole_edit = current_widget.sole_edit.text().replace(',', '.')
-        date_pvr_edit = current_widget.date_pvr_edit.text()
-        count_pvr_edit = current_widget.count_pvr_edit.text()
-        type_pvr_edit = current_widget.type_pvr_edit.text()
-        pressuar_pvr_edit = current_widget.pressuar_pvr_edit.text().replace(',', '.')
-        date_pressuar_edit = current_widget.date_pressuar_edit.text()
+        self.plast_line = current_widget.plast_line.text()
+        self.roof_edit = current_widget.roof_edit.text().replace(',', '.')
+        self.sole_edit = current_widget.sole_edit.text().replace(',', '.')
+        self.date_pvr_edit = current_widget.date_pvr_edit.text()
+        self.count_pvr_edit = current_widget.count_pvr_edit.text()
+        self.type_pvr_edit = current_widget.type_pvr_edit.text()
+        self.pressuar_pvr_edit = current_widget.pressuar_pvr_edit.text().replace(',', '.')
+        self.date_pressuar_edit = current_widget.date_pressuar_edit.text()
         vertical_line = current_widget.vertical_line.text().replace(',', '.')
 
-        if '' in [plast_line, roof_edit, sole_edit, count_pvr_edit, type_pvr_edit]:
+        if '' in [self.plast_line, self.roof_edit, self.sole_edit, self.count_pvr_edit, self.type_pvr_edit]:
             QMessageBox.warning(self, 'Ошибка', 'Не введены все даныые')
             return
-        udlin = round(float(roof_edit) - float(vertical_line), 1)
-        if [plast_line, vertical_line, roof_edit, sole_edit, date_pvr_edit, count_pvr_edit,
-            type_pvr_edit, pressuar_pvr_edit, date_pressuar_edit] not in self.dict_perforation:
+        udlin = round(float(self.roof_edit) - float(vertical_line), 1)
+        if [self.plast_line, vertical_line, self.roof_edit, self.sole_edit, self.date_pvr_edit, self.count_pvr_edit,
+            self.type_pvr_edit, self.pressuar_pvr_edit, self.date_pressuar_edit] not in self.dict_perforation:
             self.dict_perforation.append(
-                [plast_line, vertical_line, roof_edit, sole_edit, date_pvr_edit, count_pvr_edit,
-                 type_pvr_edit, pressuar_pvr_edit, date_pressuar_edit])
+                [self.plast_line, vertical_line, self.roof_edit, self.sole_edit, self.date_pvr_edit, self.count_pvr_edit,
+                 self.type_pvr_edit, self.pressuar_pvr_edit, self.date_pressuar_edit])
         rows = 0
         self.tableWidget.insertRow(rows)
 
-        self.tableWidget.setItem(rows, 0, QTableWidgetItem(str(plast_line)))
+        self.tableWidget.setItem(rows, 0, QTableWidgetItem(str(self.plast_line)))
         self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(vertical_line)))
-        self.tableWidget.setItem(rows, 2, QTableWidgetItem(str(roof_edit)))
-        self.tableWidget.setItem(rows, 3, QTableWidgetItem(str(sole_edit)))
-        self.tableWidget.setItem(rows, 4, QTableWidgetItem(str(date_pvr_edit)))
+        self.tableWidget.setItem(rows, 2, QTableWidgetItem(str(self.roof_edit)))
+        self.tableWidget.setItem(rows, 3, QTableWidgetItem(str(self.sole_edit)))
+        self.tableWidget.setItem(rows, 4, QTableWidgetItem(str(self.date_pvr_edit)))
         aaaa = self.old_index
         if self.old_index == 0:
-            self.tableWidget.setItem(rows, 6, QTableWidgetItem(str(count_pvr_edit)))
-            self.tableWidget.setItem(rows, 7, QTableWidgetItem(str(type_pvr_edit)))
+            self.tableWidget.setItem(rows, 6, QTableWidgetItem(str(self.count_pvr_edit)))
+            self.tableWidget.setItem(rows, 7, QTableWidgetItem(str(self.type_pvr_edit)))
             self.tableWidget.setItem(rows, 8, QTableWidgetItem(str(udlin)))
-            self.tableWidget.setItem(rows, 9, QTableWidgetItem(str(pressuar_pvr_edit)))
-            self.tableWidget.setItem(rows, 10, QTableWidgetItem(str(date_pressuar_edit)))
+            self.tableWidget.setItem(rows, 9, QTableWidgetItem(str(self.pressuar_pvr_edit)))
+            self.tableWidget.setItem(rows, 10, QTableWidgetItem(str(self.date_pressuar_edit)))
         else:
-            self.tableWidget.setItem(rows, 5, QTableWidgetItem(str(count_pvr_edit)))
-            self.tableWidget.setItem(rows, 6, QTableWidgetItem(str(type_pvr_edit)))
+            self.tableWidget.setItem(rows, 5, QTableWidgetItem(str(self.count_pvr_edit)))
+            self.tableWidget.setItem(rows, 6, QTableWidgetItem(str(self.type_pvr_edit)))
             self.tableWidget.setItem(rows, 7, QTableWidgetItem(str(udlin)))
-            self.tableWidget.setItem(rows, 8, QTableWidgetItem(str(pressuar_pvr_edit)))
-            self.tableWidget.setItem(rows, 9, QTableWidgetItem(str(date_pressuar_edit)))
+            self.tableWidget.setItem(rows, 8, QTableWidgetItem(str(self.pressuar_pvr_edit)))
+            self.tableWidget.setItem(rows, 9, QTableWidgetItem(str(self.date_pressuar_edit)))
 
     def addPerfProject(self):
         current_widget = self.tabWidget.currentWidget()
@@ -506,7 +481,7 @@ class DopPlanWindow(MyMainWindow):
         self.bottom_row_index = 5000
 
         perforation_list = []
-        aaaaa = self.data
+
         for i, row in self.data.items():
             if i != 'image':
                 list_row = []
@@ -553,28 +528,11 @@ class DopPlanWindow(MyMainWindow):
                         self.tableWidget.setItem(rows, index_col - 1, QTableWidgetItem(str(col_pvr)))
     @staticmethod
     def read_excel_in_base(number_well, area_well, work_plan, type_kr):
-        if well_data.connect_in_base:
-            conn = connect_to_database(well_data.DB_WELL_DATA)
-            cursor = conn.cursor()
-            param = '%s'
+        db = connection_to_database(well_data.DB_WELL_DATA)
+        data_well_base = WorkDatabaseWell(db)
 
-        else:
-            db_path = connect_to_db('well_data.db', 'data_base_well/')
+        data_well = data_well_base.read_excel_in_base(number_well, area_well, work_plan, type_kr)
 
-            conn = sqlite3.connect(f'{db_path}')
-            cursor = conn.cursor()
-            param = '?'
-        aaa = well_data.contractor
-        cursor.execute(f"SELECT excel_json "
-                       f"FROM wells "
-                       f"WHERE well_number={param} AND area_well={param} AND contractor={param} "
-                       f"AND costumer={param} AND work_plan={param} AND type_kr={param}",
-                       (str(number_well), area_well, well_data.contractor, well_data.costumer, work_plan, type_kr))
-        data_well = cursor.fetchall()
-        if cursor:
-            cursor.close()
-        if conn:
-            conn.close()
         try:
             dict_well = json.loads(data_well[len(data_well) - 1][0])
             data = dict_well['data']
@@ -761,7 +719,7 @@ class DopPlanWindow(MyMainWindow):
         self.tableWidget.removeRow(row)
 
     def add_work(self):
-        from data_base.work_with_base import check_in_database_well_data, insert_data_well_dop_plan, round_cell
+        from data_base.work_with_base import  insert_data_well_dop_plan, round_cell
         from well_data import ProtectedIsNonNone
         
         current_widget = self.tabWidget.currentWidget()
@@ -899,7 +857,7 @@ class DopPlanWindow(MyMainWindow):
                     return
 
                 if ' от' in well_data_in_base_combo:
-                    asd = well_data_in_base_combo.split(' ')
+
                     data_table_in_base_combo = well_data_in_base_combo.split(' ')[-1]
                     table_in_base = well_data_in_base_combo.split(' ')[3]
                     type_kr = well_data_in_base_combo.split(' ')[2]
@@ -920,7 +878,9 @@ class DopPlanWindow(MyMainWindow):
                 else:
                     QMessageBox.critical(self, 'пункт', 'Необходимо выбрать пункт плана работ')
                     return
-                list_dop_plan = self.get_tables_starting_with(well_data.well_number._value,
+                db = connection_to_database(well_data.DB_WELL_DATA)
+                data_base =WorkDatabaseWell(db)
+                list_dop_plan = data_base.get_tables_starting_with(well_data.well_number._value,
                                                                                 well_data.well_area._value, table_in_base, type_kr)
                 if list_dop_plan:
                     if any([f'ДП№{number_dp}' in dop_plan or f'ДП№{number_dp}' in dop_plan for dop_plan in list_dop_plan]):
@@ -934,14 +894,17 @@ class DopPlanWindow(MyMainWindow):
                     QMessageBox.critical(self, 'База данных', 'Необходимо выбрать план работ')
                     return
 
-                data_well = check_in_database_well_data(well_number, well_area, table_in_base)
+                db = connection_to_database(well_data.DB_WELL_DATA)
+                data_well_base = WorkDatabaseWell(db)
+
+                data_well = data_well_base.check_in_database_well_data(well_number, well_area, table_in_base)
 
                 if data_well[0]:
 
-                    well_data.type_kr = data_well[1][2]
-                    if data_well[1][3]:
-                        well_data.dict_category = json.loads(data_well[1][3])
-                    insert_data_well_dop_plan(data_well[1][0])
+                    well_data.type_kr = data_well[2]
+                    if data_well[3]:
+                        well_data.dict_category = json.loads(data_well[3])
+                    insert_data_well_dop_plan(data_well[0])
 
                 # self.work_with_excel(well_number, well_area, table_in_base, type_kr)
 
@@ -1068,47 +1031,6 @@ class DopPlanWindow(MyMainWindow):
         well_data.pause = False
         self.close()
 
-    def delete_data(self, number_well, area_well, work_plan, type_kr):
-        if well_data.connect_in_base:
-            try:
-                conn = connect_to_database(well_data.DB_WELL_DATA)
-                cursor = conn.cursor()
-
-                cursor.execute("""
-                DELETE FROM wells 
-                WHERE well_number = %s AND area_well = %s  AND costumer = %s AND work_plan= %s AND type_kr=%s""",
-                               (str(number_well), area_well,  well_data.costumer, work_plan, type_kr)
-                               )
-
-                conn.commit()
-                cursor.close()
-                conn.close()
-
-            except psycopg2.Error as e:
-                # Выведите сообщение об ошибке
-                QMessageBox.warning(None, 'Ошибка',
-                                          f'Ошибка удаления {type(e).__name__}\n\n{str(e)}')
-        else:
-            try:
-                db_path = connect_to_db('well_data.db', 'data_base_well/')
-
-                conn = sqlite3.connect(f'{db_path}')
-                cursor = conn.cursor()
-
-                cursor.execute("DELETE FROM wells  WHERE well_number = ? AND area_well = ? "
-                               "AND contractor = ? AND costumer = ? AND work_plan=?",
-                               (str(number_well._value), area_well._value, well_data.contractor, well_data.costumer,
-                                work_plan))
-
-                conn.commit()
-                cursor.close()
-                conn.close()
-
-            except sqlite3.Error as e:
-                # Выведите сообщение об ошибке
-                QMessageBox.warning(None, 'Ошибка',
-                                          f'Ошибка удаления {type(e).__name__}\n\n{str(e)}')
-
     def add_work_excel(self, ws2, work_list, ind_ins):
         for i in range(1, len(work_list) + 1):  # Добавлением работ
             for j in range(1, 13):
@@ -1143,7 +1065,7 @@ class DopPlanWindow(MyMainWindow):
                                                                             vertical='center')
 
     def extraction_data(self, table_name, paragraph_row=0):
-        from data_base.work_with_base import connect_to_db
+
 
         date_table = table_name.split(' ')[-1]
         well_number = table_name.split(' ')[0]
@@ -1152,46 +1074,13 @@ class DopPlanWindow(MyMainWindow):
         contractor = well_data.contractor
         work_plan = table_name.split(' ')[3]
 
-        if well_data.connect_in_base:
-            try:
-                # Устанавливаем соединение с базой данных
-                conn = connect_to_database(well_data.DB_WELL_DATA)
-
-                cursor = conn.cursor()
-                param = '%s'
+        db = connection_to_database(well_data.DB_WELL_DATA)
+        data_well_base = WorkDatabaseWell(db)
 
 
-            except psycopg2.Error as e:
-                # Выведите сообщение об ошибке
-                QMessageBox.warning(None, 'Ошибка', f"Тип ошибки: {e}. Проверьте количество переданных аргументов.")
+        result_table = data_well_base.extraction_data(str(well_number), well_area, type_kr,
+                                                      work_plan, date_table, contractor)
 
-        else:
-            try:
-                # Формируем полный путь к файлу базы данных
-                db_path = connect_to_db('well_data.db', 'data_base_well')
-                conn = sqlite3.connect(db_path)
-                cursor = conn.cursor()
-                param = '?'
-
-
-            except sqlite3.Error as e:
-                # Выведите сообщение об ошибке
-                QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных.')
-
-        query = f'''
-        SELECT data_change_paragraph FROM wells 
-        WHERE well_number={param} AND area_well={param} AND type_kr={param} 
-        AND work_plan={param} AND today={param} AND contractor={param}'''
-
-        cursor.execute(query,
-        (str(well_number), well_area, type_kr, work_plan, date_table, contractor))
-
-        result_table = cursor.fetchone()
-        # Закройте курсор и соединение
-        if cursor:
-            cursor.close()
-        if conn:
-            conn.close()
         if result_table is None:
             QMessageBox.warning(self, 'Ошибка',
                                 f'В базе данных скв {well_number} {well_area} отсутствует данные, '
@@ -1203,7 +1092,7 @@ class DopPlanWindow(MyMainWindow):
             if well_data.work_plan in ['dop_plan', 'dop_plan_in_base']:
                 DopPlanWindow.insert_data_dop_plan(self, result, paragraph_row)
             elif well_data.work_plan == 'plan_change':
-                DopPlanWindow.insert_data_dop_plan(self, result, 1)
+                DopPlanWindow.insert_data_plan(self, result)
             well_data.data_well_is_True = True
 
         else:
@@ -1213,9 +1102,40 @@ class DopPlanWindow(MyMainWindow):
 
         return
 
+    def insert_data_plan(self, result):
+        well_data.data_list = []
+        well_data.fluid = float(result[0][7][:4].replace('г', ''))
+
+        for ind, row in enumerate(result):
+            if ind == 1:
+                well_data.bottom = row[1]
+                well_data.category_pressuar2 = row[8]
+                well_data.category_h2s_2 = row[9]
+                well_data.gaz_f_pr_2 = row[10]
+
+                well_data.plast_work_short = json.dumps(row[3], ensure_ascii=False)
+
+            data_list = []
+            for index, data in enumerate(row):
+                if index == 6:
+                    if data == 'false' or data == 0 or data == '0':
+                        data = False
+                    else:
+                        data = True
+                data_list.append(data)
+            well_data.data_list.append(data_list)
+        well_data.current_bottom = result[ind][1]
+        well_data.dict_perforation = json.loads(result[ind][2])
+
+        well_data.plast_all = json.loads(result[ind][3])
+        well_data.plast_work = json.loads(result[ind][4])
+        well_data.leakage = json.loads(result[ind][5])
+        well_data.dict_perforation_short = json.loads(result[ind][2])
+
+        definition_plast_work(None)
     def insert_data_dop_plan(self, result, paragraph_row):
         paragraph_row = paragraph_row - 1
-        aaas = len(result)
+
         if len(result) <= paragraph_row:
             QMessageBox.warning(self, 'Ошибка', f'В плане работ только {len(result)} пунктов')
             return

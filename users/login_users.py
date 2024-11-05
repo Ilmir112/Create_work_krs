@@ -1,18 +1,19 @@
-import sqlite3
 import well_data
-import psycopg2
+
 from PyQt5.QtWidgets import QWidget, QLabel, QLineEdit, QPushButton, QMessageBox, QComboBox, QGridLayout
 from PyQt5.QtCore import Qt
-from data_base.config_base import connect_to_database
+
+from data_base.config_base import UserService, connection_to_database, \
+    RegistrationService
 
 
 class LoginWindow(QWidget):
     def __init__(self):
         super().__init__()
+
         self.setWindowTitle('окно входа')
 
-        # Установка флага `Qt.WindowModal`
-        self.setWindowModality(Qt.WindowModal)
+
 
         self.label_username = QLabel("Пользователь:", self)
         self.username = QComboBox(self)
@@ -53,134 +54,47 @@ class LoginWindow(QWidget):
         self.username.clear()
         self.username.addItems(users_list)
 
+    def closeEvent(self, event):
+        if self.sender() == None:  # Проверяем вызывающий объект
+            # Закрываем основное окно при закрытии окна входа
+            # self.main_window.close()
+            event.accept()  # Принимаем событие закрытия
     def login(self):
-        from data_base.work_with_base import connect_to_db
-        from main import MyMainWindow
 
         username = self.username.currentText()
         password = self.password.text()
         last_name, first_name, second_name, _ = username.split(' ')
 
-        if well_data.connect_in_base:
-            try:
-                conn = connect_to_database(well_data.DB_NAME_USER)
-                if conn:
+        db = connection_to_database(well_data.DB_NAME_USER)
 
-                    cursor = conn.cursor()
-                    cursor.execute(
-                        "SELECT last_name, first_name, second_name, password, position_in, organization FROM users "
-                        "WHERE last_name=(%s) AND first_name=(%s) AND second_name=(%s)",
-                        (last_name, first_name, second_name))
-                    password_base = cursor.fetchone()
+        user_service = UserService(db, db.path_index)
 
-                    password_base_short = f'{password_base[0]} {password_base[1]} {password_base[2]} '
-                    if password_base_short == username and password_base[3] == str(password):
-                        # QMessageBox.information(self, 'Пароль', 'вход произведен')
-                        self.close()
-                        well_data.user = (password_base[4] + ' ' + password_base[5],
-                                          f'{password_base[0]} {password_base[1][0]}.{password_base[2][0]}.')
+        user_dict = user_service.get_user(last_name, first_name, second_name)
+        if user_dict['last_name'] == last_name and user_dict['first_name'] == first_name \
+                and user_dict['second_name'] and user_dict['password'] == str(password):
+            # mes = QMessageBox.information(self, 'Пароль', 'вход произведен')
+            self.close()
+            well_data.user = (user_dict["pozition"] + ' ' + user_dict["organization"],
+                              f'{user_dict["last_name"]} '
+                              f'{user_dict["first_name"][0]}.{user_dict["second_name"][0]}.')
 
-                        well_data.contractor = password_base[5]
+            well_data.contractor = user_dict["organization"]
 
-                        well_data.pause = False
-                    else:
-                        QMessageBox.critical(self, 'Пароль', 'логин и пароль не совпадает')
-                else:
-                    MyMainWindow.pause_app(self)
-            except psycopg2.Error as e:
-                self.pause_app()
-                well_data.pause = False
-                # Выведите сообщение об ошибке
-                QMessageBox.warning(None, 'Ошибка',
-                                    f'Ошибка подключения к базе данных, проверьте наличие интернета {type(e).__name__}\n\n{str(e)}')
-            finally:
-                # Закройте курсор и соединение
-                if cursor:
-                    cursor.close()
-                if conn:
-                    conn.close()
+            well_data.pause = True
         else:
-            try:
-                db_path = connect_to_db('users.db', 'users_database')
-                conn = sqlite3.connect(f'{db_path}')
-                cursor = conn.cursor()
-                cursor.execute(
-                    "SELECT last_name, first_name, second_name, password, position_in, organization FROM users "
-                    "WHERE last_name=? AND first_name=? AND second_name=?",
-                    (last_name, first_name, second_name)
-                )
-                password_base = cursor.fetchone()
+            QMessageBox.critical(self, 'Пароль', 'логин и пароль не совпадает')
 
-                if password_base:
-                    password_base_short = f'{password_base[0]} {password_base[1]} {password_base[2]} '
-                    if password_base_short == username and password_base[3] == str(password):
 
-                        # QMessageBox.information(self, 'Пароль', 'вход произведен')
-                        self.close()
-                        well_data.user = (password_base[4] + ' ' + password_base[5], password_base_short)
+        well_data.pause = False
 
-                        well_data.contractor = password_base[5]
-                        well_data.pause = False
-
-                    else:
-                        QMessageBox.critical(None, 'Пароль', 'логин и пароль не совпадают')
-
-                else:
-                    QMessageBox.critical(None, 'Пароль', 'Пользователь не найден')
-                    return False
-
-            except sqlite3.Error as e:
-                QMessageBox.warning(None, 'Ошибка', f'Ошибка подключения к базе данных, проверьте наличие интернет {type(e).__name__}\n\n{str(e)}')
-                return False
-            finally:
-                # Закройте курсор и соединение
-                if cursor:
-                    cursor.close()
-                if conn:
-                    conn.close()
 
         if 'РН' in well_data.contractor:
             well_data.connect_in_base = False
 
     def get_list_users(self):
-        from data_base.work_with_base import connect_to_db
-        # Создаем подключение к базе данных
-        if well_data.connect_in_base:
-            conn = connect_to_database(well_data.DB_NAME_USER)
-            cursor = conn.cursor()
-
-            cursor.execute("SELECT last_name, first_name, second_name, position_in, organization  FROM users")
-            users = cursor.fetchall()
-            users_list = []
-
-            for user in users:
-                position = user[3] + " " + user[4]
-                user_name = user[0] + " " + user[1] + ' ' + user[2] + ' '
-                users_list.append((position, user_name))
-
-            conn.close()
-        else:
-
-            users_list = []
-            try:
-
-                db_path = connect_to_db('users.db', 'users_database')
-                conn = sqlite3.connect(f'{db_path}')
-                cursor = conn.cursor()
-
-                cursor.execute("SELECT last_name, first_name, second_name, position_in, organization FROM users")
-                users = cursor.fetchall()
-
-                for user in users:
-                    position = user[3] + " " + user[4]
-                    user_name = user[0] + " " + user[1] + ' ' + user[2] + ' '
-                    users_list.append((position, user_name))
-
-                conn.close()
-                return users_list
-            except sqlite3.Error as e:
-                print(f"Ошибка подключения к SQLite: {type(e).__name__}\n\n{str(e)}")
-                return []
+        db = connection_to_database(well_data.DB_NAME_USER)
+        user_service = UserService(db, db.path_index)
+        users_list = user_service.get_users_list()
         return users_list
 
     def show_register_window(self):
@@ -267,7 +181,7 @@ class RegisterWindow(QWidget):
         self.grid.addWidget(self.region, 5, 2)
 
     def register_user(self):
-        from data_base.work_with_base import connect_to_db
+
         last_name = self.last_name.text().title().strip()
         first_name = self.first_name.text().title().strip()
         second_name = self.second_name.text().title().strip()
@@ -277,70 +191,21 @@ class RegisterWindow(QWidget):
         password = self.password.text().strip()
         password2 = self.password2.text().strip()
 
-        if well_data.connect_in_base:
-            conn = connect_to_database(well_data.DB_NAME_USER)
-            cursor = conn.cursor()
+        db = connection_to_database(well_data.DB_NAME_USER)
 
-            # Проверяем, существует ли пользователь с таким именем
-            cursor.execute("SELECT last_name, first_name, second_name  FROM users "
-                           "WHERE last_name=(%s) AND first_name=(%s) AND second_name=(%s)",
-                           (last_name, first_name, second_name))
+        registration = RegistrationService(db, db.path_index)
 
-            existing_user = cursor.fetchone()
+        existing_user = registration.check_user_in_database(last_name, first_name, second_name)
 
-            if existing_user:  # Если пользователь уже существует
-                QMessageBox.critical(self, 'Данный пользовать существует', 'Данный пользовать существует')
-            else:  # Если пользователя с таким именем еще нет
-                position_in = position_in + " " + region
-                if password == password2:
-                    cursor.execute(
-                        "INSERT INTO users ("
-                        "last_name, first_name, second_name, position_in, organization, password) "
-                        "VALUES (%s, %s, %s, %s, %s, %s)",
-                        (last_name, first_name, second_name, position_in, organization, password))
-                    conn.commit()
-                    conn.close()
+        if existing_user:  # Если пользователь уже существует
+            QMessageBox.critical(self, 'Данный пользовать существует', 'Данный пользовать существует')
+        else:  # Если пользователя с таким именем еще нет
+            position_in = position_in + " " + region
+            if password == password2:
+                registration.registration_user(last_name, first_name, second_name, position_in, organization, password)
 
-                    QMessageBox.information(self, 'Регистрация', 'пользователь успешно создан')
-                    self.close()
-                else:
-                    QMessageBox.information(self, 'пароль', 'Пароли не совпадают')
-        else:
-            try:
-                db_path = connect_to_db('users.db', 'users_database')
-                conn = sqlite3.connect(f'{db_path}')
-                cursor = conn.cursor()
+                QMessageBox.information(self, 'Регистрация', 'пользователь успешно создан')
+                self.close()
+            else:
+                QMessageBox.information(self, 'пароль', 'Пароли не совпадают')
 
-                # Проверяем, существует ли пользователь с таким именем
-                cursor.execute(
-                    "SELECT last_name, first_name, second_name FROM users WHERE last_name=? AND first_name=? "
-                    "AND second_name=?",
-                    (last_name, first_name, second_name)
-                )
-                existing_user = cursor.fetchone()
-
-                if existing_user:
-                    QMessageBox.critical(None, 'Данный пользовать существует', 'Данный пользовать существует')
-                    return False
-
-                else:
-                    position_in = position_in + " " + region
-                    if password == password2:
-                        cursor.execute(
-                            "INSERT INTO users (last_name, first_name, second_name, position_in, organization, password) "
-                            "VALUES (?, ?, ?, ?, ?, ?)",
-                            (last_name, first_name, second_name, position_in, organization, password)
-                        )
-                        conn.commit()
-                        conn.close()
-
-                        QMessageBox.information(None, 'Регистрация', 'пользователь успешно создан')
-                        return True
-
-                    else:
-                        QMessageBox.information(None, 'пароль', 'Пароли не совпадают')
-                        return False
-
-            except sqlite3.Error as e:
-                QMessageBox.critical(None, 'Ошибка', f"Ошибка при регистрации: {type(e).__name__}\n\n{str(e)}")
-                return False

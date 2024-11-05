@@ -8,6 +8,7 @@ from openpyxl.utils.cell import get_column_letter
 from openpyxl.styles import Font, Alignment, Border, Side
 
 from cdng import events_gnvp, add_itog, events_gnvp_gnkt
+from data_base.config_base import connection_to_database, WorkDatabaseWell
 from find import ProtectedIsNonNone
 from main import MyMainWindow
 from plan import delete_rows_pz
@@ -32,7 +33,7 @@ class CreatePZ(MyMainWindow):
 
         from find import WellNkt, Well_perforation, WellCondition, WellHistory_data, Well_data, Well_Category, \
             WellFond_data, WellSucker_rod, Well_expected_pick_up, WellData
-        from data_base.work_with_base import check_in_database_well_data
+
 
         well_data.work_plan = work_plan
 
@@ -42,7 +43,7 @@ class CreatePZ(MyMainWindow):
 
         well_data.region = region_select(well_data.cdng._value)
 
-        WellData.read_well(ws, well_data.cat_well_max._value, well_data.data_pvr_min._value)
+        WellData.read_well(self, ws, well_data.cat_well_max._value, well_data.data_pvr_min._value)
         well_data.region = region_select(well_data.cdng._value)
 
         date_str2 = datetime.strptime('2024-09-19', '%Y-%m-%d')
@@ -53,13 +54,15 @@ class CreatePZ(MyMainWindow):
                                                            'Введите номер дополнительного плана работ',
                                                            number_list, 0, False)
 
-            data_well = \
-                check_in_database_well_data(well_data.well_number._value, well_data.well_area._value,
+            db = connection_to_database(well_data.DB_WELL_DATA)
+            data_well_base = WorkDatabaseWell(db)
+
+            data_well = data_well_base.check_in_database_well_data(well_data.well_number._value, well_data.well_area._value,
                                             f'ДП№{well_data.number_dp}')
 
-            if data_well[0]:
+            if data_well:
 
-                date_str1 = datetime.strptime(f'{data_well[1][1]}', '%Y-%m-%d')
+                date_str1 = datetime.strptime(f'{data_well[1]}', '%Y-%m-%d')
                 if date_str1 > date_str2:
 
                     change_work_work_plan = QMessageBox.question(self,

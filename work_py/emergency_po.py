@@ -115,6 +115,10 @@ class EmergencyPo(MyMainWindow):
         vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonadd_work, 3, 0)
 
+    def closeEvent(self, event):
+                # Закрываем основное окно при закрытии окна входа
+        self.operation_window = None
+        event.accept()  # Принимаем событие закрытия
     def add_work(self):
         po_str_combo = self.tabWidget.currentWidget().po_type_combo.currentText()
         nkt_str_combo = self.tabWidget.currentWidget().nkt_str_combo.currentText()

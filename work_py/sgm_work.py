@@ -437,6 +437,11 @@ class TemplateKrs(MyMainWindow):
 
         return list_template_ek
 
+    def closeEvent(self, event):
+                # Закрываем основное окно при закрытии окна входа
+        self.operation_window = None
+        event.accept()  # Принимаем событие закрытия
+
     def update_skm_interval(self, index_plan, skm_list):
 
         row_index = index_plan - well_data.count_row_well

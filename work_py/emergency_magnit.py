@@ -136,7 +136,10 @@ class Emergency_magnit(MyMainWindow):
         vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonadd_work, 3, 0)
 
-
+    def closeEvent(self, event):
+                # Закрываем основное окно при закрытии окна входа
+        self.operation_window = None
+        event.accept()  # Принимаем событие закрытия
     def add_work(self):
         nkt_str_combo = self.tabWidget.currentWidget().nkt_str_combo.currentText()
         print_diametr_line = self.tabWidget.currentWidget().print_diametr_line.text()

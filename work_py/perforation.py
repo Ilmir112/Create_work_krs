@@ -122,6 +122,10 @@ class PerforationWindow(MyMainWindow):
         vbox.addWidget(self.buttonadd_work, 3, 0)
         vbox.addWidget(self.buttonAddProject, 3, 1)
 
+    def closeEvent(self, event):
+                # Закрываем основное окно при закрытии окна входа
+        self.operation_window = None
+        event.accept()  # Принимаем событие закрытия
     def addPerfProject(self):
 
         if well_data.grp_plan:
