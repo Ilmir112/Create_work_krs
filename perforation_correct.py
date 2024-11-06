@@ -14,7 +14,6 @@ class FloatLineEdit(QLineEdit):
 
         # Устанавливаем валидатор для проверки на float
 
-
         reg = QRegExp("[0-9.]*")
         pValidator = QRegExpValidator(self)
         pValidator.setRegExp(reg)
@@ -35,7 +34,6 @@ class FloatLineEdit(QLineEdit):
 class TabPage_SO(QWidget):
     def __init__(self, parent=None):
         super().__init__()
-       
 
         self.labels_plast = {}
         self.dict_perforation = well_data.dict_perforation
@@ -56,16 +54,13 @@ class TabPage_SO(QWidget):
         grid.addWidget(self.template_status_label, 0, 4)
         grid.addWidget(self.raiding_status_label, 0, 5)
 
-
-
         plast_all = list(self.dict_perforation.keys())
         plast_projects = list(self.dict_perforation_project.keys())
 
         index_interval = 1
         for plast in plast_all:
             for index, (roof, sole) in enumerate(list(sorted(self.dict_perforation[plast]["интервал"],
-                                                             key=lambda x:x[0]))):
-
+                                                             key=lambda x: x[0]))):
                 plast_edit = QLineEdit(self)
                 plast_edit.setText(plast)
 
@@ -105,7 +100,7 @@ class TabPage_SO(QWidget):
                 setattr(self, f"raiding_status_{index_interval}_edit", raiding_status_ComboBox)
 
                 self.labels_plast[index_interval] = (plast_edit, roof_edit, sole_edit, plast_status_ComboBox,
-                                          template_status_ComboBox, raiding_status_ComboBox)
+                                                     template_status_ComboBox, raiding_status_ComboBox)
                 index_interval += 1
         if len(well_data.dict_perforation) != 0:
             for plast in plast_projects:
@@ -177,7 +172,7 @@ class PerforationCorrect(MyMainWindow):
 
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
-        self.setWindowModality(QtCore.Qt.ApplicationModal) # Устанавливаем модальность окна
+        self.setWindowModality(QtCore.Qt.ApplicationModal)  # Устанавливаем модальность окна
 
         self.tabWidget = TabWidget()
 
@@ -215,7 +210,6 @@ class PerforationCorrect(MyMainWindow):
                 plast_raid = []
                 plast_project = []
 
-
             if plast_status == 'отключен':
                 plast_oktl.append(True)
             elif plast_status == 'вскрыт':
@@ -237,9 +231,8 @@ class PerforationCorrect(MyMainWindow):
 
             if len(plast_project) > 0:
                 if plast in self.dict_perforation_project:
-
                     self.dict_perforation_project.setdefault(
-                            plast, {}).setdefault('интервал', []).append([float(roof), float(sole)])
+                        plast, {}).setdefault('интервал', []).append([float(roof), float(sole)])
 
 
 
@@ -266,7 +259,6 @@ class PerforationCorrect(MyMainWindow):
                 for plast in list(well_data.dict_perforation.keys()):
                     if plast in plast_del:
                         well_data.dict_perforation.pop(plast)
-
 
         adafw = well_data.dict_perforation_project
         definition_plast_work(self)

@@ -5,7 +5,7 @@ from collections import namedtuple
 import psycopg2
 from PyQt5.QtWidgets import  QMessageBox
 import well_data
-from data_base.config_base import connect_to_database, GnktDatabaseWell
+from data_base.config_base import connect_to_database, GnktDatabaseWell, connection_to_database
 
 Saddles = namedtuple('Saddles', ['saddle', 'ball'])
 
@@ -76,9 +76,10 @@ dict_saddles = {
          }
 }
 def read_database_gnkt(contractor, gnkt_number):
+
     # Подключение к базе данных
     try:
-        db = connect_to_database(well_data.DB_NAME_GNKT)
+        db = connection_to_database(well_data.DB_NAME_GNKT)
 
         data_gnkt = GnktDatabaseWell(db)
 
@@ -90,26 +91,23 @@ def read_database_gnkt(contractor, gnkt_number):
         well_previus_list = [(well[2], well[9]) for well in result]
         well_previus_list = sorted(well_previus_list, key=lambda x:  datetime.strptime(x[1], "%d.%m.%Y"), reverse=True)
         well_previus_list = list(map(lambda x: x[0], list(filter(lambda x: x[0], well_previus_list))))
+
+
     except psycopg2.Error as e:
         # Выведите сообщение об ошибке
         QMessageBox.warning(None, 'Ошибка', f'Ошибка подключения к базе данных {e}')
         return []
-    finally:
-        # Закройте курсор и соединение
-        if cursor:
-            cursor.close()
-        if conn:
-            conn.close()
 
 
-        return well_previus_list
+
+    return well_previus_list
 
 
 def insert_data_base_gnkt(contractor, well_name, gnkt_number, gnkt_length, diametr_length,
                      iznos, pipe_mileage, pipe_fatigue, pvo, previous_well):
 
     try:
-        db = connect_to_database(well_data.DB_NAME_GNKT)
+        db = connection_to_database(well_data.DB_NAME_GNKT)
         data_gnkt = GnktDatabaseWell(db)
 
         if 'ойл-сервис' in contractor.lower():
@@ -123,43 +121,10 @@ def insert_data_base_gnkt(contractor, well_name, gnkt_number, gnkt_length, diame
             data_gnkt.insert_data_base_gnkt(contractor, gnkt_number, well_name, gnkt_length, diametr_length, iznos,
                            pipe_mileage, pipe_fatigue, previous_well, current_datetime, pvo)
             QMessageBox.information(None, 'база данных', f'Скважина добавлена в базу данных')
-
-        else:
-            mes = QMessageBox.question(None, 'база данных', f'Скважина уже есть в базе данных, обновить?')
-            if mes == QMessageBox.StandardButton.Yes:
-                # Подготовленный запрос для удаления
-                query1 = f"DELETE FROM gnkt_{contractor} WHERE well_number LIKE (%s)"
-
-                # Выполнение запроса
-                cursor.execute(query1, ('%' + filenames + '%',))
-
-                current_datetime = datetime.today().strftime('%d.%m.%Y')
-
-                data_values = (gnkt_number, well_name, gnkt_length, diametr_length, iznos,
-                               pipe_mileage, pipe_fatigue, previous_well, current_datetime, pvo)
-
-                # Подготовленный запрос для вставки данных с параметрами
-                query = f"INSERT INTO gnkt_{contractor} " \
-                        f"(gnkt_number, well_number, length_gnkt, diameter_gnkt, wear_gnkt, mileage_gnkt, " \
-                        f"tubing_fatigue, previous_well, today, pvo_number) " \
-                        f"VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-
-                # Выполнение запроса с использованием параметров
-                cursor.execute(query, data_values)
-                QMessageBox.information(None, 'база данных', f'Скважина добавлена в базу данных')
+    except Exception as e:
+        QMessageBox.warning(None, 'база данных', f'Скважина не добавлена в базу данных {e}')
 
 
-
-        conn.commit()
-    except psycopg2.Error as e:
-        # Выведите сообщение об ошибке
-        QMessageBox.warning(None, 'Ошибка', 'Ошибка подключения к базе данных, Скважина не добавлена в базу')
-    finally:
-        # Закройте курсор и соединение
-        if cursor:
-            cursor.close()
-        if conn:
-            conn.close()
 
 
 

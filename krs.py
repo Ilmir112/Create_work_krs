@@ -143,7 +143,7 @@ class TabPageGno(QWidget):
             start_date = datetime(current_date.year - 1, 12, 1).date()
             end_date = datetime(current_date.year, 4, 1).date()
 
-        # Проверяем условие: если текущая дата находится в указанном периоде    
+        # Проверяем условие: если текущая дата находится в указанном периоде
         if well_data.region in ['КГМ', 'АГМ']:
             fluid_p = 1.02
         else:

@@ -1,10 +1,10 @@
 import json
 import well_data
 
-from PyQt5 import QtCore,  QtWidgets
+from PyQt5 import QtCore, QtWidgets
 from PyQt5.Qt import *
 
-from main import  MyMainWindow
+from main import MyMainWindow
 
 
 class TabPageSO(QWidget):
@@ -158,7 +158,7 @@ class TabWidget(QTabWidget):
         self.addTab(TabPageSO(self), 'Изменение данных')
 
 
-class CorrectSignaturesWindow( MyMainWindow):
+class CorrectSignaturesWindow(MyMainWindow):
 
     def __init__(self):
         super(CorrectSignaturesWindow, self).__init__()
@@ -186,7 +186,6 @@ class CorrectSignaturesWindow( MyMainWindow):
     def add_row_table(self):
         selected_region = TabPageSO.selected_region
         self.current_widget = self.tabWidget.currentWidget()
-        
 
         chief_engineer_edit_type = self.current_widget.chief_engineer_edit_type.text()
         chief_engineer_name_edit_type = self.current_widget.chief_engineer_name_edit_type.text().title()

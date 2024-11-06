@@ -167,6 +167,8 @@ class RegistrationService:
                 f"VALUES ({self.path_index},{self.path_index}, {self.path_index}, {self.path_index},"
                 f" {self.path_index}, {self.path_index})",
                 (last_name, first_name, second_name, position_in, organization, password))
+            # Не забудьте сделать коммит
+            self.db_connection.commit()
 
 
 class CheckWellExistence:
@@ -220,6 +222,8 @@ class CheckWellExistence:
 
             cursor.execute(query,
             (well_number, area_well, version_year, region_name, costumer))
+            # Не забудьте сделать коммит
+            self.db_connection.commit()
 
     def create_table_classification(self, region_name: str):
 
@@ -333,6 +337,8 @@ class CheckWellExistence:
                 h2s_pr, h2s_mg_l, h2s_mg_m, categoty_gf,
                 gas_factor, version_year, region, costumer
             ))
+            # Не забудьте сделать коммит
+            self.db_connection.commit()
 
     def drop_table(self, cursor, region_name):
 
@@ -528,6 +534,8 @@ class WorkDatabaseWell:
                                    well_data.user[1], type_kr, data_paragraph, cdng, category_dict)
                     # Выполнение запроса с использованием параметров
                     cursor.execute(query, data_values)
+                    # Не забудьте сделать коммит
+                    self.db_connection.commit()
 
 
 
@@ -695,16 +703,30 @@ class GnktDatabaseWell:
     def check_data_base_gnkt(self, contractor, well_number, well_area):
         if not self.db_connection:
             return None
-        with self.db_connection.cursor() as cursor:
+        with self.db_connection.cursor() as self.cursor:
             filenames = f"{well_number} {well_area} "
 
             query = f"SELECT * FROM gnkt_{contractor} WHERE well_number LIKE ({self.path_index})"
 
             # Выполнение запроса
-            cursor.execute(query, ('%' + filenames + '%',))
+            self.cursor.execute(query, ('%' + filenames + '%',))
 
-            result = cursor.fetchall()
+            result = self.cursor.fetchall()
             return result
+
+    def update_data_gnkt(self, contractor, previuos_well):
+        well_number = previuos_well.split(' ')[0]
+        well_area = previuos_well.split(' ')[1]
+        if not self.db_connection:
+            return None
+        with self.db_connection.cursor() as cursor:
+            query = f"SELECT * FROM gnkt_{contractor} WHERE well_number LIKE ({self.path_index})"
+            filenames = f"{well_number} {well_area} "
+            # Выполнение запроса
+            cursor.execute(query, ('%' + filenames + '%',))
+            result = cursor.fetchone()
+        return result
+
     def insert_data_base_gnkt(self, contractor, gnkt_number, well_name, gnkt_length, diametr_length, iznos,
                            pipe_mileage, pipe_fatigue, previous_well, current_datetime, pvo):
         if not self.db_connection:
@@ -723,6 +745,9 @@ class GnktDatabaseWell:
 
             # Выполнение запроса с использованием параметров
             cursor.execute(query, data_values)
+            # Не забудьте сделать коммит
+            self.db_connection.commit()
+
     def read_database_gnkt(self, contractor, gnkt_number):
         if not self.db_connection:
             return None

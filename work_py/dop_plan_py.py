@@ -412,6 +412,7 @@ class DopPlanWindow(MyMainWindow):
         vbox.addWidget(self.buttonAddProject, 3, 1)
 
     def add_row_table(self):
+
         current_widget = self.tabWidget.currentWidget()
 
         self.plast_line = current_widget.plast_line.text()
@@ -454,6 +455,7 @@ class DopPlanWindow(MyMainWindow):
             self.tableWidget.setItem(rows, 7, QTableWidgetItem(str(udlin)))
             self.tableWidget.setItem(rows, 8, QTableWidgetItem(str(self.pressuar_pvr_edit)))
             self.tableWidget.setItem(rows, 9, QTableWidgetItem(str(self.date_pressuar_edit)))
+
 
     def addPerfProject(self):
         current_widget = self.tabWidget.currentWidget()
@@ -721,6 +723,7 @@ class DopPlanWindow(MyMainWindow):
     def add_work(self):
         from data_base.work_with_base import  insert_data_well_dop_plan, round_cell
         from well_data import ProtectedIsNonNone
+        from work_py.advanted_file import definition_plast_work
         
         current_widget = self.tabWidget.currentWidget()
         method_bottom_combo = current_widget.method_bottom_combo.currentText()
@@ -1027,6 +1030,7 @@ class DopPlanWindow(MyMainWindow):
             work_list = self.work_list(work_earlier)
             well_data.ins_ind2 = self.ins_ind + 2
             self.populate_row(self.ins_ind + 2, work_list, self.table_widget, self.work_plan)
+            definition_plast_work(self)
 
         well_data.pause = False
         self.close()

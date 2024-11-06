@@ -128,7 +128,7 @@ class GeophysicWindow(MyMainWindow):
             research = f'ЗАДАЧА 2.7.3  Определение состояния цементного камня (АКЦ, АК сканирование). в интервале ' \
                        f'{edit_type}-{edit_type2}м,' \
                        f'Определение плотности, дефектов цементного камня, эксцентриситета колонны (СГДТ) в ' \
-                       f'интервале 0 - {well_data.perforation_roof - 20} '
+                       f'интервале 0 - {well_data.perforation_roof - 20}м '
             research_short = f'АКЦ в интервале {edit_type}-{edit_type2}м.' \
                              f'СГДТ в интервале 0 - {well_data.perforation_roof - 20}'
 
@@ -156,6 +156,9 @@ class GeophysicWindow(MyMainWindow):
 
         elif geophysic == 'ГК и ЛМ':
             research = f'Произвести записи ГК и ЛМ интервале {edit_type}-{edit_type2}м. '
+            research_short = f'ГК и ЛМ в интервале {edit_type}-{edit_type2}м.'
+        elif geophysic == 'прихватоопределитель':
+            research = f'Произвести прихватоопределитель интервале {edit_type}-{edit_type2}м. '
             research_short = f'ГК и ЛМ в интервале {edit_type}-{edit_type2}м.'
 
         return research, research_short

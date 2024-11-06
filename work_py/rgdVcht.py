@@ -28,9 +28,9 @@ def rgd_without_paker(self):
          None, None, None, None, None, None, None,
          'мастер КРС', ''.join(['10' if well_data.region != 'ЧГМ' else '4'])],
         [None, None,
-         'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС {well_data.contractor}". Составить'
-         ' акт готовности скважины и передать его начальнику партии. При необходимости подготовить площадку'
-         ' напротив мостков для постановки партии ГИС.',
+         f'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС {well_data.contractor}". Составить'
+         f' акт готовности скважины и передать его начальнику партии. При необходимости подготовить площадку'
+         f' напротив мостков для постановки партии ГИС.',
          None, None, None, None, None, None, None,
          'мастер КРС', None],
         [f'РГД по колонне при закачке не менее {GnoDescentWindow.PzakPriGis(self)}атм',
@@ -45,8 +45,10 @@ def rgd_without_paker(self):
          'Мастер КРС, подрядчик по ГИС', 20]]
     ori = QMessageBox.question(self, 'ОРИ', 'Нужна ли интерпретация?')
     if ori == QMessageBox.StandardButton.Yes:
+
+        ori = f'Интерпретация данных ГИС'
         rgd_list.append([f'ОРИ', None,
-                         f'Интерпретация данных ГИС, согласовать с ПТО и Ведущим инженером ЦДНГ опрессовку фНКТ ',
+                         ori,
                          None, None, None, None, None, None, None,
                          'Мастер КРС, подрядчик по ГИС', 8])
         rgd_list.append([None, None,

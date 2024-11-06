@@ -309,9 +309,9 @@ def raid(string):
 def definition_plast_work(self):
     # Определение работающих пластов
     plast_work = set()
-    perforation_roof = 10000
+    perforation_roof = well_data.current_bottom
     perforation_sole = 0
-    aaaaa = well_data.current_bottom
+
 
     for plast, value in well_data.dict_perforation.items():
         for interval in value['интервал']:

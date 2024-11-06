@@ -210,7 +210,7 @@ class ClayWindow(MyMainWindow):
             dict_nkt = {73: current_bottom_edit}
         glin_list = [
             [f'СПО пера до глубины {current_bottom_edit}м. Опрессовать НКТ на 200атм', None,
-             f'Спустить {RirWindow.pero_select(self, current_bottom_edit)}  на тНКТ{well_data.nkt_diam}м до '
+             f'Спустить {RirWindow.pero_select(self, current_bottom_edit)}  на тНКТ{well_data.nkt_diam}мм до '
              f'глубины {current_bottom_edit}м с замером, шаблонированием '
              f'шаблоном {well_data.nkt_template}мм. \n'
              f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
@@ -258,7 +258,8 @@ class ClayWindow(MyMainWindow):
              None, None, None, None, None, None, None,
              'мастер КРС', well_volume_norm(24)],
             [None, None,
-             f'Опрессовать НКТ на 200атм. Вымыть шар. Поднять перо на тНКТ{well_data.nkt_diam}м с глубины {current_bottom_edit}м с доливом скважины в объеме '
+             f'Опрессовать НКТ на 200атм. Вымыть шар. Поднять перо на тНКТ{well_data.nkt_diam}мм с глубины '
+             f'{current_bottom_edit}м с доливом скважины в объеме '
              f'{round(current_bottom_edit * 1.12 / 1000, 1)}м3 тех. жидкостью '
              f'уд.весом {well_data.fluid_work}',
              None, None, None, None, None, None, None,
@@ -292,8 +293,8 @@ class ClayWindow(MyMainWindow):
 
         dict_nkt = {73: rirRoof}
         pero_list = [
-            [f'СПО {RirWindow.pero_select(self, rirSole)}  на тНКТ{nkt_diam}м до {rirSole}м', None,
-             f'Спустить {RirWindow.pero_select(self, rirSole)}  на тНКТ{nkt_diam}м до глубины {rirSole}м с '
+            [f'СПО {RirWindow.pero_select(self, rirSole)}  на тНКТ{nkt_diam}мм до {rirSole}м', None,
+             f'Спустить {RirWindow.pero_select(self, rirSole)}  на тНКТ{nkt_diam}мм до глубины {rirSole}м с '
              f'замером, шаблонированием '
              f'шаблоном {well_data.nkt_template}мм. \n'
              f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
@@ -302,12 +303,12 @@ class ClayWindow(MyMainWindow):
             [f'закачку глинистого раствора в интервале {rirSole}-{rirRoof}м в объеме {volume_cement}м3 '
              f'({round(volume_cement * 0.45, 2)}т'
              f' сухого порошка)', None,
-             f'Произвести закачку глинистого раствора с добавлением ингибитора коррозии {round(volume_cement * 11, 1)}гр с '
-             f'удельной дозировкой 11гр/м3 '
+             f'Произвести закачку глинистого раствора в объеме {volume_cement}м3 '
              f'удельным весом не менее 1,24г/см3 в интервале {rirSole}-{rirRoof}м.\n'
              f'- Приготовить и закачать в глинистый раствор уд.весом не менее 1,24г/см3 в объеме {volume_cement}м3 '
              f'({round(volume_cement * 0.45, 2)}т'
-             f' сухого порошка).\n'
+             f' сухого порошка) с добавлением ингибитора коррозии {round(volume_cement * 11, 1)}гр с '
+             f'удельной дозировкой 11гр/м3 .\n'
              f'-Продавить тех жидкостью  в объеме {volume_vn_nkt(dict_nkt)}м3.',
              None, None, None, None, None, None, None,
              'мастер КРС', 2.5]]
@@ -318,14 +319,14 @@ class ClayWindow(MyMainWindow):
 
         if rir_question_QCombo == 'Нет':
             pero_list.append([None, None,
-                              f'Поднять перо на тНКТ{nkt_diam}м с глубины {rirSole}м с доливом скважины в объеме '
+                              f'Поднять перо на тНКТ{nkt_diam}мм с глубины {rirSole}м с доливом скважины в объеме '
                               f'{round(rirSole * 1.3 / 1000, 1)}м3 тех. жидкостью '
                               f'уд.весом {well_data.fluid_work}',
                               None, None, None, None, None, None, None,
                               'мастер КРС', descentNKT_norm(rirRoof, 1)])
         else:
             pero_list.append([None, None,
-                              f'Поднять перо на тНКТ{nkt_diam}м до глубины {rirRoof}м с доливом скважины в объеме'
+                              f'Поднять перо на тНКТ{nkt_diam}мм до глубины {rirRoof}м с доливом скважины в объеме'
                               f' {round((rirSole - rirRoof) * 1.3 / 1000, 1)}м3 тех. жидкостью '
                               f'уд.весом {well_data.fluid_work}',
                               None, None, None, None, None, None, None,

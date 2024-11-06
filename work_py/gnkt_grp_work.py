@@ -7,7 +7,7 @@ import well_data
 from datetime import datetime
 
 
-from data_base.config_base import connect_to_database
+from data_base.config_base import connect_to_database, connection_to_database, GnktDatabaseWell
 
 from main import MyMainWindow
 
@@ -205,27 +205,22 @@ class TabPageGnkt(QWidget):
         previus_well = self.previous_well_combo.currentText()
         try:
             if previus_well:
-                conn = connect_to_database(well_data.DB_NAME_GNKT)
-
-                cursor = conn.cursor()
+                db = connection_to_database(well_data.DB_NAME_GNKT)
+                data_gnkt = GnktDatabaseWell(db)
 
                 if 'ойл-сервис' in well_data.contractor.lower():
                     contractor = 'oil_service'
 
-                cursor.execute("""
-                    SELECT * FROM gnkt_{contractor} WHERE well_number = %s;
-                """.format(contractor=contractor), (previus_well,))
-
-                result_gnkt = cursor.fetchone()
+                result_gnkt = data_gnkt.update_data_gnkt(contractor, previus_well)
 
                 self.lenght_gnkt_edit.setText(str(result_gnkt[3]))
                 self.iznos_gnkt_edit.setText(str(result_gnkt[5]))
                 self.pipe_mileage_edit.setText(str(result_gnkt[6]))
                 self.pvo_number_edit.setText(str(result_gnkt[10]))
 
-                conn.close()
-        except:
-            print('Ошибка подключения')
+
+        except Exception as e:
+            print(f'Ошибка  с базой ГНКТ {e}')
 
     def update_number_gnkt(self, gnkt_number):
         if gnkt_number != '':
@@ -420,15 +415,22 @@ class GnktModel(MyMainWindow):
                     ws2.cell(row=i + 1, column=2).fill = PatternFill(start_color='C5D9F1', end_color='C5D9F1',
                                                                      fill_type='solid')
                     ws2.cell(row=i + 1, column=2).font = Font(name='Arial', size=13, bold=True)
-
-                else:
+                elif i <= 32:
                     ws2.merge_cells(start_column=3, start_row=i + 1, end_column=11, end_row=i + 1)
                     ws2.cell(row=i + 1, column=3).alignment = Alignment(wrap_text=True, horizontal='left',
+                                                                        vertical='center')
+                    ws2.cell(row=i + 1, column=11).alignment = Alignment(wrap_text=True, horizontal='center',
+                                                                         vertical='center')
+                else:
+                    ws2.merge_cells(start_column=3, start_row=i + 1, end_column=10, end_row=i + 1)
+                    ws2.cell(row=i + 1, column=3).alignment = Alignment(wrap_text=True, horizontal='left',
+                                                                        vertical='center')
+                    ws2.cell(row=i + 1, column=11).alignment = Alignment(wrap_text=True, horizontal='center',
                                                                         vertical='center')
 
             for col in range(13):
                 ws2.column_dimensions[get_column_letter(col + 1)].width = colWidth[col]
-
+            ws2.column_dimensions[get_column_letter(11)].width = 30
             ws2.print_area = f'B1:L{self.table_widget.rowCount() + 45}'
             ws2.page_setup.fitToPage = True
             ws2.page_setup.fitToHeight = False
