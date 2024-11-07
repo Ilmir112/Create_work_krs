@@ -268,36 +268,36 @@ class GnktModel(MyMainWindow):
 
             n = 0
             m = 0
-            for plast in well_data.plast_all:
-                count_interval = well_data.dict_perforation[plast]['счет_объединение']
+            for plast, interval in well_data.img_pvr_list:
+                for roof_plast, sole_plast in interval:
+                    count_interval = well_data.dict_perforation[plast]['счет_объединение']
 
-                ws.merge_cells(start_column=23, start_row=27 + m,
-                               end_column=23, end_row=27 + count_interval + m - 1)
-                ws.merge_cells(start_column=22, start_row=27 + m,
-                               end_column=22, end_row=27 + count_interval + m - 1)
-                ws.merge_cells(start_column=21, start_row=27 + m,
-                               end_column=21, end_row=27 + count_interval + m - 1)
-                m += count_interval
-                roof_plast = well_data.dict_perforation[plast]['кровля']
-                sole_plast = well_data.dict_perforation[plast]['подошва']
-                try:
-                    if roof_plast > well_data.depth_fond_paker_do["do"] and roof_plast < well_data.current_bottom:
-                        interval_str = f'{plast} {roof_plast}-{sole_plast}'
-                        coordinate_pvr = f'F{48 + n}'
+                    ws.merge_cells(start_column=23, start_row=27 + m,
+                                   end_column=23, end_row=27 + count_interval + m - 1)
+                    ws.merge_cells(start_column=22, start_row=27 + m,
+                                   end_column=22, end_row=27 + count_interval + m - 1)
+                    ws.merge_cells(start_column=21, start_row=27 + m,
+                                   end_column=21, end_row=27 + count_interval + m - 1)
+                    m += count_interval
 
-                        ws.cell(row=48 + n, column=10).value = interval_str
-                        ws.merge_cells(start_column=10, start_row=48 + n,
-                                       end_column=12, end_row=48 + n + 2)
-                        ws.cell(row=48 + n, column=10).font = Font(name='Arial', size=12, bold=True)
-                        ws.cell(row=48 + n, column=10).alignment = Alignment(wrap_text=True, horizontal='left',
-                                                                             vertical='center')
-                        n += 3
-                        self.insert_image(ws, f'{well_data.path_image}imageFiles/schema_well/ПВР.png',
-                                          coordinate_pvr, 85, 70)
-                except:
-                    QMessageBox.critical(self,
-                                         'Ошибка', f'программа не смогла вставить интервал перфорации в схему'
-                                                   f'{roof_plast}-{sole_plast}')
+                    try:
+                        if roof_plast > well_data.depth_fond_paker_do["do"] and roof_plast < well_data.current_bottom:
+                            interval_str = f'{plast} \n {roof_plast}-{sole_plast}'
+                            coordinate_pvr = f'F{43 + n}'
+
+                            ws.cell(row=43 + n, column=10).value = interval_str
+                            ws.merge_cells(start_column=10, start_row=43 + n,
+                                           end_column=12, end_row=43 + n + 2)
+                            ws.cell(row=43 + n, column=10).font = Font(name='Arial', size=12, bold=True)
+                            ws.cell(row=43 + n, column=10).alignment = Alignment(wrap_text=True, horizontal='left',
+                                                                                 vertical='center')
+                            n += 3
+                            self.insert_image(ws, f'{well_data.path_image}imageFiles/schema_well/ПВР.png',
+                                              coordinate_pvr, 85, 40)
+                    except:
+                        QMessageBox.critical(self,
+                                             'Ошибка', f'программа не смогла вставить интервал перфорации в схему'
+                                                       f'{roof_plast}-{sole_plast}')
 
             coordinate_voln = f'E18'
             self.insert_image(ws,
@@ -1060,14 +1060,17 @@ class GnktModel(MyMainWindow):
                                     None, None, None, None, None, None, None, None]
 
         pvr_list = []
+        well_data.img_pvr_list = []
         for plast in sorted(well_data.plast_all, key=lambda x: self.get_start_depth(
                 well_data.dict_perforation[x]['интервал'][0])):
             count_interval = 0
             for interval in well_data.dict_perforation[plast]['интервал']:
-                count_interval += 1
+
                 if well_data.dict_perforation[plast]['отключение']:
                     izol = 'Изолирован'
                 else:
+                    count_interval += 1
+                    well_data.img_pvr_list = [(plast, well_data.dict_perforation[plast]['интервал'])]
                     izol = 'рабочий'
                 if well_data.paker_do['do'] != 0:
                     if well_data.dict_perforation[plast]['кровля'] < well_data.depth_fond_paker_do['do']:
@@ -1092,138 +1095,7 @@ class GnktModel(MyMainWindow):
 
         return schema_well_list
 
-    # def count_row_height(self, ws2, work_list, sheet_name):
-    #
-    #     from openpyxl.utils.cell import range_boundaries, get_column_letter
-    #
-    #     colWidth = [2.85546875, 14.42578125, 16.140625, 22.85546875, 17.140625, 14.42578125, 13.0, 13.0, 17.0,
-    #                 14.42578125, 13.0, 21, 12.140625, None]
-    #
-    #     text_width_dict = {35: (0, 100), 50: (101, 200), 70: (201, 300), 110: (301, 400), 120: (401, 500),
-    #                        130: (501, 600), 150: (601, 700), 170: (701, 800), 190: (801, 900), 230: (901, 1500)}
-    #
-    #     boundaries_dict = {}
-    #
-    #     for ind, _range in enumerate(ws2.merged_cells.ranges):
-    #         boundaries_dict[ind] = range_boundaries(str(_range))
-    #
-    #     for key, value in boundaries_dict.items():
-    #         ws2.unmerge_cells(start_column=value[0], start_row=value[1],
-    #                           end_column=value[2], end_row=value[3])
-    #     ins_ind = 1
-    #
-    #     for i in range(1, len(work_list) + 1):  # Добавлением работ
-    #         if str(work_list[i - 1][1]).isdigit() and i > 39:  # Нумерация
-    #             work_list[i - 1][1] = str(ins_ind)
-    #             ins_ind += 1
-    #         for j in range(1, 13):
-    #             cell = ws2.cell(row=i, column=j)
-    #
-    #             if cell and str(cell) != str(work_list[i - 1][j - 1]):
-    #                 if str(work_list[i - 1][j - 1]).replace('.', '').isdigit() and \
-    #                         str(work_list[i - 1][j - 1]).count('.') != 2:
-    #                     cell.value = str(work_list[i - 1][j - 1]).replace('.', ',')
-    #                     # print(f'цифры {cell.value}')
-    #                 else:
-    #                     cell.value = work_list[i - 1][j - 1]
-    #
-    #     # print(merged_cells_dict)
-    #     if sheet_name != 'Ход работ':
-    #         for key, value in boundaries_dict.items():
-    #             # print(value)
-    #             ws2.merge_cells(start_column=value[0], start_row=value[1],
-    #                             end_column=value[2], end_row=value[3])
-    #
-    #     elif sheet_name == 'Ход работ':
-    #         for i, row_data in enumerate(work_list):
-    #             # print(f'gghhg {work_list[i][2]}')
-    #             for column, data in enumerate(row_data):
-    #                 if column == 2:
-    #                     if not data is None:
-    #                         text = data
-    #                         for key, value in text_width_dict.items():
-    #                             if value[0] <= len(text) <= value[1]:
-    #                                 ws2.row_dimensions[i + 1].height = int(key)
-    #                 elif column == 1:
-    #                     if not data is None:
-    #                         text = data
-    #                         # print(text)
-    #                         for key, value in text_width_dict.items():
-    #                             if value[0] <= len(text) <= value[1]:
-    #                                 ws2.row_dimensions[i + 1].height = int(key)
-    #                 if column != 0:
-    #                     ws2.cell(row=i + 1, column=column + 1).border = well_data.thin_border
-    #                 if column == 1 or column == 11:
-    #                     ws2.cell(row=i + 1, column=column + 1).alignment = Alignment(wrap_text=True,
-    #                                                                                  horizontal='center',
-    #                                                                                  vertical='center')
-    #                     ws2.cell(row=i + 1, column=column + 1).font = Font(name='Arial', size=13, bold=False)
-    #                 else:
-    #                     ws2.cell(row=i + 1, column=column + 1).alignment = Alignment(wrap_text=True, horizontal='left',
-    #                                                                                  vertical='center')
-    #                     ws2.cell(row=i + 1, column=column + 1).font = Font(name='Arial', size=13, bold=False)
-    #                     if 'примечание' in str(ws2.cell(row=i + 1, column=column + 1).value).lower() or \
-    #                             'внимание' in str(ws2.cell(row=i + 1, column=column + 1).value).lower() or \
-    #                             'мероприятия' in str(ws2.cell(row=i + 1, column=column + 1).value).lower() or \
-    #                             'порядок работ' in str(ws2.cell(row=i + 1, column=column + 1).value).lower() or \
-    #                             'ТЕХНОЛОГИЧЕСКИЕ ПРОЦЕССЫ' in str(
-    #                         ws2.cell(row=i + 1, column=column + 1).value).upper() or \
-    #                             'оказание первой (доврачебной) помощи' in str(
-    #                         ws2.cell(row=i + 1, column=column + 1).value).lower() or \
-    #                             'Контроль воздушной среды' in str(
-    #                         ws2.cell(row=i + 1, column=column + 1).value).lower() or \
-    #                             'Требования безопасности' in str(
-    #                         ws2.cell(row=i + 1, column=column + 1).value).lower() or \
-    #                             'По доп.согласованию с Заказчиком' in str(
-    #                         ws2.cell(row=i + 1, column=column + 1).value).lower():
-    #                         # print('есть жирный')
-    #                         ws2.cell(row=i + 1, column=column + 1).font = Font(name='Arial', size=13, bold=True)
-    #
-    #             if len(work_list[i][1]) > 5:
-    #                 ws2.merge_cells(start_column=2, start_row=i + 1, end_column=12, end_row=i + 1)
-    #                 ws2.cell(row=i + 1, column=2).alignment = Alignment(wrap_text=True, horizontal='center',
-    #                                                                     vertical='center')
-    #                 ws2.cell(row=i + 1, column=2).fill = PatternFill(start_color='C5D9F1', end_color='C5D9F1',
-    #                                                                  fill_type='solid')
-    #                 ws2.cell(row=i + 1, column=2).font = Font(name='Arial', size=13, bold=True)
-    #
-    #             else:
-    #                 ws2.merge_cells(start_column=3, start_row=i + 1, end_column=11, end_row=i + 1)
-    #                 ws2.cell(row=i + 1, column=3).alignment = Alignment(wrap_text=True, horizontal='left',
-    #                                                                     vertical='center')
-    #
-    #         for col in range(13):
-    #             ws2.column_dimensions[get_column_letter(col + 1)].width = colWidth[col]
-    #
-    #         ws2.print_area = f'B1:L{self.table_widget.rowCount() + 45}'
-    #         ws2.page_setup.fitToPage = True
-    #         ws2.page_setup.fitToHeight = False
-    #         ws2.page_setup.fitToWidth = True
-    #         ws2.print_options.horizontalCentered = True
-    #         # зададим размер листа
-    #         ws2.page_setup.paperSize = ws2.PAPERSIZE_A4
-    #         # содержимое по ширине страницы
-    #         ws2.sheet_properties.pageSetUpPr.fitToPage = True
-    #         ws2.page_setup.fitToHeight = False
-    #
-    #     for row_ind, row in enumerate(ws2.iter_rows(values_only=True)):
-    #         for col, value in enumerate(row):
-    #             if 'А.Р. Хасаншин' in str(value):
-    #                 coordinate = f'{get_column_letter(col + 1)}{row_ind - 1}'
-    #                 self.insert_image(ws2, f'{well_data.path_image}imageFiles/Хасаншин.png', coordinate)
-    #             elif 'Д.Д. Шамигулов' in str(value):
-    #                 coordinate = f'{get_column_letter(col + 1)}{row_ind - 2}'
-    #                 self.insert_image(ws2, f'{well_data.path_image}imageFiles/Шамигулов.png', coordinate)
-    #             elif 'Зуфаров' in str(value):
-    #                 coordinate = f'{get_column_letter(col - 2)}{row_ind}'
-    #                 self.insert_image(ws2, f'{well_data.path_image}imageFiles/Зуфаров.png', coordinate)
-    #             elif 'М.К.Алиев' in str(value):
-    #                 coordinate = f'{get_column_letter(col - 1)}{row_ind - 2}'
-    #                 self.insert_image(ws2, f'{well_data.path_image}imageFiles/Алиев махир.png', coordinate)
-    #             elif 'З.К. Алиев' in str(value):
-    #                 coordinate = f'{get_column_letter(col - 1)}{row_ind - 2}'
-    #                 self.insert_image(ws2, f'{well_data.path_image}imageFiles/Алиев Заур.png', coordinate)
-    #                 break
+
 
     def create_title_list(self, ws2):
 
