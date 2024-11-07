@@ -521,8 +521,12 @@ class GnktOsvWindow(GnktModel):
             gnkt_opz.extend(osvoenie_list)
 
         if self.data_gnkt.acids_work_combo == 'Да':
-            acid_sel, acid_sel_short, depth_fond_paker_do, acid_volume_edit = self.select_text_acid(self.data_gnkt)
-            work_list = self.work_opz_gnkt(acid_sel, acid_sel_short, depth_fond_paker_do, acid_volume_edit)
+            acid_info = [[
+                self.data_gnkt.plast_combo, "svk_true_combo", self.data_gnkt.roof_plast,
+                self.data_gnkt.sole_plast, self.data_gnkt.acid_edit, self.data_gnkt.acid_proc_edit,
+                self.data_gnkt.acid_volume_edit]]
+
+            work_list = self.work_opz_gnkt(acid_info)
 
             gnkt_opz.extend([['', 'По согласованию с заказчиком произвести следующие работы:',
              None, None, None, None, None, None, None,
@@ -701,6 +705,7 @@ class GnktOsvWindow(GnktModel):
         for row in range(len(work_list)):
             for col in range(23):
                 if work_list[row][col]:
+                    # print(work_list[row][col])
                     ws.cell(row=row + 1, column=col + 1).value = work_list[row][col]
         # Перебираем строки и скрываем те, у которых все значения равны None
         for row_ind, row in enumerate(ws.iter_rows(values_only=True)):

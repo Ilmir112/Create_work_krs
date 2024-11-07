@@ -623,8 +623,9 @@ class WellCondition(FindIndexPZ):
                                 well_data.static_level = ProtectedIsDigit(row[col + 1].value.split('/')[0])
                             else:
                                 well_data.static_level = ProtectedIsDigit(row[col + 1].value)
-                        elif 'Рмкп ( э/к и' in str(value):
+                        elif 'Рмкп ' in str(value):
                             well_data.pressuar_mkp = ProtectedIsNonNone(row[col + 2].value)
+
                         elif "грп" in str(value).lower():
                             well_data.grp_plan = True
 
@@ -801,7 +802,7 @@ class Well_data(FindIndexPZ):
         well_data.column_wall_thickness = ProtectedIsNonNone('не корректно')
         well_data.shoe_column = ProtectedIsNonNone('не корректно')
         well_data.level_cement_column = ProtectedIsNonNone('не корректно')
-        well_data.pressuar_mkp = ProtectedIsNonNone('не корректно')
+        well_data.pressuar_mkp = ProtectedIsNonNone('0')
         well_data.column_additional_diametr = ProtectedIsNonNone('не корректно')
         well_data.column_additional_wall_thickness = ProtectedIsNonNone('не корректно')
         well_data.head_column_additional = ProtectedIsNonNone('не корректно')
@@ -823,6 +824,11 @@ class Well_data(FindIndexPZ):
                         well_data.bottomhole_artificial = \
                             FindIndexPZ.definition_is_None(self, well_data.bottomhole_artificial, row_index, col, 5)
                         # print(f'пробуренный забой {well_data.bottomhole_artificial}')
+
+                    elif 'интервалы темпа набора кривизны ' in str(value).lower():
+                        well_data.interval_temp = ProtectedIsDigit(row[col + 2].value)
+                        well_data.interval_temp = FindIndexPZ.definition_is_None(self, well_data.interval_temp,
+                                                                                 row_index, col+2, 1)
 
                     elif 'зенитный угол' in str(value).lower():
                         well_data.max_angle = ProtectedIsDigit(row[col + 4].value)

@@ -6,7 +6,6 @@ import well_data
 
 from datetime import datetime
 
-
 from data_base.config_base import connect_to_database, connection_to_database, GnktDatabaseWell
 
 from main import MyMainWindow
@@ -30,7 +29,6 @@ class TabPageGnkt(QWidget):
         self.validator_float = QDoubleValidator(0, 8000, 1)
 
         self.init_gnkt()
-
 
     def init_gnkt(self):
         self.gnkt_number_label = QLabel('Номер флота ГНКТ')
@@ -71,9 +69,6 @@ class TabPageGnkt(QWidget):
         self.distance_pntzh_line = QLineEdit(self)
         self.distance_pntzh_line.setValidator(self.validator_int)
 
-
-
-
         self.grid = QGridLayout(self)
         self.grid.addWidget(self.gnkt_number_label, 0, 2, 1, 5)
         self.grid.addWidget(self.gnkt_number_combo, 1, 2, 1, 5)
@@ -113,7 +108,6 @@ class TabPageGnkt(QWidget):
             self.grid.addWidget(self.acids_work_label, 6, 2)
             self.grid.addWidget(self.acids_work_combo, 7, 2)
 
-
             self.acids_work_combo.setCurrentIndex(2)
         elif well_data.work_plan == 'gnkt_frez':
             self.need_frez_port_label = QLabel('Необходимость фрезерования портов')
@@ -130,7 +124,6 @@ class TabPageGnkt(QWidget):
         self.acids_work_combo.currentTextChanged.connect(self.update_acids_work)
         self.gnkt_number_combo.currentTextChanged.connect(self.update_number_gnkt)
         self.previous_well_combo.currentTextChanged.connect(self.update_data_gnkt)
-
 
     def update_acids_work(self, index):
         if index == 'Нет':
@@ -201,6 +194,7 @@ class TabPageGnkt(QWidget):
             self.grid.addWidget(self.acid_proc_edit, 7, 5)
             self.grid.addWidget(self.pressure_Label, 6, 6)
             self.grid.addWidget(self.pressure_edit, 7, 6)
+
     def update_data_gnkt(self):
         previus_well = self.previous_well_combo.currentText()
         try:
@@ -250,28 +244,27 @@ class GnktModel(MyMainWindow):
         vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
 
-
     def insert_image_schema(self, ws):
 
         if well_data.paker_do["do"] != 0:
             coordinate_nkt_with_paker = 'F6'
             self.insert_image(ws, f'{well_data.path_image}imageFiles/schema_well/НКТ с пакером.png',
-                                       coordinate_nkt_with_paker, 100, 510)
+                              coordinate_nkt_with_paker, 100, 510)
         elif well_data.dict_nkt:
             coordinate_nkt_with_voronka = 'F6'
-            self.insert_image( ws, f'{well_data.path_image}imageFiles/schema_well/НКТ с воронкой.png',
-                                       coordinate_nkt_with_voronka, 70, 470)
+            self.insert_image(ws, f'{well_data.path_image}imageFiles/schema_well/НКТ с воронкой.png',
+                              coordinate_nkt_with_voronka, 70, 470)
 
         if self.work_plan in ['gnkt_bopz']:
             coordinate = 'F65'
             self.insert_image(ws, f'{well_data.path_image}imageFiles/schema_well/angle_well.png',
-                                       coordinate, 265, 373)
+                              coordinate, 265, 373)
 
         elif self.work_plan in ['gnkt_after_grp', 'gnkt_opz']:
             coordinate_propant = 'F43'
             if self.work_plan in ['gnkt_after_grp']:
                 self.insert_image(ws, f'{well_data.path_image}imageFiles/schema_well/пропант.png',
-                                           coordinate_propant, 90, 500)
+                                  coordinate_propant, 90, 500)
 
             n = 0
             m = 0
@@ -300,16 +293,16 @@ class GnktModel(MyMainWindow):
                                                                              vertical='center')
                         n += 3
                         self.insert_image(ws, f'{well_data.path_image}imageFiles/schema_well/ПВР.png',
-                                                   coordinate_pvr, 85, 70)
+                                          coordinate_pvr, 85, 70)
                 except:
                     QMessageBox.critical(self,
-                                               'Ошибка', f'программа не смогла вставить интервал перфорации в схему'
-                                                         f'{roof_plast}-{sole_plast}')
+                                         'Ошибка', f'программа не смогла вставить интервал перфорации в схему'
+                                                   f'{roof_plast}-{sole_plast}')
 
             coordinate_voln = f'E18'
             self.insert_image(ws,
-                                       f'{well_data.path_image}imageFiles/schema_well/переход.png',
-                                       coordinate_voln, 150, 60)
+                              f'{well_data.path_image}imageFiles/schema_well/переход.png',
+                              coordinate_voln, 150, 60)
 
     def count_row_height(self, ws2, work_list, sheet_name):
 
@@ -352,7 +345,6 @@ class GnktModel(MyMainWindow):
                     else:
                         cell.value = work_list[i - 1][j - 1]
 
-
         # print(merged_cells_dict)
         if sheet_name != 'Ход работ':
             for key, value in boundaries_dict.items():
@@ -365,7 +357,7 @@ class GnktModel(MyMainWindow):
                     for column, data in enumerate(row_data):
                         if i < 2:
                             ws2.cell(row=i + 1, column=column + 1).alignment = Alignment(horizontal='left',
-                                                                             vertical='center')
+                                                                                         vertical='center')
 
             elif sheet_name == 'СХЕМА' and self.work_plan != 'gnkt_frez':
                 self.insert_image_schema(ws2)
@@ -426,7 +418,7 @@ class GnktModel(MyMainWindow):
                     ws2.cell(row=i + 1, column=3).alignment = Alignment(wrap_text=True, horizontal='left',
                                                                         vertical='center')
                     ws2.cell(row=i + 1, column=11).alignment = Alignment(wrap_text=True, horizontal='center',
-                                                                        vertical='center')
+                                                                         vertical='center')
 
             for col in range(13):
                 ws2.column_dimensions[get_column_letter(col + 1)].width = colWidth[col]
@@ -473,19 +465,20 @@ class GnktModel(MyMainWindow):
             well_data.pause = True
 
             if well_data.work_plan in ['gnkt_after_grp', 'gnkt_opz', 'gnkt_bopz']:
-
                 self.work_schema = self.data_gnkt.schema_well(self.data_gnkt.current_bottom_edit,
-                                                                self.data_gnkt.fluid_edit, self.data_gnkt.gnkt_number_combo,
-                                                                self.data_gnkt.lenght_gnkt_edit,
-                                                                self.data_gnkt.iznos_gnkt_edit,
-                                                                self.data_gnkt.pvo_number,
-                                                                self.data_gnkt.diametr_length,
-                                                                self.data_gnkt.pipe_mileage_edit)
+                                                              self.data_gnkt.fluid_edit,
+                                                              self.data_gnkt.gnkt_number_combo,
+                                                              self.data_gnkt.lenght_gnkt_edit,
+                                                              self.data_gnkt.iznos_gnkt_edit,
+                                                              self.data_gnkt.pvo_number,
+                                                              self.data_gnkt.diametr_length,
+                                                              self.data_gnkt.pipe_mileage_edit)
 
                 self.copy_pvr(self.ws_schema, self.work_schema)
         else:
             self.data_gnkt.close()
             self.data_gnkt = None
+
     def update_opz_data(self, current_widget):
 
         self.roof_plast = round(float(current_widget.roof_edit.text().replace(',', '.')), 1)
@@ -497,6 +490,7 @@ class GnktModel(MyMainWindow):
         self.acid_proc_edit = int(current_widget.acid_proc_edit.text().replace(',', '.'))
         self.pressure_edit = int(current_widget.pressure_edit.text())
         self.plast_combo = str(current_widget.plast_combo.combo_box.currentText())
+
     def add_work(self):
         self.current_widget = self.tabWidget.currentWidget()
         self.gnkt_number_combo = self.current_widget.gnkt_number_combo.currentText()
@@ -505,8 +499,6 @@ class GnktModel(MyMainWindow):
         self.pipe_mileage_edit = self.current_widget.pipe_mileage_edit.text()
         self.distance_pntzh = self.current_widget.distance_pntzh_line.text()
         self.pipe_fatigue = 0
-
-
 
         self.current_bottom_edit = self.current_widget.current_bottom_edit.text()
         if self.current_bottom_edit == '':
@@ -550,7 +542,8 @@ class GnktModel(MyMainWindow):
 
         self.diametr_length = 38
 
-        if '' in [self.gnkt_number_combo, self.lenght_gnkt_edit, self.iznos_gnkt_edit, self.fluid_edit, self.pvo_number]:
+        if '' in [self.gnkt_number_combo, self.lenght_gnkt_edit, self.iznos_gnkt_edit, self.fluid_edit,
+                  self.pvo_number]:
             QMessageBox.warning(self, 'Некорректные данные', f'Не все данные заполнены')
             return
         else:
@@ -560,7 +553,6 @@ class GnktModel(MyMainWindow):
             well_data.fluid_edit = self.fluid_edit
             well_data.pvo_number = self.pvo_number
 
-
         fluid_question = QMessageBox.question(self, 'Удельный вес',
                                               f'Работы необходимо производить на тех воде {self.fluid_edit}г/см3?')
         if fluid_question == QMessageBox.StandardButton.No:
@@ -568,127 +560,138 @@ class GnktModel(MyMainWindow):
 
         self.well_volume_ek, self.well_volume_dp = self.check_volume_well()
 
-
-
         well_data.pause = False
         self.close()
         # return work_list
 
+    def select_text_acid(self, plast_combo, roof, sole, acid_edit, acid_proc_edit, acid_volume_edit):
 
-
-
-    def select_text_acid(self, data_gnkt):
-
-        if data_gnkt.acid_edit == 'HCl':
-            acid_24 = round(data_gnkt.acid_volume_edit * data_gnkt.acid_proc_edit / 24 * 1.118, 1)
-            acid_sel = f'Произвести  солянокислотную обработку {data_gnkt.plast_combo} в объеме {data_gnkt.acid_volume_edit}м3 ' \
-                       f' ({data_gnkt.acid_edit} - {data_gnkt.acid_proc_edit} %) силами/' \
-                       f' Крезол НС с протяжкой БДТ вдоль интервалов перфорации {data_gnkt.roof_plast}-{data_gnkt.sole_plast}м ' \
+        if acid_edit == 'HCl':
+            acid_24 = round(acid_volume_edit * acid_proc_edit / 24 * 1.118, 1)
+            acid_sel = f'Произвести  солянокислотную обработку {plast_combo} в объеме {acid_volume_edit}м3 ' \
+                       f' ({acid_edit} - {acid_proc_edit} %) силами/' \
+                       f' Крезол НС с протяжкой БДТ вдоль интервалов перфорации {roof}-{sole}м ' \
                        f'(снизу вверх) в ' \
                        f'присутствии представителя заказчика с составлением акта, не превышая давления' \
                        f' закачки не более Р={well_data.max_admissible_pressure._value}атм.\n' \
-                       f' (для приготовления соляной кислоты в объеме {data_gnkt.acid_volume_edit}м3 - ' \
-                       f'{data_gnkt.acid_proc_edit}% необходимо замешать {acid_24}т HCL 24% и пресной воды ' \
-                       f'{round(data_gnkt.acid_volume_edit - acid_24, 1)}м3)'
-            acid_sel_short = f'СКО пласта {data_gnkt.plast_combo}  в объеме  {data_gnkt.acid_volume_edit}м3  ' \
-                             f'({data_gnkt.acid_edit} - {data_gnkt.acid_proc_edit} %)'
-        elif data_gnkt.acid_edit == 'ВТ':
-
-            acid_sel = f'Произвести кислотную обработку пласта {data_gnkt.plast_combo} {data_gnkt.vt}  силами Крезол ' \
-                       f'НС с протяжкой БДТ вдоль интервалов перфорации {data_gnkt.roof_plast}-' \
-                       f'{data_gnkt.sole_plast}м (снизу вверх) в присутствии представителя ' \
+                       f' (для приготовления соляной кислоты в объеме {acid_volume_edit}м3 - ' \
+                       f'{acid_proc_edit}% необходимо замешать {acid_24}т HCL 24% и пресной воды ' \
+                       f'{round(acid_volume_edit - acid_24, 1)}м3)'
+            acid_sel_short = f'СКО пласта {plast_combo} {roof}-{sole} в объеме  {acid_volume_edit}м3  ' \
+                             f'({acid_edit} - {acid_proc_edit} %)'
+        elif acid_edit == 'ВТ':
+            acid_sel = f'Произвести кислотную обработку пласта f{roof}-{sole}м {acid_edit} силами Крезол ' \
+                       f'НС с протяжкой БДТ вдоль интервалов перфорации {roof}-{sole}м (снизу вверх) в присутствии ' \
+                       f'представителя ' \
                        f'Заказчика с составлением акта, не превышая давления закачки не более ' \
                        f'Р = {well_data.max_admissible_pressure._value}атм.'
-            acid_sel_short = f'{data_gnkt.vt} пласта {data_gnkt.plast_combo}  в объеме ' \
-                             f'{data_gnkt.acid_volume_edit}м3  ({data_gnkt.acid_edit} - {data_gnkt.acid_proc_edit} %)'
-        elif data_gnkt.acid_edit == 'HF':
-            acid_sel = f'Произвести глинокислотную обработку пласта {data_gnkt.plast_combo} в объеме ' \
-                       f'{data_gnkt.acid_volume_edit}м3 ' \
+            acid_sel_short = f'{acid_edit} пласта {plast_combo}  в объеме ' \
+                             f'{acid_volume_edit}м3  ({acid_edit} - {acid_proc_edit} %)'
+        elif acid_edit == 'HF':
+            acid_sel = f'Произвести глинокислотную обработку пласта {plast_combo} в объеме ' \
+                       f'{acid_volume_edit}м3 ' \
                        f'(концентрация в смеси HF 3% / HCl 13%) силами Крезол ' \
-                       f'НС с протяжкой БДТ вдоль интервалов перфорации {data_gnkt.roof_plast}-' \
-                       f'{data_gnkt.sole_plast}м (снизу вверх) в присутствии представителя ' \
+                       f'НС с протяжкой БДТ вдоль интервалов перфорации {roof}-{sole}м (снизу вверх) в' \
+                       f' присутствии представителя ' \
                        f'Заказчика с составлением акта, не превышая давления закачки не более ' \
                        f'Р={well_data.max_admissible_pressure._value}атм.'
-            acid_sel_short = f'ГКО пласта {data_gnkt.plast_combo}  в объеме  {data_gnkt.acid_volume_edit}м3'
-        elif data_gnkt.acid_edit == 'Лимонная кислота':
-            acid_sel = f'Произвести лимонной кислотой пласта {data_gnkt.plast_combo} в объеме ' \
-                       f'{data_gnkt.acid_volume_edit}м3 ' \
-                       f'с протяжкой БДТ вдоль интервалов перфорации {data_gnkt.roof_plast}-' \
-                       f'{data_gnkt.sole_plast}м (снизу вверх) в присутствии представителя ' \
+            acid_sel_short = f'ГКО пласта {plast_combo}  в объеме  {acid_volume_edit}м3'
+        elif acid_edit == 'Лимонная кислота':
+            acid_sel = f'Произвести лимонной кислотой пласта {plast_combo} в объеме ' \
+                       f'{acid_volume_edit}м3 ' \
+                       f'с протяжкой БДТ вдоль интервалов перфорации {roof}-{sole}м (снизу вверх) в присутствии' \
+                       f' представителя ' \
                        f'Заказчика с составлением акта, не превышая давления закачки не более ' \
                        f'Р={well_data.max_admissible_pressure._value}атм.'
-            acid_sel_short = f'КО лимонной кислотой пласта {data_gnkt.plast_combo} в объеме  {data_gnkt.acid_volume_edit}м3'
+            acid_sel_short = f'КО лимонной кислотой пласта {plast_combo} в объеме {acid_volume_edit}м3'
 
+        return acid_sel, acid_sel_short
 
+    def work_opz_gnkt(self, acid_info):
+
+        self.volume_gntk = round(float(well_data.lenght_gnkt_edit) * 0.74 / 1000, 1)
+
+        depth_fond_paker_do = sum(map(int, list(well_data.dict_nkt.values())))
         if well_data.depth_fond_paker_do["do"] == 0:
-            depth_fond_paker_do = sum(list(well_data.dict_nkt.values()))
+            self.depth_fond_paker_do = sum(list(well_data.dict_nkt.values()))
             # print(depth_fond_paker_do)
-            if depth_fond_paker_do >= well_data.current_bottom:
+            if self.depth_fond_paker_do >= well_data.current_bottom:
                 depth_fond_paker_do, ok = QInputDialog.getDouble(self, 'глубина НКТ',
                                                                  'Введите Глубины башмака НКТ', 500,
                                                                  0, well_data.current_bottom)
         else:
-            depth_fond_paker_do = well_data.depth_fond_paker_do["do"]
+            self.depth_fond_paker_do = well_data.depth_fond_paker_do["do"]
 
-        acid_volume_edit = data_gnkt.acid_volume_edit
-        return acid_sel, acid_sel_short, depth_fond_paker_do, acid_volume_edit
-    def work_opz_gnkt(self, acid_sel, acid_sel_short, depth_fond_paker_do, acid_volume_edit):
+        opz = []
+        volume_sko = 0
+        for plast_combo,skv_como, roof, sole, acid_edit, acid_proc_edit, acid_volume_edit in acid_info:
+            acid_sel, acid_sel_short = self.select_text_acid(plast_combo, roof, sole, acid_edit, acid_proc_edit,
+                                                             acid_volume_edit)
+            volume_sko += acid_volume_edit
 
-        volume_gntk = round(float(well_data.lenght_gnkt_edit) * 0.74 / 1000, 1)
-
-        opz = [
-            [None,
-             'КИСЛОТНАЯ ОБРАБОТКА',
+            opz.extend([[f'Установить КНК до глубины {sole}м',
+                        17, f'Установить КНК до глубины {sole}м',
+                        None, None, None, None, None, None, None,
+                        'Мастер ГНКТ, состав бригады', 0.2],
+                        [acid_sel_short,
+                         17, acid_sel,
+                         None, None, None, None, None, None, None,
+                         'Мастер ГНКТ, состав бригады, подрядчик по ОПЗ', 2]]
+                       )
+        opz.insert(0,             [None,
+             f'КИСЛОТНАЯ ОБРАБОТКА в объеме {volume_sko}м3 {acid_edit} {acid_proc_edit}% ',
              None, None, None, None, None, None, None, None,
-             'Мастер ГНКТ, состав бригады, представитель Заказчика', 1.33],
-            [acid_sel_short,
-             17, acid_sel,
-             None, None, None, None, None, None, None,
-             'Мастер ГНКТ, состав бригады, подрядчик по ОПЗ', 2],
-            [None,
-             18, f'Закачку {volume_gntk}м3 кислоты производить при открытом малом затрубном пространстве на '
-                 f'циркуляции. Закачку оставшейся '
-                 f'кислоты в объеме {round(acid_volume_edit - volume_gntk, 1)}м3 производить '
-                 f'при закрытом малом затрубном '
-                 f'пространстве. Составить Акт.',
-             None, None, None, None, None, None, None,
-             'Мастер ГНКТ, состав бригады', 2.88],
-            [None, 19, f'Продавить кислоту в пласт мин.водой уд.веса {well_data.fluid_work} в объёме '
-                       f'{volume_gntk + 0.5}м3 при '
-                       f'давлении не более '
-                       f'{well_data.max_admissible_pressure._value}атм. Составить Акт',
-             None, None, None, None, None, None, None,
-             'Мастер ГНКТ, состав бригады', 1.11],
-            [None, 20,
-             f'Приподнять БДТ на {int(depth_fond_paker_do) - 20}м. Стоянка на реакции 2 часа. В СЛУЧАЕ'
-             f' ОТСУТСТВИЯ ДАВЛЕНИЯ '
-             f'ПРОДАВКИ ПРИ СКО, РАБОТЫ ПРОИЗВОДИМ БЕЗ РЕАГИРОВАНИЯ.СОСТАВИТЬ АКТ)',
-             None, None, None, None, None, None, None,
-             'Мастер ГНКТ, состав бригады', 3.06],
-            ['разрядку скважины для извлечения продуктов',
-             21,
-             'Произвести разрядку скважины для извлечения продуктов реакции кислоты в объёме не менее объёма '
-             'закаченной кислоты + объём малого затрубного пространства (из расчета 1,88л на 1 м пространства между '
-             '73мм колонной НКТ и БДТ;'
-             ' 0,46л между 60мм НКТ и БДТ; 3,38л между 89мм НКТ и БДТ) + 3м3. Разрядку производить до чистой'
-             ' промывочной '
-             'жидкости (без признаков продуктов реакции кислоты), но не более 2 часов. Зафиксировать '
-             'избыточное давление '
-             'на устье скважины, объём и описание скважинной жидкости на выходе с отражением их в акте,'
-             ' суточном рапорте '
-             'работы бригад. Составить Акт.',
-             None, None, None, None, None, None, None,
-             'Мастер ГНКТ, состав бригады', 1],
-            ['Допустить БДТ до забоя. Промыть скважину ',
-             16, f'Допустить БДТ до забоя. Промыть скважину  мин.водой уд.веса {well_data.fluid_work}  с составлением '
-                 f'соответствующего акта. При отсутствии циркуляции дальнейшие промывки исключить. Определить '
-                 f'приемистость пласта в трубное пространство при давлении не более '
-                 f'{well_data.max_admissible_pressure._value}атм'
-                 f'  (перед определением приемистости произвести закачку тех.воды не менее 6м3 или при установившемся '
-                 f'давлении закачки, но не более 1 часа). Установить БДТ на гл.{well_data.current_bottom}м.',
-             None, None, None, None, None, None, None,
-             'Мастер ГНКТ, состав бригады, представитель Заказчика', 1.33],
-        ]
+             'Мастер ГНКТ, состав бригады, представитель Заказчика', None])
+
+        work_list = [[None,
+                      18,
+                      f'ПРИМЕЧАНИЕ:\n '
+                      f'Закачку первого объема {self.volume_gntk}м3 кислоты производить при открытом малом '
+                      f'затрубном пространстве на '
+                      f'циркуляции. Закачку оставшейся '
+                      f'кислоты в объеме {round(volume_sko - self.volume_gntk, 1)}м3 производить '
+                      f'при закрытом малом затрубном '
+                      f'пространстве. Составить Акт.',
+                      None, None, None, None, None, None, None,
+                      'Мастер ГНКТ, состав бригады', 2.88],
+                     [None, 19, f'Продавить кислоту в пласт мин.водой уд.веса {well_data.fluid_work} в объёме '
+                                f'{round(self.volume_gntk + 1.5, 1)}м3 при '
+                                f'давлении не более '
+                                f'{well_data.max_admissible_pressure._value}атм. Составить Акт',
+                      None, None, None, None, None, None, None,
+                      'Мастер ГНКТ, состав бригады', 1.11],
+                     [None, 20,
+                      f'Приподнять БДТ на {int(self.depth_fond_paker_do) - 20}м. Стоянка на реакции 2 часа. В СЛУЧАЕ'
+                      f' ОТСУТСТВИЯ ДАВЛЕНИЯ '
+                      f'ПРОДАВКИ ПРИ СКО, РАБОТЫ ПРОИЗВОДИМ БЕЗ РЕАГИРОВАНИЯ.СОСТАВИТЬ АКТ)',
+                      None, None, None, None, None, None, None,
+                      'Мастер ГНКТ, состав бригады', 3.06],
+                     ['разрядку скважины для извлечения продуктов',
+                      21,
+                      'Произвести разрядку скважины для извлечения продуктов реакции кислоты в объёме не менее объёма '
+                      'закаченной кислоты + объём малого затрубного пространства (из расчета 1,88л на 1 м пространства между '
+                      '73мм колонной НКТ и БДТ;'
+                      ' 0,46л между 60мм НКТ и БДТ; 3,38л между 89мм НКТ и БДТ) + 3м3. Разрядку производить до чистой'
+                      ' промывочной '
+                      'жидкости (без признаков продуктов реакции кислоты), но не более 2 часов. Зафиксировать '
+                      'избыточное давление '
+                      'на устье скважины, объём и описание скважинной жидкости на выходе с отражением их в акте,'
+                      ' суточном рапорте '
+                      'работы бригад. Составить Акт.',
+                      None, None, None, None, None, None, None,
+                      'Мастер ГНКТ, состав бригады', 1],
+                     ['Допустить БДТ до забоя. Промыть скважину ',
+                      16,
+                      f'Допустить БДТ до забоя. Промыть скважину  мин.водой уд.веса {well_data.fluid_work}  с составлением '
+                      f'соответствующего акта. При отсутствии циркуляции дальнейшие промывки исключить. Определить '
+                      f'приемистость пласта в трубное пространство при давлении не более '
+                      f'{well_data.max_admissible_pressure._value}атм'
+                      f'  (перед определением приемистости произвести закачку тех.воды не менее 6м3 или при установившемся '
+                      f'давлении закачки, но не более 1 часа). Установить БДТ на гл.{well_data.current_bottom}м.',
+                      None, None, None, None, None, None, None,
+                      'Мастер ГНКТ, состав бригады, представитель Заказчика', 1.33],
+                     ]
+        opz.extend(work_list)
         return opz
 
     @staticmethod
@@ -724,7 +727,7 @@ class GnktModel(MyMainWindow):
                 vertikal = min(map(float, list(well_data.dict_perforation[plast_work]["вертикаль"])))
                 break
             except Exception as e:
-               QMessageBox.warning(self, 'Ошибка', f'Ошибка прочтения данных ПВР {e}')
+                QMessageBox.warning(self, 'Ошибка', f'Ошибка прочтения данных ПВР {e}')
 
         koef_anomal = round(float(self.pressuar) * 101325 / (float(vertikal) * 9.81 * 1000), 1)
 
@@ -789,8 +792,6 @@ class GnktModel(MyMainWindow):
         volume_vn_gnkt = round(30.2 ** 2 * 3.14 / (4 * 1000), 2)
 
         volume_gnkt = round(float(gnkt_lenght) * volume_vn_gnkt / 1000, 1)
-
-
 
         volume_pm_ek = round(
             3.14 * (well_data.column_diametr._value - 2 * well_data.column_wall_thickness._value) ** 2 / 4 / 1000, 2)
@@ -884,16 +885,19 @@ class GnktModel(MyMainWindow):
              None,
              f'{well_data.column_direction_diametr._value}', well_data.column_direction_wall_thickness._value,
              round(well_data.column_direction_diametr._value - 2 * well_data.column_direction_wall_thickness._value, 1),
-             f'0-', well_data.column_direction_lenght._value, f'{well_data.level_cement_direction._value}', None, None],
+             f'0-', well_data.column_direction_lenght._value,
+             f'{well_data.level_cement_direction._value}-{well_data.column_direction_lenght._value}', None,
+             None],
             [None, None, None, None, None, None, None, None, None, f'{lenght_nkt}м', None, None, 'Кондуктор',
              None, None, well_data.column_conductor_diametr._value, well_data.column_conductor_wall_thickness._value,
              f'{round(well_data.column_conductor_diametr._value - 2 * well_data.column_conductor_wall_thickness._value)}',
              f'0-', well_data.column_conductor_lenght._value,
-             f'{well_data.level_cement_conductor._value}', None, None],
+             f'{well_data.level_cement_conductor._value}-{well_data.column_conductor_lenght._value}', None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Экспл. колонна', None, None,
              f'{well_data.column_diametr._value}', f'{well_data.column_wall_thickness._value}',
              f'{round(float(well_data.column_diametr._value - 2 * well_data.column_wall_thickness._value), 1)}',
-             f'0-', well_data.shoe_column._value, well_data.level_cement_column._value, volume_pm_ek, self.well_volume_ek],
+             f'0-', well_data.shoe_column._value, f'0-{well_data.level_cement_column._value}', volume_pm_ek,
+             self.well_volume_ek],
             [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, "", ""],
             [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
@@ -971,7 +975,7 @@ class GnktModel(MyMainWindow):
              None, None, well_data.category_pressuar, None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Содержание H2S, мг/л', None, None,
              None,
-             None, well_data.h2s_mg[0], None, None, None, None, None],
+             None, 'отсут' if well_data.h2s_mg[0] is None else well_data.h2s_mg[0], None, None, None, None, None],
             [None, None, None, None, None, None, None, None,
              None, None, None, None, 'Газовый фактор', None, None, None,
              None, well_data.gaz_f_pr[0], None, None, None, None, None],
@@ -984,8 +988,9 @@ class GnktModel(MyMainWindow):
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Максимальный угол наклона', None,
              None, None, None, well_data.max_angle._value, None, 'на глубине', None, well_data.max_angle_H._value,
              None],
-            [None, None, None, None, None, None, None, None, None, None, None, None, 'Макс. набор кривизны более', None,
-             None, None, None, 'вертикальная', None, 'на глубине', None, None, None],
+            [None, None, None, None, None, None, None, None, None, None, None, None,
+             'Интервалы темпа набора кривизны более 1,5°  на 10 м', None,
+             None, None, None, well_data.interval_temp._value, None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Дата начало / окончания бурения',
              None, None, None, None, self.date_dmy(well_data.date_drilling_run), None,
              self.date_dmy(well_data.date_drilling_cancel),
@@ -993,7 +998,7 @@ class GnktModel(MyMainWindow):
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Дата ввода в эксплуатацию', None,
              None, None, None, f'{well_data.сommissioning_date}', None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Р в межколонном пространстве',
-             0, None, None, None, 0, None, ' ', None, None, None],
+             None, None, None, None, well_data.pressuar_mkp._value, None, ' ', None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Первоначальное Р опр-ки ЭК', None,
              None, None, None, well_data.first_pressure._value, None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Результат предыдущей опрес-и ЭК',
@@ -1240,7 +1245,8 @@ class GnktModel(MyMainWindow):
             [None, None, None, None, None, None, None, None, None, None, None, None],
             [None, None, '№ скважины:', f'{well_data.well_number._value}', 'куст:', None, 'Месторождение:', None, None,
              well_data.well_oilfield._value, None, None],
-            [None, None, 'инв. №:', well_data.inv_number._value, None, None, None, None, 'Площадь: ', well_data.well_area._value,
+            [None, None, 'инв. №:', well_data.inv_number._value, None, None, None, None, 'Площадь: ',
+             well_data.well_area._value,
              None,
              1],
             [None, None, None, None, None, None, None, 'цех:', f'{well_data.cdng._value}', None, None, None]]
@@ -1304,7 +1310,6 @@ class GnktModel(MyMainWindow):
         # зададим размер листа
         ws2.page_setup.paperSize = ws2.PAPERSIZE_A4
 
-
     def date_dmy(self, date_str):
         print(date_str, type(date_str))
         if '-' in str(date_str):
@@ -1345,9 +1350,6 @@ class GnktModel(MyMainWindow):
 class GnktOsvWindow2(GnktModel):
     def __init__(self, parent=None):
         super().__init__()
-
-
-
 
 
 if __name__ == '__main__':

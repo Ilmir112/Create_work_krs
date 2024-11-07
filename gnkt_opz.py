@@ -1,6 +1,6 @@
 from PyQt5.QtGui import QIntValidator, QDoubleValidator
 from PyQt5.QtWidgets import QInputDialog, QMessageBox, QMainWindow, QTabWidget, QLabel, QLineEdit, QComboBox, \
-    QGridLayout, QWidget, QPushButton
+    QGridLayout, QWidget, QPushButton, QTableWidget, QTableWidgetItem
 from PyQt5 import QtWidgets
 
 import well_data
@@ -194,9 +194,9 @@ class TabPage_gnkt(QWidget):
 
 
 class TabWidget(QTabWidget):
-    def __init__(self):
+    def __init__(self, tableWidget):
         super().__init__()
-        self.addTab(TabPage_gnkt(self), 'ГНКТ ОПЗ')
+        self.addTab(TabPage_gnkt(tableWidget), 'ГНКТ ОПЗ')
 
 
 class GnktOpz(GnktModel):
@@ -208,19 +208,44 @@ class GnktOpz(GnktModel):
 
         self.work_plan = 'gnkt_opz'
         self.paker_select = None
-        
+
+        self.tableWidget = QTableWidget(0, 7)
+        self.tabWidget = TabWidget(self.tableWidget)
+
+        self.tableWidget.setHorizontalHeaderLabels(
+            ["Пласт",  'кровля', 'Подошва', 'СКВ', "вид кислоты", "процент", "объем"])
+
+        self.buttonAddString = QPushButton('Добавить обработку')
+        self.buttonAddString.clicked.connect(self.addString)
+
         self.fluid_edit = fluid_edit
 
         self.table_widget = table_widget
-        self.tabWidget = TabWidget()
+
         self.dict_nkt = {}
 
         self.buttonAdd = QPushButton('Добавить данные в план работ')
         self.buttonAdd.clicked.connect(self.add_work)
+        self.buttonDel = QPushButton('Удалить записи из таблице')
+        self.buttonDel.clicked.connect(self.del_row_table)
+        self.buttonAddString = QPushButton('Добавить обработку')
+        self.buttonAddString.clicked.connect(self.addString)
         vbox = QGridLayout(self.centralWidget)
         vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
-        vbox.addWidget(self.buttonAdd, 2, 0)
+        vbox.addWidget(self.buttonAddString, 2, 0)
+        vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
+        vbox.addWidget(self.tableWidget, 1, 0, 1, 2)
 
+        vbox.addWidget(self.buttonDel, 2, 1)
+        vbox.addWidget(self.buttonAdd, 3, 0, 1, 0)
+
+
+    def del_row_table(self):
+        row = self.tableWidget.currentRow()
+        if row == -1:
+            QMessageBox.information(self, 'Внимание', 'Выберите строку для удаления')
+            return
+        self.tableWidget.removeRow(row)
     def add_work(self):
 
         self.current_widget = self.tabWidget.currentWidget()
@@ -254,8 +279,75 @@ class GnktOpz(GnktModel):
         well_data.pause = False
         self.close()
 
+    def addString(self):
+
+        roof_plast = float(self.tabWidget.currentWidget().roof_edit.text().replace(',', '.'))
+        sole_plast = float(self.tabWidget.currentWidget().sole_edit.text().replace(',', '.'))
+
+        plast_combo = str(self.tabWidget.currentWidget().plast_combo.combo_box.currentText())
+
+
+        acid_edit_list = ['HCl', 'HF', 'ВТ', 'лимонная кислота']
+        acid_edit = self.tabWidget.currentWidget().acid_edit.currentText()
+        acid_edit_combo = QComboBox(self)
+        acid_edit_combo.addItems(acid_edit_list)
+        acid_edit_combo.setCurrentIndex(acid_edit_list.index(acid_edit))
+        self.tabWidget.currentWidget().acid_volume_edit.text().replace(',', '.')
+        acid_volume_edit = float(self.tabWidget.currentWidget().acid_volume_edit.text().replace(',', '.'))
+        acid_proc_edit = int(float(self.tabWidget.currentWidget().acid_proc_edit.text().replace(',', '.')))
+        svk_true_combo_str = self.tabWidget.currentWidget().svk_true_combo.currentText()
+
+
+        svk_true_combo = QComboBox(self)
+        svk_true_list = ['Нужно СКВ', 'без СКВ']
+        svk_true_combo.addItems(svk_true_list)
+        svk_true_combo.setCurrentIndex(svk_true_list.index(svk_true_combo_str))
+
+        if not plast_combo or not acid_edit or not acid_volume_edit or not acid_proc_edit:
+            QMessageBox.information(self, 'Внимание', 'Заполните данные по объему')
+            return
+
+
+
+        self.tableWidget.setSortingEnabled(False)
+        rows = self.tableWidget.rowCount()
+
+        self.tableWidget.insertRow(rows)
+        self.tableWidget.setItem(rows, 0, QTableWidgetItem(plast_combo))
+
+        self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(roof_plast)))
+        self.tableWidget.setItem(rows, 2, QTableWidgetItem(str(sole_plast)))
+        self.tableWidget.setCellWidget(rows, 3, svk_true_combo)
+        self.tableWidget.setCellWidget(rows, 4, acid_edit_combo)
+        self.tableWidget.setItem(rows, 5, QTableWidgetItem(str(acid_proc_edit)))
+        self.tableWidget.setItem(rows, 6, QTableWidgetItem(str(acid_volume_edit)))
+
+
 
     def gnkt_work_opz(self, data_gnkt):
+
+        rows = self.tableWidget.rowCount()
+
+        if rows == 0:
+            QMessageBox.warning(self, "ВНИМАНИЕ", 'Нужно добавить интервалы обработки')
+            return
+        acid_info = []
+
+        interval_sko = ''
+        for row in range(rows):
+
+            plast_combo = self.tableWidget.item(row, 0).text()
+
+            roof_plast = self.tableWidget.item(row, 1).text()
+            sole_plast = self.tableWidget.item(row, 2).text()
+            svk_true_combo = self.tableWidget.cellWidget(row, 3).currentText()
+            acid_edit = self.tableWidget.cellWidget(row, 4).currentText()
+            acid_proc_edit = int(float(self.tableWidget.item(row, 5).text()))
+            acid_volume_edit = round(float(self.tableWidget.item(row, 6).text()), 1)
+            acid_info.append([plast_combo, svk_true_combo, roof_plast , sole_plast, acid_edit,acid_proc_edit, acid_volume_edit])
+            interval_sko += f'{roof_plast}-{sole_plast}, '
+
+
 
         block_gnvp_list = events_gnvp_frez(data_gnkt.distance_pntzh, float(data_gnkt.fluid_edit))
 
@@ -269,7 +361,16 @@ class GnktOpz(GnktModel):
         if self.need_rast_combo == 'нужно':
             volume_rast_edit = self.volume_rast_edit
 
-        acid_sel, acid_sel_short, depth_fond_paker_do, _ = self.select_text_acid(self)
+        depth_fond_paker_do = sum(map(int, list(well_data.dict_nkt.values())))
+        if well_data.depth_fond_paker_do["do"] == 0:
+            self.depth_fond_paker_do = sum(list(well_data.dict_nkt.values()))
+            # print(depth_fond_paker_do)
+            if self.depth_fond_paker_do >= well_data.current_bottom:
+                depth_fond_paker_do, ok = QInputDialog.getDouble(self, 'глубина НКТ',
+                                                                 'Введите Глубины башмака НКТ', 500,
+                                                                 0, well_data.current_bottom)
+        else:
+            self.depth_fond_paker_do= well_data.depth_fond_paker_do["do"]
 
         gnkt_opz = [
             [None, 'Порядок работы', None, None, None, None, None, None, None, None, None, None],
@@ -372,7 +473,7 @@ class GnktOpz(GnktModel):
              f'посадке ГНКТ в колонне НКТ произвести закачку (на циркуляции) растворителя в объёме 0,2 м3 в ГНКТ. '
              f'Произвести продавку (на циркуляции) растворителя АСПО до башмака ГНКТ мин.водой уд.вес {well_data.fluid_work} '
              f'в объёме 2,0м3. Закрыть Кран на тройнике устьевого оборудования. '
-             f'{"Стоянка на реакции 2 часа." if well_data.region != "ТГМ" and acid_sel != "HF" else "без реагирования"}'
+             f'{"Стоянка на реакции 2 часа." if well_data.region != "ТГМ" and acid_info[0][3] != "HF" else "без реагирования"}'
              f' Промывка колонны '
              f'НКТ - не менее1 цикла. Составить Акт. Промывка подвески ФНКТ по согласованию ПТО и ЦДНГ',
              None, None, None, None, None, None, None,
@@ -401,10 +502,9 @@ class GnktOpz(GnktModel):
             [None, 'ГИДРОСВАБИРОВАНИЕ И ОПРЕДЕЛЕНИЕ ПРИЕМИСТОСТИ',
              None, None, None, None, None, None, None, None, None,
              'Мастер ГНКТ, представитель Заказчика', None],
-            [f'гидросвабирование в инт {self.roof_plast}-'
-             f'{self.sole_plast}м при Рзак={well_data.max_admissible_pressure._value}атм',
-             23, f'Произвести гидросвабирование пласта в интервале {self.roof_plast}-'
-                 f'{self.sole_plast}м (закрыть затруб, произвести задавку в пласт '
+            [f'гидросвабирование в инт {interval_sko}м при Рзак={well_data.max_admissible_pressure._value}атм',
+             23, f'Произвести гидросвабирование пласта в интервале {interval_sko[:-2]}м (закрыть затруб, произвести '
+                 f'задавку в пласт '
                  f'жидкости при не более Рзак={well_data.max_admissible_pressure._value}атм при установленном '
                  f'герметичном пакере. '
                  f'Операции по задавке и изливу произвести 3-4 раза в зависимости от приёмистости). ',
@@ -455,7 +555,7 @@ class GnktOpz(GnktModel):
                      None, None, None, None, None, None, None,
                      'Мастер ГНКТ, предст. Заказчика', 1]
 
-        opz = self.work_opz_gnkt(acid_sel, acid_sel_short, depth_fond_paker_do, self.acid_volume_edit)
+        opz = self.work_opz_gnkt(acid_info)
         n = 17
         if well_data.depth_fond_paker_do['do'] != 0:  # вставка строк при наличии пакера
             gnkt_opz.insert(7, paker_opr)

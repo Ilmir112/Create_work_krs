@@ -990,8 +990,12 @@ class Work_with_gnkt(GnktModel):
 
         if self.data_gnkt.acids_work_combo == 'Да':
 
-            acid_sel, acid_sel_short, depth_fond_paker_do, acid_volume_edit = self.select_text_acid(self.data_gnkt)
-            acid_work_list = self.work_opz_gnkt(acid_sel, acid_sel_short, depth_fond_paker_do, acid_volume_edit)
+            acid_info = [[
+                self.data_gnkt.plast_combo, "svk_true_combo", self.data_gnkt.roof_plast,
+                self.data_gnkt.sole_plast, self.data_gnkt.acid_edit, self.data_gnkt.acid_proc_edit,
+                self.data_gnkt.acid_volume_edit]]
+
+            acid_work_list = self.work_opz_gnkt(acid_info)
 
             for row in acid_work_list:
                 gnkt_work_list.append(row)
