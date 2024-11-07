@@ -268,8 +268,9 @@ class GnktModel(MyMainWindow):
 
             n = 0
             m = 0
-            for plast, interval in well_data.img_pvr_list:
-                for roof_plast, sole_plast in interval:
+            for plast in well_data.plast_work:
+                for roof_plast, sole_plast in well_data.dict_perforation[plast]['интервал']:
+
                     count_interval = well_data.dict_perforation[plast]['счет_объединение']
 
                     ws.merge_cells(start_column=23, start_row=27 + m,
@@ -287,13 +288,13 @@ class GnktModel(MyMainWindow):
 
                             ws.cell(row=43 + n, column=10).value = interval_str
                             ws.merge_cells(start_column=10, start_row=43 + n,
-                                           end_column=12, end_row=43 + n + 2)
+                                           end_column=12, end_row=43 + n + 1)
                             ws.cell(row=43 + n, column=10).font = Font(name='Arial', size=12, bold=True)
-                            ws.cell(row=43 + n, column=10).alignment = Alignment(wrap_text=True, horizontal='left',
+                            ws.cell(row=43 + n, column=10).alignment = Alignment(wrap_text=True, horizontal='center',
                                                                                  vertical='center')
                             n += 3
                             self.insert_image(ws, f'{well_data.path_image}imageFiles/schema_well/ПВР.png',
-                                              coordinate_pvr, 85, 40)
+                                              coordinate_pvr, 85, 50)
                     except:
                         QMessageBox.critical(self,
                                              'Ошибка', f'программа не смогла вставить интервал перфорации в схему'
