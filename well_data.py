@@ -265,6 +265,7 @@ data_in_base = False
 dict_nkt = {}
 dict_nkt_po = {}
 path_image = '_internal/'
+#
 # path_image = ''
 
 dict_volume_chemistry = {'пункт': [], 'цемент': 0.0, 'HCl': 0.0, 'HF': 0.0, 'NaOH': 0.0, 'ВТ СКО': 0.0,
