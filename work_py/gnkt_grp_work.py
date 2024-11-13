@@ -129,22 +129,25 @@ class TabPageGnkt(TabPageUnion):
 
     def update_acids_work(self, index):
         if index == 'Нет':
-            self.acids_type_label.setParent(None)
-            self.acid_edit.setParent(None)
-            self.acid_volume_label.setParent(None)
-            self.acid_volume_edit.setParent(None)
-            self.acid_proc_label.setParent(None)
-            self.acid_proc_edit.setParent(None)
-            self.pressure_Label.setParent(None)
-            self.pressure_edit.setParent(None)
-            self.roof_label.setParent(None)
-            self.roof_edit.setParent(None)
+            try:
+                self.acids_type_label.setParent(None)
+                self.acid_edit.setParent(None)
+                self.acid_volume_label.setParent(None)
+                self.acid_volume_edit.setParent(None)
+                self.acid_proc_label.setParent(None)
+                self.acid_proc_edit.setParent(None)
+                self.pressure_Label.setParent(None)
+                self.pressure_edit.setParent(None)
+                self.roof_label.setParent(None)
+                self.roof_edit.setParent(None)
 
-            self.sole_label.setParent(None)
-            self.sole_edit.setParent(None)
+                self.sole_label.setParent(None)
+                self.sole_edit.setParent(None)
 
-            self.plast_label.setParent(None)
-            self.plast_combo.setParent(None)
+                self.plast_label.setParent(None)
+                self.plast_combo.setParent(None)
+            except:
+                pass
 
         elif index == 'Да':
             self.acids_type_label = QLabel('Вид кислоты')
@@ -470,7 +473,7 @@ class GnktModel(WindowUnion):
             self.data_gnkt = GnktOsvWindow2(self.dict_data_well)
             self.data_gnkt.setWindowTitle("Данные по ГНКТ")
             self.data_gnkt.setGeometry(200, 400, 100, 400)
-            self.data_gnkt.show()
+            self.set_modal_window(self.data_gnkt)
             self.pause_app()
             well_data.pause = True
 

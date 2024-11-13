@@ -19,10 +19,8 @@ class TabPageGnkt(TabPageUnion):
 
     def __init__(self, parent=None):
         from krs import volume_jamming_well
-        super().__init__()
+        super().__init__(parent)
 
-        self.validator_int = QIntValidator(0, 8000)
-        self.validator_float = QDoubleValidator(0, 8000, 2)
 
         self.roof_label = QLabel("кровля пласта", self)
         self.roof_edit = QLineEdit(self)
@@ -178,7 +176,7 @@ class TabWidget(TabWidgetUnion):
 class GnktBopz(GnktModel):
 
     def __init__(self, table_widget, data_gnkt, parent=None):
-        super(GnktBopz, self).__init__()
+        super(GnktBopz, self).__init__(parent)
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
 
@@ -188,7 +186,7 @@ class GnktBopz(GnktModel):
         self.fluid_edit = self.data_gnkt.fluid_edit
 
         self.table_widget = table_widget
-        self.tabWidget = TabWidget()
+        self.tabWidget = TabWidget(self.dict_data_well)
         self.dict_nkt = {}
 
         self.buttonAdd = QPushButton('Добавить данные в план работ')
@@ -197,11 +195,7 @@ class GnktBopz(GnktModel):
         vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
 
-        self.buttonAdd = QPushButton('Добавить данные в план работ')
-        self.buttonAdd.clicked.connect(self.add_work)
-        vbox = QGridLayout(self.centralWidget)
-        vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
-        vbox.addWidget(self.buttonAdd, 2, 0)
+
 
     def add_work(self):
         try:

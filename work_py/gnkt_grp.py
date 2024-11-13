@@ -175,7 +175,7 @@ class GnktOsvWindow(GnktModel):
         elif self.work_plan == 'gnkt_bopz':
 
             self.data_gnkt_opz = GnktBopz(self.table_widget,
-                                          self.data_gnkt, self.data_gnkt.fluid_edit)
+                                          self.data_gnkt, self.dict_data_well)
             self.data_gnkt_opz.show()
             well_data.pause = True
             self.pause_app()

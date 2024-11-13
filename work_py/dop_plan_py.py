@@ -385,9 +385,15 @@ class DopPlanWindow(WindowUnion):
 
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
-        self.ins_ind = self.dict_data_well["ins_ind"]
+
+
         self.table_widget = table_widget
-        self.work_plan =  self.dict_data_well["work_plan"]
+        self.work_plan = self.dict_data_well["work_plan"]
+        if self.work_plan == 'dop_plan_in_base':
+            self.dict_data_well["number_dp"] = 0
+            self.ins_ind = 0
+        else:
+            self.ins_ind = self.dict_data_well["ins_ind"]
 
         self.data, self.rowHeights, self.colWidth, self.boundaries_dict = None, None, None, None
         self.target_row_index = None

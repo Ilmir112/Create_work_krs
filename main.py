@@ -307,7 +307,7 @@ class MyMainWindow(QMainWindow):
                 self.rir_window = DopPlanWindow(self.dict_data_well, self.table_widget)
 
             self.rir_window.setGeometry(200, 400, 800, 200)
-            self.rir_window.show()
+            self.set_modal_window(self.rir_window)
             well_data.pause = True
             self.pause_app()
 

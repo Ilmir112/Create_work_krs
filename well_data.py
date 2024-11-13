@@ -110,10 +110,10 @@ user = ['', '']
 
 data_in_base = False
 
-path_image = '_internal/'
-# path_image = ''
+# path_image = '_internal/'
+path_image = ''
 
-dict_volume_chemistry = {'пункт': [], 'цемент': 0.0, 'HCl': 0.0, 'HF': 0.0, 'NaOH': 0.0, 'ВТ СКО': 0.0,
+DICT_VOLUME_CHEMISTRY = {'пункт': [], 'цемент': 0.0, 'HCl': 0.0, 'HF': 0.0, 'NaOH': 0.0, 'ВТ СКО': 0.0,
                          'Глина': 0.0, 'растворитель': 0.0, 'уд.вес': 0.0,
                          'песок': 0.0, 'РПК': 0.0, 'РПП': 0.0, "извлекаемый пакер": 0.0, "ЕЛАН": 0.0,
                          'РИР 2С': 0.0, 'РИР ОВП': 0.0, 'гидрофабизатор': 0.0}
@@ -121,9 +121,13 @@ dict_volume_chemistry = {'пункт': [], 'цемент': 0.0, 'HCl': 0.0, 'HF'
 
 data = ''
 rowHeights = ''
+data_well_is_True = False
+current_date = datetime.now().date()
+# path_image = '_internal/'
+path_image = ''
 colWidth = ''
 boundaries_dict = ''
-
+sucker_rod_none = False
 
 plast_project = []
 plast_work = []
