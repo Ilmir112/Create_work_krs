@@ -12,11 +12,13 @@ from gnkt_data import gnkt_data
 from collections import namedtuple
 
 from work_py.gnkt_grp_work import GnktModel
+from work_py.parent_work import TabWidgetUnion
 
 
-class TabPage_gnkt(QWidget):
+class TabPageGnkt(QWidget):
     def __init__(self, parent=None):
         super().__init__()
+        self.dict_data_well = parent
 
         self.validator_int = QIntValidator(0, 8000)
         self.validator_float = QDoubleValidator(0, 8000, 1)
@@ -26,15 +28,15 @@ class TabPage_gnkt(QWidget):
 
         self.roof_label = QLabel("кровля пласта", self)
         self.roof_edit = QLineEdit(self)
-        self.roof_edit.setText(f'{well_data.perforation_roof}')
+        self.roof_edit.setText(f'{self.dict_data_well["perforation_roof"]}')
         self.roof_edit.setValidator(self.validator_float)
 
         self.sole_label = QLabel("подошва пласта", self)
         self.sole_edit = QLineEdit(self)
-        self.sole_edit.setText(f'{well_data.perforation_sole}')
+        self.sole_edit.setText(f'{self.dict_data_well["perforation_roof"]}')
         self.sole_edit.setValidator(self.validator_float)
         plast_work = ['']
-        plast_work.extend(well_data.plast_work)
+        plast_work.extend(self.dict_data_well['plast_work'])
 
         self.plast_label = QLabel("Выбор пласта", self)
         self.plast_combo = CheckableComboBox(self)
@@ -97,7 +99,7 @@ class TabPage_gnkt(QWidget):
 
         self.pressure_Label = QLabel("Давление закачки", self)
         self.pressure_edit = QLineEdit(self)
-        self.pressure_edit.setText(f'{well_data.max_admissible_pressure._value}')
+        self.pressure_edit.setText(f'{self.dict_data_well["max_admissible_pressure"]._value}')
         self.pressure_edit.setValidator(self.validator_int)
 
 
@@ -167,12 +169,12 @@ class TabPage_gnkt(QWidget):
 
     def update_plast_edit(self):
 
-        dict_perforation = well_data.dict_perforation
+        dict_perforation = self.dict_data_well["dict_perforation"]
         plasts = well_data.texts
         # print(f'пласты {plasts, len(well_data.texts), len(plasts), well_data.texts}')
-        roof_plast = well_data.current_bottom
+        roof_plast = self.dict_data_well["current_bottom"]
         sole_plast = 0
-        for plast in well_data.plast_work:
+        for plast in self.dict_data_well['plast_work']:
             for plast_sel in plasts:
                 if plast_sel == plast:
                     if roof_plast >= dict_perforation[plast]['кровля']:
@@ -193,16 +195,16 @@ class TabPage_gnkt(QWidget):
             self.sko_vt_edit.setParent(None)
 
 
-class TabWidget(QTabWidget):
-    def __init__(self, tableWidget):
+class TabWidget(TabWidgetUnion):
+    def __init__(self, dict_data_well):
         super().__init__()
-        self.addTab(TabPage_gnkt(tableWidget), 'ГНКТ ОПЗ')
+        self.addTab(TabPageGnkt(dict_data_well), 'ГНКТ ОПЗ')
 
 
 class GnktOpz(GnktModel):
     def __init__(self, table_widget, fluid_edit, parent=None):
-
-        super(GnktOpz, self).__init__()
+        super(GnktOpz, self).__init__(parent)
+        self.dict_data_well = parent
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
 
@@ -210,7 +212,7 @@ class GnktOpz(GnktModel):
         self.paker_select = None
 
         self.tableWidget = QTableWidget(0, 7)
-        self.tabWidget = TabWidget(self.tableWidget)
+        self.tabWidget = TabWidget(self.dict_data_well)
 
         self.tableWidget.setHorizontalHeaderLabels(
             ["Пласт",  'кровля', 'Подошва', 'СКВ', "вид кислоты", "процент", "объем"])
@@ -349,28 +351,29 @@ class GnktOpz(GnktModel):
 
 
 
-        block_gnvp_list = events_gnvp_frez(data_gnkt.distance_pntzh, float(data_gnkt.fluid_edit))
+        block_gnvp_list = events_gnvp_frez(self, data_gnkt.distance_pntzh, float(data_gnkt.fluid_edit))
 
         if self.acid_true_edit == "нужно":
             acid_true_quest = True
         else:
             acid_true_quest = False
 
-        well_data.fluid_work, well_data.fluid_work_short = GnoWindow.calc_work_fluid(self.fluid_edit)
+        self.dict_data_well["fluid_work"], self.dict_data_well["fluid_work_short"] =\
+            GnoWindow.calc_work_fluid(self, self.fluid_edit)
 
         if self.need_rast_combo == 'нужно':
             volume_rast_edit = self.volume_rast_edit
 
-        depth_fond_paker_do = sum(map(int, list(well_data.dict_nkt.values())))
-        if well_data.depth_fond_paker_do["do"] == 0:
-            self.depth_fond_paker_do = sum(list(well_data.dict_nkt.values()))
+        depth_fond_paker_do = sum(map(int, list(self.dict_data_well["dict_nkt"].values())))
+        if self.dict_data_well["depth_fond_paker_do"]["do"] == 0:
+            self.depth_fond_paker_do = sum(list(self.dict_data_well["dict_nkt"].values()))
             # print(depth_fond_paker_do)
-            if self.depth_fond_paker_do >= well_data.current_bottom:
+            if self.depth_fond_paker_do >= self.dict_data_well["current_bottom"]:
                 depth_fond_paker_do, ok = QInputDialog.getDouble(self, 'глубина НКТ',
                                                                  'Введите Глубины башмака НКТ', 500,
-                                                                 0, well_data.current_bottom)
+                                                                 0, self.dict_data_well["current_bottom"])
         else:
-            self.depth_fond_paker_do= well_data.depth_fond_paker_do["do"]
+            self.depth_fond_paker_do= self.dict_data_well["depth_fond_paker_do"]["do"]
 
         gnkt_opz = [
             [None, 'Порядок работы', None, None, None, None, None, None, None, None, None, None],
@@ -425,7 +428,7 @@ class GnktOpz(GnktModel):
              f'("Обвязки устья '
              f'при глушении скважин, после проведения гидроразрыва пласта и работы на скважинах ППД с оборудованием'
              f' койлтюбинговых установок на месторождениях ООО "Башнефть-Добыча") превентором ППК 80х35 '
-             f'(4-х секционный превентор БП 80-70.00.00.000 (700атм)) №{well_data.pvo_number} и инжектором. '
+             f'(4-х секционный превентор БП 80-70.00.00.000 (700атм)) №{self.dict_data_well["pvo_number"]} и инжектором. '
              f'РАБОТЫ ПО МОНТАЖУ КОЛТЮБИНГОВОЙ УСТАНОВКИ'
              ' В СООТВЕТСТВИИ С ТЕХНОЛОГИЧЕСКОЙ ИНСТРУКЦИЕЙ, ФЕДЕРАЛЬНЫХ НОРМ И ПРАВИЛА В ОБЛАСТИ ПРОМЫШЛЕННОЙ '
              'БЕЗОПАСНОСТИ «ПРАВИЛА БЕЗОПАСНОСТИ В НЕФТЯНОЙ И ГАЗОВОЙ ПРОМЫШЛЕННОСТИ»  РОСТЕХНАДЗОР '
@@ -443,17 +446,17 @@ class GnktOpz(GnktModel):
                    f'безопосности.'
                    f' Запустить систему регистрации СОРП. Оповестить всех людей на кустовой площадке о проведении '
                    f'опрессовки.'
-                   f' Опрессовать все нагнетательные линии на {min(225, well_data.max_admissible_pressure._value * 1.5)}атм. '
+                   f' Опрессовать все нагнетательные линии на {min(225, self.dict_data_well["max_admissible_pressure"]._value * 1.5)}атм. '
                    f'Опрессовать  выкидную линию '
                    f'от устья скважины до желобной ёмкости на '
-                   f'{min(225, round(well_data.max_admissible_pressure._value * 1.5, 1))}атм c выдержкой 30мин'
+                   f'{min(225, round(self.dict_data_well["max_admissible_pressure"]._value * 1.5, 1))}атм c выдержкой 30мин'
                    f'(надёжно закрепить, оборудовать дроссельными задвижками)',
              None, None, None, None, None, None, None,
              'Мастер ГНКТ, представ.БВО (вызов по телефонограмме при необходимости)', 'факт'],
             [None, 11,
              f'При закрытой центральной задвижке фондовой арматуры. Опрессовать превентор, глухие и трубные  '
                f'плашки на '
-               f'устье скважины на Р={well_data.max_admissible_pressure._value}атм с выдержкой 30 мин (опрессовку ПВО '
+               f'устье скважины на Р={self.dict_data_well["max_admissible_pressure"]._value}атм с выдержкой 30 мин (опрессовку ПВО '
                f'зафиксировать'
                f' в вахтовом журнале). Оформить соответствующий акт в присутствии представителя Башкирского '
                f'военизированного '
@@ -466,20 +469,20 @@ class GnktOpz(GnktModel):
              None, None, None, None, None, None, None, None,
              'Мастер ГНКТ, представитель Заказчика', None],
             [None, 12,
-             f'Произвести спуск БДТ + насадка 5 каналов до {well_data.current_bottom}м (забой) с промывкой скважины '
-             f'мин.водой уд.веса {well_data.fluid_work} с фиксацией давления промывки, расход жидкости не менее 200л\\мин, объем '
+             f'Произвести спуск БДТ + насадка 5 каналов до {self.dict_data_well["current_bottom"]}м (забой) с промывкой скважины '
+             f'мин.водой уд.веса {self.dict_data_well["fluid_work"]} с фиксацией давления промывки, расход жидкости не менее 200л\\мин, объем '
              f'промывки не менее 1 цикла  со скоростью 5м/мин. Убедиться в наличии свободного прохода КНК-2 (при '
              f'прохождении насадкой лубрикаторной задвижки, пакера, воронки скорость спуска минимальная 2м/мин). При '
              f'посадке ГНКТ в колонне НКТ произвести закачку (на циркуляции) растворителя в объёме 0,2 м3 в ГНКТ. '
-             f'Произвести продавку (на циркуляции) растворителя АСПО до башмака ГНКТ мин.водой уд.вес {well_data.fluid_work} '
+             f'Произвести продавку (на циркуляции) растворителя АСПО до башмака ГНКТ мин.водой уд.вес {self.dict_data_well["fluid_work"]} '
              f'в объёме 2,0м3. Закрыть Кран на тройнике устьевого оборудования. '
-             f'{"Стоянка на реакции 2 часа." if well_data.region != "ТГМ" and acid_info[0][3] != "HF" else "без реагирования"}'
+             f'{"Стоянка на реакции 2 часа." if self.dict_data_well["region"] != "ТГМ" and acid_info[0][3] != "HF" else "без реагирования"}'
              f' Промывка колонны '
              f'НКТ - не менее1 цикла. Составить Акт. Промывка подвески ФНКТ по согласованию ПТО и ЦДНГ',
              None, None, None, None, None, None, None,
              'Мастер ГНКТ, представитель Заказчика', 2.04],
-            [f'Промыть НКТ и скважину с гл.{well_data.current_bottom}м',
-             13, f'Промыть НКТ и скважину с гл.{well_data.current_bottom}м мин.водой уд.веса {well_data.fluid_work}  в 1 цикл'
+            [f'Промыть НКТ и скважину с гл.{self.dict_data_well["current_bottom"]}м',
+             13, f'Промыть НКТ и скважину с гл.{self.dict_data_well["current_bottom"]}м мин.водой уд.веса {self.dict_data_well["fluid_work"]}  в 1 цикл'
                  f' с добавлением 1т растворителя с составлением соответствующего акта. При появлении затяжек или '
                  f'посадок при спуско-подъемных операциях произвести интенсивную промывку '
                  f'осложненного участка скважины. ',
@@ -490,8 +493,8 @@ class GnktOpz(GnktModel):
                  f' представителя Заказчика при открытом'
                  f' малом затрубном пространстве на циркуляции. Произвести продавку растворителя АСПО до '
                  f'башмака ГНКТ '
-                 f'мин.водой уд.вес {well_data.fluid_work} в объёме 2,2м3 не превышая давления закачки не более  '
-                 f'Р={well_data.max_admissible_pressure._value}атм. ',
+                 f'мин.водой уд.вес {self.dict_data_well["fluid_work"]} в объёме 2,2м3 не превышая давления закачки не более  '
+                 f'Р={self.dict_data_well["max_admissible_pressure"]._value}атм. ',
              None, None, None, None, None, None, None,
              'Мастер ГНКТ, состав бригады, представитель Заказчика', 1.92],
             [None, 15,
@@ -502,28 +505,28 @@ class GnktOpz(GnktModel):
             [None, 'ГИДРОСВАБИРОВАНИЕ И ОПРЕДЕЛЕНИЕ ПРИЕМИСТОСТИ',
              None, None, None, None, None, None, None, None, None,
              'Мастер ГНКТ, представитель Заказчика', None],
-            [f'гидросвабирование в инт {interval_sko}м при Рзак={well_data.max_admissible_pressure._value}атм',
+            [f'гидросвабирование в инт {interval_sko}м при Рзак={self.dict_data_well["max_admissible_pressure"]._value}атм',
              23, f'Произвести гидросвабирование пласта в интервале {interval_sko[:-2]}м (закрыть затруб, произвести '
                  f'задавку в пласт '
-                 f'жидкости при не более Рзак={well_data.max_admissible_pressure._value}атм при установленном '
+                 f'жидкости при не более Рзак={self.dict_data_well["max_admissible_pressure"]._value}атм при установленном '
                  f'герметичном пакере. '
                  f'Операции по задавке и изливу произвести 3-4 раза в зависимости от приёмистости). ',
              None, None, None, None, None, None, None,
              'Мастер ГНКТ, состав бригады, представитель Заказчика', 1],
-            [f'Исследовать скважину на приёмистость при Рзак={well_data.expected_P}атм',
-             24, f'Исследовать скважину на приёмистость при Рзак={well_data.expected_P}атм с составлением акта в '
+            [f'Исследовать скважину на приёмистость при Рзак={self.dict_data_well["expected_P"]}атм',
+             24, f'Исследовать скважину на приёмистость при Рзак={self.dict_data_well["expected_P"]}атм с составлением акта в '
                  f' в присутствии представителя ЦДНГ с составлением соответствующего акта (для вызова представителя '
                  f'давать телефонограмму в ЦДНГ). Определение приёмистости производить после насыщения пласта не '
                  f'менее 6м3 или '
                  f'при установившемся давлении закачки, но не более 1 часов. При недостижении запланированной '
                  f'приёмистости '
-                 f'{well_data.expected_Q}м3/сут при Р= {well_data.expected_P}атм дальнейшие работы производить '
+                 f'{self.dict_data_well["expected_Q"]}м3/сут при Р= {self.dict_data_well["expected_P"]}атм дальнейшие работы производить '
                  f'по согласованию с Заказчиком. Составить Акт ',
              None, None, None, None, None, None, None,
              'Мастер ГНКТ, состав бригады, представитель Заказчика', 1.4],
             [None,
              25, f'Вызвать телефонограммой представителя Заказчика для замера приёмистости  при '
-                 f'Рзак={well_data.expected_P}атм прибором "Панаметрикс".Перед запуском скважины '
+                 f'Рзак={self.dict_data_well["expected_P"]}атм прибором "Панаметрикс".Перед запуском скважины '
                  f'произвести сброс жидкости с водовода в объёме 3-5м3 в ЕДК в зависимости от наличия нефтяной '
                  f'эмульсии на '
                  f'выходе в технологическую емкость для предупреждения повторной кольматации ПЗП шламом с водовода и '
@@ -534,7 +537,7 @@ class GnktOpz(GnktModel):
              None, None, None, None, None, None, None,
              'Мастер ГНКТ, состав бригады, представитель Заказчика УСРСиСТ', 1.4],
             [None, 26,
-             f'Поднять БДТ до устья с промывкой скважины мин.водой {well_data.fluid_work} . Составить Акт. '
+             f'Поднять БДТ до устья с промывкой скважины мин.водой {self.dict_data_well["fluid_work"]} . Составить Акт. '
              f'Согласовать с '
              f'Заказчиком утилизацию жидкости в коллектор.',
              None, None, None, None, None, None, None,
@@ -549,15 +552,15 @@ class GnktOpz(GnktModel):
              None, None, None, None, None, None, None,
              'Мастер ГНКТ, представитель Заказчика', None],
         ]
-        paker_opr = [f'Опрессовать пакер на {well_data.max_admissible_pressure._value}атм',
-                     5, f'Опрессовать пакер на {well_data.max_admissible_pressure._value}атм с выдержкой 30 мин с '
+        paker_opr = [f'Опрессовать пакер на {self.dict_data_well["max_admissible_pressure"]._value}атм',
+                     5, f'Опрессовать пакер на {self.dict_data_well["max_admissible_pressure"]._value}атм с выдержкой 30 мин с '
                         f'оформлением соответствующего акта в присутствии  представителя ЦДНГ',
                      None, None, None, None, None, None, None,
                      'Мастер ГНКТ, предст. Заказчика', 1]
 
         opz = self.work_opz_gnkt(acid_info)
         n = 17
-        if well_data.depth_fond_paker_do['do'] != 0:  # вставка строк при наличии пакера
+        if self.dict_data_well["depth_fond_paker_do"]["do"] != 0:  # вставка строк при наличии пакера
             gnkt_opz.insert(7, paker_opr)
             n += 1
 

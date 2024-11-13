@@ -7,13 +7,15 @@ from PyQt5.QtWidgets import QMessageBox, QInputDialog, QMainWindow, QWidget, QLa
     QTabWidget, QPushButton, QHeaderView, QTableWidget, QTableWidgetItem
 
 from work_py.alone_oreration import privyazkaNKT
+from .parent_work import TabPageUnion, WindowUnion, TabWidgetUnion
 from .rationingKRS import descentNKT_norm, liftingNKT_norm
 
 
-class TabPage_SO(QWidget):
+class TabPageSo(TabPageUnion):
     def __init__(self, parent=None):
-
         super().__init__()
+
+        self.dict_data_well = parent
 
         self.validator = QDoubleValidator(0.0, 80000.0, 2)
 
@@ -33,14 +35,14 @@ class TabPage_SO(QWidget):
         self.need_privyazka_QCombo = QComboBox()
         self.need_privyazka_QCombo.addItems(['Нет', 'Да'])
 
-        if len(well_data.plast_work) != 0:
-            pakerDepth = well_data.perforation_roof - 20
+        if len(self.dict_data_well['plast_work']) != 0:
+            pakerDepth = self.dict_data_well["perforation_roof"] - 20
         else:
-            # print(well_data.dict_perforation)
-            if well_data.leakiness:
-                aaaaa = well_data.dict_leakiness['НЭК']['интервал']
+            # print(self.dict_data_well["dict_perforation"])
+            if self.dict_data_well["dict_leakiness"]:
+                aaaaa = self.dict_data_well["dict_leakiness"]['НЭК']['интервал']
                 pakerDepth = min([float(nek.split('-')[0]) - 10
-                                       for nek in well_data.dict_leakiness['НЭК']['интервал'].keys()])
+                                       for nek in self.dict_data_well["dict_leakiness"]['НЭК']['интервал'].keys()])
         try:
             self.paker_depth_edit.setText(str(int(pakerDepth)))
         except:
@@ -76,12 +78,12 @@ class TabPage_SO(QWidget):
 
     def update_paker_need(self, index):
         if index == 'Да':
-            if len(well_data.plast_work) != 0:
-                paker_depth_zumpf = int(well_data.perforation_sole + 10)
+            if len(self.dict_data_well['plast_work']) != 0:
+                paker_depth_zumpf = int(self.dict_data_well["perforation_roof"] + 10)
             else:
-                if well_data.leakiness:
+                if self.dict_data_well["dict_leakiness"]:
                     paker_depth_zumpf = int(max([float(nek.split('-')[0])+10
-                                           for nek in well_data.dict_leakiness['НЭК']['интервал'].keys()]))
+                                           for nek in self.dict_data_well["dict_leakiness"]['НЭК']['интервал'].keys()]))
 
             self.paker_depth_zumpf_edit.setText(f'{paker_depth_zumpf}')
 
@@ -94,9 +96,9 @@ class TabPage_SO(QWidget):
     def update_paker(self):
         paker_depth = self.paker_depth_edit.text()
         if paker_depth != '':
-            if well_data.open_trunk_well is True:
+            if self.dict_data_well["open_trunk_well"] is True:
 
-                paker_khost = well_data.current_bottom - int(paker_depth)
+                paker_khost = self.dict_data_well["current_bottom"] - int(paker_depth)
                 self.paker_khost_edit.setText(f'{paker_khost}')
                 self.diametr_paker_edit.setText(f'{self.paker_diametr_select(int(paker_depth))}')
             else:
@@ -104,13 +106,13 @@ class TabPage_SO(QWidget):
                 self.paker_khost_edit.setText(f'{paker_khost}')
                 self.diametr_paker_edit.setText(f'{self.paker_diametr_select(int(paker_depth))}')
             need_count = 0
-            for plast in well_data.plast_all:
-                for roof, sole in well_data.dict_perforation[plast]['интервал']:
+            for plast in self.dict_data_well["plast_all"]:
+                for roof, sole in self.dict_data_well["dict_perforation"][plast]['интервал']:
                     if abs(float(roof) - float(paker_depth)) < 10 or abs(float(sole) - float(paker_depth))< 10:
                         need_count += 1
-            if well_data.leakiness:
-                a = well_data.dict_leakiness
-                for interval in well_data.dict_leakiness['НЭК']['интервал']:
+            if self.dict_data_well["dict_leakiness"]:
+                a = self.dict_data_well["dict_leakiness"]
+                for interval in self.dict_data_well["dict_leakiness"]['НЭК']['интервал']:
                     roof, sole = interval.split('-')
                     if abs(float(roof) - float(paker_depth)) < 10 or abs(float(sole) - float(paker_depth)) < 10:
                         need_count += 1
@@ -141,12 +143,12 @@ class TabPage_SO(QWidget):
             204: (215, 221)
         }
 
-        if well_data.column_additional is False or (
-                well_data.column_additional is True and int(depth_landing) <= well_data.head_column_additional._value):
-            diam_internal_ek = well_data.column_diametr._value - 2 * well_data.column_wall_thickness._value
+        if self.dict_data_well["column_additional"] is False or (
+                self.dict_data_well["column_additional"] is True and int(depth_landing) <= self.dict_data_well["head_column_additional"]._value):
+            diam_internal_ek = self.dict_data_well["column_diametr"]._value - 2 * self.dict_data_well["column_wall_thickness"]._value
         else:
-            diam_internal_ek = well_data.column_additional_diametr._value - \
-                               2 * well_data.column_additional_wall_thickness._value
+            diam_internal_ek = self.dict_data_well["column_additional_diametr"]._value - \
+                               2 * self.dict_data_well["column_additional_wall_thickness"]._value
 
         for diam, diam_internal_paker in paker_diam_dict.items():
             if diam_internal_paker[0] <= diam_internal_ek <= diam_internal_paker[1]:
@@ -155,24 +157,24 @@ class TabPage_SO(QWidget):
         return paker_diametr
 
 
-class TabWidget(QTabWidget):
-    def __init__(self):
+class TabWidget(TabWidgetUnion):
+    def __init__(self, parent):
         super().__init__()
-        self.addTab(TabPage_SO(self), 'Опрессовка')
+        self.addTab(TabPageSo(parent), 'Опрессовка')
 
 
-class OpressovkaEK(MyMainWindow):
-    def __init__(self, ins_ind, table_widget, forRirTrue=False, parent=None):
+class OpressovkaEK(WindowUnion):
+    def __init__(self, dict_data_well, table_widget, parent=None):
         super().__init__()
+
+        self.dict_data_well = dict_data_well
+        self.ins_ind = dict_data_well['ins_ind']
+        self.tabWidget = TabWidget(self.dict_data_well)
 
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
         self.table_widget = table_widget
-        self.ins_ind = ins_ind
-        # self.paker_select = None
-        self.forRirTrue = forRirTrue
 
-        self.tabWidget = TabWidget()
         self.tableWidget = QTableWidget(0, 3)
         self.tableWidget.setHorizontalHeaderLabels(
             ["хвост", "посадка пакера"])
@@ -224,9 +226,9 @@ class OpressovkaEK(MyMainWindow):
         else:
             paker_depth_zumpf = 0
 
-        if int(paker_khost) + int(paker_depth) > well_data.current_bottom and pressureZUMPF_combo == 'Нет' \
+        if int(paker_khost) + int(paker_depth) > self.dict_data_well["current_bottom"] and pressureZUMPF_combo == 'Нет' \
                 or int(paker_khost) + int(
-            paker_depth_zumpf) > well_data.current_bottom and pressureZUMPF_combo == 'Да':
+            paker_depth_zumpf) > self.dict_data_well["current_bottom"] and pressureZUMPF_combo == 'Да':
             QMessageBox.warning(self, 'Некорректные данные', f'Компоновка НКТ c хвостовик + пакер '
                                                                    f'ниже текущего забоя')
             return
@@ -259,7 +261,7 @@ class OpressovkaEK(MyMainWindow):
         pressureZUMPF_question_QCombo = self.tabWidget.currentWidget().pressureZUMPF_question_QCombo.currentText()
         if pressureZUMPF_question_QCombo == 'Да':
             paker_depth_zumpf = int(float(self.tabWidget.currentWidget().paker_depth_zumpf_edit.text()))
-            if paker_khost + paker_depth_zumpf >= well_data.current_bottom:
+            if paker_khost + paker_depth_zumpf >= self.dict_data_well["current_bottom"]:
                 QMessageBox.warning(self, 'ОШИБКА', 'Длина хвостовика и пакера ниже текущего забоя')
                 return
 
@@ -292,40 +294,40 @@ class OpressovkaEK(MyMainWindow):
 
     # Добавление строк с опрессовкой ЭК
     def select_combo_paker(self, paker_khost, paker_depth, paker_diametr):
-        if well_data.column_additional is False or well_data.column_additional is True \
-                and paker_depth < well_data.head_column_additional._value:
+        if self.dict_data_well["column_additional"] is False or self.dict_data_well["column_additional"] is True \
+                and paker_depth < self.dict_data_well["head_column_additional"]._value:
 
-            paker_select = f'воронку + НКТ{well_data.nkt_diam}мм {paker_khost}м +' \
+            paker_select = f'воронку + НКТ{self.dict_data_well["nkt_diam"]}мм {paker_khost}м +' \
                            f' пакер ПРО-ЯМО-{paker_diametr}мм (либо аналог) ' \
-                           f'для ЭК {well_data.column_diametr._value}мм х {well_data.column_wall_thickness._value}мм +' \
+                           f'для ЭК {self.dict_data_well["column_diametr"]._value}мм х {self.dict_data_well["column_wall_thickness"]._value}мм +' \
                            f' {OpressovkaEK.nkt_opress(self)[0]}'
-            paker_short = f'в-у + НКТ{well_data.nkt_diam}мм {paker_khost}м +' \
+            paker_short = f'в-у + НКТ{self.dict_data_well["nkt_diam"]}мм {paker_khost}м +' \
                           f' пакер ПРО-ЯМО-{paker_diametr}мм  +' \
                           f' {OpressovkaEK.nkt_opress(self)[0]}'
-        elif well_data.column_additional is True and well_data.column_additional_diametr._value < 110 and \
-                paker_depth > well_data.head_column_additional._value:
+        elif self.dict_data_well["column_additional"] is True and self.dict_data_well["column_additional_diametr"]._value < 110 and \
+                paker_depth > self.dict_data_well["head_column_additional"]._value:
             paker_select = f'воронку + НКТ{60}мм {paker_khost}м + пакер ПРО-ЯМО-' \
                            f'{paker_diametr}мм ' \
                            f'(либо аналог)  ' \
-                           f'для ЭК {well_data.column_additional_diametr._value}мм х ' \
-                           f'{well_data.column_additional_wall_thickness._value}мм  + {OpressovkaEK.nkt_opress(self)[0]} ' \
-                           f'+ НКТ60мм L- {round(paker_depth - well_data.head_column_additional._value, 0)}м'
+                           f'для ЭК {self.dict_data_well["column_additional_diametr"]._value}мм х ' \
+                           f'{self.dict_data_well["column_additional_wall_thickness"]._value}мм  + {OpressovkaEK.nkt_opress(self)[0]} ' \
+                           f'+ НКТ60мм L- {round(paker_depth - self.dict_data_well["head_column_additional"]._value, 0)}м'
             paker_short = f'в-у + НКТ{60}мм {paker_khost}м + пакер ПРО-ЯМО-' \
                           f'{paker_diametr}мм ' \
                           f' + {OpressovkaEK.nkt_opress(self)[0]} ' \
-                          f'+ НКТ60мм L- {round(paker_depth - well_data.head_column_additional._value, 0)}м'
-        elif well_data.column_additional is True and well_data.column_additional_diametr._value > 110 and \
-                paker_depth > well_data.head_column_additional._value:
-            paker_select = f'воронку + НКТ{well_data.nkt_diam}мм со снятыми фасками {paker_khost}м + ' \
+                          f'+ НКТ60мм L- {round(paker_depth - self.dict_data_well["head_column_additional"]._value, 0)}м'
+        elif self.dict_data_well["column_additional"] is True and self.dict_data_well["column_additional_diametr"]._value > 110 and \
+                paker_depth > self.dict_data_well["head_column_additional"]._value:
+            paker_select = f'воронку + НКТ{self.dict_data_well["nkt_diam"]}мм со снятыми фасками {paker_khost}м + ' \
                            f'пакер ПРО-ЯМО-{paker_diametr}мм (либо аналог) ' \
-                           f'для ЭК {well_data.column_additional_diametr._value}мм х ' \
-                           f'{well_data.column_additional_wall_thickness._value}мм  + {OpressovkaEK.nkt_opress(self)[0]}' \
-                           f'+ НКТ{well_data.nkt_diam}мм со снятыми фасками L- ' \
-                           f'{round(paker_depth - well_data.head_column_additional._value, 0)}м'
-            paker_short = f'в-у + НКТ{well_data.nkt_diam}мм со снятыми фасками {paker_khost}м + ' \
+                           f'для ЭК {self.dict_data_well["column_additional_diametr"]._value}мм х ' \
+                           f'{self.dict_data_well["column_additional_wall_thickness"]._value}мм  + {OpressovkaEK.nkt_opress(self)[0]}' \
+                           f'+ НКТ{self.dict_data_well["nkt_diam"]}мм со снятыми фасками L- ' \
+                           f'{round(paker_depth - self.dict_data_well["head_column_additional"]._value, 0)}м'
+            paker_short = f'в-у + НКТ{self.dict_data_well["nkt_diam"]}мм со снятыми фасками {paker_khost}м + ' \
                           f'пакер ПРО-ЯМО-{paker_diametr}мм + {OpressovkaEK.nkt_opress(self)[0]}' \
-                          f'+ НКТ{well_data.nkt_diam}мм со снятыми фасками L- ' \
-                          f'{round(paker_depth - well_data.head_column_additional._value, 0)}м'
+                          f'+ НКТ{self.dict_data_well["nkt_diam"]}мм со снятыми фасками L- ' \
+                          f'{round(paker_depth - self.dict_data_well["head_column_additional"]._value, 0)}м'
 
         nkt_opress_list = OpressovkaEK.nkt_opress(self)
         return paker_select, paker_short, nkt_opress_list
@@ -337,18 +339,18 @@ class OpressovkaEK(MyMainWindow):
         if pressureZUMPF_question == 'Да':
             paker_list = [
                 [f'СПО {paker_short} до глубины {paker_depth_zumpf}', None,
-                 f'Спустить {paker_select} на НКТ{well_data.nkt_diam}мм до глубины {paker_depth_zumpf}м,'
+                 f'Спустить {paker_select} на НКТ{self.dict_data_well["nkt_diam"]}мм до глубины {paker_depth_zumpf}м,'
                  f' воронкой до {paker_depth_zumpf + paker_khost}м'
-                 f' с замером, шаблонированием шаблоном {well_data.nkt_template}мм. {nkt_opress_list[1]} '
-                 f'{("Произвести пробную посадку на глубине 50м" if well_data.column_additional is False else "")} '
+                 f' с замером, шаблонированием шаблоном {self.dict_data_well["nkt_template"]}мм. {nkt_opress_list[1]} '
+                 f'{("Произвести пробную посадку на глубине 50м" if self.dict_data_well["column_additional"] is False else "")} '
                  f'ПРИ ОТСУТСТВИИ ЦИРКУЛЯЦИИ ПРЕДУСМОТРЕТЬ НАЛИЧИИ В КОМПОНОВКЕ УРАВНИТЕЛЬНЫХ КЛАПАНОВ ИЛИ СБИВНОГО '
                  f'КЛАПАНА С ВВЕРТЫШЕМ НАД ПАКЕРОМ',
                  None, None, None, None, None, None, None,
                  'мастер КРС', descentNKT_norm(paker_depth_zumpf, 1.2)],
-                [f'Опрессовать ЗУМПФ в инт {paker_depth_zumpf} - {well_data.current_bottom}м на '
-                 f'Р={well_data.max_admissible_pressure._value}атм', None,
-                 f'Посадить пакер. Опрессовать ЗУМПФ в интервале {paker_depth_zumpf} - {well_data.current_bottom}м на '
-                 f'Р={well_data.max_admissible_pressure._value}атм в течение 30 минут в присутствии представителя заказчика, '
+                [f'Опрессовать ЗУМПФ в инт {paker_depth_zumpf} - {self.dict_data_well["current_bottom"]}м на '
+                 f'Р={self.dict_data_well["max_admissible_pressure"]._value}атм', None,
+                 f'Посадить пакер. Опрессовать ЗУМПФ в интервале {paker_depth_zumpf} - {self.dict_data_well["current_bottom"]}м на '
+                 f'Р={self.dict_data_well["max_admissible_pressure"]._value}атм в течение 30 минут в присутствии представителя заказчика, '
                  f'составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, '
                  f'с подтверждением за 2 часа до начала работ)',
                  None, None, None, None, None, None, None,
@@ -379,18 +381,18 @@ class OpressovkaEK(MyMainWindow):
                  None, None, None, None, None, None, None,
                  'мастер КРС', None],
                 [None, None,
-                 f'Поднять {paker_select} на НКТ{well_data.nkt_diam}мм c глубины {paker_depth}м с доливом скважины в '
-                 f'объеме {round(paker_depth * 1.12 / 1000, 1)}м3 удельным весом {well_data.fluid_work}',
+                 f'Поднять {paker_select} на НКТ{self.dict_data_well["nkt_diam"]}мм c глубины {paker_depth}м с доливом скважины в '
+                 f'объеме {round(paker_depth * 1.12 / 1000, 1)}м3 удельным весом {self.dict_data_well["fluid_work"]}',
                  None, None, None, None, None, None, None,
                  'мастер КРС', liftingNKT_norm(paker_depth, 1.2)]]
 
         else:
             paker_list = [
                 [f'СПо {paker_short} до глубины {paker_depth}м', None,
-                 f'Спустить {paker_select} на НКТ{well_data.nkt_diam}мм до глубины {paker_depth}м, '
+                 f'Спустить {paker_select} на НКТ{self.dict_data_well["nkt_diam"]}мм до глубины {paker_depth}м, '
                  f'воронкой до {paker_depth + paker_khost}м'
-                 f' с замером, шаблонированием шаблоном {well_data.nkt_template}мм. {nkt_opress_list[1]} '
-                 f'{("Произвести пробную посадку на глубине 50м" if well_data.column_additional is False else "")} '
+                 f' с замером, шаблонированием шаблоном {self.dict_data_well["nkt_template"]}мм. {nkt_opress_list[1]} '
+                 f'{("Произвести пробную посадку на глубине 50м" if self.dict_data_well["column_additional"] is False else "")} '
                  f'ПРИ ОТСУТСТВИИ ЦИРКУЛЯЦИИ ПРЕДУСМОТРЕТЬ НАЛИЧИИ В КОМПОНОВКЕ УРАВНИТЕЛЬНЫХ КЛАПАНОВ ИЛИ СБИВНОГО '
                  f'КЛАПАНА С ВВЕРТЫШЕМ НАД ПАКЕРОМ',
                  None, None, None, None, None, None, None,
@@ -415,8 +417,8 @@ class OpressovkaEK(MyMainWindow):
                  None, None, None, None, None, None, None,
                  'мастер КРС', None],
                 [None, None,
-                 f'Поднять {paker_select} на НКТ{well_data.nkt_diam}мм c глубины {paker_depth}м с доливом скважины в '
-                 f'объеме {round(paker_depth * 1.12 / 1000, 1)}м3 удельным весом {well_data.fluid_work}',
+                 f'Поднять {paker_select} на НКТ{self.dict_data_well["nkt_diam"]}мм c глубины {paker_depth}м с доливом скважины в '
+                 f'объеме {round(paker_depth * 1.12 / 1000, 1)}м3 удельным весом {self.dict_data_well["fluid_work"]}',
                  None, None, None, None, None, None, None,
                  'мастер КРС', liftingNKT_norm(paker_depth, 1.2)]]
 
@@ -427,8 +429,8 @@ class OpressovkaEK(MyMainWindow):
 
     def addString(self):
         paker_depth = int(float(self.tabWidget.currentWidget().paker_depth_edit.text()))
-        if len(well_data.dict_leakiness) != 0:
-            dict_leakinest_keys = sorted(list(well_data.dict_leakiness['НЭК']['интервал'].keys()), key=lambda x: x[0],
+        if len(self.dict_data_well["dict_leakiness"]) != 0:
+            dict_leakinest_keys = sorted(list(self.dict_data_well["dict_leakiness"]['НЭК']['интервал'].keys()), key=lambda x: x[0],
                                          reverse=False)
 
             leakness_list = [float(dict_leakinest_keys[0].split('-')[0]) - 10]
@@ -440,11 +442,11 @@ class OpressovkaEK(MyMainWindow):
                 leakness_list.append(paker_depth)
         else:
             leakness_list = [paker_depth]
-        for plast in well_data.plast_all:
-            leakness_list.append(well_data.dict_perforation[plast]['кровля'] -10)
-            leakness_list.append(well_data.dict_perforation[plast]['подошва'] + 10)
+        for plast in self.dict_data_well["plast_all"]:
+            leakness_list.append(self.dict_data_well["dict_perforation"][plast]['кровля'] -10)
+            leakness_list.append(self.dict_data_well["dict_perforation"][plast]['подошва'] + 10)
         rows = self.tableWidget.rowCount()
-        current_bottom = well_data.current_bottom
+        current_bottom = self.dict_data_well["current_bottom"]
         # print(drilling_interval)
         for sole in sorted(leakness_list):
             if paker_depth > sole:
@@ -461,10 +463,10 @@ class OpressovkaEK(MyMainWindow):
 
         paker_list = [
             [f'Спо {paker_short} до глубины {paker_depth}м', None,
-             f'Спустить {paker_select} на НКТ{well_data.nkt_diam}мм до глубины {paker_depth}м, '
+             f'Спустить {paker_select} на НКТ{self.dict_data_well["nkt_diam"]}мм до глубины {paker_depth}м, '
              f'воронкой до {paker_depth + paker_khost}м'
-             f' с замером, шаблонированием шаблоном {well_data.nkt_template}мм. {nkt_opress_list[1]} '
-             f'{("Произвести пробную посадку на глубине 50м" if well_data.column_additional is False else "")} '
+             f' с замером, шаблонированием шаблоном {self.dict_data_well["nkt_template"]}мм. {nkt_opress_list[1]} '
+             f'{("Произвести пробную посадку на глубине 50м" if self.dict_data_well["column_additional"] is False else "")} '
              f'ПРИ ОТСУТСТВИИ ЦИРКУЛЯЦИИ ПРЕДУСМОТРЕТЬ НАЛИЧИИ В КОМПОНОВКЕ УРАВНИТЕЛЬНЫХ КЛАПАНОВ ИЛИ СБИВНОГО '
              f'КЛАПАНА С ВВЕРТЫШЕМ НАД ПАКЕРОМ',
              None, None, None, None, None, None, None,
@@ -489,14 +491,14 @@ class OpressovkaEK(MyMainWindow):
              None, None, None, None, None, None, None,
              'мастер КРС', None]
         ]
-        if well_data.leakiness:
-            dict_leakinest_keys = sorted(list(well_data.dict_leakiness['НЭК']['интервал'].keys()), key=lambda x: float(x[0]),
+        if self.dict_data_well["dict_leakiness"]:
+            dict_leakinest_keys = sorted(list(self.dict_data_well["dict_leakiness"]['НЭК']['интервал'].keys()), key=lambda x: float(x[0]),
                                          reverse=False)
         else:
             dict_leakinest_keys = []
 
-        for plast in well_data.plast_all:
-            dict_leakinest_keys.append(f'{well_data.dict_perforation[plast]["кровля"]}-{well_data.dict_perforation[plast]["подошва"]}')
+        for plast in self.dict_data_well["plast_all"]:
+            dict_leakinest_keys.append(f'{self.dict_data_well["dict_perforation"][plast]["кровля"]}-{self.dict_data_well["dict_perforation"][plast]["подошва"]}')
 
         for ind_nek, pakerNEK in enumerate(depth_paker_list[1:]):
             nek_count = ''
@@ -512,16 +514,16 @@ class OpressovkaEK(MyMainWindow):
                  f'При герметичности колонны:  Допустить пакер до глубины {pakerNEK}м',
                  None, None, None, None, None, None, None,
                  'мастер КРС', descentNKT_norm(pakerNEK -paker_depth, 1.2)],
-                [f'Опрессовать в инт 0-{pakerNEK}м на Р={well_data.max_admissible_pressure._value}атм', None,
+                [f'Опрессовать в инт 0-{pakerNEK}м на Р={self.dict_data_well["max_admissible_pressure"]._value}атм', None,
                  f'{nkt_opress_list[1]}. Посадить пакер. Опрессовать эксплуатационную колонну в '
-                 f'интервале {pakerNEK}-0м на Р={well_data.max_admissible_pressure._value}атм'
+                 f'интервале {pakerNEK}-0м на Р={self.dict_data_well["max_admissible_pressure"]._value}атм'
                  f' в течение 30 минут в присутствии представителя заказчика, составить акт.',
                  None, None, None, None, None, None, None,
                  'мастер КРС', 0.77],
-                [f'Насыщение 5м3. Определение Q при Р-{well_data.max_admissible_pressure._value}', None,
+                [f'Насыщение 5м3. Определение Q при Р-{self.dict_data_well["max_admissible_pressure"]._value}', None,
                  f'ПРИ НЕГЕРМЕТИЧНОСТИ: \nПроизвести насыщение скважины в объеме 5м3 по '
                  f'затрубному пространству. Определить приемистость '
-                 f'НЭК {nek_count[:-2]} при Р-{well_data.max_admissible_pressure._value}'
+                 f'НЭК {nek_count[:-2]} при Р-{self.dict_data_well["max_admissible_pressure"]._value}'
                  f'атм по затрубному пространству'
                  f'в присутствии представителя УСРСиСТ или подрядчика по РИР. (Вести контроль '
                  f'за отдачей жидкости '
@@ -545,10 +547,10 @@ class OpressovkaEK(MyMainWindow):
                  f'Допустить пакер до глубины {paker_depth_zumpf}м',
                  None, None, None, None, None, None, None,
                  'мастер КРС', 0.77],
-                [f'Опрессовать ЗУМПФ в инт {paker_depth_zumpf} - {well_data.current_bottom}м на '
-                 f'Р={well_data.max_admissible_pressure._value}атм', None,
-                 f'Посадить пакер. Опрессовать ЗУМПФ в интервале {paker_depth_zumpf} - {well_data.current_bottom}м на '
-                 f'Р={well_data.max_admissible_pressure._value}атм в течение 30 минут в присутствии представителя заказчика, '
+                [f'Опрессовать ЗУМПФ в инт {paker_depth_zumpf} - {self.dict_data_well["current_bottom"]}м на '
+                 f'Р={self.dict_data_well["max_admissible_pressure"]._value}атм', None,
+                 f'Посадить пакер. Опрессовать ЗУМПФ в интервале {paker_depth_zumpf} - {self.dict_data_well["current_bottom"]}м на '
+                 f'Р={self.dict_data_well["max_admissible_pressure"]._value}атм в течение 30 минут в присутствии представителя заказчика, '
                  f'составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, '
                  f'с подтверждением за 2 часа до начала работ)',
                  None, None, None, None, None, None, None,
@@ -559,19 +561,19 @@ class OpressovkaEK(MyMainWindow):
                  None, None, None, None, None, None, None,
                  'мастер КРС', 0.7],
                 [None, None,
-                 f'Поднять {paker_select} на НКТ{well_data.nkt_diam} c глубины '
+                 f'Поднять {paker_select} на НКТ{self.dict_data_well["nkt_diam"]} c глубины '
                  f'{paker_depth}м с доливом скважины в '
                  f'объеме {round(paker_depth * 1.12 / 1000, 1)}м3 удельным весом '
-                 f'{well_data.fluid_work}',
+                 f'{self.dict_data_well["fluid_work"]}',
                  None, None, None, None, None, None, None,
                  'мастер КРС', liftingNKT_norm(paker_depth, 1.2)]
             ]
         else:
             zumpf_list = [[None, None,
-             f'Поднять {paker_select} на НКТ{well_data.nkt_diam} c глубины '
+             f'Поднять {paker_select} на НКТ{self.dict_data_well["nkt_diam"]} c глубины '
              f'{paker_depth}м с доливом скважины в '
              f'объеме {round(paker_depth * 1.12 / 1000, 1)}м3 удельным весом '
-             f'{well_data.fluid_work}',
+             f'{self.dict_data_well["fluid_work"]}',
              None, None, None, None, None, None, None,
              'мастер КРС', liftingNKT_norm(paker_depth, 1.2)]
             ]
@@ -589,8 +591,8 @@ class OpressovkaEK(MyMainWindow):
 
     def nkt_opress(self):
 
-        if well_data.nkt_opressTrue is False:
-            well_data.nkt_opressTrue is True
+        if self.dict_data_well["nkt_opress_true"] is False:
+            self.dict_data_well["nkt_opress_true"] is True
             return 'НКТ + опрессовочное седло', 'Опрессовать НКТ на 200атм. Вымыть шар'
         else:
             return 'НКТ', ''
@@ -599,15 +601,15 @@ class OpressovkaEK(MyMainWindow):
     def check_for_template_paker(self, depth):
 
         check_true = False
-        # print(f' глубина шаблона {well_data.template_depth}, посадка пакера {depth}')
+        # print(f' глубина шаблона {self.dict_data_well["template_depth"]}, посадка пакера {depth}')
         while check_true is False:
             if depth < float(
-                    well_data.head_column_additional._value) and depth <= well_data.template_depth and well_data.column_additional:
+                    self.dict_data_well["head_column_additional"]._value) and depth <= self.dict_data_well["template_depth"] and self.dict_data_well["column_additional"]:
                 check_true = True
             elif depth > float(
-                    well_data.head_column_additional._value) and depth <= well_data.template_depth_addition and well_data.column_additional:
+                    self.dict_data_well["head_column_additional"]._value) and depth <= self.dict_data_well["template_depth_addition"] and self.dict_data_well["column_additional"]:
                 check_true = True
-            elif depth <= well_data.template_depth and well_data.column_additional is False:
+            elif depth <= self.dict_data_well["template_depth"] and self.dict_data_well["column_additional"] is False:
                 check_true = True
 
             if check_true is False:
@@ -615,7 +617,7 @@ class OpressovkaEK(MyMainWindow):
                 false_template = QMessageBox.question(None, 'Проверка глубины пакера',
                                                       f'Проверка показала посадка пакера {depth}м '
                                                       f'опускается ниже глубины шаблонирования ЭК '
-                                                      f'{well_data.template_depth}м'
+                                                      f'{self.dict_data_well["template_depth"]}м'
                                                       f'изменить глубину ?')
 
         return check_true
@@ -625,35 +627,35 @@ class OpressovkaEK(MyMainWindow):
 
         interval_list = []
 
-        for plast in well_data.plast_all:
-            if well_data.dict_perforation[plast]['отключение'] is False:
-                for interval in well_data.dict_perforation[plast]['интервал']:
-                    if interval[0] < well_data.current_bottom:
+        for plast in self.dict_data_well["plast_all"]:
+            if self.dict_data_well["dict_perforation"][plast]['отключение'] is False:
+                for interval in self.dict_data_well["dict_perforation"][plast]['интервал']:
+                    if interval[0] < self.dict_data_well["current_bottom"]:
                         interval_list.append(interval)
 
-        if well_data.leakiness is True:
-            for nek in well_data.dict_leakiness['НЭК']['интервал']:
-                if well_data.dict_leakiness['НЭК']['интервал'][nek]['отключение'] is False and float(nek.split('-')[0]) < depth:
+        if self.dict_data_well["leakiness"] is True:
+            for nek in self.dict_data_well["dict_leakiness"]['НЭК']['интервал']:
+                if self.dict_data_well["dict_leakiness"]['НЭК']['интервал'][nek]['отключение'] is False and float(nek.split('-')[0]) < depth:
                     interval_list.append(list(map(float, nek.split('-'))))
 
         if any([float(interval[1]) < float(depth) for interval in interval_list]):
             check_true = True
             testing_pressure_str = f'Закачкой тех жидкости в затрубное пространство при Р=' \
-                                   f'{well_data.max_admissible_pressure._value}атм' \
+                                   f'{self.dict_data_well["max_admissible_pressure"]._value}атм' \
                                    f' удостоверить в отсутствии выхода тех жидкости и герметичности пакера, составить акт. ' \
                                    f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа ' \
                                    f'до начала работ)'
             testing_pressure_short = f'Закачкой в затруб при Р=' \
-                                     f'{well_data.max_admissible_pressure._value}атм' \
+                                     f'{self.dict_data_well["max_admissible_pressure"]._value}атм' \
                                      f' удостоверить в герметичности пакера'
         else:
             check_true = False
             testing_pressure_str = f'Опрессовать эксплуатационную колонну в интервале {depth}-0м на ' \
-                                   f'Р={well_data.max_admissible_pressure._value}атм' \
+                                   f'Р={self.dict_data_well["max_admissible_pressure"]._value}атм' \
                                    f' в течение 30 минут в присутствии представителя заказчика, составить акт. ' \
                                    f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа ' \
                                    f'до начала работ)'
-            testing_pressure_short = f'Опрессовать в {depth}-0м на Р={well_data.max_admissible_pressure._value}атм'
+            testing_pressure_short = f'Опрессовать в {depth}-0м на Р={self.dict_data_well["max_admissible_pressure"]._value}атм'
 
         return testing_pressure_str, testing_pressure_short, check_true
 

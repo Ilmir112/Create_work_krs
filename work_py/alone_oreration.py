@@ -12,20 +12,20 @@ from .rationingKRS import liftingNKT_norm, descentNKT_norm, well_volume_norm
 
 
 def kot_select(self, current_bottom):
-    if well_data.column_additional is False \
+    if self.dict_data_well["column_additional"] is False \
             or (
-            well_data.column_additional is True and well_data.current_bottom <= well_data.head_column_additional._value):
-        kot_select = f'КОТ-50 (клапан обратный тарельчатый) +НКТ{well_data.nkt_diam}мм 10м + репер '
+            self.dict_data_well["column_additional"] is True and self.dict_data_well["current_bottom"] <= self.dict_data_well["head_column_additional"]._value):
+        kot_select = f'КОТ-50 (клапан обратный тарельчатый) +НКТ{self.dict_data_well["nkt_diam"]}мм 10м + репер '
 
-    elif well_data.column_additional is True and well_data.column_additional_diametr._value < 110 and \
-            current_bottom >= well_data.head_column_additional._value:
+    elif self.dict_data_well["column_additional"] is True and self.dict_data_well["column_additional_diametr"]._value < 110 and \
+            current_bottom >= self.dict_data_well["head_column_additional"]._value:
         kot_select = f'КОТ-50 (клапан обратный тарельчатый) + НКТ{60}мм 10м + репер + ' \
-                     f'НКТ60мм L- {round(current_bottom - well_data.head_column_additional._value, 0)}м'
-    elif well_data.column_additional is True and well_data.column_additional_diametr._value > 110 and \
-            current_bottom >= well_data.head_column_additional._value:
+                     f'НКТ60мм L- {round(current_bottom - self.dict_data_well["head_column_additional"]._value, 0)}м'
+    elif self.dict_data_well["column_additional"] is True and self.dict_data_well["column_additional_diametr"]._value > 110 and \
+            current_bottom >= self.dict_data_well["head_column_additional"]._value:
         kot_select = f'КОТ-50 (клапан обратный тарельчатый) + НКТ{73}мм со снятыми фасками 10м + репер + ' \
-                     f'НКТ{well_data.nkt_diam}мм со снятыми фасками' \
-                     f' L- {round(current_bottom - well_data.head_column_additional._value, 0)}м'
+                     f'НКТ{self.dict_data_well["nkt_diam"]}мм со снятыми фасками' \
+                     f' L- {round(current_bottom - self.dict_data_well["head_column_additional"]._value, 0)}м'
 
     return kot_select
 
@@ -35,27 +35,27 @@ def kot_work(self, current_bottom=0):
         current_bottom, _ = QInputDialog.getDouble(None,
                                                    'Глубина забоя',
                                                    'Введите глубину необходимого текущего забоя',
-                                                   well_data.current_bottom, 1, 10000, 1)
+                                                   self.dict_data_well["current_bottom"], 1, 10000, 1)
 
     kot_list = [
-        [f'статической уровень {well_data.static_level._value}', None,
+        [f'статической уровень {self.dict_data_well["static_level"]._value}', None,
          f'При отсутствии циркуляции:\n'
-         f'Спустить {kot_select(self, current_bottom)} на НКТ{well_data.nkt_diam}мм до глубины {current_bottom}м'
-         f' с замером, шаблонированием шаблоном {well_data.nkt_template}мм.',
+         f'Спустить {kot_select(self, current_bottom)} на НКТ{self.dict_data_well["nkt_diam"]}мм до глубины {current_bottom}м'
+         f' с замером, шаблонированием шаблоном {self.dict_data_well["nkt_template"]}мм.',
          None, None, None, None, None, None, None,
          'мастер КРС', descentNKT_norm(current_bottom, 1)],
         [f'{kot_select(self, current_bottom)} до H-{current_bottom} закачкой обратной промывкой', None,
          f'Произвести очистку забоя скважины до гл.{current_bottom}м закачкой обратной промывкой тех '
-         f'жидкости уд.весом {well_data.fluid_work}, по согласованию с Заказчиком',
+         f'жидкости уд.весом {self.dict_data_well["fluid_work"]}, по согласованию с Заказчиком',
          None, None, None, None, None, None, None, 'мастер КРС', 0.4],
         [None, None,
          f'При необходимости согласовать закачку блок пачки по технологическому плану работ подрядчика',
          None, None, None, None, None, None, None,
          'мастер КРС, предст. заказчика', None],
         [None, None,
-         f'Поднять {kot_select(self, current_bottom)} на НКТ{well_data.nkt_diam}мм c глубины '
+         f'Поднять {kot_select(self, current_bottom)} на НКТ{self.dict_data_well["nkt_diam"]}мм c глубины '
          f'{current_bottom}м с доливом скважины в объеме {round(float(current_bottom) * 1.12 / 1000, 1)}м3 '
-         f'удельным весом {well_data.fluid_work}',
+         f'удельным весом {self.dict_data_well["fluid_work"]}',
          None, None, None, None, None, None, None,
          'мастер КРС', liftingNKT_norm(float(current_bottom), 1)],
         [None, None,
@@ -63,24 +63,24 @@ def kot_work(self, current_bottom=0):
          None, None, None, None, None, None, None,
          'мастер КРС', None]
     ]
-    well_data.current_bottom = current_bottom
+    self.dict_data_well["current_bottom"] = current_bottom
     return kot_list
 
 
 def check_h2s(self, plast=0, fluid_new=0, expected_pressure=0):
-    if len(well_data.plast_project) != 0:
-        if len(well_data.plast_project) != 0:
-            plast = well_data.plast_project[0]
+    if len(self.dict_data_well["plast_project"]) != 0:
+        if len(self.dict_data_well["plast_project"]) != 0:
+            plast = self.dict_data_well["plast_project"][0]
         else:
             plast, ok = QInputDialog.getText(self, 'выбор пласта для расчета ЖГС ', 'введите пласт для перфорации')
-            well_data.plast_project.append(plast)
+            self.dict_data_well["plast_project"].append(plast)
         try:
-            fluid_new = list(well_data.dict_perforation_project[plast]['рабочая жидкость'])[0]
+            fluid_new = list(self.dict_data_well["dict_perforation_project"][plast]['рабочая жидкость'])[0]
         except:
             fluid_new, ok = QInputDialog.getDouble(self, 'Новое значение удельного веса жидкости',
                                                    'Введите значение удельного веса жидкости', 1.02, 1, 1.72, 2)
-        if len(well_data.dict_category) != 0:
-            expected_pressure = well_data.dict_category[well_data.plast_project[0]]['по давлению'].data_pressuar
+        if len(self.dict_data_well["dict_category"]) != 0:
+            expected_pressure = self.dict_data_well["dict_category"][self.dict_data_well["plast_project"][0]]['по давлению'].data_pressuar
         else:
             expected_pressure, ok = QInputDialog.getDouble(self, 'Ожидаемое давление по пласту',
                                                            'Введите Ожидаемое давление по пласту', 0, 0, 300, 1)
@@ -96,44 +96,44 @@ def check_h2s(self, plast=0, fluid_new=0, expected_pressure=0):
     return fluid_new, plast, expected_pressure
 
 
-def need_h2s(fluid_new, plast_edit, expected_pressure):
-    asd = well_data.dict_category
-    сat_h2s_list = list(map(int, [well_data.dict_category[plast]['по сероводороду'].category for plast in
-                                  well_data.plast_work if well_data.dict_category.get(plast) and
-                                  well_data.dict_category[plast]['отключение'] == 'рабочий']))
+def need_h2s(self, fluid_new, plast_edit, expected_pressure):
+    asd = self.dict_data_well["dict_category"]
+    сat_h2s_list = list(map(int, [self.dict_data_well["dict_category"][plast]['по сероводороду'].category for plast in
+                                  self.dict_data_well['plast_work'] if self.dict_data_well["dict_category"].get(plast) and
+                                  self.dict_data_well["dict_category"][plast]['отключение'] == 'рабочий']))
 
-    cat_h2s_list_plan = list(map(int, [well_data.dict_category[plast]['по сероводороду'].category for plast in
-                                       well_data.plast_project if well_data.dict_category.get(plast) and
-                                       well_data.dict_category[plast]['отключение'] == 'планируемый']))
+    cat_h2s_list_plan = list(map(int, [self.dict_data_well["dict_category"][plast]['по сероводороду'].category for plast in
+                                       self.dict_data_well["plast_project"] if self.dict_data_well["dict_category"].get(plast) and
+                                       self.dict_data_well["dict_category"][plast]['отключение'] == 'планируемый']))
 
     if len(cat_h2s_list_plan) != 0:
 
-        if cat_h2s_list_plan[0] in [1, 2, '1', '2'] and len(well_data.plast_work) == 0:
+        if cat_h2s_list_plan[0] in [1, 2, '1', '2'] and len(self.dict_data_well['plast_work']) == 0:
             expenditure_h2s = round(
-                max([well_data.dict_category[plast]['по сероводороду'].poglot for plast in well_data.plast_project]), 3)
-            fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода {well_data.type_absorbent} из ' \
+                max([self.dict_data_well["dict_category"][plast]['по сероводороду'].poglot for plast in self.dict_data_well["plast_project"]]), 3)
+            fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода {self.dict_data_well["type_absorbent"]} из ' \
                          f'расчета {expenditure_h2s}кг/м3 либо аналог'
-            fluid_work_short = f'{fluid_new}г/см3 {well_data.type_absorbent} {expenditure_h2s}кг/м3 '
-        elif cat_h2s_list_plan[0] in [3, '3'] and len(well_data.plast_work) == 0:
+            fluid_work_short = f'{fluid_new}г/см3 {self.dict_data_well["type_absorbent"]} {expenditure_h2s}кг/м3 '
+        elif cat_h2s_list_plan[0] in [3, '3'] and len(self.dict_data_well['plast_work']) == 0:
             fluid_work = f'{fluid_new}г/см3 '
             fluid_work_short = f'{fluid_new}г/см3 '
 
-        elif ((cat_h2s_list_plan[0] in [1, 2]) or (сat_h2s_list[0] in [1, 2])) and len(well_data.plast_work) != 0:
+        elif ((cat_h2s_list_plan[0] in [1, 2]) or (сat_h2s_list[0] in [1, 2])) and len(self.dict_data_well['plast_work']) != 0:
             try:
                 expenditure_h2s_plan = max(
-                    [well_data.dict_category[well_data.plast_project[0]]['по сероводороду'].poglot
-                     for plast in well_data.plast_project])
+                    [self.dict_data_well["dict_category"][self.dict_data_well["plast_project"][0]]['по сероводороду'].poglot
+                     for plast in self.dict_data_well["plast_project"]])
             except:
                 expenditure_h2s_plan = QInputDialog.getDouble(None, 'нет данных',
                                                               'ВВедите расход поглотетеля сероводорода', 0.25, 0, 3)
 
             expenditure_h2s = max(
-                [well_data.dict_category[well_data.plast_work[0]]['по сероводороду'].poglot])
+                [self.dict_data_well["dict_category"][self.dict_data_well['plast_work'][0]]['по сероводороду'].poglot])
             expenditure_h2s = round(max([expenditure_h2s, expenditure_h2s_plan]), 2)
 
-            fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода {well_data.type_absorbent} из ' \
+            fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода {self.dict_data_well["type_absorbent"]} из ' \
                          f'расчета {expenditure_h2s}кг/м3 либо аналог'
-            fluid_work_short = f'{fluid_new}г/см3 ХИМТЕХНО 101 {expenditure_h2s}кг/м3 '
+            fluid_work_short = f'{fluid_new}г/см3 {self.dict_data_well["type_absorbent"]} {expenditure_h2s}кг/м3 '
         else:
             fluid_work = f'{fluid_new}г/см3 '
             fluid_work_short = f'{fluid_new}г/см3 '
@@ -153,26 +153,26 @@ def need_h2s(fluid_new, plast_edit, expected_pressure):
         cat_h2s_list_plan.append(cat_H2S)
         h2s_mg, _ = QInputDialog.getDouble(None, 'сероводород в мг/л',
                                            'Введите значение серовородода в мг/л', 0, 0, 100, 5)
-        well_data.h2s_mg.append(h2s_mg)
+        self.dict_data_well["h2s_mg"].append(h2s_mg)
         h2s_pr, _ = QInputDialog.getDouble(None, 'сероводород в процентах',
                                            'Введите значение серовородода в процентах', 0, 0, 100, 1)
         poglot = H2S.calv_h2s(None, cat_H2S, h2s_mg, h2s_pr)
         Data_h2s = namedtuple("Data_h2s", "category data_procent data_mg_l poglot")
         Pressuar = namedtuple("Pressuar", "category data_pressuar")
-        well_data.dict_category.setdefault(plast_edit, {}).setdefault(
+        self.dict_data_well["dict_category"].setdefault(plast_edit, {}).setdefault(
             'по давлению', Pressuar(int(cat_H2S), pressuar))
-        well_data.dict_category.setdefault(plast_edit, {}).setdefault(
+        self.dict_data_well["dict_category"].setdefault(plast_edit, {}).setdefault(
             'по сероводороду', Data_h2s(int(cat_pressuar), h2s_pr, h2s_mg, poglot))
-        well_data.dict_category.setdefault(plast_edit, {}).setdefault(
+        self.dict_data_well["dict_category"].setdefault(plast_edit, {}).setdefault(
             'отключение', 'планируемый')
 
         if cat_h2s_list_plan[0] in [1, 2]:
 
             expenditure_h2s = round(
-                max([well_data.dict_category[plast]['по сероводороду'].poglot for plast in well_data.plast_project]), 2)
-            fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода {well_data.type_absorbent} из ' \
+                max([self.dict_data_well["dict_category"][plast]['по сероводороду'].poglot for plast in self.dict_data_well["plast_project"]]), 2)
+            fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода {self.dict_data_well["type_absorbent"]} из ' \
                          f'расчета {expenditure_h2s}кг/м3  либо аналог'
-            fluid_work_short = f'{fluid_new}г/см3 {well_data.type_absorbent} {expenditure_h2s}кг/м3 '
+            fluid_work_short = f'{fluid_new}г/см3 {self.dict_data_well["type_absorbent"]} {expenditure_h2s}кг/м3 '
         else:
             fluid_work = f'{fluid_new}г/см3 '
             fluid_work_short = f'{fluid_new}г/см3 '
@@ -214,12 +214,12 @@ def definition_Q(self):
 
 
 def definition_Q_nek(self):
-    open_checkbox_dialog()
+    open_checkbox_dialog(self.dict_data_well)
     plast = well_data.plast_select
-    definition_Q_list = [[f'Насыщение 5м3 Q-{plast} при {well_data.max_admissible_pressure._value}', None,
+    definition_Q_list = [[f'Насыщение 5м3 Q-{plast} при {self.dict_data_well["max_admissible_pressure"]._value}', None,
                           f'Произвести насыщение скважины по затрубу до стабилизации давления закачки не '
                           f'менее 5м3. Опробовать по затрубу'
-                          f' на приемистость {plast} при Р={well_data.max_admissible_pressure._value}атм в присутствии '
+                          f' на приемистость {plast} при Р={self.dict_data_well["max_admissible_pressure"]._value}атм в присутствии '
                           f'представителя ЦДНГ. '
                           f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, '
                           f'с подтверждением за 2 часа до '
@@ -275,7 +275,7 @@ def pvo_cat1(self):
             f' П178х168 или П168 х 146 или ' \
             f'П178 х 146 в зависимости от типоразмера крестовины и колонной головки). Спустить и посадить ' \
             f'пакер на глубину 10м. Опрессовать ПВО (трубные плашки превентора) на ' \
-            f'Р-{well_data.max_admissible_pressure._value}атм ' \
+            f'Р-{self.dict_data_well["max_admissible_pressure"]._value}атм ' \
             f'(на максимально допустимое давление опрессовки ' \
             f'эксплуатационной колонны в течении 30мин), сорвать и извлечь пакер. \n' \
             f'- Обеспечить о обогрев превентора, станции управления ПВО оборудовать теплоизоляционными ' \
@@ -298,7 +298,7 @@ def pvo_cat1(self):
          pvo_1, None, None,
          None, None, None, None, None,
          'Мастер КРС, представ-ли ПАСФ и Заказчика, Пуск. ком', 4.67]]
-    well_data.kat_pvo = 1
+    self.dict_data_well["kat_pvo"] = 1
     return pvo_list
 
 
@@ -308,19 +308,19 @@ def fluid_change(self):
     try:
         fluid_work, fluid_work_short, plast, expected_pressure = check_h2s(self)
 
-        well_data.fluid_work, well_data.fluid_work_short = fluid_work, fluid_work_short
+        self.dict_data_well["fluid_work"], self.dict_data_well["fluid_work_short"] = fluid_work, fluid_work_short
 
         fluid_change_list = [
-            [f'Cмена объема {well_data.fluid}г/см3- {round(well_volume(self, well_data.current_bottom), 1)}м3',
+            [f'Cмена объема {self.dict_data_well["fluid"]}г/см3- {round(well_volume(self, self.dict_data_well["current_bottom"]), 1)}м3',
              None,
-             f'Произвести смену объема обратной промывкой по круговой циркуляции  жидкостью  {well_data.fluid_work} '
+             f'Произвести смену объема обратной промывкой по круговой циркуляции  жидкостью  {self.dict_data_well["fluid_work"]} '
              f'(по расчету по вскрываемому пласта Рожид- {expected_pressure}атм) в объеме не '
-             f'менее {round(well_volume(self, well_data.current_bottom), 1)}м3  в присутствии '
+             f'менее {round(well_volume(self, self.dict_data_well["current_bottom"]), 1)}м3  в присутствии '
              f'представителя заказчика, Составить акт. '
              f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за '
              f'2 часа до начала работ)',
              None, None, None, None, None, None, None,
-             'мастер КРС', well_volume_norm(well_volume(self, well_data.current_bottom))]
+             'мастер КРС', well_volume_norm(well_volume(self, self.dict_data_well["current_bottom"]))]
         ]
 
 
@@ -331,20 +331,20 @@ def fluid_change(self):
     return fluid_change_list
 
 
-def update_fluid(index_plan, fluid_str, table_widget):
-    row_index = index_plan - well_data.count_row_well
+def update_fluid(self, index_plan, fluid_str, table_widget):
+    row_index = index_plan - self.dict_data_well["count_row_well"]
 
-    for index_row, data in enumerate(well_data.data_list):
+    for index_row, data in enumerate(self.dict_data_well["data_list"]):
         if index_row == row_index:
-            fluid_str_old = well_data.data_list[index_row][7]
+            fluid_str_old = self.dict_data_well["data_list"][index_row][7]
         if row_index <= index_row:
 
-            if well_data.data_list[index_row][7] == fluid_str_old:
-                well_data.data_list[index_row][7] = fluid_str
+            if self.dict_data_well["data_list"][index_row][7] == fluid_str_old:
+                self.dict_data_well["data_list"][index_row][7] = fluid_str
 
                 for column in range(table_widget.columnCount()):
                     if column == 2 or column == 0:
-                        row_change = index_row + well_data.count_row_well
+                        row_change = index_row + self.dict_data_well["count_row_well"]
                         value = table_widget.item(row_change, column).text()
                         if value != None or value != '':
                             if fluid_str_old in value:
@@ -353,7 +353,7 @@ def update_fluid(index_plan, fluid_str, table_widget):
                                 table_widget.setItem(row_change, column, new_value)
 
 
-def calculationFluidWork(vertical, pressure):
+def calculationFluidWork(dict_data_well, vertical, pressure):
     if (isinstance(vertical, float) or isinstance(vertical, int)) and (
             isinstance(pressure, float) or isinstance(pressure, int)):
 
@@ -361,11 +361,11 @@ def calculationFluidWork(vertical, pressure):
         stockRatio = 0.1 if float(vertical) <= 1200 else 0.05
 
         fluidWork = round(float(str(pressure)) * (1 + stockRatio) / float(vertical) / 0.0981, 2)
-        # print(fluidWork < 1.02 , (well_data.region == 'КГМ' or well_data.region == 'АГМ'))
-        if fluidWork < 1.02 and (well_data.region == 'КГМ' or well_data.region == 'АГМ'):
+        # print(fluidWork < 1.02 , (self.dict_data_well["region"] == 'КГМ' or self.dict_data_well["region"] == 'АГМ'))
+        if fluidWork < 1.02 and (dict_data_well["region"] == 'КГМ' or dict_data_well["region"] == 'АГМ'):
             fluidWork = 1.02
         elif fluidWork < 1.02 and (
-                well_data.region == 'ИГМ' or well_data.region == 'ТГМ' or well_data.region == 'ЧГМ'):
+                dict_data_well["region"] == 'ИГМ' or dict_data_well["region"] == 'ТГМ' or dict_data_well["region"] == 'ЧГМ'):
             fluidWork = 1.01
 
         return fluidWork
@@ -373,42 +373,6 @@ def calculationFluidWork(vertical, pressure):
         return None
 
 
-def pvo_gno(kat_pvo):
-    if 'Ойл' in well_data.contractor:
-        date_str = 'от 07.03.2024г'
-    elif 'РН' in well_data.contractor:
-        date_str = ''
-    # print(f' ПВО {kat_pvo}')
-    pvo_2 = f'Установить ПВО по схеме №2 утвержденной главным инженером {well_data.contractor} {date_str} (тип плашечный ' \
-            f'сдвоенный ПШП-2ФТ-152х21) и посадить пакер. ' \
-            f'Спустить пакер на глубину 10м. Опрессовать ПВО (трубные плашки превентора) и линии манифольда до концевых ' \
-            f'задвижек на Р-{well_data.max_admissible_pressure._value}атм на максимально допустимое давление ' \
-            f'опрессовки эксплуатационной колонны в течении ' \
-            f'30мин), сорвать пакер. ' \
-        # f'В случае невозможности опрессовки по ' \
-    # f'результатам определения приемистости и по согласованию с заказчиком  опрессовать трубные плашки ПВО на ' \
-    # f'давление поглощения, но не менее 30атм. '
-
-    pvo_1 = f'Установить ПВО по схеме №2 утвержденной главным инженером {well_data.contractor} {date_str} ' \
-            f'(тип плашечный сдвоенный ПШП-2ФТ-160х21Г Крестовина КР160х21Г, ' \
-            f'задвижка ЗМС 65х21 (3шт), Шарового крана 1КШ-73х21, авар. трубы (патрубок НКТ73х7-7-Е, ' \
-            f' (при необходимости произвести монтаж переводника' \
-            f' П178х168 или П168 х 146 или ' \
-            f'П178 х 146 в зависимости от типоразмера крестовины и колонной головки). Спустить и посадить ' \
-            f'пакер на глубину 10м. Опрессовать ПВО (трубные плашки превентора) на ' \
-            f'Р-{well_data.max_admissible_pressure._value}атм ' \
-            f'(на максимально допустимое давление опрессовки ' \
-            f'эксплуатационной колонны в течении 30мин), сорвать и извлечь пакер. Опрессовать ' \
-            f'выкидную линию после концевых задвижек на ' \
-            f'Р - 50 кгс/см2 (5 МПа) - для противовыбросового оборудования, рассчитанного на' \
-            f'давление до 210 кгс/см2 ((21 МПа)\n' \
-            f'- Обеспечить обогрев превентора и СУП в зимнее время . \n Получить разрешение на производство работ в ' \
-            f'присутствии представителя ПФС'
-    if kat_pvo == 1:
-        return pvo_1, f'Монтаж ПВО по схеме №2 + ГидроПревентор'
-    else:
-        # print(pvo_2)
-        return pvo_2, f'Монтаж ПВО по схеме №2'
 
 
 def lifting_unit(self):
@@ -427,25 +391,25 @@ def lifting_unit(self):
     upa_60 = f'Установить подъёмный агрегат на устье не менее 60т. Пусковой комиссией составить ' \
              f'акт готовности  подьемного агрегата и бригады для проведения ремонта скважины.'
 
-    return upa_60 if well_data.bottomhole_artificial._value >= 2300 else aprs_40
+    return upa_60 if self.dict_data_well["bottomhole_artificial"]._value >= 2300 else aprs_40
 
 
-def volume_vn_ek(current):
-    if well_data.column_additional is False or well_data.column_additional is True and current < well_data.head_column_additional._value:
+def volume_vn_ek(self, current):
+    if self.dict_data_well["column_additional"] is False or self.dict_data_well["column_additional"] is True and current < self.dict_data_well["head_column_additional"]._value:
         volume = round(
-            (well_data.column_diametr._value - 2 * well_data.column_wall_thickness._value) ** 2 * 3.14 / 4 / 1000, 2)
+            (self.dict_data_well["column_diametr"]._value - 2 * self.dict_data_well["column_wall_thickness"]._value) ** 2 * 3.14 / 4 / 1000, 2)
     else:
         volume = round(
-            (well_data.column_additional_diametr._value - 2 * well_data.column_additional_wall_thickness._value
+            (self.dict_data_well["column_additional_diametr"]._value - 2 * self.dict_data_well["column_additional_wall_thickness"]._value
              ) ** 2 * 3.14 / 4 / 1000, 2)
 
     return round(volume, 1)
 
 
 def volume_vn_nkt(dict_nkt):  # Внутренний объем одного погонного местра НКТ
-    # print(dict_nkt)
+    volume_vn_nkt = 0
     for nkt, lenght_nkt in dict_nkt.items():
-        volume_vn_nkt = 0
+
         nkt = ''.join(c for c in str(nkt) if c.isdigit())
         if '60' in str(nkt):
             t_nkt = 5
@@ -515,53 +479,53 @@ def volume_nkt_metal(dict_nkt):  # Внутренний объем НКТ жел
 
 
 def well_volume(self, current_bottom):
-    # print(well_data.column_additional)
-    if well_data.column_additional is False:
-        # print(well_data.column_diametr._value, well_data.column_wall_thickness._value, current_bottom)
+    # print(self.dict_data_well["column_additional"])
+    if self.dict_data_well["column_additional"] is False:
+        # print(self.dict_data_well["column_diametr"]._value, self.dict_data_well["column_wall_thickness"]._value, current_bottom)
         volume_well = 3.14 * (
-                well_data.column_diametr._value - well_data.column_wall_thickness._value * 2) ** 2 / 4 / 1000000 * (
+                self.dict_data_well["column_diametr"]._value - self.dict_data_well["column_wall_thickness"]._value * 2) ** 2 / 4 / 1000000 * (
                           current_bottom)
 
     else:
-        # print(f' ghb [{well_data.column_additional_diametr._value, well_data.column_additional_wall_thickness._value}]')
+        # print(f' ghb [{self.dict_data_well["column_additional_diametr"]._value, self.dict_data_well["column_additional_wall_thickness"]._value}]')
         volume_well = (3.14 * (
-                well_data.column_additional_diametr._value - well_data.column_additional_wall_thickness._value * 2) ** 2 / 4 / 1000 * (
-                               current_bottom - float(well_data.head_column_additional._value)) / 1000) + (
+                self.dict_data_well["column_additional_diametr"]._value - self.dict_data_well["column_additional_wall_thickness"]._value * 2) ** 2 / 4 / 1000 * (
+                               current_bottom - float(self.dict_data_well["head_column_additional"]._value)) / 1000) + (
                               3.14 * (
-                              well_data.column_diametr._value - well_data.column_wall_thickness._value * 2) ** 2 / 4 / 1000 * (
-                                  float(well_data.head_column_additional._value)) / 1000)
+                              self.dict_data_well["column_diametr"]._value - self.dict_data_well["column_wall_thickness"]._value * 2) ** 2 / 4 / 1000 * (
+                                  float(self.dict_data_well["head_column_additional"]._value)) / 1000)
     # print(f'Объем скважины {volume_well}')
     return round(volume_well, 1)
 
 
 def volume_pod_NKT(self):  # Расчет необходимого объема внутри НКТ и между башмаком НКТ и забоем
 
-    nkt_l = round(sum(list(well_data.dict_nkt.values())), 1)
-    if well_data.column_additional is False:
-        v_pod_gno = 3.14 * (int(well_data.column_diametr._value) - int(
-            well_data.column_wall_thickness._value) * 2) ** 2 / 4 / 1000 * (
-                            float(well_data.current_bottom) - int(nkt_l)) / 1000
+    nkt_l = round(sum(list(self.dict_data_well["dict_nkt"].values())), 1)
+    if self.dict_data_well["column_additional"] is False:
+        v_pod_gno = 3.14 * (int(self.dict_data_well["column_diametr"]._value) - int(
+            self.dict_data_well["column_wall_thickness"]._value) * 2) ** 2 / 4 / 1000 * (
+                            float(self.dict_data_well["current_bottom"]) - int(nkt_l)) / 1000
 
-    elif round(sum(list(well_data.dict_nkt.values())), 1) > float(well_data.head_column_additional._value):
+    elif round(sum(list(self.dict_data_well["dict_nkt"].values())), 1) > float(self.dict_data_well["head_column_additional"]._value):
         v_pod_gno = 3.14 * (
-                well_data.column_diametr._value - well_data.column_wall_thickness._value * 2) ** 2 / 4 / 1000 * (
-                            float(well_data.head_column_additional._value) - nkt_l) / 1000 + 3.14 * (
-                            well_data.column_additional_diametr._value - well_data.column_additional_wall_thickness._value * 2) ** 2 / 4 / 1000 * (
-                            well_data.current_bottom - float(well_data.head_column_additional._value)) / 1000
-    elif nkt_l <= float(well_data.head_column_additional._value):
+                self.dict_data_well["column_diametr"]._value - self.dict_data_well["column_wall_thickness"]._value * 2) ** 2 / 4 / 1000 * (
+                            float(self.dict_data_well["head_column_additional"]._value) - nkt_l) / 1000 + 3.14 * (
+                            self.dict_data_well["column_additional_diametr"]._value - self.dict_data_well["column_additional_wall_thickness"]._value * 2) ** 2 / 4 / 1000 * (
+                            self.dict_data_well["current_bottom"] - float(self.dict_data_well["head_column_additional"]._value)) / 1000
+    elif nkt_l <= float(self.dict_data_well["head_column_additional"]._value):
         v_pod_gno = 3.14 * (
-                well_data.column_additional_diametr._value - well_data.column_additional_wall_thickness._value * 2) ** 2 / 4 / 1000 * (
-                            well_data.current_bottom - nkt_l) / 1000
-    volume_in_nkt = v_pod_gno + volume_vn_nkt(well_data.dict_nkt) - volume_rod(self, well_data.dict_sucker_rod)
-    # print(f'Внутренный объем + Зумпф{volume_in_nkt, v_pod_gno, volume_vn_nkt(well_data.dict_nkt)}, ')
+                self.dict_data_well["column_additional_diametr"]._value - self.dict_data_well["column_additional_wall_thickness"]._value * 2) ** 2 / 4 / 1000 * (
+                            self.dict_data_well["current_bottom"] - nkt_l) / 1000
+    volume_in_nkt = v_pod_gno + volume_vn_nkt(self.dict_data_well["dict_nkt"]) - volume_rod(self, self.dict_data_well["dict_sucker_rod"])
+    # print(f'Внутренный объем + Зумпф{volume_in_nkt, v_pod_gno, volume_vn_nkt(self.dict_data_well["dict_nkt"])}, ')
     return round(volume_in_nkt, 1)
 
 
 def volume_jamming_well(self, current_bottom):  # объем глушения скважины
 
     volume_jamming_well = round(
-        (well_volume(self, current_bottom) - volume_nkt_metal(well_data.dict_nkt) - volume_rod(self,
-                                                                                               well_data.dict_sucker_rod)) * 1.1,
+        (well_volume(self, current_bottom) - volume_nkt_metal(self.dict_data_well["dict_nkt"]) - volume_rod(self,
+                                                                                               self.dict_data_well["dict_sucker_rod"])) * 1.1,
         1)
 
     return volume_jamming_well
@@ -570,7 +534,7 @@ def volume_jamming_well(self, current_bottom):  # объем глушения с
 def well_jamming(self, without_damping, lift_key, volume_well_jaming):
     # print(f' выбранный {lift_key}')
 
-    # print(f'расстояние ПВР {abs(sum(list(well_data.dict_nkt.values())) - well_data.perforation_roof), volume_jamming_well(self), volume_nkt_metal(well_data.dict_nkt), volume_rod(well_data.dict_sucker_rod)}')
+    # print(f'расстояние ПВР {abs(sum(list(self.dict_data_well["dict_nkt"].values())) - self.dict_data_well["perforation_roof"]), volume_jamming_well(self), volume_nkt_metal(self.dict_data_well["dict_nkt"]), volume_rod(self.dict_data_well["dict_sucker_rod"])}')
     well_jamming_list2 = f'Вести контроль плотности на  выходе в конце глушения. В случае отсутствия  на последнем кубе глушения  жидкости ' \
                          f'уд.веса равной удельному весу ЖГ, дальнейшие промывки и удельный вес жидкостей промывок согласовать с Заказчиком,' \
                          f' при наличии Ризб - произвести замер, перерасчет ЖГ и повторное глушение с корректировкой удельного веса жидкости' \
@@ -579,8 +543,8 @@ def well_jamming(self, without_damping, lift_key, volume_well_jaming):
                          f'ПО РЕЗУЛЬТАТАМ ЗАМЕРОВ ПРИНИМАЕТСЯ РЕШЕНИЕ ОБ ПРОДОЛЖЕНИИ ОТБИВКИ УРОВНЯ В СКВАЖИНЕ ДО КРИТИЧЕСКОЙ ГЛУБИНЫ ЗА ' \
                          f'ПРОМЕЖУТОК ВРЕМЕНИ.'
 
-    # print(f' Глушение {volume_jamming_well(self, well_data.current_bottom), volume_nkt_metal(well_data.dict_nkt), volume_rod(well_data.dict_sucker_rod)}')
-    # print(well_data.well_volume_in_PZ)
+    # print(f' Глушение {volume_jamming_well(self, self.dict_data_well["current_bottom"]), volume_nkt_metal(self.dict_data_well["dict_nkt"]), volume_rod(self.dict_data_well["dict_sucker_rod"])}')
+    # print(self.dict_data_well["well_volume_in_PZ"])
 
     if without_damping is True:
         well_jamming_str = f'Скважина состоит в перечне скважин ООО Башнефть-Добыча, на которых допускается проведение ТКРС без предварительного глушения на текущий квартал'
@@ -588,64 +552,64 @@ def well_jamming(self, without_damping, lift_key, volume_well_jaming):
         well_jamming_list2 = f'В случае наличия избыточного давления необходимость повторного глушения скважины дополнительно согласовать со специалистами ПТО  и ЦДНГ.'
     elif without_damping is False and lift_key in ['НН с пакером', 'НВ с пакером', 'ЭЦН с пакером', 'ОРЗ']:
 
-        well_after = f'Произвести закачку на поглощение не более {well_data.max_admissible_pressure._value}атм тех жидкости в ' \
-                     f'объеме {round(volume_well_jaming - well_volume(self, sum(list(well_data.dict_nkt_po.values()))), 1)}м3.' if round(
-            volume_well_jaming - well_volume(self, sum(list(well_data.dict_nkt_po.values()))), 1) > 0.1 else ''
-        well_jamming_str = f'Произвести закачку в трубное пространство тех жидкости уд.весом {well_data.fluid_work} в ' \
-                           f'объеме {round(well_volume(self, sum(list(well_data.dict_nkt.values()))) - volume_pod_NKT(self), 1)}м3 на циркуляцию. ' \
+        well_after = f'Произвести закачку на поглощение не более {self.dict_data_well["max_admissible_pressure"]._value}атм тех жидкости в ' \
+                     f'объеме {round(volume_well_jaming - well_volume(self, sum(list(self.dict_data_well["dict_nkt_po"].values()))), 1)}м3.' if round(
+            volume_well_jaming - well_volume(self, sum(list(self.dict_data_well["dict_nkt_po"].values()))), 1) > 0.1 else ''
+        well_jamming_str = f'Произвести закачку в трубное пространство тех жидкости уд.весом {self.dict_data_well["fluid_work"]} в ' \
+                           f'объеме {round(well_volume(self, sum(list(self.dict_data_well["dict_nkt"].values()))) - volume_pod_NKT(self), 1)}м3 на циркуляцию. ' \
                            f'{well_after} Закрыть затрубное пространство. ' \
                            f' Закрыть скважину на  стабилизацию не менее 2 часов. (согласовать ' \
                            f'глушение в коллектор, в случае отсутствия на желобную емкость)'
-        well_jamming_short = f'Глушение в НКТ уд.весом {well_data.fluid_work_short} ' \
-                             f'объеме {round(well_volume(self, sum(list(well_data.dict_nkt.values()))) - volume_pod_NKT(self), 1)}м3 ' \
+        well_jamming_short = f'Глушение в НКТ уд.весом {self.dict_data_well["fluid_work_short"]} ' \
+                             f'объеме {round(well_volume(self, sum(list(self.dict_data_well["dict_nkt"].values()))) - volume_pod_NKT(self), 1)}м3 ' \
                              f'на циркуляцию. {well_after} '
     elif without_damping is False and lift_key in ['ОРД']:
-        well_jamming_str = f'Произвести закачку в затрубное пространство тех жидкости уд.весом {well_data.fluid_work_short}в ' \
-                           f'объеме {round(well_volume(self, well_data.current_bottom) - well_volume(self, well_data.depth_fond_paker_do["do"]), 1)}м3 ' \
-                           f'на поглощение при давлении не более {well_data.max_admissible_pressure._value}атм. Закрыть ' \
+        well_jamming_str = f'Произвести закачку в затрубное пространство тех жидкости уд.весом {self.dict_data_well["fluid_work_short"]}в ' \
+                           f'объеме {round(well_volume(self, self.dict_data_well["current_bottom"]) - well_volume(self, self.dict_data_well["depth_fond_paker_do"]["do"]), 1)}м3 ' \
+                           f'на поглощение при давлении не более {self.dict_data_well["max_admissible_pressure"]._value}атм. Закрыть ' \
                            f'затрубное пространство. Закрыть скважину на стабилизацию не менее 2 часов. (согласовать ' \
                            f'глушение в коллектор, в случае отсутствия на желобную емкость)'
-        well_jamming_short = f'Глушение в затруб уд.весом {well_data.fluid_work_short} в ' \
-                             f'объеме {round(well_volume(self, well_data.current_bottom) - well_volume(self, well_data.depth_fond_paker_do["do"]), 1)}м3 '
+        well_jamming_short = f'Глушение в затруб уд.весом {self.dict_data_well["fluid_work_short"]} в ' \
+                             f'объеме {round(well_volume(self, self.dict_data_well["current_bottom"]) - well_volume(self, self.dict_data_well["depth_fond_paker_do"]["do"]), 1)}м3 '
     elif without_damping is False and lift_key in ['НН', 'НВ', 'ЭЦН']:
         well_jamming_str = f'Произвести глушение скважины в объеме {volume_well_jaming}м3 тех ' \
-                           f'жидкостью уд.весом {well_data.fluid_work}' \
+                           f'жидкостью уд.весом {self.dict_data_well["fluid_work"]}' \
                            f' на циркуляцию в следующим алгоритме: \n Произвести закачку в затрубное пространство ' \
                            f'тех жидкости в ' \
-                           f'объеме {round(well_volume(self, sum(list(well_data.dict_nkt.values()))), 1)}м3 на ' \
+                           f'объеме {round(well_volume(self, sum(list(self.dict_data_well["dict_nkt"].values()))), 1)}м3 на ' \
                            f'циркуляцию. Закрыть трубное пространство. ' \
-                           f'Произвести закачку на поглощение не более {well_data.max_admissible_pressure._value}атм ' \
+                           f'Произвести закачку на поглощение не более {self.dict_data_well["max_admissible_pressure"]._value}атм ' \
                            f'тех жидкости в ' \
-                           f'объеме {round(volume_well_jaming - well_volume(self, sum(list(well_data.dict_nkt.values()))), 1)}м3. Закрыть скважину на ' \
+                           f'объеме {round(volume_well_jaming - well_volume(self, sum(list(self.dict_data_well["dict_nkt"].values()))), 1)}м3. Закрыть скважину на ' \
                            f'стабилизацию не менее 2 часов. (согласовать глушение в коллектор, в случае ' \
                            f'отсутствия на желобную емкость'
         well_jamming_short = f'Глушение в затруб в объеме {volume_well_jaming}м3 тех ' \
-                             f'жидкостью уд.весом {well_data.fluid_work_short}'
-    elif abs(sum(list(well_data.dict_nkt.values())) - well_data.perforation_roof) > 150:
+                             f'жидкостью уд.весом {self.dict_data_well["fluid_work_short"]}'
+    elif abs(sum(list(self.dict_data_well["dict_nkt"].values())) - self.dict_data_well["perforation_roof"]) > 150:
         well_jamming_str = f'Произвести глушение скважины объеме {volume_well_jaming}м3 тех ' \
-                           f'жидкостью уд.весом {well_data.fluid_work}' \
+                           f'жидкостью уд.весом {self.dict_data_well["fluid_work"]}' \
                            f' на циркуляцию в следующим алгоритме: \n Произвести закачку в затрубное пространство ' \
                            f'тех жидкости в ' \
-                           f'объеме {round(well_volume(self, sum(list(well_data.dict_nkt.values()))), 1)}м3 на ' \
+                           f'объеме {round(well_volume(self, sum(list(self.dict_data_well["dict_nkt"].values()))), 1)}м3 на ' \
                            f'циркуляцию. Закрыть трубное пространство. ' \
-                           f'Произвести закачку на поглощение не более {well_data.max_admissible_pressure._value}атм ' \
+                           f'Произвести закачку на поглощение не более {self.dict_data_well["max_admissible_pressure"]._value}атм ' \
                            f'тех жидкости в ' \
-                           f'объеме {round(volume_well_jaming - well_volume(self, sum(list(well_data.dict_nkt.values()))), 1)}м3. Закрыть скважину на ' \
+                           f'объеме {round(volume_well_jaming - well_volume(self, sum(list(self.dict_data_well["dict_nkt"].values()))), 1)}м3. Закрыть скважину на ' \
                            f'стабилизацию не менее 2 часов. (согласовать глушение в коллектор, в случае ' \
                            f'отсутствия на желобную емкость'
         well_jamming_short = f'Глушение в затруб в объеме {volume_well_jaming}м3 тех ' \
-                             f'жидкостью уд.весом {well_data.fluid_work_short}'
-    elif abs(sum(list(well_data.dict_nkt.values())) - well_data.perforation_roof) <= 150:
+                             f'жидкостью уд.весом {self.dict_data_well["fluid_work_short"]}'
+    elif abs(sum(list(self.dict_data_well["dict_nkt"].values())) - self.dict_data_well["perforation_roof"]) <= 150:
         well_jamming_str = f'Произвести глушение скважины  в объеме {volume_well_jaming}м3 тех ' \
-                           f'жидкостью уд.весом {well_data.fluid_work}' \
+                           f'жидкостью уд.весом {self.dict_data_well["fluid_work"]}' \
                            f' на циркуляцию. Закрыть скважину на ' \
                            f'стабилизацию не менее 2 часов. (согласовать глушение в коллектор, в случае отсутствия ' \
                            f'на желобную емкость)'
-        well_jamming_short = f'Глушение в затруб в объеме {volume_well_jaming}м3 уд.весом {well_data.fluid_work_short}'
+        well_jamming_short = f'Глушение в затруб в объеме {volume_well_jaming}м3 уд.весом {self.dict_data_well["fluid_work_short"]}'
 
-    if len(well_data.plast_work) == 0 and len(well_data.dict_leakiness) == 0:
-        well_jamming_str = f'Опрессовать эксплуатационную колонну в интервале 0- {well_data.current_bottom}м на ' \
-                           f'Р={well_data.max_admissible_pressure._value}атм' \
+    if len(self.dict_data_well['plast_work']) == 0 and self.dict_data_well["dict_leakiness"]:
+        well_jamming_str = f'Опрессовать эксплуатационную колонну в интервале 0- {self.dict_data_well["current_bottom"]}м на ' \
+                           f'Р={self.dict_data_well["max_admissible_pressure"]._value}атм' \
                            f' в течение 30 минут в присутствии представителя заказчика, составить акт. ' \
                            f'(Вызов представителя осуществлять телефонограммой за 12 часов, ' \
                            f'с подтверждением за 2 часа ' \
@@ -668,18 +632,8 @@ def is_number(num):
         return False
 
 
-def open_checkbox_dialog():
-    dialog = CheckBoxDialog()
+def open_checkbox_dialog(self):
+    dialog = CheckBoxDialog(self)
     dialog.exec_()
 
 
-# Определение трех режимов давлений при определении приемистости
-def pressure_mode(mode, plast):
-    mode = float(mode) / 10 * 10
-    if mode > well_data.max_admissible_pressure._value and (plast != 'D2ps' or plast.lower() != 'дпаш'):
-        mode_str = f'{float(mode)}, {float(mode) - 10}, {float(mode) - 20}'
-    elif (plast == 'D2ps' or plast.lower() == 'дпаш') and well_data.region == 'ИГМ':
-        mode_str = f'{120}, {140}, {160}'
-    else:
-        mode_str = f'{float(mode) - 10}, {float(mode)}, {float(mode) + 10}'
-    return mode_str

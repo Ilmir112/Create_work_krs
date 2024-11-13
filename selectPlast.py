@@ -6,17 +6,18 @@ import well_data
 
 class CheckBoxDialog(QDialog):
 
-    def __init__(self):
+    def __init__(self, dict_data_well):
         super().__init__()
+        self.dict_data_well = dict_data_well
 
 
         layout = QVBoxLayout()
         n = 1
-        for plast in well_data.plast_work:
+        for plast in self.dict_data_well['plast_work']:
             self.plast = QCheckBox(plast)
             layout.addWidget(self.plast)
-        if well_data.leakiness:
-            for nek in list(well_data.dict_leakiness['НЭК']['интервал'].keys()):
+        if self.dict_data_well["dict_leakiness"]:
+            for nek in list(self.dict_data_well["dict_leakiness"]['НЭК']['интервал'].keys()):
                 self.plast = QCheckBox(f'НЭК {nek}')
                 layout.addWidget(self.plast)
 
@@ -31,13 +32,13 @@ class CheckBoxDialog(QDialog):
 
         well_data.plast_select = ''
         selected_options = []
-        # print(f' рабочие пласты {well_data.plast_work}')
-        for plast in well_data.plast_work:
+        # print(f' рабочие пласты {self.dict_data_well['plast_work']}')
+        for plast in self.dict_data_well['plast_work']:
             if self.plast.isChecked():
                 if self.plast.text() not in selected_options:
                     selected_options.append(self.plast.text())
 
-        for plast in well_data.plast_project:
+        for plast in self.dict_data_well["plast_project"]:
             if self.plast.isChecked():
                 if self.plast.text() not in selected_options:
                     selected_options.append(self.plast.text())

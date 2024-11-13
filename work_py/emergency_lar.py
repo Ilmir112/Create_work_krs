@@ -10,12 +10,14 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QLineEdi
 
 from main import MyMainWindow
 from work_py.emergencyWork import magnet_select, sbt_select
+from work_py.parent_work import TabWidgetUnion, TabPageUnion, WindowUnion
 from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
 
 
-class TabPage_SO_lar(QWidget):
+class TabPageSoLar(TabPageUnion):
     def __init__(self, parent=None):
         super().__init__()
+        self.dict_data_well = parent
 
         self.validator_int = QIntValidator(0, 10)
 
@@ -48,8 +50,8 @@ class TabPage_SO_lar(QWidget):
         self.udlinitelel_lenght.setValidator(self.validator_int)
         self.udlinitelel_lenght.setText('2')
 
-        if well_data.column_additional is False or (well_data.column_additional and
-                                                    well_data.head_column_additional._value < well_data.current_bottom):
+        if self.dict_data_well["column_additional"] is False or (self.dict_data_well["column_additional"] and
+                                                    self.dict_data_well["head_column_additional"]._value < self.dict_data_well["current_bottom"]):
             self.nkt_select_combo.setCurrentIndex(0)
         else:
             self.nkt_select_combo.setCurrentIndex(1)
@@ -102,35 +104,38 @@ class TabPage_SO_lar(QWidget):
         # self.nkt_select_combo.currentTextChanged.connect(self.update_raid_edit)
 
         self.nkt_select_combo.setCurrentIndex(1)
-        self.bottom_line.setText(f'{well_data.current_bottom}')
+        self.bottom_line.setText(f'{self.dict_data_well["current_bottom"]}')
 
-        if well_data.column_additional is False or \
-                (well_data.column_additional and well_data.current_bottom < well_data.head_column_additional._value):
+        if self.dict_data_well["column_additional"] is False or \
+                (self.dict_data_well["column_additional"] and self.dict_data_well["current_bottom"] < self.dict_data_well["head_column_additional"]._value):
             self.nkt_select_combo.setCurrentIndex(1)
             self.nkt_select_combo.setCurrentIndex(0)
         else:
             self.nkt_select_combo.setCurrentIndex(1)
 
-        if well_data.emergency_well is True:
-            self.emergency_bottom_line.setText(f'{well_data.emergency_bottom}')
+        if self.dict_data_well["emergency_well"] is True:
+            self.emergency_bottom_line.setText(f'{self.dict_data_well["emergency_bottom"]}')
 
 
-class TabWidget(QTabWidget):
-    def __init__(self):
+class TabWidget(TabWidgetUnion):
+    def __init__(self, parent):
         super().__init__()
-        self.addTab(TabPage_SO_lar(), 'ловильные работы')
+        self.addTab(TabPageSoLar(parent), 'ловильные работы')
 
 
-class Emergency_lar(MyMainWindow):
+class EmergencyLarWork(WindowUnion):
 
-    def __init__(self, ins_ind, table_widget, parent=None):
-        super(Emergency_lar, self).__init__()
+    def __init__(self, dict_data_well, table_widget, parent=None):
+        super().__init__()
+
+        self.dict_data_well = dict_data_well
+        self.ins_ind = dict_data_well['ins_ind']
+        self.tabWidget = TabWidget(self.dict_data_well)
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
 
-        self.ins_ind = ins_ind
+        
         self.table_widget = table_widget
-        self.tabWidget = TabWidget()
 
         self.buttonadd_work = QPushButton('Добавить в план работ')
         self.buttonadd_work.clicked.connect(self.add_work, Qt.QueuedConnection)
@@ -169,7 +174,7 @@ class Emergency_lar(MyMainWindow):
         if emergency_bottom_line != '':
             emergency_bottom_line = int(float(emergency_bottom_line))
 
-            if emergency_bottom_line > well_data.current_bottom:
+            if emergency_bottom_line > self.dict_data_well["current_bottom"]:
                 QMessageBox.warning(self, 'Ошибка',
                                           'Забой ниже глубины текущего забоя')
                 return
@@ -178,13 +183,13 @@ class Emergency_lar(MyMainWindow):
                                       'ВВедите аварийный забой')
             return
 
-        if nkt_key == 'оборудование в ЭК' and well_data.column_additional and \
-                emergency_bottom_line > well_data.head_column_additional._value:
+        if nkt_key == 'оборудование в ЭК' and self.dict_data_well["column_additional"] and \
+                emergency_bottom_line > self.dict_data_well["head_column_additional"]._value:
             QMessageBox.warning(self, 'Ошибка',
                                       'Не корректно выбрана компоновка для доп колонны')
             return
-        elif nkt_key == 'оборудование в ДП' and well_data.column_additional and \
-                emergency_bottom_line < well_data.head_column_additional._value:
+        elif nkt_key == 'оборудование в ДП' and self.dict_data_well["column_additional"] and \
+                emergency_bottom_line < self.dict_data_well["head_column_additional"]._value:
             QMessageBox.warning(self, 'Ошибка',
                                       'Не корректно выбрана компоновка для основной колонны')
             return
@@ -195,7 +200,7 @@ class Emergency_lar(MyMainWindow):
             raid_list = self.emergence_sbt(lar_diametr_line, nkt_key, lar_type_combo,
                                            emergency_bottom_line, bottom_line, gidroayss_combo, ubt_combo, udlinitelel,
                                            udlinitelel_lenght)
-        well_data.current_bottom = bottom_line
+        self.dict_data_well["current_bottom"] = bottom_line
 
         self.populate_row(self.ins_ind, raid_list, self.table_widget)
         well_data.pause = False
@@ -238,7 +243,7 @@ class Emergency_lar(MyMainWindow):
              f' до глубины нахождения аварийной головы ({emergency_bottom_line}м)\n '
              f'Включение в компоновку ударной компоновки дополнительно согласовать с УСРСиСТ',
              None, None, None, None, None, None, None,
-             'мастер КРС', descentNKT_norm(well_data.current_bottom, 1)],
+             'мастер КРС', descentNKT_norm(self.dict_data_well["current_bottom"], 1)],
             [None, None,
              f'Во избежание срабатывания механизма фиксации плашек в освобожденном положении, спуск '
              f'следует производить без вращения труболовки',
@@ -248,7 +253,7 @@ class Emergency_lar(MyMainWindow):
              f'Произвести монтаж ведущей трубы и мех.ротора.\n '
              f'За 2-5 метров до верхнего конца аварийного объекта при наличии циркуляции рекомендуется '
              f'восстановить '
-             f'циркуляцию и промыть скважину тех водой {well_data.fluid_work}. При прокачке промывочной '
+             f'циркуляцию и промыть скважину тех водой {self.dict_data_well["fluid_work"]}. При прокачке промывочной '
              f'жидкости спустить '
              f'{lar_type_combo} до верхнего конца аварийной колонны.\n'
              f'Произвести ловильные работы на "голове" аварийной компоновки. Количество подходов и оборотов '
@@ -263,25 +268,25 @@ class Emergency_lar(MyMainWindow):
             [None, None,
              f'При положительных результатах расхаживания - демонтаж ведущей трубы и мех.ротора. '
              f'Поднять компоновку с доливом тех жидкости в '
-             f'объеме {round(well_data.current_bottom * 1.25 / 1000, 1)}м3'
-             f' удельным весом {well_data.fluid_work}.',
+             f'объеме {round(self.dict_data_well["current_bottom"] * 1.25 / 1000, 1)}м3'
+             f' удельным весом {self.dict_data_well["fluid_work"]}.',
              None, None, None, None, None, None, None,
-             'Мастер', liftingNKT_norm(well_data.current_bottom, 1)],
+             'Мастер', liftingNKT_norm(self.dict_data_well["current_bottom"], 1)],
             [None, None,
              f'При необходимости: Сборка и спуск компоновки: кольцевой фрезер с удлинителем '
              f'L= {udlinitelel_str}м + СБТ, до глубины нахождения аварийной "головы". (Компоновку согласовать дополнительно с УСРСиСТ',
              None, None, None, None, None, None, None,
-             'мастер КРС, УСРСиСТ', descentNKT_norm(well_data.current_bottom, 1.2)],
+             'мастер КРС, УСРСиСТ', descentNKT_norm(self.dict_data_well["current_bottom"], 1.2)],
             [None, None,
              f'Монтаж монтаж ведущей трубы и мех.ротора. Обуривание аварийной головы на глубины согласованной с '
              f'УСРСиСТ демонтаж мех ротора',
              None, None, None, None, None, None, None,
              'мастер КРС, УСРСиСТ', 10],
             [None, None,
-             f'Поднять компоновку с доливом тех жидкости в объеме {round(well_data.current_bottom * 1.25 / 1000, 1)}м3'
-             f' удельным весом {well_data.fluid_work}.',
+             f'Поднять компоновку с доливом тех жидкости в объеме {round(self.dict_data_well["current_bottom"] * 1.25 / 1000, 1)}м3'
+             f' удельным весом {self.dict_data_well["fluid_work"]}.',
              None, None, None, None, None, None, None,
-             'Мастер, подрядчик по ГИС', liftingNKT_norm(well_data.current_bottom, 1)],
+             'Мастер, подрядчик по ГИС', liftingNKT_norm(self.dict_data_well["current_bottom"], 1)],
             [None, None,
              f'По согласованию заказчиком повторить ловильные аварийные работы'
              f' с подбором аварийного оборудования',
@@ -292,7 +297,7 @@ class Emergency_lar(MyMainWindow):
              None, None, None, None, None, None, None,
              'Мастер, подрядчик по ГИС', None]]
 
-        well_data.current_bottom = bottom_line
+        self.dict_data_well["current_bottom"] = bottom_line
         return emergence_sbt
 
     def emergencyNKT(self, lar_diametr_line, nkt_key, lar_type_combo, nkt_str_combo,
@@ -313,7 +318,7 @@ class Emergency_lar(MyMainWindow):
             [f'монтаж ведущей трубы', None,
              f'Произвести монтаж ведущей трубы.\n '
              f'За 2-5 метров до верхнего конца аварийного объекта при наличии циркуляции рекомендуется '
-             f'восстановить циркуляцию и промыть скважину тех водой {well_data.fluid_work}. При прокачке промывочной '
+             f'восстановить циркуляцию и промыть скважину тех водой {self.dict_data_well["fluid_work"]}. При прокачке промывочной '
              f'жидкости спустить '
              f'{lar_type_combo} до верхнего конца аварийной колонны.\n'
              f'Произвести ловильные работы на "голове" аварийной компоновки. Количество подходов и оборотов '
@@ -328,12 +333,12 @@ class Emergency_lar(MyMainWindow):
             [None, None,
              f'При положительных результатах расхаживания - демонтаж ведущей трубы. '
              f'Поднять компоновку с доливом тех жидкости в '
-             f'объеме {round(well_data.current_bottom * 1.25 / 1000, 1)}м3'
-             f' удельным весом {well_data.fluid_work}.',
+             f'объеме {round(self.dict_data_well["current_bottom"] * 1.25 / 1000, 1)}м3'
+             f' удельным весом {self.dict_data_well["fluid_work"]}.',
              None, None, None, None, None, None, None,
-             'Мастер', liftingNKT_norm(well_data.current_bottom, 1)],
+             'Мастер', liftingNKT_norm(self.dict_data_well["current_bottom"], 1)],
         ]
-        well_data.current_bottom = bottom_line
+        self.dict_data_well["current_bottom"] = bottom_line
 
         return emergencyNKT_list
 

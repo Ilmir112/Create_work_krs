@@ -6,25 +6,25 @@ from openpyxl.utils.cell import range_boundaries, get_column_letter
 import well_data
 
 
-def delete_rows_pz(self, ws):
+def delete_rows_pz(self, ws, cat_well_min, data_well_max, data_x_max):
     boundaries_dict = {}
 
     for ind, _range in enumerate(ws.merged_cells.ranges):
         boundaries_dict[ind] = range_boundaries(str(_range))
 
     # rowHeights_top = [None, 18.0, 18, 18,None, 18.0, 18, 18,None, 18.0, 18, 18, 18.0, 18, 18, 18.0, 18, 18, 18.0, 18, 18]
-    rowHeights1 = [ws.row_dimensions[i + 1].height for i in range(well_data.cat_well_min._value, ws.max_row)]
+    rowHeights1 = [ws.row_dimensions[i + 1].height for i in range(cat_well_min._value, ws.max_row)]
     for key, value in boundaries_dict.items():
         try:
             ws.unmerge_cells(start_column=value[0], start_row=value[1],
                              end_column=value[2], end_row=value[3])
         except:
             pass
-    # print(f'индекс удаления {1, well_data.cat_well_min - 1} , {well_data.data_well_max + 2, ws.max_row - well_data.data_well_max}')
+    # print(f'индекс удаления {1, self.dict_data_well["cat_well_min"] - 1} , {data_well_max + 2, ws.max_row - data_well_max}')
 
-    ws.delete_rows(well_data.data_x_max._value, ws.max_row - well_data.data_x_max._value)
+    ws.delete_rows(data_x_max._value, ws.max_row - data_x_max._value)
 
-    ws.delete_rows(1, well_data.cat_well_min._value - 1)
+    ws.delete_rows(1, cat_well_min._value - 1)
 
     # print(sorted(boundaries_dict))
     well_data.rowHeights = rowHeights1
@@ -32,9 +32,9 @@ def delete_rows_pz(self, ws):
     for _ in range(16):
         ws.insert_rows(1, 1)
     for key, value in boundaries_dict.items():
-        if value[1] <= well_data.data_well_max._value + 1 and value[1] >= well_data.cat_well_min._value:
-            ws.merge_cells(start_column=value[0], start_row=value[1] + 16 - well_data.cat_well_min._value + 1,
-                           end_column=value[2], end_row=value[3] + 16 - well_data.cat_well_min._value + 1)
+        if value[1] <= data_well_max._value + 1 and value[1] >= cat_well_min._value:
+            ws.merge_cells(start_column=value[0], start_row=value[1] + 16 - cat_well_min._value + 1,
+                           end_column=value[2], end_row=value[3] + 16 - cat_well_min._value + 1)
 
     # print(f'{ws.max_row, len(well_data.rowHeights)}dd')
     for index_row, row in enumerate(ws.iter_rows()):  # Копирование высоты строки
@@ -45,32 +45,8 @@ def head_ind(start, finish):
     return f'A{start}:L{finish}'
 
 
-def copy_row(ws, ws2, head):
-    boundaries_dict = {}
 
-    for ind, _range in enumerate(ws.merged_cells.ranges):
-        boundaries_dict[ind] = range_boundaries(str(_range))
-
-    rowHeights1 = [ws.row_dimensions[i + 1].height for i in range(ws.max_row)]
-    colWidth = [ws.column_dimensions[get_column_letter(i + 1)].width for i in range(0, 13)] + [None]
-    for key, value in boundaries_dict.items():
-        ws.unmerge_cells(start_column=value[0], start_row=value[1],
-                         end_column=value[2], end_row=value[3])
-    copy_true_ws(ws, ws2, head)
-
-    for key, value in boundaries_dict.items():
-        ws2.merge_cells(start_column=value[0], start_row=value[1],
-                        end_column=value[2], end_row=value[3])
-
-    for index_row, row in enumerate(ws.iter_rows()):  # Копирование высоты строки
-        ws2.row_dimensions[index_row].height = rowHeights1[index_row]
-        if index_row == 2:
-            for col_ind, col in enumerate(row):
-                if col_ind <= 12:
-                    ws2.column_dimensions[get_column_letter(col_ind + 1)].width = colWidth[col_ind]
-
-
-def copy_true_ws(ws, ws2, head):
+def copy_true_ws(dict_data_well, ws, ws2, head):
     for row_number, row in enumerate(ws[head]):
         for col_number, cell in enumerate(row):
             if row_number == 0:
@@ -79,7 +55,7 @@ def copy_true_ws(ws, ws2, head):
                 ws2.cell(row_number + 1, col_number + 1, cell.value)
 
             if 'катег' in str(cell.value).lower():
-                if well_data.work_plan not in ['krs', 'dop_plan', 'dop_plan_in_base', 'plan_change']:
+                if dict_data_well["work_plan"] not in ['krs', 'dop_plan', 'dop_plan_in_base', 'plan_change']:
                     ws2.cell(row=row_number + 1, column=col_number + 1).alignment = Alignment(wrap_text=True,
                                                                                               horizontal='left',
                                                                                               vertical='center')

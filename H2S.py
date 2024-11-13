@@ -5,54 +5,54 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QComboBo
 
 def calc_h2s(ws3, h2s_pr, h2s_mg):
     from H2S import well_volume
-    # print(well_data.dict_nkt)
-    nkt_1 = list(well_data.dict_nkt.keys())[0]
-    nkt_1_l = well_data.dict_nkt[nkt_1]
+    # print(self.dict_data_well["dict_nkt"])
+    nkt_1 = list(self.dict_data_well["dict_nkt"].keys())[0]
+    nkt_1_l = self.dict_data_well["dict_nkt"][nkt_1]
 
     try:
-        nkt_2 = list(well_data.dict_nkt.keys())[1]
-        nkt_2_l = well_data.dict_nkt[nkt_2]
+        nkt_2 = list(self.dict_data_well["dict_nkt"].keys())[1]
+        nkt_2_l = self.dict_data_well["dict_nkt"][nkt_2]
     except:
         nkt_2 = 0
         nkt_2_l = 0
 
     def gno_volume():
-        nkt_l = sum(list(well_data.dict_nkt.values()))
+        nkt_l = sum(list(self.dict_data_well["dict_nkt"].values()))
         # print(nkt_l)
-        if well_data.column_additional is True:
+        if self.dict_data_well["column_additional"] is True:
 
             gno_well = 3.14 * (
-                        well_data.column_diametr - well_data.column_wall_thickness._value * 2) ** 2 / 4 / 1000 * (
-                                   well_data.bottom - float(well_data.head_column_additional._value)) / 1000 / 10
+                        self.dict_data_well["column_diametr"] - self.dict_data_well["column_wall_thickness"]._value * 2) ** 2 / 4 / 1000 * (
+                                   self.dict_data_well["bottom"] - float(self.dict_data_well["head_column_additional"]._value)) / 1000 / 10
         else:
-            if nkt_l < well_data.shoe_column._value:
+            if nkt_l < self.dict_data_well["shoe_column"]._value:
                 gno_well = (3.14 * (
-                            well_data.column_diametr - well_data.column_wall_thickness._value * 2) ** 2 / 4 / 1000 * (
-                                        well_data.bottom - float(well_data.head_column_additional._value)) / 1000) + (
+                            self.dict_data_well["column_diametr"] - self.dict_data_well["column_wall_thickness"]._value * 2) ** 2 / 4 / 1000 * (
+                                        self.dict_data_well["bottom"] - float(self.dict_data_well["head_column_additional"]._value)) / 1000) + (
                                        3.14 * (
-                                           well_data.column_diametr - well_data.column_wall_thickness._value * 2) ** 2 / 4 / 1000 * (
-                                                   well_data.shoe_column - nkt_l) / 1000)
+                                           self.dict_data_well["column_diametr"] - self.dict_data_well["column_wall_thickness"]._value * 2) ** 2 / 4 / 1000 * (
+                                                   self.dict_data_well["shoe_column"] - nkt_l) / 1000)
             else:
                 gno_well = 3.14 * (
-                            well_data.column_additional_diametr._value - well_data.column_additional_wall_thickness._value * 2) ** 2 / 4 / 1000 * (
-                                       well_data.bottom - nkt_1_l) / 10000
+                            self.dict_data_well["column_additional_diametr"]._value - self.dict_data_well["column_additional_wall_thickness"]._value * 2) ** 2 / 4 / 1000 * (
+                                       self.dict_data_well["bottom"] - nkt_1_l) / 10000
 
         return gno_well
 
     try:
-        nkt_3 = list(well_data.dict_nkt.keys())[2]
+        nkt_3 = list(self.dict_data_well["dict_nkt"].keys())[2]
     except:
         nkt_3 = 0
     try:
-        sucker_rod_l_25 = well_data.dict_sucker_rod['25']
+        sucker_rod_l_25 = self.dict_data_well["dict_sucker_rod"]['25']
     except:
         sucker_rod_l_25 = 0
     try:
-        sucker_rod_l_22 = well_data.dict_sucker_rod['22']
+        sucker_rod_l_22 = self.dict_data_well["dict_sucker_rod"]['22']
     except:
         sucker_rod_l_22 = 0
     try:
-        sucker_rod_l_19 = well_data.dict_sucker_rod['19']
+        sucker_rod_l_19 = self.dict_data_well["dict_sucker_rod"]['19']
     except:
         sucker_rod_l_19 = 0
 
@@ -63,24 +63,24 @@ def calc_h2s(ws3, h2s_pr, h2s_mg):
         [None, 'Объем раствора глушения - по объему скважины от устья до забоя', None, None, None, None],
         [None, None, None, None, None, None],
         [None, '№', 'Параметр', None, 'Результат расчета', None],
-        [None, 1, 'Параметры скважины', None, f'{well_data.well_number._value} {well_data.well_area._value}', None],
-        [None, 1.1, 'Забой скважины', 'м', round(float(well_data.bottomhole_artificial._value), 1), 'формула'],
-        [None, 1.2, 'текущий забой', 'м', round(float(well_data.bottom), 1), 'ввод'],
-        [None, 1.3, 'Диаметр ЭК (ступень 1 верхняя)', 'мм', int(well_data.column_diametr._value), 'ввод'],
+        [None, 1, 'Параметры скважины', None, f'{self.dict_data_well["well_number"]._value} {self.dict_data_well["well_area"]._value}', None],
+        [None, 1.1, 'Забой скважины', 'м', round(float(self.dict_data_well["bottomhole_artificial"]._value), 1), 'формула'],
+        [None, 1.2, 'текущий забой', 'м', round(float(self.dict_data_well["bottom"]), 1), 'ввод'],
+        [None, 1.3, 'Диаметр ЭК (ступень 1 верхняя)', 'мм', int(self.dict_data_well["column_diametr"]._value), 'ввод'],
         [None, '1.3.1.', 'Толщина стенки ЭК (ступень 1 верхняя)', 'мм',
-         round(float(well_data.column_wall_thickness._value), 1), 'ввод'],
-        [None, '1.3.2.', 'Длина подвески ЭК (ступень 1 верхняя)', 'м', int(well_data.shoe_column._value), 'ввод'],
-        [None, '1.3.3.', 'Диаметр ЭК (ступень 2 хвостовик)', 'мм', int(well_data.column_additional_diametr._value),
+         round(float(self.dict_data_well["column_wall_thickness"]._value), 1), 'ввод'],
+        [None, '1.3.2.', 'Длина подвески ЭК (ступень 1 верхняя)', 'м', int(self.dict_data_well["shoe_column"]._value), 'ввод'],
+        [None, '1.3.3.', 'Диаметр ЭК (ступень 2 хвостовик)', 'мм', int(self.dict_data_well["column_additional_diametr"]._value),
          'ввод'],
         [None, '1.3.4.', 'Толщина стенки ЭК (ступень 2 хвостовик)', 'м',
-         float(well_data.column_additional_wall_thickness._value),
+         float(self.dict_data_well["column_additional_wall_thickness"]._value),
          'ввод'],
         [None, '1.3.5.', 'Длина подвески ЭК (ступень 2 хвостовик)', 'м',
-         abs(int(well_data.head_column_additional._value) - int(well_data.shoe_column_additional._value)), 'ввод'],
-        [None, '1.3.6.', 'Глубина "головы" (ступень 2 хвостовик)', 'м', int(well_data.head_column_additional._value),
+         abs(int(self.dict_data_well["head_column_additional"]._value) - int(self.dict_data_well["shoe_column_additional"]._value)), 'ввод'],
+        [None, '1.3.6.', 'Глубина "головы" (ступень 2 хвостовик)', 'м', int(self.dict_data_well["head_column_additional"]._value),
          'ввод',
          ],
-        [None, '1.3.7.', 'Глубина "башмака" (ступень 2 хвостовик)', 'м', int(well_data.shoe_column_additional._value),
+        [None, '1.3.7.', 'Глубина "башмака" (ступень 2 хвостовик)', 'м', int(self.dict_data_well["shoe_column_additional"]._value),
          'формула'],
         [None, None, None, None, None, None],
         [None, 2, 'Параметры ГНО', None, None, None, None],
@@ -117,12 +117,12 @@ def calc_h2s(ws3, h2s_pr, h2s_mg):
          'формула'],
         [None, None, None, None, None, None],
         [None, 4, 'Параметры добываемой жидкости и газа', None, None, None, None],
-        [None, 4.1, 'Газосодержание нефти', 'м3/тонну', well_data.gaz_f_pr[0], 'ввод'],
-        [None, 4.2, 'Содержание сероводорода в газе (по данным проекта разработки)', '% (об)', well_data.h2s_pr[0],
+        [None, 4.1, 'Газосодержание нефти', 'м3/тонну', self.dict_data_well["gaz_f_pr"][0], 'ввод'],
+        [None, 4.2, 'Содержание сероводорода в газе (по данным проекта разработки)', '% (об)', self.dict_data_well["h2s_pr"][0],
          'ввод'],
-        [None, 4.3, 'Обводенность продукции', '% (масс.)', well_data.proc_water, 'ввод'],
+        [None, 4.3, 'Обводенность продукции', '% (масс.)', self.dict_data_well["proc_water"], 'ввод'],
         [None, 4.4, 'Содержание сероводорода в пластовом флюиде (устьевая проба, вода+нефть)', 'мг/дм3',
-         well_data.h2s_mg[0], 'ввод'],
+         self.dict_data_well["h2s_mg"][0], 'ввод'],
         [None, 4.5, 'Плотность воды', 'г/см3', 1.17, 'ввод'],
         [None, 4.6, 'Плотность нефти', 'г/см3', 0.9, 'ввод'],
         [None, None, None, None, None, None],
@@ -199,60 +199,60 @@ def calc_h2s(ws3, h2s_pr, h2s_mg):
 
 
 def well_volume(self, current_bottom):
-    # print(well_data.column_additional)
-    if well_data.column_additional is False:
+    # print(self.dict_data_well["column_additional"])
+    if self.dict_data_well["column_additional"] is False:
 
         volume_well = 3.14 * (
-                    well_data.column_diametr._value - well_data.column_wall_thickness._value * 2) ** 2 / 4 / 1000000 * (
+                    self.dict_data_well["column_diametr"]._value - self.dict_data_well["column_wall_thickness"]._value * 2) ** 2 / 4 / 1000000 * (
                           current_bottom)
         return volume_well
     else:
 
         volume_well = (3.14 * (
-                    well_data.column_additional_diametr._value - well_data.column_wall_thickness._value * 2) ** 2 / 4 / 1000 * (
+                    self.dict_data_well["column_additional_diametr"]._value - self.dict_data_well["column_wall_thickness"]._value * 2) ** 2 / 4 / 1000 * (
                                current_bottom - float(
-                           well_data.head_column_additional._value)) / 1000) + (
+                           self.dict_data_well["head_column_additional"]._value)) / 1000) + (
                               3.14 * (
-                                  well_data.column_diametr._value - well_data.column_wall_thickness._value * 2) ** 2 / 4 / 1000 * (
-                                  float(well_data.head_column_additional._value)) / 1000)
+                                  self.dict_data_well["column_diametr"]._value - self.dict_data_well["column_wall_thickness"]._value * 2) ** 2 / 4 / 1000 * (
+                                  float(self.dict_data_well["head_column_additional"]._value)) / 1000)
         return volume_well
 
 
 def calv_h2s(self, cat_H2S, h2s_mg, h2s_pr):
     if '2' in str(cat_H2S) or '1' in str(cat_H2S):
-        nkt_l = sum(list(well_data.dict_nkt.values()))
+        nkt_l = sum(list(self.dict_data_well["dict_nkt"].values()))
         # Внутренний объем ЭК на 1 п.м.
         udel_vnutr_v = round(10 * 3.14 * (
-                    (well_data.column_diametr._value - well_data.column_wall_thickness._value * 2) * 0.01) ** 2 / 4, 2)
+                    (self.dict_data_well["column_diametr"]._value - self.dict_data_well["column_wall_thickness"]._value * 2) * 0.01) ** 2 / 4, 2)
 
-        if well_data.column_additional:
-            udel_vn_khv = round(10 * 3.14 * ((well_data.column_additional_diametr._value -
-                                         well_data.column_additional_wall_thickness._value * 2) * 0.01) ** 2 / 4, 2)
+        if self.dict_data_well["column_additional"]:
+            udel_vn_khv = round(10 * 3.14 * ((self.dict_data_well["column_additional_diametr"]._value -
+                                         self.dict_data_well["column_additional_wall_thickness"]._value * 2) * 0.01) ** 2 / 4, 2)
 
-        if well_data.column_additional is False:
+        if self.dict_data_well["column_additional"] is False:
 
-            v_pod_gno = round(3.14 * (int(well_data.column_diametr._value) - int(
-                well_data.column_wall_thickness._value) * 2) ** 2 / 4 / 1000 * (
-                                    well_data.current_bottom - int(nkt_l)) / 1000, 2)
-        elif nkt_l > float(well_data.head_column_additional._value):
+            v_pod_gno = round(3.14 * (int(self.dict_data_well["column_diametr"]._value) - int(
+                self.dict_data_well["column_wall_thickness"]._value) * 2) ** 2 / 4 / 1000 * (
+                                    self.dict_data_well["current_bottom"] - int(nkt_l)) / 1000, 2)
+        elif nkt_l > float(self.dict_data_well["head_column_additional"]._value):
             v_pod_gno = round(3.14 * (
-                        well_data.column_diametr._value - well_data.column_wall_thickness._value * 2) ** 2 / 4 / 1000 * (
-                                    float(well_data.head_column_additional._value) - nkt_l) / 1000 + 3.14 * (
-                                    well_data.column_additional_diametr._value - well_data.column_additional_wall_thickness._value * 2) ** 2 / 4 / 1000 * (
-                                    well_data.current_bottom - float(
-                                well_data.head_column_additional._value)) / 1000, 2)
-        elif nkt_l <= float(well_data.head_column_additional._value):
+                        self.dict_data_well["column_diametr"]._value - self.dict_data_well["column_wall_thickness"]._value * 2) ** 2 / 4 / 1000 * (
+                                    float(self.dict_data_well["head_column_additional"]._value) - nkt_l) / 1000 + 3.14 * (
+                                    self.dict_data_well["column_additional_diametr"]._value - self.dict_data_well["column_additional_wall_thickness"]._value * 2) ** 2 / 4 / 1000 * (
+                                    self.dict_data_well["current_bottom"] - float(
+                                self.dict_data_well["head_column_additional"]._value)) / 1000, 2)
+        elif nkt_l <= float(self.dict_data_well["head_column_additional"]._value):
             v_pod_gno = round(3.14 * (
-                        well_data.column_additional_diametr._value - well_data.column_additional_wall_thickness._value * 2) ** 2 / 4 / 1000 * (
-                            well_data.current_bottom - nkt_l) / 1000,2)
+                        self.dict_data_well["column_additional_diametr"]._value - self.dict_data_well["column_additional_wall_thickness"]._value * 2) ** 2 / 4 / 1000 * (
+                            self.dict_data_well["current_bottom"] - nkt_l) / 1000,2)
         udel_vodoiz_nkt = 0
-        volume_well = well_volume(self, well_data.current_bottom)
-        aaa = well_data.dict_nkt
+        volume_well = well_volume(self, self.dict_data_well["current_bottom"])
+        aaa = self.dict_data_well["dict_nkt"]
 
         vodoiz_nkt = 0
 
 
-        for nkt_key, nkt_values in well_data.dict_nkt.items():
+        for nkt_key, nkt_values in self.dict_data_well["dict_nkt"].items():
             if '73' in nkt_key:
                 nkt_1 = 73
                 nkt_width = 5.5
@@ -274,7 +274,7 @@ def calv_h2s(self, cat_H2S, h2s_mg, h2s_pr):
         sucker_rod_l_22 = 0
         sucker_rod_l_19 = 0
 
-        for sucker_key, sucker_value in well_data.dict_sucker_rod.items():
+        for sucker_key, sucker_value in self.dict_data_well["dict_sucker_rod"].items():
             if '25' in sucker_key:
                 sucker_rod_l_25 =  sucker_value
             elif '22' in sucker_key:
@@ -286,21 +286,21 @@ def calv_h2s(self, cat_H2S, h2s_mg, h2s_pr):
         vodoiz_sucker = (10 * 3.14 * ((25 * 0.01) ** 2 / 4) * sucker_rod_l_25 / 1000) + (
                     10 * 3.14 * ((25 * 0.01) ** 2 / 4) * sucker_rod_l_22 / 1000) + (
                                     10 * 3.14 * ((25 * 0.01) ** 2 / 4) * sucker_rod_l_19 / 1000)
-        aaaa= well_data.proc_water
-        oil_mass = round(float(udel_vodoiz_nkt * (100 - well_data.proc_water) * 0.9 / 100),2)
-        # print(f'oil {oil_mass}-{type(oil_mass)} , {well_data.gaz_f_pr[0]}-{type(well_data.gaz_f_pr[0])}')
+        aaaa= self.dict_data_well["proc_water"]
+        oil_mass = round(float(udel_vodoiz_nkt * (100 - self.dict_data_well["proc_water"]) * 0.9 / 100),2)
+        # print(f'oil {oil_mass}-{type(oil_mass)} , {self.dict_data_well["gaz_f_pr"][0]}-{type(self.dict_data_well["gaz_f_pr"][0])}')
         try:
-            volume_h2s = well_data.gaz_f_pr[0] * oil_mass * (float(h2s_pr)) / 100
+            volume_h2s = self.dict_data_well["gaz_f_pr"][0] * oil_mass * (float(h2s_pr)) / 100
         except:
-            well_data.gaz_f_pr = [11]
-            volume_h2s = well_data.gaz_f_pr[0] * oil_mass * (float(h2s_pr)) / 100
+            self.dict_data_well["gaz_f_pr"] = [11]
+            volume_h2s = self.dict_data_well["gaz_f_pr"][0] * oil_mass * (float(h2s_pr)) / 100
 
         h2s_mass_in_oil = round(34 * volume_h2s * 1000 / 22.14, 0)
         # print(type(vodoiz_sucker), type(vodoiz_nkt), h2s_mg, float(h2s_mg))
         h2s_mass_in_water = round(float(vodoiz_sucker + vodoiz_nkt) * h2s_mg, 0)
         # print(f'h2a{h2s_mass_in_water}')2
-        mass_oil_pog_gno = v_pod_gno * (100 - well_data.proc_water) * 0.9 / 100
-        h2s_volume_pod_gno = mass_oil_pog_gno * well_data.gaz_f_pr[0] * h2s_pr / 100
+        mass_oil_pog_gno = v_pod_gno * (100 - self.dict_data_well["proc_water"]) * 0.9 / 100
+        h2s_volume_pod_gno = mass_oil_pog_gno * self.dict_data_well["gaz_f_pr"][0] * h2s_pr / 100
         mass_h2s_gas = round(34 * h2s_volume_pod_gno * 1000/ 22.14, 0)
         mass_h2s_water = round(v_pod_gno * h2s_mg, 0)
         # print(f'mass{mass_h2s_water}')

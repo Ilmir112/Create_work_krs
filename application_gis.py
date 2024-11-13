@@ -8,9 +8,10 @@ from PyQt5.QtWidgets import QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, 
     QMessageBox, QApplication, QTableWidget, QTableWidgetItem, QVBoxLayout, QHeaderView
 
 from main import  MyMainWindow
+from work_py.parent_work import TabPageUnion, TabWidgetUnion
 
 
-class TabPage_SO_pvr(QWidget):
+class TabPageSoPvr(TabPageUnion):
 
     def __init__(self, parent=None):
         super().__init__()
@@ -19,7 +20,7 @@ class TabPage_SO_pvr(QWidget):
 
         self.number_brigada_label = QLabel('Номер бригады', self)
         self.number_brigada_combo = QComboBox(self)
-        brigada_list = list(well_data.dict_telephon.keys())
+        brigada_list = list(DICT_TELEPHONE.keys())
         self.number_brigada_combo.addItems(brigada_list)
 
         self.number_telephone_label = QLabel('номер телефона, self')
@@ -27,7 +28,7 @@ class TabPage_SO_pvr(QWidget):
 
         self.date_new_label = QLabel('Дата заявки', self)
         self.date_new_edit = QLineEdit(self)
-        self.date_new_edit.setText(f'{well_data.current_date}')
+        self.date_new_edit.setText(f'{current_date}')
 
         self.time_new_label = QLabel('Время заявки', self)
         self.time_new_edit = QLineEdit(self)
@@ -38,8 +39,8 @@ class TabPage_SO_pvr(QWidget):
 
         self.nkt_label = QLabel("Внешний диаметр НКТ:", self)
         self.nkt_edit = QLineEdit(self)
-        if well_data.column_additional is False and well_data.column_diametr._value > 110 or \
-                (well_data.column_additional and well_data.column_additional_diametr._value > 110):
+        if self.dict_data_well["column_additional"] is False and self.dict_data_well["column_diametr"]._value > 110 or \
+                (self.dict_data_well["column_additional"] and self.dict_data_well["column_additional_diametr"]._value > 110):
             self.nkt_edit.setText('73')
         else:
             self.nkt_edit.setText('60')
@@ -124,19 +125,19 @@ class TabPage_SO_pvr(QWidget):
         self.number_brigada_combo.currentTextChanged.connect(self.update_brigade)
 
     def update_brigade(self, index):
-        self.number_telephone_edit.setText(str(well_data.dict_telephon[self.number_brigada_combo.currentText()]))
+        self.number_telephone_edit.setText(str(DICT_TELEPHONE[self.number_brigada_combo.currentText()]))
     def geophygist_data(self):
 
         if self.ComboBoxGeophygist.currentText() in ['Гироскоп', 'АКЦ', 'ЭМДС', 'ПТС', 'РК', 'ГК и ЛМ']:
             self.lineedit_type.setText('0')
-            self.lineedit_type2.setText(f'{well_data.current_bottom}')
+            self.lineedit_type2.setText(f'{self.dict_data_well["current_bottom"]}')
 
-class TabWidget(QTabWidget):
-    def __init__(self):
+class TabWidget(TabWidgetUnion):
+    def __init__(self, parent=None):
         super().__init__()
-        self.addTab(TabPage_SO_pvr(self), 'Заявка на ГИС')
+        self.addTab(TabPageSoPvr(parent), 'Заявка на ГИС')
 
-class GisApplication( MyMainWindow):
+class GisApplication(MyMainWindow):
 
     def __init__(self, table_pvr, parent=None):
         super( MyMainWindow, self).__init__()
@@ -177,11 +178,11 @@ class GisApplication( MyMainWindow):
 
     def addPerfProject(self):
 
-        if len(well_data.gis_list) == 0:
+        if len(self.dict_data_well["gis_list"]) == 0:
             QMessageBox.warning(self, 'Ошибка', 'Исследования в плане работ не найдены')
             return
 
-        for pvr in well_data.gis_list:
+        for pvr in self.dict_data_well["gis_list"]:
             rows = self.tableWidget.rowCount()
             try:
                 type_gis = self.geophysic_sel(pvr)
@@ -207,7 +208,7 @@ class GisApplication( MyMainWindow):
         if not edit_type or not edit_type2 or not researchGis:
             QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
             return
-        if well_data.current_bottom < float(edit_type2):
+        if self.dict_data_well["current_bottom"] < float(edit_type2):
             QMessageBox.information(self, 'Внимание', 'глубина исследований ниже текущего забоя')
             return
 
@@ -301,7 +302,7 @@ class GisApplication( MyMainWindow):
     def add_work(self):
         from main import  MyMainWindow
 
-        wb = openpyxl.load_workbook(f'{well_data.path_image}property_excel/template_gis.xlsx')
+        wb = openpyxl.load_workbook(f'{path_image}property_excel/template_gis.xlsx')
 
         # Выбираем активный лист
         self.ws_pvr = wb.active
@@ -380,20 +381,20 @@ class GisApplication( MyMainWindow):
 
         #  MyMainWindow.copy_pz(self, self.ws_pvr, self.table_pvr, 'application_pvr', 42)
 
-        well_data.pause = False
+        pause = False
         self.close()
-        well_data.gis_list = []
-        well_data.pvr_row = []
+        self.dict_data_well["gis_list"] = []
+        self.dict_data_well["pvr_row"] = []
         self.ws_pvr.print_area = f'B1:AP{85}'
 
-        filenames = f'{well_data.well_number._value} {well_data.well_area._value} ГИС {well_data.current_date}.xlsx'
+        filenames = f'{self.dict_data_well["well_number"]._value} {self.dict_data_well["well_area"]._value} ГИС {well_data.current_date}.xlsx'
         path = 'D:\Documents\Desktop\ГТМ\заявки ГИС'
         full_path = path + "/" + filenames
         if wb:
             wb.close()
             self.save_file_dialog(wb, full_path)
             # wb2.save(full_path)
-            print(f"Table data saved to Excel {full_path} {well_data.number_dp}")
+            print(f'Table data saved to Excel {full_path}')
         if wb:
             wb.close()
 
@@ -409,18 +410,18 @@ class GisApplication( MyMainWindow):
                             nkt_edit, nkt_shoe_edit,
                             nkt_com_edit, paker_type, paker_depth, fluid, note_to_gis):
 
-        column_data = f'{well_data.column_diametr._value}мм x {well_data.column_wall_thickness._value} в инт ' \
-                      f'0-{well_data.shoe_column._value}м'
-        if well_data.column_additional:
-            column_data_add = f'{well_data.column_additional_diametr._value}мм x ' \
-                              f'{well_data.column_additional_wall_thickness._value} в инт ' \
-                          f'{well_data.head_column_additional._value}-{well_data.shoe_column_additional._value}м'
+        column_data = f'{self.dict_data_well["column_diametr"]._value}мм x {self.dict_data_well["column_wall_thickness"]._value} в инт ' \
+                      f'0-{self.dict_data_well["shoe_column"]._value}м'
+        if self.dict_data_well["column_additional"]:
+            column_data_add = f'{self.dict_data_well["column_additional_diametr"]._value}мм x ' \
+                              f'{self.dict_data_well["column_additional_wall_thickness"]._value} в инт ' \
+                          f'{self.dict_data_well["head_column_additional"]._value}-{self.dict_data_well["shoe_column_additional"]._value}м'
         else:
             column_data_add = ''
-        pressuar = well_data.dict_category[list(well_data.dict_category.keys())[0]]['по давлению'].data_pressuar
+        pressuar = self.dict_data_well["dict_category"][list(self.dict_data_well["dict_category"].keys())[0]]['по давлению'].data_pressuar
 
-        conductor = f'{well_data.column_conductor_diametr._value}мм x {well_data.column_conductor_wall_thickness._value} в инт ' \
-                      f'0-{well_data.column_conductor_lenght._value}м'
+        conductor = f'{self.dict_data_well["column_conductor_diametr"]._value}мм x {self.dict_data_well["column_conductor_wall_thickness"]._value} в инт ' \
+                      f'0-{self.dict_data_well["column_conductor_lenght"]._value}м'
         if nkt_edit != '':
             nkt_edit_vn = float(nkt_edit) - 2 * 5.5
         else:
@@ -442,17 +443,17 @@ class GisApplication( MyMainWindow):
              None, None, 'по договору №', None, None, None, None, None, 'ГТМ', None, None, None, None, None, None, None,
              None, None, None, None, None, None, None, None, None],
             [None, 'Заказчик', None, None, None, f'{well_data.contractor}', None, None, None, None, None, None, None, None, None,
-             None, None, None, None, 'Цех', None, None, well_data.cdng._value, None, None, None, None, None, None, None, None,
+             None, None, None, None, 'Цех', None, None, self.dict_data_well["cdng"]._value, None, None, None, None, None, None, None, None,
              None, None, None, None, None, None, None, None, None, None],
             [None, 'Уполномоченный представитель', None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None, None, None, None, None, None],
-            [None, '№ скважины', None, None, None, None, well_data.well_number._value, None, None, None, None, None,
+            [None, '№ скважины', None, None, None, None, self.dict_data_well["well_number"]._value, None, None, None, None, None,
              None, 'куст', None, None,
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None, None, None],
-            [None, 'Регион', None, None, None, well_data.region, None, None, None, None, None, None, None, 'Месторождение', None,
-             None, None, None, None, well_data.well_area._value, None, None, None, None, None, None, None, None, None, None, None, None, None,
+            [None, 'Регион', None, None, None, self.dict_data_well["region"], None, None, None, None, None, None, None, 'Месторождение', None,
+             None, None, None, None, self.dict_data_well["well_area"]._value, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None, None, None, None],
             [None, 'Дата', None, None, date_new_edit, None, None, None, None, None, 'Время',
              None, None, time_new_edit, None, None, None, None, None, None, None, None, None, None, None,
@@ -501,21 +502,21 @@ class GisApplication( MyMainWindow):
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None, None, None, None, None, None],
             [None, 'Категория скважины по ГНВП', None, None, None, None, None, None, None, None, None, 'Рпл:', None,
-             well_data.category_pressuar,
-             None, None, None, None, None, 'H2S:', None, well_data.category_h2s, None, None, None, None, None, None,
+             self.dict_data_well["category_pressuar"],
+             None, None, None, None, None, 'H2S:', None, self.dict_data_well["category_h2s"], None, None, None, None, None, None,
              'Газовый фактор:', None,
-             None, None, None, None, None,  well_data.category_gf, None,  None, None, None, None],
-            [None, 'Пробуренный забой', None, None, None, None, None, None, well_data.bottomhole_drill._value, None,
+             None, None, None, None, None,  self.dict_data_well["category_gf"], None,  None, None, None, None],
+            [None, 'Пробуренный забой', None, None, None, None, None, None, self.dict_data_well["bottomhole_drill"]._value, None,
              None, None, None, 'м.', None,
-             'Искусственный забой', None, None, None, None, None, None, None, well_data.bottomhole_artificial._value,
+             'Искусственный забой', None, None, None, None, None, None, None, self.dict_data_well["bottomhole_artificial"]._value,
              None, None, 'м.', None,
-             'Текущий забой', None, None, None, None, None, well_data.current_bottom, None,  None, None, 'м.', None, None],
-            [None, 'Максимальный угол', None, None, None, None, None, None, well_data.max_angle._value, None, None,
+             'Текущий забой', None, None, None, None, None, self.dict_data_well["current_bottom"], None,  None, None, 'м.', None, None],
+            [None, 'Максимальный угол', None, None, None, None, None, None, self.dict_data_well["max_angle"]._value, None, None,
              None, None, None, None,
-             'гр.', None, 'на глубине', None, None, None, well_data.max_angle_H._value, None, None, None, None, 'м.',
+             'гр.', None, 'на глубине', None, None, None, self.dict_data_well["max_angle_H"]._value, None, None, None, None, 'м.',
              None, None, None, None,
              None, None, None, None, None, None, None, None, None, None],
-            [None, 'Расстояние муфта-ротор', None, None, None, None, None, None, None, None, well_data.stol_rotora._value, None, None, None,
+            [None, 'Расстояние муфта-ротор', None, None, None, None, None, None, None, None, self.dict_data_well["stol_rotora"]._value, None, None, None,
              'м.', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None, None, None, None, None],
             [None, 'Кондуктор: глубина спуска, м.', None, None, None, None, None, None, None, None, None,
@@ -531,7 +532,7 @@ class GisApplication( MyMainWindow):
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              'Окно врезки, м.', None, None, None, None, None, None, None, None, None, None, None, None],
             [None, 'Высота подъема цемента за колонной, м.', None, None, None, None, None, None, None, None, None, None,
-             None, None, None, well_data.level_cement_column._value, None, None, None, None, None, None, None, None, None, None, None, None, None,
+             None, None, None, self.dict_data_well["level_cement_column"]._value, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None, None, None, None, None, None, None, None],
             [None, 'Толщина стенки труб последней колонны, мм', None, None, None, None, None, None, None, None, None,
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
@@ -552,12 +553,12 @@ class GisApplication( MyMainWindow):
             [None, 'Пусковые муфты', None, None, None, None, None, None, None, 'муфты', None, None, None, None, None,
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None, None, None, None],
-            [None, 'Расстояние муфта-ротор, м.', None, None, None, None, None, None, None, None, None, well_data.stol_rotora._value, None, None,
+            [None, 'Расстояние муфта-ротор, м.', None, None, None, None, None, None, None, None, None, self.dict_data_well["stol_rotora"]._value, None, None,
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None, None, None, None, None],
             [None, 'Скважина заполнена:', None, None, None, None, None, None, None, 'Тип:', None, None, 'тех.вода ',
              None, None, None, None, None, None, None, None, None, None, None, None, 'Уровень, м.', None, None, None,
-              None, well_data.static_level._value, None,  None, None, None, None, None, None, None, None, None],
+              None, self.dict_data_well["static_level"]._value, None,  None, None, None, None, None, None, None, None, None],
             [None, 'Плотность, г/см3', None, None, None, None, None, fluid, None, None, None, None, 'Вязкость, сек.',
              None, None, None, None, None, None, None, None, None, None, None, 'УЭС, Омм', None, None, None, None, None,
              None, None, None, None, None, None, None, None, None, None, None],
@@ -663,7 +664,7 @@ class GisApplication( MyMainWindow):
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None],
             [None, 'Максимально ожидаемое давление на устье скважины', None, None, None, None, None, None, None, None,
-             None, None, None, None, None, None, None, None, None, well_data.max_admissible_pressure._value, None,
+             None, None, None, None, None, None, None, None, None, self.dict_data_well["max_admissible_pressure"]._value, None,
              None, None, None, None, None, 'атм.', None,
              None, None, None, None, None, None, None, None, None, None, None, None, None],
             [None, 'Расстояние до скважины', None, None, None, None, None, None, None, None, None, None, None, None,
@@ -682,7 +683,7 @@ class GisApplication( MyMainWindow):
             [None, 'Заявку подал:', None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None, None, None, None, None, None, 'телефон', None, None, None, None, None, None,
              None, None, None, None, None, None, None, None],
-            [None, f'{well_data.user[0]} {well_data.user[1]}', None, None, None, None, None, None, None, None, None,
+            [None, f'{user[0]} {user[1]}', None, None, None, None, None, None, None, None, None,
              None, None, None, None, None, None, None,
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None],
@@ -719,9 +720,9 @@ class GisApplication( MyMainWindow):
              'примечание', None, None, None, None, None, None, None, None, None, None]]
 
 
-        for plast in well_data.plast_all:
-            for interval in well_data.dict_perforation[plast]['интервал']:
-                if well_data.dict_perforation[plast]['отключение']:
+        for plast in self.dict_data_well["plast_all"]:
+            for interval in self.dict_data_well["dict_perforation"][plast]['интервал']:
+                if self.dict_data_well["dict_perforation"][plast]['отключение']:
                     izol = 'Изолирован'
                 else:
                     izol = 'рабочий'

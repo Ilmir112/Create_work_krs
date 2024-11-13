@@ -8,7 +8,7 @@ def rgd_without_paker(self):
     rgd_list = [
         [f'СП НКТ 300м', None,
          f'Спустить с замером воронку на НКТ до глубины 300м с замером, шаблонированием шаблоном '
-         f'{well_data.nkt_template}мм . '
+         f'{self.dict_data_well["nkt_template"]}мм . '
          f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
          None, None, None, None, None, None, None,
          'мастер КРС', 1.3],
@@ -17,16 +17,16 @@ def rgd_without_paker(self):
          f'{well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г '
          f'Обвязать устье скважины с ЕДК на жесткую линию. Опрессовать ПВО максимально допустимое давление '
          f'опрессовки э/колонны на '
-         f'устье {well_data.max_admissible_pressure._value}атм, по невозможности на давление поглощения, но не'
+         f'устье {self.dict_data_well["max_admissible_pressure"]._value}атм, по невозможности на давление поглощения, но не'
          f' менее 30атм '
          f'в течении 30мин Провести практическое обучение вахт по сигналу "выброс" с записью в журнале проведения '
          f'учебных тревог',
          None, None, None, None, None, None, None,
          'мастер КРС', 0.75],
-        [''.join(['ОВТР 10ч' if well_data.region != 'ЧГМ' else 'ОВТР 4ч']), None,
-         ''.join(['ОВТР 10ч' if well_data.region != 'ЧГМ' else 'ОВТР 4ч']),
+        [''.join(['ОВТР 10ч' if self.dict_data_well["region"] != 'ЧГМ' else 'ОВТР 4ч']), None,
+         ''.join(['ОВТР 10ч' if self.dict_data_well["region"] != 'ЧГМ' else 'ОВТР 4ч']),
          None, None, None, None, None, None, None,
-         'мастер КРС', ''.join(['10' if well_data.region != 'ЧГМ' else '4'])],
+         'мастер КРС', ''.join(['10' if self.dict_data_well["region"] != 'ЧГМ' else '4'])],
         [None, None,
          f'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС {well_data.contractor}". Составить'
          f' акт готовности скважины и передать его начальнику партии. При необходимости подготовить площадку'
@@ -53,13 +53,13 @@ def rgd_without_paker(self):
                          'Мастер КРС, подрядчик по ГИС', 8])
         rgd_list.append([None, None,
                          f'Поднять компоновку с доливом скважины в объеме 0.3м3 тех. жидкостью  уд.весом'
-                         f' {well_data.fluid_work}',
+                         f' {self.dict_data_well["fluid_work"]}',
                          None, None, None, None, None, None, None,
                          'Мастер КРС', 1.3])
     else:
         rgd_list.append([None, None,
                          f'Поднять компоновку с доливом скважины в объеме 0.3м3 тех. жидкостью  уд.весом '
-                         f'{well_data.fluid_work}',
+                         f'{self.dict_data_well["fluid_work"]}',
                          None, None, None, None, None, None, None,
                          'Мастер КРС', 1.3])
     return rgd_list
@@ -67,10 +67,10 @@ def rgd_without_paker(self):
 
 def rgd_with_paker(self):
     work_list = [
-        [''.join(['ОВТР 10ч' if well_data.region != 'ЧГМ' else 'ОВТР 4ч']),
-         None, ''.join(['ОВТР 10ч' if well_data.region != 'ЧГМ' else 'ОВТР 4ч']),
+        [''.join(['ОВТР 10ч' if self.dict_data_well["region"] != 'ЧГМ' else 'ОВТР 4ч']),
+         None, ''.join(['ОВТР 10ч' if self.dict_data_well["region"] != 'ЧГМ' else 'ОВТР 4ч']),
          None, None, None, None, None, None, None,
-         'мастер КРС', ''.join(['10' if well_data.region != 'ЧГМ' else '4'])],
+         'мастер КРС', ''.join(['10' if self.dict_data_well["region"] != 'ЧГМ' else '4'])],
         [None, None,
          f'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС {well_data.contractor}". '
          f'Составить'

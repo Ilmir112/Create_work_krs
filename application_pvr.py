@@ -14,10 +14,11 @@ from plan import copy_true_ws
 import well_data
 import sys
 
+from work_py.parent_work import TabPageUnion, TabWidgetUnion, WindowUnion
 from work_py.perforation import PerforationWindow
 
 
-class TabPage_SO_pvr(QWidget):
+class TabPageSoPvr(TabPageUnion):
 
     def __init__(self, parent=None):
         super().__init__()
@@ -26,7 +27,7 @@ class TabPage_SO_pvr(QWidget):
 
         self.number_brigada_label = QLabel('Номер бригады', self)
         self.number_brigada_combo = QComboBox(self)
-        brigada_list = well_data.dict_telephon
+        brigada_list = well_data.DICT_TELEPHONE
         self.number_brigada_combo.addItems(list(brigada_list.keys()))
 
 
@@ -151,16 +152,16 @@ class TabPage_SO_pvr(QWidget):
         self.number_brigada_combo.currentTextChanged.connect(self.update_brigade)
 
     def update_brigade(self, index):
-        self.number_telephone_edit.setText(str(well_data.dict_telephon[self.number_brigada_combo.currentText()]))
+        self.number_telephone_edit.setText(str(well_data.DICT_TELEPHONE[self.number_brigada_combo.currentText()]))
 
 
-class TabWidget(QTabWidget):
+class TabWidget(TabWidgetUnion):
     def __init__(self):
         super().__init__()
-        self.addTab(TabPage_SO_pvr(self), 'Заявка на ПВР')
+        self.addTab(TabPageSoPvr(self), 'Заявка на ПВР')
 
 
-class PvrApplication(MyMainWindow):
+class PvrApplication(WindowUnion):
     def __init__(self, table_pvr, parent=None):
         super().__init__()
         layout = QVBoxLayout()
@@ -203,12 +204,12 @@ class PvrApplication(MyMainWindow):
 
     def addPerfProject(self):
 
-        if len(well_data.pvr_row) == 0:
+        if len(self.dict_data_well["pvr_row"]) == 0:
 
             QMessageBox.warning(self, 'Ошибка', 'Перфорация в плане работ не найдены')
             return
         rows = self.tableWidget.rowCount()
-        for pvr in well_data.pvr_row:
+        for pvr in self.dict_data_well["pvr_row"]:
             self.tableWidget.insertRow(rows)
             self.tableWidget.setItem(rows, 0, QTableWidgetItem(str(pvr[0])))
             self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(pvr[2])))
@@ -229,7 +230,7 @@ class PvrApplication(MyMainWindow):
         if not edit_type or not edit_type2 or not chargesx or not editIndexFormation:
             QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
             return
-        if float(edit_type2.replace(',', '.')) >= float(well_data.current_bottom):
+        if float(edit_type2.replace(',', '.')) >= float(self.dict_data_well["current_bottom"]):
             QMessageBox.information(self, 'Внимание', 'Подошва интервала перфорации ниже текущего забоя')
             return
 
@@ -319,17 +320,17 @@ class PvrApplication(MyMainWindow):
         self.close()
         self.ws_pvr.print_area = f'B1:AP{114}'
 
-        filenames = f'{well_data.well_number._value} {well_data.well_area._value} ПВР {well_data.current_date}.xlsx'
+        filenames = f'{self.dict_data_well["well_number"]._value} {self.dict_data_well["well_area"]._value} ПВР {well_data.current_date}.xlsx'
         path = 'D:\Documents\Desktop\ГТМ\заявки ГИС'
         full_path = path + "/" + filenames
         if wb:
             wb.close()
             self.save_file_dialog(wb, full_path)
             # wb2.save(full_path)
-            print(f"Table data saved to Excel {full_path} {well_data.number_dp}")
+            print(f'Table data saved to Excel {full_path}')
         if wb:
             wb.close()
-        well_data.pvr_row = []
+        self.dict_data_well["pvr_row"] = []
 
     def del_row_table(self):
         row = self.tableWidget.currentRow()
@@ -342,15 +343,15 @@ class PvrApplication(MyMainWindow):
     def application_pvr_def(self, number_brigada, number_telephone, date_new_edit, time_new_edit, work_edit, nkt_edit, nkt_shoe_edit,
                             nkt_com_edit, paker_type, paker_depth, fluid):
 
-        column_data = f'{well_data.column_diametr._value}мм x {well_data.column_wall_thickness._value} в инт ' \
-                      f'0-{well_data.shoe_column._value}м'
-        if well_data.column_additional:
-            column_data_add = f'{well_data.column_additional_diametr._value}мм x ' \
-                              f'{well_data.column_additional_wall_thickness._value} в инт ' \
-                          f'{well_data.head_column_additional._value}-{well_data.shoe_column_additional._value}м'
+        column_data = f'{self.dict_data_well["column_diametr"]._value}мм x {self.dict_data_well["column_wall_thickness"]._value} в инт ' \
+                      f'0-{self.dict_data_well["shoe_column"]._value}м'
+        if self.dict_data_well["column_additional"]:
+            column_data_add = f'{self.dict_data_well["column_additional_diametr"]._value}мм x ' \
+                              f'{self.dict_data_well["column_additional_wall_thickness"]._value} в инт ' \
+                          f'{self.dict_data_well["head_column_additional"]._value}-{self.dict_data_well["shoe_column_additional"]._value}м'
         else:
             column_data_add = ''
-        pressuar = well_data.dict_category[list(well_data.dict_category.keys())[0]]['по давлению'].data_pressuar
+        pressuar = self.dict_data_well["dict_category"][list(self.dict_data_well["dict_category"].keys())[0]]['по давлению'].data_pressuar
 
         value_list = [
             ['З А Я В К А', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
@@ -382,7 +383,7 @@ class PvrApplication(MyMainWindow):
              None, None, None, None, None, None, None, None, None],
             [None, 'Заказчик', None, None, None, f'{well_data.contractor}', None, None, None, None, None, None, None, None, None,
              None,
-             None, None, None, 'Цех', None, None, well_data.cdng._value, None, None, None, None, None, None, None, None,
+             None, None, None, 'Цех', None, None, self.dict_data_well["cdng"]._value, None, None, None, None, None, None, None, None,
              None,
              None,
              None, None, None, None, None, None, None, None, None, None],
@@ -391,14 +392,14 @@ class PvrApplication(MyMainWindow):
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None,
              None, None, None, None, None, None, None, None, None],
-            [None, '№ скважины', None, None, None, None, well_data.well_number._value, None, None, None, None, None, None,
+            [None, '№ скважины', None, None, None, None, self.dict_data_well["well_number"]._value, None, None, None, None, None, None,
              'куст', None,
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None,
              None, None, None, None, None, None, None, None, None],
-            [None, 'Регион', None, None, None, well_data.region, None, None, None, None, None, None, None,
+            [None, 'Регион', None, None, None, self.dict_data_well["region"], None, None, None, None, None, None, None,
              'Месторождение',
-             None, None, None, None, None, well_data.well_area._value, None, None, None, None, None, None, None, None, None,
+             None, None, None, None, None, self.dict_data_well["well_area"]._value, None, None, None, None, None, None, None, None, None,
              None,
              None,
              None, None, None, None, None, None, None, None, None, None, None, None],
@@ -511,21 +512,21 @@ class PvrApplication(MyMainWindow):
              None,
              None, None, None, None, None, None, None, None, None, None],
             [None, 'Категория скважины по ГНВП', None, None, None, None, None, None, None, None, None, 'Рпл:', None,
-             well_data.category_pressuar,
-             None, None, None, None, None, 'H2S:', None, well_data.category_h2s, None, None, None, None, None, None,
+             self.dict_data_well["category_pressuar"],
+             None, None, None, None, None, 'H2S:', None, self.dict_data_well["category_h2s"], None, None, None, None, None, None,
              'Газовый фактор:',
-             None, None, None, None, None, None,well_data.category_gf, None, None, None, None, None, None, None],
-            [None, 'Пробуренный забой', None, None, None, None, None, None, well_data.bottomhole_drill._value, None, None, None,
+             None, None, None, None, None, None,self.dict_data_well["category_gf"], None, None, None, None, None, None, None],
+            [None, 'Пробуренный забой', None, None, None, None, None, None, self.dict_data_well["bottomhole_drill"]._value, None, None, None,
              None,
-             'м.', None, 'Искусственный забой', None, None, None, None, None, None, None, well_data.bottomhole_artificial._value, None,
+             'м.', None, 'Искусственный забой', None, None, None, None, None, None, None, self.dict_data_well["bottomhole_artificial"]._value, None,
              None,
-             'м.', None, 'Текущий забой', None, None, None, None, None, well_data.current_bottom, None, None, None, 'м.',
+             'м.', None, 'Текущий забой', None, None, None, None, None, self.dict_data_well["current_bottom"], None, None, None, 'м.',
              None,
              None, None, None],
-            [None, 'Максимальный угол', None, None, None, None, None, None, well_data.max_angle._value, None, None, None, None,
-             None, None, 'гр.', None, 'на глубине', None, None, None, well_data.max_angle_H._value, None, None, None, None, 'м.',
+            [None, 'Максимальный угол', None, None, None, None, None, None, self.dict_data_well["max_angle"]._value, None, None, None, None,
+             None, None, 'гр.', None, 'на глубине', None, None, None, self.dict_data_well["max_angle_H"]._value, None, None, None, None, 'м.',
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
-            [None, 'Расстояние муфта-ротор', None, None, None, None, None, None, None, None, well_data.stol_rotora._value, None,
+            [None, 'Расстояние муфта-ротор', None, None, None, None, None, None, None, None, self.dict_data_well["stol_rotora"]._value, None,
              None, None, 'м.', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None, None, None, None, None, None, None, None, None],
             [None, 'диаметр обсадной колонны, мм.', None, None, None, None, None, None, None, None, None, None, None,
@@ -555,16 +556,16 @@ class PvrApplication(MyMainWindow):
              None,
              None, None, None, None, None, 'Высота подъема цемента за колонной, м.', None, None, None, None, None, None,
              None,
-             None, None, None, None, None, None, well_data.level_cement_column._value, None, None, None, None, None, None, None, None],
+             None, None, None, None, None, None, self.dict_data_well["level_cement_column"]._value, None, None, None, None, None, None, None, None],
             [None, 'Устьевое оборудование скважины', None, None, None, None, None, None, None, None, None, None, None,
-             f'ПШП-{well_data.column_diametr._value}',
+             f'ПШП-{self.dict_data_well["column_diametr"]._value}',
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None,
              None, None, None, None, None, None, None, None, None, None],
             [None, 'Скважина заполнена:', None, None, None, None, None, None, None, 'Тип:', None, 'тех.вода ', None,
              None, None,
              None, None, None, None, None, None, None, None, None, 'Уровень, м', None, None, None,
-             well_data.static_level._value, None, None,
+             self.dict_data_well["static_level"]._value, None, None,
              None, None, None, None, None, None, None, None, None, None, None, None],
             [None, 'Плотность, г./см3', None, None, None, None, None, fluid, None, None, None, None, None,
              'Вязкость, сек.', None, None, None, None, None, None, None, None, None, None, None, 'УЭС, Омм', None, None,
@@ -579,7 +580,7 @@ class PvrApplication(MyMainWindow):
              None, None,
              f'{pressuar}атм', None, None, None, None, None, None, None, 'Газовый фактор, м3/т', None, None, None,
              None, None,
-             None, None, well_data.gaz_f_pr[0], None, None, None, None, None, None, None, None, None, None, None, None],
+             None, None, self.dict_data_well["gaz_f_pr"][0], None, None, None, None, None, None, None, None, None, None, None, None],
             [None, 'Температура в интервале ПВР, С', None, None, None, None, None, None, None, None, None, None, None,
              None,
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
@@ -820,10 +821,10 @@ class PvrApplication(MyMainWindow):
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None,
              None, None, None, None, None, None, None, None, None],
-            [None, 'Способ эксплуатации', None, None, None, None, None, None, None, f'{well_data.dict_pump_ECN["do"]}', None, None,
+            [None, 'Способ эксплуатации', None, None, None, None, None, None, None, f'{self.dict_data_well["dict_pump_ECN"]["do"]}', None, None,
              None, None,
              None, None, None, None, None, None, None, None, None, 'глубина спуска, м', None, None, None, None, None,
-             f'{well_data.dict_pump_ECN_h["do"]}',
+             f'{self.dict_data_well["dict_pump_ECN_h"]["do"]}',
              None, None, None, None, None, None, None, None, None, None, None, None, None],
             [None, 'Время остановки скважины', None, None, None, None, None, None, None, None, None, None, None, None,
              None,
@@ -870,7 +871,7 @@ class PvrApplication(MyMainWindow):
              None, None, None, None, None],
             [None, 'Максимально ожидаемое давление на устье скважины', None, None, None, None, None, None, None, None,
              None,
-             None, None, None, None, None, None, None, None, f'{well_data.max_admissible_pressure._value}', None, None, None, None, None, None,
+             None, None, None, None, None, None, None, None, f'{self.dict_data_well["max_admissible_pressure"]._value}', None, None, None, None, None, None,
              'атм.',
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
             [None, 'Расстояние до скважины', None, None, None, None, None, None, None, None, None, None, None, None,
@@ -937,9 +938,9 @@ class PvrApplication(MyMainWindow):
              'примечание', None, None, None, None, None, None, None, None, None, None]]
 
 
-        for plast in well_data.plast_all:
-            for interval in well_data.dict_perforation[plast]['интервал']:
-                if well_data.dict_perforation[plast]['отключение']:
+        for plast in self.dict_data_well["plast_all"]:
+            for interval in self.dict_data_well["dict_perforation"][plast]['интервал']:
+                if self.dict_data_well["dict_perforation"][plast]['отключение']:
                     izol = 'Изолирован'
                 else:
                     izol = 'рабочий'

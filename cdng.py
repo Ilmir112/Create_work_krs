@@ -2,7 +2,7 @@ import well_data
 from work_py.data_informations import calc_pntzh, dict_data_cdng
 
 
-def events_gnvp_gnkt():
+def events_gnvp_gnkt(self):
     events_gnvp_gnkt = [
         [None,
          '1. Все операции при производстве работ выполнять в соответствии с действующими Федеральными нормами и '
@@ -31,7 +31,7 @@ def events_gnvp_gnkt():
         [None, ' 4. Движение транспортных средств осуществлять согласно схемы маршрута передвижения специальной '
                'техники по площадке скважины в присутствии ответственного лица', None, None,
          None, None, None, None, None, None, None],
-        [None, f'5. Производить опрессовку плашек ПВО {well_data.max_admissible_pressure._value}атм на максимально'
+        [None, f'5. Производить опрессовку плашек ПВО {self.dict_data_well["max_admissible_pressure"]._value}атм на максимально'
                f' ожидаемое давление на устье + 10 % (для освоения), но не выше максимально допустимого '
                f'давления опрессовки эксплуатационной колонны с выдержкой в течении 30мин и составлением '
                f'акта на опрессовку ПВО (согласно плана мероприятий по результатам  расследования и анализа '
@@ -118,7 +118,7 @@ def events_gnvp_gnkt():
     return events_gnvp_gnkt
 
 
-def events_gnvp_frez(distance, fluid):
+def events_gnvp_frez(self, distance, fluid):
     block_gnvp_list = [
         [None, 'Мероприятия по предотвращению аварий, инцидентов и несчастных случаев:',
          None, None, None, None, None, None, None, None, None, None],
@@ -199,7 +199,7 @@ def events_gnvp_frez(distance, fluid):
          f'Производить замеры ГВС при спуске, промывках и освоении не реже, чем как через каждый час, '
          f'с записью в журнале времени и результатов замеров ГВС. В случае возникновения '
          f'газонефтеводопроявления следует прекратить все работы, загерметизировать устье скважины и '
-         f'сообщить об этом в службу ЦИТС{well_data.contractor} и «Заказчика» {dict_data_cdng[well_data.cdng._value]}',
+         f'сообщить об этом в службу ЦИТС{well_data.contractor} и «Заказчика» {dict_data_cdng[self.dict_data_well["cdng"]._value]}',
          None, None, None, None, None, None, None, None,
          'Мастер ГНКТ', None],
         [None, 5, 'Перед началом работ по капитальному ремонту скважин иметь в наличии в исправном состоянии '
@@ -207,8 +207,8 @@ def events_gnvp_frez(distance, fluid):
          None, None, None, None, None, None, None, None,
          'Мастер ГНКТ', None],
         [None, 6, f'Двухкратный запас жидкости глушения уд.веса {fluid}г/см3 в объеме '
-                  f'{round(float(well_data.well_volume_in_PZ[0]) * 2, 1)}м3 находится на '
-                  f'{"".join(calc_pntzh(float(fluid), well_data.cdng._value))} на расстоянии {distance}км от скважины.'
+                  f'{round(float(self.dict_data_well["well_volume_in_PZ"][0]) * 2, 1)}м3 находится на '
+                  f'{"".join(calc_pntzh(float(fluid), self.dict_data_well["cdng"]._value))} на расстоянии {distance}км от скважины.'
                   f' {well_data.contractor} в случае необходимости '
                   '(аварийного глушения) обязуется обеспечить завоз жидкости глушения на объект работ.', None, None,
          None, None, None, None, None, None, 'Подрядчик по КРС', None],
@@ -242,7 +242,7 @@ def events_gnvp_frez(distance, fluid):
     return block_gnvp_list
 
 
-def events_gnvp(contractor):
+def events_gnvp(self, contractor):
     events_gnvp = ''
     if 'Ойл' in contractor:
         events_gnvp = [
@@ -284,7 +284,7 @@ def events_gnvp(contractor):
              None, None, None, None, None, None, None],
             [None,
              f'5. Производить опрессовку трубных  плашек ПВО с СПО тех.пакера на гл.10м на давление '
-             f'{well_data.max_admissible_pressure._value}атм на максимально'
+             f'{self.dict_data_well["max_admissible_pressure"]._value}атм на максимально'
              f' ожидаемое давление на устье + 10 % (для освоения), но не выше максимально допустимого '
              f'давления опрессовки эксплуатационной колонны с выдержкой в течении 30мин и составлением '
              f'акта на опрессовку ПВО (согласно плана мероприятий по результатам  расследования и анализа '
@@ -380,7 +380,7 @@ def events_gnvp(contractor):
              ', БКФ или ДОТ и БРИЗ) согласно ПЛА. Результаты замеров заносить в журнал КВС.',
              None, None, None, None, None, None, None, None, None],
             [None,
-             f'5. Оборудовать устье скважины согласно по схеме № {well_data.kat_pvo}, утвержденной главным инженером '
+             f'5. Оборудовать устье скважины согласно по схеме № {self.dict_data_well["kat_pvo"]}, утвержденной главным инженером '
              f'{well_data.contractor}  {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}, согласно '
              f'схемы обвязки устья скважин  на месторождениях {well_data.costumer} превенторной '
              f'установкой при капитальном, текущем ремонте, освоении для скважин, соответствующей категории по '
@@ -714,22 +714,22 @@ REGION_BASHNEFT_DICT = {
 }
 
 
-def add_itog():
+def add_itog(self):
     add_itog_list = [
         [None, 'ИТОГО:', None, None, None, None, None, None, None, None, None,
-         f'=ROUND(SUM(L{well_data.itog_ind_min + 2}:L{well_data.itog_ind_max}),1)'],
+         f'=ROUND(SUM(L{self.dict_data_well["itog_ind_min"] + 2}:L{self.dict_data_well["itog_ind_max"]}),1)'],
         [None, 'Герметизация , разгерметизация  устья  скважины', None, None, None, None, None, None, None,
-         None, None, f'=ROUND(SUM(L{well_data.itog_ind_min + 2}:L{well_data.itog_ind_max - 1})/11.5*11/60 ,1)'],
+         None, None, f'=ROUND(SUM(L{self.dict_data_well["itog_ind_min"] + 2}:L{self.dict_data_well["itog_ind_max"] - 1})/11.5*11/60 ,1)'],
         [None, 'Заправка ДВС', None, None, None, None, None, None, None, None, None,
-         f'=ROUND(SUM(L{well_data.itog_ind_min}:L{well_data.itog_ind_max - 1})/11.5*0.3    ,1)'],
+         f'=ROUND(SUM(L{self.dict_data_well["itog_ind_min"]}:L{self.dict_data_well["itog_ind_max"] - 1})/11.5*0.3    ,1)'],
         [None, 'ПЗР в начале и конце смены с заполнением вахтового журнала', None, None, None, None, None,
-         None, None, None, None, f'=ROUND(SUM(L{well_data.itog_ind_min}:L{well_data.itog_ind_max - 1})/11.5*0.3,1)'],
+         None, None, None, None, f'=ROUND(SUM(L{self.dict_data_well["itog_ind_min"]}:L{self.dict_data_well["itog_ind_max"] - 1})/11.5*0.3,1)'],
         [None, 'Непредвиденные  работы  : ', None, None, None, None, None, None, None, None, None,
-         f'=ROUND(SUM(L{well_data.itog_ind_min}:L{well_data.itog_ind_max + 2})*'
-         f'{well_data.bottomhole_artificial._value}/100*0.0004 ,1)'],
+         f'=ROUND(SUM(L{self.dict_data_well["itog_ind_min"]}:L{self.dict_data_well["itog_ind_max"] + 2})*'
+         f'{self.dict_data_well["bottomhole_artificial"]._value}/100*0.0004 ,1)'],
         [None, 'ВСЕГО  :', None, None, None, None, None, None, None, None, None,
-         f'=ROUND(l{well_data.itog_ind_max + 1} + l{well_data.itog_ind_max + 2} +'
-         f' l{well_data.itog_ind_max + 3} + l{well_data.itog_ind_max + 4} +l{well_data.itog_ind_max + 5}, 1)'],
+         f'=ROUND(l{self.dict_data_well["itog_ind_max"] + 1} + l{self.dict_data_well["itog_ind_max"] + 2} +'
+         f' l{self.dict_data_well["itog_ind_max"] + 3} + l{self.dict_data_well["itog_ind_max"] + 4} +l{self.dict_data_well["itog_ind_max"] + 5}, 1)'],
         [None,
          'Примечания: В соответствии с регламентом на производство КРС – заблаговременно подавать заявки на '
          'необходимое оборудование, а так же вызывать представителя Заказчика на геофизические работы, ПВР, '

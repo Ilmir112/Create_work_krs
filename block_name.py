@@ -38,7 +38,7 @@ def pop_down(self, region, curator_sel):
     if 'Ойл' in well_data.contractor:
         nach_tkrs = ''
         nach_tkrs_post = ''
-        if region == 'ЧГМ' or region == 'ТГМ' or 'gnkt' in well_data.work_plan:
+        if region == 'ЧГМ' or region == 'ТГМ' or 'gnkt' in self.dict_data_well["work_plan"]:
             nach_tkrs = podpis_dict["ООО Ойл-сервис"]["head_of_workshop_1"]["surname"]
             nach_tkrs_post = podpis_dict["ООО Ойл-сервис"]["head_of_workshop_1"]["post"]
         elif region == 'КГМ' or region == 'АГМ':
@@ -143,39 +143,39 @@ def pop_down(self, region, curator_sel):
     ved_orm_list = [None, podpis_dict["регион"][region]['ved_orm']['post'], None, None, None, None, '_______________',
                     None, None,
                     podpis_dict["регион"][region]['ved_orm']['surname'], None, None]
-    if (region == 'ЧГМ') and well_data.curator == 'ОР':
+    if (region == 'ЧГМ') and self.dict_data_well["curator"] == 'ОР':
         podp_down.insert(13, ved_orm_list)
         podp_down.insert(14,
                          [None, None, None, None, None, None, '"___"___________', None, None, '     дата подписания',
                           None,
                           None])
-    elif (region == 'КГМ') and well_data.curator == 'ОР' and well_data.work_plan == 'gnkt_opz':
+    elif (region == 'КГМ') and self.dict_data_well["curator"] == 'ОР' and self.dict_data_well["work_plan"] == 'gnkt_opz':
 
         podp_down.insert(12, ved_orm_list)
         podp_down.insert(13,
                          [None, None, None, None, None, None, '"___"___________', None, None, '     дата подписания',
                           None,
                           None])
-    elif (region == 'КГМ') and well_data.curator == 'ОР':
+    elif (region == 'КГМ') and self.dict_data_well["curator"] == 'ОР':
 
         podp_down.insert(12, ved_gtm_list)
         podp_down.insert(13,
                          [None, None, None, None, None, None, '"___"___________', None, None, '     дата подписания',
                           None,
                           None])
-    elif region == 'КГМ' or region == 'ЧГМ' and well_data.curator == 'ГТМ':
+    elif region == 'КГМ' or region == 'ЧГМ' and self.dict_data_well["curator"] == 'ГТМ':
         podp_down.insert(12, ved_gtm_list)
         podp_down.insert(13,
                          [None, None, None, None, None, None, '"___"___________', None, None, '     дата подписания',
                           None,
                           None])
-    elif region == 'КГМ' or region == 'ЧГМ' and well_data.curator == 'ГТМ':
+    elif region == 'КГМ' or region == 'ЧГМ' and self.dict_data_well["curator"] == 'ГТМ':
         podp_down.insert(12, ved_gtm_list)
         podp_down.insert(13,
                          [None, None, None, None, None, None, '"___"___________', None, None, '     дата подписания',
                           None,
                           None])
-    if well_data.curator == "ВНС":
+    if self.dict_data_well["curator"] == "ВНС":
         podp_down.insert(6, [None, 'Менеджер ТКРС БНД', None, None, None, None, '___________________', None, None,
                              'А.М. Кузьмин', None, ' '])
         podp_down.insert(7,
@@ -263,44 +263,44 @@ def razdel_1(self, region, contractor):
          None]]
     if well_data.data_in_base is False:
 
-        if len(well_data.plast_work) != 0:
-            # print(well_data.plast_work, well_data.dict_category)
+        if len(self.dict_data_well['plast_work']) != 0:
+            # print(self.dict_data_well['plast_work'], self.dict_data_well["dict_category"])
             try:
-                cat_P_1 = well_data.dict_category[well_data.plast_work[0]]['по давлению'].category
-                cat_h2s_list = well_data.dict_category[well_data.plast_work[0]]['по сероводороду'].category
-                cat_gaz = well_data.dict_category[well_data.plast_work[0]]['по газовому фактору'].category
+                cat_P_1 = self.dict_data_well["dict_category"][self.dict_data_well['plast_work'][0]]['по давлению'].category
+                cat_h2s_list = self.dict_data_well["dict_category"][self.dict_data_well['plast_work'][0]]['по сероводороду'].category
+                cat_gaz = self.dict_data_well["dict_category"][self.dict_data_well['plast_work'][0]]['по газовому фактору'].category
             except:
-                cat_P_1 = well_data.cat_P_1[0]
-                cat_h2s_list = well_data.cat_h2s_list[0]
-                cat_gaz = well_data.cat_gaz_f_pr[0]
+                cat_P_1 = self.dict_data_well["cat_P_1"][0]
+                cat_h2s_list = self.dict_data_well["cat_h2s_list"][0]
+                cat_gaz = self.dict_data_well["cat_gaz_f_pr"][0]
         else:
 
-            cat_P_1 = well_data.cat_P_1[0]
-            cat_h2s_list = well_data.cat_h2s_list[0]
-            cat_gaz = well_data.cat_gaz_f_pr[0]
+            cat_P_1 = self.dict_data_well["cat_P_1"][0]
+            cat_h2s_list = self.dict_data_well["cat_h2s_list"][0]
+            cat_gaz = self.dict_data_well["cat_gaz_f_pr"][0]
         try:
-            cat_P_1_plan = well_data.dict_category[well_data.plast_project[0]]['по давлению'].category
-            cat_h2s_list_plan = well_data.dict_category[well_data.plast_project[0]]['по сероводороду'].category
-            cat_gaz_plan = well_data.dict_category[well_data.plast_project[0]]['по газовому фактору'].category
+            cat_P_1_plan = self.dict_data_well["dict_category"][self.dict_data_well["plast_project"][0]]['по давлению'].category
+            cat_h2s_list_plan = self.dict_data_well["dict_category"][self.dict_data_well["plast_project"][0]]['по сероводороду'].category
+            cat_gaz_plan = self.dict_data_well["dict_category"][self.dict_data_well["plast_project"][0]]['по газовому фактору'].category
         except:
             cat_P_1_plan = 3
             cat_h2s_list_plan = 3
             cat_gaz_plan = 3
 
         if 1 in [cat_P_1, cat_P_1_plan, cat_h2s_list, cat_gaz, cat_h2s_list_plan, cat_gaz_plan,
-                 well_data.category_pressuar] or '1' in [cat_P_1, cat_P_1_plan, cat_h2s_list, cat_gaz,
+                 self.dict_data_well["category_pressuar"]] or '1' in [cat_P_1, cat_P_1_plan, cat_h2s_list, cat_gaz,
                                                          cat_h2s_list_plan, cat_gaz_plan,
-                                                         well_data.category_pressuar] or \
-                well_data.curator == 'ВНС':
+                                                         self.dict_data_well["category_pressuar"]] or \
+                self.dict_data_well["curator"] == 'ВНС':
             for row in range(len(podp_bvo)):
                 for col in range(len(podp_bvo[row])):
                     razdel_1[row + 9][col] = podp_bvo[row][col]
         if 1 in [cat_P_1, cat_h2s_list, cat_gaz] or \
-                well_data.curator == 'ВНС':
-            well_data.kat_pvo = 1
-            well_data.bvo = True
+                self.dict_data_well["curator"] == 'ВНС':
+            self.dict_data_well["kat_pvo"] = 1
+            self.dict_data_well["bvo"] = True
 
-        if well_data.grp_plan is True:
+        if self.dict_data_well["grp_plan"] is True:
             for row in range(len(podp_grp)):
                 for col in range(len(podp_grp[row])):
                     razdel_1[row + 12][col] = podp_grp[row][col]

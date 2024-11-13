@@ -6,7 +6,7 @@ import psycopg2
 import well_data
 from data_base.config_base import connect_to_database, DB_CLASSIFICATION
 
-conn = connect_to_database(well_data.DB_CLASSIFICATION)
+conn = connect_to_database(DB_CLASSIFICATION)
 
 with conn:
     with conn.cursor() as cursor:

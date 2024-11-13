@@ -4,11 +4,13 @@ from PyQt5.QtGui import QIntValidator, QDoubleValidator
 
 import well_data
 from main import MyMainWindow
+from work_py.parent_work import TabPageUnion, WindowUnion,TabWidgetUnion
 
 
-class TabPage_SO_leakage(QWidget):
+class TabPageSo_leakage(TabPageUnion):
     def __init__(self, parent=None):
-        super().__init__()
+        super().__init__(parent)
+
         self.validator = QDoubleValidator(0, 8000, 1)
 
         self.roof_leakage_label = QLabel("Кровля", self)
@@ -39,20 +41,20 @@ class TabPage_SO_leakage(QWidget):
 
 
 
-class TabWidget(QTabWidget):
-    def __init__(self):
+class TabWidget(TabWidgetUnion):
+    def __init__(self, parent):
         super().__init__()
-        self.addTab(TabPage_SO_leakage(self), 'Негерметичность')
+        self.addTab(TabPageSo_leakage(parent), 'Негерметичность')
 
-class LeakageWindow(MyMainWindow):
+class LeakageWindow(WindowUnion):
 
     def __init__(self, parent=None):
 
-        super(LeakageWindow, self).__init__()
+        super(LeakageWindow, self).__init__(parent)
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
 
-        self.tabWidget = TabWidget()
+        self.tabWidget = TabWidget(parent)
         self.tableWidget = QTableWidget(0, 3)
         self.tableWidget.setHorizontalHeaderLabels(
             ["Кровля", "Подошва", "изоляция"])
@@ -78,17 +80,17 @@ class LeakageWindow(MyMainWindow):
         vbox.addWidget(self.buttonadd_work, 3, 0)
         vbox.addWidget(self.buttonAddString, 3, 1)
 
-        if len(well_data.dict_leakiness) != 0:
+        if len(self.dict_data_well["dict_leakiness"]) != 0:
 
-            ffa = well_data.dict_leakiness['НЭК']
-            for nek in well_data.dict_leakiness['НЭК']['интервал']:
+            ffa = self.dict_data_well["dict_leakiness"]['НЭК']
+            for nek in self.dict_data_well["dict_leakiness"]['НЭК']['интервал']:
                 rows = self.tableWidget.rowCount()
 
                 roof_leakage, sole_leakage_line = nek.split('-')
                 self.tableWidget.insertRow(rows)
                 insulation_combo1 = QComboBox(self)
                 insulation_combo1.addItems(['не изолирован', 'изолирован'])
-                if well_data.dict_leakiness['НЭК']['интервал'][nek]['отключение']:
+                if self.dict_data_well["dict_leakiness"]['НЭК']['интервал'][nek]['отключение']:
                     insulation_combo1.setCurrentIndex(1)
                 self.tableWidget.setItem(rows, 0, QTableWidgetItem(roof_leakage))
                 self.tableWidget.setItem(rows, 1, QTableWidgetItem(sole_leakage_line))
@@ -112,8 +114,8 @@ class LeakageWindow(MyMainWindow):
         if not roof_leakage or not sole_leakage_line:
             QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
             return
-        # ada = float(well_data.bottomhole_artificial._value)
-        # if float(well_data.bottomhole_artificial._value) <= float(sole_leakage_line):
+        # ada = float(self.dict_data_well["bottomhole_artificial"]._value)
+        # if float(self.dict_data_well["bottomhole_artificial"]._value) <= float(sole_leakage_line):
         #     QMessageBox.information(self, 'Внимание', 'глубина НЭК ниже искусственного забоя')
         #     return
 
@@ -185,7 +187,7 @@ class LeakageWindow(MyMainWindow):
                 dict_leakiness.setdefault(
                     'НЭК', {}).setdefault('интервал', {}).setdefault((f"{roof}-{sole}"), {}).setdefault(
                     'отрайбировано', False)
-        # well_data.dict_leakiness = dict_leakiness
+        # self.dict_data_well["dict_leakiness"] = dict_leakiness
         # print(dict_leakiness)
 
         well_data.pause = False

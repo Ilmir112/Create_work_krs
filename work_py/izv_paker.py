@@ -10,14 +10,16 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QLineEdi
 
 from main import MyMainWindow
 from work_py.alone_oreration import well_volume
+from work_py.parent_work import TabWidgetUnion, WindowUnion, TabPageUnion
 from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
 from work_py.rir import RirWindow
-from  work_py.opressovka import TabPage_SO
+from  work_py.opressovka import TabPageSo
 
 
-class TabPage_SO_paker_izv(QWidget):
+class TabPageSoPakerIzv(TabPageUnion):
     def __init__(self, parent=None):
         super().__init__()
+        self.dict_data_well = parent
 
         self.validator = QIntValidator(0, 80000)
 
@@ -33,8 +35,8 @@ class TabPage_SO_paker_izv(QWidget):
         self.nkt_select_combo = QComboBox(self)
         self.nkt_select_combo.addItems(['пакер в ЭК', 'пакер в ДП'])
 
-        if well_data.column_additional is False or (well_data.column_additional and
-                                                    well_data.head_column_additional._value < well_data.current_bottom):
+        if self.dict_data_well["column_additional"] is False or (self.dict_data_well["column_additional"] and
+                                                    self.dict_data_well["head_column_additional"]._value < self.dict_data_well["current_bottom"]):
             self.nkt_select_combo.setCurrentIndex(0)
         else:
 
@@ -52,7 +54,7 @@ class TabPage_SO_paker_izv(QWidget):
         self.roof_sand_edit = QLineEdit(self)
         self.roof_sand_edit.setValidator(self.validator)
 
-        self.roof_sand_edit.setText(f'{well_data.perforation_roof - 20}')
+        self.roof_sand_edit.setText(f'{self.dict_data_well["perforation_roof"] - 20}')
         self.roof_sand_edit.setClearButtonEnabled(True)
 
         self.type_work_label = QLabel("Вид работ", self)
@@ -93,14 +95,14 @@ class TabPage_SO_paker_izv(QWidget):
 
         self.type_work_combo.setCurrentIndex(1)
 
-        if well_data.column_additional is False or \
-                (well_data.column_additional and well_data.current_bottom < well_data.head_column_additional._value):
+        if self.dict_data_well["column_additional"] is False or \
+                (self.dict_data_well["column_additional"] and self.dict_data_well["current_bottom"] < self.dict_data_well["head_column_additional"]._value):
             self.nkt_select_combo.setCurrentIndex(1)
             self.nkt_select_combo.setCurrentIndex(0)
         else:
             self.nkt_select_combo.setCurrentIndex(1)
 
-        if well_data.forPaker_list == True:
+        if self.dict_data_well["for_paker_list"] == True:
             self.type_work_combo.setCurrentIndex(1)
         else:
             self.type_work_combo.setCurrentIndex(0)
@@ -132,18 +134,18 @@ class TabPage_SO_paker_izv(QWidget):
             self.pero_diametr_label.setText('диаметр пакера')
 
 
-            self.current_bottom_edit.setText(f'{well_data.current_bottom}')
+            self.current_bottom_edit.setText(f'{self.dict_data_well["current_bottom"]}')
             self.current_bottom_label.setParent(None)
             self.current_bottom_edit.setParent(None)
         else:
 
-            self.current_bottom_edit.setText(f'{well_data.current_bottom}')
+            self.current_bottom_edit.setText(f'{self.dict_data_well["current_bottom"]}')
             self.grid.addWidget(self.current_bottom_label, 7, 3)
             self.grid.addWidget(self.current_bottom_edit, 8, 3)
             self.pero_diametr_label.setText('диаметр пера')
-            if well_data.column_additional or well_data.column_additional is False and \
-                    well_data.column_diametr._value < 130:
-                self.pero_diametr_line.setText(f'{well_data.nkt_diam}')
+            if self.dict_data_well["column_additional"] or self.dict_data_well["column_additional"] is False and \
+                    self.dict_data_well["column_diametr"]._value < 130:
+                self.pero_diametr_line.setText(f'{self.dict_data_well["nkt_diam"]}')
             else:
                 self.pero_diametr_line.setText(f'110')
             self.paker_type_label.setParent(None)
@@ -152,16 +154,16 @@ class TabPage_SO_paker_izv(QWidget):
             self.need_sand_filing_combo.setParent(None)
             self.roof_sand_label.setParent(None)
             self.roof_sand_edit.setParent(None)
-            if well_data.forPaker_list == True:
+            if self.dict_data_well["for_paker_list"] == True:
 
                 self.paker_depth_line.setText(f'{well_data.depth_paker_izv}')
-            self.current_bottom_edit.setText(str(well_data.current_bottom2))
+            self.current_bottom_edit.setText(str(self.dict_data_well["current_bottom2"]))
 
     def update_depth_paker(self):
         paker_depth = self.paker_depth_line.text()
         if paker_depth.isdigit():
             self.roof_sand_edit.setText(str(int(float(paker_depth))-20))
-            self.pero_diametr_line.setText(str(TabPage_SO.paker_diametr_select(self, paker_depth)))
+            self.pero_diametr_line.setText(str(TabPageSo.paker_diametr_select(self, paker_depth)))
 
     def update_raid_edit(self, index):
         pass
@@ -169,21 +171,22 @@ class TabPage_SO_paker_izv(QWidget):
 
 
 
-class TabWidget(QTabWidget):
-    def __init__(self):
+class TabWidget(TabWidgetUnion):
+    def __init__(self, parent):
         super().__init__()
-        self.addTab(TabPage_SO_paker_izv(), 'извлекаемый пакер')
+        self.addTab(TabPageSoPakerIzv(parent), 'извлекаемый пакер')
 
 
-class PakerIzvlek(MyMainWindow):
-    def __init__(self, ins_ind, table_widget, parent=None):
+class PakerIzvlek(WindowUnion):
+    def __init__(self, dict_data_well, table_widget, parent=None):
         super().__init__()
+
+        self.dict_data_well = dict_data_well
+        self.ins_ind = dict_data_well['ins_ind']
+        self.tabWidget = TabWidget(self.dict_data_well)
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
-
-        self.ins_ind = ins_ind
         self.table_widget = table_widget
-        self.tabWidget = TabWidget()
 
         self.buttonadd_work = QPushButton('Добавить в план работ')
         self.buttonadd_work.clicked.connect(self.add_work, Qt.QueuedConnection)
@@ -216,40 +219,40 @@ class PakerIzvlek(MyMainWindow):
         if paker_depth_line != '':
             paker_depth_line = int(float(paker_depth_line))
 
-        if nkt_select_combo == 'пакер в ЭК' and well_data.column_additional and \
-                paker_depth_line > well_data.head_column_additional._value:
+        if nkt_select_combo == 'пакер в ЭК' and self.dict_data_well["column_additional"] and \
+                paker_depth_line > self.dict_data_well["head_column_additional"]._value:
             QMessageBox.warning(self, 'Ошибка',
                                       'Не корректно выбрана компоновка печати для доп колонны')
             return
-        elif nkt_select_combo == 'пакер в ДП' and well_data.column_additional and \
-                paker_depth_line < well_data.head_column_additional._value:
+        elif nkt_select_combo == 'пакер в ДП' and self.dict_data_well["column_additional"] and \
+                paker_depth_line < self.dict_data_well["head_column_additional"]._value:
             QMessageBox.warning(self, 'Ошибка',
                                       'Не корректно выбрана компоновка для основной колонны')
             return
 
         if type_work_combo == 'установка':
             if paker_depth_line == '':
-                pQMessageBox.warning(self, 'Ошибка',
+                QMessageBox.warning(self, 'Ошибка',
                                           'Введите данные по глубине установки пакера')
                 return
 
-            if paker_depth_line > well_data.current_bottom:
+            if paker_depth_line > self.dict_data_well["current_bottom"]:
                 QMessageBox.warning(self, 'Ошибка',
                                           'Забой ниже глубины текущего забоя')
                 return
             elif paker_depth_line == '' or pero_diametr_line == '':
                 QMessageBox.warning(self, 'ПРОВЕРКА', 'Необходимо добавить глубину посадки пакера')
                 return
-            if well_data.column_additional and int(paker_depth_line) > well_data.head_column_additional._value and \
+            if self.dict_data_well["column_additional"] and int(paker_depth_line) > self.dict_data_well["head_column_additional"]._value and \
                     nkt_key == 'пакер в ЭК':
                 QMessageBox.information(self, 'Внимание', 'Компоновка подобрана не корректно')
                 return
-            if well_data.column_additional and int(paker_depth_line) < well_data.head_column_additional._value \
+            if self.dict_data_well["column_additional"] and int(paker_depth_line) < self.dict_data_well["head_column_additional"]._value \
                     and nkt_key == 'пакер в ДП':
                 QMessageBox.information(self, 'Внимание', 'Компоновка подобрана не корректно')
                 return
 
-            if int(paker_depth_line) > well_data.current_bottom:
+            if int(paker_depth_line) > self.dict_data_well["current_bottom"]:
                 QMessageBox.warning(self, 'Некорректные данные', f'Компоновка НКТ c хвостовик + пакер '
                                                                        f'ниже текущего забоя')
                 return
@@ -279,7 +282,7 @@ class PakerIzvlek(MyMainWindow):
              f'{paker_depth_line}м',  None,
              f'Спустить пакер {paker_type_combo}-{pero_diametr_line} (извлекаемый) '
              f'{TemplateKrs.calc_combo_nkt("НКТ", paker_depth_line)} на тНКТ до'
-             f' глубины {paker_depth_line}м с замером, шаблонированием шаблоном {well_data.nkt_template}мм.'
+             f' глубины {paker_depth_line}м с замером, шаблонированием шаблоном {self.dict_data_well["nkt_template"]}мм.'
              f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
              None, None, None, None, None, None, None,
              'Мастер КРС, подрядчик РИР, УСРСиСТ', liftingNKT_norm(paker_depth_line, 1.2)],
@@ -304,14 +307,14 @@ class PakerIzvlek(MyMainWindow):
             filling_list = [
                 [None, None,
                  f'Поднять ИУГ до глубины {roof_sand_edit - 120}м с доливом тех жидкости в '
-                 f'объеме  {round(120 * 1.12 / 1000, 1)}м3 уд.весом {well_data.fluid_work}',
+                 f'объеме  {round(120 * 1.12 / 1000, 1)}м3 уд.весом {self.dict_data_well["fluid_work"]}',
                  None, None, None, None, None, None, None,
                  'Мастер КРС, подрядчик по ГИС', 4],
                 [f'отсыпка в инт. {roof_sand_edit} - {paker_depth_line}  в объеме'
                  f' {round(well_volume(self, paker_depth_line) / paker_depth_line * 1000 * (20), 0)}л',
                  None, f'Произвести отсыпку кварцевым песком в инт. {roof_sand_edit} - {paker_depth_line} '
                        f' в объеме {volume_sand}л '
-                       f'Закачать в НКТ кварцевый песок  с доводкой тех.жидкостью {well_data.fluid_work}',
+                       f'Закачать в НКТ кварцевый песок  с доводкой тех.жидкостью {self.dict_data_well["fluid_work"]}',
                  None, None, None, None, None, None, None,
                  'мастер КРС', 3.5],
                 [f'Ожидание 4 часа.', None, f'Ожидание оседания песка 4 часа.',
@@ -332,26 +335,26 @@ class PakerIzvlek(MyMainWindow):
                  'мастер КРС', None],
                 [None, None,
                  f'Поднять ИУГ с глубины {roof_sand_edit}м с доливом тех '
-                 f'жидкости в объеме  {round(roof_sand_edit * 1.12 / 1000, 1)}м3 уд.весом {well_data.fluid_work}',
+                 f'жидкости в объеме  {round(roof_sand_edit * 1.12 / 1000, 1)}м3 уд.весом {self.dict_data_well["fluid_work"]}',
                  None, None, None, None, None, None, None,
                  'Мастер КРС, подрядчик по ГИС', 4]]
 
             for row in filling_list:
                 rir_list.append(row)
-            well_data.current_bottom2 = well_data.current_bottom
-            well_data.current_bottom = roof_sand_edit
+            self.dict_data_well["current_bottom2"] = self.dict_data_well["current_bottom"]
+            self.dict_data_well["current_bottom"] = roof_sand_edit
             well_data.depth_paker_izv = paker_depth_line
             self.calculate_chemistry('песок', volume_sand)
         else:
             rir_list.append([None, None,
                              f'Поднять ИУГ c глубины {paker_depth_line}м с доливом тех жидкости в объеме '
-                             f'{round(paker_depth_line * 1.12 / 1000, 1)}м3 уд.весом {well_data.fluid_work}',
+                             f'{round(paker_depth_line * 1.12 / 1000, 1)}м3 уд.весом {self.dict_data_well["fluid_work"]}',
                              None, None, None, None, None, None, None,
                              'Мастер КРС, подрядчик по ГИС', 4])
-            well_data.current_bottom2 = well_data.current_bottom
-            well_data.current_bottom = paker_depth_line
+            self.dict_data_well["current_bottom2"] = self.dict_data_well["current_bottom"]
+            self.dict_data_well["current_bottom"] = paker_depth_line
 
-        well_data.forPaker_list = True
+        self.dict_data_well["for_paker_list"] = True
         well_data.depth_paker_izv = paker_depth_line
         return rir_list
 
@@ -359,15 +362,15 @@ class PakerIzvlek(MyMainWindow):
         from work_py.template_work import TemplateKrs
 
         rir_list = [
-            [f'СПО {RirWindow.pero_select(self, well_data.current_bottom).replace("перо", f"перо-{pero_diametr_line}мм")} до '
-             f'глубины {round(well_data.current_bottom, 0)}м', None,
-             f'Спустить {RirWindow.pero_select(self, well_data.current_bottom).replace("перо", f"перо-{pero_diametr_line}мм")}  '
-             f'{TemplateKrs.calc_combo_nkt("НКТ", paker_depth_line)} на НКТ{well_data.nkt_diam}мм до '
-             f'глубины {round(well_data.current_bottom, 0)}м с замером, шаблонированием шаблоном {well_data.nkt_template}мм. '
+            [f'СПО {RirWindow.pero_select(self, self.dict_data_well["current_bottom"]).replace("перо", f"перо-{pero_diametr_line}мм")} до '
+             f'глубины {round(self.dict_data_well["current_bottom"], 0)}м', None,
+             f'Спустить {RirWindow.pero_select(self, self.dict_data_well["current_bottom"]).replace("перо", f"перо-{pero_diametr_line}мм")}  '
+             f'{TemplateKrs.calc_combo_nkt("НКТ", paker_depth_line)} на НКТ{self.dict_data_well["nkt_diam"]}мм до '
+             f'глубины {round(self.dict_data_well["current_bottom"], 0)}м с замером, шаблонированием шаблоном {self.dict_data_well["nkt_template"]}мм. '
              f'(При СПО первых десяти НКТ на '
              f'спайдере дополнительно устанавливать элеватор ЭХЛ)',
              None, None, None, None, None, None, None,
-             'Мастер КР', descentNKT_norm(well_data.current_bottom, 1)],
+             'Мастер КР', descentNKT_norm(self.dict_data_well["current_bottom"], 1)],
             [f'Вымыв песка до гл.{paker_depth_line - 10}',
              None,
              f'Произвести нормализацию забоя (вымыв кварцевого песка) с наращиванием, комбинированной промывкой '
@@ -377,39 +380,39 @@ class PakerIzvlek(MyMainWindow):
              None, None, None, None, None, None, None,
              'мастер КРС', 3.5],
             [None, None,
-             f'Поднять {RirWindow.pero_select(self, well_data.current_bottom)} НКТ{well_data.nkt_diam}мм с глубины '
+             f'Поднять {RirWindow.pero_select(self, self.dict_data_well["current_bottom"])} НКТ{self.dict_data_well["nkt_diam"]}мм с глубины '
              f'{paker_depth_line - 10}м с доливом '
              f'скважины'
              f' в объеме {round((paker_depth_line - 10) * 1.12 / 1000, 1)}м3 тех. '
-             f'жидкостью  уд.весом {well_data.fluid_work}',
+             f'жидкостью  уд.весом {self.dict_data_well["fluid_work"]}',
              None, None, None, None, None, None, None,
              'мастер КРС', liftingNKT_norm(paker_depth_line - 10, 1)]]
 
         emer_list = [
             [f'СПО лов. инст до до Н= {paker_depth_line-10}', None,
               f'Спустить с замером ловильный инструмент {TemplateKrs.calc_combo_nkt("НКТ", paker_depth_line)} на '
-              f'НКТ{well_data.nkt_diam} до Н= {paker_depth_line-10}м с замером. ',
+              f'НКТ{self.dict_data_well["nkt_diam"]} до Н= {paker_depth_line-10}м с замером. ',
               None, None, None, None, None, None, None,
-              'мастер КРС', liftingNKT_norm(well_data.current_bottom, 1)],
+              'мастер КРС', liftingNKT_norm(self.dict_data_well["current_bottom"], 1)],
              [f'Вымыв песка до {paker_depth_line}м. Извлечение пакера', None,
               f'Произвести нормализацию (вымыв кварцевого песка) на ловильном инструменте до глубины '
               f'{paker_depth_line}м обратной '
-              f'промывкой уд.весом {well_data.fluid_work} \n'
+              f'промывкой уд.весом {self.dict_data_well["fluid_work"]} \n'
               f'Произвести  ловильный работы при представителе заказчика на глубине {paker_depth_line}м.',
               None, None, None, None, None, None, None,
               'мастер КРС', liftingNKT_norm(paker_depth_line, 1)],
              [None, None,
               f'Расходить и поднять компоновку {TemplateKrs.calc_combo_nkt("НКТ", paker_depth_line)} '
-              f'НКТ{well_data.nkt_diam}мм с глубины {paker_depth_line}м с '
+              f'НКТ{self.dict_data_well["nkt_diam"]}мм с глубины {paker_depth_line}м с '
               f'доливом скважины в объеме {round(paker_depth_line * 1.12 / 1000, 1)}м3 тех. жидкостью '
-              f'уд.весом {well_data.fluid_work}',
+              f'уд.весом {self.dict_data_well["fluid_work"]}',
               None, None, None, None, None, None, None,
               'мастер КРС', liftingNKT_norm(paker_depth_line, 1)]]
         for row in emer_list:
             rir_list.append(row)
 
-        well_data.current_bottom = current_bottom
-        well_data.forPaker_list = False
+        self.dict_data_well["current_bottom"] = current_bottom
+        self.dict_data_well["for_paker_list"] = False
         return rir_list
 
 

@@ -19,54 +19,55 @@ def skm_interval(self, template):
         sgm_True = True
 
     str_raid = []
-    if well_data.paker_do["posle"] != 0:
+    if self.dict_data_well["paker_do"]["posle"] != 0:
         str_raid.append(
-            [float(well_data.depth_fond_paker_do["posle"]) - 20, float(well_data.depth_fond_paker_do["posle"]) + 20])
+            [float(self.dict_data_well["depth_fond_paker_do"]["posle"]) - 20, float(self.dict_data_well["depth_fond_paker_do"]["posle"]) + 20])
 
-    if well_data.leakiness:
-        a = well_data.dict_leakiness
-        for nek in list(well_data.dict_leakiness['НЭК']['интервал'].keys()):
-            if int(float(nek.split('-')[1])) + 20 < well_data.current_bottom:
+    if self.dict_data_well["dict_leakiness"]:
+        a = self.dict_data_well["dict_leakiness"]
+        for nek in list(self.dict_data_well["dict_leakiness"]['НЭК']['интервал'].keys()):
+            if int(float(nek.split('-')[1])) + 20 < self.dict_data_well["current_bottom"]:
                 str_raid.append([int(float(nek.split('-')[0])) - 90, int(float(nek.split('-')[1])) + 20])
             else:
                 str_raid.append([int(float(nek.split('-')[0])) - 90,
-                                 well_data.current_bottom - 2])
+                                 self.dict_data_well["current_bottom"] - 2])
 
     if all(
-            [well_data.dict_perforation[plast]['отрайбировано'] is True for plast in well_data.plast_all
-             if well_data.dict_perforation[plast]['подошва'] < well_data.current_bottom]) or sgm_True:
+            [self.dict_data_well["dict_perforation"][plast]['отрайбировано'] is True for plast in self.dict_data_well["plast_all"]
+             if self.dict_data_well["dict_perforation"][plast]['подошва'] < self.dict_data_well["current_bottom"]]) or sgm_True:
         str_raid = []
 
         perforating_intervals = []
 
-        for plast in well_data.plast_all:
-            for interval in well_data.dict_perforation[plast]['интервал']:
-                if interval[1] < well_data.current_bottom:
+        for plast in self.dict_data_well["plast_all"]:
+            for interval in self.dict_data_well["dict_perforation"][plast]['интервал']:
+                if interval[1] < self.dict_data_well["current_bottom"]:
                     perforating_intervals.append(list(interval))
 
-        str_raid.extend(remove_overlapping_intervals(perforating_intervals))
+        str_raid.extend(remove_overlapping_intervals(self, perforating_intervals))
 
-    elif all([well_data.dict_perforation[plast]['отрайбировано'] is False for plast in well_data.plast_all]):
-        str_raid.append([well_data.perforation_roof - 90, well_data.skm_depth])
-        if well_data.leakiness:
-            for nek in list(well_data.dict_leakiness['НЭК']['интервал'].keys()):
+    elif all([self.dict_data_well["dict_perforation"][plast]['отрайбировано'] is False for plast in self.dict_data_well["plast_all"]]):
+        str_raid.append([self.dict_data_well["perforation_roof"] - 90, self.dict_data_well["skm_depth"]])
+        if self.dict_data_well["dict_leakiness"]:
+            for nek in list(self.dict_data_well["dict_leakiness"]['НЭК']['интервал'].keys()):
                 # print(f' наруш {nek}')
-                if float(nek.split('-')[1]) + 20 < well_data.current_bottom:
+                if float(nek.split('-')[1]) + 20 < self.dict_data_well["current_bottom"]:
                     str_raid.append([int(float(nek.split('-')[0])) - 90, int(float(nek.split('-')[1])) + 20])
                 else:
                     str_raid.append([int(float(nek.split('-')[0])) - 90,
-                                     well_data.current_bottom - 2])
+                                     self.dict_data_well["current_bottom"] - 2])
 
 
-    if len(well_data.dict_perforation_project) != 0 and any(
-            [plast in well_data.plast_all for plast in list(well_data.dict_perforation_project.keys())]) is False:
-        for plast in well_data.dict_perforation_project:
+    if self.dict_data_well["plast_project"]:
+        if any(
+            [plast in self.dict_data_well['plast_all'] for plast in self.dict_data_well["plast_project"]]) is False:
+            for plast in self.dict_data_well["dict_perforation_project"]:
 
-            for interval in well_data.dict_perforation_project[plast]['интервал']:
-                if interval[1] < well_data.current_bottom:
-                    str_raid.append([interval[0] - 70, interval[1] + 20])
-                else:
-                    str_raid.append([interval[0] - 70, well_data.current_bottom - 2])
+                for interval in self.dict_data_well["dict_perforation_project"][plast]['интервал']:
+                    if interval[1] < self.dict_data_well["current_bottom"]:
+                        str_raid.append([interval[0] - 70, interval[1] + 20])
+                    else:
+                        str_raid.append([interval[0] - 70, self.dict_data_well["current_bottom"] - 2])
 
     # print(f'скреперо {str_raid}')
     merged_segments = merge_overlapping_intervals(str_raid)
@@ -76,92 +77,92 @@ def skm_interval(self, template):
     for interval in merged_segments:
 
         if template in ['ПСШ ЭК', 'ПСШ без хвоста', 'ПСШ открытый ствол', 'СГМ ЭК', 'СГМ открытый ствол']:
-            if well_data.skm_depth >= interval[1] and interval[1] > interval[0]:
+            if self.dict_data_well["skm_depth"] >= interval[1] and interval[1] > interval[0]:
                 merged_segments_new.append(interval)
-            elif well_data.skm_depth <= interval[1] and well_data.skm_depth >= interval[0] and interval[1] > interval[
+            elif self.dict_data_well["skm_depth"] <= interval[1] and self.dict_data_well["skm_depth"] >= interval[0] and interval[1] > interval[
                 0]:
-                merged_segments_new.append([interval[0], well_data.skm_depth])
+                merged_segments_new.append([interval[0], self.dict_data_well["skm_depth"]])
 
         elif template in ['ПСШ СКМ в доп колонне c хвостом', 'ПСШ СКМ в доп колонне без хвоста',
                           'ПСШ СКМ в доп колонне + открытый ствол',
                                          'СГМ в доп колонне + открытый ствол',
-                                         'СГМ в доп колонне'] and well_data.skm_depth >= interval[1]:
+                                         'СГМ в доп колонне'] and self.dict_data_well["skm_depth"] >= interval[1]:
 
-            if interval[0] > float(well_data.head_column_additional._value) and interval[1] >= float(
-                    well_data.head_column_additional._value) and well_data.skm_depth >= interval[1] \
+            if interval[0] > float(self.dict_data_well["head_column_additional"]._value) and interval[1] >= float(
+                    self.dict_data_well["head_column_additional"]._value) and self.dict_data_well["skm_depth"] >= interval[1] \
                     and interval[1] > interval[0]:
                 # print(f'1 {interval, merged_segments}')
                 merged_segments_new.append(interval)
 
-            elif interval[0] < float(well_data.head_column_additional._value) and interval[1] > float(
-                    well_data.head_column_additional._value) and well_data.skm_depth <= interval[1] \
-                    and well_data.skm_depth >= interval[0] and interval[1] > interval[0]:
+            elif interval[0] < float(self.dict_data_well["head_column_additional"]._value) and interval[1] > float(
+                    self.dict_data_well["head_column_additional"]._value) and self.dict_data_well["skm_depth"] <= interval[1] \
+                    and self.dict_data_well["skm_depth"] >= interval[0] and interval[1] > interval[0]:
                 # print(f'2 {interval, merged_segments}')
 
-                merged_segments_new.append((well_data.head_column_additional._value + 2, well_data.skm_depth))
-            elif interval[0] < float(well_data.head_column_additional._value) and interval[1] > float(
-                    well_data.head_column_additional._value) and well_data.skm_depth >= interval[1] and interval[1] > \
+                merged_segments_new.append((self.dict_data_well["head_column_additional"]._value + 2, self.dict_data_well["skm_depth"]))
+            elif interval[0] < float(self.dict_data_well["head_column_additional"]._value) and interval[1] > float(
+                    self.dict_data_well["head_column_additional"]._value) and self.dict_data_well["skm_depth"] >= interval[1] and interval[1] > \
                     interval[0]:
 
-                merged_segments_new.append((well_data.head_column_additional._value + 2, interval[1]))
+                merged_segments_new.append((self.dict_data_well["head_column_additional"]._value + 2, interval[1]))
                 # print(f'3 {interval, merged_segments}')
 
         elif template in ['ПСШ Доп колонна СКМ в основной колонне', 'СГМ в основной колонне']:
-            if interval[0] < float(well_data.head_column_additional._value) and interval[1] < float(
-                    well_data.head_column_additional._value) and well_data.skm_depth >= interval[1] and interval[1] > \
+            if interval[0] < float(self.dict_data_well["head_column_additional"]._value) and interval[1] < float(
+                    self.dict_data_well["head_column_additional"]._value) and self.dict_data_well["skm_depth"] >= interval[1] and interval[1] > \
                     interval[0]:
                 merged_segments_new.append(interval)
 
-            elif interval[0] < float(well_data.head_column_additional._value) and interval[1] > float(
-                    well_data.head_column_additional._value) and well_data.skm_depth <= interval[1] \
-                    and well_data.skm_depth >= interval[0] and interval[1] > interval[0]:
+            elif interval[0] < float(self.dict_data_well["head_column_additional"]._value) and interval[1] > float(
+                    self.dict_data_well["head_column_additional"]._value) and self.dict_data_well["skm_depth"] <= interval[1] \
+                    and self.dict_data_well["skm_depth"] >= interval[0] and interval[1] > interval[0]:
                 # merged_segments.remove(interval)
-                merged_segments_new.append((interval[0], well_data.skm_depth))
+                merged_segments_new.append((interval[0], self.dict_data_well["skm_depth"]))
 
     return merged_segments_new
 
 
 # Функция исключения из интервалов скреперования интервалов ПВР
-def remove_overlapping_intervals(perforating_intervals, skm_interval=None):
+def remove_overlapping_intervals(self, perforating_intervals, skm_interval=None):
     if skm_interval is None:
         # print(f' перфорация_ {perforating_intervals}')
         skipping_intervals = []
-        if well_data.paker_do["posle"] != 0:
-            if well_data.skm_depth > well_data.depth_fond_paker_do["posle"] + 20:
+        if self.dict_data_well["paker_do"]["posle"] != 0:
+            if self.dict_data_well["skm_depth"] > self.dict_data_well["depth_fond_paker_do"]["posle"] + 20:
                 skipping_intervals.append(
-                    [float(well_data.depth_fond_paker_do["posle"]) - 70,
-                     float(well_data.depth_fond_paker_do["posle"]) + 20])
+                    [float(self.dict_data_well["depth_fond_paker_do"]["posle"]) - 70,
+                     float(self.dict_data_well["depth_fond_paker_do"]["posle"]) + 20])
                 # print(f'1 {skipping_intervals}')
-            elif well_data.skm_depth > well_data.depth_fond_paker_do["posle"]:
+            elif self.dict_data_well["skm_depth"] > self.dict_data_well["depth_fond_paker_do"]["posle"]:
                 skipping_intervals.append(
-                    [float(well_data.depth_fond_paker_do["posle"]) - 20, well_data.skm_depth])
+                    [float(self.dict_data_well["depth_fond_paker_do"]["posle"]) - 20, self.dict_data_well["skm_depth"]])
                 # print(f'2 {skipping_intervals}')
 
-        if well_data.leakiness:
-            for nek in list(well_data.dict_leakiness['НЭК']['интервал'].keys()):
-                if int(float(nek.split('-')[1])) + 20 < well_data.skm_depth:
+        if self.dict_data_well["dict_leakiness"]:
+            for nek in list(self.dict_data_well["dict_leakiness"]['НЭК']['интервал'].keys()):
+                if int(float(nek.split('-')[1])) + 20 < self.dict_data_well["skm_depth"]:
                     skipping_intervals.append([int(float(nek.split('-')[0])) - 90, int(float(nek.split('-')[1])) + 20])
                 else:
                     skipping_intervals.append([int(float(nek.split('-')[0])) - 90,
-                                               well_data.skm_depth])
-        # print(f'глубина СКМ {well_data.skm_depth, skipping_intervals}')
+                                               self.dict_data_well["skm_depth"]])
+        # print(f'глубина СКМ {self.dict_data_well["skm_depth"], skipping_intervals}')
         perforating_intervals = sorted(perforating_intervals, key=lambda x: x[0])
 
         for pvr in sorted(perforating_intervals, key=lambda x: x[0]):
 
-            if pvr[1] + 40 < well_data.skm_depth:
+            if pvr[1] + 40 < self.dict_data_well["skm_depth"]:
                 skipping_intervals.append([pvr[0] - 90, pvr[0] - 2])
-                if well_data.skm_depth >= pvr[1] + 40:
+                if self.dict_data_well["skm_depth"] >= pvr[1] + 40:
                     if [pvr[1] + 2, pvr[1] + 40] not in skipping_intervals:
                         skipping_intervals.append([pvr[1] + 2, pvr[1] + 40])
                 else:
-                    if [pvr[1] + 2, well_data.skm_depth] not in skipping_intervals:
-                        skipping_intervals.append([pvr[1] + 2, well_data.skm_depth])
-            elif pvr[1] + 40 > well_data.skm_depth:
+                    if [pvr[1] + 2, self.dict_data_well["skm_depth"]] not in skipping_intervals:
+                        skipping_intervals.append([pvr[1] + 2, self.dict_data_well["skm_depth"]])
+            elif pvr[1] + 40 > self.dict_data_well["skm_depth"]:
                 if [pvr[0] - 90, pvr[0] - 2] not in skipping_intervals:
                     skipping_intervals.append([pvr[0] - 90, pvr[0] - 2])
-                if [pvr[1] + 1, well_data.skm_depth] not in skipping_intervals:
-                    skipping_intervals.append([pvr[1] + 1, well_data.skm_depth])
+                if [pvr[1] + 1, self.dict_data_well["skm_depth"]] not in skipping_intervals:
+                    skipping_intervals.append([pvr[1] + 1, self.dict_data_well["skm_depth"]])
 
         # print(f'СКМ на основе ПВР{sorted(skipping_intervals, key=lambda x: x[0])}')
 
@@ -188,73 +189,73 @@ def remove_overlapping_intervals(perforating_intervals, skm_interval=None):
     return skipping_intervals_new
 
 
-def raiding_interval(ryber_key):
+def raiding_interval(dict_data_well, ryber_key):
     str_raid = []
     crt = 0
-    for plast in well_data.plast_all:
+    for plast in dict_data_well["plast_all"]:
 
-        if well_data.dict_perforation[plast]['отрайбировано'] is False and \
-                well_data.dict_perforation[plast]['кровля'] <= well_data.current_bottom:
+        if dict_data_well["dict_perforation"][plast]['отрайбировано'] is False and \
+                dict_data_well["dict_perforation"][plast]['кровля'] <= dict_data_well["current_bottom"]:
 
-            for interval in well_data.dict_perforation[plast]['интервал']:
-                if float(interval[1]) < well_data.current_bottom and float(interval[0]) < float(interval[1]):
-                    if well_data.column_additional is False or \
-                            (well_data.column_additional and \
-                             well_data.head_column_additional._value > well_data.current_bottom):
+            for interval in dict_data_well["dict_perforation"][plast]['интервал']:
+                if float(interval[1]) < dict_data_well["current_bottom"] and float(interval[0]) < float(interval[1]):
+                    if dict_data_well["column_additional"] is False or \
+                            (dict_data_well["column_additional"] and \
+                             dict_data_well["head_column_additional"]._value > dict_data_well["current_bottom"]):
 
-                        if float(interval[1]) + 20 <= well_data.current_bottom and \
-                                well_data.shoe_column._value >= float(interval[1]) + 20:
+                        if float(interval[1]) + 20 <= dict_data_well["current_bottom"] and \
+                                dict_data_well["shoe_column"]._value >= float(interval[1]) + 20:
                             crt = [float(interval[0]) - 20, float(interval[1]) + 20]
-                        elif float(interval[1]) + 20 >= well_data.shoe_column._value and \
-                                well_data.shoe_column._value > well_data.current_bottom:
-                            crt = [float(interval[0]) - 20, well_data.shoe_column._value]
-                        elif float(interval[1]) + 20 >= well_data.shoe_column._value and \
-                                well_data.shoe_column._value <= well_data.current_bottom:
-                            crt = [float(interval[0]) - 20, well_data.current_bottom]
-                        elif float(interval[1]) + 20 < well_data.shoe_column._value and \
-                                float(interval[1] + 20) > well_data.current_bottom:
-                            crt = [float(interval[0]) - 20, well_data.current_bottom]
+                        elif float(interval[1]) + 20 >= dict_data_well["shoe_column"]._value and \
+                                dict_data_well["shoe_column"]._value > dict_data_well["current_bottom"]:
+                            crt = [float(interval[0]) - 20, dict_data_well["shoe_column"]._value]
+                        elif float(interval[1]) + 20 >= dict_data_well["shoe_column"]._value and \
+                                dict_data_well["shoe_column"]._value <= dict_data_well["current_bottom"]:
+                            crt = [float(interval[0]) - 20, dict_data_well["current_bottom"]]
+                        elif float(interval[1]) + 20 < dict_data_well["shoe_column"]._value and \
+                                float(interval[1] + 20) > dict_data_well["current_bottom"]:
+                            crt = [float(interval[0]) - 20, dict_data_well["current_bottom"]]
                     else:
-                        if float(interval[1]) + 20 <= well_data.current_bottom and \
-                                well_data.shoe_column_additional._value >= float(interval[1]) + 20:
+                        if float(interval[1]) + 20 <= dict_data_well["current_bottom"] and \
+                                dict_data_well["shoe_column_additional"]._value >= float(interval[1]) + 20:
                             crt = [float(interval[0]) - 20, float(interval[1]) + 20]
-                        elif float(interval[1]) + 20 >= well_data.shoe_column_additional._value:
-                            crt = [float(interval[0]) - 20, well_data.shoe_column._value]
-                        elif float(interval[1]) + 20 < well_data.shoe_column_additional._value and \
-                                float(interval[1] + 20) > well_data.current_bottom:
-                            crt = [float(interval[0]) - 20, well_data.current_bottom]
+                        elif float(interval[1]) + 20 >= dict_data_well["shoe_column_additional"]._value:
+                            crt = [float(interval[0]) - 20, dict_data_well["shoe_column"]._value]
+                        elif float(interval[1]) + 20 < dict_data_well["shoe_column_additional"]._value and \
+                                float(interval[1] + 20) > dict_data_well["current_bottom"]:
+                            crt = [float(interval[0]) - 20, dict_data_well["current_bottom"]]
                 if crt != 0 and crt not in str_raid:
                     str_raid.append(crt)
 
-    if len(well_data.drilling_interval) != 0:
-        for interval in well_data.drilling_interval:
-            if float(interval[1]) + 20 <= well_data.current_bottom and interval[0] < interval[1]:
+    if len(dict_data_well["drilling_interval"]) != 0:
+        for interval in dict_data_well["drilling_interval"]:
+            if float(interval[1]) + 20 <= dict_data_well["current_bottom"] and interval[0] < interval[1]:
                 str_raid.append((float(interval[0]) - 20, float(interval[1]) + 20))
-            elif float(interval[1]) + 20 > well_data.current_bottom and interval[0] < interval[1]:
-                str_raid.append((float(interval[0]) - 20, well_data.current_bottom))
+            elif float(interval[1]) + 20 > dict_data_well["current_bottom"] and interval[0] < interval[1]:
+                str_raid.append((float(interval[0]) - 20, dict_data_well["current_bottom"]))
 
-    if len(well_data.dict_leakiness) != 0:
+    if len(dict_data_well["dict_leakiness"]) != 0:
 
-        for nek in list(well_data.dict_leakiness['НЭК']['интервал'].keys()):
-            if well_data.dict_leakiness['НЭК']['интервал'][nek]['отрайбировано'] is False:
+        for nek in list(dict_data_well["dict_leakiness"]['НЭК']['интервал'].keys()):
+            if dict_data_well["dict_leakiness"]['НЭК']['интервал'][nek]['отрайбировано'] is False:
 
-                if float(nek.split('-')[1]) + 30 <= well_data.current_bottom and float(
-                        nek.split('-')[0]) + 30 <= well_data.current_bottom:
+                if float(nek.split('-')[1]) + 30 <= dict_data_well["current_bottom"] and float(
+                        nek.split('-')[0]) + 30 <= dict_data_well["current_bottom"]:
                     crt = (float(nek.split('-')[0]) - 30, float(nek.split('-')[1]) + 30)
                 else:
-                    crt = (float(nek.split('-')[0]) - 30, well_data.current_bottom)
+                    crt = (float(nek.split('-')[0]) - 30, dict_data_well["current_bottom"])
                 str_raid.append(crt)
 
     merged_segments = merge_overlapping_intervals(str_raid)
     merged_segments_new = []
-    if ryber_key == 'райбер в ЭК' and well_data.column_additional:
+    if ryber_key == 'райбер в ЭК' and dict_data_well["column_additional"]:
         for str in merged_segments:
-            if str[0] < well_data.head_column_additional._value and str[0] < str[1]:
+            if str[0] < dict_data_well["head_column_additional"]._value and str[0] < str[1]:
                 merged_segments_new.append(str)
 
-    elif ryber_key == 'райбер в ДП' and well_data.column_additional:
+    elif ryber_key == 'райбер в ДП' and dict_data_well["column_additional"]:
         for str in merged_segments:
-            if str[1] > well_data.head_column_additional._value and str[0] < str[1]:
+            if str[1] > dict_data_well["head_column_additional"]._value and str[0] < str[1]:
                 merged_segments_new.append(str)
     else:
         for str in merged_segments:
@@ -263,19 +264,19 @@ def raiding_interval(ryber_key):
     return merged_segments_new
 
 
-def change_True_raid(self, str_raid):
-    if well_data.dict_leakiness:
-        for nek in list(well_data.dict_leakiness['НЭК']['интервал'].keys()):
+def change_true_raid(self, str_raid):
+    if self.dict_data_well["dict_leakiness"]:
+        for nek in list(self.dict_data_well["dict_leakiness"]['НЭК']['интервал'].keys()):
             for str in str_raid:
                 # print(str[0], list(nek)[0], str[1])
                 if str[0] <= float(nek.split('-')[0]) <= str[1]:
-                    well_data.dict_leakiness['НЭК']['интервал'][nek]['отрайбировано'] = True
-    if well_data.plast_all:
-        for plast in well_data.plast_all:
-            for interval in list((well_data.dict_perforation[plast]['интервал'])):
+                    self.dict_data_well["dict_leakiness"]['НЭК']['интервал'][nek]['отрайбировано'] = True
+    if self.dict_data_well["plast_all"]:
+        for plast in self.dict_data_well["plast_all"]:
+            for interval in list((self.dict_data_well["dict_perforation"][plast]['интервал'])):
                 for str in str_raid:
                     if str[0] <= list(interval)[0] <= str[1]:
-                        well_data.dict_perforation[plast]['отрайбировано'] = True
+                        self.dict_data_well["dict_perforation"][plast]['отрайбировано'] = True
 
 
 def merge_overlapping_intervals(intervals):
@@ -309,33 +310,40 @@ def raid(string):
 def definition_plast_work(self):
     # Определение работающих пластов
     plast_work = set()
-    perforation_roof = well_data.current_bottom
+    perforation_roof = 5000
     perforation_sole = 0
 
 
-    for plast, value in well_data.dict_perforation.items():
+
+    for plast, value in self.dict_data_well["dict_perforation"].items():
         for interval in value['интервал']:
 
-            if well_data.dict_perforation[plast]["отключение"] is False:
+            if self.dict_data_well["dict_perforation"][plast]["отключение"] is False:
                 plast_work.add(plast)
-            roof = min(list(map(lambda x: float(x[0]), list(well_data.dict_perforation[plast]['интервал']))))
-            sole = max(list(map(lambda x: float(x[1]), list(well_data.dict_perforation[plast]['интервал']))))
-            well_data.dict_perforation[plast]["кровля"] = roof
-            well_data.dict_perforation[plast]["подошва"] = sole
-            if well_data.dict_perforation[plast]["отключение"] is False:
+            roof = min(list(map(lambda x: float(x[0]), list(self.dict_data_well["dict_perforation"][plast]['интервал']))))
+            sole = max(list(map(lambda x: float(x[1]), list(self.dict_data_well["dict_perforation"][plast]['интервал']))))
+            self.dict_data_well["dict_perforation"][plast]["кровля"] = roof
+            self.dict_data_well["dict_perforation"][plast]["подошва"] = sole
+            if self.dict_data_well["dict_perforation"][plast]["отключение"] is False:
 
-                if perforation_roof >= roof and well_data.current_bottom > roof:
+                if perforation_roof >= roof and self.dict_data_well["current_bottom"] > roof:
                     perforation_roof = roof
-                if perforation_sole < sole and well_data.current_bottom > sole:
+                if perforation_sole < sole and self.dict_data_well["current_bottom"] > sole:
                     perforation_sole = sole
 
-    well_data.perforation_roof = perforation_roof
-    well_data.perforation_sole = perforation_sole
-    well_data.dict_perforation = dict(
-        sorted(well_data.dict_perforation.items(), key=lambda item: (not item[1]['отключение'],
+    self.dict_data_well["perforation_roof"] = perforation_roof
+    self.dict_data_well["perforation_sole"] = perforation_sole
+    self.dict_data_well["dict_perforation"] = dict(
+        sorted(self.dict_data_well["dict_perforation"].items(), key=lambda item: (not item[1]['отключение'],
                                                                      item[0])))
-    well_data.plast_all = list(well_data.dict_perforation.keys())
-    well_data.plast_work = list(plast_work)
+    self.dict_data_well['plast_all'] = list(self.dict_data_well["dict_perforation"].keys())
+    self.dict_data_well['plast_work'] = list(plast_work)
+    self.dict_data_well["plast_all"] = list(self.dict_data_well["dict_perforation"].keys())
+    well_data.plast_work = self.dict_data_well['plast_work']
+    if len(self.dict_data_well["dict_perforation_project"]) != 0:
+        self.dict_data_well["plast_project"] = list(self.dict_data_well["dict_perforation_project"].keys())
+
+
 
 
 def count_row_height(self, wb2, ws, ws2, work_list, merged_cells_dict, ind_ins):
@@ -364,7 +372,7 @@ def count_row_height(self, wb2, ws, ws2, work_list, merged_cells_dict, ind_ins):
 
     head = plan.head_ind(0, ind_ins)
 
-    plan.copy_true_ws(ws, ws2, head)
+    plan.copy_true_ws(self.dict_data_well, ws, ws2, head)
     boundaries_dict_index = 1000
     stop_str = 1500
     for i in range(1, len(work_list) + 1):  # Добавлением работ
@@ -451,17 +459,19 @@ def count_row_height(self, wb2, ws, ws2, work_list, merged_cells_dict, ind_ins):
 
     try:
         # вставка сохраненных изображение по координатам ячеек
-        if well_data.image_list:
+        if self.dict_data_well["image_list"]:
 
-            for img in well_data.image_list:
+            for img in self.dict_data_well["image_list"]:
                 image_path = img[0]
                 logo = Image(image_path) # Используем open для открытия изображения
                 logo.width, logo.height = img[2][0] * 0.48, img[2][1] * 0.72
                 ws2.add_image(logo, img[1])
     except TypeError as e:
         QMessageBox.warning(None, 'Ошибка', f'Ошибка Изменения размера изображения {type(e).__name__}\n\n{str(e)}')
-    if well_data.image_data:
-        for image_info in well_data.image_data:
+
+    if self.dict_data_well["image_data"]:
+
+        for image_info in self.dict_data_well["image_data"]:
             coord = image_info["coord"]
             width = image_info["width"]
             height = image_info["height"]

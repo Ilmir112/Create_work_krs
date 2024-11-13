@@ -394,10 +394,10 @@ class CheckWellExistence:
             return None
         with self.db_connection.cursor() as cursor:
             # Проверка наличия записи в базе данных
-            cursor.execute(
-                f"SELECT categoty_pressure, categoty_h2s, categoty_gf, today FROM {region}_классификатор "
-                f"WHERE well_number =(%s) and deposit_area =(%s)",
-                (str(well_number._value), deposit_area._value))
+            query = f"SELECT categoty_pressure, categoty_h2s, categoty_gf, today FROM {region}_классификатор " \
+                    f"WHERE well_number =({self.path_index}) and deposit_area =({self.path_index})"
+            data = (str(well_number._value), deposit_area._value)
+            cursor.execute(query, data)
 
             result = cursor.fetchone()
             return result
@@ -427,9 +427,10 @@ class CheckWellExistence:
 
 
 class WorkDatabaseWell:
-    def __init__(self, connect_to_database: DatabaseConnection, path_index="%s"):
+    def __init__(self, connect_to_database: DatabaseConnection, dict_data_well=None, path_index="%s"):
         self.db_connection = connect_to_database.connect_to_database()
         self.path_index = path_index
+        self.dict_data_well = dict_data_well
 
     def get_tables_starting_with(self, well_number, well_area, work_plan, type_kr):
         if not self.db_connection:
@@ -471,22 +472,23 @@ class WorkDatabaseWell:
         data_well = json.dumps(data_well_dict, ensure_ascii=False)
         excel_json = json.dumps(excel, ensure_ascii=False)
         date_today = datetime.now()
-        type_kr = well_data.type_kr.split(' ')[0]
-        adedaas = well_data.data_list
-        data_paragraph = json.dumps(well_data.data_list, ensure_ascii=False)
-        cdng = well_data.cdng._value
-        category_dict = json.dumps(well_data.dict_category, ensure_ascii=False)
-        # print(row, well_data.count_row_well)
+        type_kr = self.dict_data_well["type_kr"].split(' ')[0]
+        adedaas = self.dict_data_well["data_list"]
+        data_paragraph = json.dumps(self.dict_data_well["data_list"], ensure_ascii=False)
+        cdng = self.dict_data_well["cdng"]._value
+        aswdaw = self.dict_data_well["dict_category"]
+        category_dict = json.dumps(self.dict_data_well["dict_category"], ensure_ascii=False)
+        # print(row, self.dict_data_well["count_row_well"])
 
         if 'dop_plan' in work_plan:
-            work_plan_str = f'ДП№{well_data.number_dp}'
+            work_plan_str = f'ДП№{self.dict_data_well["number_dp"]}'
         elif 'krs' in work_plan:
             work_plan_str = 'ПР'
         elif work_plan == 'plan_change':
-            if well_data.work_plan_change == 'krs':
+            if self.dict_data_well["work_plan_change"] == 'krs':
                 work_plan_str = 'ПР'
             else:
-                work_plan_str = f'ДП№{well_data.number_dp}'
+                work_plan_str = f'ДП№{self.dict_data_well["number_dp"]}'
 
 
         try:
@@ -549,51 +551,51 @@ class WorkDatabaseWell:
                                                 f' {type(e).__name__}\n\n{str(e)}')
 
     def insert_data_in_chemistry(self) -> None:
-        if well_data.work_plan in ['dop_plan', 'dop_plan_in_base']:
-            string_work = f' ДП№ {well_data.number_dp}'
-        elif well_data.work_plan == 'krs':
+        if self.dict_data_well["work_plan"] in ['dop_plan', 'dop_plan_in_base']:
+            string_work = f' ДП№ {self.dict_data_well["number_dp"]}'
+        elif self.dict_data_well["work_plan"] == 'krs':
             string_work = 'ПР'
-        elif well_data.work_plan == 'plan_change':
-            if well_data.work_plan_change == 'krs':
+        elif self.dict_data_well["work_plan"] == 'plan_change':
+            if self.dict_data_well["work_plan_change"] == 'krs':
                 string_work = 'ПР изм'
             else:
-                string_work = f'ДП№{well_data.number_dp} изм '
+                string_work = f'ДП№{self.dict_data_well["number_dp"]} изм '
 
-        elif well_data.work_plan == 'gnkt_bopz':
+        elif self.dict_data_well["work_plan"] == 'gnkt_bopz':
             string_work = 'ГНКТ БОПЗ ВНС'
-        elif well_data.work_plan == 'gnkt_opz':
+        elif self.dict_data_well["work_plan"] == 'gnkt_opz':
             string_work = 'ГНКТ ОПЗ'
-        elif well_data.work_plan == 'gnkt_after_grp':
+        elif self.dict_data_well["work_plan"] == 'gnkt_after_grp':
             string_work = 'ГНКТ ОСВ ГРП'
         else:
             string_work = 'ГНКТ'
 
         date_today = datetime.now()
-        data_work = (well_data.well_number._value,
-                     well_data.well_area._value,
-                     well_data.region,
+        data_work = (self.dict_data_well["well_number"]._value,
+                     self.dict_data_well["well_area"]._value,
+                     self.dict_data_well["region"],
                      well_data.costumer,
                      well_data.contractor,
                      string_work,
-                     well_data.type_kr.split(" ")[0],
+                     self.dict_data_well["type_kr"].split(" ")[0],
                      date_today,
-                     well_data.dict_volume_chemistry['цемент'],
-                     well_data.dict_volume_chemistry['HCl'],
-                     well_data.dict_volume_chemistry['HF'],
-                     well_data.dict_volume_chemistry['NaOH'],
-                     well_data.dict_volume_chemistry['ВТ СКО'],
-                     well_data.dict_volume_chemistry['Глина'],
-                     well_data.dict_volume_chemistry['песок'],
-                     well_data.dict_volume_chemistry['РПК'],
-                     well_data.dict_volume_chemistry['РПП'],
-                     well_data.dict_volume_chemistry["извлекаемый пакер"],
-                     well_data.dict_volume_chemistry["ЕЛАН"],
-                     well_data.dict_volume_chemistry['растворитель'],
-                     well_data.dict_volume_chemistry["РИР 2С"],
-                     well_data.dict_volume_chemistry["РИР ОВП"],
-                     well_data.dict_volume_chemistry['гидрофабизатор'],
-                     round(well_data.normOfTime, 1),
-                     well_data.fluid
+                     well_data.DICT_VOLUME_CHEMISTRY['цемент'],
+                     well_data.DICT_VOLUME_CHEMISTRY['HCl'],
+                     well_data.DICT_VOLUME_CHEMISTRY['HF'],
+                     well_data.DICT_VOLUME_CHEMISTRY['NaOH'],
+                     well_data.DICT_VOLUME_CHEMISTRY['ВТ СКО'],
+                     well_data.DICT_VOLUME_CHEMISTRY['Глина'],
+                     well_data.DICT_VOLUME_CHEMISTRY['песок'],
+                     well_data.DICT_VOLUME_CHEMISTRY['РПК'],
+                     well_data.DICT_VOLUME_CHEMISTRY['РПП'],
+                     well_data.DICT_VOLUME_CHEMISTRY["извлекаемый пакер"],
+                     well_data.DICT_VOLUME_CHEMISTRY["ЕЛАН"],
+                     well_data.DICT_VOLUME_CHEMISTRY['растворитель'],
+                     well_data.DICT_VOLUME_CHEMISTRY["РИР 2С"],
+                     well_data.DICT_VOLUME_CHEMISTRY["РИР ОВП"],
+                     well_data.DICT_VOLUME_CHEMISTRY['гидрофабизатор'],
+                     round(self.dict_data_well["norm_of_time"], 1),
+                     self.dict_data_well["fluid"]
                      )
 
 
@@ -657,7 +659,7 @@ class WorkDatabaseWell:
             return None
         with self.db_connection.cursor() as cursor:
             query = f'''
-                    SELECT data_change_paragraph FROM wells 
+                    SELECT data_change_paragraph, data_well, type_kr, category_dict FROM wells 
                     WHERE well_number={self.path_index} AND area_well={self.path_index} AND type_kr={self.path_index} 
                     AND work_plan={self.path_index} AND today={self.path_index} AND contractor={self.path_index}'''
 

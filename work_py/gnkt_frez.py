@@ -8,36 +8,34 @@ from openpyxl.utils import get_column_letter
 import well_data
 from perforation_correct_gnkt_frez import PerforationCorrectGnktFrez
 
-
 import plan
 from openpyxl.styles import Border, Side, PatternFill, Font, Alignment
 from openpyxl.workbook import Workbook
 
-from work_py.alone_oreration import  well_volume, volume_nkt_metal, volume_nkt
+from work_py.alone_oreration import well_volume, volume_nkt_metal, volume_nkt
 from work_py.gnkt_grp import GnktOsvWindow
-from work_py.gnkt_grp_work import  GnktModel
+from work_py.gnkt_grp_work import GnktModel
 
 
-class Work_with_gnkt(GnktModel):
+class WorkWithGnkt(GnktModel):
 
-
-    def __init__(self, ws, table_title, table_schema, table_widget):
+    def __init__(self, ws, table_title, table_schema, table_widget, parent=None):
         from open_pz import CreatePZ
 
-        super().__init__()
+        super().__init__(parent)
+        self.dict_data_well = parent
         self.table_widget = table_widget
         self.table_title = table_title
         self.table_schema = table_schema
 
-        self.dict_perforation = well_data.dict_perforation
+        self.dict_perforation = self.dict_data_well["dict_perforation"]
         self.data_gnkt = None
         self.ws = ws
         self.work_plan = 'gnkt_frez'
         self.perforation_correct_window2 = None
-        
 
         if self.perforation_correct_window2 is None:
-            self.perforation_correct_window2 = PerforationCorrectGnktFrez(self)
+            self.perforation_correct_window2 = PerforationCorrectGnktFrez(self.dict_data_well)
             self.perforation_correct_window2.setWindowTitle("Сверка данных по муфтам")
             # self.perforation_correct_window2.setGeometry(200, 400, 100, 400)
             self.perforation_correct_window2.show()
@@ -61,34 +59,31 @@ class Work_with_gnkt(GnktModel):
             self.perforation_correct_window2 = None
         self.wb_gnkt = Workbook()
 
-        self.work_with_data_gnkt()
-        
+        self.data_gnkt = self.work_with_data_gnkt()
+
         self.ws_title = self.wb_gnkt.create_sheet(title="Титульник")
 
         self.ws_schema = self.wb_gnkt.create_sheet(title="СХЕМА")
         self.ws_work = self.wb_gnkt.create_sheet(title="Ход работ")
         self.wb_gnkt.remove(self.wb_gnkt['Sheet'])
 
-        head = plan.head_ind(well_data.cat_well_min._value, well_data.cat_well_max._value)
+        head = plan.head_ind(self.dict_data_well["cat_well_min"]._value, self.dict_data_well["cat_well_max"]._value)
 
-        plan.copy_true_ws(self.ws, self.ws_title, head)
+        plan.copy_true_ws(self.dict_data_well, self.ws, self.ws_title, head)
 
         self.create_title_list(self.ws_title)
-        self.schema_well(self.ws_schema)
+        self.schema_well(self.ws_schema, self.data_gnkt)
 
         self.copy_pz(self.ws_title, table_title, 'gnkt_frez', 13, 1)
         self.copy_pz(self.ws_schema, table_schema, 'gnkt_frez', 47, 2)
         self.copy_pz(self.ws_work, table_widget, 'gnkt_frez', 12, 3)
-        work_well = self.work_gnkt_frez()
+        work_well = self.work_gnkt_frez(self.data_gnkt)
         self.populate_row(0, work_well, table_widget, self.work_plan)
 
         CreatePZ.add_itog(self, self.ws_work, self.table_widget.rowCount() + 1, self.work_plan)
 
-    
-
-
-    def schema_well(self, ws3):
-        well_data.count_row_well = 0
+    def schema_well(self, ws3, data_gnkt):
+        self.dict_data_well["count_row_well"] = 0
 
         from work_py.alone_oreration import volume_vn_nkt, well_volume
 
@@ -102,7 +97,7 @@ class Work_with_gnkt(GnktModel):
                            28: (17, 17, 18, 17), 29: (32, 8, 39, 8), 30: (40, 15, 42, 15), 31: (19, 20, 20, 20),
                            32: (21, 20, 22, 20), 33: (21, 14, 22, 14), 34: (13, 19, 14, 19),
                            36: (11, 13, 12, 13), 37: (43, 7, 48, 7), 38: (37, 3, 48, 3), 39: (7, 6, 12, 11),
-                           40:(27, 22, 28, 22), 41: (19, 22, 20, 22), 42: (32, 18, 39, 18), 43: (21, 22, 22, 22),
+                           40: (27, 22, 28, 22), 41: (19, 22, 20, 22), 42: (32, 18, 39, 18), 43: (21, 22, 22, 22),
                            44: (46, 23, 48, 23), 45: (7, 18, 12, 18), 47: (43, 8, 48, 8),
                            48: (13, 7, 30, 7), 49: (46, 15, 48, 15), 50: (43, 14, 45, 14), 51: (40, 18, 42, 18),
                            52: (17, 23, 18, 23), 53: (43, 10, 48, 10), 54: (29, 14, 30, 14),
@@ -154,41 +149,44 @@ class Work_with_gnkt(GnktModel):
                     13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0,
                     13.0, 13.0, 13.0, 5.42578125, 13.0, 4.5703125, 2.28515625, 10.28515625]
 
-        self.plast_work = well_data.plast_all[0]
+        self.plast_work = self.dict_data_well["plast_all"][0]
         plast_work = self.plast_work
-        # print(self.plast_work, list(well_data.dict_perforation[plast_work]))
-        self.pressuar = list(well_data.dict_perforation[plast_work]["давление"])[0]
+        # print(self.plast_work, list(self.dict_data_well["dict_perforation"][plast_work]))
+        self.pressuar = list(self.dict_data_well["dict_perforation"][plast_work]["давление"])[0]
 
-        zamer = list(well_data.dict_perforation[plast_work]['замер'])[0]
-        vertikal = min(map(float, list(well_data.dict_perforation[plast_work]["вертикаль"])))
+        zamer = list(self.dict_data_well["dict_perforation"][plast_work]['замер'])[0]
+        vertikal = min(map(float, list(self.dict_data_well["dict_perforation"][plast_work]["вертикаль"])))
         self.fluid = self.calc_fluid()
         self.zhgs = f'{self.fluid}г/см3'
         koef_anomal = round(float(self.pressuar) * 101325 / (float(vertikal) * 9.81 * 1000), 1)
-        if well_data.dict_nkt:
-            nkt = int(list(well_data.dict_nkt.keys())[0])
+        nkt = 0
+        nkt_widht = 0
+        if self.dict_data_well["dict_nkt"]:
+            nkt = int(list(self.dict_data_well["dict_nkt"].keys())[0])
             if nkt == 73:
                 nkt_widht = 5.5
             elif nkt == 89:
                 nkt_widht = 6.5
             elif nkt == 60:
                 nkt_widht = 5
-        lenght_nkt = sum(list(map(int, well_data.dict_nkt.values())))
+        lenght_nkt = sum(list(map(int, self.dict_data_well["dict_nkt"].values())))
 
         bottom_first_port = self.ports_data['№1']['кровля']
 
-        gnkt_lenght = int(well_data.gnkt_length)
-        gnkt_lenght_str = f'длина ГНКТ - {well_data.gnkt_length}м; износ -{well_data.iznos}%; ' \
-                      f'пробег '
+        gnkt_lenght = float(int(data_gnkt.lenght_gnkt_edit))
+        gnkt_lenght_str = f'длина ГНКТ - {data_gnkt.lenght_gnkt_edit}м; износ -{data_gnkt.iznos_gnkt_edit}%; ' \
+                          f'пробег = {data_gnkt.pipe_mileage_edit}'
         volume_vn_gnkt = round(30.2 ** 2 * 3.14 / (4 * 1000), 2)
         volume_gnkt = round(gnkt_lenght * volume_vn_gnkt / 1000, 1)
 
-        well_volume_ek = well_volume(self, well_data.head_column_additional._value)
-        well_volume_dp = well_volume(self, well_data.current_bottom) - well_volume_ek
+        well_volume_ek = well_volume(self, self.dict_data_well["head_column_additional"]._value)
+        well_volume_dp = well_volume(self, self.dict_data_well["current_bottom"]) - well_volume_ek
 
         volume_pm_ek = round(
-            3.14 * (well_data.column_diametr._value - 2 * well_data.column_wall_thickness._value) ** 2 / 4 / 1000, 2)
-        volume_pm_dp = round(3.14 * (well_data.column_additional_diametr._value - 2 *
-                                     well_data.column_additional_wall_thickness._value) ** 2 / 4 / 1000, 2)
+            3.14 * (self.dict_data_well["column_diametr"]._value - 2 * self.dict_data_well[
+                "column_wall_thickness"]._value) ** 2 / 4 / 1000, 2)
+        volume_pm_dp = round(3.14 * (self.dict_data_well["column_additional_diametr"]._value - 2 *
+                                     self.dict_data_well["column_additional_wall_thickness"]._value) ** 2 / 4 / 1000, 2)
 
         schema_well_list = [
             ['СХЕМА СКВАЖИНЫ', None, None, None, None, None, None, None, None, None, None, None, None,
@@ -201,9 +199,11 @@ class Work_with_gnkt(GnktModel):
              None, None, None, None, None, None, None, None, None, None, None, None, None],
 
             [None, None, None, None, None, None, None, None, None, None, None, None, None,
-             '№ скважины:', None, None, None, None, None, None, None, well_data.well_number._value, None, None, None, None,
+             '№ скважины:', None, None, None, None, None, None, None, self.dict_data_well["well_number"]._value, None,
+             None, None, None,
              None, None,
-             None, 'Месторождение:', None, None, None, None, None, None, well_data.well_oilfield._value, None, None, None,
+             None, 'Месторождение:', None, None, None, None, None, None, self.dict_data_well["well_oilfield"]._value,
+             None, None, None,
              None,
              None, None, None, None, None, None],
 
@@ -233,13 +233,15 @@ class Work_with_gnkt(GnktModel):
             [None, None, None, None, None, None, None, None, None, None, None, None,
              'тройник 80х70-80х70 В60-В60',
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-             'Содержание H2S', None, None, None, None, None, None, None, round(well_data.h2s_mg[0], 5), None, None,
+             'Содержание H2S', None, None, None, None, None, None, None, round(self.dict_data_well["h2s_mg"][0], 5),
+             None, None,
              None,
              None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None,
              f'ФА  ГРП ГУ 180х35-89 К1ХЛ № ',
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-             'Газовый фактор', None, None, None, None, None, None, None, well_data.gaz_f_pr[0], None, None, None, None,
+             'Газовый фактор', None, None, None, None, None, None, None, self.dict_data_well["gaz_f_pr"][0], None, None,
+             None, None,
              None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Переходная катушка 180х21-89-3"',
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
@@ -253,10 +255,11 @@ class Work_with_gnkt(GnktModel):
              None, None, None, None, None],
 
             [' ', None, None, None, None, None, 'Тип КГ', None, None, None, None, None,
-             well_data.column_head_m, None, None, None, None, None, None, None, None, None, None,
+             self.dict_data_well["column_head_m"], None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None, None, None, None,
-             'Макс.угол в горизонт. участке', None, None, None, None, None, None, None, well_data.max_angle._value, None, None,
-             'на глубине', None, None, well_data.max_angle_H._value, None],
+             'Макс.угол в горизонт. участке', None, None, None, None, None, None, None,
+             self.dict_data_well["max_angle"]._value, None, None,
+             'на глубине', None, None, self.dict_data_well["max_angle_H"]._value, None],
 
             [None, None, None, None, None, None,
              'Диаметр канавки', None, None, None, None, None, 'Наруж.\nдиаметр',
@@ -265,75 +268,96 @@ class Work_with_gnkt(GnktModel):
              None, None, f'{6.21}/10м', None, None, 'на глубине', None, None, '1310', None],
 
             [None, None, None, None, None, None,
-             'Стол ротора', None, None, None, f'{well_data.stol_rotora._value}м', None, None, None, None, None,
+             'Стол ротора', None, None, None, f'{self.dict_data_well["stol_rotora"]._value}м', None, None, None, None,
+             None,
              None, None, 'от', None, 'до', None, None, None, None, None, 'п.м', None, 'м3', None, None,
-             'Жидкость глушения', None, None, None, None, None, None, None, self.zhgs, None, None, 'в объеме', None, None,
+             'Жидкость глушения', None, None, None, None, None, None, None, self.zhgs, None, None, 'в объеме', None,
+             None,
              f'{28.9}м3', None],
             [None, None, None, None, None, None, 'Направление', None, None, None, None, None,
-             well_data.column_direction_diametr._value, None, well_data.column_direction_wall_thickness._value, None,
-             well_data.column_direction_diametr._value - 2 * well_data.column_direction_wall_thickness._value, None,
-             well_data.column_direction_lenght._value, None, None, None, well_data.level_cement_direction._value, None, None,
+             self.dict_data_well["column_direction_diametr"]._value, None,
+             self.dict_data_well["column_direction_wall_thickness"]._value, None,
+             self.dict_data_well["column_direction_diametr"]._value - 2 * self.dict_data_well[
+                 "column_direction_wall_thickness"]._value, None,
+             self.dict_data_well["column_direction_lenght"]._value, None, None, None,
+             self.dict_data_well["level_cement_direction"]._value, None, None,
              None, None, None, None, None, None, 'Ожидаемый дебит',
-             None, None, None, None, None, None, None, f'{well_data.Qwater}м3/сут', None, None,
-             f'{well_data.Qoil}м3', None, None,
-             f'{well_data.proc_water}%', None],
+             None, None, None, None, None, None, None, f'{self.dict_data_well["Qwater"]}м3/сут', None, None,
+             f'{self.dict_data_well["Qoil"]}м3', None, None,
+             f'{self.dict_data_well["proc_water"]}%', None],
             [None, None, None, None, None, None, 'Кондуктор', None, None, None, None, None,
-             well_data.column_conductor_diametr._value, None, well_data.column_conductor_wall_thickness._value, None,
-             well_data.column_conductor_diametr._value - 2 * well_data.column_conductor_wall_thickness._value,
-             None, well_data.column_conductor_lenght._value, None, None, None, well_data.level_cement_conductor._value,
+             self.dict_data_well["column_conductor_diametr"]._value, None,
+             self.dict_data_well["column_conductor_wall_thickness"]._value, None,
+             self.dict_data_well["column_conductor_diametr"]._value - 2 * self.dict_data_well[
+                 "column_conductor_wall_thickness"]._value,
+             None, self.dict_data_well["column_conductor_lenght"]._value, None, None, None,
+             self.dict_data_well["level_cement_conductor"]._value,
              None, None, None, None, None, None, None, None,
              'Начало / окончание бурения', None, None, None, None, None, None, None,
-             self.date_dmy(well_data.date_drilling_run), None, None,
-             self.date_dmy(well_data.date_drilling_cancel), None, None, None,
+             self.date_dmy(self.dict_data_well["date_drilling_run"]), None, None,
+             self.date_dmy(self.dict_data_well["date_drilling_cancel"]), None, None, None,
              None],
             [None, None, None, None, None, None, 'Экспл. колонна', None, None, None, None, None,
-             well_data.column_diametr._value, None, well_data.column_wall_thickness._value, None,
-             well_data.column_diametr._value - 2 * well_data.column_wall_thickness._value, None,
-             f'0-{well_data.shoe_column._value}м', None,
+             self.dict_data_well["column_diametr"]._value, None, self.dict_data_well["column_wall_thickness"]._value,
              None,
-             None, well_data.level_cement_column._value, None, None, None, volume_pm_ek, None, well_volume_ek,
+             self.dict_data_well["column_diametr"]._value - 2 * self.dict_data_well["column_wall_thickness"]._value,
+             None,
+             f'0-{self.dict_data_well["shoe_column"]._value}м', None,
+             None,
+             None, self.dict_data_well["level_cement_column"]._value, None, None, None, volume_pm_ek, None,
+             well_volume_ek,
              None, None, 'Р в межколонном пространстве', None, None, None, None, None, None, None,
-             f'{0}атм', None, None, None, self.date_dmy(well_data.date_drilling_cancel), None, None, None],
+             f'{0}атм', None, None, None, self.date_dmy(self.dict_data_well["date_drilling_cancel"]), None, None, None],
             [None, None, None, None, None, None, "Хвостовик  ''НТЦ ''ЗЭРС''", None, None, None, None,
-             None, well_data.column_additional_diametr._value, None,
-             well_data.column_additional_wall_thickness._value, None,
-             well_data.column_additional_diametr._value - 2 * well_data.column_additional_wall_thickness._value, None,
-             well_data.head_column_additional._value, None, well_data.shoe_column_additional._value, None,
+             None, self.dict_data_well["column_additional_diametr"]._value, None,
+             self.dict_data_well["column_additional_wall_thickness"]._value, None,
+             self.dict_data_well["column_additional_diametr"]._value - 2 * self.dict_data_well[
+                 "column_additional_wall_thickness"]._value, None,
+             self.dict_data_well["head_column_additional"]._value, None,
+             self.dict_data_well["shoe_column_additional"]._value, None,
              'не цементиров.', None,
              None, None, volume_pm_dp,
              None, well_volume_dp, None, None, 'Давление опрессовки МКП', None, None, None, None, None, None, None,
              None, None, None, None, None, None, None, None],
-            [None, None, None, None, None, None, f'Подвеска НКТ {nkt}мм', None, None, None, None, None, nkt, None,
-             nkt_widht,
-             None, nkt - 2 * nkt_widht, None, f'{0}', None, f'{lenght_nkt - 0.5 - 2.6 - 3}м', None,
-             f'{lenght_nkt - 0.5 - 2.6 - 3}м', None, None, None,
-             volume_vn_nkt(well_data.dict_nkt), None, volume_vn_nkt(well_data.dict_nkt) + 0.47, None, None,
+            [None, None, None, None, None, None, '' if nkt == 0 else f'Подвеска НКТ {nkt}мм', None, None, None, None,
+             None, '' if nkt == 0 else nkt, None,
+             '' if nkt == 0 else nkt_widht,
+             None, '' if nkt == 0 else nkt - 2 * nkt_widht, None, f'{0}', None, '' if nkt == 0 else f'{lenght_nkt - 0.5 - 2.6 - 3}м', None,
+             '' if nkt == 0 else f'{lenght_nkt - 0.5 - 2.6 - 3}м', None, None, None,
+             '' if nkt == 0 else volume_vn_nkt(self.dict_data_well["dict_nkt"]), None,
+             '' if nkt == 0 else volume_vn_nkt(self.dict_data_well["dict_nkt"]) + 0.47, None, None,
              'Давление опрессовки ЭК ', None, None, None, None,
-             None, None, None, f'{well_data.max_admissible_pressure._value}атм', None, None,
+             None, None, None, f'{self.dict_data_well["max_admissible_pressure"]._value}атм', None, None,
              None,
              None, None, 'гермет.', None],
-            [None, None, None, None, None, None, 'Гидроякорь ', None, None, None, None, None, 122, None, None, None, 71,
-             None, f'{lenght_nkt}', None, f'{lenght_nkt + 1}м', None, f'{0.5}м3', None, None, None, None, None, None,
+            [None, None, None, None, None, None, '' if nkt == 0 else 'Гидроякорь ', None, None, None, None,
+             None, '' if nkt == 0 else 122, None, None, None, '' if nkt == 0 else 71,
+             None, '' if nkt == 0 else f'{lenght_nkt}', None, '' if nkt == 0 else f'{lenght_nkt + 1}м', None,
+             '' if nkt == 0 else f'{0.5}м3', None, None, None, None, None, None,
              None,
              None, 'Макс. допустимое Р опр-ки ЭК', None, None, None, None, None, None, None,
-             well_data.max_admissible_pressure._value, None, None, None,
+             self.dict_data_well["max_admissible_pressure"]._value, None, None, None,
              None, None, None, None],
-            [None, None, None, None, None, None, 'Патрубок 1 шт.', None, None, None, None, None, nkt, None, 6.5, None,
-             74.2, None, lenght_nkt - 5.6, None, f'{lenght_nkt - 2.6}м', None, f'{3}м', None, None, None, None,
+            [None, None, None, None, None, None, '' if nkt == 0 else 'Патрубок 1 шт.', None, None, None, None,
+             None, '' if nkt == 0 else nkt, None, '' if nkt == 0 else 6.5, None,
+             '' if nkt == 0 else 74.2, None, '' if nkt == 0 else lenght_nkt - 5.6, None,
+             '' if nkt == 0 else f'{lenght_nkt - 2.6}м', None, '' if nkt == 0 else f'{3}м', None, None, None, None,
              None, None, None, None, 'Макс. ожидаемое Р на устье скв.', None, None, None, None, None, None, None, 92.8,
              None, None, None, None, None, None, None],
-            [None, None, None, None, None, None, f'стингер {well_data.paker_do["do"]}', None, None, None, None, None,
+            [None, None, None, None, None, None, '' if nkt == 0 else f'стингер {self.dict_data_well["paker_do"]["do"]}',
+             None, None, None,
+             None, None,
              None, None,
              None, None, 71, None, lenght_nkt - 2.6, None, lenght_nkt, None, f'{2.6}м', None, None, None, None,
              None, None, None, None, 'Текущий забой до ГРП ', None, None, None, None, None, None, None, None, None,
-             None, None, None, None, f'{well_data.current_bottom}м', None],
+             None, None, None, None, f'{self.dict_data_well["current_bottom"]}м', None],
             [None, None, None, None, None, None, 'ГНКТ', None, None, None, None, None, 38.1, None, 3.96, None, 30.18,
              None, gnkt_lenght_str, None, None, None, None, None, None, None, volume_vn_gnkt, None,
              volume_gnkt, None,
              None, 'Искусственный забой  (МГРП №1)', None, None, None, None, None, None, None, None,
              None, None, None, None, None, f'{bottom_first_port}м', None]]
 
-        # self.ports_data = self.work_with_port(self.plast_work, well_data.dict_perforation)
+        # self.ports_data = self.work_with_port(self.plast_work, self.dict_data_well["dict_perforation"])
         self.ports_list, merge_port = self.insert_ports_data(self.ports_data)
 
         # print(ports_list)
@@ -511,35 +535,37 @@ class Work_with_gnkt(GnktModel):
         # зададим размер листа
         ws3.page_setup.paperSize = ws3.PAPERSIZE_A4
 
-    def work_gnkt_frez(self):
+    def work_gnkt_frez(self, data_gnkt):
         from krs import GnoWindow
         from cdng import events_gnvp_frez
-        if well_data.column_additional:
-            if sum(list(well_data.dict_nkt.values())) != 0 and \
-                    abs(well_data.depth_fond_paker_do['do'] - well_data.head_column_additional._value) > 30:
+        if self.dict_data_well["column_additional"]:
+            if sum(list(self.dict_data_well["dict_nkt"].values())) != 0 and \
+                    abs(self.dict_data_well["depth_fond_paker_do"]["do"] - self.dict_data_well[
+                        "head_column_additional"]._value) > 30:
                 ntk_true = True
                 paker_true = False
-                nkt_lenght = round(sum(list(well_data.dict_nkt.values())), 0)
-            elif sum(list(well_data.dict_nkt.values())) != 0 and \
-                        abs(well_data.depth_fond_paker_do['do'] - well_data.head_column_additional._value) < 30:
+                nkt_lenght = round(sum(list(self.dict_data_well["dict_nkt"].values())), 0)
+            elif sum(list(self.dict_data_well["dict_nkt"].values())) != 0 and \
+                    abs(self.dict_data_well["depth_fond_paker_do"]["do"] - self.dict_data_well[
+                        "head_column_additional"]._value) < 30:
                 ntk_true = True
                 paker_true = True
-                nkt_lenght = round(sum(list(well_data.dict_nkt.values())), 0)
+                nkt_lenght = round(sum(list(self.dict_data_well["dict_nkt"].values())), 0)
 
             else:
                 ntk_true = False
                 paker_true = False
                 nkt_lenght = 0
         else:
-            if sum(list(well_data.dict_nkt.values())) != 0 and \
-                    well_data.depth_fond_paker_do['do'] != 0:
+            if sum(list(self.dict_data_well["dict_nkt"].values())) != 0 and \
+                    self.dict_data_well["depth_fond_paker_do"]["do"] != 0:
                 ntk_true = True
                 paker_true = True
-                nkt_lenght = round(sum(list(well_data.dict_nkt.values())), 0)
-            elif sum(list(well_data.dict_nkt.values())) == 0:
+                nkt_lenght = round(sum(list(self.dict_data_well["dict_nkt"].values())), 0)
+            elif sum(list(self.dict_data_well["dict_nkt"].values())) == 0:
                 ntk_true = False
                 paker_true = False
-                nkt_lenght = round(sum(list(well_data.dict_nkt.values())), 0)
+                nkt_lenght = round(sum(list(self.dict_data_well["dict_nkt"].values())), 0)
             else:
                 ntk_true = True
                 paker_true = False
@@ -547,24 +573,25 @@ class Work_with_gnkt(GnktModel):
 
         fluid_work_insert = self.data_gnkt.fluid_edit
 
-        fluid_work, well_data.fluid_work_short = GnoWindow.calc_work_fluid(fluid_work_insert)
+        fluid_work, self.dict_data_well["fluid_work_short"] = GnoWindow.calc_work_fluid(self, fluid_work_insert)
 
-        block_gnvp_list = events_gnvp_frez(self.data_gnkt.distance_pntzh, fluid_work_insert)
+        block_gnvp_list = events_gnvp_frez(self, self.data_gnkt.distance_pntzh, fluid_work_insert)
 
         gnkt_work_list = []
 
         for row in block_gnvp_list:
             gnkt_work_list.append(row)
 
-
+        workjau = f'СПО промывочной КНК-1 с промывкой до МГРП №{self.top_muft}. СПО фрезеровочной КНК-2: фрезерование ' \
+                  f'МГРП №{self.top_muft}-№2.' \
+                  f' Тех.отстой , замер Ризб. По доп.согласованию с Заказчиком, СПО промывочной КНК-1 до ' \
+                  f'текущего забоя (МГРП №1).'
+        if data_gnkt.need_frez_port == 'Нет':
+            workjau = f'СПО промывочной КНК-1 с промывкой до текущего забоя. Глушение скважины.'
 
         gnkt_work_firts = [
             [None, 'ЦЕЛЬ ПРОГРАММЫ', None, None, None, None, None, None, None, None, None, None, None],
-            [None, 1,
-             f'СПО промывочной КНК-1 с промывкой до МГРП {self.top_muft}. СПО фрезеровочной КНК-2: фрезерование '
-             f'МГРП {self.top_muft}-{2}. '
-             'Тех.отстой , замер Ризб. По доп.согласованию с Заказчиком, СПО промывочной КНК-1 до '
-             'текущего забоя (МГРП №1).', None, None, None, None, None, None, None, None, None, None, None],
+            [None, 1, workjau, None, None, None, None, None, None, None, None, None, None, None],
             [None, 2,
              'Внимание: Для проведения технологических операций завоз жидкости производить с ПНТЖ, '
              'согласованного с Заказчиком. Перед началом работ согласовать с Заказчиком пункт утилизации'
@@ -679,7 +706,7 @@ class Work_with_gnkt(GnktModel):
              f'При закрытой центральной задвижке фонтанной арматуры опрессовать ГНКТ и все нагнетательные '
              f'линии на 250атм. Опрессовать ПВО, обратные клапана и выкидную линию от устья скважины '
              f'до желобной ёмкости (надёжно закрепить, оборудовать дроссельными задвижками) опрессовать '
-             f'на {well_data.max_admissible_pressure._value}атм с выдержкой 30мин. Результат опрессовки ПВО зафиксировать'
+             f'на {self.dict_data_well["max_admissible_pressure"]._value}атм с выдержкой 30мин. Результат опрессовки ПВО зафиксировать'
              f' в вахтовом журнале и '
              f'составить акт опрессовки ПВО. Установить на малом и большом затрубе технологический манометр. '
              f'Провести УТЗ и инструктаж. Опрессовку проводить в присутствии представителя ПФС, мастера, '
@@ -774,41 +801,40 @@ class Work_with_gnkt(GnktModel):
         for row in gnkt_work_firts:
             gnkt_work_list.append(row)
 
-
-
         if self.data_gnkt.need_frez_port == 'Да':
             frez_mufts = [
-            [None, 'Спуск фрезеровочной КНК-2. Фрезерование муфт ГРП (фрак-портов)', None, None, None, None, None, None,
-             None, None, None, None, None],
-            [None, 29,
-             'Собрать фрезеровочную Компоновку Низа Колонны-2, далее КНК-2: наружный коннектор Ø 54мм + '
-             'обратный клапан створчатого типа 54мм + гидравлический разъединитель 57мм + ВЗД Ø 54-55мм +'
-             ' торцевой фрез Ø 68мм. Постоянно после сборки компоновки, проверять работоспособность ВЗД перед спуском '
-             'в скважину на устье. Произвести замеры составных частей КНК с записью в журнале. Произвести монтаж '
-             'лубрикатора и инжектора на устье скважины. Произвести необходимые опрессовки.',
-             None, None, None, None, None, None, None, None, 'Мастер ГНКТ', None],
-            [None, 30,
-             'Открыв скважину и записав число оборотов задвижки – зафиксировать дату и время. Спустить КНК-2 в '
-             f'скважину с периодическими прокачками рабочей жидкостью (тех.вода {fluid_work})  с проверкой веса на '
-             f'подъём через каждые 300м спуска до глубины {self.ports_data[self.top_muft]["кровля"] - 20}м. '
-             f'Убедиться в наличии свободного прохода по лифту НКТ.',
-             None, None, None, None, None, None, None, None,
-             'Мастер ГНКТ', None],
-            [None, 31,
-             f'При получении посадки в НКТ и отсутствии прохода КНК-2 до гл.{self.ports_data[self.top_muft]["кровля"] - 20}м,'
-             f' приподнять КНК-2 на 20м выше '
-             f'глубины посадки. Вывести НКА на рабочий режим в соответствии с рабочими параметрами ВЗД. Произвести '
-             'проработку (проходного сечения НКТ) места посадки до получения свободного прохода в НКТ с составлением '
-             'АКТа.',
-             None, None, None, None, None, None, None, None, 'Мастер ГНКТ', None],
-            [None, 32,
-             f'При свободном и беспрепятственном прохождении КНК-2 на г/трубе в НКТ до гл.'
-             f'{self.ports_data[self.top_muft]["кровля"] - 20}м, продолжить '
-             f'доспуск КНК-2 с минимальной подачей  ВЗД до {self.top_muft} до получения посадки на гл.'
-             f'{self.ports_data[self.top_muft]["кровля"] - 20}м. '
-             'Установить метку на г/трубе.',
-             None, None, None, None, None, None, None,
-             None, 'Мастер ГНКТ', None]]
+                [None, 'Спуск фрезеровочной КНК-2. Фрезерование муфт ГРП (фрак-портов)', None, None, None, None, None,
+                 None,
+                 None, None, None, None, None],
+                [None, 29,
+                 'Собрать фрезеровочную Компоновку Низа Колонны-2, далее КНК-2: наружный коннектор Ø 54мм + '
+                 'обратный клапан створчатого типа 54мм + гидравлический разъединитель 57мм + ВЗД Ø 54-55мм +'
+                 ' торцевой фрез Ø 68мм. Постоянно после сборки компоновки, проверять работоспособность ВЗД перед спуском '
+                 'в скважину на устье. Произвести замеры составных частей КНК с записью в журнале. Произвести монтаж '
+                 'лубрикатора и инжектора на устье скважины. Произвести необходимые опрессовки.',
+                 None, None, None, None, None, None, None, None, 'Мастер ГНКТ', None],
+                [None, 30,
+                 'Открыв скважину и записав число оборотов задвижки – зафиксировать дату и время. Спустить КНК-2 в '
+                 f'скважину с периодическими прокачками рабочей жидкостью (тех.вода {fluid_work})  с проверкой веса на '
+                 f'подъём через каждые 300м спуска до глубины {self.ports_data[self.top_muft]["кровля"] - 20}м. '
+                 f'Убедиться в наличии свободного прохода по лифту НКТ.',
+                 None, None, None, None, None, None, None, None,
+                 'Мастер ГНКТ', None],
+                [None, 31,
+                 f'При получении посадки в НКТ и отсутствии прохода КНК-2 до гл.{self.ports_data[self.top_muft]["кровля"] - 20}м,'
+                 f' приподнять КНК-2 на 20м выше '
+                 f'глубины посадки. Вывести НКА на рабочий режим в соответствии с рабочими параметрами ВЗД. Произвести '
+                 'проработку (проходного сечения НКТ) места посадки до получения свободного прохода в НКТ с составлением '
+                 'АКТа.',
+                 None, None, None, None, None, None, None, None, 'Мастер ГНКТ', None],
+                [None, 32,
+                 f'При свободном и беспрепятственном прохождении КНК-2 на г/трубе в НКТ до гл.'
+                 f'{self.ports_data[self.top_muft]["кровля"] - 20}м, продолжить '
+                 f'доспуск КНК-2 с минимальной подачей  ВЗД до {self.top_muft} до получения посадки на гл.'
+                 f'{self.ports_data[self.top_muft]["кровля"] - 20}м. '
+                 'Установить метку на г/трубе.',
+                 None, None, None, None, None, None, None,
+                 None, 'Мастер ГНКТ', None]]
 
             frez_mufts = []
             count_muft = -2
@@ -932,7 +958,8 @@ class Work_with_gnkt(GnktModel):
                  'фрезеровочной КНК.',
                  None, None, None, None, None, None, None, None,
                  'Мастер ГНКТ', None],
-                [None, 'Промывку произвести по доп. согласованию с Заказчиком.', None, None, None, None, None, None, None,
+                [None, 'Промывку произвести по доп. согласованию с Заказчиком.', None, None, None, None, None, None,
+                 None,
                  None, None, None, None],
                 [None, 'Спуск промывочной КНК-1', None, None, None, None, None, None, None, None, None, None, None],
                 [None, 47,
@@ -986,8 +1013,6 @@ class Work_with_gnkt(GnktModel):
             for row in frez_mufts:
                 gnkt_work_list.append(row)
 
-
-
         if self.data_gnkt.acids_work_combo == 'Да':
 
             acid_info = [[
@@ -999,8 +1024,6 @@ class Work_with_gnkt(GnktModel):
 
             for row in acid_work_list:
                 gnkt_work_list.append(row)
-
-
 
         work_list = [
             [None, 'По согласованию с Заказчиком, подтверждение нормализованного забоя', None, None, None, None, None,
@@ -1088,68 +1111,91 @@ class Work_with_gnkt(GnktModel):
              None, None, None, None, None, None, None, None,
              'Мастер ГНКТ', None]]
 
-        for row in work_list :
+        for row in work_list:
             gnkt_work_list.append(row)
 
-
-
-
         return gnkt_work_list
+
     def jamming_well_str(self, ntk_true, paker_true):
-        if ntk_true is True and paker_true is True:
+        volume_first = round((well_volume(self, self.dict_data_well["perforation_sole"]) - volume_nkt_metal(
+            self.dict_data_well["dict_nkt"]) - volume_nkt(self.dict_data_well["dict_nkt"])) * 1.2, 1)
+
+        if ntk_true and paker_true:
 
             jamming_well = f'Произвести подъем с замещением скважинной жидкости на раствор глушения, ' \
                            f'удельного веса по согласованию ' \
-                             f'с Заказчиком, рассчитанного по замеру Ризб после 2-х часов отстоя и удел.веса рабочей' \
-                           f' жидкости в скважин, '\
-                 f'но не менее удельного веса расчитанного для пластового давления указанного в настоящем плане работ '\
-                 f'{self.zhgs} (при Рпл={self.pressuar}атм).  До завоза раствора, '\
-                 f'скважину разряжать. Перед замещением КНК установить '\
-                 f'в интервале нижнего фрак-порта.\nПрокачать на циркуляцию жидкость глушения в объеме не менее '\
-                 f'{ self.volume_dumping(ntk_true, paker_true, self.bottom_muft)}м3 '\
-                 f'(трубного пространства) с одновременным подъемом ГНКТ (с протяжкой ГНКТ перевести хвостовик). '\
-                 f'В процессе перевода соблюдать равенство объемов закаченной и отобранной из скважины жидкости, '\
-                 f'т.е. не допускать режима фонтанирования (поглощения).'
+                           f'с Заказчиком, рассчитанного по замеру Ризб после 2-х часов отстоя и удел.веса рабочей' \
+                           f' жидкости в скважин, ' \
+                           f'но не менее удельного веса расчитанного для пластового давления указанного в ' \
+                           f'настоящем плане работ ' \
+                           f'{self.zhgs} (при Рпл={self.pressuar}атм).  До завоза раствора, ' \
+                           f'скважину разряжать. Перед замещением КНК установить ' \
+                           f'в интервале нижнего фрак-порта.\nПрокачать на циркуляцию жидкость глушения в ' \
+                           f'объеме не менее ' \
+                           f'{self.volume_dumping(ntk_true, paker_true)}м3 ' \
+                           f'(трубного пространства) с одновременным подъемом ГНКТ (с протяжкой ГНКТ ' \
+                           f'перевести хвостовик). ' \
+                           f'В процессе перевода соблюдать равенство объемов закаченной и отобранной из ' \
+                           f'скважины жидкости, ' \
+                           f'т.е. не допускать режима фонтанирования (поглощения).'
         elif ntk_true is True and paker_true is False:
-            # print(f'объем скважины {well_volume(self, well_data.perforation_sole)}')
-            # print(f'объем металла {volume_nkt_metal(well_data.dict_nkt)}')
-            # print(f'объем внутренний НКТ {volume_nkt(well_data.dict_nkt)}')
-            volume_first = round((well_volume(self, well_data.perforation_sole) -volume_nkt_metal(well_data.dict_nkt) -volume_nkt(well_data.dict_nkt)) *1.2, 1)
-            # print(volume_first)
 
             jamming_well = f'Произвести замер избыточного давления в течении 2ч при условии заполнения ствола ствола ' \
-                         f'жидкостью уд.весом 1.01г/см3. Произвести перерасчет забойного давления, Согласовать с ' \
-                         f'заказчиком глушение скважин и необходимый удельный вес жидкости глушения,  но не менее ' \
+                           f'жидкостью уд.весом 1.01г/см3. Произвести перерасчет забойного давления, Согласовать с ' \
+                           f'заказчиком глушение скважин и необходимый удельный вес жидкости глушения,  но не менее ' \
                            f'удельного веса расчитанного для пластового ' \
-                         f'давления указанного в настоящем плане работ {self.zhgs} (при Рпл={self.pressuar}атм). ' \
+                           f'давления указанного в настоящем плане работ {self.zhgs} (при Рпл={self.pressuar}атм). ' \
                            f'Допустить КНК до нижнего фрак-порта.' \
-                         f'До завоза раствора, скважину разряжать. При достаточной вязкости раствора  предусмотреть ' \
-                           f'работу без обратного клапана'\
+                           f'До завоза раствора, скважину разряжать. При достаточной вязкости раствора  предусмотреть ' \
+                           f'работу без обратного клапана' \
                            f'Произвести перевод на тех жидкость расчетного удельного ' \
-                         f'веса в объеме {volume_first}м3 (объем подпакерного пространства + затруб + 20% запас), ' \
-                         f'вывести циркуляцию с большого затруба  с ПРОТЯЖКОЙ ГНКТ СНИЗУ ВВЕРХ  с выходом ' \
-                         f'циркуляции по большому затрубу до башмака НКТ до гл. {well_data.depth_fond_paker_do["do"]}м ' \
-                         f'В башмаке НКТ промыть до выхода жидкости глушения по малому затрубу в объеме ' \
-                         f'{round(volume_nkt(well_data.dict_nkt),1)}м3 с одновременным подъемом ГНКТ. Тех отстой 2ч.' \
-                         f' В случае отрицательного результата по глушению скважины произвести перерасчет ЖГС и ' \
-                         f'повторить операцию. В процессе перевода соблюдать равенство объемов закаченной и ' \
-                           f'отобранной из скважины жидкости, '\
-                        f'т.е. не допускать режима фонтанирования (поглощения).'
+                           f'веса в объеме {volume_first}м3 (объем подпакерного пространства + затруб + 20% запас), ' \
+                           f'вывести циркуляцию с большого затруба  с ПРОТЯЖКОЙ ГНКТ СНИЗУ ВВЕРХ  с выходом ' \
+                           f'циркуляции по большому затрубу до башмака НКТ до гл. ' \
+                           f'{self.dict_data_well["depth_fond_paker_do"]["do"]}м ' \
+                           f'В башмаке НКТ промыть до выхода жидкости глушения по малому затрубу в объеме ' \
+                           f'{round(volume_nkt(self.dict_data_well["dict_nkt"]), 1)}м3 с одновременным подъемом ГНКТ. Тех отстой 2ч.' \
+                           f' В случае отрицательного результата по глушению скважины произвести перерасчет ЖГС и ' \
+                           f'повторить операцию. В процессе перевода соблюдать равенство объемов закаченной и ' \
+                           f'отобранной из скважины жидкости, ' \
+                           f'т.е. не допускать режима фонтанирования (поглощения).'
+
+        else:
+
+            jamming_well = f'Произвести замер избыточного давления в течении 2ч при условии заполнения ствола ствола ' \
+                           f'жидкостью уд.весом 1.01г/см3. Произвести перерасчет забойного давления, Согласовать с ' \
+                           f'заказчиком глушение скважин и необходимый удельный вес жидкости глушения,  но не менее ' \
+                           f'удельного веса расчитанного для пластового ' \
+                           f'давления указанного в настоящем плане работ {self.zhgs} (при Рпл={self.pressuar}атм). ' \
+                           f'Допустить КНК до текущего забоя.' \
+                           f'При достаточной вязкости раствора  предусмотреть ' \
+                           f'работу без обратного клапана' \
+                           f'Произвести перевод на тех жидкость расчетного удельного ' \
+                           f'веса в объеме {volume_first}м3 (объем скважины + 20% запас), ' \
+                           f'вывести циркуляцию до выхода жидкости глушения по малому затрубу в объеме ' \
+                           f'{round(volume_first, 1)}м3 с одновременным подъемом ГНКТ. Тех отстой 2ч.' \
+                           f' В случае отрицательного результата по глушению скважины произвести перерасчет ЖГС и ' \
+                           f'повторить операцию. В процессе перевода соблюдать равенство объемов закаченной и ' \
+                           f'отобранной из скважины жидкости, ' \
+                           f'т.е. не допускать режима фонтанирования (поглощения).'
 
         return jamming_well
-    def volume_dumping(self, ntk_true, first_muft):
-        from work_py.alone_oreration import volume_pod_NKT, volume_jamming_well
+
+    def volume_dumping(self, ntk_true, paker_true):
+        from work_py.alone_oreration import volume_pod_NKT, volume_jamming_well, volume_vn_nkt
 
         if ntk_true is True:
             volume = volume_pod_NKT(self) * 1.2
+        elif paker_true:
+            volume = (volume_pod_NKT(self) + volume_vn_nkt(self.dict_data_well["dict_nkt"])) * 1.2
         else:
-            volume = volume_jamming_well(self, first_muft) * 1.1
+            volume = volume_jamming_well(self, self.dict_data_well["current_bottom"]) * 1.2
         return round(volume, 1)
 
     def date_dmy(self, date_str):
         if isinstance(date_str, datetime):
             return date_str.strftime('%d.%m.%Y')
-        date_obj = ''.join(re.findall(r'[\d\.-]',  date_str))
+        date_obj = ''.join(re.findall(r'[\d\.-]', date_str))
 
         return date_obj
 
@@ -1202,11 +1248,7 @@ class Work_with_gnkt(GnktModel):
             [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None, None, None, None, None, None, None],
-            [None, 'Цель работ', None, None, None, None, None, None,
-             f'СПО промывочной КНК-1 с промывкой до МГРП №{self.top_muft}. СПО фрезеровочной КНК-2: фрезерование '
-             f'МГРП №{self.top_muft}-№2.'
-             f' Тех.отстой , замер Ризб. По доп.согласованию с Заказчиком, СПО промывочной КНК-1 до '
-             f'текущего забоя (МГРП №1).',
+            [None, 'Цель работ', None, None, None, None, None, None, "='Ход работ'!C33",
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None],
@@ -1244,7 +1286,6 @@ class Work_with_gnkt(GnktModel):
                 n += col_port
                 m += 2
 
-
         return ports_list, merge_port
 
     def calc_fluid(self):
@@ -1253,9 +1294,9 @@ class Work_with_gnkt(GnktModel):
         try:
 
             fluid_p = 0.83
-            for plast in well_data.plast_work:
-                if float(list(well_data.dict_perforation[plast]['рабочая жидкость'])[0]) > fluid_p:
-                    fluid_p = list(well_data.dict_perforation[plast]['рабочая жидкость'])[0]
+            for plast in self.dict_data_well['plast_work']:
+                if float(list(self.dict_data_well["dict_perforation"][plast]['рабочая жидкость'])[0]) > fluid_p:
+                    fluid_p = list(self.dict_data_well["dict_perforation"][plast]['рабочая жидкость'])[0]
             fluid_list.append(fluid_p)
 
             fluid_work_insert, ok = QInputDialog.getDouble(self, 'Рабочая жидкость',
@@ -1271,6 +1312,6 @@ class Work_with_gnkt(GnktModel):
 
 if __name__ == '__main__':
     app = QApplication([])
-    window = Work_with_gnkt(1, 1, 1, 1)
+    window = WorkWithGnkt(1, 1, 1, 1)
     window.show()
     app.exec_()

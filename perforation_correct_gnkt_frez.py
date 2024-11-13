@@ -4,18 +4,18 @@ from PyQt5.Qt import *
 import well_data
 from gnkt_data.gnkt_data import dict_saddles
 from main import MyMainWindow
+from work_py.parent_work import TabPageUnion, TabWidgetUnion, WindowUnion
 
 
-class TabPage_SO(QWidget):
+class TabPageSo(TabPageUnion):
     def __init__(self, parent=None):
-        super().__init__()
-       
+        super().__init__(parent)
 
         manufacturer_list = ['НТЦ ЗЭРС', 'Зенит', 'Барбус']
         self.grid = QGridLayout(self)
 
         self.labels_plast = {}
-        self.dict_perforation = well_data.dict_perforation
+        self.dict_perforation = self.dict_data_well["dict_perforation"]
         plast_all = list(self.dict_perforation.keys())[0]
 
         self.number_port_label = QLabel("номер порта")
@@ -88,11 +88,13 @@ class TabPage_SO(QWidget):
         self.manufacturer_combo.setCurrentIndex(1)
 
     def check_manufacturer(self, plast):
-       
+
         if self.manufacturer_combo.currentText() == 'НТЦ ЗЭРС':
             self.manufacturer = 'НТЦ ЗЭРС'
-            if (well_data.column_additional and well_data.column_additional_diametr._value < 110) \
-                    or well_data.column_additional is False and well_data.column_diametr._value < 110:
+            if (self.dict_data_well["column_additional"] and self.dict_data_well[
+                "column_additional_diametr"]._value < 110) \
+                    or self.dict_data_well["column_additional"] is False and self.dict_data_well[
+                "column_diametr"]._value < 110:
                 self.type_column = "ФПЗН.102"
 
             else:
@@ -159,22 +161,22 @@ class TabPage_SO(QWidget):
         self.labels_plast[index_interval][5] = self.diametr_ball_edit.text()
 
 
-class TabWidget(QTabWidget):
-    def __init__(self):
+class TabWidget(TabWidgetUnion):
+    def __init__(self, parent):
         super().__init__()
-        self.addTab(TabPage_SO(self), 'Проверка корректности данных перфорации')
+        self.addTab(TabPageSo(parent), 'Проверка корректности данных перфорации')
 
 
-class PerforationCorrectGnktFrez(MyMainWindow):
+class PerforationCorrectGnktFrez(WindowUnion):
 
     def __init__(self, parent=None):
-        super(PerforationCorrectGnktFrez, self).__init__()
+        super(PerforationCorrectGnktFrez, self).__init__(parent)
 
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
         self.setWindowModality(QtCore.Qt.ApplicationModal)  # Устанавливаем модальность окна
 
-        self.tabWidget = TabWidget()
+        self.tabWidget = TabWidget(self.dict_data_well)
 
         self.buttonAdd = QPushButton('сохранить данные')
         self.buttonAdd.clicked.connect(self.add_row_table)
@@ -185,10 +187,8 @@ class PerforationCorrectGnktFrez(MyMainWindow):
         vbox.addWidget(self.buttonAdd, 3, 0)
 
     def add_row_table(self):
-       
-
         # Пересохранение данных по интервалам портам
-        self.dict_perforation = well_data.dict_perforation
+        self.dict_perforation = self.dict_data_well["dict_perforation"]
         plast_work = list(self.dict_perforation.keys())[0]
         manufacturer = self.tabWidget.currentWidget().manufacturer_combo.currentText()
         type_column = self.tabWidget.currentWidget().type_column_edit.text()

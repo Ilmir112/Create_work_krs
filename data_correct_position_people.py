@@ -5,6 +5,7 @@ from PyQt5 import QtCore, QtWidgets
 from PyQt5.Qt import *
 
 from main import MyMainWindow
+from work_py.parent_work import TabWidgetUnion, WindowUnion
 
 
 class TabPageSO(QWidget):
@@ -25,8 +26,8 @@ class TabPageSO(QWidget):
 
         self.regionLabel = QLabel("Регион", self)
         self.regioncomboBox = QComboBox(self)
-        self.region_list = well_data.region_list
-        self.regioncomboBox.addItems(self.region_list)
+        self.REGION_LIST = well_data.REGION_LIST
+        self.regioncomboBox.addItems(self.REGION_LIST)
         self.regioncomboBox.currentIndexChanged.connect(self.update_line_edit)
 
         if 'Ойл' in well_data.contractor and 'Ойл' not in self.productLavelType.currentText():
@@ -152,13 +153,13 @@ class TabPageSO(QWidget):
         self.representative_of_grr_name_edit_type.setText(self.podpis_dict['регион'][selected_region]["grr"]['surname'])
 
 
-class TabWidget(QTabWidget):
+class TabWidget(TabWidgetUnion):
     def __init__(self):
         super().__init__()
         self.addTab(TabPageSO(self), 'Изменение данных')
 
 
-class CorrectSignaturesWindow(MyMainWindow):
+class CorrectSignaturesWindow(WindowUnion):
 
     def __init__(self):
         super(CorrectSignaturesWindow, self).__init__()

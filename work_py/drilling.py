@@ -5,11 +5,14 @@ import well_data
 from PyQt5.QtCore import Qt
 
 from main import MyMainWindow
+from .parent_work import TabPageUnion, TabWidgetUnion, WindowUnion
 from .rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
 
-class TabPage_SO_drill(QWidget):
+
+class TabPageSoDrill(TabPageUnion):
     def __init__(self, parent=None):
         super().__init__()
+        self.dict_data_well = parent
 
         self.drill_select_label = QLabel("компоновка НКТ", self)
         self.drill_select_combo = QComboBox(self)
@@ -36,27 +39,27 @@ class TabPage_SO_drill(QWidget):
         self.nkt_str_combo.addItems(
             ['НКТ', 'СБТ'])
 
-        if well_data.column_additional is False or (well_data.column_additional and
-                                                   well_data.head_column_additional._value >= well_data.current_bottom):
+        if self.dict_data_well["column_additional"] is False or (self.dict_data_well["column_additional"] and
+                                                   self.dict_data_well["head_column_additional"]._value >= self.dict_data_well["current_bottom"]):
             self.drill_select_combo.setCurrentIndex(0)
-            if well_data.column_diametr._value > 127:
+            if self.dict_data_well["column_diametr"]._value > 127:
                 self.downhole_motor_line.setText('Д-106')
             else:
                 self.downhole_motor_line.setText('Д-76')
 
-            self.drill_diametr_line.setText(str(self.drillingBit_diam_select(well_data.current_bottom)))
+            self.drill_diametr_line.setText(str(self.drillingBit_diam_select(self.dict_data_well["current_bottom"])))
 
         else:
-            if well_data.column_additional_diametr._value > 127:
+            if self.dict_data_well["column_additional_diametr"]._value > 127:
                 self.downhole_motor_line.setText('Д-106')
             else:
                 self.downhole_motor_line.setText('Д-76')
             self.drill_select_combo.setCurrentIndex(1)
-            self.drill_diametr_line.setText(str(self.drillingBit_diam_select(well_data.current_bottom)))
+            self.drill_diametr_line.setText(str(self.drillingBit_diam_select(self.dict_data_well["current_bottom"])))
 
         self.roof_drill_label = QLabel("Текущий забой", self)
         self.roof_drill_line = QLineEdit(self)
-        self.roof_drill_line.setText(f'{well_data.current_bottom}')
+        self.roof_drill_line.setText(f'{self.dict_data_well["current_bottom"]}')
         self.roof_drill_line.setClearButtonEnabled(True)
 
         self.sole_drill_label = QLabel("Подошва", self)
@@ -68,7 +71,7 @@ class TabPage_SO_drill(QWidget):
         self.drill_label = QLabel("добавление поинтервального бурения", self)
         self.drill_cm_combo = QComboBox(self)
 
-        self.drill_cm_combo.addItems(well_data.bottomType_list)
+        self.drill_cm_combo.addItems(well_data.BOTTOM_TYPE_LIST)
 
         self.need_privyazka_Label = QLabel("Привязка оборудования", self)
         self.need_privyazka_QCombo = QComboBox()
@@ -112,7 +115,7 @@ class TabPage_SO_drill(QWidget):
         sole_drill_line = self.sole_drill_line.text()
         if sole_drill_line != '':
             sole_drill_line = int(float(sole_drill_line))
-        if well_data.forPaker_list:
+        if self.dict_data_well["for_paker_list"]:
             if well_data.depth_paker_izv  <= sole_drill_line:
                 QMessageBox.information(self, 'ОШИБКА', 'Необходимо извлечь извлекаемый пакер')
                 self.sole_drill_line.setText('')
@@ -121,15 +124,15 @@ class TabPage_SO_drill(QWidget):
     def update_drill_edit(self, index):
 
         if index == 'долото в ЭК':
-            TabPage_SO_drill.drill_diametr_line.setText(str(self.drillingBit_diam_select(well_data.current_bottom)))
-            if well_data.column_diametr._value > 127:
+            TabPageSoDrill.drill_diametr_line.setText(str(self.drillingBit_diam_select(self.dict_data_well["current_bottom"])))
+            if self.dict_data_well["column_diametr"]._value > 127:
                 self.downhole_motor_line.setText('Д-106')
             else:
                 self.downhole_motor_line.setText('Д-76')
         else:
             self.drill_diametr_line.setText(
-                str(self.drillingBit_diam_select(well_data.head_column_additional._value - 1)))
-            if well_data.column_additional_diametr._value < 127:
+                str(self.drillingBit_diam_select(self.dict_data_well["head_column_additional"]._value - 1)))
+            if self.dict_data_well["column_additional_diametr"]._value < 127:
                 self.downhole_motor_line.setText('Д-106')
             else:
                 self.downhole_motor_line.setText('Д-76')
@@ -155,11 +158,11 @@ class TabPage_SO_drill(QWidget):
             204: (215, 221)
         }
 
-        if well_data.column_additional is False or (
-                well_data.column_additional is True and depth_landing <= well_data.head_column_additional._value):
-            diam_internal_ek = well_data.column_diametr._value - 2 * well_data.column_wall_thickness._value
+        if self.dict_data_well["column_additional"] is False or (
+                self.dict_data_well["column_additional"] is True and depth_landing <= self.dict_data_well["head_column_additional"]._value):
+            diam_internal_ek = self.dict_data_well["column_diametr"]._value - 2 * self.dict_data_well["column_wall_thickness"]._value
         else:
-            diam_internal_ek = well_data.column_additional_diametr._value - 2 * well_data.column_additional_wall_thickness._value
+            diam_internal_ek = self.dict_data_well["column_additional_diametr"]._value - 2 * self.dict_data_well["column_additional_wall_thickness"]._value
 
         for diam, diam_internal_bit in drillingBit_dict.items():
             if diam_internal_bit[0] <= diam_internal_ek <= diam_internal_bit[1]:
@@ -168,21 +171,25 @@ class TabPage_SO_drill(QWidget):
         return bit_diametr
 
 
-class TabWidget(QTabWidget):
-    def __init__(self):
+class TabWidget(TabWidgetUnion):
+    def __init__(self, parent=None):
         super().__init__()
-        self.addTab(TabPage_SO_drill(self), 'Бурение')
+        self.addTab(TabPageSoDrill(parent), 'Бурение')
 
 
-class Drill_window(MyMainWindow):
-    def __init__(self, ins_ind, table_widget, parent=None):
-        super(Drill_window, self).__init__()
+class Drill_window(WindowUnion):
+    def __init__(self, dict_data_well, table_widget, parent=None):
+        super().__init__()
+
+        self.dict_data_well = dict_data_well
+        self.ins_ind = dict_data_well['ins_ind']
+        self.tabWidget = TabWidget(self.dict_data_well)
 
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
-        self.ins_ind = ins_ind
+
         self.table_widget = table_widget
-        self.tabWidget = TabWidget()
+
         self.tableWidget = QTableWidget(0, 3)
         self.tableWidget.setHorizontalHeaderLabels(
             ["Кровля", "Подошва", "вид разбуриваемого забоя"])
@@ -219,14 +226,14 @@ class Drill_window(MyMainWindow):
         sole_drill = self.tabWidget.currentWidget().sole_drill_line.text().replace(',', '.')
         drill_type = self.tabWidget.currentWidget().drill_cm_combo.currentText()
         drill_type_combo = QComboBox(self)
-        drill_type_combo.addItems(well_data.bottomType_list)
-        index_drill_True = well_data.bottomType_list.index(drill_type)
+        drill_type_combo.addItems(well_data.BOTTOM_TYPE_LIST)
+        index_drill_True = well_data.BOTTOM_TYPE_LIST.index(drill_type)
         drill_type_combo.setCurrentIndex(index_drill_True)
 
         if not roof_drill or not sole_drill:
             QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
             return
-        if well_data.bottomhole_drill._value < float(sole_drill):
+        if self.dict_data_well["bottomhole_drill"]._value < float(sole_drill):
             QMessageBox.information(self, 'Внимание', 'глубина НЭК ниже искусственного забоя')
             return
 
@@ -259,12 +266,12 @@ class Drill_window(MyMainWindow):
             QMessageBox.information(self, 'Внимание', 'Не заполнен необходимый забой')
             return
 
-        drilling_interval = list(set([well_data.dict_perforation[plast]["подошва"] for plast in well_data.plast_all]))
+        drilling_interval = list(set([self.dict_data_well["dict_perforation"][plast]["подошва"] for plast in self.dict_data_well["plast_all"]]))
         drilling_interval.append(int(current_depth))
-        if len(well_data.dict_leakiness) != 0:
-            # print(well_data.dict_leakiness)
+        if len(self.dict_data_well["dict_leakiness"]) != 0:
+            # print(self.dict_data_well["dict_leakiness"])
             leakness_list = []
-            for nek in list(well_data.dict_leakiness['НЭК']['интервал'].keys()):
+            for nek in list(self.dict_data_well["dict_leakiness"]['НЭК']['интервал'].keys()):
                 nek_bur = float(nek.split('-')[1]) + 10
                 if len(leakness_list) == 0:
                     leakness_list.append(nek_bur)
@@ -274,10 +281,10 @@ class Drill_window(MyMainWindow):
 
 
             drilling_interval.extend(leakness_list)
-        # drilling_interval = list(filter(key = lambda x: x[0] > well_data.current_bottom, drilling_interval))
+        # drilling_interval = list(filter(key = lambda x: x[0] > self.dict_data_well["current_bottom"], drilling_interval))
 
         rows = self.tableWidget.rowCount()
-        roof = well_data.current_bottom
+        roof = self.dict_data_well["current_bottom"]
         # print(drilling_interval)
         for sole in sorted(drilling_interval):
 
@@ -333,13 +340,13 @@ class Drill_window(MyMainWindow):
                 sole = int(float(sole_drill.text()))
                 drill_True = drill_type_combo.currentText()
                 if self.drillingBit_diam != '':
-                    if well_data.column_additional is False or (well_data.column_additional and sole < well_data.head_column_additional._value):
-                        if well_data.column_diametr._value - 2 * well_data.column_wall_thickness._value <= float(
+                    if self.dict_data_well["column_additional"] is False or (self.dict_data_well["column_additional"] and sole < self.dict_data_well["head_column_additional"]._value):
+                        if self.dict_data_well["column_diametr"]._value - 2 * self.dict_data_well["column_wall_thickness"]._value <= float(
                                 self.drillingBit_diam):
                             QMessageBox.warning(self, 'ОШИБКА', 'Не корректный диаметр долото')
                             return
                     else:
-                        if well_data.column_additional_diametr._value - 2 * well_data.column_additional_wall_thickness._value <= float(
+                        if self.dict_data_well["column_additional_diametr"]._value - 2 * self.dict_data_well["column_additional_wall_thickness"]._value <= float(
                                 self.drillingBit_diam):
                             QMessageBox.warning(self, 'ОШИБКА', 'Не корректный диаметр долото')
                             return
@@ -379,45 +386,45 @@ class Drill_window(MyMainWindow):
         from work_py.alone_oreration import privyazkaNKT
         from work_py.alone_oreration import well_volume
 
-        currentBottom = well_data.current_bottom
+        currentBottom = self.dict_data_well["current_bottom"]
         current_depth = drill_tuple[-1][0]
         bottomType = drill_tuple[-1][1]
 
-        if well_data.column_additional is True:
-            nkt_pod = '60мм' if well_data.column_additional_diametr._value < 110 else '73мм со снятыми фасками'
+        if self.dict_data_well["column_additional"] is True:
+            nkt_pod = '60мм' if self.dict_data_well["column_additional_diametr"]._value < 110 else '73мм со снятыми фасками'
 
-        nkt_diam = well_data.nkt_diam
+        nkt_diam = self.dict_data_well["nkt_diam"]
 
-        if well_data.column_additional is False \
-                or (well_data.column_additional is True
-                    and well_data.head_column_additional._value >= well_data.current_bottom):
+        if self.dict_data_well["column_additional"] is False \
+                or (self.dict_data_well["column_additional"] is True
+                    and self.dict_data_well["head_column_additional"]._value >= self.dict_data_well["current_bottom"]):
             drilling_str = f'{drill_type_combo}-{drillingBit_diam} для ' \
-                           f'ЭК {well_data.column_diametr._value}мм х {well_data.column_wall_thickness._value}мм +' \
+                           f'ЭК {self.dict_data_well["column_diametr"]._value}мм х {self.dict_data_well["column_wall_thickness"]._value}мм +' \
                            f' забойный двигатель {downhole_motor} + НКТ{nkt_diam} 20м + репер '
             drilling_short = f'{drill_type_combo}-{drillingBit_diam} + ' \
                              f'забойный двигатель {downhole_motor}  + НКТ{nkt_diam} 20м + репер '
 
-        elif well_data.column_additional is True:
-            drilling_str = f'{drill_type_combo}-{drillingBit_diam} для ЭК {well_data.column_additional_diametr._value}мм х ' \
-                           f'{well_data.column_additional_wall_thickness._value}мм + забойный двигатель ' \
+        elif self.dict_data_well["column_additional"] is True:
+            drilling_str = f'{drill_type_combo}-{drillingBit_diam} для ЭК {self.dict_data_well["column_additional_diametr"]._value}мм х ' \
+                           f'{self.dict_data_well["column_additional_wall_thickness"]._value}мм + забойный двигатель ' \
                            f'{downhole_motor} +НКТ{nkt_pod} 20м + репер + ' \
-                           f'НКТ{nkt_pod} {round(well_data.current_bottom - well_data.head_column_additional._value, 0)}м'
+                           f'НКТ{nkt_pod} {round(self.dict_data_well["current_bottom"] - self.dict_data_well["head_column_additional"]._value, 0)}м'
             drilling_short = f'{drill_type_combo}-{drillingBit_diam}  + забойный двигатель  {downhole_motor} +НКТ{nkt_pod} 20м + ' \
                              f'репер + ' \
-                             f'НКТ{nkt_pod} {round(well_data.current_bottom - well_data.head_column_additional._value, 0)}м'
+                             f'НКТ{nkt_pod} {round(self.dict_data_well["current_bottom"] - self.dict_data_well["head_column_additional"]._value, 0)}м'
 
-        well_data.drilling_interval.append([well_data.current_bottom, current_depth])
+        self.dict_data_well["drilling_interval"].append([self.dict_data_well["current_bottom"], current_depth])
 
         drilling_list = [
             [f'СПО {drilling_short} до т.з -', None,
              f'Спустить {drilling_str} на НКТ{nkt_diam}м до до текущего забоя с замером, '
-             f'шаблонированием шаблоном {well_data.nkt_template}мм\n'
+             f'шаблонированием шаблоном {self.dict_data_well["nkt_template"]}мм\n'
              f' (При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ). '
              f'В случае разгрузки инструмента  при спуске, проработать место посадки с промывкой скв., составить акт.'
              f'СКОРОСТЬ СПУСКА НЕ БОЛЕЕ 1 М/С (НЕ ДОХОДЯ 40 - 50 М ДО ПЛАНОВОГО ИНТЕРВАЛА СКОРОСТЬ СПУСКА СНИЗИТЬ ДО 0,25 М/С). '
              f'ЗА 20 М ДО ЗАБОЯ СПУСК ПРОИЗВОДИТЬ С ПРОМЫВКОЙ',
              None, None, None, None, None, None, None,
-             'мастер КРС', descentNKT_norm(well_data.current_bottom, 1.2)],
+             'мастер КРС', descentNKT_norm(self.dict_data_well["current_bottom"], 1.2)],
             [None, None,
              f'Собрать промывочное оборудование: вертлюг, ведущая труба (установить вставной фильтр под ведущей трубой), '
              f'буровой рукав, устьевой герметизатор, нагнетательная линия. Застраховать буровой рукав за вертлюг. ',
@@ -427,8 +434,8 @@ class Drill_window(MyMainWindow):
 
         if Drill_window.check_pressure(self, current_depth):
             drilling_list.append(
-                [f'Опрессовать ЭК и ЦМ на Р={well_data.max_admissible_pressure._value}атм', None,
-              f'Опрессовать ЭК и ЦМ на Р={well_data.max_admissible_pressure._value}атм в присутствии '
+                [f'Опрессовать ЭК и ЦМ на Р={self.dict_data_well["max_admissible_pressure"]._value}атм', None,
+              f'Опрессовать ЭК и ЦМ на Р={self.dict_data_well["max_admissible_pressure"]._value}атм в присутствии '
               f'представителя заказчика. Составить акт. '
               f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до '
               f'начала работ) \n'
@@ -445,11 +452,11 @@ class Drill_window(MyMainWindow):
                 # print(drill_sole, self.check_pressure(drill_sole))
                 for row in self.reply_drilling(drill_sole, bottomType2, drilling_str, nkt_diam):
                     drilling_list.append(row)
-            drilling_list.append([f'Промыть  {well_data.fluid_work} в объеме '
-                                             f'{round(well_volume(self, well_data.current_bottom) * 2, 1)}м3', None,
-                                             f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {well_data.fluid_work}  '
+            drilling_list.append([f'Промыть  {self.dict_data_well["fluid_work"]} в объеме '
+                                             f'{round(well_volume(self, self.dict_data_well["current_bottom"]) * 2, 1)}м3', None,
+                                             f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {self.dict_data_well["fluid_work"]}  '
                                              f'в присутствии представителя заказчика в объеме '
-                                             f'{round(well_volume(self, well_data.current_bottom) * 2, 1)}м3. Составить акт.',
+                                             f'{round(well_volume(self, self.dict_data_well["current_bottom"]) * 2, 1)}м3. Составить акт.',
                                              None, None, None, None, None, None, None,
                                              'мастер КРС, предст. заказчика', 1.5])
 
@@ -462,10 +469,10 @@ class Drill_window(MyMainWindow):
              None, None, None, None, None, None, None,
              'Мастер КРС, УСРСиСТ', None],
             [None, None,
-             f'Поднять  {drilling_str} на НКТ{nkt_diam} с глубины {well_data.current_bottom}м с доливом скважины в '
-             f'объеме {round(well_data.current_bottom * 1.4 / 1000, 1)}м3 тех. жидкостью  уд.весом {well_data.fluid_work}',
+             f'Поднять  {drilling_str} на НКТ{nkt_diam} с глубины {self.dict_data_well["current_bottom"]}м с доливом скважины в '
+             f'объеме {round(self.dict_data_well["current_bottom"] * 1.4 / 1000, 1)}м3 тех. жидкостью  уд.весом {self.dict_data_well["fluid_work"]}',
              None, None, None, None, None, None, None,
-             'мастер КРС', liftingNKT_norm(well_data.current_bottom, 1.3)]
+             'мастер КРС', liftingNKT_norm(self.dict_data_well["current_bottom"], 1.3)]
         ]
         if need_privyazka_QCombo == 'Да':
 
@@ -474,17 +481,17 @@ class Drill_window(MyMainWindow):
             drilling_list_end.insert(-1, privyazkaNKT_list)
             drilling_list_end.insert(-1, [f'Удостоверится в наличии необходимого забоя', None,
                                           f'На привязанных НКТ удостоверится, что текущий забой находится на '
-                                          f'глубине {well_data.current_bottom}м',
+                                          f'глубине {self.dict_data_well["current_bottom"]}м',
              None, None, None, None, None, None, None,
              'Мастер КРС, УСРСиСТ', None])
 
 
         drilling_list.extend(drilling_list_end)
 
-        well_data.current_bottom = current_depth
+        self.dict_data_well["current_bottom"] = current_depth
 
         if bottomType == "РПК" or bottomType == "РПП":
-            well_data.current_bottom = currentBottom
+            self.dict_data_well["current_bottom"] = currentBottom
             drilling_list.append([f'Завоз СБТ', None,
                                   f'В случае возможности завоза тяжелого оборудования и установки УПА-60 (АПР60/80), '
                                   f'по согласованию с Заказчиком нормализацию выполнить по следующему пункту',
@@ -493,11 +500,11 @@ class Drill_window(MyMainWindow):
 
             for row in self.drilling_sbt(drill_tuple, drill_type_combo, drillingBit_diam, downhole_motor):
                 drilling_list.append(row)
-            drilling_list.insert(-2, [f'Промыть  {well_data.fluid_work} в объеме '
-                                  f'{round(well_volume(self, well_data.current_bottom) * 2, 1)}м3', None,
-                                  f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {well_data.fluid_work}  '
+            drilling_list.insert(-2, [f'Промыть  {self.dict_data_well["fluid_work"]} в объеме '
+                                  f'{round(well_volume(self, self.dict_data_well["current_bottom"]) * 2, 1)}м3', None,
+                                  f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {self.dict_data_well["fluid_work"]}  '
                                   f'в присутствии представителя заказчика в объеме '
-                                  f'{round(well_volume(self, well_data.current_bottom) * 2, 1)}м3. Составить акт.',
+                                  f'{round(well_volume(self, self.dict_data_well["current_bottom"]) * 2, 1)}м3. Составить акт.',
                                   None, None, None, None, None, None, None,
                                   'мастер КРС, предст. заказчика', 1.5])
 
@@ -508,7 +515,7 @@ class Drill_window(MyMainWindow):
         drilling_true_quest_list = [
             [f'Произвести нормализацию {bottomtype} до Н -{current_depth}м', None,
              f'Произвести нормализацию {bottomtype} до глубины {current_depth}м с наращиванием, промывкой '
-             f'тех жидкостью уд.весом {well_data.fluid_work}. '
+             f'тех жидкостью уд.весом {self.dict_data_well["fluid_work"]}. '
              f'Работы производить согласно сборника технологических регламентов и инструкций в присутствии'
              f' представителя заказчика.',
              None, None, None, None, None, None, None,
@@ -517,8 +524,8 @@ class Drill_window(MyMainWindow):
 
         if Drill_window.check_pressure(self, current_depth):
             drilling_true_quest_list.append(
-                [f'Опрессовать ЭК и ЦМ на Р={well_data.max_admissible_pressure._value}атм', None,
-                 f'Опрессовать ЭК и ЦМ на Р={well_data.max_admissible_pressure._value}атм в '
+                [f'Опрессовать ЭК и ЦМ на Р={self.dict_data_well["max_admissible_pressure"]._value}атм', None,
+                 f'Опрессовать ЭК и ЦМ на Р={self.dict_data_well["max_admissible_pressure"]._value}атм в '
                  f'присутствии представителя заказчика. Составить акт. '
                  f'(Вызов представителя осуществлять телефонограммой за 12 часов, с '
                  f'подтверждением за 2 часа до начала работ) \n'
@@ -527,53 +534,53 @@ class Drill_window(MyMainWindow):
                  'Мастер КРС, УСРСиСТ', 0.67])
 
 
-        well_data.current_bottom = current_depth
+        self.dict_data_well["current_bottom"] = current_depth
         return drilling_true_quest_list
 
     def drilling_sbt(self, drill_tuple, drill_type_combo, drillingBit_diam, downhole_motor):
 
 
-        currentBottom = well_data.current_bottom
+        currentBottom = self.dict_data_well["current_bottom"]
 
         current_depth = drill_tuple[-1][0]
 
         nkt_pod = "2'3/8"
-        nkt_diam = "2'7/8" if well_data.column_diametr._value > 110 else "2'3/8"
+        nkt_diam = "2'7/8" if self.dict_data_well["column_diametr"]._value > 110 else "2'3/8"
 
-        if well_data.column_additional is False or (
-                well_data.column_additional is True and well_data.head_column_additional._value >= current_depth):
-            drilling_str = f'{drill_type_combo}-{drillingBit_diam} для ЭК {well_data.column_diametr._value}мм х ' \
-                           f'{well_data.column_wall_thickness._value}мм '
-            drilling_short = f'{drill_type_combo}-{drillingBit_diam} для ЭК {well_data.column_diametr._value}мм х ' \
-                             f'{well_data.column_wall_thickness._value}мм '
+        if self.dict_data_well["column_additional"] is False or (
+                self.dict_data_well["column_additional"] is True and self.dict_data_well["head_column_additional"]._value >= current_depth):
+            drilling_str = f'{drill_type_combo}-{drillingBit_diam} для ЭК {self.dict_data_well["column_diametr"]._value}мм х ' \
+                           f'{self.dict_data_well["column_wall_thickness"]._value}мм '
+            drilling_short = f'{drill_type_combo}-{drillingBit_diam} для ЭК {self.dict_data_well["column_diametr"]._value}мм х ' \
+                             f'{self.dict_data_well["column_wall_thickness"]._value}мм '
             sbt_lenght = f'СБТ {nkt_diam} - {int(current_depth + 100)}м'
 
-        elif well_data.column_additional is True:
+        elif self.dict_data_well["column_additional"] is True:
             drilling_str = f'{drill_type_combo}-{drillingBit_diam} для ЭК ' \
-                           f'{well_data.column_additional_diametr._value}мм х ' \
-                           f'{well_data.column_additional_wall_thickness._value}мм + СБТ{nkt_pod} ' \
-                           f'{well_data.current_bottom - well_data.head_column_additional._value}м'
+                           f'{self.dict_data_well["column_additional_diametr"]._value}мм х ' \
+                           f'{self.dict_data_well["column_additional_wall_thickness"]._value}мм + СБТ{nkt_pod} ' \
+                           f'{self.dict_data_well["current_bottom"] - self.dict_data_well["head_column_additional"]._value}м'
             drilling_short = f'{drill_type_combo}-{drillingBit_diam}  + СБТ{nkt_pod} ' \
-                             f'{well_data.current_bottom - well_data.head_column_additional._value}м'
-            sbt_lenght = f'СБТ {nkt_diam} - {well_data.head_column_additional._value}м и СБТ {nkt_pod}' \
-                         f' {int(current_depth + 100)-well_data.head_column_additional._value}м'
+                             f'{self.dict_data_well["current_bottom"] - self.dict_data_well["head_column_additional"]._value}м'
+            sbt_lenght = f'СБТ {nkt_diam} - {self.dict_data_well["head_column_additional"]._value}м и СБТ {nkt_pod}' \
+                         f' {int(current_depth + 100)-self.dict_data_well["head_column_additional"]._value}м'
 
-        well_data.drilling_interval.append([well_data.current_bottom, current_depth])
+        self.dict_data_well["drilling_interval"].append([self.dict_data_well["current_bottom"], current_depth])
 
         drilling_list = [
             [f'Завезти на скважину {sbt_lenght}', None,
                  f'Завезти на скважину СБТ {sbt_lenght} – Укладка труб на стеллажи.',
                  None, None, None, None, None, None, None,
                  'Мастер', None],
-            [f'СПО {drilling_short} на СБТ {nkt_diam} до Н= {well_data.current_bottom - 30}', None,
-                 f'Спустить {drilling_str}  на СБТ {nkt_diam} до Н= {well_data.current_bottom - 30}м с замером, '
+            [f'СПО {drilling_short} на СБТ {nkt_diam} до Н= {self.dict_data_well["current_bottom"] - 30}', None,
+                 f'Спустить {drilling_str}  на СБТ {nkt_diam} до Н= {self.dict_data_well["current_bottom"] - 30}м с замером, '
                  f' (При СПО первых десяти СБТ на спайдере дополнительно устанавливать элеватор ЭХЛ). '
                  f'В случае разгрузки инструмента  при спуске, проработать место посадки с промывкой скв., '
                  f'составить акт. СКОРОСТЬ СПУСКА НЕ БОЛЕЕ 1 М/С (НЕ ДОХОДЯ 40 - 50 М ДО ПЛАНОВОГО ИНТЕРВАЛА СКОРОСТЬ '
                  f'СПУСКА СНИЗИТЬ ДО 0,25 М/С). '
                  f'ЗА 20 М ДО ЗАБОЯ СПУСК ПРОИЗВОДИТЬ С ПРОМЫВКОЙ',
                  None, None, None, None, None, None, None,
-                 'мастер КРС', descentNKT_norm(well_data.current_bottom, 1.1)],
+                 'мастер КРС', descentNKT_norm(self.dict_data_well["current_bottom"], 1.1)],
             [f'монтаж мех.ротора', None,
                  f'Произвести монтаж мех.ротора. Собрать промывочное оборудование: вертлюг, ведущая труба (установить '
                  f'вставной фильтр под ведущей трубой), '
@@ -585,8 +592,8 @@ class Drill_window(MyMainWindow):
 
         if self.check_pressure(current_depth) == True:
             drilling_list.append(
-                [f'Опрессовать ЭК и ЦМ на Р={well_data.max_admissible_pressure._value}атм', None,
-                 f'Опрессовать ЭК и ЦМ на Р={well_data.max_admissible_pressure._value}атм в присутствии представителя '
+                [f'Опрессовать ЭК и ЦМ на Р={self.dict_data_well["max_admissible_pressure"]._value}атм', None,
+                 f'Опрессовать ЭК и ЦМ на Р={self.dict_data_well["max_admissible_pressure"]._value}атм в присутствии представителя '
                  f'заказчика. Составить акт. '
                  f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до '
                  f'начала работ) \n'
@@ -594,7 +601,7 @@ class Drill_window(MyMainWindow):
                  None, None, None, None, None, None, None,
                  'Мастер КРС, УСРСиСТ', 0.67])
 
-        well_data.current_bottom = current_depth
+        self.dict_data_well["current_bottom"] = current_depth
 
         for drill_sole, bottomType2 in drill_tuple:
             if self.check_pressure(drill_sole) is True:
@@ -622,10 +629,10 @@ class Drill_window(MyMainWindow):
                 None, None, None, None, None, None, None,
                 'мастер КРС, предст. заказчика', 0.77],
             [None, None,
-             f'Поднять  {drilling_str} на СБТ с глубины {well_data.current_bottom}м с доливом скважины в '
-             f'объеме {round(well_data.current_bottom * 1.4 / 1000, 1)}м3 тех. жидкостью  уд.весом {well_data.fluid_work}',
+             f'Поднять  {drilling_str} на СБТ с глубины {self.dict_data_well["current_bottom"]}м с доливом скважины в '
+             f'объеме {round(self.dict_data_well["current_bottom"] * 1.4 / 1000, 1)}м3 тех. жидкостью  уд.весом {self.dict_data_well["fluid_work"]}',
              None, None, None, None, None, None, None,
-             'мастер КРС', liftingNKT_norm(well_data.current_bottom, 1.3)]
+             'мастер КРС', liftingNKT_norm(self.dict_data_well["current_bottom"], 1.3)]
         ]
         drilling_list.extend(drilling_list_end)
         return drilling_list
@@ -635,17 +642,17 @@ class Drill_window(MyMainWindow):
 
         check_True = True
 
-        for plast in well_data.plast_all:
-            if well_data.dict_perforation[plast]['отключение'] is False:
-                for interval in well_data.dict_perforation[plast]['интервал']:
+        for plast in self.dict_data_well["plast_all"]:
+            if self.dict_data_well["dict_perforation"][plast]['отключение'] is False:
+                for interval in self.dict_data_well["dict_perforation"][plast]['интервал']:
                     if depth > interval[0]:
                         check_True = False
 
-        if well_data.leakiness is True:
+        if self.dict_data_well["leakiness"] is True:
 
-            for nek in well_data.dict_leakiness['НЭК']['интервал']:
-                # print(well_data.dict_leakiness)
-                if well_data.dict_leakiness['НЭК']['интервал'][nek]['отключение'] is False:
+            for nek in self.dict_data_well["dict_leakiness"]['НЭК']['интервал']:
+                # print(self.dict_data_well["dict_leakiness"])
+                if self.dict_data_well["dict_leakiness"]['НЭК']['интервал'][nek]['отключение'] is False:
                     if depth > float(nek.split('-')[0]):
                         check_True = False
         return check_True
@@ -655,13 +662,13 @@ class Drill_window(MyMainWindow):
         from work_py.alone_oreration import well_volume
         from work_py.alone_oreration import kot_work
 
-        max_port = max([well_data.dict_perforation[plast]['подошва'] for plast in well_data.plast_work]) - 2
-        min_port = max([well_data.dict_perforation[plast]['кровля'] for plast in well_data.plast_work])
+        max_port = max([self.dict_data_well["dict_perforation"][plast]['подошва'] for plast in self.dict_data_well['plast_work']]) - 2
+        min_port = max([self.dict_data_well["dict_perforation"][plast]['кровля'] for plast in self.dict_data_well['plast_work']])
 
         current_depth, ok = QInputDialog.getInt(None, 'Нормализация забоя',
                                                 'Введите глубину необходимого забоя при нормализации',
                                                 int(max_port), 0,
-                                                int(well_data.bottomhole_artificial._value + 500))
+                                                int(self.dict_data_well["bottomhole_artificial"]._value + 500))
 
         kot_question = QMessageBox.question(self, 'КОТ', 'Нужно ли произвести СПО '
                                                          'обратных клапанов перед фрезом?')
@@ -671,29 +678,29 @@ class Drill_window(MyMainWindow):
         else:
             kot_list = []
 
-        drillingBit_diam = TabPage_SO_drill.drillingBit_diam_select(self, current_depth)
+        drillingBit_diam = TabPageSoDrill.drillingBit_diam_select(self, current_depth)
 
         drillingBit_diam, ok = QInputDialog.getDouble(None, 'Диаметр фреза',
                                                 'Введите диаметр фреза', drillingBit_diam, 50, 210, 1)
         nkt_pod = "2' 3/8"
 
-        nkt_diam = ''.join(["2 7/8" if well_data.column_diametr._value > 110 else "2 3/8"])
+        nkt_diam = ''.join(["2 7/8" if self.dict_data_well["column_diametr"]._value > 110 else "2 3/8"])
 
-        if well_data.column_additional is False or (
-                well_data.column_additional is True and well_data.head_column_additional._value >= well_data.current_bottom):
+        if self.dict_data_well["column_additional"] is False or (
+                self.dict_data_well["column_additional"] is True and self.dict_data_well["head_column_additional"]._value >= self.dict_data_well["current_bottom"]):
             drilling_str = f'торцевой фрезер -{drillingBit_diam} + СБТ + магнит колонный  2⅜ БТ (П) '
             drilling_short = f'торцевой фрезер -{drillingBit_diam} + СБТ + магнит колонный  2⅜ БТ (П) '
 
 
-        elif well_data.column_additional is True:
+        elif self.dict_data_well["column_additional"] is True:
             drilling_str = f'торцевой фрезер -{drillingBit_diam} + СБТ + магнит колонный  2⅜ БТ (П) + ' \
                            f'СБТ{nkt_pod} ' \
-                           f'{round(current_depth - well_data.head_column_additional._value, 1)}м'
+                           f'{round(current_depth - self.dict_data_well["head_column_additional"]._value, 1)}м'
             drilling_short = f'торцевой фрезер -{drillingBit_diam} + СБТ + магнит колонный  2⅜ БТ (П) + ' \
                              f'СБТ{nkt_pod} ' \
-                             f'{round(current_depth - well_data.head_column_additional._value, 1)}м'
+                             f'{round(current_depth - self.dict_data_well["head_column_additional"]._value, 1)}м'
 
-        well_data.drilling_interval.append([well_data.current_bottom, current_depth])
+        self.dict_data_well["drilling_interval"].append([self.dict_data_well["current_bottom"], current_depth])
         drilling_list = [[f'Завоз на скважину СБТ', None,
          f'Завоз на скважину СБТ – Укладка труб на стеллажи.',
          None, None, None, None, None, None, None,
@@ -731,36 +738,36 @@ class Drill_window(MyMainWindow):
              f'ПРИПОДНИМАЕМ ИНСТРУМЕНТ ПОСЛЕ 15-20 МИНУТ РАБОТЫ',
              None, None, None, None, None, None, None,
              'Мастер КРС, УСРСиСТ', None],
-            [f'Промыть  {well_data.fluid_work}  '
+            [f'Промыть  {self.dict_data_well["fluid_work"]}  '
              f'в объеме {round(well_volume(self, current_depth) * 2, 1)}м3', None,
-             f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {well_data.fluid_work}  '
+             f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {self.dict_data_well["fluid_work"]}  '
              f'в присутствии представителя заказчика в объеме '
              f'{round(well_volume(self, current_depth) * 2, 1)}м3. Составить акт.',
              None, None, None, None, None, None, None,
              'мастер КРС, предст. заказчика', well_volume_norm(well_volume(self, current_depth))],
             [None, None,
              f'Поднять  {drilling_str} на СБТ {nkt_diam} с глубины {current_depth}м с доливом скважины в '
-             f'объеме {round(well_data.current_bottom * 1.4 / 1000, 1)}м3 тех. жидкостью  уд.весом {well_data.fluid_work}',
+             f'объеме {round(self.dict_data_well["current_bottom"] * 1.4 / 1000, 1)}м3 тех. жидкостью  уд.весом {self.dict_data_well["fluid_work"]}',
              None, None, None, None, None, None, None,
-             'мастер КРС', liftingNKT_norm(well_data.current_bottom, 1.3)],
+             'мастер КРС', liftingNKT_norm(self.dict_data_well["current_bottom"], 1.3)],
             [None, None,
              f'В случае превышении норм времени на фрезерование портов увеличение продолжительности дополнительно '
              f'согласовать с супервайзерской службой с составление акта на фактически затраченное время. Или согласовать '
              f'смену вооружения и повторить работы',
              None, None, None, None, None, None, None,
-             'мастер КРС', liftingNKT_norm(well_data.current_bottom, 1.3)],
+             'мастер КРС', liftingNKT_norm(self.dict_data_well["current_bottom"], 1.3)],
             [None, None,
              f'При посадке фреза на глубине выше планируемого порта по согласованию с УСРСиСТ произвести следующие работы:',
              None, None, None, None, None, None, None,
-             'мастер КРС', liftingNKT_norm(well_data.current_bottom, 1.3)]
+             'мастер КРС', liftingNKT_norm(self.dict_data_well["current_bottom"], 1.3)]
         ]
         for row in drilling_list:
             kot_list.append(row)
 
-        well_data.current_bottom = current_depth
+        self.dict_data_well["current_bottom"] = current_depth
 
         kot_list.extend(kot_work(self, current_depth))
 
-        # print(f'забой {well_data.current_bottom }')
+        # print(f'забой {self.dict_data_well["current_bottom"] }')
 
         return kot_list

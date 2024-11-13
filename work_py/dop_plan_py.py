@@ -1,5 +1,5 @@
 import json
-
+from collections import namedtuple
 
 from openpyxl.styles import Font, Alignment
 
@@ -17,18 +17,19 @@ from data_base.config_base import connection_to_database, WorkDatabaseWell
 from krs import GnoWindow
 from main import MyMainWindow
 from work_py.advanted_file import merge_overlapping_intervals, definition_plast_work
+from work_py.parent_work import TabPageUnion, TabWidgetUnion, WindowUnion
 
 
-class TabPageDp(QWidget):
-    def __init__(self, work_plan, tableWidget, old_index):
-        super().__init__()
+class TabPageDp(TabPageUnion):
+    def __init__(self, dict_data_well, tableWidget, old_index, parent =None):
+        super().__init__(dict_data_well)
 
         self.tableWidget = tableWidget
         self.old_index = old_index
 
         self.validator_int = QIntValidator(0, 8000)
         self.validator_float = QDoubleValidator(0, 8000, 1)
-        self.work_plan = work_plan
+        self.work_plan = dict_data_well['work_plan']
 
         self.well_number_label = QLabel('номер скважины')
         self.well_number_edit = QLineEdit(self)
@@ -41,13 +42,13 @@ class TabPageDp(QWidget):
         self.number_DP_Combo = QComboBox(self)
 
         self.number_DP_Combo.addItems(['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'])
-        if well_data.number_dp != 0:
-            self.number_DP_Combo.setCurrentIndex(int(well_data.number_dp) - 1)
+        if self.dict_data_well["number_dp"] != 0:
+            self.number_DP_Combo.setCurrentIndex(int(self.dict_data_well["number_dp"]) - 1)
 
         self.current_bottom_label = QLabel('Забой текущий')
         self.current_bottom_edit = QLineEdit(self)
         self.current_bottom_edit.setValidator(self.validator_float)
-        self.current_bottom_edit.setText(f'{well_data.current_bottom}')
+        # self.current_bottom_edit.setText(f'{self.dict_data_well["current_bottom"]}')
 
         self.current_bottom_date_label = QLabel('дата определения забоя')
         self.current_bottom_date_edit = QDateEdit(self)
@@ -61,7 +62,7 @@ class TabPageDp(QWidget):
         self.template_depth_label = QLabel('Глубина \nшаблонирования ЭК')
         self.template_depth_edit = QLineEdit(self)
         self.template_depth_edit.setValidator(self.validator_float)
-        self.template_depth_edit.setText(str(well_data.template_depth))
+        # self.template_depth_edit.setText(str(self.dict_data_well["template_depth"]))
 
         self.template_lenght_label = QLabel('Длина шаблона')
         self.template_lenght_edit = QLineEdit(self)
@@ -104,10 +105,10 @@ class TabPageDp(QWidget):
         self.date_pressuar_edit = QDateEdit(self)
         self.date_pressuar_edit.setDisplayFormat("dd.MM.yyyy")
 
-        # if well_data.fluid_work == '':
-        #     self.fluid_edit.setText(f'{TabPageGno.calc_fluid(self.work_plan, well_data.current_bottom)}')
+        # if self.dict_data_well["fluid_work"] == '':
+        #     self.fluid_edit.setText(f'{TabPageGno.calc_fluid(self.work_plan, self.dict_data_well["current_bottom"])}')
         # else:
-        #     self.fluid_edit.setText(f'{well_data.fluid_work}')
+        #     self.fluid_edit.setText(f'{self.dict_data_well["fluid_work"]}')
 
         self.work_label = QLabel("Ранее проведенные работы:", self)
         self.work_edit = QTextEdit(self)
@@ -151,9 +152,15 @@ class TabPageDp(QWidget):
 
         self.grid.addWidget(self.work_label, 25, 1)
         self.grid.addWidget(self.work_edit, 26, 1, 2, 4)
-        self.well_area_edit.setText(f"{well_data.well_area._value}")
+
         self.well_number_edit.editingFinished.connect(self.update_well)
-        self.well_number_edit.setText(f"{well_data.well_number._value}")
+        try:
+            self.well_area_edit.setText(f'{self.dict_data_well["well_area"]._value}')
+            self.well_number_edit.setText(f'{self.dict_data_well["well_number"]._value}')
+            self.well_area_edit.setEnabled(False)
+            self.well_number_edit.setEnabled(False)
+        except:
+            pass
 
         # self.well_area_edit.textChanged.connect(self.update_well)
 
@@ -195,7 +202,7 @@ class TabPageDp(QWidget):
 
     def check_in_database_well_data2(self, number_well):
         db = connection_to_database(well_data.DB_WELL_DATA)
-        data_well_base = WorkDatabaseWell(db)
+        data_well_base = WorkDatabaseWell(db, self.dict_data_well)
 
 
         # Получение всех результатов
@@ -312,20 +319,21 @@ class TabPageDp(QWidget):
             # self.well_number_edit.setText(well_number)
             self.well_area_edit.setText(well_area)
         if number_dp != '':
-            well_data.number_dp = int(float(number_dp))
+            self.dict_data_well["number_dp"] = int(float(number_dp))
 
         if index_change_line != '':
             index_change_line = int(float(index_change_line))
-            DopPlanWindow.extraction_data(self, well_data_in_base_combo, index_change_line)
-
-            self.template_depth_edit.setText(str(well_data.template_depth))
-            self.template_lenght_edit.setText(str(well_data.template_lenght))
+            data = DopPlanWindow.extraction_data(self, well_data_in_base_combo, index_change_line)
+            if data is None:
+                return
+            self.template_depth_edit.setText(str(self.dict_data_well["template_depth"]))
+            self.template_lenght_edit.setText(str(self.dict_data_well["template_lenght"]))
             skm_interval = ''
 
             try:
 
-                if len(well_data.skm_interval) != 0:
-                    for roof, sole in well_data.skm_interval:
+                if len(self.dict_data_well["skm_interval"]) != 0:
+                    for roof, sole in self.dict_data_well["skm_interval"]:
                         if f'{roof}-{sole}' not in skm_interval:
                             skm_interval += f'{roof}-{sole}, '
             except Exception as e:
@@ -336,9 +344,9 @@ class TabPageDp(QWidget):
 
             try:
 
-                if len(well_data.ribbing_interval) != 0:
-                    asddfg = well_data.ribbing_interval
-                    for roof, sole in well_data.ribbing_interval:
+                if len(self.dict_data_well["ribbing_interval"]) != 0:
+                    asddfg = self.dict_data_well["ribbing_interval"]
+                    for roof, sole in self.dict_data_well["ribbing_interval"]:
                         if f'{roof}-{sole}' not in raiding_interval:
                             raiding_interval += f'{roof}-{sole}, '
             except Exception as e:
@@ -347,50 +355,47 @@ class TabPageDp(QWidget):
 
             self.skm_interval_edit.setText(skm_interval[:-2])
             self.raiding_interval_edit.setText(raiding_interval[:-2])
-            self.current_bottom_edit.setText(str(well_data.current_bottom))
-            self.fluid_edit.setText(str(well_data.fluid_work))
-            if well_data.column_additional:
+            self.current_bottom_edit.setText(str(self.dict_data_well["current_bottom"]))
+            self.fluid_edit.setText(str(self.dict_data_well["fluid_work"]))
+            if self.dict_data_well["column_additional"]:
                 self.template_depth_addition_label = QLabel('Глубина спуска шаблона в доп колонне')
                 self.template_depth_addition_edit = QLineEdit(self)
                 self.template_depth_addition_edit.setValidator(self.validator_float)
-                self.template_depth_addition_edit.setText(str(well_data.template_depth_addition))
+                self.template_depth_addition_edit.setText(str(self.dict_data_well["template_depth_addition"]))
 
                 self.template_lenght_addition_label = QLabel('Длина шаблона в доп колонне')
                 self.template_lenght_addition_edit = QLineEdit(self)
                 self.template_lenght_addition_edit.setValidator(self.validator_float)
-                self.template_lenght_addition_edit.setText(str(well_data.template_lenght_addition))
+                self.template_lenght_addition_edit.setText(str(self.dict_data_well["template_lenght_addition"]))
                 self.grid.addWidget(self.template_depth_addition_label, 6, 4)
                 self.grid.addWidget(self.template_depth_addition_edit, 7, 4)
                 self.grid.addWidget(self.template_lenght_addition_label, 6, 5)
                 self.grid.addWidget(self.template_lenght_addition_edit, 7, 5)
 
 
-class TabWidget(QTabWidget):
+class TabWidget(TabWidgetUnion):
     def __init__(self, work_plan, tableWidget=0, old_index=0):
         super().__init__()
         self.addTab(TabPageDp(work_plan, tableWidget, old_index), 'Дополнительный план работ')
 
 
-class DopPlanWindow(MyMainWindow):
-    def __init__(self, ins_ind, table_widget, work_plan, ws=None, parent=None):
+class DopPlanWindow(WindowUnion):
+    def __init__(self, dict_data_well, table_widget, parent=None):
+        super(DopPlanWindow, self).__init__(dict_data_well)
 
-        super(DopPlanWindow, self).__init__()
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
-        self.ins_ind = ins_ind
+        self.ins_ind = self.dict_data_well["ins_ind"]
         self.table_widget = table_widget
-        self.work_plan = work_plan
-        self.dict_perforation = []
+        self.work_plan =  self.dict_data_well["work_plan"]
 
-
-        self.ws = ws
         self.data, self.rowHeights, self.colWidth, self.boundaries_dict = None, None, None, None
         self.target_row_index = None
         self.target_row_index_cancel = None
         self.old_index = 0
         self.tableWidget = QTableWidget(0, 12)
 
-        self.tabWidget = TabWidget(self.work_plan, self.tableWidget, self.old_index)
+        self.tabWidget = TabWidget(self.dict_data_well, self.tableWidget, self.old_index)
         self.tableWidget.setSortingEnabled(True)
         self.tableWidget.setAlternatingRowColors(True)
 
@@ -475,12 +480,14 @@ class DopPlanWindow(MyMainWindow):
 
     def work_with_excel(self, well_number, well_area, work_plan, type_kr):
 
+        self.dict_data_well["gips_in_well"] = False
         self.data, self.rowHeights, self.colWidth, self.boundaries_dict = \
             DopPlanWindow.read_excel_in_base(well_number, well_area, work_plan, type_kr)
 
         self.target_row_index = 5000
         self.target_row_index_cancel = 5000
         self.bottom_row_index = 5000
+
 
         perforation_list = []
 
@@ -493,17 +500,17 @@ class DopPlanWindow(MyMainWindow):
                     elif 'вскрытия/отключения' in str(row[col]['value']):
                         self.old_index = 1
                     elif 'II. История эксплуатации скважины' in str(row[col]['value'])  and \
-                            well_data.work_plan not in ['plan_change']:
+                            self.dict_data_well["work_plan"] not in ['plan_change']:
                         self.target_row_index_cancel = int(i) - 1
                         break
                     elif 'внутренний диаметр ( d шарошечного долота) необсаженной части ствола' in str(row[col]['value']) and \
-                            well_data.work_plan not in ['plan_change']:
+                            self.dict_data_well["work_plan"] not in ['plan_change']:
                         self.target_row_index_cancel = int(i)
                         break
-                    elif 'Порядок работы' == str(row[col]['value']) and well_data.data_x_max._value == 0:
-                        well_data.data_x_max = well_data.ProtectedIsDigit(int(i) + 1)
+                    elif 'Порядок работы' in str(row[2]['value']):
+                        self.dict_data_well["data_x_max"] = well_data.ProtectedIsDigit(int(i) + 1)
                         break
-                    elif 'ИТОГО:' in str(row[col]['value']) and well_data.work_plan in ['plan_change']:
+                    elif 'ИТОГО:' in str(row[col]['value']) and self.dict_data_well["work_plan"] in ['plan_change']:
                         self.target_row_index_cancel = int(i)+1
                         break
                     elif 'Текущий забой ' == str(row[col]['value']):
@@ -514,13 +521,18 @@ class DopPlanWindow(MyMainWindow):
 
                     if int(i) > self.target_row_index_cancel:
                         break
+            else:
+
+                self.dict_data_well["image_list"] = row
 
             if len(list_row) != 0 and not 'внутренний диаметр ( d шарошечного долота) необсаженной части ствола' in list_row:
                 if all([col == None or col == '' for col in list_row]) is False:
                     perforation_list.append(list_row)
-        well_data.ins_ind2 = well_data.data_x_max._value
+        self.dict_data_well["ins_ind2"] = self.dict_data_well["data_x_max"]._value
+        self.dict_data_well["count_template"] = 1
 
-        if well_data.work_plan != 'plan_change':
+
+        if self.dict_data_well["work_plan"] != 'plan_change':
             self.tableWidget.setSortingEnabled(False)
             rows = self.tableWidget.rowCount()
             for row_pvr in perforation_list[::-1]:
@@ -528,6 +540,8 @@ class DopPlanWindow(MyMainWindow):
                 for index_col, col_pvr in enumerate(row_pvr):
                     if col_pvr != None:
                         self.tableWidget.setItem(rows, index_col - 1, QTableWidgetItem(str(col_pvr)))
+        from data_correct import DataWindow
+        DataWindow.definition_open_trunk_well(self)
     @staticmethod
     def read_excel_in_base(number_well, area_well, work_plan, type_kr):
         db = connection_to_database(well_data.DB_WELL_DATA)
@@ -724,6 +738,7 @@ class DopPlanWindow(MyMainWindow):
         from data_base.work_with_base import  insert_data_well_dop_plan, round_cell
         from well_data import ProtectedIsNonNone
         from work_py.advanted_file import definition_plast_work
+        self.dict_data_well["data_list"] = []
         
         current_widget = self.tabWidget.currentWidget()
         method_bottom_combo = current_widget.method_bottom_combo.currentText()
@@ -750,7 +765,7 @@ class DopPlanWindow(MyMainWindow):
 
             template_depth_edit = current_widget.template_depth_edit.text()
             template_lenght_edit = current_widget.template_lenght_edit.text()
-            if well_data.column_additional:
+            if self.dict_data_well["column_additional"]:
                 template_depth_addition_edit = current_widget.template_depth_addition_edit.text()
                 template_lenght_addition_edit = current_widget.template_lenght_addition_edit.text()
             skm_interval_edit = current_widget.skm_interval_edit.text()
@@ -766,11 +781,11 @@ class DopPlanWindow(MyMainWindow):
                                                                   'так ли это?')
                 if mes == QMessageBox.StandardButton.No:
                     return
-            if float(template_depth_edit) > float(well_data.bottomhole_artificial._value):
-                QMessageBox.critical(self, 'Забой', 'Шаблонирование не может быть ниже текущего забоя')
+            if float(template_depth_edit) > float(self.dict_data_well["bottomhole_drill"]._value):
+                QMessageBox.critical(self, 'Забой', 'Шаблонирование не может быть ниже искусственного забоя забоя')
                 return
             if number_dp != '':
-                well_data.number_dp = int(float(number_dp))
+                self.dict_data_well["number_dp"] = int(float(number_dp))
 
             if (0.87 <= float(fluid[:3].replace(',', '.')) <= 1.64) == False:
                 QMessageBox.critical(self, 'рабочая жидкость',
@@ -781,23 +796,23 @@ class DopPlanWindow(MyMainWindow):
                 if 'г/см3' not in fluid:
                     QMessageBox.critical(self, 'уд.вес', 'нужно добавить значение "г/см3" в уд.вес')
                     return
-                well_data.fluid_work = fluid
-                well_data.fluid_work_short = fluid[:7]
+                self.dict_data_well["fluid_work"] = fluid
+                self.dict_data_well["fluid_work_short"] = fluid[:7]
 
-                well_data.fluid = float(fluid[:4].replace('г', ''))
+                self.dict_data_well["fluid"] = float(fluid[:4].replace('г', ''))
             else:
-                well_data.fluid = float(fluid)
+                self.dict_data_well["fluid"] = float(fluid)
 
-                if float(current_bottom) > well_data.bottomhole_drill._value:
+                if float(current_bottom) > self.dict_data_well["bottomhole_drill"]._value:
                     QMessageBox.critical(self, 'Забой', 'Текущий забой больше пробуренного забоя')
                     return
-                well_data.fluid_work, well_data.fluid_work_short = GnoWindow.calc_work_fluid(fluid)
+                self.dict_data_well["fluid_work"], self.dict_data_well["fluid_work_short"] = GnoWindow.calc_work_fluid(self, fluid)
 
-            well_data.template_depth = float(template_depth_edit)
-            well_data.template_lenght = float(template_lenght_edit)
-            if well_data.column_additional:
-                well_data.template_depth = float(template_depth_addition_edit)
-                well_data.template_lenght = float(template_lenght_addition_edit)
+            self.dict_data_well["template_depth"] = float(template_depth_edit)
+            self.dict_data_well["template_lenght"] = float(template_lenght_edit)
+            if self.dict_data_well["column_additional"]:
+                self.dict_data_well["template_depth"] = float(template_depth_addition_edit)
+                self.dict_data_well["template_lenght"] = float(template_lenght_addition_edit)
 
             try:
                 skm_interval = []
@@ -811,7 +826,7 @@ class DopPlanWindow(MyMainWindow):
 
                 skm_interval_new = merge_overlapping_intervals(skm_interval)
 
-                well_data.skm_interval = skm_interval_new
+                self.dict_data_well["skm_interval"] = skm_interval_new
 
             except:
                 QMessageBox.warning(self, 'Ошибка',
@@ -831,7 +846,7 @@ class DopPlanWindow(MyMainWindow):
 
                 raiding_interval_new = merge_overlapping_intervals(raiding_interval)
 
-                well_data.ribbing_interval = raiding_interval_new
+                self.dict_data_well["ribbing_interval"] = raiding_interval_new
 
             except Exception as e:
                 QMessageBox.warning(self, 'Ошибка',
@@ -839,92 +854,56 @@ class DopPlanWindow(MyMainWindow):
                                           f' {e}')
                 return
 
-            if len(well_data.skm_interval) == 0:
+            if len(self.dict_data_well["skm_interval"]) == 0:
                 mes = QMessageBox.question(self, 'Ошибка',
                                            'Интервалы скреперования отсутствуют, так ли это?')
                 if mes == QMessageBox.StandardButton.No:
                     return
 
-            if len(well_data.ribbing_interval) == 0:
+            if len(self.dict_data_well["ribbing_interval"]) == 0:
                 mes = QMessageBox.question(self, 'Ошибка',
                                            'Интервалы Райбирования отсутствуют, так ли это?')
                 if mes == QMessageBox.StandardButton.No:
                     return
 
-            well_data.count_template = 1
-            if well_data.data_in_base:
+            self.dict_data_well["count_template"] = 1
+            well_data_in_base_combo = current_widget.well_data_in_base_combo.currentText()
+            if well_data_in_base_combo == '':
+                QMessageBox.critical(self, 'База данных', 'Необходимо выбрать план работ')
+                return
+            list_dop_plan = well_data_in_base_combo.split(' ')
+            if list_dop_plan:
+                if any([f'ДП№{number_dp}' in dop_plan or f'ДП№{number_dp}' in dop_plan for dop_plan in list_dop_plan]):
+                    question = QMessageBox.question(self, 'Ошибка', f'дополнительный план работ № {number_dp} '
+                                                                    f'есть в базе, обновить доп план?')
+                    if question == QMessageBox.StandardButton.No:
+                        return
 
-                well_data_in_base_combo = current_widget.well_data_in_base_combo.currentText()
-                if well_data_in_base_combo == '':
-                    QMessageBox.warning(self, 'Ошибка', 'Не выбрана скважина в базе данных')
-                    return
-
-                if ' от' in well_data_in_base_combo:
-
-                    data_table_in_base_combo = well_data_in_base_combo.split(' ')[-1]
-                    table_in_base = well_data_in_base_combo.split(' ')[3]
-                    type_kr = well_data_in_base_combo.split(' ')[2]
-                    well_data.type_kr = type_kr + ' ' "vf"
-                    number_dp_in_base = "".join(c for c in table_in_base if c.isdigit())
-                    table_in_base = well_data_in_base_combo.split(' ')[3].replace('krs', 'ПР').replace('dop_plan_in_base',
-                                                                                                   'ДП№').replace(
-                        'dop_plan', 'ДП№')
-
-                index_change_line = current_widget.index_change_line.text()
-                well_number = current_widget.well_number_edit.text()
-                well_area = current_widget.well_area_edit.text()
-                if well_area != '' and well_area != '':
-                    well_data.well_number, well_data.well_area = \
-                        ProtectedIsNonNone(well_number), ProtectedIsNonNone(well_area)
-                if index_change_line != '':
-                    index_change_line = int(float(index_change_line))
-                else:
-                    QMessageBox.critical(self, 'пункт', 'Необходимо выбрать пункт плана работ')
-                    return
-                db = connection_to_database(well_data.DB_WELL_DATA)
-                data_base =WorkDatabaseWell(db)
-                list_dop_plan = data_base.get_tables_starting_with(well_data.well_number._value,
-                                                                                well_data.well_area._value, table_in_base, type_kr)
-                if list_dop_plan:
-                    if any([f'ДП№{number_dp}' in dop_plan or f'ДП№{number_dp}' in dop_plan for dop_plan in list_dop_plan]):
-                        question = QMessageBox.question(self, 'Ошибка', f'дополнительный план работ № {number_dp} '
-                                                                        f'есть в базе, обновить доп план?')
-                        if question == QMessageBox.StandardButton.No:
-                            return
+            index_change_line = current_widget.index_change_line.text()
+            well_number = current_widget.well_number_edit.text()
+            well_area = current_widget.well_area_edit.text()
+            if well_area != '' and well_area != '':
+                self.dict_data_well["well_number"], self.dict_data_well["well_area"] = \
+                    ProtectedIsNonNone(well_number), ProtectedIsNonNone(well_area)
+            if index_change_line != '':
+                index_change_line = int(float(index_change_line))
+            else:
+                QMessageBox.critical(self, 'пункт', 'Необходимо выбрать пункт плана работ')
+                return
 
 
-                if well_data_in_base_combo == '':
-                    QMessageBox.critical(self, 'База данных', 'Необходимо выбрать план работ')
-                    return
-
-                db = connection_to_database(well_data.DB_WELL_DATA)
-                data_well_base = WorkDatabaseWell(db)
-
-                data_well = data_well_base.check_in_database_well_data(well_number, well_area, table_in_base)
-
-                if data_well[0]:
-
-                    well_data.type_kr = data_well[2]
-                    if data_well[3]:
-                        well_data.dict_category = json.loads(data_well[3])
-                    insert_data_well_dop_plan(data_well[0])
-
-                # self.work_with_excel(well_number, well_area, table_in_base, type_kr)
-
-                self.extraction_data(well_data_in_base_combo, index_change_line)
-
-            well_data.current_bottom = current_bottom
+            self.dict_data_well["current_bottom"] = current_bottom
 
             if skm_interval_edit not in ['', 0, '0-0'] and '-' in skm_interval_edit:
                 if ',' in skm_interval_edit:
                     for skm_int in skm_interval_edit.split(','):
-                        well_data.skm_interval.append(list(map(int, skm_int.split('-'))))
+                        self.dict_data_well["skm_interval"].append(list(map(int, skm_int.split('-'))))
                 else:
-                    well_data.skm_interval.append(list(map(int, skm_interval_edit.split('-'))))
+                    self.dict_data_well["skm_interval"].append(list(map(int, skm_interval_edit.split('-'))))
 
             rows = self.tableWidget.rowCount()
 
-            self.work_with_excel(well_number, well_area, table_in_base, type_kr)
+            self.work_with_excel(well_number, well_area, list_dop_plan[3], list_dop_plan[2])
             if change_pvr_combo == 'Да':
                 if rows == 0:
                     QMessageBox.warning(self, 'Ошибка', 'Нужно загрузить интервалы перфорации')
@@ -954,18 +933,18 @@ class DopPlanWindow(MyMainWindow):
                 work_list = self.work_list(work_earlier)
                 self.populate_row(self.ins_ind + 3, work_list, self.table_widget, self.work_plan)
 
-            if len(self.dict_perforation) != 0:
-                for plast, vertical_line,  roof_int, sole_int, date_pvr_edit, count_pvr_edit, \
-                    type_pvr_edit, pressuar_pvr_edit, date_pressuar_edit in self.dict_perforation:
-                    well_data.dict_perforation.setdefault(plast, {}).setdefault('отрайбировано', False)
-                    well_data.dict_perforation.setdefault(plast, {}).setdefault('Прошаблонировано', False)
+                if len(self.dict_perforation) != 0:
+                    for plast, vertical_line,  roof_int, sole_int, date_pvr_edit, count_pvr_edit, \
+                        type_pvr_edit, pressuar_pvr_edit, date_pressuar_edit in self.dict_perforation:
+                        self.dict_data_well["dict_perforation"].setdefault(plast, {}).setdefault('отрайбировано', False)
+                        self.dict_data_well["dict_perforation"].setdefault(plast, {}).setdefault('Прошаблонировано', False)
 
-                    well_data.dict_perforation.setdefault(plast, {}).setdefault('интервал', []).append(
-                        (float(roof_int), float(sole_int)))
-                    well_data.dict_perforation_short.setdefault(plast, {}).setdefault('интервал', []).append(
-                        (float(roof_int), float(sole_int)))
-                    well_data.dict_perforation.setdefault(plast, {}).setdefault('отключение', False)
-                    well_data.dict_perforation_short.setdefault(plast, {}).setdefault('отключение', False)
+                        self.dict_data_well["dict_perforation"].setdefault(plast, {}).setdefault('интервал', []).append(
+                            (float(roof_int), float(sole_int)))
+                        self.dict_data_well["dict_perforation_short"].setdefault(plast, {}).setdefault('интервал', []).append(
+                            (float(roof_int), float(sole_int)))
+                        self.dict_data_well["dict_perforation"].setdefault(plast, {}).setdefault('отключение', False)
+                        self.dict_data_well["dict_perforation_short"].setdefault(plast, {}).setdefault('отключение', False)
 
         else:
             fluid = current_widget.fluid_edit.text().replace(',', '.')
@@ -978,7 +957,7 @@ class DopPlanWindow(MyMainWindow):
 
             template_depth_edit = current_widget.template_depth_edit.text()
             template_lenght_edit = current_widget.template_lenght_edit.text()
-            if well_data.column_additional:
+            if self.dict_data_well["column_additional"]:
                 template_depth_addition_edit = current_widget.template_depth_addition_edit.text()
                 template_lenght_addition_edit = current_widget.template_lenght_addition_edit.text()
             skm_interval_edit = current_widget.skm_interval_edit.text()
@@ -987,9 +966,9 @@ class DopPlanWindow(MyMainWindow):
                 if skm_interval_edit not in ['', 0, '0-0'] and '-' in skm_interval_edit:
                     if ',' in skm_interval_edit:
                         for skm_int in skm_interval_edit.split(','):
-                            well_data.skm_interval.append(list(map(int, skm_int.split('-'))))
+                            self.dict_data_well["skm_interval"].append(list(map(int, skm_int.split('-'))))
                     else:
-                        well_data.skm_interval.append(list(map(int, skm_interval_edit.split('-'))))
+                        self.dict_data_well["skm_interval"].append(list(map(int, skm_interval_edit.split('-'))))
 
             except:
                 QMessageBox.warning(self, 'Ошибка',
@@ -1009,26 +988,26 @@ class DopPlanWindow(MyMainWindow):
                 QMessageBox.critical(self, 'Забой', 'Шаблонирование не может быть ниже текущего забоя')
                 return
             if number_dp != '':
-                well_data.number_dp = int(float(number_dp))
+                self.dict_data_well["number_dp"] = int(float(number_dp))
 
             if (0.87 <= float(fluid[:3].replace(',', '.')) <= 1.64) == False:
                 QMessageBox.critical(self, 'рабочая жидкость',
                                            'уд. вес рабочей жидкости не может быть меньше 0,87 и больше 1,64')
                 return
 
-            # if float(current_bottom) > well_data.bottomhole_drill._value:
+            # if float(current_bottom) > self.dict_data_well["bottomhole_drill"]._value:
             #     QMessageBox.critical(self, 'Забой', 'Текущий забой больше пробуренного забоя')
             #     return
-            well_data.fluid_work, well_data.fluid_work_short = GnoWindow.calc_work_fluid(fluid)
+            self.dict_data_well["fluid_work"], self.dict_data_well["fluid_work_short"] = GnoWindow.calc_work_fluid(self, fluid)
 
-            well_data.template_depth = float(template_depth_edit)
-            well_data.template_lenght = float(template_lenght_edit)
-            if well_data.column_additional:
-                well_data.template_depth = float(template_depth_addition_edit)
-                well_data.template_lenght = float(template_lenght_addition_edit)
+            self.dict_data_well["template_depth"] = float(template_depth_edit)
+            self.dict_data_well["template_lenght"] = float(template_lenght_edit)
+            if self.dict_data_well["column_additional"]:
+                self.dict_data_well["template_depth"] = float(template_depth_addition_edit)
+                self.dict_data_well["template_lenght"] = float(template_lenght_addition_edit)
 
             work_list = self.work_list(work_earlier)
-            well_data.ins_ind2 = self.ins_ind + 2
+            self.dict_data_well["ins_ind2"] = self.ins_ind + 2
             self.populate_row(self.ins_ind + 2, work_list, self.table_widget, self.work_plan)
             definition_plast_work(self)
 
@@ -1063,7 +1042,7 @@ class DopPlanWindow(MyMainWindow):
 
                         if 'порядок работы' in str(cell.value).lower() or \
                                 'наименование работ' in str(cell.value).lower():
-                            well_data.ins_ind2 = i + 1
+                            self.dict_data_well["ins_ind2"] = i + 1
                             ws2.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=True)
                             ws2.cell(row=i, column=j).alignment = Alignment(wrap_text=True, horizontal='center',
                                                                             vertical='center')
@@ -1079,24 +1058,57 @@ class DopPlanWindow(MyMainWindow):
         work_plan = table_name.split(' ')[3]
 
         db = connection_to_database(well_data.DB_WELL_DATA)
-        data_well_base = WorkDatabaseWell(db)
+        data_well_base = WorkDatabaseWell(db, self.dict_data_well)
 
 
         result_table = data_well_base.extraction_data(str(well_number), well_area, type_kr,
                                                       work_plan, date_table, contractor)
 
+
         if result_table is None:
             QMessageBox.warning(self, 'Ошибка',
                                 f'В базе данных скв {well_number} {well_area} отсутствует данные, '
                                 f'используйте excel вариант плана работ')
+            return None
 
         if result_table[0]:
             result = json.loads(result_table[0])
+            from data_base.work_with_base import insert_data_well_dop_plan
+            insert_data_well_dop_plan(self, result_table[1])
 
-            if well_data.work_plan in ['dop_plan', 'dop_plan_in_base']:
-                DopPlanWindow.insert_data_dop_plan(self, result, paragraph_row)
-            elif well_data.work_plan == 'plan_change':
-                DopPlanWindow.insert_data_plan(self, result)
+            self.dict_data_well["type_kr"] = result_table[2]
+            if result_table[3]:
+                dict_data_well = json.loads(result_table[3])
+                # self.dict_data_well["dict_category"]
+                Pressuar = namedtuple("Pressuar", "category data_pressuar")
+                Data_h2s = namedtuple("Data_h2s", "category data_procent data_mg_l poglot")
+                Data_gaz = namedtuple("Data_gaz", "category data")
+                self.dict_data_well['dict_category'] = {}
+
+
+                for plast, plast_data in dict_data_well.items():
+                    sfdfr = dict_data_well[plast]['по давлению']
+                    self.dict_data_well['dict_category'].setdefault(plast, {}).setdefault(
+                        'по давлению',
+                        Pressuar(*dict_data_well[plast]['по давлению']))
+                    self.dict_data_well['dict_category'].setdefault(plast, {}).setdefault(
+                        'по сероводороду', Data_h2s(*dict_data_well[plast]['по сероводороду']))
+                    self.dict_data_well['dict_category'].setdefault(plast, {}).setdefault(
+                        'по газовому фактору', Data_gaz(*dict_data_well[plast]['по газовому фактору']))
+
+                    self.dict_data_well['dict_category'].setdefault(plast, {}).setdefault(
+                        'отключение', dict_data_well[plast]['отключение'])
+
+
+
+            if self.dict_data_well["work_plan"] in ['dop_plan', 'dop_plan_in_base']:
+                data = DopPlanWindow.insert_data_dop_plan(self, result, paragraph_row)
+                if data is None:
+                    return None
+            elif self.dict_data_well["work_plan"] == 'plan_change':
+                data = DopPlanWindow.insert_data_plan(self, result)
+                if data is None:
+                    return None
             well_data.data_well_is_True = True
 
         else:
@@ -1104,20 +1116,32 @@ class DopPlanWindow(MyMainWindow):
             QMessageBox.warning(self, 'Проверка наличия таблицы в базе данных',
                                       f"Таблицы '{table_name}' нет в базе данных.")
 
-        return
+        return True
 
     def insert_data_plan(self, result):
-        well_data.data_list = []
-        well_data.fluid = float(result[0][7][:4].replace('г', ''))
+        self.dict_data_well["data_list"] = []
+        self.dict_data_well["gips_in_well"] = False
+        self.dict_data_well["drilling_interval"] = []
+        self.dict_data_well["for_paker_list"] = False
+        self.dict_data_well["grp_plan"] = False
+        self.dict_data_well["angle_data"] = []
+        self.dict_data_well["nkt_opress_true"] = False
+        self.dict_data_well['plast_project'] = []
+        self.dict_data_well["drilling_interval"] = []
+        self.dict_data_well["dict_perforation_project"] = {}
+        self.dict_data_well["bvo"] = False
+        self.dict_data_well["fluid"] = float(result[0][7][:4].replace('г', ''))
+        self.dict_data_well["stabilizator_true"] = False
+        self.dict_data_well["current_bottom2"] = 0
 
         for ind, row in enumerate(result):
             if ind == 1:
-                well_data.bottom = row[1]
-                well_data.category_pressuar2 = row[8]
-                well_data.category_h2s_2 = row[9]
-                well_data.gaz_f_pr_2 = row[10]
+                self.dict_data_well["bottom"] = row[1]
+                self.dict_data_well["category_pressuar2"] = row[8]
+                self.dict_data_well["category_h2s_2"] = row[9]
+                self.dict_data_well["gaz_f_pr_2"] = row[10]
 
-                well_data.plast_work_short = json.dumps(row[3], ensure_ascii=False)
+                self.dict_data_well['plast_work_short'] = json.dumps(row[3], ensure_ascii=False)
 
             data_list = []
             for index, data in enumerate(row):
@@ -1127,58 +1151,96 @@ class DopPlanWindow(MyMainWindow):
                     else:
                         data = True
                 data_list.append(data)
-            well_data.data_list.append(data_list)
-        well_data.current_bottom = result[ind][1]
-        well_data.dict_perforation = json.loads(result[ind][2])
+            self.dict_data_well["data_list"].append(data_list)
+        self.dict_data_well["current_bottom"] = result[ind][1]
+        self.dict_data_well["dict_perforation"] = json.loads(result[ind][2])
 
-        well_data.plast_all = json.loads(result[ind][3])
-        well_data.plast_work = json.loads(result[ind][4])
-        well_data.leakage = json.loads(result[ind][5])
-        well_data.dict_perforation_short = json.loads(result[ind][2])
+        self.dict_data_well['plast_all'] = json.loads(result[ind][3])
+        self.dict_data_well['plast_work'] = json.loads(result[ind][4])
+        self.dict_data_well["dict_leakiness"] = json.loads(result[ind][5])
+        self.dict_data_well["leakiness"] = False
+        self.dict_data_well["leakiness_interval"] = []
+        if self.dict_data_well["dict_leakiness"]:
+            self.dict_data_well["leakiness"] = True
+            self.dict_data_well["leakiness_interval"] = list(self.dict_data_well["dict_leakiness"]['НЭК'].keys())
 
-        definition_plast_work(None)
+        self.dict_data_well["dict_perforation_short"] = json.loads(result[ind][2])
+
+        self.dict_data_well["category_pressuar"] = result[ind][8]
+        self.dict_data_well["category_h2s"] = result[ind][9]
+        self.dict_data_well["category_gf"] = result[ind][10]
+        if str(result[ind][8]) == '1' or str(result[ind][9]) == '1' or str(result[ind][10]) or '1':
+            self.dict_data_well["bvo"] = True
+
+        definition_plast_work(self)
+        return True
     def insert_data_dop_plan(self, result, paragraph_row):
+        self.dict_data_well['plast_project'] = []
+        self.dict_data_well["dict_perforation_project"] = {}
+        self.dict_data_well["data_list"] = []
+        self.dict_data_well["gips_in_well"] = False
+        self.dict_data_well["drilling_interval"] = []
+        self.dict_data_well["for_paker_list"] = False
+        self.dict_data_well["grp_plan"] = False
+        self.dict_data_well["angle_data"] = []
+        self.dict_data_well["nkt_opress_true"] = False
+        self.dict_data_well["bvo"] = False
+        self.dict_data_well["stabilizator_true"] = False
+        self.dict_data_well["current_bottom2"] = 0
+
         paragraph_row = paragraph_row - 1
 
         if len(result) <= paragraph_row:
             QMessageBox.warning(self, 'Ошибка', f'В плане работ только {len(result)} пунктов')
             return
 
-        well_data.current_bottom = result[paragraph_row][1]
+        self.dict_data_well["current_bottom"] = result[paragraph_row][1]
 
-        well_data.dict_perforation = json.loads(result[paragraph_row][2])
+        self.dict_data_well["dict_perforation"] = json.loads(result[paragraph_row][2])
 
-        well_data.plast_all = json.loads(result[paragraph_row][3])
-        well_data.plast_work = json.loads(result[paragraph_row][4])
-        well_data.leakage = json.loads(result[paragraph_row][5])
+        self.dict_data_well['plast_all'] = json.loads(result[paragraph_row][3])
+        self.dict_data_well['plast_work'] = json.loads(result[paragraph_row][4])
+        self.dict_data_well["dict_leakiness"] = json.loads(result[paragraph_row][5])
+        self.dict_data_well["leakiness"] = False
+        self.dict_data_well["leakiness_interval"] = []
+        if self.dict_data_well["dict_leakiness"]:
+            self.dict_data_well["leakiness"] = True
+            self.dict_data_well["leakiness_interval"] = list(self.dict_data_well["dict_leakiness"]['НЭК'].keys())
+
         if result[paragraph_row][6] == 'true':
-            well_data.column_additional = True
+            self.dict_data_well["column_additional"] = True
         else:
-            well_data.column_additional = False
+            self.dict_data_well["column_additional"] = False
 
-        well_data.fluid_work = result[paragraph_row][7]
+        self.dict_data_well["fluid_work"] = result[paragraph_row][7]
 
-        well_data.category_pressuar = result[paragraph_row][8]
-        well_data.category_h2s = result[paragraph_row][9]
-        well_data.category_gf = result[paragraph_row][10]
+        self.dict_data_well["category_pressuar"] = result[paragraph_row][8]
+        self.dict_data_well["category_h2s"] = result[paragraph_row][9]
+        self.dict_data_well["category_gf"] = result[paragraph_row][10]
+        self.dict_data_well["kat_pvo"] = 2
+        if str(self.dict_data_well["category_pressuar"]) == '1' or str(self.dict_data_well["category_h2s"]) == '1' \
+                or self.dict_data_well["category_gf"] == '1':
+            self.dict_data_well["kat_pvo"] = 1
         try:
-            well_data.template_depth, well_data.template_lenght, well_data.template_depth_addition, \
-            well_data.template_lenght_addition = json.loads(result[paragraph_row][11])
+            self.dict_data_well["template_depth"], self.dict_data_well["template_lenght"], \
+            self.dict_data_well["template_depth_addition"], \
+            self.dict_data_well["template_lenght_addition"] = json.loads(result[paragraph_row][11])
         except:
-            well_data.template_depth = result[paragraph_row][11]
-        well_data.skm_interval = json.loads(result[paragraph_row][12])
+            self.dict_data_well["template_depth"] = result[paragraph_row][11]
+        self.dict_data_well["skm_interval"] = json.loads(result[paragraph_row][12])
 
-        well_data.problemWithEk_depth = result[paragraph_row][13]
-        well_data.problemWithEk_diametr = result[paragraph_row][14]
-        well_data.dict_perforation_short = json.loads(result[paragraph_row][2])
+        self.dict_data_well["problem_with_ek_depth"] = result[paragraph_row][13]
+        self.dict_data_well["problem_with_ek_diametr"] = result[paragraph_row][14]
+        self.dict_data_well["dict_perforation_short"] = json.loads(result[paragraph_row][2])
 
         try:
 
-            well_data.ribbing_interval = json.loads(result[paragraph_row][15])
+            self.dict_data_well["ribbing_interval"] = json.loads(result[paragraph_row][15])
         except:
             pass
 
-        definition_plast_work(None)
+        definition_plast_work(self)
+        return True
 
     def work_list(self, work_earlier):
         krs_begin = [[None, None,

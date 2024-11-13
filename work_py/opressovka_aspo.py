@@ -6,14 +6,16 @@ from PyQt5.QtWidgets import QMessageBox, QInputDialog, QMainWindow, QWidget, QLa
     QTabWidget, QPushButton
 
 from work_py.alone_oreration import privyazkaNKT
-from .opressovka import OpressovkaEK, TabPage_SO
+from .opressovka import OpressovkaEK, TabPageSo
+from .parent_work import TabWidgetUnion, TabPageUnion, WindowUnion
 from .rationingKRS import descentNKT_norm, liftingNKT_norm
 
 
-class TabPage_SO_aspo(QWidget):
+class TabPageSo_aspo(TabPageUnion):
     def __init__(self, parent=None):
-
         super().__init__()
+
+        self.dict_data_well = parent
 
         self.validator = QIntValidator(0, 5000)
 
@@ -30,12 +32,12 @@ class TabPage_SO_aspo(QWidget):
         self.paker_depth_edit.setValidator(self.validator)
         self.paker_depth_edit.textChanged.connect(self.update_paker)
 
-        if len(well_data.plast_work) != 0:
-            pakerDepth = well_data.perforation_roof - 20
+        if len(self.dict_data_well['plast_work']) != 0:
+            pakerDepth = self.dict_data_well["perforation_roof"] - 20
         else:
-            if well_data.leakiness:
-                pakerDepth = min([well_data.dict_leakiness['НЭК']['интервал'][nek][0] - 10
-                                  for nek in well_data.dict_leakiness['НЭК']['интервал'].keys()])
+            if self.dict_data_well["dict_leakiness"]:
+                pakerDepth = min([self.dict_data_well["dict_leakiness"]['НЭК']['интервал'][nek][0] - 10
+                                  for nek in self.dict_data_well["dict_leakiness"]['НЭК']['интервал'].keys()])
 
         self.paker_depth_edit.setText(str(int(pakerDepth)))
 
@@ -52,35 +54,36 @@ class TabPage_SO_aspo(QWidget):
 
     def update_paker(self):
 
-        if well_data.open_trunk_well is True:
+        if self.dict_data_well["open_trunk_well"] is True:
             paker_depth = self.paker_depth_edit.text()
             if paker_depth != '':
-                paker_khost = well_data.current_bottom - int(paker_depth)
+                paker_khost = self.dict_data_well["current_bottom"] - int(paker_depth)
                 self.paker_khost_edit.setText(f'{paker_khost}')
-                self.diametr_paker_edit.setText(f'{TabPage_SO.paker_diametr_select(int(paker_depth))}')
+                self.diametr_paker_edit.setText(f'{TabPageSo.paker_diametr_select(int(paker_depth))}')
         else:
             paker_depth = self.paker_depth_edit.text()
             if paker_depth != '':
                 paker_khost = 10
                 self.paker_khost_edit.setText(f'{paker_khost}')
-                self.diametr_paker_edit.setText(f'{TabPage_SO.paker_diametr_select(int(paker_depth))}')
+                self.diametr_paker_edit.setText(f'{TabPageSo.paker_diametr_select(int(paker_depth))}')
 
 
-class TabWidget(QTabWidget):
-    def __init__(self):
+class TabWidget(TabWidgetUnion):
+    def __init__(self, parent=None):
         super().__init__()
-        self.addTab(TabPage_SO(self), 'Очистка колонны с пакером')
+        self.addTab(TabPageSo(parent), 'Очистка колонны с пакером')
 
 
-class PakerAspo(MyMainWindow):
-    def __init__(self, ins_ind, table_widget, parent=None):
+class PakerAspo(WindowUnion):
+    def __init__(self, dict_data_well, table_widget, parent=None):
         super().__init__()
+
+        self.dict_data_well = dict_data_well
+        self.ins_ind = dict_data_well['ins_ind']
+        self.tabWidget = TabWidget(self.dict_data_well)
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
         self.table_widget = table_widget
-        self.ins_ind = ins_ind
-
-        self.tabWidget = TabWidget()
 
         self.buttonAdd = QPushButton('Добавить данные в план работ')
         self.buttonAdd.clicked.connect(self.add_work)
@@ -93,7 +96,7 @@ class PakerAspo(MyMainWindow):
         paker_khost = int(float(self.tabWidget.currentWidget().paker_khost_edit.text()))
         paker_depth = int(float(self.tabWidget.currentWidget().paker_depth_edit.text()))
 
-        if int(paker_khost) + int(paker_depth) > well_data.current_bottom:
+        if int(paker_khost) + int(paker_depth) > self.dict_data_well["current_bottom"]:
             QMessageBox.warning(self, 'Некорректные данные', f'Компоновка НКТ c хвостовик + пакер '
                                                              f'ниже текущего забоя')
             return
@@ -116,47 +119,47 @@ class PakerAspo(MyMainWindow):
 
     # Добавление строк с опрессовкой ЭК
     def paker_list(self, paker_diametr, paker_khost, paker_depth):
-        if well_data.column_additional is False or well_data.column_additional is True \
-                and paker_depth < well_data.head_column_additional._value:
+        if self.dict_data_well["column_additional"] is False or self.dict_data_well["column_additional"] is True \
+                and paker_depth < self.dict_data_well["head_column_additional"]._value:
 
-            paker_select = f'Заглушка сбивной клапан с ввертышем + НКТ{well_data.nkt_diam}мм {paker_khost}м +' \
+            paker_select = f'Заглушка сбивной клапан с ввертышем + НКТ{self.dict_data_well["nkt_diam"]}мм {paker_khost}м +' \
                            f' пакер ПРО-ЯМО-{paker_diametr}мм (либо аналог) ' \
-                           f'для ЭК {well_data.column_diametr._value}мм х {well_data.column_wall_thickness._value}мм + щелевой фильтр' \
+                           f'для ЭК {self.dict_data_well["column_diametr"]._value}мм х {self.dict_data_well["column_wall_thickness"]._value}мм + щелевой фильтр' \
                            f' {OpressovkaEK.nkt_opress(self)[0]}'
-            paker_short = f'Заглушка сбивной клапан с ввертышем + + НКТ{well_data.nkt_diam}мм {paker_khost}м +' \
+            paker_short = f'Заглушка сбивной клапан с ввертышем + + НКТ{self.dict_data_well["nkt_diam"]}мм {paker_khost}м +' \
                           f' пакер ПРО-ЯМО-{paker_diametr}мм  + ' \
                           f'  + щелевой фильтр'
-        elif well_data.column_additional is True and well_data.column_additional_diametr._value < 110 and \
-                paker_depth > well_data.head_column_additional._value:
+        elif self.dict_data_well["column_additional"] is True and self.dict_data_well["column_additional_diametr"]._value < 110 and \
+                paker_depth > self.dict_data_well["head_column_additional"]._value:
             paker_select = f'Заглушка сбивной клапан с ввертышем + НКТ{60}мм {paker_khost}м + пакер ПРО-ЯМО-' \
                            f'{paker_diametr}мм (либо аналог) ' \
-                           f'для ЭК {well_data.column_additional_diametr._value}мм х ' \
-                           f'{well_data.column_additional_wall_thickness._value}мм ' \
-                           f'+ НКТ60мм L- {round(paker_depth - well_data.head_column_additional._value, 0)}м'
+                           f'для ЭК {self.dict_data_well["column_additional_diametr"]._value}мм х ' \
+                           f'{self.dict_data_well["column_additional_wall_thickness"]._value}мм ' \
+                           f'+ НКТ60мм L- {round(paker_depth - self.dict_data_well["head_column_additional"]._value, 0)}м'
             paker_short = f'Заглушка сбивной клапан с ввертышем + НКТ{60}мм {paker_khost}м + пакер ПРО-ЯМО-' \
                           f'{paker_diametr}мм + щелевой фильтр' \
-                          f'+ НКТ60мм L- {round(paker_depth - well_data.head_column_additional._value, 0)}м'
-        elif well_data.column_additional is True and well_data.column_additional_diametr._value > 110 and \
-                paker_depth > well_data.head_column_additional._value:
-            paker_select = f'Заглушка сбивной клапан с ввертышем + НКТ{well_data.nkt_diam}мм со снятыми фасками {paker_khost}м + ' \
+                          f'+ НКТ60мм L- {round(paker_depth - self.dict_data_well["head_column_additional"]._value, 0)}м'
+        elif self.dict_data_well["column_additional"] is True and self.dict_data_well["column_additional_diametr"]._value > 110 and \
+                paker_depth > self.dict_data_well["head_column_additional"]._value:
+            paker_select = f'Заглушка сбивной клапан с ввертышем + НКТ{self.dict_data_well["nkt_diam"]}мм со снятыми фасками {paker_khost}м + ' \
                            f'пакер ПРО-ЯМО-{paker_diametr}мм (либо аналог) ' \
-                           f'для ЭК {well_data.column_additional_diametr._value}мм х ' \
-                           f'{well_data.column_additional_wall_thickness._value}мм + щелевой фильтр' \
-                           f'+ НКТ{well_data.nkt_diam}мм со снятыми фасками L- ' \
-                           f'{round(paker_depth - well_data.head_column_additional._value, 0)}м'
-            paker_short = f'Заглушка сбивной клапан с ввертышем + НКТ{well_data.nkt_diam}мм со снятыми фасками {paker_khost}м + ' \
+                           f'для ЭК {self.dict_data_well["column_additional_diametr"]._value}мм х ' \
+                           f'{self.dict_data_well["column_additional_wall_thickness"]._value}мм + щелевой фильтр' \
+                           f'+ НКТ{self.dict_data_well["nkt_diam"]}мм со снятыми фасками L- ' \
+                           f'{round(paker_depth - self.dict_data_well["head_column_additional"]._value, 0)}м'
+            paker_short = f'Заглушка сбивной клапан с ввертышем + НКТ{self.dict_data_well["nkt_diam"]}мм со снятыми фасками {paker_khost}м + ' \
                           f'пакер ПРО-ЯМО-{paker_diametr}мм + щелевой фильтр' \
-                          f'+ НКТ{well_data.nkt_diam}мм со снятыми фасками L- ' \
-                          f'{round(paker_depth - well_data.head_column_additional._value, 0)}м'
+                          f'+ НКТ{self.dict_data_well["nkt_diam"]}мм со снятыми фасками L- ' \
+                          f'{round(paker_depth - self.dict_data_well["head_column_additional"]._value, 0)}м'
 
         nkt_opress_list = OpressovkaEK.nkt_opress(self)
 
         paker_list = [
             [f'СПо {paker_short} до глубины {paker_depth}м', None,
-             f'Спустить {paker_select} на НКТ{well_data.nkt_diam}мм до глубины {paker_depth}м, '
+             f'Спустить {paker_select} на НКТ{self.dict_data_well["nkt_diam"]}мм до глубины {paker_depth}м, '
              f'воронкой до {paker_depth + paker_khost}м'
-             f' с замером, шаблонированием шаблоном {well_data.nkt_template}мм. {nkt_opress_list[1]} '
-             f'{("Произвести пробную посадку на глубине 50м" if well_data.column_additional is False else "")} '
+             f' с замером, шаблонированием шаблоном {self.dict_data_well["nkt_template"]}мм. {nkt_opress_list[1]} '
+             f'{("Произвести пробную посадку на глубине 50м" if self.dict_data_well["column_additional"] is False else "")} '
              f'ПРИ ОТСУТСТВИИ ЦИРКУЛЯЦИИ ПРЕДУСМОТРЕТЬ НАЛИЧИИ В КОМПОНОВКЕ УРАВНИТЕЛЬНЫХ КЛАПАНОВ ИЛИ СБИВНОГО '
              f'КЛАПАНА С ВВЕРТЫШЕМ НАД ПАКЕРОМ',
              None, None, None, None, None, None, None,
@@ -167,7 +170,7 @@ class PakerAspo(MyMainWindow):
             [f'Очистить колонну от АСПО растворителем - 2м3', None,
              f'Очистить колонну от АСПО растворителем - 2м3. При открытом затрубном пространстве закачать в '
              f'трубное пространство растворитель в объеме 2м3, продавить в трубное пространство тех.жидкостью '
-             f'в объеме {round(3 * well_data.current_bottom / 1000, 1)}м3. Приподнять. Закрыть трубное и затрубное '
+             f'в объеме {round(3 * self.dict_data_well["current_bottom"] / 1000, 1)}м3. Приподнять. Закрыть трубное и затрубное '
              f'пространство. Реагирование 2 часа.',
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика', 4],
@@ -185,8 +188,8 @@ class PakerAspo(MyMainWindow):
              None, None, None, None, None, None, None,
              'мастер КРС', None],
             [None, None,
-             f'Поднять {paker_select} на НКТ{well_data.nkt_diam}мм c глубины {paker_depth}м с доливом скважины в '
-             f'объеме {round(paker_depth * 1.12 / 1000, 1)}м3 удельным весом {well_data.fluid_work}',
+             f'Поднять {paker_select} на НКТ{self.dict_data_well["nkt_diam"]}мм c глубины {paker_depth}м с доливом скважины в '
+             f'объеме {round(paker_depth * 1.12 / 1000, 1)}м3 удельным весом {self.dict_data_well["fluid_work"]}',
              None, None, None, None, None, None, None,
              'мастер КРС', liftingNKT_norm(paker_depth, 1.2)]]
 

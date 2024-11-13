@@ -3,22 +3,21 @@ from PyQt5.QtWidgets import QInputDialog, QWidget, QLabel, QComboBox, QLineEdit,
 
 import well_data
 from main import MyMainWindow
-from .rationingKRS import descentNKT_norm, liftingNKT_norm,well_volume_norm
+from .parent_work import TabWidgetUnion, TabPageUnion, WindowUnion
+from .rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
 from .template_work import TemplateKrs
 
 
-class TabPage_SO_kompress(QWidget):
-    def __init__(self, paker_layout_combo, parent=None):
+class TabPageSoKompress(TabPageUnion):
+    def __init__(self, parent=None):
         from .acid_paker import CheckableComboBox
-        from .opressovka import OpressovkaEK, TabPage_SO
-
         super().__init__()
+        self.dict_data_well = parent
 
         self.kompress_true_label = QLabel("компоновка", self)
         self.kompress_true_combo = QComboBox(self)
         paker_layout_list = ['воронка', 'с пакером']
         self.kompress_true_combo.addItems(paker_layout_list)
-        self.paker_layout_combo = paker_layout_combo
 
         self.kompress_true_combo.setCurrentIndex(0)
 
@@ -28,9 +27,9 @@ class TabPage_SO_kompress(QWidget):
 
         self.khovst_label = QLabel("глубина воронки", self)
         self.khvost_edit = QLineEdit(self)
-        self.khvost_edit.setText(f'{well_data.perforation_roof-100}')        
+        self.khvost_edit.setText(f'{self.dict_data_well["perforation_roof"] - 100}')
 
-        plast_work = well_data.plast_work
+        plast_work = self.dict_data_well['plast_work']
         self.plast_label = QLabel("Выбор пласта", self)
         self.plast_combo = CheckableComboBox(self)
         self.plast_combo.combo_box.addItems(plast_work)
@@ -76,18 +75,18 @@ class TabPage_SO_kompress(QWidget):
 
         self.labels_muft = {}
 
-
     def kompress_TrueEdit_select(self):
         if self.kompress_true_combo.currentText() == 'воронка':
             pass
+
     def update_plast_edit(self):
 
-        dict_perforation = well_data.dict_perforation
+        dict_perforation = self.dict_data_well["dict_perforation"]
         plasts = well_data.texts
         # print(f'пласты {plasts, len(well_data.texts), len(plasts), well_data.texts}')
-        roof_plast = well_data.current_bottom
+        roof_plast = self.dict_data_well["current_bottom"]
         sole_plast = 0
-        for plast in well_data.plast_work:
+        for plast in self.dict_data_well['plast_work']:
             for plast_sel in plasts:
                 if plast_sel == plast:
                     if roof_plast >= dict_perforation[plast]['кровля']:
@@ -95,23 +94,27 @@ class TabPage_SO_kompress(QWidget):
                     if sole_plast <= dict_perforation[plast]['подошва']:
                         sole_plast = dict_perforation[plast]['подошва']
 
-        self.khvost_edit.setText(f"{roof_plast -100}")
-class TabWidget(QTabWidget):
-    def __init__(self):
-        super().__init__()
-        self.addTab(TabPage_SO_kompress(self), 'Освоение компрессором')
+        self.khvost_edit.setText(f"{roof_plast - 100}")
 
 
-class KompressWindow(MyMainWindow):
-    def __init__(self, ins_ind, table_widget, parent=None):
+class TabWidget(TabWidgetUnion):
+    def __init__(self, parent=None):
         super().__init__()
+        self.addTab(TabPageSoKompress(parent), 'Освоение компрессором')
+
+
+class KompressWindow(WindowUnion):
+    def __init__(self, dict_data_well, table_widget, parent=None):
+        super().__init__()
+
+        self.dict_data_well = dict_data_well
+        self.ins_ind = dict_data_well['ins_ind']
+        self.tabWidget = TabWidget(self.dict_data_well)
 
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
         self.table_widget = table_widget
-        self.ins_ind = ins_ind
 
-        self.tabWidget = TabWidget()
         self.dict_nkt = {}
 
         self.buttonAdd = QPushButton('Добавить данные в план работ')
@@ -121,9 +124,10 @@ class KompressWindow(MyMainWindow):
         vbox.addWidget(self.buttonAdd, 2, 0)
 
     def closeEvent(self, event):
-                # Закрываем основное окно при закрытии окна входа
+        # Закрываем основное окно при закрытии окна входа
         self.operation_window = None
         event.accept()  # Принимаем событие закрытия
+
     def add_work(self):
         from main import MyMainWindow
 
@@ -137,18 +141,18 @@ class KompressWindow(MyMainWindow):
         plast_combo = str(self.tabWidget.currentWidget().plast_combo.combo_box.currentText())
         depth_gauge_combo = str(self.tabWidget.currentWidget().depth_gauge_combo.currentText())
 
-
-        if int(khvost_edit) - (count_muft * int(dictance_without_murt)) - 100 < well_data.static_level._value:
+        if int(khvost_edit) - (count_muft * int(dictance_without_murt)) - 100 < self.dict_data_well[
+            "static_level"]._value:
             QMessageBox.warning(self, 'Некорректные данные',
-                                      f'Статический уровень в скважине {well_data.static_level} ниже глубины '
-                                      f'вверхней муфты {int(khvost_edit) - (count_muft * int(dictance_without_murt))}'
-                                       f'ниже текущего забоя')
+                                f'Статический уровень в скважине {self.dict_data_well["static_level"]} ниже глубины '
+                                f'вверхней муфты {int(khvost_edit) - (count_muft * int(dictance_without_murt))}'
+                                f'ниже текущего забоя')
             return
 
         if int(khvost_edit) - (count_muft * int(dictance_without_murt)) - 100 < 600:
             QMessageBox.warning(self, 'Некорректные данные',
-                          f'вверхняя муфта на Н -{int(khvost_edit) - (count_muft * int(dictance_without_murt))},'
-                           f'это слишком высото')
+                                f'вверхняя муфта на Н -{int(khvost_edit) - (count_muft * int(dictance_without_murt))},'
+                                f'это слишком высоко')
             return
 
         if kompress_true_combo == 'воронка':
@@ -162,53 +166,54 @@ class KompressWindow(MyMainWindow):
         self.close()
 
     def kompress(self, plast_combo, kompress_TypeCombo, khvost_edit, kompress_volume, count_muft,
-                                      depth_gauge_combo, dictance_without_murt):
+                 depth_gauge_combo, dictance_without_murt):
 
         if kompress_TypeCombo == 'Задача №2.1.15':  # , 'Задача №2.1.16', 'Задача №2.1.11', 'своя задача']'
             kompress_select = f'ЗАДАЧА 2.1.5. Определение профиля и состава притока, дебита, источника ' \
                               f'обводнения  пласта {plast_combo} и ' \
-                          f'технического состояния эксплуатационной колонны при компрессировании' \
-                          f' с отбором жидкости не менее {kompress_volume}м3. \n' \
-                          f'Пробы при освоении отбирать в стандартной таре на {kompress_volume - 10}, ' \
+                              f'технического состояния эксплуатационной колонны при компрессировании' \
+                              f' с отбором жидкости не менее {kompress_volume}м3. \n' \
+                              f'Пробы при освоении отбирать в стандартной таре на {kompress_volume - 10}, ' \
                               f'{kompress_volume - 5}, {kompress_volume}м3,' \
-                          f' своевременно подавать телефонограммы на завоз тары и вывоз проб'
+                              f' своевременно подавать телефонограммы на завоз тары и вывоз проб'
         gauge = ''
         if depth_gauge_combo == 'Да':
             gauge = ' + Контейнер с МТГ-25'
 
+        nkt_diam = self.dict_data_well["nkt_diam"]
 
-
-
-        nkt_diam = well_data.nkt_diam
-
-        if well_data.column_additional is False or well_data.column_additional is True and\
-                khvost_edit < well_data.head_column_additional._value:
+        if self.dict_data_well["column_additional"] is False or self.dict_data_well["column_additional"] is True and \
+                khvost_edit < self.dict_data_well["head_column_additional"]._value:
             paker_select = f'воронку + c/о {gauge} + НКТ{nkt_diam} '
             paker_short = f'в-ку + c/о {gauge} + НКТ{nkt_diam} '
             for ind in range(count_muft, 1, -1):
                 paker_select += f' {dictance_without_murt}м + ПМ - {ind}мм + НКТ{nkt_diam}'
                 paker_short += f' {dictance_without_murt}м + ПМ - {ind}мм + НКТ{nkt_diam}'
 
-            paker_select += f' ПМ - 1мм '
-            paker_short += f' ПМ - 1мм '
+            paker_select += f' {dictance_without_murt}м ПМ - 1мм '
+            paker_short += f' {dictance_without_murt}м ПМ - 1мм '
             dict_nkt = {73: khvost_edit}
-        elif well_data.column_additional is True and well_data.column_additional_diametr._value < 110 and \
-                khvost_edit > well_data.head_column_additional._value:
+        elif self.dict_data_well["column_additional"] is True and self.dict_data_well[
+            "column_additional_diametr"]._value < 110 and \
+                khvost_edit > self.dict_data_well["head_column_additional"]._value:
             paker_select = f'воронку + НКТ{60} '
             paker_short = f'в-ку + НКТ{60} '
             for ind in range(count_muft):
                 paker_select += f' {dictance_without_murt}м + ПМ - {ind}мм + НКТ{60}'
                 paker_short += f' {dictance_without_murt}м + ПМ - {ind}мм + НКТ{60}'
 
-            paker_select += f' ПМ - 1мм  + НКТ{60} {int(khvost_edit - (count_muft * dictance_without_murt) - well_data.head_column_additional._value)}м'
-            paker_short += f' ПМ - 1мм + НКТ{60} {int(khvost_edit - (count_muft * dictance_without_murt) - well_data.head_column_additional._value)}м'
+            paker_select += f' ПМ - 1мм  + НКТ{60} ' \
+                            f'{int(khvost_edit - (count_muft * dictance_without_murt) - self.dict_data_well["head_column_additional"]._value)}м'
+            paker_short += f' ПМ - 1мм + НКТ{60} ' \
+                           f'{int(khvost_edit - (count_muft * dictance_without_murt) - self.dict_data_well["head_column_additional"]._value)}м'
 
-            dict_nkt = {73: well_data.head_column_additional._value, 60: int(khvost_edit - well_data.head_column_additional._value)}
+            dict_nkt = {73: self.dict_data_well["head_column_additional"]._value,
+                        60: int(khvost_edit - self.dict_data_well["head_column_additional"]._value)}
 
         paker_list = [
             [f'СПО {paker_short} на НКТ{nkt_diam}м до глубины {khvost_edit}м.', None,
              f'Спустить {paker_select} на НКТ{nkt_diam}м до глубины {khvost_edit}м'
-             f' с замером, шаблонированием шаблоном {well_data.nkt_template}мм.',
+             f' с замером, шаблонированием шаблоном {self.dict_data_well["nkt_template"]}мм.',
              None, None, None, None, None, None, None,
              'мастер КРС', round(
                 descentNKT_norm(khvost_edit, 1))],
@@ -218,10 +223,13 @@ class KompressWindow(MyMainWindow):
              None, None, None, None, None, None, None,
              'мастер КРС', None],
             [None, None,
-             f'Произвести  монтаж ГИС согласно схемы  №8 при свабированиии утвержденной главным инженером  {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г. '
-             f'Обвязать устье скважины с ЕДК на жесткую линию. Опрессовать ПВО максимально допустимое давление опрессовки э/колонны на устье '
-             f'{well_data.max_admissible_pressure._value}атм,'
-             f' по невозможности на давление поглощения, но не менее 30атм в течении 30мин Провести практическое обучение вахт по '
+             f'Произвести  монтаж ГИС согласно схемы  №8 при свабированиии утвержденной главным инженером '
+             f'{well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г. '
+             f'Обвязать устье скважины с ЕДК на жесткую линию. Опрессовать ПВО максимально допустимое '
+             f'давление опрессовки э/колонны на устье '
+             f'{self.dict_data_well["max_admissible_pressure"]._value}атм,'
+             f' по невозможности на давление поглощения, но не менее 30атм в течении 30мин Провести '
+             f'практическое обучение вахт по '
              f'сигналу "выброс" с записью в журнале проведения учебных тревог',
              None, None, None, None, None, None, None,
              'Мастер КРС, подрядчик по ГИС', 1.2],
@@ -237,7 +245,8 @@ class KompressWindow(MyMainWindow):
             [f'Промывка скважины  не менее {round(TemplateKrs.well_volume(self) * 1.5, 1)}м3', None,
              f' При наличии избыточного давления: '
              f'произвести промывку скважину обратной промывкой ' \
-             f'по круговой циркуляции  жидкостью уд.весом {well_data.fluid_work} при расходе жидкости не ' \
+             f'по круговой циркуляции  жидкостью уд.весом {self.dict_data_well["fluid_work"]} при расходе '
+             f'жидкости не ' \
              f'менее 6-8 л/сек в объеме не менее {round(TemplateKrs.well_volume(self) * 1.5, 1)}м3 ' \
              f'в присутствии представителя заказчика ДО ЧИСТОЙ ВОДЫ.Составить акт.',
              None, None, None, None, None, None, None,
@@ -245,17 +254,18 @@ class KompressWindow(MyMainWindow):
             [f'выполнить снятие КВУ в течение часа с интервалом 15 минут',
              None,
              f'Перед подъемом подземного оборудования, после проведённых работ по освоению выполнить снятие КВУ в '
-             f'течение часа с интервалом 15 минут для определения стабильного стистатического уровня в скважине. '
-             f'При подъеме уровня в скважине и образовании избыточного давления наустье, выполнить замер пластового давления '
+             f'течение часа с интервалом 15 минут для определения стабильного статического уровня в скважине. '
+             f'При подъеме уровня в скважине и образовании избыточного давления на устье, выполнить замер '
+             f'пластового давления '
              f'или вычислить его расчетным методом.',
              None, None, None, None, None, None, None,
              'Мастер КРС', 0.5],
             [None, None,
              f'Поднять {paker_select} на НКТ{nkt_diam} c глубины {khvost_edit}м с доливом скважины в '
-             f'объеме {round(khvost_edit * 1.12 / 1000, 1)}м3 удельным весом {well_data.fluid_work}',
+             f'объеме {round(khvost_edit * 1.12 / 1000, 1)}м3 удельным весом {self.dict_data_well["fluid_work"]}',
              None, None, None, None, None, None, None,
              'мастер КРС',
-             liftingNKT_norm(khvost_edit,1)]
+             liftingNKT_norm(khvost_edit, 1)]
         ]
 
         return paker_list

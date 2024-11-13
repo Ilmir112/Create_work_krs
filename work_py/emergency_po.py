@@ -4,12 +4,15 @@ from PyQt5.QtWidgets import QInputDialog, QWidget, QLabel, QLineEdit, QComboBox,
 
 import well_data
 from main import MyMainWindow
+from .parent_work import TabPageUnion, WindowUnion,TabWidgetUnion
 from .rationingKRS import descentNKT_norm, liftingNKT_norm
 
-class TabPage_SO_lar(QWidget):
+
+class TabPageSoLar(TabPageUnion):
     def __init__(self, parent=None):
         super().__init__()
 
+        self.dict_data_well = parent
         self.po_type_label = QLabel("Прихваченное оборудование", self)
         self.po_type_combo = QComboBox(self)
         raid_type_list = ['ЭЦН', 'пакер', 'НКТ']
@@ -27,8 +30,8 @@ class TabPage_SO_lar(QWidget):
         self.nkt_select_combo = QComboBox(self)
         self.nkt_select_combo.addItems(['оборудование в ЭК', 'оборудование в ДП'])
 
-        if well_data.column_additional is False or (well_data.column_additional and
-                                                    well_data.head_column_additional._value < well_data.current_bottom):
+        if self.dict_data_well["column_additional"] is False or (self.dict_data_well["column_additional"] and
+                                                    self.dict_data_well["head_column_additional"]._value < self.dict_data_well["current_bottom"]):
             self.nkt_select_combo.setCurrentIndex(0)
         else:
             self.nkt_select_combo.setCurrentIndex(1)
@@ -74,38 +77,40 @@ class TabPage_SO_lar(QWidget):
         # self.nkt_select_combo.currentTextChanged.connect(self.update_raid_edit)
 
         self.nkt_select_combo.setCurrentIndex(1)
-        self.bottom_line.setText(f'{well_data.current_bottom}')
+        self.bottom_line.setText(f'{self.dict_data_well["current_bottom"]}')
 
-        if well_data.column_additional is False or \
-                (well_data.column_additional and well_data.current_bottom < well_data.head_column_additional._value):
+        if self.dict_data_well["column_additional"] is False or \
+                (self.dict_data_well["column_additional"] and self.dict_data_well["current_bottom"] < self.dict_data_well["head_column_additional"]._value):
             self.nkt_select_combo.setCurrentIndex(1)
             self.nkt_select_combo.setCurrentIndex(0)
         else:
             self.nkt_select_combo.setCurrentIndex(1)
 
-        if well_data.emergency_well is True:
-            self.emergency_bottom_line.setText(f'{well_data.emergency_bottom}')
+        if self.dict_data_well["emergency_well"] is True:
+            self.emergency_bottom_line.setText(f'{self.dict_data_well["emergency_bottom"]}')
 
 
 
 
 
-class TabWidget(QTabWidget):
-    def __init__(self):
+class TabWidget(TabWidgetUnion):
+    def __init__(self, parent):
         super().__init__()
-        self.addTab(TabPage_SO_lar(), 'ловильные работы')
+        self.addTab(TabPageSoLar(parent), 'ловильные работы')
 
 
-class EmergencyPo(MyMainWindow):
+class EmergencyPo(WindowUnion):
 
-    def __init__(self, ins_ind, table_widget, parent=None):
-        super(EmergencyPo, self).__init__()
+    def __init__(self, dict_data_well, table_widget, parent=None):
+        super().__init__()
+
+        self.dict_data_well = dict_data_well
+        self.ins_ind = dict_data_well['ins_ind']
+        self.tabWidget = TabWidget(self.dict_data_well)
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
 
-        self.ins_ind = ins_ind
         self.table_widget = table_widget
-        self.tabWidget = TabWidget()
 
         self.buttonadd_work = QPushButton('Добавить в план работ')
         self.buttonadd_work.clicked.connect(self.add_work, Qt.QueuedConnection)
@@ -133,7 +138,7 @@ class EmergencyPo(MyMainWindow):
         if emergency_bottom_line != '':
             emergency_bottom_line = int(float(emergency_bottom_line))
 
-            if emergency_bottom_line > well_data.current_bottom:
+            if emergency_bottom_line > self.dict_data_well["current_bottom"]:
                 QMessageBox.warning(self, 'Ошибка',
                                           'Забой ниже глубины текущего забоя')
                 return
@@ -142,20 +147,20 @@ class EmergencyPo(MyMainWindow):
                                       'ВВедите аварийный забой')
             return
 
-        if nkt_key == 'оборудование в ЭК' and well_data.column_additional and \
-                emergency_bottom_line > well_data.head_column_additional._value:
+        if nkt_key == 'оборудование в ЭК' and self.dict_data_well["column_additional"] and \
+                emergency_bottom_line > self.dict_data_well["head_column_additional"]._value:
             QMessageBox.warning(self, 'Ошибка',
                                       'Не корректно выбрана компоновка для доп колонны')
             return
-        elif nkt_key == 'оборудование в ДП' and well_data.column_additional and \
-                emergency_bottom_line < well_data.head_column_additional._value:
+        elif nkt_key == 'оборудование в ДП' and self.dict_data_well["column_additional"] and \
+                emergency_bottom_line < self.dict_data_well["head_column_additional"]._value:
             QMessageBox.warning(self, 'Ошибка',
                                       'Не корректно выбрана компоновка для основной колонны')
             return
 
         raid_list = self.emergency_sticking(po_str_combo, lar_diametr_line, nkt_key, lar_type_combo,
                                            emergency_bottom_line, bottom_line)
-        well_data.current_bottom = bottom_line
+        self.dict_data_well["current_bottom"] = bottom_line
 
         self.populate_row(self.ins_ind, raid_list, self.table_widget)
         well_data.pause = False
@@ -164,7 +169,7 @@ class EmergencyPo(MyMainWindow):
 
     def emergency_sticking(self, emergence_type, lar_diametr_line, nkt_key, lar_type_combo,
                       emergency_bottom_line, bottom_line):
-        from work_py.emergency_lar import Emergency_lar
+        from work_py.emergency_lar import EmergencyLarWork
         from work_py.emergencyWork import emergency_hook, magnet_select
 
         emergency_list = [
@@ -192,7 +197,7 @@ class EmergencyPo(MyMainWindow):
              f'Поднять аварийные НКТ до устья. \nПри выявлении отложений солей и гипса, отобрать шлам. '
              f'Сдать в лабораторию для проведения хим. анализа.',
              None, None, None, None, None, None, None,
-             'Мастер КРС', liftingNKT_norm(well_data.current_bottom, 1.2)],
+             'Мастер КРС', liftingNKT_norm(self.dict_data_well["current_bottom"], 1.2)],
             [f'Завоз на скважину СБТ', None,
              f'Завоз на скважину СБТ – Укладка труб на стеллажи.',
              None, None, None, None, None, None, None,
@@ -213,17 +218,17 @@ class EmergencyPo(MyMainWindow):
               f'Спустить с замером торцевую печать {magnet_select(self, "НКТ")} до аварийная головы с замером.'
               f' (При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ) ',
               None, None, None, None, None, None, None,
-              'мастер КРС', descentNKT_norm(well_data.current_bottom, 1.2)],
+              'мастер КРС', descentNKT_norm(self.dict_data_well["current_bottom"], 1.2)],
              [None, None,
               f'Произвести работу печатью  с обратной промывкой с разгрузкой до 5т.',
               None, None, None, None, None, None, None,
               'мастер КРС, УСРСиСТ', 2.5],
              [None, None,
               f'Поднять {magnet_select(self, "НКТ")} с доливом тех жидкости в '
-              f'объеме {round(well_data.current_bottom * 1.25 / 1000, 1)}м3'
-              f' удельным весом {well_data.fluid_work}.',
+              f'объеме {round(self.dict_data_well["current_bottom"] * 1.25 / 1000, 1)}м3'
+              f' удельным весом {self.dict_data_well["fluid_work"]}.',
               None, None, None, None, None, None, None,
-              'Мастер КРС', liftingNKT_norm(well_data.current_bottom, 1.2)],
+              'Мастер КРС', liftingNKT_norm(self.dict_data_well["current_bottom"], 1.2)],
              [None, None,
               f'По результату ревизии печати, согласовать с ПТО  и УСРСиСТ и '
               f'подобрать ловильный инструмент',

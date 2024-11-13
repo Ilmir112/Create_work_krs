@@ -36,8 +36,8 @@ class Classifier_well(MyMainWindow):
         self.region = region
         self.costumer = costumer
         self.number_well = None
-        if well_data.well_number:
-            self.number_well = well_data.well_number._value
+        if self.dict_data_well["well_number"]:
+            self.number_well = self.dict_data_well["well_number"]._value
 
         self.setCentralWidget(self.table_class)
         self.model = self.table_class.model()
@@ -240,9 +240,9 @@ class Classifier_well(MyMainWindow):
                 db = connection_to_database(well_data.DB_CLASSIFICATION)
                 self.classification_well = CheckWellExistence(db)
 
-                region_list = ['ЧГМ', 'АГМ', 'ТГМ', 'ИГМ', 'КГМ', ]
+                REGION_LIST = ['ЧГМ', 'АГМ', 'ТГМ', 'ИГМ', 'КГМ', ]
 
-                for region_name in region_list:
+                for region_name in REGION_LIST:
                     if region_name == region:
                         if check_param in region_name:
                             self.classification_well.create_table_without_juming(region_name)
@@ -322,7 +322,7 @@ class Classifier_well(MyMainWindow):
 
     def export_to_database_class_well(self, fname, costumer, region):
 
-        region_list = ['ЧГМ_классификатор', 'АГМ_классификатор', 'ТГМ_классификатор', 'ИГМ_классификатор',
+        REGION_LIST = ['ЧГМ_классификатор', 'АГМ_классификатор', 'ТГМ_классификатор', 'ИГМ_классификатор',
                        'КГМ_классификатор']
 
         # Загрузка файла Excel
@@ -337,7 +337,7 @@ class Classifier_well(MyMainWindow):
             date_measurement, pressure_Ppl, categoty_h2s, h2s_pr, h2s_mg_l, h2s_mg_m, categoty_gf, \
             gas_factor, area_row, check_file = self.classification_well.read_excel_file_classification(ws)
 
-            for region_name in region_list:
+            for region_name in REGION_LIST:
                 if region in region_name:
                     self.classification_well.create_table_classification(region_name)
 
@@ -413,7 +413,7 @@ def connect_to_db(name_base, folder_base):
 
 
 
-def excel_in_json(sheet):
+def excel_in_json(self, sheet):
     index_end_copy = 46
 
     data = {}
@@ -532,7 +532,7 @@ def excel_in_json(sheet):
                         })
                         data[row[0].row] = row_data
 
-    data['image'] = well_data.image_data
+    data['image'] = self.dict_data_well["image_data"]
     rowHeights = [sheet.row_dimensions[i + 1].height for i in range(sheet.max_row) if i <= index_end_copy]
     # rowHeights = [sheet.row_dimensions[i + 1].height for i in range(sheet.max_row)if i <= 46]
     colWidth = [sheet.column_dimensions[get_column_letter(i + 1)].width for i in range(0, 80)] + [None]
@@ -547,61 +547,69 @@ def excel_in_json(sheet):
     return data_excel
 
 
-def insert_data_well_dop_plan(data_well):
+def insert_data_well_dop_plan(self, data_well):
     from well_data import ProtectedIsDigit, ProtectedIsNonNone
 
     well_data_dict = json.loads(data_well)
 
-    well_data.column_direction_diametr = ProtectedIsDigit(well_data_dict["направление"]["диаметр"])
-    well_data.column_direction_wall_thickness = ProtectedIsDigit(well_data_dict["направление"]["толщина стенки"])
-    well_data.column_direction_lenght = ProtectedIsDigit(well_data_dict["направление"]["башмак"])
-    well_data.level_cement_direction = ProtectedIsDigit(well_data_dict["направление"]["цемент"])
-    well_data.column_conductor_diametr = ProtectedIsDigit(well_data_dict["кондуктор"]["диаметр"])
+    self.dict_data_well["column_direction_diametr"] = ProtectedIsDigit(well_data_dict["направление"]["диаметр"])
+    self.dict_data_well["column_direction_wall_thickness"] = ProtectedIsDigit(well_data_dict["направление"]["толщина стенки"])
+    self.dict_data_well["column_direction_lenght"] = ProtectedIsDigit(well_data_dict["направление"]["башмак"])
+    self.dict_data_well["level_cement_direction"] = ProtectedIsDigit(well_data_dict["направление"]["цемент"])
+    self.dict_data_well["column_conductor_diametr"] = ProtectedIsDigit(well_data_dict["кондуктор"]["диаметр"])
     well_data.column_conductor_wall_thicknes = ProtectedIsDigit(well_data_dict["кондуктор"]["толщина стенки"])
-    well_data.column_conductor_lenght = ProtectedIsDigit(well_data_dict["кондуктор"]["башмак"])
-    well_data.level_cement_conductor = ProtectedIsDigit(well_data_dict["кондуктор"]["цемент"])
-    well_data.column_diametr = ProtectedIsDigit(well_data_dict["ЭК"]["диаметр"])
-    well_data.column_wall_thickness = ProtectedIsDigit(well_data_dict["ЭК"]["толщина стенки"])
-    well_data.shoe_column = ProtectedIsDigit(well_data_dict["ЭК"]["башмак"])
-    well_data.column_additional = well_data_dict["допколонна"]["наличие"]
-    well_data.column_additional_diametr = ProtectedIsDigit(well_data_dict["допколонна"]["диаметр"])
-    well_data.column_additional_wall_thickness = ProtectedIsDigit(well_data_dict["допколонна"]["толщина стенки"])
-    well_data.shoe_column_additional = ProtectedIsDigit(well_data_dict["допколонна"]["башмак"])
-    well_data.head_column_additional = ProtectedIsDigit(well_data_dict["допколонна"]["голова"])
-    well_data.curator = well_data_dict["куратор"]
-    well_data.dict_pump_SHGN = well_data_dict["оборудование"]["ШГН"]["тип"]
-    well_data.dict_pump_SHGN_h = well_data_dict["оборудование"]["ШГН"]["глубина "]
-    well_data.dict_pump_ECN = well_data_dict["оборудование"]["ЭЦН"]["тип"]
-    well_data.dict_pump_ECN_h = well_data_dict["оборудование"]["ЭЦН"]["глубина "]
-    well_data.paker_do = well_data_dict["оборудование"]["пакер"]["тип"]
-    well_data.depth_fond_paker_do = well_data_dict["оборудование"]["пакер"]["глубина "]
-    well_data.paker2_do = well_data_dict["оборудование"]["пакер2"]["тип"]
-    well_data.depth_fond_paker2_do = well_data_dict["оборудование"]["пакер2"]["глубина "]
-    well_data.static_level = ProtectedIsDigit(well_data_dict["статика"])
-    well_data.dinamic_level = ProtectedIsDigit(well_data_dict["динамика"])
-    well_data.dict_nkt_po = well_data_dict["НКТ"]
-    well_data.dict_sucker_rod_po = well_data_dict["штанги"]
-    well_data.Qoil = well_data_dict['ожидаемые']['нефть']
-    well_data.Qwater = well_data_dict['ожидаемые']['вода']
-    well_data.proc_water = well_data_dict['ожидаемые']['обводненность']
-    well_data.expected_P = well_data_dict['ожидаемые']['давление']
-    well_data.expected_Q = well_data_dict['ожидаемые']['приемистость']
+    self.dict_data_well["column_conductor_lenght"] = ProtectedIsDigit(well_data_dict["кондуктор"]["башмак"])
+    self.dict_data_well["level_cement_conductor"] = ProtectedIsDigit(well_data_dict["кондуктор"]["цемент"])
+    self.dict_data_well["column_diametr"] = ProtectedIsDigit(well_data_dict["ЭК"]["диаметр"])
+    self.dict_data_well["column_wall_thickness"] = ProtectedIsDigit(well_data_dict["ЭК"]["толщина стенки"])
+    self.dict_data_well["shoe_column"] = ProtectedIsDigit(well_data_dict["ЭК"]["башмак"])
+    self.dict_data_well["column_additional"] = well_data_dict["допколонна"]["наличие"]
+    self.dict_data_well["column_additional_diametr"] = ProtectedIsDigit(well_data_dict["допколонна"]["диаметр"])
+    self.dict_data_well["column_additional_wall_thickness"] = ProtectedIsDigit(well_data_dict["допколонна"]["толщина стенки"])
+    self.dict_data_well["shoe_column_additional"] = ProtectedIsDigit(well_data_dict["допколонна"]["башмак"])
+    self.dict_data_well["head_column_additional"] = ProtectedIsDigit(well_data_dict["допколонна"]["голова"])
+    self.dict_data_well["curator"] = well_data_dict["куратор"]
+    self.dict_data_well["dict_pump_SHGN"] = well_data_dict["оборудование"]["ШГН"]["тип"]
+    self.dict_data_well["dict_pump_SHGN_h"] = well_data_dict["оборудование"]["ШГН"]["глубина "]
+    self.dict_data_well["dict_pump_ECN"] = well_data_dict["оборудование"]["ЭЦН"]["тип"]
+    self.dict_data_well["dict_pump_ECN_h"] = well_data_dict["оборудование"]["ЭЦН"]["глубина "]
+    self.dict_data_well["paker_do"] = well_data_dict["оборудование"]["пакер"]["тип"]
+    self.dict_data_well["depth_fond_paker_do"] = well_data_dict["оборудование"]["пакер"]["глубина "]
+    self.dict_data_well["paker2_do"] = well_data_dict["оборудование"]["пакер2"]["тип"]
+    self.dict_data_well["depth_fond_paker2_do"] = well_data_dict["оборудование"]["пакер2"]["глубина "]
+    self.dict_data_well["static_level"] = ProtectedIsDigit(well_data_dict["статика"])
+    self.dict_data_well["dinamic_level"] = ProtectedIsDigit(well_data_dict["динамика"])
+    try:
+        self.dict_data_well["dict_nkt_po"] = well_data_dict["НКТ"]['После']
+        self.dict_data_well["dict_nkt"] = well_data_dict["НКТ"]['До']
+        self.dict_data_well["dict_sucker_rod_po"] = well_data_dict["штанги"]['После']
+        self.dict_data_well["dict_sucker_rod"] = well_data_dict["штанги"]['До']
+    except:
+        self.dict_data_well["dict_nkt_po"] = well_data_dict["НКТ"]
+        self.dict_data_well["dict_nkt"] = well_data_dict["НКТ"]
+        self.dict_data_well["dict_sucker_rod_po"] = well_data_dict["штанги"]
+        self.dict_data_well["dict_sucker_rod"] = well_data_dict["штанги"]
+    self.dict_data_well["Qoil"] = well_data_dict['ожидаемые']['нефть']
+    self.dict_data_well["Qwater"] = well_data_dict['ожидаемые']['вода']
+    self.dict_data_well["proc_water"] = well_data_dict['ожидаемые']['обводненность']
+    self.dict_data_well["expected_P"] = well_data_dict['ожидаемые']['давление']
+    self.dict_data_well["expected_Q"] = well_data_dict['ожидаемые']['приемистость']
 
-    well_data.bottomhole_drill = ProtectedIsDigit(well_data_dict['данные']['пробуренный забой'])
-    well_data.bottomhole_artificial = ProtectedIsDigit(well_data_dict['данные']['искусственный забой'])
-    well_data.max_angle = ProtectedIsDigit(well_data_dict['данные']['максимальный угол'])
-    well_data.max_angle_H = ProtectedIsDigit(well_data_dict['данные']['глубина'])
-    well_data.max_expected_pressure = ProtectedIsDigit(well_data_dict['данные']['максимальное ожидаемое давление'])
-    well_data.max_admissible_pressure = ProtectedIsDigit(well_data_dict['данные']['максимальное допустимое давление'])
+    self.dict_data_well["bottomhole_drill"] = ProtectedIsDigit(well_data_dict['данные']['пробуренный забой'])
+    self.dict_data_well["bottomhole_artificial"] = ProtectedIsDigit(well_data_dict['данные']['искусственный забой'])
+    self.dict_data_well["max_angle"] = ProtectedIsDigit(well_data_dict['данные']['максимальный угол'])
+    self.dict_data_well["max_angle_H"] = ProtectedIsDigit(well_data_dict['данные']['глубина'])
+    self.dict_data_well["max_expected_pressure"] = ProtectedIsDigit(well_data_dict['данные']['максимальное ожидаемое давление'])
+    self.dict_data_well["max_admissible_pressure"] = ProtectedIsDigit(well_data_dict['данные']['максимальное допустимое давление'])
 
-    well_data.curator = well_data_dict['куратор']
-    well_data.region = well_data_dict['регион']
-    well_data.cdng = ProtectedIsNonNone(well_data_dict['ЦДНГ'])
+    self.dict_data_well["curator"] = well_data_dict['куратор']
+    self.dict_data_well["region"] = well_data_dict['регион']
+    self.dict_data_well["cdng"] = ProtectedIsNonNone(well_data_dict['ЦДНГ'])
 
-    well_data.data_well_dict = well_data_dict
+    self.dict_data_well["data_well_dict"] = well_data_dict
     # QMessageBox.information(None, 'Данные с базы', "Данные вставлены из базы данных")
 
-    definition_plast_work(None)
+    # definition_plast_work(self)
 
 
 
@@ -618,7 +626,7 @@ def round_cell(data):
         return data
 
 
-def insert_data_new_excel_file(data, rowHeights, colWidth, boundaries_dict):
+def insert_data_new_excel_file(self, data, rowHeights, colWidth, boundaries_dict):
     wb_new = openpyxl.Workbook()
     sheet_new = wb_new.active
 
@@ -703,7 +711,7 @@ def insert_data_new_excel_file(data, rowHeights, colWidth, boundaries_dict):
                                                            wrap_text=wrap_true)
 
     try:
-        well_data.image_data = data['image']
+        self.dict_data_well["image_data"] = data['image']
         # Добавьте обработку ошибки, например, пропуск изображения или запись информации об ошибке в лог
     except ValueError as e:
         print(f"Ошибка при вставке изображения: {type(e).__name__}\n\n{str(e)}")
@@ -714,18 +722,18 @@ def insert_data_new_excel_file(data, rowHeights, colWidth, boundaries_dict):
 
     for index_row, row in enumerate(sheet_new.iter_rows()):
         # Копирование высоты строки
-        if any(['Наименование работ' in str(col.value) for col in row[:13]]) and well_data.work_plan not in [
+        if any(['Наименование работ' in str(col.value) for col in row[:13]]) and self.dict_data_well["work_plan"] not in [
             'plan_change']:
             index_delete = index_row + 2
-            well_data.ins_ind2 = index_row + 2
+            well_data.gns_ind2 = index_row + 2
 
-        elif any(['ПЛАН РАБОТ' in str(col.value).upper() for col in row[:4]]) and well_data.work_plan not in [
+        elif any(['ПЛАН РАБОТ' in str(col.value).upper() for col in row[:4]]) and self.dict_data_well["work_plan"] not in [
             'plan_change']:
-            sheet_new.cell(row=index_row + 1, column=2).value = f'ДОПОЛНИТЕЛЬНЫЙ ПЛАН РАБОТ № {well_data.number_dp}'
+            sheet_new.cell(row=index_row + 1, column=2).value = f'ДОПОЛНИТЕЛЬНЫЙ ПЛАН РАБОТ № {self.dict_data_well["number_dp"]}'
 
-        elif any(['ИТОГО:' in str(col.value).upper() for col in row[:4]]) and well_data.work_plan in ['plan_change']:
+        elif any(['ИТОГО:' in str(col.value).upper() for col in row[:4]]) and self.dict_data_well["work_plan"] in ['plan_change']:
             index_delete = index_row + 2
-            well_data.ins_ind2 = index_row + 2
+            well_data.gns_ind2 = index_row + 2
 
         elif all([col is None for col in row[:13]]):
             sheet_new.row_dimensions[index_row].hidden = True
@@ -734,7 +742,7 @@ def insert_data_new_excel_file(data, rowHeights, colWidth, boundaries_dict):
         except:
             pass
 
-    if well_data.work_plan not in ['plan_change']:
+    if self.dict_data_well["work_plan"] not in ['plan_change']:
         sheet_new.delete_rows(index_delete, sheet_new.max_row - index_delete + 1)
 
     return sheet_new

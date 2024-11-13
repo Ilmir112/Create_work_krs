@@ -103,7 +103,7 @@ def read_database_gnkt(contractor, gnkt_number):
     return well_previus_list
 
 
-def insert_data_base_gnkt(contractor, well_name, gnkt_number, gnkt_length, diametr_length,
+def insert_data_base_gnkt(self, contractor, well_name, gnkt_number, gnkt_length, diametr_length,
                      iznos, pipe_mileage, pipe_fatigue, pvo, previous_well):
 
     try:
@@ -113,7 +113,7 @@ def insert_data_base_gnkt(contractor, well_name, gnkt_number, gnkt_length, diame
         if 'ойл-сервис' in contractor.lower():
             contractor = 'oil_service'
 
-        result = data_gnkt.check_data_base_gnkt(contractor, well_data.well_number._value, well_data.well_area._value)
+        result = data_gnkt.check_data_base_gnkt(contractor, self.dict_data_well["well_number"]._value, self.dict_data_well["well_area"]._value)
 
         if len(result) == 0:
             current_datetime = datetime.today().strftime('%d.%m.%Y')

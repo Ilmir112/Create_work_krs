@@ -3,12 +3,14 @@ from PyQt5.QtWidgets import  QMessageBox, QWidget, QLabel, QComboBox, QLineEdit,
 
 import well_data
 from main import MyMainWindow
+from work_py.parent_work import TabPageUnion, TabWidgetUnion, WindowUnion
 
 
-
-class TabPage_SO_block(QWidget):
+class TabPageSoBlock(TabPageUnion):
     def __init__(self, parent=None):
         super().__init__()
+
+        self.dict_data_well = parent
 
         self.validator = QIntValidator(0, 80000)
 
@@ -17,7 +19,7 @@ class TabPage_SO_block(QWidget):
         self.current_label = QLabel("Текущий забой", self)
         self.current_edit = QLineEdit(self)
         self.current_edit.setValidator(self.validator_float)
-        self.current_edit.setText(str(well_data.current_bottom))
+        self.current_edit.setText(str(self.dict_data_well["current_bottom"]))
 
         self.select_nkt_label = QLabel("выбор компоновки", self)
         self.select_nkt_combo = QComboBox(self)
@@ -31,7 +33,7 @@ class TabPage_SO_block(QWidget):
         self.length_nkt_label = QLabel("Длина НКТ", self)
         self.length_nkt_edit = QLineEdit(self)
         self.length_nkt_edit.setValidator(self.validator_float)
-        self.length_nkt_edit.setText(f'{sum(well_data.dict_nkt_po.values())}')
+        self.length_nkt_edit.setText(f'{sum(self.dict_data_well["dict_nkt_po"].values())}')
 
         self.distance_between_nkt_label = QLabel('Расстояние между НКТ')
         self.distance_between_nkt_edit = QLineEdit(self)
@@ -59,28 +61,28 @@ class TabPage_SO_block(QWidget):
 
     def update_tubing(self, index):
         if index == 'Фондовые НКТ':
-            self.length_nkt_edit.setText(f'{sum(well_data.dict_nkt_po.values())}')
+            self.length_nkt_edit.setText(f'{sum(self.dict_data_well["dict_nkt_po"].values())}')
         else:
-            self.length_nkt_edit.setText(f'{well_data.current_bottom}')
+            self.length_nkt_edit.setText(f'{self.dict_data_well["current_bottom"]}')
 
 
-class TabWidget(QTabWidget):
-    def __init__(self):
+class TabWidget(TabWidgetUnion):
+    def __init__(self, parent=None):
         super().__init__()
-        self.addTab(TabPage_SO_block(self), 'Опрессовка НКТ')
+        self.addTab(TabPageSoBlock(parent), 'Опрессовка НКТ')
 
 
-class TubingPressuarWindow(MyMainWindow):
-
-
-    def __init__(self, ins_ind, table_widget, parent=None):
+class TubingPressuarWindow(WindowUnion):
+    def __init__(self, dict_data_well, table_widget, parent=None):
         super().__init__()
+
+        self.dict_data_well = dict_data_well
+        self.ins_ind = dict_data_well['ins_ind']
+        self.tabWidget = TabWidget(self.dict_data_well)
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
 
-        self.ins_ind = ins_ind
         self.table_widget = table_widget
-        self.tabWidget = TabWidget()
 
         self.buttonAdd = QPushButton('Добавить данные в план работ')
         self.buttonAdd.clicked.connect(self.add_work)
@@ -96,10 +98,10 @@ class TubingPressuarWindow(MyMainWindow):
                 distance_between_nkt_edit = int(float(distance_between_nkt_edit))
             select_nkt_combo = self.tabWidget.currentWidget().select_nkt_combo.currentText()
             current_edit = int(float(self.tabWidget.currentWidget().current_edit.text().replace(',', '.')))
-            if current_edit >= well_data.bottomhole_artificial._value:
+            if current_edit >= self.dict_data_well["bottomhole_artificial"]._value:
                 QMessageBox.warning(self, 'Ошибка',
                                     f'Необходимый забой-{current_edit}м ниже исскуственного '
-                                    f'{well_data.bottomhole_artificial._value}м')
+                                    f'{self.dict_data_well["bottomhole_artificial"]._value}м')
                 return
 
             length_nkt_edit = self.tabWidget.currentWidget().length_nkt_edit.text().replace(',', '.')
@@ -129,9 +131,9 @@ class TubingPressuarWindow(MyMainWindow):
         from .descent_gno import GnoDescentWindow
         from .rationingKRS import liftingNKT_norm, descentNKT_norm
 
-        if select_nkt_combo != 'Фондовые НКТ' or well_data.curator == 'ОР':
+        if select_nkt_combo != 'Фондовые НКТ' or self.dict_data_well["curator"] == 'ОР':
             block_pack_list = [
-                [f'Спустить заглушку на фНКТ{well_data.nkt_diam} до глубины {current_edit}мм', None,
+                [f'Спустить заглушку на фНКТ{self.dict_data_well["nkt_diam"]} до глубины {current_edit}мм', None,
                  f'Произвести спуск заглушки на фондовых НКТ с поинтервальной опрессовкой их через каждые '
                  f'{distance_between_nkt_edit}м на Р={pressuar_edit}тм  на Н={length_nkt_edit}м. '
                  f'Негерметичные НКТ отбраковать. (При СПО первых десяти НКТ на спайдере дополнительно устанавливать'
@@ -139,7 +141,7 @@ class TubingPressuarWindow(MyMainWindow):
                  None, None, None, None, None, None, None,
                  'мастер КРС', descentNKT_norm(length_nkt_edit, 1)],
                 [None, None,
-                 f'Поднять заглушку на НКТ с доливом тех жидкости {well_data.fluid_work}', None, None, None, None,
+                 f'Поднять заглушку на НКТ с доливом тех жидкости {self.dict_data_well["fluid_work"]}', None, None, None, None,
                  None, None, None,
                  'Мастер КРС', liftingNKT_norm(length_nkt_edit, 1)],
             ]
@@ -148,7 +150,7 @@ class TubingPressuarWindow(MyMainWindow):
             calc_fond_list = GnoDescentWindow.calc_fond_nkt(self, length_nkt_edit, distance_between_nkt_edit)
 
             block_pack_list = [
-                [f'Спустить заглушку на фНКТ{well_data.nkt_diam} до глубины {current_edit}мм', None,
+                [f'Спустить заглушку на фНКТ{self.dict_data_well["nkt_diam"]} до глубины {current_edit}мм', None,
                  f'Произвести спуск заглушки на фондовых НКТ с поинтервальной опрессовкой их через каждые '
                  f'{distance_between_nkt_edit}м на Р={pressuar_edit}тм  на Н={length_nkt_edit}м. '
                  f'Негерметичные НКТ отбраковать. (При СПО первых десяти НКТ на спайдере дополнительно устанавливать'
@@ -160,7 +162,7 @@ class TubingPressuarWindow(MyMainWindow):
                  None, None, None, None, None, None, None,
                  'мастер КРС, заказчик', descentNKT_norm(length_nkt_edit, 1)],
                 [None, None,
-                 f'Поднять заглушку на НКТ с доливом тех жидкости {well_data.fluid_work} с глубины {length_nkt_edit}м',
+                 f'Поднять заглушку на НКТ с доливом тех жидкости {self.dict_data_well["fluid_work"]} с глубины {length_nkt_edit}м',
                  None, None, None, None,
                  None, None, None,
                  'Мастер КРС', liftingNKT_norm(length_nkt_edit, 1)]]

@@ -4,9 +4,11 @@ from PyQt5.QtWidgets import QInputDialog, QWidget, QLabel, QLineEdit, QComboBox,
 
 import well_data
 from main import MyMainWindow
+from .parent_work import TabWidgetUnion, TabPageUnion, WindowUnion
 from .rationingKRS import descentNKT_norm, liftingNKT_norm
 
-class TabPage_SO_curator(QWidget):
+
+class TabPageSo_curator(TabPageUnion):
     def __init__(self, parent=None):
         super().__init__()
 
@@ -20,13 +22,13 @@ class TabPage_SO_curator(QWidget):
         self.grid.addWidget(self.curator_combo, 3, 0)
 
 
-class TabWidget(QTabWidget):
+class TabWidget(TabWidgetUnion):
     def __init__(self):
         super().__init__()
-        self.addTab(TabPage_SO_curator(), 'Куратор')
+        self.addTab(TabPageSo_curator(), 'Куратор')
 
 
-class SelectCurator(MyMainWindow):
+class SelectCurator(WindowUnion):
 
     def __init__(self, parent=None):
         super().__init__()
@@ -45,7 +47,7 @@ class SelectCurator(MyMainWindow):
 
     def add_work(self):
         curator_combo = self.tabWidget.currentWidget().curator_combo.currentText()
-        well_data.curator = curator_combo
+        self.dict_data_well["curator"] = curator_combo
 
         well_data.pause = False
         self.close()

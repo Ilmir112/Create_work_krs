@@ -6,15 +6,18 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QLineEdi
 
 import well_data
 from main import MyMainWindow
+from .parent_work import TabPageUnion, WindowUnion, TabWidgetUnion
 
 from .rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
-from .advanted_file import change_True_raid
+from .advanted_file import change_true_raid
 
 
 
-class TabPage_SO_raid(QWidget):
+class TabPageSo_raid(TabPageUnion):
     def __init__(self, parent=None):
         super().__init__()
+
+        self.dict_data_well = parent
 
         self.raid_diametr_label = QLabel("Диаметр райбера", self)
         self.raid_diametr_line = QLineEdit(self)
@@ -32,15 +35,15 @@ class TabPage_SO_raid(QWidget):
         self.downhole_motor_line = QLineEdit(self)
         self.downhole_motor_line.setClearButtonEnabled(True)
 
-        if well_data.column_additional is False or (well_data.column_additional and
-                                                    well_data.head_column_additional._value < well_data.current_bottom):
+        if self.dict_data_well["column_additional"] is False or (self.dict_data_well["column_additional"] and
+                                                    self.dict_data_well["head_column_additional"]._value < self.dict_data_well["current_bottom"]):
             self.raid_select_combo.setCurrentIndex(0)
-            if well_data.column_diametr._value > 127:
+            if self.dict_data_well["column_diametr"]._value > 127:
                 self.downhole_motor_line.setText('Д-106')
             else:
                 self.downhole_motor_line.setText('Д-76')
         else:
-            if well_data.column_additional_diametr._value > 127:
+            if self.dict_data_well["column_additional_diametr"]._value > 127:
                 self.downhole_motor_line.setText('Д-106')
             else:
                 self.downhole_motor_line.setText('Д-76')
@@ -97,8 +100,8 @@ class TabPage_SO_raid(QWidget):
         self.raid_select_combo.currentTextChanged.connect(self.update_raid_edit)
         self.raid_select_combo.setCurrentIndex(1)
 
-        if well_data.column_additional is False or \
-                (well_data.column_additional and well_data.current_bottom < well_data.head_column_additional._value):
+        if self.dict_data_well["column_additional"] is False or \
+                (self.dict_data_well["column_additional"] and self.dict_data_well["current_bottom"] < self.dict_data_well["head_column_additional"]._value):
             self.raid_select_combo.setCurrentIndex(0)
         else:
 
@@ -115,16 +118,16 @@ class TabPage_SO_raid(QWidget):
     def update_raid_edit(self, index):
 
         if index == 'райбер в ЭК':
-            self.raid_diametr_line.setText(str(self.raiding_Bit_diam_select(well_data.head_column_additional._value - 10)))
-            if well_data.column_diametr._value > 127:
+            self.raid_diametr_line.setText(str(self.raiding_Bit_diam_select(self.dict_data_well["head_column_additional"]._value - 10)))
+            if self.dict_data_well["column_diametr"]._value > 127:
                 self.downhole_motor_line.setText('Д-106')
             else:
                 self.downhole_motor_line.setText('Д-76')
 
 
         if index == 'райбер в ДП':
-            self.raid_diametr_line.setText(str(self.raiding_Bit_diam_select(well_data.current_bottom)))
-            if well_data.column_additional_diametr._value > 127:
+            self.raid_diametr_line.setText(str(self.raiding_Bit_diam_select(self.dict_data_well["current_bottom"])))
+            if self.dict_data_well["column_additional_diametr"]._value > 127:
                 self.downhole_motor_line.setText('Д-106')
             else:
                 self.downhole_motor_line.setText('Д-76')
@@ -150,37 +153,38 @@ class TabPage_SO_raid(QWidget):
             204: (215, 221)
         }
 
-        if well_data.column_additional is False or (
-                well_data.column_additional is True and depth <= well_data.head_column_additional._value):
-            diam_internal_ek = well_data.column_diametr._value - 2 * well_data.column_wall_thickness._value
+        if self.dict_data_well["column_additional"] is False or (
+                self.dict_data_well["column_additional"] is True and depth <= self.dict_data_well["head_column_additional"]._value):
+            diam_internal_ek = self.dict_data_well["column_diametr"]._value - 2 * self.dict_data_well["column_wall_thickness"]._value
         else:
-            diam_internal_ek = well_data.column_additional_diametr._value - 2 * well_data.column_additional_wall_thickness._value
+            diam_internal_ek = self.dict_data_well["column_additional_diametr"]._value - 2 * self.dict_data_well["column_additional_wall_thickness"]._value
 
         for diam, diam_internal_bit in raiding_Bit_dict.items():
             if diam_internal_bit[0] <= diam_internal_ek <= diam_internal_bit[1]:
                 bit_diametr = diam
 
-        if 'ПОМ' in str(well_data.paker_do["posle"]).upper() and '122' in str(well_data.paker_do["posle"]):
+        if 'ПОМ' in str(self.dict_data_well["paker_do"]["posle"]).upper() and '122' in str(self.dict_data_well["paker_do"]["posle"]):
             bit_diametr = 126
 
         return bit_diametr
 
 
-class TabWidget(QTabWidget):
-    def __init__(self):
+class TabWidget(TabWidgetUnion):
+    def __init__(self, parent=None):
         super().__init__()
-        self.addTab(TabPage_SO_raid(), 'Райбер')
+        self.addTab(TabPageSo_raid(parent), 'Райбер')
 
 
-class Raid(MyMainWindow):
-    def __init__(self, ins_ind, table_widget, parent=None):
-        super(MyMainWindow, self).__init__()
+class Raid(WindowUnion):
+    def __init__(self, dict_data_well, table_widget, parent=None):
+        super().__init__()
+
+        self.dict_data_well = dict_data_well
+        self.ins_ind = dict_data_well['ins_ind']
+        self.tabWidget = TabWidget(self.dict_data_well)
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
-
-        self.ins_ind = ins_ind
         self.table_widget = table_widget
-        self.tabWidget = TabWidget()
         self.tableWidget = QTableWidget(0, 3)
         self.tableWidget.setHorizontalHeaderLabels(
             ["Кровля", "Подошва", "необходимость райбирования"])
@@ -222,16 +226,16 @@ class Raid(MyMainWindow):
         if not roof_raid or not sole_raid:
             QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
             return
-        if well_data.column_additional and int(roof_raid) > well_data.head_column_additional._value and \
+        if self.dict_data_well["column_additional"] and int(roof_raid) > self.dict_data_well["head_column_additional"]._value and \
                 ryber_key == 'райбер в ЭК':
             QMessageBox.information(self, 'Внимание', 'Компоновка подобрана не корректно')
             return
-        if well_data.column_additional and int(sole_raid) < well_data.head_column_additional._value \
+        if self.dict_data_well["column_additional"] and int(sole_raid) < self.dict_data_well["head_column_additional"]._value \
                 and ryber_key == 'райбер в ДП':
             QMessageBox.information(self, 'Внимание', 'Компоновка подобрана не корректно')
             return
 
-        if well_data.current_bottom < float(sole_raid):
+        if self.dict_data_well["current_bottom"] < float(sole_raid):
             QMessageBox.information(self, 'Внимание', 'глубина НЭК ниже искусственного забоя')
             return
 
@@ -250,16 +254,16 @@ class Raid(MyMainWindow):
         from .advanted_file import raiding_interval
         ryber_key = self.tabWidget.currentWidget().raid_select_combo.currentText()
         self.downhole_motor = self.tabWidget.currentWidget().downhole_motor_line.text()
-        raiding_interval = raiding_interval(ryber_key)
+        raiding_interval = raiding_interval(self.dict_data_well, ryber_key)
         # 'райбер в ЭК': ryber_str_EK, 'райбер в ДП'
         if raiding_interval:
-            if ryber_key == 'райбер в ЭК' and well_data.column_additional and \
-                    raiding_interval[0][1] > well_data.head_column_additional._value:
+            if ryber_key == 'райбер в ЭК' and self.dict_data_well["column_additional"] and \
+                    raiding_interval[0][1] > self.dict_data_well["head_column_additional"]._value:
                 QMessageBox.warning(self, 'Ошибка',
                                           'Не корректно выбрана компоновка')
                 return
-            elif ryber_key == 'райбер в ДП' and well_data.column_additional and \
-                    raiding_interval[0][0] < well_data.head_column_additional._value:
+            elif ryber_key == 'райбер в ДП' and self.dict_data_well["column_additional"] and \
+                    raiding_interval[0][0] < self.dict_data_well["head_column_additional"]._value:
                 QMessageBox.warning(self, 'Ошибка',
                                           'Не корректно выбрана компоновка')
                 return
@@ -291,10 +295,10 @@ class Raid(MyMainWindow):
             if roof_raid and sole_raid:
                 roof = int(roof_raid.text())
                 sole = int(sole_raid.text())
-                if sole > well_data.current_bottom:
+                if sole > self.dict_data_well["current_bottom"]:
                     QMessageBox.warning(self, 'Ошибка',
                                               f'подошвы райбирования {sole}м больше текущего забоя'
-                                              f' {well_data.current_bottom}м')
+                                              f' {self.dict_data_well["current_bottom"]}м')
                     return
                 raid_tuple.append((roof, sole))
 
@@ -304,7 +308,7 @@ class Raid(MyMainWindow):
         else:
             raid_list = self.raiding_sbt(raid_tuple[::-1], ryber_key)
 
-        well_data.ribbing_interval.extend(raid_tuple[::-1])
+        self.dict_data_well["ribbing_interval"].extend(raid_tuple[::-1])
 
         self.populate_row(self.ins_ind, raid_list, self.table_widget)
         well_data.pause = False
@@ -332,24 +336,24 @@ class Raid(MyMainWindow):
         downhole_motor = self.tabWidget.currentWidget().downhole_motor_line.text()
         raid_type_combo = self.tabWidget.currentWidget().raid_type_combo.currentText()
         nkt_pod = 0
-        current_str = well_data.current_bottom
-        if well_data.column_additional:
-            if ryber_key == 'райбер в ЭК' and well_data.head_column_additional._value < well_data.current_bottom:
-                current_str = well_data.head_column_additional._value
+        current_str = self.dict_data_well["current_bottom"]
+        if self.dict_data_well["column_additional"]:
+            if ryber_key == 'райбер в ЭК' and self.dict_data_well["head_column_additional"]._value < self.dict_data_well["current_bottom"]:
+                current_str = self.dict_data_well["head_column_additional"]._value
 
-            nkt_pod = '60мм' if well_data.column_additional_diametr._value < 110 else '73мм со снятыми фасками'
+            nkt_pod = '60мм' if self.dict_data_well["column_additional_diametr"]._value < 110 else '73мм со снятыми фасками'
 
-        nkt_diam = well_data.nkt_diam
-        nkt_template = well_data.nkt_template
+        nkt_diam = self.dict_data_well["nkt_diam"]
+        nkt_template = self.dict_data_well["nkt_template"]
 
-        ryber_str_EK = f'райбер {raid_type_combo}-{ryber_diam} для ЭК {well_data.column_diametr._value}мм х ' \
-                       f'{well_data.column_wall_thickness._value}мм +' \
-                       f' забойный двигатель {downhole_motor} + НКТ{well_data.nkt_diam} 20м + репер '
+        ryber_str_EK = f'райбер {raid_type_combo}-{ryber_diam} для ЭК {self.dict_data_well["column_diametr"]._value}мм х ' \
+                       f'{self.dict_data_well["column_wall_thickness"]._value}мм +' \
+                       f' забойный двигатель {downhole_motor} + НКТ{self.dict_data_well["nkt_diam"]} 20м + репер '
 
-        ryber_str_DP = f'райбер {raid_type_combo}-{ryber_diam} для ЭК {well_data.column_additional_diametr._value}мм х ' \
-                       f'{well_data.column_additional_wall_thickness._value}мм + забойный двигатель ' \
+        ryber_str_DP = f'райбер {raid_type_combo}-{ryber_diam} для ЭК {self.dict_data_well["column_additional_diametr"]._value}мм х ' \
+                       f'{self.dict_data_well["column_additional_wall_thickness"]._value}мм + забойный двигатель ' \
                        f'{downhole_motor} + НКТ{nkt_pod} 20м + репер + ' \
-                       f'НКТ{nkt_pod} {round(well_data.current_bottom - float(well_data.head_column_additional._value))}м'
+                       f'НКТ{nkt_pod} {round(self.dict_data_well["current_bottom"] - float(self.dict_data_well["head_column_additional"]._value))}м'
 
         rayber_dict = {'райбер в ЭК': ryber_str_EK, 'райбер в ДП': ryber_str_DP}
 
@@ -359,10 +363,10 @@ class Raid(MyMainWindow):
         if len(raiding_interval_tuple) != 0:
             krovly_raiding = int(raiding_interval_tuple[0][0])
         else:
-            krovly_raiding = well_data.perforation_roof
+            krovly_raiding = self.dict_data_well["perforation_roof"]
 
         raiding_interval = raid(raiding_interval_tuple)
-        change_True_raid(self, raiding_interval_tuple)
+        change_true_raid(self, raiding_interval_tuple)
         ryber_list = [
             [f'СПО {ryber_str}  на НКТ{nkt_diam} до Н={krovly_raiding}м', None,
              f'Спустить {ryber_str}  на НКТ{nkt_diam} до Н={krovly_raiding}м с замером, '
@@ -393,20 +397,20 @@ class Raid(MyMainWindow):
              f' ПРЕДУСМОТРЕТЬ КОМПЕНСАЦИЮ РЕАКТИВНОГО МОМЕНТА НА ВЕДУЩЕЙ ТРУБЕ))',
              None, None, None, None, None, None, None,
              'Мастер КРС, УСРСиСТ', None],
-            [f'Промывка уд.весом {well_data.fluid_work[:6]}  в объеме {round(TemplateKrs.well_volume(self) * 2, 1)}м3',
+            [f'Промывка уд.весом {self.dict_data_well["fluid_work"][:6]}  в объеме {round(TemplateKrs.well_volume(self) * 2, 1)}м3',
              None,
-             f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {well_data.fluid_work}  '
+             f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {self.dict_data_well["fluid_work"]}  '
              f'в присутствии представителя заказчика в объеме {round(TemplateKrs.well_volume(self) * 2, 1)}м3. Составить акт.',
              None, None, None, None, None, None, None,
              'мастер КРС, предст. заказчика', well_volume_norm(TemplateKrs.well_volume(self))],
             [None, None,
              f'Поднять {ryber_str} на НКТ{nkt_diam}м с глубины {current_str}м с доливом скважины в '
-             f'объеме {round(well_data.current_bottom * 1.12 / 1000, 1)}м3 тех. жидкостью  уд.весом {well_data.fluid_work}',
+             f'объеме {round(self.dict_data_well["current_bottom"] * 1.12 / 1000, 1)}м3 тех. жидкостью  уд.весом {self.dict_data_well["fluid_work"]}',
              None, None, None, None, None, None, None,
              'мастер КРС', liftingNKT_norm(current_str, 1.2)]]
 
-        # print(f' после отрайбирования {[well_data.dict_perforation[plast]["отрайбировано"] for plast in well_data.plast_work]}')
-        # if len(well_data.plast_work) == 0:
+        # print(f' после отрайбирования {[self.dict_data_well["dict_perforation"][plast]["отрайбировано"] for plast in self.dict_data_well['plast_work']]}')
+        # if len(self.dict_data_well['plast_work']) == 0:
         #     acid_true_quest = QMessageBox.question(self, 'Необходимость смены объема',
         #                                            'Нужно ли изменять удельный вес?')
         #     try:
@@ -429,21 +433,21 @@ class Raid(MyMainWindow):
         ryber_key = self.tabWidget.currentWidget().raid_select_combo.currentText()
         raid_type_combo = self.tabWidget.currentWidget().raid_type_combo.currentText()
 
-        current_str = well_data.current_bottom
-        if well_data.column_additional:
+        current_str = self.dict_data_well["current_bottom"]
+        if self.dict_data_well["column_additional"]:
             if ryber_key == 'райбер в ЭК':
-                current_str = well_data.head_column_additional._value
+                current_str = self.dict_data_well["head_column_additional"]._value
 
         nkt_pod = "2'3/8"
-        nkt_diam = "2'7/8" if well_data.column_diametr._value > 110 else "2'3/8"
+        nkt_diam = "2'7/8" if self.dict_data_well["column_diametr"]._value > 110 else "2'3/8"
 
-        ryber_str_EK = f'райбер {raid_type_combo}-{ryber_diam} для ЭК {well_data.column_diametr._value}мм х {well_data.column_wall_thickness._value}мм '
-        ryber_str_short_ek = f'райбер ФКК-{ryber_diam} для ЭК {well_data.column_diametr._value}мм х {well_data.column_wall_thickness._value}мм '
+        ryber_str_EK = f'райбер {raid_type_combo}-{ryber_diam} для ЭК {self.dict_data_well["column_diametr"]._value}мм х {self.dict_data_well["column_wall_thickness"]._value}мм '
+        ryber_str_short_ek = f'райбер ФКК-{ryber_diam} для ЭК {self.dict_data_well["column_diametr"]._value}мм х {self.dict_data_well["column_wall_thickness"]._value}мм '
 
-        ryber_str_DP = f'райбер {raid_type_combo}-{ryber_diam} для ЭК {well_data.column_additional_diametr._value}мм х ' \
-                       f'{well_data.column_additional_wall_thickness._value}мм + СБТ {nkt_pod} ' \
-                       f'{int(well_data.current_bottom - well_data.head_column_additional._value)}м'
-        ryber_str_short_dp = f'райбер ФКК-{ryber_diam}  + СБТ {nkt_pod} {int(well_data.current_bottom - well_data.head_column_additional._value)}м'
+        ryber_str_DP = f'райбер {raid_type_combo}-{ryber_diam} для ЭК {self.dict_data_well["column_additional_diametr"]._value}мм х ' \
+                       f'{self.dict_data_well["column_additional_wall_thickness"]._value}мм + СБТ {nkt_pod} ' \
+                       f'{int(self.dict_data_well["current_bottom"] - self.dict_data_well["head_column_additional"]._value)}м'
+        ryber_str_short_dp = f'райбер ФКК-{ryber_diam}  + СБТ {nkt_pod} {int(self.dict_data_well["current_bottom"] - self.dict_data_well["head_column_additional"]._value)}м'
 
         rayber_dict = {'райбер в ЭК': (ryber_str_EK, ryber_str_short_ek),
                        'райбер в ДП': (ryber_str_DP, ryber_str_short_dp)}
@@ -453,7 +457,7 @@ class Raid(MyMainWindow):
         if len(raiding_interval_tuple) != 0:
             krovly_raiding = int(raiding_interval_tuple[0][0])
         else:
-            krovly_raiding = well_data.perforation_roof
+            krovly_raiding = self.dict_data_well["perforation_roof"]
 
         raiding_interval = raid(raiding_interval_tuple)
         ryber_list = [
@@ -465,7 +469,7 @@ class Raid(MyMainWindow):
              f'СПУСКА СНИЗИТЬ ДО 0,25 М/С). '
              f'ЗА 20 М ДО ЗАБОЯ СПУСК ПРОИЗВОДИТЬ С ПРОМЫВКОЙ',
              None, None, None, None, None, None, None,
-             'мастер КРС', descentNKT_norm(well_data.current_bottom, 1.1)],
+             'мастер КРС', descentNKT_norm(self.dict_data_well["current_bottom"], 1.1)],
             [f'монтаж мех.ротора', None,
              f'Произвести монтаж мех.ротора. Собрать промывочное оборудование: вертлюг, ведущая труба (установить '
              f'вставной фильтр под ведущей трубой), '
@@ -485,20 +489,20 @@ class Raid(MyMainWindow):
              f' ПРЕДУСМОТРЕТЬ КОМПЕНСАЦИЮ РЕАКТИВНОГО МОМЕНТА НА ВЕДУЩЕЙ ТРУБЕ))',
              None, None, None, None, None, None, None,
              'Мастер КРС, УСРСиСТ', None],
-            [f'Промывка уд.весом {well_data.fluid_work[:6]}  в объеме {round(TemplateKrs.well_volume(self) * 2, 1)}м3',
+            [f'Промывка уд.весом {self.dict_data_well["fluid_work"][:6]}  в объеме {round(TemplateKrs.well_volume(self) * 2, 1)}м3',
              None,
-             f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {well_data.fluid_work}  '
+             f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {self.dict_data_well["fluid_work"]}  '
              f'в присутствии представителя заказчика в объеме {round(TemplateKrs.well_volume(self) * 2, 1)}м3. Составить акт.',
              None, None, None, None, None, None, None,
              'мастер КРС, предст. заказчика', well_volume_norm(TemplateKrs.well_volume(self))],
             [None, None,
              f'Поднять  {ryber_str} на СБТ{nkt_diam}м с глубины {current_str}м с доливом скважины в '
-             f'объеме {round(well_data.current_bottom * 1.12 / 1000, 1)}м3 тех. жидкостью  уд.весом {well_data.fluid_work}',
+             f'объеме {round(self.dict_data_well["current_bottom"] * 1.12 / 1000, 1)}м3 тех. жидкостью  уд.весом {self.dict_data_well["fluid_work"]}',
              None, None, None, None, None, None, None,
              'мастер КРС', liftingNKT_norm(current_str, 1.2)]]
 
-        # print(f' после отрайбирования {[well_data.dict_perforation[plast]["отрайбировано"] for plast in well_data.plast_work]}')
-        if len(well_data.plast_work) == 0:
+        # print(f' после отрайбирования {[self.dict_data_well["dict_perforation"][plast]["отрайбировано"] for plast in self.dict_data_well['plast_work']]}')
+        if len(self.dict_data_well['plast_work']) == 0:
             acid_true_quest = QMessageBox.question(self, 'Необходимость смены объема',
                                                    'Нужно ли изменять удельный вес?')
             if acid_true_quest == QMessageBox.StandardButton.Yes:

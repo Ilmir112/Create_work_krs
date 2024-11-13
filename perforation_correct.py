@@ -6,6 +6,7 @@ from PyQt5.QtGui import QRegExpValidator, QColor, QPalette
 
 from main import MyMainWindow
 from work_py.advanted_file import definition_plast_work
+from work_py.parent_work import TabWidgetUnion, WindowUnion
 
 
 class FloatLineEdit(QLineEdit):
@@ -31,13 +32,14 @@ class FloatLineEdit(QLineEdit):
             self.setPalette(self.parentWidget().palette())
 
 
-class TabPage_SO(QWidget):
+class TabPageSo(QWidget):
     def __init__(self, parent=None):
         super().__init__()
+        self.dict_data_well = parent
 
         self.labels_plast = {}
-        self.dict_perforation = well_data.dict_perforation
-        self.dict_perforation_project = well_data.dict_perforation_project
+        self.dict_perforation = self.dict_data_well["dict_perforation"]
+        self.dict_perforation_project = self.dict_data_well["dict_perforation_project"]
 
         self.plast_label = QLabel("пласта")
         self.roof_label = QLabel("Кровля")
@@ -102,7 +104,7 @@ class TabPage_SO(QWidget):
                 self.labels_plast[index_interval] = (plast_edit, roof_edit, sole_edit, plast_status_ComboBox,
                                                      template_status_ComboBox, raiding_status_ComboBox)
                 index_interval += 1
-        if len(well_data.dict_perforation) != 0:
+        if len(self.dict_data_well["dict_perforation"]) != 0:
             for plast in plast_projects:
                 for index, (roof, sole) in enumerate(list(sorted(self.dict_perforation_project[plast]["интервал"],
                                                                  key=lambda x: x[0]))):
@@ -159,22 +161,22 @@ class TabPage_SO(QWidget):
         return 0 if self.dict_perforation[plast]['отрайбировано'] else 1
 
 
-class TabWidget(QTabWidget):
-    def __init__(self):
+class TabWidget(TabWidgetUnion):
+    def __init__(self, dict_data_well):
         super().__init__()
-        self.addTab(TabPage_SO(self), 'Проверка корректности данных перфорации')
+        self.addTab(TabPageSo(dict_data_well), 'Проверка корректности данных перфорации')
 
 
-class PerforationCorrect(MyMainWindow):
+class PerforationCorrect(WindowUnion):
 
     def __init__(self, parent=None):
         super(PerforationCorrect, self).__init__()
-
+        self.dict_data_well = parent
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
         self.setWindowModality(QtCore.Qt.ApplicationModal)  # Устанавливаем модальность окна
 
-        self.tabWidget = TabWidget()
+        self.tabWidget = TabWidget(self.dict_data_well)
 
         self.buttonAdd = QPushButton('сохранить данные')
         self.buttonAdd.clicked.connect(self.add_row_table)
@@ -186,7 +188,7 @@ class PerforationCorrect(MyMainWindow):
 
     def add_row_table(self):
 
-        self.dict_perforation = well_data.dict_perforation
+        self.dict_perforation = self.dict_data_well["dict_perforation"]
         plast_all = self.tabWidget.currentWidget().labels_plast
         self.dict_perforation_project = {}
 
@@ -238,33 +240,33 @@ class PerforationCorrect(MyMainWindow):
 
 
             else:
-                if plast in well_data.dict_perforation:
+                if plast in self.dict_data_well["dict_perforation"]:
                     if all([oktl is True for oktl in plast_oktl]):
-                        well_data.dict_perforation_short[plast]['отключение'] = True
-                        well_data.dict_perforation[plast]["отключение"] = True
+                        self.dict_data_well["dict_perforation_short"][plast]['отключение'] = True
+                        self.dict_data_well["dict_perforation"][plast]["отключение"] = True
                     else:
-                        well_data.dict_perforation_short[plast]['отключение'] = False
-                        well_data.dict_perforation[plast]['отключение'] = False
+                        self.dict_data_well["dict_perforation_short"][plast]['отключение'] = False
+                        self.dict_data_well["dict_perforation"][plast]['отключение'] = False
                     if all([oktl is True for oktl in plast_templ]):
-                        well_data.dict_perforation[plast]['Прошаблонировано'] = True
+                        self.dict_data_well["dict_perforation"][plast]['Прошаблонировано'] = True
                     else:
-                        well_data.dict_perforation[plast]['Прошаблонировано'] = False
+                        self.dict_data_well["dict_perforation"][plast]['Прошаблонировано'] = False
                     if all([oktl is True for oktl in plast_raid]):
-                        well_data.dict_perforation[plast]['отрайбировано'] = True
+                        self.dict_data_well["dict_perforation"][plast]['отрайбировано'] = True
                     else:
-                        well_data.dict_perforation[plast]['отрайбировано'] = False
+                        self.dict_data_well["dict_perforation"][plast]['отрайбировано'] = False
 
             if len(plast_del) > 0:
-                aaa = well_data.dict_perforation
-                for plast in list(well_data.dict_perforation.keys()):
+                aaa = self.dict_data_well["dict_perforation"]
+                for plast in list(self.dict_data_well["dict_perforation"].keys()):
                     if plast in plast_del:
-                        well_data.dict_perforation.pop(plast)
+                        self.dict_data_well["dict_perforation"].pop(plast)
 
-        adafw = well_data.dict_perforation_project
+        adafw = self.dict_data_well["dict_perforation_project"]
         definition_plast_work(self)
-        well_data.plast_work_short = well_data.plast_work
+        self.dict_data_well['plast_work_short'] = self.dict_data_well['plast_work']
 
-        if len(well_data.plast_work) == 0:
+        if len(self.dict_data_well['plast_work']) == 0:
             perf_true_quest = QMessageBox.question(self, 'Программа',
                                                    'Программа определили,что в скважине интервалов '
                                                    'перфорации нет, верно ли?')
