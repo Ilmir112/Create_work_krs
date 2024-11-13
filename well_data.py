@@ -58,168 +58,26 @@ def get_password(service_name, username):
 
 
 connect_in_base = True
-type_kr = ''
-column_head_m = ''
-date_drilling_cancel = ''
-сommissioning_date = ''
-date_drilling_run = ''
-appointment = ''
-ribbing_interval = []
-number_bush = ProtectedIsDigit(0)
-wellhead_fittings = ''
-inv_number = ProtectedIsNonNone('не корректно')
-cdng = ProtectedIsNonNone('не корректно')
-gnkt_number = 0
-gnkt_length = 0
-diametr_length = 0
-emergency_bottom = ''
-iznos = 0
-bottomType_list = ['ЦМ', 'РПК', 'РПП', 'ВП', 'Гипсовых отложений', 'проходимости']
-type_absorbent = ''
-pipe_mileage = 0
-pipe_fatigue = 0
-pvo = 0
-previous_well = 0
-bottomhole_drill = ProtectedIsNonNone('не корректно')
-bottomhole_artificial = ProtectedIsDigit(5000)
-max_angle = ProtectedIsNonNone('не корректно')
-max_angle_H = ProtectedIsNonNone('не корректно')
-stol_rotora = ProtectedIsNonNone('не корректно')
-column_conductor_diametr = ProtectedIsNonNone('не корректно')
-column_conductor_wall_thickness = ProtectedIsNonNone('не корректно')
-column_conductor_lenght = ProtectedIsNonNone('не корректно')
-level_cement_direction = ProtectedIsNonNone('не корректно')
-level_cement_conductor = ProtectedIsNonNone('не корректно')
-column_diametr = ProtectedIsNonNone('не корректно')
-column_wall_thickness = ProtectedIsNonNone('не корректно')
-shoe_column = ProtectedIsNonNone('не корректно')
-level_cement_column = ProtectedIsNonNone('не корректно')
-index_row_pvr_list = []
-gis_list = []
-pvr_row = []
-current_date = datetime.now().date()
-pressuar_mkp = ProtectedIsNonNone('0')
-column_additional_diametr = ProtectedIsNonNone('не корректно')
-column_additional_wall_thickness = ProtectedIsNonNone('не корректно')
-head_column_additional = ProtectedIsNonNone('не корректно')
-shoe_column_additional = ProtectedIsNonNone('не корректно')
-column_direction_lenght = ProtectedIsDigit('не корректно')
 
-column_direction_diametr = ProtectedIsNonNone('не корректно')
-column_direction_wall_thickness = ProtectedIsNonNone('не корректно')
-data_list = []
-problemWithEk_diametr = 220
-data_fond_min = ProtectedIsDigit(0)
-cat_well_min = ProtectedIsDigit(0)
-cat_well_max = ProtectedIsDigit(0)
-data_well_max = ProtectedIsDigit(0)
-first_pressure = ProtectedIsDigit(0)
-data_pvr_max = ProtectedIsDigit(0)
-q_water = ProtectedIsDigit(0)
-proc_water = ProtectedIsDigit(100)
-data_well_min = ProtectedIsDigit(0)
-data_pvr_min = ProtectedIsDigit(0)
-pipes_ind = ProtectedIsDigit(0)
-condition_of_wells = ProtectedIsDigit(0)
-static_level = ProtectedIsNonNone('не корректно')
-dinamic_level = ProtectedIsNonNone('не корректно')
-sucker_rod_ind = ProtectedIsDigit(0)
-data_x_max = ProtectedIsDigit(0)
-data_x_min = ProtectedIsDigit(0)
+number_bush = ProtectedIsDigit(0)
+
+BOTTOM_TYPE_LIST = ['ЦМ', 'РПК', 'РПП', 'ВП', 'Гипсовых отложений', 'проходимости']
+
+
 
 DB_WELL_DATA = 'well_data'
 DB_NAME_USER = 'krs2'
 DB_NAME_GNKT = 'gnkt_database'
 DB_CLASSIFICATION = 'databaseclassification'
 
-problemWithEk = False
 plast_all = []
-konte_true = False
-gipsInWell = False
-grp_plan = False
-nkt_opressTrue = False
-open_trunk_well = False
-lift_ecn_can = False
-sucker_rod_none = True
+
+
 pause = True
-curator = '0'
-lift_ecn_can_addition = False
-column_passability = False
-column_additional_passability = False
-column_direction_True = False
-work_perforations_approved = False
-leakiness = False
-emergency_well = False
-column_additional = False
-without_damping = False
-well_number = ProtectedIsNonNone('0')
-angle_data = []
-well_area = ProtectedIsNonNone(' ')
-bvo = False
-old_version = True
-skm_depth = 0
 
-pakerTwoSKO = False
-normOfTime = 0
-Qoil = 0
-template_depth = 0
-nkt_diam = 73
-b_plan = 0
 
-expected_Q = 0
-expected_P = 0
-stabilizator_true = False
-plast_select = ''
-dict_perforation = {}
-dict_perforation_project = {}
-itog_ind_min = 0
-work_plan = None
-kat_pvo = 2
-gaz_f_pr = []
-paker_diametr = 0
-cat_gaz_f_pr = []
-paker_layout = 0
 
-max_expected_pressure = 0
-leakiness_Count = 0
 
-expected_pick_up = {}
-fluid_work = 0
-
-ins_ind = 0
-number_dp = 0
-len_razdel_1 = 0
-current_bottom = 0
-count_template = 0
-forPaker_list = False
-current_bottom2 = 5000
-dict_leakiness = {}
-dict_perforation_short = {}
-
-emergency_count = 0
-skm_interval = []
-template_lenght = 0
-category_pressuar = 3
-category_h2s = 3
-category_gf = 3
-work_perforations = []
-work_perforations_dict = {}
-paker_do = {"do": 0, "posle": 0}
-values = []
-depth_fond_paker_do = {"do": 0, "posle": 0}
-paker2_do = {"do": 0, "posle": 0}
-depth_fond_paker2_do = {"do": 0, "posle": 0}
-perforation_roof = 50000
-perforation_sole = 0
-dict_pump_SHGN = {"do": '0', "posle": '0'}
-dict_pump_ECN = {"do": '0', "posle": '0'}
-dict_pump_SHGN_h = {"do": '0', "posle": '0'}
-dict_pump_ECN_h = {"do": '0', "posle": '0'}
-dict_pump = {"do": '0', "posle": '0'}
-leakiness_interval = []
-dict_pump_h = {"do": 0, "posle": 0}
-
-cat_P_1 = []
 costumer = 'ОАО "Башнефть"'
 contractor = 'ойл-сервис'
 dict_contractor = {
@@ -239,31 +97,19 @@ dict_contractor = {
 countAcid = 0
 swabTypeComboIndex = 1
 swab_true_edit_type = 1
-groove_diameter = ''
-bur_rastvor = ''
-drilling_interval = []
-max_angle = 0
+
 dop_work_list = None
 paker_izv_paker = ''
 privyazkaSKO = 0
 nkt_mistake = False
-h2s_pr = []
+
 plan_correct_index = 0
 cat_h2s_list = []
 user = ['', '']
-itog_ind_max = ''
-texts = ''
-h2s_mg = []
-h2s_mg_m3 = []
-lift_key = 0
-check_data_in_pz = []
-dict_category = {}
-max_admissible_pressure = ProtectedIsDigit(0)
-region = ''
-interval_temp = ''
+
+
 data_in_base = False
-dict_nkt = {}
-dict_nkt_po = {}
+
 path_image = '_internal/'
 # path_image = ''
 
@@ -272,39 +118,23 @@ dict_volume_chemistry = {'пункт': [], 'цемент': 0.0, 'HCl': 0.0, 'HF'
                          'песок': 0.0, 'РПК': 0.0, 'РПП': 0.0, "извлекаемый пакер": 0.0, "ЕЛАН": 0.0,
                          'РИР 2С': 0.0, 'РИР ОВП': 0.0, 'гидрофабизатор': 0.0}
 
-data_well_dict = {}
-ins_ind2 = 0
+
 data = ''
 rowHeights = ''
 colWidth = ''
 boundaries_dict = ''
-Qwater = 100
-dict_sucker_rod = {}
-dict_sucker_rod_po = {}
-row_expected = []
-category_pressuar2 = ''
-rowHeights = []
+
 
 plast_project = []
 plast_work = []
-image_data = []
-leakage_window = None
-cat_P_P = []
-data_well_is_True = False
-well_oilfield = 0
-template_depth_addition = 0
-template_lenght_addition = 0
-nkt_template = 59
 yellow_fill = PatternFill(start_color="FFFF00", end_color="FFFF00", fill_type="solid")
-well_volume_in_PZ = []
-image_list = []
-problemWithEk_depth = 10000
+
 thin_border = Border(left=Side(style='thin'),
                      right=Side(style='thin'),
                      top=Side(style='thin'),
                      bottom=Side(style='thin'))
 
-dict_telephon = {
+DICT_TELEPHONE = {
     'Бригада № 1': 9228432791,
     'Бригада № 2': 9174006602,
     'Бригада № 3': 9174009883,
@@ -428,19 +258,12 @@ dict_telephon = {
 }
 
 
-def if_None(value):
-    if isinstance(value, datetime):
-        return value
-    elif value is None or 'отс' in str(value).lower() or str(value).replace(' ', '') == '-' \
-            or value == 0 or str(value).replace(' ', '') == '':
-        return 'отсут'
-    else:
-        return value
 
 
-region_list = ['', 'АГМ', 'ИГМ', 'ТГМ', 'ЧГМ', 'КГМ']
 
-type_kr_list = [
+REGION_LIST = ['', 'АГМ', 'ИГМ', 'ТГМ', 'ЧГМ', 'КГМ']
+
+TYPE_KR_LIST = [
     '',
     'КР1  Ремонтно - изоляционные работы',
     'КР1-1  Отключение отдельных интервалов и пропластков объекта эксплуатации',
@@ -598,7 +421,7 @@ type_kr_list = [
     'КР14-3- Освоение эксплуатационных скважин с МС ГРП',
     'КР14-4 Освоение эксплуатационной скважины с горизонтальным окончанием'
 ]
-dict_calc_CaCl = {
+DICT_CALC_CACL = {
     1.01: (14.9, 997),
     1.02: (29.5, 995),
     1.03: (44.2, 993),
@@ -633,7 +456,7 @@ dict_calc_CaCl = {
     1.32: (482, 838)
 }
 
-dict_calc_CaZHG = {
+DICT_CALC_CAZHG = {
     1.33: (498, 832),
     1.34: (513, 827),
     1.35: (529, 821),
