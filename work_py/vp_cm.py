@@ -2,7 +2,7 @@ from PyQt5.QtGui import QIntValidator
 from PyQt5.QtWidgets import QInputDialog, QTabWidget, QMainWindow, QWidget, QLineEdit, QLabel, QComboBox, QGridLayout, \
     QPushButton, QMessageBox
 
-import well_data
+import data_list
 from main import MyMainWindow
 from .parent_work import TabWidgetUnion, WindowUnion, TabPageUnion
 from .rir import RirWindow
@@ -142,7 +142,7 @@ class VpWindow(WindowUnion):
 
 
         self.populate_row(self.ins_ind, work_list, self.table_widget)
-        well_data.pause = False
+        data_list.pause = False
         self.close()
 
     def closeEvent(self, event):
@@ -154,10 +154,10 @@ class VpWindow(WindowUnion):
         if self.dict_data_well["perforation_roof"] > vp_depth:
             vp_list = [
                 [None, None,
-                 f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {well_data.contractor}". '
+                 f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {data_list.contractor}". '
                  f'При необходимости подготовить место для установки партии ГИС напротив мостков. '
                  f'Произвести  монтаж ГИС согласно схемы  №8а утвержденной главным инженером '
-                 f'{well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г',
+                 f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г',
                  None, None, None, None, None, None, None,
                  'Мастер КРС', None, None, None],
                 [f'Произвести установку {vp_type_QCombo} на {vp_depth}м', None,
@@ -211,10 +211,10 @@ class VpWindow(WindowUnion):
         else:
             vp_list = [
                 [None, None,
-                 f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {well_data.contractor}". '
+                 f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {data_list.contractor}". '
                  f'При необходимости  подготовить место для установки партии ГИС напротив мостков. '
                  f'Произвести  монтаж ГИС согласно схемы  №8а утвержденной главным инженером от '
-                 f'{well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г',
+                 f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г',
                  None, None, None, None, None, None, None,
                  'Мастер КРС', None, None, None],
                 [f'Произвести установку {vp_type_QCombo} на {vp_depth}м',
@@ -247,10 +247,10 @@ class VpWindow(WindowUnion):
         if need_question_QCombo == 'Нет':
             vp_list = [
                 [None, None,
-                 f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {well_data.contractor}". '
+                 f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {data_list.contractor}". '
                  f'При необходимости подготовить место для установки партии ГИС напротив мостков. '
                  f'Произвести  монтаж ГИС согласно схемы  №8а утвержденной главным инженером '
-                 f'{well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г',
+                 f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г',
                  None, None, None, None, None, None, None,
                  'Мастер КРС', None, None, None],
                 [f'Произвести установку {vp_type_QCombo} на {vp_depth}м', None,
@@ -285,10 +285,10 @@ class VpWindow(WindowUnion):
 
         vp_list = [
             [None, None,
-             f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {well_data.contractor}". '
+             f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {data_list.contractor}". '
              f'При необходимости  подготовить место для установки партии ГИС напротив мостков. '
              f'Произвести  монтаж ГИС согласно схемы  №8а утвержденной главным инженером от '
-             f'{well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г',
+             f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г',
              None, None, None, None, None, None, None,
              'Мастер КРС', None, None, None],
 

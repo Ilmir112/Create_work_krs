@@ -1,7 +1,7 @@
 import json
 import sqlite3
 
-import well_data
+import data_list
 import psycopg2
 from openpyxl.styles import Font, Alignment
 
@@ -55,7 +55,7 @@ class TabPageDp(TabPageUnion):
         # if self.work_plan not in ['dop_plan_in_base']:
         #     self.well_number_edit.setText(f'{self.dict_data_well["well_number"]._value}')
 
-        if well_data.data_in_base:
+        if data_list.data_in_base:
             self.well_data_label = QLabel('файл excel')
             self.well_data_in_base_combo = QComboBox()
             self.well_data_in_base_combo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents)
@@ -77,7 +77,7 @@ class TabPageDp(TabPageUnion):
     def update_well(self):
         from .dop_plan_py import TabPageDp
 
-        if well_data.data_in_base:
+        if data_list.data_in_base:
 
             well_list =TabPageDp.check_in_database_well_data2(self, self.well_number_edit.text())
 
@@ -127,12 +127,12 @@ class CorrectPlanWindow(WindowUnion):
         from data_base.work_with_base import insert_data_well_dop_plan, round_cell
         from work_py.dop_plan_py import DopPlanWindow
 
-        from well_data import ProtectedIsNonNone
+        from data_list import ProtectedIsNonNone
 
         well_number = self.tabWidget.currentWidget().well_number_edit.text()
         well_area = self.tabWidget.currentWidget().well_area_edit.text()
 
-        if well_data.data_in_base:
+        if data_list.data_in_base:
             data_well_data_in_base_combo, data_table_in_base_combo = '', ''
 
             well_data_in_base_combo = self.tabWidget.currentWidget().well_data_in_base_combo.currentText()
@@ -146,7 +146,7 @@ class CorrectPlanWindow(WindowUnion):
                 else:
                     self.dict_data_well["work_plan_change"] = 'krs'
 
-            db = connection_to_database(well_data.DB_WELL_DATA)
+            db = connection_to_database(data_list.DB_WELL_DATA)
             data_well_base = WorkDatabaseWell(db, self.dict_data_well)
 
             data_well = data_well_base.check_in_database_well_data(well_number, well_area, well_data_in_base)
@@ -164,22 +164,22 @@ class CorrectPlanWindow(WindowUnion):
 
             DopPlanWindow.work_with_excel(self, well_number, well_area, well_data_in_base, self.dict_data_well["type_kr"])
 
-            well_data.data, well_data.rowHeights, well_data.colWidth, well_data.boundaries_dict = \
+            data_list.data, data_list.rowHeights, data_list.colWidth, data_list.boundaries_dict = \
                 DopPlanWindow.change_pvr_in_bottom(self, self.data, self.rowHeights, self.colWidth,
                                                    self.boundaries_dict)
 
 
             if well_area != '' and well_area != '':
-                self.dict_data_well["well_number"], self.dict_data_well["well_area"] = \
+                self.well_number, self.dict_data_well["well_area"] = \
                     ProtectedIsNonNone(well_number), ProtectedIsNonNone(well_area)
 
 
 
-            well_data.pause = False
+            data_list.pause = False
             self.close()
 
     def add_work_excel(self, ws2, work_list, ind_ins):
-        from well_data import ProtectedIsDigit
+        from data_list import ProtectedIsDigit
         for i in range(1, len(work_list) + 1):  # Добавлением работ
             for j in range(1, 13):
                 cell = ws2.cell(row=i, column=j)
@@ -189,7 +189,7 @@ class CorrectPlanWindow(WindowUnion):
                     if i >= ind_ins:
 
                         if j != 1:
-                            cell.border = well_data.thin_border
+                            cell.border = data_list.thin_border
                         if j == 11:
                             cell.font = Font(name='Arial', size=11, bold=False)
                         # if j == 12:

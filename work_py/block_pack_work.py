@@ -2,7 +2,7 @@ from PyQt5.QtGui import QDoubleValidator, QIntValidator
 from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QTabWidget, \
     QMainWindow, QPushButton
 
-import well_data
+import data_list
 from main import MyMainWindow
 from .acid_paker import CheckableComboBox
 from .alone_oreration import volume_vn_ek
@@ -104,7 +104,7 @@ class TabPageSoBlock(TabPageUnion):
         return round(volume_block, 1)
 
     def calculate_pvr(self):
-        plasts = well_data.texts
+        plasts = data_list.texts
         metr_pvr = 0
         for plast in self.dict_data_well['plast_work']:
             for plast_sel in plasts:
@@ -172,7 +172,7 @@ class BlockPackWindow(WindowUnion):
         self.calculate_chemistry('ЕЛАН', block_type_edit)
 
         self.populate_row(self.ins_ind, work_list, self.table_widget)
-        well_data.pause = False
+        data_list.pause = False
         self.close()
 
     def closeEvent(self, event):
@@ -188,15 +188,15 @@ class BlockPackWindow(WindowUnion):
         from .template_work import TemplateKrs
         if 1 < fluid_new_edit < 1.34:
             type_of_chemistry = 'CaCl'
-            water_fresh = round(well_data.DICT_CALC_CACL[fluid_new_edit][1] * (
+            water_fresh = round(data_list.DICT_CALC_CACL[fluid_new_edit][1] * (
                         block_volume_edit - oil_volume_edit - block_type_edit) / 1000, 1)
-            volume_chemistry = round(well_data.DICT_CALC_CACL[fluid_new_edit][0] * (
+            volume_chemistry = round(data_list.DICT_CALC_CACL[fluid_new_edit][0] * (
                         block_volume_edit - oil_volume_edit - block_type_edit) / 1000, 1)
         elif 1.34 < fluid_new_edit < 1.6:
             type_of_chemistry = 'CaЖГ'
-            water_fresh = round(well_data.DICT_CALC_CAZHG[fluid_new_edit][
+            water_fresh = round(data_list.DICT_CALC_CAZHG[fluid_new_edit][
                                     1] * block_volume_edit - oil_volume_edit - block_type_edit / 1000, 1)
-            volume_chemistry = round(well_data.DICT_CALC_CAZHG[fluid_new_edit][
+            volume_chemistry = round(data_list.DICT_CALC_CAZHG[fluid_new_edit][
                                          0] * block_volume_edit - oil_volume_edit - block_type_edit / 1000, 1)
 
         volume_zatrub = well_volume(self, current_edit) - volume_nkt_metal(

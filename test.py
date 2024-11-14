@@ -3,7 +3,7 @@ import psycopg2
 
 
 # Создание подключения
-import well_data
+import data_list
 from data_base.config_base import connect_to_database, DB_CLASSIFICATION
 
 conn = connect_to_database(DB_CLASSIFICATION)

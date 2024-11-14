@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QMessageBox
 from dotenv import load_dotenv
 import psycopg2
 
-import well_data
+import data_list
 
 from typing import Dict, List
 from abc import ABC, abstractmethod
@@ -476,7 +476,7 @@ class WorkDatabaseWell:
         adedaas = self.dict_data_well["data_list"]
         data_paragraph = json.dumps(self.dict_data_well["data_list"], ensure_ascii=False)
         cdng = self.dict_data_well["cdng"]._value
-        aswdaw = self.dict_data_well["dict_category"]
+
         category_dict = json.dumps(self.dict_data_well["dict_category"], ensure_ascii=False)
         # print(row, self.dict_data_well["count_row_well"])
 
@@ -515,10 +515,10 @@ class WorkDatabaseWell:
                                          AND costumer ={self.path_index} AND work_plan ={self.path_index} 
                                          AND type_kr={self.path_index}
                                                     """, (
-                                data_well, date_today, excel_json, work_plan_str, well_data.user[1], type_kr,
-                                data_paragraph, cdng,
-                                category_dict, str(well_number), well_area, contractor, costumer, work_plan_str,
-                                type_kr))
+                            data_well, date_today, excel_json, work_plan_str, data_list.user[1], type_kr,
+                            data_paragraph, cdng,
+                            category_dict, str(well_number), well_area, contractor, costumer, work_plan_str,
+                            type_kr))
 
                         QMessageBox.information(None, 'Успешно', 'Данные обновлены')
 
@@ -532,8 +532,8 @@ class WorkDatabaseWell:
                             f"{self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, " \
                             f"{self.path_index}, {self.path_index})"
                     data_values = (str(well_number), well_area,
-                                   data_well, date_today, excel_json, contractor, well_data.costumer, work_plan_str,
-                                   well_data.user[1], type_kr, data_paragraph, cdng, category_dict)
+                                   data_well, date_today, excel_json, contractor, data_list.costumer, work_plan_str,
+                                   data_list.user[1], type_kr, data_paragraph, cdng, category_dict)
                     # Выполнение запроса с использованием параметров
                     cursor.execute(query, data_values)
                     # Не забудьте сделать коммит
@@ -574,26 +574,26 @@ class WorkDatabaseWell:
         data_work = (self.dict_data_well["well_number"]._value,
                      self.dict_data_well["well_area"]._value,
                      self.dict_data_well["region"],
-                     well_data.costumer,
-                     well_data.contractor,
+                     data_list.costumer,
+                     data_list.contractor,
                      string_work,
                      self.dict_data_well["type_kr"].split(" ")[0],
                      date_today,
-                     well_data.DICT_VOLUME_CHEMISTRY['цемент'],
-                     well_data.DICT_VOLUME_CHEMISTRY['HCl'],
-                     well_data.DICT_VOLUME_CHEMISTRY['HF'],
-                     well_data.DICT_VOLUME_CHEMISTRY['NaOH'],
-                     well_data.DICT_VOLUME_CHEMISTRY['ВТ СКО'],
-                     well_data.DICT_VOLUME_CHEMISTRY['Глина'],
-                     well_data.DICT_VOLUME_CHEMISTRY['песок'],
-                     well_data.DICT_VOLUME_CHEMISTRY['РПК'],
-                     well_data.DICT_VOLUME_CHEMISTRY['РПП'],
-                     well_data.DICT_VOLUME_CHEMISTRY["извлекаемый пакер"],
-                     well_data.DICT_VOLUME_CHEMISTRY["ЕЛАН"],
-                     well_data.DICT_VOLUME_CHEMISTRY['растворитель'],
-                     well_data.DICT_VOLUME_CHEMISTRY["РИР 2С"],
-                     well_data.DICT_VOLUME_CHEMISTRY["РИР ОВП"],
-                     well_data.DICT_VOLUME_CHEMISTRY['гидрофабизатор'],
+                     data_list.DICT_VOLUME_CHEMISTRY['цемент'],
+                     data_list.DICT_VOLUME_CHEMISTRY['HCl'],
+                     data_list.DICT_VOLUME_CHEMISTRY['HF'],
+                     data_list.DICT_VOLUME_CHEMISTRY['NaOH'],
+                     data_list.DICT_VOLUME_CHEMISTRY['ВТ СКО'],
+                     data_list.DICT_VOLUME_CHEMISTRY['Глина'],
+                     data_list.DICT_VOLUME_CHEMISTRY['песок'],
+                     data_list.DICT_VOLUME_CHEMISTRY['РПК'],
+                     data_list.DICT_VOLUME_CHEMISTRY['РПП'],
+                     data_list.DICT_VOLUME_CHEMISTRY["извлекаемый пакер"],
+                     data_list.DICT_VOLUME_CHEMISTRY["ЕЛАН"],
+                     data_list.DICT_VOLUME_CHEMISTRY['растворитель'],
+                     data_list.DICT_VOLUME_CHEMISTRY["РИР 2С"],
+                     data_list.DICT_VOLUME_CHEMISTRY["РИР ОВП"],
+                     data_list.DICT_VOLUME_CHEMISTRY['гидрофабизатор'],
                      round(self.dict_data_well["norm_of_time"], 1),
                      self.dict_data_well["fluid"]
                      )
@@ -650,7 +650,7 @@ class WorkDatabaseWell:
                            f"WHERE well_number = {self.path_index} AND area_well = {self.path_index} "
                            f"AND contractor = {self.path_index} AND costumer = {self.path_index}"
                            f" AND work_plan={self.path_index} AND type_kr={self.path_index}",
-                           (str(number_well), area_well, well_data.contractor, well_data.costumer, work_plan, type_kr))
+                           (str(number_well), area_well, data_list.contractor, data_list.costumer, work_plan, type_kr))
             data_well = cursor.fetchall()
             return data_well
 
@@ -676,7 +676,7 @@ class WorkDatabaseWell:
             cursor.execute(
                 f"SELECT well_number, area_well, type_kr, today, work_plan FROM wells "
                 f"WHERE well_number={self.path_index} AND contractor={self.path_index} AND costumer ={self.path_index}",
-                (str(number_well), well_data.contractor, well_data.costumer))
+                (str(number_well), data_list.contractor, data_list.costumer))
 
             # Получение всех результатов
             wells_with_data = cursor.fetchall()
@@ -690,7 +690,7 @@ class WorkDatabaseWell:
                            f"WHERE well_number = {self.path_index} AND area_well = {self.path_index} "
                            f"AND contractor = {self.path_index} AND costumer = {self.path_index} AND "
                            f"work_plan={self.path_index}",
-                           (str(number_well), area_well, well_data.contractor, well_data.costumer, work_plan))
+                           (str(number_well), area_well, data_list.contractor, data_list.costumer, work_plan))
 
             data_well = cursor.fetchone()
             return data_well
@@ -759,7 +759,7 @@ class GnktDatabaseWell:
 
 
 def connection_to_database(DB_NAME):
-    if well_data.connect_in_base:
+    if data_list.connect_in_base:
         try:
             db = PostgresConnection(DB_NAME)
             db.connect_to_database()

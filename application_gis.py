@@ -1,6 +1,6 @@
 import openpyxl
 import re
-import well_data
+import data_list
 import sys
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIntValidator, QDoubleValidator
@@ -14,13 +14,14 @@ from work_py.parent_work import TabPageUnion, TabWidgetUnion
 class TabPageSoPvr(TabPageUnion):
 
     def __init__(self, parent=None):
-        super().__init__()
+        super().__init__(parent)
+
         self.validator_int = QIntValidator(0, 600)
         self.validator_float = QDoubleValidator(0.87, 1.65, 2)
 
         self.number_brigada_label = QLabel('Номер бригады', self)
         self.number_brigada_combo = QComboBox(self)
-        brigada_list = list(DICT_TELEPHONE.keys())
+        brigada_list = list(data_list.DICT_TELEPHONE.keys())
         self.number_brigada_combo.addItems(brigada_list)
 
         self.number_telephone_label = QLabel('номер телефона, self')
@@ -28,7 +29,7 @@ class TabPageSoPvr(TabPageUnion):
 
         self.date_new_label = QLabel('Дата заявки', self)
         self.date_new_edit = QLineEdit(self)
-        self.date_new_edit.setText(f'{current_date}')
+        self.date_new_edit.setText(f'{data_list.current_date}')
 
         self.time_new_label = QLabel('Время заявки', self)
         self.time_new_edit = QLineEdit(self)
@@ -125,7 +126,7 @@ class TabPageSoPvr(TabPageUnion):
         self.number_brigada_combo.currentTextChanged.connect(self.update_brigade)
 
     def update_brigade(self, index):
-        self.number_telephone_edit.setText(str(DICT_TELEPHONE[self.number_brigada_combo.currentText()]))
+        self.number_telephone_edit.setText(str(data_list.DICT_TELEPHONE[self.number_brigada_combo.currentText()]))
     def geophygist_data(self):
 
         if self.ComboBoxGeophygist.currentText() in ['Гироскоп', 'АКЦ', 'ЭМДС', 'ПТС', 'РК', 'ГК и ЛМ']:
@@ -140,12 +141,12 @@ class TabWidget(TabWidgetUnion):
 class GisApplication(MyMainWindow):
 
     def __init__(self, table_pvr, parent=None):
-        super( MyMainWindow, self).__init__()
-
+        super(MyMainWindow, self).__init__()
+        self.dict_data_well = parent
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
         self.table_pvr = table_pvr
-        self.tabWidget = TabWidget()
+        self.tabWidget = TabWidget(self.dict_data_well)
 
         self.tableWidget = QTableWidget(0, 3)
         self.tableWidget.setHorizontalHeaderLabels(
@@ -300,9 +301,9 @@ class GisApplication(MyMainWindow):
                 ws.row_dimensions[row_ind+1].hidden = True
 
     def add_work(self):
-        from main import  MyMainWindow
 
-        wb = openpyxl.load_workbook(f'{path_image}property_excel/template_gis.xlsx')
+
+        wb = openpyxl.load_workbook(f'{data_list.path_image}property_excel/template_gis.xlsx')
 
         # Выбираем активный лист
         self.ws_pvr = wb.active
@@ -387,7 +388,7 @@ class GisApplication(MyMainWindow):
         self.dict_data_well["pvr_row"] = []
         self.ws_pvr.print_area = f'B1:AP{85}'
 
-        filenames = f'{self.dict_data_well["well_number"]._value} {self.dict_data_well["well_area"]._value} ГИС {well_data.current_date}.xlsx'
+        filenames = f'{self.dict_data_well["well_number"]._value} {self.dict_data_well["well_area"]._value} ГИС {data_list.current_date}.xlsx'
         path = 'D:\Documents\Desktop\ГТМ\заявки ГИС'
         full_path = path + "/" + filenames
         if wb:
@@ -442,7 +443,7 @@ class GisApplication(MyMainWindow):
             [None, 'Исполнитель', None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, 'по договору №', None, None, None, None, None, 'ГТМ', None, None, None, None, None, None, None,
              None, None, None, None, None, None, None, None, None],
-            [None, 'Заказчик', None, None, None, f'{well_data.contractor}', None, None, None, None, None, None, None, None, None,
+            [None, 'Заказчик', None, None, None, f'{data_list.contractor}', None, None, None, None, None, None, None, None, None,
              None, None, None, None, 'Цех', None, None, self.dict_data_well["cdng"]._value, None, None, None, None, None, None, None, None,
              None, None, None, None, None, None, None, None, None, None],
             [None, 'Уполномоченный представитель', None, None, None, None, None, None, None, None, None, None, None,
@@ -683,7 +684,7 @@ class GisApplication(MyMainWindow):
             [None, 'Заявку подал:', None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None, None, None, None, None, None, 'телефон', None, None, None, None, None, None,
              None, None, None, None, None, None, None, None],
-            [None, f'{user[0]} {user[1]}', None, None, None, None, None, None, None, None, None,
+            [None, f'{data_list.user[0]} {data_list.user[1]}', None, None, None, None, None, None, None, None, None,
              None, None, None, None, None, None, None,
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None],

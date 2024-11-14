@@ -3,7 +3,7 @@ import math
 from PyQt5.QtWidgets import QMessageBox, QWidget, QLabel, QComboBox, QLineEdit, \
     QGridLayout, QPushButton, QTableWidget, QHeaderView, QTableWidgetItem, QApplication
 
-import well_data
+import data_list
 from PyQt5.QtCore import Qt
 
 from work_py.parent_work import TabPageUnion, TabWidgetUnion, WindowUnion
@@ -303,7 +303,7 @@ class TabPageSoWith(TabPageUnion):
             dictance_three = ''
         nkt_diam = self.dict_data_well["nkt_diam"]
         kot_str = ''
-        if 'Ойл' in well_data.contractor:
+        if 'Ойл' in data_list.contractor:
             kot_str = '+ КОТ-50'
         if self.dict_data_well["column_additional"] or \
                 (self.dict_data_well["head_column_additional"]._value >= current_bottom and self.dict_data_well[
@@ -462,7 +462,7 @@ class TabPageSoWith(TabPageUnion):
         if index != '':
 
             kot_str = ''
-            if 'Ойл' in well_data.contractor:
+            if 'Ойл' in data_list.contractor:
                 kot_str = '+ КОТ-50'
 
             SKM_type = self.SKM_type_Combo.currentText()
@@ -793,7 +793,7 @@ class TabPageSoWith(TabPageUnion):
         else:
             return "4", "4"
 
-            # print(f' ЭЦН длина" {well_data.lift_ecn_can, well_data.lift_ecn_can_addition, "ЭЦН" in str(well_data.dict_pump["posle"][0]).upper()}')
+            # print(f' ЭЦН длина" {data_list.lift_ecn_can, data_list.lift_ecn_can_addition, "ЭЦН" in str(data_list.dict_pump["posle"][0]).upper()}')
 
     def definition_roof_not_raiding(self, current_bottom):
 
@@ -1143,7 +1143,7 @@ class TemplateKrs(WindowUnion):
             self.dict_data_well["skm_interval"].extend(skm_list)
 
         self.populate_row(self.ins_ind, work_template_list, self.table_widget)
-        well_data.pause = False
+        data_list.pause = False
         self.close()
 
     def del_row_table(self):
@@ -1298,7 +1298,7 @@ class TemplateKrs(WindowUnion):
              None, None, None, None, None, None, None, 'Мастер КРС', None, None]]
 
         privyazka_nkt = [f'Привязка по ГК и ЛМ По привязому НКТ удостовериться в наличии текущего забоя', None,
-                         f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {well_data.contractor}.'
+                         f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {data_list.contractor}.'
                          f' ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины.'
                          f' По привязому НКТ удостовериться в наличии '
                          f'текущего забоя с плановым, Нормализовать '

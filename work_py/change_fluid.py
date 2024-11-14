@@ -4,7 +4,7 @@ from PyQt5.QtGui import QIntValidator, QDoubleValidator
 from PyQt5.QtWidgets import QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QTabWidget, QMainWindow, QPushButton, \
     QMessageBox
 
-import well_data
+import data_list
 from H2S import calv_h2s
 from main import MyMainWindow
 from work_py.alone_oreration import need_h2s
@@ -292,7 +292,7 @@ class Change_fluid_Window(WindowUnion):
         else:
             work_list = self.fluid_change_old_plast(fluid_new_edit)
         self.populate_row(self.ins_ind, work_list, self.table_widget)
-        well_data.pause = False
+        data_list.pause = False
         self.close()
 
     def closeEvent(self, event):

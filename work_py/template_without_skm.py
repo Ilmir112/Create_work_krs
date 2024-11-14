@@ -1,6 +1,6 @@
 import json
 import math
-import well_data
+import data_list
 
 from PyQt5.QtWidgets import QInputDialog, QMessageBox, QTabWidget, QWidget, QLabel, QComboBox, QMainWindow, QLineEdit, \
     QGridLayout, QPushButton, QBoxLayout, QApplication
@@ -249,7 +249,7 @@ class TabPageSo(TabPageUnion):
                 dictance_template_second != '' and first_template != '':
 
             kot_str = ''
-            if 'Ойл' in well_data.contractor and len(self.dict_data_well['plast_work']) != 0:
+            if 'Ойл' in data_list.contractor and len(self.dict_data_well['plast_work']) != 0:
                 kot_str = '+ КОТ-50'
 
             if self.template_Combo.currentText() == 'шаблон ЭК с хвостом':
@@ -337,7 +337,7 @@ class TabPageSo(TabPageUnion):
         template_str = ''
         skm_teml_str = ''
         kot_str = ''
-        if 'Ойл' in well_data.contractor:
+        if 'Ойл' in data_list.contractor:
             kot_str = '+ КОТ'
         nkt_diam = self.dict_data_well["nkt_diam"]
         if self.dict_data_well["column_additional"] is False or (self.dict_data_well["column_additional"] and
@@ -561,7 +561,7 @@ class TabPageSo(TabPageUnion):
         else:
             return "2", "4"
 
-            # print(f' ЭЦН длина" {well_data.lift_ecn_can, well_data.lift_ecn_can_addition, "ЭЦН" in str(well_data.dict_pump["posle"][0]).upper()}')
+            # print(f' ЭЦН длина" {data_list.plift_ecn_can, data_list.lift_ecn_can_addition, "ЭЦН" in str(data_list.pdict_pump["posle"][0]).upper()}')
 
 
 class TabWidget(TabWidgetUnion):
@@ -651,7 +651,7 @@ class Template_without_skm(WindowUnion):
 
         self.populate_row(self.ins_ind, work_list, self.table_widget)
 
-        well_data.pause = False
+        data_list.pause = False
         self.close()
 
     def closeEvent(self, event):
@@ -824,7 +824,7 @@ class Template_without_skm(WindowUnion):
              None, None, None, None, None, None, None, 'Мастер КРС', None, None]]
 
         privyazka_nkt = [f'Привязка по ГК и ЛМ По привязому НКТ удостовериться в наличии текущего забоя', None,
-                         f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {well_data.contractor}".'
+                         f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {data_list.contractor}".'
                          f' ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины.'
                          f' По привязому НКТ удостовериться в наличии'
                          f'текущего забоя с плановым, Нормализовать забой обратной промывкой тех жидкостью '
@@ -907,7 +907,7 @@ class Template_without_skm(WindowUnion):
                     self.raid_window.show()
                     self.pause_app()
                     drill_work_list = self.raid_window.add_work()
-                    well_data.pause = True
+                    data_list.pause = True
 
                     self.raid_window = None
                 else:
@@ -923,7 +923,7 @@ class Template_without_skm(WindowUnion):
                     self.raid_window.show()
                     self.pause_app()
                     drill_work_list = self.raid_window.add_work()
-                    well_data.pause = True
+                    data_list.pause = True
 
                     self.raid_window = None
                 else:

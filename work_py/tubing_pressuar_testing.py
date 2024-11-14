@@ -1,7 +1,7 @@
 from PyQt5.QtGui import QDoubleValidator, QIntValidator
 from PyQt5.QtWidgets import  QMessageBox, QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QTabWidget, QPushButton
 
-import well_data
+import data_list
 from main import MyMainWindow
 from work_py.parent_work import TabPageUnion, TabWidgetUnion, WindowUnion
 
@@ -118,7 +118,7 @@ class TubingPressuarWindow(WindowUnion):
                                            distance_between_nkt_edit)
 
         self.populate_row(self.ins_ind, work_list, self.table_widget)
-        well_data.pause = False
+        data_list.pause = False
         self.close()
 
     def closeEvent(self, event):

@@ -7,7 +7,7 @@ from PyQt5.QtGui import QPalette, QStandardItem, QIntValidator
 from PyQt5.QtWidgets import QVBoxLayout, QStyledItemDelegate, qApp, QMessageBox, QCompleter, QTableWidget, \
     QTableWidgetItem, QMainWindow
 
-import well_data
+import data_list
 
 from work_py.alone_oreration import volume_vn_nkt, well_volume, kot_work
 from main import MyMainWindow
@@ -94,16 +94,16 @@ class CheckableComboBoxChild(QComboBox):
         self.killTimer(event.timerId())
 
     def updateText(self):
-        well_data.texts = []
+        data_list.texts = []
 
         for i in range(self.model().rowCount()):
 
             if self.model().item(i).checkState() == Qt.Checked:
                 # print(self.model().item(i).text())
 
-                well_data.texts.append(self.model().item(i).text())
+                data_list.texts.append(self.model().item(i).text())
 
-        text = ", ".join(well_data.texts)
+        text = ", ".join(data_list.texts)
 
         self.lineEdit().setText(text)
 
@@ -119,14 +119,14 @@ class CheckableComboBoxChild(QComboBox):
         item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsUserCheckable)
         a = text
         b = TabPageSo.count_plast
-        if text in well_data.plast_work and not text in TabPageSo.count_plast:
+        if text in data_list.plast_work and not text in TabPageSo.count_plast:
             if text not in TabPageSo.count_plast:
-                item.setData(Qt.Unchecked if not text in well_data.plast_work else Qt.Checked, Qt.CheckStateRole)
+                item.setData(Qt.Unchecked if not text in data_list.plast_work else Qt.Checked, Qt.CheckStateRole)
                 TabPageSo.count_plast.append(text)
         else:
-            if well_data.plast_project:
+            if data_list.plast_project:
                 if text not in TabPageSo.count_plast:
-                    item.setData(Qt.Unchecked if not text in well_data.plast_project else Qt.Checked, Qt.CheckStateRole)
+                    item.setData(Qt.Unchecked if not text in data_list.plast_project else Qt.Checked, Qt.CheckStateRole)
 
         self.model().appendRow(item)
 
@@ -270,7 +270,7 @@ class TabPageSoAcid(TabPageUnion):
         self.swabTypeLabel = QLabel("задача при освоении", self)
         self.swabTypeCombo = QComboBox(self)
         self.swabTypeCombo.addItems(['Задача №2.1.13', 'Задача №2.1.16', 'Задача №2.1.11', 'ГРР', 'своя задача'])
-        self.swabTypeCombo.setCurrentIndex(well_data.swabTypeComboIndex)
+        self.swabTypeCombo.setCurrentIndex(data_list.swabTypeComboIndex)
         self.swabTypeCombo.setProperty('value', 'Задача №2.1.16')
 
         self.swab_pakerLabel = QLabel("Глубина посадки нижнего пакера при освоении", self)
@@ -447,7 +447,7 @@ class TabPageSoAcid(TabPageUnion):
             self.paker_depth_zumpf_edit.setParent(None)
 
     def update_calculate_sko(self):
-        plasts = well_data.texts
+        plasts = data_list.texts
         metr_pvr = 0
         for plast in self.dict_data_well['plast_work']:
             for plast_sel in plasts:
@@ -592,8 +592,8 @@ class TabPageSoAcid(TabPageUnion):
     def update_plast_edit(self):
 
         dict_perforation = self.dict_data_well["dict_perforation"]
-        plasts = well_data.texts
-        # print(f'пласты {plasts, len(well_data.texts), len(plasts), well_data.texts}')
+        plasts = data_list.texts
+        # print(f'пласты {plasts, len(data_list.texts), len(plasts), data_list.texts}')
         roof_plast = self.dict_data_well["current_bottom"]
         sole_plast = 0
         for plast in self.dict_data_well['plast_work']:
@@ -643,7 +643,7 @@ class TabPageSoAcid(TabPageUnion):
     def update_paker_edit(self):
         dict_perforation = self.dict_data_well["dict_perforation"]
         rows = self.tableWidget.rowCount()
-        plasts = well_data.texts
+        plasts = data_list.texts
         # print(plasts)
         roof_plast = self.dict_data_well["current_bottom"]
         sole_plast = 0
@@ -950,9 +950,9 @@ class AcidPakerWindow(WindowUnion):
                     if paker_khost < 0:
                         QMessageBox.warning(self, "ВНИМАНИЕ", 'Не корректная компоновка')
                         return
-                    well_data.paker_khost = paker_khost
+                    data_list.paker_khost = paker_khost
                 else:
-                    paker_khost = well_data.paker_khost
+                    paker_khost = data_list.paker_khost
 
                 paker_depth = int(float(self.tableWidget.item(row, 2).text()))
                 paker2_depth = int(float(self.tableWidget.item(row, 3).text()))
@@ -981,9 +981,9 @@ class AcidPakerWindow(WindowUnion):
                 plast_combo = self.tableWidget.item(row, 0).text()
                 if row == 0:
                     paker_khost = int(float(self.tableWidget.item(row, 1).text()))
-                    well_data.paker_khost = paker_khost
+                    data_list.paker_khost = paker_khost
                 else:
-                    paker_khost = well_data.paker_khost
+                    paker_khost = data_list.paker_khost
                 paker_depth = int(float(self.tableWidget.item(row, 2).text()))
                 svk_true_combo = self.tableWidget.cellWidget(row, 3).currentText()
                 acid_edit = self.tableWidget.cellWidget(row, 4).currentText()
@@ -1012,9 +1012,9 @@ class AcidPakerWindow(WindowUnion):
                 plast_combo = self.tableWidget.item(row, 0).text()
                 if row == 0:
                     paker_khost = int(float(self.tableWidget.item(row, 1).text()))
-                    well_data.paker_khost = paker_khost
+                    data_list.paker_khost = paker_khost
                 else:
-                    paker_khost = well_data.paker_khost
+                    paker_khost = data_list.paker_khost
                 paker_depth = int(float(self.tableWidget.item(row, 2).text()))
                 svk_true_combo = self.tableWidget.cellWidget(row, 3).currentText()
                 acid_edit = self.tableWidget.cellWidget(row, 4).currentText()
@@ -1035,9 +1035,9 @@ class AcidPakerWindow(WindowUnion):
                 plast_combo = self.tableWidget.item(row, 0).text()
                 if row == 0:
                     paker_khost = int(float(self.tableWidget.item(row, 1).text()))
-                    well_data.paker_khost = paker_khost
+                    data_list.paker_khost = paker_khost
                 else:
-                    paker_khost = well_data.paker_khost
+                    paker_khost = data_list.paker_khost
 
                 svk_true_combo = self.tableWidget.cellWidget(row, 2).currentText()
                 acid_edit = self.tableWidget.cellWidget(row, 3).currentText()
@@ -1169,7 +1169,7 @@ class AcidPakerWindow(WindowUnion):
         self.calculate_chemistry(acid_edit, acid_volume_edit)
 
         self.populate_row(self.ins_ind, work_template_list, self.table_widget)
-        well_data.pause = False
+        data_list.pause = False
         self.close()
 
 
@@ -1333,7 +1333,7 @@ class AcidPakerWindow(WindowUnion):
             mtg_str = 'контейнер с манометром МТГ'
         else:
             mtg_str = ''
-        if swab_true_edit_type == 'без освоения' and 'Ойл' in well_data.contractor:
+        if swab_true_edit_type == 'без освоения' and 'Ойл' in data_list.contractor:
             swab_layout = 'Заглушку + щелевой фильтр'
             swab_layout2 = 'сбивной клапан с ввертышем'
         else:

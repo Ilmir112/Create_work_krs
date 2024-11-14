@@ -5,7 +5,7 @@ import sqlite3
 
 import openpyxl
 import psycopg2
-import well_data
+import data_list
 
 from datetime import datetime
 
@@ -36,8 +36,8 @@ class Classifier_well(MyMainWindow):
         self.region = region
         self.costumer = costumer
         self.number_well = None
-        if self.dict_data_well["well_number"]:
-            self.number_well = self.dict_data_well["well_number"]._value
+        # if self.well_number:
+        #     self.number_well = self.dict_data_well["well_number"]._value
 
         self.setCentralWidget(self.table_class)
         self.model = self.table_class.model()
@@ -129,7 +129,7 @@ class Classifier_well(MyMainWindow):
         self.setLayout(layout)
 
     def get_data_from_db(self, region):
-        db = connection_to_database(well_data.DB_CLASSIFICATION)
+        db = connection_to_database(data_list.DB_CLASSIFICATION)
 
         well_classification = CheckWellExistence(db)
         data = well_classification.get_data_from_db(region)
@@ -138,7 +138,7 @@ class Classifier_well(MyMainWindow):
 
     @staticmethod
     def insert_database(data_base, data_work, query):
-        if well_data.connect_in_base:
+        if data_list.connect_in_base:
 
             # Параметры подключения к PostgreSQL
             try:
@@ -152,7 +152,7 @@ class Classifier_well(MyMainWindow):
 
         else:
             try:
-                db_path = connect_to_db('well_data.db', 'data_base_well')
+                db_path = connect_to_db('data_list.db', 'data_base_well')
                 # Создание подключения к базе данных SQLite
                 conn = sqlite3.connect(db_path)
                 query.replace('%s', '?')
@@ -197,7 +197,7 @@ class Classifier_well(MyMainWindow):
             conn.close()
 
     def get_data_from_class_well_db(self, region):
-        db = connection_to_database(well_data.DB_CLASSIFICATION)
+        db = connection_to_database(data_list.DB_CLASSIFICATION)
 
         well_classification = CheckWellExistence(db)
         data = well_classification.get_data_from_class_well_db(region)
@@ -234,10 +234,10 @@ class Classifier_well(MyMainWindow):
             if index_row > 18:
                 break
 
-        if well_data.connect_in_base:
+        if data_list.connect_in_base:
             try:
                 # Подключение к базе данных
-                db = connection_to_database(well_data.DB_CLASSIFICATION)
+                db = connection_to_database(data_list.DB_CLASSIFICATION)
                 self.classification_well = CheckWellExistence(db)
 
                 REGION_LIST = ['ЧГМ', 'АГМ', 'ТГМ', 'ИГМ', 'КГМ', ]
@@ -330,7 +330,7 @@ class Classifier_well(MyMainWindow):
         ws = wb.active
 
         try:
-            db = connection_to_database(well_data.DB_CLASSIFICATION)
+            db = connection_to_database(data_list.DB_CLASSIFICATION)
             self.classification_well = CheckWellExistence(db)
 
             check_param, well_column, cdng, area_column, oilfield, categoty_pressure, pressure_Gst, \
@@ -548,7 +548,7 @@ def excel_in_json(self, sheet):
 
 
 def insert_data_well_dop_plan(self, data_well):
-    from well_data import ProtectedIsDigit, ProtectedIsNonNone
+    from data_list import ProtectedIsDigit, ProtectedIsNonNone
 
     well_data_dict = json.loads(data_well)
 
@@ -557,7 +557,7 @@ def insert_data_well_dop_plan(self, data_well):
     self.dict_data_well["column_direction_lenght"] = ProtectedIsDigit(well_data_dict["направление"]["башмак"])
     self.dict_data_well["level_cement_direction"] = ProtectedIsDigit(well_data_dict["направление"]["цемент"])
     self.dict_data_well["column_conductor_diametr"] = ProtectedIsDigit(well_data_dict["кондуктор"]["диаметр"])
-    well_data.column_conductor_wall_thicknes = ProtectedIsDigit(well_data_dict["кондуктор"]["толщина стенки"])
+    data_list.column_conductor_wall_thicknes = ProtectedIsDigit(well_data_dict["кондуктор"]["толщина стенки"])
     self.dict_data_well["column_conductor_lenght"] = ProtectedIsDigit(well_data_dict["кондуктор"]["башмак"])
     self.dict_data_well["level_cement_conductor"] = ProtectedIsDigit(well_data_dict["кондуктор"]["цемент"])
     self.dict_data_well["column_diametr"] = ProtectedIsDigit(well_data_dict["ЭК"]["диаметр"])
@@ -725,7 +725,7 @@ def insert_data_new_excel_file(self, data, rowHeights, colWidth, boundaries_dict
         if any(['Наименование работ' in str(col.value) for col in row[:13]]) and self.dict_data_well["work_plan"] not in [
             'plan_change']:
             index_delete = index_row + 2
-            well_data.gns_ind2 = index_row + 2
+            data_list.gns_ind2 = index_row + 2
 
         elif any(['ПЛАН РАБОТ' in str(col.value).upper() for col in row[:4]]) and self.dict_data_well["work_plan"] not in [
             'plan_change']:
@@ -733,7 +733,7 @@ def insert_data_new_excel_file(self, data, rowHeights, colWidth, boundaries_dict
 
         elif any(['ИТОГО:' in str(col.value).upper() for col in row[:4]]) and self.dict_data_well["work_plan"] in ['plan_change']:
             index_delete = index_row + 2
-            well_data.gns_ind2 = index_row + 2
+            data_list.gns_ind2 = index_row + 2
 
         elif all([col is None for col in row[:13]]):
             sheet_new.row_dimensions[index_row].hidden = True

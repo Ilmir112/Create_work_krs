@@ -1,4 +1,4 @@
-import well_data
+import data_list
 
 from PyQt5.QtWidgets import QWidget, QLabel, QLineEdit, QPushButton, QMessageBox, QComboBox, QGridLayout
 from PyQt5.QtCore import Qt
@@ -65,7 +65,7 @@ class LoginWindow(QWidget):
         password = self.password.text()
         last_name, first_name, second_name, _ = username.split(' ')
 
-        db = connection_to_database(well_data.DB_NAME_USER)
+        db = connection_to_database(data_list.DB_NAME_USER)
 
         user_service = UserService(db, db.path_index)
 
@@ -74,25 +74,25 @@ class LoginWindow(QWidget):
                 and user_dict['second_name'] and user_dict['password'] == str(password):
             # mes = QMessageBox.information(self, 'Пароль', 'вход произведен')
             self.close()
-            well_data.user = (user_dict["pozition"] + ' ' + user_dict["organization"],
+            data_list.user = (user_dict["pozition"] + ' ' + user_dict["organization"],
                               f'{user_dict["last_name"]} '
                               f'{user_dict["first_name"][0]}.{user_dict["second_name"][0]}.')
 
-            well_data.contractor = user_dict["organization"]
+            data_list.contractor = user_dict["organization"]
 
-            well_data.pause = True
+            data_list.pause = True
         else:
             QMessageBox.critical(self, 'Пароль', 'логин и пароль не совпадает')
 
 
-        well_data.pause = False
+        data_list.pause = False
 
 
-        if 'РН' in well_data.contractor:
-            well_data.connect_in_base = False
+        if 'РН' in data_list.contractor:
+            data_list.connect_in_base = False
 
     def get_list_users(self):
-        db = connection_to_database(well_data.DB_NAME_USER)
+        db = connection_to_database(data_list.DB_NAME_USER)
         user_service = UserService(db, db.path_index)
         users_list = user_service.get_users_list()
         return users_list
@@ -191,7 +191,7 @@ class RegisterWindow(QWidget):
         password = self.password.text().strip()
         password2 = self.password2.text().strip()
 
-        db = connection_to_database(well_data.DB_NAME_USER)
+        db = connection_to_database(data_list.DB_NAME_USER)
 
         registration = RegistrationService(db, db.path_index)
 

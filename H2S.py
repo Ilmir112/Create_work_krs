@@ -1,4 +1,4 @@
-import well_data
+import data_list
 from openpyxl.styles import Border, Side, Font,  Alignment
 from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QTabWidget, \
     QMainWindow, QPushButton, QTextEdit

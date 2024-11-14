@@ -11,7 +11,7 @@ import time
 import psutil
 import requests
 import zipfile
-import well_data
+import data_list
 from PyQt5.QtNetwork import QSslConfiguration, QSslCertificate, QSslKey, QSsl
 
 from PyQt5.QtWidgets import (
@@ -88,7 +88,7 @@ class UpdateChecker(QWidget):
         return super().eventFilter(obj, event)
 
     def def_complete_prog(self):
-        well_data.pause = False
+        data_list.pause = False
         self.close()
 
     def start_update(self):
@@ -159,7 +159,7 @@ class UpdateChecker(QWidget):
     def on_close(self):
         UpdateChecker.close()
     def get_current_version(self):
-        with open(f'{well_data.path_image}users/version_app.json', 'r') as file:
+        with open(f'{data_list.path_image}users/version_app.json', 'r') as file:
             data = json.load(file)
             version_app = data['version']
         return version_app
@@ -266,7 +266,7 @@ class UpdateThread(QThread):
 
     def update_process(self):
 
-        extract_len = len(well_data.path_image) + len('ZIMA.exe')
+        extract_len = len(data_list.path_image) + len('ZIMA.exe')
 
         extract_dir = os.path.dirname(os.path.abspath(__file__))[:-extract_len]
         new_extract_dir = extract_dir + '/ZimaUpdate'
@@ -293,7 +293,7 @@ class UpdateThread(QThread):
         print(f'папка архива {new_extract_dir}')
         # Файл databaseWell.db существует, перемещаем все, кроме исключений
         for filename in os.listdir(new_extract_dir):
-            if filename not in ["databaseWell.db", "well_data.db", "users.db", 'version_app.json', 'my_app.log']:
+            if filename not in ["databaseWell.db", "data_list.pdb", "users.db", 'version_app.json', 'my_app.log']:
                 source_path = os.path.join(new_extract_dir, filename)[:-len('/zima')]
                 print(f'source_path {source_path}')
                 absolute_path = os.path.abspath(__file__)
@@ -365,11 +365,11 @@ class UpdateThread(QThread):
     @staticmethod
     def update_version(new_version):
         # Открываем JSON файл для чтения
-        with open(f'{well_data.path_image}users/version_app.json', "r") as file:
+        with open(f'{data_list.path_image}users/version_app.json', "r") as file:
             data = json.load(file)
             data["version"] = new_version
 
-        with open(f'{well_data.path_image}users/version_app.json', 'w') as file:
+        with open(f'{data_list.path_image}users/version_app.json', 'w') as file:
             json.dump(data, file, indent=4)
     @staticmethod
     def close_zima(zima_process_name):

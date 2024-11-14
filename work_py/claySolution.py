@@ -1,13 +1,13 @@
 from PyQt5.QtWidgets import QInputDialog, QMessageBox
 
-import well_data
+import data_list
 from work_py.alone_oreration import volume_vn_ek, volume_vn_nkt, well_volume
 
 from PyQt5.QtGui import QDoubleValidator, QIntValidator
 from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QTabWidget, \
     QMainWindow, QPushButton
 
-import well_data
+import data_list
 from main import MyMainWindow
 from .parent_work import TabWidgetUnion, WindowUnion, TabPageUnion
 from .rir import RirWindow
@@ -199,7 +199,7 @@ class ClayWindow(WindowUnion):
             work_list = self.clay_solution_q(current_bottom_edit, volume_clay_edit)
 
         self.populate_row(self.ins_ind, work_list, self.table_widget)
-        well_data.pause = False
+        data_list.pause = False
         self.close()
 
     def clay_solution_q(self, current_bottom_edit, volume_clay_edit):
@@ -221,7 +221,7 @@ class ClayWindow(WindowUnion):
             [None, None,
              f'По результатам определения приёмистости выполнить следующие работы: \n'
              f'В случае приёмистости свыше 480 м3/сут при Р=100атм выполнить работы по закачке гдинистого раствора '
-             f'(по согласованию с ГС и ПТО {well_data.contractor} и заказчика). \n'
+             f'(по согласованию с ГС и ПТО {data_list.contractor} и заказчика). \n'
              f'В случае приёмистости менее 480 м3/сут при Р=100атм и более 120м3/сут при Р=100атм приступить '
              f'к выполнению РИР',
              None, None, None, None, None, None, None,

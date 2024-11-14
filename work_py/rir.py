@@ -1,4 +1,4 @@
-import well_data
+import data_list
 from PyQt5.QtGui import QDoubleValidator, QIntValidator
 from PyQt5.QtWidgets import QMessageBox, QInputDialog, QLabel, QComboBox, QLineEdit, QGridLayout, QWidget, QPushButton, \
     QMainWindow, QTabWidget
@@ -334,7 +334,7 @@ class TabPageSoRir(TabPageUnion):
 
         dict_perforation = self.dict_data_well["dict_perforation"]
 
-        plasts = well_data.texts
+        plasts = data_list.texts
 
         roof_plast = self.dict_data_well["current_bottom"]
         sole_plast = 0
@@ -416,9 +416,9 @@ class RirWindow(WindowUnion):
              None, None, None, None, None, None, None,
              'мастер КРС', descentNKT_norm(roof_rir_edit, 1.2)],
             [f'Привязка по ГК и ЛМ', None,
-             f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {well_data.contractor}". '
+             f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {data_list.contractor}". '
              f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером  '
-             f'{well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г. '
+             f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г. '
              f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины',
              None, None, None, None, None, None, None,
              'Мастер КРС, подрядчик по ГИС', 4],
@@ -516,9 +516,9 @@ class RirWindow(WindowUnion):
              None, None, None, None, None, None, None,
              'мастер КРС', descentNKT_norm(roof_rir_edit, 1.2)],
             [f'Привязка по ГК и ЛМ', None,
-             f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {well_data.contractor}". '
+             f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {data_list.contractor}". '
              f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером '
-             f'{well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г. '
+             f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г. '
              f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины Отбить забой по ГК и ЛМ',
              None, None, None, None, None, None, None,
              'Мастер КРС, подрядчик по ГИС', 4],
@@ -772,7 +772,7 @@ class RirWindow(WindowUnion):
                 [None, None,
                  f'По результатам определения приёмистости выполнить следующие работы: \n'
                  f'В случае приёмистости свыше 480 м3/сут при Р=100атм выполнить работы по закачке гдинистого раствора '
-                 f'(по согласованию с ГС и ПТО {well_data.contractor} и заказчика). \n'
+                 f'(по согласованию с ГС и ПТО {data_list.contractor} и заказчика). \n'
                  f'В случае приёмистости менее 480 м3/сут при Р=100атм и более 120м3/сут при Р=100атм приступить '
                  f'к выполнению РИР',
                  None, None, None, None, None, None, None,
@@ -1220,7 +1220,7 @@ class RirWindow(WindowUnion):
             self.calculate_chemistry('РПП', volume_cement)
 
         self.populate_row(self.ins_ind, work_list, self.table_widget)
-        well_data.pause = False
+        data_list.pause = False
         self.close()
 
     def calc_buffer(self, roof, sole, dict_nkt):
@@ -1238,7 +1238,7 @@ class RirWindow(WindowUnion):
                                                   int(self.dict_data_well["perforation_roof"] - 50), 0,
                                                   int(self.dict_data_well["bottomhole_drill"]._value))
 
-        well_data.paker_izv_paker = paker_izv_paker
+        data_list.paker_izv_paker = paker_izv_paker
         rir_list = [[f'СПО пакера извлекаемый до глубины {paker_izv_paker}м',
                      None,
                      f'Спустить  пакера извлекаемый компании НЕОИНТЕХ +НКТ 20м + реперный патрубок 2м на тНКТ до'
@@ -1247,7 +1247,7 @@ class RirWindow(WindowUnion):
                      None, None, None, None, None, None, None,
                      'Мастер КРС, подрядчик РИР, УСРСиСТ', liftingNKT_norm(paker_izv_paker, 1.2)],
                     [f'Привязка', None,
-                     f'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС {well_data.contractor}". '
+                     f'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС {data_list.contractor}". '
                      f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины',
                      None, None, None, None, None, None, None,
                      'Мастер КРС, подрядчик по ГИС', 4],
@@ -1325,41 +1325,41 @@ class RirWindow(WindowUnion):
              f'спайдере дополнительно устанавливать элеватор ЭХЛ)',
              None, None, None, None, None, None, None,
              'Мастер КР', descentNKT_norm(self.dict_data_well["current_bottom"], 1)],
-            [f'Вымыв песка до гл.{well_data.paker_izv_paker - 10}',
+            [f'Вымыв песка до гл.{data_list.paker_izv_paker - 10}',
              None,
              f'Произвести нормализацию забоя (вымыв кварцевого песка) с наращиванием, комбинированной промывкой '
              f'по круговой циркуляции '
-             f'жидкостью  с расходом жидкости не менее 8 л/с до гл.{well_data.paker_izv_paker - 10}м. \n'
+             f'жидкостью  с расходом жидкости не менее 8 л/с до гл.{data_list.paker_izv_paker - 10}м. \n'
              f'Тех отстой 2ч. Повторное определение текущего забоя, при необходимости повторно вымыть.',
              None, None, None, None, None, None, None,
              'мастер КРС', 3.5],
             [None, None,
              f'Поднять {RirWindow.pero_select(self, self.dict_data_well["current_bottom"])} НКТ{self.dict_data_well["nkt_diam"]}мм с глубины '
-             f'{well_data.paker_izv_paker - 10}м с доливом '
+             f'{data_list.paker_izv_paker - 10}м с доливом '
              f'скважины'
-             f' в объеме {round((well_data.paker_izv_paker - 10) * 1.12 / 1000, 1)}м3 тех. '
+             f' в объеме {round((data_list.paker_izv_paker - 10) * 1.12 / 1000, 1)}м3 тех. '
              f'жидкостью  уд.весом {self.dict_data_well["fluid_work"]}',
              None, None, None, None, None, None, None,
-             'мастер КРС', liftingNKT_norm(well_data.paker_izv_paker - 10, 1)]]
+             'мастер КРС', liftingNKT_norm(data_list.paker_izv_paker - 10, 1)]]
 
         emer_list = [
             [f'СПО лов. инст до до Н= {self.dict_data_well["current_bottom"]}', None,
              f'Спустить с замером ловильный инструмент на НКТ до Н= {self.dict_data_well["current_bottom"]}м с замером. ',
              None, None, None, None, None, None, None,
              'мастер КРС', liftingNKT_norm(self.dict_data_well["current_bottom"], 1)],
-            [f'Вымыв песка до {well_data.paker_izv_paker}м. Извлечение пакера', None,
+            [f'Вымыв песка до {data_list.paker_izv_paker}м. Извлечение пакера', None,
              f'Произвести нормализацию (вымыв кварцевого песка) на ловильном инструменте до глубины '
-             f'{well_data.paker_izv_paker}м обратной '
+             f'{data_list.paker_izv_paker}м обратной '
              f'промывкой уд.весом {self.dict_data_well["fluid_work"]} \n'
-             f'Произвести  ловильный работы при представителе заказчика на глубине {well_data.paker_izv_paker}м.',
+             f'Произвести  ловильный работы при представителе заказчика на глубине {data_list.paker_izv_paker}м.',
              None, None, None, None, None, None, None,
-             'мастер КРС', liftingNKT_norm(well_data.paker_izv_paker, 1)],
+             'мастер КРС', liftingNKT_norm(data_list.paker_izv_paker, 1)],
             [None, None,
-             f'Расходить и поднять компоновку НКТ{self.dict_data_well["nkt_diam"]}мм с глубины {well_data.paker_izv_paker}м с '
-             f'доливом скважины в объеме {round(well_data.paker_izv_paker * 1.12 / 1000, 1)}м3 тех. жидкостью '
+             f'Расходить и поднять компоновку НКТ{self.dict_data_well["nkt_diam"]}мм с глубины {data_list.paker_izv_paker}м с '
+             f'доливом скважины в объеме {round(data_list.paker_izv_paker * 1.12 / 1000, 1)}м3 тех. жидкостью '
              f'уд.весом {self.dict_data_well["fluid_work"]}',
              None, None, None, None, None, None, None,
-             'мастер КРС', liftingNKT_norm(well_data.paker_izv_paker, 1)]]
+             'мастер КРС', liftingNKT_norm(data_list.paker_izv_paker, 1)]]
         for row in emer_list:
             rir_list.append(row)
 

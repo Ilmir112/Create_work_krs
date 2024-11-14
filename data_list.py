@@ -63,8 +63,6 @@ number_bush = ProtectedIsDigit(0)
 
 BOTTOM_TYPE_LIST = ['ЦМ', 'РПК', 'РПП', 'ВП', 'Гипсовых отложений', 'проходимости']
 
-
-
 DB_WELL_DATA = 'well_data'
 DB_NAME_USER = 'krs2'
 DB_NAME_GNKT = 'gnkt_database'
@@ -72,20 +70,12 @@ DB_CLASSIFICATION = 'databaseclassification'
 
 plast_all = []
 
-
 pause = True
-
-
-
 
 costumer = 'ОАО "Башнефть"'
 contractor = 'ойл-сервис'
-dict_contractor = {
+DICT_CONTRACTOR = {
     'ООО "Ойл-сервис"':
-        {
-            'Дата ПВО': 'от 15.10.2021'
-        },
-    'ООО "Ойл-cервис"':
         {
             'Дата ПВО': 'от 15.10.2021'
         },
@@ -107,17 +97,15 @@ plan_correct_index = 0
 cat_h2s_list = []
 user = ['', '']
 
-
 data_in_base = False
 
-# path_image = '_internal/'
-path_image = ''
+path_image = '_internal/'
+# path_image = ''
 
 DICT_VOLUME_CHEMISTRY = {'пункт': [], 'цемент': 0.0, 'HCl': 0.0, 'HF': 0.0, 'NaOH': 0.0, 'ВТ СКО': 0.0,
                          'Глина': 0.0, 'растворитель': 0.0, 'уд.вес': 0.0,
                          'песок': 0.0, 'РПК': 0.0, 'РПП': 0.0, "извлекаемый пакер": 0.0, "ЕЛАН": 0.0,
                          'РИР 2С': 0.0, 'РИР ОВП': 0.0, 'гидрофабизатор': 0.0}
-
 
 data = ''
 rowHeights = ''
@@ -260,10 +248,6 @@ DICT_TELEPHONE = {
     'Бригада ГНКТ №1': 9174003142,
     'Бригада ГНКТ №2': 9174001690
 }
-
-
-
-
 
 REGION_LIST = ['', 'АГМ', 'ИГМ', 'ТГМ', 'ЧГМ', 'КГМ']
 

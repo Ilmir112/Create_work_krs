@@ -1,7 +1,7 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QCheckBox, QPushButton, QDialog
 
-import well_data
+import data_list
 
 
 class CheckBoxDialog(QDialog):
@@ -30,7 +30,7 @@ class CheckBoxDialog(QDialog):
 
     def handle_button_click(self):
 
-        well_data.plast_select = ''
+        data_list.plast_select = ''
         selected_options = []
         # print(f' рабочие пласты {self.dict_data_well['plast_work']}')
         for plast in self.dict_data_well['plast_work']:
@@ -46,7 +46,7 @@ class CheckBoxDialog(QDialog):
         print("Selected options:", selected_options)
         plast_select = ', '.join(selected_options)
         self.close()
-        return well_data.plast_select
+        return data_list.plast_select
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

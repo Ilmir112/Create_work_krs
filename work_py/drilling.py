@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QLineEdit, QComboBox, QGridLayout, QTabWidget, \
     QTableWidget, QHeaderView, QPushButton, QTableWidgetItem, QApplication, QMainWindow
 
-import well_data
+import data_list
 from PyQt5.QtCore import Qt
 
 from main import MyMainWindow
@@ -71,7 +71,7 @@ class TabPageSoDrill(TabPageUnion):
         self.drill_label = QLabel("добавление поинтервального бурения", self)
         self.drill_cm_combo = QComboBox(self)
 
-        self.drill_cm_combo.addItems(well_data.BOTTOM_TYPE_LIST)
+        self.drill_cm_combo.addItems(data_list.pOTTOM_TYPE_LIST)
 
         self.need_privyazka_Label = QLabel("Привязка оборудования", self)
         self.need_privyazka_QCombo = QComboBox()
@@ -116,7 +116,7 @@ class TabPageSoDrill(TabPageUnion):
         if sole_drill_line != '':
             sole_drill_line = int(float(sole_drill_line))
         if self.dict_data_well["for_paker_list"]:
-            if well_data.depth_paker_izv  <= sole_drill_line:
+            if data_list.depth_paker_izv  <= sole_drill_line:
                 QMessageBox.information(self, 'ОШИБКА', 'Необходимо извлечь извлекаемый пакер')
                 self.sole_drill_line.setText('')
 
@@ -226,8 +226,8 @@ class Drill_window(WindowUnion):
         sole_drill = self.tabWidget.currentWidget().sole_drill_line.text().replace(',', '.')
         drill_type = self.tabWidget.currentWidget().drill_cm_combo.currentText()
         drill_type_combo = QComboBox(self)
-        drill_type_combo.addItems(well_data.BOTTOM_TYPE_LIST)
-        index_drill_True = well_data.BOTTOM_TYPE_LIST.index(drill_type)
+        drill_type_combo.addItems(data_list.BOTTOM_TYPE_LIST)
+        index_drill_True = data_list.BOTTOM_TYPE_LIST.index(drill_type)
         drill_type_combo.setCurrentIndex(index_drill_True)
 
         if not roof_drill or not sole_drill:
@@ -364,12 +364,12 @@ class Drill_window(WindowUnion):
 
         try:
             self.populate_row(self.ins_ind, drill_list, self.table_widget)
-            well_data.pause = False
+            data_list.pause = False
 
             self.close()
         except:
 
-            well_data.pause = False
+            data_list.pause = False
             self.close()
             return drill_list
 

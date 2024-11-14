@@ -3,7 +3,7 @@ from copy import copy
 from openpyxl.styles import Alignment
 from openpyxl.utils.cell import range_boundaries, get_column_letter
 
-import well_data
+import data_list
 
 
 def delete_rows_pz(self, ws, cat_well_min, data_well_max, data_x_max):
@@ -27,7 +27,7 @@ def delete_rows_pz(self, ws, cat_well_min, data_well_max, data_x_max):
     ws.delete_rows(1, cat_well_min._value - 1)
 
     # print(sorted(boundaries_dict))
-    well_data.rowHeights = rowHeights1
+    data_list.rowHeights = rowHeights1
 
     for _ in range(16):
         ws.insert_rows(1, 1)
@@ -36,9 +36,9 @@ def delete_rows_pz(self, ws, cat_well_min, data_well_max, data_x_max):
             ws.merge_cells(start_column=value[0], start_row=value[1] + 16 - cat_well_min._value + 1,
                            end_column=value[2], end_row=value[3] + 16 - cat_well_min._value + 1)
 
-    # print(f'{ws.max_row, len(well_data.rowHeights)}dd')
+    # print(f'{ws.max_row, len(data_list.prowHeights)}dd')
     for index_row, row in enumerate(ws.iter_rows()):  # Копирование высоты строки
-        ws.row_dimensions[index_row + 17].height = well_data.rowHeights[index_row - 1]
+        ws.row_dimensions[index_row + 17].height = data_list.rowHeights[index_row - 1]
 
 
 def head_ind(start, finish):

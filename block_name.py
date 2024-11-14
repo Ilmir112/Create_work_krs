@@ -1,6 +1,6 @@
 from datetime import datetime
 
-import well_data
+import data_list
 from cdng import REGION_BASHNEFT_DICT
 import json
 
@@ -12,7 +12,7 @@ def region_select(cdng):
 
 # выбор подписантов в зависимости от вида ГТМ
 def curator_sel(curator, region):
-    with open(f'{well_data.path_image}podpisant.json', 'r', encoding='utf-8') as file:
+    with open(f'{data_list.path_image}podpisant.json', 'r', encoding='utf-8') as file:
         podpis_dict = json.load(file)
     if curator == 'ОР':
         return (podpis_dict["регион"][region]['ruk_orm']['post'], podpis_dict["регион"][region]["ruk_orm"]['surname'])
@@ -32,10 +32,10 @@ current_datetime = datetime.today()
 # Выбор подписантов в зависимости от региона
 def pop_down(self, region, curator_sel):
 
-    with open(f'{well_data.path_image}podpisant.json', 'r', encoding='utf-8') as file:
+    with open(f'{data_list.path_image}podpisant.json', 'r', encoding='utf-8') as file:
         podpis_dict = json.load(file)
     nach_list = ''
-    if 'Ойл' in well_data.contractor:
+    if 'Ойл' in data_list.contractor:
         nach_tkrs = ''
         nach_tkrs_post = ''
         if region == 'ЧГМ' or region == 'ТГМ' or 'gnkt' in self.dict_data_well["work_plan"]:
@@ -49,25 +49,25 @@ def pop_down(self, region, curator_sel):
             nach_tkrs_post = podpis_dict["ООО Ойл-сервис"]["head_of_workshop_4"]["post"]
 
         nach_list = [
-            [None, f'План работ составил {well_data.user[0]}', None, None, None, None, '___________________', None,
+            [None, f'План работ составил {data_list.user[0]}', None, None, None, None, '___________________', None,
              None,
-             f'{well_data.user[1]}', None, None],
+             f'{data_list.user[1]}', None, None],
             [None, None, None, None, None, None, None, None, 'дата составления', None,
              datetime.now().strftime('%d.%m.%Y'),
              None],
             [None, None, f'{nach_tkrs_post}', None, None, None, None, None, None,
              nach_tkrs, None, None],
             [None, None, None, None, None, None, None, None, None, '     дата подписания', None, None]]
-    elif "РН" in well_data.contractor:
+    elif "РН" in data_list.contractor:
         nach_list = [
-            [None, f'План работ составил {well_data.user[0]}', None, None, None, None, '___________________', None,
+            [None, f'План работ составил {data_list.user[0]}', None, None, None, None, '___________________', None,
              None,
-             f'{well_data.user[1]}', None, None],
+             f'{data_list.user[1]}', None, None],
             [None, None, None, None, None, None, None, None, 'дата составления', None,
              datetime.now().strftime('%d.%m.%Y'),
              None]]
 
-    with open(f'{well_data.path_image}podpisant.json', 'r', encoding='utf-8') as file:
+    with open(f'{data_list.path_image}podpisant.json', 'r', encoding='utf-8') as file:
         podpis_dict = json.load(file)
 
     podp_down = [
@@ -116,17 +116,17 @@ def pop_down(self, region, curator_sel):
          None, None, None],
         [None, None, None, 'Проинструктированы, с планом работ ознакомлены:                         ', None,
          None, None, None, None, None, None, None],
-        [None, None, 'Мастер бригады', None, None, None, f'Инструктаж провел мастер бригады {well_data.contractor}',
+        [None, None, 'Мастер бригады', None, None, None, f'Инструктаж провел мастер бригады {data_list.contractor}',
          None, None, None, None, None],
         [None, None, 'Мастер бригады', None, None, None, None, None, None, None, 'подпись', None],
-        [None, f'Бурильщик {well_data.contractor}', None, None,
-         f'_____________________Бурильщик {well_data.contractor}________________________', None, None, None, None,
+        [None, f'Бурильщик {data_list.contractor}', None, None,
+         f'_____________________Бурильщик {data_list.contractor}________________________', None, None, None, None,
          None, None, None],
-        [None, f'Пом.бур-ка {well_data.contractor}', None, None,
-         f'_____________________Пом.бур-ка {well_data.contractor}_______________________', None, None, None, None,
+        [None, f'Пом.бур-ка {data_list.contractor}', None, None,
+         f'_____________________Пом.бур-ка {data_list.contractor}_______________________', None, None, None, None,
          None, None, None],
-        [None, f'Пом.бур-ка {well_data.contractor}', None, None,
-         f'_____________________Пом.бур-ка {well_data.contractor}_______________________', None, None, None, None,
+        [None, f'Пом.бур-ка {data_list.contractor}', None, None,
+         f'_____________________Пом.бур-ка {data_list.contractor}_______________________', None, None, None, None,
          None, None, None],
         [None, None, 'Машинист', None,
          '_____________________ Машинист ________________________', None, None, None,
@@ -187,7 +187,7 @@ def pop_down(self, region, curator_sel):
 
 
 def razdel_1(self, region, contractor):
-    with open(f'{well_data.path_image}podpisant.json', 'r', encoding='utf-8') as file:
+    with open(f'{data_list.path_image}podpisant.json', 'r', encoding='utf-8') as file:
         podpis_dict = json.load(file)
     razdel_1 = ''
     if 'Ойл' in contractor:
@@ -221,7 +221,7 @@ def razdel_1(self, region, contractor):
         razdel_1 = [
             [None, 'СОГЛАСОВАНО:', None, None, None, None, None, 'УТВЕРЖДАЕМ:', None, None, None, None],
             [None, podpis_dict["регион"][region]['gi']['post'], None, None, None, None, None,
-             f'Главный Инженер Экспедиции № 5 {well_data.contractor} филиал г. Уфа ', None, None, None, None],
+             f'Главный Инженер Экспедиции № 5 {data_list.contractor} филиал г. Уфа ', None, None, None, None],
             [None, f'____________{podpis_dict["регион"][region]["gi"]["surname"]}', None, None, None, None, None,
              '_____________А.А. Фаррахов ', None, None, None, None],
             [None, f'"____"_____________________{current_datetime.year}г.', None, None, None, None, None,
@@ -231,7 +231,7 @@ def razdel_1(self, region, contractor):
              None, None, None],
             [None, podpis_dict["регион"][region]['gg']['post'], None, None, None,
              None,
-             None, f'Главный геолог Экспедиции № 5 {well_data.contractor} филиал г.Уфа', None, None, None, None],
+             None, f'Главный геолог Экспедиции № 5 {data_list.contractor} филиал г.Уфа', None, None, None, None],
 
             [None, f'_____________{podpis_dict["регион"][region]["gg"]["surname"]}', None, None, None, None, None,
              f'_____________Е.А. Самойлова', None, None, '',
@@ -261,7 +261,7 @@ def razdel_1(self, region, contractor):
         [None, f'"____"_____________________{current_datetime.year}г.', None, None, None, None, None, None,
          None, None, None,
          None]]
-    if well_data.data_in_base is False:
+    if data_list.data_in_base is False:
 
         if len(self.dict_data_well['plast_work']) != 0:
             # print(self.dict_data_well['plast_work'], self.dict_data_well["dict_category"])

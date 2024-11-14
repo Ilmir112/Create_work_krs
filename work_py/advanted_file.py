@@ -5,7 +5,7 @@ from io import BytesIO
 from PyQt5.QtWidgets import QMessageBox
 
 import plan
-import well_data
+import data_list
 
 from openpyxl.styles import Font, Alignment
 from main import MyMainWindow
@@ -339,7 +339,7 @@ def definition_plast_work(self):
     self.dict_data_well['plast_all'] = list(self.dict_data_well["dict_perforation"].keys())
     self.dict_data_well['plast_work'] = list(plast_work)
     self.dict_data_well["plast_all"] = list(self.dict_data_well["dict_perforation"].keys())
-    well_data.plast_work = self.dict_data_well['plast_work']
+    data_list.plast_work = self.dict_data_well['plast_work']
     if len(self.dict_data_well["dict_perforation_project"]) != 0:
         self.dict_data_well["plast_project"] = list(self.dict_data_well["dict_perforation_project"].keys())
 
@@ -402,7 +402,7 @@ def count_row_height(self, wb2, ws, ws2, work_list, merged_cells_dict, ind_ins):
                     if abs(i - ind_ins) > 1 and stop_str > i:
                         ws2[F"B{i}"].value = f'=COUNTA($C${ind_ins + 2}:C{i})'
                     if j != 1:
-                        cell.border = well_data.thin_border
+                        cell.border = data_list.thin_border
                     if j == 11:
                         cell.font = Font(name='Arial', size=11, bold=False)
                     # if j == 12:
@@ -487,7 +487,7 @@ def count_row_height(self, wb2, ws, ws2, work_list, merged_cells_dict, ind_ins):
                 # Проверка размеров изображения:
                 print(f"Размеры изображения: {image.size}")
 
-                file = f'{well_data.path_image}imageFiles/image_work/{coord}.png'
+                file = f'{data_list.path_image}imageFiles/image_work/{coord}.png'
 
                 # # Преобразуем изображение в режим RGB
                 # image = image.convert('RGB')

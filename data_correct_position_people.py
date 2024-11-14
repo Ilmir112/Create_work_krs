@@ -1,5 +1,5 @@
 import json
-import well_data
+import data_list
 
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.Qt import *
@@ -16,7 +16,7 @@ class TabPageSO(QWidget):
         super().__init__()
 
         # Открытие JSON файла и чтение данных
-        with open(f'{well_data.path_image}podpisant.json', 'r', encoding='utf-8') as file:
+        with open(f'{data_list.path_image}podpisant.json', 'r', encoding='utf-8') as file:
             self.podpis_dict = json.load(file)
         TabPageSO.podpis_dict = self.podpis_dict
 
@@ -26,13 +26,13 @@ class TabPageSO(QWidget):
 
         self.regionLabel = QLabel("Регион", self)
         self.regioncomboBox = QComboBox(self)
-        self.REGION_LIST = well_data.REGION_LIST
+        self.REGION_LIST = data_list.REGION_LIST
         self.regioncomboBox.addItems(self.REGION_LIST)
         self.regioncomboBox.currentIndexChanged.connect(self.update_line_edit)
 
-        if 'Ойл' in well_data.contractor and 'Ойл' not in self.productLavelType.currentText():
+        if 'Ойл' in data_list.contractor and 'Ойл' not in self.productLavelType.currentText():
             self.productLavelType.addItems(['Ойл'])
-        elif 'РН' in well_data.contractor and 'РН' not in self.productLavelType.currentText():
+        elif 'РН' in data_list.contractor and 'РН' not in self.productLavelType.currentText():
             self.productLavelType.addItems(['РН'])
 
         self.region_select = self.regioncomboBox.currentText()
@@ -251,7 +251,7 @@ class CorrectSignaturesWindow(WindowUnion):
             self.podpis_dict['регион'][selected_region]["grr"]['post'] = representative_of_grr_edit_type
             self.podpis_dict['регион'][selected_region]["grr"]['surname'] = representative_of_grr_name_edit_type
 
-            with open(f'{well_data.path_image}podpisant.json', 'w', encoding='utf-8') as json_file:
+            with open(f'{data_list.path_image}podpisant.json', 'w', encoding='utf-8') as json_file:
                 json.dump(self.podpis_dict, json_file, indent=4, ensure_ascii=False)
 
             self.close()

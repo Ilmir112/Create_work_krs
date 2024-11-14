@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QMessageBox
 
-import well_data
+import data_list
 from .descent_gno import GnoDescentWindow
 
 
@@ -14,7 +14,7 @@ def rgd_without_paker(self):
          'мастер КРС', 1.3],
         [None, None,
          f'Произвести  монтаж ГИС согласно схемы  №8 при работе ГИС с утвержденной главным инженером  '
-         f'{well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г '
+         f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г '
          f'Обвязать устье скважины с ЕДК на жесткую линию. Опрессовать ПВО максимально допустимое давление '
          f'опрессовки э/колонны на '
          f'устье {self.dict_data_well["max_admissible_pressure"]._value}атм, по невозможности на давление поглощения, но не'
@@ -28,7 +28,7 @@ def rgd_without_paker(self):
          None, None, None, None, None, None, None,
          'мастер КРС', ''.join(['10' if self.dict_data_well["region"] != 'ЧГМ' else '4'])],
         [None, None,
-         f'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС {well_data.contractor}". Составить'
+         f'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС {data_list.contractor}". Составить'
          f' акт готовности скважины и передать его начальнику партии. При необходимости подготовить площадку'
          f' напротив мостков для постановки партии ГИС.',
          None, None, None, None, None, None, None,
@@ -72,7 +72,7 @@ def rgd_with_paker(self):
          None, None, None, None, None, None, None,
          'мастер КРС', ''.join(['10' if self.dict_data_well["region"] != 'ЧГМ' else '4'])],
         [None, None,
-         f'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС {well_data.contractor}". '
+         f'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС {data_list.contractor}". '
          f'Составить'
          ' акт готовности скважины и передать его начальнику партии. При необходимости подготовить площадку'
          ' напротив мостков для постановки партии ГИС.',

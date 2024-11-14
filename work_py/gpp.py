@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QMessageBox, QLabel, QLineEdit, QComboBox, QGridLayo
 
 import krs
 import main
-import well_data
+import data_list
 from main import MyMainWindow
 from .parent_work import TabWidgetUnion, WindowUnion, TabPageUnion
 
@@ -106,14 +106,14 @@ class GppWindow(WindowUnion):
         work_list = self.grpGpp(paker_depth, current_depth, diametr_paker, gisOTZ_after_true_quest)
 
         self.populate_row(self.ins_ind, work_list, self.table_widget)
-        well_data.pause = False
+        data_list.pause = False
         self.close()
 
     def grpGpp(self, gpp_depth, current_depth, diametr_paker, gisOTZ_after_true_quest):
 
-        if 'Ойл' in well_data.contractor:
+        if 'Ойл' in data_list.contractor:
             schema_grp = '7'
-        elif 'РН' in well_data.contractor:
+        elif 'РН' in data_list.contractor:
             schema_grp = '6'
 
         nkt_diam = ''.join(['89' if self.dict_data_well["column_diametr"]._value > 110 else '60'])
@@ -150,9 +150,9 @@ class GppWindow(WindowUnion):
              'мастер КРС', ''],
             [f'Привязка по ГК и ЛМ',
              None, f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС '
-                   f'{well_data.contractor}". '
+                   f'{data_list.contractor}". '
                    f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером '
-                   f'{well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г. '
+                   f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г. '
                    f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины',
              None, None, None, None, None, None, None,
              'Мастер КРС, подрядчик по ГИС', 4],
@@ -167,8 +167,8 @@ class GppWindow(WindowUnion):
              'Мастер КРС, заказчик', " "],
             [None, None,
              f'Обвязать устье скважины согласно схемы ПВО №{schema_grp} утвержденной главным инженером'
-             f' {well_data.contractor} '
-             f' {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г для проведения ГРП на месторождениях'
+             f' {data_list.contractor} '
+             f' {data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г для проведения ГРП на месторождениях'
              f' ООО "БашнефтьДобыча". Посадить планшайбу. '
              f'Произвести демонтаж'
              f' оборудования. Опрессовать установленную арматуру для ГРП на '

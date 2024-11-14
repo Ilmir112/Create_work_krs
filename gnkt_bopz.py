@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox, QMainWindow, QTabWidget, 
     QGridLayout, QWidget, QPushButton
 from PyQt5 import QtWidgets
 
-import well_data
+import data_list
 from cdng import events_gnvp_frez
 from krs import GnoWindow
 from main import MyMainWindow
@@ -142,8 +142,8 @@ class TabPageGnkt(TabPageUnion):
     def update_plast_edit(self):
 
         dict_perforation = self.dict_data_well["dict_perforation"]
-        plasts = well_data.texts
-        # print(f'пласты {plasts, len(well_data.texts), len(plasts), well_data.texts}')
+        plasts = data_list.texts
+        # print(f'пласты {plasts, len(data_list.ptexts), len(plasts), data_list.texts}')
         roof_plast = self.dict_data_well["current_bottom"]
         sole_plast = 0
         for plast in self.dict_data_well['plast_work']:
@@ -239,7 +239,7 @@ class GnktBopz(GnktModel):
 
         work_list = self.gnkt_work(self.data_gnkt)
 
-        well_data.pause = False
+        data_list.pause = False
         self.close()
         return work_list
 
@@ -316,7 +316,7 @@ class GnktBopz(GnktModel):
              f'Произвести монтаж 4-х секционного превентора БП 80-70.00.00.000 (700атм) и инжектора на устье скважины '
              f'согласно «Схемы обвязки №5 устья противовыбросовым оборудованием при производстве работ по промывке '
              f'скважины с установкой «ГНКТ» утвержденная главным инженером  '
-             f'{well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г. Произвести обвязку установки '
+             f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г. Произвести обвязку установки '
              f'ГНКТ, насосно-компрессорного агрегата, желобной циркуляционной системы.',
              None, None, None, None, None, None, None, None, 'Мастер ГНКТ'],
             [None, 10,
@@ -485,7 +485,7 @@ class GnktBopz(GnktModel):
             [None, 38, 
              'ВНИМАНИЕ: При наличии посадок КНК - спуск производить с остановками для промежуточных '
              'промывок. В случае прихвата ГНКТ в скважине - проинформировсть ответственного представителя Заказчика и '
-             f'руководство ГНКТ {well_data.contractor}. Дальнейшие действия производить в '
+             f'руководство ГНКТ {data_list.contractor}. Дальнейшие действия производить в '
              f'присутствии представителя Заказчика '
              'с составлением АКТа согласно "Плана-Схемы действий при прихватах ГНКТ" ТЕХНОЛОГИЧЕСКОЙ ИНСТРУКЦИИ ОАО '
              '«Башнефть добыча»', None, None, None, None, None, None, None, None, 

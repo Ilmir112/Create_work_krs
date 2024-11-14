@@ -2,7 +2,7 @@ import logging
 
 from PyQt5.QtGui import QDoubleValidator, QIntValidator
 
-import well_data
+import data_list
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QLineEdit, QComboBox, QGridLayout, QTabWidget, \
@@ -156,7 +156,7 @@ class TabPageSoPakerIzv(TabPageUnion):
             self.roof_sand_edit.setParent(None)
             if self.dict_data_well["for_paker_list"] == True:
 
-                self.paker_depth_line.setText(f'{well_data.depth_paker_izv}')
+                self.paker_depth_line.setText(f'{data_list.depth_paker_izv}')
             self.current_bottom_edit.setText(str(self.dict_data_well["current_bottom2"]))
 
     def update_depth_paker(self):
@@ -271,7 +271,7 @@ class PakerIzvlek(WindowUnion):
             raid_list = PakerIzvlek.izvlech_paker(self, pero_diametr_line, paker_depth_line, current_bottom)
 
         self.populate_row(self.ins_ind, raid_list, self.table_widget)
-        well_data.pause = False
+        data_list.pause = False
         self.close()
 
     def rir_izvelPaker(self, paker_depth_line, pero_diametr_line, paker_type_combo, sand_question, roof_sand_edit):
@@ -287,7 +287,7 @@ class PakerIzvlek(WindowUnion):
              None, None, None, None, None, None, None,
              'Мастер КРС, подрядчик РИР, УСРСиСТ', liftingNKT_norm(paker_depth_line, 1.2)],
             [f'Привязка', None,
-             f'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС {well_data.contractor}". '
+             f'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС {data_list.contractor}". '
              f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины',
              None, None, None, None, None, None, None,
              'Мастер КРС, подрядчик по ГИС', 4],
@@ -343,7 +343,7 @@ class PakerIzvlek(WindowUnion):
                 rir_list.append(row)
             self.dict_data_well["current_bottom2"] = self.dict_data_well["current_bottom"]
             self.dict_data_well["current_bottom"] = roof_sand_edit
-            well_data.depth_paker_izv = paker_depth_line
+            data_list.depth_paker_izv = paker_depth_line
             self.calculate_chemistry('песок', volume_sand)
         else:
             rir_list.append([None, None,
@@ -355,7 +355,7 @@ class PakerIzvlek(WindowUnion):
             self.dict_data_well["current_bottom"] = paker_depth_line
 
         self.dict_data_well["for_paker_list"] = True
-        well_data.depth_paker_izv = paker_depth_line
+        data_list.depth_paker_izv = paker_depth_line
         return rir_list
 
     def izvlech_paker(self, pero_diametr_line, paker_depth_line, current_bottom):

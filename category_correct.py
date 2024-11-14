@@ -8,7 +8,7 @@ from work_py.acid_paker import CheckableComboBox
 
 from collections import namedtuple
 
-import well_data
+import data_list
 from H2S import calv_h2s
 from work_py.parent_work import TabPageUnion, TabWidgetUnion, WindowUnion
 
@@ -61,7 +61,7 @@ class TabPageSo(TabPageUnion):
 
         n = 1
         work_plast_iter = None
-        well_data.number_indez = []
+        data_list.number_indez = []
         work_plast = ''
         work_plast_index = 1
 
@@ -214,7 +214,7 @@ class TabPageSo(TabPageUnion):
                                        category_gf_edit, h2s_pr_edit, h2s_mg_edit, gaz_f_pr_edit,
                                        pressuar_data_edit, isolated_plast, calc_plast_h2s)
 
-            well_data.number_indez.append(n)
+            data_list.number_indez.append(n)
             n += 3
 
     def ifNone(self, string):
@@ -268,7 +268,7 @@ class CategoryWindow(WindowUnion):
         Data_h2s = namedtuple("Data_h2s", "category data_procent data_mg_l poglot")
         Data_gaz = namedtuple("Data_gaz", "category data")
         if cat_P_1:
-            for index in well_data.number_indez:
+            for index in data_list.number_indez:
                 for ind in range(1, 6):
                     if self.ifNum(self.tabWidget.currentWidget().labels_category[index][ind].text()) is False:
                         QMessageBox.warning(self, 'Ошибка', 'ошибка в сохранении данных, не корректные данные ')
@@ -306,7 +306,7 @@ class CategoryWindow(WindowUnion):
                             'отключение', self.tabWidget.currentWidget().labels_category[index][8].currentText())
 
                         self.dict_data_well["dict_category"] = self.dict_category
-                        well_data.pause = False
+                        data_list.pause = False
 
                     except:
                         QMessageBox.warning(self, 'Ошибка', "Ошибка сохранения данных по категории")

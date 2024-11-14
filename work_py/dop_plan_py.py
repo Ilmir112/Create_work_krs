@@ -3,7 +3,7 @@ from collections import namedtuple
 
 from openpyxl.styles import Font, Alignment
 
-import well_data
+import data_list
 
 from PyQt5.Qt import *
 from PyQt5.QtGui import QIntValidator, QDoubleValidator
@@ -169,7 +169,7 @@ class TabPageDp(TabPageUnion):
         self.change_pvr_combo.setCurrentIndex(0)
 
 
-        if well_data.data_in_base:
+        if data_list.data_in_base:
 
             # self.table_in_base_label = QLabel('данные по скважине')
             # self.table_in_base_combo = QComboBox()
@@ -201,7 +201,7 @@ class TabPageDp(TabPageUnion):
                 self.number_DP_Combo.setCurrentIndex(int(number_dp_in_base))
 
     def check_in_database_well_data2(self, number_well):
-        db = connection_to_database(well_data.DB_WELL_DATA)
+        db = connection_to_database(data_list.DB_WELL_DATA)
         data_well_base = WorkDatabaseWell(db, self.dict_data_well)
 
 
@@ -294,7 +294,7 @@ class TabPageDp(TabPageUnion):
     def update_well(self):
 
         self.table_name = str(self.well_number_edit.text()) + self.well_area_edit.text()
-        if well_data.data_in_base:
+        if data_list.data_in_base:
 
             well_list = self.check_in_database_well_data2(self.well_number_edit.text())
             if well_list:
@@ -514,7 +514,7 @@ class DopPlanWindow(WindowUnion):
                         self.target_row_index_cancel = int(i)
                         break
                     elif 'Порядок работы' in str(row[2]['value']):
-                        self.dict_data_well["data_x_max"] = well_data.ProtectedIsDigit(int(i) + 1)
+                        self.dict_data_well["data_x_max"] = data_list.ProtectedIsDigit(int(i) + 1)
                         break
                     elif 'ИТОГО:' in str(row[col]['value']) and self.dict_data_well["work_plan"] in ['plan_change']:
                         self.target_row_index_cancel = int(i)+1
@@ -550,7 +550,7 @@ class DopPlanWindow(WindowUnion):
         DataWindow.definition_open_trunk_well(self)
     @staticmethod
     def read_excel_in_base(number_well, area_well, work_plan, type_kr):
-        db = connection_to_database(well_data.DB_WELL_DATA)
+        db = connection_to_database(data_list.DB_WELL_DATA)
         data_well_base = WorkDatabaseWell(db)
 
         data_well = data_well_base.read_excel_in_base(number_well, area_well, work_plan, type_kr)
@@ -742,7 +742,7 @@ class DopPlanWindow(WindowUnion):
 
     def add_work(self):
         from data_base.work_with_base import  insert_data_well_dop_plan, round_cell
-        from well_data import ProtectedIsNonNone
+        from data_list import ProtectedIsNonNone
         from work_py.advanted_file import definition_plast_work
         self.dict_data_well["data_list"] = []
         
@@ -756,7 +756,7 @@ class DopPlanWindow(WindowUnion):
         if change_pvr_combo == '':
             QMessageBox.warning(self, 'Ошибка', 'Нужно выбрать пункт изменения ПВР')
             return
-        if well_data.data_in_base:
+        if data_list.data_in_base:
 
             fluid = current_widget.fluid_edit.text().replace(',', '.')
 
@@ -798,7 +798,7 @@ class DopPlanWindow(WindowUnion):
                                            'уд. вес рабочей жидкости не может быть меньше 0,87 и больше 1,64')
                 return
 
-            if well_data.data_in_base:
+            if data_list.data_in_base:
                 if 'г/см3' not in fluid:
                     QMessageBox.critical(self, 'уд.вес', 'нужно добавить значение "г/см3" в уд.вес')
                     return
@@ -889,7 +889,7 @@ class DopPlanWindow(WindowUnion):
             well_number = current_widget.well_number_edit.text()
             well_area = current_widget.well_area_edit.text()
             if well_area != '' and well_area != '':
-                self.dict_data_well["well_number"], self.dict_data_well["well_area"] = \
+                self.well_number, self.dict_data_well["well_area"] = \
                     ProtectedIsNonNone(well_number), ProtectedIsNonNone(well_area)
             if index_change_line != '':
                 index_change_line = int(float(index_change_line))
@@ -925,16 +925,16 @@ class DopPlanWindow(WindowUnion):
                         else:
                             list_row.append(None)
                     plast_row.append(list_row)
-                well_data.data, well_data.rowHeights, well_data.colWidth, well_data.boundaries_dict = \
+                data_list.data, data_list.rowHeights, data_list.colWidth, data_list.boundaries_dict = \
                     self.insert_row_in_pvr(self.data, self.rowHeights, self.colWidth, self.boundaries_dict, plast_row,
                                            current_bottom, current_bottom_date_edit, method_bottom_combo)
             else:
 
-                well_data.data, well_data.rowHeights, well_data.colWidth, well_data.boundaries_dict = \
+                data_list.data, data_list.rowHeights, data_list.colWidth, data_list.boundaries_dict = \
                     self.change_pvr_in_bottom(self.data, self.rowHeights, self.colWidth, self.boundaries_dict,
                                               current_bottom, current_bottom_date_edit, method_bottom_combo)
-            if well_data.data_in_base:
-                well_data.dop_work_list = self.work_list(work_earlier)
+            if data_list.data_in_base:
+                data_list.dop_work_list = self.work_list(work_earlier)
             else:
                 work_list = self.work_list(work_earlier)
                 self.populate_row(self.ins_ind + 3, work_list, self.table_widget, self.work_plan)
@@ -1017,7 +1017,7 @@ class DopPlanWindow(WindowUnion):
             self.populate_row(self.ins_ind + 2, work_list, self.table_widget, self.work_plan)
             definition_plast_work(self)
 
-        well_data.pause = False
+        data_list.pause = False
         self.close()
 
     def add_work_excel(self, ws2, work_list, ind_ins):
@@ -1030,7 +1030,7 @@ class DopPlanWindow(WindowUnion):
                     if i >= ind_ins:
 
                         if j != 1:
-                            cell.border = well_data.thin_border
+                            cell.border = data_list.thin_border
                         if j == 11:
                             cell.font = Font(name='Arial', size=11, bold=False)
                         # if j == 12:
@@ -1060,10 +1060,10 @@ class DopPlanWindow(WindowUnion):
         well_number = table_name.split(' ')[0]
         well_area = table_name.split(' ')[1]
         type_kr = table_name.split(' ')[2].replace('None', 'null')
-        contractor = well_data.contractor
+        contractor = data_list.contractor
         work_plan = table_name.split(' ')[3]
 
-        db = connection_to_database(well_data.DB_WELL_DATA)
+        db = connection_to_database(data_list.DB_WELL_DATA)
         data_well_base = WorkDatabaseWell(db, self.dict_data_well)
 
 
@@ -1115,10 +1115,10 @@ class DopPlanWindow(WindowUnion):
                 data = DopPlanWindow.insert_data_plan(self, result)
                 if data is None:
                     return None
-            well_data.data_well_is_True = True
+            data_list.data_well_is_True = True
 
         else:
-            well_data.data_in_base = False
+            data_list.data_in_base = False
             QMessageBox.warning(self, 'Проверка наличия таблицы в базе данных',
                                       f"Таблицы '{table_name}' нет в базе данных.")
 

@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QMessageBox, QWidget, QLabel, QComboBox, \
     QLineEdit, QGridLayout, QTabWidget, \
     QMainWindow, QPushButton, QApplication, QInputDialog, QTableWidget, QTableWidgetItem
 
-import well_data
+import data_list
 from H2S import calv_h2s
 
 from work_py.alone_oreration import well_volume
@@ -80,7 +80,7 @@ class TabPageSoSwab(TabPageUnion):
         self.swabTypeCombo.addItems(['', 'Задача №2.1.13', 'Задача №2.1.14', 'Задача №2.1.16', 'Задача №2.1.11',
                                      'Задача №2.1.16 + герметичность пакера', 'ГРР'
                                                                               'своя задача'])
-        self.swabTypeCombo.setCurrentIndex(well_data.swabTypeComboIndex)
+        self.swabTypeCombo.setCurrentIndex(data_list.swabTypeComboIndex)
 
         self.swab_volumeEditLabel = QLabel("объем освоения", self)
         self.swab_volumeEdit = QLineEdit(self)
@@ -309,7 +309,7 @@ class TabPageSoSwab(TabPageUnion):
     def update_paker_edit(self):
         dict_perforation = self.dict_data_well["dict_perforation"]
         rows = self.tableWidget.rowCount()
-        plasts = well_data.texts
+        plasts = data_list.texts
         # print(plasts)
         roof_plast = self.dict_data_well["current_bottom"]
         sole_plast = 0
@@ -528,8 +528,8 @@ class TabPageSoSwab(TabPageUnion):
     def update_plast_edit(self):
 
         dict_perforation = self.dict_data_well["dict_perforation"]
-        plasts = well_data.texts
-        # print(f'пласты {plasts, len(well_data.texts), len(plasts), well_data.texts}')
+        plasts = data_list.texts
+        # print(f'пласты {plasts, len(data_list.ptexts), len(plasts), data_list.texts}')
         roof_plast = self.dict_data_well["current_bottom"]
         sole_plast = 0
 
@@ -832,9 +832,9 @@ class SwabWindow(WindowUnion):
                     if paker_khost < 0:
                         QMessageBox.warning(self, "ВНИМАНИЕ", 'Не корректная компоновка')
                         return
-                    well_data.paker_khost = paker_khost
+                    data_list.paker_khost = paker_khost
                 else:
-                    paker_khost = well_data.paker_khost
+                    paker_khost = data_list.paker_khost
 
                 paker_depth = int(float(self.tableWidget.item(row, 2).text()))
                 paker2_depth = int(float(self.tableWidget.item(row, 3).text()))
@@ -868,9 +868,9 @@ class SwabWindow(WindowUnion):
                     if paker_khost < 0:
                         QMessageBox.warning(self, "ВНИМАНИЕ", 'Не корректная компоновка')
                         return
-                    well_data.paker_khost = paker_khost
+                    data_list.paker_khost = paker_khost
                 else:
-                    paker_khost = well_data.paker_khost
+                    paker_khost = data_list.paker_khost
 
                 paker_depth = int(float(self.tableWidget.item(row, 2).text()))
                 swabTypeCombo = self.tableWidget.cellWidget(row, 3).currentText()
@@ -912,9 +912,9 @@ class SwabWindow(WindowUnion):
                     if paker_khost < 0:
                         QMessageBox.warning(self, "ВНИМАНИЕ", 'Не корректная компоновка')
                         return
-                    well_data.paker_khost = paker_khost
+                    data_list.paker_khost = paker_khost
                 else:
-                    paker_khost = well_data.paker_khost
+                    paker_khost = data_list.paker_khost
 
                 paker_depth = int(float(self.tableWidget.item(row, 2).text()))
                 swabTypeCombo = self.tableWidget.cellWidget(row, 3).currentText()
@@ -955,7 +955,7 @@ class SwabWindow(WindowUnion):
                 work_list = self.swabbing_opy_with_paker(diametr_paker, paker_khost, paker_depth, paker2_depth)
 
         self.populate_row(self.ins_ind, work_list, self.table_widget)
-        well_data.pause = False
+        data_list.pause = False
         self.close()
 
     def closeEvent(self, event):
@@ -963,9 +963,9 @@ class SwabWindow(WindowUnion):
         self.operation_window = None
         event.accept()  # Принимаем событие закрытия
     def swabbing_opy_with_paker(self, diametr_paker, paker_khost, paker_depth, depth_opy):
-        if 'Ойл' in well_data.contractor:
+        if 'Ойл' in data_list.contractor:
             schema_swab = '8'
-        elif 'РН' in well_data.contractor:
+        elif 'РН' in data_list.contractor:
             schema_swab = '7'
         if self.check_true_depth_template(paker_depth) is False:
             return
@@ -1035,13 +1035,13 @@ class SwabWindow(WindowUnion):
              None, None, None, None, None, None, None,
              'мастер КРС', 1.2],
             [None, None,
-             f'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС {well_data.contractor}". '
+             f'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС {data_list.contractor}". '
              f' Составить акт готовности скважины и передать его начальнику партии',
              None, None, None, None, None, None, None,
              'мастер КРС', None],
             [None, None,
              f'Произвести  монтаж СВАБа согласно схемы №{schema_swab} при свабированиии утвержденной главным инженером от '
-             f'{well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}. '
+             f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}. '
              f'Обвязать устье скважины с ЕДК на жесткую линию. Опрессовать ПВО максимально допустимое давление '
              f'опрессовки э/колонны на устье {self.dict_data_well["max_admissible_pressure"]._value}атм,'
              f' по невозможности на давление поглощения, но не менее 30атм в течении 30мин Провести практическое '
@@ -1147,9 +1147,9 @@ class SwabWindow(WindowUnion):
         elif nkt_diam == 60:
             dict_nkt = {60: depth_opy}
 
-        if 'Ойл' in well_data.contractor:
+        if 'Ойл' in data_list.contractor:
             schema_swab = '8'
-        elif 'РН' in well_data.contractor:
+        elif 'РН' in data_list.contractor:
             schema_swab = '7'
 
         paker_list = [
@@ -1178,13 +1178,13 @@ class SwabWindow(WindowUnion):
              None, None, None, None, None, None, None,
              'мастер КРС', liftingNKT_norm(float(self.dict_data_well["current_bottom"]) - (depth_opy + 200), 1)],
             [None, None,
-             f'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС {well_data.contractor}". '
+             f'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС {data_list.contractor}". '
              f' Составить акт готовности скважины и передать его начальнику партии',
              None, None, None, None, None, None, None,
              'мастер КРС', None],
             [None, None,
              f'Произвести  монтаж СВАБа согласно схемы №{schema_swab} при свабированиии утвержденной главным инженером '
-             f'{well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г. '
+             f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г. '
              f'Обвязать устье скважины с ЕДК на жесткую линию. Опрессовать ПВО максимально допустимое'
              f' давление опрессовки э/колонны на устье {self.dict_data_well["max_admissible_pressure"]._value}атм,'
              f' по невозможности на давление поглощения, но не менее 30атм в течении 30мин Провести практическое '
@@ -1362,9 +1362,9 @@ class SwabWindow(WindowUnion):
             dict_nkt = {int(nkt_diam): paker_depth + paker_khost}
         elif nkt_diam == 60:
             dict_nkt = {60: paker_depth + paker_khost}
-        if 'Ойл' in well_data.contractor:
+        if 'Ойл' in data_list.contractor:
             schema_swab = '8'
-        elif 'РН' in well_data.contractor:
+        elif 'РН' in data_list.contractor:
             schema_swab = '7'
         paker_list = [
             [f'СПО {paker_short} на НКТ{nkt_diam}м до H- {paker_depth}м, заглушкой до {paker_depth + paker_khost}м',
@@ -1383,13 +1383,13 @@ class SwabWindow(WindowUnion):
              'мастер КРС', 0.4],
 
             [None, None,
-             f'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС {well_data.contractor}". '
+             f'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС {data_list.contractor}". '
              f' Составить акт готовности скважины и передать его начальнику партии',
              None, None, None, None, None, None, None,
              'мастер КРС', None],
             [None, None,
              f'Произвести  монтаж СВАБа согласно схемы №{schema_swab} при свабированиии утвержденной главным инженером '
-             f'{well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г.'
+             f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г.'
              f'Обвязать устье скважины с ЕДК на жесткую линию. Опрессовать ПВО на максимально допустимое '
              f'давление на устье {self.dict_data_well["max_admissible_pressure"]._value}атм,'
              f' по невозможности на давление поглощения, но не менее 30атм в течении 30мин Провести '
@@ -1436,8 +1436,8 @@ class SwabWindow(WindowUnion):
         for plast in list(self.dict_data_well["dict_perforation"].keys()):
             for interval in self.dict_data_well["dict_perforation"][plast]['интервал']:
                 if abs(float(interval[1] - paker_depth)) < 10 or abs(float(interval[0] - paker_depth)) < 10:
-                    if privyazkaNKT(self) not in paker_list and well_data.privyazkaSKO == 0:
-                        well_data.privyazkaSKO += 1
+                    if privyazkaNKT(self) not in paker_list and data_list.privyazkaSKO == 0:
+                        data_list.privyazkaSKO += 1
                         paker_list.insert(1, privyazkaNKT(self)[0])
 
         if need_change_zgs_combo == 'Да':
@@ -1516,9 +1516,9 @@ class SwabWindow(WindowUnion):
             dict_nkt = {int(nkt_diam): paker_depth + paker_khost}
         elif nkt_diam == 60:
             dict_nkt = {60: paker_depth + paker_khost}
-        if 'Ойл' in well_data.contractor:
+        if 'Ойл' in data_list.contractor:
             schema_swab = '8'
-        elif 'РН' in well_data.contractor:
+        elif 'РН' in data_list.contractor:
             schema_swab = '7'
         if pressureZUMPF_combo == "Да":
             paker_list = [
@@ -1593,13 +1593,13 @@ class SwabWindow(WindowUnion):
 
         paker_list.extend([
             [None, None,
-             f'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС {well_data.contractor}". '
+             f'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС {data_list.contractor}". '
              f' Составить акт готовности скважины и передать его начальнику партии',
              None, None, None, None, None, None, None,
              'мастер КРС', None],
             [None, None,
              f'Произвести  монтаж СВАБа согласно схемы №{schema_swab} при свабированиии утвержденной главным инженером '
-             f'{well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г.'
+             f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г.'
              f'Обвязать устье скважины с ЕДК на жесткую линию. Опрессовать ПВО на максимально допустимое '
              f'давление на устье {self.dict_data_well["max_admissible_pressure"]._value}атм,'
              f' по невозможности на давление поглощения, но не менее 30атм в течении 30мин Провести '
@@ -1645,8 +1645,8 @@ class SwabWindow(WindowUnion):
         for plast in list(self.dict_data_well["dict_perforation"].keys()):
             for interval in self.dict_data_well["dict_perforation"][plast]['интервал']:
                 if abs(float(interval[1] - paker_depth)) < 10 or abs(float(interval[0] - paker_depth)) < 10:
-                    if privyazkaNKT(self) not in paker_list and well_data.privyazkaSKO == 0:
-                        well_data.privyazkaSKO += 1
+                    if privyazkaNKT(self) not in paker_list and data_list.privyazkaSKO == 0:
+                        data_list.privyazkaSKO += 1
                         paker_list.insert(1, privyazkaNKT(self)[0])
 
         if need_change_zgs_combo == 'Да':
@@ -1730,9 +1730,9 @@ class SwabWindow(WindowUnion):
             dict_nkt = {73: paker1_depth + paker_khost}
         elif nkt_diam == 60:
             dict_nkt = {60: paker1_depth + paker_khost}
-        if 'Ойл' in well_data.contractor:
+        if 'Ойл' in data_list.contractor:
             schema_swab = '8'
-        elif 'РН' in well_data.contractor:
+        elif 'РН' in data_list.contractor:
             schema_swab = '7'
         paker_list = [
             [f'Спуск {paker_short} до глубины {paker1_depth}/{paker2_depth}м', None,
@@ -1760,13 +1760,13 @@ class SwabWindow(WindowUnion):
              None, None, None, None, None, None, None,
              'мастер КРС', None],
             [None, None,
-             f'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС {well_data.contractor}". '
+             f'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС {data_list.contractor}". '
              f' Составить акт готовности скважины и передать его начальнику партии',
              None, None, None, None, None, None, None,
              'мастер КРС', None],
             [None, None,
              f'Произвести  монтаж СВАБа согласно схемы №{schema_swab} при свабированиии утвержденной главным инженером '
-             f'{well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г. '
+             f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г. '
              f'Обвязать устье скважины с ЕДК на жесткую линию. Опрессовать ПВО на максимально допустимое давление на '
              f'устье {self.dict_data_well["max_admissible_pressure"]._value}атм,'
              f' по невозможности на давление поглощения, но не менее 30атм в течении 30мин Провести практическое '
@@ -1807,8 +1807,8 @@ class SwabWindow(WindowUnion):
         for plast in list(self.dict_data_well["dict_perforation"].keys()):
             for interval in self.dict_data_well["dict_perforation"][plast]['интервал']:
                 if abs(float(interval[1] - paker1_depth)) < 10 or abs(float(interval[0] - paker1_depth)) < 10:
-                    if privyazkaNKT(self) not in paker_list and well_data.privyazkaSKO == 0:
-                        well_data.privyazkaSKO += 1
+                    if privyazkaNKT(self) not in paker_list and data_list.privyazkaSKO == 0:
+                        data_list.privyazkaSKO += 1
                         paker_list.insert(1, *privyazkaNKT(self))
         if need_change_zgs_combo == 'Да':
             paker_list.extend(Change_fluid_Window.fluid_change(self, plast_new, fluid_new, pressuar_new))
@@ -1852,9 +1852,9 @@ class SwabWindow(WindowUnion):
             paker_short = f'обточ муфту + НКТ{60}мм {round(paker_depth - self.dict_data_well["head_column_additional"]._value, 1)}м ' \
                           f'{depthGauge}'
             dict_nkt = {60: paker_depth}
-        if 'Ойл' in well_data.contractor:
+        if 'Ойл' in data_list.contractor:
             schema_swab = '8'
-        elif 'РН' in well_data.contractor:
+        elif 'РН' in data_list.contractor:
             schema_swab = '7'
         paker_list = [
             [paker_short, None,
@@ -1865,13 +1865,13 @@ class SwabWindow(WindowUnion):
                 self.dict_data_well["current_bottom"] / 9.52 * 1.51 / 60 * 1.2 * 1.2 * 1.04 + 0.18 + 0.008 * paker_depth / 9.52 + 0.003 * self.dict_data_well["current_bottom"] / 9.52,
                 2)],
             [None, None,
-             f'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС {well_data.contractor}". '
+             f'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС {data_list.contractor}". '
              f' Составить акт готовности скважины и передать его начальнику партии',
              None, None, None, None, None, None, None,
              'мастер КРС', None],
             [None, None,
              f'Произвести  монтаж СВАБа согласно схемы №{schema_swab} при свабированиии утвержденной главным инженером '
-             f'{well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г. '
+             f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г. '
              f'Обвязать устье скважины с ЕДК на жесткую линию. Опрессовать ПВО на максимально допустимое давление на устье '
              f'{self.dict_data_well["max_admissible_pressure"]._value}атм,'
              f' по невозможности на давление поглощения, но не менее 30атм в течении 30мин Провести практическое '

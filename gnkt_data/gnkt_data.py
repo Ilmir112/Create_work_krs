@@ -4,7 +4,7 @@ from collections import namedtuple
 
 import psycopg2
 from PyQt5.QtWidgets import  QMessageBox
-import well_data
+import data_list
 from data_base.config_base import connect_to_database, GnktDatabaseWell, connection_to_database
 
 Saddles = namedtuple('Saddles', ['saddle', 'ball'])
@@ -79,7 +79,7 @@ def read_database_gnkt(contractor, gnkt_number):
 
     # Подключение к базе данных
     try:
-        db = connection_to_database(well_data.DB_NAME_GNKT)
+        db = connection_to_database(data_list.DB_NAME_GNKT)
 
         data_gnkt = GnktDatabaseWell(db)
 
@@ -107,7 +107,7 @@ def insert_data_base_gnkt(self, contractor, well_name, gnkt_number, gnkt_length,
                      iznos, pipe_mileage, pipe_fatigue, pvo, previous_well):
 
     try:
-        db = connection_to_database(well_data.DB_NAME_GNKT)
+        db = connection_to_database(data_list.DB_NAME_GNKT)
         data_gnkt = GnktDatabaseWell(db)
 
         if 'ойл-сервис' in contractor.lower():
@@ -126,57 +126,3 @@ def insert_data_base_gnkt(self, contractor, well_name, gnkt_number, gnkt_length,
 
 
 
-
-
-# def create_data_base(contractor, gnkt_number):
-#     # Подключение к базе данных SQLite
-#     conn = psycopg2.connect(**well_data.postgres_conn_gnkt)
-#     cursor = conn.cursor()
-#     if 'ойл-сервис' in contractor.lower():
-#         contractor = 'oil_service'
-#
-#         # Удаление всех данных из таблицы
-#         cursor.execute(f"DROP TABLE gnkt_{contractor}")
-#
-#     # Создание таблицы в базе данных
-#     cursor.execute(f'CREATE TABLE IF NOT EXISTS gnkt_{contractor}'
-#                    f'(ID SERIAL PRIMARY KEY NOT NULL,'
-#                    f'gnkt_number TEXT,'
-#                    f'well_number TEXT,'
-#                    f'length_gnkt INT NOT NULL, '
-#                    f'diameter_gnkt DECIMAL(10,2) NOT NULL,'
-#                    f'wear_gnkt DECIMAL(5,2) NOT NULL,'
-#                    f'mileage_gnkt INT NOT NULL,'
-#                    f'tubing_fatigue TEXT NOT NULL,'
-#                    f'previous_well TEXT NOT NULL,'
-#                    f'today TEXT NOT NULL,'
-#                    f'pvo_number TEXT)'
-#                    )
-#     Gnkt_data = namedtuple("Gnkt_data",
-#                            ["gnkt_length", "diametr_length", "iznos", "pipe_mileage", 'pipe_fatigue',
-#                             "pvo"])
-#     gnkt_2 = Gnkt_data(2200, 38, 20, 43056, '25', 115)
-#     gnkt_1 = Gnkt_data(3200, 38, 20, 60875, '25', 166)
-#     for ind, gnkt in enumerate([gnkt_1, gnkt_2]):
-#         if ind == 0:
-#             gnkt_number = 'ГНКТ №1'
-#         else:
-#             gnkt_number = 'ГНКТ №2'
-#         data_values = (gnkt_number, '1963', gnkt.gnkt_length, gnkt.diametr_length, gnkt.iznos,
-#                        gnkt.pipe_mileage, gnkt.pipe_fatigue, '12 Сухоязская кат 3 gnkt_opz.xlsx', '26.04.2024', gnkt.pvo)
-#         # Подготовленный запрос для вставки данных с параметрами
-#         query = f"INSERT INTO gnkt_{contractor} " \
-#                 f"(gnkt_number, well_number, length_gnkt, diameter_gnkt, wear_gnkt, mileage_gnkt, tubing_fatigue, previous_well, today, pvo_number) " \
-#                 f"VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-#
-#         # Выполнение запроса с использованием параметров
-#         cursor.execute(query, data_values)
-#
-#     # Сохранение изменений
-#     conn.commit()
-#
-#     # Закрытие соединения с базой данных
-#     conn.close()
-# contractor = 'ООО "Ойл-Сервис'
-# # print()
-# create_data_base(contractor, 'ГНКТ №1')

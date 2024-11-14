@@ -3,7 +3,7 @@ import math
 from PyQt5.QtWidgets import QInputDialog, QMessageBox, QTabWidget, QWidget, QLabel, QComboBox, QMainWindow, QLineEdit, \
     QGridLayout, QPushButton, QBoxLayout, QTableWidget, QHeaderView, QTableWidgetItem, QApplication
 
-import well_data
+import data_list
 from PyQt5.QtCore import Qt
 
 
@@ -355,7 +355,7 @@ class TemplateKrs(WindowUnion):
             self.dict_data_well["skm_interval"].extend(skm_list)
 
         self.populate_row(self.ins_ind, work_template_list, self.table_widget)
-        well_data.pause = False
+        data_list.pause = False
         self.close()
 
     def del_row_table(self):
@@ -422,7 +422,7 @@ class TemplateKrs(WindowUnion):
 
 
         privyazka_nkt = [f'Привязка по ГК и ЛМ По привязому НКТ удостовериться в наличии текущего забоя', None,
-                         f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {well_data.contractor}.'
+                         f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {data_list.contractor}.'
                          f' ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины.'
                          f' По привязому НКТ удостовериться в наличии '
                          f'текущего забоя с плановым, Нормализовать '

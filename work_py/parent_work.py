@@ -4,7 +4,7 @@ from PyQt5.QtGui import QDoubleValidator, QIntValidator
 from PyQt5.QtWidgets import QWidget, QTabWidget
 
 from main import MyMainWindow
-from well_data import contractor
+from data_list import contractor
 
 
 class TabPageUnion(QWidget):

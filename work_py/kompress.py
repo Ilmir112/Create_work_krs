@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QInputDialog, QWidget, QLabel, QComboBox, QLineEdit, QTabWidget, QMainWindow, QPushButton, \
     QGridLayout, QMessageBox
 
-import well_data
+import data_list
 from main import MyMainWindow
 from .parent_work import TabWidgetUnion, TabPageUnion, WindowUnion
 from .rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
@@ -82,8 +82,8 @@ class TabPageSoKompress(TabPageUnion):
     def update_plast_edit(self):
 
         dict_perforation = self.dict_data_well["dict_perforation"]
-        plasts = well_data.texts
-        # print(f'пласты {plasts, len(well_data.texts), len(plasts), well_data.texts}')
+        plasts = data_list.texts
+        # print(f'пласты {plasts, len(data_list.ptexts), len(plasts), data_list.texts}')
         roof_plast = self.dict_data_well["current_bottom"]
         sole_plast = 0
         for plast in self.dict_data_well['plast_work']:
@@ -162,7 +162,7 @@ class KompressWindow(WindowUnion):
             pass
 
         self.populate_row(self.ins_ind, work_list, self.table_widget)
-        well_data.pause = False
+        data_list.pause = False
         self.close()
 
     def kompress(self, plast_combo, kompress_TypeCombo, khvost_edit, kompress_volume, count_muft,
@@ -218,13 +218,13 @@ class KompressWindow(WindowUnion):
              'мастер КРС', round(
                 descentNKT_norm(khvost_edit, 1))],
             [None, None,
-             f'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС {well_data.contractor}". '
+             f'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС {data_list.contractor}". '
              f' Составить акт готовности скважины и передать его начальнику партии',
              None, None, None, None, None, None, None,
              'мастер КРС', None],
             [None, None,
              f'Произвести  монтаж ГИС согласно схемы  №8 при свабированиии утвержденной главным инженером '
-             f'{well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г. '
+             f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г. '
              f'Обвязать устье скважины с ЕДК на жесткую линию. Опрессовать ПВО максимально допустимое '
              f'давление опрессовки э/колонны на устье '
              f'{self.dict_data_well["max_admissible_pressure"]._value}атм,'

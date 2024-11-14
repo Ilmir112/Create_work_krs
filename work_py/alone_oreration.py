@@ -5,7 +5,7 @@ from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QInputDialog
 
 import H2S
-import well_data
+import data_list
 from selectPlast import CheckBoxDialog
 
 from .rationingKRS import liftingNKT_norm, descentNKT_norm, well_volume_norm
@@ -186,9 +186,9 @@ def konte(self):
          f'Скважина согласована на проведение работ по технологии контейнерно-канатных технологий по '
          f'технологическому плану Таграс-РС.'
          f'Вызвать геофизическую партию. Заявку оформить за 24 часов сутки через '
-         f'геологическую службу {well_data.contractor}. '
+         f'геологическую службу {data_list.contractor}. '
          f'Произвести монтаж ПАРТИИ ГИС согласно утвержденной главным инженером от'
-         f' {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}. Предварительно нужно заявить вставку №6',
+         f' {data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}. Предварительно нужно заявить вставку №6',
          None, None, None, None, None, None, None,
          'мастер КРС', 1.25],
         [None, None, f'Произвести работы указанные в плане работ силами спец подрядчика, при выполнении '
@@ -215,7 +215,7 @@ def definition_Q(self):
 
 def definition_Q_nek(self):
     open_checkbox_dialog(self.dict_data_well)
-    plast = well_data.plast_select
+    plast = data_list.plast_select
     definition_Q_list = [[f'Насыщение 5м3 Q-{plast} при {self.dict_data_well["max_admissible_pressure"]._value}', None,
                           f'Произвести насыщение скважины по затрубу до стабилизации давления закачки не '
                           f'менее 5м3. Опробовать по затрубу'
@@ -232,9 +232,9 @@ def definition_Q_nek(self):
 
 def privyazkaNKT(self):
     priv_list = [[f'ГИС Привязка по ГК и ЛМ', None,
-                  f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {well_data.contractor}". '
+                  f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {data_list.contractor}". '
                   f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером '
-                  f'{well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г. '
+                  f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г. '
                   f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины',
                   None, None, None, None, None, None, None,
                   'Мастер КРС, подрядчик по ГИС', 4]]
@@ -243,8 +243,8 @@ def privyazkaNKT(self):
 
 def definitionBottomGKLM(self):
     priv_list = [[f'Отбить забой по ГК и ЛМ', None,
-                  f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {well_data.contractor}". '
-                  f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером  {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г. '
+                  f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {data_list.contractor}". '
+                  f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером  {data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г. '
                   f'ЗАДАЧА 2.8.2 Отбить забой по ГК и ЛМ',
                   None, None, None, None, None, None, None,
                   'Мастер КРС, подрядчик по ГИС', 4]]
@@ -253,9 +253,9 @@ def definitionBottomGKLM(self):
 
 def pressuar_gis(self):
     priv_list = [[f'Замер Рпл', None,
-                  f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {well_data.contractor}". '
+                  f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {data_list.contractor}". '
                   f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером '
-                  f'{well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г. '
+                  f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г. '
                   f'Произвести замер Рпл в течении 4часов. При необходимости согласовать с заказчиком смену категории',
                   None, None, None, None, None, None, None,
                   'Мастер КРС, подрядчик по ГИС', 8]]
@@ -263,12 +263,12 @@ def pressuar_gis(self):
 
 
 def pvo_cat1(self):
-    if 'Ойл' in well_data.contractor:
+    if 'Ойл' in data_list.contractor:
         date_str = 'от 07.03.2024г'
-    elif 'РН' in well_data.contractor:
+    elif 'РН' in data_list.contractor:
         date_str = 'от 28.02.2024г'
 
-    pvo_1 = f'Установить ПВО по схеме №2 утвержденной главным инженером {well_data.contractor} {date_str} ' \
+    pvo_1 = f'Установить ПВО по схеме №2 утвержденной главным инженером {data_list.contractor} {date_str} ' \
             f'(тип плашечный сдвоенный ПШП-2ФТ-160х21Г Крестовина КР160х21Г, ' \
             f'задвижка ЗМС 65х21 (3шт), Шарового крана 1КШ-73х21, авар. трубы (патрубок НКТ73х7-7-Е, ' \
             f' (при необходимости произвести монтаж переводника' \
@@ -544,7 +544,7 @@ def well_jamming(self, without_damping, lift_key, volume_well_jaming):
                          f'ПРОМЕЖУТОК ВРЕМЕНИ.'
 
     # print(f' Глушение {volume_jamming_well(self, self.dict_data_well["current_bottom"]), volume_nkt_metal(self.dict_data_well["dict_nkt"]), volume_rod(self.dict_data_well["dict_sucker_rod"])}')
-    # print(self.dict_data_well["well_volume_in_PZ"])
+    # print(self.dict_data_well["well_volume_in_pz"])
 
     if without_damping is True:
         well_jamming_str = f'Скважина состоит в перечне скважин ООО Башнефть-Добыча, на которых допускается проведение ТКРС без предварительного глушения на текущий квартал'

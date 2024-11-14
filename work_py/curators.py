@@ -1,14 +1,13 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QInputDialog, QWidget, QLabel, QLineEdit, QComboBox, QGridLayout, QTabWidget, QPushButton, \
-    QMessageBox
+from PyQt5.QtWidgets import  QWidget, QLabel, QComboBox, QGridLayout,  QPushButton
 
-import well_data
-from main import MyMainWindow
+import data_list
+
 from .parent_work import TabWidgetUnion, TabPageUnion, WindowUnion
-from .rationingKRS import descentNKT_norm, liftingNKT_norm
 
 
-class TabPageSo_curator(TabPageUnion):
+
+class TabPageSoCurator(TabPageUnion):
     def __init__(self, parent=None):
         super().__init__()
 
@@ -23,15 +22,14 @@ class TabPageSo_curator(TabPageUnion):
 
 
 class TabWidget(TabWidgetUnion):
-    def __init__(self):
+    def __init__(self, parent=None):
         super().__init__()
-        self.addTab(TabPageSo_curator(), 'Куратор')
+        self.addTab(TabPageSoCurator(parent), 'Куратор')
 
 
 class SelectCurator(WindowUnion):
-
     def __init__(self, parent=None):
-        super().__init__()
+        super().__init__(parent)
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
 
@@ -49,7 +47,7 @@ class SelectCurator(WindowUnion):
         curator_combo = self.tabWidget.currentWidget().curator_combo.currentText()
         self.dict_data_well["curator"] = curator_combo
 
-        well_data.pause = False
+        data_list.pause = False
         self.close()
 
 

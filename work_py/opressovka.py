@@ -1,7 +1,7 @@
 from PyQt5 import Qt
 from PyQt5.QtGui import QDoubleValidator
 
-import well_data
+import data_list
 from main import MyMainWindow
 from PyQt5.QtWidgets import QMessageBox, QInputDialog, QMainWindow, QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, \
     QTabWidget, QPushButton, QHeaderView, QTableWidget, QTableWidgetItem
@@ -289,7 +289,7 @@ class OpressovkaEK(WindowUnion):
             work_list = OpressovkaEK.interval_pressure_testing(self, paker_khost, diametr_paker, depth_paker_list, pressureZUMPF_question, paker_depth_zumpf)
 
         self.populate_row(self.ins_ind, work_list, self.table_widget)
-        well_data.pause = False
+        data_list.pause = False
         self.close()
 
     # Добавление строк с опрессовкой ЭК

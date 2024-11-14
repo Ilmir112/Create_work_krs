@@ -1,7 +1,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.Qt import *
 
-import well_data
+import data_list
 from gnkt_data.gnkt_data import dict_saddles
 from main import MyMainWindow
 from work_py.parent_work import TabPageUnion, TabWidgetUnion, WindowUnion
@@ -217,7 +217,7 @@ class PerforationCorrectGnktFrez(WindowUnion):
         # print(dict_ports)
         self.dict_ports = dict_ports
 
-        well_data.pause = False
+        data_list.pause = False
         self.close()
         return dict_ports
 

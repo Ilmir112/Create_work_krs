@@ -1,4 +1,4 @@
-import well_data
+import data_list
 import re
 
 from PyQt5 import QtCore, QtWidgets
@@ -227,7 +227,7 @@ class TabPageSoCorrect(TabPageUnion):
         self.paker2_depth_posle_edit_type = FloatLineEdit(self)
         self.paker2_depth_posle_edit_type.setText(
             self.remove_non_numeric_chars(self.ifNone(str(self.dict_data_well["depth_fond_paker2_do"]["posle"]))))
-        # print(f' насос спуск {well_data.dict_pump["posle"]}')
+        # print(f' насос спуск {data_list.pdict_pump["posle"]}')
 
         self.static_level_Label = QLabel('Статический уровень в скважине')
         self.static_level_edit_type = FloatLineEdit(self)
@@ -259,7 +259,7 @@ class TabPageSoCorrect(TabPageUnion):
         self.dict_nkt = self.dict_data_well["dict_nkt"]
         self.dict_nkt_po = self.dict_data_well["dict_nkt_po"]
         # print(self.dict_data_well["dict_nkt"],  self.dict_data_well["dict_nkt_po"])
-        a = self.dict_data_well["dict_sucker_rod"]
+
         self.dict_sucker_rod = self.dict_data_well["dict_sucker_rod"]
         self.dict_sucker_rod_po = self.dict_data_well["dict_sucker_rod_po"]
 
@@ -563,13 +563,13 @@ class TabPageSoCorrect(TabPageUnion):
         self.curator_Combo.currentTextChanged.connect(self.update_curator)
         # print(f'куратор индекс {curator, curator_list.index(curator)}')
         self.curator_Combo.setCurrentIndex(curator_list.index(curator))
-        self.region_Combo.addItems(well_data.REGION_LIST)
-        self.region_Combo.setCurrentIndex(well_data.REGION_LIST.index(self.dict_data_well["region"]))
+        self.region_Combo.addItems(data_list.REGION_LIST)
+        self.region_Combo.setCurrentIndex(data_list.REGION_LIST.index(self.dict_data_well["region"]))
 
         self.type_kr_Combo.view().setWordWrap(True)
         self.type_kr_Combo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
 
-        self.type_kr_Combo.addItems(well_data.TYPE_KR_LIST)
+        self.type_kr_Combo.addItems(data_list.TYPE_KR_LIST)
 
         self.type_kr_Combo.setCurrentIndex(self.select_type_kr())
 
@@ -577,7 +577,7 @@ class TabPageSoCorrect(TabPageUnion):
     def select_type_kr(self):
         kr = self.dict_data_well["type_kr"].split(' ')[0] + ' '
         index_sel = 0
-        for index, type_kr in enumerate(well_data.TYPE_KR_LIST):
+        for index, type_kr in enumerate(data_list.TYPE_KR_LIST):
             if kr in type_kr:
                 index_sel = index
         return index_sel
@@ -983,11 +983,11 @@ class DataWindow(WindowUnion):
                 close_file = False
             else:
                 close_file = True
-        elif (well_data.nkt_mistake is True and len(self.dict_data_well["dict_nkt"]) == 0):
+        elif (data_list.nkt_mistake is True and len(self.dict_data_well["dict_nkt"]) == 0):
             QMessageBox.information(self, 'Внимание',
                                           'При вызванной ошибке НКТ до ремонта не может быть пустым')
             close_file = False
-        elif well_data.nkt_mistake is True and len(self.dict_data_well["dict_nkt_po"]) == 0:
+        elif data_list.nkt_mistake is True and len(self.dict_data_well["dict_nkt_po"]) == 0:
             QMessageBox.information(self, 'Внимание',
                                           'При вызванной ошибке НКТ после ремонта не может быть пустым')
             close_file = False
@@ -1213,7 +1213,7 @@ class DataWindow(WindowUnion):
 
 
 
-            well_data.pause = False
+            data_list.pause = False
             self.close()
 
     def definition_open_trunk_well(self):

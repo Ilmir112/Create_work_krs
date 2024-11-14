@@ -2,7 +2,7 @@ from PyQt5.QtGui import QDoubleValidator, QIntValidator
 from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QTabWidget, \
     QMainWindow, QPushButton
 
-import well_data
+import data_list
 from main import MyMainWindow
 from .alone_oreration import volume_vn_ek
 from .parent_work import TabWidgetUnion, TabPageUnion, WindowUnion
@@ -177,7 +177,7 @@ class PeroWindow(WindowUnion):
 
         self.dict_data_well["current_bottom"] = current_edit
         self.populate_row(self.ins_ind, work_list, self.table_widget)
-        well_data.pause = False
+        data_list.pause = False
         self.close()
 
     def pero(self, current_edit, pero_combo_QCombo, solvent_question_QCombo, solvent_volume_edit):

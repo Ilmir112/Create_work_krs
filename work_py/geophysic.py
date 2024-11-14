@@ -1,7 +1,7 @@
 from PyQt5 import QtWidgets
 from PyQt5.Qt import *
 
-import well_data
+import data_list
 from main import MyMainWindow
 from work_py.parent_work import TabWidgetUnion, WindowUnion, TabPageUnion
 
@@ -186,17 +186,17 @@ class GeophysicWindow(WindowUnion):
         rows = self.tableWidget.rowCount()
         geophysicalResearch = [
             [" ", None,
-             f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {well_data.contractor}". '
+             f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {data_list.contractor}". '
              f'При необходимости  подготовить место для установки партии ГИС напротив мостков. '
              f'Произвести  монтаж ГИС согласно схемы  №8а утвержденной главным инженером '
-             f'{well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г',
+             f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г',
              None, None, None, None, None, None, None,
              'Мастер КРС', ' '],
             [' ', None,
              f'Долить скважину до устья тех жидкостью уд.весом {self.dict_data_well["fluid_work"]} .Установить ПВО по'
              f' схеме №8а утвержденной '
-             f'главным инженером {well_data.contractor} '
-             f'{well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г. Опрессовать  плашки  ПВО '
+             f'главным инженером {data_list.contractor} '
+             f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г. Опрессовать  плашки  ПВО '
              f'(на давление опрессовки ЭК, но '
              f'не ниже максимального ожидаемого давления на устье) {self.dict_data_well["max_admissible_pressure"]._value}атм, '
              f'по невозможности на давление поглощения, но '

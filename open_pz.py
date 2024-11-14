@@ -1,7 +1,7 @@
 import base64
 from abc import ABC, abstractmethod
 
-import well_data
+import data_list
 from datetime import datetime
 from PyQt5.QtWidgets import QInputDialog, QMessageBox
 from openpyxl_image_loader import SheetImageLoader
@@ -31,15 +31,15 @@ class PzInDatabase(WorkWithPZ):
 
 
     def open_excel_file(self):
-        if 'Ойл' in well_data.contractor:
+        if 'Ойл' in data_list.contractor:
             contractor = 'ОЙЛ'
-        elif 'РН' in well_data.contractor:
+        elif 'РН' in data_list.contractor:
             contractor = 'РН'
 
         if self.data_well.work_plan == 'plan_change':
             DopPlanWindow.extraction_data(self, str(self.data_well.well_number._value) + " " +
                                           self.data_well.well_area._value + " " + 'krs' + " " + contractor, 1)
-            self.ws.delete_rows(well_data.plan_correct_index._value, self.ws.max_row)
+            self.ws.delete_rows(data_list.plan_correct_index._value, self.ws.max_row)
             return self.ws
 
 class CreatePZ(MyMainWindow):
@@ -47,6 +47,7 @@ class CreatePZ(MyMainWindow):
         super(CreatePZ, self).__init__()
         self.ws = ws
         self.dict_data_well = dict_data_well
+
 
 
 
@@ -58,16 +59,17 @@ class CreatePZ(MyMainWindow):
                 for row_ind, row in enumerate(ws.iter_rows(values_only=True, max_col=13)):
                     ws.row_dimensions[row_ind].hidden = False
 
-                    if any(['ПЛАН РАБОТ' in str(col).upper() for col in row]) \
+                    if 'ПЛАН РАБОТ' == row[1] \
                             and work_plan == 'dop_plan':
                         ws.cell(row=row_ind + 1, column=2).value = \
                             f'ДОПОЛНИТЕЛЬНЫЙ ПЛАН РАБОТ № {self.dict_data_well["number_dp"]}'
 
-
-                    elif 'План-заказ' in row:
-                        # print(row)
-
-                        ws.cell(row=row_ind + 1, column=2).value = 'ПЛАН РАБОТ'
+                    elif 'План-заказ' == row[1]:
+                        if work_plan != 'dop_plan':
+                            ws.cell(row=row_ind + 1, column=2).value = 'ПЛАН РАБОТ'
+                        else:
+                            ws.cell(row=row_ind + 1, column=2).value = \
+                                f'ДОПОЛНИТЕЛЬНЫЙ ПЛАН РАБОТ № {self.dict_data_well["number_dp"]}'
 
                     for col, value in enumerate(row):
                         if not value is None and col <= 12:
@@ -93,7 +95,7 @@ class CreatePZ(MyMainWindow):
                                            'application_gis', 'gnkt_after_grp', 'gnkt_opz', 'plan_change']:
                 # print(f'план работ {self.dict_data_well["work_plan"]}')
 
-                razdel = razdel_1(self, self.dict_data_well["region"], well_data.contractor)
+                razdel = razdel_1(self, self.dict_data_well["region"], data_list.contractor)
 
                 for i in range(1, len(razdel)):  # Добавлением подписантов на вверху
                     for j in range(1, 13):
@@ -106,10 +108,10 @@ class CreatePZ(MyMainWindow):
 
                 # print(f' индекс вставки ГНВП{self.dict_data_well["ins_ind"]}')
                 dict_events_gnvp = {}
-                dict_events_gnvp['krs'] = events_gnvp(self, well_data.contractor)
+                dict_events_gnvp['krs'] = events_gnvp(self, data_list.contractor)
                 dict_events_gnvp['gnkt_opz'] = events_gnvp_gnkt(self)
                 dict_events_gnvp['gnkt_bopz'] = events_gnvp_gnkt(self)
-                dict_events_gnvp['dop_plan'] = events_gnvp(self, well_data.contractor)
+                dict_events_gnvp['dop_plan'] = events_gnvp(self, data_list.contractor)
 
                 # if work_plan != 'dop_plan':
                 text_width_dict = {20: (0, 100), 30: (101, 200), 40: (201, 300), 60: (301, 400), 70: (401, 500),
@@ -124,7 +126,7 @@ class CreatePZ(MyMainWindow):
                                      bottom=Side(style='thin', color=red))
 
                 if work_plan != 'normir':
-                    if 'Ойл' in well_data.contractor:
+                    if 'Ойл' in data_list.contractor:
                         for i in range(self.dict_data_well["ins_ind"], self.dict_data_well["ins_ind"] + len(dict_events_gnvp[work_plan])):
                             ws.merge_cells(start_row=i, start_column=2, end_row=i, end_column=12)
                             data = ws.cell(row=i, column=2)
@@ -142,7 +144,7 @@ class CreatePZ(MyMainWindow):
                                     "о недопустимости нецелевого расхода" in str(data.value):
                                 data.alignment = Alignment(wrap_text=True, horizontal='center',
                                                            vertical='center')
-                                data.fill = well_data.yellow_fill
+                                data.fill = data_list.yellow_fill
                                 data.font = Font(name='Arial Cyr', size=13, bold=True)
 
                             else:
@@ -156,7 +158,7 @@ class CreatePZ(MyMainWindow):
                                     if value[0] <= len(text) <= value[1]:
                                         ws.row_dimensions[i].height = int(key)
 
-                    elif 'РН' in well_data.contractor:
+                    elif 'РН' in data_list.contractor:
                         # Устанавливаем красный цвет для текста
                         red_font = Font(name='Arial Cyr', size=13, color='FF0000', bold=True)
                         for i in range(self.dict_data_well["ins_ind"], self.dict_data_well["ins_ind"] + len(dict_events_gnvp[work_plan])):
@@ -333,7 +335,7 @@ class CreatePZ(MyMainWindow):
                     for j in range(1, 13):
                         ws.cell(row=i, column=j).value = itog_list[i - ins_ind][j - 1]
                         if j != 1:
-                            ws.cell(row=i, column=j).border = well_data.thin_border
+                            ws.cell(row=i, column=j).border = data_list.thin_border
                             ws.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=False)
 
                     ws.merge_cells(start_row=i, start_column=2, end_row=i, end_column=11)
@@ -344,7 +346,7 @@ class CreatePZ(MyMainWindow):
                     ws.row_dimensions[ins_ind + 8].height = 50
                     for j in range(1, 13):
                         ws.cell(row=i, column=j).value = itog_list[i - ins_ind][j - 1]
-                        ws.cell(row=i, column=j).border = well_data.thin_border
+                        ws.cell(row=i, column=j).border = data_list.thin_border
                         ws.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=False)
                         ws.cell(row=i, column=j).alignment = Alignment(wrap_text=True, horizontal='left',
                                                                        vertical='center')

@@ -10,7 +10,7 @@ from openpyxl.workbook import Workbook
 from data_base.config_base import connect_to_database
 from main import MyMainWindow
 
-import well_data
+import data_list
 from gnkt_data.gnkt_data import gnkt_dict, read_database_gnkt, insert_data_base_gnkt
 from gnkt_opz import GnktOpz
 from krs import TabPageGno, GnoWindow
@@ -81,7 +81,7 @@ class TabPageDp(TabPageAll):
 
         try:
 
-            conn = connect_to_database(well_data.DB_NAME_GNKT)
+            conn = connect_to_database(data_list.DB_NAME_GNKT)
             cursor = conn.cursor()
             cursor.execute(f"SELECT * FROM КГМ WHERE today (%s), ?", (number_gnkt, self.previous_well_edit.text()))
 
@@ -163,11 +163,11 @@ class GnktOsvWindow(GnktModel):
 
             self.data_gnkt_opz = GnktOpz(self.table_widget, self.data_gnkt.fluid_edit, self.dict_data_well)
             self.data_gnkt_opz.show()
-            well_data.pause = True
+            data_list.pause = True
             self.pause_app()
 
             work_well = self.data_gnkt_opz.gnkt_work_opz(self.data_gnkt)
-            well_data.pause = True
+            data_list.pause = True
 
             self.data_gnkt_opz.close()  # Close window.
 
@@ -177,11 +177,11 @@ class GnktOsvWindow(GnktModel):
             self.data_gnkt_opz = GnktBopz(self.table_widget,
                                           self.data_gnkt, self.dict_data_well)
             self.data_gnkt_opz.show()
-            well_data.pause = True
+            data_list.pause = True
             self.pause_app()
 
             work_well = self.data_gnkt_opz.add_work()
-            well_data.pause = True
+            data_list.pause = True
             self.data_gnkt_opz.close()
         elif self.work_plan == 'gnkt_after_grp':
             work_well = self.gnkt_work(self.data_gnkt.fluid_edit, self.data_gnkt.current_bottom_edit)
@@ -191,9 +191,9 @@ class GnktOsvWindow(GnktModel):
 
 
         if self.work_plan in ['gnkt_bopz']:
-            self.wb_gnkt = load_workbook(f'{well_data.path_image}property_excel/template_gnkt_bopz.xlsx')
+            self.wb_gnkt = load_workbook(f'{data_list.path_image}property_excel/template_gnkt_bopz.xlsx')
         else:
-            self.wb_gnkt = load_workbook(f'{well_data.path_image}property_excel/tepmpale_gnkt_osv_grp.xlsx')
+            self.wb_gnkt = load_workbook(f'{data_list.path_image}property_excel/tepmpale_gnkt_osv_grp.xlsx')
 
 
         self.ws_schema = self.wb_gnkt.active
@@ -353,7 +353,7 @@ class GnktOsvWindow(GnktModel):
              f'и инжектора н'
              f'а устье скважины согласно «Схемы обвязки № 5 устья противовыбросовым оборудованием при '
              f'производстве работ по промывке скважины с установкой «ГНКТ» утвержденная главным '
-             f'инженером  {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г. Произвести обвязку '
+             f'инженером  {data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г. Произвести обвязку '
              f'установки ГНКТ, насосно-компрессорного '
              f'агрегата, желобной циркуляционной системы.',
              None, None, None, None, None, None, None,
@@ -601,7 +601,7 @@ class GnktOsvWindow(GnktModel):
             [None, 29,
              f'ВНИМАНИЕ: При наличии посадок КНК - спуск производить с остановками для промежуточных промывок. '
              f'В случае прихвата ГНКТ в скважине - проинформировсть ответственного представителя Заказчика и '
-             f'руководство ГНКТ {well_data.contractor}. Дальнейшие действия производить в присутствии представителя '
+             f'руководство ГНКТ {data_list.contractor}. Дальнейшие действия производить в присутствии представителя '
              f'Заказчика с составлением АКТа согласно "Плана-Схемы действий при прихватах ГНКТ" '
              f'ТЕХНОЛОГИЧЕСКОЙ ИНСТРУКЦИИ ОАО «Башнефть добыча»',
              None, None, None, None, None, None, None,
@@ -707,7 +707,7 @@ class GnktOsvWindow(GnktModel):
         for row in range(len(work_list)):
             for col in range(23):
                 if work_list[row][col]:
-                    # print(work_list[row][col])
+                    print(work_list[row][col])
                     ws.cell(row=row + 1, column=col + 1).value = work_list[row][col]
         # Перебираем строки и скрываем те, у которых все значения равны None
         for row_ind, row in enumerate(ws.iter_rows(values_only=True)):

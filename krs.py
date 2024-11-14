@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QComboBo
     QPushButton
 from datetime import datetime
 
-import well_data
+import data_list
 
 from work_py.alone_oreration import lifting_unit, weigth_pipe, volume_pod_NKT, volume_jamming_well
 from work_py.mkp import mkp_revision_1_kateg
@@ -27,9 +27,9 @@ class TabPageGno(TabPageUnion):
         self.volume_jumping_label = QLabel("Объем глушения", self)
         self.volume_jumping_edit = QLineEdit(self)
         volume_well_jaming = self.volume()
-        if abs(float(self.dict_data_well["well_volume_in_PZ"][0]) - volume_well_jaming) > 0.5:
+        if abs(float(self.dict_data_well["well_volume_in_pz"][0]) - volume_well_jaming) > 0.5:
             QMessageBox.warning(None, 'Некорректный объем скважины',
-                                      f'Объем скважины указанный в ПЗ -{self.dict_data_well["well_volume_in_PZ"]}м3 '
+                                      f'Объем скважины указанный в ПЗ -{self.dict_data_well["well_volume_in_pz"]}м3 '
                                       f'не совпадает '
                                       f'с расчетным {volume_well_jaming}м3')
             volume_well_jaming, _ = QInputDialog.getDouble(self,
@@ -138,7 +138,7 @@ class TabPageGno(TabPageUnion):
         if work_plan != 'gnkt_frez':
             self.dict_data_well["current_bottom"] = current_bottom
         # Задаем начальную и конечную даты периода
-        current_date = well_data.current_date
+        current_date = data_list.current_date
         if current_date.month > 4:
             start_date = datetime(current_date.year, 12, 1).date()
             end_date = datetime(current_date.year + 1, 4, 1).date()
@@ -234,7 +234,7 @@ class GnoWindow(WindowUnion):
         self.populate_row(self.ins_ind, work_list, self.table_widget)
         self.dict_data_well["current_bottom"] = current_bottom
 
-        well_data.pause = False
+        data_list.pause = False
         self.close()
 
     def work_krs(self, work_plan, lift_key, volume_well_jaming, fluid):
@@ -430,7 +430,7 @@ class GnoWindow(WindowUnion):
                 [f'подьем {self.dict_data_well["dict_pump_SHGN"]["do"]}', None,
                  f'Сорвать насос штанговый насос {self.dict_data_well["dict_pump_SHGN"]["do"]}(зафиксировать вес при срыве).'
                  f' Обвязать устье скважины согласно схемы №3 утвержденной главным '
-                 f'инженером  {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г при СПО штанг '
+                 f'инженером  {data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г при СПО штанг '
                  f'(ПМШ 62х21 либо аналог). Опрессовать ПВО на '
                  f'{self.dict_data_well["max_admissible_pressure"]._value}атм. '
                  f'{sucker_pod_jaming}'
@@ -815,7 +815,7 @@ class GnoWindow(WindowUnion):
                  f'Сорвать насос {self.dict_data_well["dict_pump_SHGN"]["do"]} (зафиксировать вес при срыве). '
                  f'Обвязать устье скважины '
                  f'согласно схемы №3 утвержденной главным '
-                 f'инженером  {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г при СПО штанг '
+                 f'инженером  {data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г при СПО штанг '
                  f'(ПМШ 62х21 либо аналог). Опрессовать ПВО на '
                  f'{self.dict_data_well["max_admissible_pressure"]._value}атм. Поднять на штангах насос '
                  f'с гл. {int(self.dict_data_well["dict_pump_SHGN_h"]["do"])}м с доливом тех жидкости уд.весом '
@@ -909,7 +909,7 @@ class GnoWindow(WindowUnion):
                 [f'Поднять насос {self.dict_data_well["dict_pump_SHGN"]["do"]}', None,
                  f'Сорвать насос {self.dict_data_well["dict_pump_SHGN"]["do"]} (зафиксировать вес при срыве). Обвязать устье скважины '
                  f'согласно схемы №3 утвержденной главным '
-                 f'инженером  {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г при СПО штанг (ПМШ 62х21 либо аналог). '
+                 f'инженером  {data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г при СПО штанг (ПМШ 62х21 либо аналог). '
                  f'Опрессовать ПВО на {self.dict_data_well["max_admissible_pressure"]._value}атм. '
                  f'{"".join([" " if without_damping_True is True else f"При наличии Избыточного давления не позволяющее сорвать пакера: Приподнять штангу. Произвести глушение в НКТ в объеме{volume_pod_NKT(self)}м3. Техостой 2ч."])}'
                  f' Поднять на штангах насос с гл. {float(self.dict_data_well["dict_pump_SHGN_h"]["do"])}м с '
@@ -1021,7 +1021,7 @@ class GnoWindow(WindowUnion):
                 [f'поднять плунжен', None,
                  f'Сорвать  плунжер. (зафиксировать вес при срыве). Обвязать устье скважины согласно схемы №3 '
                  f'утвержденной главным '
-                 f'инженером  {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г при СПО штанг (ПМШ 62х21 либо аналог). Опрессовать ПВО на '
+                 f'инженером  {data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г при СПО штанг (ПМШ 62х21 либо аналог). Опрессовать ПВО на '
                  f'{self.dict_data_well["max_admissible_pressure"]._value}атм. Заловить конус спуском одной '
                  f'штанги. Поднять на штангах плунжер с гл. {float(self.dict_data_well["dict_pump_SHGN_h"]["do"])}м с доливом тех '
                  f'жидкости уд.весом {self.dict_data_well["fluid_work"]} '
@@ -1111,7 +1111,7 @@ class GnoWindow(WindowUnion):
                 ['Поднять плунжер', None,
                  f'Сорвать плунжер насоса (зафиксировать вес при срыве). Обвязать устье скважины согласно '
                  f'схемы №3 утвержденной главным '
-                 f'инженером {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г при СПО штанг (ПМШ 62х21 либо аналог). Опрессовать ПВО на '
+                 f'инженером {data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г при СПО штанг (ПМШ 62х21 либо аналог). Опрессовать ПВО на '
                  f'{self.dict_data_well["max_admissible_pressure"]._value}атм. Спуском одной штанги заловить конус. '
                  f'{"".join([" " if without_damping_True is True else f"При наличии Избыточного давления не позволяющее сорвать пакера: Приподнять штангу. Произвести глушение в НКТ в объеме{volume_pod_NKT(self)}м3. Техостой 2ч."])}'
 

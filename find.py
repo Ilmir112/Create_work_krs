@@ -1,5 +1,5 @@
 import re
-import well_data
+import data_list
 import base64
 from datetime import datetime
 
@@ -12,14 +12,12 @@ from openpyxl.utils.cell import get_column_letter
 from openpyxl_image_loader import SheetImageLoader
 
 from category_correct import CategoryWindow
-from data_base.config_base import WorkDatabaseWell, connect_to_database, connection_to_database
-from data_correct import DataWindow
+from data_base.config_base import WorkDatabaseWell, connection_to_database
 from main import ExcelWorker, MyMainWindow, MyWindow
 from perforation_correct import PerforationCorrect
 from plan import delete_rows_pz
 
-from well_data import ProtectedIsDigit, ProtectedIsNonNone
-from work_py.advanted_file import definition_plast_work
+from data_list import ProtectedIsDigit, ProtectedIsNonNone
 
 
 class FindIndexPZ(MyMainWindow):
@@ -55,6 +53,24 @@ class FindIndexPZ(MyMainWindow):
         self.data_pvr_min = ProtectedIsDigit(0)
         self.pipes_ind = ProtectedIsDigit(0)
         self.data_pvr_max = ProtectedIsDigit(0)
+        self.dict_data_well["paker_do"] = {"do": 0, "posle": 0}
+        self.dict_data_well["depth_fond_paker_do"] = {"do": 0, "posle": 0}
+        self.dict_data_well["paker2_do"] = {"do": 0, "posle": 0}
+        self.dict_data_well["depth_fond_paker2_do"] = {"do": 0, "posle": 0}
+        self.dict_data_well["dict_pump_SHGN"] = {"do": 0, "posle": 0}
+        self.dict_data_well["dict_pump_ECN"] = {"do": 0, "posle": 0}
+        self.dict_data_well["dict_pump_SHGN_h"] = {"do": 0, "posle": 0}
+        self.dict_data_well["dict_pump_ECN_h"] = {"do": 0, "posle": 0}
+        self.dict_data_well["dict_sucker_rod"] = {}
+        self.dict_data_well["gis_list"] = []
+        self.dict_data_well["pvr_row"] = []
+        self.dict_data_well["dict_nkt"] = {}
+        self.dict_data_well["dict_nkt_po"] = {}
+        self.dict_data_well["dict_sucker_rod_po"] = {}
+        self.dict_data_well["dict_pump"] = {"do": 0, "posle": 0}
+        self.dict_data_well["column_head_m"] = ''
+        self.dict_data_well["wellhead_fittings"] = ''
+        self.dict_data_well["groove_diameter"] = ''
         self.dict_data_well["image_list"] = []
         self.dict_data_well["image_data"] = []
         self.dict_data_well["dict_leakiness"] = {}
@@ -92,7 +108,7 @@ class FindIndexPZ(MyMainWindow):
 
         self.dict_data_well["index_row_pvr_list"] = []
         self.dict_data_well["gis_list"] = []
-        self.dict_data_well["pvr_row"] = []
+
         self.dict_data_well["data_list"] = []
 
         self.dict_data_well["plast_all"] = []
@@ -111,10 +127,10 @@ class FindIndexPZ(MyMainWindow):
         self.dict_data_well["cat_P_P"] = []
         self.dict_data_well["image_data"] = []
         self.dict_data_well["check_data_in_pz"] = []
-        self.dict_data_well["pvr_row"] = []
+
         self.dict_data_well["gis_list"] = []
         self.dict_data_well["index_row_pvr_list"] = []
-        self.dict_data_well["well_volume_in_PZ"] = []
+        self.dict_data_well["well_volume_in_pz"] = []
         self.read_pz()
 
     def read_pz(self):
@@ -161,7 +177,7 @@ class FindIndexPZ(MyMainWindow):
             elif any(['VIII. Вид и категория ремонта, его шифр' in str(col) for col in row]):
                 type_kr = self.ws.cell(row=row_ind + 2, column=1).value
                 n = 1
-                while type_kr == None and n != 8:
+                while type_kr is None and n != 8:
                     type_kr = self.ws.cell(row=row_ind + 2, column=1 + n).value
                     n += 1
                 self.dict_data_well["type_kr"] = type_kr
@@ -216,7 +232,7 @@ class FindIndexPZ(MyMainWindow):
             self.pause_app()
             return
 
-        if well_data.sucker_rod_none:
+        if data_list.sucker_rod_none:
             if self.sucker_rod_ind._value == 0:
                 sucker_mes = QMessageBox.question(self, 'ШТАНГИ', 'Программа определелила, что в скважине '
                                                                   'отсутствуют штанги, корректно ли это?')
@@ -287,9 +303,9 @@ class FindIndexPZ(MyMainWindow):
             try:
                 image = image_loader.get(f'{get_column_letter(col)}{row}')
                 image.save(
-                    f'{well_data.path_image}imageFiles/image_work/image{get_column_letter(col)}{row}.png')
+                    f'{data_list.path_image}imageFiles/image_work/image{get_column_letter(col)}{row}.png')
                 image_size = image.size
-                image_path = f'{well_data.path_image}imageFiles/image_work/image{get_column_letter(col)}{row}.png'
+                image_path = f'{data_list.path_image}imageFiles/image_work/image{get_column_letter(col)}{row}.png'
 
                 coord = f'{get_column_letter(col)}{row + 17 - self.dict_data_well["cat_well_min"]._value}'
 
@@ -312,7 +328,6 @@ class FindIndexPZ(MyMainWindow):
                     f.write(image_base64)
                 # Добавление информации в список
                 self.dict_data_well["image_data"].append(image_info)
-
             except:
                 pass
 
@@ -385,13 +400,13 @@ class WellNkt(FindIndexPZ):
 
     def __init__(self):
         super().__init__()
-        # self.read_well(self.ws, well_data.pipes_ind._value, well_data.condition_of_wells._value)
+        # self.read_well(self.ws, data_list.pipes_ind._value, data_list.condition_of_wells._value)
 
     def read_well(self, begin_index, cancel_index):
         dict_nkt = {}
         dict_nkt_po = {}
         a_plan = 0
-        well_data.nkt_mistake = False
+        data_list.nkt_mistake = False
         for row in range(begin_index, cancel_index):  # словарь количества НКТ и метраж
             if 'план' in str(self.ws.cell(row=row, column=3).value).lower() or str(
                     self.ws.cell(row=row, column=3).value).lower() == 'после ремонта':
@@ -415,9 +430,9 @@ class WellNkt(FindIndexPZ):
                         dict_nkt_po[key] = dict_nkt_po.get(
                             key, 0) + round(FindIndexPZ.check_str_None(self, value), 1)
                 # print(f'индекс a_plan {dict_nkt}')
-            # well_data.shoe_nkt = float(sum(dict_nkt.values()))
+            # data_list.shoe_nkt = float(sum(dict_nkt.values()))
         # except:
-        #     well_data.nkt_mistake = True
+        #     data_list.nkt_mistake = True
         #     QMessageBox.warning(self, 'Ошибка', 'Программа не смогла определить диаметры и длину НКТ')
         self.dict_data_well["dict_nkt"] = dict_nkt
         self.dict_data_well["dict_nkt_po"] = dict_nkt_po
@@ -429,7 +444,7 @@ class WellSuckerRod(FindIndexPZ):
 
         super().__init__()
 
-        # self.read_well(self.ws, well_data.sucker_rod_ind._value, well_data.pipes_ind._value)
+        # self.read_well(self.ws, data_list.sucker_rod_ind._value, data_list.pipes_ind._value)
 
     def read_well(self, begin_index, cancel_index):
 
@@ -446,17 +461,17 @@ class WellSuckerRod(FindIndexPZ):
                     self.ws.cell(row=row, column=3).value).lower() == 'после ремонта':
                     b_plan = row
 
-            if b_plan == 0 and well_data.sucker_rod_none is True:
+            if b_plan == 0 and data_list.sucker_rod_none is True:
                 sucker_rod_question = QMessageBox.question(self,
                                                            'отсутствие штанг',
                                                            'Программа определило что штанг в '
                                                            'скважине нет, корректно?')
                 if sucker_rod_question == QMessageBox.StandardButton.Yes:
-                    well_data.sucker_rod_none = False
+                    data_list.sucker_rod_none = False
                 else:
-                    well_data.sucker_rod_none = True
+                    data_list.sucker_rod_none = True
 
-                if well_data.sucker_rod_none == True:
+                if data_list.sucker_rod_none == True:
                     sucker_rod_question = QMessageBox.warning(self, 'Индекс планового НКТ',
                                                               'Программа не могла определить начала строку с ПЗ'
                                                               ' штанги - план')
@@ -481,7 +496,7 @@ class WellSuckerRod(FindIndexPZ):
                             break
 
                             return
-                    if key != None and row >= b_plan:
+                    if key is not None and row >= b_plan:
                         try:
                             dict_sucker_rod_po[key] = dict_sucker_rod_po.get(key, 0) + int(
                                 float(str(value).replace(',', '.')))
@@ -499,9 +514,8 @@ class WellSuckerRod(FindIndexPZ):
 class WellFondData(FindIndexPZ):
 
     def __init__(self):
-
         super().__init__()
-        # self.read_well(self.ws, well_data.data_fond_min._value, well_data.condition_of_wells._value)
+        # self.read_well(self.ws, data_list.data_fond_min._value, data_list.condition_of_wells._value)
 
     def read_well(self, begin_index, cancel_index):
 
@@ -515,7 +529,11 @@ class WellFondData(FindIndexPZ):
         dict_pump_ECN_h = {"do": '0', "posle": '0'}
         dict_pump = {"do": '0', "posle": '0'}
 
-        well_data.old_index = 1
+
+        data_list.old_index = 1
+        wellhead_fittings = ''
+        column_head_m = ''
+        groove_diameter = ''
         for row_index, row in enumerate(self.ws.iter_rows(min_row=begin_index, max_row=cancel_index)):
             row_index += begin_index
             for col, cell in enumerate(row):
@@ -663,7 +681,7 @@ class WellHistoryData(FindIndexPZ):
         super().__init__()
         self.leakage_window = None
 
-        # self.read_well(self.ws, well_data.data_pvr_max._value, well_data.data_fond_min._value)
+        # self.read_well(self.ws, data_list.data_pvr_max._value, data_list.data_fond_min._value)
 
     def read_well(self, begin_index, cancel_index):
 
@@ -712,11 +730,12 @@ class WellHistoryData(FindIndexPZ):
                         self.dict_data_well["date_drilling_cancel"] = row[col + 2].value
                         self.dict_data_well["date_drilling_cancel"] = row[col + 2].value
 
-                        self.dict_data_well["date_drilling_cancel"] = FindIndexPZ.definition_is_None(self,
-                                                                                                     self.dict_data_well[
-                                                                                                         "date_drilling_cancel"],
-                                                                                                     row_index + begin_index,
-                                                                                                     col + 1, 1)
+                        self.dict_data_well["date_drilling_cancel"] =\
+                            FindIndexPZ.definition_is_None(self,
+                                                             self.dict_data_well[
+                                                                 "date_drilling_cancel"],
+                                                             row_index + begin_index,
+                                                             col + 1, 1)
                     elif 'Дата ввода в экспл' in str(value):
                         self.dict_data_well["сommissioning_date"] = row[col + 2].value
                         if type(self.dict_data_well["сommissioning_date"]) is datetime:
@@ -744,11 +763,12 @@ class WellHistoryData(FindIndexPZ):
 
                     elif 'Максимально допустимое давление'.lower() in str(value).lower():
                         self.dict_data_well["max_admissible_pressure"] = ProtectedIsDigit(row[col + 1].value)
-                        self.dict_data_well["max_admissible_pressure"] = FindIndexPZ.definition_is_None(self,
-                                                                                                        self.dict_data_well[
-                                                                                                            "max_admissible_pressure"],
-                                                                                                        row_index + begin_index,
-                                                                                                        col + 1, 1)
+                        self.dict_data_well["max_admissible_pressure"] = \
+                            FindIndexPZ.definition_is_None(self,
+                                                           self.dict_data_well[
+                                                               "max_admissible_pressure"],
+                                                           row_index + begin_index,
+                                                           col + 1, 1)
         if self.dict_data_well["date_drilling_run"] == '':
             self.dict_data_well["check_data_in_pz"].append('не указано начало бурения\n')
         if self.dict_data_well["date_drilling_cancel"] == '':
@@ -768,21 +788,21 @@ class WellCondition(FindIndexPZ):
     def __init__(self):
         super().__init__()
 
-        # self.read_well(self.ws, well_data.condition_of_wells._value, self.dict_data_well["data_well_max"]._value)
+        # self.read_well(self.ws, data_list.condition_of_wells._value, self.dict_data_well["data_well_max"]._value)
 
     def read_well(self, begin_index, cancel_index):
-        from main import MyMainWindow
+
 
         self.dict_data_well["static_level"] = ProtectedIsNonNone('не корректно')
         self.dict_data_well["dinamic_level"] = ProtectedIsNonNone('не корректно')
-        self.dict_data_well["well_volume_in_PZ"] = []
+        self.dict_data_well["well_volume_in_pz"] = []
         self.dict_data_well["pressuar_mkp"] = ProtectedIsNonNone('не корректно')
 
         for row_index, row in enumerate(self.ws.iter_rows(min_row=begin_index, max_row=cancel_index)):
             row_index += begin_index
             for col, cell in enumerate(row):
                 value = cell.value
-                if value != None:
+                if value is not None:
                     if 'нэк' in str(
                             value).lower() or 'негерм' in str(value).lower() or 'нарушение э' in str(
                         value).lower() or 'нарушение г' in str(value).lower():
@@ -813,15 +833,15 @@ class WellCondition(FindIndexPZ):
                                 col + 1, 1)
                         elif 'Vжг' in str(value):
                             try:
-                                well_volume_in_PZ = str(row[col + 1].value).replace(',', '.')
-                                # print(f'строка {well_volume_in_PZ}')
-                                # well_volume_in_PZ = FindIndexPZ.definition_is_None(self,well_volume_in_PZ, row_index, col + 1, 1)
-                                self.dict_data_well["well_volume_in_PZ"].append(round(float(well_volume_in_PZ), 1))
+                                well_volume_in_pz = str(row[col + 1].value).replace(',', '.')
+                                # print(f'строка {well_volume_in_pz}')
+
+                                self.dict_data_well["well_volume_in_pz"].append(round(float(well_volume_in_pz), 1))
                             except:
-                                well_volume_in_PZ, _ = QInputDialog.getDouble(self, 'Объем глушения',
+                                well_volume_in_pz, _ = QInputDialog.getDouble(self, 'Объем глушения',
                                                                               'ВВедите объем глушения согласно ПЗ', 50,
                                                                               1, 70)
-                                self.dict_data_well["well_volume_in_PZ"].append(well_volume_in_PZ)
+                                self.dict_data_well["well_volume_in_pz"].append(well_volume_in_pz)
 
         if self.dict_data_well["static_level"]._value == 'не корректно':
             self.dict_data_well["check_data_in_pz"].append('не указано статический уровень')
@@ -890,13 +910,10 @@ class WellExpectedPickUp(FindIndexPZ):
                             print(f'ошибка в определение')
 
             try:
-
                 if self.dict_data_well["expected_Q"] and self.dict_data_well["expected_P"]:
                     self.dict_data_well["expected_pick_up"][self.dict_data_well["expected_Q"]] = self.dict_data_well[
                         "expected_P"]
-
             except Exception as e:
-
                 print(f'Ошибка в определении ожидаемых показателей {e}')
 
         return self.dict_data_well
@@ -905,8 +922,7 @@ class WellExpectedPickUp(FindIndexPZ):
 class WellName(FindIndexPZ):
     def __init__(self):
         super().__init__(parent=None)
-
-        # self.read_well(self.ws, self.cat_well_max._value, well_data.data_pvr_min._value)
+        # self.read_well(self.ws, self.cat_well_max._value, data_list.data_pvr_min._value)
 
     def read_well(self, begin_index, cancel_index):
         for row_index, row in enumerate(self.ws.iter_rows(min_row=begin_index, max_row=cancel_index)):
@@ -920,7 +936,7 @@ class WellName(FindIndexPZ):
                         self.dict_data_well["well_area"] = ProtectedIsNonNone(row[col + 1].value)
                         # self.dict_data_well["well_number"] = ProtectedIsNonNone(row[col - 1].value)
                         # self.dict_data_well["well_area"] = ProtectedIsNonNone(row[col + 1].value)
-                    elif 'месторождение ' in str(value):  # определение номера скважины                        
+                    elif 'месторождение ' in str(value):  # определение номера скважины
                         self.dict_data_well["well_oilfield"] = ProtectedIsNonNone(row[col + 2].value)
                         # self.dict_data_well["well_oilfield"] = ProtectedIsNonNone(row[col + 2].value)
                     elif 'Инв. №' in str(value):
@@ -942,7 +958,7 @@ class WellData(FindIndexPZ):
     def __init__(self):
         super().__init__()
 
-        # self.read_well(self.ws, self.cat_well_max._value, well_data.data_pvr_min._value)
+        # self.read_well(self.ws, self.cat_well_max._value, data_list.data_pvr_min._value)
 
     def read_well(self, begin_index, cancel_index):
         from work_py.opressovka import TabPageSo
@@ -1022,14 +1038,14 @@ class WellData(FindIndexPZ):
                             self, ProtectedIsDigit(row[col + 5].value), row_index, col + 1, 1)
 
                     elif 'Направление' in str(value) and 'Шахтное направление' not in str(value) and \
-                            self.ws.cell(row=row_index + 1, column=col + 1).value != None and \
+                            self.ws.cell(row=row_index + 1, column=col + 1).value is not None and \
                             FindIndexPZ.check_str_None(self, row[col + 3].value) != '0':
                         self.dict_data_well["column_direction_True"] = True
                         if self.dict_data_well["column_direction_True"]:
                             for col1, cell in enumerate(row):
                                 if 'Уровень цемента' in str(cell.value):
                                     n = 1
-                                    while row[col1 + n].value == None or n > 6:
+                                    while row[col1 + n].value is None or n > 6:
                                         if 'уст' in str(row[col1 + 2].value).lower() or str(
                                                 row[col1 + 2].value).isdigit():
                                             self.dict_data_well["level_cement_direction"] = ProtectedIsDigit(0)
@@ -1268,11 +1284,11 @@ class WellData(FindIndexPZ):
 
             self.data_window.show()
             self.pause_app()
-            well_data.pause = True
+            data_list.pause = True
             self.data_window = None
 
             if self.dict_data_well["work_plan"] == 'krs':
-                db = connection_to_database(well_data.DB_WELL_DATA)
+                db = connection_to_database(data_list.DB_WELL_DATA)
                 check_in_base = WorkDatabaseWell(db, self.dict_data_well)
                 tables_filter = check_in_base.get_tables_starting_with(self.dict_data_well["well_number"]._value,
                                                                        self.dict_data_well["well_area"]._value, 'ПР',
@@ -1335,7 +1351,7 @@ class WellPerforation(FindIndexPZ):
     def __init__(self):
         super().__init__()
 
-        # self.read_well(self.ws, well_data.data_pvr_min._value, well_data.data_pvr_max._value + 1)
+        # self.read_well(self.ws, data_list.data_pvr_min._value, data_list.data_pvr_max._value + 1)
 
     def read_well(self, begin_index, cancel_index):
         from work_py.alone_oreration import is_number, calculationFluidWork
@@ -1470,7 +1486,7 @@ class WellPerforation(FindIndexPZ):
             except:
                 QMessageBox.warning(self, 'ОШИБКА',
                                     F'Приложение не смогло определить индекс пласта в строке {row_index}')
-                well_data.pause = True
+                data_list.pause = True
                 self.pause_app()
 
             for ind, row in enumerate(perforations_intervals):
@@ -1534,6 +1550,7 @@ class WellPerforation(FindIndexPZ):
                     zhgs = 1.01
                     aaaa = row[col_pressuar_index], row[col_vert_index]
                     if str(row[col_pressuar_index]).replace(',', '').replace('.', '').isdigit() and row[col_vert_index]:
+
                         data_p = float(str(row[col_pressuar_index]).replace(',', '.'))
                         self.dict_data_well["dict_perforation"].setdefault(plast, {}).setdefault('давление',
                                                                                                  []).append(
@@ -1545,9 +1562,9 @@ class WellPerforation(FindIndexPZ):
                                                     float(str(row[col_vert_index]).replace(',', '.')), float(data_p))
                     else:
                         self.dict_data_well["dict_perforation"].setdefault(plast, {}).setdefault('давление',
-                                                                                                 []).append('0')
+                                                                                                 []).append(None)
                         self.dict_data_well["dict_perforation_short"].setdefault(plast, {}).setdefault('давление',
-                                                                                                       []).append('0')
+                                                                                                       []).append(None)
                     if zhgs:
                         self.dict_data_well["dict_perforation"].setdefault(plast, {}).setdefault('рабочая жидкость',
                                                                                                  []).append(zhgs)
@@ -1639,7 +1656,7 @@ class WellPerforation(FindIndexPZ):
 
             self.perforation_correct_window2.show()
             self.pause_app()
-            well_data.pause = True
+            data_list.pause = True
             self.perforation_correct_window2 = None
             # definition_plast_work(self)
         else:
@@ -1653,7 +1670,7 @@ class WellPerforation(FindIndexPZ):
 class WellCategory(FindIndexPZ):
     def __init__(self):
         super(WellCategory, self).__init__()
-        # self.read_well(self.ws, self.cat_well_min._value, well_data.data_well_min._value)
+        # self.read_well(self.ws, self.cat_well_min._value, data_list.data_well_min._value)
 
     def read_well(self, begin_index, cancel_index):
 
@@ -1665,7 +1682,7 @@ class WellCategory(FindIndexPZ):
         self.dict_data_well["cat_well_max"] = ProtectedIsDigit(cancel_index)
         self.dict_data_well["bur_rastvor"] = ''
 
-        if well_data.data_in_base is False:
+        if data_list.data_in_base is False:
             try:
                 for row in range(begin_index, cancel_index):
                     for col in range(1, 13):
@@ -1741,7 +1758,7 @@ class WellCategory(FindIndexPZ):
             if len(self.dict_data_well["cat_h2s_list"]) == 0:
                 QMessageBox.warning(self, 'ОШИБКА', 'Приложение не смогла найти значение '
                                                     'сероводорода в процентах')
-                well_data.pause = True
+                data_list.pause = True
                 self.pause_app()
 
             if self.data_window is None:
@@ -1750,7 +1767,7 @@ class WellCategory(FindIndexPZ):
                 # self.data_window.setGeometry(200, 200, 200, 200)
                 self.data_window.show()
                 self.pause_app()
-                well_data.pause = True
+                data_list.pause = True
             else:
                 self.data_window.close()
                 self.data_window = None

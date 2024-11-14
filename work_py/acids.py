@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QComboBo
     QMainWindow, QPushButton
 
 import krs
-import well_data
+import data_list
 from gnkt_data.gnkt_data import gnkt_dict
 from main import MyMainWindow
 from .acid_paker import CheckableComboBox
@@ -158,7 +158,7 @@ class GonsWindow(WindowUnion):
                                   acid_calcul_Edit, pressure_edit, iron_true_combo, iron_volume_edit)
         self.populate_row(self.ins_ind, work_list, self.table_widget)
         self.calculate_chemistry(acid_edit, acid_volume_edit)
-        well_data.pause = False
+        data_list.pause = False
         self.close()
         return work_list
 

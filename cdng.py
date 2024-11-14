@@ -1,4 +1,4 @@
-import well_data
+import data_list
 from work_py.data_informations import calc_pntzh, dict_data_cdng
 
 
@@ -85,7 +85,7 @@ def events_gnvp_gnkt(self):
                ' Обеспечить запас жидкости для постоянного долива в процессе подъема НКТ в объёме не '
                'менее 10 м3 уд.веса',
          None, None, None, None, None, None, None, None, None],
-        [None, f'4. Оборудовать устье скважины по схеме  №5, утвержденной главным инженером {well_data.contractor} от'
+        [None, f'4. Оборудовать устье скважины по схеме  №5, утвержденной главным инженером {data_list.contractor} от'
                ' 14.10.2021г, согласно схемы обвязки устья скважин  на месторождениях ООО Башнефть-Добыча превенторной'
                ' установкой при капитальном, текущем ремонте, освоении для скважин, соответствующей категории по '
                'степени опасности возникновения газонефтеводопроявлений ', None, None, None, None, None, None, None,
@@ -199,7 +199,7 @@ def events_gnvp_frez(self, distance, fluid):
          f'Производить замеры ГВС при спуске, промывках и освоении не реже, чем как через каждый час, '
          f'с записью в журнале времени и результатов замеров ГВС. В случае возникновения '
          f'газонефтеводопроявления следует прекратить все работы, загерметизировать устье скважины и '
-         f'сообщить об этом в службу ЦИТС{well_data.contractor} и «Заказчика» {dict_data_cdng[self.dict_data_well["cdng"]._value]}',
+         f'сообщить об этом в службу ЦИТС{data_list.contractor} и «Заказчика» {dict_data_cdng[self.dict_data_well["cdng"]._value]}',
          None, None, None, None, None, None, None, None,
          'Мастер ГНКТ', None],
         [None, 5, 'Перед началом работ по капитальному ремонту скважин иметь в наличии в исправном состоянии '
@@ -207,9 +207,9 @@ def events_gnvp_frez(self, distance, fluid):
          None, None, None, None, None, None, None, None,
          'Мастер ГНКТ', None],
         [None, 6, f'Двухкратный запас жидкости глушения уд.веса {fluid}г/см3 в объеме '
-                  f'{round(float(self.dict_data_well["well_volume_in_PZ"][0]) * 2, 1)}м3 находится на '
+                  f'{round(float(self.dict_data_well["well_volume_in_pz"][0]) * 2, 1)}м3 находится на '
                   f'{"".join(calc_pntzh(float(fluid), self.dict_data_well["cdng"]._value))} на расстоянии {distance}км от скважины.'
-                  f' {well_data.contractor} в случае необходимости '
+                  f' {data_list.contractor} в случае необходимости '
                   '(аварийного глушения) обязуется обеспечить завоз жидкости глушения на объект работ.', None, None,
          None, None, None, None, None, None, 'Подрядчик по КРС', None],
         [None, 7,
@@ -381,8 +381,8 @@ def events_gnvp(self, contractor):
              None, None, None, None, None, None, None, None, None],
             [None,
              f'5. Оборудовать устье скважины согласно по схеме № {self.dict_data_well["kat_pvo"]}, утвержденной главным инженером '
-             f'{well_data.contractor}  {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}, согласно '
-             f'схемы обвязки устья скважин  на месторождениях {well_data.costumer} превенторной '
+             f'{data_list.contractor}  {data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}, согласно '
+             f'схемы обвязки устья скважин  на месторождениях {data_list.costumer} превенторной '
              f'установкой при капитальном, текущем ремонте, освоении для скважин, соответствующей категории по '
              f'степени опасности возникновения газонефтеводопроявлений ',
              None, None, None, None, None, None, None, None, None],

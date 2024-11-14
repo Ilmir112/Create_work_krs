@@ -1,4 +1,4 @@
-import well_data
+import data_list
 import re
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.Qt import *
@@ -272,13 +272,13 @@ class PerforationCorrect(WindowUnion):
                                                    'перфорации нет, верно ли?')
             if perf_true_quest == QMessageBox.StandardButton.Yes:
 
-                well_data.pause = False
+                data_list.pause = False
                 self.close()
                 return
             else:
 
                 return
-        well_data.pause = False
+        data_list.pause = False
         self.close()
 
 

@@ -4,7 +4,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QLineEdit, QComboBox, QGridLayout, QTabWidget, \
     QTableWidget, QHeaderView, QPushButton, QTableWidgetItem, QApplication, QMainWindow
 
-import well_data
+import data_list
 from main import MyMainWindow
 from .parent_work import TabPageUnion, WindowUnion, TabWidgetUnion
 
@@ -311,7 +311,7 @@ class Raid(WindowUnion):
         self.dict_data_well["ribbing_interval"].extend(raid_tuple[::-1])
 
         self.populate_row(self.ins_ind, raid_list, self.table_widget)
-        well_data.pause = False
+        data_list.pause = False
         self.close()
 
     def del_row_table(self):

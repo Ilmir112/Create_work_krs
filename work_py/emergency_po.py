@@ -2,7 +2,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QInputDialog, QWidget, QLabel, QLineEdit, QComboBox, QGridLayout, QTabWidget, QPushButton, \
     QMessageBox
 
-import well_data
+import data_list
 from main import MyMainWindow
 from .parent_work import TabPageUnion, WindowUnion,TabWidgetUnion
 from .rationingKRS import descentNKT_norm, liftingNKT_norm
@@ -163,7 +163,7 @@ class EmergencyPo(WindowUnion):
         self.dict_data_well["current_bottom"] = bottom_line
 
         self.populate_row(self.ins_ind, raid_list, self.table_widget)
-        well_data.pause = False
+        data_list.pause = False
         self.close()
 
 
@@ -179,7 +179,7 @@ class EmergencyPo(WindowUnion):
              None, None, None, None, None, None, None,
              'Аварийный Мастер КРС, УСРСиСТ', 12],
             [None, None,
-             f'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС {well_data.contractor}". '
+             f'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС {data_list.contractor}". '
              f'Составить акт готовности скважины и передать его начальнику партии',
              None, None, None, None, None, None, None,
              'Мастер, подрядчик по ГИС', None],

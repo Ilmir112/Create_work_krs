@@ -1,5 +1,5 @@
 import krs
-import well_data
+import data_list
 from PyQt5.QtGui import QDoubleValidator
 from PyQt5.QtWidgets import QInputDialog, QMessageBox, QLabel, QLineEdit, QComboBox, QGridLayout, QWidget, QTabWidget, \
     QMainWindow, QPushButton
@@ -148,7 +148,7 @@ class GrpWindow(WindowUnion):
                                   normalization_true_quest, current_depth)
 
         self.populate_row(self.ins_ind, work_list, self.table_widget)
-        well_data.pause = False
+        data_list.pause = False
         self.close()
 
     def normalization(self, current_depth, diametr_paker, gisOTZ_after_true_quest):
@@ -230,9 +230,9 @@ class GrpWindow(WindowUnion):
              'Мастер КРС', liftingNKT_norm(current_depth, 1.2)],
             [f'по согласованию с заказчиком: Отбивка забоя',
              None, f'по согласованию с заказчиком: \n'
-                   f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {well_data.contractor}". '
+                   f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {data_list.contractor}". '
                    f'Произвести монтаж ПАРТИИ ГИС согласно схемы №8а утвержденной главным инженером '
-                   f'{well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г. '
+                   f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г. '
                    f'ЗАДАЧА 2.8.2 Отбить забой по ГК и ЛМ',
              None, None, None, None, None, None, None,
              'Мастер КРС, подрядчик по ГИС', 4]]
@@ -278,9 +278,9 @@ class GrpWindow(WindowUnion):
 
     def grpPaker(self, diametr_paker, paker_depth, paker_khost, gisOTZ_true_quest, gisOTZ_after_true_quest,
                  normalization_true_quest, current_depth):
-        if 'Ойл' in well_data.contractor:
+        if 'Ойл' in data_list.contractor:
             schema_grp = '7а'
-        elif 'РН' in well_data.contractor:
+        elif 'РН' in data_list.contractor:
             schema_grp = '6'
 
         if self.dict_data_well["column_diametr"]._value > 133:
@@ -315,9 +315,9 @@ class GrpWindow(WindowUnion):
              None, None, None, None, None, None, None,
              'мастер КРС', ''],
             [f'Привязка по ГК и ЛМ', None,
-             f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {well_data.contractor}". '
+             f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {data_list.contractor}". '
              f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером  '
-             f'{well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г. '
+             f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г. '
              f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины Отбить забой по ГК и ЛМ',
              None, None, None, None, None, None, None,
              'Мастер КРС, подрядчик по ГИС', 4],
@@ -340,8 +340,8 @@ class GrpWindow(WindowUnion):
              'Мастер КРС, заказчик', " "],
             [None, None,
              f'Демонтировать ПВО. Обвязать устье скважины согласно схемы ПВО №{schema_grp} утвержденной главным '
-             f'инженером {well_data.contractor} '
-             f' {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г для проведения ГРП на месторождениях '
+             f'инженером {data_list.contractor} '
+             f' {data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г для проведения ГРП на месторождениях '
              f'ООО "БашнефтьДобыча". Посадить планшайбу. '
              f'Произвести демонтаж'
              f' оборудования. Опрессовать установленную арматуру для ГРП на '
@@ -440,8 +440,8 @@ class GrpWindow(WindowUnion):
         if gisOTZ_true_quest == 'Да':
             paker_list.append(
                 [f'Отбить забой по ГК и ЛМ', None,
-                 f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {well_data.contractor}". '
-                 f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером  {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г. '
+                 f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {data_list.contractor}". '
+                 f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером  {data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г. '
                  f'ЗАДАЧА 2.8.2 Отбить забой по ГК и ЛМ',
                  None, None, None, None, None, None, None,
                  'Мастер КРС, подрядчик по ГИС', 4])

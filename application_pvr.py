@@ -1,21 +1,14 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIntValidator, QDoubleValidator
-from PyQt5.QtWidgets import QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QTabWidget, QMainWindow, QPushButton, \
+from PyQt5.QtWidgets import QWidget, QLabel, QComboBox, QLineEdit, QGridLayout,  QPushButton, \
     QMessageBox, QApplication, QTableWidget, QTableWidgetItem, QVBoxLayout, QHeaderView
 import openpyxl
-from openpyxl.utils.cell import range_boundaries, get_column_letter
-from openpyxl.workbook import Workbook
 
-from block_name import region
-from property_excel.property_excel_pvr import boundaries, rowHeights1, colWidth
+import data_list
 
-from main import MyMainWindow, MyMainWindow
-from plan import copy_true_ws
-import well_data
-import sys
 
 from work_py.parent_work import TabPageUnion, TabWidgetUnion, WindowUnion
-from work_py.perforation import PerforationWindow
+
 
 
 class TabPageSoPvr(TabPageUnion):
@@ -27,7 +20,7 @@ class TabPageSoPvr(TabPageUnion):
 
         self.number_brigada_label = QLabel('Номер бригады', self)
         self.number_brigada_combo = QComboBox(self)
-        brigada_list = well_data.DICT_TELEPHONE
+        brigada_list = data_list.DICT_TELEPHONE
         self.number_brigada_combo.addItems(list(brigada_list.keys()))
 
 
@@ -37,7 +30,7 @@ class TabPageSoPvr(TabPageUnion):
 
         self.date_new_label = QLabel('Дата заявки', self)
         self.date_new_edit = QLineEdit(self)
-        self.date_new_edit.setText(f'{well_data.current_date}')
+        self.date_new_edit.setText(f'{data_list.current_date}')
 
         self.time_new_label = QLabel('Время заявки', self)
         self.time_new_edit = QLineEdit(self)
@@ -152,26 +145,27 @@ class TabPageSoPvr(TabPageUnion):
         self.number_brigada_combo.currentTextChanged.connect(self.update_brigade)
 
     def update_brigade(self, index):
-        self.number_telephone_edit.setText(str(well_data.DICT_TELEPHONE[self.number_brigada_combo.currentText()]))
+        self.number_telephone_edit.setText(str(data_list.DICT_TELEPHONE[self.number_brigada_combo.currentText()]))
 
 
 class TabWidget(TabWidgetUnion):
-    def __init__(self):
+    def __init__(self, parent=None):
         super().__init__()
-        self.addTab(TabPageSoPvr(self), 'Заявка на ПВР')
+        self.addTab(TabPageSoPvr(parent), 'Заявка на ПВР')
 
 
 class PvrApplication(WindowUnion):
     def __init__(self, table_pvr, parent=None):
         super().__init__()
-        layout = QVBoxLayout()
+        self.dict_data_well = parent
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
         self.table_pvr = table_pvr
         # self.model = self.table_pvr.model()
         # self.table_pvr.setColumnCount(42)
         # self.table_pvr.setRowCount(113)
-        self.tabWidget = TabWidget()
+        self.tabWidget = TabWidget(parent)
+
 
         self.tableWidget = QTableWidget(0, 7)
         self.tableWidget.setHorizontalHeaderLabels(
@@ -203,7 +197,7 @@ class PvrApplication(WindowUnion):
         vbox.addWidget(self.buttonAddProject, 3, 1)
 
     def addPerfProject(self):
-
+        aas = self.dict_data_well["pvr_row"]
         if len(self.dict_data_well["pvr_row"]) == 0:
 
             QMessageBox.warning(self, 'Ошибка', 'Перфорация в плане работ не найдены')
@@ -266,7 +260,7 @@ class PvrApplication(WindowUnion):
     def add_work(self):
         
 
-        wb = openpyxl.load_workbook(f'{well_data.path_image}property_excel/template_pvr.xlsx')
+        wb = openpyxl.load_workbook(f'{data_list.path_image}property_excel/template_pvr.xlsx')
         # Выбираем активный лист
         self.ws_pvr = wb.active
         number_brigada = str(self.tabWidget.currentWidget().number_brigada_combo.currentText())
@@ -316,11 +310,11 @@ class PvrApplication(WindowUnion):
 
         # MyWindow.copy_pz(self, self.ws_pvr, self.table_pvr, 'application_pvr', 42)
 
-        well_data.pause = False
+        data_list.pause = False
         self.close()
         self.ws_pvr.print_area = f'B1:AP{114}'
 
-        filenames = f'{self.dict_data_well["well_number"]._value} {self.dict_data_well["well_area"]._value} ПВР {well_data.current_date}.xlsx'
+        filenames = f'{self.dict_data_well["well_number"]._value} {self.dict_data_well["well_area"]._value} ПВР {data_list.current_date}.xlsx'
         path = 'D:\Documents\Desktop\ГТМ\заявки ГИС'
         full_path = path + "/" + filenames
         if wb:
@@ -330,7 +324,7 @@ class PvrApplication(WindowUnion):
             print(f'Table data saved to Excel {full_path}')
         if wb:
             wb.close()
-        self.dict_data_well["pvr_row"] = []
+
 
     def del_row_table(self):
         row = self.tableWidget.currentRow()
@@ -381,7 +375,7 @@ class PvrApplication(WindowUnion):
              None, 'по договору №', None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None,
              None, None, None, None, None, None, None, None, None],
-            [None, 'Заказчик', None, None, None, f'{well_data.contractor}', None, None, None, None, None, None, None, None, None,
+            [None, 'Заказчик', None, None, None, f'{data_list.contractor}', None, None, None, None, None, None, None, None, None,
              None,
              None, None, None, 'Цех', None, None, self.dict_data_well["cdng"]._value, None, None, None, None, None, None, None, None,
              None,
@@ -899,7 +893,7 @@ class PvrApplication(WindowUnion):
              None, None, None, None, None, None, None, None, None, 'телефон', None, None, None, None, None, None, None,
              None,
              None, None, None, None, None, None, None, None],
-            [None, f'{well_data.user[0]} {well_data.user[1]}', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+            [None, f'{data_list.user[0]} {data_list.user[1]}', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None,
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None,

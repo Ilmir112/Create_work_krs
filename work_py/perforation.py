@@ -1,7 +1,7 @@
 from PyQt5 import QtWidgets
 from PyQt5.Qt import *
 
-import well_data
+import data_list
 from main import MyMainWindow
 from work_py.parent_work import TabPageUnion, TabWidgetUnion, WindowUnion
 from .advanted_file import definition_plast_work
@@ -313,9 +313,9 @@ class PerforationWindow(WindowUnion):
 
             if self.dict_data_well["kat_pvo"] < kateg2:
                 self.dict_data_well["kat_pvo"] = kateg2
-        if 'Ойл' in well_data.contractor:
+        if 'Ойл' in data_list.contractor:
             shema_str = 'a'
-        elif 'РН' in well_data.contractor:
+        elif 'РН' in data_list.contractor:
             if type_perforation == 'ПВР на кабеле':
                 shema_str = 'a'
             else:
@@ -323,10 +323,10 @@ class PerforationWindow(WindowUnion):
         perforation = [
             [None, None,
              f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через '
-             f'ЦИТС {well_data.contractor}". '
+             f'ЦИТС {data_list.contractor}". '
              f'При необходимости  подготовить место для установки партии ГИС напротив мостков. '
              f'Произвести  монтаж ГИС согласно схемы  №8{shema_str} утвержденной главным инженером от '
-             f'{well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г',
+             f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г',
              None, None, None, None, None, None, None,
              'Мастер КРС', None, None, None],
             [None, None,
@@ -338,7 +338,7 @@ class PerforationWindow(WindowUnion):
              f'Передать по сводке уровня жидкости до перфорации и после перфорации.'
              f'(Произвести фотографию перфоратора в заряженном состоянии, и после проведения '
              f'перфорации,'
-             f' фотографии предоставить в ЦИТС {well_data.contractor}',
+             f' фотографии предоставить в ЦИТС {data_list.contractor}',
              None, None, None, None, None, None, None,
              'Мастер КРС, подрядчик по ГИС', 1.2, None],
             ["ГИС (Перфорация на кабеле ЗАДАЧА 2.9.1)", None,
@@ -414,7 +414,7 @@ class PerforationWindow(WindowUnion):
              f'(с шаблонировкой НКТ{self.dict_data_well["nkt_diam"]}мм шаблоном {self.dict_data_well["nkt_template"]}мм. '
              f'Спуск компоновки производить  со скоростью не более 0,30 м/с, не допуская резких ударов и вращения.'
              f'(Произвести фотографию перфоратора в заряженном состоянии, и после проведения перфорации, '
-             f'фотографии предоставить в ЦИТС {well_data.contractor}, передать по сводке уровня '
+             f'фотографии предоставить в ЦИТС {data_list.contractor}, передать по сводке уровня '
              f'жидкости до перфорации и после перфорации) '
              f'(При СПО первых десяти НКТ на спайдере дополнительно '
              f'устанавливать элеватор ЭХЛ).',

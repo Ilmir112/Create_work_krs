@@ -2,12 +2,12 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.Qt import *
 from PyQt5.QtGui import QIntValidator, QDoubleValidator
 
-import well_data
+import data_list
 from main import MyMainWindow
 from work_py.parent_work import TabPageUnion, WindowUnion,TabWidgetUnion
 
 
-class TabPageSo_leakage(TabPageUnion):
+class TabPageSoLeakage(TabPageUnion):
     def __init__(self, parent=None):
         super().__init__(parent)
 
@@ -44,13 +44,13 @@ class TabPageSo_leakage(TabPageUnion):
 class TabWidget(TabWidgetUnion):
     def __init__(self, parent):
         super().__init__()
-        self.addTab(TabPageSo_leakage(parent), 'Негерметичность')
+        self.addTab(TabPageSoLeakage(parent), 'Негерметичность')
 
 class LeakageWindow(WindowUnion):
 
     def __init__(self, parent=None):
-
         super(LeakageWindow, self).__init__(parent)
+        self.dict_data_well = parent
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
 
@@ -80,6 +80,7 @@ class LeakageWindow(WindowUnion):
         vbox.addWidget(self.buttonadd_work, 3, 0)
         vbox.addWidget(self.buttonAddString, 3, 1)
 
+        asd = self.dict_data_well["dict_leakiness"]
         if len(self.dict_data_well["dict_leakiness"]) != 0:
 
             ffa = self.dict_data_well["dict_leakiness"]['НЭК']
@@ -187,10 +188,10 @@ class LeakageWindow(WindowUnion):
                 dict_leakiness.setdefault(
                     'НЭК', {}).setdefault('интервал', {}).setdefault((f"{roof}-{sole}"), {}).setdefault(
                     'отрайбировано', False)
-        # self.dict_data_well["dict_leakiness"] = dict_leakiness
+        self.dict_data_well["dict_leakiness"] = dict_leakiness
         # print(dict_leakiness)
 
-        well_data.pause = False
+        data_list.pause = False
         self.close()
         return dict_leakiness
 

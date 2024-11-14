@@ -1,5 +1,5 @@
 import subprocess
-import well_data
+import data_list
 # Указываем путь к вашему файлу приложения PyQt
 entry_point = 'main.py'
 
@@ -63,10 +63,10 @@ additional_files = [
     ('perforation_correct_gnkt_frez.py', '.'),
     ('plan.py', '.'),
     ('plan23.py', '.'),
-    (f'{well_data.path_image}podpisant.json', '.'),
+    (f'{data_list.path_image}podpisant.json', '.'),
     ('proverka.py', '.'),
     ('selectPlast.py', '.'),
-    ('well_data.py', '.'),
+    ('data_list.py', '.'),
     ('work_json.py', '.'),
     ('application_gis.py', '.'),
     ('application_gis.py', '.'),

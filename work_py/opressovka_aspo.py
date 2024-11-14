@@ -1,6 +1,6 @@
 from PyQt5.QtGui import QDoubleValidator, QIntValidator
 
-import well_data
+import data_list
 from main import MyMainWindow
 from PyQt5.QtWidgets import QMessageBox, QInputDialog, QMainWindow, QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, \
     QTabWidget, QPushButton
@@ -109,7 +109,7 @@ class PakerAspo(WindowUnion):
 
         work_list = PakerAspo.paker_list(self, diametr_paker, paker_khost, paker_depth)
         self.populate_row(self.ins_ind, work_list, self.table_widget)
-        well_data.pause = False
+        data_list.pause = False
         self.close()
 
     def closeEvent(self, event):

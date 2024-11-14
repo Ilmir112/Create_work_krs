@@ -2,7 +2,7 @@ from PyQt5.QtGui import QDoubleValidator, QIntValidator
 from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QTabWidget, \
     QMainWindow, QPushButton
 
-import well_data
+import data_list
 from main import MyMainWindow
 from .alone_oreration import volume_vn_ek
 from .parent_work import TabPageUnion, WindowUnion, TabWidgetUnion
@@ -246,7 +246,7 @@ class SandWindow(WindowUnion):
             work_list.extend(rir_list[1:])
 
         self.populate_row(self.ins_ind, work_list, self.table_widget)
-        well_data.pause = False
+        data_list.pause = False
         self.close()
 
     def closeEvent(self, event):
@@ -306,9 +306,9 @@ class SandWindow(WindowUnion):
              None, None, None, None, None, None, None,
              'мастер КРС', 1.2],
             [None, None,
-             f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {well_data.contractor}". При необходимости '
+             f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {data_list.contractor}". При необходимости '
              f'подготовить место для установки партии ГИС напротив мостков. Произвести  монтаж ГИС согласно схемы  №8 при '
-             f'привязке утвержденной главным инженером  {well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г.',
+             f'привязке утвержденной главным инженером  {data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г.',
              None, None, None, None, None, None, None,
              'мастер КРС', None],
             [f'Привязка ', None,

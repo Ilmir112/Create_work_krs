@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QInputDialog, QApplication
 
 from openpyxl.utils import get_column_letter
 
-import well_data
+import data_list
 from perforation_correct_gnkt_frez import PerforationCorrectGnktFrez
 
 import plan
@@ -40,7 +40,7 @@ class WorkWithGnkt(GnktModel):
             # self.perforation_correct_window2.setGeometry(200, 400, 100, 400)
             self.perforation_correct_window2.show()
             self.pause_app()
-            well_data.pause = True
+            data_list.pause = True
             self.dict_ports = self.perforation_correct_window2.dict_ports
 
             self.perforation_correct_window2.close()
@@ -497,7 +497,7 @@ class WorkWithGnkt(GnktModel):
                 # print(f'вставка1 ')
                 column_img = f'H{value[1] + 6}'
 
-                self.insert_image(ws3, f'{well_data.path_image}imageFiles/schema_well/port.png', coordinate, 200, 200)
+                self.insert_image(ws3, f'{data_list.path_image}imageFiles/schema_well/port.png', coordinate, 200, 200)
 
             for i in range(3):
                 cell = ws3.cell(row=27, column=value[0] + i)
@@ -521,9 +521,9 @@ class WorkWithGnkt(GnktModel):
 
         coordinate = f'B3'
 
-        self.insert_image(ws3, f'{well_data.path_image}imageFiles/schema_well/gorizont_1.png', coordinate, 237, 1023)
+        self.insert_image(ws3, f'{data_list.path_image}imageFiles/schema_well/gorizont_1.png', coordinate, 237, 1023)
         # print(Column_img)
-        self.insert_image(ws3, f'{well_data.path_image}imageFiles/schema_well/gorizont_12.png', column_img, 1800, 120)
+        self.insert_image(ws3, f'{data_list.path_image}imageFiles/schema_well/gorizont_12.png', column_img, 1800, 120)
 
         ws3.print_area = f'B1:AW{37}'
         ws3.page_setup.fitToPage = True
@@ -686,7 +686,7 @@ class WorkWithGnkt(GnktModel):
              f'и инжектора на устье '
              f'скважины согласно «Схемы обвязки №5 устья противовыбросовым оборудованием при производстве работ по '
              f'промывке скважины с установкой «ГНКТ» утвержденная главным инженером от '
-             f'{well_data.dict_contractor[well_data.contractor]["Дата ПВО"]}г. Произвести обвязку установки ГНКТ, '
+             f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г. Произвести обвязку установки ГНКТ, '
              f'насосно-компрессорного агрегата, желобной циркуляционной системы.',
              None, None, None, None, None, None, None, None,
              'Мастер ГНКТ', None],
@@ -1079,9 +1079,9 @@ class WorkWithGnkt(GnktModel):
             [None, 62,
              f'ВНИМАНИЕ: При наличии посадок КНК - спуск производить с остановками для промежуточных промывок. В случае '
              f'прихвата ГНКТ в скважине - проинформировсть ответственного представителя Заказчика и руководство ГНКТ'
-             f'{well_data.contractor}. Дальнейшие действия производить в присутствии представителя Заказчика с '
+             f'{data_list.contractor}. Дальнейшие действия производить в присутствии представителя Заказчика с '
              f'составлением АКТа '
-             f'согласно "Плана-Схемы действий при прихватах ГНКТ" ТЕХНОЛОГИЧЕСКОЙ ИНСТРУКЦИИ {well_data.costumer}',
+             f'согласно "Плана-Схемы действий при прихватах ГНКТ" ТЕХНОЛОГИЧЕСКОЙ ИНСТРУКЦИИ {data_list.costumer}',
              None, None, None, None, None, None, None, None,
              'Мастер ГНКТ, предст.Заказчика Мастер по сложным работам ГНКТ', None],
             [None, 'Использование хим. реагентов в процессе работ', None, None, None, None, None, None, None, None,
