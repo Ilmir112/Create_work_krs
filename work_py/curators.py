@@ -9,7 +9,7 @@ from .parent_work import TabWidgetUnion, TabPageUnion, WindowUnion
 
 class TabPageSoCurator(TabPageUnion):
     def __init__(self, parent=None):
-        super().__init__()
+        super().__init__(parent)
 
         self.curator_label = QLabel("Куратор", self)
         self.curator_combo = QComboBox(self)
@@ -33,7 +33,7 @@ class SelectCurator(WindowUnion):
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
 
-        self.tabWidget = TabWidget()
+        self.tabWidget = TabWidget(parent)
 
         self.buttonadd_work = QPushButton('Изменить')
         self.buttonadd_work.clicked.connect(self.add_work, Qt.QueuedConnection)

@@ -2465,7 +2465,7 @@ class MyWindow(MyMainWindow):
         from work_py.curators import SelectCurator
 
         if self.new_window is None:
-            self.new_window = SelectCurator()
+            self.new_window = SelectCurator(self.dict_data_well)
             # WellCondition.leakage_window.setGeometry(200, 400, 300, 400)
             self.set_modal_window(self.new_window)
             self.pause_app()

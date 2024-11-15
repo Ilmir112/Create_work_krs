@@ -162,6 +162,7 @@ class CorrectPlanWindow(WindowUnion):
                     self.dict_data_well["appointment"] =ProtectedIsNonNone(data_well[5])
                     self.dict_data_well["inv_number"] = ProtectedIsNonNone(data_well[6])
                     self.dict_data_well["wellhead_fittings"] = data_well[7]
+                    self.dict_data_well["emergency_well"] = False
 
                 insert_data_well_dop_plan(self, data_well[0])
 
@@ -175,7 +176,7 @@ class CorrectPlanWindow(WindowUnion):
 
 
             if well_area != '' and well_area != '':
-                self.well_number, self.dict_data_well["well_area"] = \
+                self.dict_data_well["well_number"], self.dict_data_well["well_area"] = \
                     ProtectedIsNonNone(well_number), ProtectedIsNonNone(well_area)
 
 

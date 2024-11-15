@@ -71,7 +71,7 @@ class TabPageSoDrill(TabPageUnion):
         self.drill_label = QLabel("добавление поинтервального бурения", self)
         self.drill_cm_combo = QComboBox(self)
 
-        self.drill_cm_combo.addItems(data_list.pOTTOM_TYPE_LIST)
+        self.drill_cm_combo.addItems(data_list.BOTTOM_TYPE_LIST)
 
         self.need_privyazka_Label = QLabel("Привязка оборудования", self)
         self.need_privyazka_QCombo = QComboBox()
