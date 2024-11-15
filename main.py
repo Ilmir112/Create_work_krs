@@ -2760,6 +2760,7 @@ if __name__ == "__main__":
         login_window = LoginWindow()
         login_window.setWindowModality(Qt.ApplicationModal)
 
+
         login_window.show()
         MyMainWindow.pause_app()
         data_list.pause = False

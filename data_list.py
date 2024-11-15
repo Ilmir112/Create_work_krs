@@ -111,8 +111,7 @@ data = ''
 rowHeights = ''
 data_well_is_True = False
 current_date = datetime.now().date()
-# path_image = '_internal/'
-path_image = ''
+
 colWidth = ''
 boundaries_dict = ''
 sucker_rod_none = False
