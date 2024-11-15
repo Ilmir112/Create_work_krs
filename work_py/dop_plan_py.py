@@ -1067,10 +1067,8 @@ class DopPlanWindow(WindowUnion):
         db = connection_to_database(data_list.DB_WELL_DATA)
         data_well_base = WorkDatabaseWell(db, self.dict_data_well)
 
-
         result_table = data_well_base.extraction_data(str(well_number), well_area, type_kr,
                                                       work_plan, date_table, contractor)
-
 
         if result_table is None:
             QMessageBox.warning(self, 'Ошибка',

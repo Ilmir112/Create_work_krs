@@ -78,17 +78,12 @@ class CreatePZ(MyMainWindow):
 
 
 
-
-
             if len(self.dict_data_well["check_data_in_pz"]) != 0:
                 check_str = ''
                 for ind, check_data in enumerate(self.dict_data_well["check_data_in_pz"]):
                     if check_data not in check_str:
                         check_str += f'{ind + 1}. {check_data} \n'
                 self.show_info_message(check_str)
-
-
-
 
 
             if self.dict_data_well["work_plan"] not in ['gnkt_frez', 'application_pvr',
@@ -359,6 +354,9 @@ class CreatePZ(MyMainWindow):
 
         curator_s = curator_sel(self.dict_data_well["curator"], self.dict_data_well["region"])
         # print(f'куратор {curator_sel, self.dict_data_well["curator"]}')
+        if curator_s is False:
+            return
+
         podp_down = pop_down(self, self.dict_data_well["region"], curator_s)
 
         for i in range(1 + ins_ind, 1 + ins_ind + len(podp_down)):

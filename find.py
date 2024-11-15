@@ -36,6 +36,9 @@ class FindIndexPZ(MyMainWindow):
         self.dict_data_well["angle_data"] = []
         self.dict_data_well["Qoil"] = 0
         self.dict_data_well["Qwater"] = 0
+        self.dict_data_well["expected_P"] = 0
+        self.dict_data_well["appointment"] = ProtectedIsNonNone('')
+        self.dict_data_well["expected_Q"] = 0
         self.sucker_rod_ind = ProtectedIsDigit(0)
         self.dict_data_well["proc_water"] = 0
         self.dict_data_well["expected_Pick_up"] = {}
@@ -339,7 +342,7 @@ class FindIndexPZ(MyMainWindow):
                     return int(float(str(string).replace(',', '.')))
                 else:
                     return round(float(str(string).replace(',', '.')), 4)
-            elif str(string).replace(' ', '') == '-' or 'отсут' in str(string) or \
+            elif str(string).replace(' ', '') == '-' or 'отсут' in str(string).lower() or \
                     str(string).strip() == '' or string is None:
                 return '0'
             elif '(мм)' in string and '(м)' in string:
@@ -945,8 +948,8 @@ class WellName(FindIndexPZ):
                     elif 'цех' == value:
                         self.dict_data_well["cdng"] = ProtectedIsDigit(row[col + 1].value)
                         # self.dict_data_well["cdng"] = ProtectedIsDigit(row[col + 1].value)
-                    elif 'назначение' == value:
-                        self.dict_data_well["appointment"] = ProtectedIsDigit(row[col + 1].value)
+                    elif 'назначение' in str(value):
+                        self.dict_data_well["appointment"] = ProtectedIsNonNone(row[col + 1].value)
                         # well_data.appointment = ProtectedIsDigit(row[col + 1].value)
                         # print(f' ЦДНГ {self.dict_data_well["cdng"]._value}')
 

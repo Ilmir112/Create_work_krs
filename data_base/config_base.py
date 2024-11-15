@@ -222,7 +222,12 @@ class WorkDatabaseWell:
         data_paragraph = json.dumps(self.dict_data_well["data_list"], ensure_ascii=False)
         cdng = self.dict_data_well["cdng"]._value
 
+        wellhead_fittings = self.dict_data_well["wellhead_fittings"]
+        well_oilfield = self.dict_data_well["well_oilfield"]._value
+        inv_number = self.dict_data_well["inv_number"]._value
+        appointment = self.dict_data_well["appointment"]._value
         category_dict = json.dumps(self.dict_data_well["dict_category"], ensure_ascii=False)
+
         # print(row, self.dict_data_well["count_row_well"])
 
         if 'dop_plan' in work_plan:
@@ -274,10 +279,14 @@ class WorkDatabaseWell:
                             f"VALUES ({self.path_index}, {self.path_index}, {self.path_index}, " \
                             f"{self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, " \
                             f"{self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, " \
+                            f"{self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, " \
                             f"{self.path_index}, {self.path_index})"
+
                     data_values = (str(well_number), well_area,
                                    data_well, date_today, excel_json, contractor, data_list.costumer, work_plan_str,
-                                   data_list.user[1], type_kr, data_paragraph, cdng, category_dict)
+                                   data_list.user[1], type_kr, data_paragraph, cdng, category_dict,
+                                   well_oilfield, appointment, str(inv_number), wellhead_fittings)
+
                     # Выполнение запроса с использованием параметров
                     cursor.execute(query, data_values)
                     # Не забудьте сделать коммит
@@ -425,7 +434,22 @@ class WorkDatabaseWell:
             wells_with_data = cursor.fetchall()
             return wells_with_data
 
-    def check_in_database_well_data(self, number_well, area_well, work_plan):
+    def check_in_database_well_data(self, number_well, area_well, work_plan, today):
+        if not self.db_connection:
+            return None
+        with self.db_connection.cursor() as cursor:
+            cursor.execute(f"SELECT data_well, today, type_kr, category_dict, well_oilfield, appointment, inv_number, wellhead_fittings "
+                           f"FROM wells "
+                           f"WHERE well_number = {self.path_index} AND area_well = {self.path_index} "
+                           f"AND contractor = {self.path_index} AND costumer = {self.path_index} AND "
+                           f"work_plan={self.path_index} AND today={self.path_index}",
+                           (str(number_well), area_well, data_list.contractor, data_list.costumer, work_plan, today))
+
+            data_well = cursor.fetchone()
+            return data_well
+
+        return False
+    def check_in_database_dp_data(self, number_well, area_well, work_plan):
         if not self.db_connection:
             return None
         with self.db_connection.cursor() as cursor:
@@ -433,7 +457,7 @@ class WorkDatabaseWell:
                            f"FROM wells "
                            f"WHERE well_number = {self.path_index} AND area_well = {self.path_index} "
                            f"AND contractor = {self.path_index} AND costumer = {self.path_index} AND "
-                           f"work_plan={self.path_index}",
+                           f"work_plan={self.path_index} AND today={self.path_index}",
                            (str(number_well), area_well, data_list.contractor, data_list.costumer, work_plan))
 
             data_well = cursor.fetchone()

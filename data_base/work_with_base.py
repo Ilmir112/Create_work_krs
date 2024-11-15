@@ -606,6 +606,7 @@ def insert_data_well_dop_plan(self, data_well):
     self.dict_data_well["region"] = well_data_dict['регион']
     self.dict_data_well["cdng"] = ProtectedIsNonNone(well_data_dict['ЦДНГ'])
 
+
     self.dict_data_well["data_well_dict"] = well_data_dict
     # QMessageBox.information(None, 'Данные с базы', "Данные вставлены из базы данных")
 

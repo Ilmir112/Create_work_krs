@@ -140,7 +140,7 @@ class MyMainWindow(QMainWindow):
             db = connection_to_database(data_list.DB_WELL_DATA)
             data_well_base = WorkDatabaseWell(db, self.dict_data_well)
 
-            data_well = data_well_base.check_in_database_well_data(self.dict_data_well["well_number"]._value,
+            data_well = data_well_base.check_in_database_dp_data(self.dict_data_well["well_number"]._value,
                                                                    self.dict_data_well["well_area"]._value,
                                                                    f'ДП№{self.dict_data_well["number_dp"]}')
 
@@ -186,8 +186,6 @@ class MyMainWindow(QMainWindow):
                 WellFondData.read_well(
                     well_pz, well_pz.data_fond_min._value, well_pz.condition_of_wells._value)
             WellData.read_well(well_pz, well_pz.cat_well_max._value, well_pz.data_pvr_min._value)
-
-
 
             WellPerforation.read_well(well_pz, well_pz.data_pvr_min._value, well_pz.data_pvr_max._value + 1)
 
@@ -285,6 +283,7 @@ class MyMainWindow(QMainWindow):
                     self.ws = read_pz.open_excel_file(self.ws, self.work_plan)
                 except FileNotFoundError as f:
                     QMessageBox.warning(self, 'Ошибка', f'Ошибка при прочтении файла {f}')
+                    self.pause_app()
 
             if self.work_plan in ['krs', 'dop_plan']:
                 self.copy_pz(self.ws, self.table_widget, self.work_plan)

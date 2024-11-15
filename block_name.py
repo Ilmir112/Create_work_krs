@@ -12,7 +12,7 @@ def region_select(cdng):
 
 # выбор подписантов в зависимости от вида ГТМ
 def curator_sel(curator, region):
-    print(f' место {data_list.path_image}podpisant.json')
+
     with open(f'{data_list.path_image}podpisant.json', 'r', encoding='utf-8') as file:
         podpis_dict = json.load(file)
     if curator == 'ОР':
@@ -25,6 +25,7 @@ def curator_sel(curator, region):
         return (podpis_dict["регион"][region]['go']['post'], podpis_dict["регион"][region]["go"]['surname'])
     elif curator == 'ГРР':
         return (podpis_dict["регион"][region]['grr']['post'], podpis_dict["регион"][region]["grr"]['surname'])
+    return False
 
 
 current_datetime = datetime.today()

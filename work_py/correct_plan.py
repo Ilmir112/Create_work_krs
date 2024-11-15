@@ -149,7 +149,8 @@ class CorrectPlanWindow(WindowUnion):
             db = connection_to_database(data_list.DB_WELL_DATA)
             data_well_base = WorkDatabaseWell(db, self.dict_data_well)
 
-            data_well = data_well_base.check_in_database_well_data(well_number, well_area, well_data_in_base)
+            data_well = data_well_base.check_in_database_well_data(well_number, well_area,
+                                                                   well_data_in_base, data_well_data_in_base_combo)
 
             if data_well:
                 self.dict_data_well["type_kr"] = data_well[2]
@@ -157,6 +158,10 @@ class CorrectPlanWindow(WindowUnion):
 
                 if data_well[3]:
                     self.dict_data_well["dict_category"] = json.loads(data_well[3])
+                    self.dict_data_well["well_oilfield"] = ProtectedIsNonNone(data_well[4])
+                    self.dict_data_well["appointment"] =ProtectedIsNonNone(data_well[5])
+                    self.dict_data_well["inv_number"] = ProtectedIsNonNone(data_well[6])
+                    self.dict_data_well["wellhead_fittings"] = data_well[7]
 
                 insert_data_well_dop_plan(self, data_well[0])
 
