@@ -485,6 +485,7 @@ class DopPlanWindow(WindowUnion):
         self.work_with_excel(well_number, well_area, table_in_base, type_kr)
 
     def work_with_excel(self, well_number, well_area, work_plan, type_kr):
+        from data_correct import DataWindow
 
         self.dict_data_well["gips_in_well"] = False
         self.data, self.rowHeights, self.colWidth, self.boundaries_dict = \
@@ -546,7 +547,7 @@ class DopPlanWindow(WindowUnion):
                 for index_col, col_pvr in enumerate(row_pvr):
                     if col_pvr != None:
                         self.tableWidget.setItem(rows, index_col - 1, QTableWidgetItem(str(col_pvr)))
-        from data_correct import DataWindow
+
         DataWindow.definition_open_trunk_well(self)
     @staticmethod
     def read_excel_in_base(number_well, area_well, work_plan, type_kr):

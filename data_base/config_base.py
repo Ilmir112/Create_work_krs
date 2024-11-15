@@ -171,6 +171,277 @@ class RegistrationService:
             self.db_connection.commit()
 
 
+class WorkDatabaseWell:
+    def __init__(self, connect_to_database: DatabaseConnection, dict_data_well=None, path_index="%s"):
+        self.db_connection = connect_to_database.connect_to_database()
+        self.path_index = path_index
+        self.dict_data_well = dict_data_well
+
+    def get_tables_starting_with(self, well_number, well_area, work_plan, type_kr):
+        if not self.db_connection:
+            return None
+        with self.db_connection.cursor() as cursor:
+            cursor.execute(f"""
+                                    SELECT well_number, area_well, type_kr, work_plan
+                                    FROM wells
+                                    WHERE well_number={self.path_index} AND area_well={self.path_index} 
+                                    AND type_kr={self.path_index} AND work_plan={self.path_index}""",
+                           (str(well_number), well_area, type_kr, work_plan))
+
+            rezult = cursor.fetchone()
+            return rezult
+
+    def determining_well_in_database(self, cursor, well_number, well_area, contractor, costumer, work_plan_str):
+
+        cursor.execute(f"""
+                                   SELECT EXISTS (
+                                       SELECT 1 
+                                       FROM wells
+                                       WHERE well_number = {self.path_index} AND area_well = {self.path_index} 
+                                       AND contractor = {self.path_index} 
+                                       AND costumer = {self.path_index} AND work_plan = {self.path_index}
+                                   ), today -- Добавляем contractor в SELECT
+                               FROM wells 
+                               WHERE well_number = {self.path_index} AND area_well ={self.path_index} AND 
+                               contractor = {self.path_index} AND 
+                               costumer = {self.path_index} AND work_plan ={self.path_index}
+                               """, (
+            str(well_number), well_area, contractor, costumer, work_plan_str,
+            str(well_number), well_area, contractor, costumer, work_plan_str))
+
+        row_exists = cursor.fetchone()
+        return row_exists
+
+    def insert_in_database_well_data(self, well_number: str, well_area: str, contractor: str,
+                                     costumer: str, data_well_dict: str, excel: str, work_plan: str):
+        data_well = json.dumps(data_well_dict, ensure_ascii=False)
+        excel_json = json.dumps(excel, ensure_ascii=False)
+        date_today = datetime.now()
+        type_kr = self.dict_data_well["type_kr"].split(' ')[0]
+        adedaas = self.dict_data_well["data_list"]
+        data_paragraph = json.dumps(self.dict_data_well["data_list"], ensure_ascii=False)
+        cdng = self.dict_data_well["cdng"]._value
+
+        category_dict = json.dumps(self.dict_data_well["dict_category"], ensure_ascii=False)
+        # print(row, self.dict_data_well["count_row_well"])
+
+        if 'dop_plan' in work_plan:
+            work_plan_str = f'ДП№{self.dict_data_well["number_dp"]}'
+        elif 'krs' in work_plan:
+            work_plan_str = 'ПР'
+        elif work_plan == 'plan_change':
+            if self.dict_data_well["work_plan_change"] == 'krs':
+                work_plan_str = 'ПР'
+            else:
+                work_plan_str = f'ДП№{self.dict_data_well["number_dp"]}'
+
+        try:
+            if not self.db_connection:
+                return None
+            with self.db_connection.cursor() as cursor:
+                row_exists = self.determining_well_in_database(cursor, well_number, well_area,
+                                                               contractor, costumer, work_plan_str)
+                if row_exists:
+                    row_exists, date_in_base = row_exists
+                    reply = QMessageBox.question(None, 'Строка найдена',
+                                                 f'Строка с {well_number} {well_area} {work_plan} уже существует от {date_in_base}. '
+                                                 f'Обновить данные?')
+                    if reply == QMessageBox.Yes:
+                        cursor.execute(f"""
+                                        UPDATE wells
+                                        SET data_well ={self.path_index}, today ={self.path_index}, 
+                                        excel_json ={self.path_index},
+                                         work_plan={self.path_index}, geolog ={self.path_index}, 
+                                        type_kr={self.path_index}, data_change_paragraph={self.path_index}, 
+                                        cdng={self.path_index}, category_dict={self.path_index}                                                                
+                                        WHERE well_number ={self.path_index} AND area_well ={self.path_index} 
+                                        AND contractor ={self.path_index}
+                                         AND costumer ={self.path_index} AND work_plan ={self.path_index} 
+                                         AND type_kr={self.path_index}
+                                                    """, (
+                            data_well, date_today, excel_json, work_plan_str, data_list.user[1], type_kr,
+                            data_paragraph, cdng,
+                            category_dict, str(well_number), well_area, contractor, costumer, work_plan_str,
+                            type_kr))
+
+                        QMessageBox.information(None, 'Успешно', 'Данные обновлены')
+
+
+                else:
+
+                    # Подготовленный запрос для вставки данных с параметрами
+                    query = f"INSERT INTO wells " \
+                            f"VALUES ({self.path_index}, {self.path_index}, {self.path_index}, " \
+                            f"{self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, " \
+                            f"{self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, " \
+                            f"{self.path_index}, {self.path_index})"
+                    data_values = (str(well_number), well_area,
+                                   data_well, date_today, excel_json, contractor, data_list.costumer, work_plan_str,
+                                   data_list.user[1], type_kr, data_paragraph, cdng, category_dict)
+                    # Выполнение запроса с использованием параметров
+                    cursor.execute(query, data_values)
+                    # Не забудьте сделать коммит
+                    self.db_connection.commit()
+
+
+
+        except psycopg2.Error as e:
+            # Выведите сообщение об ошибке
+            QMessageBox.warning(None, 'Ошибка', f'Ошибка подключения к базе данных  well_data'
+                                                f' {type(e).__name__}\n\n{str(e)}')
+        except sqlite3.Error as e:
+            # Выведите сообщение об ошибке
+            QMessageBox.warning(None, 'Ошибка', f'Ошибка подключения к базе данных  well_data'
+                                                f' {type(e).__name__}\n\n{str(e)}')
+
+    def insert_data_in_chemistry(self) -> None:
+        if self.dict_data_well["work_plan"] in ['dop_plan', 'dop_plan_in_base']:
+            string_work = f' ДП№ {self.dict_data_well["number_dp"]}'
+        elif self.dict_data_well["work_plan"] == 'krs':
+            string_work = 'ПР'
+        elif self.dict_data_well["work_plan"] == 'plan_change':
+            if self.dict_data_well["work_plan_change"] == 'krs':
+                string_work = 'ПР изм'
+            else:
+                string_work = f'ДП№{self.dict_data_well["number_dp"]} изм '
+
+        elif self.dict_data_well["work_plan"] == 'gnkt_bopz':
+            string_work = 'ГНКТ БОПЗ ВНС'
+        elif self.dict_data_well["work_plan"] == 'gnkt_opz':
+            string_work = 'ГНКТ ОПЗ'
+        elif self.dict_data_well["work_plan"] == 'gnkt_after_grp':
+            string_work = 'ГНКТ ОСВ ГРП'
+        else:
+            string_work = 'ГНКТ'
+
+        date_today = datetime.now()
+        data_work = (self.dict_data_well["well_number"]._value,
+                     self.dict_data_well["well_area"]._value,
+                     self.dict_data_well["region"],
+                     data_list.costumer,
+                     data_list.contractor,
+                     string_work,
+                     self.dict_data_well["type_kr"].split(" ")[0],
+                     date_today,
+                     data_list.DICT_VOLUME_CHEMISTRY['цемент'],
+                     data_list.DICT_VOLUME_CHEMISTRY['HCl'],
+                     data_list.DICT_VOLUME_CHEMISTRY['HF'],
+                     data_list.DICT_VOLUME_CHEMISTRY['NaOH'],
+                     data_list.DICT_VOLUME_CHEMISTRY['ВТ СКО'],
+                     data_list.DICT_VOLUME_CHEMISTRY['Глина'],
+                     data_list.DICT_VOLUME_CHEMISTRY['песок'],
+                     data_list.DICT_VOLUME_CHEMISTRY['РПК'],
+                     data_list.DICT_VOLUME_CHEMISTRY['РПП'],
+                     data_list.DICT_VOLUME_CHEMISTRY["извлекаемый пакер"],
+                     data_list.DICT_VOLUME_CHEMISTRY["ЕЛАН"],
+                     data_list.DICT_VOLUME_CHEMISTRY['растворитель'],
+                     data_list.DICT_VOLUME_CHEMISTRY["РИР 2С"],
+                     data_list.DICT_VOLUME_CHEMISTRY["РИР ОВП"],
+                     data_list.DICT_VOLUME_CHEMISTRY['гидрофабизатор'],
+                     round(self.dict_data_well["norm_of_time"], 1),
+                     self.dict_data_well["fluid"]
+                     )
+
+        cursor = self.db_connection.cursor()
+
+        cursor.execute(
+            f"""SELECT * FROM chemistry
+           WHERE well_number={self.path_index} AND well_area={self.path_index} AND region={self.path_index}
+            AND costumer={self.path_index} AND contractor={self.path_index} AND work_plan={self.path_index} 
+            AND type_kr={self.path_index}
+           """, (data_work[:7]))
+
+        row_exists = cursor.fetchone()
+
+        if row_exists:
+            query2 = f'''UPDATE chemistry
+            SET today={self.path_index}, cement={self.path_index}, HCl={self.path_index}, HF={self.path_index}, 
+            NaOH={self.path_index}, VT_SKO={self.path_index},
+                clay={self.path_index}, sand={self.path_index}, RPK={self.path_index}, RPP={self.path_index}, 
+                RKI={self.path_index},
+                 ELAN={self.path_index},ASPO={self.path_index}, RIR_2C={self.path_index}, 
+                 RIR_OVP={self.path_index}, gidrofabizator={self.path_index}, 
+                 norm_time={self.path_index}, fluid={self.path_index}
+            WHERE well_number={self.path_index} AND well_area={self.path_index} AND region={self.path_index} AND
+                costumer={self.path_index} AND contractor={self.path_index} AND work_plan={self.path_index} 
+                AND type_kr={self.path_index}'''
+            data_work2 = data_work[7:] + data_work[:7]
+
+            cursor.execute(query2, data_work2)
+
+        else:
+            query = f"INSERT INTO chemistry " \
+                    f"VALUES ({self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, " \
+                    f"{self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, " \
+                    f"{self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, " \
+                    f"{self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}," \
+                    f" {self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, " \
+                    f"{self.path_index}, {self.path_index})"
+            cursor.execute(query, data_work)
+        self.db_connection.commit()
+        if cursor:
+            cursor.close()
+        if self.db_connection:
+            self.db_connection.close()
+
+    def read_excel_in_base(self, number_well, area_well, work_plan, type_kr):
+        if not self.db_connection:
+            return None
+        with self.db_connection.cursor() as cursor:
+            cursor.execute(f"SELECT excel_json "
+                           f"FROM wells "
+                           f"WHERE well_number = {self.path_index} AND area_well = {self.path_index} "
+                           f"AND contractor = {self.path_index} AND costumer = {self.path_index}"
+                           f" AND work_plan={self.path_index} AND type_kr={self.path_index}",
+                           (str(number_well), area_well, data_list.contractor, data_list.costumer, work_plan, type_kr))
+            data_well = cursor.fetchall()
+            return data_well
+
+    def extraction_data(self, well_number, well_area, type_kr, work_plan, date_table, contractor):
+        if not self.db_connection:
+            return None
+        with self.db_connection.cursor() as cursor:
+            query = f'''
+                    SELECT data_change_paragraph, data_well, type_kr, category_dict FROM wells 
+                    WHERE well_number={self.path_index} AND area_well={self.path_index} AND type_kr={self.path_index} 
+                    AND work_plan={self.path_index} AND today={self.path_index} AND contractor={self.path_index}'''
+
+            cursor.execute(query,
+                           (str(well_number), well_area, type_kr, work_plan, date_table, contractor))
+
+            result_table = cursor.fetchone()
+            return result_table
+
+    def check_well_in_database_well_data(self, number_well: str) -> List:
+        if not self.db_connection:
+            return None
+        with self.db_connection.cursor() as cursor:
+            cursor.execute(
+                f"SELECT well_number, area_well, type_kr, today, work_plan FROM wells "
+                f"WHERE well_number={self.path_index} AND contractor={self.path_index} AND costumer ={self.path_index}",
+                (str(number_well), data_list.contractor, data_list.costumer))
+
+            # Получение всех результатов
+            wells_with_data = cursor.fetchall()
+            return wells_with_data
+
+    def check_in_database_well_data(self, number_well, area_well, work_plan):
+        if not self.db_connection:
+            return None
+        with self.db_connection.cursor() as cursor:
+            cursor.execute(f"SELECT data_well, today, type_kr, category_dict "
+                           f"FROM wells "
+                           f"WHERE well_number = {self.path_index} AND area_well = {self.path_index} "
+                           f"AND contractor = {self.path_index} AND costumer = {self.path_index} AND "
+                           f"work_plan={self.path_index}",
+                           (str(number_well), area_well, data_list.contractor, data_list.costumer, work_plan))
+
+            data_well = cursor.fetchone()
+            return data_well
+
+        return False
+
+
 class CheckWellExistence:
     def __init__(self, connect_to_database: DatabaseConnection, path_index="%s"):
         self.db_connection = connect_to_database.connect_to_database()
@@ -211,8 +482,9 @@ class CheckWellExistence:
                            f'today TEXT,'
                            f'region TEXT,'
                            f'costumer TEXT)')
-    def insert_data_in_table_without_juming(self, well_number:str, area_well:str,
-                                            version_year:str, region_name:str, costumer:str):
+
+    def insert_data_in_table_without_juming(self, well_number: str, area_well: str,
+                                            version_year: str, region_name: str, costumer: str):
         if not self.db_connection:
             return None
         with self.db_connection.cursor() as cursor:
@@ -221,7 +493,7 @@ class CheckWellExistence:
                     f"{self.path_index})"
 
             cursor.execute(query,
-            (well_number, area_well, version_year, region_name, costumer))
+                           (well_number, area_well, version_year, region_name, costumer))
             # Не забудьте сделать коммит
             self.db_connection.commit()
 
@@ -307,14 +579,15 @@ class CheckWellExistence:
                         elif 'Газовый фактор' == value:
                             categoty_gf = col
                             gas_factor = col + 1
-        return check_param,  well_column, cdng, area_column, oilfield, categoty_pressure,\
-               pressure_Gst, date_measurement, pressure_Ppl, categoty_h2s, h2s_pr, h2s_mg_l,\
+        return check_param, well_column, cdng, area_column, oilfield, categoty_pressure, \
+               pressure_Gst, date_measurement, pressure_Ppl, categoty_h2s, h2s_pr, h2s_mg_l, \
                h2s_mg_m, categoty_gf, gas_factor, area_row, check_file
+
     def insert_data_in_classification(self, region_name, cdng, well_number, area_well,
                                       oilfield_str, categoty_pressure, pressure_Ppl, pressure_Gst,
                                       date_measurement, categoty_h2s,
-                                        h2s_pr, h2s_mg_l, h2s_mg_m, categoty_gf,
-                                        gas_factor, version_year, region, costumer):
+                                      h2s_pr, h2s_mg_l, h2s_mg_m, categoty_gf,
+                                      gas_factor, version_year, region, costumer):
         if not self.db_connection:
             return None
         with self.db_connection.cursor() as cursor:
@@ -426,277 +699,6 @@ class CheckWellExistence:
         return None
 
 
-class WorkDatabaseWell:
-    def __init__(self, connect_to_database: DatabaseConnection, dict_data_well=None, path_index="%s"):
-        self.db_connection = connect_to_database.connect_to_database()
-        self.path_index = path_index
-        self.dict_data_well = dict_data_well
-
-    def get_tables_starting_with(self, well_number, well_area, work_plan, type_kr):
-        if not self.db_connection:
-            return None
-        with self.db_connection.cursor() as cursor:
-            cursor.execute(f"""
-                                    SELECT well_number, area_well, type_kr, work_plan
-                                    FROM wells
-                                    WHERE well_number={self.path_index} AND area_well={self.path_index} 
-                                    AND type_kr={self.path_index} AND work_plan={self.path_index}""",
-                           (str(well_number), well_area, type_kr, work_plan))
-
-            rezult = cursor.fetchone()
-            return rezult
-
-    def determining_well_in_database(self, cursor, well_number, well_area, contractor, costumer, work_plan_str):
-
-        cursor.execute(f"""
-                                   SELECT EXISTS (
-                                       SELECT 1 
-                                       FROM wells
-                                       WHERE well_number = {self.path_index} AND area_well = {self.path_index} 
-                                       AND contractor = {self.path_index} 
-                                       AND costumer = {self.path_index} AND work_plan = {self.path_index}
-                                   ), today -- Добавляем contractor в SELECT
-                               FROM wells 
-                               WHERE well_number = {self.path_index} AND area_well ={self.path_index} AND 
-                               contractor = {self.path_index} AND 
-                               costumer = {self.path_index} AND work_plan ={self.path_index}
-                               """, (
-            str(well_number), well_area, contractor, costumer, work_plan_str,
-            str(well_number), well_area, contractor, costumer, work_plan_str))
-
-        row_exists = cursor.fetchone()
-        return row_exists
-
-    def insert_in_database_well_data(self, well_number:str, well_area:str, contractor:str,
-                                  costumer:str, data_well_dict:str, excel:str, work_plan:str):
-        data_well = json.dumps(data_well_dict, ensure_ascii=False)
-        excel_json = json.dumps(excel, ensure_ascii=False)
-        date_today = datetime.now()
-        type_kr = self.dict_data_well["type_kr"].split(' ')[0]
-        adedaas = self.dict_data_well["data_list"]
-        data_paragraph = json.dumps(self.dict_data_well["data_list"], ensure_ascii=False)
-        cdng = self.dict_data_well["cdng"]._value
-
-        category_dict = json.dumps(self.dict_data_well["dict_category"], ensure_ascii=False)
-        # print(row, self.dict_data_well["count_row_well"])
-
-        if 'dop_plan' in work_plan:
-            work_plan_str = f'ДП№{self.dict_data_well["number_dp"]}'
-        elif 'krs' in work_plan:
-            work_plan_str = 'ПР'
-        elif work_plan == 'plan_change':
-            if self.dict_data_well["work_plan_change"] == 'krs':
-                work_plan_str = 'ПР'
-            else:
-                work_plan_str = f'ДП№{self.dict_data_well["number_dp"]}'
-
-
-        try:
-            if not self.db_connection:
-                return None
-            with self.db_connection.cursor() as cursor:
-                row_exists = self.determining_well_in_database(cursor, well_number, well_area,
-                                                               contractor, costumer, work_plan_str)
-                if row_exists:
-                    row_exists, date_in_base = row_exists
-                    reply = QMessageBox.question(None, 'Строка найдена',
-                                                 f'Строка с {well_number} {well_area} {work_plan} уже существует от {date_in_base}. '
-                                                 f'Обновить данные?')
-                    if reply == QMessageBox.Yes:
-                        cursor.execute(f"""
-                                        UPDATE wells
-                                        SET data_well ={self.path_index}, today ={self.path_index}, 
-                                        excel_json ={self.path_index},
-                                         work_plan={self.path_index}, geolog ={self.path_index}, 
-                                        type_kr={self.path_index}, data_change_paragraph={self.path_index}, 
-                                        cdng={self.path_index}, category_dict={self.path_index}                                                                
-                                        WHERE well_number ={self.path_index} AND area_well ={self.path_index} 
-                                        AND contractor ={self.path_index}
-                                         AND costumer ={self.path_index} AND work_plan ={self.path_index} 
-                                         AND type_kr={self.path_index}
-                                                    """, (
-                            data_well, date_today, excel_json, work_plan_str, data_list.user[1], type_kr,
-                            data_paragraph, cdng,
-                            category_dict, str(well_number), well_area, contractor, costumer, work_plan_str,
-                            type_kr))
-
-                        QMessageBox.information(None, 'Успешно', 'Данные обновлены')
-
-
-                else:
-
-                    # Подготовленный запрос для вставки данных с параметрами
-                    query = f"INSERT INTO wells " \
-                            f"VALUES ({self.path_index}, {self.path_index}, {self.path_index}, " \
-                            f"{self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, " \
-                            f"{self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, " \
-                            f"{self.path_index}, {self.path_index})"
-                    data_values = (str(well_number), well_area,
-                                   data_well, date_today, excel_json, contractor, data_list.costumer, work_plan_str,
-                                   data_list.user[1], type_kr, data_paragraph, cdng, category_dict)
-                    # Выполнение запроса с использованием параметров
-                    cursor.execute(query, data_values)
-                    # Не забудьте сделать коммит
-                    self.db_connection.commit()
-
-
-
-        except psycopg2.Error as e:
-            # Выведите сообщение об ошибке
-            QMessageBox.warning(None, 'Ошибка', f'Ошибка подключения к базе данных  well_data'
-                                                f' {type(e).__name__}\n\n{str(e)}')
-        except sqlite3.Error as e:
-            # Выведите сообщение об ошибке
-            QMessageBox.warning(None, 'Ошибка', f'Ошибка подключения к базе данных  well_data'
-                                                f' {type(e).__name__}\n\n{str(e)}')
-
-    def insert_data_in_chemistry(self) -> None:
-        if self.dict_data_well["work_plan"] in ['dop_plan', 'dop_plan_in_base']:
-            string_work = f' ДП№ {self.dict_data_well["number_dp"]}'
-        elif self.dict_data_well["work_plan"] == 'krs':
-            string_work = 'ПР'
-        elif self.dict_data_well["work_plan"] == 'plan_change':
-            if self.dict_data_well["work_plan_change"] == 'krs':
-                string_work = 'ПР изм'
-            else:
-                string_work = f'ДП№{self.dict_data_well["number_dp"]} изм '
-
-        elif self.dict_data_well["work_plan"] == 'gnkt_bopz':
-            string_work = 'ГНКТ БОПЗ ВНС'
-        elif self.dict_data_well["work_plan"] == 'gnkt_opz':
-            string_work = 'ГНКТ ОПЗ'
-        elif self.dict_data_well["work_plan"] == 'gnkt_after_grp':
-            string_work = 'ГНКТ ОСВ ГРП'
-        else:
-            string_work = 'ГНКТ'
-
-        date_today = datetime.now()
-        data_work = (self.dict_data_well["well_number"]._value,
-                     self.dict_data_well["well_area"]._value,
-                     self.dict_data_well["region"],
-                     data_list.costumer,
-                     data_list.contractor,
-                     string_work,
-                     self.dict_data_well["type_kr"].split(" ")[0],
-                     date_today,
-                     data_list.DICT_VOLUME_CHEMISTRY['цемент'],
-                     data_list.DICT_VOLUME_CHEMISTRY['HCl'],
-                     data_list.DICT_VOLUME_CHEMISTRY['HF'],
-                     data_list.DICT_VOLUME_CHEMISTRY['NaOH'],
-                     data_list.DICT_VOLUME_CHEMISTRY['ВТ СКО'],
-                     data_list.DICT_VOLUME_CHEMISTRY['Глина'],
-                     data_list.DICT_VOLUME_CHEMISTRY['песок'],
-                     data_list.DICT_VOLUME_CHEMISTRY['РПК'],
-                     data_list.DICT_VOLUME_CHEMISTRY['РПП'],
-                     data_list.DICT_VOLUME_CHEMISTRY["извлекаемый пакер"],
-                     data_list.DICT_VOLUME_CHEMISTRY["ЕЛАН"],
-                     data_list.DICT_VOLUME_CHEMISTRY['растворитель'],
-                     data_list.DICT_VOLUME_CHEMISTRY["РИР 2С"],
-                     data_list.DICT_VOLUME_CHEMISTRY["РИР ОВП"],
-                     data_list.DICT_VOLUME_CHEMISTRY['гидрофабизатор'],
-                     round(self.dict_data_well["norm_of_time"], 1),
-                     self.dict_data_well["fluid"]
-                     )
-
-
-        cursor = self.db_connection.cursor()
-
-        cursor.execute(
-            f"""SELECT * FROM chemistry
-           WHERE well_number={self.path_index} AND well_area={self.path_index} AND region={self.path_index}
-            AND costumer={self.path_index} AND contractor={self.path_index} AND work_plan={self.path_index} 
-            AND type_kr={self.path_index}
-           """, (data_work[:7]))
-
-        row_exists = cursor.fetchone()
-
-        if row_exists:
-            query2 = f'''UPDATE chemistry
-            SET today={self.path_index}, cement={self.path_index}, HCl={self.path_index}, HF={self.path_index}, 
-            NaOH={self.path_index}, VT_SKO={self.path_index},
-                clay={self.path_index}, sand={self.path_index}, RPK={self.path_index}, RPP={self.path_index}, 
-                RKI={self.path_index},
-                 ELAN={self.path_index},ASPO={self.path_index}, RIR_2C={self.path_index}, 
-                 RIR_OVP={self.path_index}, gidrofabizator={self.path_index}, 
-                 norm_time={self.path_index}, fluid={self.path_index}
-            WHERE well_number={self.path_index} AND well_area={self.path_index} AND region={self.path_index} AND
-                costumer={self.path_index} AND contractor={self.path_index} AND work_plan={self.path_index} 
-                AND type_kr={self.path_index}'''
-            data_work2 = data_work[7:] + data_work[:7]
-
-            cursor.execute(query2, data_work2)
-
-        else:
-            query = f"INSERT INTO chemistry " \
-                    f"VALUES ({self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, " \
-                    f"{self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, " \
-                    f"{self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, " \
-                    f"{self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}," \
-                    f" {self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, " \
-                    f"{self.path_index}, {self.path_index})"
-            cursor.execute(query, data_work)
-        self.db_connection.commit()
-        if cursor:
-            cursor.close()
-        if self.db_connection:
-            self.db_connection.close()
-
-    def read_excel_in_base(self, number_well, area_well, work_plan, type_kr):
-        if not self.db_connection:
-            return None
-        with self.db_connection.cursor() as cursor:
-            cursor.execute(f"SELECT excel_json "
-                           f"FROM wells "
-                           f"WHERE well_number = {self.path_index} AND area_well = {self.path_index} "
-                           f"AND contractor = {self.path_index} AND costumer = {self.path_index}"
-                           f" AND work_plan={self.path_index} AND type_kr={self.path_index}",
-                           (str(number_well), area_well, data_list.contractor, data_list.costumer, work_plan, type_kr))
-            data_well = cursor.fetchall()
-            return data_well
-
-    def extraction_data(self, well_number, well_area, type_kr, work_plan, date_table, contractor):
-        if not self.db_connection:
-            return None
-        with self.db_connection.cursor() as cursor:
-            query = f'''
-                    SELECT data_change_paragraph, data_well, type_kr, category_dict FROM wells 
-                    WHERE well_number={self.path_index} AND area_well={self.path_index} AND type_kr={self.path_index} 
-                    AND work_plan={self.path_index} AND today={self.path_index} AND contractor={self.path_index}'''
-
-            cursor.execute(query,
-                           (str(well_number), well_area, type_kr, work_plan, date_table, contractor))
-
-            result_table = cursor.fetchone()
-            return result_table
-
-    def check_well_in_database_well_data(self, number_well: str) -> List:
-        if not self.db_connection:
-            return None
-        with self.db_connection.cursor() as cursor:
-            cursor.execute(
-                f"SELECT well_number, area_well, type_kr, today, work_plan FROM wells "
-                f"WHERE well_number={self.path_index} AND contractor={self.path_index} AND costumer ={self.path_index}",
-                (str(number_well), data_list.contractor, data_list.costumer))
-
-            # Получение всех результатов
-            wells_with_data = cursor.fetchall()
-            return wells_with_data
-    def check_in_database_well_data(self, number_well, area_well, work_plan):
-        if not self.db_connection:
-            return None
-        with self.db_connection.cursor() as cursor:
-            cursor.execute(f"SELECT data_well, today, type_kr, category_dict "
-                           f"FROM wells "
-                           f"WHERE well_number = {self.path_index} AND area_well = {self.path_index} "
-                           f"AND contractor = {self.path_index} AND costumer = {self.path_index} AND "
-                           f"work_plan={self.path_index}",
-                           (str(number_well), area_well, data_list.contractor, data_list.costumer, work_plan))
-
-            data_well = cursor.fetchone()
-            return data_well
-
-        return False
-
 class GnktDatabaseWell:
     def __init__(self, connect_to_database: DatabaseConnection, path_index="%s"):
         self.db_connection = connect_to_database.connect_to_database()
@@ -730,7 +732,7 @@ class GnktDatabaseWell:
         return result
 
     def insert_data_base_gnkt(self, contractor, gnkt_number, well_name, gnkt_length, diametr_length, iznos,
-                           pipe_mileage, pipe_fatigue, previous_well, current_datetime, pvo):
+                              pipe_mileage, pipe_fatigue, previous_well, current_datetime, pvo):
         if not self.db_connection:
             return None
         with self.db_connection.cursor() as cursor:
@@ -781,10 +783,6 @@ def connection_to_database(DB_NAME):
         return db
 
 
-# db = PostgresConnection('krs2')
-# db.connect_to_database()
-# user_service = UserService(db)
-# print(user_service.get_users_list())
 
 
 #
