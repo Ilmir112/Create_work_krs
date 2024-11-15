@@ -8,8 +8,6 @@ import plan
 import data_list
 
 from openpyxl.styles import Font, Alignment
-from main import MyMainWindow
-
 
 def skm_interval(self, template):
     sgm_True = False
@@ -21,7 +19,8 @@ def skm_interval(self, template):
     str_raid = []
     if self.dict_data_well["paker_do"]["posle"] != 0:
         str_raid.append(
-            [float(self.dict_data_well["depth_fond_paker_do"]["posle"]) - 20, float(self.dict_data_well["depth_fond_paker_do"]["posle"]) + 20])
+            [float(self.dict_data_well["depth_fond_paker_do"]["posle"]) - 20,
+             float(self.dict_data_well["depth_fond_paker_do"]["posle"]) + 20])
 
     if self.dict_data_well["dict_leakiness"]:
         a = self.dict_data_well["dict_leakiness"]
@@ -308,12 +307,11 @@ def raid(string):
 
 
 def definition_plast_work(self):
+    from work_py.alone_oreration import calculation_fluid_work
     # Определение работающих пластов
     plast_work = set()
     perforation_roof = 5000
     perforation_sole = 0
-
-
 
     for plast, value in self.dict_data_well["dict_perforation"].items():
         for interval in value['интервал']:
@@ -330,6 +328,13 @@ def definition_plast_work(self):
                     perforation_roof = roof
                 if perforation_sole < sole and self.dict_data_well["current_bottom"] > sole:
                     perforation_sole = sole
+        zhgs = 1.01
+        zhgs = calculation_fluid_work(self.dict_data_well,
+                                      min(self.dict_data_well["dict_perforation"][plast]["вертикаль"]),
+                                      float(max(self.dict_data_well["dict_perforation"][plast]['давление'])))
+        if zhgs:
+            self.dict_data_well["dict_perforation"].setdefault(plast, {}).setdefault('рабочая жидкость',
+                                                                                     []).append(zhgs)
 
     self.dict_data_well["perforation_roof"] = perforation_roof
     self.dict_data_well["perforation_sole"] = perforation_sole

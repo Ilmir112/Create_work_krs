@@ -35,7 +35,7 @@ class VolumeWell(ABC):
         for diam_rod, lenght_rod in dict_sucker_rod.items():
             if diam_rod:
                 volume_rod += (3.14 * (lenght_rod * (
-                        FindIndexPZ.check_str_None(None, diam_rod) / 1000) / lenght_rod) ** 2) / 4 * lenght_rod
+                        FindIndexPZ.check_str_none(None, diam_rod) / 1000) / lenght_rod) ** 2) / 4 * lenght_rod
         return round(volume_rod, 5)
 
 

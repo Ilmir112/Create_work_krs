@@ -353,7 +353,7 @@ def update_fluid(self, index_plan, fluid_str, table_widget):
                                 table_widget.setItem(row_change, column, new_value)
 
 
-def calculationFluidWork(dict_data_well, vertical, pressure):
+def calculation_fluid_work(dict_data_well, vertical, pressure):
     if (isinstance(vertical, float) or isinstance(vertical, int)) and (
             isinstance(pressure, float) or isinstance(pressure, int)):
 
@@ -436,7 +436,7 @@ def volume_rod(self, dict_sucker_rod):  # Объем штанг
     for diam_rod, lenght_rod in dict_sucker_rod.items():
         if diam_rod:
             volume_rod += (3.14 * (lenght_rod * (
-                    FindIndexPZ.check_str_None(self, diam_rod) / 1000) / lenght_rod) ** 2) / 4 * lenght_rod
+                    FindIndexPZ.check_str_none(self, diam_rod) / 1000) / lenght_rod) ** 2) / 4 * lenght_rod
     return round(volume_rod, 5)
 
 

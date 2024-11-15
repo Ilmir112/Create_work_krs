@@ -153,7 +153,6 @@ class TabPageGno(TabPageUnion):
             fluid_p = 1.01
 
         for plast in self.dict_data_well['plast_work']:
-
             if float(list(self.dict_data_well["dict_perforation"][plast]['рабочая жидкость'])[0]) > fluid_p:
                 fluid_p = list(self.dict_data_well["dict_perforation"][plast]['рабочая жидкость'])[0]
         fluid_list.append(fluid_p)

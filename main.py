@@ -50,7 +50,8 @@ class UncaughtExceptions(QObject):
     @pyqtSlot(object)
     def handleException(self, ex):
         try:
-            logger.critical(f'{self.dict_data_well["well_number"]._value} {self.dict_data_well["well_area"]._value} Критическая ошибка: {ex}')
+            logger.critical(f'{self.dict_data_well["well_number"]._value}'
+                            f' {self.dict_data_well["well_area"]._value} Критическая ошибка: {ex}')
         except:
             logger.critical(f'{self.well_number} {self.dict_data_well["well_area"]} Критическая ошибка: {ex}')
 
@@ -492,8 +493,8 @@ class MyMainWindow(QMainWindow):
                     value = self.table_widget.item(row, column)
                     if value != None:
                         value = value.text()
-
-                        if 'схеме №' in value or 'схемы №' in value or 'Схемы обвязки №' in value or 'схемы ПВО №' in value:
+                        if 'схеме №' in value or 'схемы №' in value or \
+                                'Схемы обвязки №' in value or 'схемы ПВО №' in value:
                             number_schema = value[value.index(' №') + 1:value.index(' №') + 4].replace(' ', '')
 
                             schema_pvo_set.add(number_schema)

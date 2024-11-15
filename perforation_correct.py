@@ -262,7 +262,7 @@ class PerforationCorrect(WindowUnion):
                     if plast in plast_del:
                         self.dict_data_well["dict_perforation"].pop(plast)
 
-        adafw = self.dict_data_well["dict_perforation_project"]
+
         definition_plast_work(self)
         self.dict_data_well['plast_work_short'] = self.dict_data_well['plast_work']
 
