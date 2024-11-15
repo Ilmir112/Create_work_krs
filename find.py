@@ -1551,6 +1551,13 @@ class WellPerforation(FindIndexPZ):
                         self.dict_data_well["dict_perforation_short"].setdefault(plast, {}).setdefault('давление',
                                                                                                        []).append(
                             round(data_p, 1))
+                    else:
+                        self.dict_data_well["dict_perforation"].setdefault(plast, {}).setdefault('давление',
+                                                                                                 []).append(
+                            round(0, 1))
+                        self.dict_data_well["dict_perforation_short"].setdefault(plast, {}).setdefault('давление',
+                                                                                                       []).append(
+                            round(0, 1))
 
                     if row[col_date_pressuar_index]:
                         self.dict_data_well["dict_perforation"].setdefault(
