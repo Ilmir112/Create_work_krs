@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from PyQt5.QtGui import QDoubleValidator, QIntValidator
-from PyQt5.QtWidgets import QWidget, QTabWidget
+from PyQt5.QtWidgets import QWidget, QTabWidget, QInputDialog
 
 from main import MyMainWindow
 from data_list import contractor
@@ -37,6 +37,44 @@ class WindowUnion(MyMainWindow):
         super().__init__()
         self.dict_data_well = parent
 
+    def calc_work_fluid(self, fluid_work_insert):
+        self.dict_data_well["fluid"] = float(fluid_work_insert)
+        self.dict_data_well["fluid_short"] = fluid_work_insert
+
+        cat_h2s_list = [self.dict_data_well["dict_category"][plast]['по сероводороду'
+                        ].category for plast in list(self.dict_data_well["dict_category"].keys()) if
+                        self.dict_data_well["dict_category"][plast]['отключение'] == 'рабочий']
+
+        if 2 in cat_h2s_list or 1 in cat_h2s_list:
+            expenditure_h2s_list = []
+            if self.dict_data_well['plast_work']:
+                try:
+                    for plast in self.dict_data_well['plast_work']:
+                        poglot = [self.dict_data_well["dict_category"][plast]['по сероводороду'].poglot for plast in
+                                  list(self.dict_data_well["dict_category"].keys())
+                                  if self.dict_data_well["dict_category"][plast]['по сероводороду'].category in [1, 2]][
+                            0]
+                        expenditure_h2s_list.append(poglot)
+                except ValueError:
+                    pass
+            else:
+                expenditure_h2s, _ = QInputDialog.getDouble(
+                    None,
+                    'Расчет поглотителя',
+                    'Отсутствуют рабочие пласты, нужно ввести необходимый расчет поглотителя',
+                    0.01, 0, 10, 2)
+
+            expenditure_h2s = round(max(expenditure_h2s_list), 3)
+            fluid_work = f'{fluid_work_insert}г/см3 с добавлением поглотителя сероводорода ' \
+                         f'{self.dict_data_well["type_absorbent"]} из ' \
+                         f'расчета {expenditure_h2s}л/м3 либо аналог '
+            fluid_work_short = f'{fluid_work_insert}г/см3 c ' \
+                               f'{self.dict_data_well["type_absorbent"]} - {expenditure_h2s}л/м3 '
+        else:
+            fluid_work = f'{fluid_work_insert}г/см3 '
+            fluid_work_short = f'{fluid_work_insert}г/см3'
+
+        return fluid_work, fluid_work_short
     def pvo_gno(self, kat_pvo):
         if 'Ойл' in contractor:
             date_str = 'от 07.03.2024г'

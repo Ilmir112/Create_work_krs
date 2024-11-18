@@ -260,6 +260,21 @@ class MyMainWindow(QMainWindow):
             return
 
         return self.dict_data_well
+    
+    def determination_injection_pressuar(self):
+        if self.dict_data_well["region"] == 'ЧГМ' and self.dict_data_well["expected_P"] < 80:
+            return 80
+        else:
+            return self.dict_data_well["expected_P"]
+    def privyazka_nkt(self):
+        priv_list = [[f'ГИС Привязка по ГК и ЛМ', None,
+                      f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {data_list.contractor}". '
+                      f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером '
+                      f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г. '
+                      f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины',
+                      None, None, None, None, None, None, None,
+                      'Мастер КРС, подрядчик по ГИС', 4]]
+        return priv_list
     def open_read_excel_file_pz(self):
         from open_pz import CreatePZ
         from data_base.work_with_base import insert_data_new_excel_file
@@ -479,7 +494,7 @@ class MyMainWindow(QMainWindow):
 
     @staticmethod
     def pause_app():
-        asww = data_list.pause
+
         while data_list.pause is True:
             QtCore.QCoreApplication.instance().processEvents()
 
@@ -1535,7 +1550,7 @@ class MyWindow(MyMainWindow):
 
         privyazka_action = QAction("Привязка НКТ", self)
         geophysical.addAction(privyazka_action)
-        privyazka_action.triggered.connect(self.privyazkaNKT)
+        privyazka_action.triggered.connect(self.privyazka_nkt)
 
         definitionBottomGKLM_action = QAction("Отбивка забоя по ЭК", self)
         geophysical.addAction(definitionBottomGKLM_action)
@@ -1568,7 +1583,7 @@ class MyWindow(MyMainWindow):
 
         opressovka_action = QAction("Опрессовка колонны", self)
         action_menu.addAction(opressovka_action)
-        opressovka_action.triggered.connect(self.pressureTest)
+        opressovka_action.triggered.connect(self.pressure_test)
 
         template_with_skm = QAction("шаблон c СКМ", self)
         template_menu = action_menu.addMenu('Шаблоны')
@@ -2075,10 +2090,10 @@ class MyWindow(MyMainWindow):
         definitionBottomGKLM_list = definitionBottomGKLM(self)
         self.populate_row(self.ins_ind, definitionBottomGKLM_list, self.table_widget)
 
-    def privyazkaNKT(self):
-        from work_py.alone_oreration import privyazkaNKT
-        privyazkaNKT_list = privyazkaNKT(self)
-        self.populate_row(self.ins_ind, privyazkaNKT_list, self.table_widget)
+    def privyazka_nkt(self):
+        from work_py.alone_oreration import privyazka_nkt
+        privyazka_nkt_list = privyazka_nkt(self)
+        self.populate_row(self.ins_ind, privyazka_nkt_list, self.table_widget)
 
     def definition_Q(self):
         from work_py.alone_oreration import definition_Q
@@ -2327,7 +2342,9 @@ class MyWindow(MyMainWindow):
             self.operation_window.close()  # Close window.
             self.operation_window = None
 
-    def pressureTest(self):
+
+
+    def pressure_test(self):
         from work_py.opressovka import OpressovkaEK
 
         if self.operation_window is None:

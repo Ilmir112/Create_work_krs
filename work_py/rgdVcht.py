@@ -33,13 +33,13 @@ def rgd_without_paker(self):
          f' напротив мостков для постановки партии ГИС.',
          None, None, None, None, None, None, None,
          'мастер КРС', None],
-        [f'РГД по колонне при закачке не менее {GnoDescentWindow.PzakPriGis(self)}атм',
+        [f'РГД по колонне при закачке не менее {self.determination_injection_pressuar(self)}атм',
          None,
          f'Произвести запись по тех.карте 2.3.1: Определение профиля приемистости скважины и оценка технического'
          f' состояния '
          f'эксплуатационной колонны при закачке (скважинная аппаратура на кабеле, НКТ подняты). '
          f'Давление закачки должно быть согласно ожидаемой закачки ППД. при закачке не менее '
-         f'{GnoDescentWindow.PzakPriGis(self)}атм '
+         f'{GnoDescentWindow.determination_injection_pressuar(self)}атм '
          f'при открытой затрубной задвижке',
          None, None, None, None, None, None, None,
          'Мастер КРС, подрядчик по ГИС', 20]]
@@ -47,8 +47,7 @@ def rgd_without_paker(self):
     if ori == QMessageBox.StandardButton.Yes:
 
         ori = f'Интерпретация данных ГИС'
-        rgd_list.append([f'ОРИ', None,
-                         ori,
+        rgd_list.append([f'ОРИ', None,ori,
                          None, None, None, None, None, None, None,
                          'Мастер КРС, подрядчик по ГИС', 8])
         rgd_list.append([None, None,
@@ -81,7 +80,7 @@ def rgd_with_paker(self):
         [f'ГИС РГД', None,
          f'Произвести запись по тех.карте 2.3.2: определение профиля приемистости и оценку технического '
          f'состояния '
-         f'эксплуатационной колонны и НКТ при закачке не менее {GnoDescentWindow.PzakPriGis(self)}атм '
+         f'эксплуатационной колонны и НКТ при закачке не менее {GnoDescentWindow.determination_injection_pressuar(self)}атм '
          f'при открытой затрубной задвижке',
          None, None, None, None, None, None, None,
          'Мастер КРС, подрядчик по ГИС', 20],

@@ -622,7 +622,7 @@ class RirWindow(WindowUnion):
 
         return rpk_nkt_select
 
-    def rirWithPero_gl(self, paker_need_Combo, plast_combo,
+    def rir_with_pero_gl(self, paker_need_Combo, plast_combo,
                        roof_rir_edit, sole_rir_edit, volume_cement, need_change_zgs_combo='Нет', plast_new_combo='',
                        fluid_new_edit='', pressuar_new_edit='', pressureZUMPF_question='Не нужно',
                        diametr_paker=122, paker_khost=0, paker_depth=0):
@@ -1184,7 +1184,7 @@ class RirWindow(WindowUnion):
                 if self.check_depth_in_skm_interval(paker_depth) is False:
                     return
 
-            work_list = self.rirWithPero_gl(paker_need_Combo, plast_combo,
+            work_list = self.rir_with_pero_gl(paker_need_Combo, plast_combo,
                                             roof_rir_edit, sole_rir_edit, volume_cement, need_change_zgs_combo,
                                             plast_new_combo,
                                             fluid_new_edit, pressuar_new_edit, pressureZUMPF_question,

@@ -255,7 +255,7 @@ class GnktBopz(GnktModel):
         shoe_nkt = sum(list(self.dict_data_well["dict_nkt"].values()))
 
 
-        fluid_work, self.dict_data_well["fluid_work_short"] = GnoWindow.calc_work_fluid(self, self.fluid_edit)
+        fluid_work, self.dict_data_well["fluid_work_short"] = self.calc_work_fluid(self, self.fluid_edit)
 
         if self.need_drilling_mud_combo == 'нужно':
             self.volume_drilling_mud_edit = self.volume_drilling_mud_edit

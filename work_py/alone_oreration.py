@@ -230,7 +230,7 @@ def definition_Q_nek(self):
     return definition_Q_list
 
 
-def privyazkaNKT(self):
+def privyazka_nkt(self):
     priv_list = [[f'ГИС Привязка по ГК и ЛМ', None,
                   f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {data_list.contractor}". '
                   f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером '
@@ -531,95 +531,6 @@ def volume_jamming_well(self, current_bottom):  # объем глушения с
     return volume_jamming_well
 
 
-def well_jamming(self, without_damping, lift_key, volume_well_jaming):
-    # print(f' выбранный {lift_key}')
-
-    # print(f'расстояние ПВР {abs(sum(list(self.dict_data_well["dict_nkt"].values())) - self.dict_data_well["perforation_roof"]), volume_jamming_well(self), volume_nkt_metal(self.dict_data_well["dict_nkt"]), volume_rod(self.dict_data_well["dict_sucker_rod"])}')
-    well_jamming_list2 = f'Вести контроль плотности на  выходе в конце глушения. В случае отсутствия  на последнем кубе глушения  жидкости ' \
-                         f'уд.веса равной удельному весу ЖГ, дальнейшие промывки и удельный вес жидкостей промывок согласовать с Заказчиком,' \
-                         f' при наличии Ризб - произвести замер, перерасчет ЖГ и повторное глушение с корректировкой удельного веса жидкости' \
-                         f' глушения. В СЛУЧАЕ ОТСУТСТВИЯ ЦИРКУЛЯЦИИ ПРИ ГЛУШЕНИИ СКВАЖИНЫ, А ТАКЖЕ ПРИ ГАЗОВОМ ФАКТОРЕ БОЛЕЕ 200м3/сут ' \
-                         f'ПРОИЗВЕСТИ ЗАМЕР СТАТИЧЕСКОГО УРОВНЯ В ТЕЧЕНИИ ЧАСА С ОТБИВКОЙ УРОВНЯ В СКВАЖИНЕ С ИНТЕРВАЛОМ 15 МИНУТ.' \
-                         f'ПО РЕЗУЛЬТАТАМ ЗАМЕРОВ ПРИНИМАЕТСЯ РЕШЕНИЕ ОБ ПРОДОЛЖЕНИИ ОТБИВКИ УРОВНЯ В СКВАЖИНЕ ДО КРИТИЧЕСКОЙ ГЛУБИНЫ ЗА ' \
-                         f'ПРОМЕЖУТОК ВРЕМЕНИ.'
-
-    # print(f' Глушение {volume_jamming_well(self, self.dict_data_well["current_bottom"]), volume_nkt_metal(self.dict_data_well["dict_nkt"]), volume_rod(self.dict_data_well["dict_sucker_rod"])}')
-    # print(self.dict_data_well["well_volume_in_pz"])
-
-    if without_damping is True:
-        well_jamming_str = f'Скважина состоит в перечне скважин ООО Башнефть-Добыча, на которых допускается проведение ТКРС без предварительного глушения на текущий квартал'
-        well_jamming_short = f'Скважина без предварительного глушения'
-        well_jamming_list2 = f'В случае наличия избыточного давления необходимость повторного глушения скважины дополнительно согласовать со специалистами ПТО  и ЦДНГ.'
-    elif without_damping is False and lift_key in ['НН с пакером', 'НВ с пакером', 'ЭЦН с пакером', 'ОРЗ']:
-
-        well_after = f'Произвести закачку на поглощение не более {self.dict_data_well["max_admissible_pressure"]._value}атм тех жидкости в ' \
-                     f'объеме {round(volume_well_jaming - well_volume(self, sum(list(self.dict_data_well["dict_nkt_po"].values()))), 1)}м3.' if round(
-            volume_well_jaming - well_volume(self, sum(list(self.dict_data_well["dict_nkt_po"].values()))), 1) > 0.1 else ''
-        well_jamming_str = f'Произвести закачку в трубное пространство тех жидкости уд.весом {self.dict_data_well["fluid_work"]} в ' \
-                           f'объеме {round(well_volume(self, sum(list(self.dict_data_well["dict_nkt"].values()))) - volume_pod_NKT(self), 1)}м3 на циркуляцию. ' \
-                           f'{well_after} Закрыть затрубное пространство. ' \
-                           f' Закрыть скважину на  стабилизацию не менее 2 часов. (согласовать ' \
-                           f'глушение в коллектор, в случае отсутствия на желобную емкость)'
-        well_jamming_short = f'Глушение в НКТ уд.весом {self.dict_data_well["fluid_work_short"]} ' \
-                             f'объеме {round(well_volume(self, sum(list(self.dict_data_well["dict_nkt"].values()))) - volume_pod_NKT(self), 1)}м3 ' \
-                             f'на циркуляцию. {well_after} '
-    elif without_damping is False and lift_key in ['ОРД']:
-        well_jamming_str = f'Произвести закачку в затрубное пространство тех жидкости уд.весом {self.dict_data_well["fluid_work_short"]}в ' \
-                           f'объеме {round(well_volume(self, self.dict_data_well["current_bottom"]) - well_volume(self, self.dict_data_well["depth_fond_paker_do"]["do"]), 1)}м3 ' \
-                           f'на поглощение при давлении не более {self.dict_data_well["max_admissible_pressure"]._value}атм. Закрыть ' \
-                           f'затрубное пространство. Закрыть скважину на стабилизацию не менее 2 часов. (согласовать ' \
-                           f'глушение в коллектор, в случае отсутствия на желобную емкость)'
-        well_jamming_short = f'Глушение в затруб уд.весом {self.dict_data_well["fluid_work_short"]} в ' \
-                             f'объеме {round(well_volume(self, self.dict_data_well["current_bottom"]) - well_volume(self, self.dict_data_well["depth_fond_paker_do"]["do"]), 1)}м3 '
-    elif without_damping is False and lift_key in ['НН', 'НВ', 'ЭЦН']:
-        well_jamming_str = f'Произвести глушение скважины в объеме {volume_well_jaming}м3 тех ' \
-                           f'жидкостью уд.весом {self.dict_data_well["fluid_work"]}' \
-                           f' на циркуляцию в следующим алгоритме: \n Произвести закачку в затрубное пространство ' \
-                           f'тех жидкости в ' \
-                           f'объеме {round(well_volume(self, sum(list(self.dict_data_well["dict_nkt"].values()))), 1)}м3 на ' \
-                           f'циркуляцию. Закрыть трубное пространство. ' \
-                           f'Произвести закачку на поглощение не более {self.dict_data_well["max_admissible_pressure"]._value}атм ' \
-                           f'тех жидкости в ' \
-                           f'объеме {round(volume_well_jaming - well_volume(self, sum(list(self.dict_data_well["dict_nkt"].values()))), 1)}м3. Закрыть скважину на ' \
-                           f'стабилизацию не менее 2 часов. (согласовать глушение в коллектор, в случае ' \
-                           f'отсутствия на желобную емкость'
-        well_jamming_short = f'Глушение в затруб в объеме {volume_well_jaming}м3 тех ' \
-                             f'жидкостью уд.весом {self.dict_data_well["fluid_work_short"]}'
-    elif abs(sum(list(self.dict_data_well["dict_nkt"].values())) - self.dict_data_well["perforation_roof"]) > 150:
-        well_jamming_str = f'Произвести глушение скважины объеме {volume_well_jaming}м3 тех ' \
-                           f'жидкостью уд.весом {self.dict_data_well["fluid_work"]}' \
-                           f' на циркуляцию в следующим алгоритме: \n Произвести закачку в затрубное пространство ' \
-                           f'тех жидкости в ' \
-                           f'объеме {round(well_volume(self, sum(list(self.dict_data_well["dict_nkt"].values()))), 1)}м3 на ' \
-                           f'циркуляцию. Закрыть трубное пространство. ' \
-                           f'Произвести закачку на поглощение не более {self.dict_data_well["max_admissible_pressure"]._value}атм ' \
-                           f'тех жидкости в ' \
-                           f'объеме {round(volume_well_jaming - well_volume(self, sum(list(self.dict_data_well["dict_nkt"].values()))), 1)}м3. Закрыть скважину на ' \
-                           f'стабилизацию не менее 2 часов. (согласовать глушение в коллектор, в случае ' \
-                           f'отсутствия на желобную емкость'
-        well_jamming_short = f'Глушение в затруб в объеме {volume_well_jaming}м3 тех ' \
-                             f'жидкостью уд.весом {self.dict_data_well["fluid_work_short"]}'
-    elif abs(sum(list(self.dict_data_well["dict_nkt"].values())) - self.dict_data_well["perforation_roof"]) <= 150:
-        well_jamming_str = f'Произвести глушение скважины  в объеме {volume_well_jaming}м3 тех ' \
-                           f'жидкостью уд.весом {self.dict_data_well["fluid_work"]}' \
-                           f' на циркуляцию. Закрыть скважину на ' \
-                           f'стабилизацию не менее 2 часов. (согласовать глушение в коллектор, в случае отсутствия ' \
-                           f'на желобную емкость)'
-        well_jamming_short = f'Глушение в затруб в объеме {volume_well_jaming}м3 уд.весом {self.dict_data_well["fluid_work_short"]}'
-
-    if len(self.dict_data_well['plast_work']) == 0 and self.dict_data_well["dict_leakiness"]:
-        well_jamming_str = f'Опрессовать эксплуатационную колонну в интервале 0- {self.dict_data_well["current_bottom"]}м на ' \
-                           f'Р={self.dict_data_well["max_admissible_pressure"]._value}атм' \
-                           f' в течение 30 минут в присутствии представителя заказчика, составить акт. ' \
-                           f'(Вызов представителя осуществлять телефонограммой за 12 часов, ' \
-                           f'с подтверждением за 2 часа ' \
-                           f'до начала работ)'
-
-        well_jamming_short = 'Рабочие интервалы отсутствуют, При необходимости необходимо согласовать ' \
-                             'глушение скважины по дополнительному плану работ'
-
-        # print([well_jamming_str, well_jamming_list2, well_jamming_short])
-    return [well_jamming_str, well_jamming_list2, well_jamming_short]
 
 
 def is_number(num):

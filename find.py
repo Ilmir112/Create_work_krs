@@ -442,14 +442,17 @@ class WellNkt(FindIndexPZ):
 
 
 class WellSuckerRod(FindIndexPZ):
-
     def __init__(self):
-
         super().__init__()
+        self.dict_data_well["dict_sucker_rod"] = {}
+        self.dict_data_well["dict_sucker_rod_po"] = {}
+
 
         # self.read_well(self.ws, data_list.sucker_rod_ind._value, data_list.pipes_ind._value)
 
     def read_well(self, begin_index, cancel_index):
+        self.dict_data_well["dict_sucker_rod"] = {}
+        self.dict_data_well["dict_sucker_rod_po"] = {}
 
         # try:
         dict_sucker_rod = {}

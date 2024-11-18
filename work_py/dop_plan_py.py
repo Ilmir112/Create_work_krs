@@ -813,7 +813,7 @@ class DopPlanWindow(WindowUnion):
                 if float(current_bottom) > self.dict_data_well["bottomhole_drill"]._value:
                     QMessageBox.critical(self, 'Забой', 'Текущий забой больше пробуренного забоя')
                     return
-                self.dict_data_well["fluid_work"], self.dict_data_well["fluid_work_short"] = GnoWindow.calc_work_fluid(self, fluid)
+                self.dict_data_well["fluid_work"], self.dict_data_well["fluid_work_short"] = self.calc_work_fluid(self, fluid)
 
             self.dict_data_well["template_depth"] = float(template_depth_edit)
             self.dict_data_well["template_lenght"] = float(template_lenght_edit)
@@ -1005,7 +1005,7 @@ class DopPlanWindow(WindowUnion):
             # if float(current_bottom) > self.dict_data_well["bottomhole_drill"]._value:
             #     QMessageBox.critical(self, 'Забой', 'Текущий забой больше пробуренного забоя')
             #     return
-            self.dict_data_well["fluid_work"], self.dict_data_well["fluid_work_short"] = GnoWindow.calc_work_fluid(self, fluid)
+            self.dict_data_well["fluid_work"], self.dict_data_well["fluid_work_short"] = self.calc_work_fluid(self, fluid)
 
             self.dict_data_well["template_depth"] = float(template_depth_edit)
             self.dict_data_well["template_lenght"] = float(template_lenght_edit)

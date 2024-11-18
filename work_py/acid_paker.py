@@ -1183,7 +1183,7 @@ class AcidPakerWindow(WindowUnion):
 
     def paker_layout_two(self, swab_true_edit_type, paker_diametr, paker_khost, paker_depth, paker2_depth,
                          depth_gauge_combo, iron_true_combo, iron_volume_edit):
-        from work_py.alone_oreration import privyazkaNKT
+        from work_py.alone_oreration import privyazka_nkt
         from .opressovka import OpressovkaEK, TabPageSo
 
         difference_paker = paker_depth - paker2_depth
@@ -1268,8 +1268,8 @@ class AcidPakerWindow(WindowUnion):
              'мастер КРС', None]]
 
         if self.need_privyazka_QCombo == 'Да' and self.paker_layout_combo in ['двухпакерная']:
-            if privyazkaNKT(self)[0] not in paker_list:
-                paker_list.insert(1, privyazkaNKT(self)[0])
+            if privyazka_nkt(self)[0] not in paker_list:
+                paker_list.insert(1, privyazka_nkt(self)[0])
         if depth_gauge_combo == 'Да':
             if self.paker_layout_combo in ['однопакерная', 'однопакерная, упорный', 'пакер с заглушкой']:
                 mtg_count = 2
@@ -1320,7 +1320,7 @@ class AcidPakerWindow(WindowUnion):
 
     def paker_layout_one(self, swab_true_edit_type, paker_diametr, paker_khost, paker_depth,
                          depth_gauge_combo, pressureZUMPF_combo='Нет', paker_depth_zumpf=0):
-        from work_py.alone_oreration import privyazkaNKT
+        from work_py.alone_oreration import privyazka_nkt
         from .opressovka import OpressovkaEK, TabPageSo
         # print(swab_true_edit_type, paker_diametr, paker_khost, paker_depth, depth_gauge_combo)
         if 'упорны' in self.paker_layout_combo:
@@ -1449,8 +1449,8 @@ class AcidPakerWindow(WindowUnion):
 
 
         if self.need_privyazka_QCombo == 'Да' and self.paker_layout_combo in ['однопакерная', 'пакер с заглушкой']:
-            if privyazkaNKT(self)[0] not in paker_list:
-                paker_list.insert(1, privyazkaNKT(self)[0])
+            if privyazka_nkt(self)[0] not in paker_list:
+                paker_list.insert(1, privyazka_nkt(self)[0])
 
         if depth_gauge_combo == 'Да':
             if self.paker_layout_combo in ['однопакерная', 'однопакерная, упорный', 'пакер с заглушкой']:
@@ -1468,7 +1468,7 @@ class AcidPakerWindow(WindowUnion):
 
     def paker_layout_one_with_zaglushka(self, swab_true_edit_type, paker_diametr, paker_khost, paker_depth,
                                         depth_gauge_combo):
-        from work_py.alone_oreration import privyazkaNKT
+        from work_py.alone_oreration import privyazka_nkt
         from .opressovka import OpressovkaEK, TabPageSo
         # print(swab_true_edit_type, paker_diametr, paker_khost, paker_depth, depth_gauge_combo)
         paker_type = 'ПРО-ЯМО'
@@ -1530,8 +1530,8 @@ class AcidPakerWindow(WindowUnion):
             for interval in self.dict_data_well["dict_perforation"][plast]['интервал']:
                 if abs(float(interval[1] - float(self.dict_data_well["depth_fond_paker_do"]["posle"]))) < 10 or abs(
                         float(interval[0] - float(self.dict_data_well["depth_fond_paker_do"]["posle"]))) < 10:
-                    if privyazkaNKT(self)[0] not in paker_list:
-                        paker_list.insert(1, privyazkaNKT(self)[0])
+                    if privyazka_nkt(self)[0] not in paker_list:
+                        paker_list.insert(1, privyazka_nkt(self)[0])
         if depth_gauge_combo == 'Да':
             if self.paker_layout_combo in ['однопакерная', 'однопакерная, упорный', 'пакер с заглушкой']:
                 mtg_count = 2

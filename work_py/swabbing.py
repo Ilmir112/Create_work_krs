@@ -13,7 +13,7 @@ from work_py.alone_oreration import well_volume
 from main import MyMainWindow
 from work_py.change_fluid import Change_fluid_Window
 
-from work_py.alone_oreration import privyazkaNKT, need_h2s
+from work_py.alone_oreration import privyazka_nkt, need_h2s
 from work_py.parent_work import TabPageUnion, TabWidgetUnion, WindowUnion
 from work_py.template_work import TabPageSoWith
 from .rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
@@ -1436,9 +1436,9 @@ class SwabWindow(WindowUnion):
         for plast in list(self.dict_data_well["dict_perforation"].keys()):
             for interval in self.dict_data_well["dict_perforation"][plast]['интервал']:
                 if abs(float(interval[1] - paker_depth)) < 10 or abs(float(interval[0] - paker_depth)) < 10:
-                    if privyazkaNKT(self) not in paker_list and data_list.privyazkaSKO == 0:
+                    if privyazka_nkt(self) not in paker_list and data_list.privyazkaSKO == 0:
                         data_list.privyazkaSKO += 1
-                        paker_list.insert(1, privyazkaNKT(self)[0])
+                        paker_list.insert(1, privyazka_nkt(self)[0])
 
         if need_change_zgs_combo == 'Да':
             paker_list.extend(Change_fluid_Window.fluid_change(self, plast_new, fluid_new, pressuar_new))
@@ -1645,9 +1645,9 @@ class SwabWindow(WindowUnion):
         for plast in list(self.dict_data_well["dict_perforation"].keys()):
             for interval in self.dict_data_well["dict_perforation"][plast]['интервал']:
                 if abs(float(interval[1] - paker_depth)) < 10 or abs(float(interval[0] - paker_depth)) < 10:
-                    if privyazkaNKT(self) not in paker_list and data_list.privyazkaSKO == 0:
+                    if privyazka_nkt(self) not in paker_list and data_list.privyazkaSKO == 0:
                         data_list.privyazkaSKO += 1
-                        paker_list.insert(1, privyazkaNKT(self)[0])
+                        paker_list.insert(1, privyazka_nkt(self)[0])
 
         if need_change_zgs_combo == 'Да':
             # print(plast_new, fluid_new, pressuar_new)
@@ -1807,9 +1807,9 @@ class SwabWindow(WindowUnion):
         for plast in list(self.dict_data_well["dict_perforation"].keys()):
             for interval in self.dict_data_well["dict_perforation"][plast]['интервал']:
                 if abs(float(interval[1] - paker1_depth)) < 10 or abs(float(interval[0] - paker1_depth)) < 10:
-                    if privyazkaNKT(self) not in paker_list and data_list.privyazkaSKO == 0:
+                    if privyazka_nkt(self) not in paker_list and data_list.privyazkaSKO == 0:
                         data_list.privyazkaSKO += 1
-                        paker_list.insert(1, *privyazkaNKT(self))
+                        paker_list.insert(1, *privyazka_nkt(self))
         if need_change_zgs_combo == 'Да':
             paker_list.extend(Change_fluid_Window.fluid_change(self, plast_new, fluid_new, pressuar_new))
             paker_list.append([None, None,

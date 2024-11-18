@@ -216,7 +216,7 @@ class GnktOsvWindow(GnktModel):
         from cdng import events_gnvp_frez
         from work_py.alone_oreration import volume_vn_nkt, volume_jamming_well, volume_pod_NKT
 
-        self.dict_data_well["fluid_work"], self.dict_data_well["fluid_work_short"] = GnoWindow.calc_work_fluid(self, fluid_work_insert)
+        self.dict_data_well["fluid_work"], self.dict_data_well["fluid_work_short"] = self.calc_work_fluid(self, fluid_work_insert)
 
         block_gnvp_list = events_gnvp_frez(self, self.data_gnkt.distance_pntzh, float(fluid_work_insert))
 

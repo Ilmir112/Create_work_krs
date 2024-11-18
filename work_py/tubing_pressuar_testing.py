@@ -128,7 +128,7 @@ class TubingPressuarWindow(WindowUnion):
 
     def pressuar_nkt_work(self, current_edit, select_nkt_combo, length_nkt_edit, pressuar_edit,
                           distance_between_nkt_edit):
-        from .descent_gno import GnoDescentWindow
+        from .descent_gno import DescentParent
         from .rationingKRS import liftingNKT_norm, descentNKT_norm
 
         if select_nkt_combo != 'Фондовые НКТ' or self.dict_data_well["curator"] == 'ОР':
@@ -147,7 +147,7 @@ class TubingPressuarWindow(WindowUnion):
             ]
         else:
 
-            calc_fond_list = GnoDescentWindow.calc_fond_nkt(self, length_nkt_edit, distance_between_nkt_edit)
+            calc_fond_list = DescentParent.calc_fond_nkt(self, length_nkt_edit, distance_between_nkt_edit)
 
             block_pack_list = [
                 [f'Спустить заглушку на фНКТ{self.dict_data_well["nkt_diam"]} до глубины {current_edit}мм', None,

@@ -5,7 +5,7 @@ from main import MyMainWindow
 from PyQt5.QtWidgets import QMessageBox, QInputDialog, QMainWindow, QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, \
     QTabWidget, QPushButton
 
-from work_py.alone_oreration import privyazkaNKT
+from work_py.alone_oreration import privyazka_nkt
 from .opressovka import OpressovkaEK, TabPageSo
 from .parent_work import TabWidgetUnion, TabPageUnion, WindowUnion
 from .rationingKRS import descentNKT_norm, liftingNKT_norm

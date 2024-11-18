@@ -7,9 +7,7 @@ from krs import GnoWindow
 
 def gnkt_work(self, volume_gntk, fluid_work_insert):
 
-
-
-    fluid_work, self.dict_data_well["fluid_work_short"] = GnoWindow.calc_work_fluid(fluid_work_insert)
+    fluid_work, self.dict_data_well["fluid_work_short"] = self.calc_work_fluid(fluid_work_insert)
     aaa = self.dict_data_well["depth_fond_paker_do"]["do"]
     if self.dict_data_well["depth_fond_paker_do"]["do"] != '0':
         niz_nkt = self.dict_data_well["depth_fond_paker_do"]["do"]

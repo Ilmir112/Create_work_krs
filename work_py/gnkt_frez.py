@@ -573,7 +573,7 @@ class WorkWithGnkt(GnktModel):
 
         fluid_work_insert = self.data_gnkt.fluid_edit
 
-        fluid_work, self.dict_data_well["fluid_work_short"] = GnoWindow.calc_work_fluid(self, fluid_work_insert)
+        fluid_work, self.dict_data_well["fluid_work_short"] = self.calc_work_fluid(self, fluid_work_insert)
 
         block_gnvp_list = events_gnvp_frez(self, self.data_gnkt.distance_pntzh, fluid_work_insert)
 

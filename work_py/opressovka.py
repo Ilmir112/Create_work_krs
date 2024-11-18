@@ -6,7 +6,7 @@ from main import MyMainWindow
 from PyQt5.QtWidgets import QMessageBox, QInputDialog, QMainWindow, QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, \
     QTabWidget, QPushButton, QHeaderView, QTableWidget, QTableWidgetItem
 
-from work_py.alone_oreration import privyazkaNKT
+from work_py.alone_oreration import privyazka_nkt
 from .parent_work import TabPageUnion, WindowUnion, TabWidgetUnion
 from .rationingKRS import descentNKT_norm, liftingNKT_norm
 
@@ -423,7 +423,7 @@ class OpressovkaEK(WindowUnion):
                  'мастер КРС', liftingNKT_norm(paker_depth, 1.2)]]
 
         if self.need_privyazka_QCombo == "Да":
-            paker_list.insert(1, privyazkaNKT(self)[0])
+            paker_list.insert(1, privyazka_nkt(self)[0])
 
         return paker_list
 
@@ -581,7 +581,7 @@ class OpressovkaEK(WindowUnion):
             paker_list.append(row)
 
         if self.need_privyazka_QCombo == "Да":
-            paker_list.insert(1, privyazkaNKT(self)[0])
+            paker_list.insert(1, privyazka_nkt(self)[0])
 
         return paker_list
 

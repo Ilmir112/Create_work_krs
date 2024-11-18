@@ -344,7 +344,7 @@ class GnktOpz(GnktModel):
             acid_true_quest = False
 
         self.dict_data_well["fluid_work"], self.dict_data_well["fluid_work_short"] = \
-            GnoWindow.calc_work_fluid(self, self.fluid_edit)
+            self.calc_work_fluid(self, self.fluid_edit)
 
         if self.need_rast_combo == 'нужно':
             volume_rast_edit = self.volume_rast_edit
