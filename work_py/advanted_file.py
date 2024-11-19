@@ -329,12 +329,17 @@ def definition_plast_work(self):
                 if perforation_sole < sole and self.dict_data_well["current_bottom"] > sole:
                     perforation_sole = sole
         zhgs = 1.01
-        vertical = min(self.dict_data_well["dict_perforation"][plast]["вертикаль"])
-        pressuar = float(max(self.dict_data_well["dict_perforation"][plast]['давление']))
-        if vertical and pressuar:
-            zhgs = calculation_fluid_work(self.dict_data_well, vertical,pressuar)
-            self.dict_data_well["dict_perforation"].setdefault(plast, {}).setdefault('рабочая жидкость',
-                                                                                     []).append(zhgs)
+        if "вертикаль" in list(self.dict_data_well["dict_perforation"][plast].keys()):
+            vertical = min(self.dict_data_well["dict_perforation"][plast]["вертикаль"])
+            pressuar = float(max(self.dict_data_well["dict_perforation"][plast]['давление']))
+            if vertical and pressuar:
+                zhgs = calculation_fluid_work(self.dict_data_well, vertical,pressuar)
+                self.dict_data_well["dict_perforation"].setdefault(plast, {}).setdefault('рабочая жидкость',
+                                                                                         []).append(zhgs)
+            else:
+                zhgs = 1.01
+                self.dict_data_well["dict_perforation"].setdefault(plast, {}).setdefault('рабочая жидкость',
+                                                                                         []).append(zhgs)
 
     self.dict_data_well["perforation_roof"] = perforation_roof
     self.dict_data_well["perforation_sole"] = perforation_sole
@@ -456,23 +461,23 @@ def count_row_height(self, wb2, ws, ws2, work_list, merged_cells_dict, ind_ins):
             ws2.merge_cells(start_row=row + 1, start_column=3, end_row=row + 1, end_column=10)
 
     for key, value in boundaries_dict.items():
-        aaa = value[1]
+
         if value[1] <= boundaries_dict_index-3:
             ws2.merge_cells(start_column=value[0], start_row=value[1],
                             end_column=value[2], end_row=value[3])
 
 
-    try:
-        # вставка сохраненных изображение по координатам ячеек
-        if self.dict_data_well["image_list"]:
-
-            for img in self.dict_data_well["image_list"]:
-                image_path = img[0]
-                logo = Image(image_path) # Используем open для открытия изображения
-                logo.width, logo.height = img[2][0] * 0.48, img[2][1] * 0.72
-                ws2.add_image(logo, img[1])
-    except TypeError as e:
-        QMessageBox.warning(None, 'Ошибка', f'Ошибка Изменения размера изображения {type(e).__name__}\n\n{str(e)}')
+    # try:
+    #     # вставка сохраненных изображение по координатам ячеек
+    #     if self.dict_data_well["image_list"]:
+    #
+    #         for img in self.dict_data_well["image_list"]:
+    #             image_path = img[0]
+    #             # logo = Image(image_path) # Используем open для открытия изображения
+    #             # logo.width, logo.height = img[2][0] * 0.48, img[2][1] * 0.72
+    #             ws2.add_image(image_path, img[1])
+    # except TypeError as e:
+    #     QMessageBox.warning(None, 'Ошибка', f'Ошибка Изменения размера изображения {type(e).__name__}\n\n{str(e)}')
 
     if self.dict_data_well["image_data"]:
 
@@ -504,7 +509,7 @@ def count_row_height(self, wb2, ws, ws2, work_list, merged_cells_dict, ind_ins):
 
                 # Сохранение изображения в Excel файл:
 
-                self.insert_image(ws2, file, coord, width, height)
+                self.insert_image(ws2, file, coord, width * 0.72, height * 0.48)
 
             except ValueError as e:
                 print(f"Ошибка при вставке изображения: {type(e).__name__}\n\n{str(e)}")

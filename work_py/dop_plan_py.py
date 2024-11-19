@@ -158,7 +158,7 @@ class TabPageDp(TabPageUnion):
             self.well_area_edit.setText(f'{self.dict_data_well["well_area"]._value}')
             self.well_number_edit.setText(f'{self.dict_data_well["well_number"]._value}')
             self.well_area_edit.setEnabled(False)
-            self.well_number_edit.setEnabled(False)
+            # self.well_number_edit.setEnabled(False)
         except:
             pass
 
@@ -742,7 +742,7 @@ class DopPlanWindow(WindowUnion):
         self.tableWidget.removeRow(row)
 
     def add_work(self):
-        from data_base.work_with_base import  insert_data_well_dop_plan, round_cell
+        from data_base.work_with_base import round_cell
         from data_list import ProtectedIsNonNone
         from work_py.advanted_file import definition_plast_work
         self.dict_data_well["data_list"] = []
@@ -890,7 +890,7 @@ class DopPlanWindow(WindowUnion):
             well_number = current_widget.well_number_edit.text()
             well_area = current_widget.well_area_edit.text()
             if well_area != '' and well_area != '':
-                self.well_number, self.dict_data_well["well_area"] = \
+                self.dict_data_well["well_number"], self.dict_data_well["well_area"] = \
                     ProtectedIsNonNone(well_number), ProtectedIsNonNone(well_area)
             if index_change_line != '':
                 index_change_line = int(float(index_change_line))
@@ -898,6 +898,26 @@ class DopPlanWindow(WindowUnion):
                 QMessageBox.critical(self, 'пункт', 'Необходимо выбрать пункт плана работ')
                 return
 
+            if ' от' in well_data_in_base_combo:
+                data_well_data_in_base_combo = well_data_in_base_combo.split(' ')[-1]
+                work_plan_in_base = well_data_in_base_combo.split(' ')[3]
+
+            db = connection_to_database(data_list.DB_WELL_DATA)
+            data_well_base = WorkDatabaseWell(db, self.dict_data_well)
+
+            data_well = data_well_base.check_in_database_well_data(well_number, well_area,
+                                                                   work_plan_in_base, data_well_data_in_base_combo)
+
+            if data_well:
+                self.dict_data_well["type_kr"] = data_well[2]
+
+                if data_well[3]:
+                    self.dict_data_well["dict_category"] = json.loads(data_well[3])
+                    self.dict_data_well["well_oilfield"] = ProtectedIsNonNone(data_well[4])
+                    self.dict_data_well["appointment"] = ProtectedIsNonNone(data_well[5])
+                    self.dict_data_well["inv_number"] = ProtectedIsNonNone(data_well[6])
+                    self.dict_data_well["wellhead_fittings"] = data_well[7]
+                    self.dict_data_well["emergency_well"] = False
 
             self.dict_data_well["current_bottom"] = current_bottom
 
@@ -1060,9 +1080,9 @@ class DopPlanWindow(WindowUnion):
         date_table = table_name.split(' ')[-1]
         well_number = table_name.split(' ')[0]
         well_area = table_name.split(' ')[1]
-        type_kr = table_name.split(' ')[2].replace('None', 'null')
+        type_kr = table_name.split(' ')[-4].replace('None', 'null')
         contractor = data_list.contractor
-        work_plan = table_name.split(' ')[3]
+        work_plan = table_name.split(' ')[-3]
 
         db = connection_to_database(data_list.DB_WELL_DATA)
         data_well_base = WorkDatabaseWell(db, self.dict_data_well)

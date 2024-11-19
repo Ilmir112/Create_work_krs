@@ -873,14 +873,6 @@ class DataWindow(WindowUnion):
                    shoe_column_additional, head_column_additional]]) and self.dict_data_well["column_additional"]:
             QMessageBox.information(self, 'Внимание', 'Не все поля в доп колонне соответствуют значениям')
             close_file = False
-        elif self.dict_data_well["column_additional"]:
-
-            if any([70 > float(column_additional_diametr),   float(column_additional_diametr) > 150,
-                    5 > float(column_additional_wall_thickness), float(column_additional_wall_thickness) > 13,
-                    5 > float(column_conductor_wall_thickness), float(column_conductor_wall_thickness) > 13,
-                    5 > float(column_wall_thickness), float(column_wall_thickness) > 13]):
-                QMessageBox.information(self, 'Внимание', 'Проверьте толщину колонны')
-                close_file = False
 
         elif self.ifNum(bottomhole_artificial) is False \
                 or self.ifNum(bottomhole_drill) is False \
@@ -906,14 +898,8 @@ class DataWindow(WindowUnion):
             QMessageBox.information(self, 'Внимание', 'Не все поля в спущенном оборудовании'
                                                             ' соответствуют значениям')
             close_file = False
-        elif self.dict_data_well["column_additional"]:
-            if int(float(str(head_column_additional).replace(',', '.'))) < 10:
-                msg = QMessageBox.question(self, 'Внимание', 'доп колонна начинается с устья?')
-                if msg == QMessageBox.StandardButton.Yes:
-                    shoe_column = shoe_column_additional
-                    columnType = column_additional_diametr
-                    column_wall_thickness = column_additional_wall_thickness
-                    self.dict_data_well["column_additional"] = False
+
+
 
 
 
@@ -992,10 +978,29 @@ class DataWindow(WindowUnion):
                                           'При вызванной ошибке НКТ после ремонта не может быть пустым')
             close_file = False
 
+
         elif self.dict_data_well["column_additional"]:
-            if int(column_additional_diametr) >= int(columnType):
+            if int(column_additional_diametr) >= float(columnType):
                 QMessageBox.information(self, 'Внимание', 'Ошибка в диаметре доп колонны')
                 close_file = False
+
+            if any([70 > float(column_additional_diametr),   float(column_additional_diametr) > 150,
+                    5 > float(column_additional_wall_thickness), float(column_additional_wall_thickness) > 13,
+                    5 > float(column_conductor_wall_thickness), float(column_conductor_wall_thickness) > 13,
+                    5 > float(column_wall_thickness), float(column_wall_thickness) > 13]):
+                QMessageBox.information(self, 'Внимание', 'Проверьте толщину колонны')
+                close_file = False
+
+            if int(float(str(head_column_additional).replace(',', '.'))) < 10:
+                msg = QMessageBox.question(self, 'Внимание', 'доп колонна начинается с устья?')
+                if msg == QMessageBox.StandardButton.Yes:
+                    shoe_column = shoe_column_additional
+                    columnType = column_additional_diametr
+                    column_wall_thickness = column_additional_wall_thickness
+                    self.dict_data_well["column_additional"] = False
+
+
+
 
         if type_kr_Combo in ['КР13-1  Подготовительные работы к ГРП (ПР)',
                              'КР13-2  Освоение скважины после ГРП (ЗР)',

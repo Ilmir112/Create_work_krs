@@ -77,7 +77,7 @@ class TabPageSoRir(TabPageUnion):
             if pakerDepth != '':
                 self.paker_depth_edit.setText(str(int(pakerDepth)))
         else:
-            if self.dict_data_well["dict_leakiness"]['НЭК']:
+            if self.dict_data_well["leakiness"]:
                 pakerDepth = min([float(nek.split('-')[0]) - 10
                                   for nek in self.dict_data_well["dict_leakiness"]['НЭК']['интервал'].keys()])
 
@@ -207,11 +207,13 @@ class TabPageSoRir(TabPageUnion):
         if index == 'Да':
             if len(self.dict_data_well['plast_work']) != 0:
                 paker_depth_zumpf = self.dict_data_well["perforation_roof"] + 10
+                self.paker_depth_zumpf_edit.setText(f'{paker_depth_zumpf}')
             else:
                 if self.dict_data_well["dict_leakiness"]:
                     paker_depth_zumpf = max([float(nek.split('-')[0]) + 10
                                              for nek in self.dict_data_well["dict_leakiness"]['НЭК']['интервал'].keys()])
-            self.paker_depth_zumpf_edit.setText(f'{paker_depth_zumpf}')
+                    self.paker_depth_zumpf_edit.setText(f'{paker_depth_zumpf}')
+
 
             self.grid.addWidget(self.paker_depth_zumpf_Label, 1, 5)
             self.grid.addWidget(self.paker_depth_zumpf_edit, 2, 5)

@@ -33,7 +33,7 @@ def rgd_without_paker(self):
          f' напротив мостков для постановки партии ГИС.',
          None, None, None, None, None, None, None,
          'мастер КРС', None],
-        [f'РГД по колонне при закачке не менее {self.determination_injection_pressuar(self)}атм',
+        [f'РГД по колонне при закачке не менее {GnoDescentWindow.determination_injection_pressuar(self)}атм',
          None,
          f'Произвести запись по тех.карте 2.3.1: Определение профиля приемистости скважины и оценка технического'
          f' состояния '

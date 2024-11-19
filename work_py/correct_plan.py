@@ -175,7 +175,7 @@ class CorrectPlanWindow(WindowUnion):
                                                    self.boundaries_dict)
 
 
-            if well_area != '' and well_area != '':
+            if well_number != '' and well_area != '':
                 self.dict_data_well["well_number"], self.dict_data_well["well_area"] = \
                     ProtectedIsNonNone(well_number), ProtectedIsNonNone(well_area)
 

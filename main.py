@@ -122,7 +122,7 @@ class MyMainWindow(QMainWindow):
 
         self.dict_category = {}
         # Запуск основного класса и всех дочерних классов в одной строке
-        well_pz = FindIndexPZ(self.ws, self.work_plan)
+        well_pz = FindIndexPZ(self.ws, self.work_plan, self)
         well_pz.dict_data_well["work_plan"] = self.work_plan
         data_well_dict = {}
         self.dict_data_well = WellName.read_well(
@@ -295,7 +295,7 @@ class MyMainWindow(QMainWindow):
                     data_list.pause = True
                     
                     self.dict_data_well = self.read_excel_file()
-                    read_pz = CreatePZ(self.dict_data_well, self.ws)
+                    read_pz = CreatePZ(self.dict_data_well, self.ws, self)
                     self.ws = read_pz.open_excel_file(self.ws, self.work_plan)
                 except FileNotFoundError as f:
                     QMessageBox.warning(self, 'Ошибка', f'Ошибка при прочтении файла {f}')
@@ -1466,10 +1466,9 @@ class MyWindow(MyMainWindow):
             if self.work_plan in ['krs', 'plan_change']:
                 self.create_short_plan(wb2, plan_short)
             #
-            if self.work_plan not in ['dop_plan_in_base']:
-                if 'Ойл' in data_list.contractor:
-                    self.insert_image(ws2, f'{data_list.path_image}imageFiles/Хасаншин.png', 'H1')
-                    self.insert_image(ws2, f'{data_list.path_image}imageFiles/Шамигулов.png', 'H4')
+            if 'Ойл' in data_list.contractor:
+                self.insert_image(ws2, f'{data_list.path_image}imageFiles/Хасаншин.png', 'H1')
+                self.insert_image(ws2, f'{data_list.path_image}imageFiles/Шамигулов.png', 'H4')
 
             excel_data_dict = excel_in_json(self, ws2)
             db = connection_to_database(data_list.DB_WELL_DATA)

@@ -599,7 +599,7 @@ class LiftPaker(GnoParent):
             else f'По результату приемистости произвести глушение скважины в НКТ тех.жидкостью в объеме ' \
                  f'обеспечивающим ' \
                  f'заполнение трубного пространства и скважины в подпакерной зоне в объеме ' \
-                 f'{volume_well_pod_nkt_calculate(self.dict_data_well) + volume_nkt(self.dict_data_well)} м3 ' \
+                 f'{volume_well_pod_nkt_calculate(self.dict_data_well) + volume_nkt(self.dict_data_well):.1f} м3 ' \
                  f'жидкостью уд.веса {self.dict_data_well["fluid_work"]} при давлении не более ' \
                  f'{self.dict_data_well["max_admissible_pressure"]._value}атм. ' \
                  f'Тех отстой 1-2 часа. Произвести замер избыточного давления в скважине.'
