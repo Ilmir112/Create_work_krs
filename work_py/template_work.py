@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import QMessageBox, QWidget, QLabel, QComboBox, QLineEdit, 
 import data_list
 from PyQt5.QtCore import Qt
 
+from main import MyWindow
 from work_py.parent_work import TabPageUnion, TabWidgetUnion, WindowUnion
 from .rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
 from PyQt5.QtGui import QDoubleValidator
@@ -50,8 +51,8 @@ class TabPageSoWith(TabPageUnion):
             self.privyazka_question_QCombo.setCurrentIndex(1)
 
         self.note_Label = QLabel("Нужно ли добавлять примечание", self)
-        self.note_question_QCombo = QComboBox(self)
-        self.note_question_QCombo.addItems(['Нет', 'Да'])
+        self.note_question_qcombo = QComboBox(self)
+        self.note_question_qcombo.addItems(['Нет', 'Да'])
 
         self.solvent_Label = QLabel("объем растворителя", self)
         self.solvent_volume_edit = QLineEdit(self)
@@ -63,7 +64,7 @@ class TabPageSoWith(TabPageUnion):
         self.solvent_question_QCombo.addItems(['Нет', 'Да'])
 
         if self.dict_data_well["count_template"] == 0:
-            self.note_question_QCombo.setCurrentIndex(1)
+            self.note_question_qcombo.setCurrentIndex(1)
             self.solvent_question_QCombo.setCurrentIndex(1)
 
         self.skm_Label = QLabel("диаметр СКМ", self)
@@ -121,7 +122,7 @@ class TabPageSoWith(TabPageUnion):
         self.grid.addWidget(self.privyazka_question_QCombo, 9, 6)
 
         self.grid.addWidget(self.note_Label, 8, 7)
-        self.grid.addWidget(self.note_question_QCombo, 9, 7)
+        self.grid.addWidget(self.note_question_qcombo, 9, 7)
 
         self.grid.addWidget(self.template_str_Label, 11, 1, 1, 8)
         self.grid.addWidget(self.template_str_Edit, 12, 1, 1, 8)
@@ -493,7 +494,7 @@ class TabPageSoWith(TabPageUnion):
             dictance_template_first = int(current_bottom - roof_plast + 5)
             self.dictance_template_first_Edit.setText(str(dictance_template_first))
 
-            lenght_template_first, lenght_template_second = self.definition_ECN_true(
+            lenght_template_first, lenght_template_second = self.definition_ecn_true(
                 self.dict_data_well["dict_pump_ECN_h"]["posle"])
             self.lenght_template_first_Edit.setText(lenght_template_first)
             self.lenght_template_second_Edit.setText(str(lenght_template_second))
@@ -762,7 +763,7 @@ class TabPageSoWith(TabPageUnion):
             self.template_str_Edit.setText(template_str)
             self.skm_teml_str_Edit.setText(skm_teml_str)
 
-    def definition_ECN_true(self, depth_ecn):
+    def definition_ecn_true(self, depth_ecn):
 
         if self.dict_data_well["column_additional"] is False and self.dict_data_well["dict_pump_ECN"]["posle"] != 0 and \
                 self.dict_data_well["column_diametr"]._value > 168:
@@ -1036,7 +1037,7 @@ class TemplateKrs(WindowUnion):
 
     def closeEvent(self, event):
         # Закрываем основное окно при закрытии окна входа
-        self.operation_window = None
+        MyWindow.operation_window = None
         event.accept()  # Принимаем событие закрытия
 
     def addString(self):
@@ -1184,7 +1185,7 @@ class TemplateKrs(WindowUnion):
         if solvent_volume_edit != '':
             solvent_volume_edit = round(float(solvent_volume_edit), 1)
 
-        note_question_QCombo = self.tabWidget.currentWidget().note_question_QCombo.currentText()
+        note_question_qcombo = self.tabWidget.currentWidget().note_question_qcombo.currentText()
 
         current_bottom = self.tabWidget.currentWidget().current_bottom_edit.text()
         if current_bottom != '':
@@ -1317,7 +1318,7 @@ class TemplateKrs(WindowUnion):
             for row in gips[::-1]:
                 list_template_ek.insert(0, row)
         # print(f'счет использования шаблн {self.dict_data_well["count_template"]}')
-        if note_question_QCombo == "Да":
+        if note_question_qcombo == "Да":
             list_template_ek = list_template_ek + notes_list
             self.dict_data_well["count_template"] += 1
         else:

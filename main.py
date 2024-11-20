@@ -69,7 +69,8 @@ class ExcelWorker(QThread):
         try:
             db = connection_to_database(data_list.DB_CLASSIFICATION)
             self.check_correct_well = CheckWellExistence(db)
-            check_true, stop_app = self.check_correct_well.checking_well_database_without_juming(well_number, deposit_area, region)
+            check_true, stop_app = self.check_correct_well.checking_well_database_without_juming(well_number,
+                                                                                                 deposit_area, region)
 
         except Exception as e:
             QMessageBox.warning(None, 'Ошибка', f"Ошибка при проверке записи: {type(e).__name__}\n\n{str(e)}")
@@ -95,6 +96,19 @@ class MyMainWindow(QMainWindow):
         self.perforation_correct_window2 = None
         self.work_plan = None
         self.dict_data_well = {}
+
+    def add_window(self, window):
+        if self.operation_window is None:
+            self.operation_window = window(self.dict_data_well, self.table_widget)
+            # self.raid_window.setGeometry(200, 400, 300, 400)
+            self.set_modal_window(self.operation_window)
+
+            self.pause_app()
+            data_list.pause = True
+            self.operation_window = None
+        else:
+            self.operation_window.close()  # Close window.
+            self.operation_window = None
 
     @staticmethod
     def insert_image(ws, file, coordinate, width=200, height=180):
@@ -127,7 +141,7 @@ class MyMainWindow(QMainWindow):
         data_well_dict = {}
         self.dict_data_well = WellName.read_well(
             well_pz, well_pz.cat_well_max._value, well_pz.data_pvr_min._value)
-        
+
         well_pz.dict_data_well['region'] = region_select(well_pz.dict_data_well['cdng']._value)
 
         date_str2 = datetime.strptime('2024-09-19', '%Y-%m-%d')
@@ -135,18 +149,17 @@ class MyMainWindow(QMainWindow):
         if self.work_plan == 'dop_plan':
             number_list = list(map(str, range(1, 50)))
             self.dict_data_well["number_dp"], ok = QInputDialog.getItem(self, 'Номер дополнительного плана работ',
-                                                      'Введите номер дополнительного плана работ',
-                                                      number_list, 0, False)
+                                                                        'Введите номер дополнительного плана работ',
+                                                                        number_list, 0, False)
 
             db = connection_to_database(data_list.DB_WELL_DATA)
             data_well_base = WorkDatabaseWell(db, self.dict_data_well)
 
             data_well = data_well_base.check_in_database_dp_data(self.dict_data_well["well_number"]._value,
-                                                                   self.dict_data_well["well_area"]._value,
-                                                                   f'ДП№{self.dict_data_well["number_dp"]}')
+                                                                 self.dict_data_well["well_area"]._value,
+                                                                 f'ДП№{self.dict_data_well["number_dp"]}')
 
             if data_well:
-
                 date_str1 = datetime.strptime(f'{data_well[1]}', '%Y-%m-%d')
                 if date_str1 > date_str2:
 
@@ -162,7 +175,8 @@ class MyMainWindow(QMainWindow):
                         self.dict_data_well["work_plan"] = 'dop_plan_in_base'
                         data_list.data_in_base = True
                         from work_py.dop_plan_py import DopPlanWindow
-                        self.rir_window = DopPlanWindow(self.dict_data_well["ins_ind"], None, self.dict_data_well["work_plan"])
+                        self.rir_window = DopPlanWindow(self.dict_data_well["ins_ind"], None,
+                                                        self.dict_data_well["work_plan"])
                         # self.rir_window.setGeometry(200, 400, 100, 200)
                         self.rir_window.show()
                         self.pause_app()
@@ -193,11 +207,10 @@ class MyMainWindow(QMainWindow):
             self.dict_data_well = \
                 WellCategory.read_well(well_pz, well_pz.cat_well_min._value, well_pz.data_well_min._value)
 
+            # self.set_modal_window(self.data_list.pdata_window)
 
-        # self.set_modal_window(self.data_list.pdata_window)
-
-        # self.pause_app()
-        # data_list.pause = True
+            # self.pause_app()
+            # data_list.pause = True
 
             if self.dict_data_well["leakiness"] is True:
                 if WellCondition.leakage_window is None:
@@ -212,18 +225,16 @@ class MyMainWindow(QMainWindow):
                     well_pz.pause = True
                     WellCondition.leakage_window = None  # Discard reference.
 
-
             if self.dict_data_well["emergency_well"] is True:
                 emergency_quest = QMessageBox.question(self, 'Аварийные работы ',
                                                        'Программа определила что в скважине'
                                                        f' авария - {self.dict_data_well["emergency_count"]}, верно ли?')
                 if emergency_quest == QMessageBox.StandardButton.Yes:
                     self.dict_data_well["emergency_well"] = True
-                    self.dict_data_well["emergency_bottom"], ok = QInputDialog.getInt(self, 'Аварийный забой',
-                                                                         'Введите глубину аварийного забоя',
-                                                                         0, 0,
-                                                                         int(self.dict_data_well[
-                                                                                 "bottomhole_artificial"]._value))
+                    self.dict_data_well["emergency_bottom"], ok = QInputDialog.getInt(
+                        self, 'Аварийный забой',
+                        'Введите глубину аварийного забоя', 0, 0,
+                        int(self.dict_data_well["bottomhole_artificial"]._value))
                 else:
                     self.dict_data_well["emergency_well"] = False
             if self.dict_data_well["problem_with_ek"] is True:
@@ -233,14 +244,16 @@ class MyMainWindow(QMainWindow):
                 if problem_with_ek_quest == QMessageBox.StandardButton.Yes:
                     self.dict_data_well["problem_with_ek"] = True
                     self.dict_data_well["problem_with_ek_depth"], ok = QInputDialog.getInt(self, 'Глубина сужения',
-                                                                              "Введите глубину cсужения", 0, 0,
-                                                                              int(self.dict_data_well[
-                                                                                      "current_bottom"]))
-                    self.dict_data_well["problem_with_ek_diametr"] = QInputDialog.getInt(self, 'диаметр внутренний cсужения',
-                                                                            "ВВедите внутренний диаметр cсужения", 0,
-                                                                            0,
-                                                                            int(float(self.dict_data_well["current_bottom"])))[
-                        0]
+                                                                                           "Введите глубину cсужения",
+                                                                                           0, 0,
+                                                                                           int(self.dict_data_well[
+                                                                                                   "current_bottom"]))
+                    self.dict_data_well["problem_with_ek_diametr"] = \
+                        QInputDialog.getInt(self, 'диаметр внутренний cсужения',
+                                            "ВВедите внутренний диаметр cсужения", 0,
+                                            0,
+                                            int(float(self.dict_data_well["current_bottom"])))[
+                            0]
                 else:
                     self.dict_data_well["problem_with_ek"] = False
 
@@ -260,12 +273,13 @@ class MyMainWindow(QMainWindow):
             return
 
         return self.dict_data_well
-    
+
     def determination_injection_pressuar(self):
         if self.dict_data_well["region"] == 'ЧГМ' and self.dict_data_well["expected_P"] < 80:
             return 80
         else:
             return self.dict_data_well["expected_P"]
+
     def privyazka_nkt(self):
         priv_list = [[f'ГИС Привязка по ГК и ЛМ', None,
                       f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {data_list.contractor}". '
@@ -275,6 +289,7 @@ class MyMainWindow(QMainWindow):
                       None, None, None, None, None, None, None,
                       'Мастер КРС, подрядчик по ГИС', 4]]
         return priv_list
+
     def open_read_excel_file_pz(self):
         from open_pz import CreatePZ
         from data_base.work_with_base import insert_data_new_excel_file
@@ -293,7 +308,7 @@ class MyMainWindow(QMainWindow):
                 try:
                     self.read_pz(self.fname)
                     data_list.pause = True
-                    
+
                     self.dict_data_well = self.read_excel_file()
                     read_pz = CreatePZ(self.dict_data_well, self.ws, self)
                     self.ws = read_pz.open_excel_file(self.ws, self.work_plan)
@@ -311,7 +326,8 @@ class MyMainWindow(QMainWindow):
                                                self.table_title, self.table_schema, self.table_widget,
                                                self.dict_data_well)
             elif self.work_plan == 'gnkt_frez':
-                self.gnkt_data = WorkWithGnkt(self.ws, self.table_title, self.table_schema, self.table_widget, self.dict_data_well)
+                self.gnkt_data = WorkWithGnkt(self.ws, self.table_title, self.table_schema, self.table_widget,
+                                              self.dict_data_well)
 
 
         elif self.work_plan in ['plan_change', 'dop_plan_in_base']:
@@ -370,8 +386,6 @@ class MyMainWindow(QMainWindow):
                     f'{self.dict_data_well["type_kr"].split(" ")[0]} кат {self.dict_data_well["category_pressuar"]}' \
                     f' {string_work} {contractor}.xlsx'
         return filenames
-
-
 
     def save_to_gnkt(self):
         from gnkt_data.gnkt_data import insert_data_base_gnkt
@@ -439,8 +453,6 @@ class MyMainWindow(QMainWindow):
         if self.wb:
             self.wb.close()
 
-
-
     @staticmethod
     def calculate_chemistry(type_chemistry, volume):
         if type_chemistry in ['HCl', 'Нефтекислотка']:
@@ -498,8 +510,6 @@ class MyMainWindow(QMainWindow):
         while data_list.pause is True:
             QtCore.QCoreApplication.instance().processEvents()
 
-
-
     def check_pvo_schema(self, ws5, ind):
         schema_pvo_set = set()
         for row in range(self.table_widget.rowCount()):
@@ -546,27 +556,32 @@ class MyMainWindow(QMainWindow):
 
         return list(schema_pvo_set)
 
-
     def insert_data_in_database(self, row_number, row_max):
 
-        dict_perforation_json = json.dumps(self.dict_data_well["dict_perforation"], default=str, ensure_ascii=False, indent=4)
+        dict_perforation_json = json.dumps(self.dict_data_well["dict_perforation"], default=str, ensure_ascii=False,
+                                           indent=4)
         # print(self.dict_data_well["dict_leakiness"])
         leakage_json = json.dumps(self.dict_data_well["dict_leakiness"], default=str, ensure_ascii=False, indent=4)
         plast_all_json = json.dumps(self.dict_data_well["plast_all"])
         plast_work_json = json.dumps(self.dict_data_well['plast_work'])
         skm_list_json = json.dumps(self.dict_data_well["skm_interval"])
         raiding_list_json = json.dumps(self.dict_data_well["ribbing_interval"])
+        head_column = self.dict_data_well["head_column"]._value
 
         template_ek = json.dumps(
-            [self.dict_data_well["template_depth"], self.dict_data_well["template_lenght"], self.dict_data_well["template_depth_addition"],
+            [self.dict_data_well["template_depth"], self.dict_data_well["template_lenght"],
+             self.dict_data_well["template_depth_addition"],
              self.dict_data_well["template_lenght_addition"]])
 
         # Подготовленные данные для вставки (пример)
-        data_values = [row_max, self.dict_data_well["current_bottom"], dict_perforation_json, plast_all_json, plast_work_json,
+        data_values = [row_max, self.dict_data_well["current_bottom"], dict_perforation_json, plast_all_json,
+                       plast_work_json,
                        leakage_json, self.dict_data_well["column_additional"], self.dict_data_well["fluid_work"],
-                       self.dict_data_well["category_pressuar"], self.dict_data_well["category_h2s"], self.dict_data_well["category_gf"],
+                       self.dict_data_well["category_pressuar"], self.dict_data_well["category_h2s"],
+                       self.dict_data_well["category_gf"],
                        template_ek, skm_list_json,
-                       self.dict_data_well["problem_with_ek_depth"], self.dict_data_well["problem_with_ek_diametr"], raiding_list_json]
+                       self.dict_data_well["problem_with_ek_depth"], self.dict_data_well["problem_with_ek_diametr"],
+                       raiding_list_json, head_column]
 
         if len(self.dict_data_well["data_list"]) == 0:
             self.dict_data_well["data_list"].append(data_values)
@@ -604,7 +619,6 @@ class MyMainWindow(QMainWindow):
             if false_question == QMessageBox.StandardButton.No:
                 return False
 
-
     def true_set_paker(self, depth):
 
         check_true = False
@@ -637,7 +651,8 @@ class MyMainWindow(QMainWindow):
 
         for i, row_data in enumerate(work_list):
             row = ins_ind + i
-            if work_plan not in ['application_pvr', 'gnkt_frez', 'gnkt_opz', 'gnkt_bopz', 'gnkt_after_grp', 'application_gis']:
+            if work_plan not in ['application_pvr', 'gnkt_frez', 'gnkt_opz', 'gnkt_bopz', 'gnkt_after_grp',
+                                 'application_gis']:
                 self.insert_data_in_database(row, row_max + i)
 
             table_widget.insertRow(row)
@@ -667,16 +682,17 @@ class MyMainWindow(QMainWindow):
 
             for row in range(table_widget.rowCount()):
                 if row >= self.dict_data_well["ins_ind2"]:
-                    
                     # Добавляем нумерацию в первую колонку
-                    item_number = QtWidgets.QTableWidgetItem(str(row - self.dict_data_well["ins_ind2"] + 1))  # Номер строки + 1
+                    item_number = QtWidgets.QTableWidgetItem(
+                        str(row - self.dict_data_well["ins_ind2"] + 1))  # Номер строки + 1
                     table_widget.setItem(row, 1, item_number)
 
     def check_true_depth_template(self, depth):
         check = True
         if self.dict_data_well["column_additional"]:
 
-            if self.dict_data_well["template_depth_addition"] < depth and depth > self.dict_data_well["head_column_additional"]._value:
+            if self.dict_data_well["template_depth_addition"] < depth and \
+                    depth > self.dict_data_well["head_column_additional"]._value:
                 check = False
                 check_question = QMessageBox.question(
                     self,
@@ -685,7 +701,8 @@ class MyMainWindow(QMainWindow):
                     f' глубины  шаблонирования {self.dict_data_well["template_depth_addition"]}')
                 if check_question == QMessageBox.StandardButton.Yes:
                     check = True
-            if self.dict_data_well["template_depth"] < depth and depth < self.dict_data_well["head_column_additional"]._value:
+            if self.dict_data_well["template_depth"] < depth and \
+                    depth < self.dict_data_well["head_column_additional"]._value:
                 check = False
                 check_question = QMessageBox.question(
                     self,
@@ -708,98 +725,101 @@ class MyMainWindow(QMainWindow):
 
     def copy_pz(self, sheet, table_widget, work_plan='krs', count_col=12, list_page=1):
         from krs import GnoWindow
+        if sheet:
+            rows = sheet.max_row
+            merged_cells = sheet.merged_cells
+            table_widget.setRowCount(rows)
+            self.dict_data_well["count_row_well"] = table_widget.rowCount()
 
-        rows = sheet.max_row
-        merged_cells = sheet.merged_cells
-        table_widget.setRowCount(rows)
-        self.dict_data_well["count_row_well"] = table_widget.rowCount()
+            if work_plan == 'plan_change':
+                self.dict_data_well["count_row_well"] = self.dict_data_well["data_x_max"]._value
 
-        if work_plan == 'plan_change':
-            self.dict_data_well["count_row_well"] = self.dict_data_well["data_x_max"]._value
+            border_styles = {}
+            for row in sheet.iter_rows():
+                for cell in row:
+                    border_styles[(cell.row, cell.column)] = cell.border
 
-        border_styles = {}
-        for row in sheet.iter_rows():
-            for cell in row:
-                border_styles[(cell.row, cell.column)] = cell.border
+            table_widget.setColumnCount(count_col)
+            rowHeights_exit = [
+                sheet.row_dimensions[i + 1].height if sheet.row_dimensions[i + 1].height is not None else 18
+                for i in range(sheet.max_row)]
 
-        table_widget.setColumnCount(count_col)
-        rowHeights_exit = [sheet.row_dimensions[i + 1].height if sheet.row_dimensions[i + 1].height is not None else 18
-                           for i in range(sheet.max_row)]
+            for row in range(1, rows + 2):
+                if row > 1 and row < rows - 1:
+                    table_widget.setRowHeight(row, int(rowHeights_exit[row]))
+                for col in range(1, count_col + 1):
+                    if not sheet.cell(row=row, column=col).value is None:
+                        if isinstance(sheet.cell(row=row, column=col).value, float) and row > 25:
+                            cell_value = str(round(sheet.cell(row=row, column=col).value, 2))
+                        elif isinstance(sheet.cell(row=row, column=col).value, datetime):
+                            cell_value = sheet.cell(row=row, column=col).value.strftime('%d.%m.%Y')
+                        else:
+                            cell_value = str(sheet.cell(row=row, column=col).value)
 
-        for row in range(1, rows + 2):
-            if row > 1 and row < rows - 1:
-                table_widget.setRowHeight(row, int(rowHeights_exit[row]))
-            for col in range(1, count_col + 1):
-                if not sheet.cell(row=row, column=col).value is None:
-                    if isinstance(sheet.cell(row=row, column=col).value, float) and row > 25:
-                        cell_value = str(round(sheet.cell(row=row, column=col).value, 2))
-                    elif isinstance(sheet.cell(row=row, column=col).value, datetime):
-                        cell_value = sheet.cell(row=row, column=col).value.strftime('%d.%m.%Y')
+                        item = QtWidgets.QTableWidgetItem(str(cell_value))
+                        table_widget.setItem(row - 1, col - 1, item)
+
+                        # Проверяем, является ли текущая ячейка объединенной
+                        for merged_cell in merged_cells:
+                            range_row = range(merged_cell.min_row, merged_cell.max_row + 1)
+                            range_col = range(merged_cell.min_col, merged_cell.max_col + 1)
+                            if row in range_row and col in range_col:
+                                # Устанавливаем количество объединяемых строк и столбцов для текущей ячейки
+                                table_widget.setSpan(row - 1, col - 1,
+                                                     merged_cell.max_row - merged_cell.min_row + 1,
+                                                     merged_cell.max_col - merged_cell.min_col + 1)
+
                     else:
-                        cell_value = str(sheet.cell(row=row, column=col).value)
+                        item = QTableWidgetItem("")
 
-                    item = QtWidgets.QTableWidgetItem(str(cell_value))
-                    table_widget.setItem(row - 1, col - 1, item)
+            if data_list.dop_work_list:
+                self.populate_row(table_widget.rowCount(), data_list.dop_work_list, self.table_widget, self.work_plan)
+            for row in range(table_widget.rowCount()):
 
-                    # Проверяем, является ли текущая ячейка объединенной
-                    for merged_cell in merged_cells:
-                        range_row = range(merged_cell.min_row, merged_cell.max_row + 1)
-                        range_col = range(merged_cell.min_col, merged_cell.max_col + 1)
-                        if row in range_row and col in range_col:
-                            # Устанавливаем количество объединяемых строк и столбцов для текущей ячейки
-                            table_widget.setSpan(row - 1, col - 1,
-                                                 merged_cell.max_row - merged_cell.min_row + 1,
-                                                 merged_cell.max_col - merged_cell.min_col + 1)
-
+                row_value_empty = True  # Флаг, указывающий, что все ячейки в строке пустые
+                # Проход по всем колонкам в текущей строке
+                for col in range(table_widget.columnCount()):
+                    item = table_widget.item(row, col)
+                    # Проверка, является ли содержимое ячейки пустым
+                    if item is not None and item.text() != "":
+                        row_value_empty = False  # Если хотя бы одна ячейка не пустая, снимаем флаг
+                        break
+                # Если все ячейки в строке пустые, скрываем строку
+                if row_value_empty:
+                    table_widget.setRowHidden(row, True)
                 else:
-                    item = QTableWidgetItem("")
+                    table_widget.setRowHidden(row, False)
 
-        if data_list.dop_work_list:
-            self.populate_row(table_widget.rowCount(), data_list.dop_work_list, self.table_widget, self.work_plan)
-        for row in range(table_widget.rowCount()):
+            if work_plan == 'krs':
+                self.work_window = GnoWindow(table_widget.rowCount(), self.table_widget, self.dict_data_well)
+                self.set_modal_window(self.work_window)
+                data_list.pause = True
+                self.pause_app()
+                data_list.pause = True
+                self.work_window = None
 
-            row_value_empty = True  # Флаг, указывающий, что все ячейки в строке пустые
-            # Проход по всем колонкам в текущей строке
-            for col in range(table_widget.columnCount()):
-                item = table_widget.item(row, col)
-                # Проверка, является ли содержимое ячейки пустым
-                if item is not None and item.text() != "":
-                    row_value_empty = False  # Если хотя бы одна ячейка не пустая, снимаем флаг
-                    break
-            # Если все ячейки в строке пустые, скрываем строку
-            if row_value_empty:
-                table_widget.setRowHidden(row, True)
-            else:
-                table_widget.setRowHidden(row, False)
+            if work_plan in ['gnkt_frez'] and list_page == 2:
+                colWidth = [2.28515625, 13.0, 4.5703125, 13.0, 13.0, 13.0, 5.7109375, 13.0, 13.0, 13.0, 4.7109375,
+                            13.0, 5.140625, 13.0, 13.0, 13.0, 13.0, 13.0, 4.7109375, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0,
+                            13.0,
+                            13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0,
+                            13.0,
+                            13.0, 13.0, 13.0, 5.42578125, 13.0, 4.5703125, 2.28515625, 10.28515625]
+                for column in range(table_widget.columnCount()):
+                    table_widget.setColumnWidth(column, int(colWidth[column]))  # Здесь задайте требуемую ширину столбца
+            elif work_plan in ['gnkt_after_grp', 'gnkt_opz', 'gnkt_after_grp', 'gnkt_bopz'] and list_page == 2:
 
-        if work_plan == 'krs':
-            self.work_window = GnoWindow(table_widget.rowCount(), self.table_widget, self.dict_data_well)
-            self.set_modal_window(self.work_window)
+                colWidth = property_excel.property_excel_pvr.colWidth_gnkt_osv
+                for column in range(table_widget.columnCount()):
+                    table_widget.setColumnWidth(column,
+                                                int(colWidth[column] * 9))  # Здесь задайте требуемую ширину столбца
+
+            elif work_plan == 'application_pvr':
+                from property_excel import property_excel_pvr
+                for column in range(table_widget.columnCount()):
+                    table_widget.setColumnWidth(column, int(
+                        property_excel_pvr.colWidth[column]))  # Здесь задайте требуемую ширину столбца
             data_list.pause = True
-            self.pause_app()
-            data_list.pause = True
-            self.work_window = None
-
-        if work_plan in ['gnkt_frez'] and list_page == 2:
-            colWidth = [2.28515625, 13.0, 4.5703125, 13.0, 13.0, 13.0, 5.7109375, 13.0, 13.0, 13.0, 4.7109375,
-                        13.0, 5.140625, 13.0, 13.0, 13.0, 13.0, 13.0, 4.7109375, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0,
-                        13.0,
-                        13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0,
-                        13.0, 13.0, 13.0, 5.42578125, 13.0, 4.5703125, 2.28515625, 10.28515625]
-            for column in range(table_widget.columnCount()):
-                table_widget.setColumnWidth(column, int(colWidth[column]))  # Здесь задайте требуемую ширину столбца
-        elif work_plan in ['gnkt_after_grp', 'gnkt_opz', 'gnkt_after_grp', 'gnkt_bopz'] and list_page == 2:
-
-            colWidth = property_excel.property_excel_pvr.colWidth_gnkt_osv
-            for column in range(table_widget.columnCount()):
-                table_widget.setColumnWidth(column, int(colWidth[column] * 9))  # Здесь задайте требуемую ширину столбца
-
-        elif work_plan == 'application_pvr':
-            from property_excel import property_excel_pvr
-            for column in range(table_widget.columnCount()):
-                table_widget.setColumnWidth(column, int(
-                    property_excel_pvr.colWidth[column]))  # Здесь задайте требуемую ширину столбца
-        data_list.pause = True
 
 
 class MyWindow(MyMainWindow):
@@ -824,8 +844,7 @@ class MyWindow(MyMainWindow):
         self.table_class = None
         self.table_juming = None
         self.resize(1400, 800)
-        # self.setWindowState(Qt.WindowFullScreen)
-        # self.setWindowFlags(Qt.Window | Qt.WindowCloseButtonHint | Qt.WindowMinimizeButtonHint | Qt.WindowTitleHint | Qt.WindowSystemMenuHint)
+
 
         self.perforation_correct_window2 = None
         self.ws = None
@@ -855,7 +874,6 @@ class MyWindow(MyMainWindow):
         self.thread.start()
 
     def insert_data_in_chemistry(self):
-
 
         if self.dict_data_well["work_plan"] in ['dop_plan', 'dop_plan_in_base']:
             string_work = f' ДП№ {self.dict_data_well["number_dp"]}'
@@ -908,8 +926,8 @@ class MyWindow(MyMainWindow):
                 f"VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, " \
                 f"%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
 
-        from data_base.work_with_base import Classifier_well
-        Classifier_well.insert_database('well_data', data_work, query)
+        from data_base.work_with_base import ClassifierWell
+        ClassifierWell.insert_database('well_data', data_work, query)
 
     @staticmethod
     def check_process():
@@ -1224,12 +1242,12 @@ class MyWindow(MyMainWindow):
                 self.close_file()
 
     def reload_class_well(self, costumer, region):
-        from data_base.work_with_base import Classifier_well
+        from data_base.work_with_base import ClassifierWell
         self.fname, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
                                                               "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
         if self.fname:
             try:
-                Classifier_well.export_to_database_class_well(self, self.fname, costumer, region)
+                ClassifierWell.export_to_database_class_well(self, self.fname, costumer, region)
 
             except FileNotFoundError:
                 print('Файл не найден')
@@ -1240,11 +1258,11 @@ class MyWindow(MyMainWindow):
             win32gui.PostMessage(splash_hwnd, win32con.WM_CLOSE, 0, 0)
 
     def open_without_damping(self, costumer, region):
-        from data_base.work_with_base import Classifier_well
+        from data_base.work_with_base import ClassifierWell
 
         if self.new_window is None:
 
-            self.new_window = Classifier_well(costumer, region, 'damping')
+            self.new_window = ClassifierWell(costumer, region, 'damping')
             self.new_window.setWindowTitle("Перечень скважин без глушения")
             # self.new_window.setGeometry(200, 400, 300, 400)
             self.new_window.show()
@@ -1288,9 +1306,9 @@ class MyWindow(MyMainWindow):
             #     pass
 
     def open_class_well(self, costumer, region):
-        from data_base.work_with_base import Classifier_well
+        from data_base.work_with_base import ClassifierWell
         if self.new_window is None:
-            self.new_window = Classifier_well(costumer, region, 'classifier_well')
+            self.new_window = ClassifierWell(costumer, region, 'ClassifierWell')
             self.new_window.setWindowTitle("Классификатор")
             # self.new_window.setGeometry(200, 400, 300, 400)
             self.new_window.show()
@@ -1299,12 +1317,12 @@ class MyWindow(MyMainWindow):
             self.new_window = None  # Discard reference.
 
     def reload_without_damping(self, costumer, region):
-        from data_base.work_with_base import Classifier_well
+        from data_base.work_with_base import ClassifierWell
         self.fname, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
                                                               "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
         if self.fname:
             try:
-                Classifier_well.export_to_sqlite_without_juming(self, self.fname, costumer, region)
+                ClassifierWell.export_to_sqlite_without_juming(self, self.fname, costumer, region)
 
             except FileNotFoundError:
                 print('Файл не найден')
@@ -1473,13 +1491,13 @@ class MyWindow(MyMainWindow):
             excel_data_dict = excel_in_json(self, ws2)
             db = connection_to_database(data_list.DB_WELL_DATA)
             data_well_base = WorkDatabaseWell(db, self.dict_data_well)
-            data_well_base.insert_in_database_well_data(self.dict_data_well["well_number"]._value, self.dict_data_well["well_area"]._value,
+            data_well_base.insert_in_database_well_data(self.dict_data_well["well_number"]._value,
+                                                        self.dict_data_well["well_area"]._value,
                                                         data_list.contractor, data_list.costumer,
-                self.dict_data_well["data_well_dict"], excel_data_dict, self.work_plan)
-
+                                                        self.dict_data_well["data_well_dict"], excel_data_dict,
+                                                        self.work_plan)
 
             data_well_base.insert_data_in_chemistry()
-
 
             ws2.print_area = f'B1:L{self.table_widget.rowCount() + 45}'
             ws2.page_setup.fitToPage = True
@@ -1542,6 +1560,10 @@ class MyWindow(MyMainWindow):
         po_action = QAction("прихватоопределить", self)
         geophysical.addAction(po_action)
         po_action.triggered.connect(self.poNewWindow)
+
+        torpedo_action = QAction("Торпедирование и извлечение ЭК", self)
+        geophysical.addAction(torpedo_action)
+        torpedo_action.triggered.connect(self.torpedo_action_window)
 
         rgd_with_paker_action = QAction("РГД с пакером", self)
         rgd_menu.addAction(rgd_with_paker_action)
@@ -1837,7 +1859,7 @@ class MyWindow(MyMainWindow):
             self.dict_data_well["dict_leakiness"] = {}
             self.dict_data_well["leakiness"] = False
             self.dict_data_well["emergency_well"] = False
-            
+
             self.dict_data_well["emergency_count"] = 0
             data_list.DICT_VOLUME_CHEMISTRY = {'пункт': [], 'цемент': 0.0, 'HCl': 0.0, 'HF': 0.0, 'NaOH': 0.0,
                                                'ВТ СКО': 0.0,
@@ -1958,22 +1980,26 @@ class MyWindow(MyMainWindow):
         self.dict_data_well["column_additional"] = data[row][6]
 
         self.dict_data_well["fluid_work"] = data[row][7]
-        self.dict_data_well["template_depth"], self.dict_data_well["template_lenght"], self.dict_data_well["template_depth_addition"], self.dict_data_well["template_lenght_addition"] = json.loads(
+        self.dict_data_well["template_depth"], self.dict_data_well["template_lenght"], self.dict_data_well[
+            "template_depth_addition"], self.dict_data_well["template_lenght_addition"] = json.loads(
             data[row][11])
         self.dict_data_well["skm_interval"] = json.loads(data[row][12])
 
         self.dict_data_well["problem_with_ek_depth"] = data[row][13]
         self.dict_data_well["problem_with_ek_diametr"] = data[row][14]
 
-
         DataWindow.definition_open_trunk_well(self)
 
         definition_plast_work(self)
         try:
             self.dict_data_well["ribbing_interval"] = json.loads(data[row][15])
-
         except:
             pass
+
+        try:
+            self.dict_data_well["head_column"] = data_list.ProtectedIsDigit(data[row][16])
+        except:
+            print('отсутствуют данные по голове хвостовика')
 
         # print(self.dict_data_well["skm_interval"])
 
@@ -1981,8 +2007,6 @@ class MyWindow(MyMainWindow):
         from work_py.drilling import Drill_window
         drilling_work_list = Drill_window.frezer_ports(self)
         self.populate_row(self.ins_ind, drilling_work_list, self.table_widget)
-
-
 
     def drilling_action_nkt(self):
         if self.operation_window is None:
@@ -2341,8 +2365,6 @@ class MyWindow(MyMainWindow):
             self.operation_window.close()  # Close window.
             self.operation_window = None
 
-
-
     def pressure_test(self):
         from work_py.opressovka import OpressovkaEK
 
@@ -2414,10 +2436,10 @@ class MyWindow(MyMainWindow):
             self.operation_window = None
 
     def template_without_skm(self):
-        from work_py.template_without_skm import Template_without_skm
+        from work_py.template_without_skm import TemplateWithoutSkm
 
         if self.operation_window is None:
-            self.operation_window = Template_without_skm(self.dict_data_well, self.table_widget)
+            self.operation_window = TemplateWithoutSkm(self.dict_data_well, self.table_widget)
             self.set_modal_window(self.operation_window)
             self.pause_app()
             data_list.pause = True
@@ -2428,18 +2450,7 @@ class MyWindow(MyMainWindow):
 
     def acidPakerNewWindow(self):
         from work_py.acid_paker import AcidPakerWindow
-
-        if self.acid_windowPaker is None:
-
-            self.acid_windowPaker = AcidPakerWindow(self.dict_data_well, self.table_widget)
-            self.acid_windowPaker.setGeometry(50, 50, 900, 500)
-            self.set_modal_window(self.acid_windowPaker)
-            self.pause_app()
-            data_list.pause = True
-
-        else:
-            self.acid_windowPaker.close()  # Close window.
-            self.acid_windowPaker = None
+        self.add_window(AcidPakerWindow)
 
     def GeophysicalNewWindow(self):
         from work_py.geophysic import GeophysicWindow
@@ -2461,7 +2472,7 @@ class MyWindow(MyMainWindow):
         from perforation_correct import PerforationCorrect
 
         self.dict_data_well["current_bottom"], ok = QInputDialog.getDouble(self, 'Необходимый забой',
-                                                              'Введите забой до которого нужно нормализовать')
+                                                                           'Введите забой до которого нужно нормализовать')
         if self.perforation_correct_window2 is None:
             self.perforation_correct_window2 = PerforationCorrect(self.dict_data_well)
             self.perforation_correct_window2.setWindowTitle("Сверка данных перфорации")
@@ -2476,7 +2487,8 @@ class MyWindow(MyMainWindow):
 
         self.dict_data_well["data_list"][-1][1] = self.dict_data_well["current_bottom"]
 
-        self.dict_data_well["data_list"][-1][2] = json.dumps(self.dict_data_well["dict_perforation"], default=str, ensure_ascii=False, indent=4)
+        self.dict_data_well["data_list"][-1][2] = json.dumps(self.dict_data_well["dict_perforation"], default=str,
+                                                             ensure_ascii=False, indent=4)
 
     def correct_curator(self):
         from work_py.curators import SelectCurator
@@ -2512,24 +2524,16 @@ class MyWindow(MyMainWindow):
         else:
             WellCondition.leakage_window.close()  # Close window.
             WellCondition.leakage_window = None  # Discard reference.
-        self.dict_data_well["data_list"][-1][5] = json.dumps(self.dict_data_well["dict_leakiness"], default=str, ensure_ascii=False, indent=4)
+        self.dict_data_well["data_list"][-1][5] = json.dumps(self.dict_data_well["dict_leakiness"], default=str,
+                                                             ensure_ascii=False, indent=4)
 
     def correctData(self):
         from data_correct import DataWindow
+        self.add_window(DataWindow)
 
-        if self.correct_window is None:
-
-            self.correct_window = DataWindow(self.dict_data_well)
-            self.correct_window.setWindowTitle("Окно корректировки")
-            # self.correct_window.setGeometry(100, 400, 300, 400)
-            self.set_modal_window(self.correct_window)
-            self.pause_app()
-            data_list.pause = True
-            self.correct_window = None
-
-        else:
-            self.correct_window.close()  # Close window.
-            self.correct_window = None  # Discard reference.
+    def torpedo_action_window(self):
+        from work_py.torpedo import TorpedoWindow
+        self.add_window(TorpedoWindow)
 
     def poNewWindow(self):
         from work_py.emergencyWork import emergencyECN
@@ -2544,25 +2548,13 @@ class MyWindow(MyMainWindow):
             if self.dict_data_well["cat_P_1"][1] == 1 and self.dict_data_well["kat_pvo"] != 1:
                 msc = QMessageBox.information(self, 'Внимание', 'Не произведен монтаж первой категории')
                 return
-
-        if self.operation_window is None:
-
-            self.operation_window = PerforationWindow(self.dict_data_well, self.table_widget)
-            self.operation_window.setWindowTitle("Перфорация")
-            # self.new_window.setGeometry(200, 400, 300, 400)
-            self.set_modal_window(self.operation_window)
-            self.pause_app()
-            data_list.pause = True
-
-        else:
-            self.operation_window.close()  # Close window.
-            self.operation_window = None  # Discard reference.
+        self.add_window(PerforationWindow)
 
     def insertPerf(self):
         self.populate_row(self.ins_ind, self.perforation_list)
 
     def create_short_plan(self, wb2, plan_short):
-        from work_py.descent_gno import TabPage_Gno
+        from work_py.descent_gno import TabPageGno
 
         ws4 = wb2.create_sheet('Sheet1')
         ws4.title = "Краткое содержание плана работ"
@@ -2576,42 +2568,53 @@ class MyWindow(MyMainWindow):
         if self.dict_data_well["dict_pump_SHGN"]["do"] != 0 and self.dict_data_well["dict_pump_ECN"]["do"] == 0 and \
                 self.dict_data_well["paker_do"]["do"] == 0:
             ws4.cell(row=3,
-                     column=1).value = f'{self.dict_data_well["dict_pump_SHGN"]["do"]} -на гл. {self.dict_data_well["dict_pump_SHGN_h"]["do"]}м'
+                     column=1).value = f'{self.dict_data_well["dict_pump_SHGN"]["do"]} -на гл. ' \
+                                       f'{self.dict_data_well["dict_pump_SHGN_h"]["do"]}м'
         elif self.dict_data_well["dict_pump_SHGN"]["do"] == 0 and self.dict_data_well["dict_pump_ECN"]["do"] != 0 and \
                 self.dict_data_well["paker_do"]["do"] == 0:
             ws4.cell(row=3,
-                     column=1).value = f'{self.dict_data_well["dict_pump_ECN"]["do"]} -на гл. {self.dict_data_well["dict_pump_ECN_h"]["do"]}м'
+                     column=1).value = f'{self.dict_data_well["dict_pump_ECN"]["do"]} -на гл. ' \
+                                       f'{self.dict_data_well["dict_pump_ECN_h"]["do"]}м'
         elif self.dict_data_well["dict_pump_SHGN"]["do"] == 0 and self.dict_data_well["dict_pump_ECN"]["do"] != 0 and \
                 self.dict_data_well["paker_do"]["do"] != 0:
             ws4.cell(row=3,
-                     column=1).value = f'{self.dict_data_well["dict_pump_ECN"]["do"]} -на гл. {self.dict_data_well["dict_pump_ECN_h"]["do"]}м \n' \
-                                       f'{self.dict_data_well["paker_do"]["do"]} на {self.dict_data_well["depth_fond_paker_do"]["do"]}м'
+                     column=1).value = f'{self.dict_data_well["dict_pump_ECN"]["do"]} -на гл.' \
+                                       f' {self.dict_data_well["dict_pump_ECN_h"]["do"]}м \n' \
+                                       f'{self.dict_data_well["paker_do"]["do"]} на ' \
+                                       f'{self.dict_data_well["depth_fond_paker_do"]["do"]}м'
         elif self.dict_data_well["dict_pump_SHGN"]["do"] != 0 and self.dict_data_well["dict_pump_ECN"]["do"] == 0 and \
                 self.dict_data_well["paker_do"]["do"] != 0:
             ws4.cell(row=3,
-                     column=1).value = f'{self.dict_data_well["dict_pump_SHGN"]["do"]} -на гл. {self.dict_data_well["dict_pump_SHGN_h"]["do"]}м \n' \
-                                       f'{self.dict_data_well["paker_do"]["do"]} на {self.dict_data_well["depth_fond_paker_do"]["do"]}м'
+                     column=1).value = f'{self.dict_data_well["dict_pump_SHGN"]["do"]} -на гл. ' \
+                                       f'{self.dict_data_well["dict_pump_SHGN_h"]["do"]}м \n' \
+                                       f'{self.dict_data_well["paker_do"]["do"]} на ' \
+                                       f'{self.dict_data_well["depth_fond_paker_do"]["do"]}м'
         elif self.dict_data_well["dict_pump_SHGN"]["do"] == 0 and self.dict_data_well["dict_pump_ECN"]["do"] == 0 and \
                 self.dict_data_well["paker_do"]["do"] != 0:
-            ws4.cell(row=3, column=1).value = f'{self.dict_data_well["paker_do"]["do"]} на {self.dict_data_well["depth_fond_paker_do"]["do"]}м'
+            ws4.cell(row=3, column=1).value = f'{self.dict_data_well["paker_do"]["do"]} на ' \
+                                              f'{self.dict_data_well["depth_fond_paker_do"]["do"]}м'
         elif self.dict_data_well["dict_pump_SHGN"]["do"] == 0 and self.dict_data_well["dict_pump_ECN"]["do"] == 0 and \
                 self.dict_data_well["paker_do"]["do"] == 0:
             ws4.cell(row=3, column=1).value = " "
         elif self.dict_data_well["dict_pump_SHGN"]["do"] != 0 and self.dict_data_well["dict_pump_ECN"]["do"] != 0 and \
                 self.dict_data_well["paker_do"]["do"] != 0:
             ws4.cell(row=3,
-                     column=1).value = f'{self.dict_data_well["dict_pump_SHGN"]["do"]} -на гл. {self.dict_data_well["dict_pump_SHGN_h"]["do"]}м \n' \
-                                       f'{self.dict_data_well["dict_pump_ECN"]["do"]} -на гл. {self.dict_data_well["dict_pump_ECN_h"]["do"]}м \n' \
-                                       f'{self.dict_data_well["paker_do"]["do"]} на {self.dict_data_well["depth_fond_paker_do"]["do"]}м '
+                     column=1).value = f'{self.dict_data_well["dict_pump_SHGN"]["do"]} -на гл.' \
+                                       f' {self.dict_data_well["dict_pump_SHGN_h"]["do"]}м \n' \
+                                       f'{self.dict_data_well["dict_pump_ECN"]["do"]} -на гл. ' \
+                                       f'{self.dict_data_well["dict_pump_ECN_h"]["do"]}м \n' \
+                                       f'{self.dict_data_well["paker_do"]["do"]} на ' \
+                                       f'{self.dict_data_well["depth_fond_paker_do"]["do"]}м '
         plast_str = ''
         pressur_set = set()
         # print(f'После {self.dict_data_well["dict_perforation_short"]}')
         for plast in list(self.dict_data_well["dict_perforation_short"].keys()):
-            if self.dict_data_well["dict_perforation_short"][plast][
-                'отключение'] is False and plast in self.dict_data_well["dict_perforation_short"]:
+            if self.dict_data_well["dict_perforation_short"][plast]['отключение'] is False and \
+                    plast in self.dict_data_well["dict_perforation_short"]:
                 for interval in self.dict_data_well["dict_perforation_short"][plast]["интервал"]:
                     plast_str += f'{plast[:4]}: {interval[0]}- {interval[1]} \n'
-            elif self.dict_data_well["dict_perforation_short"][plast]['отключение'] and plast in self.dict_data_well["dict_perforation_short"]:
+            elif self.dict_data_well["dict_perforation_short"][plast]['отключение'] and \
+                    plast in self.dict_data_well["dict_perforation_short"]:
                 for interval in self.dict_data_well["dict_perforation_short"][plast]["интервал"]:
                     plast_str += f'{plast[:4]} :{interval[0]}- {interval[1]} (изол)\n'
             try:
@@ -2625,24 +2628,30 @@ class MyWindow(MyMainWindow):
             except Exception as e:
                 QMessageBox.warning(self, 'Ошибка', f'Ошибка вставки давления в краткое описание {e}')
 
-        ws4.cell(row=6, column=1).value = f'НКТ: \n {TabPage_Gno.gno_nkt_opening(self.dict_data_well["dict_nkt"])}'
+        ws4.cell(row=6, column=1).value = f'НКТ: \n {TabPageGno.gno_nkt_opening(self.dict_data_well["dict_nkt"])}'
         ws4.cell(row=7, column=1).value = f'Рпл: \n {" ".join(list(pressur_set))}атм'
         # ws4.cell(row=8, column=1).value = f'ЖГС = {self.dict_data_well["fluid_work_short"]}г/см3'
         ws4.cell(row=9,
-                 column=1).value = f'Нст- {self.dict_data_well["static_level"]._value}м / Ндин - {self.dict_data_well["dinamic_level"]._value}м'
+                 column=1).value = f'Нст- {self.dict_data_well["static_level"]._value}м / Ндин -' \
+                                   f' {self.dict_data_well["dinamic_level"]._value}м'
         if self.dict_data_well["curator"] == 'ОР':
-            ws4.cell(row=10, column=1).value = f'Ожид {self.dict_data_well["expected_Q"]}м3/сут при Р-{self.dict_data_well["expected_P"]}м3/сут'
+            ws4.cell(row=10,
+                     column=1).value = f'Ожид {self.dict_data_well["expected_Q"]}м3/сут при Р-{self.dict_data_well["expected_P"]}м3/сут'
         else:
-            ws4.cell(row=10, column=1).value = f'Qн {self.dict_data_well["Qoil"]}т Qж- {self.dict_data_well["Qwater"]}м3/сут'
-        ws4.cell(row=11, column=1).value = f'макс угол {self.dict_data_well["max_angle"]._value} на {self.dict_data_well["max_angle_H"]._value}'
+            ws4.cell(row=10,
+                     column=1).value = f'Qн {self.dict_data_well["Qoil"]}т Qж- {self.dict_data_well["Qwater"]}м3/сут'
+        ws4.cell(row=11,
+                 column=1).value = f'макс угол {self.dict_data_well["max_angle"]._value} на {self.dict_data_well["max_angle_depth"]._value}'
         ws4.cell(row=1, column=2).value = self.dict_data_well["cdng"]._value
         try:
             try:
-                category_pressuar = self.dict_data_well["dict_category"][self.dict_data_well['plast_work_short'][0]]["по давлению"].category
+                category_pressuar = self.dict_data_well["dict_category"][self.dict_data_well['plast_work_short'][0]][
+                    "по давлению"].category
             except:
                 category_pressuar = self.dict_data_well["category_pressuar2"]
             try:
-                category_h2s = self.dict_data_well["dict_category"][self.dict_data_well['plast_work_short'][0]]["по сероводороду"].category
+                category_h2s = self.dict_data_well["dict_category"][self.dict_data_well['plast_work_short'][0]][
+                    "по сероводороду"].category
             except:
                 category_h2s = self.dict_data_well["category_h2s_2"]
             try:
@@ -2661,7 +2670,8 @@ class MyWindow(MyMainWindow):
         column_well = f'{self.dict_data_well["column_diametr"]._value}х{self.dict_data_well["column_wall_thickness"]._value} в ' \
                       f'инт 0 - {self.dict_data_well["shoe_column"]._value}м ' \
             if self.dict_data_well["column_additional"] is False else \
-            f'{self.dict_data_well["column_diametr"]._value} х {self.dict_data_well["column_wall_thickness"]._value} \n' \
+            f'{self.dict_data_well["column_diametr"]._value} х ' \
+            f'{self.dict_data_well["column_wall_thickness"]._value} \n' \
             f'0 - {self.dict_data_well["shoe_column"]._value}м/\n{self.dict_data_well["column_additional_diametr"]._value}' \
             f' х {self.dict_data_well["column_additional_wall_thickness"]._value} в инт ' \
             f'{self.dict_data_well["head_column_additional"]._value}-{self.dict_data_well["head_column_additional"]._value}м'
@@ -2757,8 +2767,6 @@ if __name__ == "__main__":
     if MyWindow.check_process():
         MyWindow.show_confirmation()
 
-
-
     # if data_list.connect_in_base:
     #     app2 = UpdateChecker()
     #     app2.check_version()
@@ -2769,13 +2777,11 @@ if __name__ == "__main__":
     #         data_list.pause = False
     #         app2.close()dow = MyWindow()
 
-
     try:
         data_list.connect_in_base = connect_to_database('krs2')
 
         login_window = LoginWindow()
         login_window.setWindowModality(Qt.ApplicationModal)
-
 
         login_window.show()
         MyMainWindow.pause_app()
@@ -2786,6 +2792,5 @@ if __name__ == "__main__":
 
     window = MyWindow()
     window.show()
-
 
     sys.exit(app.exec_())

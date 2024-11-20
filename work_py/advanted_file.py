@@ -410,7 +410,11 @@ def count_row_height(self, wb2, ws, ws2, work_list, merged_cells_dict, ind_ins):
                 cell.value = is_num(work_list[i - 1][j - 1])
                 if i >= ind_ins:
                     if abs(i - ind_ins) > 1 and stop_str > i:
-                        ws2[F"B{i}"].value = f'=COUNTA($C${ind_ins + 2}:C{i})'
+                        if self.work_plan in ['dop_plan', 'dop_plan_in_base']:
+                            if 'Ранее проведенные работ' not in str(ws2[F"C{i}"].value):
+                                ws2[F"B{i}"].value = f'=COUNTA($C${ind_ins + 3}:C{i})'
+                        else:
+                            ws2[F"B{i}"].value = f'=COUNTA($C${ind_ins + 2}:C{i})'
                     if j != 1:
                         cell.border = data_list.thin_border
                     if j == 11:

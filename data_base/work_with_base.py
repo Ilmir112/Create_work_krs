@@ -24,12 +24,12 @@ from main import MyMainWindow
 from work_py.advanted_file import definition_plast_work
 
 
-class Classifier_well(MyMainWindow):
+class ClassifierWell(MyMainWindow):
     number_well = None
 
-    def __init__(self, costumer, region, classifier_well, parent=None):
+    def __init__(self, costumer, region, ClassifierWell, parent=None):
 
-        super(Classifier_well, self).__init__()
+        super(ClassifierWell, self).__init__()
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
         self.table_class = QTableWidget()
@@ -41,9 +41,9 @@ class Classifier_well(MyMainWindow):
 
         self.setCentralWidget(self.table_class)
         self.model = self.table_class.model()
-        if classifier_well == 'classifier_well':
+        if ClassifierWell == 'ClassifierWell':
             self.open_to_sqlite_class_well(costumer, region)
-        elif classifier_well == 'damping':
+        elif ClassifierWell == 'damping':
             self.open_to_sqlite_without_juming(costumer, region)
 
     def open_to_sqlite_without_juming(self, costumer, region):
@@ -598,14 +598,20 @@ def insert_data_well_dop_plan(self, data_well):
     self.dict_data_well["bottomhole_drill"] = ProtectedIsDigit(well_data_dict['данные']['пробуренный забой'])
     self.dict_data_well["bottomhole_artificial"] = ProtectedIsDigit(well_data_dict['данные']['искусственный забой'])
     self.dict_data_well["max_angle"] = ProtectedIsDigit(well_data_dict['данные']['максимальный угол'])
-    self.dict_data_well["max_angle_H"] = ProtectedIsDigit(well_data_dict['данные']['глубина'])
+    self.dict_data_well["max_angle_depth"] = ProtectedIsDigit(well_data_dict['данные']['глубина'])
     self.dict_data_well["max_expected_pressure"] = ProtectedIsDigit(well_data_dict['данные']['максимальное ожидаемое давление'])
     self.dict_data_well["max_admissible_pressure"] = ProtectedIsDigit(well_data_dict['данные']['максимальное допустимое давление'])
 
     self.dict_data_well["curator"] = well_data_dict['куратор']
     self.dict_data_well["region"] = well_data_dict['регион']
     self.dict_data_well["cdng"] = ProtectedIsNonNone(well_data_dict['ЦДНГ'])
-
+    try:
+        self.dict_data_well["head_column"] = ProtectedIsDigit(well_data_dict['ЭК']['голова ЭК'])
+        self.dict_data_well["diametr_doloto_ek"] = ProtectedIsDigit(well_data_dict['данные']['диаметр долото при бурении'])
+    except Exception as e:
+        self.dict_data_well["head_column"] = ProtectedIsDigit(0)
+        self.dict_data_well["diametr_doloto_ek"] = ProtectedIsDigit(0)
+        print(f'отсутствуют данные в базе по голове хвостовика и диаметру долото {e}')
 
     self.dict_data_well["data_well_dict"] = well_data_dict
     # QMessageBox.information(None, 'Данные с базы', "Данные вставлены из базы данных")
@@ -765,6 +771,6 @@ if __name__ == "__main__":
 
     app = QtWidgets.QApplication(sys.argv)
     # app.setStyleSheet()
-    window = Classifier_well()
+    window = ClassifierWell()
     window.show()
     sys.exit(app.exec_())

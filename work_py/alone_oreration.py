@@ -395,7 +395,8 @@ def lifting_unit(self):
 
 
 def volume_vn_ek(self, current):
-    if self.dict_data_well["column_additional"] is False or self.dict_data_well["column_additional"] is True and current < self.dict_data_well["head_column_additional"]._value:
+    if self.dict_data_well["column_additional"] is False or self.dict_data_well["column_additional"] is True \
+            and current < self.dict_data_well["head_column_additional"]._value:
         volume = round(
             (self.dict_data_well["column_diametr"]._value - 2 * self.dict_data_well["column_wall_thickness"]._value) ** 2 * 3.14 / 4 / 1000, 2)
     else:

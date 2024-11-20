@@ -317,9 +317,9 @@ class TabPageSoAcid(TabPageUnion):
         self.paker_depth_zumpf_edit = QLineEdit(self)
         self.paker_depth_zumpf_edit.setValidator(self.validator_int)
 
-        self.pressureZUMPF_question_Label = QLabel("Нужно ли опрессовывать ЗУМПФ", self)
-        self.pressureZUMPF_question_QCombo = QComboBox(self)
-        self.pressureZUMPF_question_QCombo.addItems(["Нет", "Да"])
+        self.pressure_zumph_question_Label = QLabel("Нужно ли опрессовывать ЗУМПФ", self)
+        self.pressure_zumph_question_QCombo = QComboBox(self)
+        self.pressure_zumph_question_QCombo.addItems(["Нет", "Да"])
 
         self.grid.addWidget(self.paker_layout_label, 0, 0, 1, 0)
         self.grid.addWidget(self.paker_layout_combo, 1, 0, 1, 0)
@@ -342,8 +342,8 @@ class TabPageSoAcid(TabPageUnion):
         self.grid.addWidget(self.need_privyazka_Label, 2, 7)
         self.grid.addWidget(self.need_privyazka_QCombo, 3, 7)
 
-        self.grid.addWidget(self.pressureZUMPF_question_Label, 2, 8)
-        self.grid.addWidget(self.pressureZUMPF_question_QCombo, 3, 8)
+        self.grid.addWidget(self.pressure_zumph_question_Label, 2, 8)
+        self.grid.addWidget(self.pressure_zumph_question_QCombo, 3, 8)
         self.grid.addWidget(self.paker_depth_zumpf_Label, 2, 9)
         self.grid.addWidget(self.paker_depth_zumpf_edit, 3, 9)
 
@@ -425,9 +425,9 @@ class TabPageSoAcid(TabPageUnion):
             self.Qplast_after_edit.setCurrentIndex(1)
         self.calculate_sko_line.editingFinished.connect(self.update_calculate_sko)
 
-        self.pressureZUMPF_question_QCombo.currentTextChanged.connect(self.update_paker_need)
-        self.pressureZUMPF_question_QCombo.setCurrentIndex(1)
-        self.pressureZUMPF_question_QCombo.setCurrentIndex(0)
+        self.pressure_zumph_question_QCombo.currentTextChanged.connect(self.update_paker_need)
+        self.pressure_zumph_question_QCombo.setCurrentIndex(1)
+        self.pressure_zumph_question_QCombo.setCurrentIndex(0)
 
     def update_paker_need(self, index):
         if index == 'Да':
@@ -527,11 +527,11 @@ class TabPageSoAcid(TabPageUnion):
         self.paker_layout_index = index
 
         if index not in ['однопакерная']:
-            self.pressureZUMPF_question_Label.setParent(None)
-            self.pressureZUMPF_question_QCombo.setParent(None)
+            self.pressure_zumph_question_Label.setParent(None)
+            self.pressure_zumph_question_QCombo.setParent(None)
         else:
-            self.grid.addWidget(self.pressureZUMPF_question_Label, 2, 8)
-            self.grid.addWidget(self.pressureZUMPF_question_QCombo, 3, 8)
+            self.grid.addWidget(self.pressure_zumph_question_Label, 2, 8)
+            self.grid.addWidget(self.pressure_zumph_question_QCombo, 3, 8)
 
 
 
@@ -801,8 +801,8 @@ class AcidPakerWindow(WindowUnion):
         rows = self.tableWidget.rowCount()
 
         if paker_layout_combo in ['однопакерная', 'однопакерная, упорный', 'пакер с заглушкой']:
-            paker_khost = self.if_None(self.tabWidget.currentWidget().paker_khost.text())
-            paker_depth = self.if_None(self.tabWidget.currentWidget().paker_depth.text())
+            paker_khost = self.check_if_none(self.tabWidget.currentWidget().paker_khost.text())
+            paker_depth = self.check_if_none(self.tabWidget.currentWidget().paker_depth.text())
 
             if self.dict_data_well["current_bottom"] < float(paker_khost + paker_depth) or \
                     0 < paker_khost + paker_depth < self.dict_data_well["current_bottom"] is False:
@@ -829,9 +829,9 @@ class AcidPakerWindow(WindowUnion):
 
             self.tableWidget.setSortingEnabled(False)
         elif paker_layout_combo in ['двухпакерная', 'двухпакерная, упорные']:
-            paker_khost = self.if_None((self.tabWidget.currentWidget().paker_khost.text()))
-            paker_depth = int(self.if_None(self.tabWidget.currentWidget().paker_depth.text()))
-            paker2_depth = int(self.if_None(self.tabWidget.currentWidget().paker2_depth.text()))
+            paker_khost = self.check_if_none((self.tabWidget.currentWidget().paker_khost.text()))
+            paker_depth = int(self.check_if_none(self.tabWidget.currentWidget().paker_depth.text()))
+            paker2_depth = int(self.check_if_none(self.tabWidget.currentWidget().paker2_depth.text()))
             if self.check_true_depth_template(paker_depth) is False:
                 return
             if self.true_set_paker(paker_depth) is False:
@@ -860,7 +860,7 @@ class AcidPakerWindow(WindowUnion):
             self.tableWidget.setItem(rows, 6, QTableWidgetItem(str(acid_proc_edit)))
             self.tableWidget.setItem(rows, 7, QTableWidgetItem(str(acid_volume_edit)))
         elif paker_layout_combo in ['воронка']:
-            paker_depth = int(self.if_None(self.tabWidget.currentWidget().paker_depth.text()))
+            paker_depth = int(self.check_if_none(self.tabWidget.currentWidget().paker_depth.text()))
 
             self.tableWidget.insertRow(rows)
             self.tableWidget.setItem(rows, 0, QTableWidgetItem(plast_combo))
@@ -906,10 +906,10 @@ class AcidPakerWindow(WindowUnion):
                 self.expected_P = int(float(self.expected_P))
             self.pressure_three = self.tabWidget.currentWidget().pressure_three_edit.text()
 
-            pressureZUMPF_combo = self.tabWidget.currentWidget().pressureZUMPF_question_QCombo.currentText()
+            pressureZUMPF_combo = self.tabWidget.currentWidget().pressure_zumph_question_QCombo.currentText()
 
             if pressureZUMPF_combo == 'Да':
-                paker_khost = self.if_None(self.tabWidget.currentWidget().paker_khost.text())
+                paker_khost = self.check_if_none(self.tabWidget.currentWidget().paker_khost.text())
                 paker_depth_zumpf = self.tabWidget.currentWidget().paker_depth_zumpf_edit.text()
 
                 if paker_depth_zumpf == '':
@@ -1888,7 +1888,7 @@ class AcidPakerWindow(WindowUnion):
 
         return flushing_downhole_list, flushing_downhole_short
 
-    def if_None(self, value):
+    def check_if_none(self, value):
 
         if isinstance(value, int) or isinstance(value, float):
             return int(value)

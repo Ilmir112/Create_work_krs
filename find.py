@@ -981,7 +981,7 @@ class WellData(FindIndexPZ):
         self.dict_data_well["bottomhole_drill"] = ProtectedIsNonNone('не корректно')
         self.dict_data_well["bottomhole_artificial"] = ProtectedIsNonNone(5000)
         self.dict_data_well["max_angle"] = ProtectedIsNonNone('не корректно')
-        self.dict_data_well["max_angle_H"] = ProtectedIsNonNone('не корректно')
+        self.dict_data_well["max_angle_depth"] = ProtectedIsNonNone('не корректно')
         self.dict_data_well["stol_rotora"] = ProtectedIsNonNone('не корректно')
         self.dict_data_well["column_conductor_diametr"] = ProtectedIsNonNone('не корректно')
         self.dict_data_well["column_conductor_wall_thickness"] = ProtectedIsNonNone('не корректно')
@@ -1033,13 +1033,13 @@ class WellData(FindIndexPZ):
                     elif 'интервалы темпа набора кривизны ' in str(value).lower():
                         self.dict_data_well["interval_temp"] = ProtectedIsDigit(row[col + 2].value)
                         self.dict_data_well["interval_temp"] = self.definition_is_none(
-                            self.dict_data_well["interval_temp"], row_index, col, 1)
+                            self.dict_data_well["interval_temp"], row_index, col+2, 1)
 
                     elif 'зенитный угол' in str(value).lower():
                         self.dict_data_well["max_angle"] = ProtectedIsDigit(row[col + 4].value)
                         for index, col1 in enumerate(row[:14]):
                             if 'на глубине' in str(col1.value):
-                                self.dict_data_well["max_angle_H"] = ProtectedIsDigit(row[index + 1].value)
+                                self.dict_data_well["max_angle_depth"] = ProtectedIsDigit(row[index + 1].value)
                             if index > 10:
                                 break
 
@@ -1244,7 +1244,7 @@ class WellData(FindIndexPZ):
             self.dict_data_well["check_data_in_pz"].append('не указано Стол ротора \n')
         if self.dict_data_well["max_angle"]._value in ['не корректно', None, '']:
             self.dict_data_well["check_data_in_pz"].append('не указано максимальный угол \n')
-        if self.dict_data_well["max_angle_H"]._value in ['не корректно', None, '']:
+        if self.dict_data_well["max_angle_depth"]._value in ['не корректно', None, '']:
             self.dict_data_well["check_data_in_pz"].append('не указано глубина максимального угла\n')
         if self.dict_data_well["level_cement_column"]._value in ['не корректно', None, '']:
             self.dict_data_well["check_data_in_pz"].append('не указан уровень цемент за колонной\n')

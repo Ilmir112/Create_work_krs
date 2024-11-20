@@ -115,9 +115,9 @@ class TabPageSoSwab(TabPageUnion):
         self.paker_depth_zumpf_edit = QLineEdit(self)
         self.paker_depth_zumpf_edit.setValidator(self.validator_int)
 
-        self.pressureZUMPF_question_Label = QLabel("Нужно ли опрессовывать ЗУМПФ", self)
-        self.pressureZUMPF_question_QCombo = QComboBox(self)
-        self.pressureZUMPF_question_QCombo.addItems(['Нет', 'Да'])
+        self.pressure_zumph_question_Label = QLabel("Нужно ли опрессовывать ЗУМПФ", self)
+        self.pressure_zumph_question_QCombo = QComboBox(self)
+        self.pressure_zumph_question_QCombo.addItems(['Нет', 'Да'])
 
 
         self.swab_true_edit_type.currentTextChanged.connect(self.swabTrueEdit_select)
@@ -143,8 +143,8 @@ class TabPageSoSwab(TabPageUnion):
         self.grid.addWidget(self.swab_volumeEdit, 7, 2)
         self.grid.addWidget(self.depth_gauge_label, 6, 3)
         self.grid.addWidget(self.depthGaugeCombo, 7, 3)
-        self.grid.addWidget(self.pressureZUMPF_question_Label, 0, 6)
-        self.grid.addWidget(self.pressureZUMPF_question_QCombo, 1, 6)
+        self.grid.addWidget(self.pressure_zumph_question_Label, 0, 6)
+        self.grid.addWidget(self.pressure_zumph_question_QCombo, 1, 6)
         self.grid.addWidget(self.paker_depth_zumpf_Label, 0, 7)
         self.grid.addWidget(self.paker_depth_zumpf_edit, 1, 7)
 
@@ -170,9 +170,9 @@ class TabPageSoSwab(TabPageUnion):
         self.need_change_zgs_combo.currentTextChanged.connect(self.update_change_fluid)
         self.need_change_zgs_combo.setCurrentIndex(1)
         self.need_change_zgs_combo.setCurrentIndex(0)
-        self.pressureZUMPF_question_QCombo.currentTextChanged.connect(self.update_paker_need)
-        self.pressureZUMPF_question_QCombo.setCurrentIndex(1)
-        self.pressureZUMPF_question_QCombo.setCurrentIndex(0)
+        self.pressure_zumph_question_QCombo.currentTextChanged.connect(self.update_paker_need)
+        self.pressure_zumph_question_QCombo.setCurrentIndex(1)
+        self.pressure_zumph_question_QCombo.setCurrentIndex(0)
 
     def update_paker_need(self, index):
         if index == 'Да':
@@ -324,11 +324,11 @@ class TabPageSoSwab(TabPageUnion):
         paker_depth = self.pakerEdit.text()
 
         if self.swab_true_edit_type.currentText() not in ['однопакерная']:
-            self.pressureZUMPF_question_Label.setParent(None)
-            self.pressureZUMPF_question_QCombo.setParent(None)
+            self.pressure_zumph_question_Label.setParent(None)
+            self.pressure_zumph_question_QCombo.setParent(None)
         else:
-            self.grid.addWidget(self.pressureZUMPF_question_Label, 2, 8)
-            self.grid.addWidget(self.pressureZUMPF_question_QCombo, 3, 8)
+            self.grid.addWidget(self.pressure_zumph_question_Label, 2, 8)
+            self.grid.addWidget(self.pressure_zumph_question_QCombo, 3, 8)
 
         if self.swab_true_edit_type.currentText() in ['однопакерная', 'однопакерная, упорный', 'пакер с заглушкой']:
 
@@ -623,8 +623,8 @@ class SwabWindow(WindowUnion):
             if rows != 0:
                 QMessageBox.warning(self, 'ОШИБКА', 'НЕЛЬЗЯ на одной и тоже компоновки освоивать повторно')
                 return
-            paker_khost = AcidPakerWindow.if_None(self, self.tabWidget.currentWidget().khvostEdit.text())
-            paker_depth = AcidPakerWindow.if_None(self, self.tabWidget.currentWidget().pakerEdit.text())
+            paker_khost = AcidPakerWindow.check_if_none(self, self.tabWidget.currentWidget().khvostEdit.text())
+            paker_depth = AcidPakerWindow.check_if_none(self, self.tabWidget.currentWidget().pakerEdit.text())
 
             if self.dict_data_well["current_bottom"] < float(paker_khost + paker_depth) or \
                     0 < paker_khost + paker_depth < self.dict_data_well["current_bottom"] is False:
@@ -648,9 +648,9 @@ class SwabWindow(WindowUnion):
 
 
         elif swab_true_edit_type in ['двухпакерная']:
-            paker_khost = AcidPakerWindow.if_None(self, self.tabWidget.currentWidget().khvostEdit.text())
-            paker_depth = AcidPakerWindow.if_None(self, self.tabWidget.currentWidget().pakerEdit.text())
-            paker2_depth = AcidPakerWindow.if_None(self, self.tabWidget.currentWidget().paker2Edit.text())
+            paker_khost = AcidPakerWindow.check_if_none(self, self.tabWidget.currentWidget().khvostEdit.text())
+            paker_depth = AcidPakerWindow.check_if_none(self, self.tabWidget.currentWidget().pakerEdit.text())
+            paker2_depth = AcidPakerWindow.check_if_none(self, self.tabWidget.currentWidget().paker2Edit.text())
             if self.check_true_depth_template(paker_depth) is False:
                 return
             if self.true_set_paker(paker_depth) is False:
@@ -681,7 +681,7 @@ class SwabWindow(WindowUnion):
             if rows != 0:
                 QMessageBox.warning(self, 'ОШИБКА', 'НЕЛЬЗЯ на одной и тоже компоновки освоивать повторно')
                 return
-            paker_depth = AcidPakerWindow.if_None(self, self.tabWidget.currentWidget().pakerEdit.text())
+            paker_depth = AcidPakerWindow.check_if_none(self, self.tabWidget.currentWidget().pakerEdit.text())
 
             self.tableWidget.insertRow(rows)
             self.tableWidget.setItem(rows, 0, QTableWidgetItem(plast_combo))
@@ -705,8 +705,8 @@ class SwabWindow(WindowUnion):
             self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(paker_opy)))
 
         elif swab_true_edit_type in ['Опрессовка снижением уровня на пакере с заглушкой']:
-            paker_depth = AcidPakerWindow.if_None(self, self.tabWidget.currentWidget().pakerEdit.text())
-            paker_khost = AcidPakerWindow.if_None(self, self.tabWidget.currentWidget().khvostEdit.text())
+            paker_depth = AcidPakerWindow.check_if_none(self, self.tabWidget.currentWidget().pakerEdit.text())
+            paker_khost = AcidPakerWindow.check_if_none(self, self.tabWidget.currentWidget().khvostEdit.text())
 
             if rows != 0:
                 QMessageBox.warning(self, 'ОШИБКА', 'НЕЛЬЗЯ на одной и тоже компоновки освоивать повторно')
@@ -735,10 +735,10 @@ class SwabWindow(WindowUnion):
             need_change_zgs_combo = self.tabWidget.currentWidget().need_change_zgs_combo.currentText()
             depthGaugeCombo = self.tabWidget.currentWidget().depthGaugeCombo.currentText()
             paker_depth_zumpf = ''
-            pressureZUMPF_combo = self.tabWidget.currentWidget().pressureZUMPF_question_QCombo.currentText()
+            pressureZUMPF_combo = self.tabWidget.currentWidget().pressure_zumph_question_QCombo.currentText()
 
             if pressureZUMPF_combo == 'Да':                
-                paker_khost = AcidPakerWindow.if_None(self, self.tabWidget.currentWidget().khvostEdit.text())
+                paker_khost = AcidPakerWindow.check_if_none(self, self.tabWidget.currentWidget().khvostEdit.text())
                 paker_depth_zumpf = int(float(self.tabWidget.currentWidget().paker_depth_zumpf_edit.text()))
                 if paker_depth_zumpf == '':
                     QMessageBox.warning(self, 'Ошибка', f'не введены глубина опрессовки ЗУМПФа')

@@ -16,7 +16,7 @@ class TabPageUnion(QWidget):
         self.dict_data_well = parent
 
     @staticmethod
-    def if_None(value):
+    def check_if_none(value):
         if isinstance(value, datetime):
             return value
         elif value is None or 'отс' in str(value).lower() or str(value).replace(' ', '') == '-' \

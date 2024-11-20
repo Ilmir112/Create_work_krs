@@ -1,6 +1,6 @@
 import openpyxl
 from openpyxl.utils.cell import coordinate_from_string
-from data_base.work_with_base import Classifier_well
+from data_base.work_with_base import ClassifierWell
 
 def excel_to_html(excel_file):
     """Преобразует Excel-файл с объединенными ячейками в HTML-код."""
@@ -134,4 +134,4 @@ guery = f'CREATE TABLE chemistry ' \
 #                          'песок': 0, 'РПК': 0, 'РПП': 0, "извлекаемый пакер": 0, "ЕЛАН": 0}
 
 
-Classifier_well.insert_database('well_data', "data_work", guery)
+ClassifierWell.insert_database('well_data', "data_work", guery)

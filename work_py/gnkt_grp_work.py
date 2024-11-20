@@ -1018,7 +1018,7 @@ class GnktModel(WindowUnion):
              None, None, None, Qoil, None, Qwater, None, proc_water, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Максимальный угол наклона', None,
              None, None, None, self.dict_data_well["max_angle"]._value, None, 'на глубине', None,
-             self.dict_data_well["max_angle_H"]._value,
+             self.dict_data_well["max_angle_depth"]._value,
              None],
             [None, None, None, None, None, None, None, None, None, None, None, None,
              'Интервалы темпа набора кривизны более 1,5°  на 10 м', None,

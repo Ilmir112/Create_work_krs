@@ -213,7 +213,7 @@ class WorkDatabaseWell:
         return row_exists
 
     def insert_in_database_well_data(self, well_number: str, well_area: str, contractor: str,
-                                     costumer: str, data_well_dict: str, excel: str, work_plan: str):
+                                     costumer: str, data_well_dict: str, excel: str, work_plan: str) -> None:
         data_well = json.dumps(data_well_dict, ensure_ascii=False)
         excel_json = json.dumps(excel, ensure_ascii=False)
         date_today = datetime.now()
@@ -227,6 +227,7 @@ class WorkDatabaseWell:
         inv_number = self.dict_data_well["inv_number"]._value
         appointment = self.dict_data_well["appointment"]._value
         category_dict = json.dumps(self.dict_data_well["dict_category"], ensure_ascii=False)
+
 
         # print(row, self.dict_data_well["count_row_well"])
 
@@ -258,7 +259,7 @@ class WorkDatabaseWell:
                                         excel_json ={self.path_index},
                                          work_plan={self.path_index}, geolog ={self.path_index}, 
                                         type_kr={self.path_index}, data_change_paragraph={self.path_index}, 
-                                        cdng={self.path_index}, category_dict={self.path_index}                                                                
+                                        cdng={self.path_index}, category_dict={self.path_index}                                                               
                                         WHERE well_number ={self.path_index} AND area_well ={self.path_index} 
                                         AND contractor ={self.path_index}
                                          AND costumer ={self.path_index} AND work_plan ={self.path_index} 
@@ -352,13 +353,13 @@ class WorkDatabaseWell:
                      )
 
         cursor = self.db_connection.cursor()
-
-        cursor.execute(
-            f"""SELECT * FROM chemistry
+        query = f"""SELECT * FROM chemistry
            WHERE well_number={self.path_index} AND well_area={self.path_index} AND region={self.path_index}
             AND costumer={self.path_index} AND contractor={self.path_index} AND work_plan={self.path_index} 
             AND type_kr={self.path_index}
-           """, (data_work[:7]))
+           """
+        aasaw = data_work[:7]
+        cursor.execute(query, (data_work[:7]))
 
         row_exists = cursor.fetchone()
 
@@ -457,7 +458,7 @@ class WorkDatabaseWell:
                            f"FROM wells "
                            f"WHERE well_number = {self.path_index} AND area_well = {self.path_index} "
                            f"AND contractor = {self.path_index} AND costumer = {self.path_index} AND "
-                           f"work_plan={self.path_index} AND today={self.path_index}",
+                           f"work_plan={self.path_index}",
                            (str(number_well), area_well, data_list.contractor, data_list.costumer, work_plan))
 
             data_well = cursor.fetchone()

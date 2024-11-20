@@ -8,10 +8,16 @@ class VolumeWell(ABC):
         pass
 
     def area_calculate(self, column_diametr, column_wall_thickness):
-        return ((column_diametr - 2 * column_wall_thickness)/1000)**2 * math.pi /4
+        return ((column_diametr - 2 * column_wall_thickness) / 1000) ** 2 * math.pi / 4
+
     @abstractmethod
     def volume_well_pod_nkt(self):
         pass
+
+    @abstractmethod
+    def volume_calculate_roof_of_sole(self, roof, sole):
+        pass
+
     @staticmethod
     def volume_nkt_metal(dict_nkt):  # Внутренний объем НКТ железа по фондовым
         volume_nkt_metal = 0
@@ -39,7 +45,6 @@ class VolumeWell(ABC):
         return round(volume_rod, 5)
 
 
-
 class VolumeWellWithoutExstraColumn(VolumeWell):
     def __init__(self, dict_data_well):
         self.dict_data_well = dict_data_well
@@ -47,6 +52,8 @@ class VolumeWellWithoutExstraColumn(VolumeWell):
         self.column_wall_thickness = dict_data_well["column_wall_thickness"]._value
         self.current_bottom = dict_data_well["current_bottom"]
         self.area_column = self.area_calculate(self.column_diametr, self.column_wall_thickness)
+        if self.dict_data_well["head_column"]._value != 0:
+            self.area_well_without_column = self.area_calculate(self.dict_data_well["diametr_doloto_ek"]._value, 0)
 
     def volume_well_calculate(self):
         return round(self.area_column * self.current_bottom, 1)
@@ -54,8 +61,22 @@ class VolumeWellWithoutExstraColumn(VolumeWell):
     def volume_well_pod_nkt(self):
         nkt_lenght = round(sum(list(self.dict_data_well["dict_nkt"].values())), 1)
         volume_well_pod_nkt = self.area_column * (
-                    float(self.dict_data_well["current_bottom"]) - float(nkt_lenght))
+                float(self.dict_data_well["current_bottom"]) - float(nkt_lenght))
         return round(volume_well_pod_nkt, 1)
+
+    def volume_calculate_roof_of_sole(self, roof, sole):
+
+        if self.dict_data_well["head_column"]._value == 0:
+            return round(self.area_column * (sole - roof))
+        else:
+            if float(sole) > self.dict_data_well["head_column"]._value and float(roof) > self.dict_data_well["head_column"]._value:
+                return round(self.area_column * (sole - roof), 1)
+            elif float(sole) < self.dict_data_well["head_column"]._value and float(roof) < self.dict_data_well["head_column"]._value:
+                return round(self.area_well_without_column * (sole - roof), 1)
+            else:
+                return round(self.area_column * (
+                        sole - float(self.dict_data_well["head_column"]._value)) + \
+                       self.area_well_without_column * (float(self.dict_data_well["head_column"]._value) - roof), 1)
 
 
 class VolumeWellWithExstraColumn(VolumeWell):
@@ -72,6 +93,8 @@ class VolumeWellWithExstraColumn(VolumeWell):
         self.area_column = self.area_calculate(self.column_diametr, self.column_wall_thickness)
         self.area_column_additional = self.area_calculate(self.column_diametr_additional,
                                                           self.column_wall_thickness_additional)
+        if self.dict_data_well["head_column"]._value != 0:
+            self.area_well_without_column = self.area_calculate(self.dict_data_well["diametr_doloto_ek"], 0)
 
     def volume_well_calculate(self):
         return round(self.area_column * self.head_column_additional +
@@ -89,11 +112,31 @@ class VolumeWellWithExstraColumn(VolumeWell):
                     float(self.dict_data_well["current_bottom"]) - int(nkt_lenght)) / 1000
         return round(volume_well_pod_nkt, 1)
 
+    def volume_calculate_roof_of_sole(self, roof, sole):
+        if self.dict_data_well["head_column"]._value == 0:
+            if sole and roof > float(self.dict_data_well["head_column_additional"]._value):
+                return round(self.area_column_additional * (sole - roof))
+            elif sole and roof < float(self.dict_data_well["head_column_additional"]._value):
+                return round(self.area_column * (sole - roof))
+            else:
+                return round(self.area_column_additional * (
+                            sole - float(self.dict_data_well["head_column_additional"]._value))) + \
+                       self.area_column * (float(self.dict_data_well["head_column_additional"]._value) - roof)
+        else:
+            if sole and roof > self.dict_data_well["head_column"]._value:
+                return round(self.area_column * (sole - roof))
+            elif sole and roof < self.dict_data_well["head_column"]._value:
+                return round(self.area_well_without_column * (sole - roof))
+            else:
+                return round(self.area_well_without_column * (
+                        sole - float(self.dict_data_well["head_column"]._value))) + \
+                       self.area_column * (float(self.dict_data_well["head_column"]._value) - roof)
 
 
 def volume_work(dict_data_well):
     if dict_data_well["column_additional"] is False or (dict_data_well["column_additional"] and
-                                                dict_data_well["head_column_additional"]._value >= dict_data_well["current_bottom"]):
+                                                        dict_data_well["head_column_additional"]._value >=
+                                                        dict_data_well["current_bottom"]):
         volume_well = VolumeWellWithoutExstraColumn(dict_data_well)
         return volume_well.volume_well_calculate()
     else:
@@ -101,8 +144,21 @@ def volume_work(dict_data_well):
         return volume_well.volume_well_calculate()
 
 
-def volume_well_pod_nkt_calculate(dict_data_well):  # Расчет необходимого объема внутри НКТ и между башмаком НКТ и забоем
+def volume_calculate_roof_of_sole(dict_data_well, roof, sole):
+    roof = float(roof)
+    sole = float(sole)
+    if dict_data_well["column_additional"] is False or (dict_data_well["column_additional"] and
+                                                        dict_data_well["head_column_additional"]._value >=
+                                                        sole):
+        volume_well = VolumeWellWithoutExstraColumn(dict_data_well)
+        return volume_well.volume_calculate_roof_of_sole(roof, sole)
+    else:
+        volume_well = VolumeWellWithExstraColumn(dict_data_well)
+        return volume_well.volume_calculate_roof_of_sole(roof, sole)
 
+
+def volume_well_pod_nkt_calculate(
+        dict_data_well):  # Расчет необходимого объема внутри НКТ и между башмаком НКТ и забоем
 
     if (dict_data_well["column_additional"] is False or
             (dict_data_well["column_additional"] and
@@ -110,7 +166,8 @@ def volume_well_pod_nkt_calculate(dict_data_well):  # Расчет необхо�
         volume_well = VolumeWellWithoutExstraColumn(dict_data_well)
         return volume_well.volume_well_pod_nkt()
 
-    elif round(sum(list(dict_data_well["dict_nkt"].values())), 1) > float(dict_data_well["head_column_additional"]._value):
+    elif round(sum(list(dict_data_well["dict_nkt"].values())), 1) > float(
+            dict_data_well["head_column_additional"]._value):
         volume_well = VolumeWellWithExstraColumn(dict_data_well)
 
         return volume_well.volume_well_pod_nkt()
@@ -123,6 +180,7 @@ def volume_jamming_well(dict_data_well):  # объем глушения сква
         1)
     return volume_jamming_well
 
+
 def volume_rod(dict_data_well):  # Объем штанг
 
     from find import FindIndexPZ
@@ -134,6 +192,7 @@ def volume_rod(dict_data_well):  # Объем штанг
                 volume_rod += (3.14 * (lenght_rod * (
                         FindIndexPZ.check_str_none(None, diam_rod) / 1000) / lenght_rod) ** 2) / 4 * lenght_rod
     return round(volume_rod, 5)
+
 
 def volume_nkt_metal(dict_data_well):  # Внутренний объем НКТ железа по фондовым
     volume_nkt_metal = 0

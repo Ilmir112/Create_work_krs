@@ -52,7 +52,7 @@ class TabPageSoGrp(TabPageUnion):
         if self.current_depth_edit.text() != '':
 
             if float(self.current_depth_edit.text()) - self.dict_data_well["perforation_roof"] > 100 \
-                    or (self.dict_data_well["max_angle"]._value > 60 and self.dict_data_well["max_angle_H"]._value < self.dict_data_well["perforation_roof"]) \
+                    or (self.dict_data_well["max_angle"]._value > 60 and self.dict_data_well["max_angle_depth"]._value < self.dict_data_well["perforation_roof"]) \
                     or self.dict_data_well["open_trunk_well"] is True:
                 self.otz_after_question_QCombo.setCurrentIndex(1)
                 self.otz_question_QCombo.setCurrentIndex(1)

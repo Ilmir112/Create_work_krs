@@ -259,7 +259,7 @@ class WorkWithGnkt(GnktModel):
              None, None, None, None, None, None, None, None,
              'Макс.угол в горизонт. участке', None, None, None, None, None, None, None,
              self.dict_data_well["max_angle"]._value, None, None,
-             'на глубине', None, None, self.dict_data_well["max_angle_H"]._value, None],
+             'на глубине', None, None, self.dict_data_well["max_angle_depth"]._value, None],
 
             [None, None, None, None, None, None,
              'Диаметр канавки', None, None, None, None, None, 'Наруж.\nдиаметр',

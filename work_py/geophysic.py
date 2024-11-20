@@ -170,7 +170,7 @@ class GeophysicWindow(WindowUnion):
 
         return research, research_short
 
-    def if_None_gis(self, value):
+    def check_if_none_gis(self, value):
 
         if isinstance(value, int) or isinstance(value, float):
             return int(value)

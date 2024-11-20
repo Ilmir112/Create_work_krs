@@ -2,7 +2,7 @@ from PyQt5 import QtWidgets
 from PyQt5.Qt import *
 
 import data_list
-from main import MyMainWindow
+from main import MyMainWindow, MyWindow
 from work_py.parent_work import TabPageUnion, TabWidgetUnion, WindowUnion
 from .advanted_file import definition_plast_work
 
@@ -127,7 +127,7 @@ class PerforationWindow(WindowUnion):
 
     def closeEvent(self, event):
                 # Закрываем основное окно при закрытии окна входа
-        self.operation_window = None
+        MyWindow.operation_window = None
         event.accept()  # Принимаем событие закрытия
     def addPerfProject(self):
 

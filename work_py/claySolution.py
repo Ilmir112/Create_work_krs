@@ -4,6 +4,7 @@ from PyQt5.QtGui import QDoubleValidator, QIntValidator
 from PyQt5.QtWidgets import QMessageBox, QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QPushButton
 
 import data_list
+from work_py.calculate_work_parametrs import volume_calculate_roof_of_sole
 
 from work_py.parent_work import TabWidgetUnion, WindowUnion, TabPageUnion
 from work_py.rir import RirWindow
@@ -39,6 +40,10 @@ class TabPageSoClay(TabPageUnion):
         self.sole_clay_edit.setText(f'{self.dict_data_well["current_bottom"]}')
         self.sole_clay_edit.setValidator(self.validator)
 
+        self.volume_clay_label = QLabel("Объем глинистого раствора", self)
+        self.volume_clay_edit = QLineEdit(self)
+        self.volume_clay_edit.setValidator(self.validator)
+
         self.rir_question_Label = QLabel("Нужно ли УЦМ производить на данной компоновке", self)
         self.rir_question_combo = QComboBox(self)
         self.rir_question_combo.addItems(['Нет', 'Да'])
@@ -48,7 +53,10 @@ class TabPageSoClay(TabPageUnion):
         self.grid.addWidget(self.purpose_of_clay_label, 2, 4)
         self.grid.addWidget(self.purpose_of_clay_combo, 3, 4)
 
-        self.roof_clay_edit.textChanged.connect(self.update_roof)
+        self.grid.addWidget(self.volume_clay_label, 4, 7)
+        self.grid.addWidget(self.volume_clay_edit, 5, 7)
+
+        self.roof_clay_edit.editingFinished.connect(self.update_roof)
 
         self.rir_question_combo.currentTextChanged.connect(self.update_rir)
         self.purpose_of_clay_combo.currentIndexChanged.connect(self.update_purpose_of_clay)
@@ -69,16 +77,7 @@ class TabPageSoClay(TabPageUnion):
 
             self.current_bottom_label.setParent(None)
             self.current_bottom_edit.setParent(None)
-            try:
-                self.volume_clay_label.setParent(None)
-                self.volume_clay_edit.setParent(None)
-            except:
-                pass
-
         else:
-            self.volume_clay_label = QLabel("Объем глинистого раствора", self)
-            self.volume_clay_edit = QLineEdit(self)
-            self.volume_clay_edit.setValidator(self.validator)
             self.volume_clay_edit.setText(f'{5}')
             self.roof_clay_label.setParent(None)
             self.roof_clay_edit.setParent(None)
@@ -90,15 +89,17 @@ class TabPageSoClay(TabPageUnion):
 
             self.grid.addWidget(self.current_bottom_label, 6, 4)
             self.grid.addWidget(self.current_bottom_edit, 7, 4)
-            self.grid.addWidget(self.volume_clay_label, 6, 5)
-            self.grid.addWidget(self.volume_clay_edit, 7, 5)
 
     def update_roof(self):
-        roof_clay_edit = self.roof_clay_edit.text()
+        roof_clay = self.roof_clay_edit.text()
+        sole_clay = self.sole_clay_edit.text()
+        if roof_clay != '' and sole_clay != '':
+            volume_calculate = volume_calculate_roof_of_sole(self.dict_data_well, roof_clay, sole_clay)
+            self.volume_clay_edit.setText(str(volume_calculate))
 
-        if roof_clay_edit != '':
-            self.sole_rir_edit.setText(f'{float(roof_clay_edit)}')
-            self.roof_rir_edit.setText(f'{float(roof_clay_edit) - 50}')
+        if self.rir_question_combo.currentText() == 'Да':
+            self.sole_rir_edit.setText(f'{float(roof_clay)}')
+            self.roof_rir_edit.setText(f'{float(roof_clay) - 50}')
 
     def update_rir(self, index):
         if index == "Нет":
@@ -111,7 +112,7 @@ class TabPageSoClay(TabPageUnion):
         else:
             self.roof_rir_label = QLabel("Плановая кровля РИР", self)
             self.roof_rir_edit = QLineEdit(self)
-            self.roof_rir_edit.editingFinished.connect(self.update_volume_cement)
+
 
             self.roof_rir_edit.setText(f'{self.dict_data_well["current_bottom"] - 50}')
             self.roof_rir_edit.setClearButtonEnabled(True)
@@ -119,10 +120,15 @@ class TabPageSoClay(TabPageUnion):
             self.sole_rir_LabelType = QLabel("Подошва РИР", self)
             self.sole_rir_edit = QLineEdit(self)
             self.sole_rir_edit.editingFinished.connect(self.update_volume_cement)
+            self.roof_rir_edit.editingFinished.connect(self.update_volume_cement)
             self.sole_rir_edit.setText(f'{self.dict_data_well["current_bottom"]}')
             self.sole_rir_edit.setClearButtonEnabled(True)
             self.cement_volume_label = QLabel('Объем цемента')
             self.cement_volume_line = QLineEdit(self)
+
+            self.info_rir_label = QLabel('Цель РИР')
+            self.info_rir_edit = QLineEdit(self)
+
 
             self.grid.addWidget(self.roof_rir_label, 6, 4)
             self.grid.addWidget(self.roof_rir_edit, 7, 4)
@@ -130,11 +136,15 @@ class TabPageSoClay(TabPageUnion):
             self.grid.addWidget(self.sole_rir_edit, 7, 5)
             self.grid.addWidget(self.cement_volume_label, 6, 6)
             self.grid.addWidget(self.cement_volume_line, 7, 6)
+            self.grid.addWidget(self.info_rir_label, 6, 7)
+            self.grid.addWidget(self.info_rir_edit, 7, 7)
 
     def update_volume_cement(self):
-        if self.roof_rir_edit.text() != '' and self.sole_rir_edit.text() != '':
+        roof_rir = self.roof_rir_edit.text()
+        sole_rir = self.sole_rir_edit.text()
+        if roof_rir != '' and sole_rir != '':
             self.cement_volume_line.setText(
-                f'{round(volume_vn_ek(self, float(self.roof_rir_edit.text())) * (float(self.sole_rir_edit.text()) - float(self.roof_rir_edit.text())) / 1000, 1)}')
+                f'{round(volume_calculate_roof_of_sole(self.dict_data_well, roof_rir, sole_rir), 1)}')
 
 
 class TabWidget(TabWidgetUnion):
@@ -328,9 +338,16 @@ class ClayWork:
     def __init__(self, parent=None):
         self.dict_data_well = parent.dict_data_well
         self.calculate_chemistry = parent.calculate_chemistry
+        self.sole_rir = None
+        self.roof_rir = None
+        self.rir_question = None
+        self.sole_clay = None
+        self.roof_clay = None
+        self.volume_clay = None
+        self.current_bottom = None
 
     def add_work_clay(self):
-        NotImplementedError('Не выбран метод реализации, метож должен быть переопределен')
+        NotImplementedError('Не выбран метод реализации, метод должен быть переопределен')
 
 
 class ClaySolutionForRir(ClayWork):
@@ -433,6 +450,7 @@ class ClaySolutionForRir(ClayWork):
 class ClaySolutionForEk(ClayWork):
     def __init__(self, parent=None):
         super().__init__(parent)
+
         self.parent = parent
 
     def add_work_clay(self):
@@ -444,6 +462,7 @@ class ClaySolutionForEk(ClayWork):
             self.roof_rir = int(float(self.parent.current_widget.roof_rir_edit.text()))
             self.sole_rir = int(float(self.parent.current_widget.sole_rir_edit.text()))
             self.volume_cement = self.parent.current_widget.cement_volume_line.text().replace(',', '.')
+            self.info_rir_edit = self.parent.current_widget.info_rir_edit.text()
             if self.volume_cement != '':
                 self.volume_cement = round(float(self.volume_cement), 1)
             elif self.volume_cement == '' and self.rir_question == "Да":
@@ -457,9 +476,9 @@ class ClaySolutionForEk(ClayWork):
         return work_list
 
     def clay_solution_def(self):
-
         nkt_diam = ''.join(['73' if self.dict_data_well["column_diametr"]._value > 110 else '60'])
-        volume_clay = round(volume_vn_ek(self, self.roof_clay * self.roof_clay - self.sole_clay) / 1000, 1)
+
+        volume_clay = round(volume_calculate_roof_of_sole(self.dict_data_well, self.roof_clay, self.sole_clay), 1)
 
         if self.dict_data_well["column_additional"] is True and self.dict_data_well[
             "column_additional_diametr"]._value < 110 and \
@@ -510,12 +529,12 @@ class ClaySolutionForEk(ClayWork):
                               f'уд.весом {self.dict_data_well["fluid_work"]}',
                               None, None, None, None, None, None, None,
                               'мастер КРС', descentNKT_norm(float(self.sole_clay) - float(self.roof_clay), 1)])
+            rir_work_list = RirWindow.rir_with_pero_gl(self, 'Не нужно', '', self.roof_rir, self.sole_rir,
+                                                       self.volume_cement, self.info_rir_edit)
             if (self.dict_data_well['plast_work']) != 0 or self.sole_clay > self.dict_data_well["perforation_roof"]:
-                rir_work_list = RirWindow.rir_with_pero_gl(self, 'Не нужно', '', self.roof_rir, self.sole_rir,
-                                                           self.volume_cement)
+
                 pero_list.extend(rir_work_list[1:])
             else:
-                rir_work_list = RirWindow.rir_with_pero_gl(self, 'Не нужно', '', self.roof_rir, self.sole_rir,
-                                                           self.volume_cement)
+
                 pero_list.extend(rir_work_list[-10:])
         return pero_list

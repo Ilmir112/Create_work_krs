@@ -10,7 +10,7 @@ from .template_work import TemplateKrs
 from PyQt5.QtWidgets import QMessageBox, QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QPushButton
 
 
-class TabPage_Gno(TabPageUnion):
+class TabPageGno(TabPageUnion):
     def __init__(self, parent=None):
         super().__init__()
         self.dict_data_well = parent
@@ -96,40 +96,40 @@ class TabPage_Gno(TabPageUnion):
 
     def select_gno(self):
 
-        if self.if_None(self.dict_data_well["dict_pump_ECN"]["posle"]) != 'отсут' and \
-                self.if_None(self.dict_data_well["dict_pump_SHGN"]["posle"]) != 'отсут':
+        if self.check_if_none(self.dict_data_well["dict_pump_ECN"]["posle"]) != 'отсут' and \
+                self.check_if_none(self.dict_data_well["dict_pump_SHGN"]["posle"]) != 'отсут':
             lift_key = 'ОРД'
-        elif self.if_None(self.dict_data_well["dict_pump_ECN"]["posle"]) != 'отсут' and \
-                self.if_None(self.dict_data_well["paker_do"]["posle"]) == 'отсут':
+        elif self.check_if_none(self.dict_data_well["dict_pump_ECN"]["posle"]) != 'отсут' and \
+                self.check_if_none(self.dict_data_well["paker_do"]["posle"]) == 'отсут':
             lift_key = 'ЭЦН'
-        elif self.if_None(self.dict_data_well["dict_pump_ECN"]["posle"]) != 'отсут' and \
-                self.if_None(self.dict_data_well["paker_do"]["posle"]) != 'отсут':
+        elif self.check_if_none(self.dict_data_well["dict_pump_ECN"]["posle"]) != 'отсут' and \
+                self.check_if_none(self.dict_data_well["paker_do"]["posle"]) != 'отсут':
             lift_key = 'ЭЦН с пакером'
-        elif self.if_None(self.dict_data_well["dict_pump_SHGN"]["posle"]) != 'отсут' and \
+        elif self.check_if_none(self.dict_data_well["dict_pump_SHGN"]["posle"]) != 'отсут' and \
                 self.dict_data_well["dict_pump_SHGN"]["posle"].upper() != 'НН' \
-                and self.if_None(self.dict_data_well["paker_do"]["posle"]) == 'отсут':
+                and self.check_if_none(self.dict_data_well["paker_do"]["posle"]) == 'отсут':
             lift_key = 'НВ'
-        elif self.if_None(self.dict_data_well["dict_pump_SHGN"]["posle"]) != 'отсут' and \
-                self.if_None(self.dict_data_well["dict_pump_SHGN"]["posle"]).upper() != 'НН' \
-                and self.if_None(self.dict_data_well["paker_do"]["posle"]) != 'отсут':
+        elif self.check_if_none(self.dict_data_well["dict_pump_SHGN"]["posle"]) != 'отсут' and \
+                self.check_if_none(self.dict_data_well["dict_pump_SHGN"]["posle"]).upper() != 'НН' \
+                and self.check_if_none(self.dict_data_well["paker_do"]["posle"]) != 'отсут':
             lift_key = 'НВ с пакером'
-        elif 'НН' in self.if_None(self.dict_data_well["dict_pump_SHGN"]["posle"]).upper() \
-                and self.if_None(self.dict_data_well["paker_do"]["posle"]) == 'отсут':
+        elif 'НН' in self.check_if_none(self.dict_data_well["dict_pump_SHGN"]["posle"]).upper() \
+                and self.check_if_none(self.dict_data_well["paker_do"]["posle"]) == 'отсут':
             lift_key = 'НН'
-        elif 'НН' in self.if_None(self.dict_data_well["dict_pump_SHGN"]["posle"]).upper() and \
-                self.if_None(self.if_None(self.dict_data_well["paker_do"]["posle"])) != 'отсут':
+        elif 'НН' in self.check_if_none(self.dict_data_well["dict_pump_SHGN"]["posle"]).upper() and \
+                self.check_if_none(self.check_if_none(self.dict_data_well["paker_do"]["posle"])) != 'отсут':
             lift_key = 'НН с пакером'
-        elif self.if_None(self.dict_data_well["dict_pump_SHGN"]["posle"]) == 'отсут' and \
-                self.if_None(self.dict_data_well["paker_do"]["posle"]) == 'отсут' \
-                and self.if_None(self.dict_data_well["dict_pump_ECN"]["posle"]) == 'отсут':
+        elif self.check_if_none(self.dict_data_well["dict_pump_SHGN"]["posle"]) == 'отсут' and \
+                self.check_if_none(self.dict_data_well["paker_do"]["posle"]) == 'отсут' \
+                and self.check_if_none(self.dict_data_well["dict_pump_ECN"]["posle"]) == 'отсут':
             lift_key = 'воронка'
         elif '89' in self.dict_data_well["dict_nkt"].keys() and '48' in self.dict_data_well["dict_nkt"].keys() and \
-                self.if_None(
+                self.check_if_none(
                     self.dict_data_well["paker_do"]["posle"]) != 'отсут':
             lift_key = 'ОРЗ'
-        elif self.if_None(self.dict_data_well["dict_pump_SHGN"]["posle"]) == 'отсут' and \
-                self.if_None(self.dict_data_well["paker_do"]["posle"]) != 'отсут' \
-                and self.if_None(self.dict_data_well["dict_pump_ECN"]["posle"]) == 'отсут':
+        elif self.check_if_none(self.dict_data_well["dict_pump_SHGN"]["posle"]) == 'отсут' and \
+                self.check_if_none(self.dict_data_well["paker_do"]["posle"]) != 'отсут' \
+                and self.check_if_none(self.dict_data_well["dict_pump_ECN"]["posle"]) == 'отсут':
             lift_key = 'пакер'
         if 'КР11' in self.dict_data_well["type_kr"]:
             lift_key = 'консервация'
@@ -140,7 +140,7 @@ class TabPage_Gno(TabPageUnion):
 class TabWidget(TabWidgetUnion):
     def __init__(self, parent):
         super().__init__()
-        self.addTab(TabPage_Gno(parent), 'Спуск ГНО')
+        self.addTab(TabPageGno(parent), 'Спуск ГНО')
 
 
 class GnoDescentWindow(WindowUnion):
@@ -491,8 +491,8 @@ class DescentNnWithPaker(DescentParent):
              'Мастер КРС, предст. заказчика', 1.5],
 
         ]
-        if self.privyazka_nkt(self)[0] not in descent_nn_with_paker:
-            descent_nn_with_paker.insert(3, self.privyazka_nkt(self)[0])
+        if self.privyazka_nkt()[0] not in descent_nn_with_paker:
+            descent_nn_with_paker.insert(3, self.privyazka_nkt()[0])
         return descent_nn_with_paker
 
 
@@ -527,11 +527,11 @@ class Conservation(DescentParent):
             [f'Не замерзающая жидкость 0,3м3', None,
              f'С целью вытеснения тех. жидкости из скважины и заполнения скважины не замерзающей жидкостью: '
              f'Допустить компоновку на технологических НКТ на глубину '
-             f'{sum(list(self.dict_data_well["dict_nkt_po"].values())) + lenght_nkt}м. ',
+             f'{sum(list(self.dict_data_well["dict_nkt_po"].values())) + lenght_nkt:.1f}м. ',
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика', descentNKT_norm(lenght_nkt, 1)],
             [None, None,
-             f'Поднять тНКТ до глубины {sum(list(self.dict_data_well["dict_nkt_po"].values()))}м '
+             f'Поднять тНКТ до глубины {sum(list(self.dict_data_well["dict_nkt_po"].values())):.1f}м '
              f'с доливом незамерзающей'
              f' жидкостью (растворитель РКД 0,3м3) до устья',
              None, None, None, None, None, None, None,
@@ -583,7 +583,7 @@ class Conservation(DescentParent):
              f'металлическую табличку с обозначением'
              f'скв.№ {self.dict_data_well["well_number"]._value} {self.dict_data_well["well_area"]._value}'
              f' месторождение, ПАО АНК Башнефть, '
-             f'дата начала и окончания консервации силами ЦДНГ после съезда бригады. ")',
+             f'дата начала и окончания консервации силами ЦДНГ после съезда бригады.',
              None, None, None, None, None, None, None,
              'ЦДНГ ', 2],
         ]
@@ -904,8 +904,8 @@ class DescentORD(DescentParent):
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика', 1.5]]
 
-        if self.privyazka_nkt(self)[0] not in descent_ord_list:
-            descent_ord_list.insert(4, self.privyazka_nkt(self)[0])
+        if self.privyazka_nkt()[0] not in descent_ord_list:
+            descent_ord_list.insert(4, self.privyazka_nkt()[0])
         return descent_ord_list
 
 
@@ -1214,8 +1214,8 @@ class DescentNvWithPaker(DescentParent):
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика', 1.5],
         ]
-        if self.privyazka_nkt(self)[0] not in descent_nv_with_paker:
-            descent_nv_with_paker.insert(3, self.privyazka_nkt(self)[0])
+        if self.privyazka_nkt()[0] not in descent_nv_with_paker:
+            descent_nv_with_paker.insert(3, self.privyazka_nkt()[0])
         return descent_nv_with_paker
 
 

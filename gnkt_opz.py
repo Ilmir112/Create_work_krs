@@ -344,7 +344,7 @@ class GnktOpz(GnktModel):
             acid_true_quest = False
 
         self.dict_data_well["fluid_work"], self.dict_data_well["fluid_work_short"] = \
-            self.calc_work_fluid(self, self.fluid_edit)
+            self.calc_work_fluid(self.fluid_edit)
 
         if self.need_rast_combo == 'нужно':
             volume_rast_edit = self.volume_rast_edit
@@ -501,6 +501,12 @@ class GnktOpz(GnktModel):
                     f'Операции по задавке и изливу произвести 3-4 раза в зависимости от приёмистости). ',
                 None, None, None, None, None, None, None,
                 'Мастер ГНКТ, состав бригады, представитель Заказчика', 1],
+            [None, 26,
+             f'Поднять БДТ до устья с промывкой скважины мин.водой {self.dict_data_well["fluid_work"]} . Составить Акт. '
+             f'Согласовать с '
+             f'Заказчиком утилизацию жидкости в коллектор.',
+             None, None, None, None, None, None, None,
+             'Мастер ГНКТ, состав бригады', 1.56],
             [f'Исследовать скважину на приёмистость при Рзак={self.dict_data_well["expected_P"]}атм',
              24,
              f'Исследовать скважину на приёмистость при Рзак={self.dict_data_well["expected_P"]}атм с составлением акта в '
@@ -525,12 +531,7 @@ class GnktOpz(GnktModel):
                  f'Составить Акт ',
              None, None, None, None, None, None, None,
              'Мастер ГНКТ, состав бригады, представитель Заказчика УСРСиСТ', 1.4],
-            [None, 26,
-             f'Поднять БДТ до устья с промывкой скважины мин.водой {self.dict_data_well["fluid_work"]} . Составить Акт. '
-             f'Согласовать с '
-             f'Заказчиком утилизацию жидкости в коллектор.',
-             None, None, None, None, None, None, None,
-             'Мастер ГНКТ, состав бригады', 1.56],
+
             [None, 27, 'Произвести демонтаж колтюбингового оборудования и линии обвязки желобной системы.',
              None, None, None, None, None, None, None,
              'Мастер ГНКТ, состав бригады', 2.25],

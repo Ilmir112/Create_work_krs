@@ -88,8 +88,8 @@ class CreatePZ(MyMainWindow):
                         ws.cell(row=i, column=j).font = Font(name='Arial Cyr', size=13, bold=True)
                     ws.merge_cells(start_row=i, start_column=2, end_row=i, end_column=7)
                     ws.merge_cells(start_row=i, start_column=8, end_row=i, end_column=12)
-                    ws.row_dimensions[i].height = 10
-                ws.row_dimensions[i+1].height = 10
+                    ws.row_dimensions[i].height = 20
+                ws.row_dimensions[i+1].height = 20
 
                 # print(f' индекс вставки ГНВП{self.dict_data_well["ins_ind"]}')
                 dict_events_gnvp = {}

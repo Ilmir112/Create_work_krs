@@ -518,7 +518,7 @@ class PvrApplication(WindowUnion):
              None,
              None, None, None],
             [None, 'Максимальный угол', None, None, None, None, None, None, self.dict_data_well["max_angle"]._value, None, None, None, None,
-             None, None, 'гр.', None, 'на глубине', None, None, None, self.dict_data_well["max_angle_H"]._value, None, None, None, None, 'м.',
+             None, None, 'гр.', None, 'на глубине', None, None, None, self.dict_data_well["max_angle_depth"]._value, None, None, None, None, 'м.',
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
             [None, 'Расстояние муфта-ротор', None, None, None, None, None, None, None, None, self.dict_data_well["stol_rotora"]._value, None,
              None, None, 'м.', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,

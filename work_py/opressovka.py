@@ -53,11 +53,11 @@ class TabPageSo(TabPageUnion):
         self.paker_depth_zumpf_edit = QLineEdit(self)
         self.paker_depth_zumpf_edit.setValidator(self.validator)
 
-        self.pressureZUMPF_question_Label = QLabel("Нужно ли опрессовывать ЗУМПФ", self)
-        self.pressureZUMPF_question_QCombo = QComboBox(self)
-        self.pressureZUMPF_question_QCombo.currentTextChanged.connect(self.update_paker_need)
+        self.pressure_zumph_question_Label = QLabel("Нужно ли опрессовывать ЗУМПФ", self)
+        self.pressure_zumph_question_QCombo = QComboBox(self)
+        self.pressure_zumph_question_QCombo.currentTextChanged.connect(self.update_paker_need)
 
-        self.pressureZUMPF_question_QCombo.addItems(['Нет', 'Да'])
+        self.pressure_zumph_question_QCombo.addItems(['Нет', 'Да'])
 
         self.grid_layout = QGridLayout(self)
 
@@ -70,8 +70,8 @@ class TabPageSo(TabPageUnion):
         self.grid_layout.addWidget(self.paker_depth_Label, 3, 3)
         self.grid_layout.addWidget(self.paker_depth_edit, 4, 3)
 
-        self.grid_layout.addWidget(self.pressureZUMPF_question_Label, 3, 5)
-        self.grid_layout.addWidget(self.pressureZUMPF_question_QCombo, 4, 5)
+        self.grid_layout.addWidget(self.pressure_zumph_question_Label, 3, 5)
+        self.grid_layout.addWidget(self.pressure_zumph_question_QCombo, 4, 5)
 
         self.grid_layout.addWidget(self.need_privyazka_Label, 3, 4)
         self.grid_layout.addWidget(self.need_privyazka_QCombo, 4, 4)
@@ -206,7 +206,7 @@ class OpressovkaEK(WindowUnion):
 
         paker_khost = int(float(self.tabWidget.currentWidget().paker_khost_edit.text()))
         paker_depth = int(float(self.tabWidget.currentWidget().paker_depth_edit.text()))
-        pressureZUMPF_combo = self.tabWidget.currentWidget().pressureZUMPF_question_QCombo.currentText()
+        pressureZUMPF_combo = self.tabWidget.currentWidget().pressure_zumph_question_QCombo.currentText()
         if not paker_khost or not paker_depth:
             QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
             return
@@ -258,8 +258,8 @@ class OpressovkaEK(WindowUnion):
         rows = self.tableWidget.rowCount()
         paker_khost = int(float(self.tabWidget.currentWidget().paker_khost_edit.text()))
         diametr_paker = int(float(self.tabWidget.currentWidget().diametr_paker_edit.text()))
-        pressureZUMPF_question_QCombo = self.tabWidget.currentWidget().pressureZUMPF_question_QCombo.currentText()
-        if pressureZUMPF_question_QCombo == 'Да':
+        pressure_zumph_question_QCombo = self.tabWidget.currentWidget().pressure_zumph_question_QCombo.currentText()
+        if pressure_zumph_question_QCombo == 'Да':
             paker_depth_zumpf = int(float(self.tabWidget.currentWidget().paker_depth_zumpf_edit.text()))
             if paker_khost + paker_depth_zumpf >= self.dict_data_well["current_bottom"]:
                 QMessageBox.warning(self, 'ОШИБКА', 'Длина хвостовика и пакера ниже текущего забоя')
@@ -279,14 +279,14 @@ class OpressovkaEK(WindowUnion):
 
 
             work_list = OpressovkaEK.paker_list(self, diametr_paker, paker_khost, paker_depth,
-                                            pressureZUMPF_question_QCombo, paker_depth_zumpf)
+                                            pressure_zumph_question_QCombo, paker_depth_zumpf)
         else:
             depth_paker_list = []
             for row in range(rows):
                 paker_depth = self.tableWidget.item(row, 1)
                 depth_paker_list.append(int(float(paker_depth.text())))
-                pressureZUMPF_question = self.tableWidget.item(row, 2)
-            work_list = OpressovkaEK.interval_pressure_testing(self, paker_khost, diametr_paker, depth_paker_list, pressureZUMPF_question, paker_depth_zumpf)
+                pressure_zumph_question = self.tableWidget.item(row, 2)
+            work_list = OpressovkaEK.interval_pressure_testing(self, paker_khost, diametr_paker, depth_paker_list, pressure_zumph_question, paker_depth_zumpf)
 
         self.populate_row(self.ins_ind, work_list, self.table_widget)
         data_list.pause = False
@@ -332,11 +332,11 @@ class OpressovkaEK(WindowUnion):
         nkt_opress_list = OpressovkaEK.nkt_opress(self)
         return paker_select, paker_short, nkt_opress_list
 
-    def paker_list(self, paker_diametr, paker_khost, paker_depth, pressureZUMPF_question, paker_depth_zumpf = 0):
+    def paker_list(self, paker_diametr, paker_khost, paker_depth, pressure_zumph_question, paker_depth_zumpf = 0):
 
         paker_select, paker_short, nkt_opress_list = OpressovkaEK.select_combo_paker(self, paker_khost, paker_depth, paker_diametr)
 
-        if pressureZUMPF_question == 'Да':
+        if pressure_zumph_question == 'Да':
             paker_list = [
                 [f'СПО {paker_short} до глубины {paker_depth_zumpf}', None,
                  f'Спустить {paker_select} на НКТ{self.dict_data_well["nkt_diam"]}мм до глубины {paker_depth_zumpf}м,'
@@ -457,7 +457,7 @@ class OpressovkaEK(WindowUnion):
         self.tableWidget.sortItems(1)
 
     def interval_pressure_testing(self, paker_khost, diametr_paker, depth_paker_list,
-                                  pressureZUMPF_question, paker_depth_zumpf = 0):
+                                  pressure_zumph_question, paker_depth_zumpf = 0):
         paker_depth = sorted(depth_paker_list)[0]
         paker_select, paker_short, nkt_opress_list = OpressovkaEK.select_combo_paker(self, paker_khost, paker_depth, diametr_paker)
 
@@ -541,7 +541,7 @@ class OpressovkaEK(WindowUnion):
                 paker_list.append(row)
             paker_depth = pakerNEK
 
-        if pressureZUMPF_question == "Да":
+        if pressure_zumph_question == "Да":
             zumpf_list = [
                 [f'Допустить пакер до глубины {paker_depth_zumpf}м', None,
                  f'Допустить пакер до глубины {paker_depth_zumpf}м',

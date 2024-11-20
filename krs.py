@@ -88,41 +88,41 @@ class TabPageGno(TabPageUnion):
 
     def select_gno(self, dict_data_well):
         lift_key = ''
-        if self.if_None(dict_data_well["dict_pump_ECN"]["do"]) != 'отсут' and \
-                self.if_None(dict_data_well["dict_pump_SHGN"]["do"]) != 'отсут':
+        if self.check_if_none(dict_data_well["dict_pump_ECN"]["do"]) != 'отсут' and \
+                self.check_if_none(dict_data_well["dict_pump_SHGN"]["do"]) != 'отсут':
             lift_key = 'ОРД'
-        elif self.if_None(dict_data_well["dict_pump_ECN"]["do"]) != 'отсут' and \
-                self.if_None(dict_data_well["paker_do"]["do"]) == 'отсут':
+        elif self.check_if_none(dict_data_well["dict_pump_ECN"]["do"]) != 'отсут' and \
+                self.check_if_none(dict_data_well["paker_do"]["do"]) == 'отсут':
             lift_key = 'ЭЦН'
-        elif self.if_None(dict_data_well["dict_pump_ECN"]["do"]) != 'отсут' and \
-                self.if_None(dict_data_well["paker_do"]["do"]) != 'отсут':
+        elif self.check_if_none(dict_data_well["dict_pump_ECN"]["do"]) != 'отсут' and \
+                self.check_if_none(dict_data_well["paker_do"]["do"]) != 'отсут':
             lift_key = 'ЭЦН с пакером'
-        elif self.if_None(dict_data_well["dict_pump_SHGN"]["do"]) != 'отсут' and \
+        elif self.check_if_none(dict_data_well["dict_pump_SHGN"]["do"]) != 'отсут' and \
                 dict_data_well["dict_pump_SHGN"]["do"].upper() != 'НН' \
-                and self.if_None(dict_data_well["paker_do"]["do"]) == 'отсут':
+                and self.check_if_none(dict_data_well["paker_do"]["do"]) == 'отсут':
             lift_key = 'НВ'
-        elif self.if_None(dict_data_well["dict_pump_SHGN"]["do"]) != 'отсут' and \
-                self.if_None(dict_data_well["dict_pump_SHGN"]["do"]).upper() != 'НН' \
-                and self.if_None(dict_data_well["paker_do"]["do"]) != 'отсут':
+        elif self.check_if_none(dict_data_well["dict_pump_SHGN"]["do"]) != 'отсут' and \
+                self.check_if_none(dict_data_well["dict_pump_SHGN"]["do"]).upper() != 'НН' \
+                and self.check_if_none(dict_data_well["paker_do"]["do"]) != 'отсут':
             lift_key = 'НВ с пакером'
-        elif 'НН' in self.if_None(dict_data_well["dict_pump_SHGN"]["do"]).upper() \
-                and self.if_None(dict_data_well["paker_do"]["do"]) == 'отсут':
+        elif 'НН' in self.check_if_none(dict_data_well["dict_pump_SHGN"]["do"]).upper() \
+                and self.check_if_none(dict_data_well["paker_do"]["do"]) == 'отсут':
             lift_key = 'НН'
-        elif 'НН' in self.if_None(dict_data_well["dict_pump_SHGN"]["do"]).upper() and \
-                self.if_None(self.if_None(dict_data_well["paker_do"]["do"])) != 'отсут':
+        elif 'НН' in self.check_if_none(dict_data_well["dict_pump_SHGN"]["do"]).upper() and \
+                self.check_if_none(self.check_if_none(dict_data_well["paker_do"]["do"])) != 'отсут':
             lift_key = 'НН с пакером'
-        elif self.if_None(dict_data_well["dict_pump_SHGN"]["do"]) == 'отсут' and \
-                self.if_None(dict_data_well["paker_do"]["do"]) == 'отсут' \
-                and self.if_None(dict_data_well["dict_pump_ECN"]["do"]) == 'отсут':
+        elif self.check_if_none(dict_data_well["dict_pump_SHGN"]["do"]) == 'отсут' and \
+                self.check_if_none(dict_data_well["paker_do"]["do"]) == 'отсут' \
+                and self.check_if_none(dict_data_well["dict_pump_ECN"]["do"]) == 'отсут':
             lift_key = 'воронка'
 
         elif '89' in dict_data_well["dict_nkt"].keys() and '48' in dict_data_well["dict_nkt"].keys() and \
-                self.if_None(
+                self.check_if_none(
                     dict_data_well["paker_do"]["do"]) != 'отсут':
             lift_key = 'ОРЗ'
-        elif self.if_None(dict_data_well["dict_pump_SHGN"]["do"]) == 'отсут' and \
-                self.if_None(dict_data_well["paker_do"]["do"]) != 'отсут' \
-                and self.if_None(dict_data_well["dict_pump_ECN"]["do"]) == 'отсут':
+        elif self.check_if_none(dict_data_well["dict_pump_SHGN"]["do"]) == 'отсут' and \
+                self.check_if_none(dict_data_well["paker_do"]["do"]) != 'отсут' \
+                and self.check_if_none(dict_data_well["dict_pump_ECN"]["do"]) == 'отсут':
             lift_key = 'пакер'
         return lift_key
 
@@ -289,8 +289,8 @@ class GnoParent(ABC):
         except Exception as e:
             QMessageBox.warning(None, 'Ошибка', f'Не корректное сохранение параметра: {type(e).__name__}\n\n{str(e)}')
 
-        from work_py.descent_gno import TabPage_Gno
-        self.nkt_diam_fond = TabPage_Gno.gno_nkt_opening(self.dict_data_well["dict_nkt"])
+        from work_py.descent_gno import TabPageGno
+        self.nkt_diam_fond = TabPageGno.gno_nkt_opening(self.dict_data_well["dict_nkt"])
 
         self.without_damping_true = self.dict_data_well["without_damping"]
         self.well_jamming_str = self.well_jamming()
@@ -495,8 +495,7 @@ class GnoParent(ABC):
         volume_nkt_str = volume_nkt(self.dict_data_well)
         volume_nkt_metal_str = volume_nkt_metal(self.dict_data_well)
         volume_rod_str = volume_rod(self.dict_data_well)
-        volume_nkt_ustie = round(
-            self.volume_well_jaming - volume_pod_nkt_str - volume_nkt_metal_str, 1)
+        volume_nkt_ustie = round(self.volume_well_jaming - volume_pod_nkt_str, 1)
         well_volume_str_after = f'{round(self.volume_well_jaming - well_volume, 1)}м3.' if round(
             self.volume_well_jaming - well_volume, 1) > 0.1 else ''
 
@@ -522,7 +521,7 @@ class GnoParent(ABC):
 
         elif self.without_damping_true is False and self.lift_key in ['ОРД']:
             well_jamming_str = f'Произвести закачку в затрубное пространство тех жидкости уд.весом ' \
-                               f'{self.dict_data_well["fluid_work_short"]}в ' \
+                               f'{self.dict_data_well["fluid_work_short"]} в ' \
                                f'объеме {round(well_volume - well_volume(self, self.dict_data_well["depth_fond_paker_do"]["do"]), 1)}м3 ' \
                                f'на поглощение при давлении не более ' \
                                f'{self.dict_data_well["max_admissible_pressure"]._value}атм. Закрыть ' \
@@ -535,14 +534,12 @@ class GnoParent(ABC):
             well_jamming_str = f'Произвести глушение скважины в объеме {self.volume_well_jaming}м3 тех ' \
                                f'жидкостью уд.весом {self.dict_data_well["fluid_work"]}' \
                                f' на циркуляцию в следующим алгоритме: \n Произвести закачку в' \
-                               f' затрубное пространство ' \
-                               f'тех жидкости в ' \
-                               f'объеме {volume_nkt_ustie}м3 на ' \
+                               f' затрубное пространство тех жидкости в объеме {volume_nkt_ustie}м3 на ' \
                                f'циркуляцию. Закрыть трубное пространство. ' \
                                f'Произвести закачку на поглощение не более ' \
                                f'{self.dict_data_well["max_admissible_pressure"]._value}атм ' \
                                f'тех жидкости в ' \
-                               f'объеме {round((volume_pod_nkt_str + volume_nkt_str) * 1.1, 1)}м3. ' \
+                               f'объеме {volume_pod_nkt_str:.1f}м3. ' \
                                f'Закрыть скважину на ' \
                                f'стабилизацию не менее 2 часов. (согласовать глушение в коллектор, в случае ' \
                                f'отсутствия на желобную емкость'

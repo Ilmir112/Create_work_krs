@@ -1025,7 +1025,7 @@ class DopPlanWindow(WindowUnion):
             # if float(current_bottom) > self.dict_data_well["bottomhole_drill"]._value:
             #     QMessageBox.critical(self, 'Забой', 'Текущий забой больше пробуренного забоя')
             #     return
-            self.dict_data_well["fluid_work"], self.dict_data_well["fluid_work_short"] = self.calc_work_fluid(self, fluid)
+            self.dict_data_well["fluid_work"], self.dict_data_well["fluid_work_short"] = self.calc_work_fluid(fluid)
 
             self.dict_data_well["template_depth"] = float(template_depth_edit)
             self.dict_data_well["template_lenght"] = float(template_lenght_edit)
@@ -1256,13 +1256,16 @@ class DopPlanWindow(WindowUnion):
 
         self.dict_data_well["problem_with_ek_depth"] = result[paragraph_row][13]
         self.dict_data_well["problem_with_ek_diametr"] = result[paragraph_row][14]
+        try:
+            self.dict_data_well["head_column"] = data_list.ProtectedIsDigit(result[paragraph_row][16])
+        except:
+            print('отсутствуют данные по голове хвостовика')
         self.dict_data_well["dict_perforation_short"] = json.loads(result[paragraph_row][2])
 
         try:
-
             self.dict_data_well["ribbing_interval"] = json.loads(result[paragraph_row][15])
         except:
-            pass
+            print('отсутствуют данные по интервалам райбирования')
 
         definition_plast_work(self)
         return True
