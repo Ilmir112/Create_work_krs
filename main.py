@@ -1279,7 +1279,7 @@ class MyWindow(MyMainWindow):
             self.read_pz(fname)
             data_list.pause = True
             self.dict_data_well = self.read_excel_file()
-            read_pz = CreatePZ(self.dict_data_well, self.ws)
+            read_pz = CreatePZ(self.dict_data_well, self.ws, self)
             self.ws = read_pz.open_excel_file(self.ws, self.work_plan)
             self.rir_window = PvrApplication(self.table_pvr, self.dict_data_well)
             self.set_modal_window(self.rir_window)
@@ -1295,7 +1295,7 @@ class MyWindow(MyMainWindow):
             self.read_pz(fname)
             data_list.pause = True
             self.dict_data_well = self.read_excel_file()
-            read_pz = CreatePZ(self.dict_data_well, self.ws)
+            read_pz = CreatePZ(self.dict_data_well, self.ws, self)
             self.ws = read_pz.open_excel_file(self.ws, self.work_plan)
             self.rir_window = GisApplication(self.table_pvr, self.dict_data_well)
             self.rir_window.show()

@@ -323,9 +323,9 @@ class TabPageSoWith(TabPageUnion):
                 self.dictance_three_Label.setParent(None)
                 if first_template != 'фильтр направление':
                     template_str = f'перо {kot_str} + шаблон-{int(first_template)}мм L-{int(lenght_template_first)}м + ' \
-                                   f'НКТ{nkt_diam}м ' \
+                                   f'НКТ{nkt_diam}мм ' \
                                    f'{int(dictance_template_first)}м + {SKM_type}-{skm} +  ' \
-                                   f'НКТ{nkt_diam}м {int(dictance_template_second)}м + шаблон-{template_second}мм ' \
+                                   f'НКТ{nkt_diam}мм {int(dictance_template_second)}м + шаблон-{template_second}мм ' \
                                    f'L-{lenght_template_second}м '
 
                     self.dict_data_well["template_depth"] = int(current_bottom - int(dictance_template_first) -
@@ -343,7 +343,7 @@ class TabPageSoWith(TabPageUnion):
                     self.dictance_template_second_Edit.setText('1')
                     dictance_template_second = self.dictance_template_second_Edit.text()
                 # if dictance_template_second != None:
-                template_str = f'перо {kot_str}+ {SKM_type}-{skm} + НКТ{nkt_diam}м {dictance_template_second}м ' \
+                template_str = f'перо {kot_str}+ {SKM_type}-{skm} + НКТ{nkt_diam}мм {dictance_template_second}м ' \
                                f' + шаблон-{template_second}мм L-{lenght_template_second}м '
                 self.dict_data_well["template_depth"] = math.ceil(current_bottom - int(dictance_template_second))
                 self.dict_data_well["skm_depth"] = self.dict_data_well["template_depth"] + int(dictance_template_second)
@@ -352,8 +352,9 @@ class TabPageSoWith(TabPageUnion):
             elif self.template_Combo.currentText() == 'ПСШ открытый ствол':
                 # if dictance_template_second != None:
                 self.template_first_Edit.setText('фильтр направление')
-                template_str = f'фильтр-направление L {lenght_template_first}м {kot_str} + НКТ{nkt_diam}м {dictance_template_first}м ' \
-                               f'+ {SKM_type}-{skm} +  НКТ{nkt_diam}м {dictance_template_second}м + ' \
+                template_str = f'фильтр-направление L {lenght_template_first}м {kot_str} + НКТ{nkt_diam}мм ' \
+                               f'{dictance_template_first}м ' \
+                               f'+ {SKM_type}-{skm} +  НКТ{nkt_diam}мм {dictance_template_second}м + ' \
                                f'шаблон-{template_second}мм L-{lenght_template_second}м '
                 self.dict_data_well["template_depth"] = int(current_bottom - int(dictance_template_first) -
                                                             int(dictance_template_second) - int(lenght_template_first))
@@ -525,9 +526,10 @@ class TabPageSoWith(TabPageUnion):
                                         "column_additional_diametr"]._value < 110 else '73мм со снятыми фасками'
 
             if index == 'ПСШ ЭК':
-                template_str = f'перо {kot_str} + шаблон-{first_template}мм L-{lenght_template_first}м + НКТ{nkt_diam}м ' \
+                template_str = f'перо {kot_str} + шаблон-{first_template}мм L-{lenght_template_first}м + ' \
+                               f'НКТ{nkt_diam}мм ' \
                                f'{dictance_template_first}м + {SKM_type}-{skm} +  ' \
-                               f'НКТ{nkt_diam}м {dictance_template_second}м  +  шаблон-{template_second}мм ' \
+                               f'НКТ{nkt_diam}мм {dictance_template_second}м  +  шаблон-{template_second}мм ' \
                                f'L-{lenght_template_second}м '
 
                 # print(f'строка шаблона {template_str}')
@@ -564,8 +566,8 @@ class TabPageSoWith(TabPageUnion):
                 dictance_template_first = int(self.dictance_template_first_Edit.text())
                 dictance_template_second = int(self.dictance_template_second_Edit.text())
 
-                template_str = f'фильтр-направление {kot_str} + НКТ{nkt_diam}м {dictance_template_first}м ' \
-                               f'+ {SKM_type}-{skm} + {dictance_template_second}м НКТ{nkt_diam}м + ' \
+                template_str = f'фильтр-направление {kot_str} + НКТ{nkt_diam}мм {dictance_template_first}м ' \
+                               f'+ {SKM_type}-{skm} + {dictance_template_second}м НКТ{nkt_diam}мм + ' \
                                f'шаблон-{template_second}мм L-{lenght_template_second}м '
                 self.dict_data_well["template_depth"] = int(
                     current_bottom - dictance_template_first - dictance_template_second)

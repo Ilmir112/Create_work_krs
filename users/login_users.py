@@ -49,7 +49,6 @@ class LoginWindow(QWidget):
         self.box_layout.addWidget(self.button_register, 2, 2)
 
     def update_users(self):
-
         users_list = list(map(lambda x: x[1], self.get_list_users()))
         self.username.clear()
         self.username.addItems(users_list)
@@ -67,38 +66,37 @@ class LoginWindow(QWidget):
 
         db = connection_to_database(data_list.DB_NAME_USER)
 
-        user_service = UserService(db, db.path_index)
+        user_service = UserService(db)
 
         user_dict = user_service.get_user(last_name, first_name, second_name)
         if user_dict['last_name'] == last_name and user_dict['first_name'] == first_name \
                 and user_dict['second_name'] and user_dict['password'] == str(password):
             # mes = QMessageBox.information(self, 'Пароль', 'вход произведен')
-            self.close()
+
             data_list.user = (user_dict["pozition"] + ' ' + user_dict["organization"],
                               f'{user_dict["last_name"]} '
                               f'{user_dict["first_name"][0]}.{user_dict["second_name"][0]}.')
 
             data_list.contractor = user_dict["organization"]
 
-            data_list.pause = True
+            data_list.pause = False
+            self.close()
         else:
             QMessageBox.critical(self, 'Пароль', 'логин и пароль не совпадает')
-
-
-        data_list.pause = False
-
+            data_list.pause = True
 
         if 'РН' in data_list.contractor:
             data_list.connect_in_base = False
 
     def get_list_users(self):
         db = connection_to_database(data_list.DB_NAME_USER)
-        user_service = UserService(db, db.path_index)
+        user_service = UserService(db)
         users_list = user_service.get_users_list()
         return users_list
 
     def show_register_window(self):
         self.register_window = RegisterWindow()
+        self.register_window.setWindowModality(Qt.ApplicationModal)
         self.register_window.show()
 
 
@@ -193,7 +191,7 @@ class RegisterWindow(QWidget):
 
         db = connection_to_database(data_list.DB_NAME_USER)
 
-        registration = RegistrationService(db, db.path_index)
+        registration = RegistrationService(db)
 
         existing_user = registration.check_user_in_database(last_name, first_name, second_name)
 

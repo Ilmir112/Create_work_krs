@@ -93,45 +93,4 @@ def excel_to_html(excel_file):
 
     return html
 
-# # Пример использования
-# excel_file = 'data.xlsx'
-# html_code = excel_to_html(excel_file)
-#
-# # Сохранение HTML-кода в файл
-# with open('data.html', 'w') as f:
-#     f.write(html_code)
 
-guery = f'CREATE TABLE chemistry ' \
-        f'(well_number TEXT,'\
-        f'well_area TEXT,'\
-        f'region TEXT,'\
-        f'costumer TEXT,'\
-        f'contractor TEXT,'\
-        f'work_plan TEXT,'\
-        f'type_kr TEXT,'\
-        f'today DATE,'\
-        f'cement FLOAT,'\
-        f'HCl FLOAT,'\
-        f'HF FLOAT,'\
-        f'NaOH FLOAT,'\
-        f'VT_SKO FLOAT,'\
-        f'clay FLOAT,'\
-        f'sand FLOAT,'\
-        f'RPK FLOAT,'\
-        f'RPP FLOAT,'\
-        f'RKI FLOAT,'\
-        f'ELAN FLOAT,'\
-        f'ASPO FLOAT,'\
-        f'RIR_2C FLOAT,'\
-        f'RIR_OVP FLOAT,'\
-        f'gidrofabizator FLOAT,'\
-        f'norm_time FLOAT,'\
-        f'fluid TEXT)'
-
-#
-# {'пункт': [], 'цемент': 0, 'HCl': 0, 'HF': 0, 'NaOH': 0, 'ВТ СКО': 0,
-#                          'Глина': 0, 'растворитель': 0, 'уд.вес': 0,
-#                          'песок': 0, 'РПК': 0, 'РПП': 0, "извлекаемый пакер": 0, "ЕЛАН": 0}
-
-
-ClassifierWell.insert_database('well_data', "data_work", guery)

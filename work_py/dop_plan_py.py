@@ -1078,7 +1078,6 @@ class DopPlanWindow(WindowUnion):
 
     def extraction_data(self, table_name, paragraph_row=0):
 
-
         date_table = table_name.split(' ')[-1]
         well_number = table_name.split(' ')[0]
         well_area = table_name.split(' ')[1]

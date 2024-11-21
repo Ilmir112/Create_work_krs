@@ -293,7 +293,7 @@ class UpdateThread(QThread):
         print(f'папка архива {new_extract_dir}')
         # Файл databaseWell.db существует, перемещаем все, кроме исключений
         for filename in os.listdir(new_extract_dir):
-            if filename not in ["databaseWell.db", "data_list.pdb", "users.db", 'version_app.json', 'my_app.log']:
+            if filename not in ["databaseWell.db", "data_list.pdb", "krs2.db", 'version_app.json', 'my_app.log']:
                 source_path = os.path.join(new_extract_dir, filename)[:-len('/zima')]
                 print(f'source_path {source_path}')
                 absolute_path = os.path.abspath(__file__)

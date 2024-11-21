@@ -25,7 +25,6 @@ class DatabaseConnection(ABC):
 
 class PostgresConnection(DatabaseConnection):
     def __init__(self, db_name):
-
         self.db_name = db_name
         self.path_index = '%s'
 
@@ -53,11 +52,29 @@ class PostgresConnection(DatabaseConnection):
 
             return connection
         except Exception as e:
-            QMessageBox.warning(None, 'Ошибка', f'Ошибка подключения к базе {type(e).__name__}\n\n{str(e)}')
+            print(f'Ошибка подключения к базе {type(e).__name__}\n\n{str(e)}')
             return None
 
     def fetch_user(self, last_name: str, first_name: str, second_name: str) -> Dict:
         return {'id': first_name, 'last_name': last_name}
+
+
+class CursorContext:
+    def __init__(self, connection):
+        self.connection = connection
+
+    def __enter__(self):
+        try:
+            self.cursor = self.connection.cursor()
+            return self.cursor
+        except:
+            return self.connection
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        try:
+            self.cursor.close()
+        except:
+            pass
 
 
 class SqlLiteConnection(DatabaseConnection):
@@ -85,22 +102,20 @@ class SqlLiteConnection(DatabaseConnection):
             QMessageBox.warning(None, 'Ошибка', f'Ошибка подключения к базе {type(e).__name__}\n\n{str(e)}')
             return None
 
-        # Assume connection is made
-
     def fetch_user(self, last_name: str, first_name: str, second_name: str) -> Dict:
         return {'id': first_name, 'last_name': last_name}
 
 
 class UserService:
-    def __init__(self, connect_to_database: DatabaseConnection, path_index="%s"):
+    def __init__(self, connect_to_database: DatabaseConnection):
         self.db_connection = connect_to_database.connect_to_database()
-        self.path_index = path_index
+        self.path_index = connect_to_database.path_index
 
     def get_user(self, last_name: str, first_name: str, second_name: str) -> Dict:
 
         if not self.db_connection:
             return None
-        with self.db_connection.cursor() as cursor:
+        with CursorContext(self.db_connection.cursor()) as cursor:
             cursor.execute(
                 f"SELECT last_name, first_name, second_name, password, position_in, organization FROM users "
                 f"WHERE last_name=({self.path_index}) AND first_name=({self.path_index}) "
@@ -122,7 +137,7 @@ class UserService:
 
         if not self.db_connection:
             return None
-        with self.db_connection.cursor() as cursor:
+        with CursorContext(self.db_connection.cursor()) as cursor:
             cursor.execute("SELECT last_name, first_name, second_name, position_in, organization  FROM users")
 
             users = cursor.fetchall()
@@ -137,15 +152,15 @@ class UserService:
 
 
 class RegistrationService:
-    def __init__(self, connect_to_database: DatabaseConnection, path_index="%s"):
+    def __init__(self, connect_to_database: DatabaseConnection):
         self.db_connection = connect_to_database.connect_to_database()
-        self.path_index = path_index
+        self.path_index = connect_to_database.path_index
 
     def check_user_in_database(self, last_name, first_name, second_name) -> List:
 
         if not self.db_connection:
             return None
-        with self.db_connection.cursor() as cursor:
+        with CursorContext(self.db_connection.cursor()) as cursor:
             # Проверяем, существует ли пользователь с таким именем
             cursor.execute(f"SELECT last_name, first_name, second_name  FROM users "
                            f"WHERE last_name=({self.path_index}) AND first_name=({self.path_index}) "
@@ -160,8 +175,8 @@ class RegistrationService:
 
         if not self.db_connection:
             return None
-        with self.db_connection.cursor() as cursor:
-            self.cursor.execute(
+        with CursorContext(self.db_connection.cursor()) as cursor:
+            cursor.execute(
                 f"INSERT INTO users ("
                 f"last_name, first_name, second_name, position_in, organization, password) "
                 f"VALUES ({self.path_index},{self.path_index}, {self.path_index}, {self.path_index},"
@@ -172,21 +187,20 @@ class RegistrationService:
 
 
 class WorkDatabaseWell:
-    def __init__(self, connect_to_database: DatabaseConnection, dict_data_well=None, path_index="%s"):
+    def __init__(self, connect_to_database: DatabaseConnection, dict_data_well=None):
         self.db_connection = connect_to_database.connect_to_database()
-        self.path_index = path_index
+        self.path_index = connect_to_database.path_index
         self.dict_data_well = dict_data_well
 
     def get_tables_starting_with(self, well_number, well_area, work_plan, type_kr):
         if not self.db_connection:
             return None
-        with self.db_connection.cursor() as cursor:
-            cursor.execute(f"""
-                                    SELECT well_number, area_well, type_kr, work_plan
-                                    FROM wells
-                                    WHERE well_number={self.path_index} AND area_well={self.path_index} 
-                                    AND type_kr={self.path_index} AND work_plan={self.path_index}""",
-                           (str(well_number), well_area, type_kr, work_plan))
+        with CursorContext(self.db_connection.cursor()) as cursor:
+            query = f"""SELECT well_number, area_well, type_kr, work_plan
+                                FROM wells
+                                WHERE well_number={self.path_index} AND area_well={self.path_index} 
+                                AND type_kr={self.path_index} AND work_plan={self.path_index}"""
+            cursor.execute(query, (str(well_number), well_area, type_kr, work_plan))
 
             rezult = cursor.fetchone()
             return rezult
@@ -216,7 +230,8 @@ class WorkDatabaseWell:
                                      costumer: str, data_well_dict: str, excel: str, work_plan: str) -> None:
         data_well = json.dumps(data_well_dict, ensure_ascii=False)
         excel_json = json.dumps(excel, ensure_ascii=False)
-        date_today = datetime.now()
+        date_today = datetime.now().strftime('%Y-%m-%d')
+
         type_kr = self.dict_data_well["type_kr"].split(' ')[0]
         adedaas = self.dict_data_well["data_list"]
         data_paragraph = json.dumps(self.dict_data_well["data_list"], ensure_ascii=False)
@@ -245,7 +260,7 @@ class WorkDatabaseWell:
         try:
             if not self.db_connection:
                 return None
-            with self.db_connection.cursor() as cursor:
+            with CursorContext(self.db_connection.cursor()) as cursor:
                 row_exists = self.determining_well_in_database(cursor, well_number, well_area,
                                                                contractor, costumer, work_plan_str)
                 if row_exists:
@@ -398,7 +413,7 @@ class WorkDatabaseWell:
     def read_excel_in_base(self, number_well, area_well, work_plan, type_kr):
         if not self.db_connection:
             return None
-        with self.db_connection.cursor() as cursor:
+        with CursorContext(self.db_connection.cursor()) as cursor:
             cursor.execute(f"SELECT excel_json "
                            f"FROM wells "
                            f"WHERE well_number = {self.path_index} AND area_well = {self.path_index} "
@@ -411,7 +426,7 @@ class WorkDatabaseWell:
     def extraction_data(self, well_number, well_area, type_kr, work_plan, date_table, contractor):
         if not self.db_connection:
             return None
-        with self.db_connection.cursor() as cursor:
+        with CursorContext(self.db_connection.cursor()) as cursor:
             query = f'''
                     SELECT data_change_paragraph, data_well, type_kr, category_dict, angle_data FROM wells 
                     WHERE well_number={self.path_index} AND area_well={self.path_index} AND type_kr={self.path_index} 
@@ -426,7 +441,7 @@ class WorkDatabaseWell:
     def check_well_in_database_well_data(self, number_well: str) -> List:
         if not self.db_connection:
             return None
-        with self.db_connection.cursor() as cursor:
+        with CursorContext(self.db_connection.cursor()) as cursor:
             cursor.execute(
                 f"SELECT well_number, area_well, type_kr, today, work_plan FROM wells "
                 f"WHERE well_number={self.path_index} AND contractor={self.path_index} AND costumer ={self.path_index}",
@@ -439,8 +454,9 @@ class WorkDatabaseWell:
     def check_in_database_well_data(self, number_well, area_well, work_plan, today):
         if not self.db_connection:
             return None
-        with self.db_connection.cursor() as cursor:
-            cursor.execute(f"SELECT data_well, today, type_kr, category_dict, well_oilfield, appointment, inv_number, wellhead_fittings "
+        with CursorContext(self.db_connection.cursor()) as cursor:
+            cursor.execute(f"SELECT data_well, today, type_kr, category_dict, well_oilfield, "
+                           f"appointment, inv_number, wellhead_fittings, angle_data "
                            f"FROM wells "
                            f"WHERE well_number = {self.path_index} AND area_well = {self.path_index} "
                            f"AND contractor = {self.path_index} AND costumer = {self.path_index} AND "
@@ -454,7 +470,7 @@ class WorkDatabaseWell:
     def check_in_database_dp_data(self, number_well, area_well, work_plan):
         if not self.db_connection:
             return None
-        with self.db_connection.cursor() as cursor:
+        with CursorContext(self.db_connection.cursor()) as cursor:
             cursor.execute(f"SELECT data_well, today, type_kr, category_dict "
                            f"FROM wells "
                            f"WHERE well_number = {self.path_index} AND area_well = {self.path_index} "
@@ -471,7 +487,7 @@ class WorkDatabaseWell:
 class CheckWellExistence:
     def __init__(self, connect_to_database: DatabaseConnection, path_index="%s"):
         self.db_connection = connect_to_database.connect_to_database()
-        self.path_index = path_index
+        self.path_index = connect_to_database.path_index
 
     @staticmethod
     def check_correct_month():
@@ -498,7 +514,7 @@ class CheckWellExistence:
 
         if not self.db_connection:
             return None
-        with self.db_connection.cursor() as cursor:
+        with CursorContext(self.db_connection.cursor()) as cursor:
             self.drop_table(cursor, region_name)
 
             # Создание таблицы в базе данных
@@ -513,7 +529,7 @@ class CheckWellExistence:
                                             version_year: str, region_name: str, costumer: str):
         if not self.db_connection:
             return None
-        with self.db_connection.cursor() as cursor:
+        with CursorContext(self.db_connection.cursor()) as cursor:
             query = f"INSERT INTO {region_name} (well_number, deposit_area, today, region, costumer) " \
                     f"VALUES ({self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, " \
                     f"{self.path_index})"
@@ -527,7 +543,7 @@ class CheckWellExistence:
 
         if not self.db_connection:
             return None
-        with self.db_connection.cursor() as cursor:
+        with CursorContext(self.db_connection.cursor()) as cursor:
             self.drop_table(cursor, region_name)
             # Создание таблицы, если она не существует
             cursor.execute(f"""
@@ -616,7 +632,7 @@ class CheckWellExistence:
                                       gas_factor, version_year, region, costumer):
         if not self.db_connection:
             return None
-        with self.db_connection.cursor() as cursor:
+        with CursorContext(self.db_connection.cursor()) as cursor:
             cursor.execute(f"""
                             INSERT INTO {region_name} (
                                 cdng, well_number, deposit_area, oilfield,
@@ -671,7 +687,7 @@ class CheckWellExistence:
         stop_app = self.checking_well_database_month(region)
         if not self.db_connection:
             return None
-        with self.db_connection.cursor() as cursor:
+        with CursorContext(self.db_connection.cursor()) as cursor:
             # Проверка наличия записи в базе данных
             cursor.execute(f"SELECT * "
                            f"FROM {region} "
@@ -691,7 +707,7 @@ class CheckWellExistence:
     def check_category(self, well_number: str, deposit_area: str, region: str) -> List:
         if not self.db_connection:
             return None
-        with self.db_connection.cursor() as cursor:
+        with CursorContext(self.db_connection.cursor()) as cursor:
             # Проверка наличия записи в базе данных
             query = f"SELECT categoty_pressure, categoty_h2s, categoty_gf, today FROM {region}_классификатор " \
                     f"WHERE well_number =({self.path_index}) and deposit_area =({self.path_index})"
@@ -703,19 +719,19 @@ class CheckWellExistence:
 
     def get_data_from_class_well_db(self, region) -> List:
         # Выполнение SQL-запроса для получения данных
-        with self.db_connection.cursor() as cur:
+        with CursorContext(self.db_connection.cursor()) as cur:
             cur.execute(f"""
-                                        SELECT cdng, well_number, deposit_area, oilfield, categoty_pressure,
-                                               pressure_Ppl, pressure_Gst, date_measurement, categoty_h2s,
-                                               h2s_pr, h2s_mg_l, h2s_mg_m, categoty_gf, gas_factor, today
-                                        FROM {region};
+                        SELECT cdng, well_number, deposit_area, oilfield, categoty_pressure,
+                               pressure_Ppl, pressure_Gst, date_measurement, categoty_h2s,
+                               h2s_pr, h2s_mg_l, h2s_mg_m, categoty_gf, gas_factor, today
+                        FROM {region};
                                     """)
             data = cur.fetchall()
             return data
 
     def get_data_from_db(self, region: str) -> List:
         # Выполнение SQL-запроса для получения данных
-        with self.db_connection.cursor() as cur:
+        with CursorContext(self.db_connection.cursor()) as cur:
             cur.execute(f"""
                                 SELECT well_number, deposit_area, today
                                 FROM {region};
@@ -728,12 +744,12 @@ class CheckWellExistence:
 class GnktDatabaseWell:
     def __init__(self, connect_to_database: DatabaseConnection, path_index="%s"):
         self.db_connection = connect_to_database.connect_to_database()
-        self.path_index = path_index
+        self.path_index = connect_to_database.path_index
 
     def check_data_base_gnkt(self, contractor, well_number, well_area):
         if not self.db_connection:
             return None
-        with self.db_connection.cursor() as self.cursor:
+        with CursorContext(self.db_connection.cursor()) as self.cursor:
             filenames = f"{well_number} {well_area} "
 
             query = f"SELECT * FROM gnkt_{contractor} WHERE well_number LIKE ({self.path_index})"
@@ -749,7 +765,7 @@ class GnktDatabaseWell:
         well_area = previuos_well.split(' ')[1]
         if not self.db_connection:
             return None
-        with self.db_connection.cursor() as cursor:
+        with CursorContext(self.db_connection.cursor()) as cursor:
             query = f"SELECT * FROM gnkt_{contractor} WHERE well_number LIKE ({self.path_index})"
             filenames = f"{well_number} {well_area} "
             # Выполнение запроса
@@ -761,7 +777,7 @@ class GnktDatabaseWell:
                               pipe_mileage, pipe_fatigue, previous_well, current_datetime, pvo):
         if not self.db_connection:
             return None
-        with self.db_connection.cursor() as cursor:
+        with CursorContext(self.db_connection.cursor()) as cursor:
             data_values = (gnkt_number, well_name, gnkt_length, diametr_length, iznos,
                            pipe_mileage, pipe_fatigue, previous_well, current_datetime, pvo)
 
@@ -781,7 +797,7 @@ class GnktDatabaseWell:
     def read_database_gnkt(self, contractor, gnkt_number):
         if not self.db_connection:
             return None
-        with self.db_connection.cursor() as cursor:
+        with CursorContext(self.db_connection.cursor()) as cursor:
             cursor.execute(f"SELECT * FROM gnkt_{contractor} WHERE gnkt_number =(%s)", (gnkt_number,))
             return cursor.fetchall()
 
@@ -793,14 +809,14 @@ def connection_to_database(DB_NAME):
             db.connect_to_database()
 
         except psycopg2.Error as e:
-            QMessageBox.warning(None, 'Ошибка',
-                                f'Ошибка подключения к базе данных, '
-                                f'проверьте наличие интернета {type(e).__name__}\n\n{str(e)}')
+            data_list.connect_in_base = False
+            print(f'Ошибка подключения к базе данных, проверьте наличие интернета {type(e).__name__}\n\n{str(e)}')
+            return None
         return db
-
     else:
+        DB_NAME = f'{DB_NAME}.db'
         try:
-            db = SqlLiteConnection('users.db')
+            db = SqlLiteConnection(DB_NAME)
             db.connect_to_database()
         except sqlite3.Error as e:
             QMessageBox.warning(None, 'Ошибка',
@@ -817,7 +833,7 @@ def connection_to_database(DB_NAME):
 # # Функция подключения к базе данных
 def connect_to_database(DB_NAME):
     conn = connection_to_database(DB_NAME)
-    if conn.path_index == '?':
+    if conn is None:
         QMessageBox.information(None, 'Проверка соединения',
                                 'Проверка показало что с облаком соединения нет, '
                                 'будет использована локальная база данных')
