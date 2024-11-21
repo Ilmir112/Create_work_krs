@@ -917,9 +917,9 @@ class DopPlanWindow(WindowUnion):
                     self.dict_data_well["wellhead_fittings"] = data_well[7]
                     self.dict_data_well["emergency_well"] = False
                     if data_well[8]:
-                        self.dict_data_well["angle_data"] = None
-                    else:
                         self.dict_data_well["angle_data"] = json.loads(data_well[8])
+                    else:
+                        self.dict_data_well["angle_data"] = []
 
             self.dict_data_well["current_bottom"] = current_bottom
 

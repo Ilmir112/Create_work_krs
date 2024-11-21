@@ -330,8 +330,9 @@ def definition_plast_work(self):
                     perforation_sole = sole
         zhgs = 1.01
         if "вертикаль" in list(self.dict_data_well["dict_perforation"][plast].keys()):
-            vertical = min(self.dict_data_well["dict_perforation"][plast]["вертикаль"])
-            pressuar = float(max(self.dict_data_well["dict_perforation"][plast]['давление']))
+
+            vertical = min(filter(lambda x: type(x) in [float, int], self.dict_data_well["dict_perforation"][plast]["вертикаль"]))
+            pressuar = float(max(filter(lambda x: type(x) in [float, int], self.dict_data_well["dict_perforation"][plast]['давление'])))
             if vertical and pressuar:
                 zhgs = calculation_fluid_work(self.dict_data_well, vertical,pressuar)
                 self.dict_data_well["dict_perforation"].setdefault(plast, {}).setdefault('рабочая жидкость',
