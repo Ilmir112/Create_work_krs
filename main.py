@@ -1712,13 +1712,13 @@ class MyWindow(MyMainWindow):
         alone_menu.addAction(konte_action)
         konte_action.triggered.connect(self.konte_action)
 
-        definition_Q_action = QAction("Определение приемитости по НКТ", self)
-        alone_menu.addAction(definition_Q_action)
-        definition_Q_action.triggered.connect(self.definition_Q)
+        definition_q_action = QAction("Определение приемитости по НКТ", self)
+        alone_menu.addAction(definition_q_action)
+        definition_q_action.triggered.connect(self.definition_q)
 
-        definition_Q_NEK_action = QAction("Определение приемитости по затрубу", self)
-        alone_menu.addAction(definition_Q_NEK_action)
-        definition_Q_NEK_action.triggered.connect(self.definition_Q_nek)
+        definition_q_NEK_action = QAction("Определение приемитости по затрубу", self)
+        alone_menu.addAction(definition_q_NEK_action)
+        definition_q_NEK_action.triggered.connect(self.definition_q_nek)
 
         kot_action = QAction('Система обратных клапанов')
         alone_menu.addAction(kot_action)
@@ -1899,7 +1899,7 @@ class MyWindow(MyMainWindow):
             self.dict_data_well["cat_P_1"] = []
             data_list.countAcid = 0
             self.dict_data_well["first_pressure"] = ProtectedIsDigit(0)
-            data_list.swabTypeComboIndex = 1
+            data_list.swab_type_comboIndex = 1
             data_list.swab_true_edit_type = 1
             self.dict_data_well["data_x_max"] = ProtectedIsDigit(0)
             self.dict_data_well["drilling_interval"] = []
@@ -1907,7 +1907,7 @@ class MyWindow(MyMainWindow):
             data_list.pakerTwoSKO = False
             data_list.privyazkaSKO = 0
             self.dict_data_well["h2s_pr"] = []
-            self.dict_data_well["cat_h2s_list"] = []
+            self.dict_data_well["category_h2s_list"] = []
             self.dict_data_well["dict_perforation_short"] = {}
             self.dict_data_well["h2s_mg"] = []
             data_list.lift_key = 0
@@ -2118,15 +2118,15 @@ class MyWindow(MyMainWindow):
         privyazka_nkt_list = privyazka_nkt(self)
         self.populate_row(self.ins_ind, privyazka_nkt_list, self.table_widget)
 
-    def definition_Q(self):
-        from work_py.alone_oreration import definition_Q
-        definition_Q_list = definition_Q(self)
-        self.populate_row(self.ins_ind, definition_Q_list, self.table_widget)
+    def definition_q(self):
+        from work_py.alone_oreration import definition_q
+        definition_q_list = definition_q(self)
+        self.populate_row(self.ins_ind, definition_q_list, self.table_widget)
 
-    def definition_Q_nek(self):
-        from work_py.alone_oreration import definition_Q_nek
-        definition_Q_list = definition_Q_nek(self)
-        self.populate_row(self.ins_ind, definition_Q_list, self.table_widget)
+    def definition_q_nek(self):
+        from work_py.alone_oreration import definition_q_nek
+        definition_q_list = definition_q_nek(self)
+        self.populate_row(self.ins_ind, definition_q_list, self.table_widget)
 
     def kot_work(self):
         from work_py.alone_oreration import kot_work

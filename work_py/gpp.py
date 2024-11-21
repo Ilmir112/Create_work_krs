@@ -97,19 +97,19 @@ class GppWindow(WindowUnion):
         diametr_paker = int(float(self.tabWidget.currentWidget().diametr_paker_edit.text()))
         paker_depth = int(float(self.tabWidget.currentWidget().paker_depth_edit.text()))
         current_depth = int(float(self.tabWidget.currentWidget().current_depth_edit.text()))
-        gisOTZ_after_true_quest = self.tabWidget.currentWidget().otz_after_question_QCombo.currentText()
+        gis_otz_after_true_quest = self.tabWidget.currentWidget().otz_after_question_QCombo.currentText()
 
         if int(paker_depth) > self.dict_data_well["current_bottom"]:
             QMessageBox.warning(self, 'Некорректные данные', f'Компоновка НКТ c хвостовик + пакер '
                                                              f'ниже текущего забоя')
             return
-        work_list = self.grpGpp(paker_depth, current_depth, diametr_paker, gisOTZ_after_true_quest)
+        work_list = self.grpGpp(paker_depth, current_depth, diametr_paker, gis_otz_after_true_quest)
+        if work_list:
+            self.populate_row(self.ins_ind, work_list, self.table_widget)
+            data_list.pause = False
+            self.close()
 
-        self.populate_row(self.ins_ind, work_list, self.table_widget)
-        data_list.pause = False
-        self.close()
-
-    def grpGpp(self, gpp_depth, current_depth, diametr_paker, gisOTZ_after_true_quest):
+    def grpGpp(self, gpp_depth, current_depth, diametr_paker, gis_otz_after_true_quest):
 
         if 'Ойл' in data_list.contractor:
             schema_grp = '7'
@@ -118,8 +118,10 @@ class GppWindow(WindowUnion):
 
         nkt_diam = ''.join(['89' if self.dict_data_well["column_diametr"]._value > 110 else '60'])
 
-        gPP_300 = self.check_depth_in_skm_interval(gpp_depth)
-        # print(self.table_widget)
+        gpp_300 = self.check_depth_in_skm_interval(300)
+        if gpp_300 is False:
+            return
+
 
         main.MyWindow.check_gpp_upa(self, self.table_widget)
 
@@ -255,7 +257,7 @@ class GppWindow(WindowUnion):
              'Мастер КРС, представ. заказчика', liftingNKT_norm(gpp_depth, 1.2)],
         ]
 
-        for row in GrpWindow.normalization(self, current_depth, diametr_paker, gisOTZ_after_true_quest):
+        for row in GrpWindow.normalization(self, current_depth, diametr_paker, gis_otz_after_true_quest):
             gpp_list.append(row)
 
         return gpp_list

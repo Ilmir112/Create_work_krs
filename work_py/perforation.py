@@ -307,9 +307,9 @@ class PerforationWindow(WindowUnion):
         type_perforation = self.tabWidget.currentWidget().combobox_type_perforation.currentText()
         if len(self.dict_data_well["cat_P_1"]) > 1:
             self.dict_data_well["category_pressuar"] = self.dict_data_well["cat_P_1"][1]
-            self.dict_data_well["category_h2s"] = self.dict_data_well["cat_h2s_list"][1]
+            self.dict_data_well["category_h2s"] = self.dict_data_well["category_h2s_list"][1]
             self.dict_data_well["category_gf"] = self.dict_data_well["cat_gaz_f_pr"][1]
-            kateg2 = [1 if str(self.dict_data_well["cat_P_1"][1]) == '1' or str(self.dict_data_well["cat_h2s_list"][1]) == '1' else 2][0]
+            kateg2 = [1 if str(self.dict_data_well["cat_P_1"][1]) == '1' or str(self.dict_data_well["category_h2s_list"][1]) == '1' else 2][0]
 
             if self.dict_data_well["kat_pvo"] < kateg2:
                 self.dict_data_well["kat_pvo"] = kateg2

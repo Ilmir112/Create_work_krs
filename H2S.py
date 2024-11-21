@@ -218,8 +218,8 @@ def well_volume(self, current_bottom):
         return volume_well
 
 
-def calv_h2s(self, cat_H2S, h2s_mg, h2s_pr):
-    if '2' in str(cat_H2S) or '1' in str(cat_H2S):
+def calv_h2s(self, category_h2s, h2s_mg, h2s_pr):
+    if '2' in str(category_h2s) or '1' in str(category_h2s):
         nkt_l = sum(list(self.dict_data_well["dict_nkt"].values()))
         # Внутренний объем ЭК на 1 п.м.
         udel_vnutr_v = round(10 * 3.14 * (

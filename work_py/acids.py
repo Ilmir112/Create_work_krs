@@ -23,7 +23,6 @@ class TabPageDp(TabPageUnion):
         self.poins_sko_Label = QLabel("точки обработки", self)
         self.poins_sko_edit = QLineEdit(self)
 
-
         plast_work = ['']
         plast_work.extend(self.dict_data_well['plast_work'])
 

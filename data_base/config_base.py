@@ -227,6 +227,7 @@ class WorkDatabaseWell:
         inv_number = self.dict_data_well["inv_number"]._value
         appointment = self.dict_data_well["appointment"]._value
         category_dict = json.dumps(self.dict_data_well["dict_category"], ensure_ascii=False)
+        angle_data = json.dumps(self.dict_data_well["angle_data"], ensure_ascii=False)
 
 
         # print(row, self.dict_data_well["count_row_well"])
@@ -281,12 +282,12 @@ class WorkDatabaseWell:
                             f"{self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, " \
                             f"{self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, " \
                             f"{self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, " \
-                            f"{self.path_index}, {self.path_index})"
+                            f"{self.path_index}, {self.path_index}, {self.path_index})"
 
                     data_values = (str(well_number), well_area,
                                    data_well, date_today, excel_json, contractor, data_list.costumer, work_plan_str,
                                    data_list.user[1], type_kr, data_paragraph, cdng, category_dict,
-                                   well_oilfield, appointment, str(inv_number), wellhead_fittings)
+                                   well_oilfield, appointment, str(inv_number), wellhead_fittings, angle_data)
 
                     # Выполнение запроса с использованием параметров
                     cursor.execute(query, data_values)
@@ -358,7 +359,7 @@ class WorkDatabaseWell:
             AND costumer={self.path_index} AND contractor={self.path_index} AND work_plan={self.path_index} 
             AND type_kr={self.path_index}
            """
-        aasaw = data_work[:7]
+
         cursor.execute(query, (data_work[:7]))
 
         row_exists = cursor.fetchone()
@@ -412,7 +413,7 @@ class WorkDatabaseWell:
             return None
         with self.db_connection.cursor() as cursor:
             query = f'''
-                    SELECT data_change_paragraph, data_well, type_kr, category_dict FROM wells 
+                    SELECT data_change_paragraph, data_well, type_kr, category_dict, angle_data FROM wells 
                     WHERE well_number={self.path_index} AND area_well={self.path_index} AND type_kr={self.path_index} 
                     AND work_plan={self.path_index} AND today={self.path_index} AND contractor={self.path_index}'''
 

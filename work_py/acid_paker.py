@@ -208,8 +208,8 @@ class TabPageSoAcid(TabPageUnion):
         self.paker_khost = QLineEdit(self)
 
         self.need_privyazka_Label = QLabel("Привязка оборудования", self)
-        self.need_privyazka_QCombo = QComboBox()
-        self.need_privyazka_QCombo.addItems(['Нет', 'Да'])
+        self.need_privyazka_q_combo = QComboBox()
+        self.need_privyazka_q_combo.addItems(['Нет', 'Да'])
 
         plast_work = ['']
         plast_work.extend(self.dict_data_well['plast_work'])
@@ -268,17 +268,22 @@ class TabPageSoAcid(TabPageUnion):
         self.acidOilProcEdit.setText('0')
 
         self.swabTypeLabel = QLabel("задача при освоении", self)
-        self.swabTypeCombo = QComboBox(self)
-        self.swabTypeCombo.addItems(['Задача №2.1.13', 'Задача №2.1.16', 'Задача №2.1.11', 'ГРР', 'своя задача'])
-        self.swabTypeCombo.setCurrentIndex(data_list.swabTypeComboIndex)
-        self.swabTypeCombo.setProperty('value', 'Задача №2.1.16')
-
+        self.swab_type_combo = QComboBox(self)
+        self.swab_type_combo.addItems(['Задача №2.1.13', 'Задача №2.1.16', 'Задача №2.1.11', 'ГРР', 'своя задача'])
+        self.swab_type_combo.setCurrentIndex(data_list.swab_type_comboIndex)
+                
         self.swab_pakerLabel = QLabel("Глубина посадки нижнего пакера при освоении", self)
         self.swab_paker_depth = QLineEdit(self)
 
         self.swab_volumeLabel = QLabel("объем освоения", self)
-        self.swab_volumeEdit = QLineEdit(self)
-        self.swab_volumeEdit.setText('20')
+        self.swab_volume_edit = QLineEdit(self)
+        
+        if self.dict_data_well["curator"] in ['КР', 'АР']:
+            self.swab_type_combo.setProperty('value', 'Задача №2.1.16')
+            self.swab_volume_edit.setText('20')
+        else:
+            self.swab_type_combo.setProperty('value', 'Задача №2.1.13')
+            self.swab_volume_edit.setText('25')
 
         self.iron_label_type = QLabel("необходимость стабилизатора железа", self)
         self.iron_true_combo = QComboBox(self)
@@ -340,7 +345,7 @@ class TabPageSoAcid(TabPageUnion):
         self.grid.addWidget(self.paker2Label, 2, 6)
         self.grid.addWidget(self.paker2_depth, 3, 6)
         self.grid.addWidget(self.need_privyazka_Label, 2, 7)
-        self.grid.addWidget(self.need_privyazka_QCombo, 3, 7)
+        self.grid.addWidget(self.need_privyazka_q_combo, 3, 7)
 
         self.grid.addWidget(self.pressure_zumph_question_Label, 2, 8)
         self.grid.addWidget(self.pressure_zumph_question_QCombo, 3, 8)
@@ -379,11 +384,11 @@ class TabPageSoAcid(TabPageUnion):
         self.grid.addWidget(self.Qplast_labelType, 6, 1)
         self.grid.addWidget(self.QplastEdit, 7, 1)
         self.grid.addWidget(self.swabTypeLabel, 8, 1)
-        self.grid.addWidget(self.swabTypeCombo, 9, 1)
+        self.grid.addWidget(self.swab_type_combo, 9, 1)
         self.grid.addWidget(self.swab_pakerLabel, 8, 2)
         self.grid.addWidget(self.swab_paker_depth, 9, 2)
         self.grid.addWidget(self.swab_volumeLabel, 8, 3)
-        self.grid.addWidget(self.swab_volumeEdit, 9, 3)
+        self.grid.addWidget(self.swab_volume_edit, 9, 3)
         self.grid.addWidget(self.Qplast_after_labelType, 10, 1)
         self.grid.addWidget(self.Qplast_after_edit, 11, 1)
 
@@ -662,7 +667,7 @@ class TabPageSoAcid(TabPageUnion):
                 for plast in self.dict_data_well["dict_perforation"]:
                     if any(abs(paker_depth - roof) < 10 or abs(paker_depth - sole) < 10
                            for roof, sole in self.dict_data_well["dict_perforation"][plast]['интервал']):
-                        self.need_privyazka_QCombo.setCurrentIndex(1)
+                        self.need_privyazka_q_combo.setCurrentIndex(1)
 
         if self.paker_layout_combo.currentText() in ['однопакерная', 'однопакерная, упорный', 'пакер с заглушкой']:
 
@@ -706,18 +711,18 @@ class TabPageSoAcid(TabPageUnion):
     def update_need_swab(self, index):
         if index == 'Нужно освоение':
             self.grid.addWidget(self.swabTypeLabel, 8, 1)
-            self.grid.addWidget(self.swabTypeCombo, 9, 1)
+            self.grid.addWidget(self.swab_type_combo, 9, 1)
             self.grid.addWidget(self.swab_pakerLabel, 8, 2)
             self.grid.addWidget(self.swab_paker_depth, 9, 2)
             self.grid.addWidget(self.swab_volumeLabel, 8, 3)
-            self.grid.addWidget(self.swab_volumeEdit, 9, 3)
+            self.grid.addWidget(self.swab_volume_edit, 9, 3)
         else:
             self.swabTypeLabel.setParent(None)
-            self.swabTypeCombo.setParent(None)
+            self.swab_type_combo.setParent(None)
             self.swab_pakerLabel.setParent(None)
             self.swab_paker_depth.setParent(None)
             self.swab_volumeLabel.setParent(None)
-            self.swab_volumeEdit.setParent(None)
+            self.swab_volume_edit.setParent(None)
 
 
 class TabWidget(TabWidgetUnion):
@@ -878,8 +883,8 @@ class AcidPakerWindow(WindowUnion):
     def add_work(self):
 
         try:
-            self.need_privyazka_QCombo = self.tabWidget.currentWidget().need_privyazka_QCombo.currentText()
-            if self.need_privyazka_QCombo == 'Да':
+            self.need_privyazka_q_combo = self.tabWidget.currentWidget().need_privyazka_q_combo.currentText()
+            if self.need_privyazka_q_combo == 'Да':
                 mes = QMessageBox.question(self, 'Привязка', 'Расстояние между пакером и ИП меньше 10м. '
                                                              'Нужна привязка корректно ли?')
                 if mes == QMessageBox.StandardButton.No:
@@ -1094,15 +1099,18 @@ class AcidPakerWindow(WindowUnion):
 
         if swab_true_edit_type == "Нужно освоение":
             try:
-                swabTypeCombo = str(self.tabWidget.currentWidget().swabTypeCombo.currentText())
-                swab_volumeEdit = int(float(self.tabWidget.currentWidget().swab_volumeEdit.text()))
+                swab_type_combo = str(self.tabWidget.currentWidget().swab_type_combo.currentText())
+                swab_volume_edit = int(float(self.tabWidget.currentWidget().swab_volume_edit.text()))
                 paker_depth_swab = int(float(self.tabWidget.currentWidget().swab_paker_depth.text()))
                 for plast in plast_combo.split(','):
                     if plast in self.dict_data_well['plast_work']:
                         if abs(paker_khost + paker_depth_swab - self.dict_data_well["dict_perforation"][plast]['кровля']) < 20:
                             mes = QMessageBox.question(self, 'Вопрос',
-                                                       f'Расстояние между низом компоновки {paker_khost + paker_depth_swab} '
-                                                       f'и кровлей ПВР меньше 20м {self.dict_data_well["dict_perforation"][plast]["кровля"]}, Продолжить?')
+                                                       f'Расстояние между низом компоновки'
+                                                       f' {paker_khost + paker_depth_swab} '
+                                                       f'и кровлей ПВР меньше 20м '
+                                                       f'{self.dict_data_well["dict_perforation"][plast]["кровля"]},'
+                                                       f' Продолжить?')
                             if mes == QMessageBox.StandardButton.No:
                                 return
             except Exception as e:
@@ -1118,7 +1126,7 @@ class AcidPakerWindow(WindowUnion):
                     return
 
                 swab_work_list = SwabWindow.swabbing_with_paker(self, diametr_paker, paker_depth_swab, paker_khost,
-                                                                 plast_combo, swabTypeCombo, swab_volumeEdit,
+                                                                 plast_combo, swab_type_combo, swab_volume_edit,
                                                                  depth_gauge_combo)
                 if self.paker_layout_combo == 'пакер с заглушкой':
                     swab_work_list.pop(6)
@@ -1143,13 +1151,13 @@ class AcidPakerWindow(WindowUnion):
 
                 swab_work_list = SwabWindow.swabbing_with_2paker(self, diametr_paker, paker_depth_swab,
                                                                   paker_depth2_swab,
-                                                                  paker_khost, plast_combo, swabTypeCombo,
-                                                                  swab_volumeEdit, depth_gauge_combo,
+                                                                  paker_khost, plast_combo, swab_type_combo,
+                                                                  swab_volume_edit, depth_gauge_combo,
                                                                   need_change_zgs_combo='Нет', plast_new='',
                                                                   fluid_new='', pressuar_new='')
             elif self.paker_layout_combo == 'воронка':
-                swab_work_list = SwabWindow.swabbing_with_voronka(self, paker_khost, plast_combo, swabTypeCombo,
-                                                                   swab_volumeEdit, depth_gauge_combo)
+                swab_work_list = SwabWindow.swabbing_with_voronka(self, paker_khost, plast_combo, swab_type_combo,
+                                                                   swab_volume_edit, depth_gauge_combo)
 
             work_template_list.extend(swab_work_list[-10:])
 
@@ -1267,7 +1275,7 @@ class AcidPakerWindow(WindowUnion):
              None, None, None, None, None, None, None,
              'мастер КРС', None]]
 
-        if self.need_privyazka_QCombo == 'Да' and self.paker_layout_combo in ['двухпакерная']:
+        if self.need_privyazka_q_combo == 'Да' and self.paker_layout_combo in ['двухпакерная']:
             if privyazka_nkt(self)[0] not in paker_list:
                 paker_list.insert(1, privyazka_nkt(self)[0])
         if depth_gauge_combo == 'Да':
@@ -1356,7 +1364,8 @@ class AcidPakerWindow(WindowUnion):
                                f'НКТ{nkt_diam}мм 10м {swab_layout2} {mtg_str} + репер'
             self.dict_nkt = {nkt_diam: float(paker_khost) + float(paker_depth)}
 
-        elif self.dict_data_well["column_additional"] is True and paker_depth > self.dict_data_well["head_column_additional"]._value:
+        elif self.dict_data_well["column_additional"] is True and \
+                paker_depth > self.dict_data_well["head_column_additional"]._value:
             gidroyakor_str = 'гидроякорь'
             self.paker_select = f'{swab_layout} 2" + НКТ{nkt_pod} {float(paker_khost)}м + пакер {paker_type}-' \
                                 f'{paker_diametr}мм (либо аналог) ' \
@@ -1397,7 +1406,8 @@ class AcidPakerWindow(WindowUnion):
                  None, None, None, None, None, None, None,
                  'мастер КРС', 0.7],
                 [None, None,
-                 f'В случае негерметичности э/к, по согласованию с заказчиком произвести ОТСЭК для определения интервала '
+                 f'В случае негерметичности э/к, по согласованию с заказчиком произвести '
+                 f'ОТСЭК для определения интервала '
                  f'негерметичности эксплуатационной колонны с точностью до одного НКТ или запись РГД, ВЧТ с '
                  f'целью определения места нарушения в присутствии представителя заказчика, составить акт. '
                  f'Определить приемистость НЭК.',
@@ -1414,8 +1424,10 @@ class AcidPakerWindow(WindowUnion):
                  'мастер КРС', descentNKT_norm(paker_depth, 1.2)],
                 [f'Опрессовать ЗУМПФ в инт {paker_depth_zumpf} - {self.dict_data_well["current_bottom"]}м на '
                  f'Р={self.dict_data_well["max_admissible_pressure"]._value}атм', None,
-                 f'Посадить пакер. Опрессовать ЗУМПФ в интервале {paker_depth_zumpf} - {self.dict_data_well["current_bottom"]}м на '
-                 f'Р={self.dict_data_well["max_admissible_pressure"]._value}атм в течение 30 минут в присутствии представителя заказчика, '
+                 f'Посадить пакер. Опрессовать ЗУМПФ в интервале {paker_depth_zumpf} - '
+                 f'{self.dict_data_well["current_bottom"]}м на '
+                 f'Р={self.dict_data_well["max_admissible_pressure"]._value}атм в течение 30 минут в '
+                 f'присутствии представителя заказчика, '
                  f'составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, '
                  f'с подтверждением за 2 часа до начала работ)',
                  None, None, None, None, None, None, None,
@@ -1448,7 +1460,7 @@ class AcidPakerWindow(WindowUnion):
                  'мастер КРС', None]]
 
 
-        if self.need_privyazka_QCombo == 'Да' and self.paker_layout_combo in ['однопакерная', 'пакер с заглушкой']:
+        if self.need_privyazka_q_combo == 'Да' and self.paker_layout_combo in ['однопакерная', 'пакер с заглушкой']:
             if privyazka_nkt(self)[0] not in paker_list:
                 paker_list.insert(1, privyazka_nkt(self)[0])
 
@@ -1469,8 +1481,7 @@ class AcidPakerWindow(WindowUnion):
     def paker_layout_one_with_zaglushka(self, swab_true_edit_type, paker_diametr, paker_khost, paker_depth,
                                         depth_gauge_combo):
         from work_py.alone_oreration import privyazka_nkt
-        from .opressovka import OpressovkaEK, TabPageSo
-        # print(swab_true_edit_type, paker_diametr, paker_khost, paker_depth, depth_gauge_combo)
+
         paker_type = 'ПРО-ЯМО'
         gidroyakor_str = ''
 

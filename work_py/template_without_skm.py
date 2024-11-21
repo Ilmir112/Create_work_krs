@@ -759,7 +759,7 @@ class TemplateWithoutSkm(WindowUnion):
 
         aa = 'КР11' in self.dict_data_well["type_kr"], self.dict_data_well["type_kr"]
         if 'КР11' in self.dict_data_well["type_kr"]:
-            definition_Q_list = [
+            definition_q_list = [
                 [f'Насыщение 5м3 определение Q при 80-120атм', None,
                  f'Произвести насыщение скважины до стабилизации давления закачки не менее 5м3. Опробовать  '
                  f' на приемистость в трех режимах при Р=80-120атм в '
@@ -770,7 +770,7 @@ class TemplateWithoutSkm(WindowUnion):
                  None, None, None, None, None, None, None,
                  'мастер КРС, УСРСиСТ', 0.17 + 0.2 + 0.2 + 0.2 + 0.15 + 0.52]]
 
-            list_template_ek.extend(definition_Q_list)
+            list_template_ek.extend(definition_q_list)
 
         list_template_ek.append([None, None,
                                  f'Поднять {template_str} на НКТ{self.dict_data_well["nkt_diam"]}мм с глубины '

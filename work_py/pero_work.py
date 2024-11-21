@@ -99,12 +99,12 @@ class TabPageSoSand(TabPageUnion):
     def update_change_fluid(self, index):
         if index == 'Да':
 
-            cat_h2s_list_plan = list(
+            category_h2s_list_plan = list(
                 map(int, [self.dict_data_well["dict_category"][plast]['по сероводороду'].category for plast in
                           self.dict_data_well["plast_project"] if self.dict_data_well["dict_category"].get(plast) and
                           self.dict_data_well["dict_category"][plast]['отключение'] == 'планируемый']))
 
-            if len(cat_h2s_list_plan) != 0:
+            if len(category_h2s_list_plan) != 0:
                 plast = self.dict_data_well["plast_project"][0]
                 self.pressuar_new_edit.setText(
                     f'{self.dict_data_well["dict_category"][plast]["по давлению"].data_pressuar}')

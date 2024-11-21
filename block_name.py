@@ -269,35 +269,35 @@ def razdel_1(self, region, contractor):
             # print(self.dict_data_well['plast_work'], self.dict_data_well["dict_category"])
             try:
                 cat_P_1 = self.dict_data_well["dict_category"][self.dict_data_well['plast_work'][0]]['по давлению'].category
-                cat_h2s_list = self.dict_data_well["dict_category"][self.dict_data_well['plast_work'][0]]['по сероводороду'].category
+                category_h2s_list = self.dict_data_well["dict_category"][self.dict_data_well['plast_work'][0]]['по сероводороду'].category
                 cat_gaz = self.dict_data_well["dict_category"][self.dict_data_well['plast_work'][0]]['по газовому фактору'].category
             except:
                 cat_P_1 = self.dict_data_well["cat_P_1"][0]
-                cat_h2s_list = self.dict_data_well["cat_h2s_list"][0]
+                category_h2s_list = self.dict_data_well["category_h2s_list"][0]
                 cat_gaz = self.dict_data_well["cat_gaz_f_pr"][0]
         else:
 
             cat_P_1 = self.dict_data_well["cat_P_1"][0]
-            cat_h2s_list = self.dict_data_well["cat_h2s_list"][0]
+            category_h2s_list = self.dict_data_well["category_h2s_list"][0]
             cat_gaz = self.dict_data_well["cat_gaz_f_pr"][0]
         try:
             cat_P_1_plan = self.dict_data_well["dict_category"][self.dict_data_well["plast_project"][0]]['по давлению'].category
-            cat_h2s_list_plan = self.dict_data_well["dict_category"][self.dict_data_well["plast_project"][0]]['по сероводороду'].category
+            category_h2s_list_plan = self.dict_data_well["dict_category"][self.dict_data_well["plast_project"][0]]['по сероводороду'].category
             cat_gaz_plan = self.dict_data_well["dict_category"][self.dict_data_well["plast_project"][0]]['по газовому фактору'].category
         except:
             cat_P_1_plan = 3
-            cat_h2s_list_plan = 3
+            category_h2s_list_plan = 3
             cat_gaz_plan = 3
 
-        if 1 in [cat_P_1, cat_P_1_plan, cat_h2s_list, cat_gaz, cat_h2s_list_plan, cat_gaz_plan,
-                 self.dict_data_well["category_pressuar"]] or '1' in [cat_P_1, cat_P_1_plan, cat_h2s_list, cat_gaz,
-                                                         cat_h2s_list_plan, cat_gaz_plan,
+        if 1 in [cat_P_1, cat_P_1_plan, category_h2s_list, cat_gaz, category_h2s_list_plan, cat_gaz_plan,
+                 self.dict_data_well["category_pressuar"]] or '1' in [cat_P_1, cat_P_1_plan, category_h2s_list, cat_gaz,
+                                                         category_h2s_list_plan, cat_gaz_plan,
                                                          self.dict_data_well["category_pressuar"]] or \
                 self.dict_data_well["curator"] == 'ВНС':
             for row in range(len(podp_bvo)):
                 for col in range(len(podp_bvo[row])):
                     razdel_1[row + 9][col] = podp_bvo[row][col]
-        if 1 in [cat_P_1, cat_h2s_list, cat_gaz] or \
+        if 1 in [cat_P_1, category_h2s_list, cat_gaz] or \
                 self.dict_data_well["curator"] == 'ВНС':
             self.dict_data_well["kat_pvo"] = 1
             self.dict_data_well["bvo"] = True

@@ -32,8 +32,8 @@ class TabPageSo(TabPageUnion):
         self.paker_depth_edit.textChanged.connect(self.update_paker)
 
         self.need_privyazka_Label = QLabel("Привязка оборудования", self)
-        self.need_privyazka_QCombo = QComboBox()
-        self.need_privyazka_QCombo.addItems(['Нет', 'Да'])
+        self.need_privyazka_q_combo = QComboBox()
+        self.need_privyazka_q_combo.addItems(['Нет', 'Да'])
 
         if len(self.dict_data_well['plast_work']) != 0:
             pakerDepth = self.dict_data_well["perforation_roof"] - 20
@@ -74,7 +74,7 @@ class TabPageSo(TabPageUnion):
         self.grid_layout.addWidget(self.pressure_zumph_question_QCombo, 4, 5)
 
         self.grid_layout.addWidget(self.need_privyazka_Label, 3, 4)
-        self.grid_layout.addWidget(self.need_privyazka_QCombo, 4, 4)
+        self.grid_layout.addWidget(self.need_privyazka_q_combo, 4, 4)
 
     def update_paker_need(self, index):
         if index == 'Да':
@@ -118,9 +118,9 @@ class TabPageSo(TabPageUnion):
                         need_count += 1
 
             if need_count == 0:
-                self.need_privyazka_QCombo.setCurrentIndex(0)
+                self.need_privyazka_q_combo.setCurrentIndex(0)
             else:
-                self.need_privyazka_QCombo.setCurrentIndex(1)
+                self.need_privyazka_q_combo.setCurrentIndex(1)
 
 
     def paker_diametr_select(self, depth_landing):
@@ -267,7 +267,7 @@ class OpressovkaEK(WindowUnion):
 
         else:
             paker_depth_zumpf = 0
-        self.need_privyazka_QCombo = self.tabWidget.currentWidget().need_privyazka_QCombo.currentText()
+        self.need_privyazka_q_combo = self.tabWidget.currentWidget().need_privyazka_q_combo.currentText()
 
         if rows == 0:
             QMessageBox.warning(self, 'ОШИБКА', 'Нужно добавить интервалы')
@@ -422,7 +422,7 @@ class OpressovkaEK(WindowUnion):
                  None, None, None, None, None, None, None,
                  'мастер КРС', liftingNKT_norm(paker_depth, 1.2)]]
 
-        if self.need_privyazka_QCombo == "Да":
+        if self.need_privyazka_q_combo == "Да":
             paker_list.insert(1, privyazka_nkt(self)[0])
 
         return paker_list
@@ -580,7 +580,7 @@ class OpressovkaEK(WindowUnion):
         for row in zumpf_list:
             paker_list.append(row)
 
-        if self.need_privyazka_QCombo == "Да":
+        if self.need_privyazka_q_combo == "Да":
             paker_list.insert(1, privyazka_nkt(self)[0])
 
         return paker_list

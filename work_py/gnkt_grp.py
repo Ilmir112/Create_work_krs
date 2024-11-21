@@ -214,7 +214,7 @@ class GnktOsvWindow(GnktModel):
 
     def gnkt_work(self, fluid_work_insert, current_bottom_edit):
         from cdng import events_gnvp_frez
-        from work_py.alone_oreration import volume_vn_nkt, volume_jamming_well, volume_pod_NKT
+        from work_py.alone_oreration import volume_vn_nkt, volume_jamming_well, volume_pod_nkt
 
         self.dict_data_well["fluid_work"], self.dict_data_well["fluid_work_short"] = self.calc_work_fluid(self, fluid_work_insert)
 
@@ -250,7 +250,7 @@ class GnktOsvWindow(GnktModel):
             volume_well_jumping = round(volume_jamming_well(self, self.dict_data_well["current_bottom"]) * 1.2, 1)
             volume_vn_nkt = round(volume_vn_nkt(self.dict_data_well["dict_nkt"]) * 1.2, 1)
             volume_well_at_shoe = round(volume_jamming_well(self, niz_nkt) * 1.2, 1) - volume_vn_nkt
-            volume_current_shoe_nkt = round(volume_pod_NKT(self) * 1.2, 1) - volume_vn_nkt
+            volume_current_shoe_nkt = round(volume_pod_nkt(self) * 1.2, 1) - volume_vn_nkt
 
             volume_str = 'Произвести замер избыточного давления в течении 2ч при условии заполнения ствола ствола ' \
                          f'жидкостью уд.весом {self.dict_data_well["fluid_work"]}. Произвести перерасчет забойного давления, Согласовать с заказчиком ' \

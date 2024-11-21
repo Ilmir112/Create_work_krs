@@ -74,8 +74,8 @@ class TabPageSoDrill(TabPageUnion):
         self.drill_cm_combo.addItems(data_list.BOTTOM_TYPE_LIST)
 
         self.need_privyazka_Label = QLabel("Привязка оборудования", self)
-        self.need_privyazka_QCombo = QComboBox()
-        self.need_privyazka_QCombo.addItems(['Нет', 'Да'])
+        self.need_privyazka_q_combo = QComboBox()
+        self.need_privyazka_q_combo.addItems(['Нет', 'Да'])
 
         self.grid = QGridLayout(self)
         self.grid.setColumnMinimumWidth(1, 150)
@@ -105,7 +105,7 @@ class TabPageSoDrill(TabPageUnion):
         self.grid.addWidget(self.roof_drill_line, 8, 0)
         self.grid.addWidget(self.sole_drill_line, 8, 1)
         self.grid.addWidget(self.need_privyazka_Label, 2, 6)
-        self.grid.addWidget(self.need_privyazka_QCombo, 3, 6)
+        self.grid.addWidget(self.need_privyazka_q_combo, 3, 6)
         self.grid.addWidget(self.drill_cm_combo, 8, 2, 2, 1)
 
         self.drill_select_combo.currentTextChanged.connect(self.update_drill_edit)
@@ -319,7 +319,7 @@ class Drill_window(WindowUnion):
             if self.drill_type_combo == '':
                 QMessageBox.warning(self, 'ОШИБКА', 'Выберете тип долото')
                 return
-            need_privyazka_QCombo = self.tabWidget.currentWidget().need_privyazka_QCombo.currentText()
+            need_privyazka_q_combo = self.tabWidget.currentWidget().need_privyazka_q_combo.currentText()
         except Exception as e:
             QMessageBox.warning(self, 'Ошибка', f'Не корректное сохранение параметра: {type(e).__name__}\n\n{str(e)}')
 
@@ -357,7 +357,7 @@ class Drill_window(WindowUnion):
         drill_tuple = sorted(drill_tuple, key=lambda x: x[0])
         if self.nkt_str == 'НКТ':
             drill_list = self.drilling_nkt(drill_tuple, self.drill_type_combo,
-                                           self.drillingBit_diam, self.downhole_motor, need_privyazka_QCombo)
+                                           self.drillingBit_diam, self.downhole_motor, need_privyazka_q_combo)
         elif self.nkt_str == 'СБТ':
             drill_list = self.drilling_sbt(drill_tuple, self.drill_type_combo,
                                            self.drillingBit_diam, self.downhole_motor)
@@ -382,7 +382,7 @@ class Drill_window(WindowUnion):
             return
         self.tableWidget.removeRow(row)
 
-    def drilling_nkt(self, drill_tuple, drill_type_combo, drillingBit_diam, downhole_motor, need_privyazka_QCombo = 'Нет' ):
+    def drilling_nkt(self, drill_tuple, drill_type_combo, drillingBit_diam, downhole_motor, need_privyazka_q_combo = 'Нет' ):
         from work_py.alone_oreration import privyazka_nkt
         from work_py.alone_oreration import well_volume
 
@@ -474,7 +474,7 @@ class Drill_window(WindowUnion):
              None, None, None, None, None, None, None,
              'мастер КРС', liftingNKT_norm(self.dict_data_well["current_bottom"], 1.3)]
         ]
-        if need_privyazka_QCombo == 'Да':
+        if need_privyazka_q_combo == 'Да':
 
             privyazka_nkt_list = privyazka_nkt(self)[0]
 

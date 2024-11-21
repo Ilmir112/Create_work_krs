@@ -65,12 +65,12 @@ class TabPageSoChange(TabPageUnion):
 
     def update_change_fluid(self, index):
         if index == 'Да':
-            cat_h2s_list_plan = list(
+            category_h2s_list_plan = list(
                 map(int, [self.dict_data_well["dict_category"][plast]['по сероводороду'].category for plast in
                           self.dict_data_well["plast_project"] if self.dict_data_well["dict_category"].get(plast) and
                           self.dict_data_well["dict_category"][plast]['отключение'] == 'планируемый']))
 
-            if len(cat_h2s_list_plan) == 0:
+            if len(category_h2s_list_plan) == 0:
                 self.category_pressuar_Label = QLabel('По Рпл')
                 self.category_pressuar_line_combo = QComboBox(self)
                 self.category_pressuar_line_combo.addItems(['1', '2', '3'])
@@ -125,7 +125,7 @@ class TabPageSoChange(TabPageUnion):
             #     self.plast_new_combo = QLineEdit(self)
             #     plast = self.plast_new_combo.text()
 
-            # if len(cat_h2s_list_plan) != 0:
+            # if len(category_h2s_list_plan) != 0:
             #     self.pressuar_new_edit.setText(f'{self.dict_data_well["dict_category"][plast]["по давлению"].data_pressuar}')
 
             self.grid.addWidget(self.plast_new_label, 9, 2)

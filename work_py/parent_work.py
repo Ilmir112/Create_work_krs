@@ -41,11 +41,11 @@ class WindowUnion(MyMainWindow):
         self.dict_data_well["fluid"] = float(fluid_work_insert)
         self.dict_data_well["fluid_short"] = fluid_work_insert
 
-        cat_h2s_list = [self.dict_data_well["dict_category"][plast]['по сероводороду'
+        category_h2s_list = [self.dict_data_well["dict_category"][plast]['по сероводороду'
                         ].category for plast in list(self.dict_data_well["dict_category"].keys()) if
                         self.dict_data_well["dict_category"][plast]['отключение'] == 'рабочий']
 
-        if 2 in cat_h2s_list or 1 in cat_h2s_list:
+        if 2 in category_h2s_list or 1 in category_h2s_list:
             expenditure_h2s_list = []
             if self.dict_data_well['plast_work']:
                 try:

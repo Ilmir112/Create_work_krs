@@ -14,8 +14,6 @@ from datetime import datetime
 
 from data_base.config_base import connection_to_database, WorkDatabaseWell
 
-from krs import GnoWindow
-from main import MyMainWindow
 from work_py.advanted_file import merge_overlapping_intervals, definition_plast_work
 from work_py.parent_work import TabPageUnion, TabWidgetUnion, WindowUnion
 
@@ -918,6 +916,10 @@ class DopPlanWindow(WindowUnion):
                     self.dict_data_well["inv_number"] = ProtectedIsNonNone(data_well[6])
                     self.dict_data_well["wellhead_fittings"] = data_well[7]
                     self.dict_data_well["emergency_well"] = False
+                    if data_well[8]:
+                        self.dict_data_well["angle_data"] = None
+                    else:
+                        self.dict_data_well["angle_data"] = json.loads(data_well[8])
 
             self.dict_data_well["current_bottom"] = current_bottom
 

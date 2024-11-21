@@ -130,7 +130,7 @@ class GrpWindow(WindowUnion):
         paker_khost = int(float(self.tabWidget.currentWidget().paker_khost_edit.text().replace(',', '.')))
         paker_depth = int(float(self.tabWidget.currentWidget().paker_depth_edit.text().replace(',', '.')))
         gisOTZ_true_quest = self.tabWidget.currentWidget().otz_question_QCombo.currentText()
-        gisOTZ_after_true_quest = self.tabWidget.currentWidget().otz_after_question_QCombo.currentText()
+        gis_otz_after_true_quest = self.tabWidget.currentWidget().otz_after_question_QCombo.currentText()
         normalization_true_quest = self.tabWidget.currentWidget().normalization_QCombo.currentText()
         current_depth = int(float(self.tabWidget.currentWidget().current_depth_edit.text().replace(',', '.')))
         if self.check_true_depth_template(paker_depth) is False:
@@ -144,14 +144,14 @@ class GrpWindow(WindowUnion):
             QMessageBox.warning(self, 'Некорректные данные', f'Компоновка НКТ c хвостовик + пакер '
                                                                    f'ниже текущего забоя')
             return
-        work_list = self.grpPaker(diametr_paker, paker_depth, paker_khost, gisOTZ_true_quest, gisOTZ_after_true_quest,
+        work_list = self.grpPaker(diametr_paker, paker_depth, paker_khost, gisOTZ_true_quest, gis_otz_after_true_quest,
                                   normalization_true_quest, current_depth)
 
         self.populate_row(self.ins_ind, work_list, self.table_widget)
         data_list.pause = False
         self.close()
 
-    def normalization(self, current_depth, diametr_paker, gisOTZ_after_true_quest):
+    def normalization(self, current_depth, diametr_paker, gis_otz_after_true_quest):
 
         from .opressovka import TabPageSo
         nkt_diam = self.dict_data_well["nkt_diam"]
@@ -237,7 +237,7 @@ class GrpWindow(WindowUnion):
              None, None, None, None, None, None, None,
              'Мастер КРС, подрядчик по ГИС', 4]]
 
-        if gisOTZ_after_true_quest == 'Нет':
+        if gis_otz_after_true_quest == 'Нет':
             normalization_list = normalization_list[:-1]
         self.dict_data_well["current_bottom"] = current_depth
 
@@ -276,7 +276,7 @@ class GrpWindow(WindowUnion):
                           f' L-{round(paker_depth - self.dict_data_well["head_column_additional"]._value, 0)}м'
         return paker_select, paker_short
 
-    def grpPaker(self, diametr_paker, paker_depth, paker_khost, gisOTZ_true_quest, gisOTZ_after_true_quest,
+    def grpPaker(self, diametr_paker, paker_depth, paker_khost, gisOTZ_true_quest, gis_otz_after_true_quest,
                  normalization_true_quest, current_depth):
         if 'Ойл' in data_list.contractor:
             schema_grp = '7а'
@@ -449,7 +449,7 @@ class GrpWindow(WindowUnion):
             pass
 
         if normalization_true_quest == 'Да':
-            for row in self.normalization(current_depth, diametr_paker, gisOTZ_after_true_quest):
+            for row in self.normalization(current_depth, diametr_paker, gis_otz_after_true_quest):
                 paker_list.append(row)
         else:
             pass

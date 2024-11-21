@@ -1254,6 +1254,8 @@ class WellData(FindIndexPZ):
                                                                               'есть данные иклинометрии?')
             if angle_true_question == QMessageBox.StandardButton.Yes:
                 self.dict_data_well["angle_data"] = WellData.read_angle_well()
+                if self.dict_data_well["angle_data"] is None:
+                    self.pause_app()
 
         if type(self.dict_data_well["column_diametr"]._value) in [float, int]:
             if str(self.dict_data_well["paker_do"]["do"]).lower() not in ['0', 0, '-', 'отсут', '', 'none', None]:
@@ -1353,11 +1355,14 @@ class WellData(FindIndexPZ):
             curvature_column, ok = QInputDialog.getInt(None, 'номер столбца',
                                                        'Программа не смогла найти номер столбца с '
                                                        'указанием интенсивности набора угла')
-
-        # Вставка данных в таблицу
-        for index_row, row in enumerate(sheet_angle.iter_rows(min_row=row_data, values_only=True)):
-            if str(row[depth_column]).replace(',', '').replace('.', '').isdigit():
-                angle_data.append((row[depth_column], row[angle_column], row[curvature_column]))
+        if depth_column != '' and row_data != '' and angle_data != '' and curvature_column != '':
+            # Вставка данных в таблицу
+            for index_row, row in enumerate(sheet_angle.iter_rows(min_row=row_data, values_only=True)):
+                if str(row[depth_column]).replace(',', '').replace('.', '').isdigit():
+                    angle_data.append((row[depth_column], row[angle_column], row[curvature_column]))
+        else:
+            QMessageBox.warning(None, 'Ошибка', 'Ошибка обработки excel файла, Необходимо проверить файл')
+            return None
         return angle_data
 
 
@@ -1683,7 +1688,7 @@ class WellCategory(FindIndexPZ):
 
     def read_well(self, begin_index, cancel_index):
 
-        self.dict_data_well["cat_h2s_list"] = []
+        self.dict_data_well["category_h2s_list"] = []
         self.dict_data_well["h2s_mg"] = []
         self.dict_data_well["cat_gaz_f_pr"] = []
         self.dict_data_well["gaz_f_pr"] = []
@@ -1705,10 +1710,10 @@ class WellCategory(FindIndexPZ):
                             elif str(cell) in ['%', 'мг/л', 'мг/дм3', 'мг/м3', 'мг/дм', 'мгдм3']:
                                 if str(cell) == '%':
                                     if self.ws.cell(row=row, column=col - 2).value is None:
-                                        self.dict_data_well["cat_h2s_list"].append(
+                                        self.dict_data_well["category_h2s_list"].append(
                                             self.ws.cell(row=row - 1, column=col - 2).value)
                                     else:
-                                        self.dict_data_well["cat_h2s_list"].append(
+                                        self.dict_data_well["category_h2s_list"].append(
                                             self.ws.cell(row=row, column=col - 2).value)
                                     if str(self.ws.cell(row=row, column=col - 1).value).strip() in ['', '-', '0',
                                                                                                     'None'] or \
@@ -1764,7 +1769,7 @@ class WellCategory(FindIndexPZ):
             except Exception as e:
                 QMessageBox.warning(self, 'Ошибка', f'Ошибка обработки данных по категориям {e}')
 
-            if len(self.dict_data_well["cat_h2s_list"]) == 0:
+            if len(self.dict_data_well["category_h2s_list"]) == 0:
                 QMessageBox.warning(self, 'ОШИБКА', 'Приложение не смогла найти значение '
                                                     'сероводорода в процентах')
                 data_list.pause = True
@@ -1791,7 +1796,7 @@ class WellCategory(FindIndexPZ):
 
             self.dict_data_well["category_pressuar"] = self.dict_data_well["cat_P_1"][0]
             # print(f'категория по давлению {self.dict_data_well["category_pressuar"]}')
-            self.dict_data_well["category_h2s"] = self.dict_data_well["cat_h2s_list"][0]
+            self.dict_data_well["category_h2s"] = self.dict_data_well["category_h2s_list"][0]
             self.dict_data_well["category_gf"] = self.dict_data_well["cat_gaz_f_pr"][0]
 
             thread = ExcelWorker()
@@ -1815,8 +1820,8 @@ class WellCategory(FindIndexPZ):
                             f'согласно классификатора от {data} категория скважины ' \
                             f'по давлению {categoty_pressure_well} категории\n')
                 if categoty_h2s_well:
-                    if str(self.dict_data_well["cat_h2s_list"][0]) != str(self.dict_data_well["category_h2s"]):
-                        # print(str(self.dict_data_well["cat_h2s_list"][0]), self.dict_data_well["category_h2s"])
+                    if str(self.dict_data_well["category_h2s_list"][0]) != str(self.dict_data_well["category_h2s"]):
+                        # print(str(self.dict_data_well["category_h2s_list"][0]), self.dict_data_well["category_h2s"])
                         #
                         QMessageBox.warning(None, 'Некорректная категория давления',
                                             f'согласно классификатора от {data} категория скважина '

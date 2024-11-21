@@ -6,7 +6,7 @@ from datetime import datetime
 
 import data_list
 
-from work_py.alone_oreration import lifting_unit, weigth_pipe, volume_pod_NKT, volume_jamming_well
+from work_py.alone_oreration import lifting_unit, weigth_pipe, volume_pod_nkt, volume_jamming_well
 from work_py.calculate_work_parametrs import volume_nkt_metal, volume_nkt, volume_well_pod_nkt_calculate
 from work_py.mkp import mkp_revision_1_kateg
 from work_py.rationingKRS import liftingNKT_norm, well_jamming_norm, liftingGNO, lifting_sucker_rod
@@ -658,7 +658,7 @@ class LiftPaker(GnoParent):
             [self.well_jamming_str[2], None, self.well_jamming_str[0], None, None,
              None, None, None, None, None,
              'Мастер КРС представитель Заказчика',
-             [str(well_jamming_norm(volume_pod_NKT(self))) if self.without_damping_true is False else None][0]],
+             [str(well_jamming_norm(volume_pod_nkt(self))) if self.without_damping_true is False else None][0]],
             ['глушение', None,
              self.well_jamming_str[1],
              None, None, None, None, None, None, None,
@@ -774,7 +774,7 @@ class LiftOrz(GnoParent):
                  self.well_jamming_str[0],
                  None, None, None, None, None, None, None,
                  'Мастер КРС, представ заказчика',
-                 [str(well_jamming_norm(volume_pod_NKT(self))) if self.without_damping_true is False else None][0]],
+                 [str(well_jamming_norm(volume_pod_nkt(self))) if self.without_damping_true is False else None][0]],
                 [None, None,
                  self.well_jamming_str[1],
                  None, None, None, None, None, None, None,
@@ -973,7 +973,7 @@ class LiftVoronka(GnoParent):
             [self.well_jamming_str[2], None, self.well_jamming_str[0],
              None, None, None, None, None, None, None,
              'Мастер КРС, представ заказчика',
-             [str(well_jamming_norm(volume_pod_NKT(self))) if self.without_damping_true is False else None][
+             [str(well_jamming_norm(volume_pod_nkt(self))) if self.without_damping_true is False else None][
                  0]],
             [None, None,
              self.well_jamming_str[1],
@@ -1066,7 +1066,7 @@ class LiftPumpNnWithPaker(GnoParent):
         sucker_jaming = ""
         if self.without_damping_true is False:
             sucker_jaming = f"При наличии Избыточного давления не позволяющее сорвать пакера: Приподнять штангу." \
-                            f" Произвести глушение в НКТ в объеме {volume_pod_NKT(self)}м3"
+                            f" Произвести глушение в НКТ в объеме {volume_pod_nkt(self)}м3"
         lift_pump_nn_with_paker = [
             [f'Опрессовать ГНО на Р={40}атм', None,
              f'Опрессовать ГНО на Р={40}атм в течении 30мин в присутствии представителя ЦДНГ. '
@@ -1121,7 +1121,7 @@ class LiftPumpNnWithPaker(GnoParent):
              self.well_jamming_str[0],
              None, None, None, None, None, None, None,
              'Мастер КРС, представ заказчика',
-             [str(well_jamming_norm(volume_pod_NKT(self))) if self.without_damping_true is False else None][0]],
+             [str(well_jamming_norm(volume_pod_nkt(self))) if self.without_damping_true is False else None][0]],
             [None, None,
              self.well_jamming_str[1],
              None, None, None, None, None, None, None,
@@ -1214,7 +1214,7 @@ class LiftPumpNvWithPaker(GnoParent):
              f'инженером  {data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г при СПО штанг '
              f'(ПМШ 62х21 либо аналог). '
              f'Опрессовать ПВО на {self.dict_data_well["max_admissible_pressure"]._value}атм. '
-             f'{"".join([" " if self.without_damping_true is True else f"При наличии Избыточного давления не позволяющее сорвать пакера: Приподнять штангу. Произвести глушение в НКТ в объеме{volume_pod_NKT(self)}м3. Техостой 2ч."])}'
+             f'{"".join([" " if self.without_damping_true is True else f"При наличии Избыточного давления не позволяющее сорвать пакера: Приподнять штангу. Произвести глушение в НКТ в объеме{volume_pod_nkt(self)}м3. Техостой 2ч."])}'
              f' Поднять на штангах насос с гл. {float(self.dict_data_well["dict_pump_SHGN_h"]["do"])}м с '
              f'доливом тех жидкости уд.весом {self.dict_data_well["fluid_work"]} '
              f'Обеспечить не превышение расчетных нагрузок на штанговые колонны при срыве  '
@@ -1250,7 +1250,7 @@ class LiftPumpNvWithPaker(GnoParent):
              self.well_jamming_str[0],
              None, None, None, None, None, None, None,
              'Мастер КРС, представ заказчика',
-             [str(well_jamming_norm(volume_pod_NKT(self))) if self.without_damping_true is False else None][0]],
+             [str(well_jamming_norm(volume_pod_nkt(self))) if self.without_damping_true is False else None][0]],
             [None, None,
              self.well_jamming_str[1],
              None, None, None, None, None, None, None,
@@ -1318,7 +1318,7 @@ class LiftEcnWithPaker(GnoParent):
     def lifting_ecn_with_paker(self):
         enc_jaming = "".join([" " if self.without_damping_true is True
                               else f"При наличии Избыточного давления не позволяющее сорвать пакера: "
-                                   f"Произвести глушение в НКТ в объеме {volume_pod_NKT(self)}м3."
+                                   f"Произвести глушение в НКТ в объеме {volume_pod_nkt(self)}м3."
                                    f" {self.dict_data_well['fluid_work']}"])
 
         lift_ecn_with_paker = [
@@ -1358,7 +1358,7 @@ class LiftEcnWithPaker(GnoParent):
              self.well_jamming_str[0],
              None, None, None, None, None, None, None,
              'Мастер КРС, представ заказчика',
-             [str(well_jamming_norm(volume_pod_NKT(self))) if self.without_damping_true is False else None][0]],
+             [str(well_jamming_norm(volume_pod_nkt(self))) if self.without_damping_true is False else None][0]],
             [None, None,
              self.well_jamming_str[1],
              None, None, None, None, None, None, None,
@@ -1542,12 +1542,12 @@ class LiftPumpNv(GnoParent):
              self.well_jamming_str[0],
              None, None, None, None, None, None, None,
              'Мастер КРС, представ заказчика',
-             [str(well_jamming_norm(volume_pod_NKT(self))) if self.without_damping_true is False else None][0]],
+             [str(well_jamming_norm(volume_pod_nkt(self))) if self.without_damping_true is False else None][0]],
             [None, None,
              self.well_jamming_str[1],
              None, None, None, None, None, None, None,
              ' Мастер КРС',
-             [str(well_jamming_norm(volume_pod_NKT(self))) if self.without_damping_true is False else None][0]],
+             [str(well_jamming_norm(volume_pod_nkt(self))) if self.without_damping_true is False else None][0]],
             [None, None,
              f'{lifting_unit(self)}', None, None, None, None, None, None, None,
              'Мастер КРС представитель Заказчика, пусков. Ком. ', 4.2],
@@ -1663,7 +1663,7 @@ class LiftPumpNn(GnoParent):
              self.well_jamming_str[0],
              None, None, None, None, None, None, None,
              'Мастер КРС, представ заказчика',
-             [str(well_jamming_norm(volume_pod_NKT(self))) if self.without_damping_true is False else None][0]],
+             [str(well_jamming_norm(volume_pod_nkt(self))) if self.without_damping_true is False else None][0]],
             [None, None,
              self.well_jamming_str[1],
              None, None, None, None, None, None, None,

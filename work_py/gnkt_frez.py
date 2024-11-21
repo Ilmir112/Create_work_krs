@@ -573,7 +573,7 @@ class WorkWithGnkt(GnktModel):
 
         fluid_work_insert = self.data_gnkt.fluid_edit
 
-        fluid_work, self.dict_data_well["fluid_work_short"] = self.calc_work_fluid(self, fluid_work_insert)
+        fluid_work, self.dict_data_well["fluid_work_short"] = self.calc_work_fluid(fluid_work_insert)
 
         block_gnvp_list = events_gnvp_frez(self, self.data_gnkt.distance_pntzh, fluid_work_insert)
 
@@ -1182,12 +1182,12 @@ class WorkWithGnkt(GnktModel):
         return jamming_well
 
     def volume_dumping(self, ntk_true, paker_true):
-        from work_py.alone_oreration import volume_pod_NKT, volume_jamming_well, volume_vn_nkt
+        from work_py.alone_oreration import volume_pod_nkt, volume_jamming_well, volume_vn_nkt
 
         if ntk_true is True:
-            volume = volume_pod_NKT(self) * 1.2
+            volume = volume_pod_nkt(self) * 1.2
         elif paker_true:
-            volume = (volume_pod_NKT(self) + volume_vn_nkt(self.dict_data_well["dict_nkt"])) * 1.2
+            volume = (volume_pod_nkt(self) + volume_vn_nkt(self.dict_data_well["dict_nkt"])) * 1.2
         else:
             volume = volume_jamming_well(self, self.dict_data_well["current_bottom"]) * 1.2
         return round(volume, 1)

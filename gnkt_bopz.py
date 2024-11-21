@@ -244,7 +244,7 @@ class GnktBopz(GnktModel):
         return work_list
 
     def gnkt_work(self, data_gnkt):
-        from krs import volume_jamming_well, volume_pod_NKT
+        from krs import volume_jamming_well, volume_pod_nkt
         from work_py.alone_oreration import volume_vn_nkt
 
         block_gnvp_list = events_gnvp_frez(self, data_gnkt.distance_pntzh, float(self.fluid_edit))
@@ -263,7 +263,7 @@ class GnktBopz(GnktModel):
         volume_well_jumping = round(self.volume_drilling_mud_edit*1.2, 1)
         volume_vn_nkt = round(volume_vn_nkt(self.dict_data_well["dict_nkt"]) * 1.2, 1)
         volume_well_at_shoe = round(volume_jamming_well(self, shoe_nkt) * 1.2 - volume_vn_nkt, 1)
-        volume_current_shoe_nkt = round(volume_pod_NKT(self)*1.2 - volume_vn_nkt, 1)
+        volume_current_shoe_nkt = round(volume_pod_nkt(self)*1.2 - volume_vn_nkt, 1)
 
         gnkt_bopz = [
             [None, 'ЦЕЛЬ ПРОГРАММЫ', None, None, None, None, None, None, None, None, None, None],

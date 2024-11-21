@@ -154,8 +154,6 @@ class CorrectPlanWindow(WindowUnion):
 
             if data_well:
                 self.dict_data_well["type_kr"] = data_well[2]
-
-
                 if data_well[3]:
                     self.dict_data_well["dict_category"] = json.loads(data_well[3])
                     self.dict_data_well["well_oilfield"] = ProtectedIsNonNone(data_well[4])
@@ -163,6 +161,10 @@ class CorrectPlanWindow(WindowUnion):
                     self.dict_data_well["inv_number"] = ProtectedIsNonNone(data_well[6])
                     self.dict_data_well["wellhead_fittings"] = data_well[7]
                     self.dict_data_well["emergency_well"] = False
+                if data_well[8]:
+                    self.dict_data_well["angle_data"] = None
+                else:
+                    self.dict_data_well["angle_data"] = json.loads(data_well[8])
 
                 insert_data_well_dop_plan(self, data_well[0])
 

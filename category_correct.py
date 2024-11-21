@@ -35,7 +35,7 @@ class TabPageSo(TabPageUnion):
                 self.plast_all.append(plast)
 
         self.cat_P_1 = self.dict_data_well["cat_P_1"]
-        self.cat_h2s_list = self.dict_data_well["cat_h2s_list"]
+        self.category_h2s_list = self.dict_data_well["category_h2s_list"]
         self.cat_gaz_f_pr = self.dict_data_well["cat_gaz_f_pr"]
         self.gaz_f_pr = self.dict_data_well["gaz_f_pr"]
         self.h2s_mg = self.dict_data_well["h2s_mg"]
@@ -118,7 +118,7 @@ class TabPageSo(TabPageUnion):
             # print(num)
             category_h2s_edit = QLineEdit(self)
             try:
-                category_h2s_edit.setText(str(self.ifNone(self.cat_h2s_list[num])))
+                category_h2s_edit.setText(str(self.ifNone(self.category_h2s_list[num])))
             except:
                 pass
             h2s_pr_edit = QLineEdit(self)
@@ -133,7 +133,7 @@ class TabPageSo(TabPageUnion):
 
             category_h2s2_edit = QLineEdit(self)
             try:
-                category_h2s2_edit.setText(str(self.ifNone(self.cat_h2s_list[num])))
+                category_h2s2_edit.setText(str(self.ifNone(self.category_h2s_list[num])))
                 h2s_mg_edit = QLineEdit(self)
             except (IndexError, TypeError):
                 pass
@@ -168,7 +168,7 @@ class TabPageSo(TabPageUnion):
 
             calc_plast_h2s = QLineEdit(self)
 
-            # print(Category_h2s_edit.text(), h2s_mg_edit.text(), h2s_pr_edit.text())
+            # print(category_h2s_edit.text(), h2s_mg_edit.text(), h2s_pr_edit.text())
 
             self.grid.addWidget(plast_index, 4, 1 + n, 1, 2)
             self.grid.addWidget(category_pressuar_line_edit, 5, 1 + n)

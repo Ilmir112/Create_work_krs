@@ -40,7 +40,8 @@ def kot_work(self, current_bottom=0):
     kot_list = [
         [f'статической уровень {self.dict_data_well["static_level"]._value}', None,
          f'При отсутствии циркуляции:\n'
-         f'Спустить {kot_select(self, current_bottom)} на НКТ{self.dict_data_well["nkt_diam"]}мм до глубины {current_bottom}м'
+         f'Спустить {kot_select(self, current_bottom)} на НКТ{self.dict_data_well["nkt_diam"]}мм до глубины'
+         f' {current_bottom}м'
          f' с замером, шаблонированием шаблоном {self.dict_data_well["nkt_template"]}мм.',
          None, None, None, None, None, None, None,
          'мастер КРС', descentNKT_norm(current_bottom, 1)],
@@ -102,23 +103,25 @@ def need_h2s(self, fluid_new, plast_edit, expected_pressure):
                                   self.dict_data_well['plast_work'] if self.dict_data_well["dict_category"].get(plast) and
                                   self.dict_data_well["dict_category"][plast]['отключение'] == 'рабочий']))
 
-    cat_h2s_list_plan = list(map(int, [self.dict_data_well["dict_category"][plast]['по сероводороду'].category for plast in
+    category_h2s_list_plan = list(map(int, [self.dict_data_well["dict_category"][plast]['по сероводороду'].category for plast in
                                        self.dict_data_well["plast_project"] if self.dict_data_well["dict_category"].get(plast) and
                                        self.dict_data_well["dict_category"][plast]['отключение'] == 'планируемый']))
 
-    if len(cat_h2s_list_plan) != 0:
+    if len(category_h2s_list_plan) != 0:
 
-        if cat_h2s_list_plan[0] in [1, 2, '1', '2'] and len(self.dict_data_well['plast_work']) == 0:
+        if category_h2s_list_plan[0] in [1, 2, '1', '2'] and len(self.dict_data_well['plast_work']) == 0:
             expenditure_h2s = round(
-                max([self.dict_data_well["dict_category"][plast]['по сероводороду'].poglot for plast in self.dict_data_well["plast_project"]]), 3)
-            fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода {self.dict_data_well["type_absorbent"]} из ' \
-                         f'расчета {expenditure_h2s}кг/м3 либо аналог'
+                max([self.dict_data_well["dict_category"][plast]['по сероводороду'].poglot
+                     for plast in self.dict_data_well["plast_project"]]), 3)
+            fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода ' \
+                         f'{self.dict_data_well["type_absorbent"]} из ' \
+                         f'расчета {expenditure_h2s}кг/м3 либо аналог (СНПХ-1200, ХИМТЕХНО 101 Марка А)'
             fluid_work_short = f'{fluid_new}г/см3 {self.dict_data_well["type_absorbent"]} {expenditure_h2s}кг/м3 '
-        elif cat_h2s_list_plan[0] in [3, '3'] and len(self.dict_data_well['plast_work']) == 0:
+        elif category_h2s_list_plan[0] in [3, '3'] and len(self.dict_data_well['plast_work']) == 0:
             fluid_work = f'{fluid_new}г/см3 '
             fluid_work_short = f'{fluid_new}г/см3 '
 
-        elif ((cat_h2s_list_plan[0] in [1, 2]) or (сat_h2s_list[0] in [1, 2])) and len(self.dict_data_well['plast_work']) != 0:
+        elif ((category_h2s_list_plan[0] in [1, 2]) or (сat_h2s_list[0] in [1, 2])) and len(self.dict_data_well['plast_work']) != 0:
             try:
                 expenditure_h2s_plan = max(
                     [self.dict_data_well["dict_category"][self.dict_data_well["plast_project"][0]]['по сероводороду'].poglot
@@ -131,8 +134,9 @@ def need_h2s(self, fluid_new, plast_edit, expected_pressure):
                 [self.dict_data_well["dict_category"][self.dict_data_well['plast_work'][0]]['по сероводороду'].poglot])
             expenditure_h2s = round(max([expenditure_h2s, expenditure_h2s_plan]), 2)
 
-            fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода {self.dict_data_well["type_absorbent"]} из ' \
-                         f'расчета {expenditure_h2s}кг/м3 либо аналог'
+            fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода ' \
+                         f'{self.dict_data_well["type_absorbent"]} из ' \
+                         f'расчета {expenditure_h2s}кг/м3 либо аналог (СНПХ-1200, ХИМТЕХНО 101 Марка А)'
             fluid_work_short = f'{fluid_new}г/см3 {self.dict_data_well["type_absorbent"]} {expenditure_h2s}кг/м3 '
         else:
             fluid_work = f'{fluid_new}г/см3 '
@@ -146,32 +150,32 @@ def need_h2s(self, fluid_new, plast_edit, expected_pressure):
         pressuar, ok = QInputDialog.getDouble(None, 'Значение по давлению вскрываемого пласта',
                                               'ВВедите давление вскрываемого пласта', 0, 0, 600, 1)
 
-        cat_H2S, ok = QInputDialog.getItem(None, 'Категория скважины по сероводороду вскрываемого пласта',
+        category_h2s, ok = QInputDialog.getItem(None, 'Категория скважины по сероводороду вскрываемого пласта',
                                            'Выберете категорию скважины по сероводороду вскрываемого пласта',
                                            cat_list, 0, False)
 
-        cat_h2s_list_plan.append(cat_H2S)
+        category_h2s_list_plan.append(category_h2s)
         h2s_mg, _ = QInputDialog.getDouble(None, 'сероводород в мг/л',
                                            'Введите значение серовородода в мг/л', 0, 0, 100, 5)
         self.dict_data_well["h2s_mg"].append(h2s_mg)
         h2s_pr, _ = QInputDialog.getDouble(None, 'сероводород в процентах',
                                            'Введите значение серовородода в процентах', 0, 0, 100, 1)
-        poglot = H2S.calv_h2s(None, cat_H2S, h2s_mg, h2s_pr)
+        poglot = H2S.calv_h2s(None, category_h2s, h2s_mg, h2s_pr)
         Data_h2s = namedtuple("Data_h2s", "category data_procent data_mg_l poglot")
         Pressuar = namedtuple("Pressuar", "category data_pressuar")
         self.dict_data_well["dict_category"].setdefault(plast_edit, {}).setdefault(
-            'по давлению', Pressuar(int(cat_H2S), pressuar))
+            'по давлению', Pressuar(int(category_h2s), pressuar))
         self.dict_data_well["dict_category"].setdefault(plast_edit, {}).setdefault(
             'по сероводороду', Data_h2s(int(cat_pressuar), h2s_pr, h2s_mg, poglot))
         self.dict_data_well["dict_category"].setdefault(plast_edit, {}).setdefault(
             'отключение', 'планируемый')
 
-        if cat_h2s_list_plan[0] in [1, 2]:
+        if category_h2s_list_plan[0] in [1, 2]:
 
             expenditure_h2s = round(
                 max([self.dict_data_well["dict_category"][plast]['по сероводороду'].poglot for plast in self.dict_data_well["plast_project"]]), 2)
             fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода {self.dict_data_well["type_absorbent"]} из ' \
-                         f'расчета {expenditure_h2s}кг/м3  либо аналог'
+                         f'расчета {expenditure_h2s}кг/м3  либо аналог (СНПХ-1200, ХИМТЕХНО 101 Марка А)'
             fluid_work_short = f'{fluid_new}г/см3 {self.dict_data_well["type_absorbent"]} {expenditure_h2s}кг/м3 '
         else:
             fluid_work = f'{fluid_new}г/см3 '
@@ -199,8 +203,8 @@ def konte(self):
     return konte_list
 
 
-def definition_Q(self):
-    definition_Q_list = [
+def definition_q(self):
+    definition_q_list = [
         [f'Насыщение 5м3 определение Q при 80-120атм', None,
          f'Произвести насыщение скважины до стабилизации давления закачки не менее 5м3. Опробовать  '
          f' на приемистость в трех режимах при Р=80-120атм в '
@@ -210,13 +214,13 @@ def definition_Q(self):
          f'начала работ). ',
          None, None, None, None, None, None, None,
          'мастер КРС', 0.17 + 0.2 + 0.2 + 0.2 + 0.15 + 0.52]]
-    return definition_Q_list
+    return definition_q_list
 
 
-def definition_Q_nek(self):
+def definition_q_nek(self):
     open_checkbox_dialog(self.dict_data_well)
     plast = data_list.plast_select
-    definition_Q_list = [[f'Насыщение 5м3 Q-{plast} при {self.dict_data_well["max_admissible_pressure"]._value}', None,
+    definition_q_list = [[f'Насыщение 5м3 Q-{plast} при {self.dict_data_well["max_admissible_pressure"]._value}', None,
                           f'Произвести насыщение скважины по затрубу до стабилизации давления закачки не '
                           f'менее 5м3. Опробовать по затрубу'
                           f' на приемистость {plast} при Р={self.dict_data_well["max_admissible_pressure"]._value}атм в присутствии '
@@ -227,7 +231,7 @@ def definition_Q_nek(self):
                           None, None, None, None, None, None, None,
                           'мастер КРС', 0.17 + 0.2 + 0.2 + 0.2 + 0.15 + 0.52]]
 
-    return definition_Q_list
+    return definition_q_list
 
 
 def privyazka_nkt(self):
@@ -244,7 +248,8 @@ def privyazka_nkt(self):
 def definitionBottomGKLM(self):
     priv_list = [[f'Отбить забой по ГК и ЛМ', None,
                   f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {data_list.contractor}". '
-                  f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером  {data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г. '
+                  f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером '
+                  f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г. '
                   f'ЗАДАЧА 2.8.2 Отбить забой по ГК и ЛМ',
                   None, None, None, None, None, None, None,
                   'Мастер КРС, подрядчик по ГИС', 4]]
@@ -253,7 +258,8 @@ def definitionBottomGKLM(self):
 
 def pressuar_gis(self):
     priv_list = [[f'Замер Рпл', None,
-                  f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {data_list.contractor}". '
+                  f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через '
+                  f'ЦИТС {data_list.contractor}". '
                   f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером '
                   f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г. '
                   f'Произвести замер Рпл в течении 4часов. При необходимости согласовать с заказчиком смену категории',
@@ -358,17 +364,17 @@ def calculation_fluid_work(dict_data_well, vertical, pressure):
             isinstance(pressure, float) or isinstance(pressure, int)):
 
         # print(vertical, pressure)
-        stockRatio = 0.1 if float(vertical) <= 1200 else 0.05
+        stock_ratio = 0.1 if float(vertical) <= 1200 else 0.05
 
-        fluidWork = round(float(str(pressure)) * (1 + stockRatio) / float(vertical) / 0.0981, 2)
-        # print(fluidWork < 1.02 , (self.dict_data_well["region"] == 'КГМ' or self.dict_data_well["region"] == 'АГМ'))
-        if fluidWork < 1.02 and (dict_data_well["region"] == 'КГМ' or dict_data_well["region"] == 'АГМ'):
-            fluidWork = 1.02
-        elif fluidWork < 1.02 and (
-                dict_data_well["region"] == 'ИГМ' or dict_data_well["region"] == 'ТГМ' or dict_data_well["region"] == 'ЧГМ'):
-            fluidWork = 1.01
+        fluid_work_calculate = round(float(str(pressure)) * (1 + stock_ratio) / float(vertical) / 0.0981, 2)
 
-        return fluidWork
+        if fluid_work_calculate < 1.02 and (dict_data_well["region"] == 'КГМ' or dict_data_well["region"] == 'АГМ'):
+            fluid_work_calculate = 1.02
+        elif fluid_work_calculate < 1.02 and (dict_data_well["region"] == 'ИГМ' or dict_data_well["region"] == 'ТГМ'
+                or dict_data_well["region"] == 'ЧГМ'):
+            fluid_work_calculate = 1.01
+
+        return fluid_work_calculate
     else:
         return None
 
@@ -499,7 +505,7 @@ def well_volume(self, current_bottom):
     return round(volume_well, 1)
 
 
-def volume_pod_NKT(self):  # Расчет необходимого объема внутри НКТ и между башмаком НКТ и забоем
+def volume_pod_nkt(self):  # Расчет необходимого объема внутри НКТ и между башмаком НКТ и забоем
 
     nkt_l = round(sum(list(self.dict_data_well["dict_nkt"].values())), 1)
     if self.dict_data_well["column_additional"] is False:
