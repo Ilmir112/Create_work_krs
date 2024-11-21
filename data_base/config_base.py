@@ -368,6 +368,7 @@ class WorkDatabaseWell:
                      self.dict_data_well["fluid"]
                      )
 
+
         cursor = self.db_connection.cursor()
         query = f"""SELECT * FROM chemistry
            WHERE well_number={self.path_index} AND well_area={self.path_index} AND region={self.path_index}
