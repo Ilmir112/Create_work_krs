@@ -85,7 +85,7 @@ DICT_CONTRACTOR = {
         }
 }
 countAcid = 0
-swabTypeComboIndex = 1
+swab_type_comboIndex = 1
 swab_true_edit_type = 1
 
 dop_work_list = None
@@ -94,7 +94,7 @@ privyazkaSKO = 0
 nkt_mistake = False
 
 plan_correct_index = 0
-cat_h2s_list = []
+category_h2s_list = []
 user = ['', '']
 
 data_in_base = False

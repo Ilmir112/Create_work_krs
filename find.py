@@ -326,11 +326,13 @@ class FindIndexPZ(MyMainWindow):
             if image_loader.image_in(coord):
                 # Загружаем изображение из текущей ячейки
                 image = image_loader.get(coord)
-
+                print('fjjfh')
                 image.save(
                     f'{data_list.path_image}imageFiles/image_work/image{get_column_letter(col)}{row}.png')
                 image_size = image.size
+                print('frvr')
                 image_path = f'{data_list.path_image}imageFiles/image_work/image{get_column_letter(col)}{row}.png'
+                print(f'{image_path}')
 
                 coord = f'{get_column_letter(col)}{row + 17 - self.cat_well_min._value}'
 
@@ -349,6 +351,7 @@ class FindIndexPZ(MyMainWindow):
                     "height": image_size[1],
                     "data": image_base64
                 }
+                print(image_info)
 
                 # Добавление информации в список
                 self.dict_data_well["image_data"].append(image_info)
