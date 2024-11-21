@@ -676,7 +676,7 @@ class CheckWellExistence:
             cursor.execute(f"SELECT * "
                            f"FROM {region} "
                            f"WHERE well_number=({self.path_index}) AND deposit_area=({self.path_index})",
-                           (str(well_number), deposit_area))
+                           (str(well_number), deposit_area.replace('_', ' ')))
             result = cursor.fetchone()
 
             # Если запись найдена, возвращается True, в противном случае возвращается False
@@ -695,7 +695,7 @@ class CheckWellExistence:
             # Проверка наличия записи в базе данных
             query = f"SELECT categoty_pressure, categoty_h2s, categoty_gf, today FROM {region}_классификатор " \
                     f"WHERE well_number =({self.path_index}) and deposit_area =({self.path_index})"
-            data = (str(well_number._value), deposit_area._value)
+            data = (str(well_number._value), str(deposit_area._value).replace("_", " "))
             cursor.execute(query, data)
 
             result = cursor.fetchone()

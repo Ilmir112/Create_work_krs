@@ -28,8 +28,7 @@ class ClassifierWell(MyMainWindow):
     number_well = None
 
     def __init__(self, costumer, region, ClassifierWell, parent=None):
-
-        super(ClassifierWell, self).__init__()
+        super().__init__()
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
         self.table_class = QTableWidget()
