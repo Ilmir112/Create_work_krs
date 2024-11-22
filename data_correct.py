@@ -255,10 +255,10 @@ class TabPageSoCorrect(TabPageUnion):
         self.curator_Combo.setMinimumWidth(50)
 
         self.region_Label = QLabel('Регион')
-        self.region_Combo = QComboBox(self)
+        self.region_combo = QComboBox(self)
 
         self.type_kr_Label = QLabel('Вид и категория ремонта, его шифр')
-        self.type_kr_Combo = QComboBox(self)
+        self.type_kr_combo = QComboBox(self)
 
         self.nkt_do_label = QLabel('НКТ  до ремонта')
         self.nkt_posle_label = QLabel('НКТ плановое согласно расчета')
@@ -371,10 +371,10 @@ class TabPageSoCorrect(TabPageUnion):
         self.grid.addWidget(self.curator_Combo, 24, 1)
 
         self.grid.addWidget(self.region_Label, 23, 2)
-        self.grid.addWidget(self.region_Combo, 24, 2)
+        self.grid.addWidget(self.region_combo, 24, 2)
 
         self.grid.addWidget(self.type_kr_Label, 23, 3)
-        self.grid.addWidget(self.type_kr_Combo, 24, 3)
+        self.grid.addWidget(self.type_kr_combo, 24, 3)
 
         self.grid.addWidget(self.nkt_do_label, 27, 1)
         self.grid.addWidget(self.nkt_posle_label, 27, 5)
@@ -575,15 +575,15 @@ class TabPageSoCorrect(TabPageUnion):
         self.curator_Combo.currentTextChanged.connect(self.update_curator)
         # print(f'куратор индекс {curator, curator_list.index(curator)}')
         self.curator_Combo.setCurrentIndex(curator_list.index(curator))
-        self.region_Combo.addItems(data_list.REGION_LIST)
-        self.region_Combo.setCurrentIndex(data_list.REGION_LIST.index(self.dict_data_well["region"]))
+        self.region_combo.addItems(data_list.REGION_LIST)
+        self.region_combo.setCurrentIndex(data_list.REGION_LIST.index(self.dict_data_well["region"]))
 
-        self.type_kr_Combo.view().setWordWrap(True)
-        self.type_kr_Combo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
+        self.type_kr_combo.view().setWordWrap(True)
+        self.type_kr_combo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
 
-        self.type_kr_Combo.addItems(data_list.TYPE_KR_LIST)
+        self.type_kr_combo.addItems(data_list.TYPE_KR_LIST)
 
-        self.type_kr_Combo.setCurrentIndex(self.select_type_kr())
+        self.type_kr_combo.setCurrentIndex(self.select_type_kr())
 
     def select_type_kr(self):
         kr = self.dict_data_well["type_kr"].split(' ')[0] + ' '
@@ -743,18 +743,18 @@ class DataWindow(WindowUnion):
         from work_py.opressovka import TabPageSo
         self.current_widget = self.tabWidget.currentWidget()
 
-        region_Combo = self.current_widget.region_Combo.currentText()
-        type_kr_Combo = self.current_widget.type_kr_Combo.currentText()
+        region_combo = self.current_widget.region_combo.currentText()
+        type_kr_combo = self.current_widget.type_kr_combo.currentText()
 
-        if region_Combo == '':
+        if region_combo == '':
             QMessageBox.warning(self, 'ОШИБКА', 'Не выбран регион')
             return
-        self.dict_data_well["region"] = region_Combo
-        if type_kr_Combo == '':
+        self.dict_data_well["region"] = region_combo
+        if type_kr_combo == '':
             QMessageBox.warning(self, 'ОШИБКА', 'Не выбран Вид и категория ремонта')
             return
         else:
-            self.dict_data_well["type_kr"] = type_kr_Combo
+            self.dict_data_well["type_kr"] = type_kr_combo
 
         column_type = self.current_widget.column_type.text()
         column_wall_thickness = self.current_widget.column_wall_thickness_edit_type2.text()
@@ -976,7 +976,7 @@ class DataWindow(WindowUnion):
 
 
         if self.dict_data_well["column_additional"]:
-            if int(column_additional_diametr) >= float(column_type):
+            if int(float(column_additional_diametr)) >= float(column_type):
                 QMessageBox.information(self, 'Внимание', 'Ошибка в диаметре доп колонны')
                 close_file = False
 
@@ -995,7 +995,7 @@ class DataWindow(WindowUnion):
                     column_wall_thickness = column_additional_wall_thickness
                     self.dict_data_well["column_additional"] = False
 
-        if type_kr_Combo in ['КР13-1  Подготовительные работы к ГРП (ПР)',
+        if type_kr_combo in ['КР13-1  Подготовительные работы к ГРП (ПР)',
                              'КР13-2  Освоение скважины после ГРП (ЗР)',
                              'КР13-1  Подготовительные работы к ГРП (ПР) КР13-2  Освоение скважины после ГРП (ЗР)',
                              'КР13-5  Подготовка скважины к проведению работ по повышению н/отдачи пластов',

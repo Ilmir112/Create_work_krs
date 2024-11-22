@@ -103,14 +103,17 @@ class VolumeWellWithExstraColumn(VolumeWell):
 
     def volume_well_pod_nkt(self):
         nkt_lenght = round(sum(list(self.dict_data_well["dict_nkt"].values())), 1)
-        if (round(sum(list(self.dict_data_well["dict_nkt"].values())), 1) >
-                float(self.dict_data_well["head_column_additional"]._value)):
+        if nkt_lenght > float(self.dict_data_well["head_column_additional"]._value):
             volume_well_pod_nkt = self.area_column_additional * (
-                    float(self.dict_data_well["current_bottom"] - int(nkt_lenght)) / 1000)
+                    float(self.dict_data_well["current_bottom"] - int(nkt_lenght)))
         else:
-            volume_well_pod_nkt = self.area_column * (
-                    float(self.dict_data_well["current_bottom"]) - int(nkt_lenght)) / 1000
-        return round(volume_well_pod_nkt, 1)
+            volume_add = self.area_column_additional * (
+                    float(self.dict_data_well["current_bottom"]) - int(nkt_lenght))
+            volume_ek = self.area_column * (float(self.dict_data_well["head_column_additional"]._value - nkt_lenght))
+
+            volume_well_pod_nkt = round(volume_add + volume_ek, 1)
+
+        return volume_well_pod_nkt
 
     def volume_calculate_roof_of_sole(self, roof, sole):
         if self.dict_data_well["head_column"]._value == 0:
@@ -166,9 +169,11 @@ def volume_well_pod_nkt_calculate(
         volume_well = VolumeWellWithoutExstraColumn(dict_data_well)
         return volume_well.volume_well_pod_nkt()
 
-    elif round(sum(list(dict_data_well["dict_nkt"].values())), 1) > float(
-            dict_data_well["head_column_additional"]._value):
+    else:
+        # round(sum(list(dict_data_well["dict_nkt"].values())), 1) > float(
+        #     dict_data_well["head_column_additional"]._value):
         volume_well = VolumeWellWithExstraColumn(dict_data_well)
+
 
         return volume_well.volume_well_pod_nkt()
 

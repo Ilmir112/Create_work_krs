@@ -329,7 +329,6 @@ class TabPageDp(TabPageUnion):
             skm_interval = ''
 
             try:
-
                 if len(self.dict_data_well["skm_interval"]) != 0:
                     for roof, sole in self.dict_data_well["skm_interval"]:
                         if f'{roof}-{sole}' not in skm_interval:
@@ -811,7 +810,7 @@ class DopPlanWindow(WindowUnion):
                 if float(current_bottom) > self.dict_data_well["bottomhole_drill"]._value:
                     QMessageBox.critical(self, 'Забой', 'Текущий забой больше пробуренного забоя')
                     return
-                self.dict_data_well["fluid_work"], self.dict_data_well["fluid_work_short"] = self.calc_work_fluid(self, fluid)
+                self.dict_data_well["fluid_work"], self.dict_data_well["fluid_work_short"] = self.calc_work_fluid(fluid)
 
             self.dict_data_well["template_depth"] = float(template_depth_edit)
             self.dict_data_well["template_lenght"] = float(template_lenght_edit)

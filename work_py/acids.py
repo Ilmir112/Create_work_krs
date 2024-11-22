@@ -14,8 +14,7 @@ from work_py.parent_work import TabPageUnion, WindowUnion, TabWidgetUnion
 
 class TabPageDp(TabPageUnion):
     def __init__(self, parent=None):
-        self.dict_data_well = parent
-        super().__init__()
+        super().__init__(parent)
 
         self.point_bottom_Label = QLabel("глубина нижней точки", self)
         self.point_bottom_edit = QLineEdit(self)

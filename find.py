@@ -1,4 +1,6 @@
 import re
+from io import BytesIO
+
 import data_list
 import base64
 from datetime import datetime
@@ -325,41 +327,32 @@ class FindIndexPZ(MyMainWindow):
             coord = f'{get_column_letter(col)}{row}'
             if image_loader.image_in(coord):
                 # Загружаем изображение из текущей ячейки
-                image = image_loader.get(coord)
-                print('fjjfh')
-                image.save(
-                    f'{data_list.path_image}imageFiles/image_work/image{get_column_letter(col)}{row}.png')
-                image_size = image.size
-                print('frvr')
-                image_path = f'{data_list.path_image}imageFiles/image_work/image{get_column_letter(col)}{row}.png'
-                print(f'{image_path}')
+                image_file = image_loader.get(coord)
+                if image_file:
+                    coord = f'{get_column_letter(col)}{row + 17 - self.cat_well_min._value}'
 
-                coord = f'{get_column_letter(col)}{row + 17 - self.cat_well_min._value}'
+                    # Создаем байтовый поток
+                    image_bytes = BytesIO()
+                    # Сохраняем изображение в байтовом потоке
+                    image_file.save(image_bytes, format='PNG')  # Замените 'PNG' на другой формат, если необходимо
+                    image_bytes.seek(0)  # Возвращаемся в начало байтового потока
+                    image_base64 = base64.b64encode(image_bytes.read()).decode("utf-8")
 
-                # self.dict_data_well["image_list"].append((image_path, coord, image_size))
+                    # Создание словаря для изображения
+                    image_info = {
+                        "coord": coord,
+                        "width":  image_file.width,
+                        "height": image_file.height,
+                        "data": image_base64
+                    }
 
-                # Чтение изображения в байты
-                with open(image_path, "rb") as f:
-                    image_bytes = f.read()
-                # Преобразование в Base64
-                image_base64 = base64.b64encode(image_bytes).decode("utf-8")
-
-                # Создание словаря для изображения
-                image_info = {
-                    "coord": coord,
-                    "width": image_size[0],
-                    "height": image_size[1],
-                    "data": image_base64
-                }
-                print(image_info)
-
-                # Добавление информации в список
-                self.dict_data_well["image_data"].append(image_info)
+                    # Добавление информации в список
+                    self.dict_data_well["image_data"].append(image_info)
 
     def check_str_none(self, string):
 
         try:
-            if MyWindow.check_str_isdigit(self, str(string)) is True:
+            if MyWindow.check_str_isdigit(str(string)) is True:
                 if str(round(float(str(string).replace(',', '.')), 1))[-1] == "0":
                     return int(float(str(string).replace(',', '.')))
                 else:
@@ -395,9 +388,9 @@ class FindIndexPZ(MyMainWindow):
                         b = str(b) + i
                 b = float(b)
                 return b
-        except:
+        except Exception as e:
             QMessageBox.warning(self, 'Ошибка',
-                                f'Ошибка в прочтении файла в строке {string}, Проверьте excel файл')
+                                f'Ошибка в прочтении файла в строке {string} {e}, Проверьте excel файл')
 
     def definition_is_none(self, data, row, col, step, m=12):
         try:
@@ -1275,10 +1268,11 @@ class WellData(FindIndexPZ):
                 else:
                     paker_diametr = TabPageSo.paker_diametr_select(self,
                                                                    self.dict_data_well["depth_fond_paker_do"]["do"])
-                    self.dict_data_well["check_data_in_pz"].append(
-                        f'Не корректно указан диаметр фондового пакера в карте спуска '
-                        f'ремонта {self.dict_data_well["paker_do"]["do"]} требуется пакер '
-                        f'диаметром {paker_diametr}мм')
+                    if str(paker_diametr) not in self.dict_data_well["paker_do"]["do"]:
+                        self.dict_data_well["check_data_in_pz"].append(
+                            f'Не корректно указан диаметр фондового пакера в карте спуска '
+                            f'ремонта {self.dict_data_well["paker_do"]["do"]} требуется пакер '
+                            f'диаметром {paker_diametr}мм')
 
             if self.dict_data_well["dict_pump_ECN"]["do"] != '0' and self.dict_data_well["dict_pump_SHGN"]["do"] != '0':
                 if self.dict_data_well["paker_do"]["do"] in ['0', None, 0]:
@@ -1802,16 +1796,16 @@ class WellCategory(FindIndexPZ):
             self.dict_data_well["category_h2s"] = self.dict_data_well["category_h2s_list"][0]
             self.dict_data_well["category_gf"] = self.dict_data_well["cat_gaz_f_pr"][0]
 
-            thread = ExcelWorker()
+            self.thread_excel = ExcelWorker(self.dict_data_well)
 
-            self.dict_data_well["without_damping"], stop_app = thread.check_well_existence(
+            self.dict_data_well["without_damping"], stop_app = self.thread_excel.check_well_existence(
                 self.dict_data_well["well_number"]._value, self.dict_data_well["well_area"]._value,
                 self.dict_data_well["region"])
             if stop_app:
                 self.pause_app()
 
             try:
-                categoty_pressure_well, categoty_h2s_well, categoty_gf, data = thread.check_category(
+                categoty_pressure_well, categoty_h2s_well, categoty_gf, data = self.thread_excel.check_category(
                     self.dict_data_well["well_number"], self.dict_data_well["well_area"], self.dict_data_well["region"])
 
                 if categoty_pressure_well:

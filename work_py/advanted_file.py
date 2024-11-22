@@ -332,13 +332,16 @@ def definition_plast_work(self):
         if "вертикаль" in list(self.dict_data_well["dict_perforation"][plast].keys()):
 
             vertical = min(filter(lambda x: type(x) in [float, int], self.dict_data_well["dict_perforation"][plast]["вертикаль"]))
+
+            self.dict_data_well["dict_perforation"][plast]['давление'].append(0)
             pressuar = float(max(filter(lambda x: type(x) in [float, int], self.dict_data_well["dict_perforation"][plast]['давление'])))
+
             if vertical and pressuar:
                 zhgs = calculation_fluid_work(self.dict_data_well, vertical,pressuar)
                 self.dict_data_well["dict_perforation"].setdefault(plast, {}).setdefault('рабочая жидкость',
                                                                                          []).append(zhgs)
             else:
-                zhgs = 1.01
+
                 self.dict_data_well["dict_perforation"].setdefault(plast, {}).setdefault('рабочая жидкость',
                                                                                          []).append(zhgs)
 
@@ -472,20 +475,7 @@ def count_row_height(self, wb2, ws, ws2, work_list, merged_cells_dict, ind_ins):
                             end_column=value[2], end_row=value[3])
 
 
-    # try:
-    #     # вставка сохраненных изображение по координатам ячеек
-    #     if self.dict_data_well["image_list"]:
-    #
-    #         for img in self.dict_data_well["image_list"]:
-    #             image_path = img[0]
-    #             # logo = Image(image_path) # Используем open для открытия изображения
-    #             # logo.width, logo.height = img[2][0] * 0.48, img[2][1] * 0.72
-    #             ws2.add_image(image_path, img[1])
-    # except TypeError as e:
-    #     QMessageBox.warning(None, 'Ошибка', f'Ошибка Изменения размера изображения {type(e).__name__}\n\n{str(e)}')
-
     if self.dict_data_well["image_data"]:
-
         for image_info in self.dict_data_well["image_data"]:
             coord = image_info["coord"]
             width = image_info["width"]
@@ -498,7 +488,7 @@ def count_row_height(self, wb2, ws, ws2, work_list, merged_cells_dict, ind_ins):
 
                 # Создаем объект PIL Image из декодированных данных
                 image = Image.open(BytesIO(decoded_image_data))
-                print(image)
+
                 # Проверка размеров изображения:
                 print(f"Размеры изображения: {image.size}")
 

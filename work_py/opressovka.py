@@ -142,17 +142,19 @@ class TabPageSo(TabPageUnion):
             182: (190.6, 203.6),
             204: (215, 221)
         }
+        try:
+            if self.dict_data_well["column_additional"] is False or (
+                    self.dict_data_well["column_additional"] is True and int(depth_landing) <= self.dict_data_well["head_column_additional"]._value):
+                diam_internal_ek = self.dict_data_well["column_diametr"]._value - 2 * self.dict_data_well["column_wall_thickness"]._value
+            else:
+                diam_internal_ek = self.dict_data_well["column_additional_diametr"]._value - \
+                                   2 * self.dict_data_well["column_additional_wall_thickness"]._value
 
-        if self.dict_data_well["column_additional"] is False or (
-                self.dict_data_well["column_additional"] is True and int(depth_landing) <= self.dict_data_well["head_column_additional"]._value):
-            diam_internal_ek = self.dict_data_well["column_diametr"]._value - 2 * self.dict_data_well["column_wall_thickness"]._value
-        else:
-            diam_internal_ek = self.dict_data_well["column_additional_diametr"]._value - \
-                               2 * self.dict_data_well["column_additional_wall_thickness"]._value
-
-        for diam, diam_internal_paker in paker_diam_dict.items():
-            if diam_internal_paker[0] <= diam_internal_ek <= diam_internal_paker[1]:
-                paker_diametr = diam
+            for diam, diam_internal_paker in paker_diam_dict.items():
+                if diam_internal_paker[0] <= diam_internal_ek <= diam_internal_paker[1]:
+                    paker_diametr = diam
+        except:
+            print('ошибка проверки диаметра пакера')
 
         return paker_diametr
 

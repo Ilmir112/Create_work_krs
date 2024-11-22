@@ -738,15 +738,31 @@ class GnktModel(WindowUnion):
     def schema_well(self, current_bottom_edit, fluid_edit, gnkt_number_combo,
                     gnkt_lenght, iznos_gnkt_edit, pvo_number, diametr_length, pipe_mileage_edit):
         self.gnkt = self.tabWidget.currentWidget()
+        pressuar = []
+        vertikal = []
+        koef_anomal = []
         for ind, plast_ind in enumerate(self.dict_data_well['plast_work']):
-            try:
-                self.pressuar = list(self.dict_data_well["dict_perforation"][plast_ind]["давление"])[0]
-                vertikal = min(map(float, list(self.dict_data_well["dict_perforation"][plast_ind]["вертикаль"])))
-                break
-            except Exception as e:
-                QMessageBox.warning(self, 'Ошибка', f'Ошибка прочтения данных ПВР {e}')
 
-        koef_anomal = round(float(self.pressuar) * 101325 / (float(vertikal) * 9.81 * 1000), 1)
+            if self.dict_data_well['paker_do']['do'] != 0:
+
+                if self.dict_data_well["dict_perforation"][plast_ind]['кровля'] > \
+                        self.dict_data_well['depth_fond_paker_do']['do']:
+                        if pressuar != 0:
+                            pressuar.append(max(list(map(
+                                float, self.dict_data_well["dict_perforation"][plast_ind]["давление"]))))
+                            vertikal.append(min(self.dict_data_well["dict_perforation"][plast_ind]["вертикаль"]))
+            else:
+                pressuar.append(max(list(map(
+                    float, self.dict_data_well["dict_perforation"][plast_ind]["давление"]))))
+                vertikal.append = min(map(
+                    float, list(self.dict_data_well["dict_perforation"][plast_ind]["вертикаль"])))
+
+        self.pressuar = max(pressuar)
+        vertikal = min(vertikal)
+        koef_anomal.append(round(float(self.pressuar) * 101325 / (float(vertikal) * 9.81 * 1000), 1))
+
+
+        koef_anomal = max(koef_anomal)
 
         nkt_str = ''
         lenght_str = '0-'

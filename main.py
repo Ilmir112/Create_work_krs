@@ -2,41 +2,30 @@
 import json
 import os
 import shutil
-
+import data_list
 import sys
 import socket
-
 import psutil
-
 import win32com.client
 import openpyxl
 import re
 import win32con
 import property_excel.property_excel_pvr
 import threading
-
 import win32gui
-
 from openpyxl.reader.excel import load_workbook
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu, QMenuBar, QAction, QTableWidget, \
     QLineEdit, QFileDialog, QToolBar, QPushButton, QMessageBox, QInputDialog, QTabWidget, QTableWidgetItem
 from PyQt5 import QtCore, QtWidgets
 from datetime import datetime
 from openpyxl.utils import get_column_letter
-
 from openpyxl.workbook import Workbook
 from openpyxl.styles import Alignment, Font
-
 from block_name import region_select
 from data_base.config_base import connect_to_database, CheckWellExistence, connection_to_database, WorkDatabaseWell
 from log_files.log import logger, QPlainTextEditLogger
-
 from openpyxl.drawing.image import Image
-
-import data_list
-
 from PyQt5.QtCore import QThread, pyqtSlot
-
 from users.login_users import LoginWindow
 from PyQt5.QtCore import Qt, QObject, pyqtSignal
 
@@ -59,19 +48,17 @@ class UncaughtExceptions(QObject):
 class ExcelWorker(QThread):
     finished = pyqtSignal()
 
-    def __init__(self):
+    def __init__(self, dict_data_well):
         super().__init__()
+        self.dict_data_well = dict_data_well
 
     def check_well_existence(self, well_number, deposit_area, region):
-
         check_true = True
-
         try:
             db = connection_to_database(data_list.DB_CLASSIFICATION)
             self.check_correct_well = CheckWellExistence(db)
             check_true, stop_app = self.check_correct_well.checking_well_database_without_juming(well_number,
                                                                                                  deposit_area, region)
-
         except Exception as e:
             QMessageBox.warning(None, 'Ошибка', f"Ошибка при проверке записи: {type(e).__name__}\n\n{str(e)}")
 
@@ -82,6 +69,24 @@ class ExcelWorker(QThread):
     def check_category(self, well_number, deposit_area, region):
         result = self.check_correct_well.check_category(well_number, deposit_area, region)
         return result
+
+    def insert_data_in_database(self, excel_data_dict, dict_data_well):
+        try:
+            db = connection_to_database(data_list.DB_WELL_DATA)
+            data_well_base = WorkDatabaseWell(db)
+            data_well_base.insert_in_database_well_data(self.dict_data_well,
+                                                        data_list.contractor, data_list.costumer, excel_data_dict)
+        except Exception as e:
+            QMessageBox.warning(None, 'Ошибка', f"Ошибка при вставке данных в базу: {type(e).__name__}\n\n{str(e)}")
+
+        try:
+            data_well_base.insert_data_in_chemistry(dict_data_well)
+        except Exception as e:
+            QMessageBox.warning(None, 'Ошибка', f"Ошибка при вставке данных химии в базу"
+                                                f": {type(e).__name__}\n\n{str(e)}")
+
+        # Завершение работы потока
+        self.finished.emit()
 
 
 class MyMainWindow(QMainWindow):
@@ -96,6 +101,29 @@ class MyMainWindow(QMainWindow):
         self.perforation_correct_window2 = None
         self.work_plan = None
         self.dict_data_well = {}
+
+    def check_gpp_upa(self, table_widget):
+        for row in range(table_widget.rowCount()):
+            for column in range(table_widget.columnCount()):
+                value = self.table_widget.item(row, column)
+                if value != None:
+                    value = value.text()
+                    if 'Установить подъёмный агрегат на устье не менее 40т' in value:
+                        new_value = QtWidgets.QTableWidgetItem(
+                            f'Установить подъёмный агрегат на устье не менее 60т. '
+                            f'Пусковой комиссией составить акт готовности подьемного '
+                            f'агрегата и бригады для проведения ремонта скважины.')
+                        table_widget.setItem(row, column, new_value)
+
+    @staticmethod
+    def check_str_isdigit(string):
+        # Паттерн для проверки: допустимы только цифры, точка и запятая
+        pattern = r'^[\d.,]+$'
+        # Проверка строки на соответствие паттерну
+        if re.match(pattern, string):
+            return True
+        else:
+            return False
 
     def add_window(self, window):
         if self.operation_window is None:
@@ -845,7 +873,6 @@ class MyWindow(MyMainWindow):
         self.table_juming = None
         self.resize(1400, 800)
 
-
         self.perforation_correct_window2 = None
         self.ws = None
         self.ins_ind = None
@@ -988,11 +1015,11 @@ class MyWindow(MyMainWindow):
         self.toolbar.addWidget(self.correctDataButton)
 
         self.correctPVRButton = QPushButton("Скорректировать работающие ПВР")
-        self.correctPVRButton.clicked.connect(self.correctPVR)
+        self.correctPVRButton.clicked.connect(self.correct_perforation)
         self.toolbar.addWidget(self.correctPVRButton)
 
         self.correctNEKButton = QPushButton("Скорректировать НЭК")
-        self.correctNEKButton.clicked.connect(self.correctNEK)
+        self.correctNEKButton.clicked.connect(self.correct_nek)
         self.toolbar.addWidget(self.correctNEKButton)
 
         self.correct_curator_Button = QPushButton("Скорректировать куратора")
@@ -1489,15 +1516,9 @@ class MyWindow(MyMainWindow):
                 self.insert_image(ws2, f'{data_list.path_image}imageFiles/Шамигулов.png', 'H4')
 
             excel_data_dict = excel_in_json(self, ws2)
-            db = connection_to_database(data_list.DB_WELL_DATA)
-            data_well_base = WorkDatabaseWell(db, self.dict_data_well)
-            data_well_base.insert_in_database_well_data(self.dict_data_well["well_number"]._value,
-                                                        self.dict_data_well["well_area"]._value,
-                                                        data_list.contractor, data_list.costumer,
-                                                        self.dict_data_well["data_well_dict"], excel_data_dict,
-                                                        self.work_plan)
+            self.thread_excel_insert = ExcelWorker(self.dict_data_well)
+            self.thread_excel_insert.insert_data_in_database(excel_data_dict, self.dict_data_well)
 
-            data_well_base.insert_data_in_chemistry()
 
             ws2.print_area = f'B1:L{self.table_widget.rowCount() + 45}'
             ws2.page_setup.fitToPage = True
@@ -1546,11 +1567,11 @@ class MyWindow(MyMainWindow):
 
         perforation_action = QAction("Перфорация", self)
         geophysical.addAction(perforation_action)
-        perforation_action.triggered.connect(self.perforationNewWindow)
+        perforation_action.triggered.connect(self.perforation_new_window)
 
         geophysical_action = QAction("Геофизические исследования", self)
         geophysical.addAction(geophysical_action)
-        geophysical_action.triggered.connect(self.GeophysicalNewWindow)
+        geophysical_action.triggered.connect(self.geophysical_new_window)
 
         rgd_menu = geophysical.addMenu("РГД")
         rgd_without_paker_action = QAction("РГД по колонне", self)
@@ -1559,7 +1580,7 @@ class MyWindow(MyMainWindow):
 
         po_action = QAction("прихватоопределить", self)
         geophysical.addAction(po_action)
-        po_action.triggered.connect(self.poNewWindow)
+        po_action.triggered.connect(self.po_new_window)
 
         torpedo_action = QAction("Торпедирование и извлечение ЭК", self)
         geophysical.addAction(torpedo_action)
@@ -1594,9 +1615,9 @@ class MyWindow(MyMainWindow):
         kompressVoronka_action.triggered.connect(self.pressuar_gis)
 
         del_menu = context_menu.addMenu('удаление строки')
-        emptyString_action = QAction("добавить пустую строку", self)
-        del_menu.addAction(emptyString_action)
-        emptyString_action.triggered.connect(self.emptyString)
+        empty_string_action = QAction("добавить пустую строку", self)
+        del_menu.addAction(empty_string_action)
+        empty_string_action.triggered.connect(self.empty_string)
 
         deleteString_action = QAction("Удалить строку", self)
         del_menu.addAction(deleteString_action)
@@ -1670,7 +1691,7 @@ class MyWindow(MyMainWindow):
         acid_menu = action_menu.addMenu('Кислотная обработка')
         acid_action1paker = QAction("Кислотная обработка", self)
         acid_menu.addAction(acid_action1paker)
-        acid_action1paker.triggered.connect(self.acidPakerNewWindow)
+        acid_action1paker.triggered.connect(self.acid_paker_new_window)
 
         acid_action_gons = QAction("ГОНС", self)
         acid_menu.addAction(acid_action_gons)
@@ -1734,17 +1755,17 @@ class MyWindow(MyMainWindow):
 
         rir_menu = action_menu.addMenu('РИР')
 
-        pakerIzvlek_action = QAction('извлекаемый пакер')
-        rir_menu.addAction(pakerIzvlek_action)
-        pakerIzvlek_action.triggered.connect(self.pakerIzvlek_action)
+        paker_izvlek_action = QAction('извлекаемый пакер')
+        rir_menu.addAction(paker_izvlek_action)
+        paker_izvlek_action.triggered.connect(self.paker_izvlek_action)
 
         rir_action = QAction('РИР')
         rir_menu.addAction(rir_action)
         rir_action.triggered.connect(self.rir_action)
 
-        claySolision_action = QAction('Глинистый раствор в ЭК')
-        rir_menu.addAction(claySolision_action)
-        claySolision_action.triggered.connect(self.claySolision)
+        clay_solision_action = QAction('Глинистый раствор в ЭК')
+        rir_menu.addAction(clay_solision_action)
+        clay_solision_action.triggered.connect(self.clay_solision)
 
         gno_menu = action_menu.addAction('Спуск фондового оборудования')
         gno_menu.triggered.connect(self.gno_bottom)
@@ -1951,17 +1972,7 @@ class MyWindow(MyMainWindow):
 
     def tubing_pressure_testing(self):
         from work_py.tubing_pressuar_testing import TubingPressuarWindow
-
-        if self.operation_window is None:
-            self.operation_window = TubingPressuarWindow(self.dict_data_well, self.table_widget)
-            self.operation_window.setGeometry(50, 50, 900, 500)
-            self.set_modal_window(self.operation_window)
-            self.pause_app()
-            data_list.pause = True
-            self.operation_window = None
-        else:
-            self.operation_window.close()  # Close window.
-            self.operation_window = None
+        self.add_window(TubingPressuarWindow)
 
     def read_clicked_mouse_data(self, row):
         from work_py.advanted_file import definition_plast_work
@@ -2009,31 +2020,12 @@ class MyWindow(MyMainWindow):
         self.populate_row(self.ins_ind, drilling_work_list, self.table_widget)
 
     def drilling_action_nkt(self):
-        if self.operation_window is None:
-            from work_py.drilling import Drill_window
-            self.operation_window = Drill_window(self.dict_data_well, self.table_widget)
-            self.set_modal_window(self.operation_window)
-            self.pause_app()
-            data_list.pause = True
-            self.operation_window = None
-        else:
-            self.operation_window.close()  # Close window.
-            self.operation_window = None
+        from work_py.drilling import Drill_window
+        self.add_window(Drill_window)
 
     def magnet_action(self):
-
         from work_py.emergency_magnit import EmergencyMagnit
-        if self.operation_window is None:
-            self.operation_window = EmergencyMagnit(self.dict_data_well, self.table_widget)
-            # self.operation_window.setGeometry(200, 400, 300, 400)
-            self.set_modal_window(self.operation_window)
-            self.pause_app()
-            data_list.pause = True
-            self.operation_window = None
-        else:
-            self.operation_window.close()  # Close window.
-            self.operation_window = None
-
+        self.add_window(EmergencyMagnit)
     def emergency_sticking_action(self):
         from work_py.emergencyWork import emergency_sticking
         emergency_sticking_list = emergency_sticking(self)
@@ -2051,45 +2043,15 @@ class MyWindow(MyMainWindow):
 
     def lar_sbt_action(self):
         from work_py.emergency_lar import EmergencyLarWork
-        if self.operation_window is None:
-            self.operation_window = EmergencyLarWork(self.dict_data_well, self.table_widget)
-            # self.operation_window.setGeometry(200, 400, 300, 400)
-
-            self.set_modal_window(self.operation_window)
-            self.pause_app()
-            data_list.pause = True
-            self.operation_window = None
-        else:
-            self.operation_window.close()  # Close window.
-            self.operation_window = None
+        self.add_window(EmergencyLarWork)
 
     def lar_po_action(self):
         from work_py.emergency_po import EmergencyPo
-        if self.operation_window is None:
-            self.operation_window = EmergencyPo(self.dict_data_well, self.table_widget)
-            # self.operation_window.setGeometry(200, 400, 300, 400)
-
-            self.set_modal_window(self.operation_window)
-            self.pause_app()
-            data_list.pause = True
-            self.operation_window = None
-        else:
-            self.operation_window.close()  # Close window.
-            self.operation_window = None
+        self.add_window(EmergencyPo)
 
     def emergency_print_work_action(self):
         from work_py.emergency_printing import EmergencyPrintWork
-        if self.operation_window is None:
-            self.operation_window = EmergencyPrintWork(self.dict_data_well, self.table_widget)
-            # self.operation_window.setGeometry(200, 400, 300, 400)
-
-            self.set_modal_window(self.operation_window)
-            self.pause_app()
-            data_list.pause = True
-            self.operation_window = None
-        else:
-            self.operation_window.close()  # Close window.
-            self.operation_window = None
+        self.add_window(EmergencyPrintWork)
 
     def rgd_without_paker_action(self):
         from work_py.rgdVcht import rgd_without_paker
@@ -2130,7 +2092,6 @@ class MyWindow(MyMainWindow):
 
     def kot_work(self):
         from work_py.alone_oreration import kot_work
-
         kot_work_list = kot_work(self)
         self.populate_row(self.ins_ind, kot_work_list, self.table_widget)
 
@@ -2146,29 +2107,11 @@ class MyWindow(MyMainWindow):
 
     def acid_action_gons(self):
         from work_py.acids import GonsWindow
+        self.add_window(GonsWindow)
 
-        if self.operation_window is None:
-            self.operation_window = GonsWindow(self.dict_data_well, self.table_widget, self.dict_data_well)
-
-            self.set_modal_window(self.operation_window)
-            self.pause_app()
-            data_list.pause = True
-            self.operation_window = None
-        else:
-            self.operation_window.close()  # Close window.
-            self.operation_window = None
-
-    def pakerIzvlek_action(self):
+    def paker_izvlek_action(self):
         from work_py.izv_paker import PakerIzvlek
-        if self.operation_window is None:
-            self.operation_window = PakerIzvlek(self.dict_data_well, self.table_widget)
-            self.set_modal_window(self.operation_window)
-            self.pause_app()
-            data_list.pause = True
-            self.operation_window = None
-        else:
-            self.operation_window.close()  # Close window.
-            self.operation_window = None
+        self.add_window(PakerIzvlek)
 
     def pvo_cat1(self):
         from work_py.alone_oreration import pvo_cat1
@@ -2177,95 +2120,30 @@ class MyWindow(MyMainWindow):
 
     def fluid_change_action(self):
         from work_py.change_fluid import Change_fluid_Window
+        self.add_window(Change_fluid_Window)
 
-        if self.operation_window is None:
-            self.operation_window = Change_fluid_Window(self.dict_data_well, self.table_widget)
-            # self.operation_window.setGeometry(200, 400, 100, 200)
-            self.operation_window.show()
-            self.set_modal_window(self.operation_window)
-            self.pause_app()
-            data_list.pause = True
-            self.operation_window = None
-        else:
-            self.operation_window.close()  # Close window.
-            self.operation_window = None
-
-    def claySolision(self):
+    def clay_solision(self):
         from work_py.claySolution import ClayWindow
-        if self.operation_window is None:
-            data_list.countAcid = 0
-            self.operation_window = ClayWindow(self.dict_data_well, self.table_widget)
-
-            self.set_modal_window(self.operation_window)
-            self.pause_app()
-            data_list.pause = True
-            self.operation_window = None
-        else:
-            self.operation_window.close()  # Close window.
-            self.operation_window = None
+        self.add_window(ClayWindow)
 
     def rir_action(self):
         from work_py.rir import RirWindow
-
-        if self.operation_window is None:
-            data_list.countAcid = 0
-            self.operation_window = RirWindow(self.dict_data_well, self.table_widget)
-            # self.operation_window.setGeometry(200, 400, 300, 400)
-
-            self.set_modal_window(self.operation_window)
-            self.pause_app()
-            data_list.pause = True
-            self.operation_window = None
-        else:
-            self.operation_window.close()  # Close window.
-            self.operation_window = None
+        self.add_window(RirWindow)
 
     def grp_with_paker(self):
         from work_py.grp import GrpWindow
-
-        if self.operation_window is None:
-            self.operation_window = GrpWindow(self.dict_data_well, self.table_widget)
-            # self.operation_window.setGeometry(200, 400, 500, 500)
-            self.set_modal_window(self.operation_window)
-            self.pause_app()
-            data_list.pause = True
-            self.operation_window = None
-        else:
-            self.operation_window.close()  # Close window.
-            self.operation_window = None
+        self.add_window(GrpWindow)
 
     def grp_with_gpp(self):
         from work_py.gpp import GppWindow
-
-        if self.operation_window is None:
-            self.operation_window = GppWindow(self.dict_data_well, self.table_widget)
-            # self.operation_window.setGeometry(200, 400, 500, 500)
-            self.set_modal_window(self.operation_window)
-            self.pause_app()
-            data_list.pause = True
-            self.operation_window = None
-        else:
-            self.operation_window.close()  # Close window.
-            self.operation_window = None
+        self.add_window(GppWindow)
 
     def filling_sand(self):
         from work_py.sand_filling import SandWindow
-
-        if self.operation_window is None:
-            self.operation_window = SandWindow(self.dict_data_well, self.table_widget)
-            # self.operation_window.setGeometry(200, 400, 500, 500)
-            self.set_modal_window(self.operation_window)
-            self.pause_app()
-            data_list.pause = True
-            self.operation_window = None
-        else:
-            self.operation_window.close()  # Close window.
-            self.operation_window = None
+        self.add_window(SandWindow)
 
     def washing_sand(self):
         from work_py.sand_filling import SandWindow
-
-        print('Вставился отсыпка песком')
         washing_work_list = SandWindow.sandWashing(self)
         self.populate_row(self.ins_ind, washing_work_list, self.table_widget)
 
@@ -2289,201 +2167,89 @@ class MyWindow(MyMainWindow):
                 self.table_widget.removeRow(row)
                 self.dict_data_well["data_list"].pop(row - self.dict_data_well["count_row_well"])
 
-    def emptyString(self):
+    def empty_string(self):
         if self.ins_ind > self.dict_data_well["count_row_well"]:
             ryber_work_list = [[None, None, None, None, None, None, None, None, None, None, None, None]]
             self.populate_row(self.ins_ind, ryber_work_list, self.table_widget)
 
     def vp_action(self):
         from work_py.vp_cm import VpWindow
-
-        if self.operation_window is None:
-            self.operation_window = VpWindow(self.dict_data_well, self.table_widget)
-            # self.operation_window.setGeometry(200, 400, 500, 500)
-            self.set_modal_window(self.operation_window)
-            self.pause_app()
-            data_list.pause = True
-            self.operation_window = None
-        else:
-            self.operation_window.close()  # Close window.
-            self.operation_window = None
+        self.add_window(VpWindow)
 
     def swibbing_with_paker(self):
         from work_py.swabbing import SwabWindow
-
-        if self.operation_window is None:
-            self.operation_window = SwabWindow(self.dict_data_well, self.table_widget)
-            self.set_modal_window(self.operation_window)
-            self.pause_app()
-            data_list.pause = True
-            self.operation_window = None
-        else:
-            self.operation_window.close()  # Close window.
-            self.operation_window = None
+        self.add_window(SwabWindow)
 
     def kompress_with_voronka(self):
         from work_py.kompress import KompressWindow
-
-        if self.operation_window is None:
-            self.operation_window = KompressWindow(self.dict_data_well, self.table_widget)
-            self.set_modal_window(self.operation_window)
-            self.pause_app()
-            data_list.pause = True
-            self.operation_window = None
-        else:
-            self.operation_window.close()  # Close window.
-            self.operation_window = None
+        self.add_window(KompressWindow)
 
     def ryber_add(self):
         from work_py.raiding import Raid
-
-        if self.operation_window is None:
-            self.operation_window = Raid(self.dict_data_well, self.table_widget)
-            self.set_modal_window(self.operation_window)
-            self.pause_app()
-            data_list.pause = True
-            self.operation_window = None
-        else:
-            self.operation_window.close()  # Close window.
-            self.operation_window = None
-
-    def gnkt_after_grp(self):
-        from gnkt_after_grp import gnkt_work
-        gnkt_work_list = gnkt_work(self)
-        self.populate_row(self.ins_ind, gnkt_work_list, self.table_widget)
+        self.add_window(Raid)
 
     def gno_bottom(self):
         from work_py.descent_gno import GnoDescentWindow
-
-        if self.operation_window is None:
-            self.operation_window = GnoDescentWindow(self.dict_data_well, self.table_widget)
-            self.set_modal_window(self.operation_window)
-            self.pause_app()
-            data_list.pause = True
-            self.operation_window = None
-        else:
-            self.operation_window.close()  # Close window.
-            self.operation_window = None
+        self.add_window(GnoDescentWindow)
 
     def pressure_test(self):
         from work_py.opressovka import OpressovkaEK
-
-        if self.operation_window is None:
-            self.operation_window = OpressovkaEK(self.dict_data_well, self.table_widget)
-            self.set_modal_window(self.operation_window)
-            self.pause_app()
-            data_list.pause = True
-            self.operation_window = None
-        else:
-            self.operation_window.close()  # Close window.
-            self.operation_window = None
+        self.add_window(OpressovkaEK)
 
     def block_pack(self):
         from work_py.block_pack_work import BlockPackWindow
-
-        self.operation_window = BlockPackWindow(self.dict_data_well, self.table_widget)
-        self.set_modal_window(self.operation_window)
-        self.pause_app()
-        data_list.pause = True
-        self.operation_window = None
+        self.add_window(BlockPackWindow)
 
     def template_pero(self):
         from work_py.pero_work import PeroWindow
-
-        self.operation_window = PeroWindow(self.dict_data_well, self.table_widget)
-        self.set_modal_window(self.operation_window)
-        self.pause_app()
-        data_list.pause = True
-        self.operation_window = None
+        self.add_window(PeroWindow)
 
     def template_with_skm(self):
         from work_py.template_work import TemplateKrs
-
-        if self.operation_window is None:
-            self.operation_window = TemplateKrs(self.dict_data_well, self.table_widget)
-            self.set_modal_window(self.operation_window)
-            self.pause_app()
-            data_list.pause = True
-            self.operation_window = None
-        else:
-            self.operation_window.close()  # Close window.
-            self.operation_window = None
+        self.add_window(TemplateKrs)
 
     def sgm_work(self):
         from work_py.sgm_work import TemplateKrs
-
-        if self.operation_window is None:
-            self.operation_window = TemplateKrs(self.dict_data_well, self.table_widget)
-            self.set_modal_window(self.operation_window)
-            self.pause_app()
-            data_list.pause = True
-            self.operation_window = None
-        else:
-            self.operation_window.close()  # Close window.
-            self.operation_window = None
+        self.add_window(TemplateKrs)
 
     def paker_clear_aspo(self):
         from work_py.opressovka_aspo import PakerAspo
-
-        if self.operation_window is None:
-            self.operation_window = PakerAspo(self.dict_data_well, self.table_widget)
-            self.set_modal_window(self.operation_window)
-            self.pause_app()
-            data_list.pause = True
-            self.operation_window = None
-        else:
-            self.operation_window.close()  # Close window.
-            self.operation_window = None
+        self.add_window(PakerAspo)
 
     def template_without_skm(self):
         from work_py.template_without_skm import TemplateWithoutSkm
+        self.add_window(TemplateWithoutSkm)
 
-        if self.operation_window is None:
-            self.operation_window = TemplateWithoutSkm(self.dict_data_well, self.table_widget)
-            self.set_modal_window(self.operation_window)
-            self.pause_app()
-            data_list.pause = True
-            self.operation_window = None
-        else:
-            self.operation_window.close()  # Close window.
-            self.operation_window = None
-
-    def acidPakerNewWindow(self):
+    def acid_paker_new_window(self):
         from work_py.acid_paker import AcidPakerWindow
         self.add_window(AcidPakerWindow)
 
-    def GeophysicalNewWindow(self):
+    def geophysical_new_window(self):
         from work_py.geophysic import GeophysicWindow
+        self.add_window(GeophysicWindow)
+        # if self.operation_window is None:
+        #     
+        #     self.operation_window = GeophysicWindow(self.dict_data_well, self.table_widget)
+        #     self.operation_window.setWindowTitle("Геофизические исследования")
+        #     self.set_modal_window(self.operation_window)
+        #     self.pause_app()
+        #     data_list.pause = True
+        #     self.operation_window = None  # Discard reference.
+        # 
+        # 
+        # else:
+        #     self.operation_window.close()  # Close window.
+        #     self.operation_window = None  # Discard reference.
 
-        if self.operation_window is None:
-            self.operation_window = GeophysicWindow(self.dict_data_well, self.table_widget)
-            self.operation_window.setWindowTitle("Геофизические исследования")
-            self.set_modal_window(self.operation_window)
-            self.pause_app()
-            data_list.pause = True
-            self.operation_window = None  # Discard reference.
-
-
-        else:
-            self.operation_window.close()  # Close window.
-            self.operation_window = None  # Discard reference.
-
-    def correctPVR(self):
+    def correct_perforation(self):
         from perforation_correct import PerforationCorrect
 
-        self.dict_data_well["current_bottom"], ok = QInputDialog.getDouble(self, 'Необходимый забой',
-                                                                           'Введите забой до которого нужно нормализовать')
-        if self.perforation_correct_window2 is None:
-            self.perforation_correct_window2 = PerforationCorrect(self.dict_data_well)
-            self.perforation_correct_window2.setWindowTitle("Сверка данных перфорации")
-            self.set_modal_window(self.perforation_correct_window2)
-            self.pause_app()
-            data_list.pause = True
-            self.perforation_correct_window2 = None
+        self.dict_data_well["current_bottom"], ok = QInputDialog.getDouble(
+            self, 'Необходимый забой', 'Введите забой до которого нужно нормализовать')
 
-        else:
-            self.perforation_correct_window2.close()
-            self.perforation_correct_window2 = None
+        self.perforation_correct_window2 = PerforationCorrect(self.dict_data_well)
+        self.perforation_correct_window2.setWindowTitle("Сверка данных перфорации")
+        self.set_modal_window(self.perforation_correct_window2)
 
         self.dict_data_well["data_list"][-1][1] = self.dict_data_well["current_bottom"]
 
@@ -2492,19 +2258,10 @@ class MyWindow(MyMainWindow):
 
     def correct_curator(self):
         from work_py.curators import SelectCurator
+        self.new_window = SelectCurator(self.dict_data_well)
+        self.set_modal_window(self.new_window)
 
-        if self.new_window is None:
-            self.new_window = SelectCurator(self.dict_data_well)
-            # WellCondition.leakage_window.setGeometry(200, 400, 300, 400)
-            self.set_modal_window(self.new_window)
-            self.pause_app()
-            data_list.pause = True
-            self.new_window = None  # Discard reference.
-        else:
-            self.new_window.close()  # Close window.
-            self.new_window = None  # Discard reference.
-
-    def correctNEK(self):
+    def correct_nek(self):
         from find import WellCondition
         from work_py.leakage_column import LeakageWindow
 
@@ -2513,14 +2270,8 @@ class MyWindow(MyMainWindow):
             WellCondition.leakage_window.setWindowTitle("Корректировка негерметичности")
             # WellCondition.leakage_window.setGeometry(200, 400, 300, 400)
             self.set_modal_window(WellCondition.leakage_window)
-
-            self.pause_app()
             self.dict_data_well["dict_leakiness"] = WellCondition.leakage_window.add_work()
             # print(f'словарь нарушений {self.dict_data_well["dict_leakiness"]}')
-            data_list.pause = True
-            WellCondition.leakage_window = None  # Discard reference.
-
-
         else:
             WellCondition.leakage_window.close()  # Close window.
             WellCondition.leakage_window = None  # Discard reference.
@@ -2535,23 +2286,18 @@ class MyWindow(MyMainWindow):
         from work_py.torpedo import TorpedoWindow
         self.add_window(TorpedoWindow)
 
-    def poNewWindow(self):
+    def po_new_window(self):
         from work_py.emergencyWork import emergencyECN
-
         template_pero_list = emergencyECN(self)
         self.populate_row(self.ins_ind, template_pero_list, self.table_widget)
 
-    def perforationNewWindow(self):
+    def perforation_new_window(self):
         from work_py.perforation import PerforationWindow
-
         if len(self.dict_data_well["cat_P_1"]) > 1:
             if self.dict_data_well["cat_P_1"][1] == 1 and self.dict_data_well["kat_pvo"] != 1:
                 msc = QMessageBox.information(self, 'Внимание', 'Не произведен монтаж первой категории')
                 return
         self.add_window(PerforationWindow)
-
-    def insertPerf(self):
-        self.populate_row(self.ins_ind, self.perforation_list)
 
     def create_short_plan(self, wb2, plan_short):
         from work_py.descent_gno import TabPageGno
@@ -2721,30 +2467,6 @@ class MyWindow(MyMainWindow):
 
         ws4.page_setup.fitToWidth = True
         ws4.print_area = 'C2:I14'
-
-    def check_gpp_upa(self, table_widget):
-        for row in range(table_widget.rowCount()):
-            for column in range(table_widget.columnCount()):
-                value = self.table_widget.item(row, column)
-                if value != None:
-                    value = value.text()
-                    if 'Установить подъёмный агрегат на устье не менее 40т' in value:
-                        new_value = QtWidgets.QTableWidgetItem(
-                            f'Установить подъёмный агрегат на устье не менее 60т. '
-                            f'Пусковой комиссией составить акт готовности подьемного '
-                            f'агрегата и бригады для проведения ремонта скважины.')
-                        table_widget.setItem(row, column, new_value)
-
-    def check_str_isdigit(self, string):
-
-        # Паттерн для проверки: допустимы только цифры, точка и запятая
-        pattern = r'^[\d.,]+$'
-
-        # Проверка строки на соответствие паттерну
-        if re.match(pattern, string):
-            return True
-        else:
-            return False
 
     @staticmethod
     def delete_files():

@@ -226,36 +226,38 @@ class WorkDatabaseWell:
         row_exists = cursor.fetchone()
         return row_exists
 
-    def insert_in_database_well_data(self, well_number: str, well_area: str, contractor: str,
-                                     costumer: str, data_well_dict: str, excel: str, work_plan: str) -> None:
-        data_well = json.dumps(data_well_dict, ensure_ascii=False)
+    def insert_in_database_well_data(self, dict_data_well, contractor: str, costumer: str, excel: str) -> None:
+        work_plan = dict_data_well["work_plan"]
+        well_number = dict_data_well["well_number"]._value
+        well_area = dict_data_well["well_area"]._value
+
+        data_well = json.dumps(dict_data_well["data_well_dict"], ensure_ascii=False)
         excel_json = json.dumps(excel, ensure_ascii=False)
         date_today = datetime.now().strftime('%Y-%m-%d')
 
-        type_kr = self.dict_data_well["type_kr"].split(' ')[0]
-        adedaas = self.dict_data_well["data_list"]
-        data_paragraph = json.dumps(self.dict_data_well["data_list"], ensure_ascii=False)
-        cdng = self.dict_data_well["cdng"]._value
+        type_kr = dict_data_well["type_kr"].split(' ')[0]
+        adedaas = dict_data_well["data_list"]
+        data_paragraph = json.dumps(dict_data_well["data_list"], ensure_ascii=False)
+        cdng = dict_data_well["cdng"]._value
 
-        wellhead_fittings = self.dict_data_well["wellhead_fittings"]
-        well_oilfield = self.dict_data_well["well_oilfield"]._value
-        inv_number = self.dict_data_well["inv_number"]._value
-        appointment = self.dict_data_well["appointment"]._value
-        category_dict = json.dumps(self.dict_data_well["dict_category"], ensure_ascii=False)
-        angle_data = json.dumps(self.dict_data_well["angle_data"], ensure_ascii=False)
-
+        wellhead_fittings = dict_data_well["wellhead_fittings"]
+        well_oilfield = dict_data_well["well_oilfield"]._value
+        inv_number = dict_data_well["inv_number"]._value
+        appointment = dict_data_well["appointment"]._value
+        category_dict = json.dumps(dict_data_well["dict_category"], ensure_ascii=False)
+        angle_data = json.dumps(dict_data_well["angle_data"], ensure_ascii=False)
 
         # print(row, self.dict_data_well["count_row_well"])
 
         if 'dop_plan' in work_plan:
-            work_plan_str = f'ДП№{self.dict_data_well["number_dp"]}'
+            work_plan_str = f'ДП№{dict_data_well["number_dp"]}'
         elif 'krs' in work_plan:
             work_plan_str = 'ПР'
         elif work_plan == 'plan_change':
-            if self.dict_data_well["work_plan_change"] == 'krs':
+            if dict_data_well["work_plan_change"] == 'krs':
                 work_plan_str = 'ПР'
             else:
-                work_plan_str = f'ДП№{self.dict_data_well["number_dp"]}'
+                work_plan_str = f'ДП№{dict_data_well["number_dp"]}'
 
         try:
             if not self.db_connection:
@@ -266,7 +268,8 @@ class WorkDatabaseWell:
                 if row_exists:
                     row_exists, date_in_base = row_exists
                     reply = QMessageBox.question(None, 'Строка найдена',
-                                                 f'Строка с {well_number} {well_area} {work_plan} уже существует от {date_in_base}. '
+                                                 f'Строка с {well_number} {well_area} {work_plan} уже '
+                                                 f'существует от {date_in_base}. '
                                                  f'Обновить данные?')
                     if reply == QMessageBox.Yes:
                         cursor.execute(f"""
@@ -287,8 +290,6 @@ class WorkDatabaseWell:
                             type_kr))
 
                         QMessageBox.information(None, 'Успешно', 'Данные обновлены')
-
-
                 else:
 
                     # Подготовленный запрос для вставки данных с параметрами
@@ -320,34 +321,34 @@ class WorkDatabaseWell:
             QMessageBox.warning(None, 'Ошибка', f'Ошибка подключения к базе данных  well_data'
                                                 f' {type(e).__name__}\n\n{str(e)}')
 
-    def insert_data_in_chemistry(self) -> None:
-        if self.dict_data_well["work_plan"] in ['dop_plan', 'dop_plan_in_base']:
-            string_work = f' ДП№ {self.dict_data_well["number_dp"]}'
-        elif self.dict_data_well["work_plan"] == 'krs':
+    def insert_data_in_chemistry(self, dict_data_well) -> None:
+        if dict_data_well["work_plan"] in ['dop_plan', 'dop_plan_in_base']:
+            string_work = f' ДП№ {dict_data_well["number_dp"]}'
+        elif dict_data_well["work_plan"] == 'krs':
             string_work = 'ПР'
-        elif self.dict_data_well["work_plan"] == 'plan_change':
-            if self.dict_data_well["work_plan_change"] == 'krs':
+        elif dict_data_well["work_plan"] == 'plan_change':
+            if dict_data_well["work_plan_change"] == 'krs':
                 string_work = 'ПР изм'
             else:
-                string_work = f'ДП№{self.dict_data_well["number_dp"]} изм '
+                string_work = f'ДП№{dict_data_well["number_dp"]} изм '
 
-        elif self.dict_data_well["work_plan"] == 'gnkt_bopz':
+        elif dict_data_well["work_plan"] == 'gnkt_bopz':
             string_work = 'ГНКТ БОПЗ ВНС'
-        elif self.dict_data_well["work_plan"] == 'gnkt_opz':
+        elif dict_data_well["work_plan"] == 'gnkt_opz':
             string_work = 'ГНКТ ОПЗ'
-        elif self.dict_data_well["work_plan"] == 'gnkt_after_grp':
+        elif dict_data_well["work_plan"] == 'gnkt_after_grp':
             string_work = 'ГНКТ ОСВ ГРП'
         else:
             string_work = 'ГНКТ'
 
         date_today = datetime.now()
-        data_work = (self.dict_data_well["well_number"]._value,
-                     self.dict_data_well["well_area"]._value,
-                     self.dict_data_well["region"],
+        data_work = (dict_data_well["well_number"]._value,
+                     dict_data_well["well_area"]._value,
+                     dict_data_well["region"],
                      data_list.costumer,
                      data_list.contractor,
                      string_work,
-                     self.dict_data_well["type_kr"].split(" ")[0],
+                     dict_data_well["type_kr"].split(" ")[0],
                      date_today,
                      data_list.DICT_VOLUME_CHEMISTRY['цемент'],
                      data_list.DICT_VOLUME_CHEMISTRY['HCl'],
@@ -364,10 +365,9 @@ class WorkDatabaseWell:
                      data_list.DICT_VOLUME_CHEMISTRY["РИР 2С"],
                      data_list.DICT_VOLUME_CHEMISTRY["РИР ОВП"],
                      data_list.DICT_VOLUME_CHEMISTRY['гидрофабизатор'],
-                     round(self.dict_data_well["norm_of_time"], 1),
-                     self.dict_data_well["fluid"]
+                     round(dict_data_well["norm_of_time"], 1),
+                     dict_data_well["fluid"]
                      )
-
 
         cursor = self.db_connection.cursor()
         query = f"""SELECT * FROM chemistry
@@ -468,6 +468,7 @@ class WorkDatabaseWell:
             return data_well
 
         return False
+
     def check_in_database_dp_data(self, number_well, area_well, work_plan):
         if not self.db_connection:
             return None
@@ -824,8 +825,6 @@ def connection_to_database(DB_NAME):
                                 f'Ошибка подключения к базе данных, '
                                 f'проверьте наличие базы {type(e).__name__}\n\n{str(e)}')
         return db
-
-
 
 
 #
