@@ -809,13 +809,16 @@ def connection_to_database(DB_NAME):
         try:
             db = PostgresConnection(DB_NAME)
             db2 = db.connect_to_database()
-
+            if db2:
+                return db
+            else:
+                return db2
 
         except psycopg2.Error as e:
             data_list.connect_in_base = False
             print(f'Ошибка подключения к базе данных, проверьте наличие интернета {type(e).__name__}\n\n{str(e)}')
-            return None
-        return db2
+
+            return False
 
     else:
         DB_NAME = f'{DB_NAME}.db'
